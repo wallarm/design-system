@@ -1,0 +1,9 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "non.geist";
+@import "non.geist/mono";
+@import "@wallarm/design-system/theme";
+
+body {
+    background: var(--color-bg-surface-1);
+}

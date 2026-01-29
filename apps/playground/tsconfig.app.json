@@ -1,0 +1,10 @@
+{
+  "extends": "@wallarm/typescript-config/react-app.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "outDir": "dist"
+  },
+  "include": ["src", "rsbuild.config.ts"],
+  "exclude": ["**/*.test.*", "**/*.spec.*", "node_modules", "dist"]
+}

@@ -1,0 +1,4 @@
+# Only run commitizen in interactive mode (not during rebase, merge, etc.)
+if [ "$2" = "" ] && [ -t 1 ]; then
+  exec < /dev/tty && npx cz --hook || true
+fi

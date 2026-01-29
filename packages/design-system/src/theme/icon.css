@@ -1,0 +1,13 @@
+@theme {
+  --icon-xs: 10px;
+  --icon-sm: 12px;
+  --icon-md: 16px;
+  --icon-lg: 20px;
+  --icon-xl: 24px;
+  --icon-2xl: 32px;
+}
+
+@utility icon-* {
+    width: --value(--icon-*);
+    height: --value(--icon-*);
+}

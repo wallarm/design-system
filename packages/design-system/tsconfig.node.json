@@ -1,0 +1,11 @@
+{
+  "extends": "@wallarm/typescript-config/nodejs.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "outDir": "dist"
+  },
+  "include": ["scripts"]
+}

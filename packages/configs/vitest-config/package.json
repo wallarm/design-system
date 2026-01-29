@@ -1,0 +1,29 @@
+{
+  "name": "@wallarm/vitest-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist"
+  },
+  "exports": {
+    "./base": "./dist/base.js",
+    "./react": "./dist/react.js"
+  },
+  "dependencies": {
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "catalog:",
+    "@testing-library/user-event": "catalog:",
+    "@vitest/ui": "4.0.18",
+    "jsdom": "27.4.0",
+    "vitest": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@wallarm/typescript-config": "workspace:*",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "typescript": "catalog:"
+  }
+}

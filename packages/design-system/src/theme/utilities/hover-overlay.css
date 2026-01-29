@@ -1,0 +1,27 @@
+@utility overlay {
+    position: relative;
+    overflow: hidden;
+
+    &:before {
+        pointer-events: none;
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+
+        background: transparent;
+
+        @apply transition-colors;
+    }
+}
+
+@utility overlay-* {
+    position: relative;
+
+    &:before {
+        background: --value(--color-*);
+        border-radius: inherit;
+    }
+}

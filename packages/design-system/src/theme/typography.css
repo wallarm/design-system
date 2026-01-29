@@ -1,0 +1,79 @@
+@theme {
+    --font-sans:
+        'Geist Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-sans-display:
+        'Geist Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+    --font-mono:
+        'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        'Liberation Mono', 'Courier New', monospace;
+    --font-serif: 'Inter', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
+
+    --font-weight-thin: 100;
+    --font-weight-extralight: 200;
+    --font-weight-light: 300;
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    --font-weight-extrablod: 800;
+    --font-weight-black: 900;
+
+    --text-2xs: 10px;
+    --text-2xs--line-height: 12px;
+
+    --text-xs: 12px;
+    --text-xs--line-height: 16px;
+
+    --text-sm: 14px;
+    --text-sm--line-height: 20px;
+
+    --text-base: 16px;
+    --text-base--line-height: 24px;
+
+    --text-lg: 18px;
+    --text-lg--line-height: 24px;
+
+    --text-xl: 20px;
+    --text-xl--line-height: 28px;
+
+    --text-2xl: 24px;
+    --text-2xl--line-height: 32px;
+
+    --text-3xl: 30px;
+    --text-3xl--line-height: 36px;
+
+    --text-4xl: 36px;
+    --text-4xl--line-height: 40px;
+
+    --text-5xl: 48px;
+    --text-5xl--line-height: 48px;
+
+    --text-6xl: 60px;
+    --text-6xl--line-height: 60px;
+
+    --text-7xl: 72px;
+    --text-7xl--line-height: 72px;
+
+    --text-8xl: 96px;
+    --text-8xl--line-height: 96px;
+
+    --text-9xl: 128px;
+    --text-9xl--line-height: 128px;
+
+    --leading-2xs: 12px;
+    --leading-xs: 16px;
+    --leading-sm: 20px;
+    --leading-base: 24px;
+    --leading-lg: 24px;
+    --leading-xl: 28px;
+    --leading-2xl: 32px;
+    --leading-3xl: 36px;
+    --leading-4xl: 40px;
+    --leading-5xl: 48px;
+    --leading-6xl: 60px;
+    --leading-7xl: 72px;
+    --leading-8xl: 96px;
+    --leading-9xl: 128px;
+}

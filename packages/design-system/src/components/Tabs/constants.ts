@@ -1,0 +1,1 @@
+export const TABS_SCROLL_BUTTON_WIDTH = 32;

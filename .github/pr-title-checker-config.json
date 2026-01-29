@@ -1,0 +1,25 @@
+{
+  "LABEL": {
+    "name": "title needs formatting",
+    "color": "EEEEEE"
+  },
+  "CHECKS": {
+    "prefixes": [
+      "feat: ",
+      "fix: ",
+      "docs: ",
+      "style: ",
+      "refactor: ",
+      "test: ",
+      "chore: ",
+      "ci: "
+    ],
+    "regexp": "^(#)?(feat|fix|docs|style|refactor|test|chore|ci)(\\(.*\\))?:?\\s.+",
+    "ignoreLabels": ["skip-title-check"]
+  },
+  "MESSAGES": {
+    "success": "PR title follows the convention!",
+    "failure": "PR title does not follow the convention. Please use format: 'type: description' or '#type(scope): description'",
+    "notice": ""
+  }
+}

@@ -1,0 +1,872 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, dev, 'alpha/*', 'beta/*', 'rc/*']
+  pull_request:
+    branches: [main]
+  pull_request_target:
+    branches: [main]
+    types: [opened, edited, synchronize, labeled, unlabeled, ready_for_review, reopened]
+  workflow_dispatch:
+    inputs:
+      release_type:
+        description: 'Release type'
+        required: true
+        default: 'skip'
+        type: choice
+        options:
+          - skip
+          - stable
+          - prerelease
+      prerelease_tag:
+        description: 'Prerelease tag (only for prerelease type)'
+        required: false
+        default: 'dev'
+        type: choice
+        options:
+          - dev
+          - alpha
+          - beta
+          - rc
+
+concurrency:
+  cancel-in-progress: true
+  group: ${{ github.workflow }}-${{ github.ref }}
+
+permissions:
+  contents: read
+  packages: write
+  pull-requests: write
+  id-token: write
+
+env:
+  NODE_VERSION: "24"
+  PNPM_VERSION: "10.22.0"
+  PLAYWRIGHT_VERSION: "v1.58.0-noble"
+  SCREENSHOT_COMMIT_MESSAGE: "🖼️ Update screenshots"
+
+jobs:
+  check-pr-title:
+    name: Check PR Title
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' || github.event_name == 'pull_request_target'
+    steps:
+      - name: Check PR title format
+        uses: thehanimo/pr-title-checker@v1.4.1
+        with:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          configuration_path: .github/pr-title-checker-config.json
+          pass_on_octokit_error: false
+
+  setup:
+    name: Setup & Dependencies
+    runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+      should-update-screenshots: ${{ steps.check-screenshots.outputs.should_update }}
+      should-skip-e2e: ${{ steps.check-e2e-skip.outputs.should_skip }}
+      is-bot-screenshot-commit: ${{ steps.check-bot-screenshot.outputs.is_bot_screenshot }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check if bot screenshot commit
+        id: check-bot-screenshot
+        run: |
+          echo "=== DEBUG: Bot screenshot commit check ==="
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit SHA: ${{ github.sha }}"
+
+          # Get commit author and message based on event type
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # For PR events, get the HEAD commit info using git
+            COMMIT_AUTHOR=$(git log -1 --pretty=format:"%an" "${{ github.event.pull_request.head.sha }}")
+            COMMIT_MSG=$(git log -1 --pretty=format:"%s" "${{ github.event.pull_request.head.sha }}")
+            echo "PR HEAD commit (SHA: ${{ github.event.pull_request.head.sha }}):"
+          else
+            # For push events, use head_commit
+            COMMIT_AUTHOR="${{ github.event.head_commit.author.name }}"
+            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            echo "Push commit:"
+          fi
+
+          echo "Author: $COMMIT_AUTHOR"
+          echo "Message: $COMMIT_MSG"
+          echo "=== END COMMIT INFO ==="
+
+          # Check if it's a bot commit with screenshot update message
+          if [[ "$COMMIT_AUTHOR" == "github-actions[bot]" && "$COMMIT_MSG" == "${{ env.SCREENSHOT_COMMIT_MESSAGE }}" ]]; then
+            echo "is_bot_screenshot=true" >> $GITHUB_OUTPUT
+            echo "✅ Bot screenshot commit DETECTED - will skip web build and E2E tests"
+          else
+            echo "is_bot_screenshot=false" >> $GITHUB_OUTPUT
+            echo "❌ Not a bot screenshot commit - normal workflow"
+          fi
+
+          echo "Final is_bot_screenshot value: $(grep is_bot_screenshot $GITHUB_OUTPUT || echo 'not found')"
+
+      - name: Check screenshot update trigger
+        id: check-screenshots
+        run: |
+          echo "=== DEBUG: Screenshot update trigger ==="
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit SHA: ${{ github.sha }}"
+
+          # Get commit message based on event type
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # For PR events, get the HEAD commit message using git
+            COMMIT_MSG=$(git log -1 --pretty=format:"%s" "${{ github.event.pull_request.head.sha }}")
+            echo "PR HEAD commit message (SHA: ${{ github.event.pull_request.head.sha }}):"
+          else
+            # For push events, use head_commit
+            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            echo "Push commit message:"
+          fi
+
+          echo "$COMMIT_MSG"
+          echo "=== END COMMIT MESSAGE ==="
+
+          if [[ "$COMMIT_MSG" == *"[update-screenshots]"* ]]; then
+            echo "should_update=true" >> $GITHUB_OUTPUT
+            echo "✅ [update-screenshots] trigger FOUND - setting should_update=true"
+          else
+            echo "should_update=false" >> $GITHUB_OUTPUT
+            echo "❌ [update-screenshots] trigger NOT FOUND - setting should_update=false"
+          fi
+
+          echo "Final should_update value: $(grep should_update $GITHUB_OUTPUT || echo 'not found')"
+
+      - name: Check E2E skip trigger
+        id: check-e2e-skip
+        run: |
+          echo "=== DEBUG: E2E skip trigger ==="
+          echo "Event: ${{ github.event_name }}"
+          echo "Branch: ${{ github.ref }}"
+          echo "Commit SHA: ${{ github.sha }}"
+
+          # Get commit message based on event type
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            # For PR events, get the HEAD commit message using git
+            COMMIT_MSG=$(git log -1 --pretty=format:"%s" "${{ github.event.pull_request.head.sha }}")
+            echo "PR HEAD commit message (SHA: ${{ github.event.pull_request.head.sha }}):"
+          else
+            # For push events, use head_commit
+            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            echo "Push commit message:"
+          fi
+
+          echo "$COMMIT_MSG"
+          echo "=== END COMMIT MESSAGE ==="
+
+          if [[ "$COMMIT_MSG" == *"[skip-e2e]"* ]]; then
+            echo "should_skip=true" >> $GITHUB_OUTPUT
+            echo "✅ [skip-e2e] trigger FOUND - setting should_skip=true"
+          else
+            echo "should_skip=false" >> $GITHUB_OUTPUT
+            echo "❌ [skip-e2e] trigger NOT FOUND - setting should_skip=false"
+          fi
+
+          echo "Final should_skip value: $(grep should_skip $GITHUB_OUTPUT || echo 'not found')"
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Generate cache key
+        id: cache-key
+        run: |
+          echo "key=deps-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}" >> $GITHUB_OUTPUT
+
+      - name: Cache dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+            .pnpm-store
+          key: ${{ steps.cache-key.outputs.key }}
+          restore-keys: |
+            deps-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+
+  quality:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    needs: [setup]
+    if: github.event_name != 'pull_request_target'
+    strategy:
+      matrix:
+        check: [lint, typecheck, test]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+            .pnpm-store
+          key: ${{ needs.setup.outputs.cache-key }}
+          restore-keys: |
+            deps-${{ runner.os }}-
+
+      - name: Install dependencies (if cache miss)
+        run: pnpm install --frozen-lockfile
+
+      - name: Run lint
+        if: matrix.check == 'lint'
+        run: pnpm lint
+
+      - name: Run typecheck
+        if: matrix.check == 'typecheck'
+        run: pnpm typecheck
+
+      - name: Run tests
+        if: matrix.check == 'test'
+        run: pnpm test:run
+
+  build:
+    name: Build Docker Images
+    runs-on: ubuntu-latest
+    needs: [setup, quality]
+    if: github.event_name != 'pull_request_target'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Storybook image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: packages/design-system/Dockerfile
+          push: true
+          tags: ghcr.io/wallarm/design-system:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+  e2e:
+    name: E2E Tests (shard ${{ matrix.shard }})
+    runs-on: ubuntu-latest
+    needs: [setup, build]
+    if: |
+      github.event_name != 'pull_request_target' &&
+      needs.setup.outputs.should-update-screenshots != 'true' &&
+      needs.setup.outputs.should-skip-e2e != 'true' &&
+      needs.setup.outputs.is-bot-screenshot-commit != 'true'
+    strategy:
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull Docker image
+        run: |
+          echo "Pulling Docker image..."
+          docker pull ghcr.io/wallarm/design-system:${{ github.sha }}
+
+
+
+      - name: Start Storybook service
+        run: |
+          echo "Starting Storybook container..."
+          docker run -d --name storybook-service -p 6006:80 ghcr.io/wallarm/design-system:${{ github.sha }} || {
+            echo "Failed to start storybook-service, checking image..."
+            docker images | grep design-system
+            exit 1
+          }
+
+          echo "Waiting for container to initialize..."
+          sleep 10
+
+          echo "=== Docker container status ==="
+          docker ps -a
+
+          echo "=== Storybook service detailed status ==="
+          docker inspect storybook-service | grep -A 10 "State"
+
+          echo "=== Storybook service logs ==="
+          docker logs storybook-service 2>&1 || true
+
+          echo "=== Check port availability ==="
+          ss -tlpn | grep ':6006' || echo "Port not listening"
+
+          echo "=== Test direct container access ==="
+          docker exec storybook-service curl -f http://localhost:80/health || echo "Storybook container health check failed"
+
+
+
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+            .pnpm-store
+          key: ${{ needs.setup.outputs.cache-key }}
+          restore-keys: |
+            deps-${{ runner.os }}-
+
+
+
+      - name: Install dependencies (if cache miss)
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Build configurations
+        run: pnpm build
+
+      - name: Wait for Storybook service
+        run: |
+          echo "Checking if Storybook is running..."
+          if ! docker ps | grep -q storybook-service; then
+            echo "Storybook service not running, checking container status..."
+            docker ps -a | grep storybook-service || echo "Container not found"
+            docker logs storybook-service 2>&1 || echo "No logs available"
+          fi
+
+          echo "Waiting for Storybook to be ready..."
+          timeout 60 sh -c 'until curl -f http://localhost:6006/health; do echo "Waiting for Storybook..."; sleep 2; done' || {
+            echo "Storybook service failed to start on port 6006"
+            exit 1
+          }
+
+
+
+      - name: Run E2E tests for Storybook (shard ${{ matrix.shard }}/3)
+        run: pnpm --filter=@wallarm/design-system exec playwright test --config=playwright.config.docker.ts --shard=${{ matrix.shard }}/3 --project=chromium
+        env:
+          CI: true
+          STORYBOOK_URL: http://localhost:6006
+
+      - name: Stop service
+        if: always()
+        run: |
+          docker stop storybook-service || true
+          docker rm storybook-service || true
+
+
+      - name: Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-results-storybook-shard-${{ matrix.shard }}
+          path: |
+            packages/design-system/test-results/
+            packages/design-system/playwright-report/
+
+
+
+
+  e2e-update-screenshots:
+    name: E2E Update Screenshots (Storybook, shard ${{ matrix.shard }})
+    runs-on: ubuntu-latest
+    needs: [setup, build]
+    if: |
+      needs.setup.outputs.should-update-screenshots == 'true'
+    strategy:
+      matrix:
+        shard: [1, 2, 3]
+    steps:
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull Docker image
+        run: |
+          echo "Pulling Docker image..."
+          docker pull ghcr.io/wallarm/design-system:${{ github.sha }}
+
+      - name: Start services
+        run: |
+          echo "Starting Docker containers..."
+          docker run -d --name ui-service -p 6006:80 ghcr.io/wallarm/design-system:${{ github.sha }} || {
+            echo "Failed to start ui-service, checking image..."
+            docker images | grep design-system
+            exit 1
+          }
+
+          docker run -d --name web-service -p 3000:80 ghcr.io/wallarm/design-system-playground:${{ github.sha }} || {
+            echo "Failed to start web-service, checking image..."
+            docker images | grep design-system-playground
+            exit 1
+          }
+
+          echo "Waiting for containers to initialize..."
+          sleep 10
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+            .pnpm-store
+          key: ${{ needs.setup.outputs.cache-key }}
+          restore-keys: |
+            deps-${{ runner.os }}-
+
+      - name: Install dependencies (if cache miss)
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        run: pnpm exec playwright install --with-deps
+
+      - name: Build configurations
+        run: pnpm build
+
+      - name: Wait for services
+        run: |
+          echo "Checking if services are running..."
+          timeout 60 sh -c 'until curl -f http://localhost:6006/health; do echo "Waiting for UI..."; sleep 2; done' || {
+            echo "UI service failed to start on port 6006"
+            exit 1
+          }
+
+          timeout 60 sh -c 'until curl -f http://localhost:3000/health; do echo "Waiting for Web..."; sleep 2; done' || {
+            echo "Web service failed to start on port 3000"
+            exit 1
+          }
+
+      - name: Update screenshots for Storybook (shard ${{ matrix.shard }}/3)
+        run: pnpm --filter=@wallarm/design-system exec playwright test --config=playwright.config.docker.ts --project=chromium --update-snapshots --shard=${{ matrix.shard }}/3
+        env:
+          CI: false
+          STORYBOOK_URL: http://localhost:6006
+
+      - name: Stop service
+        if: always()
+        run: |
+          docker stop storybook-service || true
+          docker rm storybook-service || true
+
+      - name: Upload updated screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: screenshots-storybook-shard-${{ matrix.shard }}
+          path: |
+            packages/design-system/src/**/*.png
+          retention-days: 1
+
+  commit-updated-screenshots:
+    name: Commit Updated Screenshots
+    runs-on: ubuntu-latest
+    needs: [e2e-update-screenshots]
+    if: always() && needs.e2e-update-screenshots.result == 'success'
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          ref: ${{ github.head_ref || github.ref_name }}
+          fetch-depth: 0
+
+      - name: Download all screenshot artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: screenshots-*-shard-*
+          merge-multiple: true
+
+      - name: Check for screenshot changes
+        id: changes
+        run: |
+          git add .
+          if git diff --cached --quiet; then
+            echo "has_changes=false" >> $GITHUB_OUTPUT
+            echo "No screenshot changes detected"
+          else
+            echo "has_changes=true" >> $GITHUB_OUTPUT
+            echo "Screenshot changes detected:"
+            git diff --cached --name-only
+          fi
+
+      - name: Commit updated screenshots
+        if: steps.changes.outputs.has_changes == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git commit -m "${{ env.SCREENSHOT_COMMIT_MESSAGE }}" --no-verify
+          git push
+
+  release:
+    name: Release packages
+    runs-on: ubuntu-latest
+    needs: [setup, e2e, build]
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      (needs.e2e.result == 'success' || needs.e2e.result == 'skipped' || needs.setup.outputs.should-skip-e2e == 'true' || needs.setup.outputs.is-bot-screenshot-commit == 'true') &&
+      (
+        (github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/alpha/') || startsWith(github.ref, 'refs/heads/beta/') || startsWith(github.ref, 'refs/heads/rc/'))) ||
+        (github.event_name == 'workflow_dispatch' && github.event.inputs.release_type != 'skip')
+      )
+    permissions:
+      contents: write
+      packages: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+
+      - name: Restore cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            node_modules
+            */*/node_modules
+            .pnpm-store
+          key: ${{ needs.setup.outputs.cache-key }}
+          restore-keys: |
+            deps-${{ runner.os }}-
+
+      - name: Install dependencies (if cache miss)
+        run: pnpm install --frozen-lockfile
+
+      - name: Build packages
+        run: pnpm build
+
+      - name: Check for changesets
+        id: changesets-check
+        run: |
+          if [ -d .changeset ] && [ "$(ls -A .changeset/*.md 2>/dev/null | grep -v README.md)" ]; then
+            echo "has_changesets=true" >> $GITHUB_OUTPUT
+            echo "✅ Found changesets"
+          else
+            echo "has_changesets=false" >> $GITHUB_OUTPUT
+            echo "📝 No changesets found"
+          fi
+
+      - name: Analyze commits for version bump
+        id: analyze-commits
+        if: steps.changesets-check.outputs.has_changesets == 'false'
+        run: |
+          echo "Analyzing commits since last release..."
+
+          # Get the last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+
+          if [ -z "$LAST_TAG" ]; then
+            echo "No previous tags found, checking all commits"
+            COMMITS=$(git log --oneline --pretty=format:"%s")
+          else
+            echo "Checking commits since $LAST_TAG"
+            COMMITS=$(git log "$LAST_TAG"..HEAD --oneline --pretty=format:"%s")
+          fi
+
+          # Determine version bump type based on conventional commits
+          VERSION_BUMP="patch"
+
+          if echo "$COMMITS" | grep -qE "^(feat|feature)(\(.+\))?!:"; then
+            VERSION_BUMP="major"
+            echo "💥 Found breaking change (feat!)"
+          elif echo "$COMMITS" | grep -qE "BREAKING CHANGE:"; then
+            VERSION_BUMP="major"
+            echo "💥 Found BREAKING CHANGE"
+          elif echo "$COMMITS" | grep -qE "^(feat|feature)(\(.+\))?:"; then
+            VERSION_BUMP="minor"
+            echo "✨ Found feature commit"
+          elif echo "$COMMITS" | grep -qE "^fix(\(.+\))?:"; then
+            VERSION_BUMP="patch"
+            echo "🐛 Found fix commit"
+          fi
+
+          echo "version_bump=$VERSION_BUMP" >> $GITHUB_OUTPUT
+          echo "📊 Suggested version bump: $VERSION_BUMP"
+
+      - name: Create automatic changeset
+        if: steps.changesets-check.outputs.has_changesets == 'false' && github.ref == 'refs/heads/main' && github.event_name != 'workflow_dispatch'
+        run: |
+          VERSION_BUMP="${{ steps.analyze-commits.outputs.version_bump }}"
+
+          # Create changeset directory if it doesn't exist
+          mkdir -p .changeset
+
+          # Generate changeset filename
+          CHANGESET_ID="auto-$(date +%s)"
+
+          # Create changeset file
+          cat > .changeset/${CHANGESET_ID}.md << EOF
+          ---
+          "@wallarm/design-system": $VERSION_BUMP
+          "@wallarm/eslint-config-wallarm": $VERSION_BUMP
+          "@wallarm/prettier-config-wallarm": $VERSION_BUMP
+          "@wallarm/stylelint-config-wallarm": $VERSION_BUMP
+          "@wallarm/tailwind-config-wallarm": $VERSION_BUMP
+          "@wallarm/tsconfig-wallarm": $VERSION_BUMP
+          ---
+
+          Automatic version bump based on conventional commits
+          EOF
+
+          echo "📝 Created automatic changeset for $VERSION_BUMP version bump"
+          echo "auto_changeset_created=true" >> $GITHUB_ENV
+
+      - name: Determine release type
+        id: release-type
+        run: |
+          # Check if manual trigger with specific release type
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            if [[ "${{ github.event.inputs.release_type }}" == "stable" ]]; then
+              echo "type=stable" >> $GITHUB_OUTPUT
+              echo "tag=latest" >> $GITHUB_OUTPUT
+            elif [[ "${{ github.event.inputs.release_type }}" == "prerelease" ]]; then
+              echo "type=prerelease" >> $GITHUB_OUTPUT
+              echo "tag=${{ github.event.inputs.prerelease_tag }}" >> $GITHUB_OUTPUT
+              echo "suffix=${{ github.event.inputs.prerelease_tag }}" >> $GITHUB_OUTPUT
+            fi
+          # Automatic trigger based on branch
+          elif [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+            echo "type=stable" >> $GITHUB_OUTPUT
+            echo "tag=latest" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == "refs/heads/dev" ]]; then
+            echo "type=prerelease" >> $GITHUB_OUTPUT
+            echo "tag=dev" >> $GITHUB_OUTPUT
+            echo "suffix=dev" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/heads/alpha/* ]]; then
+            echo "type=prerelease" >> $GITHUB_OUTPUT
+            echo "tag=alpha" >> $GITHUB_OUTPUT
+            echo "suffix=alpha" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/heads/beta/* ]]; then
+            echo "type=prerelease" >> $GITHUB_OUTPUT
+            echo "tag=beta" >> $GITHUB_OUTPUT
+            echo "suffix=beta" >> $GITHUB_OUTPUT
+          elif [[ "${{ github.ref }}" == refs/heads/rc/* ]]; then
+            echo "type=prerelease" >> $GITHUB_OUTPUT
+            echo "tag=rc" >> $GITHUB_OUTPUT
+            echo "suffix=rc" >> $GITHUB_OUTPUT
+          fi
+
+          echo "Release type: $(grep type $GITHUB_OUTPUT || echo 'not set')"
+          echo "Tag: $(grep tag $GITHUB_OUTPUT || echo 'not set')"
+
+      - name: Version and Publish with auto-changeset
+        if: steps.release-type.outputs.type == 'stable' && env.auto_changeset_created == 'true'
+        run: |
+          # Apply version bump from changeset
+          pnpm changeset version
+
+          # Commit version changes
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git diff --staged --quiet && git diff --quiet; then
+            echo "No version changes needed"
+          else
+            git add -A
+            git commit -m "chore: version packages [skip ci]"
+
+            # Push changes back to the branch
+            git push origin HEAD:${{ github.ref_name }}
+          fi
+
+          # Publish packages to npm
+          pnpm changeset publish
+
+          # Create GitHub release
+          VERSION=$(node -p "require('./packages/design-system/package.json').version")
+          gh release create "v$VERSION" \
+            --title "v$VERSION" \
+            --notes "Automatic release based on conventional commits" \
+            --target ${{ github.sha }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Create Release Pull Request or Publish (stable)
+        if: steps.release-type.outputs.type == 'stable' && env.auto_changeset_created != 'true'
+        id: changesets-stable
+        uses: changesets/action@v1
+        with:
+          publish: pnpm release
+          title: "🚀 Release"
+          commit: "chore: version packages"
+          createGithubReleases: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Generate and publish prerelease
+        if: steps.release-type.outputs.type == 'prerelease'
+        run: |
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          pnpm changeset version --snapshot ${{ steps.release-type.outputs.suffix }}-${SHORT_SHA}
+          pnpm changeset publish --tag ${{ steps.release-type.outputs.tag }} --no-git-tag
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Release summary (stable - manual changeset)
+        if: steps.release-type.outputs.type == 'stable' && env.auto_changeset_created != 'true' && steps.changesets-stable.outputs.published == 'true'
+        run: |
+          echo "🎉 Successfully published stable release:"
+          echo "${{ steps.changesets-stable.outputs.publishedPackages }}"
+
+      - name: Release summary (stable - auto changeset)
+        if: steps.release-type.outputs.type == 'stable' && env.auto_changeset_created == 'true'
+        run: |
+          VERSION=$(node -p "require('./packages/design-system/package.json').version")
+          echo "🎉 Successfully published stable release: v$VERSION"
+          echo "Release was automatically versioned based on conventional commits"
+
+      - name: Release summary (prerelease)
+        if: steps.release-type.outputs.type == 'prerelease'
+        run: |
+          echo "🚀 Published prerelease with tag: ${{ steps.release-type.outputs.tag }}"
+
+  deploy-storybook:
+    name: Deploy Storybook to GitHub Pages
+    runs-on: ubuntu-latest
+    needs: [setup, e2e, build]
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      (needs.e2e.result == 'success' || needs.e2e.result == 'skipped' || needs.setup.outputs.should-skip-e2e == 'true' || needs.setup.outputs.is-bot-screenshot-commit == 'true') &&
+      github.ref == 'refs/heads/main' &&
+      github.event_name == 'push'
+    permissions:
+      contents: read
+      packages: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Pull Storybook Docker image
+        run: docker pull ghcr.io/wallarm/design-system:${{ github.sha }}
+
+      - name: Extract static files from Docker
+        run: |
+          echo "Creating container from Storybook image..."
+          docker create --name ui-extract ghcr.io/wallarm/design-system:${{ github.sha }}
+
+          echo "Extracting storybook static files..."
+          docker cp ui-extract:/usr/share/nginx/html ./storybook-static
+
+          echo "Cleaning up container..."
+          docker rm ui-extract
+
+          echo "Files extracted successfully:"
+          ls -la ./storybook-static
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./storybook-static
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Deployment notification
+        run: |
+          echo "🚀 Storybook deployed to GitHub Pages!"
+          echo "URL: ${{ steps.deployment.outputs.page_url }}"

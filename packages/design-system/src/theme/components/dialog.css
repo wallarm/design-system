@@ -1,0 +1,5 @@
+:root {
+    --dialog-pushed-back-scale: 0.98;
+    --dialog-pushed-back-ratio: 0.02;
+    --dialog-pushed-back-offset: 32px;
+}

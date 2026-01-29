@@ -1,0 +1,8 @@
+:root {
+    --drawer-overlay-z-index: 40;
+    --drawer-positioner-z-index: 50;
+    --drawer-level-ratio: calc(var(--drawer-overlay-z-index) / 2);
+    --drawer-pushed-back-scale: 0.98;
+    --drawer-pushed-back-ratio: 0.02;
+    --drawer-pushed-back-offset: 60px;
+}

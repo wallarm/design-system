@@ -1,0 +1,85 @@
+@theme {
+    --color-slate-50: #f8fafc;
+    --color-slate-100: #f1f5f9;
+    --color-slate-200: #e2e8f0;
+    --color-slate-300: #cad5e2;
+    --color-slate-400: #90a1b9;
+    --color-slate-500: #62748e;
+    --color-slate-600: #45556c;
+    --color-slate-700: #314158;
+    --color-slate-800: #1d293d;
+    --color-slate-900: #0f172b;
+    --color-slate-950: #020618;
+
+    --color-red-50: #fef2f2;
+    --color-red-100: #ffe2e2;
+    --color-red-200: #ffc9c9;
+    --color-red-300: #ffa2a2;
+    --color-red-400: #ff6467;
+    --color-red-500: #fb2c36;
+    --color-red-600: #e7000b;
+    --color-red-700: #c10007;
+    --color-red-800: #9f0712;
+    --color-red-900: #82181a;
+    --color-red-950: #460809;
+
+    --color-w-orange-50: #fff5ed;
+    --color-w-orange-100: #ffe1d0;
+    --color-w-orange-200: #ffc8ac;
+    --color-w-orange-300: #ffa985;
+    --color-w-orange-400: #ff8a52;
+    --color-w-orange-500: #ff6633;
+    --color-w-orange-600: #ff441c;
+    --color-w-orange-700: #e12f0c;
+    --color-w-orange-800: #b82005;
+    --color-w-orange-900: #911908;
+    --color-w-orange-950: #560e06;
+
+    --color-amber-50: #fffbeb;
+    --color-amber-100: #fef3c6;
+    --color-amber-200: #fee685;
+    --color-amber-300: #ffd230;
+    --color-amber-400: #ffb900;
+    --color-amber-500: #fe9a00;
+    --color-amber-600: #e17100;
+    --color-amber-700: #bb4d00;
+    --color-amber-800: #973c00;
+    --color-amber-900: #7b3306;
+    --color-amber-950: #461901;
+
+    --color-green-50: #f0fdf4;
+    --color-green-100: #dcfce7;
+    --color-green-200: #b9f8cf;
+    --color-green-300: #7bf1a8;
+    --color-green-400: #05df72;
+    --color-green-500: #00c950;
+    --color-green-600: #00a63e;
+    --color-green-700: #008236;
+    --color-green-800: #016630;
+    --color-green-900: #0d542b;
+    --color-green-950: #032e15;
+
+    --color-blue-50: #eff6ff;
+    --color-blue-100: #dbeafe;
+    --color-blue-200: #bedbff;
+    --color-blue-300: #8ec5ff;
+    --color-blue-400: #51a2ff;
+    --color-blue-500: #2b7fff;
+    --color-blue-600: #155dfc;
+    --color-blue-700: #1447e6;
+    --color-blue-800: #193cb8;
+    --color-blue-900: #1c398e;
+    --color-blue-950: #162456;
+
+    --color-purple-50: #faf5ff;
+    --color-purple-100: #f3e8ff;
+    --color-purple-200: #e9d4ff;
+    --color-purple-300: #dab2ff;
+    --color-purple-400: #c27aff;
+    --color-purple-500: #ad46ff;
+    --color-purple-600: #9810fa;
+    --color-purple-700: #8200db;
+    --color-purple-800: #6e11b0;
+    --color-purple-900: #59168b;
+    --color-purple-950: #3c0366;
+}

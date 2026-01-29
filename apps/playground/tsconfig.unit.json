@@ -1,0 +1,9 @@
+{
+  "extends": "@wallarm/typescript-config/unit.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "outDir": "dist"
+  },
+  "include": ["vitest.config.ts", "**/*.test.*", "**/*.spec.*"]
+}

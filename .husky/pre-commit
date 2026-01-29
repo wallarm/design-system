@@ -1,0 +1,1 @@
+pnpm typecheck --affected && pnpm lint --affected && pnpm format --affected
