@@ -1,0 +1,12 @@
+{
+  "name": "@wallarm/tailwind-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./postcss": "./postcss.config.js"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "4.1.18"
+  }
+}

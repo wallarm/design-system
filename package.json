@@ -1,0 +1,136 @@
+{
+  "name": "wallarm-design-system",
+  "version": "0.1.0",
+  "description": "A comprehensive design system and component library for Wallarm",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wallarm/design-system.git"
+  },
+  "license": "MIT",
+  "author": "Wallarm",
+  "scripts": {
+    "build": "turbo run build",
+    "build:configs": "pnpm --filter=\"./packages/configs/*\" build",
+    "dev": "turbo run dev",
+    "web:dev": "pnpm --filter=@wallarm/playground dev",
+    "ui:dev": "pnpm --filter=@wallarm/design-system dev",
+    "storybook": "turbo run storybook",
+    "lint": "turbo run lint",
+    "lint:fix": "turbo run lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "test:ui": "turbo run test:ui",
+    "test:coverage": "turbo run test:coverage",
+    "test:run": "turbo run test:run",
+    "e2e": "turbo run e2e",
+    "e2e:ui": "turbo run e2e:ui",
+    "e2e:report": "turbo run e2e:report",
+    "e2e:docker:report": "echo '📊 Starting Docker E2E reports on ports 9323 (UI) and 9324 (Web)' && turbo run e2e:docker:report",
+    "e2e:docker:report:ui": "pnpm --filter=@wallarm/design-system e2e:docker:report",
+    "e2e:docker:report:web": "pnpm --filter=@wallarm/playground e2e:docker:report",
+    "e2e:local": "./scripts/e2e-docker.sh",
+    "e2e:local:ui": "./scripts/e2e-docker.sh ui",
+    "e2e:local:web": "./scripts/e2e-docker.sh web",
+    "e2e:docker": "./scripts/e2e-docker.sh --docker",
+    "e2e:docker:ui": "./scripts/e2e-docker.sh --docker ui",
+    "e2e:docker:web": "./scripts/e2e-docker.sh --docker web",
+    "e2e:docker:update": "./scripts/e2e-docker.sh --docker --update",
+    "e2e:docker:update:ui": "./scripts/e2e-docker.sh --docker --update ui",
+    "e2e:docker:update:web": "./scripts/e2e-docker.sh --docker --update web",
+    "e2e:failed": "./scripts/e2e-docker.sh --failed",
+    "e2e:failed:ui": "./scripts/e2e-docker.sh --failed ui",
+    "e2e:failed:web": "./scripts/e2e-docker.sh --failed web",
+    "e2e:docker:failed": "./scripts/e2e-docker.sh --docker --failed",
+    "e2e:docker:failed:ui": "./scripts/e2e-docker.sh --docker --failed ui",
+    "e2e:docker:failed:web": "./scripts/e2e-docker.sh --docker --failed web",
+    "ci:ui": "pnpm --filter=@wallarm/design-system typecheck && pnpm --filter=@wallarm/design-system lint && pnpm --filter=@wallarm/design-system test:run && pnpm --filter=@wallarm/design-system build-storybook && pnpm --filter=@wallarm/design-system e2e",
+    "ci:web": "pnpm --filter=@wallarm/playground typecheck && pnpm --filter=@wallarm/playground lint && pnpm --filter=@wallarm/playground test:run && pnpm --filter=@wallarm/playground build && pnpm --filter=@wallarm/playground e2e",
+    "ci:local": "pnpm build:configs && pnpm ci:ui && pnpm ci:web",
+    "clean": "pnpm -r exec rm -rf node_modules dist coverage .turbo test-results playwright-report test-results storybook-static && rm -rf node_modules .turbo",
+    "commit": "cz",
+    "changeset": "changeset",
+    "version": "changeset version",
+    "version:alpha": "changeset version --snapshot alpha",
+    "release": "pnpm build && changeset publish",
+    "release:alpha": "pnpm build && changeset publish --tag alpha",
+    "prepare": "husky"
+  },
+  "devDependencies": {
+    "@changesets/changelog-git": "0.2.1",
+    "@changesets/changelog-github": "0.5.2",
+    "@changesets/cli": "2.29.8",
+    "@commitlint/cli": "20.3.1",
+    "@commitlint/config-conventional": "20.3.1",
+    "@playwright/test": "catalog:",
+    "commitizen": "4.3.1",
+    "cz-conventional-changelog": "3.3.0",
+    "husky": "9.1.7",
+    "prettier": "3.8.1",
+    "prettier-plugin-tailwindcss": "0.7.2",
+    "turbo": "2.7.6",
+    "typescript": "catalog:"
+  },
+  "packageManager": "pnpm@10.22.0",
+  "engines": {
+    "node": ">=24"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog",
+      "maxHeaderWidth": 100,
+      "maxLineWidth": 100,
+      "defaultType": "feat",
+      "defaultScope": "",
+      "defaultSubject": "",
+      "defaultBody": "",
+      "types": {
+        "feat": {
+          "description": "A new feature",
+          "title": "Features"
+        },
+        "fix": {
+          "description": "A bug fix",
+          "title": "Bug Fixes"
+        },
+        "docs": {
+          "description": "Documentation only changes",
+          "title": "Documentation"
+        },
+        "style": {
+          "description": "Changes that do not affect the meaning of the code",
+          "title": "Styles"
+        },
+        "refactor": {
+          "description": "A code change that neither fixes a bug nor adds a feature",
+          "title": "Code Refactoring"
+        },
+        "perf": {
+          "description": "A code change that improves performance",
+          "title": "Performance Improvements"
+        },
+        "test": {
+          "description": "Adding missing tests or correcting existing tests",
+          "title": "Tests"
+        },
+        "build": {
+          "description": "Changes that affect the build system or external dependencies",
+          "title": "Build System"
+        },
+        "ci": {
+          "description": "Changes to our CI configuration files and scripts",
+          "title": "Continuous Integration"
+        },
+        "chore": {
+          "description": "Other changes that don't modify src or test files",
+          "title": "Chores"
+        },
+        "revert": {
+          "description": "Reverts a previous commit",
+          "title": "Reverts"
+        }
+      }
+    }
+  }
+}

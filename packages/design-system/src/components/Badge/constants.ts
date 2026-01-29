@@ -1,0 +1,31 @@
+export const BadgeTypeEnum = {
+  Solid: 'solid',
+  Secondary: 'secondary',
+  Outline: 'outline',
+  Text: 'text',
+  TextColor: 'text-color',
+} as const;
+
+export const BadgeColorEnum = {
+  Slate: 'slate',
+  Red: 'red',
+  WOrange: 'w-orange',
+  Amber: 'amber',
+  Yellow: 'yellow',
+  Lime: 'lime',
+  Green: 'green',
+  Emerald: 'emerald',
+  Teal: 'teal',
+  Cyan: 'cyan',
+  Sky: 'sky',
+  Blue: 'blue',
+  Indigo: 'indigo',
+  Violet: 'violet',
+  Fuchsia: 'fuchsia',
+  Pink: 'pink',
+  Rose: 'rose',
+  Gray: 'gray',
+  Zinc: 'zinc',
+  Neutral: 'neutral',
+  Stone: 'stone',
+} as const;

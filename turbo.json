@@ -1,0 +1,93 @@
+{
+  "$schema": "https://v2-7-6.turborepo.dev/schema.json",
+  "ui": "tui",
+  "tasks": {
+    "dev": {
+      "dependsOn": ["@wallarm/design-system#build"],
+      "cache": true,
+      "persistent": true
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["$TURBO_DEFAULT$", ".env*"],
+      "outputs": ["dist/**"]
+    },
+    "build:doctor": {
+      "dependsOn": ["^build:doctor"]
+    },
+    "storybook": {
+      "cache": true,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^lint"]
+    },
+    "lint:fix": {
+      "dependsOn": ["^lint:fix"]
+    },
+    "typecheck": {
+      "dependsOn": ["^build", "^typecheck"]
+    },
+    "test": {
+      "dependsOn": ["@wallarm/vitest-config#build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "vitest.config.{ts,js}",
+        "vitest.setup.{ts,js}"
+      ],
+      "outputs": ["coverage/**"]
+    },
+    "test:run": {
+      "dependsOn": ["@wallarm/vitest-config#build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "vitest.config.{ts,js}",
+        "vitest.setup.{ts,js}"
+      ],
+      "outputs": ["coverage/**"]
+    },
+    "test:coverage": {
+      "dependsOn": ["@wallarm/vitest-config#build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "**/*.{test,spec}.{ts,tsx,js,jsx}",
+        "vitest.config.{ts,js}",
+        "vitest.setup.{ts,js}"
+      ],
+      "outputs": ["coverage/**"]
+    },
+    "test:ui": {
+      "cache": false,
+      "persistent": true
+    },
+    "e2e": {
+      "dependsOn": ["^build"],
+      "inputs": [
+        "src/**/*.{ts,tsx,js,jsx}",
+        "tests/**/*.{test,spec,e2e}.{ts,tsx,js,jsx}",
+        "playwright.config.{ts,js}"
+      ],
+      "outputs": ["test-results/**", "playwright-report/**"]
+    },
+    "e2e:ui": {
+      "dependsOn": ["^build"],
+      "cache": false,
+      "persistent": true
+    },
+    "e2e:report": {
+      "dependsOn": ["^e2e"],
+      "cache": false,
+      "persistent": true
+    },
+    "e2e:docker": {
+      "cache": false,
+      "persistent": true
+    },
+    "e2e:docker:report": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

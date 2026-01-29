@@ -1,0 +1,23 @@
+{
+  "extends": "@wallarm/typescript-config/react-library.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true,
+    "rootDir": "src",
+    "outDir": "dist",
+    "isolatedModules": true
+  },
+  "include": ["src"],
+  "exclude": [
+    "**/*.test.*",
+    "**/*.spec.*",
+    "**/*.stories.*",
+    "**/*.e2e.*",
+    "node_modules",
+    "dist",
+    "storybook-static"
+  ]
+}

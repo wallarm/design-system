@@ -1,0 +1,18 @@
+{
+  "name": "@wallarm/typescript-config",
+  "version": "0.0.0",
+  "private": true,
+  "license": "MIT",
+  "exports": {
+    "./base.json": "./base.json",
+    "./react-app.json": "./react-app.json",
+    "./react-library.json": "./react-library.json",
+    "./nodejs.json": "./nodejs.json",
+    "./e2e.json": "./e2e.json",
+    "./unit.json": "./unit.json",
+    "./storybook.json": "./storybook.json"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

@@ -1,0 +1,6 @@
+@theme {
+    --color-focus-brand: --alpha(var(--color-orange-600) / 30%);
+    --color-focus-primary: --alpha(var(--color-slate-400) / 30%);
+    --color-focus-destructive: --alpha(var(--color-red-600) / 20%);
+    --color-focus-destructive-hover: --alpha(var(--color-red-600) / 30%);
+}

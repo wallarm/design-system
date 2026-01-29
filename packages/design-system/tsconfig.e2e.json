@@ -1,0 +1,14 @@
+{
+  "extends": "@wallarm/typescript-config/e2e.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "outDir": "dist",
+    "types": ["node"]
+  },
+  "include": [
+    "**/*.e2e.*",
+    "playwright.config.ts",
+    "playwright.config.docker.ts"
+  ]
+}

@@ -1,0 +1,39 @@
+@import './colors/primary.css';
+@import './colors/secondary.css';
+@import './colors/grayscale.css';
+@import './colors/other.css';
+@import './blur.css';
+@import './radius.css';
+@import './shadow.css';
+@import './spacing.css';
+@import './typography.css';
+@import './semantic.css';
+@import './focus.css';
+@import './icon.css';
+@import './utilities/hover-overlay.css';
+@import './components/drawer.css';
+@import './components/dialog.css';
+
+
+[data-scope='scroll-area'][data-part='viewport'] {
+    scrollbar-width: none;
+    &::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+/** Remove when old DS will be removed **/
+:where(:root) {
+    cursor: default;
+    overflow-wrap: break-word;
+}
+
+:where(svg:not([fill])) {
+    fill: currentColor;
+}
+
+@layer utilities {
+    textarea::-webkit-resizer {
+        display: none;
+    }
+}

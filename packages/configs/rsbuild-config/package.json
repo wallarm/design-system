@@ -1,0 +1,16 @@
+{
+  "name": "@wallarm/rsbuild-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "main": "./rsbuild.config.ts",
+  "exports": {
+    "./*": "./*.ts"
+  },
+  "devDependencies": {
+    "@rsbuild/core": "catalog:",
+    "@rsbuild/plugin-react": "catalog:",
+    "@rsdoctor/rspack-plugin": "1.5.0",
+    "@rspack/core": "catalog:"
+  }
+}
