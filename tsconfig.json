@@ -1,0 +1,11 @@
+{
+  "extends": "./packages/configs/typescript-config/nodejs.json",
+  "compilerOptions": {
+    "composite": true,
+    "noEmit": false,
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "dist"
+  },
+  "include": ["scripts"]
+}
