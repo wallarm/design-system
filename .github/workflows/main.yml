@@ -2,7 +2,7 @@ name: CI/CD Pipeline
 
 on:
   push:
-    branches: [main, 'feature/*']
+    branches: [main, 'feature/*', 'tests/*']
   pull_request:
     branches: [main]
 
@@ -231,7 +231,7 @@ jobs:
 
       - name: Install allurectl
         run: |
-          wget -qO- https://github.com/allure-framework/allurectl/releases/latest/download/allurectl_linux_amd64.tar.gz | tar xz
+          wget -qO allurectl https://github.com/allure-framework/allurectl/releases/latest/download/allurectl_linux_amd64
           chmod +x allurectl
           sudo mv allurectl /usr/local/bin/
 
@@ -243,11 +243,15 @@ jobs:
 
       - name: Serve Storybook & Run E2E tests
         run: |
+          # Set up directory structure for serving with /design-system/ base path
+          mkdir -p storybook-serve/design-system
+          cp -r packages/design-system/storybook-static/* storybook-serve/design-system/
+
           # Start HTTP server for Storybook
-          npx http-server packages/design-system/storybook-static -p 6006 &
+          npx http-server storybook-serve -p 6006 &
 
           # Wait for server to be ready
-          timeout 30 bash -c 'until curl -f http://localhost:6006/iframe.html; do sleep 1; done'
+          timeout 30 bash -c 'until curl -f http://localhost:6006/design-system/iframe.html; do sleep 1; done'
 
           # Run E2E tests with Allure reporting
           cd packages/design-system
@@ -259,7 +263,7 @@ jobs:
           fi
         env:
           CI: true
-          STORYBOOK_URL: http://localhost:6006
+          STORYBOOK_URL: http://localhost:6006/design-system
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
@@ -324,20 +328,26 @@ jobs:
 
       - name: Update screenshots
         run: |
+          # Set up directory structure for serving with /design-system/ base path
+          mkdir -p storybook-serve/design-system
+          cp -r packages/design-system/storybook-static/* storybook-serve/design-system/
+
           # Start HTTP server for Storybook
-          npx http-server packages/design-system/storybook-static -p 6006 &
+          npx http-server storybook-serve -p 6006 &
 
           # Wait for server to be ready
-          timeout 30 bash -c 'until curl -f http://localhost:6006/iframe.html; do sleep 1; done'
+          timeout 30 bash -c 'until curl -f http://localhost:6006/design-system/iframe.html; do sleep 1; done'
 
-          # Update screenshots
+          # Unset CI to allow snapshot creation
+          unset CI
+
+          # Update screenshots (exit code ignored - new snapshots cause non-zero exit)
           pnpm --filter=@wallarm/design-system exec playwright test \
             --shard=${{ matrix.shard }}/3 \
             --project=chromium \
-            --update-snapshots
+            --update-snapshots || true
         env:
-          CI: false
-          STORYBOOK_URL: http://localhost:6006
+          STORYBOOK_URL: http://localhost:6006/design-system
 
       - name: Upload updated screenshots
         uses: actions/upload-artifact@v4
