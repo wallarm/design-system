@@ -30,6 +30,7 @@ export const AlertClose: FC<AlertCloseProps> = ({ ref, onClick }) => {
             variant="ghost"
             color="neutral"
             size="small"
+            aria-label="close"
             onClick={onClick}
           >
             <X />

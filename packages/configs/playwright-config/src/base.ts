@@ -5,6 +5,7 @@ export const baseConfig = defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
+  timeout: 30000,
   reporter: 'html',
   use: {
     trace: 'on-first-retry',
@@ -32,6 +33,8 @@ export const baseConfig = defineConfig({
       },
     },
   ],
+  snapshotPathTemplate:
+    '{testDir}/{testFileDir}/{testFileName}-snapshots/{testName}-{projectName}{ext}',
   expect: {
     toHaveScreenshot: { maxDiffPixelRatio: 0.2 },
   },
