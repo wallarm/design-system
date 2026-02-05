@@ -4,6 +4,9 @@ import { baseConfig } from './base.js';
 export const dockerConfig = defineConfig({
   ...baseConfig,
 
+  snapshotPathTemplate:
+    '{testDir}/{testFileDir}/{testFileName}-snapshots/{testName}-{projectName}{ext}',
+
   // Docker-specific configuration
   use: {
     ...baseConfig.use,

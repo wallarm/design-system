@@ -9,7 +9,8 @@
   },
   "exports": {
     "./base": "./dist/base.js",
-    "./docker": "./dist/docker.js"
+    "./docker": "./dist/docker.js",
+    "./storybook": "./dist/storybook.js"
   },
   "dependencies": {
     "@playwright/test": "catalog:"

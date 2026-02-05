@@ -1,9 +1,9 @@
-import type { FC, Ref } from 'react';
+import type { ButtonHTMLAttributes, FC, Ref } from 'react';
 import { X } from '../../icons';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 
-export interface AlertCloseProps {
+export interface AlertCloseProps extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
   ref?: Ref<HTMLButtonElement>;
   /** Callback when the close button is clicked */
   onClick?: () => void;
@@ -14,12 +14,20 @@ export interface AlertCloseProps {
  *
  * Renders a close button with an X icon and "Close" tooltip.
  */
-export const AlertClose: FC<AlertCloseProps> = ({ ref, onClick }) => {
+export const AlertClose: FC<AlertCloseProps> = ({ ref, onClick, ...props }) => {
   return (
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button ref={ref} variant='ghost' color='neutral' size='small' onClick={onClick}>
+          <Button
+            {...props}
+            ref={ref}
+            variant='ghost'
+            color='neutral'
+            size='small'
+            aria-label='close'
+            onClick={onClick}
+          >
             <X />
           </Button>
         </TooltipTrigger>

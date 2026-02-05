@@ -1,6 +1,7 @@
 import {
   type ComponentType,
   type FC,
+  type HTMLAttributes,
   type ReactNode,
   type Ref,
   useLayoutEffect,
@@ -35,7 +36,7 @@ const iconMap: Record<AlertColor, ComponentType<{ className?: string; size?: 'lg
   success: CircleCheckBig,
 };
 
-export interface AlertIconProps {
+export interface AlertIconProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   ref?: Ref<HTMLDivElement>;
   /** Override the default icon for the variant */
   icon?: ReactNode;
@@ -47,7 +48,7 @@ export interface AlertIconProps {
  * Automatically displays the appropriate icon based on the parent Alert's data-color attribute.
  * Can be overridden with a custom icon via the `icon` prop.
  */
-export const AlertIcon: FC<AlertIconProps> = ({ ref, icon }) => {
+export const AlertIcon: FC<AlertIconProps> = ({ ref, icon, ...props }) => {
   const internalRef = useRef<HTMLDivElement>(null);
   const [color, setColor] = useState<AlertColor>('primary');
 
@@ -76,7 +77,7 @@ export const AlertIcon: FC<AlertIconProps> = ({ ref, icon }) => {
   const IconComponent = iconMap[color];
 
   return (
-    <div ref={setRefs} className='py-2 shrink-0'>
+    <div {...props} ref={setRefs} className='py-2 shrink-0'>
       {icon || <IconComponent size='lg' className={alertIconVariants({ color })} />}
     </div>
   );
