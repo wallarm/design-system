@@ -41,6 +41,7 @@
    * ======================================== */
     --color-icon-primary: var(--color-slate-900);
     --color-icon-primary-alt: var(--color-white);
+    --color-icon-primary-fixed: var(--color-slate-900);
     --color-icon-primary-alt-fixed: var(--color-white);
     --color-icon-primary-disable: --alpha(var(--color-slate-900) / 40%);
     --color-icon-primary-alt-disable: --alpha(var(--color-white) / 40%);
@@ -208,6 +209,55 @@
     --color-component-logo-wordmark-alt: var(--color-white);
     --color-component-kbi-tooltip-bg: --alpha(var(--color-white) / 20%);
     --color-component-dialog-overlay: --alpha(var(--color-white) / 60%);
+    --color-component-code-snippet-bg: --alpha(var(--color-slate-500) / 6%);
+
+    /* ========================================
+   * SYNTAX COLORS
+   * ======================================== */
+    --color-syntax-no-syntax: var(--color-slate-900);
+
+    /* Syntax Highlighting */
+    --color-syntax-function: var(--color-blue-600);
+    --color-syntax-keyword: #7008e7;
+    --color-syntax-tag: #00786f;
+    --color-syntax-comment: var(--color-slate-500);
+
+    /* Syntax Highlight - Neutral */
+    --color-syntax-highlight-neutral-code: var(--color-slate-900);
+    --color-syntax-highlight-neutral-indicator: #45556c;
+    --color-syntax-highlight-neutral-highlight: --alpha(var(--color-slate-500) / 6%);
+    --color-syntax-highlight-selected-code: var(--color-white);
+    --color-syntax-highlight-selected-bg: var(--color-syntax-highlight-neutral-code);
+
+    /* Syntax Highlight - Info */
+    --color-syntax-highlight-info-code: var(--color-blue-600);
+    --color-syntax-highlight-info-indicator: var(--color-blue-600);
+    --color-syntax-highlight-info-highlight: --alpha(var(--color-blue-500) / 6%);
+
+    /* Syntax Highlight - Error */
+    --color-syntax-highlight-error-code: var(--color-red-600);
+    --color-syntax-highlight-error-indicator: var(--color-red-600);
+    --color-syntax-highlight-error-highlight: --alpha(var(--color-red-500) / 6%);
+
+    /* Syntax Highlight - Warning */
+    --color-syntax-highlight-warning-code: var(--color-amber-700);
+    --color-syntax-highlight-warning-indicator: #e17100;
+    --color-syntax-highlight-warning-highlight: --alpha(var(--color-amber-500) / 6%);
+
+    /* Syntax Highlight - Success */
+    --color-syntax-highlight-success-code: var(--color-green-600);
+    --color-syntax-highlight-success-indicator: var(--color-green-600);
+    --color-syntax-highlight-success-highlight: --alpha(var(--color-green-500) / 6%);
+
+    /* Syntax Highlight - Brand */
+    --color-syntax-highlight-brand-code: var(--color-w-orange-600);
+    --color-syntax-highlight-brand-indicator: var(--color-w-orange-600);
+    --color-syntax-highlight-brand-highlight: --alpha(var(--color-w-orange-500) / 6%);
+
+    /* Syntax Highlight - AI */
+    --color-syntax-highlight-ai-code: var(--color-purple-600);
+    --color-syntax-highlight-ai-indicator: var(--color-purple-600);
+    --color-syntax-highlight-ai-highlight: --alpha(var(--color-purple-500) / 6%);
 
     /* ========================================
    * BADGE COLORS
@@ -340,10 +390,28 @@
        * ======================================== */
     --color-icon-primary: var(--color-white);
     --color-icon-primary-alt: var(--color-slate-900);
+    --color-icon-primary-fixed: var(--color-white);
+    --color-icon-primary-alt-fixed: var(--color-slate-900);
     --color-icon-primary-disable: --alpha(var(--color-white) / 40%);
     --color-icon-primary-alt-disable: --alpha(var(--color-slate-900) / 40%);
     --color-icon-secondary: --alpha(var(--color-white) / 80%);
     --color-icon-secondary-alt: var(--color-slate-500);
+
+    /* ========================================
+       * SYNTAX COLORS
+       * ======================================== */
+    --color-syntax-no-syntax: var(--color-white);
+
+    /* Syntax Highlighting */
+    --color-syntax-function: var(--color-blue-400);
+    --color-syntax-keyword: #a855f7;
+    --color-syntax-tag: #2dd4bf;
+    --color-syntax-comment: --alpha(var(--color-white) / 60%);
+
+    /* Syntax Highlight - Neutral */
+    --color-syntax-highlight-neutral-code: var(--color-white);
+    --color-syntax-highlight-selected-code: var(--color-slate-900);
+    --color-syntax-highlight-selected-bg: var(--color-syntax-highlight-neutral-code);
 
     /* ========================================
        * BACKGROUND COLORS
