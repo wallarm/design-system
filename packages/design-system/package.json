@@ -91,6 +91,7 @@
     "@rsbuild/core": "catalog:",
     "@rsbuild/plugin-react": "catalog:",
     "@rslib/core": "0.19.3",
+    "@shikijs/types": "^3.22.0",
     "@storybook/addon-docs": "10.2.0",
     "@storybook/addon-mcp": "0.2.2",
     "@storybook/addon-themes": "10.2.0",
@@ -100,6 +101,7 @@
     "@testing-library/user-event": "catalog:",
     "@types/lodash-es": "4.17.12",
     "@types/node": "catalog:",
+    "@types/prismjs": "^1.26.5",
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitest/coverage-v8": "catalog:",
@@ -132,6 +134,10 @@
     "@radix-ui/react-tooltip": "1.2.8",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
+    "highlight.js": "^11.11.1",
+    "prism-react-renderer": "^2.4.1",
+    "prismjs": "^1.30.0",
+    "shiki": "^3.22.0",
     "tailwind-merge": "3.4.0"
   },
   "peerDependencies": {
