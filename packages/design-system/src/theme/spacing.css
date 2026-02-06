@@ -1,5 +1,6 @@
 @theme {
     --spacing: 1px;
+    --spacing-none: 0px;
     --spacing-1: 1px;
     --spacing-2: 2px;
     --spacing-4: 4px;
