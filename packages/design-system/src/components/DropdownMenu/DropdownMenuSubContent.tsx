@@ -1,7 +1,5 @@
 import type { ComponentPropsWithoutRef, ElementRef, FC, Ref } from 'react';
-
 import { SubContent } from '@radix-ui/react-dropdown-menu';
-
 import { cn } from '../../utils/cn';
 
 /**
@@ -11,9 +9,7 @@ const DROPDOWN_MENU_SUB_CONTENT_ALIGN_OFFSET = -9;
 
 const DROPDOWN_MENU_SUB_SIDE_OFFSET = 4;
 
-type DropdownMenuSubContentProps = ComponentPropsWithoutRef<
-  typeof SubContent
-> & {
+type DropdownMenuSubContentProps = ComponentPropsWithoutRef<typeof SubContent> & {
   ref?: Ref<ElementRef<typeof SubContent>>;
 };
 

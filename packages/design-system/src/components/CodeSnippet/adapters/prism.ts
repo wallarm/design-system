@@ -1,12 +1,5 @@
 import { Prism } from 'prism-react-renderer';
-
-import type {
-  HighlightResult,
-  PrismLanguage,
-  SyntaxAdapter,
-  Token,
-  TokenType,
-} from './types';
+import type { HighlightResult, PrismLanguage, SyntaxAdapter, Token, TokenType } from './types';
 
 // Make Prism available globally so we can load additional languages
 // This must be done before importing language components
@@ -90,15 +83,10 @@ function mapTokenType(prismType: string): TokenType {
 }
 
 type PrismTokenContent = string | PrismToken | PrismToken[];
-type PrismToken =
-  | string
-  | { type: string; content: PrismTokenContent; alias?: string | string[] };
+type PrismToken = string | { type: string; content: PrismTokenContent; alias?: string | string[] };
 
 /** Flatten nested Prism tokens into a flat array */
-function flattenToken(
-  token: PrismToken,
-  parentType: string = 'plain',
-): Token[] {
+function flattenToken(token: PrismToken, parentType: string = 'plain'): Token[] {
   if (typeof token === 'string') {
     return [{ content: token, type: mapTokenType(parentType) }];
   }
@@ -112,7 +100,7 @@ function flattenToken(
 
   if (Array.isArray(content)) {
     // Handle array of strings or tokens
-    return content.flatMap((item) => {
+    return content.flatMap(item => {
       if (typeof item === 'string') {
         return [{ content: item, type: mapTokenType(tokenType) }];
       }
@@ -127,10 +115,7 @@ function flattenToken(
 export const prismAdapter: SyntaxAdapter<PrismLanguage> = {
   name: 'prism',
 
-  async highlight(
-    code: string,
-    language: PrismLanguage,
-  ): Promise<HighlightResult> {
+  async highlight(code: string, language: PrismLanguage): Promise<HighlightResult> {
     // Load additional languages if needed
     await loadAdditionalLanguages();
 
@@ -138,9 +123,7 @@ export const prismAdapter: SyntaxAdapter<PrismLanguage> = {
 
     if (!grammar) {
       // Fallback to plain text if language not supported
-      const tokens: Token[][] = code
-        .split('\n')
-        .map((line) => [{ content: line, type: 'plain' }]);
+      const tokens: Token[][] = code.split('\n').map(line => [{ content: line, type: 'plain' }]);
       return { tokens };
     }
 

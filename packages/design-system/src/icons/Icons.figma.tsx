@@ -1,7 +1,5 @@
 import React from 'react';
-
 import figma from '@figma/code-connect';
-
 import {
   Activity,
   ArrowBigUp,
@@ -231,13 +229,9 @@ figma.connect(
   },
 );
 
-figma.connect(
-  Check,
-  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=5771-5',
-  {
-    example: () => <Check />,
-  },
-);
+figma.connect(Check, 'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=5771-5', {
+  example: () => <Check />,
+});
 
 figma.connect(
   CheckCheck,
@@ -1223,13 +1217,9 @@ figma.connect(
   },
 );
 
-figma.connect(
-  X,
-  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=5724-873',
-  {
-    example: () => <X />,
-  },
-);
+figma.connect(X, 'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=5724-873', {
+  example: () => <X />,
+});
 
 figma.connect(
   ZoomIn,

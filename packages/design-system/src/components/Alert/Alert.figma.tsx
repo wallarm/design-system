@@ -1,7 +1,5 @@
 import figma from '@figma/code-connect';
-
 import { Button } from '../Button';
-
 import { Alert } from './Alert';
 import { AlertClose } from './AlertClose';
 import { AlertContent } from './AlertContent';
@@ -19,7 +17,7 @@ figma.connect(Alert, figmaNodeUrl, {
     Type: 'Primary',
   },
   example: () => (
-    <Alert color="primary">
+    <Alert color='primary'>
       <AlertIcon />
       <AlertContent>
         <AlertTitle>Message goes here</AlertTitle>
@@ -35,7 +33,7 @@ figma.connect(Alert, figmaNodeUrl, {
     Type: 'Destructive',
   },
   example: () => (
-    <Alert color="destructive">
+    <Alert color='destructive'>
       <AlertIcon />
       <AlertContent>
         <AlertTitle>Message goes here</AlertTitle>
@@ -51,7 +49,7 @@ figma.connect(Alert, figmaNodeUrl, {
     Type: 'Info',
   },
   example: () => (
-    <Alert color="info">
+    <Alert color='info'>
       <AlertIcon />
       <AlertContent>
         <AlertTitle>Message goes here</AlertTitle>
@@ -67,7 +65,7 @@ figma.connect(Alert, figmaNodeUrl, {
     Type: 'Warning',
   },
   example: () => (
-    <Alert color="warning">
+    <Alert color='warning'>
       <AlertIcon />
       <AlertContent>
         <AlertTitle>Message goes here</AlertTitle>
@@ -83,7 +81,7 @@ figma.connect(Alert, figmaNodeUrl, {
     Type: 'Success',
   },
   example: () => (
-    <Alert color="success">
+    <Alert color='success'>
       <AlertIcon />
       <AlertContent>
         <AlertTitle>Message goes here</AlertTitle>
@@ -99,7 +97,7 @@ figma.connect(Alert, figmaNodeUrl, {
     Closable: true,
   },
   example: () => (
-    <Alert color="destructive">
+    <Alert color='destructive'>
       <AlertIcon />
       <AlertContent>
         <AlertTitle>Message goes here</AlertTitle>
@@ -116,17 +114,17 @@ figma.connect(Alert, figmaNodeUrl, {
     'Top Actions': true,
   },
   example: () => (
-    <Alert color="destructive">
+    <Alert color='destructive'>
       <AlertIcon />
       <AlertContent>
         <AlertTitle>Message goes here</AlertTitle>
         <AlertDescription>Description goes here</AlertDescription>
       </AlertContent>
       <AlertControls>
-        <Button variant="secondary" color="destructive" size="small">
+        <Button variant='secondary' color='destructive' size='small'>
           Button
         </Button>
-        <Button variant="secondary" color="destructive" size="small">
+        <Button variant='secondary' color='destructive' size='small'>
           Button
         </Button>
       </AlertControls>
@@ -140,16 +138,16 @@ figma.connect(Alert, figmaNodeUrl, {
     'Bottom Actions': true,
   },
   example: () => (
-    <Alert color="destructive">
+    <Alert color='destructive'>
       <AlertIcon />
       <AlertContent>
         <AlertTitle>Message goes here</AlertTitle>
         <AlertDescription>Description goes here</AlertDescription>
         <AlertControls>
-          <Button variant="secondary" color="destructive" size="small">
+          <Button variant='secondary' color='destructive' size='small'>
             Button
           </Button>
-          <Button variant="secondary" color="destructive" size="small">
+          <Button variant='secondary' color='destructive' size='small'>
             Button
           </Button>
         </AlertControls>
@@ -164,13 +162,13 @@ figma.connect(Alert, figmaNodeUrl, {
     'Code TBD': true,
   },
   example: () => (
-    <Alert color="destructive">
+    <Alert color='destructive'>
       <AlertIcon />
       <AlertContent>
         <AlertTitle>Message goes here</AlertTitle>
         <AlertDescription>Description goes here</AlertDescription>
-        <div className="pt-8">
-          <span className="font-mono font-medium text-xs leading-xs text-text-danger">
+        <div className='pt-8'>
+          <span className='font-mono font-medium text-xs leading-xs text-text-danger'>
             Optional code output
           </span>
         </div>

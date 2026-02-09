@@ -4,10 +4,7 @@ export const baseConfig = {
     environment: 'jsdom',
     css: true,
     passWithNoTests: true,
-    include: [
-      '**/*.{test,spec}.{js,ts,jsx,tsx}',
-      '**/__tests__/**/*.{js,ts,jsx,tsx}',
-    ],
+    include: ['**/*.{test,spec}.{js,ts,jsx,tsx}', '**/__tests__/**/*.{js,ts,jsx,tsx}'],
     exclude: [
       'node_modules/',
       'dist/',

@@ -1,8 +1,6 @@
 import { useState } from 'react';
-
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { Earth, Info } from '../../icons';
 import { Heading } from '../Heading';
 import {
@@ -10,14 +8,13 @@ import {
   SelectButtonTag,
   SelectButtonTagValue,
   SelectContent,
+  type SelectDataItem,
   SelectOption,
   SelectOptionIndicator,
   SelectOptionText,
   SelectPositioner,
-  type SelectDataItem,
 } from '../Select';
 import { HStack, VStack } from '../Stack';
-
 import { Tag } from './Tag';
 import { TagClose } from './TagClose';
 
@@ -42,16 +39,14 @@ const meta = {
 
 export default meta;
 
-export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
-  <Tag {...args}>Tag</Tag>
-);
+export const Basic: StoryFn<typeof meta> = ({ ...args }) => <Tag {...args}>Tag</Tag>;
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack align="center" spacing={8}>
-    <Tag {...args} size="medium">
+  <HStack align='center' spacing={8}>
+    <Tag {...args} size='medium'>
       Medium Tag
     </Tag>
-    <Tag {...args} size="large">
+    <Tag {...args} size='large'>
       Large Tag
     </Tag>
   </HStack>
@@ -59,10 +54,10 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
 
 export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack spacing={8}>
-    <Tag {...args} size="medium" disabled>
+    <Tag {...args} size='medium' disabled>
       Disabled Medium
     </Tag>
-    <Tag {...args} size="large" disabled>
+    <Tag {...args} size='large' disabled>
       Disabled Large
     </Tag>
   </HStack>
@@ -119,7 +114,7 @@ export const Selectable: StoryFn<typeof meta> = () => {
         label: 'UTC+7',
       },
     ],
-    isItemDisabled: (item) => item.value === 'UTC+2',
+    isItemDisabled: item => item.value === 'UTC+2',
   });
 
   return (
@@ -127,12 +122,12 @@ export const Selectable: StoryFn<typeof meta> = () => {
       <Select collection={collection}>
         <SelectButtonTag>
           <Earth />
-          <SelectButtonTagValue placeholder="Timezone" />
+          <SelectButtonTagValue placeholder='Timezone' />
         </SelectButtonTag>
 
         <SelectPositioner>
           <SelectContent>
-            {collection.items.map((skill) => (
+            {collection.items.map(skill => (
               <SelectOption key={skill.value} item={skill}>
                 <SelectOptionText>{skill.label}</SelectOptionText>
                 <SelectOptionIndicator />
@@ -143,14 +138,14 @@ export const Selectable: StoryFn<typeof meta> = () => {
       </Select>
 
       <Select collection={collection}>
-        <SelectButtonTag size="large">
+        <SelectButtonTag size='large'>
           <Earth />
-          <SelectButtonTagValue placeholder="Timezone" />
+          <SelectButtonTagValue placeholder='Timezone' />
         </SelectButtonTag>
 
         <SelectPositioner>
           <SelectContent>
-            {collection.items.map((skill) => (
+            {collection.items.map(skill => (
               <SelectOption key={skill.value} item={skill}>
                 <SelectOptionText>{skill.label}</SelectOptionText>
                 <SelectOptionIndicator />
@@ -164,19 +159,19 @@ export const Selectable: StoryFn<typeof meta> = () => {
 };
 
 export const WithIcons: StoryFn<typeof meta> = ({ ...args }) => (
-  <VStack spacing={12} align="stretch">
+  <VStack spacing={12} align='stretch'>
     <VStack spacing={8}>
-      <Heading size="sm">Medium Size</Heading>
+      <Heading size='sm'>Medium Size</Heading>
       <HStack spacing={8}>
-        <Tag {...args} size="medium">
+        <Tag {...args} size='medium'>
           <Earth />
           Tag with left icon
         </Tag>
-        <Tag {...args} size="medium">
+        <Tag {...args} size='medium'>
           Tag with right icon
           <Info />
         </Tag>
-        <Tag {...args} size="medium">
+        <Tag {...args} size='medium'>
           <Earth />
           Tag with left and right icons
           <Info />
@@ -184,17 +179,17 @@ export const WithIcons: StoryFn<typeof meta> = ({ ...args }) => (
       </HStack>
     </VStack>
     <VStack spacing={8}>
-      <Heading size="sm">Large Size</Heading>
+      <Heading size='sm'>Large Size</Heading>
       <HStack spacing={8}>
-        <Tag {...args} size="large">
+        <Tag {...args} size='large'>
           <Earth />
           Tag with left icon
         </Tag>
-        <Tag {...args} size="large">
+        <Tag {...args} size='large'>
           Tag with right icon
           <Info />
         </Tag>
-        <Tag {...args} size="large">
+        <Tag {...args} size='large'>
           <Earth />
           Tag with left and right icons
           <Info />

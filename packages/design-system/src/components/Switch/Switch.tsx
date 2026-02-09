@@ -1,20 +1,13 @@
 import type { FC } from 'react';
-
 import { Switch as ArkUiSwitch } from '@ark-ui/react/switch';
-
 import { cn } from '../../utils/cn';
-
 import { SwitchContext } from './SwitchContext';
 
 export interface SwitchProps extends Omit<ArkUiSwitch.RootProps, 'className'> {
   a11yMode?: boolean;
 }
 
-export const Switch: FC<SwitchProps> = ({
-  children,
-  a11yMode = false,
-  ...props
-}) => (
+export const Switch: FC<SwitchProps> = ({ children, a11yMode = false, ...props }) => (
   <SwitchContext.Provider value={{ a11yMode }}>
     <ArkUiSwitch.Root
       {...props}

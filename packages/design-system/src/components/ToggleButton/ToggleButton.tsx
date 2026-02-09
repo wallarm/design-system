@@ -1,7 +1,5 @@
 import type { FC, MouseEvent, Ref } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { useControlled } from '../../hooks';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
 
@@ -13,8 +11,7 @@ const toggleButtonVariants = cva('disabled:opacity-50', {
     },
     color: {
       brand: '',
-      neutral:
-        'focus-visible:ring-focus-primary data-[focus=true]:ring-focus-primary',
+      neutral: 'focus-visible:ring-focus-primary data-[focus=true]:ring-focus-primary',
     },
     active: {
       true: '',
@@ -88,10 +85,7 @@ const toggleButtonVariants = cva('disabled:opacity-50', {
 
 type ToggleButtonVariantProps = VariantProps<typeof toggleButtonVariants>;
 
-export type ToggleButtonProps = Omit<
-  Omit<ButtonBaseProps, 'onToggle'>,
-  'onClick'
-> &
+export type ToggleButtonProps = Omit<Omit<ButtonBaseProps, 'onToggle'>, 'onClick'> &
   ToggleButtonVariantProps & {
     ref?: Ref<HTMLButtonElement>;
     defaultValue?: boolean;

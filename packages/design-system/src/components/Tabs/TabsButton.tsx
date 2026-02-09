@@ -1,7 +1,5 @@
 import type { FC, Ref } from 'react';
-
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
-
 import { tabsTriggerVariants } from './classes';
 
 /**
@@ -16,19 +14,9 @@ export interface TabsButtonProps extends ButtonBaseProps {
   ref?: Ref<HTMLButtonElement>;
 }
 
-export const TabsButton: FC<TabsButtonProps> = ({
-  children,
-  size = 'medium',
-  ref,
-  ...props
-}) => {
+export const TabsButton: FC<TabsButtonProps> = ({ children, size = 'medium', ref, ...props }) => {
   return (
-    <ButtonBase
-      {...props}
-      ref={ref}
-      size={size}
-      className={tabsTriggerVariants({ size })}
-    >
+    <ButtonBase {...props} ref={ref} size={size} className={tabsTriggerVariants({ size })}>
       {children}
     </ButtonBase>
   );

@@ -1,7 +1,5 @@
 import type { ComponentRef, FC, Ref } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 import { Separator, type SeparatorProps } from '../Separator';
 
@@ -34,9 +32,7 @@ const segmentedControlSeparatorVariants = cva('flex h-16', {
   },
 });
 
-type SegmentedControlSeparatorVariants = VariantProps<
-  typeof segmentedControlSeparatorVariants
->;
+type SegmentedControlSeparatorVariants = VariantProps<typeof segmentedControlSeparatorVariants>;
 
 /**
  * Visual separator component for SegmentedControl.
@@ -49,8 +45,8 @@ interface SegmentedControlSeparatorBaseProps extends SeparatorProps {
   ref?: Ref<ComponentRef<typeof Separator>>;
 }
 
-export type SegmentedControlSeparatorProps =
-  SegmentedControlSeparatorBaseProps & SegmentedControlSeparatorVariants;
+export type SegmentedControlSeparatorProps = SegmentedControlSeparatorBaseProps &
+  SegmentedControlSeparatorVariants;
 
 export const SegmentedControlSeparator: FC<SegmentedControlSeparatorProps> = ({
   className,
@@ -59,14 +55,9 @@ export const SegmentedControlSeparator: FC<SegmentedControlSeparatorProps> = ({
   ...props
 }) => {
   return (
-    <div
-      className={cn(
-        'flex items-center content-stretch relative shrink-0',
-        className,
-      )}
-    >
+    <div className={cn('flex items-center content-stretch relative shrink-0', className)}>
       <div className={cn(segmentedControlSeparatorVariants({ mx }))}>
-        <Separator ref={ref} orientation="vertical" {...props} />
+        <Separator ref={ref} orientation='vertical' {...props} />
       </div>
     </div>
   );

@@ -1,9 +1,6 @@
 import type { FC } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
-
 import { LoaderCircle } from './LoaderCircle';
 import { LoaderSonner } from './LoaderSonner';
 
@@ -47,16 +44,10 @@ export const Loader: FC<LoaderProps> = ({
   const className = cn(loaderVariants({ size, color }));
 
   if (type === 'sonner') {
-    return <LoaderSonner className={className} data-role="spinner" />;
+    return <LoaderSonner className={className} data-role='spinner' />;
   }
 
-  return (
-    <LoaderCircle
-      className={className}
-      background={background}
-      data-role="spinner"
-    />
-  );
+  return <LoaderCircle className={className} background={background} data-role='spinner' />;
 };
 
 Loader.displayName = 'Loader';

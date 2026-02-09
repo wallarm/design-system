@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { ToggleButton } from './ToggleButton';
 
 const figmaNodeUrl =
@@ -34,7 +33,7 @@ figma.connect(ToggleButton, figmaNodeUrl, {
     iconOnly: figma.boolean('Icon only'),
     selected: figma.boolean('Selected'),
   },
-  example: (props) => (
+  example: props => (
     <ToggleButton
       variant={props.variant}
       color={props.color}
@@ -79,7 +78,7 @@ figma.connect(ToggleButton, figmaNodeUrl, {
     'Icon only': true,
     'Left element': true,
   },
-  example: (props) => (
+  example: props => (
     <ToggleButton
       variant={props.variant}
       color={props.color}
@@ -124,7 +123,7 @@ figma.connect(ToggleButton, figmaNodeUrl, {
   variant: {
     'Left element': true,
   },
-  example: (props) => (
+  example: props => (
     <ToggleButton
       variant={props.variant}
       color={props.color}
@@ -171,7 +170,7 @@ figma.connect(ToggleButton, figmaNodeUrl, {
   variant: {
     'Right element': true,
   },
-  example: (props) => (
+  example: props => (
     <ToggleButton
       variant={props.variant}
       color={props.color}
@@ -219,7 +218,7 @@ figma.connect(ToggleButton, figmaNodeUrl, {
     'Left element': true,
     'Right element': true,
   },
-  example: (props) => (
+  example: props => (
     <ToggleButton
       variant={props.variant}
       color={props.color}
@@ -269,7 +268,7 @@ figma.connect(ToggleButton, figmaNodeUrl, {
   variant: {
     Badge: true,
   },
-  example: (props) => (
+  example: props => (
     <ToggleButton
       variant={props.variant}
       color={props.color}

@@ -233,26 +233,20 @@ export const generateBadgeVariants = (): ColorVariant[] => {
   });
 
   // Process colors with muted support
-  badgeColorsMuted.forEach((color) => {
+  badgeColorsMuted.forEach(color => {
     const classes = colorClassMap[color];
 
     // Solid variants
     variants.push(createVariant('solid', color, classes.solid, false));
-    variants.push(
-      createVariant('solid', color, classes.solidMuted ?? '', true),
-    );
+    variants.push(createVariant('solid', color, classes.solidMuted ?? '', true));
 
     // Secondary variants
     variants.push(createVariant('secondary', color, classes.secondary, false));
-    variants.push(
-      createVariant('secondary', color, classes.secondaryMuted ?? '', true),
-    );
+    variants.push(createVariant('secondary', color, classes.secondaryMuted ?? '', true));
 
     // Outline variants
     variants.push(createVariant('outline', color, classes.outline, false));
-    variants.push(
-      createVariant('outline', color, classes.outlineMuted ?? '', true),
-    );
+    variants.push(createVariant('outline', color, classes.outlineMuted ?? '', true));
 
     // Text variants
     variants.push(createVariant('text', color, classes.text, false));
@@ -260,9 +254,7 @@ export const generateBadgeVariants = (): ColorVariant[] => {
 
     // Text-color variants
     variants.push(createVariant('text-color', color, classes.textColor, false));
-    variants.push(
-      createVariant('text-color', color, classes.textColorMuted ?? '', true),
-    );
+    variants.push(createVariant('text-color', color, classes.textColorMuted ?? '', true));
   });
 
   // Process colors without muted support
@@ -285,7 +277,7 @@ export const generateBadgeVariants = (): ColorVariant[] => {
     BadgeColorEnum.Rose,
   ];
 
-  colorsWithoutMuted.forEach((color) => {
+  colorsWithoutMuted.forEach(color => {
     const classes = colorClassMap[color];
 
     variants.push(createVariant('solid', color, classes.solid));

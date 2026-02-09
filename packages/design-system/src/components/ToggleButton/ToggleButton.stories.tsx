@@ -1,11 +1,8 @@
 import { useState } from 'react';
-
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { ChevronLeft, ChevronRight } from '../../icons';
 import { Heading } from '../Heading';
 import { HStack, VStack } from '../Stack';
-
 import { ToggleButton } from './ToggleButton';
 
 const meta = {
@@ -50,20 +47,20 @@ export const VariantsAndColors: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
     <Heading>Brand</Heading>
     <HStack>
-      <ToggleButton {...args} variant="outline" color="brand">
+      <ToggleButton {...args} variant='outline' color='brand'>
         Outline
       </ToggleButton>
-      <ToggleButton {...args} variant="ghost" color="brand">
+      <ToggleButton {...args} variant='ghost' color='brand'>
         Ghost
       </ToggleButton>
     </HStack>
 
     <Heading>Neutral</Heading>
     <HStack>
-      <ToggleButton variant="outline" color="neutral">
+      <ToggleButton variant='outline' color='neutral'>
         Outline
       </ToggleButton>
-      <ToggleButton variant="ghost" color="neutral">
+      <ToggleButton variant='ghost' color='neutral'>
         Ghost
       </ToggleButton>
     </HStack>
@@ -71,14 +68,14 @@ export const VariantsAndColors: StoryFn<typeof meta> = ({ ...args }) => (
 );
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack align="center">
-    <ToggleButton {...args} size="small">
+  <HStack align='center'>
+    <ToggleButton {...args} size='small'>
       Small
     </ToggleButton>
-    <ToggleButton {...args} size="medium">
+    <ToggleButton {...args} size='medium'>
       Medium
     </ToggleButton>
-    <ToggleButton {...args} size="large">
+    <ToggleButton {...args} size='large'>
       Large
     </ToggleButton>
   </HStack>
@@ -92,7 +89,7 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
     <ToggleButton {...args} disabled active>
       Disabled Active
     </ToggleButton>
-    <ToggleButton {...args} disabled variant="ghost">
+    <ToggleButton {...args} disabled variant='ghost'>
       Ghost Disabled
     </ToggleButton>
   </HStack>
@@ -106,7 +103,7 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
     <ToggleButton {...args} loading active>
       Loading Active
     </ToggleButton>
-    <ToggleButton {...args} loading variant="ghost">
+    <ToggleButton {...args} loading variant='ghost'>
       Ghost Loading
     </ToggleButton>
   </HStack>
@@ -132,13 +129,13 @@ export const Icons: StoryFn<typeof meta> = ({ ...args }) => (
 
 export const IconOnly: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack>
-    <ToggleButton {...args} aria-label="Toggle option 1">
+    <ToggleButton {...args} aria-label='Toggle option 1'>
       <ChevronRight />
     </ToggleButton>
-    <ToggleButton {...args} loading aria-label="Toggle option 2">
+    <ToggleButton {...args} loading aria-label='Toggle option 2'>
       <ChevronRight />
     </ToggleButton>
-    <ToggleButton {...args} disabled aria-label="Toggle option 3">
+    <ToggleButton {...args} disabled aria-label='Toggle option 3'>
       <ChevronRight />
     </ToggleButton>
   </HStack>
@@ -148,12 +145,7 @@ export const Controlled: StoryFn<typeof meta> = ({ ...args }) => {
   const [active, setActive] = useState<boolean>(false);
 
   return (
-    <ToggleButton
-      {...args}
-      aria-label="Toggle option 1"
-      active={active}
-      onToggle={setActive}
-    >
+    <ToggleButton {...args} aria-label='Toggle option 1' active={active} onToggle={setActive}>
       Controlled
     </ToggleButton>
   );

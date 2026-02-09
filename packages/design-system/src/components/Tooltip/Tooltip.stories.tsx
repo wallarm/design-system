@@ -1,10 +1,8 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { ChevronRight } from '../../icons';
 import { Button } from '../Button';
 import { Kbd } from '../Kbd';
 import { Text } from '../Text';
-
 import { Tooltip } from './Tooltip';
 import { TooltipContent } from './TooltipContent';
 import { TooltipTrigger } from './TooltipTrigger';
@@ -23,7 +21,7 @@ export default meta;
 export const Basic: StoryFn<typeof meta> = () => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <Button variant="outline" color="neutral">
+      <Button variant='outline' color='neutral'>
         <ChevronRight />
       </Button>
     </TooltipTrigger>
@@ -34,15 +32,15 @@ export const Basic: StoryFn<typeof meta> = () => (
 export const WithDescription: StoryFn<typeof meta> = () => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <Button variant="outline" color="neutral">
+      <Button variant='outline' color='neutral'>
         <ChevronRight />
       </Button>
     </TooltipTrigger>
     <TooltipContent>
-      <Text size="xs" weight="medium">
+      <Text size='xs' weight='medium'>
         Title
       </Text>
-      <Text size="xs">Description</Text>
+      <Text size='xs'>Description</Text>
     </TooltipContent>
   </Tooltip>
 );
@@ -50,7 +48,7 @@ export const WithDescription: StoryFn<typeof meta> = () => (
 export const WithKbd: StoryFn<typeof meta> = () => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <Button variant="outline" color="neutral">
+      <Button variant='outline' color='neutral'>
         <ChevronRight />
       </Button>
     </TooltipTrigger>

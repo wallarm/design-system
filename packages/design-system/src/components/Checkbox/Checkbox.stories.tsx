@@ -1,10 +1,8 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { Info } from '../../icons';
 import { Field, FieldDescription, FieldLabel } from '../Field';
 import { HStack, VStack } from '../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-
 import { Checkbox } from './Checkbox';
 import { CheckboxDescription } from './CheckboxDescription';
 import { CheckboxGroup } from './CheckboxGroup';
@@ -42,7 +40,7 @@ export const Checked: StoryFn<typeof meta> = () => (
 );
 
 export const Indeterminate: StoryFn<typeof meta> = () => (
-  <Checkbox checked="indeterminate">
+  <Checkbox checked='indeterminate'>
     <CheckboxIndicator />
     <CheckboxLabel>Accept terms and conditions</CheckboxLabel>
   </Checkbox>
@@ -60,7 +58,7 @@ export const Disabled: StoryFn<typeof meta> = () => (
       <CheckboxLabel>Accept terms and conditions</CheckboxLabel>
     </Checkbox>
 
-    <Checkbox checked="indeterminate" disabled>
+    <Checkbox checked='indeterminate' disabled>
       <CheckboxIndicator />
       <CheckboxLabel>Accept terms and conditions</CheckboxLabel>
     </Checkbox>
@@ -86,23 +84,23 @@ export const WithDescription: StoryFn<typeof meta> = () => (
 );
 
 export const Group: StoryFn<typeof meta> = () => (
-  <CheckboxGroup name="framework" defaultValue={['vue']}>
-    <Checkbox value="react">
+  <CheckboxGroup name='framework' defaultValue={['vue']}>
+    <Checkbox value='react'>
       <CheckboxIndicator />
       <CheckboxLabel>React</CheckboxLabel>
     </Checkbox>
 
-    <Checkbox value="solid">
+    <Checkbox value='solid'>
       <CheckboxIndicator />
       <CheckboxLabel>Solid</CheckboxLabel>
     </Checkbox>
 
-    <Checkbox value="vue">
+    <Checkbox value='vue'>
       <CheckboxIndicator />
       <CheckboxLabel>Vue</CheckboxLabel>
     </Checkbox>
 
-    <Checkbox value="svelte">
+    <Checkbox value='svelte'>
       <CheckboxIndicator />
       <CheckboxLabel>Svelte</CheckboxLabel>
     </Checkbox>
@@ -110,12 +108,8 @@ export const Group: StoryFn<typeof meta> = () => (
 );
 
 export const Card: StoryFn<typeof meta> = () => (
-  <CheckboxGroup
-    variant="card"
-    name="framework"
-    defaultValue={['vue', 'angular']}
-  >
-    <Checkbox value="react">
+  <CheckboxGroup variant='card' name='framework' defaultValue={['vue', 'angular']}>
+    <Checkbox value='react'>
       <CheckboxIndicator />
       <CheckboxLabel>React</CheckboxLabel>
       <CheckboxDescription>
@@ -123,7 +117,7 @@ export const Card: StoryFn<typeof meta> = () => (
       </CheckboxDescription>
     </Checkbox>
 
-    <Checkbox value="solid">
+    <Checkbox value='solid'>
       <CheckboxIndicator />
       <CheckboxLabel>
         Solid
@@ -139,7 +133,7 @@ export const Card: StoryFn<typeof meta> = () => (
       </CheckboxDescription>
     </Checkbox>
 
-    <Checkbox value="vue">
+    <Checkbox value='vue'>
       <CheckboxIndicator />
       <CheckboxLabel>Vue</CheckboxLabel>
       <CheckboxDescription>
@@ -147,7 +141,7 @@ export const Card: StoryFn<typeof meta> = () => (
       </CheckboxDescription>
     </Checkbox>
 
-    <Checkbox value="svelte" disabled>
+    <Checkbox value='svelte' disabled>
       <CheckboxIndicator />
       <CheckboxLabel>Svelte</CheckboxLabel>
       <CheckboxDescription>
@@ -155,7 +149,7 @@ export const Card: StoryFn<typeof meta> = () => (
       </CheckboxDescription>
     </Checkbox>
 
-    <Checkbox value="angular" disabled>
+    <Checkbox value='angular' disabled>
       <CheckboxIndicator />
       <CheckboxLabel>Angular</CheckboxLabel>
       <CheckboxDescription>
@@ -166,7 +160,7 @@ export const Card: StoryFn<typeof meta> = () => (
 );
 
 export const FormField: StoryFn<typeof meta> = () => (
-  <HStack align="start" spacing={40}>
+  <HStack align='start' spacing={40}>
     <Field>
       <FieldLabel>
         Label{' '}
@@ -180,23 +174,23 @@ export const FormField: StoryFn<typeof meta> = () => (
 
       <FieldDescription>This is an input description.</FieldDescription>
 
-      <CheckboxGroup name="framework" defaultValue={['vue']}>
-        <Checkbox value="react">
+      <CheckboxGroup name='framework' defaultValue={['vue']}>
+        <Checkbox value='react'>
           <CheckboxIndicator />
           <CheckboxLabel>React</CheckboxLabel>
         </Checkbox>
 
-        <Checkbox value="solid">
+        <Checkbox value='solid'>
           <CheckboxIndicator />
           <CheckboxLabel>Solid</CheckboxLabel>
         </Checkbox>
 
-        <Checkbox value="vue">
+        <Checkbox value='vue'>
           <CheckboxIndicator />
           <CheckboxLabel>Vue</CheckboxLabel>
         </Checkbox>
 
-        <Checkbox value="svelte">
+        <Checkbox value='svelte'>
           <CheckboxIndicator />
           <CheckboxLabel>Svelte</CheckboxLabel>
         </Checkbox>
@@ -216,23 +210,23 @@ export const FormField: StoryFn<typeof meta> = () => (
 
       <FieldDescription>This is an input description.</FieldDescription>
 
-      <CheckboxGroup variant="card" name="framework" defaultValue={['vue']}>
-        <Checkbox value="react">
+      <CheckboxGroup variant='card' name='framework' defaultValue={['vue']}>
+        <Checkbox value='react'>
           <CheckboxIndicator />
           <CheckboxLabel>React</CheckboxLabel>
         </Checkbox>
 
-        <Checkbox value="solid">
+        <Checkbox value='solid'>
           <CheckboxIndicator />
           <CheckboxLabel>Solid</CheckboxLabel>
         </Checkbox>
 
-        <Checkbox value="vue">
+        <Checkbox value='vue'>
           <CheckboxIndicator />
           <CheckboxLabel>Vue</CheckboxLabel>
         </Checkbox>
 
-        <Checkbox value="svelte">
+        <Checkbox value='svelte'>
           <CheckboxIndicator />
           <CheckboxLabel>Svelte</CheckboxLabel>
         </Checkbox>

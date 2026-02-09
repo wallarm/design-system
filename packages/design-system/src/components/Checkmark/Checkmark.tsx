@@ -1,7 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
-
 import type { CheckboxCheckedState } from '@ark-ui/react/checkbox';
-
 import { Check, Minus } from '../../icons';
 import { cn } from '../../utils/cn';
 
@@ -13,10 +11,7 @@ interface CheckmarkBaseProps {
 
 type CheckmarkProps = CheckmarkNativeProps & CheckmarkBaseProps;
 
-export const Checkmark: FC<CheckmarkProps> = ({
-  checkedState = false,
-  ...props
-}) => (
+export const Checkmark: FC<CheckmarkProps> = ({ checkedState = false, ...props }) => (
   <div
     className={cn(
       // Layout
@@ -53,20 +48,10 @@ export const Checkmark: FC<CheckmarkProps> = ({
       '[&[data-focus-visible][data-state=indeterminate]]:ring-focus-brand',
     )}
     data-state={
-      checkedState === 'indeterminate'
-        ? 'indeterminate'
-        : checkedState
-          ? 'checked'
-          : 'unchecked'
+      checkedState === 'indeterminate' ? 'indeterminate' : checkedState ? 'checked' : 'unchecked'
     }
     {...props}
   >
-    {checkedState === 'indeterminate' ? (
-      <Minus />
-    ) : checkedState ? (
-      <Check />
-    ) : (
-      false
-    )}
+    {checkedState === 'indeterminate' ? <Minus /> : checkedState ? <Check /> : false}
   </div>
 );

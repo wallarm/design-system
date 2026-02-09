@@ -1,7 +1,5 @@
 import type { FC } from 'react';
-
 import { cva } from 'class-variance-authority';
-
 import { ChevronLeft, ChevronRight } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { Button } from '../../Button';
@@ -85,10 +83,7 @@ interface TabsListScrollButtonProps {
   visible: boolean;
 }
 
-export const TabsListScrollButton: FC<TabsListScrollButtonProps> = ({
-  direction,
-  visible,
-}) => {
+export const TabsListScrollButton: FC<TabsListScrollButtonProps> = ({ direction, visible }) => {
   const { scrollRef } = useTabsSharedContext();
 
   const handleClick = () => {
@@ -108,13 +103,13 @@ export const TabsListScrollButton: FC<TabsListScrollButtonProps> = ({
       <div className={cn(scrollGradientVariants({ side: direction }))} />
 
       <Button
-        variant="ghost"
-        color="neutral"
-        size="small"
+        variant='ghost'
+        color='neutral'
+        size='small'
         onClick={handleClick}
         aria-label={direction === 'left' ? 'Scroll left' : 'Scroll right'}
       >
-        <Icon className="text-slate-900" />
+        <Icon className='text-slate-900' />
       </Button>
     </div>
   );

@@ -5,11 +5,9 @@ export const linkVariants = cva(
   {
     variants: {
       type: {
-        default:
-          'text-text-link-default hover:text-text-link-hover active:text-link-default',
+        default: 'text-text-link-default hover:text-text-link-hover active:text-link-default',
         alt: 'text-text-link-default-alt hover:text-text-link-hover-alt active:text-link-default-alt',
-        muted:
-          'text-text-secondary hover:text-text-link-hover active:text-link-default',
+        muted: 'text-text-secondary hover:text-text-link-hover active:text-link-default',
       },
       size: {
         xs: 'text-2xs',

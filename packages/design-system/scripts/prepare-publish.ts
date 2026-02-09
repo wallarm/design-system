@@ -54,10 +54,7 @@ function prepareForPublish(): void {
     const packageJson: PackageJson = JSON.parse(packageJsonContent);
 
     // Backup original package.json
-    fs.writeFileSync(
-      packageJsonBackupPath,
-      JSON.stringify(packageJson, null, 2),
-    );
+    fs.writeFileSync(packageJsonBackupPath, JSON.stringify(packageJson, null, 2));
     console.log('💾 Original backed up to package.json.backup');
 
     // Clean exports
@@ -68,15 +65,12 @@ function prepareForPublish(): void {
 
     // Remove src from files if present (only dist should be published)
     if (packageJson.files?.includes('src')) {
-      packageJson.files = packageJson.files.filter((f) => f !== 'src');
+      packageJson.files = packageJson.files.filter(f => f !== 'src');
       console.log('📁 Removed src from files');
     }
 
     // Write cleaned package.json
-    fs.writeFileSync(
-      packageJsonPath,
-      JSON.stringify(packageJson, null, 2) + '\n',
-    );
+    fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
 
     console.log('✅ package.json prepared for publishing');
   } catch (error) {

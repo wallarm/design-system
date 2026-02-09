@@ -1,14 +1,11 @@
 import type { FC } from 'react';
-
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import {
   Toaster as ArkToaster,
   type CreateToasterReturn,
   createToaster,
 } from '@ark-ui/react/toast';
-
 import { cn } from '../../utils/cn';
-
 import { Toast, type ToastData } from './Toast';
 
 export interface ToastCreateOptions extends Omit<ToastData, 'id'> {
@@ -40,9 +37,7 @@ export const toaster: TypedToaster = {
       ...options,
       duration:
         options.duration ??
-        (options.variant === 'extended'
-          ? EXTENDED_TOAST_DURATION_MS
-          : SIMPLE_TOAST_DURATION_MS),
+        (options.variant === 'extended' ? EXTENDED_TOAST_DURATION_MS : SIMPLE_TOAST_DURATION_MS),
     });
   },
 };
@@ -72,7 +67,7 @@ export const Toaster: FC = () => {
           '[&_[data-scope=toast][data-part=root]:nth-child(2):not([data-stack])]:after:[background:--alpha(var(--color-white)/20%)] [&_[data-scope=toast][data-part=root]:nth-child(2):not([data-stack])]:after:opacity-100',
         )}
       >
-        {(toast) => <Toast key={toast.id} toast={toast as ToastData} />}
+        {toast => <Toast key={toast.id} toast={toast as ToastData} />}
       </ArkToaster>
     </ArkUiPortal>
   );

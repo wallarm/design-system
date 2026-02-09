@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { Button } from './Button';
 
 const figmaNodeUrl =
@@ -36,7 +35,7 @@ figma.connect(Button, figmaNodeUrl, {
     }),
     iconOnly: figma.boolean('Icon only'),
   },
-  example: (props) => (
+  example: props => (
     <Button
       variant={props.variant}
       color={props.color}
@@ -84,7 +83,7 @@ figma.connect(Button, figmaNodeUrl, {
     'Icon only': true,
     'Left element': true,
   },
-  example: (props) => (
+  example: props => (
     <Button
       variant={props.variant}
       color={props.color}
@@ -131,7 +130,7 @@ figma.connect(Button, figmaNodeUrl, {
   variant: {
     'Left element': true,
   },
-  example: (props) => (
+  example: props => (
     <Button
       variant={props.variant}
       color={props.color}
@@ -179,7 +178,7 @@ figma.connect(Button, figmaNodeUrl, {
   variant: {
     'Right element': true,
   },
-  example: (props) => (
+  example: props => (
     <Button
       variant={props.variant}
       color={props.color}
@@ -228,7 +227,7 @@ figma.connect(Button, figmaNodeUrl, {
     'Left element': true,
     'Right element': true,
   },
-  example: (props) => (
+  example: props => (
     <Button
       variant={props.variant}
       color={props.color}
@@ -279,7 +278,7 @@ figma.connect(Button, figmaNodeUrl, {
   variant: {
     Badge: true,
   },
-  example: (props) => (
+  example: props => (
     <Button
       variant={props.variant}
       color={props.color}

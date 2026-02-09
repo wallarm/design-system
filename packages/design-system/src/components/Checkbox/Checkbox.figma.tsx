@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { Checkbox } from './Checkbox';
 import { CheckboxDescription } from './CheckboxDescription';
 import { CheckboxIndicator } from './CheckboxIndicator';
@@ -38,7 +37,7 @@ figma.connect(Checkbox, figmaNodeUrl, {
     Indeterminate: true,
   },
   example: ({ label, disabled }) => (
-    <Checkbox checked="indeterminate" disabled={disabled}>
+    <Checkbox checked='indeterminate' disabled={disabled}>
       <CheckboxIndicator />
       <CheckboxLabel>{label}</CheckboxLabel>
     </Checkbox>

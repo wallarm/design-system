@@ -1,14 +1,6 @@
-import type {
-  FC,
-  HTMLAttributes,
-  MouseEvent,
-  PropsWithChildren,
-  Ref,
-} from 'react';
-
+import type { FC, HTMLAttributes, MouseEvent, PropsWithChildren, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 import { type BadgeProps, badgeVariants } from '../Badge';
 
@@ -44,10 +36,7 @@ interface TagBaseProps {
   ref?: Ref<HTMLDivElement>;
 }
 
-export type TagProps = TagNativeProps &
-  TagVariantProps &
-  TagBaseProps &
-  PropsWithChildren;
+export type TagProps = TagNativeProps & TagVariantProps & TagBaseProps & PropsWithChildren;
 
 export const Tag: FC<TagProps> = ({
   size = 'medium',
@@ -76,7 +65,7 @@ export const Tag: FC<TagProps> = ({
           size,
         }),
       )}
-      data-slot="tag"
+      data-slot='tag'
       data-disabled={disabled ? 'true' : undefined}
       tabIndex={disabled ? -1 : 0}
       onClick={handleClick}

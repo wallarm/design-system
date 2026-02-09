@@ -1,8 +1,6 @@
 import type { FC } from 'react';
-
 import { RadioGroup as ArkUiRadioGroup } from '@ark-ui/react/radio-group';
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 
 const radioGroupVariants = cva('', {
@@ -33,19 +31,13 @@ const radioGroupVariants = cva('', {
   },
 });
 
-export type RadioGroupNativeProps = Omit<
-  ArkUiRadioGroup.RootProps,
-  'className'
->;
+export type RadioGroupNativeProps = Omit<ArkUiRadioGroup.RootProps, 'className'>;
 
 export type RadioGroupVariantsProps = VariantProps<typeof radioGroupVariants>;
 
 export type RadioGroupProps = RadioGroupNativeProps & RadioGroupVariantsProps;
 
-export const RadioGroup: FC<RadioGroupProps> = ({
-  variant = 'default',
-  ...props
-}) => (
+export const RadioGroup: FC<RadioGroupProps> = ({ variant = 'default', ...props }) => (
   <ArkUiRadioGroup.Root
     {...props}
     className={cn(radioGroupVariants({ variant }), 'flex flex-col gap-8')}

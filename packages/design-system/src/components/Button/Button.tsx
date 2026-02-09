@@ -1,7 +1,5 @@
 import type { ElementType, FC } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
 
@@ -14,14 +12,12 @@ const buttonVariants = cva('', {
       secondary: '',
     },
     color: {
-      brand:
-        'focus-visible:ring-focus-brand data-[focus=true]:ring-focus-brand',
+      brand: 'focus-visible:ring-focus-brand data-[focus=true]:ring-focus-brand',
       neutral:
         'text-text-primary disabled:opacity-50 focus-visible:ring-focus-primary data-[focus=true]:ring-focus-primary',
       'neutral-alt':
         'text-text-primary-alt disabled:opacity-50 focus-visible:ring-focus-primary data-[focus=true]:ring-focus-primary',
-      destructive:
-        'focus-visible:ring-focus-destructive data-[focus=true]:ring-focus-destructive',
+      destructive: 'focus-visible:ring-focus-destructive data-[focus=true]:ring-focus-destructive',
     },
   },
   compoundVariants: [
@@ -120,8 +116,7 @@ const buttonVariants = cva('', {
 
 type ButtonVariantProps = VariantProps<typeof buttonVariants>;
 
-export type ButtonProps<C extends ElementType = 'button'> = ButtonBaseProps<C> &
-  ButtonVariantProps;
+export type ButtonProps<C extends ElementType = 'button'> = ButtonBaseProps<C> & ButtonVariantProps;
 
 export const Button: FC<ButtonProps<ElementType>> = ({
   variant = 'primary',

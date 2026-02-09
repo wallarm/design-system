@@ -1,9 +1,6 @@
 import type { FC, ReactNode, Ref } from 'react';
-
 import { Dialog } from '@ark-ui/react/dialog';
-
 import { cn } from '../../utils/cn';
-
 import { drawerContentVariants } from './classes';
 import { useDrawerContext } from './DrawerContext';
 import { DrawerOverlay } from './DrawerOverlay';
@@ -16,11 +13,7 @@ export interface DrawerContentProps {
   ref?: Ref<HTMLDivElement>;
 }
 
-export const DrawerContent: FC<DrawerContentProps> = ({
-  children,
-  asChild,
-  ref,
-}) => {
+export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }) => {
   const { width, isResizing, overlay } = useDrawerContext();
 
   return (

@@ -1,13 +1,9 @@
 import type { FC, HTMLAttributes } from 'react';
-
 import { cn } from '../../utils/cn';
 
-export type SelectFooterProps = Omit<
-  HTMLAttributes<HTMLDivElement>,
-  'className'
->;
+export type SelectFooterProps = Omit<HTMLAttributes<HTMLDivElement>, 'className'>;
 
-export const SelectFooter: FC<SelectFooterProps> = (props) => (
+export const SelectFooter: FC<SelectFooterProps> = props => (
   <div
     {...props}
     className={cn(

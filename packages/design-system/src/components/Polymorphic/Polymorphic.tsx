@@ -11,10 +11,9 @@ export type AsProp<C extends ElementType> = {
   as?: C;
 };
 
-export type PolymorphicComponentProps<
-  C extends ElementType,
-  Props = object,
-> = PropsWithChildren<Props & AsProp<C>> &
+export type PolymorphicComponentProps<C extends ElementType, Props = object> = PropsWithChildren<
+  Props & AsProp<C>
+> &
   Omit<ComponentPropsWithoutRef<C>, keyof (AsProp<C> & Props)>;
 
 export type PolymorphicComponent<T extends ElementType, Props = object> = {
@@ -28,9 +27,12 @@ export type PolymorphicProps = {
   ref?: Ref<unknown>;
 };
 
-export const Polymorphic: FC<
-  PolymorphicComponentProps<ElementType, PolymorphicProps>
-> = ({ as = 'div', className, children, ...props }) => {
+export const Polymorphic: FC<PolymorphicComponentProps<ElementType, PolymorphicProps>> = ({
+  as = 'div',
+  className,
+  children,
+  ...props
+}) => {
   const Component = as;
 
   return (

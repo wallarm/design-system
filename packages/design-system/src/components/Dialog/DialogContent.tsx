@@ -1,7 +1,5 @@
 import type { FC, Ref } from 'react';
-
 import { Dialog as ArkUiDialog } from '@ark-ui/react/dialog';
-
 import { cn } from '../../utils/cn';
 import {
   type DrawerContentProps,
@@ -10,7 +8,6 @@ import {
   drawerContentVariants,
   useDrawerContext,
 } from '../Drawer';
-
 import { DialogPositioner } from './DialogPositioner';
 
 type DialogContentProps = DrawerContentProps & { ref?: Ref<HTMLDivElement> };

@@ -1,7 +1,5 @@
 import { useState } from 'react';
-
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { CircleDashed, Ellipsis } from '../../icons';
 import {
   DropdownMenu,
@@ -10,7 +8,6 @@ import {
   DropdownMenuTrigger,
 } from '../DropdownMenu';
 import { NumericBadge } from '../NumericBadge';
-
 import { SegmentedTabs } from './SegmentedTabs';
 import { SegmentedTabsButton } from './SegmentedTabsButton';
 import { SegmentedTabsContent } from './SegmentedTabsContent';
@@ -62,86 +59,86 @@ export default meta;
 type Story = StoryFn<typeof meta>;
 
 export const Basic: Story = () => (
-  <SegmentedTabs defaultValue="react">
+  <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
-      <SegmentedTabsTrigger value="react">React</SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="vue">Vue</SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="solid">Solid</SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="svelte">Svelte</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='react'>React</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='vue'>Vue</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='solid'>Solid</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='svelte'>Svelte</SegmentedTabsTrigger>
     </SegmentedTabsList>
-    <SegmentedTabsContent value="react">React Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="vue">Vue Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="solid">Solid Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="svelte">Svelte Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='react'>React Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='vue'>Vue Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='solid'>Solid Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='svelte'>Svelte Content</SegmentedTabsContent>
   </SegmentedTabs>
 );
 
 export const Disabled: Story = () => (
-  <SegmentedTabs defaultValue="react">
+  <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
-      <SegmentedTabsTrigger value="react" disabled>
+      <SegmentedTabsTrigger value='react' disabled>
         React
       </SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="vue">Vue</SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="solid">Solid</SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="svelte">Svelte</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='vue'>Vue</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='solid'>Solid</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='svelte'>Svelte</SegmentedTabsTrigger>
     </SegmentedTabsList>
-    <SegmentedTabsContent value="react">React Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="vue">Vue Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="solid">Solid Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="svelte">Svelte Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='react'>React Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='vue'>Vue Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='solid'>Solid Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='svelte'>Svelte Content</SegmentedTabsContent>
   </SegmentedTabs>
 );
 
 export const WithNumericBadge: Story = () => (
-  <SegmentedTabs defaultValue="react">
+  <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
-      <SegmentedTabsTrigger value="react">React</SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="vue">
+      <SegmentedTabsTrigger value='react'>React</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='vue'>
         Vue
         <NumericBadge>1</NumericBadge>
       </SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="solid">Solid</SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="svelte">Svelte</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='solid'>Solid</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='svelte'>Svelte</SegmentedTabsTrigger>
     </SegmentedTabsList>
-    <SegmentedTabsContent value="react">React Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="vue">Vue Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="solid">Solid Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="svelte">Svelte Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='react'>React Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='vue'>Vue Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='solid'>Solid Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='svelte'>Svelte Content</SegmentedTabsContent>
   </SegmentedTabs>
 );
 
 export const WithIcons: Story = () => (
-  <SegmentedTabs defaultValue="react">
+  <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
-      <SegmentedTabsTrigger value="react">
+      <SegmentedTabsTrigger value='react'>
         <CircleDashed />
         React
       </SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="vue">
+      <SegmentedTabsTrigger value='vue'>
         <CircleDashed />
       </SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="solid">
+      <SegmentedTabsTrigger value='solid'>
         <CircleDashed />
         Solid
         <NumericBadge>1</NumericBadge>
       </SegmentedTabsTrigger>
-      <SegmentedTabsTrigger value="svelte">
+      <SegmentedTabsTrigger value='svelte'>
         <CircleDashed />
         <NumericBadge>1</NumericBadge>
       </SegmentedTabsTrigger>
     </SegmentedTabsList>
-    <SegmentedTabsContent value="react">React Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="vue">Vue Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="solid">Solid Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="svelte">Svelte Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='react'>React Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='vue'>Vue Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='solid'>Solid Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='svelte'>Svelte Content</SegmentedTabsContent>
   </SegmentedTabs>
 );
 
 export const WithContextAction: Story = () => (
-  <SegmentedTabs defaultValue="react">
+  <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
-      <SegmentedTabsTrigger value="react">
+      <SegmentedTabsTrigger value='react'>
         React
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -154,7 +151,7 @@ export const WithContextAction: Story = () => (
         </DropdownMenu>
       </SegmentedTabsTrigger>
 
-      <SegmentedTabsTrigger value="vue">
+      <SegmentedTabsTrigger value='vue'>
         Vue
         <NumericBadge>1</NumericBadge>
         <DropdownMenu>
@@ -168,7 +165,7 @@ export const WithContextAction: Story = () => (
         </DropdownMenu>
       </SegmentedTabsTrigger>
 
-      <SegmentedTabsTrigger value="solid">
+      <SegmentedTabsTrigger value='solid'>
         Solid
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -181,7 +178,7 @@ export const WithContextAction: Story = () => (
         </DropdownMenu>
       </SegmentedTabsTrigger>
 
-      <SegmentedTabsTrigger value="svelte">
+      <SegmentedTabsTrigger value='svelte'>
         Svelte
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -194,24 +191,24 @@ export const WithContextAction: Story = () => (
         </DropdownMenu>
       </SegmentedTabsTrigger>
     </SegmentedTabsList>
-    <SegmentedTabsContent value="react">React Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="vue">Vue Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="solid">Solid Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="svelte">Svelte Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='react'>React Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='vue'>Vue Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='solid'>Solid Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='svelte'>Svelte Content</SegmentedTabsContent>
   </SegmentedTabs>
 );
 
 export const WithSeparator: Story = () => (
-  <SegmentedTabs defaultValue="react">
+  <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
-      <SegmentedTabsTrigger value="react">React</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='react'>React</SegmentedTabsTrigger>
 
-      <SegmentedTabsTrigger value="vue">
+      <SegmentedTabsTrigger value='vue'>
         Vue
         <NumericBadge>1</NumericBadge>
       </SegmentedTabsTrigger>
 
-      <SegmentedTabsTrigger value="svelte">Svelte</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='svelte'>Svelte</SegmentedTabsTrigger>
 
       <SegmentedTabsSeparator />
 
@@ -228,26 +225,26 @@ export const WithSeparator: Story = () => (
         </DropdownMenuContent>
       </DropdownMenu>
     </SegmentedTabsList>
-    <SegmentedTabsContent value="react">React Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="vue">Vue Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="solid">Solid Content</SegmentedTabsContent>
-    <SegmentedTabsContent value="svelte">Svelte Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='react'>React Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='vue'>Vue Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='solid'>Solid Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='svelte'>Svelte Content</SegmentedTabsContent>
   </SegmentedTabs>
 );
 
 export const FullWidth: Story = () => (
-  <div className="min-w-800">
-    <SegmentedTabs defaultValue="react" fullWidth>
+  <div className='min-w-800'>
+    <SegmentedTabs defaultValue='react' fullWidth>
       <SegmentedTabsList>
-        <SegmentedTabsTrigger value="react">React</SegmentedTabsTrigger>
-        <SegmentedTabsTrigger value="vue">Vue</SegmentedTabsTrigger>
-        <SegmentedTabsTrigger value="solid">Solid</SegmentedTabsTrigger>
-        <SegmentedTabsTrigger value="svelte">Svelte</SegmentedTabsTrigger>
+        <SegmentedTabsTrigger value='react'>React</SegmentedTabsTrigger>
+        <SegmentedTabsTrigger value='vue'>Vue</SegmentedTabsTrigger>
+        <SegmentedTabsTrigger value='solid'>Solid</SegmentedTabsTrigger>
+        <SegmentedTabsTrigger value='svelte'>Svelte</SegmentedTabsTrigger>
       </SegmentedTabsList>
-      <SegmentedTabsContent value="react">React Content</SegmentedTabsContent>
-      <SegmentedTabsContent value="vue">Vue Content</SegmentedTabsContent>
-      <SegmentedTabsContent value="solid">Solid Content</SegmentedTabsContent>
-      <SegmentedTabsContent value="svelte">Svelte Content</SegmentedTabsContent>
+      <SegmentedTabsContent value='react'>React Content</SegmentedTabsContent>
+      <SegmentedTabsContent value='vue'>Vue Content</SegmentedTabsContent>
+      <SegmentedTabsContent value='solid'>Solid Content</SegmentedTabsContent>
+      <SegmentedTabsContent value='svelte'>Svelte Content</SegmentedTabsContent>
     </SegmentedTabs>
   </div>
 );
@@ -258,18 +255,18 @@ export const Controlled: Story = () => {
   return (
     <SegmentedTabs value={value} onChange={setValue}>
       <SegmentedTabsList>
-        <SegmentedTabsTrigger value="react">React</SegmentedTabsTrigger>
+        <SegmentedTabsTrigger value='react'>React</SegmentedTabsTrigger>
 
-        <SegmentedTabsTrigger value="vue">Vue</SegmentedTabsTrigger>
+        <SegmentedTabsTrigger value='vue'>Vue</SegmentedTabsTrigger>
 
-        <SegmentedTabsTrigger value="solid">Solid</SegmentedTabsTrigger>
+        <SegmentedTabsTrigger value='solid'>Solid</SegmentedTabsTrigger>
 
-        <SegmentedTabsTrigger value="svelte">Svelte</SegmentedTabsTrigger>
+        <SegmentedTabsTrigger value='svelte'>Svelte</SegmentedTabsTrigger>
       </SegmentedTabsList>
-      <SegmentedTabsContent value="react">React Content</SegmentedTabsContent>
-      <SegmentedTabsContent value="vue">Vue Content</SegmentedTabsContent>
-      <SegmentedTabsContent value="solid">Solid Content</SegmentedTabsContent>
-      <SegmentedTabsContent value="svelte">Svelte Content</SegmentedTabsContent>
+      <SegmentedTabsContent value='react'>React Content</SegmentedTabsContent>
+      <SegmentedTabsContent value='vue'>Vue Content</SegmentedTabsContent>
+      <SegmentedTabsContent value='solid'>Solid Content</SegmentedTabsContent>
+      <SegmentedTabsContent value='svelte'>Svelte Content</SegmentedTabsContent>
     </SegmentedTabs>
   );
 };

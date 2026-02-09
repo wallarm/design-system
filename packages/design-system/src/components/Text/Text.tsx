@@ -1,8 +1,6 @@
 import type { FC, HTMLAttributes, PropsWithChildren, Ref } from 'react';
-
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 
 const textVariants = cva('font-sans-display break-words', {
@@ -43,10 +41,7 @@ const textVariants = cva('font-sans-display break-words', {
   },
 });
 
-type TextNativeProps = Omit<
-  HTMLAttributes<HTMLParagraphElement>,
-  'className' | 'color'
->;
+type TextNativeProps = Omit<HTMLAttributes<HTMLParagraphElement>, 'className' | 'color'>;
 
 type TextVariantProps = VariantProps<typeof textVariants>;
 
@@ -75,10 +70,7 @@ export const Text: FC<PropsWithChildren<TextProps>> = ({
   return (
     <Comp
       {...props}
-      className={cn(
-        textVariants({ size, weight, color, truncate, align, grow }),
-        lineClampClass,
-      )}
+      className={cn(textVariants({ size, weight, color, truncate, align, grow }), lineClampClass)}
     />
   );
 };

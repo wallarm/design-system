@@ -1,3 +1,4 @@
+export { drawerContentVariants, drawerPositionerVariants } from './classes';
 export { Drawer, type DrawerProps } from './Drawer';
 export { DrawerBody, type DrawerBodyProps } from './DrawerBody';
 export { DrawerClose, type DrawerCloseProps } from './DrawerClose';
@@ -18,4 +19,3 @@ export {
 export { DrawerResizeHandle } from './DrawerResizeHandle';
 export { DrawerTitle, type DrawerTitleProps } from './DrawerTitle';
 export { DrawerTrigger, type DrawerTriggerProps } from './DrawerTrigger';
-export { drawerContentVariants, drawerPositionerVariants } from './classes';

@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { Textarea } from './Textarea';
 
 const figmaNodeUrl =
@@ -15,9 +14,7 @@ figma.connect(Textarea, figmaNodeUrl, {
     error: figma.boolean('Error'),
     placeholder: figma.string('Placeholder'),
   },
-  example: ({ size, placeholder }) => (
-    <Textarea size={size} placeholder={placeholder} />
-  ),
+  example: ({ size, placeholder }) => <Textarea size={size} placeholder={placeholder} />,
 });
 
 figma.connect(Textarea, figmaNodeUrl, {

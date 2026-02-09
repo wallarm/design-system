@@ -1,5 +1,4 @@
-import { type ReactNode } from 'react';
-
+import type { ReactNode } from 'react';
 import { cn } from '../../utils/cn';
 import { TooltipContent } from '../Tooltip';
 

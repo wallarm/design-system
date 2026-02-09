@@ -1,6 +1,5 @@
 import { withThemeByClassName } from '@storybook/addon-themes';
-import type { Preview, Decorator } from 'storybook-react-rsbuild';
-
+import type { Decorator, Preview } from 'storybook-react-rsbuild';
 import { ThemeProvider, Toaster, TooltipProvider } from '../src';
 import './preview.css';
 
@@ -37,7 +36,7 @@ export const decorators: Decorator[] = [
     },
     defaultTheme: 'light',
   }),
-  (Story) => (
+  Story => (
     <ThemeProvider>
       <TooltipProvider>
         <Story />

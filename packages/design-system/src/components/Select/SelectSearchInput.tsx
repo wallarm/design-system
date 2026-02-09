@@ -1,5 +1,4 @@
 import type { ChangeEvent, FC } from 'react';
-
 import { Search } from '../../icons';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '../InputGroup';
 
@@ -8,10 +7,7 @@ interface SelectSearchInputProps {
   onChange: (value: string) => void;
 }
 
-export const SelectSearchInput: FC<SelectSearchInputProps> = ({
-  value,
-  onChange,
-}) => {
+export const SelectSearchInput: FC<SelectSearchInputProps> = ({ value, onChange }) => {
   const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
     onChange(event.target.value);
   };
@@ -21,11 +17,7 @@ export const SelectSearchInput: FC<SelectSearchInputProps> = ({
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
-      <InputGroupInput
-        placeholder="Search"
-        value={value}
-        onChange={handleChange}
-      />
+      <InputGroupInput placeholder='Search' value={value} onChange={handleChange} />
     </InputGroup>
   );
 };

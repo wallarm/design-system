@@ -1,5 +1,4 @@
 import { createFileRoute } from '@tanstack/react-router';
-
 import { Button } from '@wallarm/design-system/Button';
 import { Heading } from '@wallarm/design-system/Heading';
 import { VStack } from '@wallarm/design-system/Stack';
@@ -18,12 +17,12 @@ function HomePage() {
   const handleSwitchTheme = () => setTheme(nextTheme);
 
   return (
-    <div className="flex flex-col justify-center w-screen h-screen p-32">
-      <VStack spacing={12} justify="center" align="center">
-        <Heading color="primary">Wallarm Design System Playground</Heading>
-        <Text color="secondary" align="center">
-          Welcome to the Wallarm Design System Playground. This is where you can
-          explore and test components.
+    <div className='flex flex-col justify-center w-screen h-screen p-32'>
+      <VStack spacing={12} justify='center' align='center'>
+        <Heading color='primary'>Wallarm Design System Playground</Heading>
+        <Text color='secondary' align='center'>
+          Welcome to the Wallarm Design System Playground. This is where you can explore and test
+          components.
         </Text>
 
         <Button onClick={handleSwitchTheme}>Switch theme to {nextTheme}</Button>

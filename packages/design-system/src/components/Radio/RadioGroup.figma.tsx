@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { RadioGroup } from './RadioGroup';
 
 const figmaNodeUrl =
@@ -9,5 +8,5 @@ figma.connect(RadioGroup, figmaNodeUrl, {
   props: {
     children: figma.children('radio-item'),
   },
-  example: ({ children }) => <RadioGroup value="any">{children}</RadioGroup>,
+  example: ({ children }) => <RadioGroup value='any'>{children}</RadioGroup>,
 });

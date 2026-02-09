@@ -1,5 +1,4 @@
 import { forwardRef, type ReactNode } from 'react';
-
 import {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -27,9 +26,9 @@ export const ToastTitle = forwardRef<HTMLDivElement, ToastTitleProps>(
         <OverflowTooltipTrigger>
           <Text
             ref={ref}
-            size="md"
-            weight="medium"
-            color="primary-alt"
+            size='md'
+            weight='medium'
+            color='primary-alt'
             lineClamp={isSimple ? 1 : 2}
           >
             {children}

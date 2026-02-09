@@ -1,8 +1,6 @@
 import type { Meta, StoryFn } from '@storybook/react';
-
 import { Info, Skull, TriangleAlert } from '../../icons';
 import { VStack } from '../Stack';
-
 import { loadHighlightJsAdapter, loadPrismAdapter, loadShikiAdapter } from './adapters';
 import { CodeSnippetAdapterProvider } from './CodeSnippetAdapterProvider';
 import { CodeSnippetCode } from './CodeSnippetCode';
@@ -11,16 +9,16 @@ import { CodeSnippetLineNumbers } from './CodeSnippetLineNumbers';
 import { CodeSnippetRoot } from './CodeSnippetRoot';
 
 const meta = {
-    title: 'Data display/CodeSnippet/CodeSnippet',
-    component: CodeSnippetRoot,
-    parameters: {
-        layout: 'padded',
-        design: {
-            type: 'figma',
-            url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=3087-29516&m=dev',
-        },
+  title: 'Data display/CodeSnippet/CodeSnippet',
+  component: CodeSnippetRoot,
+  parameters: {
+    layout: 'padded',
+    design: {
+      type: 'figma',
+      url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=3087-29516&m=dev',
     },
-    tags: ['autodocs'],
+  },
+  tags: ['autodocs'],
 } satisfies Meta<typeof CodeSnippetRoot>;
 
 export default meta;
@@ -51,57 +49,57 @@ const jsonCode = `{
  * Basic code snippet with plain text rendering.
  */
 export const Default: StoryFn<typeof meta> = () => (
-    <CodeSnippetRoot code={bashCode} language='text'>
-        <CodeSnippetContent>
-            <CodeSnippetCode />
-        </CodeSnippetContent>
-    </CodeSnippetRoot>
+  <CodeSnippetRoot code={bashCode} language='text'>
+    <CodeSnippetContent>
+      <CodeSnippetCode />
+    </CodeSnippetContent>
+  </CodeSnippetRoot>
 );
 
 /**
  * Code snippet with line numbers displayed.
  */
 export const WithLineNumbers: StoryFn<typeof meta> = () => (
-    <CodeSnippetRoot code={sampleCode} language='text'>
-        <CodeSnippetContent>
-            <CodeSnippetLineNumbers />
-            <CodeSnippetCode />
-        </CodeSnippetContent>
-    </CodeSnippetRoot>
+  <CodeSnippetRoot code={sampleCode} language='text'>
+    <CodeSnippetContent>
+      <CodeSnippetLineNumbers />
+      <CodeSnippetCode />
+    </CodeSnippetContent>
+  </CodeSnippetRoot>
 );
 
 /**
  * Different size variants: sm, md (default), lg.
  */
 export const Sizes: StoryFn<typeof meta> = () => (
-    <VStack spacing={16}>
-        <VStack align='start' spacing={4}>
-            <span className='text-xs text-text-secondary font-medium'>sm</span>
-            <CodeSnippetRoot code={bashCode} language='text' size='sm'>
-                <CodeSnippetContent>
-                    <CodeSnippetCode />
-                </CodeSnippetContent>
-            </CodeSnippetRoot>
-        </VStack>
-
-        <VStack align='start' spacing={4}>
-            <span className='text-xs text-text-secondary font-medium'>md (default)</span>
-            <CodeSnippetRoot code={bashCode} language='text' size='md'>
-                <CodeSnippetContent>
-                    <CodeSnippetCode />
-                </CodeSnippetContent>
-            </CodeSnippetRoot>
-        </VStack>
-
-        <VStack align='start' spacing={4}>
-            <span className='text-xs text-text-secondary font-medium'>lg</span>
-            <CodeSnippetRoot code={bashCode} language='text' size='lg'>
-                <CodeSnippetContent>
-                    <CodeSnippetCode />
-                </CodeSnippetContent>
-            </CodeSnippetRoot>
-        </VStack>
+  <VStack spacing={16}>
+    <VStack align='start' spacing={4}>
+      <span className='text-xs text-text-secondary font-medium'>sm</span>
+      <CodeSnippetRoot code={bashCode} language='text' size='sm'>
+        <CodeSnippetContent>
+          <CodeSnippetCode />
+        </CodeSnippetContent>
+      </CodeSnippetRoot>
     </VStack>
+
+    <VStack align='start' spacing={4}>
+      <span className='text-xs text-text-secondary font-medium'>md (default)</span>
+      <CodeSnippetRoot code={bashCode} language='text' size='md'>
+        <CodeSnippetContent>
+          <CodeSnippetCode />
+        </CodeSnippetContent>
+      </CodeSnippetRoot>
+    </VStack>
+
+    <VStack align='start' spacing={4}>
+      <span className='text-xs text-text-secondary font-medium'>lg</span>
+      <CodeSnippetRoot code={bashCode} language='text' size='lg'>
+        <CodeSnippetContent>
+          <CodeSnippetCode />
+        </CodeSnippetContent>
+      </CodeSnippetRoot>
+    </VStack>
+  </VStack>
 );
 
 /**
@@ -110,7 +108,7 @@ export const Sizes: StoryFn<typeof meta> = () => (
  * and an optional prefix (text, icon, etc.).
  */
 export const LineAnnotations: StoryFn<typeof meta> = () => {
-    const httpCode = `Host: inventory.example.com
+  const httpCode = `Host: inventory.example.com
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
 AppleWebKit/537.36
 Accept: application/json, text/plain, */*
@@ -118,29 +116,29 @@ Accept-Language: en-US,en;q=0.9
 Connection: keep-alive
 Cache-Control: no-cache`;
 
-    return (
-        <CodeSnippetRoot
-            code={httpCode}
-            language='text'
-            lines={{
-                3: { color: 'danger', prefix: <Skull /> },
-                5: { color: 'warning', prefix: <TriangleAlert /> },
-                7: { color: 'info', prefix: <Info /> },
-            }}
-        >
-            <CodeSnippetContent>
-                <CodeSnippetLineNumbers />
-                <CodeSnippetCode />
-            </CodeSnippetContent>
-        </CodeSnippetRoot>
-    );
+  return (
+    <CodeSnippetRoot
+      code={httpCode}
+      language='text'
+      lines={{
+        3: { color: 'danger', prefix: <Skull /> },
+        5: { color: 'warning', prefix: <TriangleAlert /> },
+        7: { color: 'info', prefix: <Info /> },
+      }}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  );
 };
 
 /**
  * All available line colors.
  */
 export const LineColors: StoryFn<typeof meta> = () => {
-    const colorsCode = `Line 1: Default (no color)
+  const colorsCode = `Line 1: Default (no color)
 Line 2: Danger color
 Line 3: Warning color
 Line 4: Info color
@@ -149,26 +147,26 @@ Line 6: Brand color
 Line 7: AI color
 Line 8: Neutral color`;
 
-    return (
-        <CodeSnippetRoot
-            code={colorsCode}
-            language='text'
-            lines={{
-                2: { color: 'danger' },
-                3: { color: 'warning' },
-                4: { color: 'info' },
-                5: { color: 'success' },
-                6: { color: 'brand' },
-                7: { color: 'ai' },
-                8: { color: 'neutral' },
-            }}
-        >
-            <CodeSnippetContent>
-                <CodeSnippetLineNumbers />
-                <CodeSnippetCode />
-            </CodeSnippetContent>
-        </CodeSnippetRoot>
-    );
+  return (
+    <CodeSnippetRoot
+      code={colorsCode}
+      language='text'
+      lines={{
+        2: { color: 'danger' },
+        3: { color: 'warning' },
+        4: { color: 'info' },
+        5: { color: 'success' },
+        6: { color: 'brand' },
+        7: { color: 'ai' },
+        8: { color: 'neutral' },
+      }}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  );
 };
 
 /**
@@ -176,7 +174,7 @@ Line 8: Neutral color`;
  * Each color has a default text style, but it can be overridden.
  */
 export const TextStyles: StoryFn<typeof meta> = () => {
-    const stylesCode = `Line 1: Default (regular)
+  const stylesCode = `Line 1: Default (regular)
 Line 2: Medium weight
 Line 3: Italic style
 Line 4: Danger with italic override
@@ -184,111 +182,109 @@ Line 5: Neutral (default italic)
 Line 6: Custom className
 Line 7: Custom inline style`;
 
-    return (
-        <CodeSnippetRoot
-            code={stylesCode}
-            language='text'
-            lines={{
-                2: { textStyle: 'medium' },
-                3: { textStyle: 'italic' },
-                4: { color: 'danger', textStyle: 'italic' },
-                5: { color: 'neutral' },
-                6: { className: 'underline' },
-                7: { style: { textDecoration: 'line-through' } },
-            }}
-        >
-            <CodeSnippetContent>
-                <CodeSnippetLineNumbers />
-                <CodeSnippetCode />
-            </CodeSnippetContent>
-        </CodeSnippetRoot>
-    );
+  return (
+    <CodeSnippetRoot
+      code={stylesCode}
+      language='text'
+      lines={{
+        2: { textStyle: 'medium' },
+        3: { textStyle: 'italic' },
+        4: { color: 'danger', textStyle: 'italic' },
+        5: { color: 'neutral' },
+        6: { className: 'underline' },
+        7: { style: { textDecoration: 'line-through' } },
+      }}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  );
 };
 
 /**
  * Lines with prefix content (text, symbols).
  */
 export const LineWithPrefix: StoryFn<typeof meta> = () => {
-    const diffCode = `const greeting = "Hello";
+  const diffCode = `const greeting = "Hello";
 console.log("old message");
 console.log("new message");
 console.log("another new line");
 
 export default greeting;`;
 
-    return (
-        <CodeSnippetRoot
-            code={diffCode}
-            language='text'
-            lines={{
-                2: { color: 'danger', prefix: '-' },
-                3: { color: 'success', prefix: '+' },
-                4: { color: 'success', prefix: '+' },
-            }}
-        >
-            <CodeSnippetContent>
-                <CodeSnippetLineNumbers />
-                <CodeSnippetCode />
-            </CodeSnippetContent>
-        </CodeSnippetRoot>
-    );
+  return (
+    <CodeSnippetRoot
+      code={diffCode}
+      language='text'
+      lines={{
+        2: { color: 'danger', prefix: '-' },
+        3: { color: 'success', prefix: '+' },
+        4: { color: 'success', prefix: '+' },
+      }}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  );
 };
 
 /**
  * Line wrapping enabled for long lines.
  */
 export const LineWrapping: StoryFn<typeof meta> = () => {
-    const longCode = `const veryLongVariableName = "This is a very long string that will demonstrate line wrapping behavior when the content exceeds the container width";
+  const longCode = `const veryLongVariableName = "This is a very long string that will demonstrate line wrapping behavior when the content exceeds the container width";
 console.log(veryLongVariableName);`;
 
-    return (
-        <VStack spacing={16}>
-            <VStack align='start' spacing={4}>
-                <span className='text-xs text-text-secondary font-medium'>Without wrapping</span>
-                <div style={{ maxWidth: '600px' }}>
-                    <CodeSnippetRoot code={longCode} language='text'>
-                        <CodeSnippetContent>
-                            <CodeSnippetLineNumbers />
-                            <CodeSnippetCode />
-                        </CodeSnippetContent>
-                    </CodeSnippetRoot>
-                </div>
-            </VStack>
+  return (
+    <VStack spacing={16}>
+      <VStack align='start' spacing={4}>
+        <span className='text-xs text-text-secondary font-medium'>Without wrapping</span>
+        <div style={{ maxWidth: '600px' }}>
+          <CodeSnippetRoot code={longCode} language='text'>
+            <CodeSnippetContent>
+              <CodeSnippetLineNumbers />
+              <CodeSnippetCode />
+            </CodeSnippetContent>
+          </CodeSnippetRoot>
+        </div>
+      </VStack>
 
-            <VStack align='start' spacing={4}>
-                <span className='text-xs text-text-secondary font-medium'>With wrapping</span>
-                <div style={{ maxWidth: '600px' }}>
-                    <CodeSnippetRoot code={longCode} language='text' wrapLines>
-                        <CodeSnippetContent>
-                            <CodeSnippetLineNumbers />
-                            <CodeSnippetCode />
-                        </CodeSnippetContent>
-                    </CodeSnippetRoot>
-                </div>
-            </VStack>
-            <VStack align='start' spacing={4}>
-                <span className='text-xs text-text-secondary font-medium'>
-                    Wrapping with annotations
-                </span>
-                <div style={{ maxWidth: '600px' }}>
-                    <CodeSnippetRoot
-                        code={longCode}
-                        language='text'
-                        wrapLines
-                        lines={{
-                            1: { color: 'danger', prefix: '-' },
-                            2: { color: 'success', prefix: '+' },
-                        }}
-                    >
-                        <CodeSnippetContent>
-                            <CodeSnippetLineNumbers />
-                            <CodeSnippetCode />
-                        </CodeSnippetContent>
-                    </CodeSnippetRoot>
-                </div>
-            </VStack>
-        </VStack>
-    );
+      <VStack align='start' spacing={4}>
+        <span className='text-xs text-text-secondary font-medium'>With wrapping</span>
+        <div style={{ maxWidth: '600px' }}>
+          <CodeSnippetRoot code={longCode} language='text' wrapLines>
+            <CodeSnippetContent>
+              <CodeSnippetLineNumbers />
+              <CodeSnippetCode />
+            </CodeSnippetContent>
+          </CodeSnippetRoot>
+        </div>
+      </VStack>
+      <VStack align='start' spacing={4}>
+        <span className='text-xs text-text-secondary font-medium'>Wrapping with annotations</span>
+        <div style={{ maxWidth: '600px' }}>
+          <CodeSnippetRoot
+            code={longCode}
+            language='text'
+            wrapLines
+            lines={{
+              1: { color: 'danger', prefix: '-' },
+              2: { color: 'success', prefix: '+' },
+            }}
+          >
+            <CodeSnippetContent>
+              <CodeSnippetLineNumbers />
+              <CodeSnippetCode />
+            </CodeSnippetContent>
+          </CodeSnippetRoot>
+        </div>
+      </VStack>
+    </VStack>
+  );
 };
 
 const longScrollCode = `// This is a code snippet that demonstrates both vertical and horizontal scrolling
@@ -329,36 +325,36 @@ export { processData, fetchUserData, DataProcessor };`;
  * The container is constrained to show scrollbars.
  */
 export const WithBothScrolls: StoryFn<typeof meta> = () => (
-    <div style={{ maxWidth: '500px', maxHeight: '300px', background: 'white' }}>
-        <CodeSnippetRoot
-            code={longScrollCode}
-            language='text'
-            lines={{
-                2: { color: 'warning', prefix: <TriangleAlert /> },
-                3: { color: 'info' },
-                13: { color: 'danger', prefix: <Skull /> },
-                20: { color: 'success', prefix: '+' },
-            }}
-            style={{ height: '280px' }}
-        >
-            <CodeSnippetContent>
-                <CodeSnippetLineNumbers />
-                <CodeSnippetCode />
-            </CodeSnippetContent>
-        </CodeSnippetRoot>
-    </div>
+  <div style={{ maxWidth: '500px', maxHeight: '300px', background: 'white' }}>
+    <CodeSnippetRoot
+      code={longScrollCode}
+      language='text'
+      lines={{
+        2: { color: 'warning', prefix: <TriangleAlert /> },
+        3: { color: 'info' },
+        13: { color: 'danger', prefix: <Skull /> },
+        20: { color: 'success', prefix: '+' },
+      }}
+      style={{ height: '280px' }}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </div>
 );
 
 /**
  * Custom starting line number.
  */
 export const CustomStartingLine: StoryFn<typeof meta> = () => (
-    <CodeSnippetRoot code={sampleCode} language='text' startingLineNumber={97}>
-        <CodeSnippetContent>
-            <CodeSnippetLineNumbers />
-            <CodeSnippetCode />
-        </CodeSnippetContent>
-    </CodeSnippetRoot>
+  <CodeSnippetRoot code={sampleCode} language='text' startingLineNumber={97}>
+    <CodeSnippetContent>
+      <CodeSnippetLineNumbers />
+      <CodeSnippetCode />
+    </CodeSnippetContent>
+  </CodeSnippetRoot>
 );
 
 /**
@@ -366,14 +362,14 @@ export const CustomStartingLine: StoryFn<typeof meta> = () => (
  * Shiki provides VS Code-quality highlighting (~200KB+ with WASM).
  */
 export const JSONWithShiki: StoryFn<typeof meta> = () => (
-    <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
-        <CodeSnippetRoot code={jsonCode} language='json'>
-            <CodeSnippetContent>
-                <CodeSnippetLineNumbers />
-                <CodeSnippetCode />
-            </CodeSnippetContent>
-        </CodeSnippetRoot>
-    </CodeSnippetAdapterProvider>
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot code={jsonCode} language='json'>
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
 );
 
 const typescriptCode = `type User = {
@@ -405,14 +401,14 @@ export { fetchUser, users };`;
  * Prism is lightweight (~15KB) and good for most use cases.
  */
 export const TypescriptWithPrism: StoryFn<typeof meta> = () => (
-    <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
-        <CodeSnippetRoot code={typescriptCode} language='typescript'>
-            <CodeSnippetContent>
-                <CodeSnippetLineNumbers />
-                <CodeSnippetCode />
-            </CodeSnippetContent>
-        </CodeSnippetRoot>
-    </CodeSnippetAdapterProvider>
+  <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
+    <CodeSnippetRoot code={typescriptCode} language='typescript'>
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
 );
 
 const curlCode = `curl -X POST "https://api.wallarm.com/v2/node" \\
@@ -429,14 +425,14 @@ const curlCode = `curl -X POST "https://api.wallarm.com/v2/node" \\
  * Prism is lightweight (~15KB) and good for most use cases.
  */
 export const BashWithPrism: StoryFn<typeof meta> = () => (
-    <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
-        <CodeSnippetRoot code={curlCode} language='bash'>
-            <CodeSnippetContent>
-                <CodeSnippetLineNumbers />
-                <CodeSnippetCode />
-            </CodeSnippetContent>
-        </CodeSnippetRoot>
-    </CodeSnippetAdapterProvider>
+  <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
+    <CodeSnippetRoot code={curlCode} language='bash'>
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
 );
 
 const htmlCode = `<!DOCTYPE html>
@@ -469,12 +465,12 @@ const htmlCode = `<!DOCTYPE html>
  * highlight.js is well-established (~30KB) with good language support.
  */
 export const HTMLWithHighlightJs: StoryFn<typeof meta> = () => (
-    <CodeSnippetAdapterProvider adapter={loadHighlightJsAdapter}>
-        <CodeSnippetRoot code={htmlCode} language='html'>
-            <CodeSnippetContent>
-                <CodeSnippetLineNumbers />
-                <CodeSnippetCode />
-            </CodeSnippetContent>
-        </CodeSnippetRoot>
-    </CodeSnippetAdapterProvider>
+  <CodeSnippetAdapterProvider adapter={loadHighlightJsAdapter}>
+    <CodeSnippetRoot code={htmlCode} language='html'>
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
 );

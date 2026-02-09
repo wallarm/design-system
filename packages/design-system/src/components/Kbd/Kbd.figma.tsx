@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { Kbd } from './Kbd';
 
 const figmaNodeUrl =

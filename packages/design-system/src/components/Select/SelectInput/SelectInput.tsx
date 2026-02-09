@@ -1,13 +1,10 @@
 import type { FC } from 'react';
-
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
 import { cva } from 'class-variance-authority';
-
 import { cn } from '../../../utils/cn';
 import { OverflowList } from '../../OverflowList';
 import { SelectArrow } from '../SelectArrow';
 import { SelectValueText, type SelectValueTextProps } from '../SelectValueText';
-
 import { SelectInputClear } from './SelectInputClear';
 import { SelectInputItemRenderer } from './SelectInputItemRenderer';
 import { SelectInputOverflowRenderer } from './SelectInputOverflowRenderer';
@@ -88,15 +85,13 @@ const selectInputVariants = cva(
 
 type SelectInputProps = Pick<SelectValueTextProps, 'placeholder'>;
 
-export const SelectInput: FC<SelectInputProps> = ({
-  placeholder = 'Choose...',
-}) => {
+export const SelectInput: FC<SelectInputProps> = ({ placeholder = 'Choose...' }) => {
   const { selectedItems, disabled, multiple } = useSelectContext();
 
   const isEmpty = selectedItems.length <= 0;
 
   return (
-    <ArkUiSelect.Control className="w-full max-w-full">
+    <ArkUiSelect.Control className='w-full max-w-full'>
       <ArkUiSelect.Trigger asChild>
         <div
           className={cn(
@@ -107,7 +102,7 @@ export const SelectInput: FC<SelectInputProps> = ({
         >
           {multiple && !isEmpty ? (
             <OverflowList
-              className="flex items-center gap-4 flex-1 h-full pl-6 overflow-hidden"
+              className='flex items-center gap-4 flex-1 h-full pl-6 overflow-hidden'
               items={selectedItems}
               itemRenderer={SelectInputItemRenderer}
               overflowRenderer={SelectInputOverflowRenderer}
@@ -118,7 +113,7 @@ export const SelectInput: FC<SelectInputProps> = ({
 
           <SelectInputClear />
 
-          <SelectArrow className="text-icon-secondary" />
+          <SelectArrow className='text-icon-secondary' />
         </div>
       </ArkUiSelect.Trigger>
     </ArkUiSelect.Control>

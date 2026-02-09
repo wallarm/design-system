@@ -1,10 +1,4 @@
-import {
-  type ReactElement,
-  type RefObject,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
+import { type ReactElement, type RefObject, useLayoutEffect, useRef, useState } from 'react';
 
 export interface UseOverflowItemsOptions<T> {
   items: T[];
@@ -45,9 +39,7 @@ export function useOverflowItems<T>({
     }
 
     // Collect measurements from refs
-    const widths = measurementRefs.current
-      .slice(0, items.length)
-      .map((ref) => ref?.offsetWidth || 0);
+    const widths = measurementRefs.current.slice(0, items.length).map(ref => ref?.offsetWidth || 0);
 
     setMeasurements(widths);
   }, [items]);
@@ -91,8 +83,7 @@ export function useOverflowItems<T>({
           try {
             // Create a temporary element to measure overflow renderer
             const tempDiv = document.createElement('div');
-            tempDiv.style.cssText =
-              'position: absolute; visibility: hidden; top: -9999px;';
+            tempDiv.style.cssText = 'position: absolute; visibility: hidden; top: -9999px;';
             tempDiv.style.font = computedStyles.font;
             document.body.appendChild(tempDiv);
 
@@ -114,8 +105,7 @@ export function useOverflowItems<T>({
           }
         }
 
-        const maxWidth =
-          availableWidth - (needsIndicator ? dynamicReserveSpace : 0);
+        const maxWidth = availableWidth - (needsIndicator ? dynamicReserveSpace : 0);
 
         if (accumulatedWidth + widthWithGap <= maxWidth || i === 0) {
           count++;
@@ -150,20 +140,17 @@ export function useOverflowItems<T>({
     const renderMeasure = renderMeasurementItem || renderItem;
 
     return (
-      <div
-        className="absolute invisible pointer-events-none"
-        aria-hidden="true"
-      >
+      <div className='absolute invisible pointer-events-none' aria-hidden='true'>
         {items.map((item, index) => {
           const key = `${index}`;
 
           return (
             <div
               key={key}
-              ref={(el) => {
+              ref={el => {
                 measurementRefs.current[index] = el;
               }}
-              className="inline-flex"
+              className='inline-flex'
             >
               {renderMeasure(item)}
             </div>

@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { Input } from './Input';
 
 const figmaNodeUrl =
@@ -19,9 +18,7 @@ figma.connect(Input, figmaNodeUrl, {
     placeholder: figma.string('Placeholder'),
   },
   variant: { Error: true },
-  example: ({ placeholder }) => (
-    <Input placeholder={placeholder} error={true} />
-  ),
+  example: ({ placeholder }) => <Input placeholder={placeholder} error={true} />,
 });
 
 figma.connect(Input, figmaNodeUrl, {
@@ -33,7 +30,5 @@ figma.connect(Input, figmaNodeUrl, {
     }),
   },
   variant: { State: 'Disabled' },
-  example: ({ placeholder, error }) => (
-    <Input placeholder={placeholder} error={error} disabled />
-  ),
+  example: ({ placeholder, error }) => <Input placeholder={placeholder} error={error} disabled />,
 });
