@@ -19,12 +19,8 @@
       "cache": true,
       "persistent": true
     },
-    "lint": {
-      "dependsOn": ["^lint"]
-    },
-    "lint:fix": {
-      "dependsOn": ["^lint:fix"]
-    },
+    "lint": {},
+    "lint:fix": {},
     "typecheck": {
       "dependsOn": ["^build", "^typecheck"]
     },
