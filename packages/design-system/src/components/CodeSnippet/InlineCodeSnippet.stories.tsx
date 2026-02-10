@@ -1,4 +1,4 @@
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { VStack } from '../Stack';
 import { TooltipProvider } from '../Tooltip';
 import { InlineCodeSnippet } from './InlineCodeSnippet';

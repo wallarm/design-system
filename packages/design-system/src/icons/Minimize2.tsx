@@ -1,10 +1,18 @@
 import type { FC } from 'react';
 import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
-export const Maximize: FC<SvgIconProps> = props => (
+export const Minimize2: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <path
-      d='M8 3H5a2 2 0 0 0-2 2v3'
+    <polyline
+      points='4,14 10,14 10,20'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      fill='none'
+    />
+    <polyline
+      points='20,10 14,10 14,4'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'
@@ -12,7 +20,7 @@ export const Maximize: FC<SvgIconProps> = props => (
       fill='none'
     />
     <path
-      d='M16 3h3a2 2 0 0 1 2 2v3'
+      d='m14 10 7-7'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'
@@ -20,15 +28,7 @@ export const Maximize: FC<SvgIconProps> = props => (
       fill='none'
     />
     <path
-      d='M3 16v3a2 2 0 0 0 2 2h3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M21 16v3a2 2 0 0 1-2 2h-3'
+      d='m3 21 7-7'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'
@@ -38,4 +38,4 @@ export const Maximize: FC<SvgIconProps> = props => (
   </SvgIcon>
 );
 
-Maximize.displayName = 'Maximize';
+Minimize2.displayName = 'Minimize2Icon';
