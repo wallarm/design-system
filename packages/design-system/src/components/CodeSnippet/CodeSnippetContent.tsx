@@ -60,10 +60,11 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
   );
 
   const hasLineNumbers = Boolean(lineNumbersElement);
+  const needsGutterElements = hasHighlights || hasLineNumbers || hasAnyPrefix;
   // When wrapLines is true, render gutter elements (color stick, line numbers, prefix) inline with each code line
-  const useInlineGutter = wrapLines;
+  const useInlineGutter = wrapLines && needsGutterElements;
   // Gutter column only needed when NOT wrapping
-  const hasGutter = !wrapLines && (hasHighlights || hasLineNumbers || hasAnyPrefix);
+  const hasGutter = !wrapLines && needsGutterElements;
 
   // Override context to enable inline gutter and line numbers when wrapping
   const overriddenContext = useMemo(
@@ -105,7 +106,8 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
       )}
       <div
         className={cn(
-          'relative z-10 flex flex-1 min-w-0 pr-12',
+          'relative z-10 flex flex-1 min-w-0',
+          !useInlineGutter && 'pr-12',
           !hasGutter && !useInlineGutter && 'pl-12',
         )}
       >

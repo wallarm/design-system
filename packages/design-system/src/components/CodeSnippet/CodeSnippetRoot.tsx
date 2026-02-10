@@ -1,5 +1,6 @@
 import type { HTMLAttributes, ReactNode, Ref } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { createPortal } from 'react-dom';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { plainAdapter } from './adapters/plain';
@@ -11,6 +12,7 @@ import {
   type LineConfig,
 } from './CodeSnippetContext';
 import { useAdapter } from './hooks';
+import { ShowMoreButton } from './internal/ShowMoreButton';
 
 const codeSnippetRootVariants = cva(
   [
@@ -25,6 +27,7 @@ const codeSnippetRootVariants = cva(
     '[&::selection]:text-[var(--color-syntax-highlight-selected-code)]',
     '[&_*::selection]:bg-[var(--color-syntax-highlight-selected-bg)]',
     '[&_*::selection]:text-[var(--color-syntax-highlight-selected-code)]',
+    '[&>[data-slot=code-snippet-actions]]:absolute [&>[data-slot=code-snippet-actions]]:right-0 [&>[data-slot=code-snippet-actions]]:top-0 [&>[data-slot=code-snippet-actions]]:z-30 [&>[data-slot=code-snippet-actions]]:p-6 [&>[data-slot=code-snippet-actions]]:rounded-br-6 [&>[data-slot=code-snippet-actions]]:rounded-tl-6',
   ].join(' '),
   {
     variants: {
@@ -81,6 +84,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   const adapterContext = useAdapter<TLanguage>();
   const [wrapLines, setWrapLines] = useState(initialWrapLines);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
   const [tokens, setTokens] = useState<Token[][] | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -120,6 +124,16 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     };
   }, [code, language, adapter]);
 
+  // Close fullscreen on Escape
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsFullscreen(false);
+    };
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, [isFullscreen]);
+
   const copyToClipboard = useCallback(async () => {
     await navigator.clipboard.writeText(code);
     onCopy?.(code);
@@ -139,9 +153,11 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       lines: new Map(Object.entries(lines).map(([k, v]) => [Number(k), v])),
       isExpanded,
       maxLines,
+      isFullscreen,
       copyToClipboard,
       setWrapLines,
       setIsExpanded,
+      setIsFullscreen,
       adapter,
     }),
     [
@@ -155,20 +171,40 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       lines,
       isExpanded,
       maxLines,
+      isFullscreen,
       copyToClipboard,
       adapter,
     ],
   );
 
+  const snippet = (
+    <div
+      data-slot='code-snippet'
+      className={cn(
+        codeSnippetRootVariants({ size }),
+        isFullscreen ? 'fixed inset-16 z-50' : className,
+      )}
+      {...(!isFullscreen ? props : {})}
+    >
+      {children}
+      {maxLines > 0 && <ShowMoreButton />}
+    </div>
+  );
+
   return (
     <CodeSnippetContext.Provider value={contextValue as unknown as CodeSnippetContextValue}>
-      <div
-        data-slot='code-snippet'
-        className={cn(codeSnippetRootVariants({ size }), className)}
-        {...props}
-      >
-        {children}
-      </div>
+      {isFullscreen
+        ? createPortal(
+            <>
+              <div
+                className='fixed inset-0 z-40 backdrop-blur-xs bg-component-dialog-overlay'
+                onClick={() => setIsFullscreen(false)}
+              />
+              {snippet}
+            </>,
+            document.body,
+          )
+        : snippet}
     </CodeSnippetContext.Provider>
   );
 };

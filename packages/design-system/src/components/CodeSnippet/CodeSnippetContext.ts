@@ -8,9 +8,20 @@ export type LineColor = 'danger' | 'warning' | 'info' | 'success' | 'brand' | 'a
 
 export type LineTextStyle = 'regular' | 'medium' | 'italic';
 
+export type LineRange = {
+  /** 0-based inclusive start character index */
+  start: number;
+  /** 0-based exclusive end character index */
+  end: number;
+  /** Color applied to the range text (bold + colored). Falls back to the line's color. */
+  color?: LineColor;
+};
+
 export type LineConfig = {
   /** Color for the line indicator, background, and text */
   color?: LineColor;
+  /** Character ranges within the line to highlight with colored bold text */
+  ranges?: LineRange[];
   /** Prefix content (text, icon, etc.) displayed before the line content */
   prefix?: ReactNode;
   /** Text style variant for the line */
@@ -44,10 +55,14 @@ export type CodeSnippetContextValue<TLanguage extends string = string> = {
   isExpanded: boolean;
   maxLines: number;
 
+  // Fullscreen
+  isFullscreen: boolean;
+
   // Actions
   copyToClipboard: () => Promise<void>;
   setWrapLines: (wrap: boolean) => void;
   setIsExpanded: (expanded: boolean) => void;
+  setIsFullscreen: (fullscreen: boolean) => void;
 
   // Adapter
   adapter: SyntaxAdapter<TLanguage> | null;

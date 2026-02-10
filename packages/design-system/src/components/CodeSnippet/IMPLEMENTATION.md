@@ -1,205 +1,135 @@
-# CodeSnippet - Remaining Tasks
+# CodeSnippet - Implementation Plan
 
 **Figma:** [WADS-Components - CodeSnippet](https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=3087-29516&m=dev)
 
 ---
 
-## Completed Components
+## Remaining Tasks
 
-| Component | Status |
-|-----------|--------|
-| CodeSnippetRoot | ✅ |
-| CodeSnippetContent | ✅ |
-| CodeSnippetCode | ✅ |
-| CodeSnippetLineNumbers | ✅ |
-| CodeSnippetContext | ✅ |
-| CodeSnippetAdapterProvider | ✅ |
-| InlineCodeSnippet | ✅ |
-| Plain Adapter | ✅ |
-| Hooks (useCodeSnippet, useAdapter) | ✅ |
+### CodeSnippetAnnotations / CodeSnippetAnnotation
+Planned but not implemented. Current line annotations work via `lines` prop on Root with `LineConfig` (color, prefix, textStyle, className, style). A dedicated annotation component pattern may be added later if needed.
 
 ---
 
-## Header Components
+## Testing Plan
 
-### CodeSnippetHeader
-Container for title, tabs and actions.
+**Status: No tests exist yet.**
 
-```tsx
-export type CodeSnippetHeaderProps = HTMLAttributes<HTMLDivElement> & {
-    ref?: Ref<HTMLDivElement>;
-};
-```
+### Unit Tests
 
-Styles: `flex items-center justify-between px-12 py-8 bg-states-primary-hover border-b border-border-primary`
+#### CodeSnippetRoot
+- [ ] Renders children within context provider
+- [ ] Tokenizes code via adapter on mount
+- [ ] Falls back to plain tokens on adapter error
+- [ ] Re-highlights when code or language changes
+- [ ] `wrapLines` prop initializes state correctly
+- [ ] `maxLines > 0` renders ShowMoreButton
+- [ ] `maxLines={0}` does not render ShowMoreButton
+- [ ] Fullscreen state: Escape key exits fullscreen
+- [ ] Fullscreen state: renders portal to document.body
+- [ ] `onCopy` callback fires on copy
 
-### CodeSnippetTitle
-Simple title text display.
+#### CodeSnippetCode
+- [ ] Renders plain text lines when tokens are loading
+- [ ] Renders tokenized lines when tokens are ready
+- [ ] Clips to `maxLines` when not expanded
+- [ ] Shows all lines when expanded
 
-```tsx
-export type CodeSnippetTitleProps = HTMLAttributes<HTMLSpanElement> & {
-    ref?: Ref<HTMLSpanElement>;
-};
-```
+#### CodeSnippetLineNumbers
+- [ ] Renders correct line numbers starting from `startingLineNumber`
+- [ ] Applies line color styling
+- [ ] Returns null when tokens are not ready
 
-Styles: `text-sm font-medium text-text-primary`
+#### CodeSnippetContent
+- [ ] Renders gutter column in non-wrap mode with line numbers
+- [ ] Renders inline gutter in wrap mode
+- [ ] Hides gutter when no highlights, line numbers, or prefixes
+- [ ] Supports native scroll mode
 
-### CodeSnippetTabs
-Tab container using existing `Tabs` component or custom implementation.
+#### CodeSnippetActions
+- [ ] Renders children in flex container
+- [ ] Accepts className override
 
-```tsx
-export type CodeSnippetTabsProps = {
-    value?: string;
-    defaultValue?: string;
-    onValueChange?: (value: string) => void;
-    children: ReactNode;
-};
-```
+#### CodeSnippetCopyButton
+- [ ] Copies code to clipboard on click
+- [ ] Shows "Copied" tooltip after copy
+- [ ] Resets copied state on click outside
+- [ ] Returns null when clipboard API unsupported
 
-### CodeSnippetTab
-Individual tab item.
+#### CodeSnippetWrapButton
+- [ ] Toggles wrapLines state on click
+- [ ] Shows active state when wrapping enabled
+- [ ] Tooltip shows "Wrap lines" / "Unwrap lines"
 
-```tsx
-export type CodeSnippetTabProps = {
-    value: string;
-    disabled?: boolean;
-    children: ReactNode;
-};
-```
+#### CodeSnippetFullscreenButton
+- [ ] Toggles fullscreen state on click
+- [ ] Shows Maximize icon normally, Minimize when fullscreen
+- [ ] Tooltip shows "Enter full screen" / "Exit full screen"
 
-### CodeSnippetActions
-Container for action buttons (right side of header).
+#### ShowMoreButton (internal)
+- [ ] Shows "Show more (N lines)" with correct count
+- [ ] Shows "Show less" when expanded
+- [ ] Returns null when no hidden lines
 
-```tsx
-export type CodeSnippetActionsProps = HTMLAttributes<HTMLDivElement> & {
-    ref?: Ref<HTMLDivElement>;
-};
-```
+#### InlineCodeSnippet
+- [ ] Renders code text
+- [ ] Copies on click when copyable
+- [ ] Does not copy when `copyable={false}`
+- [ ] Renders correct size variant
+- [ ] Supports `asChild` rendering
 
-Styles: `flex items-center gap-4`
+### Adapter Tests
 
----
+#### Plain Adapter
+- [ ] Returns plain tokens for any input
+- [ ] Splits code by newlines correctly
 
-## Action Buttons
+#### Prism Adapter
+- [ ] Highlights JavaScript code with correct token types
+- [ ] Handles unknown language gracefully
+- [ ] Returns supported languages list
 
-### CodeSnippetCopyButton
-Copy code to clipboard. Use `useCodeSnippet()` to get `copyToClipboard`.
+#### Shiki Adapter
+- [ ] Highlights TypeScript code with correct token types
+- [ ] Lazy-loads highlighter on first use
+- [ ] Falls back to plain on error
 
-```tsx
-export type CodeSnippetCopyButtonProps = Omit<ButtonProps, 'children'> & {
-    copyLabel?: string;
-    copiedLabel?: string;
-};
-```
+#### Highlight.js Adapter
+- [ ] Highlights HTML code with correct token types
+- [ ] Decodes HTML entities correctly
+- [ ] Falls back to plain on error
 
-- Use `Copy` and `Check` icons
-- Show "Copied" state for 2 seconds
+### Integration Tests
 
-### CodeSnippetWrapButton
-Toggle line wrapping. Use `useCodeSnippet()` to get `wrapLines` and `setWrapLines`.
+- [ ] Full composition: Root + Header + Tabs + Actions + Content + LineNumbers + Code
+- [ ] Tab switching updates displayed code
+- [ ] Copy button copies correct code for active tab
+- [ ] Wrap toggle changes code layout
+- [ ] ShowMore expands/collapses code
+- [ ] Floating actions positioned correctly without header
 
-```tsx
-export type CodeSnippetWrapButtonProps = Omit<ButtonProps, 'children'>;
-```
+### Screenshot Tests (E2E)
 
-### CodeSnippetFullscreenButton
-Toggle fullscreen mode. Requires adding `isFullscreen` and `setIsFullscreen` to context.
+- [ ] Default
+- [ ] WithLineNumbers
+- [ ] Sizes (sm, md, lg)
+- [ ] LineAnnotations
+- [ ] LineColors (all 7)
+- [ ] TextStyles
+- [ ] LineWithPrefix (diff)
+- [ ] LineWrapping
+- [ ] WithBothScrolls
+- [ ] CustomStartingLine
+- [ ] JSONWithShiki
+- [ ] TypescriptWithPrism
+- [ ] BashWithPrism
+- [ ] HTMLWithHighlightJs
+- [ ] WithHeader
+- [ ] WithTabsAndActions
+- [ ] WithFloatingActions
+- [ ] ShowMore
+- [ ] InlineCodeSnippet - Default
+- [ ] InlineCodeSnippet - Sizes
+- [ ] InlineCodeSnippet - NonCopyable
+- [ ] InlineCodeSnippet - VariousContent
 
-```tsx
-export type CodeSnippetFullscreenButtonProps = Omit<ButtonProps, 'children'>;
-```
-
-### CodeSnippetShowMore
-Expand/collapse for long code blocks.
-
-```tsx
-export type CodeSnippetShowMoreProps = {
-    maxLines?: number;
-    showMoreLabel?: string;
-    showLessLabel?: string;
-};
-```
-
----
-
-## Annotation Components
-
-### CodeSnippetAnnotations
-Container that positions annotations relative to line numbers.
-
-### CodeSnippetAnnotation
-Annotation marker on a specific line.
-
-```tsx
-export type CodeSnippetAnnotationProps = {
-    line: number;
-    type?: 'info' | 'warning' | 'error';
-    children: ReactNode;
-};
-```
-
----
-
-## Optional Adapters
-
-### Prism Adapter
-```bash
-yarn add prism-react-renderer
-```
-Create `adapters/prism.ts` with `createPrismAdapter()`.
-
-### Shiki Adapter
-```bash
-yarn add shiki
-```
-Create `adapters/shiki.ts` with `createShikiAdapter()`.
-
-### Highlight.js Adapter
-```bash
-yarn add highlight.js
-```
-Create `adapters/highlightjs.ts` with `createHighlightJsAdapter()`.
-
----
-
-## Additional Tasks
-
-### CodeSnippetField
-Form field wrapper using existing `Field` component pattern.
-
-### Storybook Stories
-Create `CodeSnippet.stories.tsx` with examples:
-- Basic usage
-- With line numbers
-- With header and actions
-- Multi-file tabs
-- Line highlighting
-- Diff view
-- Collapsible
-- Inline code
-
----
-
-## Current File Structure
-
-```
-src/shared/ds/components/CodeSnippet/
-├── adapters/
-│   ├── index.ts              ✅
-│   ├── types.ts              ✅
-│   └── plain.ts              ✅
-├── hooks/
-│   ├── index.ts              ✅
-│   ├── useAdapter.ts         ✅
-│   └── useCodeSnippet.ts     ✅
-├── CodeSnippetAdapterProvider.tsx  ✅
-├── CodeSnippetCode.tsx             ✅
-├── CodeSnippetContent.tsx          ✅
-├── CodeSnippetContext.ts           ✅
-├── CodeSnippetLineNumbers.tsx      ✅
-├── CodeSnippetRoot.tsx             ✅
-├── InlineCodeSnippet.tsx           ✅
-├── lineStyles.ts                   ✅
-├── index.ts                        ✅
-└── IMPLEMENTATION.md
-```

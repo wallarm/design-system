@@ -119,13 +119,13 @@ export const ToggleButton: FC<ToggleButtonProps> = ({
 
   return (
     <ButtonBase
+      {...props}
       className={toggleButtonVariants({ variant, color, active })}
       size={size}
       loading={loading}
       disabled={isDisabled}
       asChild={asChild}
       onClick={handleToggle}
-      {...props}
     />
   );
 };

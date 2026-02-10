@@ -26,11 +26,13 @@ const TOKEN_CLASSES: Record<TokenType, string> = {
 export type CodeTokenProps = {
   token: Token;
   colorClass?: string;
+  /** Color class from a range highlight — takes highest priority */
+  rangeColorClass?: string;
 };
 
 /** Renders a single syntax-highlighted token */
-export const CodeToken: FC<CodeTokenProps> = ({ token, colorClass }) => (
-  <span className={colorClass ?? token.className ?? TOKEN_CLASSES[token.type]}>
+export const CodeToken: FC<CodeTokenProps> = ({ token, colorClass, rangeColorClass }) => (
+  <span className={rangeColorClass ?? colorClass ?? token.className ?? TOKEN_CLASSES[token.type]}>
     {token.content}
   </span>
 );

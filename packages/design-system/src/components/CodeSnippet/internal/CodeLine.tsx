@@ -69,7 +69,17 @@ export const CodeLine: FC<CodeLineProps> = ({
           )}
         </>
       )}
-      <span className={cn('flex-1', colorClass, textStyleClass, lineClassName)}>{children}</span>
+      <span
+        className={cn(
+          'flex-1',
+          showInlineGutter && 'pr-12',
+          colorClass,
+          textStyleClass,
+          lineClassName,
+        )}
+      >
+        {children}
+      </span>
     </div>
   );
 };
