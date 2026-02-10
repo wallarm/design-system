@@ -1,41 +1,45 @@
 import type { FC } from 'react';
 import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
-export const Maximize: FC<SvgIconProps> = props => (
+export const WrapText: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
+    <line
+      x1='3'
+      y1='6'
+      x2='21'
+      y2='6'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+    />
     <path
-      d='M8 3H5a2 2 0 0 0-2 2v3'
+      d='M3 12h15a3 3 0 1 1 0 6h-4'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'
       strokeLinejoin='round'
       fill='none'
     />
-    <path
-      d='M16 3h3a2 2 0 0 1 2 2v3'
+    <polyline
+      points='16 16 14 18 16 20'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'
       strokeLinejoin='round'
       fill='none'
     />
-    <path
-      d='M3 16v3a2 2 0 0 0 2 2h3'
+    <line
+      x1='3'
+      y1='18'
+      x2='10'
+      y2='18'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'
       strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M21 16v3a2 2 0 0 1-2 2h-3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
     />
   </SvgIcon>
 );
 
-Maximize.displayName = 'Maximize';
+WrapText.displayName = 'WrapTextIcon';

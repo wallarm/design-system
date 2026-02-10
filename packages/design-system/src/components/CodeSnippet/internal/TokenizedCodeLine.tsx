@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import type { Token } from '../adapters/types';
 import type { LineConfig } from '../CodeSnippetContext';
-import { getLineTextStyles } from '../lib/lineUtils';
+import { getLineTextStyles, splitTokensByRanges } from '../lib/lineUtils';
 import { CodeLine } from './CodeLine';
 import { CodeToken } from './CodeToken';
 
@@ -24,6 +24,29 @@ export const TokenizedCodeLine: FC<TokenizedCodeLineProps> = ({
   lineNumber,
 }) => {
   const { colorClass } = getLineTextStyles(lineConfig);
+  const ranges = lineConfig?.ranges;
+  const hasRanges = ranges && ranges.length > 0;
+
+  if (hasRanges) {
+    const enrichedTokens = splitTokensByRanges(tokens, ranges, lineConfig?.color);
+    return (
+      <CodeLine
+        lineConfig={lineConfig}
+        lineHeightClass={lineHeightClass}
+        showInlineGutter={showInlineGutter}
+        lineNumber={lineNumber}
+      >
+        {enrichedTokens.map((token, i) => (
+          <CodeToken
+            key={i}
+            token={token}
+            colorClass={colorClass}
+            rangeColorClass={token.rangeColor}
+          />
+        ))}
+      </CodeLine>
+    );
+  }
 
   return (
     <CodeLine

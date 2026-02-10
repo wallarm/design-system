@@ -6,39 +6,39 @@ import type { CodeSnippetSize, LineColor, LineTextStyle } from '../CodeSnippetCo
  */
 export const LINE_COLOR_STYLES: Record<LineColor, { border: string; bg: string; text: string }> = {
   danger: {
-    border: 'border-border-danger',
-    bg: 'bg-bg-danger',
-    text: 'text-text-danger font-medium',
+    border: 'border-syntax-highlight-error-indicator',
+    bg: 'bg-syntax-highlight-error-highlight',
+    text: 'text-syntax-highlight-error-code font-medium',
   },
   warning: {
-    border: 'border-border-warning',
-    bg: 'bg-bg-warning',
-    text: 'text-text-warning font-medium',
+    border: 'border-syntax-highlight-warning-indicator',
+    bg: 'bg-syntax-highlight-warning-highlight',
+    text: 'text-syntax-highlight-warning-code font-medium',
   },
   info: {
-    border: 'border-border-info',
-    bg: 'bg-bg-info',
-    text: 'text-text-info font-medium',
+    border: 'border-syntax-highlight-info-indicator',
+    bg: 'bg-syntax-highlight-info-highlight',
+    text: 'text-syntax-highlight-info-code font-medium',
   },
   success: {
-    border: 'border-border-success',
-    bg: 'bg-bg-success',
-    text: 'text-text-success font-medium',
+    border: 'border-syntax-highlight-success-indicator',
+    bg: 'bg-syntax-highlight-success-highlight',
+    text: 'text-syntax-highlight-success-code font-medium',
   },
   brand: {
-    border: 'border-border-brand',
-    bg: 'bg-bg-brand',
-    text: 'text-text-brand font-medium',
+    border: 'border-syntax-highlight-brand-indicator',
+    bg: 'bg-syntax-highlight-brand-highlight',
+    text: 'text-syntax-highlight-brand-code font-medium',
   },
   ai: {
-    border: 'border-border-ai',
-    bg: 'bg-bg-ai',
-    text: 'text-text-ai font-medium',
+    border: 'border-syntax-highlight-ai-indicator',
+    bg: 'bg-syntax-highlight-ai-highlight',
+    text: 'text-syntax-highlight-ai-code font-medium',
   },
   neutral: {
-    border: 'border-border-primary',
-    bg: 'bg-states-primary-hover',
-    text: 'text-text-secondary font-medium',
+    border: 'border-syntax-highlight-neutral-indicator',
+    bg: 'bg-syntax-highlight-neutral-highlight',
+    text: 'text-syntax-highlight-neutral-code font-medium',
   },
 };
 

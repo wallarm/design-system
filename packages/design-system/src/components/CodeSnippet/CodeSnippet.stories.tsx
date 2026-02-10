@@ -1,12 +1,21 @@
-import type { Meta, StoryFn } from '@storybook/react';
+import { useState } from 'react';
+import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Info, Skull, TriangleAlert } from '../../icons';
 import { VStack } from '../Stack';
 import { loadHighlightJsAdapter, loadPrismAdapter, loadShikiAdapter } from './adapters';
+import { CodeSnippetActions } from './CodeSnippetActions';
 import { CodeSnippetAdapterProvider } from './CodeSnippetAdapterProvider';
 import { CodeSnippetCode } from './CodeSnippetCode';
 import { CodeSnippetContent } from './CodeSnippetContent';
+import { CodeSnippetCopyButton } from './CodeSnippetCopyButton';
+import { CodeSnippetFullscreenButton } from './CodeSnippetFullscreenButton';
+import { CodeSnippetHeader } from './CodeSnippetHeader';
 import { CodeSnippetLineNumbers } from './CodeSnippetLineNumbers';
 import { CodeSnippetRoot } from './CodeSnippetRoot';
+import { CodeSnippetTab } from './CodeSnippetTab';
+import { CodeSnippetTabs } from './CodeSnippetTabs';
+import { CodeSnippetTitle } from './CodeSnippetTitle';
+import { CodeSnippetWrapButton } from './CodeSnippetWrapButton';
 
 const meta = {
   title: 'Data display/CodeSnippet/CodeSnippet',
@@ -170,6 +179,46 @@ Line 8: Neutral color`;
 };
 
 /**
+ * Highlight specific character ranges within lines with colored bold text.
+ * Ranges define start (inclusive) and end (exclusive) character indices.
+ * When ranges are present, the whole-line text color is suppressed;
+ * only the specified ranges get colored + bold text.
+ * The line background/border from `color` still applies.
+ */
+export const LineRanges: StoryFn<typeof meta> = () => {
+  const httpCode = `GET /api/v2/users HTTP/1.1
+Host: inventory.example.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+Accept: application/json, text/plain, */*
+Accept-Language: en-US,en;q=0.9
+Connection: keep-alive
+X-Forwarded-For: 192.168.1.100
+Cache-Control: no-cache`;
+
+  return (
+    <CodeSnippetRoot
+      code={httpCode}
+      language='text'
+      lines={{
+        4: {
+          color: 'danger',
+          ranges: [{ start: 8, end: 24 }],
+        },
+        7: {
+          color: 'info',
+          ranges: [{ start: 17, end: 30 }],
+        },
+      }}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  );
+};
+
+/**
  * Text styles for lines: regular, medium, italic.
  * Each color has a default text style, but it can be overridden.
  */
@@ -257,6 +306,26 @@ console.log(veryLongVariableName);`;
         <span className='text-xs text-text-secondary font-medium'>With wrapping</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot code={longCode} language='text' wrapLines>
+            <CodeSnippetContent>
+              <CodeSnippetLineNumbers />
+              <CodeSnippetCode />
+            </CodeSnippetContent>
+          </CodeSnippetRoot>
+        </div>
+      </VStack>
+      <VStack align='start' spacing={4}>
+        <span className='text-xs text-text-secondary font-medium'>
+          Without wrapping with annotations
+        </span>
+        <div style={{ maxWidth: '600px' }}>
+          <CodeSnippetRoot
+            code={longCode}
+            language='text'
+            lines={{
+              1: { color: 'danger', prefix: '-' },
+              2: { color: 'success', prefix: '+' },
+            }}
+          >
             <CodeSnippetContent>
               <CodeSnippetLineNumbers />
               <CodeSnippetCode />
@@ -473,4 +542,110 @@ export const HTMLWithHighlightJs: StoryFn<typeof meta> = () => (
       </CodeSnippetContent>
     </CodeSnippetRoot>
   </CodeSnippetAdapterProvider>
+);
+
+/**
+ * Header with a simple title.
+ */
+export const WithHeader: StoryFn<typeof meta> = () => (
+  <CodeSnippetRoot code={bashCode} language='text'>
+    <CodeSnippetHeader>
+      <CodeSnippetTitle>install.sh</CodeSnippetTitle>
+    </CodeSnippetHeader>
+    <CodeSnippetContent>
+      <CodeSnippetCode />
+    </CodeSnippetContent>
+  </CodeSnippetRoot>
+);
+
+const packageManagerCodes: Record<string, string> = {
+  npm: 'npx wasd-new@latest add code-snippet inline-code-snippet button',
+  pnpm: 'pnpm dlx wasd-new@latest add code-snippet inline-code-snippet button',
+  yarn: 'yarn dlx wasd-new@latest add code-snippet inline-code-snippet button',
+  bun: 'bunx wasd-new@latest add code-snippet inline-code-snippet button',
+};
+
+/**
+ * Header with tabs for switching between package managers and a copy action.
+ * Matches Figma node 3099:5956.
+ *
+ * The tab indicator sits directly on the header's bottom border —
+ * the tab list itself has **no** border of its own.
+ */
+export const WithTabsAndActions: StoryFn<typeof meta> = () => {
+  const [tab, setTab] = useState('npm');
+  const code = packageManagerCodes[tab] ?? '';
+
+  return (
+    <div style={{ width: '320px' }}>
+      <CodeSnippetRoot code={code} language='text'>
+        <CodeSnippetHeader>
+          <CodeSnippetTabs value={tab} onValueChange={setTab}>
+            <CodeSnippetTab value='npm'>npm</CodeSnippetTab>
+            <CodeSnippetTab value='pnpm'>pnpm</CodeSnippetTab>
+            <CodeSnippetTab value='yarn'>yarn</CodeSnippetTab>
+            <CodeSnippetTab value='bun'>bun</CodeSnippetTab>
+          </CodeSnippetTabs>
+          <CodeSnippetActions>
+            <CodeSnippetFullscreenButton />
+            <CodeSnippetWrapButton />
+            <CodeSnippetCopyButton />
+          </CodeSnippetActions>
+        </CodeSnippetHeader>
+        <CodeSnippetContent>
+          <CodeSnippetCode />
+        </CodeSnippetContent>
+      </CodeSnippetRoot>
+    </div>
+  );
+};
+
+/**
+ * Floating actions without a header.
+ * Actions are positioned absolute at the top-right corner of the code snippet.
+ * Matches Figma node 3092:13248.
+ */
+export const WithFloatingActions: StoryFn<typeof meta> = () => (
+  <div style={{ width: '320px' }}>
+    <CodeSnippetRoot code={sampleCode} language='text'>
+      <CodeSnippetActions>
+        <CodeSnippetWrapButton />
+        <CodeSnippetCopyButton />
+      </CodeSnippetActions>
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </div>
+);
+
+const showMoreCode = `Host: inventory.example.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+Referer: https://app.example.com/dashboard
+Accept: application/json, text/plain, */*
+Accept-Language: en-US,en;q=0.9
+Connection: keep-alive
+Cache-Control: no-cache
+Referer: https://app.example.com/dashboard
+Accept: application/json, text/plain, */*
+Accept-Language: en-US,en;q=0.9
+Connection: keep-alive
+Cache-Control: no-cache`;
+
+/**
+ * Show more / show less button to collapse long code snippets.
+ * Matches Figma node 3092:19114.
+ *
+ * When `maxLines` is set, only the first N lines are shown.
+ * The button shows the count of hidden lines and toggles expand/collapse.
+ */
+export const ShowMore: StoryFn<typeof meta> = () => (
+  <div style={{ width: '500px' }}>
+    <CodeSnippetRoot code={showMoreCode} language='text' maxLines={7}>
+      <CodeSnippetContent>
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </div>
 );
