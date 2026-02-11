@@ -75,6 +75,7 @@ exports['./*'] = {
 
 packageJson.exports = exports;
 
+// biome-ignore lint/style/useTemplate: just new line
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
 
 console.log(`Generated exports for ${components.length} components`);
