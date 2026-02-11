@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-
 import { DrawerBody, type DrawerBodyProps } from '../Drawer';
 
 export type DialogBodyProps = DrawerBodyProps;

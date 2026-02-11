@@ -1,7 +1,5 @@
 import type { FC, ReactNode } from 'react';
-
 import { Dialog } from '@ark-ui/react/dialog';
-
 import { useDrawerContext } from './DrawerContext';
 
 interface DrawerRootProps {

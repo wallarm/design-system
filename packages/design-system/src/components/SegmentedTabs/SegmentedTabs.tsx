@@ -1,8 +1,6 @@
 import type { FC, ReactNode } from 'react';
-
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
 

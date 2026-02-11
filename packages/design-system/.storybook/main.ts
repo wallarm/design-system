@@ -1,6 +1,6 @@
+import type { StorybookConfig } from 'storybook-react-rsbuild';
 import { dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import type { StorybookConfig } from 'storybook-react-rsbuild';
 
 const config: StorybookConfig = {
   framework: getAbsolutePath('storybook-react-rsbuild'),

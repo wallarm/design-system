@@ -1,9 +1,6 @@
 import type { FC, KeyboardEvent, PropsWithChildren, Ref } from 'react';
-
 import { SegmentGroup } from '@ark-ui/react/segment-group';
-
 import { cn } from '../../utils/cn';
-
 import { segmentedControlItemClassNamesBase } from './classes';
 
 /**
@@ -22,9 +19,13 @@ export interface SegmentedControlItemProps {
   ref?: Ref<HTMLLabelElement>;
 }
 
-export const SegmentedControlItem: FC<
-  PropsWithChildren<SegmentedControlItemProps>
-> = ({ className, value, disabled, children, ref }) => {
+export const SegmentedControlItem: FC<PropsWithChildren<SegmentedControlItemProps>> = ({
+  className,
+  value,
+  disabled,
+  children,
+  ref,
+}) => {
   const handleKeyDown = (event: KeyboardEvent<HTMLLabelElement>) => {
     if ((event.key === ' ' || event.key === 'Enter') && !disabled) {
       // Forward to hidden input by clicking the wrapper (which triggers Ark UI selection)
@@ -50,11 +51,8 @@ export const SegmentedControlItem: FC<
     >
       {children}
 
-      <SegmentGroup.ItemControl className="absolute inset-0 opacity-0 pointer-events-none" />
-      <SegmentGroup.ItemHiddenInput
-        className="absolute inset-0 opacity-0"
-        tabIndex={-1}
-      />
+      <SegmentGroup.ItemControl className='absolute inset-0 opacity-0 pointer-events-none' />
+      <SegmentGroup.ItemHiddenInput className='absolute inset-0 opacity-0' tabIndex={-1} />
     </SegmentGroup.Item>
   );
 };

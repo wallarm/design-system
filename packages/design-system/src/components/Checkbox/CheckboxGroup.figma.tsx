@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { CheckboxGroup } from './CheckboxGroup';
 
 const figmaNodeUrl =

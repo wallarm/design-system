@@ -1,14 +1,6 @@
-import {
-  type CSSProperties,
-  type FC,
-  type MouseEvent,
-  type ReactNode,
-  useMemo,
-} from 'react';
-
+import { type CSSProperties, type FC, type MouseEvent, type ReactNode, useMemo } from 'react';
 import { Popover as ArkUiPopover, usePopoverContext } from '@ark-ui/react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
-
 import { cn } from '../../utils/cn';
 import {
   ScrollArea,
@@ -16,7 +8,6 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaViewport,
 } from '../ScrollArea';
-
 import {
   POPOVER_MAX_HEIGHT,
   POPOVER_MAX_WIDTH,

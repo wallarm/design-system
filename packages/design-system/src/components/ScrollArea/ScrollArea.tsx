@@ -1,7 +1,5 @@
 import type { FC } from 'react';
-
 import { ScrollArea as ArkUiScrollArea } from '@ark-ui/react/scroll-area';
-
 import { cn } from '../../utils/cn';
 
 export type ScrollAreaProps = ArkUiScrollArea.RootProps;

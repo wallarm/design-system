@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-
 import { cn } from '../../../utils/cn';
 import { useTabsSharedContext } from '../TabsSharedContext';
 
@@ -7,9 +6,7 @@ interface TabsListScrollAreaProps {
   children: ReactNode;
 }
 
-export const TabsListScrollArea: FC<TabsListScrollAreaProps> = ({
-  children,
-}) => {
+export const TabsListScrollArea: FC<TabsListScrollAreaProps> = ({ children }) => {
   const { scrollRef } = useTabsSharedContext();
 
   return (

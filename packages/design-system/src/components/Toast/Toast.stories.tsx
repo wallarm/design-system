@@ -1,10 +1,7 @@
 import { useRef } from 'react';
-
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { Activity } from '../../icons';
 import { Button } from '../Button';
-
 import { ToastActions, Toaster, useToast } from './index';
 
 const meta = {
@@ -30,8 +27,8 @@ const ToastDemo = () => {
   const toast = useToast();
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex gap-8 flex-wrap">
+    <div className='flex flex-col gap-12'>
+      <div className='flex gap-8 flex-wrap'>
         <Button
           onClick={() =>
             toast.create({
@@ -141,8 +138,8 @@ export const UpdateLoadingToSuccess: StoryFn = () => {
   };
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex gap-8 flex-wrap">
+    <div className='flex flex-col gap-12'>
+      <div className='flex gap-8 flex-wrap'>
         <Button onClick={createToast}>Create loading toast</Button>
         <Button onClick={updateToast}>Update to success</Button>
       </div>
@@ -154,8 +151,8 @@ export const SimpleWithActions: StoryFn = () => {
   const toast = useToast();
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex gap-8 flex-wrap">
+    <div className='flex flex-col gap-12'>
+      <div className='flex gap-8 flex-wrap'>
         <Button
           onClick={() =>
             toast.create({
@@ -165,9 +162,9 @@ export const SimpleWithActions: StoryFn = () => {
               actions: (
                 <ToastActions>
                   <Button
-                    variant="secondary"
-                    size="small"
-                    color="neutral-alt"
+                    variant='secondary'
+                    size='small'
+                    color='neutral-alt'
                     onClick={() => console.log('Undo clicked')}
                   >
                     Undo
@@ -188,17 +185,17 @@ export const SimpleWithActions: StoryFn = () => {
               actions: (
                 <ToastActions>
                   <Button
-                    variant="secondary"
-                    size="small"
-                    color="neutral-alt"
+                    variant='secondary'
+                    size='small'
+                    color='neutral-alt'
                     onClick={() => console.log('View clicked')}
                   >
                     View
                   </Button>
                   <Button
-                    variant="secondary"
-                    size="small"
-                    color="neutral-alt"
+                    variant='secondary'
+                    size='small'
+                    color='neutral-alt'
                     onClick={() => console.log('Dismiss clicked')}
                   >
                     Dismiss
@@ -219,8 +216,8 @@ export const ExtendedWithActions: StoryFn = () => {
   const toast = useToast();
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex gap-8 flex-wrap">
+    <div className='flex flex-col gap-12'>
+      <div className='flex gap-8 flex-wrap'>
         <Button
           onClick={() =>
             toast.create({
@@ -231,9 +228,9 @@ export const ExtendedWithActions: StoryFn = () => {
               actions: (
                 <ToastActions>
                   <Button
-                    variant="secondary"
-                    size="small"
-                    color="neutral-alt"
+                    variant='secondary'
+                    size='small'
+                    color='neutral-alt'
                     onClick={() => console.log('Action clicked')}
                   >
                     Action
@@ -255,17 +252,17 @@ export const ExtendedWithActions: StoryFn = () => {
               actions: (
                 <ToastActions>
                   <Button
-                    variant="secondary"
-                    size="small"
-                    color="neutral-alt"
+                    variant='secondary'
+                    size='small'
+                    color='neutral-alt'
                     onClick={() => console.log('View clicked')}
                   >
                     View
                   </Button>
                   <Button
-                    variant="secondary"
-                    size="small"
-                    color="neutral-alt"
+                    variant='secondary'
+                    size='small'
+                    color='neutral-alt'
                     onClick={() => console.log('Download clicked')}
                   >
                     Download
@@ -286,8 +283,8 @@ export const LongText: StoryFn = () => {
   const toast = useToast();
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex gap-8 flex-wrap">
+    <div className='flex flex-col gap-12'>
+      <div className='flex gap-8 flex-wrap'>
         <Button
           onClick={() =>
             toast.create({
@@ -331,8 +328,8 @@ export const WithoutCloseButton: StoryFn = () => {
   const toast = useToast();
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex gap-8 flex-wrap">
+    <div className='flex flex-col gap-12'>
+      <div className='flex gap-8 flex-wrap'>
         <Button
           onClick={() =>
             toast.create({
@@ -355,17 +352,16 @@ export const CustomIcon: StoryFn = () => {
   const toast = useToast();
 
   return (
-    <div className="flex flex-col gap-12">
-      <div className="flex gap-8 flex-wrap">
+    <div className='flex flex-col gap-12'>
+      <div className='flex gap-8 flex-wrap'>
         <Button
           onClick={() =>
             toast.create({
               title: 'Custom icon toast',
               variant: 'extended',
-              description:
-                'This toast uses a custom icon that overrides the type-based icon.',
+              description: 'This toast uses a custom icon that overrides the type-based icon.',
               type: 'success',
-              icon: <Activity size="lg" className="text-purple-500" />,
+              icon: <Activity size='lg' className='text-purple-500' />,
             })
           }
         >

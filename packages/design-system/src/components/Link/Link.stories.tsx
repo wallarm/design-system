@@ -1,8 +1,6 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { ArrowRight, SquareArrowOutUpRight } from '../../icons';
 import { VStack } from '../Stack';
-
 import { Link } from './Link';
 
 const meta = {
@@ -15,19 +13,19 @@ const meta = {
 
 export default meta;
 
-export const Basic: StoryFn<typeof meta> = () => <Link href="#">Link</Link>;
+export const Basic: StoryFn<typeof meta> = () => <Link href='#'>Link</Link>;
 
 export const Types: StoryFn<typeof meta> = () => (
   <VStack>
-    <Link href="#" type="default">
+    <Link href='#' type='default'>
       Link
     </Link>
 
-    <Link href="#" type="alt">
+    <Link href='#' type='alt'>
       Link
     </Link>
 
-    <Link href="#" type="muted">
+    <Link href='#' type='muted'>
       Link
     </Link>
   </VStack>
@@ -35,11 +33,11 @@ export const Types: StoryFn<typeof meta> = () => (
 
 export const Weight: StoryFn<typeof meta> = () => (
   <VStack>
-    <Link href="#" weight="regular">
+    <Link href='#' weight='regular'>
       Link
     </Link>
 
-    <Link href="#" weight="medium">
+    <Link href='#' weight='medium'>
       Link
     </Link>
   </VStack>
@@ -47,23 +45,23 @@ export const Weight: StoryFn<typeof meta> = () => (
 
 export const Sizes: StoryFn<typeof meta> = () => (
   <VStack>
-    <Link href="#" size="xl">
+    <Link href='#' size='xl'>
       Link
     </Link>
 
-    <Link href="#" size="lg">
+    <Link href='#' size='lg'>
       Link
     </Link>
 
-    <Link href="#" size="md">
+    <Link href='#' size='md'>
       Link
     </Link>
 
-    <Link href="#" size="sm">
+    <Link href='#' size='sm'>
       Link
     </Link>
 
-    <Link href="#" size="xs">
+    <Link href='#' size='xs'>
       Link
     </Link>
   </VStack>
@@ -71,11 +69,11 @@ export const Sizes: StoryFn<typeof meta> = () => (
 
 export const Icons: StoryFn<typeof meta> = () => (
   <VStack>
-    <Link href="#">
+    <Link href='#'>
       Open new tab <SquareArrowOutUpRight />
     </Link>
 
-    <Link href="#">
+    <Link href='#'>
       Let's explore <ArrowRight />
     </Link>
   </VStack>

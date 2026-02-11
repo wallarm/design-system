@@ -1,5 +1,4 @@
 import { type FC, type ReactNode, useEffect, useMemo, useState } from 'react';
-
 import { ThemeProviderContext } from './ThemeProviderContext';
 
 type Theme = 'dark' | 'light' | 'system';

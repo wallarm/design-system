@@ -6,9 +6,7 @@ import type {
   ReactNode,
   Ref,
 } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 
 const breadcrumbsItemVariants = cva(
@@ -98,7 +96,7 @@ export const BreadcrumbsItem: FC<BreadcrumbsItemProps> = ({
         </a>
       ) : (
         <button
-          type="button"
+          type='button'
           onClick={onClick}
           className={commonClasses}
           aria-current={isCurrent ? ('page' as const) : undefined}

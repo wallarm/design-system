@@ -1,10 +1,7 @@
 import type { AnchorHTMLAttributes, FC, Ref } from 'react';
-
 import { Slot } from '@radix-ui/react-slot';
-import { type VariantProps } from 'class-variance-authority';
-
+import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
-
 import { linkVariants } from './classes';
 
 type LinkNativeProps = AnchorHTMLAttributes<HTMLAnchorElement>;
@@ -26,7 +23,5 @@ export const Link: FC<LinkProps> = ({
 }) => {
   const Comp = asChild ? Slot : 'a';
 
-  return (
-    <Comp {...props} className={cn(linkVariants({ type, size, weight }))} />
-  );
+  return <Comp {...props} className={cn(linkVariants({ type, size, weight }))} />;
 };

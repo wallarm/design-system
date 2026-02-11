@@ -1,11 +1,8 @@
 import { Fragment } from 'react';
-
 import { capitalize } from 'lodash-es';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { Check, CircleCheck, Info, PenTool, X } from '../../icons';
 import { HStack } from '../Stack';
-
 import { Badge } from './Badge';
 import { BadgeColorEnum, BadgeTypeEnum } from './constants';
 import { badgeColorsMuted } from './generateBadgeVariants';
@@ -43,22 +40,20 @@ const meta = {
 
 export default meta;
 
-export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
-  <Badge {...args}>Badge</Badge>
-);
+export const Basic: StoryFn<typeof meta> = ({ ...args }) => <Badge {...args}>Badge</Badge>;
 
 export const Dotted: StoryFn<typeof meta> = ({ ...args }) => (
-  <Badge {...args} variant="dotted">
+  <Badge {...args} variant='dotted'>
     Badge
   </Badge>
 );
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack align="center" spacing={8}>
-    <Badge {...args} size="medium">
+  <HStack align='center' spacing={8}>
+    <Badge {...args} size='medium'>
       Medium
     </Badge>
-    <Badge {...args} size="large">
+    <Badge {...args} size='large'>
       Large
     </Badge>
   </HStack>
@@ -66,19 +61,19 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
 
 export const Types: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack spacing={8}>
-    <Badge {...args} type="solid">
+    <Badge {...args} type='solid'>
       Solid
     </Badge>
-    <Badge {...args} type="secondary">
+    <Badge {...args} type='secondary'>
       Secondary
     </Badge>
-    <Badge {...args} type="outline">
+    <Badge {...args} type='outline'>
       Outline
     </Badge>
-    <Badge {...args} type="text">
+    <Badge {...args} type='text'>
       Text
     </Badge>
-    <Badge {...args} type="text-color">
+    <Badge {...args} type='text-color'>
       Text Color
     </Badge>
   </HStack>
@@ -86,10 +81,10 @@ export const Types: StoryFn<typeof meta> = ({ ...args }) => (
 
 export const TextVariants: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack spacing={8}>
-    <Badge {...args} textVariant="default">
+    <Badge {...args} textVariant='default'>
       Default Text
     </Badge>
-    <Badge {...args} textVariant="code">
+    <Badge {...args} textVariant='code'>
       Code Text
     </Badge>
   </HStack>
@@ -98,23 +93,23 @@ export const TextVariants: StoryFn<typeof meta> = ({ ...args }) => (
 export const WithIconsLeft: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack spacing={8}>
     <Badge {...args}>
-      <Check size="sm" />
+      <Check size='sm' />
       Success
     </Badge>
     <Badge {...args}>
-      <X size="sm" />
+      <X size='sm' />
       Error
     </Badge>
     <Badge {...args}>
-      <Info size="sm" />
+      <Info size='sm' />
       Info
     </Badge>
     <Badge {...args}>
-      <CircleCheck size="sm" />
+      <CircleCheck size='sm' />
       Verified
     </Badge>
     <Badge {...args}>
-      <Check size="sm" />
+      <Check size='sm' />
       Complete
     </Badge>
   </HStack>
@@ -124,23 +119,23 @@ export const WithIconsRight: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack spacing={8}>
     <Badge {...args}>
       Success
-      <Check size="sm" />
+      <Check size='sm' />
     </Badge>
     <Badge {...args}>
       Error
-      <X size="sm" />
+      <X size='sm' />
     </Badge>
     <Badge {...args}>
       Info
-      <Info size="sm" />
+      <Info size='sm' />
     </Badge>
     <Badge {...args}>
       Verified
-      <CircleCheck size="sm" />
+      <CircleCheck size='sm' />
     </Badge>
     <Badge {...args}>
       Complete
-      <Check size="sm" />
+      <Check size='sm' />
     </Badge>
   </HStack>
 );
@@ -148,29 +143,29 @@ export const WithIconsRight: StoryFn<typeof meta> = ({ ...args }) => (
 export const IconsOnly: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack spacing={8}>
     <Badge {...args}>
-      <Check size="sm" />
+      <Check size='sm' />
     </Badge>
     <Badge {...args}>
-      <X size="sm" />
+      <X size='sm' />
     </Badge>
     <Badge {...args}>
-      <Info size="sm" />
+      <Info size='sm' />
     </Badge>
     <Badge {...args}>
-      <CircleCheck size="sm" />
+      <CircleCheck size='sm' />
     </Badge>
     <Badge {...args}>
-      <Check size="sm" />
+      <Check size='sm' />
     </Badge>
   </HStack>
 );
 
 export const ColorVariants: StoryFn<typeof meta> = () => (
-  <table className="w-full">
+  <table className='w-full'>
     <thead>
       <tr>
-        {Object.keys(BadgeTypeEnum).map((type) => (
-          <th key={type} className="p-8 text-left">
+        {Object.keys(BadgeTypeEnum).map(type => (
+          <th key={type} className='p-8 text-left'>
             {type}
           </th>
         ))}
@@ -180,7 +175,7 @@ export const ColorVariants: StoryFn<typeof meta> = () => (
       {Object.entries(BadgeColorEnum).map(([label, color]) => (
         <tr key={color}>
           {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-            <td key={type} className="p-8">
+            <td key={type} className='p-8'>
               <Badge type={type} color={color}>
                 {label}
               </Badge>
@@ -193,21 +188,21 @@ export const ColorVariants: StoryFn<typeof meta> = () => (
 );
 
 export const MutedVariants: StoryFn<typeof meta> = () => (
-  <table className="w-full">
+  <table className='w-full'>
     <thead>
       <tr>
-        {Object.keys(BadgeTypeEnum).map((type) => (
-          <th key={type} className="p-8 text-left">
+        {Object.keys(BadgeTypeEnum).map(type => (
+          <th key={type} className='p-8 text-left'>
             {type}
           </th>
         ))}
       </tr>
     </thead>
     <tbody>
-      {badgeColorsMuted.map((color) => (
+      {badgeColorsMuted.map(color => (
         <tr key={color}>
           {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-            <td key={type} className="p-8">
+            <td key={type} className='p-8'>
               {(type === 'outline' && color === 'slate') || type === 'solid' ? (
                 <Badge type={type} color={color} muted>
                   {capitalize(color)}
@@ -222,11 +217,11 @@ export const MutedVariants: StoryFn<typeof meta> = () => (
 );
 
 export const ContentVariants: StoryFn<typeof meta> = () => (
-  <table className="w-full">
+  <table className='w-full'>
     <thead>
       <tr>
-        {Object.keys(BadgeTypeEnum).map((type) => (
-          <th key={type} className="p-8 text-left">
+        {Object.keys(BadgeTypeEnum).map(type => (
+          <th key={type} className='p-8 text-left'>
             {type}
           </th>
         ))}
@@ -237,7 +232,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
         <Fragment key={color}>
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-              <td key={type} className="p-8">
+              <td key={type} className='p-8'>
                 <Badge type={type} color={color}>
                   {label}
                 </Badge>
@@ -247,7 +242,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
 
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-              <td key={type} className="p-8">
+              <td key={type} className='p-8'>
                 <Badge type={type} color={color}>
                   {label}
 
@@ -259,7 +254,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
 
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-              <td key={type} className="p-8">
+              <td key={type} className='p-8'>
                 <Badge type={type} color={color}>
                   <PenTool />
                   {label}
@@ -270,7 +265,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
 
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-              <td key={type} className="p-8">
+              <td key={type} className='p-8'>
                 <Badge type={type} color={color}>
                   <PenTool />
                   {label}
@@ -282,8 +277,8 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
 
           <tr />
           {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-            <td key={type} className="p-8">
-              <Badge type={type} color={color} variant="dotted">
+            <td key={type} className='p-8'>
+              <Badge type={type} color={color} variant='dotted'>
                 {label}
               </Badge>
             </td>
@@ -291,8 +286,8 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
 
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-              <td key={type} className="p-8">
-                <Badge type={type} color={color} variant="dotted">
+              <td key={type} className='p-8'>
+                <Badge type={type} color={color} variant='dotted'>
                   {label}
                   <X />
                 </Badge>
@@ -302,7 +297,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
 
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-              <td key={type} className="p-8">
+              <td key={type} className='p-8'>
                 <Badge type={type} color={color}>
                   {label}
                   <Info />
@@ -313,7 +308,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
 
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-              <td key={type} className="p-8">
+              <td key={type} className='p-8'>
                 <Badge type={type} color={color}>
                   <PenTool />
                 </Badge>
@@ -324,9 +319,8 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
           {badgeColorsMuted.includes(color) && (
             <tr key={color}>
               {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-                <td key={type} className="p-8">
-                  {(type === 'outline' && color === 'slate') ||
-                  type === 'solid' ? (
+                <td key={type} className='p-8'>
+                  {(type === 'outline' && color === 'slate') || type === 'solid' ? (
                     <Badge type={type} color={color} muted>
                       {capitalize(color)}
                     </Badge>

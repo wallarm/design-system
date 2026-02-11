@@ -1,9 +1,7 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { Info } from '../../icons';
 import { VStack } from '../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-
 import { Switch } from './Switch';
 import { SwitchControl } from './SwitchControl';
 import { SwitchDescription } from './SwitchDescription';
@@ -52,14 +50,12 @@ export const WithDescription: StoryFn<typeof meta> = () => (
   <Switch>
     <SwitchControl />
     <SwitchLabel>Enable notifications</SwitchLabel>
-    <SwitchDescription>
-      Receive notifications about updates and new features.
-    </SwitchDescription>
+    <SwitchDescription>Receive notifications about updates and new features.</SwitchDescription>
   </Switch>
 );
 
 export const Multiple: StoryFn<typeof meta> = () => (
-  <VStack align="start">
+  <VStack align='start'>
     <Switch>
       <SwitchControl />
       <SwitchLabel>
@@ -71,9 +67,7 @@ export const Multiple: StoryFn<typeof meta> = () => (
           <TooltipContent>Additional information</TooltipContent>
         </Tooltip>
       </SwitchLabel>
-      <SwitchDescription>
-        Receive email notifications about important updates.
-      </SwitchDescription>
+      <SwitchDescription>Receive email notifications about important updates.</SwitchDescription>
     </Switch>
 
     <Switch checked>
@@ -87,9 +81,7 @@ export const Multiple: StoryFn<typeof meta> = () => (
           <TooltipContent>Additional information</TooltipContent>
         </Tooltip>
       </SwitchLabel>
-      <SwitchDescription>
-        Get push notifications on your mobile device.
-      </SwitchDescription>
+      <SwitchDescription>Get push notifications on your mobile device.</SwitchDescription>
     </Switch>
 
     <Switch>
@@ -103,9 +95,7 @@ export const Multiple: StoryFn<typeof meta> = () => (
           <TooltipContent>Additional information</TooltipContent>
         </Tooltip>
       </SwitchLabel>
-      <SwitchDescription>
-        Receive SMS notifications for critical alerts.
-      </SwitchDescription>
+      <SwitchDescription>Receive SMS notifications for critical alerts.</SwitchDescription>
     </Switch>
   </VStack>
 );

@@ -1,7 +1,5 @@
 import { Children, type FC } from 'react';
-
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
-
 import { cn } from '../../utils/cn';
 import {
   ScrollArea,
@@ -10,15 +8,11 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaViewport,
 } from '../ScrollArea';
-
 import { SelectEmptyState } from './SelectEmptyState';
 
 type SelectContentProps = Omit<ArkUiSelect.ContentProps, 'className'>;
 
-export const SelectContent: FC<SelectContentProps> = ({
-  children,
-  ...props
-}) => {
+export const SelectContent: FC<SelectContentProps> = ({ children, ...props }) => {
   const isEmpty = Children.count(children) === 0;
 
   return (
@@ -29,7 +23,7 @@ export const SelectContent: FC<SelectContentProps> = ({
     >
       <ScrollArea>
         <ScrollAreaViewport>
-          <ScrollAreaContent className="flex flex-col gap-1">
+          <ScrollAreaContent className='flex flex-col gap-1'>
             {isEmpty ? <SelectEmptyState /> : children}
           </ScrollAreaContent>
         </ScrollAreaViewport>

@@ -1,19 +1,10 @@
 import type { ReactElement, ReactNode } from 'react';
 import { cloneElement, isValidElement } from 'react';
-
 import { Toast as ArkToast } from '@ark-ui/react/toast';
 import { cva } from 'class-variance-authority';
-
-import {
-  CircleCheckBig,
-  Info,
-  OctagonAlert,
-  type SvgIconProps,
-  TriangleAlert,
-} from '../../icons';
+import { CircleCheckBig, Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
 import { cn } from '../../utils/cn';
 import { Loader } from '../Loader';
-
 import { ToastClose } from './ToastClose';
 import { ToastDescription } from './ToastDescription';
 import { ToastIcon } from './ToastIcon';
@@ -85,10 +76,7 @@ export const Toast = ({ toast }: ToastProps) => {
     if (toast.icon) {
       if (isValidElement(toast.icon)) {
         const iconElement = toast.icon as ReactElement;
-        const existingProps = (iconElement.props || {}) as Record<
-          string,
-          unknown
-        >;
+        const existingProps = (iconElement.props || {}) as Record<string, unknown>;
 
         // Determine color class based on toast type
         const colorClass =
@@ -122,36 +110,28 @@ export const Toast = ({ toast }: ToastProps) => {
     // Default icon based on type
     if (toastType === 'default') return null;
     if (toastType === 'loading') {
-      return <Loader type="sonner" size="lg" color="primary-alt" />;
+      return <Loader type='sonner' size='lg' color='primary-alt' />;
     }
 
     const iconConfig = toastIconMap[toastType];
     if (!iconConfig) return null;
 
     const IconComponent = iconConfig.component;
-    return <IconComponent size="lg" className={iconConfig.className} />;
+    return <IconComponent size='lg' className={iconConfig.className} />;
   };
 
   const toastIcon = getToastIcon();
 
   return (
-    <ArkToast.Root
-      key={toast.id}
-      className={cn(toastVariants({ variant: toastVariant }))}
-    >
+    <ArkToast.Root key={toast.id} className={cn(toastVariants({ variant: toastVariant }))}>
       <div className={cn('flex w-full items-start gap-8 relative z-10')}>
         {toastIcon && <ToastIcon>{toastIcon}</ToastIcon>}
 
         <div
-          className={cn(
-            'flex-1 flex',
-            isSimple ? 'flex-row gap-16 items-start' : 'flex-col gap-8',
-          )}
+          className={cn('flex-1 flex', isSimple ? 'flex-row gap-16 items-start' : 'flex-col gap-8')}
         >
-          <div className="flex-1 py-2">
-            {toast.title && (
-              <ToastTitle variant={toastVariant}>{toast.title}</ToastTitle>
-            )}
+          <div className='flex-1 py-2'>
+            {toast.title && <ToastTitle variant={toastVariant}>{toast.title}</ToastTitle>}
             {!isSimple && toast.description && (
               <ToastDescription>{toast.description}</ToastDescription>
             )}

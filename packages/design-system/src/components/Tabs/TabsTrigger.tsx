@@ -1,9 +1,6 @@
 import type { FC, FocusEvent, ReactNode } from 'react';
-
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
-
 import { cn } from '../../utils/cn';
-
 import { tabsTriggerVariants } from './classes';
 import { TABS_SCROLL_BUTTON_WIDTH } from './constants';
 import { useTabsSharedContext } from './TabsSharedContext';

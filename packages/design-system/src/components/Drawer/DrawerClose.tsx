@@ -1,12 +1,9 @@
-import type { FC, ReactNode, Ref, FocusEvent } from 'react';
-
+import type { FC, FocusEvent, ReactNode, Ref } from 'react';
 import { Dialog } from '@ark-ui/react/dialog';
-
 import { X } from '../../icons';
 import { Button } from '../Button';
 import { Kbd } from '../Kbd';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-
 import { useDrawerContext } from './DrawerContext';
 
 export interface DrawerCloseProps {
@@ -16,11 +13,7 @@ export interface DrawerCloseProps {
   ref?: Ref<HTMLButtonElement>;
 }
 
-export const DrawerClose: FC<DrawerCloseProps> = ({
-  children,
-  asChild = false,
-  ref,
-}) => {
+export const DrawerClose: FC<DrawerCloseProps> = ({ children, asChild = false, ref }) => {
   const { closeOnEscape } = useDrawerContext();
 
   const handleFocusCapture = (event: FocusEvent<HTMLButtonElement>) => {
@@ -39,18 +32,12 @@ export const DrawerClose: FC<DrawerCloseProps> = ({
     <Tooltip delayDuration={300}>
       <TooltipTrigger asChild>
         <Dialog.CloseTrigger asChild onFocusCapture={handleFocusCapture}>
-          <Button
-            ref={ref}
-            variant="ghost"
-            color="neutral"
-            size="small"
-            aria-label="Close drawer"
-          >
+          <Button ref={ref} variant='ghost' color='neutral' size='small' aria-label='Close drawer'>
             {children || <X />}
           </Button>
         </Dialog.CloseTrigger>
       </TooltipTrigger>
-      <TooltipContent side="bottom" sideOffset={4}>
+      <TooltipContent side='bottom' sideOffset={4}>
         Close {closeOnEscape && <Kbd>ESC</Kbd>}
       </TooltipContent>
     </Tooltip>

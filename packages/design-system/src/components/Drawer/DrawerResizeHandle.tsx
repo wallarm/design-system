@@ -7,13 +7,10 @@ import {
   useRef,
   useState,
 } from 'react';
-
 import { cva } from 'class-variance-authority';
 import { throttle } from 'lodash-es';
-
 import { cn } from '../../utils/cn';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-
 import { useDrawerContext } from './DrawerContext';
 
 const drawerResizeHandleVariants = cva(
@@ -70,9 +67,7 @@ export const DrawerResizeHandle: FC<DrawerResizeHandleProps> = ({ ref }) => {
     e.preventDefault();
 
     // Get the actual drawer content element width
-    const drawerContent = e.currentTarget.closest(
-      '[role="dialog"]',
-    ) as HTMLElement;
+    const drawerContent = e.currentTarget.closest('[role="dialog"]') as HTMLElement;
 
     if (!drawerContent) return;
 
@@ -94,10 +89,7 @@ export const DrawerResizeHandle: FC<DrawerResizeHandleProps> = ({ ref }) => {
         const { startX, startWidth } = dragStateRef.current;
         // Moving left increases width, moving right decreases
         const delta = startX - e.clientX;
-        const newWidth = Math.min(
-          Math.max(startWidth + delta, minWidth),
-          maxWidth,
-        );
+        const newWidth = Math.min(Math.max(startWidth + delta, minWidth), maxWidth);
         setWidth(newWidth); // Always set as number (pixels) after resize starts
       }, 16), // ~60fps
     [minWidth, maxWidth, setWidth],
@@ -134,7 +126,7 @@ export const DrawerResizeHandle: FC<DrawerResizeHandleProps> = ({ ref }) => {
         onMouseDown={handleMouseDown}
       />
 
-      <TooltipContent side="left">Drag to resize</TooltipContent>
+      <TooltipContent side='left'>Drag to resize</TooltipContent>
     </Tooltip>
   );
 };

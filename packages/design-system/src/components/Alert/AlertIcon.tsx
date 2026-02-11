@@ -7,23 +7,10 @@ import {
   useRef,
   useState,
 } from 'react';
-
 import { cva } from 'class-variance-authority';
+import { CircleCheckBig, CircleDashed, Info, OctagonAlert, TriangleAlert } from '../../icons';
 
-import {
-  CircleCheckBig,
-  CircleDashed,
-  Info,
-  OctagonAlert,
-  TriangleAlert,
-} from '../../icons';
-
-export type AlertColor =
-  | 'primary'
-  | 'destructive'
-  | 'info'
-  | 'warning'
-  | 'success';
+export type AlertColor = 'primary' | 'destructive' | 'info' | 'warning' | 'success';
 
 const alertIconVariants = cva('shrink-0', {
   variants: {
@@ -40,10 +27,7 @@ const alertIconVariants = cva('shrink-0', {
   },
 });
 
-const iconMap: Record<
-  AlertColor,
-  ComponentType<{ className?: string; size?: 'lg' }>
-> = {
+const iconMap: Record<AlertColor, ComponentType<{ className?: string; size?: 'lg' }>> = {
   primary: CircleDashed,
   destructive: OctagonAlert,
   info: Info,
@@ -92,10 +76,8 @@ export const AlertIcon: FC<AlertIconProps> = ({ ref, icon }) => {
   const IconComponent = iconMap[color];
 
   return (
-    <div ref={setRefs} className="py-2 shrink-0">
-      {icon || (
-        <IconComponent size="lg" className={alertIconVariants({ color })} />
-      )}
+    <div ref={setRefs} className='py-2 shrink-0'>
+      {icon || <IconComponent size='lg' className={alertIconVariants({ color })} />}
     </div>
   );
 };

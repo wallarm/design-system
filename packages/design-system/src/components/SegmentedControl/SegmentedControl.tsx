@@ -1,19 +1,11 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
-
 import { SegmentGroup } from '@ark-ui/react/segment-group';
-import { type VariantProps } from 'class-variance-authority';
-
+import type { VariantProps } from 'class-variance-authority';
 import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
+import { segmentedControlIndicatorClassNames, segmentedControlVariants } from './classes';
 
-import {
-  segmentedControlIndicatorClassNames,
-  segmentedControlVariants,
-} from './classes';
-
-type SegmentedControlVariantProps = VariantProps<
-  typeof segmentedControlVariants
->;
+type SegmentedControlVariantProps = VariantProps<typeof segmentedControlVariants>;
 
 type SegmentedControlNativeProps = Omit<
   HTMLAttributes<HTMLDivElement>,

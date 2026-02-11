@@ -1,13 +1,13 @@
 export { plainAdapter } from './plain';
 export type {
-    HighlightJsLanguage,
-    HighlightResult,
-    PlainLanguage,
-    PrismLanguage,
-    ShikiLanguage,
-    SyntaxAdapter,
-    Token,
-    TokenType,
+  HighlightJsLanguage,
+  HighlightResult,
+  PlainLanguage,
+  PrismLanguage,
+  ShikiLanguage,
+  SyntaxAdapter,
+  Token,
+  TokenType,
 } from './types';
 
 /**
@@ -16,8 +16,8 @@ export type {
  * Bundle size: ~15KB gzipped
  */
 export const loadPrismAdapter = async () => {
-    const { prismAdapter } = await import('./prism');
-    return prismAdapter;
+  const { prismAdapter } = await import('./prism');
+  return prismAdapter;
 };
 
 /**
@@ -26,8 +26,8 @@ export const loadPrismAdapter = async () => {
  * Bundle size: ~200KB+ gzipped (includes WASM)
  */
 export const loadShikiAdapter = async () => {
-    const { shikiAdapter } = await import('./shiki');
-    return shikiAdapter;
+  const { shikiAdapter } = await import('./shiki');
+  return shikiAdapter;
 };
 
 /**
@@ -36,6 +36,6 @@ export const loadShikiAdapter = async () => {
  * Bundle size: ~30KB gzipped (core + common languages)
  */
 export const loadHighlightJsAdapter = async () => {
-    const { highlightJsAdapter } = await import('./highlightjs');
-    return highlightJsAdapter;
+  const { highlightJsAdapter } = await import('./highlightjs');
+  return highlightJsAdapter;
 };

@@ -1,12 +1,11 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
-
 import { cn } from '../../utils/cn';
 
 type OverlayProps = Omit<HTMLAttributes<HTMLDivElement>, 'className'> & {
   ref?: Ref<HTMLDivElement>;
 };
 
-export const Overlay: FC<OverlayProps> = (props) => (
+export const Overlay: FC<OverlayProps> = props => (
   <div
     {...props}
     className={cn(

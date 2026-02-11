@@ -1,7 +1,5 @@
 import type { FC, ReactNode, Ref } from 'react';
-
 import { cn } from '../../utils/cn';
-
 import { DrawerClose } from './DrawerClose';
 
 export interface DrawerHeaderProps {
@@ -12,7 +10,7 @@ export interface DrawerHeaderProps {
 export const DrawerHeader: FC<DrawerHeaderProps> = ({ children, ref }) => (
   <div
     ref={ref}
-    data-slot="drawer-header"
+    data-slot='drawer-header'
     className={cn(
       'relative shrink-0 w-full',
       'bg-bg-surface-2',

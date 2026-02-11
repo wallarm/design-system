@@ -1,11 +1,8 @@
 import type { FC, HTMLAttributes } from 'react';
-
 import { Field as ArkUiField } from '@ark-ui/react/field';
 import { Fieldset as ArkUiFieldset } from '@ark-ui/react/fieldset';
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
-
 import { checkContainCheckboxGroup } from './utils';
 
 const fieldVariants = cva(
@@ -39,11 +36,7 @@ type FieldVariantsProps = VariantProps<typeof fieldVariants>;
 
 type FieldProps = FieldNativeProps & FieldVariantsProps;
 
-export const Field: FC<FieldProps> = ({
-  orientation = 'vertical',
-  children,
-  ...props
-}) => {
+export const Field: FC<FieldProps> = ({ orientation = 'vertical', children, ...props }) => {
   const isContainCheckboxGroup = checkContainCheckboxGroup(children);
 
   const Comp = isContainCheckboxGroup ? ArkUiFieldset.Root : ArkUiField.Root;
@@ -51,8 +44,8 @@ export const Field: FC<FieldProps> = ({
   return (
     <Comp
       {...props}
-      role="group"
-      data-slot="field"
+      role='group'
+      data-slot='field'
       data-orientation={orientation}
       className={cn(fieldVariants({ orientation }))}
     >

@@ -1,7 +1,5 @@
 import type { FC, ReactNode } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 
 const drawerFooterControlsVariants = cva('flex items-center gap-8', {
@@ -13,9 +11,7 @@ const drawerFooterControlsVariants = cva('flex items-center gap-8', {
   },
 });
 
-type DrawerFooterControlsVariantsProps = VariantProps<
-  typeof drawerFooterControlsVariants
->;
+type DrawerFooterControlsVariantsProps = VariantProps<typeof drawerFooterControlsVariants>;
 
 interface DrawerFooterControlsBaseProps {
   children: ReactNode;
@@ -27,10 +23,6 @@ export type DrawerFooterControlsProps = DrawerFooterControlsBaseProps &
 export const DrawerFooterControls: FC<DrawerFooterControlsProps> = ({
   children,
   placement = 'right',
-}) => (
-  <div className={cn(drawerFooterControlsVariants({ placement }))}>
-    {children}
-  </div>
-);
+}) => <div className={cn(drawerFooterControlsVariants({ placement }))}>{children}</div>;
 
 DrawerFooterControls.displayName = 'DrawerFooterControls';

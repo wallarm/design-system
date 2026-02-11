@@ -1,7 +1,5 @@
 import { type FC, type PropsWithChildren, useRef } from 'react';
-
 import type { TabsSize, TabsVariant } from '../types';
-
 import { TabsSharedContext } from './TabsSharedContext';
 
 interface TabsSharedContextProviderProps extends PropsWithChildren {

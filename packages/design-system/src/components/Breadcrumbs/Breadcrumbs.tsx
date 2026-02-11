@@ -1,8 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Children, cloneElement, isValidElement } from 'react';
-
 import { cn } from '../../utils/cn';
-
 import { BreadcrumbsSeparator } from './BreadcrumbsSeparator';
 
 export type BreadcrumbsProps = HTMLAttributes<HTMLElement> & {
@@ -33,11 +31,7 @@ export type BreadcrumbsProps = HTMLAttributes<HTMLElement> & {
  */
 let separatorId = 0;
 
-export const Breadcrumbs: FC<BreadcrumbsProps> = ({
-  className,
-  children,
-  ...props
-}) => {
+export const Breadcrumbs: FC<BreadcrumbsProps> = ({ className, children, ...props }) => {
   const childrenArray = Children.toArray(children);
   const childrenWithSeparators: ReactNode[] = [];
 
@@ -45,10 +39,7 @@ export const Breadcrumbs: FC<BreadcrumbsProps> = ({
     const isLastItem = index === childrenArray.length - 1;
 
     const clonedChild = isValidElement(child)
-      ? cloneElement(child, { isCurrent: isLastItem } as Record<
-          string,
-          unknown
-        >)
+      ? cloneElement(child, { isCurrent: isLastItem } as Record<string, unknown>)
       : child;
 
     childrenWithSeparators.push(clonedChild);
@@ -59,19 +50,13 @@ export const Breadcrumbs: FC<BreadcrumbsProps> = ({
        */
       // eslint-disable-next-line react-hooks/globals
       separatorId += 1;
-      childrenWithSeparators.push(
-        <BreadcrumbsSeparator key={`separator-${separatorId}`} />,
-      );
+      childrenWithSeparators.push(<BreadcrumbsSeparator key={`separator-${separatorId}`} />);
     }
   });
 
   return (
-    <nav
-      className={cn('flex items-center', className)}
-      aria-label="Breadcrumb"
-      {...props}
-    >
-      <ol className="flex items-center gap-0">{childrenWithSeparators}</ol>
+    <nav className={cn('flex items-center', className)} aria-label='Breadcrumb' {...props}>
+      <ol className='flex items-center gap-0'>{childrenWithSeparators}</ol>
     </nav>
   );
 };

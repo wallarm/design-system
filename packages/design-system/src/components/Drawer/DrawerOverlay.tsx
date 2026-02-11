@@ -1,7 +1,5 @@
 import type { FC, Ref } from 'react';
-
 import { Dialog } from '@ark-ui/react/dialog';
-
 import { Overlay } from '../Overlay';
 
 interface DrawerOverlayProps {

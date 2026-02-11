@@ -1,18 +1,12 @@
 import type { FC, Ref } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import type { AlertColor } from './AlertIcon';
 import { ALERT_MAX_WIDTH, ALERT_MIN_WIDTH } from './const';
 
 export type { AlertColor };
 
 const alertVariants = cva(
-  [
-    'font-sans flex items-start gap-8',
-    'rounded-12 border-1',
-    'pl-16 pr-12 py-12',
-  ],
+  ['font-sans flex items-start gap-8', 'rounded-12 border-1', 'pl-16 pr-12 py-12'],
   {
     variants: {
       color: {
@@ -57,7 +51,7 @@ export const Alert: FC<AlertProps> = ({
   return (
     <div
       ref={ref}
-      role="alert"
+      role='alert'
       data-color={color}
       className={alertVariants({ color })}
       style={{ minWidth, maxWidth }}

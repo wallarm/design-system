@@ -1,7 +1,5 @@
 import figma from '@figma/code-connect';
-
 import { SquareArrowOutUpRight } from '../../icons';
-
 import { Link } from './Link';
 
 const figmaNodeUrl =
@@ -58,7 +56,7 @@ figma.connect(Link, figmaNodeUrl, {
     Medium: true,
   },
   example: ({ type, size, label }) => (
-    <Link type={type} size={size} weight="medium">
+    <Link type={type} size={size} weight='medium'>
       {label}
     </Link>
   ),

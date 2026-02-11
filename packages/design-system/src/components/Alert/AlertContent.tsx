@@ -1,5 +1,4 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
-
 import { cn } from '../../utils/cn';
 
 export interface AlertContentProps extends HTMLAttributes<HTMLDivElement> {
@@ -11,18 +10,12 @@ export interface AlertContentProps extends HTMLAttributes<HTMLDivElement> {
  *
  * Provides proper spacing and flex layout for child components.
  */
-export const AlertContent: FC<AlertContentProps> = ({
-  ref,
-  children,
-  ...props
-}) => {
+export const AlertContent: FC<AlertContentProps> = ({ ref, children, ...props }) => {
   return (
     <div
       {...props}
       ref={ref}
-      className={cn(
-        'flex-1 flex flex-col gap-0 py-2 **:data-[slot=alert-controls]:mt-8',
-      )}
+      className={cn('flex-1 flex flex-col gap-0 py-2 **:data-[slot=alert-controls]:mt-8')}
     >
       {children}
     </div>

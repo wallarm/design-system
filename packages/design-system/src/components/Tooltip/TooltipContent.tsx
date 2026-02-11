@@ -1,8 +1,6 @@
 import type { ComponentPropsWithoutRef, ElementRef, FC, Ref } from 'react';
-
 import { Content, Portal } from '@radix-ui/react-tooltip';
 import { cva } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
 
@@ -53,10 +51,7 @@ export const TooltipContent: FC<TooltipContentProps> = ({
       ref={ref}
       sideOffset={sideOffset}
       collisionPadding={8}
-      className={cn(
-        tooltipContentVariants({ hasNonTextEnd: hasNonTextEnd(children) }),
-        className,
-      )}
+      className={cn(tooltipContentVariants({ hasNonTextEnd: hasNonTextEnd(children) }), className)}
       {...props}
     >
       {children}

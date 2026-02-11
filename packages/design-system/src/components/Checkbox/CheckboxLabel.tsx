@@ -1,12 +1,10 @@
 import type { FC } from 'react';
-
 import { Checkbox as ArkUiCheckbox } from '@ark-ui/react/checkbox';
-
 import { cn } from '../../utils/cn';
 
 export type CheckboxLabelProps = Omit<ArkUiCheckbox.LabelProps, 'className'>;
 
-export const CheckboxLabel: FC<CheckboxLabelProps> = (props) => (
+export const CheckboxLabel: FC<CheckboxLabelProps> = props => (
   <ArkUiCheckbox.Label
     {...props}
     className={cn(

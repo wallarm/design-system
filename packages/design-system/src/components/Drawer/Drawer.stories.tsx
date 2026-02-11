@@ -1,7 +1,5 @@
 import { useState } from 'react';
-
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { PanelRight } from '../../icons';
 import { Button } from '../Button';
 import { HStack, VStack } from '../Stack';
@@ -9,7 +7,6 @@ import { Switch, SwitchControl, SwitchLabel } from '../Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../Tabs';
 import { Text } from '../Text';
 import { TooltipProvider } from '../Tooltip';
-
 import { DRAWER_SIZES, DRAWER_WIDTH_CONSTRAINTS } from './constants';
 import { Drawer, type DrawerProps } from './Drawer';
 import { DrawerBody } from './DrawerBody';
@@ -65,7 +62,7 @@ const meta = {
     },
   },
   decorators: [
-    (Story) => (
+    Story => (
       <TooltipProvider>
         <Story />
       </TooltipProvider>
@@ -85,13 +82,7 @@ const ContentPlaceholder = ({
 }) => (
   <div
     className={`w-full rounded-12 bg-[#f1f5f9] ${fillHeight ? 'flex-1 min-h-0' : ''}`}
-    style={
-      height
-        ? { height: `${height}px` }
-        : fillHeight
-          ? undefined
-          : { height: '200px' }
-    }
+    style={height ? { height: `${height}px` } : fillHeight ? undefined : { height: '200px' }}
   />
 );
 
@@ -133,10 +124,10 @@ export const WithFooter: StoryFn<DrawerProps> = () => {
         </DrawerBody>
         <DrawerFooter>
           <DrawerFooterControls>
-            <Button variant="ghost" color="neutral" size="large">
+            <Button variant='ghost' color='neutral' size='large'>
               Button
             </Button>
-            <Button variant="primary" color="brand" size="large">
+            <Button variant='primary' color='brand' size='large'>
               Button
             </Button>
           </DrawerFooterControls>
@@ -162,7 +153,7 @@ export const WithFooterLeftActions: StoryFn<DrawerProps> = () => (
       </DrawerBody>
 
       <DrawerFooter>
-        <DrawerFooterControls placement="left">
+        <DrawerFooterControls placement='left'>
           <Switch>
             <SwitchControl />
             <SwitchLabel>Remember choice</SwitchLabel>
@@ -170,11 +161,11 @@ export const WithFooterLeftActions: StoryFn<DrawerProps> = () => (
         </DrawerFooterControls>
 
         <DrawerClose asChild>
-          <Button variant="ghost" color="neutral" size="large">
+          <Button variant='ghost' color='neutral' size='large'>
             Cancel
           </Button>
         </DrawerClose>
-        <Button variant="primary" color="brand" size="large">
+        <Button variant='primary' color='brand' size='large'>
           Apply
         </Button>
       </DrawerFooter>
@@ -193,7 +184,7 @@ WithFooterLeftActions.parameters = {
 
 /** Drawer with different sizes - Small */
 export const Sizes: StoryFn<DrawerProps> = () => (
-  <HStack spacing={8} justify="center">
+  <HStack spacing={8} justify='center'>
     <Drawer width={DRAWER_SIZES.small}>
       <DrawerTrigger asChild>
         <Button>Open Small ({DRAWER_SIZES.small}px)</Button>
@@ -244,8 +235,8 @@ export const Sizes: StoryFn<DrawerProps> = () => (
 /** Custom width with percentage */
 export const CustomSizes: StoryFn<DrawerProps> = () => {
   return (
-    <HStack spacing={8} justify="center">
-      <Drawer width="50%">
+    <HStack spacing={8} justify='center'>
+      <Drawer width='50%'>
         <DrawerTrigger asChild>
           <Button>50% Width</Button>
         </DrawerTrigger>
@@ -256,7 +247,7 @@ export const CustomSizes: StoryFn<DrawerProps> = () => {
           </DrawerHeader>
 
           <DrawerBody>
-            <div className="py-12">
+            <div className='py-12'>
               <p>This drawer takes 50% of the viewport width.</p>
             </div>
           </DrawerBody>
@@ -274,7 +265,7 @@ export const CustomSizes: StoryFn<DrawerProps> = () => {
           </DrawerHeader>
 
           <DrawerBody>
-            <div className="py-12">
+            <div className='py-12'>
               <p>This drawer has a fixed width of 1000px.</p>
             </div>
           </DrawerBody>
@@ -300,15 +291,15 @@ export const Resizable: StoryFn<DrawerProps> = () => {
           </DrawerHeader>
 
           <DrawerBody>
-            <div className="py-12">
-              <p className="mb-16">Drag the left edge to resize this drawer.</p>
+            <div className='py-12'>
+              <p className='mb-16'>Drag the left edge to resize this drawer.</p>
               <ContentPlaceholder height={300} />
             </div>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
 
-      <Drawer width="900px">
+      <Drawer width='900px'>
         <DrawerTrigger asChild>
           <Button>Open Resizable Drawer (900px)</Button>
         </DrawerTrigger>
@@ -320,17 +311,15 @@ export const Resizable: StoryFn<DrawerProps> = () => {
           </DrawerHeader>
 
           <DrawerBody>
-            <div className="py-12">
-              <p className="mb-16">
-                Width is set as "900px" string. Drag the left edge to resize.
-              </p>
+            <div className='py-12'>
+              <p className='mb-16'>Width is set as "900px" string. Drag the left edge to resize.</p>
               <ContentPlaceholder height={300} />
             </div>
           </DrawerBody>
         </DrawerContent>
       </Drawer>
 
-      <Drawer width="50%">
+      <Drawer width='50%'>
         <DrawerTrigger asChild>
           <Button>Open Resizable Drawer (50%)</Button>
         </DrawerTrigger>
@@ -342,10 +331,9 @@ export const Resizable: StoryFn<DrawerProps> = () => {
           </DrawerHeader>
 
           <DrawerBody>
-            <div className="py-12">
-              <p className="mb-16">
-                Width is set as "50%". Drag the left edge to resize - it will
-                convert to pixels.
+            <div className='py-12'>
+              <p className='mb-16'>
+                Width is set as "50%". Drag the left edge to resize - it will convert to pixels.
               </p>
               <ContentPlaceholder height={300} />
             </div>
@@ -370,7 +358,7 @@ export const Scrollable: StoryFn<DrawerProps> = () => {
         </DrawerHeader>
 
         <DrawerBody>
-          <div className="flex flex-col gap-16 py-12">
+          <div className='flex flex-col gap-16 py-12'>
             {Array.from({ length: 20 }).map((_, i) => (
               <ContentPlaceholder key={i} height={100} />
             ))}
@@ -379,11 +367,11 @@ export const Scrollable: StoryFn<DrawerProps> = () => {
 
         <DrawerFooter>
           <DrawerClose asChild>
-            <Button variant="ghost" color="neutral" size="large">
+            <Button variant='ghost' color='neutral' size='large'>
               Close
             </Button>
           </DrawerClose>
-          <Button variant="primary" color="brand" size="large">
+          <Button variant='primary' color='brand' size='large'>
             Confirm
           </Button>
         </DrawerFooter>
@@ -407,19 +395,19 @@ export const Controlled: StoryFn<DrawerProps> = () => {
           </DrawerHeader>
 
           <DrawerBody>
-            <div className="py-12">
-              <p className="mb-16">This drawer is controlled externally.</p>
+            <div className='py-12'>
+              <p className='mb-16'>This drawer is controlled externally.</p>
               <ContentPlaceholder />
             </div>
           </DrawerBody>
 
           <DrawerFooter>
             <DrawerClose asChild>
-              <Button variant="ghost" color="neutral" size="large">
+              <Button variant='ghost' color='neutral' size='large'>
                 Cancel
               </Button>
             </DrawerClose>
-            <Button variant="primary" color="brand" size="large">
+            <Button variant='primary' color='brand' size='large'>
               Save Changes
             </Button>
           </DrawerFooter>
@@ -464,7 +452,7 @@ export const NoOverlay: StoryFn<DrawerProps> = () => {
         </DrawerHeader>
 
         <DrawerBody>
-          <div className="py-12">
+          <div className='py-12'>
             <p>This drawer has no overlay backdrop.</p>
           </div>
         </DrawerBody>
@@ -488,7 +476,7 @@ export const WithNested: StoryFn<DrawerProps> = () => {
           {/* Level 2 drawer */}
           <Drawer>
             <DrawerTrigger asChild>
-              <Button variant="ghost" color="neutral" size="small">
+              <Button variant='ghost' color='neutral' size='small'>
                 <PanelRight />
                 2nd level drawer
               </Button>
@@ -500,7 +488,7 @@ export const WithNested: StoryFn<DrawerProps> = () => {
                 {/* Level 3 drawer */}
                 <Drawer>
                   <DrawerTrigger asChild>
-                    <Button variant="ghost" color="neutral" size="small">
+                    <Button variant='ghost' color='neutral' size='small'>
                       <PanelRight />
                       3nd level drawer
                     </Button>
@@ -512,7 +500,7 @@ export const WithNested: StoryFn<DrawerProps> = () => {
                     </DrawerHeader>
 
                     <DrawerBody>
-                      <VStack spacing={12} align="start">
+                      <VStack spacing={12} align='start'>
                         <Text>Level 3! Unlimited nesting works.</Text>
                         <ContentPlaceholder height={150} />
                       </VStack>
@@ -520,7 +508,7 @@ export const WithNested: StoryFn<DrawerProps> = () => {
 
                     <DrawerFooter>
                       <DrawerClose asChild>
-                        <Button size="large" variant="ghost" color="neutral">
+                        <Button size='large' variant='ghost' color='neutral'>
                           Back
                         </Button>
                       </DrawerClose>
@@ -530,10 +518,9 @@ export const WithNested: StoryFn<DrawerProps> = () => {
               </DrawerHeader>
 
               <DrawerBody>
-                <VStack spacing={12} align="start">
+                <VStack spacing={12} align='start'>
                   <Text>
-                    This is Level 2 drawer. Main drawer is pushed back. You can
-                    go deeper:
+                    This is Level 2 drawer. Main drawer is pushed back. You can go deeper:
                   </Text>
 
                   <ContentPlaceholder height={150} />
@@ -542,11 +529,11 @@ export const WithNested: StoryFn<DrawerProps> = () => {
 
               <DrawerFooter>
                 <DrawerClose asChild>
-                  <Button variant="ghost" color="neutral" size="large">
+                  <Button variant='ghost' color='neutral' size='large'>
                     Back
                   </Button>
                 </DrawerClose>
-                <Button variant="primary" color="brand" size="large">
+                <Button variant='primary' color='brand' size='large'>
                   Apply
                 </Button>
               </DrawerFooter>
@@ -555,10 +542,8 @@ export const WithNested: StoryFn<DrawerProps> = () => {
         </DrawerHeader>
 
         <DrawerBody>
-          <VStack spacing={12} align="start">
-            <Text>
-              This is Level 1 drawer. Click below to open nested drawers:
-            </Text>
+          <VStack spacing={12} align='start'>
+            <Text>This is Level 1 drawer. Click below to open nested drawers:</Text>
 
             <ContentPlaceholder height={300} />
           </VStack>
@@ -566,11 +551,11 @@ export const WithNested: StoryFn<DrawerProps> = () => {
 
         <DrawerFooter>
           <DrawerClose asChild>
-            <Button variant="ghost" color="neutral" size="large">
+            <Button variant='ghost' color='neutral' size='large'>
               Cancel
             </Button>
           </DrawerClose>
-          <Button variant="primary" color="brand" size="large">
+          <Button variant='primary' color='brand' size='large'>
             Save
           </Button>
         </DrawerFooter>
@@ -596,23 +581,23 @@ export const WithTabs: StoryFn<DrawerProps> = () => {
           </DrawerHeader>
 
           <TabsList>
-            <TabsTrigger value="tab1">General</TabsTrigger>
-            <TabsTrigger value="tab2">Settings</TabsTrigger>
-            <TabsTrigger value="tab3">Advanced</TabsTrigger>
+            <TabsTrigger value='tab1'>General</TabsTrigger>
+            <TabsTrigger value='tab2'>Settings</TabsTrigger>
+            <TabsTrigger value='tab3'>Advanced</TabsTrigger>
           </TabsList>
 
           <DrawerBody>
-            <div className="pt-12">
-              <TabsContent value="tab1">
-                <h3 className="text-lg font-medium mb-8">General Settings</h3>
+            <div className='pt-12'>
+              <TabsContent value='tab1'>
+                <h3 className='text-lg font-medium mb-8'>General Settings</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
-              <TabsContent value="tab2">
-                <h3 className="text-lg font-medium mb-8">Configuration</h3>
+              <TabsContent value='tab2'>
+                <h3 className='text-lg font-medium mb-8'>Configuration</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
-              <TabsContent value="tab3">
-                <h3 className="text-lg font-medium mb-8">Advanced Options</h3>
+              <TabsContent value='tab3'>
+                <h3 className='text-lg font-medium mb-8'>Advanced Options</h3>
                 <ContentPlaceholder height={300} />
               </TabsContent>
             </div>
@@ -620,11 +605,11 @@ export const WithTabs: StoryFn<DrawerProps> = () => {
 
           <DrawerFooter>
             <DrawerClose asChild>
-              <Button variant="ghost" color="neutral" size="large">
+              <Button variant='ghost' color='neutral' size='large'>
                 Cancel
               </Button>
             </DrawerClose>
-            <Button variant="primary" color="brand" size="large">
+            <Button variant='primary' color='brand' size='large'>
               Apply Settings
             </Button>
           </DrawerFooter>

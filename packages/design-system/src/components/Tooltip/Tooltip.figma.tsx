@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { Tooltip } from './Tooltip';
 import { TooltipContent } from './TooltipContent';
 import { TooltipProvider } from './TooltipProvider';

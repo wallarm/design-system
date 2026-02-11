@@ -1,6 +1,5 @@
 // Only import types from highlight.js — the library is loaded lazily via dynamic import
 import type { HLJSApi } from 'highlight.js';
-
 import type {
   HighlightJsLanguage,
   HighlightResult,
@@ -140,7 +139,7 @@ function decodeHtmlEntities(text: string): string {
 
 async function getHljs() {
   if (!hljsPromise) {
-    hljsPromise = import('highlight.js').then((module) => module.default);
+    hljsPromise = import('highlight.js').then(module => module.default);
   }
   return hljsPromise;
 }
@@ -148,17 +147,14 @@ async function getHljs() {
 export const highlightJsAdapter: SyntaxAdapter<HighlightJsLanguage> = {
   name: 'highlight.js',
 
-  async highlight(
-    code: string,
-    language: HighlightJsLanguage,
-  ): Promise<HighlightResult> {
+  async highlight(code: string, language: HighlightJsLanguage): Promise<HighlightResult> {
     try {
       const hljs = await getHljs();
 
       const result = hljs.highlight(code, { language });
       const lines = result.value.split('\n');
 
-      const tokens: Token[][] = lines.map((line) => {
+      const tokens: Token[][] = lines.map(line => {
         if (!line) return [{ content: '', type: 'plain' as const }];
         return parseHljsHtml(line);
       });
@@ -168,7 +164,7 @@ export const highlightJsAdapter: SyntaxAdapter<HighlightJsLanguage> = {
       // Fallback to plain text if highlighting fails
       const tokens: Token[][] = code
         .split('\n')
-        .map((line) => [{ content: line, type: 'plain' as const }]);
+        .map(line => [{ content: line, type: 'plain' as const }]);
       return { tokens };
     }
   },

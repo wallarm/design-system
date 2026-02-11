@@ -1,14 +1,9 @@
 import type { FC, Ref } from 'react';
-
 import { NumberInput as ArkUiNumberInput } from '@ark-ui/react/number-input';
-
 import { ChevronDown, ChevronUp } from '../../icons';
 import { cn } from '../../utils/cn';
 
-type NumberInputNativeProps = Omit<
-  ArkUiNumberInput.RootProps,
-  'className' | 'invalid'
->;
+type NumberInputNativeProps = Omit<ArkUiNumberInput.RootProps, 'className' | 'invalid'>;
 
 interface NumberInputBaseProps {
   error?: boolean;
@@ -84,14 +79,10 @@ export const NumberInput: FC<NumberInputProps> = ({
         '[&_svg]:icon-sm [&_svg]:text-icon-secondary [&_svg]:pointer-events-none',
       )}
     >
-      <ArkUiNumberInput.IncrementTrigger
-        className={numberInputTriggerClassNames}
-      >
+      <ArkUiNumberInput.IncrementTrigger className={numberInputTriggerClassNames}>
         <ChevronUp />
       </ArkUiNumberInput.IncrementTrigger>
-      <ArkUiNumberInput.DecrementTrigger
-        className={numberInputTriggerClassNames}
-      >
+      <ArkUiNumberInput.DecrementTrigger className={numberInputTriggerClassNames}>
         <ChevronDown />
       </ArkUiNumberInput.DecrementTrigger>
     </ArkUiNumberInput.Control>

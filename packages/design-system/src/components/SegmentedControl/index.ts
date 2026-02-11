@@ -1,4 +1,9 @@
 export {
+  segmentedControlIndicatorClassNames,
+  segmentedControlItemClassNamesBase,
+  segmentedControlVariants,
+} from './classes';
+export {
   SegmentedControl,
   type SegmentedControlProps,
 } from './SegmentedControl';
@@ -14,8 +19,3 @@ export {
   SegmentedControlSeparator,
   type SegmentedControlSeparatorProps,
 } from './SegmentedControlSeparator';
-export {
-  segmentedControlItemClassNamesBase,
-  segmentedControlVariants,
-  segmentedControlIndicatorClassNames,
-} from './classes';

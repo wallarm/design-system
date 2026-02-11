@@ -1,7 +1,5 @@
 import type { ComponentProps, FC } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 
 const kbdVariants = cva(
@@ -27,7 +25,7 @@ type KbdVariantsProps = VariantProps<typeof kbdVariants>;
 type KbdProps = ComponentProps<'kbd'> & KbdVariantsProps;
 
 export const Kbd: FC<KbdProps> = ({ size = 'small', ...props }) => (
-  <kbd {...props} data-slot="kbd" className={cn(kbdVariants({ size }))} />
+  <kbd {...props} data-slot='kbd' className={cn(kbdVariants({ size }))} />
 );
 
 Kbd.displayName = 'Kbd';

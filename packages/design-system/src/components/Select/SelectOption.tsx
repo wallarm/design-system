@@ -1,11 +1,6 @@
 import type { FC } from 'react';
-
-import {
-  type CollectionItem,
-  Select as ArkUiSelect,
-} from '@ark-ui/react/select';
+import { Select as ArkUiSelect, type CollectionItem } from '@ark-ui/react/select';
 import type { VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 import { dropdownMenuItemVariants } from '../DropdownMenu';
 
@@ -21,10 +16,7 @@ type SelectOptionProps = SelectOptionNativeProps &
   SelectOptionVariantsProps &
   SelectOptionBaseProps;
 
-export const SelectOption: FC<SelectOptionProps> = ({
-  variant = 'default',
-  ...props
-}) => {
+export const SelectOption: FC<SelectOptionProps> = ({ variant = 'default', ...props }) => {
   return (
     <ArkUiSelect.Item
       {...props}

@@ -1,20 +1,11 @@
 import { Fragment, useState } from 'react';
-
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
-import {
-  LayoutGrid,
-  LayoutTemplate,
-  Pen,
-  Search,
-  SquareArrowOutUpRight,
-} from '../../icons';
+import { LayoutGrid, LayoutTemplate, Pen, Search, SquareArrowOutUpRight } from '../../icons';
 import { Button } from '../Button';
 import { Field, FieldContent, FieldLabel, FieldSet } from '../Field';
 import { HStack, VStack } from '../Stack';
 import { Tag } from '../Tag';
-
 import { Select } from './Select';
 import { SelectButton } from './SelectButton';
 import { SelectClearTrigger } from './SelectClearTrigger';
@@ -90,24 +81,22 @@ const skills: SelectDataItem[] = [
   },
 ];
 
-const skillsWithoutIcons: SelectDataItem[] = skills.map(
-  ({ icon, ...skill }) => skill,
-);
+const skillsWithoutIcons: SelectDataItem[] = skills.map(({ icon, ...skill }) => skill);
 
 export const Basic: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
-    isItemDisabled: (item) => item.value === 'angular',
+    isItemDisabled: item => item.value === 'angular',
   });
 
   return (
-    <div className="w-300">
+    <div className='w-300'>
       <Select collection={collection}>
         <SelectButton />
 
         <SelectPositioner>
           <SelectContent>
-            {collection.items.map((skill) => (
+            {collection.items.map(skill => (
               <SelectOption key={skill.value} item={skill}>
                 <SelectOptionText>{skill.label}</SelectOptionText>
                 <SelectOptionIndicator />
@@ -126,15 +115,15 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
   });
 
   return (
-    <div className="w-800">
+    <div className='w-800'>
       <VStack spacing={16}>
         <HStack spacing={8}>
           <Select collection={collection}>
-            <SelectButton placeholder="Default" />
+            <SelectButton placeholder='Default' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -145,11 +134,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection}>
-            <SelectButton variant="ghost" placeholder="Ghost + Neutral" />
+            <SelectButton variant='ghost' placeholder='Ghost + Neutral' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -160,15 +149,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection}>
-            <SelectButton
-              variant="ghost"
-              color="brand"
-              placeholder="Ghost + Brand"
-            />
+            <SelectButton variant='ghost' color='brand' placeholder='Ghost + Brand' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -179,14 +164,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection}>
-            <SelectButton
-              variant="secondary"
-              placeholder="Secondary + Neutral"
-            />
+            <SelectButton variant='secondary' placeholder='Secondary + Neutral' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -197,15 +179,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection}>
-            <SelectButton
-              variant="secondary"
-              color="brand"
-              placeholder="Ghost + Brand"
-            />
+            <SelectButton variant='secondary' color='brand' placeholder='Ghost + Brand' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -218,11 +196,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
 
         <HStack spacing={8}>
           <Select collection={collection} disabled>
-            <SelectButton placeholder="Default" />
+            <SelectButton placeholder='Default' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -233,11 +211,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection} disabled>
-            <SelectButton variant="ghost" placeholder="Ghost + Neutral" />
+            <SelectButton variant='ghost' placeholder='Ghost + Neutral' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -248,15 +226,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection} disabled>
-            <SelectButton
-              variant="ghost"
-              color="brand"
-              placeholder="Ghost + Brand"
-            />
+            <SelectButton variant='ghost' color='brand' placeholder='Ghost + Brand' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -267,14 +241,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection} disabled>
-            <SelectButton
-              variant="secondary"
-              placeholder="Secondary + Neutral"
-            />
+            <SelectButton variant='secondary' placeholder='Secondary + Neutral' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -285,15 +256,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection} disabled>
-            <SelectButton
-              variant="secondary"
-              color="brand"
-              placeholder="Ghost + Brand"
-            />
+            <SelectButton variant='secondary' color='brand' placeholder='Ghost + Brand' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -306,11 +273,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
 
         <HStack spacing={8}>
           <Select collection={collection} loading>
-            <SelectButton placeholder="Default" />
+            <SelectButton placeholder='Default' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -321,11 +288,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection} loading>
-            <SelectButton variant="ghost" placeholder="Ghost + Neutral" />
+            <SelectButton variant='ghost' placeholder='Ghost + Neutral' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -336,15 +303,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection} loading>
-            <SelectButton
-              variant="ghost"
-              color="brand"
-              placeholder="Ghost + Brand"
-            />
+            <SelectButton variant='ghost' color='brand' placeholder='Ghost + Brand' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -355,14 +318,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection} loading>
-            <SelectButton
-              variant="secondary"
-              placeholder="Secondary + Neutral"
-            />
+            <SelectButton variant='secondary' placeholder='Secondary + Neutral' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -373,15 +333,11 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
 
           <Select collection={collection} loading>
-            <SelectButton
-              variant="secondary"
-              color="brand"
-              placeholder="Ghost + Brand"
-            />
+            <SelectButton variant='secondary' color='brand' placeholder='Ghost + Brand' />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -403,25 +359,17 @@ export const Multiple: StoryFn<typeof Select> = () => {
 
   return (
     <VStack>
-      <div className="w-400">
+      <div className='w-400'>
         <Select
           collection={collection}
           multiple
-          defaultValue={[
-            'react',
-            'vue',
-            'angular',
-            'nodejs',
-            'python',
-            'java',
-            'typescript',
-          ]}
+          defaultValue={['react', 'vue', 'angular', 'nodejs', 'python', 'java', 'typescript']}
         >
           <SelectInput />
 
           <SelectPositioner>
             <SelectContent>
-              {collection.items.map((skill) => (
+              {collection.items.map(skill => (
                 <SelectOption key={skill.value} item={skill}>
                   <SelectOptionText>{skill.label}</SelectOptionText>
                   <SelectOptionIndicator />
@@ -432,26 +380,18 @@ export const Multiple: StoryFn<typeof Select> = () => {
         </Select>
       </div>
 
-      <div className="w-400">
+      <div className='w-400'>
         <Select
           collection={collection}
           multiple
           invalid
-          defaultValue={[
-            'react',
-            'vue',
-            'angular',
-            'nodejs',
-            'python',
-            'java',
-            'typescript',
-          ]}
+          defaultValue={['react', 'vue', 'angular', 'nodejs', 'python', 'java', 'typescript']}
         >
           <SelectInput />
 
           <SelectPositioner>
             <SelectContent>
-              {collection.items.map((skill) => (
+              {collection.items.map(skill => (
                 <SelectOption key={skill.value} item={skill}>
                   <SelectOptionText>{skill.label}</SelectOptionText>
                   <SelectOptionIndicator />
@@ -462,26 +402,18 @@ export const Multiple: StoryFn<typeof Select> = () => {
         </Select>
       </div>
 
-      <div className="w-400">
+      <div className='w-400'>
         <Select
           collection={collection}
           multiple
           disabled
-          defaultValue={[
-            'react',
-            'vue',
-            'angular',
-            'nodejs',
-            'python',
-            'java',
-            'typescript',
-          ]}
+          defaultValue={['react', 'vue', 'angular', 'nodejs', 'python', 'java', 'typescript']}
         >
           <SelectInput />
 
           <SelectPositioner>
             <SelectContent>
-              {collection.items.map((skill) => (
+              {collection.items.map(skill => (
                 <SelectOption key={skill.value} item={skill}>
                   <SelectOptionText>{skill.label}</SelectOptionText>
                   <SelectOptionIndicator />
@@ -502,25 +434,17 @@ export const MultipleWithIcons: StoryFn<typeof Select> = () => {
 
   return (
     <VStack>
-      <div className="w-400">
+      <div className='w-400'>
         <Select
           collection={collection}
           multiple
-          defaultValue={[
-            'react',
-            'vue',
-            'angular',
-            'nodejs',
-            'python',
-            'java',
-            'typescript',
-          ]}
+          defaultValue={['react', 'vue', 'angular', 'nodejs', 'python', 'java', 'typescript']}
         >
           <SelectInput />
 
           <SelectPositioner>
             <SelectContent>
-              {collection.items.map((skill) => {
+              {collection.items.map(skill => {
                 const { icon: Icon } = skill;
 
                 return (
@@ -536,26 +460,18 @@ export const MultipleWithIcons: StoryFn<typeof Select> = () => {
         </Select>
       </div>
 
-      <div className="w-400">
+      <div className='w-400'>
         <Select
           collection={collection}
           multiple
           invalid
-          defaultValue={[
-            'react',
-            'vue',
-            'angular',
-            'nodejs',
-            'python',
-            'java',
-            'typescript',
-          ]}
+          defaultValue={['react', 'vue', 'angular', 'nodejs', 'python', 'java', 'typescript']}
         >
           <SelectInput />
 
           <SelectPositioner>
             <SelectContent>
-              {collection.items.map((skill) => {
+              {collection.items.map(skill => {
                 const { icon: Icon } = skill;
 
                 return (
@@ -571,26 +487,18 @@ export const MultipleWithIcons: StoryFn<typeof Select> = () => {
         </Select>
       </div>
 
-      <div className="w-400">
+      <div className='w-400'>
         <Select
           collection={collection}
           multiple
           disabled
-          defaultValue={[
-            'react',
-            'vue',
-            'angular',
-            'nodejs',
-            'python',
-            'java',
-            'typescript',
-          ]}
+          defaultValue={['react', 'vue', 'angular', 'nodejs', 'python', 'java', 'typescript']}
         >
           <SelectInput />
 
           <SelectPositioner>
             <SelectContent>
-              {collection.items.map((skill) => {
+              {collection.items.map(skill => {
                 const { icon: Icon } = skill;
 
                 return (
@@ -612,7 +520,7 @@ export const MultipleWithIcons: StoryFn<typeof Select> = () => {
 export const Grouped: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
-    groupBy: (item) => item.category ?? '',
+    groupBy: item => item.category ?? '',
   });
 
   return (
@@ -625,11 +533,9 @@ export const Grouped: StoryFn<typeof Select> = () => {
             <SelectGroup key={category}>
               <SelectGroupLabel>
                 {category}
-                {index === 0 && (
-                  <SelectClearTrigger>Clear all</SelectClearTrigger>
-                )}
+                {index === 0 && <SelectClearTrigger>Clear all</SelectClearTrigger>}
               </SelectGroupLabel>
-              {group.map((skill) => (
+              {group.map(skill => (
                 <SelectOption key={skill.value} item={skill}>
                   <SelectOptionText>{skill.label}</SelectOptionText>
                   <SelectOptionIndicator />
@@ -654,7 +560,7 @@ export const Disabled: StoryFn<typeof Select> = () => {
 
       <SelectPositioner>
         <SelectContent>
-          {collection.items.map((skill) => (
+          {collection.items.map(skill => (
             <SelectOption key={skill.value} item={skill}>
               <SelectOptionText>{skill.label}</SelectOptionText>
               <SelectOptionIndicator />
@@ -677,7 +583,7 @@ export const Loading: StoryFn<typeof Select> = () => {
 
       <SelectPositioner>
         <SelectContent>
-          {collection.items.map((skill) => (
+          {collection.items.map(skill => (
             <SelectOption key={skill.value} item={skill}>
               <SelectOptionText>{skill.label}</SelectOptionText>
               <SelectOptionIndicator />
@@ -695,14 +601,14 @@ export const WithSelectInput: StoryFn<typeof Select> = () => {
   });
 
   return (
-    <div className="w-300">
-      <VStack align="stretch">
+    <div className='w-300'>
+      <VStack align='stretch'>
         <Select collection={collection}>
           <SelectInput />
 
           <SelectPositioner>
             <SelectContent>
-              {collection.items.map((skill) => (
+              {collection.items.map(skill => (
                 <SelectOption key={skill.value} item={skill}>
                   <SelectOptionText>{skill.label}</SelectOptionText>
                   <SelectOptionIndicator />
@@ -717,7 +623,7 @@ export const WithSelectInput: StoryFn<typeof Select> = () => {
 
           <SelectPositioner>
             <SelectContent>
-              {collection.items.map((skill) => (
+              {collection.items.map(skill => (
                 <SelectOption key={skill.value} item={skill}>
                   <SelectOptionText>{skill.label}</SelectOptionText>
                   <SelectOptionIndicator />
@@ -732,7 +638,7 @@ export const WithSelectInput: StoryFn<typeof Select> = () => {
 
           <SelectPositioner>
             <SelectContent>
-              {collection.items.map((skill) => (
+              {collection.items.map(skill => (
                 <SelectOption key={skill.value} item={skill}>
                   <SelectOptionText>{skill.label}</SelectOptionText>
                   <SelectOptionIndicator />
@@ -752,7 +658,7 @@ export const WithSeparator: StoryFn<typeof Select> = () => {
   });
 
   return (
-    <div className="w-300">
+    <div className='w-300'>
       <Select collection={collection}>
         <SelectButton />
 
@@ -781,7 +687,7 @@ export const WithIcons: StoryFn<typeof Select> = () => {
   });
 
   return (
-    <div className="w-300">
+    <div className='w-300'>
       <Select collection={collection}>
         <SelectButton />
 
@@ -804,11 +710,11 @@ export const WithIcons: StoryFn<typeof Select> = () => {
 export const WithFooter: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
-    groupBy: (item) => item.category ?? '',
+    groupBy: item => item.category ?? '',
   });
 
   return (
-    <div className="w-300">
+    <div className='w-300'>
       <Select collection={collection}>
         <SelectButton />
 
@@ -818,17 +724,13 @@ export const WithFooter: StoryFn<typeof Select> = () => {
               <SelectGroup key={category}>
                 <SelectGroupLabel>
                   {category}
-                  {index === 0 && (
-                    <SelectClearTrigger>Clear all</SelectClearTrigger>
-                  )}
+                  {index === 0 && <SelectClearTrigger>Clear all</SelectClearTrigger>}
                 </SelectGroupLabel>
-                {group.map((skill) => (
+                {group.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     {skill.description && (
-                      <SelectOptionDescription>
-                        {skill.description}
-                      </SelectOptionDescription>
+                      <SelectOptionDescription>{skill.description}</SelectOptionDescription>
                     )}
                     <SelectOptionIndicator />
                   </SelectOption>
@@ -838,18 +740,18 @@ export const WithFooter: StoryFn<typeof Select> = () => {
           </SelectContent>
 
           <SelectFooter>
-            <HStack justify="between">
-              <Button variant="ghost" color="neutral" size="small">
+            <HStack justify='between'>
+              <Button variant='ghost' color='neutral' size='small'>
                 <SquareArrowOutUpRight />
                 See all
               </Button>
 
-              <HStack justify="end">
-                <Button variant="ghost" color="neutral" size="small">
+              <HStack justify='end'>
+                <Button variant='ghost' color='neutral' size='small'>
                   Cancel
                 </Button>
 
-                <Button variant="primary" color="brand" size="small">
+                <Button variant='primary' color='brand' size='small'>
                   Apply
                 </Button>
               </HStack>
@@ -866,12 +768,12 @@ export const WithSearch: StoryFn<typeof Select> = () => {
 
   const collection = createListCollection({
     items: skillsWithoutIcons,
-    groupBy: (item) => item.category ?? '',
-    itemToString: (item) => item.label,
+    groupBy: item => item.category ?? '',
+    itemToString: item => item.label,
   });
 
   return (
-    <div className="w-300">
+    <div className='w-300'>
       <Select collection={collection}>
         <SelectButton />
 
@@ -882,25 +784,19 @@ export const WithSearch: StoryFn<typeof Select> = () => {
 
           <SelectContent>
             {collection
-              .filter((skill) =>
-                skill.toLowerCase().includes(searchValue.toLowerCase()),
-              )
+              .filter(skill => skill.toLowerCase().includes(searchValue.toLowerCase()))
               .group()
               .map(([category, group], index) => (
                 <SelectGroup key={category}>
                   <SelectGroupLabel>
                     {category}
-                    {index === 0 && (
-                      <SelectClearTrigger>Clear all</SelectClearTrigger>
-                    )}
+                    {index === 0 && <SelectClearTrigger>Clear all</SelectClearTrigger>}
                   </SelectGroupLabel>
-                  {group.map((skill) => (
+                  {group.map(skill => (
                     <SelectOption key={skill.value} item={skill}>
                       <SelectOptionText>{skill.label}</SelectOptionText>
                       {skill.description && (
-                        <SelectOptionDescription>
-                          {skill.description}
-                        </SelectOptionDescription>
+                        <SelectOptionDescription>{skill.description}</SelectOptionDescription>
                       )}
                       <SelectOptionIndicator />
                     </SelectOption>
@@ -910,18 +806,18 @@ export const WithSearch: StoryFn<typeof Select> = () => {
           </SelectContent>
 
           <SelectFooter>
-            <HStack justify="between">
-              <Button variant="ghost" color="neutral" size="small">
+            <HStack justify='between'>
+              <Button variant='ghost' color='neutral' size='small'>
                 <SquareArrowOutUpRight />
                 See all
               </Button>
 
-              <HStack justify="end">
-                <Button variant="ghost" color="neutral" size="small">
+              <HStack justify='end'>
+                <Button variant='ghost' color='neutral' size='small'>
                   Cancel
                 </Button>
 
-                <Button variant="primary" color="brand" size="small">
+                <Button variant='primary' color='brand' size='small'>
                   Apply
                 </Button>
               </HStack>
@@ -939,7 +835,7 @@ export const WithFormField: StoryFn<typeof Select> = () => {
   });
 
   return (
-    <div className="w-300">
+    <div className='w-300'>
       <FieldSet>
         <Field>
           <FieldLabel>Single with SelectInput</FieldLabel>
@@ -949,7 +845,7 @@ export const WithFormField: StoryFn<typeof Select> = () => {
 
               <SelectPositioner>
                 <SelectContent>
-                  {collection.items.map((skill) => (
+                  {collection.items.map(skill => (
                     <SelectOption key={skill.value} item={skill}>
                       <SelectOptionText>{skill.label}</SelectOptionText>
                       <SelectOptionIndicator />
@@ -969,7 +865,7 @@ export const WithFormField: StoryFn<typeof Select> = () => {
 
               <SelectPositioner>
                 <SelectContent>
-                  {collection.items.map((skill) => (
+                  {collection.items.map(skill => (
                     <SelectOption key={skill.value} item={skill}>
                       <SelectOptionText>{skill.label}</SelectOptionText>
                       <SelectOptionIndicator />
@@ -984,16 +880,12 @@ export const WithFormField: StoryFn<typeof Select> = () => {
         <Field>
           <FieldLabel>Multiple with SelectInput</FieldLabel>
           <FieldContent>
-            <Select
-              collection={collection}
-              multiple
-              defaultValue={['react', 'vue']}
-            >
+            <Select collection={collection} multiple defaultValue={['react', 'vue']}>
               <SelectInput />
 
               <SelectPositioner>
                 <SelectContent>
-                  {collection.items.map((skill) => (
+                  {collection.items.map(skill => (
                     <SelectOption key={skill.value} item={skill}>
                       <SelectOptionText>{skill.label}</SelectOptionText>
                       <SelectOptionIndicator />
@@ -1008,16 +900,12 @@ export const WithFormField: StoryFn<typeof Select> = () => {
         <Field>
           <FieldLabel>Multiple with SelectButton</FieldLabel>
           <FieldContent>
-            <Select
-              collection={collection}
-              multiple
-              defaultValue={['react', 'vue', 'angular']}
-            >
+            <Select collection={collection} multiple defaultValue={['react', 'vue', 'angular']}>
               <SelectButton />
 
               <SelectPositioner>
                 <SelectContent>
-                  {collection.items.map((skill) => (
+                  {collection.items.map(skill => (
                     <SelectOption key={skill.value} item={skill}>
                       <SelectOptionText>{skill.label}</SelectOptionText>
                       <SelectOptionIndicator />
@@ -1039,25 +927,17 @@ export const WithTags: StoryFn<typeof Select> = () => {
   });
 
   return (
-    <div className="w-300">
+    <div className='w-300'>
       <Select
         collection={collection}
         multiple
-        defaultValue={[
-          'react',
-          'vue',
-          'angular',
-          'nodejs',
-          'python',
-          'java',
-          'typescript',
-        ]}
+        defaultValue={['react', 'vue', 'angular', 'nodejs', 'python', 'java', 'typescript']}
       >
         <SelectInput />
 
         <SelectPositioner>
           <SelectContent>
-            {collection.items.map((skill) => (
+            {collection.items.map(skill => (
               <SelectOption key={skill.value} item={skill}>
                 <Tag>{skill.label}</Tag>
               </SelectOption>

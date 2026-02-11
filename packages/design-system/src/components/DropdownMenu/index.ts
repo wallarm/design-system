@@ -1,3 +1,8 @@
+export {
+  dropdownMenuClassNames,
+  dropdownMenuItemVariants,
+  dropdownMenuLabelVariants,
+} from './classes';
 export { DropdownMenu } from './DropdownMenu';
 export { DropdownMenuContent } from './DropdownMenuContent';
 export { DropdownMenuGroup } from './DropdownMenuGroup';
@@ -10,8 +15,3 @@ export { DropdownMenuSub } from './DropdownMenuSub';
 export { DropdownMenuSubContent } from './DropdownMenuSubContent';
 export { DropdownMenuSubTrigger } from './DropdownMenuSubTrigger';
 export { DropdownMenuTrigger } from './DropdownMenuTrigger';
-export {
-  dropdownMenuLabelVariants,
-  dropdownMenuItemVariants,
-  dropdownMenuClassNames,
-} from './classes';

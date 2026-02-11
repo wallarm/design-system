@@ -1,7 +1,5 @@
 import type { FC, ReactNode, Ref, SVGProps } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../utils/cn';
 
 const iconVariants = cva('', {
@@ -32,9 +30,7 @@ interface SvgIconBaseProps {
 
 export type SvgIconSize = NonNullable<SvgIconVariantProps['size']>;
 
-export type SvgIconProps = SvgIconNativeProps &
-  SvgIconVariantProps &
-  SvgIconBaseProps;
+export type SvgIconProps = SvgIconNativeProps & SvgIconVariantProps & SvgIconBaseProps;
 
 export const SvgIcon: FC<SvgIconProps> = ({
   children,
@@ -46,7 +42,7 @@ export const SvgIcon: FC<SvgIconProps> = ({
 }) => (
   <svg
     ref={ref}
-    xmlns="http://www.w3.org/2000/svg"
+    xmlns='http://www.w3.org/2000/svg'
     {...props}
     className={cn(iconVariants({ size }), className)}
   >

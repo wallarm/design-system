@@ -1,8 +1,6 @@
 import { type FC, useState } from 'react';
-
 import { createListCollection } from '@ark-ui/react';
-import { type Meta, type StoryFn } from 'storybook-react-rsbuild';
-
+import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Flex } from '../components/Flex';
 import { Heading } from '../components/Heading';
 import { Input } from '../components/Input';
@@ -18,7 +16,6 @@ import {
 import { HStack, VStack } from '../components/Stack';
 import { Text } from '../components/Text';
 import { ToggleButton } from '../components/ToggleButton';
-
 // Import all icon components
 import { Activity } from './Activity';
 import { Alt } from './Alt';
@@ -135,8 +132,8 @@ import { PencilOff } from './PencilOff';
 import { PencilRuler } from './PencilRuler';
 import { PenLine } from './PenLine';
 import { PenOff } from './PenOff';
-import { Pentagon } from './Pentagon';
 import { PenTool } from './PenTool';
+import { Pentagon } from './Pentagon';
 import { Plus } from './Plus';
 import { Quote } from './Quote';
 import { Redo } from './Redo';
@@ -367,18 +364,12 @@ export default meta;
 
 type Story = StoryFn<typeof meta>;
 
-const IconGrid = ({
-  icons,
-  title,
-}: {
-  icons: Record<string, FC<SvgIconProps>>;
-  title: string;
-}) => {
+const IconGrid = ({ icons, title }: { icons: Record<string, FC<SvgIconProps>>; title: string }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSize, setSelectedSize] = useState<SvgIconSize>('md');
 
   const collection = createListCollection<SelectDataItem>({
-    items: ['xs', 'sm', 'md', 'lg', 'xl', '2xl'].map((size) => ({
+    items: ['xs', 'sm', 'md', 'lg', 'xl', '2xl'].map(size => ({
       value: size,
       label: size.toUpperCase(),
     })),
@@ -389,16 +380,16 @@ const IconGrid = ({
   );
 
   return (
-    <VStack spacing={12} align="stretch">
+    <VStack spacing={12} align='stretch'>
       <VStack spacing={12}>
         <Heading>{title}</Heading>
 
         <HStack spacing={8}>
           <Input
-            type="text"
-            placeholder="Search icons..."
+            type='text'
+            placeholder='Search icons...'
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={e => setSearchTerm(e.target.value)}
           />
 
           <Select
@@ -410,7 +401,7 @@ const IconGrid = ({
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((option) => (
+                {collection.items.map(option => (
                   <SelectOption key={option.value} item={option}>
                     <SelectOptionText>{option.label}</SelectOptionText>
                   </SelectOption>
@@ -431,16 +422,13 @@ const IconGrid = ({
         {filteredIcons.map(([name, IconComponent]) => (
           <div
             key={name}
-            className="flex flex-col items-center justify-center p-16 border border-border-primary rounded-8 bg-component-outline-button-bg transition-colors cursor-pointer"
+            className='flex flex-col items-center justify-center p-16 border border-border-primary rounded-8 bg-component-outline-button-bg transition-colors cursor-pointer'
             onClick={() => navigator.clipboard?.writeText(`<${name} />`)}
             title={`Click to copy: <${name} />`}
           >
-            <IconComponent
-              size={selectedSize}
-              style={{ marginBottom: '8px' }}
-            />
+            <IconComponent size={selectedSize} style={{ marginBottom: '8px' }} />
 
-            <Text color="secondary" size="sm">
+            <Text color='secondary' size='sm'>
               {name}
             </Text>
           </div>
@@ -454,9 +442,7 @@ const IconGrid = ({
             padding: '40px',
           }}
         >
-          <Text color="secondary">
-            No icons found matching &#34;{searchTerm}&#34;
-          </Text>
+          <Text color='secondary'>No icons found matching &#34;{searchTerm}&#34;</Text>
         </div>
       )}
     </VStack>
@@ -466,12 +452,9 @@ const IconGrid = ({
 export const AllIcons: Story = () => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const allIcons = Object.values(iconCategories).reduce(
-    (acc, categoryIcons) => {
-      return { ...acc, ...categoryIcons };
-    },
-    {},
-  );
+  const allIcons = Object.values(iconCategories).reduce((acc, categoryIcons) => {
+    return { ...acc, ...categoryIcons };
+  }, {});
 
   const displayIcons =
     selectedCategory === 'All'
@@ -479,27 +462,22 @@ export const AllIcons: Story = () => {
       : iconCategories[selectedCategory as keyof typeof iconCategories] || {};
 
   return (
-    <VStack spacing={20} align="stretch">
-      <Flex gap={8} wrap="wrap">
+    <VStack spacing={20} align='stretch'>
+      <Flex gap={8} wrap='wrap'>
         <ToggleButton
           active={selectedCategory === 'All'}
           onToggle={() => setSelectedCategory('All')}
         >
           All ({Object.keys(allIcons).length})
         </ToggleButton>
-        {Object.keys(iconCategories).map((category) => (
+        {Object.keys(iconCategories).map(category => (
           <ToggleButton
             key={category}
             active={selectedCategory === category}
             onToggle={() => setSelectedCategory(category)}
           >
             {category} (
-            {
-              Object.keys(
-                iconCategories[category as keyof typeof iconCategories],
-              ).length
-            }
-            )
+            {Object.keys(iconCategories[category as keyof typeof iconCategories]).length})
           </ToggleButton>
         ))}
       </Flex>
@@ -517,27 +495,27 @@ export const IconSizes: Story = () => (
     <h3 style={{ marginBottom: '20px' }}>Icon Sizes</h3>
     <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
       <div style={{ textAlign: 'center' }}>
-        <Check size="xs" title="Check icon XS" />
+        <Check size='xs' title='Check icon XS' />
         <div style={{ fontSize: '12px', marginTop: '4px' }}>XS</div>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <Check size="sm" title="Check icon SM" />
+        <Check size='sm' title='Check icon SM' />
         <div style={{ fontSize: '12px', marginTop: '4px' }}>SM</div>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <Check size="md" title="Check icon MD" />
+        <Check size='md' title='Check icon MD' />
         <div style={{ fontSize: '12px', marginTop: '4px' }}>MD</div>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <Check size="lg" title="Check icon LG" />
+        <Check size='lg' title='Check icon LG' />
         <div style={{ fontSize: '12px', marginTop: '4px' }}>LG</div>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <Check size="xl" title="Check icon XL" />
+        <Check size='xl' title='Check icon XL' />
         <div style={{ fontSize: '12px', marginTop: '4px' }}>XL</div>
       </div>
       <div style={{ textAlign: 'center' }}>
-        <Check size="2xl" title="Check icon 2XL" />
+        <Check size='2xl' title='Check icon 2XL' />
         <div style={{ fontSize: '12px', marginTop: '4px' }}>2XL</div>
       </div>
     </div>

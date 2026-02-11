@@ -1,13 +1,12 @@
 import type { FC, HTMLAttributes } from 'react';
-
 import { cn } from '../../utils/cn';
 
 type InputGroupProps = HTMLAttributes<HTMLDivElement>;
 
-export const InputGroup: FC<InputGroupProps> = (props) => (
+export const InputGroup: FC<InputGroupProps> = props => (
   <div
-    data-slot="input-group"
-    role="group"
+    data-slot='input-group'
+    role='group'
     className={cn(
       'group/input-group',
 
