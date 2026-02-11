@@ -70,6 +70,7 @@ function prepareForPublish(): void {
     }
 
     // Write cleaned package.json
+    // biome-ignore lint/style/useTemplate: just new line
     fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
 
     console.log('✅ package.json prepared for publishing');
