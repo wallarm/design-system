@@ -1,7 +1,5 @@
 import type { ButtonHTMLAttributes, FC, Ref } from 'react';
-
 import { Slot } from '@radix-ui/react-slot';
-
 import { cn } from '../../utils/cn';
 import { linkVariants } from '../Link';
 
@@ -17,10 +15,7 @@ interface FieldActionBaseProps {
 
 type FieldActionProps = FieldActionNativeProps & FieldActionBaseProps;
 
-export const FieldAction: FC<FieldActionProps> = ({
-  asChild = false,
-  ...props
-}) => {
+export const FieldAction: FC<FieldActionProps> = ({ asChild = false, ...props }) => {
   const Comp = asChild ? Slot : 'button';
 
   return (

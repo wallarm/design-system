@@ -1,9 +1,7 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { CirclePlus, Earth, LayoutTemplate, Maximize, Plus } from '../../icons';
 import { Button } from '../Button';
 import { Kbd, KbdGroup } from '../Kbd';
-
 import { DropdownMenu } from './DropdownMenu';
 import { DropdownMenuContent } from './DropdownMenuContent';
 import { DropdownMenuGroup } from './DropdownMenuGroup';
@@ -51,11 +49,11 @@ export default meta;
 export const Basic: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button variant="outline" color="neutral">
+      <Button variant='outline' color='neutral'>
         Open
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="start">
+    <DropdownMenuContent align='start'>
       <DropdownMenuLabel>My Account</DropdownMenuLabel>
       <DropdownMenuGroup>
         <DropdownMenuItem>
@@ -128,7 +126,7 @@ export const Basic: StoryFn<typeof meta> = () => (
       <DropdownMenuItem>Support</DropdownMenuItem>
       <DropdownMenuItem disabled>API</DropdownMenuItem>
       <DropdownMenuSeparator />
-      <DropdownMenuItem variant="destructive">
+      <DropdownMenuItem variant='destructive'>
         Log out
         <DropdownMenuShortcut>
           <KbdGroup>
@@ -144,12 +142,12 @@ export const Basic: StoryFn<typeof meta> = () => (
 export const WithDescriptions: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button variant="outline" color="neutral">
+      <Button variant='outline' color='neutral'>
         <Plus />
         Add Widget
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="start">
+    <DropdownMenuContent align='start'>
       <DropdownMenuItem>
         <DropdownMenuItemContent>
           <DropdownMenuItemText>Bar-volume chart</DropdownMenuItemText>
@@ -176,7 +174,7 @@ export const WithDescriptions: StoryFn<typeof meta> = () => (
       </DropdownMenuItem>
       <DropdownMenuSeparator />
 
-      <DropdownMenuItem variant="brand">
+      <DropdownMenuItem variant='brand'>
         <CirclePlus />
         <DropdownMenuItemText>Request custom widget</DropdownMenuItemText>
       </DropdownMenuItem>
@@ -187,12 +185,12 @@ export const WithDescriptions: StoryFn<typeof meta> = () => (
 export const WithIcons: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button variant="outline" color="neutral">
+      <Button variant='outline' color='neutral'>
         <Plus />
         Add Widget
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="start">
+    <DropdownMenuContent align='start'>
       <DropdownMenuItem>
         <DropdownMenuItemIcon>
           <LayoutTemplate />
@@ -223,7 +221,7 @@ export const WithIcons: StoryFn<typeof meta> = () => (
       </DropdownMenuItem>
       <DropdownMenuSeparator />
 
-      <DropdownMenuItem variant="brand">
+      <DropdownMenuItem variant='brand'>
         <CirclePlus />
         <DropdownMenuItemText>Request custom widget</DropdownMenuItemText>
       </DropdownMenuItem>
@@ -234,12 +232,12 @@ export const WithIcons: StoryFn<typeof meta> = () => (
 export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button variant="outline" color="neutral">
+      <Button variant='outline' color='neutral'>
         <Plus />
         Add Widget
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align="start">
+    <DropdownMenuContent align='start'>
       <DropdownMenuItem>
         <DropdownMenuItemIcon>
           <LayoutTemplate />
@@ -275,7 +273,7 @@ export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
       </DropdownMenuItem>
       <DropdownMenuSeparator />
 
-      <DropdownMenuItem variant="brand">
+      <DropdownMenuItem variant='brand'>
         <CirclePlus />
         <DropdownMenuItemText>Request custom widget</DropdownMenuItemText>
       </DropdownMenuItem>

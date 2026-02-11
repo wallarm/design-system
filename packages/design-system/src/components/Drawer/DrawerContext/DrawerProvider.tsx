@@ -1,8 +1,6 @@
 import { type FC, type ReactNode, useState } from 'react';
-
 import { useControlled } from '../../../hooks';
 import { DRAWER_SIZES, DRAWER_WIDTH_CONSTRAINTS } from '../constants';
-
 import { DrawerContext } from './DrawerContext';
 import type { DrawerContextValue } from './types';
 
@@ -62,9 +60,5 @@ export const DrawerProvider: FC<DrawerContextProviderProps> = ({
     maxWidth,
   };
 
-  return (
-    <DrawerContext.Provider value={contextValue}>
-      {children}
-    </DrawerContext.Provider>
-  );
+  return <DrawerContext.Provider value={contextValue}>{children}</DrawerContext.Provider>;
 };

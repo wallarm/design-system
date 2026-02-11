@@ -1,5 +1,4 @@
 import { useMemo } from 'react';
-
 import { type ToastCreateOptions, toaster } from './Toaster';
 
 export type CreateToastOptions = ToastCreateOptions;
@@ -21,12 +20,8 @@ export const useToast = (): UseToastReturn => {
     () => ({
       create: (options: CreateToastOptions) => toaster.create(options),
       update: ({ id, ...options }: UpdateToastOptions) =>
-        toaster.update(
-          id,
-          options as unknown as Parameters<typeof toaster.update>[1],
-        ),
-      dismiss: (options: DismissToastOptions = {}) =>
-        toaster.dismiss(options.id),
+        toaster.update(id, options as unknown as Parameters<typeof toaster.update>[1]),
+      dismiss: (options: DismissToastOptions = {}) => toaster.dismiss(options.id),
     }),
     [],
   );

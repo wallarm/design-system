@@ -1,7 +1,5 @@
 import type { FC, MouseEvent } from 'react';
-
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
-
 import { X } from '../../../icons';
 import { cn } from '../../../utils/cn';
 

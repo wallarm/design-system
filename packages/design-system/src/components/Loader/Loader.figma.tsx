@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { Loader } from './Loader';
 
 const figmaNodeUrl =
@@ -26,9 +25,7 @@ figma.connect(Loader, figmaNodeUrl, {
       Destructive: 'danger',
     }),
   },
-  example: ({ type, color, size }) => (
-    <Loader type={type} size={size} color={color} />
-  ),
+  example: ({ type, color, size }) => <Loader type={type} size={size} color={color} />,
 });
 
 figma.connect(Loader, figmaNodeUrl, {

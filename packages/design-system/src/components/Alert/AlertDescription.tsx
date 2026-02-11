@@ -1,5 +1,4 @@
 import type { FC, ReactNode, Ref } from 'react';
-
 import {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -21,14 +20,10 @@ export interface AlertDescriptionProps {
  * Supports text truncation with configurable max lines.
  * Shows a tooltip with full text when content is truncated.
  */
-export const AlertDescription: FC<AlertDescriptionProps> = ({
-  ref,
-  children,
-  lineClamp,
-}) => (
+export const AlertDescription: FC<AlertDescriptionProps> = ({ ref, children, lineClamp }) => (
   <OverflowTooltip>
     <OverflowTooltipTrigger>
-      <Text ref={ref} size="sm" color="secondary" lineClamp={lineClamp}>
+      <Text ref={ref} size='sm' color='secondary' lineClamp={lineClamp}>
         {children}
       </Text>
     </OverflowTooltipTrigger>

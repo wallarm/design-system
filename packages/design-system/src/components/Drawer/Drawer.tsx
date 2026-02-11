@@ -1,5 +1,4 @@
 import type { FC, ReactNode } from 'react';
-
 import { DrawerProvider } from './DrawerContext';
 import { DrawerRoot } from './DrawerRoot';
 
@@ -43,10 +42,7 @@ export const Drawer: FC<DrawerProps> = ({
     minWidth={minWidth}
     maxWidth={maxWidth}
   >
-    <DrawerRoot
-      closeOnEscape={closeOnEscape}
-      closeOnOutsideClick={closeOnOutsideClick}
-    >
+    <DrawerRoot closeOnEscape={closeOnEscape} closeOnOutsideClick={closeOnOutsideClick}>
       {children}
     </DrawerRoot>
   </DrawerProvider>

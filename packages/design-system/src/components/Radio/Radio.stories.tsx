@@ -1,10 +1,8 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { Info } from '../../icons';
 import { Field, FieldDescription, FieldLabel } from '../Field';
 import { HStack } from '../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-
 import { Radio } from './Radio';
 import { RadioDescription } from './RadioDescription';
 import { RadioGroup } from './RadioGroup';
@@ -28,8 +26,8 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<typeof meta> = () => (
-  <RadioGroup name="framework" defaultValue="svelte">
-    <Radio value="react">
+  <RadioGroup name='framework' defaultValue='svelte'>
+    <Radio value='react'>
       <RadioIndicator />
       <RadioLabel>React</RadioLabel>
       <RadioDescription>
@@ -37,7 +35,7 @@ export const Basic: StoryFn<typeof meta> = () => (
       </RadioDescription>
     </Radio>
 
-    <Radio value="solid">
+    <Radio value='solid'>
       <RadioIndicator />
       <RadioLabel>
         Solid
@@ -50,12 +48,12 @@ export const Basic: StoryFn<typeof meta> = () => (
       </RadioLabel>
     </Radio>
 
-    <Radio value="vue" disabled>
+    <Radio value='vue' disabled>
       <RadioIndicator />
       <RadioLabel>Vue</RadioLabel>
     </Radio>
 
-    <Radio value="svelte">
+    <Radio value='svelte'>
       <RadioIndicator />
       <RadioLabel>Svelte</RadioLabel>
     </Radio>
@@ -63,8 +61,8 @@ export const Basic: StoryFn<typeof meta> = () => (
 );
 
 export const Card: StoryFn<typeof meta> = () => (
-  <RadioGroup variant="card" name="framework" defaultValue="vue">
-    <Radio value="react">
+  <RadioGroup variant='card' name='framework' defaultValue='vue'>
+    <Radio value='react'>
       <RadioIndicator />
       <RadioLabel>React</RadioLabel>
       <RadioDescription>
@@ -72,7 +70,7 @@ export const Card: StoryFn<typeof meta> = () => (
       </RadioDescription>
     </Radio>
 
-    <Radio value="solid">
+    <Radio value='solid'>
       <RadioIndicator />
       <RadioLabel>
         Solid
@@ -85,7 +83,7 @@ export const Card: StoryFn<typeof meta> = () => (
       </RadioLabel>
     </Radio>
 
-    <Radio value="vue" disabled>
+    <Radio value='vue' disabled>
       <RadioIndicator />
       <RadioLabel>Vue</RadioLabel>
       <RadioDescription>
@@ -93,7 +91,7 @@ export const Card: StoryFn<typeof meta> = () => (
       </RadioDescription>
     </Radio>
 
-    <Radio value="svelte">
+    <Radio value='svelte'>
       <RadioIndicator />
       <RadioLabel>Svelte</RadioLabel>
     </Radio>
@@ -101,7 +99,7 @@ export const Card: StoryFn<typeof meta> = () => (
 );
 
 export const FormField: StoryFn<typeof meta> = () => (
-  <HStack align="start" spacing={40}>
+  <HStack align='start' spacing={40}>
     <Field>
       <FieldLabel>
         Label
@@ -115,8 +113,8 @@ export const FormField: StoryFn<typeof meta> = () => (
 
       <FieldDescription>This is an input description.</FieldDescription>
 
-      <RadioGroup name="framework" defaultValue="svelte">
-        <Radio value="react">
+      <RadioGroup name='framework' defaultValue='svelte'>
+        <Radio value='react'>
           <RadioIndicator />
           <RadioLabel>React</RadioLabel>
           <RadioDescription>
@@ -124,17 +122,17 @@ export const FormField: StoryFn<typeof meta> = () => (
           </RadioDescription>
         </Radio>
 
-        <Radio value="solid">
+        <Radio value='solid'>
           <RadioIndicator />
           <RadioLabel>Solid</RadioLabel>
         </Radio>
 
-        <Radio value="vue" disabled>
+        <Radio value='vue' disabled>
           <RadioIndicator />
           <RadioLabel>Vue</RadioLabel>
         </Radio>
 
-        <Radio value="svelte">
+        <Radio value='svelte'>
           <RadioIndicator />
           <RadioLabel>Svelte</RadioLabel>
         </Radio>
@@ -154,8 +152,8 @@ export const FormField: StoryFn<typeof meta> = () => (
 
       <FieldDescription>This is an input description.</FieldDescription>
 
-      <RadioGroup variant="card" name="framework" defaultValue="svelte">
-        <Radio value="react">
+      <RadioGroup variant='card' name='framework' defaultValue='svelte'>
+        <Radio value='react'>
           <RadioIndicator />
           <RadioLabel>React</RadioLabel>
           <RadioDescription>
@@ -163,17 +161,17 @@ export const FormField: StoryFn<typeof meta> = () => (
           </RadioDescription>
         </Radio>
 
-        <Radio value="solid">
+        <Radio value='solid'>
           <RadioIndicator />
           <RadioLabel>Solid</RadioLabel>
         </Radio>
 
-        <Radio value="vue" disabled>
+        <Radio value='vue' disabled>
           <RadioIndicator />
           <RadioLabel>Vue</RadioLabel>
         </Radio>
 
-        <Radio value="svelte">
+        <Radio value='svelte'>
           <RadioIndicator />
           <RadioLabel>Svelte</RadioLabel>
         </Radio>

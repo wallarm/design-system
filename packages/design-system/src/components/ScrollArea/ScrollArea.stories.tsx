@@ -1,10 +1,7 @@
 import type { FC, PropsWithChildren } from 'react';
-
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { cn } from '../../utils/cn';
 import { HStack, VStack } from '../Stack';
-
 import { ScrollArea } from './ScrollArea';
 import { ScrollAreaContent } from './ScrollAreaContent';
 import { ScrollAreaCorner } from './ScrollAreaCorner';
@@ -27,10 +24,7 @@ const meta = {
 
 export default meta;
 
-const Box: FC<PropsWithChildren<{ className?: string }>> = ({
-  children,
-  className,
-}) => (
+const Box: FC<PropsWithChildren<{ className?: string }>> = ({ children, className }) => (
   <div
     className={cn(
       'flex py-4 px-8 items-center justify-center bg-blue-500 text-white rounded',
@@ -42,7 +36,7 @@ const Box: FC<PropsWithChildren<{ className?: string }>> = ({
 );
 
 export const Vertical: StoryFn<typeof meta> = () => (
-  <div className="w-320 h-320 overflow-hidden">
+  <div className='w-320 h-320 overflow-hidden'>
     <ScrollArea>
       <ScrollAreaViewport>
         <ScrollAreaContent>
@@ -51,7 +45,7 @@ export const Vertical: StoryFn<typeof meta> = () => (
               const value = `${index + 1}`;
 
               return (
-                <Box key={value} className="h-40 w-full">
+                <Box key={value} className='h-40 w-full'>
                   {value}
                 </Box>
               );
@@ -68,7 +62,7 @@ export const Vertical: StoryFn<typeof meta> = () => (
 );
 
 export const Horizontal: StoryFn<typeof meta> = () => (
-  <div className="w-320 h-320 overflow-hidden">
+  <div className='w-320 h-320 overflow-hidden'>
     <ScrollArea>
       <ScrollAreaViewport>
         <ScrollAreaContent>
@@ -77,7 +71,7 @@ export const Horizontal: StoryFn<typeof meta> = () => (
               const value = `${index + 1}`;
 
               return (
-                <Box key={value} className="h-320 w-40">
+                <Box key={value} className='h-320 w-40'>
                   {value}
                 </Box>
               );
@@ -86,7 +80,7 @@ export const Horizontal: StoryFn<typeof meta> = () => (
         </ScrollAreaContent>
       </ScrollAreaViewport>
 
-      <ScrollAreaScrollbar orientation="horizontal" />
+      <ScrollAreaScrollbar orientation='horizontal' />
 
       <ScrollAreaCorner />
     </ScrollArea>

@@ -1,27 +1,19 @@
 import type { FC } from 'react';
-
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
-
 import { Button, type ButtonProps } from '../Button';
-
 import { SelectArrow } from './SelectArrow';
 import { useSelectSharedContext } from './SelectSharedContext';
 import { SelectValueIcon } from './SelectValueIcon';
 import { SelectValueText, type SelectValueTextProps } from './SelectValueText';
 
-type SelectButtonBaseProps = Omit<
-  ButtonProps,
-  'variant' | 'color' | 'size' | 'disabled'
->;
+type SelectButtonBaseProps = Omit<ButtonProps, 'variant' | 'color' | 'size' | 'disabled'>;
 
 interface SelectButtonVariantProps {
   variant?: Exclude<ButtonProps['variant'], 'primary'>;
   color?: Exclude<ButtonProps['color'], 'destructive'>;
 }
 
-type SelectButtonProps = SelectButtonBaseProps &
-  SelectButtonVariantProps &
-  SelectValueTextProps;
+type SelectButtonProps = SelectButtonBaseProps & SelectButtonVariantProps & SelectValueTextProps;
 
 export const SelectButton: FC<SelectButtonProps> = ({
   placeholder = 'Choose...',
@@ -39,7 +31,7 @@ export const SelectButton: FC<SelectButtonProps> = ({
           {...props}
           variant={variant}
           color={color}
-          size="large"
+          size='large'
           loading={loading}
           disabled={disabled}
           fullWidth

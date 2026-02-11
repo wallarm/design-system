@@ -1,5 +1,4 @@
 import type { FC, ReactNode, Ref } from 'react';
-
 import { Dialog } from '@ark-ui/react/dialog';
 
 export interface DrawerTriggerProps {
@@ -9,11 +8,7 @@ export interface DrawerTriggerProps {
   ref?: Ref<HTMLButtonElement>;
 }
 
-export const DrawerTrigger: FC<DrawerTriggerProps> = ({
-  children,
-  asChild = false,
-  ref,
-}) => (
+export const DrawerTrigger: FC<DrawerTriggerProps> = ({ children, asChild = false, ref }) => (
   <Dialog.Trigger ref={ref} asChild={asChild}>
     {children}
   </Dialog.Trigger>

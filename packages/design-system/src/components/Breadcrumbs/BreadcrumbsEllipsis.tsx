@@ -1,14 +1,12 @@
 import type { ButtonHTMLAttributes, FC, Ref } from 'react';
-
 import { Ellipsis } from '../../icons';
 import { cn } from '../../utils/cn';
 
-export type BreadcrumbsEllipsisProps =
-  ButtonHTMLAttributes<HTMLButtonElement> & {
-    ref?: Ref<HTMLButtonElement>;
-    /** Additional CSS classes */
-    className?: string;
-  };
+export type BreadcrumbsEllipsisProps = ButtonHTMLAttributes<HTMLButtonElement> & {
+  ref?: Ref<HTMLButtonElement>;
+  /** Additional CSS classes */
+  className?: string;
+};
 
 /**
  * Ellipsis component for truncated breadcrumbs.
@@ -21,14 +19,11 @@ export type BreadcrumbsEllipsisProps =
  * <BreadcrumbsEllipsis onClick={showMoreItems} />
  * ```
  */
-export const BreadcrumbsEllipsis: FC<BreadcrumbsEllipsisProps> = ({
-  className,
-  ...props
-}) => {
+export const BreadcrumbsEllipsis: FC<BreadcrumbsEllipsisProps> = ({ className, ...props }) => {
   return (
     <li>
       <button
-        type="button"
+        type='button'
         className={cn(
           [
             'flex items-center gap-4 min-h-[20px] px-4 py-0 rounded-6',
@@ -39,10 +34,10 @@ export const BreadcrumbsEllipsis: FC<BreadcrumbsEllipsisProps> = ({
           ],
           className,
         )}
-        aria-label="Show more breadcrumbs"
+        aria-label='Show more breadcrumbs'
         {...props}
       >
-        <Ellipsis size="md" />
+        <Ellipsis size='md' />
       </button>
     </li>
   );

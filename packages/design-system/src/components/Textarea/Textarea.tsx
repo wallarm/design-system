@@ -1,10 +1,8 @@
 import type { FC, Ref, TextareaHTMLAttributes } from 'react';
-
-import { type HTMLProps } from '@ark-ui/react/factory';
+import type { HTMLProps } from '@ark-ui/react/factory';
 import { useFieldContext } from '@ark-ui/react/field';
 import { mergeProps } from '@ark-ui/react/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { SvgIcon } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
 import { inputVariants } from '../Input';
@@ -19,10 +17,7 @@ const textareaVariants = cva('min-h-[60px]', {
   },
 });
 
-type TextareaNativeProps = Omit<
-  TextareaHTMLAttributes<HTMLTextAreaElement>,
-  'className'
->;
+type TextareaNativeProps = Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, 'className'>;
 
 type TextareaVariantsProps = VariantProps<typeof textareaVariants>;
 
@@ -39,12 +34,10 @@ export const Textarea: FC<TextareaProps> = ({
   ...props
 }) => {
   const field = useFieldContext();
-  const mergedProps = mergeProps<HTMLProps<'textarea'>>(
-    field?.getTextareaProps(),
-  );
+  const mergedProps = mergeProps<HTMLProps<'textarea'>>(field?.getTextareaProps());
 
   return (
-    <div className="relative">
+    <div className='relative'>
       <textarea
         {...mergedProps}
         {...props}
@@ -55,14 +48,10 @@ export const Textarea: FC<TextareaProps> = ({
       />
 
       <SvgIcon
-        className="w-12 h-12 absolute bottom-0 right-0 text-icon-secondary pointer-events-none"
-        viewBox="0 0 12 12"
+        className='w-12 h-12 absolute bottom-0 right-0 text-icon-secondary pointer-events-none'
+        viewBox='0 0 12 12'
       >
-        <path
-          d="M6 8L8 6M8 3L3 8"
-          stroke="currentColor"
-          strokeLinecap="round"
-        />
+        <path d='M6 8L8 6M8 3L3 8' stroke='currentColor' strokeLinecap='round' />
       </SvgIcon>
     </div>
   );

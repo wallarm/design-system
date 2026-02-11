@@ -1,5 +1,4 @@
 import { cva } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 
 export const tabsTriggerVariants = cva(

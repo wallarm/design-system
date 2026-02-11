@@ -1,11 +1,8 @@
 import type { FC } from 'react';
 import { useContext } from 'react';
-
 import { Switch as ArkUiSwitch, useSwitchContext } from '@ark-ui/react/switch';
-
 import { Check, X } from '../../icons';
 import { cn } from '../../utils/cn';
-
 import { SwitchContext } from './SwitchContext';
 
 export const SwitchControl: FC = () => {
@@ -30,10 +27,10 @@ export const SwitchControl: FC = () => {
       )}
     >
       {a11yMode && !isChecked && (
-        <X className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 text-icon-secondary pointer-events-none z-0" />
+        <X className='absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 text-icon-secondary pointer-events-none z-0' />
       )}
       {a11yMode && isChecked && (
-        <Check className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 text-white pointer-events-none z-0" />
+        <Check className='absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 text-white pointer-events-none z-0' />
       )}
       <ArkUiSwitch.Thumb
         className={cn(

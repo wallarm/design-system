@@ -1,5 +1,4 @@
 import type { FC, Ref } from 'react';
-
 import { cn } from '../../utils/cn';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
 

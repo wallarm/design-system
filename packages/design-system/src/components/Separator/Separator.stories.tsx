@@ -1,9 +1,7 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { Heading } from '../Heading';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
-
 import { Separator } from './Separator';
 
 const meta = {
@@ -23,9 +21,9 @@ export const Basic: StoryFn<typeof meta> = () => (
     <Separator spacing={16} />
     <HStack spacing={0}>
       <Text>Blog</Text>
-      <Separator decorative orientation="vertical" spacing={16} />
+      <Separator decorative orientation='vertical' spacing={16} />
       <Text>Docs</Text>
-      <Separator decorative orientation="vertical" spacing={16} />
+      <Separator decorative orientation='vertical' spacing={16} />
       <Text>Source</Text>
     </HStack>
   </VStack>

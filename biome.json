@@ -1,0 +1,22 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.1.4/schema.json",
+  "extends": ["./packages/configs/biome-config/biome.json"],
+  "files": {
+    "includes": [
+      "**/src/**/*",
+      "**/e2e/**/*.ts",
+      "**/packages/**/*.ts",
+      "**/packages/**/*.tsx",
+      "**/packages/**/*.js",
+      "**/packages/**/*.jsx",
+      "**/*.d.ts",
+      "**/*.css",
+      "!**/src/theme/**/*.css",
+      "*.config.ts",
+      "**/.storybook/**/*",
+      "*.json",
+      "!**/dist",
+      "!**/node_modules"
+    ]
+  }
+}

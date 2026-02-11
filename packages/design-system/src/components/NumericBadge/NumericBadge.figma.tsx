@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { NumericBadge } from './NumericBadge';
 
 const figmaNodeUrl =
@@ -17,7 +16,5 @@ figma.connect(NumericBadge, figmaNodeUrl, {
     }),
     children: figma.string('#'),
   },
-  example: ({ type, children }) => (
-    <NumericBadge type={type}>{children}</NumericBadge>
-  ),
+  example: ({ type, children }) => <NumericBadge type={type}>{children}</NumericBadge>,
 });

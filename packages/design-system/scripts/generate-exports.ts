@@ -25,14 +25,12 @@ interface PackageJson {
   [key: string]: unknown;
 }
 
-const packageJson: PackageJson = JSON.parse(
-  fs.readFileSync(packageJsonPath, 'utf8'),
-);
+const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
 const components = fs
   .readdirSync(componentsDir, { withFileTypes: true })
-  .filter((dirent) => dirent.isDirectory())
-  .map((dirent) => dirent.name);
+  .filter(dirent => dirent.isDirectory())
+  .map(dirent => dirent.name);
 
 const exports: PackageExports = {
   '.': {
@@ -57,7 +55,7 @@ const exports: PackageExports = {
   },
 };
 
-components.forEach((component) => {
+components.forEach(component => {
   exports[`./${component}`] = {
     development: `./src/components/${component}/index.ts`,
     types: `./dist/components/${component}/index.d.ts`,

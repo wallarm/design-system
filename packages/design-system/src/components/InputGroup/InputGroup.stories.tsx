@@ -1,6 +1,5 @@
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { Info, LayoutGrid, LayoutTemplate, Search } from '../../icons';
 import { Kbd } from '../Kbd';
 import { Loader } from '../Loader';
@@ -15,7 +14,6 @@ import {
 } from '../Select';
 import { VStack } from '../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-
 import { InputGroup } from './InputGroup';
 import { InputGroupAddon } from './InputGroupAddon';
 import { InputGroupInput } from './InputGroupInput';
@@ -42,18 +40,18 @@ export const Basic: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
-      <InputGroupInput placeholder="Enter" />
-      <InputGroupAddon align="inline-end">
+      <InputGroupInput placeholder='Enter' />
+      <InputGroupAddon align='inline-end'>
         <Info />
       </InputGroupAddon>
     </InputGroup>
 
     <InputGroup>
-      <InputGroupAddon variant="outline">
+      <InputGroupAddon variant='outline'>
         <InputGroupText>https://</InputGroupText>
       </InputGroupAddon>
-      <InputGroupInput placeholder="Enter" value="wallarm/user-settings" />
-      <InputGroupAddon variant="outline" align="inline-end">
+      <InputGroupInput placeholder='Enter' value='wallarm/user-settings' />
+      <InputGroupAddon variant='outline' align='inline-end'>
         <InputGroupText>.com</InputGroupText>
       </InputGroupAddon>
     </InputGroup>
@@ -66,8 +64,8 @@ export const Disabled: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
-      <InputGroupInput placeholder="Enter" disabled />
-      <InputGroupAddon align="inline-end">
+      <InputGroupInput placeholder='Enter' disabled />
+      <InputGroupAddon align='inline-end'>
         <Info />
       </InputGroupAddon>
     </InputGroup>
@@ -76,12 +74,8 @@ export const Disabled: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <InputGroupText>https://</InputGroupText>
       </InputGroupAddon>
-      <InputGroupInput
-        placeholder="Enter"
-        value="wallarm/user-settings"
-        disabled
-      />
-      <InputGroupAddon align="inline-end">
+      <InputGroupInput placeholder='Enter' value='wallarm/user-settings' disabled />
+      <InputGroupAddon align='inline-end'>
         <InputGroupText>.com</InputGroupText>
       </InputGroupAddon>
     </InputGroup>
@@ -94,8 +88,8 @@ export const WithError: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
-      <InputGroupInput placeholder="Enter" error />
-      <InputGroupAddon align="inline-end">
+      <InputGroupInput placeholder='Enter' error />
+      <InputGroupAddon align='inline-end'>
         <Info />
       </InputGroupAddon>
     </InputGroup>
@@ -104,12 +98,8 @@ export const WithError: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <InputGroupText>https://</InputGroupText>
       </InputGroupAddon>
-      <InputGroupInput
-        placeholder="Enter"
-        value="wallarm/user-settings"
-        error
-      />
-      <InputGroupAddon align="inline-end">
+      <InputGroupInput placeholder='Enter' value='wallarm/user-settings' error />
+      <InputGroupAddon align='inline-end'>
         <InputGroupText>.com</InputGroupText>
       </InputGroupAddon>
     </InputGroup>
@@ -118,9 +108,9 @@ export const WithError: StoryFn<typeof meta> = () => (
 
 export const WithLoader: StoryFn<typeof meta> = () => (
   <InputGroup>
-    <InputGroupInput placeholder="Searching..." disabled />
-    <InputGroupAddon align="inline-end">
-      <Loader size="md" />
+    <InputGroupInput placeholder='Searching...' disabled />
+    <InputGroupAddon align='inline-end'>
+      <Loader size='md' />
     </InputGroupAddon>
   </InputGroup>
 );
@@ -130,8 +120,8 @@ export const WithKbd: StoryFn<typeof meta> = () => (
     <InputGroupAddon>
       <Search />
     </InputGroupAddon>
-    <InputGroupInput placeholder="Search" />
-    <InputGroupAddon align="inline-end">
+    <InputGroupInput placeholder='Search' />
+    <InputGroupAddon align='inline-end'>
       <Kbd>⌘</Kbd>
       <Kbd>K</Kbd>
     </InputGroupAddon>
@@ -143,8 +133,8 @@ export const WithTooltip: StoryFn<typeof meta> = () => (
     <InputGroupAddon>
       <Search />
     </InputGroupAddon>
-    <InputGroupInput placeholder="Enter" />
-    <InputGroupAddon align="inline-end">
+    <InputGroupInput placeholder='Enter' />
+    <InputGroupAddon align='inline-end'>
       <Tooltip>
         <TooltipTrigger asChild>
           <Info />
@@ -182,13 +172,13 @@ export const WithSelect: StoryFn<typeof meta> = () => {
   return (
     <VStack spacing={12}>
       <InputGroup>
-        <InputGroupAddon variant="outline">
+        <InputGroupAddon variant='outline'>
           <Select collection={collection}>
             <SelectButton />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -199,18 +189,18 @@ export const WithSelect: StoryFn<typeof meta> = () => {
           </Select>
         </InputGroupAddon>
 
-        <InputGroupInput placeholder="Enter" />
+        <InputGroupInput placeholder='Enter' />
       </InputGroup>
 
       <InputGroup>
-        <InputGroupInput placeholder="Enter" />
-        <InputGroupAddon align="inline-end" variant="outline">
+        <InputGroupInput placeholder='Enter' />
+        <InputGroupAddon align='inline-end' variant='outline'>
           <Select collection={collection}>
             <SelectButton />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -229,7 +219,7 @@ export const WithSelect: StoryFn<typeof meta> = () => {
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />
@@ -240,18 +230,18 @@ export const WithSelect: StoryFn<typeof meta> = () => {
           </Select>
         </InputGroupAddon>
 
-        <InputGroupInput placeholder="Enter" />
+        <InputGroupInput placeholder='Enter' />
       </InputGroup>
 
       <InputGroup>
-        <InputGroupInput placeholder="Enter" />
-        <InputGroupAddon align="inline-end">
+        <InputGroupInput placeholder='Enter' />
+        <InputGroupAddon align='inline-end'>
           <Select collection={collection}>
             <SelectButton />
 
             <SelectPositioner>
               <SelectContent>
-                {collection.items.map((skill) => (
+                {collection.items.map(skill => (
                   <SelectOption key={skill.value} item={skill}>
                     <SelectOptionText>{skill.label}</SelectOptionText>
                     <SelectOptionIndicator />

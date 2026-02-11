@@ -8,9 +8,7 @@ import {
   useEffect,
   useRef,
 } from 'react';
-
 import { TooltipTrigger } from '../Tooltip';
-
 import { useOverflowTooltip } from './OverflowTooltipContext';
 
 export interface OverflowTooltipTriggerProps {

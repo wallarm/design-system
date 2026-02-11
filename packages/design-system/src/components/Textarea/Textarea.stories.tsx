@@ -1,8 +1,6 @@
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn, StoryObj } from 'storybook-react-rsbuild';
-
 import { HStack } from '../Stack';
-
 import { Textarea } from './Textarea';
 
 const meta = {
@@ -30,10 +28,10 @@ export default meta;
 export const Basic: StoryObj<typeof meta> = {};
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack spacing={16} align="start">
-    <Textarea {...args} size="default" />
-    <Textarea {...args} size="medium" />
-    <Textarea {...args} size="small" />
+  <HStack spacing={16} align='start'>
+    <Textarea {...args} size='default' />
+    <Textarea {...args} size='medium' />
+    <Textarea {...args} size='small' />
   </HStack>
 );
 

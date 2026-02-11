@@ -6,7 +6,6 @@ import {
   useCallback,
   useMemo,
 } from 'react';
-
 import { useOverflowItems } from '../../hooks';
 import { cn } from '../../utils/cn';
 
@@ -50,20 +49,16 @@ const OverflowListComponent = <T,>({
     [items, itemRenderer],
   );
 
-  const { containerRef, visibleItems, hiddenItems, MeasurementContainer } =
-    useOverflowItems({
-      items,
-      renderItem: memoizedMeasurementRenderer,
-      overflowRenderer: (items) => overflowRenderer(items) as ReactElement,
-      reserveSpace: 80,
-    });
+  const { containerRef, visibleItems, hiddenItems, MeasurementContainer } = useOverflowItems({
+    items,
+    renderItem: memoizedMeasurementRenderer,
+    overflowRenderer: items => overflowRenderer(items) as ReactElement,
+    reserveSpace: 80,
+  });
 
   // Adjust visible items based on minVisibleItems
   const finalVisibleItems = useMemo(() => {
-    if (
-      visibleItems.length < minVisibleItems &&
-      items.length >= minVisibleItems
-    ) {
+    if (visibleItems.length < minVisibleItems && items.length >= minVisibleItems) {
       return items.slice(0, minVisibleItems);
     }
     return visibleItems;
@@ -91,12 +86,7 @@ const OverflowListComponent = <T,>({
       return null;
     }
     return overflowRenderer(finalHiddenItems);
-  }, [
-    finalHiddenCount,
-    alwaysRenderOverflow,
-    overflowRenderer,
-    finalHiddenItems,
-  ]);
+  }, [finalHiddenCount, alwaysRenderOverflow, overflowRenderer, finalHiddenItems]);
 
   // Render visible items
   const visibleElements = useMemo(
@@ -107,11 +97,7 @@ const OverflowListComponent = <T,>({
   return (
     <>
       <MeasurementContainer />
-      <div
-        ref={containerRef}
-        className={cn('flex min-w-0', className)}
-        {...props}
-      >
+      <div ref={containerRef} className={cn('flex min-w-0', className)} {...props}>
         {collapseFrom === 'start' && overflowElement}
         {visibleElements}
         {collapseFrom === 'end' && overflowElement}

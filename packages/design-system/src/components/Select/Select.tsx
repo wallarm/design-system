@@ -1,11 +1,9 @@
 import { useMemo } from 'react';
-
 import {
   Select as ArkUiSelect,
   type CollectionItem,
   type SelectRootProps,
 } from '@ark-ui/react/select';
-
 import { SelectSharedProvider } from './SelectSharedContext';
 
 type SelectNativeProps<T extends CollectionItem> = Omit<
@@ -17,8 +15,7 @@ interface SelectBaseProps {
   loading?: boolean;
 }
 
-type SelectProps<T extends CollectionItem> = SelectNativeProps<T> &
-  SelectBaseProps;
+type SelectProps<T extends CollectionItem> = SelectNativeProps<T> & SelectBaseProps;
 
 export const Select = <T extends CollectionItem>({
   children,

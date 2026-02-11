@@ -1,14 +1,8 @@
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { Info } from '../../icons';
 import { Button } from '../Button';
-import {
-  Checkbox,
-  CheckboxDescription,
-  CheckboxIndicator,
-  CheckboxLabel,
-} from '../Checkbox';
+import { Checkbox, CheckboxDescription, CheckboxIndicator, CheckboxLabel } from '../Checkbox';
 import { Input } from '../Input';
 import { NumberInput } from '../NumberInput';
 import { Radio, RadioGroup, RadioIndicator, RadioLabel } from '../Radio';
@@ -21,15 +15,9 @@ import {
   SelectPositioner,
 } from '../Select';
 import { HStack } from '../Stack';
-import {
-  Switch,
-  SwitchControl,
-  SwitchDescription,
-  SwitchLabel,
-} from '../Switch';
+import { Switch, SwitchControl, SwitchDescription, SwitchLabel } from '../Switch';
 import { Textarea } from '../Textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-
 import { Field } from './Field';
 import { FieldAction } from './FieldAction';
 import { FieldDescription } from './FieldDescription';
@@ -64,20 +52,7 @@ export default meta;
 
 export const Basic: StoryFn<typeof meta> = () => {
   const monthsCollection = createListCollection({
-    items: [
-      '01',
-      '02',
-      '03',
-      '04',
-      '05',
-      '06',
-      '07',
-      '08',
-      '09',
-      '10',
-      '11',
-      '12',
-    ],
+    items: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
   });
 
   const yearsCollection = createListCollection({
@@ -85,43 +60,37 @@ export const Basic: StoryFn<typeof meta> = () => {
   });
 
   return (
-    <div className="min-w-320">
+    <div className='min-w-320'>
       <form>
         <FieldGroup>
           <FieldSet>
             <FieldLegend>Payment Method</FieldLegend>
 
-            <FieldDescription>
-              All transactions are secure and encrypted
-            </FieldDescription>
+            <FieldDescription>All transactions are secure and encrypted</FieldDescription>
 
             <FieldGroup>
               <Field>
                 <FieldLabel>Name on Card</FieldLabel>
-                <Input placeholder="Evil Rabbit" />
+                <Input placeholder='Evil Rabbit' />
               </Field>
               <Field>
-                <FieldLabel htmlFor="checkout-7j9-card-number-uw1">
-                  Card Number
-                </FieldLabel>
+                <FieldLabel htmlFor='checkout-7j9-card-number-uw1'>Card Number</FieldLabel>
                 <Input
-                  id="checkout-7j9-card-number-uw1"
-                  placeholder="1234 5678 9012 3456"
+                  id='checkout-7j9-card-number-uw1'
+                  placeholder='1234 5678 9012 3456'
                   required
                 />
-                <FieldDescription>
-                  Enter your 16-digit card number
-                </FieldDescription>
+                <FieldDescription>Enter your 16-digit card number</FieldDescription>
               </Field>
 
               <HStack>
                 <Field>
                   <FieldLabel>Month</FieldLabel>
                   <Select collection={monthsCollection}>
-                    <SelectButton placeholder="Month" />
+                    <SelectButton placeholder='Month' />
                     <SelectPositioner>
                       <SelectContent>
-                        {monthsCollection.items.map((month) => (
+                        {monthsCollection.items.map(month => (
                           <SelectOption key={month} item={month}>
                             <SelectOptionText>{month}</SelectOptionText>
                           </SelectOption>
@@ -135,11 +104,11 @@ export const Basic: StoryFn<typeof meta> = () => {
                   <FieldLabel>Year</FieldLabel>
 
                   <Select collection={yearsCollection}>
-                    <SelectButton placeholder="Year" />
+                    <SelectButton placeholder='Year' />
 
                     <SelectPositioner>
                       <SelectContent>
-                        {yearsCollection.items.map((year) => (
+                        {yearsCollection.items.map(year => (
                           <SelectOption key={year} item={year}>
                             <SelectOptionText>{year}</SelectOptionText>
                           </SelectOption>
@@ -151,13 +120,13 @@ export const Basic: StoryFn<typeof meta> = () => {
 
                 <Field>
                   <FieldLabel>CVV</FieldLabel>
-                  <Input placeholder="123" required />
+                  <Input placeholder='123' required />
                 </Field>
               </HStack>
 
               <Field>
                 <FieldLabel>Amount</FieldLabel>
-                <NumberInput defaultValue="1000" />
+                <NumberInput defaultValue='1000' />
               </Field>
             </FieldGroup>
           </FieldSet>
@@ -172,7 +141,7 @@ export const Basic: StoryFn<typeof meta> = () => {
             </FieldDescription>
 
             <FieldGroup>
-              <Field orientation="horizontal">
+              <Field orientation='horizontal'>
                 <Checkbox defaultChecked>
                   <CheckboxIndicator />
                   <CheckboxLabel>Same as shipping address</CheckboxLabel>
@@ -191,16 +160,16 @@ export const Basic: StoryFn<typeof meta> = () => {
             </FieldDescription>
 
             <Field>
-              <RadioGroup defaultValue="monthly">
-                <Radio value="monthly">
+              <RadioGroup defaultValue='monthly'>
+                <Radio value='monthly'>
                   <RadioIndicator />
                   <RadioLabel>Monthly ($9.99/month)</RadioLabel>
                 </Radio>
-                <Radio value="yearly">
+                <Radio value='yearly'>
                   <RadioIndicator />
                   <RadioLabel>Yearly ($99.99/year)</RadioLabel>
                 </Radio>
-                <Radio value="lifetime">
+                <Radio value='lifetime'>
                   <RadioIndicator />
                   <RadioLabel>Lifetime ($299.99)</RadioLabel>
                 </Radio>
@@ -212,7 +181,7 @@ export const Basic: StoryFn<typeof meta> = () => {
 
           <FieldSet>
             <FieldGroup>
-              <Field orientation="horizontal">
+              <Field orientation='horizontal'>
                 <Switch>
                   <SwitchControl />
                   <SwitchLabel>Notice when delivered</SwitchLabel>
@@ -225,15 +194,15 @@ export const Basic: StoryFn<typeof meta> = () => {
             <FieldGroup>
               <Field>
                 <FieldLabel>Comments</FieldLabel>
-                <Textarea placeholder="Add any additional comments" />
+                <Textarea placeholder='Add any additional comments' />
               </Field>
             </FieldGroup>
           </FieldSet>
 
-          <Field orientation="horizontal">
-            <Button type="submit">Submit</Button>
+          <Field orientation='horizontal'>
+            <Button type='submit'>Submit</Button>
 
-            <Button variant="outline" color="neutral" type="button">
+            <Button variant='outline' color='neutral' type='button'>
               Cancel
             </Button>
           </Field>
@@ -244,22 +213,18 @@ export const Basic: StoryFn<typeof meta> = () => {
 };
 
 export const Inputs: StoryFn<typeof meta> = () => (
-  <div className="min-w-320">
+  <div className='min-w-320'>
     <FieldSet>
       <FieldGroup>
         <Field>
           <FieldLabel>Username</FieldLabel>
-          <Input type="text" placeholder="Max Leiter" />
-          <FieldDescription>
-            Choose a unique username for your account.
-          </FieldDescription>
+          <Input type='text' placeholder='Max Leiter' />
+          <FieldDescription>Choose a unique username for your account.</FieldDescription>
         </Field>
         <Field>
           <FieldLabel>Password</FieldLabel>
-          <FieldDescription>
-            Must be at least 8 characters long.
-          </FieldDescription>
-          <Input type="password" placeholder="********" />
+          <FieldDescription>Must be at least 8 characters long.</FieldDescription>
+          <Input type='password' placeholder='********' />
         </Field>
       </FieldGroup>
     </FieldSet>
@@ -267,15 +232,13 @@ export const Inputs: StoryFn<typeof meta> = () => (
 );
 
 export const Textareas: StoryFn<typeof meta> = () => (
-  <div className="min-w-320">
+  <div className='min-w-320'>
     <FieldSet>
       <FieldGroup>
         <Field>
           <FieldLabel>Feedback</FieldLabel>
-          <Textarea placeholder="Your feedback helps us improve..." rows={4} />
-          <FieldDescription>
-            Share your thoughts about our service.
-          </FieldDescription>
+          <Textarea placeholder='Your feedback helps us improve...' rows={4} />
+          <FieldDescription>Share your thoughts about our service.</FieldDescription>
         </Field>
       </FieldGroup>
     </FieldSet>
@@ -283,7 +246,7 @@ export const Textareas: StoryFn<typeof meta> = () => (
 );
 
 export const Fieldset: StoryFn<typeof meta> = () => (
-  <div className="min-w-320">
+  <div className='min-w-320'>
     <FieldSet>
       <FieldLegend>Profile</FieldLegend>
       <FieldDescription>This appears on invoices and emails.</FieldDescription>
@@ -294,17 +257,15 @@ export const Fieldset: StoryFn<typeof meta> = () => (
             Full name
             <FieldAction>Generate new</FieldAction>
           </FieldLabel>
-          <Input autoComplete="off" placeholder="Evil Rabbit" />
-          <FieldDescription>
-            This appears on invoices and emails.
-          </FieldDescription>
+          <Input autoComplete='off' placeholder='Evil Rabbit' />
+          <FieldDescription>This appears on invoices and emails.</FieldDescription>
         </Field>
         <Field required>
           <FieldLabel>
             Username
             <FieldIndicator />
           </FieldLabel>
-          <Input placeholder="@paveldurov" autoComplete="off" error />
+          <Input placeholder='@paveldurov' autoComplete='off' error />
           <FieldError>Choose another username.</FieldError>
         </Field>
         <Field>
@@ -317,7 +278,7 @@ export const Fieldset: StoryFn<typeof meta> = () => (
               <TooltipContent>Additional information</TooltipContent>
             </Tooltip>
           </FieldLabel>
-          <Textarea placeholder="Your message..." />
+          <Textarea placeholder='Your message...' />
           <FieldDescription>Enter your message.</FieldDescription>
         </Field>
       </FieldGroup>
@@ -326,39 +287,33 @@ export const Fieldset: StoryFn<typeof meta> = () => (
 );
 
 export const Switches: StoryFn<typeof meta> = () => (
-  <div className="min-w-320">
+  <div className='min-w-320'>
     <FieldSet>
       <FieldLegend>Notification Settings</FieldLegend>
       <FieldDescription>Manage your notification preferences.</FieldDescription>
 
       <FieldGroup>
-        <Field orientation="horizontal">
+        <Field orientation='horizontal'>
           <Switch defaultChecked>
             <SwitchControl />
             <SwitchLabel>Email notifications</SwitchLabel>
-            <SwitchDescription>
-              Receive email alerts for important updates.
-            </SwitchDescription>
+            <SwitchDescription>Receive email alerts for important updates.</SwitchDescription>
           </Switch>
         </Field>
 
-        <Field orientation="horizontal">
+        <Field orientation='horizontal'>
           <Switch>
             <SwitchControl />
             <SwitchLabel>Push notifications</SwitchLabel>
-            <SwitchDescription>
-              Get push notifications on your device.
-            </SwitchDescription>
+            <SwitchDescription>Get push notifications on your device.</SwitchDescription>
           </Switch>
         </Field>
 
-        <Field orientation="horizontal">
+        <Field orientation='horizontal'>
           <Switch defaultChecked>
             <SwitchControl />
             <SwitchLabel>SMS notifications</SwitchLabel>
-            <SwitchDescription>
-              Receive text messages for critical alerts.
-            </SwitchDescription>
+            <SwitchDescription>Receive text messages for critical alerts.</SwitchDescription>
           </Switch>
         </Field>
       </FieldGroup>
@@ -367,73 +322,63 @@ export const Switches: StoryFn<typeof meta> = () => (
 );
 
 export const Radios: StoryFn<typeof meta> = () => (
-  <div className="min-w-320">
+  <div className='min-w-320'>
     <FieldSet>
       <FieldLegend>Delivery Method</FieldLegend>
-      <FieldDescription>
-        Choose how you want to receive your order.
-      </FieldDescription>
+      <FieldDescription>Choose how you want to receive your order.</FieldDescription>
 
       <Field>
-        <RadioGroup defaultValue="standard">
-          <Radio value="standard">
+        <RadioGroup defaultValue='standard'>
+          <Radio value='standard'>
             <RadioIndicator />
             <RadioLabel>Standard Shipping (5-7 days)</RadioLabel>
           </Radio>
-          <Radio value="express">
+          <Radio value='express'>
             <RadioIndicator />
             <RadioLabel>Express Shipping (2-3 days)</RadioLabel>
           </Radio>
-          <Radio value="overnight">
+          <Radio value='overnight'>
             <RadioIndicator />
             <RadioLabel>Overnight Shipping (1 day)</RadioLabel>
           </Radio>
-          <Radio value="pickup">
+          <Radio value='pickup'>
             <RadioIndicator />
             <RadioLabel>In-store Pickup</RadioLabel>
           </Radio>
         </RadioGroup>
 
-        <FieldDescription>
-          Shipping costs will be calculated at checkout.
-        </FieldDescription>
+        <FieldDescription>Shipping costs will be calculated at checkout.</FieldDescription>
       </Field>
     </FieldSet>
   </div>
 );
 
 export const Checkboxes: StoryFn<typeof meta> = () => (
-  <div className="min-w-320">
+  <div className='min-w-320'>
     <FieldSet>
       <FieldLegend>Terms and Preferences</FieldLegend>
       <FieldDescription>Select which terms you agree to.</FieldDescription>
 
       <FieldGroup>
-        <Field orientation="horizontal">
+        <Field orientation='horizontal'>
           <Checkbox defaultChecked>
             <CheckboxIndicator />
             <CheckboxLabel>I accept the terms and conditions</CheckboxLabel>
-            <CheckboxDescription>
-              You must agree to our terms to continue.
-            </CheckboxDescription>
+            <CheckboxDescription>You must agree to our terms to continue.</CheckboxDescription>
           </Checkbox>
         </Field>
-        <Field orientation="horizontal">
+        <Field orientation='horizontal'>
           <Checkbox>
             <CheckboxIndicator />
             <CheckboxLabel>Subscribe to newsletter</CheckboxLabel>
-            <CheckboxDescription>
-              Get weekly updates and exclusive offers.
-            </CheckboxDescription>
+            <CheckboxDescription>Get weekly updates and exclusive offers.</CheckboxDescription>
           </Checkbox>
         </Field>
-        <Field orientation="horizontal">
+        <Field orientation='horizontal'>
           <Checkbox defaultChecked>
             <CheckboxIndicator />
             <CheckboxLabel>Share usage data</CheckboxLabel>
-            <CheckboxDescription>
-              Help us improve our services.
-            </CheckboxDescription>
+            <CheckboxDescription>Help us improve our services.</CheckboxDescription>
           </Checkbox>
         </Field>
       </FieldGroup>
@@ -442,23 +387,21 @@ export const Checkboxes: StoryFn<typeof meta> = () => (
 );
 
 export const NumberInputs: StoryFn<typeof meta> = () => (
-  <div className="min-w-320">
+  <div className='min-w-320'>
     <FieldSet>
       <FieldLegend>Product Details</FieldLegend>
-      <FieldDescription>
-        Configure your product quantity and pricing.
-      </FieldDescription>
+      <FieldDescription>Configure your product quantity and pricing.</FieldDescription>
 
       <FieldGroup>
         <Field>
           <FieldLabel>Quantity</FieldLabel>
-          <NumberInput defaultValue="1" min={1} max={100} />
+          <NumberInput defaultValue='1' min={1} max={100} />
           <FieldDescription>Choose between 1 and 100 items.</FieldDescription>
         </Field>
         <Field>
           <FieldLabel>Price per unit</FieldLabel>
           <NumberInput
-            defaultValue="99.99"
+            defaultValue='99.99'
             step={0.01}
             formatOptions={{ style: 'currency', currency: 'USD' }}
           />
@@ -466,12 +409,7 @@ export const NumberInputs: StoryFn<typeof meta> = () => (
         </Field>
         <Field>
           <FieldLabel>Discount percentage</FieldLabel>
-          <NumberInput
-            defaultValue="10"
-            min={0}
-            max={100}
-            formatOptions={{ style: 'percent' }}
-          />
+          <NumberInput defaultValue='10' min={0} max={100} formatOptions={{ style: 'percent' }} />
           <FieldDescription>Apply a discount from 0% to 100%.</FieldDescription>
         </Field>
       </FieldGroup>
@@ -518,21 +456,19 @@ export const Selects: StoryFn<typeof meta> = () => {
   });
 
   return (
-    <div className="min-w-320">
+    <div className='min-w-320'>
       <FieldSet>
         <FieldLegend>Regional Settings</FieldLegend>
-        <FieldDescription>
-          Configure your location and language preferences.
-        </FieldDescription>
+        <FieldDescription>Configure your location and language preferences.</FieldDescription>
 
         <FieldGroup>
           <Field>
             <FieldLabel>Country</FieldLabel>
             <Select collection={countriesCollection}>
-              <SelectButton placeholder="Select a country" />
+              <SelectButton placeholder='Select a country' />
               <SelectPositioner>
                 <SelectContent>
-                  {countriesCollection.items.map((country) => (
+                  {countriesCollection.items.map(country => (
                     <SelectOption key={country.value} item={country}>
                       <SelectOptionText>{country.label}</SelectOptionText>
                     </SelectOption>
@@ -540,17 +476,15 @@ export const Selects: StoryFn<typeof meta> = () => {
                 </SelectContent>
               </SelectPositioner>
             </Select>
-            <FieldDescription>
-              Your country determines available features.
-            </FieldDescription>
+            <FieldDescription>Your country determines available features.</FieldDescription>
           </Field>
           <Field>
             <FieldLabel>Language</FieldLabel>
             <Select collection={languagesCollection}>
-              <SelectButton placeholder="Select a language" />
+              <SelectButton placeholder='Select a language' />
               <SelectPositioner>
                 <SelectContent>
-                  {languagesCollection.items.map((language) => (
+                  {languagesCollection.items.map(language => (
                     <SelectOption key={language.value} item={language}>
                       <SelectOptionText>{language.label}</SelectOptionText>
                     </SelectOption>
@@ -563,10 +497,10 @@ export const Selects: StoryFn<typeof meta> = () => {
           <Field>
             <FieldLabel>Timezone</FieldLabel>
             <Select collection={timezonesCollection}>
-              <SelectButton placeholder="Select a timezone" />
+              <SelectButton placeholder='Select a timezone' />
               <SelectPositioner>
                 <SelectContent>
-                  {timezonesCollection.items.map((timezone) => (
+                  {timezonesCollection.items.map(timezone => (
                     <SelectOption key={timezone.value} item={timezone}>
                       <SelectOptionText>{timezone.label}</SelectOptionText>
                     </SelectOption>
@@ -574,9 +508,7 @@ export const Selects: StoryFn<typeof meta> = () => {
                 </SelectContent>
               </SelectPositioner>
             </Select>
-            <FieldDescription>
-              All times will be displayed in this timezone.
-            </FieldDescription>
+            <FieldDescription>All times will be displayed in this timezone.</FieldDescription>
           </Field>
         </FieldGroup>
       </FieldSet>

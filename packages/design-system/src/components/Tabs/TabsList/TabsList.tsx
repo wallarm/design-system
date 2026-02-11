@@ -1,17 +1,8 @@
-import {
-  type FC,
-  type ReactNode,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from 'react';
-
+import { type FC, type ReactNode, useLayoutEffect, useRef, useState } from 'react';
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cva } from 'class-variance-authority';
-
 import { cn } from '../../../utils/cn';
 import { useTabsSharedContext } from '../TabsSharedContext';
-
 import { TabsListIndicator } from './TabsListIndicator';
 import { TabsListScrollArea } from './TabsListScrollArea';
 import { TabsListScrollButton } from './TabsListScrollButton';
@@ -103,22 +94,15 @@ export const TabsList: FC<TabsListProps> = ({ children }) => {
   }, [scrollRef, hasOverflow]);
 
   return (
-    <div className={cn('relative')} data-slot="tabs-list">
-      {hasOverflow && (
-        <TabsListScrollButton direction="left" visible={canScrollLeft} />
-      )}
+    <div className={cn('relative')} data-slot='tabs-list'>
+      {hasOverflow && <TabsListScrollButton direction='left' visible={canScrollLeft} />}
       <TabsListScrollArea>
-        <ArkUiTabs.List
-          ref={listRef}
-          className={cn(tabsListVariants({ size }))}
-        >
+        <ArkUiTabs.List ref={listRef} className={cn(tabsListVariants({ size }))}>
           {children}
           <TabsListIndicator />
         </ArkUiTabs.List>
       </TabsListScrollArea>
-      {hasOverflow && (
-        <TabsListScrollButton direction="right" visible={canScrollRight} />
-      )}
+      {hasOverflow && <TabsListScrollButton direction='right' visible={canScrollRight} />}
     </div>
   );
 };

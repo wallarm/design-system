@@ -1,5 +1,4 @@
 import figma from '@figma/code-connect';
-
 import { Radio } from './Radio';
 import { RadioDescription } from './RadioDescription';
 import { RadioIndicator } from './RadioIndicator';

@@ -1,12 +1,7 @@
 import type { FC } from 'react';
-
 import { Dialog as ArkUiDialog } from '@ark-ui/react/dialog';
-
 import { cn } from '../../utils/cn';
-import {
-  type DrawerPositionerProps,
-  drawerPositionerVariants,
-} from '../Drawer';
+import { type DrawerPositionerProps, drawerPositionerVariants } from '../Drawer';
 
 type DialogPositionerProps = Omit<DrawerPositionerProps, 'isResizing'>;
 

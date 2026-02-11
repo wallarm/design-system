@@ -1,11 +1,9 @@
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-
 import { ChevronLeft, ChevronRight } from '../../icons';
 import { Heading } from '../Heading';
 import { NumericBadge } from '../NumericBadge';
 import { HStack, VStack } from '../Stack';
-
 import { Button } from './Button';
 
 const meta = {
@@ -37,15 +35,15 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Brand</Heading>
 
     <HStack>
-      <Button {...args} variant="primary" color="brand">
+      <Button {...args} variant='primary' color='brand'>
         Primary
       </Button>
 
-      <Button {...args} variant="ghost" color="brand">
+      <Button {...args} variant='ghost' color='brand'>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="brand">
+      <Button {...args} variant='secondary' color='brand'>
         Secondary
       </Button>
     </HStack>
@@ -53,15 +51,15 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Neutral</Heading>
 
     <HStack>
-      <Button {...args} variant="outline" color="neutral">
+      <Button {...args} variant='outline' color='neutral'>
         Outline
       </Button>
 
-      <Button {...args} variant="ghost" color="neutral">
+      <Button {...args} variant='ghost' color='neutral'>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="neutral">
+      <Button {...args} variant='secondary' color='neutral'>
         Secondary
       </Button>
     </HStack>
@@ -69,15 +67,15 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Neutral Alt</Heading>
 
     <HStack>
-      <Button {...args} variant="outline" color="neutral-alt">
+      <Button {...args} variant='outline' color='neutral-alt'>
         Outline
       </Button>
 
-      <Button {...args} variant="ghost" color="neutral-alt">
+      <Button {...args} variant='ghost' color='neutral-alt'>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="neutral-alt">
+      <Button {...args} variant='secondary' color='neutral-alt'>
         Secondary
       </Button>
     </HStack>
@@ -85,19 +83,19 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Destructive</Heading>
 
     <HStack>
-      <Button {...args} variant="primary" color="destructive">
+      <Button {...args} variant='primary' color='destructive'>
         Primary
       </Button>
 
-      <Button {...args} variant="outline" color="destructive">
+      <Button {...args} variant='outline' color='destructive'>
         Outline
       </Button>
 
-      <Button {...args} variant="ghost" color="destructive">
+      <Button {...args} variant='ghost' color='destructive'>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="destructive">
+      <Button {...args} variant='secondary' color='destructive'>
         Secondary
       </Button>
     </HStack>
@@ -105,14 +103,14 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
 );
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack align="end" justify="center">
-    <Button {...args} size="small">
+  <HStack align='end' justify='center'>
+    <Button {...args} size='small'>
       Small
     </Button>
-    <Button {...args} size="medium">
+    <Button {...args} size='medium'>
       Medium
     </Button>
-    <Button {...args} size="large">
+    <Button {...args} size='large'>
       Large
     </Button>
   </HStack>
@@ -123,15 +121,15 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Brand</Heading>
 
     <HStack>
-      <Button {...args} variant="primary" color="brand" disabled>
+      <Button {...args} variant='primary' color='brand' disabled>
         Primary
       </Button>
 
-      <Button {...args} variant="ghost" color="brand" disabled>
+      <Button {...args} variant='ghost' color='brand' disabled>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="brand" disabled>
+      <Button {...args} variant='secondary' color='brand' disabled>
         Secondary
       </Button>
     </HStack>
@@ -139,15 +137,15 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Neutral</Heading>
 
     <HStack>
-      <Button {...args} variant="outline" color="neutral" disabled>
+      <Button {...args} variant='outline' color='neutral' disabled>
         Outline
       </Button>
 
-      <Button {...args} variant="ghost" color="neutral" disabled>
+      <Button {...args} variant='ghost' color='neutral' disabled>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="neutral" disabled>
+      <Button {...args} variant='secondary' color='neutral' disabled>
         Secondary
       </Button>
     </HStack>
@@ -155,15 +153,15 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Neutral Alt</Heading>
 
     <HStack>
-      <Button {...args} variant="outline" color="neutral-alt" disabled>
+      <Button {...args} variant='outline' color='neutral-alt' disabled>
         Outline
       </Button>
 
-      <Button {...args} variant="ghost" color="neutral-alt" disabled>
+      <Button {...args} variant='ghost' color='neutral-alt' disabled>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="neutral-alt" disabled>
+      <Button {...args} variant='secondary' color='neutral-alt' disabled>
         Secondary
       </Button>
     </HStack>
@@ -171,19 +169,19 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Destructive</Heading>
 
     <HStack>
-      <Button {...args} variant="primary" color="destructive" disabled>
+      <Button {...args} variant='primary' color='destructive' disabled>
         Primary
       </Button>
 
-      <Button {...args} variant="outline" color="destructive" disabled>
+      <Button {...args} variant='outline' color='destructive' disabled>
         Outline
       </Button>
 
-      <Button {...args} variant="ghost" color="destructive" disabled>
+      <Button {...args} variant='ghost' color='destructive' disabled>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="destructive" disabled>
+      <Button {...args} variant='secondary' color='destructive' disabled>
         Secondary
       </Button>
     </HStack>
@@ -195,15 +193,15 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Brand</Heading>
 
     <HStack>
-      <Button {...args} variant="primary" color="brand" loading>
+      <Button {...args} variant='primary' color='brand' loading>
         Primary
       </Button>
 
-      <Button {...args} variant="ghost" color="brand" loading>
+      <Button {...args} variant='ghost' color='brand' loading>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="brand" loading>
+      <Button {...args} variant='secondary' color='brand' loading>
         Secondary
       </Button>
     </HStack>
@@ -211,15 +209,15 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Neutral</Heading>
 
     <HStack>
-      <Button {...args} variant="outline" color="neutral" loading>
+      <Button {...args} variant='outline' color='neutral' loading>
         Outline
       </Button>
 
-      <Button {...args} variant="ghost" color="neutral" loading>
+      <Button {...args} variant='ghost' color='neutral' loading>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="neutral" loading>
+      <Button {...args} variant='secondary' color='neutral' loading>
         Secondary
       </Button>
     </HStack>
@@ -227,15 +225,15 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Neutral Alt</Heading>
 
     <HStack>
-      <Button {...args} variant="outline" color="neutral-alt" loading>
+      <Button {...args} variant='outline' color='neutral-alt' loading>
         Outline
       </Button>
 
-      <Button {...args} variant="ghost" color="neutral-alt" loading>
+      <Button {...args} variant='ghost' color='neutral-alt' loading>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="neutral-alt" loading>
+      <Button {...args} variant='secondary' color='neutral-alt' loading>
         Secondary
       </Button>
     </HStack>
@@ -243,19 +241,19 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
     <Heading>Destructive</Heading>
 
     <HStack>
-      <Button {...args} variant="primary" color="destructive" loading>
+      <Button {...args} variant='primary' color='destructive' loading>
         Primary
       </Button>
 
-      <Button {...args} variant="outline" color="destructive" loading>
+      <Button {...args} variant='outline' color='destructive' loading>
         Outline
       </Button>
 
-      <Button {...args} variant="ghost" color="destructive" loading>
+      <Button {...args} variant='ghost' color='destructive' loading>
         Ghost
       </Button>
 
-      <Button {...args} variant="secondary" color="destructive" loading>
+      <Button {...args} variant='secondary' color='destructive' loading>
         Secondary
       </Button>
     </HStack>
@@ -284,7 +282,7 @@ export const Icons: StoryFn<typeof meta> = ({ ...args }) => (
 export const Badge: StoryFn<typeof meta> = ({ ...args }) => (
   <Button {...args}>
     With badge
-    <NumericBadge type="outline">1</NumericBadge>
+    <NumericBadge type='outline'>1</NumericBadge>
   </Button>
 );
 
@@ -306,14 +304,14 @@ export const IconOnly: StoryFn<typeof meta> = ({ ...args }) => (
 
 export const LinkAsButton: StoryFn<typeof meta> = ({ ...args }) => (
   <Button {...args} asChild>
-    <a href="https://google.com" target="_blank" rel="noopener noreferrer">
+    <a href='https://google.com' target='_blank' rel='noopener noreferrer'>
       Button as link
     </a>
   </Button>
 );
 
 export const FullWidth: StoryFn<typeof meta> = ({ ...args }) => (
-  <div className="w-400">
+  <div className='w-400'>
     <Button {...args} fullWidth>
       Full width example
     </Button>

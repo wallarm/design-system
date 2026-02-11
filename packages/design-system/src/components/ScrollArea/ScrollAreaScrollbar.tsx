@@ -1,8 +1,6 @@
 import { type CSSProperties, type FC, useMemo } from 'react';
-
 import { ScrollArea as ArkUiScrollArea } from '@ark-ui/react/scroll-area';
 import { cva } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 
 const scrollAreaScrollbarVariants = cva(
@@ -29,10 +27,7 @@ const scrollAreaScrollbarThumbVariants = cva(
   },
 );
 
-export type ScrollAreaScrollbarProps = Omit<
-  ArkUiScrollArea.ScrollbarProps,
-  'className' | 'style'
->;
+export type ScrollAreaScrollbarProps = Omit<ArkUiScrollArea.ScrollbarProps, 'className' | 'style'>;
 
 export const ScrollAreaScrollbar: FC<ScrollAreaScrollbarProps> = ({
   orientation = 'vertical',
@@ -53,9 +48,7 @@ export const ScrollAreaScrollbar: FC<ScrollAreaScrollbarProps> = ({
       orientation={orientation}
       className={cn(scrollAreaScrollbarVariants({ orientation }))}
     >
-      <ArkUiScrollArea.Thumb
-        className={cn(scrollAreaScrollbarThumbVariants({ orientation }))}
-      />
+      <ArkUiScrollArea.Thumb className={cn(scrollAreaScrollbarThumbVariants({ orientation }))} />
     </ArkUiScrollArea.Scrollbar>
   );
 };

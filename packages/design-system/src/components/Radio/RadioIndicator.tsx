@@ -1,10 +1,5 @@
 import type { FC } from 'react';
-
-import {
-  RadioGroup as ArkUiRadioGroup,
-  useRadioGroupItemContext,
-} from '@ark-ui/react/radio-group';
-
+import { RadioGroup as ArkUiRadioGroup, useRadioGroupItemContext } from '@ark-ui/react/radio-group';
 import { Dot } from '../../icons';
 import { cn } from '../../utils/cn';
 

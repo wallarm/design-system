@@ -1,9 +1,6 @@
 import type { FC, ReactNode } from 'react';
-
 import { Dialog } from '@ark-ui/react/dialog';
-
 import { cn } from '../../utils/cn';
-
 import { drawerPositionerVariants } from './classes';
 
 export interface DrawerPositionerProps {
@@ -11,10 +8,7 @@ export interface DrawerPositionerProps {
   isResizing: boolean;
 }
 
-export const DrawerPositioner: FC<DrawerPositionerProps> = ({
-  children,
-  isResizing,
-}) => (
+export const DrawerPositioner: FC<DrawerPositionerProps> = ({ children, isResizing }) => (
   <Dialog.Positioner
     className={cn(
       drawerPositionerVariants({ isResizing }),

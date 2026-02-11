@@ -1,7 +1,5 @@
 import type { FC, PropsWithChildren } from 'react';
-
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
-
 import { Tag, type TagProps } from '../../Tag';
 import { SelectArrow } from '../SelectArrow';
 

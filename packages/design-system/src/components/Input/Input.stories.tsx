@@ -1,6 +1,5 @@
 import { fn } from 'storybook/test';
 import type { Meta, StoryObj } from 'storybook-react-rsbuild';
-
 import { Input } from './Input';
 
 const meta = {

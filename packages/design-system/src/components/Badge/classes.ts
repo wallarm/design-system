@@ -1,8 +1,7 @@
 import { cva } from 'class-variance-authority';
-
 import { BadgeColorEnum } from './constants';
 import { generateBadgeVariants } from './generateBadgeVariants';
-import { type BadgeColor } from './types';
+import type { BadgeColor } from './types';
 
 type BadgeVariantsColorMap = Partial<{
   [K in BadgeColor]: string;

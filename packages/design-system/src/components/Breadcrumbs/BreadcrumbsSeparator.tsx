@@ -1,5 +1,4 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-
 import { ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
 
@@ -33,10 +32,10 @@ export const BreadcrumbsSeparator: FC<BreadcrumbsSeparatorProps> = ({
   return (
     <li
       className={cn('flex items-center justify-center w-20 h-20', className)}
-      aria-hidden="true"
+      aria-hidden='true'
       {...props}
     >
-      {children || <ChevronRight size="md" className="text-icon-secondary" />}
+      {children || <ChevronRight size='md' className='text-icon-secondary' />}
     </li>
   );
 };

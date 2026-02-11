@@ -1,7 +1,5 @@
 import type { ComponentProps, FC, MouseEvent } from 'react';
-
 import { cva, type VariantProps } from 'class-variance-authority';
-
 import { cn } from '../../utils/cn';
 
 const inputGroupAddonVariants = cva(
@@ -76,8 +74,8 @@ export const InputGroupAddon: FC<
   return (
     <div
       {...props}
-      role="group"
-      data-slot="input-group-addon"
+      role='group'
+      data-slot='input-group-addon'
       data-align={align}
       className={cn(inputGroupAddonVariants({ align, variant }))}
       onClick={handleClick}

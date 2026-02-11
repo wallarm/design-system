@@ -1,14 +1,11 @@
 import type { ElementType, FC, Ref } from 'react';
-
 import { Slot } from '@radix-ui/react-slot';
-import { type VariantProps } from 'class-variance-authority';
-
+import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
 import { isIconOnly } from '../../utils/isIconOnly';
 import { Loader } from '../Loader';
 import type { PolymorphicComponentProps } from '../Polymorphic';
-
 import { buttonBaseVariants } from './classes';
 
 type ButtonBaseVariantProps = Omit<
@@ -22,14 +19,13 @@ type ButtonBaseBaseProps = {
   ref?: Ref<HTMLElement>;
 };
 
-export type ButtonBaseProps<C extends ElementType = 'button'> =
-  PolymorphicComponentProps<C, ButtonBaseVariantProps & ButtonBaseBaseProps>;
+export type ButtonBaseProps<C extends ElementType = 'button'> = PolymorphicComponentProps<
+  C,
+  ButtonBaseVariantProps & ButtonBaseBaseProps
+>;
 
 export const ButtonBase: FC<
-  PolymorphicComponentProps<
-    ElementType,
-    ButtonBaseVariantProps & ButtonBaseBaseProps
-  >
+  PolymorphicComponentProps<ElementType, ButtonBaseVariantProps & ButtonBaseBaseProps>
 > = ({
   as = 'button',
   size = 'large',
@@ -65,12 +61,10 @@ export const ButtonBase: FC<
     >
       {loading ? (
         <>
-          <span className="items-center justify-center opacity-0">
-            {children}
-          </span>
+          <span className='items-center justify-center opacity-0'>{children}</span>
 
-          <span className="flex items-center justify-center w-full h-full absolute top-0 right-0 bottom-0 left-0">
-            <Loader size="md" />
+          <span className='flex items-center justify-center w-full h-full absolute top-0 right-0 bottom-0 left-0'>
+            <Loader size='md' />
           </span>
         </>
       ) : (

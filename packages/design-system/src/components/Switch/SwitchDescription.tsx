@@ -1,20 +1,16 @@
 import type { FC, HTMLAttributes } from 'react';
-
 import { Text } from '../Text';
 
-export type SwitchDescriptionProps = Omit<
-  HTMLAttributes<HTMLParagraphElement>,
-  'className'
->;
+export type SwitchDescriptionProps = Omit<HTMLAttributes<HTMLParagraphElement>, 'className'>;
 
-export const SwitchDescription: FC<SwitchDescriptionProps> = (props) => (
+export const SwitchDescription: FC<SwitchDescriptionProps> = props => (
   <Text
     {...props}
-    size="md"
-    weight="regular"
-    color="secondary"
-    data-scope="switch"
-    data-part="description"
+    size='md'
+    weight='regular'
+    color='secondary'
+    data-scope='switch'
+    data-part='description'
   />
 );
 

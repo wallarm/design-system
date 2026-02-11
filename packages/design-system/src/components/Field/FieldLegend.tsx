@@ -1,5 +1,4 @@
 import type { FC, HTMLAttributes } from 'react';
-
 import { cn } from '../../utils/cn';
 
 type FieldLegendNativeProps = HTMLAttributes<HTMLLegendElement>;
@@ -10,13 +9,10 @@ interface FieldLegendBaseProps {
 
 type FieldLegendProps = FieldLegendNativeProps & FieldLegendBaseProps;
 
-export const FieldLegend: FC<FieldLegendProps> = ({
-  variant = 'legend',
-  ...props
-}) => (
+export const FieldLegend: FC<FieldLegendProps> = ({ variant = 'legend', ...props }) => (
   <legend
     {...props}
-    data-slot="field-legend"
+    data-slot='field-legend'
     data-variant={variant}
     className={cn(
       'font-medium text-text-primary',

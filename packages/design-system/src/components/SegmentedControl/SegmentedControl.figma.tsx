@@ -1,7 +1,5 @@
 import figma from '@figma/code-connect';
-
 import { NumericBadge } from '../NumericBadge';
-
 import { SegmentedControl } from './SegmentedControl';
 import { SegmentedControlButton } from './SegmentedControlButton';
 import { SegmentedControlItem } from './SegmentedControlItem';
@@ -13,10 +11,10 @@ const figmaNodeUrl =
 // Basic variant
 figma.connect(SegmentedControl, figmaNodeUrl, {
   example: () => (
-    <SegmentedControl value="1">
-      <SegmentedControlItem value="1">Headers</SegmentedControlItem>
-      <SegmentedControlItem value="2">Parameters</SegmentedControlItem>
-      <SegmentedControlItem value="3">Schema</SegmentedControlItem>
+    <SegmentedControl value='1'>
+      <SegmentedControlItem value='1'>Headers</SegmentedControlItem>
+      <SegmentedControlItem value='2'>Parameters</SegmentedControlItem>
+      <SegmentedControlItem value='3'>Schema</SegmentedControlItem>
     </SegmentedControl>
   ),
 });
@@ -28,20 +26,20 @@ figma.connect(SegmentedControl, figmaNodeUrl, {
   },
   example: () => (
     <SegmentedControl
-      value="1"
+      value='1'
       onChange={() => {
         /* Figma placeholder */
       }}
     >
-      <SegmentedControlItem value="1">
+      <SegmentedControlItem value='1'>
         Headers
         <NumericBadge>{33}</NumericBadge>
       </SegmentedControlItem>
-      <SegmentedControlItem value="2">
+      <SegmentedControlItem value='2'>
         Parameters
         <NumericBadge>{100}</NumericBadge>
       </SegmentedControlItem>
-      <SegmentedControlItem value="3">Schema</SegmentedControlItem>
+      <SegmentedControlItem value='3'>Schema</SegmentedControlItem>
     </SegmentedControl>
   ),
 });
@@ -53,14 +51,14 @@ figma.connect(SegmentedControl, figmaNodeUrl, {
   },
   example: () => (
     <SegmentedControl
-      value="1"
+      value='1'
       onChange={() => {
         /* Figma placeholder */
       }}
     >
-      <SegmentedControlItem value="1">Overview</SegmentedControlItem>
-      <SegmentedControlItem value="2">Analytics</SegmentedControlItem>
-      <SegmentedControlItem value="3">Reports</SegmentedControlItem>
+      <SegmentedControlItem value='1'>Overview</SegmentedControlItem>
+      <SegmentedControlItem value='2'>Analytics</SegmentedControlItem>
+      <SegmentedControlItem value='3'>Reports</SegmentedControlItem>
       <SegmentedControlSeparator />
       <SegmentedControlButton>More</SegmentedControlButton>
     </SegmentedControl>
@@ -77,16 +75,16 @@ figma.connect(SegmentedControl, figmaNodeUrl, {
   },
   example: ({ fullWidth = true }) => (
     <SegmentedControl
-      value="1"
+      value='1'
       onChange={() => {
         /* Figma placeholder */
       }}
       fullWidth={fullWidth}
     >
-      <SegmentedControlItem value="1">Overview</SegmentedControlItem>
-      <SegmentedControlItem value="2">Analytics</SegmentedControlItem>
-      <SegmentedControlItem value="3">Reports</SegmentedControlItem>
-      <SegmentedControlItem value="4">Settings</SegmentedControlItem>
+      <SegmentedControlItem value='1'>Overview</SegmentedControlItem>
+      <SegmentedControlItem value='2'>Analytics</SegmentedControlItem>
+      <SegmentedControlItem value='3'>Reports</SegmentedControlItem>
+      <SegmentedControlItem value='4'>Settings</SegmentedControlItem>
     </SegmentedControl>
   ),
 });

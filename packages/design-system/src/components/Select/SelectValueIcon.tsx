@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-
 import { useSelectContext } from '@ark-ui/react/select';
 
 interface SelectValueIconProps {

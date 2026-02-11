@@ -1,13 +1,7 @@
 import type { FC, Ref } from 'react';
-
 import { X } from '../../icons';
 import { Button } from '../Button';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '../Tooltip';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
 
 export interface AlertCloseProps {
   ref?: Ref<HTMLButtonElement>;
@@ -25,13 +19,7 @@ export const AlertClose: FC<AlertCloseProps> = ({ ref, onClick }) => {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <Button
-            ref={ref}
-            variant="ghost"
-            color="neutral"
-            size="small"
-            onClick={onClick}
-          >
+          <Button ref={ref} variant='ghost' color='neutral' size='small' onClick={onClick}>
             <X />
           </Button>
         </TooltipTrigger>

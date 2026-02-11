@@ -1,7 +1,5 @@
 import type { ComponentPropsWithoutRef, ElementRef, FC, Ref } from 'react';
-
 import { Content } from '@radix-ui/react-dropdown-menu';
-
 import { cn } from '../../utils/cn';
 import {
   ScrollArea,
@@ -10,7 +8,6 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaViewport,
 } from '../ScrollArea';
-
 import { dropdownMenuClassNames } from './classes';
 import { DropdownMenuPortal } from './DropdownMenuPortal';
 
@@ -41,9 +38,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
     >
       <ScrollArea>
         <ScrollAreaViewport>
-          <ScrollAreaContent className={cn('flex flex-col gap-1')}>
-            {children}
-          </ScrollAreaContent>
+          <ScrollAreaContent className={cn('flex flex-col gap-1')}>{children}</ScrollAreaContent>
         </ScrollAreaViewport>
         <ScrollAreaScrollbar />
         <ScrollAreaCorner />

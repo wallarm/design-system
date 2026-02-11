@@ -1,5 +1,4 @@
 import type { FC, MouseEvent } from 'react';
-
 import { X } from '../../icons';
 
 interface TagCloseProps {
@@ -13,5 +12,5 @@ export const TagClose: FC<TagCloseProps> = ({ onClick }) => {
     onClick?.(event);
   };
 
-  return <X size="sm" data-slot="tag-close" onClick={handleClick} />;
+  return <X size='sm' data-slot='tag-close' onClick={handleClick} />;
 };
