@@ -12,7 +12,8 @@
     "./docker": "./dist/docker.js"
   },
   "dependencies": {
-    "@playwright/test": "catalog:"
+    "@playwright/test": "catalog:",
+    "allure-playwright": "catalog:"
   },
   "devDependencies": {
     "@wallarm/typescript-config": "workspace:*",
