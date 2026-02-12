@@ -10,6 +10,7 @@ export default mergeRsbuildConfig(rsbuildConfig, {
         TanStackRouterRspack({
           target: 'react',
           autoCodeSplitting: true,
+          semicolons: true,
         }),
       ],
     },
