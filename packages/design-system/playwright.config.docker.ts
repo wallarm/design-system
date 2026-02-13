@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test';
-import { dockerConfig } from '@wallarm/playwright-config/docker';
+import { dockerConfig } from '@wallarm-org/playwright-config/docker';
 
 const DEFAULT_DOCKER_URL = 'http://host.docker.internal:6006';
 const envUrl = process.env.STORYBOOK_URL || DEFAULT_DOCKER_URL;

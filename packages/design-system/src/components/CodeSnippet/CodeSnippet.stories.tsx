@@ -32,12 +32,12 @@ function add(a, b) {
 
 export default add;`;
 
-const bashCode = `npm install @wallarm/sdk
+const bashCode = `npm install @wallarm-org/sdk
 npm run build
 npm run test`;
 
 const jsonCode = `{
-    "name": "@wallarm/sdk",
+    "name": "@wallarm-org/sdk",
     "version": "1.0.0",
     "dependencies": {
         "react": "^19.0.0",

@@ -1,5 +1,5 @@
 import { createRouter, RouterProvider } from '@tanstack/react-router';
-import { ThemeProvider } from '@wallarm/design-system/ThemeProvider';
+import { ThemeProvider } from '@wallarm-org/design-system/ThemeProvider';
 import { routeTree } from './routeTree.gen';
 
 import './App.css';

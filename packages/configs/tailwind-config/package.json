@@ -1,5 +1,5 @@
 {
-  "name": "@wallarm/tailwind-config",
+  "name": "@wallarm-org/tailwind-config",
   "version": "0.0.0",
   "type": "module",
   "private": true,

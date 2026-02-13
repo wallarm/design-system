@@ -1,5 +1,5 @@
 {
-  "extends": "@wallarm/typescript-config/react-library.json",
+  "extends": "@wallarm-org/typescript-config/react-library.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

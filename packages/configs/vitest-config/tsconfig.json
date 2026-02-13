@@ -1,5 +1,5 @@
 {
-  "extends": "@wallarm/typescript-config/base.json",
+  "extends": "@wallarm-org/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "./dist",
     "declaration": true,

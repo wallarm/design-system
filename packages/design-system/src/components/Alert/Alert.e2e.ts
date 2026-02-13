@@ -1,5 +1,5 @@
 import { expect, type Page, test } from '@playwright/test';
-import { createStoryHelper } from '@wallarm/playwright-config/storybook';
+import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 import type { AlertColor } from './Alert';
 
 const alertStory = createStoryHelper('messaging-alert', [

@@ -9,12 +9,7 @@ import { execSync } from 'node:child_process';
 import chalk from 'chalk';
 
 const PACKAGES = [
-  '@wallarm/design-system',
-  '@wallarm/eslint-config-wallarm',
-  '@wallarm/prettier-config-wallarm',
-  '@wallarm/stylelint-config-wallarm',
-  '@wallarm/tailwind-config-wallarm',
-  '@wallarm/tsconfig-wallarm',
+  '@wallarm-org/design-system',
 ];
 
 interface DistTag {
@@ -72,9 +67,9 @@ function main(): void {
     console.log(chalk.dim('─'.repeat(60)));
     console.log(chalk.bold.green('\n✨ Usage Examples:\n'));
     console.log('  Install specific RC:');
-    console.log('    npm install @wallarm/design-system@rc-button\n');
+    console.log('    npm install @wallarm-org/design-system@rc-button\n');
     console.log('  Install with alias:');
-    console.log('    npm install my-rc@npm:@wallarm/design-system@rc-button\n');
+    console.log('    npm install my-rc@npm:@wallarm-org/design-system@rc-button\n');
   }
 }
 

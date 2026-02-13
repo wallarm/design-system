@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-import { dockerConfig } from '@wallarm/playwright-config/docker';
+import { dockerConfig } from '@wallarm-org/playwright-config/docker';
 
 export default defineConfig({
   ...dockerConfig,

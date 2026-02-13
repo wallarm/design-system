@@ -4,7 +4,7 @@
   "globalPassThroughEnv": ["STORYBOOK_URL"],
   "tasks": {
     "dev": {
-      "dependsOn": ["@wallarm/design-system#build"],
+      "dependsOn": ["@wallarm-org/design-system#build"],
       "cache": true,
       "persistent": true
     },
@@ -26,7 +26,7 @@
       "dependsOn": ["^build", "^typecheck"]
     },
     "test": {
-      "dependsOn": ["@wallarm/vitest-config#build"],
+      "dependsOn": ["@wallarm-org/vitest-config#build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx}",
         "**/*.{test,spec}.{ts,tsx,js,jsx}",
@@ -36,7 +36,7 @@
       "outputs": ["coverage/**"]
     },
     "test:run": {
-      "dependsOn": ["@wallarm/vitest-config#build"],
+      "dependsOn": ["@wallarm-org/vitest-config#build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx}",
         "**/*.{test,spec}.{ts,tsx,js,jsx}",
@@ -46,7 +46,7 @@
       "outputs": ["coverage/**"]
     },
     "test:coverage": {
-      "dependsOn": ["@wallarm/vitest-config#build"],
+      "dependsOn": ["@wallarm-org/vitest-config#build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx}",
         "**/*.{test,spec}.{ts,tsx,js,jsx}",

@@ -19,8 +19,8 @@
           "options": {
             "groups": [
               "react*",
-              [":PACKAGE:", "!@wallarm/**/*"],
-              "@wallarm/*",
+              [":PACKAGE:", "!@wallarm-org/**/*"],
+              "@wallarm-org/*",
               "!**/*.{css,less,scss,sass}"
             ]
           }

@@ -153,19 +153,19 @@ pnpm release:alpha
 
 ```bash
 # Install latest stable
-npm install @wallarm/design-system
+npm install @wallarm-org/design-system
 
 # Install dev prerelease
-npm install @wallarm/design-system@dev
+npm install @wallarm-org/design-system@dev
 
 # Install alpha prerelease
-npm install @wallarm/design-system@alpha
+npm install @wallarm-org/design-system@alpha
 
 # Install beta prerelease
-npm install @wallarm/design-system@beta
+npm install @wallarm-org/design-system@beta
 
 # Install rc prerelease
-npm install @wallarm/design-system@rc
+npm install @wallarm-org/design-system@rc
 ```
 
 ## Package Configuration
@@ -180,7 +180,7 @@ The release process is configured in:
 
 The following packages are not published:
 
-- `@wallarm/playground` - Internal testing application
+- `@wallarm-org/playground` - Internal testing application
 
 ## Troubleshooting
 

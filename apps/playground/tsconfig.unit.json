@@ -1,5 +1,5 @@
 {
-  "extends": "@wallarm/typescript-config/unit.json",
+  "extends": "@wallarm-org/typescript-config/unit.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

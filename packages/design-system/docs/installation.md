@@ -15,13 +15,13 @@ Before you begin, make sure you have:
 
 ```bash
 # npm
-npm install @wallarm/design-system
+npm install @wallarm-org/design-system
 
 # yarn
-yarn add @wallarm/design-system
+yarn add @wallarm-org/design-system
 
 # pnpm
-pnpm add @wallarm/design-system
+pnpm add @wallarm-org/design-system
 ```
 
 ### Step 2: Install required peer dependencies
@@ -58,7 +58,7 @@ Create a CSS file for your application:
 @import 'tw-animate-css';
 @import 'non.geist';
 @import 'non.geist/mono';
-@import '@wallarm/design-system/theme';
+@import '@wallarm-org/design-system/theme';
 ```
 
 ### Step 4: Set up ThemeProvider and import styles
@@ -67,8 +67,8 @@ Wrap your application with `ThemeProvider`:
 
 ```tsx
 // App.tsx
-import { ThemeProvider } from '@wallarm/design-system/ThemeProvider';
-import { Button } from '@wallarm/design-system/Button';
+import { ThemeProvider } from '@wallarm-org/design-system/ThemeProvider';
+import { Button } from '@wallarm-org/design-system/Button';
 import './App.css';
 
 export const App = () => {
@@ -86,7 +86,7 @@ export const App = () => {
 
 **Solution**: Make sure that:
 
-1. Theme file `@wallarm/design-system/theme` is imported
+1. Theme file `@wallarm-org/design-system/theme` is imported
 2. Application is wrapped in `ThemeProvider`
 3. CSS imports are in the correct order
 
@@ -122,10 +122,10 @@ The library supports tree-shaking. Import only the components you need:
 
 ```tsx
 // ✅ Good - imports only Button
-import { Button } from '@wallarm/design-system/Button';
+import { Button } from '@wallarm-org/design-system/Button';
 
 // ❌ Bad - imports entire library
-import { Button } from '@wallarm/design-system';
+import { Button } from '@wallarm-org/design-system';
 ```
 
 ## 🎉 Done!

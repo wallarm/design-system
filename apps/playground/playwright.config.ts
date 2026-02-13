@@ -1,6 +1,6 @@
 import { defineConfig } from '@playwright/test';
 
-import { baseConfig } from '@wallarm/playwright-config/base';
+import { baseConfig } from '@wallarm-org/playwright-config/base';
 
 export default defineConfig({
   ...baseConfig,

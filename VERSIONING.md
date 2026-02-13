@@ -12,7 +12,7 @@ This project follows [Semantic Versioning 2.0.0](https://semver.org/) (SemVer) f
 
 ### NPM Package
 
-The `@wallarm/design-system` package is published to NPM registry and follows this versioning scheme:
+The `@wallarm-org/design-system` package is published to NPM registry and follows this versioning scheme:
 
 - **Major version (X.0.0)**: Breaking changes
 - **Minor version (0.X.0)**: New features, backward compatible
@@ -233,10 +233,10 @@ git commit -m "message" --no-verify
 1. Feature development on `feature/new-button` branch
 2. Add changeset with `pnpm changeset`
 3. PR to `dev` branch → Alpha version published automatically
-4. Testing in alpha: `npm install @wallarm/design-system@alpha`
+4. Testing in alpha: `npm install @wallarm-org/design-system@alpha`
 5. PR to `main` branch → Version PR created
 6. Merge version PR → Production release published
-7. Users update: `npm install @wallarm/design-system@latest`
+7. Users update: `npm install @wallarm-org/design-system@latest`
 
 ## Troubleshooting
 

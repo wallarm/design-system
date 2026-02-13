@@ -1,5 +1,5 @@
 {
-  "name": "@wallarm/playground",
+  "name": "@wallarm-org/playground",
   "version": "0.1.0",
   "description": "Playground application for testing and demonstrating Wallarm design system components",
   "private": true,
@@ -38,7 +38,7 @@
   "dependencies": {
     "@tanstack/react-router": "1.157.16",
     "@tanstack/router-devtools": "1.157.16",
-    "@wallarm/design-system": "workspace:*",
+    "@wallarm-org/design-system": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwindcss": "catalog:",
@@ -52,11 +52,11 @@
     "@types/react": "catalog:",
     "@types/react-dom": "catalog:",
     "@vitest/coverage-v8": "catalog:",
-    "@wallarm/playwright-config": "workspace:*",
-    "@wallarm/rsbuild-config": "workspace:*",
-    "@wallarm/tailwind-config": "workspace:*",
-    "@wallarm/typescript-config": "workspace:*",
-    "@wallarm/vitest-config": "workspace:*",
+    "@wallarm-org/playwright-config": "workspace:*",
+    "@wallarm-org/rsbuild-config": "workspace:*",
+    "@wallarm-org/tailwind-config": "workspace:*",
+    "@wallarm-org/typescript-config": "workspace:*",
+    "@wallarm-org/vitest-config": "workspace:*",
     "typescript": "catalog:",
     "vitest": "catalog:"
   }

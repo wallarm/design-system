@@ -1,5 +1,5 @@
 {
-  "name": "@wallarm/playwright-config",
+  "name": "@wallarm-org/playwright-config",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -17,7 +17,7 @@
     "allure-playwright": "catalog:"
   },
   "devDependencies": {
-    "@wallarm/typescript-config": "workspace:*",
+    "@wallarm-org/typescript-config": "workspace:*",
     "@types/node": "catalog:",
     "typescript": "catalog:"
   }

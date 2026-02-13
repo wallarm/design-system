@@ -1,4 +1,4 @@
 {
-  "extends": "@wallarm/typescript-config/unit.json",
+  "extends": "@wallarm-org/typescript-config/unit.json",
   "include": ["vitest.config.ts", "**/*.test.*", "**/*.spec.*"]
 }

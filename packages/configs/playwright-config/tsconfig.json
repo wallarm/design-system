@@ -1,5 +1,5 @@
 {
-  "extends": "@wallarm/typescript-config/nodejs.json",
+  "extends": "@wallarm-org/typescript-config/nodejs.json",
   "compilerOptions": {
     "outDir": "dist",
     "lib": ["ES2023", "DOM"]

@@ -1,3 +1,3 @@
-import { rsbuildConfig } from '@wallarm/rsbuild-config/rsbuild.config';
+import { rsbuildConfig } from '@wallarm-org/rsbuild-config/rsbuild.config';
 
 export default rsbuildConfig;

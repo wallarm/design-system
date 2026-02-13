@@ -1,5 +1,5 @@
 import { defineConfig } from '@playwright/test';
-import { baseConfig } from '@wallarm/playwright-config/base';
+import { baseConfig } from '@wallarm-org/playwright-config/base';
 
 const DEFAULT_URL = 'http://localhost:6006';
 const envUrl = process.env.STORYBOOK_URL || DEFAULT_URL;

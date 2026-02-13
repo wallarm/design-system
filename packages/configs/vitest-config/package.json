@@ -1,5 +1,5 @@
 {
-  "name": "@wallarm/vitest-config",
+  "name": "@wallarm-org/vitest-config",
   "version": "0.0.0",
   "type": "module",
   "private": true,
@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@types/node": "catalog:",
-    "@wallarm/typescript-config": "workspace:*",
+    "@wallarm-org/typescript-config": "workspace:*",
     "react": "catalog:",
     "react-dom": "catalog:",
     "typescript": "catalog:"

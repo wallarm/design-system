@@ -233,7 +233,7 @@ check_local_services() {
         echo -e "${BLUE}Checking Storybook on http://localhost:6006...${NC}"
         if ! curl -f http://localhost:6006 >/dev/null 2>&1; then
             echo -e "${RED}❌ Storybook is not running on http://localhost:6006${NC}"
-            echo -e "${YELLOW}Please start it with: pnpm --filter=@wallarm/ui dev${NC}"
+            echo -e "${YELLOW}Please start it with: pnpm --filter=@wallarm-org/ui dev${NC}"
             exit 1
         fi
         echo -e "${GREEN}✅ Storybook is running${NC}"
@@ -243,7 +243,7 @@ check_local_services() {
         echo -e "${BLUE}Checking Web app on http://localhost:3000...${NC}"
         if ! curl -f http://localhost:3000 >/dev/null 2>&1; then
             echo -e "${RED}❌ Web app is not running on http://localhost:3000${NC}"
-            echo -e "${YELLOW}Please start it with: pnpm --filter=@wallarm/web dev${NC}"
+            echo -e "${YELLOW}Please start it with: pnpm --filter=@wallarm-org/web dev${NC}"
             exit 1
         fi
         echo -e "${GREEN}✅ Web app is running${NC}"
@@ -263,9 +263,9 @@ run_local_tests() {
                 e2e_cmd="e2e:failed"
             fi
             if [[ "$VERBOSE" == "true" ]]; then
-                pnpm --filter=@wallarm/ui $e2e_cmd $PLAYWRIGHT_ARGS
+                pnpm --filter=@wallarm-org/ui $e2e_cmd $PLAYWRIGHT_ARGS
             else
-                pnpm --filter=@wallarm/ui $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
+                pnpm --filter=@wallarm-org/ui $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
             fi
             ;;
         web)
@@ -275,9 +275,9 @@ run_local_tests() {
                 e2e_cmd="e2e:failed"
             fi
             if [[ "$VERBOSE" == "true" ]]; then
-                pnpm --filter=@wallarm/web $e2e_cmd $PLAYWRIGHT_ARGS
+                pnpm --filter=@wallarm-org/web $e2e_cmd $PLAYWRIGHT_ARGS
             else
-                pnpm --filter=@wallarm/web $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
+                pnpm --filter=@wallarm-org/web $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
             fi
             ;;
         all)
@@ -287,16 +287,16 @@ run_local_tests() {
                 e2e_cmd="e2e:failed"
             fi
             if [[ "$VERBOSE" == "true" ]]; then
-                pnpm --filter=@wallarm/ui $e2e_cmd $PLAYWRIGHT_ARGS
+                pnpm --filter=@wallarm-org/ui $e2e_cmd $PLAYWRIGHT_ARGS
             else
-                pnpm --filter=@wallarm/ui $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
+                pnpm --filter=@wallarm-org/ui $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
             fi
 
             echo -e "${BLUE}Running Web E2E tests...${NC}"
             if [[ "$VERBOSE" == "true" ]]; then
-                pnpm --filter=@wallarm/web $e2e_cmd $PLAYWRIGHT_ARGS
+                pnpm --filter=@wallarm-org/web $e2e_cmd $PLAYWRIGHT_ARGS
             else
-                pnpm --filter=@wallarm/web $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
+                pnpm --filter=@wallarm-org/web $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
             fi
             ;;
     esac

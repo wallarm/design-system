@@ -29,13 +29,13 @@ services:
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm/design-system exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps webkit &&
         echo 'Running UI E2E tests...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
-          pnpm --filter=@wallarm/design-system exec playwright test --config=playwright.config.docker.ts;
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts;
         else
           echo "Running tests for: ${PLAYWRIGHT_ARGS}" &&
-          pnpm --filter=@wallarm/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS};
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS};
         fi
     profiles:
       - ui
@@ -67,13 +67,13 @@ services:
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm/design-system exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps webkit &&
         echo 'Updating UI E2E screenshots...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
-          pnpm --filter=@wallarm/design-system exec playwright test --config=playwright.config.docker.ts --update-snapshots;
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts --update-snapshots;
         else
           echo "Updating screenshots for: ${PLAYWRIGHT_ARGS}" &&
-          pnpm --filter=@wallarm/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS} --update-snapshots;
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS} --update-snapshots;
         fi
     profiles:
       - ui-update
@@ -105,13 +105,13 @@ services:
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm/playground exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/playground exec playwright install --with-deps webkit &&
         echo 'Running Web E2E tests...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
-          pnpm --filter=@wallarm/playground exec playwright test --config=playwright.config.docker.ts;
+          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts;
         else
           echo "Running tests for: ${PLAYWRIGHT_ARGS}" &&
-          pnpm --filter=@wallarm/playground exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS};
+          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS};
         fi
     profiles:
       - web
@@ -143,13 +143,13 @@ services:
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm/playground exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/playground exec playwright install --with-deps webkit &&
         echo 'Updating Web E2E screenshots...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
-          pnpm --filter=@wallarm/playground exec playwright test --config=playwright.config.docker.ts --update-snapshots;
+          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts --update-snapshots;
         else
           echo "Updating screenshots for: ${PLAYWRIGHT_ARGS}" &&
-          pnpm --filter=@wallarm/playground exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS} --update-snapshots;
+          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS} --update-snapshots;
         fi
     profiles:
       - web-update
@@ -177,16 +177,16 @@ services:
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm/design-system exec playwright install --with-deps webkit &&
-        pnpm --filter=@wallarm/playground exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/playground exec playwright install --with-deps webkit &&
         echo 'Running all E2E tests...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
-          pnpm --filter=@wallarm/design-system exec playwright test --config=playwright.config.docker.ts &&
-          pnpm --filter=@wallarm/playground exec playwright test --config=playwright.config.docker.ts;
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts &&
+          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts;
         else
           echo "Running tests for: ${PLAYWRIGHT_ARGS}" &&
-          pnpm --filter=@wallarm/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS} &&
-          pnpm --filter=@wallarm/playground exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS};
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS} &&
+          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS};
         fi
     profiles:
       - all

@@ -24,8 +24,8 @@ See [Installation Guide](docs/installation.md) for detailed setup instructions.
 
 ```tsx
 // App.tsx
-import { ThemeProvider } from '@wallarm/design-system/ThemeProvider';
-import { Button } from '@wallarm/design-system/Button';
+import { ThemeProvider } from '@wallarm-org/design-system/ThemeProvider';
+import { Button } from '@wallarm-org/design-system/Button';
 import 'non.geist';
 import 'non.geist/mono';
 import './App.css';
@@ -84,7 +84,7 @@ pnpm build
 ## 📖 Resources
 
 - [Storybook](https://wallarm.github.io/design-system/) - Interactive examples
-- [NPM](https://www.npmjs.com/package/@wallarm/design-system) - NPM package
+- [NPM](https://www.npmjs.com/package/@wallarm-org/design-system) - NPM package
 - [GitHub](https://github.com/wallarm/design-system) - Source code
 
 ## 📄 License

@@ -30,7 +30,7 @@ pnpm web:dev
 pnpm build
 
 # Build specific package
-pnpm build --filter=@wallarm/design-system
+pnpm build --filter=@wallarm-org/design-system
 ```
 
 ### Testing
@@ -84,17 +84,17 @@ wallarm-design-system/
 
 **Apps:**
 
-- `@wallarm/playground` - Playground application for testing and demonstrating components (Rsbuild + React + TypeScript)
+- `@wallarm-org/playground` - Playground application for testing and demonstrating components (Rsbuild + React + TypeScript)
 
 **Packages:**
 
-- `@wallarm/design-system` - Core design system library with React components and Storybook documentation
-- `@wallarm/eslint-config` - Shared ESLint configurations
-- `@wallarm/typescript-config` - Shared TypeScript configurations
-- `@wallarm/playwright-config` - Shared Playwright test configurations
-- `@wallarm/vitest-config` - Shared Vitest test configurations
-- `@wallarm/rsbuild-config` - Shared Rsbuild bundler configurations
-- `@wallarm/tailwind-config` - Shared Tailwind CSS configurations
+- `@wallarm-org/design-system` - Core design system library with React components and Storybook documentation
+- `@wallarm-org/eslint-config` - Shared ESLint configurations
+- `@wallarm-org/typescript-config` - Shared TypeScript configurations
+- `@wallarm-org/playwright-config` - Shared Playwright test configurations
+- `@wallarm-org/vitest-config` - Shared Vitest test configurations
+- `@wallarm-org/rsbuild-config` - Shared Rsbuild bundler configurations
+- `@wallarm-org/tailwind-config` - Shared Tailwind CSS configurations
 
 ## 🛠 Tech Stack
 

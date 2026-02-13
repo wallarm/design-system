@@ -51,3 +51,6 @@ yarn-error.log*
 
 # Tanstack Router
 .tanstack
+
+# Semantic Release backup
+package.json.backup

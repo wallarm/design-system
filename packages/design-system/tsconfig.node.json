@@ -1,5 +1,5 @@
 {
-  "extends": "@wallarm/typescript-config/nodejs.json",
+  "extends": "@wallarm-org/typescript-config/nodejs.json",
   "compilerOptions": {
     "composite": true,
     "noEmit": false,

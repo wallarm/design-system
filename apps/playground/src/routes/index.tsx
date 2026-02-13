@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Button } from '@wallarm/design-system/Button';
-import { Heading } from '@wallarm/design-system/Heading';
-import { VStack } from '@wallarm/design-system/Stack';
-import { Text } from '@wallarm/design-system/Text';
-import { useTheme } from '@wallarm/design-system/ThemeProvider';
+import { Button } from '@wallarm-org/design-system/Button';
+import { Heading } from '@wallarm-org/design-system/Heading';
+import { VStack } from '@wallarm-org/design-system/Stack';
+import { Text } from '@wallarm-org/design-system/Text';
+import { useTheme } from '@wallarm-org/design-system/ThemeProvider';
 
 export const Route = createFileRoute('/')({
   component: HomePage,

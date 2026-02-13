@@ -9,12 +9,12 @@ const __dirname = path.dirname(__filename);
 
 // Packages that should be published
 const PUBLISHABLE_PACKAGES = [
-  '@wallarm/design-system',
-  '@wallarm/eslint-config-wallarm',
-  '@wallarm/prettier-config-wallarm',
-  '@wallarm/stylelint-config-wallarm',
-  '@wallarm/tailwind-config-wallarm',
-  '@wallarm/tsconfig-wallarm',
+  '@wallarm-org/design-system',
+  '@wallarm-org/eslint-config-wallarm',
+  '@wallarm-org/prettier-config-wallarm',
+  '@wallarm-org/stylelint-config-wallarm',
+  '@wallarm-org/tailwind-config-wallarm',
+  '@wallarm-org/tsconfig-wallarm',
 ] as const;
 
 type PackageName = (typeof PUBLISHABLE_PACKAGES)[number];

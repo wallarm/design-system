@@ -62,7 +62,7 @@ For local updates:
 pnpm e2e:docker:update:ui
 
 # Without Docker
-pnpm --filter=@wallarm/design-system test:e2e --update-snapshots
+pnpm --filter=@wallarm-org/design-system test:e2e --update-snapshots
 ```
 
 ## Development Workflow
@@ -103,10 +103,10 @@ git push origin feature/awesome-button
 
 ```bash
 # Install specific feature RC
-npm install @wallarm/design-system@rc-awesome-button
+npm install @wallarm-org/design-system@rc-awesome-button
 
 # View all available RC versions
-npm view @wallarm/design-system dist-tags
+npm view @wallarm-org/design-system dist-tags
 
 # Test in your application
 # Share with QA team for testing
@@ -138,29 +138,29 @@ npm view @wallarm/design-system dist-tags
 
 ```bash
 # Latest stable version from main branch
-npm install @wallarm/design-system
+npm install @wallarm-org/design-system
 ```
 
 ### Feature RC Versions
 
 ```bash
 # Install specific feature RC
-npm install @wallarm/design-system@rc-button
-npm install @wallarm/design-system@rc-modal
-npm install @wallarm/design-system@rc-dark-mode
+npm install @wallarm-org/design-system@rc-button
+npm install @wallarm-org/design-system@rc-modal
+npm install @wallarm-org/design-system@rc-dark-mode
 
 # List all RC versions
-npm view @wallarm/design-system dist-tags | grep rc-
+npm view @wallarm-org/design-system dist-tags | grep rc-
 ```
 
 ## Version Examples
 
 | Branch              | Version Format         | npm Install Command                               |
 | ------------------- | ---------------------- | ------------------------------------------------- |
-| `main`              | `1.0.0`                | `npm install @wallarm/design-system`              |
-| `feature/button`    | `1.0.0-rc.button.1`    | `npm install @wallarm/design-system@rc-button`    |
-| `feature/modal`     | `1.0.0-rc.modal.1`     | `npm install @wallarm/design-system@rc-modal`     |
-| `feature/issue-123` | `1.0.0-rc.issue-123.1` | `npm install @wallarm/design-system@rc-issue-123` |
+| `main`              | `1.0.0`                | `npm install @wallarm-org/design-system`              |
+| `feature/button`    | `1.0.0-rc.button.1`    | `npm install @wallarm-org/design-system@rc-button`    |
+| `feature/modal`     | `1.0.0-rc.modal.1`     | `npm install @wallarm-org/design-system@rc-modal`     |
+| `feature/issue-123` | `1.0.0-rc.issue-123.1` | `npm install @wallarm-org/design-system@rc-issue-123` |
 
 ## What Happens Automatically
 
@@ -190,10 +190,10 @@ npm view @wallarm/design-system dist-tags | grep rc-
 
 ```bash
 # List all dist-tags
-npm view @wallarm/design-system dist-tags
+npm view @wallarm-org/design-system dist-tags
 
 # Filter RC versions only
-npm view @wallarm/design-system dist-tags | grep "rc-"
+npm view @wallarm-org/design-system dist-tags | grep "rc-"
 ```
 
 ### Clean Up Old RC Versions
@@ -201,19 +201,19 @@ npm view @wallarm/design-system dist-tags | grep "rc-"
 ```bash
 # RC versions are automatically deprecated after merge
 # Manual cleanup (if needed):
-npm deprecate @wallarm/design-system@1.0.0-rc.old-feature.1 "Feature merged to main"
+npm deprecate @wallarm-org/design-system@1.0.0-rc.old-feature.1 "Feature merged to main"
 ```
 
 ### Testing Multiple RCs
 
 ```bash
 # Install different RCs in different projects
-cd project-a && npm install @wallarm/design-system@rc-button
-cd project-b && npm install @wallarm/design-system@rc-modal
+cd project-a && npm install @wallarm-org/design-system@rc-button
+cd project-b && npm install @wallarm-org/design-system@rc-modal
 
 # Or use npm aliases
-npm install button-rc@npm:@wallarm/design-system@rc-button
-npm install modal-rc@npm:@wallarm/design-system@rc-modal
+npm install button-rc@npm:@wallarm-org/design-system@rc-button
+npm install modal-rc@npm:@wallarm-org/design-system@rc-modal
 ```
 
 ## Requirements
@@ -265,7 +265,7 @@ npm install modal-rc@npm:@wallarm/design-system@rc-modal
 
 ### Can't Install RC Version
 
-- Check exact tag name: `npm view @wallarm/design-system dist-tags`
+- Check exact tag name: `npm view @wallarm-org/design-system dist-tags`
 - Use full version if tag doesn't work: `@1.0.0-rc.button.1`
 
 ### Multiple Features with Same Version
@@ -291,7 +291,7 @@ git push origin feature/date-picker
 # Creates: 1.0.0-rc.date-picker.1
 
 # 4. Test RC
-npm install @wallarm/design-system@rc-date-picker
+npm install @wallarm-org/design-system@rc-date-picker
 
 # 5. Fix issues
 git commit -m "fix: timezone handling"
@@ -317,8 +317,8 @@ git checkout -b feature/tooltip main
 git push # → 1.0.0-rc.tooltip.1
 
 # Both can be tested independently
-npm install @wallarm/design-system@rc-calendar  # Team A's work
-npm install @wallarm/design-system@rc-tooltip   # Team B's work
+npm install @wallarm-org/design-system@rc-calendar  # Team A's work
+npm install @wallarm-org/design-system@rc-tooltip   # Team B's work
 
 # Merge when ready (in any order)
 ```
