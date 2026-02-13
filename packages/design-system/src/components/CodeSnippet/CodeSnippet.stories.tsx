@@ -1,4 +1,4 @@
-import type { Meta, StoryFn } from '@storybook/react';
+import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Info, Skull, TriangleAlert } from '../../icons';
 import { VStack } from '../Stack';
 import { loadHighlightJsAdapter, loadPrismAdapter, loadShikiAdapter } from './adapters';
@@ -9,7 +9,7 @@ import { CodeSnippetLineNumbers } from './CodeSnippetLineNumbers';
 import { CodeSnippetRoot } from './CodeSnippetRoot';
 
 const meta = {
-  title: 'Data display/CodeSnippet/CodeSnippet',
+  title: 'Data display/CodeSnippet',
   component: CodeSnippetRoot,
   parameters: {
     layout: 'padded',
