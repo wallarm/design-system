@@ -4,6 +4,9 @@ import { baseConfig } from './base.js';
 export const dockerConfig = defineConfig({
   ...baseConfig,
 
+  snapshotPathTemplate:
+    '{testDir}/{testFileDir}/{testFileName}-snapshots/{testName}-{projectName}{ext}',
+
   // Docker-specific configuration
   use: {
     ...baseConfig.use,
@@ -37,6 +40,14 @@ export const dockerConfig = defineConfig({
     ['html', { outputFolder: './playwright-report', open: 'never' }],
     ['junit', { outputFile: './test-results/junit.xml' }],
     ['list'],
+    [
+      'allure-playwright',
+      {
+        detail: true,
+        resultsDir: './allure-results',
+        suiteTitle: false,
+      },
+    ],
   ],
 
   // Global setup/teardown

@@ -17,6 +17,8 @@ node_modules
 coverage
 playwright-report
 test-results
+allure-results
+allure-report
 
 # Turbo
 .turbo
@@ -45,7 +47,6 @@ yarn-error.log*
 # IDEs
 .idea
 .vscode
-.env
 .mcp.json
 
 # Tanstack Router

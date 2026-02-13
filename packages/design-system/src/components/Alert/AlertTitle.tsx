@@ -1,4 +1,4 @@
-import type { FC, ReactNode, Ref } from 'react';
+import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -6,7 +6,7 @@ import {
 } from '../OverflowTooltip';
 import { Text } from '../Text';
 
-export interface AlertTitleProps {
+export interface AlertTitleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   ref?: Ref<HTMLDivElement>;
   children: ReactNode;
   /** Maximum number of lines before truncation (default: 4). Set to 0 to disable truncation. */
@@ -20,10 +20,10 @@ export interface AlertTitleProps {
  * Supports text truncation with configurable max lines.
  * Shows a tooltip with full text when content is truncated.
  */
-export const AlertTitle: FC<AlertTitleProps> = ({ ref, children, lineClamp }) => (
+export const AlertTitle: FC<AlertTitleProps> = ({ ref, children, lineClamp, ...props }) => (
   <OverflowTooltip>
     <OverflowTooltipTrigger>
-      <Text ref={ref} size='sm' weight='medium' color='primary' lineClamp={lineClamp}>
+      <Text {...props} ref={ref} size='sm' weight='medium' color='primary' lineClamp={lineClamp}>
         {children}
       </Text>
     </OverflowTooltipTrigger>
