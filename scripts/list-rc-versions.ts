@@ -10,11 +10,6 @@ import chalk from 'chalk';
 
 const PACKAGES = [
   '@wallarm/design-system',
-  '@wallarm/eslint-config-wallarm',
-  '@wallarm/prettier-config-wallarm',
-  '@wallarm/stylelint-config-wallarm',
-  '@wallarm/tailwind-config-wallarm',
-  '@wallarm/tsconfig-wallarm',
 ];
 
 interface DistTag {
