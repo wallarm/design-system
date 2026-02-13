@@ -71,7 +71,7 @@
         "noExtraBooleanCast": "error",
         "noUselessCatch": "error",
         "noUselessConstructor": "error",
-        "noUselessFragments": "warn",
+        "noUselessFragments": "off",
         "noUselessLabel": "error",
         "noUselessLoneBlockStatements": "error",
         "noUselessRename": "error",
@@ -313,7 +313,12 @@
     },
     {
       "includes": ["**/*.stories.{ts,tsx,js,jsx,mjs,cjs}"],
-      "linter": { "rules": { "correctness": { "useHookAtTopLevel": "off" } } }
+      "linter": {
+        "rules": {
+          "correctness": { "useHookAtTopLevel": "off" },
+          "suspicious": { "noConsole": "off", "noArrayIndexKey": "off" }
+        }
+      }
     },
     {
       "includes": ["**/.storybook/main.{js,cjs,mjs,ts}"],

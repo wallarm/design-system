@@ -1,6 +1,6 @@
-import { type FC, useState } from 'react';
+import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react';
-import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import type { Meta, StoryObj } from '@storybook/react';
 import { Flex } from '../components/Flex';
 import { Heading } from '../components/Heading';
 import { Input } from '../components/Input';
@@ -29,6 +29,23 @@ import { ArrowRight } from './ArrowRight';
 import { ArrowUp } from './ArrowUp';
 import { ArrowUpLeft } from './ArrowUpLeft';
 import { ArrowUpRight } from './ArrowUpRight';
+import { Calendar } from './Calendar';
+import { CalendarCheck } from './CalendarCheck';
+import { CalendarCheck2 } from './CalendarCheck2';
+import { CalendarClock } from './CalendarClock';
+import { CalendarCog } from './CalendarCog';
+import { CalendarDays } from './CalendarDays';
+import { CalendarFold } from './CalendarFold';
+import { CalendarHeart } from './CalendarHeart';
+import { CalendarMinus } from './CalendarMinus';
+import { CalendarMinus2 } from './CalendarMinus2';
+import { CalendarOff } from './CalendarOff';
+import { CalendarPlus } from './CalendarPlus';
+import { CalendarPlus2 } from './CalendarPlus2';
+import { CalendarRange } from './CalendarRange';
+import { CalendarSearch } from './CalendarSearch';
+import { CalendarX } from './CalendarX';
+import { CalendarX2 } from './CalendarX2';
 import { Check } from './Check';
 import { CheckCheck } from './CheckCheck';
 import { ChevronDown } from './ChevronDown';
@@ -61,6 +78,7 @@ import { CircleDotDashed } from './CircleDotDashed';
 import { CircleEllipsis } from './CircleEllipsis';
 import { CircleHelp } from './CircleHelp';
 import { CirclePlus } from './CirclePlus';
+import { Clock } from './Clock';
 import { Command } from './Command';
 import { Ctrl } from './Ctrl';
 import { Dot } from './Dot';
@@ -118,6 +136,9 @@ import { MessagesSquare } from './MessagesSquare';
 import { Minus } from './Minus';
 import { Mouse } from './Mouse';
 import { Move3D } from './Move3D';
+import { NotebookPen } from './NotebookPen';
+import { NotepadText } from './NotepadText';
+import { OctagonAlert } from './OctagonAlert';
 import { PanelBottom } from './PanelBottom';
 import { PanelBottomOpen } from './PanelBottomOpen';
 import { PanelRight } from './PanelRight';
@@ -148,7 +169,7 @@ import { SlidersHorizontal } from './SlidersHorizontal';
 import { SlidersVertical } from './SlidersVertical';
 import { Space } from './Space';
 import { SquareArrowOutUpRight } from './SquareArrowOutUpRight';
-import { SvgIcon, type SvgIconProps, type SvgIconSize } from './SvgIcon';
+import type { SvgIconSize } from './SvgIcon';
 import { Trash } from './Trash';
 import { Trash2 } from './Trash2';
 import { TriangleAlert } from './TriangleAlert';
@@ -221,6 +242,26 @@ const iconCategories = {
     Search,
     Info,
   },
+  'Calendar & Time': {
+    Calendar,
+    CalendarCheck,
+    CalendarCheck2,
+    CalendarClock,
+    CalendarCog,
+    CalendarDays,
+    CalendarFold,
+    CalendarHeart,
+    CalendarMinus,
+    CalendarMinus2,
+    CalendarOff,
+    CalendarPlus,
+    CalendarPlus2,
+    CalendarRange,
+    CalendarSearch,
+    CalendarX,
+    CalendarX2,
+    Clock,
+  },
   'Keyboard Keys': {
     Alt,
     Command,
@@ -258,12 +299,17 @@ const iconCategories = {
   Movement: {
     Move3D,
   },
+  Notes: {
+    NotebookPen,
+    NotepadText,
+  },
   'Mouse & Pointers': {
     Mouse,
   },
   Shapes: {
     Pentagon,
     TriangleAlert,
+    OctagonAlert,
     Dot,
   },
   'Editing Tools': {
@@ -349,7 +395,6 @@ const iconCategories = {
 
 const meta: Meta = {
   title: 'Primitives/Icons',
-  component: SvgIcon,
   parameters: {
     layout: 'centered',
     docs: {
@@ -362,9 +407,9 @@ const meta: Meta = {
 
 export default meta;
 
-type Story = StoryFn<typeof meta>;
+type Story = StoryObj;
 
-const IconGrid = ({ icons, title }: { icons: Record<string, FC<SvgIconProps>>; title: string }) => {
+const IconGrid = ({ icons, title }: { icons: Record<string, any>; title: string }) => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSize, setSelectedSize] = useState<SvgIconSize>('md');
 
@@ -442,82 +487,86 @@ const IconGrid = ({ icons, title }: { icons: Record<string, FC<SvgIconProps>>; t
             padding: '40px',
           }}
         >
-          <Text color='secondary'>No icons found matching &#34;{searchTerm}&#34;</Text>
+          <Text color='secondary'>No icons found matching "{searchTerm}"</Text>
         </div>
       )}
     </VStack>
   );
 };
 
-export const AllIcons: Story = () => {
-  const [selectedCategory, setSelectedCategory] = useState<string>('All');
+export const AllIcons: Story = {
+  render: () => {
+    const [selectedCategory, setSelectedCategory] = useState<string>('All');
 
-  const allIcons = Object.values(iconCategories).reduce((acc, categoryIcons) => {
-    return { ...acc, ...categoryIcons };
-  }, {});
+    const allIcons = Object.values(iconCategories).reduce((acc, categoryIcons) => {
+      return { ...acc, ...categoryIcons };
+    }, {});
 
-  const displayIcons =
-    selectedCategory === 'All'
-      ? allIcons
-      : iconCategories[selectedCategory as keyof typeof iconCategories] || {};
+    const displayIcons =
+      selectedCategory === 'All'
+        ? allIcons
+        : iconCategories[selectedCategory as keyof typeof iconCategories] || {};
 
-  return (
-    <VStack spacing={20} align='stretch'>
-      <Flex gap={8} wrap='wrap'>
-        <ToggleButton
-          active={selectedCategory === 'All'}
-          onToggle={() => setSelectedCategory('All')}
-        >
-          All ({Object.keys(allIcons).length})
-        </ToggleButton>
-        {Object.keys(iconCategories).map(category => (
+    return (
+      <VStack spacing={20} align='stretch'>
+        <Flex gap={8} wrap='wrap'>
           <ToggleButton
-            key={category}
-            active={selectedCategory === category}
-            onToggle={() => setSelectedCategory(category)}
+            active={selectedCategory === 'All'}
+            onToggle={() => setSelectedCategory('All')}
           >
-            {category} (
-            {Object.keys(iconCategories[category as keyof typeof iconCategories]).length})
+            All ({Object.keys(allIcons).length})
           </ToggleButton>
-        ))}
-      </Flex>
+          {Object.keys(iconCategories).map(category => (
+            <ToggleButton
+              key={category}
+              active={selectedCategory === category}
+              onToggle={() => setSelectedCategory(category)}
+            >
+              {category} (
+              {Object.keys(iconCategories[category as keyof typeof iconCategories]).length})
+            </ToggleButton>
+          ))}
+        </Flex>
 
-      <IconGrid
-        icons={displayIcons}
-        title={selectedCategory === 'All' ? 'All Icons' : selectedCategory}
-      />
-    </VStack>
-  );
+        <IconGrid
+          icons={displayIcons}
+          title={selectedCategory === 'All' ? 'All Icons' : selectedCategory}
+        />
+      </VStack>
+    );
+  },
 };
 
-export const IconSizes: Story = () => (
-  <div style={{ padding: '20px' }}>
-    <h3 style={{ marginBottom: '20px' }}>Icon Sizes</h3>
-    <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
-      <div style={{ textAlign: 'center' }}>
-        <Check size='xs' title='Check icon XS' />
-        <div style={{ fontSize: '12px', marginTop: '4px' }}>XS</div>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <Check size='sm' title='Check icon SM' />
-        <div style={{ fontSize: '12px', marginTop: '4px' }}>SM</div>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <Check size='md' title='Check icon MD' />
-        <div style={{ fontSize: '12px', marginTop: '4px' }}>MD</div>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <Check size='lg' title='Check icon LG' />
-        <div style={{ fontSize: '12px', marginTop: '4px' }}>LG</div>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <Check size='xl' title='Check icon XL' />
-        <div style={{ fontSize: '12px', marginTop: '4px' }}>XL</div>
-      </div>
-      <div style={{ textAlign: 'center' }}>
-        <Check size='2xl' title='Check icon 2XL' />
-        <div style={{ fontSize: '12px', marginTop: '4px' }}>2XL</div>
+export const IconSizes: Story = {
+  render: () => (
+    <div style={{ padding: '20px' }}>
+      <h3 style={{ marginBottom: '20px' }}>Icon Sizes</h3>
+      <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <Check size='xs' title='Check icon XS' />
+          <div style={{ fontSize: '12px', marginTop: '4px' }}>XS</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <Check size='sm' title='Check icon SM' />
+          <div style={{ fontSize: '12px', marginTop: '4px' }}>SM</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <Check size='md' title='Check icon MD' />
+          <div style={{ fontSize: '12px', marginTop: '4px' }}>MD</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <Check size='lg' title='Check icon LG' />
+          <div style={{ fontSize: '12px', marginTop: '4px' }}>LG</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <Check size='xl' title='Check icon XL' />
+          <div style={{ fontSize: '12px', marginTop: '4px' }}>XL</div>
+        </div>
+        <div style={{ textAlign: 'center' }}>
+          <Check size='2xl' title='Check icon 2XL' />
+          <div style={{ fontSize: '12px', marginTop: '4px' }}>2XL</div>
+        </div>
       </div>
     </div>
-  </div>
-);
+  ),
+};

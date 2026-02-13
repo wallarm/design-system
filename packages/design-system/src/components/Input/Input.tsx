@@ -15,7 +15,13 @@ export type InputProps = InputNativeProps &
     ref?: Ref<HTMLInputElement>;
   };
 
-export const Input: FC<InputProps> = ({ className, error = false, disabled = false, ...props }) => {
+export const Input: FC<InputProps> = ({
+  className,
+  error = false,
+  disabled = false,
+  ref,
+  ...props
+}) => {
   const field = useFieldContext();
   const mergedProps = mergeProps<HTMLProps<'input'>>(field?.getInputProps(), props);
 
@@ -27,6 +33,8 @@ export const Input: FC<InputProps> = ({ className, error = false, disabled = fal
       disabled={disabled}
       aria-invalid={Boolean(error)}
       aria-disabled={disabled}
+      ref={ref}
+      data-slot='input'
     />
   );
 };

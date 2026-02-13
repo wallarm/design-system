@@ -9,6 +9,7 @@ const config: StorybookConfig = {
     getAbsolutePath('@storybook/addon-docs'),
     getAbsolutePath('@storybook/addon-mcp'),
     getAbsolutePath('@storybook/addon-themes'),
+    getAbsolutePath('storybook-addon-tag-badges'),
   ],
   features: {
     experimentalComponentsManifest: true,

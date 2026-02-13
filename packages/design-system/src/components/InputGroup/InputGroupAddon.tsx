@@ -29,7 +29,7 @@ const inputGroupAddonVariants = cva(
       },
       variant: {
         outline: 'px-12 bg-states-primary-default-alt border-border-primary',
-        ghost: '[&:not(:has([data-scope=select]))+input]:px-0',
+        ghost: '[&:not(:has([data-scope=select]))+[data-slot=input]]:px-0',
       },
     },
     defaultVariants: {

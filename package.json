@@ -77,6 +77,11 @@
     "turbo": "2.7.6",
     "typescript": "catalog:"
   },
+  "pnpm": {
+    "overrides": {
+      "@internationalized/date": "3.11.0"
+    }
+  },
   "packageManager": "pnpm@10.22.0",
   "engines": {
     "node": ">=24"
