@@ -36,7 +36,7 @@ export const baseConfig = defineConfig({
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/{testFileName}-snapshots/{testName}-{projectName}{ext}',
   expect: {
-    toHaveScreenshot: { maxDiffPixelRatio: 0.2 },
+    toHaveScreenshot: { maxDiffPixelRatio: 0.02, threshold: 0.15 },
   },
   // webServer will be overridden in specific projects
 });

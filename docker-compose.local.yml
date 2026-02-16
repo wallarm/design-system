@@ -11,9 +11,9 @@ services:
       - node_modules:/app/node_modules
       - playwright_cache:/ms-playwright
       # Map test directories for screenshot updates
-      - ./packages/ui/src:/app/packages/ui/src:delegated
-      - ./packages/ui/test-results:/app/packages/ui/test-results:delegated
-      - ./packages/ui/playwright-report:/app/packages/ui/playwright-report:delegated
+      - ./packages/design-system/src:/app/packages/design-system/src:delegated
+      - ./packages/design-system/test-results:/app/packages/design-system/test-results:delegated
+      - ./packages/design-system/playwright-report:/app/packages/design-system/playwright-report:delegated
     environment:
       - NODE_ENV=test
       - CI=false
@@ -25,17 +25,17 @@ services:
       - -c
       - |
         echo 'Setting up pnpm...' &&
-        npm install -g pnpm@10.22.0 &&
+        npm install -g pnpm@10.29.3 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps chromium &&
         echo 'Running UI E2E tests...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
-          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts;
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts --project=chromium;
         else
           echo "Running tests for: ${PLAYWRIGHT_ARGS}" &&
-          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS};
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts --project=chromium ${PLAYWRIGHT_ARGS};
         fi
     profiles:
       - ui
@@ -49,9 +49,9 @@ services:
       - node_modules:/app/node_modules
       - playwright_cache:/ms-playwright
       # Map test directories for screenshot updates
-      - ./packages/ui/src:/app/packages/ui/src:delegated
-      - ./packages/ui/test-results:/app/packages/ui/test-results:delegated
-      - ./packages/ui/playwright-report:/app/packages/ui/playwright-report:delegated
+      - ./packages/design-system/src:/app/packages/design-system/src:delegated
+      - ./packages/design-system/test-results:/app/packages/design-system/test-results:delegated
+      - ./packages/design-system/playwright-report:/app/packages/design-system/playwright-report:delegated
     environment:
       - NODE_ENV=test
       - CI=false
@@ -63,17 +63,17 @@ services:
       - -c
       - |
         echo 'Setting up pnpm...' &&
-        npm install -g pnpm@10.22.0 &&
+        npm install -g pnpm@10.29.3 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps chromium &&
         echo 'Updating UI E2E screenshots...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
-          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts --update-snapshots;
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts --project=chromium --update-snapshots;
         else
           echo "Updating screenshots for: ${PLAYWRIGHT_ARGS}" &&
-          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS} --update-snapshots;
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts --project=chromium ${PLAYWRIGHT_ARGS} --update-snapshots;
         fi
     profiles:
       - ui-update
@@ -101,11 +101,11 @@ services:
       - -c
       - |
         echo 'Setting up pnpm...' &&
-        npm install -g pnpm@10.22.0 &&
+        npm install -g pnpm@10.29.3 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm-org/playground exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/playground exec playwright install --with-deps chromium &&
         echo 'Running Web E2E tests...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
           pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts;
@@ -139,11 +139,11 @@ services:
       - -c
       - |
         echo 'Setting up pnpm...' &&
-        npm install -g pnpm@10.22.0 &&
+        npm install -g pnpm@10.29.3 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm-org/playground exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/playground exec playwright install --with-deps chromium &&
         echo 'Updating Web E2E screenshots...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
           pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts --update-snapshots;
@@ -173,20 +173,20 @@ services:
       - -c
       - |
         echo 'Setting up pnpm...' &&
-        npm install -g pnpm@10.22.0 &&
+        npm install -g pnpm@10.29.3 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps webkit &&
-        pnpm --filter=@wallarm-org/playground exec playwright install --with-deps webkit &&
+        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps chromium &&
+        pnpm --filter=@wallarm-org/playground exec playwright install --with-deps chromium &&
         echo 'Running all E2E tests...' &&
         if [ -z "${PLAYWRIGHT_ARGS}" ]; then
-          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts &&
-          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts;
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts --project=chromium &&
+          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts --project=chromium;
         else
           echo "Running tests for: ${PLAYWRIGHT_ARGS}" &&
-          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS} &&
-          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS};
+          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts --project=chromium ${PLAYWRIGHT_ARGS} &&
+          pnpm --filter=@wallarm-org/playground exec playwright test --config=playwright.config.docker.ts --project=chromium ${PLAYWRIGHT_ARGS};
         fi
     profiles:
       - all
