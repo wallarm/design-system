@@ -1,3 +1,8 @@
+## 0.2.0-rc-feat-code-snippet-actions.1 (2026-02-16)
+
+* test: Code snippet ([a40dc55](https://github.com/wallarm/design-system/commit/a40dc55))
+* feat: Code snippet actions ([c98f4e5](https://github.com/wallarm/design-system/commit/c98f4e5))
+
 ## 0.1.0 (2026-02-13)
 
 * feat: release flow (#11) ([2c9401e](https://github.com/wallarm/design-system/commit/2c9401e)), closes [#11](https://github.com/wallarm/design-system/issues/11)
