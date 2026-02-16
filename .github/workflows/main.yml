@@ -17,7 +17,7 @@ permissions:
 
 env:
   NODE_VERSION: "24"
-  PNPM_VERSION: "10.22.0"
+  PNPM_VERSION: "10.29.3"
   SCREENSHOT_COMMIT_MESSAGE: "🖼️ Update screenshots"
   ALLURE_ENDPOINT: ${{ vars.ALLURE_ENDPOINT }}
   ALLURE_PROJECT_ID: ${{ vars.ALLURE_PROJECT_ID }}
