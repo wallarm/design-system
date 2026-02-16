@@ -64,8 +64,7 @@ Special triggers:
 
 For complex domain-specific tasks, use specialized agents through routing in [AGENTS.md](./AGENTS.md):
 
-- **UI Agent** (`/ui`) - Component development, Storybook
-- **Web Agent** (`/web`) - Application features, routing
+- **Design System Agent** (`/design-system`) - Component development, Storybook
 - **Test Agent** (`/test`) - Testing strategies, coverage
 - **CI/CD Agent** (`/ci`) - Pipeline optimization, deployment
 
