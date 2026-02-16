@@ -18,6 +18,10 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT_DIR="$(dirname "$SCRIPT_DIR")"
 DOCKER_COMPOSE_FILE="$ROOT_DIR/docker-compose.local.yml"
 
+# Extract Playwright version from pnpm-workspace.yaml catalog (single source of truth)
+PLAYWRIGHT_VERSION=$(grep "@playwright/test" "$ROOT_DIR/pnpm-workspace.yaml" | sed "s/.*: *//")
+export PLAYWRIGHT_VERSION
+
 # Default values
 COMPONENT=""
 CLEANUP=true
@@ -35,9 +39,8 @@ Usage: $0 [OPTIONS] [COMPONENT] [-- PLAYWRIGHT_ARGS]
 Run Playwright E2E tests locally or in Docker
 
 COMPONENT:
-    ui      Run UI (Storybook) E2E tests
-    web     Run Web application E2E tests
-    all     Run all E2E tests (default)
+    design-system   Run Design System (Storybook) E2E tests
+    all             Run all E2E tests (default)
 
     Note: Component will be auto-detected from test file paths if not specified
 
@@ -53,19 +56,17 @@ PLAYWRIGHT_ARGS:
     Any arguments after -- will be passed directly to Playwright
 
 EXAMPLES:
-    $0                  # Run all E2E tests locally
-    $0 ui              # Run only UI E2E tests locally
-    $0 web             # Run only Web E2E tests locally
-    $0 --docker ui     # Run UI tests in Docker
-    $0 --docker --update ui  # Update UI screenshots in Docker
-    $0 --failed ui     # Run only previously failed UI tests locally
-    $0 --docker --failed ui  # Run only previously failed UI tests in Docker
-    $0 --verbose web   # Run Web tests with verbose output
-    $0 ui -- packages/ui/src/components/Logo/Logo.e2e.ts  # Run specific test file
-    $0 -- packages/ui/src/components/Logo/Logo.e2e.ts    # Auto-detect UI from path
-    $0 --docker ui -- -g "Logo Business"  # Run tests matching pattern in Docker
-    $0 --docker -- packages/ui/src/components/Logo/Logo.e2e.ts  # Auto-detect in Docker
-    $0 ui -- --project=webkit  # Run tests only in webkit browser
+    $0                              # Run all E2E tests locally
+    $0 design-system                # Run only Design System E2E tests locally
+    $0 --docker design-system       # Run Design System tests in Docker
+    $0 --docker --update design-system  # Update Design System screenshots in Docker
+    $0 --failed design-system       # Run only previously failed Design System tests locally
+    $0 --docker --failed design-system  # Run only previously failed Design System tests in Docker
+    $0 design-system -- packages/design-system/src/components/Alert/Alert.e2e.ts  # Run specific test file
+    $0 -- packages/design-system/src/components/Alert/Alert.e2e.ts    # Auto-detect from path
+    $0 --docker design-system -- -g "Alert"  # Run tests matching pattern in Docker
+    $0 --docker -- packages/design-system/src/components/Logo/Logo.e2e.ts  # Auto-detect in Docker
+    $0 design-system -- --project=chromium  # Run tests only in chromium browser
 
 PREREQUISITES:
     Local mode: Apps must be running (pnpm dev)
@@ -101,7 +102,7 @@ while [[ $# -gt 0 ]]; do
             CLEANUP=false
             shift
             ;;
-        ui|web|all)
+        design-system|all)
             COMPONENT="$1"
             shift
             ;;
@@ -121,17 +122,11 @@ done
 
 # Auto-detect component from test file path if not specified and args provided
 if [[ -z "$COMPONENT" && -n "$PLAYWRIGHT_ARGS" ]]; then
-    if [[ "$PLAYWRIGHT_ARGS" == *"packages/ui/"* ]]; then
-        COMPONENT="ui"
-        echo -e "${YELLOW}Auto-detected component: ui (based on test path)${NC}"
-        # Convert full path to relative path for UI package
-        PLAYWRIGHT_ARGS=$(echo "$PLAYWRIGHT_ARGS" | sed 's|packages/ui/||g')
-        echo -e "${YELLOW}Converted path: $PLAYWRIGHT_ARGS${NC}"
-    elif [[ "$PLAYWRIGHT_ARGS" == *"apps/web/"* ]]; then
-        COMPONENT="web"
-        echo -e "${YELLOW}Auto-detected component: web (based on test path)${NC}"
-        # Convert full path to relative path for Web package
-        PLAYWRIGHT_ARGS=$(echo "$PLAYWRIGHT_ARGS" | sed 's|apps/web/||g')
+    if [[ "$PLAYWRIGHT_ARGS" == *"packages/design-system/"* ]]; then
+        COMPONENT="design-system"
+        echo -e "${YELLOW}Auto-detected component: design-system (based on test path)${NC}"
+        # Convert full path to relative path for Design System package
+        PLAYWRIGHT_ARGS=$(echo "$PLAYWRIGHT_ARGS" | sed 's|packages/design-system/||g')
         echo -e "${YELLOW}Converted path: $PLAYWRIGHT_ARGS${NC}"
     fi
 fi
@@ -205,15 +200,8 @@ cleanup() {
         # Determine profile based on mode
         local profile="$COMPONENT"
         if [[ "$UPDATE_SNAPSHOTS" == "true" ]]; then
-            if [[ "$COMPONENT" == "ui" ]]; then
-                profile="ui-update"
-            elif [[ "$COMPONENT" == "web" ]]; then
-                profile="web-update"
-            elif [[ "$COMPONENT" == "all" ]]; then
-                # Clean both update profiles
-                docker-compose -f "$DOCKER_COMPOSE_FILE" --profile "ui-update" down --volumes --remove-orphans 2>/dev/null || true
-                docker-compose -f "$DOCKER_COMPOSE_FILE" --profile "web-update" down --volumes --remove-orphans 2>/dev/null || true
-                return
+            if [[ "$COMPONENT" == "design-system" || "$COMPONENT" == "all" ]]; then
+                profile="design-system-update"
             fi
         fi
         docker-compose -f "$DOCKER_COMPOSE_FILE" --profile "$profile" down --volumes --remove-orphans 2>/dev/null || true
@@ -229,24 +217,14 @@ trap cleanup EXIT
 check_local_services() {
     echo -e "${BLUE}🔍 Checking if local services are running...${NC}"
 
-    if [[ "$COMPONENT" == "ui" || "$COMPONENT" == "all" ]]; then
+    if [[ "$COMPONENT" == "design-system" || "$COMPONENT" == "all" ]]; then
         echo -e "${BLUE}Checking Storybook on http://localhost:6006...${NC}"
         if ! curl -f http://localhost:6006 >/dev/null 2>&1; then
             echo -e "${RED}❌ Storybook is not running on http://localhost:6006${NC}"
-            echo -e "${YELLOW}Please start it with: pnpm --filter=@wallarm-org/ui dev${NC}"
+            echo -e "${YELLOW}Please start it with: pnpm --filter=@wallarm-org/design-system dev${NC}"
             exit 1
         fi
         echo -e "${GREEN}✅ Storybook is running${NC}"
-    fi
-
-    if [[ "$COMPONENT" == "web" || "$COMPONENT" == "all" ]]; then
-        echo -e "${BLUE}Checking Web app on http://localhost:3000...${NC}"
-        if ! curl -f http://localhost:3000 >/dev/null 2>&1; then
-            echo -e "${RED}❌ Web app is not running on http://localhost:3000${NC}"
-            echo -e "${YELLOW}Please start it with: pnpm --filter=@wallarm-org/web dev${NC}"
-            exit 1
-        fi
-        echo -e "${GREEN}✅ Web app is running${NC}"
     fi
 }
 
@@ -256,47 +234,16 @@ run_local_tests() {
     echo -e "${BLUE}🧪 Running $component E2E tests locally...${NC}"
 
     case $component in
-        ui)
-            echo -e "${BLUE}Running UI E2E tests...${NC}"
+        design-system|all)
+            echo -e "${BLUE}Running Design System E2E tests...${NC}"
             local e2e_cmd="e2e"
             if [[ "$FAILED_ONLY" == "true" ]]; then
                 e2e_cmd="e2e:failed"
             fi
             if [[ "$VERBOSE" == "true" ]]; then
-                pnpm --filter=@wallarm-org/ui $e2e_cmd $PLAYWRIGHT_ARGS
+                pnpm --filter=@wallarm-org/design-system $e2e_cmd $PLAYWRIGHT_ARGS
             else
-                pnpm --filter=@wallarm-org/ui $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
-            fi
-            ;;
-        web)
-            echo -e "${BLUE}Running Web E2E tests...${NC}"
-            local e2e_cmd="e2e"
-            if [[ "$FAILED_ONLY" == "true" ]]; then
-                e2e_cmd="e2e:failed"
-            fi
-            if [[ "$VERBOSE" == "true" ]]; then
-                pnpm --filter=@wallarm-org/web $e2e_cmd $PLAYWRIGHT_ARGS
-            else
-                pnpm --filter=@wallarm-org/web $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
-            fi
-            ;;
-        all)
-            echo -e "${BLUE}Running UI E2E tests...${NC}"
-            local e2e_cmd="e2e"
-            if [[ "$FAILED_ONLY" == "true" ]]; then
-                e2e_cmd="e2e:failed"
-            fi
-            if [[ "$VERBOSE" == "true" ]]; then
-                pnpm --filter=@wallarm-org/ui $e2e_cmd $PLAYWRIGHT_ARGS
-            else
-                pnpm --filter=@wallarm-org/ui $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
-            fi
-
-            echo -e "${BLUE}Running Web E2E tests...${NC}"
-            if [[ "$VERBOSE" == "true" ]]; then
-                pnpm --filter=@wallarm-org/web $e2e_cmd $PLAYWRIGHT_ARGS
-            else
-                pnpm --filter=@wallarm-org/web $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
+                pnpm --filter=@wallarm-org/design-system $e2e_cmd $PLAYWRIGHT_ARGS > /dev/null 2>&1
             fi
             ;;
     esac
@@ -314,33 +261,8 @@ run_docker_tests() {
     # Determine profile based on mode and component
     local profile="$component"
     if [[ "$UPDATE_SNAPSHOTS" == "true" ]]; then
-        if [[ "$component" == "ui" ]]; then
-            profile="ui-update"
-        elif [[ "$component" == "web" ]]; then
-            profile="web-update"
-        elif [[ "$component" == "all" ]]; then
-            # Set Playwright args as environment variable for Docker containers
-            if [[ -n "$PLAYWRIGHT_ARGS" ]]; then
-                export PLAYWRIGHT_ARGS
-            fi
-
-            # Run both update profiles sequentially
-            echo -e "${BLUE}🚀 Starting UI screenshot update...${NC}"
-            local ui_cmd="docker-compose -f $DOCKER_COMPOSE_FILE --profile ui-update"
-            if [[ "$VERBOSE" == "true" ]]; then
-                $ui_cmd up --build --abort-on-container-exit
-            else
-                $ui_cmd up --build --abort-on-container-exit 2>/dev/null
-            fi
-
-            echo -e "${BLUE}🚀 Starting Web screenshot update...${NC}"
-            local web_cmd="docker-compose -f $DOCKER_COMPOSE_FILE --profile web-update"
-            if [[ "$VERBOSE" == "true" ]]; then
-                $web_cmd up --build --abort-on-container-exit
-            else
-                $web_cmd up --build --abort-on-container-exit 2>/dev/null
-            fi
-            return
+        if [[ "$component" == "design-system" || "$component" == "all" ]]; then
+            profile="design-system-update"
         fi
     fi
 

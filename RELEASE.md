@@ -59,7 +59,7 @@ For local updates:
 
 ```bash
 # Using Docker (recommended)
-pnpm e2e:docker:update:ui
+pnpm e2e:docker:update:design-system
 
 # Without Docker
 pnpm --filter=@wallarm-org/design-system test:e2e --update-snapshots

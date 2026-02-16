@@ -12,8 +12,8 @@ WORKDIR /app
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Copy package.json files for all packages for proper dependency installation
-COPY apps/web/package.json ./apps/web/
-COPY packages/ui/package.json ./packages/ui/
+COPY apps/playground/package.json ./apps/playground/
+COPY packages/design-system/package.json ./packages/design-system/
 COPY packages/configs/eslint-config/package.json ./packages/configs/eslint-config/
 COPY packages/configs/playwright-config/package.json ./packages/configs/playwright-config/
 COPY packages/configs/rsbuild-config/package.json ./packages/configs/rsbuild-config/
@@ -22,7 +22,7 @@ COPY packages/configs/typescript-config/package.json ./packages/configs/typescri
 COPY packages/configs/vitest-config/package.json ./packages/configs/vitest-config/
 
 # Install dependencies
-RUN pnpm install --frozen-lockfile --filter=@wallarm/web...
+RUN pnpm install --frozen-lockfile --filter=@wallarm-org/playground...
 
 # Build application
 FROM base AS builder
@@ -30,7 +30,7 @@ WORKDIR /app
 
 # Copy node_modules from previous stage
 COPY --from=deps /app/node_modules ./node_modules
-COPY --from=deps /app/apps/web/node_modules ./apps/web/node_modules
+COPY --from=deps /app/apps/playground/node_modules ./apps/playground/node_modules
 COPY --from=deps /app/packages ./packages
 
 # Copy source code
@@ -39,20 +39,20 @@ COPY . .
 # Build configs
 RUN pnpm build:configs
 
-# Build ui library
-RUN pnpm --filter=@wallarm/ui build
+# Build design-system library
+RUN pnpm --filter=@wallarm-org/design-system build
 
-# Build web application
-RUN pnpm --filter=@wallarm/web build
+# Build playground application
+RUN pnpm --filter=@wallarm-org/playground build
 
 # Production stage - Nginx for static files
 FROM nginx:alpine AS production
 
 # Copy built files
-COPY --from=builder /app/apps/web/dist /usr/share/nginx/html
+COPY --from=builder /app/apps/playground/dist /usr/share/nginx/html
 
 # Nginx configuration for SPA
-COPY apps/web/nginx.conf /etc/nginx/conf.d/default.conf
+COPY apps/playground/nginx.conf /etc/nginx/conf.d/default.conf
 
 # Configure nginx to run without root
 RUN chown -R nginx:nginx /usr/share/nginx/html && \
