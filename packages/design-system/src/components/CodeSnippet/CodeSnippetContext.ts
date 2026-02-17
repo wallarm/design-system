@@ -35,7 +35,7 @@ export type LineConfig = {
 export type CodeSnippetContextValue<TLanguage extends string = string> = {
   // Content
   code: string;
-  language: TLanguage;
+  language?: TLanguage;
   tokens: Token[][] | null;
   isLoading: boolean;
 
