@@ -1,6 +1,6 @@
 {
   "name": "@wallarm-org/design-system",
-  "version": "0.2.0-rc-feat-code-snippet-actions.1",
+  "version": "0.2.0",
   "description": "Core design system library with React components and Storybook documentation",
   "publishConfig": {
     "access": "public",
