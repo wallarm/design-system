@@ -53,7 +53,7 @@ export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippe
     /** The code string to display */
     code: string;
     /** Programming language for syntax highlighting */
-    language: TLanguage;
+    language?: TLanguage;
     /** Per-line configuration (color, prefix) keyed by line number */
     lines?: Record<number, LineConfig>;
     /** Starting line number (default: 1) */
@@ -70,7 +70,7 @@ export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippe
 
 export const CodeSnippetRoot = <TLanguage extends string = string>({
   code,
-  language,
+  language = 'text' as TLanguage,
   size = 'md',
   lines = {},
   startingLineNumber = 1,
