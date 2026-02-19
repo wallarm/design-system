@@ -1,3 +1,7 @@
+## 0.3.0-rc-feature-CORE-2159-tour-component.1 (2026-02-19)
+
+* feat: Tour component ([6597d7e](https://github.com/wallarm/design-system/commit/6597d7e))
+
 ## 0.2.0 (2026-02-17)
 
 * test: Code snippet ([74e5c08](https://github.com/wallarm/design-system/commit/74e5c08))
