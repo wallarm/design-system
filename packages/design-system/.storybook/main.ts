@@ -1,6 +1,8 @@
 import type { StorybookConfig } from 'storybook-react-rsbuild';
-import { dirname } from 'node:path';
+import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const config: StorybookConfig = {
   framework: getAbsolutePath('storybook-react-rsbuild'),
@@ -14,10 +16,15 @@ const config: StorybookConfig = {
     experimentalComponentsManifest: true,
     experimentalCodeExamples: true,
   },
+  staticDirs: ['./assets'],
   rsbuildFinal: async (config, { configType }) => {
     if (configType === 'PRODUCTION' && config.output) {
       config.output.assetPrefix = '/design-system/';
     }
+
+    config.server ??= {};
+    config.server.publicDir = [{ name: resolve(__dirname, 'assets') }];
+
     return config;
   },
 };
