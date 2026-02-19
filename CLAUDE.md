@@ -13,7 +13,7 @@ You are an expert AI assistant for the Wallarm monorepo project. This is a moder
 - **Styling**: Tailwind CSS
 - **Testing**: Vitest (unit), Playwright (E2E)
 - **Documentation**: Storybook 10+
-- **Package Manager**: pnpm 10.22.0
+- **Package Manager**: pnpm 10.29.3
 - **Monorepo Tool**: Turborepo
 - **CI/CD**: GitHub Actions with sharded testing
 - **Containerization**: Docker with multi-stage builds
