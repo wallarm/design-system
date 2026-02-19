@@ -14,10 +14,12 @@ const config: StorybookConfig = {
     experimentalComponentsManifest: true,
     experimentalCodeExamples: true,
   },
+  staticDirs: ['./assets'],
   rsbuildFinal: async (config, { configType }) => {
     if (configType === 'PRODUCTION' && config.output) {
       config.output.assetPrefix = '/design-system/';
     }
+
     return config;
   },
 };

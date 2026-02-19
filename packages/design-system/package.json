@@ -117,6 +117,7 @@
     "@wallarm-org/tailwind-config": "workspace:*",
     "@wallarm-org/typescript-config": "workspace:*",
     "@wallarm-org/vitest-config": "workspace:*",
+    "@zag-js/tour": "^1.33.1",
     "glob": "^13.0.0",
     "@wallarm-org/mcp-core": "workspace:*",
     "ts-morph": "^25.0.0",
