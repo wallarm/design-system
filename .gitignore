@@ -54,3 +54,6 @@ yarn-error.log*
 
 # Semantic Release backup
 package.json.backup
+
+# Claude
+.claude/agent-memory
