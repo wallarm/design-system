@@ -54,7 +54,7 @@ yarn-error.log*
 # Semantic Release backup
 package.json.backup
 
+# Claude
+.claude/agent-memory
 .playwright-mcp
 
-# Translated docs
-TABLE_DESIGN_RU.md
