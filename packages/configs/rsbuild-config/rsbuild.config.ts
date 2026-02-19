@@ -1,6 +1,6 @@
 import { defineConfig } from '@rsbuild/core';
-import * as rspack from '@rspack/core';
 import { pluginReact } from '@rsbuild/plugin-react';
+import * as rspack from '@rspack/core';
 
 export const rsbuildConfig = defineConfig({
   plugins: [pluginReact()],
