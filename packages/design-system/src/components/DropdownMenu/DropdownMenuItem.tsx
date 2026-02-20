@@ -1,26 +1,38 @@
-import type { ComponentPropsWithoutRef, ElementRef, FC, Ref } from 'react';
-import { Item } from '@radix-ui/react-dropdown-menu';
+import { type FC, type HTMLAttributes, type Ref, useId } from 'react';
+import { Menu } from '@ark-ui/react/menu';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { dropdownMenuItemVariants } from './classes';
 
-type DropdownMenuItemNativeProps = ComponentPropsWithoutRef<typeof Item>;
-
 export type DropdownMenuItemVariantsProps = VariantProps<typeof dropdownMenuItemVariants>;
 
-interface DropdownMenuItemBaseProps {
+interface DropdownMenuItemProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
+    DropdownMenuItemVariantsProps {
   inset?: boolean;
-  ref?: Ref<ElementRef<typeof Item>>;
+  disabled?: boolean;
+  onSelect?: () => void;
+  ref?: Ref<HTMLDivElement>;
 }
-
-type DropdownMenuItemProps = DropdownMenuItemNativeProps &
-  DropdownMenuItemVariantsProps &
-  DropdownMenuItemBaseProps;
 
 export const DropdownMenuItem: FC<DropdownMenuItemProps> = ({
   inset = false,
   variant = 'default',
+  onSelect,
+  disabled,
   ...props
-}) => <Item {...props} className={cn(dropdownMenuItemVariants({ variant, inset }))} />;
+}) => {
+  const id = useId();
+
+  return (
+    <Menu.Item
+      {...props}
+      value={id}
+      disabled={disabled}
+      onSelect={onSelect}
+      className={cn(dropdownMenuItemVariants({ variant, inset }))}
+    />
+  );
+};
 
 DropdownMenuItem.displayName = 'DropdownMenuItem';

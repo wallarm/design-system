@@ -1,7 +1,6 @@
 import figma from '@figma/code-connect';
 import { Tooltip } from './Tooltip';
 import { TooltipContent } from './TooltipContent';
-import { TooltipProvider } from './TooltipProvider';
 import { TooltipTrigger } from './TooltipTrigger';
 
 const figmaNodeUrl =
@@ -12,11 +11,9 @@ figma.connect(Tooltip, figmaNodeUrl, {
     content: figma.string('Name'),
   },
   example: ({ content }) => (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger />
-        <TooltipContent>{content}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger />
+      <TooltipContent>{content}</TooltipContent>
+    </Tooltip>
   ),
 });

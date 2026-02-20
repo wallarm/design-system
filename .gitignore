@@ -54,3 +54,5 @@ yarn-error.log*
 
 # Semantic Release backup
 package.json.backup
+
+.playwright-mcp

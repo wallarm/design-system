@@ -1,5 +1,4 @@
 import type { ComponentPropsWithoutRef, FC, Ref } from 'react';
-import { Root } from '@radix-ui/react-separator';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
@@ -83,9 +82,11 @@ const separatorVariants = cva('shrink-0 bg-border-primary', {
   ],
 });
 
-export type SeparatorProps = Omit<ComponentPropsWithoutRef<typeof Root>, 'className'> &
+export type SeparatorProps = ComponentPropsWithoutRef<'div'> &
   VariantProps<typeof separatorVariants> & {
-    ref?: Ref<HTMLHRElement>;
+    ref?: Ref<HTMLDivElement>;
+    orientation?: 'horizontal' | 'vertical';
+    decorative?: boolean;
   };
 
 export const Separator: FC<SeparatorProps> = ({
@@ -94,9 +95,10 @@ export const Separator: FC<SeparatorProps> = ({
   spacing,
   ...props
 }) => (
-  <Root
-    decorative={decorative}
-    orientation={orientation}
+  <div
+    role={decorative ? 'none' : 'separator'}
+    aria-orientation={decorative ? undefined : orientation}
+    data-orientation={orientation}
     className={cn(separatorVariants({ orientation, spacing }))}
     {...props}
   />

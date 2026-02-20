@@ -117,7 +117,7 @@ export const DrawerResizeHandle: FC<DrawerResizeHandleProps> = ({ ref }) => {
   const barIsVisible = isHovered || isDragging;
 
   return (
-    <Tooltip open={isHovered && !isDragging}>
+    <Tooltip positioning={{ placement: 'left' }} open={isHovered && !isDragging}>
       <TooltipTrigger
         ref={ref}
         className={cn(drawerResizeHandleVariants({ barIsVisible }))}
@@ -126,7 +126,7 @@ export const DrawerResizeHandle: FC<DrawerResizeHandleProps> = ({ ref }) => {
         onMouseDown={handleMouseDown}
       />
 
-      <TooltipContent side='left'>Drag to resize</TooltipContent>
+      <TooltipContent>Drag to resize</TooltipContent>
     </Tooltip>
   );
 };

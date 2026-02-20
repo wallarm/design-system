@@ -1,0 +1,73 @@
+import type { Ref } from 'react';
+import type { Row } from '@tanstack/react-table';
+import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
+import { Td, Tr } from './primitives';
+import { TableBodyCell } from './TableBodyCell';
+import { useTableContext } from './TableContext';
+import { TableExpandedRow } from './TableExpandedRow';
+
+const SYSTEM_COLUMN_IDS = new Set([TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID]);
+
+interface TableRowProps<T> {
+  row: Row<T>;
+  ref?: Ref<HTMLTableRowElement>;
+  'data-index'?: number;
+}
+
+export const TableRow = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<T>) => {
+  const { expandingEnabled } = useTableContext<T>();
+  const isSelected = row.getIsSelected();
+  const isGroupParent = row.subRows.length > 0;
+
+  if (isGroupParent) {
+    const cells = row.getVisibleCells();
+    const systemCells = cells.filter(c => SYSTEM_COLUMN_IDS.has(c.column.id));
+    const dataCells = cells.filter(c => !SYSTEM_COLUMN_IDS.has(c.column.id));
+    const firstDataCell = dataCells[0];
+
+    return (
+      <>
+        <Tr
+          ref={ref}
+          data-index={dataIndex}
+          className='group/row'
+          data-selected={isSelected || undefined}
+          aria-selected={isSelected || undefined}
+        >
+          {systemCells.map(cell => (
+            <TableBodyCell key={cell.id} cell={cell} />
+          ))}
+          {firstDataCell && <TableBodyCell cell={firstDataCell} className='border-r-0' />}
+          {dataCells.slice(1).map(cell => (
+            <Td
+              key={cell.id}
+              className='border-y border-x-0 border-border-primary-light bg-bg-surface-2 overlay group-hover/row:overlay-states-primary-hover group-data-selected/row:overlay-states-primary-active'
+              style={{ width: cell.column.getSize() }}
+              aria-hidden='true'
+            />
+          ))}
+        </Tr>
+        {expandingEnabled && <TableExpandedRow row={row} />}
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Tr
+        ref={ref}
+        data-index={dataIndex}
+        className='group/row'
+        data-selected={isSelected || undefined}
+        aria-selected={isSelected || undefined}
+      >
+        {row.getVisibleCells().map(cell => (
+          <TableBodyCell key={cell.id} cell={cell} />
+        ))}
+      </Tr>
+      {expandingEnabled && <TableExpandedRow row={row} />}
+    </>
+  );
+};
+
+TableRow.displayName = 'TableRow';
