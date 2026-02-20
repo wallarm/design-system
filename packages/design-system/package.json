@@ -1,6 +1,6 @@
 {
   "name": "@wallarm-org/design-system",
-  "version": "0.2.0",
+  "version": "0.3.0-rc-feature-CORE-2159-tour-component.1",
   "description": "Core design system library with React components and Storybook documentation",
   "publishConfig": {
     "access": "public",
@@ -110,6 +110,7 @@
     "@wallarm-org/tailwind-config": "workspace:*",
     "@wallarm-org/typescript-config": "workspace:*",
     "@wallarm-org/vitest-config": "workspace:*",
+    "@zag-js/tour": "^1.33.1",
     "glob": "^13.0.0",
     "lodash-es": "4.17.23",
     "non.geist": "catalog:",
