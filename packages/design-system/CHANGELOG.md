@@ -1,3 +1,7 @@
+## <small>0.2.1 (2026-02-21)</small>
+
+* fix: added source to scanning all components (#20) ([339a5bf](https://github.com/wallarm/design-system/commit/339a5bf)), closes [#20](https://github.com/wallarm/design-system/issues/20)
+
 ## 0.2.0-rc-fix-theme.1 (2026-02-21)
 
 * fix: added source to scanning all components ([dc60b29](https://github.com/wallarm/design-system/commit/dc60b29))
