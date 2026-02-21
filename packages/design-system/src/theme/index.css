@@ -1,3 +1,5 @@
+@source "../components";
+
 @import './colors/primary.css';
 @import './colors/secondary.css';
 @import './colors/grayscale.css';
