@@ -82,6 +82,9 @@ export const Colors: StoryFn<typeof meta> = ({ ...args }) => (
     <Text {...args} color='secondary-alt'>
       Secondary alt color text
     </Text>
+    <Text {...args} color='tertiary-alt'>
+      Tertiary alt color text
+    </Text>
   </VStack>
 );
 

@@ -3,11 +3,11 @@ import { Switch as ArkUiSwitch } from '@ark-ui/react/switch';
 import { cn } from '../../utils/cn';
 import { SwitchContext } from './SwitchContext';
 
-export interface SwitchProps extends Omit<ArkUiSwitch.RootProps, 'className'> {
+export interface SwitchProps extends ArkUiSwitch.RootProps {
   a11yMode?: boolean;
 }
 
-export const Switch: FC<SwitchProps> = ({ children, a11yMode = false, ...props }) => (
+export const Switch: FC<SwitchProps> = ({ children, className, a11yMode = false, ...props }) => (
   <SwitchContext.Provider value={{ a11yMode }}>
     <ArkUiSwitch.Root
       {...props}
@@ -19,6 +19,7 @@ export const Switch: FC<SwitchProps> = ({ children, a11yMode = false, ...props }
         '*:data-[part=description]:col-start-2 *:data-[part=description]:col-end-3',
         '[&:not([data-disabled])]:cursor-pointer',
         'data-disabled:opacity-50 data-disabled:pointer-events-none data-disabled:cursor-not-allowed',
+        className,
       )}
     >
       {children}

@@ -1,0 +1,1 @@
+export { TableSettingsMenu } from './TableSettingsMenu';

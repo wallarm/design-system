@@ -6,7 +6,6 @@ import { HStack, VStack } from '../Stack';
 import { Switch, SwitchControl, SwitchLabel } from '../Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../Tabs';
 import { Text } from '../Text';
-import { TooltipProvider } from '../Tooltip';
 import { DIALOG_SIZES, DIALOG_WIDTH_CONSTRAINTS } from './constants';
 import { Dialog, type DialogProps } from './Dialog';
 import { DialogBody } from './DialogBody';
@@ -61,13 +60,7 @@ const meta = {
       defaultValue: DIALOG_WIDTH_CONSTRAINTS.max,
     },
   },
-  decorators: [
-    Story => (
-      <TooltipProvider>
-        <Story />
-      </TooltipProvider>
-    ),
-  ],
+  decorators: [],
 } satisfies Meta<typeof Dialog>;
 
 export default meta;

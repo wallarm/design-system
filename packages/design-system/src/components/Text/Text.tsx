@@ -23,6 +23,7 @@ const textVariants = cva('font-sans-display break-words', {
       'primary-alt': 'text-text-primary-alt',
       secondary: 'text-text-secondary',
       'secondary-alt': 'text-text-secondary-alt',
+      'tertiary-alt': 'text-text-tertiary-alt',
       danger: 'text-text-danger',
       inherit: 'text-inherit',
     },

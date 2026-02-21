@@ -248,41 +248,41 @@ export const DifferentSides: StoryFn<OverflowTooltipProps> = () => {
     <div className='font-sans flex flex-col gap-32 w-300 py-32'>
       <div>
         <p className='text-sm text-text-secondary mb-8'>Tooltip on top (default)</p>
-        <OverflowTooltip>
+        <OverflowTooltip positioning={{ placement: 'top' }}>
           <OverflowTooltipTrigger>
             <div className='truncate'>{text}</div>
           </OverflowTooltipTrigger>
-          <OverflowTooltipContent side='top'>{text}</OverflowTooltipContent>
+          <OverflowTooltipContent>{text}</OverflowTooltipContent>
         </OverflowTooltip>
       </div>
 
       <div>
         <p className='text-sm text-text-secondary mb-8'>Tooltip on bottom</p>
-        <OverflowTooltip>
+        <OverflowTooltip positioning={{ placement: 'bottom' }}>
           <OverflowTooltipTrigger>
             <div className='truncate'>{text}</div>
           </OverflowTooltipTrigger>
-          <OverflowTooltipContent side='bottom'>{text}</OverflowTooltipContent>
+          <OverflowTooltipContent>{text}</OverflowTooltipContent>
         </OverflowTooltip>
       </div>
 
       <div>
         <p className='text-sm text-text-secondary mb-8'>Tooltip on left</p>
-        <OverflowTooltip>
+        <OverflowTooltip positioning={{ placement: 'left' }}>
           <OverflowTooltipTrigger>
             <div className='truncate'>{text}</div>
           </OverflowTooltipTrigger>
-          <OverflowTooltipContent side='left'>{text}</OverflowTooltipContent>
+          <OverflowTooltipContent>{text}</OverflowTooltipContent>
         </OverflowTooltip>
       </div>
 
       <div>
         <p className='text-sm text-text-secondary mb-8'>Tooltip on right</p>
-        <OverflowTooltip>
+        <OverflowTooltip positioning={{ placement: 'right' }}>
           <OverflowTooltipTrigger>
             <div className='truncate'>{text}</div>
           </OverflowTooltipTrigger>
-          <OverflowTooltipContent side='right'>{text}</OverflowTooltipContent>
+          <OverflowTooltipContent>{text}</OverflowTooltipContent>
         </OverflowTooltip>
       </div>
     </div>

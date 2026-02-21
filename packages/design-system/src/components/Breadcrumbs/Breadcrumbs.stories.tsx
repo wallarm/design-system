@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { ChevronDown, CircleDashed, Home } from '../../icons';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../Tooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { Breadcrumbs, BreadcrumbsEllipsis, BreadcrumbsItem } from './index';
 
 const meta: Meta<typeof Breadcrumbs> = {
@@ -135,31 +135,29 @@ export const WithTruncation: StoryFn<typeof Breadcrumbs> = args => {
 
   return (
     <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
-      <TooltipProvider>
-        <Breadcrumbs {...args}>
-          <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
-          <BreadcrumbsItem href='#level1'>Level 1</BreadcrumbsItem>
-          {!showAll ? (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <BreadcrumbsEllipsis onClick={() => setShowAll(true)} />
-              </TooltipTrigger>
-              <TooltipContent>WIP</TooltipContent>
-            </Tooltip>
-          ) : (
-            [
-              <BreadcrumbsItem key='level2' href='#level2'>
-                Level 2
-              </BreadcrumbsItem>,
-              <BreadcrumbsItem key='level3' href='#level3'>
-                Level 3
-              </BreadcrumbsItem>,
-            ]
-          )}
-          <BreadcrumbsItem href='#penultimate'>Penultimate</BreadcrumbsItem>
-          <BreadcrumbsItem href='#current'>Current Page</BreadcrumbsItem>
-        </Breadcrumbs>
-      </TooltipProvider>
+      <Breadcrumbs {...args}>
+        <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
+        <BreadcrumbsItem href='#level1'>Level 1</BreadcrumbsItem>
+        {!showAll ? (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <BreadcrumbsEllipsis onClick={() => setShowAll(true)} />
+            </TooltipTrigger>
+            <TooltipContent>WIP</TooltipContent>
+          </Tooltip>
+        ) : (
+          [
+            <BreadcrumbsItem key='level2' href='#level2'>
+              Level 2
+            </BreadcrumbsItem>,
+            <BreadcrumbsItem key='level3' href='#level3'>
+              Level 3
+            </BreadcrumbsItem>,
+          ]
+        )}
+        <BreadcrumbsItem href='#penultimate'>Penultimate</BreadcrumbsItem>
+        <BreadcrumbsItem href='#current'>Current Page</BreadcrumbsItem>
+      </Breadcrumbs>
     </div>
   );
 };

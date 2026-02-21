@@ -1,5 +1,6 @@
-import type { ComponentPropsWithoutRef, ElementRef, FC, Ref } from 'react';
-import { Content } from '@radix-ui/react-dropdown-menu';
+import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import { Menu } from '@ark-ui/react/menu';
+import { Portal } from '@ark-ui/react/portal';
 import { cn } from '../../utils/cn';
 import {
   ScrollArea,
@@ -9,42 +10,40 @@ import {
   ScrollAreaViewport,
 } from '../ScrollArea';
 import { dropdownMenuClassNames } from './classes';
-import { DropdownMenuPortal } from './DropdownMenuPortal';
 
-type DropdownMenuContentProps = ComponentPropsWithoutRef<typeof Content> & {
-  ref?: Ref<ElementRef<typeof Content>>;
-};
+interface DropdownMenuContentProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+  ref?: Ref<HTMLDivElement>;
+}
 
 export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
   className,
-  sideOffset = 4,
   children,
   ref,
   ...props
 }) => (
-  <DropdownMenuPortal>
-    <Content
-      ref={ref}
-      sideOffset={sideOffset}
-      collisionPadding={4}
-      className={cn(
-        dropdownMenuClassNames,
-        'max-h-(--radix-dropdown-menu-content-available-height)',
-        'origin-[--radix-dropdown-menu-content-transform-origin]',
-        className,
-      )}
-      {...props}
-      asChild
-    >
-      <ScrollArea>
-        <ScrollAreaViewport>
-          <ScrollAreaContent className={cn('flex flex-col gap-1')}>{children}</ScrollAreaContent>
-        </ScrollAreaViewport>
-        <ScrollAreaScrollbar />
-        <ScrollAreaCorner />
-      </ScrollArea>
-    </Content>
-  </DropdownMenuPortal>
+  <Portal>
+    <Menu.Positioner>
+      <Menu.Content
+        ref={ref}
+        className={cn(
+          dropdownMenuClassNames,
+          'max-h-(--available-height)',
+          'origin-[--transform-origin]',
+          className,
+        )}
+        {...props}
+      >
+        <ScrollArea className={cn('flex flex-col min-h-0')} style={{ position: 'static' }}>
+          <ScrollAreaViewport>
+            <ScrollAreaContent className={cn('flex flex-col gap-1')}>{children}</ScrollAreaContent>
+          </ScrollAreaViewport>
+          <ScrollAreaScrollbar />
+          <ScrollAreaCorner />
+        </ScrollArea>
+      </Menu.Content>
+    </Menu.Positioner>
+  </Portal>
 );
 
 DropdownMenuContent.displayName = 'DropdownMenuContent';

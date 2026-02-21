@@ -1,18 +1,10 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { VStack } from '../Stack';
-import { TooltipProvider } from '../Tooltip';
 import { InlineCodeSnippet } from './InlineCodeSnippet';
 
 const meta = {
   title: 'Data Display/CodeSnippet/InlineCodeSnippet',
   component: InlineCodeSnippet,
-  decorators: [
-    Story => (
-      <TooltipProvider>
-        <Story />
-      </TooltipProvider>
-    ),
-  ],
   parameters: {
     layout: 'centered',
     design: {

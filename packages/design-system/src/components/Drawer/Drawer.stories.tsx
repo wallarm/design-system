@@ -6,7 +6,6 @@ import { HStack, VStack } from '../Stack';
 import { Switch, SwitchControl, SwitchLabel } from '../Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../Tabs';
 import { Text } from '../Text';
-import { TooltipProvider } from '../Tooltip';
 import { DRAWER_SIZES, DRAWER_WIDTH_CONSTRAINTS } from './constants';
 import { Drawer, type DrawerProps } from './Drawer';
 import { DrawerBody } from './DrawerBody';
@@ -61,13 +60,7 @@ const meta = {
       defaultValue: DRAWER_WIDTH_CONSTRAINTS.max,
     },
   },
-  decorators: [
-    Story => (
-      <TooltipProvider>
-        <Story />
-      </TooltipProvider>
-    ),
-  ],
+  decorators: [],
 } satisfies Meta<typeof Drawer>;
 
 export default meta;

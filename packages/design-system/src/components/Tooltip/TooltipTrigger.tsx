@@ -1,8 +1,12 @@
-import { forwardRef } from 'react';
-import { type TooltipTriggerProps, Trigger } from '@radix-ui/react-tooltip';
+import type { ComponentPropsWithoutRef, ElementRef, FC, Ref } from 'react';
+import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
 
-export const TooltipTrigger = forwardRef<React.ElementRef<typeof Trigger>, TooltipTriggerProps>(
-  (props, ref) => <Trigger ref={ref} {...props} />,
+type TooltipTriggerProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Trigger> & {
+  ref?: Ref<ElementRef<typeof ArkUiTooltip.Trigger>>;
+};
+
+export const TooltipTrigger: FC<TooltipTriggerProps> = ({ ref, ...props }) => (
+  <ArkUiTooltip.Trigger ref={ref} {...props} />
 );
 
 TooltipTrigger.displayName = 'TooltipTrigger';

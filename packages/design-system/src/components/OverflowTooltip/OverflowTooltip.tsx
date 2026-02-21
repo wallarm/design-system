@@ -1,17 +1,23 @@
 import { type ReactNode, useState } from 'react';
-import { Tooltip, TooltipProvider } from '../Tooltip';
+import { Tooltip } from '../Tooltip';
+import type { TooltipProps } from '../Tooltip/Tooltip';
 import { OverflowTooltipContext } from './OverflowTooltipContext';
 
 export interface OverflowTooltipProps {
   children: ReactNode;
   forceTooltip?: boolean;
+  positioning?: TooltipProps['positioning'];
 }
 
 /**
  * Root component for OverflowTooltip.
  * Automatically detects overflow in child elements.
  */
-export const OverflowTooltip = ({ children, forceTooltip = false }: OverflowTooltipProps) => {
+export const OverflowTooltip = ({
+  children,
+  forceTooltip = false,
+  positioning,
+}: OverflowTooltipProps) => {
   const [isOverflowing, setIsOverflowing] = useState(false);
   const shouldShowTooltip = isOverflowing || forceTooltip;
 
@@ -23,9 +29,9 @@ export const OverflowTooltip = ({ children, forceTooltip = false }: OverflowTool
         forceTooltip,
       }}
     >
-      <TooltipProvider>
-        <Tooltip open={shouldShowTooltip ? undefined : false}>{children}</Tooltip>
-      </TooltipProvider>
+      <Tooltip open={shouldShowTooltip ? undefined : false} positioning={positioning}>
+        {children}
+      </Tooltip>
     </OverflowTooltipContext.Provider>
   );
 };

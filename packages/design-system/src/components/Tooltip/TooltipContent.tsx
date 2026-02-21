@@ -1,5 +1,6 @@
 import type { ComponentPropsWithoutRef, ElementRef, FC, Ref } from 'react';
-import { Content, Portal } from '@radix-ui/react-tooltip';
+import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
+import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
@@ -11,7 +12,7 @@ const tooltipContentVariants = cva(
     // Behavior
     'z-50 overflow-hidden',
     // Animation base
-    'animate-in fade-in-0 zoom-in-95 origin-[--radix-tooltip-content-transform-origin]',
+    'animate-in fade-in-0 zoom-in-95 origin-[--transform-origin]',
     // Animation closed
     'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
     // Animation bottom
@@ -35,28 +36,25 @@ const tooltipContentVariants = cva(
   },
 );
 
-type TooltipContentProps = ComponentPropsWithoutRef<typeof Content> & {
-  ref?: Ref<ElementRef<typeof Content>>;
+type TooltipContentProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Content> & {
+  ref?: Ref<ElementRef<typeof ArkUiTooltip.Content>>;
 };
 
-export const TooltipContent: FC<TooltipContentProps> = ({
-  children,
-  sideOffset = 6,
-  className,
-  ref,
-  ...props
-}) => (
-  <Portal>
-    <Content
-      ref={ref}
-      sideOffset={sideOffset}
-      collisionPadding={8}
-      className={cn(tooltipContentVariants({ hasNonTextEnd: hasNonTextEnd(children) }), className)}
-      {...props}
-    >
-      {children}
-    </Content>
-  </Portal>
+export const TooltipContent: FC<TooltipContentProps> = ({ children, className, ref, ...props }) => (
+  <ArkUiPortal>
+    <ArkUiTooltip.Positioner>
+      <ArkUiTooltip.Content
+        ref={ref}
+        className={cn(
+          tooltipContentVariants({ hasNonTextEnd: hasNonTextEnd(children) }),
+          className,
+        )}
+        {...props}
+      >
+        {children}
+      </ArkUiTooltip.Content>
+    </ArkUiTooltip.Positioner>
+  </ArkUiPortal>
 );
 
 TooltipContent.displayName = 'TooltipContent';

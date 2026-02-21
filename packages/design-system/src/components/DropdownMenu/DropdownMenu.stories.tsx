@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { Kbd, KbdGroup } from '../Kbd';
 import { DropdownMenu } from './DropdownMenu';
 import { DropdownMenuContent } from './DropdownMenuContent';
+import { DropdownMenuContextTrigger } from './DropdownMenuContextTrigger';
 import { DropdownMenuGroup } from './DropdownMenuGroup';
 import { DropdownMenuItem } from './DropdownMenuItem';
 import { DropdownMenuItemContent } from './DropdownMenuItemContent';
@@ -11,13 +12,10 @@ import { DropdownMenuItemDescription } from './DropdownMenuItemDescription';
 import { DropdownMenuItemIcon } from './DropdownMenuItemIcon';
 import { DropdownMenuItemText } from './DropdownMenuItemText';
 import { DropdownMenuLabel } from './DropdownMenuLabel';
-import { DropdownMenuPortal } from './DropdownMenuPortal';
 import { DropdownMenuSeparator } from './DropdownMenuSeparator';
 import { DropdownMenuShortcut } from './DropdownMenuShortcut';
-import { DropdownMenuSub } from './DropdownMenuSub';
-import { DropdownMenuSubContent } from './DropdownMenuSubContent';
-import { DropdownMenuSubTrigger } from './DropdownMenuSubTrigger';
 import { DropdownMenuTrigger } from './DropdownMenuTrigger';
+import { DropdownMenuTriggerItem } from './DropdownMenuTriggerItem';
 
 const meta = {
   title: 'Actions/DropdownMenu',
@@ -31,13 +29,11 @@ const meta = {
     DropdownMenuItemIcon,
     DropdownMenuItemText,
     DropdownMenuLabel,
-    DropdownMenuPortal,
     DropdownMenuSeparator,
     DropdownMenuShortcut,
-    DropdownMenuSub,
-    DropdownMenuSubContent,
-    DropdownMenuSubTrigger,
     DropdownMenuTrigger,
+    DropdownMenuTriggerItem,
+    DropdownMenuContextTrigger,
   },
   parameters: {
     layout: 'centered',
@@ -53,7 +49,7 @@ export const Basic: StoryFn<typeof meta> = () => (
         Open
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align='start'>
+    <DropdownMenuContent>
       <DropdownMenuLabel>My Account</DropdownMenuLabel>
       <DropdownMenuGroup>
         <DropdownMenuItem>
@@ -98,17 +94,106 @@ export const Basic: StoryFn<typeof meta> = () => (
 
       <DropdownMenuGroup>
         <DropdownMenuItem>Team</DropdownMenuItem>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger>Invite users</DropdownMenuSubTrigger>
-          <DropdownMenuPortal>
-            <DropdownMenuSubContent>
-              <DropdownMenuItem>Email</DropdownMenuItem>
-              <DropdownMenuItem>Message</DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem>More...</DropdownMenuItem>
-            </DropdownMenuSubContent>
-          </DropdownMenuPortal>
-        </DropdownMenuSub>
+        <DropdownMenu>
+          <DropdownMenuTriggerItem>Invite users</DropdownMenuTriggerItem>
+          <DropdownMenuContent>
+            <DropdownMenuItem>Email</DropdownMenuItem>
+            <DropdownMenuItem>Message</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>More...</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <DropdownMenuItem>
+          New Team
+          <DropdownMenuShortcut>
+            <KbdGroup>
+              <Kbd>⌘</Kbd>
+              <Kbd>T</Kbd>
+            </KbdGroup>
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
+
+      <DropdownMenuSeparator />
+
+      <DropdownMenuItem>GitHub</DropdownMenuItem>
+      <DropdownMenuItem>Support</DropdownMenuItem>
+      <DropdownMenuItem disabled>API</DropdownMenuItem>
+      <DropdownMenuSeparator />
+      <DropdownMenuItem variant='destructive'>
+        Log out
+        <DropdownMenuShortcut>
+          <KbdGroup>
+            <Kbd>⌘</Kbd>
+            <Kbd>Q</Kbd>
+          </KbdGroup>
+        </DropdownMenuShortcut>
+      </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+);
+
+export const Context: StoryFn<typeof meta> = () => (
+  <DropdownMenu>
+    <DropdownMenuContextTrigger asChild>
+      <div className='flex items-center justify-center w-300 h-192 border border-border-primary border-dashed rounded-8'>
+        Right click here
+      </div>
+    </DropdownMenuContextTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuLabel>My Account</DropdownMenuLabel>
+      <DropdownMenuGroup>
+        <DropdownMenuItem>
+          Profile
+          <DropdownMenuShortcut>
+            <KbdGroup>
+              <Kbd>⌘</Kbd>
+              <Kbd>P</Kbd>
+            </KbdGroup>
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          Billing
+          <DropdownMenuShortcut>
+            <KbdGroup>
+              <Kbd>⌘</Kbd>
+              <Kbd>B</Kbd>
+            </KbdGroup>
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          Settings
+          <DropdownMenuShortcut>
+            <KbdGroup>
+              <Kbd>⌘</Kbd>
+              <Kbd>S</Kbd>
+            </KbdGroup>
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          Keyboard shortcuts super
+          <DropdownMenuShortcut>
+            <KbdGroup>
+              <Kbd>⌘</Kbd>
+              <Kbd>K</Kbd>
+            </KbdGroup>
+          </DropdownMenuShortcut>
+        </DropdownMenuItem>
+      </DropdownMenuGroup>
+
+      <DropdownMenuSeparator />
+
+      <DropdownMenuGroup>
+        <DropdownMenuItem>Team</DropdownMenuItem>
+        <DropdownMenu>
+          <DropdownMenuTriggerItem>Invite users</DropdownMenuTriggerItem>
+          <DropdownMenuContent>
+            <DropdownMenuItem>Email</DropdownMenuItem>
+            <DropdownMenuItem>Message</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>More...</DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
         <DropdownMenuItem>
           New Team
           <DropdownMenuShortcut>
@@ -147,7 +232,7 @@ export const WithDescriptions: StoryFn<typeof meta> = () => (
         Add Widget
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align='start'>
+    <DropdownMenuContent>
       <DropdownMenuItem>
         <DropdownMenuItemContent>
           <DropdownMenuItemText>Bar-volume chart</DropdownMenuItemText>
@@ -190,7 +275,7 @@ export const WithIcons: StoryFn<typeof meta> = () => (
         Add Widget
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align='start'>
+    <DropdownMenuContent>
       <DropdownMenuItem>
         <DropdownMenuItemIcon>
           <LayoutTemplate />
@@ -237,7 +322,7 @@ export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
         Add Widget
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent align='start'>
+    <DropdownMenuContent>
       <DropdownMenuItem>
         <DropdownMenuItemIcon>
           <LayoutTemplate />

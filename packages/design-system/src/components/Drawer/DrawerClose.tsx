@@ -29,7 +29,7 @@ export const DrawerClose: FC<DrawerCloseProps> = ({ children, asChild = false, r
   }
 
   return (
-    <Tooltip delayDuration={300}>
+    <Tooltip>
       <TooltipTrigger asChild>
         <Dialog.CloseTrigger asChild onFocusCapture={handleFocusCapture}>
           <Button ref={ref} variant='ghost' color='neutral' size='small' aria-label='Close drawer'>
@@ -37,9 +37,7 @@ export const DrawerClose: FC<DrawerCloseProps> = ({ children, asChild = false, r
           </Button>
         </Dialog.CloseTrigger>
       </TooltipTrigger>
-      <TooltipContent side='bottom' sideOffset={4}>
-        Close {closeOnEscape && <Kbd>ESC</Kbd>}
-      </TooltipContent>
+      <TooltipContent>Close {closeOnEscape && <Kbd>ESC</Kbd>}</TooltipContent>
     </Tooltip>
   );
 };
