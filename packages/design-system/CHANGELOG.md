@@ -1,6 +1,9 @@
 ## 0.2.0-rc-fix-theme.1 (2026-02-21)
 
 * fix: added source to scanning all components ([dc60b29](https://github.com/wallarm/design-system/commit/dc60b29))
+
+## 0.2.0 (2026-02-17)
+
 * test: Code snippet ([74e5c08](https://github.com/wallarm/design-system/commit/74e5c08))
 * test: Code snippet. Optional language ([01718aa](https://github.com/wallarm/design-system/commit/01718aa))
 * test: Toast component (#10) ([4911de0](https://github.com/wallarm/design-system/commit/4911de0)), closes [#10](https://github.com/wallarm/design-system/issues/10)
