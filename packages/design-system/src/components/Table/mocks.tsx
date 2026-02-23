@@ -1,21 +1,21 @@
 import { Check, Copy, Filter, FilterX } from '../../icons';
 import { Badge } from '../Badge';
 import { InlineCodeSnippet } from '../CodeSnippet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuContextTrigger,
+  DropdownMenuItem,
+  DropdownMenuItemContent,
+  DropdownMenuItemDescription,
+  DropdownMenuItemIcon,
+  DropdownMenuItemText,
+  DropdownMenuSeparator,
+} from '../DropdownMenu';
 import { HStack, VStack } from '../Stack';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
 import { createTableColumnHelper } from './lib';
-import {
-  TableContextMenu,
-  TableContextMenuContent,
-  TableContextMenuItem,
-  TableContextMenuItemContent,
-  TableContextMenuItemDescription,
-  TableContextMenuItemIcon,
-  TableContextMenuItemText,
-  TableContextMenuSeparator,
-  TableContextMenuTrigger,
-} from './TableContextMenu';
 import type { TableColumnDef } from './types';
 
 // ---------------------------------------------------------------------------
@@ -667,47 +667,43 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
       ...col,
       size: 220,
       cell: ({ getValue }: { getValue: () => string }) => (
-        <TableContextMenu>
-          <TableContextMenuTrigger>
+        <DropdownMenu>
+          <DropdownMenuContextTrigger>
             <Text size='sm' truncate>
               {getValue()}
             </Text>
-          </TableContextMenuTrigger>
-          <TableContextMenuContent>
-            <TableContextMenuItem onSelect={() => alert(`Copied: ${getValue()}`)}>
-              <TableContextMenuItemIcon>
+          </DropdownMenuContextTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onSelect={() => alert(`Copied: ${getValue()}`)}>
+              <DropdownMenuItemIcon>
                 <Copy />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemText>Copy value</TableContextMenuItemText>
-            </TableContextMenuItem>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemText>Copy value</DropdownMenuItemText>
+            </DropdownMenuItem>
 
-            <TableContextMenuSeparator />
+            <DropdownMenuSeparator />
 
-            <TableContextMenuItem onSelect={() => alert(`Show only: ${getValue()}`)}>
-              <TableContextMenuItemIcon>
+            <DropdownMenuItem onSelect={() => alert(`Show only: ${getValue()}`)}>
+              <DropdownMenuItemIcon>
                 <Filter />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemContent>
-                <TableContextMenuItemText>Show only</TableContextMenuItemText>
-                <TableContextMenuItemDescription>
-                  Filter to matching rows
-                </TableContextMenuItemDescription>
-              </TableContextMenuItemContent>
-            </TableContextMenuItem>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemContent>
+                <DropdownMenuItemText>Show only</DropdownMenuItemText>
+                <DropdownMenuItemDescription>Filter to matching rows</DropdownMenuItemDescription>
+              </DropdownMenuItemContent>
+            </DropdownMenuItem>
 
-            <TableContextMenuItem onSelect={() => alert(`Exclude: ${getValue()}`)}>
-              <TableContextMenuItemIcon>
+            <DropdownMenuItem onSelect={() => alert(`Exclude: ${getValue()}`)}>
+              <DropdownMenuItemIcon>
                 <FilterX />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemContent>
-                <TableContextMenuItemText>Exclude</TableContextMenuItemText>
-                <TableContextMenuItemDescription>
-                  Filter out matching rows
-                </TableContextMenuItemDescription>
-              </TableContextMenuItemContent>
-            </TableContextMenuItem>
-          </TableContextMenuContent>
-        </TableContextMenu>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemContent>
+                <DropdownMenuItemText>Exclude</DropdownMenuItemText>
+                <DropdownMenuItemDescription>Filter out matching rows</DropdownMenuItemDescription>
+              </DropdownMenuItemContent>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     };
   }
@@ -716,8 +712,8 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
     return {
       ...col,
       cell: ({ row }: { row: { original: SecurityHeaderEntry } }) => (
-        <TableContextMenu>
-          <TableContextMenuTrigger>
+        <DropdownMenu>
+          <DropdownMenuContextTrigger>
             <HStack spacing={8}>
               <span className='text-sm'>{row.original.ipCountryFlag}</span>
               <Text size='sm'>{row.original.ip}</Text>
@@ -725,40 +721,38 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
                 {row.original.provider}
               </Badge>
             </HStack>
-          </TableContextMenuTrigger>
-          <TableContextMenuContent>
-            <TableContextMenuItem onSelect={() => alert(`Copied: ${row.original.ip}`)}>
-              <TableContextMenuItemIcon>
+          </DropdownMenuContextTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onSelect={() => alert(`Copied: ${row.original.ip}`)}>
+              <DropdownMenuItemIcon>
                 <Copy />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemText>Copy IP</TableContextMenuItemText>
-            </TableContextMenuItem>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemText>Copy IP</DropdownMenuItemText>
+            </DropdownMenuItem>
 
-            <TableContextMenuSeparator />
+            <DropdownMenuSeparator />
 
-            <TableContextMenuItem onSelect={() => alert(`Show only: ${row.original.ip}`)}>
-              <TableContextMenuItemIcon>
+            <DropdownMenuItem onSelect={() => alert(`Show only: ${row.original.ip}`)}>
+              <DropdownMenuItemIcon>
                 <Filter />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemContent>
-                <TableContextMenuItemText>Show only</TableContextMenuItemText>
-                <TableContextMenuItemDescription>Filter to this IP</TableContextMenuItemDescription>
-              </TableContextMenuItemContent>
-            </TableContextMenuItem>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemContent>
+                <DropdownMenuItemText>Show only</DropdownMenuItemText>
+                <DropdownMenuItemDescription>Filter to this IP</DropdownMenuItemDescription>
+              </DropdownMenuItemContent>
+            </DropdownMenuItem>
 
-            <TableContextMenuItem onSelect={() => alert(`Exclude: ${row.original.ip}`)}>
-              <TableContextMenuItemIcon>
+            <DropdownMenuItem onSelect={() => alert(`Exclude: ${row.original.ip}`)}>
+              <DropdownMenuItemIcon>
                 <FilterX />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemContent>
-                <TableContextMenuItemText>Exclude</TableContextMenuItemText>
-                <TableContextMenuItemDescription>
-                  Filter out this IP
-                </TableContextMenuItemDescription>
-              </TableContextMenuItemContent>
-            </TableContextMenuItem>
-          </TableContextMenuContent>
-        </TableContextMenu>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemContent>
+                <DropdownMenuItemText>Exclude</DropdownMenuItemText>
+                <DropdownMenuItemDescription>Filter out this IP</DropdownMenuItemDescription>
+              </DropdownMenuItemContent>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     };
   }

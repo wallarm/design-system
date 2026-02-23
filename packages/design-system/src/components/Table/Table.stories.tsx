@@ -4,6 +4,17 @@ import { Copy, Filter, FilterX, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { InlineCodeSnippet } from '../CodeSnippet';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuContextTrigger,
+  DropdownMenuItem,
+  DropdownMenuItemContent,
+  DropdownMenuItemDescription,
+  DropdownMenuItemIcon,
+  DropdownMenuItemText,
+  DropdownMenuSeparator,
+} from '../DropdownMenu';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import {
@@ -22,17 +33,6 @@ import {
 } from './mocks';
 import { Table } from './Table';
 import { TableActionBar } from './TableActionBar';
-import {
-  TableContextMenu,
-  TableContextMenuContent,
-  TableContextMenuItem,
-  TableContextMenuItemContent,
-  TableContextMenuItemDescription,
-  TableContextMenuItemIcon,
-  TableContextMenuItemText,
-  TableContextMenuSeparator,
-  TableContextMenuTrigger,
-} from './TableContextMenu';
 import { TableEmptyState } from './TableEmptyState';
 import type {
   TableColumnDef,
@@ -271,63 +271,59 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
     securityColumnHelper.accessor('objectName', {
       header: 'Object name',
       cell: ({ getValue }) => (
-        <TableContextMenu>
-          <TableContextMenuTrigger>
+        <DropdownMenu>
+          <DropdownMenuContextTrigger>
             <Text size='sm'>{getValue()}</Text>
-          </TableContextMenuTrigger>
-          <TableContextMenuContent>
-            <TableContextMenuItem onSelect={() => alert('Copy')}>
-              <TableContextMenuItemIcon>
+          </DropdownMenuContextTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onSelect={() => alert('Copy')}>
+              <DropdownMenuItemIcon>
                 <Copy />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemText>Copy value</TableContextMenuItemText>
-            </TableContextMenuItem>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemText>Copy value</DropdownMenuItemText>
+            </DropdownMenuItem>
 
-            <TableContextMenuSeparator />
+            <DropdownMenuSeparator />
 
-            <TableContextMenuItem onSelect={() => alert('Show Only')}>
-              <TableContextMenuItemIcon>
+            <DropdownMenuItem onSelect={() => alert('Show Only')}>
+              <DropdownMenuItemIcon>
                 <Filter />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemContent>
-                <TableContextMenuItemText>Show only</TableContextMenuItemText>
-                <TableContextMenuItemDescription>
-                  Filter to matching rows
-                </TableContextMenuItemDescription>
-              </TableContextMenuItemContent>
-            </TableContextMenuItem>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemContent>
+                <DropdownMenuItemText>Show only</DropdownMenuItemText>
+                <DropdownMenuItemDescription>Filter to matching rows</DropdownMenuItemDescription>
+              </DropdownMenuItemContent>
+            </DropdownMenuItem>
 
-            <TableContextMenuItem onSelect={() => alert('Exclude')}>
-              <TableContextMenuItemIcon>
+            <DropdownMenuItem onSelect={() => alert('Exclude')}>
+              <DropdownMenuItemIcon>
                 <FilterX />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemContent>
-                <TableContextMenuItemText>Exclude</TableContextMenuItemText>
-                <TableContextMenuItemDescription>
-                  Filter out matching rows
-                </TableContextMenuItemDescription>
-              </TableContextMenuItemContent>
-            </TableContextMenuItem>
-          </TableContextMenuContent>
-        </TableContextMenu>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemContent>
+                <DropdownMenuItemText>Exclude</DropdownMenuItemText>
+                <DropdownMenuItemDescription>Filter out matching rows</DropdownMenuItemDescription>
+              </DropdownMenuItemContent>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     }),
     securityColumnHelper.accessor('parameter', {
       header: 'Parameters',
       cell: ({ getValue }) => (
-        <TableContextMenu>
-          <TableContextMenuTrigger>
+        <DropdownMenu>
+          <DropdownMenuContextTrigger>
             <InlineCodeSnippet code={getValue()} size='sm' copyable={false} />
-          </TableContextMenuTrigger>
-          <TableContextMenuContent>
-            <TableContextMenuItem onSelect={() => alert('Execute')}>
-              <TableContextMenuItemIcon>
+          </DropdownMenuContextTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem onSelect={() => alert('Execute')}>
+              <DropdownMenuItemIcon>
                 <Copy />
-              </TableContextMenuItemIcon>
-              <TableContextMenuItemText>Execute</TableContextMenuItemText>
-            </TableContextMenuItem>
-          </TableContextMenuContent>
-        </TableContextMenu>
+              </DropdownMenuItemIcon>
+              <DropdownMenuItemText>Execute</DropdownMenuItemText>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     }),
     securityColumnHelper.accessor('status', {
