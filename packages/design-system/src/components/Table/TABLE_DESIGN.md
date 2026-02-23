@@ -243,7 +243,7 @@ All interactive states work in two modes via the `useControlled` hook:
 - Pin columns to the left or right of the scrollable area
 - Pinned columns remain visible during horizontal scrolling
 - Visual shadow / divider at the boundary of pinned and scrollable zones
-- Control: via column definition (`enablePinning`) or programmatically via props
+- Control: via column definition (`enableColumnPinning`) or programmatically via props
 - Pinned columns are excluded from column reorder
 
 ### 7. Column Drag & Drop
