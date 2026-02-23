@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Column } from '@tanstack/react-table';
 import {
   ArrowLeft,
@@ -42,6 +43,8 @@ export const TableHeadCellMenu = <T,>({ column }: TableColumnHeaderMenuProps<T>)
   const canPin = pinningEnabled && column.getCanPin() && !isAlwaysPinned;
   const canHide = visibilityEnabled && column.getCanHide();
   const canReorder = columnDndEnabled && !isAlwaysPinned;
+
+  const [menuOpen, setMenuOpen] = useState(false);
 
   if (!canSort && !canPin && !canHide && !canReorder) return null;
 
@@ -88,10 +91,10 @@ export const TableHeadCellMenu = <T,>({ column }: TableColumnHeaderMenuProps<T>)
   const hasMovement = canMoveLeft || canMoveRight;
 
   return (
-    <Tooltip>
+    <Tooltip disabled={menuOpen}>
       <TooltipTrigger asChild>
         <span className='inline-flex'>
-          <DropdownMenu>
+          <DropdownMenu onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
               <Button variant='ghost' color='neutral' size='small' aria-label='More'>
                 <Ellipsis />
