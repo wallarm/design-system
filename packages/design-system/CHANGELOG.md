@@ -1,3 +1,8 @@
+## 0.3.0-rc-feature-WDS-85-table-tech-design.1 (2026-02-23)
+
+* feat: Table prototype ([f218703](https://github.com/wallarm/design-system/commit/f218703))
+* feat: Table tech design [WDS-85] ([8f59c1e](https://github.com/wallarm/design-system/commit/8f59c1e))
+
 ## 0.3.0 (2026-02-24)
 
 * feat: mcp [WDS-86] (#21) ([157bd79](https://github.com/wallarm/design-system/commit/157bd79)), closes [#21](https://github.com/wallarm/design-system/issues/21)
@@ -6,7 +11,7 @@
 
 * feat: mcp [WDS-86] ([99ec761](https://github.com/wallarm/design-system/commit/99ec761))
 
-## <small>0.2.1 (2026-02-21)</small>
+## 0.2.1 (2026-02-21)
 
 * fix: added source to scanning all components (#20) ([339a5bf](https://github.com/wallarm/design-system/commit/339a5bf)), closes [#20](https://github.com/wallarm/design-system/issues/20)
 
