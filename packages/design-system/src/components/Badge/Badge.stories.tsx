@@ -6,7 +6,10 @@ import { HStack } from '../Stack';
 import { Badge } from './Badge';
 import { BadgeColorEnum, BadgeTypeEnum } from './constants';
 import { badgeColorsMuted } from './generateBadgeVariants';
-import type { BadgeType } from './types';
+import type { BadgeColor, BadgeType } from './types';
+
+const isMutedSupported = (type: BadgeType, color: BadgeColor): boolean =>
+  type === 'solid' || (type === 'outline' && color === 'slate');
 
 const meta = {
   title: 'Status Indication/Badge',
@@ -160,6 +163,35 @@ export const IconsOnly: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+export const MutedVariants: StoryFn<typeof meta> = () => (
+  <table className='w-full'>
+    <thead>
+      <tr>
+        {Object.keys(BadgeTypeEnum).map(type => (
+          <th key={type} className='p-8 text-left'>
+            {type}
+          </th>
+        ))}
+      </tr>
+    </thead>
+    <tbody>
+      {badgeColorsMuted.map(color => (
+        <tr key={color}>
+          {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
+            <td key={type} className='p-8'>
+              {isMutedSupported(type, color) ? (
+                <Badge type={type} color={color} muted>
+                  {capitalize(color)}
+                </Badge>
+              ) : null}
+            </td>
+          ))}
+        </tr>
+      ))}
+    </tbody>
+  </table>
+);
+
 export const ColorVariants: StoryFn<typeof meta> = () => (
   <table className='w-full'>
     <thead>
@@ -179,35 +211,6 @@ export const ColorVariants: StoryFn<typeof meta> = () => (
               <Badge type={type} color={color}>
                 {label}
               </Badge>
-            </td>
-          ))}
-        </tr>
-      ))}
-    </tbody>
-  </table>
-);
-
-export const MutedVariants: StoryFn<typeof meta> = () => (
-  <table className='w-full'>
-    <thead>
-      <tr>
-        {Object.keys(BadgeTypeEnum).map(type => (
-          <th key={type} className='p-8 text-left'>
-            {type}
-          </th>
-        ))}
-      </tr>
-    </thead>
-    <tbody>
-      {badgeColorsMuted.map(color => (
-        <tr key={color}>
-          {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-            <td key={type} className='p-8'>
-              {(type === 'outline' && color === 'slate') || type === 'solid' ? (
-                <Badge type={type} color={color} muted>
-                  {capitalize(color)}
-                </Badge>
-              ) : null}
             </td>
           ))}
         </tr>
@@ -320,7 +323,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
             <tr key={color}>
               {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
                 <td key={type} className='p-8'>
-                  {(type === 'outline' && color === 'slate') || type === 'solid' ? (
+                  {isMutedSupported(type, color) ? (
                     <Badge type={type} color={color} muted>
                       {capitalize(color)}
                     </Badge>
