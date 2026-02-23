@@ -62,6 +62,7 @@ export const tableBodyCellVariants = cva(
     'has-[>_[data-state=open]]:ring-2 has-[>_[data-state=open]]:ring-inset has-[>_[data-state=open]]:ring-border-strong-brand',
     'has-[>_[data-part=context-trigger]]:p-0',
     '[&>[data-part=context-trigger]]:px-16 [&>[data-part=context-trigger]]:py-8 [&>[data-part=context-trigger]]:text-left',
+    '[&>[data-part=context-trigger]]:w-full [&>[data-part=context-trigger]]:outline-none',
   ),
   {
     variants: {
