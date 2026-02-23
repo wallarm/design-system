@@ -1,5 +1,12 @@
 ## 0.3.0-rc-feature-WDS-85-table-tech-design.1 (2026-02-23)
 
+* fix: remove TableContextMenu and simplify to use DropdownMenu ([1fdf60c](https://github.com/wallarm/design-system/commit/1fdf60c))
+* chore(release): v0.3.0-rc-feature-WDS-85-table-tech-design.1 [skip ci] ([b2d9b13](https://github.com/wallarm/design-system/commit/b2d9b13))
+* feat: Table prototype ([f218703](https://github.com/wallarm/design-system/commit/f218703))
+* feat: Table tech design [WDS-85] ([8f59c1e](https://github.com/wallarm/design-system/commit/8f59c1e))
+
+## 0.3.0-rc-feature-WDS-85-table-tech-design.1 (2026-02-23)
+
 * feat: Table prototype ([f218703](https://github.com/wallarm/design-system/commit/f218703))
 * feat: Table tech design [WDS-85] ([8f59c1e](https://github.com/wallarm/design-system/commit/8f59c1e))
 
