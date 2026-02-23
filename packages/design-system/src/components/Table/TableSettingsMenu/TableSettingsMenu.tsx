@@ -26,6 +26,7 @@ import {
 } from '../../DropdownMenu';
 import { Input } from '../../Input';
 import { Separator } from '../../Separator';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { VStack } from '../../Stack';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from '../lib';
 import { useTableContext } from '../TableContext';
@@ -44,6 +45,7 @@ export const TableSettingsMenu: FC = () => {
   } = ctx;
 
   const [search, setSearch] = useState('');
+  const [menuOpen, setMenuOpen] = useState(false);
 
   // Filter out utility columns (_selection, _expand) — they shouldn't appear in settings
   const allColumns = table
@@ -127,62 +129,69 @@ export const TableSettingsMenu: FC = () => {
         'rounded-tr-12',
       )}
     >
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant='outline' color='neutral' size='small' className='shadow-sm'>
-            <Settings />
-          </Button>
-        </DropdownMenuTrigger>
+      <Tooltip disabled={menuOpen}>
+        <TooltipTrigger asChild>
+          <span className='inline-flex'>
+            <DropdownMenu onOpenChange={setMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <Button variant='outline' color='neutral' size='small' className='shadow-sm' aria-label='Table settings'>
+                  <Settings />
+                </Button>
+              </DropdownMenuTrigger>
 
-        <DropdownMenuContent className={cn('min-w-256')}>
-          <VStack spacing={8} align='stretch'>
-            <Input placeholder='Search' value={search} onChange={e => setSearch(e.target.value)} />
+              <DropdownMenuContent className={cn('min-w-256')}>
+                <VStack spacing={8} align='stretch'>
+                  <Input placeholder='Search' value={search} onChange={e => setSearch(e.target.value)} />
 
-            <VStack>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext
-                  items={filteredColumns
-                    .filter(c => !alwaysPinnedLeft.includes(c.id))
-                    .map(c => c.id)}
-                  strategy={verticalListSortingStrategy}
-                >
-                  {filteredColumns.map(col => {
-                    const showSeparator =
-                      hasUserPinned &&
-                      unpinnedColumns.length > 0 &&
-                      col.id === unpinnedColumns[0]?.id;
+                  <VStack>
+                    <DndContext
+                      sensors={sensors}
+                      collisionDetection={closestCenter}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <SortableContext
+                        items={filteredColumns
+                          .filter(c => !alwaysPinnedLeft.includes(c.id))
+                          .map(c => c.id)}
+                        strategy={verticalListSortingStrategy}
+                      >
+                        {filteredColumns.map(col => {
+                          const showSeparator =
+                            hasUserPinned &&
+                            unpinnedColumns.length > 0 &&
+                            col.id === unpinnedColumns[0]?.id;
 
-                    return (
-                      <Fragment key={col.id}>
-                        {showSeparator && <Separator spacing={4} />}
+                          return (
+                            <Fragment key={col.id}>
+                              {showSeparator && <Separator spacing={4} />}
 
-                        <TableSettingsMenuItem column={col} canDrag={columnDndEnabled} />
-                      </Fragment>
-                    );
-                  })}
-                </SortableContext>
-              </DndContext>
-            </VStack>
+                              <TableSettingsMenuItem column={col} canDrag={columnDndEnabled} />
+                            </Fragment>
+                          );
+                        })}
+                      </SortableContext>
+                    </DndContext>
+                  </VStack>
 
-            <DropdownMenuSeparator />
+                  <DropdownMenuSeparator />
 
-            <Button
-              variant='ghost'
-              color='neutral'
-              size='small'
-              onClick={handleReset}
-              disabled={isDefaultState}
-              fullWidth
-            >
-              Reset to default
-            </Button>
-          </VStack>
-        </DropdownMenuContent>
-      </DropdownMenu>
+                  <Button
+                    variant='ghost'
+                    color='neutral'
+                    size='small'
+                    onClick={handleReset}
+                    disabled={isDefaultState}
+                    fullWidth
+                  >
+                    Reset to default
+                  </Button>
+                </VStack>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </span>
+        </TooltipTrigger>
+        <TooltipContent>Table settings</TooltipContent>
+      </Tooltip>
     </div>
   );
 };
