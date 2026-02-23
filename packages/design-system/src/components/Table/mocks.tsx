@@ -368,6 +368,8 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
   securityColumnHelper.accessor('lastSeen', {
     header: 'Last seen',
     size: 120,
+    enableSorting: true,
+    meta: { sortType: 'date' as const },
     cell: ({ getValue }) => (
       <Text size='sm' color='secondary'>
         {getValue()}

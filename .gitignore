@@ -55,3 +55,6 @@ yarn-error.log*
 package.json.backup
 
 .playwright-mcp
+
+# Translated docs
+TABLE_DESIGN_RU.md

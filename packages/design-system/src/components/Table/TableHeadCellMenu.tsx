@@ -18,23 +18,13 @@ import {
   DropdownMenuTrigger,
   DropdownMenuTriggerItem,
 } from '../DropdownMenu';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
+import { SORT_LABELS } from './lib';
 import { useTableContext } from './TableContext';
 
 interface TableColumnHeaderMenuProps<T> {
   column: Column<T, unknown>;
 }
-
-const SORT_LABELS: Record<string, [string, string]> = {
-  text: ['A \u2192 Z', 'Z \u2192 A'],
-  number: ['Highest on top', 'Lowest on top'],
-  date: ['Newest on top', 'Oldest on top'],
-  duration: ['Longest on top', 'Shortest on top'],
-  score: ['Highest on top', 'Lowest on top'],
-  boolean: ['Yes on top', 'No on top'],
-  version: ['Latest on top', 'Earliest on top'],
-  severity: ['Most critical on top', 'Least critical on top'],
-  size: ['Largest on top', 'Smallest on top'],
-};
 
 const getSortLabels = (column: Column<unknown, unknown>): [string, string] => {
   const sortType = column.columnDef.meta?.sortType;
@@ -98,76 +88,83 @@ export const TableHeadCellMenu = <T,>({ column }: TableColumnHeaderMenuProps<T>)
   const hasMovement = canMoveLeft || canMoveRight;
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant='ghost' color='neutral' size='small' aria-label='Column menu'>
-          <Ellipsis />
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        {/* Move left / Move right */}
-        {canMoveLeft && (
-          <DropdownMenuItem onSelect={() => handleMove('left')}>
-            <ArrowLeft size='sm' />
-            Move left
-          </DropdownMenuItem>
-        )}
-        {canMoveRight && (
-          <DropdownMenuItem onSelect={() => handleMove('right')}>
-            <ArrowRight size='sm' />
-            Move right
-          </DropdownMenuItem>
-        )}
-
-        {hasMovement && (canSort || canPin || canHide) && <DropdownMenuSeparator />}
-
-        {/* Sort submenu */}
-        {canSort && (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className='inline-flex'>
           <DropdownMenu>
-            <DropdownMenuTriggerItem>
-              <ChevronsDown size='sm' />
-              Sort
-            </DropdownMenuTriggerItem>
+            <DropdownMenuTrigger asChild>
+              <Button variant='ghost' color='neutral' size='small' aria-label='More'>
+                <Ellipsis />
+              </Button>
+            </DropdownMenuTrigger>
             <DropdownMenuContent>
-              <DropdownMenuItem onSelect={() => handleSort(false)}>
-                {ascLabel}
-                {sortDirection === 'asc' && (
-                  <Check size='sm' className='ml-auto text-icon-primary' />
-                )}
-              </DropdownMenuItem>
-              <DropdownMenuItem onSelect={() => handleSort(true)}>
-                {descLabel}
-                {sortDirection === 'desc' && (
-                  <Check size='sm' className='ml-auto text-icon-primary' />
-                )}
-              </DropdownMenuItem>
+              {/* Move left / Move right */}
+              {canMoveLeft && (
+                <DropdownMenuItem onSelect={() => handleMove('left')}>
+                  <ArrowLeft size='sm' />
+                  Move left
+                </DropdownMenuItem>
+              )}
+              {canMoveRight && (
+                <DropdownMenuItem onSelect={() => handleMove('right')}>
+                  <ArrowRight size='sm' />
+                  Move right
+                </DropdownMenuItem>
+              )}
+
+              {hasMovement && (canSort || canPin || canHide) && <DropdownMenuSeparator />}
+
+              {/* Sort submenu */}
+              {canSort && (
+                <DropdownMenu>
+                  <DropdownMenuTriggerItem>
+                    <ChevronsDown size='sm' />
+                    Sort
+                  </DropdownMenuTriggerItem>
+                  <DropdownMenuContent>
+                    <DropdownMenuItem onSelect={() => handleSort(false)}>
+                      {ascLabel}
+                      {sortDirection === 'asc' && (
+                        <Check size='sm' className='ml-auto text-icon-primary' />
+                      )}
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => handleSort(true)}>
+                      {descLabel}
+                      {sortDirection === 'desc' && (
+                        <Check size='sm' className='ml-auto text-icon-primary' />
+                      )}
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+
+              {/* Pin / Unpin */}
+              {canPin && isPinned && (
+                <DropdownMenuItem onSelect={() => handlePin(false)}>
+                  <PinOff size='sm' />
+                  Unpin
+                </DropdownMenuItem>
+              )}
+              {canPin && !isPinned && (
+                <DropdownMenuItem onSelect={() => handlePin('left')}>
+                  <Pin size='sm' />
+                  Pin
+                </DropdownMenuItem>
+              )}
+
+              {/* Hide */}
+              {canHide && (
+                <DropdownMenuItem onSelect={handleHide}>
+                  <EyeOff size='sm' />
+                  Hide
+                </DropdownMenuItem>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
-        )}
-
-        {/* Pin / Unpin */}
-        {canPin && isPinned && (
-          <DropdownMenuItem onSelect={() => handlePin(false)}>
-            <PinOff size='sm' />
-            Unpin
-          </DropdownMenuItem>
-        )}
-        {canPin && !isPinned && (
-          <DropdownMenuItem onSelect={() => handlePin('left')}>
-            <Pin size='sm' />
-            Pin
-          </DropdownMenuItem>
-        )}
-
-        {/* Hide */}
-        {canHide && (
-          <DropdownMenuItem onSelect={handleHide}>
-            <EyeOff size='sm' />
-            Hide
-          </DropdownMenuItem>
-        )}
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>More</TooltipContent>
+    </Tooltip>
   );
 };
 

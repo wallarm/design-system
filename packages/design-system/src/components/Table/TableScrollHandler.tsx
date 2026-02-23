@@ -1,6 +1,7 @@
 import { type FC, useCallback } from 'react';
 import { ArrowLeft, ArrowRight } from '../../icons';
 import { Button } from '../Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useTableContext } from './TableContext';
 
 interface TableScrollHandlerProps {
@@ -32,26 +33,36 @@ export const TableScrollHandler: FC<TableScrollHandlerProps> = ({ atStart, atEnd
 
   return (
     <div className='shrink-0 ml-auto flex items-center gap-4'>
-      <Button
-        variant='ghost'
-        color='neutral'
-        size='small'
-        disabled={atStart}
-        onClick={handleScrollLeft}
-        aria-label='Scroll left'
-      >
-        <ArrowLeft />
-      </Button>
-      <Button
-        variant='ghost'
-        color='neutral'
-        size='small'
-        disabled={atEnd}
-        onClick={handleScrollRight}
-        aria-label='Scroll right'
-      >
-        <ArrowRight />
-      </Button>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant='ghost'
+            color='neutral'
+            size='small'
+            disabled={atStart}
+            onClick={handleScrollLeft}
+            aria-label='Scroll left'
+          >
+            <ArrowLeft />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Scroll left</TooltipContent>
+      </Tooltip>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant='ghost'
+            color='neutral'
+            size='small'
+            disabled={atEnd}
+            onClick={handleScrollRight}
+            aria-label='Scroll right'
+          >
+            <ArrowRight />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Scroll right</TooltipContent>
+      </Tooltip>
     </div>
   );
 };
