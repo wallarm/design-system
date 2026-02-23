@@ -1,3 +1,7 @@
+## 0.3.0-rc-feature-WDS-86-mcp.1 (2026-02-23)
+
+* feat: mcp [WDS-86] ([99ec761](https://github.com/wallarm/design-system/commit/99ec761))
+
 ## <small>0.2.1 (2026-02-21)</small>
 
 * fix: added source to scanning all components (#20) ([339a5bf](https://github.com/wallarm/design-system/commit/339a5bf)), closes [#20](https://github.com/wallarm/design-system/issues/20)
