@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
 const scrollAreaScrollbarVariants = cva(
-  'bg-transparent rounded-8 transition-opacity overflow-hidden',
+  'z-30 bg-transparent rounded-8 transition-opacity overflow-hidden',
   {
     variants: {
       orientation: {

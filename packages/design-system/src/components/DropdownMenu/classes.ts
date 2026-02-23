@@ -23,7 +23,7 @@ export const dropdownMenuItemVariants = cva(
     // Misc
     'relative cursor-pointer select-none outline-none transition-colors',
     // States
-    'data-[disabled]:cursor-not-allowed data-[disabled]:opacity-50',
+    'data-disabled:cursor-not-allowed data-disabled:opacity-50',
     // Icons
     '[&_svg]:pointer-events-none [&_svg]:icon-md [&>svg]:icon-md [&>svg]:shrink-0',
   ],
@@ -34,6 +34,7 @@ export const dropdownMenuItemVariants = cva(
           'text-text-primary',
           'not-data-disabled:hover:bg-states-primary-hover',
           'not-data-disabled:focus:bg-states-primary-hover',
+          'not-data-disabled:data-highlighted:bg-states-primary-hover',
           'not-data-disabled:active:bg-states-primary-pressed',
           'not-data-disabled:data-[state=open]:bg-states-primary-hover',
         ),
@@ -41,6 +42,7 @@ export const dropdownMenuItemVariants = cva(
           'text-text-brand',
           'not-data-disabled:hover:bg-states-brand-hover',
           'not-data-disabled:focus:bg-states-brand-hover',
+          'not-data-disabled:data-highlighted:bg-states-brand-hover',
           'not-data-disabled:active:bg-states-brand-pressed',
           'not-data-disabled:data-[state=open]:bg-states-brand-hover',
         ),
@@ -48,6 +50,7 @@ export const dropdownMenuItemVariants = cva(
           'text-text-danger',
           'not-data-disabled:hover:bg-states-danger-hover',
           'not-data-disabled:focus:bg-states-danger-hover',
+          'not-data-disabled:data-highlighted:bg-states-danger-hover',
           'not-data-disabled:active:bg-states-danger-pressed',
           'not-data-disabled:data-[state=open]:bg-states-danger-hover',
         ),
