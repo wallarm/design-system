@@ -7,6 +7,7 @@ catalog:
   allure-playwright: 3.0.0
   '@biomejs/biome': 2.1.4
   '@playwright/test': 1.58.0
+  '@rslib/core': 0.19.3
   '@rsbuild/core': 1.7.2
   '@rsbuild/plugin-react': 1.4.3
   '@rspack/core': 1.7.3

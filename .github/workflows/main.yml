@@ -36,11 +36,12 @@ jobs:
       should-update-screenshots: ${{ steps.check-screenshots.outputs.should_update }}
       is-bot-screenshot-commit: ${{ steps.check-bot.outputs.is_bot }}
       should-skip-e2e: ${{ steps.check-e2e-skip.outputs.should_skip }}
+      should-release-mcp: ${{ steps.check-mcp.outputs.should_release }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Check if bot screenshot commit
         id: check-bot
@@ -91,6 +92,39 @@ jobs:
           else
             echo "should_skip=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Check MCP release trigger
+        id: check-mcp
+        run: |
+          SHOULD_RELEASE="false"
+
+          # Check for breaking change in commit messages since last tag
+          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+          if [ -n "$LAST_TAG" ]; then
+            RANGE="${LAST_TAG}..HEAD"
+          else
+            RANGE="HEAD~10..HEAD"
+          fi
+
+          # Detect breaking changes (feat!:, fix!:, BREAKING CHANGE in body)
+          if git log "$RANGE" --pretty="%B" | grep -qE "^(feat|fix|refactor|perf)(\(.+\))?!:|BREAKING CHANGE"; then
+            echo "🔥 Breaking change detected — MCP release triggered"
+            SHOULD_RELEASE="true"
+          fi
+
+          # Detect changes in mcp-core or mcp packages
+          if [ -n "$LAST_TAG" ]; then
+            CHANGED_FILES=$(git diff --name-only "$LAST_TAG"..HEAD)
+          else
+            CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD)
+          fi
+
+          if echo "$CHANGED_FILES" | grep -qE "^packages/(mcp-core|mcp)/"; then
+            echo "📦 MCP package changes detected — MCP release triggered"
+            SHOULD_RELEASE="true"
+          fi
+
+          echo "should_release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
 
   # ========================================
   # Quality Checks (Parallel)
@@ -506,8 +540,16 @@ jobs:
           name: built-packages
           path: .
 
-      - name: Release
+      - name: Release design-system
         run: pnpm semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Release mcp
+        if: needs.setup.outputs.should-release-mcp == 'true'
+        run: pnpm semantic-release --extends ./packages/mcp/.releaserc.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

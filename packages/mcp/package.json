@@ -1,0 +1,55 @@
+{
+  "name": "@wallarm-org/mcp",
+  "version": "0.1.0",
+  "description": "MCP server for Wallarm Design System — provides component metadata, props, variants, and design tokens to AI assistants",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wallarm/design-system.git",
+    "directory": "packages/mcp"
+  },
+  "license": "MIT",
+  "author": "Wallarm",
+  "type": "module",
+  "bin": {
+    "wallarm-ds-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rslib build",
+    "dev": "rslib build --watch",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "pnpm build && prepare-publish",
+    "postpublish": "restore-package"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@wallarm-org/mcp-core": "workspace:*"
+  },
+  "peerDependencies": {
+    "@wallarm-org/design-system": ">=0.2.0"
+  },
+  "peerDependenciesMeta": {
+    "@wallarm-org/design-system": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@wallarm-org/design-system": "workspace:*",
+    "@wallarm-org/publish-scripts": "workspace:*",
+    "@wallarm-org/typescript-config": "workspace:*",
+    "@wallarm-org/vitest-config": "workspace:*",
+    "@rslib/core": "catalog:",
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "zod": "^3.24.0"
+  }
+}

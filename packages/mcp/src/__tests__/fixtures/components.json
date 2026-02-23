@@ -1,0 +1,111 @@
+{
+  "version": "0.2.1",
+  "generatedAt": "2026-01-01T00:00:00.000Z",
+  "components": [
+    {
+      "name": "Button",
+      "description": "Primary interactive button component with multiple variants and colors.",
+      "importPath": "@wallarm-org/design-system/Button",
+      "props": [
+        { "name": "variant", "type": "'primary' | 'outline' | 'ghost' | 'secondary'", "required": false, "description": "Visual style variant", "defaultValue": "primary" },
+        { "name": "color", "type": "'brand' | 'neutral' | 'neutral-alt' | 'destructive'", "required": false, "description": "Color scheme", "defaultValue": "brand" },
+        { "name": "size", "type": "'small' | 'medium' | 'large'", "required": false, "description": "Button size", "defaultValue": "large" },
+        { "name": "loading", "type": "boolean", "required": false, "description": "Show loading state", "defaultValue": "false" },
+        { "name": "disabled", "type": "boolean", "required": false },
+        { "name": "fullWidth", "type": "boolean", "required": false }
+      ],
+      "variants": [
+        { "name": "variant", "options": ["primary", "outline", "ghost", "secondary"] },
+        { "name": "color", "options": ["brand", "neutral", "neutral-alt", "destructive"] },
+        { "name": "size", "options": ["small", "medium", "large"], "defaultValue": "large" }
+      ],
+      "subComponents": [],
+      "examples": [
+        {
+          "name": "Basic",
+          "code": "({ ...args }) => {\n  return <Button {...args}>Button</Button>;\n}"
+        },
+        {
+          "name": "FullWidth",
+          "code": "({ ...args }) => (\n  <div className='w-400'>\n    <Button {...args} fullWidth>\n      Full width example\n    </Button>\n  </div>\n)"
+        }
+      ]
+    },
+    {
+      "name": "Alert",
+      "description": "Alert component for displaying important messages to users.",
+      "importPath": "@wallarm-org/design-system/Alert",
+      "props": [
+        { "name": "color", "type": "'primary' | 'destructive' | 'info' | 'warning' | 'success'", "required": false, "description": "Color variant of the alert", "defaultValue": "primary" },
+        { "name": "minWidth", "type": "number", "required": false, "description": "Minimum width in pixels", "defaultValue": "256" },
+        { "name": "maxWidth", "type": "number", "required": false, "description": "Maximum width in pixels", "defaultValue": "980" }
+      ],
+      "variants": [
+        { "name": "color", "options": ["primary", "destructive", "info", "warning", "success"], "defaultValue": "primary" }
+      ],
+      "subComponents": [
+        {
+          "name": "AlertIcon",
+          "props": [{ "name": "color", "type": "AlertColor", "required": false }]
+        },
+        {
+          "name": "AlertClose",
+          "props": [{ "name": "color", "type": "AlertColor", "required": false }]
+        },
+        {
+          "name": "AlertTitle",
+          "props": []
+        }
+      ],
+      "examples": [
+        {
+          "name": "WithCloseButton",
+          "code": "() => {\n  const [show, setShow] = useState(true);\n  return show && <Alert><AlertClose onClick={() => setShow(false)} /></Alert>;\n}"
+        }
+      ]
+    },
+    {
+      "name": "Badge",
+      "description": "Badge component for status labels and tags.",
+      "importPath": "@wallarm-org/design-system/Badge",
+      "props": [
+        { "name": "variant", "type": "'default' | 'dotted'", "required": false },
+        { "name": "size", "type": "'medium' | 'large'", "required": false },
+        { "name": "color", "type": "BadgeColor", "required": false }
+      ],
+      "variants": [
+        { "name": "variant", "options": ["default", "dotted"], "defaultValue": "default" },
+        { "name": "size", "options": ["medium", "large"] },
+        { "name": "type", "options": ["solid", "secondary", "outline", "text", "text-color"] },
+        { "name": "color", "options": [] }
+      ],
+      "subComponents": [],
+      "examples": [
+        {
+          "name": "Basic",
+          "code": "({ ...args }) => <Badge {...args}>Badge</Badge>"
+        }
+      ]
+    }
+  ],
+  "tokens": [
+    {
+      "name": "colors-primary",
+      "description": "Primary brand colors",
+      "tokens": [
+        { "name": "--color-slate-50", "value": "#f8fafc" },
+        { "name": "--color-slate-900", "value": "#0f172b" },
+        { "name": "--color-w-orange-500", "value": "#ff6633" }
+      ]
+    },
+    {
+      "name": "spacing",
+      "description": "Spacing scale values",
+      "tokens": [
+        { "name": "--spacing-4", "value": "4px" },
+        { "name": "--spacing-8", "value": "8px" },
+        { "name": "--spacing-16", "value": "16px" }
+      ]
+    }
+  ]
+}
