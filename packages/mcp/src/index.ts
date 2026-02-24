@@ -5,7 +5,9 @@ import { loadMetadata } from './metadata';
 import { getComponentListContent } from './resources/components';
 import { getTokensContent } from './resources/tokens';
 import { formatComponentDetails, getComponent } from './tools/get-component';
+import { formatTokenCategory, getTokenCategory } from './tools/get-token-category';
 import { searchComponents } from './tools/search-component';
+import { searchTokens } from './tools/search-token';
 
 async function main() {
   // All non-protocol output goes to stderr (critical for stdio transport)
@@ -71,6 +73,60 @@ async function main() {
         return { content: [{ type: 'text', text: `Component "${name}" not found.${hint}` }] };
       }
       return { content: [{ type: 'text', text: formatComponentDetails(component) }] };
+    },
+  );
+
+  server.registerTool(
+    'search_token',
+    {
+      description:
+        'Search for design tokens by name, value, or category. Returns matched tokens sorted by relevance.',
+      inputSchema: {
+        query: z
+          .string()
+          .describe(
+            'Search query — token name (e.g. "spacing-8"), value (e.g. "#ff6633"), or category (e.g. "colors-primary")',
+          ),
+      },
+    },
+    async ({ query }) => {
+      const results = searchTokens(metadata, query);
+      if (results.length === 0) {
+        return { content: [{ type: 'text', text: `No tokens found for "${query}"` }] };
+      }
+      const text = results
+        .slice(0, 20)
+        .map(r => `- \`${r.name}\`: \`${r.value}\`  _(${r.category})_`)
+        .join('\n');
+      return { content: [{ type: 'text', text }] };
+    },
+  );
+
+  server.registerTool(
+    'get_token_category',
+    {
+      description:
+        'Get all tokens in a specific category (e.g. "spacing", "colors-primary", "typography").',
+      inputSchema: {
+        name: z
+          .string()
+          .describe('Category name (case-insensitive), e.g. "spacing", "colors-primary", "shadow"'),
+      },
+    },
+    async ({ name }) => {
+      const category = getTokenCategory(metadata, name);
+      if (!category) {
+        const categories = metadata.tokens.map(c => c.name);
+        return {
+          content: [
+            {
+              type: 'text',
+              text: `Category "${name}" not found.\n\nAvailable categories: ${categories.join(', ')}`,
+            },
+          ],
+        };
+      }
+      return { content: [{ type: 'text', text: formatTokenCategory(category) }] };
     },
   );
 
