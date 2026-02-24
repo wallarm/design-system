@@ -93,6 +93,16 @@ export {
   InputGroupInput,
   InputGroupText,
 } from './components/InputGroup';
+export {
+  type DatacenterKey,
+  datacenters,
+  IpAddress,
+  type IpAddressEntry,
+  type IpAddressProps,
+  type ProxyTypeKey,
+  proxyTypes,
+  type SourceKey,
+} from './components/IpAddress';
 export { Kbd, KbdGroup } from './components/Kbd';
 export { Link, type LinkProps } from './components/Link';
 export { Loader, type LoaderProps } from './components/Loader';
