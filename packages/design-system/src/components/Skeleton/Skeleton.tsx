@@ -1,45 +1,48 @@
-import type { ComponentProps, FC, PropsWithChildren, Ref } from 'react';
+import type { FC, HTMLAttributes, PropsWithChildren, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
-const skeletonVariants = cva('animate-pulse bg-bg-primary rounded-6', {
+const skeletonVariants = cva('overflow-clip relative rounded-6', {
   variants: {
-    variant: {
-      text: 'h-16 w-full',
-      circular: 'rounded-full',
-      rect: '',
-      rounded: 'rounded-12',
-    },
-    asChild: {
-      true: 'select-none pointer-events-none overflow-hidden text-transparent *:invisible',
-      false: '',
+    transparent: {
+      true: '',
+      false: 'bg-bg-surface-1',
     },
   },
   defaultVariants: {
-    variant: 'rect',
-    asChild: false,
+    transparent: true,
   },
 });
 
-type SkeletonNativeProps = ComponentProps<'div'>;
+type SkeletonVariantsProps = VariantProps<typeof skeletonVariants>;
 
-type SkeletonVariantProps = VariantProps<typeof skeletonVariants>;
+interface SkeletonBaseProps {
+  ref?: Ref<HTMLDivElement>;
+  asChild?: boolean;
+  loading?: boolean;
+  animated?: boolean;
+  width?: string | number;
+  height?: string | number;
+  rounded?: number;
+}
 
-export type SkeletonProps = SkeletonNativeProps &
-  SkeletonVariantProps &
-  PropsWithChildren & {
-    ref?: Ref<HTMLDivElement>;
-    loading?: boolean;
-  };
+export type SkeletonProps = HTMLAttributes<HTMLDivElement> &
+  SkeletonVariantsProps &
+  SkeletonBaseProps &
+  PropsWithChildren;
 
 export const Skeleton: FC<SkeletonProps> = ({
-  variant = 'rect',
-  loading = true,
+  ref,
   asChild = false,
+  loading = true,
+  animated = true,
+  transparent = true,
+  width,
+  height,
+  rounded,
   className,
   children,
-  ref,
   ...props
 }) => {
   if (!loading) {
@@ -50,14 +53,21 @@ export const Skeleton: FC<SkeletonProps> = ({
 
   return (
     <Comp
+      {...props}
       ref={ref}
       data-slot='skeleton'
-      aria-hidden
-      tabIndex={-1}
-      className={cn(skeletonVariants({ variant, asChild }), className)}
-      {...props}
+      className={cn('w-full h-[20px]', skeletonVariants({ transparent }), className)}
+      style={{ width, height, borderRadius: rounded }}
     >
-      {children}
+      <div
+        className={cn('absolute inset-0', animated && 'animate-pulse')}
+        style={{
+          backgroundImage:
+            'linear-gradient(90deg, rgba(71, 85, 105, 0.06) 0px, rgba(71, 85, 105, 0.16) 284px, rgba(71, 85, 105, 0.06) 568px, rgba(71, 85, 105, 0.16) 852px)',
+          backgroundSize: '852px 100%',
+          backgroundRepeat: 'repeat-x',
+        }}
+      />
     </Comp>
   );
 };
