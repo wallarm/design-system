@@ -26,7 +26,7 @@
     "test": "vitest",
     "test:run": "vitest run",
     "typecheck": "tsc --noEmit",
-    "prepublishOnly": "pnpm build && prepare-publish",
+    "prepublishOnly": "prepare-publish",
     "postpublish": "restore-package"
   },
   "dependencies": {
