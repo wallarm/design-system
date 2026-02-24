@@ -29,6 +29,7 @@ export {
   type CheckboxProps,
 } from './components/Checkbox';
 export { Code, type CodeProps } from './components/Code';
+export { Country, type CountryProps } from './components/Country';
 export {
   Drawer,
   DrawerBody,
