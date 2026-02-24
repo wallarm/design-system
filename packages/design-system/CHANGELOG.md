@@ -1,3 +1,7 @@
+## 0.4.0 (2026-02-24)
+
+* feat: Table [WDS-85] (#18) ([300ff57](https://github.com/wallarm/design-system/commit/300ff57)), closes [#18](https://github.com/wallarm/design-system/issues/18)
+
 ## 0.3.1 (2026-02-24)
 
 * fix: prepublishing (#23) ([1b9cbc7](https://github.com/wallarm/design-system/commit/1b9cbc7)), closes [#23](https://github.com/wallarm/design-system/issues/23)
