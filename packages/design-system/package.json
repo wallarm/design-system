@@ -68,7 +68,7 @@
     "build": "rslib build && pnpm generate-metadata",
     "generate-metadata": "tsx scripts/metadata/generate.ts",
     "build:watch": "rslib build --watch",
-    "prepublishOnly": "rslib build && prepare-publish",
+    "prepublishOnly": "prepare-publish",
     "postpublish": "restore-package",
     "generate-exports": "tsx scripts/generate-exports.ts",
     "publish:local": "pnpm build && yalc publish --push",
