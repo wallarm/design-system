@@ -76,7 +76,7 @@ export const TableInner: FC<TableInnerProps> = ({
         >
           <ScrollAreaViewport ref={containerRef} data-table-scroll-container tabIndex={-1}>
             <table
-              className={cn('table-fixed border-separate border-spacing-0')}
+              className={cn('table-fixed border-separate border-spacing-0 overflow-clip')}
               style={{ width: tableWidth }}
               aria-label={ariaLabel}
             >
