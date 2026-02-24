@@ -1,3 +1,7 @@
+## <small>0.3.1 (2026-02-24)</small>
+
+* fix: prepublishing (#23) ([1b9cbc7](https://github.com/wallarm/design-system/commit/1b9cbc7)), closes [#23](https://github.com/wallarm/design-system/issues/23)
+
 ## 0.3.0 (2026-02-24)
 
 * feat: mcp [WDS-86] (#21) ([157bd79](https://github.com/wallarm/design-system/commit/157bd79)), closes [#21](https://github.com/wallarm/design-system/issues/21)
