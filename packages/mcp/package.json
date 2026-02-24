@@ -30,7 +30,7 @@
     "postpublish": "restore-package"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.12.1",
+    "@modelcontextprotocol/sdk": "1.26.0",
     "@wallarm-org/mcp-core": "workspace:*"
   },
   "peerDependencies": {
@@ -50,6 +50,6 @@
     "@types/node": "catalog:",
     "typescript": "catalog:",
     "vitest": "catalog:",
-    "zod": "^3.24.0"
+    "zod": "catalog:"
   }
 }

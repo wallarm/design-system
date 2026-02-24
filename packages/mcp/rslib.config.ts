@@ -1,4 +1,4 @@
-import { defineConfig, rspack } from '@rslib/core';
+import { defineConfig } from '@rslib/core';
 
 export default defineConfig({
   lib: [
@@ -6,11 +6,8 @@ export default defineConfig({
       format: 'esm',
       bundle: true,
       dts: false,
-      autoExtension: false,
-      output: {
-        filename: {
-          js: 'index.js',
-        },
+      banner: {
+        js: '#!/usr/bin/env node',
       },
     },
   ],
@@ -23,15 +20,5 @@ export default defineConfig({
       index: './src/index.ts',
     },
     tsconfigPath: './tsconfig.json',
-  },
-  tools: {
-    rspack: {
-      plugins: [
-        new rspack.BannerPlugin({
-          banner: '#!/usr/bin/env node',
-          raw: true,
-        }),
-      ],
-    },
   },
 });

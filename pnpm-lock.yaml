@@ -69,6 +69,9 @@ catalogs:
     vitest:
       specifier: 4.0.18
       version: 4.0.18
+    zod:
+      specifier: 4.3.6
+      version: 4.3.6
 
 importers:
 
@@ -223,10 +226,10 @@ importers:
         specifier: 'catalog:'
         version: 5.9.3
 
-  packages/configs/publish-scripts:
+  packages/configs/publishing:
     dependencies:
       tsx:
-        specifier: ^4.21.0
+        specifier: 4.21.0
         version: 4.21.0
 
   packages/configs/rsbuild-config:
@@ -399,7 +402,7 @@ importers:
         version: link:../configs/playwright-config
       '@wallarm-org/publish-scripts':
         specifier: workspace:*
-        version: link:../configs/publish-scripts
+        version: link:../configs/publishing
       '@wallarm-org/rsbuild-config':
         specifier: workspace:*
         version: link:../configs/rsbuild-config
@@ -455,8 +458,8 @@ importers:
   packages/mcp:
     dependencies:
       '@modelcontextprotocol/sdk':
-        specifier: ^1.12.1
-        version: 1.26.0(zod@3.25.76)
+        specifier: 1.26.0
+        version: 1.26.0(zod@4.3.6)
       '@wallarm-org/mcp-core':
         specifier: workspace:*
         version: link:../mcp-core
@@ -472,7 +475,7 @@ importers:
         version: link:../design-system
       '@wallarm-org/publish-scripts':
         specifier: workspace:*
-        version: link:../configs/publish-scripts
+        version: link:../configs/publishing
       '@wallarm-org/typescript-config':
         specifier: workspace:*
         version: link:../configs/typescript-config
@@ -486,14 +489,14 @@ importers:
         specifier: 'catalog:'
         version: 4.0.18(@types/node@24.10.4)(@vitest/ui@4.0.18)(happy-dom@20.0.10)(jiti@2.6.1)(jsdom@27.4.0)(lightningcss@1.30.2)(terser@5.46.0)(tsx@4.21.0)
       zod:
-        specifier: ^3.24.0
-        version: 3.25.76
+        specifier: 'catalog:'
+        version: 4.3.6
 
   packages/mcp-core:
     dependencies:
       zod:
-        specifier: ^3.24.0
-        version: 3.25.76
+        specifier: 'catalog:'
+        version: 4.3.6
     devDependencies:
       '@rslib/core':
         specifier: 'catalog:'
@@ -6561,6 +6564,9 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zod@4.3.6:
+    resolution: {integrity: sha512-rftlrkhHZOcjDwkGlnUtZZkvaPHCsDATp4pGpuOOMDaTdDDXF91wuVDJoWoPsKX/3YPQ5fHuF3STjcYyKr+Qhg==}
+
   zwitch@2.0.4:
     resolution: {integrity: sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A==}
 
@@ -7343,7 +7349,7 @@ snapshots:
       '@types/react': 19.2.9
       react: 19.2.4
 
-  '@modelcontextprotocol/sdk@1.26.0(zod@3.25.76)':
+  '@modelcontextprotocol/sdk@1.26.0(zod@4.3.6)':
     dependencies:
       '@hono/node-server': 1.19.9(hono@4.12.2)
       ajv: 8.17.1
@@ -7360,8 +7366,8 @@ snapshots:
       json-schema-typed: 8.0.2
       pkce-challenge: 5.0.1
       raw-body: 3.0.2
-      zod: 3.25.76
-      zod-to-json-schema: 3.25.1(zod@3.25.76)
+      zod: 4.3.6
+      zod-to-json-schema: 3.25.1(zod@4.3.6)
     transitivePeerDependencies:
       - supports-color
 
@@ -13137,9 +13143,9 @@ snapshots:
 
   yoctocolors@2.1.2: {}
 
-  zod-to-json-schema@3.25.1(zod@3.25.76):
+  zod-to-json-schema@3.25.1(zod@4.3.6):
     dependencies:
-      zod: 3.25.76
+      zod: 4.3.6
 
   zod-validation-error@3.5.4(zod@3.25.58):
     dependencies:
@@ -13148,5 +13154,7 @@ snapshots:
   zod@3.25.58: {}
 
   zod@3.25.76: {}
+
+  zod@4.3.6: {}
 
   zwitch@2.0.4: {}

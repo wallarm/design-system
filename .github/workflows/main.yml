@@ -271,8 +271,20 @@ jobs:
       - name: Build config packages
         run: pnpm --filter="./packages/configs/*" build
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Install Playwright system deps
+        run: pnpm exec playwright install-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Install allurectl
         run: |
@@ -316,6 +328,7 @@ jobs:
         with:
           name: e2e-results-shard-${{ matrix.shard }}
           path: packages/design-system/test-results/
+          if-no-files-found: ignore
 
   # ========================================
   # E2E Update Screenshots
@@ -360,8 +373,20 @@ jobs:
       - name: Build config packages
         run: pnpm --filter="./packages/configs/*" build
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Install Playwright system deps
+        run: pnpm exec playwright install-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Download Storybook artifact
         uses: actions/download-artifact@v4
@@ -549,7 +574,8 @@ jobs:
 
       - name: Release mcp
         if: needs.setup.outputs.should-release-mcp == 'true'
-        run: pnpm semantic-release --extends ./packages/mcp/.releaserc.json
+        working-directory: packages/mcp
+        run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
