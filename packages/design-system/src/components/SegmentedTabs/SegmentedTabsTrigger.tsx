@@ -3,7 +3,7 @@ import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cn } from '../../utils/cn';
 import { segmentedControlItemClassNamesBase } from '../SegmentedControl';
 
-interface SegmentedTabsTriggerProps {
+export interface SegmentedTabsTriggerProps {
   children: ReactNode;
   value: string;
   disabled?: boolean;

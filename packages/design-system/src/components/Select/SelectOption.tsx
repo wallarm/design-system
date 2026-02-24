@@ -8,7 +8,7 @@ type SelectOptionNativeProps = Omit<ArkUiSelect.ItemProps, 'className'>;
 
 type SelectOptionVariantsProps = VariantProps<typeof dropdownMenuItemVariants>;
 
-interface SelectOptionBaseProps {
+export interface SelectOptionBaseProps {
   item: CollectionItem;
 }
 

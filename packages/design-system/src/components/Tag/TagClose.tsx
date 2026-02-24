@@ -1,7 +1,7 @@
 import type { FC, MouseEvent } from 'react';
 import { X } from '../../icons';
 
-interface TagCloseProps {
+export interface TagCloseProps {
   onClick?: (event: MouseEvent<SVGSVGElement>) => void;
 }
 

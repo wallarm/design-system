@@ -16,7 +16,7 @@ import {
 } from './constants';
 import type { PopoverSizeDimension } from './types';
 
-interface PopoverContentProps {
+export interface PopoverContentProps {
   children: ReactNode;
   minHeight?: PopoverSizeDimension;
   maxHeight?: PopoverSizeDimension;

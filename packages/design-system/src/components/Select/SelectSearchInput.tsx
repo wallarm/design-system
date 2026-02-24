@@ -2,7 +2,7 @@ import type { ChangeEvent, FC } from 'react';
 import { Search } from '../../icons';
 import { InputGroup, InputGroupAddon, InputGroupInput } from '../InputGroup';
 
-interface SelectSearchInputProps {
+export interface SelectSearchInputProps {
   value: string;
   onChange: (value: string) => void;
 }

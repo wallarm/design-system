@@ -8,7 +8,7 @@ import { SelectValueText, type SelectValueTextProps } from './SelectValueText';
 
 type SelectButtonBaseProps = Omit<ButtonProps, 'variant' | 'color' | 'size' | 'disabled'>;
 
-interface SelectButtonVariantProps {
+export interface SelectButtonVariantProps {
   variant?: Exclude<ButtonProps['variant'], 'primary'>;
   color?: Exclude<ButtonProps['color'], 'destructive'>;
 }

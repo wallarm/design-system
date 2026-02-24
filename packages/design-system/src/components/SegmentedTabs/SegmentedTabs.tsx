@@ -18,7 +18,7 @@ const segmentedControlVariants = cva('', {
 
 type SegmentedTabsVariantProps = VariantProps<typeof segmentedControlVariants>;
 
-interface SegmentedTabsBaseProps {
+export interface SegmentedTabsBaseProps {
   children: ReactNode;
   value?: string;
   defaultValue?: string;

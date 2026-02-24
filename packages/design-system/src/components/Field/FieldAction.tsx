@@ -8,7 +8,7 @@ type FieldActionNativeProps = Omit<
   'className' | 'color' | 'disabled'
 >;
 
-interface FieldActionBaseProps {
+export interface FieldActionBaseProps {
   asChild?: boolean;
   ref?: Ref<HTMLButtonElement>;
 }

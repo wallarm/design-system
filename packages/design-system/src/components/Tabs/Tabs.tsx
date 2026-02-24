@@ -4,7 +4,7 @@ import { cn } from '../../utils/cn';
 import { TabsSharedContextProvider } from './TabsSharedContext';
 import type { TabsSize, TabsVariant } from './types';
 
-interface TabsProps {
+export interface TabsProps {
   children: ReactNode;
   size?: TabsSize;
   variant?: TabsVariant;

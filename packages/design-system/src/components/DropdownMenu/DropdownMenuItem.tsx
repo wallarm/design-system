@@ -8,7 +8,7 @@ type DropdownMenuItemNativeProps = ComponentPropsWithoutRef<typeof Item>;
 
 export type DropdownMenuItemVariantsProps = VariantProps<typeof dropdownMenuItemVariants>;
 
-interface DropdownMenuItemBaseProps {
+export interface DropdownMenuItemBaseProps {
   inset?: boolean;
   ref?: Ref<ElementRef<typeof Item>>;
 }

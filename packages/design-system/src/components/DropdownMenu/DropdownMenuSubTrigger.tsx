@@ -9,7 +9,7 @@ type DropdownMenuSubTriggerNativeProps = ComponentPropsWithoutRef<typeof SubTrig
 
 export type DropdownMenuSubTriggerVariantsProps = DropdownMenuItemVariantsProps;
 
-interface DropdownMenuSubTriggerBaseProps {
+export interface DropdownMenuSubTriggerBaseProps {
   inset?: boolean;
   ref?: Ref<ElementRef<typeof SubTrigger>>;
 }
