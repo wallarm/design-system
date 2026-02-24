@@ -47,10 +47,14 @@ yarn-error.log*
 # IDEs
 .idea
 .vscode
-.mcp.json
 
 # Tanstack Router
 .tanstack
 
 # Semantic Release backup
 package.json.backup
+
+.playwright-mcp
+
+# Translated docs
+TABLE_DESIGN_RU.md

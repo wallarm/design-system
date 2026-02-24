@@ -210,6 +210,7 @@
     --color-component-kbi-tooltip-bg: --alpha(var(--color-white) / 20%);
     --color-component-dialog-overlay: --alpha(var(--color-white) / 60%);
     --color-component-code-snippet-bg: --alpha(var(--color-slate-500) / 6%);
+    --color-component-toast-bg: var(--color-slate-800);
 
     /* ========================================
    * SYNTAX COLORS
@@ -454,6 +455,7 @@
     --color-component-logo-ic: var(--color-w-orange-600);
     --color-component-logo-wordmark: var(--color-slate-950);
     --color-component-logo-wordmark-alt: var(--color-black);
+    --color-component-toast-bg: var(--color-slate-200);
 
     /* ========================================
        * BADGE COLORS
