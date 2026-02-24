@@ -16,7 +16,7 @@ interface ExportConfig {
   [key: string]: any;
 }
 
-const pkgDir = process.env.INIT_CWD || process.cwd();
+const pkgDir = process.cwd();
 const packageJsonPath = path.join(pkgDir, 'package.json');
 const packageJsonBackupPath = path.join(pkgDir, 'package.json.backup');
 
