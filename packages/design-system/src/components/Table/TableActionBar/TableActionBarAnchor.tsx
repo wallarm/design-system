@@ -4,7 +4,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../../utils/cn';
 import { useTableContext } from '../TableContext';
 
-const tableActionBarAnchorVariants = cva(cn('relative outline-none'), {
+const tableActionBarAnchorVariants = cva(cn('w-full relative outline-none'), {
   variants: {
     virtualized: {
       true: 'h-full',
