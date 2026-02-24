@@ -1,3 +1,7 @@
+## 0.3.0 (2026-02-24)
+
+* feat: mcp [WDS-86] (#21) ([157bd79](https://github.com/wallarm/design-system/commit/157bd79)), closes [#21](https://github.com/wallarm/design-system/issues/21)
+
 ## 0.3.0-rc-feature-WDS-86-mcp.1 (2026-02-23)
 
 * feat: mcp [WDS-86] ([99ec761](https://github.com/wallarm/design-system/commit/99ec761))
