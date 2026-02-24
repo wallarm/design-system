@@ -98,13 +98,16 @@ jobs:
         run: |
           SHOULD_RELEASE="false"
 
-          # Check for breaking change in commit messages since last tag
-          LAST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-          if [ -n "$LAST_TAG" ]; then
-            RANGE="${LAST_TAG}..HEAD"
+          # Compare against the merge base with main to detect ALL branch changes
+          MERGE_BASE=$(git merge-base origin/main HEAD 2>/dev/null || echo "")
+          if [ -n "$MERGE_BASE" ] && [ "$MERGE_BASE" != "$(git rev-parse HEAD)" ]; then
+            RANGE="${MERGE_BASE}..HEAD"
           else
-            RANGE="HEAD~10..HEAD"
+            # On main branch, compare with previous commit
+            RANGE="HEAD~1..HEAD"
           fi
+
+          echo "Checking range: $RANGE"
 
           # Detect breaking changes (feat!:, fix!:, BREAKING CHANGE in body)
           if git log "$RANGE" --pretty="%B" | grep -qE "^(feat|fix|refactor|perf)(\(.+\))?!:|BREAKING CHANGE"; then
@@ -113,11 +116,7 @@ jobs:
           fi
 
           # Detect changes in mcp-core or mcp packages
-          if [ -n "$LAST_TAG" ]; then
-            CHANGED_FILES=$(git diff --name-only "$LAST_TAG"..HEAD)
-          else
-            CHANGED_FILES=$(git diff --name-only HEAD~1..HEAD)
-          fi
+          CHANGED_FILES=$(git diff --name-only "$RANGE")
 
           if echo "$CHANGED_FILES" | grep -qE "^packages/(mcp-core|mcp)/"; then
             echo "📦 MCP package changes detected — MCP release triggered"
