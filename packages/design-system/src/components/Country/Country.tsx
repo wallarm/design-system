@@ -1,4 +1,5 @@
-import type { ComponentProps, FC } from 'react';
+import type { ComponentProps, FC, Ref } from 'react';
+import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { type CountryCode, countries } from './countries';
@@ -35,6 +36,8 @@ type CountryVariantsProps = VariantProps<typeof countryVariants>;
 type CountryNativeProps = Omit<ComponentProps<'div'>, 'children'>;
 
 interface CountryBaseProps {
+  ref?: Ref<HTMLDivElement>;
+  asChild?: boolean;
   code: string;
   flag?: boolean;
   name?: boolean;
@@ -43,6 +46,8 @@ interface CountryBaseProps {
 export type CountryProps = CountryNativeProps & CountryVariantsProps & CountryBaseProps;
 
 export const Country: FC<CountryProps> = ({
+  ref,
+  asChild = false,
   code,
   flag = true,
   name = true,
@@ -55,8 +60,15 @@ export const Country: FC<CountryProps> = ({
 
   if (!flag && !name) return code;
 
+  const Comp = asChild ? Slot : 'div';
+
   return (
-    <div {...props} data-slot='country' className={cn(countryVariants({ size }), className)}>
+    <Comp
+      {...props}
+      ref={ref}
+      data-slot='country'
+      className={cn(countryVariants({ size }), className)}
+    >
       {flag && countryData?.flag && (
         <img
           src={countryData.flag}
@@ -65,6 +77,6 @@ export const Country: FC<CountryProps> = ({
         />
       )}
       {name && <span className={nameVariants({ size })}>{countryData?.name ?? code}</span>}
-    </div>
+    </Comp>
   );
 };
