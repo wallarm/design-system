@@ -136,6 +136,8 @@ export interface TableProps<T> {
   getRowId?: (row: T, index: number) => string;
   /** Accessible label for the table */
   'aria-label'?: string;
+  /** Additional CSS class for the root container */
+  className?: string;
 
   // --- Sorting ---
   sorting?: TableSortingState;

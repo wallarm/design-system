@@ -19,6 +19,7 @@ interface TableInnerProps {
   virtualized: boolean;
   showSettings: boolean;
   ariaLabel?: string;
+  className?: string;
   children?: ReactNode;
 }
 
@@ -27,6 +28,7 @@ export const TableInner: FC<TableInnerProps> = ({
   virtualized,
   showSettings,
   ariaLabel,
+  className,
   children,
 }) => {
   const { containerRef, table } = useTableContext();
@@ -69,7 +71,7 @@ export const TableInner: FC<TableInnerProps> = ({
 
   return (
     <TableActionBarProvider>
-      <TableActionBarAnchor>
+      <TableActionBarAnchor className={className}>
         <ScrollArea
           ref={scrollRootRef}
           className={cn('group/scroll', tableContainerVariants({ virtualized }))}

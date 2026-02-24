@@ -87,6 +87,16 @@ export const LoadingState: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} isLoading />
 );
 
+export const LoadingWithData: StoryFn<typeof meta> = () => (
+  <Table
+    className='h-500'
+    data={securityEvents}
+    columns={securityColumns}
+    getRowId={row => row.id}
+    isLoading
+  />
+);
+
 export const EmptyState: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} getRowId={row => row.id}>
     <TableEmptyState>
@@ -122,15 +132,14 @@ export const ColumnPinning: StoryFn<typeof meta> = () => {
   });
 
   return (
-    <div className='max-w-800'>
-      <Table
-        data={securityEvents}
-        columns={securityColumns}
-        getRowId={row => row.id}
-        columnPinning={columnPinning}
-        onColumnPinningChange={setColumnPinning}
-      />
-    </div>
+    <Table
+      className='max-w-800'
+      data={securityEvents}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      columnPinning={columnPinning}
+      onColumnPinningChange={setColumnPinning}
+    />
   );
 };
 
@@ -378,9 +387,13 @@ export const Virtualization: StoryFn<typeof meta> = () => {
   const largeData = useMemo(() => createLargeSecurityEvents(1000), []);
 
   return (
-    <div className='h-500'>
-      <Table data={largeData} columns={securityColumns} getRowId={row => row.id} virtualized />
-    </div>
+    <Table
+      className='h-500'
+      data={largeData}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      virtualized
+    />
   );
 };
 
@@ -401,47 +414,46 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
   });
 
   return (
-    <div className='h-500'>
-      <Table<SecurityHeaderEntry>
-        data={data}
-        columns={fullFeaturedColumns}
-        getRowId={row => row.id}
-        getSubRows={row => row.children}
-        // Grouping
-        expanded={expanded}
-        onExpandedChange={setExpanded}
-        // Sorting
-        sorting={sorting}
-        onSortingChange={setSorting}
-        // Row selection
-        rowSelection={rowSelection}
-        onRowSelectionChange={setRowSelection}
-        // Column resizing
-        columnSizing={columnSizing}
-        onColumnSizingChange={setColumnSizing}
-        // Column pinning
-        columnPinning={columnPinning}
-        onColumnPinningChange={setColumnPinning}
-        // Column DnD ordering
-        columnOrder={columnOrder}
-        onColumnOrderChange={setColumnOrder}
-        // Column visibility + settings
-        columnVisibility={columnVisibility}
-        onColumnVisibilityChange={setColumnVisibility}
-        defaultColumnVisibility={{}}
-        defaultColumnOrder={headerColumnIds}
-        // Virtual scrolling
-        virtualized
-      >
-        <TableActionBar>
-          <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
-            <Copy /> Duplicate
-          </Button>
-          <Button color='brand' onClick={() => alert('Delete clicked')}>
-            <Trash2 /> Delete
-          </Button>
-        </TableActionBar>
-      </Table>
-    </div>
+    <Table<SecurityHeaderEntry>
+      className='h-500'
+      data={data}
+      columns={fullFeaturedColumns}
+      getRowId={row => row.id}
+      getSubRows={row => row.children}
+      // Grouping
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      // Sorting
+      sorting={sorting}
+      onSortingChange={setSorting}
+      // Row selection
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+      // Column resizing
+      columnSizing={columnSizing}
+      onColumnSizingChange={setColumnSizing}
+      // Column pinning
+      columnPinning={columnPinning}
+      onColumnPinningChange={setColumnPinning}
+      // Column DnD ordering
+      columnOrder={columnOrder}
+      onColumnOrderChange={setColumnOrder}
+      // Column visibility + settings
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
+      defaultColumnVisibility={{}}
+      defaultColumnOrder={headerColumnIds}
+      // Virtual scrolling
+      virtualized
+    >
+      <TableActionBar>
+        <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
+          <Copy /> Duplicate
+        </Button>
+        <Button color='brand' onClick={() => alert('Delete clicked')}>
+          <Trash2 /> Delete
+        </Button>
+      </TableActionBar>
+    </Table>
   );
 };
