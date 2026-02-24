@@ -30,8 +30,7 @@
     "postpublish": "restore-package"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "1.26.0",
-    "@wallarm-org/mcp-core": "workspace:*"
+    "@modelcontextprotocol/sdk": "1.26.0"
   },
   "peerDependencies": {
     "@wallarm-org/design-system": ">=0.2.0"
@@ -43,6 +42,7 @@
   },
   "devDependencies": {
     "@wallarm-org/design-system": "workspace:*",
+    "@wallarm-org/mcp-core": "workspace:*",
     "@wallarm-org/publish-scripts": "workspace:*",
     "@wallarm-org/typescript-config": "workspace:*",
     "@wallarm-org/vitest-config": "workspace:*",

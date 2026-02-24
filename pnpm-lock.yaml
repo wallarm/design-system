@@ -460,9 +460,6 @@ importers:
       '@modelcontextprotocol/sdk':
         specifier: 1.26.0
         version: 1.26.0(zod@4.3.6)
-      '@wallarm-org/mcp-core':
-        specifier: workspace:*
-        version: link:../mcp-core
     devDependencies:
       '@rslib/core':
         specifier: 'catalog:'
@@ -473,6 +470,9 @@ importers:
       '@wallarm-org/design-system':
         specifier: workspace:*
         version: link:../design-system
+      '@wallarm-org/mcp-core':
+        specifier: workspace:*
+        version: link:../mcp-core
       '@wallarm-org/publish-scripts':
         specifier: workspace:*
         version: link:../configs/publishing
