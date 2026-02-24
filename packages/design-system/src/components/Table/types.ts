@@ -130,6 +130,8 @@ export interface TableProps<T> {
   columns: TableColumnDef<T>[];
   /** Show skeleton rows */
   isLoading?: boolean;
+  /** Number of skeleton rows to display when loading (default: 6) */
+  skeletonCount?: number;
   /** Slot for TableActionBar, TableEmptyState, and other compound components */
   children?: ReactNode;
   /** Row id accessor for stable row identity */

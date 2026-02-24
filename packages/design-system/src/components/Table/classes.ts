@@ -14,7 +14,7 @@ const pinnedLeftShadow = 'group-data-[scrolled]/scroll:shadow-[2px_0_3px_0_rgba(
 export const tableHeadCellVariants = cva(
   cn(
     tableCellBase,
-    'pl-16 pr-4 py-8 text-left text-xs font-medium text-text-secondary',
+    'pl-16 pr-4 py-4 text-left text-xs font-medium text-text-secondary',
     'first:rounded-tl-12 last:rounded-tr-12',
     'bg-bg-light-primary',
     'whitespace-nowrap select-none outline-none',

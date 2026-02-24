@@ -12,6 +12,12 @@ import {
   DropdownMenuItemText,
   DropdownMenuSeparator,
 } from '../DropdownMenu';
+import { Link } from '../Link';
+import {
+  OverflowTooltip,
+  OverflowTooltipContent,
+  OverflowTooltipTrigger,
+} from '../OverflowTooltip';
 import { HStack, VStack } from '../Stack';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
@@ -263,9 +269,14 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
       <VStack spacing={4}>
-        <Text size='sm' truncate grow>
-          {row.original.objectName}
-        </Text>
+        <OverflowTooltip>
+          <OverflowTooltipTrigger asChild>
+            <Link size='sm' type='muted' weight='medium'>
+              {row.original.objectName}
+            </Link>
+          </OverflowTooltipTrigger>
+          <OverflowTooltipContent>{row.original.objectName}</OverflowTooltipContent>
+        </OverflowTooltip>
 
         <HStack spacing={4}>
           {row.original.isActive && (
@@ -671,9 +682,14 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
       cell: ({ getValue }: { getValue: () => string }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
-            <Text size='sm' truncate>
-              {getValue()}
-            </Text>
+            <OverflowTooltip>
+              <OverflowTooltipTrigger asChild>
+                <Text size='sm' truncate>
+                  {getValue()}
+                </Text>
+              </OverflowTooltipTrigger>
+              <OverflowTooltipContent>{getValue()}</OverflowTooltipContent>
+            </OverflowTooltip>
           </DropdownMenuContextTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onSelect={() => alert(`Copied: ${getValue()}`)}>

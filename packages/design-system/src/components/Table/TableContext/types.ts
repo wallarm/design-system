@@ -5,6 +5,7 @@ import type { TableProps } from '../types';
 export interface TableContextValue<T> {
   table: TanStackTable<T>;
   isLoading: boolean;
+  skeletonCount: number;
 
   // Feature flags (derived from props)
   sortingEnabled: boolean;

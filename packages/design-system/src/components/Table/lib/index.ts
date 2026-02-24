@@ -6,7 +6,6 @@ export {
   TABLE_SELECT_COLUMN_ID,
   TABLE_SELECT_COLUMN_WIDTH,
   TABLE_SKELETON_ROWS,
-  TABLE_SKELETON_ROWS_APPEND,
   TABLE_VIRTUALIZATION_OVERSCAN,
 } from './constants';
 export { createExpandColumn } from './createExpandColumn';

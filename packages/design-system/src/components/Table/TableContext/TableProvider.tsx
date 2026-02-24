@@ -39,6 +39,7 @@ import {
   TABLE_EXPAND_COLUMN_ID,
   TABLE_MIN_COLUMN_WIDTH,
   TABLE_SELECT_COLUMN_ID,
+  TABLE_SKELETON_ROWS,
   TABLE_VIRTUALIZATION_OVERSCAN,
 } from '../lib';
 import { TableContext } from './TableContext';
@@ -49,6 +50,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     data,
     columns,
     isLoading = false,
+    skeletonCount = TABLE_SKELETON_ROWS,
     children,
     getRowId,
 
@@ -269,6 +271,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     () => ({
       table,
       isLoading,
+      skeletonCount,
       sortingEnabled,
       selectionEnabled,
       resizingEnabled,
@@ -293,6 +296,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     [
       table,
       isLoading,
+      skeletonCount,
       sortingEnabled,
       selectionEnabled,
       resizingEnabled,

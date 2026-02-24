@@ -31,7 +31,7 @@ export const TableInner: FC<TableInnerProps> = ({
   className,
   children,
 }) => {
-  const { containerRef, table } = useTableContext();
+  const { containerRef, table, isLoading } = useTableContext();
   const scrollRootRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState(0);
 
@@ -65,6 +65,13 @@ export const TableInner: FC<TableInnerProps> = ({
     viewport.addEventListener('scroll', handleScroll, { passive: true });
     return () => viewport.removeEventListener('scroll', handleScroll);
   }, [containerRef]);
+
+  useEffect(() => {
+    const viewport = containerRef.current;
+    if (!viewport || !isLoading || isEmpty) return;
+
+    viewport.scrollTop = viewport.scrollHeight;
+  }, [containerRef, isLoading, isEmpty]);
 
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);
