@@ -11,7 +11,7 @@ type SelectNativeProps<T extends CollectionItem> = Omit<
   'positioning' | 'lazyMount' | 'unmountOnExit'
 >;
 
-interface SelectBaseProps {
+export interface SelectBaseProps {
   loading?: boolean;
 }
 

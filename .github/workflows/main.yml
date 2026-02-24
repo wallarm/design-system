@@ -36,21 +36,27 @@ jobs:
       should-update-screenshots: ${{ steps.check-screenshots.outputs.should_update }}
       is-bot-screenshot-commit: ${{ steps.check-bot.outputs.is_bot }}
       should-skip-e2e: ${{ steps.check-e2e-skip.outputs.should_skip }}
+      should-release-mcp: ${{ steps.check-mcp.outputs.should_release }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          fetch-depth: 0
 
       - name: Check if bot screenshot commit
         id: check-bot
+        env:
+          COMMIT_AUTHOR_PUSH: ${{ github.event.head_commit.author.name }}
+          COMMIT_MSG_PUSH: ${{ github.event.head_commit.message }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            COMMIT_AUTHOR=$(git log ${{ github.event.pull_request.head.sha }} -1 --pretty=%an)
-            COMMIT_MSG=$(git log ${{ github.event.pull_request.head.sha }} -1 --pretty=%B)
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            COMMIT_AUTHOR=$(git log "$PR_HEAD_SHA" -1 --pretty=%an)
+            COMMIT_MSG=$(git log "$PR_HEAD_SHA" -1 --pretty=%B)
           else
-            COMMIT_AUTHOR="${{ github.event.head_commit.author.name }}"
-            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            COMMIT_AUTHOR="$COMMIT_AUTHOR_PUSH"
+            COMMIT_MSG="$COMMIT_MSG_PUSH"
           fi
 
           if [[ "$COMMIT_AUTHOR" == "github-actions[bot]" && "$COMMIT_MSG" == "${{ env.SCREENSHOT_COMMIT_MESSAGE }}" ]]; then
@@ -62,11 +68,15 @@ jobs:
 
       - name: Check screenshot update trigger
         id: check-screenshots
+        env:
+          COMMIT_MSG_PUSH: ${{ github.event.head_commit.message }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            COMMIT_MSG=$(git log ${{ github.event.pull_request.head.sha }} -1 --pretty=%B)
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            COMMIT_MSG=$(git log "$PR_HEAD_SHA" -1 --pretty=%B)
           else
-            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            COMMIT_MSG="$COMMIT_MSG_PUSH"
           fi
 
           if [[ "$COMMIT_MSG" == *"[update-screenshots]"* ]]; then
@@ -78,11 +88,15 @@ jobs:
 
       - name: Check E2E skip trigger
         id: check-e2e-skip
+        env:
+          COMMIT_MSG_PUSH: ${{ github.event.head_commit.message }}
+          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          EVENT_NAME: ${{ github.event_name }}
         run: |
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            COMMIT_MSG=$(git log ${{ github.event.pull_request.head.sha }} -1 --pretty=%B)
+          if [[ "$EVENT_NAME" == "pull_request" ]]; then
+            COMMIT_MSG=$(git log "$PR_HEAD_SHA" -1 --pretty=%B)
           else
-            COMMIT_MSG="${{ github.event.head_commit.message }}"
+            COMMIT_MSG="$COMMIT_MSG_PUSH"
           fi
 
           if [[ "$COMMIT_MSG" == *"[skip-e2e]"* ]]; then
@@ -91,6 +105,38 @@ jobs:
           else
             echo "should_skip=false" >> $GITHUB_OUTPUT
           fi
+
+      - name: Check MCP release trigger
+        id: check-mcp
+        run: |
+          SHOULD_RELEASE="false"
+
+          # Compare against the merge base with main to detect ALL branch changes
+          MERGE_BASE=$(git merge-base origin/main HEAD 2>/dev/null || echo "")
+          if [ -n "$MERGE_BASE" ] && [ "$MERGE_BASE" != "$(git rev-parse HEAD)" ]; then
+            RANGE="${MERGE_BASE}..HEAD"
+          else
+            # On main branch, compare with previous commit
+            RANGE="HEAD~1..HEAD"
+          fi
+
+          echo "Checking range: $RANGE"
+
+          # Detect breaking changes (feat!:, fix!:, BREAKING CHANGE in body)
+          if git log "$RANGE" --pretty="%B" | grep -qE "^(feat|fix|refactor|perf)(\(.+\))?!:|BREAKING CHANGE"; then
+            echo "🔥 Breaking change detected — MCP release triggered"
+            SHOULD_RELEASE="true"
+          fi
+
+          # Detect changes in mcp-core or mcp packages
+          CHANGED_FILES=$(git diff --name-only "$RANGE")
+
+          if echo "$CHANGED_FILES" | grep -qE "^packages/(mcp-core|mcp)/"; then
+            echo "📦 MCP package changes detected — MCP release triggered"
+            SHOULD_RELEASE="true"
+          fi
+
+          echo "should_release=$SHOULD_RELEASE" >> $GITHUB_OUTPUT
 
   # ========================================
   # Quality Checks (Parallel)
@@ -139,7 +185,7 @@ jobs:
   build:
     name: Build Packages
     runs-on: ubuntu-latest
-    needs: [quality]
+    needs: [setup, quality]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -237,8 +283,20 @@ jobs:
       - name: Build config packages
         run: pnpm --filter="./packages/configs/*" build
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Install Playwright system deps
+        run: pnpm exec playwright install-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Install allurectl
         run: |
@@ -282,6 +340,7 @@ jobs:
         with:
           name: e2e-results-shard-${{ matrix.shard }}
           path: packages/design-system/test-results/
+          if-no-files-found: ignore
 
   # ========================================
   # E2E Update Screenshots
@@ -326,8 +385,20 @@ jobs:
       - name: Build config packages
         run: pnpm --filter="./packages/configs/*" build
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
+
       - name: Install Playwright browsers
         run: pnpm exec playwright install --with-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+      - name: Install Playwright system deps
+        run: pnpm exec playwright install-deps chromium
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Download Storybook artifact
         uses: actions/download-artifact@v4
@@ -504,9 +575,18 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: built-packages
-          path: .
+          path: packages
 
-      - name: Release
+      - name: Release design-system
+        run: pnpm semantic-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      - name: Release mcp
+        if: needs.setup.outputs.should-release-mcp == 'true'
+        working-directory: packages/mcp
         run: pnpm semantic-release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -29,7 +29,7 @@ const tabsListVariants = cva(
   },
 );
 
-interface TabsListProps {
+export interface TabsListProps {
   children: ReactNode;
 }
 

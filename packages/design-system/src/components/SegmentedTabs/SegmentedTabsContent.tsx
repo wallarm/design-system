@@ -2,7 +2,7 @@ import type { FC, ReactNode } from 'react';
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cn } from '../../utils/cn';
 
-interface SegmentedTabsContentProps {
+export interface SegmentedTabsContentProps {
   value: string;
   children: ReactNode;
   asChild?: boolean;

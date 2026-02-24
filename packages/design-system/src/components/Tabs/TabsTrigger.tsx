@@ -5,7 +5,7 @@ import { tabsTriggerVariants } from './classes';
 import { TABS_SCROLL_BUTTON_WIDTH } from './constants';
 import { useTabsSharedContext } from './TabsSharedContext';
 
-interface TabsTriggerProps {
+export interface TabsTriggerProps {
   children: ReactNode;
   value: string;
   disabled?: boolean;

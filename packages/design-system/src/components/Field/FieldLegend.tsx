@@ -3,7 +3,7 @@ import { cn } from '../../utils/cn';
 
 type FieldLegendNativeProps = HTMLAttributes<HTMLLegendElement>;
 
-interface FieldLegendBaseProps {
+export interface FieldLegendBaseProps {
   variant?: 'legend' | 'label';
 }
 

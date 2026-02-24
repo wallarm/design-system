@@ -47,7 +47,7 @@ const headingVariants = cva('font-sans-display text-text-primary tracking-[-0.02
 
 type HeadingVariantProps = VariantProps<typeof headingVariants>;
 
-interface HeadingBaseProps {
+export interface HeadingBaseProps {
   asChild?: boolean;
   lineClamp?: number;
   ref?: Ref<HTMLElement>;

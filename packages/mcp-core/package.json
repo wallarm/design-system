@@ -1,0 +1,43 @@
+{
+  "name": "@wallarm-org/mcp-core",
+  "version": "0.1.0",
+  "description": "Shared types and Zod schemas for Wallarm Design System MCP metadata",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wallarm/design-system.git",
+    "directory": "packages/mcp-core"
+  },
+  "license": "MIT",
+  "author": "Wallarm",
+  "type": "module",
+  "exports": {
+    ".": {
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "rslib build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@rslib/core": "catalog:",
+    "@wallarm-org/typescript-config": "workspace:*",
+    "typescript": "catalog:"
+  }
+}

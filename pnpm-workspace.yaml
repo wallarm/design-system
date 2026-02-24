@@ -7,6 +7,7 @@ catalog:
   allure-playwright: 3.0.0
   '@biomejs/biome': 2.1.4
   '@playwright/test': 1.58.0
+  '@rslib/core': 0.19.3
   '@rsbuild/core': 1.7.2
   '@rsbuild/plugin-react': 1.4.3
   '@rspack/core': 1.7.3
@@ -25,3 +26,4 @@ catalog:
   tw-animate-css: 1.4.0
   typescript: 5.9.3
   vitest: 4.0.18
+  zod: 4.3.6

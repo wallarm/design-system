@@ -26,8 +26,6 @@ See [Installation Guide](docs/installation.md) for detailed setup instructions.
 // App.tsx
 import { ThemeProvider } from '@wallarm-org/design-system/ThemeProvider';
 import { Button } from '@wallarm-org/design-system/Button';
-import 'non.geist';
-import 'non.geist/mono';
 import './App.css';
 
 export const App = () => {
@@ -37,6 +35,19 @@ export const App = () => {
     </ThemeProvider>
   );
 };
+```
+
+```css
+/* App.css */
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'non.geist';
+@import 'non.geist/mono';
+@import '@wallarm-org/design-system/theme';
+
+body {
+    background-color: var(--color-bg-surface-1)
+}
 ```
 
 ## ✨ Features

@@ -44,7 +44,7 @@ interface DrawerResizeHandleCoordinates {
   startWidth: number;
 }
 
-interface DrawerResizeHandleProps {
+export interface DrawerResizeHandleProps {
   ref?: Ref<HTMLButtonElement>;
 }
 

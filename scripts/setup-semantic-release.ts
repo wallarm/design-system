@@ -10,11 +10,7 @@ const __dirname = path.dirname(__filename);
 // Packages that should be published
 const PUBLISHABLE_PACKAGES = [
   '@wallarm-org/design-system',
-  '@wallarm-org/eslint-config-wallarm',
-  '@wallarm-org/prettier-config-wallarm',
-  '@wallarm-org/stylelint-config-wallarm',
-  '@wallarm-org/tailwind-config-wallarm',
-  '@wallarm-org/tsconfig-wallarm',
+  '@wallarm-org/mcp',
 ] as const;
 
 type PackageName = (typeof PUBLISHABLE_PACKAGES)[number];
@@ -110,6 +106,14 @@ function setupPackages(): void {
 
   if (designSystemPkg && isPublishablePackage(designSystemPkg.name)) {
     createPackageReleaseConfig(designSystemPath, designSystemPkg.name);
+  }
+
+  // Process MCP package
+  const mcpPath = path.join(packagesDir, 'mcp');
+  const mcpPkg = readPackageJson(mcpPath);
+
+  if (mcpPkg && isPublishablePackage(mcpPkg.name)) {
+    createPackageReleaseConfig(mcpPath, mcpPkg.name);
   }
 
   // Process config packages

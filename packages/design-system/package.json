@@ -1,6 +1,6 @@
 {
   "name": "@wallarm-org/design-system",
-  "version": "0.2.1",
+  "version": "0.3.0-rc-feature-WDS-86-mcp.1",
   "description": "Core design system library with React components and Storybook documentation",
   "publishConfig": {
     "access": "public",
@@ -38,6 +38,11 @@
       "require": "./dist/theme/index.css",
       "default": "./dist/theme/index.css"
     },
+    "./metadata": {
+      "import": "./dist/metadata/components.json",
+      "require": "./dist/metadata/components.json",
+      "default": "./dist/metadata/components.json"
+    },
     "./lib/*": {
       "development": "./src/lib/*.ts",
       "types": "./dist/lib/*.d.ts",
@@ -60,10 +65,11 @@
   "module": "dist/components/index.js",
   "types": "dist/components/index.d.ts",
   "scripts": {
-    "build": "rslib build",
+    "build": "rslib build && pnpm generate-metadata",
+    "generate-metadata": "tsx scripts/metadata/generate.ts",
     "build:watch": "rslib build --watch",
-    "prepublishOnly": "pnpm build && tsx scripts/prepare-publish.ts",
-    "postpublish": "tsx scripts/restore-package.ts",
+    "prepublishOnly": "prepare-publish",
+    "postpublish": "restore-package",
     "generate-exports": "tsx scripts/generate-exports.ts",
     "publish:local": "pnpm build && yalc publish --push",
     "lint": "biome check",
@@ -90,7 +96,7 @@
     "@figma/code-connect": "1.3.12",
     "@rsbuild/core": "catalog:",
     "@rsbuild/plugin-react": "catalog:",
-    "@rslib/core": "0.19.3",
+    "@rslib/core": "catalog:",
     "@shikijs/types": "^3.22.0",
     "@storybook/addon-docs": "10.2.0",
     "@storybook/addon-mcp": "0.2.2",
@@ -106,11 +112,14 @@
     "@types/react-dom": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@wallarm-org/playwright-config": "workspace:*",
+    "@wallarm-org/publish-scripts": "workspace:*",
     "@wallarm-org/rsbuild-config": "workspace:*",
     "@wallarm-org/tailwind-config": "workspace:*",
     "@wallarm-org/typescript-config": "workspace:*",
     "@wallarm-org/vitest-config": "workspace:*",
     "glob": "^13.0.0",
+    "@wallarm-org/mcp-core": "workspace:*",
+    "ts-morph": "^25.0.0",
     "lodash-es": "4.17.23",
     "non.geist": "catalog:",
     "postcss": "8.5.6",
