@@ -3,7 +3,14 @@ import { TableInner } from './TableInner';
 import type { TableProps } from './types';
 
 export const Table = <T,>(props: TableProps<T>) => {
-  const { data, isLoading = false, children, className, 'aria-label': ariaLabel, ...providerProps } = props;
+  const {
+    data,
+    isLoading = false,
+    children,
+    className,
+    'aria-label': ariaLabel,
+    ...providerProps
+  } = props;
 
   const isEmpty = data.length === 0 && !isLoading;
   const showSettings = !!props.onColumnVisibilityChange || !!props.onColumnOrderChange;

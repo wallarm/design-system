@@ -59,10 +59,13 @@ export const tableBodyCellVariants = cva(
     'bg-bg-surface-2',
     'align-top',
     'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
-    'has-[>_[data-state=open]]:ring-2 has-[>_[data-state=open]]:ring-inset has-[>_[data-state=open]]:ring-border-strong-brand',
+    'has-[>_[data-state=open][data-part=context-trigger]]:ring-2',
+    'has-[>_[data-state=open][data-part=context-trigger]]:ring-inset',
+    'has-[>_[data-state=open][data-part=context-trigger]]:ring-border-strong-brand',
     'has-[>_[data-part=context-trigger]]:p-0',
-    '[&>[data-part=context-trigger]]:px-16 [&>[data-part=context-trigger]]:py-8 [&>[data-part=context-trigger]]:text-left',
-    '[&>[data-part=context-trigger]]:w-full [&>[data-part=context-trigger]]:outline-none',
+    '[&>[data-part=context-trigger]]:w-full',
+    '[&>[data-part=context-trigger]]:px-16 [&>[data-part=context-trigger]]:py-8',
+    '[&>[data-part=context-trigger]]:text-left [&>[data-part=context-trigger]]:outline-none',
   ),
   {
     variants: {
