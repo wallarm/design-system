@@ -1,6 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table';
 import { ChevronDown, ChevronRight } from '../../../icons';
 import { ToggleButton } from '../../ToggleButton';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_EXPAND_COLUMN_WIDTH } from './constants';
 
 /**
@@ -19,7 +20,7 @@ export const createExpandColumn = <T,>(): ColumnDef<T, unknown> => {
     enablePinning: false,
     meta: {
       headerClassName: 'px-4 py-6',
-      cellClassName: 'px-4 py-6',
+      cellClassName: 'px-4 py-6 has-[>_[data-state=open]]:ring-0',
     },
     header: () => null,
     cell: ({ row }) => {
@@ -28,17 +29,22 @@ export const createExpandColumn = <T,>(): ColumnDef<T, unknown> => {
       const expanded = row.getIsExpanded();
 
       return (
-        <ToggleButton
-          variant='ghost'
-          color='neutral'
-          size='small'
-          active={expanded}
-          onToggle={row.getToggleExpandedHandler()}
-          aria-expanded={expanded}
-          aria-label={expanded ? 'Collapse row' : 'Expand row'}
-        >
-          {expanded ? <ChevronDown /> : <ChevronRight />}
-        </ToggleButton>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <ToggleButton
+              variant='ghost'
+              color='neutral'
+              size='small'
+              active={expanded}
+              onToggle={row.getToggleExpandedHandler()}
+              aria-expanded={expanded}
+              aria-label={expanded ? 'Collapse row' : 'Expand row'}
+            >
+              {expanded ? <ChevronDown /> : <ChevronRight />}
+            </ToggleButton>
+          </TooltipTrigger>
+          <TooltipContent>{expanded ? 'Collapse' : 'Expand'}</TooltipContent>
+        </Tooltip>
       );
     },
   };
