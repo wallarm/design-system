@@ -26,8 +26,8 @@ import {
 } from '../../DropdownMenu';
 import { Input } from '../../Input';
 import { Separator } from '../../Separator';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { VStack } from '../../Stack';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from '../lib';
 import { useTableContext } from '../TableContext';
 import { TableSettingsMenuItem } from './TableSettingsMenuItem';
@@ -134,14 +134,24 @@ export const TableSettingsMenu: FC = () => {
           <span className='inline-flex'>
             <DropdownMenu onOpenChange={setMenuOpen}>
               <DropdownMenuTrigger asChild>
-                <Button variant='outline' color='neutral' size='small' className='shadow-sm' aria-label='Table settings'>
+                <Button
+                  variant='outline'
+                  color='neutral'
+                  size='small'
+                  className='shadow-sm'
+                  aria-label='Table settings'
+                >
                   <Settings />
                 </Button>
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className={cn('min-w-256')}>
                 <VStack spacing={8} align='stretch'>
-                  <Input placeholder='Search' value={search} onChange={e => setSearch(e.target.value)} />
+                  <Input
+                    placeholder='Search'
+                    value={search}
+                    onChange={e => setSearch(e.target.value)}
+                  />
 
                   <VStack>
                     <DndContext
