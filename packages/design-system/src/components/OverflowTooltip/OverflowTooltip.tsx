@@ -29,7 +29,7 @@ export const OverflowTooltip = ({
         forceTooltip,
       }}
     >
-      <Tooltip open={shouldShowTooltip ? undefined : false} positioning={positioning}>
+      <Tooltip disabled={!shouldShowTooltip} positioning={positioning}>
         {children}
       </Tooltip>
     </OverflowTooltipContext.Provider>
