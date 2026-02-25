@@ -19,8 +19,8 @@ pnpm dev
 # Start Storybook
 pnpm storybook
 
-# Start Playground application (optional, not included in CI/CD)
-pnpm web:dev
+# Start Design System dev server
+pnpm design-system:dev
 ```
 
 ### Build
@@ -142,10 +142,9 @@ git commit -m "fix: button styles [update-screenshots]"
 git commit -m "docs: update readme [skip-e2e]"
 
 # AI assistants available via triggers:
-/ui component Card    # UI component
-/web feature auth     # Web feature
-/test e2e checkout    # E2E tests
-/ci workflow deploy   # CI/CD workflow
+/design-system component Card    # Design System component
+/test e2e checkout               # E2E tests
+/ci workflow deploy              # CI/CD workflow
 ```
 
 ## 📚 Documentation
@@ -163,7 +162,7 @@ git commit -m "docs: update readme [skip-e2e]"
 ```bash
 pnpm dev              # Start all applications
 pnpm storybook        # Design system Storybook
-pnpm web:dev          # Playground application (not in CI/CD)
+pnpm design-system:dev # Design system dev server
 ```
 
 ### Testing
