@@ -155,7 +155,7 @@ describe('Alert', () => {
 
 ## Rules & Conventions
 
-**IMPORTANT**: Read `docs/e2e-test-rules.md` before writing any E2E test. It is the single source of truth for naming, Allure metadata, test grouping, severity guidelines, and the full annotated example.
+**IMPORTANT**: Read `docs/e2e-test-rules.md` before writing any E2E test. It is the single source of truth for naming, test grouping, severity guidelines, and the full annotated example.
 
 ## File Structure & Naming
 
@@ -242,7 +242,7 @@ await componentStory.goto(page, 'Story Name');
 | Workers            | auto (CPU cores)   | 1                     |
 | Video              | off                | retain-on-failure     |
 | Trace              | off                | retain-on-failure     |
-| Reporters          | html               | html, junit, list, allure-playwright |
+| Reporters          | html               | html, junit, list     |
 
 Tests that pass locally may fail in CI due to `workers: 1` (slower) or stricter action/navigation timeouts.
 
@@ -250,7 +250,6 @@ Tests that pass locally may fail in CI due to `workers: 1` (slower) or stricter 
 
 The existing E2E tests (`Alert.e2e.ts`, `CodeSnippet.e2e.ts`, `Toast.e2e.ts`) were written before `docs/e2e-test-rules.md` was established. They are **not compliant** with current rules:
 
-- Missing `allure` imports and metadata calls
 - Old `test.describe` naming (e.g., `'Alert Component'` instead of `'Component: Alert'`)
 - Old grouping names (`'View'`, `'Screenshots'` instead of `'Visual'`, `'Interactions'`, `'Accessibility'`)
 - Test titles don't start with `'Should'`

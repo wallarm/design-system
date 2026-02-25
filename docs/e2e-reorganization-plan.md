@@ -1,4 +1,4 @@
-# E2E Test Reorganization Plan for Allure TestOps
+# E2E Test Reorganization Plan
 
 This document describes the concrete steps to rename and restructure existing E2E tests to follow the rules defined in [`docs/e2e-test-rules.md`](./e2e-test-rules.md).
 
@@ -8,23 +8,21 @@ This document describes the concrete steps to rename and restructure existing E2
 | ----------------------- | ----- |
 | Test files              | 4     |
 | Total test cases        | 60    |
-| Allure annotations      | 0     |
+| Metadata annotations    | 0     |
 | Naming convention       | Mixed (PascalCase screenshots, sentence-case interactions) |
 | Severity classification | None  |
 | Tag classification      | None  |
 
 ### Issues Found
 
-1. **No Allure annotations** - No `allure.epic/feature/story/severity/tags` calls anywhere
-2. **No `allure-playwright` import** - Missing from all test files
-3. **Inconsistent naming** - CodeSnippet screenshots use PascalCase (`WithLineNumbers`, `LineAnnotations`), Alert/Toast use sentence-case (`All color variants`, `Success toast`)
-4. **No "Should" prefix** - No test titles follow the "Should..." convention
-5. **No scenario group standardization** - Varying group names: `View`, `Screenshots`, `Close Button`, `View - All Types`
-6. **No severity or tag classification** - No tests have severity or tag metadata
+1. **Inconsistent naming** - CodeSnippet screenshots use PascalCase (`WithLineNumbers`, `LineAnnotations`), Alert/Toast use sentence-case (`All color variants`, `Success toast`)
+2. **No "Should" prefix** - No test titles follow the "Should..." convention
+3. **No scenario group standardization** - Varying group names: `View`, `Screenshots`, `Close Button`, `View - All Types`
+4. **No severity or tag classification** - No tests have severity or tag metadata
 
 ## Storybook Category to Epic Mapping
 
-| Storybook Category | Allure Epic   | Components Covered         |
+| Storybook Category | Epic          | Components Covered         |
 | ------------------ | ------------- | -------------------------- |
 | Messaging          | Messaging     | Alert, Toast               |
 | Data Display       | Data Display  | CodeSnippet, InlineCodeSnippet |
@@ -106,108 +104,24 @@ test.describe('Alert Component', () => {
 **After:**
 ```ts
 import { expect, type Page, test } from '@playwright/test';
-import { allure } from 'allure-playwright';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 test.describe('Component: Alert', () => {
   test.describe('Visual', () => {
     test('Should render all color variants correctly', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Visual');
-      await allure.severity('critical');
-      await allure.tags('visual', 'smoke');
-
       await alertStory.goto(page, 'All Colors');
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render with title only correctly', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Visual');
-      await allure.severity('normal');
-      await allure.tags('visual', 'regression');
-
       await alertStory.goto(page, 'Title Only');
       await expect(page).toHaveScreenshot();
     });
-
-    test('Should render min and max width correctly', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Visual');
-      await allure.severity('normal');
-      await allure.tags('visual', 'regression');
-
-      await alertStory.goto(page, 'Min Max Width');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render max lines correctly', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Visual');
-      await allure.severity('normal');
-      await allure.tags('visual', 'regression');
-
-      await alertStory.goto(page, 'Max Lines');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with code correctly', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Visual');
-      await allure.severity('normal');
-      await allure.tags('visual', 'regression');
-
-      await alertStory.goto(page, 'With Code');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render close button correctly', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Visual');
-      await allure.severity('normal');
-      await allure.tags('visual', 'regression');
-
-      await alertStory.goto(page, 'With Close Button');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with controls correctly', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Visual');
-      await allure.severity('normal');
-      await allure.tags('visual', 'regression');
-
-      await alertStory.goto(page, 'With Controls');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with bottom actions correctly', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Visual');
-      await allure.severity('normal');
-      await allure.tags('visual', 'regression');
-
-      await alertStory.goto(page, 'With Bottom Actions');
-      await expect(page).toHaveScreenshot();
-    });
+    // ... other visual tests
   });
 
   test.describe('Interactions', () => {
     test('Should close alert when close button is clicked', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Interactions');
-      await allure.severity('critical');
-      await allure.tags('regression');
-
       await alertStory.goto(page, 'With Close Button');
       const alerts = getAlerts(page);
       await expect(alerts).toHaveCount(2);
@@ -219,49 +133,11 @@ test.describe('Component: Alert', () => {
       await expect(infoAlert).toBeHidden();
       await expect(getAlertByColor(page, 'warning')).toBeVisible();
     });
-
-    test('Should activate control when Learn more button is clicked', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Interactions');
-      await allure.severity('normal');
-      await allure.tags('regression');
-
-      await alertStory.goto(page, 'With Controls');
-      // ... test body unchanged
-    });
-
-    test('Should display both control and close buttons', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Interactions');
-      await allure.severity('normal');
-      await allure.tags('regression');
-
-      await alertStory.goto(page, 'With Controls');
-      // ... test body unchanged
-    });
-
-    test('Should activate action when primary action button is clicked', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Interactions');
-      await allure.severity('normal');
-      await allure.tags('regression');
-
-      await alertStory.goto(page, 'With Bottom Actions');
-      // ... test body unchanged
-    });
+    // ... other interaction tests
   });
 
   test.describe('Accessibility', () => {
     test('Should be dismissible via keyboard Enter key', async ({ page }) => {
-      await allure.epic('Messaging');
-      await allure.feature('Alert');
-      await allure.story('Accessibility');
-      await allure.severity('critical');
-      await allure.tags('a11y', 'regression');
-
       await alertStory.goto(page, 'With Close Button');
       // ... test body unchanged
     });
@@ -432,16 +308,9 @@ test.describe('App E2E Tests', () => {
 **After:**
 ```ts
 import { expect, test } from '@playwright/test';
-import { allure } from 'allure-playwright';
 
 test.describe('Component: App', () => {
   test('Should load homepage successfully', async ({ page }) => {
-    await allure.epic('Application');
-    await allure.feature('App');
-    await allure.story('Visual');
-    await allure.severity('critical');
-    await allure.tags('smoke');
-
     await page.goto('/');
     await expect(true).toBeTruthy();
   });
@@ -452,14 +321,7 @@ test.describe('Component: App', () => {
 
 ## Migration Steps
 
-### Step 1: Add `allure-playwright` import
-
-Add to all 4 test files:
-```ts
-import { allure } from 'allure-playwright';
-```
-
-### Step 2: Rename top-level describe blocks
+### Step 1: Rename top-level describe blocks
 
 | File | Current | New |
 | ---- | ------- | --- |
@@ -469,7 +331,7 @@ import { allure } from 'allure-playwright';
 | Toast.e2e.ts | `Toast Component` | `Component: Toast` |
 | app.e2e.ts | `App E2E Tests` | `Component: App` |
 
-### Step 3: Restructure scenario group describes
+### Step 2: Restructure scenario group describes
 
 Flatten the current per-feature grouping into the standardized 3-group hierarchy:
 - `Visual` — all screenshot/appearance tests
@@ -478,29 +340,18 @@ Flatten the current per-feature grouping into the standardized 3-group hierarchy
 
 This requires moving tests from current feature-based groups (e.g., `Close Button`, `With Controls`) into the appropriate scenario group.
 
-### Step 4: Rename test titles to "Should..." format
+### Step 3: Rename test titles to "Should..." format
 
 Apply the naming conventions from the tables above. Key patterns:
 - Screenshot tests: `"Should render {description} correctly"`
 - Interaction tests: `"Should {action} when {trigger}"`
 - Accessibility tests: `"Should be {behavior} via {method}"`
 
-### Step 5: Add Allure metadata to every test
-
-Add the 4 required calls at the start of each test body:
-```ts
-await allure.epic('...');
-await allure.feature('...');
-await allure.story('...');
-await allure.severity('...');
-await allure.tags('...');
-```
-
-### Step 6: Remove `beforeEach` hooks where structure changes
+### Step 4: Remove `beforeEach` hooks where structure changes
 
 Tests in Alert.e2e.ts currently use `beforeEach` for story navigation within feature-based groups. When restructuring to Visual/Interactions/Accessibility groups, move the `goto` call into each individual test since tests in the same group now navigate to different stories.
 
-### Step 7: Add clipboard mocking for copy interaction tests
+### Step 5: Add clipboard mocking for copy interaction tests
 
 CodeSnippet and InlineCodeSnippet copy tests require clipboard API mocking **before navigation** for headless/Docker environments:
 
@@ -519,11 +370,11 @@ This applies to:
 - CodeSnippet: `Should copy code and show tooltip when copy button is clicked`
 - InlineCodeSnippet: `Should copy text when clicked on copyable and not copy when non-copyable`
 
-### Step 8: Ensure syntax highlighting readiness for CodeSnippet screenshots
+### Step 6: Ensure syntax highlighting readiness for CodeSnippet screenshots
 
 CodeSnippet uses async syntax highlighters (Shiki, Prism, Highlight.js). Before taking screenshots, wait for highlight tokens to appear in the DOM to avoid capturing un-highlighted code. This is especially important for tests like `Should render JSON with Shiki highlighting correctly` and other language-specific visual tests.
 
-### Step 9: Update screenshot file references
+### Step 7: Update screenshot file references
 
 Renaming `test.describe` and `test()` titles will change the generated snapshot paths. The current snapshot path template is:
 ```
@@ -532,11 +383,11 @@ Renaming `test.describe` and `test()` titles will change the generated snapshot 
 
 Since `{testName}` includes the full describe chain + test title, **all existing screenshots will be invalidated**.
 
-### Step 10: Regenerate screenshots
+### Step 8: Regenerate screenshots
 
 After all renames are complete, create a commit with `[update-screenshots]` in the message to trigger CI/CD screenshot regeneration:
 ```
-refactor: reorganize E2E tests for Allure TestOps [update-screenshots]
+refactor: reorganize E2E tests [update-screenshots]
 ```
 
 ## CI/CD Considerations
@@ -578,10 +429,7 @@ The `[update-screenshots]` commit trigger in CI/CD will automatically regenerate
 | ------ | ------ | ----- |
 | Test files | 4 | 4 |
 | Total test cases | 60 | 60 |
-| Allure annotations | 0 | 60 (all tests) |
 | Naming convention | Mixed | Consistent "Should..." |
 | Describe hierarchy | Feature-based (mixed) | Visual/Interactions/Accessibility |
 | Severity classification | None | All classified |
 | Tag classification | None | All tagged |
-| Allure epics | 0 | 3 (Messaging, Data Display, Application) |
-| Allure features | 0 | 5 (Alert, CodeSnippet, InlineCodeSnippet, Toast, App) |

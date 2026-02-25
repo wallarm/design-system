@@ -5,7 +5,6 @@
 That document is the single source of truth for:
 - File & directory conventions (`*.e2e.ts`, colocated with source)
 - `test.describe` / `test()` naming structure
-- Allure metadata (epic, feature, story, severity, tags)
 - Screenshot / Interaction / Accessibility test grouping
 - Severity guidelines
 - Full annotated example

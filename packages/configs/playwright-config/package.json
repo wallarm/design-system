@@ -13,8 +13,7 @@
     "./storybook": "./dist/storybook.js"
   },
   "dependencies": {
-    "@playwright/test": "catalog:",
-    "allure-playwright": "catalog:"
+    "@playwright/test": "catalog:"
   },
   "devDependencies": {
     "@wallarm-org/typescript-config": "workspace:*",
