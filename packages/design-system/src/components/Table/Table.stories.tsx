@@ -392,7 +392,26 @@ export const Virtualization: StoryFn<typeof meta> = () => {
       data={largeData}
       columns={securityColumns}
       getRowId={row => row.id}
-      virtualized
+      virtualized='container'
+    />
+  );
+};
+
+export const WindowVirtualization: StoryFn<typeof meta> = () => {
+  const largeData = useMemo(() => createLargeSecurityEvents(1000), []);
+  const [columnOrder, setColumnOrder] = useState<string[]>([]);
+  const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+
+  return (
+    <Table
+      data={largeData}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      virtualized='window'
+      columnOrder={columnOrder}
+      onColumnOrderChange={setColumnOrder}
+      columnSizing={columnSizing}
+      onColumnSizingChange={setColumnSizing}
     />
   );
 };
@@ -444,7 +463,7 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
       defaultColumnVisibility={{}}
       defaultColumnOrder={headerColumnIds}
       // Virtual scrolling
-      virtualized
+      virtualized='container'
     >
       <TableActionBar>
         <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>

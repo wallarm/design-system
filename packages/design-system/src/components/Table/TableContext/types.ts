@@ -1,6 +1,6 @@
 import type { ReactNode, RefObject } from 'react';
 import type { Column, Row, Table as TanStackTable, VisibilityState } from '@tanstack/react-table';
-import type { TableProps } from '../types';
+import type { TableProps, TableVirtualized } from '../types';
 
 export interface TableContextValue<T> {
   table: TanStackTable<T>;
@@ -16,7 +16,7 @@ export interface TableContextValue<T> {
   groupingEnabled: boolean;
   expandingEnabled: boolean;
   visibilityEnabled: boolean;
-  virtualized: boolean;
+  virtualized: TableVirtualized | undefined;
 
   // Rendering helpers
   renderExpandedRow?: (row: Row<T>) => ReactNode;

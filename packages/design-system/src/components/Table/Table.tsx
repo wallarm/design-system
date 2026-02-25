@@ -19,7 +19,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     <TableProvider data={data} isLoading={isLoading} {...providerProps}>
       <TableInner
         isEmpty={isEmpty}
-        virtualized={!!props.virtualized}
+        virtualized={props.virtualized}
         showSettings={showSettings}
         ariaLabel={ariaLabel}
         className={className}

@@ -24,10 +24,10 @@ import { SORT_LABELS } from './lib';
 import { useTableContext } from './TableContext';
 
 interface TableColumnHeaderMenuProps<T> {
-  column: Column<T, unknown>;
+  column: Column<T>;
 }
 
-const getSortLabels = (column: Column<unknown, unknown>): [string, string] => {
+const getSortLabels = (column: Column<unknown>): [string, string] => {
   const sortType = column.columnDef.meta?.sortType;
   if (sortType && SORT_LABELS[sortType]) return SORT_LABELS[sortType];
   return SORT_LABELS.text!;

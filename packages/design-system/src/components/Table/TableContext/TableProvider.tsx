@@ -75,7 +75,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     onColumnVisibilityChange,
     defaultColumnVisibility,
     defaultColumnOrder,
-    virtualized = false,
+    virtualized,
     estimateRowHeight,
     overscan = TABLE_VIRTUALIZATION_OVERSCAN,
   } = props;

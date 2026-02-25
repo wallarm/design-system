@@ -24,6 +24,9 @@ declare module '@tanstack/react-table' {
 // Public API types — consumers use these instead of @tanstack/react-table
 // ---------------------------------------------------------------------------
 
+/** Virtualization mode */
+export type TableVirtualized = 'container' | 'window';
+
 /** Sorting state: array of `{ id, desc }` */
 export type TableSortingState = { id: string; desc: boolean }[];
 
@@ -180,7 +183,8 @@ export interface TableProps<T> {
   defaultColumnOrder?: string[];
 
   // --- Virtualization ---
-  virtualized?: boolean;
+  /** Enable row virtualization. `'container'` virtualizes within the scroll container; `'window'` virtualizes against the browser window. */
+  virtualized?: TableVirtualized;
   estimateRowHeight?: (index: number) => number;
   overscan?: number;
 }

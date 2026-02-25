@@ -7,7 +7,8 @@ import { useTableContext } from '../TableContext';
 const tableActionBarAnchorVariants = cva(cn('w-full relative outline-none'), {
   variants: {
     virtualized: {
-      true: 'h-full',
+      container: 'h-full',
+      window: '',
     },
   },
 });

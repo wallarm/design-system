@@ -22,7 +22,7 @@ export const tableHeadCellVariants = cva(
   {
     variants: {
       interactive: {
-        true: 'hover:overlay-states-primary-hover cursor-pointer',
+        true: 'hover:overlay-states-primary-hover',
         false: '',
       },
       sorted: {
@@ -95,12 +95,9 @@ export const tableContainerVariants = cva(
   {
     variants: {
       virtualized: {
-        true: 'h-full',
-        false: '',
+        container: 'h-full',
+        window: '',
       },
-    },
-    defaultVariants: {
-      virtualized: false,
     },
   },
 );

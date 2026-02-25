@@ -3,11 +3,11 @@ import { TABLE_EXPAND_COLUMN_ID } from './lib';
 import { Td, Tr } from './primitives';
 import { useTableContext } from './TableContext';
 
-interface TableExpandedRowProps<T> {
+interface TableRowExpandedProps<T> {
   row: Row<T>;
 }
 
-export const TableExpandedRow = <T,>({ row }: TableExpandedRowProps<T>) => {
+export const TableRowExpanded = <T,>({ row }: TableRowExpandedProps<T>) => {
   const { table, renderExpandedRow } = useTableContext<T>();
 
   if (!row.getIsExpanded() || !renderExpandedRow) return null;
@@ -33,4 +33,4 @@ export const TableExpandedRow = <T,>({ row }: TableExpandedRowProps<T>) => {
   );
 };
 
-TableExpandedRow.displayName = 'TableExpandedRow';
+TableRowExpanded.displayName = 'Expanded';

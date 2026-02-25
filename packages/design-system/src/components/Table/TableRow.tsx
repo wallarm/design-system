@@ -3,9 +3,9 @@ import type { Row } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
 import { Td, Tr } from './primitives';
-import { TableBodyCell } from './TableBodyCell';
+import { TableBodyCell } from './TableBody';
 import { useTableContext } from './TableContext';
-import { TableExpandedRow } from './TableExpandedRow';
+import { TableRowExpanded } from './TableRowExpanded';
 
 const SYSTEM_COLUMN_IDS = new Set([TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID]);
 
@@ -53,7 +53,7 @@ export const TableRow = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProp
             />
           ))}
         </Tr>
-        {expandingEnabled && <TableExpandedRow row={row} />}
+        {expandingEnabled && <TableRowExpanded row={row} />}
       </>
     );
   }
@@ -71,7 +71,7 @@ export const TableRow = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProp
           <TableBodyCell key={cell.id} cell={cell} />
         ))}
       </Tr>
-      {expandingEnabled && <TableExpandedRow row={row} />}
+      {expandingEnabled && <TableRowExpanded row={row} />}
     </>
   );
 };

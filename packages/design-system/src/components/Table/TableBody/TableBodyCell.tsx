@@ -1,8 +1,8 @@
 import { type Cell, flexRender } from '@tanstack/react-table';
-import { cn } from '../../utils/cn';
-import { getPinningStyles, isLastPinnedLeft, TABLE_EXPAND_COLUMN_ID, useColumnDnd } from './lib';
-import { Td } from './primitives';
-import { useTableContext } from './TableContext';
+import { cn } from '../../../utils/cn';
+import { getPinningStyles, isLastPinnedLeft, TABLE_EXPAND_COLUMN_ID, useColumnDnd } from '../lib';
+import { Td } from '../primitives';
+import { useTableContext } from '../TableContext';
 
 interface TableBodyCellProps<T> {
   cell: Cell<T, unknown>;

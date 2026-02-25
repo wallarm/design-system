@@ -15,3 +15,4 @@ export { getDndStyles } from './getDndStyles';
 export { getPinningStyles } from './getPinningStyles';
 export { isLastPinnedLeft } from './isLastPinnedLeft';
 export { useColumnDnd } from './useColumnDnd';
+export { useContainerWidth } from './useContainerWidth';
