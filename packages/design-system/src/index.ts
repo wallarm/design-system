@@ -167,6 +167,7 @@ export {
   SelectSeparator,
 } from './components/Select';
 export { Separator, type SeparatorProps } from './components/Separator';
+export { Skeleton, type SkeletonProps } from './components/Skeleton';
 export {
   HStack,
   type HStackProps,
