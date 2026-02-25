@@ -1,3 +1,7 @@
+## <small>0.4.1 (2026-02-25)</small>
+
+* fix: Table misc changes (#26) ([da81238](https://github.com/wallarm/design-system/commit/da81238)), closes [#26](https://github.com/wallarm/design-system/issues/26)
+
 ## 0.4.0 (2026-02-24)
 
 * feat: Table [WDS-85] (#18) ([300ff57](https://github.com/wallarm/design-system/commit/300ff57)), closes [#18](https://github.com/wallarm/design-system/issues/18)
