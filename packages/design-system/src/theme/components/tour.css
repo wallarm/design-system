@@ -1,0 +1,24 @@
+/* Block scroll & keep horizontal overflow while the tour backdrop is visible. */
+html:has([data-scope='tour'][data-part='backdrop']),
+html:has([data-scope='tour'][data-part='backdrop']) > body {
+    overflow: hidden;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.4;
+        transform: scale(1.08);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+@theme {
+    --animate-pulse: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
