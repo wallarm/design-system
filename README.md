@@ -105,7 +105,9 @@ wallarm-design-system/
 - **Rsbuild** - Modern build tool based on Rspack
 - **Tailwind CSS v4** - Utility-first CSS framework
 - **Ark UI** - Headless component primitives
-- **Radix UI** - Accessible component primitives
+- **DnD Kit** for drag and drop behavior
+- **TanStack Table** for table layouts
+- **TanStack Virtual** for virtualization
 
 ### Development
 

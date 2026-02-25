@@ -5,8 +5,10 @@ import {
   isValidElement,
   type ReactElement,
   type Ref,
+  useCallback,
   useEffect,
   useRef,
+  useState,
 } from 'react';
 import { TooltipTrigger } from '../Tooltip';
 import { useOverflowTooltip } from './OverflowTooltipContext';
@@ -19,7 +21,8 @@ export interface OverflowTooltipTriggerProps {
 
 /**
  * Trigger component that automatically detects overflow in the element.
- * Checks for actual overflow by comparing scrollWidth/Height with clientWidth/Height.
+ * Observers are created lazily on pointer enter for performance —
+ * avoids hundreds of ResizeObserver/MutationObserver instances in virtualized lists.
  */
 export const OverflowTooltipTrigger: FC<OverflowTooltipTriggerProps> = ({
   children,
@@ -28,13 +31,17 @@ export const OverflowTooltipTrigger: FC<OverflowTooltipTriggerProps> = ({
 }) => {
   const { setIsOverflowing } = useOverflowTooltip();
   const containerRef = useRef<HTMLElement>(null);
+  const [activated, setActivated] = useState(false);
+
+  const handlePointerEnter = useCallback(() => {
+    setActivated(true);
+  }, []);
 
   useEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || !activated) return;
 
     const checkOverflow = () => {
-      // Check overflow only on the container itself
       const hasOverflow =
         container.scrollWidth > container.clientWidth ||
         container.scrollHeight > container.clientHeight;
@@ -42,7 +49,7 @@ export const OverflowTooltipTrigger: FC<OverflowTooltipTriggerProps> = ({
       setIsOverflowing(hasOverflow);
     };
 
-    // Initial check
+    // Immediate check on activation
     checkOverflow();
 
     // Setup ResizeObserver for container only
@@ -62,7 +69,7 @@ export const OverflowTooltipTrigger: FC<OverflowTooltipTriggerProps> = ({
       resizeObserver.disconnect();
       mutationObserver.disconnect();
     };
-  }, [setIsOverflowing]);
+  }, [activated, setIsOverflowing]);
 
   const setRefs = (node: HTMLElement) => {
     containerRef.current = node;
@@ -87,12 +94,21 @@ export const OverflowTooltipTrigger: FC<OverflowTooltipTriggerProps> = ({
     }
   };
 
+  const mergePointerEnter = useCallback(
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (e: any) => {
+      handlePointerEnter();
+      (children as ComponentPropsWithRef<any>).props?.onPointerEnter?.(e);
+    },
+    [handlePointerEnter, children],
+  );
+
   return (
     <TooltipTrigger asChild={asChild}>
       {isValidElement(children)
-        ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          cloneElement<ComponentPropsWithRef<any>>(children, {
+        ? cloneElement<ComponentPropsWithRef<any>>(children, {
             ref: setRefs,
+            onPointerEnter: mergePointerEnter,
           })
         : children}
     </TooltipTrigger>

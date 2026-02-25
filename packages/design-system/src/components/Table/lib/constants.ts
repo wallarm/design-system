@@ -1,5 +1,5 @@
 export const TABLE_SKELETON_ROWS = 12;
-export const TABLE_VIRTUALIZATION_OVERSCAN = 5;
+export const TABLE_VIRTUALIZATION_OVERSCAN = 3;
 export const TABLE_MIN_COLUMN_WIDTH = 96;
 
 export const TABLE_SELECT_COLUMN_ID = '_selection';

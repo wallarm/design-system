@@ -30,7 +30,7 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
   ariaLabel,
   children,
 }) => {
-  const { containerRef, table, isLoading, onEndReached, onEndReachedThreshold } = useTableContext();
+  const { containerRef, table, onEndReached, onEndReachedThreshold } = useTableContext();
   const scrollRootRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
 

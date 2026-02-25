@@ -21,7 +21,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   ariaLabel,
   children,
 }) => {
-  const { table, isLoading, onEndReached, onEndReachedThreshold } = useTableContext();
+  const { table, onEndReached, onEndReachedThreshold } = useTableContext();
   const rootRef = useRef<HTMLDivElement>(null);
   const headerScrollRef = useRef<HTMLDivElement>(null);
   const bodyScrollRef = useRef<HTMLDivElement>(null);
@@ -68,39 +68,37 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   const tableStyles = 'table-fixed border-separate border-spacing-0';
 
   return (
-    <>
-      <div ref={rootRef} className='group/scroll outline-none'>
-        {/* Sticky header — own border/rounding so it looks correct when detached */}
-        <div className='sticky top-0 z-30 relative'>
-          <div
-            ref={headerScrollRef}
-            className='overflow-hidden rounded-t-12 border border-b-0 border-border-primary-light'
-          >
-            <table className={tableStyles} style={{ width: tableWidth }} aria-hidden>
-              <TableColGroup tableWidth={tableWidth} />
-              <TableHead />
-            </table>
-          </div>
-          {showSettings && <TableSettingsMenu />}
+    <div ref={rootRef} className='group/scroll outline-none'>
+      {/* Sticky header — own border/rounding so it looks correct when detached */}
+      <div className='sticky top-0 z-30 relative'>
+        <div
+          ref={headerScrollRef}
+          className='overflow-hidden rounded-t-12 border border-b-0 border-border-primary-light'
+        >
+          <table className={tableStyles} style={{ width: tableWidth }} aria-hidden>
+            <TableColGroup tableWidth={tableWidth} />
+            <TableHead />
+          </table>
         </div>
-
-        {/* Scrollable body — ScrollArea for styled horizontal scrollbar */}
-        <ScrollArea className='group/scroll rounded-b-12 border border-t-0 border-border-primary-light'>
-          <ScrollAreaViewport
-            ref={bodyScrollRef}
-            data-table-scroll-container
-            style={{ overflowX: 'auto', overflowY: 'hidden' }}
-          >
-            <table className={tableStyles} style={{ width: tableWidth }} aria-label={ariaLabel}>
-              <TableColGroup tableWidth={tableWidth} />
-              {!isEmpty && <TableBody />}
-            </table>
-            {children}
-          </ScrollAreaViewport>
-          <ScrollAreaScrollbar orientation='horizontal' />
-        </ScrollArea>
+        {showSettings && <TableSettingsMenu />}
       </div>
-    </>
+
+      {/* Scrollable body — ScrollArea for styled horizontal scrollbar */}
+      <ScrollArea className='group/scroll rounded-b-12 border border-t-0 border-border-primary-light'>
+        <ScrollAreaViewport
+          ref={bodyScrollRef}
+          data-table-scroll-container
+          style={{ overflowX: 'auto', overflowY: 'hidden' }}
+        >
+          <table className={tableStyles} style={{ width: tableWidth }} aria-label={ariaLabel}>
+            <TableColGroup tableWidth={tableWidth} />
+            {!isEmpty && <TableBody />}
+          </table>
+          {children}
+        </ScrollAreaViewport>
+        <ScrollAreaScrollbar orientation='horizontal' />
+      </ScrollArea>
+    </div>
   );
 };
 
