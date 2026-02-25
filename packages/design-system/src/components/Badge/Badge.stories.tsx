@@ -17,7 +17,6 @@ const meta = {
   parameters: {
     layout: 'centered',
   },
-
   argTypes: {
     size: {
       control: 'select',
