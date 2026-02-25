@@ -7,6 +7,7 @@ import {
   ScrollAreaViewport,
 } from '../../ScrollArea';
 import { tableContainerVariants } from '../classes';
+import { useEndReached } from '../hooks';
 import { useContainerWidth } from '../lib';
 import { TableBody } from '../TableBody';
 import { TableColGroup } from '../TableColGroup';
@@ -29,9 +30,16 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
   ariaLabel,
   children,
 }) => {
-  const { containerRef, table, isLoading } = useTableContext();
+  const { containerRef, table, isLoading, onEndReached, onEndReachedThreshold } = useTableContext();
   const scrollRootRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
+
+  useEndReached({
+    mode: 'container',
+    scrollRef: containerRef,
+    onEndReached,
+    threshold: onEndReachedThreshold,
+  });
 
   useEffect(() => {
     const viewport = containerRef.current;
@@ -49,10 +57,10 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
 
   useEffect(() => {
     const viewport = containerRef.current;
-    if (!viewport || !isLoading || isEmpty) return;
+    if (!viewport || !isLoading || isEmpty || onEndReached) return;
 
     viewport.scrollTop = viewport.scrollHeight;
-  }, [containerRef, isLoading, isEmpty]);
+  }, [containerRef, isLoading, isEmpty, onEndReached]);
 
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);

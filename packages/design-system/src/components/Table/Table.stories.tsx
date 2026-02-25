@@ -30,6 +30,7 @@ import {
   securityColumnIds,
   securityColumns,
   securityEvents,
+  useInfiniteData,
 } from './mocks';
 import { Table } from './Table';
 import { TableActionBar } from './TableActionBar';
@@ -413,6 +414,51 @@ export const WindowVirtualization: StoryFn<typeof meta> = () => {
       columnSizing={columnSizing}
       onColumnSizingChange={setColumnSizing}
     />
+  );
+};
+
+export const InfiniteScroll: StoryFn<typeof meta> = () => {
+  const { data, isFetching, hasMore, totalItems, fetchNextPage } = useInfiniteData();
+
+  return (
+    <VStack spacing={8}>
+      <Text size='sm' color='secondary'>
+        Loaded {data.length} of {totalItems} rows {isFetching && '— loading...'}
+        {!hasMore && ' — all loaded'}
+      </Text>
+      <Table
+        className='h-500'
+        data={data}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='container'
+        isLoading={isFetching}
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={200}
+      />
+    </VStack>
+  );
+};
+
+export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
+  const { data, isFetching, hasMore, totalItems, fetchNextPage } = useInfiniteData();
+
+  return (
+    <VStack spacing={8}>
+      <Text size='sm' color='secondary'>
+        Loaded {data.length} of {totalItems} rows {isFetching && '— loading...'}
+        {!hasMore && ' — all loaded'}
+      </Text>
+      <Table
+        data={data}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='window'
+        isLoading={isFetching}
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={300}
+      />
+    </VStack>
   );
 };
 

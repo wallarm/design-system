@@ -78,6 +78,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     virtualized,
     estimateRowHeight,
     overscan = TABLE_VIRTUALIZATION_OVERSCAN,
+    onEndReached,
+    onEndReachedThreshold,
   } = props;
 
   // Feature detection
@@ -292,6 +294,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       masterColumnId,
       lastSelectedRowIndexRef,
       containerRef,
+      onEndReached,
+      onEndReachedThreshold,
     }),
     [
       table,
@@ -315,6 +319,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       setColumnOrder,
       alwaysPinnedLeft,
       masterColumnId,
+      onEndReached,
+      onEndReachedThreshold,
     ],
   );
 

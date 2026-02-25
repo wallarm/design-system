@@ -1,3 +1,4 @@
+import { useCallback, useMemo, useState } from 'react';
 import { Check, Copy, Filter, FilterX } from '../../icons';
 import { Badge } from '../Badge';
 import { InlineCodeSnippet } from '../CodeSnippet';
@@ -777,3 +778,30 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
 
   return col;
 });
+
+// ---------------------------------------------------------------------------
+// Infinite scroll — hook for stories
+// ---------------------------------------------------------------------------
+
+const INFINITE_PAGE_SIZE = 50;
+const INFINITE_MAX_ITEMS = 500;
+
+export function useInfiniteData() {
+  const allData = useMemo(() => createLargeSecurityEvents(INFINITE_MAX_ITEMS), []);
+  const [data, setData] = useState(() => allData.slice(0, INFINITE_PAGE_SIZE));
+  const [isFetching, setIsFetching] = useState(false);
+  const hasMore = data.length < allData.length;
+
+  const fetchNextPage = useCallback(() => {
+    if (isFetching || !hasMore) return;
+    setIsFetching(true);
+
+    // Simulate network delay
+    setTimeout(() => {
+      setData(prev => allData.slice(0, prev.length + INFINITE_PAGE_SIZE));
+      setIsFetching(false);
+    }, 800);
+  }, [isFetching, hasMore, allData]);
+
+  return { data, isFetching, hasMore, totalItems: INFINITE_MAX_ITEMS, fetchNextPage };
+}

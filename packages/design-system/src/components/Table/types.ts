@@ -187,4 +187,10 @@ export interface TableProps<T> {
   virtualized?: TableVirtualized;
   estimateRowHeight?: (index: number) => number;
   overscan?: number;
+
+  // --- Infinite scroll ---
+  /** Callback fired when the user scrolls near the end of the table */
+  onEndReached?: () => void;
+  /** Distance from the bottom (in px) to trigger onEndReached (default: 200) */
+  onEndReachedThreshold?: number;
 }

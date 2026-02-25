@@ -1,8 +1,8 @@
 import type { FC, ReactNode } from 'react';
 import { TableActionBarAnchor, TableActionBarProvider } from '../TableActionBar';
+import type { TableVirtualized } from '../types';
 import { TableInnerContainer } from './TableInnerContainer';
 import { TableInnerWindow } from './TableInnerWindow';
-import type { TableVirtualized } from '../types';
 
 interface TableInnerProps {
   isEmpty: boolean;
