@@ -8,7 +8,10 @@ Wallarm Design System is a collection of ready-to-use, accessible, and customiza
 
 - **TypeScript** for type safety
 - **Tailwind CSS v4** for styling
-- **Radix UI and Ark UI** for accessibility
+- **Ark UI** for accessibility
+- **DnD Kit** for drag and drop behavior
+- **TanStack Table** for table layouts
+- **TanStack Virtual** for virtualization
 
 ## 📚 Documentation Structure
 
