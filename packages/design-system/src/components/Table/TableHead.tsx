@@ -7,7 +7,7 @@ export const TableHead: FC = () => {
   const { table } = useTableContext();
 
   return (
-    <THead className='sticky top-0 z-30 min-h-32'>
+    <THead className='sticky top-0 z-30 h-32'>
       {table.getHeaderGroups().map(headerGroup => (
         <Tr key={headerGroup.id}>
           {headerGroup.headers.map(header => (
