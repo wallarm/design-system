@@ -87,8 +87,8 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
       {isNotBasicColumn && content}
 
       {!header.isPlaceholder && !isNotBasicColumn && (
-        <div className='flex items-center'>
-          <HStack spacing={2}>
+        <HStack align='center'>
+          <HStack gap={2} fullWidth>
             <Text size='xs' weight='medium' truncate>
               {content}
             </Text>
@@ -103,7 +103,7 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
           )}
 
           {isMasterColumn && hasOverflow && <TableScrollHandler atStart={atStart} atEnd={atEnd} />}
-        </div>
+        </HStack>
       )}
 
       {canResize && <TableResizeHandler header={header} />}

@@ -35,7 +35,7 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<typeof meta> = () => (
-  <VStack spacing={12}>
+  <VStack gap={12}>
     <InputGroup>
       <InputGroupAddon>
         <Search />
@@ -59,7 +59,7 @@ export const Basic: StoryFn<typeof meta> = () => (
 );
 
 export const Disabled: StoryFn<typeof meta> = () => (
-  <VStack spacing={12}>
+  <VStack gap={12}>
     <InputGroup>
       <InputGroupAddon>
         <Search />
@@ -83,7 +83,7 @@ export const Disabled: StoryFn<typeof meta> = () => (
 );
 
 export const WithError: StoryFn<typeof meta> = () => (
-  <VStack spacing={12}>
+  <VStack gap={12}>
     <InputGroup>
       <InputGroupAddon>
         <Search />
@@ -170,7 +170,7 @@ export const WithSelect: StoryFn<typeof meta> = () => {
   });
 
   return (
-    <VStack spacing={12}>
+    <VStack gap={12}>
       <InputGroup>
         <InputGroupAddon variant='outline'>
           <Select collection={collection}>

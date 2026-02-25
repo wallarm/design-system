@@ -173,7 +173,7 @@ WithFooterLeftActions.parameters = {
 
 /** Dialog with different sizes - Small */
 export const Sizes: StoryFn<DialogProps> = () => (
-  <HStack spacing={8} justify='center'>
+  <HStack gap={8} justify='center'>
     <Dialog width={DIALOG_SIZES.small}>
       <DialogTrigger asChild>
         <Button>Open Small ({DIALOG_SIZES.small}px)</Button>
@@ -224,7 +224,7 @@ export const Sizes: StoryFn<DialogProps> = () => (
 /** Custom width with percentage */
 export const CustomSizes: StoryFn<DialogProps> = () => {
   return (
-    <HStack spacing={8} justify='center'>
+    <HStack gap={8} justify='center'>
       <Dialog width='50%'>
         <DialogTrigger asChild>
           <Button>50% Width</Button>
@@ -361,7 +361,7 @@ export const NoClosableOnEsc: StoryFn<DialogProps> = () => {
 /** Without overlay */
 export const NoOverlay: StoryFn<DialogProps> = () => {
   return (
-    <VStack spacing={12}>
+    <VStack gap={12}>
       <Text>
         Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has
         been the industry's standard dummy text ever since the 1500s, when an unknown printer took a
@@ -454,7 +454,7 @@ export const WithNested: StoryFn<DialogProps> = () => {
                     </DialogHeader>
 
                     <DialogBody>
-                      <VStack spacing={12} align='start'>
+                      <VStack gap={12} align='start'>
                         <Text>Level 3! Unlimited nesting works.</Text>
                         <ContentPlaceholder height={150} />
                       </VStack>
@@ -472,7 +472,7 @@ export const WithNested: StoryFn<DialogProps> = () => {
               </DialogHeader>
 
               <DialogBody>
-                <VStack spacing={12} align='start'>
+                <VStack gap={12} align='start'>
                   <Text>This is Level 2 dialog. Main dialog is pushed back.</Text>
 
                   <ContentPlaceholder height={150} />
@@ -494,7 +494,7 @@ export const WithNested: StoryFn<DialogProps> = () => {
         </DialogHeader>
 
         <DialogBody>
-          <VStack spacing={12} align='start'>
+          <VStack gap={12} align='start'>
             <Text>This is Level 1 dialog. Click above to open nested dialogs:</Text>
 
             <ContentPlaceholder height={150} />

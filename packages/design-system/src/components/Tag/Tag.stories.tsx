@@ -42,7 +42,7 @@ export default meta;
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => <Tag {...args}>Tag</Tag>;
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack align='center' spacing={8}>
+  <HStack align='center' gap={8}>
     <Tag {...args} size='medium'>
       Medium Tag
     </Tag>
@@ -53,7 +53,7 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
 );
 
 export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack spacing={8}>
+  <HStack gap={8}>
     <Tag {...args} size='medium' disabled>
       Disabled Medium
     </Tag>
@@ -118,7 +118,7 @@ export const Selectable: StoryFn<typeof meta> = () => {
   });
 
   return (
-    <VStack spacing={8}>
+    <VStack gap={8}>
       <Select collection={collection}>
         <SelectButtonTag>
           <Earth />
@@ -159,10 +159,10 @@ export const Selectable: StoryFn<typeof meta> = () => {
 };
 
 export const WithIcons: StoryFn<typeof meta> = ({ ...args }) => (
-  <VStack spacing={12} align='stretch'>
-    <VStack spacing={8}>
+  <VStack gap={12} align='stretch'>
+    <VStack gap={8}>
       <Heading size='sm'>Medium Size</Heading>
-      <HStack spacing={8}>
+      <HStack gap={8}>
         <Tag {...args} size='medium'>
           <Earth />
           Tag with left icon
@@ -178,9 +178,9 @@ export const WithIcons: StoryFn<typeof meta> = ({ ...args }) => (
         </Tag>
       </HStack>
     </VStack>
-    <VStack spacing={8}>
+    <VStack gap={8}>
       <Heading size='sm'>Large Size</Heading>
-      <HStack spacing={8}>
+      <HStack gap={8}>
         <Tag {...args} size='large'>
           <Earth />
           Tag with left icon

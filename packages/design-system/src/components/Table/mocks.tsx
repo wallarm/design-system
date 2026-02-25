@@ -269,7 +269,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <VStack spacing={4}>
+      <VStack gap={4}>
         <OverflowTooltip>
           <OverflowTooltipTrigger asChild>
             <Link size='sm' type='muted' weight='medium'>
@@ -279,7 +279,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
           <OverflowTooltipContent>{row.original.objectName}</OverflowTooltipContent>
         </OverflowTooltip>
 
-        <HStack spacing={4}>
+        <HStack gap={4}>
           {row.original.isActive && (
             <span className='flex items-center gap-4'>
               <span className='inline-block size-6 rounded-full bg-red-500' />
@@ -312,8 +312,8 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <HStack spacing={8}>
-        <HStack spacing={4}>
+      <HStack gap={8}>
+        <HStack gap={4}>
           <span className='text-sm'>🇺🇸</span>
           <Text size='sm'>{row.original.sourceIp}</Text>
         </HStack>
@@ -357,7 +357,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     cell: ({ getValue }) => {
       const { date, time } = formatDate(getValue());
       return (
-        <VStack spacing={0}>
+        <VStack gap={0}>
           <Text size='sm'>{date}</Text>
           <Text size='xs' color='secondary'>
             {time}
@@ -393,7 +393,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     header: 'Endpoints',
     size: 220,
     cell: ({ row }) => (
-      <HStack spacing={6}>
+      <HStack gap={6}>
         <Badge
           color={METHOD_COLORS[row.original.endpointMethod] ?? 'slate'}
           type='secondary'
@@ -511,8 +511,8 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <HStack spacing={8}>
-        <HStack spacing={4}>
+      <HStack gap={8}>
+        <HStack gap={4}>
           <span className='text-sm'>{row.original.ipCountryFlag}</span>
           <Text size='sm'>{row.original.ip}</Text>
         </HStack>
@@ -569,7 +569,7 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     header: 'Version',
     size: 140,
     cell: ({ row }) => (
-      <HStack spacing={4} align='center'>
+      <HStack gap={4} align='center'>
         <Check size='sm' className='text-text-success' />
         <Text size='sm' color='inherit'>
           {row.original.version}
@@ -733,7 +733,7 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
       cell: ({ row }: { row: { original: SecurityHeaderEntry } }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
-            <HStack spacing={8}>
+            <HStack gap={8}>
               <span className='text-sm'>{row.original.ipCountryFlag}</span>
               <Text size='sm'>{row.original.ip}</Text>
               <Badge color='slate' type='secondary' size='medium'>

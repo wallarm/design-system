@@ -23,10 +23,10 @@ export const TableActionBar: FC<TableActionBarProps> = ({ children }) => (
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom',
         )}
       >
-        <HStack spacing={40} align='center'>
+        <HStack gap={40} align='center'>
           <TableActionBarSelection />
 
-          <HStack spacing={8} align='center'>
+          <HStack gap={8} align='center'>
             {children}
           </HStack>
         </HStack>

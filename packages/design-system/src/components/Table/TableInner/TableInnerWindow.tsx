@@ -62,11 +62,6 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
     };
   }, [syncScroll]);
 
-  useEffect(() => {
-    if (!isLoading || isEmpty || onEndReached) return;
-    window.scrollTo({ top: document.documentElement.scrollHeight });
-  }, [isLoading, isEmpty, onEndReached]);
-
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);
 

@@ -12,7 +12,7 @@ export const SelectInputOverflowRenderer = (items: SelectDataItem[]) => (
       <Tag size='large'>+{items.length}</Tag>
     </PopoverTrigger>
     <PopoverContent minHeight='auto' maxWidth={POPOVER_MAX_WIDTH}>
-      <HStack spacing={4} wrap='wrap'>
+      <HStack gap={4} wrap='wrap'>
         {items.map(item => (
           <Tag key={item.value} size='large'>
             {item.label}

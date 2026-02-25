@@ -58,7 +58,7 @@ export const Basic: Story = () => (
 
 export const Variants: Story = () => (
   <div className='w-600'>
-    <VStack spacing={32}>
+    <VStack gap={32}>
       <Tabs defaultValue='1'>
         <TabsList>
           <TabsTrigger value='1'>Tab 1 (Default)</TabsTrigger>
@@ -157,7 +157,7 @@ export const Badge: Story = () => (
 
 export const Sizes: Story = () => (
   <div className='w-600'>
-    <VStack spacing={32}>
+    <VStack gap={32}>
       <Tabs defaultValue='1' size='medium'>
         <TabsList>
           <TabsTrigger value='1'>Tab 1</TabsTrigger>

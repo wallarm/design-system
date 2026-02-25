@@ -99,7 +99,7 @@ export const Card: StoryFn<typeof meta> = () => (
 );
 
 export const FormField: StoryFn<typeof meta> = () => (
-  <HStack align='start' spacing={40}>
+  <HStack align='start' gap={40}>
     <Field>
       <FieldLabel>
         Label

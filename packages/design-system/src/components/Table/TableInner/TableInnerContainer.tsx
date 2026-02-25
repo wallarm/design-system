@@ -55,13 +55,6 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
     return () => viewport.removeEventListener('scroll', handleScroll);
   }, [containerRef]);
 
-  useEffect(() => {
-    const viewport = containerRef.current;
-    if (!viewport || !isLoading || isEmpty || onEndReached) return;
-
-    viewport.scrollTop = viewport.scrollHeight;
-  }, [containerRef, isLoading, isEmpty, onEndReached]);
-
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);
 

@@ -47,7 +47,7 @@ const stackVariants = cva('', {
       true: 'shrink',
       false: 'shrink-0',
     },
-    spacing: {
+    gap: {
       0: '',
       1: 'gap-1',
       2: 'gap-2',
@@ -91,7 +91,7 @@ export const Stack: FC<StackProps> = ({
   align = 'stretch',
   justify = 'start',
   wrap = 'nowrap',
-  spacing = 4,
+  gap = 4,
   fullWidth,
   flexGrow,
   flexShrink,
@@ -121,7 +121,7 @@ export const Stack: FC<StackProps> = ({
           align,
           justify,
           wrap,
-          spacing,
+          gap,
           fullWidth,
           flexGrow,
           flexShrink,

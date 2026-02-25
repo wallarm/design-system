@@ -101,7 +101,7 @@ export const LoadingWithData: StoryFn<typeof meta> = () => (
 export const EmptyState: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} getRowId={row => row.id}>
     <TableEmptyState>
-      <VStack align='center' justify='center' spacing={8}>
+      <VStack align='center' justify='center' gap={8}>
         <Text size='sm' weight='medium' color='primary'>
           No results found
         </Text>
@@ -241,23 +241,23 @@ export const RowExpanding: StoryFn<typeof meta> = () => {
             Event Details
           </Text>
           <div className='grid grid-cols-3 gap-8 mt-8'>
-            <VStack spacing={2}>
+            <VStack gap={2}>
               <Text size='xs' color='secondary'>
                 Source IP
               </Text>
               <Text size='sm'>{row.original.sourceIp}</Text>
             </VStack>
-            <VStack spacing={2}>
+            <VStack gap={2}>
               <Text size='xs' color='secondary'>
                 Provider
               </Text>
               <Text size='sm'>{row.original.sourceProvider}</Text>
             </VStack>
-            <VStack spacing={2}>
+            <VStack gap={2}>
               <Text size='xs' color='secondary'>
                 Endpoint
               </Text>
-              <HStack spacing={4}>
+              <HStack gap={4}>
                 <Badge
                   color={METHOD_COLORS[row.original.endpointMethod] ?? 'slate'}
                   type='secondary'
@@ -421,7 +421,7 @@ export const InfiniteScroll: StoryFn<typeof meta> = () => {
   const { data, isFetching, hasMore, totalItems, fetchNextPage } = useInfiniteData();
 
   return (
-    <VStack spacing={8}>
+    <VStack gap={8}>
       <Text size='sm' color='secondary'>
         Loaded {data.length} of {totalItems} rows {isFetching && '— loading...'}
         {!hasMore && ' — all loaded'}
@@ -444,7 +444,7 @@ export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
   const { data, isFetching, hasMore, totalItems, fetchNextPage } = useInfiniteData();
 
   return (
-    <VStack spacing={8}>
+    <VStack gap={8}>
       <Text size='sm' color='secondary'>
         Loaded {data.length} of {totalItems} rows {isFetching && '— loading...'}
         {!hasMore && ' — all loaded'}

@@ -49,7 +49,7 @@ export const Dotted: StoryFn<typeof meta> = ({ ...args }) => (
 );
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack align='center' spacing={8}>
+  <HStack align='center' gap={8}>
     <Badge {...args} size='medium'>
       Medium
     </Badge>
@@ -60,7 +60,7 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
 );
 
 export const Types: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack spacing={8}>
+  <HStack gap={8}>
     <Badge {...args} type='solid'>
       Solid
     </Badge>
@@ -80,7 +80,7 @@ export const Types: StoryFn<typeof meta> = ({ ...args }) => (
 );
 
 export const TextVariants: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack spacing={8}>
+  <HStack gap={8}>
     <Badge {...args} textVariant='default'>
       Default Text
     </Badge>
@@ -91,7 +91,7 @@ export const TextVariants: StoryFn<typeof meta> = ({ ...args }) => (
 );
 
 export const WithIconsLeft: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack spacing={8}>
+  <HStack gap={8}>
     <Badge {...args}>
       <Check size='sm' />
       Success
@@ -116,7 +116,7 @@ export const WithIconsLeft: StoryFn<typeof meta> = ({ ...args }) => (
 );
 
 export const WithIconsRight: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack spacing={8}>
+  <HStack gap={8}>
     <Badge {...args}>
       Success
       <Check size='sm' />
@@ -141,7 +141,7 @@ export const WithIconsRight: StoryFn<typeof meta> = ({ ...args }) => (
 );
 
 export const IconsOnly: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack spacing={8}>
+  <HStack gap={8}>
     <Badge {...args}>
       <Check size='sm' />
     </Badge>

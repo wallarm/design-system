@@ -49,22 +49,22 @@ export const Default: StoryFn<typeof meta> = () => (
  * Explicit sizes: sm, md, lg - use these when you need a specific size.
  */
 export const Sizes: StoryFn<typeof meta> = () => (
-  <VStack align='start' spacing={16}>
-    <VStack align='start' spacing={4}>
+  <VStack align='start' gap={16}>
+    <VStack align='start' gap={4}>
       <span className='text-xs text-text-secondary font-medium'>sm</span>
       <div className='text-xs text-text-primary'>
         To start creating an interface, run{' '}
         <InlineCodeSnippet code='npm install @wads/ui' size='sm' /> and then apply the following...
       </div>
     </VStack>
-    <VStack align='start' spacing={4}>
+    <VStack align='start' gap={4}>
       <span className='text-xs text-text-secondary font-medium'>md</span>
       <div className='text-sm text-text-primary'>
         To start creating an interface, run{' '}
         <InlineCodeSnippet code='npm install @wads/ui' size='md' /> and then apply the following...
       </div>
     </VStack>
-    <VStack align='start' spacing={4}>
+    <VStack align='start' gap={4}>
       <span className='text-xs text-text-secondary font-medium'>lg</span>
       <div className='text-base text-text-primary'>
         To start creating an interface, run{' '}
