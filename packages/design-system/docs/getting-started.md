@@ -17,7 +17,11 @@ Wallarm Design System is a collection of ready-to-use, accessible, and customiza
 
 ### Installation
 
-Detailed [installation](/packages/design-system/docs/documentation-installation--docs) and setup instructions for your project.
+Detailed [installation](/docs/documentation-installation--docs) and setup instructions for your project.
+
+### Adding Components
+
+Guide for [creating new components](/docs/documentation-adding-components--docs) — file structure, patterns, and best practices.
 
 ## 💾 Important Information
 
