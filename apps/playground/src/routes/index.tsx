@@ -18,7 +18,7 @@ function HomePage() {
 
   return (
     <div className='flex flex-col justify-center w-screen h-screen p-32'>
-      <VStack spacing={12} justify='center' align='center'>
+      <VStack gap={12} justify='center' align='center'>
         <Heading color='primary'>Wallarm Design System Playground</Heading>
         <Text color='secondary' align='center'>
           Welcome to the Wallarm Design System Playground. This is where you can explore and test

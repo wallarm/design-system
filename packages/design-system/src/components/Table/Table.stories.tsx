@@ -30,6 +30,7 @@ import {
   securityColumnIds,
   securityColumns,
   securityEvents,
+  useInfiniteData,
 } from './mocks';
 import { Table } from './Table';
 import { TableActionBar } from './TableActionBar';
@@ -87,10 +88,20 @@ export const LoadingState: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} isLoading />
 );
 
+export const LoadingWithData: StoryFn<typeof meta> = () => (
+  <Table
+    className='h-500'
+    data={securityEvents}
+    columns={securityColumns}
+    getRowId={row => row.id}
+    isLoading
+  />
+);
+
 export const EmptyState: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} getRowId={row => row.id}>
     <TableEmptyState>
-      <VStack align='center' justify='center' spacing={8}>
+      <VStack align='center' justify='center' gap={8}>
         <Text size='sm' weight='medium' color='primary'>
           No results found
         </Text>
@@ -122,15 +133,14 @@ export const ColumnPinning: StoryFn<typeof meta> = () => {
   });
 
   return (
-    <div className='max-w-800'>
-      <Table
-        data={securityEvents}
-        columns={securityColumns}
-        getRowId={row => row.id}
-        columnPinning={columnPinning}
-        onColumnPinningChange={setColumnPinning}
-      />
-    </div>
+    <Table
+      className='max-w-800'
+      data={securityEvents}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      columnPinning={columnPinning}
+      onColumnPinningChange={setColumnPinning}
+    />
   );
 };
 
@@ -231,23 +241,23 @@ export const RowExpanding: StoryFn<typeof meta> = () => {
             Event Details
           </Text>
           <div className='grid grid-cols-3 gap-8 mt-8'>
-            <VStack spacing={2}>
+            <VStack gap={2}>
               <Text size='xs' color='secondary'>
                 Source IP
               </Text>
               <Text size='sm'>{row.original.sourceIp}</Text>
             </VStack>
-            <VStack spacing={2}>
+            <VStack gap={2}>
               <Text size='xs' color='secondary'>
                 Provider
               </Text>
               <Text size='sm'>{row.original.sourceProvider}</Text>
             </VStack>
-            <VStack spacing={2}>
+            <VStack gap={2}>
               <Text size='xs' color='secondary'>
                 Endpoint
               </Text>
-              <HStack spacing={4}>
+              <HStack gap={4}>
                 <Badge
                   color={METHOD_COLORS[row.original.endpointMethod] ?? 'slate'}
                   type='secondary'
@@ -378,9 +388,77 @@ export const Virtualization: StoryFn<typeof meta> = () => {
   const largeData = useMemo(() => createLargeSecurityEvents(1000), []);
 
   return (
-    <div className='h-500'>
-      <Table data={largeData} columns={securityColumns} getRowId={row => row.id} virtualized />
-    </div>
+    <Table
+      className='h-500'
+      data={largeData}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      virtualized='container'
+    />
+  );
+};
+
+export const WindowVirtualization: StoryFn<typeof meta> = () => {
+  const largeData = useMemo(() => createLargeSecurityEvents(1000), []);
+  const [columnOrder, setColumnOrder] = useState<string[]>([]);
+  const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+
+  return (
+    <Table
+      data={largeData}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      virtualized='window'
+      columnOrder={columnOrder}
+      onColumnOrderChange={setColumnOrder}
+      columnSizing={columnSizing}
+      onColumnSizingChange={setColumnSizing}
+    />
+  );
+};
+
+export const InfiniteScroll: StoryFn<typeof meta> = () => {
+  const { data, isFetching, hasMore, totalItems, fetchNextPage } = useInfiniteData();
+
+  return (
+    <VStack gap={8}>
+      <Text size='sm' color='secondary'>
+        Loaded {data.length} of {totalItems} rows {isFetching && '— loading...'}
+        {!hasMore && ' — all loaded'}
+      </Text>
+      <Table
+        className='h-500'
+        data={data}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='container'
+        isLoading={isFetching}
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={200}
+      />
+    </VStack>
+  );
+};
+
+export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
+  const { data, isFetching, hasMore, totalItems, fetchNextPage } = useInfiniteData();
+
+  return (
+    <VStack gap={8}>
+      <Text size='sm' color='secondary'>
+        Loaded {data.length} of {totalItems} rows {isFetching && '— loading...'}
+        {!hasMore && ' — all loaded'}
+      </Text>
+      <Table
+        data={data}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='window'
+        isLoading={isFetching}
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={300}
+      />
+    </VStack>
   );
 };
 
@@ -401,47 +479,46 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
   });
 
   return (
-    <div className='h-500'>
-      <Table<SecurityHeaderEntry>
-        data={data}
-        columns={fullFeaturedColumns}
-        getRowId={row => row.id}
-        getSubRows={row => row.children}
-        // Grouping
-        expanded={expanded}
-        onExpandedChange={setExpanded}
-        // Sorting
-        sorting={sorting}
-        onSortingChange={setSorting}
-        // Row selection
-        rowSelection={rowSelection}
-        onRowSelectionChange={setRowSelection}
-        // Column resizing
-        columnSizing={columnSizing}
-        onColumnSizingChange={setColumnSizing}
-        // Column pinning
-        columnPinning={columnPinning}
-        onColumnPinningChange={setColumnPinning}
-        // Column DnD ordering
-        columnOrder={columnOrder}
-        onColumnOrderChange={setColumnOrder}
-        // Column visibility + settings
-        columnVisibility={columnVisibility}
-        onColumnVisibilityChange={setColumnVisibility}
-        defaultColumnVisibility={{}}
-        defaultColumnOrder={headerColumnIds}
-        // Virtual scrolling
-        virtualized
-      >
-        <TableActionBar>
-          <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
-            <Copy /> Duplicate
-          </Button>
-          <Button color='brand' onClick={() => alert('Delete clicked')}>
-            <Trash2 /> Delete
-          </Button>
-        </TableActionBar>
-      </Table>
-    </div>
+    <Table<SecurityHeaderEntry>
+      className='h-500'
+      data={data}
+      columns={fullFeaturedColumns}
+      getRowId={row => row.id}
+      getSubRows={row => row.children}
+      // Grouping
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      // Sorting
+      sorting={sorting}
+      onSortingChange={setSorting}
+      // Row selection
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+      // Column resizing
+      columnSizing={columnSizing}
+      onColumnSizingChange={setColumnSizing}
+      // Column pinning
+      columnPinning={columnPinning}
+      onColumnPinningChange={setColumnPinning}
+      // Column DnD ordering
+      columnOrder={columnOrder}
+      onColumnOrderChange={setColumnOrder}
+      // Column visibility + settings
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
+      defaultColumnVisibility={{}}
+      defaultColumnOrder={headerColumnIds}
+      // Virtual scrolling
+      virtualized='container'
+    >
+      <TableActionBar>
+        <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
+          <Copy /> Duplicate
+        </Button>
+        <Button color='brand' onClick={() => alert('Delete clicked')}>
+          <Trash2 /> Delete
+        </Button>
+      </TableActionBar>
+    </Table>
   );
 };

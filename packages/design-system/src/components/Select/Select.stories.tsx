@@ -116,8 +116,8 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
 
   return (
     <div className='w-800'>
-      <VStack spacing={16}>
-        <HStack spacing={8}>
+      <VStack gap={16}>
+        <HStack gap={8}>
           <Select collection={collection}>
             <SelectButton placeholder='Default' />
 
@@ -194,7 +194,7 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
         </HStack>
 
-        <HStack spacing={8}>
+        <HStack gap={8}>
           <Select collection={collection} disabled>
             <SelectButton placeholder='Default' />
 
@@ -271,7 +271,7 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
           </Select>
         </HStack>
 
-        <HStack spacing={8}>
+        <HStack gap={8}>
           <Select collection={collection} loading>
             <SelectButton placeholder='Default' />
 

@@ -19,7 +19,7 @@ export const Basic: StoryFn<typeof meta> = () => (
     <Heading>Separator examples</Heading>
     <Text>Wallarm Design System component library.</Text>
     <Separator spacing={16} />
-    <HStack spacing={0}>
+    <HStack gap={0}>
       <Text>Blog</Text>
       <Separator decorative orientation='vertical' spacing={16} />
       <Text>Docs</Text>

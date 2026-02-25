@@ -21,5 +21,6 @@ export type {
   TableRowSelectionState,
   TableSortingState,
   TableUpdater,
+  TableVirtualized,
   TableVisibilityState,
 } from './types';

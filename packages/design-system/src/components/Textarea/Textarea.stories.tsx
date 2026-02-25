@@ -28,7 +28,7 @@ export default meta;
 export const Basic: StoryObj<typeof meta> = {};
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack spacing={16} align='start'>
+  <HStack gap={16} align='start'>
     <Textarea {...args} size='default' />
     <Textarea {...args} size='medium' />
     <Textarea {...args} size='small' />

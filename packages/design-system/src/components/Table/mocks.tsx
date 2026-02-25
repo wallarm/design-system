@@ -1,3 +1,4 @@
+import { useCallback, useMemo, useState } from 'react';
 import { Check, Copy, Filter, FilterX } from '../../icons';
 import { Badge } from '../Badge';
 import { InlineCodeSnippet } from '../CodeSnippet';
@@ -12,6 +13,12 @@ import {
   DropdownMenuItemText,
   DropdownMenuSeparator,
 } from '../DropdownMenu';
+import { Link } from '../Link';
+import {
+  OverflowTooltip,
+  OverflowTooltipContent,
+  OverflowTooltipTrigger,
+} from '../OverflowTooltip';
 import { HStack, VStack } from '../Stack';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
@@ -262,12 +269,17 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <VStack spacing={4}>
-        <Text size='sm' truncate grow>
-          {row.original.objectName}
-        </Text>
+      <VStack gap={4}>
+        <OverflowTooltip>
+          <OverflowTooltipTrigger asChild>
+            <Link size='sm' type='muted' weight='medium'>
+              {row.original.objectName}
+            </Link>
+          </OverflowTooltipTrigger>
+          <OverflowTooltipContent>{row.original.objectName}</OverflowTooltipContent>
+        </OverflowTooltip>
 
-        <HStack spacing={4}>
+        <HStack gap={4}>
           {row.original.isActive && (
             <span className='flex items-center gap-4'>
               <span className='inline-block size-6 rounded-full bg-red-500' />
@@ -300,8 +312,8 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <HStack spacing={8}>
-        <HStack spacing={4}>
+      <HStack gap={8}>
+        <HStack gap={4}>
           <span className='text-sm'>🇺🇸</span>
           <Text size='sm'>{row.original.sourceIp}</Text>
         </HStack>
@@ -345,7 +357,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     cell: ({ getValue }) => {
       const { date, time } = formatDate(getValue());
       return (
-        <VStack spacing={0}>
+        <VStack gap={0}>
           <Text size='sm'>{date}</Text>
           <Text size='xs' color='secondary'>
             {time}
@@ -381,7 +393,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     header: 'Endpoints',
     size: 220,
     cell: ({ row }) => (
-      <HStack spacing={6}>
+      <HStack gap={6}>
         <Badge
           color={METHOD_COLORS[row.original.endpointMethod] ?? 'slate'}
           type='secondary'
@@ -499,8 +511,8 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <HStack spacing={8}>
-        <HStack spacing={4}>
+      <HStack gap={8}>
+        <HStack gap={4}>
           <span className='text-sm'>{row.original.ipCountryFlag}</span>
           <Text size='sm'>{row.original.ip}</Text>
         </HStack>
@@ -557,7 +569,7 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     header: 'Version',
     size: 140,
     cell: ({ row }) => (
-      <HStack spacing={4} align='center'>
+      <HStack gap={4} align='center'>
         <Check size='sm' className='text-text-success' />
         <Text size='sm' color='inherit'>
           {row.original.version}
@@ -671,9 +683,14 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
       cell: ({ getValue }: { getValue: () => string }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
-            <Text size='sm' truncate>
-              {getValue()}
-            </Text>
+            <OverflowTooltip>
+              <OverflowTooltipTrigger asChild>
+                <Text size='sm' truncate>
+                  {getValue()}
+                </Text>
+              </OverflowTooltipTrigger>
+              <OverflowTooltipContent>{getValue()}</OverflowTooltipContent>
+            </OverflowTooltip>
           </DropdownMenuContextTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onSelect={() => alert(`Copied: ${getValue()}`)}>
@@ -716,7 +733,7 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
       cell: ({ row }: { row: { original: SecurityHeaderEntry } }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
-            <HStack spacing={8}>
+            <HStack gap={8}>
               <span className='text-sm'>{row.original.ipCountryFlag}</span>
               <Text size='sm'>{row.original.ip}</Text>
               <Badge color='slate' type='secondary' size='medium'>
@@ -761,3 +778,30 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
 
   return col;
 });
+
+// ---------------------------------------------------------------------------
+// Infinite scroll — hook for stories
+// ---------------------------------------------------------------------------
+
+const INFINITE_PAGE_SIZE = 50;
+const INFINITE_MAX_ITEMS = 500;
+
+export function useInfiniteData() {
+  const allData = useMemo(() => createLargeSecurityEvents(INFINITE_MAX_ITEMS), []);
+  const [data, setData] = useState(() => allData.slice(0, INFINITE_PAGE_SIZE));
+  const [isFetching, setIsFetching] = useState(false);
+  const hasMore = data.length < allData.length;
+
+  const fetchNextPage = useCallback(() => {
+    if (isFetching || !hasMore) return;
+    setIsFetching(true);
+
+    // Simulate network delay
+    setTimeout(() => {
+      setData(prev => allData.slice(0, prev.length + INFINITE_PAGE_SIZE));
+      setIsFetching(false);
+    }, 800);
+  }, [isFetching, hasMore, allData]);
+
+  return { data, isFetching, hasMore, totalItems: INFINITE_MAX_ITEMS, fetchNextPage };
+}

@@ -1,10 +1,11 @@
 import type { ReactNode, RefObject } from 'react';
 import type { Column, Row, Table as TanStackTable, VisibilityState } from '@tanstack/react-table';
-import type { TableProps } from '../types';
+import type { TableProps, TableVirtualized } from '../types';
 
 export interface TableContextValue<T> {
   table: TanStackTable<T>;
   isLoading: boolean;
+  skeletonCount: number;
 
   // Feature flags (derived from props)
   sortingEnabled: boolean;
@@ -15,7 +16,7 @@ export interface TableContextValue<T> {
   groupingEnabled: boolean;
   expandingEnabled: boolean;
   visibilityEnabled: boolean;
-  virtualized: boolean;
+  virtualized: TableVirtualized | undefined;
 
   // Rendering helpers
   renderExpandedRow?: (row: Row<T>) => ReactNode;
@@ -44,6 +45,10 @@ export interface TableContextValue<T> {
 
   // Container ref for scoping keyboard handlers
   containerRef: RefObject<HTMLDivElement | null>;
+
+  // Infinite scroll
+  onEndReached?: () => void;
+  onEndReachedThreshold?: number;
 }
 
 export interface TableProviderProps<T> extends Omit<TableProps<T>, 'children' | 'aria-label'> {

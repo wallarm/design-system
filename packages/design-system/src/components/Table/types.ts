@@ -24,6 +24,9 @@ declare module '@tanstack/react-table' {
 // Public API types — consumers use these instead of @tanstack/react-table
 // ---------------------------------------------------------------------------
 
+/** Virtualization mode */
+export type TableVirtualized = 'container' | 'window';
+
 /** Sorting state: array of `{ id, desc }` */
 export type TableSortingState = { id: string; desc: boolean }[];
 
@@ -130,12 +133,16 @@ export interface TableProps<T> {
   columns: TableColumnDef<T>[];
   /** Show skeleton rows */
   isLoading?: boolean;
+  /** Number of skeleton rows to display when loading (default: 6) */
+  skeletonCount?: number;
   /** Slot for TableActionBar, TableEmptyState, and other compound components */
   children?: ReactNode;
   /** Row id accessor for stable row identity */
   getRowId?: (row: T, index: number) => string;
   /** Accessible label for the table */
   'aria-label'?: string;
+  /** Additional CSS class for the root container */
+  className?: string;
 
   // --- Sorting ---
   sorting?: TableSortingState;
@@ -176,7 +183,14 @@ export interface TableProps<T> {
   defaultColumnOrder?: string[];
 
   // --- Virtualization ---
-  virtualized?: boolean;
+  /** Enable row virtualization. `'container'` virtualizes within the scroll container; `'window'` virtualizes against the browser window. */
+  virtualized?: TableVirtualized;
   estimateRowHeight?: (index: number) => number;
   overscan?: number;
+
+  // --- Infinite scroll ---
+  /** Callback fired when the user scrolls near the end of the table */
+  onEndReached?: () => void;
+  /** Distance from the bottom (in px) to trigger onEndReached (default: 200) */
+  onEndReachedThreshold?: number;
 }

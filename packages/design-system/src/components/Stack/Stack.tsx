@@ -5,8 +5,12 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { getValidChildren } from './utils';
 
-const stackVariants = cva('flex flex-1 w-full', {
+const stackVariants = cva('', {
   variants: {
+    inline: {
+      true: 'inline-flex',
+      false: 'flex',
+    },
     direction: {
       row: 'flex-row',
       column: 'flex-col',
@@ -33,7 +37,17 @@ const stackVariants = cva('flex flex-1 w-full', {
       nowrap: 'flex-nowrap',
       reverse: 'flex-wrap-reverse',
     },
-    spacing: {
+    fullWidth: {
+      true: 'w-full',
+    },
+    flexGrow: {
+      true: 'flex-1',
+    },
+    flexShrink: {
+      true: 'shrink',
+      false: 'shrink-0',
+    },
+    gap: {
       0: '',
       1: 'gap-1',
       2: 'gap-2',
@@ -72,11 +86,15 @@ export type StackProps = StackNativeProps &
   };
 
 export const Stack: FC<StackProps> = ({
+  inline = false,
   direction = 'column',
   align = 'stretch',
   justify = 'start',
   wrap = 'nowrap',
-  spacing = 4,
+  gap = 4,
+  fullWidth,
+  flexGrow,
+  flexShrink,
   asChild = false,
   children,
   ...props
@@ -98,11 +116,15 @@ export const Stack: FC<StackProps> = ({
       {...props}
       className={cn(
         stackVariants({
+          inline,
           direction,
           align,
           justify,
           wrap,
-          spacing,
+          gap,
+          fullWidth,
+          flexGrow,
+          flexShrink,
         }),
       )}
     >

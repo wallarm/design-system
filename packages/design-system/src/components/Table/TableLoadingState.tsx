@@ -1,14 +1,11 @@
 import type { FC } from 'react';
 import { Skeleton } from '../Skeleton';
-import { TABLE_SKELETON_ROWS, TABLE_SKELETON_ROWS_APPEND } from './lib';
 import { Td, Tr } from './primitives';
 import { useTableContext } from './TableContext';
 
 export const TableLoadingState: FC = () => {
-  const { table } = useTableContext();
+  const { table, skeletonCount } = useTableContext();
   const columns = table.getVisibleLeafColumns();
-  const rows = table.getRowModel().rows;
-  const skeletonCount = rows.length > 0 ? TABLE_SKELETON_ROWS_APPEND : TABLE_SKELETON_ROWS;
 
   return (
     <>
@@ -23,7 +20,7 @@ export const TableLoadingState: FC = () => {
                 className='px-16 py-8 border-b border-r border-border-primary-light'
                 style={{ width: column.getSize() }}
               >
-                <Skeleton className='h-36 w-full' />
+                <Skeleton className='h-20 w-full' />
               </Td>
             ))}
           </Tr>

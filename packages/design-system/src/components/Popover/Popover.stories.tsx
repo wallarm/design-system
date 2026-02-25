@@ -33,7 +33,7 @@ export const Basic: StoryFn<typeof meta> = () => (
       </Button>
     </PopoverTrigger>
     <PopoverContent>
-      <VStack spacing={12}>
+      <VStack gap={12}>
         <Text size='sm'>This action will remove all and every bit!</Text>
 
         <Alert color='warning'>
@@ -59,7 +59,7 @@ export const Basic: StoryFn<typeof meta> = () => (
 );
 
 export const MinMaxWidth: StoryFn<typeof meta> = () => (
-  <VStack spacing={32}>
+  <VStack gap={32}>
     <Popover>
       <PopoverTrigger asChild>
         <Button variant='outline' color='neutral'>
@@ -97,7 +97,7 @@ export const MinMaxWidth: StoryFn<typeof meta> = () => (
 );
 
 export const MinMaxHeight: StoryFn<typeof meta> = () => (
-  <VStack spacing={32}>
+  <VStack gap={32}>
     <Popover>
       <PopoverTrigger asChild>
         <Button variant='outline' color='neutral'>
@@ -118,7 +118,7 @@ export const MinMaxHeight: StoryFn<typeof meta> = () => (
         </Button>
       </PopoverTrigger>
       <PopoverContent>
-        <VStack spacing={12}>
+        <VStack gap={12}>
           <Text size='xs' weight='medium'>
             Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum
             has been the industry's standard dummy text ever since the 1500s, when an unknown

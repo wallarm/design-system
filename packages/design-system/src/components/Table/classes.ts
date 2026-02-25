@@ -14,7 +14,7 @@ const pinnedLeftShadow = 'group-data-[scrolled]/scroll:shadow-[2px_0_3px_0_rgba(
 export const tableHeadCellVariants = cva(
   cn(
     tableCellBase,
-    'pl-16 pr-4 py-8 text-left text-xs font-medium text-text-secondary',
+    'pl-16 pr-4 py-4 text-left text-xs font-medium text-text-secondary',
     'first:rounded-tl-12 last:rounded-tr-12',
     'bg-bg-light-primary',
     'whitespace-nowrap select-none outline-none',
@@ -22,7 +22,7 @@ export const tableHeadCellVariants = cva(
   {
     variants: {
       interactive: {
-        true: 'hover:overlay-states-primary-hover cursor-pointer',
+        true: 'hover:overlay-states-primary-hover',
         false: '',
       },
       sorted: {
@@ -59,10 +59,13 @@ export const tableBodyCellVariants = cva(
     'bg-bg-surface-2',
     'align-top',
     'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
-    'has-[>_[data-state=open]]:ring-2 has-[>_[data-state=open]]:ring-inset has-[>_[data-state=open]]:ring-border-strong-brand',
+    'has-[>_[data-state=open][data-part=context-trigger]]:ring-2',
+    'has-[>_[data-state=open][data-part=context-trigger]]:ring-inset',
+    'has-[>_[data-state=open][data-part=context-trigger]]:ring-border-strong-brand',
     'has-[>_[data-part=context-trigger]]:p-0',
-    '[&>[data-part=context-trigger]]:px-16 [&>[data-part=context-trigger]]:py-8 [&>[data-part=context-trigger]]:text-left',
-    '[&>[data-part=context-trigger]]:w-full [&>[data-part=context-trigger]]:outline-none',
+    '[&>[data-part=context-trigger]]:w-full',
+    '[&>[data-part=context-trigger]]:px-16 [&>[data-part=context-trigger]]:py-8',
+    '[&>[data-part=context-trigger]]:text-left [&>[data-part=context-trigger]]:outline-none',
   ),
   {
     variants: {
@@ -92,12 +95,9 @@ export const tableContainerVariants = cva(
   {
     variants: {
       virtualized: {
-        true: 'h-full',
-        false: '',
+        container: 'h-full',
+        window: '',
       },
-    },
-    defaultVariants: {
-      virtualized: false,
     },
   },
 );

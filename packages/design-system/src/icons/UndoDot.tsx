@@ -3,31 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const UndoDot: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <circle
-      cx='12'
-      cy='17'
-      r='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M3 7v6h6'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M21 17a9 9 0 0 1-9 9 9 9 0 0 1-6-2.3L3 21'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M10 17C10 15.8954 10.8954 15 12 15C13.1046 15 14 15.8954 14 17C14 18.1046 13.1046 19 12 19C10.8954 19 10 18.1046 10 17ZM20 17C20 14.8783 19.1575 12.8431 17.6572 11.3428C16.1569 9.84248 14.1217 9 12 9C10.0316 9.00225 8.13336 9.73062 6.66797 11.0449L6.66699 11.0439L5.60547 12H9C9.55228 12 10 12.4477 10 13C10 13.5523 9.55228 14 9 14H3C2.44772 14 2 13.5523 2 13V7C2 6.44772 2.44772 6 3 6C3.55228 6 4 6.44772 4 7V10.7539L5.33105 9.55664L5.33203 9.55566C7.16409 7.91251 9.53805 7.00251 11.999 7H12L12.4961 7.0127C14.9676 7.13537 17.3132 8.17061 19.0713 9.92871C20.9467 11.8041 22 14.3478 22 17C22 17.5523 21.5523 18 21 18C20.4477 18 20 17.5523 20 17Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

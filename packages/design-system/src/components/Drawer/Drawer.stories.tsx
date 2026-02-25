@@ -177,7 +177,7 @@ WithFooterLeftActions.parameters = {
 
 /** Drawer with different sizes - Small */
 export const Sizes: StoryFn<DrawerProps> = () => (
-  <HStack spacing={8} justify='center'>
+  <HStack gap={8} justify='center'>
     <Drawer width={DRAWER_SIZES.small}>
       <DrawerTrigger asChild>
         <Button>Open Small ({DRAWER_SIZES.small}px)</Button>
@@ -228,7 +228,7 @@ export const Sizes: StoryFn<DrawerProps> = () => (
 /** Custom width with percentage */
 export const CustomSizes: StoryFn<DrawerProps> = () => {
   return (
-    <HStack spacing={8} justify='center'>
+    <HStack gap={8} justify='center'>
       <Drawer width='50%'>
         <DrawerTrigger asChild>
           <Button>50% Width</Button>
@@ -271,7 +271,7 @@ export const CustomSizes: StoryFn<DrawerProps> = () => {
 /** Resizable drawer */
 export const Resizable: StoryFn<DrawerProps> = () => {
   return (
-    <VStack spacing={12}>
+    <VStack gap={12}>
       <Drawer width={800}>
         <DrawerTrigger asChild>
           <Button>Open Resizable Drawer (as number)</Button>
@@ -493,7 +493,7 @@ export const WithNested: StoryFn<DrawerProps> = () => {
                     </DrawerHeader>
 
                     <DrawerBody>
-                      <VStack spacing={12} align='start'>
+                      <VStack gap={12} align='start'>
                         <Text>Level 3! Unlimited nesting works.</Text>
                         <ContentPlaceholder height={150} />
                       </VStack>
@@ -511,7 +511,7 @@ export const WithNested: StoryFn<DrawerProps> = () => {
               </DrawerHeader>
 
               <DrawerBody>
-                <VStack spacing={12} align='start'>
+                <VStack gap={12} align='start'>
                   <Text>
                     This is Level 2 drawer. Main drawer is pushed back. You can go deeper:
                   </Text>
@@ -535,7 +535,7 @@ export const WithNested: StoryFn<DrawerProps> = () => {
         </DrawerHeader>
 
         <DrawerBody>
-          <VStack spacing={12} align='start'>
+          <VStack gap={12} align='start'>
             <Text>This is Level 1 drawer. Click below to open nested drawers:</Text>
 
             <ContentPlaceholder height={300} />

@@ -146,7 +146,7 @@ export const TableSettingsMenu: FC = () => {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className={cn('min-w-256')}>
-                <VStack spacing={8} align='stretch'>
+                <VStack gap={8} align='stretch'>
                   <Input
                     placeholder='Search'
                     value={search}

@@ -81,8 +81,8 @@ export const WithLineNumbers: StoryFn<typeof meta> = () => (
  * Different size variants: sm, md (default), lg.
  */
 export const Sizes: StoryFn<typeof meta> = () => (
-  <VStack spacing={16}>
-    <VStack align='start' spacing={4}>
+  <VStack gap={16}>
+    <VStack align='start' gap={4}>
       <span className='text-xs text-text-secondary font-medium'>sm</span>
       <CodeSnippetRoot code={bashCode} language='text' size='sm'>
         <CodeSnippetContent>
@@ -91,7 +91,7 @@ export const Sizes: StoryFn<typeof meta> = () => (
       </CodeSnippetRoot>
     </VStack>
 
-    <VStack align='start' spacing={4}>
+    <VStack align='start' gap={4}>
       <span className='text-xs text-text-secondary font-medium'>md (default)</span>
       <CodeSnippetRoot code={bashCode} language='text' size='md'>
         <CodeSnippetContent>
@@ -100,7 +100,7 @@ export const Sizes: StoryFn<typeof meta> = () => (
       </CodeSnippetRoot>
     </VStack>
 
-    <VStack align='start' spacing={4}>
+    <VStack align='start' gap={4}>
       <span className='text-xs text-text-secondary font-medium'>lg</span>
       <CodeSnippetRoot code={bashCode} language='text' size='lg'>
         <CodeSnippetContent>
@@ -289,8 +289,8 @@ export const LineWrapping: StoryFn<typeof meta> = () => {
 console.log(veryLongVariableName);`;
 
   return (
-    <VStack spacing={16}>
-      <VStack align='start' spacing={4}>
+    <VStack gap={16}>
+      <VStack align='start' gap={4}>
         <span className='text-xs text-text-secondary font-medium'>Without wrapping</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot code={longCode} language='text'>
@@ -302,7 +302,7 @@ console.log(veryLongVariableName);`;
         </div>
       </VStack>
 
-      <VStack align='start' spacing={4}>
+      <VStack align='start' gap={4}>
         <span className='text-xs text-text-secondary font-medium'>With wrapping</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot code={longCode} language='text' wrapLines>
@@ -313,7 +313,7 @@ console.log(veryLongVariableName);`;
           </CodeSnippetRoot>
         </div>
       </VStack>
-      <VStack align='start' spacing={4}>
+      <VStack align='start' gap={4}>
         <span className='text-xs text-text-secondary font-medium'>
           Without wrapping with annotations
         </span>
@@ -333,7 +333,7 @@ console.log(veryLongVariableName);`;
           </CodeSnippetRoot>
         </div>
       </VStack>
-      <VStack align='start' spacing={4}>
+      <VStack align='start' gap={4}>
         <span className='text-xs text-text-secondary font-medium'>Wrapping with annotations</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot

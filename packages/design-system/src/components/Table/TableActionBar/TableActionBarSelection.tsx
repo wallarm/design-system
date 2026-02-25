@@ -24,7 +24,7 @@ export const TableActionBarSelection: FC = () => {
         {count} selected
       </Text>
 
-      <HStack spacing={6}>
+      <HStack gap={6}>
         {!allSelected && (
           <Link type='alt' onClick={handleSelectAll}>
             Select all

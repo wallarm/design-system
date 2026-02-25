@@ -1,11 +1,11 @@
-import type { Ref } from 'react';
+import { memo, type Ref } from 'react';
 import type { Row } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
 import { Td, Tr } from './primitives';
-import { TableBodyCell } from './TableBodyCell';
+import { TableBodyCell } from './TableBody';
 import { useTableContext } from './TableContext';
-import { TableExpandedRow } from './TableExpandedRow';
+import { TableRowExpanded } from './TableRowExpanded';
 
 const SYSTEM_COLUMN_IDS = new Set([TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID]);
 
@@ -15,7 +15,7 @@ interface TableRowProps<T> {
   'data-index'?: number;
 }
 
-export const TableRow = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<T>) => {
+const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<T>) => {
   const { expandingEnabled } = useTableContext<T>();
   const isGroupParent = row.subRows.length > 0;
   const isSelected = isGroupParent ? row.getIsAllSubRowsSelected() : row.getIsSelected();
@@ -53,7 +53,7 @@ export const TableRow = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProp
             />
           ))}
         </Tr>
-        {expandingEnabled && <TableExpandedRow row={row} />}
+        {expandingEnabled && <TableRowExpanded row={row} />}
       </>
     );
   }
@@ -71,9 +71,11 @@ export const TableRow = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProp
           <TableBodyCell key={cell.id} cell={cell} />
         ))}
       </Tr>
-      {expandingEnabled && <TableExpandedRow row={row} />}
+      {expandingEnabled && <TableRowExpanded row={row} />}
     </>
   );
 };
 
-TableRow.displayName = 'TableRow';
+TableRowInner.displayName = 'TableRow';
+
+export const TableRow = memo(TableRowInner) as typeof TableRowInner;

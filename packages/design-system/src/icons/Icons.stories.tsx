@@ -380,11 +380,11 @@ const IconGrid = ({ icons, title }: { icons: Record<string, FC<SvgIconProps>>; t
   );
 
   return (
-    <VStack spacing={12} align='stretch'>
-      <VStack spacing={12}>
+    <VStack gap={12} align='stretch'>
+      <VStack gap={12}>
         <Heading>{title}</Heading>
 
-        <HStack spacing={8}>
+        <HStack gap={8}>
           <Input
             type='text'
             placeholder='Search icons...'
@@ -462,7 +462,7 @@ export const AllIcons: Story = () => {
       : iconCategories[selectedCategory as keyof typeof iconCategories] || {};
 
   return (
-    <VStack spacing={20} align='stretch'>
+    <VStack gap={20} align='stretch'>
       <Flex gap={8} wrap='wrap'>
         <ToggleButton
           active={selectedCategory === 'All'}

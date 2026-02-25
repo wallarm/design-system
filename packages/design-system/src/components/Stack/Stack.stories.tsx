@@ -24,7 +24,7 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
-  <Stack {...args} spacing={4}>
+  <Stack {...args} gap={4}>
     <Box>A</Box>
     <Box>B</Box>
     <Box>C</Box>
@@ -35,7 +35,7 @@ export const Direction: StoryFn<typeof meta> = ({ ...args }) => (
   <Flex direction='column' gap={8}>
     <Flex direction='column'>
       <Heading>VStack (Vertical)</Heading>
-      <VStack {...args} spacing={4}>
+      <VStack {...args} gap={4}>
         <Box>1</Box>
         <Box>2</Box>
         <Box>3</Box>
@@ -44,7 +44,7 @@ export const Direction: StoryFn<typeof meta> = ({ ...args }) => (
 
     <Flex direction='column'>
       <Heading>HStack (Horizontal)</Heading>
-      <HStack {...args} spacing={4}>
+      <HStack {...args} gap={4}>
         <Box>1</Box>
         <Box>2</Box>
         <Box>3</Box>
@@ -88,7 +88,7 @@ export const Spacing: StoryFn<typeof meta> = ({ ...args }) => (
   <Flex direction='column' gap={8}>
     <Flex direction='column'>
       <Heading>Spacing 2</Heading>
-      <VStack {...args} spacing={2}>
+      <VStack {...args} gap={2}>
         <Box>A</Box>
         <Box>B</Box>
         <Box>C</Box>
@@ -97,7 +97,7 @@ export const Spacing: StoryFn<typeof meta> = ({ ...args }) => (
 
     <Flex direction='column'>
       <Heading>Spacing 4</Heading>
-      <VStack {...args} spacing={4}>
+      <VStack {...args} gap={4}>
         <Box>A</Box>
         <Box>B</Box>
         <Box>C</Box>
@@ -106,7 +106,7 @@ export const Spacing: StoryFn<typeof meta> = ({ ...args }) => (
 
     <Flex direction='column'>
       <Heading>Spacing 8</Heading>
-      <VStack {...args} spacing={8}>
+      <VStack {...args} gap={8}>
         <Box>A</Box>
         <Box>B</Box>
         <Box>C</Box>
@@ -118,12 +118,60 @@ export const Spacing: StoryFn<typeof meta> = ({ ...args }) => (
 export const Wrap: StoryFn<typeof meta> = ({ ...args }) => (
   <Flex direction='column'>
     <Heading>Wrap enabled (width: 12rem)</Heading>
-    <HStack {...args} spacing={2} wrap='wrap'>
+    <HStack {...args} gap={2} wrap='wrap'>
       {new Array(40).fill(null).map((_, index) => {
         const key = `${index + 1}`;
 
         return <Box key={key}>{key}</Box>;
       })}
     </HStack>
+  </Flex>
+);
+
+export const FlexBehavior: StoryFn<typeof meta> = ({ ...args }) => (
+  <Flex direction='column' gap={8}>
+    <Flex direction='column'>
+      <Heading>Default (no grow, no full width)</Heading>
+      <HStack {...args} gap={4}>
+        <Box>A</Box>
+        <Box>B</Box>
+        <Box>C</Box>
+      </HStack>
+    </Flex>
+
+    <Flex direction='column'>
+      <Heading>fullWidth</Heading>
+      <HStack {...args} gap={4} fullWidth>
+        <Box>A</Box>
+        <Box>B</Box>
+        <Box>C</Box>
+      </HStack>
+    </Flex>
+
+    <Flex direction='column'>
+      <Heading>flexGrow</Heading>
+      <HStack>
+        <VStack {...args} gap={4} flexGrow>
+          <Box>A</Box>
+          <Box>B</Box>
+        </VStack>
+        <VStack {...args} gap={4}>
+          <Box>C</Box>
+        </VStack>
+      </HStack>
+    </Flex>
+
+    <Flex direction='column'>
+      <Heading>flexShrink=false (no shrink)</Heading>
+      <div className='w-48 overflow-hidden border border-gray-300 rounded'>
+        <HStack {...args} gap={4} flexShrink={false}>
+          <Box>A</Box>
+          <Box>B</Box>
+          <Box>C</Box>
+          <Box>D</Box>
+          <Box>E</Box>
+        </HStack>
+      </div>
+    </Flex>
   </Flex>
 );
