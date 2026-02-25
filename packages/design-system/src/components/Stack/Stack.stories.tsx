@@ -127,3 +127,51 @@ export const Wrap: StoryFn<typeof meta> = ({ ...args }) => (
     </HStack>
   </Flex>
 );
+
+export const FlexBehavior: StoryFn<typeof meta> = ({ ...args }) => (
+  <Flex direction='column' gap={8}>
+    <Flex direction='column'>
+      <Heading>Default (no grow, no full width)</Heading>
+      <HStack {...args} spacing={4}>
+        <Box>A</Box>
+        <Box>B</Box>
+        <Box>C</Box>
+      </HStack>
+    </Flex>
+
+    <Flex direction='column'>
+      <Heading>fullWidth</Heading>
+      <HStack {...args} spacing={4} fullWidth>
+        <Box>A</Box>
+        <Box>B</Box>
+        <Box>C</Box>
+      </HStack>
+    </Flex>
+
+    <Flex direction='column'>
+      <Heading>flexGrow</Heading>
+      <HStack>
+        <VStack {...args} spacing={4} flexGrow>
+          <Box>A</Box>
+          <Box>B</Box>
+        </VStack>
+        <VStack {...args} spacing={4}>
+          <Box>C</Box>
+        </VStack>
+      </HStack>
+    </Flex>
+
+    <Flex direction='column'>
+      <Heading>flexShrink=false (no shrink)</Heading>
+      <div className='w-48 overflow-hidden border border-gray-300 rounded'>
+        <HStack {...args} spacing={4} flexShrink={false}>
+          <Box>A</Box>
+          <Box>B</Box>
+          <Box>C</Box>
+          <Box>D</Box>
+          <Box>E</Box>
+        </HStack>
+      </div>
+    </Flex>
+  </Flex>
+);

@@ -3,8 +3,12 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
-const flexVariants = cva('flex', {
+const flexVariants = cva('', {
   variants: {
+    inline: {
+      true: 'inline-flex',
+      false: 'flex',
+    },
     direction: {
       row: 'flex-row',
       column: 'flex-col',
@@ -111,6 +115,7 @@ export type FlexProps = FlexNativeProps &
   };
 
 export const Flex: FC<FlexProps> = ({
+  inline = false,
   direction = 'row',
   align = 'stretch',
   justify = 'start',
@@ -130,6 +135,7 @@ export const Flex: FC<FlexProps> = ({
     <Comp
       className={cn(
         flexVariants({
+          inline,
           direction,
           align,
           justify,
