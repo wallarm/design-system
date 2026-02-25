@@ -21,10 +21,6 @@ env:
   PNPM_VERSION: "10.29.3"
   PLAYWRIGHT_VERSION: "1.58.0"
   SCREENSHOT_COMMIT_MESSAGE: "🖼️ Update screenshots"
-  ALLURE_ENDPOINT: ${{ vars.ALLURE_ENDPOINT }}
-  ALLURE_PROJECT_ID: ${{ vars.ALLURE_PROJECT_ID }}
-  ALLURE_TOKEN: ${{ secrets.ALLURE_TOKEN }}
-  ALLURE_RESULTS: ${{ secrets.ALLURE_RESULTS }}
 
 jobs:
   # ========================================
@@ -299,12 +295,6 @@ jobs:
         run: pnpm exec playwright install-deps chromium
         if: steps.playwright-cache.outputs.cache-hit == 'true'
 
-      - name: Install allurectl
-        run: |
-          wget -qO allurectl https://github.com/allure-framework/allurectl/releases/latest/download/allurectl_linux_amd64
-          chmod +x allurectl
-          sudo mv allurectl /usr/local/bin/
-
       - name: Download Storybook artifact
         uses: actions/download-artifact@v4
         with:
@@ -323,14 +313,9 @@ jobs:
           # Wait for server to be ready
           timeout 30 bash -c 'until curl -f http://localhost:6006/design-system/iframe.html; do sleep 1; done'
 
-          # Run E2E tests with Allure reporting
+          # Run E2E tests
           cd packages/design-system
-          if [ -n "$ALLURE_TOKEN" ]; then
-            export ALLURE_LAUNCH_NAME="${{ github.ref_name }} #${{ github.run_number }} shard-${{ matrix.shard }}"
-            allurectl watch -- pnpm exec playwright test --shard=${{ matrix.shard }}/3 --project=chromium
-          else
-            pnpm exec playwright test --shard=${{ matrix.shard }}/3 --project=chromium
-          fi
+          pnpm exec playwright test --shard=${{ matrix.shard }}/3 --project=chromium
         env:
           CI: true
           STORYBOOK_URL: http://localhost:6006/design-system
