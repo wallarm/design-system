@@ -462,6 +462,62 @@ export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
   );
 };
 
+export const HeaderColumnDescription: StoryFn<typeof meta> = () => {
+  const [sorting, setSorting] = useState<TableSortingState>([]);
+
+  const columns = useMemo<TableColumnDef<(typeof securityEvents)[number]>[]>(
+    () =>
+      securityColumns.map(col => {
+        const key = 'accessorKey' in col ? col.accessorKey : undefined;
+        if (key === 'objectName') {
+          return {
+            ...col,
+            meta: {
+              ...col.meta,
+              description: { type: 'text' as const, content: 'Target resource' },
+            },
+          };
+        }
+        if (key === 'sourceIp') {
+          return {
+            ...col,
+            meta: {
+              ...col.meta,
+              description: { type: 'tooltip' as const, content: 'Request origin IP' },
+            },
+          };
+        }
+        if (key === 'requests') {
+          return {
+            ...col,
+            meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Total hits' } },
+          };
+        }
+        if (key === 'parameter') {
+          return {
+            ...col,
+            meta: {
+              ...col.meta,
+              description: { type: 'text' as const, content: 'Affected param' },
+            },
+          };
+        }
+        return col;
+      }),
+    [],
+  );
+
+  return (
+    <Table
+      data={securityEvents}
+      columns={columns}
+      getRowId={row => row.id}
+      sorting={sorting}
+      onSortingChange={setSorting}
+    />
+  );
+};
+
 export const FullFeatured: StoryFn<typeof meta> = () => {
   const data = useMemo(() => createLargeGroupedData(12, 50), []);
 

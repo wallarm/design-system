@@ -297,12 +297,10 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
   }),
   securityColumnHelper.accessor('requests', {
     header: 'Requests',
-    size: 100,
+    size: 160,
     enableSorting: true,
     meta: {
       sortType: 'number' as const,
-      headerClassName: 'text-right',
-      cellClassName: 'text-right',
     },
     cell: ({ getValue }) => <Text size='sm'>{formatRequests(getValue())}</Text>,
   }),
@@ -528,8 +526,6 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     enableSorting: true,
     meta: {
       sortType: 'number' as const,
-      headerClassName: 'text-right',
-      cellClassName: 'text-right',
     },
     cell: ({ getValue }) => <Text size='sm'>{formatRequests(getValue())}</Text>,
   }),
@@ -680,6 +676,7 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
     return {
       ...col,
       size: 220,
+      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Target resource' } },
       cell: ({ getValue }: { getValue: () => string }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
@@ -730,6 +727,7 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
   if (key === 'ip') {
     return {
       ...col,
+      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Origin IP' } },
       cell: ({ row }: { row: { original: SecurityHeaderEntry } }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
@@ -773,6 +771,34 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
           </DropdownMenuContent>
         </DropdownMenu>
       ),
+    };
+  }
+
+  if (key === 'requests') {
+    return {
+      ...col,
+      meta: { ...col.meta, description: { type: 'text' as const, content: 'Total hits' } },
+    };
+  }
+
+  if (key === 'status') {
+    return {
+      ...col,
+      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Resolution state' } },
+    };
+  }
+
+  if (key === 'lastEdited') {
+    return {
+      ...col,
+      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Last modified' } },
+    };
+  }
+
+  if (key === 'lastSynced') {
+    return {
+      ...col,
+      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Last sync time' } },
     };
   }
 

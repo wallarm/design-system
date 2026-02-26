@@ -1,9 +1,11 @@
 import { flexRender, type Header } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
-import { HStack } from '../Stack';
+import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useHorizontalScrollState } from './hooks';
 import {
+  getAlignClass,
   getPinningStyles,
   isLastPinnedLeft,
   TABLE_EXPAND_COLUMN_ID,
@@ -45,12 +47,10 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
     column.columnDef.id === TABLE_SELECT_COLUMN_ID ||
     column.columnDef.id === TABLE_EXPAND_COLUMN_ID;
 
-  const hasMenu = isNotBasicColumn
-    ? false
-    : canSort ||
-      (pinningEnabled && column.getCanPin()) ||
-      (visibilityEnabled && column.getCanHide()) ||
-      columnDndEnabled;
+  const canPin = pinningEnabled && column.getCanPin();
+  const canHide = visibilityEnabled && column.getCanHide();
+  const hasMenu =
+    isNotBasicColumn || isMasterColumn ? false : canPin || canHide || columnDndEnabled;
 
   const sortDirection = column.getIsSorted();
 
@@ -61,14 +61,37 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
   const { hasOverflow, atStart, atEnd } = useHorizontalScrollState(containerRef, isMasterColumn);
 
   const content = flexRender(header.column.columnDef.header, header.getContext());
+  const alignClass = getAlignClass(meta);
+  const isRightAligned = alignClass === 'text-right';
 
+  const description = meta?.description;
+  const isTextDescription = description?.type === 'text';
+  const isTooltipDescription = description?.type === 'tooltip';
   const ariaSort =
     sortDirection === 'asc' ? 'ascending' : sortDirection === 'desc' ? 'descending' : undefined;
+
+  const titleNode = isTooltipDescription ? (
+    <span className='decoration-dashed underline underline-offset-2 truncate'>
+      <Text size='xs' weight='medium' truncate>
+        {content}
+      </Text>
+    </span>
+  ) : (
+    <Text size='xs' weight='medium' truncate>
+      {content}
+    </Text>
+  );
 
   return (
     <Th
       ref={canDnd ? setNodeRef : undefined}
-      className={cn('group', meta?.headerClassName)}
+      className={cn(
+        'group',
+        alignClass,
+        isRightAligned && 'pl-4 pr-16',
+        isTextDescription && 'py-8',
+        meta?.headerClassName,
+      )}
       interactive={canSort}
       sorted={!!sortDirection}
       pinned={isPinned === 'left'}
@@ -87,16 +110,40 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
       {isNotBasicColumn && content}
 
       {!header.isPlaceholder && !isNotBasicColumn && (
-        <HStack align='center'>
-          <HStack gap={2} fullWidth>
-            <Text size='xs' weight='medium' truncate>
-              {content}
-            </Text>
+        <HStack
+          align={isTextDescription ? 'start' : 'center'}
+          justify={isRightAligned ? (hasMenu ? 'between' : 'end') : undefined}
+        >
+          {isRightAligned && hasMenu && (
+            <span className='shrink-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
+              <TableHeadCellMenu column={column} />
+            </span>
+          )}
 
-            {canSort && <TableSortHandler header={header} />}
-          </HStack>
+          <VStack align={isRightAligned ? 'end' : undefined}>
+            <HStack gap={2}>
+              {isRightAligned && canSort && <TableSortHandler header={header} />}
 
-          {hasMenu && (
+              {isTooltipDescription ? (
+                <Tooltip>
+                  <TooltipTrigger asChild>{titleNode}</TooltipTrigger>
+                  <TooltipContent>{description.content}</TooltipContent>
+                </Tooltip>
+              ) : (
+                titleNode
+              )}
+
+              {!isRightAligned && canSort && <TableSortHandler header={header} />}
+            </HStack>
+
+            {isTextDescription && (
+              <Text size='xs' weight='regular' color='secondary' truncate>
+                {description.content}
+              </Text>
+            )}
+          </VStack>
+
+          {!isRightAligned && hasMenu && (
             <span className='shrink-0 ml-auto opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
               <TableHeadCellMenu column={column} />
             </span>
