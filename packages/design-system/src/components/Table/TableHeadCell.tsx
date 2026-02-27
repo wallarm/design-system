@@ -106,6 +106,12 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
       aria-sort={ariaSort}
       {...(canDnd ? { ...listeners, ...attributes } : {})}
       tabIndex={-1}
+      onMouseDown={(e) => {
+        const target = e.target as HTMLElement;
+        if (!target.closest('button')) {
+          e.preventDefault();
+        }
+      }}
     >
       {isNotBasicColumn && content}
 
@@ -115,7 +121,7 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
           justify={isRightAligned ? (hasMenu ? 'between' : 'end') : undefined}
         >
           {isRightAligned && hasMenu && (
-            <span className='shrink-0 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
+            <span className='shrink-0 opacity-0 group-hover:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
               <TableHeadCellMenu column={column} />
             </span>
           )}
@@ -144,7 +150,7 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
           </VStack>
 
           {!isRightAligned && hasMenu && (
-            <span className='shrink-0 ml-auto opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
+            <span className='shrink-0 ml-auto opacity-0 group-hover:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
               <TableHeadCellMenu column={column} />
             </span>
           )}

@@ -357,7 +357,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
       return (
         <VStack gap={0}>
           <Text size='sm'>{date}</Text>
-          <Text size='xs' color='secondary'>
+          <Text size='sm' color='secondary'>
             {time}
           </Text>
         </VStack>
