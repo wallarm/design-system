@@ -127,6 +127,26 @@ export const ColumnResizing: StoryFn<typeof meta> = () => {
   );
 };
 
+export const ColumnResizingWithPinning: StoryFn<typeof meta> = () => {
+  const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+  const [columnPinning, setColumnPinning] = useState<TableColumnPinningState>({
+    left: ['objectName'],
+  });
+
+  return (
+    <Table
+      className='max-w-800'
+      data={securityEvents}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      columnSizing={columnSizing}
+      onColumnSizingChange={setColumnSizing}
+      columnPinning={columnPinning}
+      onColumnPinningChange={setColumnPinning}
+    />
+  );
+};
+
 export const ColumnPinning: StoryFn<typeof meta> = () => {
   const [columnPinning, setColumnPinning] = useState<TableColumnPinningState>({
     left: ['objectName'],
