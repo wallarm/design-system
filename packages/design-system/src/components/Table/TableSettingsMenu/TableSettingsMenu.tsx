@@ -1,4 +1,4 @@
-import { type FC, Fragment, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 import {
   closestCenter,
   DndContext,
@@ -14,13 +14,14 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { eq } from 'lodash-es';
+import { isEqual } from 'lodash-es';
 import { Settings } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { Button } from '../../Button';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../DropdownMenu';
@@ -110,11 +111,11 @@ export const TableSettingsMenu: FC = () => {
   const { columnVisibility: currentVisibility, columnOrder: currentOrder } = table.getState();
 
   const isDefaultState = useMemo(() => {
-    const visibilityMatch = !defaultColumnVisibility || currentVisibility;
-    eq(currentVisibility, defaultColumnVisibility);
+    const visibilityMatch =
+      !defaultColumnVisibility || isEqual(currentVisibility, defaultColumnVisibility);
 
     const orderMatch =
-      !defaultColumnOrder || currentOrder.length === 0 || eq(currentOrder, defaultColumnOrder);
+      !defaultColumnOrder || currentOrder.length === 0 || isEqual(currentOrder, defaultColumnOrder);
 
     return visibilityMatch && orderMatch;
   }, [currentVisibility, currentOrder, defaultColumnVisibility, defaultColumnOrder]);
@@ -165,20 +166,17 @@ export const TableSettingsMenu: FC = () => {
                           .map(c => c.id)}
                         strategy={verticalListSortingStrategy}
                       >
-                        {filteredColumns.map(col => {
-                          const showSeparator =
-                            hasUserPinned &&
-                            unpinnedColumns.length > 0 &&
-                            col.id === unpinnedColumns[0]?.id;
+                        {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
 
-                          return (
-                            <Fragment key={col.id}>
-                              {showSeparator && <Separator spacing={4} />}
+                        {pinnedColumns.map(col => (
+                          <TableSettingsMenuItem key={col.id} column={col} canDrag={columnDndEnabled} />
+                        ))}
 
-                              <TableSettingsMenuItem column={col} canDrag={columnDndEnabled} />
-                            </Fragment>
-                          );
-                        })}
+                        {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
+
+                        {unpinnedColumns.map(col => (
+                          <TableSettingsMenuItem key={col.id} column={col} canDrag={columnDndEnabled} />
+                        ))}
                       </SortableContext>
                     </DndContext>
                   </VStack>

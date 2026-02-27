@@ -36,7 +36,7 @@ export const TableSettingsMenuItem = <T,>({ column, canDrag }: TableSettingsMenu
       ref={setNodeRef}
       style={style}
       className={cn(
-        'flex items-center w-full gap-8 rounded-6 px-8 py-6',
+        'relative flex items-center w-full rounded-6 pl-20 pr-8 py-6',
         'hover:bg-states-primary-hover transition-colors',
         'data-disabled:opacity-50 data-disabled:pointer-events-none',
       )}
@@ -44,7 +44,7 @@ export const TableSettingsMenuItem = <T,>({ column, canDrag }: TableSettingsMenu
     >
       <span
         className={cn(
-          'shrink-0 cursor-grab active:cursor-grabbing text-icon-secondary hover:text-icon-primary data-disabled:opacity-50 data-disabled:pointer-events-none',
+          'absolute left-4 top-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing text-icon-secondary hover:text-icon-primary data-disabled:opacity-50 data-disabled:pointer-events-none',
         )}
         {...attributes}
         {...listeners}
