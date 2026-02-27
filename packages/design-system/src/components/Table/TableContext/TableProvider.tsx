@@ -204,9 +204,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
   // Enforces always-pinned columns stay at the beginning in their original order.
   const setColumnOrder = useCallback(
     (newOrder: string[]) => {
-      const pinned = alwaysPinnedLeft.filter(id => newOrder.includes(id));
       const rest = newOrder.filter(id => !alwaysPinnedLeft.includes(id));
-      handleColumnOrderChange([...pinned, ...rest]);
+      handleColumnOrderChange([...alwaysPinnedLeft, ...rest]);
     },
     [handleColumnOrderChange, alwaysPinnedLeft],
   );
