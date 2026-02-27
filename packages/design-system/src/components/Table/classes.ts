@@ -9,7 +9,10 @@ const tableCellBase = cn(
 );
 
 /** Shared pinned shadow for the last pinned-left column */
-const pinnedLeftShadow = 'group-data-[scrolled]/scroll:shadow-[2px_0_3px_0_rgba(0,0,0,0.1)]';
+const pinnedLeftShadow = cn(
+  'group-data-[scrolled]/scroll:shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.1)]',
+  'group-data-[scrolled]/scroll:[clip-path:inset(0px_-40px_0px_0px)]',
+);
 
 export const tableHeadCellVariants = cva(
   cn(

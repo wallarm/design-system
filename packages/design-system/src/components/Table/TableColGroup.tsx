@@ -24,7 +24,8 @@ export const TableColGroup: FC<TableColGroupProps> = ({ tableWidth }) => {
 
   const isFixed = (col: (typeof columns)[number]) =>
     SYSTEM_COLUMN_IDS.has(col.id) ||
-    (!col.getCanResize() && col.columnDef.minSize === col.columnDef.maxSize);
+    (!col.getCanResize() && col.columnDef.minSize === col.columnDef.maxSize) ||
+    col.columnDef.meta?.resizeType === 'cut';
 
   const fixedWidth = columns.filter(isFixed).reduce((sum, c) => sum + c.getSize(), 0);
 
