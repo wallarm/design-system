@@ -34,6 +34,9 @@ export const TableBodyCell = <T,>({
   const pinningStyles = getPinningStyles(column);
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
 
+  const isCut = meta?.resizeType === 'cut';
+  const content = flexRender(cell.column.columnDef.cell, cell.getContext());
+
   return (
     <Td
       className={cn(getAlignClass(meta), meta?.cellClassName, className)}
@@ -41,10 +44,23 @@ export const TableBodyCell = <T,>({
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}
       ref={canDnd ? setNodeRef : undefined}
-      style={{ ...pinningStyles, width: cell.column.getSize(), ...dndStyle }}
+      style={{
+        ...pinningStyles,
+        width: cell.column.getSize(),
+        ...dndStyle,
+        overflow: isCut ? 'hidden' : 'visible',
+      }}
       colSpan={colSpan}
     >
-      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+      {isCut ? (
+        <div className='overflow-hidden' style={{ minWidth: column.columnDef.size }}>
+          {content}
+        </div>
+      ) : (
+        <div className='flex flex-wrap [&_*]:flex-wrap [&_*]:min-w-0 [&_*]:truncate'>
+          {content}
+        </div>
+      )}
     </Td>
   );
 };

@@ -21,6 +21,8 @@ declare module '@tanstack/react-table' {
     align?: 'left' | 'center' | 'right';
     /** Optional description — shown as text below the title or as a tooltip on hover. Title gets dashed underline. */
     description?: { type: 'text' | 'tooltip'; content: string };
+    /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
+    resizeType?: 'cut' | 'resize';
   }
 }
 
@@ -94,6 +96,8 @@ export interface TableColumnMeta {
   align?: 'left' | 'center' | 'right';
   /** Optional description — shown as text below the title or as a tooltip on hover. Title gets dashed underline. */
   description?: { type: 'text' | 'tooltip'; content: string };
+  /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
+  resizeType?: 'cut' | 'resize';
 }
 
 /** Shared column properties */
