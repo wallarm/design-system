@@ -301,7 +301,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
   }),
   securityColumnHelper.accessor('sourceIp', {
     header: 'Source',
-    size: 180,
+    size: 200,
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (

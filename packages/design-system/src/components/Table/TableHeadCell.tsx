@@ -41,8 +41,10 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
   const isMasterColumn = column.id === masterColumnId;
   const meta = column.columnDef.meta;
 
+  const isLastColumn = column.getIsLastColumn();
+  const hasSettingsMenu = visibilityEnabled || columnDndEnabled;
   const canSort = sortingEnabled && column.getCanSort();
-  const canResize = resizingEnabled && column.getCanResize() && !column.getIsLastColumn();
+  const canResize = resizingEnabled && column.getCanResize() && !isLastColumn;
   const isNotBasicColumn =
     column.columnDef.id === TABLE_SELECT_COLUMN_ID ||
     column.columnDef.id === TABLE_EXPAND_COLUMN_ID;
@@ -89,6 +91,7 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
         'group',
         alignClass,
         isRightAligned && 'pl-4 pr-16',
+        isLastColumn && hasSettingsMenu && 'pr-[44px]',
         isTextDescription && 'py-8',
         meta?.headerClassName,
       )}
