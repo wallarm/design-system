@@ -1,7 +1,9 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Check, Copy, Filter, FilterX } from '../../icons';
+import { abbreviateNumber } from '../../utils/abbreviateNumber';
 import { Badge } from '../Badge';
 import { InlineCodeSnippet } from '../CodeSnippet';
+import { DateTime } from '../DateTime';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,7 +22,7 @@ import {
   OverflowTooltipContent,
   OverflowTooltipTrigger,
 } from '../OverflowTooltip';
-import { HStack, VStack } from '../Stack';
+import { HStack } from '../Stack';
 import { Text } from '../Text';
 import { createTableColumnHelper } from './lib';
 import type { TableColumnDef } from './types';
@@ -64,23 +66,6 @@ export interface SecurityHeaderEntry {
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
-
-export function formatRequests(n: number): string {
-  if (n >= 1000) return `${Math.round(n / 1000)}k`;
-  return String(n);
-}
-
-export function formatDate(iso: string): { date: string; time: string } {
-  const d = new Date(iso);
-  const date = d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-  const time = d.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true,
-  });
-  return { date, time };
-}
 
 export const METHOD_COLORS: Record<string, 'green' | 'blue' | 'amber' | 'red' | 'violet'> = {
   GET: 'green',
@@ -297,7 +282,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     meta: {
       sortType: 'number' as const,
     },
-    cell: ({ getValue }) => <Text size='sm'>{formatRequests(getValue())}</Text>,
+    cell: ({ getValue }) => <Text size='sm'>{abbreviateNumber(getValue())}</Text>,
   }),
   securityColumnHelper.accessor('sourceIp', {
     header: 'Source',
@@ -347,17 +332,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     size: 160,
     enableSorting: true,
     meta: { sortType: 'date' as const },
-    cell: ({ getValue }) => {
-      const { date, time } = formatDate(getValue());
-      return (
-        <VStack gap={0}>
-          <Text size='sm'>{date}</Text>
-          <Text size='sm' color='secondary'>
-            {time}
-          </Text>
-        </VStack>
-      );
-    },
+    cell: ({ getValue }) => <DateTime value={getValue()} format='relative' />,
   }),
   securityColumnHelper.accessor('cweId', {
     header: 'Security info',
@@ -522,7 +497,7 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     meta: {
       sortType: 'number' as const,
     },
-    cell: ({ getValue }) => <Text size='sm'>{formatRequests(getValue())}</Text>,
+    cell: ({ getValue }) => <Text size='sm'>{abbreviateNumber(getValue())}</Text>,
   }),
   headerColumnHelper.accessor('status', {
     header: 'Status',

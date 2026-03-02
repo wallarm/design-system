@@ -315,6 +315,9 @@ importers:
       clsx:
         specifier: 2.1.1
         version: 2.1.1
+      date-fns:
+        specifier: 4.1.0
+        version: 4.1.0
       highlight.js:
         specifier: ^11.11.1
         version: 11.11.1
@@ -3108,6 +3111,9 @@ packages:
   data-urls@6.0.1:
     resolution: {integrity: sha512-euIQENZg6x8mj3fO6o9+fOW8MimUI4PpD/fZBhJfeioZVy9TUpM4UY7KjQNVZFlqwJ0UdzRDzkycB997HEq1BQ==}
     engines: {node: '>=20'}
+
+  date-fns@4.1.0:
+    resolution: {integrity: sha512-Ukq0owbQXxa/U3EGtsdVBkR1w7KOQ5gIBqdH2hkvknzZPYvBxb/aa6E8L7tmjFtkwZBu3UXBbjIgPo/Ez4xaNg==}
 
   debug@4.3.7:
     resolution: {integrity: sha512-Er2nc/H7RrMXZBFCEim6TCmMk02Z8vLC2Rbi1KEBggpo0fS6l0S1nnapwmIi3yW/+GOJap1Krg4w0Hg80oCqgQ==}
@@ -9351,6 +9357,8 @@ snapshots:
     dependencies:
       whatwg-mimetype: 5.0.0
       whatwg-url: 15.1.0
+
+  date-fns@4.1.0: {}
 
   debug@4.3.7:
     dependencies:
