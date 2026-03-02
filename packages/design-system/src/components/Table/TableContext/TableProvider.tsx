@@ -124,7 +124,10 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     if (prefix.length === 0) {
       // Mark only the first user column as master
       if (withAutoMeta.length > 0) {
-        return [{ ...withAutoMeta[0], ...masterOverrides }, ...withAutoMeta.slice(1)] as ColumnDef<T, any>[];
+        return [{ ...withAutoMeta[0], ...masterOverrides }, ...withAutoMeta.slice(1)] as ColumnDef<
+          T,
+          any
+        >[];
       }
       return withAutoMeta;
     }

@@ -52,6 +52,12 @@ export const Checkmark: FC<CheckmarkProps> = ({ checkedState = false, ...props }
     }
     {...props}
   >
-    {checkedState === 'indeterminate' ? <CheckboxIndeterminate /> : checkedState ? <Check /> : false}
+    {checkedState === 'indeterminate' ? (
+      <CheckboxIndeterminate />
+    ) : checkedState ? (
+      <Check />
+    ) : (
+      false
+    )}
   </div>
 );

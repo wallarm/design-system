@@ -380,7 +380,6 @@ export const WithFooter: StoryFn<typeof meta> = () => (
         <DropdownMenuFooter>
           <span>Footer is WIP Hotkey</span>
           <span className='flex items-center gap-8'>
-
             <KbdGroup>
               <Kbd>⌘</Kbd>
               <Kbd>⌘</Kbd>

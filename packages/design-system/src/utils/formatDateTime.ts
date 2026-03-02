@@ -63,10 +63,7 @@ export const formatRelativeTime = (date: Date, now: Date = new Date()): string =
  *
  * Output: "11 Feb, 2026 14:32:07 GMT+2"
  */
-export const formatAbsoluteTime = (
-  date: Date,
-  options: { showSeconds?: boolean } = {},
-): string => {
+export const formatAbsoluteTime = (date: Date, options: { showSeconds?: boolean } = {}): string => {
   if (!isValid(date)) return '—';
   const { showSeconds = true } = options;
   const timePattern = showSeconds ? 'HH:mm:ss' : 'HH:mm';
@@ -104,5 +101,7 @@ const formatTimezone = (date: Date): string => {
   const sign = offset > 0 ? '+' : '-';
   const hours = Math.floor(Math.abs(offset) / 60);
   const minutes = Math.abs(offset) % 60;
-  return minutes === 0 ? `GMT${sign}${hours}` : `GMT${sign}${hours}:${String(minutes).padStart(2, '0')}`;
+  return minutes === 0
+    ? `GMT${sign}${hours}`
+    : `GMT${sign}${hours}:${String(minutes).padStart(2, '0')}`;
 };
