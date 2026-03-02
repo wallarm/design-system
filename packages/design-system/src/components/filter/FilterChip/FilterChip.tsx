@@ -59,7 +59,7 @@ export const FilterChip: FC<FilterChipProps> = ({
           'border border-solid rounded-lg',
           'bg-badge-badge-bg border-border-primary',
           // Typography
-          'text-text-secondary text-sm font-normal',
+          'text-text-secondary text-sm font-normal leading-5',
           className,
         )}
         data-slot='filter-chip'
@@ -82,7 +82,7 @@ export const FilterChip: FC<FilterChipProps> = ({
           'border border-solid rounded-lg',
           'bg-badge-badge-bg border-border-primary',
           // Typography
-          'text-text-secondary text-sm font-normal',
+          'text-text-secondary text-sm font-normal leading-5',
           className,
         )}
         data-slot='filter-chip'
