@@ -1,6 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { parse, parseCondition } from './parser';
+import { describe, expect, it } from 'vitest';
 import type { Condition } from '../types';
+import { parse, parseCondition } from './parser';
 
 describe('FilterComponent Parser', () => {
   describe('parseCondition', () => {
@@ -172,6 +172,125 @@ describe('FilterComponent Parser', () => {
 
       expect(result.isComplete).toBe(true);
       expect((result.expression as Condition).field).toBe('user_status');
+    });
+
+    // US-003: Quoted String Support
+    describe('quoted string values', () => {
+      it('should parse double-quoted string with spaces', () => {
+        const result = parseCondition('title = "hello world"');
+
+        expect(result.isComplete).toBe(true);
+        expect(result.expression).toEqual({
+          type: 'condition',
+          field: 'title',
+          operator: '=',
+          value: 'hello world',
+        } as Condition);
+      });
+
+      it('should parse single-quoted string with spaces', () => {
+        const result = parseCondition("description = 'test value here'");
+
+        expect(result.isComplete).toBe(true);
+        expect(result.expression).toEqual({
+          type: 'condition',
+          field: 'description',
+          operator: '=',
+          value: 'test value here',
+        } as Condition);
+      });
+
+      it('should handle escaped double quotes in double-quoted string', () => {
+        const result = parseCondition('message = "say \\"hello\\""');
+
+        expect(result.isComplete).toBe(true);
+        const condition = result.expression as Condition;
+        expect(condition.value).toBe('say "hello"');
+      });
+
+      it('should handle escaped single quotes in single-quoted string', () => {
+        const result = parseCondition("text = 'it\\'s working'");
+
+        expect(result.isComplete).toBe(true);
+        const condition = result.expression as Condition;
+        expect(condition.value).toBe("it's working");
+      });
+
+      it('should handle escaped backslashes', () => {
+        const result = parseCondition('path = "C:\\\\Users\\\\test"');
+
+        expect(result.isComplete).toBe(true);
+        const condition = result.expression as Condition;
+        expect(condition.value).toBe('C:\\Users\\test');
+      });
+
+      it('should handle empty quoted string', () => {
+        const result = parseCondition('value = ""');
+
+        expect(result.isComplete).toBe(true);
+        const condition = result.expression as Condition;
+        expect(condition.value).toBe('');
+      });
+
+      it('should handle quoted string with special characters', () => {
+        const result = parseCondition('email = "user@example.com"');
+
+        expect(result.isComplete).toBe(true);
+        const condition = result.expression as Condition;
+        expect(condition.value).toBe('user@example.com');
+      });
+
+      it('should handle incomplete quoted string (unclosed quote)', () => {
+        const result = parseCondition('title = "hello');
+
+        expect(result.isComplete).toBe(false);
+        expect(result.expression).toBeNull();
+      });
+
+      it('should handle quoted string with numbers', () => {
+        const result = parseCondition('code = "123"');
+
+        expect(result.isComplete).toBe(true);
+        const condition = result.expression as Condition;
+        expect(condition.value).toBe('123');
+        expect(typeof condition.value).toBe('string');
+      });
+
+      it('should parse quoted value with like operator', () => {
+        const result = parseCondition('name like "john doe"');
+
+        expect(result.isComplete).toBe(true);
+        expect(result.expression).toEqual({
+          type: 'condition',
+          field: 'name',
+          operator: 'like',
+          value: 'john doe',
+        } as Condition);
+      });
+
+      it('should handle mixed quotes (single inside double)', () => {
+        const result = parseCondition('text = "it\'s fine"');
+
+        expect(result.isComplete).toBe(true);
+        const condition = result.expression as Condition;
+        expect(condition.value).toBe("it's fine");
+      });
+
+      it('should handle mixed quotes (double inside single)', () => {
+        const result = parseCondition('quote = \'"hello" world\'');
+
+        expect(result.isComplete).toBe(true);
+        const condition = result.expression as Condition;
+        expect(condition.value).toBe('"hello" world');
+      });
+
+      it('should still parse unquoted values', () => {
+        const result = parseCondition('status = active');
+
+        expect(result.isComplete).toBe(true);
+        const condition = result.expression as Condition;
+        expect(condition.value).toBe('active');
+      });
     });
   });
 

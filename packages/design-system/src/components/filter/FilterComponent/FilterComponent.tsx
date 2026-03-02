@@ -1,7 +1,7 @@
 import type { FC } from 'react';
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FilterField } from '../FilterField';
-import type { FilterChipData, ExprNode, FieldMetadata, Condition } from '../types';
+import type { Condition, ExprNode, FieldMetadata, FilterChipData } from '../types';
 import { parse } from './parser';
 
 /**
@@ -232,7 +232,7 @@ export const FilterComponent: FC<FilterComponentProps> = ({
       chips={state.chips.map(chip => ({
         id: chip.id,
         content: (
-          <div className="px-2 py-1 text-sm">
+          <div className='px-2 py-1 text-sm'>
             {chip.attribute} {chip.operator} {chip.value}
           </div>
         ),
