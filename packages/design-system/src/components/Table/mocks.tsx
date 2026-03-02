@@ -15,6 +15,7 @@ import {
   DropdownMenuItemText,
   DropdownMenuSeparator,
 } from '../DropdownMenu';
+import type { SourceKey } from '../IpAddress';
 import { IpAddress } from '../IpAddress';
 import { Link } from '../Link';
 import {
@@ -24,7 +25,6 @@ import {
 } from '../OverflowTooltip';
 import { HStack } from '../Stack';
 import { Text } from '../Text';
-import type { SourceKey } from '../IpAddress';
 import { createTableColumnHelper } from './lib';
 import type { TableColumnDef } from './types';
 
