@@ -27,7 +27,8 @@ export const TableBodyCell = <T,>({
   const column = cell.column;
   const isPinned = column.getIsPinned();
   const meta = column.columnDef.meta;
-  const isExpandedToggle = column.id === TABLE_EXPAND_COLUMN_ID && cell.row.getIsExpanded();
+  const isExpandColumn = column.id === TABLE_EXPAND_COLUMN_ID;
+  const isExpandedToggle = isExpandColumn && (cell.row.getIsExpanded() || cell.row.depth > 0);
 
   const { canDnd, setNodeRef, dndStyle } = useColumnDnd(column);
 
@@ -39,7 +40,16 @@ export const TableBodyCell = <T,>({
 
   return (
     <Td
-      className={cn(getAlignClass(meta), meta?.cellClassName, className)}
+      className={cn(
+        getAlignClass(meta),
+        meta?.cellClassName,
+        isExpandColumn &&
+          cell.row.depth > 0 && [
+            '[tr[data-depth]:has(+_tr:not([data-depth]))_&]:!border-b',
+            '[tr[data-depth]:last-child_&]:!border-b',
+          ],
+        className,
+      )}
       pinned={isPinned === 'left'}
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}

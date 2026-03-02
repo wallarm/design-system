@@ -81,7 +81,7 @@ export const tableBodyCellVariants = cva(
         false: '',
       },
       expanded: {
-        true: 'border-b-0',
+        true: 'border-b-0 before:!hidden',
         false: '',
       },
     },
