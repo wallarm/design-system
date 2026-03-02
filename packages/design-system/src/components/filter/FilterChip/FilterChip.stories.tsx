@@ -120,3 +120,35 @@ export const CombinedWithOr: StoryFn<typeof meta> = () => (
     <FilterChip variant='chip' attribute='Status' operator='is' value='Pending' />
   </div>
 );
+
+/**
+ * Opening parenthesis variant
+ */
+export const OpeningParenthesis = Template.bind({});
+OpeningParenthesis.args = {
+  variant: '(',
+};
+
+/**
+ * Closing parenthesis variant
+ */
+export const ClosingParenthesis = Template.bind({});
+ClosingParenthesis.args = {
+  variant: ')',
+};
+
+/**
+ * Combined example showing grouped conditions with parentheses
+ * Example: (IP is 192.168.1.1 OR IP is 10.0.0.1) AND Country is US
+ */
+export const CombinedWithParentheses: StoryFn<typeof meta> = () => (
+  <div className='flex items-center gap-1'>
+    <FilterChip variant='(' />
+    <FilterChip variant='chip' attribute='IP Address' operator='is' value='192.168.1.1' />
+    <FilterChip variant='or' />
+    <FilterChip variant='chip' attribute='IP Address' operator='is' value='10.0.0.1' />
+    <FilterChip variant=')' />
+    <FilterChip variant='and' />
+    <FilterChip variant='chip' attribute='Country' operator='is' value='US' />
+  </div>
+);

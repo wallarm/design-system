@@ -88,6 +88,52 @@ export const FilterChip: FC<FilterChipProps> = ({
     );
   }
 
+  // Render opening parenthesis variant
+  if (variant === '(') {
+    return (
+      <div
+        className={cn(
+          // Layout
+          'flex items-center justify-center px-2 py-0',
+          'min-h-[20px]',
+          // Border & Background
+          'border border-solid rounded-lg',
+          'bg-badge-badge-bg border-border-primary',
+          // Typography
+          'text-text-secondary text-sm font-normal',
+          className,
+        )}
+        data-slot='filter-chip'
+        {...props}
+      >
+        (
+      </div>
+    );
+  }
+
+  // Render closing parenthesis variant
+  if (variant === ')') {
+    return (
+      <div
+        className={cn(
+          // Layout
+          'flex items-center justify-center px-2 py-0',
+          'min-h-[20px]',
+          // Border & Background
+          'border border-solid rounded-lg',
+          'bg-badge-badge-bg border-border-primary',
+          // Typography
+          'text-text-secondary text-sm font-normal',
+          className,
+        )}
+        data-slot='filter-chip'
+        {...props}
+      >
+        )
+      </div>
+    );
+  }
+
   // Render chip variant
   if (variant === 'chip') {
     return (
@@ -118,7 +164,7 @@ export const FilterChip: FC<FilterChipProps> = ({
     );
   }
 
-  // Variants not yet implemented (parentheses will be added in US-006)
+  // Unknown variant - should not happen with proper TypeScript usage
   return null;
 };
 
