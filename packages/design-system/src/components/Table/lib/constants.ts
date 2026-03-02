@@ -23,6 +23,12 @@ export const getAlignClass = (meta?: { align?: string; sortType?: string }): str
   return 'text-left';
 };
 
+/** Border-bottom override for the last expanded row in a depth group */
+export const getExpandBorderClass = (isExpandColumn: boolean, depth: number): string | false =>
+  isExpandColumn &&
+  depth > 0 &&
+  '[tr[data-depth]:has(+_tr:not([data-depth]))_&]:!border-b [tr[data-depth]:last-child_&]:!border-b';
+
 /** Sort labels by sortType: [ascLabel, descLabel] */
 export const SORT_LABELS: Record<string, [string, string]> = {
   text: ['A \u2192 Z', 'Z \u2192 A'],

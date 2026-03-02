@@ -279,9 +279,6 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     header: 'Requests',
     size: 160,
     enableSorting: true,
-    meta: {
-      sortType: 'number' as const,
-    },
     cell: ({ getValue }) => <Text size='sm'>{abbreviateNumber(getValue())}</Text>,
   }),
   securityColumnHelper.accessor('sourceIp', {
@@ -494,9 +491,6 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     header: 'Requests',
     size: 100,
     enableSorting: true,
-    meta: {
-      sortType: 'number' as const,
-    },
     cell: ({ getValue }) => <Text size='sm'>{abbreviateNumber(getValue())}</Text>,
   }),
   headerColumnHelper.accessor('status', {
