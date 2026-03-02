@@ -3,6 +3,8 @@ export { FilterChip, type FilterChipProps } from './FilterChip';
 export { FilterField, type FilterFieldProps } from './FilterField';
 export { FilterMainMenu, type FilterMainMenuProps } from './FilterMainMenu';
 export { FilterOperatorMenu, type FilterOperatorMenuProps } from './FilterOperatorMenu';
+export { FilterValueMenu, type FilterValueMenuProps, type ValueOption } from './FilterValueMenu';
+export { FilterComponent, type FilterComponentProps, type FilterComponentState, type EditingContext } from './FilterComponent';
 // Segment Components
 export { SegmentAttribute, SegmentOperator, SegmentValue } from './segments';
 // Types and Constants
