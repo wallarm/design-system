@@ -1,4 +1,5 @@
 import type { FC, FocusEvent, HTMLAttributes, ReactNode } from 'react';
+import { cloneElement, isValidElement } from 'react';
 import { X } from '../../../icons/X';
 import { cn } from '../../../utils/cn';
 
@@ -59,6 +60,15 @@ export const FilterField: FC<FilterFieldProps> = ({
   const visibleChips = chips.slice(0, 3);
   const hasMoreChips = chips.length > 3;
 
+  // Function to inject error prop into chip content if error state is active
+  const injectErrorProp = (chipContent: ReactNode): ReactNode => {
+    if (!error || !isValidElement(chipContent)) {
+      return chipContent;
+    }
+    // Clone the element and inject the error prop
+    return cloneElement(chipContent, { error: true } as any);
+  };
+
   return (
     <div
       className={cn(
@@ -93,7 +103,7 @@ export const FilterField: FC<FilterFieldProps> = ({
           <div className='flex items-center gap-1'>
             {visibleChips.map(chip => (
               <div key={chip.id} className='shrink-0'>
-                {chip.content}
+                {injectErrorProp(chip.content)}
               </div>
             ))}
             {hasMoreChips && (

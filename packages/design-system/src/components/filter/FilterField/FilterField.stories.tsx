@@ -196,7 +196,7 @@ export const ErrorEmpty: Story = {
 };
 
 /**
- * Error state - with chips.
+ * Error state - with chips. Error automatically propagates to chips.
  */
 export const ErrorWithChips: Story = {
   args: {
@@ -205,7 +205,7 @@ export const ErrorWithChips: Story = {
     chips: [
       {
         id: '1',
-        content: <FilterChip variant='chip' attribute='IP' operator='is' value='invalid' error />,
+        content: <FilterChip variant='chip' attribute='IP' operator='is' value='invalid' />,
       },
     ],
   },
@@ -410,7 +410,7 @@ export const FocusStateDemo: Story = {
 };
 
 /**
- * Error hover and focus states - red focus ring.
+ * Error hover and focus states - red focus ring. Error propagates to chips automatically.
  */
 export const ErrorStatesDemo: Story = {
   render: () => {
@@ -429,15 +429,25 @@ export const ErrorStatesDemo: Story = {
           <FilterField placeholder='Search attacks...' error />
         </div>
         <div>
-          <p className='mb-2 text-sm text-text-secondary'>Error with chips and clear button:</p>
+          <p className='mb-2 text-sm text-text-secondary'>
+            Error with chips (error propagates automatically):
+          </p>
           <FilterField
             placeholder='Search attacks...'
             error
             chips={[
               {
                 id: '1',
+                content: <FilterChip variant='chip' attribute='IP' operator='is' value='invalid' />,
+              },
+              {
+                id: '2',
+                content: <FilterChip variant='and' />,
+              },
+              {
+                id: '3',
                 content: (
-                  <FilterChip variant='chip' attribute='IP' operator='is' value='invalid' error />
+                  <FilterChip variant='chip' attribute='Country' operator='is' value='Unknown' />
                 ),
               },
             ]}
