@@ -47,7 +47,9 @@ export const DateTime: FC<DateTimeProps> = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <span ref={ref} data-slot='datetime' {...props}>
-            <Text size='sm' color='secondary'>—</Text>
+            <Text size='sm' color='secondary'>
+              —
+            </Text>
           </span>
         </TooltipTrigger>
         <TooltipContent>No data</TooltipContent>
@@ -60,7 +62,9 @@ export const DateTime: FC<DateTimeProps> = ({
   if (!isValid(date)) {
     return (
       <span ref={ref} data-slot='datetime' {...props}>
-        <Text size='sm' color='secondary'>—</Text>
+        <Text size='sm' color='secondary'>
+          —
+        </Text>
       </span>
     );
   }
