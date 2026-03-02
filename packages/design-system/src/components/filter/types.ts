@@ -86,28 +86,80 @@ export type ExprNode = Condition | Group;
 export const OPERATOR_LABELS: Record<FilterOperator, string> = {
   '=': 'is',
   '!=': 'is not',
-  '>': 'greater than',
-  '<': 'less than',
-  '>=': 'greater than or equal to',
-  '<=': 'less than or equal to',
-  like: 'contains',
-  not_like: 'does not contain',
-  in: 'is one of',
-  not_in: 'is not one of',
-  is_null: 'is empty',
-  is_not_null: 'is not empty',
-  between: 'is between',
+  '>': 'greater',
+  '<': 'less',
+  '>=': 'greater or equal',
+  '<=': 'less or equal',
+  like: 'like',
+  not_like: 'not like',
+  in: 'is any of',
+  not_in: 'is not any of',
+  is_null: 'is set',
+  is_not_null: 'is not set',
+  between: 'between',
 };
 
 /**
- * Operators by Field Type Mapping
- * Maps field types to their available operators
+ * Field type-specific operator labels
+ * Some operators have different labels depending on field type
  */
-export const OPERATORS_BY_TYPE: Record<FieldType, FilterOperator[]> = {
-  string: ['=', '!=', 'like', 'not_like', 'in', 'not_in', 'is_null', 'is_not_null'],
-  integer: ['=', '!=', '>', '<', '>=', '<=', 'between', 'in', 'not_in', 'is_null', 'is_not_null'],
-  float: ['=', '!=', '>', '<', '>=', '<=', 'between', 'is_null', 'is_not_null'],
-  date: ['=', '!=', '>', '<', '>=', '<=', 'between', 'is_null', 'is_not_null'],
-  boolean: ['=', '!=', 'is_null', 'is_not_null'],
-  enum: ['=', '!=', 'in', 'not_in', 'is_null', 'is_not_null'],
+export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOperator, string>>> = {
+  string: {
+    is_null: 'is set',
+    is_not_null: 'is not set',
+  },
+  integer: {},
+  float: {},
+  date: {
+    '>': 'after',
+    '>=': 'on or after',
+    '<': 'before',
+    '<=': 'is on or before',
+  },
+  boolean: {
+    '=': 'is true',
+    '!=': 'is false',
+    is_null: 'is set',
+    is_not_null: 'is not set',
+  },
+  enum: {
+    in: 'is any of 🤔 wip',
+    not_in: 'is not any of 🤔 wip',
+    is_null: 'is set',
+    is_not_null: 'is not set',
+  },
+};
+
+/**
+ * Helper to get operator label for specific field type
+ */
+export function getOperatorLabel(operator: FilterOperator, fieldType: FieldType): string {
+  return OPERATOR_LABELS_BY_TYPE[fieldType]?.[operator] ?? OPERATOR_LABELS[operator];
+}
+
+/**
+ * Operators by Field Type Mapping (with groups for separators)
+ * Maps field types to their available operators, grouped logically
+ */
+export const OPERATORS_BY_TYPE: Record<FieldType, FilterOperator[][]> = {
+  string: [
+    ['=', '!=', 'like', 'not_like'],
+    ['is_null', 'is_not_null'],
+  ],
+  integer: [
+    ['=', '!=', '>', '<', '>=', '<='],
+  ],
+  float: [
+    ['=', '!=', '>', '<', '>=', '<='],
+  ],
+  date: [
+    ['>', '>=', '<', '<=', '=', '!=', 'between'],
+  ],
+  boolean: [
+    ['=', '!=', 'is_null', 'is_not_null'],
+  ],
+  enum: [
+    ['=', '!=', 'in', 'not_in'],
+    ['is_null', 'is_not_null'],
+  ],
 };

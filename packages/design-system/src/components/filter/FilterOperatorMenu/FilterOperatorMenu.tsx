@@ -1,6 +1,8 @@
-import { type FC, useEffect, useRef, useState } from 'react';
+import type { FC } from 'react';
 import { cn } from '../../../utils/cn';
-import { type FieldType, type FilterOperator, OPERATOR_LABELS, OPERATORS_BY_TYPE } from '../types';
+import { FilterDropdownBase } from '../base';
+import type { FilterDropdownSection } from '../base/types';
+import { type FieldType, type FilterOperator, getOperatorLabel, OPERATORS_BY_TYPE } from '../types';
 
 export interface FilterOperatorMenuProps {
   /**
@@ -31,7 +33,8 @@ export interface FilterOperatorMenuProps {
 
 /**
  * FilterOperatorMenu component
- * Displays a dropdown menu with operators based on field type
+ * Dropdown menu for selecting filter operators based on field type
+ * Uses FilterDropdownBase for consistent behavior
  */
 export const FilterOperatorMenu: FC<FilterOperatorMenuProps> = ({
   fieldType,
@@ -41,120 +44,33 @@ export const FilterOperatorMenu: FC<FilterOperatorMenuProps> = ({
   onOpenChange,
   className,
 }) => {
-  // Get operators for the field type
-  const operators = OPERATORS_BY_TYPE[fieldType] || [];
+  const operatorGroups = OPERATORS_BY_TYPE[fieldType] || [];
 
-  // State for keyboard navigation - track highlighted index
-  const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  // Convert operator groups to dropdown sections
+  const sections: FilterDropdownSection[] = operatorGroups.map((group, index) => ({
+    id: `group-${index}`,
+    items: group.map(operator => ({
+      id: operator,
+      label: getOperatorLabel(operator, fieldType),
+      value: operator,
+    })),
+    // Show separator after each group except the last one
+    showSeparator: index < operatorGroups.length - 1,
+  }));
 
-  // Reset highlighted index to first item when menu opens
-  useEffect(() => {
-    if (open) {
-      setHighlightedIndex(0);
-      // Focus the menu container for keyboard events
-      menuRef.current?.focus();
-    }
-  }, [open]);
-
-  // Scroll highlighted item into view
-  useEffect(() => {
-    if (open && itemRefs.current[highlightedIndex]) {
-      itemRefs.current[highlightedIndex]?.scrollIntoView({
-        block: 'nearest',
-        behavior: 'smooth',
-      });
-    }
-  }, [highlightedIndex, open]);
-
-  if (!open) {
-    return null;
-  }
-
-  const handleSelect = (operator: FilterOperator) => {
-    onSelect(operator);
-    onOpenChange?.(false);
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setHighlightedIndex(prev => (prev + 1) % operators.length);
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setHighlightedIndex(prev => (prev - 1 + operators.length) % operators.length);
-        break;
-      case 'Enter': {
-        e.preventDefault();
-        const selectedOp = operators[highlightedIndex];
-        if (selectedOp) {
-          handleSelect(selectedOp);
-        }
-        break;
-      }
-      case 'Escape':
-        e.preventDefault();
-        onOpenChange?.(false);
-        break;
-      default:
-        // No action needed for other keys
-        break;
-    }
+  const handleSelect = (item: { value: FilterOperator }) => {
+    onSelect(item.value);
   };
 
   return (
-    <div
-      ref={menuRef}
-      className={cn(
-        'w-64',
-        'bg-white border border-border-primary rounded-xl',
-        'shadow-md',
-        'flex flex-col gap-1 p-2',
-        className,
-      )}
-      data-slot='filter-operator-menu'
-      role='menu'
-      aria-label='Filter operators'
-      aria-expanded={open}
-      tabIndex={-1}
-      onKeyDown={handleKeyDown}
-    >
-      {operators.map((operator, index) => {
-        const isSelected = selectedOperator === operator;
-        const isHighlighted = highlightedIndex === index;
-        return (
-          <button
-            key={operator}
-            ref={el => {
-              itemRefs.current[index] = el;
-            }}
-            type='button'
-            onClick={() => handleSelect(operator)}
-            className={cn(
-              'flex items-start gap-1 px-2 py-1.5',
-              'rounded-md overflow-clip',
-              'text-sm font-normal text-text-primary text-left',
-              'bg-transparent',
-              'hover:bg-gray-100',
-              'transition-colors',
-              isSelected && 'bg-blue-50',
-              isHighlighted && 'bg-gray-100',
-            )}
-            role='menuitem'
-            aria-selected={isSelected}
-          >
-            <div className='flex flex-1 gap-2 items-start min-h-[1px] min-w-[1px]'>
-              <div className='flex flex-1 flex-col items-start min-h-[1px] min-w-[1px]'>
-                <span className='leading-5'>{OPERATOR_LABELS[operator]}</span>
-              </div>
-            </div>
-          </button>
-        );
-      })}
-    </div>
+    <FilterDropdownBase
+      sections={sections}
+      onSelect={handleSelect}
+      open={open}
+      onOpenChange={onOpenChange}
+      footerHint="to select"
+      className={cn('w-64', className)}
+    />
   );
 };
 
