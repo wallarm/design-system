@@ -42,35 +42,84 @@ export const FilterChip: FC<FilterChipProps> = ({
   className,
   ...props
 }) => {
-  // Only render chip variant for now (US-004)
-  if (variant !== 'chip') {
-    return null;
+  // Render AND variant
+  if (variant === 'and') {
+    return (
+      <div
+        className={cn(
+          // Layout
+          'flex items-center justify-center px-2 py-0',
+          'min-h-[20px]',
+          // Border & Background
+          'border border-solid rounded-lg',
+          'bg-badge-badge-bg border-border-primary',
+          // Typography
+          'text-text-secondary text-sm font-normal',
+          className,
+        )}
+        data-slot='filter-chip'
+        {...props}
+      >
+        AND
+      </div>
+    );
   }
 
-  return (
-    <div
-      className={cn(
-        // Layout
-        'flex items-center gap-0 px-1 py-0',
-        'min-h-[20px] max-w-[320px]',
-        // Border & Background
-        'border border-solid rounded-lg',
-        error ? 'bg-bg-light-danger border-border-danger' : 'bg-badge-badge-bg border-border-primary',
-        className,
-      )}
-      data-slot='filter-chip'
-      {...props}
-    >
-      {/* Attribute segment */}
-      {attribute && <SegmentAttribute className='shrink-0'>{attribute}</SegmentAttribute>}
+  // Render OR variant
+  if (variant === 'or') {
+    return (
+      <div
+        className={cn(
+          // Layout
+          'flex items-center justify-center px-2 py-0',
+          'min-h-[20px]',
+          // Border & Background
+          'border border-solid rounded-lg',
+          'bg-badge-badge-bg border-border-primary',
+          // Typography
+          'text-text-secondary text-sm font-normal',
+          className,
+        )}
+        data-slot='filter-chip'
+        {...props}
+      >
+        OR
+      </div>
+    );
+  }
 
-      {/* Operator segment */}
-      {operator && <SegmentOperator className='shrink-0'>{operator}</SegmentOperator>}
+  // Render chip variant
+  if (variant === 'chip') {
+    return (
+      <div
+        className={cn(
+          // Layout
+          'flex items-center gap-0 px-1 py-0',
+          'min-h-[20px] max-w-[320px]',
+          // Border & Background
+          'border border-solid rounded-lg',
+          error
+            ? 'bg-bg-light-danger border-border-danger'
+            : 'bg-badge-badge-bg border-border-primary',
+          className,
+        )}
+        data-slot='filter-chip'
+        {...props}
+      >
+        {/* Attribute segment */}
+        {attribute && <SegmentAttribute className='shrink-0'>{attribute}</SegmentAttribute>}
 
-      {/* Value segment */}
-      {value && <SegmentValue className='shrink-0'>{value}</SegmentValue>}
-    </div>
-  );
+        {/* Operator segment */}
+        {operator && <SegmentOperator className='shrink-0'>{operator}</SegmentOperator>}
+
+        {/* Value segment */}
+        {value && <SegmentValue className='shrink-0'>{value}</SegmentValue>}
+      </div>
+    );
+  }
+
+  // Variants not yet implemented (parentheses will be added in US-006)
+  return null;
 };
 
 FilterChip.displayName = 'FilterChip';

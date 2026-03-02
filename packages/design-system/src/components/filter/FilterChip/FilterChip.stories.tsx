@@ -82,3 +82,41 @@ RealisticExample.args = {
   value: '192.168.1.1',
   error: false,
 };
+
+/**
+ * AND logical operator variant
+ */
+export const AndOperator = Template.bind({});
+AndOperator.args = {
+  variant: 'and',
+};
+
+/**
+ * OR logical operator variant
+ */
+export const OrOperator = Template.bind({});
+OrOperator.args = {
+  variant: 'or',
+};
+
+/**
+ * Combined example showing chip + AND + chip
+ */
+export const CombinedWithAnd: StoryFn<typeof meta> = () => (
+  <div className='flex items-center gap-1'>
+    <FilterChip variant='chip' attribute='IP Address' operator='is' value='192.168.1.1' />
+    <FilterChip variant='and' />
+    <FilterChip variant='chip' attribute='Country' operator='is' value='US' />
+  </div>
+);
+
+/**
+ * Combined example showing chip + OR + chip
+ */
+export const CombinedWithOr: StoryFn<typeof meta> = () => (
+  <div className='flex items-center gap-1'>
+    <FilterChip variant='chip' attribute='Status' operator='is' value='Active' />
+    <FilterChip variant='or' />
+    <FilterChip variant='chip' attribute='Status' operator='is' value='Pending' />
+  </div>
+);
