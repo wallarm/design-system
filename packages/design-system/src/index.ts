@@ -30,6 +30,7 @@ export {
 } from './components/Checkbox';
 export { Code, type CodeProps } from './components/Code';
 export { Country, type CountryProps } from './components/Country';
+export { DateTime, type DateTimeProps } from './components/DateTime';
 export {
   Drawer,
   DrawerBody,
