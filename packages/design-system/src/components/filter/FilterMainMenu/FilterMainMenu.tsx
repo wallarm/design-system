@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, useEffect, useRef, useState } from 'react';
 import { CirclePlus } from '../../../icons/CirclePlus';
 import { CircleSlash } from '../../../icons/CircleSlash';
 import { cn } from '../../../utils/cn';
@@ -59,6 +59,10 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
   onSelectOr,
   className,
 }) => {
+  const [activeIndex, setActiveIndex] = useState(0);
+  const menuRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
+
   if (!open) {
     return null;
   }
@@ -84,8 +88,110 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
   const showRecent = limitedRecentConditions.length > 0;
   const showSuggestions = suggestedFields.length > 0;
 
+  // Build navigable items list
+  const navigableItems: Array<{
+    type: 'recent' | 'suggested' | 'field' | 'and' | 'or';
+    data: FieldMetadata | Condition | null;
+    handler: () => void;
+  }> = [];
+
+  // Add recent conditions
+  limitedRecentConditions.forEach(condition => {
+    const fieldMeta = fields.find(f => f.name === condition.field);
+    if (fieldMeta) {
+      navigableItems.push({
+        type: 'recent',
+        data: condition,
+        handler: () => handleSelect(fieldMeta),
+      });
+    }
+  });
+
+  // Add suggested fields
+  if (showSuggestions && !showRecent) {
+    suggestedFields.forEach(field => {
+      navigableItems.push({
+        type: 'suggested',
+        data: field,
+        handler: () => handleSelect(field),
+      });
+    });
+  }
+
+  // Add all fields
+  fields.forEach(field => {
+    navigableItems.push({
+      type: 'field',
+      data: field,
+      handler: () => handleSelect(field),
+    });
+  });
+
+  // Add AND/OR operators
+  if (onSelectAnd) {
+    navigableItems.push({
+      type: 'and',
+      data: null,
+      handler: handleSelectAnd,
+    });
+  }
+  if (onSelectOr) {
+    navigableItems.push({
+      type: 'or',
+      data: null,
+      handler: handleSelectOr,
+    });
+  }
+
+  const totalItems = navigableItems.length;
+
+  // Keyboard navigation
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          setActiveIndex(prev => (prev + 1) % totalItems);
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          setActiveIndex(prev => (prev - 1 + totalItems) % totalItems);
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (activeIndex >= 0 && activeIndex < totalItems) {
+            navigableItems[activeIndex].handler();
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          onOpenChange?.(false);
+          break;
+      }
+    };
+
+    if (open) {
+      window.addEventListener('keydown', handleKeyDown);
+      return () => window.removeEventListener('keydown', handleKeyDown);
+    }
+  }, [open, activeIndex, totalItems, navigableItems, onOpenChange]);
+
+  // Scroll to active item
+  useEffect(() => {
+    if (activeIndex >= 0 && itemRefs.current[activeIndex]) {
+      itemRefs.current[activeIndex]?.scrollIntoView({
+        block: 'nearest',
+        behavior: 'smooth',
+      });
+    }
+  }, [activeIndex]);
+
+  // Track item index for keyboard navigation
+  let itemIndex = 0;
+
   return (
     <div
+      ref={menuRef}
       className={cn(
         'w-[300px]', // 300px width (Figma spec)
         'bg-white border border-border-primary-light rounded-xl',
@@ -122,19 +228,24 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
               const operator = String(condition.operator); // Will show raw operator for now
               const value = String(condition.value);
 
+              const currentIndex = itemIndex++;
+              const isActive = currentIndex === activeIndex;
+
               return (
                 <button
                   key={`recent-${index}`}
+                  ref={el => (itemRefs.current[currentIndex] = el)}
                   type='button'
                   onClick={() => fieldMeta && handleSelect(fieldMeta)}
                   className={cn(
                     'flex items-start gap-1 px-2 py-1.5',
                     'rounded-md overflow-clip',
-                    'text-left bg-transparent',
-                    'hover:bg-gray-100',
+                    'text-left',
                     'transition-colors',
+                    isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50',
                   )}
                   role='menuitem'
+                  aria-selected={isActive}
                 >
                   <div className='flex flex-1 gap-2 items-start'>
                     <div className='flex flex-1 flex-col items-start'>
@@ -175,20 +286,25 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
         {showSuggestions && !showRecent && (
           <>
             {suggestedFields.map((field, index) => {
+              const currentIndex = itemIndex++;
+              const isActive = currentIndex === activeIndex;
+
               // Show as "Attribute operator Value" format for suggestions too
               return (
                 <button
                   key={`suggested-${index}`}
+                  ref={el => (itemRefs.current[currentIndex] = el)}
                   type='button'
                   onClick={() => handleSelect(field)}
                   className={cn(
                     'flex items-start gap-1 px-2 py-1.5',
                     'rounded-md overflow-clip',
-                    'text-left bg-transparent',
-                    'hover:bg-gray-100',
+                    'text-left',
                     'transition-colors',
+                    isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50',
                   )}
                   role='menuitem'
+                  aria-selected={isActive}
                 >
                   <div className='flex flex-1 gap-2 items-start'>
                     <div className='flex flex-1 flex-col items-start'>
@@ -226,21 +342,26 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
         )}
 
         {/* All fields section */}
-        {fields.map(field => (
-          <button
-            key={field.name}
-            type='button'
-            onClick={() => handleSelect(field)}
-            className={cn(
-              'flex items-start gap-1 px-2 py-1.5',
-              'rounded-md overflow-clip',
-              'text-sm font-normal text-text-primary text-left',
-              'bg-transparent',
-              'hover:bg-gray-100',
-              'transition-colors',
-            )}
-            role='menuitem'
-          >
+        {fields.map(field => {
+          const currentIndex = itemIndex++;
+          const isActive = currentIndex === activeIndex;
+
+          return (
+            <button
+              key={field.name}
+              ref={el => (itemRefs.current[currentIndex] = el)}
+              type='button'
+              onClick={() => handleSelect(field)}
+              className={cn(
+                'flex items-start gap-1 px-2 py-1.5',
+                'rounded-md overflow-clip',
+                'text-sm font-normal text-text-primary text-left',
+                'transition-colors',
+                isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50',
+              )}
+              role='menuitem'
+              aria-selected={isActive}
+            >
             <div className='flex flex-1 gap-2 items-start'>
               <div className='flex flex-1 flex-col items-start'>
                 <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
@@ -249,7 +370,8 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
               </div>
             </div>
           </button>
-        ))}
+          );
+        })}
 
         {/* Separator before AND/OR */}
         <div className='flex flex-col gap-2 items-center justify-center overflow-clip px-2 py-1'>
@@ -257,19 +379,25 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
         </div>
 
         {/* AND operator */}
-        {onSelectAnd && (
-          <button
-            type='button'
-            onClick={handleSelectAnd}
-            className={cn(
-              'flex items-start gap-1 px-2 py-1.5',
-              'rounded-md overflow-clip',
-              'text-left bg-transparent',
-              'hover:bg-gray-100',
-              'transition-colors',
-            )}
-            role='menuitem'
-          >
+        {onSelectAnd && (() => {
+          const currentIndex = itemIndex++;
+          const isActive = currentIndex === activeIndex;
+
+          return (
+            <button
+              ref={el => (itemRefs.current[currentIndex] = el)}
+              type='button'
+              onClick={handleSelectAnd}
+              className={cn(
+                'flex items-start gap-1 px-2 py-1.5',
+                'rounded-md overflow-clip',
+                'text-left',
+                'transition-colors',
+                isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50',
+              )}
+              role='menuitem'
+              aria-selected={isActive}
+            >
             <div className='flex flex-1 gap-2 items-start'>
               <div className='flex items-center pt-0.5 w-4'>
                 <CirclePlus className='h-4 w-4 text-text-primary' />
@@ -281,22 +409,29 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
               </div>
             </div>
           </button>
-        )}
+          );
+        })()}
 
         {/* OR operator */}
-        {onSelectOr && (
-          <button
-            type='button'
-            onClick={handleSelectOr}
-            className={cn(
-              'flex items-start gap-1 px-2 py-1.5',
-              'rounded-md overflow-clip',
-              'text-left bg-transparent',
-              'hover:bg-gray-100',
-              'transition-colors',
-            )}
-            role='menuitem'
-          >
+        {onSelectOr && (() => {
+          const currentIndex = itemIndex++;
+          const isActive = currentIndex === activeIndex;
+
+          return (
+            <button
+              ref={el => (itemRefs.current[currentIndex] = el)}
+              type='button'
+              onClick={handleSelectOr}
+              className={cn(
+                'flex items-start gap-1 px-2 py-1.5',
+                'rounded-md overflow-clip',
+                'text-left',
+                'transition-colors',
+                isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50',
+              )}
+              role='menuitem'
+              aria-selected={isActive}
+            >
             <div className='flex flex-1 gap-2 items-start'>
               <div className='flex items-center pt-0.5 w-4'>
                 <CircleSlash className='h-4 w-4 text-text-primary' />
@@ -308,7 +443,8 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
               </div>
             </div>
           </button>
-        )}
+          );
+        })()}
       </div>
 
       {/* Keyboard navigation hints footer */}
