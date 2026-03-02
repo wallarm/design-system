@@ -2,6 +2,7 @@ import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import {
   getAlignClass,
+  getExpandBorderClass,
   getPinningStyles,
   isLastPinnedLeft,
   TABLE_EXPAND_COLUMN_ID,
@@ -42,12 +43,8 @@ export const TableBodyCell = <T,>({
     <Td
       className={cn(
         getAlignClass(meta),
+        getExpandBorderClass(isExpandColumn, cell.row.depth),
         meta?.cellClassName,
-        isExpandColumn &&
-          cell.row.depth > 0 && [
-            '[tr[data-depth]:has(+_tr:not([data-depth]))_&]:!border-b',
-            '[tr[data-depth]:last-child_&]:!border-b',
-          ],
         className,
       )}
       pinned={isPinned === 'left'}
@@ -67,7 +64,7 @@ export const TableBodyCell = <T,>({
           {content}
         </div>
       ) : (
-        <div className='flex flex-wrap [&_*]:flex-wrap [&_*]:min-w-0 [&_*]:truncate'>
+        <div className='flex flex-wrap [&_*]:flex-wrap [&_*]:min-w-0 [&_*]:truncate [.text-right>&]:justify-end'>
           {content}
         </div>
       )}
