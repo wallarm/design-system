@@ -21,6 +21,9 @@ export const linkVariants = cva(
         regular: 'font-normal',
         medium: 'font-medium',
       },
+      disabled: {
+        true: 'pointer-events-none !text-text-tertiary cursor-default !decoration-transparent',
+      },
     },
   },
 );
