@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { FilterChip } from '../FilterChip/FilterChip';
@@ -94,6 +94,85 @@ describe('FilterField', () => {
 
       // Placeholder should not be shown when we have 2 chips
       expect(screen.queryByText('Search attacks...')).not.toBeInTheDocument();
+    });
+  });
+
+  describe('chip removal', () => {
+    it('calls onRemove callback when chip delete button is clicked', async () => {
+      const user = userEvent.setup();
+      const onRemove = vi.fn();
+
+      const mockChips = [
+        {
+          id: '1',
+          content: (
+            <FilterChip
+              variant='chip'
+              attribute='IP'
+              operator='is'
+              value='192.168.1.1'
+              onRemove={onRemove}
+            />
+          ),
+        },
+      ];
+
+      const { container } = render(<FilterField chips={mockChips} />);
+
+      // Hover over the chip to show delete button using fireEvent
+      const chip = container.querySelector('[data-slot="filter-chip"]');
+      fireEvent.mouseEnter(chip!);
+
+      // Click delete button
+      const deleteButton = screen.getByRole('button', { name: /remove filter/i });
+      await user.click(deleteButton);
+
+      expect(onRemove).toHaveBeenCalledTimes(1);
+    });
+
+    it('supports chip removal with onChipRemove callback pattern', async () => {
+      const user = userEvent.setup();
+      const onChipRemove = vi.fn();
+
+      const mockChips = [
+        {
+          id: '1',
+          content: (
+            <FilterChip
+              variant='chip'
+              attribute='IP'
+              operator='is'
+              value='192.168.1.1'
+              onRemove={() => onChipRemove('1')}
+            />
+          ),
+        },
+        {
+          id: '2',
+          content: (
+            <FilterChip
+              variant='chip'
+              attribute='Country'
+              operator='is'
+              value='US'
+              onRemove={() => onChipRemove('2')}
+            />
+          ),
+        },
+      ];
+
+      const { container } = render(<FilterField chips={mockChips} onChipRemove={onChipRemove} />);
+
+      // Hover over the first chip to show delete button using fireEvent
+      const chips = container.querySelectorAll('[data-slot="filter-chip"]');
+      fireEvent.mouseEnter(chips[0]!);
+
+      // Click delete button on first chip
+      const deleteButtons = screen.getAllByRole('button', { name: /remove filter/i });
+      await user.click(deleteButtons[0]);
+
+      expect(onChipRemove).toHaveBeenCalledWith('1');
+      expect(onChipRemove).toHaveBeenCalledTimes(1);
     });
   });
 
