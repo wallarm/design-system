@@ -21,8 +21,8 @@ import { Button } from '../../Button';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuFooter,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../DropdownMenu';
 import { Input } from '../../Input';
@@ -110,15 +110,16 @@ export const TableSettingsMenu: FC = () => {
   // Disabled when current state matches defaults (nothing to reset)
   const { columnVisibility: currentVisibility, columnOrder: currentOrder } = table.getState();
 
-  const isDefaultState = useMemo(() => {
-    const visibilityMatch =
-      !defaultColumnVisibility || isEqual(currentVisibility, defaultColumnVisibility);
+  // When currentOrder is [] TanStack uses natural column order — treat as matching default.
+  // Once the user reorders (or clicks Reset), currentOrder becomes an explicit array.
+  const effectiveOrder = currentOrder.length === 0 ? defaultColumnOrder : currentOrder;
 
-    const orderMatch =
-      !defaultColumnOrder || currentOrder.length === 0 || isEqual(currentOrder, defaultColumnOrder);
+  const visibilityMatch =
+    !defaultColumnVisibility || isEqual(currentVisibility, defaultColumnVisibility);
 
-    return visibilityMatch && orderMatch;
-  }, [currentVisibility, currentOrder, defaultColumnVisibility, defaultColumnOrder]);
+  const orderMatch = !defaultColumnOrder || isEqual(effectiveOrder, defaultColumnOrder);
+
+  const isDefaultState = visibilityMatch && orderMatch;
 
   return (
     <div
@@ -146,7 +147,23 @@ export const TableSettingsMenu: FC = () => {
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className={cn('min-w-256')}>
+              <DropdownMenuContent
+                className={cn('min-w-256')}
+                footer={
+                  <DropdownMenuFooter>
+                    <Button
+                      variant='ghost'
+                      color='neutral'
+                      size='small'
+                      onClick={handleReset}
+                      disabled={isDefaultState}
+                      fullWidth
+                    >
+                      Reset to default
+                    </Button>
+                  </DropdownMenuFooter>
+                }
+              >
                 <VStack gap={8} align='stretch'>
                   <Input
                     placeholder='Search'
@@ -180,19 +197,6 @@ export const TableSettingsMenu: FC = () => {
                       </SortableContext>
                     </DndContext>
                   </VStack>
-
-                  <DropdownMenuSeparator />
-
-                  <Button
-                    variant='ghost'
-                    color='neutral'
-                    size='small'
-                    onClick={handleReset}
-                    disabled={isDefaultState}
-                    fullWidth
-                  >
-                    Reset to default
-                  </Button>
                 </VStack>
               </DropdownMenuContent>
             </DropdownMenu>
