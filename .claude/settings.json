@@ -1,0 +1,10 @@
+{
+    "env": {
+      "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+    },
+    "enabledPlugins": {
+      "ralph-loop@claude-plugins-official": true,
+      "ralph-skills@ralph-marketplace": true
+    }
+  }
+  

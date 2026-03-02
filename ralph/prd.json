@@ -1,0 +1,426 @@
+{
+  "project": "Wallarm Design System",
+  "branchName": "ralph/filter-attacks-components",
+  "description": "Filter Attacks Components - UI components for building complex attack filter queries with attribute-operator-value conditions and AND/OR logic",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "Create TypeScript types and interfaces for filter components",
+      "description": "As a developer, I need type definitions for filter components to ensure type safety.",
+      "acceptanceCriteria": [
+        "Create packages/ui/src/filter/types.ts file",
+        "Define FilterChipData interface with id, variant, attribute, operator, value, error fields",
+        "Define FilterChipVariant type: 'chip' | 'and' | 'or' | '(' | ')'",
+        "Define FieldMetadata interface matching backend structure (name, label, type, description, operators, default)",
+        "Define ExprNode, Condition, and Group types for expression tree",
+        "Define operator mapping constants (OPERATOR_LABELS, OPERATORS_BY_TYPE)",
+        "Export all types from types.ts",
+        "Typecheck passes"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-002",
+      "title": "Create SegmentAttribute component",
+      "description": "As a developer, I need a SegmentAttribute component to display attribute names in filter chips.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5925-21364",
+        "Create packages/ui/src/filter/segments/SegmentAttribute.tsx",
+        "Component displays attribute name with primary text color (#0f172b)",
+        "Font size: 14px, font weight: 400, padding: 2px",
+        "Support text truncation with ellipsis",
+        "Accept className prop for custom styling",
+        "Export from packages/ui/src/filter/segments/index.ts",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-003",
+      "title": "Create SegmentOperator and SegmentValue components",
+      "description": "As a developer, I need segment components for operator and value display in filter chips.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=6012-49371",
+        "Create packages/ui/src/filter/segments/SegmentOperator.tsx for operator display",
+        "SegmentOperator displays with secondary text color (#62748e)",
+        "Create packages/ui/src/filter/segments/SegmentValue.tsx for value display",
+        "SegmentValue displays with info text color (#155dfc) and medium font weight (500)",
+        "Both support text truncation with ellipsis",
+        "Font size: 14px, padding: 2px for both",
+        "Export both from segments/index.ts",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-004",
+      "title": "Create base FilterChip component for 'chip' variant",
+      "description": "As a developer, I need a FilterChip component to display attribute-operator-value filter conditions.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5922-21018",
+        "Create packages/ui/src/filter/FilterChip/FilterChip.tsx",
+        "Support 'chip' variant displaying SegmentAttribute + SegmentOperator + SegmentValue",
+        "Default state: white background (#fff), border (#cad5e2), rounded 8px",
+        "Max width: 320px with horizontal layout",
+        "Accept props: variant, attribute, operator, value, error, onRemove, className",
+        "Use design tokens (CSS variables) not hardcoded values",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-005",
+      "title": "Add logical operator variants to FilterChip (AND/OR)",
+      "description": "As a developer, I need FilterChip to support AND/OR logical operator display.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5922-20983",
+        "Support 'and' variant displaying 'AND' text",
+        "Support 'or' variant displaying 'OR' text",
+        "Both use secondary text color (#62748e), same styling as chip variant",
+        "Both have white background, border, 8px radius",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-006",
+      "title": "Add parenthesis variants to FilterChip",
+      "description": "As a developer, I need FilterChip to support parenthesis display for grouping.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5922-20991",
+        "Support '(' variant displaying opening parenthesis",
+        "Support ')' variant displaying closing parenthesis",
+        "Both use secondary text color, same styling as other variants",
+        "Both have white background, border, 8px radius",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-007",
+      "title": "Add hover states and delete functionality to FilterChip",
+      "description": "As a user, I want to see hover feedback and be able to delete filter chips.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5925-21222",
+        "On hover: show delete button (× icon) on the right side",
+        "Delete button positioned absolutely, right: -12px, rounded right side",
+        "Clicking delete button triggers onRemove callback",
+        "Error state: red background (#ffe2e2), red border (#ffa2a2)",
+        "Error state persists on hover",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 7,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-008",
+      "title": "Create base FilterOperatorMenu with operator mapping",
+      "description": "As a developer, I need a dropdown menu that shows operators based on field type.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5936-34572",
+        "Create packages/ui/src/filter/FilterOperatorMenu/FilterOperatorMenu.tsx",
+        "Accept fieldType prop: 'string' | 'integer' | 'date' | 'float' | 'boolean' | 'enum'",
+        "Map field types to operators using OPERATORS_BY_TYPE constant",
+        "Display operators in dropdown menu (256px width)",
+        "Menu has white background, border, 12px radius, shadow",
+        "Accept props: fieldType, selectedOperator, onSelect, open, onOpenChange",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 8,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-009",
+      "title": "Add human-readable operator labels to FilterOperatorMenu",
+      "description": "As a user, I want to see readable operator names (not symbols) in the dropdown.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5936-34572",
+        "Use OPERATOR_LABELS constant to map operators to labels",
+        "Display labels: '=' → 'is', '!=' → 'is not', 'like' → 'contains', etc.",
+        "Menu items show label text with 14px font, 400 weight",
+        "Selected operator has visual indicator",
+        "Clicking item triggers onSelect(operator) callback",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 9,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-010",
+      "title": "Add keyboard navigation to FilterOperatorMenu",
+      "description": "As a user, I want to navigate the operator menu with keyboard for accessibility.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5936-34573",
+        "Arrow up/down navigates between menu items",
+        "Enter key selects highlighted item and closes menu",
+        "Esc key closes menu without selection",
+        "First item highlighted by default when menu opens",
+        "Add ARIA labels: aria-expanded, role=menu, role=menuitem",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 10,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-011",
+      "title": "Create base FilterMainMenu with field list",
+      "description": "As a developer, I need a dropdown menu to display available filter fields.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5937-2749",
+        "Create packages/ui/src/filter/FilterMainMenu/FilterMainMenu.tsx",
+        "Accept fields prop (array of FieldMetadata)",
+        "Display fields in scrollable list (320px width)",
+        "Each item shows field label (not field name)",
+        "Menu has white background, border, 12px radius, shadow",
+        "Accept props: fields, onSelect, open, onOpenChange",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 11,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-012",
+      "title": "Add search functionality to FilterMainMenu",
+      "description": "As a user, I want to search/filter the list of available fields.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5932-14223",
+        "Add search input at top of menu",
+        "Search filters fields by label and name (case-insensitive)",
+        "Filtered list updates as user types",
+        "Empty state message when no matches found",
+        "Search input has placeholder 'Search fields...'",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 12,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-013",
+      "title": "Add recent fields section to FilterMainMenu",
+      "description": "As a user, I want to see recently used fields at the top of the menu.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5937-2752",
+        "Accept recentFields prop (array of FieldMetadata, max 3)",
+        "Display 'Recent' section at top if recentFields provided",
+        "Display 'Suggestions' section for commonly used fields",
+        "Sections separated visually",
+        "Keyboard navigation hints at bottom: '↑ ↓ to navigate' '↵ to select'",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 13,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-014",
+      "title": "Create base FilterField component",
+      "description": "As a developer, I need a FilterField component that serves as the main entry point for filter UI.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5992-58496",
+        "Create packages/ui/src/filter/FilterField/FilterField.tsx",
+        "Display input field with 800px width, 40px height, 8px radius",
+        "Show placeholder 'Search [object]...' when empty",
+        "Accept props: chips, placeholder, error, leftIcon, showKeyboardHint, onChipRemove, onClear, onFocus, onBlur, className",
+        "White background, border (#cad5e2), shadow on focus",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 14,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-015",
+      "title": "Add chip display to FilterField",
+      "description": "As a user, I want to see active filter chips inside the input field.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5992-58496",
+        "Render FilterChip components from chips prop",
+        "Display chips horizontally (flex layout)",
+        "Show max 3 visible chips, then show placeholder hint",
+        "Chips positioned on left side of field",
+        "Each chip can be removed via onChipRemove callback",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 15,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-016",
+      "title": "Add focus and hover states to FilterField",
+      "description": "As a user, I want visual feedback when interacting with the filter field.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5992-58496",
+        "Hover state: border color changes to #90a1b9",
+        "Focus state: blue focus ring with 3px spread rgba(144,161,185,0.3)",
+        "Show clear button (X icon) on right when field has chips",
+        "Clear button triggers onClear callback",
+        "Optional keyboard hint (⌘K or Ctrl+K) shown on right when showKeyboardHint=true",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 16,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-017",
+      "title": "Add error validation state to FilterField",
+      "description": "As a user, I want to see visual feedback when filter has validation errors.",
+      "acceptanceCriteria": [
+        "Reference Figma design: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=5992-58496",
+        "Error state (error=true): red border (#e7000b)",
+        "Error hover: red focus ring rgba(231,0,11,0.3) with 3px spread",
+        "Error focus: red focus ring rgba(231,0,11,0.2) with 3px spread",
+        "Error state propagates to FilterChip components (red background)",
+        "aria-invalid attribute set when error=true",
+        "Typecheck passes",
+        "Verify in browser using dev-browser skill"
+      ],
+      "priority": 17,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-018",
+      "title": "Add unit tests for filter components",
+      "description": "As a developer, I need unit tests to ensure components work correctly.",
+      "acceptanceCriteria": [
+        "Create FilterChip.test.tsx with tests for all variants (chip, and, or, parentheses)",
+        "Test FilterChip states (default, hover, error)",
+        "Create segment tests for SegmentAttribute, SegmentOperator, SegmentValue",
+        "Test text truncation in segments",
+        "Create FilterOperatorMenu.test.tsx testing operator filtering by type",
+        "Create FilterMainMenu.test.tsx testing search and field filtering",
+        "Create FilterField.test.tsx testing chip management",
+        "All tests pass (pnpm test)",
+        "Code coverage >80% for filter components",
+        "Typecheck passes"
+      ],
+      "priority": 18,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-019",
+      "title": "Add component interaction tests",
+      "description": "As a developer, I need interaction tests to verify user workflows.",
+      "acceptanceCriteria": [
+        "Test FilterChip hover behavior and delete button click",
+        "Test FilterOperatorMenu keyboard navigation (arrow keys, Enter, Esc)",
+        "Test FilterOperatorMenu selection callback",
+        "Test FilterMainMenu search input and filtering",
+        "Test FilterField focus, blur, chip removal",
+        "Test FilterField clear button functionality",
+        "All component tests pass using Testing Library",
+        "Typecheck passes"
+      ],
+      "priority": 19,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-020",
+      "title": "Add E2E screenshot tests for FilterChip",
+      "description": "As a developer, I need visual regression tests for FilterChip component.",
+      "acceptanceCriteria": [
+        "Create FilterChip.e2e.ts following docs/e2e-test-rules.md",
+        "Screenshot tests for all variants: chip, and, or, (, )",
+        "Screenshot tests for all states: default, hover, error",
+        "Test grouped as: Screenshot tests, Interaction tests, Accessibility tests",
+        "Tests use Playwright with proper selectors",
+        "E2E tests pass in CI/CD",
+        "Typecheck passes"
+      ],
+      "priority": 20,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-021",
+      "title": "Add E2E screenshot tests for FilterField",
+      "description": "As a developer, I need visual regression tests for FilterField component.",
+      "acceptanceCriteria": [
+        "Create FilterField.e2e.ts following docs/e2e-test-rules.md",
+        "Screenshot tests for 8 states from Figma: empty, filled (1-3 chips), hover, focus, error combinations",
+        "Test dropdown opening/closing",
+        "Test chip add/remove interactions",
+        "Test keyboard navigation",
+        "E2E tests pass in CI/CD",
+        "Typecheck passes"
+      ],
+      "priority": 21,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-022",
+      "title": "Add Storybook stories for all filter components",
+      "description": "As a developer, I need comprehensive Storybook documentation for filter components.",
+      "acceptanceCriteria": [
+        "Create FilterChip.stories.tsx with all variants and states",
+        "Create SegmentAttribute.stories.tsx, SegmentOperator.stories.tsx, SegmentValue.stories.tsx",
+        "Create FilterOperatorMenu.stories.tsx with all field types",
+        "Create FilterMainMenu.stories.tsx with search and recent fields demos",
+        "Create FilterField.stories.tsx with all states (empty, filled, error)",
+        "Add composition example story showing all components together",
+        "All stories have interactive controls (args)",
+        "All stories have code examples",
+        "Storybook builds without errors",
+        "Typecheck passes"
+      ],
+      "priority": 22,
+      "passes": false,
+      "notes": ""
+    },
+    {
+      "id": "US-023",
+      "title": "Create barrel exports and package structure",
+      "description": "As a developer, I need proper exports from the filter package.",
+      "acceptanceCriteria": [
+        "Create packages/ui/src/filter/index.ts barrel file",
+        "Export all components: FilterChip, FilterField, FilterOperatorMenu, FilterMainMenu",
+        "Export segment components: SegmentAttribute, SegmentOperator, SegmentValue",
+        "Export all types from types.ts",
+        "Verify imports work: import { FilterChip } from '@wallarm/ui/filter'",
+        "Add filter components to main package export",
+        "Typecheck passes"
+      ],
+      "priority": 23,
+      "passes": false,
+      "notes": ""
+    }
+  ]
+}
