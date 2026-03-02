@@ -7,8 +7,7 @@ import { useTableContext } from '../TableContext';
 export const TableActionBarSelection: FC = () => {
   const { table } = useTableContext();
   const count = Object.keys(table.getState().rowSelection).length;
-  const totalRows = table.getPreFilteredRowModel().rows.length;
-  const allSelected = count === totalRows;
+  const allSelected = table.getIsAllRowsSelected();
 
   const handleSelectAll = () => {
     table.toggleAllRowsSelected(true);
@@ -25,17 +24,20 @@ export const TableActionBarSelection: FC = () => {
       </Text>
 
       <HStack gap={6}>
-        {!allSelected && (
-          <Link type='alt' onClick={handleSelectAll}>
-            Select all
-          </Link>
-        )}
+        <Link
+          type={allSelected ? 'muted' : 'alt'}
+          size='md'
+          onClick={handleSelectAll}
+          disabled={allSelected}
+        >
+          Select all
+        </Link>
 
         <Text size='sm' color='tertiary-alt' weight='medium'>
           ·
         </Text>
 
-        <Link type='alt' onClick={handleClear}>
+        <Link type='alt' size='md' onClick={handleClear}>
           Clear
         </Link>
       </HStack>

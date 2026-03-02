@@ -18,9 +18,9 @@ export const TableActionBar: FC<TableActionBarProps> = ({ children }) => (
           'pl-12 pr-8 py-8',
 
           // Animation opened
-          'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom',
+          'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300',
           // Animation closed
-          'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom',
+          'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom data-[state=closed]:duration-150',
         )}
       >
         <HStack gap={40} align='center'>

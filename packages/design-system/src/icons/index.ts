@@ -12,6 +12,7 @@ export { ArrowUpLeft } from './ArrowUpLeft';
 export { ArrowUpRight } from './ArrowUpRight';
 export { Bug } from './Bug';
 export { Check } from './Check';
+export { CheckboxIndeterminate } from './CheckboxIndeterminate';
 export { CheckCheck } from './CheckCheck';
 export { ChevronDown } from './ChevronDown';
 export { ChevronFirst } from './ChevronFirst';
