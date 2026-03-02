@@ -1,7 +1,8 @@
 import type { FC } from 'react';
 import { useState, useCallback, useEffect } from 'react';
 import { FilterField } from '../FilterField';
-import type { FilterChipData, ExprNode, FieldMetadata } from '../types';
+import type { FilterChipData, ExprNode, FieldMetadata, Condition } from '../types';
+import { parse } from './parser';
 
 /**
  * Editing Context Types
@@ -98,17 +99,54 @@ export const FilterComponent: FC<FilterComponentProps> = ({
   }, [value]);
 
   /**
-   * Parse input text to expression and chips
-   * Placeholder for US-002 parser implementation
+   * Convert parsed expression to filter chips
    */
-  const parseInput = useCallback((text: string): { expression: ExprNode | null; chips: FilterChipData[] } => {
-    // TODO: Implement parser in US-002
-    // For now, return empty state
-    return {
-      expression: null,
-      chips: [],
-    };
+  const expressionToChips = useCallback((expression: ExprNode | null): FilterChipData[] => {
+    if (!expression) {
+      return [];
+    }
+
+    // For now, only handle single Condition nodes (US-002)
+    // Will be extended for AND/OR/parentheses in US-009-011
+    if (expression.type === 'condition') {
+      const condition = expression as Condition;
+      return [
+        {
+          id: `chip-${Date.now()}`,
+          variant: 'chip',
+          attribute: condition.field,
+          operator: condition.operator,
+          value: String(condition.value),
+        },
+      ];
+    }
+
+    return [];
   }, []);
+
+  /**
+   * Parse input text to expression and chips
+   */
+  const parseInput = useCallback(
+    (text: string): { expression: ExprNode | null; chips: FilterChipData[] } => {
+      const result = parse(text);
+
+      if (!result.expression) {
+        return {
+          expression: null,
+          chips: [],
+        };
+      }
+
+      const chips = expressionToChips(result.expression);
+
+      return {
+        expression: result.expression,
+        chips,
+      };
+    },
+    [expressionToChips],
+  );
 
   /**
    * Handle input text change
