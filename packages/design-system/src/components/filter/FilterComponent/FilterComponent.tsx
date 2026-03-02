@@ -1,6 +1,7 @@
-import type { FC } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import type { FC, KeyboardEvent, ChangeEvent } from 'react';
+import { useCallback, useEffect, useState, useRef } from 'react';
 import { FilterField } from '../FilterField';
+import { FilterMainMenu } from '../FilterMainMenu';
 import { SegmentAttribute, SegmentOperator, SegmentValue } from '../segments';
 import type { Condition, ExprNode, FieldMetadata, FilterChipData, FilterOperator } from '../types';
 import { getOperatorLabel } from '../types';
@@ -83,6 +84,8 @@ export const FilterComponent: FC<FilterComponentProps> = ({
   showKeyboardHint = true,
   className,
 }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
   // Internal state
   const [state, setState] = useState<FilterComponentState>({
     inputText: '',
@@ -91,6 +94,9 @@ export const FilterComponent: FC<FilterComponentProps> = ({
     chips: [],
     expression: null,
   });
+
+  // Dropdown visibility state
+  const [showFieldMenu, setShowFieldMenu] = useState(false);
 
   // Sync controlled value to internal state
   useEffect(() => {
@@ -162,12 +168,43 @@ export const FilterComponent: FC<FilterComponentProps> = ({
         inputText: text,
         expression,
         chips,
+        editingContext: text.trim() === '' || !expression ? 'field' : null,
       }));
+
+      // Show field menu when typing and no complete expression yet
+      if (text.trim() !== '' && !expression) {
+        setShowFieldMenu(true);
+      } else {
+        setShowFieldMenu(false);
+      }
 
       // Emit onChange event
       onChange?.(expression, chips);
     },
     [parseInput, onChange],
+  );
+
+  /**
+   * Handle text input from user typing
+   */
+  const handleTextInput = useCallback(
+    (event: ChangeEvent<HTMLInputElement>) => {
+      handleInputChange(event.target.value);
+    },
+    [handleInputChange],
+  );
+
+  /**
+   * Handle keyboard events
+   */
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLInputElement>) => {
+      if (event.key === 'Escape') {
+        setShowFieldMenu(false);
+      }
+      // Arrow keys and Enter are handled by FilterMainMenu
+    },
+    [],
   );
 
   /**
@@ -218,6 +255,22 @@ export const FilterComponent: FC<FilterComponentProps> = ({
   }, [onChange]);
 
   /**
+   * Handle field selection from FilterMainMenu
+   */
+  const handleFieldSelect = useCallback(
+    (field: FieldMetadata) => {
+      // Update input text with selected field name + space for operator
+      const newText = `${field.name} `;
+      handleInputChange(newText);
+      setShowFieldMenu(false);
+
+      // Focus back on input
+      inputRef.current?.focus();
+    },
+    [handleInputChange],
+  );
+
+  /**
    * Handle field focus - set initial editing context
    */
   const handleFocus = useCallback(() => {
@@ -226,6 +279,7 @@ export const FilterComponent: FC<FilterComponentProps> = ({
         ...prev,
         editingContext: 'field',
       }));
+      setShowFieldMenu(true);
     }
   }, [state.inputText]);
 
@@ -241,37 +295,87 @@ export const FilterComponent: FC<FilterComponentProps> = ({
     [fields],
   );
 
+  // Filter fields based on current input
+  const filteredFields = fields.filter(field =>
+    field.label.toLowerCase().includes(state.inputText.toLowerCase()) ||
+    field.name.toLowerCase().includes(state.inputText.toLowerCase()),
+  );
+
   return (
-    <FilterField
-      chips={state.chips.map(chip => {
-        if (!chip.attribute || !chip.operator) {
-          return {
-            id: chip.id,
-            content: null,
-          };
-        }
+    <div className='relative w-full'>
+      {/* Wrapper combining FilterField visual and input */}
+      <div className='relative'>
+        {state.chips.length === 0 ? (
+          // When no chips, show input directly
+          <div className='relative'>
+            <input
+              ref={inputRef}
+              type='text'
+              value={state.inputText}
+              onChange={handleTextInput}
+              onKeyDown={handleKeyDown}
+              onFocus={handleFocus}
+              placeholder={placeholder}
+              className='h-10 w-full max-w-[800px] rounded-lg border border-border-primary bg-component-input-bg px-3 py-2 text-sm shadow-xs placeholder:text-text-tertiary focus:border-border-strong-primary focus:shadow-focus-ring-primary focus:outline-none'
+            />
+          </div>
+        ) : (
+          // When chips exist, show FilterField with chips and hidden input for continued typing
+          <>
+            <FilterField
+              chips={state.chips.map(chip => {
+                if (!chip.attribute || !chip.operator) {
+                  return {
+                    id: chip.id,
+                    content: null,
+                  };
+                }
 
-        const fieldType = getFieldType(chip.attribute);
-        const operatorLabel = getOperatorLabel(chip.operator as FilterOperator, fieldType);
+                const fieldType = getFieldType(chip.attribute);
+                const operatorLabel = getOperatorLabel(chip.operator as FilterOperator, fieldType);
 
-        return {
-          id: chip.id,
-          content: (
-            <>
-              <SegmentAttribute>{chip.attribute}</SegmentAttribute>
-              <SegmentOperator>{operatorLabel}</SegmentOperator>
-              <SegmentValue>{chip.value ?? ''}</SegmentValue>
-            </>
-          ),
-        };
-      })}
-      placeholder={placeholder}
-      showKeyboardHint={showKeyboardHint}
-      onChipRemove={handleChipRemove}
-      onClear={state.chips.length > 0 ? handleClear : undefined}
-      onFocus={handleFocus}
-      className={className}
-    />
+                return {
+                  id: chip.id,
+                  content: (
+                    <>
+                      <SegmentAttribute>{chip.attribute}</SegmentAttribute>
+                      <SegmentOperator>{operatorLabel}</SegmentOperator>
+                      <SegmentValue>{chip.value ?? ''}</SegmentValue>
+                    </>
+                  ),
+                };
+              })}
+              placeholder={placeholder}
+              showKeyboardHint={showKeyboardHint}
+              onChipRemove={handleChipRemove}
+              onClear={handleClear}
+              className={className}
+            />
+            <input
+              ref={inputRef}
+              type='text'
+              value={state.inputText}
+              onChange={handleTextInput}
+              onKeyDown={handleKeyDown}
+              className='absolute top-0 left-0 opacity-0 pointer-events-none'
+              aria-hidden='true'
+            />
+          </>
+        )}
+      </div>
+
+      {/* FilterMainMenu dropdown */}
+      {showFieldMenu && filteredFields.length > 0 && (
+        <div className='absolute top-full left-0 mt-1 z-50'>
+          <FilterMainMenu
+            fields={filteredFields}
+            onSelect={handleFieldSelect}
+            open={showFieldMenu}
+            onOpenChange={setShowFieldMenu}
+          />
+        </div>
+      )}
+    </div>
   );
 };
 
