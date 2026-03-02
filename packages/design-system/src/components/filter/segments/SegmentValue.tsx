@@ -9,8 +9,8 @@ export const SegmentValue: FC<SegmentValueProps> = ({ children, className, ...pr
   return (
     <div
       className={cn(
-        'flex items-center justify-center p-2',
-        'text-sm font-medium text-text-info',
+        'flex items-center justify-center p-0.5',
+        'text-sm font-medium text-text-info leading-5',
         'overflow-hidden text-ellipsis whitespace-nowrap',
         className,
       )}

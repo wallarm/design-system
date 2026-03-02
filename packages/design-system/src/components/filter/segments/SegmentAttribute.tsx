@@ -9,8 +9,8 @@ export const SegmentAttribute: FC<SegmentAttributeProps> = ({ children, classNam
   return (
     <div
       className={cn(
-        'flex items-center justify-center p-2',
-        'text-sm font-normal text-text-primary',
+        'flex items-center justify-center p-0.5',
+        'text-sm font-normal text-text-primary leading-5',
         'overflow-hidden text-ellipsis whitespace-nowrap',
         className,
       )}

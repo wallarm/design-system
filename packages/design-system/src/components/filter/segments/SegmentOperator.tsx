@@ -9,8 +9,8 @@ export const SegmentOperator: FC<SegmentOperatorProps> = ({ children, className,
   return (
     <div
       className={cn(
-        'flex items-center justify-center p-2',
-        'text-sm font-normal text-text-secondary',
+        'flex items-center justify-center p-0.5',
+        'text-sm font-normal text-text-secondary leading-5',
         'overflow-hidden text-ellipsis whitespace-nowrap',
         className,
       )}

@@ -146,7 +146,7 @@ export const FilterChip: FC<FilterChipProps> = ({
         className={cn(
           // Layout
           'relative flex items-center gap-0 px-1 py-0',
-          'min-h-[20px] max-w-[320px]',
+          'min-h-[20px] max-w-[560px]',
           // Border & Background
           'border border-solid rounded-lg',
           error
