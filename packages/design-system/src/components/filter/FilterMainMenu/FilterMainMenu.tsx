@@ -373,10 +373,12 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
           );
         })}
 
-        {/* Separator before AND/OR */}
-        <div className='flex flex-col gap-2 items-center justify-center overflow-clip px-2 py-1'>
-          <div className='border-t border-border-primary h-px w-full' />
-        </div>
+        {/* Separator before AND/OR - only show if AND/OR operators exist */}
+        {(onSelectAnd || onSelectOr) && (
+          <div className='flex flex-col gap-2 items-center justify-center overflow-clip px-2 py-1'>
+            <div className='border-t border-border-primary h-px w-full' />
+          </div>
+        )}
 
         {/* AND operator */}
         {onSelectAnd && (() => {
