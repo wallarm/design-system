@@ -1,8 +1,8 @@
-import { type FC, useState } from 'react';
-import { Search } from '../../../icons/Search';
+import type { FC } from 'react';
+import { CirclePlus } from '../../../icons/CirclePlus';
+import { CircleSlash } from '../../../icons/CircleSlash';
 import { cn } from '../../../utils/cn';
-import { Input } from '../../Input/Input';
-import type { FieldMetadata } from '../types';
+import type { Condition, FieldMetadata, OPERATOR_LABELS } from '../types';
 
 export interface FilterMainMenuProps {
   /**
@@ -22,13 +22,22 @@ export interface FilterMainMenuProps {
    */
   onOpenChange?: (open: boolean) => void;
   /**
-   * Optional array of recently used fields (max 3)
+   * Optional array of recently used conditions (max 3)
+   * Displayed as "Attribute operator Value" format
    */
-  recentFields?: FieldMetadata[];
+  recentConditions?: Condition[];
   /**
    * Optional array of suggested commonly used fields
    */
   suggestedFields?: FieldMetadata[];
+  /**
+   * Callback when AND operator is selected
+   */
+  onSelectAnd?: () => void;
+  /**
+   * Callback when OR operator is selected
+   */
+  onSelectOr?: () => void;
   /**
    * Optional custom class name
    */
@@ -37,19 +46,19 @@ export interface FilterMainMenuProps {
 
 /**
  * FilterMainMenu component
- * Displays a dropdown menu with available filter fields
+ * Displays a dropdown menu with available filter fields, recent conditions, and AND/OR operators
  */
 export const FilterMainMenu: FC<FilterMainMenuProps> = ({
   fields,
   onSelect,
   open = false,
   onOpenChange,
-  recentFields = [],
+  recentConditions = [],
   suggestedFields = [],
+  onSelectAnd,
+  onSelectOr,
   className,
 }) => {
-  const [searchQuery, setSearchQuery] = useState('');
-
   if (!open) {
     return null;
   }
@@ -57,47 +66,30 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
   const handleSelect = (field: FieldMetadata) => {
     onSelect(field);
     onOpenChange?.(false);
-    setSearchQuery(''); // Reset search on selection
   };
 
-  // Limit recent fields to max 3
-  const limitedRecentFields = recentFields.slice(0, 3);
+  const handleSelectAnd = () => {
+    onSelectAnd?.();
+    onOpenChange?.(false);
+  };
 
-  // Filter fields based on search query (case-insensitive, match label and name)
-  const filteredFields = searchQuery.trim()
-    ? fields.filter(
-        field =>
-          field.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          field.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : fields;
+  const handleSelectOr = () => {
+    onSelectOr?.();
+    onOpenChange?.(false);
+  };
 
-  // Filter recent/suggested fields based on search too
-  const filteredRecentFields = searchQuery.trim()
-    ? limitedRecentFields.filter(
-        field =>
-          field.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          field.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : limitedRecentFields;
+  // Limit recent conditions to max 3
+  const limitedRecentConditions = recentConditions.slice(0, 3);
 
-  const filteredSuggestedFields = searchQuery.trim()
-    ? suggestedFields.filter(
-        field =>
-          field.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-          field.name.toLowerCase().includes(searchQuery.toLowerCase()),
-      )
-    : suggestedFields;
-
-  const showRecent = filteredRecentFields.length > 0;
-  const showSuggestions = filteredSuggestedFields.length > 0;
+  const showRecent = limitedRecentConditions.length > 0;
+  const showSuggestions = suggestedFields.length > 0;
 
   return (
     <div
       className={cn(
-        'w-80', // 320px width
-        'bg-white border border-border-primary rounded-xl',
-        'shadow-md',
+        'w-[300px]', // 300px width (Figma spec)
+        'bg-white border border-border-primary-light rounded-xl',
+        'shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1),0px_2px_4px_0px_rgba(0,0,0,0.1)]',
         'flex flex-col gap-px p-2',
         className,
       )}
@@ -106,133 +98,243 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
       aria-label='Filter fields'
       aria-expanded={open}
     >
-      {/* Search input */}
-      <div className='px-2 py-1.5 mb-1'>
-        <div className='relative'>
-          <div className='absolute left-2 top-1/2 -translate-y-1/2 pointer-events-none'>
-            <Search className='h-4 w-4 text-text-secondary' />
-          </div>
-          <Input
-            type='text'
-            placeholder='Search fields...'
-            value={searchQuery}
-            onChange={e => setSearchQuery(e.target.value)}
-            className='pl-8 pr-2 h-8 text-sm w-full'
-            autoFocus
-          />
-        </div>
-      </div>
 
-      {/* Scrollable field list with sections */}
-      <div className='flex flex-col gap-px max-h-80 overflow-y-auto'>
-        {/* Recent fields section */}
-        {showRecent && (
-          <div className='flex flex-col gap-px'>
-            <div className='px-2 py-1.5 text-xs font-medium text-text-secondary'>Recent</div>
-            {filteredRecentFields.map(field => (
-              <button
-                key={`recent-${field.name}`}
-                type='button'
-                onClick={() => handleSelect(field)}
-                className={cn(
-                  'flex items-start gap-1 px-2 py-1.5',
-                  'rounded-md overflow-clip',
-                  'text-sm font-normal text-text-primary text-left',
-                  'bg-transparent',
-                  'hover:bg-gray-100',
-                  'transition-colors',
-                )}
-                role='menuitem'
-              >
-                <div className='flex flex-1 gap-2 items-start min-h-[1px] min-w-[1px]'>
-                  <div className='flex flex-1 flex-col items-start min-h-[1px] min-w-[1px]'>
-                    <span className='leading-5'>{field.label}</span>
-                  </div>
-                </div>
-              </button>
-            ))}
-            {/* Separator after recent */}
-            <div className='h-px bg-border-primary my-1' />
+      {/* Header: Recent or Suggestions */}
+      {(showRecent || showSuggestions) && (
+        <div className='flex items-center justify-center overflow-clip px-2 py-2 pb-0.5'>
+          <div className='flex flex-1 gap-0.5 items-center'>
+            <div className='flex flex-1 flex-col justify-center leading-none text-xs font-medium text-text-secondary'>
+              <p className='leading-4 whitespace-pre-wrap'>{showRecent ? 'Recent' : 'Suggestions'}</p>
+            </div>
           </div>
+        </div>
+      )}
+
+      {/* Scrollable content */}
+      <div className='flex flex-col gap-px max-h-80 overflow-y-auto'>
+        {/* Recent conditions section - show "Attribute operator Value" */}
+        {showRecent && (
+          <>
+            {limitedRecentConditions.map((condition, index) => {
+              // Find field metadata to get label
+              const fieldMeta = fields.find(f => f.name === condition.field);
+              const attribute = fieldMeta?.label || condition.field;
+              const operator = String(condition.operator); // Will show raw operator for now
+              const value = String(condition.value);
+
+              return (
+                <button
+                  key={`recent-${index}`}
+                  type='button'
+                  onClick={() => fieldMeta && handleSelect(fieldMeta)}
+                  className={cn(
+                    'flex items-start gap-1 px-2 py-1.5',
+                    'rounded-md overflow-clip',
+                    'text-left bg-transparent',
+                    'hover:bg-gray-100',
+                    'transition-colors',
+                  )}
+                  role='menuitem'
+                >
+                  <div className='flex flex-1 gap-2 items-start'>
+                    <div className='flex flex-1 flex-col items-start'>
+                      {/* Attribute operator Value format */}
+                      <div className='flex gap-0.5 items-center p-0'>
+                        {/* Attribute */}
+                        <div className='flex items-center justify-center p-0'>
+                          <div className='flex flex-col justify-center leading-none overflow-hidden text-ellipsis whitespace-nowrap text-sm font-normal text-text-primary'>
+                            <p className='leading-5 overflow-hidden text-ellipsis'>{attribute}</p>
+                          </div>
+                        </div>
+                        {/* Operator */}
+                        <div className='flex items-center justify-center p-0'>
+                          <div className='flex flex-col justify-center leading-none overflow-hidden text-ellipsis whitespace-nowrap text-sm font-normal text-text-secondary'>
+                            <p className='leading-5 overflow-hidden text-ellipsis'>{operator}</p>
+                          </div>
+                        </div>
+                        {/* Value */}
+                        <div className='flex items-center justify-center p-0'>
+                          <div className='flex flex-col justify-center leading-none overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium text-text-info'>
+                            <p className='leading-5 overflow-hidden text-ellipsis'>{value}</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+            {/* Separator */}
+            <div className='flex flex-col gap-2 items-center justify-center overflow-clip px-2 py-1'>
+              <div className='border-t border-border-primary h-px w-full' />
+            </div>
+          </>
         )}
 
         {/* Suggestions section */}
-        {showSuggestions && (
-          <div className='flex flex-col gap-px'>
-            <div className='px-2 py-1.5 text-xs font-medium text-text-secondary'>Suggestions</div>
-            {filteredSuggestedFields.map(field => (
-              <button
-                key={`suggested-${field.name}`}
-                type='button'
-                onClick={() => handleSelect(field)}
-                className={cn(
-                  'flex items-start gap-1 px-2 py-1.5',
-                  'rounded-md overflow-clip',
-                  'text-sm font-normal text-text-primary text-left',
-                  'bg-transparent',
-                  'hover:bg-gray-100',
-                  'transition-colors',
-                )}
-                role='menuitem'
-              >
-                <div className='flex flex-1 gap-2 items-start min-h-[1px] min-w-[1px]'>
-                  <div className='flex flex-1 flex-col items-start min-h-[1px] min-w-[1px]'>
-                    <span className='leading-5'>{field.label}</span>
+        {showSuggestions && !showRecent && (
+          <>
+            {suggestedFields.map((field, index) => {
+              // Show as "Attribute operator Value" format for suggestions too
+              return (
+                <button
+                  key={`suggested-${index}`}
+                  type='button'
+                  onClick={() => handleSelect(field)}
+                  className={cn(
+                    'flex items-start gap-1 px-2 py-1.5',
+                    'rounded-md overflow-clip',
+                    'text-left bg-transparent',
+                    'hover:bg-gray-100',
+                    'transition-colors',
+                  )}
+                  role='menuitem'
+                >
+                  <div className='flex flex-1 gap-2 items-start'>
+                    <div className='flex flex-1 flex-col items-start'>
+                      {/* Attribute operator Value format */}
+                      <div className='flex gap-0.5 items-center p-0'>
+                        {/* Attribute */}
+                        <div className='flex items-center justify-center p-0'>
+                          <div className='flex flex-col justify-center leading-none overflow-hidden text-ellipsis whitespace-nowrap text-sm font-normal text-text-primary'>
+                            <p className='leading-5 overflow-hidden text-ellipsis'>{field.label}</p>
+                          </div>
+                        </div>
+                        {/* Operator */}
+                        <div className='flex items-center justify-center p-0'>
+                          <div className='flex flex-col justify-center leading-none overflow-hidden text-ellipsis whitespace-nowrap text-sm font-normal text-text-secondary'>
+                            <p className='leading-5 overflow-hidden text-ellipsis'>operator</p>
+                          </div>
+                        </div>
+                        {/* Value */}
+                        <div className='flex items-center justify-center p-0'>
+                          <div className='flex flex-col justify-center leading-none overflow-hidden text-ellipsis whitespace-nowrap text-sm font-medium text-text-info'>
+                            <p className='leading-5 overflow-hidden text-ellipsis'>Value</p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </button>
-            ))}
-            {/* Separator after suggestions */}
-            <div className='h-px bg-border-primary my-1' />
-          </div>
+                </button>
+              );
+            })}
+            {/* Separator */}
+            <div className='flex flex-col gap-2 items-center justify-center overflow-clip px-2 py-1'>
+              <div className='border-t border-border-primary h-px w-full' />
+            </div>
+          </>
         )}
 
         {/* All fields section */}
-        {filteredFields.length > 0 ? (
-          filteredFields.map(field => (
-            <button
-              key={field.name}
-              type='button'
-              onClick={() => handleSelect(field)}
-              className={cn(
-                'flex items-start gap-1 px-2 py-1.5',
-                'rounded-md overflow-clip',
-                'text-sm font-normal text-text-primary text-left',
-                'bg-transparent',
-                'hover:bg-gray-100',
-                'transition-colors',
-              )}
-              role='menuitem'
-            >
-              <div className='flex flex-1 gap-2 items-start min-h-[1px] min-w-[1px]'>
-                <div className='flex flex-1 flex-col items-start min-h-[1px] min-w-[1px]'>
-                  <span className='leading-5'>{field.label}</span>
+        {fields.map(field => (
+          <button
+            key={field.name}
+            type='button'
+            onClick={() => handleSelect(field)}
+            className={cn(
+              'flex items-start gap-1 px-2 py-1.5',
+              'rounded-md overflow-clip',
+              'text-sm font-normal text-text-primary text-left',
+              'bg-transparent',
+              'hover:bg-gray-100',
+              'transition-colors',
+            )}
+            role='menuitem'
+          >
+            <div className='flex flex-1 gap-2 items-start'>
+              <div className='flex flex-1 flex-col items-start'>
+                <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
+                  <p className='leading-5 whitespace-pre-wrap'>{field.label}</p>
                 </div>
               </div>
-            </button>
-          ))
-        ) : (
-          <div className='px-2 py-4 text-center text-sm text-text-secondary'>No fields found</div>
+            </div>
+          </button>
+        ))}
+
+        {/* Separator before AND/OR */}
+        <div className='flex flex-col gap-2 items-center justify-center overflow-clip px-2 py-1'>
+          <div className='border-t border-border-primary h-px w-full' />
+        </div>
+
+        {/* AND operator */}
+        {onSelectAnd && (
+          <button
+            type='button'
+            onClick={handleSelectAnd}
+            className={cn(
+              'flex items-start gap-1 px-2 py-1.5',
+              'rounded-md overflow-clip',
+              'text-left bg-transparent',
+              'hover:bg-gray-100',
+              'transition-colors',
+            )}
+            role='menuitem'
+          >
+            <div className='flex flex-1 gap-2 items-start'>
+              <div className='flex items-center pt-0.5 w-4'>
+                <CirclePlus className='h-4 w-4 text-text-primary' />
+              </div>
+              <div className='flex flex-1 flex-col items-start'>
+                <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
+                  <p className='leading-5 whitespace-pre-wrap'>AND</p>
+                </div>
+              </div>
+            </div>
+          </button>
+        )}
+
+        {/* OR operator */}
+        {onSelectOr && (
+          <button
+            type='button'
+            onClick={handleSelectOr}
+            className={cn(
+              'flex items-start gap-1 px-2 py-1.5',
+              'rounded-md overflow-clip',
+              'text-left bg-transparent',
+              'hover:bg-gray-100',
+              'transition-colors',
+            )}
+            role='menuitem'
+          >
+            <div className='flex flex-1 gap-2 items-start'>
+              <div className='flex items-center pt-0.5 w-4'>
+                <CircleSlash className='h-4 w-4 text-text-primary' />
+              </div>
+              <div className='flex flex-1 flex-col items-start'>
+                <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
+                  <p className='leading-5 whitespace-pre-wrap'>OR</p>
+                </div>
+              </div>
+            </div>
+          </button>
         )}
       </div>
 
-      {/* Keyboard navigation hints */}
-      <div className='border-t border-border-primary pt-2 mt-1'>
-        <div className='flex items-center gap-4 px-2'>
-          <div className='flex items-center gap-1'>
-            <kbd className='inline-flex items-center justify-center h-5 min-w-[20px] px-1 bg-white border border-border-secondary rounded text-xs text-text-secondary'>
-              ↑
-            </kbd>
-            <kbd className='inline-flex items-center justify-center h-5 min-w-[20px] px-1 bg-white border border-border-secondary rounded text-xs text-text-secondary'>
-              ↓
-            </kbd>
-            <span className='text-xs font-medium text-text-secondary ml-1'>to navigate</span>
+      {/* Keyboard navigation hints footer */}
+      <div className='relative h-8 w-full'>
+        {/* Top border */}
+        <div className='absolute h-px left-0 right-0 top-[5px] border-t border-border-primary' />
+
+        {/* Navigation hints */}
+        <div className='absolute flex gap-1 items-center left-0 top-[12px]'>
+          <div className='flex gap-0.5 items-center'>
+            {/* Arrow keys placeholders - using text for now */}
+            <span className='text-xs font-medium text-text-secondary'>↑ ↓</span>
           </div>
-          <div className='flex items-center gap-1'>
-            <kbd className='inline-flex items-center justify-center h-5 min-w-[20px] px-1 bg-white border border-border-secondary rounded text-xs text-text-secondary'>
-              ↵
-            </kbd>
-            <span className='text-xs font-medium text-text-secondary ml-1'>to select</span>
+          <div className='flex flex-col justify-center leading-none text-xs font-medium text-text-secondary text-right whitespace-nowrap'>
+            <p className='leading-4'>to navigate</p>
+          </div>
+        </div>
+
+        {/* Select hint */}
+        <div className='absolute flex gap-1 items-center left-32 top-[12px]'>
+          <div className='flex gap-0.5 items-center'>
+            {/* Enter key placeholder */}
+            <span className='text-xs font-medium text-text-secondary'>↵</span>
+          </div>
+          <div className='flex flex-col justify-center leading-none text-xs font-medium text-text-secondary text-right whitespace-nowrap'>
+            <p className='leading-4'>to select</p>
           </div>
         </div>
       </div>
