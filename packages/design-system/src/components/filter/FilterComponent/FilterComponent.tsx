@@ -2,9 +2,11 @@ import type { FC, KeyboardEvent, ChangeEvent } from 'react';
 import { useCallback, useEffect, useState, useRef } from 'react';
 import { FilterField } from '../FilterField';
 import { FilterMainMenu } from '../FilterMainMenu';
+import { FilterOperatorMenu } from '../FilterOperatorMenu';
+import { FilterValueMenu } from '../FilterValueMenu';
 import { SegmentAttribute, SegmentOperator, SegmentValue } from '../segments';
 import type { Condition, ExprNode, FieldMetadata, FilterChipData, FilterOperator } from '../types';
-import { getOperatorLabel } from '../types';
+import { getOperatorLabel, OPERATORS_BY_TYPE } from '../types';
 import { parse } from './parser';
 
 /**
@@ -97,6 +99,11 @@ export const FilterComponent: FC<FilterComponentProps> = ({
 
   // Dropdown visibility state
   const [showFieldMenu, setShowFieldMenu] = useState(false);
+  const [showOperatorMenu, setShowOperatorMenu] = useState(false);
+  const [showValueMenu, setShowValueMenu] = useState(false);
+
+  // Current field being edited (for operator/value menus)
+  const [currentField, setCurrentField] = useState<FieldMetadata | null>(null);
 
   // Sync controlled value to internal state
   useEffect(() => {
@@ -157,31 +164,129 @@ export const FilterComponent: FC<FilterComponentProps> = ({
   );
 
   /**
+   * Determine what the user is currently typing based on input analysis
+   */
+  const analyzeInput = useCallback(
+    (text: string) => {
+      const trimmed = text.trim();
+      if (!trimmed) {
+        return { context: 'field' as const, field: null, hasOperator: false, hasValue: false };
+      }
+
+      // Try to match a field name
+      const matchedField = fields.find(f => trimmed.startsWith(f.name));
+      if (!matchedField) {
+        return { context: 'field' as const, field: null, hasOperator: false, hasValue: false };
+      }
+
+      // Check if there's text after the field name
+      const afterField = trimmed.slice(matchedField.name.length).trim();
+      if (!afterField) {
+        return {
+          context: 'field' as const,
+          field: matchedField,
+          hasOperator: false,
+          hasValue: false,
+        };
+      }
+
+      // Check if there's an operator
+      const operators = ['>=', '<=', '!=', '=', '>', '<', 'like', 'not_like'];
+      let foundOp = null;
+      for (const op of operators) {
+        if (afterField.startsWith(op)) {
+          foundOp = op;
+          break;
+        }
+      }
+
+      if (!foundOp) {
+        return {
+          context: 'operator' as const,
+          field: matchedField,
+          hasOperator: false,
+          hasValue: false,
+        };
+      }
+
+      // Check if there's text after operator
+      const afterOp = afterField.slice(foundOp.length).trim();
+      if (!afterOp) {
+        return {
+          context: 'value' as const,
+          field: matchedField,
+          hasOperator: true,
+          hasValue: false,
+        };
+      }
+
+      return {
+        context: 'value' as const,
+        field: matchedField,
+        hasOperator: true,
+        hasValue: true,
+      };
+    },
+    [fields],
+  );
+
+  /**
    * Handle input text change
    */
   const handleInputChange = useCallback(
     (text: string) => {
-      const { expression, chips } = parseInput(text);
+      const parseResult = parse(text);
+      const { expression, isComplete } = parseResult;
+
+      // If expression is complete, create chip and clear input
+      if (isComplete && expression) {
+        const chips = expressionToChips(expression);
+        setState(prev => ({
+          ...prev,
+          inputText: '',
+          expression,
+          chips,
+          editingContext: null,
+        }));
+        setShowFieldMenu(false);
+        setShowOperatorMenu(false);
+        setShowValueMenu(false);
+        setCurrentField(null);
+        onChange?.(expression, chips);
+        return;
+      }
+
+      // Analyze what user is typing
+      const analysis = analyzeInput(text);
 
       setState(prev => ({
         ...prev,
         inputText: text,
-        expression,
-        chips,
-        editingContext: text.trim() === '' || !expression ? 'field' : null,
+        expression: null,
+        editingContext: analysis.context,
       }));
 
-      // Show field menu when typing and no complete expression yet
-      if (text.trim() !== '' && !expression) {
-        setShowFieldMenu(true);
-      } else {
+      // Show appropriate menu based on context
+      if (analysis.context === 'field') {
+        setShowFieldMenu(text.trim() !== '');
+        setShowOperatorMenu(false);
+        setShowValueMenu(false);
+        setCurrentField(analysis.field);
+      } else if (analysis.context === 'operator') {
         setShowFieldMenu(false);
+        setShowOperatorMenu(true);
+        setShowValueMenu(false);
+        setCurrentField(analysis.field);
+      } else if (analysis.context === 'value') {
+        setShowFieldMenu(false);
+        setShowOperatorMenu(false);
+        setShowValueMenu(true);
+        setCurrentField(analysis.field);
       }
 
-      // Emit onChange event
-      onChange?.(expression, chips);
+      onChange?.(null, state.chips);
     },
-    [parseInput, onChange],
+    [parse, parseInput, expressionToChips, analyzeInput, onChange, state.chips],
   );
 
   /**
@@ -261,13 +366,48 @@ export const FilterComponent: FC<FilterComponentProps> = ({
     (field: FieldMetadata) => {
       // Update input text with selected field name + space for operator
       const newText = `${field.name} `;
+      setCurrentField(field);
       handleInputChange(newText);
-      setShowFieldMenu(false);
 
       // Focus back on input
       inputRef.current?.focus();
     },
     [handleInputChange],
+  );
+
+  /**
+   * Handle operator selection from FilterOperatorMenu
+   */
+  const handleOperatorSelect = useCallback(
+    (operator: FilterOperator) => {
+      if (!currentField) return;
+
+      // Update input text with field + operator + space for value
+      const newText = `${currentField.name} ${operator} `;
+      handleInputChange(newText);
+
+      // Focus back on input
+      inputRef.current?.focus();
+    },
+    [currentField, handleInputChange],
+  );
+
+  /**
+   * Handle value selection from FilterValueMenu
+   */
+  const handleValueSelect = useCallback(
+    (value: string | number | boolean) => {
+      if (!currentField) return;
+
+      // Get the current input and append the value
+      // This will complete the expression
+      const newText = `${state.inputText}${value}`;
+      handleInputChange(newText);
+
+      // Focus back on input
+      inputRef.current?.focus();
+    },
+    [currentField, state.inputText, handleInputChange],
   );
 
   /**
@@ -372,6 +512,31 @@ export const FilterComponent: FC<FilterComponentProps> = ({
             onSelect={handleFieldSelect}
             open={showFieldMenu}
             onOpenChange={setShowFieldMenu}
+          />
+        </div>
+      )}
+
+      {/* FilterOperatorMenu dropdown */}
+      {showOperatorMenu && currentField && (
+        <div className='absolute top-full left-0 mt-1 z-50'>
+          <FilterOperatorMenu
+            fieldType={currentField.type}
+            selectedOperator={undefined}
+            onSelect={handleOperatorSelect}
+            open={showOperatorMenu}
+            onOpenChange={setShowOperatorMenu}
+          />
+        </div>
+      )}
+
+      {/* FilterValueMenu dropdown */}
+      {showValueMenu && currentField && currentField.values && currentField.values.length > 0 && (
+        <div className='absolute top-full left-0 mt-1 z-50'>
+          <FilterValueMenu
+            values={currentField.values}
+            onSelect={handleValueSelect}
+            open={showValueMenu}
+            onOpenChange={setShowValueMenu}
           />
         </div>
       )}

@@ -21,12 +21,24 @@ const mockFields: FieldMetadata[] = [
     label: 'Status',
     type: 'enum',
     operators: ['=', '!=', 'in', 'not_in'],
+    values: [
+      { value: 'active', label: 'Active' },
+      { value: 'pending', label: 'Pending' },
+      { value: 'closed', label: 'Closed' },
+    ],
   },
   {
     name: 'priority',
     label: 'Priority',
     type: 'integer',
     operators: ['=', '!=', '>', '<', '>=', '<='],
+    values: [
+      { value: 1, label: '1 - Low' },
+      { value: 2, label: '2' },
+      { value: 3, label: '3 - Medium' },
+      { value: 4, label: '4' },
+      { value: 5, label: '5 - High' },
+    ],
   },
   {
     name: 'title',
@@ -45,6 +57,10 @@ const mockFields: FieldMetadata[] = [
     label: 'Active',
     type: 'boolean',
     operators: ['=', '!='],
+    values: [
+      { value: true, label: 'True' },
+      { value: false, label: 'False' },
+    ],
   },
 ];
 

@@ -13,6 +13,7 @@ export type {
   ExprNode,
   FieldMetadata,
   FieldType,
+  FieldValueOption,
   FilterChipData,
   FilterChipVariant,
   FilterOperator,

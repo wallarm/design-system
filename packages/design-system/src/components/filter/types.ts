@@ -39,6 +39,15 @@ export type FilterOperator =
   | 'between';
 
 /**
+ * Value option for enum/select fields
+ */
+export interface FieldValueOption {
+  value: string | number | boolean;
+  label: string;
+  badge?: { color: string; text: string };
+}
+
+/**
  * Field Metadata Interface
  * Matches backend structure for field definitions
  */
@@ -49,6 +58,7 @@ export interface FieldMetadata {
   description?: string;
   operators?: FilterOperator[];
   default?: string | number | boolean;
+  values?: FieldValueOption[];
 }
 
 /**
