@@ -47,96 +47,90 @@ export const FilterChip: FC<FilterChipProps> = ({
   // Always call hooks at the top level (even if not used for all variants)
   const [isHovered, setIsHovered] = useState(false);
 
-  // Render AND variant
-  if (variant === 'and') {
+  // Helper function for rendering operator/parenthesis variants
+  const renderOperatorChip = (content: string) => {
     return (
       <div
         className={cn(
           // Layout
-          'flex items-center justify-center px-2 py-0',
-          'min-h-[20px]',
+          'relative flex items-center justify-center px-1 py-0',
+          'min-h-[20px] max-w-[320px]',
           // Border & Background
           'border border-solid rounded-lg',
-          'bg-badge-badge-bg border-border-primary',
-          // Typography
-          'text-text-secondary text-sm font-normal leading-5',
+          error
+            ? 'bg-bg-light-danger border-border-danger'
+            : 'bg-badge-badge-bg border-border-primary',
           className,
         )}
         data-slot='filter-chip'
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         {...props}
       >
-        AND
+        {/* Text content with proper structure */}
+        <div className='flex flex-col justify-center leading-none overflow-hidden text-ellipsis whitespace-nowrap p-0.5'>
+          <p
+            className={cn(
+              'text-sm font-normal leading-5 overflow-hidden text-ellipsis',
+              error ? 'text-text-danger' : 'text-text-secondary',
+            )}
+          >
+            {content}
+          </p>
+        </div>
+
+        {/* Delete button - shown on hover */}
+        {isHovered && onRemove && (
+          <button
+            type='button'
+            onClick={e => {
+              e.stopPropagation();
+              onRemove();
+            }}
+            className={cn(
+              // Position
+              'absolute -right-3 top-[-1px]',
+              // Layout
+              'flex items-center justify-center',
+              'h-full w-[18px]',
+              // Border & Background
+              'border border-solid',
+              'border-l-0',
+              error ? 'border-border-danger' : 'border-border-primary',
+              'rounded-r-lg',
+              // Background color
+              error ? 'bg-bg-light-danger' : 'bg-badge-badge-bg',
+              // Text color
+              error ? 'text-text-danger' : 'text-text-secondary',
+            )}
+            data-slot='filter-chip-delete'
+            aria-label='Remove filter'
+          >
+            <X className='h-3 w-3' />
+          </button>
+        )}
       </div>
     );
+  };
+
+  // Render AND variant
+  if (variant === 'and') {
+    return renderOperatorChip('AND');
   }
 
   // Render OR variant
   if (variant === 'or') {
-    return (
-      <div
-        className={cn(
-          // Layout
-          'flex items-center justify-center px-2 py-0',
-          'min-h-[20px]',
-          // Border & Background
-          'border border-solid rounded-lg',
-          'bg-badge-badge-bg border-border-primary',
-          // Typography
-          'text-text-secondary text-sm font-normal leading-5',
-          className,
-        )}
-        data-slot='filter-chip'
-        {...props}
-      >
-        OR
-      </div>
-    );
+    return renderOperatorChip('OR');
   }
 
   // Render opening parenthesis variant
   if (variant === '(') {
-    return (
-      <div
-        className={cn(
-          // Layout
-          'flex items-center justify-center px-2 py-0',
-          'min-h-[20px]',
-          // Border & Background
-          'border border-solid rounded-lg',
-          'bg-badge-badge-bg border-border-primary',
-          // Typography
-          'text-text-secondary text-sm font-normal',
-          className,
-        )}
-        data-slot='filter-chip'
-        {...props}
-      >
-        (
-      </div>
-    );
+    return renderOperatorChip('(');
   }
 
   // Render closing parenthesis variant
   if (variant === ')') {
-    return (
-      <div
-        className={cn(
-          // Layout
-          'flex items-center justify-center px-2 py-0',
-          'min-h-[20px]',
-          // Border & Background
-          'border border-solid rounded-lg',
-          'bg-badge-badge-bg border-border-primary',
-          // Typography
-          'text-text-secondary text-sm font-normal',
-          className,
-        )}
-        data-slot='filter-chip'
-        {...props}
-      >
-        )
-      </div>
-    );
+    return renderOperatorChip(')');
   }
 
   // Render chip variant
