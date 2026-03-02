@@ -13,12 +13,14 @@ import { dropdownMenuClassNames } from './classes';
 
 interface DropdownMenuContentProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
+  footer?: ReactNode;
   ref?: Ref<HTMLDivElement>;
 }
 
 export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
   className,
   children,
+  footer,
   ref,
   ...props
 }) => (
@@ -30,6 +32,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
           dropdownMenuClassNames,
           'max-h-(--available-height)',
           'origin-[--transform-origin]',
+          footer && '!overflow-y-hidden',
           className,
         )}
         {...props}
@@ -41,6 +44,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
           <ScrollAreaScrollbar />
           <ScrollAreaCorner />
         </ScrollArea>
+        {footer}
       </Menu.Content>
     </Menu.Positioner>
   </Portal>
