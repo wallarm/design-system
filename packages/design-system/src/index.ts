@@ -84,6 +84,29 @@ export {
   FieldTitle,
 } from './components/Field';
 export { Flex, type FlexProps } from './components/Flex';
+export {
+  type Condition,
+  type ExprNode,
+  type FieldMetadata,
+  type FieldType,
+  FilterChip,
+  type FilterChipData,
+  type FilterChipProps,
+  type FilterChipVariant,
+  FilterField,
+  type FilterFieldProps,
+  FilterMainMenu,
+  type FilterMainMenuProps,
+  type FilterOperator,
+  FilterOperatorMenu,
+  type FilterOperatorMenuProps,
+  type Group,
+  OPERATOR_LABELS,
+  OPERATORS_BY_TYPE,
+  SegmentAttribute,
+  SegmentOperator,
+  SegmentValue,
+} from './components/filter';
 export { Heading, type HeadingProps } from './components/Heading';
 export { Input, type InputProps } from './components/Input';
 export {
