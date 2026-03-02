@@ -21,10 +21,10 @@ interface DateTimeBaseProps {
   description?: ReactNode;
   /** Show seconds in tooltip absolute time. Default: true */
   showSeconds?: boolean;
-  ref?: Ref<HTMLSpanElement>;
+  ref?: Ref<HTMLTimeElement>;
 }
 
-type DateTimeNativeProps = Omit<HTMLAttributes<HTMLSpanElement>, 'className'>;
+type DateTimeNativeProps = Omit<HTMLAttributes<HTMLTimeElement>, 'className'>;
 
 export type DateTimeProps = DateTimeNativeProps & DateTimeBaseProps;
 
@@ -46,11 +46,11 @@ export const DateTime: FC<DateTimeProps> = ({
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <span ref={ref} data-slot='datetime' {...props}>
+          <time ref={ref} data-slot='datetime' {...props}>
             <Text size='sm' color='secondary'>
               —
             </Text>
-          </span>
+          </time>
         </TooltipTrigger>
         <TooltipContent>No data</TooltipContent>
       </Tooltip>
@@ -61,11 +61,11 @@ export const DateTime: FC<DateTimeProps> = ({
 
   if (!isValid(date)) {
     return (
-      <span ref={ref} data-slot='datetime' {...props}>
+      <time ref={ref} data-slot='datetime' {...props}>
         <Text size='sm' color='secondary'>
           —
         </Text>
-      </span>
+      </time>
     );
   }
 
