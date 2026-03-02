@@ -109,7 +109,7 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
       aria-sort={ariaSort}
       {...(canDnd ? { ...listeners, ...attributes } : {})}
       tabIndex={-1}
-      onMouseDown={(e) => {
+      onMouseDown={e => {
         const target = e.target as HTMLElement;
         if (!target.closest('button')) {
           e.preventDefault();

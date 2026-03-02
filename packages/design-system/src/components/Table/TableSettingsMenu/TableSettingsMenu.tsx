@@ -186,13 +186,21 @@ export const TableSettingsMenu: FC = () => {
                         {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
 
                         {pinnedColumns.map(col => (
-                          <TableSettingsMenuItem key={col.id} column={col} canDrag={columnDndEnabled} />
+                          <TableSettingsMenuItem
+                            key={col.id}
+                            column={col}
+                            canDrag={columnDndEnabled}
+                          />
                         ))}
 
                         {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
 
                         {unpinnedColumns.map(col => (
-                          <TableSettingsMenuItem key={col.id} column={col} canDrag={columnDndEnabled} />
+                          <TableSettingsMenuItem
+                            key={col.id}
+                            column={col}
+                            canDrag={columnDndEnabled}
+                          />
                         ))}
                       </SortableContext>
                     </DndContext>
