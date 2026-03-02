@@ -96,7 +96,12 @@ export const FilterField: FC<FilterFieldProps> = ({
       {...props}
     >
       {/* Left side: icon and chips/placeholder */}
-      <div className='flex flex-1 items-center gap-2 px-3'>
+      <div
+        className={cn(
+          'flex flex-1 items-center gap-2 pr-1',
+          hasChips ? 'pl-2' : 'pl-3', // 8px when filled, 12px when empty (Figma spec)
+        )}
+      >
         {leftIcon && <div className='shrink-0'>{leftIcon}</div>}
 
         {hasChips ? (
