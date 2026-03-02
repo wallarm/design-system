@@ -1,3 +1,4 @@
+import * as React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
 import type { FilterChipProps } from './FilterChip';
 import { FilterChip } from './FilterChip';
@@ -152,3 +153,58 @@ export const CombinedWithParentheses: StoryFn<typeof meta> = () => (
     <FilterChip variant='chip' attribute='Country' operator='is' value='US' />
   </div>
 );
+
+/**
+ * Chip with delete button (hover to see delete button)
+ */
+export const WithDeleteButton = Template.bind({});
+WithDeleteButton.args = {
+  variant: 'chip',
+  attribute: 'IP Address',
+  operator: 'is',
+  value: '192.168.1.1',
+  error: false,
+  onRemove: () => alert('Filter removed'),
+};
+
+/**
+ * Error state with delete button (hover to see delete button)
+ */
+export const ErrorWithDelete = Template.bind({});
+ErrorWithDelete.args = {
+  variant: 'chip',
+  attribute: 'Invalid Field',
+  operator: 'is',
+  value: 'Invalid Value',
+  error: true,
+  onRemove: () => alert('Filter removed'),
+};
+
+/**
+ * Interactive example showing multiple chips with delete functionality
+ */
+export const InteractiveDeleteExample: StoryFn<typeof meta> = () => {
+  const [chips, setChips] = React.useState([
+    { id: 1, attribute: 'IP Address', operator: 'is', value: '192.168.1.1' },
+    { id: 2, attribute: 'Country', operator: 'is', value: 'US' },
+    { id: 3, attribute: 'Status', operator: 'is', value: 'Active' },
+  ]);
+
+  return (
+    <div className='flex items-center gap-1 flex-wrap'>
+      {chips.map((chip, index) => (
+        <React.Fragment key={chip.id}>
+          {index > 0 && <FilterChip variant='and' />}
+          <FilterChip
+            variant='chip'
+            attribute={chip.attribute}
+            operator={chip.operator}
+            value={chip.value}
+            onRemove={() => setChips(chips.filter(c => c.id !== chip.id))}
+          />
+        </React.Fragment>
+      ))}
+      {chips.length === 0 && <p className='text-text-secondary text-sm'>All filters removed</p>}
+    </div>
+  );
+};
