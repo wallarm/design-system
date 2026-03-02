@@ -173,5 +173,27 @@ export const Interactive: Story = {
   },
 };
 
+/**
+ * Example demonstrating search functionality
+ * Try typing "status", "HTTP", or "CWE" in the search field
+ */
+export const WithSearch: Story = {
+  args: {
+    fields: sampleFields,
+    open: true,
+    onSelect: () => {
+      // Field selection handler
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'The search input filters fields by label and name (case-insensitive). Try searching for "status" to see fields with "status" in their name or label.',
+      },
+    },
+  },
+};
+
 // Import React for the Interactive story
 import React from 'react';
