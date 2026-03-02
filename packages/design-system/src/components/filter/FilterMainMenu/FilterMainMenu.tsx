@@ -160,7 +160,7 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
         case 'Enter':
           e.preventDefault();
           if (activeIndex >= 0 && activeIndex < totalItems) {
-            navigableItems[activeIndex].handler();
+            navigableItems[activeIndex]?.handler();
           }
           break;
         case 'Escape':
@@ -234,7 +234,9 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
               return (
                 <button
                   key={`recent-${index}`}
-                  ref={el => (itemRefs.current[currentIndex] = el)}
+                  ref={el => {
+                    itemRefs.current[currentIndex] = el;
+                  }}
                   type='button'
                   onClick={() => fieldMeta && handleSelect(fieldMeta)}
                   className={cn(
@@ -293,7 +295,9 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
               return (
                 <button
                   key={`suggested-${index}`}
-                  ref={el => (itemRefs.current[currentIndex] = el)}
+                  ref={el => {
+                    itemRefs.current[currentIndex] = el;
+                  }}
                   type='button'
                   onClick={() => handleSelect(field)}
                   className={cn(
@@ -349,7 +353,9 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
           return (
             <button
               key={field.name}
-              ref={el => (itemRefs.current[currentIndex] = el)}
+              ref={el => {
+                itemRefs.current[currentIndex] = el;
+              }}
               type='button'
               onClick={() => handleSelect(field)}
               className={cn(
@@ -387,7 +393,9 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
 
           return (
             <button
-              ref={el => (itemRefs.current[currentIndex] = el)}
+              ref={el => {
+                itemRefs.current[currentIndex] = el;
+              }}
               type='button'
               onClick={handleSelectAnd}
               className={cn(
@@ -421,7 +429,9 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
 
           return (
             <button
-              ref={el => (itemRefs.current[currentIndex] = el)}
+              ref={el => {
+                itemRefs.current[currentIndex] = el;
+              }}
               type='button'
               onClick={handleSelectOr}
               className={cn(
