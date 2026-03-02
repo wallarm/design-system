@@ -24,6 +24,7 @@ import {
 } from '../OverflowTooltip';
 import { HStack } from '../Stack';
 import { Text } from '../Text';
+import type { SourceKey } from '../IpAddress';
 import { createTableColumnHelper } from './lib';
 import type { TableColumnDef } from './types';
 
@@ -292,7 +293,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
           {
             ip: row.original.sourceIp,
             country: row.original.sourceCountry,
-            sources: [row.original.sourceProvider],
+            sources: [row.original.sourceProvider as SourceKey],
           },
         ]}
       />
@@ -481,7 +482,7 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
           {
             ip: row.original.ip,
             country: row.original.ipCountry,
-            sources: row.original.provider ? [row.original.provider] : undefined,
+            sources: row.original.provider ? [row.original.provider as SourceKey] : undefined,
           },
         ]}
       />
@@ -700,7 +701,7 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
                 {
                   ip: row.original.ip,
                   country: row.original.ipCountry,
-                  sources: row.original.provider ? [row.original.provider] : undefined,
+                  sources: row.original.provider ? [row.original.provider as SourceKey] : undefined,
                 },
               ]}
             />

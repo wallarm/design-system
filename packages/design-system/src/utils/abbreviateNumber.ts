@@ -1,8 +1,16 @@
-const suffixes = ['', 'k', 'm', 'b', 't'] as const;
-
-// Lower bounds for each suffix bucket.
-// 999,500 rounds to 1m (not 999.5k), while 999,499 stays 999k.
-const thresholds = [0, 1_000, 999_500, 999_500_000, 999_500_000_000];
+/**
+ * Suffix tiers: [minAbsValue, divisor, suffix].
+ * Sorted descending so the first match wins.
+ *
+ * Boundaries use "rounding-aware" thresholds:
+ * 999,500 rounds to 1m (not 999.5k), 999,499 stays 999k.
+ */
+const tiers: [threshold: number, divisor: number, suffix: string][] = [
+  [999_500_000_000, 1e12, 't'],
+  [999_500_000, 1e9, 'b'],
+  [999_500, 1e6, 'm'],
+  [1_000, 1e3, 'k'],
+];
 
 const fullFormatter = new Intl.NumberFormat('en-US');
 
@@ -21,28 +29,21 @@ export const abbreviateNumber = (value: number): string => {
   const sign = value < 0 ? '-' : '';
   const abs = Math.abs(value);
 
-  if (abs < 1000) return String(value);
+  if (abs < 1_000) return String(value);
 
-  // Find the right suffix bucket
-  let i = thresholds.length - 1;
-  while (i > 0 && abs < thresholds[i]) {
-    i--;
-  }
+  const tier = tiers.find(([threshold]) => abs >= threshold);
 
-  const divisor = 10 ** (i * 3);
-  let scaled = abs / divisor;
+  if (!tier) return String(value);
 
-  // Determine decimal precision based on the abbreviated value
+  const [, divisor, suffix] = tier;
+  const scaled = abs / divisor;
+
+  // ≥100 → 0 decimals; <100 → 1 decimal (drop trailing .0)
   const precision = scaled >= 100 ? 0 : 1;
+  const rounded = Math.round(scaled * 10 ** precision) / 10 ** precision;
+  const formatted = rounded % 1 === 0 ? String(rounded) : rounded.toFixed(1);
 
-  // Round to the chosen precision
-  const factor = 10 ** precision;
-  scaled = Math.round(scaled * factor) / factor;
-
-  // Drop trailing .0
-  const formatted = scaled % 1 === 0 ? String(Math.round(scaled)) : scaled.toFixed(1);
-
-  return `${sign}${formatted}${suffixes[i]}`;
+  return `${sign}${formatted}${suffix}`;
 };
 
 /**
