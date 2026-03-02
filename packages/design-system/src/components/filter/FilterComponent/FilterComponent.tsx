@@ -1,7 +1,9 @@
 import type { FC } from 'react';
 import { useCallback, useEffect, useState } from 'react';
 import { FilterField } from '../FilterField';
-import type { Condition, ExprNode, FieldMetadata, FilterChipData } from '../types';
+import { SegmentAttribute, SegmentOperator, SegmentValue } from '../segments';
+import type { Condition, ExprNode, FieldMetadata, FilterChipData, FilterOperator } from '../types';
+import { getOperatorLabel } from '../types';
 import { parse } from './parser';
 
 /**
@@ -227,16 +229,42 @@ export const FilterComponent: FC<FilterComponentProps> = ({
     }
   }, [state.inputText]);
 
+  /**
+   * Get field type for a field name
+   * TODO: This will use the fields prop metadata in future stories
+   */
+  const getFieldType = useCallback(
+    (fieldName: string) => {
+      const field = fields.find(f => f.name === fieldName);
+      return field?.type ?? 'string';
+    },
+    [fields],
+  );
+
   return (
     <FilterField
-      chips={state.chips.map(chip => ({
-        id: chip.id,
-        content: (
-          <div className='px-2 py-1 text-sm'>
-            {chip.attribute} {chip.operator} {chip.value}
-          </div>
-        ),
-      }))}
+      chips={state.chips.map(chip => {
+        if (!chip.attribute || !chip.operator) {
+          return {
+            id: chip.id,
+            content: null,
+          };
+        }
+
+        const fieldType = getFieldType(chip.attribute);
+        const operatorLabel = getOperatorLabel(chip.operator as FilterOperator, fieldType);
+
+        return {
+          id: chip.id,
+          content: (
+            <>
+              <SegmentAttribute>{chip.attribute}</SegmentAttribute>
+              <SegmentOperator>{operatorLabel}</SegmentOperator>
+              <SegmentValue>{chip.value ?? ''}</SegmentValue>
+            </>
+          ),
+        };
+      })}
       placeholder={placeholder}
       showKeyboardHint={showKeyboardHint}
       onChipRemove={handleChipRemove}
