@@ -55,6 +55,8 @@ export const FilterField: FC<FilterFieldProps> = ({
   ...props
 }) => {
   const hasChips = chips.length > 0;
+  const visibleChips = chips.slice(0, 3);
+  const hasMoreChips = chips.length > 3;
 
   return (
     <div
@@ -70,7 +72,8 @@ export const FilterField: FC<FilterFieldProps> = ({
           'focus-within:border-border-strong-danger focus-within:shadow-focus-ring-destructive',
         className,
       )}
-      role="textbox"
+      role='textbox'
+      tabIndex={0}
       aria-invalid={error}
       onFocus={onFocus}
       onBlur={onBlur}
@@ -83,11 +86,14 @@ export const FilterField: FC<FilterFieldProps> = ({
 
         {hasChips ? (
           <div className='flex items-center gap-1'>
-            {chips.map(chip => (
+            {visibleChips.map(chip => (
               <div key={chip.id} className='shrink-0'>
                 {chip.content}
               </div>
             ))}
+            {hasMoreChips && (
+              <p className='pl-1 text-sm leading-5 text-text-secondary'>{placeholder}</p>
+            )}
           </div>
         ) : (
           <p className='text-sm leading-5 text-text-secondary'>{placeholder}</p>

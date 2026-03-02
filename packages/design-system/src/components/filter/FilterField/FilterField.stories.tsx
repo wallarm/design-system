@@ -1,3 +1,4 @@
+import React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
 import { Search } from '../../../icons/Search';
 import { FilterChip } from '../FilterChip';
@@ -129,9 +130,33 @@ export const WithMultipleChips: Story = {
 };
 
 /**
- * Field with three chips (max visible before showing placeholder hint).
+ * Field with exactly three chips (max visible).
  */
-export const WithThreeChips: Story = {
+export const WithExactlyThreeChips: Story = {
+  args: {
+    placeholder: 'Search [object]...',
+    leftIcon: <Search className='size-6 text-text-secondary' />,
+    chips: [
+      {
+        id: '1',
+        content: <FilterChip variant='chip' attribute='IP' operator='is' value='192.168.1.1' />,
+      },
+      {
+        id: '2',
+        content: <FilterChip variant='and' />,
+      },
+      {
+        id: '3',
+        content: <FilterChip variant='chip' attribute='Country' operator='is' value='US' />,
+      },
+    ],
+  },
+};
+
+/**
+ * Field with more than three chips - shows first 3 + placeholder hint.
+ */
+export const WithMoreThanThreeChips: Story = {
   args: {
     placeholder: 'Search [object]...',
     leftIcon: <Search className='size-6 text-text-secondary' />,
@@ -187,6 +212,56 @@ export const ErrorWithChips: Story = {
 };
 
 /**
+ * Interactive example with chip removal.
+ */
+export const InteractiveWithRemoval: Story = {
+  render: () => {
+    const [chips, setChips] = React.useState([
+      { id: '1', variant: 'chip' as const, attribute: 'IP', operator: 'is', value: '192.168.1.1' },
+      { id: '2', variant: 'and' as const },
+      { id: '3', variant: 'chip' as const, attribute: 'Country', operator: 'is', value: 'US' },
+      { id: '4', variant: 'and' as const },
+      { id: '5', variant: 'chip' as const, attribute: 'Status', operator: 'is', value: 'Active' },
+    ]);
+
+    const handleChipRemove = (chipId: string) => {
+      setChips(chips.filter(c => c.id !== chipId));
+    };
+
+    const handleClear = () => {
+      setChips([]);
+    };
+
+    return (
+      <div className='space-y-4'>
+        <FilterField
+          placeholder='Search attacks...'
+          leftIcon={<Search className='size-6 text-text-secondary' />}
+          showKeyboardHint
+          chips={chips.map(chip => ({
+            id: chip.id,
+            content: (
+              <FilterChip
+                variant={chip.variant}
+                attribute={chip.attribute}
+                operator={chip.operator}
+                value={chip.value}
+                onRemove={chip.variant === 'chip' ? () => handleChipRemove(chip.id) : undefined}
+              />
+            ),
+          }))}
+          onChipRemove={handleChipRemove}
+          onClear={handleClear}
+        />
+        <p className='text-sm text-text-secondary'>
+          Total chips: {chips.length}, Visible: {Math.min(chips.length, 3)}
+        </p>
+      </div>
+    );
+  },
+};
+
+/**
  * Interactive example with all features.
  */
 export const Interactive: Story = {
@@ -207,7 +282,7 @@ export const Interactive: Story = {
                   attribute='IP'
                   operator='is'
                   value='192.168.1.1'
-                  onRemove={() => console.log('Remove chip 1')}
+                  onRemove={() => {}}
                 />
               ),
             },
@@ -223,13 +298,13 @@ export const Interactive: Story = {
                   attribute='Country'
                   operator='is not'
                   value='US'
-                  onRemove={() => console.log('Remove chip 3')}
+                  onRemove={() => {}}
                 />
               ),
             },
           ]}
-          onChipRemove={chipId => console.log('Remove chip:', chipId)}
-          onClear={() => console.log('Clear all')}
+          onChipRemove={_chipId => {}}
+          onClear={() => {}}
         />
       </div>
     );
