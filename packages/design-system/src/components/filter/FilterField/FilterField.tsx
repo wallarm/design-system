@@ -1,4 +1,5 @@
 import type { FC, FocusEvent, HTMLAttributes, ReactNode } from 'react';
+import { X } from '../../../icons/X';
 import { cn } from '../../../utils/cn';
 
 export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -64,12 +65,16 @@ export const FilterField: FC<FilterFieldProps> = ({
         // Base styles
         'relative flex h-10 w-full max-w-[800px] items-center overflow-clip rounded-lg',
         'border border-border-primary bg-component-input-bg shadow-xs',
+        // Hover styles
+        !error && 'hover:border-component-border-input-hover',
+        error && 'hover:shadow-[0px_0px_0px_3px_rgba(231,0,11,0.3)]',
         // Focus styles
-        'focus-within:border-border-strong-primary focus-within:shadow-focus-ring-primary',
+        !error &&
+          'focus-within:border-border-strong-primary focus-within:shadow-focus-ring-primary',
         // Error styles
         error && 'border-border-strong-danger',
         error &&
-          'focus-within:border-border-strong-danger focus-within:shadow-focus-ring-destructive',
+          'focus-within:border-border-strong-danger focus-within:shadow-[0px_0px_0px_3px_rgba(231,0,11,0.2)]',
         className,
       )}
       role='textbox'
@@ -111,6 +116,16 @@ export const FilterField: FC<FilterFieldProps> = ({
               K
             </kbd>
           </div>
+        )}
+        {hasChips && onClear && (
+          <button
+            type='button'
+            onClick={onClear}
+            className='flex h-6 w-6 items-center justify-center rounded-full hover:bg-bg-neutral-subtle'
+            aria-label='Clear all filters'
+          >
+            <X className='h-4 w-4 text-text-secondary' />
+          </button>
         )}
       </div>
     </div>

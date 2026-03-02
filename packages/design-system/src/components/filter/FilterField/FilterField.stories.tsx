@@ -310,3 +310,141 @@ export const Interactive: Story = {
     );
   },
 };
+
+/**
+ * Field with chips and clear button - hover to see clear button.
+ */
+export const WithClearButton: Story = {
+  args: {
+    placeholder: 'Search attacks...',
+    leftIcon: <Search className='size-6 text-text-secondary' />,
+    showKeyboardHint: true,
+    chips: [
+      {
+        id: '1',
+        content: <FilterChip variant='chip' attribute='IP' operator='is' value='192.168.1.1' />,
+      },
+      {
+        id: '2',
+        content: <FilterChip variant='and' />,
+      },
+      {
+        id: '3',
+        content: <FilterChip variant='chip' attribute='Country' operator='is' value='US' />,
+      },
+    ],
+    onClear: () => alert('Clear clicked!'),
+  },
+};
+
+/**
+ * Hover state demonstration - border changes to #90a1b9.
+ */
+export const HoverStateDemo: Story = {
+  render: () => {
+    return (
+      <div className='space-y-4'>
+        <div>
+          <p className='mb-2 text-sm text-text-secondary'>
+            Hover over the field to see border color change:
+          </p>
+          <FilterField
+            placeholder='Search attacks...'
+            leftIcon={<Search className='size-6 text-text-secondary' />}
+          />
+        </div>
+        <div>
+          <p className='mb-2 text-sm text-text-secondary'>Hover with chips:</p>
+          <FilterField
+            placeholder='Search attacks...'
+            chips={[
+              {
+                id: '1',
+                content: (
+                  <FilterChip variant='chip' attribute='IP' operator='is' value='192.168.1.1' />
+                ),
+              },
+            ]}
+            onClear={() => {}}
+          />
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ * Focus state demonstration - focus ring appears with 3px spread.
+ */
+export const FocusStateDemo: Story = {
+  render: () => {
+    return (
+      <div className='space-y-4'>
+        <div>
+          <p className='mb-2 text-sm text-text-secondary'>
+            Click the field to see focus ring (blue, 3px spread):
+          </p>
+          <FilterField
+            placeholder='Search attacks...'
+            leftIcon={<Search className='size-6 text-text-secondary' />}
+          />
+        </div>
+        <div>
+          <p className='mb-2 text-sm text-text-secondary'>Focus state with chips:</p>
+          <FilterField
+            placeholder='Search attacks...'
+            chips={[
+              {
+                id: '1',
+                content: (
+                  <FilterChip variant='chip' attribute='IP' operator='is' value='192.168.1.1' />
+                ),
+              },
+            ]}
+            onClear={() => {}}
+          />
+        </div>
+      </div>
+    );
+  },
+};
+
+/**
+ * Error hover and focus states - red focus ring.
+ */
+export const ErrorStatesDemo: Story = {
+  render: () => {
+    return (
+      <div className='space-y-4'>
+        <div>
+          <p className='mb-2 text-sm text-text-secondary'>
+            Hover: red focus ring with rgba(231,0,11,0.3)
+          </p>
+          <FilterField placeholder='Search attacks...' error />
+        </div>
+        <div>
+          <p className='mb-2 text-sm text-text-secondary'>
+            Focus: red focus ring with rgba(231,0,11,0.2)
+          </p>
+          <FilterField placeholder='Search attacks...' error />
+        </div>
+        <div>
+          <p className='mb-2 text-sm text-text-secondary'>Error with chips and clear button:</p>
+          <FilterField
+            placeholder='Search attacks...'
+            error
+            chips={[
+              {
+                id: '1',
+                content: (
+                  <FilterChip variant='chip' attribute='IP' operator='is' value='invalid' error />
+                ),
+              },
+            ]}
+            onClear={() => {}}
+          />
+        </div>
+      </div>
+    );
+  },
+};
