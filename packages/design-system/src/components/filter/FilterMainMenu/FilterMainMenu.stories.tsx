@@ -195,5 +195,138 @@ export const WithSearch: Story = {
   },
 };
 
+/**
+ * FilterMainMenu with recent fields section
+ * Shows up to 3 recently used fields at the top
+ */
+export const WithRecentFields: Story = {
+  args: {
+    fields: sampleFields,
+    recentFields: [
+      {
+        name: 'status',
+        label: 'Status',
+        type: 'enum',
+        description: 'Request status',
+      },
+      {
+        name: 'http_status_code',
+        label: 'HTTP status code',
+        type: 'integer',
+        description: 'HTTP response status code',
+      },
+      {
+        name: 'location',
+        label: 'Location',
+        type: 'string',
+        description: 'Geographic location',
+      },
+    ],
+    open: true,
+    onSelect: () => {
+      // Field selection handler
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Recent fields are displayed at the top of the menu (max 3) with a "Recent" section header.',
+      },
+    },
+  },
+};
+
+/**
+ * FilterMainMenu with suggestions section
+ * Shows commonly used fields
+ */
+export const WithSuggestions: Story = {
+  args: {
+    fields: sampleFields,
+    suggestedFields: [
+      {
+        name: 'status',
+        label: 'Status',
+        type: 'enum',
+        description: 'Request status',
+      },
+      {
+        name: 'severity',
+        label: 'Severity',
+        type: 'enum',
+        description: 'Attack severity level',
+      },
+      {
+        name: 'location',
+        label: 'Location',
+        type: 'string',
+        description: 'Geographic location',
+      },
+    ],
+    open: true,
+    onSelect: () => {
+      // Field selection handler
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story: 'Suggested fields are displayed with a "Suggestions" section header.',
+      },
+    },
+  },
+};
+
+/**
+ * FilterMainMenu with both recent and suggestions
+ * Shows the full menu with all sections
+ */
+export const WithRecentAndSuggestions: Story = {
+  args: {
+    fields: sampleFields,
+    recentFields: [
+      {
+        name: 'http_status_code',
+        label: 'HTTP status code',
+        type: 'integer',
+        description: 'HTTP response status code',
+      },
+      {
+        name: 'endpoint',
+        label: 'Endpoint',
+        type: 'string',
+        description: 'API endpoint path',
+      },
+    ],
+    suggestedFields: [
+      {
+        name: 'status',
+        label: 'Status',
+        type: 'enum',
+        description: 'Request status',
+      },
+      {
+        name: 'severity',
+        label: 'Severity',
+        type: 'enum',
+        description: 'Attack severity level',
+      },
+    ],
+    open: true,
+    onSelect: () => {
+      // Field selection handler
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Full menu with Recent section at top, Suggestions section in the middle, and all fields below. Each section is visually separated. Keyboard hints are shown at the bottom.',
+      },
+    },
+  },
+};
+
 // Import React for the Interactive story
 import React from 'react';

@@ -22,6 +22,14 @@ export interface FilterMainMenuProps {
    */
   onOpenChange?: (open: boolean) => void;
   /**
+   * Optional array of recently used fields (max 3)
+   */
+  recentFields?: FieldMetadata[];
+  /**
+   * Optional array of suggested commonly used fields
+   */
+  suggestedFields?: FieldMetadata[];
+  /**
    * Optional custom class name
    */
   className?: string;
@@ -36,6 +44,8 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
   onSelect,
   open = false,
   onOpenChange,
+  recentFields = [],
+  suggestedFields = [],
   className,
 }) => {
   const [searchQuery, setSearchQuery] = useState('');
@@ -50,6 +60,9 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
     setSearchQuery(''); // Reset search on selection
   };
 
+  // Limit recent fields to max 3
+  const limitedRecentFields = recentFields.slice(0, 3);
+
   // Filter fields based on search query (case-insensitive, match label and name)
   const filteredFields = searchQuery.trim()
     ? fields.filter(
@@ -58,6 +71,26 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
           field.name.toLowerCase().includes(searchQuery.toLowerCase()),
       )
     : fields;
+
+  // Filter recent/suggested fields based on search too
+  const filteredRecentFields = searchQuery.trim()
+    ? limitedRecentFields.filter(
+        field =>
+          field.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          field.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : limitedRecentFields;
+
+  const filteredSuggestedFields = searchQuery.trim()
+    ? suggestedFields.filter(
+        field =>
+          field.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          field.name.toLowerCase().includes(searchQuery.toLowerCase()),
+      )
+    : suggestedFields;
+
+  const showRecent = filteredRecentFields.length > 0;
+  const showSuggestions = filteredSuggestedFields.length > 0;
 
   return (
     <div
@@ -90,8 +123,71 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
         </div>
       </div>
 
-      {/* Scrollable field list */}
+      {/* Scrollable field list with sections */}
       <div className='flex flex-col gap-px max-h-80 overflow-y-auto'>
+        {/* Recent fields section */}
+        {showRecent && (
+          <div className='flex flex-col gap-px'>
+            <div className='px-2 py-1.5 text-xs font-medium text-text-secondary'>Recent</div>
+            {filteredRecentFields.map(field => (
+              <button
+                key={`recent-${field.name}`}
+                type='button'
+                onClick={() => handleSelect(field)}
+                className={cn(
+                  'flex items-start gap-1 px-2 py-1.5',
+                  'rounded-md overflow-clip',
+                  'text-sm font-normal text-text-primary text-left',
+                  'bg-transparent',
+                  'hover:bg-gray-100',
+                  'transition-colors',
+                )}
+                role='menuitem'
+              >
+                <div className='flex flex-1 gap-2 items-start min-h-[1px] min-w-[1px]'>
+                  <div className='flex flex-1 flex-col items-start min-h-[1px] min-w-[1px]'>
+                    <span className='leading-5'>{field.label}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+            {/* Separator after recent */}
+            <div className='h-px bg-border-primary my-1' />
+          </div>
+        )}
+
+        {/* Suggestions section */}
+        {showSuggestions && (
+          <div className='flex flex-col gap-px'>
+            <div className='px-2 py-1.5 text-xs font-medium text-text-secondary'>Suggestions</div>
+            {filteredSuggestedFields.map(field => (
+              <button
+                key={`suggested-${field.name}`}
+                type='button'
+                onClick={() => handleSelect(field)}
+                className={cn(
+                  'flex items-start gap-1 px-2 py-1.5',
+                  'rounded-md overflow-clip',
+                  'text-sm font-normal text-text-primary text-left',
+                  'bg-transparent',
+                  'hover:bg-gray-100',
+                  'transition-colors',
+                )}
+                role='menuitem'
+              >
+                <div className='flex flex-1 gap-2 items-start min-h-[1px] min-w-[1px]'>
+                  <div className='flex flex-1 flex-col items-start min-h-[1px] min-w-[1px]'>
+                    <span className='leading-5'>{field.label}</span>
+                  </div>
+                </div>
+              </button>
+            ))}
+            {/* Separator after suggestions */}
+            <div className='h-px bg-border-primary my-1' />
+          </div>
+        )}
+
+        {/* All fields section */}
         {filteredFields.length > 0 ? (
           filteredFields.map(field => (
             <button
@@ -118,6 +214,27 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
         ) : (
           <div className='px-2 py-4 text-center text-sm text-text-secondary'>No fields found</div>
         )}
+      </div>
+
+      {/* Keyboard navigation hints */}
+      <div className='border-t border-border-primary pt-2 mt-1'>
+        <div className='flex items-center gap-4 px-2'>
+          <div className='flex items-center gap-1'>
+            <kbd className='inline-flex items-center justify-center h-5 min-w-[20px] px-1 bg-white border border-border-secondary rounded text-xs text-text-secondary'>
+              ↑
+            </kbd>
+            <kbd className='inline-flex items-center justify-center h-5 min-w-[20px] px-1 bg-white border border-border-secondary rounded text-xs text-text-secondary'>
+              ↓
+            </kbd>
+            <span className='text-xs font-medium text-text-secondary ml-1'>to navigate</span>
+          </div>
+          <div className='flex items-center gap-1'>
+            <kbd className='inline-flex items-center justify-center h-5 min-w-[20px] px-1 bg-white border border-border-secondary rounded text-xs text-text-secondary'>
+              ↵
+            </kbd>
+            <span className='text-xs font-medium text-text-secondary ml-1'>to select</span>
+          </div>
+        </div>
       </div>
     </div>
   );
