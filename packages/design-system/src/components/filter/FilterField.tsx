@@ -93,9 +93,6 @@ export const FilterField: FC<FilterFieldProps> = ({
     return result;
   }, [expression.chips, hasMoreChips]);
 
-  const hasChips = expression.conditions.length > 0;
-  const hasContent = hasChips || autocomplete.isBuilding;
-
   // ── Render ─────────────────────────────────────────────────
 
   return (
@@ -121,8 +118,6 @@ export const FilterField: FC<FilterFieldProps> = ({
         onChipRemove={autocomplete.handleChipRemove}
         onClear={autocomplete.handleClear}
         hasMoreChips={hasMoreChips}
-        hasContent={hasContent}
-        hasChips={hasChips}
         {...props}
       />
 

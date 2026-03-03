@@ -1,8 +1,8 @@
 import type { ChangeEvent, FC, HTMLAttributes, KeyboardEvent, MouseEvent as ReactMouseEvent, Ref } from 'react';
 import { cn } from '../../../utils/cn';
 import { inputVariants } from '../../Input/classes';
-import { FilterChip } from '../FilterChip';
 import type { FilterChipData } from '../types';
+import { ChipList } from '../primitives';
 import { FilterInputBarActions } from './FilterInputBarActions';
 
 interface FilterInputBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
@@ -41,10 +41,6 @@ interface FilterInputBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'chil
   onClear: () => void;
   /** Whether there are more chips than visible */
   hasMoreChips?: boolean;
-  /** Whether there is any content (chips or building chip) */
-  hasContent?: boolean;
-  /** Whether there are any completed chips */
-  hasChips?: boolean;
 }
 
 export const FilterInputBar: FC<FilterInputBarProps> = ({
@@ -63,13 +59,11 @@ export const FilterInputBar: FC<FilterInputBarProps> = ({
   onChipRemove,
   onClear,
   hasMoreChips = false,
-  hasContent: hasContentProp,
-  hasChips: hasChipsProp,
   className,
   ...props
 }) => {
-  const hasChips = hasChipsProp ?? chips.length > 0;
-  const hasContent = hasContentProp ?? (hasChips || buildingChipData != null);
+  const hasChips = chips.length > 0;
+  const hasContent = hasChips || buildingChipData != null;
 
   return (
     <div
@@ -90,31 +84,15 @@ export const FilterInputBar: FC<FilterInputBarProps> = ({
     >
       <div className={cn('flex flex-1 items-center pr-4', hasContent ? 'gap-4 pl-8' : 'pl-12')}>
         {hasContent && (
-          <div className='flex items-center gap-1'>
-            {chips.map(chip => {
-              const isConnector = chip.variant === 'and' || chip.variant === 'or';
-              return (
-                <div
-                  key={chip.id}
-                  className='shrink-0 cursor-pointer hover:z-10'
-                  onClick={(e) => onChipClick(chip.id, e)}
-                >
-                  <FilterChip
-                    {...chip}
-                    onRemove={isConnector ? undefined : () => onChipRemove(chip.id)}
-                  />
-                </div>
-              );
-            })}
-            {hasMoreChips && (
-              <p className='pl-4 text-sm text-text-secondary'>{placeholder}</p>
-            )}
-            {buildingChipData && (
-              <div ref={buildingChipRef} className='shrink-0'>
-                <FilterChip {...buildingChipData} />
-              </div>
-            )}
-          </div>
+          <ChipList
+            chips={chips}
+            buildingChipData={buildingChipData}
+            buildingChipRef={buildingChipRef}
+            hasMoreChips={hasMoreChips}
+            placeholder={placeholder}
+            onChipClick={onChipClick}
+            onChipRemove={onChipRemove}
+          />
         )}
 
         {!hasMoreChips && (
