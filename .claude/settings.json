@@ -12,7 +12,9 @@
       "Bash(grep -r \"RootProps\" node_modules/@ark-ui/react/dist/menu*.d.ts)",
       "mcp__claude_ai_Figma__get_design_context",
       "Bash(npx tsc --noEmit --project packages/design-system/tsconfig.json)",
-      "Bash(git add .claude/settings.json)"
+      "Bash(git add .claude/settings.json)",
+      "Bash(npx eslint packages/design-system/src/components/filter/FilterField/FilterField.tsx)",
+      "Bash(npx eslint src/components/filter/FilterField/FilterField.tsx)"
     ]
   },
   "enabledPlugins": {

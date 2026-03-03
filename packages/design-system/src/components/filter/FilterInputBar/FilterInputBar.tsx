@@ -1,13 +1,9 @@
 import type { ChangeEvent, FC, HTMLAttributes, KeyboardEvent, MouseEvent as ReactMouseEvent, Ref } from 'react';
-import { X } from '../../../icons/X';
 import { cn } from '../../../utils/cn';
-import { Button } from '../../Button';
-import { Input } from '../../Input';
 import { inputVariants } from '../../Input/classes';
-import { Kbd } from '../../Kbd/Kbd';
-import { KbdGroup } from '../../Kbd/KbdGroup';
 import { FilterChip } from '../FilterChip';
 import type { FilterChipData } from '../types';
+import { FilterInputBarActions } from '../FilterInputBarActions';
 
 interface FilterInputBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /** Visible chips to render (already sliced) */
@@ -122,38 +118,24 @@ export const FilterInputBar: FC<FilterInputBarProps> = ({
         )}
 
         {!hasMoreChips && (
-          <Input
+          <input
             ref={inputRef}
             type='text'
             value={inputText}
             onChange={onInputChange}
             onKeyDown={onInputKeyDown}
             placeholder={hasContent ? '' : placeholder}
-            className='flex-1 h-auto border-none bg-transparent p-0 shadow-none ring-0 focus-visible:ring-0'
+            className='flex-1 h-auto border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0'
           />
         )}
       </div>
 
-      <div className='flex shrink-0 items-center gap-8 pr-12'>
-        {showKeyboardHint && !hasContent && (
-          <KbdGroup>
-            <Kbd>⌘</Kbd>
-            <Kbd>K</Kbd>
-          </KbdGroup>
-        )}
-        {hasChips && (
-          <Button
-            variant='ghost'
-            color='neutral'
-            size='small'
-            onClick={onClear}
-            aria-label='Clear all filters'
-            className='text-icon-secondary'
-          >
-            <X />
-          </Button>
-        )}
-      </div>
+      <FilterInputBarActions
+        showKeyboardHint={showKeyboardHint}
+        hasContent={hasContent}
+        hasChips={hasChips}
+        onClear={onClear}
+      />
     </div>
   );
 };
