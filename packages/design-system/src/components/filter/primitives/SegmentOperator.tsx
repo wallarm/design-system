@@ -8,15 +8,14 @@ type SegmentOperatorProps = HTMLAttributes<HTMLDivElement> & {
 export const SegmentOperator: FC<SegmentOperatorProps> = ({ children, className, ...props }) => (
   <div
     className={cn(
-      'flex flex-col justify-center p-2',
+      'flex flex-col justify-center p-2 overflow-hidden',
       'leading-none',
-      ' text-ellipsis whitespace-nowrap',
       className,
     )}
     data-slot='segment-operator'
     {...props}
   >
-    <p className='text-sm font-normal text-text-secondary  text-ellipsis'>
+    <p className='text-sm font-normal text-text-secondary truncate'>
       {children}
     </p>
   </div>

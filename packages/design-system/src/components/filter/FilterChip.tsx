@@ -154,8 +154,8 @@ export const FilterChip: FC<FilterChipProps> = ({
         {/* Operator segment */}
         {operator && <SegmentOperator className='shrink-0'>{operator}</SegmentOperator>}
 
-        {/* Value segment */}
-        {value && <SegmentValue className='shrink-0'>{value}</SegmentValue>}
+        {/* Value segment — min-w-0 allows truncation */}
+        {value && <SegmentValue className='min-w-0'>{value}</SegmentValue>}
 
         {/* Delete button - shown on hover */}
         {isHovered && onRemove && (

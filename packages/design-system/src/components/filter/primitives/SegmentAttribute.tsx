@@ -8,15 +8,14 @@ type SegmentAttributeProps = HTMLAttributes<HTMLDivElement> & {
 export const SegmentAttribute: FC<SegmentAttributeProps> = ({ children, className, ...props }) => (
   <div
     className={cn(
-      'flex flex-col justify-center p-2',
+      'flex flex-col justify-center p-2 overflow-hidden',
       'leading-none',
-      ' text-ellipsis whitespace-nowrap',
       className,
     )}
     data-slot='segment-attribute'
     {...props}
   >
-    <p className='text-sm font-normal text-text-primary  text-ellipsis'>
+    <p className='text-sm font-normal text-text-primary truncate'>
       {children}
     </p>
   </div>

@@ -8,15 +8,14 @@ type SegmentValueProps = HTMLAttributes<HTMLDivElement> & {
 export const SegmentValue: FC<SegmentValueProps> = ({ children, className, ...props }) => (
   <div
     className={cn(
-      'flex flex-col justify-center p-2',
+      'flex flex-col justify-center p-2 overflow-hidden',
       'leading-none',
-      ' text-ellipsis whitespace-nowrap',
       className,
     )}
     data-slot='segment-value'
     {...props}
   >
-    <p className='text-sm font-medium text-text-info  text-ellipsis'>
+    <p className='text-sm font-medium text-text-info truncate'>
       {children}
     </p>
   </div>
