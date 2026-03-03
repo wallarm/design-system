@@ -68,6 +68,7 @@ export const FilterField: FC<FilterFieldProps> = ({
   const [isFocused, setIsFocused] = useState(false);
   const [menuLeftOffset, setMenuLeftOffset] = useState(0);
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
+  const [multiSelectValues, setMultiSelectValues] = useState<Array<string | number | boolean>>([]);
   // Timestamp of last menu transition — blur won't close within 400ms of a transition
   const lastTransitionRef = useRef(0);
 
@@ -87,7 +88,9 @@ export const FilterField: FC<FilterFieldProps> = ({
       variant: 'chip',
       attribute: field?.label || condition.field,
       operator: getOperatorLabel(condition.operator, field?.type || 'string'),
-      value: String(condition.value ?? ''),
+      value: Array.isArray(condition.value)
+        ? condition.value.map(v => field?.values?.find(opt => opt.value === v)?.label ?? String(v)).join(', ')
+        : String(condition.value ?? ''),
       error,
     }];
   }, [fields, error]);
@@ -117,17 +120,22 @@ export const FilterField: FC<FilterFieldProps> = ({
     const handleEscape = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
+        // If multi-select with values chosen → confirm them
+        if (multiSelectValues.length > 0 && selectedField && selectedOperator) {
+          createChip(selectedField, selectedOperator, multiSelectValues);
+        }
         setMenuState('closed');
         setSelectedField(null);
         setSelectedOperator(null);
         setEditingChipId(null);
+        setMultiSelectValues([]);
         inputRef.current?.focus();
       }
     };
 
     window.addEventListener('keydown', handleEscape);
     return () => window.removeEventListener('keydown', handleEscape);
-  }, [menuState]);
+  }, [menuState, multiSelectValues, selectedField, selectedOperator]);
 
   // ── Handlers ──────────────────────────────────────────────
 
@@ -164,9 +172,28 @@ export const FilterField: FC<FilterFieldProps> = ({
     setMenuState('value');
   };
 
+  const isMultiSelectOperator = (op: FilterOperator | null): boolean =>
+    op === 'in' || op === 'not_in';
+
   const handleValueSelect = (val: string | number | boolean) => {
-    if (selectedField && selectedOperator) {
-      createChip(selectedField, selectedOperator, val);
+    if (!selectedField || !selectedOperator) return;
+
+    // Multi-select: toggle value in the list
+    if (isMultiSelectOperator(selectedOperator)) {
+      setMultiSelectValues(prev =>
+        prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val],
+      );
+      return;
+    }
+
+    // Single-select: create chip immediately
+    createChip(selectedField, selectedOperator, val);
+    resetState();
+  };
+
+  const handleMultiSelectConfirm = () => {
+    if (selectedField && selectedOperator && multiSelectValues.length > 0) {
+      createChip(selectedField, selectedOperator, multiSelectValues);
       resetState();
     }
   };
@@ -174,7 +201,7 @@ export const FilterField: FC<FilterFieldProps> = ({
   const createChip = (
     field: FieldMetadata,
     operator: FilterOperator,
-    val: string | number | boolean | null,
+    val: string | number | boolean | null | Array<string | number | boolean>,
   ) => {
     const condition: Condition = {
       type: 'condition',
@@ -183,9 +210,16 @@ export const FilterField: FC<FilterFieldProps> = ({
       value: val,
     };
 
-    // Use the label from field.values if available, otherwise fall back to raw value
-    const valueOption = field.values?.find(v => v.value === val);
-    const displayValue = valueOption?.label ?? String(val ?? '');
+    // Build display value — join labels for arrays (in/not_in)
+    let displayValue: string;
+    if (Array.isArray(val)) {
+      displayValue = val
+        .map(v => field.values?.find(opt => opt.value === v)?.label ?? String(v))
+        .join(', ');
+    } else {
+      const valueOption = field.values?.find(v => v.value === val);
+      displayValue = valueOption?.label ?? String(val ?? '');
+    }
 
     const newChip: FilterChipData = {
       id: `chip-${Date.now()}`,
@@ -205,6 +239,7 @@ export const FilterField: FC<FilterFieldProps> = ({
     setSelectedField(null);
     setSelectedOperator(null);
     setEditingChipId(null);
+    setMultiSelectValues([]);
     setMenuState('closed');
     inputRef.current?.focus();
   };
@@ -220,6 +255,8 @@ export const FilterField: FC<FilterFieldProps> = ({
     setInputText('');
     setSelectedField(null);
     setSelectedOperator(null);
+    setEditingChipId(null);
+    setMultiSelectValues([]);
     setMenuState('closed');
     onChange?.(null);
     inputRef.current?.focus();
@@ -285,11 +322,16 @@ export const FilterField: FC<FilterFieldProps> = ({
 
       const activeEl = document.activeElement;
       if (!containerRef.current?.contains(activeEl)) {
+        // Confirm multi-select if values were chosen
+        if (multiSelectValues.length > 0 && selectedField && selectedOperator) {
+          createChip(selectedField, selectedOperator, multiSelectValues);
+        }
         setIsFocused(false);
         setMenuState('closed');
         setSelectedField(null);
         setSelectedOperator(null);
         setEditingChipId(null);
+        setMultiSelectValues([]);
       }
     }, 200);
   };
@@ -298,11 +340,16 @@ export const FilterField: FC<FilterFieldProps> = ({
 
   // Progressive building chip — shows attribute/operator as user selects them
   const isBuilding = !editingChipId && selectedField !== null;
+  const buildingMultiValue = multiSelectValues.length > 0
+    ? multiSelectValues
+        .map(v => selectedField?.values?.find(opt => opt.value === v)?.label ?? String(v))
+        .join(', ')
+    : undefined;
   const buildingChipData = isBuilding ? {
     variant: 'chip' as const,
     attribute: selectedField!.label,
     operator: selectedOperator ? getOperatorLabel(selectedOperator, selectedField!.type) : undefined,
-    value: undefined,
+    value: buildingMultiValue,
   } : null;
 
   // Reposition dropdown to the right edge of the building chip
@@ -427,6 +474,8 @@ export const FilterField: FC<FilterFieldProps> = ({
             values={selectedField.values || []}
             open={true}
             onSelect={handleValueSelect}
+            multiSelect={isMultiSelectOperator(selectedOperator)}
+            selectedValues={multiSelectValues}
           />
         </div>
       )}

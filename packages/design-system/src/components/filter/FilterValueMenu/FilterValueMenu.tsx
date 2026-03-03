@@ -43,10 +43,11 @@ export interface FilterValueMenuProps {
 const Checkbox: FC<{ checked?: boolean }> = ({ checked }) => (
   <div
     className={cn(
-      'size-4 rounded border border-border-primary bg-white',
-      'shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]',
+      'size-4 rounded-[4px] border shadow-xs',
       'flex items-center justify-center',
-      checked && 'bg-primary border-primary',
+      checked
+        ? 'bg-bg-fill-brand border-bg-fill-brand'
+        : 'bg-bg-surface-3 border-border-primary',
     )}
   >
     {checked && (

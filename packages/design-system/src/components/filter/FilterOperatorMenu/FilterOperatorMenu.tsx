@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { cn } from '../../../utils/cn';
 import { FilterDropdownBase } from '../base';
 import type { FilterDropdownSection } from '../base/types';
-import { type FieldType, type FilterOperator, getOperatorLabel, OPERATORS_BY_TYPE } from '../types';
+import { type FieldType, type FilterOperator, getOperatorLabel, OPERATOR_SYMBOLS, OPERATORS_BY_TYPE } from '../types';
 
 export interface FilterOperatorMenuProps {
   /**
@@ -46,6 +46,8 @@ export const FilterOperatorMenu: FC<FilterOperatorMenuProps> = ({
 }) => {
   const operatorGroups = OPERATORS_BY_TYPE[fieldType] || [];
 
+  const showSymbols = fieldType !== 'boolean';
+
   // Convert operator groups to dropdown sections
   const sections: FilterDropdownSection[] = operatorGroups.map((group, index) => ({
     id: `group-${index}`,
@@ -53,6 +55,18 @@ export const FilterOperatorMenu: FC<FilterOperatorMenuProps> = ({
       id: operator,
       label: getOperatorLabel(operator, fieldType),
       value: operator,
+      renderContent: showSymbols
+        ? (item) => (
+            <div className='flex flex-1 items-center min-w-0'>
+              <div className='flex flex-1 flex-col justify-center leading-none text-sm font-normal text-text-primary min-w-0'>
+                <p className='leading-5 overflow-hidden text-ellipsis'>{item.label}</p>
+              </div>
+              <span className='shrink-0 font-mono text-xs text-text-secondary'>
+                {OPERATOR_SYMBOLS[operator]}
+              </span>
+            </div>
+          )
+        : undefined,
     })),
     // Show separator after each group except the last one
     showSeparator: index < operatorGroups.length - 1,

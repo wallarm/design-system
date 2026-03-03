@@ -72,7 +72,7 @@ export interface Condition {
   type: 'condition';
   field: string;
   operator: FilterOperator;
-  value: string | number | boolean | null;
+  value: string | number | boolean | null | Array<string | number | boolean>;
 }
 
 /**
@@ -88,6 +88,26 @@ export interface Group {
  * Expression Node - Can be either a Condition or a Group
  */
 export type ExprNode = Condition | Group;
+
+/**
+ * Operator Symbol Mapping
+ * Maps operators to their raw symbol displayed on the right side of menus
+ */
+export const OPERATOR_SYMBOLS: Record<FilterOperator, string> = {
+  '=': '=',
+  '!=': '!=',
+  '>': '>',
+  '<': '<',
+  '>=': '>=',
+  '<=': '<=',
+  like: '~',
+  not_like: '!~',
+  in: 'IN',
+  not_in: 'NOT IN',
+  is_null: '= null',
+  is_not_null: '!= null',
+  between: '<>',
+};
 
 /**
  * Operator Label Mapping
@@ -169,10 +189,13 @@ export function getOperatorFromLabel(label: string, fieldType: FieldType): Filte
  */
 export const OPERATORS_BY_TYPE: Record<FieldType, FilterOperator[][]> = {
   string: [
-    ['=', '!=', 'like', 'not_like'],
+    ['=', '!=', 'in', 'like', 'not_like'],
     ['is_null', 'is_not_null'],
   ],
-  integer: [['=', '!=', '>', '<', '>=', '<=']],
+  integer: [
+    ['=', '!=', '>', '<', '>=', '<='],
+    ['in'],
+  ],
   float: [['=', '!=', '>', '<', '>=', '<=']],
   date: [['>', '>=', '<', '<=', '=', '!=', 'between']],
   boolean: [['=', '!=', 'is_null', 'is_not_null']],
