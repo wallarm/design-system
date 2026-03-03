@@ -17,7 +17,7 @@ export const SegmentAttribute: FC<SegmentAttributeProps> = ({ children, classNam
       data-slot='segment-attribute'
       {...props}
     >
-      <p className='text-sm font-normal text-text-primary leading-5 text-ellipsis'>
+      <p className='text-sm font-normal text-text-primary  text-ellipsis'>
         {children}
       </p>
     </div>

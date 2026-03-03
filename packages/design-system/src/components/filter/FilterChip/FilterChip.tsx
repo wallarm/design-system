@@ -71,7 +71,7 @@ export const FilterChip: FC<FilterChipProps> = ({
         <div className='flex flex-col justify-center leading-none  text-ellipsis whitespace-nowrap p-2'>
           <p
             className={cn(
-              'text-sm font-normal leading-5  text-ellipsis',
+              'text-sm font-normal   text-ellipsis',
               error ? 'text-text-danger' : 'text-text-secondary',
             )}
           >

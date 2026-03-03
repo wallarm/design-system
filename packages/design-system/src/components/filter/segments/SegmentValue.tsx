@@ -17,7 +17,7 @@ export const SegmentValue: FC<SegmentValueProps> = ({ children, className, ...pr
       data-slot='segment-value'
       {...props}
     >
-      <p className='text-sm font-medium text-text-info leading-5 text-ellipsis'>
+      <p className='text-sm font-medium text-text-info  text-ellipsis'>
         {children}
       </p>
     </div>

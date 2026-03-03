@@ -17,7 +17,7 @@ export const SegmentOperator: FC<SegmentOperatorProps> = ({ children, className,
       data-slot='segment-operator'
       {...props}
     >
-      <p className='text-sm font-normal text-text-secondary leading-5  text-ellipsis'>
+      <p className='text-sm font-normal text-text-secondary  text-ellipsis'>
         {children}
       </p>
     </div>

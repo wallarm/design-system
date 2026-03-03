@@ -11,7 +11,8 @@
       "Bash(grep -r \"highlightedValue\\\\|highlightedId\" \"node_modules/.pnpm/@zag-js+menu@1\"*/node_modules/@zag-js/menu/dist/*.d.ts)",
       "Bash(grep -r \"RootProps\" node_modules/@ark-ui/react/dist/menu*.d.ts)",
       "mcp__claude_ai_Figma__get_design_context",
-      "Bash(npx tsc --noEmit --project packages/design-system/tsconfig.json)"
+      "Bash(npx tsc --noEmit --project packages/design-system/tsconfig.json)",
+      "Bash(git add .claude/settings.json)"
     ]
   },
   "enabledPlugins": {
