@@ -14,7 +14,7 @@ export const DropdownMenuFooter: FC<DropdownMenuFooterProps> = ({
   <div
     ref={ref}
     className={cn(
-      'flex items-center gap-4 border-t border-border-primary mx-8 pt-8 pb-4',
+      'flex items-center gap-16 border-t border-border-primary mx-8 pt-8 pb-4',
       'text-xs font-medium text-text-secondary',
       className,
     )}

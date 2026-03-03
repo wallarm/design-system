@@ -166,18 +166,22 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
           })}
         </DropdownMenuGroup>
         <DropdownMenuFooter>
-          <KbdGroup>
-            <Kbd>↑</Kbd>
-            <Kbd>↓</Kbd>
-          </KbdGroup>
-          to navigate
-          <KbdGroup><Kbd>↵</Kbd></KbdGroup>
-          to select
+          <span className='flex items-center gap-4'>
+            <KbdGroup>
+              <Kbd>↑</Kbd>
+              <Kbd>↓</Kbd>
+            </KbdGroup>
+            to navigate
+          </span>
+          <span className='flex items-center gap-4'>
+            <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+            to select
+          </span>
           {multiSelect && (
-            <>
-              {' '}
-              <KbdGroup><Kbd>↵</Kbd></KbdGroup> to select more
-            </>
+            <span className='flex items-center gap-4'>
+              <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+              to select more
+            </span>
           )}
         </DropdownMenuFooter>
       </DropdownMenuContent>

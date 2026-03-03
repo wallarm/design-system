@@ -247,13 +247,17 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
         )}
 
         <DropdownMenuFooter>
-          <KbdGroup>
-            <Kbd>↑</Kbd>
-            <Kbd>↓</Kbd>
-          </KbdGroup>
-          to navigate
-          <KbdGroup><Kbd>↵</Kbd></KbdGroup>
-          to select
+          <span className='flex items-center gap-4'>
+            <KbdGroup>
+              <Kbd>↑</Kbd>
+              <Kbd>↓</Kbd>
+            </KbdGroup>
+            to navigate
+          </span>
+          <span className='flex items-center gap-4'>
+            <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+            to select
+          </span>
         </DropdownMenuFooter>
       </DropdownMenuContent>
     </DropdownMenu>
