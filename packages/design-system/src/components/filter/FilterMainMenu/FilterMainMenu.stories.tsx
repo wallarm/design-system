@@ -159,15 +159,18 @@ export const Interactive: Story = {
             </div>
           )}
         </div>
-        <FilterMainMenu
-          fields={sampleFields}
-          open={open}
-          onOpenChange={setOpen}
-          onSelect={field => {
-            setSelectedField(field);
-            setOpen(false);
-          }}
-        />
+        {/* Absolute positioned wrapper prevents layout shift */}
+        <div className='relative'>
+          <FilterMainMenu
+            fields={sampleFields}
+            open={open}
+            onOpenChange={setOpen}
+            onSelect={field => {
+              setSelectedField(field);
+              setOpen(false);
+            }}
+          />
+        </div>
       </div>
     );
   },

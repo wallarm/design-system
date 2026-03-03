@@ -39,6 +39,8 @@ export const FilterDropdownBase: FC<FilterDropdownBaseProps> = ({
     <div
       ref={menuRef}
       className={cn(
+        // Positioning - absolute to prevent layout shift
+        'absolute top-full left-0 mt-1 z-50',
         'w-[300px]',
         'bg-white border border-border-primary-light rounded-xl',
         'shadow-[0px_4px_6px_0px_rgba(0,0,0,0.1),0px_2px_4px_0px_rgba(0,0,0,0.1)]',
