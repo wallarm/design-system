@@ -1,350 +1,177 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { FilterChip } from '../FilterChip/FilterChip';
+import type { Condition, Group } from '../types';
 import { FilterField } from './FilterField';
+
+const sampleFields = [
+  {
+    name: 'status',
+    label: 'Status',
+    type: 'enum' as const,
+    values: [
+      { value: 'active', label: 'Active' },
+      { value: 'pending', label: 'Pending' },
+    ],
+  },
+  {
+    name: 'priority',
+    label: 'Priority',
+    type: 'integer' as const,
+    values: [
+      { value: 1, label: 'Low' },
+      { value: 5, label: 'Medium' },
+    ],
+  },
+];
 
 describe('FilterField', () => {
   describe('basic rendering', () => {
     it('renders with default placeholder', () => {
-      render(<FilterField />);
-      expect(screen.getByText('Search [object]...')).toBeInTheDocument();
+      render(<FilterField fields={sampleFields} />);
+      expect(screen.getByPlaceholderText('Type to filter...')).toBeInTheDocument();
     });
 
     it('renders with custom placeholder', () => {
-      render(<FilterField placeholder='Search attacks...' />);
-      expect(screen.getByText('Search attacks...')).toBeInTheDocument();
+      render(<FilterField fields={sampleFields} placeholder='Search attacks...' />);
+      expect(screen.getByPlaceholderText('Search attacks...')).toBeInTheDocument();
     });
 
     it('applies custom className', () => {
-      const { container } = render(<FilterField className='custom-class' />);
+      const { container } = render(<FilterField fields={sampleFields} className='custom-class' />);
+      const wrapper = container.firstElementChild;
+      expect(wrapper).toHaveClass('custom-class');
+    });
+
+    it('has combobox role', () => {
+      const { container } = render(<FilterField fields={sampleFields} />);
       const field = container.querySelector('[data-slot="filter-field"]');
-      expect(field).toHaveClass('custom-class');
-    });
-
-    it('has correct role and tabIndex', () => {
-      const { container } = render(<FilterField />);
-      const field = container.querySelector('[data-slot="filter-field"]');
-      expect(field).toHaveAttribute('role', 'textbox');
-      expect(field).toHaveAttribute('tabIndex', '0');
+      expect(field).toHaveAttribute('role', 'combobox');
     });
   });
 
-  describe('chip management', () => {
-    const mockChips = [
-      {
-        id: '1',
-        content: <FilterChip variant='chip' attribute='IP' operator='is' value='192.168.1.1' />,
-      },
-      {
-        id: '2',
-        content: <FilterChip variant='chip' attribute='Country' operator='is' value='US' />,
-      },
-      {
-        id: '3',
-        content: <FilterChip variant='chip' attribute='Status' operator='is' value='Active' />,
-      },
-    ];
+  describe('controlled mode with single condition', () => {
+    it('displays chip when value is a single Condition', () => {
+      const condition: Condition = {
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      };
 
-    it('displays chips when provided', () => {
-      render(<FilterField chips={mockChips} />);
+      render(<FilterField fields={sampleFields} value={condition} />);
 
-      expect(screen.getByText('IP')).toBeInTheDocument();
-      expect(screen.getByText('Country')).toBeInTheDocument();
       expect(screen.getByText('Status')).toBeInTheDocument();
+      expect(screen.getByText('Active')).toBeInTheDocument();
     });
 
-    it('shows max 3 visible chips', () => {
-      const manyChips = [
-        ...mockChips,
-        {
-          id: '4',
-          content: <FilterChip variant='chip' attribute='Port' operator='is' value='8080' />,
-        },
-      ];
-
-      render(<FilterField chips={manyChips} />);
-
-      // First 3 chips should be visible
-      expect(screen.getByText('IP')).toBeInTheDocument();
-      expect(screen.getByText('Country')).toBeInTheDocument();
-      expect(screen.getByText('Status')).toBeInTheDocument();
-
-      // 4th chip should not be visible
-      expect(screen.queryByText('Port')).not.toBeInTheDocument();
-    });
-
-    it('shows placeholder hint when more than 3 chips', () => {
-      const manyChips = [
-        ...mockChips,
-        {
-          id: '4',
-          content: <FilterChip variant='chip' attribute='Port' operator='is' value='8080' />,
-        },
-      ];
-
-      render(<FilterField chips={manyChips} placeholder='Search attacks...' />);
-
-      // Placeholder should be shown as a hint
-      expect(screen.getByText('Search attacks...')).toBeInTheDocument();
-    });
-
-    it('hides placeholder when chips are present (less than 4)', () => {
-      render(<FilterField chips={mockChips.slice(0, 2)} placeholder='Search attacks...' />);
-
-      // Placeholder should not be shown when we have 2 chips
-      expect(screen.queryByText('Search attacks...')).not.toBeInTheDocument();
-    });
-  });
-
-  describe('chip removal', () => {
-    it('calls onRemove callback when chip delete button is clicked', async () => {
+    it('calls onChange with null when chip is cleared', async () => {
       const user = userEvent.setup();
-      const onRemove = vi.fn();
+      const onChange = vi.fn();
+      const condition: Condition = {
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      };
 
-      const mockChips = [
-        {
-          id: '1',
-          content: (
-            <FilterChip
-              variant='chip'
-              attribute='IP'
-              operator='is'
-              value='192.168.1.1'
-              onRemove={onRemove}
-            />
-          ),
-        },
-      ];
-
-      const { container } = render(<FilterField chips={mockChips} />);
-
-      // Hover over the chip to show delete button using fireEvent
-      const chip = container.querySelector('[data-slot="filter-chip"]');
-      fireEvent.mouseEnter(chip!);
-
-      // Click delete button
-      const deleteButton = screen.getByRole('button', { name: /remove filter/i });
-      await user.click(deleteButton);
-
-      expect(onRemove).toHaveBeenCalledTimes(1);
-    });
-
-    it('supports chip removal with onChipRemove callback pattern', async () => {
-      const user = userEvent.setup();
-      const onChipRemove = vi.fn();
-
-      const mockChips = [
-        {
-          id: '1',
-          content: (
-            <FilterChip
-              variant='chip'
-              attribute='IP'
-              operator='is'
-              value='192.168.1.1'
-              onRemove={() => onChipRemove('1')}
-            />
-          ),
-        },
-        {
-          id: '2',
-          content: (
-            <FilterChip
-              variant='chip'
-              attribute='Country'
-              operator='is'
-              value='US'
-              onRemove={() => onChipRemove('2')}
-            />
-          ),
-        },
-      ];
-
-      const { container } = render(<FilterField chips={mockChips} onChipRemove={onChipRemove} />);
-
-      // Hover over the first chip to show delete button using fireEvent
-      const chips = container.querySelectorAll('[data-slot="filter-chip"]');
-      fireEvent.mouseEnter(chips[0]!);
-
-      // Click delete button on first chip
-      const deleteButtons = screen.getAllByRole('button', { name: /remove filter/i });
-      await user.click(deleteButtons[0]);
-
-      expect(onChipRemove).toHaveBeenCalledWith('1');
-      expect(onChipRemove).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('clear functionality', () => {
-    const mockChips = [
-      {
-        id: '1',
-        content: <FilterChip variant='chip' attribute='IP' operator='is' value='192.168.1.1' />,
-      },
-    ];
-
-    it('shows clear button when chips exist and onClear is provided', () => {
-      render(<FilterField chips={mockChips} onClear={vi.fn()} />);
-
-      const clearButton = screen.getByRole('button', { name: /clear all filters/i });
-      expect(clearButton).toBeInTheDocument();
-    });
-
-    it('does not show clear button when no chips', () => {
-      render(<FilterField chips={[]} onClear={vi.fn()} />);
-
-      const clearButton = screen.queryByRole('button', { name: /clear all filters/i });
-      expect(clearButton).not.toBeInTheDocument();
-    });
-
-    it('does not show clear button when onClear is not provided', () => {
-      render(<FilterField chips={mockChips} />);
-
-      const clearButton = screen.queryByRole('button', { name: /clear all filters/i });
-      expect(clearButton).not.toBeInTheDocument();
-    });
-
-    it('calls onClear when clear button is clicked', async () => {
-      const user = userEvent.setup();
-      const onClear = vi.fn();
-
-      render(<FilterField chips={mockChips} onClear={onClear} />);
+      render(<FilterField fields={sampleFields} value={condition} onChange={onChange} />);
 
       const clearButton = screen.getByRole('button', { name: /clear all filters/i });
       await user.click(clearButton);
 
-      expect(onClear).toHaveBeenCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith(null);
+    });
+  });
+
+  describe('controlled mode with Group (multi-condition)', () => {
+    it('displays multiple chips with AND connector', () => {
+      const group: Group = {
+        type: 'group',
+        operator: 'and',
+        children: [
+          { type: 'condition', field: 'status', operator: '=', value: 'active' },
+          { type: 'condition', field: 'priority', operator: '=', value: 1 },
+        ],
+      };
+
+      render(<FilterField fields={sampleFields} value={group} />);
+
+      expect(screen.getByText('Status')).toBeInTheDocument();
+      expect(screen.getByText('Priority')).toBeInTheDocument();
+      expect(screen.getByText('AND')).toBeInTheDocument();
+    });
+
+    it('displays OR connector when group operator is or', () => {
+      const group: Group = {
+        type: 'group',
+        operator: 'or',
+        children: [
+          { type: 'condition', field: 'status', operator: '=', value: 'active' },
+          { type: 'condition', field: 'priority', operator: '=', value: 1 },
+        ],
+      };
+
+      render(<FilterField fields={sampleFields} value={group} />);
+
+      expect(screen.getByText('OR')).toBeInTheDocument();
     });
   });
 
   describe('keyboard hint', () => {
     it('shows keyboard hint when showKeyboardHint is true', () => {
-      render(<FilterField showKeyboardHint={true} />);
+      render(<FilterField fields={sampleFields} showKeyboardHint={true} />);
 
-      expect(screen.getByText('⌘')).toBeInTheDocument();
       expect(screen.getByText('K')).toBeInTheDocument();
     });
 
     it('does not show keyboard hint by default', () => {
-      render(<FilterField />);
+      render(<FilterField fields={sampleFields} />);
 
-      expect(screen.queryByText('⌘')).not.toBeInTheDocument();
       expect(screen.queryByText('K')).not.toBeInTheDocument();
     });
   });
 
-  describe('left icon', () => {
-    it('displays left icon when provided', () => {
-      const Icon = () => <span data-testid='test-icon'>🔍</span>;
-      render(<FilterField leftIcon={<Icon />} />);
-
-      expect(screen.getByTestId('test-icon')).toBeInTheDocument();
-    });
-
-    it('does not display icon container when leftIcon is not provided', () => {
-      const { container } = render(<FilterField />);
-      const iconContainer = container.querySelector('.shrink-0:first-child');
-      expect(iconContainer).not.toBeInTheDocument();
-    });
-  });
-
   describe('error state', () => {
-    const mockChips = [
-      {
-        id: '1',
-        content: <FilterChip variant='chip' attribute='IP' operator='is' value='192.168.1.1' />,
-      },
-    ];
-
     it('applies error border when error is true', () => {
-      const { container } = render(<FilterField error={true} />);
+      const { container } = render(<FilterField fields={sampleFields} error={true} />);
       const field = container.querySelector('[data-slot="filter-field"]');
       expect(field).toHaveClass('border-border-strong-danger');
     });
 
     it('sets aria-invalid when error is true', () => {
-      const { container } = render(<FilterField error={true} />);
+      const { container } = render(<FilterField fields={sampleFields} error={true} />);
       const field = container.querySelector('[data-slot="filter-field"]');
       expect(field).toHaveAttribute('aria-invalid', 'true');
     });
 
-    it('propagates error prop to chip content', () => {
-      const { container } = render(<FilterField chips={mockChips} error={true} />);
-
-      // Check if the chip has error styling (red background)
-      const chip = container.querySelector('[data-slot="filter-chip"]');
-      expect(chip).toHaveClass('bg-bg-light-danger', 'border-border-danger');
-    });
-
     it('applies normal styling when error is false', () => {
-      const { container } = render(<FilterField error={false} />);
+      const { container } = render(<FilterField fields={sampleFields} error={false} />);
       const field = container.querySelector('[data-slot="filter-field"]');
       expect(field).toHaveClass('border-border-primary');
       expect(field).not.toHaveClass('border-border-strong-danger');
     });
   });
 
-  describe('focus and blur callbacks', () => {
-    it('calls onFocus when field receives focus', async () => {
-      const user = userEvent.setup();
-      const onFocus = vi.fn();
-
-      const { container } = render(<FilterField onFocus={onFocus} />);
-      const field = container.querySelector('[data-slot="filter-field"]');
-
-      await user.click(field!);
-
-      expect(onFocus).toHaveBeenCalledTimes(1);
-    });
-
-    it('calls onBlur when field loses focus', async () => {
-      const user = userEvent.setup();
-      const onBlur = vi.fn();
-
-      const { container } = render(<FilterField onBlur={onBlur} />);
-      const field = container.querySelector('[data-slot="filter-field"]');
-
-      await user.click(field!);
-      await user.tab(); // Move focus away
-
-      expect(onBlur).toHaveBeenCalledTimes(1);
-    });
-  });
-
   describe('accessibility', () => {
-    it('has correct aria-label for clear button', () => {
-      const mockChips = [
-        {
-          id: '1',
-          content: <FilterChip variant='chip' attribute='IP' operator='is' value='192.168.1.1' />,
-        },
-      ];
+    it('has correct aria-label for clear button when chips exist', () => {
+      const condition: Condition = {
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      };
 
-      render(<FilterField chips={mockChips} onClear={vi.fn()} />);
+      render(<FilterField fields={sampleFields} value={condition} />);
 
       const clearButton = screen.getByRole('button', { name: /clear all filters/i });
       expect(clearButton).toHaveAttribute('aria-label', 'Clear all filters');
     });
 
-    it('has correct role attribute', () => {
-      const { container } = render(<FilterField />);
+    it('has combobox role attribute', () => {
+      const { container } = render(<FilterField fields={sampleFields} />);
       const field = container.querySelector('[data-slot="filter-field"]');
-      expect(field).toHaveAttribute('role', 'textbox');
-    });
-  });
-
-  describe('styling', () => {
-    it('has correct base styling', () => {
-      const { container } = render(<FilterField />);
-      const field = container.querySelector('[data-slot="filter-field"]');
-      expect(field).toHaveClass('h-10', 'max-w-[800px]', 'rounded-lg');
-    });
-
-    it('applies hover border color when not in error state', () => {
-      const { container } = render(<FilterField />);
-      const field = container.querySelector('[data-slot="filter-field"]');
-      expect(field).toHaveClass('hover:border-component-border-input-hover');
+      expect(field).toHaveAttribute('role', 'combobox');
     });
   });
 });

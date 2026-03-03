@@ -4,33 +4,52 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const compositionStory = createStoryHelper('components-filter-composition', [
   'Default',
   'Simple',
+  'Multi Condition',
   'Backend Integration',
 ] as const);
 
 test.describe('Component: FilterField - Self-Contained Mechanics', () => {
-  // Helper to create a complete chip
+  // Helper to create a complete chip (field → operator → value)
   async function createChip(page: any) {
     const input = page.locator('input[type="text"]');
     await input.click();
 
-    // Wait for and select field
     await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
     const firstField = page.locator('[role="menuitem"]').first();
     await firstField.click();
 
-    // Wait for and select operator
     await page.waitForTimeout(300);
     await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
     const firstOperator = page.locator('[role="menuitem"]').first();
     await firstOperator.click();
 
-    // Wait for and select value
     await page.waitForTimeout(300);
     await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
     const firstValue = page.locator('[role="menuitem"]').first();
     await firstValue.click();
 
-    // Wait for chip to be created
+    await page.waitForTimeout(300);
+  }
+
+  // Helper to create a chip by selecting specific field/value by text
+  async function createChipWithSelection(page: any, fieldText: string, valueText: string) {
+    const input = page.locator('input[type="text"]');
+    await input.click();
+
+    await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
+    const field = page.locator('[role="menuitem"]').filter({ hasText: fieldText });
+    await field.click();
+
+    await page.waitForTimeout(300);
+    await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
+    const firstOperator = page.locator('[role="menuitem"]').first();
+    await firstOperator.click();
+
+    await page.waitForTimeout(300);
+    await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
+    const valueItem = page.locator('[role="menuitem"]').filter({ hasText: valueText });
+    await valueItem.click();
+
     await page.waitForTimeout(300);
   }
 
@@ -41,11 +60,9 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      // Field menu should open automatically
       const menu = page.locator('[data-slot="filter-main-menu"]');
       await expect(menu).toBeVisible({ timeout: 2000 });
 
-      // Should have menu items
       const menuItems = page.locator('[role="menuitem"]');
       await expect(menuItems.first()).toBeVisible();
     });
@@ -56,24 +73,20 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      // Step 1: Select field
       await page.waitForSelector('[data-slot="filter-main-menu"]', { state: 'visible', timeout: 2000 });
       const statusField = page.locator('[role="menuitem"]').filter({ hasText: 'Status' });
       await statusField.click();
 
-      // Step 2: Select operator
       await page.waitForTimeout(300);
       await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 2000 });
       const isOperator = page.locator('[role="menuitem"]').first();
       await isOperator.click();
 
-      // Step 3: Select value
       await page.waitForTimeout(300);
       await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 2000 });
       const activeValue = page.locator('[role="menuitem"]').filter({ hasText: 'Active' });
       await activeValue.click();
 
-      // Step 4: Verify chip created
       await page.waitForTimeout(300);
       const chip = page.locator('[data-slot="filter-chip"]');
       await expect(chip).toBeVisible();
@@ -84,35 +97,28 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
     test('Should delete chip when delete button clicked', async ({ page }) => {
       await compositionStory.goto(page, 'Simple');
 
-      // Create chip using helper
       await createChip(page);
 
-      // Verify chip exists
       const chip = page.locator('[data-slot="filter-chip"]');
       await expect(chip).toBeVisible();
 
-      // Hover and click delete
       await chip.hover();
       await page.waitForTimeout(200);
       const deleteButton = page.locator('[data-slot="filter-chip-delete"]');
       await expect(deleteButton).toBeVisible();
       await deleteButton.click();
 
-      // Chip should be removed
       await expect(chip).not.toBeVisible();
     });
 
     test('Should clear all chips when clear button clicked', async ({ page }) => {
       await compositionStory.goto(page, 'Simple');
 
-      // Create chip using helper
       await createChip(page);
 
-      // Verify chip exists
       const chip = page.locator('[data-slot="filter-chip"]');
       await expect(chip).toBeVisible();
 
-      // Hover field to show clear button
       const field = page.locator('[data-slot="filter-field"]');
       await field.hover();
       await page.waitForTimeout(200);
@@ -121,25 +127,20 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
       await expect(clearButton).toBeVisible();
       await clearButton.click();
 
-      // All chips should be removed
       await expect(chip).not.toBeVisible();
     });
 
     test('Should open operator menu when chip operator clicked', async ({ page }) => {
       await compositionStory.goto(page, 'Simple');
 
-      // Create chip using helper
       await createChip(page);
 
-      // Click operator segment to edit
       const chip = page.locator('[data-slot="filter-chip"]');
       const operatorSegment = chip.locator('[data-slot="segment-operator"]');
       await operatorSegment.click();
 
-      // Chip should stay visible
       await expect(chip).toBeVisible();
 
-      // Operator menu should open
       await page.waitForTimeout(300);
       await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 2000 });
       const menu = page.locator('[role="menu"]');
@@ -149,18 +150,14 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
     test('Should open value menu when chip value clicked', async ({ page }) => {
       await compositionStory.goto(page, 'Simple');
 
-      // Create chip using helper
       await createChip(page);
 
-      // Click value segment to edit
       const chip = page.locator('[data-slot="filter-chip"]');
       const valueSegment = chip.locator('[data-slot="segment-value"]');
       await valueSegment.click();
 
-      // Chip should stay visible
       await expect(chip).toBeVisible();
 
-      // Value menu should open
       await page.waitForTimeout(300);
       await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 2000 });
       const menu = page.locator('[role="menu"]');
@@ -170,18 +167,14 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
     test('Should open field menu when chip attribute clicked', async ({ page }) => {
       await compositionStory.goto(page, 'Simple');
 
-      // Create chip using helper
       await createChip(page);
 
-      // Click attribute segment to edit
       const chip = page.locator('[data-slot="filter-chip"]');
       const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
       await attributeSegment.click();
 
-      // Chip should stay visible
       await expect(chip).toBeVisible();
 
-      // Field menu should open
       await page.waitForTimeout(300);
       const fieldMenu = page.locator('[data-slot="filter-main-menu"]');
       await expect(fieldMenu).toBeVisible({ timeout: 2000 });
@@ -193,17 +186,12 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      // Field menu should be open
       const menu = page.locator('[data-slot="filter-main-menu"]');
       await expect(menu).toBeVisible({ timeout: 2000 });
 
-      // Wait for event listeners to register after render
       await page.waitForTimeout(100);
-
-      // Press Escape
       await page.keyboard.press('Escape');
 
-      // Menu should close
       await expect(menu).not.toBeVisible({ timeout: 2000 });
     });
 
@@ -213,17 +201,12 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      // Field menu should be open
       await page.waitForSelector('[data-slot="filter-main-menu"]', { state: 'visible', timeout: 2000 });
 
-      // Press ArrowDown to navigate
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('ArrowDown');
-
-      // Press Enter to select
       await page.keyboard.press('Enter');
 
-      // Operator menu should open
       await page.waitForTimeout(300);
       await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 2000 });
     });
@@ -231,12 +214,87 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
     test('Should refocus input after chip creation', async ({ page }) => {
       await compositionStory.goto(page, 'Simple');
 
-      // Create chip using helper
       await createChip(page);
 
-      // Input should be focused again for next chip
       const input = page.locator('input[type="text"]');
       await expect(input).toBeFocused();
+    });
+  });
+
+  test.describe('Multi-Condition', () => {
+    test('Should create two conditions with AND chip between them', async ({ page }) => {
+      await compositionStory.goto(page, 'Multi Condition');
+
+      await createChipWithSelection(page, 'Status', 'Active');
+
+      const firstChip = page.locator('[data-slot="filter-chip"]').filter({ hasText: 'Status' });
+      await expect(firstChip).toBeVisible();
+
+      await createChipWithSelection(page, 'Priority', 'Low');
+
+      const allChips = page.locator('[data-slot="filter-chip"]');
+      await expect(allChips).toHaveCount(3);
+
+      const andChip = page.locator('[data-slot="filter-chip"]').filter({ hasText: 'AND' });
+      await expect(andChip).toBeVisible();
+    });
+
+    test('Should toggle AND to OR when connector chip clicked', async ({ page }) => {
+      await compositionStory.goto(page, 'Multi Condition');
+
+      await createChipWithSelection(page, 'Status', 'Active');
+      await createChipWithSelection(page, 'Priority', 'Low');
+
+      const andChip = page.locator('[data-slot="filter-chip"]').filter({ hasText: 'AND' });
+      await expect(andChip).toBeVisible();
+
+      await andChip.click();
+      await page.waitForTimeout(200);
+
+      const orChip = page.locator('[data-slot="filter-chip"]').filter({ hasText: 'OR' });
+      await expect(orChip).toBeVisible();
+
+      await expect(andChip).not.toBeVisible();
+    });
+
+    test('Should remove connector when condition is removed', async ({ page }) => {
+      await compositionStory.goto(page, 'Multi Condition');
+
+      await createChipWithSelection(page, 'Status', 'Active');
+      await createChipWithSelection(page, 'Priority', 'Low');
+
+      const allChips = page.locator('[data-slot="filter-chip"]');
+      await expect(allChips).toHaveCount(3);
+
+      const statusChip = page.locator('[data-slot="filter-chip"]').filter({ hasText: 'Status' });
+      await statusChip.hover();
+      await page.waitForTimeout(200);
+      const deleteButton = statusChip.locator('[data-slot="filter-chip-delete"]');
+      await deleteButton.click();
+      await page.waitForTimeout(300);
+
+      await expect(allChips).toHaveCount(1);
+      const andChip = page.locator('[data-slot="filter-chip"]').filter({ hasText: 'AND' });
+      await expect(andChip).not.toBeVisible();
+    });
+
+    test('Should output Group expression with multiple conditions', async ({ page }) => {
+      await compositionStory.goto(page, 'Multi Condition');
+
+      await createChipWithSelection(page, 'Status', 'Active');
+      await createChipWithSelection(page, 'Priority', 'Low');
+
+      const debug = page.locator('[data-testid="expression-debug"]');
+      await expect(debug).toBeVisible();
+
+      const debugText = await debug.textContent();
+      const expression = JSON.parse(debugText!);
+
+      expect(expression.type).toBe('group');
+      expect(expression.operator).toBe('and');
+      expect(expression.children).toHaveLength(2);
+      expect(expression.children[0].field).toBe('status');
+      expect(expression.children[1].field).toBe('priority');
     });
   });
 
@@ -252,47 +310,37 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
       await compositionStory.goto(page, 'Simple');
 
       const field = page.locator('[data-slot="filter-field"]');
-
-      // Initially not expanded
       await expect(field).toHaveAttribute('aria-expanded', 'false');
 
-      // Click to open menu
       const input = page.locator('input[type="text"]');
       await input.click();
       await page.waitForTimeout(300);
 
-      // Should be expanded
       await expect(field).toHaveAttribute('aria-expanded', 'true');
     });
 
     test('Should be keyboard navigable through entire flow', async ({ page }) => {
       await compositionStory.goto(page, 'Simple');
 
-      // Tab to input
       await page.keyboard.press('Tab');
 
       const input = page.locator('input[type="text"]');
       await expect(input).toBeFocused();
 
-      // Menu should open
       await page.waitForSelector('[data-slot="filter-main-menu"]', { state: 'visible', timeout: 2000 });
 
-      // Navigate with arrows and select with Enter
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('Enter');
       await page.waitForTimeout(300);
 
-      // Operator menu
       await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 2000 });
       await page.keyboard.press('Enter');
       await page.waitForTimeout(300);
 
-      // Value menu
       await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 2000 });
       await page.keyboard.press('Enter');
       await page.waitForTimeout(300);
 
-      // Chip should be created
       const chip = page.locator('[data-slot="filter-chip"]');
       await expect(chip).toBeVisible();
     });

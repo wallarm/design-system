@@ -1,5 +1,5 @@
 import type { ChangeEvent, FC, FocusEvent, HTMLAttributes, KeyboardEvent, MouseEvent as ReactMouseEvent } from 'react';
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { X } from '../../../icons/X';
 import { cn } from '../../../utils/cn';
 import { FilterChip } from '../FilterChip';
@@ -12,6 +12,7 @@ import type {
   FieldMetadata,
   FilterChipData,
   FilterOperator,
+  Group,
 } from '../types';
 import { getOperatorFromLabel, getOperatorLabel } from '../types';
 
@@ -45,9 +46,26 @@ export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, '
 
 type MenuState = 'closed' | 'field' | 'operator' | 'value';
 
+/** Build an ExprNode from conditions + connector operator */
+function buildExpression(conditions: Condition[], connectorOp: 'and' | 'or'): ExprNode | null {
+  if (conditions.length === 0) return null;
+  if (conditions.length === 1) return conditions[0];
+  return { type: 'group', operator: connectorOp, children: conditions };
+}
+
+/** Extract conditions + connector from an ExprNode */
+function expressionToConditions(expr: ExprNode | null): { conditions: Condition[]; connector: 'and' | 'or' } {
+  if (!expr) return { conditions: [], connector: 'and' };
+  if (expr.type === 'condition') return { conditions: [expr], connector: 'and' };
+  const group = expr as Group;
+  const conditions = group.children.filter((c): c is Condition => c.type === 'condition');
+  return { conditions, connector: group.operator };
+}
+
 /**
  * FilterField - Self-contained filter component.
  * Handles autocomplete flow (field → operator → value), chip creation, and expression management.
+ * Supports multiple conditions joined by AND/OR connectors.
  * Just pass `fields` config from backend API and it works.
  */
 export const FilterField: FC<FilterFieldProps> = ({
@@ -62,65 +80,92 @@ export const FilterField: FC<FilterFieldProps> = ({
 }) => {
   const [inputText, setInputText] = useState('');
   const [menuState, setMenuState] = useState<MenuState>('closed');
-  const [chips, setChips] = useState<FilterChipData[]>([]);
+  const [conditions, setConditions] = useState<Condition[]>([]);
+  const [connectorOperator, setConnectorOperator] = useState<'and' | 'or'>('and');
   const [selectedField, setSelectedField] = useState<FieldMetadata | null>(null);
   const [selectedOperator, setSelectedOperator] = useState<FilterOperator | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [menuLeftOffset, setMenuLeftOffset] = useState(0);
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
   const [multiSelectValues, setMultiSelectValues] = useState<Array<string | number | boolean>>([]);
-  // Timestamp of last menu transition — blur won't close within 400ms of a transition
   const lastTransitionRef = useRef(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const buildingChipRef = useRef<HTMLDivElement>(null);
 
-  // Convert expression to chips
-  const expressionToChips = useCallback((expr: ExprNode | null): FilterChipData[] => {
-    if (!expr || expr.type !== 'condition') return [];
+  /** Map a chip ID (e.g. "chip-2") back to condition index */
+  const chipIdToConditionIndex = (chipId: string): number | null => {
+    const match = chipId.match(/^chip-(\d+)$/);
+    return match ? Number(match[1]) : null;
+  };
 
-    const condition = expr as Condition;
-    const field = fields.find(f => f.name === condition.field);
+  // Derive display chips from conditions + connector operator
+  const chips = useMemo((): FilterChipData[] => {
+    const result: FilterChipData[] = [];
+    for (let i = 0; i < conditions.length; i++) {
+      const condition = conditions[i];
+      const field = fields.find(f => f.name === condition.field);
 
-    return [{
-      id: `chip-${Date.now()}`,
-      variant: 'chip',
-      attribute: field?.label || condition.field,
-      operator: getOperatorLabel(condition.operator, field?.type || 'string'),
-      value: Array.isArray(condition.value)
-        ? condition.value.map(v => field?.values?.find(opt => opt.value === v)?.label ?? String(v)).join(', ')
-        : String(condition.value ?? ''),
-      error,
-    }];
-  }, [fields, error]);
+      let displayValue: string;
+      if (Array.isArray(condition.value)) {
+        displayValue = condition.value
+          .map(v => field?.values?.find(opt => opt.value === v)?.label ?? String(v))
+          .join(', ');
+      } else {
+        displayValue = String(condition.value ?? '');
+        if (field?.values) {
+          const opt = field.values.find(o => o.value === condition.value);
+          if (opt) displayValue = opt.label;
+        }
+      }
 
-  // Sync chips with value prop (controlled mode)
+      if (i > 0) {
+        result.push({
+          id: `connector-${i}`,
+          variant: connectorOperator,
+          error,
+        });
+      }
+
+      result.push({
+        id: `chip-${i}`,
+        variant: 'chip',
+        attribute: field?.label || condition.field,
+        operator: getOperatorLabel(condition.operator, field?.type || 'string'),
+        value: displayValue,
+        error,
+      });
+    }
+    return result;
+  }, [conditions, connectorOperator, fields, error]);
+
+  // Sync conditions with value prop (controlled mode)
   useEffect(() => {
     if (value !== undefined) {
-      setChips(expressionToChips(value));
+      const { conditions: newConditions, connector } = expressionToConditions(value);
+      setConditions(newConditions);
+      setConnectorOperator(connector);
     }
-  }, [value, expressionToChips]);
+  }, [value]);
 
   // Auto-open field menu ONLY on initial focus (not after Escape)
   const prevFocusedRef = useRef(false);
   useEffect(() => {
-    // Only open when isFocused transitions from false → true
-    if (isFocused && !prevFocusedRef.current && chips.length === 0 && inputText === '') {
+    if (isFocused && !prevFocusedRef.current && conditions.length === 0 && inputText === '') {
       setMenuLeftOffset(0);
       setMenuState('field');
     }
     prevFocusedRef.current = isFocused;
-  }, [isFocused, chips.length, inputText]);
+  }, [isFocused, conditions.length, inputText]);
 
-  // Global Escape handler — works even when menu buttons have focus
+  // Global Escape handler
   useEffect(() => {
     if (menuState === 'closed') return;
 
     const handleEscape = (e: globalThis.KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        // If multi-select with values chosen → confirm them
         if (multiSelectValues.length > 0 && selectedField && selectedOperator) {
           createChip(selectedField, selectedOperator, multiSelectValues);
         }
@@ -147,7 +192,7 @@ export const FilterField: FC<FilterFieldProps> = ({
     if (text && !selectedField) {
       setMenuState('field');
     } else if (!text && !selectedField) {
-      setMenuState(isFocused && chips.length === 0 ? 'field' : 'closed');
+      setMenuState(isFocused && conditions.length === 0 ? 'field' : 'closed');
     }
   };
 
@@ -178,7 +223,6 @@ export const FilterField: FC<FilterFieldProps> = ({
   const handleValueSelect = (val: string | number | boolean) => {
     if (!selectedField || !selectedOperator) return;
 
-    // Multi-select: toggle value in the list
     if (isMultiSelectOperator(selectedOperator)) {
       setMultiSelectValues(prev =>
         prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val],
@@ -186,16 +230,8 @@ export const FilterField: FC<FilterFieldProps> = ({
       return;
     }
 
-    // Single-select: create chip immediately
     createChip(selectedField, selectedOperator, val);
     resetState();
-  };
-
-  const handleMultiSelectConfirm = () => {
-    if (selectedField && selectedOperator && multiSelectValues.length > 0) {
-      createChip(selectedField, selectedOperator, multiSelectValues);
-      resetState();
-    }
   };
 
   const createChip = (
@@ -210,28 +246,26 @@ export const FilterField: FC<FilterFieldProps> = ({
       value: val,
     };
 
-    // Build display value — join labels for arrays (in/not_in)
-    let displayValue: string;
-    if (Array.isArray(val)) {
-      displayValue = val
-        .map(v => field.values?.find(opt => opt.value === v)?.label ?? String(v))
-        .join(', ');
-    } else {
-      const valueOption = field.values?.find(v => v.value === val);
-      displayValue = valueOption?.label ?? String(val ?? '');
-    }
+    setConditions(prev => {
+      let newConditions: Condition[];
 
-    const newChip: FilterChipData = {
-      id: `chip-${Date.now()}`,
-      variant: 'chip',
-      attribute: field.label,
-      operator: getOperatorLabel(operator, field.type),
-      value: displayValue,
-      error,
-    };
+      if (editingChipId) {
+        const idx = chipIdToConditionIndex(editingChipId);
+        if (idx !== null && idx < prev.length) {
+          newConditions = [...prev];
+          newConditions[idx] = condition;
+        } else {
+          newConditions = [...prev, condition];
+        }
+      } else {
+        newConditions = [...prev, condition];
+      }
 
-    setChips([newChip]);
-    onChange?.(condition);
+      const expr = buildExpression(newConditions, connectorOperator);
+      onChange?.(expr);
+
+      return newConditions;
+    });
   };
 
   const resetState = () => {
@@ -245,13 +279,21 @@ export const FilterField: FC<FilterFieldProps> = ({
   };
 
   const handleChipRemove = (chipId: string) => {
-    setChips(prev => prev.filter(c => c.id !== chipId));
-    onChange?.(null);
+    const idx = chipIdToConditionIndex(chipId);
+    if (idx === null) return;
+
+    setConditions(prev => {
+      const newConditions = prev.filter((_, i) => i !== idx);
+      const expr = buildExpression(newConditions, connectorOperator);
+      onChange?.(expr);
+      return newConditions;
+    });
     inputRef.current?.focus();
   };
 
   const handleClear = () => {
-    setChips([]);
+    setConditions([]);
+    setConnectorOperator('and');
     setInputText('');
     setSelectedField(null);
     setSelectedOperator(null);
@@ -262,19 +304,37 @@ export const FilterField: FC<FilterFieldProps> = ({
     inputRef.current?.focus();
   };
 
+  const handleConnectorClick = () => {
+    setConnectorOperator(prev => {
+      const next = prev === 'and' ? 'or' : 'and';
+      const expr = buildExpression(conditions, next);
+      onChange?.(expr);
+      return next;
+    });
+  };
+
   const handleChipClick = (chipId: string, e: ReactMouseEvent) => {
+    if (chipId.startsWith('connector-')) {
+      handleConnectorClick();
+      return;
+    }
+
+    const idx = chipIdToConditionIndex(chipId);
+    if (idx === null) return;
+
+    const condition = conditions[idx];
+    if (!condition) return;
+
+    const field = fields.find(f => f.name === condition.field);
+    if (!field) return;
+
     const chip = chips.find(c => c.id === chipId);
     if (!chip || chip.variant !== 'chip') return;
 
-    const field = fields.find(f => f.label === chip.attribute);
-    if (!field) return;
-
-    // Detect which segment was clicked via data-slot attribute
     const target = e.target as HTMLElement;
     const segmentEl = target.closest('[data-slot]') as HTMLElement | null;
     const slot = segmentEl?.getAttribute('data-slot');
 
-    // Calculate left offset of clicked segment relative to container
     if (segmentEl && containerRef.current) {
       const containerRect = containerRef.current.getBoundingClientRect();
       const segmentRect = segmentEl.getBoundingClientRect();
@@ -286,28 +346,27 @@ export const FilterField: FC<FilterFieldProps> = ({
     setSelectedField(field);
 
     if (slot === 'segment-attribute') {
-      // Click on field name → open field menu
       setSelectedOperator(null);
       setMenuState('field');
     } else if (slot === 'segment-value') {
-      // Click on value → open value menu (need raw operator)
       const rawOperator = getOperatorFromLabel(chip.operator || '', field.type);
       setSelectedOperator(rawOperator);
       setMenuState('value');
     } else {
-      // Click on operator or chip container → open operator menu
       setSelectedOperator(null);
       setMenuState('operator');
     }
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && inputText === '' && chips.length > 0) {
+    if (e.key === 'Backspace' && inputText === '' && conditions.length > 0) {
       e.preventDefault();
-      const lastChip = chips[chips.length - 1];
-      if (lastChip) {
-        handleChipRemove(lastChip.id);
-      }
+      setConditions(prev => {
+        const newConditions = prev.slice(0, -1);
+        const expr = buildExpression(newConditions, connectorOperator);
+        onChange?.(expr);
+        return newConditions;
+      });
     }
   };
 
@@ -315,14 +374,12 @@ export const FilterField: FC<FilterFieldProps> = ({
     setIsFocused(true);
   };
 
-  const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
+  const handleBlur = (_e: FocusEvent<HTMLDivElement>) => {
     setTimeout(() => {
-      // Don't close within 400ms of a menu transition (field→operator→value click)
       if (Date.now() - lastTransitionRef.current < 400) return;
 
       const activeEl = document.activeElement;
       if (!containerRef.current?.contains(activeEl)) {
-        // Confirm multi-select if values were chosen
         if (multiSelectValues.length > 0 && selectedField && selectedOperator) {
           createChip(selectedField, selectedOperator, multiSelectValues);
         }
@@ -338,7 +395,6 @@ export const FilterField: FC<FilterFieldProps> = ({
 
   // ── Render ────────────────────────────────────────────────
 
-  // Progressive building chip — shows attribute/operator as user selects them
   const isBuilding = !editingChipId && selectedField !== null;
   const buildingMultiValue = multiSelectValues.length > 0
     ? multiSelectValues
@@ -352,7 +408,6 @@ export const FilterField: FC<FilterFieldProps> = ({
     value: buildingMultiValue,
   } : null;
 
-  // Reposition dropdown to the right edge of the building chip
   useLayoutEffect(() => {
     if (!isBuilding || !buildingChipRef.current || !containerRef.current) return;
     if (menuState !== 'operator' && menuState !== 'value') return;
@@ -362,10 +417,25 @@ export const FilterField: FC<FilterFieldProps> = ({
     setMenuLeftOffset(chipRect.right - containerRect.left);
   });
 
-  const hasChips = chips.length > 0;
+  const maxVisibleConditions = 3;
+  const hasMoreChips = conditions.length > maxVisibleConditions;
+
+  const visibleChips = useMemo(() => {
+    if (!hasMoreChips) return chips;
+    const result: FilterChipData[] = [];
+    let condCount = 0;
+    for (const chip of chips) {
+      if (chip.variant === 'chip') {
+        condCount++;
+        if (condCount > maxVisibleConditions) break;
+      }
+      result.push(chip);
+    }
+    return result;
+  }, [chips, hasMoreChips]);
+
+  const hasChips = conditions.length > 0;
   const hasContent = hasChips || isBuilding;
-  const visibleChips = chips.slice(0, 3);
-  const hasMoreChips = chips.length > 3;
 
   return (
     <div
@@ -394,15 +464,21 @@ export const FilterField: FC<FilterFieldProps> = ({
         <div className={cn('flex flex-1 items-center gap-2 pr-1', hasContent ? 'pl-2' : 'pl-3')}>
           {hasContent && (
             <div className='flex items-center gap-1'>
-              {visibleChips.map(chip => (
-                <div
-                  key={chip.id}
-                  className='shrink-0 cursor-pointer hover:z-10'
-                  onClick={(e) => handleChipClick(chip.id, e)}
-                >
-                  <FilterChip {...chip} onRemove={() => handleChipRemove(chip.id)} />
-                </div>
-              ))}
+              {visibleChips.map(chip => {
+                const isConnector = chip.variant === 'and' || chip.variant === 'or';
+                return (
+                  <div
+                    key={chip.id}
+                    className='shrink-0 cursor-pointer hover:z-10'
+                    onClick={(e) => handleChipClick(chip.id, e)}
+                  >
+                    <FilterChip
+                      {...chip}
+                      onRemove={isConnector ? undefined : () => handleChipRemove(chip.id)}
+                    />
+                  </div>
+                );
+              })}
               {hasMoreChips && (
                 <p className='pl-1 text-sm leading-5 text-text-secondary'>{placeholder}</p>
               )}
@@ -447,7 +523,7 @@ export const FilterField: FC<FilterFieldProps> = ({
         </div>
       </div>
 
-      {/* Dropdown menus — NO onOpenChange, we manage state ourselves */}
+      {/* Dropdown menus */}
       {menuState === 'field' && (
         <div className='absolute top-full mt-1 z-50' style={{ left: menuLeftOffset }}>
           <FilterMainMenu
