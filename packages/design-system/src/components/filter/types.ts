@@ -148,6 +148,22 @@ export function getOperatorLabel(operator: FilterOperator, fieldType: FieldType)
 }
 
 /**
+ * Reverse lookup: get raw FilterOperator from its display label and field type
+ */
+export function getOperatorFromLabel(label: string, fieldType: FieldType): FilterOperator | null {
+  // Check type-specific labels first (more specific)
+  const typeLabels = OPERATOR_LABELS_BY_TYPE[fieldType];
+  for (const [op, lbl] of Object.entries(typeLabels)) {
+    if (lbl === label) return op as FilterOperator;
+  }
+  // Fall back to generic labels
+  for (const [op, lbl] of Object.entries(OPERATOR_LABELS)) {
+    if (lbl === label) return op as FilterOperator;
+  }
+  return null;
+}
+
+/**
  * Operators by Field Type Mapping (with groups for separators)
  * Maps field types to their available operators, grouped logically
  */

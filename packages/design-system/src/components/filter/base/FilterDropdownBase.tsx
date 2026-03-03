@@ -81,11 +81,12 @@ export const FilterDropdownBase: FC<FilterDropdownBaseProps> = ({
                   onClick={() => !item.disabled && onSelect(item)}
                   disabled={item.disabled}
                   className={cn(
-                    'flex items-start gap-1 px-2 py-1.5',
+                    'flex w-full items-start gap-1 px-2 py-1.5',
                     'rounded-md overflow-clip',
                     'text-left',
                     'transition-colors',
                     item.disabled && 'opacity-50 cursor-not-allowed',
+                    !item.disabled && 'cursor-pointer',
                     !item.disabled &&
                       (isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50'),
                   )}

@@ -1,5 +1,5 @@
-import type { ChangeEvent, FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ChangeEvent, FC, FocusEvent, HTMLAttributes, KeyboardEvent, MouseEvent as ReactMouseEvent } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { X } from '../../../icons/X';
 import { cn } from '../../../utils/cn';
 import { FilterChip } from '../FilterChip';
@@ -13,7 +13,7 @@ import type {
   FilterChipData,
   FilterOperator,
 } from '../types';
-import { getOperatorLabel } from '../types';
+import { getOperatorFromLabel, getOperatorLabel } from '../types';
 
 export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /**
@@ -66,11 +66,14 @@ export const FilterField: FC<FilterFieldProps> = ({
   const [selectedField, setSelectedField] = useState<FieldMetadata | null>(null);
   const [selectedOperator, setSelectedOperator] = useState<FilterOperator | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [menuLeftOffset, setMenuLeftOffset] = useState(0);
+  const [editingChipId, setEditingChipId] = useState<string | null>(null);
   // Timestamp of last menu transition — blur won't close within 400ms of a transition
   const lastTransitionRef = useRef(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
+  const buildingChipRef = useRef<HTMLDivElement>(null);
 
   // Convert expression to chips
   const expressionToChips = useCallback((expr: ExprNode | null): FilterChipData[] => {
@@ -101,6 +104,7 @@ export const FilterField: FC<FilterFieldProps> = ({
   useEffect(() => {
     // Only open when isFocused transitions from false → true
     if (isFocused && !prevFocusedRef.current && chips.length === 0 && inputText === '') {
+      setMenuLeftOffset(0);
       setMenuState('field');
     }
     prevFocusedRef.current = isFocused;
@@ -114,6 +118,9 @@ export const FilterField: FC<FilterFieldProps> = ({
       if (e.key === 'Escape') {
         e.preventDefault();
         setMenuState('closed');
+        setSelectedField(null);
+        setSelectedOperator(null);
+        setEditingChipId(null);
         inputRef.current?.focus();
       }
     };
@@ -127,6 +134,7 @@ export const FilterField: FC<FilterFieldProps> = ({
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setInputText(text);
+    setMenuLeftOffset(0);
 
     if (text && !selectedField) {
       setMenuState('field');
@@ -196,6 +204,7 @@ export const FilterField: FC<FilterFieldProps> = ({
     setInputText('');
     setSelectedField(null);
     setSelectedOperator(null);
+    setEditingChipId(null);
     setMenuState('closed');
     inputRef.current?.focus();
   };
@@ -216,16 +225,41 @@ export const FilterField: FC<FilterFieldProps> = ({
     inputRef.current?.focus();
   };
 
-  const handleChipClick = (chipId: string) => {
+  const handleChipClick = (chipId: string, e: ReactMouseEvent) => {
     const chip = chips.find(c => c.id === chipId);
     if (!chip || chip.variant !== 'chip') return;
 
     const field = fields.find(f => f.label === chip.attribute);
-    if (field) {
-      lastTransitionRef.current = Date.now();
-      setSelectedField(field);
+    if (!field) return;
+
+    // Detect which segment was clicked via data-slot attribute
+    const target = e.target as HTMLElement;
+    const segmentEl = target.closest('[data-slot]') as HTMLElement | null;
+    const slot = segmentEl?.getAttribute('data-slot');
+
+    // Calculate left offset of clicked segment relative to container
+    if (segmentEl && containerRef.current) {
+      const containerRect = containerRef.current.getBoundingClientRect();
+      const segmentRect = segmentEl.getBoundingClientRect();
+      setMenuLeftOffset(segmentRect.left - containerRect.left);
+    }
+
+    lastTransitionRef.current = Date.now();
+    setEditingChipId(chipId);
+    setSelectedField(field);
+
+    if (slot === 'segment-attribute') {
+      // Click on field name → open field menu
       setSelectedOperator(null);
-      setChips([]);
+      setMenuState('field');
+    } else if (slot === 'segment-value') {
+      // Click on value → open value menu (need raw operator)
+      const rawOperator = getOperatorFromLabel(chip.operator || '', field.type);
+      setSelectedOperator(rawOperator);
+      setMenuState('value');
+    } else {
+      // Click on operator or chip container → open operator menu
+      setSelectedOperator(null);
       setMenuState('operator');
     }
   };
@@ -255,34 +289,54 @@ export const FilterField: FC<FilterFieldProps> = ({
         setMenuState('closed');
         setSelectedField(null);
         setSelectedOperator(null);
+        setEditingChipId(null);
       }
     }, 200);
   };
 
   // ── Render ────────────────────────────────────────────────
 
+  // Progressive building chip — shows attribute/operator as user selects them
+  const isBuilding = !editingChipId && selectedField !== null;
+  const buildingChipData = isBuilding ? {
+    variant: 'chip' as const,
+    attribute: selectedField!.label,
+    operator: selectedOperator ? getOperatorLabel(selectedOperator, selectedField!.type) : undefined,
+    value: undefined,
+  } : null;
+
+  // Reposition dropdown to the right edge of the building chip
+  useLayoutEffect(() => {
+    if (!isBuilding || !buildingChipRef.current || !containerRef.current) return;
+    if (menuState !== 'operator' && menuState !== 'value') return;
+
+    const containerRect = containerRef.current.getBoundingClientRect();
+    const chipRect = buildingChipRef.current.getBoundingClientRect();
+    setMenuLeftOffset(chipRect.right - containerRect.left);
+  });
+
   const hasChips = chips.length > 0;
+  const hasContent = hasChips || isBuilding;
   const visibleChips = chips.slice(0, 3);
   const hasMoreChips = chips.length > 3;
 
   return (
     <div
       ref={containerRef}
-      className='relative inline-block w-full'
+      className={cn('relative w-full', className)}
       onFocus={handleFocus}
       onBlur={handleBlur}
     >
       {/* Input bar */}
       <div
         className={cn(
-          'relative flex h-10 w-full max-w-[800px] items-center overflow-clip rounded-lg',
+          'relative flex h-10 w-full items-center overflow-visible rounded-lg',
           'border border-border-primary bg-component-input-bg shadow-xs',
           !error && 'hover:border-component-border-input-hover',
           error && 'hover:shadow-[0px_0px_0px_3px_rgba(231,0,11,0.3)]',
           !error && 'focus-within:border-border-strong-primary focus-within:shadow-focus-ring-primary',
           error && 'border-border-strong-danger',
           error && 'focus-within:border-border-strong-danger focus-within:shadow-[0px_0px_0px_3px_rgba(231,0,11,0.2)]',
-          className,
         )}
         role='combobox'
         aria-expanded={menuState !== 'closed'}
@@ -290,20 +344,25 @@ export const FilterField: FC<FilterFieldProps> = ({
         data-slot='filter-field'
         {...props}
       >
-        <div className={cn('flex flex-1 items-center gap-2 pr-1', hasChips ? 'pl-2' : 'pl-3')}>
-          {hasChips && (
+        <div className={cn('flex flex-1 items-center gap-2 pr-1', hasContent ? 'pl-2' : 'pl-3')}>
+          {hasContent && (
             <div className='flex items-center gap-1'>
               {visibleChips.map(chip => (
                 <div
                   key={chip.id}
-                  className='shrink-0 cursor-pointer'
-                  onClick={() => handleChipClick(chip.id)}
+                  className='shrink-0 cursor-pointer hover:z-10'
+                  onClick={(e) => handleChipClick(chip.id, e)}
                 >
                   <FilterChip {...chip} onRemove={() => handleChipRemove(chip.id)} />
                 </div>
               ))}
               {hasMoreChips && (
                 <p className='pl-1 text-sm leading-5 text-text-secondary'>{placeholder}</p>
+              )}
+              {buildingChipData && (
+                <div ref={buildingChipRef} className='shrink-0'>
+                  <FilterChip {...buildingChipData} />
+                </div>
               )}
             </div>
           )}
@@ -315,14 +374,14 @@ export const FilterField: FC<FilterFieldProps> = ({
               value={inputText}
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
-              placeholder={hasChips ? '' : placeholder}
+              placeholder={hasContent ? '' : placeholder}
               className='flex-1 bg-transparent outline-none text-sm leading-5 text-text-primary placeholder:text-text-secondary'
             />
           )}
         </div>
 
         <div className='flex shrink-0 items-center gap-2 pr-3'>
-          {showKeyboardHint && !hasChips && (
+          {showKeyboardHint && !hasContent && (
             <div className='flex items-center gap-0.5'>
               <kbd className='inline-flex h-5 min-w-[20px] items-center justify-center rounded border border-component-border-hotkey bg-bg-surface-2 px-1 text-xs'>⌘</kbd>
               <kbd className='inline-flex h-5 min-w-[20px] items-center justify-center rounded border border-component-border-hotkey bg-bg-surface-2 px-1 text-xs'>K</kbd>
@@ -332,7 +391,7 @@ export const FilterField: FC<FilterFieldProps> = ({
             <button
               type='button'
               onClick={handleClear}
-              className='flex h-6 w-6 items-center justify-center rounded-full hover:bg-bg-neutral-subtle'
+              className='flex h-6 w-6 cursor-pointer items-center justify-center rounded-full hover:bg-bg-neutral-subtle'
               aria-label='Clear all filters'
             >
               <X className='h-4 w-4 text-text-secondary' />
@@ -343,7 +402,7 @@ export const FilterField: FC<FilterFieldProps> = ({
 
       {/* Dropdown menus — NO onOpenChange, we manage state ourselves */}
       {menuState === 'field' && (
-        <div className='absolute top-full left-0 mt-1 z-50'>
+        <div className='absolute top-full mt-1 z-50' style={{ left: menuLeftOffset }}>
           <FilterMainMenu
             fields={fields}
             open={true}
@@ -353,7 +412,7 @@ export const FilterField: FC<FilterFieldProps> = ({
       )}
 
       {menuState === 'operator' && selectedField && (
-        <div className='absolute top-full left-0 mt-1 z-50'>
+        <div className='absolute top-full mt-1 z-50' style={{ left: menuLeftOffset }}>
           <FilterOperatorMenu
             fieldType={selectedField.type}
             open={true}
@@ -363,7 +422,7 @@ export const FilterField: FC<FilterFieldProps> = ({
       )}
 
       {menuState === 'value' && selectedField && selectedOperator && (
-        <div className='absolute top-full left-0 mt-1 z-50'>
+        <div className='absolute top-full mt-1 z-50' style={{ left: menuLeftOffset }}>
           <FilterValueMenu
             values={selectedField.values || []}
             open={true}

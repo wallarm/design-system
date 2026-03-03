@@ -53,7 +53,7 @@ export const FilterChip: FC<FilterChipProps> = ({
       <div
         className={cn(
           // Layout
-          'relative flex items-center justify-center px-1 py-0',
+          'relative flex items-center justify-center px-1 py-0 cursor-pointer',
           'min-h-[20px] max-w-[320px]',
           // Border & Background
           'border border-solid rounded-lg',
@@ -88,17 +88,16 @@ export const FilterChip: FC<FilterChipProps> = ({
               onRemove();
             }}
             className={cn(
-              // Position
-              'absolute -right-3 top-[-1px]',
-              // Layout
-              'flex items-center justify-center',
-              'h-full w-[18px]',
+              // Position — extend 1px above and below chip border
+              'absolute -right-3 top-[-1px] bottom-[-1px]',
+              // Layout — reset button padding
+              'flex items-center justify-center p-0 cursor-pointer',
+              'w-[18px]',
               // Border & Background
               'border border-solid',
               'border-l-0',
               error ? 'border-border-danger' : 'border-border-primary',
               'rounded-r-lg',
-              // Background color
               error ? 'bg-bg-light-danger' : 'bg-badge-badge-bg',
               // Text color
               error ? 'text-text-danger' : 'text-text-secondary',
@@ -139,7 +138,7 @@ export const FilterChip: FC<FilterChipProps> = ({
       <div
         className={cn(
           // Layout
-          'relative flex items-center gap-0 px-1 py-0',
+          'relative flex items-center gap-0 px-1 py-0 cursor-pointer',
           'min-h-[20px] max-w-[560px]',
           // Border & Background
           'border border-solid rounded-lg',
@@ -171,20 +170,19 @@ export const FilterChip: FC<FilterChipProps> = ({
               onRemove();
             }}
             className={cn(
-              // Position
-              'absolute -right-3',
-              // Layout
-              'flex items-center justify-center',
-              'h-full w-[18px]',
-              // Border & Background
+              // Position — extend 1px above and below chip border
+              'absolute -right-3 top-[-1px] bottom-[-1px]',
+              // Layout — reset button padding
+              'flex items-center justify-center p-0 cursor-pointer',
+              'w-[18px]',
+              // Border & Background — match Figma exactly
               'border border-solid',
-              'border-l-0 border-border-primary',
+              'border-l-0',
+              error ? 'border-border-danger' : 'border-border-primary',
               'rounded-r-lg',
-              // Hover gradient background
-              'bg-gradient-to-r from-[rgba(98,116,142,0.08)] to-[rgba(98,116,142,0.08)]',
-              'bg-[rgb(255,255,255)]',
+              error ? 'bg-bg-light-danger' : 'bg-badge-badge-bg',
               // Text color
-              'text-text-secondary',
+              error ? 'text-text-danger' : 'text-text-secondary',
             )}
             data-slot='filter-chip-delete'
             aria-label='Remove filter'

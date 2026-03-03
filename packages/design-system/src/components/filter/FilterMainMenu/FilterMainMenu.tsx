@@ -164,8 +164,7 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
           }
           break;
         case 'Escape':
-          e.preventDefault();
-          onOpenChange?.(false);
+          // Escape is handled by FilterField's global handler
           break;
       }
     };
@@ -241,7 +240,7 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
                   type='button'
                   onClick={() => fieldMeta && handleSelect(fieldMeta)}
                   className={cn(
-                    'flex items-start gap-1 px-2 py-1.5',
+                    'flex w-full items-start gap-1 px-2 py-1.5 cursor-pointer',
                     'rounded-md overflow-clip',
                     'text-left',
                     'transition-colors',
@@ -302,7 +301,7 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
                   type='button'
                   onClick={() => handleSelect(field)}
                   className={cn(
-                    'flex items-start gap-1 px-2 py-1.5',
+                    'flex w-full items-start gap-1 px-2 py-1.5 cursor-pointer',
                     'rounded-md overflow-clip',
                     'text-left',
                     'transition-colors',
@@ -360,7 +359,7 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
               type='button'
               onClick={() => handleSelect(field)}
               className={cn(
-                'flex items-start gap-1 px-2 py-1.5',
+                'flex w-full items-start gap-1 px-2 py-1.5 cursor-pointer',
                 'rounded-md overflow-clip',
                 'text-sm font-normal text-text-primary text-left',
                 'transition-colors',
@@ -401,7 +400,7 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
                 type='button'
                 onClick={handleSelectAnd}
                 className={cn(
-                  'flex items-start gap-1 px-2 py-1.5',
+                  'flex w-full items-start gap-1 px-2 py-1.5 cursor-pointer',
                   'rounded-md overflow-clip',
                   'text-left',
                   'transition-colors',
@@ -438,7 +437,7 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
                 type='button'
                 onClick={handleSelectOr}
                 className={cn(
-                  'flex items-start gap-1 px-2 py-1.5',
+                  'flex w-full items-start gap-1 px-2 py-1.5 cursor-pointer',
                   'rounded-md overflow-clip',
                   'text-left',
                   'transition-colors',

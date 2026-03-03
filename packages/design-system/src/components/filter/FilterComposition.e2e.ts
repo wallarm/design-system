@@ -125,23 +125,66 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
       await expect(chip).not.toBeVisible();
     });
 
-    test('Should enter edit mode when chip clicked', async ({ page }) => {
+    test('Should open operator menu when chip operator clicked', async ({ page }) => {
       await compositionStory.goto(page, 'Simple');
 
       // Create chip using helper
       await createChip(page);
 
-      // Click chip to edit
+      // Click operator segment to edit
       const chip = page.locator('[data-slot="filter-chip"]');
-      await chip.click();
+      const operatorSegment = chip.locator('[data-slot="segment-operator"]');
+      await operatorSegment.click();
 
-      // Chip should be removed and value menu should open
-      await expect(chip).not.toBeVisible();
+      // Chip should stay visible
+      await expect(chip).toBeVisible();
 
+      // Operator menu should open
       await page.waitForTimeout(300);
       await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 2000 });
       const menu = page.locator('[role="menu"]');
       await expect(menu).toBeVisible();
+    });
+
+    test('Should open value menu when chip value clicked', async ({ page }) => {
+      await compositionStory.goto(page, 'Simple');
+
+      // Create chip using helper
+      await createChip(page);
+
+      // Click value segment to edit
+      const chip = page.locator('[data-slot="filter-chip"]');
+      const valueSegment = chip.locator('[data-slot="segment-value"]');
+      await valueSegment.click();
+
+      // Chip should stay visible
+      await expect(chip).toBeVisible();
+
+      // Value menu should open
+      await page.waitForTimeout(300);
+      await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 2000 });
+      const menu = page.locator('[role="menu"]');
+      await expect(menu).toBeVisible();
+    });
+
+    test('Should open field menu when chip attribute clicked', async ({ page }) => {
+      await compositionStory.goto(page, 'Simple');
+
+      // Create chip using helper
+      await createChip(page);
+
+      // Click attribute segment to edit
+      const chip = page.locator('[data-slot="filter-chip"]');
+      const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+      await attributeSegment.click();
+
+      // Chip should stay visible
+      await expect(chip).toBeVisible();
+
+      // Field menu should open
+      await page.waitForTimeout(300);
+      const fieldMenu = page.locator('[data-slot="filter-main-menu"]');
+      await expect(fieldMenu).toBeVisible({ timeout: 2000 });
     });
 
     test('Should close menu when Escape pressed', async ({ page }) => {
@@ -154,11 +197,14 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
       const menu = page.locator('[data-slot="filter-main-menu"]');
       await expect(menu).toBeVisible({ timeout: 2000 });
 
+      // Wait for event listeners to register after render
+      await page.waitForTimeout(100);
+
       // Press Escape
       await page.keyboard.press('Escape');
 
       // Menu should close
-      await expect(menu).not.toBeVisible();
+      await expect(menu).not.toBeVisible({ timeout: 2000 });
     });
 
     test('Should navigate menu with keyboard arrows', async ({ page }) => {
