@@ -6,14 +6,12 @@ import { FilterChip } from '../FilterChip';
 import { FilterMainMenu } from '../FilterMainMenu';
 import { FilterOperatorMenu } from '../FilterOperatorMenu';
 import { FilterValueMenu } from '../FilterValueMenu';
-import { parse } from '../parser';
 import type {
   Condition,
   ExprNode,
   FieldMetadata,
   FilterChipData,
   FilterOperator,
-  FieldType,
 } from '../types';
 import { getOperatorLabel } from '../types';
 
@@ -32,7 +30,7 @@ export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   onChange?: (expression: ExprNode | null) => void;
   /**
    * Placeholder text to display when field is empty
-   * @default "Search [object]..."
+   * @default "Type to filter..."
    */
   placeholder?: string;
   /**
@@ -48,9 +46,9 @@ export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, '
 type MenuState = 'closed' | 'field' | 'operator' | 'value';
 
 /**
- * FilterField - Self-contained filter component
- * Handles autocomplete, parsing, and chip creation internally
- * Just pass fields config and it works!
+ * FilterField - Self-contained filter component.
+ * Handles autocomplete flow (field → operator → value), chip creation, and expression management.
+ * Just pass `fields` config from backend API and it works.
  */
 export const FilterField: FC<FilterFieldProps> = ({
   fields = [],
@@ -62,13 +60,14 @@ export const FilterField: FC<FilterFieldProps> = ({
   className,
   ...props
 }) => {
-  // Internal state
   const [inputText, setInputText] = useState('');
   const [menuState, setMenuState] = useState<MenuState>('closed');
   const [chips, setChips] = useState<FilterChipData[]>([]);
   const [selectedField, setSelectedField] = useState<FieldMetadata | null>(null);
   const [selectedOperator, setSelectedOperator] = useState<FilterOperator | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  // Timestamp of last menu transition — blur won't close within 400ms of a transition
+  const lastTransitionRef = useRef(0);
 
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -97,74 +96,95 @@ export const FilterField: FC<FilterFieldProps> = ({
     }
   }, [value, expressionToChips]);
 
-  // Auto-open field menu when focused and no chips
+  // Auto-open field menu ONLY on initial focus (not after Escape)
+  const prevFocusedRef = useRef(false);
   useEffect(() => {
-    if (isFocused && chips.length === 0 && menuState === 'closed' && inputText === '') {
+    // Only open when isFocused transitions from false → true
+    if (isFocused && !prevFocusedRef.current && chips.length === 0 && inputText === '') {
       setMenuState('field');
     }
-  }, [isFocused, chips.length, menuState, inputText]);
+    prevFocusedRef.current = isFocused;
+  }, [isFocused, chips.length, inputText]);
 
-  // Handle input change
+  // Global Escape handler — works even when menu buttons have focus
+  useEffect(() => {
+    if (menuState === 'closed') return;
+
+    const handleEscape = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        setMenuState('closed');
+        inputRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, [menuState]);
+
+  // ── Handlers ──────────────────────────────────────────────
+
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setInputText(text);
 
-    // Show field menu when typing
     if (text && !selectedField) {
       setMenuState('field');
-    } else if (!text) {
-      setMenuState('closed');
-      setSelectedField(null);
-      setSelectedOperator(null);
+    } else if (!text && !selectedField) {
+      setMenuState(isFocused && chips.length === 0 ? 'field' : 'closed');
     }
   };
 
-  // Handle field selection
   const handleFieldSelect = (field: FieldMetadata) => {
+    lastTransitionRef.current = Date.now();
     setSelectedField(field);
     setInputText('');
     setMenuState('operator');
   };
 
-  // Handle operator selection
   const handleOperatorSelect = (operator: FilterOperator) => {
-    setSelectedOperator(operator);
-
-    // Check if operator needs a value
     const noValueOps: FilterOperator[] = ['is_null', 'is_not_null'];
 
     if (noValueOps.includes(operator)) {
-      // Create chip immediately for operators that don't need values
       createChip(selectedField!, operator, null);
       resetState();
-    } else {
-      setMenuState('value');
+      return;
     }
+
+    lastTransitionRef.current = Date.now();
+    setSelectedOperator(operator);
+    setMenuState('value');
   };
 
-  // Handle value selection
-  const handleValueSelect = (value: string | number | boolean) => {
+  const handleValueSelect = (val: string | number | boolean) => {
     if (selectedField && selectedOperator) {
-      createChip(selectedField, selectedOperator, value);
+      createChip(selectedField, selectedOperator, val);
       resetState();
     }
   };
 
-  // Create a chip and update expression
-  const createChip = (field: FieldMetadata, operator: FilterOperator, value: string | number | boolean | null) => {
+  const createChip = (
+    field: FieldMetadata,
+    operator: FilterOperator,
+    val: string | number | boolean | null,
+  ) => {
     const condition: Condition = {
       type: 'condition',
       field: field.name,
       operator,
-      value,
+      value: val,
     };
+
+    // Use the label from field.values if available, otherwise fall back to raw value
+    const valueOption = field.values?.find(v => v.value === val);
+    const displayValue = valueOption?.label ?? String(val ?? '');
 
     const newChip: FilterChipData = {
       id: `chip-${Date.now()}`,
       variant: 'chip',
       attribute: field.label,
       operator: getOperatorLabel(operator, field.type),
-      value: String(value ?? ''),
+      value: displayValue,
       error,
     };
 
@@ -172,7 +192,6 @@ export const FilterField: FC<FilterFieldProps> = ({
     onChange?.(condition);
   };
 
-  // Reset state after chip creation
   const resetState = () => {
     setInputText('');
     setSelectedField(null);
@@ -181,13 +200,12 @@ export const FilterField: FC<FilterFieldProps> = ({
     inputRef.current?.focus();
   };
 
-  // Handle chip removal
   const handleChipRemove = (chipId: string) => {
-    setChips(chips.filter(c => c.id !== chipId));
+    setChips(prev => prev.filter(c => c.id !== chipId));
     onChange?.(null);
+    inputRef.current?.focus();
   };
 
-  // Handle clear all
   const handleClear = () => {
     setChips([]);
     setInputText('');
@@ -198,24 +216,21 @@ export const FilterField: FC<FilterFieldProps> = ({
     inputRef.current?.focus();
   };
 
-  // Handle chip click (edit mode)
   const handleChipClick = (chipId: string) => {
     const chip = chips.find(c => c.id === chipId);
     if (!chip || chip.variant !== 'chip') return;
 
-    // Find the field
     const field = fields.find(f => f.label === chip.attribute);
     if (field) {
+      lastTransitionRef.current = Date.now();
       setSelectedField(field);
       setSelectedOperator(null);
       setChips([]);
-      setMenuState('value');
+      setMenuState('operator');
     }
   };
 
-  // Handle keyboard shortcuts
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    // Backspace at start of input - remove last chip
     if (e.key === 'Backspace' && inputText === '' && chips.length > 0) {
       e.preventDefault();
       const lastChip = chips[chips.length - 1];
@@ -223,32 +238,28 @@ export const FilterField: FC<FilterFieldProps> = ({
         handleChipRemove(lastChip.id);
       }
     }
-
-    // Escape - close menus
-    if (e.key === 'Escape') {
-      setMenuState('closed');
-    }
   };
 
-  // Handle focus
-  const handleFocus = (e: FocusEvent<HTMLDivElement>) => {
+  const handleFocus = () => {
     setIsFocused(true);
   };
 
-  // Handle blur
   const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
-    // Delay to allow menu clicks to register
     setTimeout(() => {
-      // Only close if focus really left and we're not in the middle of autocomplete
-      const activeEl = document.activeElement;
-      const isMenuButton = activeEl?.closest('[role="menu"]') || activeEl?.closest('[role="menuitem"]');
+      // Don't close within 400ms of a menu transition (field→operator→value click)
+      if (Date.now() - lastTransitionRef.current < 400) return;
 
-      if (!containerRef.current?.contains(activeEl) && !isMenuButton) {
+      const activeEl = document.activeElement;
+      if (!containerRef.current?.contains(activeEl)) {
         setIsFocused(false);
         setMenuState('closed');
+        setSelectedField(null);
+        setSelectedOperator(null);
       }
-    }, 250);
+    }, 200);
   };
+
+  // ── Render ────────────────────────────────────────────────
 
   const hasChips = chips.length > 0;
   const visibleChips = chips.slice(0, 3);
@@ -257,25 +268,20 @@ export const FilterField: FC<FilterFieldProps> = ({
   return (
     <div
       ref={containerRef}
-      className='relative inline-block'
+      className='relative inline-block w-full'
       onFocus={handleFocus}
       onBlur={handleBlur}
     >
+      {/* Input bar */}
       <div
         className={cn(
-          // Base styles
           'relative flex h-10 w-full max-w-[800px] items-center overflow-clip rounded-lg',
           'border border-border-primary bg-component-input-bg shadow-xs',
-          // Hover styles
           !error && 'hover:border-component-border-input-hover',
           error && 'hover:shadow-[0px_0px_0px_3px_rgba(231,0,11,0.3)]',
-          // Focus styles
-          !error &&
-            'focus-within:border-border-strong-primary focus-within:shadow-focus-ring-primary',
-          // Error styles
+          !error && 'focus-within:border-border-strong-primary focus-within:shadow-focus-ring-primary',
           error && 'border-border-strong-danger',
-          error &&
-            'focus-within:border-border-strong-danger focus-within:shadow-[0px_0px_0px_3px_rgba(231,0,11,0.2)]',
+          error && 'focus-within:border-border-strong-danger focus-within:shadow-[0px_0px_0px_3px_rgba(231,0,11,0.2)]',
           className,
         )}
         role='combobox'
@@ -284,14 +290,7 @@ export const FilterField: FC<FilterFieldProps> = ({
         data-slot='filter-field'
         {...props}
       >
-        {/* Left side: chips and input */}
-        <div
-          className={cn(
-            'flex flex-1 items-center gap-2 pr-1',
-            hasChips ? 'pl-2' : 'pl-3',
-          )}
-        >
-          {/* Chips */}
+        <div className={cn('flex flex-1 items-center gap-2 pr-1', hasChips ? 'pl-2' : 'pl-3')}>
           {hasChips && (
             <div className='flex items-center gap-1'>
               {visibleChips.map(chip => (
@@ -300,10 +299,7 @@ export const FilterField: FC<FilterFieldProps> = ({
                   className='shrink-0 cursor-pointer'
                   onClick={() => handleChipClick(chip.id)}
                 >
-                  <FilterChip
-                    {...chip}
-                    onRemove={() => handleChipRemove(chip.id)}
-                  />
+                  <FilterChip {...chip} onRemove={() => handleChipRemove(chip.id)} />
                 </div>
               ))}
               {hasMoreChips && (
@@ -312,7 +308,6 @@ export const FilterField: FC<FilterFieldProps> = ({
             </div>
           )}
 
-          {/* Input field */}
           {!hasMoreChips && (
             <input
               ref={inputRef}
@@ -321,25 +316,16 @@ export const FilterField: FC<FilterFieldProps> = ({
               onChange={handleInputChange}
               onKeyDown={handleKeyDown}
               placeholder={hasChips ? '' : placeholder}
-              className={cn(
-                'flex-1 bg-transparent outline-none',
-                'text-sm leading-5 text-text-primary',
-                'placeholder:text-text-secondary',
-              )}
+              className='flex-1 bg-transparent outline-none text-sm leading-5 text-text-primary placeholder:text-text-secondary'
             />
           )}
         </div>
 
-        {/* Right side: keyboard hint and clear button */}
         <div className='flex shrink-0 items-center gap-2 pr-3'>
           {showKeyboardHint && !hasChips && (
             <div className='flex items-center gap-0.5'>
-              <kbd className='inline-flex h-5 min-w-[20px] items-center justify-center rounded border border-component-border-hotkey bg-bg-surface-2 px-1 text-xs'>
-                ⌘
-              </kbd>
-              <kbd className='inline-flex h-5 min-w-[20px] items-center justify-center rounded border border-component-border-hotkey bg-bg-surface-2 px-1 text-xs'>
-                K
-              </kbd>
+              <kbd className='inline-flex h-5 min-w-[20px] items-center justify-center rounded border border-component-border-hotkey bg-bg-surface-2 px-1 text-xs'>⌘</kbd>
+              <kbd className='inline-flex h-5 min-w-[20px] items-center justify-center rounded border border-component-border-hotkey bg-bg-surface-2 px-1 text-xs'>K</kbd>
             </div>
           )}
           {hasChips && (
@@ -355,13 +341,12 @@ export const FilterField: FC<FilterFieldProps> = ({
         </div>
       </div>
 
-      {/* Menus */}
+      {/* Dropdown menus — NO onOpenChange, we manage state ourselves */}
       {menuState === 'field' && (
         <div className='absolute top-full left-0 mt-1 z-50'>
           <FilterMainMenu
             fields={fields}
             open={true}
-            onOpenChange={(open) => !open && setMenuState('closed')}
             onSelect={handleFieldSelect}
           />
         </div>
@@ -372,7 +357,6 @@ export const FilterField: FC<FilterFieldProps> = ({
           <FilterOperatorMenu
             fieldType={selectedField.type}
             open={true}
-            onOpenChange={(open) => !open && setMenuState('closed')}
             onSelect={handleOperatorSelect}
           />
         </div>
@@ -383,7 +367,6 @@ export const FilterField: FC<FilterFieldProps> = ({
           <FilterValueMenu
             values={selectedField.values || []}
             open={true}
-            onOpenChange={(open) => !open && setMenuState('closed')}
             onSelect={handleValueSelect}
           />
         </div>
