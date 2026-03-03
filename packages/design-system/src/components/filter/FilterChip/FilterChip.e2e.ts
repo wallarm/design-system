@@ -176,7 +176,9 @@ test.describe('Component: FilterChip', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render chip error state with delete button on hover correctly', async ({ page }) => {
+    test('Should render chip error state with delete button on hover correctly', async ({
+      page,
+    }) => {
       await filterChipStory.goto(page, 'Error With Delete');
       const chip = page.locator('[data-slot="filter-chip"]').first();
       await chip.hover();

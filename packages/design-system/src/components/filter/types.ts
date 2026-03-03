@@ -156,18 +156,10 @@ export const OPERATORS_BY_TYPE: Record<FieldType, FilterOperator[][]> = {
     ['=', '!=', 'like', 'not_like'],
     ['is_null', 'is_not_null'],
   ],
-  integer: [
-    ['=', '!=', '>', '<', '>=', '<='],
-  ],
-  float: [
-    ['=', '!=', '>', '<', '>=', '<='],
-  ],
-  date: [
-    ['>', '>=', '<', '<=', '=', '!=', 'between'],
-  ],
-  boolean: [
-    ['=', '!=', 'is_null', 'is_not_null'],
-  ],
+  integer: [['=', '!=', '>', '<', '>=', '<=']],
+  float: [['=', '!=', '>', '<', '>=', '<=']],
+  date: [['>', '>=', '<', '<=', '=', '!=', 'between']],
+  boolean: [['=', '!=', 'is_null', 'is_not_null']],
   enum: [
     ['=', '!=', 'in', 'not_in'],
     ['is_null', 'is_not_null'],

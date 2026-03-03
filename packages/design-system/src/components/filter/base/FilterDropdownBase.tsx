@@ -84,7 +84,8 @@ export const FilterDropdownBase: FC<FilterDropdownBaseProps> = ({
                     'text-left',
                     'transition-colors',
                     item.disabled && 'opacity-50 cursor-not-allowed',
-                    !item.disabled && (isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50'),
+                    !item.disabled &&
+                      (isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50'),
                   )}
                   role='menuitem'
                   aria-selected={isActive}

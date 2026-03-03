@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from 'react';
-import { cn } from '../../../utils/cn';
 import { ChevronRight } from '../../../icons/ChevronRight';
+import { cn } from '../../../utils/cn';
 import { FilterDropdownBase } from '../base';
 import type { FilterDropdownItem, FilterDropdownSection } from '../base/types';
 
@@ -41,20 +41,22 @@ export interface FilterValueMenuProps {
  * Checkbox component for multi-select mode
  */
 const Checkbox: FC<{ checked?: boolean }> = ({ checked }) => (
-  <div className={cn(
-    'size-4 rounded border border-border-primary bg-white',
-    'shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]',
-    'flex items-center justify-center',
-    checked && 'bg-primary border-primary',
-  )}>
+  <div
+    className={cn(
+      'size-4 rounded border border-border-primary bg-white',
+      'shadow-[0px_1px_2px_0px_rgba(0,0,0,0.05)]',
+      'flex items-center justify-center',
+      checked && 'bg-primary border-primary',
+    )}
+  >
     {checked && (
-      <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+      <svg width='12' height='12' viewBox='0 0 12 12' fill='none'>
         <path
-          d="M10 3L4.5 8.5L2 6"
-          stroke="white"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+          d='M10 3L4.5 8.5L2 6'
+          stroke='white'
+          strokeWidth='2'
+          strokeLinecap='round'
+          strokeLinejoin='round'
         />
       </svg>
     )}
@@ -84,7 +86,7 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
     badge: option.badge,
     hasSubmenu: option.hasSubmenu,
     // Custom render for items with checkboxes or badges
-    renderContent: (item) => {
+    renderContent: item => {
       const isChecked = selectedValues.includes(option.value);
 
       return (

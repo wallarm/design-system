@@ -68,7 +68,7 @@ export const FilterOperatorMenu: FC<FilterOperatorMenuProps> = ({
       onSelect={handleSelect}
       open={open}
       onOpenChange={onOpenChange}
-      footerHint="to select"
+      footerHint='to select'
       className={cn('w-64', className)}
     />
   );

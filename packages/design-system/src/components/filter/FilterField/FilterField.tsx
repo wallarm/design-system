@@ -26,6 +26,10 @@ export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, '
    */
   showKeyboardHint?: boolean;
   /**
+   * Callback when a chip is clicked for editing
+   */
+  onChipClick?: (chipId: string) => void;
+  /**
    * Callback when a chip is removed
    */
   onChipRemove?: (chipId: string) => void;
@@ -49,6 +53,7 @@ export const FilterField: FC<FilterFieldProps> = ({
   error = false,
   leftIcon,
   showKeyboardHint = false,
+  onChipClick,
   onChipRemove,
   onClear,
   onFocus,
@@ -107,7 +112,11 @@ export const FilterField: FC<FilterFieldProps> = ({
         {hasChips ? (
           <div className='flex items-center gap-1'>
             {visibleChips.map(chip => (
-              <div key={chip.id} className='shrink-0'>
+              <div
+                key={chip.id}
+                className={cn('shrink-0', onChipClick && 'cursor-pointer')}
+                onClick={() => onChipClick?.(chip.id)}
+              >
                 {injectErrorProp(chip.content)}
               </div>
             ))}

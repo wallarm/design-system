@@ -204,13 +204,14 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
       aria-label='Filter fields'
       aria-expanded={open}
     >
-
       {/* Header: Recent or Suggestions */}
       {(showRecent || showSuggestions) && (
         <div className='flex items-center justify-center overflow-clip px-2 py-2 pb-0.5'>
           <div className='flex flex-1 gap-0.5 items-center'>
             <div className='flex flex-1 flex-col justify-center leading-none text-xs font-medium text-text-secondary'>
-              <p className='leading-4 whitespace-pre-wrap'>{showRecent ? 'Recent' : 'Suggestions'}</p>
+              <p className='leading-4 whitespace-pre-wrap'>
+                {showRecent ? 'Recent' : 'Suggestions'}
+              </p>
             </div>
           </div>
         </div>
@@ -368,14 +369,14 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
               role='menuitem'
               aria-selected={isActive}
             >
-            <div className='flex flex-1 gap-2 items-start'>
-              <div className='flex flex-1 flex-col items-start'>
-                <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
-                  <p className='leading-5 whitespace-pre-wrap'>{field.label}</p>
+              <div className='flex flex-1 gap-2 items-start'>
+                <div className='flex flex-1 flex-col items-start'>
+                  <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
+                    <p className='leading-5 whitespace-pre-wrap'>{field.label}</p>
+                  </div>
                 </div>
               </div>
-            </div>
-          </button>
+            </button>
           );
         })}
 
@@ -387,76 +388,78 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
         )}
 
         {/* AND operator */}
-        {onSelectAnd && (() => {
-          const currentIndex = itemIndex++;
-          const isActive = currentIndex === activeIndex;
+        {onSelectAnd &&
+          (() => {
+            const currentIndex = itemIndex++;
+            const isActive = currentIndex === activeIndex;
 
-          return (
-            <button
-              ref={el => {
-                itemRefs.current[currentIndex] = el;
-              }}
-              type='button'
-              onClick={handleSelectAnd}
-              className={cn(
-                'flex items-start gap-1 px-2 py-1.5',
-                'rounded-md overflow-clip',
-                'text-left',
-                'transition-colors',
-                isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50',
-              )}
-              role='menuitem'
-              aria-selected={isActive}
-            >
-            <div className='flex flex-1 gap-2 items-start'>
-              <div className='flex items-center pt-0.5 w-4'>
-                <CirclePlus className='h-4 w-4 text-text-primary' />
-              </div>
-              <div className='flex flex-1 flex-col items-start'>
-                <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
-                  <p className='leading-5 whitespace-pre-wrap'>AND</p>
+            return (
+              <button
+                ref={el => {
+                  itemRefs.current[currentIndex] = el;
+                }}
+                type='button'
+                onClick={handleSelectAnd}
+                className={cn(
+                  'flex items-start gap-1 px-2 py-1.5',
+                  'rounded-md overflow-clip',
+                  'text-left',
+                  'transition-colors',
+                  isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50',
+                )}
+                role='menuitem'
+                aria-selected={isActive}
+              >
+                <div className='flex flex-1 gap-2 items-start'>
+                  <div className='flex items-center pt-0.5 w-4'>
+                    <CirclePlus className='h-4 w-4 text-text-primary' />
+                  </div>
+                  <div className='flex flex-1 flex-col items-start'>
+                    <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
+                      <p className='leading-5 whitespace-pre-wrap'>AND</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </button>
-          );
-        })()}
+              </button>
+            );
+          })()}
 
         {/* OR operator */}
-        {onSelectOr && (() => {
-          const currentIndex = itemIndex++;
-          const isActive = currentIndex === activeIndex;
+        {onSelectOr &&
+          (() => {
+            const currentIndex = itemIndex++;
+            const isActive = currentIndex === activeIndex;
 
-          return (
-            <button
-              ref={el => {
-                itemRefs.current[currentIndex] = el;
-              }}
-              type='button'
-              onClick={handleSelectOr}
-              className={cn(
-                'flex items-start gap-1 px-2 py-1.5',
-                'rounded-md overflow-clip',
-                'text-left',
-                'transition-colors',
-                isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50',
-              )}
-              role='menuitem'
-              aria-selected={isActive}
-            >
-            <div className='flex flex-1 gap-2 items-start'>
-              <div className='flex items-center pt-0.5 w-4'>
-                <CircleSlash className='h-4 w-4 text-text-primary' />
-              </div>
-              <div className='flex flex-1 flex-col items-start'>
-                <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
-                  <p className='leading-5 whitespace-pre-wrap'>OR</p>
+            return (
+              <button
+                ref={el => {
+                  itemRefs.current[currentIndex] = el;
+                }}
+                type='button'
+                onClick={handleSelectOr}
+                className={cn(
+                  'flex items-start gap-1 px-2 py-1.5',
+                  'rounded-md overflow-clip',
+                  'text-left',
+                  'transition-colors',
+                  isActive ? 'bg-gray-100' : 'bg-transparent hover:bg-gray-50',
+                )}
+                role='menuitem'
+                aria-selected={isActive}
+              >
+                <div className='flex flex-1 gap-2 items-start'>
+                  <div className='flex items-center pt-0.5 w-4'>
+                    <CircleSlash className='h-4 w-4 text-text-primary' />
+                  </div>
+                  <div className='flex flex-1 flex-col items-start'>
+                    <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
+                      <p className='leading-5 whitespace-pre-wrap'>OR</p>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
-          </button>
-          );
-        })()}
+              </button>
+            );
+          })()}
       </div>
 
       {/* Keyboard navigation hints footer */}

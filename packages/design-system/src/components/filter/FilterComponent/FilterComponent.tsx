@@ -1,5 +1,5 @@
-import type { FC, KeyboardEvent, ChangeEvent } from 'react';
-import { useCallback, useEffect, useState, useRef } from 'react';
+import type { ChangeEvent, FC, KeyboardEvent } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { FilterField } from '../FilterField';
 import { FilterMainMenu } from '../FilterMainMenu';
 import { FilterOperatorMenu } from '../FilterOperatorMenu';
@@ -302,15 +302,12 @@ export const FilterComponent: FC<FilterComponentProps> = ({
   /**
    * Handle keyboard events
    */
-  const handleKeyDown = useCallback(
-    (event: KeyboardEvent<HTMLInputElement>) => {
-      if (event.key === 'Escape') {
-        setShowFieldMenu(false);
-      }
-      // Arrow keys and Enter are handled by FilterMainMenu
-    },
-    [],
-  );
+  const handleKeyDown = useCallback((event: KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Escape') {
+      setShowFieldMenu(false);
+    }
+    // Arrow keys and Enter are handled by FilterMainMenu
+  }, []);
 
   /**
    * Handle cursor position change
@@ -327,12 +324,52 @@ export const FilterComponent: FC<FilterComponentProps> = ({
   }, []);
 
   /**
+   * Handle chip click for editing
+   */
+  const handleChipClick = useCallback(
+    (chipId: string) => {
+      // Find the chip being edited
+      const chip = state.chips.find(c => c.id === chipId);
+      if (!chip || !chip.attribute || !chip.operator) {
+        return;
+      }
+
+      // Convert chip back to text format
+      const chipText = `${chip.attribute} ${chip.operator} ${chip.value ?? ''}`;
+
+      // Remove the chip from the list
+      const updatedChips = state.chips.filter(c => c.id !== chipId);
+
+      // Set the text in input and show value menu (most common edit case)
+      setState(prev => ({
+        ...prev,
+        inputText: chipText,
+        chips: updatedChips,
+        editingContext: 'value',
+      }));
+
+      // Find the field to show appropriate dropdown
+      const field = fields.find(f => f.name === chip.attribute);
+      if (field) {
+        setCurrentField(field);
+        setShowFieldMenu(false);
+        setShowOperatorMenu(false);
+        setShowValueMenu(true);
+      }
+
+      // Focus the input
+      inputRef.current?.focus();
+
+      onChange?.(null, updatedChips);
+    },
+    [state.chips, fields, onChange],
+  );
+
+  /**
    * Handle chip removal
    */
   const handleChipRemove = useCallback(
     (chipId: string) => {
-      // TODO: Remove chip and update expression
-      // This will be implemented when chip editing is added (US-017)
       const updatedChips = state.chips.filter(chip => chip.id !== chipId);
       setState(prev => ({
         ...prev,
@@ -436,9 +473,10 @@ export const FilterComponent: FC<FilterComponentProps> = ({
   );
 
   // Filter fields based on current input
-  const filteredFields = fields.filter(field =>
-    field.label.toLowerCase().includes(state.inputText.toLowerCase()) ||
-    field.name.toLowerCase().includes(state.inputText.toLowerCase()),
+  const filteredFields = fields.filter(
+    field =>
+      field.label.toLowerCase().includes(state.inputText.toLowerCase()) ||
+      field.name.toLowerCase().includes(state.inputText.toLowerCase()),
   );
 
   return (
@@ -487,6 +525,7 @@ export const FilterComponent: FC<FilterComponentProps> = ({
               })}
               placeholder={placeholder}
               showKeyboardHint={showKeyboardHint}
+              onChipClick={handleChipClick}
               onChipRemove={handleChipRemove}
               onClear={handleClear}
               className={className}
