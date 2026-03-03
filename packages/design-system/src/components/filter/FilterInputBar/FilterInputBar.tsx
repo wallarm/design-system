@@ -1,67 +1,26 @@
-import type { ChangeEvent, FC, HTMLAttributes, KeyboardEvent, MouseEvent as ReactMouseEvent, Ref } from 'react';
+import type { FC, HTMLAttributes } from 'react';
 import { cn } from '../../../utils/cn';
 import { inputVariants } from '../../Input/classes';
-import type { FilterChipData } from '../types';
+import { useFilterContext } from '../FilterContext';
 import { ChipList } from '../primitives';
 import { FilterInputBarActions } from './FilterInputBarActions';
 
-interface FilterInputBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
-  /** Visible chips to render (already sliced) */
-  chips: FilterChipData[];
-  /** Building chip data (in-progress filter) */
-  buildingChipData?: {
-    variant: 'chip';
-    attribute: string;
-    operator?: string;
-    value?: string;
-  } | null;
-  /** Ref for the building chip wrapper */
-  buildingChipRef?: Ref<HTMLDivElement>;
-  /** Input text value */
-  inputText: string;
-  /** Callback when input text changes */
-  onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
-  /** Callback when key is pressed in input */
-  onInputKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
-  /** Ref for the input element */
-  inputRef?: Ref<HTMLInputElement>;
-  /** Placeholder text */
-  placeholder: string;
-  /** Whether the field has a validation error */
-  error?: boolean;
-  /** Whether to show the keyboard hint */
-  showKeyboardHint?: boolean;
-  /** Whether the menu is open */
-  menuOpen?: boolean;
-  /** Callback when a chip is clicked */
-  onChipClick: (chipId: string, e: ReactMouseEvent) => void;
-  /** Callback when a chip is removed */
-  onChipRemove: (chipId: string) => void;
-  /** Callback to clear all filters */
-  onClear: () => void;
-  /** Whether there are more chips than visible */
-  hasMoreChips?: boolean;
-}
+type FilterInputBarProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
 
-export const FilterInputBar: FC<FilterInputBarProps> = ({
-  chips,
-  buildingChipData,
-  buildingChipRef,
-  inputText,
-  onInputChange,
-  onInputKeyDown,
-  inputRef,
-  placeholder,
-  error = false,
-  showKeyboardHint = false,
-  menuOpen = false,
-  onChipClick,
-  onChipRemove,
-  onClear,
-  hasMoreChips = false,
-  className,
-  ...props
-}) => {
+export const FilterInputBar: FC<FilterInputBarProps> = ({ className, ...props }) => {
+  const {
+    chips,
+    buildingChipData,
+    hasMoreChips,
+    inputText,
+    inputRef,
+    placeholder,
+    error,
+    menuOpen,
+    onInputChange,
+    onInputKeyDown,
+  } = useFilterContext();
+
   const hasChips = chips.length > 0;
   const hasContent = hasChips || buildingChipData != null;
 
@@ -83,17 +42,7 @@ export const FilterInputBar: FC<FilterInputBarProps> = ({
       {...props}
     >
       <div className={cn('flex flex-1 items-center pr-4', hasContent ? 'gap-4 pl-8' : 'pl-12')}>
-        {hasContent && (
-          <ChipList
-            chips={chips}
-            buildingChipData={buildingChipData}
-            buildingChipRef={buildingChipRef}
-            hasMoreChips={hasMoreChips}
-            placeholder={placeholder}
-            onChipClick={onChipClick}
-            onChipRemove={onChipRemove}
-          />
-        )}
+        {hasContent && <ChipList />}
 
         {!hasMoreChips && (
           <input
@@ -108,12 +57,7 @@ export const FilterInputBar: FC<FilterInputBarProps> = ({
         )}
       </div>
 
-      <FilterInputBarActions
-        showKeyboardHint={showKeyboardHint}
-        hasContent={hasContent}
-        hasChips={hasChips}
-        onClear={onClear}
-      />
+      <FilterInputBarActions />
     </div>
   );
 };

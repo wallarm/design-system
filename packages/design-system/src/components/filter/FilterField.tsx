@@ -1,6 +1,8 @@
 import type { FC, HTMLAttributes } from 'react';
 import { useMemo, useRef } from 'react';
 import { cn } from '../../utils/cn';
+import type { FilterContextValue } from './FilterContext';
+import { FilterProvider } from './FilterContext';
 import { FilterInputBar } from './FilterInputBar';
 import { FilterMainMenu } from './FilterMainMenu';
 import { FilterOperatorMenu } from './FilterOperatorMenu';
@@ -93,6 +95,43 @@ export const FilterField: FC<FilterFieldProps> = ({
     return result;
   }, [expression.chips, hasMoreChips]);
 
+  // ── Context value ──────────────────────────────────────────
+
+  const contextValue: FilterContextValue = useMemo(
+    () => ({
+      chips: visibleChips,
+      buildingChipData: autocomplete.buildingChipData,
+      buildingChipRef,
+      hasMoreChips,
+      inputText: autocomplete.inputText,
+      inputRef,
+      placeholder,
+      error,
+      showKeyboardHint,
+      menuOpen: autocomplete.menuState !== 'closed',
+      onInputChange: autocomplete.handleInputChange,
+      onInputKeyDown: autocomplete.handleKeyDown,
+      onChipClick: autocomplete.handleChipClick,
+      onChipRemove: autocomplete.handleChipRemove,
+      onClear: autocomplete.handleClear,
+    }),
+    [
+      visibleChips,
+      autocomplete.buildingChipData,
+      hasMoreChips,
+      autocomplete.inputText,
+      placeholder,
+      error,
+      showKeyboardHint,
+      autocomplete.menuState,
+      autocomplete.handleInputChange,
+      autocomplete.handleKeyDown,
+      autocomplete.handleChipClick,
+      autocomplete.handleChipRemove,
+      autocomplete.handleClear,
+    ],
+  );
+
   // ── Render ─────────────────────────────────────────────────
 
   return (
@@ -102,24 +141,9 @@ export const FilterField: FC<FilterFieldProps> = ({
       onFocus={autocomplete.handleFocus}
       onBlur={autocomplete.handleBlur}
     >
-      <FilterInputBar
-        chips={visibleChips}
-        buildingChipData={autocomplete.buildingChipData}
-        buildingChipRef={buildingChipRef}
-        inputText={autocomplete.inputText}
-        onInputChange={autocomplete.handleInputChange}
-        onInputKeyDown={autocomplete.handleKeyDown}
-        inputRef={inputRef}
-        placeholder={placeholder}
-        error={error}
-        showKeyboardHint={showKeyboardHint}
-        menuOpen={autocomplete.menuState !== 'closed'}
-        onChipClick={autocomplete.handleChipClick}
-        onChipRemove={autocomplete.handleChipRemove}
-        onClear={autocomplete.handleClear}
-        hasMoreChips={hasMoreChips}
-        {...props}
-      />
+      <FilterProvider value={contextValue}>
+        <FilterInputBar {...props} />
+      </FilterProvider>
 
       {/* Dropdown menus — positioned below the input container */}
       <FilterMainMenu
