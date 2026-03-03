@@ -1,8 +1,19 @@
-import type { FC } from 'react';
+import { Fragment, type FC, useMemo } from 'react';
 import { cn } from '../../../utils/cn';
-import { FilterDropdownBase } from '../base';
-import type { FilterDropdownSection } from '../base/types';
-import { type FieldType, type FilterOperator, getOperatorLabel, OPERATOR_SYMBOLS, OPERATORS_BY_TYPE } from '../types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuFooter,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuItemText,
+  DropdownMenuSeparator,
+} from '../../DropdownMenu';
+import { Kbd } from '../../Kbd/Kbd';
+import { KbdGroup } from '../../Kbd/KbdGroup';
+import { useKeyboardNav } from '../base';
+import type { FilterDropdownItem } from '../base/types';
+import { type FieldType, type FilterOperator, getOperatorLabel, OPERATORS_BY_TYPE } from '../types';
 
 export interface FilterOperatorMenuProps {
   /**
@@ -26,6 +37,10 @@ export interface FilterOperatorMenuProps {
    */
   onOpenChange?: (open: boolean) => void;
   /**
+   * Override positioning config for the dropdown
+   */
+  positioning?: Record<string, unknown>;
+  /**
    * Optional custom class name
    */
   className?: string;
@@ -34,57 +49,64 @@ export interface FilterOperatorMenuProps {
 /**
  * FilterOperatorMenu component
  * Dropdown menu for selecting filter operators based on field type
- * Uses FilterDropdownBase for consistent behavior
  */
 export const FilterOperatorMenu: FC<FilterOperatorMenuProps> = ({
   fieldType,
-  selectedOperator,
   onSelect,
   open = false,
   onOpenChange,
+  positioning,
   className,
 }) => {
   const operatorGroups = OPERATORS_BY_TYPE[fieldType] || [];
 
-  const showSymbols = fieldType !== 'boolean';
+  const flatItems: FilterDropdownItem[] = useMemo(
+    () =>
+      operatorGroups.flat().map(op => ({
+        id: op,
+        label: getOperatorLabel(op, fieldType),
+        value: op,
+      })),
+    [operatorGroups, fieldType],
+  );
 
-  // Convert operator groups to dropdown sections
-  const sections: FilterDropdownSection[] = operatorGroups.map((group, index) => ({
-    id: `group-${index}`,
-    items: group.map(operator => ({
-      id: operator,
-      label: getOperatorLabel(operator, fieldType),
-      value: operator,
-      renderContent: showSymbols
-        ? (item) => (
-            <div className='flex flex-1 items-center min-w-0'>
-              <div className='flex flex-1 flex-col justify-center leading-none text-sm font-normal text-text-primary min-w-0'>
-                <p className='leading-5 overflow-hidden text-ellipsis'>{item.label}</p>
-              </div>
-              <span className='shrink-0 font-mono text-xs text-text-secondary'>
-                {OPERATOR_SYMBOLS[operator]}
-              </span>
-            </div>
-          )
-        : undefined,
-    })),
-    // Show separator after each group except the last one
-    showSeparator: index < operatorGroups.length - 1,
-  }));
+  const { activeIndex } = useKeyboardNav({
+    items: flatItems,
+    open,
+    onSelect: item => onSelect(item.value as FilterOperator),
+    onClose: () => onOpenChange?.(false),
+  });
 
-  const handleSelect = (item: { value: FilterOperator }) => {
-    onSelect(item.value);
-  };
+  const highlightedValue = flatItems[activeIndex]?.id ?? null;
 
   return (
-    <FilterDropdownBase
-      sections={sections}
-      onSelect={handleSelect}
-      open={open}
-      onOpenChange={onOpenChange}
-      footerHint='to select'
-      className={cn('w-64', className)}
-    />
+    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue}>
+      <DropdownMenuContent className={cn('w-64', className)}>
+        {operatorGroups.map((group, groupIdx) => (
+          <Fragment key={`group-${groupIdx}`}>
+            <DropdownMenuGroup>
+              {group.map(operator => (
+                <DropdownMenuItem key={operator} value={operator} onSelect={() => onSelect(operator)}>
+                  <DropdownMenuItemText>
+                    {getOperatorLabel(operator, fieldType)}
+                  </DropdownMenuItemText>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuGroup>
+            {groupIdx < operatorGroups.length - 1 && <DropdownMenuSeparator />}
+          </Fragment>
+        ))}
+        <DropdownMenuFooter>
+          <KbdGroup>
+            <Kbd>↑</Kbd>
+            <Kbd>↓</Kbd>
+          </KbdGroup>
+          to navigate
+          <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+          to select
+        </DropdownMenuFooter>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

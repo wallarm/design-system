@@ -104,7 +104,7 @@ OrOperator.args = {
  * Combined example showing chip + AND + chip
  */
 export const CombinedWithAnd: StoryFn<typeof meta> = () => (
-  <div className='flex items-center gap-1'>
+  <div className='flex items-center gap-4'>
     <FilterChip variant='chip' attribute='IP Address' operator='is' value='192.168.1.1' />
     <FilterChip variant='and' />
     <FilterChip variant='chip' attribute='Country' operator='is' value='US' />
@@ -115,7 +115,7 @@ export const CombinedWithAnd: StoryFn<typeof meta> = () => (
  * Combined example showing chip + OR + chip
  */
 export const CombinedWithOr: StoryFn<typeof meta> = () => (
-  <div className='flex items-center gap-1'>
+  <div className='flex items-center gap-4'>
     <FilterChip variant='chip' attribute='Status' operator='is' value='Active' />
     <FilterChip variant='or' />
     <FilterChip variant='chip' attribute='Status' operator='is' value='Pending' />
@@ -143,7 +143,7 @@ ClosingParenthesis.args = {
  * Example: (IP is 192.168.1.1 OR IP is 10.0.0.1) AND Country is US
  */
 export const CombinedWithParentheses: StoryFn<typeof meta> = () => (
-  <div className='flex items-center gap-1'>
+  <div className='flex items-center gap-4'>
     <FilterChip variant='(' />
     <FilterChip variant='chip' attribute='IP Address' operator='is' value='192.168.1.1' />
     <FilterChip variant='or' />
@@ -191,7 +191,7 @@ export const InteractiveDeleteExample: StoryFn<typeof meta> = () => {
   ]);
 
   return (
-    <div className='flex items-center gap-1 flex-wrap'>
+    <div className='flex items-center gap-4 flex-wrap'>
       {chips.map((chip, index) => (
         <React.Fragment key={chip.id}>
           {index > 0 && <FilterChip variant='and' />}

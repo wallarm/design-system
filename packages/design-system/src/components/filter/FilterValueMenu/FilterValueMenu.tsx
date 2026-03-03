@@ -1,8 +1,18 @@
-import type { FC, ReactNode } from 'react';
+import { type FC, useMemo } from 'react';
 import { ChevronRight } from '../../../icons/ChevronRight';
 import { cn } from '../../../utils/cn';
-import { FilterDropdownBase } from '../base';
-import type { FilterDropdownItem, FilterDropdownSection } from '../base/types';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuFooter,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuItemText,
+} from '../../DropdownMenu';
+import { Kbd } from '../../Kbd/Kbd';
+import { KbdGroup } from '../../Kbd/KbdGroup';
+import { useKeyboardNav } from '../base';
+import type { FilterDropdownItem } from '../base/types';
 
 export interface ValueOption {
   /** Value identifier */
@@ -33,6 +43,9 @@ export interface FilterValueMenuProps {
   selectedValues?: Array<ValueOption['value']>;
   /** Custom width (defaults to 300px for standard, 172px for date pickers) */
   width?: 'standard' | 'compact' | number;
+  /** Virtual anchor point for positioning */
+  /** Override positioning config for the dropdown */
+  positioning?: Record<string, unknown>;
   /** Optional custom class name */
   className?: string;
 }
@@ -43,7 +56,7 @@ export interface FilterValueMenuProps {
 const Checkbox: FC<{ checked?: boolean }> = ({ checked }) => (
   <div
     className={cn(
-      'size-4 rounded-[4px] border shadow-xs',
+      'size-16 rounded-4 border shadow-xs',
       'flex items-center justify-center',
       checked
         ? 'bg-bg-fill-brand border-bg-fill-brand'
@@ -77,77 +90,27 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
   multiSelect = false,
   selectedValues = [],
   width = 'standard',
+  positioning,
   className,
 }) => {
-  // Convert values to dropdown items
-  const items: FilterDropdownItem[] = values.map(option => ({
-    id: String(option.value),
-    label: option.label,
-    value: option.value,
-    badge: option.badge,
-    hasSubmenu: option.hasSubmenu,
-    // Custom render for items with checkboxes or badges
-    renderContent: item => {
-      const isChecked = selectedValues.includes(option.value);
+  const flatItems: FilterDropdownItem[] = useMemo(
+    () =>
+      values.map(opt => ({
+        id: String(opt.value),
+        label: opt.label,
+        value: opt.value,
+      })),
+    [values],
+  );
 
-      return (
-        <div className='flex flex-1 gap-2 items-start min-w-0'>
-          {/* Badge */}
-          {option.badge && (
-            <div
-              className='flex items-center gap-1 px-1.5 py-0.5 rounded text-xs font-medium max-w-[320px] min-h-[20px] overflow-clip'
-              style={{ backgroundColor: option.badge.color }}
-            >
-              <div className='size-1.5 rounded-full bg-current' />
-              <span className='leading-4 overflow-hidden text-ellipsis'>{option.badge.text}</span>
-            </div>
-          )}
+  const { activeIndex } = useKeyboardNav({
+    items: flatItems,
+    open,
+    onSelect: item => onSelect(item.value),
+    onClose: () => onOpenChange?.(false),
+  });
 
-          {/* Text label (only if no badge) */}
-          {!option.badge && (
-            <div className='flex flex-1 flex-col items-start min-w-0'>
-              <div className='flex flex-col justify-center leading-none text-sm font-normal text-text-primary w-full'>
-                <p className='leading-5 whitespace-pre-wrap overflow-hidden text-ellipsis'>
-                  {item.label}
-                </p>
-              </div>
-            </div>
-          )}
-
-          {/* Checkbox for multi-select */}
-          {multiSelect && (
-            <div className='flex items-start justify-end py-0.5'>
-              <Checkbox checked={isChecked} />
-            </div>
-          )}
-
-          {/* Submenu arrow */}
-          {option.hasSubmenu && !multiSelect && (
-            <div className='flex items-center text-text-secondary pt-0.5'>
-              <ChevronRight className='size-4' />
-            </div>
-          )}
-        </div>
-      );
-    },
-  }));
-
-  const sections: FilterDropdownSection[] = [
-    {
-      id: 'values',
-      items,
-    },
-  ];
-
-  const handleSelect = (item: { value: ValueOption['value'] }) => {
-    onSelect(item.value);
-    if (!multiSelect) {
-      onOpenChange?.(false);
-    }
-  };
-
-  // Determine footer hint based on mode
-  const footerHint = multiSelect ? 'to select    to select more' : 'to select';
+  const highlightedValue = flatItems[activeIndex]?.id ?? null;
 
   // Determine width class
   let widthClass = 'w-[300px]';
@@ -158,14 +121,67 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
   }
 
   return (
-    <FilterDropdownBase
-      sections={sections}
-      onSelect={handleSelect}
-      open={open}
-      onOpenChange={onOpenChange}
-      footerHint={footerHint}
-      className={cn(widthClass, className)}
-    />
+    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue}>
+      <DropdownMenuContent className={cn(widthClass, className)}>
+        <DropdownMenuGroup>
+          {values.map(option => {
+            const isChecked = selectedValues.includes(option.value);
+
+            return (
+              <DropdownMenuItem
+                key={String(option.value)}
+                value={String(option.value)}
+                onSelect={() => onSelect(option.value)}
+              >
+                {/* Badge */}
+                {option.badge ? (
+                  <div
+                    className='flex items-center gap-4 px-6 py-2 rounded-4 text-xs font-medium max-w-[320px] min-h-[20px] overflow-clip'
+                    style={{ backgroundColor: option.badge.color }}
+                  >
+                    <div className='size-6 rounded-full bg-current' />
+                    <span className='leading-4 text-ellipsis'>
+                      {option.badge.text}
+                    </span>
+                  </div>
+                ) : (
+                  <DropdownMenuItemText>{option.label}</DropdownMenuItemText>
+                )}
+
+                {/* Checkbox for multi-select */}
+                {multiSelect && (
+                  <div className='flex items-start justify-end py-2 ml-auto'>
+                    <Checkbox checked={isChecked} />
+                  </div>
+                )}
+
+                {/* Submenu arrow */}
+                {option.hasSubmenu && !multiSelect && (
+                  <div className='flex items-center text-text-secondary ml-auto'>
+                    <ChevronRight />
+                  </div>
+                )}
+              </DropdownMenuItem>
+            );
+          })}
+        </DropdownMenuGroup>
+        <DropdownMenuFooter>
+          <KbdGroup>
+            <Kbd>↑</Kbd>
+            <Kbd>↓</Kbd>
+          </KbdGroup>
+          to navigate
+          <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+          to select
+          {multiSelect && (
+            <>
+              {' '}
+              <KbdGroup><Kbd>↵</Kbd></KbdGroup> to select more
+            </>
+          )}
+        </DropdownMenuFooter>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 

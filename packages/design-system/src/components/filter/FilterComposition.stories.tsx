@@ -717,7 +717,7 @@ export const BackendIntegration: Story = {
     });
 
     if (!metadata) {
-      return <div className='w-[800px] h-10 bg-gray-100 rounded-lg animate-pulse' />;
+      return <div className='w-[800px] h-40 bg-gray-100 rounded-8 animate-pulse' />;
     }
 
     return (

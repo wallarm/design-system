@@ -38,21 +38,3 @@ export interface FilterDropdownSection {
   /** Whether to show separator after this section */
   showSeparator?: boolean;
 }
-
-/**
- * Props for FilterDropdownBase component
- */
-export interface FilterDropdownBaseProps {
-  /** Sections to display in the dropdown */
-  sections: FilterDropdownSection[];
-  /** Callback when item is selected */
-  onSelect: (item: FilterDropdownItem) => void;
-  /** Whether the dropdown is open */
-  open?: boolean;
-  /** Callback when open state should change */
-  onOpenChange?: (open: boolean) => void;
-  /** Custom footer hint text */
-  footerHint?: string;
-  /** Optional custom class name */
-  className?: string;
-}

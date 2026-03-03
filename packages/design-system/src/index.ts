@@ -59,6 +59,7 @@ export {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuContextTrigger,
+  DropdownMenuFooter,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuItemContent,

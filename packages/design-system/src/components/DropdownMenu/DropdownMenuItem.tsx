@@ -12,6 +12,8 @@ export interface DropdownMenuItemProps
   inset?: boolean;
   disabled?: boolean;
   onSelect?: () => void;
+  /** Explicit value for programmatic highlighting via highlightedValue */
+  value?: string;
   ref?: Ref<HTMLDivElement>;
 }
 
@@ -20,14 +22,15 @@ export const DropdownMenuItem: FC<DropdownMenuItemProps> = ({
   variant = 'default',
   onSelect,
   disabled,
+  value,
   ...props
 }) => {
-  const id = useId();
+  const autoId = useId();
 
   return (
     <Menu.Item
       {...props}
-      value={id}
+      value={value ?? autoId}
       disabled={disabled}
       onSelect={onSelect}
       className={cn(dropdownMenuItemVariants({ variant, inset }))}

@@ -17,15 +17,14 @@ interface UseKeyboardNavReturn {
   activeIndex: number;
   /** Set active index */
   setActiveIndex: (index: number) => void;
-  /** Refs array for items (for auto-scroll) */
-  itemRefs: React.MutableRefObject<(HTMLElement | null)[]>;
-  /** Ref for menu container */
-  menuRef: React.RefObject<HTMLDivElement | null>;
 }
 
 /**
- * Hook for keyboard navigation in dropdown menus
- * Handles Arrow Up/Down, Enter, and Escape keys
+ * Hook for keyboard navigation in dropdown menus.
+ *
+ * Uses a **capture-phase** listener on `window` so it fires before
+ * Ark UI's onKeyDown on Menu.Content. Calls `stopPropagation()` to
+ * prevent Ark UI from double-handling ArrowUp/Down/Enter/Escape.
  */
 export function useKeyboardNav({
   items,
@@ -34,76 +33,90 @@ export function useKeyboardNav({
   onClose,
 }: UseKeyboardNavOptions): UseKeyboardNavReturn {
   const [activeIndex, setActiveIndex] = useState(0);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLElement | null)[]>([]);
 
-  const totalItems = items.length;
+  // Keep fresh references without re-registering the effect
+  const itemsRef = useRef(items);
+  const onSelectRef = useRef(onSelect);
+  const onCloseRef = useRef(onClose);
+  const activeIndexRef = useRef(activeIndex);
 
-  // Keyboard event handler
+  itemsRef.current = items;
+  onSelectRef.current = onSelect;
+  onCloseRef.current = onClose;
+  activeIndexRef.current = activeIndex;
+
+  // Reset activeIndex when menu opens
+  const prevOpenRef = useRef(open);
   useEffect(() => {
+    if (open && !prevOpenRef.current) {
+      setActiveIndex(0);
+    }
+    prevOpenRef.current = open;
+  }, [open]);
+
+  // Keyboard event handler — capture phase to intercept before Ark UI
+  useEffect(() => {
+    if (!open) return;
+
     const handleKeyDown = (e: KeyboardEvent) => {
+      const currentItems = itemsRef.current;
+      const total = currentItems.length;
+      if (total === 0) return;
+
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
+          e.stopPropagation();
           setActiveIndex(prev => {
-            // Skip disabled items when navigating
-            let nextIndex = (prev + 1) % totalItems;
-            while (items[nextIndex]?.disabled && nextIndex !== prev) {
-              nextIndex = (nextIndex + 1) % totalItems;
+            let next = (prev + 1) % total;
+            while (currentItems[next]?.disabled && next !== prev) {
+              next = (next + 1) % total;
             }
-            return nextIndex;
+            return next;
           });
           break;
 
         case 'ArrowUp':
           e.preventDefault();
+          e.stopPropagation();
           setActiveIndex(prev => {
-            // Skip disabled items when navigating
-            let nextIndex = (prev - 1 + totalItems) % totalItems;
-            while (items[nextIndex]?.disabled && nextIndex !== prev) {
-              nextIndex = (nextIndex - 1 + totalItems) % totalItems;
+            let next = (prev - 1 + total) % total;
+            while (currentItems[next]?.disabled && next !== prev) {
+              next = (next - 1 + total) % total;
             }
-            return nextIndex;
+            return next;
           });
           break;
 
         case 'Enter':
           e.preventDefault();
-          if (activeIndex >= 0 && activeIndex < totalItems) {
-            const item = items[activeIndex];
-            if (item && !item.disabled) {
-              onSelect(item);
+          e.stopPropagation();
+          {
+            const idx = activeIndexRef.current;
+            if (idx >= 0 && idx < total) {
+              const item = currentItems[idx];
+              if (item && !item.disabled) {
+                onSelectRef.current(item);
+              }
             }
           }
           break;
 
         case 'Escape':
           e.preventDefault();
-          onClose?.();
+          e.stopPropagation();
+          onCloseRef.current?.();
           break;
       }
     };
 
-    if (open) {
-      window.addEventListener('keydown', handleKeyDown);
-      return () => window.removeEventListener('keydown', handleKeyDown);
-    }
-  }, [open, activeIndex, totalItems, items, onSelect, onClose]);
-
-  // Auto-scroll to active item
-  useEffect(() => {
-    if (activeIndex >= 0 && itemRefs.current[activeIndex]) {
-      itemRefs.current[activeIndex]?.scrollIntoView({
-        block: 'nearest',
-        behavior: 'smooth',
-      });
-    }
-  }, [activeIndex]);
+    // Capture phase: fires before Ark UI's handler on Menu.Content
+    window.addEventListener('keydown', handleKeyDown, true);
+    return () => window.removeEventListener('keydown', handleKeyDown, true);
+  }, [open]);
 
   return {
     activeIndex,
     setActiveIndex,
-    itemRefs,
-    menuRef,
   };
 }

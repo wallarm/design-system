@@ -1,10 +1,21 @@
 {
-    "env": {
-      "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
-    },
-    "enabledPlugins": {
-      "ralph-loop@claude-plugins-official": true,
-      "ralph-skills@ralph-marketplace": true
-    }
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "permissions": {
+    "allow": [
+      "mcp__figma-web__get_design_context",
+      "mcp__figma-web__get_metadata",
+      "WebFetch(domain:www.figma.com)",
+      "mcp__figma-web__get_screenshot",
+      "Bash(grep -r \"highlightedValue\\\\|highlightedId\" \"node_modules/.pnpm/@zag-js+menu@1\"*/node_modules/@zag-js/menu/dist/*.d.ts)",
+      "Bash(grep -r \"RootProps\" node_modules/@ark-ui/react/dist/menu*.d.ts)",
+      "mcp__claude_ai_Figma__get_design_context",
+      "Bash(npx tsc --noEmit --project packages/design-system/tsconfig.json)"
+    ]
+  },
+  "enabledPlugins": {
+    "ralph-loop@claude-plugins-official": true,
+    "ralph-skills@ralph-marketplace": true
   }
-  
+}

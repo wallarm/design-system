@@ -53,10 +53,10 @@ export const FilterChip: FC<FilterChipProps> = ({
       <div
         className={cn(
           // Layout
-          'relative flex items-center justify-center px-1 py-0 cursor-pointer',
+          'relative flex items-center justify-center px-4 py-0 cursor-pointer',
           'min-h-[20px] max-w-[320px]',
           // Border & Background
-          'border border-solid rounded-lg',
+          'border border-solid rounded-8',
           error
             ? 'bg-bg-light-danger border-border-danger'
             : 'bg-badge-badge-bg border-border-primary',
@@ -68,10 +68,10 @@ export const FilterChip: FC<FilterChipProps> = ({
         {...props}
       >
         {/* Text content with proper structure */}
-        <div className='flex flex-col justify-center leading-none overflow-hidden text-ellipsis whitespace-nowrap p-0.5'>
+        <div className='flex flex-col justify-center leading-none  text-ellipsis whitespace-nowrap p-2'>
           <p
             className={cn(
-              'text-sm font-normal leading-5 overflow-hidden text-ellipsis',
+              'text-sm font-normal leading-5  text-ellipsis',
               error ? 'text-text-danger' : 'text-text-secondary',
             )}
           >
@@ -89,7 +89,7 @@ export const FilterChip: FC<FilterChipProps> = ({
             }}
             className={cn(
               // Position — extend 1px above and below chip border
-              'absolute -right-3 top-[-1px] bottom-[-1px]',
+              'absolute -right-12 top-[-1px] bottom-[-1px]',
               // Layout — reset button padding
               'flex items-center justify-center p-0 cursor-pointer',
               'w-[18px]',
@@ -97,7 +97,7 @@ export const FilterChip: FC<FilterChipProps> = ({
               'border border-solid',
               'border-l-0',
               error ? 'border-border-danger' : 'border-border-primary',
-              'rounded-r-lg',
+              'rounded-r-8',
               error ? 'bg-bg-light-danger' : 'bg-badge-badge-bg',
               // Text color
               error ? 'text-text-danger' : 'text-text-secondary',
@@ -105,7 +105,7 @@ export const FilterChip: FC<FilterChipProps> = ({
             data-slot='filter-chip-delete'
             aria-label='Remove filter'
           >
-            <X className='h-3 w-3' />
+            <X size='sm' />
           </button>
         )}
       </div>
@@ -138,10 +138,10 @@ export const FilterChip: FC<FilterChipProps> = ({
       <div
         className={cn(
           // Layout
-          'relative flex items-center gap-0 px-1 py-0 cursor-pointer',
+          'relative flex items-center gap-0 px-4 py-0 cursor-pointer',
           'min-h-[20px] max-w-[560px]',
           // Border & Background
-          'border border-solid rounded-lg',
+          'border border-solid rounded-8',
           error
             ? 'bg-bg-light-danger border-border-danger'
             : 'bg-badge-badge-bg border-border-primary',
@@ -171,7 +171,7 @@ export const FilterChip: FC<FilterChipProps> = ({
             }}
             className={cn(
               // Position — extend 1px above and below chip border
-              'absolute -right-3 top-[-1px] bottom-[-1px]',
+              'absolute -right-12 top-[-1px] bottom-[-1px]',
               // Layout — reset button padding
               'flex items-center justify-center p-0 cursor-pointer',
               'w-[18px]',
@@ -179,7 +179,7 @@ export const FilterChip: FC<FilterChipProps> = ({
               'border border-solid',
               'border-l-0',
               error ? 'border-border-danger' : 'border-border-primary',
-              'rounded-r-lg',
+              'rounded-r-8',
               error ? 'bg-bg-light-danger' : 'bg-badge-badge-bg',
               // Text color
               error ? 'text-text-danger' : 'text-text-secondary',
@@ -187,7 +187,7 @@ export const FilterChip: FC<FilterChipProps> = ({
             data-slot='filter-chip-delete'
             aria-label='Remove filter'
           >
-            <X className='h-3 w-3' />
+            <X size='sm' />
           </button>
         )}
       </div>
