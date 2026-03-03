@@ -104,36 +104,38 @@ function AttackFilters() {
 ```
 
 **Key Features:**
-- **Config-driven**: Just pass `fields` from API, everything works
-- Autocomplete menus (field → operator → value)
-- Expression parsing (supports AND/OR logic)
-- Visual chips rendering
-- Shows up to 3 visible chips, then displays placeholder hint
-- Automatic error propagation to all chips
-- Clear button (appears on hover when chips exist)
-- Keyboard navigation (⌘K / Ctrl+K)
+- **Self-contained**: Internal state management, no manual wiring needed
+- **Config-driven**: Just pass `fields` from API, everything works automatically
+- Autocomplete menus (field → operator → value) handled internally
+- Expression parsing and chip creation automatic
+- Visual chips rendering (up to 3 visible, then placeholder hint)
+- Click chip to edit, hover to delete
+- Clear button (appears when chips exist)
+- Keyboard shortcuts (Backspace to delete, Escape to close menus)
 
-**Props:**
+**Props (Simplified API):**
 ```typescript
 interface FilterFieldProps {
-  // Config-driven mode
+  // Required config from backend
   fields?: FieldMetadata[];           // Fields from backend API
-  value?: ExprNode | null;            // Parsed expression
-  onChange?: (expression: ExprNode | null) => void;
 
-  // Legacy mode (manual chips)
-  chips?: Array<{ id: string; content: ReactNode }>;
+  // Controlled mode (optional)
+  value?: ExprNode | null;            // Current expression
+  onChange?: (expression: ExprNode | null) => void;  // Callback on change
 
-  // Common props
+  // Optional styling
   placeholder?: string;
   error?: boolean;
-  leftIcon?: ReactNode;
   showKeyboardHint?: boolean;
-  onChipClick?: (chipId: string) => void;
-  onChipRemove?: (chipId: string) => void;
-  onClear?: () => void;
 }
 ```
+
+**How it works internally:**
+- User clicks/types → FilterMainMenu opens automatically
+- User selects field → FilterOperatorMenu opens automatically
+- User selects operator → FilterValueMenu opens automatically
+- User selects value → Chip created automatically
+- Expression parsed and onChange called automatically
 
 **Stories to reference:**
 - `Default` - Empty state with placeholder
@@ -1028,8 +1030,12 @@ function expressionToChips(expression: ExprNode | null): FilterChipData[] {
 ## 📖 Reference Files
 
 ### Parser
-- `FilterComponent/parser.ts` - Expression parsing logic
-- `FilterComponent/parser.test.ts` - Parser unit tests (40+ tests)
+- `filter/parser.ts` - Expression parsing logic
+  - Handles single condition parsing: `field operator value`
+  - Auto-detects value types (string, number, boolean, null)
+  - Supports quoted strings (single and double quotes)
+  - Operators: `=, !=, >, <, >=, <=, like, not_like, in, not_in, is_null, is_not_null, between`
+  - Used internally by FilterField for autocomplete
 
 ### Type Definitions
 - `types.ts` - All TypeScript interfaces and types
@@ -1038,12 +1044,12 @@ function expressionToChips(expression: ExprNode | null): FilterChipData[] {
   - `OPERATORS_BY_TYPE`, `getOperatorLabel()`
 
 ### Components
-- `FilterField/FilterField.tsx` - Main visual container
-- `FilterChip/FilterChip.tsx` - Chip rendering
-- `FilterMainMenu/FilterMainMenu.tsx` - Field selection
-- `FilterOperatorMenu/FilterOperatorMenu.tsx` - Operator selection
-- `FilterValueMenu/FilterValueMenu.tsx` - Value selection
-- `segments/` - SegmentAttribute, SegmentOperator, SegmentValue
+- `FilterField/FilterField.tsx` - **Self-contained filter component** (integrates all menus internally)
+- `FilterChip/FilterChip.tsx` - Chip rendering (used by FilterField)
+- `FilterMainMenu/FilterMainMenu.tsx` - Field selection menu (used internally by FilterField)
+- `FilterOperatorMenu/FilterOperatorMenu.tsx` - Operator selection menu (used internally by FilterField)
+- `FilterValueMenu/FilterValueMenu.tsx` - Value selection menu (used internally by FilterField)
+- `segments/` - SegmentAttribute, SegmentOperator, SegmentValue (used by FilterChip)
 
 ---
 
