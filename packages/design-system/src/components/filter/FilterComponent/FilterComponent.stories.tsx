@@ -145,3 +145,53 @@ export const DemoConditions: Story = {
     );
   },
 };
+
+/**
+ * Demonstrates AND/OR logic support (US-009)
+ * Type expressions combining multiple conditions with AND or OR operators
+ */
+export const AndOrExpressions: Story = {
+  render: () => {
+    const [expression, setExpression] = useState<ExprNode | null>(null);
+    const [chips, setChips] = useState<FilterChipData[]>([]);
+
+    const handleChange = (expr: ExprNode | null, newChips: FilterChipData[]) => {
+      setExpression(expr);
+      setChips(newChips);
+    };
+
+    return (
+      <div className='w-[800px] space-y-4'>
+        <FilterComponent
+          fields={mockFields}
+          value={expression}
+          onChange={handleChange}
+          placeholder='Type AND/OR expressions...'
+        />
+        <div className='text-xs space-y-2'>
+          <p className='font-semibold'>Try these AND/OR expressions:</p>
+          <ul className='list-disc list-inside space-y-1 text-gray-600'>
+            <li>
+              <code>status = active AND priority &gt; 5</code>
+            </li>
+            <li>
+              <code>type = bug OR type = feature</code>
+            </li>
+            <li>
+              <code>status = active AND priority &gt; 5 AND assignee = john</code>
+            </li>
+            <li>
+              <code>active = true OR archived = false</code>
+            </li>
+          </ul>
+          <div className='mt-4'>
+            <strong>Chips ({chips.length}):</strong>
+            <pre className='mt-1 p-2 bg-gray-100 rounded text-xs overflow-auto max-h-[200px]'>
+              {chips.length > 0 ? JSON.stringify(chips, null, 2) : '[]'}
+            </pre>
+          </div>
+        </div>
+      </div>
+    );
+  },
+};
