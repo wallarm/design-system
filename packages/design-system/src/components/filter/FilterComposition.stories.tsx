@@ -91,39 +91,33 @@ const attackFields: FieldMetadata[] = [
 ];
 
 /**
- * Complete working filter component with autocomplete, parsing, AND/OR logic, and chip editing.
- * Just start typing or click to see suggestions.
+ * Complete working filter component with autocomplete, parsing, and chip creation.
+ * Just pass fields config and it works automatically!
+ * Click to see field menu, select field → operator → value to create chips.
  */
 export const Default: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>(null);
 
     return (
-      <div className='w-[800px]'>
+      <div className='w-[800px] space-y-4'>
         <FilterField
           fields={attackFields}
           value={expression}
-          onChange={setExpression}
+          onChange={(expr) => {
+            console.log('Expression changed:', expr);
+            setExpression(expr);
+          }}
           placeholder='Type to filter attacks...'
           showKeyboardHint
         />
-      </div>
-    );
-  },
-};
 
-/**
- * With initial value demonstrating AND logic
- */
-export const WithAndLogic: Story = {
-  render: () => {
-    return (
-      <div className='w-[800px]'>
-        <FilterField
-          fields={attackFields}
-          placeholder='Example: severity = critical AND blocked = true'
-          showKeyboardHint
-        />
+        {/* Debug output */}
+        {expression && (
+          <div className='p-4 bg-gray-100 rounded text-xs'>
+            <pre>{JSON.stringify(expression, null, 2)}</pre>
+          </div>
+        )}
       </div>
     );
   },
@@ -131,6 +125,7 @@ export const WithAndLogic: Story = {
 
 /**
  * Minimal example with fewer fields
+ * Shows simple config-driven usage
  */
 export const Simple: Story = {
   render: () => {
@@ -162,6 +157,41 @@ export const Simple: Story = {
         <FilterField
           fields={simpleFields}
           placeholder='Filter items...'
+          onChange={(expr) => console.log('Filter:', expr)}
+        />
+      </div>
+    );
+  },
+};
+
+/**
+ * Backend integration example
+ * Shows how to use with API config (like from sessions-api metadata.go)
+ */
+export const BackendIntegration: Story = {
+  render: () => {
+    const [metadata, setMetadata] = useState<FieldMetadata[] | null>(null);
+    const [expression, setExpression] = useState<ExprNode | null>(null);
+
+    // Simulate fetching metadata from backend
+    useState(() => {
+      // In real app: fetch('/api/security/query-metadata')
+      setTimeout(() => {
+        setMetadata(attackFields);
+      }, 100);
+    });
+
+    if (!metadata) {
+      return <div className='w-[800px] h-10 bg-gray-100 rounded-lg animate-pulse' />;
+    }
+
+    return (
+      <div className='w-[800px]'>
+        <FilterField
+          fields={metadata}
+          value={expression}
+          onChange={setExpression}
+          placeholder='Loading metadata from backend...'
         />
       </div>
     );
