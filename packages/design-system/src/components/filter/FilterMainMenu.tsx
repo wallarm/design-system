@@ -136,17 +136,15 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
     }
   };
 
-  const { activeIndex } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: handleItemSelect,
     onClose: () => onOpenChange?.(false),
   });
 
-  const highlightedValue = flatItems[activeIndex]?.id ?? null;
-
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue}>
+    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue} onHighlightChange={onHighlightChange}>
       <DropdownMenuContent className={cn('w-[300px]', className)} data-slot='filter-main-menu'>
         {/* Recent conditions */}
         {showRecent && (

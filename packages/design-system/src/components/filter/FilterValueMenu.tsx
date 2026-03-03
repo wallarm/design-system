@@ -77,14 +77,12 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
     [values],
   );
 
-  const { activeIndex } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: item => onSelect(item.value),
     onClose: () => onOpenChange?.(false),
   });
-
-  const highlightedValue = flatItems[activeIndex]?.id ?? null;
 
   // Determine width class
   let widthClass = 'w-[300px]';
@@ -95,7 +93,7 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
   }
 
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue}>
+    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue} onHighlightChange={onHighlightChange}>
       <DropdownMenuContent className={cn(widthClass, className)}>
         <DropdownMenuGroup>
           {values.map(option => {

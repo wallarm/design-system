@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FilterDropdownItem } from '../types';
 
 interface UseKeyboardNavOptions {
@@ -17,6 +17,10 @@ interface UseKeyboardNavReturn {
   activeIndex: number;
   /** Set active index */
   setActiveIndex: (index: number) => void;
+  /** Value to pass as highlightedValue to DropdownMenu */
+  highlightedValue: string | null;
+  /** Handler for DropdownMenu onHighlightChange — syncs mouse hover with activeIndex */
+  onHighlightChange: (details: { highlightedValue: string | null }) => void;
 }
 
 /**
@@ -25,6 +29,9 @@ interface UseKeyboardNavReturn {
  * Uses a **capture-phase** listener on `window` so it fires before
  * Ark UI's onKeyDown on Menu.Content. Calls `stopPropagation()` to
  * prevent Ark UI from double-handling ArrowUp/Down/Enter/Escape.
+ *
+ * Syncs with Ark UI's highlight via `highlightedValue` / `onHighlightChange`
+ * so both keyboard and mouse interactions show visual highlight.
  */
 export const useKeyboardNav = ({
   items,
@@ -115,8 +122,21 @@ export const useKeyboardNav = ({
     return () => window.removeEventListener('keydown', handleKeyDown, true);
   }, [open]);
 
+  // Sync Ark UI's mouse-driven highlight with our activeIndex
+  const onHighlightChange = useCallback((details: { highlightedValue: string | null }) => {
+    if (!details.highlightedValue) return;
+    const idx = itemsRef.current.findIndex(item => item.id === details.highlightedValue);
+    if (idx >= 0) {
+      setActiveIndex(idx);
+    }
+  }, []);
+
+  const highlightedValue = items[activeIndex]?.id ?? null;
+
   return {
     activeIndex,
     setActiveIndex,
+    highlightedValue,
+    onHighlightChange,
   };
 };

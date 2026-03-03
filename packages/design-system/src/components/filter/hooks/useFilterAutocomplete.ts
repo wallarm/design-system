@@ -1,7 +1,10 @@
-import type { ChangeEvent, KeyboardEvent, MouseEvent as ReactMouseEvent, RefObject } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { getOperatorFromLabel, getOperatorLabel, isMultiSelectOperator } from '../lib';
+import type { ChangeEvent, KeyboardEvent, RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getOperatorLabel, isMultiSelectOperator } from '../lib';
 import type { Condition, FieldMetadata, FilterChipData, FilterOperator } from '../types';
+import { useBlurGuard } from './useBlurGuard';
+import { useChipEditing } from './useChipEditing';
+import { useMenuPositioning } from './useMenuPositioning';
 
 type MenuState = 'closed' | 'field' | 'operator' | 'value';
 
@@ -42,70 +45,76 @@ export const useFilterAutocomplete = ({
   const [selectedField, setSelectedField] = useState<FieldMetadata | null>(null);
   const [selectedOperator, setSelectedOperator] = useState<FilterOperator | null>(null);
   const [isFocused, setIsFocused] = useState(false);
-  const [editingChipId, setEditingChipId] = useState<string | null>(null);
   const [multiSelectValues, setMultiSelectValues] = useState<Array<string | number | boolean>>([]);
-  const lastTransitionRef = useRef(0);
-  const menuOffsetRef = useRef(0);
 
-  const isBuilding = !editingChipId && selectedField !== null;
+  // Extracted hooks — ordered to avoid circular deps
+  const isPointerInMenuRef = useBlurGuard({ containerRef });
 
-  // Update menu offset to align with the building chip's left edge
-  const updateBuildingChipOffset = () => {
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    const chipRect = buildingChipRef.current?.getBoundingClientRect();
-    if (containerRect && chipRect) {
-      menuOffsetRef.current = chipRect.left - containerRect.left;
-    }
-  };
-
-  // After building chip renders, update menu offset to align dropdown with the chip
-  useEffect(() => {
-    if (isBuilding && menuState !== 'closed') {
-      updateBuildingChipOffset();
-    }
+  const { menuPositioning, setMenuOffset, resetMenuOffset } = useMenuPositioning({
+    containerRef,
+    buildingChipRef,
+    isBuilding: selectedField !== null,
+    menuState,
   });
 
-  // Auto-open field menu ONLY on initial focus (not after Escape)
+  const editing = useChipEditing({
+    conditions,
+    chips,
+    fields,
+    containerRef,
+    upsertCondition,
+    toggleConnector,
+    setMenuOffset,
+    setSelectedField,
+    setSelectedOperator,
+    setMenuState,
+  });
+
+  const isBuilding = selectedField !== null && !editing.editingChipId;
+
+  // Auto-open field menu on initial focus when empty
   const prevFocusedRef = useRef(false);
   useEffect(() => {
     if (isFocused && !prevFocusedRef.current && conditions.length === 0 && inputText === '') {
-      lastTransitionRef.current = Date.now();
-      menuOffsetRef.current = 0;
+      resetMenuOffset();
       setMenuState('field');
     }
     prevFocusedRef.current = isFocused;
-  }, [isFocused, conditions.length, inputText]);
+  }, [isFocused, conditions.length, inputText, resetMenuOffset]);
+
+  // --- State reset ---
 
   const resetState = () => {
     setInputText('');
     setSelectedField(null);
     setSelectedOperator(null);
-    setEditingChipId(null);
+    editing.clearEditing();
     setMultiSelectValues([]);
     setMenuState('closed');
-    menuOffsetRef.current = 0;
+    resetMenuOffset();
     inputRef.current?.focus();
   };
 
+  // --- Handlers ---
+
   const handleMenuClose = useCallback(() => {
     if (multiSelectValues.length > 0 && selectedField && selectedOperator) {
-      upsertCondition(selectedField, selectedOperator, multiSelectValues, editingChipId);
+      upsertCondition(selectedField, selectedOperator, multiSelectValues, editing.editingChipId);
     }
     setMenuState('closed');
     setSelectedField(null);
     setSelectedOperator(null);
-    setEditingChipId(null);
+    editing.clearEditing();
     setMultiSelectValues([]);
-    menuOffsetRef.current = 0;
+    resetMenuOffset();
     inputRef.current?.focus();
-  }, [multiSelectValues, selectedField, selectedOperator, editingChipId, upsertCondition, inputRef]);
+  }, [multiSelectValues, selectedField, selectedOperator, editing, upsertCondition, inputRef, resetMenuOffset]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setInputText(text);
 
     if (text && !selectedField) {
-      lastTransitionRef.current = Date.now();
       setMenuState('field');
     } else if (!text && !selectedField) {
       setMenuState(isFocused && conditions.length === 0 ? 'field' : 'closed');
@@ -113,7 +122,10 @@ export const useFilterAutocomplete = ({
   };
 
   const handleFieldSelect = (field: FieldMetadata) => {
-    lastTransitionRef.current = Date.now();
+    if (editing.tryEditField(field)) {
+      resetState();
+      return;
+    }
     setSelectedField(field);
     setInputText('');
     setMenuState('operator');
@@ -123,12 +135,16 @@ export const useFilterAutocomplete = ({
     const noValueOps: FilterOperator[] = ['is_null', 'is_not_null'];
 
     if (noValueOps.includes(operator)) {
-      upsertCondition(selectedField!, operator, null, editingChipId);
+      upsertCondition(selectedField!, operator, null, editing.editingChipId);
       resetState();
       return;
     }
 
-    lastTransitionRef.current = Date.now();
+    if (editing.tryEditOperator(operator, selectedField!)) {
+      resetState();
+      return;
+    }
+
     setSelectedOperator(operator);
     setMenuState('value');
   };
@@ -143,73 +159,19 @@ export const useFilterAutocomplete = ({
       return;
     }
 
-    upsertCondition(selectedField, selectedOperator, val, editingChipId);
+    upsertCondition(selectedField, selectedOperator, val, editing.editingChipId);
     resetState();
   };
 
   const handleChipRemove = (chipId: string) => {
     removeCondition(chipId);
-    menuOffsetRef.current = 0;
+    resetMenuOffset();
     inputRef.current?.focus();
   };
 
   const handleClear = () => {
     clearAll();
-    setInputText('');
-    setSelectedField(null);
-    setSelectedOperator(null);
-    setEditingChipId(null);
-    setMultiSelectValues([]);
-    setMenuState('closed');
-    menuOffsetRef.current = 0;
-    inputRef.current?.focus();
-  };
-
-  const handleChipClick = (chipId: string, e: ReactMouseEvent) => {
-    if (chipId.startsWith('connector-')) {
-      toggleConnector();
-      return;
-    }
-
-    const match = chipId.match(/^chip-(\d+)$/);
-    const idx = match ? Number(match[1]) : null;
-    if (idx === null) return;
-
-    const condition = conditions[idx];
-    if (!condition) return;
-
-    const field = fields.find(f => f.name === condition.field);
-    if (!field) return;
-
-    const chip = chips.find(c => c.id === chipId);
-    if (!chip || chip.variant !== 'chip') return;
-
-    const target = e.target as HTMLElement;
-    const segmentEl = target.closest('[data-slot]') as HTMLElement | null;
-    const slot = segmentEl?.getAttribute('data-slot');
-
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    if (containerRect && segmentEl) {
-      menuOffsetRef.current = segmentEl.getBoundingClientRect().left - containerRect.left;
-    } else {
-      menuOffsetRef.current = 0;
-    }
-
-    lastTransitionRef.current = Date.now();
-    setEditingChipId(chipId);
-    setSelectedField(field);
-
-    if (slot === 'segment-attribute') {
-      setSelectedOperator(null);
-      setMenuState('field');
-    } else if (slot === 'segment-value') {
-      const rawOperator = getOperatorFromLabel(chip.operator || '', field.type);
-      setSelectedOperator(rawOperator);
-      setMenuState('value');
-    } else {
-      setSelectedOperator(null);
-      setMenuState('operator');
-    }
+    resetState();
   };
 
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
@@ -225,26 +187,29 @@ export const useFilterAutocomplete = ({
 
   const handleBlur = () => {
     setTimeout(() => {
-      if (Date.now() - lastTransitionRef.current < 400) return;
+      if (isPointerInMenuRef.current) return;
 
       const activeEl = document.activeElement;
       const isInContainer = containerRef.current?.contains(activeEl);
       const isInMenu = activeEl?.closest('[data-scope="menu"]');
-      if (!isInContainer && !isInMenu) {
+      const hasOpenMenu = document.querySelector('[data-scope="menu"][data-state="open"]');
+
+      if (!isInContainer && !isInMenu && !hasOpenMenu) {
         if (multiSelectValues.length > 0 && selectedField && selectedOperator) {
-          upsertCondition(selectedField, selectedOperator, multiSelectValues, editingChipId);
+          upsertCondition(selectedField, selectedOperator, multiSelectValues, editing.editingChipId);
         }
         setIsFocused(false);
         setMenuState('closed');
         setSelectedField(null);
         setSelectedOperator(null);
-        setEditingChipId(null);
+        editing.clearEditing();
         setMultiSelectValues([]);
       }
     }, 200);
   };
 
-  // Building chip data for in-progress filter
+  // --- Derived values ---
+
   const buildingMultiValue = multiSelectValues.length > 0
     ? multiSelectValues
       .map(v => selectedField?.values?.find(opt => opt.value === v)?.label ?? String(v))
@@ -257,26 +222,6 @@ export const useFilterAutocomplete = ({
     operator: selectedOperator ? getOperatorLabel(selectedOperator, selectedField!.type) : undefined,
     value: buildingMultiValue,
   } : null;
-
-  // Positioning for all menus — shifts horizontally to follow the active chip
-  const menuPositioning = useMemo(() => ({
-    placement: 'bottom-start' as const,
-    gutter: 4,
-    getAnchorRect: () => {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return null;
-      return {
-        x: rect.left + menuOffsetRef.current,
-        y: rect.y,
-        width: rect.width - menuOffsetRef.current,
-        height: rect.height,
-        top: rect.top,
-        bottom: rect.bottom,
-        left: rect.left + menuOffsetRef.current,
-        right: rect.right,
-      };
-    },
-  }), [containerRef]);
 
   return {
     inputText,
@@ -292,7 +237,7 @@ export const useFilterAutocomplete = ({
     handleOperatorSelect,
     handleValueSelect,
     handleMenuClose,
-    handleChipClick,
+    handleChipClick: editing.handleChipClick,
     handleChipRemove,
     handleClear,
     handleKeyDown,

@@ -14,6 +14,8 @@ interface DropdownMenuProps {
   positioning?: Menu.RootProps['positioning'];
   /** Programmatically control which item is highlighted */
   highlightedValue?: string | null;
+  /** Callback when the highlighted item changes (e.g. on mouse hover) */
+  onHighlightChange?: (details: Menu.HighlightChangeDetails) => void;
   /** Whether selecting an item closes the menu (default true) */
   closeOnSelect?: boolean;
 }
@@ -38,6 +40,7 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
   anchorPoint,
   positioning,
   highlightedValue,
+  onHighlightChange,
   closeOnSelect,
   ...props
 }) => {
@@ -60,6 +63,7 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
         {...(anchorPoint != null && { anchorPoint })}
         {...(highlightedValue != null && { highlightedValue })}
         {...(closeOnSelect != null && { closeOnSelect })}
+        {...(onHighlightChange != null && { onHighlightChange })}
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={handleOpenChange}

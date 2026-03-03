@@ -70,17 +70,15 @@ export const FilterOperatorMenu: FC<FilterOperatorMenuProps> = ({
     [operatorGroups, fieldType],
   );
 
-  const { activeIndex } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: item => onSelect(item.value as FilterOperator),
     onClose: () => onOpenChange?.(false),
   });
 
-  const highlightedValue = flatItems[activeIndex]?.id ?? null;
-
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue}>
+    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue} onHighlightChange={onHighlightChange}>
       <DropdownMenuContent className={cn('w-64', className)}>
         {operatorGroups.map((group, groupIdx) => (
           <Fragment key={`group-${groupIdx}`}>
