@@ -3,7 +3,7 @@ import { cn } from '../../../utils/cn';
 import { inputVariants } from '../../Input/classes';
 import { FilterChip } from '../FilterChip';
 import type { FilterChipData } from '../types';
-import { FilterInputBarActions } from '../FilterInputBarActions';
+import { FilterInputBarActions } from './FilterInputBarActions';
 
 interface FilterInputBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /** Visible chips to render (already sliced) */

@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 /**
  * Filter Chip Variant Types
  */
@@ -90,117 +92,40 @@ export interface Group {
 export type ExprNode = Condition | Group;
 
 /**
- * Operator Symbol Mapping
- * Maps operators to their raw symbol displayed on the right side of menus
+ * Item in a dropdown menu
  */
-export const OPERATOR_SYMBOLS: Record<FilterOperator, string> = {
-  '=': '=',
-  '!=': '!=',
-  '>': '>',
-  '<': '<',
-  '>=': '>=',
-  '<=': '<=',
-  like: '~',
-  not_like: '!~',
-  in: 'IN',
-  not_in: 'NOT IN',
-  is_null: '= null',
-  is_not_null: '!= null',
-  between: '<>',
-};
-
-/**
- * Operator Label Mapping
- * Maps operator symbols to human-readable labels
- */
-export const OPERATOR_LABELS: Record<FilterOperator, string> = {
-  '=': 'is',
-  '!=': 'is not',
-  '>': 'greater',
-  '<': 'less',
-  '>=': 'greater or equal',
-  '<=': 'less or equal',
-  like: 'like',
-  not_like: 'not like',
-  in: 'is any of',
-  not_in: 'is not any of',
-  is_null: 'is set',
-  is_not_null: 'is not set',
-  between: 'between',
-};
-
-/**
- * Field type-specific operator labels
- * Some operators have different labels depending on field type
- */
-export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOperator, string>>> = {
-  string: {
-    is_null: 'is set',
-    is_not_null: 'is not set',
-  },
-  integer: {},
-  float: {},
-  date: {
-    '>': 'after',
-    '>=': 'on or after',
-    '<': 'before',
-    '<=': 'is on or before',
-  },
-  boolean: {
-    '=': 'is true',
-    '!=': 'is false',
-    is_null: 'is set',
-    is_not_null: 'is not set',
-  },
-  enum: {
-    in: 'is any of 🤔 wip',
-    not_in: 'is not any of 🤔 wip',
-    is_null: 'is set',
-    is_not_null: 'is not set',
-  },
-};
-
-/**
- * Helper to get operator label for specific field type
- */
-export function getOperatorLabel(operator: FilterOperator, fieldType: FieldType): string {
-  return OPERATOR_LABELS_BY_TYPE[fieldType]?.[operator] ?? OPERATOR_LABELS[operator];
+export interface FilterDropdownItem {
+  /** Unique identifier */
+  id: string;
+  /** Display label */
+  label: string;
+  /** Value to return on selection */
+  value: any;
+  /** Optional icon to display */
+  icon?: ReactNode;
+  /** Optional badge with color and text */
+  badge?: {
+    color: string;
+    text: string;
+  };
+  /** Whether item is disabled */
+  disabled?: boolean;
+  /** Whether item shows a submenu arrow */
+  hasSubmenu?: boolean;
+  /** Custom renderer for item content */
+  renderContent?: (item: FilterDropdownItem) => ReactNode;
 }
 
 /**
- * Reverse lookup: get raw FilterOperator from its display label and field type
+ * Section in a dropdown menu (group of items)
  */
-export function getOperatorFromLabel(label: string, fieldType: FieldType): FilterOperator | null {
-  // Check type-specific labels first (more specific)
-  const typeLabels = OPERATOR_LABELS_BY_TYPE[fieldType];
-  for (const [op, lbl] of Object.entries(typeLabels)) {
-    if (lbl === label) return op as FilterOperator;
-  }
-  // Fall back to generic labels
-  for (const [op, lbl] of Object.entries(OPERATOR_LABELS)) {
-    if (lbl === label) return op as FilterOperator;
-  }
-  return null;
+export interface FilterDropdownSection {
+  /** Unique identifier */
+  id: string;
+  /** Optional section title/header */
+  title?: string;
+  /** Items in this section */
+  items: FilterDropdownItem[];
+  /** Whether to show separator after this section */
+  showSeparator?: boolean;
 }
-
-/**
- * Operators by Field Type Mapping (with groups for separators)
- * Maps field types to their available operators, grouped logically
- */
-export const OPERATORS_BY_TYPE: Record<FieldType, FilterOperator[][]> = {
-  string: [
-    ['=', '!=', 'in', 'like', 'not_like'],
-    ['is_null', 'is_not_null'],
-  ],
-  integer: [
-    ['=', '!=', '>', '<', '>=', '<='],
-    ['in'],
-  ],
-  float: [['=', '!=', '>', '<', '>=', '<=']],
-  date: [['>', '>=', '<', '<=', '=', '!=', 'between']],
-  boolean: [['=', '!=', 'is_null', 'is_not_null']],
-  enum: [
-    ['=', '!=', 'in', 'not_in'],
-    ['is_null', 'is_not_null'],
-  ],
-};

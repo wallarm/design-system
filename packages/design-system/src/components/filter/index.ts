@@ -4,9 +4,11 @@ export { FilterField, type FilterFieldProps } from './FilterField';
 export { FilterMainMenu, type FilterMainMenuProps } from './FilterMainMenu';
 export { FilterOperatorMenu, type FilterOperatorMenuProps } from './FilterOperatorMenu';
 export { FilterValueMenu, type FilterValueMenuProps, type ValueOption } from './FilterValueMenu';
-// Segment Components
-export { SegmentAttribute, SegmentOperator, SegmentValue } from './segments';
-// Types and Constants
+// Primitives
+export { SegmentAttribute, SegmentOperator, SegmentValue } from './primitives';
+// Lib (constants & utilities)
+export { OPERATOR_LABELS, OPERATORS_BY_TYPE } from './lib';
+// Types
 export type {
   Condition,
   ExprNode,
@@ -18,4 +20,3 @@ export type {
   FilterOperator,
   Group,
 } from './types';
-export { OPERATOR_LABELS, OPERATORS_BY_TYPE } from './types';
