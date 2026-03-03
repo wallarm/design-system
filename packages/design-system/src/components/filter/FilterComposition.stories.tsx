@@ -1,16 +1,16 @@
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { FilterComponent } from './FilterComponent';
+import { FilterField } from './FilterField';
 import type { ExprNode, FieldMetadata } from './types';
 
 const meta = {
   title: 'Components/Filter/Composition',
-  component: FilterComponent,
+  component: FilterField,
   parameters: {
     layout: 'centered',
   },
   tags: ['autodocs'],
-} satisfies Meta<typeof FilterComponent>;
+} satisfies Meta<typeof FilterField>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -100,7 +100,7 @@ export const Default: Story = {
 
     return (
       <div className='w-[800px]'>
-        <FilterComponent
+        <FilterField
           fields={attackFields}
           value={expression}
           onChange={setExpression}
@@ -119,7 +119,7 @@ export const WithAndLogic: Story = {
   render: () => {
     return (
       <div className='w-[800px]'>
-        <FilterComponent
+        <FilterField
           fields={attackFields}
           placeholder='Example: severity = critical AND blocked = true'
           showKeyboardHint
@@ -159,7 +159,7 @@ export const Simple: Story = {
 
     return (
       <div className='w-[600px]'>
-        <FilterComponent
+        <FilterField
           fields={simpleFields}
           placeholder='Filter items...'
         />

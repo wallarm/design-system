@@ -2,6 +2,10 @@ import React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
 import { Search } from '../../../icons/Search';
 import { FilterChip } from '../FilterChip';
+import { FilterMainMenu } from '../FilterMainMenu/FilterMainMenu';
+import { FilterOperatorMenu } from '../FilterOperatorMenu/FilterOperatorMenu';
+import type { FieldMetadata, FieldType, FilterOperator } from '../types';
+import { getOperatorLabel } from '../types';
 import type { FilterFieldProps } from './FilterField';
 import { FilterField } from './FilterField';
 
@@ -306,6 +310,189 @@ export const Interactive: Story = {
           onChipRemove={_chipId => {}}
           onClear={() => {}}
         />
+      </div>
+    );
+  },
+};
+
+/**
+ * Interactive example with menu integration.
+ *
+ * Features:
+ * - Click on **attribute** (field name) to open FilterMainMenu and change the field
+ * - Click on **operator** (is, is not, etc.) to open FilterOperatorMenu and change the operator
+ * - Each chip can be removed using the hover delete button
+ * - All chips can be cleared using the X button in the field
+ *
+ * This demonstrates the full integration pattern for building an interactive filter UI.
+ */
+export const WithMenuIntegration: Story = {
+  render: () => {
+    const [chips, setChips] = React.useState<
+      Array<{
+        id: string;
+        variant: 'chip' | 'and' | 'or';
+        field?: string;
+        fieldType?: FieldType;
+        operator?: FilterOperator;
+        value?: string;
+      }>
+    >([
+      { id: '1', variant: 'chip', field: 'Status', fieldType: 'enum', operator: '=', value: 'Active' },
+      { id: '2', variant: 'and' },
+      {
+        id: '3',
+        variant: 'chip',
+        field: 'HTTP status code',
+        fieldType: 'integer',
+        operator: '=',
+        value: '200',
+      },
+    ]);
+
+    const [openMenu, setOpenMenu] = React.useState<{
+      type: 'main' | 'operator' | null;
+      chipId: string | null;
+      position?: { x: number; y: number };
+    }>({ type: null, chipId: null });
+
+    // Sample fields for FilterMainMenu
+    const sampleFields: FieldMetadata[] = [
+      { name: 'status', label: 'Status', type: 'enum' },
+      { name: 'severity', label: 'Severity', type: 'enum' },
+      { name: 'location', label: 'Location', type: 'string' },
+      { name: 'http_status_code', label: 'HTTP status code', type: 'integer' },
+      { name: 'endpoint', label: 'Endpoint', type: 'string' },
+    ];
+
+    const handleChipClick = (chipId: string, event: React.MouseEvent) => {
+      const chip = chips.find(c => c.id === chipId);
+      if (!chip || chip.variant !== 'chip') return;
+
+      const target = event.target as HTMLElement;
+      const segmentSlot = target.closest('[data-slot]')?.getAttribute('data-slot');
+
+      const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+
+      if (segmentSlot === 'segment-attribute') {
+        setOpenMenu({
+          type: 'main',
+          chipId,
+          position: { x: rect.left, y: rect.bottom + 4 },
+        });
+      } else if (segmentSlot === 'segment-operator') {
+        setOpenMenu({
+          type: 'operator',
+          chipId,
+          position: { x: rect.left, y: rect.bottom + 4 },
+        });
+      }
+    };
+
+    const handleFieldSelect = (field: FieldMetadata) => {
+      if (openMenu.chipId) {
+        setChips(prevChips =>
+          prevChips.map(chip =>
+            chip.id === openMenu.chipId
+              ? { ...chip, field: field.label, fieldType: field.type }
+              : chip,
+          ),
+        );
+      }
+      setOpenMenu({ type: null, chipId: null });
+    };
+
+    const handleOperatorSelect = (operator: FilterOperator) => {
+      if (openMenu.chipId) {
+        setChips(prevChips =>
+          prevChips.map(chip =>
+            chip.id === openMenu.chipId ? { ...chip, operator } : chip,
+          ),
+        );
+      }
+      setOpenMenu({ type: null, chipId: null });
+    };
+
+    const handleChipRemove = (chipId: string) => {
+      setChips(chips.filter(c => c.id !== chipId));
+    };
+
+    const handleClear = () => {
+      setChips([]);
+    };
+
+    return (
+      <div className='relative space-y-4'>
+        <FilterField
+          placeholder='Search attacks...'
+          leftIcon={<Search className='size-6 text-text-secondary' />}
+          showKeyboardHint
+          chips={chips.map(chip => ({
+            id: chip.id,
+            content:
+              chip.variant === 'chip' ? (
+                <div onClick={(e: React.MouseEvent) => handleChipClick(chip.id, e)}>
+                  <FilterChip
+                    variant='chip'
+                    attribute={chip.field}
+                    operator={
+                      chip.operator && chip.fieldType
+                        ? getOperatorLabel(chip.operator, chip.fieldType)
+                        : chip.operator
+                    }
+                    value={chip.value}
+                    onRemove={() => handleChipRemove(chip.id)}
+                  />
+                </div>
+              ) : (
+                <FilterChip variant={chip.variant} />
+              ),
+          }))}
+          onChipRemove={handleChipRemove}
+          onClear={handleClear}
+        />
+
+        <p className='text-sm text-text-secondary'>
+          Click on attribute or operator segments to edit. Total chips: {chips.length}
+        </p>
+
+        {/* FilterMainMenu */}
+        {openMenu.type === 'main' && openMenu.position && (
+          <div
+            style={{
+              position: 'fixed',
+              top: openMenu.position.y,
+              left: openMenu.position.x,
+              zIndex: 1000,
+            }}
+          >
+            <FilterMainMenu
+              fields={sampleFields}
+              open={true}
+              onOpenChange={() => setOpenMenu({ type: null, chipId: null })}
+              onSelect={handleFieldSelect}
+            />
+          </div>
+        )}
+
+        {/* FilterOperatorMenu */}
+        {openMenu.type === 'operator' && openMenu.position && openMenu.chipId && (
+          <div
+            style={{
+              position: 'fixed',
+              top: openMenu.position.y,
+              left: openMenu.position.x,
+              zIndex: 1000,
+            }}
+          >
+            <FilterOperatorMenu
+              fieldType={chips.find(c => c.id === openMenu.chipId)?.fieldType || 'string'}
+              open={true}
+              onOpenChange={() => setOpenMenu({ type: null, chipId: null })}
+              onSelect={handleOperatorSelect}
+            />
+          </div>
+        )}
       </div>
     );
   },

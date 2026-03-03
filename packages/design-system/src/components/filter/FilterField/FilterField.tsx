@@ -2,10 +2,23 @@ import type { FC, FocusEvent, HTMLAttributes, ReactNode } from 'react';
 import { cloneElement, isValidElement } from 'react';
 import { X } from '../../../icons/X';
 import { cn } from '../../../utils/cn';
+import type { ExprNode, FieldMetadata } from '../types';
 
-export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /**
-   * Array of filter chip data to display
+   * Available fields from backend API config
+   */
+  fields?: FieldMetadata[];
+  /**
+   * Current filter expression value (controlled mode)
+   */
+  value?: ExprNode | null;
+  /**
+   * Callback when filter expression changes
+   */
+  onChange?: (expression: ExprNode | null) => void;
+  /**
+   * Array of filter chip data to display (legacy mode - use fields instead)
    */
   chips?: Array<{ id: string; content: ReactNode }>;
   /**
@@ -48,6 +61,9 @@ export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, '
 }
 
 export const FilterField: FC<FilterFieldProps> = ({
+  fields,
+  value,
+  onChange,
   chips = [],
   placeholder = 'Search [object]...',
   error = false,
@@ -61,6 +77,10 @@ export const FilterField: FC<FilterFieldProps> = ({
   className,
   ...props
 }) => {
+  // Config-driven mode: use fields
+  // Legacy mode: use chips
+  const isConfigMode = fields !== undefined;
+
   const hasChips = chips.length > 0;
   const visibleChips = chips.slice(0, 3);
   const hasMoreChips = chips.length > 3;

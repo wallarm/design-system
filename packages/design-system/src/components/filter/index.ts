@@ -1,11 +1,5 @@
 // Components
 export { FilterChip, type FilterChipProps } from './FilterChip';
-export {
-  type EditingContext,
-  FilterComponent,
-  type FilterComponentProps,
-  type FilterComponentState,
-} from './FilterComponent';
 export { FilterField, type FilterFieldProps } from './FilterField';
 export { FilterMainMenu, type FilterMainMenuProps } from './FilterMainMenu';
 export { FilterOperatorMenu, type FilterOperatorMenuProps } from './FilterOperatorMenu';
