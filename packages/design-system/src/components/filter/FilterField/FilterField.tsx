@@ -239,11 +239,15 @@ export const FilterField: FC<FilterFieldProps> = ({
   const handleBlur = (e: FocusEvent<HTMLDivElement>) => {
     // Delay to allow menu clicks to register
     setTimeout(() => {
-      if (!containerRef.current?.contains(document.activeElement)) {
+      // Only close if focus really left and we're not in the middle of autocomplete
+      const activeEl = document.activeElement;
+      const isMenuButton = activeEl?.closest('[role="menu"]') || activeEl?.closest('[role="menuitem"]');
+
+      if (!containerRef.current?.contains(activeEl) && !isMenuButton) {
         setIsFocused(false);
         setMenuState('closed');
       }
-    }, 200);
+    }, 250);
   };
 
   const hasChips = chips.length > 0;
