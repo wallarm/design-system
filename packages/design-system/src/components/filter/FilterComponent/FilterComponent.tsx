@@ -1,11 +1,12 @@
 import type { ChangeEvent, FC, KeyboardEvent } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { FilterChip } from '../FilterChip';
 import { FilterField } from '../FilterField';
 import { FilterMainMenu } from '../FilterMainMenu';
 import { FilterOperatorMenu } from '../FilterOperatorMenu';
 import { FilterValueMenu } from '../FilterValueMenu';
 import { SegmentAttribute, SegmentOperator, SegmentValue } from '../segments';
-import type { Condition, ExprNode, FieldMetadata, FilterChipData, FilterOperator } from '../types';
+import type { Condition, ExprNode, FieldMetadata, FilterChipData, FilterOperator, Group } from '../types';
 import { getOperatorLabel, OPERATORS_BY_TYPE } from '../types';
 import { parse } from './parser';
 
@@ -121,8 +122,7 @@ export const FilterComponent: FC<FilterComponentProps> = ({
       return [];
     }
 
-    // For now, only handle single Condition nodes (US-002)
-    // Will be extended for AND/OR/parentheses in US-009-011
+    // Handle single Condition node
     if (expression.type === 'condition') {
       const condition = expression as Condition;
       return [
@@ -134,6 +134,31 @@ export const FilterComponent: FC<FilterComponentProps> = ({
           value: String(condition.value),
         },
       ];
+    }
+
+    // Handle Group node (AND/OR)
+    if (expression.type === 'group') {
+      const group = expression as Group;
+      const chips: FilterChipData[] = [];
+
+      for (let i = 0; i < group.children.length; i++) {
+        const child = group.children[i];
+
+        if (!child) continue;
+
+        // Add child chips
+        chips.push(...expressionToChips(child));
+
+        // Add AND/OR chip between children (not after last child)
+        if (i < group.children.length - 1) {
+          chips.push({
+            id: `${group.operator}-${Date.now()}-${i}`,
+            variant: group.operator,
+          });
+        }
+      }
+
+      return chips;
     }
 
     return [];
@@ -502,6 +527,15 @@ export const FilterComponent: FC<FilterComponentProps> = ({
           <>
             <FilterField
               chips={state.chips.map(chip => {
+                // Handle AND/OR chips
+                if (chip.variant === 'and' || chip.variant === 'or') {
+                  return {
+                    id: chip.id,
+                    content: <FilterChip variant={chip.variant} />,
+                  };
+                }
+
+                // Handle condition chips
                 if (!chip.attribute || !chip.operator) {
                   return {
                     id: chip.id,

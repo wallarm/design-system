@@ -1,4 +1,4 @@
-import type { Condition, ExprNode, FilterOperator } from '../types';
+import type { Condition, ExprNode, FilterOperator, Group } from '../types';
 
 /**
  * Parse Result
@@ -215,15 +215,111 @@ export function parseCondition(input: string): ParseResult {
 }
 
 /**
+ * Parse AND/OR expressions combining multiple conditions
+ *
+ * Examples:
+ * - "status = active AND priority > 5" → Group with 'and' operator
+ * - "type = bug OR type = feature" → Group with 'or' operator
+ *
+ * @param input - Input text to parse
+ * @returns ParseResult with Group expression or remaining text
+ */
+function parseExpression(input: string): ParseResult {
+  const trimmed = input.trim();
+
+  if (!trimmed) {
+    return {
+      expression: null,
+      remainingText: '',
+      isComplete: false,
+    };
+  }
+
+  // Parse first condition
+  const firstResult = parseCondition(trimmed);
+
+  if (!firstResult.expression) {
+    // First condition incomplete
+    return firstResult;
+  }
+
+  // Check if there's an AND/OR operator after the first condition
+  const remaining = firstResult.remainingText.trim();
+
+  // Check for AND or OR keyword (case insensitive)
+  // Match with optional whitespace and content after
+  const andMatch = remaining.match(/^(and|AND)(\s+(.*))?$/i);
+  const orMatch = remaining.match(/^(or|OR)(\s+(.*))?$/i);
+
+  if (!andMatch && !orMatch) {
+    // No logical operator - just return the single condition
+    return firstResult;
+  }
+
+  // Determine which operator was found
+  const logicalOp = andMatch ? 'and' : 'or';
+  // Group 3 contains the text after AND/OR (group 2 is the optional whitespace+content)
+  const afterOperator = (andMatch?.[3] ?? orMatch?.[3] ?? '').trim();
+
+  if (!afterOperator) {
+    // Logical operator present but no second condition yet - incomplete
+    return {
+      expression: null,
+      remainingText: trimmed,
+      isComplete: false,
+    };
+  }
+
+  // Parse the rest of the expression recursively
+  const restResult = parseExpression(afterOperator);
+
+  if (!restResult.expression) {
+    // Second part incomplete - return incomplete state
+    return {
+      expression: null,
+      remainingText: trimmed,
+      isComplete: false,
+    };
+  }
+
+  // Build Group node
+  const children: ExprNode[] = [];
+
+  // If first expression is already a Group with same operator, flatten it
+  if (firstResult.expression.type === 'group' && (firstResult.expression as Group).operator === logicalOp) {
+    children.push(...(firstResult.expression as Group).children);
+  } else {
+    children.push(firstResult.expression);
+  }
+
+  // If rest expression is already a Group with same operator, flatten it
+  if (restResult.expression.type === 'group' && (restResult.expression as Group).operator === logicalOp) {
+    children.push(...(restResult.expression as Group).children);
+  } else {
+    children.push(restResult.expression);
+  }
+
+  const group: Group = {
+    type: 'group',
+    operator: logicalOp,
+    children,
+  };
+
+  return {
+    expression: group,
+    remainingText: restResult.remainingText,
+    isComplete: true,
+  };
+}
+
+/**
  * Main parse function
- * Currently only handles single conditions (US-002)
- * Will be extended in US-009 and US-010 for AND/OR and parentheses
+ * Handles single conditions and AND/OR expressions (US-002, US-009)
+ * Will be extended in US-010 for parentheses
  *
  * @param input - Input text to parse
  * @returns ParseResult
  */
 export function parse(input: string): ParseResult {
-  // For now, just parse a single condition
-  // This will be extended in future user stories
-  return parseCondition(input);
+  return parseExpression(input);
 }

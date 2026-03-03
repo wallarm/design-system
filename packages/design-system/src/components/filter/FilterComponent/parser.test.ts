@@ -326,3 +326,124 @@ describe('FilterComponent Parser', () => {
     });
   });
 });
+
+  describe('AND/OR expression parsing (US-009)', () => {
+    it('should parse simple AND expression', () => {
+      const result = parse('status = active AND priority > 5');
+
+      expect(result.isComplete).toBe(true);
+      expect(result.expression).toEqual({
+        type: 'group',
+        operator: 'and',
+        children: [
+          {
+            type: 'condition',
+            field: 'status',
+            operator: '=',
+            value: 'active',
+          },
+          {
+            type: 'condition',
+            field: 'priority',
+            operator: '>',
+            value: 5,
+          },
+        ],
+      });
+    });
+
+    it('should parse simple OR expression', () => {
+      const result = parse('type = bug OR type = feature');
+
+      expect(result.isComplete).toBe(true);
+      expect(result.expression).toEqual({
+        type: 'group',
+        operator: 'or',
+        children: [
+          {
+            type: 'condition',
+            field: 'type',
+            operator: '=',
+            value: 'bug',
+          },
+          {
+            type: 'condition',
+            field: 'type',
+            operator: '=',
+            value: 'feature',
+          },
+        ],
+      });
+    });
+
+    it('should handle case insensitive AND', () => {
+      const result = parse('status = active and priority > 5');
+
+      expect(result.isComplete).toBe(true);
+      expect(result.expression?.type).toBe('group');
+      if (result.expression?.type === 'group') {
+        expect(result.expression.operator).toBe('and');
+      }
+    });
+
+    it('should handle case insensitive OR', () => {
+      const result = parse('type = bug or type = feature');
+
+      expect(result.isComplete).toBe(true);
+      expect(result.expression?.type).toBe('group');
+      if (result.expression?.type === 'group') {
+        expect(result.expression.operator).toBe('or');
+      }
+    });
+
+    it('should flatten multiple AND conditions', () => {
+      const result = parse('a = 1 AND b = 2 AND c = 3');
+
+      expect(result.isComplete).toBe(true);
+      expect(result.expression?.type).toBe('group');
+      if (result.expression?.type === 'group') {
+        expect(result.expression.operator).toBe('and');
+        expect(result.expression.children.length).toBe(3);
+      }
+    });
+
+    it('should flatten multiple OR conditions', () => {
+      const result = parse('a = 1 OR b = 2 OR c = 3');
+
+      expect(result.isComplete).toBe(true);
+      expect(result.expression?.type).toBe('group');
+      if (result.expression?.type === 'group') {
+        expect(result.expression.operator).toBe('or');
+        expect(result.expression.children.length).toBe(3);
+      }
+    });
+
+    it('should return incomplete when AND has no second condition', () => {
+      const result = parse('status = active AND');
+
+      expect(result.isComplete).toBe(false);
+      expect(result.expression).toBeNull();
+    });
+
+    it('should return incomplete when OR has no second condition', () => {
+      const result = parse('type = bug OR');
+
+      expect(result.isComplete).toBe(false);
+      expect(result.expression).toBeNull();
+    });
+
+    it('should handle quoted values in AND expression', () => {
+      const result = parse('title = "hello world" AND status = active');
+
+      expect(result.isComplete).toBe(true);
+      expect(result.expression?.type).toBe('group');
+      if (result.expression?.type === 'group') {
+        expect(result.expression.children[0]).toEqual({
+          type: 'condition',
+          field: 'title',
+          operator: '=',
+          value: 'hello world',
+        });
+      }
+    });
+  });
