@@ -6,6 +6,7 @@ interface UseKeyboardNavOptions {
   open: boolean;
   onSelect: (item: QueryBarDropdownItem) => void;
   onClose?: () => void;
+  onArrowRight?: () => void;
 }
 
 /**
@@ -22,6 +23,7 @@ export const useKeyboardNav = ({
   open,
   onSelect,
   onClose,
+  onArrowRight,
 }: UseKeyboardNavOptions) => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
@@ -29,8 +31,8 @@ export const useKeyboardNav = ({
   // Mutable ref for the latest index — avoids stale closures in navigate
   const activeIndexRef = useRef(0);
 
-  const stateRef = useRef({ items, onSelect, onClose });
-  stateRef.current = { items, onSelect, onClose };
+  const stateRef = useRef({ items, onSelect, onClose, onArrowRight });
+  stateRef.current = { items, onSelect, onClose, onArrowRight };
 
   // Reset when menu opens
   const prevOpenRef = useRef(open);
@@ -65,7 +67,7 @@ export const useKeyboardNav = ({
     if (!open) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      const { items: list, onSelect: select, onClose: close } = stateRef.current;
+      const { items: list, onSelect: select, onClose: close, onArrowRight: arrowRight } = stateRef.current;
       if (list.length === 0) return;
 
       const isMod = e.metaKey || e.ctrlKey;
@@ -109,6 +111,15 @@ export const useKeyboardNav = ({
             if (item && !item.disabled) select(item);
             return prev;
           });
+          break;
+        }
+
+        case 'ArrowRight': {
+          if (!arrowRight) break;
+          e.preventDefault();
+          e.stopPropagation();
+          setPendingIds(new Set());
+          arrowRight();
           break;
         }
 

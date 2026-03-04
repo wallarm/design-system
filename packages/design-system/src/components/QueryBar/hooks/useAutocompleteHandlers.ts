@@ -83,6 +83,15 @@ export const useAutocompleteHandlers = ({
     resetState(!!committed && !isEditing);
   }, [editing.editingChipId, multiSelect, selectedField, selectedOperator, upsertCondition, resetState]);
 
+  /** ArrowRight in multi-select value menu → commit selected values and start new chip */
+  const handleCommitAndNewChip = useCallback(() => {
+    const committed = multiSelect.commitIfNeeded();
+    if (committed && selectedField && selectedOperator) {
+      upsertCondition(selectedField, selectedOperator, committed, editing.editingChipId);
+      resetState(true);
+    }
+  }, [editing.editingChipId, multiSelect, selectedField, selectedOperator, upsertCondition, resetState]);
+
   const handleFieldSelect = (field: FieldMetadata) => {
     if (editing.tryEditField(field)) {
       resetState();
@@ -209,5 +218,6 @@ export const useAutocompleteHandlers = ({
     handleBlur,
     handleChipRemove,
     handleClear,
+    handleCommitAndNewChip,
   };
 };

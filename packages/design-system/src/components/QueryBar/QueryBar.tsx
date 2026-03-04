@@ -88,6 +88,7 @@ export const QueryBar: FC<QueryBarProps> = ({
     handleInputClick,
     handleFocus,
     handleBlur,
+    handleCommitAndNewChip,
   } = useQueryBarAutocomplete({
     fields,
     conditions,
@@ -166,6 +167,7 @@ export const QueryBar: FC<QueryBarProps> = ({
           multiSelect={isMultiSelectOperator(selectedOperator)}
           selectedValues={selectedValues}
           positioning={menuPositioning}
+          onArrowRight={isMultiSelectOperator(selectedOperator) ? handleCommitAndNewChip : undefined}
         />
       )}
     </div>

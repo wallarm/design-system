@@ -29,7 +29,7 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
 
   return (
     <div
-      className={cn(chipVariants({ error, interactive }), 'max-w-[560px]', className)}
+      className={cn(chipVariants({ error, interactive }), 'max-w-[600px]', className)}
       data-slot='query-bar-chip'
       onMouseEnter={interactive ? () => setIsHovered(true) : undefined}
       onMouseLeave={interactive ? () => setIsHovered(false) : undefined}
@@ -37,7 +37,7 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
     >
       <Segment variant='attribute' className='shrink-0'>{attribute}</Segment>
       {operator && <Segment variant='operator' className='shrink-0'>{operator}</Segment>}
-      {value && <Segment variant='value' className='min-w-0'>{value}</Segment>}
+      {value && <Segment variant='value' className='min-w-0 max-w-[400px]'>{value}</Segment>}
 
       {isHovered && onRemove && <QueryBarRemoveButton error={error} onRemove={onRemove} />}
     </div>

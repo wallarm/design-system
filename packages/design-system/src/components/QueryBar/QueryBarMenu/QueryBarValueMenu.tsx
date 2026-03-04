@@ -49,6 +49,8 @@ export interface QueryBarValueMenuProps {
   /** Virtual anchor point for positioning */
   /** Override positioning config for the dropdown */
   positioning?: Record<string, unknown>;
+  /** Callback when ArrowRight is pressed (commit multi-select & start new chip) */
+  onArrowRight?: () => void;
   /** Optional custom class name */
   className?: string;
 }
@@ -68,6 +70,7 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
   selectedValues = [],
   width = 'standard',
   positioning,
+  onArrowRight,
   className,
 }) => {
   const flatItems: QueryBarDropdownItem[] = useMemo(
@@ -85,6 +88,7 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
     open,
     onSelect: item => onSelect(item.value),
     onClose: onEscape ?? (() => onOpenChange?.(false)),
+    onArrowRight,
   });
 
   // Determine width class

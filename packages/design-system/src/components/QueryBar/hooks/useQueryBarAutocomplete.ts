@@ -163,5 +163,6 @@ export const useQueryBarAutocomplete = ({
     handleInputClick: handlers.handleInputClick,
     handleFocus: handlers.handleFocus,
     handleBlur: handlers.handleBlur,
+    handleCommitAndNewChip: handlers.handleCommitAndNewChip,
   };
 };

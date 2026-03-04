@@ -61,3 +61,6 @@ tasks/
 scripts/ralph/progress.txt
 scripts/ralph/prd.json
 scripts/ralph/archive/
+
+# Dev notes
+QUERYBAR_NOTES.md
