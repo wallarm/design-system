@@ -1,15 +1,10 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import { cn } from '../../../utils/cn';
-import { BuildingQueryBarChip } from './BuildingQueryBarChip';
 import { QueryBarConnectorChip } from './QueryBarConnectorChip';
 import { QueryBarChip } from './QueryBarChip';
 import { useQueryBarContext } from '../QueryBarContext';
 
-interface QueryBarChipListProps {
-  children?: ReactNode;
-}
-
-export const QueryBarChipList: FC<QueryBarChipListProps> = ({ children }) => {
+export const QueryBarChipList: FC = () => {
   const { chips, buildingChipData, buildingChipRef, onChipClick, onChipRemove } =
     useQueryBarContext();
 
@@ -43,14 +38,14 @@ export const QueryBarChipList: FC<QueryBarChipListProps> = ({ children }) => {
       })}
       {buildingChipData && (
         <div ref={buildingChipRef} className='shrink-0'>
-          <BuildingQueryBarChip
+          <QueryBarChip
+            building
             attribute={buildingChipData.attribute ?? ''}
             operator={buildingChipData.operator}
             value={buildingChipData.value}
           />
         </div>
       )}
-      {children}
     </>
   );
 };

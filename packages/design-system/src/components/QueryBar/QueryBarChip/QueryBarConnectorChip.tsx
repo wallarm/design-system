@@ -2,6 +2,7 @@ import type { FC, HTMLAttributes } from 'react';
 import { cn } from '../../../utils/cn';
 import { VARIANT_LABELS } from '../lib/constants';
 import type { QueryBarChipVariant } from '../types';
+import { chipVariants } from './classes';
 
 export type ConnectorVariant = Exclude<QueryBarChipVariant, 'chip'>;
 
@@ -20,14 +21,7 @@ export const QueryBarConnectorChip: FC<QueryBarConnectorChipProps> = ({
 
   return (
     <div
-      className={cn(
-        'relative flex items-center justify-center px-4 py-0 cursor-pointer',
-        'min-h-[20px] max-w-[320px] border border-solid rounded-8',
-        error
-          ? 'bg-bg-light-danger border-border-danger'
-          : 'bg-badge-badge-bg border-border-primary',
-        className,
-      )}
+      className={cn(chipVariants({ error, interactive: true }), 'max-w-[320px]', className)}
       data-slot='query-bar-chip'
       {...props}
     >

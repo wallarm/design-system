@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { QueryBarMainMenu } from '../QueryBarMainMenu';
+import { QueryBarMainMenu } from '../QueryBarMenu';
 import type { FieldMetadata } from '../types';
 
 const meta = {

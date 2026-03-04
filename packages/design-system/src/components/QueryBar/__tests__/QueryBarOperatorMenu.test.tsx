@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { QueryBarOperatorMenu } from '../QueryBarOperatorMenu';
+import { QueryBarOperatorMenu } from '../QueryBarMenu';
 import { OPERATOR_LABELS, OPERATORS_BY_TYPE } from '../lib';
 
 describe('QueryBarOperatorMenu', () => {

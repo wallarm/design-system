@@ -1,7 +1,7 @@
 import { type FC, useMemo } from 'react';
-import { ChevronRight } from '../../icons/ChevronRight';
-import { cn } from '../../utils/cn';
-import { Checkmark } from '../Checkmark';
+import { ChevronRight } from '../../../icons/ChevronRight';
+import { cn } from '../../../utils/cn';
+import { Checkmark } from '../../Checkmark';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,11 +9,11 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuItemText,
-} from '../DropdownMenu';
-import { Kbd } from '../Kbd/Kbd';
-import { KbdGroup } from '../Kbd/KbdGroup';
-import { useKeyboardNav } from './hooks';
-import type { QueryBarDropdownItem } from './types';
+} from '../../DropdownMenu';
+import { Kbd } from '../../Kbd/Kbd';
+import { KbdGroup } from '../../Kbd/KbdGroup';
+import { useKeyboardNav } from '../hooks';
+import type { QueryBarDropdownItem } from '../types';
 
 export interface ValueOption {
   /** Value identifier */

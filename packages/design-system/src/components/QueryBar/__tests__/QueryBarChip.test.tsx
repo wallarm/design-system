@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { BuildingQueryBarChip, QueryBarConnectorChip, QueryBarChip } from '../QueryBarChip';
+import { QueryBarConnectorChip, QueryBarChip } from '../QueryBarChip';
 
 describe('QueryBarChip', () => {
   it('renders chip with attribute, operator, and value', () => {
@@ -141,27 +141,27 @@ describe('QueryBarConnectorChip', () => {
   });
 });
 
-describe('BuildingQueryBarChip', () => {
+describe('QueryBarChip building mode', () => {
   it('renders with only attribute', () => {
-    render(<BuildingQueryBarChip attribute='IP Address' />);
+    render(<QueryBarChip building attribute='IP Address' />);
     expect(screen.getByText('IP Address')).toBeInTheDocument();
   });
 
   it('renders with attribute and operator', () => {
-    render(<BuildingQueryBarChip attribute='IP Address' operator='is' />);
+    render(<QueryBarChip building attribute='IP Address' operator='is' />);
     expect(screen.getByText('IP Address')).toBeInTheDocument();
     expect(screen.getByText('is')).toBeInTheDocument();
   });
 
   it('renders with attribute, operator, and value', () => {
-    render(<BuildingQueryBarChip attribute='IP Address' operator='is' value='192.168.1.1' />);
+    render(<QueryBarChip building attribute='IP Address' operator='is' value='192.168.1.1' />);
     expect(screen.getByText('IP Address')).toBeInTheDocument();
     expect(screen.getByText('is')).toBeInTheDocument();
     expect(screen.getByText('192.168.1.1')).toBeInTheDocument();
   });
 
   it('does not have hover/remove functionality', () => {
-    const { container } = render(<BuildingQueryBarChip attribute='Test' />);
+    const { container } = render(<QueryBarChip building attribute='Test' />);
     const chip = container.querySelector('[data-slot="query-bar-chip"]');
     fireEvent.mouseEnter(chip!);
 

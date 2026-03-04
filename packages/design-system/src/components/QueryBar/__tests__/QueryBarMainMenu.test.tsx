@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { QueryBarMainMenu } from '../QueryBarMainMenu';
+import { QueryBarMainMenu } from '../QueryBarMenu';
 import type { FieldMetadata } from '../types';
 
 const mockFields: FieldMetadata[] = [

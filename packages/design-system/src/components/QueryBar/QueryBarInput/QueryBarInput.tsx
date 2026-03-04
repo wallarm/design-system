@@ -41,18 +41,17 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
       {...props}
     >
       <div className={cn('flex flex-1 flex-wrap items-center gap-4 py-4 pr-4', hasContent ? 'pl-8' : 'pl-12')}>
-        <QueryBarChipList>
-          <input
-            ref={inputRef}
-            type='text'
-            value={inputText}
-            onChange={onInputChange}
-            onKeyDown={onInputKeyDown}
-            onClick={onInputClick}
-            placeholder={hasContent ? '' : placeholder}
-            className={cn('h-auto min-w-0 border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0', hasContent ? 'w-0 flex-[1_1_0]' : 'flex-1')}
-          />
-        </QueryBarChipList>
+        <QueryBarChipList />
+        <input
+          ref={inputRef}
+          type='text'
+          value={inputText}
+          onChange={onInputChange}
+          onKeyDown={onInputKeyDown}
+          onClick={onInputClick}
+          placeholder={hasContent ? '' : placeholder}
+          className={cn('h-auto min-w-0 border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0', hasContent ? 'w-0 flex-[1_1_0]' : 'flex-1')}
+        />
       </div>
 
       <QueryBarInputActions />

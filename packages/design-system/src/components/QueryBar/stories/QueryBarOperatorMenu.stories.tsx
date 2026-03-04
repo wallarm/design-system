@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
-import type { QueryBarOperatorMenuProps } from '../QueryBarOperatorMenu';
-import { QueryBarOperatorMenu } from '../QueryBarOperatorMenu';
+import type { QueryBarOperatorMenuProps } from '../QueryBarMenu';
+import { QueryBarOperatorMenu } from '../QueryBarMenu';
 import type { FilterOperator } from '../types';
 
 const meta = {

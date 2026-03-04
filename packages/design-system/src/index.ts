@@ -92,8 +92,6 @@ export {
   type FieldType,
   type FilterOperator,
   type Group,
-  OPERATOR_LABELS,
-  OPERATORS_BY_TYPE,
   QueryBar,
   QueryBarChip,
   type QueryBarChipData,
@@ -104,9 +102,6 @@ export {
   QueryBarOperatorMenu,
   type QueryBarOperatorMenuProps,
   type QueryBarProps,
-  SegmentAttribute,
-  SegmentOperator,
-  SegmentValue,
 } from './components/QueryBar';
 export { Heading, type HeadingProps } from './components/Heading';
 export { Input, type InputProps } from './components/Input';

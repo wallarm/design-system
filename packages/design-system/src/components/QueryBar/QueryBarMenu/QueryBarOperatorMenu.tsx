@@ -1,5 +1,5 @@
 import { Fragment, type FC, useMemo } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '../../../utils/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,12 +8,12 @@ import {
   DropdownMenuItem,
   DropdownMenuItemText,
   DropdownMenuSeparator,
-} from '../DropdownMenu';
-import { Kbd } from '../Kbd/Kbd';
-import { KbdGroup } from '../Kbd/KbdGroup';
-import { useKeyboardNav } from './hooks';
-import { getOperatorLabel, OPERATORS_BY_TYPE } from './lib';
-import type { FieldType, QueryBarDropdownItem, FilterOperator } from './types';
+} from '../../DropdownMenu';
+import { Kbd } from '../../Kbd/Kbd';
+import { KbdGroup } from '../../Kbd/KbdGroup';
+import { useKeyboardNav } from '../hooks';
+import { getOperatorLabel, OPERATORS_BY_TYPE } from '../lib';
+import type { FieldType, QueryBarDropdownItem, FilterOperator } from '../types';
 
 export interface QueryBarOperatorMenuProps {
   /**

@@ -1,7 +1,7 @@
 import { type FC, useMemo } from 'react';
-import { CirclePlus } from '../../icons/CirclePlus';
-import { CircleSlash } from '../../icons/CircleSlash';
-import { cn } from '../../utils/cn';
+import { CirclePlus } from '../../../icons/CirclePlus';
+import { CircleSlash } from '../../../icons/CircleSlash';
+import { cn } from '../../../utils/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,11 +12,11 @@ import {
   DropdownMenuItemText,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-} from '../DropdownMenu';
-import { Kbd } from '../Kbd/Kbd';
-import { KbdGroup } from '../Kbd/KbdGroup';
-import { useKeyboardNav } from './hooks';
-import type { Condition, FieldMetadata, QueryBarDropdownItem } from './types';
+} from '../../DropdownMenu';
+import { Kbd } from '../../Kbd/Kbd';
+import { KbdGroup } from '../../Kbd/KbdGroup';
+import { useKeyboardNav } from '../hooks';
+import type { Condition, FieldMetadata, QueryBarDropdownItem } from '../types';
 
 export interface QueryBarMainMenuProps {
   /**

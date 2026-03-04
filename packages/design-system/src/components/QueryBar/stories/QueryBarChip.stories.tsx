@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
-import { BuildingQueryBarChip, QueryBarConnectorChip, QueryBarChip, type QueryBarChipProps } from '../QueryBarChip';
+import { QueryBarConnectorChip, QueryBarChip, type QueryBarChipProps } from '../QueryBarChip';
 
 const meta = {
   title: 'Components/QueryBar/QueryBarChip',
@@ -216,21 +216,21 @@ export const ClosingParenthesisError: StoryFn = () => <QueryBarConnectorChip var
  * Building chip — only attribute selected
  */
 export const BuildingAttributeOnly: StoryFn = () => (
-  <BuildingQueryBarChip attribute='IP Address' />
+  <QueryBarChip building attribute='IP Address' />
 );
 
 /**
  * Building chip — attribute + operator selected
  */
 export const BuildingWithOperator: StoryFn = () => (
-  <BuildingQueryBarChip attribute='IP Address' operator='is' />
+  <QueryBarChip building attribute='IP Address' operator='is' />
 );
 
 /**
  * Building chip — attribute + operator + value (about to commit)
  */
 export const BuildingComplete: StoryFn = () => (
-  <BuildingQueryBarChip attribute='IP Address' operator='is' value='192.168.1.1' />
+  <QueryBarChip building attribute='IP Address' operator='is' value='192.168.1.1' />
 );
 
 // ============================================================================
@@ -257,9 +257,9 @@ export const AllStatesShowcase: StoryFn = () => (
     <div>
       <h3 className='text-sm font-medium text-text-primary mb-2'>Building Chip</h3>
       <div className='flex items-center gap-2 flex-wrap'>
-        <BuildingQueryBarChip attribute='IP Address' />
-        <BuildingQueryBarChip attribute='IP Address' operator='is' />
-        <BuildingQueryBarChip attribute='IP Address' operator='is' value='192.168.1.1' />
+        <QueryBarChip building attribute='IP Address' />
+        <QueryBarChip building attribute='IP Address' operator='is' />
+        <QueryBarChip building attribute='IP Address' operator='is' value='192.168.1.1' />
       </div>
     </div>
 
