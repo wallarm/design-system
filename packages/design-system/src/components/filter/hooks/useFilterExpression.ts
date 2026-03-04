@@ -23,10 +23,12 @@ export const useFilterExpression = ({ fields, value, onChange, error }: UseFilte
     }
   }, [value]);
 
-  // Derive display chips from conditions + connectors
+  // Derive display chips from conditions + connectors.
+  // When AND and OR are mixed, AND-groups of 2+ conditions get wrapped in parentheses.
   const chips = useMemo((): FilterChipData[] => {
-    const result: FilterChipData[] = [];
-    for (let i = 0; i < conditions.length; i++) {
+    if (conditions.length === 0) return [];
+
+    const makeConditionChip = (i: number): FilterChipData => {
       const condition = conditions[i];
       const field = fields.find(f => f.name === condition.field);
 
@@ -43,24 +45,71 @@ export const useFilterExpression = ({ fields, value, onChange, error }: UseFilte
         }
       }
 
-      if (i > 0) {
-        const connectorOp = connectors[i - 1] ?? 'and';
-        result.push({
-          id: `connector-${i}`,
-          variant: connectorOp,
-          error,
-        });
-      }
-
-      result.push({
+      return {
         id: `chip-${i}`,
         variant: 'chip',
         attribute: field?.label || condition.field,
         operator: getOperatorLabel(condition.operator, field?.type || 'string'),
         value: displayValue,
         error,
-      });
+      };
+    };
+
+    const hasMixed = connectors.includes('and') && connectors.includes('or');
+
+    if (!hasMixed) {
+      // All same operator — flat list, no parentheses needed
+      const result: FilterChipData[] = [];
+      for (let i = 0; i < conditions.length; i++) {
+        if (i > 0) {
+          result.push({ id: `connector-${i}`, variant: connectors[i - 1] ?? 'and', error });
+        }
+        result.push(makeConditionChip(i));
+      }
+      return result;
     }
+
+    // Mixed AND/OR — split into AND-groups, wrap groups of 2+ in parentheses
+    const groups: number[][] = [[0]]; // groups of condition indices
+    for (let i = 0; i < connectors.length; i++) {
+      if (connectors[i] === 'or') {
+        groups.push([i + 1]);
+      } else {
+        groups[groups.length - 1].push(i + 1);
+      }
+    }
+
+    const result: FilterChipData[] = [];
+    let parenCounter = 0;
+
+    for (let g = 0; g < groups.length; g++) {
+      if (g > 0) {
+        // OR connector between groups — use the condition index of the first item in the group
+        const firstIdx = groups[g][0];
+        result.push({ id: `connector-${firstIdx}`, variant: 'or', error });
+      }
+
+      const group = groups[g];
+      const needsParens = group.length > 1;
+
+      if (needsParens) {
+        result.push({ id: `paren-open-${parenCounter}`, variant: '(', error });
+      }
+
+      for (let j = 0; j < group.length; j++) {
+        const condIdx = group[j];
+        if (j > 0) {
+          result.push({ id: `connector-${condIdx}`, variant: 'and', error });
+        }
+        result.push(makeConditionChip(condIdx));
+      }
+
+      if (needsParens) {
+        result.push({ id: `paren-close-${parenCounter}`, variant: ')', error });
+        parenCounter++;
+      }
+    }
+
     return result;
   }, [conditions, connectors, fields, error]);
 

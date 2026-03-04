@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { cn } from '../../../utils/cn';
 import { FilterChip } from '../FilterChip';
 import { useFilterContext } from '../FilterContext';
 
@@ -13,16 +14,17 @@ export const ChipList: FC<ChipListProps> = ({ children }) => {
   return (
     <>
       {chips.map(chip => {
+        const isCondition = chip.variant === 'chip';
         const isConnector = chip.variant === 'and' || chip.variant === 'or';
         return (
           <div
             key={chip.id}
-            className='shrink-0 cursor-pointer hover:z-10'
-            onClick={(e) => onChipClick(chip.id, e)}
+            className={cn('shrink-0', (isCondition || isConnector) && 'cursor-pointer hover:z-10')}
+            onClick={isCondition || isConnector ? (e) => onChipClick(chip.id, e) : undefined}
           >
             <FilterChip
               {...chip}
-              onRemove={isConnector ? undefined : () => onChipRemove(chip.id)}
+              onRemove={isCondition ? () => onChipRemove(chip.id) : undefined}
             />
           </div>
         );
