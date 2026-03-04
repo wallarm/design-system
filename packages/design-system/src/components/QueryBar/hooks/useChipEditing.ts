@@ -1,9 +1,7 @@
 import type { MouseEvent as ReactMouseEvent, RefObject } from 'react';
 import { useState } from 'react';
 import { chipIdToConditionIndex, getOperatorFromLabel, isMultiSelectOperator } from '../lib';
-import type { Condition, FieldMetadata, QueryBarChipData, FilterOperator } from '../types';
-
-type MenuState = 'closed' | 'field' | 'operator' | 'value';
+import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../types';
 
 interface UseChipEditingOptions {
   conditions: Condition[];

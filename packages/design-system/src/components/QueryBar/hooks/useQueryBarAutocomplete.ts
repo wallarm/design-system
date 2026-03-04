@@ -1,11 +1,11 @@
-import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { chipIdToConditionIndex, getOperatorLabel, isMultiSelectOperator, isNoValueOperator } from '../lib';
-import type { Condition, FieldMetadata, QueryBarChipData, FilterOperator } from '../types';
+import type { RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { getOperatorLabel } from '../lib';
+import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../types';
+import { useAutocompleteHandlers } from './useAutocompleteHandlers';
 import { useChipEditing } from './useChipEditing';
 import { useMenuPositioning } from './useMenuPositioning';
-
-type MenuState = 'closed' | 'field' | 'operator' | 'value';
+import { useMultiSelect } from './useMultiSelect';
 
 interface UseQueryBarAutocompleteOptions {
   fields: FieldMetadata[];
@@ -39,12 +39,15 @@ export const useQueryBarAutocomplete = ({
   buildingChipRef,
   inputRef,
 }: UseQueryBarAutocompleteOptions) => {
+  // ── Core state ────────────────────────────────────────────
+
   const [inputText, setInputText] = useState('');
   const [menuState, setMenuState] = useState<MenuState>('closed');
   const [selectedField, setSelectedField] = useState<FieldMetadata | null>(null);
   const [selectedOperator, setSelectedOperator] = useState<FilterOperator | null>(null);
   const [isFocused, setIsFocused] = useState(false);
-  const [multiSelectValues, setMultiSelectValues] = useState<Array<string | number | boolean>>([]);
+
+  // ── Child hooks ───────────────────────────────────────────
 
   const { menuPositioning, setMenuOffset, resetMenuOffset } = useMenuPositioning({
     containerRef,
@@ -64,13 +67,58 @@ export const useQueryBarAutocomplete = ({
     setMenuOffset,
     setSelectedField,
     setSelectedOperator,
-    setMultiSelectValues,
+    setMultiSelectValues: vals => multiSelect.setMultiSelectValues(vals),
     setMenuState,
   });
 
-  const isBuilding = selectedField !== null && !editing.editingChipId;
+  const multiSelect = useMultiSelect({
+    selectedField,
+    selectedOperator,
+    editingChipId: editing.editingChipId,
+    conditions,
+  });
 
-  // Auto-open field menu on initial focus when empty
+  // ── State reset ───────────────────────────────────────────
+
+  const resetState = useCallback((openFieldMenu = false) => {
+    setInputText('');
+    setSelectedField(null);
+    setSelectedOperator(null);
+    editing.clearEditing();
+    multiSelect.reset();
+    resetMenuOffset();
+    setMenuState(openFieldMenu ? 'field' : 'closed');
+    inputRef.current?.focus();
+  }, [editing, multiSelect, inputRef, resetMenuOffset]);
+
+  // ── Handlers ──────────────────────────────────────────────
+
+  const handlers = useAutocompleteHandlers({
+    inputText,
+    menuState,
+    selectedField,
+    selectedOperator,
+    isFocused,
+    conditions,
+    setInputText,
+    setMenuState,
+    setSelectedField,
+    setSelectedOperator,
+    setIsFocused,
+    editing,
+    multiSelect,
+    upsertCondition,
+    removeCondition,
+    removeLastCondition,
+    clearAll,
+    containerRef,
+    inputRef,
+    resetMenuOffset,
+    resetState,
+  });
+
+  // ── Auto-open field menu on initial focus when empty ──────
+
   const prevFocusedRef = useRef(false);
   useEffect(() => {
     if (isFocused && !prevFocusedRef.current && conditions.length === 0 && inputText === '') {
@@ -80,198 +128,40 @@ export const useQueryBarAutocomplete = ({
     prevFocusedRef.current = isFocused;
   }, [isFocused, conditions.length, inputText, resetMenuOffset]);
 
-  // --- State reset ---
+  // ── Derived values ────────────────────────────────────────
 
-  const resetState = useCallback((openFieldMenu = false) => {
-    setInputText('');
-    setSelectedField(null);
-    setSelectedOperator(null);
-    editing.clearEditing();
-    setMultiSelectValues([]);
-    resetMenuOffset();
-    setMenuState(openFieldMenu ? 'field' : 'closed');
-    inputRef.current?.focus();
-  }, [editing, inputRef, resetMenuOffset]);
-
-  // --- Handlers ---
-
-  /** Close menu and save pending multi-select values (click outside) */
-  const handleMenuClose = useCallback(() => {
-    const isEditing = !!editing.editingChipId;
-    const hasMultiValues = multiSelectValues.length > 0 && selectedField && selectedOperator;
-
-    if (hasMultiValues) {
-      upsertCondition(selectedField, selectedOperator, multiSelectValues, editing.editingChipId);
-    }
-
-    resetState(!!hasMultiValues && !isEditing);
-  }, [multiSelectValues, selectedField, selectedOperator, editing, upsertCondition, resetState]);
-
-  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value;
-    setInputText(text);
-
-    if (text && !selectedField) {
-      setMenuState('field');
-    } else if (!text && !selectedField) {
-      setMenuState(isFocused && conditions.length === 0 ? 'field' : 'closed');
-    }
-  };
-
-  const handleFieldSelect = (field: FieldMetadata) => {
-    if (editing.tryEditField(field)) {
-      resetState();
-      return;
-    }
-    setSelectedField(field);
-    setInputText('');
-    setMenuState('operator');
-  };
-
-  const handleOperatorSelect = (operator: FilterOperator) => {
-    if (isNoValueOperator(operator)) {
-      const isEditing = !!editing.editingChipId;
-      upsertCondition(selectedField!, operator, null, editing.editingChipId);
-      resetState(!isEditing);
-      return;
-    }
-
-    // When editing a chip and changing operator selectivity (single↔multi),
-    // open value menu for re-selection instead of committing incompatible value
-    if (editing.editingChipId) {
-      const condition = conditions.find((_, i) => `chip-${i}` === editing.editingChipId);
-      const wasMulti = Array.isArray(condition?.value);
-      const willBeMulti = isMultiSelectOperator(operator);
-
-      if (wasMulti !== willBeMulti) {
-        // Selectivity changed — reset values and open value menu
-        setMultiSelectValues(willBeMulti && condition
-          ? (Array.isArray(condition.value) ? condition.value : condition.value != null ? [condition.value] : [])
-          : [],
-        );
-        setSelectedOperator(operator);
-        setMenuState('value');
-        return;
-      }
-
-      // Same selectivity — commit immediately
-      if (editing.tryEditOperator(operator, selectedField!)) {
-        resetState();
-        return;
-      }
-    }
-
-    setSelectedOperator(operator);
-    setMenuState('value');
-  };
-
-  const handleValueSelect = (val: string | number | boolean) => {
-    if (!selectedField || !selectedOperator) return;
-
-    if (isMultiSelectOperator(selectedOperator)) {
-      setMultiSelectValues(prev =>
-        prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val],
-      );
-      return;
-    }
-
-    const isEditing = !!editing.editingChipId;
-    upsertCondition(selectedField, selectedOperator, val, editing.editingChipId);
-    resetState(!isEditing);
-  };
-
-  const handleChipRemove = (chipId: string) => {
-    removeCondition(chipId);
-    resetMenuOffset();
-    inputRef.current?.focus();
-  };
-
-  const handleClear = () => {
-    clearAll();
-    resetState();
-  };
-
-  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && inputText === '' && conditions.length > 0) {
-      e.preventDefault();
-      removeLastCondition();
-    }
-  };
-
-  const handleInputClick = () => {
-    if (menuState === 'closed' && !selectedField) {
-      resetMenuOffset();
-      setMenuState('field');
-    }
-  };
-
-  const handleFocus = () => {
-    setIsFocused(true);
-  };
-
-  const handleBlur = (e: FocusEvent) => {
-    // Menu is open — Ark UI handles outside clicks via onOpenChange → handleMenuClose
-    if (menuState !== 'closed') return;
-
-    // Focus stayed within the container (e.g. moved between input and clear button)
-    const related = e.relatedTarget as HTMLElement | null;
-    if (containerRef.current?.contains(related)) return;
-
-    setIsFocused(false);
-    resetState();
-  };
-
-  // --- Derived values ---
-
-  // Compute selectedValues for the value menu (multi-select + single-select editing)
-  const selectedValues = useMemo(() => {
-    if (multiSelectValues.length > 0) return multiSelectValues;
-    if (editing.editingChipId && selectedOperator && !isMultiSelectOperator(selectedOperator)) {
-      const idx = chipIdToConditionIndex(editing.editingChipId);
-      if (idx !== null) {
-        const condition = conditions[idx];
-        if (condition?.value != null && !Array.isArray(condition.value)) {
-          return [condition.value];
-        }
-      }
-    }
-    return [];
-  }, [multiSelectValues, editing.editingChipId, selectedOperator, conditions]);
-
-  const buildingMultiValue = multiSelectValues.length > 0
-    ? multiSelectValues
-      .map(v => selectedField?.values?.find(opt => opt.value === v)?.label ?? String(v))
-      .join(', ')
-    : undefined;
+  const isBuilding = selectedField !== null && !editing.editingChipId;
 
   const buildingChipData = isBuilding ? {
     attribute: selectedField!.label,
     operator: selectedOperator ? getOperatorLabel(selectedOperator, selectedField!.type) : undefined,
-    value: buildingMultiValue,
+    value: multiSelect.buildingMultiValue,
   } : null;
+
+  // ── Public API ────────────────────────────────────────────
 
   return {
     inputText,
     menuState,
     selectedField,
     selectedOperator,
-    multiSelectValues,
-    selectedValues,
+    multiSelectValues: multiSelect.multiSelectValues,
+    selectedValues: multiSelect.selectedValues,
     isBuilding,
     buildingChipData,
     menuPositioning,
-    handleInputChange,
-    handleFieldSelect,
-    handleOperatorSelect,
-    handleValueSelect,
-    handleMenuClose,
+    handleInputChange: handlers.handleInputChange,
+    handleFieldSelect: handlers.handleFieldSelect,
+    handleOperatorSelect: handlers.handleOperatorSelect,
+    handleValueSelect: handlers.handleValueSelect,
+    handleMenuClose: handlers.handleMenuClose,
     handleMenuDiscard: resetState,
     handleChipClick: editing.handleChipClick,
-    handleChipRemove,
-    handleClear,
-    handleKeyDown,
-    handleInputClick,
-    handleFocus,
-    handleBlur,
+    handleChipRemove: handlers.handleChipRemove,
+    handleClear: handlers.handleClear,
+    handleKeyDown: handlers.handleKeyDown,
+    handleInputClick: handlers.handleInputClick,
+    handleFocus: handlers.handleFocus,
+    handleBlur: handlers.handleBlur,
   };
 };

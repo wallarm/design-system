@@ -92,6 +92,11 @@ export interface Group {
 export type ExprNode = Condition | Group;
 
 /**
+ * Autocomplete menu state
+ */
+export type MenuState = 'closed' | 'field' | 'operator' | 'value';
+
+/**
  * Item in a dropdown menu
  */
 export interface QueryBarDropdownItem {

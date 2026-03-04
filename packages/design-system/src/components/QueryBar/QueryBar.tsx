@@ -1,8 +1,7 @@
 import type { FC, HTMLAttributes } from 'react';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { cn } from '../../utils/cn';
-import type { QueryBarContextValue } from './QueryBarContext';
-import { QueryBarProvider } from './QueryBarContext';
+import { QueryBarProvider, useQueryBarContextValue } from './QueryBarContext';
 import { QueryBarInput } from './QueryBarInput';
 import { QueryBarMainMenu } from './QueryBarMainMenu';
 import { QueryBarOperatorMenu } from './QueryBarOperatorMenu';
@@ -60,17 +59,46 @@ export const QueryBar: FC<QueryBarProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
   const buildingChipRef = useRef<HTMLDivElement>(null);
 
-  const expression = useQueryBarExpression({ fields, value, onChange, error });
+  const {
+    conditions,
+    chips,
+    upsertCondition,
+    removeCondition,
+    removeLastCondition,
+    clearAll,
+    toggleConnector,
+  } = useQueryBarExpression({ fields, value, onChange, error });
 
-  const autocomplete = useQueryBarAutocomplete({
+  const {
+    inputText,
+    menuState,
+    selectedField,
+    selectedOperator,
+    selectedValues,
+    buildingChipData,
+    menuPositioning,
+    handleInputChange,
+    handleFieldSelect,
+    handleOperatorSelect,
+    handleValueSelect,
+    handleMenuClose,
+    handleMenuDiscard,
+    handleChipClick,
+    handleChipRemove,
+    handleClear,
+    handleKeyDown,
+    handleInputClick,
+    handleFocus,
+    handleBlur,
+  } = useQueryBarAutocomplete({
     fields,
-    conditions: expression.conditions,
-    chips: expression.chips,
-    upsertCondition: expression.upsertCondition,
-    removeCondition: expression.removeCondition,
-    removeLastCondition: expression.removeLastCondition,
-    clearAll: expression.clearAll,
-    toggleConnector: expression.toggleConnector,
+    conditions,
+    chips,
+    upsertCondition,
+    removeCondition,
+    removeLastCondition,
+    clearAll,
+    toggleConnector,
     containerRef,
     buildingChipRef,
     inputRef,
@@ -78,40 +106,23 @@ export const QueryBar: FC<QueryBarProps> = ({
 
   // ── Context value ──────────────────────────────────────────
 
-  const contextValue: QueryBarContextValue = useMemo(
-    () => ({
-      chips: expression.chips,
-      buildingChipData: autocomplete.buildingChipData,
-      buildingChipRef,
-      inputText: autocomplete.inputText,
-      inputRef,
-      placeholder,
-      error,
-      showKeyboardHint,
-      menuOpen: autocomplete.menuState !== 'closed',
-      onInputChange: autocomplete.handleInputChange,
-      onInputKeyDown: autocomplete.handleKeyDown,
-      onInputClick: autocomplete.handleInputClick,
-      onChipClick: autocomplete.handleChipClick,
-      onChipRemove: autocomplete.handleChipRemove,
-      onClear: autocomplete.handleClear,
-    }),
-    [
-      expression.chips,
-      autocomplete.buildingChipData,
-      autocomplete.inputText,
-      placeholder,
-      error,
-      showKeyboardHint,
-      autocomplete.menuState,
-      autocomplete.handleInputChange,
-      autocomplete.handleKeyDown,
-      autocomplete.handleInputClick,
-      autocomplete.handleChipClick,
-      autocomplete.handleChipRemove,
-      autocomplete.handleClear,
-    ],
-  );
+  const contextValue = useQueryBarContextValue({
+    chips,
+    buildingChipData,
+    buildingChipRef,
+    inputText,
+    inputRef,
+    placeholder,
+    error,
+    showKeyboardHint,
+    menuState,
+    onInputChange: handleInputChange,
+    onInputKeyDown: handleKeyDown,
+    onInputClick: handleInputClick,
+    onChipClick: handleChipClick,
+    onChipRemove: handleChipRemove,
+    onClear: handleClear,
+  });
 
   // ── Render ─────────────────────────────────────────────────
 
@@ -119,8 +130,8 @@ export const QueryBar: FC<QueryBarProps> = ({
     <div
       ref={containerRef}
       className={cn('relative w-full', className)}
-      onFocus={autocomplete.handleFocus}
-      onBlur={autocomplete.handleBlur}
+      onFocus={handleFocus}
+      onBlur={handleBlur}
     >
       <QueryBarProvider value={contextValue}>
         <QueryBarInput {...props} />
@@ -129,34 +140,34 @@ export const QueryBar: FC<QueryBarProps> = ({
       {/* Dropdown menus — positioned below the input container */}
       <QueryBarMainMenu
         fields={fields}
-        open={autocomplete.menuState === 'field'}
-        onSelect={autocomplete.handleFieldSelect}
-        onOpenChange={() => autocomplete.handleMenuClose()}
-        onEscape={autocomplete.handleMenuDiscard}
-        positioning={autocomplete.menuPositioning}
+        open={menuState === 'field'}
+        onSelect={handleFieldSelect}
+        onOpenChange={() => handleMenuClose()}
+        onEscape={handleMenuDiscard}
+        positioning={menuPositioning}
       />
 
-      {autocomplete.selectedField && (
+      {selectedField && (
         <QueryBarOperatorMenu
-          fieldType={autocomplete.selectedField.type}
-          open={autocomplete.menuState === 'operator'}
-          onSelect={autocomplete.handleOperatorSelect}
-          onOpenChange={() => autocomplete.handleMenuClose()}
-          onEscape={autocomplete.handleMenuDiscard}
-          positioning={autocomplete.menuPositioning}
+          fieldType={selectedField.type}
+          open={menuState === 'operator'}
+          onSelect={handleOperatorSelect}
+          onOpenChange={() => handleMenuClose()}
+          onEscape={handleMenuDiscard}
+          positioning={menuPositioning}
         />
       )}
 
-      {autocomplete.selectedField && autocomplete.selectedOperator && (
+      {selectedField && selectedOperator && (
         <QueryBarValueMenu
-          values={autocomplete.selectedField.values || []}
-          open={autocomplete.menuState === 'value'}
-          onSelect={autocomplete.handleValueSelect}
-          onOpenChange={() => autocomplete.handleMenuClose()}
-          onEscape={autocomplete.handleMenuDiscard}
-          multiSelect={isMultiSelectOperator(autocomplete.selectedOperator)}
-          selectedValues={autocomplete.selectedValues}
-          positioning={autocomplete.menuPositioning}
+          values={selectedField.values || []}
+          open={menuState === 'value'}
+          onSelect={handleValueSelect}
+          onOpenChange={() => handleMenuClose()}
+          onEscape={handleMenuDiscard}
+          multiSelect={isMultiSelectOperator(selectedOperator)}
+          selectedValues={selectedValues}
+          positioning={menuPositioning}
         />
       )}
     </div>
