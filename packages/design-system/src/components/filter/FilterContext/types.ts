@@ -13,7 +13,6 @@ export interface FilterContextValue {
   chips: FilterChipData[];
   buildingChipData: BuildingChipData | null;
   buildingChipRef: Ref<HTMLDivElement>;
-  hasMoreChips: boolean;
   // Input
   inputText: string;
   inputRef: Ref<HTMLInputElement>;
@@ -25,6 +24,7 @@ export interface FilterContextValue {
   // Callbacks
   onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onInputKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
+  onInputClick: () => void;
   onChipClick: (chipId: string, e: ReactMouseEvent) => void;
   onChipRemove: (chipId: string) => void;
   onClear: () => void;

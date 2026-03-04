@@ -11,7 +11,6 @@ export const FilterInputBar: FC<FilterInputBarProps> = ({ className, ...props })
   const {
     chips,
     buildingChipData,
-    hasMoreChips,
     inputText,
     inputRef,
     placeholder,
@@ -19,15 +18,15 @@ export const FilterInputBar: FC<FilterInputBarProps> = ({ className, ...props })
     menuOpen,
     onInputChange,
     onInputKeyDown,
+    onInputClick,
   } = useFilterContext();
 
-  const hasChips = chips.length > 0;
-  const hasContent = hasChips || buildingChipData != null;
+  const hasContent = chips.length > 0 || buildingChipData != null;
 
   return (
     <div
       className={cn(
-        'relative flex h-40 w-full items-center overflow-clip',
+        'relative flex min-h-40 w-full items-center overflow-hidden',
         inputVariants({ error }),
         'px-0',
         'focus-within:outline-none focus-within:ring-3',
@@ -41,20 +40,19 @@ export const FilterInputBar: FC<FilterInputBarProps> = ({ className, ...props })
       data-slot='filter-field'
       {...props}
     >
-      <div className={cn('flex flex-1 items-center pr-4', hasContent ? 'gap-4 pl-8' : 'pl-12')}>
-        {hasContent && <ChipList />}
-
-        {!hasMoreChips && (
+      <div className={cn('flex flex-1 flex-wrap items-center gap-4 py-4 pr-4', hasContent ? 'pl-8' : 'pl-12')}>
+        <ChipList>
           <input
             ref={inputRef}
             type='text'
             value={inputText}
             onChange={onInputChange}
             onKeyDown={onInputKeyDown}
+            onClick={onInputClick}
             placeholder={hasContent ? '' : placeholder}
-            className='flex-1 h-auto border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0'
+            className={cn('h-auto min-w-0 border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0', hasContent ? 'w-0 flex-[1_1_0]' : 'flex-1')}
           />
-        )}
+        </ChipList>
       </div>
 
       <FilterInputBarActions />

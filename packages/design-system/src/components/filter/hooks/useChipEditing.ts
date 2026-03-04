@@ -1,7 +1,7 @@
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import type { RefObject } from 'react';
 import { useState } from 'react';
-import { getOperatorFromLabel } from '../lib';
+import { getOperatorFromLabel, isMultiSelectOperator } from '../lib';
 import type { Condition, FieldMetadata, FilterChipData, FilterOperator } from '../types';
 
 type MenuState = 'closed' | 'field' | 'operator' | 'value';
@@ -17,10 +17,11 @@ interface UseChipEditingOptions {
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
   ) => void;
-  toggleConnector: () => void;
+  toggleConnector: (connectorId: string) => void;
   setMenuOffset: (offset: number) => void;
   setSelectedField: (field: FieldMetadata) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
+  setMultiSelectValues: (values: Array<string | number | boolean>) => void;
   setMenuState: (state: MenuState) => void;
 }
 
@@ -39,6 +40,7 @@ export const useChipEditing = ({
   setMenuOffset,
   setSelectedField,
   setSelectedOperator,
+  setMultiSelectValues,
   setMenuState,
 }: UseChipEditingOptions) => {
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
@@ -77,7 +79,7 @@ export const useChipEditing = ({
 
   const handleChipClick = (chipId: string, e: ReactMouseEvent) => {
     if (chipId.startsWith('connector-')) {
-      toggleConnector();
+      toggleConnector(chipId);
       return;
     }
 
@@ -114,6 +116,12 @@ export const useChipEditing = ({
     } else if (slot === 'segment-value') {
       const rawOperator = getOperatorFromLabel(chip.operator || '', field.type);
       setSelectedOperator(rawOperator);
+
+      // Pre-populate selected values for multi-select operators
+      if (rawOperator && isMultiSelectOperator(rawOperator) && Array.isArray(condition.value)) {
+        setMultiSelectValues(condition.value);
+      }
+
       setMenuState('value');
     } else {
       setSelectedOperator(null);

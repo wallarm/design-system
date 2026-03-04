@@ -53,6 +53,10 @@ export interface FilterMainMenuProps {
    */
   onSelectOr?: () => void;
   /**
+   * Callback when Escape is pressed (discard)
+   */
+  onEscape?: () => void;
+  /**
    * Override positioning config for the dropdown
    */
   positioning?: Record<string, unknown>;
@@ -75,6 +79,7 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
   suggestedFields = [],
   onSelectAnd,
   onSelectOr,
+  onEscape,
   positioning,
   className,
 }) => {
@@ -140,7 +145,7 @@ export const FilterMainMenu: FC<FilterMainMenuProps> = ({
     items: flatItems,
     open,
     onSelect: handleItemSelect,
-    onClose: () => onOpenChange?.(false),
+    onClose: onEscape ?? (() => onOpenChange?.(false)),
   });
 
   return (

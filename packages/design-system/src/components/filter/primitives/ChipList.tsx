@@ -1,13 +1,17 @@
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import { FilterChip } from '../FilterChip';
 import { useFilterContext } from '../FilterContext';
 
-export const ChipList: FC = () => {
-  const { chips, buildingChipData, buildingChipRef, hasMoreChips, placeholder, onChipClick, onChipRemove } =
+interface ChipListProps {
+  children?: ReactNode;
+}
+
+export const ChipList: FC<ChipListProps> = ({ children }) => {
+  const { chips, buildingChipData, buildingChipRef, onChipClick, onChipRemove } =
     useFilterContext();
 
   return (
-    <div className='flex items-center gap-1'>
+    <>
       {chips.map(chip => {
         const isConnector = chip.variant === 'and' || chip.variant === 'or';
         return (
@@ -23,15 +27,13 @@ export const ChipList: FC = () => {
           </div>
         );
       })}
-      {hasMoreChips && (
-        <p className='pl-4 text-sm text-text-secondary'>{placeholder}</p>
-      )}
       {buildingChipData && (
         <div ref={buildingChipRef} className='shrink-0'>
           <FilterChip {...buildingChipData} />
         </div>
       )}
-    </div>
+      {children}
+    </>
   );
 };
 

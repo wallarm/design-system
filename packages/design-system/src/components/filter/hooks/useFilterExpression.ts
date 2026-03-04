@@ -12,18 +12,18 @@ interface UseFilterExpressionOptions {
 
 export const useFilterExpression = ({ fields, value, onChange, error }: UseFilterExpressionOptions) => {
   const [conditions, setConditions] = useState<Condition[]>([]);
-  const [connectorOperator, setConnectorOperator] = useState<'and' | 'or'>('and');
+  const [connectors, setConnectors] = useState<Array<'and' | 'or'>>([]);
 
   // Sync conditions with value prop (controlled mode)
   useEffect(() => {
     if (value !== undefined) {
-      const { conditions: newConditions, connector } = expressionToConditions(value);
-      setConditions(newConditions);
-      setConnectorOperator(connector);
+      const result = expressionToConditions(value);
+      setConditions(result.conditions);
+      setConnectors(result.connectors);
     }
   }, [value]);
 
-  // Derive display chips from conditions + connector operator
+  // Derive display chips from conditions + connectors
   const chips = useMemo((): FilterChipData[] => {
     const result: FilterChipData[] = [];
     for (let i = 0; i < conditions.length; i++) {
@@ -44,9 +44,10 @@ export const useFilterExpression = ({ fields, value, onChange, error }: UseFilte
       }
 
       if (i > 0) {
+        const connectorOp = connectors[i - 1] ?? 'and';
         result.push({
           id: `connector-${i}`,
-          variant: connectorOperator,
+          variant: connectorOp,
           error,
         });
       }
@@ -61,7 +62,7 @@ export const useFilterExpression = ({ fields, value, onChange, error }: UseFilte
       });
     }
     return result;
-  }, [conditions, connectorOperator, fields, error]);
+  }, [conditions, connectors, fields, error]);
 
   const upsertCondition = (
     field: FieldMetadata,
@@ -91,7 +92,20 @@ export const useFilterExpression = ({ fields, value, onChange, error }: UseFilte
         newConditions = [...prev, condition];
       }
 
-      const expr = buildExpression(newConditions, connectorOperator);
+      // Add default connector when appending a new condition
+      if (!editingChipId && newConditions.length > 1) {
+        setConnectors(c => {
+          const updated = [...c];
+          while (updated.length < newConditions.length - 1) {
+            updated.push('and');
+          }
+          return updated;
+        });
+      }
+
+      const expr = buildExpression(newConditions, connectors.length >= newConditions.length - 1
+        ? connectors
+        : [...connectors, 'and']);
       onChange?.(expr);
 
       return newConditions;
@@ -104,7 +118,28 @@ export const useFilterExpression = ({ fields, value, onChange, error }: UseFilte
 
     setConditions(prev => {
       const newConditions = prev.filter((_, i) => i !== idx);
-      const expr = buildExpression(newConditions, connectorOperator);
+
+      // Remove the connector associated with this condition
+      setConnectors(c => {
+        const updated = [...c];
+        if (idx === 0 && updated.length > 0) {
+          // Removing first condition: remove first connector
+          updated.splice(0, 1);
+        } else if (idx > 0 && idx - 1 < updated.length) {
+          // Removing non-first: remove connector before it
+          updated.splice(idx - 1, 1);
+        }
+        return updated;
+      });
+
+      const newConnectors = [...connectors];
+      if (idx === 0 && newConnectors.length > 0) {
+        newConnectors.splice(0, 1);
+      } else if (idx > 0 && idx - 1 < newConnectors.length) {
+        newConnectors.splice(idx - 1, 1);
+      }
+
+      const expr = buildExpression(newConditions, newConnectors);
       onChange?.(expr);
       return newConditions;
     });
@@ -113,7 +148,9 @@ export const useFilterExpression = ({ fields, value, onChange, error }: UseFilte
   const removeLastCondition = () => {
     setConditions(prev => {
       const newConditions = prev.slice(0, -1);
-      const expr = buildExpression(newConditions, connectorOperator);
+      const newConnectors = connectors.slice(0, -1);
+      setConnectors(newConnectors);
+      const expr = buildExpression(newConditions, newConnectors);
       onChange?.(expr);
       return newConditions;
     });
@@ -121,22 +158,30 @@ export const useFilterExpression = ({ fields, value, onChange, error }: UseFilte
 
   const clearAll = () => {
     setConditions([]);
-    setConnectorOperator('and');
+    setConnectors([]);
     onChange?.(null);
   };
 
-  const toggleConnector = () => {
-    setConnectorOperator(prev => {
-      const next = prev === 'and' ? 'or' : 'and';
-      const expr = buildExpression(conditions, next);
+  const toggleConnector = (connectorId: string) => {
+    const match = connectorId.match(/^connector-(\d+)$/);
+    if (!match) return;
+    const condIdx = Number(match[1]);
+    const connectorIdx = condIdx - 1;
+
+    setConnectors(prev => {
+      const updated = [...prev];
+      if (connectorIdx >= 0 && connectorIdx < updated.length) {
+        updated[connectorIdx] = updated[connectorIdx] === 'and' ? 'or' : 'and';
+      }
+      const expr = buildExpression(conditions, updated);
       onChange?.(expr);
-      return next;
+      return updated;
     });
   };
 
   return {
     conditions,
-    connectorOperator,
+    connectors,
     chips,
     upsertCondition,
     removeCondition,

@@ -37,6 +37,10 @@ export interface FilterOperatorMenuProps {
    */
   onOpenChange?: (open: boolean) => void;
   /**
+   * Callback when Escape is pressed (discard)
+   */
+  onEscape?: () => void;
+  /**
    * Override positioning config for the dropdown
    */
   positioning?: Record<string, unknown>;
@@ -55,6 +59,7 @@ export const FilterOperatorMenu: FC<FilterOperatorMenuProps> = ({
   onSelect,
   open = false,
   onOpenChange,
+  onEscape,
   positioning,
   className,
 }) => {
@@ -74,7 +79,7 @@ export const FilterOperatorMenu: FC<FilterOperatorMenuProps> = ({
     items: flatItems,
     open,
     onSelect: item => onSelect(item.value as FilterOperator),
-    onClose: () => onOpenChange?.(false),
+    onClose: onEscape ?? (() => onOpenChange?.(false)),
   });
 
   return (

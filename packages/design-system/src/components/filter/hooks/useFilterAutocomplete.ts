@@ -1,5 +1,5 @@
 import type { ChangeEvent, KeyboardEvent, RefObject } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getOperatorLabel, isMultiSelectOperator } from '../lib';
 import type { Condition, FieldMetadata, FilterChipData, FilterOperator } from '../types';
 import { useBlurGuard } from './useBlurGuard';
@@ -21,7 +21,7 @@ interface UseFilterAutocompleteOptions {
   removeCondition: (chipId: string) => void;
   removeLastCondition: () => void;
   clearAll: () => void;
-  toggleConnector: () => void;
+  toggleConnector: (connectorId: string) => void;
   containerRef: RefObject<HTMLDivElement | null>;
   buildingChipRef: RefObject<HTMLDivElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
@@ -53,6 +53,7 @@ export const useFilterAutocomplete = ({
   const { menuPositioning, setMenuOffset, resetMenuOffset } = useMenuPositioning({
     containerRef,
     buildingChipRef,
+    inputRef,
     isBuilding: selectedField !== null,
     menuState,
   });
@@ -67,6 +68,7 @@ export const useFilterAutocomplete = ({
     setMenuOffset,
     setSelectedField,
     setSelectedOperator,
+    setMultiSelectValues,
     setMenuState,
   });
 
@@ -84,31 +86,30 @@ export const useFilterAutocomplete = ({
 
   // --- State reset ---
 
-  const resetState = () => {
+  const resetState = useCallback((openFieldMenu = false) => {
     setInputText('');
     setSelectedField(null);
     setSelectedOperator(null);
     editing.clearEditing();
     setMultiSelectValues([]);
-    setMenuState('closed');
     resetMenuOffset();
+    setMenuState(openFieldMenu ? 'field' : 'closed');
     inputRef.current?.focus();
-  };
+  }, [editing, inputRef, resetMenuOffset]);
 
   // --- Handlers ---
 
+  /** Close menu and save pending multi-select values (click outside) */
   const handleMenuClose = useCallback(() => {
-    if (multiSelectValues.length > 0 && selectedField && selectedOperator) {
+    const isEditing = !!editing.editingChipId;
+    const hasMultiValues = multiSelectValues.length > 0 && selectedField && selectedOperator;
+
+    if (hasMultiValues) {
       upsertCondition(selectedField, selectedOperator, multiSelectValues, editing.editingChipId);
     }
-    setMenuState('closed');
-    setSelectedField(null);
-    setSelectedOperator(null);
-    editing.clearEditing();
-    setMultiSelectValues([]);
-    resetMenuOffset();
-    inputRef.current?.focus();
-  }, [multiSelectValues, selectedField, selectedOperator, editing, upsertCondition, inputRef, resetMenuOffset]);
+
+    resetState(!!hasMultiValues && !isEditing);
+  }, [multiSelectValues, selectedField, selectedOperator, editing, upsertCondition, resetState]);
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
@@ -135,8 +136,9 @@ export const useFilterAutocomplete = ({
     const noValueOps: FilterOperator[] = ['is_null', 'is_not_null'];
 
     if (noValueOps.includes(operator)) {
+      const isEditing = !!editing.editingChipId;
       upsertCondition(selectedField!, operator, null, editing.editingChipId);
-      resetState();
+      resetState(!isEditing);
       return;
     }
 
@@ -159,8 +161,9 @@ export const useFilterAutocomplete = ({
       return;
     }
 
+    const isEditing = !!editing.editingChipId;
     upsertCondition(selectedField, selectedOperator, val, editing.editingChipId);
-    resetState();
+    resetState(!isEditing);
   };
 
   const handleChipRemove = (chipId: string) => {
@@ -178,6 +181,13 @@ export const useFilterAutocomplete = ({
     if (e.key === 'Backspace' && inputText === '' && conditions.length > 0) {
       e.preventDefault();
       removeLastCondition();
+    }
+  };
+
+  const handleInputClick = () => {
+    if (menuState === 'closed' && !selectedField) {
+      resetMenuOffset();
+      setMenuState('field');
     }
   };
 
@@ -199,16 +209,28 @@ export const useFilterAutocomplete = ({
           upsertCondition(selectedField, selectedOperator, multiSelectValues, editing.editingChipId);
         }
         setIsFocused(false);
-        setMenuState('closed');
-        setSelectedField(null);
-        setSelectedOperator(null);
-        editing.clearEditing();
-        setMultiSelectValues([]);
+        resetState();
       }
     }, 200);
   };
 
   // --- Derived values ---
+
+  // Compute selectedValues for the value menu (multi-select + single-select editing)
+  const selectedValues = useMemo(() => {
+    if (multiSelectValues.length > 0) return multiSelectValues;
+    if (editing.editingChipId && selectedOperator && !isMultiSelectOperator(selectedOperator)) {
+      const match = editing.editingChipId.match(/^chip-(\d+)$/);
+      const idx = match ? Number(match[1]) : null;
+      if (idx !== null) {
+        const condition = conditions[idx];
+        if (condition?.value != null && !Array.isArray(condition.value)) {
+          return [condition.value];
+        }
+      }
+    }
+    return [];
+  }, [multiSelectValues, editing.editingChipId, selectedOperator, conditions]);
 
   const buildingMultiValue = multiSelectValues.length > 0
     ? multiSelectValues
@@ -229,6 +251,7 @@ export const useFilterAutocomplete = ({
     selectedField,
     selectedOperator,
     multiSelectValues,
+    selectedValues,
     isBuilding,
     buildingChipData,
     menuPositioning,
@@ -237,10 +260,12 @@ export const useFilterAutocomplete = ({
     handleOperatorSelect,
     handleValueSelect,
     handleMenuClose,
+    handleMenuDiscard: resetState,
     handleChipClick: editing.handleChipClick,
     handleChipRemove,
     handleClear,
     handleKeyDown,
+    handleInputClick,
     handleFocus,
     handleBlur,
   };

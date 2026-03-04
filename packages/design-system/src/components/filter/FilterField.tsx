@@ -10,7 +10,7 @@ import { FilterValueMenu } from './FilterValueMenu';
 import { useFilterAutocomplete } from './hooks';
 import { useFilterExpression } from './hooks';
 import { isMultiSelectOperator } from './lib';
-import type { ExprNode, FieldMetadata, FilterChipData } from './types';
+import type { ExprNode, FieldMetadata } from './types';
 
 export interface FilterFieldProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /**
@@ -76,33 +76,13 @@ export const FilterField: FC<FilterFieldProps> = ({
     inputRef,
   });
 
-  // ── Derived display state ──────────────────────────────────
-
-  const maxVisibleConditions = 3;
-  const hasMoreChips = expression.conditions.length > maxVisibleConditions;
-
-  const visibleChips = useMemo(() => {
-    if (!hasMoreChips) return expression.chips;
-    const result: FilterChipData[] = [];
-    let condCount = 0;
-    for (const chip of expression.chips) {
-      if (chip.variant === 'chip') {
-        condCount++;
-        if (condCount > maxVisibleConditions) break;
-      }
-      result.push(chip);
-    }
-    return result;
-  }, [expression.chips, hasMoreChips]);
-
   // ── Context value ──────────────────────────────────────────
 
   const contextValue: FilterContextValue = useMemo(
     () => ({
-      chips: visibleChips,
+      chips: expression.chips,
       buildingChipData: autocomplete.buildingChipData,
       buildingChipRef,
-      hasMoreChips,
       inputText: autocomplete.inputText,
       inputRef,
       placeholder,
@@ -111,14 +91,14 @@ export const FilterField: FC<FilterFieldProps> = ({
       menuOpen: autocomplete.menuState !== 'closed',
       onInputChange: autocomplete.handleInputChange,
       onInputKeyDown: autocomplete.handleKeyDown,
+      onInputClick: autocomplete.handleInputClick,
       onChipClick: autocomplete.handleChipClick,
       onChipRemove: autocomplete.handleChipRemove,
       onClear: autocomplete.handleClear,
     }),
     [
-      visibleChips,
+      expression.chips,
       autocomplete.buildingChipData,
-      hasMoreChips,
       autocomplete.inputText,
       placeholder,
       error,
@@ -126,6 +106,7 @@ export const FilterField: FC<FilterFieldProps> = ({
       autocomplete.menuState,
       autocomplete.handleInputChange,
       autocomplete.handleKeyDown,
+      autocomplete.handleInputClick,
       autocomplete.handleChipClick,
       autocomplete.handleChipRemove,
       autocomplete.handleClear,
@@ -150,6 +131,8 @@ export const FilterField: FC<FilterFieldProps> = ({
         fields={fields}
         open={autocomplete.menuState === 'field'}
         onSelect={autocomplete.handleFieldSelect}
+        onOpenChange={() => autocomplete.handleMenuClose()}
+        onEscape={autocomplete.handleMenuDiscard}
         positioning={autocomplete.menuPositioning}
       />
 
@@ -158,6 +141,8 @@ export const FilterField: FC<FilterFieldProps> = ({
           fieldType={autocomplete.selectedField.type}
           open={autocomplete.menuState === 'operator'}
           onSelect={autocomplete.handleOperatorSelect}
+          onOpenChange={() => autocomplete.handleMenuClose()}
+          onEscape={autocomplete.handleMenuDiscard}
           positioning={autocomplete.menuPositioning}
         />
       )}
@@ -167,8 +152,10 @@ export const FilterField: FC<FilterFieldProps> = ({
           values={autocomplete.selectedField.values || []}
           open={autocomplete.menuState === 'value'}
           onSelect={autocomplete.handleValueSelect}
+          onOpenChange={() => autocomplete.handleMenuClose()}
+          onEscape={autocomplete.handleMenuDiscard}
           multiSelect={isMultiSelectOperator(autocomplete.selectedOperator)}
-          selectedValues={autocomplete.multiSelectValues}
+          selectedValues={autocomplete.selectedValues}
           positioning={autocomplete.menuPositioning}
         />
       )}

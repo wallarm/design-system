@@ -42,6 +42,8 @@ export interface FilterValueMenuProps {
   multiSelect?: boolean;
   /** Currently selected values (for checkboxes) */
   selectedValues?: Array<ValueOption['value']>;
+  /** Callback when Escape is pressed (discard) */
+  onEscape?: () => void;
   /** Custom width (defaults to 300px for standard, 172px for date pickers) */
   width?: 'standard' | 'compact' | number;
   /** Virtual anchor point for positioning */
@@ -61,6 +63,7 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
   onSelect,
   open = false,
   onOpenChange,
+  onEscape,
   multiSelect = false,
   selectedValues = [],
   width = 'standard',
@@ -81,7 +84,7 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
     items: flatItems,
     open,
     onSelect: item => onSelect(item.value),
-    onClose: () => onOpenChange?.(false),
+    onClose: onEscape ?? (() => onOpenChange?.(false)),
   });
 
   // Determine width class
@@ -120,12 +123,16 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
                   <DropdownMenuItemText>{option.label}</DropdownMenuItemText>
                 )}
 
-                {/* Checkbox for multi-select */}
-                {multiSelect && (
+                {/* Checkbox for multi-select, checkmark for single-select */}
+                {multiSelect ? (
                   <div className='flex items-start justify-end py-2 ml-auto'>
                     <Checkmark checkedState={isChecked} />
                   </div>
-                )}
+                ) : isChecked ? (
+                  <div className='flex items-start justify-end py-2 ml-auto'>
+                    <Checkmark checkedState={true} />
+                  </div>
+                ) : null}
 
                 {/* Submenu arrow */}
                 {option.hasSubmenu && !multiSelect && (

@@ -6,6 +6,7 @@ type MenuState = 'closed' | 'field' | 'operator' | 'value';
 interface UseMenuPositioningOptions {
   containerRef: RefObject<HTMLElement | null>;
   buildingChipRef: RefObject<HTMLElement | null>;
+  inputRef?: RefObject<HTMLElement | null>;
   isBuilding: boolean;
   menuState: MenuState;
 }
@@ -18,6 +19,7 @@ interface UseMenuPositioningOptions {
 export const useMenuPositioning = ({
   containerRef,
   buildingChipRef,
+  inputRef,
   isBuilding,
   menuState,
 }: UseMenuPositioningOptions) => {
@@ -31,14 +33,21 @@ export const useMenuPositioning = ({
     menuOffsetRef.current = 0;
   }, []);
 
-  // After building chip renders, update offset to align dropdown with the chip
+  // After building chip renders, update offset to align dropdown with the chip.
+  // When no building chip (field menu for new condition), align with the input.
   useEffect(() => {
-    if (isBuilding && menuState !== 'closed') {
-      const containerRect = containerRef.current?.getBoundingClientRect();
+    if (menuState === 'closed') return;
+    const containerRect = containerRef.current?.getBoundingClientRect();
+    if (!containerRect) return;
+
+    if (isBuilding) {
       const chipRect = buildingChipRef.current?.getBoundingClientRect();
-      if (containerRect && chipRect) {
+      if (chipRect) {
         menuOffsetRef.current = chipRect.left - containerRect.left;
       }
+    } else if (menuState === 'field' && inputRef?.current) {
+      const inputRect = inputRef.current.getBoundingClientRect();
+      menuOffsetRef.current = inputRect.left - containerRect.left;
     }
   });
 
