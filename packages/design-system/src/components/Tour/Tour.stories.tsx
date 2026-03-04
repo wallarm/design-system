@@ -1,25 +1,22 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { Info } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
+import { Checkbox, CheckboxIndicator, CheckboxLabel } from '../Checkbox';
+import { Field, FieldLabel, FieldSet } from '../Field';
+import { Input } from '../Input';
 import { Kbd, KbdGroup } from '../Kbd';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
-import { beaconStepEffect, useTour, waitForStepEvent } from './lib';
+import { beaconStepEffect, waitForStepEvent } from './lib';
 import { Tour } from './Tour';
-import { TourDescription } from './TourDescription';
-import { TourFooter } from './TourFooter';
-import { TourTitle } from './TourTitle';
 import type { TourStepDetails } from './types';
+import { useTour } from './useTour';
 
 const meta = {
   title: 'Overlay/Tour',
   component: Tour,
-  subcomponents: {
-    TourTitle,
-    TourDescription,
-    TourFooter,
-  },
   parameters: {
     layout: 'centered',
     docs: {
@@ -37,7 +34,7 @@ export const Overview: StoryFn<typeof meta> = () => {
   const firstRef = useRef<HTMLButtonElement>(null);
   const secondRef = useRef<HTMLButtonElement>(null);
   const thirdRef = useRef<HTMLButtonElement>(null);
-  const fourthRef = useRef<HTMLDivElement>(null);
+  const fourthRef = useRef<SVGSVGElement>(null);
 
   const steps: TourStepDetails[] = [
     {
@@ -78,7 +75,7 @@ export const Overview: StoryFn<typeof meta> = () => {
     {
       id: 'fourthStep',
       type: 'tooltip',
-      target: () => fourthRef.current,
+      target: () => fourthRef.current as HTMLElement | null,
       title: 'An alternative spotlight shape',
       description:
         'Ideal for highlighting compact or icon-sized elements where a rectangular highlight would feel oversized.',
@@ -146,20 +143,20 @@ export const Overview: StoryFn<typeof meta> = () => {
           <Button ref={firstRef} variant='outline' color='neutral' size='large'>
             First step
           </Button>
+
           <Button ref={secondRef} variant='outline' color='neutral' size='large'>
             Second step
           </Button>
+
           <Button ref={thirdRef} variant='outline' color='neutral' size='large'>
             Third step
           </Button>
-          <div className='py-8 px-12'>
-            <div className='flex items-center gap-16'>
-              <Badge variant='dotted' color='green' size='medium'>
-                Last step
-              </Badge>
-              <div ref={fourthRef} className='size-16 rounded-full bg-feedback-success-secondary' />
-            </div>
-          </div>
+
+          <Badge variant='dotted' color='green' size='medium'>
+            Last step
+          </Badge>
+
+          <Info ref={fourthRef} />
         </HStack>
 
         <Button
@@ -173,22 +170,9 @@ export const Overview: StoryFn<typeof meta> = () => {
         </Button>
       </VStack>
 
-      <Tour tour={tour}>
-        <TourTitle />
-        <TourDescription />
-        <TourFooter showProgress />
-      </Tour>
+      <Tour tour={tour} />
     </div>
   );
-};
-
-Overview.parameters = {
-  docs: {
-    description: {
-      story:
-        'Demonstrates dialog steps, tooltip steps with media, backdrop-less highlights, and circle spotlight shapes. Supports full keyboard navigation.',
-    },
-  },
 };
 
 const PLACEMENTS = [
@@ -274,22 +258,9 @@ export const Placement: StoryFn<typeof meta> = () => {
         </Button>
       </VStack>
 
-      <Tour tour={tour}>
-        <TourTitle />
-        <TourDescription />
-        <TourFooter showProgress />
-      </Tour>
+      <Tour tour={tour} />
     </div>
   );
-};
-
-Placement.parameters = {
-  docs: {
-    description: {
-      story:
-        'Supports placement in any direction relative to the target element. Auto-flips when the popover would overflow the viewport.',
-    },
-  },
 };
 
 export const BeaconTriggered: StoryFn<typeof meta> = () => {
@@ -304,16 +275,11 @@ export const BeaconTriggered: StoryFn<typeof meta> = () => {
       description:
         'When there is only one step, the footer shows a single "Got it" dismiss button instead of navigation controls. No progress indicator is displayed.',
       backdrop: false,
-      effect: beaconStepEffect,
+      effect: beaconStepEffect(),
     },
   ];
 
-  const tour = useTour({ closeOnInteractOutside: false, steps });
-
-  // Auto-start: beacon appears immediately on page load
-  useEffect(() => {
-    tour.start();
-  }, []);
+  const tour = useTour({ closeOnInteractOutside: false, steps, autoStart: true });
 
   return (
     <div className='w-600 p-32'>
@@ -331,22 +297,9 @@ export const BeaconTriggered: StoryFn<typeof meta> = () => {
         </HStack>
       </VStack>
 
-      <Tour tour={tour}>
-        <TourTitle />
-        <TourDescription />
-        <TourFooter showProgress />
-      </Tour>
+      <Tour tour={tour} />
     </div>
   );
-};
-
-BeaconTriggered.parameters = {
-  docs: {
-    description: {
-      story:
-        'A passive discovery pattern where a pulsing beacon highlights a new feature without blocking the UI. The popover appears only after the user clicks the highlighted element.',
-    },
-  },
 };
 
 export const WaitForInteraction: StoryFn<typeof meta> = () => {
@@ -420,30 +373,15 @@ export const WaitForInteraction: StoryFn<typeof meta> = () => {
         </Button>
       </VStack>
 
-      <Tour tour={tour}>
-        <TourTitle />
-        <TourDescription />
-        <TourFooter showProgress />
-      </Tour>
+      <Tour tour={tour} />
     </div>
   );
 };
 
-WaitForInteraction.parameters = {
-  docs: {
-    description: {
-      story:
-        'Uses `waitForStepEvent` effect callback that attaches an event listener to the target element and calls `next()` when the user interacts with it.',
-    },
-  },
-};
-
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
 export const WaitForInput: StoryFn<typeof meta> = () => {
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
-  const termsRef = useRef<HTMLDivElement>(null);
+  const termsRef = useRef<HTMLLabelElement>(null);
 
   const steps: TourStepDetails[] = [
     {
@@ -468,7 +406,10 @@ export const WaitForInput: StoryFn<typeof meta> = () => {
       placement: 'bottom-start',
       effect: args =>
         waitForStepEvent('input', args, {
-          predicate: el => emailRegex.test((el as HTMLInputElement).value),
+          predicate: el => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            return emailRegex.test((el as HTMLInputElement).value);
+          },
           delay: 1500,
         }),
     },
@@ -513,36 +454,21 @@ export const WaitForInput: StoryFn<typeof meta> = () => {
           performed, the tour will automatically move forward.
         </Text>
 
-        <VStack gap={12} align='stretch'>
-          <VStack gap={4} align='stretch'>
-            <Text size='xs' weight='medium'>
-              Name
-            </Text>
-            <input
-              ref={nameRef}
-              type='text'
-              placeholder='Enter your name'
-              className='h-40 rounded-8 border border-border-primary-light bg-bg-surface-2 px-12 font-sans text-sm text-text-primary outline-none focus:border-border-brand'
-            />
-          </VStack>
-          <VStack gap={4} align='stretch'>
-            <Text size='xs' weight='medium'>
-              Email
-            </Text>
-            <input
-              ref={emailRef}
-              type='email'
-              placeholder='Enter your email'
-              className='h-40 rounded-8 border border-border-primary-light bg-bg-surface-2 px-12 font-sans text-sm text-text-primary outline-none focus:border-border-brand'
-            />
-          </VStack>
-          <HStack gap={8} ref={termsRef}>
-            <input type='checkbox' id='tour-terms' className='size-16' />
-            <Text size='xs' asChild>
-              <label htmlFor='tour-terms'>I accept the terms and conditions</label>
-            </Text>
-          </HStack>
-        </VStack>
+        <FieldSet>
+          <Field>
+            <FieldLabel>Name</FieldLabel>
+            <Input ref={nameRef} placeholder='Enter your name' />
+          </Field>
+          <Field>
+            <FieldLabel>Email</FieldLabel>
+            <Input ref={emailRef} type='email' placeholder='Enter your email' />
+          </Field>
+
+          <Checkbox ref={termsRef}>
+            <CheckboxIndicator />
+            <CheckboxLabel>I accept the terms and conditions</CheckboxLabel>
+          </Checkbox>
+        </FieldSet>
 
         <Button
           data-testid='tour-start'
@@ -555,20 +481,7 @@ export const WaitForInput: StoryFn<typeof meta> = () => {
         </Button>
       </VStack>
 
-      <Tour tour={tour}>
-        <TourTitle />
-        <TourDescription />
-        <TourFooter showProgress />
-      </Tour>
+      <Tour tour={tour} />
     </div>
   );
-};
-
-WaitForInput.parameters = {
-  docs: {
-    description: {
-      story:
-        'Tour steps wait for form input validation before proceeding. Uses `waitForStepEvent` with a predicate function to validate user input.',
-    },
-  },
 };

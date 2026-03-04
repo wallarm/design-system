@@ -1,11 +1,13 @@
-import type { FC, PropsWithChildren } from 'react';
-import { Tour as ArkUiTour, type TourRootProps as ArkUiTourRootProps } from '@ark-ui/react';
-import { TourContent } from './TourContent';
+import type { FC } from 'react';
+import { Tour as ArkUiTour } from '@ark-ui/react';
+import { TourInner } from './TourInner';
 
-export type TourProps = ArkUiTourRootProps;
+export type TourProps = Omit<ArkUiTour.RootProps, 'children'>;
 
-export const Tour: FC<PropsWithChildren<TourProps>> = ({ children, ...props }) => (
-  <ArkUiTour.Root {...props}>
-    <TourContent>{children}</TourContent>
+export const Tour: FC<TourProps> = ({ lazyMount = true, unmountOnExit = true, ...props }) => (
+  <ArkUiTour.Root {...props} lazyMount={lazyMount} unmountOnExit={unmountOnExit}>
+    <TourInner />
   </ArkUiTour.Root>
 );
+
+Tour.displayName = 'Tour';

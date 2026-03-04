@@ -1,12 +1,15 @@
-import type { FC } from 'react';
+import type { FC, Ref } from 'react';
 import { Checkbox as ArkUiCheckbox } from '@ark-ui/react/checkbox';
 import { cn } from '../../utils/cn';
 
-export type CheckboxProps = Omit<ArkUiCheckbox.RootProps, 'className'>;
+export interface CheckboxProps extends ArkUiCheckbox.RootProps {
+  ref?: Ref<HTMLLabelElement>;
+}
 
-export const Checkbox: FC<CheckboxProps> = ({ children, ...props }) => (
+export const Checkbox: FC<CheckboxProps> = ({ children, ref, ...props }) => (
   <ArkUiCheckbox.Root
     {...props}
+    ref={ref}
     className={cn(
       // Layout ---- basic
       'items-center gap-x-8',

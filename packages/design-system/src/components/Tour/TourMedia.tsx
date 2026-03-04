@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { useTourContext } from '@ark-ui/react';
+import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
 export interface TourMediaProps {
@@ -9,9 +10,18 @@ export interface TourMediaProps {
 
 const VIDEO_RE = /\.(mp4|webm|ogg)$/i;
 
+const mediaVariants = cva('w-full overflow-clip', {
+  variants: {
+    type: {
+      dialog: 'shrink-0',
+      tooltip: '',
+    },
+  },
+});
+
 export const TourMedia: FC<TourMediaProps> = ({ children, className }) => {
   const { step } = useTourContext();
-  const isDialog = step?.type === 'dialog';
+  const type = step?.type === 'dialog' ? 'dialog' : 'tooltip';
   const src = step?.meta?.mediaSrc as string | undefined;
   const alt = (step?.meta?.mediaAlt as string) ?? '';
 
@@ -20,7 +30,7 @@ export const TourMedia: FC<TourMediaProps> = ({ children, className }) => {
   const isVideo = src && VIDEO_RE.test(src);
 
   return (
-    <div className={cn('w-full overflow-clip', isDialog && 'shrink-0', className)}>
+    <div className={cn(mediaVariants({ type }), className)}>
       {src ? (
         isVideo ? (
           <video

@@ -1,28 +1,36 @@
 import { forwardRef } from 'react';
+import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
+import { Heading } from '../Heading';
 import {
-  Tour as ArkUiTour,
-  type TourTitleProps as ArkUiTourTitleProps,
-  useTourContext,
-} from '@ark-ui/react';
-import { cn } from '../../utils/cn';
+  OverflowTooltip,
+  OverflowTooltipContent,
+  OverflowTooltipTrigger,
+} from '../OverflowTooltip';
 
-export type TourTitleProps = ArkUiTourTitleProps;
+export type TourTitleProps = ArkUiTour.TitleProps;
 
 export const TourTitle = forwardRef<HTMLHeadingElement, TourTitleProps>(
-  ({ className, ...props }, ref) => {
+  ({ children, ...props }, ref) => {
     const { step } = useTourContext();
 
     return (
-      <ArkUiTour.Title
-        ref={ref}
-        className={cn(
-          'font-sans-display font-medium text-lg leading-xl',
-          'line-clamp-2',
-          step?.type === 'dialog' ? 'text-text-primary' : 'text-white',
-          className,
-        )}
-        {...props}
-      />
+      <OverflowTooltip>
+        <OverflowTooltipTrigger>
+          <ArkUiTour.Title {...props} ref={ref} asChild>
+            <Heading
+              size='lg'
+              color={step?.type === 'dialog' ? 'primary' : 'primary-alt'}
+              weight='medium'
+              lineClamp={2}
+            >
+              {children}
+            </Heading>
+          </ArkUiTour.Title>
+        </OverflowTooltipTrigger>
+        <OverflowTooltipContent>{children}</OverflowTooltipContent>
+      </OverflowTooltip>
     );
   },
 );
+
+TourTitle.displayName = 'TourTitle';
