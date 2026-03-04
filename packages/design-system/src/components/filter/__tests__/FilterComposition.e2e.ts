@@ -4,7 +4,6 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const compositionStory = createStoryHelper('components-filter-composition', [
   'Default',
   'Simple',
-  'Multi Condition',
   'Backend Integration',
 ] as const);
 
@@ -219,11 +218,9 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await expect(input).toBeFocused();
     });
-  });
 
-  test.describe('Multi-Condition', () => {
     test('Should create two conditions with AND chip between them', async ({ page }) => {
-      await compositionStory.goto(page, 'Multi Condition');
+      await compositionStory.goto(page, 'Simple');
 
       await createChipWithSelection(page, 'Status', 'Active');
 
@@ -240,7 +237,7 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
     });
 
     test('Should toggle AND to OR when connector chip clicked', async ({ page }) => {
-      await compositionStory.goto(page, 'Multi Condition');
+      await compositionStory.goto(page, 'Simple');
 
       await createChipWithSelection(page, 'Status', 'Active');
       await createChipWithSelection(page, 'Priority', 'Low');
@@ -258,7 +255,7 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
     });
 
     test('Should remove connector when condition is removed', async ({ page }) => {
-      await compositionStory.goto(page, 'Multi Condition');
+      await compositionStory.goto(page, 'Simple');
 
       await createChipWithSelection(page, 'Status', 'Active');
       await createChipWithSelection(page, 'Priority', 'Low');
@@ -279,7 +276,7 @@ test.describe('Component: FilterField - Self-Contained Mechanics', () => {
     });
 
     test('Should output Group expression with multiple conditions', async ({ page }) => {
-      await compositionStory.goto(page, 'Multi Condition');
+      await compositionStory.goto(page, 'Simple');
 
       await createChipWithSelection(page, 'Status', 'Active');
       await createChipWithSelection(page, 'Priority', 'Low');

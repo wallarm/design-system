@@ -594,52 +594,10 @@ export const Default: Story = {
 };
 
 /**
- * Minimal example with fewer fields
- * Shows simple config-driven usage
+ * Minimal example with fewer fields.
+ * Supports multiple conditions with AND/OR — create several filters in a row.
  */
 export const Simple: Story = {
-  render: () => {
-    const simpleFields: FieldMetadata[] = [
-      {
-        name: 'status',
-        label: 'Status',
-        type: 'enum',
-        values: [
-          { value: 'active', label: 'Active' },
-          { value: 'pending', label: 'Pending' },
-          { value: 'archived', label: 'Archived' },
-        ],
-      },
-      {
-        name: 'priority',
-        label: 'Priority',
-        type: 'integer',
-        values: [
-          { value: 1, label: 'Low' },
-          { value: 5, label: 'Medium' },
-          { value: 10, label: 'High' },
-        ],
-      },
-    ];
-
-    return (
-      <div className='w-[600px]'>
-        <FilterField
-          fields={simpleFields}
-          placeholder='Filter items...'
-          onChange={(expr) => console.log('Filter:', expr)}
-        />
-      </div>
-    );
-  },
-};
-
-/**
- * Multi-condition example with AND/OR support.
- * Create multiple conditions — AND chips auto-insert between them.
- * Click any AND/OR chip to toggle all connectors.
- */
-export const MultiCondition: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>(null);
 
@@ -664,31 +622,20 @@ export const MultiCondition: Story = {
           { value: 10, label: 'High' },
         ],
       },
-      {
-        name: 'country',
-        label: 'Country',
-        type: 'string',
-        values: [
-          { value: 'US', label: 'US' },
-          { value: 'DE', label: 'DE' },
-          { value: 'JP', label: 'JP' },
-        ],
-      },
     ];
 
     return (
-      <div className='w-[800px] space-y-4'>
+      <div className='w-[600px] space-y-4'>
         <FilterField
           fields={simpleFields}
           value={expression}
           onChange={(expr) => {
-            console.log('Expression changed:', expr);
+            console.log('Filter:', expr);
             setExpression(expr);
           }}
-          placeholder='Add multiple filters...'
+          placeholder='Filter items...'
         />
 
-        {/* Debug output */}
         {expression && (
           <div className='p-4 bg-gray-100 rounded text-xs'>
             <pre data-testid='expression-debug'>{JSON.stringify(expression, null, 2)}</pre>
