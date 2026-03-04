@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { buildExpression, chipIdToConditionIndex, expressionToConditions } from '../lib';
-import { getOperatorLabel } from '../lib';
+import { getDateDisplayLabel, getOperatorLabel } from '../lib';
 import type { Condition, ExprNode, FieldMetadata, QueryBarChipData, FilterOperator } from '../types';
 
 interface UseQueryBarExpressionOptions {
@@ -29,11 +29,17 @@ export const useQueryBarExpression = ({ fields, value, onChange, error }: UseQue
     if (conditions.length === 0) return [];
 
     const makeConditionChip = (i: number): QueryBarChipData => {
-      const condition = conditions[i];
+      const condition = conditions[i]!;
       const field = fields.find(f => f.name === condition.field);
 
       let displayValue: string;
-      if (Array.isArray(condition.value)) {
+      if (field?.type === 'date') {
+        if (Array.isArray(condition.value)) {
+          displayValue = condition.value.map(v => getDateDisplayLabel(String(v))).join(' – ');
+        } else {
+          displayValue = getDateDisplayLabel(String(condition.value ?? ''));
+        }
+      } else if (Array.isArray(condition.value)) {
         displayValue = condition.value
           .map(v => field?.values?.find(opt => opt.value === v)?.label ?? String(v))
           .join(', ');

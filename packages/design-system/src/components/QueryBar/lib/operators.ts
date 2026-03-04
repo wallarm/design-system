@@ -30,3 +30,7 @@ export const isMultiSelectOperator = (op: FilterOperator | null): op is FilterOp
 /** Check if operator requires no value (unary) */
 export const isNoValueOperator = (op: FilterOperator): boolean =>
   (NO_VALUE_OPERATORS as readonly string[]).includes(op);
+
+/** Check if operator is a between/range operator */
+export const isBetweenOperator = (op: FilterOperator | null): boolean =>
+  op === 'between';

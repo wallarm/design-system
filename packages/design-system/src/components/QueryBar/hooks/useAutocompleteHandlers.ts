@@ -1,8 +1,9 @@
 import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
 import { useCallback } from 'react';
-import { isMultiSelectOperator, isNoValueOperator } from '../lib';
+import { isBetweenOperator, isMultiSelectOperator, isNoValueOperator } from '../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../types';
 import type { useChipEditing } from './useChipEditing';
+import type { useDateRange } from '../DateValue/hooks';
 import type { useMultiSelect } from './useMultiSelect';
 
 interface UseAutocompleteHandlersOptions {
@@ -24,6 +25,7 @@ interface UseAutocompleteHandlersOptions {
   // Child hooks
   editing: ReturnType<typeof useChipEditing>;
   multiSelect: ReturnType<typeof useMultiSelect>;
+  dateRange: ReturnType<typeof useDateRange>;
 
   // External callbacks
   upsertCondition: (
@@ -59,6 +61,7 @@ export const useAutocompleteHandlers = ({
   setIsFocused,
   editing,
   multiSelect,
+  dateRange,
   upsertCondition,
   removeCondition,
   removeLastCondition,
@@ -142,6 +145,16 @@ export const useAutocompleteHandlers = ({
 
     if (isMultiSelectOperator(selectedOperator)) {
       multiSelect.toggleValue(val);
+      return;
+    }
+
+    // Between operator: collect two values before committing
+    if (isBetweenOperator(selectedOperator) && selectedField.type === 'date') {
+      const result = dateRange.selectValue(String(val));
+      if (!result) return; // Waiting for second value
+      const isEditing = !!editing.editingChipId;
+      upsertCondition(selectedField, selectedOperator, result, editing.editingChipId);
+      resetState(!isEditing);
       return;
     }
 

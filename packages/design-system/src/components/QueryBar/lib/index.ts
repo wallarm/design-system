@@ -6,7 +6,9 @@ export {
   OPERATORS_BY_TYPE,
   VARIANT_LABELS,
 } from './constants';
-export { getOperatorFromLabel, getOperatorLabel, isMultiSelectOperator, isNoValueOperator } from './operators';
+export { getOperatorFromLabel, getOperatorLabel, isBetweenOperator, isMultiSelectOperator, isNoValueOperator } from './operators';
+export { DATE_PRESETS, formatDateForChip, getDateDisplayLabel, isDatePreset } from '../DateValue/constants';
+export type { DatePreset } from '../DateValue/constants';
 export { buildExpression, expressionToConditions } from './expression';
 export { chipIdToConditionIndex } from './conditions';
 export { parse, parseCondition } from './parser';

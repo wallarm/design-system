@@ -37,6 +37,11 @@ type Story = StoryObj<typeof meta>;
 
 const sampleFields: FieldMetadata[] = [
   {
+    name: 'last_seen',
+    label: 'Last seen',
+    type: 'date',
+  },
+  {
     name: 'status',
     label: 'Status',
     type: 'enum',

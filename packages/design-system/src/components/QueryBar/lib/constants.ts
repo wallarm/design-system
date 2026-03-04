@@ -80,7 +80,10 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
     '>': 'after',
     '>=': 'on or after',
     '<': 'before',
-    '<=': 'is on or before',
+    '<=': 'on or before',
+    '=': 'on',
+    '!=': 'not on',
+    between: 'between',
   },
   boolean: {
     '=': 'is true',

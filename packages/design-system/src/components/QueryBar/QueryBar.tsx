@@ -3,10 +3,10 @@ import { useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { QueryBarProvider, useQueryBarContextValue } from './QueryBarContext';
 import { QueryBarInput } from './QueryBarInput';
-import { QueryBarMainMenu, QueryBarOperatorMenu, QueryBarValueMenu } from './QueryBarMenu';
+import { QueryBarDateValueMenu, QueryBarMainMenu, QueryBarOperatorMenu, QueryBarValueMenu } from './QueryBarMenu';
 import { useQueryBarAutocomplete } from './hooks';
 import { useQueryBarExpression } from './hooks';
-import { isMultiSelectOperator } from './lib';
+import { isBetweenOperator, isMultiSelectOperator } from './lib';
 import type { ExprNode, FieldMetadata } from './types';
 
 export interface QueryBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
@@ -89,6 +89,8 @@ export const QueryBar: FC<QueryBarProps> = ({
     handleFocus,
     handleBlur,
     handleCommitAndNewChip,
+    editingDateIsAbsolute,
+    handleRangeSelect,
   } = useQueryBarAutocomplete({
     fields,
     conditions,
@@ -158,17 +160,35 @@ export const QueryBar: FC<QueryBarProps> = ({
       )}
 
       {selectedField && selectedOperator && (
-        <QueryBarValueMenu
-          values={selectedField.values || []}
-          open={menuState === 'value'}
-          onSelect={handleValueSelect}
-          onOpenChange={() => handleMenuClose()}
-          onEscape={handleMenuDiscard}
-          multiSelect={isMultiSelectOperator(selectedOperator)}
-          selectedValues={selectedValues}
-          positioning={menuPositioning}
-          onArrowRight={isMultiSelectOperator(selectedOperator) ? handleCommitAndNewChip : undefined}
-        />
+        selectedField.type === 'date' ? (
+          <QueryBarDateValueMenu
+            open={menuState === 'value'}
+            onSelect={handleValueSelect}
+            onRangeSelect={handleRangeSelect}
+            onOpenChange={() => handleMenuClose()}
+            onEscape={handleMenuDiscard}
+            positioning={menuPositioning}
+            initialCalendar={editingDateIsAbsolute}
+            range={isBetweenOperator(selectedOperator)}
+            betweenLabel={
+              isBetweenOperator(selectedOperator)
+                ? 'Select date range'
+                : undefined
+            }
+          />
+        ) : (
+          <QueryBarValueMenu
+            values={selectedField.values || []}
+            open={menuState === 'value'}
+            onSelect={handleValueSelect}
+            onOpenChange={() => handleMenuClose()}
+            onEscape={handleMenuDiscard}
+            multiSelect={isMultiSelectOperator(selectedOperator)}
+            selectedValues={selectedValues}
+            positioning={menuPositioning}
+            onArrowRight={isMultiSelectOperator(selectedOperator) ? handleCommitAndNewChip : undefined}
+          />
+        )
       )}
     </div>
   );

@@ -1,9 +1,10 @@
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getOperatorLabel } from '../lib';
+import { getDateDisplayLabel, getOperatorLabel, isDatePreset } from '../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../types';
 import { useAutocompleteHandlers } from './useAutocompleteHandlers';
 import { useChipEditing } from './useChipEditing';
+import { useDateRange } from '../DateValue/hooks';
 import { useMenuPositioning } from './useMenuPositioning';
 import { useMultiSelect } from './useMultiSelect';
 
@@ -78,6 +79,8 @@ export const useQueryBarAutocomplete = ({
     conditions,
   });
 
+  const dateRange = useDateRange();
+
   // ── State reset ───────────────────────────────────────────
 
   const resetState = useCallback((openFieldMenu = false) => {
@@ -86,6 +89,7 @@ export const useQueryBarAutocomplete = ({
     setSelectedOperator(null);
     editing.clearEditing();
     multiSelect.reset();
+    dateRange.reset();
     resetMenuOffset();
     setMenuState(openFieldMenu ? 'field' : 'closed');
     inputRef.current?.focus();
@@ -107,6 +111,7 @@ export const useQueryBarAutocomplete = ({
     setIsFocused,
     editing,
     multiSelect,
+    dateRange,
     upsertCondition,
     removeCondition,
     removeLastCondition,
@@ -132,11 +137,38 @@ export const useQueryBarAutocomplete = ({
 
   const isBuilding = selectedField !== null && !editing.editingChipId;
 
+  // When editing a date chip, determine if its value is an absolute date (not a preset)
+  const editingDateIsAbsolute = (() => {
+    if (!editing.editingChipId || selectedField?.type !== 'date') return false;
+    const idx = Number(editing.editingChipId.replace('chip-', ''));
+    const condition = conditions[idx];
+    if (!condition) return false;
+    const val = String(condition.value ?? '');
+    return val !== '' && !isDatePreset(val);
+  })();
+
+  const buildingValue = (() => {
+    if (multiSelect.buildingMultiValue) return multiSelect.buildingMultiValue;
+    if (dateRange.fromValue && selectedOperator === 'between') {
+      return `${getDateDisplayLabel(dateRange.fromValue)} – ...`;
+    }
+    return undefined;
+  })();
+
   const buildingChipData = isBuilding ? {
     attribute: selectedField!.label,
     operator: selectedOperator ? getOperatorLabel(selectedOperator, selectedField!.type) : undefined,
-    value: multiSelect.buildingMultiValue,
+    value: buildingValue,
   } : null;
+
+  // ── Range select (between + calendar) ────────────────────
+
+  const handleRangeSelect = useCallback((from: string, to: string) => {
+    if (!selectedField || !selectedOperator) return;
+    const isEditing = !!editing.editingChipId;
+    upsertCondition(selectedField, selectedOperator, [from, to], editing.editingChipId);
+    resetState(!isEditing);
+  }, [selectedField, selectedOperator, editing.editingChipId, upsertCondition, resetState]);
 
   // ── Public API ────────────────────────────────────────────
 
@@ -164,5 +196,8 @@ export const useQueryBarAutocomplete = ({
     handleFocus: handlers.handleFocus,
     handleBlur: handlers.handleBlur,
     handleCommitAndNewChip: handlers.handleCommitAndNewChip,
+    handleRangeSelect,
+    dateRangeIndex: dateRange.currentIndex,
+    editingDateIsAbsolute,
   };
 };
