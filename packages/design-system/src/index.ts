@@ -237,3 +237,18 @@ export {
   type TooltipProps,
   TooltipTrigger,
 } from './components/Tooltip';
+export {
+  type BeaconStepEffectOptions,
+  beaconStepEffect,
+  Tour,
+  type TourProps,
+  type TourStatusChangeDetails,
+  type TourStepAction,
+  type TourStepChangeDetails,
+  type TourStepChangeDetailsExtended,
+  type TourStepDetails,
+  type TourStepEffectArgs,
+  useTour,
+  type WaitForStepEventOptions,
+  waitForStepEvent,
+} from './components/Tour';

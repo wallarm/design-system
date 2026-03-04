@@ -4,6 +4,7 @@
 services:
   playwright-design-system:
     image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.58.0}-noble
+    platform: linux/amd64
     working_dir: /app
     shm_size: '2gb'
     volumes:
@@ -28,6 +29,8 @@ services:
         npm install -g pnpm@10.29.3 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
+        echo 'Building playwright-config...' &&
+        pnpm --filter=@wallarm-org/playwright-config build &&
         echo 'Installing Playwright browsers...' &&
         pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps chromium &&
         echo 'Running Design System E2E tests...' &&
@@ -42,6 +45,7 @@ services:
 
   playwright-design-system-update:
     image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.58.0}-noble
+    platform: linux/amd64
     working_dir: /app
     shm_size: '2gb'
     volumes:
@@ -66,6 +70,8 @@ services:
         npm install -g pnpm@10.29.3 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
+        echo 'Building playwright-config...' &&
+        pnpm --filter=@wallarm-org/playwright-config build &&
         echo 'Installing Playwright browsers...' &&
         pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps chromium &&
         echo 'Updating Design System E2E screenshots...' &&
@@ -80,6 +86,7 @@ services:
 
   playwright-all:
     image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.58.0}-noble
+    platform: linux/amd64
     working_dir: /app
     shm_size: '2gb'
     volumes:
@@ -100,6 +107,8 @@ services:
         npm install -g pnpm@10.29.3 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
+        echo 'Building playwright-config...' &&
+        pnpm --filter=@wallarm-org/playwright-config build &&
         echo 'Installing Playwright browsers...' &&
         pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps chromium &&
         echo 'Running all E2E tests...' &&
