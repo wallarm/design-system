@@ -1,8 +1,7 @@
-import type { ChangeEvent, KeyboardEvent, RefObject } from 'react';
+import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { getOperatorLabel, isMultiSelectOperator } from '../lib';
 import type { Condition, FieldMetadata, QueryBarChipData, FilterOperator } from '../types';
-import { useBlurGuard } from './useBlurGuard';
 import { useChipEditing } from './useChipEditing';
 import { useMenuPositioning } from './useMenuPositioning';
 
@@ -46,9 +45,6 @@ export const useQueryBarAutocomplete = ({
   const [selectedOperator, setSelectedOperator] = useState<FilterOperator | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [multiSelectValues, setMultiSelectValues] = useState<Array<string | number | boolean>>([]);
-
-  // Extracted hooks — ordered to avoid circular deps
-  const isPointerInMenuRef = useBlurGuard({ containerRef });
 
   const { menuPositioning, setMenuOffset, resetMenuOffset } = useMenuPositioning({
     containerRef,
@@ -215,23 +211,16 @@ export const useQueryBarAutocomplete = ({
     setIsFocused(true);
   };
 
-  const handleBlur = () => {
-    setTimeout(() => {
-      if (isPointerInMenuRef.current) return;
+  const handleBlur = (e: FocusEvent) => {
+    // Menu is open — Ark UI handles outside clicks via onOpenChange → handleMenuClose
+    if (menuState !== 'closed') return;
 
-      const activeEl = document.activeElement;
-      const isInContainer = containerRef.current?.contains(activeEl);
-      const isInMenu = activeEl?.closest('[data-scope="menu"]');
-      const hasOpenMenu = document.querySelector('[data-scope="menu"][data-state="open"]');
+    // Focus stayed within the container (e.g. moved between input and clear button)
+    const related = e.relatedTarget as HTMLElement | null;
+    if (containerRef.current?.contains(related)) return;
 
-      if (!isInContainer && !isInMenu && !hasOpenMenu) {
-        if (multiSelectValues.length > 0 && selectedField && selectedOperator) {
-          upsertCondition(selectedField, selectedOperator, multiSelectValues, editing.editingChipId);
-        }
-        setIsFocused(false);
-        resetState();
-      }
-    }, 200);
+    setIsFocused(false);
+    resetState();
   };
 
   // --- Derived values ---
