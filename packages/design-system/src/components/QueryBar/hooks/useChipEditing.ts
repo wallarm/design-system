@@ -1,7 +1,6 @@
-import type { MouseEvent as ReactMouseEvent } from 'react';
-import type { RefObject } from 'react';
+import type { MouseEvent as ReactMouseEvent, RefObject } from 'react';
 import { useState } from 'react';
-import { getOperatorFromLabel, isMultiSelectOperator } from '../lib';
+import { chipIdToConditionIndex, getOperatorFromLabel, isMultiSelectOperator } from '../lib';
 import type { Condition, FieldMetadata, QueryBarChipData, FilterOperator } from '../types';
 
 type MenuState = 'closed' | 'field' | 'operator' | 'value';
@@ -25,6 +24,46 @@ interface UseChipEditingOptions {
   setMenuState: (state: MenuState) => void;
 }
 
+// ── Pure helpers ────────────────────────────────────────────
+
+/** Resolve chip ID → Condition */
+const getConditionByChipId = (chipId: string, conditions: Condition[]): Condition | null => {
+  const idx = chipIdToConditionIndex(chipId);
+  return idx !== null ? conditions[idx] ?? null : null;
+};
+
+/** Determine which segment was clicked via data-slot */
+type ClickedSegment = 'attribute' | 'operator' | 'value';
+
+const getClickedSegment = (target: HTMLElement): ClickedSegment => {
+  const slot = target.closest('[data-slot]')?.getAttribute('data-slot');
+  if (slot === 'segment-attribute') return 'attribute';
+  if (slot === 'segment-value') return 'value';
+  return 'operator';
+};
+
+/** Calculate menu X offset relative to container */
+const calcMenuOffset = (
+  target: HTMLElement,
+  segment: ClickedSegment,
+  containerRef: RefObject<HTMLElement | null>,
+): number => {
+  const chipEl = target.closest('[data-slot="query-bar-chip"]') as HTMLElement | null;
+  const segmentEl = target.closest('[data-slot]') as HTMLElement | null;
+  const anchorEl = segment === 'attribute' ? chipEl : segmentEl;
+  const containerRect = containerRef.current?.getBoundingClientRect();
+  if (!containerRect || !anchorEl) return 0;
+  return anchorEl.getBoundingClientRect().left - containerRect.left;
+};
+
+const SEGMENT_TO_MENU: Record<ClickedSegment, MenuState> = {
+  attribute: 'field',
+  operator: 'operator',
+  value: 'value',
+};
+
+// ── Hook ───────────────────────────────────────────────────
+
 /**
  * Manages editing of existing filter chips.
  * Handles chip click → determine segment → open appropriate menu.
@@ -45,33 +84,19 @@ export const useChipEditing = ({
 }: UseChipEditingOptions) => {
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
 
-  const getEditingCondition = (): Condition | null => {
-    if (!editingChipId) return null;
-    const match = editingChipId.match(/^chip-(\d+)$/);
-    const idx = match ? Number(match[1]) : null;
-    if (idx === null) return null;
-    return conditions[idx] ?? null;
-  };
-
-  /**
-   * Called from handleFieldSelect — if editing, commits the field change immediately.
-   * Returns true if handled (editing mode), false if normal flow should continue.
-   */
+  /** If editing, commits field change immediately. Returns true if handled. */
   const tryEditField = (field: FieldMetadata): boolean => {
     if (!editingChipId) return false;
-    const condition = getEditingCondition();
+    const condition = getConditionByChipId(editingChipId, conditions);
     if (!condition) return false;
     upsertCondition(field, condition.operator, condition.value, editingChipId);
     return true;
   };
 
-  /**
-   * Called from handleOperatorSelect — if editing, commits the operator change immediately.
-   * Returns true if handled (editing mode), false if normal flow should continue.
-   */
+  /** If editing, commits operator change immediately. Returns true if handled. */
   const tryEditOperator = (operator: FilterOperator, selectedField: FieldMetadata): boolean => {
     if (!editingChipId) return false;
-    const condition = getEditingCondition();
+    const condition = getConditionByChipId(editingChipId, conditions);
     if (!condition) return false;
     upsertCondition(selectedField, operator, condition.value, editingChipId);
     return true;
@@ -83,11 +108,7 @@ export const useChipEditing = ({
       return;
     }
 
-    const match = chipId.match(/^chip-(\d+)$/);
-    const idx = match ? Number(match[1]) : null;
-    if (idx === null) return;
-
-    const condition = conditions[idx];
+    const condition = getConditionByChipId(chipId, conditions);
     if (!condition) return;
 
     const field = fields.find(f => f.name === condition.field);
@@ -97,44 +118,26 @@ export const useChipEditing = ({
     if (!chip || chip.variant !== 'chip') return;
 
     const target = e.target as HTMLElement;
-    const segmentEl = target.closest('[data-slot]') as HTMLElement | null;
-    const slot = segmentEl?.getAttribute('data-slot');
+    const segment = getClickedSegment(target);
 
-    // For attribute, anchor at the chip start; for operator/value, anchor at the segment
-    const chipEl = target.closest('[data-slot="query-bar-chip"]') as HTMLElement | null;
-    const anchorEl = slot === 'segment-attribute' ? chipEl : segmentEl;
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    if (containerRect && anchorEl) {
-      setMenuOffset(anchorEl.getBoundingClientRect().left - containerRect.left);
-    } else {
-      setMenuOffset(0);
-    }
-
+    setMenuOffset(calcMenuOffset(target, segment, containerRef));
     setEditingChipId(chipId);
     setSelectedField(field);
 
-    if (slot === 'segment-attribute') {
-      setSelectedOperator(null);
-      setMenuState('field');
-    } else if (slot === 'segment-value') {
+    if (segment === 'value') {
       const rawOperator = getOperatorFromLabel(chip.operator || '', field.type);
       setSelectedOperator(rawOperator);
-
-      // Pre-populate selected values for multi-select operators
       if (rawOperator && isMultiSelectOperator(rawOperator) && Array.isArray(condition.value)) {
         setMultiSelectValues(condition.value);
       }
-
-      setMenuState('value');
     } else {
       setSelectedOperator(null);
-      setMenuState('operator');
     }
+
+    setMenuState(SEGMENT_TO_MENU[segment]);
   };
 
-  const clearEditing = () => {
-    setEditingChipId(null);
-  };
+  const clearEditing = () => setEditingChipId(null);
 
   return {
     editingChipId,

@@ -1,5 +1,5 @@
 import type { FieldType, FilterOperator } from '../types';
-import { OPERATOR_LABELS, OPERATOR_LABELS_BY_TYPE } from './constants';
+import { MULTI_SELECT_OPERATORS, NO_VALUE_OPERATORS, OPERATOR_LABELS, OPERATOR_LABELS_BY_TYPE } from './constants';
 
 /**
  * Helper to get operator label for specific field type
@@ -22,3 +22,11 @@ export const getOperatorFromLabel = (label: string, fieldType: FieldType): Filte
   }
   return null;
 };
+
+/** Check if operator supports multi-select */
+export const isMultiSelectOperator = (op: FilterOperator | null): op is FilterOperator =>
+  op !== null && (MULTI_SELECT_OPERATORS as readonly string[]).includes(op);
+
+/** Check if operator requires no value (unary) */
+export const isNoValueOperator = (op: FilterOperator): boolean =>
+  (NO_VALUE_OPERATORS as readonly string[]).includes(op);

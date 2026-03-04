@@ -1,4 +1,4 @@
-import type { Condition, ExprNode, FilterOperator, Group } from '../types';
+import type { Condition, ExprNode } from '../types';
 
 /**
  * Build an ExprNode from flat conditions + per-gap connectors.
@@ -12,30 +12,34 @@ export const buildExpression = (
   if (conditions.length === 0) return null;
   if (conditions.length === 1) return conditions[0];
 
-  // Split conditions into AND-groups by OR connectors
-  const orGroups: Condition[][] = [[conditions[0]]];
-
-  for (let i = 0; i < connectors.length; i++) {
-    if (connectors[i] === 'or') {
-      orGroups.push([conditions[i + 1]]);
-    } else {
-      orGroups[orGroups.length - 1].push(conditions[i + 1]);
-    }
-  }
-
-  // Build nodes for each AND-group
-  const andNodes: ExprNode[] = orGroups.map(group =>
-    group.length === 1 ? group[0] : { type: 'group', operator: 'and', children: group },
+  // Split conditions into AND-groups separated by OR connectors
+  // Invariant: connectors.length === conditions.length - 1
+  const orGroups = connectors.reduce<Condition[][]>(
+    (groups, connector, i) => {
+      const next = conditions[i + 1]!;
+      if (connector === 'or') {
+        groups.push([next]);
+      } else {
+        groups.at(-1)!.push(next);
+      }
+      return groups;
+    },
+    [[conditions[0]!]],
   );
 
-  if (andNodes.length === 1) return andNodes[0];
-  return { type: 'group', operator: 'or', children: andNodes };
+  // Wrap each AND-group into a node
+  const andNodes = orGroups.map<ExprNode>(group =>
+    group.length === 1 ? group[0]! : { type: 'group', operator: 'and', children: group },
+  );
+
+  return andNodes.length === 1
+    ? andNodes[0]!
+    : { type: 'group', operator: 'or', children: andNodes };
 };
 
 /**
  * Flatten a (possibly nested) ExprNode back to flat conditions + connectors.
- * Walks the tree depth-first; when transitioning between children of a group,
- * inserts the group's operator as the connector.
+ * Walks the tree depth-first; between siblings inserts the parent's operator.
  */
 export const expressionToConditions = (
   expr: ExprNode | null,
@@ -46,30 +50,17 @@ export const expressionToConditions = (
   const conditions: Condition[] = [];
   const connectors: Array<'and' | 'or'> = [];
 
-  const walk = (node: ExprNode) => {
+  const walk = (node: ExprNode): void => {
     if (node.type === 'condition') {
       conditions.push(node);
-    } else {
-      const group = node as Group;
-      for (let i = 0; i < group.children.length; i++) {
-        if (i > 0) {
-          connectors.push(group.operator);
-        }
-        walk(group.children[i]);
-      }
+      return;
     }
+    node.children.forEach((child, i) => {
+      if (i > 0) connectors.push(node.operator);
+      walk(child);
+    });
   };
 
   walk(expr);
   return { conditions, connectors };
 };
-
-/** Map a chip ID (e.g. "chip-2") back to condition index */
-export const chipIdToConditionIndex = (chipId: string): number | null => {
-  const match = chipId.match(/^chip-(\d+)$/);
-  return match ? Number(match[1]) : null;
-};
-
-/** Check if operator supports multi-select */
-export const isMultiSelectOperator = (op: FilterOperator | null): boolean =>
-  op === 'in' || op === 'not_in';

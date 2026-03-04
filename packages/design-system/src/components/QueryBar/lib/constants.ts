@@ -1,5 +1,19 @@
-import type { FieldType, QueryBarChipVariant, FilterOperator } from '../types';
+import type { FieldType, FilterOperator, QueryBarChipVariant } from '../types';
 
+/**
+ * Operators that require no value (unary)
+ */
+export const NO_VALUE_OPERATORS: readonly FilterOperator[] = ['is_null', 'is_not_null'] as const;
+
+/**
+ * Operators that support multi-select values
+ */
+export const MULTI_SELECT_OPERATORS: readonly FilterOperator[] = ['in', 'not_in'] as const;
+
+/**
+ * Pattern to extract condition index from chip ID (e.g. "chip-2" → 2)
+ */
+export const CHIP_ID_PATTERN = /^chip-(\d+)$/;
 
 /**
  * Labels for non-chip filter chip variants (connectors, brackets)

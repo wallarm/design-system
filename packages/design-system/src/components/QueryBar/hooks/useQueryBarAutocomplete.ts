@@ -1,6 +1,6 @@
 import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { getOperatorLabel, isMultiSelectOperator } from '../lib';
+import { chipIdToConditionIndex, getOperatorLabel, isMultiSelectOperator, isNoValueOperator } from '../lib';
 import type { Condition, FieldMetadata, QueryBarChipData, FilterOperator } from '../types';
 import { useChipEditing } from './useChipEditing';
 import { useMenuPositioning } from './useMenuPositioning';
@@ -129,9 +129,7 @@ export const useQueryBarAutocomplete = ({
   };
 
   const handleOperatorSelect = (operator: FilterOperator) => {
-    const noValueOps: FilterOperator[] = ['is_null', 'is_not_null'];
-
-    if (noValueOps.includes(operator)) {
+    if (isNoValueOperator(operator)) {
       const isEditing = !!editing.editingChipId;
       upsertCondition(selectedField!, operator, null, editing.editingChipId);
       resetState(!isEditing);
@@ -229,8 +227,7 @@ export const useQueryBarAutocomplete = ({
   const selectedValues = useMemo(() => {
     if (multiSelectValues.length > 0) return multiSelectValues;
     if (editing.editingChipId && selectedOperator && !isMultiSelectOperator(selectedOperator)) {
-      const match = editing.editingChipId.match(/^chip-(\d+)$/);
-      const idx = match ? Number(match[1]) : null;
+      const idx = chipIdToConditionIndex(editing.editingChipId);
       if (idx !== null) {
         const condition = conditions[idx];
         if (condition?.value != null && !Array.isArray(condition.value)) {
