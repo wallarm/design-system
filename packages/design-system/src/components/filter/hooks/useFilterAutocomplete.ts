@@ -70,6 +70,7 @@ export const useFilterAutocomplete = ({
     setSelectedOperator,
     setMultiSelectValues,
     setMenuState,
+    setMultiSelectValues,
   });
 
   const isBuilding = selectedField !== null && !editing.editingChipId;
@@ -142,9 +143,29 @@ export const useFilterAutocomplete = ({
       return;
     }
 
-    if (editing.tryEditOperator(operator, selectedField!)) {
-      resetState();
-      return;
+    // When editing a chip and changing operator selectivity (single↔multi),
+    // open value menu for re-selection instead of committing incompatible value
+    if (editing.editingChipId) {
+      const condition = conditions.find((_, i) => `chip-${i}` === editing.editingChipId);
+      const wasMulti = Array.isArray(condition?.value);
+      const willBeMulti = isMultiSelectOperator(operator);
+
+      if (wasMulti !== willBeMulti) {
+        // Selectivity changed — reset values and open value menu
+        setMultiSelectValues(willBeMulti && condition
+          ? (Array.isArray(condition.value) ? condition.value : condition.value != null ? [condition.value] : [])
+          : [],
+        );
+        setSelectedOperator(operator);
+        setMenuState('value');
+        return;
+      }
+
+      // Same selectivity — commit immediately
+      if (editing.tryEditOperator(operator, selectedField!)) {
+        resetState();
+        return;
+      }
     }
 
     setSelectedOperator(operator);

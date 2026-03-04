@@ -100,9 +100,12 @@ export const useChipEditing = ({
     const segmentEl = target.closest('[data-slot]') as HTMLElement | null;
     const slot = segmentEl?.getAttribute('data-slot');
 
+    // For attribute, anchor at the chip start; for operator/value, anchor at the segment
+    const chipEl = target.closest('[data-slot="filter-chip"]') as HTMLElement | null;
+    const anchorEl = slot === 'segment-attribute' ? chipEl : segmentEl;
     const containerRect = containerRef.current?.getBoundingClientRect();
-    if (containerRect && segmentEl) {
-      setMenuOffset(segmentEl.getBoundingClientRect().left - containerRect.left);
+    if (containerRect && anchorEl) {
+      setMenuOffset(anchorEl.getBoundingClientRect().left - containerRect.left);
     } else {
       setMenuOffset(0);
     }

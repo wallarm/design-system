@@ -13,8 +13,10 @@ interface UseMenuPositioningOptions {
 
 /**
  * Manages dropdown menu positioning relative to the active chip or input.
- * Computes a horizontal offset so the dropdown aligns with the building chip
- * or the clicked chip segment.
+ * Computes a horizontal offset so the dropdown aligns with:
+ * - The input element (when selecting a field, before building chip exists)
+ * - The building chip (when selecting operator/value during chip creation)
+ * - The clicked chip segment (when editing an existing chip)
  */
 export const useMenuPositioning = ({
   containerRef,

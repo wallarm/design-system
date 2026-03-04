@@ -2,141 +2,105 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import type { FilterDropdownItem } from '../types';
 
 interface UseKeyboardNavOptions {
-  /** All navigable items (flattened from sections) */
   items: FilterDropdownItem[];
-  /** Whether the dropdown is open */
   open: boolean;
-  /** Callback when item is selected */
   onSelect: (item: FilterDropdownItem) => void;
-  /** Callback when dropdown should close */
   onClose?: () => void;
 }
 
-interface UseKeyboardNavReturn {
-  /** Current active item index */
-  activeIndex: number;
-  /** Set active index */
-  setActiveIndex: (index: number) => void;
-  /** Value to pass as highlightedValue to DropdownMenu */
-  highlightedValue: string | null;
-  /** Handler for DropdownMenu onHighlightChange — syncs mouse hover with activeIndex */
-  onHighlightChange: (details: { highlightedValue: string | null }) => void;
-}
-
 /**
- * Hook for keyboard navigation in dropdown menus.
+ * Keyboard navigation for filter dropdown menus.
  *
- * Uses a **capture-phase** listener on `window` so it fires before
- * Ark UI's onKeyDown on Menu.Content. Calls `stopPropagation()` to
- * prevent Ark UI from double-handling ArrowUp/Down/Enter/Escape.
+ * Uses a capture-phase listener on `window` to intercept ArrowUp/Down/Enter/Escape
+ * before Ark UI Menu handles them (Menu.Content steals focus from the input).
  *
- * Syncs with Ark UI's highlight via `highlightedValue` / `onHighlightChange`
- * so both keyboard and mouse interactions show visual highlight.
+ * Syncs with Ark UI's highlight system via `highlightedValue` / `onHighlightChange`.
  */
 export const useKeyboardNav = ({
   items,
   open,
   onSelect,
   onClose,
-}: UseKeyboardNavOptions): UseKeyboardNavReturn => {
+}: UseKeyboardNavOptions) => {
   const [activeIndex, setActiveIndex] = useState(0);
 
-  // Keep fresh references without re-registering the effect
-  const itemsRef = useRef(items);
-  const onSelectRef = useRef(onSelect);
-  const onCloseRef = useRef(onClose);
-  const activeIndexRef = useRef(activeIndex);
+  // Single ref object to avoid re-registering the effect on every render
+  const stateRef = useRef({ items, onSelect, onClose, activeIndex });
+  stateRef.current = { items, onSelect, onClose, activeIndex };
 
-  itemsRef.current = items;
-  onSelectRef.current = onSelect;
-  onCloseRef.current = onClose;
-  activeIndexRef.current = activeIndex;
-
-  // Reset activeIndex when menu opens
+  // Reset highlight when menu opens
   const prevOpenRef = useRef(open);
   useEffect(() => {
-    if (open && !prevOpenRef.current) {
-      setActiveIndex(0);
-    }
+    if (open && !prevOpenRef.current) setActiveIndex(0);
     prevOpenRef.current = open;
   }, [open]);
 
-  // Keyboard event handler — capture phase to intercept before Ark UI
+  // Navigate to next enabled item in given direction (+1 or -1)
+  const navigate = useCallback((direction: 1 | -1) => {
+    setActiveIndex(prev => {
+      const { items: list } = stateRef.current;
+      const total = list.length;
+      if (total === 0) return prev;
+
+      let next = (prev + direction + total) % total;
+      // Skip disabled items (with safety to avoid infinite loop)
+      let attempts = total;
+      while (list[next]?.disabled && --attempts > 0) {
+        next = (next + direction + total) % total;
+      }
+      return next;
+    });
+  }, []);
+
+  // Capture-phase keydown — fires before Ark UI's handler on Menu.Content
   useEffect(() => {
     if (!open) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      const currentItems = itemsRef.current;
-      const total = currentItems.length;
-      if (total === 0) return;
+      const { items: list, onSelect: select, onClose: close, activeIndex: idx } = stateRef.current;
+      if (list.length === 0) return;
 
       switch (e.key) {
         case 'ArrowDown':
           e.preventDefault();
           e.stopPropagation();
-          setActiveIndex(prev => {
-            let next = (prev + 1) % total;
-            while (currentItems[next]?.disabled && next !== prev) {
-              next = (next + 1) % total;
-            }
-            return next;
-          });
+          navigate(1);
           break;
 
         case 'ArrowUp':
           e.preventDefault();
           e.stopPropagation();
-          setActiveIndex(prev => {
-            let next = (prev - 1 + total) % total;
-            while (currentItems[next]?.disabled && next !== prev) {
-              next = (next - 1 + total) % total;
-            }
-            return next;
-          });
+          navigate(-1);
           break;
 
-        case 'Enter':
+        case 'Enter': {
           e.preventDefault();
           e.stopPropagation();
-          {
-            const idx = activeIndexRef.current;
-            if (idx >= 0 && idx < total) {
-              const item = currentItems[idx];
-              if (item && !item.disabled) {
-                onSelectRef.current(item);
-              }
-            }
-          }
+          const item = list[idx];
+          if (item && !item.disabled) select(item);
           break;
+        }
 
         case 'Escape':
           e.preventDefault();
           e.stopPropagation();
-          onCloseRef.current?.();
+          close?.();
           break;
       }
     };
 
-    // Capture phase: fires before Ark UI's handler on Menu.Content
     window.addEventListener('keydown', handleKeyDown, true);
     return () => window.removeEventListener('keydown', handleKeyDown, true);
-  }, [open]);
+  }, [open, navigate]);
 
-  // Sync Ark UI's mouse-driven highlight with our activeIndex
+  // Sync mouse hover highlight with keyboard activeIndex
   const onHighlightChange = useCallback((details: { highlightedValue: string | null }) => {
     if (!details.highlightedValue) return;
-    const idx = itemsRef.current.findIndex(item => item.id === details.highlightedValue);
-    if (idx >= 0) {
-      setActiveIndex(idx);
-    }
+    const idx = stateRef.current.items.findIndex(item => item.id === details.highlightedValue);
+    if (idx >= 0) setActiveIndex(idx);
   }, []);
 
   const highlightedValue = items[activeIndex]?.id ?? null;
 
-  return {
-    activeIndex,
-    setActiveIndex,
-    highlightedValue,
-    onHighlightChange,
-  };
+  return { activeIndex, setActiveIndex, highlightedValue, onHighlightChange };
 };
