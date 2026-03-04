@@ -1,3 +1,10 @@
+## 0.5.0 (2026-03-04)
+
+* ci: workflow_dispatch ([6394b9f](https://github.com/wallarm/design-system/commit/6394b9f))
+* 🖼️ Update screenshots ([34604a4](https://github.com/wallarm/design-system/commit/34604a4))
+* chore: screenshot trigger [update-screenshots] ([e2aa533](https://github.com/wallarm/design-system/commit/e2aa533))
+* feat: Tour component (#17) ([517035f](https://github.com/wallarm/design-system/commit/517035f)), closes [#17](https://github.com/wallarm/design-system/issues/17)
+
 ## <small>0.4.2 (2026-03-02)</small>
 
 * docs: e2e test rules (#19) ([4feaa55](https://github.com/wallarm/design-system/commit/4feaa55)), closes [#19](https://github.com/wallarm/design-system/issues/19)
