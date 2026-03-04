@@ -80,7 +80,7 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
     [values],
   );
 
-  const { highlightedValue, onHighlightChange } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange, pendingIds } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: item => onSelect(item.value),
@@ -101,12 +101,14 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
         <DropdownMenuGroup>
           {values.map(option => {
             const isChecked = selectedValues.includes(option.value);
+            const isPending = pendingIds.has(String(option.value));
 
             return (
               <DropdownMenuItem
                 key={String(option.value)}
                 value={String(option.value)}
                 onSelect={() => onSelect(option.value)}
+                style={isPending ? { backgroundColor: 'var(--color-states-primary-hover)' } : undefined}
               >
                 {/* Badge */}
                 {option.badge ? (
@@ -145,22 +147,31 @@ export const FilterValueMenu: FC<FilterValueMenuProps> = ({
           })}
         </DropdownMenuGroup>
         <DropdownMenuFooter>
-          <span className='flex items-center gap-4'>
-            <KbdGroup>
-              <Kbd>↑</Kbd>
-              <Kbd>↓</Kbd>
-            </KbdGroup>
-            to navigate
-          </span>
-          <span className='flex items-center gap-4'>
-            <KbdGroup><Kbd>↵</Kbd></KbdGroup>
-            to select
-          </span>
-          {multiSelect && (
-            <span className='flex items-center gap-4'>
-              <KbdGroup><Kbd>↵</Kbd></KbdGroup>
-              to select more
-            </span>
+          {multiSelect ? (
+            <>
+              <span className='flex items-center gap-4'>
+                <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+                to select
+              </span>
+              <span className='flex items-center gap-4'>
+                <KbdGroup><Kbd>⌘</Kbd><Kbd>↑</Kbd><Kbd>↓</Kbd></KbdGroup>
+                to multi-select
+              </span>
+            </>
+          ) : (
+            <>
+              <span className='flex items-center gap-4'>
+                <KbdGroup>
+                  <Kbd>↑</Kbd>
+                  <Kbd>↓</Kbd>
+                </KbdGroup>
+                to navigate
+              </span>
+              <span className='flex items-center gap-4'>
+                <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+                to select
+              </span>
+            </>
           )}
         </DropdownMenuFooter>
       </DropdownMenuContent>

@@ -1,4 +1,6 @@
 // Components
+export { BuildingFilterChip, type BuildingFilterChipProps } from './BuildingFilterChip';
+export { ConnectorChip, type ConnectorChipProps, type ConnectorVariant } from './ConnectorChip';
 export { FilterChip, type FilterChipProps } from './FilterChip';
 export { FilterField, type FilterFieldProps } from './FilterField';
 export { FilterMainMenu, type FilterMainMenuProps } from './FilterMainMenu';

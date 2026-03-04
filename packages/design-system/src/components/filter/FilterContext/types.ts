@@ -2,7 +2,6 @@ import type { ChangeEvent, KeyboardEvent, MouseEvent as ReactMouseEvent, Ref } f
 import type { FilterChipData } from '../types';
 
 export interface BuildingChipData {
-  variant: 'chip';
   attribute: string;
   operator?: string;
   value?: string;

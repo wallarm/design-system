@@ -1,5 +1,7 @@
 import * as React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
+import { BuildingFilterChip } from '../BuildingFilterChip';
+import { ConnectorChip } from '../ConnectorChip';
 import { FilterChip } from '../FilterChip';
 import type { FilterChipProps } from '../FilterChip';
 
@@ -8,22 +10,17 @@ const meta = {
   component: FilterChip,
   tags: ['autodocs'],
   argTypes: {
-    variant: {
-      control: 'select',
-      options: ['chip', 'and', 'or', '(', ')'],
-      description: 'The variant of the filter chip',
-    },
     attribute: {
       control: 'text',
-      description: 'The attribute name (for chip variant)',
+      description: 'The attribute name',
     },
     operator: {
       control: 'text',
-      description: 'The operator (for chip variant)',
+      description: 'The operator',
     },
     value: {
       control: 'text',
-      description: 'The value (for chip variant)',
+      description: 'The value',
     },
     error: {
       control: 'boolean',
@@ -41,7 +38,6 @@ const Template: StoryFn<typeof meta> = (args: FilterChipProps) => <FilterChip {.
  */
 export const Default = Template.bind({});
 Default.args = {
-  variant: 'chip',
   attribute: 'Attribute',
   operator: 'operator',
   value: 'Value',
@@ -53,7 +49,6 @@ Default.args = {
  */
 export const WithError = Template.bind({});
 WithError.args = {
-  variant: 'chip',
   attribute: 'Attribute',
   operator: 'operator',
   value: 'Value',
@@ -65,7 +60,6 @@ WithError.args = {
  */
 export const WithLongText = Template.bind({});
 WithLongText.args = {
-  variant: 'chip',
   attribute: 'Very Long Attribute Name That Should Truncate',
   operator: 'is',
   value: 'Very Long Value That Should Also Truncate With Ellipsis',
@@ -77,7 +71,6 @@ WithLongText.args = {
  */
 export const RealisticExample = Template.bind({});
 RealisticExample.args = {
-  variant: 'chip',
   attribute: 'IP Address',
   operator: 'is',
   value: '192.168.1.1',
@@ -87,70 +80,58 @@ RealisticExample.args = {
 /**
  * AND logical operator variant
  */
-export const AndOperator = Template.bind({});
-AndOperator.args = {
-  variant: 'and',
-};
+export const AndOperator: StoryFn = () => <ConnectorChip variant='and' />;
 
 /**
  * OR logical operator variant
  */
-export const OrOperator = Template.bind({});
-OrOperator.args = {
-  variant: 'or',
-};
+export const OrOperator: StoryFn = () => <ConnectorChip variant='or' />;
 
 /**
  * Combined example showing chip + AND + chip
  */
-export const CombinedWithAnd: StoryFn<typeof meta> = () => (
+export const CombinedWithAnd: StoryFn = () => (
   <div className='flex items-center gap-4'>
-    <FilterChip variant='chip' attribute='IP Address' operator='is' value='192.168.1.1' />
-    <FilterChip variant='and' />
-    <FilterChip variant='chip' attribute='Country' operator='is' value='US' />
+    <FilterChip attribute='IP Address' operator='is' value='192.168.1.1' />
+    <ConnectorChip variant='and' />
+    <FilterChip attribute='Country' operator='is' value='US' />
   </div>
 );
 
 /**
  * Combined example showing chip + OR + chip
  */
-export const CombinedWithOr: StoryFn<typeof meta> = () => (
+export const CombinedWithOr: StoryFn = () => (
   <div className='flex items-center gap-4'>
-    <FilterChip variant='chip' attribute='Status' operator='is' value='Active' />
-    <FilterChip variant='or' />
-    <FilterChip variant='chip' attribute='Status' operator='is' value='Pending' />
+    <FilterChip attribute='Status' operator='is' value='Active' />
+    <ConnectorChip variant='or' />
+    <FilterChip attribute='Status' operator='is' value='Pending' />
   </div>
 );
 
 /**
  * Opening parenthesis variant
  */
-export const OpeningParenthesis = Template.bind({});
-OpeningParenthesis.args = {
-  variant: '(',
-};
+export const OpeningParenthesis: StoryFn = () => <ConnectorChip variant='(' />;
 
 /**
  * Closing parenthesis variant
  */
-export const ClosingParenthesis = Template.bind({});
-ClosingParenthesis.args = {
-  variant: ')',
-};
+export const ClosingParenthesis: StoryFn = () => <ConnectorChip variant=')' />;
 
 /**
  * Combined example showing grouped conditions with parentheses
  * Example: (IP is 192.168.1.1 OR IP is 10.0.0.1) AND Country is US
  */
-export const CombinedWithParentheses: StoryFn<typeof meta> = () => (
+export const CombinedWithParentheses: StoryFn = () => (
   <div className='flex items-center gap-4'>
-    <FilterChip variant='(' />
-    <FilterChip variant='chip' attribute='IP Address' operator='is' value='192.168.1.1' />
-    <FilterChip variant='or' />
-    <FilterChip variant='chip' attribute='IP Address' operator='is' value='10.0.0.1' />
-    <FilterChip variant=')' />
-    <FilterChip variant='and' />
-    <FilterChip variant='chip' attribute='Country' operator='is' value='US' />
+    <ConnectorChip variant='(' />
+    <FilterChip attribute='IP Address' operator='is' value='192.168.1.1' />
+    <ConnectorChip variant='or' />
+    <FilterChip attribute='IP Address' operator='is' value='10.0.0.1' />
+    <ConnectorChip variant=')' />
+    <ConnectorChip variant='and' />
+    <FilterChip attribute='Country' operator='is' value='US' />
   </div>
 );
 
@@ -159,7 +140,6 @@ export const CombinedWithParentheses: StoryFn<typeof meta> = () => (
  */
 export const WithDeleteButton = Template.bind({});
 WithDeleteButton.args = {
-  variant: 'chip',
   attribute: 'IP Address',
   operator: 'is',
   value: '192.168.1.1',
@@ -172,7 +152,6 @@ WithDeleteButton.args = {
  */
 export const ErrorWithDelete = Template.bind({});
 ErrorWithDelete.args = {
-  variant: 'chip',
   attribute: 'Invalid Field',
   operator: 'is',
   value: 'Invalid Value',
@@ -183,7 +162,7 @@ ErrorWithDelete.args = {
 /**
  * Interactive example showing multiple chips with delete functionality
  */
-export const InteractiveDeleteExample: StoryFn<typeof meta> = () => {
+export const InteractiveDeleteExample: StoryFn = () => {
   const [chips, setChips] = React.useState([
     { id: 1, attribute: 'IP Address', operator: 'is', value: '192.168.1.1' },
     { id: 2, attribute: 'Country', operator: 'is', value: 'US' },
@@ -194,9 +173,8 @@ export const InteractiveDeleteExample: StoryFn<typeof meta> = () => {
     <div className='flex items-center gap-4 flex-wrap'>
       {chips.map((chip, index) => (
         <React.Fragment key={chip.id}>
-          {index > 0 && <FilterChip variant='and' />}
+          {index > 0 && <ConnectorChip variant='and' />}
           <FilterChip
-            variant='chip'
             attribute={chip.attribute}
             operator={chip.operator}
             value={chip.value}
@@ -210,132 +188,53 @@ export const InteractiveDeleteExample: StoryFn<typeof meta> = () => {
 };
 
 // ============================================================================
-// AND Operator Variants - All States
+// Connector Variants - All States
 // ============================================================================
 
 /**
  * AND operator with error state
  */
-export const AndOperatorError = Template.bind({});
-AndOperatorError.args = {
-  variant: 'and',
-  error: true,
-};
-
-/**
- * AND operator with hover state (hover to see delete button)
- */
-export const AndOperatorHover = Template.bind({});
-AndOperatorHover.args = {
-  variant: 'and',
-  onRemove: () => alert('AND removed'),
-};
-
-/**
- * AND operator with error and hover state (hover to see delete button)
- */
-export const AndOperatorErrorHover = Template.bind({});
-AndOperatorErrorHover.args = {
-  variant: 'and',
-  error: true,
-  onRemove: () => alert('AND removed'),
-};
-
-// ============================================================================
-// OR Operator Variants - All States
-// ============================================================================
+export const AndOperatorError: StoryFn = () => <ConnectorChip variant='and' error />;
 
 /**
  * OR operator with error state
  */
-export const OrOperatorError = Template.bind({});
-OrOperatorError.args = {
-  variant: 'or',
-  error: true,
-};
-
-/**
- * OR operator with hover state (hover to see delete button)
- */
-export const OrOperatorHover = Template.bind({});
-OrOperatorHover.args = {
-  variant: 'or',
-  onRemove: () => alert('OR removed'),
-};
-
-/**
- * OR operator with error and hover state (hover to see delete button)
- */
-export const OrOperatorErrorHover = Template.bind({});
-OrOperatorErrorHover.args = {
-  variant: 'or',
-  error: true,
-  onRemove: () => alert('OR removed'),
-};
-
-// ============================================================================
-// Opening Parenthesis Variants - All States
-// ============================================================================
+export const OrOperatorError: StoryFn = () => <ConnectorChip variant='or' error />;
 
 /**
  * Opening parenthesis with error state
  */
-export const OpeningParenthesisError = Template.bind({});
-OpeningParenthesisError.args = {
-  variant: '(',
-  error: true,
-};
-
-/**
- * Opening parenthesis with hover state (hover to see delete button)
- */
-export const OpeningParenthesisHover = Template.bind({});
-OpeningParenthesisHover.args = {
-  variant: '(',
-  onRemove: () => alert('( removed'),
-};
-
-/**
- * Opening parenthesis with error and hover state (hover to see delete button)
- */
-export const OpeningParenthesisErrorHover = Template.bind({});
-OpeningParenthesisErrorHover.args = {
-  variant: '(',
-  error: true,
-  onRemove: () => alert('( removed'),
-};
-
-// ============================================================================
-// Closing Parenthesis Variants - All States
-// ============================================================================
+export const OpeningParenthesisError: StoryFn = () => <ConnectorChip variant='(' error />;
 
 /**
  * Closing parenthesis with error state
  */
-export const ClosingParenthesisError = Template.bind({});
-ClosingParenthesisError.args = {
-  variant: ')',
-  error: true,
-};
+export const ClosingParenthesisError: StoryFn = () => <ConnectorChip variant=')' error />;
+
+// ============================================================================
+// Building Chip Variants
+// ============================================================================
 
 /**
- * Closing parenthesis with hover state (hover to see delete button)
+ * Building chip — only attribute selected
  */
-export const ClosingParenthesisHover = Template.bind({});
-ClosingParenthesisHover.args = {
-  variant: ')',
-  onRemove: () => alert(') removed'),
-};
+export const BuildingAttributeOnly: StoryFn = () => (
+  <BuildingFilterChip attribute='IP Address' />
+);
 
 /**
- * Closing parenthesis with error and hover state (hover to see delete button)
+ * Building chip — attribute + operator selected
  */
-export const ClosingParenthesisErrorHover = Template.bind({});
-ClosingParenthesisErrorHover.args = {
-  variant: ')',
-  error: true,
-  onRemove: () => alert(') removed'),
-};
+export const BuildingWithOperator: StoryFn = () => (
+  <BuildingFilterChip attribute='IP Address' operator='is' />
+);
+
+/**
+ * Building chip — attribute + operator + value (about to commit)
+ */
+export const BuildingComplete: StoryFn = () => (
+  <BuildingFilterChip attribute='IP Address' operator='is' value='192.168.1.1' />
+);
 
 // ============================================================================
 // All States Showcase
@@ -344,51 +243,37 @@ ClosingParenthesisErrorHover.args = {
 /**
  * Showcase of all FilterChip variants and states
  */
-export const AllStatesShowcase: StoryFn<typeof meta> = () => (
+export const AllStatesShowcase: StoryFn = () => (
   <div className='flex flex-col gap-4'>
     {/* Chip variants */}
     <div>
-      <h3 className='text-sm font-medium text-text-primary mb-2'>Chip Variant</h3>
+      <h3 className='text-sm font-medium text-text-primary mb-2'>Filter Chip</h3>
       <div className='flex items-center gap-2 flex-wrap'>
-        <FilterChip variant='chip' attribute='Attribute' operator='operator' value='Value' />
-        <FilterChip variant='chip' attribute='Attribute' operator='operator' value='Value' error />
-        <FilterChip
-          variant='chip'
-          attribute='Attribute'
-          operator='operator'
-          value='Value'
-          onRemove={() => {}}
-        />
-        <FilterChip
-          variant='chip'
-          attribute='Attribute'
-          operator='operator'
-          value='Value'
-          error
-          onRemove={() => {}}
-        />
+        <FilterChip attribute='Attribute' operator='operator' value='Value' />
+        <FilterChip attribute='Attribute' operator='operator' value='Value' error />
+        <FilterChip attribute='Attribute' operator='operator' value='Value' onRemove={() => {}} />
+        <FilterChip attribute='Attribute' operator='operator' value='Value' error onRemove={() => {}} />
       </div>
     </div>
 
-    {/* AND variants */}
+    {/* Building chip variants */}
     <div>
-      <h3 className='text-sm font-medium text-text-primary mb-2'>AND Operator</h3>
+      <h3 className='text-sm font-medium text-text-primary mb-2'>Building Chip</h3>
       <div className='flex items-center gap-2 flex-wrap'>
-        <FilterChip variant='and' />
-        <FilterChip variant='and' error />
-        <FilterChip variant='and' onRemove={() => {}} />
-        <FilterChip variant='and' error onRemove={() => {}} />
+        <BuildingFilterChip attribute='IP Address' />
+        <BuildingFilterChip attribute='IP Address' operator='is' />
+        <BuildingFilterChip attribute='IP Address' operator='is' value='192.168.1.1' />
       </div>
     </div>
 
-    {/* OR variants */}
+    {/* Connector variants */}
     <div>
-      <h3 className='text-sm font-medium text-text-primary mb-2'>OR Operator</h3>
+      <h3 className='text-sm font-medium text-text-primary mb-2'>Connectors</h3>
       <div className='flex items-center gap-2 flex-wrap'>
-        <FilterChip variant='or' />
-        <FilterChip variant='or' error />
-        <FilterChip variant='or' onRemove={() => {}} />
-        <FilterChip variant='or' error onRemove={() => {}} />
+        <ConnectorChip variant='and' />
+        <ConnectorChip variant='and' error />
+        <ConnectorChip variant='or' />
+        <ConnectorChip variant='or' error />
       </div>
     </div>
 
@@ -396,14 +281,10 @@ export const AllStatesShowcase: StoryFn<typeof meta> = () => (
     <div>
       <h3 className='text-sm font-medium text-text-primary mb-2'>Parentheses</h3>
       <div className='flex items-center gap-2 flex-wrap'>
-        <FilterChip variant='(' />
-        <FilterChip variant='(' error />
-        <FilterChip variant='(' onRemove={() => {}} />
-        <FilterChip variant='(' error onRemove={() => {}} />
-        <FilterChip variant=')' />
-        <FilterChip variant=')' error />
-        <FilterChip variant=')' onRemove={() => {}} />
-        <FilterChip variant=')' error onRemove={() => {}} />
+        <ConnectorChip variant='(' />
+        <ConnectorChip variant='(' error />
+        <ConnectorChip variant=')' />
+        <ConnectorChip variant=')' error />
       </div>
     </div>
   </div>

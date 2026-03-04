@@ -70,7 +70,6 @@ export const useFilterAutocomplete = ({
     setSelectedOperator,
     setMultiSelectValues,
     setMenuState,
-    setMultiSelectValues,
   });
 
   const isBuilding = selectedField !== null && !editing.editingChipId;
@@ -260,7 +259,6 @@ export const useFilterAutocomplete = ({
     : undefined;
 
   const buildingChipData = isBuilding ? {
-    variant: 'chip' as const,
     attribute: selectedField!.label,
     operator: selectedOperator ? getOperatorLabel(selectedOperator, selectedField!.type) : undefined,
     value: buildingMultiValue,
