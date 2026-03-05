@@ -22,7 +22,7 @@ export const linkVariants = cva(
         medium: 'font-medium',
       },
       disabled: {
-        true: 'pointer-events-none !text-text-tertiary cursor-default !decoration-transparent',
+        true: '!text-text-tertiary !cursor-not-allowed !decoration-transparent hover:!decoration-transparent',
       },
     },
   },

@@ -147,23 +147,7 @@ export const TableSettingsMenu: FC = () => {
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent
-                className={cn('min-w-256')}
-                footer={
-                  <DropdownMenuFooter>
-                    <Button
-                      variant='ghost'
-                      color='neutral'
-                      size='small'
-                      onClick={handleReset}
-                      disabled={isDefaultState}
-                      fullWidth
-                    >
-                      Reset to default
-                    </Button>
-                  </DropdownMenuFooter>
-                }
-              >
+              <DropdownMenuContent className={cn('min-w-256')}>
                 <VStack gap={8} align='stretch'>
                   <Input
                     placeholder='Search'
@@ -206,6 +190,18 @@ export const TableSettingsMenu: FC = () => {
                     </DndContext>
                   </VStack>
                 </VStack>
+                <DropdownMenuFooter>
+                  <Button
+                    variant='ghost'
+                    color='neutral'
+                    size='small'
+                    onClick={handleReset}
+                    disabled={isDefaultState}
+                    fullWidth
+                  >
+                    Reset to default
+                  </Button>
+                </DropdownMenuFooter>
               </DropdownMenuContent>
             </DropdownMenu>
           </span>

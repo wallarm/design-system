@@ -1,4 +1,4 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import type { FC, HTMLAttributes, Ref } from 'react';
 import { isValid } from 'date-fns';
 import { cn } from '../../utils/cn';
 import {
@@ -17,8 +17,6 @@ interface DateTimeBaseProps {
   value: string | Date | number | null | undefined;
   /** Display format. Default: 'relative' */
   format?: DateTimeFormat;
-  /** Secondary text below the date */
-  description?: ReactNode;
   /** Show seconds in tooltip absolute time. Default: true */
   showSeconds?: boolean;
   ref?: Ref<HTMLTimeElement>;
@@ -36,7 +34,6 @@ const toDate = (value: string | Date | number): Date => {
 export const DateTime: FC<DateTimeProps> = ({
   value,
   format = 'relative',
-  description,
   showSeconds = true,
   ref,
   ...props
@@ -95,7 +92,7 @@ export const DateTime: FC<DateTimeProps> = ({
     );
   }
 
-  // Datetime: date + time (or description) in two lines
+  // Datetime: date + time in two lines
   if (format === 'datetime') {
     return (
       <Tooltip>
@@ -109,7 +106,7 @@ export const DateTime: FC<DateTimeProps> = ({
           >
             <Text size='sm'>{formatAbsoluteDate(date)}</Text>
             <Text size='sm' color='secondary'>
-              {description ?? formatTimeOnly(date)}
+              {formatTimeOnly(date)}
             </Text>
           </time>
         </TooltipTrigger>
@@ -118,7 +115,7 @@ export const DateTime: FC<DateTimeProps> = ({
     );
   }
 
-  // Date: absolute date, optional description
+  // Date: absolute date
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -130,11 +127,6 @@ export const DateTime: FC<DateTimeProps> = ({
           {...props}
         >
           <Text size='sm'>{formatAbsoluteDate(date)}</Text>
-          {description && (
-            <Text size='sm' color='secondary'>
-              {description}
-            </Text>
-          )}
         </time>
       </TooltipTrigger>
       <TooltipContent>{tooltipText}</TooltipContent>

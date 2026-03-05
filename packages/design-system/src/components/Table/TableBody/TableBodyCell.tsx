@@ -55,7 +55,7 @@ export const TableBodyCell = <T,>({
         ...pinningStyles,
         width: cell.column.getSize(),
         ...dndStyle,
-        overflow: isCut ? 'hidden' : 'visible',
+        ...(isCut && { overflow: 'hidden' }),
       }}
       colSpan={colSpan}
     >
@@ -64,9 +64,7 @@ export const TableBodyCell = <T,>({
           {content}
         </div>
       ) : (
-        <div className='flex flex-wrap [&_*]:flex-wrap [&_*]:min-w-0 [&_*]:truncate [.text-right>&]:justify-end'>
-          {content}
-        </div>
+        content
       )}
     </Td>
   );

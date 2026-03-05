@@ -107,8 +107,18 @@ export const DatetimeFormat: StoryFn<typeof meta> = () => (
 
 export const WithDescription: StoryFn<typeof meta> = () => (
   <VStack gap={12} align='start'>
-    <DateTime value='2026-01-01T00:00:00' format='date' description='Created by admin' />
-    <DateTime value='2026-02-11T14:32:07' format='datetime' description='Last modified' />
+    <VStack>
+      <DateTime value='2026-01-01T00:00:00' format='date' />
+      <Text size='sm' color='secondary'>
+        Created by admin
+      </Text>
+    </VStack>
+    <VStack>
+      <DateTime value='2026-02-11T14:32:07' format='date' />
+      <Text size='sm' color='secondary'>
+        Last modified
+      </Text>
+    </VStack>
   </VStack>
 );
 

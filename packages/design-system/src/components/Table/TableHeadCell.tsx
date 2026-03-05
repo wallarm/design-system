@@ -72,14 +72,13 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
   const ariaSort =
     sortDirection === 'asc' ? 'ascending' : sortDirection === 'desc' ? 'descending' : undefined;
 
-  const titleNode = isTooltipDescription ? (
-    <span className='decoration-dashed underline underline-offset-2 truncate'>
-      <Text size='xs' weight='medium' truncate>
-        {content}
-      </Text>
-    </span>
-  ) : (
-    <Text size='xs' weight='medium' truncate>
+  const titleNode = (
+    <Text
+      size='xs'
+      weight='medium'
+      truncate
+      decoration={isTooltipDescription ? 'dashed' : undefined}
+    >
       {content}
     </Text>
   );

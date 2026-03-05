@@ -375,23 +375,20 @@ export const WithFooter: StoryFn<typeof meta> = () => (
         Open
       </Button>
     </DropdownMenuTrigger>
-    <DropdownMenuContent
-      footer={
-        <DropdownMenuFooter>
-          <span>Footer is WIP Hotkey</span>
-          <span className='flex items-center gap-8'>
-            <KbdGroup>
-              <Kbd>⌘</Kbd>
-              <Kbd>⌘</Kbd>
-            </KbdGroup>
-          </span>
-        </DropdownMenuFooter>
-      }
-    >
+    <DropdownMenuContent>
       <DropdownMenuItem>Filter A</DropdownMenuItem>
       <DropdownMenuItem>Filter B</DropdownMenuItem>
       <DropdownMenuItem>Filter C</DropdownMenuItem>
       <DropdownMenuItem>Filter D</DropdownMenuItem>
+      <DropdownMenuFooter>
+        <span>Footer is WIP Hotkey</span>
+        <span className='flex items-center gap-8'>
+          <KbdGroup>
+            <Kbd>⌘</Kbd>
+            <Kbd>⌘</Kbd>
+          </KbdGroup>
+        </span>
+      </DropdownMenuFooter>
     </DropdownMenuContent>
   </DropdownMenu>
 );
