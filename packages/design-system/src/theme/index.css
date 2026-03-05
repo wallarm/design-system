@@ -16,6 +16,7 @@
 @import './components/drawer.css';
 @import './components/dialog.css';
 @import './components/tour.css';
+@import './components/skeleton.css';
 
 [data-scope='scroll-area'][data-part='viewport'] {
     scrollbar-width: none;

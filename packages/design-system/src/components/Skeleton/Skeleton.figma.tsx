@@ -6,10 +6,7 @@ const figmaNodeUrl =
 
 figma.connect(Skeleton, figmaNodeUrl, {
   props: {
-    animated: figma.boolean('Animated'),
     transparent: figma.boolean('Transparent'),
   },
-  example: ({ animated, transparent }) => (
-    <Skeleton animated={animated} transparent={transparent} />
-  ),
+  example: ({ transparent }) => <Skeleton width='100%' height='20px' transparent={transparent} />,
 });

@@ -20,7 +20,7 @@ export const TableLoadingState: FC = () => {
                 className='px-16 py-8 border-b border-r border-border-primary-light'
                 style={{ width: column.getSize() }}
               >
-                <Skeleton className='h-20 w-full' />
+                <Skeleton width='100%' height='20px' />
               </Td>
             ))}
           </Tr>
