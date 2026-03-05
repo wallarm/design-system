@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { QueryBarConnectorChip, QueryBarChip } from '../QueryBarChip';
+import { QueryBarConnectorChip, QueryBarChip } from '../QueryBarInput';
 
 describe('QueryBarChip', () => {
   it('renders chip with attribute, operator, and value', () => {

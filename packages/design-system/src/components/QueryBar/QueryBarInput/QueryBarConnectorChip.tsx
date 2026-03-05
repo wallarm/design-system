@@ -2,7 +2,7 @@ import type { FC, HTMLAttributes } from 'react';
 import { cn } from '../../../utils/cn';
 import { VARIANT_LABELS } from '../lib/constants';
 import type { QueryBarChipVariant } from '../types';
-import { chipVariants } from './classes';
+import { chipVariants } from './QueryBarChip/classes';
 
 export type ConnectorVariant = Exclude<QueryBarChipVariant, 'chip'>;
 

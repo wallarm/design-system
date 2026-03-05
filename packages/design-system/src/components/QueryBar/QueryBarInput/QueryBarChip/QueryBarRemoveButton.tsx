@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { X } from '../../../icons/X';
+import { X } from '../../../../icons/X';
 import { removeButtonVariants } from './classes';
 
 export const QueryBarRemoveButton: FC<{ error: boolean; onRemove: () => void }> = ({ error, onRemove }) => (

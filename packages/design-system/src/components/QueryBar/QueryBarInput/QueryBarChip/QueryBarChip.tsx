@@ -1,6 +1,6 @@
 import type { FC, HTMLAttributes, MouseEvent as ReactMouseEvent } from 'react';
 import { useCallback, useRef, useState } from 'react';
-import { cn } from '../../../utils/cn';
+import { cn } from '../../../../utils/cn';
 import { chipVariants } from './classes';
 import { QueryBarRemoveButton } from './QueryBarRemoveButton';
 import { Segment } from './Segment';

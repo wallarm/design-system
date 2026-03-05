@@ -1,5 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Segment } from '../QueryBarChip/Segment';
+import { Segment } from '../QueryBarInput';
 
 const meta = {
   title: 'QueryBar/Segments/Segment',

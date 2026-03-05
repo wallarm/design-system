@@ -1,6 +1,6 @@
 import type { ChangeEvent, KeyboardEvent, Ref } from 'react';
 import type { QueryBarChipData } from '../types';
-import type { ChipSegment } from '../QueryBarChip/QueryBarChip';
+import type { ChipSegment } from '../QueryBarInput/QueryBarChip';
 
 export interface BuildingChipData {
   attribute: string;

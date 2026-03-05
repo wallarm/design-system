@@ -1,5 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
-import { cn } from '../../../utils/cn';
+import { cn } from '../../../../utils/cn';
 
 type SegmentVariant = 'attribute' | 'operator' | 'value';
 

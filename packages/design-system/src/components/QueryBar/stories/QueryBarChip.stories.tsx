@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
-import { QueryBarConnectorChip, QueryBarChip, type QueryBarChipProps } from '../QueryBarChip';
+import { QueryBarConnectorChip, QueryBarChip, type QueryBarChipProps } from '../QueryBarInput';
 
 const meta = {
   title: 'Components/QueryBar/QueryBarChip',

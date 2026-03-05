@@ -1,6 +1,6 @@
 import type { ChangeEvent, KeyboardEvent, RefObject } from 'react';
 import { useMemo } from 'react';
-import type { ChipSegment } from '../QueryBarChip/QueryBarChip';
+import type { ChipSegment } from '../QueryBarInput/QueryBarChip';
 import type { MenuState, QueryBarChipData } from '../types';
 import type { BuildingChipData, QueryBarContextValue } from './types';
 

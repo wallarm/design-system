@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { cn } from '../../../utils/cn';
 import { QueryBarConnectorChip } from './QueryBarConnectorChip';
-import { QueryBarChip } from './QueryBarChip';
+import { QueryBarChip } from './QueryBarChip/QueryBarChip';
 import { useQueryBarContext } from '../QueryBarContext';
 
 export const QueryBarChipList: FC = () => {

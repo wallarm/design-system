@@ -2,7 +2,7 @@ import type { FC, HTMLAttributes } from 'react';
 import { cn } from '../../../utils/cn';
 import { inputVariants } from '../../Input/classes';
 import { useQueryBarContext } from '../QueryBarContext';
-import { QueryBarChipList } from '../QueryBarChip';
+import { QueryBarChipList } from './QueryBarChip';
 import { QueryBarInputActions } from './QueryBarInputActions';
 
 type QueryBarInputProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;

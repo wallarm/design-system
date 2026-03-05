@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
-import { Segment } from '../QueryBarChip/Segment';
+import { Segment } from '../QueryBarInput';
 
 describe('Segment', () => {
   describe('attribute variant', () => {
