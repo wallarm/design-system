@@ -98,7 +98,6 @@ export { Input, type InputProps } from './components/Input';
 export {
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
 } from './components/InputGroup';
 export {
