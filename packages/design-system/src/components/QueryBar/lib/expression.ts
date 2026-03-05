@@ -10,30 +10,34 @@ export const buildExpression = (
   connectors: Array<'and' | 'or'>,
 ): ExprNode | null => {
   if (conditions.length === 0) return null;
-  if (conditions.length === 1) return conditions[0];
+  if (conditions.length === 1) return conditions[0] ?? null;
 
   // Split conditions into AND-groups separated by OR connectors
   // Invariant: connectors.length === conditions.length - 1
+  const first = conditions[0];
+  if (!first) return null;
+
   const orGroups = connectors.reduce<Condition[][]>(
     (groups, connector, i) => {
-      const next = conditions[i + 1]!;
+      const next = conditions[i + 1];
+      if (!next) return groups;
       if (connector === 'or') {
         groups.push([next]);
       } else {
-        groups.at(-1)!.push(next);
+        groups.at(-1)?.push(next);
       }
       return groups;
     },
-    [[conditions[0]!]],
+    [[first]],
   );
 
   // Wrap each AND-group into a node
   const andNodes = orGroups.map<ExprNode>(group =>
-    group.length === 1 ? group[0]! : { type: 'group', operator: 'and', children: group },
+    group.length === 1 && group[0] ? group[0] : { type: 'group', operator: 'and', children: group },
   );
 
-  return andNodes.length === 1
-    ? andNodes[0]!
+  return andNodes.length === 1 && andNodes[0]
+    ? andNodes[0]
     : { type: 'group', operator: 'or', children: andNodes };
 };
 

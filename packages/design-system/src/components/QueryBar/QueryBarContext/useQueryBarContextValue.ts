@@ -63,7 +63,9 @@ export const useQueryBarContextValue = ({
     [
       chips,
       buildingChipData,
+      buildingChipRef,
       inputText,
+      inputRef,
       placeholder,
       error,
       showKeyboardHint,

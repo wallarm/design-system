@@ -8,7 +8,8 @@ const makeConditionChip = (
   fields: FieldMetadata[],
   error: boolean,
 ): QueryBarChipData => {
-  const condition = conditions[i]!;
+  const condition = conditions[i];
+  if (!condition) return { id: `chip-${i}`, variant: 'chip', attribute: '', operator: '', value: '', error } as QueryBarChipData;
   const field = fields.find(f => f.name === condition.field);
 
   let displayValue: string;
@@ -69,7 +70,7 @@ export const buildChips = (
       if (conn === 'or') {
         acc.push([i + 1]);
       } else {
-        acc[acc.length - 1].push(i + 1);
+        acc.at(-1)?.push(i + 1);
       }
       return acc;
     },

@@ -12,5 +12,3 @@ export type { DatePreset } from '../QueryBarMenu/QueryBarDateValueMenu/constants
 export { buildExpression, expressionToConditions } from './expression';
 export { buildChips } from './buildChips';
 export { chipIdToConditionIndex } from './conditions';
-export { parse, parseCondition } from './parser';
-export type { ParseResult } from './parser';
