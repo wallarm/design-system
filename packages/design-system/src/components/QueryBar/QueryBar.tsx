@@ -84,21 +84,12 @@ export const QueryBar: FC<QueryBarProps> = ({
 
   const contextValue = useQueryBarContextValue({
     chips,
-    buildingChipData: autocomplete.buildingChipData,
+    autocomplete,
     buildingChipRef,
-    inputText: autocomplete.inputText,
     inputRef,
     placeholder,
     error,
     showKeyboardHint,
-    menuState: autocomplete.menuState,
-    onInputChange: autocomplete.handleInputChange,
-    onInputKeyDown: autocomplete.handleKeyDown,
-    onInputClick: autocomplete.handleInputClick,
-    onChipClick: autocomplete.handleChipClick,
-    onConnectorClick: autocomplete.handleConnectorClick,
-    onChipRemove: autocomplete.handleChipRemove,
-    onClear: autocomplete.handleClear,
   });
 
   // ── Render ─────────────────────────────────────────────────
@@ -114,24 +105,7 @@ export const QueryBar: FC<QueryBarProps> = ({
         <QueryBarInput {...props} />
       </QueryBarProvider>
 
-      <QueryBarMenu
-        fields={fields}
-        menuState={autocomplete.menuState}
-        selectedField={autocomplete.selectedField}
-        selectedOperator={autocomplete.selectedOperator}
-        menuPositioning={autocomplete.menuPositioning}
-        editingMultiValues={autocomplete.editingMultiValues}
-        editingSingleValue={autocomplete.editingSingleValue}
-        editingDateIsAbsolute={autocomplete.editingDateIsAbsolute}
-        onFieldSelect={autocomplete.handleFieldSelect}
-        onOperatorSelect={autocomplete.handleOperatorSelect}
-        onValueSelect={autocomplete.handleValueSelect}
-        onMultiCommit={autocomplete.handleMultiCommit}
-        onRangeSelect={autocomplete.handleRangeSelect}
-        onMenuClose={autocomplete.handleMenuClose}
-        onMenuDiscard={autocomplete.handleMenuDiscard}
-        onBuildingValueChange={autocomplete.handleBuildingValueChange}
-      />
+      <QueryBarMenu fields={fields} autocomplete={autocomplete} />
     </div>
   );
 };
