@@ -1,3 +1,7 @@
+## 0.6.0 (2026-03-05)
+
+* feat: Skeleton component (#24) ([29ed809](https://github.com/wallarm/design-system/commit/29ed809)), closes [#24](https://github.com/wallarm/design-system/issues/24)
+
 ## 0.5.0 (2026-03-04)
 
 * ci: workflow_dispatch ([6394b9f](https://github.com/wallarm/design-system/commit/6394b9f))
