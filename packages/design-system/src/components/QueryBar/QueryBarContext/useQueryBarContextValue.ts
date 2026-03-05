@@ -1,5 +1,6 @@
-import type { ChangeEvent, KeyboardEvent, MouseEvent as ReactMouseEvent, RefObject } from 'react';
+import type { ChangeEvent, KeyboardEvent, RefObject } from 'react';
 import { useMemo } from 'react';
+import type { ChipSegment } from '../QueryBarChip/QueryBarChip';
 import type { MenuState, QueryBarChipData } from '../types';
 import type { BuildingChipData, QueryBarContextValue } from './types';
 
@@ -16,7 +17,8 @@ interface UseQueryBarContextValueOptions {
   onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onInputKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
   onInputClick: () => void;
-  onChipClick: (chipId: string, e: ReactMouseEvent) => void;
+  onChipClick: (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => void;
+  onConnectorClick: (chipId: string) => void;
   onChipRemove: (chipId: string) => void;
   onClear: () => void;
 }
@@ -35,6 +37,7 @@ export const useQueryBarContextValue = ({
   onInputKeyDown,
   onInputClick,
   onChipClick,
+  onConnectorClick,
   onChipRemove,
   onClear,
 }: UseQueryBarContextValueOptions): QueryBarContextValue =>
@@ -53,6 +56,7 @@ export const useQueryBarContextValue = ({
       onInputKeyDown,
       onInputClick,
       onChipClick,
+      onConnectorClick,
       onChipRemove,
       onClear,
     }),
@@ -68,6 +72,7 @@ export const useQueryBarContextValue = ({
       onInputKeyDown,
       onInputClick,
       onChipClick,
+      onConnectorClick,
       onChipRemove,
       onClear,
     ],

@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useEffect, useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 type MenuState = 'closed' | 'field' | 'operator' | 'value';
 
@@ -13,10 +13,10 @@ interface UseMenuPositioningOptions {
 
 /**
  * Manages dropdown menu positioning relative to the active chip or input.
- * Computes a horizontal offset so the dropdown aligns with:
+ * Computes a horizontal offset lazily in getAnchorRect so the dropdown aligns with:
  * - The input element (when selecting a field, before building chip exists)
  * - The building chip (when selecting operator/value during chip creation)
- * - The clicked chip segment (when editing an existing chip)
+ * - The clicked chip segment (when editing — offset set externally via setMenuOffset)
  */
 export const useMenuPositioning = ({
   containerRef,
@@ -25,52 +25,48 @@ export const useMenuPositioning = ({
   isBuilding,
   menuState,
 }: UseMenuPositioningOptions) => {
-  const menuOffsetRef = useRef(0);
+  // Explicit offset set by chip editing (absolute left relative to container)
+  const editingOffsetRef = useRef<number | null>(null);
 
   const setMenuOffset = useCallback((offset: number) => {
-    menuOffsetRef.current = offset;
+    editingOffsetRef.current = offset;
   }, []);
 
   const resetMenuOffset = useCallback(() => {
-    menuOffsetRef.current = 0;
+    editingOffsetRef.current = null;
   }, []);
-
-  // After building chip renders, update offset to align dropdown with the chip.
-  // When no building chip (field menu for new condition), align with the input.
-  useEffect(() => {
-    if (menuState === 'closed') return;
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    if (!containerRect) return;
-
-    if (isBuilding) {
-      const chipRect = buildingChipRef.current?.getBoundingClientRect();
-      if (chipRect) {
-        menuOffsetRef.current = chipRect.left - containerRect.left;
-      }
-    } else if (menuState === 'field' && inputRef?.current) {
-      const inputRect = inputRef.current.getBoundingClientRect();
-      menuOffsetRef.current = inputRect.left - containerRect.left;
-    }
-  });
 
   const menuPositioning = useMemo(() => ({
     placement: 'bottom-start' as const,
     gutter: 4,
     getAnchorRect: () => {
-      const rect = containerRef.current?.getBoundingClientRect();
-      if (!rect) return null;
+      const containerRect = containerRef.current?.getBoundingClientRect();
+      if (!containerRect) return null;
+
+      // Determine offset: editing > building chip > input > 0
+      let offset = 0;
+      if (editingOffsetRef.current !== null) {
+        offset = editingOffsetRef.current;
+      } else if (isBuilding) {
+        const chipRect = buildingChipRef.current?.getBoundingClientRect();
+        if (chipRect) offset = chipRect.left - containerRect.left;
+      } else if (menuState === 'field' && inputRef?.current) {
+        const inputRect = inputRef.current.getBoundingClientRect();
+        offset = inputRect.left - containerRect.left;
+      }
+
       return {
-        x: rect.left + menuOffsetRef.current,
-        y: rect.y,
-        width: rect.width - menuOffsetRef.current,
-        height: rect.height,
-        top: rect.top,
-        bottom: rect.bottom,
-        left: rect.left + menuOffsetRef.current,
-        right: rect.right,
+        x: containerRect.left + offset,
+        y: containerRect.y,
+        width: containerRect.width - offset,
+        height: containerRect.height,
+        top: containerRect.top,
+        bottom: containerRect.bottom,
+        left: containerRect.left + offset,
+        right: containerRect.right,
       };
     },
-  }), [containerRef]);
+  }), [containerRef, buildingChipRef, inputRef, isBuilding, menuState]);
 
   return { menuPositioning, setMenuOffset, resetMenuOffset };
 };

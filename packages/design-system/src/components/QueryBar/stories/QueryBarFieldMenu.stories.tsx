@@ -1,10 +1,10 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import { QueryBarMainMenu } from '../QueryBarMenu';
+import { QueryBarFieldMenu } from '../QueryBarMenu';
 import type { FieldMetadata } from '../types';
 
 const meta = {
-  title: 'Components/QueryBar/QueryBarMainMenu',
-  component: QueryBarMainMenu,
+  title: 'Components/QueryBar/QueryBarFieldMenu',
+  component: QueryBarFieldMenu,
   parameters: {
     layout: 'centered',
   },
@@ -21,7 +21,7 @@ const meta = {
       description: 'Whether the menu is open',
     },
   },
-} satisfies Meta<typeof QueryBarMainMenu>;
+} satisfies Meta<typeof QueryBarFieldMenu>;
 
 export default meta;
 type Story = StoryObj<typeof meta>;
@@ -97,7 +97,7 @@ const sampleFields: FieldMetadata[] = [
 ];
 
 /**
- * Default QueryBarMainMenu with field list
+ * Default QueryBarFieldMenu with field list
  */
 export const Default: Story = {
   args: {
@@ -110,7 +110,7 @@ export const Default: Story = {
 };
 
 /**
- * QueryBarMainMenu with fewer fields
+ * QueryBarFieldMenu with fewer fields
  */
 export const FewFields: Story = {
   args: {
@@ -123,7 +123,7 @@ export const FewFields: Story = {
 };
 
 /**
- * Closed QueryBarMainMenu (should not render)
+ * Closed QueryBarFieldMenu (should not render)
  */
 export const Closed: Story = {
   args: {
@@ -161,7 +161,7 @@ export const Interactive: Story = {
         </div>
         {/* Absolute positioned wrapper prevents layout shift */}
         <div className='relative'>
-          <QueryBarMainMenu
+          <QueryBarFieldMenu
             fields={sampleFields}
             open={open}
             onOpenChange={setOpen}
@@ -199,7 +199,7 @@ export const WithSearch: Story = {
 };
 
 /**
- * QueryBarMainMenu with recent fields section
+ * QueryBarFieldMenu with recent fields section
  * Shows up to 3 recently used fields at the top
  */
 export const WithRecentFields: Story = {
@@ -241,7 +241,7 @@ export const WithRecentFields: Story = {
 };
 
 /**
- * QueryBarMainMenu with suggestions section
+ * QueryBarFieldMenu with suggestions section
  * Shows commonly used fields
  */
 export const WithSuggestions: Story = {
@@ -282,7 +282,7 @@ export const WithSuggestions: Story = {
 };
 
 /**
- * QueryBarMainMenu with both recent and suggestions
+ * QueryBarFieldMenu with both recent and suggestions
  * Shows the full menu with all sections
  */
 export const WithRecentAndSuggestions: Story = {

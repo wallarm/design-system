@@ -51,11 +51,9 @@ export const useKeyboardNav = ({
     const total = list.length;
     if (total === 0) return activeIndexRef.current;
 
-    let next = (activeIndexRef.current + direction + total) % total;
-    let attempts = total;
-    while (list[next]?.disabled && --attempts > 0) {
-      next = (next + direction + total) % total;
-    }
+    const start = (activeIndexRef.current + direction + total) % total;
+    const next = Array.from({ length: total }, (_, i) => (start + i * direction + total * total) % total)
+      .find(idx => !list[idx]?.disabled) ?? start;
 
     activeIndexRef.current = next;
     setActiveIndex(next);
@@ -100,10 +98,10 @@ export const useKeyboardNav = ({
           // Read pending from ref-synced state via functional updater
           setPendingIds(prev => {
             if (prev.size > 0) {
-              for (const id of prev) {
+              prev.forEach(id => {
                 const item = list.find(i => i.id === id);
                 if (item && !item.disabled) select(item);
-              }
+              });
               return new Set();
             }
             // No pending — select current item

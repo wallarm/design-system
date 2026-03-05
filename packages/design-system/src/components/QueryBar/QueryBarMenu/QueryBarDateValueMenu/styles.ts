@@ -1,4 +1,4 @@
-import { cn } from '../../../utils/cn';
+import { cn } from '../../../../utils/cn';
 
 /** Shared cell trigger styles for month/year views */
 export const cellTriggerClass = 'w-full h-[36px] text-sm rounded-8 cursor-pointer hover:bg-states-brand-hover data-[selected]:bg-bg-fill-brand data-[selected]:text-text-primary-alt data-[selected]:font-medium';

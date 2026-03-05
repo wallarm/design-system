@@ -1,12 +1,11 @@
-import type { RefObject } from 'react';
+import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { getDateDisplayLabel, getOperatorLabel, isDatePreset } from '../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../types';
-import { useAutocompleteHandlers } from './useAutocompleteHandlers';
 import { useChipEditing } from './useChipEditing';
-import { useDateRange } from '../DateValue/hooks';
+import { useDateRange } from '../QueryBarMenu/QueryBarDateValueMenu/hooks';
 import { useMenuPositioning } from './useMenuPositioning';
-import { useMultiSelect } from './useMultiSelect';
+import { deriveAutocompleteValues } from './deriveAutocompleteValues';
+import { useMenuFlow } from './useMenuFlow';
 
 interface UseQueryBarAutocompleteOptions {
   fields: FieldMetadata[];
@@ -47,6 +46,7 @@ export const useQueryBarAutocomplete = ({
   const [selectedField, setSelectedField] = useState<FieldMetadata | null>(null);
   const [selectedOperator, setSelectedOperator] = useState<FilterOperator | null>(null);
   const [isFocused, setIsFocused] = useState(false);
+  const [buildingMultiValue, setBuildingMultiValue] = useState<string | undefined>(undefined);
 
   // ── Child hooks ───────────────────────────────────────────
 
@@ -64,19 +64,10 @@ export const useQueryBarAutocomplete = ({
     fields,
     containerRef,
     upsertCondition,
-    toggleConnector,
     setMenuOffset,
     setSelectedField,
     setSelectedOperator,
-    setMultiSelectValues: vals => multiSelect.setMultiSelectValues(vals),
     setMenuState,
-  });
-
-  const multiSelect = useMultiSelect({
-    selectedField,
-    selectedOperator,
-    editingChipId: editing.editingChipId,
-    conditions,
   });
 
   const dateRange = useDateRange();
@@ -88,39 +79,88 @@ export const useQueryBarAutocomplete = ({
     setSelectedField(null);
     setSelectedOperator(null);
     editing.clearEditing();
-    multiSelect.reset();
     dateRange.reset();
+    setBuildingMultiValue(undefined);
     resetMenuOffset();
     setMenuState(openFieldMenu ? 'field' : 'closed');
     inputRef.current?.focus();
-  }, [editing, multiSelect, inputRef, resetMenuOffset]);
+  }, [editing, inputRef, resetMenuOffset]);
 
-  // ── Handlers ──────────────────────────────────────────────
+  // ── Menu flow handlers ────────────────────────────────────
 
-  const handlers = useAutocompleteHandlers({
-    inputText,
-    menuState,
+  const {
+    handleMenuClose,
+    handleFieldSelect,
+    handleOperatorSelect,
+    handleValueSelect,
+    handleMultiCommit,
+    handleBuildingValueChange,
+    handleRangeSelect,
+  } = useMenuFlow({
+    editing,
     selectedField,
     selectedOperator,
-    isFocused,
-    conditions,
-    setInputText,
-    setMenuState,
+    upsertCondition,
+    resetState,
+    dateRange,
     setSelectedField,
     setSelectedOperator,
-    setIsFocused,
-    editing,
-    multiSelect,
-    dateRange,
-    upsertCondition,
-    removeCondition,
-    removeLastCondition,
-    clearAll,
-    containerRef,
-    inputRef,
-    resetMenuOffset,
-    resetState,
+    setInputText,
+    setMenuState,
+    setBuildingMultiValue,
   });
+
+  // ── Input events ──────────────────────────────────────────
+
+  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
+    const text = e.target.value;
+    setInputText(text);
+
+    if (text && !selectedField) {
+      setMenuState('field');
+    } else if (!text && !selectedField) {
+      setMenuState(isFocused && conditions.length === 0 ? 'field' : 'closed');
+    }
+  }, [selectedField, isFocused, conditions.length]);
+
+  const handleInputClick = useCallback(() => {
+    if (menuState === 'closed' && !selectedField) {
+      resetMenuOffset();
+      setMenuState('field');
+    }
+  }, [menuState, selectedField, resetMenuOffset]);
+
+  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace' && inputText === '' && conditions.length > 0) {
+      e.preventDefault();
+      removeLastCondition();
+    }
+  }, [inputText, conditions.length, removeLastCondition]);
+
+  // ── Focus ─────────────────────────────────────────────────
+
+  const handleFocus = useCallback(() => setIsFocused(true), []);
+
+  const handleBlur = useCallback((e: FocusEvent) => {
+    if (menuState !== 'closed') return;
+    const related = e.relatedTarget as HTMLElement | null;
+    if (containerRef.current?.contains(related)) return;
+    setIsFocused(false);
+    resetState();
+  }, [menuState, containerRef, resetState]);
+
+  // ── Chip management ───────────────────────────────────────
+
+  const handleChipRemove = useCallback((chipId: string) => {
+    removeCondition(chipId);
+    resetMenuOffset();
+    inputRef.current?.focus();
+  }, [removeCondition, resetMenuOffset, inputRef]);
+
+  const handleClear = useCallback(() => {
+    clearAll();
+    resetState();
+  }, [clearAll, resetState]);
 
   // ── Auto-open field menu on initial focus when empty ──────
 
@@ -135,40 +175,20 @@ export const useQueryBarAutocomplete = ({
 
   // ── Derived values ────────────────────────────────────────
 
-  const isBuilding = selectedField !== null && !editing.editingChipId;
-
-  // When editing a date chip, determine if its value is an absolute date (not a preset)
-  const editingDateIsAbsolute = (() => {
-    if (!editing.editingChipId || selectedField?.type !== 'date') return false;
-    const idx = Number(editing.editingChipId.replace('chip-', ''));
-    const condition = conditions[idx];
-    if (!condition) return false;
-    const val = String(condition.value ?? '');
-    return val !== '' && !isDatePreset(val);
-  })();
-
-  const buildingValue = (() => {
-    if (multiSelect.buildingMultiValue) return multiSelect.buildingMultiValue;
-    if (dateRange.fromValue && selectedOperator === 'between') {
-      return `${getDateDisplayLabel(dateRange.fromValue)} – ...`;
-    }
-    return undefined;
-  })();
-
-  const buildingChipData = isBuilding ? {
-    attribute: selectedField!.label,
-    operator: selectedOperator ? getOperatorLabel(selectedOperator, selectedField!.type) : undefined,
-    value: buildingValue,
-  } : null;
-
-  // ── Range select (between + calendar) ────────────────────
-
-  const handleRangeSelect = useCallback((from: string, to: string) => {
-    if (!selectedField || !selectedOperator) return;
-    const isEditing = !!editing.editingChipId;
-    upsertCondition(selectedField, selectedOperator, [from, to], editing.editingChipId);
-    resetState(!isEditing);
-  }, [selectedField, selectedOperator, editing.editingChipId, upsertCondition, resetState]);
+  const {
+    isBuilding,
+    buildingChipData,
+    editingMultiValues,
+    editingSingleValue,
+    editingDateIsAbsolute,
+  } = deriveAutocompleteValues({
+    editingChipId: editing.editingChipId,
+    selectedField,
+    selectedOperator,
+    conditions,
+    buildingMultiValue,
+    dateRangeFromValue: dateRange.fromValue,
+  });
 
   // ── Public API ────────────────────────────────────────────
 
@@ -177,25 +197,27 @@ export const useQueryBarAutocomplete = ({
     menuState,
     selectedField,
     selectedOperator,
-    multiSelectValues: multiSelect.multiSelectValues,
-    selectedValues: multiSelect.selectedValues,
     isBuilding,
     buildingChipData,
     menuPositioning,
-    handleInputChange: handlers.handleInputChange,
-    handleFieldSelect: handlers.handleFieldSelect,
-    handleOperatorSelect: handlers.handleOperatorSelect,
-    handleValueSelect: handlers.handleValueSelect,
-    handleMenuClose: handlers.handleMenuClose,
+    editingMultiValues,
+    editingSingleValue,
+    handleInputChange,
+    handleFieldSelect,
+    handleOperatorSelect,
+    handleValueSelect,
+    handleMultiCommit,
+    handleBuildingValueChange,
+    handleMenuClose,
     handleMenuDiscard: resetState,
     handleChipClick: editing.handleChipClick,
-    handleChipRemove: handlers.handleChipRemove,
-    handleClear: handlers.handleClear,
-    handleKeyDown: handlers.handleKeyDown,
-    handleInputClick: handlers.handleInputClick,
-    handleFocus: handlers.handleFocus,
-    handleBlur: handlers.handleBlur,
-    handleCommitAndNewChip: handlers.handleCommitAndNewChip,
+    handleConnectorClick: toggleConnector,
+    handleChipRemove,
+    handleClear,
+    handleKeyDown,
+    handleInputClick,
+    handleFocus,
+    handleBlur,
     handleRangeSelect,
     dateRangeIndex: dateRange.currentIndex,
     editingDateIsAbsolute,

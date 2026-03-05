@@ -1,14 +1,14 @@
 import type { FC } from 'react';
-import { ChevronRight } from '../../../icons/ChevronRight';
+import { ChevronRight } from '../../../../icons/ChevronRight';
 import {
   DropdownMenuFooter,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuItemText,
   DropdownMenuSeparator,
-} from '../../DropdownMenu';
-import { Kbd } from '../../Kbd/Kbd';
-import { KbdGroup } from '../../Kbd/KbdGroup';
+} from '../../../DropdownMenu';
+import { Kbd } from '../../../Kbd/Kbd';
+import { KbdGroup } from '../../../Kbd/KbdGroup';
 import { DATE_PRESETS } from './constants';
 
 export interface DatePresetsProps {

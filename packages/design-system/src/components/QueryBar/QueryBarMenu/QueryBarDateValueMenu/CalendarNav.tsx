@@ -1,7 +1,7 @@
 import { DatePicker } from '@ark-ui/react/date-picker';
 import type { FC } from 'react';
-import { ChevronLeft } from '../../../icons/ChevronLeft';
-import { ChevronRight } from '../../../icons/ChevronRight';
+import { ChevronLeft } from '../../../../icons/ChevronLeft';
+import { ChevronRight } from '../../../../icons/ChevronRight';
 
 export const CalendarNav: FC = () => (
   <DatePicker.ViewControl className='flex items-center justify-between mb-8'>

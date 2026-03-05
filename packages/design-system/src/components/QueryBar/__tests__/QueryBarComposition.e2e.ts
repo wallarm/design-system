@@ -59,7 +59,7 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      const menu = page.locator('[data-slot="query-bar-main-menu"]');
+      const menu = page.locator('[data-slot="query-bar-field-menu"]');
       await expect(menu).toBeVisible({ timeout: 2000 });
 
       const menuItems = page.locator('[role="menuitem"]');
@@ -72,7 +72,7 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      await page.waitForSelector('[data-slot="query-bar-main-menu"]', { state: 'visible', timeout: 2000 });
+      await page.waitForSelector('[data-slot="query-bar-field-menu"]', { state: 'visible', timeout: 2000 });
       const statusField = page.locator('[role="menuitem"]').filter({ hasText: 'Status' });
       await statusField.click();
 
@@ -175,7 +175,7 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       await expect(chip).toBeVisible();
 
       await page.waitForTimeout(300);
-      const fieldMenu = page.locator('[data-slot="query-bar-main-menu"]');
+      const fieldMenu = page.locator('[data-slot="query-bar-field-menu"]');
       await expect(fieldMenu).toBeVisible({ timeout: 2000 });
     });
 
@@ -185,7 +185,7 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      const menu = page.locator('[data-slot="query-bar-main-menu"]');
+      const menu = page.locator('[data-slot="query-bar-field-menu"]');
       await expect(menu).toBeVisible({ timeout: 2000 });
 
       await page.waitForTimeout(100);
@@ -200,7 +200,7 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      await page.waitForSelector('[data-slot="query-bar-main-menu"]', { state: 'visible', timeout: 2000 });
+      await page.waitForSelector('[data-slot="query-bar-field-menu"]', { state: 'visible', timeout: 2000 });
 
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('ArrowDown');
@@ -324,7 +324,7 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await expect(input).toBeFocused();
 
-      await page.waitForSelector('[data-slot="query-bar-main-menu"]', { state: 'visible', timeout: 2000 });
+      await page.waitForSelector('[data-slot="query-bar-field-menu"]', { state: 'visible', timeout: 2000 });
 
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('Enter');
@@ -348,8 +348,8 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      await page.waitForSelector('[data-slot="query-bar-main-menu"]', { state: 'visible', timeout: 2000 });
-      const menu = page.locator('[data-slot="query-bar-main-menu"]');
+      await page.waitForSelector('[data-slot="query-bar-field-menu"]', { state: 'visible', timeout: 2000 });
+      const menu = page.locator('[data-slot="query-bar-field-menu"]');
       await expect(menu).toHaveAttribute('role', 'menu');
 
       const menuItems = page.locator('[role="menuitem"]');

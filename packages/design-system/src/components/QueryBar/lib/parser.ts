@@ -38,14 +38,16 @@ export const parseCondition = (input: string): ParseResult => {
   let operatorMatch: FilterOperator | null = null;
   let operatorIndex = -1;
 
-  for (const op of operators) {
-    const index = trimmed.indexOf(op);
-    if (index > 0) {
-      operatorMatch = op;
-      operatorIndex = index;
-      break;
-    }
-  }
+  const found = operators.reduce<{ op: FilterOperator | null; idx: number }>(
+    (acc, op) => {
+      if (acc.op) return acc; // already found
+      const index = trimmed.indexOf(op);
+      return index > 0 ? { op, idx: index } : acc;
+    },
+    { op: null, idx: -1 },
+  );
+  operatorMatch = found.op;
+  operatorIndex = found.idx;
 
   // No operator found - incomplete
   if (!operatorMatch || operatorIndex === -1) {

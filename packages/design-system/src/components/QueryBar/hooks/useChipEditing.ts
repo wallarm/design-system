@@ -1,6 +1,7 @@
-import type { MouseEvent as ReactMouseEvent, RefObject } from 'react';
-import { useState } from 'react';
-import { chipIdToConditionIndex, getOperatorFromLabel, isMultiSelectOperator } from '../lib';
+import type { RefObject } from 'react';
+import { useCallback, useState } from 'react';
+import { chipIdToConditionIndex, getOperatorFromLabel } from '../lib';
+import type { ChipSegment } from '../QueryBarChip/QueryBarChip';
 import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../types';
 
 interface UseChipEditingOptions {
@@ -14,11 +15,9 @@ interface UseChipEditingOptions {
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
   ) => void;
-  toggleConnector: (connectorId: string) => void;
   setMenuOffset: (offset: number) => void;
   setSelectedField: (field: FieldMetadata) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
-  setMultiSelectValues: (values: Array<string | number | boolean>) => void;
   setMenuState: (state: MenuState) => void;
 }
 
@@ -30,31 +29,7 @@ const getConditionByChipId = (chipId: string, conditions: Condition[]): Conditio
   return idx !== null ? conditions[idx] ?? null : null;
 };
 
-/** Determine which segment was clicked via data-slot */
-type ClickedSegment = 'attribute' | 'operator' | 'value';
-
-const getClickedSegment = (target: HTMLElement): ClickedSegment => {
-  const slot = target.closest('[data-slot]')?.getAttribute('data-slot');
-  if (slot === 'segment-attribute') return 'attribute';
-  if (slot === 'segment-value') return 'value';
-  return 'operator';
-};
-
-/** Calculate menu X offset relative to container */
-const calcMenuOffset = (
-  target: HTMLElement,
-  segment: ClickedSegment,
-  containerRef: RefObject<HTMLElement | null>,
-): number => {
-  const chipEl = target.closest('[data-slot="query-bar-chip"]') as HTMLElement | null;
-  const segmentEl = target.closest('[data-slot]') as HTMLElement | null;
-  const anchorEl = segment === 'attribute' ? chipEl : segmentEl;
-  const containerRect = containerRef.current?.getBoundingClientRect();
-  if (!containerRect || !anchorEl) return 0;
-  return anchorEl.getBoundingClientRect().left - containerRect.left;
-};
-
-const SEGMENT_TO_MENU: Record<ClickedSegment, MenuState> = {
+const SEGMENT_TO_MENU: Record<ChipSegment, MenuState> = {
   attribute: 'field',
   operator: 'operator',
   value: 'value',
@@ -64,7 +39,7 @@ const SEGMENT_TO_MENU: Record<ClickedSegment, MenuState> = {
 
 /**
  * Manages editing of existing filter chips.
- * Handles chip click → determine segment → open appropriate menu.
+ * Handles chip click → open appropriate menu based on segment.
  * Provides tryEditField/tryEditOperator for immediate commit when editing.
  */
 export const useChipEditing = ({
@@ -73,39 +48,33 @@ export const useChipEditing = ({
   fields,
   containerRef,
   upsertCondition,
-  toggleConnector,
   setMenuOffset,
   setSelectedField,
   setSelectedOperator,
-  setMultiSelectValues,
   setMenuState,
 }: UseChipEditingOptions) => {
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
 
   /** If editing, commits field change immediately. Returns true if handled. */
-  const tryEditField = (field: FieldMetadata): boolean => {
+  const tryEditField = useCallback((field: FieldMetadata): boolean => {
     if (!editingChipId) return false;
     const condition = getConditionByChipId(editingChipId, conditions);
     if (!condition) return false;
     upsertCondition(field, condition.operator, condition.value, editingChipId);
     return true;
-  };
+  }, [editingChipId, conditions, upsertCondition]);
 
   /** If editing, commits operator change immediately. Returns true if handled. */
-  const tryEditOperator = (operator: FilterOperator, selectedField: FieldMetadata): boolean => {
+  const tryEditOperator = useCallback((operator: FilterOperator, selectedField: FieldMetadata): boolean => {
     if (!editingChipId) return false;
     const condition = getConditionByChipId(editingChipId, conditions);
     if (!condition) return false;
     upsertCondition(selectedField, operator, condition.value, editingChipId);
     return true;
-  };
+  }, [editingChipId, conditions, upsertCondition]);
 
-  const handleChipClick = (chipId: string, e: ReactMouseEvent) => {
-    if (chipId.startsWith('connector-')) {
-      toggleConnector(chipId);
-      return;
-    }
-
+  /** Handle chip segment click — receives pre-computed segment and anchorRect from QueryBarChip */
+  const handleChipClick = useCallback((chipId: string, segment: ChipSegment, anchorRect: DOMRect) => {
     const condition = getConditionByChipId(chipId, conditions);
     if (!condition) return;
 
@@ -115,27 +84,22 @@ export const useChipEditing = ({
     const chip = chips.find(c => c.id === chipId);
     if (!chip || chip.variant !== 'chip') return;
 
-    const target = e.target as HTMLElement;
-    const segment = getClickedSegment(target);
-
-    setMenuOffset(calcMenuOffset(target, segment, containerRef));
+    const containerRect = containerRef.current?.getBoundingClientRect();
+    setMenuOffset(containerRect ? anchorRect.left - containerRect.left : 0);
     setEditingChipId(chipId);
     setSelectedField(field);
 
     if (segment === 'value') {
       const rawOperator = getOperatorFromLabel(chip.operator || '', field.type);
       setSelectedOperator(rawOperator);
-      if (rawOperator && isMultiSelectOperator(rawOperator) && Array.isArray(condition.value)) {
-        setMultiSelectValues(condition.value);
-      }
     } else {
       setSelectedOperator(null);
     }
 
     setMenuState(SEGMENT_TO_MENU[segment]);
-  };
+  }, [conditions, fields, chips, containerRef, setMenuOffset, setSelectedField, setSelectedOperator, setMenuState]);
 
-  const clearEditing = () => setEditingChipId(null);
+  const clearEditing = useCallback(() => setEditingChipId(null), []);
 
   return {
     editingChipId,

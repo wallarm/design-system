@@ -3,10 +3,9 @@ import { useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { QueryBarProvider, useQueryBarContextValue } from './QueryBarContext';
 import { QueryBarInput } from './QueryBarInput';
-import { QueryBarDateValueMenu, QueryBarMainMenu, QueryBarOperatorMenu, QueryBarValueMenu } from './QueryBarMenu';
+import { QueryBarMenu } from './QueryBarMenu/QueryBarMenu';
 import { useQueryBarAutocomplete } from './hooks';
 import { useQueryBarExpression } from './hooks';
-import { isBetweenOperator, isMultiSelectOperator } from './lib';
 import type { ExprNode, FieldMetadata } from './types';
 
 export interface QueryBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
@@ -67,31 +66,7 @@ export const QueryBar: FC<QueryBarProps> = ({
     toggleConnector,
   } = useQueryBarExpression({ fields, value, onChange, error });
 
-  const {
-    inputText,
-    menuState,
-    selectedField,
-    selectedOperator,
-    selectedValues,
-    buildingChipData,
-    menuPositioning,
-    handleInputChange,
-    handleFieldSelect,
-    handleOperatorSelect,
-    handleValueSelect,
-    handleMenuClose,
-    handleMenuDiscard,
-    handleChipClick,
-    handleChipRemove,
-    handleClear,
-    handleKeyDown,
-    handleInputClick,
-    handleFocus,
-    handleBlur,
-    handleCommitAndNewChip,
-    editingDateIsAbsolute,
-    handleRangeSelect,
-  } = useQueryBarAutocomplete({
+  const autocomplete = useQueryBarAutocomplete({
     fields,
     conditions,
     chips,
@@ -109,20 +84,21 @@ export const QueryBar: FC<QueryBarProps> = ({
 
   const contextValue = useQueryBarContextValue({
     chips,
-    buildingChipData,
+    buildingChipData: autocomplete.buildingChipData,
     buildingChipRef,
-    inputText,
+    inputText: autocomplete.inputText,
     inputRef,
     placeholder,
     error,
     showKeyboardHint,
-    menuState,
-    onInputChange: handleInputChange,
-    onInputKeyDown: handleKeyDown,
-    onInputClick: handleInputClick,
-    onChipClick: handleChipClick,
-    onChipRemove: handleChipRemove,
-    onClear: handleClear,
+    menuState: autocomplete.menuState,
+    onInputChange: autocomplete.handleInputChange,
+    onInputKeyDown: autocomplete.handleKeyDown,
+    onInputClick: autocomplete.handleInputClick,
+    onChipClick: autocomplete.handleChipClick,
+    onConnectorClick: autocomplete.handleConnectorClick,
+    onChipRemove: autocomplete.handleChipRemove,
+    onClear: autocomplete.handleClear,
   });
 
   // ── Render ─────────────────────────────────────────────────
@@ -131,65 +107,31 @@ export const QueryBar: FC<QueryBarProps> = ({
     <div
       ref={containerRef}
       className={cn('relative w-full', className)}
-      onFocus={handleFocus}
-      onBlur={handleBlur}
+      onFocus={autocomplete.handleFocus}
+      onBlur={autocomplete.handleBlur}
     >
       <QueryBarProvider value={contextValue}>
         <QueryBarInput {...props} />
       </QueryBarProvider>
 
-      {/* Dropdown menus — positioned below the input container */}
-      <QueryBarMainMenu
+      <QueryBarMenu
         fields={fields}
-        open={menuState === 'field'}
-        onSelect={handleFieldSelect}
-        onOpenChange={() => handleMenuClose()}
-        onEscape={handleMenuDiscard}
-        positioning={menuPositioning}
+        menuState={autocomplete.menuState}
+        selectedField={autocomplete.selectedField}
+        selectedOperator={autocomplete.selectedOperator}
+        menuPositioning={autocomplete.menuPositioning}
+        editingMultiValues={autocomplete.editingMultiValues}
+        editingSingleValue={autocomplete.editingSingleValue}
+        editingDateIsAbsolute={autocomplete.editingDateIsAbsolute}
+        onFieldSelect={autocomplete.handleFieldSelect}
+        onOperatorSelect={autocomplete.handleOperatorSelect}
+        onValueSelect={autocomplete.handleValueSelect}
+        onMultiCommit={autocomplete.handleMultiCommit}
+        onRangeSelect={autocomplete.handleRangeSelect}
+        onMenuClose={autocomplete.handleMenuClose}
+        onMenuDiscard={autocomplete.handleMenuDiscard}
+        onBuildingValueChange={autocomplete.handleBuildingValueChange}
       />
-
-      {selectedField && (
-        <QueryBarOperatorMenu
-          fieldType={selectedField.type}
-          open={menuState === 'operator'}
-          onSelect={handleOperatorSelect}
-          onOpenChange={() => handleMenuClose()}
-          onEscape={handleMenuDiscard}
-          positioning={menuPositioning}
-        />
-      )}
-
-      {selectedField && selectedOperator && (
-        selectedField.type === 'date' ? (
-          <QueryBarDateValueMenu
-            open={menuState === 'value'}
-            onSelect={handleValueSelect}
-            onRangeSelect={handleRangeSelect}
-            onOpenChange={() => handleMenuClose()}
-            onEscape={handleMenuDiscard}
-            positioning={menuPositioning}
-            initialCalendar={editingDateIsAbsolute}
-            range={isBetweenOperator(selectedOperator)}
-            betweenLabel={
-              isBetweenOperator(selectedOperator)
-                ? 'Select date range'
-                : undefined
-            }
-          />
-        ) : (
-          <QueryBarValueMenu
-            values={selectedField.values || []}
-            open={menuState === 'value'}
-            onSelect={handleValueSelect}
-            onOpenChange={() => handleMenuClose()}
-            onEscape={handleMenuDiscard}
-            multiSelect={isMultiSelectOperator(selectedOperator)}
-            selectedValues={selectedValues}
-            positioning={menuPositioning}
-            onArrowRight={isMultiSelectOperator(selectedOperator) ? handleCommitAndNewChip : undefined}
-          />
-        )
-      )}
     </div>
   );
 };

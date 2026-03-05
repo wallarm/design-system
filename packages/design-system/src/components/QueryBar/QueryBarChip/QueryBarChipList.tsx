@@ -5,7 +5,7 @@ import { QueryBarChip } from './QueryBarChip';
 import { useQueryBarContext } from '../QueryBarContext';
 
 export const QueryBarChipList: FC = () => {
-  const { chips, buildingChipData, buildingChipRef, onChipClick, onChipRemove } =
+  const { chips, buildingChipData, buildingChipRef, onChipClick, onConnectorClick, onChipRemove } =
     useQueryBarContext();
 
   return (
@@ -17,7 +17,7 @@ export const QueryBarChipList: FC = () => {
           <div
             key={chip.id}
             className={cn('shrink-0', (isCondition || isConnector) && 'cursor-pointer hover:z-10')}
-            onClick={isCondition || isConnector ? (e) => onChipClick(chip.id, e) : undefined}
+            onClick={isConnector ? () => onConnectorClick(chip.id) : undefined}
           >
             {isCondition ? (
               <QueryBarChip
@@ -26,6 +26,7 @@ export const QueryBarChipList: FC = () => {
                 value={chip.value}
                 error={chip.error}
                 onRemove={() => onChipRemove(chip.id)}
+                onSegmentClick={(segment, anchorRect) => onChipClick(chip.id, segment, anchorRect)}
               />
             ) : (
               <QueryBarConnectorChip

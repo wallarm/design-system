@@ -1,13 +1,13 @@
 import { type FC, useEffect, useMemo, useRef, useState } from 'react';
-import { cn } from '../../../utils/cn';
-import { DropdownMenu, DropdownMenuContent } from '../../DropdownMenu';
-import { useKeyboardNav } from '../hooks';
-import type { QueryBarDropdownItem } from '../types';
+import { cn } from '../../../../utils/cn';
+import { DropdownMenu, DropdownMenuContent } from '../../../DropdownMenu';
+import { useKeyboardNav } from '../../hooks';
+import type { QueryBarDropdownItem } from '../../types';
 import { DATE_PRESETS } from './constants';
 import { DateCalendar } from './DateCalendar';
 import { DatePresets } from './DatePresets';
 
-export interface DateValueProps {
+export interface QueryBarDateValueMenuProps {
   open: boolean;
   onSelect: (value: string) => void;
   onRangeSelect?: (from: string, to: string) => void;
@@ -21,7 +21,7 @@ export interface DateValueProps {
   className?: string;
 }
 
-export const DateValue: FC<DateValueProps> = ({
+export const QueryBarDateValueMenu: FC<QueryBarDateValueMenuProps> = ({
   open,
   onSelect,
   onRangeSelect,
@@ -37,7 +37,11 @@ export const DateValue: FC<DateValueProps> = ({
   const switchingViewRef = useRef(false);
 
   useEffect(() => {
-    if (open) setShowCalendar(initialCalendar);
+    if (open) {
+      setShowCalendar(initialCalendar);
+    } else if (showCalendar) {
+      setShowCalendar(false);
+    }
   }, [open, initialCalendar]);
 
   const flatItems: QueryBarDropdownItem[] = useMemo(
@@ -79,11 +83,6 @@ export const DateValue: FC<DateValueProps> = ({
     setShowCalendar(false);
   };
 
-  // Reset calendar state when menu closes
-  if (!open && showCalendar) {
-    setShowCalendar(false);
-  }
-
   return (
     <DropdownMenu
       open={open}
@@ -122,4 +121,4 @@ export const DateValue: FC<DateValueProps> = ({
   );
 };
 
-DateValue.displayName = 'DateValue';
+QueryBarDateValueMenu.displayName = 'QueryBarDateValueMenu';

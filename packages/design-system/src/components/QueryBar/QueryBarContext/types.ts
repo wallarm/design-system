@@ -1,5 +1,6 @@
-import type { ChangeEvent, KeyboardEvent, MouseEvent as ReactMouseEvent, Ref } from 'react';
+import type { ChangeEvent, KeyboardEvent, Ref } from 'react';
 import type { QueryBarChipData } from '../types';
+import type { ChipSegment } from '../QueryBarChip/QueryBarChip';
 
 export interface BuildingChipData {
   attribute: string;
@@ -24,7 +25,8 @@ export interface QueryBarContextValue {
   onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onInputKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
   onInputClick: () => void;
-  onChipClick: (chipId: string, e: ReactMouseEvent) => void;
+  onChipClick: (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => void;
+  onConnectorClick: (chipId: string) => void;
   onChipRemove: (chipId: string) => void;
   onClear: () => void;
 }

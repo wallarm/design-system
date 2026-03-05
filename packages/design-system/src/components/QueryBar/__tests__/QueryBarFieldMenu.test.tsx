@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { QueryBarMainMenu } from '../QueryBarMenu';
+import { QueryBarFieldMenu } from '../QueryBarMenu';
 import type { FieldMetadata } from '../types';
 
 const mockFields: FieldMetadata[] = [
@@ -12,10 +12,10 @@ const mockFields: FieldMetadata[] = [
   { name: 'response_time', label: 'Response Time', type: 'float' },
 ];
 
-describe('QueryBarMainMenu', () => {
+describe('QueryBarFieldMenu', () => {
   describe('field list display', () => {
     it('displays all fields by label', () => {
-      render(<QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
 
       for (const field of mockFields) {
         expect(screen.getByText(field.label)).toBeInTheDocument();
@@ -24,7 +24,7 @@ describe('QueryBarMainMenu', () => {
 
     it('returns null when open is false', () => {
       const { container } = render(
-        <QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={false} />,
+        <QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={false} />,
       );
 
       expect(container.firstChild).toBeNull();
@@ -35,7 +35,7 @@ describe('QueryBarMainMenu', () => {
     it('filters fields by label (case-insensitive)', async () => {
       const user = userEvent.setup();
 
-      render(<QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
 
       const searchInput = screen.getByPlaceholderText('Search fields...');
       await user.type(searchInput, 'count');
@@ -52,7 +52,7 @@ describe('QueryBarMainMenu', () => {
     it('filters fields by name (case-insensitive)', async () => {
       const user = userEvent.setup();
 
-      render(<QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
 
       const searchInput = screen.getByPlaceholderText('Search fields...');
       await user.type(searchInput, 'ip_add');
@@ -64,7 +64,7 @@ describe('QueryBarMainMenu', () => {
     it('shows empty state when no matches found', async () => {
       const user = userEvent.setup();
 
-      render(<QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
 
       const searchInput = screen.getByPlaceholderText('Search fields...');
       await user.type(searchInput, 'nonexistent');
@@ -76,7 +76,7 @@ describe('QueryBarMainMenu', () => {
       const user = userEvent.setup();
       const onSelect = vi.fn();
 
-      render(<QueryBarMainMenu fields={mockFields} onSelect={onSelect} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={onSelect} open={true} />);
 
       const searchInput = screen.getByPlaceholderText('Search fields...') as HTMLInputElement;
       await user.type(searchInput, 'country');
@@ -93,7 +93,7 @@ describe('QueryBarMainMenu', () => {
       const user = userEvent.setup();
       const onSelect = vi.fn();
 
-      render(<QueryBarMainMenu fields={mockFields} onSelect={onSelect} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={onSelect} open={true} />);
 
       const ipAddressButton = screen.getByText('IP Address');
       await user.click(ipAddressButton);
@@ -108,7 +108,7 @@ describe('QueryBarMainMenu', () => {
       const onOpenChange = vi.fn();
 
       render(
-        <QueryBarMainMenu
+        <QueryBarFieldMenu
           fields={mockFields}
           onSelect={onSelect}
           onOpenChange={onOpenChange}
@@ -131,7 +131,7 @@ describe('QueryBarMainMenu', () => {
 
     it('displays recent fields section when recentFields provided', () => {
       render(
-        <QueryBarMainMenu
+        <QueryBarFieldMenu
           fields={mockFields}
           onSelect={vi.fn()}
           open={true}
@@ -148,7 +148,7 @@ describe('QueryBarMainMenu', () => {
       const manyRecentFields = [...mockFields]; // 5 fields
 
       render(
-        <QueryBarMainMenu
+        <QueryBarFieldMenu
           fields={mockFields}
           onSelect={vi.fn()}
           open={true}
@@ -166,7 +166,7 @@ describe('QueryBarMainMenu', () => {
       const user = userEvent.setup();
 
       render(
-        <QueryBarMainMenu
+        <QueryBarFieldMenu
           fields={mockFields}
           onSelect={vi.fn()}
           open={true}
@@ -188,7 +188,7 @@ describe('QueryBarMainMenu', () => {
       const user = userEvent.setup();
 
       render(
-        <QueryBarMainMenu
+        <QueryBarFieldMenu
           fields={mockFields}
           onSelect={vi.fn()}
           open={true}
@@ -211,7 +211,7 @@ describe('QueryBarMainMenu', () => {
 
     it('displays suggestions section when suggestedFields provided', () => {
       render(
-        <QueryBarMainMenu
+        <QueryBarFieldMenu
           fields={mockFields}
           onSelect={vi.fn()}
           open={true}
@@ -228,7 +228,7 @@ describe('QueryBarMainMenu', () => {
       const user = userEvent.setup();
 
       render(
-        <QueryBarMainMenu
+        <QueryBarFieldMenu
           fields={mockFields}
           onSelect={vi.fn()}
           open={true}
@@ -247,7 +247,7 @@ describe('QueryBarMainMenu', () => {
 
   describe('keyboard navigation hints', () => {
     it('displays keyboard navigation hints', () => {
-      render(<QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
 
       expect(screen.getByText('to navigate')).toBeInTheDocument();
       expect(screen.getByText('to select')).toBeInTheDocument();
@@ -259,7 +259,7 @@ describe('QueryBarMainMenu', () => {
 
   describe('accessibility', () => {
     it('has correct ARIA attributes', () => {
-      render(<QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
 
       const menu = screen.getByRole('menu');
       expect(menu).toHaveAttribute('aria-label', 'Filter fields');
@@ -267,14 +267,14 @@ describe('QueryBarMainMenu', () => {
     });
 
     it('has correct role attributes for menu items', () => {
-      render(<QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
 
       const menuItems = screen.getAllByRole('menuitem');
       expect(menuItems.length).toBe(mockFields.length);
     });
 
     it('search input is rendered', () => {
-      render(<QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
 
       const searchInput = screen.getByPlaceholderText('Search fields...');
       // Verify search input is in the document
@@ -286,7 +286,7 @@ describe('QueryBarMainMenu', () => {
   describe('styling', () => {
     it('applies custom className', () => {
       const { container } = render(
-        <QueryBarMainMenu
+        <QueryBarFieldMenu
           fields={mockFields}
           onSelect={vi.fn()}
           open={true}
@@ -294,16 +294,16 @@ describe('QueryBarMainMenu', () => {
         />,
       );
 
-      const menu = container.querySelector('[data-slot="query-bar-main-menu"]');
+      const menu = container.querySelector('[data-slot="query-bar-field-menu"]');
       expect(menu).toHaveClass('custom-class');
     });
 
     it('has correct base styling', () => {
       const { container } = render(
-        <QueryBarMainMenu fields={mockFields} onSelect={vi.fn()} open={true} />,
+        <QueryBarFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />,
       );
 
-      const menu = container.querySelector('[data-slot="query-bar-main-menu"]');
+      const menu = container.querySelector('[data-slot="query-bar-field-menu"]');
       expect(menu).toHaveClass('w-80', 'bg-white', 'rounded-xl');
     });
   });

@@ -13,14 +13,11 @@ export const getOperatorLabel = (operator: FilterOperator, fieldType: FieldType)
 export const getOperatorFromLabel = (label: string, fieldType: FieldType): FilterOperator | null => {
   // Check type-specific labels first (more specific)
   const typeLabels = OPERATOR_LABELS_BY_TYPE[fieldType];
-  for (const [op, lbl] of Object.entries(typeLabels)) {
-    if (lbl === label) return op as FilterOperator;
-  }
+  const typeMatch = Object.entries(typeLabels).find(([, lbl]) => lbl === label);
+  if (typeMatch) return typeMatch[0] as FilterOperator;
   // Fall back to generic labels
-  for (const [op, lbl] of Object.entries(OPERATOR_LABELS)) {
-    if (lbl === label) return op as FilterOperator;
-  }
-  return null;
+  const genericMatch = Object.entries(OPERATOR_LABELS).find(([, lbl]) => lbl === label);
+  return genericMatch ? (genericMatch[0] as FilterOperator) : null;
 };
 
 /** Check if operator supports multi-select */
