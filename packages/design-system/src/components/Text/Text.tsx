@@ -75,7 +75,10 @@ export const Text: FC<PropsWithChildren<TextProps>> = ({
   return (
     <Comp
       {...props}
-      className={cn(textVariants({ size, weight, color, truncate, align, grow, decoration }), lineClampClass)}
+      className={cn(
+        textVariants({ size, weight, color, truncate, align, grow, decoration }),
+        lineClampClass,
+      )}
     />
   );
 };

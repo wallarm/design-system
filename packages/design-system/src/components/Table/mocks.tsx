@@ -641,7 +641,11 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
     return {
       ...col,
       size: 220,
-      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Target resource' } },
+      meta: {
+        ...col.meta,
+        resizeType: 'cut' as const,
+        description: { type: 'tooltip' as const, content: 'Target resource' },
+      },
       cell: ({ getValue }: { getValue: () => string }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
