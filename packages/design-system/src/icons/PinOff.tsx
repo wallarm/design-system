@@ -12,15 +12,7 @@ export const PinOff: FC<SvgIconProps> = props => (
       fill='none'
     />
     <path
-      d='M15 9.34V7a1 1 0 0 1 1-1 2 2 0 0 0 2-2V3H6v1a2 2 0 0 0 2 2 1 1 0 0 1 1 1v2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M17.64 15 19 17H5v-1.76a2 2 0 0 1 1.11-1.79l1.78-.9A2 2 0 0 0 9 10.76V10'
+      d='M15 9.34V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H7.89'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'
@@ -29,6 +21,14 @@ export const PinOff: FC<SvgIconProps> = props => (
     />
     <path
       d='m2 2 20 20'
+      stroke='currentColor'
+      strokeWidth='2'
+      strokeLinecap='round'
+      strokeLinejoin='round'
+      fill='none'
+    />
+    <path
+      d='M9 9v1.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h11'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'

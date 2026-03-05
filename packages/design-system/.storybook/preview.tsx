@@ -1,3 +1,4 @@
+import './react-aria-polyfill';
 import { withThemeByClassName } from '@storybook/addon-themes';
 import type { Decorator, Preview } from 'storybook-react-rsbuild';
 import { ThemeProvider, Toaster } from '../src';
