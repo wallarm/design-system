@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import { Fragment, type FC, useMemo } from 'react';
 import { cn } from '../../../utils/cn';
 import {
@@ -44,6 +45,8 @@ export interface QueryBarOperatorMenuProps {
    * Override positioning config for the dropdown
    */
   positioning?: Record<string, unknown>;
+  /** Ref to the query bar input — ArrowUp on first item returns focus here */
+  inputRef?: RefObject<HTMLInputElement | null>;
   /**
    * Optional custom class name
    */
@@ -61,6 +64,7 @@ export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
   onOpenChange,
   onEscape,
   positioning,
+  inputRef,
   className,
 }) => {
   const operatorGroups = OPERATORS_BY_TYPE[fieldType] || [];
@@ -80,6 +84,7 @@ export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
     open,
     onSelect: item => onSelect(item.value as FilterOperator),
     onClose: onEscape ?? (() => onOpenChange?.(false)),
+    inputRef,
   });
 
   return (

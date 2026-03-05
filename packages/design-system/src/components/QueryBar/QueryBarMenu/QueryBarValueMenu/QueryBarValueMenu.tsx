@@ -1,11 +1,14 @@
-import type { FC } from 'react';
+import type { FC, RefObject } from 'react';
 import { cn } from '../../../../utils/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuFooter,
   DropdownMenuGroup,
 } from '../../../DropdownMenu';
-import { MenuFooter } from '../MenuFooter';
+import { Kbd } from '../../../Kbd/Kbd';
+import { KbdGroup } from '../../../Kbd/KbdGroup';
+import { MenuEmptyState } from '../MenuEmptyState';
 import { ValueMenuItem } from './ValueMenuItem';
 import { useValueMenuState } from './useValueMenuState';
 
@@ -31,6 +34,8 @@ export interface QueryBarValueMenuProps {
   width?: 'standard' | 'compact' | number;
   positioning?: Record<string, unknown>;
   onBuildingValueChange?: (preview: string | undefined) => void;
+  /** Ref to the query bar input — ArrowUp on first item returns focus here */
+  inputRef?: RefObject<HTMLInputElement | null>;
   className?: string;
 }
 
@@ -47,6 +52,7 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
   width = 'standard',
   positioning,
   onBuildingValueChange,
+  inputRef,
   className,
 }) => {
   const {
@@ -54,11 +60,10 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
     highlightedValue,
     onHighlightChange,
     pendingIds,
-    commitChecked,
     handleItemSelect,
   } = useValueMenuState({
     values, open, multiSelect, initialValues, highlightValue,
-    onSelect, onCommit, onEscape, onOpenChange, onBuildingValueChange,
+    onSelect, onCommit, onEscape, onOpenChange, onBuildingValueChange, inputRef,
   });
 
   const widthClass = width === 'compact' ? 'w-[172px]' : 'w-[300px]';
@@ -67,29 +72,54 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
   return (
     <DropdownMenu
       open={open}
-      onOpenChange={(isOpen) => {
-        if (!isOpen && multiSelect) commitChecked();
-        onOpenChange?.(isOpen);
-      }}
+      onOpenChange={onOpenChange}
       closeOnSelect={false}
       positioning={positioning}
       highlightedValue={highlightedValue}
       onHighlightChange={onHighlightChange}
     >
       <DropdownMenuContent className={cn(widthClass, className)} style={widthStyle}>
-        <DropdownMenuGroup>
-          {values.map(option => (
-            <ValueMenuItem
-              key={String(option.value)}
-              option={option}
-              isChecked={selectedValues.includes(option.value)}
-              isPending={pendingIds.has(String(option.value))}
-              multiSelect={multiSelect}
-              onSelect={() => handleItemSelect({ id: String(option.value), label: option.label, value: option.value })}
-            />
-          ))}
-        </DropdownMenuGroup>
-        <MenuFooter multiSelect={multiSelect} />
+        {values.length > 0 ? (
+          <DropdownMenuGroup>
+            {values.map(option => (
+              <ValueMenuItem
+                key={String(option.value)}
+                option={option}
+                isChecked={selectedValues.includes(option.value)}
+                isPending={pendingIds.has(String(option.value))}
+                multiSelect={multiSelect}
+                onSelect={() => handleItemSelect({ id: String(option.value), label: option.label, value: option.value })}
+              />
+            ))}
+          </DropdownMenuGroup>
+        ) : (
+          <MenuEmptyState />
+        )}
+        <DropdownMenuFooter>
+          {multiSelect ? (
+            <>
+              <span className='flex items-center gap-4'>
+                <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+                to select
+              </span>
+              <span className='flex items-center gap-4'>
+                <KbdGroup><Kbd>⌘</Kbd><Kbd>↑</Kbd><Kbd>↓</Kbd></KbdGroup>
+                to multi-select
+              </span>
+            </>
+          ) : (
+            <>
+              <span className='flex items-center gap-4'>
+                <KbdGroup><Kbd>↑</Kbd><Kbd>↓</Kbd></KbdGroup>
+                to navigate
+              </span>
+              <span className='flex items-center gap-4'>
+                <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+                to select
+              </span>
+            </>
+          )}
+        </DropdownMenuFooter>
       </DropdownMenuContent>
     </DropdownMenu>
   );

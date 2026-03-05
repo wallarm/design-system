@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useKeyboardNav } from '../../hooks';
 import type { QueryBarDropdownItem } from '../../types';
@@ -16,6 +17,7 @@ interface UseValueMenuStateOptions {
   onEscape?: () => void;
   onOpenChange?: (open: boolean) => void;
   onBuildingValueChange?: (preview: string | undefined) => void;
+  inputRef?: RefObject<HTMLInputElement | null>;
 }
 
 export const useValueMenuState = ({
@@ -29,28 +31,33 @@ export const useValueMenuState = ({
   onEscape,
   onOpenChange,
   onBuildingValueChange,
+  inputRef,
 }: UseValueMenuStateOptions) => {
   // ── Multi-select internal state ─────────────────────────
   const [checkedValues, setCheckedValues] = useState<ConditionValue[]>(initialValues);
+  const checkedValuesRef = useRef(checkedValues);
 
   // Only reset checked values on open transition, not on every initialValues reference change
   const prevOpenRef = useRef(false);
   useEffect(() => {
     if (open && !prevOpenRef.current) {
       setCheckedValues(initialValues);
+      checkedValuesRef.current = initialValues;
     }
     prevOpenRef.current = open;
   }, [open, initialValues]);
 
   const toggleValue = (val: ConditionValue) => {
-    setCheckedValues(prev =>
-      prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val],
-    );
+    setCheckedValues(prev => {
+      const next = prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val];
+      checkedValuesRef.current = next;
+      return next;
+    });
   };
 
   const commitChecked = () => {
-    if (checkedValues.length > 0 && onCommit) {
-      onCommit(checkedValues);
+    if (checkedValuesRef.current.length > 0 && onCommit) {
+      onCommit(checkedValuesRef.current);
     }
   };
 
@@ -79,6 +86,8 @@ export const useValueMenuState = ({
     onSelect: handleItemSelect,
     onClose: onEscape ?? handleClose,
     onArrowRight: multiSelect ? () => commitChecked() : undefined,
+    onPendingCommit: multiSelect ? () => commitChecked() : undefined,
+    inputRef,
   });
 
   // ── Selected values for display ─────────────────────────

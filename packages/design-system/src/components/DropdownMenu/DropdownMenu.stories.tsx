@@ -15,6 +15,7 @@ import { DropdownMenuLabel } from './DropdownMenuLabel';
 import { DropdownMenuSeparator } from './DropdownMenuSeparator';
 import { DropdownMenuShortcut } from './DropdownMenuShortcut';
 import { DropdownMenuTrigger } from './DropdownMenuTrigger';
+import { DropdownMenuFooter } from './DropdownMenuFooter';
 import { DropdownMenuTriggerItem } from './DropdownMenuTriggerItem';
 
 const meta = {
@@ -310,6 +311,40 @@ export const WithIcons: StoryFn<typeof meta> = () => (
         <CirclePlus />
         <DropdownMenuItemText>Request custom widget</DropdownMenuItemText>
       </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+);
+
+export const WithFooter: StoryFn<typeof meta> = () => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open
+      </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuItem>Profile</DropdownMenuItem>
+      <DropdownMenuItem>Billing</DropdownMenuItem>
+      <DropdownMenuItem>Settings</DropdownMenuItem>
+      <DropdownMenuItem>Notifications</DropdownMenuItem>
+      <DropdownMenuItem>Integrations</DropdownMenuItem>
+      <DropdownMenuItem>Security</DropdownMenuItem>
+      <DropdownMenuItem>API Keys</DropdownMenuItem>
+      <DropdownMenuItem>Webhooks</DropdownMenuItem>
+      <DropdownMenuItem>Audit Log</DropdownMenuItem>
+      <DropdownMenuItem>Team Members</DropdownMenuItem>
+      <DropdownMenuItem>Permissions</DropdownMenuItem>
+      <DropdownMenuItem>Usage</DropdownMenuItem>
+      <DropdownMenuFooter>
+        <span className='flex items-center gap-4'>
+          <KbdGroup><Kbd>↑</Kbd><Kbd>↓</Kbd></KbdGroup>
+          to navigate
+        </span>
+        <span className='flex items-center gap-4'>
+          <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+          to select
+        </span>
+      </DropdownMenuFooter>
     </DropdownMenuContent>
   </DropdownMenu>
 );

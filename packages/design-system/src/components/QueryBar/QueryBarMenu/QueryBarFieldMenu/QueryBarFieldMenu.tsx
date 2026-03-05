@@ -1,19 +1,25 @@
+import type { RefObject } from 'react';
 import { type FC, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuFooter,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuItemText,
 } from '../../../DropdownMenu';
+import { Kbd } from '../../../Kbd/Kbd';
+import { KbdGroup } from '../../../Kbd/KbdGroup';
 import { useKeyboardNav } from '../../hooks';
 import type { Condition, FieldMetadata, QueryBarDropdownItem } from '../../types';
-import { MenuFooter } from '../MenuFooter';
+import { MenuEmptyState } from '../MenuEmptyState';
 import { OperatorsSection, RecentSection, SuggestionsSection } from './FieldMenuSections';
 
 export interface QueryBarFieldMenuProps {
   fields: FieldMetadata[];
+  /** Text from the input to filter displayed fields */
+  filterText?: string;
   onSelect: (field: FieldMetadata) => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -23,11 +29,14 @@ export interface QueryBarFieldMenuProps {
   onSelectOr?: () => void;
   onEscape?: () => void;
   positioning?: Record<string, unknown>;
+  /** Ref to the query bar input — ArrowUp on first item returns focus here */
+  inputRef?: RefObject<HTMLInputElement | null>;
   className?: string;
 }
 
 export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
   fields,
+  filterText = '',
   onSelect,
   open = false,
   onOpenChange,
@@ -37,16 +46,23 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
   onSelectOr,
   onEscape,
   positioning,
+  inputRef,
   className,
 }) => {
   const limitedRecentConditions = recentConditions.slice(0, 3);
   const showRecent = limitedRecentConditions.length > 0;
   const showSuggestions = suggestedFields.length > 0;
+  const query = filterText.toLowerCase();
+
+  const filteredFields = useMemo(
+    () => query ? fields.filter(f => f.label.toLowerCase().includes(query) || f.name.toLowerCase().includes(query)) : fields,
+    [fields, query],
+  );
 
   const flatItems: QueryBarDropdownItem[] = useMemo(() => {
     const items: QueryBarDropdownItem[] = [];
 
-    if (showRecent) {
+    if (!query && showRecent) {
       limitedRecentConditions.forEach((condition, index) => {
         const fieldMeta = fields.find(f => f.name === condition.field);
         items.push({
@@ -57,21 +73,21 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
       });
     }
 
-    if (showSuggestions && !showRecent) {
+    if (!query && showSuggestions && !showRecent) {
       suggestedFields.forEach((field, index) => {
         items.push({ id: `suggested-${index}`, label: field.label, value: { type: 'field', field } });
       });
     }
 
-    fields.forEach(field => {
+    filteredFields.forEach(field => {
       items.push({ id: `field-${field.name}`, label: field.label, value: { type: 'field', field } });
     });
 
-    if (onSelectAnd) items.push({ id: 'and', label: 'AND', value: { type: 'and' } });
-    if (onSelectOr) items.push({ id: 'or', label: 'OR', value: { type: 'or' } });
+    if (!query && onSelectAnd) items.push({ id: 'and', label: 'AND', value: { type: 'and' } });
+    if (!query && onSelectOr) items.push({ id: 'or', label: 'OR', value: { type: 'or' } });
 
     return items;
-  }, [fields, limitedRecentConditions, suggestedFields, showRecent, showSuggestions, onSelectAnd, onSelectOr]);
+  }, [filteredFields, fields, limitedRecentConditions, suggestedFields, showRecent, showSuggestions, onSelectAnd, onSelectOr, query]);
 
   const handleItemSelect = (item: QueryBarDropdownItem) => {
     const data = item.value as { type: string; field?: FieldMetadata };
@@ -89,32 +105,46 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
     open,
     onSelect: handleItemSelect,
     onClose: onEscape ?? (() => onOpenChange?.(false)),
+    inputRef,
   });
 
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue} onHighlightChange={onHighlightChange}>
       <DropdownMenuContent className={cn('w-[300px]', className)} data-slot='query-bar-field-menu'>
-        {showRecent && (
+        {!query && showRecent && (
           <RecentSection conditions={limitedRecentConditions} fields={fields} onSelect={onSelect} />
         )}
 
-        {showSuggestions && !showRecent && (
+        {!query && showSuggestions && !showRecent && (
           <SuggestionsSection fields={suggestedFields} onSelect={onSelect} />
         )}
 
-        <DropdownMenuGroup>
-          {fields.map(field => (
-            <DropdownMenuItem key={field.name} value={`field-${field.name}`} onSelect={() => onSelect(field)}>
-              <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuGroup>
+        {filteredFields.length > 0 ? (
+          <DropdownMenuGroup>
+            {filteredFields.map(field => (
+              <DropdownMenuItem key={field.name} value={`field-${field.name}`} onSelect={() => onSelect(field)}>
+                <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
+        ) : (
+          <MenuEmptyState />
+        )}
 
-        {(onSelectAnd || onSelectOr) && (
+        {!query && (onSelectAnd || onSelectOr) && (
           <OperatorsSection onSelectAnd={onSelectAnd} onSelectOr={onSelectOr} />
         )}
 
-        <MenuFooter />
+        <DropdownMenuFooter>
+          <span className='flex items-center gap-4'>
+            <KbdGroup><Kbd>↑</Kbd><Kbd>↓</Kbd></KbdGroup>
+            to navigate
+          </span>
+          <span className='flex items-center gap-4'>
+            <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+            to select
+          </span>
+        </DropdownMenuFooter>
       </DropdownMenuContent>
     </DropdownMenu>
   );

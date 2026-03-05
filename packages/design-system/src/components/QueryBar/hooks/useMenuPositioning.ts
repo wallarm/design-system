@@ -43,7 +43,7 @@ export const useMenuPositioning = ({
       const containerRect = containerRef.current?.getBoundingClientRect();
       if (!containerRect) return null;
 
-      // Determine offset: editing > building chip > input > 0
+      // Determine horizontal offset: editing > building chip > input > 0
       let offset = 0;
       if (editingOffsetRef.current !== null) {
         offset = editingOffsetRef.current;

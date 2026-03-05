@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, RefObject } from 'react';
 import { QueryBarDateValueMenu } from './QueryBarDateValueMenu';
 import { isBetweenOperator, isMultiSelectOperator } from '../lib';
 import type { FieldMetadata, FilterOperator, MenuState } from '../types';
@@ -7,6 +7,7 @@ import { QueryBarOperatorMenu } from './QueryBarOperatorMenu';
 import { QueryBarValueMenu } from './QueryBarValueMenu';
 
 export interface QueryBarAutocompleteState {
+  inputText: string;
   menuState: MenuState;
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
@@ -14,6 +15,7 @@ export interface QueryBarAutocompleteState {
   editingMultiValues: Array<string | number | boolean>;
   editingSingleValue: string | number | boolean | undefined;
   editingDateIsAbsolute: boolean;
+  inputRef: RefObject<HTMLInputElement | null>;
   handleFieldSelect: (field: FieldMetadata) => void;
   handleOperatorSelect: (operator: FilterOperator) => void;
   handleValueSelect: (val: string | number | boolean) => void;
@@ -31,6 +33,7 @@ export interface QueryBarMenuProps {
 
 export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) => {
   const {
+    inputText,
     menuState,
     selectedField,
     selectedOperator,
@@ -38,6 +41,7 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
     editingMultiValues,
     editingSingleValue,
     editingDateIsAbsolute,
+    inputRef,
     handleFieldSelect,
     handleOperatorSelect,
     handleValueSelect,
@@ -52,11 +56,13 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
     <>
       <QueryBarFieldMenu
         fields={fields}
+        filterText={inputText}
         open={menuState === 'field'}
         onSelect={handleFieldSelect}
         onOpenChange={() => handleMenuClose()}
         onEscape={handleMenuDiscard}
         positioning={menuPositioning}
+        inputRef={inputRef}
       />
 
       {selectedField && (
@@ -67,6 +73,7 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
           onOpenChange={() => handleMenuClose()}
           onEscape={handleMenuDiscard}
           positioning={menuPositioning}
+          inputRef={inputRef}
         />
       )}
 
@@ -84,6 +91,7 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
             betweenLabel={
               isBetweenOperator(selectedOperator) ? 'Select date range' : undefined
             }
+            inputRef={inputRef}
           />
         ) : (
           <QueryBarValueMenu
@@ -98,6 +106,7 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
             highlightValue={editingSingleValue}
             positioning={menuPositioning}
             onBuildingValueChange={handleBuildingValueChange}
+            inputRef={inputRef}
           />
         )
       )}

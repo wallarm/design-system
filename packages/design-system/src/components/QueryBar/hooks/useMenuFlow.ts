@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import { useCallback } from 'react';
 import { isBetweenOperator, isNoValueOperator } from '../lib';
 import type { FieldMetadata, FilterOperator, MenuState } from '../types';
@@ -10,6 +11,7 @@ interface MenuFlowDeps {
   };
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
+  inputRef: RefObject<HTMLInputElement | null>;
   upsertCondition: (
     field: FieldMetadata,
     operator: FilterOperator,
@@ -29,6 +31,7 @@ export const useMenuFlow = ({
   editing,
   selectedField,
   selectedOperator,
+  inputRef,
   upsertCondition,
   resetState,
   dateRange,
@@ -38,9 +41,11 @@ export const useMenuFlow = ({
   setMenuState,
   setBuildingMultiValue,
 }: MenuFlowDeps) => {
+  // Ignore Ark UI close when focus is returning to our input (e.g. ArrowUp on first item)
   const handleMenuClose = useCallback(() => {
+    if (document.activeElement === inputRef.current) return;
     resetState();
-  }, [resetState]);
+  }, [resetState, inputRef]);
 
   const handleFieldSelect = useCallback((field: FieldMetadata) => {
     if (editing.tryEditField(field)) {

@@ -1,28 +1,19 @@
-import type { FC, HTMLAttributes, Ref } from 'react';
+import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 
 interface DropdownMenuFooterProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
   ref?: Ref<HTMLDivElement>;
 }
 
-export const DropdownMenuFooter: FC<DropdownMenuFooterProps> = ({
-  className,
-  children,
-  ref,
-  ...props
-}) => (
+export const DropdownMenuFooter: FC<DropdownMenuFooterProps> = ({ className, ...props }) => (
   <div
-    ref={ref}
     className={cn(
-      'flex items-center gap-16 border-t border-border-primary mx-8 pt-8 pb-4',
-      'text-xs font-medium text-text-secondary',
+      '-mx-8 -mb-8 mt-4 flex items-center justify-between gap-8 rounded-b-12 border-t border-border-primary-light px-8 py-8 text-sm text-text-secondary',
       className,
     )}
-    data-slot='dropdown-menu-footer'
     {...props}
-  >
-    {children}
-  </div>
+  />
 );
 
 DropdownMenuFooter.displayName = 'DropdownMenuFooter';

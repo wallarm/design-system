@@ -100,6 +100,7 @@ export const useQueryBarAutocomplete = ({
     editing,
     selectedField,
     selectedOperator,
+    inputRef,
     upsertCondition,
     resetState,
     dateRange,
@@ -131,11 +132,18 @@ export const useQueryBarAutocomplete = ({
   }, [menuState, selectedField, resetMenuOffset]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Backspace' && inputText === '' && conditions.length > 0) {
+    if (e.key === 'ArrowDown' && menuState !== 'closed') {
+      e.preventDefault();
+      const menuEl = document.querySelector<HTMLElement>('[role="menu"][data-state="open"]');
+      menuEl?.focus();
+      return;
+    }
+    if (e.key === 'Backspace' && !e.repeat && inputText === '' && conditions.length > 0) {
       e.preventDefault();
       removeLastCondition();
+      setMenuState('closed');
     }
-  }, [inputText, conditions.length, removeLastCondition]);
+  }, [inputText, conditions.length, removeLastCondition, menuState]);
 
   // ── Focus ─────────────────────────────────────────────────
 
@@ -154,6 +162,7 @@ export const useQueryBarAutocomplete = ({
   const handleChipRemove = useCallback((chipId: string) => {
     removeCondition(chipId);
     resetMenuOffset();
+    setMenuState('closed');
     inputRef.current?.focus();
   }, [removeCondition, resetMenuOffset, inputRef]);
 
@@ -172,6 +181,25 @@ export const useQueryBarAutocomplete = ({
     }
     prevFocusedRef.current = isFocused;
   }, [isFocused, conditions.length, inputText, resetMenuOffset]);
+
+  // ── Prevent Ark UI focus steal on menu open ──────────────
+  // Ark UI Menu steals focus via rAF when a menu mounts.
+  // We redirect once per menu state change so focus stays on the input.
+  // After that, ArrowDown can freely move focus to the menu.
+
+  useEffect(() => {
+    if (menuState === 'closed') return;
+
+    let cancelled = false;
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (!cancelled && document.activeElement !== inputRef.current) {
+          inputRef.current?.focus();
+        }
+      });
+    });
+    return () => { cancelled = true; };
+  }, [menuState, inputRef]);
 
   // ── Derived values ────────────────────────────────────────
 
@@ -202,6 +230,7 @@ export const useQueryBarAutocomplete = ({
     menuPositioning,
     editingMultiValues,
     editingSingleValue,
+    inputRef,
     handleInputChange,
     handleFieldSelect,
     handleOperatorSelect,

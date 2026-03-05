@@ -1,4 +1,11 @@
-import { Children, type FC, type HTMLAttributes, isValidElement, type ReactNode, type Ref } from 'react';
+import {
+  Children,
+  type FC,
+  type HTMLAttributes,
+  isValidElement,
+  type ReactNode,
+  type Ref,
+} from 'react';
 import { Menu } from '@ark-ui/react/menu';
 import { Portal } from '@ark-ui/react/portal';
 import { cn } from '../../utils/cn';
@@ -9,8 +16,12 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaViewport,
 } from '../ScrollArea';
+
 import { dropdownMenuClassNames } from './classes';
 import { DropdownMenuFooter } from './DropdownMenuFooter';
+
+const isFooter = (child: ReactNode): boolean =>
+  isValidElement(child) && child.type === DropdownMenuFooter;
 
 interface DropdownMenuContentProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -24,12 +35,8 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
   ...props
 }) => {
   const childArray = Children.toArray(children);
-  const footerChildren = childArray.filter(
-    child => isValidElement(child) && child.type === DropdownMenuFooter,
-  );
-  const menuChildren = childArray.filter(
-    child => !(isValidElement(child) && child.type === DropdownMenuFooter),
-  );
+  const footerChildren = childArray.filter(isFooter);
+  const menuChildren = childArray.filter(child => !isFooter(child));
 
   return (
     <Portal>
@@ -38,7 +45,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
           ref={ref}
           className={cn(
             dropdownMenuClassNames,
-            'max-h-(--available-height)',
+            'max-h-[min(415px,var(--available-height))]',
             'origin-[--transform-origin]',
             className,
           )}

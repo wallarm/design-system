@@ -1,3 +1,4 @@
+import type { RefObject } from 'react';
 import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../../../../utils/cn';
 import { DropdownMenu, DropdownMenuContent } from '../../../DropdownMenu';
@@ -18,6 +19,8 @@ export interface QueryBarDateValueMenuProps {
   initialCalendar?: boolean;
   /** Enable range selection in the calendar (for "between" operator) */
   range?: boolean;
+  /** Ref to the query bar input — ArrowUp on first item returns focus here */
+  inputRef?: RefObject<HTMLInputElement | null>;
   className?: string;
 }
 
@@ -31,6 +34,7 @@ export const QueryBarDateValueMenu: FC<QueryBarDateValueMenuProps> = ({
   betweenLabel,
   initialCalendar = false,
   range = false,
+  inputRef,
   className,
 }) => {
   const [showCalendar, setShowCalendar] = useState(initialCalendar);
@@ -65,6 +69,7 @@ export const QueryBarDateValueMenu: FC<QueryBarDateValueMenuProps> = ({
     open: open && !showCalendar,
     onSelect: handleItemSelect,
     onClose: onEscape ?? (() => onOpenChange?.(false)),
+    inputRef,
     onArrowRight: () => {
       const highlighted = flatItems.find(i => i.id === highlightedValue);
       if (highlighted?.id === '__absolute__') {
