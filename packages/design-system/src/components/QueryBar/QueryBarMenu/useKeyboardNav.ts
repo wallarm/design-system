@@ -57,6 +57,7 @@ export const useKeyboardNav = ({
 
   // Reset when menu opens
   const prevOpenRef = useRef(open);
+  const prevItemsLenRef = useRef(items.length);
   useEffect(() => {
     if (open && !prevOpenRef.current) {
       setActiveIndex(-1);
@@ -65,6 +66,18 @@ export const useKeyboardNav = ({
     }
     prevOpenRef.current = open;
   }, [open]);
+
+  // Clamp activeIndex when items list changes (e.g. filtering)
+  useEffect(() => {
+    if (items.length !== prevItemsLenRef.current) {
+      prevItemsLenRef.current = items.length;
+      if (activeIndexRef.current >= items.length) {
+        const clamped = items.length > 0 ? items.length - 1 : -1;
+        activeIndexRef.current = clamped;
+        setActiveIndex(clamped);
+      }
+    }
+  }, [items.length]);
 
   // Navigate to next enabled item, returns the new index synchronously
   const navigate = useCallback((direction: 1 | -1): number => {

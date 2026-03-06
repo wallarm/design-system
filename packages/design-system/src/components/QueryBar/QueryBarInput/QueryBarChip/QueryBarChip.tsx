@@ -1,5 +1,5 @@
 import type { FC, HTMLAttributes, MouseEvent as ReactMouseEvent } from 'react';
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import { chipVariants } from './classes';
 import { useEditingContext } from './EditingContext';
@@ -32,7 +32,6 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
   className,
   ...props
 }) => {
-  const [isHovered, setIsHovered] = useState(false);
   const interactive = !building;
   const chipRef = useRef<HTMLDivElement>(null);
 
@@ -69,9 +68,7 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
     <div
       ref={chipRef}
       className={cn(chipVariants({ error, interactive }), 'max-w-[600px]', className)}
-      data-slot='query-bar-chip'
-      onMouseEnter={interactive ? () => setIsHovered(true) : undefined}
-      onMouseLeave={interactive ? () => setIsHovered(false) : undefined}
+      data-slot='query-bar-condition-chip'
       {...props}
     >
       <Segment
@@ -101,7 +98,7 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
         </Segment>
       )}
 
-      {isHovered && onRemove && <QueryBarRemoveButton error={error} onRemove={onRemove} />}
+      {onRemove && <QueryBarRemoveButton error={error} onRemove={onRemove} />}
     </div>
   );
 };

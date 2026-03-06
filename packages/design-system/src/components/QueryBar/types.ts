@@ -109,7 +109,7 @@ export interface QueryBarDropdownItem {
   /** Display label */
   label: string;
   /** Value to return on selection */
-  value: any;
+  value: unknown;
   /** Optional icon to display */
   icon?: ReactNode;
   /** Optional badge with color and text */

@@ -2,12 +2,13 @@ import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
 import { useCallback, useMemo } from 'react';
 import { cn } from '../../../utils/cn';
 import { inputVariants } from '../../Input/classes';
-import { findChipSplitIndex } from '../lib';
+import { findChipSplitIndex, isMenuRelated } from '../lib';
 import { useQueryBarContext } from '../QueryBarContext';
 import { ChipsWithGaps, TrailingGap } from './ChipsWithGaps';
-import { queryBarContainerVariants, queryBarInnerVariants, queryBarInputVariants } from './classes';
+import { queryBarContainerVariants, queryBarInnerVariants } from './classes';
 import { EditingProvider } from './QueryBarChip/EditingContext';
 import { QueryBarChip } from './QueryBarChip/QueryBarChip';
+import { QueryBarFilterInput } from './QueryBarFilterInput';
 import { QueryBarInputActions } from './QueryBarInputActions';
 
 type QueryBarInputProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
@@ -17,21 +18,14 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
     chips,
     buildingChipData,
     buildingChipRef,
-    inputText,
-    inputRef,
-    placeholder,
-    error,
-    menuOpen,
     insertIndex,
     insertAfterConnector,
-    onInputChange,
-    onInputKeyDown,
+    error,
     onInputClick,
     onGapClick,
     onChipClick,
     onConnectorChange,
     onChipRemove,
-    // Inline segment editing
     editingChipId,
     editingSegment,
     segmentFilterText,
@@ -51,13 +45,17 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
   const chipsBefore = useMemo(() => chips.slice(0, chipSplitIndex), [chips, chipSplitIndex]);
   const chipsAfter = useMemo(() => chips.slice(chipSplitIndex), [chips, chipSplitIndex]);
 
-  // Hide the gap that sits right next to the input cursor
   const lastBefore = chipsBefore[chipsBefore.length - 1];
   const firstAfter = chipsAfter[0];
   const hideTrailingGap = lastBefore?.variant === 'and' || lastBefore?.variant === 'or';
   const hideLeadingGap = firstAfter?.variant === 'and' || firstAfter?.variant === 'or';
 
-  // ── Segment editing handlers ──────────────────────────────
+  const chipsGapProps = {
+    onChipClick,
+    onConnectorChange,
+    onChipRemove,
+    onGapClick,
+  } as const;
 
   const handleSegmentEditKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -66,14 +64,11 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
         onCancelSegmentEdit();
         return;
       }
-      // Enter on value segment → commit custom value
-      // Only fires if useKeyboardNav (capture phase) didn't preventDefault (i.e. no active menu item)
       if (e.key === 'Enter' && editingSegment === 'value' && !e.defaultPrevented) {
         e.preventDefault();
         onCustomValueCommit(segmentFilterText);
         return;
       }
-      // ArrowDown → move focus to the open menu
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         menuRef.current?.focus();
@@ -84,16 +79,7 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
 
   const handleSegmentEditBlur = useCallback(
     (e: FocusEvent<HTMLInputElement>) => {
-      const related = e.relatedTarget as HTMLElement | null;
-      // Don't cancel if focus moves to a dropdown menu or date picker
-      if (
-        related?.closest('[role="menu"]') ||
-        related?.closest('[data-scope="menu"]') ||
-        related?.closest('[data-scope="date-picker"]') ||
-        related?.closest('[data-part="content"]')
-      )
-        return;
-      onCancelSegmentEdit();
+      if (!isMenuRelated(e.relatedTarget as HTMLElement | null)) onCancelSegmentEdit();
     },
     [onCancelSegmentEdit],
   );
@@ -109,9 +95,6 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
     >
       <div
         className={cn(inputVariants({ error }), queryBarContainerVariants({ error }), className)}
-        role='combobox'
-        aria-expanded={menuOpen}
-        aria-invalid={error}
         data-slot='query-bar'
         {...props}
       >
@@ -119,19 +102,10 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
         <div
           className={queryBarInnerVariants({ hasContent })}
           onClick={e => {
-            if (e.target === e.currentTarget) {
-              onInputClick();
-            }
+            if (e.target === e.currentTarget) onInputClick();
           }}
         >
-          <ChipsWithGaps
-            chips={chipsBefore}
-            hideTrailingGap={hideTrailingGap}
-            onChipClick={onChipClick}
-            onConnectorChange={onConnectorChange}
-            onChipRemove={onChipRemove}
-            onGapClick={onGapClick}
-          />
+          <ChipsWithGaps chips={chipsBefore} hideTrailingGap={hideTrailingGap} {...chipsGapProps} />
 
           {buildingChipData && (
             <div ref={buildingChipRef} className={cn('min-w-0', hasContent && 'ml-8')}>
@@ -143,26 +117,10 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
               />
             </div>
           )}
-          <input
-            ref={inputRef}
-            type='text'
-            value={inputText}
-            onChange={onInputChange}
-            onKeyDown={onInputKeyDown}
-            onClick={onInputClick}
-            placeholder={hasContent ? '' : placeholder}
-            style={hasContent ? { width: `${Math.max(4, inputText.length * 8)}px` } : undefined}
-            className={queryBarInputVariants({ hasContent })}
-          />
 
-          <ChipsWithGaps
-            chips={chipsAfter}
-            hideLeadingGap={hideLeadingGap}
-            onChipClick={onChipClick}
-            onConnectorChange={onConnectorChange}
-            onChipRemove={onChipRemove}
-            onGapClick={onGapClick}
-          />
+          <QueryBarFilterInput hasContent={hasContent} />
+
+          <ChipsWithGaps chips={chipsAfter} hideLeadingGap={hideLeadingGap} {...chipsGapProps} />
 
           {chipsAfter.length > 0 && <TrailingGap chips={chipsAfter} onGapClick={onGapClick} />}
         </div>

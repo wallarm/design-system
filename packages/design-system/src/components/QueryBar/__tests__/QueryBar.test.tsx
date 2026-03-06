@@ -43,10 +43,10 @@ describe('QueryBar', () => {
       expect(wrapper).toHaveClass('custom-class');
     });
 
-    it('has combobox role', () => {
-      const { container } = render(<QueryBar fields={sampleFields} />);
-      const field = container.querySelector('[data-slot="query-bar"]');
-      expect(field).toHaveAttribute('role', 'combobox');
+    it('has combobox role on input', () => {
+      render(<QueryBar fields={sampleFields} />);
+      const input = screen.getByRole('combobox');
+      expect(input).toBeInTheDocument();
     });
   });
 
@@ -140,9 +140,9 @@ describe('QueryBar', () => {
     });
 
     it('sets aria-invalid when error is true', () => {
-      const { container } = render(<QueryBar fields={sampleFields} error={true} />);
-      const field = container.querySelector('[data-slot="query-bar"]');
-      expect(field).toHaveAttribute('aria-invalid', 'true');
+      render(<QueryBar fields={sampleFields} error={true} />);
+      const input = screen.getByRole('combobox');
+      expect(input).toHaveAttribute('aria-invalid', 'true');
     });
 
     it('applies normal styling when error is false', () => {
@@ -186,10 +186,10 @@ describe('QueryBar', () => {
       expect(clearButton).toHaveAttribute('aria-label', 'Clear all filters');
     });
 
-    it('has combobox role attribute', () => {
-      const { container } = render(<QueryBar fields={sampleFields} />);
-      const field = container.querySelector('[data-slot="query-bar"]');
-      expect(field).toHaveAttribute('role', 'combobox');
+    it('has combobox role attribute on input', () => {
+      render(<QueryBar fields={sampleFields} />);
+      const input = screen.getByRole('combobox');
+      expect(input).toHaveAttribute('aria-autocomplete', 'list');
     });
   });
 });

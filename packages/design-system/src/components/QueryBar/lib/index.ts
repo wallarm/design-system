@@ -10,3 +10,4 @@ export { getOperatorFromLabel, getOperatorLabel, isBetweenOperator, isMultiSelec
 export { DATE_PRESETS, formatDateForChip, getDateDisplayLabel, isDatePreset } from '../QueryBarMenu/QueryBarDateValueMenu/constants';
 export type { DatePreset } from '../QueryBarMenu/QueryBarDateValueMenu/constants';
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
+export { isMenuRelated } from './dom';

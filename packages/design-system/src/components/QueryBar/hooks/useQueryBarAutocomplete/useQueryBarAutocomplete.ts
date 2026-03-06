@@ -1,6 +1,6 @@
 import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { chipIdToConditionIndex } from '../../lib';
+import { chipIdToConditionIndex, isMenuRelated } from '../../lib';
 import { useDateRange } from '../../QueryBarMenu/QueryBarDateValueMenu/hooks';
 import type {
   Condition,
@@ -184,15 +184,13 @@ export const useQueryBarAutocomplete = ({
 
   const handleBlur = useCallback(
     (e: FocusEvent) => {
-      if (menuState !== 'closed') return;
       const related = e.relatedTarget as HTMLElement | null;
       if (containerRef.current?.contains(related)) return;
-      // Don't reset when focus moves to a dropdown portal (e.g. connector chip menu)
-      if (related?.closest('[data-scope="menu"]')) return;
+      if (isMenuRelated(related)) return;
       setIsFocused(false);
       resetState();
     },
-    [menuState, containerRef, resetState],
+    [containerRef, resetState],
   );
 
   // ── Chip management ───────────────────────────────────────

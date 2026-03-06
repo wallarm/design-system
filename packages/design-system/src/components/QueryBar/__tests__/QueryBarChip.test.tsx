@@ -25,21 +25,13 @@ describe('QueryBarChip', () => {
       <QueryBarChip attribute='Test' className='custom-class' />,
     );
 
-    const chip = container.querySelector('[data-slot="query-bar-chip"]');
+    const chip = container.querySelector('[data-slot="query-bar-condition-chip"]');
     expect(chip).toHaveClass('custom-class');
   });
 
-  it('shows delete button on hover when onRemove is provided', async () => {
-    const user = userEvent.setup();
+  it('renders delete button when onRemove is provided', () => {
     const onRemove = vi.fn();
-
-    const { container } = render(
-      <QueryBarChip attribute='Test' onRemove={onRemove} />,
-    );
-
-    const chip = container.querySelector('[data-slot="query-bar-chip"]');
-    await user.hover(chip!);
-
+    render(<QueryBarChip attribute='Test' onRemove={onRemove} />);
     const deleteButton = screen.getByRole('button', { name: /remove filter/i });
     expect(deleteButton).toBeInTheDocument();
   });
@@ -47,17 +39,9 @@ describe('QueryBarChip', () => {
   it('calls onRemove when delete button is clicked', async () => {
     const user = userEvent.setup();
     const onRemove = vi.fn();
-
-    const { container } = render(
-      <QueryBarChip attribute='Test' onRemove={onRemove} />,
-    );
-
-    const chip = container.querySelector('[data-slot="query-bar-chip"]');
-    fireEvent.mouseEnter(chip!);
-
+    render(<QueryBarChip attribute='Test' onRemove={onRemove} />);
     const deleteButton = screen.getByRole('button', { name: /remove filter/i });
     await user.click(deleteButton);
-
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
 
@@ -66,7 +50,7 @@ describe('QueryBarChip', () => {
 
     const { container } = render(<QueryBarChip attribute='Test' />);
 
-    const chip = container.querySelector('[data-slot="query-bar-chip"]');
+    const chip = container.querySelector('[data-slot="query-bar-condition-chip"]');
     await user.hover(chip!);
 
     const deleteButton = screen.queryByRole('button', { name: /remove filter/i });
@@ -77,30 +61,22 @@ describe('QueryBarChip', () => {
     it('applies error styling when error is true', () => {
       const { container } = render(<QueryBarChip attribute='Test' error={true} />);
 
-      const chip = container.querySelector('[data-slot="query-bar-chip"]');
+      const chip = container.querySelector('[data-slot="query-bar-condition-chip"]');
       expect(chip).toHaveClass('bg-bg-light-danger', 'border-border-danger');
     });
 
     it('applies normal styling when error is false', () => {
       const { container } = render(<QueryBarChip attribute='Test' error={false} />);
 
-      const chip = container.querySelector('[data-slot="query-bar-chip"]');
+      const chip = container.querySelector('[data-slot="query-bar-condition-chip"]');
       expect(chip).toHaveClass('bg-badge-badge-bg', 'border-border-primary');
     });
   });
 
   describe('accessibility', () => {
-    it('has correct aria-label for delete button', async () => {
-      const user = userEvent.setup();
+    it('has correct aria-label for delete button', () => {
       const onRemove = vi.fn();
-
-      const { container } = render(
-        <QueryBarChip attribute='Test' onRemove={onRemove} />,
-      );
-
-      const chip = container.querySelector('[data-slot="query-bar-chip"]');
-      await user.hover(chip!);
-
+      render(<QueryBarChip attribute='Test' onRemove={onRemove} />);
       const deleteButton = screen.getByRole('button', { name: /remove filter/i });
       expect(deleteButton).toHaveAttribute('aria-label', 'Remove filter');
     });
@@ -130,13 +106,13 @@ describe('QueryBarConnectorChip', () => {
 
   it('applies error styling', () => {
     const { container } = render(<QueryBarConnectorChip variant='and' error />);
-    const chip = container.querySelector('[data-slot="query-bar-chip"]');
+    const chip = container.querySelector('[data-slot="query-bar-connector-chip"]');
     expect(chip).toHaveClass('bg-bg-light-danger', 'border-border-danger');
   });
 
   it('applies normal styling', () => {
     const { container } = render(<QueryBarConnectorChip variant='and' />);
-    const chip = container.querySelector('[data-slot="query-bar-chip"]');
+    const chip = container.querySelector('[data-slot="query-bar-connector-chip"]');
     expect(chip).toHaveClass('bg-badge-badge-bg', 'border-border-primary');
   });
 });
@@ -162,7 +138,7 @@ describe('QueryBarChip building mode', () => {
 
   it('does not have hover/remove functionality', () => {
     const { container } = render(<QueryBarChip building attribute='Test' />);
-    const chip = container.querySelector('[data-slot="query-bar-chip"]');
+    const chip = container.querySelector('[data-slot="query-bar-condition-chip"]');
     fireEvent.mouseEnter(chip!);
 
     const deleteButton = screen.queryByRole('button', { name: /remove filter/i });

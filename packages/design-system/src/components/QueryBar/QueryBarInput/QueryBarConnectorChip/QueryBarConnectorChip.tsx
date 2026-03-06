@@ -41,7 +41,8 @@ export const QueryBarConnectorChip: FC<QueryBarConnectorChipProps> = ({
           <button
             type='button'
             className={cn(chipVariants({ error, interactive: true }), 'max-w-[320px]', className)}
-            data-slot='query-bar-chip'
+            data-slot='query-bar-connector-chip'
+            aria-label={`Logical operator: ${label}`}
           >
             <div className={segmentContainer}>
               <p className={connectorTextVariants({ error })}>

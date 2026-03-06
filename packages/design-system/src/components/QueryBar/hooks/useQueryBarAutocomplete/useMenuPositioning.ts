@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import { useCallback, useMemo, useRef } from 'react';
 
-type MenuState = 'closed' | 'field' | 'operator' | 'value';
+import type { MenuState } from '../../types';
 
 interface UseMenuPositioningOptions {
   containerRef: RefObject<HTMLElement | null>;

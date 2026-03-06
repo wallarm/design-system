@@ -41,13 +41,15 @@ export const useValueMenuState = ({
 
   // Only reset checked values on open transition, not on every initialValues reference change
   const prevOpenRef = useRef(false);
+  const initialValuesRef = useRef(initialValues);
+  initialValuesRef.current = initialValues;
   useEffect(() => {
     if (open && !prevOpenRef.current) {
-      setCheckedValues(initialValues);
-      checkedValuesRef.current = initialValues;
+      setCheckedValues(initialValuesRef.current);
+      checkedValuesRef.current = initialValuesRef.current;
     }
     prevOpenRef.current = open;
-  }, [open, initialValues]);
+  }, [open]);
 
   const toggleValue = (val: ConditionValue) => {
     setCheckedValues(prev => {

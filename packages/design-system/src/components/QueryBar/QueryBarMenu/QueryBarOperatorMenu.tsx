@@ -23,10 +23,6 @@ export interface QueryBarOperatorMenuProps {
    */
   fieldType: FieldType;
   /**
-   * The currently selected operator (if any)
-   */
-  selectedOperator?: FilterOperator;
-  /**
    * Callback when an operator is selected
    */
   onSelect: (operator: FilterOperator) => void;

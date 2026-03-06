@@ -1,10 +1,7 @@
 import type { FC } from 'react';
 import { ChevronRight } from '../../../../icons/ChevronRight';
 import { Checkmark } from '../../../Checkmark';
-import {
-  DropdownMenuItem,
-  DropdownMenuItemText,
-} from '../../../DropdownMenu';
+import { DropdownMenuItem, DropdownMenuItemText } from '../../../DropdownMenu';
 import type { ValueOption } from './QueryBarValueMenu';
 
 interface ValueMenuItemProps {
@@ -26,7 +23,7 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
     key={String(option.value)}
     value={String(option.value)}
     onSelect={onSelect}
-    style={isPending ? { backgroundColor: 'var(--color-states-primary-hover)' } : undefined}
+    className={isPending ? 'bg-states-primary-hover' : undefined}
   >
     {/* Badge */}
     {option.badge ? (
@@ -35,9 +32,7 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
         style={{ backgroundColor: option.badge.color }}
       >
         <div className='size-6 rounded-full bg-current' />
-        <span className='leading-4 text-ellipsis'>
-          {option.badge.text}
-        </span>
+        <span className='leading-4 text-ellipsis'>{option.badge.text}</span>
       </div>
     ) : (
       <DropdownMenuItemText>{option.label}</DropdownMenuItemText>

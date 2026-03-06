@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 
 /** Base chip container styles shared by QueryBarChip and QueryBarConnectorChip */
 export const chipVariants = cva(
-  'relative flex items-center justify-center px-4 py-0 min-h-[20px] border border-solid rounded-8',
+  'group/chip relative flex items-center justify-center px-4 py-0 min-h-[20px] border border-solid rounded-8',
   {
     variants: {
       error: {
@@ -38,9 +38,9 @@ export const segmentTextVariants = cva(
   },
 );
 
-/** Remove button styles */
+/** Remove button styles — hidden by default, shown on chip hover or button focus */
 export const removeButtonVariants = cva(
-  'absolute -right-12 top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8',
+  'absolute -right-12 top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 group-hover/chip:opacity-100 focus:opacity-100 transition-opacity',
   {
     variants: {
       error: {

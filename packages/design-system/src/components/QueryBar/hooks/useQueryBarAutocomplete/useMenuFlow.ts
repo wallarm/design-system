@@ -65,15 +65,17 @@ export const useMenuFlow = ({
   }, [editing, resetState, setSelectedField, setInputText, setMenuState]);
 
   const handleOperatorSelect = useCallback((operator: FilterOperator) => {
+    if (!selectedField) return;
+
     if (isNoValueOperator(operator)) {
       const isEditing = !!editing.editingChipId;
-      upsertCondition(selectedField!, operator, null, editing.editingChipId, isEditing ? undefined : insertIndex);
+      upsertCondition(selectedField, operator, null, editing.editingChipId, isEditing ? undefined : insertIndex);
       resetState();
       return;
     }
 
     if (editing.editingChipId) {
-      if (editing.tryEditOperator(operator, selectedField!)) {
+      if (editing.tryEditOperator(operator, selectedField)) {
         resetState();
         return;
       }
@@ -81,7 +83,7 @@ export const useMenuFlow = ({
 
     setSelectedOperator(operator);
     setMenuState('value');
-  }, [editing, selectedField, upsertCondition, resetState, setSelectedOperator, setMenuState]);
+  }, [editing, selectedField, insertIndex, upsertCondition, resetState, setSelectedOperator, setMenuState]);
 
   /** Single-select value (including date presets, between date collection) */
   const handleValueSelect = useCallback((val: string | number | boolean) => {

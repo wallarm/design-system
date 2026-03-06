@@ -1,4 +1,4 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 
 /**
  * Manages two-value selection for the "between" date operator.
@@ -6,6 +6,8 @@ import { useCallback, useState } from 'react';
  */
 export const useDateRange = () => {
   const [fromValue, setFromValue] = useState<string | null>(null);
+  const fromValueRef = useRef<string | null>(null);
+  fromValueRef.current = fromValue;
 
   /** Current selection index: 0 = selecting "from", 1 = selecting "to" */
   const currentIndex = fromValue === null ? 0 : 1;
@@ -15,17 +17,20 @@ export const useDateRange = () => {
    * values are selected, or null if waiting for the second value.
    */
   const selectValue = useCallback((value: string): [string, string] | null => {
-    if (fromValue === null) {
+    if (fromValueRef.current === null) {
       setFromValue(value);
+      fromValueRef.current = value;
       return null;
     }
-    const result: [string, string] = [fromValue, value];
+    const result: [string, string] = [fromValueRef.current, value];
     setFromValue(null);
+    fromValueRef.current = null;
     return result;
-  }, [fromValue]);
+  }, []);
 
   const reset = useCallback(() => {
     setFromValue(null);
+    fromValueRef.current = null;
   }, []);
 
   return { fromValue, currentIndex, selectValue, reset };

@@ -1,6 +1,6 @@
 import { DatePicker, parseDate } from '@ark-ui/react/date-picker';
 import type { DateValue } from '@zag-js/date-picker';
-import { type FC, useMemo, useState } from 'react';
+import { type FC, useEffect, useMemo, useState } from 'react';
 import { ChevronLeft } from '../../../../icons/ChevronLeft';
 import { DropdownMenuSeparator } from '../../../DropdownMenu';
 import { DayView } from './DayView';
@@ -34,6 +34,11 @@ export interface DateCalendarProps {
 export const DateCalendar: FC<DateCalendarProps> = ({ onSelect, onRangeSelect, onBack, onEscape, betweenLabel, range = false, initialValue, filterText }) => {
   const parsedInitial = useMemo(() => tryParseDateValue(initialValue), [initialValue]);
   const [selectedValue, setSelectedValue] = useState<DateValue | undefined>(parsedInitial);
+
+  // Reset selectedValue when initialValue changes (e.g. reopening with different date)
+  useEffect(() => {
+    setSelectedValue(parsedInitial);
+  }, [parsedInitial]);
 
   // Parse filterText into a DateValue for focused navigation
   const parsedFilter = useMemo(() => tryParseDateValue(filterText), [filterText]);
