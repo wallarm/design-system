@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useKeyboardNav } from '../../hooks';
+import { useKeyboardNav } from '../useKeyboardNav';
 import type { QueryBarDropdownItem } from '../../types';
 import type { ValueOption } from './QueryBarValueMenu';
 

@@ -12,7 +12,7 @@ import {
 } from '../../DropdownMenu';
 import { Kbd } from '../../Kbd/Kbd';
 import { KbdGroup } from '../../Kbd/KbdGroup';
-import { useKeyboardNav } from '../hooks';
+import { useKeyboardNav } from './useKeyboardNav';
 import { getOperatorLabel, OPERATORS_BY_TYPE } from '../lib';
 import type { FieldType, QueryBarDropdownItem, FilterOperator } from '../types';
 

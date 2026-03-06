@@ -1,8 +1,8 @@
 import type { RefObject } from 'react';
 import { useCallback, useMemo, useState } from 'react';
-import { chipIdToConditionIndex, getOperatorFromLabel } from '../lib';
-import type { ChipSegment } from '../QueryBarInput/QueryBarChip';
-import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../types';
+import { chipIdToConditionIndex, getOperatorFromLabel } from '../../lib';
+import type { ChipSegment } from '../../QueryBarInput/QueryBarChip';
+import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../../types';
 
 interface UseChipEditingOptions {
   conditions: Condition[];

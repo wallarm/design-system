@@ -11,7 +11,7 @@ import {
 } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
-import { useKeyboardNav } from '../../hooks';
+import { useKeyboardNav } from '../useKeyboardNav';
 import type { Condition, FieldMetadata, QueryBarDropdownItem } from '../../types';
 import { MenuEmptyState } from '../MenuEmptyState';
 import { OperatorsSection, RecentSection, SuggestionsSection } from './FieldMenuSections';

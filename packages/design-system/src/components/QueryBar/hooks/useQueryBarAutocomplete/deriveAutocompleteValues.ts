@@ -1,6 +1,6 @@
-import { chipIdToConditionIndex, getDateDisplayLabel, getOperatorLabel, isDatePreset, isMultiSelectOperator } from '../lib';
-import type { Condition, FieldMetadata, FilterOperator } from '../types';
-import type { BuildingChipData } from '../QueryBarContext/types';
+import { chipIdToConditionIndex, getDateDisplayLabel, getOperatorLabel, isDatePreset, isMultiSelectOperator } from '../../lib';
+import type { Condition, FieldMetadata, FilterOperator } from '../../types';
+import type { BuildingChipData } from '../../QueryBarContext/types';
 
 interface DeriveOptions {
   editingChipId: string | null;

@@ -9,6 +9,4 @@ export {
 export { getOperatorFromLabel, getOperatorLabel, isBetweenOperator, isMultiSelectOperator, isNoValueOperator } from './operators';
 export { DATE_PRESETS, formatDateForChip, getDateDisplayLabel, isDatePreset } from '../QueryBarMenu/QueryBarDateValueMenu/constants';
 export type { DatePreset } from '../QueryBarMenu/QueryBarDateValueMenu/constants';
-export { buildExpression, expressionToConditions } from './expression';
-export { buildChips } from './buildChips';
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';

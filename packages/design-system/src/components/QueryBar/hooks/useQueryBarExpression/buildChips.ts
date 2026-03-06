@@ -1,5 +1,5 @@
-import type { Condition, FieldMetadata, QueryBarChipData } from '../types';
-import { getDateDisplayLabel, getOperatorLabel } from './index';
+import type { Condition, FieldMetadata, QueryBarChipData } from '../../types';
+import { getDateDisplayLabel, getOperatorLabel } from '../../lib';
 
 /** Build a display chip for a single condition */
 const makeConditionChip = (

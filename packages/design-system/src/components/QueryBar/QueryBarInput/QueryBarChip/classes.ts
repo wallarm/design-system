@@ -21,6 +21,23 @@ export const chipVariants = cva(
   },
 );
 
+/** Segment container */
+export const segmentContainer = 'flex flex-col justify-center overflow-hidden p-2 leading-none';
+
+/** Segment text styles by variant */
+export const segmentTextVariants = cva(
+  'truncate text-sm',
+  {
+    variants: {
+      variant: {
+        attribute: 'font-normal text-text-primary',
+        operator: 'font-normal text-text-secondary',
+        value: 'font-medium text-text-info',
+      },
+    },
+  },
+);
+
 /** Remove button styles */
 export const removeButtonVariants = cva(
   'absolute -right-12 top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8',

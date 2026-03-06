@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import { useCallback } from 'react';
-import { isBetweenOperator, isNoValueOperator } from '../lib';
-import type { FieldMetadata, FilterOperator, MenuState } from '../types';
+import { isBetweenOperator, isNoValueOperator } from '../../lib';
+import type { FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface MenuFlowDeps {
   editing: {

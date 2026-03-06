@@ -1,9 +1,9 @@
 import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { chipIdToConditionIndex } from '../lib';
-import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../types';
+import { chipIdToConditionIndex } from '../../lib';
+import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../../types';
+import { useDateRange } from '../../QueryBarMenu/QueryBarDateValueMenu/hooks';
 import { useChipEditing } from './useChipEditing';
-import { useDateRange } from '../QueryBarMenu/QueryBarDateValueMenu/hooks';
 import { useMenuPositioning } from './useMenuPositioning';
 import { deriveAutocompleteValues } from './deriveAutocompleteValues';
 import { useMenuFlow } from './useMenuFlow';

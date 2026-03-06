@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { buildExpression, chipIdToConditionIndex, expressionToConditions } from '../lib';
-import { buildChips } from '../lib/buildChips';
-import type { Condition, ExprNode, FieldMetadata, FilterOperator } from '../types';
+import { chipIdToConditionIndex } from '../../lib';
+import type { Condition, ExprNode, FieldMetadata, FilterOperator } from '../../types';
+import { buildExpression, expressionToConditions } from './expression';
+import { buildChips } from './buildChips';
 
 interface UseQueryBarExpressionOptions {
   fields: FieldMetadata[];

@@ -1,4 +1,4 @@
-import type { Condition, ExprNode } from '../types';
+import type { Condition, ExprNode } from '../../types';
 
 /**
  * Build an ExprNode from flat conditions + per-gap connectors.

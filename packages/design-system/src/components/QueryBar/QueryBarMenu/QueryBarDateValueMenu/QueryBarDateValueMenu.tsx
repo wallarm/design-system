@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../../../../utils/cn';
 import { DropdownMenu, DropdownMenuContent } from '../../../DropdownMenu';
-import { useKeyboardNav } from '../../hooks';
+import { useKeyboardNav } from '../useKeyboardNav';
 import type { QueryBarDropdownItem } from '../../types';
 import { DATE_PRESETS } from './constants';
 import { DateCalendar } from './DateCalendar';

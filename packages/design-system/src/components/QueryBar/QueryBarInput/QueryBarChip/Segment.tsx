@@ -1,6 +1,6 @@
 import type { FC, HTMLAttributes } from 'react';
 import { cn } from '../../../../utils/cn';
-import { segmentContainer, segmentTextVariants } from '../classes';
+import { segmentContainer, segmentTextVariants } from './classes';
 
 type SegmentVariant = 'attribute' | 'operator' | 'value';
 

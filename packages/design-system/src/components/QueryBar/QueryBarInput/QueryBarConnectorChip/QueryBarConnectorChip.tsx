@@ -1,15 +1,15 @@
 import type { FC, FocusEvent, MouseEvent } from 'react';
-import { cn } from '../../../utils/cn';
+import { cn } from '../../../../utils/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuItemText,
-} from '../../DropdownMenu';
-import { DropdownMenuTrigger } from '../../DropdownMenu/DropdownMenuTrigger';
-import { VARIANT_LABELS } from '../lib/constants';
-import { chipVariants } from './QueryBarChip/classes';
-import { connectorTextVariants, segmentContainer } from './classes';
+} from '../../../DropdownMenu';
+import { DropdownMenuTrigger } from '../../../DropdownMenu/DropdownMenuTrigger';
+import { VARIANT_LABELS } from '../../lib/constants';
+import { chipVariants, segmentContainer } from '../QueryBarChip/classes';
+import { connectorTextVariants } from './classes';
 
 export type ConnectorVariant = 'and' | 'or';
 
