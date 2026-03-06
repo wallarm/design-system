@@ -16,6 +16,7 @@ export type LinkProps = LinkNativeProps &
   };
 
 export const Link: FC<LinkProps> = ({
+  className,
   asChild = false,
   type = 'default',
   size = 'lg',
@@ -32,7 +33,7 @@ export const Link: FC<LinkProps> = ({
       aria-disabled={disabled || undefined}
       tabIndex={disabled ? -1 : props.tabIndex}
       onClick={disabled ? undefined : onClick}
-      className={cn(linkVariants({ type, size, weight, disabled }))}
+      className={cn(linkVariants({ type, size, weight, disabled }), className)}
     />
   );
 };

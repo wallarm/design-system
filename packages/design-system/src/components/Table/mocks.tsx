@@ -3,6 +3,7 @@ import { Check, Copy, Filter, FilterX } from '../../icons';
 import { abbreviateNumber } from '../../utils/abbreviateNumber';
 import { Badge } from '../Badge';
 import { InlineCodeSnippet } from '../CodeSnippet';
+import type { CountryCode } from '../Country';
 import { DateTime } from '../DateTime';
 import {
   DropdownMenu,
@@ -15,8 +16,7 @@ import {
   DropdownMenuItemText,
   DropdownMenuSeparator,
 } from '../DropdownMenu';
-import type { SourceKey } from '../IpAddress';
-import { IpAddress } from '../IpAddress';
+import { Ip, IpAddress, IpCountry, IpProvider, type SourceKey, sourceLabels } from '../Ip';
 import { Link } from '../Link';
 import {
   OverflowTooltip,
@@ -39,7 +39,7 @@ export interface SecurityEvent {
   isActive: boolean;
   requests: number;
   sourceIp: string;
-  sourceCountry: string;
+  sourceCountry: CountryCode;
   sourceProvider: string;
   parameter: string;
   status: 'Blocked' | 'Monitoring';
@@ -53,8 +53,8 @@ export interface SecurityEvent {
 export interface SecurityHeaderEntry {
   id: string;
   objectName: string;
-  ip: string;
-  ipCountry: string;
+  ip: string | null;
+  ipCountry: CountryCode | null;
   provider: string;
   requests: number;
   status: 'New' | 'Active' | 'Resolved';
@@ -288,15 +288,13 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <IpAddress
-        addresses={[
-          {
-            ip: row.original.sourceIp,
-            country: row.original.sourceCountry,
-            sources: [row.original.sourceProvider as SourceKey],
-          },
-        ]}
-      />
+      <Ip>
+        {row.original.sourceCountry && <IpCountry code={row.original.sourceCountry} />}
+        <IpAddress>{row.original.sourceIp}</IpAddress>
+        {row.original.sourceProvider && (
+          <IpProvider>{sourceLabels[row.original.sourceProvider as SourceKey]}</IpProvider>
+        )}
+      </Ip>
     ),
   }),
   securityColumnHelper.accessor('parameter', {
@@ -403,7 +401,7 @@ export const groupedHeaderData: SecurityHeaderEntry[] = [
     id: 'group-csp',
     objectName: 'Content Security Policy',
     ip: '',
-    ipCountry: '',
+    ipCountry: null,
     provider: '',
     requests: 0,
     status: 'New',
@@ -416,7 +414,7 @@ export const groupedHeaderData: SecurityHeaderEntry[] = [
     id: 'group-cto',
     objectName: 'Content-Type-Options',
     ip: '',
-    ipCountry: '',
+    ipCountry: null,
     provider: '',
     requests: 0,
     status: 'New',
@@ -429,7 +427,7 @@ export const groupedHeaderData: SecurityHeaderEntry[] = [
     id: 'group-xfo',
     objectName: 'X-Frame-Options',
     ip: '',
-    ipCountry: '',
+    ipCountry: null,
     provider: '',
     requests: 0,
     status: 'New',
@@ -442,7 +440,7 @@ export const groupedHeaderData: SecurityHeaderEntry[] = [
     id: 'group-hsts',
     objectName: 'HTTP Strict Transport Security',
     ip: '',
-    ipCountry: '',
+    ipCountry: null,
     provider: '',
     requests: 0,
     status: 'New',
@@ -477,15 +475,13 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <IpAddress
-        addresses={[
-          {
-            ip: row.original.ip,
-            country: row.original.ipCountry,
-            sources: row.original.provider ? [row.original.provider as SourceKey] : undefined,
-          },
-        ]}
-      />
+      <Ip>
+        {row.original.ipCountry && <IpCountry code={row.original.ipCountry} />}
+        <IpAddress>{row.original.ip}</IpAddress>
+        {row.original.provider && (
+          <IpProvider>{sourceLabels[row.original.provider as SourceKey]}</IpProvider>
+        )}
+      </Ip>
     ),
   }),
   headerColumnHelper.accessor('requests', {
@@ -580,7 +576,7 @@ export function createLargeGroupedData(
   groupCount = 12,
   childrenPerGroup = 50,
 ): SecurityHeaderEntry[] {
-  return Array.from({ length: groupCount }, (_, gi) => {
+  return Array.from({ length: groupCount }, (_, gi): SecurityHeaderEntry => {
     const groupName = HEADER_GROUPS.at(gi % HEADER_GROUPS.length)!;
     const groupId = `group-${gi}`;
 
@@ -588,7 +584,7 @@ export function createLargeGroupedData(
       id: groupId,
       objectName: groupName,
       ip: '',
-      ipCountry: '',
+      ipCountry: null,
       provider: '',
       requests: 0,
       status: 'New' as const,
@@ -700,15 +696,13 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
       cell: ({ row }: { row: { original: SecurityHeaderEntry } }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
-            <IpAddress
-              addresses={[
-                {
-                  ip: row.original.ip,
-                  country: row.original.ipCountry,
-                  sources: row.original.provider ? [row.original.provider as SourceKey] : undefined,
-                },
-              ]}
-            />
+            <Ip>
+              {row.original.ipCountry && <IpCountry code={row.original.ipCountry} />}
+              <IpAddress>{row.original.ip}</IpAddress>
+              {row.original.provider && (
+                <IpProvider>{sourceLabels[row.original.provider as SourceKey]}</IpProvider>
+              )}
+            </Ip>
           </DropdownMenuContextTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onSelect={() => alert(`Copied: ${row.original.ip}`)}>

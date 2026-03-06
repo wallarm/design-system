@@ -34,7 +34,7 @@ const codeVariants = cva('font-mono leading-sm', {
   },
 });
 
-type CodeNativeProps = Omit<HTMLAttributes<HTMLParagraphElement>, 'className'>;
+type CodeNativeProps = HTMLAttributes<HTMLParagraphElement>;
 
 type CodeVariantProps = VariantProps<typeof codeVariants>;
 
@@ -54,6 +54,7 @@ export const Code: FC<PropsWithChildren<CodeProps>> = ({
   asChild = false,
   truncate = false,
   lineClamp,
+  className,
   ...props
 }) => {
   const Comp = asChild ? Slot : 'p';
@@ -64,6 +65,7 @@ export const Code: FC<PropsWithChildren<CodeProps>> = ({
       className={cn(
         codeVariants({ size, weight, color, italic, truncate }),
         lineClamp && `line-clamp-${lineClamp}`,
+        className,
       )}
     />
   );
