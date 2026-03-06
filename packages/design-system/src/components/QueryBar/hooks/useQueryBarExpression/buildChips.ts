@@ -1,5 +1,5 @@
-import type { Condition, FieldMetadata, QueryBarChipData } from '../../types';
 import { getDateDisplayLabel, getOperatorLabel } from '../../lib';
+import type { Condition, FieldMetadata, QueryBarChipData } from '../../types';
 
 /** Build a display chip for a single condition */
 const makeConditionChip = (
@@ -10,7 +10,15 @@ const makeConditionChip = (
 ): QueryBarChipData => {
   const condition = conditions[i];
   const chipError = condition?.error || error;
-  if (!condition) return { id: `chip-${i}`, variant: 'chip', attribute: '', operator: '', value: '', error } as QueryBarChipData;
+  if (!condition)
+    return {
+      id: `chip-${i}`,
+      variant: 'chip',
+      attribute: '',
+      operator: '',
+      value: '',
+      error,
+    } as QueryBarChipData;
   const field = fields.find(f => f.name === condition.field);
 
   let displayValue: string;
@@ -64,7 +72,7 @@ export const buildChips = (
     return conditions.flatMap((_, i) => {
       const chip = makeConditionChip(i, conditions, fields, error);
       return i > 0
-        ? [{ id: `connector-${i}`, variant: connectors[i - 1] ?? 'and', error } as QueryBarChipData, chip]
+        ? [{ id: `connector-${i}`, variant: connectors[i - 1] ?? 'and' } as QueryBarChipData, chip]
         : [chip];
     });
   }
@@ -85,24 +93,24 @@ export const buildChips = (
   return groups.reduce<{ chips: QueryBarChipData[]; parenCounter: number }>(
     (acc, group, g) => {
       if (g > 0) {
-        acc.chips.push({ id: `connector-${group[0]!}`, variant: 'or', error });
+        acc.chips.push({ id: `connector-${group[0]!}`, variant: 'or' });
       }
 
       const needsParens = group.length > 1;
 
       if (needsParens) {
-        acc.chips.push({ id: `paren-open-${acc.parenCounter}`, variant: '(', error });
+        acc.chips.push({ id: `paren-open-${acc.parenCounter}`, variant: '(' });
       }
 
       group.forEach((condIdx, j) => {
         if (j > 0) {
-          acc.chips.push({ id: `connector-${condIdx}`, variant: 'and', error });
+          acc.chips.push({ id: `connector-${condIdx}`, variant: 'and' });
         }
         acc.chips.push(makeConditionChip(condIdx, conditions, fields, error));
       });
 
       if (needsParens) {
-        acc.chips.push({ id: `paren-close-${acc.parenCounter}`, variant: ')', error });
+        acc.chips.push({ id: `paren-close-${acc.parenCounter}`, variant: ')' });
         acc.parenCounter++;
       }
 

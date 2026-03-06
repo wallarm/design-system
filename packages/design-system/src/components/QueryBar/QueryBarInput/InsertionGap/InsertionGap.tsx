@@ -10,7 +10,10 @@ export const InsertionGap: FC<InsertionGapProps> = ({ onClick }) => (
   <button
     type='button'
     className={insertionGapButton}
-    onClick={(e) => { e.stopPropagation(); onClick(); }}
+    onClick={e => {
+      e.stopPropagation();
+      onClick();
+    }}
     tabIndex={-1}
     aria-hidden='true'
   >

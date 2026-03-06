@@ -1,12 +1,12 @@
-import { DatePicker } from '@ark-ui/react/date-picker';
 import type { FC } from 'react';
+import { DatePicker } from '@ark-ui/react/date-picker';
 import { CalendarNav } from './CalendarNav';
 import { cellTriggerClass } from './styles';
 
 export const YearView: FC = () => (
   <DatePicker.View view='year'>
     <DatePicker.Context>
-      {(api) => (
+      {api => (
         <>
           <CalendarNav />
           <DatePicker.Table className='w-full border-collapse'>
@@ -14,7 +14,11 @@ export const YearView: FC = () => (
               {api.getYearsGrid({ columns: 4 }).map((years, i) => (
                 <DatePicker.TableRow key={i} className='flex'>
                   {years.map((year, j) => (
-                    <DatePicker.TableCell key={j} value={year.value} className='flex-1 text-center p-0'>
+                    <DatePicker.TableCell
+                      key={j}
+                      value={year.value}
+                      className='flex-1 text-center p-0'
+                    >
                       <DatePicker.TableCellTrigger className={cellTriggerClass}>
                         {year.label}
                       </DatePicker.TableCellTrigger>

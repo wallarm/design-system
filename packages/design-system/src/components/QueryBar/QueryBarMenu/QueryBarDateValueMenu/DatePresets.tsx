@@ -19,10 +19,15 @@ export interface DatePresetsProps {
   filterText?: string;
 }
 
-export const DatePresets: FC<DatePresetsProps> = ({ onSelect, onAbsoluteClick, betweenLabel, filterText = '' }) => {
+export const DatePresets: FC<DatePresetsProps> = ({
+  onSelect,
+  onAbsoluteClick,
+  betweenLabel,
+  filterText = '',
+}) => {
   const query = filterText.toLowerCase();
   const filteredPresets = useMemo(
-    () => query ? DATE_PRESETS.filter(p => p.label.toLowerCase().includes(query)) : DATE_PRESETS,
+    () => (query ? DATE_PRESETS.filter(p => p.label.toLowerCase().includes(query)) : DATE_PRESETS),
     [query],
   );
   const showAbsolute = !query || 'absolute date'.includes(query);
@@ -30,9 +35,7 @@ export const DatePresets: FC<DatePresetsProps> = ({ onSelect, onAbsoluteClick, b
   return (
     <>
       {betweenLabel && (
-        <div className='px-8 py-4 text-xs font-medium text-text-secondary'>
-          {betweenLabel}
-        </div>
+        <div className='px-8 py-4 text-xs font-medium text-text-secondary'>{betweenLabel}</div>
       )}
       {filteredPresets.length > 0 ? (
         <DropdownMenuGroup>
@@ -54,10 +57,7 @@ export const DatePresets: FC<DatePresetsProps> = ({ onSelect, onAbsoluteClick, b
         <>
           {filteredPresets.length > 0 && <DropdownMenuSeparator />}
           <DropdownMenuGroup>
-            <DropdownMenuItem
-              value='__absolute__'
-              onSelect={onAbsoluteClick}
-            >
+            <DropdownMenuItem value='__absolute__' onSelect={onAbsoluteClick}>
               <DropdownMenuItemText>Absolute date</DropdownMenuItemText>
               <div className='flex items-center text-text-secondary ml-auto'>
                 <ChevronRight />
@@ -69,7 +69,9 @@ export const DatePresets: FC<DatePresetsProps> = ({ onSelect, onAbsoluteClick, b
 
       <DropdownMenuFooter>
         <span className='flex items-center gap-4'>
-          <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+          <KbdGroup>
+            <Kbd>↵</Kbd>
+          </KbdGroup>
           to select
         </span>
       </DropdownMenuFooter>

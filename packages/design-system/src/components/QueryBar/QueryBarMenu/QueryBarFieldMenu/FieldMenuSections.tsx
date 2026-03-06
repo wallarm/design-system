@@ -33,7 +33,9 @@ export const RecentSection: FC<RecentSectionProps> = ({ conditions, fields, onSe
           <DropdownMenuItem
             key={`recent-${index}`}
             value={`recent-${index}`}
-            onSelect={() => { if (fieldMeta) onSelect(fieldMeta); }}
+            onSelect={() => {
+              if (fieldMeta) onSelect(fieldMeta);
+            }}
           >
             <span className='flex gap-2 items-center text-sm'>
               <span className='text-text-primary'>{attribute}</span>
@@ -93,13 +95,17 @@ export const OperatorsSection: FC<OperatorsSectionProps> = ({ onSelectAnd, onSel
     <DropdownMenuSeparator />
     {onSelectAnd && (
       <DropdownMenuItem value='and' onSelect={() => onSelectAnd()}>
-        <DropdownMenuItemIcon><CirclePlus /></DropdownMenuItemIcon>
+        <DropdownMenuItemIcon>
+          <CirclePlus />
+        </DropdownMenuItemIcon>
         <DropdownMenuItemText>AND</DropdownMenuItemText>
       </DropdownMenuItem>
     )}
     {onSelectOr && (
       <DropdownMenuItem value='or' onSelect={() => onSelectOr()}>
-        <DropdownMenuItemIcon><CircleSlash /></DropdownMenuItemIcon>
+        <DropdownMenuItemIcon>
+          <CircleSlash />
+        </DropdownMenuItemIcon>
         <DropdownMenuItemText>OR</DropdownMenuItemText>
       </DropdownMenuItem>
     )}

@@ -1,14 +1,14 @@
 import type { FC, HTMLAttributes } from 'react';
 import { useRef } from 'react';
 import { cn } from '../../utils/cn';
+import { useQueryBarAutocomplete, useQueryBarExpression } from './hooks';
 import { QueryBarProvider, useQueryBarContextValue } from './QueryBarContext';
 import { QueryBarInput } from './QueryBarInput';
 import { QueryBarMenu } from './QueryBarMenu/QueryBarMenu';
-import { useQueryBarAutocomplete } from './hooks';
-import { useQueryBarExpression } from './hooks';
 import type { ExprNode, FieldMetadata } from './types';
 
-export interface QueryBarProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
+export interface QueryBarProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /**
    * Available fields from backend API config
    */

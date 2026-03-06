@@ -180,7 +180,11 @@ export const useQueryBarAutocomplete = ({
 
   // ── Focus ─────────────────────────────────────────────────
 
-  const handleFocus = useCallback(() => setIsFocused(true), []);
+  const handleFocus = useCallback((e: FocusEvent) => {
+    // Ignore focus from connector chip — its DropdownMenu manages its own focus
+    if ((e.target as HTMLElement)?.closest?.('[data-slot="query-bar-connector-chip"]')) return;
+    setIsFocused(true);
+  }, []);
 
   const handleBlur = useCallback(
     (e: FocusEvent) => {

@@ -1,5 +1,5 @@
-import { CHIP_ID_PATTERN } from './constants';
 import type { QueryBarChipData } from '../types';
+import { CHIP_ID_PATTERN } from './constants';
 
 /** Map a chip ID (e.g. "chip-2") back to condition index */
 export const chipIdToConditionIndex = (chipId: string): number | null => {
@@ -26,7 +26,12 @@ export const findChipSplitIndex = (
           return i;
         }
         // Split before the connector that precedes this chip
-        if (i > 0 && chips[i - 1].variant !== 'chip' && chips[i - 1].variant !== '(' && chips[i - 1].variant !== ')') {
+        if (
+          i > 0 &&
+          chips[i - 1].variant !== 'chip' &&
+          chips[i - 1].variant !== '(' &&
+          chips[i - 1].variant !== ')'
+        ) {
           return i - 1;
         }
         return i;

@@ -2,7 +2,13 @@ import type { RefObject } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { chipIdToConditionIndex, getOperatorFromLabel } from '../../lib';
 import type { ChipSegment } from '../../QueryBarInput/QueryBarChip';
-import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../../types';
+import type {
+  Condition,
+  FieldMetadata,
+  FilterOperator,
+  MenuState,
+  QueryBarChipData,
+} from '../../types';
 
 interface UseChipEditingOptions {
   conditions: Condition[];
@@ -29,7 +35,7 @@ interface UseChipEditingOptions {
 /** Resolve chip ID → Condition */
 const getConditionByChipId = (chipId: string, conditions: Condition[]): Condition | null => {
   const idx = chipIdToConditionIndex(chipId);
-  return idx !== null ? conditions[idx] ?? null : null;
+  return idx !== null ? (conditions[idx] ?? null) : null;
 };
 
 const SEGMENT_TO_MENU: Record<ChipSegment, MenuState> = {
@@ -61,60 +67,79 @@ export const useChipEditing = ({
   const [segmentFilterText, setSegmentFilterText] = useState('');
 
   /** If editing, commits field change immediately. Returns true if handled. */
-  const tryEditField = useCallback((field: FieldMetadata): boolean => {
-    if (!editingChipId) return false;
-    const condition = getConditionByChipId(editingChipId, conditions);
-    if (!condition) return false;
-    upsertCondition(field, condition.operator, condition.value, editingChipId);
-    return true;
-  }, [editingChipId, conditions, upsertCondition]);
+  const tryEditField = useCallback(
+    (field: FieldMetadata): boolean => {
+      if (!editingChipId) return false;
+      const condition = getConditionByChipId(editingChipId, conditions);
+      if (!condition) return false;
+      upsertCondition(field, condition.operator, condition.value, editingChipId);
+      return true;
+    },
+    [editingChipId, conditions, upsertCondition],
+  );
 
   /** If editing, commits operator change immediately. Returns true if handled. */
-  const tryEditOperator = useCallback((operator: FilterOperator, selectedField: FieldMetadata): boolean => {
-    if (!editingChipId) return false;
-    const condition = getConditionByChipId(editingChipId, conditions);
-    if (!condition) return false;
-    upsertCondition(selectedField, operator, condition.value, editingChipId);
-    return true;
-  }, [editingChipId, conditions, upsertCondition]);
+  const tryEditOperator = useCallback(
+    (operator: FilterOperator, selectedField: FieldMetadata): boolean => {
+      if (!editingChipId) return false;
+      const condition = getConditionByChipId(editingChipId, conditions);
+      if (!condition) return false;
+      upsertCondition(selectedField, operator, condition.value, editingChipId);
+      return true;
+    },
+    [editingChipId, conditions, upsertCondition],
+  );
 
   /** Handle chip segment click — receives pre-computed segment and anchorRect from QueryBarChip */
-  const handleChipClick = useCallback((chipId: string, segment: ChipSegment, anchorRect: DOMRect) => {
-    const condition = getConditionByChipId(chipId, conditions);
-    if (!condition) return;
+  const handleChipClick = useCallback(
+    (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => {
+      const condition = getConditionByChipId(chipId, conditions);
+      if (!condition) return;
 
-    const field = fields.find(f => f.name === condition.field);
-    if (!field) return;
+      const field = fields.find(f => f.name === condition.field);
+      if (!field) return;
 
-    const chip = chips.find(c => c.id === chipId);
-    if (!chip || chip.variant !== 'chip') return;
+      const chip = chips.find(c => c.id === chipId);
+      if (!chip || chip.variant !== 'chip') return;
 
-    const containerRect = containerRef.current?.getBoundingClientRect();
-    setMenuOffset(containerRect ? anchorRect.left - containerRect.left : 0);
-    setEditingChipId(chipId);
-    setSelectedField(field);
+      const containerRect = containerRef.current?.getBoundingClientRect();
+      setMenuOffset(containerRect ? anchorRect.left - containerRect.left : 0);
+      setEditingChipId(chipId);
+      setSelectedField(field);
 
-    const rawOperator = segment === 'value' || segment === 'operator'
-      ? getOperatorFromLabel(chip.operator || '', field.type) ?? condition.operator
-      : null;
+      const rawOperator =
+        segment === 'value' || segment === 'operator'
+          ? (getOperatorFromLabel(chip.operator || '', field.type) ?? condition.operator)
+          : null;
 
-    if (segment === 'value') {
-      setSelectedOperator(rawOperator);
-    } else {
-      setSelectedOperator(null);
-    }
+      if (segment === 'value') {
+        setSelectedOperator(rawOperator);
+      } else {
+        setSelectedOperator(null);
+      }
 
-    setEditingSegment(segment);
-    // Show full dropdown (empty filter) when condition has an error
-    const segmentText: Record<ChipSegment, string> = {
-      attribute: chip.attribute ?? '',
-      operator: chip.operator ?? '',
-      value: chip.value ?? '',
-    };
-    setSegmentFilterText(condition.error ? '' : segmentText[segment]);
+      setEditingSegment(segment);
+      // Show full dropdown (empty filter) when condition has an error
+      const segmentText: Record<ChipSegment, string> = {
+        attribute: chip.attribute ?? '',
+        operator: chip.operator ?? '',
+        value: chip.value ?? '',
+      };
+      setSegmentFilterText(condition.error ? '' : segmentText[segment]);
 
-    setMenuState(SEGMENT_TO_MENU[segment]);
-  }, [conditions, fields, chips, containerRef, setMenuOffset, setSelectedField, setSelectedOperator, setMenuState]);
+      setMenuState(SEGMENT_TO_MENU[segment]);
+    },
+    [
+      conditions,
+      fields,
+      chips,
+      containerRef,
+      setMenuOffset,
+      setSelectedField,
+      setSelectedOperator,
+      setMenuState,
+    ],
+  );
 
   const clearEditing = useCallback(() => {
     setEditingChipId(null);
@@ -128,15 +153,27 @@ export const useChipEditing = ({
     setMenuState('closed');
   }, [setMenuState]);
 
-  return useMemo(() => ({
-    editingChipId,
-    editingSegment,
-    segmentFilterText,
-    setSegmentFilterText,
-    handleChipClick,
-    tryEditField,
-    tryEditOperator,
-    clearEditing,
-    cancelSegmentEdit,
-  }), [editingChipId, editingSegment, segmentFilterText, handleChipClick, tryEditField, tryEditOperator, clearEditing, cancelSegmentEdit]);
+  return useMemo(
+    () => ({
+      editingChipId,
+      editingSegment,
+      segmentFilterText,
+      setSegmentFilterText,
+      handleChipClick,
+      tryEditField,
+      tryEditOperator,
+      clearEditing,
+      cancelSegmentEdit,
+    }),
+    [
+      editingChipId,
+      editingSegment,
+      segmentFilterText,
+      handleChipClick,
+      tryEditField,
+      tryEditOperator,
+      clearEditing,
+      cancelSegmentEdit,
+    ],
+  );
 };

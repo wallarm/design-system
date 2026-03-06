@@ -134,7 +134,9 @@ export const useKeyboardNav = ({
     if (!open) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      const inMenu = (e.target as HTMLElement)?.closest?.('[role="menu"]');
+      // Only intercept events from *our* QueryBar menu, not from nested dropdowns (e.g. connector chip)
+      const target = e.target as HTMLElement | null;
+      const inMenu = menuRef?.current?.contains(target);
       const isMod = e.metaKey || e.ctrlKey;
 
       // ── Focus is inside the menu ──────────────────────────

@@ -1,12 +1,12 @@
-import { DatePicker } from '@ark-ui/react/date-picker';
 import type { FC } from 'react';
+import { DatePicker } from '@ark-ui/react/date-picker';
 import { CalendarNav } from './CalendarNav';
 import { dayCellTriggerClass } from './styles';
 
 export const DayView: FC = () => (
   <DatePicker.View view='day'>
     <DatePicker.Context>
-      {(api) => (
+      {api => (
         <>
           <CalendarNav />
           <DatePicker.Table className='w-full border-collapse'>
@@ -26,7 +26,11 @@ export const DayView: FC = () => (
               {api.weeks.map((week, i) => (
                 <DatePicker.TableRow key={i} className='flex'>
                   {week.map((day, j) => (
-                    <DatePicker.TableCell key={j} value={day} className='flex-1 text-center p-[2px]'>
+                    <DatePicker.TableCell
+                      key={j}
+                      value={day}
+                      className='flex-1 text-center p-[2px]'
+                    >
                       <DatePicker.TableCellTrigger className={dayCellTriggerClass}>
                         {day.day}
                       </DatePicker.TableCellTrigger>

@@ -44,7 +44,9 @@ describe('Segment', () => {
 
   it('applies custom className', () => {
     const { container } = render(
-      <Segment variant='attribute' className='custom-class'>Test</Segment>,
+      <Segment variant='attribute' className='custom-class'>
+        Test
+      </Segment>,
     );
     const segment = container.querySelector('[data-slot="segment-attribute"]');
     expect(segment).toHaveClass('custom-class');
@@ -52,7 +54,9 @@ describe('Segment', () => {
 
   it('forwards HTML attributes', () => {
     const { container } = render(
-      <Segment variant='attribute' data-testid='custom-test-id'>Test</Segment>,
+      <Segment variant='attribute' data-testid='custom-test-id'>
+        Test
+      </Segment>,
     );
     expect(container.querySelector('[data-testid="custom-test-id"]')).toBeInTheDocument();
   });

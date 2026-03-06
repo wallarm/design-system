@@ -1,6 +1,5 @@
 import type { RefObject } from 'react';
 import { useCallback, useMemo, useRef } from 'react';
-
 import type { MenuState } from '../../types';
 
 interface UseMenuPositioningOptions {
@@ -36,37 +35,40 @@ export const useMenuPositioning = ({
     editingOffsetRef.current = null;
   }, []);
 
-  const menuPositioning = useMemo(() => ({
-    placement: 'bottom-start' as const,
-    gutter: 4,
-    getAnchorRect: () => {
-      const containerRect = containerRef.current?.getBoundingClientRect();
-      if (!containerRect) return null;
+  const menuPositioning = useMemo(
+    () => ({
+      placement: 'bottom-start' as const,
+      gutter: 4,
+      getAnchorRect: () => {
+        const containerRect = containerRef.current?.getBoundingClientRect();
+        if (!containerRect) return null;
 
-      // Determine horizontal offset: editing > building chip > input > 0
-      let offset = 0;
-      if (editingOffsetRef.current !== null) {
-        offset = editingOffsetRef.current;
-      } else if (isBuilding) {
-        const chipRect = buildingChipRef.current?.getBoundingClientRect();
-        if (chipRect) offset = chipRect.left - containerRect.left;
-      } else if (menuState === 'field' && inputRef?.current) {
-        const inputRect = inputRef.current.getBoundingClientRect();
-        offset = inputRect.left - containerRect.left;
-      }
+        // Determine horizontal offset: editing > building chip > input > 0
+        let offset = 0;
+        if (editingOffsetRef.current !== null) {
+          offset = editingOffsetRef.current;
+        } else if (isBuilding) {
+          const chipRect = buildingChipRef.current?.getBoundingClientRect();
+          if (chipRect) offset = chipRect.left - containerRect.left;
+        } else if (menuState === 'field' && inputRef?.current) {
+          const inputRect = inputRef.current.getBoundingClientRect();
+          offset = inputRect.left - containerRect.left;
+        }
 
-      return {
-        x: containerRect.left + offset,
-        y: containerRect.y,
-        width: containerRect.width - offset,
-        height: containerRect.height,
-        top: containerRect.top,
-        bottom: containerRect.bottom,
-        left: containerRect.left + offset,
-        right: containerRect.right,
-      };
-    },
-  }), [containerRef, buildingChipRef, inputRef, isBuilding, menuState]);
+        return {
+          x: containerRect.left + offset,
+          y: containerRect.y,
+          width: containerRect.width - offset,
+          height: containerRect.height,
+          top: containerRect.top,
+          bottom: containerRect.bottom,
+          left: containerRect.left + offset,
+          right: containerRect.right,
+        };
+      },
+    }),
+    [containerRef, buildingChipRef, inputRef, isBuilding, menuState],
+  );
 
   return { menuPositioning, setMenuOffset, resetMenuOffset };
 };

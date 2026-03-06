@@ -11,7 +11,9 @@ const meta = {
 
 export default meta;
 
-export const Attribute: StoryFn<typeof meta> = () => <Segment variant='attribute'>IP Address</Segment>;
+export const Attribute: StoryFn<typeof meta> = () => (
+  <Segment variant='attribute'>IP Address</Segment>
+);
 
 export const Operator: StoryFn<typeof meta> = () => <Segment variant='operator'>is</Segment>;
 

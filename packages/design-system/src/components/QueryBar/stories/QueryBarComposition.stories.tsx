@@ -581,7 +581,7 @@ export const Default: Story = {
         <QueryBar
           fields={attackFields}
           value={expression}
-          onChange={(expr) => {
+          onChange={expr => {
             console.log('Expression changed:', expr);
             setExpression(expr);
           }}
@@ -636,7 +636,7 @@ export const Simple: Story = {
         <QueryBar
           fields={simpleFields}
           value={expression}
-          onChange={(expr) => {
+          onChange={expr => {
             console.log('Filter:', expr);
             setExpression(expr);
           }}

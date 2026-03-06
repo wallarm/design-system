@@ -30,9 +30,7 @@ const priorityField = fields[1]!;
 describe('useQueryBarExpression', () => {
   describe('initial state', () => {
     it('starts with empty conditions and connectors', () => {
-      const { result } = renderHook(() =>
-        useQueryBarExpression({ fields, error: false }),
-      );
+      const { result } = renderHook(() => useQueryBarExpression({ fields, error: false }));
       expect(result.current.conditions).toEqual([]);
       expect(result.current.connectors).toEqual([]);
       expect(result.current.chips).toEqual([]);
@@ -400,9 +398,7 @@ describe('useQueryBarExpression', () => {
 
   describe('removeLastCondition is removed', () => {
     it('does not expose removeLastCondition', () => {
-      const { result } = renderHook(() =>
-        useQueryBarExpression({ fields, error: false }),
-      );
+      const { result } = renderHook(() => useQueryBarExpression({ fields, error: false }));
       expect(result.current).not.toHaveProperty('removeLastCondition');
     });
   });

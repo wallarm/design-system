@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
-import { QueryBarConnectorChip, QueryBarChip, type QueryBarChipProps } from '../QueryBarInput';
+import { QueryBarChip, type QueryBarChipProps, QueryBarConnectorChip } from '../QueryBarInput';
 
 const meta = {
   title: 'Components/QueryBar/QueryBarChip',
@@ -185,28 +185,8 @@ export const InteractiveDeleteExample: StoryFn = () => {
 };
 
 // ============================================================================
-// Connector Variants - All States
+// Connector Variants
 // ============================================================================
-
-/**
- * AND operator with error state
- */
-export const AndOperatorError: StoryFn = () => <QueryBarConnectorChip variant='and' error />;
-
-/**
- * OR operator with error state
- */
-export const OrOperatorError: StoryFn = () => <QueryBarConnectorChip variant='or' error />;
-
-/**
- * Opening parenthesis with error state
- */
-export const OpeningParenthesisError: StoryFn = () => <QueryBarConnectorChip variant='(' error />;
-
-/**
- * Closing parenthesis with error state
- */
-export const ClosingParenthesisError: StoryFn = () => <QueryBarConnectorChip variant=')' error />;
 
 // ============================================================================
 // Building Chip Variants
@@ -249,7 +229,13 @@ export const AllStatesShowcase: StoryFn = () => (
         <QueryBarChip attribute='Attribute' operator='operator' value='Value' />
         <QueryBarChip attribute='Attribute' operator='operator' value='Value' error />
         <QueryBarChip attribute='Attribute' operator='operator' value='Value' onRemove={() => {}} />
-        <QueryBarChip attribute='Attribute' operator='operator' value='Value' error onRemove={() => {}} />
+        <QueryBarChip
+          attribute='Attribute'
+          operator='operator'
+          value='Value'
+          error
+          onRemove={() => {}}
+        />
       </div>
     </div>
 
@@ -267,21 +253,8 @@ export const AllStatesShowcase: StoryFn = () => (
     <div>
       <h3 className='text-sm font-medium text-text-primary mb-2'>Connectors</h3>
       <div className='flex items-center gap-2 flex-wrap'>
-        <QueryBarConnectorChip variant='and' />
-        <QueryBarConnectorChip variant='and' error />
-        <QueryBarConnectorChip variant='or' />
-        <QueryBarConnectorChip variant='or' error />
-      </div>
-    </div>
-
-    {/* Parenthesis variants */}
-    <div>
-      <h3 className='text-sm font-medium text-text-primary mb-2'>Parentheses</h3>
-      <div className='flex items-center gap-2 flex-wrap'>
-        <QueryBarConnectorChip variant='(' />
-        <QueryBarConnectorChip variant='(' error />
-        <QueryBarConnectorChip variant=')' />
-        <QueryBarConnectorChip variant=')' error />
+        <QueryBarConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
+        <QueryBarConnectorChip variant='or' chipId='c-2' onChange={() => {}} />
       </div>
     </div>
   </div>

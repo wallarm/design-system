@@ -1,1 +1,5 @@
-export { QueryBarValueMenu, type QueryBarValueMenuProps, type ValueOption } from './QueryBarValueMenu';
+export {
+  QueryBarValueMenu,
+  type QueryBarValueMenuProps,
+  type ValueOption,
+} from './QueryBarValueMenu';

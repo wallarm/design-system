@@ -1,8 +1,8 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { QueryBarOperatorMenu } from '../QueryBarMenu';
 import { OPERATOR_LABELS, OPERATORS_BY_TYPE } from '../lib';
+import { QueryBarOperatorMenu } from '../QueryBarMenu';
 
 describe('QueryBarOperatorMenu', () => {
   describe('operator filtering by field type', () => {

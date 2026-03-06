@@ -1,5 +1,9 @@
-export { QueryBarConnectorChip, type QueryBarConnectorChipProps, type ConnectorVariant } from '../QueryBarConnectorChip';
-export { QueryBarChip, type QueryBarChipProps, type ChipSegment } from './QueryBarChip';
-export { EditingProvider, useEditingContext, type EditingContextValue } from './EditingContext';
+export {
+  type ConnectorVariant,
+  QueryBarConnectorChip,
+  type QueryBarConnectorChipProps,
+} from '../QueryBarConnectorChip';
+export { type EditingContextValue, EditingProvider, useEditingContext } from './EditingContext';
+export { type ChipSegment, QueryBarChip, type QueryBarChipProps } from './QueryBarChip';
 export { QueryBarRemoveButton } from './QueryBarRemoveButton';
 export { Segment } from './Segment';

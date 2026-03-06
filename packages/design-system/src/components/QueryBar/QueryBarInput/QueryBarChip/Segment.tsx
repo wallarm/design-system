@@ -16,7 +16,15 @@ type SegmentProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const Segment: FC<SegmentProps> = ({
-  variant, children, className, editing, editText, onEditChange, onEditKeyDown, onEditBlur, ...props
+  variant,
+  children,
+  className,
+  editing,
+  editText,
+  onEditChange,
+  onEditKeyDown,
+  onEditBlur,
+  ...props
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -81,7 +89,9 @@ export const Segment: FC<SegmentProps> = ({
           </span>
         </>
       ) : (
-        <p ref={textRef} className={segmentTextVariants({ variant })}>{children}</p>
+        <p ref={textRef} className={segmentTextVariants({ variant })}>
+          {children}
+        </p>
       )}
     </div>
   );

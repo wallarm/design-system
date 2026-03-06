@@ -1,6 +1,6 @@
+import { type FC, useEffect, useMemo, useState } from 'react';
 import { DatePicker, parseDate } from '@ark-ui/react/date-picker';
 import type { DateValue } from '@zag-js/date-picker';
-import { type FC, useEffect, useMemo, useState } from 'react';
 import { ChevronLeft } from '../../../../icons/ChevronLeft';
 import { DropdownMenuSeparator } from '../../../DropdownMenu';
 import { DayView } from './DayView';
@@ -14,7 +14,11 @@ const tryParseDateValue = (value: string | undefined): DateValue | undefined => 
     // Try ISO format first (e.g. "2026-03-06"), then native Date (e.g. "Mar 6, 2026")
     return parseDate(value);
   } catch {
-    try { return parseDate(new Date(value)); } catch { return undefined; }
+    try {
+      return parseDate(new Date(value));
+    } catch {
+      return undefined;
+    }
   }
 };
 
@@ -31,7 +35,16 @@ export interface DateCalendarProps {
   filterText?: string;
 }
 
-export const DateCalendar: FC<DateCalendarProps> = ({ onSelect, onRangeSelect, onBack, onEscape, betweenLabel, range = false, initialValue, filterText }) => {
+export const DateCalendar: FC<DateCalendarProps> = ({
+  onSelect,
+  onRangeSelect,
+  onBack,
+  onEscape,
+  betweenLabel,
+  range = false,
+  initialValue,
+  filterText,
+}) => {
   const parsedInitial = useMemo(() => tryParseDateValue(initialValue), [initialValue]);
   const [selectedValue, setSelectedValue] = useState<DateValue | undefined>(parsedInitial);
 
@@ -45,7 +58,10 @@ export const DateCalendar: FC<DateCalendarProps> = ({ onSelect, onRangeSelect, o
   // Navigate calendar to the typed date, or fall back to selection / initial
   const focusedValue = parsedFilter ?? selectedValue ?? parsedInitial;
 
-  const value = useMemo(() => selectedValue ? [selectedValue] : parsedInitial ? [parsedInitial] : undefined, [selectedValue, parsedInitial]);
+  const value = useMemo(
+    () => (selectedValue ? [selectedValue] : parsedInitial ? [parsedInitial] : undefined),
+    [selectedValue, parsedInitial],
+  );
 
   const handleValueChange = (details: { value: DateValue[] }) => {
     if (range && onRangeSelect && details.value.length >= 2) {
@@ -71,7 +87,7 @@ export const DateCalendar: FC<DateCalendarProps> = ({ onSelect, onRangeSelect, o
       <button
         type='button'
         className='flex items-center gap-4 px-8 py-6 text-sm text-text-secondary hover:text-text-primary w-full'
-        onClick={(e) => {
+        onClick={e => {
           e.stopPropagation();
           onBack();
         }}
@@ -82,9 +98,7 @@ export const DateCalendar: FC<DateCalendarProps> = ({ onSelect, onRangeSelect, o
       <DropdownMenuSeparator />
 
       {betweenLabel && (
-        <div className='px-8 py-4 text-xs font-medium text-text-secondary'>
-          {betweenLabel}
-        </div>
+        <div className='px-8 py-4 text-xs font-medium text-text-secondary'>{betweenLabel}</div>
       )}
 
       <div className='p-8'>

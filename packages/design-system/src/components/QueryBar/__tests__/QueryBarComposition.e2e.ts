@@ -66,13 +66,18 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       await expect(menuItems.first()).toBeVisible();
     });
 
-    test('Should complete full autocomplete flow: field → operator → value → chip', async ({ page }) => {
+    test('Should complete full autocomplete flow: field → operator → value → chip', async ({
+      page,
+    }) => {
       await compositionStory.goto(page, 'Simple');
 
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      await page.waitForSelector('[data-slot="query-bar-field-menu"]', { state: 'visible', timeout: 2000 });
+      await page.waitForSelector('[data-slot="query-bar-field-menu"]', {
+        state: 'visible',
+        timeout: 2000,
+      });
       const statusField = page.locator('[role="menuitem"]').filter({ hasText: 'Status' });
       await statusField.click();
 
@@ -200,7 +205,10 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      await page.waitForSelector('[data-slot="query-bar-field-menu"]', { state: 'visible', timeout: 2000 });
+      await page.waitForSelector('[data-slot="query-bar-field-menu"]', {
+        state: 'visible',
+        timeout: 2000,
+      });
 
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('ArrowDown');
@@ -347,7 +355,10 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await expect(input).toBeFocused();
 
-      await page.waitForSelector('[data-slot="query-bar-field-menu"]', { state: 'visible', timeout: 2000 });
+      await page.waitForSelector('[data-slot="query-bar-field-menu"]', {
+        state: 'visible',
+        timeout: 2000,
+      });
 
       await page.keyboard.press('ArrowDown');
       await page.keyboard.press('Enter');
@@ -371,7 +382,10 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       const input = page.locator('input[type="text"]');
       await input.click();
 
-      await page.waitForSelector('[data-slot="query-bar-field-menu"]', { state: 'visible', timeout: 2000 });
+      await page.waitForSelector('[data-slot="query-bar-field-menu"]', {
+        state: 'visible',
+        timeout: 2000,
+      });
       const menu = page.locator('[data-slot="query-bar-field-menu"]');
       await expect(menu).toHaveAttribute('role', 'menu');
 

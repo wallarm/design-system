@@ -25,18 +25,15 @@ export const chipVariants = cva(
 export const segmentContainer = 'flex flex-col justify-center overflow-hidden p-2 leading-none';
 
 /** Segment text styles by variant */
-export const segmentTextVariants = cva(
-  'truncate text-sm',
-  {
-    variants: {
-      variant: {
-        attribute: 'font-normal text-text-primary',
-        operator: 'font-normal text-text-secondary',
-        value: 'font-medium text-text-info',
-      },
+export const segmentTextVariants = cva('truncate text-sm', {
+  variants: {
+    variant: {
+      attribute: 'font-normal text-text-primary',
+      operator: 'font-normal text-text-secondary',
+      value: 'font-medium text-text-info',
     },
   },
-);
+});
 
 /** Remove button styles — hidden by default, shown on chip hover or button focus */
 export const removeButtonVariants = cva(

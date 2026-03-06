@@ -1,13 +1,11 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { QueryBarConnectorChip, QueryBarChip } from '../QueryBarInput';
+import { QueryBarChip, QueryBarConnectorChip } from '../QueryBarInput';
 
 describe('QueryBarChip', () => {
   it('renders chip with attribute, operator, and value', () => {
-    render(
-      <QueryBarChip attribute='IP Address' operator='is' value='192.168.1.1' />,
-    );
+    render(<QueryBarChip attribute='IP Address' operator='is' value='192.168.1.1' />);
 
     expect(screen.getByText('IP Address')).toBeInTheDocument();
     expect(screen.getByText('is')).toBeInTheDocument();
@@ -21,9 +19,7 @@ describe('QueryBarChip', () => {
   });
 
   it('applies custom className', () => {
-    const { container } = render(
-      <QueryBarChip attribute='Test' className='custom-class' />,
-    );
+    const { container } = render(<QueryBarChip attribute='Test' className='custom-class' />);
 
     const chip = container.querySelector('[data-slot="query-bar-condition-chip"]');
     expect(chip).toHaveClass('custom-class');
@@ -85,33 +81,19 @@ describe('QueryBarChip', () => {
 
 describe('QueryBarConnectorChip', () => {
   it('renders AND text', () => {
-    render(<QueryBarConnectorChip variant='and' />);
+    render(<QueryBarConnectorChip variant='and' chipId='c-1' onChange={vi.fn()} />);
     expect(screen.getByText('AND')).toBeInTheDocument();
   });
 
   it('renders OR text', () => {
-    render(<QueryBarConnectorChip variant='or' />);
+    render(<QueryBarConnectorChip variant='or' chipId='c-1' onChange={vi.fn()} />);
     expect(screen.getByText('OR')).toBeInTheDocument();
   });
 
-  it('renders opening parenthesis', () => {
-    render(<QueryBarConnectorChip variant='(' />);
-    expect(screen.getByText('(')).toBeInTheDocument();
-  });
-
-  it('renders closing parenthesis', () => {
-    render(<QueryBarConnectorChip variant=')' />);
-    expect(screen.getByText(')')).toBeInTheDocument();
-  });
-
-  it('applies error styling', () => {
-    const { container } = render(<QueryBarConnectorChip variant='and' error />);
-    const chip = container.querySelector('[data-slot="query-bar-connector-chip"]');
-    expect(chip).toHaveClass('bg-bg-light-danger', 'border-border-danger');
-  });
-
   it('applies normal styling', () => {
-    const { container } = render(<QueryBarConnectorChip variant='and' />);
+    const { container } = render(
+      <QueryBarConnectorChip variant='and' chipId='c-1' onChange={vi.fn()} />,
+    );
     const chip = container.querySelector('[data-slot="query-bar-connector-chip"]');
     expect(chip).toHaveClass('bg-badge-badge-bg', 'border-border-primary');
   });

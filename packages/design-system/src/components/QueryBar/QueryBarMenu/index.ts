@@ -2,4 +2,8 @@ export { QueryBarDateValueMenu, type QueryBarDateValueMenuProps } from './QueryB
 export { QueryBarFieldMenu, type QueryBarFieldMenuProps } from './QueryBarFieldMenu';
 export { QueryBarMenu, type QueryBarMenuProps } from './QueryBarMenu';
 export { QueryBarOperatorMenu, type QueryBarOperatorMenuProps } from './QueryBarOperatorMenu';
-export { QueryBarValueMenu, type QueryBarValueMenuProps, type ValueOption } from './QueryBarValueMenu';
+export {
+  QueryBarValueMenu,
+  type QueryBarValueMenuProps,
+  type ValueOption,
+} from './QueryBarValueMenu';

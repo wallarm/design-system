@@ -1,7 +1,8 @@
 import { cn } from '../../../../utils/cn';
 
 /** Shared cell trigger styles for month/year views */
-export const cellTriggerClass = 'w-full h-[36px] text-sm rounded-8 cursor-pointer hover:bg-states-brand-hover data-[selected]:ring-2 data-[selected]:ring-inset data-[selected]:ring-border-strong-brand data-[selected]:font-medium';
+export const cellTriggerClass =
+  'w-full h-[36px] text-sm rounded-8 cursor-pointer hover:bg-states-brand-hover data-[selected]:ring-2 data-[selected]:ring-inset data-[selected]:ring-border-strong-brand data-[selected]:font-medium';
 
 /** Day cell trigger styles with today indicator, range highlights */
 export const dayCellTriggerClass = cn(

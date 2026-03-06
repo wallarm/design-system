@@ -1,1 +1,5 @@
-export { QueryBarConnectorChip, type QueryBarConnectorChipProps, type ConnectorVariant } from './QueryBarConnectorChip';
+export {
+  type ConnectorVariant,
+  QueryBarConnectorChip,
+  type QueryBarConnectorChipProps,
+} from './QueryBarConnectorChip';

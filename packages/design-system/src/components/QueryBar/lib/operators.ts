@@ -1,5 +1,10 @@
 import type { FieldType, FilterOperator } from '../types';
-import { MULTI_SELECT_OPERATORS, NO_VALUE_OPERATORS, OPERATOR_LABELS, OPERATOR_LABELS_BY_TYPE } from './constants';
+import {
+  MULTI_SELECT_OPERATORS,
+  NO_VALUE_OPERATORS,
+  OPERATOR_LABELS,
+  OPERATOR_LABELS_BY_TYPE,
+} from './constants';
 
 /**
  * Helper to get operator label for specific field type
@@ -10,7 +15,10 @@ export const getOperatorLabel = (operator: FilterOperator, fieldType: FieldType)
 /**
  * Reverse lookup: get raw FilterOperator from its display label and field type
  */
-export const getOperatorFromLabel = (label: string, fieldType: FieldType): FilterOperator | null => {
+export const getOperatorFromLabel = (
+  label: string,
+  fieldType: FieldType,
+): FilterOperator | null => {
   // Check type-specific labels first (more specific)
   const typeLabels = OPERATOR_LABELS_BY_TYPE[fieldType];
   const typeMatch = Object.entries(typeLabels).find(([, lbl]) => lbl === label);
@@ -29,5 +37,4 @@ export const isNoValueOperator = (op: FilterOperator): boolean =>
   (NO_VALUE_OPERATORS as readonly string[]).includes(op);
 
 /** Check if operator is a between/range operator */
-export const isBetweenOperator = (op: FilterOperator | null): boolean =>
-  op === 'between';
+export const isBetweenOperator = (op: FilterOperator | null): boolean => op === 'between';

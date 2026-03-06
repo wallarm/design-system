@@ -1,5 +1,5 @@
-import { DatePicker } from '@ark-ui/react/date-picker';
 import type { FC } from 'react';
+import { DatePicker } from '@ark-ui/react/date-picker';
 import { ChevronLeft } from '../../../../icons/ChevronLeft';
 import { ChevronRight } from '../../../../icons/ChevronRight';
 

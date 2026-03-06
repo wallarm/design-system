@@ -66,7 +66,6 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
           <QueryBarConnectorChip
             chipId={chip.id}
             variant={chip.variant as 'and' | 'or'}
-            error={chip.error}
             onChange={onConnectorChange}
           />
         </div>,

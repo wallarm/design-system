@@ -1,6 +1,12 @@
-import { chipIdToConditionIndex, getDateDisplayLabel, getOperatorLabel, isDatePreset, isMultiSelectOperator } from '../../lib';
-import type { Condition, FieldMetadata, FilterOperator } from '../../types';
+import {
+  chipIdToConditionIndex,
+  getDateDisplayLabel,
+  getOperatorLabel,
+  isDatePreset,
+  isMultiSelectOperator,
+} from '../../lib';
 import type { BuildingChipData } from '../../QueryBarContext/types';
+import type { Condition, FieldMetadata, FilterOperator } from '../../types';
 
 interface DeriveOptions {
   editingChipId: string | null;
@@ -49,7 +55,11 @@ export const deriveAutocompleteValues = ({
     if (idx === null) return [];
     const condition = conditions[idx];
     if (!condition) return [];
-    const values = Array.isArray(condition.value) ? condition.value : condition.value != null ? [condition.value] : [];
+    const values = Array.isArray(condition.value)
+      ? condition.value
+      : condition.value != null
+        ? [condition.value]
+        : [];
     // When condition has error, only pre-check values that exist in the field's values list
     if (condition.error && selectedField?.values) {
       return values.filter(v => selectedField.values!.some(opt => opt.value === v));
@@ -58,7 +68,8 @@ export const deriveAutocompleteValues = ({
   })();
 
   const editingSingleValue = (() => {
-    if (!editingChipId || !selectedOperator || isMultiSelectOperator(selectedOperator)) return undefined;
+    if (!editingChipId || !selectedOperator || isMultiSelectOperator(selectedOperator))
+      return undefined;
     const idx = chipIdToConditionIndex(editingChipId);
     if (idx === null) return undefined;
     const condition = conditions[idx];
@@ -75,11 +86,15 @@ export const deriveAutocompleteValues = ({
     return undefined;
   })();
 
-  const buildingChipData: BuildingChipData | null = isBuilding ? {
-    attribute: selectedField!.label,
-    operator: selectedOperator ? getOperatorLabel(selectedOperator, selectedField!.type) : undefined,
-    value: buildingValue,
-  } : null;
+  const buildingChipData: BuildingChipData | null = isBuilding
+    ? {
+        attribute: selectedField!.label,
+        operator: selectedOperator
+          ? getOperatorLabel(selectedOperator, selectedField!.type)
+          : undefined,
+        value: buildingValue,
+      }
+    : null;
 
   return {
     isBuilding,
