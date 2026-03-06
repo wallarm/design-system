@@ -6,7 +6,7 @@ export const baseConfig = defineConfig({
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : undefined,
   timeout: 30000,
-  reporter: 'html',
+  reporter: [['html'], ['junit', { outputFile: 'test-results/junit.xml' }]],
   use: {
     trace: 'on-first-retry',
     screenshot: 'only-on-failure',

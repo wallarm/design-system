@@ -14,6 +14,7 @@ permissions:
   contents: write
   packages: write
   pull-requests: write
+  checks: write
   id-token: write
   issues: write
 
@@ -176,7 +177,21 @@ jobs:
         run: pnpm install --frozen-lockfile
 
       - name: Run ${{ matrix.check }}
-        run: pnpm ${{ matrix.check }}
+        run: |
+          if [ "${{ matrix.check }}" = "test" ]; then
+            pnpm test:run -- --reporter=default --reporter=junit --outputFile=./test-results/junit.xml
+          else
+            pnpm ${{ matrix.check }}
+          fi
+
+      - name: Upload unit test results
+        if: always() && matrix.check == 'test'
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results
+          path: |
+            packages/*/test-results/junit.xml
+          if-no-files-found: ignore
 
   # ========================================
   # Build
@@ -322,13 +337,68 @@ jobs:
           CI: true
           STORYBOOK_URL: http://localhost:6006/design-system
 
-      - name: Upload test results
+      - name: Upload E2E test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: e2e-results-shard-${{ matrix.shard }}
-          path: packages/design-system/test-results/
+          path: |
+            packages/design-system/test-results/
+            packages/design-system/playwright-report/
           if-no-files-found: ignore
+
+  # ========================================
+  # Report Unit Test Results
+  # ========================================
+  unit-test-report:
+    name: Report Unit Test Results
+    runs-on: ubuntu-latest
+    needs: [quality]
+    if: always() && needs.quality.result != 'skipped'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download unit test artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: unit-test-results
+          path: unit-test-artifacts
+
+      - name: Publish unit test results
+        uses: dorny/test-reporter@v1
+        with:
+          name: Unit Test Results
+          path: "unit-test-artifacts/**/junit.xml"
+          reporter: java-junit
+          fail-on-error: false
+
+  # ========================================
+  # Report E2E Test Results
+  # ========================================
+  e2e-report:
+    name: Report E2E Results
+    runs-on: ubuntu-latest
+    needs: [e2e]
+    if: always() && needs.e2e.result != 'skipped'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download all E2E artifacts
+        uses: actions/download-artifact@v4
+        with:
+          pattern: e2e-results-*
+          path: e2e-artifacts
+          merge-multiple: false
+
+      - name: Publish E2E test results
+        uses: dorny/test-reporter@v1
+        with:
+          name: E2E Test Results
+          path: "e2e-artifacts/**/junit.xml"
+          reporter: java-junit
+          fail-on-error: false
 
   # ========================================
   # E2E Update Screenshots
