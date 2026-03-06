@@ -7,6 +7,7 @@ import { useQueryBarContext } from '../QueryBarContext';
 import { QueryBarChip } from './QueryBarChip/QueryBarChip';
 import { QueryBarInputActions } from './QueryBarInputActions';
 import { ChipsWithGaps, TrailingGap } from './ChipsWithGaps';
+import { queryBarContainerVariants, queryBarInnerVariants, queryBarInputVariants } from './classes';
 
 type QueryBarInputProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
 
@@ -50,12 +51,8 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
   return (
     <div
       className={cn(
-        'relative flex min-h-40 w-full items-center overflow-hidden',
         inputVariants({ error }),
-        'px-0',
-        'focus-within:outline-none focus-within:ring-3',
-        !error && 'focus-within:not-disabled:border-border-strong-primary focus-within:ring-focus-primary',
-        error && 'focus-within:ring-focus-destructive',
+        queryBarContainerVariants({ error }),
         className,
       )}
       role='combobox'
@@ -66,7 +63,7 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
     >
       {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
       <div
-        className={cn('flex min-h-full flex-1 cursor-text flex-wrap items-center py-4 pr-4', hasContent ? 'pl-4' : 'pl-12')}
+        className={queryBarInnerVariants({ hasContent })}
         onClick={(e) => {
           if (e.target === e.currentTarget) {
             onInputClick();
@@ -94,7 +91,7 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
           onClick={onInputClick}
           placeholder={hasContent ? '' : placeholder}
           style={hasContent ? { width: `${Math.max(2, (inputText.length + 1) * 8)}px` } : undefined}
-          className={cn('h-auto border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0', hasContent ? 'mx-8' : 'flex-1')}
+          className={queryBarInputVariants({ hasContent })}
         />
 
         <ChipsWithGaps chips={chipsAfter} hideLeadingGap={hideLeadingGap} onChipClick={onChipClick} onConnectorChange={onConnectorChange} onChipRemove={onChipRemove} onGapClick={onGapClick} />

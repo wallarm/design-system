@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { insertionGapButton, insertionGapDivider } from './classes';
 
 interface InsertionGapProps {
   onClick: () => void;
@@ -8,12 +9,12 @@ interface InsertionGapProps {
 export const InsertionGap: FC<InsertionGapProps> = ({ onClick }) => (
   <button
     type='button'
-    className='group relative z-20 flex h-28 w-8 shrink-0 cursor-text items-center justify-center'
+    className={insertionGapButton}
     onClick={(e) => { e.stopPropagation(); onClick(); }}
     tabIndex={-1}
     aria-hidden='true'
   >
-    <div className='h-16 w-1 rounded-full bg-transparent transition-colors group-hover:bg-border-primary/50' />
+    <div className={insertionGapDivider} />
   </button>
 );
 

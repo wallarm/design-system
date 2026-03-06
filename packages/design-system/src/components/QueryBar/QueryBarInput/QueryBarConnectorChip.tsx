@@ -9,6 +9,7 @@ import {
 import { DropdownMenuTrigger } from '../../DropdownMenu/DropdownMenuTrigger';
 import { VARIANT_LABELS } from '../lib/constants';
 import { chipVariants } from './QueryBarChip/classes';
+import { connectorTextVariants, segmentContainer } from './classes';
 
 export type ConnectorVariant = 'and' | 'or';
 
@@ -42,8 +43,8 @@ export const QueryBarConnectorChip: FC<QueryBarConnectorChipProps> = ({
             className={cn(chipVariants({ error, interactive: true }), 'max-w-[320px]', className)}
             data-slot='query-bar-chip'
           >
-            <div className='flex flex-col justify-center leading-none overflow-hidden p-2'>
-              <p className={cn('text-sm font-normal truncate', error ? 'text-text-danger' : 'text-text-secondary')}>
+            <div className={segmentContainer}>
+              <p className={connectorTextVariants({ error })}>
                 {label}
               </p>
             </div>
