@@ -1,3 +1,7 @@
+## <small>0.6.1 (2026-03-06)</small>
+
+* fix: Table component (#29) ([0e214ca](https://github.com/wallarm/design-system/commit/0e214ca)), closes [#29](https://github.com/wallarm/design-system/issues/29)
+
 ## 0.6.0 (2026-03-05)
 
 * feat: Skeleton component (#24) ([29ed809](https://github.com/wallarm/design-system/commit/29ed809)), closes [#24](https://github.com/wallarm/design-system/issues/24)
