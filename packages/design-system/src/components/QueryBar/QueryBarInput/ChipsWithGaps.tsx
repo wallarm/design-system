@@ -1,15 +1,11 @@
 import type { FC, ReactNode } from 'react';
 import type { QueryBarChipData } from '../types';
+import { InsertionGap } from './InsertionGap';
 import type { ChipSegment } from './QueryBarChip';
 import { QueryBarChip } from './QueryBarChip/QueryBarChip';
 import { QueryBarConnectorChip } from './QueryBarConnectorChip';
-import { InsertionGap } from './InsertionGap';
 
-/**
- * Renders chips with InsertionGap components around each connector.
- * Trailing gap is handled separately in the parent to avoid duplicates when chips are split.
- */
-export const ChipsWithGaps: FC<{
+interface ChipsWithGapsProps {
   chips: QueryBarChipData[];
   hideLeadingGap?: boolean;
   hideTrailingGap?: boolean;
@@ -17,7 +13,21 @@ export const ChipsWithGaps: FC<{
   onConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   onChipRemove: (chipId: string) => void;
   onGapClick: (conditionIndex: number, afterConnector: boolean) => void;
-}> = ({ chips, hideLeadingGap, hideTrailingGap, onChipClick, onConnectorChange, onChipRemove, onGapClick }) => {
+}
+
+/**
+ * Renders chips with InsertionGap components around each connector.
+ * Trailing gap is handled separately in the parent to avoid duplicates when chips are split.
+ */
+export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
+  chips,
+  hideLeadingGap,
+  hideTrailingGap,
+  onChipClick,
+  onConnectorChange,
+  onChipRemove,
+  onGapClick,
+}) => {
   const elements: ReactNode[] = [];
   let connectorIndex = 0;
   const connectorCount = chips.filter(c => c.variant === 'and' || c.variant === 'or').length;
@@ -30,6 +40,7 @@ export const ChipsWithGaps: FC<{
       elements.push(
         <div key={chip.id} className='shrink-0 cursor-pointer hover:z-10'>
           <QueryBarChip
+            chipId={chip.id}
             attribute={chip.attribute ?? ''}
             operator={chip.operator}
             value={chip.value}

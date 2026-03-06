@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useKeyboardNav } from '../useKeyboardNav';
 import type { QueryBarDropdownItem } from '../../types';
+import { useKeyboardNav } from '../useKeyboardNav';
 import type { ValueOption } from './QueryBarValueMenu';
 
 type ConditionValue = string | number | boolean;
@@ -18,6 +18,7 @@ interface UseValueMenuStateOptions {
   onOpenChange?: (open: boolean) => void;
   onBuildingValueChange?: (preview: string | undefined) => void;
   inputRef?: RefObject<HTMLInputElement | null>;
+  menuRef?: RefObject<HTMLDivElement | null>;
 }
 
 export const useValueMenuState = ({
@@ -32,6 +33,7 @@ export const useValueMenuState = ({
   onOpenChange,
   onBuildingValueChange,
   inputRef,
+  menuRef,
 }: UseValueMenuStateOptions) => {
   // ── Multi-select internal state ─────────────────────────
   const [checkedValues, setCheckedValues] = useState<ConditionValue[]>(initialValues);
@@ -88,6 +90,7 @@ export const useValueMenuState = ({
     onArrowRight: multiSelect ? () => commitChecked() : undefined,
     onPendingCommit: multiSelect ? () => commitChecked() : undefined,
     inputRef,
+    menuRef,
   });
 
   // ── Selected values for display ─────────────────────────
@@ -98,9 +101,10 @@ export const useValueMenuState = ({
       : [];
 
   // ── Building value preview ──────────────────────────────
-  const buildingMultiValue = multiSelect && checkedValues.length > 0
-    ? checkedValues.map(v => values.find(opt => opt.value === v)?.label ?? String(v)).join(', ')
-    : undefined;
+  const buildingMultiValue =
+    multiSelect && checkedValues.length > 0
+      ? checkedValues.map(v => values.find(opt => opt.value === v)?.label ?? String(v)).join(', ')
+      : undefined;
 
   useEffect(() => {
     onBuildingValueChange?.(buildingMultiValue);

@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { Fragment, type FC, useMemo } from 'react';
+import { type FC, Fragment, useMemo } from 'react';
 import { cn } from '../../../utils/cn';
 import {
   DropdownMenu,
@@ -12,9 +12,10 @@ import {
 } from '../../DropdownMenu';
 import { Kbd } from '../../Kbd/Kbd';
 import { KbdGroup } from '../../Kbd/KbdGroup';
-import { useKeyboardNav } from './useKeyboardNav';
 import { getOperatorLabel, OPERATORS_BY_TYPE } from '../lib';
-import type { FieldType, QueryBarDropdownItem, FilterOperator } from '../types';
+import type { FieldType, FilterOperator, QueryBarDropdownItem } from '../types';
+import { MenuEmptyState } from './MenuEmptyState';
+import { useKeyboardNav } from './useKeyboardNav';
 
 export interface QueryBarOperatorMenuProps {
   /**
@@ -47,6 +48,10 @@ export interface QueryBarOperatorMenuProps {
   positioning?: Record<string, unknown>;
   /** Ref to the query bar input — ArrowUp on first item returns focus here */
   inputRef?: RefObject<HTMLInputElement | null>;
+  /** Text to filter operators by label */
+  filterText?: string;
+  /** Ref to the menu content element — shared across menus for focus management */
+  menuRef?: RefObject<HTMLDivElement | null>;
   /**
    * Optional custom class name
    */
@@ -65,18 +70,33 @@ export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
   onEscape,
   positioning,
   inputRef,
+  filterText = '',
+  menuRef,
   className,
 }) => {
   const operatorGroups = OPERATORS_BY_TYPE[fieldType] || [];
+  const query = filterText.toLowerCase();
+
+  const filteredGroups = useMemo(
+    () =>
+      query
+        ? operatorGroups
+            .map(group =>
+              group.filter(op => getOperatorLabel(op, fieldType).toLowerCase().includes(query)),
+            )
+            .filter(group => group.length > 0)
+        : operatorGroups,
+    [operatorGroups, fieldType, query],
+  );
 
   const flatItems: QueryBarDropdownItem[] = useMemo(
     () =>
-      operatorGroups.flat().map(op => ({
+      filteredGroups.flat().map(op => ({
         id: op,
         label: getOperatorLabel(op, fieldType),
         value: op,
       })),
-    [operatorGroups, fieldType],
+    [filteredGroups, fieldType],
   );
 
   const { highlightedValue, onHighlightChange } = useKeyboardNav({
@@ -85,28 +105,46 @@ export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
     onSelect: item => onSelect(item.value as FilterOperator),
     onClose: onEscape ?? (() => onOpenChange?.(false)),
     inputRef,
+    menuRef,
   });
 
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue} onHighlightChange={onHighlightChange}>
-      <DropdownMenuContent className={cn('w-64', className)}>
-        {operatorGroups.map((group, groupIdx) => (
-          <Fragment key={`group-${groupIdx}`}>
-            <DropdownMenuGroup>
-              {group.map(operator => (
-                <DropdownMenuItem key={operator} value={operator} onSelect={() => onSelect(operator)}>
-                  <DropdownMenuItemText>
-                    {getOperatorLabel(operator, fieldType)}
-                  </DropdownMenuItemText>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuGroup>
-            {groupIdx < operatorGroups.length - 1 && <DropdownMenuSeparator />}
-          </Fragment>
-        ))}
+    <DropdownMenu
+      open={open}
+      onOpenChange={onOpenChange}
+      closeOnSelect={false}
+      positioning={positioning}
+      highlightedValue={highlightedValue}
+      onHighlightChange={onHighlightChange}
+    >
+      <DropdownMenuContent ref={menuRef} className={cn('w-64', className)}>
+        {filteredGroups.length > 0 ? (
+          filteredGroups.map((group, groupIdx) => (
+            <Fragment key={`group-${groupIdx}`}>
+              <DropdownMenuGroup>
+                {group.map(operator => (
+                  <DropdownMenuItem
+                    key={operator}
+                    value={operator}
+                    onSelect={() => onSelect(operator)}
+                  >
+                    <DropdownMenuItemText>
+                      {getOperatorLabel(operator, fieldType)}
+                    </DropdownMenuItemText>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
+              {groupIdx < filteredGroups.length - 1 && <DropdownMenuSeparator />}
+            </Fragment>
+          ))
+        ) : (
+          <MenuEmptyState />
+        )}
         <DropdownMenuFooter>
           <span className='flex items-center gap-4'>
-            <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+            <KbdGroup>
+              <Kbd>↵</Kbd>
+            </KbdGroup>
             to select
           </span>
         </DropdownMenuFooter>

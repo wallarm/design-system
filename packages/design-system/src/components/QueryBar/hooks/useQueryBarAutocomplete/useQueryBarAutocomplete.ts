@@ -1,12 +1,18 @@
 import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { chipIdToConditionIndex } from '../../lib';
-import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../../types';
 import { useDateRange } from '../../QueryBarMenu/QueryBarDateValueMenu/hooks';
-import { useChipEditing } from './useChipEditing';
-import { useMenuPositioning } from './useMenuPositioning';
+import type {
+  Condition,
+  FieldMetadata,
+  FilterOperator,
+  MenuState,
+  QueryBarChipData,
+} from '../../types';
 import { deriveAutocompleteValues } from './deriveAutocompleteValues';
+import { useChipEditing } from './useChipEditing';
 import { useMenuFlow } from './useMenuFlow';
+import { useMenuPositioning } from './useMenuPositioning';
 
 interface UseQueryBarAutocompleteOptions {
   fields: FieldMetadata[];
@@ -18,6 +24,8 @@ interface UseQueryBarAutocompleteOptions {
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
     atIndex?: number,
+    error?: boolean,
+    dateOrigin?: 'relative' | 'absolute',
   ) => void;
   removeCondition: (chipId: string) => void;
   removeConditionAtIndex: (index: number) => void;
@@ -103,6 +111,7 @@ export const useQueryBarAutocomplete = ({
     handleMultiCommit,
     handleBuildingValueChange,
     handleRangeSelect,
+    handleCustomValueCommit,
   } = useMenuFlow({
     editing,
     selectedField,
@@ -110,6 +119,7 @@ export const useQueryBarAutocomplete = ({
     inputRef,
     insertIndex: effectiveInsertIndex,
     upsertCondition,
+    conditions,
     resetState,
     dateRange,
     setSelectedField,
@@ -121,16 +131,19 @@ export const useQueryBarAutocomplete = ({
 
   // ── Input events ──────────────────────────────────────────
 
-  const handleInputChange = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-    const text = e.target.value;
-    setInputText(text);
+  const handleInputChange = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const text = e.target.value;
+      setInputText(text);
 
-    if (text && !selectedField) {
-      setMenuState('field');
-    } else if (!text && !selectedField) {
-      setMenuState(isFocused && conditions.length === 0 ? 'field' : 'closed');
-    }
-  }, [selectedField, isFocused, conditions.length]);
+      if (text && !selectedField) {
+        setMenuState('field');
+      } else if (!text && !selectedField) {
+        setMenuState(isFocused && conditions.length === 0 ? 'field' : 'closed');
+      }
+    },
+    [selectedField, isFocused, conditions.length],
+  );
 
   const handleInputClick = useCallback(() => {
     inputRef.current?.focus();
@@ -140,53 +153,63 @@ export const useQueryBarAutocomplete = ({
     }
   }, [menuState, selectedField, resetMenuOffset, inputRef]);
 
-  const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'ArrowDown' && menuState !== 'closed') {
-      e.preventDefault();
-      const menuEl = document.querySelector<HTMLElement>('[role="menu"][data-state="open"]');
-      menuEl?.focus();
-      return;
-    }
-    if (e.key === 'Backspace' && !e.repeat && inputText === '' && conditions.length > 0) {
-      e.preventDefault();
-      const removeIdx = effectiveInsertIndex - 1;
-      if (removeIdx >= 0) {
-        removeConditionAtIndex(removeIdx);
-        setInsertIndex(prev => {
-          const eff = prev ?? conditions.length;
-          return eff > 0 ? eff - 1 : 0;
-        });
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'ArrowDown' && menuState !== 'closed') {
+        e.preventDefault();
+        menuRef.current?.focus();
+        return;
       }
-      setMenuState('closed');
-    }
-  }, [inputText, conditions.length, effectiveInsertIndex, removeConditionAtIndex, menuState]);
+      if (e.key === 'Backspace' && !e.repeat && inputText === '' && conditions.length > 0) {
+        e.preventDefault();
+        const removeIdx = effectiveInsertIndex - 1;
+        if (removeIdx >= 0) {
+          removeConditionAtIndex(removeIdx);
+          setInsertIndex(prev => {
+            const eff = prev ?? conditions.length;
+            return eff > 0 ? eff - 1 : 0;
+          });
+        }
+        setMenuState('closed');
+      }
+    },
+    [inputText, conditions.length, effectiveInsertIndex, removeConditionAtIndex, menuState],
+  );
 
   // ── Focus ─────────────────────────────────────────────────
 
   const handleFocus = useCallback(() => setIsFocused(true), []);
 
-  const handleBlur = useCallback((e: FocusEvent) => {
-    if (menuState !== 'closed') return;
-    const related = e.relatedTarget as HTMLElement | null;
-    if (containerRef.current?.contains(related)) return;
-    // Don't reset when focus moves to a dropdown portal (e.g. connector chip menu)
-    if (related?.closest('[data-scope="menu"]')) return;
-    setIsFocused(false);
-    resetState();
-  }, [menuState, containerRef, resetState]);
+  const handleBlur = useCallback(
+    (e: FocusEvent) => {
+      if (menuState !== 'closed') return;
+      const related = e.relatedTarget as HTMLElement | null;
+      if (containerRef.current?.contains(related)) return;
+      // Don't reset when focus moves to a dropdown portal (e.g. connector chip menu)
+      if (related?.closest('[data-scope="menu"]')) return;
+      setIsFocused(false);
+      resetState();
+    },
+    [menuState, containerRef, resetState],
+  );
 
   // ── Chip management ───────────────────────────────────────
 
-  const handleChipRemove = useCallback((chipId: string) => {
-    const chipCondIdx = chipIdToConditionIndex(chipId);
-    if (chipCondIdx !== null && chipCondIdx < effectiveInsertIndex) {
-      setInsertIndex(prev => prev != null ? prev - 1 : prev);
-    }
-    removeCondition(chipId);
-    resetMenuOffset();
-    setMenuState('closed');
-    inputRef.current?.focus();
-  }, [removeCondition, resetMenuOffset, inputRef, effectiveInsertIndex]);
+  const handleChipRemove = useCallback(
+    (chipId: string) => {
+      const chipCondIdx = chipIdToConditionIndex(chipId);
+      if (chipCondIdx !== null && chipCondIdx < effectiveInsertIndex) {
+        setInsertIndex(prev => (prev != null ? prev - 1 : prev));
+      }
+      removeCondition(chipId);
+      resetMenuOffset();
+      setMenuState('closed');
+      inputRef.current?.focus();
+    },
+    [removeCondition, resetMenuOffset, inputRef, effectiveInsertIndex],
+  );
 
   const handleClear = useCallback(() => {
     clearAll();
@@ -195,13 +218,16 @@ export const useQueryBarAutocomplete = ({
 
   // ── Gap click (insertion between chips) ─────────────────────
 
-  const handleGapClick = useCallback((conditionIndex: number, afterConnector: boolean) => {
-    setInsertIndex(conditionIndex);
-    setInsertAfterConnector(afterConnector);
-    resetMenuOffset();
-    setMenuState('field');
-    inputRef.current?.focus();
-  }, [resetMenuOffset, inputRef]);
+  const handleGapClick = useCallback(
+    (conditionIndex: number, afterConnector: boolean) => {
+      setInsertIndex(conditionIndex);
+      setInsertAfterConnector(afterConnector);
+      resetMenuOffset();
+      setMenuState('field');
+      inputRef.current?.focus();
+    },
+    [resetMenuOffset, inputRef],
+  );
 
   // ── Auto-open field menu on initial focus when empty ──────
 
@@ -225,13 +251,25 @@ export const useQueryBarAutocomplete = ({
     let cancelled = false;
     requestAnimationFrame(() => {
       requestAnimationFrame(() => {
-        if (!cancelled && document.activeElement !== inputRef.current) {
+        if (cancelled) return;
+        if (editing.editingSegment) {
+          // Redirect focus to the segment input, beating Ark UI's focus steal
+          const segmentInput = containerRef.current?.querySelector<HTMLInputElement>(
+            `[data-slot="segment-${editing.editingSegment}"] input`,
+          );
+          if (segmentInput && document.activeElement !== segmentInput) {
+            segmentInput.focus();
+            segmentInput.select();
+          }
+        } else if (document.activeElement !== inputRef.current) {
           inputRef.current?.focus();
         }
       });
     });
-    return () => { cancelled = true; };
-  }, [menuState, inputRef]);
+    return () => {
+      cancelled = true;
+    };
+  }, [menuState, inputRef, editing.editingSegment, containerRef]);
 
   // ── Derived values ────────────────────────────────────────
 
@@ -285,5 +323,13 @@ export const useQueryBarAutocomplete = ({
     insertAfterConnector,
     dateRangeIndex: dateRange.currentIndex,
     editingDateIsAbsolute,
+    // Inline segment editing
+    editingChipId: editing.editingChipId,
+    editingSegment: editing.editingSegment,
+    segmentFilterText: editing.segmentFilterText,
+    handleSegmentFilterChange: editing.setSegmentFilterText,
+    cancelSegmentEdit: editing.cancelSegmentEdit,
+    handleCustomValueCommit,
+    menuRef,
   };
 };

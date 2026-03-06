@@ -11,9 +11,9 @@ import {
 } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
-import { useKeyboardNav } from '../useKeyboardNav';
 import type { Condition, FieldMetadata, QueryBarDropdownItem } from '../../types';
 import { MenuEmptyState } from '../MenuEmptyState';
+import { useKeyboardNav } from '../useKeyboardNav';
 import { OperatorsSection, RecentSection, SuggestionsSection } from './FieldMenuSections';
 
 export interface QueryBarFieldMenuProps {
@@ -31,6 +31,8 @@ export interface QueryBarFieldMenuProps {
   positioning?: Record<string, unknown>;
   /** Ref to the query bar input — ArrowUp on first item returns focus here */
   inputRef?: RefObject<HTMLInputElement | null>;
+  /** Ref to the menu content element — shared across menus for focus management */
+  menuRef?: RefObject<HTMLDivElement | null>;
   className?: string;
 }
 
@@ -47,6 +49,7 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
   onEscape,
   positioning,
   inputRef,
+  menuRef,
   className,
 }) => {
   const limitedRecentConditions = recentConditions.slice(0, 3);
@@ -55,7 +58,12 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
   const query = filterText.toLowerCase();
 
   const filteredFields = useMemo(
-    () => query ? fields.filter(f => f.label.toLowerCase().includes(query) || f.name.toLowerCase().includes(query)) : fields,
+    () =>
+      query
+        ? fields.filter(
+            f => f.label.toLowerCase().includes(query) || f.name.toLowerCase().includes(query),
+          )
+        : fields,
     [fields, query],
   );
 
@@ -75,19 +83,37 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
 
     if (!query && showSuggestions && !showRecent) {
       suggestedFields.forEach((field, index) => {
-        items.push({ id: `suggested-${index}`, label: field.label, value: { type: 'field', field } });
+        items.push({
+          id: `suggested-${index}`,
+          label: field.label,
+          value: { type: 'field', field },
+        });
       });
     }
 
     filteredFields.forEach(field => {
-      items.push({ id: `field-${field.name}`, label: field.label, value: { type: 'field', field } });
+      items.push({
+        id: `field-${field.name}`,
+        label: field.label,
+        value: { type: 'field', field },
+      });
     });
 
     if (!query && onSelectAnd) items.push({ id: 'and', label: 'AND', value: { type: 'and' } });
     if (!query && onSelectOr) items.push({ id: 'or', label: 'OR', value: { type: 'or' } });
 
     return items;
-  }, [filteredFields, fields, limitedRecentConditions, suggestedFields, showRecent, showSuggestions, onSelectAnd, onSelectOr, query]);
+  }, [
+    filteredFields,
+    fields,
+    limitedRecentConditions,
+    suggestedFields,
+    showRecent,
+    showSuggestions,
+    onSelectAnd,
+    onSelectOr,
+    query,
+  ]);
 
   const handleItemSelect = (item: QueryBarDropdownItem) => {
     const data = item.value as { type: string; field?: FieldMetadata };
@@ -106,11 +132,23 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
     onSelect: handleItemSelect,
     onClose: onEscape ?? (() => onOpenChange?.(false)),
     inputRef,
+    menuRef,
   });
 
   return (
-    <DropdownMenu open={open} onOpenChange={onOpenChange} closeOnSelect={false} positioning={positioning} highlightedValue={highlightedValue} onHighlightChange={onHighlightChange}>
-      <DropdownMenuContent className={cn('w-[300px]', className)} data-slot='query-bar-field-menu'>
+    <DropdownMenu
+      open={open}
+      onOpenChange={onOpenChange}
+      closeOnSelect={false}
+      positioning={positioning}
+      highlightedValue={highlightedValue}
+      onHighlightChange={onHighlightChange}
+    >
+      <DropdownMenuContent
+        ref={menuRef}
+        className={cn('w-[300px]', className)}
+        data-slot='query-bar-field-menu'
+      >
         {!query && showRecent && (
           <RecentSection conditions={limitedRecentConditions} fields={fields} onSelect={onSelect} />
         )}
@@ -122,7 +160,11 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
         {filteredFields.length > 0 ? (
           <DropdownMenuGroup>
             {filteredFields.map(field => (
-              <DropdownMenuItem key={field.name} value={`field-${field.name}`} onSelect={() => onSelect(field)}>
+              <DropdownMenuItem
+                key={field.name}
+                value={`field-${field.name}`}
+                onSelect={() => onSelect(field)}
+              >
                 <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
               </DropdownMenuItem>
             ))}
@@ -137,11 +179,16 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
 
         <DropdownMenuFooter>
           <span className='flex items-center gap-4'>
-            <KbdGroup><Kbd>↑</Kbd><Kbd>↓</Kbd></KbdGroup>
+            <KbdGroup>
+              <Kbd>↑</Kbd>
+              <Kbd>↓</Kbd>
+            </KbdGroup>
             to navigate
           </span>
           <span className='flex items-center gap-4'>
-            <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+            <KbdGroup>
+              <Kbd>↵</Kbd>
+            </KbdGroup>
             to select
           </span>
         </DropdownMenuFooter>

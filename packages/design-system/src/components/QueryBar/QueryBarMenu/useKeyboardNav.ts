@@ -12,6 +12,8 @@ interface UseKeyboardNavOptions {
   onPendingCommit?: () => void;
   /** When provided, ArrowUp on the first item returns focus to this input */
   inputRef?: RefObject<HTMLInputElement | null>;
+  /** Ref to the menu content element — used for scoped queries and focus management */
+  menuRef?: RefObject<HTMLDivElement | null>;
 }
 
 /**
@@ -31,6 +33,7 @@ export const useKeyboardNav = ({
   onArrowRight,
   onPendingCommit,
   inputRef,
+  menuRef,
 }: UseKeyboardNavOptions) => {
   const [activeIndex, setActiveIndex] = useState(-1);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
@@ -41,8 +44,16 @@ export const useKeyboardNav = ({
   const pendingIdsRef = useRef(pendingIds);
   pendingIdsRef.current = pendingIds;
 
-  const stateRef = useRef({ items, onSelect, onClose, onArrowRight, onPendingCommit, inputRef });
-  stateRef.current = { items, onSelect, onClose, onArrowRight, onPendingCommit, inputRef };
+  const stateRef = useRef({
+    items,
+    onSelect,
+    onClose,
+    onArrowRight,
+    onPendingCommit,
+    inputRef,
+    menuRef,
+  });
+  stateRef.current = { items, onSelect, onClose, onArrowRight, onPendingCommit, inputRef, menuRef };
 
   // Reset when menu opens
   const prevOpenRef = useRef(open);
@@ -63,12 +74,13 @@ export const useKeyboardNav = ({
 
     // First navigation — start from the beginning (down) or end (up)
     const current = activeIndexRef.current;
-    const start = current === -1
-      ? (direction === 1 ? 0 : total - 1)
-      : (current + direction + total) % total;
+    const start =
+      current === -1 ? (direction === 1 ? 0 : total - 1) : (current + direction + total) % total;
 
-    const next = Array.from({ length: total }, (_, i) => (start + i * direction + total * total) % total)
-      .find(idx => !list[idx]?.disabled) ?? start;
+    const next =
+      Array.from({ length: total }, (_, i) => (start + i * direction + total * total) % total).find(
+        idx => !list[idx]?.disabled,
+      ) ?? start;
 
     activeIndexRef.current = next;
     setActiveIndex(next);
@@ -77,7 +89,8 @@ export const useKeyboardNav = ({
     const itemId = list[next]?.id;
     if (itemId) {
       requestAnimationFrame(() => {
-        const el = document.querySelector<HTMLElement>(
+        const container = stateRef.current.menuRef?.current;
+        const el = container?.querySelector<HTMLElement>(
           `[role="menuitem"][data-value="${CSS.escape(itemId)}"]`,
         );
         el?.scrollIntoView({ block: 'nearest' });
@@ -162,8 +175,18 @@ export const useKeyboardNav = ({
         return;
       }
 
+      // ── Focus is on a segment inline-edit input ──
+      // Let native cursor keys work, but allow Enter/Escape to be handled below
+      const isSegmentInput = (e.target as HTMLElement)?.closest?.('[data-slot^="segment-"]');
+      if (isSegmentInput && e.key !== 'Enter' && e.key !== 'Escape') return;
+
       // ── Focus is on the input ─────────────────────────────
-      const { items: list, onSelect: select, onClose: close, onArrowRight: arrowRight } = stateRef.current;
+      const {
+        items: list,
+        onSelect: select,
+        onClose: close,
+        onArrowRight: arrowRight,
+      } = stateRef.current;
       if (list.length === 0) return;
 
       switch (e.key) {
@@ -175,10 +198,10 @@ export const useKeyboardNav = ({
         }
 
         case 'Enter': {
-          e.preventDefault();
-          e.stopPropagation();
           const { onPendingCommit: commit } = stateRef.current;
           if (pendingIdsRef.current.size > 0) {
+            e.preventDefault();
+            e.stopPropagation();
             pendingIdsRef.current.forEach(id => {
               const item = list.find(i => i.id === id);
               if (item && !item.disabled) select(item);
@@ -186,9 +209,13 @@ export const useKeyboardNav = ({
             setPendingIds(new Set());
             queueMicrotask(() => commit?.());
           } else if (activeIndexRef.current >= 0) {
+            e.preventDefault();
+            e.stopPropagation();
             const item = list[activeIndexRef.current];
             if (item && !item.disabled) select(item);
           }
+          // No pending items and no active selection — let event propagate
+          // (e.g. segment input handles Enter for custom value commit)
           break;
         }
 
@@ -231,7 +258,8 @@ export const useKeyboardNav = ({
       activeIndexRef.current = idx;
     }
     // Scroll highlighted item into view
-    const el = document.querySelector<HTMLElement>(
+    const container = stateRef.current.menuRef?.current;
+    const el = container?.querySelector<HTMLElement>(
       `[role="menuitem"][data-value="${CSS.escape(details.highlightedValue)}"]`,
     );
     el?.scrollIntoView({ block: 'nearest' });

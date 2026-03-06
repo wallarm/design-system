@@ -1,4 +1,4 @@
-import type { FC, RefObject } from 'react';
+import { type FC, type RefObject, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
 import {
   DropdownMenu,
@@ -9,8 +9,8 @@ import {
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
 import { MenuEmptyState } from '../MenuEmptyState';
-import { ValueMenuItem } from './ValueMenuItem';
 import { useValueMenuState } from './useValueMenuState';
+import { ValueMenuItem } from './ValueMenuItem';
 
 export interface ValueOption {
   value: string | number | boolean;
@@ -36,6 +36,10 @@ export interface QueryBarValueMenuProps {
   onBuildingValueChange?: (preview: string | undefined) => void;
   /** Ref to the query bar input — ArrowUp on first item returns focus here */
   inputRef?: RefObject<HTMLInputElement | null>;
+  /** Text to filter values by label */
+  filterText?: string;
+  /** Ref to the menu content element — shared across menus for focus management */
+  menuRef?: RefObject<HTMLDivElement | null>;
   className?: string;
 }
 
@@ -53,18 +57,55 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
   positioning,
   onBuildingValueChange,
   inputRef,
+  filterText = '',
+  menuRef,
   className,
 }) => {
+  const query = filterText.toLowerCase();
+  const filteredValues = useMemo(
+    () =>
+      query
+        ? values.filter(
+            v =>
+              v.label.toLowerCase().includes(query) ||
+              String(v.value).toLowerCase().includes(query),
+          )
+        : values,
+    [values, query],
+  );
+
   const {
     selectedValues,
+    checkedValues,
     highlightedValue,
     onHighlightChange,
     pendingIds,
     handleItemSelect,
   } = useValueMenuState({
-    values, open, multiSelect, initialValues, highlightValue,
-    onSelect, onCommit, onEscape, onOpenChange, onBuildingValueChange, inputRef,
+    values: filteredValues,
+    open,
+    multiSelect,
+    initialValues,
+    highlightValue,
+    onSelect,
+    onCommit,
+    onEscape,
+    onOpenChange,
+    onBuildingValueChange,
+    inputRef,
+    menuRef,
   });
+
+  // For multi-select, ensure checked items are always visible (even when filtered out)
+  // and always appear first for stable ordering.
+  const displayValues = useMemo(() => {
+    if (!multiSelect) return filteredValues;
+    const checkedSet = new Set(checkedValues.map(String));
+    if (checkedSet.size === 0) return filteredValues;
+    const checkedItems = values.filter(v => checkedSet.has(String(v.value)));
+    const uncheckedFiltered = filteredValues.filter(v => !checkedSet.has(String(v.value)));
+    return [...checkedItems, ...uncheckedFiltered];
+  }, [filteredValues, values, multiSelect, checkedValues]);
 
   const widthClass = width === 'compact' ? 'w-[172px]' : 'w-[300px]';
   const widthStyle = typeof width === 'number' ? { width: `${width}px` } : undefined;
@@ -78,17 +119,23 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
       highlightedValue={highlightedValue}
       onHighlightChange={onHighlightChange}
     >
-      <DropdownMenuContent className={cn(widthClass, className)} style={widthStyle}>
-        {values.length > 0 ? (
+      <DropdownMenuContent ref={menuRef} className={cn(widthClass, className)} style={widthStyle}>
+        {displayValues.length > 0 ? (
           <DropdownMenuGroup>
-            {values.map(option => (
+            {displayValues.map(option => (
               <ValueMenuItem
                 key={String(option.value)}
                 option={option}
                 isChecked={selectedValues.includes(option.value)}
                 isPending={pendingIds.has(String(option.value))}
                 multiSelect={multiSelect}
-                onSelect={() => handleItemSelect({ id: String(option.value), label: option.label, value: option.value })}
+                onSelect={() =>
+                  handleItemSelect({
+                    id: String(option.value),
+                    label: option.label,
+                    value: option.value,
+                  })
+                }
               />
             ))}
           </DropdownMenuGroup>
@@ -99,22 +146,33 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
           {multiSelect ? (
             <>
               <span className='flex items-center gap-4'>
-                <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+                <KbdGroup>
+                  <Kbd>↵</Kbd>
+                </KbdGroup>
                 to select
               </span>
               <span className='flex items-center gap-4'>
-                <KbdGroup><Kbd>⌘</Kbd><Kbd>↑</Kbd><Kbd>↓</Kbd></KbdGroup>
+                <KbdGroup>
+                  <Kbd>⌘</Kbd>
+                  <Kbd>↑</Kbd>
+                  <Kbd>↓</Kbd>
+                </KbdGroup>
                 to multi-select
               </span>
             </>
           ) : (
             <>
               <span className='flex items-center gap-4'>
-                <KbdGroup><Kbd>↑</Kbd><Kbd>↓</Kbd></KbdGroup>
+                <KbdGroup>
+                  <Kbd>↑</Kbd>
+                  <Kbd>↓</Kbd>
+                </KbdGroup>
                 to navigate
               </span>
               <span className='flex items-center gap-4'>
-                <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+                <KbdGroup>
+                  <Kbd>↵</Kbd>
+                </KbdGroup>
                 to select
               </span>
             </>

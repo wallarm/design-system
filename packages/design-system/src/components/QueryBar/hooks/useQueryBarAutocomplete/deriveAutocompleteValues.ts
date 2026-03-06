@@ -36,6 +36,8 @@ export const deriveAutocompleteValues = ({
     if (idx === null) return false;
     const condition = conditions[idx];
     if (!condition) return false;
+    // Use stored dateOrigin if available (preserves original type after invalid edits)
+    if (condition.dateOrigin) return condition.dateOrigin === 'absolute';
     const val = String(condition.value ?? '');
     return val !== '' && !isDatePreset(val);
   })();
@@ -47,7 +49,12 @@ export const deriveAutocompleteValues = ({
     if (idx === null) return [];
     const condition = conditions[idx];
     if (!condition) return [];
-    return Array.isArray(condition.value) ? condition.value : condition.value != null ? [condition.value] : [];
+    const values = Array.isArray(condition.value) ? condition.value : condition.value != null ? [condition.value] : [];
+    // When condition has error, only pre-check values that exist in the field's values list
+    if (condition.error && selectedField?.values) {
+      return values.filter(v => selectedField.values!.some(opt => opt.value === v));
+    }
+    return values;
   })();
 
   const editingSingleValue = (() => {

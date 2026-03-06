@@ -1,6 +1,6 @@
-import type { ChangeEvent, KeyboardEvent, Ref } from 'react';
-import type { QueryBarChipData } from '../types';
+import type { ChangeEvent, KeyboardEvent, Ref, RefObject } from 'react';
 import type { ChipSegment } from '../QueryBarInput/QueryBarChip';
+import type { QueryBarChipData } from '../types';
 
 export interface BuildingChipData {
   attribute: string;
@@ -32,4 +32,13 @@ export interface QueryBarContextValue {
   onConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   onChipRemove: (chipId: string) => void;
   onClear: () => void;
+  // Inline segment editing
+  editingChipId: string | null;
+  editingSegment: ChipSegment | null;
+  segmentFilterText: string;
+  onSegmentFilterChange: (text: string) => void;
+  onCancelSegmentEdit: () => void;
+  onCustomValueCommit: (customText: string) => void;
+  /** Ref to the currently open menu content element */
+  menuRef: RefObject<HTMLDivElement | null>;
 }

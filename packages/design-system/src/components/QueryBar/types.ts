@@ -75,6 +75,10 @@ export interface Condition {
   field: string;
   operator: FilterOperator;
   value: string | number | boolean | null | Array<string | number | boolean>;
+  /** Per-condition validation error (e.g. value not in allowed list) */
+  error?: boolean;
+  /** For date fields: tracks whether the value originated as relative preset or absolute date */
+  dateOrigin?: 'relative' | 'absolute';
 }
 
 /**

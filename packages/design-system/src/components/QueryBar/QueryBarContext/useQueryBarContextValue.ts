@@ -18,6 +18,14 @@ interface AutocompleteForContext {
   handleGapClick: (conditionIndex: number, afterConnector: boolean) => void;
   insertIndex: number;
   insertAfterConnector: boolean;
+  // Inline segment editing
+  editingChipId: string | null;
+  editingSegment: ChipSegment | null;
+  segmentFilterText: string;
+  handleSegmentFilterChange: (text: string) => void;
+  cancelSegmentEdit: () => void;
+  handleCustomValueCommit: (customText: string) => void;
+  menuRef: RefObject<HTMLDivElement | null>;
 }
 
 interface UseQueryBarContextValueOptions {
@@ -60,6 +68,13 @@ export const useQueryBarContextValue = ({
       onConnectorChange: autocomplete.handleConnectorChange,
       onChipRemove: autocomplete.handleChipRemove,
       onClear: autocomplete.handleClear,
+      editingChipId: autocomplete.editingChipId,
+      editingSegment: autocomplete.editingSegment,
+      segmentFilterText: autocomplete.segmentFilterText,
+      onSegmentFilterChange: autocomplete.handleSegmentFilterChange,
+      onCancelSegmentEdit: autocomplete.cancelSegmentEdit,
+      onCustomValueCommit: autocomplete.handleCustomValueCommit,
+      menuRef: autocomplete.menuRef,
     }),
     [
       chips,
@@ -76,6 +91,13 @@ export const useQueryBarContextValue = ({
       autocomplete.handleConnectorChange,
       autocomplete.handleChipRemove,
       autocomplete.handleClear,
+      autocomplete.editingChipId,
+      autocomplete.editingSegment,
+      autocomplete.segmentFilterText,
+      autocomplete.handleSegmentFilterChange,
+      autocomplete.cancelSegmentEdit,
+      autocomplete.handleCustomValueCommit,
+      autocomplete.menuRef,
       buildingChipRef,
       inputRef,
       placeholder,

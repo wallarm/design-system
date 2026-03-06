@@ -9,15 +9,20 @@ const makeConditionChip = (
   error: boolean,
 ): QueryBarChipData => {
   const condition = conditions[i];
+  const chipError = condition?.error || error;
   if (!condition) return { id: `chip-${i}`, variant: 'chip', attribute: '', operator: '', value: '', error } as QueryBarChipData;
   const field = fields.find(f => f.name === condition.field);
 
   let displayValue: string;
+  let hasInvalidDate = false;
   if (field?.type === 'date') {
     if (Array.isArray(condition.value)) {
-      displayValue = condition.value.map(v => getDateDisplayLabel(String(v))).join(' – ');
+      const parts = condition.value.map(v => getDateDisplayLabel(String(v)));
+      hasInvalidDate = parts.some(p => p === 'Invalid Date');
+      displayValue = parts.join(' – ');
     } else {
       displayValue = getDateDisplayLabel(String(condition.value ?? ''));
+      hasInvalidDate = displayValue === 'Invalid Date';
     }
   } else if (Array.isArray(condition.value)) {
     displayValue = condition.value
@@ -37,7 +42,7 @@ const makeConditionChip = (
     attribute: field?.label || condition.field,
     operator: getOperatorLabel(condition.operator, field?.type || 'string'),
     value: displayValue,
-    error,
+    error: chipError || hasInvalidDate,
   };
 };
 

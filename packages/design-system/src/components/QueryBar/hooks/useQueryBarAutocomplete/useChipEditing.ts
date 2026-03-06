@@ -14,6 +14,9 @@ interface UseChipEditingOptions {
     operator: FilterOperator,
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
+    atIndex?: number,
+    error?: boolean,
+    dateOrigin?: 'relative' | 'absolute',
   ) => void;
   setMenuOffset: (offset: number) => void;
   setSelectedField: (field: FieldMetadata) => void;
@@ -54,6 +57,8 @@ export const useChipEditing = ({
   setMenuState,
 }: UseChipEditingOptions) => {
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
+  const [editingSegment, setEditingSegment] = useState<ChipSegment | null>(null);
+  const [segmentFilterText, setSegmentFilterText] = useState('');
 
   /** If editing, commits field change immediately. Returns true if handled. */
   const tryEditField = useCallback((field: FieldMetadata): boolean => {
@@ -89,23 +94,49 @@ export const useChipEditing = ({
     setEditingChipId(chipId);
     setSelectedField(field);
 
+    const rawOperator = segment === 'value' || segment === 'operator'
+      ? getOperatorFromLabel(chip.operator || '', field.type) ?? condition.operator
+      : null;
+
     if (segment === 'value') {
-      const rawOperator = getOperatorFromLabel(chip.operator || '', field.type);
       setSelectedOperator(rawOperator);
     } else {
       setSelectedOperator(null);
     }
 
+    setEditingSegment(segment);
+    // Show full dropdown (empty filter) when condition has an error
+    const segmentText: Record<ChipSegment, string> = {
+      attribute: chip.attribute ?? '',
+      operator: chip.operator ?? '',
+      value: chip.value ?? '',
+    };
+    setSegmentFilterText(condition.error ? '' : segmentText[segment]);
+
     setMenuState(SEGMENT_TO_MENU[segment]);
   }, [conditions, fields, chips, containerRef, setMenuOffset, setSelectedField, setSelectedOperator, setMenuState]);
 
-  const clearEditing = useCallback(() => setEditingChipId(null), []);
+  const clearEditing = useCallback(() => {
+    setEditingChipId(null);
+    setEditingSegment(null);
+    setSegmentFilterText('');
+  }, []);
+
+  const cancelSegmentEdit = useCallback(() => {
+    setEditingSegment(null);
+    setSegmentFilterText('');
+    setMenuState('closed');
+  }, [setMenuState]);
 
   return useMemo(() => ({
     editingChipId,
+    editingSegment,
+    segmentFilterText,
+    setSegmentFilterText,
     handleChipClick,
     tryEditField,
     tryEditOperator,
     clearEditing,
-  }), [editingChipId, handleChipClick, tryEditField, tryEditOperator, clearEditing]);
+    cancelSegmentEdit,
+  }), [editingChipId, editingSegment, segmentFilterText, handleChipClick, tryEditField, tryEditOperator, clearEditing, cancelSegmentEdit]);
 };

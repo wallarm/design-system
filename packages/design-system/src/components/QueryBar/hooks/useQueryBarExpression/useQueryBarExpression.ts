@@ -40,12 +40,16 @@ export const useQueryBarExpression = ({ fields, value, onChange, error }: UseQue
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
     atIndex?: number,
+    error?: boolean,
+    dateOrigin?: 'relative' | 'absolute',
   ) => {
     const condition: Condition = {
       type: 'condition',
       field: field.name,
       operator,
       value: val,
+      ...(error && { error }),
+      ...(dateOrigin && { dateOrigin }),
     };
 
     setState(prev => {
