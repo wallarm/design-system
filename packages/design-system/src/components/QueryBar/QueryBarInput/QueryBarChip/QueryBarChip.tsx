@@ -3,6 +3,7 @@ import { useCallback, useRef, useState } from 'react';
 import { cn } from '../../../../utils/cn';
 import { chipVariants } from './classes';
 import { useEditingContext } from './EditingContext';
+import { OperatorSegment } from './OperatorSegment';
 import { QueryBarRemoveButton } from './QueryBarRemoveButton';
 import { Segment } from './Segment';
 
@@ -82,14 +83,12 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
         {attribute}
       </Segment>
       {operator && (
-        <Segment
-          variant='operator'
+        <OperatorSegment
           className='shrink-0'
           onClick={interactive ? e => handleSegmentClick('operator', e) : undefined}
-          {...segmentEditProps('operator')}
         >
           {operator}
-        </Segment>
+        </OperatorSegment>
       )}
       {value && (
         <Segment

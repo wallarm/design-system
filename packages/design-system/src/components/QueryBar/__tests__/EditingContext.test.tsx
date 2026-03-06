@@ -100,23 +100,22 @@ describe('QueryBarChip with EditingContext', () => {
     expect(onChange).toHaveBeenCalledWith('new-value');
   });
 
-  it('calls onSegmentEditKeyDown on keydown', () => {
-    const onKeyDown = vi.fn();
+  it('does not show input for operator segment (operator is not inline-editable)', () => {
     render(
       <EditingProvider
         editingChipId='chip-0'
         editingSegment='operator'
         segmentFilterText='is'
         onSegmentFilterChange={noop}
-        onSegmentEditKeyDown={onKeyDown}
+        onSegmentEditKeyDown={noop}
         onSegmentEditBlur={noop}
       >
         <QueryBarChip chipId='chip-0' attribute='IP' operator='is' value='1.2.3.4' />
       </EditingProvider>,
     );
-    const input = screen.getByRole('textbox');
-    fireEvent.keyDown(input, { key: 'Escape' });
-    expect(onKeyDown).toHaveBeenCalled();
+    // Operator segment never renders an input — only dropdown selection
+    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
+    expect(screen.getByText('is')).toBeInTheDocument();
   });
 
   it('does not show input for non-matching segment', () => {

@@ -62,7 +62,8 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
 
   // Route filter text: use segment inline text when editing, otherwise main input
   const fieldFilterText = editingSegment === 'attribute' ? segmentFilterText : inputText;
-  const operatorFilterText = editingSegment === 'operator' ? segmentFilterText : '';
+  // Operator is not inline-editable — always show all options
+  const operatorFilterText = '';
   // For multi-select, filter by text after the last comma
   const valueFilterText =
     editingSegment === 'value'
