@@ -17,6 +17,12 @@ declare module '@tanstack/react-table' {
       | 'version'
       | 'severity'
       | 'size';
+    /** Cell text alignment. Defaults to 'right' for number/score/size sortType, 'left' otherwise */
+    align?: 'left' | 'center' | 'right';
+    /** Optional description — shown as text below the title or as a tooltip on hover. Title gets dashed underline. */
+    description?: { type: 'text' | 'tooltip'; content: string };
+    /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
+    resizeType?: 'cut' | 'resize';
   }
 }
 
@@ -86,6 +92,12 @@ export interface TableColumnMeta {
     | 'version'
     | 'severity'
     | 'size';
+  /** Cell text alignment. Defaults to 'right' for number/score/size sortType, 'left' otherwise */
+  align?: 'left' | 'center' | 'right';
+  /** Optional description — shown as text below the title or as a tooltip on hover. Title gets dashed underline. */
+  description?: { type: 'text' | 'tooltip'; content: string };
+  /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
+  resizeType?: 'cut' | 'resize';
 }
 
 /** Shared column properties */

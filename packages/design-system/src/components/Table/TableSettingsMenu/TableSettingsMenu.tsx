@@ -1,4 +1,4 @@
-import { type FC, Fragment, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 import {
   closestCenter,
   DndContext,
@@ -14,14 +14,15 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
-import { eq } from 'lodash-es';
+import { isEqual } from 'lodash-es';
 import { Settings } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { Button } from '../../Button';
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuSeparator,
+  DropdownMenuFooter,
+  DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '../../DropdownMenu';
 import { Input } from '../../Input';
@@ -109,15 +110,16 @@ export const TableSettingsMenu: FC = () => {
   // Disabled when current state matches defaults (nothing to reset)
   const { columnVisibility: currentVisibility, columnOrder: currentOrder } = table.getState();
 
-  const isDefaultState = useMemo(() => {
-    const visibilityMatch = !defaultColumnVisibility || currentVisibility;
-    eq(currentVisibility, defaultColumnVisibility);
+  // When currentOrder is [] TanStack uses natural column order — treat as matching default.
+  // Once the user reorders (or clicks Reset), currentOrder becomes an explicit array.
+  const effectiveOrder = currentOrder.length === 0 ? defaultColumnOrder : currentOrder;
 
-    const orderMatch =
-      !defaultColumnOrder || currentOrder.length === 0 || eq(currentOrder, defaultColumnOrder);
+  const visibilityMatch =
+    !defaultColumnVisibility || isEqual(currentVisibility, defaultColumnVisibility);
 
-    return visibilityMatch && orderMatch;
-  }, [currentVisibility, currentOrder, defaultColumnVisibility, defaultColumnOrder]);
+  const orderMatch = !defaultColumnOrder || isEqual(effectiveOrder, defaultColumnOrder);
+
+  const isDefaultState = visibilityMatch && orderMatch;
 
   return (
     <div
@@ -165,26 +167,30 @@ export const TableSettingsMenu: FC = () => {
                           .map(c => c.id)}
                         strategy={verticalListSortingStrategy}
                       >
-                        {filteredColumns.map(col => {
-                          const showSeparator =
-                            hasUserPinned &&
-                            unpinnedColumns.length > 0 &&
-                            col.id === unpinnedColumns[0]?.id;
+                        {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
 
-                          return (
-                            <Fragment key={col.id}>
-                              {showSeparator && <Separator spacing={4} />}
+                        {pinnedColumns.map(col => (
+                          <TableSettingsMenuItem
+                            key={col.id}
+                            column={col}
+                            canDrag={columnDndEnabled}
+                          />
+                        ))}
 
-                              <TableSettingsMenuItem column={col} canDrag={columnDndEnabled} />
-                            </Fragment>
-                          );
-                        })}
+                        {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
+
+                        {unpinnedColumns.map(col => (
+                          <TableSettingsMenuItem
+                            key={col.id}
+                            column={col}
+                            canDrag={columnDndEnabled}
+                          />
+                        ))}
                       </SortableContext>
                     </DndContext>
                   </VStack>
-
-                  <DropdownMenuSeparator />
-
+                </VStack>
+                <DropdownMenuFooter>
                   <Button
                     variant='ghost'
                     color='neutral'
@@ -195,7 +201,7 @@ export const TableSettingsMenu: FC = () => {
                   >
                     Reset to default
                   </Button>
-                </VStack>
+                </DropdownMenuFooter>
               </DropdownMenuContent>
             </DropdownMenu>
           </span>

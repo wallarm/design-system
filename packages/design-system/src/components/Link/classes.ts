@@ -8,6 +8,7 @@ export const linkVariants = cva(
         default: 'text-text-link-default hover:text-text-link-hover active:text-link-default',
         alt: 'text-text-link-default-alt hover:text-text-link-hover-alt active:text-link-default-alt',
         muted: 'text-text-secondary hover:text-text-link-hover active:text-link-default',
+        table: 'text-text-primary hover:text-text-link-hover active:text-link-default',
       },
       size: {
         xs: 'text-2xs',
@@ -19,6 +20,9 @@ export const linkVariants = cva(
       weight: {
         regular: 'font-normal',
         medium: 'font-medium',
+      },
+      disabled: {
+        true: '!text-text-tertiary !cursor-not-allowed !decoration-transparent hover:!decoration-transparent',
       },
     },
   },

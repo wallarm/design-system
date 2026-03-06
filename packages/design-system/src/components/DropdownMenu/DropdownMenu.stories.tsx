@@ -5,6 +5,7 @@ import { Kbd, KbdGroup } from '../Kbd';
 import { DropdownMenu } from './DropdownMenu';
 import { DropdownMenuContent } from './DropdownMenuContent';
 import { DropdownMenuContextTrigger } from './DropdownMenuContextTrigger';
+import { DropdownMenuFooter } from './DropdownMenuFooter';
 import { DropdownMenuGroup } from './DropdownMenuGroup';
 import { DropdownMenuItem } from './DropdownMenuItem';
 import { DropdownMenuItemContent } from './DropdownMenuItemContent';
@@ -34,6 +35,7 @@ const meta = {
     DropdownMenuTrigger,
     DropdownMenuTriggerItem,
     DropdownMenuContextTrigger,
+    DropdownMenuFooter,
   },
   parameters: {
     layout: 'centered',
@@ -362,6 +364,31 @@ export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
         <CirclePlus />
         <DropdownMenuItemText>Request custom widget</DropdownMenuItemText>
       </DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
+);
+
+export const WithFooter: StoryFn<typeof meta> = () => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open
+      </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuItem>Filter A</DropdownMenuItem>
+      <DropdownMenuItem>Filter B</DropdownMenuItem>
+      <DropdownMenuItem>Filter C</DropdownMenuItem>
+      <DropdownMenuItem>Filter D</DropdownMenuItem>
+      <DropdownMenuFooter>
+        <span>Footer is WIP Hotkey</span>
+        <span className='flex items-center gap-8'>
+          <KbdGroup>
+            <Kbd>⌘</Kbd>
+            <Kbd>⌘</Kbd>
+          </KbdGroup>
+        </span>
+      </DropdownMenuFooter>
     </DropdownMenuContent>
   </DropdownMenu>
 );

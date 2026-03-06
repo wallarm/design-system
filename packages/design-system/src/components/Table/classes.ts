@@ -9,12 +9,15 @@ const tableCellBase = cn(
 );
 
 /** Shared pinned shadow for the last pinned-left column */
-const pinnedLeftShadow = 'group-data-[scrolled]/scroll:shadow-[2px_0_3px_0_rgba(0,0,0,0.1)]';
+const pinnedLeftShadow = cn(
+  'group-data-[scrolled]/scroll:shadow-[0px_20px_25px_-5px_rgba(0,0,0,0.1)]',
+  'group-data-[scrolled]/scroll:[clip-path:inset(0px_-40px_0px_0px)]',
+);
 
 export const tableHeadCellVariants = cva(
   cn(
     tableCellBase,
-    'pl-16 pr-4 py-4 text-left text-xs font-medium text-text-secondary',
+    'pl-16 pr-4 py-4 text-xs font-medium text-text-secondary',
     'first:rounded-tl-12 last:rounded-tr-12',
     'bg-bg-light-primary',
     'whitespace-nowrap select-none outline-none',
@@ -59,13 +62,13 @@ export const tableBodyCellVariants = cva(
     'bg-bg-surface-2',
     'align-top',
     'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
-    'has-[>_[data-state=open][data-part=context-trigger]]:ring-2',
-    'has-[>_[data-state=open][data-part=context-trigger]]:ring-inset',
-    'has-[>_[data-state=open][data-part=context-trigger]]:ring-border-strong-brand',
-    'has-[>_[data-part=context-trigger]]:p-0',
-    '[&>[data-part=context-trigger]]:w-full',
-    '[&>[data-part=context-trigger]]:px-16 [&>[data-part=context-trigger]]:py-8',
-    '[&>[data-part=context-trigger]]:text-left [&>[data-part=context-trigger]]:outline-none',
+    '[&:has([data-state=open][data-part=context-trigger])]:ring-2',
+    '[&:has([data-state=open][data-part=context-trigger])]:ring-inset',
+    '[&:has([data-state=open][data-part=context-trigger])]:ring-border-strong-brand',
+    '[&:has([data-part=context-trigger])]:p-0',
+    '[&_[data-part=context-trigger]]:w-full',
+    '[&_[data-part=context-trigger]]:px-16 [&_[data-part=context-trigger]]:py-8',
+    '[&_[data-part=context-trigger]]:text-left [&_[data-part=context-trigger]]:outline-none',
   ),
   {
     variants: {
@@ -78,7 +81,7 @@ export const tableBodyCellVariants = cva(
         false: '',
       },
       expanded: {
-        true: 'border-b-0',
+        true: 'border-b-0 before:hidden',
         false: '',
       },
     },

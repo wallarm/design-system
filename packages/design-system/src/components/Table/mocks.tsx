@@ -1,7 +1,10 @@
 import { useCallback, useMemo, useState } from 'react';
 import { Check, Copy, Filter, FilterX } from '../../icons';
+import { abbreviateNumber } from '../../utils/abbreviateNumber';
 import { Badge } from '../Badge';
 import { InlineCodeSnippet } from '../CodeSnippet';
+import type { CountryCode } from '../Country';
+import { DateTime } from '../DateTime';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,14 +16,14 @@ import {
   DropdownMenuItemText,
   DropdownMenuSeparator,
 } from '../DropdownMenu';
+import { Ip, IpAddress, IpCountry, IpProvider, type SourceKey, sourceLabels } from '../Ip';
 import { Link } from '../Link';
 import {
   OverflowTooltip,
   OverflowTooltipContent,
   OverflowTooltipTrigger,
 } from '../OverflowTooltip';
-import { HStack, VStack } from '../Stack';
-import { Tag } from '../Tag';
+import { HStack } from '../Stack';
 import { Text } from '../Text';
 import { createTableColumnHelper } from './lib';
 import type { TableColumnDef } from './types';
@@ -36,6 +39,7 @@ export interface SecurityEvent {
   isActive: boolean;
   requests: number;
   sourceIp: string;
+  sourceCountry: CountryCode;
   sourceProvider: string;
   parameter: string;
   status: 'Blocked' | 'Monitoring';
@@ -49,8 +53,8 @@ export interface SecurityEvent {
 export interface SecurityHeaderEntry {
   id: string;
   objectName: string;
-  ip: string;
-  ipCountryFlag: string;
+  ip: string | null;
+  ipCountry: CountryCode | null;
   provider: string;
   requests: number;
   status: 'New' | 'Active' | 'Resolved';
@@ -63,23 +67,6 @@ export interface SecurityHeaderEntry {
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
-
-export function formatRequests(n: number): string {
-  if (n >= 1000) return `${Math.round(n / 1000)}k`;
-  return String(n);
-}
-
-export function formatDate(iso: string): { date: string; time: string } {
-  const d = new Date(iso);
-  const date = d.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
-  const time = d.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    second: '2-digit',
-    hour12: true,
-  });
-  return { date, time };
-}
 
 export const METHOD_COLORS: Record<string, 'green' | 'blue' | 'amber' | 'red' | 'violet'> = {
   GET: 'green',
@@ -101,7 +88,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: false,
     requests: 22000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-SESSION-ID',
     status: 'Blocked',
     firstDetected: '2026-01-28T15:00:00',
@@ -117,7 +105,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: false,
     requests: 25000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-DEVICE-ID',
     status: 'Blocked',
     firstDetected: '2026-01-27T16:20:10',
@@ -133,7 +122,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: true,
     requests: 30000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-CLIENT-VERSION',
     status: 'Monitoring',
     firstDetected: '2026-01-26T17:35:25',
@@ -149,7 +139,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: true,
     requests: 35000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-ORIGIN',
     status: 'Blocked',
     firstDetected: '2026-01-25T18:50:15',
@@ -165,7 +156,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: true,
     requests: 20000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-TIMESTAMP',
     status: 'Blocked',
     firstDetected: '2026-01-29T14:45:30',
@@ -181,7 +173,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: false,
     requests: 40000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-REQUEST-TYPE',
     status: 'Blocked',
     firstDetected: '2026-01-24T19:05:45',
@@ -197,7 +190,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: false,
     requests: 50000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-CLIENT-ID',
     status: 'Monitoring',
     firstDetected: '2026-01-23T20:30:00',
@@ -213,7 +207,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: true,
     requests: 75000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-RESPONSE-FORMAT',
     status: 'Monitoring',
     firstDetected: '2026-01-22T21:45:50',
@@ -229,7 +224,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: false,
     requests: 15000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-API-KEY',
     status: 'Blocked',
     firstDetected: '2026-01-31T12:15:00',
@@ -245,7 +241,8 @@ export const securityEvents: SecurityEvent[] = [
     isActive: false,
     requests: 18000,
     sourceIp: '34.74.73.20',
-    sourceProvider: 'AWS',
+    sourceCountry: 'US',
+    sourceProvider: 'aws',
     parameter: 'header.X-USER-ID',
     status: 'Blocked',
     firstDetected: '2026-01-30T13:30:45',
@@ -267,60 +264,37 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     header: 'Object name',
     size: 300,
     enableSorting: true,
-    meta: { sortType: 'text' as const },
+    meta: { sortType: 'text' as const, resizeType: 'cut' as const },
     cell: ({ row }) => (
-      <VStack gap={4}>
-        <OverflowTooltip>
-          <OverflowTooltipTrigger asChild>
-            <Link size='sm' type='muted' weight='medium'>
-              {row.original.objectName}
-            </Link>
-          </OverflowTooltipTrigger>
-          <OverflowTooltipContent>{row.original.objectName}</OverflowTooltipContent>
-        </OverflowTooltip>
-
-        <HStack gap={4}>
-          {row.original.isActive && (
-            <span className='flex items-center gap-4'>
-              <span className='inline-block size-6 rounded-full bg-red-500' />
-              <Text size='xs' color='secondary'>
-                Now
-              </Text>
-            </span>
-          )}
-          {row.original.tags.map(tag => (
-            <Tag key={tag}>{tag}</Tag>
-          ))}
-        </HStack>
-      </VStack>
+      <OverflowTooltip>
+        <OverflowTooltipTrigger asChild>
+          <Link size='sm' type='table' weight='medium'>
+            {row.original.objectName}
+          </Link>
+        </OverflowTooltipTrigger>
+        <OverflowTooltipContent>{row.original.objectName}</OverflowTooltipContent>
+      </OverflowTooltip>
     ),
   }),
   securityColumnHelper.accessor('requests', {
     header: 'Requests',
-    size: 100,
+    size: 160,
     enableSorting: true,
-    meta: {
-      sortType: 'number' as const,
-      headerClassName: 'text-right',
-      cellClassName: 'text-right',
-    },
-    cell: ({ getValue }) => <Text size='sm'>{formatRequests(getValue())}</Text>,
+    cell: ({ getValue }) => <Text size='sm'>{abbreviateNumber(getValue())}</Text>,
   }),
   securityColumnHelper.accessor('sourceIp', {
     header: 'Source',
-    size: 180,
+    size: 200,
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <HStack gap={8}>
-        <HStack gap={4}>
-          <span className='text-sm'>🇺🇸</span>
-          <Text size='sm'>{row.original.sourceIp}</Text>
-        </HStack>
-        <Badge color='slate' type='secondary' size='medium'>
-          {row.original.sourceProvider}
-        </Badge>
-      </HStack>
+      <Ip>
+        {row.original.sourceCountry && <IpCountry code={row.original.sourceCountry} />}
+        <IpAddress>{row.original.sourceIp}</IpAddress>
+        {row.original.sourceProvider && (
+          <IpProvider>{sourceLabels[row.original.sourceProvider as SourceKey]}</IpProvider>
+        )}
+      </Ip>
     ),
   }),
   securityColumnHelper.accessor('parameter', {
@@ -354,17 +328,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     size: 160,
     enableSorting: true,
     meta: { sortType: 'date' as const },
-    cell: ({ getValue }) => {
-      const { date, time } = formatDate(getValue());
-      return (
-        <VStack gap={0}>
-          <Text size='sm'>{date}</Text>
-          <Text size='xs' color='secondary'>
-            {time}
-          </Text>
-        </VStack>
-      );
-    },
+    cell: ({ getValue }) => <DateTime value={getValue()} format='relative' />,
   }),
   securityColumnHelper.accessor('cweId', {
     header: 'Security info',
@@ -423,8 +387,8 @@ const createHeaderEntries = (groupId: string, count: number): SecurityHeaderEntr
     id: `${groupId}-${i + 1}`,
     objectName: '/v1/antibot/api/report/{parameter_1}',
     ip: '142.198.167.52/32',
-    ipCountryFlag: '🇪🇸',
-    provider: 'Azure',
+    ipCountry: 'ES',
+    provider: 'azure',
     requests: 23000,
     status: 'New' as const,
     lastEdited: '2 days ago',
@@ -437,7 +401,7 @@ export const groupedHeaderData: SecurityHeaderEntry[] = [
     id: 'group-csp',
     objectName: 'Content Security Policy',
     ip: '',
-    ipCountryFlag: '',
+    ipCountry: null,
     provider: '',
     requests: 0,
     status: 'New',
@@ -450,7 +414,7 @@ export const groupedHeaderData: SecurityHeaderEntry[] = [
     id: 'group-cto',
     objectName: 'Content-Type-Options',
     ip: '',
-    ipCountryFlag: '',
+    ipCountry: null,
     provider: '',
     requests: 0,
     status: 'New',
@@ -463,7 +427,7 @@ export const groupedHeaderData: SecurityHeaderEntry[] = [
     id: 'group-xfo',
     objectName: 'X-Frame-Options',
     ip: '',
-    ipCountryFlag: '',
+    ipCountry: null,
     provider: '',
     requests: 0,
     status: 'New',
@@ -476,7 +440,7 @@ export const groupedHeaderData: SecurityHeaderEntry[] = [
     id: 'group-hsts',
     objectName: 'HTTP Strict Transport Security',
     ip: '',
-    ipCountryFlag: '',
+    ipCountry: null,
     provider: '',
     requests: 0,
     status: 'New',
@@ -498,7 +462,7 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     header: 'Object name',
     size: 300,
     enableSorting: true,
-    meta: { sortType: 'text' as const },
+    meta: { sortType: 'text' as const, resizeType: 'cut' as const },
     cell: ({ getValue }) => (
       <Text size='sm' truncate>
         {getValue()}
@@ -511,27 +475,20 @@ export const headerColumns: TableColumnDef<SecurityHeaderEntry>[] = [
     enableSorting: true,
     meta: { sortType: 'text' as const },
     cell: ({ row }) => (
-      <HStack gap={8}>
-        <HStack gap={4}>
-          <span className='text-sm'>{row.original.ipCountryFlag}</span>
-          <Text size='sm'>{row.original.ip}</Text>
-        </HStack>
-        <Badge color='slate' type='secondary' size='medium'>
-          {row.original.provider}
-        </Badge>
-      </HStack>
+      <Ip>
+        {row.original.ipCountry && <IpCountry code={row.original.ipCountry} />}
+        <IpAddress>{row.original.ip}</IpAddress>
+        {row.original.provider && (
+          <IpProvider>{sourceLabels[row.original.provider as SourceKey]}</IpProvider>
+        )}
+      </Ip>
     ),
   }),
   headerColumnHelper.accessor('requests', {
     header: 'Requests',
     size: 100,
     enableSorting: true,
-    meta: {
-      sortType: 'number' as const,
-      headerClassName: 'text-right',
-      cellClassName: 'text-right',
-    },
-    cell: ({ getValue }) => <Text size='sm'>{formatRequests(getValue())}</Text>,
+    cell: ({ getValue }) => <Text size='sm'>{abbreviateNumber(getValue())}</Text>,
   }),
   headerColumnHelper.accessor('status', {
     header: 'Status',
@@ -603,8 +560,8 @@ const HEADER_GROUPS = [
 ] as const;
 
 const IPS = ['142.198.167.52/32', '10.0.42.7/24', '192.168.1.100/32', '172.16.0.55/16'] as const;
-const FLAGS = ['🇪🇸', '🇺🇸', '🇩🇪', '🇯🇵'] as const;
-const PROVIDERS = ['Azure', 'AWS', 'GCP', 'Cloudflare'] as const;
+const FLAGS = ['ES', 'US', 'DE', 'JP'] as const;
+const PROVIDERS = ['azure', 'aws', 'gce', 'aws'] as const;
 const STATUSES = ['New', 'Active', 'Resolved'] as const;
 const VERSIONS = ['Up to date', 'Outdated'] as const;
 const ENDPOINTS = [
@@ -619,7 +576,7 @@ export function createLargeGroupedData(
   groupCount = 12,
   childrenPerGroup = 50,
 ): SecurityHeaderEntry[] {
-  return Array.from({ length: groupCount }, (_, gi) => {
+  return Array.from({ length: groupCount }, (_, gi): SecurityHeaderEntry => {
     const groupName = HEADER_GROUPS.at(gi % HEADER_GROUPS.length)!;
     const groupId = `group-${gi}`;
 
@@ -627,7 +584,7 @@ export function createLargeGroupedData(
       id: groupId,
       objectName: groupName,
       ip: '',
-      ipCountryFlag: '',
+      ipCountry: null,
       provider: '',
       requests: 0,
       status: 'New' as const,
@@ -638,7 +595,7 @@ export function createLargeGroupedData(
         id: `${groupId}-${ci}`,
         objectName: ENDPOINTS.at(ci % ENDPOINTS.length)!,
         ip: IPS.at(ci % IPS.length)!,
-        ipCountryFlag: FLAGS.at(ci % FLAGS.length)!,
+        ipCountry: FLAGS.at(ci % FLAGS.length)!,
         provider: PROVIDERS.at(ci % PROVIDERS.length)!,
         requests: 5000 + ci * 1000,
         status: STATUSES.at(ci % STATUSES.length)!,
@@ -680,6 +637,11 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
     return {
       ...col,
       size: 220,
+      meta: {
+        ...col.meta,
+        resizeType: 'cut' as const,
+        description: { type: 'tooltip' as const, content: 'Target resource' },
+      },
       cell: ({ getValue }: { getValue: () => string }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
@@ -730,16 +692,17 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
   if (key === 'ip') {
     return {
       ...col,
+      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Origin IP' } },
       cell: ({ row }: { row: { original: SecurityHeaderEntry } }) => (
         <DropdownMenu>
           <DropdownMenuContextTrigger>
-            <HStack gap={8}>
-              <span className='text-sm'>{row.original.ipCountryFlag}</span>
-              <Text size='sm'>{row.original.ip}</Text>
-              <Badge color='slate' type='secondary' size='medium'>
-                {row.original.provider}
-              </Badge>
-            </HStack>
+            <Ip>
+              {row.original.ipCountry && <IpCountry code={row.original.ipCountry} />}
+              <IpAddress>{row.original.ip}</IpAddress>
+              {row.original.provider && (
+                <IpProvider>{sourceLabels[row.original.provider as SourceKey]}</IpProvider>
+              )}
+            </Ip>
           </DropdownMenuContextTrigger>
           <DropdownMenuContent>
             <DropdownMenuItem onSelect={() => alert(`Copied: ${row.original.ip}`)}>
@@ -773,6 +736,34 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
           </DropdownMenuContent>
         </DropdownMenu>
       ),
+    };
+  }
+
+  if (key === 'requests') {
+    return {
+      ...col,
+      meta: { ...col.meta, description: { type: 'text' as const, content: 'Total hits' } },
+    };
+  }
+
+  if (key === 'status') {
+    return {
+      ...col,
+      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Resolution state' } },
+    };
+  }
+
+  if (key === 'lastEdited') {
+    return {
+      ...col,
+      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Last modified' } },
+    };
+  }
+
+  if (key === 'lastSynced') {
+    return {
+      ...col,
+      meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Last sync time' } },
     };
   }
 

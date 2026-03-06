@@ -95,6 +95,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
 
   // Auto-inject selection / expand columns based on enabled features
   // Also mark first user column as master column: non-pinnable, non-hideable
+  // Auto-detect sortType from data when not explicitly set
   const mergedColumns = useMemo<ColumnDef<T, any>[]>(() => {
     const cols = columns as ColumnDef<T, any>[];
     const prefix: ColumnDef<T, any>[] = [];
@@ -107,24 +108,38 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       prefix.push(createSelectionColumn<T>());
     }
 
+    // Auto-detect sortType from data values for accessor columns
+    const firstRow = data[0] as Record<string, unknown> | undefined;
+    const withAutoMeta = cols.map(col => {
+      if (!firstRow || !('accessorKey' in col) || col.meta?.sortType) return col;
+      const value = firstRow[col.accessorKey as string];
+      if (typeof value === 'number') {
+        return { ...col, meta: { ...col.meta, sortType: 'number' as const } };
+      }
+      return col;
+    });
+
     const masterOverrides = { enableColumnPinning: false, enableHiding: false };
 
     if (prefix.length === 0) {
       // Mark only the first user column as master
-      if (cols.length > 0) {
-        return [{ ...cols[0], ...masterOverrides }, ...cols.slice(1)] as ColumnDef<T, any>[];
+      if (withAutoMeta.length > 0) {
+        return [{ ...withAutoMeta[0], ...masterOverrides }, ...withAutoMeta.slice(1)] as ColumnDef<
+          T,
+          any
+        >[];
       }
-      return cols;
+      return withAutoMeta;
     }
 
     // Mark first user column as master column
     const userCols =
-      cols.length > 0
-        ? cols.map((col, index) => (index === 0 ? { ...col, ...masterOverrides } : col))
-        : cols;
+      withAutoMeta.length > 0
+        ? withAutoMeta.map((col, index) => (index === 0 ? { ...col, ...masterOverrides } : col))
+        : withAutoMeta;
 
     return [...prefix, ...userCols] as ColumnDef<T, any>[];
-  }, [columns, selectionEnabled, expandingEnabled, subRowGroupingEnabled]);
+  }, [columns, data, selectionEnabled, expandingEnabled, subRowGroupingEnabled]);
 
   // Master column ID — first data column (not _selection or _expand)
   const masterColumnId = useMemo<string | null>(() => {
@@ -204,9 +219,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
   // Enforces always-pinned columns stay at the beginning in their original order.
   const setColumnOrder = useCallback(
     (newOrder: string[]) => {
-      const pinned = alwaysPinnedLeft.filter(id => newOrder.includes(id));
       const rest = newOrder.filter(id => !alwaysPinnedLeft.includes(id));
-      handleColumnOrderChange([...pinned, ...rest]);
+      handleColumnOrderChange([...alwaysPinnedLeft, ...rest]);
     },
     [handleColumnOrderChange, alwaysPinnedLeft],
   );
