@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { chipIdToConditionIndex, getOperatorFromLabel } from '../lib';
 import type { ChipSegment } from '../QueryBarInput/QueryBarChip';
 import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../types';
@@ -101,11 +101,11 @@ export const useChipEditing = ({
 
   const clearEditing = useCallback(() => setEditingChipId(null), []);
 
-  return {
+  return useMemo(() => ({
     editingChipId,
     handleChipClick,
     tryEditField,
     tryEditOperator,
     clearEditing,
-  };
+  }), [editingChipId, handleChipClick, tryEditField, tryEditOperator, clearEditing]);
 };

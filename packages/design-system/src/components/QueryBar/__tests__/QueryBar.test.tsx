@@ -153,6 +153,24 @@ describe('QueryBar', () => {
     });
   });
 
+  describe('input focus on empty space click', () => {
+    it('has cursor-text wrapper that delegates clicks to input', () => {
+      const condition: Condition = {
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      };
+
+      const { container } = render(<QueryBar fields={sampleFields} value={condition} />);
+
+      const queryBar = container.querySelector('[data-slot="query-bar"]')!;
+      const wrapper = queryBar.querySelector('.cursor-text')!;
+      expect(wrapper).toBeTruthy();
+      expect(wrapper.classList.contains('cursor-text')).toBe(true);
+    });
+  });
+
   describe('accessibility', () => {
     it('has correct aria-label for clear button when chips exist', () => {
       const condition: Condition = {

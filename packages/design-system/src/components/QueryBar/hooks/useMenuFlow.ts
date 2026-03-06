@@ -12,13 +12,15 @@ interface MenuFlowDeps {
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
   inputRef: RefObject<HTMLInputElement | null>;
+  insertIndex: number;
   upsertCondition: (
     field: FieldMetadata,
     operator: FilterOperator,
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
+    atIndex?: number,
   ) => void;
-  resetState: (openFieldMenu?: boolean) => void;
+  resetState: () => void;
   dateRange: { selectValue: (val: string) => string[] | null };
   setSelectedField: (f: FieldMetadata | null) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
@@ -32,6 +34,7 @@ export const useMenuFlow = ({
   selectedField,
   selectedOperator,
   inputRef,
+  insertIndex,
   upsertCondition,
   resetState,
   dateRange,
@@ -60,8 +63,8 @@ export const useMenuFlow = ({
   const handleOperatorSelect = useCallback((operator: FilterOperator) => {
     if (isNoValueOperator(operator)) {
       const isEditing = !!editing.editingChipId;
-      upsertCondition(selectedField!, operator, null, editing.editingChipId);
-      resetState(!isEditing);
+      upsertCondition(selectedField!, operator, null, editing.editingChipId, isEditing ? undefined : insertIndex);
+      resetState();
       return;
     }
 
@@ -83,24 +86,23 @@ export const useMenuFlow = ({
     if (isBetweenOperator(selectedOperator) && selectedField.type === 'date') {
       const result = dateRange.selectValue(String(val));
       if (!result) return;
-      const isEditing = !!editing.editingChipId;
       upsertCondition(selectedField, selectedOperator, result, editing.editingChipId);
-      resetState(!isEditing);
+      resetState();
       return;
     }
 
     const isEditing = !!editing.editingChipId;
-    upsertCondition(selectedField, selectedOperator, val, editing.editingChipId);
-    resetState(!isEditing);
-  }, [selectedField, selectedOperator, editing, dateRange, upsertCondition, resetState]);
+    upsertCondition(selectedField, selectedOperator, val, editing.editingChipId, isEditing ? undefined : insertIndex);
+    resetState();
+  }, [selectedField, selectedOperator, editing, dateRange, insertIndex, upsertCondition, resetState]);
 
   /** Multi-select commit: receives final array from QueryBarValueMenu */
   const handleMultiCommit = useCallback((values: Array<string | number | boolean>) => {
     if (!selectedField || !selectedOperator || values.length === 0) return;
     const isEditing = !!editing.editingChipId;
-    upsertCondition(selectedField, selectedOperator, values, editing.editingChipId);
-    resetState(!isEditing);
-  }, [selectedField, selectedOperator, editing, upsertCondition, resetState]);
+    upsertCondition(selectedField, selectedOperator, values, editing.editingChipId, isEditing ? undefined : insertIndex);
+    resetState();
+  }, [selectedField, selectedOperator, editing, insertIndex, upsertCondition, resetState]);
 
   /** Building value preview from QueryBarValueMenu multi-select */
   const handleBuildingValueChange = useCallback((preview: string | undefined) => {
@@ -111,9 +113,9 @@ export const useMenuFlow = ({
   const handleRangeSelect = useCallback((from: string, to: string) => {
     if (!selectedField || !selectedOperator) return;
     const isEditing = !!editing.editingChipId;
-    upsertCondition(selectedField, selectedOperator, [from, to], editing.editingChipId);
-    resetState(!isEditing);
-  }, [selectedField, selectedOperator, editing.editingChipId, upsertCondition, resetState]);
+    upsertCondition(selectedField, selectedOperator, [from, to], editing.editingChipId, isEditing ? undefined : insertIndex);
+    resetState();
+  }, [selectedField, selectedOperator, editing, insertIndex, upsertCondition, resetState]);
 
   return {
     handleMenuClose,

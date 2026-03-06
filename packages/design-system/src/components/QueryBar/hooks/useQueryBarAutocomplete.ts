@@ -1,5 +1,6 @@
 import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { chipIdToConditionIndex } from '../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState, QueryBarChipData } from '../types';
 import { useChipEditing } from './useChipEditing';
 import { useDateRange } from '../QueryBarMenu/QueryBarDateValueMenu/hooks';
@@ -16,11 +17,12 @@ interface UseQueryBarAutocompleteOptions {
     operator: FilterOperator,
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
+    atIndex?: number,
   ) => void;
   removeCondition: (chipId: string) => void;
-  removeLastCondition: () => void;
+  removeConditionAtIndex: (index: number) => void;
   clearAll: () => void;
-  toggleConnector: (connectorId: string) => void;
+  setConnectorValue: (connectorId: string, value: 'and' | 'or') => void;
   containerRef: RefObject<HTMLDivElement | null>;
   buildingChipRef: RefObject<HTMLDivElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
@@ -32,9 +34,9 @@ export const useQueryBarAutocomplete = ({
   chips,
   upsertCondition,
   removeCondition,
-  removeLastCondition,
+  removeConditionAtIndex,
   clearAll,
-  toggleConnector,
+  setConnectorValue,
   containerRef,
   buildingChipRef,
   inputRef,
@@ -47,6 +49,9 @@ export const useQueryBarAutocomplete = ({
   const [selectedOperator, setSelectedOperator] = useState<FilterOperator | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [buildingMultiValue, setBuildingMultiValue] = useState<string | undefined>(undefined);
+  const [insertIndex, setInsertIndex] = useState<number | null>(null);
+  const [insertAfterConnector, setInsertAfterConnector] = useState(false);
+  const effectiveInsertIndex = insertIndex ?? conditions.length;
 
   // ── Child hooks ───────────────────────────────────────────
 
@@ -74,15 +79,17 @@ export const useQueryBarAutocomplete = ({
 
   // ── State reset ───────────────────────────────────────────
 
-  const resetState = useCallback((openFieldMenu = false) => {
+  const resetState = useCallback(() => {
     setInputText('');
     setSelectedField(null);
     setSelectedOperator(null);
     editing.clearEditing();
     dateRange.reset();
     setBuildingMultiValue(undefined);
+    setInsertIndex(null);
+    setInsertAfterConnector(false);
     resetMenuOffset();
-    setMenuState(openFieldMenu ? 'field' : 'closed');
+    setMenuState('closed');
     inputRef.current?.focus();
   }, [editing, inputRef, resetMenuOffset]);
 
@@ -101,6 +108,7 @@ export const useQueryBarAutocomplete = ({
     selectedField,
     selectedOperator,
     inputRef,
+    insertIndex: effectiveInsertIndex,
     upsertCondition,
     resetState,
     dateRange,
@@ -125,11 +133,12 @@ export const useQueryBarAutocomplete = ({
   }, [selectedField, isFocused, conditions.length]);
 
   const handleInputClick = useCallback(() => {
+    inputRef.current?.focus();
     if (menuState === 'closed' && !selectedField) {
       resetMenuOffset();
       setMenuState('field');
     }
-  }, [menuState, selectedField, resetMenuOffset]);
+  }, [menuState, selectedField, resetMenuOffset, inputRef]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'ArrowDown' && menuState !== 'closed') {
@@ -140,10 +149,17 @@ export const useQueryBarAutocomplete = ({
     }
     if (e.key === 'Backspace' && !e.repeat && inputText === '' && conditions.length > 0) {
       e.preventDefault();
-      removeLastCondition();
+      const removeIdx = effectiveInsertIndex - 1;
+      if (removeIdx >= 0) {
+        removeConditionAtIndex(removeIdx);
+        setInsertIndex(prev => {
+          const eff = prev ?? conditions.length;
+          return eff > 0 ? eff - 1 : 0;
+        });
+      }
       setMenuState('closed');
     }
-  }, [inputText, conditions.length, removeLastCondition, menuState]);
+  }, [inputText, conditions.length, effectiveInsertIndex, removeConditionAtIndex, menuState]);
 
   // ── Focus ─────────────────────────────────────────────────
 
@@ -153,6 +169,8 @@ export const useQueryBarAutocomplete = ({
     if (menuState !== 'closed') return;
     const related = e.relatedTarget as HTMLElement | null;
     if (containerRef.current?.contains(related)) return;
+    // Don't reset when focus moves to a dropdown portal (e.g. connector chip menu)
+    if (related?.closest('[data-scope="menu"]')) return;
     setIsFocused(false);
     resetState();
   }, [menuState, containerRef, resetState]);
@@ -160,16 +178,30 @@ export const useQueryBarAutocomplete = ({
   // ── Chip management ───────────────────────────────────────
 
   const handleChipRemove = useCallback((chipId: string) => {
+    const chipCondIdx = chipIdToConditionIndex(chipId);
+    if (chipCondIdx !== null && chipCondIdx < effectiveInsertIndex) {
+      setInsertIndex(prev => prev != null ? prev - 1 : prev);
+    }
     removeCondition(chipId);
     resetMenuOffset();
     setMenuState('closed');
     inputRef.current?.focus();
-  }, [removeCondition, resetMenuOffset, inputRef]);
+  }, [removeCondition, resetMenuOffset, inputRef, effectiveInsertIndex]);
 
   const handleClear = useCallback(() => {
     clearAll();
     resetState();
   }, [clearAll, resetState]);
+
+  // ── Gap click (insertion between chips) ─────────────────────
+
+  const handleGapClick = useCallback((conditionIndex: number, afterConnector: boolean) => {
+    setInsertIndex(conditionIndex);
+    setInsertAfterConnector(afterConnector);
+    resetMenuOffset();
+    setMenuState('field');
+    inputRef.current?.focus();
+  }, [resetMenuOffset, inputRef]);
 
   // ── Auto-open field menu on initial focus when empty ──────
 
@@ -240,14 +272,17 @@ export const useQueryBarAutocomplete = ({
     handleMenuClose,
     handleMenuDiscard: resetState,
     handleChipClick: editing.handleChipClick,
-    handleConnectorClick: toggleConnector,
+    handleConnectorChange: setConnectorValue,
     handleChipRemove,
     handleClear,
     handleKeyDown,
     handleInputClick,
+    handleGapClick,
     handleFocus,
     handleBlur,
     handleRangeSelect,
+    insertIndex: effectiveInsertIndex,
+    insertAfterConnector,
     dateRangeIndex: dateRange.currentIndex,
     editingDateIsAbsolute,
   };

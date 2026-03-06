@@ -11,4 +11,4 @@ export { DATE_PRESETS, formatDateForChip, getDateDisplayLabel, isDatePreset } fr
 export type { DatePreset } from '../QueryBarMenu/QueryBarDateValueMenu/constants';
 export { buildExpression, expressionToConditions } from './expression';
 export { buildChips } from './buildChips';
-export { chipIdToConditionIndex } from './conditions';
+export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';

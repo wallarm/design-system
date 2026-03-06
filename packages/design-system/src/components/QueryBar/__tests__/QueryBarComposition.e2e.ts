@@ -275,6 +275,29 @@ test.describe('Component: QueryBar - Self-Contained Mechanics', () => {
       await expect(andChip).not.toBeVisible();
     });
 
+    test('Should open field menu when clicking empty space after chips', async ({ page }) => {
+      await compositionStory.goto(page, 'Simple');
+
+      await createChip(page);
+
+      const chip = page.locator('[data-slot="query-bar-chip"]');
+      await expect(chip).toBeVisible();
+
+      // Click the empty space to the right of the chips (the cursor-text wrapper)
+      const queryBar = page.locator('[data-slot="query-bar"]');
+      const queryBarBox = await queryBar.boundingBox();
+      expect(queryBarBox).toBeTruthy();
+
+      // Click near the right edge of the QueryBar (empty space after input)
+      await page.mouse.click(
+        queryBarBox!.x + queryBarBox!.width - 60,
+        queryBarBox!.y + queryBarBox!.height / 2,
+      );
+
+      const fieldMenu = page.locator('[data-slot="query-bar-field-menu"]');
+      await expect(fieldMenu).toBeVisible({ timeout: 2000 });
+    });
+
     test('Should output Group expression with multiple conditions', async ({ page }) => {
       await compositionStory.goto(page, 'Simple');
 

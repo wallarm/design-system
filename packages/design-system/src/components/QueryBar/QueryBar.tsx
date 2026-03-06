@@ -61,9 +61,9 @@ export const QueryBar: FC<QueryBarProps> = ({
     chips,
     upsertCondition,
     removeCondition,
-    removeLastCondition,
+    removeConditionAtIndex,
     clearAll,
-    toggleConnector,
+    setConnectorValue,
   } = useQueryBarExpression({ fields, value, onChange, error });
 
   const autocomplete = useQueryBarAutocomplete({
@@ -72,9 +72,9 @@ export const QueryBar: FC<QueryBarProps> = ({
     chips,
     upsertCondition,
     removeCondition,
-    removeLastCondition,
+    removeConditionAtIndex,
     clearAll,
-    toggleConnector,
+    setConnectorValue,
     containerRef,
     buildingChipRef,
     inputRef,

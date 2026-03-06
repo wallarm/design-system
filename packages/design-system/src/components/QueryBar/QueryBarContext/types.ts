@@ -21,12 +21,15 @@ export interface QueryBarContextValue {
   error: boolean;
   showKeyboardHint: boolean;
   menuOpen: boolean;
+  insertIndex: number;
+  insertAfterConnector: boolean;
   // Callbacks
   onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onInputKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
   onInputClick: () => void;
+  onGapClick: (conditionIndex: number, afterConnector: boolean) => void;
   onChipClick: (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => void;
-  onConnectorClick: (chipId: string) => void;
+  onConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   onChipRemove: (chipId: string) => void;
   onClear: () => void;
 }

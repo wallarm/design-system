@@ -92,8 +92,8 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
     is_not_null: 'is not set',
   },
   enum: {
-    in: 'is any of 🤔 wip',
-    not_in: 'is not any of 🤔 wip',
+    in: 'is any of',
+    not_in: 'is not any of',
     is_null: 'is set',
     is_not_null: 'is not set',
   },
