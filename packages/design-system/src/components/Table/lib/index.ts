@@ -1,4 +1,6 @@
 export {
+  getAlignClass,
+  getExpandBorderClass,
   SORT_LABELS,
   TABLE_END_REACHED_THRESHOLD,
   TABLE_EXPAND_COLUMN_ID,

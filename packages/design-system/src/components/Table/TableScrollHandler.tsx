@@ -33,7 +33,7 @@ export const TableScrollHandler: FC<TableScrollHandlerProps> = ({ atStart, atEnd
 
   return (
     <div className='shrink-0 ml-auto flex items-center gap-4'>
-      <Tooltip>
+      <Tooltip disabled={atStart}>
         <TooltipTrigger asChild>
           <Button
             variant='ghost'
@@ -48,7 +48,7 @@ export const TableScrollHandler: FC<TableScrollHandlerProps> = ({ atStart, atEnd
         </TooltipTrigger>
         <TooltipContent>Scroll left</TooltipContent>
       </Tooltip>
-      <Tooltip>
+      <Tooltip disabled={atEnd}>
         <TooltipTrigger asChild>
           <Button
             variant='ghost'

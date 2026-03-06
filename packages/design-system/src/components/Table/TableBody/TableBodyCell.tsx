@@ -1,6 +1,13 @@
 import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
-import { getPinningStyles, isLastPinnedLeft, TABLE_EXPAND_COLUMN_ID, useColumnDnd } from '../lib';
+import {
+  getAlignClass,
+  getExpandBorderClass,
+  getPinningStyles,
+  isLastPinnedLeft,
+  TABLE_EXPAND_COLUMN_ID,
+  useColumnDnd,
+} from '../lib';
 import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
 
@@ -21,24 +28,44 @@ export const TableBodyCell = <T,>({
   const column = cell.column;
   const isPinned = column.getIsPinned();
   const meta = column.columnDef.meta;
-  const isExpandedToggle = column.id === TABLE_EXPAND_COLUMN_ID && cell.row.getIsExpanded();
+  const isExpandColumn = column.id === TABLE_EXPAND_COLUMN_ID;
+  const isExpandedToggle = isExpandColumn && (cell.row.getIsExpanded() || cell.row.depth > 0);
 
   const { canDnd, setNodeRef, dndStyle } = useColumnDnd(column);
 
   const pinningStyles = getPinningStyles(column);
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
 
+  const isCut = meta?.resizeType === 'cut';
+  const content = flexRender(cell.column.columnDef.cell, cell.getContext());
+
   return (
     <Td
-      className={cn(meta?.cellClassName, className)}
+      className={cn(
+        getAlignClass(meta),
+        getExpandBorderClass(isExpandColumn, cell.row.depth),
+        meta?.cellClassName,
+        className,
+      )}
       pinned={isPinned === 'left'}
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}
       ref={canDnd ? setNodeRef : undefined}
-      style={{ ...pinningStyles, width: cell.column.getSize(), ...dndStyle }}
+      style={{
+        ...pinningStyles,
+        width: cell.column.getSize(),
+        ...dndStyle,
+        ...(isCut && { overflow: 'hidden' }),
+      }}
       colSpan={colSpan}
     >
-      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+      {isCut ? (
+        <div className='overflow-hidden' style={{ minWidth: column.columnDef.size }}>
+          {content}
+        </div>
+      ) : (
+        content
+      )}
     </Td>
   );
 };

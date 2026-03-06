@@ -10,6 +10,25 @@ export const TABLE_EXPAND_COLUMN_WIDTH = 33;
 
 export const TABLE_END_REACHED_THRESHOLD = 200;
 
+/** Sort types that default to right-aligned columns */
+const RIGHT_ALIGNED_SORT_TYPES = new Set(['number', 'score', 'size']);
+
+/** Resolve text-align class from column meta */
+export const getAlignClass = (meta?: { align?: string; sortType?: string }): string => {
+  const align =
+    meta?.align ??
+    (meta?.sortType && RIGHT_ALIGNED_SORT_TYPES.has(meta.sortType) ? 'right' : undefined);
+  if (align === 'right') return 'text-right';
+  if (align === 'center') return 'text-center';
+  return 'text-left';
+};
+
+/** Border-bottom override for the last expanded row in a depth group */
+export const getExpandBorderClass = (isExpandColumn: boolean, depth: number): string | false =>
+  isExpandColumn &&
+  depth > 0 &&
+  '[tr[data-depth]:has(+_tr:not([data-depth]))_&]:!border-b [tr[data-depth]:last-child_&]:!border-b';
+
 /** Sort labels by sortType: [ascLabel, descLabel] */
 export const SORT_LABELS: Record<string, [string, string]> = {
   text: ['A \u2192 Z', 'Z \u2192 A'],

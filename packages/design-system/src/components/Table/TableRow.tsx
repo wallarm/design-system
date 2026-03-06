@@ -66,6 +66,7 @@ const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<
         className='group/row'
         data-selected={isSelected || undefined}
         aria-selected={isSelected || undefined}
+        data-depth={row.depth > 0 ? row.depth : undefined}
       >
         {row.getVisibleCells().map(cell => (
           <TableBodyCell key={cell.id} cell={cell} />

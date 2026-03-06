@@ -35,7 +35,7 @@ export const createExpandColumn = <T,>(): ColumnDef<T, unknown> => {
               variant='ghost'
               color='neutral'
               size='small'
-              active={expanded}
+              active={false}
               onToggle={row.getToggleExpandedHandler()}
               aria-expanded={expanded}
               aria-label={expanded ? 'Collapse row' : 'Expand row'}

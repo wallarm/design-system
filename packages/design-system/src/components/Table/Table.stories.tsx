@@ -127,6 +127,26 @@ export const ColumnResizing: StoryFn<typeof meta> = () => {
   );
 };
 
+export const ColumnResizingWithPinning: StoryFn<typeof meta> = () => {
+  const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+  const [columnPinning, setColumnPinning] = useState<TableColumnPinningState>({
+    left: ['objectName'],
+  });
+
+  return (
+    <Table
+      className='max-w-800'
+      data={securityEvents}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      columnSizing={columnSizing}
+      onColumnSizingChange={setColumnSizing}
+      columnPinning={columnPinning}
+      onColumnPinningChange={setColumnPinning}
+    />
+  );
+};
+
 export const ColumnPinning: StoryFn<typeof meta> = () => {
   const [columnPinning, setColumnPinning] = useState<TableColumnPinningState>({
     left: ['objectName'],
@@ -459,6 +479,62 @@ export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
         onEndReachedThreshold={300}
       />
     </VStack>
+  );
+};
+
+export const HeaderColumnDescription: StoryFn<typeof meta> = () => {
+  const [sorting, setSorting] = useState<TableSortingState>([]);
+
+  const columns = useMemo<TableColumnDef<(typeof securityEvents)[number]>[]>(
+    () =>
+      securityColumns.map(col => {
+        const key = 'accessorKey' in col ? col.accessorKey : undefined;
+        if (key === 'objectName') {
+          return {
+            ...col,
+            meta: {
+              ...col.meta,
+              description: { type: 'text' as const, content: 'Target resource' },
+            },
+          };
+        }
+        if (key === 'sourceIp') {
+          return {
+            ...col,
+            meta: {
+              ...col.meta,
+              description: { type: 'tooltip' as const, content: 'Request origin IP' },
+            },
+          };
+        }
+        if (key === 'requests') {
+          return {
+            ...col,
+            meta: { ...col.meta, description: { type: 'tooltip' as const, content: 'Total hits' } },
+          };
+        }
+        if (key === 'parameter') {
+          return {
+            ...col,
+            meta: {
+              ...col.meta,
+              description: { type: 'text' as const, content: 'Affected param' },
+            },
+          };
+        }
+        return col;
+      }),
+    [],
+  );
+
+  return (
+    <Table
+      data={securityEvents}
+      columns={columns}
+      getRowId={row => row.id}
+      sorting={sorting}
+      onSortingChange={setSorting}
+    />
   );
 };
 

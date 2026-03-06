@@ -39,6 +39,9 @@ const textVariants = cva('font-sans-display break-words', {
       true: 'truncate',
       false: 'whitespace-pre-wrap',
     },
+    decoration: {
+      dashed: 'underline decoration-dashed underline-offset-2',
+    },
   },
 });
 
@@ -62,6 +65,7 @@ export const Text: FC<PropsWithChildren<TextProps>> = ({
   asChild = false,
   grow = false,
   align,
+  decoration,
   lineClamp,
   ...props
 }) => {
@@ -71,7 +75,10 @@ export const Text: FC<PropsWithChildren<TextProps>> = ({
   return (
     <Comp
       {...props}
-      className={cn(textVariants({ size, weight, color, truncate, align, grow }), lineClampClass)}
+      className={cn(
+        textVariants({ size, weight, color, truncate, align, grow, decoration }),
+        lineClampClass,
+      )}
     />
   );
 };

@@ -12,16 +12,28 @@ export type LinkProps = LinkNativeProps &
   LinkVariantsProps & {
     ref?: Ref<HTMLAnchorElement>;
     asChild?: boolean;
+    disabled?: boolean;
   };
 
 export const Link: FC<LinkProps> = ({
+  className,
   asChild = false,
   type = 'default',
   size = 'lg',
   weight = 'regular',
+  disabled = false,
+  onClick,
   ...props
 }) => {
   const Comp = asChild ? Slot : 'a';
 
-  return <Comp {...props} className={cn(linkVariants({ type, size, weight }))} />;
+  return (
+    <Comp
+      {...props}
+      aria-disabled={disabled || undefined}
+      tabIndex={disabled ? -1 : props.tabIndex}
+      onClick={disabled ? undefined : onClick}
+      className={cn(linkVariants({ type, size, weight, disabled }), className)}
+    />
+  );
 };
