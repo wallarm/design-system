@@ -64,13 +64,25 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
   const fieldFilterText = editingSegment === 'attribute' ? segmentFilterText : inputText;
   // Operator is not inline-editable — always show all options
   const operatorFilterText = '';
-  // For multi-select, filter by text after the last comma
-  const valueFilterText =
-    editingSegment === 'value'
-      ? isMultiSelectOperator(selectedOperator)
-        ? (segmentFilterText.split(',').pop()?.trim() ?? '')
-        : segmentFilterText
-      : inputText;
+  // For multi-select, filter by the text after the last comma —
+  // but only if that token is NOT already a known selected value (otherwise show all).
+  const valueFilterText = (() => {
+    if (editingSegment !== 'value') return inputText;
+    if (!isMultiSelectOperator(selectedOperator)) return segmentFilterText;
+    const lastToken = segmentFilterText.split(',').pop()?.trim() ?? '';
+    if (!lastToken) return '';
+    // If the last token matches a field value label/value, it's a completed selection — don't filter
+    const fieldValues = selectedField?.values;
+    if (fieldValues) {
+      const isKnownValue = fieldValues.some(
+        v =>
+          v.label.toLowerCase() === lastToken.toLowerCase() ||
+          String(v.value).toLowerCase() === lastToken.toLowerCase(),
+      );
+      if (isKnownValue) return '';
+    }
+    return lastToken;
+  })();
 
   return (
     <>

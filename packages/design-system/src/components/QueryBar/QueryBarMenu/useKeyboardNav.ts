@@ -310,7 +310,9 @@ export const useKeyboardNav = ({
     el?.scrollIntoView({ block: 'nearest' });
   }, []);
 
-  const highlightedValue = items[activeIndex]?.id ?? null;
+  // Empty string (not null) so DropdownMenu always passes it to Ark UI,
+  // preventing Ark's default auto-highlight of the first item when focus is elsewhere.
+  const highlightedValue = items[activeIndex]?.id ?? '';
 
   return { activeIndex, setActiveIndex, highlightedValue, onHighlightChange, pendingIds };
 };

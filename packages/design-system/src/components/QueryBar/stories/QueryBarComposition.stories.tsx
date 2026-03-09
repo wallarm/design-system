@@ -18,6 +18,17 @@ type Story = StoryObj<typeof meta>;
 // Real backend where_fields from sessions-api metadata with sample values
 const attackFields: FieldMetadata[] = [
   {
+    name: 'status',
+    label: 'Status',
+    type: 'enum',
+    description: 'Attack status',
+    operators: ['=', '!=', 'in'],
+    values: [
+      { value: 'registered', label: 'Registered' },
+      { value: 'blocked', label: 'Blocked' },
+    ],
+  },
+  {
     name: 'last_seen',
     label: 'Last seen',
     type: 'date',

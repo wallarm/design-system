@@ -46,9 +46,8 @@ const sampleFields: FieldMetadata[] = [
     label: 'Status',
     type: 'enum',
     values: [
-      { value: 'active', label: 'Active' },
-      { value: 'pending', label: 'Pending' },
-      { value: 'archived', label: 'Archived' },
+      { value: 'registered', label: 'Registered' },
+      { value: 'blocked', label: 'Blocked' },
     ],
   },
   {
