@@ -25,6 +25,7 @@ interface AutocompleteForContext {
   handleSegmentFilterChange: (text: string) => void;
   cancelSegmentEdit: () => void;
   handleCustomValueCommit: (customText: string) => void;
+  handleCustomAttributeCommit: (customText: string) => void;
   menuRef: RefObject<HTMLDivElement | null>;
 }
 
@@ -74,6 +75,7 @@ export const useQueryBarContextValue = ({
       onSegmentFilterChange: autocomplete.handleSegmentFilterChange,
       onCancelSegmentEdit: autocomplete.cancelSegmentEdit,
       onCustomValueCommit: autocomplete.handleCustomValueCommit,
+      onCustomAttributeCommit: autocomplete.handleCustomAttributeCommit,
       menuRef: autocomplete.menuRef,
     }),
     [
@@ -97,6 +99,7 @@ export const useQueryBarContextValue = ({
       autocomplete.handleSegmentFilterChange,
       autocomplete.cancelSegmentEdit,
       autocomplete.handleCustomValueCommit,
+      autocomplete.handleCustomAttributeCommit,
       autocomplete.menuRef,
       buildingChipRef,
       inputRef,

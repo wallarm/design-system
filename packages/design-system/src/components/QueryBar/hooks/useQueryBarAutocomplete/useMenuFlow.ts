@@ -9,6 +9,27 @@ import {
 } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
+/** Check if condition value(s) are valid for the given field. Returns true if error. */
+const validateValueForField = (
+  field: FieldMetadata,
+  value: Condition['value'],
+): boolean => {
+  // No values list means any value is acceptable (free-text field)
+  if (!field.values || field.values.length === 0) return false;
+  // Null value (no-value operators) is always valid
+  if (value == null) return false;
+
+  const values = Array.isArray(value) ? value : [value];
+  return values.some(
+    v =>
+      !field.values!.some(
+        opt =>
+          opt.value === v ||
+          String(opt.value).toLowerCase() === String(v).toLowerCase(),
+      ),
+  );
+};
+
 interface MenuFlowDeps {
   editing: {
     editingChipId: string | null;
@@ -17,6 +38,7 @@ interface MenuFlowDeps {
   };
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
+  fields: FieldMetadata[];
   inputRef: RefObject<HTMLInputElement | null>;
   insertIndex: number;
   upsertCondition: (
@@ -42,6 +64,7 @@ export const useMenuFlow = ({
   editing,
   selectedField,
   selectedOperator,
+  fields,
   inputRef,
   insertIndex,
   upsertCondition,
@@ -66,11 +89,31 @@ export const useMenuFlow = ({
 
   const handleFieldSelect = useCallback(
     (field: FieldMetadata) => {
+      // When editing an existing chip's attribute — update field, keep operator/value
+      if (editing.editingChipId && editing.editingSegment === 'attribute') {
+        const idx = chipIdToConditionIndex(editing.editingChipId);
+        const condition = idx !== null ? conditionsRef.current[idx] : null;
+        if (condition) {
+          // Check if current value(s) are valid for the new field
+          const error = validateValueForField(field, condition.value);
+          upsertCondition(
+            field,
+            condition.operator,
+            condition.value,
+            editing.editingChipId,
+            undefined,
+            error || undefined,
+            condition.dateOrigin,
+          );
+        }
+        resetState();
+        return;
+      }
       setSelectedField(field);
       setInputText('');
       setMenuState('operator');
     },
-    [setSelectedField, setInputText, setMenuState],
+    [editing, upsertCondition, resetState, setSelectedField, setInputText, setMenuState],
   );
 
   const handleOperatorSelect = useCallback(
@@ -267,6 +310,55 @@ export const useMenuFlow = ({
     ],
   );
 
+  /** Commit a custom typed attribute (from inline segment editing) */
+  const handleCustomAttributeCommit = useCallback(
+    (customText: string) => {
+      if (!editing.editingChipId || !customText.trim()) return;
+      const trimmed = customText.trim();
+      const idx = chipIdToConditionIndex(editing.editingChipId);
+      const condition = idx !== null ? conditionsRef.current[idx] : null;
+      if (!condition) return;
+
+      // Try to match the typed text to a known field
+      const matchedField = fields.find(
+        f =>
+          f.label.toLowerCase() === trimmed.toLowerCase() ||
+          f.name.toLowerCase() === trimmed.toLowerCase(),
+      );
+
+      if (matchedField) {
+        const error = validateValueForField(matchedField, condition.value);
+        upsertCondition(
+          matchedField,
+          condition.operator,
+          condition.value,
+          editing.editingChipId,
+          undefined,
+          error || undefined,
+          condition.dateOrigin,
+        );
+      } else {
+        // Unknown field — create a synthetic FieldMetadata and mark as error
+        const syntheticField: FieldMetadata = {
+          name: trimmed,
+          label: trimmed,
+          type: 'string',
+        };
+        upsertCondition(
+          syntheticField,
+          condition.operator,
+          condition.value,
+          editing.editingChipId,
+          undefined,
+          true,
+          condition.dateOrigin,
+        );
+      }
+      resetState();
+    },
+    [editing, fields, upsertCondition, resetState],
+  );
+
   return {
     handleMenuClose,
     handleFieldSelect,
@@ -276,5 +368,6 @@ export const useMenuFlow = ({
     handleBuildingValueChange,
     handleRangeSelect,
     handleCustomValueCommit,
+    handleCustomAttributeCommit,
   };
 };

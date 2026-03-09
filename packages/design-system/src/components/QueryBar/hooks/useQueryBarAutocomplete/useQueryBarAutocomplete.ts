@@ -115,10 +115,12 @@ export const useQueryBarAutocomplete = ({
     handleBuildingValueChange,
     handleRangeSelect,
     handleCustomValueCommit,
+    handleCustomAttributeCommit,
   } = useMenuFlow({
     editing,
     selectedField,
     selectedOperator,
+    fields,
     inputRef,
     insertIndex: effectiveInsertIndex,
     upsertCondition,
@@ -341,6 +343,7 @@ export const useQueryBarAutocomplete = ({
     handleSegmentFilterChange: editing.setSegmentFilterText,
     cancelSegmentEdit: editing.cancelSegmentEdit,
     handleCustomValueCommit,
+    handleCustomAttributeCommit,
     menuRef,
   };
 };

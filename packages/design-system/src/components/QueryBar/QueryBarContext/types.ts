@@ -39,6 +39,7 @@ export interface QueryBarContextValue {
   onSegmentFilterChange: (text: string) => void;
   onCancelSegmentEdit: () => void;
   onCustomValueCommit: (customText: string) => void;
+  onCustomAttributeCommit: (customText: string) => void;
   /** Ref to the currently open menu content element */
   menuRef: RefObject<HTMLDivElement | null>;
 }

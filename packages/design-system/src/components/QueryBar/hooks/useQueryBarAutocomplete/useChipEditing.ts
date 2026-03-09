@@ -63,7 +63,8 @@ export const useChipEditing = ({
       if (!condition) return;
 
       const field = fields.find(f => f.name === condition.field);
-      if (!field) return;
+      // For unknown fields (error chips), allow attribute editing to pick a valid field
+      if (!field && segment !== 'attribute') return;
 
       const chip = chips.find(c => c.id === chipId);
       if (!chip || chip.variant !== 'chip') return;
@@ -71,11 +72,11 @@ export const useChipEditing = ({
       const containerRect = containerRef.current?.getBoundingClientRect();
       setMenuOffset(containerRect ? anchorRect.left - containerRect.left : 0);
       setEditingChipId(chipId);
-      setSelectedField(field);
+      setSelectedField(field ?? null);
 
       const rawOperator =
         segment === 'value' || segment === 'operator'
-          ? (getOperatorFromLabel(chip.operator || '', field.type) ?? condition.operator)
+          ? (getOperatorFromLabel(chip.operator || '', field?.type ?? 'string') ?? condition.operator)
           : null;
 
       if (segment === 'value') {

@@ -32,6 +32,7 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
     onSegmentFilterChange,
     onCancelSegmentEdit,
     onCustomValueCommit,
+    onCustomAttributeCommit,
     menuRef,
   } = useQueryBarContext();
 
@@ -64,17 +65,24 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
         onCancelSegmentEdit();
         return;
       }
-      if (e.key === 'Enter' && editingSegment === 'value' && !e.defaultPrevented) {
-        e.preventDefault();
-        onCustomValueCommit(segmentFilterText);
-        return;
+      if (e.key === 'Enter' && !e.defaultPrevented) {
+        if (editingSegment === 'value') {
+          e.preventDefault();
+          onCustomValueCommit(segmentFilterText);
+          return;
+        }
+        if (editingSegment === 'attribute') {
+          e.preventDefault();
+          onCustomAttributeCommit(segmentFilterText);
+          return;
+        }
       }
       if (e.key === 'ArrowDown') {
         e.preventDefault();
         menuRef.current?.focus();
       }
     },
-    [onCancelSegmentEdit, editingSegment, segmentFilterText, onCustomValueCommit, menuRef],
+    [onCancelSegmentEdit, editingSegment, segmentFilterText, onCustomValueCommit, onCustomAttributeCommit, menuRef],
   );
 
   const handleSegmentEditBlur = useCallback(
