@@ -70,7 +70,7 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
       ? isMultiSelectOperator(selectedOperator)
         ? (segmentFilterText.split(',').pop()?.trim() ?? '')
         : segmentFilterText
-      : '';
+      : inputText;
 
   return (
     <>

@@ -57,15 +57,22 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
   const showSuggestions = suggestedFields.length > 0;
   const query = filterText.toLowerCase();
 
-  const filteredFields = useMemo(
-    () =>
-      query
-        ? fields.filter(
-            f => f.label.toLowerCase().includes(query) || f.name.toLowerCase().includes(query),
-          )
-        : fields,
-    [fields, query],
-  );
+  const filteredFields = useMemo(() => {
+    if (!query) return fields;
+    const matches = fields.filter(
+      f => f.label.toLowerCase().includes(query) || f.name.toLowerCase().includes(query),
+    );
+    // Sort: startsWith first (label or name), then includes
+    return matches.sort((a, b) => {
+      const aStarts =
+        a.label.toLowerCase().startsWith(query) || a.name.toLowerCase().startsWith(query);
+      const bStarts =
+        b.label.toLowerCase().startsWith(query) || b.name.toLowerCase().startsWith(query);
+      if (aStarts && !bStarts) return -1;
+      if (!aStarts && bStarts) return 1;
+      return 0;
+    });
+  }, [fields, query]);
 
   const flatItems: QueryBarDropdownItem[] = useMemo(() => {
     const items: QueryBarDropdownItem[] = [];
