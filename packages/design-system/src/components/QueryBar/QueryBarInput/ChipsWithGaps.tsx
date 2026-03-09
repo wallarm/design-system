@@ -82,6 +82,8 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
   return <>{elements}</>;
 };
 
+ChipsWithGaps.displayName = 'ChipsWithGaps';
+
 /** Trailing gap rendered once after chipsAfter in the parent layout. */
 export const TrailingGap: FC<{
   chips: QueryBarChipData[];
@@ -93,3 +95,5 @@ export const TrailingGap: FC<{
   const trailingIdx = match ? Number(match[1]) + 1 : 0;
   return <InsertionGap onClick={() => onGapClick(trailingIdx, true)} />;
 };
+
+TrailingGap.displayName = 'TrailingGap';

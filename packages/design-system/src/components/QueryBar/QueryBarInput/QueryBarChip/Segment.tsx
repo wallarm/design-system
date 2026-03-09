@@ -33,22 +33,29 @@ export const Segment: FC<SegmentProps> = ({
   const lastTextWidthRef = useRef<number>(0);
   const [inputWidth, setInputWidth] = useState<number | undefined>(undefined);
 
-  // Continuously measure text width while not editing
+  // Measure text width when content changes (only while not editing)
   useEffect(() => {
     if (editing || !textRef.current) return;
     lastTextWidthRef.current = textRef.current.offsetWidth;
-  });
+  }, [editing, children]);
 
-  // Auto-focus when entering edit mode
+  // Auto-focus when entering edit mode.
+  // Double rAF is needed to beat Ark UI's focus steal via zag.js (which uses single rAF).
+  // If Ark UI changes its focus timing, this workaround may need updating.
   useEffect(() => {
     if (!editing) return;
-    // Use double rAF to beat Ark UI focus steal
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
+    let outer = 0;
+    let inner = 0;
+    outer = requestAnimationFrame(() => {
+      inner = requestAnimationFrame(() => {
         inputRef.current?.focus();
         inputRef.current?.select();
       });
     });
+    return () => {
+      cancelAnimationFrame(outer);
+      cancelAnimationFrame(inner);
+    };
   }, [editing]);
 
   // Dynamically measure input width from hidden sizer span

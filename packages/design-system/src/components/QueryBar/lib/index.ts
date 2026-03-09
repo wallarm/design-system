@@ -15,6 +15,7 @@ export {
   VARIANT_LABELS,
 } from './constants';
 export { isMenuRelated } from './dom';
+export { filterAndSort } from './filterSort';
 export {
   getOperatorFromLabel,
   getOperatorLabel,

@@ -30,6 +30,19 @@ const validateValueForField = (
   );
 };
 
+/** Resolve a text input to the actual field value (e.g. label "Active" → value "active") */
+const resolveFieldValue = (
+  field: FieldMetadata,
+  text: string,
+): string | number | boolean => {
+  const match = field.values?.find(
+    v =>
+      v.label.toLowerCase() === text.toLowerCase() ||
+      String(v.value).toLowerCase() === text.toLowerCase(),
+  );
+  return match ? match.value : text;
+};
+
 interface MenuFlowDeps {
   editing: {
     editingChipId: string | null;
@@ -81,9 +94,10 @@ export const useMenuFlow = ({
   const conditionsRef = useRef(conditions);
   conditionsRef.current = conditions;
 
-  // Ignore Ark UI close when focus is returning to our input (e.g. ArrowUp on first item)
+  // Ignore Ark UI close when focus is on our input or a segment inline-edit input
   const handleMenuClose = useCallback(() => {
     if (document.activeElement === inputRef.current) return;
+    if ((document.activeElement as HTMLElement)?.closest?.('[data-slot^="segment-"]')) return;
     resetState();
   }, [resetState, inputRef]);
 
@@ -194,12 +208,8 @@ export const useMenuFlow = ({
   const handleBuildingValueChange = useCallback(
     (preview: string | undefined) => {
       setBuildingMultiValue(preview);
-      // When editing a multi-select value segment, sync segment text with dropdown selections
-      if (editing.editingSegment === 'value' && isMultiSelectOperator(selectedOperator)) {
-        editing.setSegmentFilterText(preview ?? '');
-      }
     },
-    [setBuildingMultiValue, editing, selectedOperator],
+    [setBuildingMultiValue],
   );
 
   /** Range select (between + calendar) */
@@ -219,95 +229,87 @@ export const useMenuFlow = ({
     [selectedField, selectedOperator, editing, insertIndex, upsertCondition, resetState],
   );
 
+  /** Commit multi-select values from inline text (comma-separated) */
+  const commitMultiSelectValue = useCallback(
+    (trimmed: string, field: FieldMetadata, operator: FilterOperator) => {
+      const isEditing = !!editing.editingChipId;
+      const parts = trimmed.split(',').map(s => s.trim()).filter(Boolean);
+      const resolved = parts.map(part => resolveFieldValue(field, part));
+      let error: boolean | undefined;
+      if (field.values && field.values.length > 0) {
+        const hasInvalid = resolved.some(
+          v => !field.values!.some(opt => opt.value === v),
+        );
+        if (hasInvalid) error = true;
+      }
+      upsertCondition(field, operator, resolved, editing.editingChipId, isEditing ? undefined : insertIndex, error);
+      resetState();
+    },
+    [editing, insertIndex, upsertCondition, resetState],
+  );
+
+  /** Commit a date value from inline text */
+  const commitDateValue = useCallback(
+    (trimmed: string, field: FieldMetadata, operator: FilterOperator) => {
+      const isEditing = !!editing.editingChipId;
+      let error: boolean | undefined;
+      let dateOrigin: 'relative' | 'absolute' | undefined;
+
+      if (editing.editingChipId) {
+        const idx = chipIdToConditionIndex(editing.editingChipId);
+        const oldCondition = idx !== null ? conditionsRef.current[idx] : null;
+        if (oldCondition) {
+          const oldVal = String(oldCondition.value ?? '');
+          dateOrigin = oldCondition.dateOrigin ?? (isDatePreset(oldVal) ? 'relative' : 'absolute');
+        }
+      }
+      const isValidPreset = isDatePreset(trimmed);
+      // Reject short strings that Date() parses loosely (e.g. '2' → 2001-02-01)
+      const isValidDate = !isValidPreset && trimmed.length >= 6 && !isNaN(new Date(trimmed).getTime());
+      if (!isValidPreset && !isValidDate) error = true;
+
+      upsertCondition(field, operator, trimmed, editing.editingChipId, isEditing ? undefined : insertIndex, error, dateOrigin);
+      resetState();
+    },
+    [editing, insertIndex, upsertCondition, resetState],
+  );
+
+  /** Commit a single-select value from inline text */
+  const commitSingleValue = useCallback(
+    (trimmed: string, field: FieldMetadata, operator: FilterOperator) => {
+      const isEditing = !!editing.editingChipId;
+      const resolved = resolveFieldValue(field, trimmed);
+      let error: boolean | undefined;
+      if (field.values && field.values.length > 0 && resolved === trimmed) {
+        // resolveFieldValue returned the raw text — no match found
+        const hasMatch = field.values.some(
+          v =>
+            v.label.toLowerCase() === trimmed.toLowerCase() ||
+            String(v.value).toLowerCase() === trimmed.toLowerCase(),
+        );
+        if (!hasMatch) error = true;
+      }
+      upsertCondition(field, operator, resolved, editing.editingChipId, isEditing ? undefined : insertIndex, error);
+      resetState();
+    },
+    [editing, insertIndex, upsertCondition, resetState],
+  );
+
   /** Commit a custom typed value (from inline segment editing) */
   const handleCustomValueCommit = useCallback(
     (customText: string) => {
       if (!selectedField || !selectedOperator || !customText.trim()) return;
       const trimmed = customText.trim();
-      const isEditing = !!editing.editingChipId;
-
-      let error: boolean | undefined;
-      let dateOrigin: 'relative' | 'absolute' | undefined;
 
       if (isMultiSelectOperator(selectedOperator)) {
-        // Parse comma-separated values, resolve each to field value
-        const parts = trimmed
-          .split(',')
-          .map(s => s.trim())
-          .filter(Boolean);
-        const resolved = parts.map(part => {
-          const match = selectedField.values?.find(
-            v =>
-              v.label.toLowerCase() === part.toLowerCase() ||
-              String(v.value).toLowerCase() === part.toLowerCase(),
-          );
-          return match ? match.value : part;
-        });
-        // Error if any value is not in the allowed list
-        if (selectedField.values && selectedField.values.length > 0) {
-          const hasInvalid = resolved.some(
-            v => !selectedField.values!.some(opt => opt.value === v),
-          );
-          if (hasInvalid) error = true;
-        }
-        upsertCondition(
-          selectedField,
-          selectedOperator,
-          resolved,
-          editing.editingChipId,
-          isEditing ? undefined : insertIndex,
-          error,
-        );
-        resetState();
-        return;
-      }
-
-      if (selectedField.type === 'date') {
-        // Determine dateOrigin from previous condition value
-        if (editing.editingChipId) {
-          const idx = chipIdToConditionIndex(editing.editingChipId);
-          const oldCondition = idx !== null ? conditionsRef.current[idx] : null;
-          if (oldCondition) {
-            const oldVal = String(oldCondition.value ?? '');
-            dateOrigin =
-              oldCondition.dateOrigin ?? (isDatePreset(oldVal) ? 'relative' : 'absolute');
-          }
-        }
-        // Validate: must be a valid preset or a properly formatted date (ISO-like or locale)
-        const isValidPreset = isDatePreset(trimmed);
-        // Reject short strings that Date() parses loosely (e.g. '2' → 2001-02-01)
-        const isValidDate =
-          !isValidPreset && trimmed.length >= 6 && !isNaN(new Date(trimmed).getTime());
-        if (!isValidPreset && !isValidDate) error = true;
+        commitMultiSelectValue(trimmed, selectedField, selectedOperator);
+      } else if (selectedField.type === 'date') {
+        commitDateValue(trimmed, selectedField, selectedOperator);
       } else {
-        // Non-date single-select: error if value not in allowed list
-        const hasMatch = selectedField.values?.some(
-          v =>
-            v.label.toLowerCase() === trimmed.toLowerCase() ||
-            String(v.value).toLowerCase() === trimmed.toLowerCase(),
-        );
-        if (selectedField.values && selectedField.values.length > 0 && !hasMatch) error = true;
+        commitSingleValue(trimmed, selectedField, selectedOperator);
       }
-
-      upsertCondition(
-        selectedField,
-        selectedOperator,
-        trimmed,
-        editing.editingChipId,
-        isEditing ? undefined : insertIndex,
-        error,
-        dateOrigin,
-      );
-      resetState();
     },
-    [
-      selectedField,
-      selectedOperator,
-      editing,
-      insertIndex,
-      upsertCondition,
-      resetState,
-    ],
+    [selectedField, selectedOperator, commitMultiSelectValue, commitDateValue, commitSingleValue],
   );
 
   /** Commit a custom typed attribute (from inline segment editing) */

@@ -55,25 +55,10 @@ export const deriveAutocompleteValues = ({
   const editingMultiValues = (() => {
     if (!editingChipId || !selectedOperator || !isMultiSelectOperator(selectedOperator)) return [];
 
-    // When inline-editing, derive checked values from the segment text
-    if (segmentFilterText !== undefined && selectedField?.values) {
-      const tokens = segmentFilterText
-        .split(',')
-        .map(t => t.trim())
-        .filter(Boolean);
-      const matched: Array<string | number | boolean> = [];
-      for (const token of tokens) {
-        const opt = selectedField.values.find(
-          o =>
-            o.label.toLowerCase() === token.toLowerCase() ||
-            String(o.value).toLowerCase() === token.toLowerCase(),
-        );
-        if (opt) matched.push(opt.value);
-      }
-      return matched;
-    }
-
-    // Fallback: derive from committed condition values
+    // Always derive from committed condition values.
+    // Segment text is NOT used here to avoid a circular dependency:
+    // segmentFilterText → editingMultiValues → initialValues → checkedValues
+    // → buildingMultiValue → setSegmentFilterText → loop
     const idx = chipIdToConditionIndex(editingChipId);
     if (idx === null) return [];
     const condition = conditions[idx];

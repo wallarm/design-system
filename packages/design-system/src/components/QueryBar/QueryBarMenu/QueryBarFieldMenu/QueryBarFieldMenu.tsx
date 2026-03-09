@@ -11,6 +11,7 @@ import {
 } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
+import { filterAndSort } from '../../lib';
 import type { Condition, FieldMetadata, QueryBarDropdownItem } from '../../types';
 import { MenuEmptyState } from '../MenuEmptyState';
 import { useKeyboardNav } from '../useKeyboardNav';
@@ -52,32 +53,19 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
   menuRef,
   className,
 }) => {
-  const limitedRecentConditions = recentConditions.slice(0, 3);
+  const limitedRecentConditions = useMemo(() => recentConditions.slice(0, 3), [recentConditions]);
   const showRecent = limitedRecentConditions.length > 0;
   const showSuggestions = suggestedFields.length > 0;
-  const query = filterText.toLowerCase();
 
-  const filteredFields = useMemo(() => {
-    if (!query) return fields;
-    const matches = fields.filter(
-      f => f.label.toLowerCase().includes(query) || f.name.toLowerCase().includes(query),
-    );
-    // Sort: startsWith first (label or name), then includes
-    return matches.sort((a, b) => {
-      const aStarts =
-        a.label.toLowerCase().startsWith(query) || a.name.toLowerCase().startsWith(query);
-      const bStarts =
-        b.label.toLowerCase().startsWith(query) || b.name.toLowerCase().startsWith(query);
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-      return 0;
-    });
-  }, [fields, query]);
+  const filteredFields = useMemo(
+    () => filterAndSort(fields, filterText, f => [f.label, f.name]),
+    [fields, filterText],
+  );
 
   const flatItems: QueryBarDropdownItem[] = useMemo(() => {
     const items: QueryBarDropdownItem[] = [];
 
-    if (!query && showRecent) {
+    if (!filterText && showRecent) {
       limitedRecentConditions.forEach((condition, index) => {
         const fieldMeta = fields.find(f => f.name === condition.field);
         items.push({
@@ -88,7 +76,7 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
       });
     }
 
-    if (!query && showSuggestions && !showRecent) {
+    if (!filterText && showSuggestions && !showRecent) {
       suggestedFields.forEach((field, index) => {
         items.push({
           id: `suggested-${index}`,
@@ -106,8 +94,8 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
       });
     });
 
-    if (!query && onSelectAnd) items.push({ id: 'and', label: 'AND', value: { type: 'and' } });
-    if (!query && onSelectOr) items.push({ id: 'or', label: 'OR', value: { type: 'or' } });
+    if (!filterText && onSelectAnd) items.push({ id: 'and', label: 'AND', value: { type: 'and' } });
+    if (!filterText && onSelectOr) items.push({ id: 'or', label: 'OR', value: { type: 'or' } });
 
     return items;
   }, [
@@ -119,7 +107,7 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
     showSuggestions,
     onSelectAnd,
     onSelectOr,
-    query,
+    filterText,
   ]);
 
   const handleItemSelect = (item: QueryBarDropdownItem) => {
@@ -158,11 +146,11 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
         className={cn('w-[300px]', className)}
         data-slot='query-bar-field-menu'
       >
-        {!query && showRecent && (
+        {!filterText && showRecent && (
           <RecentSection conditions={limitedRecentConditions} fields={fields} onSelect={onSelect} />
         )}
 
-        {!query && showSuggestions && !showRecent && (
+        {!filterText && showSuggestions && !showRecent && (
           <SuggestionsSection fields={suggestedFields} onSelect={onSelect} />
         )}
 
@@ -182,7 +170,7 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
           <MenuEmptyState />
         )}
 
-        {!query && (onSelectAnd || onSelectOr) && (
+        {!filterText && (onSelectAnd || onSelectOr) && (
           <OperatorsSection onSelectAnd={onSelectAnd} onSelectOr={onSelectOr} />
         )}
 

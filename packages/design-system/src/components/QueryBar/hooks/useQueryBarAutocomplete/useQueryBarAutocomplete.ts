@@ -61,9 +61,11 @@ export const useQueryBarAutocomplete = ({
   const [insertAfterConnector, setInsertAfterConnector] = useState(false);
   const effectiveInsertIndex = insertIndex ?? conditions.length;
 
-  // Ref keeps effectiveInsertIndex fresh for callbacks to avoid stale closures
+  // Refs keep values fresh for callbacks to avoid stale closures and unnecessary recreation
   const effectiveInsertIndexRef = useRef(effectiveInsertIndex);
   effectiveInsertIndexRef.current = effectiveInsertIndex;
+  const conditionsLengthRef = useRef(conditions.length);
+  conditionsLengthRef.current = conditions.length;
 
   // ── Child hooks ───────────────────────────────────────────
 
@@ -144,10 +146,10 @@ export const useQueryBarAutocomplete = ({
       if (text && !selectedField) {
         setMenuState('field');
       } else if (!text && !selectedField) {
-        setMenuState(isFocused && conditions.length === 0 ? 'field' : 'closed');
+        setMenuState(isFocused && conditionsLengthRef.current === 0 ? 'field' : 'closed');
       }
     },
-    [selectedField, isFocused, conditions.length],
+    [selectedField, isFocused],
   );
 
   const handleInputClick = useCallback(() => {
@@ -167,20 +169,20 @@ export const useQueryBarAutocomplete = ({
         menuRef.current?.focus();
         return;
       }
-      if (e.key === 'Backspace' && !e.repeat && inputText === '' && conditions.length > 0) {
+      if (e.key === 'Backspace' && !e.repeat && inputText === '' && conditionsLengthRef.current > 0) {
         e.preventDefault();
         const removeIdx = effectiveInsertIndexRef.current - 1;
         if (removeIdx >= 0) {
           removeConditionAtIndex(removeIdx);
           setInsertIndex(prev => {
-            const eff = prev ?? conditions.length;
+            const eff = prev ?? conditionsLengthRef.current;
             return eff > 0 ? eff - 1 : 0;
           });
         }
         setMenuState('closed');
       }
     },
-    [inputText, conditions.length, removeConditionAtIndex, menuState],
+    [inputText, removeConditionAtIndex, menuState],
   );
 
   // ── Focus ─────────────────────────────────────────────────
@@ -248,9 +250,10 @@ export const useQueryBarAutocomplete = ({
   }, [isFocused, conditions.length, inputText, resetMenuOffset]);
 
   // ── Prevent Ark UI focus steal on menu open ──────────────
-  // Ark UI Menu steals focus via rAF when a menu mounts.
-  // We redirect once per menu state change so focus stays on the input.
-  // After that, ArrowDown can freely move focus to the menu.
+  // Ark UI Menu (zag.js) steals focus via single rAF when a menu mounts.
+  // Double rAF beats this by executing after zag's focus redirect.
+  // ⚠️ Fragile: if Ark UI changes its focus timing, this workaround may break.
+  // After redirect, ArrowDown can freely move focus to the menu.
 
   useEffect(() => {
     if (menuState === 'closed') return;
@@ -334,7 +337,6 @@ export const useQueryBarAutocomplete = ({
     handleRangeSelect,
     insertIndex: effectiveInsertIndex,
     insertAfterConnector,
-    dateRangeIndex: dateRange.currentIndex,
     editingDateIsAbsolute,
     // Inline segment editing
     editingChipId: editing.editingChipId,

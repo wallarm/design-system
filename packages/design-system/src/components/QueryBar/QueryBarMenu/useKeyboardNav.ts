@@ -208,9 +208,10 @@ export const useKeyboardNav = ({
       }
 
       // ── Focus is on a segment inline-edit input ──
-      // Let native cursor keys work, but allow Enter/Escape to be handled below
+      // Only intercept ArrowDown/Up (menu navigation) and Escape (close).
+      // Enter must propagate to the segment's onKeyDown for value commit.
       const isSegmentInput = (e.target as HTMLElement)?.closest?.('[data-slot^="segment-"]');
-      if (isSegmentInput && e.key !== 'Enter' && e.key !== 'Escape') return;
+      if (isSegmentInput && e.key !== 'Escape' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
 
       // ── Focus is on the input ─────────────────────────────
       const {

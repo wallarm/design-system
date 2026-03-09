@@ -60,7 +60,8 @@ export const OPERATOR_LABELS: Record<FilterOperator, string> = {
   not_like: 'not like',
   in: 'is any of',
   not_in: 'is not any of',
-  // Note: "is set" means the field has a value (IS NOT NULL), matching Wallarm API semantics
+  // ⚠️ Inverted labels: Wallarm API uses is_null to mean "field has a value" (IS SET).
+  // This is opposite to SQL semantics. Keep in sync with backend API contract.
   is_null: 'is set',
   is_not_null: 'is not set',
   between: 'between',

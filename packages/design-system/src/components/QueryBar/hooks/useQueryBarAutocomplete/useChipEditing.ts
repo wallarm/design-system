@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { chipIdToConditionIndex, getOperatorFromLabel } from '../../lib';
 import type { ChipSegment } from '../../QueryBarInput/QueryBarChip';
 import type {
@@ -16,7 +16,7 @@ interface UseChipEditingOptions {
   fields: FieldMetadata[];
   containerRef: RefObject<HTMLElement | null>;
   setMenuOffset: (offset: number) => void;
-  setSelectedField: (field: FieldMetadata) => void;
+  setSelectedField: (field: FieldMetadata | null) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
   setMenuState: (state: MenuState) => void;
 }
@@ -56,17 +56,25 @@ export const useChipEditing = ({
   const [editingSegment, setEditingSegment] = useState<ChipSegment | null>(null);
   const [segmentFilterText, setSegmentFilterText] = useState('');
 
+  // Refs keep data fresh for callbacks without causing callback recreation
+  const conditionsRef = useRef(conditions);
+  conditionsRef.current = conditions;
+  const chipsRef = useRef(chips);
+  chipsRef.current = chips;
+  const fieldsRef = useRef(fields);
+  fieldsRef.current = fields;
+
   /** Handle chip segment click — receives pre-computed segment and anchorRect from QueryBarChip */
   const handleChipClick = useCallback(
     (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => {
-      const condition = getConditionByChipId(chipId, conditions);
+      const condition = getConditionByChipId(chipId, conditionsRef.current);
       if (!condition) return;
 
-      const field = fields.find(f => f.name === condition.field);
+      const field = fieldsRef.current.find(f => f.name === condition.field);
       // For unknown fields (error chips), allow attribute editing to pick a valid field
       if (!field && segment !== 'attribute') return;
 
-      const chip = chips.find(c => c.id === chipId);
+      const chip = chipsRef.current.find(c => c.id === chipId);
       if (!chip || chip.variant !== 'chip') return;
 
       const containerRect = containerRef.current?.getBoundingClientRect();
@@ -96,16 +104,7 @@ export const useChipEditing = ({
 
       setMenuState(SEGMENT_TO_MENU[segment]);
     },
-    [
-      conditions,
-      fields,
-      chips,
-      containerRef,
-      setMenuOffset,
-      setSelectedField,
-      setSelectedOperator,
-      setMenuState,
-    ],
+    [containerRef, setMenuOffset, setSelectedField, setSelectedOperator, setMenuState],
   );
 
   const clearEditing = useCallback(() => {

@@ -8,6 +8,7 @@ import {
 } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
+import { filterAndSort } from '../../lib';
 import { MenuEmptyState } from '../MenuEmptyState';
 import { useValueMenuState } from './useValueMenuState';
 import { ValueMenuItem } from './ValueMenuItem';
@@ -61,27 +62,10 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
   menuRef,
   className,
 }) => {
-  const query = filterText.toLowerCase();
-  const filteredValues = useMemo(() => {
-    if (!query) return values;
-    const matches = values.filter(
-      v =>
-        v.label.toLowerCase().includes(query) ||
-        String(v.value).toLowerCase().includes(query),
-    );
-    // Sort: startsWith first (label or value), then includes
-    return matches.sort((a, b) => {
-      const aStarts =
-        a.label.toLowerCase().startsWith(query) ||
-        String(a.value).toLowerCase().startsWith(query);
-      const bStarts =
-        b.label.toLowerCase().startsWith(query) ||
-        String(b.value).toLowerCase().startsWith(query);
-      if (aStarts && !bStarts) return -1;
-      if (!aStarts && bStarts) return 1;
-      return 0;
-    });
-  }, [values, query]);
+  const filteredValues = useMemo(
+    () => filterAndSort(values, filterText, v => [v.label, String(v.value)]),
+    [values, filterText],
+  );
 
   const {
     selectedValues,
