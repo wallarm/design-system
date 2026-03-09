@@ -5,6 +5,7 @@ import type { ChipSegment } from '../../QueryBarInput/QueryBarChip';
 import type {
   Condition,
   FieldMetadata,
+  FilterOperator,
   MenuState,
   QueryBarChipData,
 } from '../../types';

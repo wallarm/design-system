@@ -69,7 +69,7 @@ export const useQueryBarExpression = ({
           } else {
             newConditions = [...prev.conditions, condition];
           }
-        } else if (atIndex != null && atIndex < prev.conditions.length) {
+        } else if (atIndex != null && atIndex >= 0 && atIndex < prev.conditions.length) {
           newConditions = [...prev.conditions];
           newConditions.splice(atIndex, 0, condition);
         } else {
@@ -80,7 +80,7 @@ export const useQueryBarExpression = ({
 
         // Add connector when inserting a new condition
         if (!editingChipId && newConditions.length > 1) {
-          if (atIndex != null && atIndex < prev.conditions.length) {
+          if (atIndex != null && atIndex >= 0 && atIndex < prev.conditions.length) {
             const connIdx = Math.max(0, atIndex - 1);
             const updated = [...prev.connectors];
             updated.splice(connIdx, 0, 'and');

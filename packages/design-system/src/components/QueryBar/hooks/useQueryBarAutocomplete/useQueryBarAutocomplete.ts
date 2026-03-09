@@ -61,6 +61,10 @@ export const useQueryBarAutocomplete = ({
   const [insertAfterConnector, setInsertAfterConnector] = useState(false);
   const effectiveInsertIndex = insertIndex ?? conditions.length;
 
+  // Ref keeps effectiveInsertIndex fresh for callbacks to avoid stale closures
+  const effectiveInsertIndexRef = useRef(effectiveInsertIndex);
+  effectiveInsertIndexRef.current = effectiveInsertIndex;
+
   // ── Child hooks ───────────────────────────────────────────
 
   const { menuPositioning, setMenuOffset, resetMenuOffset } = useMenuPositioning({
@@ -163,7 +167,7 @@ export const useQueryBarAutocomplete = ({
       }
       if (e.key === 'Backspace' && !e.repeat && inputText === '' && conditions.length > 0) {
         e.preventDefault();
-        const removeIdx = effectiveInsertIndex - 1;
+        const removeIdx = effectiveInsertIndexRef.current - 1;
         if (removeIdx >= 0) {
           removeConditionAtIndex(removeIdx);
           setInsertIndex(prev => {
@@ -174,7 +178,7 @@ export const useQueryBarAutocomplete = ({
         setMenuState('closed');
       }
     },
-    [inputText, conditions.length, effectiveInsertIndex, removeConditionAtIndex, menuState],
+    [inputText, conditions.length, removeConditionAtIndex, menuState],
   );
 
   // ── Focus ─────────────────────────────────────────────────
@@ -201,7 +205,7 @@ export const useQueryBarAutocomplete = ({
   const handleChipRemove = useCallback(
     (chipId: string) => {
       const chipCondIdx = chipIdToConditionIndex(chipId);
-      if (chipCondIdx !== null && chipCondIdx < effectiveInsertIndex) {
+      if (chipCondIdx !== null && chipCondIdx < effectiveInsertIndexRef.current) {
         setInsertIndex(prev => (prev != null ? prev - 1 : prev));
       }
       removeCondition(chipId);
@@ -209,7 +213,7 @@ export const useQueryBarAutocomplete = ({
       setMenuState('closed');
       inputRef.current?.focus();
     },
-    [removeCondition, resetMenuOffset, inputRef, effectiveInsertIndex],
+    [removeCondition, resetMenuOffset, inputRef],
   );
 
   const handleClear = useCallback(() => {
@@ -249,10 +253,10 @@ export const useQueryBarAutocomplete = ({
   useEffect(() => {
     if (menuState === 'closed') return;
 
-    let cancelled = false;
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => {
-        if (cancelled) return;
+    let outerRaf = 0;
+    let innerRaf = 0;
+    outerRaf = requestAnimationFrame(() => {
+      innerRaf = requestAnimationFrame(() => {
         if (editing.editingSegment) {
           // Redirect focus to the segment input, beating Ark UI's focus steal
           const segmentInput = containerRef.current?.querySelector<HTMLInputElement>(
@@ -271,7 +275,8 @@ export const useQueryBarAutocomplete = ({
       });
     });
     return () => {
-      cancelled = true;
+      cancelAnimationFrame(outerRaf);
+      cancelAnimationFrame(innerRaf);
     };
   }, [menuState, inputRef, editing.editingSegment, containerRef]);
 

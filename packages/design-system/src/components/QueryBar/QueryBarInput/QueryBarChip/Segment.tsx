@@ -62,8 +62,15 @@ export const Segment: FC<SegmentProps> = ({
     setInputWidth(Math.max(20, lastTextWidthRef.current, sizerWidth + 2));
   }, [editing, editText]);
 
+  const isInteractive = !!props.onClick;
+
   return (
-    <div className={cn(segmentContainer, className)} data-slot={`segment-${variant}`} {...props}>
+    <div
+      className={cn(segmentContainer, className)}
+      data-slot={`segment-${variant}`}
+      {...(isInteractive && { role: 'button', 'aria-label': `Edit filter ${variant}` })}
+      {...props}
+    >
       {editing ? (
         <>
           <input
@@ -73,6 +80,7 @@ export const Segment: FC<SegmentProps> = ({
             onChange={e => onEditChange?.(e.target.value)}
             onKeyDown={onEditKeyDown}
             onBlur={onEditBlur}
+            aria-label={`Filter ${variant}`}
             className={cn(
               segmentTextVariants({ variant }),
               'bg-transparent border-none outline-none p-0 m-0',

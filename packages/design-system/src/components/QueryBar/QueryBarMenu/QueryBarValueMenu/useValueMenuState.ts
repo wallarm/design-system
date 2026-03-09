@@ -37,7 +37,9 @@ export const useValueMenuState = ({
 }: UseValueMenuStateOptions) => {
   // ── Multi-select internal state ─────────────────────────
   const [checkedValues, setCheckedValues] = useState<ConditionValue[]>(initialValues);
+  // Single source of truth: ref is always synced declaratively from state
   const checkedValuesRef = useRef(checkedValues);
+  checkedValuesRef.current = checkedValues;
 
   // Only reset checked values on open transition, not on every initialValues reference change
   const prevOpenRef = useRef(false);
@@ -46,17 +48,14 @@ export const useValueMenuState = ({
   useEffect(() => {
     if (open && !prevOpenRef.current) {
       setCheckedValues(initialValuesRef.current);
-      checkedValuesRef.current = initialValuesRef.current;
     }
     prevOpenRef.current = open;
   }, [open]);
 
   const toggleValue = (val: ConditionValue) => {
-    setCheckedValues(prev => {
-      const next = prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val];
-      checkedValuesRef.current = next;
-      return next;
-    });
+    setCheckedValues(prev =>
+      prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val],
+    );
   };
 
   const commitChecked = () => {

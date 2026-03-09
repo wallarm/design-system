@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback } from 'react';
+import { useCallback, useRef } from 'react';
 import {
   chipIdToConditionIndex,
   isBetweenOperator,
@@ -52,6 +52,10 @@ export const useMenuFlow = ({
   setMenuState,
   setBuildingMultiValue,
 }: MenuFlowDeps) => {
+  // Ref keeps conditions fresh for callbacks without adding to dependency arrays
+  const conditionsRef = useRef(conditions);
+  conditionsRef.current = conditions;
+
   // Ignore Ark UI close when focus is returning to our input (e.g. ArrowUp on first item)
   const handleMenuClose = useCallback(() => {
     if (document.activeElement === inputRef.current) return;
@@ -213,7 +217,7 @@ export const useMenuFlow = ({
         // Determine dateOrigin from previous condition value
         if (editing.editingChipId) {
           const idx = chipIdToConditionIndex(editing.editingChipId);
-          const oldCondition = idx !== null ? conditions[idx] : null;
+          const oldCondition = idx !== null ? conditionsRef.current[idx] : null;
           if (oldCondition) {
             const oldVal = String(oldCondition.value ?? '');
             dateOrigin =
@@ -251,7 +255,6 @@ export const useMenuFlow = ({
       selectedField,
       selectedOperator,
       editing,
-      conditions,
       insertIndex,
       upsertCondition,
       resetState,
