@@ -48,11 +48,15 @@ export const QueryBarDateValueMenu: FC<QueryBarDateValueMenuProps> = ({
 }) => {
   const [showCalendar, setShowCalendar] = useState(initialCalendar);
   const switchingViewRef = useRef(false);
-  const query = filterText.toLowerCase();
+  // After returning from calendar via "Back", show all presets unfiltered
+  const [backFromCalendar, setBackFromCalendar] = useState(false);
+  const effectiveFilterText = backFromCalendar ? '' : filterText;
+  const query = effectiveFilterText.toLowerCase();
 
   useEffect(() => {
     if (open) {
       setShowCalendar(initialCalendar);
+      setBackFromCalendar(false);
     } else if (showCalendar) {
       setShowCalendar(false);
     }
@@ -130,6 +134,7 @@ export const QueryBarDateValueMenu: FC<QueryBarDateValueMenuProps> = ({
             onRangeSelect={handleRangeSelect}
             onBack={() => {
               switchingViewRef.current = true;
+              setBackFromCalendar(true);
               setShowCalendar(false);
             }}
             onEscape={() => setShowCalendar(false)}
@@ -143,10 +148,11 @@ export const QueryBarDateValueMenu: FC<QueryBarDateValueMenuProps> = ({
             onSelect={onSelect}
             onAbsoluteClick={() => {
               switchingViewRef.current = true;
+              setBackFromCalendar(false);
               setShowCalendar(true);
             }}
             betweenLabel={betweenLabel}
-            filterText={filterText}
+            filterText={effectiveFilterText}
           />
         )}
       </DropdownMenuContent>
