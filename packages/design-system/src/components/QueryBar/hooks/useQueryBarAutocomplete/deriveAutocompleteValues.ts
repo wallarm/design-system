@@ -15,6 +15,8 @@ interface DeriveOptions {
   conditions: Condition[];
   buildingMultiValue: string | undefined;
   dateRangeFromValue: string | null | undefined;
+  /** Segment text when inline-editing a value — used to derive checked values from text */
+  segmentFilterText?: string;
 }
 
 export interface DerivedAutocompleteValues {
@@ -32,6 +34,7 @@ export const deriveAutocompleteValues = ({
   conditions,
   buildingMultiValue,
   dateRangeFromValue,
+  segmentFilterText,
 }: DeriveOptions): DerivedAutocompleteValues => {
   const isBuilding = selectedField !== null && !editingChipId;
 
@@ -51,6 +54,26 @@ export const deriveAutocompleteValues = ({
   // ── Editing values for QueryBarValueMenu ────────────────
   const editingMultiValues = (() => {
     if (!editingChipId || !selectedOperator || !isMultiSelectOperator(selectedOperator)) return [];
+
+    // When inline-editing, derive checked values from the segment text
+    if (segmentFilterText !== undefined && selectedField?.values) {
+      const tokens = segmentFilterText
+        .split(',')
+        .map(t => t.trim())
+        .filter(Boolean);
+      const matched: Array<string | number | boolean> = [];
+      for (const token of tokens) {
+        const opt = selectedField.values.find(
+          o =>
+            o.label.toLowerCase() === token.toLowerCase() ||
+            String(o.value).toLowerCase() === token.toLowerCase(),
+        );
+        if (opt) matched.push(opt.value);
+      }
+      return matched;
+    }
+
+    // Fallback: derive from committed condition values
     const idx = chipIdToConditionIndex(editingChipId);
     if (idx === null) return [];
     const condition = conditions[idx];
@@ -60,7 +83,6 @@ export const deriveAutocompleteValues = ({
       : condition.value != null
         ? [condition.value]
         : [];
-    // When condition has error, only pre-check values that exist in the field's values list
     if (condition.error && selectedField?.values) {
       return values.filter(v => selectedField.values!.some(opt => opt.value === v));
     }

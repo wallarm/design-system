@@ -295,6 +295,8 @@ export const useQueryBarAutocomplete = ({
     conditions,
     buildingMultiValue,
     dateRangeFromValue: dateRange.fromValue,
+    segmentFilterText:
+      editing.editingSegment === 'value' ? editing.segmentFilterText : undefined,
   });
 
   // ── Public API ────────────────────────────────────────────

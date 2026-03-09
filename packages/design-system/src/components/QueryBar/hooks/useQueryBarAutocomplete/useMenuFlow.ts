@@ -12,6 +12,8 @@ import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../
 interface MenuFlowDeps {
   editing: {
     editingChipId: string | null;
+    editingSegment: string | null;
+    setSegmentFilterText: (text: string) => void;
   };
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
@@ -149,8 +151,12 @@ export const useMenuFlow = ({
   const handleBuildingValueChange = useCallback(
     (preview: string | undefined) => {
       setBuildingMultiValue(preview);
+      // When editing a multi-select value segment, sync segment text with dropdown selections
+      if (editing.editingSegment === 'value' && isMultiSelectOperator(selectedOperator)) {
+        editing.setSegmentFilterText(preview ?? '');
+      }
     },
-    [setBuildingMultiValue],
+    [setBuildingMultiValue, editing, selectedOperator],
   );
 
   /** Range select (between + calendar) */

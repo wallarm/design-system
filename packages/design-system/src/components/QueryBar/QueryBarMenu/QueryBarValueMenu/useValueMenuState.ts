@@ -41,7 +41,7 @@ export const useValueMenuState = ({
   const checkedValuesRef = useRef(checkedValues);
   checkedValuesRef.current = checkedValues;
 
-  // Only reset checked values on open transition, not on every initialValues reference change
+  // Reset checked values on open transition
   const prevOpenRef = useRef(false);
   const initialValuesRef = useRef(initialValues);
   initialValuesRef.current = initialValues;
@@ -51,6 +51,16 @@ export const useValueMenuState = ({
     }
     prevOpenRef.current = open;
   }, [open]);
+
+  // Sync checked values when initialValues change while menu is already open
+  // (e.g., user edits segment text to remove a value — dropdown should uncheck it)
+  const serializedInitial = initialValues.map(String).sort().join('\0');
+  useEffect(() => {
+    if (open && prevOpenRef.current) {
+      setCheckedValues(initialValues);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serializedInitial]);
 
   const toggleValue = (val: ConditionValue) => {
     setCheckedValues(prev =>
