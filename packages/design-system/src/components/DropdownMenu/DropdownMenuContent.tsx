@@ -16,12 +16,8 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaViewport,
 } from '../ScrollArea';
-
 import { dropdownMenuClassNames } from './classes';
 import { DropdownMenuFooter } from './DropdownMenuFooter';
-
-const isFooter = (child: ReactNode): boolean =>
-  isValidElement(child) && child.type === DropdownMenuFooter;
 
 interface DropdownMenuContentProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -35,8 +31,12 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
   ...props
 }) => {
   const childArray = Children.toArray(children);
-  const footerChildren = childArray.filter(isFooter);
-  const menuChildren = childArray.filter(child => !isFooter(child));
+  const footerChildren = childArray.filter(
+    child => isValidElement(child) && child.type === DropdownMenuFooter,
+  );
+  const menuChildren = childArray.filter(
+    child => !(isValidElement(child) && child.type === DropdownMenuFooter),
+  );
 
   return (
     <Portal>
@@ -45,7 +45,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
           ref={ref}
           className={cn(
             dropdownMenuClassNames,
-            'max-h-[min(415px,var(--available-height))]',
+            'max-h-(--available-height)',
             'origin-[--transform-origin]',
             className,
           )}
