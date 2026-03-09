@@ -131,6 +131,8 @@ export const QueryBarFieldMenu: FC<QueryBarFieldMenuProps> = ({
     open,
     onSelect: handleItemSelect,
     onClose: onEscape ?? (() => onOpenChange?.(false)),
+    onArrowRight: () => {},
+    arrowRightSelectsActive: true,
     inputRef,
     menuRef,
   });

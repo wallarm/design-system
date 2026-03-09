@@ -23,6 +23,7 @@ export const DropdownMenuItem: FC<DropdownMenuItemProps> = ({
   onSelect,
   disabled,
   value,
+  className,
   ...props
 }) => {
   const autoId = useId();
@@ -33,7 +34,7 @@ export const DropdownMenuItem: FC<DropdownMenuItemProps> = ({
       value={value ?? autoId}
       disabled={disabled}
       onSelect={onSelect}
-      className={cn(dropdownMenuItemVariants({ variant, inset }))}
+      className={cn(dropdownMenuItemVariants({ variant, inset }), className)}
     />
   );
 };

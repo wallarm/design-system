@@ -76,7 +76,6 @@ export const useQueryBarAutocomplete = ({
     chips,
     fields,
     containerRef,
-    upsertCondition,
     setMenuOffset,
     setSelectedField,
     setSelectedOperator,
@@ -262,6 +261,9 @@ export const useQueryBarAutocomplete = ({
           if (segmentInput && document.activeElement !== segmentInput) {
             segmentInput.focus();
             segmentInput.select();
+          } else if (!segmentInput && document.activeElement !== inputRef.current) {
+            // Segment has no inline input (e.g., operator) — focus main input
+            inputRef.current?.focus();
           }
         } else if (document.activeElement !== inputRef.current) {
           inputRef.current?.focus();

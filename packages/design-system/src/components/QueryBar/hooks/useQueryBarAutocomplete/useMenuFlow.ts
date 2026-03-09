@@ -12,8 +12,6 @@ import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../
 interface MenuFlowDeps {
   editing: {
     editingChipId: string | null;
-    tryEditField: (field: FieldMetadata) => boolean;
-    tryEditOperator: (operator: FilterOperator, field: FieldMetadata) => boolean;
   };
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
@@ -62,15 +60,11 @@ export const useMenuFlow = ({
 
   const handleFieldSelect = useCallback(
     (field: FieldMetadata) => {
-      if (editing.tryEditField(field)) {
-        resetState();
-        return;
-      }
       setSelectedField(field);
       setInputText('');
       setMenuState('operator');
     },
-    [editing, resetState, setSelectedField, setInputText, setMenuState],
+    [setSelectedField, setInputText, setMenuState],
   );
 
   const handleOperatorSelect = useCallback(
@@ -88,13 +82,6 @@ export const useMenuFlow = ({
         );
         resetState();
         return;
-      }
-
-      if (editing.editingChipId) {
-        if (editing.tryEditOperator(operator, selectedField)) {
-          resetState();
-          return;
-        }
       }
 
       setSelectedOperator(operator);

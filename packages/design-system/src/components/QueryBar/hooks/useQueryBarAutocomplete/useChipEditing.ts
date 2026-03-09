@@ -5,7 +5,6 @@ import type { ChipSegment } from '../../QueryBarInput/QueryBarChip';
 import type {
   Condition,
   FieldMetadata,
-  FilterOperator,
   MenuState,
   QueryBarChipData,
 } from '../../types';
@@ -15,15 +14,6 @@ interface UseChipEditingOptions {
   chips: QueryBarChipData[];
   fields: FieldMetadata[];
   containerRef: RefObject<HTMLElement | null>;
-  upsertCondition: (
-    field: FieldMetadata,
-    operator: FilterOperator,
-    val: string | number | boolean | null | Array<string | number | boolean>,
-    editingChipId?: string | null,
-    atIndex?: number,
-    error?: boolean,
-    dateOrigin?: 'relative' | 'absolute',
-  ) => void;
   setMenuOffset: (offset: number) => void;
   setSelectedField: (field: FieldMetadata) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
@@ -48,15 +38,14 @@ const SEGMENT_TO_MENU: Record<ChipSegment, MenuState> = {
 
 /**
  * Manages editing of existing filter chips.
- * Handles chip click → open appropriate menu based on segment.
- * Provides tryEditField/tryEditOperator for immediate commit when editing.
+ * Handles chip click → open appropriate menu based on segment,
+ * then advances through the full flow (field → operator → value).
  */
 export const useChipEditing = ({
   conditions,
   chips,
   fields,
   containerRef,
-  upsertCondition,
   setMenuOffset,
   setSelectedField,
   setSelectedOperator,
@@ -65,30 +54,6 @@ export const useChipEditing = ({
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
   const [editingSegment, setEditingSegment] = useState<ChipSegment | null>(null);
   const [segmentFilterText, setSegmentFilterText] = useState('');
-
-  /** If editing, commits field change immediately. Returns true if handled. */
-  const tryEditField = useCallback(
-    (field: FieldMetadata): boolean => {
-      if (!editingChipId) return false;
-      const condition = getConditionByChipId(editingChipId, conditions);
-      if (!condition) return false;
-      upsertCondition(field, condition.operator, condition.value, editingChipId);
-      return true;
-    },
-    [editingChipId, conditions, upsertCondition],
-  );
-
-  /** If editing, commits operator change immediately. Returns true if handled. */
-  const tryEditOperator = useCallback(
-    (operator: FilterOperator, selectedField: FieldMetadata): boolean => {
-      if (!editingChipId) return false;
-      const condition = getConditionByChipId(editingChipId, conditions);
-      if (!condition) return false;
-      upsertCondition(selectedField, operator, condition.value, editingChipId);
-      return true;
-    },
-    [editingChipId, conditions, upsertCondition],
-  );
 
   /** Handle chip segment click — receives pre-computed segment and anchorRect from QueryBarChip */
   const handleChipClick = useCallback(
@@ -160,8 +125,6 @@ export const useChipEditing = ({
       segmentFilterText,
       setSegmentFilterText,
       handleChipClick,
-      tryEditField,
-      tryEditOperator,
       clearEditing,
       cancelSegmentEdit,
     }),
@@ -170,8 +133,6 @@ export const useChipEditing = ({
       editingSegment,
       segmentFilterText,
       handleChipClick,
-      tryEditField,
-      tryEditOperator,
       clearEditing,
       cancelSegmentEdit,
     ],

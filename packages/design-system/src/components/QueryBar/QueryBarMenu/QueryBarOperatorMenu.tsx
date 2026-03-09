@@ -100,6 +100,8 @@ export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
     open,
     onSelect: item => onSelect(item.value as FilterOperator),
     onClose: onEscape ?? (() => onOpenChange?.(false)),
+    onArrowRight: () => {},
+    arrowRightSelectsActive: true,
     inputRef,
     menuRef,
   });

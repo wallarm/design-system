@@ -10,6 +10,8 @@ interface UseKeyboardNavOptions {
   onArrowRight?: () => void;
   /** Called after all pending items are selected via Cmd+Enter */
   onPendingCommit?: () => void;
+  /** When true, ArrowRight selects the active item (like Enter) instead of calling onArrowRight */
+  arrowRightSelectsActive?: boolean;
   /** When provided, ArrowUp on the first item returns focus to this input */
   inputRef?: RefObject<HTMLInputElement | null>;
   /** Ref to the menu content element — used for scoped queries and focus management */
@@ -32,6 +34,7 @@ export const useKeyboardNav = ({
   onClose,
   onArrowRight,
   onPendingCommit,
+  arrowRightSelectsActive = false,
   inputRef,
   menuRef,
 }: UseKeyboardNavOptions) => {
@@ -50,10 +53,11 @@ export const useKeyboardNav = ({
     onClose,
     onArrowRight,
     onPendingCommit,
+    arrowRightSelectsActive,
     inputRef,
     menuRef,
   });
-  stateRef.current = { items, onSelect, onClose, onArrowRight, onPendingCommit, inputRef, menuRef };
+  stateRef.current = { items, onSelect, onClose, onArrowRight, onPendingCommit, arrowRightSelectsActive, inputRef, menuRef };
 
   // Reset when menu opens
   const prevOpenRef = useRef(open);
@@ -114,10 +118,15 @@ export const useKeyboardNav = ({
   }, []);
 
   // Cmd/Ctrl+Arrow multi-select helper — marks current + next items as pending
-  const handleModArrow = (e: KeyboardEvent) => {
+  const suppressHighlightRef = useRef(false);
+  const handleModArrow = useCallback((e: KeyboardEvent) => {
     const { items: list } = stateRef.current;
     e.preventDefault();
-    e.stopPropagation();
+    // stopImmediatePropagation prevents other capture-phase listeners on window
+    // (e.g. Ark UI / zag.js) from also processing Cmd+Arrow as "jump to end".
+    // Side-effect: any other global Cmd+Arrow listeners on window won't fire.
+    e.stopImmediatePropagation();
+    suppressHighlightRef.current = true;
     const currentItem = list[activeIndexRef.current];
     const nextIdx = navigate(e.key === 'ArrowDown' ? 1 : -1);
     const nextItem = list[nextIdx];
@@ -127,7 +136,12 @@ export const useKeyboardNav = ({
       if (nextItem && !nextItem.disabled) next.add(nextItem.id);
       return next;
     });
-  };
+    // Assumes Ark UI fires onHighlightChange within the same frame as the
+    // controlled-prop update. If Ark UI defers further, this window is too short.
+    requestAnimationFrame(() => {
+      suppressHighlightRef.current = false;
+    });
+  }, [navigate]);
 
   // Capture-phase keydown
   useEffect(() => {
@@ -160,13 +174,12 @@ export const useKeyboardNav = ({
           queueMicrotask(() => commit?.());
           return;
         }
-        // ArrowRight → commit checked values and move to next step
+        // ArrowRight → select active item and advance, or commit checked values
         if (e.key === 'ArrowRight') {
-          const { onArrowRight: arrowRight, items: list, onSelect: select } = stateRef.current;
+          const { onArrowRight: arrowRight, arrowRightSelectsActive: selectsActive, items: list, onSelect: select } = stateRef.current;
           if (!arrowRight) return;
           e.preventDefault();
           e.stopPropagation();
-          // Select any pending items first
           if (pendingIdsRef.current.size > 0) {
             pendingIdsRef.current.forEach(id => {
               const item = list.find(i => i.id === id);
@@ -174,6 +187,10 @@ export const useKeyboardNav = ({
             });
             setPendingIds(new Set());
             queueMicrotask(() => arrowRight());
+          } else if (selectsActive && activeIndexRef.current >= 0) {
+            // Single-select: select highlighted item (onSelect handler advances the flow)
+            const item = list[activeIndexRef.current];
+            if (item && !item.disabled) select(item);
           } else {
             arrowRight();
           }
@@ -207,8 +224,15 @@ export const useKeyboardNav = ({
       switch (e.key) {
         case 'ArrowDown':
         case 'ArrowUp': {
-          if (!isMod) break; // plain arrows — не перехватываем (ArrowDown → фокус на меню в useQueryBarAutocomplete)
-          handleModArrow(e);
+          if (isMod) {
+            handleModArrow(e);
+            break;
+          }
+          // Plain arrow from input → navigate to first/last item and focus the menu
+          e.preventDefault();
+          e.stopPropagation();
+          navigate(e.key === 'ArrowDown' ? 1 : -1);
+          stateRef.current.menuRef?.current?.focus();
           break;
         }
 
@@ -238,7 +262,7 @@ export const useKeyboardNav = ({
           if (!arrowRight) break;
           e.preventDefault();
           e.stopPropagation();
-          // Select any pending items first, then commit
+          const { arrowRightSelectsActive: selectsActive } = stateRef.current;
           if (pendingIdsRef.current.size > 0) {
             pendingIdsRef.current.forEach(id => {
               const item = list.find(i => i.id === id);
@@ -246,6 +270,9 @@ export const useKeyboardNav = ({
             });
             setPendingIds(new Set());
             queueMicrotask(() => arrowRight());
+          } else if (selectsActive && activeIndexRef.current >= 0) {
+            const item = list[activeIndexRef.current];
+            if (item && !item.disabled) select(item);
           } else {
             arrowRight();
           }
@@ -267,6 +294,9 @@ export const useKeyboardNav = ({
   // Sync mouse hover / Ark UI keyboard nav with our state + scroll into view
   const onHighlightChange = useCallback((details: { highlightedValue: string | null }) => {
     if (!details.highlightedValue) return;
+    // During multi-select (Cmd+Arrow), ignore external highlight changes from Ark UI
+    // — our navigate() already set the correct activeIndex
+    if (suppressHighlightRef.current) return;
     const idx = stateRef.current.items.findIndex(item => item.id === details.highlightedValue);
     if (idx >= 0) {
       setActiveIndex(idx);
