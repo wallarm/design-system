@@ -1,5 +1,5 @@
 import { type FC, useEffect, useMemo, useState } from 'react';
-import { type DateValue, DatePicker, parseDate } from '@ark-ui/react/date-picker';
+import { DatePicker, type DateValue, parseDate } from '@ark-ui/react/date-picker';
 import { ChevronLeft } from '../../../../icons/ChevronLeft';
 import { DropdownMenuSeparator } from '../../../DropdownMenu';
 import { DayView } from './DayView';
