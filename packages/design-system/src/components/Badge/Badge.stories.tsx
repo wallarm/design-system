@@ -277,14 +277,15 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
             ))}
           </tr>
 
-          <tr />
-          {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
-            <td key={type} className='p-8'>
-              <Badge type={type} color={color} variant='dotted'>
-                {label}
-              </Badge>
-            </td>
-          ))}
+          <tr>
+            {Object.values(BadgeTypeEnum).map((type: BadgeType) => (
+              <td key={type} className='p-8'>
+                <Badge type={type} color={color} variant='dotted'>
+                  {label}
+                </Badge>
+              </td>
+            ))}
+          </tr>
 
           <tr>
             {Object.values(BadgeTypeEnum).map((type: BadgeType) => (

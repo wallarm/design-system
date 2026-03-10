@@ -3,3 +3,9 @@
 @import 'non.geist';
 @import 'non.geist/mono';
 @import '../src/theme/index.css';
+
+html,
+.docs-story {
+    background: var(--color-bg-page-bg);
+    color: var(--color-text-primary);
+}

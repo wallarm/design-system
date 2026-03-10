@@ -61,7 +61,7 @@ export const TourFooter: FC<TourFooterProps> = () => {
                     <ArkUiTour.ActionTrigger key={action.label} action={action} asChild>
                       <Button
                         variant={isLast ? 'primary' : 'ghost'}
-                        color={isLast ? 'brand' : type === 'dialog' ? 'neutral' : 'neutral-alt'}
+                        color={isLast ? 'brand' : 'neutral'}
                         size={type === 'dialog' ? 'large' : 'small'}
                       >
                         {action.label}

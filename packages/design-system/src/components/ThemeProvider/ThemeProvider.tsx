@@ -1,7 +1,6 @@
 import { type FC, type ReactNode, useEffect, useMemo, useState } from 'react';
 import { ThemeProviderContext } from './ThemeProviderContext';
-
-type Theme = 'dark' | 'light' | 'system';
+import type { Theme } from './types';
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -11,7 +10,7 @@ interface ThemeProviderProps {
 
 export const ThemeProvider: FC<ThemeProviderProps> = ({
   children,
-  defaultTheme = 'system',
+  defaultTheme = 'light',
   storageKey = 'wasd-theme',
   ...props
 }) => {
@@ -22,9 +21,7 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({
   useEffect(() => {
     const root = window.document.documentElement;
 
-    root.classList.remove('light', 'dark');
-
-    root.classList.add(theme);
+    root.setAttribute('data-theme', theme);
   }, [theme]);
 
   const value = useMemo(

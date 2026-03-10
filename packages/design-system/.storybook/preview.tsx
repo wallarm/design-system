@@ -1,7 +1,9 @@
-import { withThemeByClassName } from '@storybook/addon-themes';
+import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Decorator, Preview } from 'storybook-react-rsbuild';
 import { ThemeProvider, Toaster } from '../src';
 import './preview.css';
+
+const isDev = process.env.NODE_ENV === 'development';
 
 const preview: Preview = {
   parameters: {
@@ -16,9 +18,9 @@ const preview: Preview = {
       initialActive: 'canvas',
       layout: {
         isFullscreen: true,
-        showNav: false,
-        showPanel: false,
-        showToolbar: false,
+        showNav: isDev,
+        showPanel: isDev,
+        showToolbar: isDev,
       },
       storySort: {
         order: ['Documentation'],
@@ -29,12 +31,13 @@ const preview: Preview = {
 };
 
 export const decorators: Decorator[] = [
-  withThemeByClassName({
+  withThemeByDataAttribute({
     themes: {
       light: 'light',
       dark: 'dark',
     },
     defaultTheme: 'light',
+    attributeName: 'data-theme',
   }),
   Story => (
     <ThemeProvider>

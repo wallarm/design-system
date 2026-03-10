@@ -9,7 +9,7 @@ export const FieldLabel: FC<LabelProps> = props => (
     {...props}
     data-slot='field-label'
     className={cn(
-      'group/field-label flex w-fit gap-4 text-sm font-medium leading-snug group-data-[disabled=true]/field:opacity-50',
+      'group/field-label flex w-fit gap-4 text-sm text-text-primary font-medium leading-snug group-data-[disabled=true]/field:opacity-50',
       'has-[>[data-slot=field]]:w-full has-[>[data-slot=field]]:rounded-8 has-[>[data-slot=field]]:border [&>[data-slot=field]]:p-4',
     )}
   />
