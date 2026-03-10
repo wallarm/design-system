@@ -580,7 +580,7 @@
     --color-component-border-hotkey: var(--color-slate-700);
     --color-component-border-input-hover: var(--color-slate-500);
     --color-component-overlay: --alpha(var(--color-slate-950) / 60%);
-    --color-component-tooltip-bg: --alpha(var(--color-slate-100) / 85%);
+    --color-component-tooltip-bg: --alpha(var(--color-slate-100) / 20%);
     --color-component-logo-ic: var(--color-w-orange-600);
     --color-component-logo-wordmark: var(--color-white);
     --color-component-logo-wordmark-alt: var(--color-slate-950);
