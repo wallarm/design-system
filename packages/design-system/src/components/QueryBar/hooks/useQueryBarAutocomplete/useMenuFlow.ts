@@ -10,10 +10,7 @@ import {
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 /** Check if condition value(s) are valid for the given field. Returns true if error. */
-const validateValueForField = (
-  field: FieldMetadata,
-  value: Condition['value'],
-): boolean => {
+const validateValueForField = (field: FieldMetadata, value: Condition['value']): boolean => {
   // No values list means any value is acceptable (free-text field)
   if (!field.values || field.values.length === 0) return false;
   // Null value (no-value operators) is always valid
@@ -23,18 +20,13 @@ const validateValueForField = (
   return values.some(
     v =>
       !field.values!.some(
-        opt =>
-          opt.value === v ||
-          String(opt.value).toLowerCase() === String(v).toLowerCase(),
+        opt => opt.value === v || String(opt.value).toLowerCase() === String(v).toLowerCase(),
       ),
   );
 };
 
 /** Resolve a text input to the actual field value (e.g. label "Active" → value "active") */
-const resolveFieldValue = (
-  field: FieldMetadata,
-  text: string,
-): string | number | boolean => {
+const resolveFieldValue = (field: FieldMetadata, text: string): string | number | boolean => {
   const match = field.values?.find(
     v =>
       v.label.toLowerCase() === text.toLowerCase() ||
@@ -233,16 +225,24 @@ export const useMenuFlow = ({
   const commitMultiSelectValue = useCallback(
     (trimmed: string, field: FieldMetadata, operator: FilterOperator) => {
       const isEditing = !!editing.editingChipId;
-      const parts = trimmed.split(',').map(s => s.trim()).filter(Boolean);
+      const parts = trimmed
+        .split(',')
+        .map(s => s.trim())
+        .filter(Boolean);
       const resolved = parts.map(part => resolveFieldValue(field, part));
       let error: boolean | undefined;
       if (field.values && field.values.length > 0) {
-        const hasInvalid = resolved.some(
-          v => !field.values!.some(opt => opt.value === v),
-        );
+        const hasInvalid = resolved.some(v => !field.values!.some(opt => opt.value === v));
         if (hasInvalid) error = true;
       }
-      upsertCondition(field, operator, resolved, editing.editingChipId, isEditing ? undefined : insertIndex, error);
+      upsertCondition(
+        field,
+        operator,
+        resolved,
+        editing.editingChipId,
+        isEditing ? undefined : insertIndex,
+        error,
+      );
       resetState();
     },
     [editing, insertIndex, upsertCondition, resetState],
@@ -265,10 +265,19 @@ export const useMenuFlow = ({
       }
       const isValidPreset = isDatePreset(trimmed);
       // Reject short strings that Date() parses loosely (e.g. '2' → 2001-02-01)
-      const isValidDate = !isValidPreset && trimmed.length >= 6 && !isNaN(new Date(trimmed).getTime());
+      const isValidDate =
+        !isValidPreset && trimmed.length >= 6 && !isNaN(new Date(trimmed).getTime());
       if (!isValidPreset && !isValidDate) error = true;
 
-      upsertCondition(field, operator, trimmed, editing.editingChipId, isEditing ? undefined : insertIndex, error, dateOrigin);
+      upsertCondition(
+        field,
+        operator,
+        trimmed,
+        editing.editingChipId,
+        isEditing ? undefined : insertIndex,
+        error,
+        dateOrigin,
+      );
       resetState();
     },
     [editing, insertIndex, upsertCondition, resetState],
@@ -289,7 +298,14 @@ export const useMenuFlow = ({
         );
         if (!hasMatch) error = true;
       }
-      upsertCondition(field, operator, resolved, editing.editingChipId, isEditing ? undefined : insertIndex, error);
+      upsertCondition(
+        field,
+        operator,
+        resolved,
+        editing.editingChipId,
+        isEditing ? undefined : insertIndex,
+        error,
+      );
       resetState();
     },
     [editing, insertIndex, upsertCondition, resetState],

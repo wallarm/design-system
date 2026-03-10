@@ -63,9 +63,7 @@ export const useValueMenuState = ({
   }, [serializedInitial]);
 
   const toggleValue = (val: ConditionValue) => {
-    setCheckedValues(prev =>
-      prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val],
-    );
+    setCheckedValues(prev => (prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]));
   };
 
   const commitChecked = () => {

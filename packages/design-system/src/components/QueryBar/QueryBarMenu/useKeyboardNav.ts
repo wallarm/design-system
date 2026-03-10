@@ -57,7 +57,16 @@ export const useKeyboardNav = ({
     inputRef,
     menuRef,
   });
-  stateRef.current = { items, onSelect, onClose, onArrowRight, onPendingCommit, arrowRightSelectsActive, inputRef, menuRef };
+  stateRef.current = {
+    items,
+    onSelect,
+    onClose,
+    onArrowRight,
+    onPendingCommit,
+    arrowRightSelectsActive,
+    inputRef,
+    menuRef,
+  };
 
   // Reset when menu opens
   const prevOpenRef = useRef(open);
@@ -119,29 +128,32 @@ export const useKeyboardNav = ({
 
   // Cmd/Ctrl+Arrow multi-select helper — marks current + next items as pending
   const suppressHighlightRef = useRef(false);
-  const handleModArrow = useCallback((e: KeyboardEvent) => {
-    const { items: list } = stateRef.current;
-    e.preventDefault();
-    // stopImmediatePropagation prevents other capture-phase listeners on window
-    // (e.g. Ark UI / zag.js) from also processing Cmd+Arrow as "jump to end".
-    // Side-effect: any other global Cmd+Arrow listeners on window won't fire.
-    e.stopImmediatePropagation();
-    suppressHighlightRef.current = true;
-    const currentItem = list[activeIndexRef.current];
-    const nextIdx = navigate(e.key === 'ArrowDown' ? 1 : -1);
-    const nextItem = list[nextIdx];
-    setPendingIds(prev => {
-      const next = new Set(prev);
-      if (currentItem && !currentItem.disabled) next.add(currentItem.id);
-      if (nextItem && !nextItem.disabled) next.add(nextItem.id);
-      return next;
-    });
-    // Assumes Ark UI fires onHighlightChange within the same frame as the
-    // controlled-prop update. If Ark UI defers further, this window is too short.
-    requestAnimationFrame(() => {
-      suppressHighlightRef.current = false;
-    });
-  }, [navigate]);
+  const handleModArrow = useCallback(
+    (e: KeyboardEvent) => {
+      const { items: list } = stateRef.current;
+      e.preventDefault();
+      // stopImmediatePropagation prevents other capture-phase listeners on window
+      // (e.g. Ark UI / zag.js) from also processing Cmd+Arrow as "jump to end".
+      // Side-effect: any other global Cmd+Arrow listeners on window won't fire.
+      e.stopImmediatePropagation();
+      suppressHighlightRef.current = true;
+      const currentItem = list[activeIndexRef.current];
+      const nextIdx = navigate(e.key === 'ArrowDown' ? 1 : -1);
+      const nextItem = list[nextIdx];
+      setPendingIds(prev => {
+        const next = new Set(prev);
+        if (currentItem && !currentItem.disabled) next.add(currentItem.id);
+        if (nextItem && !nextItem.disabled) next.add(nextItem.id);
+        return next;
+      });
+      // Assumes Ark UI fires onHighlightChange within the same frame as the
+      // controlled-prop update. If Ark UI defers further, this window is too short.
+      requestAnimationFrame(() => {
+        suppressHighlightRef.current = false;
+      });
+    },
+    [navigate],
+  );
 
   // Capture-phase keydown
   useEffect(() => {
@@ -176,7 +188,12 @@ export const useKeyboardNav = ({
         }
         // ArrowRight → select active item and advance, or commit checked values
         if (e.key === 'ArrowRight') {
-          const { onArrowRight: arrowRight, arrowRightSelectsActive: selectsActive, items: list, onSelect: select } = stateRef.current;
+          const {
+            onArrowRight: arrowRight,
+            arrowRightSelectsActive: selectsActive,
+            items: list,
+            onSelect: select,
+          } = stateRef.current;
           if (!arrowRight) return;
           e.preventDefault();
           e.stopPropagation();
@@ -211,7 +228,8 @@ export const useKeyboardNav = ({
       // Only intercept ArrowDown/Up (menu navigation) and Escape (close).
       // Enter must propagate to the segment's onKeyDown for value commit.
       const isSegmentInput = (e.target as HTMLElement)?.closest?.('[data-slot^="segment-"]');
-      if (isSegmentInput && e.key !== 'Escape' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp') return;
+      if (isSegmentInput && e.key !== 'Escape' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp')
+        return;
 
       // ── Focus is on the input ─────────────────────────────
       const {

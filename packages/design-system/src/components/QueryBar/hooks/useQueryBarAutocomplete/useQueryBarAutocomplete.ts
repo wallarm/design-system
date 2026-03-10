@@ -169,7 +169,12 @@ export const useQueryBarAutocomplete = ({
         menuRef.current?.focus();
         return;
       }
-      if (e.key === 'Backspace' && !e.repeat && inputText === '' && conditionsLengthRef.current > 0) {
+      if (
+        e.key === 'Backspace' &&
+        !e.repeat &&
+        inputText === '' &&
+        conditionsLengthRef.current > 0
+      ) {
         e.preventDefault();
         const removeIdx = effectiveInsertIndexRef.current - 1;
         if (removeIdx >= 0) {
@@ -300,8 +305,7 @@ export const useQueryBarAutocomplete = ({
     conditions,
     buildingMultiValue,
     dateRangeFromValue: dateRange.fromValue,
-    segmentFilterText:
-      editing.editingSegment === 'value' ? editing.segmentFilterText : undefined,
+    segmentFilterText: editing.editingSegment === 'value' ? editing.segmentFilterText : undefined,
   });
 
   // ── Public API ────────────────────────────────────────────

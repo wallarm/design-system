@@ -94,24 +94,6 @@ export {
   FieldTitle,
 } from './components/Field';
 export { Flex, type FlexProps } from './components/Flex';
-export {
-  type Condition,
-  type ExprNode,
-  type FieldMetadata,
-  type FieldType,
-  type FilterOperator,
-  type Group,
-  QueryBar,
-  QueryBarChip,
-  type QueryBarChipData,
-  type QueryBarChipProps,
-  type QueryBarChipVariant,
-  QueryBarFieldMenu,
-  type QueryBarFieldMenuProps,
-  QueryBarOperatorMenu,
-  type QueryBarOperatorMenuProps,
-  type QueryBarProps,
-} from './components/QueryBar';
 export { Heading, type HeadingProps } from './components/Heading';
 export { Input, type InputProps } from './components/Input';
 export {
@@ -155,6 +137,24 @@ export {
   type OverflowTooltipProps,
 } from './components/OverflowTooltip';
 export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
+export {
+  type Condition,
+  type ExprNode,
+  type FieldMetadata,
+  type FieldType,
+  type FilterOperator,
+  type Group,
+  QueryBar,
+  QueryBarChip,
+  type QueryBarChipData,
+  type QueryBarChipProps,
+  type QueryBarChipVariant,
+  QueryBarFieldMenu,
+  type QueryBarFieldMenuProps,
+  QueryBarOperatorMenu,
+  type QueryBarOperatorMenuProps,
+  type QueryBarProps,
+} from './components/QueryBar';
 export {
   Radio,
   RadioDescription,

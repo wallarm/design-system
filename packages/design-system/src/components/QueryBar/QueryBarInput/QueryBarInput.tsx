@@ -82,7 +82,14 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
         menuRef.current?.focus();
       }
     },
-    [onCancelSegmentEdit, editingSegment, segmentFilterText, onCustomValueCommit, onCustomAttributeCommit, menuRef],
+    [
+      onCancelSegmentEdit,
+      editingSegment,
+      segmentFilterText,
+      onCustomValueCommit,
+      onCustomAttributeCommit,
+      menuRef,
+    ],
   );
 
   const handleSegmentEditBlur = useCallback(

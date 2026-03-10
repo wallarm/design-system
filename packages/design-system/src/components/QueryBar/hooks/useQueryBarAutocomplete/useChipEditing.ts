@@ -84,7 +84,8 @@ export const useChipEditing = ({
 
       const rawOperator =
         segment === 'value' || segment === 'operator'
-          ? (getOperatorFromLabel(chip.operator || '', field?.type ?? 'string') ?? condition.operator)
+          ? (getOperatorFromLabel(chip.operator || '', field?.type ?? 'string') ??
+            condition.operator)
           : null;
 
       if (segment === 'value') {

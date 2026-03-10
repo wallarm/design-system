@@ -16,7 +16,6 @@ import { DropdownMenuLabel } from './DropdownMenuLabel';
 import { DropdownMenuSeparator } from './DropdownMenuSeparator';
 import { DropdownMenuShortcut } from './DropdownMenuShortcut';
 import { DropdownMenuTrigger } from './DropdownMenuTrigger';
-import { DropdownMenuFooter } from './DropdownMenuFooter';
 import { DropdownMenuTriggerItem } from './DropdownMenuTriggerItem';
 
 const meta = {
@@ -339,11 +338,16 @@ export const WithFooter: StoryFn<typeof meta> = () => (
       <DropdownMenuItem>Usage</DropdownMenuItem>
       <DropdownMenuFooter>
         <span className='flex items-center gap-4'>
-          <KbdGroup><Kbd>↑</Kbd><Kbd>↓</Kbd></KbdGroup>
+          <KbdGroup>
+            <Kbd>↑</Kbd>
+            <Kbd>↓</Kbd>
+          </KbdGroup>
           to navigate
         </span>
         <span className='flex items-center gap-4'>
-          <KbdGroup><Kbd>↵</Kbd></KbdGroup>
+          <KbdGroup>
+            <Kbd>↵</Kbd>
+          </KbdGroup>
           to select
         </span>
       </DropdownMenuFooter>
@@ -399,31 +403,6 @@ export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
         <CirclePlus />
         <DropdownMenuItemText>Request custom widget</DropdownMenuItemText>
       </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
-
-export const WithFooter: StoryFn<typeof meta> = () => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button variant='outline' color='neutral'>
-        Open
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent>
-      <DropdownMenuItem>Filter A</DropdownMenuItem>
-      <DropdownMenuItem>Filter B</DropdownMenuItem>
-      <DropdownMenuItem>Filter C</DropdownMenuItem>
-      <DropdownMenuItem>Filter D</DropdownMenuItem>
-      <DropdownMenuFooter>
-        <span>Footer is WIP Hotkey</span>
-        <span className='flex items-center gap-8'>
-          <KbdGroup>
-            <Kbd>⌘</Kbd>
-            <Kbd>⌘</Kbd>
-          </KbdGroup>
-        </span>
-      </DropdownMenuFooter>
     </DropdownMenuContent>
   </DropdownMenu>
 );

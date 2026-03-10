@@ -77,7 +77,9 @@ test.describe('Component: QueryBar - Editing', () => {
       await page.waitForTimeout(300);
 
       // Chip should now show Priority, not Status
-      const updatedChip = page.locator('[data-slot="query-bar-chip"]').filter({ hasText: 'Priority' });
+      const updatedChip = page
+        .locator('[data-slot="query-bar-chip"]')
+        .filter({ hasText: 'Priority' });
       await expect(updatedChip).toBeVisible();
 
       // Should NOT have opened operator menu (stays on the chip as-is)
@@ -137,7 +139,9 @@ test.describe('Component: QueryBar - Editing', () => {
       await page.waitForTimeout(300);
 
       // Should show the unknown attribute name
-      const updatedChip = page.locator('[data-slot="query-bar-chip"]').filter({ hasText: 'UnknownField' });
+      const updatedChip = page
+        .locator('[data-slot="query-bar-chip"]')
+        .filter({ hasText: 'UnknownField' });
       await expect(updatedChip).toBeVisible();
 
       // Expression should have error
@@ -166,7 +170,9 @@ test.describe('Component: QueryBar - Editing', () => {
       await page.waitForTimeout(300);
 
       // Now click attribute of the error chip
-      const errorChip = page.locator('[data-slot="query-bar-chip"]').filter({ hasText: 'BadField' });
+      const errorChip = page
+        .locator('[data-slot="query-bar-chip"]')
+        .filter({ hasText: 'BadField' });
       await expect(errorChip).toBeVisible();
 
       const errorAttr = errorChip.locator('[data-slot="segment-attribute"]');
@@ -251,7 +257,9 @@ test.describe('Component: QueryBar - Editing', () => {
       await page.waitForTimeout(300);
 
       // Chip should now show Priority
-      const updatedChip = page.locator('[data-slot="query-bar-chip"]').filter({ hasText: 'Priority' });
+      const updatedChip = page
+        .locator('[data-slot="query-bar-chip"]')
+        .filter({ hasText: 'Priority' });
       await expect(updatedChip).toBeVisible();
     });
 
