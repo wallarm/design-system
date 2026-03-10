@@ -50,3 +50,5 @@ export const TourMedia: FC<TourMediaProps> = ({ children, className }) => {
     </div>
   );
 };
+
+TourMedia.displayName = 'TourMedia';

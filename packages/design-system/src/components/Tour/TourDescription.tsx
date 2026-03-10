@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
+import { Tour as ArkUiTour } from '@ark-ui/react';
 import {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -11,17 +11,11 @@ export type TourDescriptionProps = ArkUiTour.DescriptionProps;
 
 export const TourDescription = forwardRef<HTMLDivElement, TourDescriptionProps>(
   ({ children, ...props }, ref) => {
-    const { step } = useTourContext();
-
     return (
       <OverflowTooltip>
         <OverflowTooltipTrigger>
           <ArkUiTour.Description {...props} ref={ref} asChild>
-            <Text
-              size='sm'
-              color={step?.type === 'dialog' ? 'primary' : 'primary-alt'}
-              lineClamp={4}
-            >
+            <Text size='sm' lineClamp={4}>
               {children}
             </Text>
           </ArkUiTour.Description>

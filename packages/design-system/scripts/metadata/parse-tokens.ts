@@ -29,7 +29,7 @@ function parseThemeBlock(css: string): TokenMetadata[] {
 
 function parseDarkOverrides(css: string): TokenMetadata[] {
   const tokens: TokenMetadata[] = [];
-  const darkRegex = /\.dark\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/gs;
+  const darkRegex = /\[data-theme="dark"\]\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/gs;
 
   for (const match of css.matchAll(darkRegex)) {
     const block = match[1];

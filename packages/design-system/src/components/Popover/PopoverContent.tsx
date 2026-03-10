@@ -63,7 +63,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
             'min-h-(--popover-min-height)',
             'max-h-[clamp(var(--popover-min-height),var(--available-height),var(--popover-max-height))]',
             // Visual
-            'p-12 bg-bg-surface-2 rounded-12 border border-border-primary-light shadow-md',
+            'p-12 bg-bg-surface-2 rounded-12 border border-border-primary-light shadow-md text-text-primary',
             // Animations
             'animate-in fade-in-0 zoom-in-95 origin-[--radix-tooltip-content-transform-origin]',
             // Animation closed

@@ -53,7 +53,7 @@ describe('parseTokens', () => {
     expect(dark).toBeDefined();
     expect(dark!.tokens.length).toBeGreaterThan(0);
     expect(dark!.tokens.find(t => t.name === '--color-bg-page-bg')!.value).toBe(
-      'var(--color-black)',
+      'var(--color-slate-950)',
     );
   });
 

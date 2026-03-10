@@ -1,5 +1,5 @@
 import { forwardRef } from 'react';
-import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
+import { Tour as ArkUiTour } from '@ark-ui/react';
 import { Heading } from '../Heading';
 import {
   OverflowTooltip,
@@ -11,18 +11,11 @@ export type TourTitleProps = ArkUiTour.TitleProps;
 
 export const TourTitle = forwardRef<HTMLHeadingElement, TourTitleProps>(
   ({ children, ...props }, ref) => {
-    const { step } = useTourContext();
-
     return (
       <OverflowTooltip>
         <OverflowTooltipTrigger>
           <ArkUiTour.Title {...props} ref={ref} asChild>
-            <Heading
-              size='lg'
-              color={step?.type === 'dialog' ? 'primary' : 'primary-alt'}
-              weight='medium'
-              lineClamp={2}
-            >
+            <Heading size='lg' weight='medium' lineClamp={2}>
               {children}
             </Heading>
           </ArkUiTour.Title>
