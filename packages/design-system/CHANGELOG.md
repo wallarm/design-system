@@ -1,3 +1,7 @@
+## <small>0.7.1 (2026-03-10)</small>
+
+* fix: Tooltip bg token in dark theme ([d4398e7](https://github.com/wallarm/design-system/commit/d4398e7))
+
 ## 0.7.0 (2026-03-10)
 
 * feat: Dark theme (#33) ([6e6d1fc](https://github.com/wallarm/design-system/commit/6e6d1fc)), closes [#33](https://github.com/wallarm/design-system/issues/33)
