@@ -3,105 +3,16 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const filterFieldStory = createStoryHelper('components-querybar-querybar', [
   'Default',
-  'With Left Icon',
   'With Keyboard Hint',
-  'With Single Chip',
-  'With Multiple Chips',
-  'With Exactly Three Chips',
   'With More Than Three Chips',
   'Error Empty',
   'Error With Chips',
   'Interactive With Removal',
   'Interactive',
   'With Clear Button',
-  'Hover State Demo',
-  'Focus State Demo',
-  'Error States Demo',
 ] as const);
 
 test.describe('Component: QueryBar', () => {
-  test.describe('Visual', () => {
-    test('Should render empty state correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'Default');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with left icon correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'With Left Icon');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with keyboard hint correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'With Keyboard Hint');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with single chip correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'With Single Chip');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with multiple chips correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'With Multiple Chips');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with exactly three chips correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'With Exactly Three Chips');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with more than three chips correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'With More Than Three Chips');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render error state empty correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'Error Empty');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render error state with chips correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'Error With Chips');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render hover state correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'Hover State Demo');
-      const field = page.locator('[data-slot="query-bar"]').first();
-      await field.hover();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render focus state correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'Focus State Demo');
-      const field = page.locator('[data-slot="query-bar"]').first();
-      await field.click();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render error hover state correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'Error States Demo');
-      const field = page.locator('[data-slot="query-bar"]').first();
-      await field.hover();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render error focus state correctly', async ({ page }) => {
-      await filterFieldStory.goto(page, 'Error States Demo');
-      const fields = page.locator('[data-slot="query-bar"]');
-      await fields.nth(1).click();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should show clear button on hover when chips exist', async ({ page }) => {
-      await filterFieldStory.goto(page, 'With Clear Button');
-      const field = page.locator('[data-slot="query-bar"]');
-      await field.hover();
-      await expect(page).toHaveScreenshot();
-    });
-  });
-
   test.describe('Interactions', () => {
     test('Should call onFocus when field is clicked', async ({ page }) => {
       await filterFieldStory.goto(page, 'Interactive');

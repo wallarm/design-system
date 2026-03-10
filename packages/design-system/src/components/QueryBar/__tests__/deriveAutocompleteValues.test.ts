@@ -30,8 +30,8 @@ const makeConditions = (overrides: Partial<Condition> = {}): Condition[] => [
 ];
 
 describe('deriveAutocompleteValues', () => {
-  describe('editingMultiValues from segment text', () => {
-    it('derives checked values from comma-separated segment text', () => {
+  describe('editingMultiValues from committed condition values', () => {
+    it('derives checked values from condition value array', () => {
       const result = deriveAutocompleteValues({
         editingChipId: 'chip-0',
         selectedField: statusField,
@@ -39,13 +39,12 @@ describe('deriveAutocompleteValues', () => {
         conditions: makeConditions(),
         buildingMultiValue: undefined,
         dateRangeFromValue: undefined,
-        segmentFilterText: 'Active, Pending',
       });
 
       expect(result.editingMultiValues).toEqual(['active', 'pending']);
     });
 
-    it('unchecks values removed from segment text', () => {
+    it('ignores segmentFilterText (derives from condition values only)', () => {
       const result = deriveAutocompleteValues({
         editingChipId: 'chip-0',
         selectedField: statusField,
@@ -56,66 +55,37 @@ describe('deriveAutocompleteValues', () => {
         segmentFilterText: 'Active',
       });
 
-      expect(result.editingMultiValues).toEqual(['active']);
+      // segmentFilterText is intentionally NOT used to avoid circular dependency
+      expect(result.editingMultiValues).toEqual(['active', 'pending']);
     });
 
-    it('returns empty when all values removed from segment text', () => {
+    it('returns empty array when condition has no value', () => {
       const result = deriveAutocompleteValues({
         editingChipId: 'chip-0',
         selectedField: statusField,
         selectedOperator: 'in',
-        conditions: makeConditions(),
+        conditions: makeConditions({ value: [] }),
         buildingMultiValue: undefined,
         dateRangeFromValue: undefined,
-        segmentFilterText: '',
       });
 
       expect(result.editingMultiValues).toEqual([]);
     });
 
-    it('matches by value (case-insensitive) when label does not match', () => {
+    it('wraps single value in array', () => {
       const result = deriveAutocompleteValues({
         editingChipId: 'chip-0',
         selectedField: statusField,
         selectedOperator: 'in',
-        conditions: makeConditions(),
+        conditions: makeConditions({ value: 'active' as unknown as string[] }),
         buildingMultiValue: undefined,
         dateRangeFromValue: undefined,
-        segmentFilterText: 'ACTIVE, blocked',
-      });
-
-      expect(result.editingMultiValues).toEqual(['active', 'blocked']);
-    });
-
-    it('ignores unknown tokens in segment text', () => {
-      const result = deriveAutocompleteValues({
-        editingChipId: 'chip-0',
-        selectedField: statusField,
-        selectedOperator: 'in',
-        conditions: makeConditions(),
-        buildingMultiValue: undefined,
-        dateRangeFromValue: undefined,
-        segmentFilterText: 'Active, unknown',
       });
 
       expect(result.editingMultiValues).toEqual(['active']);
     });
 
-    it('falls back to condition values when segmentFilterText is undefined', () => {
-      const result = deriveAutocompleteValues({
-        editingChipId: 'chip-0',
-        selectedField: statusField,
-        selectedOperator: 'in',
-        conditions: makeConditions(),
-        buildingMultiValue: undefined,
-        dateRangeFromValue: undefined,
-        segmentFilterText: undefined,
-      });
-
-      expect(result.editingMultiValues).toEqual(['active', 'pending']);
-    });
-
-    it('falls back to condition values for free-text fields even with segment text', () => {
+    it('returns condition values for free-text fields', () => {
       const result = deriveAutocompleteValues({
         editingChipId: 'chip-0',
         selectedField: freeTextField,
