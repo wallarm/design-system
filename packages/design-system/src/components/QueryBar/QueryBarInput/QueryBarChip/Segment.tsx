@@ -33,10 +33,11 @@ export const Segment: FC<SegmentProps> = ({
   const lastTextWidthRef = useRef<number>(0);
   const [inputWidth, setInputWidth] = useState<number | undefined>(undefined);
 
-  // Measure text width when content changes (only while not editing)
+  // Measure text width when content changes (only while not editing).
+  // Uses getBoundingClientRect for sub-pixel precision to avoid layout shift.
   useEffect(() => {
     if (editing || !textRef.current) return;
-    lastTextWidthRef.current = textRef.current.offsetWidth;
+    lastTextWidthRef.current = textRef.current.getBoundingClientRect().width;
   }, [editing, children]);
 
   // Auto-focus when entering edit mode.
@@ -64,9 +65,9 @@ export const Segment: FC<SegmentProps> = ({
       setInputWidth(undefined);
       return;
     }
-    const sizerWidth = sizerRef.current?.offsetWidth ?? 0;
+    const sizerWidth = sizerRef.current?.getBoundingClientRect().width ?? 0;
     // Use max of original text width and current content, with a minimum of 20px
-    setInputWidth(Math.max(20, lastTextWidthRef.current, sizerWidth + 2));
+    setInputWidth(Math.max(20, lastTextWidthRef.current, sizerWidth));
   }, [editing, editText]);
 
   const isInteractive = !!props.onClick;
@@ -92,7 +93,7 @@ export const Segment: FC<SegmentProps> = ({
               segmentTextVariants({ variant }),
               'bg-transparent border-none outline-none p-0 m-0',
             )}
-            style={{ width: inputWidth ? `${inputWidth}px` : undefined }}
+            style={{ width: `${inputWidth ?? Math.max(20, lastTextWidthRef.current)}px` }}
           />
           {/* Hidden sizer to measure text width */}
           <span
