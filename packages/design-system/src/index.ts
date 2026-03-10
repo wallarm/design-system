@@ -18,6 +18,19 @@ export {
 export { Badge, type BadgeProps } from './components/Badge';
 export { Button, type ButtonProps } from './components/Button';
 export {
+  Card,
+  CardContent,
+  type CardContentProps,
+  CardFooter,
+  type CardFooterProps,
+  CardHeader,
+  type CardHeaderProps,
+  type CardProps,
+  CardTitle,
+  type CardTitleProps,
+  cardVariants,
+} from './components/Card';
+export {
   Checkbox,
   CheckboxDescription,
   type CheckboxDescriptionProps,
