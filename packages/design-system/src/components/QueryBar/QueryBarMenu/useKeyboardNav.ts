@@ -303,6 +303,8 @@ export const useKeyboardNav = ({
           e.stopPropagation();
           close?.();
           break;
+        default:
+          break;
       }
     };
 

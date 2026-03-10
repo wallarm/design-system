@@ -266,7 +266,7 @@ export const useMenuFlow = ({
       const isValidPreset = isDatePreset(trimmed);
       // Reject short strings that Date() parses loosely (e.g. '2' → 2001-02-01)
       const isValidDate =
-        !isValidPreset && trimmed.length >= 6 && !isNaN(new Date(trimmed).getTime());
+        !isValidPreset && trimmed.length >= 6 && !Number.isNaN(new Date(trimmed).getTime());
       if (!isValidPreset && !isValidDate) error = true;
 
       upsertCondition(

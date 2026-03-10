@@ -7,10 +7,34 @@
       "description": "Primary interactive button component with multiple variants and colors.",
       "importPath": "@wallarm-org/design-system/Button",
       "props": [
-        { "name": "variant", "type": "'primary' | 'outline' | 'ghost' | 'secondary'", "required": false, "description": "Visual style variant", "defaultValue": "primary" },
-        { "name": "color", "type": "'brand' | 'neutral' | 'neutral-alt' | 'destructive'", "required": false, "description": "Color scheme", "defaultValue": "brand" },
-        { "name": "size", "type": "'small' | 'medium' | 'large'", "required": false, "description": "Button size", "defaultValue": "large" },
-        { "name": "loading", "type": "boolean", "required": false, "description": "Show loading state", "defaultValue": "false" },
+        {
+          "name": "variant",
+          "type": "'primary' | 'outline' | 'ghost' | 'secondary'",
+          "required": false,
+          "description": "Visual style variant",
+          "defaultValue": "primary"
+        },
+        {
+          "name": "color",
+          "type": "'brand' | 'neutral' | 'neutral-alt' | 'destructive'",
+          "required": false,
+          "description": "Color scheme",
+          "defaultValue": "brand"
+        },
+        {
+          "name": "size",
+          "type": "'small' | 'medium' | 'large'",
+          "required": false,
+          "description": "Button size",
+          "defaultValue": "large"
+        },
+        {
+          "name": "loading",
+          "type": "boolean",
+          "required": false,
+          "description": "Show loading state",
+          "defaultValue": "false"
+        },
         { "name": "disabled", "type": "boolean", "required": false },
         { "name": "fullWidth", "type": "boolean", "required": false }
       ],
@@ -36,12 +60,34 @@
       "description": "Alert component for displaying important messages to users.",
       "importPath": "@wallarm-org/design-system/Alert",
       "props": [
-        { "name": "color", "type": "'primary' | 'destructive' | 'info' | 'warning' | 'success'", "required": false, "description": "Color variant of the alert", "defaultValue": "primary" },
-        { "name": "minWidth", "type": "number", "required": false, "description": "Minimum width in pixels", "defaultValue": "256" },
-        { "name": "maxWidth", "type": "number", "required": false, "description": "Maximum width in pixels", "defaultValue": "980" }
+        {
+          "name": "color",
+          "type": "'primary' | 'destructive' | 'info' | 'warning' | 'success'",
+          "required": false,
+          "description": "Color variant of the alert",
+          "defaultValue": "primary"
+        },
+        {
+          "name": "minWidth",
+          "type": "number",
+          "required": false,
+          "description": "Minimum width in pixels",
+          "defaultValue": "256"
+        },
+        {
+          "name": "maxWidth",
+          "type": "number",
+          "required": false,
+          "description": "Maximum width in pixels",
+          "defaultValue": "980"
+        }
       ],
       "variants": [
-        { "name": "color", "options": ["primary", "destructive", "info", "warning", "success"], "defaultValue": "primary" }
+        {
+          "name": "color",
+          "options": ["primary", "destructive", "info", "warning", "success"],
+          "defaultValue": "primary"
+        }
       ],
       "subComponents": [
         {

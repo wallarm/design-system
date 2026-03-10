@@ -117,7 +117,7 @@ function prepareForPublish(): void {
 
     // Remove src from files if present (only dist should be published)
     if (packageJson.files?.includes('src')) {
-      packageJson.files = packageJson.files.filter((f) => f !== 'src');
+      packageJson.files = packageJson.files.filter(f => f !== 'src');
       console.log('📁 Removed src from files');
     }
 
@@ -125,7 +125,7 @@ function prepareForPublish(): void {
     const monorepoRoot = findMonorepoRoot(pkgDir);
 
     if (packageJson.dependencies) {
-      const hasWorkspaceDeps = Object.values(packageJson.dependencies).some((v) =>
+      const hasWorkspaceDeps = Object.values(packageJson.dependencies).some(v =>
         v.startsWith('workspace:'),
       );
       if (hasWorkspaceDeps) {
