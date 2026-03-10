@@ -80,9 +80,9 @@ export const useValueMenuState = ({
 
   const handleItemSelect = (item: QueryBarDropdownItem) => {
     if (multiSelect) {
-      toggleValue(item.value);
+      toggleValue(item.value as ConditionValue);
     } else {
-      onSelect(item.value);
+      onSelect(item.value as ConditionValue);
     }
   };
 

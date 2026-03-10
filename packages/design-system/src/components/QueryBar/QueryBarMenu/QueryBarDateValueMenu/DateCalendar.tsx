@@ -1,6 +1,5 @@
 import { type FC, useEffect, useMemo, useState } from 'react';
-import { DatePicker, parseDate } from '@ark-ui/react/date-picker';
-import type { DateValue } from '@zag-js/date-picker';
+import { type DateValue, DatePicker, parseDate } from '@ark-ui/react/date-picker';
 import { ChevronLeft } from '../../../../icons/ChevronLeft';
 import { DropdownMenuSeparator } from '../../../DropdownMenu';
 import { DayView } from './DayView';

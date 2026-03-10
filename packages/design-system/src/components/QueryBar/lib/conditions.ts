@@ -19,7 +19,7 @@ export const findChipSplitIndex = (
 ): number => {
   let conditionCount = 0;
   for (let i = 0; i < chips.length; i++) {
-    if (chips[i].variant === 'chip') {
+    if (chips[i]!.variant === 'chip') {
       if (conditionCount === conditionInsertIndex) {
         if (afterConnector) {
           // Split right at the condition chip (after its connector)
@@ -28,9 +28,9 @@ export const findChipSplitIndex = (
         // Split before the connector that precedes this chip
         if (
           i > 0 &&
-          chips[i - 1].variant !== 'chip' &&
-          chips[i - 1].variant !== '(' &&
-          chips[i - 1].variant !== ')'
+          chips[i - 1]!.variant !== 'chip' &&
+          chips[i - 1]!.variant !== '(' &&
+          chips[i - 1]!.variant !== ')'
         ) {
           return i - 1;
         }
