@@ -1,3 +1,8 @@
+## 0.7.0 (2026-03-10)
+
+* feat: Dark theme (#33) ([6e6d1fc](https://github.com/wallarm/design-system/commit/6e6d1fc)), closes [#33](https://github.com/wallarm/design-system/issues/33)
+* ci: added tests reports (#30) ([8cb7a8b](https://github.com/wallarm/design-system/commit/8cb7a8b)), closes [#30](https://github.com/wallarm/design-system/issues/30)
+
 ## <small>0.6.1 (2026-03-06)</small>
 
 * fix: Table component (#29) ([0e214ca](https://github.com/wallarm/design-system/commit/0e214ca)), closes [#29](https://github.com/wallarm/design-system/issues/29)
