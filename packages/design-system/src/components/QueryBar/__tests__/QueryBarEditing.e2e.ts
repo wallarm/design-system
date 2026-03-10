@@ -11,18 +11,24 @@ async function createChipWithSelection(page: any, fieldText: string, valueText: 
   const input = page.locator('input[type="text"]');
   await input.click();
 
-  await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
-  await page.locator('[role="menuitem"]').filter({ hasText: fieldText }).click();
+  // Step 1: Select field
+  const fieldItem = page.locator('[role="menuitem"]').filter({ hasText: fieldText });
+  await expect(fieldItem).toBeVisible({ timeout: 10000 });
+  await fieldItem.click();
 
-  await page.waitForTimeout(300);
-  await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
-  await page.locator('[role="menuitem"]').first().click();
+  // Step 2: Select operator (first available)
+  const operatorItem = page.locator('[role="menuitem"]').first();
+  await expect(operatorItem).toBeVisible({ timeout: 10000 });
+  await operatorItem.click();
 
-  await page.waitForTimeout(300);
-  await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
-  await page.locator('[role="menuitem"]').filter({ hasText: valueText }).click();
+  // Step 3: Select value
+  const valueItem = page.locator('[role="menuitem"]').filter({ hasText: valueText });
+  await expect(valueItem).toBeVisible({ timeout: 10000 });
+  await valueItem.click();
 
-  await page.waitForTimeout(300);
+  // Wait for chip to appear
+  const chip = page.locator('[data-slot="query-bar-chip"]');
+  await expect(chip.first()).toBeVisible({ timeout: 5000 });
 }
 
 // Helper: create a multi-select chip (Status in [values])
@@ -35,22 +41,28 @@ async function createMultiSelectChip(
   const input = page.locator('input[type="text"]');
   await input.click();
 
-  await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
-  await page.locator('[role="menuitem"]').filter({ hasText: fieldText }).click();
+  // Step 1: Select field
+  const fieldItem = page.locator('[role="menuitem"]').filter({ hasText: fieldText });
+  await expect(fieldItem).toBeVisible({ timeout: 10000 });
+  await fieldItem.click();
 
-  await page.waitForTimeout(300);
-  await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
-  await page.locator('[role="menuitem"]').filter({ hasText: operatorText }).click();
+  // Step 2: Select operator
+  const operatorItem = page.locator('[role="menuitem"]').filter({ hasText: operatorText });
+  await expect(operatorItem).toBeVisible({ timeout: 10000 });
+  await operatorItem.click();
 
-  await page.waitForTimeout(300);
+  // Step 3: Select values
   for (const val of valueTexts) {
-    await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
-    await page.locator('[role="menuitem"]').filter({ hasText: val }).click();
-    await page.waitForTimeout(200);
+    const valueItem = page.locator('[role="menuitem"]').filter({ hasText: val });
+    await expect(valueItem).toBeVisible({ timeout: 10000 });
+    await valueItem.click();
   }
   // Close multi-select by pressing Escape
   await page.keyboard.press('Escape');
-  await page.waitForTimeout(300);
+
+  // Wait for chip to appear
+  const chip = page.locator('[data-slot="query-bar-chip"]');
+  await expect(chip.first()).toBeVisible({ timeout: 5000 });
 }
 
 test.describe('Component: QueryBar - Editing', () => {
@@ -246,21 +258,23 @@ test.describe('Component: QueryBar - Editing', () => {
       await createChipWithSelection(page, 'Status', 'Active');
 
       const chip = page.locator('[data-slot="query-bar-chip"]').filter({ hasText: 'Status' });
+      await expect(chip).toBeVisible({ timeout: 5000 });
+
       const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+      await expect(attributeSegment).toBeVisible({ timeout: 5000 });
       await attributeSegment.click();
-      await page.waitForTimeout(300);
 
       // Type a valid field name and press Enter
       const segmentInput = page.locator('[data-slot^="segment-"] input');
+      await expect(segmentInput).toBeVisible({ timeout: 5000 });
       await segmentInput.fill('Priority');
       await page.keyboard.press('Enter');
-      await page.waitForTimeout(300);
 
       // Chip should now show Priority
       const updatedChip = page
         .locator('[data-slot="query-bar-chip"]')
         .filter({ hasText: 'Priority' });
-      await expect(updatedChip).toBeVisible();
+      await expect(updatedChip).toBeVisible({ timeout: 5000 });
     });
 
     test('Should cancel attribute edit via Escape key', async ({ page }) => {
@@ -269,15 +283,17 @@ test.describe('Component: QueryBar - Editing', () => {
       await createChipWithSelection(page, 'Status', 'Active');
 
       const chip = page.locator('[data-slot="query-bar-chip"]').filter({ hasText: 'Status' });
+      await expect(chip).toBeVisible({ timeout: 5000 });
+
       const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+      await expect(attributeSegment).toBeVisible({ timeout: 5000 });
       await attributeSegment.click();
-      await page.waitForTimeout(300);
 
       // Type something then cancel
       const segmentInput = page.locator('[data-slot^="segment-"] input');
+      await expect(segmentInput).toBeVisible({ timeout: 5000 });
       await segmentInput.fill('Priority');
       await page.keyboard.press('Escape');
-      await page.waitForTimeout(300);
 
       // Chip should still show Status (not changed)
       await expect(chip).toContainText('Status');
