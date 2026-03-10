@@ -161,12 +161,7 @@ export const SimpleWithActions: StoryFn = () => {
               variant: 'simple',
               actions: (
                 <ToastActions>
-                  <Button
-                    variant='secondary'
-                    size='small'
-                    color='neutral-alt'
-                    onClick={() => console.log('Undo clicked')}
-                  >
+                  <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
                     Undo
                   </Button>
                 </ToastActions>
@@ -184,20 +179,10 @@ export const SimpleWithActions: StoryFn = () => {
               variant: 'simple',
               actions: (
                 <ToastActions>
-                  <Button
-                    variant='secondary'
-                    size='small'
-                    color='neutral-alt'
-                    onClick={() => console.log('View clicked')}
-                  >
+                  <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
                     View
                   </Button>
-                  <Button
-                    variant='secondary'
-                    size='small'
-                    color='neutral-alt'
-                    onClick={() => console.log('Dismiss clicked')}
-                  >
+                  <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
                     Dismiss
                   </Button>
                 </ToastActions>
@@ -227,12 +212,7 @@ export const ExtendedWithActions: StoryFn = () => {
               variant: 'extended',
               actions: (
                 <ToastActions>
-                  <Button
-                    variant='secondary'
-                    size='small'
-                    color='neutral-alt'
-                    onClick={() => console.log('Action clicked')}
-                  >
+                  <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
                     Action
                   </Button>
                 </ToastActions>
@@ -251,20 +231,10 @@ export const ExtendedWithActions: StoryFn = () => {
               variant: 'extended',
               actions: (
                 <ToastActions>
-                  <Button
-                    variant='secondary'
-                    size='small'
-                    color='neutral-alt'
-                    onClick={() => console.log('View clicked')}
-                  >
+                  <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
                     View
                   </Button>
-                  <Button
-                    variant='secondary'
-                    size='small'
-                    color='neutral-alt'
-                    onClick={() => console.log('Download clicked')}
-                  >
+                  <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
                     Download
                   </Button>
                 </ToastActions>

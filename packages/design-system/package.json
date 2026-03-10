@@ -103,6 +103,7 @@
     "@storybook/addon-themes": "10.2.0",
     "@storybook/mcp": "0.2.1",
     "@tailwindcss/postcss": "4.1.18",
+    "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "catalog:",
     "@types/lodash-es": "4.17.12",
