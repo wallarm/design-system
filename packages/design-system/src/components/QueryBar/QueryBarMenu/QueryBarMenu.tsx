@@ -1,5 +1,5 @@
 import type { FC, RefObject } from 'react';
-import { isBetweenOperator, isMultiSelectOperator } from '../lib';
+import { getFieldValues, isBetweenOperator, isMultiSelectOperator } from '../lib';
 import type { ChipSegment } from '../QueryBarInput/QueryBarChip';
 import type { FieldMetadata, FilterOperator, MenuState } from '../types';
 import { QueryBarDateValueMenu } from './QueryBarDateValueMenu';
@@ -72,8 +72,8 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
     const lastToken = segmentFilterText.split(',').pop()?.trim() ?? '';
     if (!lastToken) return '';
     // If the last token matches a field value label/value, it's a completed selection — don't filter
-    const fieldValues = selectedField?.values;
-    if (fieldValues) {
+    const fieldValues = selectedField ? getFieldValues(selectedField) : [];
+    if (fieldValues.length > 0) {
       const isKnownValue = fieldValues.some(
         v =>
           v.label.toLowerCase() === lastToken.toLowerCase() ||
@@ -132,22 +132,25 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
             initialValue={editingSingleValue != null ? String(editingSingleValue) : undefined}
           />
         ) : (
-          <QueryBarValueMenu
-            values={selectedField.values || []}
-            open={menuState === 'value'}
-            onSelect={handleValueSelect}
-            onCommit={handleMultiCommit}
-            onOpenChange={() => handleMenuClose()}
-            onEscape={handleMenuDiscard}
-            multiSelect={isMultiSelectOperator(selectedOperator)}
-            initialValues={editingMultiValues}
-            highlightValue={editingSingleValue}
-            positioning={menuPositioning}
-            onBuildingValueChange={handleBuildingValueChange}
-            inputRef={inputRef}
-            menuRef={menuRef}
-            filterText={valueFilterText}
-          />
+          // Freeform fields (no predefined values) skip the dropdown — user types and presses Enter
+          getFieldValues(selectedField).length > 0 && (
+            <QueryBarValueMenu
+              values={getFieldValues(selectedField)}
+              open={menuState === 'value'}
+              onSelect={handleValueSelect}
+              onCommit={handleMultiCommit}
+              onOpenChange={() => handleMenuClose()}
+              onEscape={handleMenuDiscard}
+              multiSelect={isMultiSelectOperator(selectedOperator)}
+              initialValues={editingMultiValues}
+              highlightValue={editingSingleValue}
+              positioning={menuPositioning}
+              onBuildingValueChange={handleBuildingValueChange}
+              inputRef={inputRef}
+              menuRef={menuRef}
+              filterText={valueFilterText}
+            />
+          )
         ))}
     </>
   );
