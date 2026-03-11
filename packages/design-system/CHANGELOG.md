@@ -1,3 +1,7 @@
+## 0.9.0 (2026-03-11)
+
+* feat: Card component (#36) ([d7d5a05](https://github.com/wallarm/design-system/commit/d7d5a05)), closes [#36](https://github.com/wallarm/design-system/issues/36)
+
 ## 0.8.0 (2026-03-11)
 
 * feat: add QueryBar filter component with inline editing and autocomplete (#35) ([cec9e49](https://github.com/wallarm/design-system/commit/cec9e49)), closes [#35](https://github.com/wallarm/design-system/issues/35)
