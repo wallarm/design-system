@@ -5,7 +5,7 @@ export const dropdownMenuClassNames = cn(
   // Dimensions
   'flex flex-col gap-1 min-w-128',
   // Leveling and scrolling
-  'z-50 overflow-hidden outline-none',
+  'z-50 overflow-y-auto overflow-x-hidden outline-none',
   // Visual
   'rounded-12 border border-border-primary-light bg-bg-surface-2 p-8 font-sans text-text-primary shadow-md outline-none',
   // Animation opened

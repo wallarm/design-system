@@ -51,6 +51,7 @@ describe('metadata generation (integration)', () => {
   it('generates valid metadata that passes Zod schema', () => {
     const result = designSystemMetadataSchema.safeParse(metadata);
     if (!result.success) {
+      console.error(result.error.format());
     }
     expect(result.success).toBe(true);
   });
