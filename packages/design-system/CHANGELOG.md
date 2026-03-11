@@ -1,3 +1,7 @@
+## 0.8.0 (2026-03-11)
+
+* feat: add QueryBar filter component with inline editing and autocomplete (#35) ([cec9e49](https://github.com/wallarm/design-system/commit/cec9e49)), closes [#35](https://github.com/wallarm/design-system/issues/35)
+
 ## <small>0.7.1 (2026-03-10)</small>
 
 * fix: Tooltip bg token in dark theme ([d4398e7](https://github.com/wallarm/design-system/commit/d4398e7))
