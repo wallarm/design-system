@@ -8,6 +8,16 @@ interface DropdownMenuProps {
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   modal?: boolean;
+  /** Virtual anchor point for positioning without a trigger element */
+  anchorPoint?: { x: number; y: number };
+  /** Override default positioning config */
+  positioning?: Menu.RootProps['positioning'];
+  /** Programmatically control which item is highlighted */
+  highlightedValue?: string | null;
+  /** Callback when the highlighted item changes (e.g. on mouse hover) */
+  onHighlightChange?: (details: Menu.HighlightChangeDetails) => void;
+  /** Whether selecting an item closes the menu (default true) */
+  closeOnSelect?: boolean;
 }
 
 const ROOT_POSITIONING: Menu.RootProps['positioning'] = {
@@ -27,10 +37,17 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
   open,
   defaultOpen,
   onOpenChange,
+  anchorPoint,
+  positioning,
+  highlightedValue,
+  onHighlightChange,
+  closeOnSelect,
   ...props
 }) => {
   const parent = useDropdownMenuContext();
   const isNested = parent !== null;
+
+  const defaultPositioning = isNested ? SUB_POSITIONING : ROOT_POSITIONING;
 
   const handleOpenChange = (details: Menu.OpenChangeDetails) => {
     onOpenChange?.(details.open);
@@ -42,7 +59,11 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
     <DropdownMenuContext value={ctx}>
       <Menu.Root
         {...props}
-        positioning={isNested ? SUB_POSITIONING : ROOT_POSITIONING}
+        positioning={positioning ?? defaultPositioning}
+        {...(anchorPoint != null && { anchorPoint })}
+        {...(highlightedValue != null && { highlightedValue })}
+        {...(closeOnSelect != null && { closeOnSelect })}
+        {...(onHighlightChange != null && { onHighlightChange })}
         open={open}
         defaultOpen={defaultOpen}
         onOpenChange={handleOpenChange}

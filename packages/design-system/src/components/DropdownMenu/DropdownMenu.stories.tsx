@@ -316,6 +316,45 @@ export const WithIcons: StoryFn<typeof meta> = () => (
   </DropdownMenu>
 );
 
+export const WithFooter: StoryFn<typeof meta> = () => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button variant='outline' color='neutral'>
+        Open
+      </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent>
+      <DropdownMenuItem>Profile</DropdownMenuItem>
+      <DropdownMenuItem>Billing</DropdownMenuItem>
+      <DropdownMenuItem>Settings</DropdownMenuItem>
+      <DropdownMenuItem>Notifications</DropdownMenuItem>
+      <DropdownMenuItem>Integrations</DropdownMenuItem>
+      <DropdownMenuItem>Security</DropdownMenuItem>
+      <DropdownMenuItem>API Keys</DropdownMenuItem>
+      <DropdownMenuItem>Webhooks</DropdownMenuItem>
+      <DropdownMenuItem>Audit Log</DropdownMenuItem>
+      <DropdownMenuItem>Team Members</DropdownMenuItem>
+      <DropdownMenuItem>Permissions</DropdownMenuItem>
+      <DropdownMenuItem>Usage</DropdownMenuItem>
+      <DropdownMenuFooter>
+        <span className='flex items-center gap-4'>
+          <KbdGroup>
+            <Kbd>↑</Kbd>
+            <Kbd>↓</Kbd>
+          </KbdGroup>
+          to navigate
+        </span>
+        <span className='flex items-center gap-4'>
+          <KbdGroup>
+            <Kbd>↵</Kbd>
+          </KbdGroup>
+          to select
+        </span>
+      </DropdownMenuFooter>
+    </DropdownMenuContent>
+  </DropdownMenu>
+);
+
 export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -364,31 +403,6 @@ export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
         <CirclePlus />
         <DropdownMenuItemText>Request custom widget</DropdownMenuItemText>
       </DropdownMenuItem>
-    </DropdownMenuContent>
-  </DropdownMenu>
-);
-
-export const WithFooter: StoryFn<typeof meta> = () => (
-  <DropdownMenu>
-    <DropdownMenuTrigger asChild>
-      <Button variant='outline' color='neutral'>
-        Open
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent>
-      <DropdownMenuItem>Filter A</DropdownMenuItem>
-      <DropdownMenuItem>Filter B</DropdownMenuItem>
-      <DropdownMenuItem>Filter C</DropdownMenuItem>
-      <DropdownMenuItem>Filter D</DropdownMenuItem>
-      <DropdownMenuFooter>
-        <span>Footer is WIP Hotkey</span>
-        <span className='flex items-center gap-8'>
-          <KbdGroup>
-            <Kbd>⌘</Kbd>
-            <Kbd>⌘</Kbd>
-          </KbdGroup>
-        </span>
-      </DropdownMenuFooter>
     </DropdownMenuContent>
   </DropdownMenu>
 );

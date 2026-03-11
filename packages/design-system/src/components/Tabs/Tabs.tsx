@@ -42,7 +42,7 @@ export const Tabs: FC<TabsProps> = ({
         unmountOnExit={unmountOnExit}
         asChild={asChild}
       >
-        {asChild ? <>{children}</> : children}
+        {asChild ? children : children}
       </ArkUiTabs.Root>
     </TabsSharedContextProvider>
   );

@@ -55,4 +55,12 @@ package.json.backup
 # Claude
 .claude/agent-memory
 .playwright-mcp
+tasks/
 
+# Ralph - ignore runtime files but keep templates
+scripts/ralph/progress.txt
+scripts/ralph/prd.json
+scripts/ralph/archive/
+
+# Dev notes
+QUERYBAR_NOTES.md

@@ -20,14 +20,11 @@ export const useControlled = <T = unknown>(
   const [valueState, setValue] = useState<T | undefined>(defaultProp);
   const value = isControlled ? controlled : valueState;
 
-  const setValueIfUncontrolled = useCallback(
-    (newValue: T | undefined) => {
-      if (!isControlled) {
-        setValue(newValue);
-      }
-    },
-    [isControlled],
-  );
+  const setValueIfUncontrolled = useCallback((newValue: T | undefined) => {
+    if (!isControlled) {
+      setValue(newValue);
+    }
+  }, []);
 
   return [value, setValueIfUncontrolled];
 };

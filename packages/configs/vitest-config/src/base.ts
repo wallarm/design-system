@@ -11,6 +11,7 @@ export const baseConfig = {
       'build/',
       '.next/',
       'coverage/',
+      '**/*.e2e.{js,ts,jsx,tsx}',
       '**/*.config.{js,ts,mjs,cjs}',
       '**/vitest.config.{js,ts,mjs,cjs}',
     ],
