@@ -12,16 +12,37 @@ import {
 } from '../../DropdownMenu';
 import { Kbd } from '../../Kbd/Kbd';
 import { KbdGroup } from '../../Kbd/KbdGroup';
-import { getOperatorLabel, OPERATORS_BY_TYPE } from '../lib';
+import { getOperatorLabel, OPERATOR_SYMBOLS, OPERATORS_BY_TYPE } from '../lib';
 import type { FieldType, FilterOperator, QueryBarDropdownItem } from '../types';
 import { MenuEmptyState } from './MenuEmptyState';
 import { useKeyboardNav } from './useKeyboardNav';
+
+/**
+ * Build operator groups filtered by a custom operators list.
+ * Preserves grouping from OPERATORS_BY_TYPE but only keeps operators present in the list.
+ */
+function filterOperatorGroups(
+  groups: FilterOperator[][],
+  operators: FilterOperator[],
+): FilterOperator[][] {
+  const allowed = new Set(operators);
+  return groups.map(group => group.filter(op => allowed.has(op))).filter(group => group.length > 0);
+}
+
+/** Field types where operator symbols are hidden (per Figma spec) */
+const HIDE_SYMBOLS_FOR: ReadonlySet<FieldType> = new Set(['boolean']);
 
 export interface QueryBarOperatorMenuProps {
   /**
    * The field type to determine which operators to show
    */
   fieldType: FieldType;
+  /**
+   * Optional list of operators from field config.
+   * When provided, only these operators are shown (preserving type-based grouping).
+   * Falls back to OPERATORS_BY_TYPE[fieldType] when not set.
+   */
+  operators?: FilterOperator[];
   /**
    * Callback when an operator is selected
    */
@@ -60,6 +81,7 @@ export interface QueryBarOperatorMenuProps {
  */
 export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
   fieldType,
+  operators,
   onSelect,
   open = false,
   onOpenChange,
@@ -70,7 +92,8 @@ export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
   menuRef,
   className,
 }) => {
-  const operatorGroups = OPERATORS_BY_TYPE[fieldType] || [];
+  const allGroups = OPERATORS_BY_TYPE[fieldType] || [];
+  const operatorGroups = operators ? filterOperatorGroups(allGroups, operators) : allGroups;
   const query = filterText.toLowerCase();
 
   const filteredGroups = useMemo(
@@ -115,7 +138,7 @@ export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
       highlightedValue={highlightedValue}
       onHighlightChange={onHighlightChange}
     >
-      <DropdownMenuContent ref={menuRef} className={cn('w-64', className)}>
+      <DropdownMenuContent ref={menuRef} className={cn('w-256', className)}>
         {filteredGroups.length > 0 ? (
           filteredGroups.map((group, groupIdx) => (
             <Fragment key={`group-${groupIdx}`}>
@@ -129,6 +152,11 @@ export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
                     <DropdownMenuItemText>
                       {getOperatorLabel(operator, fieldType)}
                     </DropdownMenuItemText>
+                    {!HIDE_SYMBOLS_FOR.has(fieldType) && (
+                      <span className='ml-auto inline-flex items-center'>
+                        <Kbd className='font-mono'>{OPERATOR_SYMBOLS[operator]}</Kbd>
+                      </span>
+                    )}
                   </DropdownMenuItem>
                 ))}
               </DropdownMenuGroup>

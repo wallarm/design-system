@@ -101,6 +101,7 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
       {selectedField && (
         <QueryBarOperatorMenu
           fieldType={selectedField.type}
+          operators={selectedField.operators}
           open={menuState === 'operator'}
           onSelect={handleOperatorSelect}
           onOpenChange={() => handleMenuClose()}
