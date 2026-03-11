@@ -29,6 +29,8 @@ const getComponentDescription = (
 };
 
 const main = () => {
+  console.log('Generating design system metadata...');
+
   const tsconfigPath = path.join(ROOT, 'tsconfig.app.json');
   const project = new Project({ tsConfigFilePath: tsconfigPath });
 
@@ -38,6 +40,8 @@ const main = () => {
     .readdirSync(componentsDir, { withFileTypes: true })
     .filter(dirent => dirent.isDirectory())
     .map(dirent => dirent.name);
+
+  console.log(`Found ${componentDirs.length} component directories`);
 
   const components: ComponentMetadata[] = [];
 
@@ -90,6 +94,8 @@ const main = () => {
   // Validate with Zod
   const result = designSystemMetadataSchema.safeParse(metadata);
   if (!result.success) {
+    console.error('Metadata validation failed:');
+    console.error(result.error.format());
     process.exit(1);
   }
 
@@ -98,6 +104,11 @@ const main = () => {
   fs.mkdirSync(outDir, { recursive: true });
   const outPath = path.join(outDir, 'components.json');
   fs.writeFileSync(outPath, JSON.stringify(metadata, null, 2));
+
+  console.log(`Metadata written to ${outPath}`);
+  console.log(`  Components: ${components.length}`);
+  console.log(`  Token categories: ${tokens.length}`);
+  console.log(`  Total tokens: ${tokens.reduce((sum, cat) => sum + cat.tokens.length, 0)}`);
 };
 
 main();
