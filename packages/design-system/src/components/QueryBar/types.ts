@@ -61,6 +61,12 @@ export interface FieldMetadata {
   operators?: FilterOperator[];
   default?: string | number | boolean;
   values?: FieldValueOption[];
+  /**
+   * Shorthand for simple string values (e.g. `["GET", "POST", "PUT"]`).
+   * Automatically converted to `FieldValueOption[]` where `value === label`.
+   * Empty array `[]` means freeform input — no dropdown, user types any value.
+   */
+  options?: string[];
 }
 
 /**

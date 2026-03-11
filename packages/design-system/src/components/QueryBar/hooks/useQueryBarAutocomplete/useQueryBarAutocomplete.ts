@@ -1,6 +1,6 @@
 import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { chipIdToConditionIndex, isMenuRelated } from '../../lib';
+import { chipIdToConditionIndex, hasFieldValues, isMenuRelated } from '../../lib';
 import { useDateRange } from '../../QueryBarMenu/QueryBarDateValueMenu/hooks';
 import type {
   Condition,
@@ -169,6 +169,18 @@ export const useQueryBarAutocomplete = ({
         menuRef.current?.focus();
         return;
       }
+      // Enter or Space commits freeform value when no predefined values exist
+      if (
+        (e.key === 'Enter' || e.key === ' ') &&
+        menuState === 'value' &&
+        selectedField &&
+        !hasFieldValues(selectedField) &&
+        inputText.trim()
+      ) {
+        e.preventDefault();
+        handleCustomValueCommit(inputText);
+        return;
+      }
       if (
         e.key === 'Backspace' &&
         !e.repeat &&
@@ -187,7 +199,7 @@ export const useQueryBarAutocomplete = ({
         setMenuState('closed');
       }
     },
-    [inputText, removeConditionAtIndex, menuState],
+    [inputText, removeConditionAtIndex, menuState, selectedField, handleCustomValueCommit],
   );
 
   // ── Focus ─────────────────────────────────────────────────
