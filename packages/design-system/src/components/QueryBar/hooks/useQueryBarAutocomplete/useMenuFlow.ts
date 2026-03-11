@@ -2,6 +2,7 @@ import type { RefObject } from 'react';
 import { useCallback, useRef } from 'react';
 import {
   chipIdToConditionIndex,
+  getFieldValues,
   isBetweenOperator,
   isDatePreset,
   isMultiSelectOperator,
@@ -11,15 +12,16 @@ import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../
 
 /** Check if condition value(s) are valid for the given field. Returns true if error. */
 const validateValueForField = (field: FieldMetadata, value: Condition['value']): boolean => {
+  const fieldValues = getFieldValues(field);
   // No values list means any value is acceptable (free-text field)
-  if (!field.values || field.values.length === 0) return false;
+  if (fieldValues.length === 0) return false;
   // Null value (no-value operators) is always valid
   if (value == null) return false;
 
   const values = Array.isArray(value) ? value : [value];
   return values.some(
     v =>
-      !field.values!.some(
+      !fieldValues.some(
         opt => opt.value === v || String(opt.value).toLowerCase() === String(v).toLowerCase(),
       ),
   );
@@ -27,7 +29,8 @@ const validateValueForField = (field: FieldMetadata, value: Condition['value']):
 
 /** Resolve a text input to the actual field value (e.g. label "Active" → value "active") */
 const resolveFieldValue = (field: FieldMetadata, text: string): string | number | boolean => {
-  const match = field.values?.find(
+  const fieldValues = getFieldValues(field);
+  const match = fieldValues.find(
     v =>
       v.label.toLowerCase() === text.toLowerCase() ||
       String(v.value).toLowerCase() === text.toLowerCase(),
@@ -231,8 +234,9 @@ export const useMenuFlow = ({
         .filter(Boolean);
       const resolved = parts.map(part => resolveFieldValue(field, part));
       let error: boolean | undefined;
-      if (field.values && field.values.length > 0) {
-        const hasInvalid = resolved.some(v => !field.values!.some(opt => opt.value === v));
+      const fv = getFieldValues(field);
+      if (fv.length > 0) {
+        const hasInvalid = resolved.some(v => !fv.some(opt => opt.value === v));
         if (hasInvalid) error = true;
       }
       upsertCondition(
@@ -289,9 +293,10 @@ export const useMenuFlow = ({
       const isEditing = !!editing.editingChipId;
       const resolved = resolveFieldValue(field, trimmed);
       let error: boolean | undefined;
-      if (field.values && field.values.length > 0 && resolved === trimmed) {
+      const fv = getFieldValues(field);
+      if (fv.length > 0 && resolved === trimmed) {
         // resolveFieldValue returned the raw text — no match found
-        const hasMatch = field.values.some(
+        const hasMatch = fv.some(
           v =>
             v.label.toLowerCase() === trimmed.toLowerCase() ||
             String(v.value).toLowerCase() === trimmed.toLowerCase(),

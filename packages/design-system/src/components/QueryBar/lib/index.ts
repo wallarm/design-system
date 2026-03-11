@@ -6,6 +6,7 @@ export {
   isDatePreset,
 } from '../QueryBarMenu/QueryBarDateValueMenu/constants';
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
+export { getFieldValues, hasFieldValues } from './fields';
 export {
   NO_VALUE_OPERATORS,
   OPERATOR_LABELS,
