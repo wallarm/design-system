@@ -15,5 +15,4 @@ export const getFieldValues = (field: FieldMetadata): FieldValueOption[] => {
  * Check if a field has predefined values (from `values` or `options`).
  * Returns false for freeform fields (`options: []` or no values at all).
  */
-export const hasFieldValues = (field: FieldMetadata): boolean =>
-  getFieldValues(field).length > 0;
+export const hasFieldValues = (field: FieldMetadata): boolean => getFieldValues(field).length > 0;
