@@ -40,8 +40,10 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
   );
   const menuChildren = childArray.filter(
     child =>
-      !(isValidElement(child) &&
-        (child.type === DropdownMenuFooter || child.type === DropdownMenuInput)),
+      !(
+        isValidElement(child) &&
+        (child.type === DropdownMenuFooter || child.type === DropdownMenuInput)
+      ),
   );
 
   return (
