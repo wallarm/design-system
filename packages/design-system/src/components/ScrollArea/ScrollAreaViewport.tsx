@@ -7,7 +7,7 @@ export type ScrollAreaViewportProps = Omit<ArkUiScrollArea.ViewportProps, 'class
 };
 
 export const ScrollAreaViewport: FC<ScrollAreaViewportProps> = props => (
-  <ArkUiScrollArea.Viewport {...props} className={cn('h-full outline-none overscroll-x-none')} />
+  <ArkUiScrollArea.Viewport {...props} className={cn('h-full outline-none overscroll-none')} />
 );
 
 ScrollAreaViewport.displayName = 'ScrollAreaViewport';
