@@ -83,6 +83,7 @@ export {
   DropdownMenuContextTrigger,
   DropdownMenuFooter,
   DropdownMenuGroup,
+  DropdownMenuInput,
   DropdownMenuItem,
   DropdownMenuItemContent,
   DropdownMenuItemDescription,

@@ -7,6 +7,7 @@ export { DropdownMenu } from './DropdownMenu';
 export { DropdownMenuContent } from './DropdownMenuContent';
 export { DropdownMenuContextTrigger } from './DropdownMenuContextTrigger';
 export { DropdownMenuFooter } from './DropdownMenuFooter';
+export { DropdownMenuInput } from './DropdownMenuInput';
 export { DropdownMenuGroup } from './DropdownMenuGroup';
 export { DropdownMenuItem } from './DropdownMenuItem';
 export { DropdownMenuItemContent } from './DropdownMenuItemContent';
