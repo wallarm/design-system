@@ -10,6 +10,7 @@ import {
 } from '../lib';
 import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
+import { TableMasterCellActions } from '../TableMasterCellActions';
 
 interface TableBodyCellProps<T> {
   cell: Cell<T, unknown>;
@@ -39,11 +40,22 @@ export const TableBodyCell = <T,>({
   const isCut = meta?.resizeType === 'cut';
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
 
+  const hasRenderActions = !!meta?.renderActions;
+  const hasRenderMenu = !!meta?.renderMenuForMoreAction;
+  const hasActions = hasRenderActions || hasRenderMenu;
+
+  // Right padding to prevent content from hiding behind absolutely-positioned actions.
+  // Matches actions container: pl-4 + buttons(24 each) + gap-2 between them + pr-6
+  const actionsPaddingRight = hasActions
+    ? 4 + (hasRenderActions ? 24 : 0) + (hasRenderActions && hasRenderMenu ? 2 : 0) + (hasRenderMenu ? 24 : 0) + 6
+    : undefined;
+
   return (
     <Td
       className={cn(
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),
+        hasActions && 'relative',
         meta?.cellClassName,
         className,
       )}
@@ -56,6 +68,7 @@ export const TableBodyCell = <T,>({
         width: cell.column.getSize(),
         ...dndStyle,
         ...(isCut && { overflow: 'hidden' }),
+        ...(actionsPaddingRight && { paddingRight: actionsPaddingRight }),
       }}
       colSpan={colSpan}
     >
@@ -65,6 +78,13 @@ export const TableBodyCell = <T,>({
         </div>
       ) : (
         content
+      )}
+      {hasActions && (
+        <TableMasterCellActions
+          row={cell.row}
+          renderActions={meta?.renderActions}
+          renderMenuForMoreAction={meta?.renderMenuForMoreAction}
+        />
       )}
     </Td>
   );
