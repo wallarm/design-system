@@ -48,7 +48,7 @@ export const TableSortHandler = <T,>({ header }: TableSortHandler<T>) => {
         <button
           type='button'
           className={cn(
-            'icon-sm shrink-0 hover:text-text-primary ',
+            'w-16 h-16 shrink-0 hover:text-text-primary',
             'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary rounded-2',
             'transition-colors cursor-pointer',
             'inline-flex items-center justify-center bg-transparent border-0 p-0',
