@@ -1,8 +1,8 @@
 import { type MouseEvent, useCallback } from 'react';
 import type { Header } from '@tanstack/react-table';
 import { MoveDown, MoveUp, MoveVertical } from '../../icons';
-import { cn } from '../../utils/cn';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
+import { tableHeaderButtonClass } from './classes';
 import { SORT_LABELS } from './lib';
 import { useTableContext } from './TableContext';
 
@@ -47,12 +47,7 @@ export const TableSortHandler = <T,>({ header }: TableSortHandler<T>) => {
       <TooltipTrigger asChild>
         <button
           type='button'
-          className={cn(
-            'w-16 h-16 shrink-0 hover:text-text-primary',
-            'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary rounded-2',
-            'transition-colors cursor-pointer',
-            'inline-flex items-center justify-center bg-transparent border-0 p-0',
-          )}
+          className={tableHeaderButtonClass}
           onClick={handleSort}
           aria-label={
             sortDirection === 'asc'

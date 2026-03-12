@@ -32,7 +32,6 @@ export const TableMasterCellActions = <T,>({
       className={cn(
         'absolute top-0 right-0 h-full',
         'flex items-start pt-6 pr-6 pl-4 gap-2',
-        'bg-[var(--color-border/primary-light)]',
       )}
     >
       {actions}

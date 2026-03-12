@@ -8,6 +8,9 @@ interface DropdownMenuInputProps
   ref?: Ref<HTMLInputElement>;
 }
 
+// Ring space: p-3/-m-3 creates room for the Input's focus-visible:ring-3
+// without being clipped by DropdownMenuContent's overflow.
+// Icon left-15 = Input's px-12 + wrapper's p-3 offset.
 export const DropdownMenuInput: FC<DropdownMenuInputProps> = ({
   className,
   ...props
