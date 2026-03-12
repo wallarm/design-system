@@ -2,6 +2,7 @@ import { type FC, useCallback } from 'react';
 import { ArrowLeft, ArrowRight } from '../../icons';
 import { cn } from '../../utils/cn';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
+import { tableHeaderButtonClass } from './classes';
 import { useTableContext } from './TableContext';
 
 interface TableScrollHandlerProps {
@@ -10,10 +11,7 @@ interface TableScrollHandlerProps {
 }
 
 const scrollButtonClass = cn(
-  'w-16 h-16 shrink-0 hover:text-text-primary',
-  'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary rounded-2',
-  'transition-colors cursor-pointer',
-  'inline-flex items-center justify-center bg-transparent border-0 p-0',
+  tableHeaderButtonClass,
   'disabled:cursor-not-allowed disabled:opacity-50',
 );
 
