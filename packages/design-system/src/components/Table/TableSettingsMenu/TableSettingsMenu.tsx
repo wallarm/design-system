@@ -23,10 +23,10 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuFooter,
+  DropdownMenuInput,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '../../DropdownMenu';
-import { Input } from '../../Input';
 import { Separator } from '../../Separator';
 import { VStack } from '../../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
@@ -167,47 +167,44 @@ export const TableSettingsMenu: FC = () => {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className={cn('min-w-256')}>
-                <VStack gap={8} align='stretch'>
-                  <Input
-                    placeholder='Search'
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                  />
-
-                  <VStack>
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
+                <DropdownMenuInput
+                  placeholder='Search'
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+                <VStack gap={1}>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={filteredColumns
+                        .filter(c => !alwaysPinnedLeft.includes(c.id))
+                        .map(c => c.id)}
+                      strategy={verticalListSortingStrategy}
                     >
-                      <SortableContext
-                        items={filteredColumns
-                          .filter(c => !alwaysPinnedLeft.includes(c.id))
-                          .map(c => c.id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
+                      {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
 
-                        {pinnedColumns.map(col => (
-                          <TableSettingsMenuItem
-                            key={col.id}
-                            column={col}
-                            canDrag={columnDndEnabled}
-                          />
-                        ))}
+                      {pinnedColumns.map(col => (
+                        <TableSettingsMenuItem
+                          key={col.id}
+                          column={col}
+                          canDrag={columnDndEnabled}
+                        />
+                      ))}
 
-                        {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
+                      {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
 
-                        {unpinnedColumns.map(col => (
-                          <TableSettingsMenuItem
-                            key={col.id}
-                            column={col}
-                            canDrag={columnDndEnabled}
-                          />
-                        ))}
-                      </SortableContext>
-                    </DndContext>
-                  </VStack>
+                      {unpinnedColumns.map(col => (
+                        <TableSettingsMenuItem
+                          key={col.id}
+                          column={col}
+                          canDrag={columnDndEnabled}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
                 </VStack>
                 <DropdownMenuFooter>
                   <Button
