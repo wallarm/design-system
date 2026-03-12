@@ -1,7 +1,46 @@
+import type { ReactNode } from 'react';
+import { createRef } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { QueryBarProvider } from '../QueryBarContext/QueryBarProvider';
+import type { QueryBarContextValue } from '../QueryBarContext/types';
 import { QueryBarChip, QueryBarConnectorChip } from '../QueryBarInput';
+
+const mockContextValue: QueryBarContextValue = {
+  chips: [],
+  buildingChipData: null,
+  buildingChipRef: createRef(),
+  inputText: '',
+  inputRef: createRef(),
+  placeholder: '',
+  error: false,
+  showKeyboardHint: false,
+  menuOpen: false,
+  insertIndex: 0,
+  insertAfterConnector: false,
+  onInputChange: vi.fn(),
+  onInputKeyDown: vi.fn(),
+  onInputClick: vi.fn(),
+  onGapClick: vi.fn(),
+  onChipClick: vi.fn(),
+  onConnectorChange: vi.fn(),
+  onChipRemove: vi.fn(),
+  onClear: vi.fn(),
+  editingChipId: null,
+  editingSegment: null,
+  segmentFilterText: '',
+  onSegmentFilterChange: vi.fn(),
+  onCancelSegmentEdit: vi.fn(),
+  onCustomValueCommit: vi.fn(),
+  onCustomAttributeCommit: vi.fn(),
+  menuRef: createRef(),
+  closeAutocompleteMenu: vi.fn(),
+};
+
+const QueryBarWrapper = ({ children }: { children: ReactNode }) => (
+  <QueryBarProvider value={mockContextValue}>{children}</QueryBarProvider>
+);
 
 describe('QueryBarChip', () => {
   it('renders chip with attribute, operator, and value', () => {
@@ -81,18 +120,23 @@ describe('QueryBarChip', () => {
 
 describe('QueryBarConnectorChip', () => {
   it('renders AND text', () => {
-    render(<QueryBarConnectorChip variant='and' chipId='c-1' onChange={vi.fn()} />);
+    render(<QueryBarConnectorChip variant='and' chipId='c-1' onChange={vi.fn()} />, {
+      wrapper: QueryBarWrapper,
+    });
     expect(screen.getByText('AND')).toBeInTheDocument();
   });
 
   it('renders OR text', () => {
-    render(<QueryBarConnectorChip variant='or' chipId='c-1' onChange={vi.fn()} />);
+    render(<QueryBarConnectorChip variant='or' chipId='c-1' onChange={vi.fn()} />, {
+      wrapper: QueryBarWrapper,
+    });
     expect(screen.getByText('OR')).toBeInTheDocument();
   });
 
   it('applies normal styling', () => {
     const { container } = render(
       <QueryBarConnectorChip variant='and' chipId='c-1' onChange={vi.fn()} />,
+      { wrapper: QueryBarWrapper },
     );
     const chip = container.querySelector('[data-slot="query-bar-connector-chip"]');
     expect(chip).toHaveClass('bg-badge-badge-bg', 'border-border-primary');
