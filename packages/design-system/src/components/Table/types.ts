@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import type { RowData } from '@tanstack/react-table';
+import type { Row, RowData } from '@tanstack/react-table';
 
 declare module '@tanstack/react-table' {
   // biome-ignore lint/correctness/noUnusedVariables: TanStack Table augmentation requires matching generic parameter name
