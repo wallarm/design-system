@@ -1,6 +1,7 @@
 import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
+import { ACTIONS_GAP, ACTIONS_PL, ACTIONS_PR, ACTION_BUTTON_SIZE } from '../classes';
 import {
   getAlignClass,
   getExpandBorderClass,
@@ -47,9 +48,13 @@ export const TableBodyCell = <T,>({
   const hasActions = hasRenderActions || hasRenderMenu;
 
   // Right padding to prevent content from hiding behind absolutely-positioned actions.
-  // Matches actions container: pl-4 + buttons(24 each) + gap-2 between them + pr-6
+  // Layout: ACTIONS_PL + buttons(ACTION_BUTTON_SIZE each) + ACTIONS_GAP between them + ACTIONS_PR
   const actionsPaddingRight = hasActions
-    ? 4 + (hasRenderActions ? 24 : 0) + (hasRenderActions && hasRenderMenu ? 2 : 0) + (hasRenderMenu ? 24 : 0) + 6
+    ? ACTIONS_PL
+    + (hasRenderActions ? ACTION_BUTTON_SIZE : 0)
+    + (hasRenderActions && hasRenderMenu ? ACTIONS_GAP : 0)
+    + (hasRenderMenu ? ACTION_BUTTON_SIZE : 0)
+    + ACTIONS_PR
     : undefined;
 
   return (
