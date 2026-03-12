@@ -2,7 +2,7 @@ import type { FieldMetadata, FieldValueOption } from '../types';
 
 /**
  * Get normalized value options for a field.
- * Merges `values` (full FieldValueOption[]) with `options` (string[] shorthand).
+ * `values` (full FieldValueOption[]) takes precedence over `options` (string[] shorthand).
  * `options` strings are converted to `{ value: s, label: s }`.
  */
 export const getFieldValues = (field: FieldMetadata): FieldValueOption[] => {

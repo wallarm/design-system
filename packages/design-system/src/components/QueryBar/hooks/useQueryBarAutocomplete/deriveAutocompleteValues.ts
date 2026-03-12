@@ -1,6 +1,7 @@
 import {
   chipIdToConditionIndex,
   getDateDisplayLabel,
+  getFieldValues,
   getOperatorLabel,
   isDatePreset,
   isMultiSelectOperator,
@@ -68,8 +69,11 @@ export const deriveAutocompleteValues = ({
       : condition.value != null
         ? [condition.value]
         : [];
-    if (condition.error && selectedField?.values) {
-      return values.filter(v => selectedField.values!.some(opt => opt.value === v));
+    if (condition.error && selectedField) {
+      const fieldValues = getFieldValues(selectedField);
+      if (fieldValues.length > 0) {
+        return values.filter(v => fieldValues.some(opt => opt.value === v));
+      }
     }
     return values;
   })();

@@ -33,6 +33,10 @@ export const queryBarInnerVariants = cva(
   },
 );
 
+/** Wrapper that visually groups the building chip and the input as one unit */
+export const buildingChipWrapperClass =
+  'flex items-center gap-2 min-w-0 rounded-8 border border-solid border-border-strong-primary bg-badge-badge-bg';
+
 /** Native input element inside the query bar */
 export const queryBarInputVariants = cva(
   'h-auto border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0',

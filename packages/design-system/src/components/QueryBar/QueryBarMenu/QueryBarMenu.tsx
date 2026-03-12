@@ -62,8 +62,11 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
 
   // Route filter text: use segment inline text when editing, otherwise main input
   const fieldFilterText = editingSegment === 'attribute' ? segmentFilterText : inputText;
-  // Operator is not inline-editable — always show all options
-  const operatorFilterText = '';
+  // Operator: filter by typed text when building a new chip (not inline editing)
+  const operatorFilterText = !editingSegment ? inputText : '';
+
+  const selectedFieldValues = selectedField ? getFieldValues(selectedField) : [];
+
   // For multi-select, filter by the text after the last comma —
   // but only if that token is NOT already a known selected value (otherwise show all).
   const valueFilterText = (() => {
@@ -72,9 +75,8 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
     const lastToken = segmentFilterText.split(',').pop()?.trim() ?? '';
     if (!lastToken) return '';
     // If the last token matches a field value label/value, it's a completed selection — don't filter
-    const fieldValues = selectedField ? getFieldValues(selectedField) : [];
-    if (fieldValues.length > 0) {
-      const isKnownValue = fieldValues.some(
+    if (selectedFieldValues.length > 0) {
+      const isKnownValue = selectedFieldValues.some(
         v =>
           v.label.toLowerCase() === lastToken.toLowerCase() ||
           String(v.value).toLowerCase() === lastToken.toLowerCase(),
@@ -133,9 +135,9 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
           />
         ) : (
           // Freeform fields (no predefined values) skip the dropdown — user types and presses Enter
-          getFieldValues(selectedField).length > 0 && (
+          selectedFieldValues.length > 0 && (
             <QueryBarValueMenu
-              values={getFieldValues(selectedField)}
+              values={selectedFieldValues}
               open={menuState === 'value'}
               onSelect={handleValueSelect}
               onCommit={handleMultiCommit}
