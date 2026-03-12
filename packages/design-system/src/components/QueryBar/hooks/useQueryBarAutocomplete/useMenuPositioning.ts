@@ -1,13 +1,12 @@
 import type { RefObject } from 'react';
 import { useCallback, useMemo, useRef } from 'react';
-import type { MenuState } from '../../types';
 
 interface UseMenuPositioningOptions {
   containerRef: RefObject<HTMLElement | null>;
   buildingChipRef: RefObject<HTMLElement | null>;
   inputRef?: RefObject<HTMLElement | null>;
   isBuilding: boolean;
-  menuState: MenuState;
+  insertIndex: number;
 }
 
 /**
@@ -22,7 +21,7 @@ export const useMenuPositioning = ({
   buildingChipRef,
   inputRef,
   isBuilding,
-  menuState,
+  insertIndex,
 }: UseMenuPositioningOptions) => {
   // Explicit offset set by chip editing (absolute left relative to container)
   const editingOffsetRef = useRef<number | null>(null);
@@ -43,31 +42,46 @@ export const useMenuPositioning = ({
         const containerRect = containerRef.current?.getBoundingClientRect();
         if (!containerRect) return null;
 
-        // Determine horizontal offset: editing > building chip > input > 0
-        let offset = 0;
+        // Determine anchor element rect: editing > building chip > input > container
+        let anchorLeft = containerRect.left;
+        let anchorTop = containerRect.top;
+        let anchorBottom = containerRect.bottom;
+        let anchorHeight = containerRect.height;
+
         if (editingOffsetRef.current !== null) {
-          offset = editingOffsetRef.current;
+          anchorLeft = containerRect.left + editingOffsetRef.current;
         } else if (isBuilding) {
           const chipRect = buildingChipRef.current?.getBoundingClientRect();
-          if (chipRect) offset = chipRect.left - containerRect.left;
-        } else if (menuState === 'field' && inputRef?.current) {
+          if (chipRect) {
+            anchorLeft = chipRect.left;
+            anchorTop = chipRect.top;
+            anchorBottom = chipRect.bottom;
+            anchorHeight = chipRect.height;
+          }
+        } else if (inputRef?.current) {
           const inputRect = inputRef.current.getBoundingClientRect();
-          offset = inputRect.left - containerRect.left;
+          anchorLeft = inputRect.left;
+          anchorTop = inputRect.top;
+          anchorBottom = inputRect.bottom;
+          anchorHeight = inputRect.height;
         }
 
+        // DOMRect-compatible shape required by Ark UI / zag.js positioning
         return {
-          x: containerRect.left + offset,
-          y: containerRect.y,
-          width: containerRect.width - offset,
-          height: containerRect.height,
-          top: containerRect.top,
-          bottom: containerRect.bottom,
-          left: containerRect.left + offset,
+          x: anchorLeft,
+          y: anchorTop,
+          width: containerRect.right - anchorLeft,
+          height: anchorHeight,
+          top: anchorTop,
+          bottom: anchorBottom,
+          left: anchorLeft,
           right: containerRect.right,
         };
       },
     }),
-    [containerRef, buildingChipRef, inputRef, isBuilding, menuState],
+    // insertIndex forces recalculation when input moves between chips
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [containerRef, buildingChipRef, inputRef, isBuilding, insertIndex],
   );
 
   return { menuPositioning, setMenuOffset, resetMenuOffset };

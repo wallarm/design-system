@@ -5,7 +5,11 @@ import { inputVariants } from '../../Input/classes';
 import { findChipSplitIndex, isMenuRelated } from '../lib';
 import { useQueryBarContext } from '../QueryBarContext';
 import { ChipsWithGaps, TrailingGap } from './ChipsWithGaps';
-import { queryBarContainerVariants, queryBarInnerVariants } from './classes';
+import {
+  buildingChipWrapperClass,
+  queryBarContainerVariants,
+  queryBarInnerVariants,
+} from './classes';
 import { EditingProvider } from './QueryBarChip/EditingContext';
 import { QueryBarChip } from './QueryBarChip/QueryBarChip';
 import { QueryBarFilterInput } from './QueryBarFilterInput';
@@ -122,18 +126,23 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
         >
           <ChipsWithGaps chips={chipsBefore} hideTrailingGap={hideTrailingGap} {...chipsGapProps} />
 
-          {buildingChipData && (
-            <div ref={buildingChipRef} className={cn('min-w-0', hasContent && 'ml-8')}>
+          {buildingChipData ? (
+            <div
+              ref={buildingChipRef}
+              className={cn(buildingChipWrapperClass, hasContent && 'ml-8')}
+            >
               <QueryBarChip
                 building
                 attribute={buildingChipData.attribute ?? ''}
                 operator={buildingChipData.operator}
                 value={buildingChipData.value}
+                className='border-none'
               />
+              <QueryBarFilterInput hasContent />
             </div>
+          ) : (
+            <QueryBarFilterInput hasContent={hasContent} />
           )}
-
-          <QueryBarFilterInput hasContent={hasContent} />
 
           <ChipsWithGaps chips={chipsAfter} hideLeadingGap={hideLeadingGap} {...chipsGapProps} />
 

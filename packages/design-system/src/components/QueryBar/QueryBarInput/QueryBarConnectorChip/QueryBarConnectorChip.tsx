@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, useCallback, useState } from 'react';
 import { CirclePlus } from '../../../../icons/CirclePlus';
 import { CircleSlash } from '../../../../icons/CircleSlash';
 import { cn } from '../../../../utils/cn';
@@ -13,6 +13,7 @@ import {
 import { DropdownMenuTrigger } from '../../../DropdownMenu/DropdownMenuTrigger';
 import { Kbd, KbdGroup } from '../../../Kbd';
 import { VARIANT_LABELS } from '../../lib/constants';
+import { useQueryBarContext } from '../../QueryBarContext';
 import { chipVariants, segmentContainer } from '../QueryBarChip/classes';
 import { connectorTextVariants } from './classes';
 
@@ -31,10 +32,25 @@ export const QueryBarConnectorChip: FC<QueryBarConnectorChipProps> = ({
   onChange,
   className,
 }) => {
+  const { menuOpen, closeAutocompleteMenu } = useQueryBarContext();
+  const [open, setOpen] = useState(false);
+
+  const handleOpenChange = useCallback(
+    (nextOpen: boolean) => {
+      if (nextOpen) closeAutocompleteMenu();
+      setOpen(nextOpen);
+    },
+    [closeAutocompleteMenu],
+  );
+
   const label = VARIANT_LABELS[variant];
 
   return (
-    <DropdownMenu positioning={{ placement: 'bottom', gutter: 4 }}>
+    <DropdownMenu
+      positioning={{ placement: 'bottom', gutter: 4 }}
+      open={open && !menuOpen}
+      onOpenChange={handleOpenChange}
+    >
       <DropdownMenuTrigger asChild>
         <button
           type='button'
