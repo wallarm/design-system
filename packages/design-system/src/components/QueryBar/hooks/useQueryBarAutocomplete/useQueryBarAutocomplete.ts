@@ -1,6 +1,7 @@
-import type { ChangeEvent, FocusEvent, KeyboardEvent, RefObject } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { chipIdToConditionIndex, hasFieldValues, isMenuRelated } from '../../lib';
+import type { RefObject } from 'react';
+import { useCallback, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
+import { chipIdToConditionIndex } from '../../lib';
 import { useDateRange } from '../../QueryBarMenu/QueryBarDateValueMenu/hooks';
 import type {
   Condition,
@@ -11,6 +12,8 @@ import type {
 } from '../../types';
 import { deriveAutocompleteValues } from './deriveAutocompleteValues';
 import { useChipEditing } from './useChipEditing';
+import { useFocusManagement } from './useFocusManagement';
+import { useInputHandlers } from './useInputHandlers';
 import { useMenuFlow } from './useMenuFlow';
 import { useMenuPositioning } from './useMenuPositioning';
 
@@ -74,7 +77,7 @@ export const useQueryBarAutocomplete = ({
     buildingChipRef,
     inputRef,
     isBuilding: selectedField !== null,
-    menuState,
+    insertIndex: effectiveInsertIndex,
   });
 
   const editing = useChipEditing({
@@ -92,19 +95,32 @@ export const useQueryBarAutocomplete = ({
 
   // ── State reset ───────────────────────────────────────────
 
-  const resetState = useCallback(() => {
-    setInputText('');
-    setSelectedField(null);
-    setSelectedOperator(null);
-    editing.clearEditing();
-    dateRange.reset();
-    setBuildingMultiValue(undefined);
-    setInsertIndex(null);
-    setInsertAfterConnector(false);
-    resetMenuOffset();
-    setMenuState('closed');
-    inputRef.current?.focus();
-  }, [editing, inputRef, resetMenuOffset]);
+  const resetState = useCallback(
+    (continueBuilding = false) => {
+      const doReset = () => {
+        setInputText('');
+        setSelectedField(null);
+        setSelectedOperator(null);
+        editing.clearEditing();
+        dateRange.reset();
+        setBuildingMultiValue(undefined);
+        setInsertIndex(null);
+        setInsertAfterConnector(false);
+        resetMenuOffset();
+        setMenuState('closed');
+      };
+
+      if (continueBuilding) {
+        // flushSync commits DOM update (input moves to new position) before reopening the menu
+        flushSync(doReset);
+        setMenuState('field');
+      } else {
+        doReset();
+      }
+      inputRef.current?.focus();
+    },
+    [editing, inputRef, resetMenuOffset],
+  );
 
   // ── Menu flow handlers ────────────────────────────────────
 
@@ -136,90 +152,42 @@ export const useQueryBarAutocomplete = ({
     setBuildingMultiValue,
   });
 
-  // ── Input events ──────────────────────────────────────────
+  // ── Input handlers ──────────────────────────────────────────
 
-  const handleInputChange = useCallback(
-    (e: ChangeEvent<HTMLInputElement>) => {
-      const text = e.target.value;
-      setInputText(text);
-
-      if (text && !selectedField) {
-        setMenuState('field');
-      } else if (!text && !selectedField) {
-        setMenuState(isFocused && conditionsLengthRef.current === 0 ? 'field' : 'closed');
-      }
-    },
-    [selectedField, isFocused],
-  );
-
-  const handleInputClick = useCallback(() => {
-    inputRef.current?.focus();
-    if (menuState === 'closed' && !selectedField) {
-      resetMenuOffset();
-      setMenuState('field');
-    }
-  }, [menuState, selectedField, resetMenuOffset, inputRef]);
-
-  const menuRef = useRef<HTMLDivElement>(null);
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowDown' && menuState !== 'closed') {
-        e.preventDefault();
-        menuRef.current?.focus();
-        return;
-      }
-      // Enter or Space commits freeform value when no predefined values exist
-      if (
-        (e.key === 'Enter' || e.key === ' ') &&
-        menuState === 'value' &&
-        selectedField &&
-        !hasFieldValues(selectedField) &&
-        inputText.trim()
-      ) {
-        e.preventDefault();
-        handleCustomValueCommit(inputText);
-        return;
-      }
-      if (
-        e.key === 'Backspace' &&
-        !e.repeat &&
-        inputText === '' &&
-        conditionsLengthRef.current > 0
-      ) {
-        e.preventDefault();
-        const removeIdx = effectiveInsertIndexRef.current - 1;
-        if (removeIdx >= 0) {
-          removeConditionAtIndex(removeIdx);
-          setInsertIndex(prev => {
-            const eff = prev ?? conditionsLengthRef.current;
-            return eff > 0 ? eff - 1 : 0;
-          });
-        }
-        setMenuState('closed');
-      }
-    },
-    [inputText, removeConditionAtIndex, menuState, selectedField, handleCustomValueCommit],
-  );
+  const { handleInputChange, handleInputClick, handleKeyDown, menuRef } = useInputHandlers({
+    inputText,
+    menuState,
+    selectedField,
+    isFocused,
+    fields,
+    inputRef,
+    conditionsLengthRef,
+    effectiveInsertIndexRef,
+    setInputText,
+    setMenuState,
+    setInsertIndex,
+    resetMenuOffset,
+    removeConditionAtIndex,
+    handleFieldSelect,
+    handleOperatorSelect,
+    handleCustomValueCommit,
+  });
 
   // ── Focus ─────────────────────────────────────────────────
 
-  const handleFocus = useCallback((e: FocusEvent) => {
-    // Ignore focus from connector chip — its DropdownMenu manages its own focus
-    if ((e.target as HTMLElement)?.closest?.('[data-slot="query-bar-connector-chip"]')) return;
-    setIsFocused(true);
-  }, []);
-
-  const handleBlur = useCallback(
-    (e: FocusEvent) => {
-      const related = e.relatedTarget as HTMLElement | null;
-      if (containerRef.current?.contains(related)) return;
-      if (isMenuRelated(related)) return;
-      setIsFocused(false);
-      resetState();
-    },
-    [containerRef, resetState],
-  );
+  const { handleFocus, handleBlur } = useFocusManagement({
+    menuState,
+    isFocused,
+    conditionsLength: conditions.length,
+    inputText,
+    containerRef,
+    inputRef,
+    editingSegment: editing.editingSegment,
+    setIsFocused,
+    setMenuState,
+    resetMenuOffset,
+    resetState,
+  });
 
   // ── Chip management ───────────────────────────────────────
 
@@ -246,61 +214,23 @@ export const useQueryBarAutocomplete = ({
 
   const handleGapClick = useCallback(
     (conditionIndex: number, afterConnector: boolean) => {
-      setInsertIndex(conditionIndex);
-      setInsertAfterConnector(afterConnector);
-      resetMenuOffset();
+      // flushSync forces DOM update before reopening so getAnchorRect reads the new input position
+      flushSync(() => {
+        setInsertIndex(conditionIndex);
+        setInsertAfterConnector(afterConnector);
+        resetMenuOffset();
+        setMenuState('closed');
+      });
       setMenuState('field');
       inputRef.current?.focus();
     },
     [resetMenuOffset, inputRef],
   );
 
-  // ── Auto-open field menu on initial focus when empty ──────
-
-  const prevFocusedRef = useRef(false);
-  useEffect(() => {
-    if (isFocused && !prevFocusedRef.current && conditions.length === 0 && inputText === '') {
-      resetMenuOffset();
-      setMenuState('field');
-    }
-    prevFocusedRef.current = isFocused;
-  }, [isFocused, conditions.length, inputText, resetMenuOffset]);
-
-  // ── Prevent Ark UI focus steal on menu open ──────────────
-  // Ark UI Menu (zag.js) steals focus via single rAF when a menu mounts.
-  // Double rAF beats this by executing after zag's focus redirect.
-  // ⚠️ Fragile: if Ark UI changes its focus timing, this workaround may break.
-  // After redirect, ArrowDown can freely move focus to the menu.
-
-  useEffect(() => {
-    if (menuState === 'closed') return;
-
-    let outerRaf = 0;
-    let innerRaf = 0;
-    outerRaf = requestAnimationFrame(() => {
-      innerRaf = requestAnimationFrame(() => {
-        if (editing.editingSegment) {
-          // Redirect focus to the segment input, beating Ark UI's focus steal
-          const segmentInput = containerRef.current?.querySelector<HTMLInputElement>(
-            `[data-slot="segment-${editing.editingSegment}"] input`,
-          );
-          if (segmentInput && document.activeElement !== segmentInput) {
-            segmentInput.focus();
-            segmentInput.select();
-          } else if (!segmentInput && document.activeElement !== inputRef.current) {
-            // Segment has no inline input (e.g., operator) — focus main input
-            inputRef.current?.focus();
-          }
-        } else if (document.activeElement !== inputRef.current) {
-          inputRef.current?.focus();
-        }
-      });
-    });
-    return () => {
-      cancelAnimationFrame(outerRaf);
-      cancelAnimationFrame(innerRaf);
-    };
-  }, [menuState, inputRef, editing.editingSegment, containerRef]);
+  // ── Close menu (for external consumers like connector chip) ──
+  const closeAutocompleteMenu = useCallback(() => {
+    setMenuState('closed');
+  }, []);
 
   // ── Derived values ────────────────────────────────────────
 
@@ -363,5 +293,6 @@ export const useQueryBarAutocomplete = ({
     handleCustomValueCommit,
     handleCustomAttributeCommit,
     menuRef,
+    closeAutocompleteMenu,
   };
 };

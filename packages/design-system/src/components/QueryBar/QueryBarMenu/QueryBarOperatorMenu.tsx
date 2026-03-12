@@ -92,16 +92,24 @@ export const QueryBarOperatorMenu: FC<QueryBarOperatorMenuProps> = ({
   menuRef,
   className,
 }) => {
-  const allGroups = OPERATORS_BY_TYPE[fieldType] || [];
-  const operatorGroups = operators ? filterOperatorGroups(allGroups, operators) : allGroups;
   const query = filterText.toLowerCase();
+
+  const operatorGroups = useMemo(() => {
+    const allGroups = OPERATORS_BY_TYPE[fieldType] || [];
+    return operators ? filterOperatorGroups(allGroups, operators) : allGroups;
+  }, [fieldType, operators]);
 
   const filteredGroups = useMemo(
     () =>
       query
         ? operatorGroups
             .map(group =>
-              group.filter(op => getOperatorLabel(op, fieldType).toLowerCase().includes(query)),
+              group.filter(
+                op =>
+                  getOperatorLabel(op, fieldType).toLowerCase().includes(query) ||
+                  OPERATOR_SYMBOLS[op].toLowerCase().includes(query) ||
+                  op.toLowerCase().includes(query),
+              ),
             )
             .filter(group => group.length > 0)
         : operatorGroups,

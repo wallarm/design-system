@@ -42,4 +42,6 @@ export interface QueryBarContextValue {
   onCustomAttributeCommit: (customText: string) => void;
   /** Ref to the currently open menu content element */
   menuRef: RefObject<HTMLDivElement | null>;
+  /** Close autocomplete menu (used by connector chip to enforce single-dropdown constraint) */
+  closeAutocompleteMenu: () => void;
 }

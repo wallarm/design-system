@@ -27,6 +27,7 @@ interface AutocompleteForContext {
   handleCustomValueCommit: (customText: string) => void;
   handleCustomAttributeCommit: (customText: string) => void;
   menuRef: RefObject<HTMLDivElement | null>;
+  closeAutocompleteMenu: () => void;
 }
 
 interface UseQueryBarContextValueOptions {
@@ -77,6 +78,7 @@ export const useQueryBarContextValue = ({
       onCustomValueCommit: autocomplete.handleCustomValueCommit,
       onCustomAttributeCommit: autocomplete.handleCustomAttributeCommit,
       menuRef: autocomplete.menuRef,
+      closeAutocompleteMenu: autocomplete.closeAutocompleteMenu,
     }),
     [
       chips,
@@ -101,6 +103,7 @@ export const useQueryBarContextValue = ({
       autocomplete.handleCustomValueCommit,
       autocomplete.handleCustomAttributeCommit,
       autocomplete.menuRef,
+      autocomplete.closeAutocompleteMenu,
       buildingChipRef,
       inputRef,
       placeholder,
