@@ -2,11 +2,7 @@ import { type ReactNode, useState } from 'react';
 import type { Row } from '@tanstack/react-table';
 import { Ellipsis } from '../../icons';
 import { cn } from '../../utils/cn';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuTrigger,
-} from '../DropdownMenu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../DropdownMenu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
 interface TableMasterCellActionsProps<T> {
@@ -28,12 +24,7 @@ export const TableMasterCellActions = <T,>({
   if (!actions && !menuContent) return null;
 
   return (
-    <div
-      className={cn(
-        'absolute top-0 right-0 h-full',
-        'flex items-start pt-6 pr-6 pl-4 gap-2',
-      )}
-    >
+    <div className={cn('absolute top-0 right-0 h-full', 'flex items-start pt-6 pr-6 pl-4 gap-2')}>
       {actions}
       {menuContent && (
         <Tooltip disabled={menuOpen}>
