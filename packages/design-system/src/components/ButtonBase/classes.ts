@@ -3,7 +3,7 @@ import { cn } from '../../utils/cn';
 
 export const buttonBaseVariants = cva(
   cn(
-    'items-center justify-center min-w-0 rounded-8',
+    'items-center justify-center min-w-0',
     'text-sm font-medium font-sans',
     'cursor-pointer overflow-hidden transition-[color,border,box-shadow,opacity]',
     'focus-visible:outline-none focus-visible:ring-3',
@@ -14,9 +14,9 @@ export const buttonBaseVariants = cva(
   {
     variants: {
       size: {
-        small: 'h-24 px-8 py-2 gap-4',
-        medium: 'h-32 px-12 py-6 gap-6',
-        large: 'h-36 px-16 py-8 gap-8',
+        small: 'h-24 px-8 py-2 gap-4 rounded-8',
+        medium: 'h-32 px-12 py-6 gap-6 rounded-8',
+        large: 'h-36 px-16 py-8 gap-8 rounded-8',
       },
       iconOnly: {
         true: '',

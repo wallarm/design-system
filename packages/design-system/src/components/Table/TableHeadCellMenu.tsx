@@ -10,7 +10,7 @@ import {
   Pin,
   PinOff,
 } from '../../icons';
-import { Button } from '../Button';
+import { cn } from '../../utils/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -96,9 +96,18 @@ export const TableHeadCellMenu = <T,>({ column }: TableColumnHeaderMenuProps<T>)
         <span className='inline-flex'>
           <DropdownMenu onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <Button variant='ghost' color='neutral' size='small' aria-label='More'>
-                <Ellipsis />
-              </Button>
+              <button
+                type='button'
+                className={cn(
+                  'w-16 h-16 shrink-0 hover:text-text-primary',
+                  'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary rounded-2',
+                  'transition-colors cursor-pointer',
+                  'inline-flex items-center justify-center bg-transparent border-0 p-0',
+                )}
+                aria-label='More'
+              >
+                <Ellipsis size='sm' />
+              </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               {/* Move left / Move right */}

@@ -24,6 +24,10 @@ declare module '@tanstack/react-table' {
     description?: { type: 'text' | 'tooltip'; content: string };
     /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
     resizeType?: 'cut' | 'resize';
+    /** Render custom action buttons (e.g. Preview) shown on hover in body cells */
+    renderActions?: (row: Row<TData>) => ReactNode;
+    /** Render dropdown menu content for the built-in ellipsis button shown on hover in body cells */
+    renderMenuForMoreAction?: (row: Row<TData>) => ReactNode;
   }
 }
 
@@ -80,7 +84,7 @@ export interface TableCellContext<T, V> {
 }
 
 /** Column meta — mirrors the ColumnMeta augmentation */
-export interface TableColumnMeta {
+export interface TableColumnMeta<T = unknown> {
   headerClassName?: string;
   cellClassName?: string;
   sortType?:
@@ -99,6 +103,10 @@ export interface TableColumnMeta {
   description?: { type: 'text' | 'tooltip'; content: string };
   /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
   resizeType?: 'cut' | 'resize';
+  /** Render custom action buttons (e.g. Preview) shown on hover in body cells */
+  renderActions?: (row: TableRow<T>) => ReactNode;
+  /** Render dropdown menu content for the built-in ellipsis button shown on hover in body cells */
+  renderMenuForMoreAction?: (row: TableRow<T>) => ReactNode;
 }
 
 /** Shared column properties */
@@ -112,7 +120,7 @@ export interface TableColumnBase<T, V> {
   enableResizing?: boolean;
   enableColumnPinning?: boolean;
   enableHiding?: boolean;
-  meta?: TableColumnMeta;
+  meta?: TableColumnMeta<T>;
 }
 
 /** Accessor column — maps to a data property */

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Copy, Filter, FilterX, Trash2 } from '../../icons';
+import { Copy, Filter, FilterX, PanelRight, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { InlineCodeSnippet } from '../CodeSnippet';
@@ -16,6 +16,7 @@ import {
   DropdownMenuSeparator,
 } from '../DropdownMenu';
 import { HStack, VStack } from '../Stack';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { Text } from '../Text';
 import {
   createLargeGroupedData,
@@ -25,6 +26,7 @@ import {
   headerColumnIds,
   headerColumns,
   METHOD_COLORS,
+  type SecurityEvent,
   type SecurityHeaderEntry,
   securityColumnHelper,
   securityColumnIds,
@@ -534,6 +536,85 @@ export const HeaderColumnDescription: StoryFn<typeof meta> = () => {
       getRowId={row => row.id}
       sorting={sorting}
       onSortingChange={setSorting}
+    />
+  );
+};
+
+export const MasterCellWithActions: StoryFn<typeof meta> = () => {
+  const [sorting, setSorting] = useState<TableSortingState>([]);
+  const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+
+  const columns = useMemo<TableColumnDef<SecurityEvent>[]>(
+    () =>
+      securityColumns.map((col, i) =>
+        i === 0
+          ? {
+            ...col,
+            meta: {
+              ...col.meta,
+              size: 400,
+              resizeType: 'resize',
+              renderActions: (row: { original: SecurityEvent }) => (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button
+                      type='button'
+                      className='h-24 w-24 shrink-0 hover:bg-states-primary-hover rounded-8 transition-colors cursor-pointer inline-flex items-center justify-center bg-transparent border-0 p-0'
+                      onClick={() => alert(`Preview: ${row.original.objectName}`)}
+                      aria-label='Preview'
+                    >
+                      <PanelRight size='sm' />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent>Preview</TooltipContent>
+                </Tooltip>
+              ),
+              renderMenuForMoreAction: (row: { original: SecurityEvent }) => (
+                <>
+                  <DropdownMenuItem
+                    onSelect={() => navigator.clipboard.writeText(row.original.objectName)}
+                  >
+                    <DropdownMenuItemIcon>
+                      <Copy />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Copy name</DropdownMenuItemText>
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    onSelect={() => alert(`Filter: ${row.original.objectName}`)}
+                  >
+                    <DropdownMenuItemIcon>
+                      <Filter />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Show only</DropdownMenuItemText>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onSelect={() => alert(`Exclude: ${row.original.objectName}`)}
+                  >
+                    <DropdownMenuItemIcon>
+                      <FilterX />
+                    </DropdownMenuItemIcon>
+                    <DropdownMenuItemText>Exclude</DropdownMenuItemText>
+                  </DropdownMenuItem>
+                </>
+              ),
+            },
+          }
+          : col,
+      ),
+    [],
+  );
+
+  return (
+    <Table
+      className='max-w-800'
+      data={securityEvents}
+      columns={columns}
+      getRowId={row => row.id}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      columnSizing={columnSizing}
+      onColumnSizingChange={setColumnSizing}
     />
   );
 };

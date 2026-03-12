@@ -90,14 +90,13 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
       ref={canDnd ? setNodeRef : undefined}
       data-testid={testId}
       className={cn(
-        'group',
+        'group align-top',
         alignClass,
         isRightAligned && 'pl-4 pr-16',
         isLastColumn && hasSettingsMenu && 'pr-[44px]',
-        isTextDescription && 'py-8',
         meta?.headerClassName,
       )}
-      interactive={canSort}
+      interactive={canSort || hasMenu}
       sorted={!!sortDirection}
       pinned={isPinned === 'left'}
       lastPinnedLeft={lastLeft}
@@ -122,7 +121,7 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
 
       {!header.isPlaceholder && !isNotBasicColumn && (
         <HStack
-          align={isTextDescription ? 'start' : 'center'}
+          align='start'
           justify={isRightAligned ? (hasMenu ? 'between' : 'end') : undefined}
         >
           {isRightAligned && hasMenu && (
@@ -131,7 +130,7 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
             </span>
           )}
 
-          <VStack align={isRightAligned ? 'end' : undefined}>
+          <VStack gap={0} align={isRightAligned ? 'end' : undefined}>
             <HStack gap={2}>
               {isRightAligned && canSort && <TableSortHandler header={header} />}
 
