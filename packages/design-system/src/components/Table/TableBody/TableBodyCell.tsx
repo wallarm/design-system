@@ -50,11 +50,11 @@ export const TableBodyCell = <T,>({
   // Right padding to prevent content from hiding behind absolutely-positioned actions.
   // Layout: ACTIONS_PL + buttons(ACTION_BUTTON_SIZE each) + ACTIONS_GAP between them + ACTIONS_PR
   const actionsPaddingRight = hasActions
-    ? ACTIONS_PL
-    + (hasRenderActions ? ACTION_BUTTON_SIZE : 0)
-    + (hasRenderActions && hasRenderMenu ? ACTIONS_GAP : 0)
-    + (hasRenderMenu ? ACTION_BUTTON_SIZE : 0)
-    + ACTIONS_PR
+    ? ACTIONS_PL +
+    (hasRenderActions ? ACTION_BUTTON_SIZE : 0) +
+    (hasRenderActions && hasRenderMenu ? ACTIONS_GAP : 0) +
+    (hasRenderMenu ? ACTION_BUTTON_SIZE : 0) +
+    ACTIONS_PR
     : undefined;
 
   return (

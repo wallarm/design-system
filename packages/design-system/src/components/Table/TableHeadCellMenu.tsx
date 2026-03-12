@@ -96,11 +96,7 @@ export const TableHeadCellMenu = <T,>({ column }: TableColumnHeaderMenuProps<T>)
         <span className='inline-flex'>
           <DropdownMenu onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <button
-                type='button'
-                className={tableHeaderButtonClass}
-                aria-label='More'
-              >
+              <button type='button' className={tableHeaderButtonClass} aria-label='More'>
                 <Ellipsis size='sm' />
               </button>
             </DropdownMenuTrigger>
