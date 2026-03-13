@@ -28,10 +28,22 @@ export const segmentContainer = 'flex flex-col justify-center overflow-hidden p-
 export const segmentTextVariants = cva('truncate text-sm', {
   variants: {
     variant: {
-      attribute: 'font-normal text-text-primary',
-      operator: 'font-normal text-text-secondary',
-      value: 'font-medium text-text-info',
+      attribute: 'font-normal',
+      operator: 'font-normal',
+      value: 'font-medium',
     },
+    error: {
+      true: 'text-text-danger',
+      false: '',
+    },
+  },
+  compoundVariants: [
+    { variant: 'attribute', error: false, className: 'text-text-primary' },
+    { variant: 'operator', error: false, className: 'text-text-secondary' },
+    { variant: 'value', error: false, className: 'text-text-info' },
+  ],
+  defaultVariants: {
+    error: false,
   },
 });
 

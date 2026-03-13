@@ -1,4 +1,4 @@
-import { type FC, useCallback, useRef, useState } from 'react';
+import { type FC, useCallback, useEffect, useRef, useState } from 'react';
 import { CirclePlus } from '../../../../icons/CirclePlus';
 import { CircleSlash } from '../../../../icons/CircleSlash';
 import { cn } from '../../../../utils/cn';
@@ -44,6 +44,12 @@ export const QueryBarConnectorChip: FC<QueryBarConnectorChipProps> = ({
     },
     [closeAutocompleteMenu],
   );
+
+  // Reset local open state when autocomplete menu opens to prevent flash
+  // during flushSync transitions (close → field) where menuOpen briefly goes false
+  useEffect(() => {
+    if (menuOpen) setOpen(false);
+  }, [menuOpen]);
 
   const positioning = useQueryBarPositioning({ anchorRef: triggerRef });
 

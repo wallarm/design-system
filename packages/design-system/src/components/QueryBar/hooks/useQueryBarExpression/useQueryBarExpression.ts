@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { chipIdToConditionIndex } from '../../lib';
-import type { Condition, ExprNode, FieldMetadata, FilterOperator } from '../../types';
+import type {
+  ChipErrorSegment,
+  Condition,
+  ExprNode,
+  FieldMetadata,
+  FilterOperator,
+} from '../../types';
 import { buildChips } from './buildChips';
 import { buildExpression, expressionToConditions } from './expression';
 
@@ -46,7 +52,7 @@ export const useQueryBarExpression = ({
       val: string | number | boolean | null | Array<string | number | boolean>,
       editingChipId?: string | null,
       atIndex?: number,
-      error?: boolean,
+      error?: ChipErrorSegment,
       dateOrigin?: 'relative' | 'absolute',
     ) => {
       const condition: Condition = {

@@ -1,11 +1,13 @@
 import type { FC, HTMLAttributes, MouseEvent as ReactMouseEvent } from 'react';
 import { useCallback, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
+import type { ChipErrorSegment } from '../../types';
 import { chipVariants } from './classes';
 import { useEditingContext } from './EditingContext';
 import { OperatorSegment } from './OperatorSegment';
 import { QueryBarRemoveButton } from './QueryBarRemoveButton';
 import { Segment } from './Segment';
+import { ValueSegment } from './ValueSegment';
 
 export type ChipSegment = 'attribute' | 'operator' | 'value';
 
@@ -14,7 +16,10 @@ export interface QueryBarChipProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   attribute: string;
   operator?: string;
   value?: string;
-  error?: boolean;
+  error?: ChipErrorSegment;
+  valueParts?: string[];
+  valueSeparator?: string;
+  errorValueIndices?: number[];
   building?: boolean;
   onRemove?: () => void;
   onSegmentClick?: (segment: ChipSegment, anchorRect: DOMRect) => void;
@@ -26,6 +31,9 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
   operator,
   value,
   error = false,
+  valueParts,
+  valueSeparator,
+  errorValueIndices,
   building = false,
   onRemove,
   onSegmentClick,
@@ -33,6 +41,7 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
   ...props
 }) => {
   const interactive = !building;
+  const hasError = !!error;
   const chipRef = useRef<HTMLDivElement>(null);
 
   const editing = useEditingContext();
@@ -67,13 +76,14 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
   return (
     <div
       ref={chipRef}
-      className={cn(chipVariants({ error, interactive }), 'max-w-[600px]', className)}
+      className={cn(chipVariants({ error: hasError, interactive }), 'max-w-[600px]', className)}
       data-slot='query-bar-condition-chip'
       {...props}
     >
       <Segment
         variant='attribute'
         className='shrink-0'
+        error={error === true || error === 'attribute'}
         onClick={interactive ? e => handleSegmentClick('attribute', e) : undefined}
         {...segmentEditProps('attribute')}
       >
@@ -88,17 +98,20 @@ export const QueryBarChip: FC<QueryBarChipProps> = ({
         </OperatorSegment>
       )}
       {value && (
-        <Segment
-          variant='value'
+        <ValueSegment
           className='min-w-0 max-w-[400px]'
+          error={activeSegment !== 'value' && (error === true || error === 'value')}
+          valueParts={valueParts}
+          valueSeparator={valueSeparator}
+          errorValueIndices={errorValueIndices}
           onClick={interactive ? e => handleSegmentClick('value', e) : undefined}
           {...segmentEditProps('value')}
         >
           {value}
-        </Segment>
+        </ValueSegment>
       )}
 
-      {onRemove && <QueryBarRemoveButton error={error} onRemove={onRemove} />}
+      {onRemove && <QueryBarRemoveButton error={hasError} onRemove={onRemove} />}
     </div>
   );
 };
