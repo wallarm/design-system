@@ -37,6 +37,7 @@ export const Segment: FC<SegmentProps> = ({
 
   // Measure text width when content changes (only while not editing).
   // Uses getBoundingClientRect for sub-pixel precision to avoid layout shift.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: children triggers re-measurement when chip text changes
   useEffect(() => {
     if (editing || !textRef.current) return;
     lastTextWidthRef.current = textRef.current.getBoundingClientRect().width;
@@ -62,6 +63,7 @@ export const Segment: FC<SegmentProps> = ({
   }, [editing]);
 
   // Dynamically measure input width from hidden sizer span
+  // biome-ignore lint/correctness/useExhaustiveDependencies: editText triggers sizer re-measurement
   useEffect(() => {
     if (!editing) {
       setInputWidth(undefined);

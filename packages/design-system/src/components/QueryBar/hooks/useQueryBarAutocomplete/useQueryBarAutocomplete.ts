@@ -122,7 +122,7 @@ export const useQueryBarAutocomplete = ({
       }
       inputRef.current?.focus();
     },
-    [editing, inputRef, resetMenuOffset],
+    [editing, dateRange, inputRef, resetMenuOffset],
   );
 
   // ── Menu flow handlers ────────────────────────────────────

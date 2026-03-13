@@ -109,7 +109,7 @@ export const useQueryBarExpression = ({
             const missing = newConditions.length - 1 - prev.connectors.length;
             newConnectors =
               missing > 0
-                ? [...prev.connectors, ...Array<'and'>(missing).fill('and')]
+                ? [...prev.connectors, ...new Array<'and'>(missing).fill('and')]
                 : prev.connectors;
           }
         }

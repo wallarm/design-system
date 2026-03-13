@@ -58,11 +58,11 @@ export const useValueMenuState = ({
   // Sync checked values when initialValues change while menu is already open
   // (e.g., user edits segment text to remove a value — dropdown should uncheck it)
   const serializedInitial = initialValues.map(String).sort().join('\0');
+  // biome-ignore lint/correctness/useExhaustiveDependencies: uses serializedInitial as a stable proxy for initialValues array identity
   useEffect(() => {
     if (open && prevOpenRef.current) {
       setCheckedValues(initialValues);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [serializedInitial]);
 
   const toggleValue = (val: ConditionValue) => {
@@ -81,6 +81,7 @@ export const useValueMenuState = ({
   };
 
   // Register blur commit function so the blur handler can commit before resetting state
+  // biome-ignore lint/correctness/useExhaustiveDependencies: commitChecked reads from refs, no need to re-register on every render
   useEffect(() => {
     if (!blurCommitRef) return;
     if (open && multiSelect) {
@@ -91,7 +92,6 @@ export const useValueMenuState = ({
     return () => {
       blurCommitRef.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open, multiSelect, blurCommitRef]);
 
   // ── Flat items for keyboard nav ─────────────────────────
