@@ -23,10 +23,8 @@ declare module '@tanstack/react-table' {
     description?: { type: 'text' | 'tooltip'; content: string };
     /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
     resizeType?: 'cut' | 'resize';
-    /** Render custom action buttons (e.g. Preview) shown on hover in body cells */
+    /** Render action buttons shown on hover in body cells */
     renderActions?: (row: Row<TData>) => ReactNode;
-    /** Render dropdown menu content for the built-in ellipsis button shown on hover in body cells */
-    renderMenuForMoreAction?: (row: Row<TData>) => ReactNode;
   }
 }
 
@@ -102,10 +100,8 @@ export interface TableColumnMeta<T = unknown> {
   description?: { type: 'text' | 'tooltip'; content: string };
   /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
   resizeType?: 'cut' | 'resize';
-  /** Render custom action buttons (e.g. Preview) shown on hover in body cells */
+  /** Render action buttons shown on hover in body cells */
   renderActions?: (row: TableRow<T>) => ReactNode;
-  /** Render dropdown menu content for the built-in ellipsis button shown on hover in body cells */
-  renderMenuForMoreAction?: (row: TableRow<T>) => ReactNode;
 }
 
 /** Shared column properties */

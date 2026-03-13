@@ -1,49 +1,35 @@
-import { type ReactNode, useState } from 'react';
-import type { Row } from '@tanstack/react-table';
-import { Ellipsis } from '../../icons';
+import { type ReactNode, useEffect, useRef } from 'react';
 import { cn } from '../../utils/cn';
-import { Button } from '../Button';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../DropdownMenu';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
-interface TableMasterCellActionsProps<T> {
-  row: Row<T>;
-  renderActions?: (row: Row<T>) => ReactNode;
-  renderMenuForMoreAction?: (row: Row<T>) => ReactNode;
+interface TableMasterCellActionsProps {
+  children: ReactNode;
+  onWidthChange?: (width: number) => void;
 }
 
-export const TableMasterCellActions = <T,>({
-  row,
-  renderActions,
-  renderMenuForMoreAction,
-}: TableMasterCellActionsProps<T>) => {
-  const [menuOpen, setMenuOpen] = useState(false);
+export const TableMasterCellActions = ({
+  children,
+  onWidthChange,
+}: TableMasterCellActionsProps) => {
+  const ref = useRef<HTMLDivElement>(null);
 
-  const actions = renderActions?.(row);
-  const menuContent = renderMenuForMoreAction?.(row);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || !onWidthChange) return;
 
-  if (!actions && !menuContent) return null;
+    const observer = new ResizeObserver(entries => {
+      const entry = entries[0];
+      if (entry) onWidthChange(el.offsetWidth);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [onWidthChange]);
 
   return (
-    <div className={cn('absolute top-0 right-0 h-full', 'flex items-start pt-6 pr-6 pl-4 gap-2')}>
-      {actions}
-      {menuContent && (
-        <Tooltip disabled={menuOpen}>
-          <TooltipTrigger asChild>
-            <span className='inline-flex'>
-              <DropdownMenu onOpenChange={setMenuOpen}>
-                <DropdownMenuTrigger asChild>
-                  <Button variant='ghost' color='neutral' size='small' aria-label='More'>
-                    <Ellipsis />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>{menuContent}</DropdownMenuContent>
-              </DropdownMenu>
-            </span>
-          </TooltipTrigger>
-          <TooltipContent>More</TooltipContent>
-        </Tooltip>
-      )}
+    <div
+      ref={ref}
+      className={cn('absolute top-0 right-0 h-full', 'flex items-start pt-6 pr-6 pl-4 gap-2')}
+    >
+      {children}
     </div>
   );
 };
