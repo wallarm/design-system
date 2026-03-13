@@ -13,8 +13,8 @@ import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
 import { filterAndSort } from '../../lib';
 import type { Condition, FieldMetadata, QueryBarDropdownItem } from '../../types';
-import { MenuEmptyState } from '../MenuEmptyState';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
+import { MenuEmptyState } from '../MenuEmptyState';
 import { OperatorsSection, RecentSection, SuggestionsSection } from './FieldMenuSections';
 
 export interface QueryBarFieldMenuProps {
