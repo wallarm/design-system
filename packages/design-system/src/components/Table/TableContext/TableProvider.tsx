@@ -141,12 +141,6 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     return [...prefix, ...userCols] as ColumnDef<T, any>[];
   }, [columns, data, selectionEnabled, expandingEnabled, subRowGroupingEnabled]);
 
-  // Whether any column has a text description
-  const hasDescription = useMemo(
-    () => columns.some(col => col.meta?.description?.type === 'text'),
-    [columns],
-  );
-
   // Master column ID — first data column (not _selection or _expand)
   const masterColumnId = useMemo<string | null>(() => {
     if (columns.length === 0) return null;
@@ -312,7 +306,6 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       defaultColumnOrder,
       setColumnOrder,
       alwaysPinnedLeft,
-      hasDescription,
       masterColumnId,
       lastSelectedRowIndexRef,
       theadRef,
@@ -341,7 +334,6 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       defaultColumnOrder,
       setColumnOrder,
       alwaysPinnedLeft,
-      hasDescription,
       masterColumnId,
       onEndReached,
       onEndReachedThreshold,

@@ -58,7 +58,8 @@ export const TableSettingsMenu: FC = () => {
     const el = theadRef.current;
     if (!el) return;
 
-    const ro = new ResizeObserver(([entry]) => {
+    const ro = new ResizeObserver(entries => {
+      const entry = entries[0];
       if (entry) setTheadHeight(entry.contentRect.height);
     });
     ro.observe(el);
