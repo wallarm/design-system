@@ -11,6 +11,8 @@ interface UseFocusManagementDeps {
   containerRef: RefObject<HTMLElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
   editingSegment: string | null;
+  /** Ref set by QueryBarValueMenu — calls commitChecked() for multi-select before blur reset. Returns true if committed. */
+  blurCommitRef: RefObject<(() => boolean) | null>;
   setIsFocused: (focused: boolean) => void;
   setMenuState: (state: MenuState) => void;
   resetMenuOffset: () => void;
@@ -25,6 +27,7 @@ export const useFocusManagement = ({
   containerRef,
   inputRef,
   editingSegment,
+  blurCommitRef,
   setIsFocused,
   setMenuState,
   resetMenuOffset,
@@ -45,9 +48,12 @@ export const useFocusManagement = ({
       if (containerRef.current?.contains(related)) return;
       if (isMenuRelated(related)) return;
       setIsFocused(false);
-      resetState();
+      // Commit pending multi-select values before resetting state.
+      // handleMultiCommit calls resetState internally, so skip the extra reset if committed.
+      const committed = blurCommitRef.current?.();
+      if (!committed) resetState();
     },
-    [containerRef, resetState, setIsFocused],
+    [containerRef, blurCommitRef, resetState, setIsFocused],
   );
 
   // ── Auto-open field menu on initial focus when empty ──────
