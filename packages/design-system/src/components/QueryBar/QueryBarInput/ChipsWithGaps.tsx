@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { CONNECTOR_ID_PATTERN } from '../lib';
 import type { QueryBarChipData } from '../types';
 import { InsertionGap } from './InsertionGap';
 import type { ChipSegment } from './QueryBarChip';
@@ -54,7 +55,7 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
         </div>,
       );
     } else if (isConnector) {
-      const match = chip.id.match(/^connector-(\d+)$/);
+      const match = chip.id.match(CONNECTOR_ID_PATTERN);
       const condIdx = match ? Number(match[1]) : 0;
       const isFirst = connectorIndex === 0;
       const isLast = connectorIndex === connectorCount - 1;

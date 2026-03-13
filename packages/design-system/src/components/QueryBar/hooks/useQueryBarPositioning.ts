@@ -1,8 +1,6 @@
 import type { RefObject } from 'react';
 import { useMemo } from 'react';
-import { buildContainerAnchoredRect } from '../lib';
-
-const QUERY_BAR_SELECTOR = '[data-slot="query-bar"]';
+import { buildContainerAnchoredRect, QUERY_BAR_SELECTOR } from '../lib';
 
 interface UseQueryBarPositioningProps {
   /** Ref to the trigger element (used for X anchor and container lookup via closest) */

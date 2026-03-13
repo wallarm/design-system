@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { COLLAPSED_MAX_HEIGHT } from './classes';
+import { COLLAPSED_MAX_HEIGHT } from '../classes';
 
 /**
  * Manages the expand/collapse state for the query bar chip area.

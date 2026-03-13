@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { QueryBarDropdownItem } from '../../types';
-import { useKeyboardNav } from '../useKeyboardNav';
+import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import type { ValueOption } from './QueryBarValueMenu';
 
 type ConditionValue = string | number | boolean;
