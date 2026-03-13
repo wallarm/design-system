@@ -53,12 +53,11 @@ export const QueryBarDateValueMenu: FC<QueryBarDateValueMenuProps> = ({
   const effectiveFilterText = backFromCalendar ? '' : filterText;
   const query = effectiveFilterText.toLowerCase();
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: showCalendar intentionally omitted — only reset on open/close transitions
   useEffect(() => {
     if (open) {
       setShowCalendar(initialCalendar);
       setBackFromCalendar(false);
-    } else if (showCalendar) {
+    } else {
       setShowCalendar(false);
     }
   }, [open, initialCalendar]);

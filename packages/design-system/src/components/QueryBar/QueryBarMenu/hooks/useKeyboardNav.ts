@@ -156,7 +156,6 @@ export const useKeyboardNav = ({
   );
 
   // Capture-phase keydown
-  // biome-ignore lint/correctness/useExhaustiveDependencies: handleModArrow and menuRef accessed via stable refs/callbacks
   useEffect(() => {
     if (!open) return;
 
@@ -311,7 +310,7 @@ export const useKeyboardNav = ({
 
     window.addEventListener('keydown', handleKeyDown, true);
     return () => window.removeEventListener('keydown', handleKeyDown, true);
-  }, [open, navigate]);
+  }, [open, navigate, handleModArrow, menuRef]);
 
   // Sync mouse hover / Ark UI keyboard nav with our state + scroll into view
   const onHighlightChange = useCallback((details: { highlightedValue: string | null }) => {
