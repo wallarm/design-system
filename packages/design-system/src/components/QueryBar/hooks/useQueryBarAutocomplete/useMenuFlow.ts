@@ -6,7 +6,13 @@ import {
   isMultiSelectOperator,
   isNoValueOperator,
 } from '../../lib';
-import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
+import type {
+  ChipErrorSegment,
+  Condition,
+  FieldMetadata,
+  FilterOperator,
+  MenuState,
+} from '../../types';
 import {
   resolveDateValue,
   resolveMultiValues,
@@ -31,7 +37,7 @@ interface MenuFlowDeps {
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
     atIndex?: number,
-    error?: boolean,
+    error?: ChipErrorSegment,
     dateOrigin?: 'relative' | 'absolute',
   ) => void;
   conditions: Condition[];
@@ -79,14 +85,14 @@ export const useMenuFlow = ({
         const idx = chipIdToConditionIndex(editing.editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
         if (condition) {
-          const error = validateValueForField(field, condition.value);
+          const hasValueError = validateValueForField(field, condition.value);
           upsertCondition(
             field,
             condition.operator,
             condition.value,
             editing.editingChipId,
             undefined,
-            error || undefined,
+            hasValueError ? 'value' : undefined,
             condition.dateOrigin,
           );
         }
@@ -214,7 +220,7 @@ export const useMenuFlow = ({
           resolved,
           editing.editingChipId,
           isEditing ? undefined : insertIndex,
-          error,
+          error ? 'value' : undefined,
         );
       } else if (selectedField.type === 'date') {
         const { error, dateOrigin } = resolveDateValue(
@@ -228,7 +234,7 @@ export const useMenuFlow = ({
           trimmed,
           editing.editingChipId,
           isEditing ? undefined : insertIndex,
-          error,
+          error ? 'value' : undefined,
           dateOrigin,
         );
       } else {
@@ -239,7 +245,7 @@ export const useMenuFlow = ({
           resolved,
           editing.editingChipId,
           isEditing ? undefined : insertIndex,
-          error,
+          error ? 'value' : undefined,
         );
       }
       resetState(!isEditing);
@@ -264,18 +270,18 @@ export const useMenuFlow = ({
       );
 
       if (matchedField) {
-        const error = validateValueForField(matchedField, condition.value);
+        const hasValueError = validateValueForField(matchedField, condition.value);
         upsertCondition(
           matchedField,
           condition.operator,
           condition.value,
           editing.editingChipId,
           undefined,
-          error || undefined,
+          hasValueError ? 'value' : undefined,
           condition.dateOrigin,
         );
       } else {
-        // Unknown field — create a synthetic FieldMetadata and mark as error
+        // Unknown field — create a synthetic FieldMetadata and mark attribute as error
         const syntheticField: FieldMetadata = {
           name: trimmed,
           label: trimmed,
@@ -287,7 +293,7 @@ export const useMenuFlow = ({
           condition.value,
           editing.editingChipId,
           undefined,
-          true,
+          'attribute',
           condition.dateOrigin,
         );
       }

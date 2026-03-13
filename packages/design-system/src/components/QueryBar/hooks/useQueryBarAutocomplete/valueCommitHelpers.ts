@@ -1,21 +1,34 @@
 import { chipIdToConditionIndex, getFieldValues, isDatePreset } from '../../lib';
-import type { Condition, FieldMetadata, FilterOperator } from '../../types';
+import type { Condition, FieldMetadata, FieldValueOption, FilterOperator } from '../../types';
+
+/** Check if a single value matches any option in the field's values list */
+export const isValidFieldValue = (
+  fieldValues: FieldValueOption[],
+  v: string | number | boolean,
+): boolean =>
+  fieldValues.some(
+    opt => opt.value === v || String(opt.value).toLowerCase() === String(v).toLowerCase(),
+  );
+
+/** Return indices of values that don't match any field option. Empty array = all valid. */
+export const getInvalidValueIndices = (
+  field: FieldMetadata,
+  values: Array<string | number | boolean>,
+): number[] => {
+  const fv = getFieldValues(field);
+  if (fv.length === 0) return [];
+  return values.reduce<number[]>((acc, v, idx) => {
+    if (!isValidFieldValue(fv, v)) acc.push(idx);
+    return acc;
+  }, []);
+};
 
 /** Check if condition value(s) are valid for the given field. Returns true if error. */
 export const validateValueForField = (field: FieldMetadata, value: Condition['value']): boolean => {
-  const fieldValues = getFieldValues(field);
-  // No values list means any value is acceptable (free-text field)
-  if (fieldValues.length === 0) return false;
   // Null value (no-value operators) is always valid
   if (value == null) return false;
-
   const values = Array.isArray(value) ? value : [value];
-  return values.some(
-    v =>
-      !fieldValues.some(
-        opt => opt.value === v || String(opt.value).toLowerCase() === String(v).toLowerCase(),
-      ),
-  );
+  return getInvalidValueIndices(field, values).length > 0;
 };
 
 /** Resolve a text input to the actual field value (e.g. label "Active" → value "active") */
@@ -59,17 +72,7 @@ export const resolveMultiValues = (
     .map(s => s.trim())
     .filter(Boolean);
   const resolved = parts.map(part => resolveFieldValue(field, part));
-  let error: boolean | undefined;
-  const fv = getFieldValues(field);
-  if (fv.length > 0) {
-    const hasInvalid = resolved.some(
-      v =>
-        !fv.some(
-          opt => opt.value === v || String(opt.value).toLowerCase() === String(v).toLowerCase(),
-        ),
-    );
-    if (hasInvalid) error = true;
-  }
+  const error = getInvalidValueIndices(field, resolved).length > 0 ? true : undefined;
   return { resolved, error };
 };
 

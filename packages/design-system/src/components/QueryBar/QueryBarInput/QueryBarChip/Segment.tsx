@@ -8,6 +8,7 @@ type SegmentVariant = 'attribute' | 'operator' | 'value';
 type SegmentProps = HTMLAttributes<HTMLDivElement> & {
   variant: SegmentVariant;
   children: string;
+  error?: boolean;
   editing?: boolean;
   editText?: string;
   onEditChange?: (text: string) => void;
@@ -19,6 +20,7 @@ export const Segment: FC<SegmentProps> = ({
   variant,
   children,
   className,
+  error,
   editing,
   editText,
   onEditChange,
@@ -90,7 +92,7 @@ export const Segment: FC<SegmentProps> = ({
             onBlur={onEditBlur}
             aria-label={`Filter ${variant}`}
             className={cn(
-              segmentTextVariants({ variant }),
+              segmentTextVariants({ variant, error }),
               'bg-transparent border-none outline-none p-0 m-0',
             )}
             style={{ width: `${inputWidth ?? Math.max(20, lastTextWidthRef.current)}px` }}
@@ -98,14 +100,14 @@ export const Segment: FC<SegmentProps> = ({
           {/* Hidden sizer to measure text width */}
           <span
             ref={sizerRef}
-            className={cn(segmentTextVariants({ variant }), 'invisible absolute whitespace-pre')}
+            className={cn(segmentTextVariants({ variant, error }), 'invisible absolute whitespace-pre')}
             aria-hidden
           >
             {editText || ' '}
           </span>
         </>
       ) : (
-        <p ref={textRef} className={segmentTextVariants({ variant })}>
+        <p ref={textRef} className={segmentTextVariants({ variant, error })}>
           {children}
         </p>
       )}

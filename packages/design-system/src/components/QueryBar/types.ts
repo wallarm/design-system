@@ -8,13 +8,22 @@ export type QueryBarChipVariant = 'chip' | 'and' | 'or' | '(' | ')';
 /**
  * QueryBar Chip Data Interface
  */
+/** Which segment of a chip has an error: attribute or value (true = whole chip) */
+export type ChipErrorSegment = boolean | 'attribute' | 'value';
+
 export interface QueryBarChipData {
   id: string;
   variant: QueryBarChipVariant;
   attribute?: string;
   operator?: string;
   value?: string;
-  error?: boolean;
+  error?: ChipErrorSegment;
+  /** Individual display parts for multi-value chips (avoids comma-split issues) */
+  valueParts?: string[];
+  /** Separator between valueParts (default: ", ") */
+  valueSeparator?: string;
+  /** Indices of invalid values in a multi-value chip (e.g. "in" operator) */
+  errorValueIndices?: number[];
 }
 
 /**
@@ -81,8 +90,8 @@ export interface Condition {
   field: string;
   operator: FilterOperator;
   value: string | number | boolean | null | Array<string | number | boolean>;
-  /** Per-condition validation error (e.g. value not in allowed list) */
-  error?: boolean;
+  /** Per-condition validation error: true = whole chip, 'attribute'/'value' = specific segment */
+  error?: ChipErrorSegment;
   /** For date fields: tracks whether the value originated as relative preset or absolute date */
   dateOrigin?: 'relative' | 'absolute';
 }
