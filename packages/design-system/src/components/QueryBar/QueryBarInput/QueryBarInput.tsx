@@ -6,7 +6,9 @@ import { findChipSplitIndex, isMenuRelated } from '../lib';
 import { useQueryBarContext } from '../QueryBarContext';
 import { ChipsWithGaps, TrailingGap } from './ChipsWithGaps';
 import {
+  ACTIONS_PADDING,
   buildingChipWrapperClass,
+  COLLAPSED_MAX_HEIGHT,
   queryBarContainerVariants,
   queryBarInnerVariants,
 } from './classes';
@@ -14,6 +16,7 @@ import { EditingProvider } from './QueryBarChip/EditingContext';
 import { QueryBarChip } from './QueryBarChip/QueryBarChip';
 import { QueryBarFilterInput } from './QueryBarFilterInput';
 import { QueryBarInputActions } from './QueryBarInputActions';
+import { useExpandCollapse } from './useExpandCollapse';
 
 type QueryBarInputProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
 
@@ -41,6 +44,8 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
   } = useQueryBarContext();
 
   const hasContent = chips.length > 0 || buildingChipData != null;
+
+  const { isExpanded, isOverflowing, innerRef, toggleExpand, multiRow } = useExpandCollapse();
 
   const chipSplitIndex = useMemo(
     () => findChipSplitIndex(chips, insertIndex, insertAfterConnector),
@@ -113,18 +118,35 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
       onSegmentEditBlur={handleSegmentEditBlur}
     >
       <div
-        className={cn(inputVariants({ error }), queryBarContainerVariants({ error }), className)}
+        className={cn(
+          inputVariants({ error }),
+          queryBarContainerVariants({ error, multiRow }),
+          className,
+        )}
         data-slot='query-bar'
         {...props}
       >
         {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
         <div
-          className={queryBarInnerVariants({ hasContent })}
+          ref={innerRef}
+          className={cn(
+            queryBarInnerVariants({ hasContent }),
+            !isExpanded && 'overflow-y-auto',
+            'query-bar-scroll',
+          )}
+          style={{
+            maxHeight: !isExpanded ? COLLAPSED_MAX_HEIGHT : undefined,
+            paddingRight: hasContent ? ACTIONS_PADDING : undefined,
+          }}
           onClick={e => {
             if (e.target === e.currentTarget) onInputClick();
           }}
         >
-          <ChipsWithGaps chips={chipsBefore} hideTrailingGap={hideTrailingGap} {...chipsGapProps} />
+          <ChipsWithGaps
+            chips={chipsBefore}
+            hideTrailingGap={hideTrailingGap}
+            {...chipsGapProps}
+          />
 
           {buildingChipData ? (
             <div
@@ -144,12 +166,22 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
             <QueryBarFilterInput hasContent={hasContent} />
           )}
 
-          <ChipsWithGaps chips={chipsAfter} hideLeadingGap={hideLeadingGap} {...chipsGapProps} />
+          <ChipsWithGaps
+            chips={chipsAfter}
+            hideLeadingGap={hideLeadingGap}
+            {...chipsGapProps}
+          />
 
-          {chipsAfter.length > 0 && <TrailingGap chips={chipsAfter} onGapClick={onGapClick} />}
+          {chipsAfter.length > 0 && (
+            <TrailingGap chips={chipsAfter} onGapClick={onGapClick} />
+          )}
         </div>
 
-        <QueryBarInputActions />
+        <QueryBarInputActions
+          isExpanded={isExpanded}
+          isOverflowing={isOverflowing}
+          onToggleExpand={toggleExpand}
+        />
       </div>
     </EditingProvider>
   );
