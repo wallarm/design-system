@@ -61,7 +61,8 @@ export const deriveAutocompleteValues = ({
 
   // ── Editing values for QueryBarValueMenu ────────────────
   const editingMultiValues = (() => {
-    if (!editingCondition || !selectedOperator || !isMultiSelectOperator(selectedOperator)) return [];
+    if (!editingCondition || !selectedOperator || !isMultiSelectOperator(selectedOperator))
+      return [];
 
     // Always derive from committed condition values.
     // Segment text is NOT used here to avoid a circular dependency:
