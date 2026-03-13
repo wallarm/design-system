@@ -8,7 +8,7 @@ interface DropdownMenuInputProps extends Omit<InputHTMLAttributes<HTMLInputEleme
   ref?: Ref<HTMLInputElement>;
 }
 
-export const DropdownMenuInput: FC<DropdownMenuInputProps> = (props) => (
+export const DropdownMenuInput: FC<DropdownMenuInputProps> = props => (
   <div className='mb-4'>
     <InputGroup>
       <InputGroupAddon>
