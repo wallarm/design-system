@@ -1,8 +1,8 @@
 import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
-import { useCallback, useMemo } from 'react';
+import { useCallback } from 'react';
 import { cn } from '../../../utils/cn';
 import { inputVariants } from '../../Input/classes';
-import { findChipSplitIndex, isMenuRelated } from '../lib';
+import { isMenuRelated } from '../lib';
 import { useQueryBarContext } from '../QueryBarContext';
 import { ChipsWithGaps, TrailingGap } from './ChipsWithGaps';
 import {
@@ -16,7 +16,8 @@ import { EditingProvider } from './QueryBarChip/EditingContext';
 import { QueryBarChip } from './QueryBarChip/QueryBarChip';
 import { QueryBarFilterInput } from './QueryBarFilterInput';
 import { QueryBarInputActions } from './QueryBarInputActions';
-import { useExpandCollapse } from './useExpandCollapse';
+import { useChipsSplitting } from './hooks/useChipsSplitting';
+import { useExpandCollapse } from './hooks/useExpandCollapse';
 
 type QueryBarInputProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
 
@@ -47,18 +48,11 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
 
   const { isExpanded, isOverflowing, innerRef, toggleExpand, multiRow } = useExpandCollapse();
 
-  const chipSplitIndex = useMemo(
-    () => findChipSplitIndex(chips, insertIndex, insertAfterConnector),
-    [chips, insertIndex, insertAfterConnector],
+  const { chipsBefore, chipsAfter, hideTrailingGap, hideLeadingGap } = useChipsSplitting(
+    chips,
+    insertIndex,
+    insertAfterConnector,
   );
-
-  const chipsBefore = useMemo(() => chips.slice(0, chipSplitIndex), [chips, chipSplitIndex]);
-  const chipsAfter = useMemo(() => chips.slice(chipSplitIndex), [chips, chipSplitIndex]);
-
-  const lastBefore = chipsBefore[chipsBefore.length - 1];
-  const firstAfter = chipsAfter[0];
-  const hideTrailingGap = lastBefore?.variant === 'and' || lastBefore?.variant === 'or';
-  const hideLeadingGap = firstAfter?.variant === 'and' || firstAfter?.variant === 'or';
 
   const chipsGapProps = {
     onChipClick,

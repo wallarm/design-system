@@ -16,6 +16,16 @@ export const MULTI_SELECT_OPERATORS: readonly FilterOperator[] = ['in', 'not_in'
 export const CHIP_ID_PATTERN = /^chip-(\d+)$/;
 
 /**
+ * Pattern to extract condition index from connector ID (e.g. "connector-2" → 2)
+ */
+export const CONNECTOR_ID_PATTERN = /^connector-(\d+)$/;
+
+/**
+ * DOM selector for the QueryBar root element
+ */
+export const QUERY_BAR_SELECTOR = '[data-slot="query-bar"]';
+
+/**
  * Labels for non-chip filter chip variants (connectors, brackets)
  */
 export const VARIANT_LABELS: Partial<Record<QueryBarChipVariant, string>> = {

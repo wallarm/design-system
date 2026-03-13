@@ -110,19 +110,22 @@ export const useChipEditing = ({
     [containerRef, setMenuOffset, setSelectedField, setSelectedOperator, setMenuState],
   );
 
-  const clearEditing = useCallback(() => {
-    setEditingChipId(null);
+  /** Reset segment-level editing state (shared by clearEditing and cancelSegmentEdit) */
+  const resetSegmentState = useCallback(() => {
     setEditingSegment(null);
     setSegmentFilterText('');
     setUserHasTyped(false);
   }, []);
 
+  const clearEditing = useCallback(() => {
+    setEditingChipId(null);
+    resetSegmentState();
+  }, [resetSegmentState]);
+
   const cancelSegmentEdit = useCallback(() => {
-    setEditingSegment(null);
-    setSegmentFilterText('');
-    setUserHasTyped(false);
+    resetSegmentState();
     setMenuState('closed');
-  }, [setMenuState]);
+  }, [resetSegmentState, setMenuState]);
 
   /** Wraps setSegmentFilterText to track user typing */
   const handleSegmentFilterChange = useCallback((text: string) => {

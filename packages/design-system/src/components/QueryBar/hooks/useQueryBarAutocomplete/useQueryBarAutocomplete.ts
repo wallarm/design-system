@@ -218,7 +218,9 @@ export const useQueryBarAutocomplete = ({
 
   const handleGapClick = useCallback(
     (conditionIndex: number, afterConnector: boolean) => {
-      // flushSync forces DOM update before reopening so getAnchorRect reads the new input position
+      // flushSync commits DOM update (input moves to gap position) before reopening the menu.
+      // setMenuState('closed') inside + setMenuState('field') outside is intentional:
+      // the menu must fully unmount so getAnchorRect reads the new input position.
       flushSync(() => {
         setInsertIndex(conditionIndex);
         setInsertAfterConnector(afterConnector);

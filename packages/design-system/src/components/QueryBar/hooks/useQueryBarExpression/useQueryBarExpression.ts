@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { chipIdToConditionIndex } from '../../lib';
+import { chipIdToConditionIndex, CONNECTOR_ID_PATTERN } from '../../lib';
 import type {
   ChipErrorSegment,
   Condition,
@@ -23,6 +23,20 @@ interface ExpressionState {
 }
 
 const EMPTY_STATE: ExpressionState = { conditions: [], connectors: [] };
+
+/** Remove the connector associated with a condition being deleted at `idx`. */
+const removeConnectorAtConditionIndex = (
+  connectors: Array<'and' | 'or'>,
+  idx: number,
+): Array<'and' | 'or'> => {
+  const updated = [...connectors];
+  if (idx === 0 && updated.length > 0) {
+    updated.splice(0, 1);
+  } else if (idx > 0 && idx - 1 < updated.length) {
+    updated.splice(idx - 1, 1);
+  }
+  return updated;
+};
 
 export const useQueryBarExpression = ({
   fields,
@@ -115,12 +129,7 @@ export const useQueryBarExpression = ({
 
       setState(prev => {
         const newConditions = prev.conditions.filter((_, i) => i !== idx);
-        const newConnectors = [...prev.connectors];
-        if (idx === 0 && newConnectors.length > 0) {
-          newConnectors.splice(0, 1);
-        } else if (idx > 0 && idx - 1 < newConnectors.length) {
-          newConnectors.splice(idx - 1, 1);
-        }
+        const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
 
         const next = { conditions: newConditions, connectors: newConnectors };
         onChange?.(buildExpression(next.conditions, next.connectors));
@@ -135,12 +144,7 @@ export const useQueryBarExpression = ({
       setState(prev => {
         if (idx < 0 || idx >= prev.conditions.length) return prev;
         const newConditions = prev.conditions.filter((_, i) => i !== idx);
-        const newConnectors = [...prev.connectors];
-        if (idx === 0 && newConnectors.length > 0) {
-          newConnectors.splice(0, 1);
-        } else if (idx > 0 && idx - 1 < newConnectors.length) {
-          newConnectors.splice(idx - 1, 1);
-        }
+        const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
 
         const next = { conditions: newConditions, connectors: newConnectors };
         onChange?.(buildExpression(next.conditions, next.connectors));
@@ -157,7 +161,7 @@ export const useQueryBarExpression = ({
 
   const setConnectorValue = useCallback(
     (connectorId: string, value: 'and' | 'or') => {
-      const match = connectorId.match(/^connector-(\d+)$/);
+      const match = connectorId.match(CONNECTOR_ID_PATTERN);
       if (!match) return;
       const condIdx = Number(match[1]);
       const connectorIdx = condIdx - 1;

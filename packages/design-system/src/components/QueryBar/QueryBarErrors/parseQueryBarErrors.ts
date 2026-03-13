@@ -20,7 +20,7 @@ export const parseQueryBarErrors = (
 
     switch (condition.error) {
       case 'attribute':
-        errors.push(`Unknown field '${condition.field}'`);
+        errors.push(`Unknown field ${condition.field}`);
         break;
 
       case 'value': {
@@ -29,18 +29,18 @@ export const parseQueryBarErrors = (
           if (fv.length > 0) {
             const invalidValues = condition.value.filter(v => !isValidFieldValue(fv, v));
             if (invalidValues.length > 0) {
-              const formatted = invalidValues.map(v => `'${String(v)}'`).join(', ');
-              errors.push(`Invalid value for '${label}': ${formatted}`);
+              const formatted = invalidValues.map(v => String(v)).join(', ');
+              errors.push(`Invalid value for ${label}: ${formatted}`);
               break;
             }
           }
         }
-        errors.push(`Invalid value for '${label}'`);
+        errors.push(`Invalid value for ${label}`);
         break;
       }
 
       default:
-        errors.push(`Invalid condition for '${label}'`);
+        errors.push(`Invalid condition for ${label}`);
         break;
     }
   }
