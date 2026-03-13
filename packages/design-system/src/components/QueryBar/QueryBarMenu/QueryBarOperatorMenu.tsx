@@ -15,7 +15,7 @@ import { KbdGroup } from '../../Kbd/KbdGroup';
 import { getOperatorLabel, OPERATOR_SYMBOLS, OPERATORS_BY_TYPE } from '../lib';
 import type { FieldType, FilterOperator, QueryBarDropdownItem } from '../types';
 import { MenuEmptyState } from './MenuEmptyState';
-import { useKeyboardNav } from './useKeyboardNav';
+import { useKeyboardNav } from './hooks/useKeyboardNav';
 
 /**
  * Build operator groups filtered by a custom operators list.

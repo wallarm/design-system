@@ -1,6 +1,14 @@
 import { chipIdToConditionIndex, getFieldValues, isDatePreset } from '../../lib';
 import type { Condition, FieldMetadata, FieldValueOption, FilterOperator } from '../../types';
 
+/** Find a field value option matching by label or value (case-insensitive) */
+const findMatchingFieldValue = (fieldValues: FieldValueOption[], text: string) =>
+  fieldValues.find(
+    v =>
+      v.label.toLowerCase() === text.toLowerCase() ||
+      String(v.value).toLowerCase() === text.toLowerCase(),
+  );
+
 /** Check if a single value matches any option in the field's values list */
 export const isValidFieldValue = (
   fieldValues: FieldValueOption[],
@@ -36,12 +44,7 @@ export const resolveFieldValue = (
   field: FieldMetadata,
   text: string,
 ): string | number | boolean => {
-  const fieldValues = getFieldValues(field);
-  const match = fieldValues.find(
-    v =>
-      v.label.toLowerCase() === text.toLowerCase() ||
-      String(v.value).toLowerCase() === text.toLowerCase(),
-  );
+  const match = findMatchingFieldValue(getFieldValues(field), text);
   return match ? match.value : text;
 };
 
@@ -51,11 +54,7 @@ export const resolveSingleValue = (
   trimmed: string,
 ): { resolved: string | number | boolean; error: boolean | undefined } => {
   const fv = getFieldValues(field);
-  const match = fv.find(
-    v =>
-      v.label.toLowerCase() === trimmed.toLowerCase() ||
-      String(v.value).toLowerCase() === trimmed.toLowerCase(),
-  );
+  const match = findMatchingFieldValue(fv, trimmed);
   return {
     resolved: match ? match.value : trimmed,
     error: fv.length > 0 && !match ? true : undefined,

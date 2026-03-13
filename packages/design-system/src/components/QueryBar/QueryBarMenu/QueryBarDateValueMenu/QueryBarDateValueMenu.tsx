@@ -3,7 +3,7 @@ import { type FC, useEffect, useMemo, useRef, useState } from 'react';
 import { cn } from '../../../../utils/cn';
 import { DropdownMenu, DropdownMenuContent } from '../../../DropdownMenu';
 import type { QueryBarDropdownItem } from '../../types';
-import { useKeyboardNav } from '../useKeyboardNav';
+import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import { DATE_PRESETS } from './constants';
 import { DateCalendar } from './DateCalendar';
 import { DatePresets } from './DatePresets';

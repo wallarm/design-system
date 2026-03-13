@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import type { QueryBarDropdownItem } from '../types';
+import type { QueryBarDropdownItem } from '../../types';
 
 interface UseKeyboardNavOptions {
   items: QueryBarDropdownItem[];
