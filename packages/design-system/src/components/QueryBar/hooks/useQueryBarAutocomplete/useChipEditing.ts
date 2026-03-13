@@ -55,6 +55,8 @@ export const useChipEditing = ({
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
   const [editingSegment, setEditingSegment] = useState<ChipSegment | null>(null);
   const [segmentFilterText, setSegmentFilterText] = useState('');
+  // Tracks whether user has typed since opening edit — suppresses filtering until first keystroke
+  const [userHasTyped, setUserHasTyped] = useState(false);
 
   // Refs keep data fresh for callbacks without causing callback recreation
   const conditionsRef = useRef(conditions);
@@ -101,6 +103,7 @@ export const useChipEditing = ({
         value: chip.value ?? '',
       };
       setSegmentFilterText(segmentText[segment]);
+      setUserHasTyped(false);
 
       setMenuState(SEGMENT_TO_MENU[segment]);
     },
@@ -111,20 +114,34 @@ export const useChipEditing = ({
     setEditingChipId(null);
     setEditingSegment(null);
     setSegmentFilterText('');
+    setUserHasTyped(false);
   }, []);
 
   const cancelSegmentEdit = useCallback(() => {
     setEditingSegment(null);
     setSegmentFilterText('');
+    setUserHasTyped(false);
     setMenuState('closed');
   }, [setMenuState]);
+
+  /** Wraps setSegmentFilterText to track user typing */
+  const handleSegmentFilterChange = useCallback((text: string) => {
+    setSegmentFilterText(text);
+    setUserHasTyped(true);
+  }, []);
+
+  // Text shown in the inline input
+  const segmentDisplayText = segmentFilterText;
+  // Text used for dropdown filtering — empty until user types
+  const segmentMenuFilterText = userHasTyped ? segmentFilterText : '';
 
   return useMemo(
     () => ({
       editingChipId,
       editingSegment,
-      segmentFilterText,
-      setSegmentFilterText,
+      segmentFilterText: segmentDisplayText,
+      segmentMenuFilterText,
+      setSegmentFilterText: handleSegmentFilterChange,
       handleChipClick,
       clearEditing,
       cancelSegmentEdit,
@@ -132,7 +149,9 @@ export const useChipEditing = ({
     [
       editingChipId,
       editingSegment,
-      segmentFilterText,
+      segmentDisplayText,
+      segmentMenuFilterText,
+      handleSegmentFilterChange,
       handleChipClick,
       clearEditing,
       cancelSegmentEdit,

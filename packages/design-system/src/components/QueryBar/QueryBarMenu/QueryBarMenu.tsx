@@ -28,7 +28,10 @@ export interface QueryBarAutocompleteState {
   handleBuildingValueChange: (preview: string | undefined) => void;
   // Inline segment editing
   segmentFilterText: string;
+  segmentMenuFilterText: string;
   editingSegment: ChipSegment | null;
+  /** Ref for multi-select blur commit — set by value menu, called by blur handler */
+  blurCommitRef: RefObject<(() => void) | null>;
 }
 
 export interface QueryBarMenuProps {
@@ -56,12 +59,13 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
     handleMenuClose,
     handleMenuDiscard,
     handleBuildingValueChange,
-    segmentFilterText,
+    segmentMenuFilterText,
     editingSegment,
+    blurCommitRef,
   } = autocomplete;
 
-  // Route filter text: use segment inline text when editing, otherwise main input
-  const fieldFilterText = editingSegment === 'attribute' ? segmentFilterText : inputText;
+  // Route filter text: use menu filter text (empty until user types) when editing, otherwise main input
+  const fieldFilterText = editingSegment === 'attribute' ? segmentMenuFilterText : inputText;
   // Operator: filter by typed text when building a new chip (not inline editing)
   const operatorFilterText = !editingSegment ? inputText : '';
 
@@ -71,8 +75,8 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
   // but only if that token is NOT already a known selected value (otherwise show all).
   const valueFilterText = (() => {
     if (editingSegment !== 'value') return inputText;
-    if (!isMultiSelectOperator(selectedOperator)) return segmentFilterText;
-    const lastToken = segmentFilterText.split(',').pop()?.trim() ?? '';
+    if (!isMultiSelectOperator(selectedOperator)) return segmentMenuFilterText;
+    const lastToken = segmentMenuFilterText.split(',').pop()?.trim() ?? '';
     if (!lastToken) return '';
     // If the last token matches a field value label/value, it's a completed selection — don't filter
     if (selectedFieldValues.length > 0) {
@@ -151,6 +155,7 @@ export const QueryBarMenu: FC<QueryBarMenuProps> = ({ fields, autocomplete }) =>
               inputRef={inputRef}
               menuRef={menuRef}
               filterText={valueFilterText}
+              blurCommitRef={blurCommitRef}
             />
           )
         ))}
