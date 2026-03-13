@@ -1,4 +1,4 @@
-import { type FC, useCallback, useState } from 'react';
+import { type FC, useCallback, useRef, useState } from 'react';
 import { CirclePlus } from '../../../../icons/CirclePlus';
 import { CircleSlash } from '../../../../icons/CircleSlash';
 import { cn } from '../../../../utils/cn';
@@ -12,6 +12,7 @@ import {
 } from '../../../DropdownMenu';
 import { DropdownMenuTrigger } from '../../../DropdownMenu/DropdownMenuTrigger';
 import { Kbd, KbdGroup } from '../../../Kbd';
+import { useQueryBarPositioning } from '../../hooks/useQueryBarPositioning';
 import { VARIANT_LABELS } from '../../lib/constants';
 import { useQueryBarContext } from '../../QueryBarContext';
 import { chipVariants, segmentContainer } from '../QueryBarChip/classes';
@@ -34,6 +35,7 @@ export const QueryBarConnectorChip: FC<QueryBarConnectorChipProps> = ({
 }) => {
   const { menuOpen, closeAutocompleteMenu } = useQueryBarContext();
   const [open, setOpen] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const handleOpenChange = useCallback(
     (nextOpen: boolean) => {
@@ -43,16 +45,19 @@ export const QueryBarConnectorChip: FC<QueryBarConnectorChipProps> = ({
     [closeAutocompleteMenu],
   );
 
+  const positioning = useQueryBarPositioning({ anchorRef: triggerRef });
+
   const label = VARIANT_LABELS[variant];
 
   return (
     <DropdownMenu
-      positioning={{ placement: 'bottom', gutter: 4 }}
+      positioning={positioning}
       open={open && !menuOpen}
       onOpenChange={handleOpenChange}
     >
       <DropdownMenuTrigger asChild>
         <button
+          ref={triggerRef}
           type='button'
           className={cn(
             chipVariants({ interactive: true }),
