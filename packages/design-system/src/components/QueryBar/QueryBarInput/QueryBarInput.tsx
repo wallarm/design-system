@@ -12,12 +12,12 @@ import {
   queryBarContainerVariants,
   queryBarInnerVariants,
 } from './classes';
+import { useChipsSplitting } from './hooks/useChipsSplitting';
+import { useExpandCollapse } from './hooks/useExpandCollapse';
 import { EditingProvider } from './QueryBarChip/EditingContext';
 import { QueryBarChip } from './QueryBarChip/QueryBarChip';
 import { QueryBarFilterInput } from './QueryBarFilterInput';
 import { QueryBarInputActions } from './QueryBarInputActions';
-import { useChipsSplitting } from './hooks/useChipsSplitting';
-import { useExpandCollapse } from './hooks/useExpandCollapse';
 
 type QueryBarInputProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
 

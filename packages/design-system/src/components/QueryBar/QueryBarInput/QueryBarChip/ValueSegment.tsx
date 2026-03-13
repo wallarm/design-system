@@ -1,6 +1,6 @@
 import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
-import { segmentContainer, segmentTextVariants } from './classes';
 import { cn } from '../../../../utils/cn';
+import { segmentContainer, segmentTextVariants } from './classes';
 import { Segment } from './Segment';
 
 interface ValueSegmentProps extends HTMLAttributes<HTMLDivElement> {

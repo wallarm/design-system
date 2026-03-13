@@ -1,6 +1,6 @@
+import { isValidFieldValue } from '../hooks/useQueryBarAutocomplete/valueCommitHelpers';
 import { getFieldValues } from '../lib';
 import type { Condition, FieldMetadata } from '../types';
-import { isValidFieldValue } from '../hooks/useQueryBarAutocomplete/valueCommitHelpers';
 
 /**
  * Parse conditions into human-readable error messages.

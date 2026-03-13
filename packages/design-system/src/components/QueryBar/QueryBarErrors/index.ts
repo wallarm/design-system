@@ -1,2 +1,2 @@
-export { QueryBarErrors, type QueryBarErrorsProps } from './QueryBarErrors';
 export { parseQueryBarErrors } from './parseQueryBarErrors';
+export { QueryBarErrors, type QueryBarErrorsProps } from './QueryBarErrors';
