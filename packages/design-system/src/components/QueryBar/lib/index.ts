@@ -14,7 +14,7 @@ export {
   OPERATORS_BY_TYPE,
   VARIANT_LABELS,
 } from './constants';
-export { isMenuRelated } from './dom';
+export { buildContainerAnchoredRect, isMenuRelated } from './dom';
 export { getFieldValues, hasFieldValues } from './fields';
 export { filterAndSort } from './filterSort';
 export {

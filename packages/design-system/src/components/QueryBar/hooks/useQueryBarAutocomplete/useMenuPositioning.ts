@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useRef } from 'react';
+import { useQueryBarPositioning } from '../useQueryBarPositioning';
 
 interface UseMenuPositioningOptions {
   containerRef: RefObject<HTMLElement | null>;
@@ -34,54 +35,28 @@ export const useMenuPositioning = ({
     editingOffsetRef.current = null;
   }, []);
 
-  const menuPositioning = useMemo(
-    () => ({
-      placement: 'bottom-start' as const,
-      gutter: 4,
-      getAnchorRect: () => {
-        const containerRect = containerRef.current?.getBoundingClientRect();
-        if (!containerRect) return null;
+  // Determine horizontal anchor: editing > building chip > input > container
+  const getAnchorLeft = useCallback(
+    (containerRect: DOMRect) => {
+      if (editingOffsetRef.current !== null) {
+        return containerRect.left + editingOffsetRef.current;
+      }
+      if (isBuilding) {
+        const chipRect = buildingChipRef.current?.getBoundingClientRect();
+        if (chipRect) return chipRect.left;
+      }
+      if (inputRef?.current) {
+        return inputRef.current.getBoundingClientRect().left;
+      }
+      return containerRect.left;
+    },
+    [isBuilding, buildingChipRef, inputRef],
+  );
 
-        // Determine anchor element rect: editing > building chip > input > container
-        let anchorLeft = containerRect.left;
-        let anchorTop = containerRect.top;
-        let anchorBottom = containerRect.bottom;
-        let anchorHeight = containerRect.height;
-
-        if (editingOffsetRef.current !== null) {
-          anchorLeft = containerRect.left + editingOffsetRef.current;
-        } else if (isBuilding) {
-          const chipRect = buildingChipRef.current?.getBoundingClientRect();
-          if (chipRect) {
-            anchorLeft = chipRect.left;
-            anchorTop = chipRect.top;
-            anchorBottom = chipRect.bottom;
-            anchorHeight = chipRect.height;
-          }
-        } else if (inputRef?.current) {
-          const inputRect = inputRef.current.getBoundingClientRect();
-          anchorLeft = inputRect.left;
-          anchorTop = inputRect.top;
-          anchorBottom = inputRect.bottom;
-          anchorHeight = inputRect.height;
-        }
-
-        // DOMRect-compatible shape required by Ark UI / zag.js positioning
-        return {
-          x: anchorLeft,
-          y: anchorTop,
-          width: containerRect.right - anchorLeft,
-          height: anchorHeight,
-          top: anchorTop,
-          bottom: anchorBottom,
-          left: anchorLeft,
-          right: containerRect.right,
-        };
-      },
-    }),
+  const menuPositioning = useQueryBarPositioning(
+    { containerRef, getAnchorLeft },
     // insertIndex forces recalculation when input moves between chips
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [containerRef, buildingChipRef, inputRef, isBuilding, insertIndex],
+    [insertIndex],
   );
 
   return { menuPositioning, setMenuOffset, resetMenuOffset };
