@@ -13,9 +13,7 @@ export const QueryBarErrors: FC<QueryBarErrorsProps> = ({ errors }) => {
   if (errors.length === 0) return null;
 
   const title =
-    errors.length === 1
-      ? 'Filter contains 1 issue:'
-      : `Filter contains ${errors.length} issues:`;
+    errors.length === 1 ? 'Filter contains 1 issue:' : `Filter contains ${errors.length} issues:`;
 
   return (
     <Alert color='destructive'>

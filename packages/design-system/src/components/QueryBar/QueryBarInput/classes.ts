@@ -31,8 +31,7 @@ const BUTTON_GAP = 8; // gap-8 between buttons
 const ACTIONS_RIGHT = 8; // right-8 offset of the actions container
 
 /** Right padding (px) applied to the chip area when content is present. */
-export const ACTIONS_PADDING =
-  BUTTON_COUNT * BUTTON_SIZE + BUTTON_GAP + ACTIONS_RIGHT;
+export const ACTIONS_PADDING = BUTTON_COUNT * BUTTON_SIZE + BUTTON_GAP + ACTIONS_RIGHT;
 
 // ── CVA variants ──────────────────────────────────────────
 
