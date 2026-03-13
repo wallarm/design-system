@@ -4,6 +4,7 @@ import { flushSync } from 'react-dom';
 import { chipIdToConditionIndex } from '../../lib';
 import { useDateRange } from '../../QueryBarMenu/QueryBarDateValueMenu/hooks';
 import type {
+  ChipErrorSegment,
   Condition,
   FieldMetadata,
   FilterOperator,
@@ -27,7 +28,7 @@ interface UseQueryBarAutocompleteOptions {
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
     atIndex?: number,
-    error?: boolean,
+    error?: ChipErrorSegment,
     dateOrigin?: 'relative' | 'absolute',
   ) => void;
   removeCondition: (chipId: string) => void;
