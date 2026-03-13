@@ -31,7 +31,7 @@ export interface QueryBarAutocompleteState {
   segmentMenuFilterText: string;
   editingSegment: ChipSegment | null;
   /** Ref for multi-select blur commit — set by value menu, called by blur handler */
-  blurCommitRef: RefObject<(() => void) | null>;
+  blurCommitRef: RefObject<(() => boolean) | null>;
 }
 
 export interface QueryBarMenuProps {
