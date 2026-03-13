@@ -22,7 +22,9 @@ export const TableRowExpanded = <T,>({ row }: TableRowExpandedProps<T>) => {
 
   return (
     <Tr data-testid={testId}>
-      {hasExpandColumn && <Td className='border-b-0 bg-bg-surface-2 sticky left-0' />}
+      {hasExpandColumn && (
+        <Td className='border-b-0 border-r border-border-primary-light bg-bg-surface-2 sticky left-0' />
+      )}
       <Td
         colSpan={contentColSpan}
         className='border-b border-border-primary-light bg-bg-primary p-0'
