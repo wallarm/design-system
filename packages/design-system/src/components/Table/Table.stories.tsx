@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Copy, Filter, FilterX, PanelRight, Trash2 } from '../../icons';
+import { Copy, Ellipsis, Filter, FilterX, PanelRight, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { InlineCodeSnippet } from '../CodeSnippet';
@@ -14,6 +14,7 @@ import {
   DropdownMenuItemIcon,
   DropdownMenuItemText,
   DropdownMenuSeparator,
+  DropdownMenuTrigger,
 } from '../DropdownMenu';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
@@ -555,43 +556,55 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
                 size: 400,
                 resizeType: 'resize',
                 renderActions: (row: { original: SecurityEvent }) => (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type='button'
-                        className='h-24 w-24 shrink-0 hover:bg-states-primary-hover rounded-8 transition-colors cursor-pointer inline-flex items-center justify-center bg-transparent border-0 p-0'
-                        onClick={() => alert(`Preview: ${row.original.objectName}`)}
-                        aria-label='Preview'
-                      >
-                        <PanelRight size='sm' />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent>Preview</TooltipContent>
-                  </Tooltip>
-                ),
-                renderMenuForMoreAction: (row: { original: SecurityEvent }) => (
                   <>
-                    <DropdownMenuItem
-                      onSelect={() => navigator.clipboard.writeText(row.original.objectName)}
-                    >
-                      <DropdownMenuItemIcon>
-                        <Copy />
-                      </DropdownMenuItemIcon>
-                      <DropdownMenuItemText>Copy name</DropdownMenuItemText>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onSelect={() => alert(`Filter: ${row.original.objectName}`)}>
-                      <DropdownMenuItemIcon>
-                        <Filter />
-                      </DropdownMenuItemIcon>
-                      <DropdownMenuItemText>Show only</DropdownMenuItemText>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => alert(`Exclude: ${row.original.objectName}`)}>
-                      <DropdownMenuItemIcon>
-                        <FilterX />
-                      </DropdownMenuItemIcon>
-                      <DropdownMenuItemText>Exclude</DropdownMenuItemText>
-                    </DropdownMenuItem>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant='ghost'
+                          color='neutral'
+                          size='small'
+                          onClick={() => alert(`Preview: ${row.original.objectName}`)}
+                          aria-label='Preview'
+                        >
+                          <PanelRight />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Preview</TooltipContent>
+                    </Tooltip>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant='ghost' color='neutral' size='small' aria-label='More'>
+                          <Ellipsis />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent>
+                        <DropdownMenuItem
+                          onSelect={() => navigator.clipboard.writeText(row.original.objectName)}
+                        >
+                          <DropdownMenuItemIcon>
+                            <Copy />
+                          </DropdownMenuItemIcon>
+                          <DropdownMenuItemText>Copy name</DropdownMenuItemText>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onSelect={() => alert(`Filter: ${row.original.objectName}`)}
+                        >
+                          <DropdownMenuItemIcon>
+                            <Filter />
+                          </DropdownMenuItemIcon>
+                          <DropdownMenuItemText>Show only</DropdownMenuItemText>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onSelect={() => alert(`Exclude: ${row.original.objectName}`)}
+                        >
+                          <DropdownMenuItemIcon>
+                            <FilterX />
+                          </DropdownMenuItemIcon>
+                          <DropdownMenuItemText>Exclude</DropdownMenuItemText>
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </>
                 ),
               },

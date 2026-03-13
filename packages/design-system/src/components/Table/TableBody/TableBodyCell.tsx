@@ -1,7 +1,8 @@
+import { useCallback, useState } from 'react';
 import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
-import { ACTIONS_GAP, ACTIONS_PL, ACTIONS_PR, ACTION_BUTTON_SIZE } from '../classes';
+import { ACTIONS_PADDING_EXTRA } from '../classes';
 import {
   getAlignClass,
   getExpandBorderClass,
@@ -43,19 +44,9 @@ export const TableBodyCell = <T,>({
   const isCut = meta?.resizeType === 'cut';
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
 
-  const hasRenderActions = !!meta?.renderActions;
-  const hasRenderMenu = !!meta?.renderMenuForMoreAction;
-  const hasActions = hasRenderActions || hasRenderMenu;
-
-  // Right padding to prevent content from hiding behind absolutely-positioned actions.
-  // Layout: ACTIONS_PL + buttons(ACTION_BUTTON_SIZE each) + ACTIONS_GAP between them + ACTIONS_PR
-  const actionsPaddingRight = hasActions
-    ? ACTIONS_PL +
-    (hasRenderActions ? ACTION_BUTTON_SIZE : 0) +
-    (hasRenderActions && hasRenderMenu ? ACTIONS_GAP : 0) +
-    (hasRenderMenu ? ACTION_BUTTON_SIZE : 0) +
-    ACTIONS_PR
-    : undefined;
+  const hasActions = !!meta?.renderActions;
+  const [actionsWidth, setActionsWidth] = useState(0);
+  const handleActionsWidth = useCallback((width: number) => setActionsWidth(width), []);
 
   return (
     <Td
@@ -76,7 +67,7 @@ export const TableBodyCell = <T,>({
         width: cell.column.getSize(),
         ...dndStyle,
         ...(isCut && { overflow: 'hidden' }),
-        ...(actionsPaddingRight && { paddingRight: actionsPaddingRight }),
+        ...(actionsWidth > 0 && { paddingRight: actionsWidth + ACTIONS_PADDING_EXTRA }),
       }}
       colSpan={colSpan}
     >
@@ -88,11 +79,9 @@ export const TableBodyCell = <T,>({
         content
       )}
       {hasActions && (
-        <TableMasterCellActions
-          row={cell.row}
-          renderActions={meta?.renderActions}
-          renderMenuForMoreAction={meta?.renderMenuForMoreAction}
-        />
+        <TableMasterCellActions onWidthChange={handleActionsWidth}>
+          {meta.renderActions!(cell.row)}
+        </TableMasterCellActions>
       )}
     </Td>
   );
