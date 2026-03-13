@@ -15,7 +15,13 @@ const meta = {
       },
     },
   },
-  decorators: [Story => <div className='w-[800px]'><Story /></div>],
+  decorators: [
+    Story => (
+      <div className='w-[800px]'>
+        <Story />
+      </div>
+    ),
+  ],
   tags: ['autodocs'],
   argTypes: {
     placeholder: {

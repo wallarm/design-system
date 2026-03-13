@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { chipIdToConditionIndex, CONNECTOR_ID_PATTERN } from '../../lib';
+import { CONNECTOR_ID_PATTERN, chipIdToConditionIndex } from '../../lib';
 import type {
   ChipErrorSegment,
   Condition,
