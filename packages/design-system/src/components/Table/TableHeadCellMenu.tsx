@@ -10,6 +10,7 @@ import {
   Pin,
   PinOff,
 } from '../../icons';
+import { Button } from '../Button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,7 +20,6 @@ import {
   DropdownMenuTriggerItem,
 } from '../DropdownMenu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-import { tableHeaderButtonClass } from './classes';
 import { SORT_LABELS } from './lib';
 import { useTableContext } from './TableContext';
 
@@ -96,9 +96,9 @@ export const TableHeadCellMenu = <T,>({ column }: TableColumnHeaderMenuProps<T>)
         <span className='inline-flex'>
           <DropdownMenu onOpenChange={setMenuOpen}>
             <DropdownMenuTrigger asChild>
-              <button type='button' className={tableHeaderButtonClass} aria-label='More'>
-                <Ellipsis size='sm' />
-              </button>
+              <Button variant='ghost' color='neutral' size='small' aria-label='More'>
+                <Ellipsis />
+              </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
               {/* Move left / Move right */}
