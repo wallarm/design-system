@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { QueryBarDropdownItem } from '../../types';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import type { ValueOption } from './QueryBarValueMenu';
@@ -57,13 +57,15 @@ export const useValueMenuState = ({
 
   // Sync checked values when initialValues change while menu is already open
   // (e.g., user edits segment text to remove a value — dropdown should uncheck it)
-  const serializedInitial = initialValues.map(String).sort().join('\0');
-  // biome-ignore lint/correctness/useExhaustiveDependencies: uses serializedInitial as a stable proxy for initialValues array identity
+  const prevSerializedRef = useRef('');
   useEffect(() => {
+    const serialized = initialValues.map(String).sort().join('\0');
+    if (serialized === prevSerializedRef.current) return;
+    prevSerializedRef.current = serialized;
     if (open && prevOpenRef.current) {
       setCheckedValues(initialValues);
     }
-  }, [serializedInitial]);
+  }, [initialValues, open]);
 
   const toggleValue = (val: ConditionValue) => {
     setCheckedValues(prev => (prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]));
@@ -72,16 +74,15 @@ export const useValueMenuState = ({
   const onCommitRef = useRef(onCommit);
   onCommitRef.current = onCommit;
 
-  const commitChecked = (): boolean => {
+  const commitChecked = useCallback((): boolean => {
     if (checkedValuesRef.current.length > 0 && onCommitRef.current) {
       onCommitRef.current(checkedValuesRef.current);
       return true;
     }
     return false;
-  };
+  }, []);
 
   // Register blur commit function so the blur handler can commit before resetting state
-  // biome-ignore lint/correctness/useExhaustiveDependencies: commitChecked reads from refs, no need to re-register on every render
   useEffect(() => {
     if (!blurCommitRef) return;
     if (open && multiSelect) {
@@ -92,7 +93,7 @@ export const useValueMenuState = ({
     return () => {
       blurCommitRef.current = null;
     };
-  }, [open, multiSelect, blurCommitRef]);
+  }, [open, multiSelect, blurCommitRef, commitChecked]);
 
   // ── Flat items for keyboard nav ─────────────────────────
   const flatItems: QueryBarDropdownItem[] = useMemo(
