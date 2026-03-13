@@ -156,6 +156,7 @@ export const useKeyboardNav = ({
   );
 
   // Capture-phase keydown
+  // biome-ignore lint/correctness/useExhaustiveDependencies: handleModArrow and menuRef accessed via stable refs/callbacks
   useEffect(() => {
     if (!open) return;
 
