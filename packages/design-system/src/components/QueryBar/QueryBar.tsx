@@ -1,8 +1,9 @@
 import type { FC, HTMLAttributes } from 'react';
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { useQueryBarAutocomplete, useQueryBarExpression } from './hooks';
 import { QueryBarProvider, useQueryBarContextValue } from './QueryBarContext';
+import { parseQueryBarErrors, QueryBarErrors } from './QueryBarErrors';
 import { QueryBarInput } from './QueryBarInput';
 import { QueryBarMenu } from './QueryBarMenu/QueryBarMenu';
 import type { ExprNode, FieldMetadata } from './types';
@@ -92,12 +93,16 @@ export const QueryBar: FC<QueryBarProps> = ({
     showKeyboardHint,
   });
 
+  // ── Errors ────────────────────────────────────────────────
+
+  const errors = useMemo(() => parseQueryBarErrors(conditions, fields), [conditions, fields]);
+
   // ── Render ─────────────────────────────────────────────────
 
   return (
     <div
       ref={containerRef}
-      className={cn('relative w-full', className)}
+      className={cn('relative flex w-full flex-col gap-4', className)}
       onFocus={autocomplete.handleFocus}
       onBlur={autocomplete.handleBlur}
     >
@@ -106,6 +111,8 @@ export const QueryBar: FC<QueryBarProps> = ({
       </QueryBarProvider>
 
       <QueryBarMenu fields={fields} autocomplete={autocomplete} />
+
+      <QueryBarErrors errors={errors} />
     </div>
   );
 };
