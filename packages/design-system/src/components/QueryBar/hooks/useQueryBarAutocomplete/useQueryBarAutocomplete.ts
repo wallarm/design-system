@@ -70,6 +70,9 @@ export const useQueryBarAutocomplete = ({
   const conditionsLengthRef = useRef(conditions.length);
   conditionsLengthRef.current = conditions.length;
 
+  // Ref for multi-select blur commit: set by QueryBarValueMenu when open in multi-select mode
+  const blurCommitRef = useRef<(() => boolean) | null>(null);
+
   // ── Child hooks ───────────────────────────────────────────
 
   const { menuPositioning, setMenuOffset, resetMenuOffset } = useMenuPositioning({
@@ -183,6 +186,7 @@ export const useQueryBarAutocomplete = ({
     containerRef,
     inputRef,
     editingSegment: editing.editingSegment,
+    blurCommitRef,
     setIsFocused,
     setMenuState,
     resetMenuOffset,
@@ -247,7 +251,7 @@ export const useQueryBarAutocomplete = ({
     conditions,
     buildingMultiValue,
     dateRangeFromValue: dateRange.fromValue,
-    segmentFilterText: editing.editingSegment === 'value' ? editing.segmentFilterText : undefined,
+    segmentFilterText: editing.editingSegment === 'value' ? editing.segmentMenuFilterText : undefined,
   });
 
   // ── Public API ────────────────────────────────────────────
@@ -288,11 +292,13 @@ export const useQueryBarAutocomplete = ({
     editingChipId: editing.editingChipId,
     editingSegment: editing.editingSegment,
     segmentFilterText: editing.segmentFilterText,
+    segmentMenuFilterText: editing.segmentMenuFilterText,
     handleSegmentFilterChange: editing.setSegmentFilterText,
     cancelSegmentEdit: editing.cancelSegmentEdit,
     handleCustomValueCommit,
     handleCustomAttributeCommit,
     menuRef,
     closeAutocompleteMenu,
+    blurCommitRef,
   };
 };

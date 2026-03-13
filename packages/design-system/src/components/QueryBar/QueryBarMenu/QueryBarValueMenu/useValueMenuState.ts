@@ -19,6 +19,8 @@ interface UseValueMenuStateOptions {
   onBuildingValueChange?: (preview: string | undefined) => void;
   inputRef?: RefObject<HTMLInputElement | null>;
   menuRef?: RefObject<HTMLDivElement | null>;
+  /** Ref to register blur commit function — called by blur handler before state reset. Returns true if committed. */
+  blurCommitRef?: RefObject<(() => boolean) | null>;
 }
 
 export const useValueMenuState = ({
@@ -34,6 +36,7 @@ export const useValueMenuState = ({
   onBuildingValueChange,
   inputRef,
   menuRef,
+  blurCommitRef,
 }: UseValueMenuStateOptions) => {
   // ── Multi-select internal state ─────────────────────────
   const [checkedValues, setCheckedValues] = useState<ConditionValue[]>(initialValues);
@@ -66,11 +69,30 @@ export const useValueMenuState = ({
     setCheckedValues(prev => (prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]));
   };
 
-  const commitChecked = () => {
-    if (checkedValuesRef.current.length > 0 && onCommit) {
-      onCommit(checkedValuesRef.current);
+  const onCommitRef = useRef(onCommit);
+  onCommitRef.current = onCommit;
+
+  const commitChecked = (): boolean => {
+    if (checkedValuesRef.current.length > 0 && onCommitRef.current) {
+      onCommitRef.current(checkedValuesRef.current);
+      return true;
     }
+    return false;
   };
+
+  // Register blur commit function so the blur handler can commit before resetting state
+  useEffect(() => {
+    if (!blurCommitRef) return;
+    if (open && multiSelect) {
+      blurCommitRef.current = commitChecked;
+    } else {
+      blurCommitRef.current = null;
+    }
+    return () => {
+      blurCommitRef.current = null;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, multiSelect, blurCommitRef]);
 
   // ── Flat items for keyboard nav ─────────────────────────
   const flatItems: QueryBarDropdownItem[] = useMemo(

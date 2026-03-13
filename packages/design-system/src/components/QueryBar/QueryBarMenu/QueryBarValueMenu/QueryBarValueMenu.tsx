@@ -41,6 +41,8 @@ export interface QueryBarValueMenuProps {
   filterText?: string;
   /** Ref to the menu content element — shared across menus for focus management */
   menuRef?: RefObject<HTMLDivElement | null>;
+  /** Ref set by this component to allow blur handler to commit multi-select values */
+  blurCommitRef?: RefObject<(() => boolean) | null>;
   className?: string;
 }
 
@@ -60,6 +62,7 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
   inputRef,
   filterText = '',
   menuRef,
+  blurCommitRef,
   className,
 }) => {
   const filteredValues = useMemo(
@@ -87,6 +90,7 @@ export const QueryBarValueMenu: FC<QueryBarValueMenuProps> = ({
     onBuildingValueChange,
     inputRef,
     menuRef,
+    blurCommitRef,
   });
 
   // For multi-select, ensure checked items are always visible (even when filtered out)
