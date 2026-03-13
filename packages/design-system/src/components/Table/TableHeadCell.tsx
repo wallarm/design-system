@@ -21,9 +21,10 @@ import { TableSortHandler } from './TableSortHandler';
 
 interface TableHeadCellProps<T> {
   header: Header<T, unknown>;
+  hasTextDescription?: boolean;
 }
 
-export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
+export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellProps<T>) => {
   const ctx = useTableContext<T>();
   const {
     sortingEnabled,
@@ -87,7 +88,8 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
     <Th
       ref={canDnd ? setNodeRef : undefined}
       className={cn(
-        'group align-top',
+        'group',
+        hasTextDescription ? 'align-top py-8' : 'align-middle',
         alignClass,
         isRightAligned && 'pl-4 pr-16',
         isLastColumn && hasSettingsMenu && 'pr-[44px]',
@@ -117,7 +119,10 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
       {isNotBasicColumn && content}
 
       {!header.isPlaceholder && !isNotBasicColumn && (
-        <HStack align='start' justify={isRightAligned ? (hasMenu ? 'between' : 'end') : undefined}>
+        <HStack
+          align={isTextDescription ? 'start' : 'center'}
+          justify={isRightAligned ? (hasMenu ? 'between' : 'end') : undefined}
+        >
           {isRightAligned && hasMenu && (
             <span className='shrink-0 opacity-0 group-hover:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
               <TableHeadCellMenu column={column} />

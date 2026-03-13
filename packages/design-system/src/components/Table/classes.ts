@@ -17,7 +17,7 @@ const pinnedLeftShadow = cn(
 export const tableHeadCellVariants = cva(
   cn(
     tableCellBase,
-    'pl-16 pr-4 py-8 text-xs font-medium text-text-secondary leading-none',
+    'pl-16 pr-4 py-4 text-xs font-medium text-text-secondary',
     'first:rounded-tl-12 last:rounded-tr-12',
     'bg-bg-light-primary',
     'whitespace-nowrap select-none outline-none',

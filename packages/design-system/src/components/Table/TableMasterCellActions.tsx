@@ -2,6 +2,7 @@ import { type ReactNode, useState } from 'react';
 import type { Row } from '@tanstack/react-table';
 import { Ellipsis } from '../../icons';
 import { cn } from '../../utils/cn';
+import { Button } from '../Button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '../DropdownMenu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
@@ -32,18 +33,9 @@ export const TableMasterCellActions = <T,>({
             <span className='inline-flex'>
               <DropdownMenu onOpenChange={setMenuOpen}>
                 <DropdownMenuTrigger asChild>
-                  <button
-                    type='button'
-                    className={cn(
-                      'h-24 w-24 shrink-0 rounded-8',
-                      'hover:bg-states-primary-hover',
-                      'transition-colors cursor-pointer',
-                      'inline-flex items-center justify-center bg-transparent border-0 p-0',
-                    )}
-                    aria-label='More'
-                  >
-                    <Ellipsis size='sm' />
-                  </button>
+                  <Button variant='ghost' color='neutral' size='small' aria-label='More'>
+                    <Ellipsis />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>{menuContent}</DropdownMenuContent>
               </DropdownMenu>

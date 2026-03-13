@@ -1,19 +1,13 @@
 import { type FC, useCallback } from 'react';
 import { ArrowLeft, ArrowRight } from '../../icons';
-import { cn } from '../../utils/cn';
+import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-import { tableHeaderButtonClass } from './classes';
 import { useTableContext } from './TableContext';
 
 interface TableScrollHandlerProps {
   atStart: boolean;
   atEnd: boolean;
 }
-
-const scrollButtonClass = cn(
-  tableHeaderButtonClass,
-  'disabled:cursor-not-allowed disabled:opacity-50',
-);
 
 export const TableScrollHandler: FC<TableScrollHandlerProps> = ({ atStart, atEnd }) => {
   const ctx = useTableContext();
@@ -41,29 +35,31 @@ export const TableScrollHandler: FC<TableScrollHandlerProps> = ({ atStart, atEnd
     <div className='shrink-0 ml-auto flex items-center gap-4'>
       <Tooltip disabled={atStart}>
         <TooltipTrigger asChild>
-          <button
-            type='button'
-            className={scrollButtonClass}
+          <Button
+            variant='ghost'
+            color='neutral'
+            size='small'
             disabled={atStart}
             onClick={handleScrollLeft}
             aria-label='Scroll left'
           >
-            <ArrowLeft size='sm' />
-          </button>
+            <ArrowLeft />
+          </Button>
         </TooltipTrigger>
         <TooltipContent>Scroll left</TooltipContent>
       </Tooltip>
       <Tooltip disabled={atEnd}>
         <TooltipTrigger asChild>
-          <button
-            type='button'
-            className={scrollButtonClass}
+          <Button
+            variant='ghost'
+            color='neutral'
+            size='small'
             disabled={atEnd}
             onClick={handleScrollRight}
             aria-label='Scroll right'
           >
-            <ArrowRight size='sm' />
-          </button>
+            <ArrowRight />
+          </Button>
         </TooltipTrigger>
         <TooltipContent>Scroll right</TooltipContent>
       </Tooltip>

@@ -6,12 +6,20 @@ import { TableHeadCell } from './TableHeadCell';
 export const TableHead: FC = () => {
   const { table, theadRef } = useTableContext();
 
+  const hasTextDescription = table
+    .getAllLeafColumns()
+    .some(col => col.columnDef.meta?.description?.type === 'text');
+
   return (
     <THead ref={theadRef} className='sticky top-0 z-30 h-32'>
       {table.getHeaderGroups().map(headerGroup => (
         <Tr key={headerGroup.id}>
           {headerGroup.headers.map(header => (
-            <TableHeadCell key={header.id} header={header} />
+            <TableHeadCell
+              key={header.id}
+              header={header}
+              hasTextDescription={hasTextDescription}
+            />
           ))}
         </Tr>
       ))}
