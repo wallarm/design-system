@@ -6,10 +6,7 @@ import { isValidFieldValue } from '../hooks/useQueryBarAutocomplete/valueCommitH
  * Parse conditions into human-readable error messages.
  * Pure function — no React, no side effects.
  */
-export const parseQueryBarErrors = (
-  conditions: Condition[],
-  fields: FieldMetadata[],
-): string[] => {
+export const parseQueryBarErrors = (conditions: Condition[], fields: FieldMetadata[]): string[] => {
   const errors: string[] = [];
 
   for (const condition of conditions) {

@@ -136,11 +136,7 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
             if (e.target === e.currentTarget) onInputClick();
           }}
         >
-          <ChipsWithGaps
-            chips={chipsBefore}
-            hideTrailingGap={hideTrailingGap}
-            {...chipsGapProps}
-          />
+          <ChipsWithGaps chips={chipsBefore} hideTrailingGap={hideTrailingGap} {...chipsGapProps} />
 
           {buildingChipData ? (
             <div
@@ -160,15 +156,9 @@ export const QueryBarInput: FC<QueryBarInputProps> = ({ className, ...props }) =
             <QueryBarFilterInput hasContent={hasContent} />
           )}
 
-          <ChipsWithGaps
-            chips={chipsAfter}
-            hideLeadingGap={hideLeadingGap}
-            {...chipsGapProps}
-          />
+          <ChipsWithGaps chips={chipsAfter} hideLeadingGap={hideLeadingGap} {...chipsGapProps} />
 
-          {chipsAfter.length > 0 && (
-            <TrailingGap chips={chipsAfter} onGapClick={onGapClick} />
-          )}
+          {chipsAfter.length > 0 && <TrailingGap chips={chipsAfter} onGapClick={onGapClick} />}
         </div>
 
         <QueryBarInputActions

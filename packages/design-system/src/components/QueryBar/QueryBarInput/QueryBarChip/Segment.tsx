@@ -100,7 +100,10 @@ export const Segment: FC<SegmentProps> = ({
           {/* Hidden sizer to measure text width */}
           <span
             ref={sizerRef}
-            className={cn(segmentTextVariants({ variant, error }), 'invisible absolute whitespace-pre')}
+            className={cn(
+              segmentTextVariants({ variant, error }),
+              'invisible absolute whitespace-pre',
+            )}
             aria-hidden
           >
             {editText || ' '}

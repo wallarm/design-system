@@ -27,8 +27,7 @@ export const useQueryBarPositioning = (
       gutter: 4,
       getAnchorRect: () => {
         const containerEl =
-          containerRef?.current ??
-          anchorRef?.current?.closest<HTMLElement>(QUERY_BAR_SELECTOR);
+          containerRef?.current ?? anchorRef?.current?.closest<HTMLElement>(QUERY_BAR_SELECTOR);
         const containerRect = containerEl?.getBoundingClientRect();
         if (!containerRect) return null;
 
