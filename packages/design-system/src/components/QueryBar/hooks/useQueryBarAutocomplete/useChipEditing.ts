@@ -95,13 +95,12 @@ export const useChipEditing = ({
       }
 
       setEditingSegment(segment);
-      // Show full dropdown (empty filter) when condition has an error
       const segmentText: Record<ChipSegment, string> = {
         attribute: chip.attribute ?? '',
         operator: chip.operator ?? '',
         value: chip.value ?? '',
       };
-      setSegmentFilterText(condition.error ? '' : segmentText[segment]);
+      setSegmentFilterText(segmentText[segment]);
 
       setMenuState(SEGMENT_TO_MENU[segment]);
     },

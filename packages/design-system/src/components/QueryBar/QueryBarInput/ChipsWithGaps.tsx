@@ -45,6 +45,9 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
             operator={chip.operator}
             value={chip.value}
             error={chip.error}
+            valueParts={chip.valueParts}
+            valueSeparator={chip.valueSeparator}
+            errorValueIndices={chip.errorValueIndices}
             onRemove={() => onChipRemove(chip.id)}
             onSegmentClick={(segment, anchorRect) => onChipClick(chip.id, segment, anchorRect)}
           />

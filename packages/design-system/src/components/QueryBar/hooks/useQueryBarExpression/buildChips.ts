@@ -1,5 +1,6 @@
 import { getDateDisplayLabel, getOperatorLabel } from '../../lib';
-import type { Condition, FieldMetadata, QueryBarChipData } from '../../types';
+import type { ChipErrorSegment, Condition, FieldMetadata, QueryBarChipData } from '../../types';
+import { getInvalidValueIndices } from '../useQueryBarAutocomplete/valueCommitHelpers';
 
 /** Build a display chip for a single condition */
 const makeConditionChip = (
@@ -9,7 +10,7 @@ const makeConditionChip = (
   error: boolean,
 ): QueryBarChipData => {
   const condition = conditions[i];
-  const chipError = condition?.error || error;
+  const chipError: ChipErrorSegment | undefined = condition?.error || (error ? true : undefined);
   if (!condition)
     return {
       id: `chip-${i}`,
@@ -17,40 +18,70 @@ const makeConditionChip = (
       attribute: '',
       operator: '',
       value: '',
-      error,
+      error: error || undefined,
     } as QueryBarChipData;
   const field = fields.find(f => f.name === condition.field);
 
-  let displayValue: string;
-  let hasInvalidDate = false;
+  const baseChip = {
+    id: `chip-${i}`,
+    variant: 'chip' as const,
+    attribute: field?.label || condition.field,
+    operator: getOperatorLabel(condition.operator, field?.type || 'string'),
+  };
+
+  // Date fields
   if (field?.type === 'date') {
     if (Array.isArray(condition.value)) {
       const parts = condition.value.map(v => getDateDisplayLabel(String(v)));
-      hasInvalidDate = parts.some(p => p === 'Invalid Date');
-      displayValue = parts.join(' – ');
-    } else {
-      displayValue = getDateDisplayLabel(String(condition.value ?? ''));
-      hasInvalidDate = displayValue === 'Invalid Date';
+      const invalidIndices = parts.reduce<number[]>((acc, p, idx) => {
+        if (p === 'Invalid Date') acc.push(idx);
+        return acc;
+      }, []);
+      return {
+        ...baseChip,
+        value: parts.join(' – '),
+        error: chipError || (invalidIndices.length > 0 ? 'value' : undefined),
+        ...(invalidIndices.length > 0 && {
+          valueParts: parts,
+          valueSeparator: ' – ',
+          errorValueIndices: invalidIndices,
+        }),
+      };
     }
-  } else if (Array.isArray(condition.value)) {
-    displayValue = condition.value
-      .map(v => field?.values?.find(opt => opt.value === v)?.label ?? String(v))
-      .join(', ');
-  } else {
-    displayValue = String(condition.value ?? '');
-    if (field?.values) {
-      const opt = field.values.find(o => o.value === condition.value);
-      if (opt) displayValue = opt.label;
-    }
+    const displayValue = getDateDisplayLabel(String(condition.value ?? ''));
+    return {
+      ...baseChip,
+      value: displayValue,
+      error: chipError || (displayValue === 'Invalid Date' ? 'value' : undefined),
+    };
+  }
+
+  // Multi-value (in, not_in)
+  if (Array.isArray(condition.value)) {
+    const valueParts = condition.value.map(
+      v => field?.values?.find(opt => opt.value === v)?.label ?? String(v),
+    );
+    const invalidIndices = field ? getInvalidValueIndices(field, condition.value) : [];
+    return {
+      ...baseChip,
+      value: valueParts.join(', '),
+      error: chipError || (invalidIndices.length > 0 ? 'value' : undefined),
+      ...(valueParts.length > 1 && { valueParts }),
+      ...(invalidIndices.length > 0 && { errorValueIndices: invalidIndices }),
+    };
+  }
+
+  // Single value
+  let displayValue = String(condition.value ?? '');
+  if (field?.values) {
+    const opt = field.values.find(o => o.value === condition.value);
+    if (opt) displayValue = opt.label;
   }
 
   return {
-    id: `chip-${i}`,
-    variant: 'chip',
-    attribute: field?.label || condition.field,
-    operator: getOperatorLabel(condition.operator, field?.type || 'string'),
+    ...baseChip,
     value: displayValue,
-    error: chipError || hasInvalidDate,
+    error: chipError,
   };
 };
 
