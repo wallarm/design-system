@@ -1,3 +1,7 @@
+## <small>0.9.1 (2026-03-13)</small>
+
+* fix: Popover z-index and export FieldAction (#39) ([d930a27](https://github.com/wallarm/design-system/commit/d930a27)), closes [#39](https://github.com/wallarm/design-system/issues/39)
+
 ## 0.9.0 (2026-03-11)
 
 * feat: Card component (#36) ([d7d5a05](https://github.com/wallarm/design-system/commit/d7d5a05)), closes [#36](https://github.com/wallarm/design-system/issues/36)
