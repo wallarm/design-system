@@ -127,7 +127,7 @@ ComponentName (root — wraps Ark UI Root with defaults)
 
 ### Pattern 5: Orchestrator (multi-context)
 **Use when:** Component is very complex with multiple independent state domains.
-**Examples in codebase:** QueryBar
+**Examples in codebase:** FilterInput
 
 ```
 ComponentName (root — orchestrator)
@@ -160,7 +160,7 @@ Design the public API following these principles:
 ```
 {ComponentName}                    — Root
 {ComponentName}{Slot}              — Named slot (CardHeader, DrawerBody)
-{ComponentName}{Feature}{Slot}     — Feature-specific slot (QueryBarFieldMenu)
+{ComponentName}{Feature}{Slot}     — Feature-specific slot (FilterInputFieldMenu)
 ```
 
 ### Props Design
@@ -325,7 +325,7 @@ Before designing, review these for consistency:
 | CodeSnippet | Provider + Context | No | Rich state |
 | Tour | Ark UI Wrapper | Yes (Tour) | Via Ark UI |
 | Field | Ark UI Wrapper | Yes (Field) | No |
-| QueryBar | Orchestrator | No | Dual context |
+| FilterInput | Orchestrator | No | Dual context |
 | Toast | Render Prop | Yes (Toaster) | No |
 
 ---
