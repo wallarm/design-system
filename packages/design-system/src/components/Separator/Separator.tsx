@@ -1,6 +1,7 @@
 import type { ComponentPropsWithoutRef, FC, Ref } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 
 const separatorVariants = cva('shrink-0 bg-border-primary', {
   variants: {
@@ -83,7 +84,8 @@ const separatorVariants = cva('shrink-0 bg-border-primary', {
 });
 
 export type SeparatorProps = ComponentPropsWithoutRef<'div'> &
-  VariantProps<typeof separatorVariants> & {
+  VariantProps<typeof separatorVariants> &
+  TestableProps & {
     ref?: Ref<HTMLDivElement>;
     orientation?: 'horizontal' | 'vertical';
     decorative?: boolean;

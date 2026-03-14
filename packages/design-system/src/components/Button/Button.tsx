@@ -1,6 +1,7 @@
 import type { ElementType, FC } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
 
 const buttonVariants = cva('', {
@@ -116,7 +117,9 @@ const buttonVariants = cva('', {
 
 type ButtonVariantProps = VariantProps<typeof buttonVariants>;
 
-export type ButtonProps<C extends ElementType = 'button'> = ButtonBaseProps<C> & ButtonVariantProps;
+export type ButtonProps<C extends ElementType = 'button'> = ButtonBaseProps<C> &
+  ButtonVariantProps &
+  TestableProps;
 
 export const Button: FC<ButtonProps<ElementType>> = ({
   variant = 'primary',

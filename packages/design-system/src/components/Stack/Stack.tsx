@@ -3,6 +3,7 @@ import { Fragment, useMemo } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 import { getValidChildren } from './utils';
 
 const stackVariants = cva('', {
@@ -80,7 +81,8 @@ type StackNativeProps = Omit<HTMLAttributes<HTMLDivElement>, 'className'>;
 type StackVariantProps = VariantProps<typeof stackVariants>;
 
 export type StackProps = StackNativeProps &
-  StackVariantProps & {
+  StackVariantProps &
+  TestableProps & {
     ref?: Ref<HTMLDivElement>;
     asChild?: boolean;
   };

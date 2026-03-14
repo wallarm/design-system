@@ -1,16 +1,14 @@
 import type { FC } from 'react';
 import { Tour as ArkUiTour } from '@ark-ui/react';
+import type { TestableProps } from '../../utils/testId';
 import { TourInner } from './TourInner';
 
-export interface TourProps extends Omit<ArkUiTour.RootProps, 'children'> {
-  /** Base value for cascading `data-testid` attributes. */
-  testId?: string;
-}
+export interface TourProps extends Omit<ArkUiTour.RootProps, 'children'>, TestableProps {}
 
 export const Tour: FC<TourProps> = ({
   lazyMount = true,
   unmountOnExit = true,
-  testId,
+  'data-testid': testId,
   ...props
 }) => (
   <ArkUiTour.Root {...props} lazyMount={lazyMount} unmountOnExit={unmountOnExit}>

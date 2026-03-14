@@ -4,6 +4,7 @@ import { useFieldContext } from '@ark-ui/react/field';
 import { mergeProps } from '@ark-ui/react/utils';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 import { inputVariants } from './classes';
 
 type InputNativeProps = InputHTMLAttributes<HTMLInputElement>;
@@ -11,7 +12,8 @@ type InputNativeProps = InputHTMLAttributes<HTMLInputElement>;
 type InputVariantsProps = VariantProps<typeof inputVariants>;
 
 export type InputProps = InputNativeProps &
-  InputVariantsProps & {
+  InputVariantsProps &
+  TestableProps & {
     ref?: Ref<HTMLInputElement>;
   };
 

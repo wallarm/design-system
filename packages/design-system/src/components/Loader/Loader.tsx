@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 import { LoaderCircle } from './LoaderCircle';
 import { LoaderSonner } from './LoaderSonner';
 
@@ -33,21 +34,29 @@ interface LoaderBaseProps {
   background?: boolean;
 }
 
-export type LoaderProps = LoaderBaseProps & LoaderVariantsProps;
+export type LoaderProps = LoaderBaseProps & LoaderVariantsProps & TestableProps;
 
 export const Loader: FC<LoaderProps> = ({
   type = 'circle',
   size = 'xl',
   color,
   background = true,
+  'data-testid': testId,
 }) => {
   const className = cn(loaderVariants({ size, color }));
 
   if (type === 'sonner') {
-    return <LoaderSonner className={className} data-role='spinner' />;
+    return <LoaderSonner className={className} data-role='spinner' data-testid={testId} />;
   }
 
-  return <LoaderCircle className={className} background={background} data-role='spinner' />;
+  return (
+    <LoaderCircle
+      className={className}
+      background={background}
+      data-role='spinner'
+      data-testid={testId}
+    />
+  );
 };
 
 Loader.displayName = 'Loader';

@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 
 const numericBadgeVariants = cva(
   'inline-flex items-center rounded-full border-1 px-4 py-1 font-mono text-xs font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:ring-offset-2',
@@ -22,7 +23,7 @@ type NumericBadgeNativeProps = HTMLAttributes<HTMLDivElement>;
 
 type NumericBadgeVariantsProps = VariantProps<typeof numericBadgeVariants>;
 
-export type NumericBadgeProps = NumericBadgeNativeProps & NumericBadgeVariantsProps;
+export type NumericBadgeProps = NumericBadgeNativeProps & NumericBadgeVariantsProps & TestableProps;
 
 export const NumericBadge: FC<NumericBadgeProps> = ({ type = 'primary', ...props }) => {
   return (

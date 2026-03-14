@@ -1,6 +1,7 @@
 import type { CSSProperties, FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 
 const skeletonVariants = cva(cn('overflow-hidden', 'animate-skeleton'), {
   variants: {
@@ -54,6 +55,7 @@ type SkeletonWrapProps = SkeletonSharedProps & {
 
 export type SkeletonProps = HTMLAttributes<HTMLDivElement> &
   SkeletonVariantsProps &
+  TestableProps &
   (SkeletonStandaloneProps | SkeletonWrapProps);
 
 export const Skeleton: FC<SkeletonProps> = ({

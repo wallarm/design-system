@@ -2,6 +2,7 @@ import type { ElementType, FC, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 import type { PolymorphicComponentProps } from '../Polymorphic';
 
 const headingVariants = cva('font-sans-display text-text-primary tracking-[-0.02em]', {
@@ -55,11 +56,11 @@ export interface HeadingBaseProps {
 
 export type HeadingProps<C extends ElementType = 'h1'> = PolymorphicComponentProps<
   C,
-  HeadingVariantProps & HeadingBaseProps
+  HeadingVariantProps & HeadingBaseProps & TestableProps
 >;
 
 export const Heading: FC<
-  PolymorphicComponentProps<ElementType, HeadingVariantProps & HeadingBaseProps>
+  PolymorphicComponentProps<ElementType, HeadingVariantProps & HeadingBaseProps & TestableProps>
 > = ({
   as = 'h1',
   size = 'xl',

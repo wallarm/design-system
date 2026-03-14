@@ -2,6 +2,7 @@ import type { FC, Ref } from 'react';
 import { NumberInput as ArkUiNumberInput } from '@ark-ui/react/number-input';
 import { ChevronDown, ChevronUp } from '../../icons';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 
 type NumberInputNativeProps = Omit<ArkUiNumberInput.RootProps, 'className' | 'invalid'>;
 
@@ -10,7 +11,7 @@ interface NumberInputBaseProps {
   ref?: Ref<HTMLDivElement>;
 }
 
-export type NumberInputProps = NumberInputNativeProps & NumberInputBaseProps;
+export type NumberInputProps = NumberInputNativeProps & NumberInputBaseProps & TestableProps;
 
 const numberInputTriggerClassNames = cn(
   // Base

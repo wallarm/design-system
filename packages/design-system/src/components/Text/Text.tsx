@@ -2,6 +2,7 @@ import type { FC, HTMLAttributes, PropsWithChildren, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 
 const textVariants = cva('font-sans-display break-words', {
   variants: {
@@ -55,7 +56,7 @@ interface TextBaseProps {
   ref?: Ref<HTMLHeadingElement>;
 }
 
-export type TextProps = TextNativeProps & TextVariantProps & TextBaseProps;
+export type TextProps = TextNativeProps & TextVariantProps & TextBaseProps & TestableProps;
 
 export const Text: FC<PropsWithChildren<TextProps>> = ({
   size = 'lg',

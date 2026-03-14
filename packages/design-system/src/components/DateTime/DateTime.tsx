@@ -7,6 +7,7 @@ import {
   formatRelativeTime,
   formatTimeOnly,
 } from '../../utils/formatDateTime';
+import type { TestableProps } from '../../utils/testId';
 import { Text } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
@@ -24,7 +25,7 @@ interface DateTimeBaseProps {
 
 type DateTimeNativeProps = Omit<HTMLAttributes<HTMLTimeElement>, 'className'>;
 
-export type DateTimeProps = DateTimeNativeProps & DateTimeBaseProps;
+export type DateTimeProps = DateTimeNativeProps & DateTimeBaseProps & TestableProps;
 
 const toDate = (value: string | Date | number): Date => {
   if (value instanceof Date) return value;

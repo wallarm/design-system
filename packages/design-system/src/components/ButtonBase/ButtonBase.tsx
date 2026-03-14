@@ -4,6 +4,7 @@ import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
 import { isIconOnly } from '../../utils/isIconOnly';
+import type { TestableProps } from '../../utils/testId';
 import { Loader } from '../Loader';
 import type { PolymorphicComponentProps } from '../Polymorphic';
 import { buttonBaseVariants } from './classes';
@@ -21,11 +22,14 @@ type ButtonBaseBaseProps = {
 
 export type ButtonBaseProps<C extends ElementType = 'button'> = PolymorphicComponentProps<
   C,
-  ButtonBaseVariantProps & ButtonBaseBaseProps
+  ButtonBaseVariantProps & ButtonBaseBaseProps & TestableProps
 >;
 
 export const ButtonBase: FC<
-  PolymorphicComponentProps<ElementType, ButtonBaseVariantProps & ButtonBaseBaseProps>
+  PolymorphicComponentProps<
+    ElementType,
+    ButtonBaseVariantProps & ButtonBaseBaseProps & TestableProps
+  >
 > = ({
   as = 'button',
   size = 'large',
