@@ -1,0 +1,54 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash(git commit*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Reminder: Use conventional commit format (type(scope): subject). Run pnpm commit for guided creation.'"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(git push --force*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'BLOCKED: Force push is not allowed. Use regular push or create a new commit.' && exit 1"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write(packages/design-system/src/components/**/*.tsx)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Component file created/modified. Remember to: 1) Export from index.ts 2) Add Storybook stories 3) Consider tests'"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit(packages/design-system/src/components/**/*.tsx)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo 'Component modified. Consider updating: 1) Storybook stories 2) Tests 3) Exports if props changed'"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/ilyapashkov/Projects/wallarm/wallarm-design-system && if git diff --name-only --diff-filter=M 2>/dev/null | grep -q 'packages/design-system/src/'; then echo 'Design system files were modified. Run quality checks before committing: pnpm typecheck && pnpm lint && pnpm test:run'; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
