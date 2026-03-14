@@ -1,3 +1,8 @@
+## 0.10.0 (2026-03-14)
+
+* feat: unified data-testid (#41) ([8a894ba](https://github.com/wallarm/design-system/commit/8a894ba)), closes [#41](https://github.com/wallarm/design-system/issues/41)
+* docs: AI adoption ([523f900](https://github.com/wallarm/design-system/commit/523f900))
+
 ## <small>0.9.1 (2026-03-13)</small>
 
 * fix: Popover z-index and export FieldAction (#39) ([d930a27](https://github.com/wallarm/design-system/commit/d930a27)), closes [#39](https://github.com/wallarm/design-system/issues/39)
