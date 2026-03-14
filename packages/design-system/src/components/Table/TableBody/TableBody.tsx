@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTestId } from '../../../utils/testId';
 import { TBody } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableLoadingState } from '../TableLoadingState';
@@ -8,6 +9,7 @@ import { TableBodyVirtualizedWindow } from './TableBodyVirtualizedWindow';
 
 export const TableBody: FC = () => {
   const { table, isLoading, virtualized } = useTableContext();
+  const testId = useTestId('body');
   const rows = table.getRowModel().rows;
   const hasData = rows.length > 0;
 
@@ -20,7 +22,7 @@ export const TableBody: FC = () => {
   }
 
   return (
-    <TBody>
+    <TBody data-testid={testId}>
       {rows.map(row => {
         return <TableRow key={row.id} row={row} />;
       })}

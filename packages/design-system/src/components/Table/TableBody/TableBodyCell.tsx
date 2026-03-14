@@ -1,5 +1,6 @@
 import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
+import { useTestId } from '../../../utils/testId';
 import {
   getAlignClass,
   getExpandBorderClass,
@@ -25,6 +26,7 @@ export const TableBodyCell = <T,>({
   disablePinnedShadow,
 }: TableBodyCellProps<T>) => {
   const { allLeafColumns } = useTableContext<T>();
+  const testId = useTestId('body-cell');
   const column = cell.column;
   const isPinned = column.getIsPinned();
   const meta = column.columnDef.meta;
@@ -41,6 +43,7 @@ export const TableBodyCell = <T,>({
 
   return (
     <Td
+      data-testid={testId}
       className={cn(
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),

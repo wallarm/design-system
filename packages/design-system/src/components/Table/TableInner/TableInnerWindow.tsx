@@ -1,4 +1,5 @@
 import { type FC, type ReactNode, useCallback, useEffect, useRef } from 'react';
+import { useTestId } from '../../../utils/testId';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
 import { useEndReached } from '../hooks';
 import { useContainerWidth } from '../lib';
@@ -22,6 +23,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   children,
 }) => {
   const { table, onEndReached, onEndReachedThreshold } = useTableContext();
+  const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
   const headerScrollRef = useRef<HTMLDivElement>(null);
   const bodyScrollRef = useRef<HTMLDivElement>(null);
@@ -68,7 +70,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   const tableStyles = 'table-fixed border-separate border-spacing-0';
 
   return (
-    <div ref={rootRef} className='group/scroll outline-none'>
+    <div ref={rootRef} data-testid={testId} className='group/scroll outline-none'>
       {/* Sticky header — own border/rounding so it looks correct when detached */}
       <div className='sticky top-0 z-30 relative'>
         <div

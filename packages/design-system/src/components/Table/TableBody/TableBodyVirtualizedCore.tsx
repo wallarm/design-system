@@ -1,5 +1,6 @@
 import type { FC, RefObject } from 'react';
 import type { Virtualizer } from '@tanstack/react-virtual';
+import { useTestId } from '../../../utils/testId';
 import { TBody, Td, Tr } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableLoadingState } from '../TableLoadingState';
@@ -15,6 +16,7 @@ export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
   virtualizer,
 }) => {
   const { table, isLoading } = useTableContext();
+  const testId = useTestId('body');
   const virtualRows = virtualizer.getVirtualItems();
   const totalSize = virtualizer.getTotalSize();
   const measureElement = virtualizer.measureElement;
@@ -23,7 +25,7 @@ export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
   const scrollMargin = virtualizer.options.scrollMargin;
 
   return (
-    <TBody ref={tbodyRef}>
+    <TBody ref={tbodyRef} data-testid={testId}>
       {virtualRows.length > 0 && (
         <Tr key='spacer-top'>
           <Td

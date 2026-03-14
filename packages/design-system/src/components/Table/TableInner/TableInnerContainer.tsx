@@ -1,5 +1,6 @@
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
 import { cn } from '../../../utils/cn';
+import { useTestId } from '../../../utils/testId';
 import {
   ScrollArea,
   ScrollAreaCorner,
@@ -31,6 +32,7 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
   children,
 }) => {
   const { containerRef, table, onEndReached, onEndReachedThreshold } = useTableContext();
+  const testId = useTestId('container');
   const scrollRootRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
 
@@ -62,6 +64,7 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
     <>
       <ScrollArea
         ref={scrollRootRef}
+        data-testid={testId}
         className={cn('group/scroll', tableContainerVariants({ virtualized }))}
       >
         <ScrollAreaViewport ref={containerRef} data-table-scroll-container tabIndex={-1}>

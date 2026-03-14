@@ -1,6 +1,7 @@
 import { memo, type Ref } from 'react';
 import type { Row } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
 import { Td, Tr } from './primitives';
 import { TableBodyCell } from './TableBody';
@@ -17,6 +18,7 @@ interface TableRowProps<T> {
 
 const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<T>) => {
   const { expandingEnabled } = useTableContext<T>();
+  const testId = useTestId('row');
   const isGroupParent = row.subRows.length > 0;
   const isSelected = isGroupParent ? row.getIsAllSubRowsSelected() : row.getIsSelected();
 
@@ -31,6 +33,7 @@ const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<
         <Tr
           ref={ref}
           data-index={dataIndex}
+          data-testid={testId}
           className='group/row'
           data-selected={isSelected || undefined}
           aria-selected={isSelected || undefined}
@@ -63,6 +66,7 @@ const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<
       <Tr
         ref={ref}
         data-index={dataIndex}
+        data-testid={testId}
         className='group/row'
         data-selected={isSelected || undefined}
         aria-selected={isSelected || undefined}
