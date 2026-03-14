@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
+import { TestIdProvider } from '../../utils/testId';
 import type { AlertColor } from './AlertIcon';
 import { ALERT_MAX_WIDTH, ALERT_MIN_WIDTH } from './const';
 
@@ -49,19 +50,23 @@ export const Alert: FC<AlertProps> = ({
   minWidth = ALERT_MIN_WIDTH,
   maxWidth = ALERT_MAX_WIDTH,
   children,
+  'data-testid': testId,
   ...props
 }) => {
   return (
-    <div
-      {...props}
-      ref={ref}
-      role='alert'
-      data-color={color}
-      className={alertVariants({ color })}
-      style={{ minWidth, maxWidth }}
-    >
-      {children}
-    </div>
+    <TestIdProvider value={testId}>
+      <div
+        {...props}
+        ref={ref}
+        role='alert'
+        data-testid={testId}
+        data-color={color}
+        className={alertVariants({ color })}
+        style={{ minWidth, maxWidth }}
+      >
+        {children}
+      </div>
+    </TestIdProvider>
   );
 };
 

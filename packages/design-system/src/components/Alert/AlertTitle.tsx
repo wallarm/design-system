@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import { useTestId } from '../../utils/testId';
 import {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -20,15 +21,27 @@ export interface AlertTitleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'c
  * Supports text truncation with configurable max lines.
  * Shows a tooltip with full text when content is truncated.
  */
-export const AlertTitle: FC<AlertTitleProps> = ({ ref, children, lineClamp, ...props }) => (
-  <OverflowTooltip>
-    <OverflowTooltipTrigger>
-      <Text {...props} ref={ref} size='sm' weight='medium' color='primary' lineClamp={lineClamp}>
-        {children}
-      </Text>
-    </OverflowTooltipTrigger>
-    <OverflowTooltipContent>{children}</OverflowTooltipContent>
-  </OverflowTooltip>
-);
+export const AlertTitle: FC<AlertTitleProps> = ({ ref, children, lineClamp, ...props }) => {
+  const testId = useTestId('title');
+
+  return (
+    <OverflowTooltip>
+      <OverflowTooltipTrigger>
+        <Text
+          {...props}
+          ref={ref}
+          data-testid={testId}
+          size='sm'
+          weight='medium'
+          color='primary'
+          lineClamp={lineClamp}
+        >
+          {children}
+        </Text>
+      </OverflowTooltipTrigger>
+      <OverflowTooltipContent>{children}</OverflowTooltipContent>
+    </OverflowTooltip>
+  );
+};
 
 AlertTitle.displayName = 'AlertTitle';
