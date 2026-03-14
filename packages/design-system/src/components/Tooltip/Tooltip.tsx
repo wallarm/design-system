@@ -1,8 +1,8 @@
 import type { FC, ReactNode } from 'react';
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-export interface TooltipProps {
+export interface TooltipProps extends TestableProps {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
@@ -15,7 +15,6 @@ export interface TooltipProps {
   interactive?: boolean;
   disabled?: boolean;
   positioning?: ArkUiTooltip.RootProps['positioning'];
-  'data-testid'?: string;
 }
 
 const TOOLTIP_POSITIONING_DEFAULT: ArkUiTooltip.RootProps['positioning'] = {

@@ -2,7 +2,7 @@ import type { ComponentProps, FC, ReactNode, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { CountryContext } from './CountryContext';
 import { type CountryCode, countries } from './countries';
 
@@ -26,7 +26,10 @@ interface CountryBaseProps {
   children?: ReactNode;
 }
 
-export type CountryProps = CountryNativeProps & CountryVariantsProps & CountryBaseProps;
+export type CountryProps = CountryNativeProps &
+  CountryVariantsProps &
+  CountryBaseProps &
+  TestableProps;
 
 export const Country: FC<CountryProps> = ({
   ref,

@@ -53,6 +53,20 @@ await page.getByTestId('login-error--controls').locator('button').click()
 
 ## API
 
+### `TestableProps`
+
+Base interface that all root compound components must extend in their props type.
+
+```tsx
+import { type TestableProps } from '../../utils/testId'
+
+export interface AlertProps extends ..., TestableProps { }
+// or for type aliases:
+export type TagProps = ... & TestableProps
+```
+
+This ensures `data-testid` can be destructured from props without TypeScript errors during declaration file generation (`rslib build`).
+
 ### `TestIdProvider`
 
 React context provider. Root components wrap their children with it.
@@ -117,10 +131,11 @@ All compound components support `data-testid` cascading. Most receive it via the
 
 ## Adding TestId to a new compound component
 
-1. Root component: destructure `'data-testid': testId` from props
-2. Root component: add `data-testid={testId}` to root element
-3. Root component: wrap children in `<TestIdProvider value={testId}>`
-4. Each sub-component: call `const testId = useTestId('slot-name')`
-5. Each sub-component: add `data-testid={testId}` to its root element
+1. Root component: extend props type with `TestableProps`
+2. Root component: destructure `'data-testid': testId` from props
+3. Root component: add `data-testid={testId}` to root element
+4. Root component: wrap children in `<TestIdProvider value={testId}>`
+5. Each sub-component: call `const testId = useTestId('slot-name')`
+6. Each sub-component: add `data-testid={testId}` to its root element
 
 See `.claude/rules/test-id.md` for the full checklist.

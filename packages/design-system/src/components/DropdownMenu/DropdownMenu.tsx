@@ -1,9 +1,9 @@
 import { type FC, type ReactNode, useMemo } from 'react';
 import { Menu } from '@ark-ui/react/menu';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { DropdownMenuContext, useDropdownMenuContext } from './DropdownMenuContext';
 
-interface DropdownMenuProps {
+interface DropdownMenuProps extends TestableProps {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
@@ -19,7 +19,6 @@ interface DropdownMenuProps {
   onHighlightChange?: (details: Menu.HighlightChangeDetails) => void;
   /** Whether selecting an item closes the menu (default true) */
   closeOnSelect?: boolean;
-  'data-testid'?: string;
 }
 
 const ROOT_POSITIONING: Menu.RootProps['positioning'] = {

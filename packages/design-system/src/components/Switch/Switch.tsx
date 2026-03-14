@@ -1,10 +1,10 @@
 import type { FC } from 'react';
 import { Switch as ArkUiSwitch } from '@ark-ui/react/switch';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { SwitchContext } from './SwitchContext';
 
-export interface SwitchProps extends ArkUiSwitch.RootProps {
+export interface SwitchProps extends ArkUiSwitch.RootProps, TestableProps {
   a11yMode?: boolean;
 }
 

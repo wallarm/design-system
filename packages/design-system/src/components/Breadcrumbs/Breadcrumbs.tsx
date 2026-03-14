@@ -1,16 +1,17 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Children, cloneElement, isValidElement } from 'react';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { BreadcrumbsSeparator } from './BreadcrumbsSeparator';
 
-export type BreadcrumbsProps = HTMLAttributes<HTMLElement> & {
-  ref?: Ref<HTMLElement>;
-  /** Additional CSS classes */
-  className?: string;
-  /** Child breadcrumb items and separators */
-  children?: ReactNode;
-};
+export type BreadcrumbsProps = HTMLAttributes<HTMLElement> &
+  TestableProps & {
+    ref?: Ref<HTMLElement>;
+    /** Additional CSS classes */
+    className?: string;
+    /** Child breadcrumb items and separators */
+    children?: ReactNode;
+  };
 
 /**
  * Breadcrumbs component for showing navigation hierarchy.

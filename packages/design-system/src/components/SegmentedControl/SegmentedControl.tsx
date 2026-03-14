@@ -3,7 +3,7 @@ import { SegmentGroup } from '@ark-ui/react/segment-group';
 import type { VariantProps } from 'class-variance-authority';
 import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { segmentedControlIndicatorClassNames, segmentedControlVariants } from './classes';
 
 type SegmentedControlVariantProps = VariantProps<typeof segmentedControlVariants>;
@@ -33,7 +33,8 @@ export interface SegmentedControlBaseProps {
 
 export type SegmentedControlProps = SegmentedControlNativeProps &
   SegmentedControlVariantProps &
-  SegmentedControlBaseProps;
+  SegmentedControlBaseProps &
+  TestableProps;
 
 /**
  * SegmentedControl component for switching between different views or options.

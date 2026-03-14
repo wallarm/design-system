@@ -1,8 +1,8 @@
 import type { FC, HTMLAttributes } from 'react';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-type InputGroupProps = HTMLAttributes<HTMLDivElement>;
+type InputGroupProps = HTMLAttributes<HTMLDivElement> & TestableProps;
 
 export const InputGroup: FC<InputGroupProps> = ({ 'data-testid': testId, ...props }) => (
   <TestIdProvider value={testId}>

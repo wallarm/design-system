@@ -314,4 +314,4 @@ export {
   type WaitForStepEventOptions,
   waitForStepEvent,
 } from './components/Tour';
-export { TestIdProvider, useTestId } from './utils/testId';
+export { type TestableProps, TestIdProvider, useTestId } from './utils/testId';

@@ -1,9 +1,9 @@
 import { forwardRef } from 'react';
 import { ScrollArea as ArkUiScrollArea } from '@ark-ui/react/scroll-area';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-export type ScrollAreaProps = ArkUiScrollArea.RootProps;
+export type ScrollAreaProps = ArkUiScrollArea.RootProps & TestableProps;
 
 export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
   ({ className, 'data-testid': testId, children, ...props }, ref) => (

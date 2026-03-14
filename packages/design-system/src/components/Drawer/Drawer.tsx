@@ -1,9 +1,9 @@
 import type { FC, ReactNode } from 'react';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { DrawerProvider } from './DrawerContext';
 import { DrawerRoot } from './DrawerRoot';
 
-export interface DrawerProps {
+export interface DrawerProps extends TestableProps {
   children: ReactNode;
   /** Controlled open state */
   open?: boolean;
@@ -21,7 +21,6 @@ export interface DrawerProps {
   minWidth?: number;
   /** Maximum width in pixels */
   maxWidth?: number;
-  'data-testid'?: string;
 }
 
 export const Drawer: FC<DrawerProps> = ({

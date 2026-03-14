@@ -1,5 +1,15 @@
 import { createContext, useContext } from 'react';
 
+/**
+ * Base interface for components that support `data-testid` cascading.
+ *
+ * Root compound components should extend this interface in their props type.
+ * This ensures `data-testid` can be destructured and passed to `TestIdProvider`.
+ */
+export interface TestableProps {
+  'data-testid'?: string;
+}
+
 const TestIdContext = createContext<string | undefined>(undefined);
 
 /**

@@ -3,7 +3,7 @@ import { Field as ArkUiField } from '@ark-ui/react/field';
 import { Fieldset as ArkUiFieldset } from '@ark-ui/react/fieldset';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { checkContainCheckboxGroup } from './utils';
 
 const fieldVariants = cva(
@@ -35,7 +35,7 @@ type FieldNativeProps = Omit<HTMLAttributes<HTMLElement>, 'className'> &
 
 type FieldVariantsProps = VariantProps<typeof fieldVariants>;
 
-type FieldProps = FieldNativeProps & FieldVariantsProps;
+type FieldProps = FieldNativeProps & FieldVariantsProps & TestableProps;
 
 export const Field: FC<FieldProps> = ({
   orientation = 'vertical',

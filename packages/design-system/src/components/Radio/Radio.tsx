@@ -1,9 +1,9 @@
 import type { FC } from 'react';
 import { RadioGroup as ArkUiRadioGroup } from '@ark-ui/react/radio-group';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-export type RadioProps = Omit<ArkUiRadioGroup.ItemProps, 'className'>;
+export type RadioProps = Omit<ArkUiRadioGroup.ItemProps, 'className'> & TestableProps;
 
 export const Radio: FC<RadioProps> = ({ children, 'data-testid': testId, ...props }) => (
   <TestIdProvider value={testId}>

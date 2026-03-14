@@ -3,7 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { plainAdapter } from './adapters/plain';
 import type { SyntaxAdapter, Token } from './adapters/types';
 import {
@@ -49,7 +49,8 @@ type CodeSnippetRootVariantProps = VariantProps<typeof codeSnippetRootVariants>;
 type CodeSnippetRootNativeProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
 
 export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippetRootNativeProps &
-  CodeSnippetRootVariantProps & {
+  CodeSnippetRootVariantProps &
+  TestableProps & {
     ref?: Ref<HTMLDivElement>;
     /** The code string to display */
     code: string;

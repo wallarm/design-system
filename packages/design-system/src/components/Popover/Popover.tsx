@@ -1,12 +1,11 @@
 import type { FC, ReactNode } from 'react';
 import { Popover as ArkUiPopover } from '@ark-ui/react';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-export interface PopoverProps {
+export interface PopoverProps extends TestableProps {
   children: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  'data-testid'?: string;
 }
 
 const POPOVER_POSITIONING_DEFAULT: ArkUiPopover.RootProps['positioning'] = {

@@ -2,14 +2,17 @@ import type { FC, HTMLAttributes, MouseEvent, MouseEventHandler, ReactNode, Ref 
 import { Slot } from '@radix-ui/react-slot';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { cardVariants } from './classes';
 
 const INTERACTIVE_SELECTORS = 'a[href],button,input,select,textarea,[tabindex]';
 
 type CardVariantProps = Omit<VariantProps<typeof cardVariants>, 'interactive' | 'disabled'>;
 
-export interface CardProps extends CardVariantProps, Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
+export interface CardProps
+  extends CardVariantProps,
+    Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
+    TestableProps {
   ref?: Ref<HTMLDivElement>;
   asChild?: boolean;
   disabled?: boolean;

@@ -19,7 +19,12 @@ These rules apply when creating or modifying any compound component that has sub
 ### Root component (e.g. `Alert`)
 
 ```tsx
-import { TestIdProvider } from '../../utils/testId'
+import { type TestableProps, TestIdProvider } from '../../utils/testId'
+
+// Extend props with TestableProps
+export interface AlertProps extends ..., TestableProps {
+  // component-specific props
+}
 
 export const Alert: FC<AlertProps> = ({
   'data-testid': testId,
@@ -61,8 +66,9 @@ export const AlertClose: FC<AlertCloseProps> = ({ ref, ...props }) => {
 
 When adding TestId support to a compound component:
 
-1. [ ] Root component: destructure `'data-testid': testId` from props
-2. [ ] Root component: pass `data-testid={testId}` to root element
-3. [ ] Root component: wrap children with `<TestIdProvider value={testId}>`
-4. [ ] Each sub-component: call `useTestId('slot-name')`
-5. [ ] Each sub-component: pass `data-testid={testId}` to its root element
+1. [ ] Root component: extend props type with `TestableProps` (import from `../../utils/testId`)
+2. [ ] Root component: destructure `'data-testid': testId` from props
+3. [ ] Root component: pass `data-testid={testId}` to root element
+4. [ ] Root component: wrap children with `<TestIdProvider value={testId}>`
+5. [ ] Each sub-component: call `useTestId('slot-name')`
+6. [ ] Each sub-component: pass `data-testid={testId}` to its root element

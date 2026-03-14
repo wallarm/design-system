@@ -1,6 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import type { AlertColor } from './AlertIcon';
 import { ALERT_MAX_WIDTH, ALERT_MIN_WIDTH } from './const';
 
@@ -26,7 +26,8 @@ const alertVariants = cva(
 
 export interface AlertProps
   extends VariantProps<typeof alertVariants>,
-    Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
+    Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
+    TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** Color variant of the alert */
   color?: AlertColor;

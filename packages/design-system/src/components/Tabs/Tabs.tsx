@@ -1,11 +1,11 @@
 import type { FC, ReactNode } from 'react';
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { TabsSharedContextProvider } from './TabsSharedContext';
 import type { TabsSize, TabsVariant } from './types';
 
-export interface TabsProps {
+export interface TabsProps extends TestableProps {
   children: ReactNode;
   size?: TabsSize;
   variant?: TabsVariant;
@@ -15,7 +15,6 @@ export interface TabsProps {
   unmountOnExit?: boolean;
   asChild?: boolean;
   onChange?: (value: string) => void;
-  'data-testid'?: string;
 }
 
 export const Tabs: FC<TabsProps> = ({

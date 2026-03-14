@@ -1,7 +1,7 @@
 import type { ComponentProps, FC, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
 type IpNativeProps = ComponentProps<'div'>;
 
@@ -10,7 +10,7 @@ interface IpBaseProps {
   asChild?: boolean;
 }
 
-export type IpProps = IpNativeProps & IpBaseProps;
+export type IpProps = IpNativeProps & IpBaseProps & TestableProps;
 
 export const Ip: FC<IpProps> = ({
   ref,

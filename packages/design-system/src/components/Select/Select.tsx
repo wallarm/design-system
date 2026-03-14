@@ -4,7 +4,7 @@ import {
   type CollectionItem,
   type SelectRootProps,
 } from '@ark-ui/react/select';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { SelectSharedProvider } from './SelectSharedContext';
 
 type SelectNativeProps<T extends CollectionItem> = Omit<
@@ -16,7 +16,7 @@ export interface SelectBaseProps {
   loading?: boolean;
 }
 
-type SelectProps<T extends CollectionItem> = SelectNativeProps<T> & SelectBaseProps;
+type SelectProps<T extends CollectionItem> = SelectNativeProps<T> & SelectBaseProps & TestableProps;
 
 export const Select = <T extends CollectionItem>({
   children,

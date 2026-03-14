@@ -1,9 +1,9 @@
 import type { FC, Ref } from 'react';
 import { Checkbox as ArkUiCheckbox } from '@ark-ui/react/checkbox';
 import { cn } from '../../utils/cn';
-import { TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-export interface CheckboxProps extends ArkUiCheckbox.RootProps {
+export interface CheckboxProps extends ArkUiCheckbox.RootProps, TestableProps {
   ref?: Ref<HTMLLabelElement>;
 }
 
