@@ -3,6 +3,7 @@ import { Field as ArkUiField } from '@ark-ui/react/field';
 import { Fieldset as ArkUiFieldset } from '@ark-ui/react/fieldset';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { checkContainCheckboxGroup } from './utils';
 
 const fieldVariants = cva(
@@ -34,23 +35,31 @@ type FieldNativeProps = Omit<HTMLAttributes<HTMLElement>, 'className'> &
 
 type FieldVariantsProps = VariantProps<typeof fieldVariants>;
 
-type FieldProps = FieldNativeProps & FieldVariantsProps;
+type FieldProps = FieldNativeProps & FieldVariantsProps & TestableProps;
 
-export const Field: FC<FieldProps> = ({ orientation = 'vertical', children, ...props }) => {
+export const Field: FC<FieldProps> = ({
+  orientation = 'vertical',
+  children,
+  'data-testid': testId,
+  ...props
+}) => {
   const isContainCheckboxGroup = checkContainCheckboxGroup(children);
 
   const Comp = isContainCheckboxGroup ? ArkUiFieldset.Root : ArkUiField.Root;
 
   return (
-    <Comp
-      {...props}
-      role='group'
-      data-slot='field'
-      data-orientation={orientation}
-      className={cn(fieldVariants({ orientation }))}
-    >
-      {children}
-    </Comp>
+    <TestIdProvider value={testId}>
+      <Comp
+        {...props}
+        role='group'
+        data-testid={testId}
+        data-slot='field'
+        data-orientation={orientation}
+        className={cn(fieldVariants({ orientation }))}
+      >
+        {children}
+      </Comp>
+    </TestIdProvider>
   );
 };
 

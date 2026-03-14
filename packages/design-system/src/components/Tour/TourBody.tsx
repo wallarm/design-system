@@ -1,6 +1,7 @@
 import type { FC, ReactNode } from 'react';
 import { useTourContext } from '@ark-ui/react';
 import { cva } from 'class-variance-authority';
+import { useTestId } from '../../utils/testId';
 
 const tourBodyVariants = cva('flex flex-col gap-2 py-12 outline-none', {
   variants: {
@@ -17,10 +18,15 @@ interface TourBodyProps {
 
 export const TourBody: FC<TourBodyProps> = ({ children }) => {
   const { step } = useTourContext();
+  const testId = useTestId('body');
 
   const type = step?.type === 'dialog' ? 'dialog' : 'tooltip';
 
-  return <div className={tourBodyVariants({ type })}>{children}</div>;
+  return (
+    <div data-testid={testId} className={tourBodyVariants({ type })}>
+      {children}
+    </div>
+  );
 };
 
 TourBody.displayName = 'TourBody';

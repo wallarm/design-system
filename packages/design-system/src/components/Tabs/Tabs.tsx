@@ -1,10 +1,11 @@
 import type { FC, ReactNode } from 'react';
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cn } from '../../utils/cn';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { TabsSharedContextProvider } from './TabsSharedContext';
 import type { TabsSize, TabsVariant } from './types';
 
-export interface TabsProps {
+export interface TabsProps extends TestableProps {
   children: ReactNode;
   size?: TabsSize;
   variant?: TabsVariant;
@@ -26,6 +27,7 @@ export const Tabs: FC<TabsProps> = ({
   lazyMount = true,
   unmountOnExit = true,
   asChild = false,
+  'data-testid': testId,
 }) => {
   const handleChange = ({ value }: ArkUiTabs.ValueChangeDetails) => {
     onChange?.(value);
@@ -35,6 +37,7 @@ export const Tabs: FC<TabsProps> = ({
     <TabsSharedContextProvider size={size} variant={variant}>
       <ArkUiTabs.Root
         className={cn('relative')}
+        data-testid={testId}
         value={value}
         defaultValue={defaultValue}
         onValueChange={handleChange}
@@ -42,7 +45,7 @@ export const Tabs: FC<TabsProps> = ({
         unmountOnExit={unmountOnExit}
         asChild={asChild}
       >
-        {asChild ? children : children}
+        <TestIdProvider value={testId}>{asChild ? children : children}</TestIdProvider>
       </ArkUiTabs.Root>
     </TabsSharedContextProvider>
   );

@@ -5,6 +5,7 @@ import { mergeProps } from '@ark-ui/react/utils';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { SvgIcon } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 import { inputVariants } from '../Input';
 
 const textareaVariants = cva('min-h-[60px]', {
@@ -25,7 +26,8 @@ type InputVariantsProps = VariantProps<typeof inputVariants>;
 
 export type TextareaProps = TextareaNativeProps &
   TextareaVariantsProps &
-  InputVariantsProps & { ref?: Ref<HTMLTextAreaElement> };
+  InputVariantsProps &
+  TestableProps & { ref?: Ref<HTMLTextAreaElement> };
 
 export const Textarea: FC<TextareaProps> = ({
   error = false,

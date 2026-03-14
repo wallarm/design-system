@@ -4,6 +4,7 @@ import { Toast as ArkToast } from '@ark-ui/react/toast';
 import { cva } from 'class-variance-authority';
 import { CircleCheckBig, Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
 import { cn } from '../../utils/cn';
+import { TestIdProvider } from '../../utils/testId';
 import { Loader } from '../Loader';
 import { ToastClose } from './ToastClose';
 import { ToastDescription } from './ToastDescription';
@@ -123,25 +124,34 @@ export const Toast = ({ toast }: ToastProps) => {
   const toastIcon = getToastIcon();
 
   return (
-    <ArkToast.Root key={toast.id} className={cn(toastVariants({ variant: toastVariant }))}>
-      <div className={cn('flex w-full items-start gap-8 relative z-10')}>
-        {toastIcon && <ToastIcon>{toastIcon}</ToastIcon>}
+    <ArkToast.Root
+      key={toast.id}
+      data-testid={toast.id}
+      className={cn(toastVariants({ variant: toastVariant }))}
+    >
+      <TestIdProvider value={toast.id}>
+        <div className={cn('flex w-full items-start gap-8 relative z-10')}>
+          {toastIcon && <ToastIcon>{toastIcon}</ToastIcon>}
 
-        <div
-          className={cn('flex-1 flex', isSimple ? 'flex-row gap-16 items-start' : 'flex-col gap-8')}
-        >
-          <div className='flex-1 py-2'>
-            {toast.title && <ToastTitle variant={toastVariant}>{toast.title}</ToastTitle>}
-            {!isSimple && toast.description && (
-              <ToastDescription>{toast.description}</ToastDescription>
+          <div
+            className={cn(
+              'flex-1 flex',
+              isSimple ? 'flex-row gap-16 items-start' : 'flex-col gap-8',
             )}
+          >
+            <div className='flex-1 py-2'>
+              {toast.title && <ToastTitle variant={toastVariant}>{toast.title}</ToastTitle>}
+              {!isSimple && toast.description && (
+                <ToastDescription>{toast.description}</ToastDescription>
+              )}
+            </div>
+
+            {toast.actions && toast.actions}
           </div>
 
-          {toast.actions && toast.actions}
+          {closable && <ToastClose />}
         </div>
-
-        {closable && <ToastClose />}
-      </div>
+      </TestIdProvider>
     </ArkToast.Root>
   );
 };

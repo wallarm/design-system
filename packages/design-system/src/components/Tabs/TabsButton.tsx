@@ -1,4 +1,5 @@
 import type { FC, Ref } from 'react';
+import { useTestId } from '../../utils/testId';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
 import { tabsTriggerVariants } from './classes';
 
@@ -15,8 +16,16 @@ export interface TabsButtonProps extends ButtonBaseProps {
 }
 
 export const TabsButton: FC<TabsButtonProps> = ({ children, size = 'medium', ref, ...props }) => {
+  const testId = useTestId('button');
+
   return (
-    <ButtonBase {...props} ref={ref} size={size} className={tabsTriggerVariants({ size })}>
+    <ButtonBase
+      {...props}
+      ref={ref}
+      data-testid={testId}
+      size={size}
+      className={tabsTriggerVariants({ size })}
+    >
       {children}
     </ButtonBase>
   );

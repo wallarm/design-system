@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+import { useTestId } from '../../utils/testId';
 import { useCodeSnippet } from './hooks';
 import { CodeContent, CodeLine, TokenizedCodeLine } from './internal';
 import { SIZE_LINE_HEIGHT_CLASSES } from './lib/lineStyles';
@@ -9,6 +10,7 @@ export type CodeSnippetCodeProps = HTMLAttributes<HTMLPreElement> & {
 };
 
 export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props }) => {
+  const testId = useTestId('code');
   const {
     code,
     tokens,
@@ -31,7 +33,7 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
     const codeLines = code.split('\n');
     const visibleLines = shouldClip ? codeLines.slice(0, maxLines) : codeLines;
     return (
-      <CodeContent wrapLines={wrapLines} className={className} {...props}>
+      <CodeContent wrapLines={wrapLines} className={className} {...props} data-testid={testId}>
         {visibleLines.map((line, index) => {
           const lineNumber = startingLineNumber + index;
           const lineConfig = lines.get(lineNumber);
@@ -63,7 +65,7 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
   const visibleTokens = shouldClip ? tokens.slice(0, maxLines) : tokens;
 
   return (
-    <CodeContent wrapLines={wrapLines} className={className} {...props}>
+    <CodeContent wrapLines={wrapLines} className={className} {...props} data-testid={testId}>
       {visibleTokens.map((lineTokens, index) => {
         const lineNumber = startingLineNumber + index;
         return (

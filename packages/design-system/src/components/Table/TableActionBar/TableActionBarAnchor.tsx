@@ -2,6 +2,7 @@ import type { FC, ReactNode } from 'react';
 import { Popover as ArkUiPopover } from '@ark-ui/react/popover';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../../utils/cn';
+import type { TestableProps } from '../../../utils/testId';
 import { useTableContext } from '../TableContext';
 
 const tableActionBarAnchorVariants = cva(cn('w-full relative outline-none'), {
@@ -13,16 +14,23 @@ const tableActionBarAnchorVariants = cva(cn('w-full relative outline-none'), {
   },
 });
 
-interface TableActionBarAnchorProps {
+interface TableActionBarAnchorProps extends TestableProps {
   className?: string;
   children: ReactNode;
 }
 
-export const TableActionBarAnchor: FC<TableActionBarAnchorProps> = ({ className, children }) => {
+export const TableActionBarAnchor: FC<TableActionBarAnchorProps> = ({
+  className,
+  'data-testid': testId,
+  children,
+}) => {
   const { virtualized } = useTableContext();
 
   return (
-    <ArkUiPopover.Anchor className={cn(tableActionBarAnchorVariants({ virtualized }), className)}>
+    <ArkUiPopover.Anchor
+      data-testid={testId}
+      className={cn(tableActionBarAnchorVariants({ virtualized }), className)}
+    >
       {children}
     </ArkUiPopover.Anchor>
   );

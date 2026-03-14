@@ -2,6 +2,7 @@ import type { AnchorHTMLAttributes, FC, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 import { linkVariants } from './classes';
 
 type LinkNativeProps = AnchorHTMLAttributes<HTMLAnchorElement>;
@@ -9,7 +10,8 @@ type LinkNativeProps = AnchorHTMLAttributes<HTMLAnchorElement>;
 type LinkVariantsProps = VariantProps<typeof linkVariants>;
 
 export type LinkProps = LinkNativeProps &
-  LinkVariantsProps & {
+  LinkVariantsProps &
+  TestableProps & {
     ref?: Ref<HTMLAnchorElement>;
     asChild?: boolean;
     disabled?: boolean;

@@ -4,6 +4,7 @@ import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
+import { useTestId } from '../../utils/testId';
 
 const tooltipContentVariants = cva(
   [
@@ -40,21 +41,26 @@ type TooltipContentProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Content>
   ref?: Ref<ElementRef<typeof ArkUiTooltip.Content>>;
 };
 
-export const TooltipContent: FC<TooltipContentProps> = ({ children, className, ref, ...props }) => (
-  <ArkUiPortal>
-    <ArkUiTooltip.Positioner>
-      <ArkUiTooltip.Content
-        ref={ref}
-        className={cn(
-          tooltipContentVariants({ hasNonTextEnd: hasNonTextEnd(children) }),
-          className,
-        )}
-        {...props}
-      >
-        {children}
-      </ArkUiTooltip.Content>
-    </ArkUiTooltip.Positioner>
-  </ArkUiPortal>
-);
+export const TooltipContent: FC<TooltipContentProps> = ({ children, className, ref, ...props }) => {
+  const testId = useTestId('content');
+
+  return (
+    <ArkUiPortal>
+      <ArkUiTooltip.Positioner>
+        <ArkUiTooltip.Content
+          ref={ref}
+          data-testid={testId}
+          className={cn(
+            tooltipContentVariants({ hasNonTextEnd: hasNonTextEnd(children) }),
+            className,
+          )}
+          {...props}
+        >
+          {children}
+        </ArkUiTooltip.Content>
+      </ArkUiTooltip.Positioner>
+    </ArkUiPortal>
+  );
+};
 
 TooltipContent.displayName = 'TooltipContent';

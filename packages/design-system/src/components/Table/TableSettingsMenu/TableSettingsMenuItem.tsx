@@ -3,6 +3,7 @@ import { CSS } from '@dnd-kit/utilities';
 import type { Column } from '@tanstack/react-table';
 import { GripVertical } from '../../../icons';
 import { cn } from '../../../utils/cn';
+import { useTestId } from '../../../utils/testId';
 import { Switch, SwitchControl, SwitchLabel } from '../../Switch';
 import { useTableContext } from '../TableContext';
 
@@ -13,6 +14,7 @@ interface TableSettingsMenuItemProps<T> {
 
 export const TableSettingsMenuItem = <T,>({ column, canDrag }: TableSettingsMenuItemProps<T>) => {
   const { masterColumnId } = useTableContext();
+  const testId = useTestId('settings-menu-item');
 
   const isVisible = column.getIsVisible();
   const canHide = column.getCanHide();
@@ -35,6 +37,7 @@ export const TableSettingsMenuItem = <T,>({ column, canDrag }: TableSettingsMenu
     <div
       ref={setNodeRef}
       style={style}
+      data-testid={testId}
       className={cn(
         'relative flex items-center w-full rounded-6 pl-20 pr-8 py-6',
         'hover:bg-states-primary-hover transition-colors',

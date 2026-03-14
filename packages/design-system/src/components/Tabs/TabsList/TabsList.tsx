@@ -2,6 +2,7 @@ import { type FC, type ReactNode, useLayoutEffect, useRef, useState } from 'reac
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../../utils/cn';
+import { useTestId } from '../../../utils/testId';
 import { useTabsSharedContext } from '../TabsSharedContext';
 import { TabsListIndicator } from './TabsListIndicator';
 import { TabsListScrollArea } from './TabsListScrollArea';
@@ -34,6 +35,7 @@ export interface TabsListProps {
 }
 
 export const TabsList: FC<TabsListProps> = ({ children }) => {
+  const testId = useTestId('list');
   const { scrollRef, size } = useTabsSharedContext();
   const listRef = useRef<HTMLDivElement>(null);
 
@@ -94,7 +96,7 @@ export const TabsList: FC<TabsListProps> = ({ children }) => {
   }, [scrollRef, hasOverflow]);
 
   return (
-    <div className={cn('relative')} data-slot='tabs-list'>
+    <div className={cn('relative')} data-slot='tabs-list' data-testid={testId}>
       {hasOverflow && <TabsListScrollButton direction='left' visible={canScrollLeft} />}
       <TabsListScrollArea>
         <ArkUiTabs.List ref={listRef} className={cn(tabsListVariants({ size }))}>

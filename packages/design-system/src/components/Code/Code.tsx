@@ -2,6 +2,7 @@ import type { FC, HTMLAttributes, PropsWithChildren, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 
 const codeVariants = cva('font-mono leading-sm', {
   variants: {
@@ -44,7 +45,7 @@ interface CodeBaseProps {
   ref?: Ref<HTMLParagraphElement>;
 }
 
-export type CodeProps = CodeNativeProps & CodeVariantProps & CodeBaseProps;
+export type CodeProps = CodeNativeProps & CodeVariantProps & CodeBaseProps & TestableProps;
 
 export const Code: FC<PropsWithChildren<CodeProps>> = ({
   size = 'l',

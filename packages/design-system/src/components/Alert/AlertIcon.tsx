@@ -10,6 +10,7 @@ import {
 } from 'react';
 import { cva } from 'class-variance-authority';
 import { CircleCheckBig, CircleDashed, Info, OctagonAlert, TriangleAlert } from '../../icons';
+import { useTestId } from '../../utils/testId';
 
 export type AlertColor = 'primary' | 'destructive' | 'info' | 'warning' | 'success';
 
@@ -49,6 +50,7 @@ export interface AlertIconProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ch
  * Can be overridden with a custom icon via the `icon` prop.
  */
 export const AlertIcon: FC<AlertIconProps> = ({ ref, icon, ...props }) => {
+  const testId = useTestId('icon');
   const internalRef = useRef<HTMLDivElement>(null);
   const [color, setColor] = useState<AlertColor>('primary');
 
@@ -77,7 +79,7 @@ export const AlertIcon: FC<AlertIconProps> = ({ ref, icon, ...props }) => {
   const IconComponent = iconMap[color];
 
   return (
-    <div {...props} ref={setRefs} className='py-2 shrink-0'>
+    <div {...props} ref={setRefs} data-testid={testId} className='py-2 shrink-0'>
       {icon || <IconComponent size='lg' className={alertIconVariants({ color })} />}
     </div>
   );

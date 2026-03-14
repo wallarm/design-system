@@ -1,10 +1,11 @@
 import type { FC, ReactNode } from 'react';
+import type { TestableProps } from '../../../utils/testId';
 import { TableActionBarAnchor, TableActionBarProvider } from '../TableActionBar';
 import type { TableVirtualized } from '../types';
 import { TableInnerContainer } from './TableInnerContainer';
 import { TableInnerWindow } from './TableInnerWindow';
 
-interface TableInnerProps {
+interface TableInnerProps extends TestableProps {
   isEmpty: boolean;
   virtualized?: TableVirtualized;
   showSettings: boolean;
@@ -19,11 +20,12 @@ export const TableInner: FC<TableInnerProps> = ({
   showSettings,
   ariaLabel,
   className,
+  'data-testid': testId,
   children,
 }) => {
   return (
     <TableActionBarProvider>
-      <TableActionBarAnchor className={className}>
+      <TableActionBarAnchor className={className} data-testid={testId}>
         {virtualized === 'window' ? (
           <TableInnerWindow isEmpty={isEmpty} showSettings={showSettings} ariaLabel={ariaLabel}>
             {children}

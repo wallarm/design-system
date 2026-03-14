@@ -9,6 +9,7 @@ import {
 import { Menu } from '@ark-ui/react/menu';
 import { Portal } from '@ark-ui/react/portal';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import {
   ScrollArea,
   ScrollAreaContent,
@@ -30,6 +31,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
   ref,
   ...props
 }) => {
+  const testId = useTestId('content');
   const childArray = Children.toArray(children);
   const footerChildren = childArray.filter(
     child => isValidElement(child) && child.type === DropdownMenuFooter,
@@ -43,6 +45,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
       <Menu.Positioner>
         <Menu.Content
           ref={ref}
+          data-testid={testId}
           className={cn(
             dropdownMenuClassNames,
             'max-h-(--available-height)',

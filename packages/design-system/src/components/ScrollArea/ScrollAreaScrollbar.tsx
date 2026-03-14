@@ -2,6 +2,7 @@ import { type CSSProperties, type FC, useMemo } from 'react';
 import { ScrollArea as ArkUiScrollArea } from '@ark-ui/react/scroll-area';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 const scrollAreaScrollbarVariants = cva(
   'z-30 bg-transparent rounded-8 transition-opacity overflow-hidden',
@@ -33,6 +34,7 @@ export const ScrollAreaScrollbar: FC<ScrollAreaScrollbarProps> = ({
   orientation = 'vertical',
   ...props
 }) => {
+  const testId = useTestId('scrollbar');
   const scrollbarStyle = useMemo<CSSProperties>(() => {
     if (orientation === 'horizontal') {
       return { left: 4, bottom: 4, right: 4 };
@@ -45,6 +47,7 @@ export const ScrollAreaScrollbar: FC<ScrollAreaScrollbarProps> = ({
     <ArkUiScrollArea.Scrollbar
       {...props}
       style={scrollbarStyle}
+      data-testid={testId}
       orientation={orientation}
       className={cn(scrollAreaScrollbarVariants({ orientation }))}
     >

@@ -1,8 +1,9 @@
 import { type FC, type ReactNode, useMemo } from 'react';
 import { Menu } from '@ark-ui/react/menu';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { DropdownMenuContext, useDropdownMenuContext } from './DropdownMenuContext';
 
-interface DropdownMenuProps {
+interface DropdownMenuProps extends TestableProps {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
@@ -42,6 +43,7 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
   highlightedValue,
   onHighlightChange,
   closeOnSelect,
+  'data-testid': testId,
   ...props
 }) => {
   const parent = useDropdownMenuContext();
@@ -57,21 +59,23 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
 
   return (
     <DropdownMenuContext value={ctx}>
-      <Menu.Root
-        {...props}
-        positioning={positioning ?? defaultPositioning}
-        {...(anchorPoint != null && { anchorPoint })}
-        {...(highlightedValue != null && { highlightedValue })}
-        {...(closeOnSelect != null && { closeOnSelect })}
-        {...(onHighlightChange != null && { onHighlightChange })}
-        open={open}
-        defaultOpen={defaultOpen}
-        onOpenChange={handleOpenChange}
-        lazyMount
-        unmountOnExit
-      >
-        {children}
-      </Menu.Root>
+      <TestIdProvider value={testId}>
+        <Menu.Root
+          {...props}
+          positioning={positioning ?? defaultPositioning}
+          {...(anchorPoint != null && { anchorPoint })}
+          {...(highlightedValue != null && { highlightedValue })}
+          {...(closeOnSelect != null && { closeOnSelect })}
+          {...(onHighlightChange != null && { onHighlightChange })}
+          open={open}
+          defaultOpen={defaultOpen}
+          onOpenChange={handleOpenChange}
+          lazyMount
+          unmountOnExit
+        >
+          {children}
+        </Menu.Root>
+      </TestIdProvider>
     </DropdownMenuContext>
   );
 };

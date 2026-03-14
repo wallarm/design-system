@@ -1,5 +1,6 @@
 import type { FC, Ref } from 'react';
 import { Ellipsis } from '../../icons';
+import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
 
 type SegmentedTabsTriggerButtonProps = Omit<
@@ -8,9 +9,12 @@ type SegmentedTabsTriggerButtonProps = Omit<
 > & { ref?: Ref<HTMLElement> };
 
 export const SegmentedTabsTriggerButton: FC<SegmentedTabsTriggerButtonProps> = props => {
+  const testId = useTestId('trigger-button');
+
   return (
     <Button
       {...props}
+      data-testid={testId}
       as='span'
       variant='ghost'
       color='neutral'

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useTestId } from '../../../utils/testId';
 import { Link } from '../../Link';
 import { HStack } from '../../Stack';
 import { Text } from '../../Text';
@@ -6,6 +7,7 @@ import { useTableContext } from '../TableContext';
 
 export const TableActionBarSelection: FC = () => {
   const { table } = useTableContext();
+  const testId = useTestId('action-bar-selection');
   const count = Object.keys(table.getState().rowSelection).length;
   const allSelected = table.getIsAllRowsSelected();
 
@@ -18,7 +20,7 @@ export const TableActionBarSelection: FC = () => {
   };
 
   return (
-    <div className='flex items-center gap-16 p-8'>
+    <div data-testid={testId} className='flex items-center gap-16 p-8'>
       <Text size='sm' color='primary-alt' weight='medium'>
         {count} selected
       </Text>

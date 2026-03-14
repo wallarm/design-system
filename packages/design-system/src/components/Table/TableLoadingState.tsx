@@ -1,10 +1,12 @@
 import type { FC } from 'react';
+import { useTestId } from '../../utils/testId';
 import { Skeleton } from '../Skeleton';
 import { Td, Tr } from './primitives';
 import { useTableContext } from './TableContext';
 
 export const TableLoadingState: FC = () => {
   const { table, skeletonCount } = useTableContext();
+  const testId = useTestId('loading');
   const columns = table.getVisibleLeafColumns();
 
   return (
@@ -13,7 +15,7 @@ export const TableLoadingState: FC = () => {
         const key = `skeleton-${rowIdx}`;
 
         return (
-          <Tr key={key}>
+          <Tr key={key} data-testid={rowIdx === 0 ? testId : undefined}>
             {columns.map(column => (
               <Td
                 key={column.id}

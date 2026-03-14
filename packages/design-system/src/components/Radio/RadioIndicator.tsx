@@ -2,12 +2,15 @@ import type { FC } from 'react';
 import { RadioGroup as ArkUiRadioGroup, useRadioGroupItemContext } from '@ark-ui/react/radio-group';
 import { Dot } from '../../icons';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 export const RadioIndicator: FC = () => {
   const { checked } = useRadioGroupItemContext();
+  const testId = useTestId('indicator');
 
   return (
     <ArkUiRadioGroup.ItemControl
+      data-testid={testId}
       className={cn(
         // Layout
         'flex items-center justify-center self-start my-2',

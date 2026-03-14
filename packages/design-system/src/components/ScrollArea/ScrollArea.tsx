@@ -1,14 +1,16 @@
 import { forwardRef } from 'react';
 import { ScrollArea as ArkUiScrollArea } from '@ark-ui/react/scroll-area';
 import { cn } from '../../utils/cn';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-export type ScrollAreaProps = ArkUiScrollArea.RootProps;
+export type ScrollAreaProps = ArkUiScrollArea.RootProps & TestableProps;
 
 export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
-  ({ className, ...props }, ref) => (
+  ({ className, 'data-testid': testId, children, ...props }, ref) => (
     <ArkUiScrollArea.Root
       {...props}
       ref={ref}
+      data-testid={testId}
       className={cn(
         'h-full outline-none',
         // Show thumbs only when content overflows in that direction
@@ -19,7 +21,9 @@ export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
         '[&:not(:has([data-overflow-y]))_[data-part=scrollbar][data-orientation=vertical]]:opacity-0',
         className,
       )}
-    />
+    >
+      <TestIdProvider value={testId}>{children}</TestIdProvider>
+    </ArkUiScrollArea.Root>
   ),
 );
 

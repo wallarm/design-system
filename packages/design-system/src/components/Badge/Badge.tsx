@@ -3,6 +3,7 @@ import { Slot } from '@radix-ui/react-slot';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { isIconOnly } from '../../utils/isIconOnly';
+import type { TestableProps } from '../../utils/testId';
 import { badgeVariants } from './classes';
 
 type BadgeNativeProps = HTMLAttributes<HTMLDivElement>;
@@ -14,7 +15,11 @@ interface BadgeBaseProps {
   asChild?: boolean;
 }
 
-export type BadgeProps = BadgeNativeProps & BadgeVariantProps & BadgeBaseProps & PropsWithChildren;
+export type BadgeProps = BadgeNativeProps &
+  BadgeVariantProps &
+  BadgeBaseProps &
+  PropsWithChildren &
+  TestableProps;
 
 export const Badge: FC<BadgeProps> = ({
   ref,

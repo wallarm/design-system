@@ -3,15 +3,18 @@ import { useContext } from 'react';
 import { Switch as ArkUiSwitch, useSwitchContext } from '@ark-ui/react/switch';
 import { Check, X } from '../../icons';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { SwitchContext } from './SwitchContext';
 
 export const SwitchControl: FC = () => {
   const arkContext = useSwitchContext();
   const { a11yMode } = useContext(SwitchContext);
+  const testId = useTestId('control');
   const isChecked = arkContext.checked;
 
   return (
     <ArkUiSwitch.Control
+      data-testid={testId}
       className={cn(
         'relative flex items-center self-start my-2',
         'w-34 h-20',

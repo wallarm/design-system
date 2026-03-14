@@ -8,6 +8,7 @@ import {
   useMemo,
 } from 'react';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import {
   ScrollArea,
   ScrollAreaContent,
@@ -38,6 +39,7 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
   nativeScroll = false,
   ...props
 }) => {
+  const testId = useTestId('content');
   const context = useCodeSnippet();
   const { wrapLines, lines, tokens, code, startingLineNumber, size } = context;
 
@@ -122,6 +124,7 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
     return (
       <div
         data-slot='code-snippet-content'
+        data-testid={testId}
         className={cn(
           'min-h-0',
           wrapLines ? 'overflow-y-auto overflow-x-hidden' : 'overflow-auto',
@@ -135,7 +138,12 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
   }
 
   return (
-    <div data-slot='code-snippet-content' className={cn('min-h-0', className)} {...props}>
+    <div
+      data-slot='code-snippet-content'
+      data-testid={testId}
+      className={cn('min-h-0', className)}
+      {...props}
+    >
       <ScrollArea>
         <ScrollAreaViewport>
           <ScrollAreaContent>{innerContent}</ScrollAreaContent>

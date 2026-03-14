@@ -1,4 +1,5 @@
 import type { Row } from '@tanstack/react-table';
+import { useTestId } from '../../utils/testId';
 import { TABLE_EXPAND_COLUMN_ID } from './lib';
 import { Td, Tr } from './primitives';
 import { useTableContext } from './TableContext';
@@ -9,6 +10,7 @@ interface TableRowExpandedProps<T> {
 
 export const TableRowExpanded = <T,>({ row }: TableRowExpandedProps<T>) => {
   const { table, renderExpandedRow } = useTableContext<T>();
+  const testId = useTestId('row-expanded');
 
   if (!row.getIsExpanded() || !renderExpandedRow) return null;
 
@@ -19,7 +21,7 @@ export const TableRowExpanded = <T,>({ row }: TableRowExpandedProps<T>) => {
   const contentColSpan = hasExpandColumn ? visibleColumns.length - 1 : visibleColumns.length;
 
   return (
-    <Tr>
+    <Tr data-testid={testId}>
       {hasExpandColumn && <Td className='border-b-0 bg-bg-surface-2 sticky left-0' />}
       <Td
         colSpan={contentColSpan}

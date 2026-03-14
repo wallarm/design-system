@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Menu } from '@ark-ui/react/menu';
+import { useTestId } from '../../utils/testId';
 import type { DropdownMenuItemVariantsProps } from './DropdownMenuItem';
 
 interface DropdownMenuTriggerProps
@@ -17,7 +18,13 @@ export const DropdownMenuTrigger: FC<DropdownMenuTriggerProps> = ({
   children,
   ...props
 }) => {
-  return <Menu.Trigger {...props}>{children}</Menu.Trigger>;
+  const testId = useTestId('trigger');
+
+  return (
+    <Menu.Trigger {...props} data-testid={testId}>
+      {children}
+    </Menu.Trigger>
+  );
 };
 
 DropdownMenuTrigger.displayName = 'DropdownMenuTrigger';

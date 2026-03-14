@@ -1,6 +1,7 @@
 import type { ComponentRef, FC, Ref } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { Separator, type SeparatorProps } from '../Separator';
 
 const segmentedControlSeparatorVariants = cva('flex h-16', {
@@ -54,8 +55,13 @@ export const SegmentedControlSeparator: FC<SegmentedControlSeparatorProps> = ({
   ref,
   ...props
 }) => {
+  const testId = useTestId('separator');
+
   return (
-    <div className={cn('flex items-center content-stretch relative shrink-0', className)}>
+    <div
+      className={cn('flex items-center content-stretch relative shrink-0', className)}
+      data-testid={testId}
+    >
       <div className={cn(segmentedControlSeparatorVariants({ mx }))}>
         <Separator ref={ref} orientation='vertical' {...props} />
       </div>

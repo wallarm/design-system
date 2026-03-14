@@ -1,6 +1,7 @@
-import { type FC, type ReactNode, useRef } from 'react';
+import type { FC, ReactNode } from 'react';
 import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
 import { cva } from 'class-variance-authority';
+import { useTestId } from '../../utils/testId';
 
 const positionerVariants = cva('focus-visible:outline-none', {
   variants: {
@@ -17,11 +18,14 @@ interface TourPositionerProps {
 
 export const TourPositioner: FC<TourPositionerProps> = ({ children }) => {
   const { step } = useTourContext();
+  const testId = useTestId('positioner');
 
   const type = step?.type === 'dialog' ? 'dialog' : 'tooltip';
 
   return (
-    <ArkUiTour.Positioner className={positionerVariants({ type })}>{children}</ArkUiTour.Positioner>
+    <ArkUiTour.Positioner data-testid={testId} className={positionerVariants({ type })}>
+      {children}
+    </ArkUiTour.Positioner>
   );
 };
 

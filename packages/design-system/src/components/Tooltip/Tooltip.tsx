@@ -1,7 +1,8 @@
 import type { FC, ReactNode } from 'react';
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-export interface TooltipProps {
+export interface TooltipProps extends TestableProps {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
@@ -36,29 +37,32 @@ export const Tooltip: FC<TooltipProps> = ({
   interactive,
   disabled,
   positioning,
+  'data-testid': testId,
 }) => {
   const handleOpenChange = (details: ArkUiTooltip.OpenChangeDetails) => {
     onOpenChange?.(details.open);
   };
 
   return (
-    <ArkUiTooltip.Root
-      open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={handleOpenChange}
-      openDelay={openDelay}
-      closeDelay={closeDelay}
-      closeOnPointerDown={closeOnPointerDown}
-      closeOnEscape={closeOnEscape}
-      closeOnScroll={closeOnScroll}
-      interactive={interactive}
-      disabled={disabled}
-      positioning={positioning ?? TOOLTIP_POSITIONING_DEFAULT}
-      lazyMount
-      unmountOnExit
-    >
-      {children}
-    </ArkUiTooltip.Root>
+    <TestIdProvider value={testId}>
+      <ArkUiTooltip.Root
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={handleOpenChange}
+        openDelay={openDelay}
+        closeDelay={closeDelay}
+        closeOnPointerDown={closeOnPointerDown}
+        closeOnEscape={closeOnEscape}
+        closeOnScroll={closeOnScroll}
+        interactive={interactive}
+        disabled={disabled}
+        positioning={positioning ?? TOOLTIP_POSITIONING_DEFAULT}
+        lazyMount
+        unmountOnExit
+      >
+        {children}
+      </ArkUiTooltip.Root>
+    </TestIdProvider>
   );
 };
 

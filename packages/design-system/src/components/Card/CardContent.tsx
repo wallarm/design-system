@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 export interface CardContentProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
@@ -16,9 +17,16 @@ export const CardContent: FC<CardContentProps> = ({
   ...props
 }) => {
   const Comp = asChild ? Slot : 'div';
+  const testId = useTestId('content');
 
   return (
-    <Comp {...props} ref={ref} data-slot='card-content' className={cn('px-16 text-md', className)}>
+    <Comp
+      {...props}
+      ref={ref}
+      data-slot='card-content'
+      data-testid={testId}
+      className={cn('px-16 text-md', className)}
+    >
       {children}
     </Comp>
   );

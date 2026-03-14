@@ -8,10 +8,11 @@ import {
 } from 'react';
 import { useOverflowItems } from '../../hooks';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 
 type CollapseDirection = 'start' | 'end';
 
-export interface OverflowListProps<T> extends HTMLAttributes<HTMLDivElement> {
+export interface OverflowListProps<T> extends HTMLAttributes<HTMLDivElement>, TestableProps {
   items: T[];
   itemRenderer: (item: T, index: number) => ReactNode;
   overflowRenderer: (items: T[]) => ReactNode;

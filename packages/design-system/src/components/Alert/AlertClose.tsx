@@ -1,5 +1,6 @@
 import type { ButtonHTMLAttributes, FC, Ref } from 'react';
 import { X } from '../../icons';
+import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
@@ -15,12 +16,15 @@ export interface AlertCloseProps extends Omit<ButtonHTMLAttributes<HTMLButtonEle
  * Renders a close button with an X icon and "Close" tooltip.
  */
 export const AlertClose: FC<AlertCloseProps> = ({ ref, onClick, ...props }) => {
+  const testId = useTestId('close');
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
           {...props}
           ref={ref}
+          data-testid={testId}
           variant='ghost'
           color='neutral'
           size='small'

@@ -1,6 +1,7 @@
 import type { ComponentProps, FC, MouseEvent } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 const inputGroupAddonVariants = cva(
   cn([
@@ -63,6 +64,8 @@ const inputGroupAddonVariants = cva(
 export const InputGroupAddon: FC<
   ComponentProps<'div'> & VariantProps<typeof inputGroupAddonVariants>
 > = ({ align = 'inline-start', variant = 'ghost', ...props }) => {
+  const testId = useTestId('addon');
+
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     if ((event.target as HTMLElement).closest('button')) {
       return;
@@ -76,6 +79,7 @@ export const InputGroupAddon: FC<
       {...props}
       role='group'
       data-slot='input-group-addon'
+      data-testid={testId}
       data-align={align}
       className={cn(inputGroupAddonVariants({ align, variant }))}
       onClick={handleClick}

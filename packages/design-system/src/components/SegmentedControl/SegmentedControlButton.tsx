@@ -1,5 +1,6 @@
 import type { FC, Ref } from 'react';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
 
 /**
@@ -20,9 +21,12 @@ export const SegmentedControlButton: FC<SegmentedControlButtonProps> = ({
   ref,
   ...props
 }) => {
+  const testId = useTestId('button');
+
   return (
     <ButtonBase
       ref={ref}
+      data-testid={testId}
       size={size}
       className={cn(
         'min-h-28 min-w-28 h-auto px-12 py-4',

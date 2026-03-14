@@ -8,6 +8,7 @@ import type {
 } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 const breadcrumbsItemVariants = cva(
   [
@@ -79,6 +80,7 @@ export const BreadcrumbsItem: FC<BreadcrumbsItemProps> = ({
   'aria-label': ariaLabel,
   ...props
 }) => {
+  const testId = useTestId('item');
   const isLink = href && !isCurrent;
 
   const commonClasses = cn(breadcrumbsItemVariants({ isCurrent }), className);
@@ -90,6 +92,7 @@ export const BreadcrumbsItem: FC<BreadcrumbsItemProps> = ({
           href={href}
           className={commonClasses}
           aria-label={ariaLabel}
+          data-testid={testId}
           {...(props as AnchorHTMLAttributes<HTMLAnchorElement>)}
         >
           {children}
@@ -102,6 +105,7 @@ export const BreadcrumbsItem: FC<BreadcrumbsItemProps> = ({
           aria-current={isCurrent ? ('page' as const) : undefined}
           tabIndex={0}
           aria-label={ariaLabel}
+          data-testid={testId}
           {...(props as ButtonHTMLAttributes<HTMLButtonElement>)}
         >
           {children}

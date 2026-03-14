@@ -1,4 +1,5 @@
 import { forwardRef, type ReactNode } from 'react';
+import { useTestId } from '../../utils/testId';
 import {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -18,16 +19,20 @@ export interface ToastDescriptionProps {
  * Shows a tooltip with full text when content is truncated.
  */
 export const ToastDescription = forwardRef<HTMLDivElement, ToastDescriptionProps>(
-  ({ children }, ref) => (
-    <OverflowTooltip>
-      <OverflowTooltipTrigger>
-        <Text ref={ref} size='md' color='secondary-alt' lineClamp={4}>
-          {children}
-        </Text>
-      </OverflowTooltipTrigger>
-      <OverflowTooltipContent>{children}</OverflowTooltipContent>
-    </OverflowTooltip>
-  ),
+  ({ children }, ref) => {
+    const testId = useTestId('description');
+
+    return (
+      <OverflowTooltip>
+        <OverflowTooltipTrigger>
+          <Text ref={ref} size='md' color='secondary-alt' lineClamp={4} data-testid={testId}>
+            {children}
+          </Text>
+        </OverflowTooltipTrigger>
+        <OverflowTooltipContent>{children}</OverflowTooltipContent>
+      </OverflowTooltip>
+    );
+  },
 );
 
 ToastDescription.displayName = 'ToastDescription';

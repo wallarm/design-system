@@ -1,6 +1,7 @@
 import type { FC, ReactNode } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 const drawerFooterControlsVariants = cva('flex items-center gap-8', {
   variants: {
@@ -23,6 +24,14 @@ export type DrawerFooterControlsProps = DrawerFooterControlsBaseProps &
 export const DrawerFooterControls: FC<DrawerFooterControlsProps> = ({
   children,
   placement = 'right',
-}) => <div className={cn(drawerFooterControlsVariants({ placement }))}>{children}</div>;
+}) => {
+  const testId = useTestId('footer-controls');
+
+  return (
+    <div data-testid={testId} className={cn(drawerFooterControlsVariants({ placement }))}>
+      {children}
+    </div>
+  );
+};
 
 DrawerFooterControls.displayName = 'DrawerFooterControls';

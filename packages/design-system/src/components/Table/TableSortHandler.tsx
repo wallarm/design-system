@@ -2,6 +2,7 @@ import { type MouseEvent, useCallback } from 'react';
 import type { Header } from '@tanstack/react-table';
 import { MoveDown, MoveUp, MoveVertical } from '../../icons';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { SORT_LABELS } from './lib';
 import { useTableContext } from './TableContext';
@@ -26,6 +27,7 @@ export const TableSortHandler = <T,>({ header }: TableSortHandler<T>) => {
 
   const ctx = useTableContext<T>();
   const { sortingEnabled } = ctx;
+  const testId = useTestId('sort');
 
   const canSort = sortingEnabled && column.getCanSort();
 
@@ -47,6 +49,7 @@ export const TableSortHandler = <T,>({ header }: TableSortHandler<T>) => {
       <TooltipTrigger asChild>
         <button
           type='button'
+          data-testid={testId}
           className={cn(
             'icon-sm shrink-0 hover:text-text-primary ',
             'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary rounded-2',

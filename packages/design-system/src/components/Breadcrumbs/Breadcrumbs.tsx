@@ -1,15 +1,17 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Children, cloneElement, isValidElement } from 'react';
 import { cn } from '../../utils/cn';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { BreadcrumbsSeparator } from './BreadcrumbsSeparator';
 
-export type BreadcrumbsProps = HTMLAttributes<HTMLElement> & {
-  ref?: Ref<HTMLElement>;
-  /** Additional CSS classes */
-  className?: string;
-  /** Child breadcrumb items and separators */
-  children?: ReactNode;
-};
+export type BreadcrumbsProps = HTMLAttributes<HTMLElement> &
+  TestableProps & {
+    ref?: Ref<HTMLElement>;
+    /** Additional CSS classes */
+    className?: string;
+    /** Child breadcrumb items and separators */
+    children?: ReactNode;
+  };
 
 /**
  * Breadcrumbs component for showing navigation hierarchy.
@@ -31,7 +33,12 @@ export type BreadcrumbsProps = HTMLAttributes<HTMLElement> & {
  */
 let separatorId = 0;
 
-export const Breadcrumbs: FC<BreadcrumbsProps> = ({ className, children, ...props }) => {
+export const Breadcrumbs: FC<BreadcrumbsProps> = ({
+  className,
+  children,
+  'data-testid': testId,
+  ...props
+}) => {
   const childrenArray = Children.toArray(children);
   const childrenWithSeparators: ReactNode[] = [];
 
@@ -55,9 +62,16 @@ export const Breadcrumbs: FC<BreadcrumbsProps> = ({ className, children, ...prop
   });
 
   return (
-    <nav className={cn('flex items-center', className)} aria-label='Breadcrumb' {...props}>
-      <ol className='flex items-center gap-0'>{childrenWithSeparators}</ol>
-    </nav>
+    <TestIdProvider value={testId}>
+      <nav
+        className={cn('flex items-center', className)}
+        aria-label='Breadcrumb'
+        data-testid={testId}
+        {...props}
+      >
+        <ol className='flex items-center gap-0'>{childrenWithSeparators}</ol>
+      </nav>
+    </TestIdProvider>
   );
 };
 

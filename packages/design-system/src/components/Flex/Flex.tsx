@@ -2,6 +2,7 @@ import type { FC, HTMLAttributes, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import type { TestableProps } from '../../utils/testId';
 
 const flexVariants = cva('', {
   variants: {
@@ -109,7 +110,8 @@ type FlexNativeProps = Omit<HTMLAttributes<HTMLDivElement>, 'className'>;
 type FlexVariantProps = VariantProps<typeof flexVariants>;
 
 export type FlexProps = FlexNativeProps &
-  FlexVariantProps & {
+  FlexVariantProps &
+  TestableProps & {
     ref?: Ref<HTMLDivElement>;
     asChild?: boolean;
   };

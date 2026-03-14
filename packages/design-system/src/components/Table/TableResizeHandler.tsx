@@ -1,6 +1,7 @@
 import type { Header } from '@tanstack/react-table';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 const tableResizeHandlerVariants = cva(
   cn(
@@ -20,14 +21,19 @@ interface TableResizeHandlerProps<T> {
   header: Header<T, unknown>;
 }
 
-export const TableResizeHandler = <T,>({ header }: TableResizeHandlerProps<T>) => (
-  <div
-    onMouseDown={header.getResizeHandler()}
-    onTouchStart={header.getResizeHandler()}
-    className={cn(tableResizeHandlerVariants())}
-    data-resizing={header.column.getIsResizing() || undefined}
-    tabIndex={-1}
-  />
-);
+export const TableResizeHandler = <T,>({ header }: TableResizeHandlerProps<T>) => {
+  const testId = useTestId('resize');
+
+  return (
+    <div
+      onMouseDown={header.getResizeHandler()}
+      onTouchStart={header.getResizeHandler()}
+      className={cn(tableResizeHandlerVariants())}
+      data-testid={testId}
+      data-resizing={header.column.getIsResizing() || undefined}
+      tabIndex={-1}
+    />
+  );
+};
 
 TableResizeHandler.displayName = 'TableResizeHandler';

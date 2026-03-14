@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { useTestId } from '../../utils/testId';
 import { TabsTrigger } from '../Tabs';
 
 export type CodeSnippetTabProps = {
@@ -7,10 +8,14 @@ export type CodeSnippetTabProps = {
   children: ReactNode;
 };
 
-export const CodeSnippetTab: FC<CodeSnippetTabProps> = ({ value, disabled, children }) => (
-  <TabsTrigger value={value} disabled={disabled}>
-    {children}
-  </TabsTrigger>
-);
+export const CodeSnippetTab: FC<CodeSnippetTabProps> = ({ value, disabled, children }) => {
+  const testId = useTestId('tab');
+
+  return (
+    <TabsTrigger value={value} disabled={disabled} data-testid={testId}>
+      {children}
+    </TabsTrigger>
+  );
+};
 
 CodeSnippetTab.displayName = 'CodeSnippetTab';

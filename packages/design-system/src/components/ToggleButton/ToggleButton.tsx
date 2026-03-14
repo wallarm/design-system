@@ -1,6 +1,7 @@
 import type { FC, MouseEvent, Ref } from 'react';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { useControlled } from '../../hooks';
+import type { TestableProps } from '../../utils/testId';
 import { ButtonBase, type ButtonBaseProps } from '../ButtonBase';
 
 const toggleButtonVariants = cva('disabled:opacity-50', {
@@ -86,7 +87,8 @@ const toggleButtonVariants = cva('disabled:opacity-50', {
 type ToggleButtonVariantProps = VariantProps<typeof toggleButtonVariants>;
 
 export type ToggleButtonProps = Omit<Omit<ButtonBaseProps, 'onToggle'>, 'onClick'> &
-  ToggleButtonVariantProps & {
+  ToggleButtonVariantProps &
+  TestableProps & {
     ref?: Ref<HTMLButtonElement>;
     defaultValue?: boolean;
     onToggle?: (active: boolean, event: MouseEvent<HTMLButtonElement>) => void;

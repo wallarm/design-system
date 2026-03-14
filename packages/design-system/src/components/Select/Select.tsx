@@ -4,6 +4,7 @@ import {
   type CollectionItem,
   type SelectRootProps,
 } from '@ark-ui/react/select';
+import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { SelectSharedProvider } from './SelectSharedContext';
 
 type SelectNativeProps<T extends CollectionItem> = Omit<
@@ -15,12 +16,13 @@ export interface SelectBaseProps {
   loading?: boolean;
 }
 
-type SelectProps<T extends CollectionItem> = SelectNativeProps<T> & SelectBaseProps;
+type SelectProps<T extends CollectionItem> = SelectNativeProps<T> & SelectBaseProps & TestableProps;
 
 export const Select = <T extends CollectionItem>({
   children,
   loading = false,
   disabled = false,
+  'data-testid': testId,
   ...props
 }: SelectProps<T>) => {
   const positioning = useMemo<ArkUiSelect.RootProps<T>['positioning']>(
@@ -33,18 +35,21 @@ export const Select = <T extends CollectionItem>({
   );
 
   return (
-    <SelectSharedProvider value={{ loading }}>
-      <ArkUiSelect.Root
-        {...props}
-        disabled={disabled}
-        positioning={positioning}
-        lazyMount
-        unmountOnExit
-      >
-        <ArkUiSelect.HiddenSelect />
-        {children}
-      </ArkUiSelect.Root>
-    </SelectSharedProvider>
+    <TestIdProvider value={testId}>
+      <SelectSharedProvider value={{ loading }}>
+        <ArkUiSelect.Root
+          {...props}
+          data-testid={testId}
+          disabled={disabled}
+          positioning={positioning}
+          lazyMount
+          unmountOnExit
+        >
+          <ArkUiSelect.HiddenSelect />
+          {children}
+        </ArkUiSelect.Root>
+      </SelectSharedProvider>
+    </TestIdProvider>
   );
 };
 

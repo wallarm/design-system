@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import type { RowData } from '@tanstack/react-table';
+import type { TestableProps } from '../../utils/testId';
 
 declare module '@tanstack/react-table' {
   // biome-ignore lint/correctness/noUnusedVariables: TanStack Table augmentation requires matching generic parameter name
@@ -138,7 +139,7 @@ export type TableColumnDef<T> = TableAccessorColumnDef<T, any> | TableDisplayCol
 // Component props
 // ---------------------------------------------------------------------------
 
-export interface TableProps<T> {
+export interface TableProps<T> extends TestableProps {
   /** Data array for rows */
   data: T[];
   /** Column definitions */

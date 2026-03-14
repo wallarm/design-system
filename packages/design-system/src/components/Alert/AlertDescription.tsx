@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import { useTestId } from '../../utils/testId';
 import {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -25,15 +26,26 @@ export const AlertDescription: FC<AlertDescriptionProps> = ({
   children,
   lineClamp,
   ...props
-}) => (
-  <OverflowTooltip>
-    <OverflowTooltipTrigger>
-      <Text {...props} ref={ref} size='sm' color='secondary' lineClamp={lineClamp}>
-        {children}
-      </Text>
-    </OverflowTooltipTrigger>
-    <OverflowTooltipContent>{children}</OverflowTooltipContent>
-  </OverflowTooltip>
-);
+}) => {
+  const testId = useTestId('description');
+
+  return (
+    <OverflowTooltip>
+      <OverflowTooltipTrigger>
+        <Text
+          {...props}
+          ref={ref}
+          data-testid={testId}
+          size='sm'
+          color='secondary'
+          lineClamp={lineClamp}
+        >
+          {children}
+        </Text>
+      </OverflowTooltipTrigger>
+      <OverflowTooltipContent>{children}</OverflowTooltipContent>
+    </OverflowTooltip>
+  );
+};
 
 AlertDescription.displayName = 'AlertDescription';

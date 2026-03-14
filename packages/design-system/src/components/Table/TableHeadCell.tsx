@@ -1,5 +1,6 @@
 import { flexRender, type Header } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
@@ -25,6 +26,7 @@ interface TableHeadCellProps<T> {
 
 export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
   const ctx = useTableContext<T>();
+  const testId = useTestId('head-cell');
   const {
     sortingEnabled,
     resizingEnabled,
@@ -86,6 +88,7 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
   return (
     <Th
       ref={canDnd ? setNodeRef : undefined}
+      data-testid={testId}
       className={cn(
         'group',
         alignClass,

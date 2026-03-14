@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { useTableContext } from './TableContext';
 
 interface TableEmptyStateProps {
@@ -7,6 +8,7 @@ interface TableEmptyStateProps {
 }
 
 export const TableEmptyState: FC<TableEmptyStateProps> = ({ children }) => {
+  const testId = useTestId('empty-state');
   const { table } = useTableContext();
 
   const { rows } = table.getRowModel();
@@ -15,7 +17,11 @@ export const TableEmptyState: FC<TableEmptyStateProps> = ({ children }) => {
 
   if (!tableIsEmpty) return null;
 
-  return <div className={cn('py-128')}>{children}</div>;
+  return (
+    <div data-testid={testId} className={cn('py-128')}>
+      {children}
+    </div>
+  );
 };
 
 TableEmptyState.displayName = 'TableEmptyState';

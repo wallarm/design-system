@@ -1,6 +1,7 @@
 import { Children, type FC } from 'react';
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import {
   ScrollArea,
   ScrollAreaContent,
@@ -13,11 +14,13 @@ import { SelectEmptyState } from './SelectEmptyState';
 type SelectContentProps = Omit<ArkUiSelect.ContentProps, 'className'>;
 
 export const SelectContent: FC<SelectContentProps> = ({ children, ...props }) => {
+  const testId = useTestId('content');
   const isEmpty = Children.count(children) === 0;
 
   return (
     <ArkUiSelect.List
       {...props}
+      data-testid={testId}
       className={cn('flex flex-col p-8 overflow-hidden outline-none')}
       asChild
     >
