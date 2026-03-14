@@ -1,6 +1,7 @@
 import type { FC, Ref } from 'react';
 import { Dialog as ArkUiDialog } from '@ark-ui/react/dialog';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import {
   type DrawerContentProps,
   DrawerOverlay,
@@ -13,6 +14,7 @@ import { DialogPositioner } from './DialogPositioner';
 type DialogContentProps = DrawerContentProps & { ref?: Ref<HTMLDivElement> };
 
 export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
+  const testId = useTestId('content');
   const { width, overlay } = useDrawerContext();
 
   return (
@@ -22,6 +24,7 @@ export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
       <DialogPositioner>
         <ArkUiDialog.Content
           ref={ref}
+          data-testid={testId}
           className={cn(
             drawerContentVariants({ isResizing: false }),
             'flex flex-col min-h-0',

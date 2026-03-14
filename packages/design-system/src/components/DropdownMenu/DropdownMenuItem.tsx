@@ -2,6 +2,7 @@ import { type FC, type HTMLAttributes, type Ref, useId } from 'react';
 import { Menu } from '@ark-ui/react/menu';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { dropdownMenuItemVariants } from './classes';
 
 export type DropdownMenuItemVariantsProps = VariantProps<typeof dropdownMenuItemVariants>;
@@ -27,6 +28,7 @@ export const DropdownMenuItem: FC<DropdownMenuItemProps> = ({
   ...props
 }) => {
   const autoId = useId();
+  const testId = useTestId('item');
 
   return (
     <Menu.Item
@@ -34,6 +36,7 @@ export const DropdownMenuItem: FC<DropdownMenuItemProps> = ({
       value={value ?? autoId}
       disabled={disabled}
       onSelect={onSelect}
+      data-testid={testId}
       className={cn(dropdownMenuItemVariants({ variant, inset }), className)}
     />
   );

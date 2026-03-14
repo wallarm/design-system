@@ -155,6 +155,7 @@ export interface TableProps<T> {
   'aria-label'?: string;
   /** Additional CSS class for the root container */
   className?: string;
+  'data-testid'?: string;
 
   // --- Sorting ---
   sorting?: TableSortingState;

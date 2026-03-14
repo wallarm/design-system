@@ -2,6 +2,7 @@ import type { FC, HTMLAttributes, MouseEvent, MouseEventHandler, ReactNode, Ref 
 import { Slot } from '@radix-ui/react-slot';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { TestIdProvider } from '../../utils/testId';
 import { cardVariants } from './classes';
 
 const INTERACTIVE_SELECTORS = 'a[href],button,input,select,textarea,[tabindex]';
@@ -23,6 +24,7 @@ export const Card: FC<CardProps> = ({
   disabled = false,
   className,
   children,
+  'data-testid': testId,
   ...props
 }) => {
   const Comp = asChild ? Slot : 'div';
@@ -44,17 +46,20 @@ export const Card: FC<CardProps> = ({
   };
 
   return (
-    <Comp
-      {...props}
-      ref={ref}
-      data-slot='card'
-      tabIndex={interactive && !disabled ? 0 : undefined}
-      aria-disabled={disabled || undefined}
-      onClick={disabled ? undefined : handleClick}
-      className={cn(cardVariants({ color, interactive, disabled }), className)}
-    >
-      {children}
-    </Comp>
+    <TestIdProvider value={testId}>
+      <Comp
+        {...props}
+        ref={ref}
+        data-slot='card'
+        data-testid={testId}
+        tabIndex={interactive && !disabled ? 0 : undefined}
+        aria-disabled={disabled || undefined}
+        onClick={disabled ? undefined : handleClick}
+        className={cn(cardVariants({ color, interactive, disabled }), className)}
+      >
+        {children}
+      </Comp>
+    </TestIdProvider>
   );
 };
 

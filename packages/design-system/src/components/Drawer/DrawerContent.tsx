@@ -1,6 +1,7 @@
 import type { FC, ReactNode, Ref } from 'react';
 import { Dialog } from '@ark-ui/react/dialog';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { drawerContentVariants } from './classes';
 import { useDrawerContext } from './DrawerContext';
 import { DrawerOverlay } from './DrawerOverlay';
@@ -14,6 +15,7 @@ export interface DrawerContentProps {
 }
 
 export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }) => {
+  const testId = useTestId('content');
   const { width, isResizing, overlay } = useDrawerContext();
 
   return (
@@ -23,6 +25,7 @@ export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }
       <DrawerPositioner isResizing={isResizing}>
         <Dialog.Content
           ref={ref}
+          data-testid={testId}
           className={cn(
             drawerContentVariants({ isResizing }),
             'h-full',

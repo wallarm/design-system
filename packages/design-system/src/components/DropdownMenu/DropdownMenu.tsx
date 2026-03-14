@@ -1,5 +1,6 @@
 import { type FC, type ReactNode, useMemo } from 'react';
 import { Menu } from '@ark-ui/react/menu';
+import { TestIdProvider } from '../../utils/testId';
 import { DropdownMenuContext, useDropdownMenuContext } from './DropdownMenuContext';
 
 interface DropdownMenuProps {
@@ -18,6 +19,7 @@ interface DropdownMenuProps {
   onHighlightChange?: (details: Menu.HighlightChangeDetails) => void;
   /** Whether selecting an item closes the menu (default true) */
   closeOnSelect?: boolean;
+  'data-testid'?: string;
 }
 
 const ROOT_POSITIONING: Menu.RootProps['positioning'] = {
@@ -42,6 +44,7 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
   highlightedValue,
   onHighlightChange,
   closeOnSelect,
+  'data-testid': testId,
   ...props
 }) => {
   const parent = useDropdownMenuContext();
@@ -57,21 +60,23 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
 
   return (
     <DropdownMenuContext value={ctx}>
-      <Menu.Root
-        {...props}
-        positioning={positioning ?? defaultPositioning}
-        {...(anchorPoint != null && { anchorPoint })}
-        {...(highlightedValue != null && { highlightedValue })}
-        {...(closeOnSelect != null && { closeOnSelect })}
-        {...(onHighlightChange != null && { onHighlightChange })}
-        open={open}
-        defaultOpen={defaultOpen}
-        onOpenChange={handleOpenChange}
-        lazyMount
-        unmountOnExit
-      >
-        {children}
-      </Menu.Root>
+      <TestIdProvider value={testId}>
+        <Menu.Root
+          {...props}
+          positioning={positioning ?? defaultPositioning}
+          {...(anchorPoint != null && { anchorPoint })}
+          {...(highlightedValue != null && { highlightedValue })}
+          {...(closeOnSelect != null && { closeOnSelect })}
+          {...(onHighlightChange != null && { onHighlightChange })}
+          open={open}
+          defaultOpen={defaultOpen}
+          onOpenChange={handleOpenChange}
+          lazyMount
+          unmountOnExit
+        >
+          {children}
+        </Menu.Root>
+      </TestIdProvider>
     </DropdownMenuContext>
   );
 };

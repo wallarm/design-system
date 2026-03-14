@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 export interface CardHeaderProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
@@ -16,12 +17,14 @@ export const CardHeader: FC<CardHeaderProps> = ({
   ...props
 }) => {
   const Comp = asChild ? Slot : 'div';
+  const testId = useTestId('header');
 
   return (
     <Comp
       {...props}
       ref={ref}
       data-slot='card-header'
+      data-testid={testId}
       className={cn('flex items-center justify-between gap-8 px-16', className)}
     >
       {children}

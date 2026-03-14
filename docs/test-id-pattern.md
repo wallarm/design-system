@@ -77,19 +77,15 @@ const testId = useTestId('close') // "login-error--close" or undefined
 
 ## Naming convention
 
-| Component        | Slot name     | Result                        |
+Slot name = sub-component suffix in kebab-case, without the parent prefix.
+
+| Sub-component    | Slot name     | Example result                |
 |------------------|---------------|-------------------------------|
 | `AlertClose`     | `close`       | `login-error--close`          |
 | `AlertIcon`      | `icon`        | `login-error--icon`           |
-| `AlertTitle`     | `title`       | `login-error--title`          |
-| `AlertContent`   | `content`     | `login-error--content`        |
-| `AlertControls`  | `controls`    | `login-error--controls`       |
 | `DialogHeader`   | `header`      | `confirm-dialog--header`      |
-| `DialogBody`     | `body`        | `confirm-dialog--body`        |
-| `DialogFooter`   | `footer`      | `confirm-dialog--footer`      |
-| `DialogClose`    | `close`       | `confirm-dialog--close`       |
-
-**Rule:** slot name = sub-component suffix in kebab-case, without the parent prefix.
+| `DialogFooterControls` | `footer-controls` | `confirm-dialog--footer-controls` |
+| `SelectSearchInput` | `search-input` | `country-select--search-input` |
 
 ## When `data-testid` is not passed
 
@@ -110,11 +106,14 @@ When no `data-testid` is provided to the root component, all derived test IDs ar
 
 These serve different purposes and coexist on the same elements.
 
-## Components with TestId support
+## How testId is sourced
 
-- ✅ Alert (reference implementation)
+All compound components support `data-testid` cascading. Most receive it via the standard `data-testid` HTML attribute. Exceptions:
 
-> More components will be added incrementally.
+| Component | Source | Why |
+|-----------|--------|-----|
+| Toast | `toast.id` (automatic) | Data-driven, no JSX props |
+| Tour | `testId` prop | No standard DOM root element |
 
 ## Adding TestId to a new compound component
 

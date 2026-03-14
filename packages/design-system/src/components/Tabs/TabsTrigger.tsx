@@ -1,6 +1,7 @@
 import type { FC, FocusEvent, ReactNode } from 'react';
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { tabsTriggerVariants } from './classes';
 import { TABS_SCROLL_BUTTON_WIDTH } from './constants';
 import { useTabsSharedContext } from './TabsSharedContext';
@@ -22,6 +23,7 @@ export const TabsTrigger: FC<TabsTriggerProps> = ({
   className,
   onFocus,
 }) => {
+  const testId = useTestId('trigger');
   const { scrollRef, size } = useTabsSharedContext();
 
   const handleFocus = (e: React.FocusEvent<HTMLButtonElement>) => {
@@ -52,6 +54,7 @@ export const TabsTrigger: FC<TabsTriggerProps> = ({
   return (
     <ArkUiTabs.Trigger
       className={cn(tabsTriggerVariants({ size }), className)}
+      data-testid={testId}
       value={value}
       disabled={disabled}
       asChild={asChild}

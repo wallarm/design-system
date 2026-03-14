@@ -2,6 +2,7 @@ import type { FC, ReactNode } from 'react';
 import { useTourContext } from '@ark-ui/react';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 export interface TourMediaProps {
   children?: ReactNode;
@@ -21,6 +22,7 @@ const mediaVariants = cva('w-full overflow-clip', {
 
 export const TourMedia: FC<TourMediaProps> = ({ children, className }) => {
   const { step } = useTourContext();
+  const testId = useTestId('media');
   const type = step?.type === 'dialog' ? 'dialog' : 'tooltip';
   const src = step?.meta?.mediaSrc as string | undefined;
   const alt = (step?.meta?.mediaAlt as string) ?? '';
@@ -30,7 +32,7 @@ export const TourMedia: FC<TourMediaProps> = ({ children, className }) => {
   const isVideo = src && VIDEO_RE.test(src);
 
   return (
-    <div className={cn(mediaVariants({ type }), className)}>
+    <div data-testid={testId} className={cn(mediaVariants({ type }), className)}>
       {src ? (
         isVideo ? (
           <video

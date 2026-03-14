@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { Badge } from '../Badge';
 import { Link } from '../Link';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
@@ -31,6 +32,7 @@ export const IpList: FC<IpListProps> = ({
   children,
   ...props
 }) => {
+  const testId = useTestId('list');
   const items = Children.toArray(children);
   const [first, ...rest] = items;
 
@@ -45,6 +47,7 @@ export const IpList: FC<IpListProps> = ({
       {...props}
       ref={ref}
       data-slot='ip-list'
+      data-testid={testId}
       className={cn('flex flex-col min-w-0 max-w-full', className)}
     >
       {first}

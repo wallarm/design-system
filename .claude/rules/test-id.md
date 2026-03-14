@@ -54,9 +54,8 @@ export const AlertClose: FC<AlertCloseProps> = ({ ref, ...props }) => {
 
 ## When to Apply
 
-- ✅ Compound components with 2+ sub-components (Alert, Dialog, Card, Field, Select, etc.)
-- ✅ Components that render multiple interactive or semantically distinct DOM elements
-- ❌ Simple leaf components (Button, Badge, Text) — they receive `data-testid` via `...rest` props spreading
+- **All compound components** (with sub-components) must implement this pattern — it is a mandatory standard, not opt-in
+- Simple leaf components (Button, Badge, Text) receive `data-testid` via `...rest` props spreading — no extra work needed
 
 ## Checklist
 

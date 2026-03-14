@@ -3,6 +3,7 @@ import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
+import { TestIdProvider } from '../../utils/testId';
 
 const segmentedControlVariants = cva('', {
   variants: {
@@ -26,6 +27,7 @@ export interface SegmentedTabsBaseProps {
   unmountOnExit?: boolean;
   fullWidth?: boolean;
   onChange?: (value: string) => void;
+  'data-testid'?: string;
 }
 
 type SegmentedTabsProps = SegmentedTabsVariantProps & SegmentedTabsBaseProps;
@@ -38,6 +40,7 @@ export const SegmentedTabs: FC<SegmentedTabsProps> = ({
   lazyMount = true,
   unmountOnExit = true,
   fullWidth = false,
+  'data-testid': testId,
 }) => {
   const [value, setValue] = useControlled({
     controlled: valueProp,
@@ -52,13 +55,14 @@ export const SegmentedTabs: FC<SegmentedTabsProps> = ({
   return (
     <ArkUiTabs.Root
       className={cn(segmentedControlVariants({ fullWidth }))}
+      data-testid={testId}
       value={value}
       defaultValue={defaultValue}
       lazyMount={lazyMount}
       unmountOnExit={unmountOnExit}
       onValueChange={handleValueChange}
     >
-      {children}
+      <TestIdProvider value={testId}>{children}</TestIdProvider>
     </ArkUiTabs.Root>
   );
 };

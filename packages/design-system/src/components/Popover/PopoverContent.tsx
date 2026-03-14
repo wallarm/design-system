@@ -2,6 +2,7 @@ import { type CSSProperties, type FC, type MouseEvent, type ReactNode, useMemo }
 import { Popover as ArkUiPopover, usePopoverContext } from '@ark-ui/react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import {
   ScrollArea,
   ScrollAreaContent,
@@ -31,6 +32,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
   minWidth = POPOVER_MIN_WIDTH,
   maxWidth = POPOVER_MAX_WIDTH,
 }) => {
+  const testId = useTestId('content');
   const { getContentProps } = usePopoverContext();
   const { id } = getContentProps();
 
@@ -54,6 +56,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
       <ArkUiPopover.Positioner>
         <ArkUiPopover.Content
           id={id}
+          data-testid={testId}
           style={style}
           className={cn(
             // Layout

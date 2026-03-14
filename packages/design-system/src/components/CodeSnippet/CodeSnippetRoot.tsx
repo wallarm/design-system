@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { TestIdProvider } from '../../utils/testId';
 import { plainAdapter } from './adapters/plain';
 import type { SyntaxAdapter, Token } from './adapters/types';
 import {
@@ -79,6 +80,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   onCopy,
   className,
   children,
+  'data-testid': testId,
   ...props
 }: CodeSnippetRootProps<TLanguage>) => {
   const adapterContext = useAdapter<TLanguage>();
@@ -180,6 +182,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   const snippet = (
     <div
       data-slot='code-snippet'
+      data-testid={testId}
       className={cn(
         codeSnippetRootVariants({ size }),
         isFullscreen ? 'fixed inset-16 z-50' : className,
@@ -192,20 +195,22 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   );
 
   return (
-    <CodeSnippetContext.Provider value={contextValue as unknown as CodeSnippetContextValue}>
-      {isFullscreen
-        ? createPortal(
-            <>
-              <div
-                className='fixed inset-0 z-40 backdrop-blur-xs bg-component-dialog-overlay'
-                onClick={() => setIsFullscreen(false)}
-              />
-              {snippet}
-            </>,
-            document.body,
-          )
-        : snippet}
-    </CodeSnippetContext.Provider>
+    <TestIdProvider value={testId}>
+      <CodeSnippetContext.Provider value={contextValue as unknown as CodeSnippetContextValue}>
+        {isFullscreen
+          ? createPortal(
+              <>
+                <div
+                  className='fixed inset-0 z-40 backdrop-blur-xs bg-component-dialog-overlay'
+                  onClick={() => setIsFullscreen(false)}
+                />
+                {snippet}
+              </>,
+              document.body,
+            )
+          : snippet}
+      </CodeSnippetContext.Provider>
+    </TestIdProvider>
   );
 };
 

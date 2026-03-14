@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { Text } from '../Text';
 
 export interface CardTitleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
@@ -8,18 +9,23 @@ export interface CardTitleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'ch
   children?: ReactNode;
 }
 
-export const CardTitle: FC<CardTitleProps> = ({ ref, icon, className, children, ...props }) => (
-  <div
-    {...props}
-    ref={ref}
-    data-slot='card-title'
-    className={cn('flex items-center gap-8', className)}
-  >
-    {icon && <span className='shrink-0'>{icon}</span>}
-    <Text size='md' weight='medium' color='primary'>
-      {children}
-    </Text>
-  </div>
-);
+export const CardTitle: FC<CardTitleProps> = ({ ref, icon, className, children, ...props }) => {
+  const testId = useTestId('title');
+
+  return (
+    <div
+      {...props}
+      ref={ref}
+      data-slot='card-title'
+      data-testid={testId}
+      className={cn('flex items-center gap-8', className)}
+    >
+      {icon && <span className='shrink-0'>{icon}</span>}
+      <Text size='md' weight='medium' color='primary'>
+        {children}
+      </Text>
+    </div>
+  );
+};
 
 CardTitle.displayName = 'CardTitle';

@@ -1,6 +1,7 @@
 import type { FC, FocusEvent, ReactNode, Ref } from 'react';
 import { Dialog } from '@ark-ui/react/dialog';
 import { X } from '../../icons';
+import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { Kbd } from '../Kbd';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
@@ -14,6 +15,7 @@ export interface DrawerCloseProps {
 }
 
 export const DrawerClose: FC<DrawerCloseProps> = ({ children, asChild = false, ref }) => {
+  const testId = useTestId('close');
   const { closeOnEscape } = useDrawerContext();
 
   const handleFocusCapture = (event: FocusEvent<HTMLButtonElement>) => {
@@ -32,7 +34,14 @@ export const DrawerClose: FC<DrawerCloseProps> = ({ children, asChild = false, r
     <Tooltip>
       <TooltipTrigger asChild>
         <Dialog.CloseTrigger asChild onFocusCapture={handleFocusCapture}>
-          <Button ref={ref} variant='ghost' color='neutral' size='small' aria-label='Close drawer'>
+          <Button
+            ref={ref}
+            data-testid={testId}
+            variant='ghost'
+            color='neutral'
+            size='small'
+            aria-label='Close drawer'
+          >
             {children || <X />}
           </Button>
         </Dialog.CloseTrigger>

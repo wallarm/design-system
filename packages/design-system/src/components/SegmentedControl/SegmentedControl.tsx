@@ -3,6 +3,7 @@ import { SegmentGroup } from '@ark-ui/react/segment-group';
 import type { VariantProps } from 'class-variance-authority';
 import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
+import { TestIdProvider } from '../../utils/testId';
 import { segmentedControlIndicatorClassNames, segmentedControlVariants } from './classes';
 
 type SegmentedControlVariantProps = VariantProps<typeof segmentedControlVariants>;
@@ -48,6 +49,7 @@ export const SegmentedControl: FC<SegmentedControlProps> = ({
   onChange,
   children,
   ref,
+  'data-testid': testId,
   ...props
 }) => {
   const [value, setValue] = useControlled({
@@ -68,12 +70,13 @@ export const SegmentedControl: FC<SegmentedControlProps> = ({
       ref={ref}
       value={value}
       onValueChange={handleValueChange}
+      data-testid={testId}
       className={cn(segmentedControlVariants({ fullWidth }), className)}
       {...props}
     >
       <SegmentGroup.Indicator className={segmentedControlIndicatorClassNames} />
 
-      {children}
+      <TestIdProvider value={testId}>{children}</TestIdProvider>
     </SegmentGroup.Root>
   );
 };

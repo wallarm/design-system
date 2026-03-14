@@ -1,10 +1,12 @@
 import type { FC, ReactNode } from 'react';
 import { Popover as ArkUiPopover } from '@ark-ui/react';
+import { TestIdProvider } from '../../utils/testId';
 
 export interface PopoverProps {
   children: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  'data-testid'?: string;
 }
 
 const POPOVER_POSITIONING_DEFAULT: ArkUiPopover.RootProps['positioning'] = {
@@ -14,21 +16,28 @@ const POPOVER_POSITIONING_DEFAULT: ArkUiPopover.RootProps['positioning'] = {
   },
 };
 
-export const Popover: FC<PopoverProps> = ({ children, open, onOpenChange }) => {
+export const Popover: FC<PopoverProps> = ({
+  children,
+  open,
+  onOpenChange,
+  'data-testid': testId,
+}) => {
   const handleOpenChange = ({ open }: ArkUiPopover.OpenChangeDetails) => {
     onOpenChange?.(open);
   };
 
   return (
-    <ArkUiPopover.Root
-      positioning={POPOVER_POSITIONING_DEFAULT}
-      open={open}
-      onOpenChange={handleOpenChange}
-      lazyMount
-      unmountOnExit
-    >
-      {children}
-    </ArkUiPopover.Root>
+    <TestIdProvider value={testId}>
+      <ArkUiPopover.Root
+        positioning={POPOVER_POSITIONING_DEFAULT}
+        open={open}
+        onOpenChange={handleOpenChange}
+        lazyMount
+        unmountOnExit
+      >
+        {children}
+      </ArkUiPopover.Root>
+    </TestIdProvider>
   );
 };
 

@@ -15,14 +15,22 @@ const tableActionBarAnchorVariants = cva(cn('w-full relative outline-none'), {
 
 interface TableActionBarAnchorProps {
   className?: string;
+  'data-testid'?: string;
   children: ReactNode;
 }
 
-export const TableActionBarAnchor: FC<TableActionBarAnchorProps> = ({ className, children }) => {
+export const TableActionBarAnchor: FC<TableActionBarAnchorProps> = ({
+  className,
+  'data-testid': testId,
+  children,
+}) => {
   const { virtualized } = useTableContext();
 
   return (
-    <ArkUiPopover.Anchor className={cn(tableActionBarAnchorVariants({ virtualized }), className)}>
+    <ArkUiPopover.Anchor
+      data-testid={testId}
+      className={cn(tableActionBarAnchorVariants({ virtualized }), className)}
+    >
       {children}
     </ArkUiPopover.Anchor>
   );

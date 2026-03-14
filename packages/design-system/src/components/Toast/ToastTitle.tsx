@@ -1,4 +1,5 @@
 import { forwardRef, type ReactNode } from 'react';
+import { useTestId } from '../../utils/testId';
 import {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -20,6 +21,7 @@ export interface ToastTitleProps {
 export const ToastTitle = forwardRef<HTMLDivElement, ToastTitleProps>(
   ({ children, variant = 'extended' }, ref) => {
     const isSimple = variant === 'simple';
+    const testId = useTestId('title');
 
     return (
       <OverflowTooltip>
@@ -30,6 +32,7 @@ export const ToastTitle = forwardRef<HTMLDivElement, ToastTitleProps>(
             weight='medium'
             color='primary-alt'
             lineClamp={isSimple ? 1 : 2}
+            data-testid={testId}
           >
             {children}
           </Text>

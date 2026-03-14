@@ -1,6 +1,7 @@
 import type { ButtonHTMLAttributes, FC, Ref } from 'react';
 import { Ellipsis } from '../../icons';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 export type BreadcrumbsEllipsisProps = ButtonHTMLAttributes<HTMLButtonElement> & {
   ref?: Ref<HTMLButtonElement>;
@@ -20,6 +21,8 @@ export type BreadcrumbsEllipsisProps = ButtonHTMLAttributes<HTMLButtonElement> &
  * ```
  */
 export const BreadcrumbsEllipsis: FC<BreadcrumbsEllipsisProps> = ({ className, ...props }) => {
+  const testId = useTestId('ellipsis');
+
   return (
     <li>
       <button
@@ -35,6 +38,7 @@ export const BreadcrumbsEllipsis: FC<BreadcrumbsEllipsisProps> = ({ className, .
           className,
         )}
         aria-label='Show more breadcrumbs'
+        data-testid={testId}
         {...props}
       >
         <Ellipsis size='md' />

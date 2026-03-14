@@ -2,6 +2,7 @@ import type { FC, HTMLAttributes, MouseEvent, PropsWithChildren, Ref } from 'rea
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { TestIdProvider } from '../../utils/testId';
 import { type BadgeProps, badgeVariants } from '../Badge';
 
 const tagVariants = cva(
@@ -44,6 +45,7 @@ export const Tag: FC<TagProps> = ({
   asChild = false,
   children,
   onClick,
+  'data-testid': testId,
   ...props
 }) => {
   const Comp = asChild ? Slot : 'div';
@@ -53,25 +55,28 @@ export const Tag: FC<TagProps> = ({
     onClick?.(event);
   };
   return (
-    <Comp
-      {...props}
-      className={cn(
-        tagVariants({ disabled }),
-        badgeVariants({
-          color: 'slate',
-          type: 'secondary',
-          textVariant: 'default',
-          muted: false,
-          size,
-        }),
-      )}
-      data-slot='tag'
-      data-disabled={disabled ? 'true' : undefined}
-      tabIndex={disabled ? -1 : 0}
-      onClick={handleClick}
-    >
-      {children}
-    </Comp>
+    <TestIdProvider value={testId}>
+      <Comp
+        {...props}
+        className={cn(
+          tagVariants({ disabled }),
+          badgeVariants({
+            color: 'slate',
+            type: 'secondary',
+            textVariant: 'default',
+            muted: false,
+            size,
+          }),
+        )}
+        data-slot='tag'
+        data-testid={testId}
+        data-disabled={disabled ? 'true' : undefined}
+        tabIndex={disabled ? -1 : 0}
+        onClick={handleClick}
+      >
+        {children}
+      </Comp>
+    </TestIdProvider>
   );
 };
 

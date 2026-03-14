@@ -2,6 +2,7 @@ import type { ComponentProps, FC, ReactNode, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { TestIdProvider } from '../../utils/testId';
 import { CountryContext } from './CountryContext';
 import { type CountryCode, countries } from './countries';
 
@@ -34,6 +35,7 @@ export const Country: FC<CountryProps> = ({
   size = 'medium',
   className,
   children,
+  'data-testid': testId,
   ...props
 }) => {
   const countryData = countries[code];
@@ -42,14 +44,17 @@ export const Country: FC<CountryProps> = ({
 
   return (
     <CountryContext.Provider value={{ code, size: size ?? 'medium', countryData }}>
-      <Comp
-        {...props}
-        ref={ref}
-        data-slot='country'
-        className={cn(countryVariants({ size }), className)}
-      >
-        {children}
-      </Comp>
+      <TestIdProvider value={testId}>
+        <Comp
+          {...props}
+          ref={ref}
+          data-testid={testId}
+          data-slot='country'
+          className={cn(countryVariants({ size }), className)}
+        >
+          {children}
+        </Comp>
+      </TestIdProvider>
     </CountryContext.Provider>
   );
 };

@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
+import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
 import { SelectArrow } from './SelectArrow';
 import { useSelectSharedContext } from './SelectSharedContext';
@@ -21,6 +22,7 @@ export const SelectButton: FC<SelectButtonProps> = ({
   color = 'neutral',
   ...props
 }) => {
+  const testId = useTestId('button');
   const { loading } = useSelectSharedContext();
   const { disabled } = useSelectContext();
 
@@ -29,6 +31,7 @@ export const SelectButton: FC<SelectButtonProps> = ({
       <ArkUiSelect.Trigger asChild>
         <Button
           {...props}
+          data-testid={testId}
           variant={variant}
           color={color}
           size='large'

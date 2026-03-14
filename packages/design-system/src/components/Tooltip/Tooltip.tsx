@@ -1,5 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
+import { TestIdProvider } from '../../utils/testId';
 
 export interface TooltipProps {
   children: ReactNode;
@@ -14,6 +15,7 @@ export interface TooltipProps {
   interactive?: boolean;
   disabled?: boolean;
   positioning?: ArkUiTooltip.RootProps['positioning'];
+  'data-testid'?: string;
 }
 
 const TOOLTIP_POSITIONING_DEFAULT: ArkUiTooltip.RootProps['positioning'] = {
@@ -36,29 +38,32 @@ export const Tooltip: FC<TooltipProps> = ({
   interactive,
   disabled,
   positioning,
+  'data-testid': testId,
 }) => {
   const handleOpenChange = (details: ArkUiTooltip.OpenChangeDetails) => {
     onOpenChange?.(details.open);
   };
 
   return (
-    <ArkUiTooltip.Root
-      open={open}
-      defaultOpen={defaultOpen}
-      onOpenChange={handleOpenChange}
-      openDelay={openDelay}
-      closeDelay={closeDelay}
-      closeOnPointerDown={closeOnPointerDown}
-      closeOnEscape={closeOnEscape}
-      closeOnScroll={closeOnScroll}
-      interactive={interactive}
-      disabled={disabled}
-      positioning={positioning ?? TOOLTIP_POSITIONING_DEFAULT}
-      lazyMount
-      unmountOnExit
-    >
-      {children}
-    </ArkUiTooltip.Root>
+    <TestIdProvider value={testId}>
+      <ArkUiTooltip.Root
+        open={open}
+        defaultOpen={defaultOpen}
+        onOpenChange={handleOpenChange}
+        openDelay={openDelay}
+        closeDelay={closeDelay}
+        closeOnPointerDown={closeOnPointerDown}
+        closeOnEscape={closeOnEscape}
+        closeOnScroll={closeOnScroll}
+        interactive={interactive}
+        disabled={disabled}
+        positioning={positioning ?? TOOLTIP_POSITIONING_DEFAULT}
+        lazyMount
+        unmountOnExit
+      >
+        {children}
+      </ArkUiTooltip.Root>
+    </TestIdProvider>
   );
 };
 

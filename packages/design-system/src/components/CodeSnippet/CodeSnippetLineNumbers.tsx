@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { useCodeSnippet } from './hooks';
 import { LINE_COLOR_STYLES, SIZE_LINE_HEIGHT_CLASSES } from './lib/lineStyles';
 
@@ -11,6 +12,7 @@ export const CodeSnippetLineNumbers: FC<CodeSnippetLineNumbersProps> = ({
   className,
   ...props
 }) => {
+  const testId = useTestId('line-numbers');
   const { tokens, startingLineNumber, lines, size } = useCodeSnippet();
 
   const lineHeightClass = SIZE_LINE_HEIGHT_CLASSES[size];
@@ -22,6 +24,7 @@ export const CodeSnippetLineNumbers: FC<CodeSnippetLineNumbersProps> = ({
   return (
     <div
       data-slot='code-snippet-line-numbers'
+      data-testid={testId}
       className={cn('flex flex-col text-text-secondary select-none text-right', className)}
       {...props}
     >

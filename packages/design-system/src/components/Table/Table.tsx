@@ -1,3 +1,4 @@
+import { TestIdProvider } from '../../utils/testId';
 import { TableProvider } from './TableContext';
 import { TableInner } from './TableInner';
 import type { TableProps } from './types';
@@ -9,6 +10,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     children,
     className,
     'aria-label': ariaLabel,
+    'data-testid': testId,
     ...providerProps
   } = props;
 
@@ -17,15 +19,18 @@ export const Table = <T,>(props: TableProps<T>) => {
 
   return (
     <TableProvider data={data} isLoading={isLoading} {...providerProps}>
-      <TableInner
-        isEmpty={isEmpty}
-        virtualized={props.virtualized}
-        showSettings={showSettings}
-        ariaLabel={ariaLabel}
-        className={className}
-      >
-        {children}
-      </TableInner>
+      <TestIdProvider value={testId}>
+        <TableInner
+          isEmpty={isEmpty}
+          virtualized={props.virtualized}
+          showSettings={showSettings}
+          ariaLabel={ariaLabel}
+          className={className}
+          data-testid={testId}
+        >
+          {children}
+        </TableInner>
+      </TestIdProvider>
     </TableProvider>
   );
 };

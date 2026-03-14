@@ -2,6 +2,7 @@ import type { FC, MouseEventHandler, Ref } from 'react';
 import { useEffect } from 'react';
 import { useCopyToClipboard } from '../../hooks';
 import { Copy } from '../../icons/Copy';
+import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useCodeSnippet } from './hooks';
@@ -15,6 +16,7 @@ export const CodeSnippetCopyButton: FC<CodeSnippetCopyButtonProps> = ({
   ref,
   ...props
 }) => {
+  const testId = useTestId('copy-button');
   const { code } = useCodeSnippet();
   const { copied, copy, reset, isSupported } = useCopyToClipboard();
 
@@ -43,6 +45,7 @@ export const CodeSnippetCopyButton: FC<CodeSnippetCopyButtonProps> = ({
           color='neutral'
           size='small'
           aria-label='Copy code'
+          data-testid={testId}
           {...props}
           onClick={handleClick}
         >

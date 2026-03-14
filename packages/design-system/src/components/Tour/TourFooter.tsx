@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
 import { cva } from 'class-variance-authority';
+import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { HStack } from '../Stack';
 import { prepareActions } from './lib';
@@ -33,6 +34,7 @@ const progressVariants = cva('font-sans font-regular text-sm leading-sm', {
 
 export const TourFooter: FC<TourFooterProps> = () => {
   const { step, firstStep, lastStep, totalSteps } = useTourContext();
+  const testId = useTestId('footer');
 
   const type = step?.type === 'dialog' ? 'dialog' : 'tooltip';
   const hideActions = !!step?.effect;
@@ -40,6 +42,7 @@ export const TourFooter: FC<TourFooterProps> = () => {
 
   return (
     <ArkUiTour.Control
+      data-testid={testId}
       className={controlVariants({
         type,
         alignment: showProgressText ? 'between' : 'end',

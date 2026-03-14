@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { Select as ArkUiSelect, type CollectionItem } from '@ark-ui/react/select';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { dropdownMenuItemVariants } from '../DropdownMenu';
 
 type SelectOptionNativeProps = Omit<ArkUiSelect.ItemProps, 'className'>;
@@ -17,9 +18,12 @@ type SelectOptionProps = SelectOptionNativeProps &
   SelectOptionBaseProps;
 
 export const SelectOption: FC<SelectOptionProps> = ({ variant = 'default', ...props }) => {
+  const testId = useTestId('option');
+
   return (
     <ArkUiSelect.Item
       {...props}
+      data-testid={testId}
       persistFocus
       className={cn(
         dropdownMenuItemVariants({ variant, inset: false }),

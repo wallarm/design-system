@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import { useTestId } from '../../utils/testId';
 import { Tabs, TabsList } from '../Tabs';
 
 export type CodeSnippetTabsProps = {
@@ -13,18 +14,23 @@ export const CodeSnippetTabs: FC<CodeSnippetTabsProps> = ({
   defaultValue,
   onValueChange,
   children,
-}) => (
-  <Tabs
-    size='small'
-    variant='grayscale'
-    value={value}
-    defaultValue={defaultValue}
-    onChange={onValueChange}
-    lazyMount={false}
-    unmountOnExit={false}
-  >
-    <TabsList>{children}</TabsList>
-  </Tabs>
-);
+}) => {
+  const testId = useTestId('tabs');
+
+  return (
+    <Tabs
+      size='small'
+      variant='grayscale'
+      value={value}
+      defaultValue={defaultValue}
+      onChange={onValueChange}
+      lazyMount={false}
+      unmountOnExit={false}
+      data-testid={testId}
+    >
+      <TabsList>{children}</TabsList>
+    </Tabs>
+  );
+};
 
 CodeSnippetTabs.displayName = 'CodeSnippetTabs';

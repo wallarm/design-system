@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 
 export type BreadcrumbsSeparatorProps = HTMLAttributes<HTMLLIElement> & {
   ref?: Ref<HTMLLIElement>;
@@ -29,10 +30,13 @@ export const BreadcrumbsSeparator: FC<BreadcrumbsSeparatorProps> = ({
   children,
   ...props
 }) => {
+  const testId = useTestId('separator');
+
   return (
     <li
       className={cn('flex items-center justify-center w-20 h-20', className)}
       aria-hidden='true'
+      data-testid={testId}
       {...props}
     >
       {children || <ChevronRight size='md' className='text-icon-secondary' />}

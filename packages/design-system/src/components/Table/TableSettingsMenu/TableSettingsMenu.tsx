@@ -17,6 +17,7 @@ import {
 import { isEqual } from 'lodash-es';
 import { Settings } from '../../../icons';
 import { cn } from '../../../utils/cn';
+import { useTestId } from '../../../utils/testId';
 import { Button } from '../../Button';
 import {
   DropdownMenu,
@@ -34,6 +35,7 @@ import { useTableContext } from '../TableContext';
 import { TableSettingsMenuItem } from './TableSettingsMenuItem';
 
 export const TableSettingsMenu: FC = () => {
+  const testId = useTestId('settings-menu');
   const ctx = useTableContext();
   const {
     table,
@@ -123,6 +125,7 @@ export const TableSettingsMenu: FC = () => {
 
   return (
     <div
+      data-testid={testId}
       className={cn(
         'absolute top-0 right-0 z-30',
         'flex items-center',

@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { useTestId } from '../../utils/testId';
 import { linkVariants } from '../Link';
 
 type SelectClearTriggerNativeProps = Omit<ArkUiSelect.TriggerProps, 'className' | 'type'>;
@@ -15,17 +16,22 @@ export const SelectClearTrigger: FC<SelectClearTriggerProps> = ({
   size = 'sm',
   weight = 'medium',
   ...props
-}) => (
-  <ArkUiSelect.ClearTrigger
-    {...props}
-    className={cn(
-      linkVariants({
-        type,
-        size,
-        weight,
-      }),
-    )}
-  />
-);
+}) => {
+  const testId = useTestId('clear-trigger');
+
+  return (
+    <ArkUiSelect.ClearTrigger
+      {...props}
+      data-testid={testId}
+      className={cn(
+        linkVariants({
+          type,
+          size,
+          weight,
+        }),
+      )}
+    />
+  );
+};
 
 SelectClearTrigger.displayName = 'SelectClearTrigger';

@@ -10,6 +10,7 @@ interface TableInnerProps {
   showSettings: boolean;
   ariaLabel?: string;
   className?: string;
+  'data-testid'?: string;
   children?: ReactNode;
 }
 
@@ -19,11 +20,12 @@ export const TableInner: FC<TableInnerProps> = ({
   showSettings,
   ariaLabel,
   className,
+  'data-testid': testId,
   children,
 }) => {
   return (
     <TableActionBarProvider>
-      <TableActionBarAnchor className={className}>
+      <TableActionBarAnchor className={className} data-testid={testId}>
         {virtualized === 'window' ? (
           <TableInnerWindow isEmpty={isEmpty} showSettings={showSettings} ariaLabel={ariaLabel}>
             {children}

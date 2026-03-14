@@ -1,6 +1,7 @@
 import { type FC, type KeyboardEvent, type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
 import { cva } from 'class-variance-authority';
+import { useTestId } from '../../utils/testId';
 
 const contentVariants = cva(
   'relative z-50 flex flex-col overflow-clip focus-visible:outline-none',
@@ -32,6 +33,7 @@ interface TourContentProps {
 
 export const TourContent: FC<TourContentProps> = ({ children }) => {
   const { step } = useTourContext();
+  const testId = useTestId('content');
 
   const contentRef = useRef<HTMLDivElement>(null);
   const type = step?.type === 'dialog' ? 'dialog' : 'tooltip';
@@ -64,6 +66,7 @@ export const TourContent: FC<TourContentProps> = ({ children }) => {
 
   return (
     <ArkUiTour.Content
+      data-testid={testId}
       ref={contentRef}
       onKeyDownCapture={handleKeyDownCapture}
       className={contentVariants({ type })}
