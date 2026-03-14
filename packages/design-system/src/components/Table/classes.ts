@@ -61,7 +61,9 @@ export const tableBodyCellVariants = cva(
     'px-16 py-8 text-sm text-text-primary',
     'bg-bg-surface-2',
     'align-top',
-    'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
+    'group-hover/row:overlay-states-primary-hover',
+    'group-data-[selected]/row:overlay-states-primary-active',
+    'group-data-[selected]/row:group-hover/row:overlay-states-primary-hover',
     '[&:has([data-state=open][data-part=context-trigger])]:ring-2',
     '[&:has([data-state=open][data-part=context-trigger])]:ring-inset',
     '[&:has([data-state=open][data-part=context-trigger])]:ring-border-strong-brand',
@@ -106,3 +108,14 @@ export const tableContainerVariants = cva(
 );
 
 export const tableRowVariants = cva('transition-colors');
+
+/** Extra right padding (px) added to cell content so it doesn't hide behind actions */
+export const ACTIONS_PADDING_EXTRA = 4;
+
+/** Small icon button used in table header (sort, scroll, menu triggers) */
+export const tableHeaderButtonClass = cn(
+  'w-16 h-16 shrink-0 hover:text-text-primary',
+  'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary rounded-2',
+  'transition-colors cursor-pointer',
+  'inline-flex items-center justify-center bg-transparent border-0 p-0',
+);

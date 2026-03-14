@@ -22,9 +22,10 @@ import { TableSortHandler } from './TableSortHandler';
 
 interface TableHeadCellProps<T> {
   header: Header<T, unknown>;
+  hasTextDescription?: boolean;
 }
 
-export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
+export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellProps<T>) => {
   const ctx = useTableContext<T>();
   const testId = useTestId('head-cell');
   const {
@@ -91,13 +92,13 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
       data-testid={testId}
       className={cn(
         'group',
+        hasTextDescription ? 'align-top py-8' : 'align-middle',
         alignClass,
         isRightAligned && 'pl-4 pr-16',
         isLastColumn && hasSettingsMenu && 'pr-[44px]',
-        isTextDescription && 'py-8',
         meta?.headerClassName,
       )}
-      interactive={canSort}
+      interactive={canSort || hasMenu}
       sorted={!!sortDirection}
       pinned={isPinned === 'left'}
       lastPinnedLeft={lastLeft}
@@ -131,7 +132,7 @@ export const TableHeadCell = <T,>({ header }: TableHeadCellProps<T>) => {
             </span>
           )}
 
-          <VStack align={isRightAligned ? 'end' : undefined}>
+          <VStack gap={0} align={isRightAligned ? 'end' : undefined}>
             <HStack gap={2}>
               {isRightAligned && canSort && <TableSortHandler header={header} />}
 
