@@ -36,7 +36,7 @@ export default meta;
 
 export const Basic: StoryFn<typeof meta> = () => (
   <VStack gap={12}>
-    <InputGroup>
+    <InputGroup data-testid='input-group'>
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>

@@ -32,7 +32,7 @@ export default meta;
 export const Basic: StoryFn<typeof Breadcrumbs> = args => {
   return (
     <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
-      <Breadcrumbs {...args}>
+      <Breadcrumbs {...args} data-testid='breadcrumbs'>
         <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
         <BreadcrumbsItem href='#products'>Products</BreadcrumbsItem>
         <BreadcrumbsItem href='#current'>Current Page</BreadcrumbsItem>

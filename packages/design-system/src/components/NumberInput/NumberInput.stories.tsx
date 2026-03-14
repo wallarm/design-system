@@ -23,7 +23,11 @@ const meta = {
 
 export default meta;
 
-export const Basic: StoryObj<typeof meta> = {};
+export const Basic: StoryObj<typeof meta> = {
+  args: {
+    'data-testid': 'number-input',
+  },
+};
 
 export const Disabled: StoryObj<typeof meta> = {
   args: {

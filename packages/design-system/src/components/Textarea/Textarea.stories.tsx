@@ -25,7 +25,11 @@ const meta = {
 
 export default meta;
 
-export const Basic: StoryObj<typeof meta> = {};
+export const Basic: StoryObj<typeof meta> = {
+  args: {
+    'data-testid': 'textarea',
+  },
+};
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack gap={16} align='start'>

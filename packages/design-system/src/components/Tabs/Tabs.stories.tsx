@@ -43,7 +43,7 @@ type Story = StoryFn<typeof meta>;
 
 export const Basic: Story = () => (
   <div className='w-600'>
-    <Tabs defaultValue='1'>
+    <Tabs defaultValue='1' data-testid='tabs'>
       <TabsList>
         <TabsTrigger value='1'>Tab 1</TabsTrigger>
         <TabsTrigger value='2'>Tab 2</TabsTrigger>

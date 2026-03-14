@@ -91,7 +91,7 @@ export const Basic: StoryFn<typeof Select> = () => {
 
   return (
     <div className='w-300'>
-      <Select collection={collection}>
+      <Select collection={collection} data-testid='select'>
         <SelectButton />
 
         <SelectPositioner>

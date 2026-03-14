@@ -82,7 +82,7 @@ const ContentPlaceholder = ({
 /** Basic uncontrolled drawer */
 export const Basic: StoryFn<DrawerProps> = () => {
   return (
-    <Drawer>
+    <Drawer data-testid='drawer'>
       <DrawerTrigger asChild>
         <Button>Open Drawer</Button>
       </DrawerTrigger>

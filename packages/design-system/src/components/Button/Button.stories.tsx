@@ -27,7 +27,11 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
-  return <Button {...args}>Button</Button>;
+  return (
+    <Button {...args} data-testid='button'>
+      Button
+    </Button>
+  );
 };
 
 export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
