@@ -76,7 +76,7 @@ const ContentPlaceholder = ({ height }: { fillHeight?: boolean; height?: number 
 /** Basic uncontrolled dialog */
 export const Basic: StoryFn<DialogProps> = () => {
   return (
-    <Dialog>
+    <Dialog data-testid='dialog'>
       <DialogTrigger asChild>
         <Button>Open Dialog</Button>
       </DialogTrigger>

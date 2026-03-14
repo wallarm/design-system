@@ -19,7 +19,7 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<typeof meta> = () => (
-  <Tooltip>
+  <Tooltip data-testid='tooltip'>
     <TooltipTrigger asChild>
       <Button variant='outline' color='neutral'>
         <ChevronRight />

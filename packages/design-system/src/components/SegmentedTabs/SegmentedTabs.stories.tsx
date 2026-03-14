@@ -59,7 +59,7 @@ export default meta;
 type Story = StoryFn<typeof meta>;
 
 export const Basic: Story = () => (
-  <SegmentedTabs defaultValue='react'>
+  <SegmentedTabs defaultValue='react' data-testid='segmented-tabs'>
     <SegmentedTabsList>
       <SegmentedTabsTrigger value='react'>React</SegmentedTabsTrigger>
       <SegmentedTabsTrigger value='vue'>Vue</SegmentedTabsTrigger>

@@ -69,7 +69,7 @@ export const Closable: StoryFn<typeof meta> = ({ ...args }) => {
   return (
     <>
       {isVisible && (
-        <Tag {...args}>
+        <Tag {...args} data-testid='tag'>
           Closable tag
           <TagClose onClick={() => setIsVisible(false)} />
         </Tag>

@@ -45,7 +45,7 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<typeof meta> = () => (
-  <DropdownMenu>
+  <DropdownMenu data-testid='dropdown-menu'>
     <DropdownMenuTrigger asChild>
       <Button variant='outline' color='neutral'>
         Open

@@ -24,7 +24,11 @@ const meta = {
 
 export default meta;
 
-export const Basic: StoryObj<typeof meta> = {};
+export const Basic: StoryObj<typeof meta> = {
+  args: {
+    'data-testid': 'input',
+  },
+};
 
 export const Focused: StoryObj<typeof meta> = {
   parameters: { pseudo: { focusVisible: true } },

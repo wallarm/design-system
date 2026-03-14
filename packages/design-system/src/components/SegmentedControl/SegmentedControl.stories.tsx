@@ -54,7 +54,7 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<SegmentedControlProps> = () => (
-  <SegmentedControl defaultValue='1'>
+  <SegmentedControl defaultValue='1' data-testid='segmented-control'>
     <SegmentedControlItem value='1'>
       Headers
       <NumericBadge>33</NumericBadge>

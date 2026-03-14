@@ -40,7 +40,9 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
-  <ToggleButton {...args}>Toggle Me</ToggleButton>
+  <ToggleButton {...args} data-testid='toggle-button'>
+    Toggle Me
+  </ToggleButton>
 );
 
 export const VariantsAndColors: StoryFn<typeof meta> = ({ ...args }) => (

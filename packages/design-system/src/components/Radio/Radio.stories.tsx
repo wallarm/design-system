@@ -27,7 +27,7 @@ export default meta;
 
 export const Basic: StoryFn<typeof meta> = () => (
   <RadioGroup name='framework' defaultValue='svelte'>
-    <Radio value='react'>
+    <Radio value='react' data-testid='radio-react'>
       <RadioIndicator />
       <RadioLabel>React</RadioLabel>
       <RadioDescription>
