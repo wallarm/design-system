@@ -26,7 +26,7 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<typeof meta> = () => (
-  <Checkbox>
+  <Checkbox data-testid='checkbox'>
     <CheckboxIndicator />
     <CheckboxLabel>Accept terms and conditions</CheckboxLabel>
   </Checkbox>

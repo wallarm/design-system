@@ -26,7 +26,7 @@ const meta = {
 export default meta;
 
 export const Basic: StoryFn<typeof meta> = () => (
-  <Popover>
+  <Popover data-testid='popover'>
     <PopoverTrigger asChild>
       <Button variant='outline' color='neutral'>
         Click me
