@@ -19,6 +19,7 @@ import {
 } from '../ScrollArea';
 import { dropdownMenuClassNames } from './classes';
 import { DropdownMenuFooter } from './DropdownMenuFooter';
+import { DropdownMenuInput } from './DropdownMenuInput';
 
 interface DropdownMenuContentProps extends HTMLAttributes<HTMLDivElement> {
   children: ReactNode;
@@ -33,11 +34,18 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
 }) => {
   const testId = useTestId('content');
   const childArray = Children.toArray(children);
+  const inputChildren = childArray.filter(
+    child => isValidElement(child) && child.type === DropdownMenuInput,
+  );
   const footerChildren = childArray.filter(
     child => isValidElement(child) && child.type === DropdownMenuFooter,
   );
   const menuChildren = childArray.filter(
-    child => !(isValidElement(child) && child.type === DropdownMenuFooter),
+    child =>
+      !(
+        isValidElement(child) &&
+        (child.type === DropdownMenuFooter || child.type === DropdownMenuInput)
+      ),
   );
 
   return (
@@ -54,6 +62,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
           )}
           {...props}
         >
+          {inputChildren}
           <ScrollArea className={cn('flex flex-col min-h-0')} style={{ position: 'static' }}>
             <ScrollAreaViewport>
               <ScrollAreaContent className={cn('flex flex-col gap-1')}>

@@ -280,6 +280,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
 
   // Refs (stable across renders)
   const lastSelectedRowIndexRef = useRef<number | null>(null);
+  const theadRef = useRef<HTMLTableSectionElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Context value
@@ -307,6 +308,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       alwaysPinnedLeft,
       masterColumnId,
       lastSelectedRowIndexRef,
+      theadRef,
       containerRef,
       onEndReached,
       onEndReachedThreshold,

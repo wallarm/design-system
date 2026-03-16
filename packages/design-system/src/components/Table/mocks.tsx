@@ -268,7 +268,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     cell: ({ row }) => (
       <OverflowTooltip>
         <OverflowTooltipTrigger asChild>
-          <Link size='sm' type='table' weight='medium'>
+          <Link size='md' type='table' weight='medium'>
             {row.original.objectName}
           </Link>
         </OverflowTooltipTrigger>

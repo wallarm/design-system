@@ -1,6 +1,8 @@
+import { useCallback, useState } from 'react';
 import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
+import { ACTIONS_PADDING_EXTRA } from '../classes';
 import {
   getAlignClass,
   getExpandBorderClass,
@@ -11,6 +13,7 @@ import {
 } from '../lib';
 import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
+import { TableMasterCellActions } from '../TableMasterCellActions';
 
 interface TableBodyCellProps<T> {
   cell: Cell<T, unknown>;
@@ -41,12 +44,17 @@ export const TableBodyCell = <T,>({
   const isCut = meta?.resizeType === 'cut';
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
 
+  const hasActions = !!meta?.renderActions;
+  const [actionsWidth, setActionsWidth] = useState(0);
+  const handleActionsWidth = useCallback((width: number) => setActionsWidth(width), []);
+
   return (
     <Td
       data-testid={testId}
       className={cn(
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),
+        hasActions && 'relative',
         meta?.cellClassName,
         className,
       )}
@@ -59,6 +67,7 @@ export const TableBodyCell = <T,>({
         width: cell.column.getSize(),
         ...dndStyle,
         ...(isCut && { overflow: 'hidden' }),
+        ...(actionsWidth > 0 && { paddingRight: actionsWidth + ACTIONS_PADDING_EXTRA }),
       }}
       colSpan={colSpan}
     >
@@ -68,6 +77,11 @@ export const TableBodyCell = <T,>({
         </div>
       ) : (
         content
+      )}
+      {hasActions && (
+        <TableMasterCellActions onWidthChange={handleActionsWidth}>
+          {meta.renderActions!(cell.row)}
+        </TableMasterCellActions>
       )}
     </Td>
   );

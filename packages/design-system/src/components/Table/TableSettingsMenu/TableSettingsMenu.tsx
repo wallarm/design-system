@@ -1,4 +1,4 @@
-import { type FC, useMemo, useState } from 'react';
+import { type FC, useEffect, useMemo, useState } from 'react';
 import {
   closestCenter,
   DndContext,
@@ -23,16 +23,18 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuFooter,
+  DropdownMenuInput,
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from '../../DropdownMenu';
-import { Input } from '../../Input';
 import { Separator } from '../../Separator';
 import { VStack } from '../../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from '../lib';
 import { useTableContext } from '../TableContext';
 import { TableSettingsMenuItem } from './TableSettingsMenuItem';
+
+const DEFAULT_HEADER_HEIGHT = 34;
 
 export const TableSettingsMenu: FC = () => {
   const testId = useTestId('settings-menu');
@@ -45,10 +47,24 @@ export const TableSettingsMenu: FC = () => {
     defaultColumnOrder,
     alwaysPinnedLeft,
     masterColumnId,
+    theadRef,
   } = ctx;
 
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [theadHeight, setTheadHeight] = useState<number | undefined>(undefined);
+
+  useEffect(() => {
+    const el = theadRef.current;
+    if (!el) return;
+
+    const ro = new ResizeObserver(entries => {
+      const entry = entries[0];
+      if (entry) setTheadHeight(entry.contentRect.height);
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [theadRef]);
 
   // Filter out utility columns (_selection, _expand) — they shouldn't appear in settings
   const allColumns = table
@@ -128,11 +144,12 @@ export const TableSettingsMenu: FC = () => {
       data-testid={testId}
       className={cn(
         'absolute top-0 right-0 z-30',
-        'flex items-center',
-        'h-32 bg-bg-light-primary border rounded-tr-12 border-border-primary-light',
+        'flex items-start',
+        'bg-bg-light-primary border rounded-tr-12 border-border-primary-light',
         'pl-6 pr-4 py-4',
         'rounded-tr-12',
       )}
+      style={{ height: theadHeight ? `${theadHeight + 1}px` : DEFAULT_HEADER_HEIGHT }}
     >
       <Tooltip disabled={menuOpen}>
         <TooltipTrigger asChild>
@@ -151,47 +168,44 @@ export const TableSettingsMenu: FC = () => {
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className={cn('min-w-256')}>
-                <VStack gap={8} align='stretch'>
-                  <Input
-                    placeholder='Search'
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                  />
-
-                  <VStack>
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
+                <DropdownMenuInput
+                  placeholder='Search'
+                  value={search}
+                  onChange={e => setSearch(e.target.value)}
+                />
+                <VStack gap={1}>
+                  <DndContext
+                    sensors={sensors}
+                    collisionDetection={closestCenter}
+                    onDragEnd={handleDragEnd}
+                  >
+                    <SortableContext
+                      items={filteredColumns
+                        .filter(c => !alwaysPinnedLeft.includes(c.id))
+                        .map(c => c.id)}
+                      strategy={verticalListSortingStrategy}
                     >
-                      <SortableContext
-                        items={filteredColumns
-                          .filter(c => !alwaysPinnedLeft.includes(c.id))
-                          .map(c => c.id)}
-                        strategy={verticalListSortingStrategy}
-                      >
-                        {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
+                      {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
 
-                        {pinnedColumns.map(col => (
-                          <TableSettingsMenuItem
-                            key={col.id}
-                            column={col}
-                            canDrag={columnDndEnabled}
-                          />
-                        ))}
+                      {pinnedColumns.map(col => (
+                        <TableSettingsMenuItem
+                          key={col.id}
+                          column={col}
+                          canDrag={columnDndEnabled}
+                        />
+                      ))}
 
-                        {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
+                      {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
 
-                        {unpinnedColumns.map(col => (
-                          <TableSettingsMenuItem
-                            key={col.id}
-                            column={col}
-                            canDrag={columnDndEnabled}
-                          />
-                        ))}
-                      </SortableContext>
-                    </DndContext>
-                  </VStack>
+                      {unpinnedColumns.map(col => (
+                        <TableSettingsMenuItem
+                          key={col.id}
+                          column={col}
+                          canDrag={columnDndEnabled}
+                        />
+                      ))}
+                    </SortableContext>
+                  </DndContext>
                 </VStack>
                 <DropdownMenuFooter>
                   <Button
