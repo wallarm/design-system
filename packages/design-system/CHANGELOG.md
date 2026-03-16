@@ -1,3 +1,8 @@
+## 0.11.0 (2026-03-16)
+
+* feat: Table experience improvements [AS-582] (#38) ([4f0826f](https://github.com/wallarm/design-system/commit/4f0826f)), closes [#38](https://github.com/wallarm/design-system/issues/38)
+* test: added tests for all components ([edac169](https://github.com/wallarm/design-system/commit/edac169))
+
 ## 0.10.0 (2026-03-14)
 
 * feat: unified data-testid (#41) ([8a894ba](https://github.com/wallarm/design-system/commit/8a894ba)), closes [#41](https://github.com/wallarm/design-system/issues/41)
