@@ -18,7 +18,7 @@ import { CodeSnippetTitle } from './CodeSnippetTitle';
 import { CodeSnippetWrapButton } from './CodeSnippetWrapButton';
 
 const meta = {
-  title: 'Data display/CodeSnippet/CodeSnippet',
+  title: 'Data display/CodeSnippet',
   component: CodeSnippetRoot,
   parameters: {
     layout: 'padded',

@@ -41,7 +41,11 @@ export {
   type CheckboxLabelProps,
   type CheckboxProps,
 } from './components/Checkbox';
-export { Code, type CodeProps } from './components/Code';
+export {
+  Code,
+  type CodeProps,
+} from './components/Code';
+export { InlineCodeSnippet, type InlineCodeSnippetProps } from './components/CodeSnippet';
 export {
   Country,
   CountryFlag,
@@ -108,12 +112,14 @@ export {
   FieldTitle,
 } from './components/Field';
 export { Flex, type FlexProps } from './components/Flex';
-export { Heading, type HeadingProps } from './components/Heading';
+export {
+  Heading,
+  type HeadingProps,
+} from './components/Heading';
 export { Input, type InputProps } from './components/Input';
 export {
   InputGroup,
   InputGroupAddon,
-  InputGroupInput,
   InputGroupText,
 } from './components/InputGroup';
 export {
@@ -140,10 +146,7 @@ export { Kbd, KbdGroup } from './components/Kbd';
 export { Link, type LinkProps } from './components/Link';
 export { Loader, type LoaderProps } from './components/Loader';
 export { NumberInput, type NumberInputProps } from './components/NumberInput';
-export {
-  NumericBadge,
-  type NumericBadgeProps,
-} from './components/NumericBadge';
+export { NumericBadge, type NumericBadgeProps } from './components/NumericBadge';
 export {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -282,14 +285,18 @@ export {
   TabsTrigger,
 } from './components/Tabs';
 export { Tag, TagClose, type TagProps } from './components/Tag';
-export { Text, type TextProps } from './components/Text';
-export { Textarea, type TextareaProps } from './components/Textarea';
 export {
-  type Theme,
-  ThemeProvider,
-  useTheme,
-} from './components/ThemeProvider';
-export { Toast, ToastActions, Toaster, toaster } from './components/Toast';
+  Text,
+  type TextProps,
+} from './components/Text';
+export { Textarea, type TextareaProps } from './components/Textarea';
+export { type Theme, ThemeProvider, useTheme } from './components/ThemeProvider';
+export {
+  Toast,
+  ToastActions,
+  Toaster,
+  toaster,
+} from './components/Toast';
 export {
   ToggleButton,
   type ToggleButtonProps,
@@ -315,4 +322,5 @@ export {
   type WaitForStepEventOptions,
   waitForStepEvent,
 } from './components/Tour';
+export { useCopyToClipboard } from './hooks';
 export { type TestableProps, TestIdProvider, useTestId } from './utils/testId';

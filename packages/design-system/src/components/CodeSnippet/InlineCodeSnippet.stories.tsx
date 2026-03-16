@@ -3,7 +3,7 @@ import { VStack } from '../Stack';
 import { InlineCodeSnippet } from './InlineCodeSnippet';
 
 const meta = {
-  title: 'Data Display/CodeSnippet/InlineCodeSnippet',
+  title: 'Data Display/InlineCodeSnippet',
   component: InlineCodeSnippet,
   parameters: {
     layout: 'centered',

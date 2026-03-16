@@ -1,6 +1,7 @@
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Info, LayoutGrid, LayoutTemplate, Search } from '../../icons';
+import { Input } from '../Input';
 import { Kbd } from '../Kbd';
 import { Loader } from '../Loader';
 import {
@@ -16,7 +17,6 @@ import { VStack } from '../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { InputGroup } from './InputGroup';
 import { InputGroupAddon } from './InputGroupAddon';
-import { InputGroupInput } from './InputGroupInput';
 import { InputGroupText } from './InputGroupText';
 
 const meta = {
@@ -24,7 +24,6 @@ const meta = {
   component: InputGroup,
   subcomponents: {
     InputGroupAddon,
-    InputGroupInput,
     InputGroupText,
   },
   parameters: {
@@ -40,7 +39,7 @@ export const Basic: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
-      <InputGroupInput placeholder='Enter' />
+      <Input placeholder='Enter' />
       <InputGroupAddon align='inline-end'>
         <Info />
       </InputGroupAddon>
@@ -50,7 +49,7 @@ export const Basic: StoryFn<typeof meta> = () => (
       <InputGroupAddon variant='outline'>
         <InputGroupText>https://</InputGroupText>
       </InputGroupAddon>
-      <InputGroupInput placeholder='Enter' value='wallarm/user-settings' />
+      <Input placeholder='Enter' value='wallarm/user-settings' />
       <InputGroupAddon variant='outline' align='inline-end'>
         <InputGroupText>.com</InputGroupText>
       </InputGroupAddon>
@@ -64,7 +63,7 @@ export const Disabled: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
-      <InputGroupInput placeholder='Enter' disabled />
+      <Input placeholder='Enter' disabled />
       <InputGroupAddon align='inline-end'>
         <Info />
       </InputGroupAddon>
@@ -74,7 +73,7 @@ export const Disabled: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <InputGroupText>https://</InputGroupText>
       </InputGroupAddon>
-      <InputGroupInput placeholder='Enter' value='wallarm/user-settings' disabled />
+      <Input placeholder='Enter' value='wallarm/user-settings' disabled />
       <InputGroupAddon align='inline-end'>
         <InputGroupText>.com</InputGroupText>
       </InputGroupAddon>
@@ -88,7 +87,7 @@ export const WithError: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
-      <InputGroupInput placeholder='Enter' error />
+      <Input placeholder='Enter' error />
       <InputGroupAddon align='inline-end'>
         <Info />
       </InputGroupAddon>
@@ -98,7 +97,7 @@ export const WithError: StoryFn<typeof meta> = () => (
       <InputGroupAddon>
         <InputGroupText>https://</InputGroupText>
       </InputGroupAddon>
-      <InputGroupInput placeholder='Enter' value='wallarm/user-settings' error />
+      <Input placeholder='Enter' value='wallarm/user-settings' error />
       <InputGroupAddon align='inline-end'>
         <InputGroupText>.com</InputGroupText>
       </InputGroupAddon>
@@ -108,7 +107,7 @@ export const WithError: StoryFn<typeof meta> = () => (
 
 export const WithLoader: StoryFn<typeof meta> = () => (
   <InputGroup>
-    <InputGroupInput placeholder='Searching...' disabled />
+    <Input placeholder='Searching...' disabled />
     <InputGroupAddon align='inline-end'>
       <Loader size='md' />
     </InputGroupAddon>
@@ -120,7 +119,7 @@ export const WithKbd: StoryFn<typeof meta> = () => (
     <InputGroupAddon>
       <Search />
     </InputGroupAddon>
-    <InputGroupInput placeholder='Search' />
+    <Input placeholder='Search' />
     <InputGroupAddon align='inline-end'>
       <Kbd>⌘</Kbd>
       <Kbd>K</Kbd>
@@ -133,7 +132,7 @@ export const WithTooltip: StoryFn<typeof meta> = () => (
     <InputGroupAddon>
       <Search />
     </InputGroupAddon>
-    <InputGroupInput placeholder='Enter' />
+    <Input placeholder='Enter' />
     <InputGroupAddon align='inline-end'>
       <Tooltip>
         <TooltipTrigger asChild>
@@ -189,11 +188,11 @@ export const WithSelect: StoryFn<typeof meta> = () => {
           </Select>
         </InputGroupAddon>
 
-        <InputGroupInput placeholder='Enter' />
+        <Input placeholder='Enter' />
       </InputGroup>
 
       <InputGroup>
-        <InputGroupInput placeholder='Enter' />
+        <Input placeholder='Enter' />
         <InputGroupAddon align='inline-end' variant='outline'>
           <Select collection={collection}>
             <SelectButton />
@@ -230,11 +229,11 @@ export const WithSelect: StoryFn<typeof meta> = () => {
           </Select>
         </InputGroupAddon>
 
-        <InputGroupInput placeholder='Enter' />
+        <Input placeholder='Enter' />
       </InputGroup>
 
       <InputGroup>
-        <InputGroupInput placeholder='Enter' />
+        <Input placeholder='Enter' />
         <InputGroupAddon align='inline-end'>
           <Select collection={collection}>
             <SelectButton />
