@@ -1,3 +1,8 @@
+## 0.14.0 (2026-03-17)
+
+* feat: IP, Country, FormatDateTime, Tour fixes (#43) ([b407797](https://github.com/wallarm/design-system/commit/b407797)), closes [#43](https://github.com/wallarm/design-system/issues/43)
+* feat(toast): smooth animation + close tooltip [WDS-54] (#15) ([493dc58](https://github.com/wallarm/design-system/commit/493dc58)), closes [#15](https://github.com/wallarm/design-system/issues/15)
+
 ## 0.13.0 (2026-03-17)
 
 * feat(query-bar): improve QueryBar UX and code quality  [AS-638] (#40) ([0871646](https://github.com/wallarm/design-system/commit/0871646)), closes [#40](https://github.com/wallarm/design-system/issues/40)
