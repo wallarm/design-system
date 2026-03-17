@@ -53,7 +53,7 @@ test.describe('Component: InputGroup', () => {
     test('Should accept text input when typed into', async ({ page }) => {
       await inputGroupStory.goto(page, 'Basic');
       const inputGroup = page.getByTestId('input-group');
-      const input = inputGroup.locator('[data-slot="input-group-control"]');
+      const input = inputGroup.locator('[data-slot="input"]');
 
       await input.fill('Hello World');
       await expect(input).toHaveValue('Hello World');
@@ -62,7 +62,7 @@ test.describe('Component: InputGroup', () => {
     test('Should show focus state when input is focused', async ({ page }) => {
       await inputGroupStory.goto(page, 'Basic');
       const inputGroup = page.getByTestId('input-group');
-      const input = inputGroup.locator('[data-slot="input-group-control"]');
+      const input = inputGroup.locator('[data-slot="input"]');
 
       await input.click();
       await expect(input).toBeFocused();
