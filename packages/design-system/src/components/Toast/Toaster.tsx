@@ -54,13 +54,15 @@ export const Toaster: FC = () => {
           // Group styles
           '[&_[data-scope=toast][data-part=group]]:flex [&_[data-scope=toast][data-part=group]]:flex-col [&_[data-scope=toast][data-part=group]]:gap-12 [&_[data-scope=toast][data-part=group]]:max-w-[560px] [&_[data-scope=toast][data-part=group]]:mx-auto',
           // Root styles with CSS variables for animations
-          '[&_[data-scope=toast][data-part=root]]:[translate:var(--x)_var(--y)] [&_[data-scope=toast][data-part=root]]:scale-[var(--scale)] [&_[data-scope=toast][data-part=root]]:z-[var(--z-index)] [&_[data-scope=toast][data-part=root]]:h-[var(--height)] [&_[data-scope=toast][data-part=root]]:opacity-[var(--opacity)] [&_[data-scope=toast][data-part=root]]:[will-change:translate,opacity,scale] [&_[data-scope=toast][data-part=root]]:[transition:translate_200ms_ease-in-out,scale_200ms_ease-in-out,opacity_200ms_ease-in-out,height_200ms_ease-in-out,box-shadow_200ms_ease-in-out]',
-          // Closed state transitions
-          '[&_[data-scope=toast][data-part=root][data-state=closed]]:[transition:translate_200ms_ease-in-out,scale_200ms_ease-in-out,opacity_200ms_ease-in-out]',
+          '[&_[data-scope=toast][data-part=root]]:[translate:var(--x)_var(--y)] [&_[data-scope=toast][data-part=root]]:scale-[var(--scale)] [&_[data-scope=toast][data-part=root]]:z-[var(--z-index)] [&_[data-scope=toast][data-part=root]]:h-[var(--height)] [&_[data-scope=toast][data-part=root]]:opacity-[var(--opacity)] [&_[data-scope=toast][data-part=root]]:[will-change:translate,opacity,scale]',
+          // Match Drawer/Dialog timings: 300ms open, 150ms close
+          '[&_[data-scope=toast][data-part=root]]:[transition-property:translate,scale,opacity,height,box-shadow] [&_[data-scope=toast][data-part=root]]:[transition-timing-function:ease] [&_[data-scope=toast][data-part=root]]:[transition-duration:300ms]',
+          '[&_[data-scope=toast][data-part=root][data-state=closed]]:[transition-property:translate,scale,opacity] [&_[data-scope=toast][data-part=root][data-state=closed]]:[transition-timing-function:ease] [&_[data-scope=toast][data-part=root][data-state=closed]]:[transition-duration:150ms]',
           // Hide 4th+ children
           '[&_[data-scope=toast][data-part=root]:nth-child(n+4)]:hidden',
           // After pseudo-element base styles
-          '[&_[data-scope=toast][data-part=root]]:after:content-[""] [&_[data-scope=toast][data-part=root]]:after:absolute [&_[data-scope=toast][data-part=root]]:after:inset-0 [&_[data-scope=toast][data-part=root]]:after:rounded-[inherit] [&_[data-scope=toast][data-part=root]]:after:pointer-events-none [&_[data-scope=toast][data-part=root]]:after:z-[1] [&_[data-scope=toast][data-part=root]]:after:opacity-0 [&_[data-scope=toast][data-part=root]]:after:transition-opacity [&_[data-scope=toast][data-part=root]]:after:duration-200 [&_[data-scope=toast][data-part=root]]:after:ease-in-out',
+          '[&_[data-scope=toast][data-part=root]]:after:content-[""] [&_[data-scope=toast][data-part=root]]:after:absolute [&_[data-scope=toast][data-part=root]]:after:inset-0 [&_[data-scope=toast][data-part=root]]:after:rounded-[inherit] [&_[data-scope=toast][data-part=root]]:after:pointer-events-none [&_[data-scope=toast][data-part=root]]:after:z-[1] [&_[data-scope=toast][data-part=root]]:after:opacity-0 [&_[data-scope=toast][data-part=root]]:after:[transition:opacity_300ms_ease]',
+          '[&_[data-scope=toast][data-part=root][data-state=closed]]:after:[transition:opacity_150ms_ease]',
           // After pseudo-element for non-first, non-stack toasts
           '[&_[data-scope=toast][data-part=root]:not([data-first]):not([data-stack])]:after:[background:--alpha(var(--color-white)/50%)] [&_[data-scope=toast][data-part=root]:not([data-first]):not([data-stack])]:after:opacity-100',
           // After pseudo-element for 2nd child (non-stack)
