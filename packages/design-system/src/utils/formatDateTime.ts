@@ -77,8 +77,9 @@ export const formatAbsoluteTime = (date: Date, options: { showSeconds?: boolean 
  *
  * Output: "11 Feb, 2026"
  */
-export const formatAbsoluteDate = (date: Date): string => {
+export const formatAbsoluteDate = (date: Date, now: Date = new Date()): string => {
   if (!isValid(date)) return '—';
+  if (date.getFullYear() === now.getFullYear()) return format(date, 'd MMM');
   return format(date, 'd MMM, yyyy');
 };
 

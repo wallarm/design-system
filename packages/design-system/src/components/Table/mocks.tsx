@@ -4,7 +4,6 @@ import { abbreviateNumber } from '../../utils/abbreviateNumber';
 import { Badge } from '../Badge';
 import { InlineCodeSnippet } from '../CodeSnippet';
 import type { CountryCode } from '../Country';
-import { DateTime } from '../DateTime';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,6 +15,7 @@ import {
   DropdownMenuItemText,
   DropdownMenuSeparator,
 } from '../DropdownMenu';
+import { FormatDateTime } from '../FormatDateTime';
 import { Ip, IpAddress, IpCountry, IpProvider, type SourceKey, sourceLabels } from '../Ip';
 import { Link } from '../Link';
 import {
@@ -328,7 +328,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     size: 160,
     enableSorting: true,
     meta: { sortType: 'date' as const },
-    cell: ({ getValue }) => <DateTime value={getValue()} format='relative' />,
+    cell: ({ getValue }) => <FormatDateTime value={getValue()} format='relative' />,
   }),
   securityColumnHelper.accessor('cweId', {
     header: 'Security info',

@@ -27,7 +27,7 @@ const progressVariants = cva('font-sans font-regular text-sm leading-sm', {
   variants: {
     type: {
       dialog: 'text-text-secondary',
-      tooltip: 'text-white/60',
+      tooltip: 'text-text-secondary-alt',
     },
   },
 });
@@ -64,7 +64,7 @@ export const TourFooter: FC<TourFooterProps> = () => {
                     <ArkUiTour.ActionTrigger key={action.label} action={action} asChild>
                       <Button
                         variant={isLast ? 'primary' : 'ghost'}
-                        color={isLast ? 'brand' : 'neutral'}
+                        color={isLast ? 'brand' : type === 'tooltip' ? 'neutral-alt' : 'neutral'}
                         size={type === 'dialog' ? 'large' : 'small'}
                       >
                         {action.label}

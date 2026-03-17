@@ -17,7 +17,7 @@ const contentVariants = cva(
         tooltip: [
           'min-w-[256px] max-w-[400px]',
           'items-start',
-          'bg-slate-800 text-white',
+          'bg-component-tooltip-bg text-text-primary-alt',
           'rounded-16 shadow-md',
         ],
       },

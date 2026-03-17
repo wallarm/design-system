@@ -10,7 +10,7 @@ export const IpCountry: FC<IpCountryProps> = ({ code }) => {
   const testId = useTestId('country');
 
   return (
-    <Country code={code} size='medium' data-testid={testId}>
+    <Country code={code} size='small' data-testid={testId}>
       <CountryFlag />
     </Country>
   );
