@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const compositionStory = createStoryHelper('components-querybar-composition', [
+const compositionStory = createStoryHelper('patterns-filterinput-composition', [
   'Default',
   'Simple',
   'Backend Integration',

@@ -4,7 +4,7 @@ import { FilterInput } from '../FilterInput';
 import type { ExprNode, FieldMetadata } from '../types';
 
 const meta = {
-  title: 'Components/FilterInput/FilterInput',
+  title: 'Patterns/FilterInput/FilterInput',
   component: FilterInput,
   parameters: {
     layout: 'centered',

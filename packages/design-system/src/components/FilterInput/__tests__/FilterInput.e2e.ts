@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const filterFieldStory = createStoryHelper('components-querybar-querybar', [
+const filterFieldStory = createStoryHelper('patterns-filterinput-filterinput', [
   'Default',
   'With Keyboard Hint',
   'With More Than Three Chips',
