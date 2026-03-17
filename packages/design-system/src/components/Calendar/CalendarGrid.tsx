@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import { DatePicker } from '@ark-ui/react';
 import { cn } from '../../utils/cn';
 import { useCalendarContext } from './CalendarContext';
@@ -11,10 +11,6 @@ interface CalendarGridProps {
   showJumpToToday?: boolean;
   /** Month offset for displaying different months in range picker (0 = current, 1 = next month) */
   monthOffset?: number;
-  /** Custom header to render instead of CalendarHeader (e.g. for view switching support) */
-  renderHeader?: () => ReactNode;
-  /** Additional className for the table element */
-  tableClassName?: string;
 }
 
 /**
@@ -26,8 +22,6 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
   showArrows = true,
   showJumpToToday = false,
   monthOffset = 0,
-  renderHeader,
-  tableClassName,
 }) => {
   const { isRange, readonly } = useCalendarContext();
 
@@ -44,19 +38,13 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
 
         return (
           <DatePicker.View view='day' className='flex flex-col gap-8'>
-            {renderHeader ? (
-              renderHeader()
-            ) : (
-              <CalendarHeader
-                showArrows={showArrows}
-                showJumpToToday={showJumpToToday}
-                visibleRangeText={visibleRangeText}
-              />
-            )}
+            <CalendarHeader
+              showArrows={showArrows}
+              showJumpToToday={showJumpToToday}
+              visibleRangeText={visibleRangeText}
+            />
 
-            <DatePicker.Table
-              className={cn('w-280 border-collapse focus:outline-none', tableClassName)}
-            >
+            <DatePicker.Table className={cn('w-280 border-collapse focus:outline-none')}>
               <DatePicker.TableHead>
                 <DatePicker.TableRow>
                   {api.weekDays.map(day => (
