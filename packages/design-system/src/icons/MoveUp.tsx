@@ -4,7 +4,7 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const MoveUp: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M8 6l4-4 4 4'
+      d='M8 6L12 2L16 6'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'
@@ -12,7 +12,7 @@ export const MoveUp: FC<SvgIconProps> = props => (
       fill='none'
     />
     <path
-      d='M12 2v20'
+      d='M12 2V22'
       stroke='currentColor'
       strokeWidth='2'
       strokeLinecap='round'

@@ -1,8 +1,7 @@
 import type { FC, InputHTMLAttributes, Ref } from 'react';
 import { Search } from '../../icons';
-import { InputGroup } from '../InputGroup/InputGroup';
-import { InputGroupAddon } from '../InputGroup/InputGroupAddon';
-import { InputGroupInput } from '../InputGroup/InputGroupInput';
+import { Input } from '../Input';
+import { InputGroup, InputGroupAddon } from '../InputGroup';
 
 interface DropdownMenuInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'type'> {
   ref?: Ref<HTMLInputElement>;
@@ -14,7 +13,7 @@ export const DropdownMenuInput: FC<DropdownMenuInputProps> = props => (
       <InputGroupAddon>
         <Search />
       </InputGroupAddon>
-      <InputGroupInput type='text' {...props} />
+      <Input type='text' {...props} />
     </InputGroup>
   </div>
 );
