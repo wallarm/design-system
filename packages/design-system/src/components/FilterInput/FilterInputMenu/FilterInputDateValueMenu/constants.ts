@@ -28,7 +28,7 @@ export const formatDateForChip = (value: string): string => {
   // ISO date-only: parse components directly — avoids timezone ambiguity
   const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (isoMatch) {
-    const d = new Date(Date.UTC(+isoMatch[1], +isoMatch[2] - 1, +isoMatch[3]));
+    const d = new Date(Date.UTC(+isoMatch[1]!, +isoMatch[2]! - 1, +isoMatch[3]!));
     return d.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',

@@ -99,8 +99,8 @@ export const displayDateToIso = (display: string): string | null => {
 export const resolveDateRangeValue = (trimmed: string): [string, string] | null => {
   const parts = trimmed.split(' – ');
   if (parts.length !== 2) return null;
-  const from = displayDateToIso(parts[0].trim());
-  const to = displayDateToIso(parts[1].trim());
+  const from = displayDateToIso(parts[0]!.trim());
+  const to = displayDateToIso(parts[1]!.trim());
   if (!from || !to) return null;
   return [from, to];
 };
