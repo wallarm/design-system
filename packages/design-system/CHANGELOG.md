@@ -1,3 +1,7 @@
+## 0.2.0-rc-feature-WDS-54-update-toast.2 (2026-03-17)
+
+* feat(toast): align transitions with drawer/dialog [WDS-54] ([58a5fd5](https://github.com/wallarm/design-system/commit/58a5fd5))
+
 ## 0.2.0-rc-feature-WDS-54-update-toast.1 (2026-02-16)
 
 * feat(toast): smooth animation + close tooltip [WDS-54] ([fb9264f](https://github.com/wallarm/design-system/commit/fb9264f))
