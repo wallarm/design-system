@@ -241,22 +241,17 @@ export const useFilterInputAutocomplete = ({
 
   // ── Derived values ────────────────────────────────────────
 
-  const {
-    isBuilding,
-    buildingChipData,
-    editingMultiValues,
-    editingSingleValue,
-    editingDateIsAbsolute,
-  } = deriveAutocompleteValues({
-    editingChipId: editing.editingChipId,
-    selectedField,
-    selectedOperator,
-    conditions,
-    buildingMultiValue,
-    dateRangeFromValue: dateRange.fromValue,
-    segmentFilterText:
-      editing.editingSegment === 'value' ? editing.segmentMenuFilterText : undefined,
-  });
+  const { isBuilding, buildingChipData, editingMultiValues, editingSingleValue, editingDateRange } =
+    deriveAutocompleteValues({
+      editingChipId: editing.editingChipId,
+      selectedField,
+      selectedOperator,
+      conditions,
+      buildingMultiValue,
+      dateRangeFromValue: dateRange.fromValue,
+      segmentFilterText:
+        editing.editingSegment === 'value' ? editing.segmentMenuFilterText : undefined,
+    });
 
   // ── Public API ────────────────────────────────────────────
 
@@ -270,6 +265,7 @@ export const useFilterInputAutocomplete = ({
     menuPositioning,
     editingMultiValues,
     editingSingleValue,
+    editingDateRange,
     inputRef,
     handleInputChange,
     handleFieldSelect,
@@ -291,7 +287,6 @@ export const useFilterInputAutocomplete = ({
     handleRangeSelect,
     insertIndex: effectiveInsertIndex,
     insertAfterConnector,
-    editingDateIsAbsolute,
     // Inline segment editing
     editingChipId: editing.editingChipId,
     editingSegment: editing.editingSegment,

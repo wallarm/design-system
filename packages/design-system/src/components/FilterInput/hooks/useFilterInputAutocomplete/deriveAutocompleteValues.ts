@@ -4,7 +4,6 @@ import {
   getDateDisplayLabel,
   getFieldValues,
   getOperatorLabel,
-  isDatePreset,
   isMultiSelectOperator,
 } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator } from '../../types';
@@ -25,7 +24,8 @@ export interface DerivedAutocompleteValues {
   buildingChipData: BuildingChipData | null;
   editingMultiValues: Array<string | number | boolean>;
   editingSingleValue: string | number | boolean | undefined;
-  editingDateIsAbsolute: boolean;
+  /** [from, to] ISO strings when editing a "between" date condition */
+  editingDateRange: [string, string] | undefined;
 }
 
 /** Resolve chip ID → Condition from the conditions array */
@@ -49,15 +49,6 @@ export const deriveAutocompleteValues = ({
 }: DeriveOptions): DerivedAutocompleteValues => {
   const isBuilding = selectedField !== null && !editingChipId;
   const editingCondition = getEditingCondition(editingChipId, conditions);
-
-  // ── Editing date absolute check ─────────────────────────
-  const editingDateIsAbsolute = (() => {
-    if (!editingCondition || selectedField?.type !== 'date') return false;
-    // Use stored dateOrigin if available (preserves original type after invalid edits)
-    if (editingCondition.dateOrigin) return editingCondition.dateOrigin === 'absolute';
-    const val = String(editingCondition.value ?? '');
-    return val !== '' && !isDatePreset(val);
-  })();
 
   // ── Editing values for FilterInputValueMenu ────────────────
   const editingMultiValues = (() => {
@@ -90,6 +81,19 @@ export const deriveAutocompleteValues = ({
     return undefined;
   })();
 
+  // Range date values for "between" date editing
+  const editingDateRange: [string, string] | undefined = (() => {
+    if (
+      !editingCondition ||
+      selectedOperator !== 'between' ||
+      selectedField?.type !== 'date' ||
+      !Array.isArray(editingCondition.value) ||
+      editingCondition.value.length < 2
+    )
+      return undefined;
+    return [String(editingCondition.value[0]), String(editingCondition.value[1])];
+  })();
+
   // ── Building chip preview ───────────────────────────────
   const buildingValue = (() => {
     if (buildingMultiValue) return buildingMultiValue;
@@ -114,6 +118,6 @@ export const deriveAutocompleteValues = ({
     buildingChipData,
     editingMultiValues,
     editingSingleValue,
-    editingDateIsAbsolute,
+    editingDateRange,
   };
 };

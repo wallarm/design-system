@@ -1,12 +1,20 @@
 import type { RefObject } from 'react';
-import { type FC, useEffect, useMemo, useRef, useState } from 'react';
+import { type FC, useCallback, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
+import {
+  Calendar,
+  CalendarBody,
+  CalendarFooter,
+  CalendarFooterControls,
+  CalendarGrids,
+  CalendarInputHeader,
+  CalendarPresets,
+  CalendarResetButton,
+  type DateValue,
+} from '../../../Calendar';
 import { DropdownMenu, DropdownMenuContent } from '../../../DropdownMenu';
-import type { FilterInputDropdownItem } from '../../types';
-import { useKeyboardNav } from '../hooks/useKeyboardNav';
-import { DATE_PRESETS } from './constants';
-import { DateCalendar } from './DateCalendar';
-import { DatePresets } from './DatePresets';
+import { ApplyButton } from './ApplyButton';
+import { dateValueToIso, tryParseDateValue } from './utils';
 
 export interface FilterInputDateValueMenuProps {
   open: boolean;
@@ -15,16 +23,14 @@ export interface FilterInputDateValueMenuProps {
   onOpenChange?: (open: boolean) => void;
   onEscape?: () => void;
   positioning?: Record<string, unknown>;
-  betweenLabel?: string;
-  initialCalendar?: boolean;
   /** Enable range selection in the calendar (for "between" operator) */
   range?: boolean;
-  /** Ref to the query bar input — ArrowUp on first item returns focus here */
-  inputRef?: RefObject<HTMLInputElement | null>;
-  /** Text to filter date presets by label */
-  filterText?: string;
   /** ISO date string for the initially selected date in the calendar */
   initialValue?: string;
+  /** [from, to] ISO date strings for range editing (between operator) */
+  initialRangeValue?: [string, string];
+  /** Live text from chip inline edit — calendar navigates to valid dates */
+  filterText?: string;
   /** Ref to the menu content element — shared across menus for focus management */
   menuRef?: RefObject<HTMLDivElement | null>;
   className?: string;
@@ -37,124 +43,86 @@ export const FilterInputDateValueMenu: FC<FilterInputDateValueMenuProps> = ({
   onOpenChange,
   onEscape,
   positioning,
-  betweenLabel,
-  initialCalendar = false,
   range = false,
-  inputRef,
-  filterText = '',
   initialValue,
+  initialRangeValue,
+  filterText,
   menuRef,
   className,
 }) => {
-  const [showCalendar, setShowCalendar] = useState(initialCalendar);
-  const switchingViewRef = useRef(false);
-  // After returning from calendar via "Back", show all presets unfiltered
-  const [backFromCalendar, setBackFromCalendar] = useState(false);
-  const effectiveFilterText = backFromCalendar ? '' : filterText;
-  const query = effectiveFilterText.toLowerCase();
-
-  useEffect(() => {
-    if (open) {
-      setShowCalendar(initialCalendar);
-      setBackFromCalendar(false);
-    } else {
-      setShowCalendar(false);
-    }
-  }, [open, initialCalendar]);
-
-  const allItems: FilterInputDropdownItem[] = useMemo(
-    () => [
-      ...DATE_PRESETS.map(p => ({ id: p.value, label: p.label, value: p.value })),
-      { id: '__absolute__', label: 'Absolute date', value: '__absolute__' },
-    ],
-    [],
+  const parsedInitial = useMemo(() => tryParseDateValue(initialValue), [initialValue]);
+  const parsedRangeFrom = useMemo(
+    () => tryParseDateValue(initialRangeValue?.[0]),
+    [initialRangeValue],
   );
-
-  const flatItems = useMemo(
-    () => (query ? allItems.filter(item => item.label.toLowerCase().includes(query)) : allItems),
-    [allItems, query],
+  const parsedRangeTo = useMemo(
+    () => tryParseDateValue(initialRangeValue?.[1]),
+    [initialRangeValue],
   );
-
-  const handleItemSelect = (item: FilterInputDropdownItem) => {
-    if (item.id === '__absolute__') {
-      setShowCalendar(true);
-      return;
+  const parsedFilter = useMemo(() => tryParseDateValue(filterText), [filterText]);
+  const focusedValue = parsedFilter ?? parsedRangeFrom ?? parsedInitial;
+  const defaultValue = useMemo(() => {
+    if (range && parsedRangeFrom && parsedRangeTo) {
+      return [parsedRangeFrom, parsedRangeTo];
     }
-    onSelect(String(item.value));
-  };
+    return parsedInitial ? [parsedInitial] : undefined;
+  }, [range, parsedInitial, parsedRangeFrom, parsedRangeTo]);
 
-  const { highlightedValue, onHighlightChange } = useKeyboardNav({
-    items: flatItems,
-    open: open && !showCalendar,
-    onSelect: handleItemSelect,
-    onClose: onEscape ?? (() => onOpenChange?.(false)),
-    inputRef,
-    menuRef,
-    onArrowRight: () => {
-      const highlighted = flatItems.find(i => i.id === highlightedValue);
-      if (highlighted?.id === '__absolute__') {
-        setShowCalendar(true);
+  const handleApply = useCallback(
+    (values: DateValue[]) => {
+      const first = values[0];
+      const second = values[1];
+      if (range && onRangeSelect && first && second) {
+        onRangeSelect(dateValueToIso(first), dateValueToIso(second));
+      } else if (!range && first) {
+        onSelect(dateValueToIso(first));
       }
     },
-  });
-
-  const handleCalendarSelect = (isoString: string) => {
-    onSelect(isoString);
-    setShowCalendar(false);
-  };
-
-  const handleRangeSelect = (from: string, to: string) => {
-    onRangeSelect?.(from, to);
-    setShowCalendar(false);
-  };
+    [range, onSelect, onRangeSelect],
+  );
 
   return (
     <DropdownMenu
       open={open}
-      onOpenChange={isOpen => {
-        // Suppress close triggered by unmounted element (Back / Absolute click)
-        if (!isOpen && switchingViewRef.current) {
-          switchingViewRef.current = false;
-          return;
-        }
-        onOpenChange?.(isOpen);
-      }}
+      onOpenChange={isOpen => onOpenChange?.(isOpen)}
       closeOnSelect={false}
       positioning={positioning}
-      highlightedValue={showCalendar ? undefined : highlightedValue}
-      onHighlightChange={showCalendar ? undefined : onHighlightChange}
     >
       <DropdownMenuContent
         ref={menuRef}
-        className={cn(showCalendar ? 'w-[280px]' : 'w-[200px]', className)}
+        className={cn('w-fit', className)}
+        onKeyDown={e => {
+          if (e.key === 'Escape') {
+            e.preventDefault();
+            e.stopPropagation();
+            onEscape ? onEscape() : onOpenChange?.(false);
+          }
+        }}
       >
-        {showCalendar ? (
-          <DateCalendar
-            onSelect={handleCalendarSelect}
-            onRangeSelect={handleRangeSelect}
-            onBack={() => {
-              switchingViewRef.current = true;
-              setBackFromCalendar(true);
-              setShowCalendar(false);
-            }}
-            onEscape={() => setShowCalendar(false)}
-            betweenLabel={betweenLabel}
-            range={range}
-            initialValue={initialValue}
-            filterText={filterText}
-          />
-        ) : (
-          <DatePresets
-            onSelect={onSelect}
-            onAbsoluteClick={() => {
-              switchingViewRef.current = true;
-              setBackFromCalendar(false);
-              setShowCalendar(true);
-            }}
-            betweenLabel={betweenLabel}
-            filterText={effectiveFilterText}
-          />
-        )}
+        <Calendar
+          key={initialRangeValue ? `${initialRangeValue[0]}_${initialRangeValue[1]}` : initialValue}
+          open
+          closeOnSelect={false}
+          type={range ? 'range' : 'single'}
+          defaultValue={defaultValue}
+          focusedValue={focusedValue}
+        >
+          {/* Render directly without DatePicker.Content to avoid
+              presence-based remounts that reset uncontrolled state */}
+          <div className='flex'>
+            <CalendarPresets />
+            <CalendarBody>
+              <CalendarInputHeader />
+              <CalendarGrids />
+              <CalendarFooter>
+                <CalendarFooterControls>
+                  <CalendarResetButton />
+                  <ApplyButton range={range} onApply={handleApply} />
+                </CalendarFooterControls>
+              </CalendarFooter>
+            </CalendarBody>
+          </div>
+        </Calendar>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -1,3 +1,4 @@
+import { MIN_DATE_STRING_LENGTH } from '../../FilterInputMenu/FilterInputDateValueMenu/constants';
 import { chipIdToConditionIndex, getFieldValues, isDatePreset } from '../../lib';
 import type { Condition, FieldMetadata, FieldValueOption, FilterOperator } from '../../types';
 
@@ -75,6 +76,35 @@ export const resolveMultiValues = (
   return { resolved, error };
 };
 
+/**
+ * Convert a display date string (e.g. "Mar 5, 2026") to ISO format ("2026-03-05").
+ * Uses local date components to avoid timezone shifts.
+ */
+export const displayDateToIso = (display: string): string | null => {
+  if (!display || display.length < MIN_DATE_STRING_LENGTH) return null;
+  // Try ISO format first — already valid
+  if (/^\d{4}-\d{2}-\d{2}$/.test(display)) return display;
+  const date = new Date(display);
+  if (Number.isNaN(date.getTime())) return null;
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+/**
+ * Resolve a "between" date range text (e.g. "Mar 5, 2026 – Mar 15, 2026")
+ * into an [from, to] ISO string array. Returns null if parsing fails.
+ */
+export const resolveDateRangeValue = (trimmed: string): [string, string] | null => {
+  const parts = trimmed.split(' – ');
+  if (parts.length !== 2) return null;
+  const from = displayDateToIso(parts[0].trim());
+  const to = displayDateToIso(parts[1].trim());
+  if (!from || !to) return null;
+  return [from, to];
+};
+
 /** Validate and resolve a date value from text */
 export const resolveDateValue = (
   trimmed: string,
@@ -95,7 +125,9 @@ export const resolveDateValue = (
   const isValidPreset = isDatePreset(trimmed);
   // Reject short strings that Date() parses loosely (e.g. '2' → 2001-02-01)
   const isValidDate =
-    !isValidPreset && trimmed.length >= 6 && !Number.isNaN(new Date(trimmed).getTime());
+    !isValidPreset &&
+    trimmed.length >= MIN_DATE_STRING_LENGTH &&
+    !Number.isNaN(new Date(trimmed).getTime());
   if (!isValidPreset && !isValidDate) error = true;
 
   return { error, dateOrigin };

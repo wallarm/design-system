@@ -15,7 +15,7 @@ export interface FilterInputAutocompleteState {
   menuPositioning: Record<string, unknown>;
   editingMultiValues: Array<string | number | boolean>;
   editingSingleValue: string | number | boolean | undefined;
-  editingDateIsAbsolute: boolean;
+  editingDateRange: [string, string] | undefined;
   inputRef: RefObject<HTMLInputElement | null>;
   menuRef: RefObject<HTMLDivElement | null>;
   handleFieldSelect: (field: FieldMetadata) => void;
@@ -48,7 +48,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
     menuPositioning,
     editingMultiValues,
     editingSingleValue,
-    editingDateIsAbsolute,
+    editingDateRange,
     inputRef,
     menuRef,
     handleFieldSelect,
@@ -129,13 +129,11 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
             onOpenChange={() => handleMenuClose()}
             onEscape={handleMenuDiscard}
             positioning={menuPositioning}
-            initialCalendar={editingDateIsAbsolute}
             range={isBetweenOperator(selectedOperator)}
-            betweenLabel={isBetweenOperator(selectedOperator) ? 'Select date range' : undefined}
-            inputRef={inputRef}
             menuRef={menuRef}
-            filterText={valueFilterText}
             initialValue={editingSingleValue != null ? String(editingSingleValue) : undefined}
+            initialRangeValue={editingDateRange}
+            filterText={valueFilterText}
           />
         ) : (
           // Freeform fields (no predefined values) skip the dropdown — user types and presses Enter

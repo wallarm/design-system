@@ -14,6 +14,7 @@ import type {
   MenuState,
 } from '../../types';
 import {
+  resolveDateRangeValue,
   resolveDateValue,
   resolveMultiValues,
   resolveSingleValue,
@@ -223,20 +224,34 @@ export const useMenuFlow = ({
           error ? 'value' : undefined,
         );
       } else if (selectedField.type === 'date') {
-        const { error, dateOrigin } = resolveDateValue(
-          trimmed,
-          editing.editingChipId,
-          conditionsRef.current,
-        );
-        upsertCondition(
-          selectedField,
-          selectedOperator,
-          trimmed,
-          editing.editingChipId,
-          isEditing ? undefined : insertIndex,
-          error ? 'value' : undefined,
-          dateOrigin,
-        );
+        // Handle "between" date ranges: parse "Mar 5, 2026 – Mar 15, 2026" → ["2026-03-05", "2026-03-15"]
+        if (isBetweenOperator(selectedOperator)) {
+          const rangeValue = resolveDateRangeValue(trimmed);
+          upsertCondition(
+            selectedField,
+            selectedOperator,
+            rangeValue ?? trimmed,
+            editing.editingChipId,
+            isEditing ? undefined : insertIndex,
+            rangeValue ? undefined : 'value',
+            'absolute',
+          );
+        } else {
+          const { error, dateOrigin } = resolveDateValue(
+            trimmed,
+            editing.editingChipId,
+            conditionsRef.current,
+          );
+          upsertCondition(
+            selectedField,
+            selectedOperator,
+            trimmed,
+            editing.editingChipId,
+            isEditing ? undefined : insertIndex,
+            error ? 'value' : undefined,
+            dateOrigin,
+          );
+        }
       } else {
         const { resolved, error } = resolveSingleValue(selectedField, trimmed);
         upsertCondition(

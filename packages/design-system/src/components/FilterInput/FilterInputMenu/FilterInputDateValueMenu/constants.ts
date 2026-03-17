@@ -1,3 +1,6 @@
+/** Minimum length of a date string worth parsing (e.g. "1d" is a preset, but "2" is noise) */
+export const MIN_DATE_STRING_LENGTH = 6;
+
 export interface DatePreset {
   value: string;
   label: string;
@@ -19,14 +22,27 @@ export const DATE_PRESETS: DatePreset[] = [
 /** Check if a value string is a relative date preset (e.g. "30m", "7d") */
 export const isDatePreset = (value: string): boolean => /^\d+[mhd]$/.test(value);
 
-/** Format an ISO date string for chip display (e.g. "Mar 4, 2026") */
-export const formatDateForChip = (isoString: string): string => {
-  const date = new Date(isoString);
+/** Format a date string for chip display (e.g. "Mar 4, 2026").
+ *  Handles both ISO (YYYY-MM-DD, parsed as UTC) and locale formats (parsed as local time). */
+export const formatDateForChip = (value: string): string => {
+  // ISO date-only: parse components directly — avoids timezone ambiguity
+  const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+  if (isoMatch) {
+    const d = new Date(Date.UTC(+isoMatch[1], +isoMatch[2] - 1, +isoMatch[3]));
+    return d.toLocaleDateString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      timeZone: 'UTC',
+    });
+  }
+  // Locale or other format: native Date parsing, display in local timezone
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
-    timeZone: 'UTC',
   });
 };
 

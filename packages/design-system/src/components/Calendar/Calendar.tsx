@@ -76,6 +76,8 @@ export interface CalendarProps {
   closeOnSelect?: boolean;
   /** Whether calendar is readonly (display only, no date selection allowed). Default: false */
   readonly?: boolean;
+  /** Controlled focused date — navigates the calendar view to this date */
+  focusedValue?: DateValue;
   /** Compound components (CalendarTrigger, CalendarContent, etc.) */
   children?: ReactNode;
 }
@@ -145,6 +147,7 @@ export const Calendar: FC<CalendarProps> = ({
   onOpenChange,
   closeOnSelect = true,
   readonly = false,
+  focusedValue,
   children,
 }) => {
   const isRange = type === 'range';
@@ -230,6 +233,7 @@ export const Calendar: FC<CalendarProps> = ({
       max={maxDate}
       isDateUnavailable={isDateUnavailable}
       outsideDaySelectable
+      focusedValue={focusedValue}
       closeOnSelect={closeOnSelect}
     >
       <CalendarProvider value={contextValue}>{children}</CalendarProvider>

@@ -1,3 +1,4 @@
+import type React from 'react';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterInput } from '../FilterInput';
@@ -7,7 +8,7 @@ const meta = {
   title: 'Patterns/FilterInput/FilterInput',
   component: FilterInput,
   parameters: {
-    layout: 'centered',
+    layout: 'fullscreen',
     docs: {
       description: {
         component:
@@ -16,9 +17,11 @@ const meta = {
     },
   },
   decorators: [
-    Story => (
-      <div className='w-[800px]'>
-        <Story />
+    (Story: React.ComponentType) => (
+      <div style={{ display: 'flex', justifyContent: 'center', padding: '2rem' }}>
+        <div style={{ width: '100%', maxWidth: 960 }}>
+          <Story />
+        </div>
       </div>
     ),
   ],
