@@ -2,6 +2,7 @@ import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
 import { useCallback } from 'react';
 import { cn } from '../../../utils/cn';
 import { inputVariants } from '../../Input/classes';
+import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
 import { useFilterInputContext } from '../FilterInputContext';
 import { isMenuRelated } from '../lib';
 import { ChipsWithGaps, TrailingGap } from './ChipsWithGaps';
@@ -120,46 +121,56 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
         data-slot='filter-input'
         {...props}
       >
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
-        <div
-          ref={innerRef}
-          className={cn(
-            filterInputInnerVariants({ hasContent }),
-            !isExpanded && 'overflow-y-auto',
-            'filter-input-scroll',
-          )}
-          style={{
-            maxHeight: !isExpanded ? COLLAPSED_MAX_HEIGHT : undefined,
-            paddingRight: hasContent ? ACTIONS_PADDING : undefined,
-          }}
-          onClick={e => {
-            if (e.target === e.currentTarget) onInputClick();
-          }}
+        <ScrollArea
+          className='h-auto flex-1 min-w-0'
+          style={{ maxHeight: !isExpanded ? COLLAPSED_MAX_HEIGHT : undefined }}
         >
-          <ChipsWithGaps chips={chipsBefore} hideTrailingGap={hideTrailingGap} {...chipsGapProps} />
-
-          {buildingChipData ? (
+          {/* Inline style overrides hardcoded h-full in ScrollAreaViewport (className is stripped) */}
+          <ScrollAreaViewport style={{ height: 'auto', maxHeight: 'inherit' }}>
+            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
             <div
-              ref={buildingChipRef}
-              className={cn(buildingChipWrapperClass, hasContent && 'ml-8')}
+              ref={innerRef}
+              className={cn(filterInputInnerVariants({ hasContent }))}
+              style={{ paddingRight: hasContent ? ACTIONS_PADDING : undefined }}
+              onClick={e => {
+                if (e.target === e.currentTarget) onInputClick();
+              }}
             >
-              <FilterInputChip
-                building
-                attribute={buildingChipData.attribute ?? ''}
-                operator={buildingChipData.operator}
-                value={buildingChipData.value}
-                className='border-none'
+              <ChipsWithGaps
+                chips={chipsBefore}
+                hideTrailingGap={hideTrailingGap}
+                {...chipsGapProps}
               />
-              <FilterInputSearch hasContent />
+
+              {buildingChipData ? (
+                <div
+                  ref={buildingChipRef}
+                  className={cn(buildingChipWrapperClass, hasContent && 'ml-8')}
+                >
+                  <FilterInputChip
+                    building
+                    attribute={buildingChipData.attribute ?? ''}
+                    operator={buildingChipData.operator}
+                    value={buildingChipData.value}
+                    className='border-none'
+                  />
+                  <FilterInputSearch hasContent />
+                </div>
+              ) : (
+                <FilterInputSearch hasContent={hasContent} />
+              )}
+
+              <ChipsWithGaps
+                chips={chipsAfter}
+                hideLeadingGap={hideLeadingGap}
+                {...chipsGapProps}
+              />
+
+              {chipsAfter.length > 0 && <TrailingGap chips={chipsAfter} onGapClick={onGapClick} />}
             </div>
-          ) : (
-            <FilterInputSearch hasContent={hasContent} />
-          )}
-
-          <ChipsWithGaps chips={chipsAfter} hideLeadingGap={hideLeadingGap} {...chipsGapProps} />
-
-          {chipsAfter.length > 0 && <TrailingGap chips={chipsAfter} onGapClick={onGapClick} />}
-        </div>
+          </ScrollAreaViewport>
+          {!isExpanded && <ScrollAreaScrollbar orientation='vertical' />}
+        </ScrollArea>
 
         <FilterInputFieldActions
           isExpanded={isExpanded}

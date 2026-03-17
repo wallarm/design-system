@@ -25,27 +25,6 @@
     }
 }
 
-/** Thin native scrollbar for the collapsed query bar chip area.
- *  Uses the same thumb color as ScrollAreaScrollbar for consistency. */
-.query-bar-scroll {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-badge-slate-dark-alt) transparent;
-
-    &::-webkit-scrollbar {
-        width: 4px;
-    }
-
-    &::-webkit-scrollbar-track {
-        background: transparent;
-        margin-block: 4px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-        background: var(--color-badge-slate-dark-alt);
-        border-radius: 9999px;
-    }
-}
-
 /** Remove when old DS will be removed **/
 :where(:root) {
     cursor: default;
