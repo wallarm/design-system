@@ -35,7 +35,7 @@ export const Country: FC<CountryProps> = ({
   ref,
   asChild = false,
   code,
-  size = 'medium',
+  size = 'small',
   className,
   children,
   'data-testid': testId,

@@ -11,28 +11,30 @@ import type { TestableProps } from '../../utils/testId';
 import { Text } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
-type DateTimeFormat = 'relative' | 'date' | 'datetime';
+type FormatDateTimeFormat = 'relative' | 'date' | 'datetime';
 
-interface DateTimeBaseProps {
+interface FormatDateTimeBaseProps {
   /** ISO string, Date object, or Unix timestamp (ms) */
   value: string | Date | number | null | undefined;
   /** Display format. Default: 'relative' */
-  format?: DateTimeFormat;
+  format?: FormatDateTimeFormat;
   /** Show seconds in tooltip absolute time. Default: true */
   showSeconds?: boolean;
   ref?: Ref<HTMLTimeElement>;
 }
 
-type DateTimeNativeProps = Omit<HTMLAttributes<HTMLTimeElement>, 'className'>;
+type FormatDateTimeNativeProps = Omit<HTMLAttributes<HTMLTimeElement>, 'className'>;
 
-export type DateTimeProps = DateTimeNativeProps & DateTimeBaseProps & TestableProps;
+export type FormatDateTimeProps = FormatDateTimeNativeProps &
+  FormatDateTimeBaseProps &
+  TestableProps;
 
 const toDate = (value: string | Date | number): Date => {
   if (value instanceof Date) return value;
   return new Date(value);
 };
 
-export const DateTime: FC<DateTimeProps> = ({
+export const FormatDateTime: FC<FormatDateTimeProps> = ({
   value,
   format = 'relative',
   showSeconds = true,
@@ -44,7 +46,7 @@ export const DateTime: FC<DateTimeProps> = ({
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <time ref={ref} data-slot='datetime' {...props}>
+          <time ref={ref} data-slot='format-date-time' {...props}>
             <Text size='sm' color='secondary'>
               —
             </Text>
@@ -59,7 +61,7 @@ export const DateTime: FC<DateTimeProps> = ({
 
   if (!isValid(date)) {
     return (
-      <time ref={ref} data-slot='datetime' {...props}>
+      <time ref={ref} data-slot='format-date-time' {...props}>
         <Text size='sm' color='secondary'>
           —
         </Text>
@@ -75,7 +77,7 @@ export const DateTime: FC<DateTimeProps> = ({
     return (
       <Tooltip>
         <TooltipTrigger asChild>
-          <time ref={ref} dateTime={isoString} data-slot='datetime' {...props}>
+          <time ref={ref} dateTime={isoString} data-slot='format-date-time' {...props}>
             <Text size='sm'>
               <span
                 className={cn(
@@ -102,7 +104,7 @@ export const DateTime: FC<DateTimeProps> = ({
             ref={ref}
             dateTime={isoString}
             className='inline-flex flex-col whitespace-nowrap'
-            data-slot='datetime'
+            data-slot='format-date-time'
             {...props}
           >
             <Text size='sm'>{formatAbsoluteDate(date)}</Text>
@@ -124,7 +126,7 @@ export const DateTime: FC<DateTimeProps> = ({
           ref={ref}
           dateTime={isoString}
           className='inline-flex flex-col whitespace-nowrap'
-          data-slot='datetime'
+          data-slot='format-date-time'
           {...props}
         >
           <Text size='sm'>{formatAbsoluteDate(date)}</Text>
@@ -135,4 +137,4 @@ export const DateTime: FC<DateTimeProps> = ({
   );
 };
 
-DateTime.displayName = 'DateTime';
+FormatDateTime.displayName = 'FormatDateTime';

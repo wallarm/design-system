@@ -13,7 +13,7 @@ const toastStory = createStoryHelper('messaging-toast', [
 
 const getToasts = (page: Page) => page.locator('[data-scope="toast"][data-part="root"]');
 const getToastCloseButton = (page: Page) =>
-  getToasts(page).first().locator('[data-part="close-trigger"]');
+  getToasts(page).first().getByRole('button', { name: 'Close' });
 
 const initToast = async (page: Page, name: string) => {
   await page.getByRole('button', { name }).click();

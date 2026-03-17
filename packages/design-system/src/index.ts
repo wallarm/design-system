@@ -102,7 +102,6 @@ export {
   DateRangeStartValue,
   useDateRangeContext,
 } from './components/DateRangeInput';
-export { DateTime, type DateTimeProps } from './components/DateTime';
 export {
   Drawer,
   DrawerBody,
@@ -178,6 +177,7 @@ export {
   type Group,
 } from './components/FilterInput';
 export { Flex, type FlexProps } from './components/Flex';
+export { FormatDateTime, type FormatDateTimeProps } from './components/FormatDateTime';
 export { Heading, type HeadingProps } from './components/Heading';
 export { Input, type InputProps } from './components/Input';
 export {
