@@ -131,6 +131,76 @@ describe('deriveAutocompleteValues', () => {
     });
   });
 
+  describe('editingDateRange for between operator', () => {
+    const dateField: FieldMetadata = {
+      name: 'last_seen',
+      label: 'Last seen',
+      type: 'date',
+    };
+
+    const makeDateConditions = (overrides: Partial<Condition> = {}): Condition[] => [
+      {
+        type: 'condition',
+        field: 'last_seen',
+        operator: 'between',
+        value: ['2026-03-05', '2026-03-15'],
+        ...overrides,
+      },
+    ];
+
+    it('derives date range from between condition', () => {
+      const result = deriveAutocompleteValues({
+        editingChipId: 'chip-0',
+        selectedField: dateField,
+        selectedOperator: 'between',
+        conditions: makeDateConditions(),
+        buildingMultiValue: undefined,
+        dateRangeFromValue: undefined,
+      });
+
+      expect(result.editingDateRange).toEqual(['2026-03-05', '2026-03-15']);
+    });
+
+    it('returns undefined for non-between operator', () => {
+      const result = deriveAutocompleteValues({
+        editingChipId: 'chip-0',
+        selectedField: dateField,
+        selectedOperator: '=',
+        conditions: makeDateConditions({ operator: '=', value: '2026-03-05' }),
+        buildingMultiValue: undefined,
+        dateRangeFromValue: undefined,
+      });
+
+      expect(result.editingDateRange).toBeUndefined();
+    });
+
+    it('returns undefined when value has fewer than 2 elements', () => {
+      const result = deriveAutocompleteValues({
+        editingChipId: 'chip-0',
+        selectedField: dateField,
+        selectedOperator: 'between',
+        conditions: makeDateConditions({ value: ['2026-03-05'] }),
+        buildingMultiValue: undefined,
+        dateRangeFromValue: undefined,
+      });
+
+      expect(result.editingDateRange).toBeUndefined();
+    });
+
+    it('returns undefined for non-date field', () => {
+      const result = deriveAutocompleteValues({
+        editingChipId: 'chip-0',
+        selectedField: statusField,
+        selectedOperator: 'between',
+        conditions: makeDateConditions(),
+        buildingMultiValue: undefined,
+        dateRangeFromValue: undefined,
+      });
+
+      expect(result.editingDateRange).toBeUndefined();
+    });
+  });
+
   describe('buildingChipData', () => {
     it('returns buildingChipData when field selected and not editing', () => {
       const result = deriveAutocompleteValues({
