@@ -1,3 +1,7 @@
+## 0.13.0 (2026-03-17)
+
+* feat(query-bar): improve QueryBar UX and code quality  [AS-638] (#40) ([0871646](https://github.com/wallarm/design-system/commit/0871646)), closes [#40](https://github.com/wallarm/design-system/issues/40)
+
 ## 0.12.0 (2026-03-17)
 
 * feat: DateTime input (#31) ([9ca4833](https://github.com/wallarm/design-system/commit/9ca4833)), closes [#31](https://github.com/wallarm/design-system/issues/31)
