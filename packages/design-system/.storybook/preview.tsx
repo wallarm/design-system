@@ -24,7 +24,7 @@ const preview: Preview = {
         showToolbar: isDev,
       },
       storySort: {
-        order: ['Documentation'],
+        order: ['Documentation', ['Patterns', { FilterInput: ['Composition', '*'] }], 'Components'],
       },
     },
   },
