@@ -1,3 +1,7 @@
+## 0.12.0 (2026-03-17)
+
+* feat: DateTime input (#31) ([9ca4833](https://github.com/wallarm/design-system/commit/9ca4833)), closes [#31](https://github.com/wallarm/design-system/issues/31)
+
 ## 0.11.0 (2026-03-16)
 
 * feat: Table experience improvements [AS-582] (#38) ([4f0826f](https://github.com/wallarm/design-system/commit/4f0826f)), closes [#38](https://github.com/wallarm/design-system/issues/38)
