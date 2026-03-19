@@ -153,6 +153,7 @@
     "highlight.js": "^11.11.1",
     "prism-react-renderer": "^2.4.1",
     "prismjs": "^1.30.0",
+    "recharts": "3.8.0",
     "shiki": "^3.22.0",
     "tailwind-merge": "3.4.0"
   },
