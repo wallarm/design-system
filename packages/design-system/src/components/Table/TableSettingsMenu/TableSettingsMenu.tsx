@@ -167,7 +167,7 @@ export const TableSettingsMenu: FC = () => {
                 </Button>
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className={cn('min-w-256')}>
+              <DropdownMenuContent className={cn('min-w-256 max-h-[430px]')}>
                 <DropdownMenuInput
                   placeholder='Search'
                   value={search}

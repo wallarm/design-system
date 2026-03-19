@@ -143,7 +143,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
     >
       <DropdownMenuContent
         ref={menuRef}
-        className={cn('w-[300px]', className)}
+        className={cn('w-[300px] max-h-[430px]', className)}
         data-slot='filter-input-field-menu'
       >
         {!filterText && showRecent && (
