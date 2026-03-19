@@ -5,7 +5,7 @@ import { FilterInputOperatorMenu } from '../FilterInputMenu';
 import type { FilterOperator } from '../types';
 
 const meta = {
-  title: 'Patterns/FilterInputOperatorMenu',
+  title: 'Patterns/FilterInput/FilterInputOperatorMenu',
   component: FilterInputOperatorMenu,
   tags: ['autodocs'],
   argTypes: {
