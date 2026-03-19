@@ -1,3 +1,7 @@
+## <small>0.14.1 (2026-03-19)</small>
+
+* fix(table): correct scrollMargin in window virtualization (#45) ([6aafb82](https://github.com/wallarm/design-system/commit/6aafb82)), closes [#45](https://github.com/wallarm/design-system/issues/45)
+
 ## 0.14.0 (2026-03-17)
 
 * feat: IP, Country, FormatDateTime, Tour fixes (#43) ([b407797](https://github.com/wallarm/design-system/commit/b407797)), closes [#43](https://github.com/wallarm/design-system/issues/43)
