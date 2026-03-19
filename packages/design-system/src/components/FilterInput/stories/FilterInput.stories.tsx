@@ -127,7 +127,7 @@ export const WithPresetValue: Story = {
     });
 
     return (
-      <div className='w-[600px] space-y-4'>
+      <>
         <FilterInput
           fields={sampleFields}
           value={expression}
@@ -135,11 +135,11 @@ export const WithPresetValue: Story = {
           placeholder='Type to filter...'
         />
         {expression && (
-          <div className='p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
-      </div>
+      </>
     );
   },
 };
@@ -159,7 +159,7 @@ export const WithMultiConditionPreset: Story = {
     });
 
     return (
-      <div className='w-[600px] space-y-4'>
+      <>
         <FilterInput
           fields={sampleFields}
           value={expression}
@@ -167,11 +167,11 @@ export const WithMultiConditionPreset: Story = {
           placeholder='Type to filter...'
         />
         {expression && (
-          <div className='p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
-      </div>
+      </>
     );
   },
 };
@@ -189,15 +189,13 @@ export const ErrorWithValue: Story = {
     });
 
     return (
-      <div className='w-[600px]'>
-        <FilterInput
-          fields={sampleFields}
-          value={expression}
-          onChange={setExpression}
-          placeholder='Type to filter...'
-          error
-        />
-      </div>
+      <FilterInput
+        fields={sampleFields}
+        value={expression}
+        onChange={setExpression}
+        placeholder='Type to filter...'
+        error
+      />
     );
   },
 };
