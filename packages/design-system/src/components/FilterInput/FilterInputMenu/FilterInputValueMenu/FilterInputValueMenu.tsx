@@ -116,7 +116,11 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
       highlightedValue={highlightedValue}
       onHighlightChange={onHighlightChange}
     >
-      <DropdownMenuContent ref={menuRef} className={cn(widthClass, className)} style={widthStyle}>
+      <DropdownMenuContent
+        ref={menuRef}
+        className={cn(widthClass, 'max-h-[430px]', className)}
+        style={widthStyle}
+      >
         {displayValues.length > 0 ? (
           <DropdownMenuGroup>
             {displayValues.map(option => (
