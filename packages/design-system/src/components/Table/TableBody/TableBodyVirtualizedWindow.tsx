@@ -3,6 +3,7 @@ import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
 import { TableBodyVirtualizedCore } from './TableBodyVirtualizedCore';
+import { useSmoothScrollOnSort } from './useSmoothScrollOnSort';
 
 /** Walk up the offsetParent chain to get absolute offset from document top. */
 function getDocumentOffsetTop(el: HTMLElement): number {
@@ -25,6 +26,8 @@ export const TableBodyVirtualizedWindow: FC = () => {
     overscan: overscan ?? TABLE_VIRTUALIZATION_OVERSCAN,
     scrollMargin: tbodyRef.current ? getDocumentOffsetTop(tbodyRef.current) : 0,
   });
+
+  useSmoothScrollOnSort(table, () => window);
 
   return <TableBodyVirtualizedCore tbodyRef={tbodyRef} virtualizer={virtualizer} />;
 };
