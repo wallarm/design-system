@@ -8,7 +8,10 @@ import { TableRow } from '../TableRow';
 
 export interface TableBodyVirtualizedCoreProps {
   tbodyRef: RefObject<HTMLTableSectionElement | null>;
-  virtualizer: Virtualizer<Window, Element> | Virtualizer<Element, Element>;
+  virtualizer:
+    | Virtualizer<Window, Element>
+    | Virtualizer<HTMLElement, Element>
+    | Virtualizer<Element, Element>;
 }
 
 export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
