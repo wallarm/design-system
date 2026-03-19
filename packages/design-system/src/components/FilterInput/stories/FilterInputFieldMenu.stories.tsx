@@ -3,7 +3,7 @@ import { FilterInputFieldMenu } from '../FilterInputMenu';
 import type { FieldMetadata } from '../types';
 
 const meta = {
-  title: 'Patterns/FilterInput/FilterInputFieldMenu',
+  title: 'Patterns/FilterInputFieldMenu',
   component: FilterInputFieldMenu,
   parameters: {
     layout: 'centered',
