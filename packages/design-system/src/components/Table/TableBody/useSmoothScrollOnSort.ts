@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import type { Table as TanStackTable } from '@tanstack/react-table';
+import type { SortingState, Table as TanStackTable } from '@tanstack/react-table';
 
 /**
  * Smooth-scrolls the table to the top when sorting changes.
@@ -10,21 +10,17 @@ export function useSmoothScrollOnSort<T>(
   table: TanStackTable<T>,
   getScrollTarget: () => HTMLElement | Window | null,
 ) {
-  const prevSortingRef = useRef(table.getState().sorting);
+  const prevSortingRef = useRef<SortingState>(table.getState().sorting);
+
+  const sorting = table.getState().sorting;
 
   useEffect(() => {
-    const currentSorting = table.getState().sorting;
-
-    if (prevSortingRef.current === currentSorting) return;
-    prevSortingRef.current = currentSorting;
+    if (prevSortingRef.current === sorting) return;
+    prevSortingRef.current = sorting;
 
     const target = getScrollTarget();
     if (!target) return;
 
-    if (target instanceof Window) {
-      target.scrollTo({ top: 0, behavior: 'smooth' });
-    } else {
-      target.scrollTo({ top: 0, behavior: 'smooth' });
-    }
-  });
+    target.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [sorting, getScrollTarget]);
 }
