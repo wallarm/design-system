@@ -7,7 +7,7 @@ import {
 } from '../FilterInputField';
 
 const meta = {
-  title: 'Patterns/FilterInput/FilterInputChip',
+  title: 'Patterns/FilterInputChip',
   component: FilterInputChip,
   tags: ['autodocs'],
   argTypes: {
