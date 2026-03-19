@@ -47,7 +47,7 @@ export const filterInputContainerVariants = cva(
       },
       multiRow: {
         true: 'items-start',
-        false: 'items-center',
+        false: 'items-stretch',
       },
     },
     defaultVariants: {
@@ -59,7 +59,7 @@ export const filterInputContainerVariants = cva(
 
 /** Inner scrollable chip area that delegates clicks to the input */
 export const filterInputInnerVariants = cva(
-  'flex min-h-full w-full cursor-text flex-wrap items-center gap-y-4 py-4',
+  'flex min-h-full w-full cursor-text flex-wrap items-center gap-y-4 py-8',
   {
     variants: {
       hasContent: {
@@ -75,7 +75,7 @@ export const filterInputInnerVariants = cva(
 
 /** Wrapper that visually groups the building chip and the filter input */
 export const buildingChipWrapperClass =
-  'flex items-center gap-2 min-w-0 rounded-8 border border-solid border-border-strong-primary bg-badge-badge-bg';
+  'flex items-center  min-w-0 rounded-8 border border-solid border-border-strong-primary bg-badge-badge-bg ml-8';
 
 /** Native input element inside the query bar */
 export const filterInputInputVariants = cva(
