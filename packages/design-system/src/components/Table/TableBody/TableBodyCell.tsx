@@ -73,7 +73,6 @@ export const TableBodyCell = <T,>({
     >
       {isCut ? (
         <div className='overflow-hidden' style={{ minWidth: column.columnDef.size }}>
-          {/* <div className='overflow-hidden text-ellipsis whitespace-nowrap' style={{ minWidth: column.columnDef.size }}> */}
           {content}
         </div>
       ) : (

@@ -4,7 +4,7 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
 import { Td, Tr } from './primitives';
-import { TableBodyCell } from './TableBody/TableBodyCell';
+import { TableBodyCell } from './TableBody';
 import { useTableContext } from './TableContext';
 import { TableRowExpanded } from './TableRowExpanded';
 

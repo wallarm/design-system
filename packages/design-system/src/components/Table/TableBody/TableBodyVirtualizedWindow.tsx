@@ -1,4 +1,4 @@
-import { type FC, useRef } from 'react';
+import { type FC, useCallback, useRef } from 'react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
@@ -27,7 +27,8 @@ export const TableBodyVirtualizedWindow: FC = () => {
     scrollMargin: tbodyRef.current ? getDocumentOffsetTop(tbodyRef.current) : 0,
   });
 
-  useSmoothScrollOnSort(table, () => window);
+  const getScrollTarget = useCallback(() => window as Window, []);
+  useSmoothScrollOnSort(table, getScrollTarget);
 
   return <TableBodyVirtualizedCore tbodyRef={tbodyRef} virtualizer={virtualizer} />;
 };

@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
 import type { Column } from '@tanstack/react-table';
-import { useTableContext } from '../TableContext/useTableContext';
+import { useTableContext } from '../TableContext';
 import { getDndStyles } from './getDndStyles';
 
 type UseSortableReturn = ReturnType<typeof useSortable>;
