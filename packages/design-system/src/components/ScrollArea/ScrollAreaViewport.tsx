@@ -14,7 +14,7 @@ export const ScrollAreaViewport: FC<ScrollAreaViewportProps> = props => {
     <ArkUiScrollArea.Viewport
       {...props}
       data-testid={testId}
-      className={cn('h-full outline-none overscroll-x-none')}
+      className={cn('h-full outline-none')}
     />
   );
 };
