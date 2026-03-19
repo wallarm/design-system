@@ -75,7 +75,7 @@ export const filterInputInnerVariants = cva(
 
 /** Wrapper that visually groups the building chip and the filter input */
 export const buildingChipWrapperClass =
-  'flex items-center  min-w-0 rounded-8 border border-solid border-border-strong-primary bg-badge-badge-bg ml-8';
+  'flex items-center min-w-0 rounded-8 border border-solid border-border-strong-primary bg-badge-badge-bg ml-8';
 
 /** Native input element inside the query bar */
 export const filterInputInputVariants = cva(
