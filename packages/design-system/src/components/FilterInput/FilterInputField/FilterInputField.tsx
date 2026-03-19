@@ -145,7 +145,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
               {buildingChipData ? (
                 <div
                   ref={buildingChipRef}
-                  className={cn(buildingChipWrapperClass, hasContent && 'ml-8')}
+                  className={cn(buildingChipWrapperClass, hasContent)}
                 >
                   <FilterInputChip
                     building
