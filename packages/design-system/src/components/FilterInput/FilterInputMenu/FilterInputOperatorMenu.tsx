@@ -146,7 +146,7 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
       highlightedValue={highlightedValue}
       onHighlightChange={onHighlightChange}
     >
-      <DropdownMenuContent ref={menuRef} className={cn('w-256', className)}>
+      <DropdownMenuContent ref={menuRef} className={cn('w-256 max-h-[430px]', className)}>
         {filteredGroups.length > 0 ? (
           filteredGroups.map((group, groupIdx) => (
             <Fragment key={`group-${groupIdx}`}>
