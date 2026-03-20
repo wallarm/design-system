@@ -1,3 +1,7 @@
+## <small>0.14.2 (2026-03-20)</small>
+
+* fix: FilterInput jump, dropdown max-height, table sort scroll [AS-685] (#50) ([ecf216a](https://github.com/wallarm/design-system/commit/ecf216a)), closes [#50](https://github.com/wallarm/design-system/issues/50)
+
 ## <small>0.14.1 (2026-03-19)</small>
 
 * fix(table): correct scrollMargin in window virtualization (#45) ([6aafb82](https://github.com/wallarm/design-system/commit/6aafb82)), closes [#45](https://github.com/wallarm/design-system/issues/45)
