@@ -1,4 +1,4 @@
-import { type FC, type ReactNode, useCallback, useEffect, useRef } from 'react';
+import { type FC, type ReactNode, useEffect, useRef } from 'react';
 import { useTestId } from '../../../utils/testId';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
 import { useEndReached } from '../hooks';
@@ -25,9 +25,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   const { table, onEndReached, onEndReachedThreshold } = useTableContext();
   const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
-  const headerScrollRef = useRef<HTMLDivElement>(null);
-  const bodyScrollRef = useRef<HTMLDivElement>(null);
-  const isSyncing = useRef(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(rootRef);
 
   useEndReached({
@@ -36,33 +34,17 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
     threshold: onEndReachedThreshold,
   });
 
-  // Sync horizontal scroll between header and body
-  const syncScroll = useCallback((source: HTMLDivElement, target: HTMLDivElement) => {
-    if (isSyncing.current) return;
-    isSyncing.current = true;
-    target.scrollLeft = source.scrollLeft;
-    isSyncing.current = false;
-  }, []);
-
   useEffect(() => {
-    const header = headerScrollRef.current;
-    const body = bodyScrollRef.current;
-    if (!header || !body) return;
+    const scrollEl = scrollRef.current;
+    if (!scrollEl) return;
 
-    const onBodyScroll = () => {
-      syncScroll(body, header);
-      rootRef.current?.toggleAttribute('data-scrolled', body.scrollLeft > 0);
+    const onScroll = () => {
+      rootRef.current?.toggleAttribute('data-scrolled', scrollEl.scrollLeft > 0);
     };
-    const onHeaderScroll = () => syncScroll(header, body);
 
-    body.addEventListener('scroll', onBodyScroll, { passive: true });
-    header.addEventListener('scroll', onHeaderScroll, { passive: true });
-
-    return () => {
-      body.removeEventListener('scroll', onBodyScroll);
-      header.removeEventListener('scroll', onHeaderScroll);
-    };
-  }, [syncScroll]);
+    scrollEl.addEventListener('scroll', onScroll, { passive: true });
+    return () => scrollEl.removeEventListener('scroll', onScroll);
+  }, []);
 
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);
@@ -70,28 +52,22 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   const tableStyles = 'table-fixed border-separate border-spacing-0';
 
   return (
-    <div ref={rootRef} data-testid={testId} className='group/scroll outline-none'>
-      {/* Sticky header — own border/rounding so it looks correct when detached */}
-      <div className='sticky top-0 z-30 relative'>
-        <div
-          ref={headerScrollRef}
-          className='overflow-hidden rounded-t-12 border border-b-0 border-border-primary-light'
-        >
-          <table className={tableStyles} style={{ width: tableWidth }} aria-hidden>
-            <TableColGroup tableWidth={tableWidth} />
-            <TableHead />
-          </table>
-        </div>
-        {showSettings && <TableSettingsMenu />}
-      </div>
-
-      {/* Scrollable body — ScrollArea for styled horizontal scrollbar */}
-      <ScrollArea className='group/scroll rounded-b-12 border border-t-0 border-border-primary-light'>
+    <div ref={rootRef} data-testid={testId} className='group/scroll relative outline-none'>
+      <ScrollArea className='group/scroll rounded-12 border border-border-primary-light'>
         <ScrollAreaViewport
-          ref={bodyScrollRef}
+          ref={scrollRef}
           data-table-scroll-container
           style={{ overflowX: 'auto', overflowY: 'hidden' }}
         >
+          {/* Sticky header */}
+          <div className='sticky top-0 z-30'>
+            <table className={tableStyles} style={{ width: tableWidth }} aria-hidden>
+              <TableColGroup tableWidth={tableWidth} />
+              <TableHead />
+            </table>
+          </div>
+
+          {/* Body */}
           <table className={tableStyles} style={{ width: tableWidth }} aria-label={ariaLabel}>
             <TableColGroup tableWidth={tableWidth} />
             {!isEmpty && <TableBody />}
@@ -100,6 +76,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
         </ScrollAreaViewport>
         <ScrollAreaScrollbar orientation='horizontal' />
       </ScrollArea>
+      {showSettings && <TableSettingsMenu />}
     </div>
   );
 };

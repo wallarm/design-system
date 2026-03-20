@@ -584,7 +584,7 @@ export const Default: Story = {
     const [expression, setExpression] = useState<ExprNode | null>(null);
 
     return (
-      <div className='w-[800px] space-y-4'>
+      <>
         <FilterInput
           fields={attackFields}
           value={expression}
@@ -598,11 +598,11 @@ export const Default: Story = {
 
         {/* Debug output */}
         {expression && (
-          <div className='p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
-      </div>
+      </>
     );
   },
 };
@@ -639,7 +639,7 @@ export const Simple: Story = {
     ];
 
     return (
-      <div className='w-[600px] space-y-4'>
+      <>
         <FilterInput
           fields={simpleFields}
           value={expression}
@@ -651,11 +651,11 @@ export const Simple: Story = {
         />
 
         {expression && (
-          <div className='p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
             <pre data-testid='expression-debug'>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
-      </div>
+      </>
     );
   },
 };
@@ -678,18 +678,16 @@ export const BackendIntegration: Story = {
     });
 
     if (!metadata) {
-      return <div className='w-[800px] h-40 bg-gray-100 rounded-8 animate-pulse' />;
+      return <div className='h-40 bg-gray-100 rounded-8 animate-pulse' />;
     }
 
     return (
-      <div className='w-[800px]'>
-        <FilterInput
-          fields={metadata}
-          value={expression}
-          onChange={setExpression}
-          placeholder='Loading metadata from backend...'
-        />
-      </div>
+      <FilterInput
+        fields={metadata}
+        value={expression}
+        onChange={setExpression}
+        placeholder='Loading metadata from backend...'
+      />
     );
   },
 };
