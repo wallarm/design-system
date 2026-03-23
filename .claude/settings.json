@@ -45,7 +45,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "cd /Users/ilyapashkov/Projects/wallarm/wallarm-design-system && if git diff --name-only --diff-filter=M 2>/dev/null | grep -q 'packages/design-system/src/'; then echo 'Design system files were modified. Run quality checks before committing: pnpm typecheck && pnpm lint && pnpm test:run'; fi"
+            "command": "if git diff --name-only --diff-filter=M 2>/dev/null | grep -q 'packages/design-system/src/'; then echo 'Design system files were modified. Run quality checks before committing: pnpm typecheck && pnpm lint && pnpm test:run'; fi"
           }
         ]
       }
