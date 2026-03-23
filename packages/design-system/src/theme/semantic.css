@@ -220,7 +220,7 @@
    * ======================================== */
     --color-syntax-no-syntax: var(--color-slate-900);
 
-    /* Syntax Highlighting */
+    /* Syntax Highlighting — base tokens (Figma source of truth) */
     --color-syntax-keyword: var(--color-violet-700);
     --color-syntax-function: var(--color-blue-600);
     --color-syntax-string: var(--color-amber-700);
@@ -231,6 +231,18 @@
     --color-syntax-type: var(--color-indigo-800);
     --color-syntax-operator: var(--color-slate-600);
     --color-syntax-variable: var(--color-green-700);
+
+    /* Syntax Highlighting — aliases for CodeToken mapping */
+    --color-syntax-number: var(--color-syntax-number-boolean);
+    --color-syntax-boolean: var(--color-syntax-number-boolean);
+    --color-syntax-constant: var(--color-syntax-number-boolean);
+    --color-syntax-builtin: var(--color-syntax-keyword);
+    --color-syntax-class-name: var(--color-syntax-type);
+    --color-syntax-property: var(--color-syntax-variable);
+    --color-syntax-attr-name: var(--color-syntax-attribute);
+    --color-syntax-attr-value: var(--color-syntax-string);
+    --color-syntax-regex: var(--color-syntax-string);
+    --color-syntax-punctuation: var(--color-syntax-operator);
 
     /* Syntax Highlight - Neutral */
     --color-syntax-highlight-neutral-code: var(--color-slate-900);
@@ -598,7 +610,7 @@
      * ======================================== */
     --color-syntax-no-syntax: var(--color-slate-200);
 
-    /* Syntax Highlighting */
+    /* Syntax Highlighting — base tokens (Figma source of truth) */
     --color-syntax-keyword: var(--color-violet-300);
     --color-syntax-function: var(--color-blue-300);
     --color-syntax-string: var(--color-amber-300);
@@ -609,6 +621,18 @@
     --color-syntax-type: var(--color-indigo-300);
     --color-syntax-operator: var(--color-slate-400);
     --color-syntax-variable: var(--color-green-300);
+
+    /* Syntax Highlighting — aliases for CodeToken mapping */
+    --color-syntax-number: var(--color-syntax-number-boolean);
+    --color-syntax-boolean: var(--color-syntax-number-boolean);
+    --color-syntax-constant: var(--color-syntax-number-boolean);
+    --color-syntax-builtin: var(--color-syntax-keyword);
+    --color-syntax-class-name: var(--color-syntax-type);
+    --color-syntax-property: var(--color-syntax-variable);
+    --color-syntax-attr-name: var(--color-syntax-attribute);
+    --color-syntax-attr-value: var(--color-syntax-string);
+    --color-syntax-regex: var(--color-syntax-string);
+    --color-syntax-punctuation: var(--color-syntax-operator);
 
     /* Syntax Highlight - Neutral */
     --color-syntax-highlight-neutral-code: var(--color-slate-200);
