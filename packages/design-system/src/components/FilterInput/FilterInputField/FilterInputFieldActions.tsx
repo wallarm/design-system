@@ -28,43 +28,49 @@ export const FilterInputFieldActions: FC<FilterInputFieldActionsProps> = ({
   const showExpandCollapse = isOverflowing || isExpanded;
 
   return (
-    <div className='absolute right-8 top-0 bottom-0 z-10 flex items-center gap-8'>
+    <>
       {showKeyboardHint && !hasContent && (
-        <KbdGroup>
-          <Kbd>⌘</Kbd>
-          <Kbd>K</Kbd>
-        </KbdGroup>
+        <div className='absolute right-8 top-0 bottom-0 z-10 flex items-center'>
+          <KbdGroup>
+            <Kbd>⌘</Kbd>
+            <Kbd>K</Kbd>
+          </KbdGroup>
+        </div>
       )}
-      {showExpandCollapse && (
-        <Tooltip>
-          <TooltipTrigger asChild>
+      {(showExpandCollapse || hasChips) && (
+        <div className='absolute right-8 top-0 z-10 flex items-center gap-8 pt-8'>
+          {showExpandCollapse && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='ghost'
+                  color='neutral'
+                  size='small'
+                  onClick={onToggleExpand}
+                  aria-label={isExpanded ? 'Collapse' : 'Expand'}
+                  className='text-icon-secondary'
+                >
+                  {isExpanded ? <Minimize2 /> : <Maximize2 />}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>{isExpanded ? 'Collapse' : 'Expand'}</TooltipContent>
+            </Tooltip>
+          )}
+          {hasChips && (
             <Button
               variant='ghost'
               color='neutral'
               size='small'
-              onClick={onToggleExpand}
-              aria-label={isExpanded ? 'Collapse' : 'Expand'}
+              onClick={onClear}
+              aria-label='Clear all filters'
               className='text-icon-secondary'
             >
-              {isExpanded ? <Minimize2 /> : <Maximize2 />}
+              <X />
             </Button>
-          </TooltipTrigger>
-          <TooltipContent>{isExpanded ? 'Collapse' : 'Expand'}</TooltipContent>
-        </Tooltip>
+          )}
+        </div>
       )}
-      {hasChips && (
-        <Button
-          variant='ghost'
-          color='neutral'
-          size='small'
-          onClick={onClear}
-          aria-label='Clear all filters'
-          className='text-icon-secondary'
-        >
-          <X />
-        </Button>
-      )}
-    </div>
+    </>
   );
 };
 
