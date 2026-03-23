@@ -45,6 +45,25 @@ describe('prismAdapter', () => {
     expect(text).toBe(code);
   });
 
+  it('highlights HTTP request with correct token types', async () => {
+    const code = 'GET /api/users HTTP/1.1\nHost: api.example.com';
+    const result = await prismAdapter.highlight(code, 'http');
+
+    expect(result.tokens).toHaveLength(2);
+
+    // First line should contain function (HTTP method maps to function due to shared Prism type)
+    const line1Types = result.tokens[0]?.map(t => t.type) ?? [];
+    expect(line1Types).toContain('function');
+
+    // Second line should contain attr-name (header name)
+    const line2Types = result.tokens[1]?.map(t => t.type) ?? [];
+    expect(line2Types).toContain('attr-name');
+
+    // Reconstructed text should match original
+    const text = result.tokens.map(line => line.map(t => t.content).join('')).join('\n');
+    expect(text).toBe(code);
+  });
+
   it('handles unknown language gracefully', async () => {
     const code = 'some code';
     // Cast to bypass type checking — simulates unsupported language at runtime
@@ -87,6 +106,20 @@ describe('shikiAdapter', () => {
     expect(types.size).toBeGreaterThan(1);
 
     // Reconstructed text should match original
+    const text = line.map(t => t.content).join('');
+    expect(text).toBe(code);
+  });
+
+  it('highlights HTTP with correct token types', async () => {
+    const { shikiAdapter } = await import('./shiki');
+    const code = 'GET /api/users HTTP/1.1';
+    const result = await shikiAdapter.highlight(code, 'http');
+
+    expect(result.tokens).toHaveLength(1);
+    const line = result.tokens[0] ?? [];
+    const types = new Set(line.map(t => t.type));
+    expect(types.size).toBeGreaterThan(1);
+
     const text = line.map(t => t.content).join('');
     expect(text).toBe(code);
   });
@@ -142,6 +175,18 @@ describe('highlightJsAdapter', () => {
 
     // Reconstructed text should match original
     const text = line.map(t => t.content).join('');
+    expect(text).toBe(code);
+  });
+
+  it('highlights HTTP with correct token types', async () => {
+    const code = 'GET /api/users HTTP/1.1\nHost: api.example.com';
+    const result = await highlightJsAdapter.highlight(code, 'http');
+
+    expect(result.tokens).toHaveLength(2);
+    const line1Types = result.tokens[0]?.map(t => t.type) ?? [];
+    expect(line1Types).toContain('keyword'); // GET method
+
+    const text = result.tokens.map(line => line.map(t => t.content).join('')).join('\n');
     expect(text).toBe(code);
   });
 

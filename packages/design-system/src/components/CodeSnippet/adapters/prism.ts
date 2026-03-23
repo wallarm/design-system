@@ -13,7 +13,10 @@ async function loadAdditionalLanguages() {
   languagesLoaded = true;
 
   // Dynamically import additional languages
-  await import('prismjs/components/prism-bash');
+  await Promise.all([
+    import('prismjs/components/prism-bash'),
+    import('prismjs/components/prism-http'),
+  ]);
 }
 
 const SUPPORTED_LANGUAGES = [
@@ -32,54 +35,69 @@ const SUPPORTED_LANGUAGES = [
   'sql',
   'yaml',
   'markdown',
+  'http',
 ] as const satisfies readonly PrismLanguage[];
+
+/** Prism token type → our strict TokenType */
+const PRISM_TOKEN_MAP: Record<string, TokenType> = {
+  plain: 'plain',
+  keyword: 'keyword',
+  string: 'string',
+  comment: 'comment',
+  function: 'function',
+  number: 'number',
+  operator: 'operator',
+  punctuation: 'punctuation',
+  'class-name': 'class-name',
+  property: 'property',
+  tag: 'tag',
+  'attr-name': 'attr-name',
+  'attr-value': 'attr-value',
+  boolean: 'boolean',
+  builtin: 'builtin',
+  constant: 'constant',
+  regex: 'regex',
+  variable: 'variable',
+  // Additional Prism types mapped to our types
+  parameter: 'variable',
+  'template-string': 'string',
+  'template-punctuation': 'punctuation',
+  interpolation: 'variable',
+  'interpolation-punctuation': 'punctuation',
+  module: 'builtin',
+  imports: 'keyword',
+  exports: 'keyword',
+  'maybe-class-name': 'class-name',
+  'known-class-name': 'class-name',
+  'function-variable': 'function',
+  'method-variable': 'function',
+  'property-access': 'property',
+  dom: 'builtin',
+  console: 'builtin',
+  // Bash-specific types
+  'assign-left': 'variable',
+  environment: 'variable',
+  shebang: 'comment',
+  'file-descriptor': 'number',
+  // HTTP-specific types
+  // Note: HTTP `method` (GET/POST) shares Prism type with JS .method() calls.
+  // We keep it as 'function' to avoid breaking JS/TS method highlighting.
+  method: 'function',
+  'request-target': 'string',
+  url: 'string',
+  'http-version': 'constant',
+  'status-code': 'number',
+  'reason-phrase': 'string',
+  'header-name': 'attr-name',
+  'header-value': 'attr-value',
+  'request-line': 'plain',
+  'response-status': 'plain',
+  header: 'plain',
+};
 
 /** Map Prism token types to our strict TokenType */
 function mapTokenType(prismType: string): TokenType {
-  const typeMap: Record<string, TokenType> = {
-    plain: 'plain',
-    keyword: 'keyword',
-    string: 'string',
-    comment: 'comment',
-    function: 'function',
-    number: 'number',
-    operator: 'operator',
-    punctuation: 'punctuation',
-    'class-name': 'class-name',
-    property: 'property',
-    tag: 'tag',
-    'attr-name': 'attr-name',
-    'attr-value': 'attr-value',
-    boolean: 'boolean',
-    builtin: 'builtin',
-    constant: 'constant',
-    regex: 'regex',
-    variable: 'variable',
-    // Additional Prism types mapped to our types
-    parameter: 'variable',
-    'template-string': 'string',
-    'template-punctuation': 'punctuation',
-    interpolation: 'variable',
-    'interpolation-punctuation': 'punctuation',
-    module: 'builtin',
-    imports: 'keyword',
-    exports: 'keyword',
-    'maybe-class-name': 'class-name',
-    'known-class-name': 'class-name',
-    'function-variable': 'function',
-    method: 'function',
-    'method-variable': 'function',
-    'property-access': 'property',
-    dom: 'builtin',
-    console: 'builtin',
-    // Bash-specific types
-    'assign-left': 'variable',
-    environment: 'variable',
-    shebang: 'comment',
-    'file-descriptor': 'number',
-  };
-
-  return typeMap[prismType] ?? 'plain';
+  return PRISM_TOKEN_MAP[prismType] ?? 'plain';
 }
 
 type PrismTokenContent = string | PrismToken | PrismToken[];
