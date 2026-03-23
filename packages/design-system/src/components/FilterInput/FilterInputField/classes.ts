@@ -77,7 +77,7 @@ export const buildingChipWrapperClass =
 
 /** Native input element inside the query bar */
 export const filterInputInputVariants = cva(
-  'h-auto border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0',
+  'h-24 border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0',
   {
     variants: {
       hasContent: {
