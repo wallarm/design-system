@@ -5,12 +5,11 @@ import { cva } from 'class-variance-authority';
 // Each value maps to a CSS dimension used in the inner chip container.
 
 const VISIBLE_ROWS = 3;
-const CHIP_ROW_HEIGHT = 22; // chip min-h-[20px] + 1px border top + 1px border bottom
+const CHIP_ROW_HEIGHT = 24; // chip h-24 (24px, border-box)
 const ROW_GAP = 4; // gap-y-4 between rows
-const PADDING_Y = 8; // py-4 top (4px) + py-4 bottom (4px)
+const PADDING_Y = 16; // py-[8px] top (8px) + py-[8px] bottom (8px)
 const EDGE_GAP = 8; // visual gap from container edges to first/last chip row
 const CONTAINER_BORDER = 2; // outer input border: 1px top + 1px bottom
-const BOTTOM_REVEAL = 6; // extra space so the bottom padding is visually apparent
 
 /** Max height (px) of the inner chip area when the query bar is collapsed. */
 export const COLLAPSED_MAX_HEIGHT =
@@ -18,8 +17,7 @@ export const COLLAPSED_MAX_HEIGHT =
   (VISIBLE_ROWS - 1) * ROW_GAP +
   PADDING_Y +
   EDGE_GAP +
-  CONTAINER_BORDER +
-  BOTTOM_REVEAL;
+  CONTAINER_BORDER;
 
 // ── Action buttons padding ────────────────────────────────
 // Reserve horizontal space so chips don't render behind the
@@ -37,7 +35,7 @@ export const ACTIONS_PADDING = BUTTON_COUNT * BUTTON_SIZE + BUTTON_GAP + ACTIONS
 
 /** Outer filter-input container (combobox wrapper) */
 export const filterInputContainerVariants = cva(
-  'relative flex min-h-40 w-full overflow-hidden px-0 focus-within:outline-none focus-within:ring-3',
+  'relative flex box-border min-h-40 w-full overflow-hidden px-0 focus-within:outline-none focus-within:ring-3',
   {
     variants: {
       error: {
@@ -59,11 +57,11 @@ export const filterInputContainerVariants = cva(
 
 /** Inner scrollable chip area that delegates clicks to the input */
 export const filterInputInnerVariants = cva(
-  'flex min-h-full w-full cursor-text flex-wrap items-center gap-y-4 py-8',
+  'flex min-h-[40px] w-full cursor-text flex-wrap items-center gap-y-4 py-[8px]',
   {
     variants: {
       hasContent: {
-        true: 'pl-4',
+        true: 'pl-8',
         false: 'pl-12 pr-4',
       },
     },
@@ -75,7 +73,7 @@ export const filterInputInnerVariants = cva(
 
 /** Wrapper that visually groups the building chip and the filter input */
 export const buildingChipWrapperClass =
-  'flex items-center min-w-0 rounded-8 border border-solid border-border-strong-primary bg-badge-badge-bg ml-8';
+  'flex items-center min-w-0 h-24 rounded-8 border border-solid border-border-strong-primary bg-badge-badge-bg ml-8';
 
 /** Native input element inside the query bar */
 export const filterInputInputVariants = cva(

@@ -21,13 +21,13 @@ import { MenuEmptyState } from './MenuEmptyState';
  * Build operator groups filtered by a custom operators list.
  * Preserves grouping from OPERATORS_BY_TYPE but only keeps operators present in the list.
  */
-function filterOperatorGroups(
+const filterOperatorGroups = (
   groups: FilterOperator[][],
   operators: FilterOperator[],
-): FilterOperator[][] {
+): FilterOperator[][] => {
   const allowed = new Set(operators);
   return groups.map(group => group.filter(op => allowed.has(op))).filter(group => group.length > 0);
-}
+};
 
 /** Field types where operator symbols are hidden (per Figma spec) */
 const HIDE_SYMBOLS_FOR: ReadonlySet<FieldType> = new Set(['boolean']);

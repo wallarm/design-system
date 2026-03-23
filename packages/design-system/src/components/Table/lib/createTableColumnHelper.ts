@@ -9,15 +9,13 @@ export interface TableColumnHelper<T> {
   display: (options: Omit<TableDisplayColumnDef<T>, 'accessorKey'>) => TableDisplayColumnDef<T>;
 }
 
-export function createTableColumnHelper<T>(): TableColumnHelper<T> {
-  return {
-    accessor: (key, options = {}) => ({
-      ...options,
-      accessorKey: key,
-    }),
-    display: options => ({
-      ...options,
-      accessorKey: undefined,
-    }),
-  };
-}
+export const createTableColumnHelper = <T>(): TableColumnHelper<T> => ({
+  accessor: (key, options = {}) => ({
+    ...options,
+    accessorKey: key,
+  }),
+  display: options => ({
+    ...options,
+    accessorKey: undefined,
+  }),
+});

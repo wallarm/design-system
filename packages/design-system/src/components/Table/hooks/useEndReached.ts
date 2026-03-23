@@ -22,12 +22,12 @@ interface UseEndReachedOptions {
  * A cooldown guard prevents rapid re-fires that can occur when new rows
  * are appended (scrollHeight grows → firedRef resets → still at bottom).
  */
-export function useEndReached({
+export const useEndReached = ({
   mode,
   scrollRef,
   onEndReached,
   threshold = TABLE_END_REACHED_THRESHOLD,
-}: UseEndReachedOptions) {
+}: UseEndReachedOptions) => {
   const firedRef = useRef(false);
   const lastFiredAtRef = useRef(0);
 
@@ -76,4 +76,4 @@ export function useEndReached({
       target.removeEventListener('scroll', check);
     };
   }, [mode, scrollRef, onEndReached, threshold]);
-}
+};

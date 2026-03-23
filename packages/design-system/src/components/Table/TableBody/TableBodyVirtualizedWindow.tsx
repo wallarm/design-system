@@ -2,19 +2,9 @@ import { type FC, useCallback, useRef } from 'react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
+import { getDocumentOffsetTop } from './lib/getDocumentOffsetTop';
 import { TableBodyVirtualizedCore } from './TableBodyVirtualizedCore';
 import { useSmoothScrollOnSort } from './useSmoothScrollOnSort';
-
-/** Walk up the offsetParent chain to get absolute offset from document top. */
-function getDocumentOffsetTop(el: HTMLElement): number {
-  let offset = 0;
-  let current: HTMLElement | null = el;
-  while (current) {
-    offset += current.offsetTop;
-    current = current.offsetParent as HTMLElement | null;
-  }
-  return offset;
-}
 
 export const TableBodyVirtualizedWindow: FC = () => {
   const { table, estimateRowHeight, overscan } = useTableContext();
