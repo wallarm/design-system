@@ -570,3 +570,88 @@ export const IconSizes: Story = {
     </div>
   ),
 };
+
+const textSizes = [
+  { label: 'xs (12px)', className: 'text-xs' },
+  { label: 'sm (14px)', className: 'text-sm' },
+  { label: 'md (16px)', className: 'text-md' },
+  { label: 'lg (18px)', className: 'text-lg' },
+] as const;
+
+const iconSizes: SvgIconSize[] = ['xs', 'sm', 'md', 'lg', 'xl'];
+
+/**
+ * Demonstrates how icons behave inside text at different text and icon sizes.
+ *
+ * - **Inherit (1em)**: icon scales with font size via `className="size-[1em]"`
+ * - **Fixed sizes**: icon stays at its fixed pixel size regardless of text size
+ */
+export const IconsInText: Story = {
+  render: () => (
+    <VStack gap={20} align='stretch'>
+      {/* Inherit size */}
+      <VStack gap={8} align='stretch'>
+        <Text weight='bold' size='sm' color='secondary'>
+          Inherit size — icon should scale with text
+        </Text>
+        <VStack gap={4} align='start'>
+          {textSizes.map(({ label, className }) => (
+            <p key={label} className={`${className} text-text-primary`}>
+              Warning: {label} text <TriangleAlert /> with inherited icon
+            </p>
+          ))}
+        </VStack>
+      </VStack>
+
+      {/* Fixed icon sizes across text sizes */}
+      <VStack gap={8} align='stretch'>
+        <Text weight='bold' size='sm' color='secondary'>
+          Fixed icon sizes in different text sizes
+        </Text>
+        <div
+          style={{
+            display: 'grid',
+            gridTemplateColumns: `100px repeat(${iconSizes.length}, 1fr)`,
+            gap: '8px 16px',
+            alignItems: 'start',
+          }}
+        >
+          {/* Header row */}
+          <Text size='xs' color='secondary' weight='medium'>
+            text \ icon
+          </Text>
+          {iconSizes.map(size => (
+            <Text key={size} size='xs' color='secondary' weight='medium'>
+              {size}
+            </Text>
+          ))}
+
+          {/* Data rows */}
+          {textSizes.map(({ label, className }) => (
+            <>
+              <Text key={`${label}-label`} size='xs' color='secondary'>
+                {label}
+              </Text>
+              {iconSizes.map(size => (
+                <p key={`${label}-${size}`} className={`${className} text-text-primary`}>
+                  <TriangleAlert size={size} /> Alert
+                </p>
+              ))}
+            </>
+          ))}
+        </div>
+      </VStack>
+
+      {/* Multiline paragraph */}
+      <VStack gap={8} align='stretch'>
+        <Text weight='bold' size='sm' color='secondary'>
+          Icon in flowing text (baseline alignment)
+        </Text>
+        <p className='text-sm text-text-primary' style={{ maxWidth: '400px' }}>
+          Click the <TriangleAlert /> icon to see warnings. You can also check <Info /> for more
+          details about the issue.
+        </p>
+      </VStack>
+    </VStack>
+  ),
+};
