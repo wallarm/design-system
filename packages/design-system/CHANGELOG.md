@@ -1,3 +1,7 @@
+## <small>0.14.4 (2026-03-23)</small>
+
+* fix: consistent 24px height for FilterInput elements [AS-687] (#52) ([fd0abc3](https://github.com/wallarm/design-system/commit/fd0abc3)), closes [#52](https://github.com/wallarm/design-system/issues/52)
+
 ## <small>0.14.3 (2026-03-23)</small>
 
 * fix: filter bar vertical jump when adding filters [AS-687] (#51) ([240f47a](https://github.com/wallarm/design-system/commit/240f47a)), closes [#51](https://github.com/wallarm/design-system/issues/51)
