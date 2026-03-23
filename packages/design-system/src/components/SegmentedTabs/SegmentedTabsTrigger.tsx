@@ -9,6 +9,8 @@ export interface SegmentedTabsTriggerProps {
   value: string;
   disabled?: boolean;
   asChild?: boolean;
+  /** Show a small brand-colored dot indicator next to the tab label */
+  indicator?: boolean;
 }
 
 export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
@@ -16,6 +18,7 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
   value,
   disabled = false,
   asChild = false,
+  indicator = false,
 }) => {
   const testId = useTestId('trigger');
 
@@ -80,6 +83,13 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
       asChild={asChild}
     >
       {children}
+      {indicator && (
+        <span
+          data-slot='segmented-tabs-indicator'
+          className='absolute -right-2 -top-2 hidden size-6 rounded-2 bg-icon-brand [[data-selected]>&]:block'
+          aria-hidden='true'
+        />
+      )}
     </ArkUiTabs.Trigger>
   );
 };
