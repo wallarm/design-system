@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Info, Skull, TriangleAlert } from '../../icons';
 import { VStack } from '../Stack';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { loadHighlightJsAdapter, loadPrismAdapter, loadShikiAdapter } from './adapters';
 import { CodeSnippetActions } from './CodeSnippetActions';
 import { CodeSnippetAdapterProvider } from './CodeSnippetAdapterProvider';
@@ -130,9 +131,39 @@ Cache-Control: no-cache`;
       code={httpCode}
       language='text'
       lines={{
-        3: { color: 'danger', prefix: <Skull /> },
-        5: { color: 'warning', prefix: <TriangleAlert /> },
-        7: { color: 'info', prefix: <Info /> },
+        3: {
+          color: 'danger',
+          prefix: (
+            <Tooltip>
+              <TooltipTrigger>
+                <Skull />
+              </TooltipTrigger>
+              <TooltipContent>Tooltip</TooltipContent>
+            </Tooltip>
+          ),
+        },
+        5: {
+          color: 'warning',
+          prefix: (
+            <Tooltip>
+              <TooltipTrigger>
+                <TriangleAlert />
+              </TooltipTrigger>
+              <TooltipContent>Tooltip</TooltipContent>
+            </Tooltip>
+          ),
+        },
+        7: {
+          color: 'info',
+          prefix: (
+            <Tooltip>
+              <TooltipTrigger>
+                <Info />
+              </TooltipTrigger>
+              <TooltipContent>Tooltip</TooltipContent>
+            </Tooltip>
+          ),
+        },
       }}
     >
       <CodeSnippetContent>
