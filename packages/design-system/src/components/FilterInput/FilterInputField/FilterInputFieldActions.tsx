@@ -28,7 +28,7 @@ export const FilterInputFieldActions: FC<FilterInputFieldActionsProps> = ({
   const showExpandCollapse = isOverflowing || isExpanded;
 
   return (
-    <div className='absolute right-8 top-0 z-10 flex items-center gap-8 pt-8'>
+    <div className='absolute right-8 top-0 bottom-0 z-10 flex items-center gap-8'>
       {showKeyboardHint && !hasContent && (
         <KbdGroup>
           <Kbd>⌘</Kbd>

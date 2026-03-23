@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 
 /** Base chip container styles shared by FilterInputChip and FilterInputConnectorChip */
 export const chipVariants = cva(
-  'group/chip relative flex items-center justify-center pl-4 pr-0 py-0 min-h-[20px] border border-solid rounded-8',
+  'group/chip relative flex items-center justify-center pl-4 pr-0 py-0 border border-solid rounded-8',
   {
     variants: {
       error: {
@@ -10,8 +10,8 @@ export const chipVariants = cva(
         false: 'bg-badge-badge-bg border-border-primary',
       },
       interactive: {
-        true: 'cursor-pointer px-4',
-        false: '',
+        true: 'cursor-pointer px-4 h-24',
+        false: 'h-[22px]',
       },
     },
     defaultVariants: {

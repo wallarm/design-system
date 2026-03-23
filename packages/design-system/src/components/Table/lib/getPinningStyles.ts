@@ -4,7 +4,7 @@ import type { Column } from '@tanstack/react-table';
 /**
  * Gets pinning-related CSS properties for a cell/header.
  */
-export function getPinningStyles<T>(column: Column<T>): CSSProperties {
+export const getPinningStyles = <T>(column: Column<T>): CSSProperties => {
   const isPinned = column.getIsPinned();
 
   if (!isPinned) return {};
@@ -15,4 +15,4 @@ export function getPinningStyles<T>(column: Column<T>): CSSProperties {
     left: `${column.getStart('left')}px`,
     position: 'sticky',
   };
-}
+};

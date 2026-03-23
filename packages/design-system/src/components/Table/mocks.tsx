@@ -572,10 +572,10 @@ const ENDPOINTS = [
   '/v1/analytics/track/{metric}',
 ] as const;
 
-export function createLargeGroupedData(
+export const createLargeGroupedData = (
   groupCount = 12,
   childrenPerGroup = 50,
-): SecurityHeaderEntry[] {
+): SecurityHeaderEntry[] => {
   return Array.from({ length: groupCount }, (_, gi): SecurityHeaderEntry => {
     const groupName = HEADER_GROUPS.at(gi % HEADER_GROUPS.length)!;
     const groupId = `group-${gi}`;
@@ -605,14 +605,14 @@ export function createLargeGroupedData(
       })),
     };
   });
-}
+};
 
 // ---------------------------------------------------------------------------
 // Large flat data — for a Virtualized story
 // ---------------------------------------------------------------------------
 
-export function createLargeSecurityEvents(count = 1000): SecurityEvent[] {
-  return Array.from({ length: count }, (_, i) => {
+export const createLargeSecurityEvents = (count = 1000): SecurityEvent[] =>
+  Array.from({ length: count }, (_, i) => {
     const base = securityEvents.at(i % securityEvents.length)!;
 
     return {
@@ -622,7 +622,6 @@ export function createLargeSecurityEvents(count = 1000): SecurityEvent[] {
       firstDetected: `2026-01-${String((i % 28) + 1).padStart(2, '0')}T${String(i % 24).padStart(2, '0')}:00:00`,
     };
   });
-}
 
 // ---------------------------------------------------------------------------
 // FullFeatured — all features combined: grouping, virtual scroll, sorting,
@@ -777,7 +776,7 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
 const INFINITE_PAGE_SIZE = 50;
 const INFINITE_MAX_ITEMS = 500;
 
-export function useInfiniteData() {
+export const useInfiniteData = () => {
   const allData = useMemo(() => createLargeSecurityEvents(INFINITE_MAX_ITEMS), []);
   const [data, setData] = useState(() => allData.slice(0, INFINITE_PAGE_SIZE));
   const [isFetching, setIsFetching] = useState(false);
@@ -795,4 +794,4 @@ export function useInfiniteData() {
   }, [isFetching, hasMore, allData]);
 
   return { data, isFetching, hasMore, totalItems: INFINITE_MAX_ITEMS, fetchNextPage };
-}
+};

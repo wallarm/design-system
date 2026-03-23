@@ -6,10 +6,10 @@ import type { SortingState, Table as TanStackTable } from '@tanstack/react-table
  * Prevents the jarring jump that occurs when the virtualizer
  * recalculates row positions after a sort.
  */
-export function useSmoothScrollOnSort<T>(
+export const useSmoothScrollOnSort = <T>(
   table: TanStackTable<T>,
   getScrollTarget: () => HTMLElement | Window | null,
-) {
+) => {
   const prevSortingRef = useRef<SortingState>(table.getState().sorting);
 
   const sorting = table.getState().sorting;
@@ -23,4 +23,4 @@ export function useSmoothScrollOnSort<T>(
 
     target.scrollTo({ top: 0, behavior: 'smooth' });
   }, [sorting, getScrollTarget]);
-}
+};
