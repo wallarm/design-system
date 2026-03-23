@@ -17,6 +17,8 @@ const codeSnippetStory = createStoryHelper('data-display-codesnippet-codesnippet
   'Typescript With Prism',
   'Bash With Prism',
   'HTML With Highlight Js',
+  'HTTP Request With Prism',
+  'HTTP Response With Shiki',
   'With Header',
   'With Tabs And Actions',
   'With Floating Actions',
@@ -82,25 +84,37 @@ test.describe('CodeSnippet', () => {
 
     test('JSONWithShiki', async ({ page }) => {
       await codeSnippetStory.goto(page, 'JSON With Shiki');
-      await expect(page.locator('.text-green-600').first()).toBeVisible();
+      await expect(page.locator('.text-syntax-string').first()).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
     test('TypescriptWithPrism', async ({ page }) => {
       await codeSnippetStory.goto(page, 'Typescript With Prism');
-      await expect(page.locator('.text-purple-600').first()).toBeVisible();
+      await expect(page.locator('.text-syntax-keyword').first()).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
     test('BashWithPrism', async ({ page }) => {
       await codeSnippetStory.goto(page, 'Bash With Prism');
-      await expect(page.locator('.text-green-600').first()).toBeVisible();
+      await expect(page.locator('.text-syntax-string').first()).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
     test('HTMLWithHighlightJs', async ({ page }) => {
       await codeSnippetStory.goto(page, 'HTML With Highlight Js');
-      await expect(page.locator('.text-red-600').first()).toBeVisible();
+      await expect(page.locator('.text-syntax-tag').first()).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('HTTPRequestWithPrism', async ({ page }) => {
+      await codeSnippetStory.goto(page, 'HTTP Request With Prism');
+      await expect(page.locator('.text-syntax-attr-name').first()).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('HTTPResponseWithShiki', async ({ page }) => {
+      await codeSnippetStory.goto(page, 'HTTP Response With Shiki');
+      await expect(page.locator('.text-syntax-keyword').first()).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 

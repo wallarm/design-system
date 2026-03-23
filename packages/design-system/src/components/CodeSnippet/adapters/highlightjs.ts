@@ -22,45 +22,47 @@ const SUPPORTED_LANGUAGES = [
   'python',
   'go',
   'sql',
+  'http',
 ] as const satisfies readonly HighlightJsLanguage[];
+
+/** highlight.js CSS class → our strict TokenType */
+const HLJS_CLASS_MAP: Record<string, TokenType> = {
+  'hljs-keyword': 'keyword',
+  'hljs-built_in': 'builtin',
+  'hljs-type': 'class-name',
+  'hljs-literal': 'boolean',
+  'hljs-number': 'number',
+  'hljs-string': 'string',
+  'hljs-regexp': 'regex',
+  'hljs-comment': 'comment',
+  'hljs-doctag': 'comment',
+  'hljs-function': 'function',
+  'hljs-title': 'function',
+  'hljs-class': 'class-name',
+  'hljs-variable': 'variable',
+  'hljs-template-variable': 'variable',
+  'hljs-attr': 'attr-name',
+  'hljs-attribute': 'attr-name',
+  'hljs-tag': 'tag',
+  'hljs-name': 'tag',
+  'hljs-selector-tag': 'tag',
+  'hljs-selector-id': 'property',
+  'hljs-selector-class': 'property',
+  'hljs-property': 'property',
+  'hljs-operator': 'operator',
+  'hljs-punctuation': 'punctuation',
+  'hljs-meta': 'keyword',
+  'hljs-params': 'variable',
+  'hljs-symbol': 'constant',
+};
 
 /** Map highlight.js CSS classes to our strict TokenType */
 function mapHljsClassToTokenType(className: string): TokenType {
-  const classMap: Record<string, TokenType> = {
-    'hljs-keyword': 'keyword',
-    'hljs-built_in': 'builtin',
-    'hljs-type': 'class-name',
-    'hljs-literal': 'boolean',
-    'hljs-number': 'number',
-    'hljs-string': 'string',
-    'hljs-regexp': 'regex',
-    'hljs-comment': 'comment',
-    'hljs-doctag': 'comment',
-    'hljs-function': 'function',
-    'hljs-title': 'function',
-    'hljs-class': 'class-name',
-    'hljs-variable': 'variable',
-    'hljs-template-variable': 'variable',
-    'hljs-attr': 'attr-name',
-    'hljs-attribute': 'attr-name',
-    'hljs-tag': 'tag',
-    'hljs-name': 'tag',
-    'hljs-selector-tag': 'tag',
-    'hljs-selector-id': 'property',
-    'hljs-selector-class': 'property',
-    'hljs-property': 'property',
-    'hljs-operator': 'operator',
-    'hljs-punctuation': 'punctuation',
-    'hljs-meta': 'keyword',
-    'hljs-params': 'variable',
-    'hljs-symbol': 'constant',
-  };
-
   // Find the first matching class
   const classes = className.split(' ');
   for (const cls of classes) {
-    if (classMap[cls]) {
-      return classMap[cls];
+    if (HLJS_CLASS_MAP[cls]) {
+      return HLJS_CLASS_MAP[cls];
     }
   }
   return 'plain';

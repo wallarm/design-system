@@ -24,6 +24,7 @@ const SUPPORTED_LANGUAGES = [
   'java',
   'c',
   'cpp',
+  'http',
 ] as const satisfies readonly ShikiLanguage[];
 
 /** Map Shiki token scopes to our strict TokenType */

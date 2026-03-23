@@ -544,6 +544,57 @@ export const HTMLWithHighlightJs: StoryFn<typeof meta> = () => (
   </CodeSnippetAdapterProvider>
 );
 
+const httpRequestCode = `GET /api/v2/users?page=1&limit=20 HTTP/1.1
+Host: api.wallarm.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9
+Content-Type: application/json
+Accept: application/json
+User-Agent: WallarmSDK/2.0
+Cache-Control: no-cache`;
+
+/**
+ * HTTP request with Prism syntax highlighting.
+ * Highlights HTTP method, URL, version, header names and values.
+ */
+export const HTTPRequestWithPrism: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
+    <CodeSnippetRoot code={httpRequestCode} language='http'>
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);
+
+const httpResponseCode = `HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-Request-Id: abc-123-def-456
+Cache-Control: no-store
+
+{
+    "users": [
+        { "id": 1, "name": "Alice" },
+        { "id": 2, "name": "Bob" }
+    ],
+    "total": 42
+}`;
+
+/**
+ * HTTP response with Shiki syntax highlighting.
+ * Highlights status line, headers, and embedded JSON body.
+ */
+export const HTTPResponseWithShiki: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot code={httpResponseCode} language='http'>
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);
+
 /**
  * Header with a simple title.
  */

@@ -14,7 +14,8 @@ export type PrismLanguage =
   | 'go'
   | 'sql'
   | 'yaml'
-  | 'markdown';
+  | 'markdown'
+  | 'http';
 
 export type ShikiLanguage =
   | 'javascript'
@@ -35,7 +36,8 @@ export type ShikiLanguage =
   | 'rust'
   | 'java'
   | 'c'
-  | 'cpp';
+  | 'cpp'
+  | 'http';
 
 export type HighlightJsLanguage =
   | 'javascript'
@@ -47,7 +49,8 @@ export type HighlightJsLanguage =
   | 'css'
   | 'python'
   | 'go'
-  | 'sql';
+  | 'sql'
+  | 'http';
 
 export type PlainLanguage = 'text' | 'plain';
 
