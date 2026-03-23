@@ -1,3 +1,7 @@
+## <small>0.14.3 (2026-03-23)</small>
+
+* fix: filter bar vertical jump when adding filters [AS-687] (#51) ([240f47a](https://github.com/wallarm/design-system/commit/240f47a)), closes [#51](https://github.com/wallarm/design-system/issues/51)
+
 ## <small>0.14.2 (2026-03-20)</small>
 
 * fix: FilterInput jump, dropdown max-height, table sort scroll [AS-685] (#50) ([ecf216a](https://github.com/wallarm/design-system/commit/ecf216a)), closes [#50](https://github.com/wallarm/design-system/issues/50)
