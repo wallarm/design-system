@@ -21,7 +21,7 @@ const codeSnippetRootVariants = cva(
     'bg-component-code-snippet-bg',
     'rounded-6',
     'font-mono',
-    'text-text-primary',
+    'text-syntax-no-syntax',
     'overflow-hidden',
     'flex flex-col',
     '[&::selection]:bg-[var(--color-syntax-highlight-selected-highlight)]',
@@ -33,13 +33,13 @@ const codeSnippetRootVariants = cva(
   {
     variants: {
       size: {
-        sm: 'text-xs',
+        sm: 'text-xs leading-sm',
         md: 'text-sm',
-        lg: 'text-base',
+        lg: 'text-base leading-sm',
       },
     },
     defaultVariants: {
-      size: 'md',
+      size: 'sm',
     },
   },
 );
@@ -73,7 +73,7 @@ export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippe
 export const CodeSnippetRoot = <TLanguage extends string = string>({
   code,
   language = 'text' as TLanguage,
-  size = 'md',
+  size = 'sm',
   lines = {},
   startingLineNumber = 1,
   wrapLines: initialWrapLines = false,
@@ -148,7 +148,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       language,
       tokens,
       isLoading,
-      size: (size ?? 'md') as CodeSnippetSize,
+      size: (size ?? 'sm') as CodeSnippetSize,
       wrapLines,
       startingLineNumber,
       inlineGutter: false,
