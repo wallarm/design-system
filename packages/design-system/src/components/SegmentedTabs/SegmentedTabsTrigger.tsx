@@ -29,7 +29,7 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
         segmentedControlItemClassNamesBase,
         'group z-1',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:px-20',
-        '[&:has([data-slot=segmented-tabs-trigger-button])]:overflow-hidden',
+        '[&:has([data-slot=segmented-tabs-trigger-button])]:[clip-path:inset(-4px_0px_-4px_0px)]',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:before:absolute',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:before:right-0',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:before:w-32',
@@ -67,16 +67,6 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
 
         // selected text
         'data-selected:text-text-primary',
-
-        // // selected states
-        // '[&[data-selected]_[data-slot=segmented-tabs-trigger-button]]:bg-component-outline-button-bg',
-        // '[&[data-selected]_[data-slot=segmented-tabs-trigger-button][data-state=open]]:bg-bg-primary',
-        // '[&[data-selected]_[data-slot=segmented-tabs-trigger-button]:hover]:bg-bg-primary',
-        //
-        // // unselected states
-        // '[&:not([data-selected])_[data-slot=segmented-tabs-trigger-button]:not(:hover)]:bg-bg-primary',
-        // '[&:not([data-selected])_[data-slot=segmented-tabs-trigger-button]:hover]:bg-component-outline-button-bg',
-        // '[&:not([data-selected])_[data-slot=segmented-tabs-trigger-button][data-state=open]]:bg-component-outline-button-bg',
       )}
       value={value}
       disabled={disabled}
