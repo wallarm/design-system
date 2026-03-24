@@ -1,3 +1,7 @@
+## 0.16.0 (2026-03-24)
+
+* feat(select): export createListCollection from ark-ui (#55) ([b32fcb7](https://github.com/wallarm/design-system/commit/b32fcb7)), closes [#55](https://github.com/wallarm/design-system/issues/55)
+
 ## 0.15.0 (2026-03-24)
 
 * feat(segmented-tabs): add indicator dot prop [AS-669] (#54) ([686bae0](https://github.com/wallarm/design-system/commit/686bae0)), closes [#54](https://github.com/wallarm/design-system/issues/54)
