@@ -1,3 +1,7 @@
+## 0.15.0 (2026-03-24)
+
+* feat(segmented-tabs): add indicator dot prop [AS-669] (#54) ([686bae0](https://github.com/wallarm/design-system/commit/686bae0)), closes [#54](https://github.com/wallarm/design-system/issues/54)
+
 ## <small>0.14.4 (2026-03-23)</small>
 
 * fix: consistent 24px height for FilterInput elements [AS-687] (#52) ([fd0abc3](https://github.com/wallarm/design-system/commit/fd0abc3)), closes [#52](https://github.com/wallarm/design-system/issues/52)
