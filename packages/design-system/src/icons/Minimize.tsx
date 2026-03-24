@@ -38,4 +38,4 @@ export const Minimize: FC<SvgIconProps> = props => (
   </SvgIcon>
 );
 
-Minimize.displayName = 'Minimize';
+Minimize.displayName = 'MinimizeIcon';

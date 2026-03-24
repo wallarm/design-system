@@ -38,4 +38,4 @@ export const Maximize: FC<SvgIconProps> = props => (
   </SvgIcon>
 );
 
-Maximize.displayName = 'Maximize';
+Maximize.displayName = 'MaximizeIcon';

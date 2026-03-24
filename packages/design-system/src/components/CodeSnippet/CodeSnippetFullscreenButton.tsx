@@ -3,6 +3,7 @@ import { Maximize } from '../../icons/Maximize';
 import { Minimize } from '../../icons/Minimize';
 import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
+import { Kbd } from '../Kbd';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useCodeSnippet } from './hooks';
 
@@ -32,7 +33,7 @@ export const CodeSnippetFullscreenButton: FC<CodeSnippetFullscreenButtonProps> =
           variant='ghost'
           color='neutral'
           size='small'
-          aria-label={isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}
+          aria-label={isFullscreen ? 'Exit full screen' : 'Enter full screen'}
           data-testid={testId}
           {...props}
           onClick={handleClick}
@@ -40,7 +41,15 @@ export const CodeSnippetFullscreenButton: FC<CodeSnippetFullscreenButtonProps> =
           {isFullscreen ? <Minimize /> : <Maximize />}
         </Button>
       </TooltipTrigger>
-      <TooltipContent>{isFullscreen ? 'Exit fullscreen' : 'Fullscreen'}</TooltipContent>
+      <TooltipContent>
+        {isFullscreen ? (
+          <>
+            Exit full screen &nbsp;<Kbd>ESC</Kbd>
+          </>
+        ) : (
+          'Enter full screen'
+        )}
+      </TooltipContent>
     </Tooltip>
   );
 };
