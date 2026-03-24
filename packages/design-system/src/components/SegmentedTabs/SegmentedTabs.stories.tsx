@@ -232,6 +232,25 @@ export const WithSeparator: Story = () => (
   </SegmentedTabs>
 );
 
+export const WithIndicator: Story = () => (
+  <SegmentedTabs defaultValue='all'>
+    <SegmentedTabsList>
+      <SegmentedTabsTrigger value='all'>All Attacks</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='critical' indicator>
+        Critical
+      </SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='api'>API Abuse</SegmentedTabsTrigger>
+      <SegmentedTabsTrigger value='custom' indicator>
+        Custom View
+      </SegmentedTabsTrigger>
+    </SegmentedTabsList>
+    <SegmentedTabsContent value='all'>All Attacks Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='critical'>Critical Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='api'>API Abuse Content</SegmentedTabsContent>
+    <SegmentedTabsContent value='custom'>Custom View Content</SegmentedTabsContent>
+  </SegmentedTabs>
+);
+
 export const FullWidth: Story = () => (
   <div className='min-w-800'>
     <SegmentedTabs defaultValue='react' fullWidth>

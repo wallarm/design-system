@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
 export const segmentedControlVariants = cva(
-  'flex bg-bg-primary p-4 gap-0 items-center rounded-12',
+  'overflow-visible flex bg-bg-primary p-4 gap-0 items-center rounded-12',
   {
     variants: {
       fullWidth: {

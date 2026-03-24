@@ -9,6 +9,8 @@ export interface SegmentedTabsTriggerProps {
   value: string;
   disabled?: boolean;
   asChild?: boolean;
+  /** Show a small brand-colored dot indicator next to the tab label */
+  indicator?: boolean;
 }
 
 export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
@@ -16,6 +18,7 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
   value,
   disabled = false,
   asChild = false,
+  indicator = false,
 }) => {
   const testId = useTestId('trigger');
 
@@ -26,11 +29,12 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
         segmentedControlItemClassNamesBase,
         'group z-1',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:px-20',
-        '[&:has([data-slot=segmented-tabs-trigger-button])]:overflow-hidden',
+        '[&:has([data-slot=segmented-tabs-trigger-button])]:overflow-visible',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:before:absolute',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:before:right-0',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:before:w-32',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:before:h-24',
+        '[&:has([data-slot=segmented-tabs-trigger-button])]:before:rounded-r-8',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:before:transition-opacity',
         '[&:has([data-slot=segmented-tabs-trigger-button])]:before:opacity-0',
         '[&:has([data-slot=segmented-tabs-trigger-button]):hover]:before:opacity-100',
@@ -64,22 +68,19 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
 
         // selected text
         'data-selected:text-text-primary',
-
-        // // selected states
-        // '[&[data-selected]_[data-slot=segmented-tabs-trigger-button]]:bg-component-outline-button-bg',
-        // '[&[data-selected]_[data-slot=segmented-tabs-trigger-button][data-state=open]]:bg-bg-primary',
-        // '[&[data-selected]_[data-slot=segmented-tabs-trigger-button]:hover]:bg-bg-primary',
-        //
-        // // unselected states
-        // '[&:not([data-selected])_[data-slot=segmented-tabs-trigger-button]:not(:hover)]:bg-bg-primary',
-        // '[&:not([data-selected])_[data-slot=segmented-tabs-trigger-button]:hover]:bg-component-outline-button-bg',
-        // '[&:not([data-selected])_[data-slot=segmented-tabs-trigger-button][data-state=open]]:bg-component-outline-button-bg',
       )}
       value={value}
       disabled={disabled}
       asChild={asChild}
     >
       {children}
+      {indicator && (
+        <span
+          data-slot='segmented-tabs-indicator'
+          className='absolute -right-2 -top-2 hidden size-6 rounded-2 bg-icon-brand [[data-selected]>&]:block'
+          aria-hidden='true'
+        />
+      )}
     </ArkUiTabs.Trigger>
   );
 };
