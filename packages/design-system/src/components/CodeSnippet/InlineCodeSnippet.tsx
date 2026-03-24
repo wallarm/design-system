@@ -66,8 +66,10 @@ export const InlineCodeSnippet: FC<InlineCodeSnippetProps> = props => {
     ref,
     ...otherProps
   } = props;
-  const { isSupported, copied, tooltipOpen, onTooltipOpenChange, handleCopy } =
-    useCopyTooltip({ text: code, enabled: copyable });
+  const { isSupported, copied, tooltipOpen, onTooltipOpenChange, handleCopy } = useCopyTooltip({
+    text: code,
+    enabled: copyable,
+  });
   const Comp = asChild ? Slot : 'code';
 
   const isCopyable = copyable && isSupported;
@@ -94,7 +96,7 @@ export const InlineCodeSnippet: FC<InlineCodeSnippetProps> = props => {
   }
 
   return (
-    <Tooltip open={tooltipOpen} onOpenChange={onTooltipOpenChange}>
+    <Tooltip open={tooltipOpen} onOpenChange={onTooltipOpenChange} closeOnPointerDown={false}>
       <TooltipTrigger asChild>{codeElement}</TooltipTrigger>
       <TooltipContent>{copied ? 'Copied' : 'Click to copy'}</TooltipContent>
     </Tooltip>

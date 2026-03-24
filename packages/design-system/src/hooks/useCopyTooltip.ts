@@ -29,6 +29,10 @@ export function useCopyTooltip({
 
   const tooltipOpen = hovering || keepOpen;
 
+  const clearTimer = useCallback(() => {
+    clearTimeout(timerRef.current);
+  }, []);
+
   const onTooltipOpenChange = useCallback(
     (open: boolean) => {
       setHovering(open);
@@ -46,13 +50,34 @@ export function useCopyTooltip({
       navigator.clipboard.writeText(text);
       setCopied(true);
       setKeepOpen(true);
-      clearTimeout(timerRef.current);
+      clearTimer();
       timerRef.current = setTimeout(() => setKeepOpen(false), 2000);
     },
-    [enabled, text],
+    [enabled, text, clearTimer],
   );
 
-  useEffect(() => () => clearTimeout(timerRef.current), []);
+  // Dismiss "Copied" tooltip on click outside.
+  // Registered on next frame so the triggering pointerdown doesn't fire it.
+  useEffect(() => {
+    if (!keepOpen) return;
+    let listenerAdded = false;
+    const dismiss = () => {
+      setKeepOpen(false);
+      clearTimer();
+    };
+    const frame = requestAnimationFrame(() => {
+      document.addEventListener('pointerdown', dismiss);
+      listenerAdded = true;
+    });
+    return () => {
+      cancelAnimationFrame(frame);
+      if (listenerAdded) {
+        document.removeEventListener('pointerdown', dismiss);
+      }
+    };
+  }, [keepOpen, clearTimer]);
+
+  useEffect(() => clearTimer, [clearTimer]);
 
   return {
     isSupported: isClipboardSupported,
