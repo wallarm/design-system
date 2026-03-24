@@ -68,8 +68,6 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
         // selected text
         'data-selected:text-text-primary',
 
-        'relative',
-
         // // selected states
         // '[&[data-selected]_[data-slot=segmented-tabs-trigger-button]]:bg-component-outline-button-bg',
         // '[&[data-selected]_[data-slot=segmented-tabs-trigger-button][data-state=open]]:bg-bg-primary',
