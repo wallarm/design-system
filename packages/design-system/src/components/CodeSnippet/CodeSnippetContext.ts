@@ -51,6 +51,9 @@ export type CodeSnippetContextValue<TLanguage extends string = string> = {
   // Line features
   lines: Map<number, LineConfig>;
 
+  // Line count
+  totalLines: number;
+
   // Expand/collapse
   isExpanded: boolean;
   maxLines: number;
@@ -67,6 +70,13 @@ export type CodeSnippetContextValue<TLanguage extends string = string> = {
   // Adapter
   adapter: SyntaxAdapter<TLanguage> | null;
 };
+
+/**
+ * Minimum number of hidden lines required to show the "Show more" button.
+ * If fewer lines are hidden, all lines are shown instead — collapsing
+ * 1–2 lines behind a button adds clutter without saving meaningful space.
+ */
+export const MIN_HIDDEN_LINES_THRESHOLD = 3;
 
 export const CodeSnippetContext = createContext<CodeSnippetContextValue | null>(null);
 

@@ -2,15 +2,15 @@ import type { FC } from 'react';
 import { ChevronDown } from '../../../icons/ChevronDown';
 import { ChevronUp } from '../../../icons/ChevronUp';
 import { Button } from '../../Button';
+import { MIN_HIDDEN_LINES_THRESHOLD } from '../CodeSnippetContext';
 import { useCodeSnippet } from '../hooks';
 
 export const ShowMoreButton: FC = () => {
-  const { code, tokens, maxLines, isExpanded, setIsExpanded } = useCodeSnippet();
+  const { totalLines, maxLines, isExpanded, setIsExpanded } = useCodeSnippet();
 
-  const totalLines = tokens?.length ?? code.split('\n').length;
   const hiddenLines = totalLines - maxLines;
 
-  if (maxLines <= 0 || hiddenLines <= 0) return null;
+  if (maxLines <= 0 || hiddenLines < MIN_HIDDEN_LINES_THRESHOLD) return null;
 
   return (
     <div data-slot='code-snippet-show-more' className='flex h-36 items-center justify-center px-6'>

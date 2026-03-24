@@ -722,12 +722,39 @@ Cache-Control: no-cache`;
  * When `maxLines` is set, only the first N lines are shown.
  * The button shows the count of hidden lines and toggles expand/collapse.
  */
+const showMoreThresholdCode = `Host: inventory.example.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
+Referer: https://app.example.com/dashboard
+Accept: application/json, text/plain, */*
+Accept-Language: en-US,en;q=0.9
+Connection: keep-alive
+Cache-Control: no-cache
+Authorization: Bearer token123
+X-Request-ID: abc-def-ghi`;
+
+/**
+ * Show more / show less with threshold behavior.
+ * First snippet (12 lines, maxLines=7) shows the button (5 hidden).
+ * Second snippet (9 lines, maxLines=7) hides only 2 lines — below
+ * the threshold of 3, so all lines are shown without the button.
+ */
 export const ShowMore: StoryFn<typeof meta> = () => (
-  <div style={{ width: '500px' }}>
-    <CodeSnippetRoot code={showMoreCode} language='text' maxLines={7}>
-      <CodeSnippetContent>
-        <CodeSnippetCode />
-      </CodeSnippetContent>
-    </CodeSnippetRoot>
+  <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '500px' }}>
+    <div>
+      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>12 lines, maxLines=7 — 5 hidden, button shown</p>
+      <CodeSnippetRoot code={showMoreCode} language='text' maxLines={7}>
+        <CodeSnippetContent>
+          <CodeSnippetCode />
+        </CodeSnippetContent>
+      </CodeSnippetRoot>
+    </div>
+    <div>
+      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>9 lines, maxLines=7 — 2 hidden, below threshold, no button</p>
+      <CodeSnippetRoot code={showMoreThresholdCode} language='text' maxLines={7}>
+        <CodeSnippetContent>
+          <CodeSnippetCode />
+        </CodeSnippetContent>
+      </CodeSnippetRoot>
+    </div>
   </div>
 );

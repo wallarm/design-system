@@ -41,11 +41,11 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
 }) => {
   const testId = useTestId('content');
   const context = useCodeSnippet();
-  const { wrapLines, lines, tokens, code, startingLineNumber, size } = context;
+  const { wrapLines, lines, totalLines, startingLineNumber, size } = context;
 
   const hasHighlights = Array.from(lines.values()).some(config => config.color != null);
   const hasAnyPrefix = Array.from(lines.values()).some(config => config.prefix != null);
-  const lineCount = tokens?.length ?? code.split('\n').length;
+  const lineCount = totalLines;
   const lineHeightClass = SIZE_LINE_HEIGHT_CLASSES[size];
 
   // Separate line numbers from other children
