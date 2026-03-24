@@ -10,4 +10,4 @@ export const CalendarClock: FC<SvgIconProps> = props => (
   </SvgIcon>
 );
 
-CalendarClock.displayName = 'CalendarClock';
+CalendarClock.displayName = 'CalendarClockIcon';

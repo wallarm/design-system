@@ -10,4 +10,4 @@ export const CalendarCheck2: FC<SvgIconProps> = props => (
   </SvgIcon>
 );
 
-CalendarCheck2.displayName = 'CalendarCheck2';
+CalendarCheck2.displayName = 'CalendarCheck2Icon';
