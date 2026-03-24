@@ -5,9 +5,9 @@ import { LINE_COLOR_STYLES, SIZE_LINE_HEIGHT_CLASSES } from '../lib/lineStyles';
 
 /** Internal component for rendering highlight backgrounds */
 export const CodeSnippetHighlights: FC = () => {
-  const { tokens, code, startingLineNumber, lines, size } = useCodeSnippet();
+  const { totalLines, startingLineNumber, lines, size } = useCodeSnippet();
 
-  const lineCount = tokens?.length ?? code.split('\n').length;
+  const lineCount = totalLines;
   const lineHeightClass = SIZE_LINE_HEIGHT_CLASSES[size];
 
   return (

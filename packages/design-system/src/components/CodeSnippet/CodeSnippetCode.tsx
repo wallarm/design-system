@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
 import { useTestId } from '../../utils/testId';
+import { MIN_HIDDEN_LINES_THRESHOLD } from './CodeSnippetContext';
 import { useCodeSnippet } from './hooks';
 import { CodeContent, CodeLine, TokenizedCodeLine } from './internal';
 import { SIZE_LINE_HEIGHT_CLASSES } from './lib/lineStyles';
@@ -21,12 +22,14 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
     size,
     inlineGutter,
     showLineNumbers,
+    totalLines,
     maxLines,
     isExpanded,
   } = useCodeSnippet();
 
   const lineHeightClass = SIZE_LINE_HEIGHT_CLASSES[size];
-  const shouldClip = maxLines > 0 && !isExpanded;
+  const hiddenLines = totalLines - maxLines;
+  const shouldClip = maxLines > 0 && !isExpanded && hiddenLines >= MIN_HIDDEN_LINES_THRESHOLD;
 
   // Show loading state or plain code if tokens not ready
   if (isLoading || !tokens) {

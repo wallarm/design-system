@@ -142,6 +142,8 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     onCopy?.(code);
   }, [code, onCopy]);
 
+  const totalLines = tokens?.length ?? code.split('\n').length;
+
   const contextValue = useMemo<CodeSnippetContextValue<TLanguage>>(
     () => ({
       code,
@@ -154,6 +156,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       inlineGutter: false,
       showLineNumbers: false,
       lines: new Map(Object.entries(lines).map(([k, v]) => [Number(k), v])),
+      totalLines,
       isExpanded,
       maxLines,
       isFullscreen,
@@ -172,6 +175,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       wrapLines,
       startingLineNumber,
       lines,
+      totalLines,
       isExpanded,
       maxLines,
       isFullscreen,
