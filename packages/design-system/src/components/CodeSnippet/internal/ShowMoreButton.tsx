@@ -13,7 +13,7 @@ export const ShowMoreButton: FC = () => {
   if (maxLines <= 0 || hiddenLines <= 0) return null;
 
   return (
-    <div data-slot='code-snippet-show-more' className='flex h-36 items-center justify-center'>
+    <div data-slot='code-snippet-show-more' className='flex h-36 items-center justify-center px-6'>
       <Button
         variant='ghost'
         color='neutral'
