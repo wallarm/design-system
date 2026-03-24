@@ -15,7 +15,7 @@ export const CodeSnippetTitle: FC<CodeSnippetTitleProps> = ({ className, ref, ..
       data-slot='code-snippet-title'
       data-testid={testId}
       className={cn(
-        'inline-flex items-center text-xs font-medium font-sans text-text-primary px-24',
+        'inline-flex items-center text-xs font-medium font-sans text-text-primary px-12',
         className,
       )}
       {...props}

@@ -14,11 +14,7 @@ export const CodeSnippetHeader: FC<CodeSnippetHeaderProps> = ({ className, ref, 
       ref={ref}
       data-slot='code-snippet-header'
       data-testid={testId}
-      className={cn(
-        'flex h-32 relative border-b border-border-primary-light',
-        '[&>[data-slot=code-snippet-actions]]:ml-auto [&>[data-slot=code-snippet-actions]]:px-6 [&>[data-slot=code-snippet-actions]]:rounded-tr-6',
-        className,
-      )}
+      className={cn('flex h-32 relative border-b border-border-primary-light', className)}
       {...props}
     />
   );

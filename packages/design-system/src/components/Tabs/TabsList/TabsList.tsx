@@ -31,10 +31,11 @@ const tabsListVariants = cva(
 );
 
 export interface TabsListProps {
+  className?: string;
   children: ReactNode;
 }
 
-export const TabsList: FC<TabsListProps> = ({ children }) => {
+export const TabsList: FC<TabsListProps> = ({ className, children }) => {
   const testId = useTestId('list');
   const { scrollRef, size } = useTabsSharedContext();
   const listRef = useRef<HTMLDivElement>(null);
@@ -99,7 +100,7 @@ export const TabsList: FC<TabsListProps> = ({ children }) => {
     <div className={cn('relative')} data-slot='tabs-list' data-testid={testId}>
       {hasOverflow && <TabsListScrollButton direction='left' visible={canScrollLeft} />}
       <TabsListScrollArea>
-        <ArkUiTabs.List ref={listRef} className={cn(tabsListVariants({ size }))}>
+        <ArkUiTabs.List ref={listRef} className={cn(tabsListVariants({ size }), className)}>
           {children}
           <TabsListIndicator />
         </ArkUiTabs.List>
