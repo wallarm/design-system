@@ -5,11 +5,11 @@ import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-const segmentedControlVariants = cva('', {
+const segmentedControlVariants = cva('relative', {
   variants: {
     fullWidth: {
-      true: 'relative w-full [&_[data-part=trigger]]:w-full',
-      false: 'relative',
+      true: 'w-full [&_[data-part=trigger]]:w-full',
+      false: '',
     },
   },
   defaultVariants: {
