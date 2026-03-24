@@ -85,7 +85,7 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
       {hasGutter && (
         <div
           data-slot='code-snippet-gutter'
-          className='sticky left-0 z-20 flex shrink-0 py-8 -my-8 mr-8 bg-bg-primary'
+          className='sticky left-0 z-20 flex shrink-0 py-8 -my-8 mr-8 bg-bg-primary [contain:paint]'
         >
           {hasHighlights && (
             <ColorStickColumn
