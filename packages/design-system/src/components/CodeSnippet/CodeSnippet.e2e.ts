@@ -178,31 +178,34 @@ test.describe('CodeSnippet', () => {
     test('Fullscreen button - enters and exits fullscreen', async ({ page }) => {
       await codeSnippetStory.goto(page, 'With Tabs And Actions');
 
-      const fullscreenButton = page.getByRole('button', { name: 'Fullscreen' });
+      const fullscreenButton = page.getByRole('button', { name: 'Enter full screen' });
       await expect(fullscreenButton).toBeVisible();
       await fullscreenButton.click();
 
-      // Should now show "Exit fullscreen" button
-      const exitButton = page.getByRole('button', { name: 'Exit fullscreen' });
+      // Should now show "Exit full screen" button
+      const exitButton = page.getByRole('button', { name: 'Exit full screen' });
       await expect(exitButton).toBeVisible();
 
       // Press Escape to exit
       await page.keyboard.press('Escape');
 
-      // Should be back to "Fullscreen" button
-      await expect(page.getByRole('button', { name: 'Fullscreen' })).toBeVisible();
+      // Should be back to "Enter full screen" button
+      await expect(page.getByRole('button', { name: 'Enter full screen' })).toBeVisible();
     });
 
     test('Show more/less - expands and collapses', async ({ page }) => {
       await codeSnippetStory.goto(page, 'Show More');
 
+      // Scope to the first snippet (12 lines, maxLines=7)
+      const firstSnippet = page.locator('[data-slot="code-snippet"]').first();
+
       // Should show "Show more (5 lines)" button (12 total - 7 maxLines = 5 hidden)
-      const showMoreButton = page.getByRole('button', { name: /Show more/ });
+      const showMoreButton = firstSnippet.getByRole('button', { name: /Show more/ });
       await expect(showMoreButton).toBeVisible();
       await expect(showMoreButton).toContainText('5 lines');
 
       // Count visible code lines before expanding
-      const codeLines = page.locator('code:not(#error-stack) > div');
+      const codeLines = firstSnippet.locator('code:not(#error-stack) > div');
       await expect(codeLines).toHaveCount(7);
 
       // Click to expand
@@ -212,12 +215,19 @@ test.describe('CodeSnippet', () => {
       await expect(codeLines).toHaveCount(12);
 
       // Button should now say "Show less"
-      const showLessButton = page.getByRole('button', { name: /Show less/ });
+      const showLessButton = firstSnippet.getByRole('button', { name: /Show less/ });
       await expect(showLessButton).toBeVisible();
 
       // Click to collapse
       await showLessButton.click();
       await expect(codeLines).toHaveCount(7);
+
+      // Second snippet (9 lines, maxLines=7) should NOT show "Show more" button
+      // because only 2 lines would be hidden (below MIN_HIDDEN_LINES_THRESHOLD of 3)
+      const secondSnippet = page.locator('[data-slot="code-snippet"]').nth(1);
+      await expect(secondSnippet.getByRole('button', { name: /Show more/ })).not.toBeVisible();
+      const secondCodeLines = secondSnippet.locator('code:not(#error-stack) > div');
+      await expect(secondCodeLines).toHaveCount(9);
     });
 
     test('Tab switching - changes displayed code', async ({ page }) => {
