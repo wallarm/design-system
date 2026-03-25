@@ -81,10 +81,10 @@ test.describe('Component: Dialog', () => {
       await dialogStory.goto(page, 'Basic');
       await openDialog(page);
 
-      // Click on the overlay area (left side, away from the dialog which slides from right)
-      await page
-        .locator('[data-scope="dialog"][data-part="backdrop"]')
-        .click({ force: true, position: { x: 10, y: 10 } });
+      // Click outside the dialog content to trigger closeOnInteractOutside.
+      // Using page.mouse.click ensures a real pointer event that the dialog
+      // library can detect, unlike force-clicking the backdrop element.
+      await page.mouse.click(10, 10);
       await expect(getDialogContent(page)).toBeHidden();
     });
 

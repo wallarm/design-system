@@ -87,9 +87,10 @@ test.describe('Component: Drawer', () => {
       await drawerStory.goto(page, 'Basic');
       await openDrawer(page);
 
-      await page
-        .locator('[data-scope="dialog"][data-part="backdrop"]')
-        .click({ force: true, position: { x: 10, y: 10 } });
+      // Click outside the drawer content to trigger closeOnInteractOutside.
+      // Using page.mouse.click ensures a real pointer event that the dialog
+      // library can detect, unlike force-clicking the backdrop element.
+      await page.mouse.click(10, 10);
       await expect(getDrawerContent(page)).toBeHidden();
     });
 
