@@ -52,6 +52,7 @@ export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
 
         return null;
       })}
+      {isLoading && <TableLoadingState />}
       {virtualRows.length > 0 && (
         <Tr key='spacer-bottom'>
           <Td
@@ -64,7 +65,6 @@ export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
           />
         </Tr>
       )}
-      {isLoading && <TableLoadingState />}
     </TBody>
   );
 };
