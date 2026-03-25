@@ -91,7 +91,7 @@ test.describe('Component: Drawer', () => {
         '[data-scope="dialog"][data-part="backdrop"][data-state="open"]',
       );
       await backdrop.waitFor({ state: 'visible' });
-      await backdrop.click({ position: { x: 10, y: 10 } });
+      await backdrop.click({ position: { x: 10, y: 10 }, force: true });
       await expect(getDrawerContent(page)).toBeHidden();
     });
 
