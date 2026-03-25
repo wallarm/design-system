@@ -81,10 +81,11 @@ test.describe('Component: Dialog', () => {
       await dialogStory.goto(page, 'Basic');
       await openDialog(page);
 
-      // Click outside the dialog content to trigger closeOnInteractOutside.
-      // Using page.mouse.click ensures a real pointer event that the dialog
-      // library can detect, unlike force-clicking the backdrop element.
-      await page.mouse.click(10, 10);
+      // Click the positioner layer outside the dialog content.
+      // Ark UI detects interact-outside on the positioner (not the backdrop),
+      // so we must click this element at a position away from the content.
+      const positioner = page.locator('[data-scope="dialog"][data-part="positioner"]');
+      await positioner.click({ position: { x: 5, y: 5 } });
       await expect(getDialogContent(page)).toBeHidden();
     });
 

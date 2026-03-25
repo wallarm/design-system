@@ -87,10 +87,11 @@ test.describe('Component: Drawer', () => {
       await drawerStory.goto(page, 'Basic');
       await openDrawer(page);
 
-      // Click outside the drawer content to trigger closeOnInteractOutside.
-      // Using page.mouse.click ensures a real pointer event that the dialog
-      // library can detect, unlike force-clicking the backdrop element.
-      await page.mouse.click(10, 10);
+      // Click the positioner layer outside the drawer content.
+      // Ark UI detects interact-outside on the positioner (not the backdrop),
+      // so we must click this element at a position away from the content.
+      const positioner = page.locator('[data-scope="dialog"][data-part="positioner"]');
+      await positioner.click({ position: { x: 5, y: 5 } });
       await expect(getDrawerContent(page)).toBeHidden();
     });
 
