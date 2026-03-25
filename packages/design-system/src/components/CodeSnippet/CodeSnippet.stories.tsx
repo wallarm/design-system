@@ -741,7 +741,9 @@ X-Request-ID: abc-def-ghi`;
 export const ShowMore: StoryFn<typeof meta> = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '500px' }}>
     <div>
-      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>12 lines, maxLines=7 — 5 hidden, button shown</p>
+      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>
+        12 lines, maxLines=7 — 5 hidden, button shown
+      </p>
       <CodeSnippetRoot code={showMoreCode} language='text' maxLines={7}>
         <CodeSnippetContent>
           <CodeSnippetCode />
@@ -749,7 +751,9 @@ export const ShowMore: StoryFn<typeof meta> = () => (
       </CodeSnippetRoot>
     </div>
     <div>
-      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>9 lines, maxLines=7 — 2 hidden, below threshold, no button</p>
+      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>
+        9 lines, maxLines=7 — 2 hidden, below threshold, no button
+      </p>
       <CodeSnippetRoot code={showMoreThresholdCode} language='text' maxLines={7}>
         <CodeSnippetContent>
           <CodeSnippetCode />

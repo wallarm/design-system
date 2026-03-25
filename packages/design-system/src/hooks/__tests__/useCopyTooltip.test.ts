@@ -108,9 +108,7 @@ describe('useCopyTooltip', () => {
   });
 
   it('does not copy when enabled is false', () => {
-    const { result } = renderHook(() =>
-      useCopyTooltip({ text: 'hello', enabled: false }),
-    );
+    const { result } = renderHook(() => useCopyTooltip({ text: 'hello', enabled: false }));
 
     act(() => {
       result.current.handleCopy(mockEvent);
@@ -149,10 +147,9 @@ describe('useCopyTooltip', () => {
   });
 
   it('copies updated text when text prop changes', () => {
-    const { result, rerender } = renderHook(
-      ({ text }) => useCopyTooltip({ text }),
-      { initialProps: { text: 'first' } },
-    );
+    const { result, rerender } = renderHook(({ text }) => useCopyTooltip({ text }), {
+      initialProps: { text: 'first' },
+    });
 
     rerender({ text: 'second' });
 

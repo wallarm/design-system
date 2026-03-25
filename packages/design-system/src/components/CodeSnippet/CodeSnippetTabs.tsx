@@ -28,7 +28,9 @@ export const CodeSnippetTabs: FC<CodeSnippetTabsProps> = ({
       unmountOnExit={false}
       data-testid={testId}
     >
-      <TabsList className='pl-8 pr-0 border-b-0 [&_[data-part=indicator]]:bottom-0'>{children}</TabsList>
+      <TabsList className='pl-8 pr-0 border-b-0 [&_[data-part=indicator]]:bottom-0'>
+        {children}
+      </TabsList>
     </Tabs>
   );
 };
