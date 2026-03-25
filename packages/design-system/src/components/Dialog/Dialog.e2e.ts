@@ -81,11 +81,13 @@ test.describe('Component: Dialog', () => {
       await dialogStory.goto(page, 'Basic');
       await openDialog(page);
 
-      // Click the positioner layer outside the dialog content.
-      // Ark UI detects interact-outside on the positioner (not the backdrop),
-      // so we must click this element at a position away from the content.
-      const positioner = page.locator('[data-scope="dialog"][data-part="positioner"]');
-      await positioner.click({ position: { x: 5, y: 5 } });
+      // Dispatch a pointerdown event on the backdrop to trigger Ark UI's
+      // closeOnInteractOutside. Normal clicks are blocked because <html>
+      // intercepts pointer events when a modal dialog is open (inert).
+      // dispatchEvent bypasses Playwright's actionability checks entirely.
+      await page
+        .locator('[data-scope="dialog"][data-part="backdrop"]')
+        .dispatchEvent('pointerdown');
       await expect(getDialogContent(page)).toBeHidden();
     });
 
