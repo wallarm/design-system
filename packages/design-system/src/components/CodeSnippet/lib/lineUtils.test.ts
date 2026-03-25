@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import type { Token } from '../adapters/types';
+import { MIN_HIDDEN_LINES_THRESHOLD } from '../CodeSnippetContext';
 import { LINE_COLOR_STYLES, LINE_TEXT_STYLE_CLASSES } from './lineStyles';
 import { getLineTextStyles, splitTextByRanges, splitTokensByRanges } from './lineUtils';
 
@@ -98,6 +99,44 @@ describe('splitTokensByRanges', () => {
       },
       { content: 'o', type: 'string', className: 'custom-class' },
     ]);
+  });
+});
+
+describe('MIN_HIDDEN_LINES_THRESHOLD (ShowMore visibility)', () => {
+  // Mirrors the condition in ShowMoreButton:
+  // if (maxLines <= 0 || hiddenLines < MIN_HIDDEN_LINES_THRESHOLD) return null;
+  function shouldShowButton(totalLines: number, maxLines: number): boolean {
+    const hiddenLines = totalLines - maxLines;
+    return maxLines > 0 && hiddenLines >= MIN_HIDDEN_LINES_THRESHOLD;
+  }
+
+  it('shows button when hidden lines >= threshold', () => {
+    // 12 total, 7 max → 5 hidden (>= 3)
+    expect(shouldShowButton(12, 7)).toBe(true);
+  });
+
+  it('shows button when hidden lines equal threshold', () => {
+    // 10 total, 7 max → 3 hidden (= 3)
+    expect(shouldShowButton(10, 7)).toBe(true);
+  });
+
+  it('hides button when hidden lines below threshold', () => {
+    // 9 total, 7 max → 2 hidden (< 3)
+    expect(shouldShowButton(9, 7)).toBe(false);
+  });
+
+  it('hides button when hidden lines are zero', () => {
+    // 7 total, 7 max → 0 hidden
+    expect(shouldShowButton(7, 7)).toBe(false);
+  });
+
+  it('hides button when maxLines is 0 (disabled)', () => {
+    expect(shouldShowButton(12, 0)).toBe(false);
+  });
+
+  it('hides button when totalLines less than maxLines', () => {
+    // 5 total, 7 max → -2 hidden
+    expect(shouldShowButton(5, 7)).toBe(false);
   });
 });
 
