@@ -87,9 +87,11 @@ test.describe('Component: Drawer', () => {
       await drawerStory.goto(page, 'Basic');
       await openDrawer(page);
 
-      await page
-        .locator('[data-scope="dialog"][data-part="backdrop"]')
-        .click({ force: true, position: { x: 10, y: 10 } });
+      const backdrop = page.locator(
+        '[data-scope="dialog"][data-part="backdrop"][data-state="open"]',
+      );
+      await backdrop.waitFor({ state: 'visible' });
+      await backdrop.click({ position: { x: 10, y: 10 } });
       await expect(getDrawerContent(page)).toBeHidden();
     });
 

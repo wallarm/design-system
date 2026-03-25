@@ -81,10 +81,11 @@ test.describe('Component: Dialog', () => {
       await dialogStory.goto(page, 'Basic');
       await openDialog(page);
 
-      // Click on the overlay area (left side, away from the dialog which slides from right)
-      await page
-        .locator('[data-scope="dialog"][data-part="backdrop"]')
-        .click({ force: true, position: { x: 10, y: 10 } });
+      const backdrop = page.locator(
+        '[data-scope="dialog"][data-part="backdrop"][data-state="open"]',
+      );
+      await backdrop.waitFor({ state: 'visible' });
+      await backdrop.click({ position: { x: 10, y: 10 } });
       await expect(getDialogContent(page)).toBeHidden();
     });
 
