@@ -29,6 +29,7 @@ VERBOSE=false
 USE_DOCKER=false
 UPDATE_SNAPSHOTS=false
 FAILED_ONLY=false
+OPEN_REPORT=false
 PLAYWRIGHT_ARGS=""
 
 # Help function
@@ -50,6 +51,7 @@ OPTIONS:
     -d, --docker    Use Docker for testing (optional isolation)
     --update        Update screenshots (only in Docker mode)
     --failed        Run only previously failed tests
+    --report        Open HTML report after tests complete (auto-opens on failure)
     --no-cleanup    Don't cleanup containers after tests (Docker mode)
 
 PLAYWRIGHT_ARGS:
@@ -96,6 +98,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         --failed)
             FAILED_ONLY=true
+            shift
+            ;;
+        --report)
+            OPEN_REPORT=true
             shift
             ;;
         --no-cleanup)
@@ -282,6 +288,28 @@ run_docker_tests() {
     fi
 }
 
+# Function to open Playwright HTML report
+open_report() {
+    local report_dir=""
+    case $COMPONENT in
+        design-system|all)
+            report_dir="$ROOT_DIR/packages/design-system/playwright-report"
+            ;;
+    esac
+
+    if [[ -n "$report_dir" && -d "$report_dir" ]]; then
+        echo -e "${BLUE}📊 Opening Playwright HTML report...${NC}"
+        if [[ "$(uname)" == "Darwin" ]]; then
+            open "$report_dir/index.html" 2>/dev/null || \
+                pnpm --filter=@wallarm-org/design-system e2e:docker:report
+        else
+            pnpm --filter=@wallarm-org/design-system e2e:docker:report
+        fi
+    else
+        echo -e "${YELLOW}⚠️ No report found at $report_dir${NC}"
+    fi
+}
+
 # Main execution
 main() {
     # Export Playwright args for Docker containers
@@ -295,13 +323,26 @@ main() {
         exit 1
     fi
 
+    local test_exit_code=0
     if [[ "$USE_DOCKER" == "true" ]]; then
         # Docker mode - run in containers
-        run_docker_tests "$COMPONENT"
+        run_docker_tests "$COMPONENT" || test_exit_code=$?
     else
         # Local mode - check services are running and run locally
         check_local_services
-        run_local_tests "$COMPONENT"
+        run_local_tests "$COMPONENT" || test_exit_code=$?
+    fi
+
+    if [[ $test_exit_code -ne 0 ]]; then
+        echo -e "${RED}❌ E2E tests failed (exit code: $test_exit_code)${NC}"
+        echo -e "${YELLOW}💡 View diff report: pnpm e2e:docker:report${NC}"
+        # Auto-open report on failure
+        open_report
+        exit $test_exit_code
+    fi
+
+    if [[ "$OPEN_REPORT" == "true" ]]; then
+        open_report
     fi
 
     if [[ "$UPDATE_SNAPSHOTS" == "true" ]]; then
