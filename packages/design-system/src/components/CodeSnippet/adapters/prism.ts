@@ -5,18 +5,17 @@ import type { HighlightResult, PrismLanguage, SyntaxAdapter, Token, TokenType } 
 // This must be done before importing language components
 (typeof globalThis !== 'undefined' ? globalThis : window).Prism = Prism;
 
-// Track if additional languages have been loaded
-let languagesLoaded = false;
+// Cache the language-loading promise so all callers await the same imports
+let languagesPromise: Promise<void> | null = null;
 
 async function loadAdditionalLanguages() {
-  if (languagesLoaded) return;
-  languagesLoaded = true;
-
-  // Dynamically import additional languages
-  await Promise.all([
-    import('prismjs/components/prism-bash'),
-    import('prismjs/components/prism-http'),
-  ]);
+  if (!languagesPromise) {
+    languagesPromise = Promise.all([
+      import('prismjs/components/prism-bash'),
+      import('prismjs/components/prism-http'),
+    ]) as Promise<unknown> as Promise<void>;
+  }
+  return languagesPromise;
 }
 
 const SUPPORTED_LANGUAGES = [
