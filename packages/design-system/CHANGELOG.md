@@ -1,3 +1,11 @@
+## <small>0.16.2 (2026-03-26)</small>
+
+* fix: WSD-72 resolve Prism adapter race condition in React Strict Mode ([e8610c3](https://github.com/wallarm/design-system/commit/e8610c3))
+* 🖼️ Update screenshots ([53783d3](https://github.com/wallarm/design-system/commit/53783d3))
+* test: Icons screenshot tests [update-screenshots] ([813efd7](https://github.com/wallarm/design-system/commit/813efd7))
+* ci: open report on fail screenshot tests ([8ed6d57](https://github.com/wallarm/design-system/commit/8ed6d57))
+* ci: run E2E tests after screenshot update commits ([e881911](https://github.com/wallarm/design-system/commit/e881911))
+
 ## <small>0.16.1 (2026-03-26)</small>
 
 * fix: update theme tokens ([4c46375](https://github.com/wallarm/design-system/commit/4c46375))
