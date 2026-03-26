@@ -81,10 +81,13 @@ test.describe('Component: Dialog', () => {
       await dialogStory.goto(page, 'Basic');
       await openDialog(page);
 
-      // Click on the overlay area (left side, away from the dialog which slides from right)
+      // Dispatch a pointerdown event on the backdrop to trigger Ark UI's
+      // closeOnInteractOutside. Normal clicks are blocked because <html>
+      // intercepts pointer events when a modal dialog is open (inert).
+      // dispatchEvent bypasses Playwright's actionability checks entirely.
       await page
         .locator('[data-scope="dialog"][data-part="backdrop"]')
-        .click({ force: true, position: { x: 10, y: 10 } });
+        .dispatchEvent('pointerdown');
       await expect(getDialogContent(page)).toBeHidden();
     });
 

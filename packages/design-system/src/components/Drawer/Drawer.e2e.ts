@@ -87,9 +87,13 @@ test.describe('Component: Drawer', () => {
       await drawerStory.goto(page, 'Basic');
       await openDrawer(page);
 
+      // Dispatch a pointerdown event on the backdrop to trigger Ark UI's
+      // closeOnInteractOutside. Normal clicks are blocked because <html>
+      // intercepts pointer events when a modal dialog is open (inert).
+      // dispatchEvent bypasses Playwright's actionability checks entirely.
       await page
         .locator('[data-scope="dialog"][data-part="backdrop"]')
-        .click({ force: true, position: { x: 10, y: 10 } });
+        .dispatchEvent('pointerdown');
       await expect(getDrawerContent(page)).toBeHidden();
     });
 

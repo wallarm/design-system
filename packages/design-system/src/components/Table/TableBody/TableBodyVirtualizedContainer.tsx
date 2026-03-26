@@ -3,6 +3,7 @@ import { useVirtualizer } from '@tanstack/react-virtual';
 import { TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
 import { TableBodyVirtualizedCore } from './TableBodyVirtualizedCore';
+import { useResetVirtualizerOnDataChange } from './useResetVirtualizerOnDataChange';
 import { useSmoothScrollOnSort } from './useSmoothScrollOnSort';
 
 export const TableBodyVirtualizedContainer: FC = () => {
@@ -21,6 +22,7 @@ export const TableBodyVirtualizedContainer: FC = () => {
     overscan: overscan ?? TABLE_VIRTUALIZATION_OVERSCAN,
   });
 
+  useResetVirtualizerOnDataChange(table, virtualizer);
   useSmoothScrollOnSort(table, getScrollElement);
 
   return <TableBodyVirtualizedCore tbodyRef={tbodyRef} virtualizer={virtualizer} />;

@@ -4,6 +4,7 @@ import { TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
 import { getDocumentOffsetTop } from './lib/getDocumentOffsetTop';
 import { TableBodyVirtualizedCore } from './TableBodyVirtualizedCore';
+import { useResetVirtualizerOnDataChange } from './useResetVirtualizerOnDataChange';
 import { useSmoothScrollOnSort } from './useSmoothScrollOnSort';
 
 export const TableBodyVirtualizedWindow: FC = () => {
@@ -16,6 +17,8 @@ export const TableBodyVirtualizedWindow: FC = () => {
     overscan: overscan ?? TABLE_VIRTUALIZATION_OVERSCAN,
     scrollMargin: tbodyRef.current ? getDocumentOffsetTop(tbodyRef.current) : 0,
   });
+
+  useResetVirtualizerOnDataChange(table, virtualizer);
 
   const getScrollTarget = useCallback(() => window as Window, []);
   useSmoothScrollOnSort(table, getScrollTarget);
