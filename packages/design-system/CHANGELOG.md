@@ -1,3 +1,26 @@
+## <small>0.16.1 (2026-03-26)</small>
+
+* fix: update theme tokens ([4c46375](https://github.com/wallarm/design-system/commit/4c46375))
+* fix: WDS-72 Code snippet ([18eb8e8](https://github.com/wallarm/design-system/commit/18eb8e8))
+* fix: WDS-72 Code snippet ([9342937](https://github.com/wallarm/design-system/commit/9342937))
+* fix: WDS-72 Code snippet ([d311f11](https://github.com/wallarm/design-system/commit/d311f11))
+* fix: WDS-72 Code snippet ([0268065](https://github.com/wallarm/design-system/commit/0268065))
+* fix: WDS-72 Code snippet ([7299f82](https://github.com/wallarm/design-system/commit/7299f82))
+* fix: WDS-72 Code snippet ([42b136a](https://github.com/wallarm/design-system/commit/42b136a))
+* fix: WDS-72 Code snippet ([6a31a92](https://github.com/wallarm/design-system/commit/6a31a92))
+* fix: WDS-72 Code snippet ([e0f1d93](https://github.com/wallarm/design-system/commit/e0f1d93))
+* fix: WDS-72 Code snippet ([f1755c0](https://github.com/wallarm/design-system/commit/f1755c0))
+* fix: WDS-72 Code snippet ([638dc13](https://github.com/wallarm/design-system/commit/638dc13))
+* fix: WDS-72 Code snippet ([1bf6664](https://github.com/wallarm/design-system/commit/1bf6664))
+* fix(table): reset virtualizer measurements on data set change [AS-675] (#62) ([d7a7786](https://github.com/wallarm/design-system/commit/d7a7786)), closes [#62](https://github.com/wallarm/design-system/issues/62)
+* 🖼️ Update screenshots ([96e1497](https://github.com/wallarm/design-system/commit/96e1497))
+* test: WDS-72 Code snippet ([5c020fd](https://github.com/wallarm/design-system/commit/5c020fd))
+* test: WDS-72 Code snippet ([6b6a0f9](https://github.com/wallarm/design-system/commit/6b6a0f9))
+* test: WDS-72 delete screenshots to regenerate [update-screenshots] ([aff354d](https://github.com/wallarm/design-system/commit/aff354d))
+* style: WDS-72 fix formatting issues ([d762c1c](https://github.com/wallarm/design-system/commit/d762c1c))
+* docs: add IconsInText story ([8a6f850](https://github.com/wallarm/design-system/commit/8a6f850))
+* docs: fix claude hook ([3a5a66c](https://github.com/wallarm/design-system/commit/3a5a66c))
+
 ## 0.16.0 (2026-03-24)
 
 * feat(select): export createListCollection from ark-ui (#55) ([b32fcb7](https://github.com/wallarm/design-system/commit/b32fcb7)), closes [#55](https://github.com/wallarm/design-system/issues/55)
