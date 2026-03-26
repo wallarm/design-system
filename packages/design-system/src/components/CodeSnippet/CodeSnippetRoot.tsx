@@ -94,6 +94,9 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   // Use adapter from context or fall back to plain adapter
   const adapter = (adapterContext?.adapter ?? plainAdapter) as SyntaxAdapter<TLanguage>;
 
+  // Normalize line endings once before any adapter or fallback sees the code
+  const normalizedCode = useMemo(() => code.replace(/\r\n?/g, '\n'), [code]);
+
   // Highlight code when code or language changes
   useEffect(() => {
     let cancelled = false;
@@ -101,14 +104,14 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     const highlight = async () => {
       setIsLoading(true);
       try {
-        const result = await adapter.highlight(code, language);
+        const result = await adapter.highlight(normalizedCode, language);
         if (!cancelled) {
           setTokens(result.tokens);
         }
       } catch {
         // On error, fall back to plain tokens
         if (!cancelled) {
-          const plainTokens = code
+          const plainTokens = normalizedCode
             .split('\n')
             .map(line => [{ content: line, type: 'plain' as const }]);
           setTokens(plainTokens);
@@ -125,7 +128,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     return () => {
       cancelled = true;
     };
-  }, [code, language, adapter]);
+  }, [normalizedCode, language, adapter]);
 
   // Close fullscreen on Escape
   useEffect(() => {
