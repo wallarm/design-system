@@ -124,6 +124,25 @@ export const useMenuFlow = ({
         return;
       }
 
+      // When editing only the operator of an existing chip, keep the current value
+      if (editing.editingChipId && editing.editingSegment === 'operator') {
+        const idx = chipIdToConditionIndex(editing.editingChipId);
+        const condition = idx !== null ? conditionsRef.current[idx] : null;
+        if (condition) {
+          upsertCondition(
+            selectedField,
+            operator,
+            condition.value,
+            editing.editingChipId,
+            undefined,
+            undefined,
+            condition.dateOrigin,
+          );
+          resetState();
+          return;
+        }
+      }
+
       setSelectedOperator(operator);
       setMenuState('value');
     },
