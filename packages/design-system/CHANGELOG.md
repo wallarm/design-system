@@ -1,3 +1,7 @@
+## <small>0.16.3 (2026-03-27)</small>
+
+* fix(filter-input): preserve value when changing only the operator [AS-736] (#65) ([8f4b9de](https://github.com/wallarm/design-system/commit/8f4b9de)), closes [#65](https://github.com/wallarm/design-system/issues/65)
+
 ## <small>0.16.2 (2026-03-26)</small>
 
 * fix: WSD-72 resolve Prism adapter race condition in React Strict Mode ([e8610c3](https://github.com/wallarm/design-system/commit/e8610c3))
