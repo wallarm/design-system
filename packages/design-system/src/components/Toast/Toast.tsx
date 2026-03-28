@@ -130,13 +130,13 @@ export const Toast = ({ toast }: ToastProps) => {
       className={cn(toastVariants({ variant: toastVariant }))}
     >
       <TestIdProvider value={toast.id}>
-        <div className={cn('flex w-full items-start gap-8 relative z-10')}>
+        <div className={cn('flex w-full gap-8 relative z-10', isSimple ? 'items-center' : 'items-start')}>
           {toastIcon && <ToastIcon>{toastIcon}</ToastIcon>}
 
           <div
             className={cn(
               'flex-1 flex',
-              isSimple ? 'flex-row gap-16 items-start' : 'flex-col gap-8',
+              isSimple ? 'flex-row gap-16 items-center' : 'flex-col gap-8',
             )}
           >
             <div className='flex-1 py-2'>
