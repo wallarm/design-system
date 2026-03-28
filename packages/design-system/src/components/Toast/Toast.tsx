@@ -12,7 +12,7 @@ import { ToastIcon } from './ToastIcon';
 import { ToastTitle } from './ToastTitle';
 
 const toastVariants = cva(
-  'group relative flex min-w-[256px] max-w-[560px] items-start gap-12 rounded-12 bg-slate-800 p-12 pl-16 shadow-lg transition-all',
+  'group relative flex min-w-[256px] max-w-[560px] items-start gap-12 rounded-12 bg-component-toast-bg p-12 pl-16 shadow-lg transition-all',
   {
     variants: {
       variant: {
