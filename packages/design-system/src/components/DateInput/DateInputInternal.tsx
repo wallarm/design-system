@@ -178,7 +178,9 @@ export const DateInputInternal = forwardRef<
 
         {hasValue && (
           <InputGroupAddon align="inline-end">
-            <TemporalClear onClick={handleClear} disabled={disabled} />
+            <div className="-mr-4">
+              <TemporalClear onClick={handleClear} disabled={disabled} />
+            </div>
           </InputGroupAddon>
         )}
       </InputGroup>

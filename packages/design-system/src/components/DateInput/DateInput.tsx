@@ -31,7 +31,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
   (
     {
       icon,
-      size,
+      size = "default",
       value: controlledValue,
       defaultValue,
       onChange,
