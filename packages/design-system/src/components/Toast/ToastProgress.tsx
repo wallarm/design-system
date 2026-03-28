@@ -42,7 +42,7 @@ export const ToastProgress: FC<ToastProgressProps> = ({ duration }) => {
   return (
     <div
       ref={containerRef}
-      className={cn('absolute inset-0 rounded-12 overflow-hidden pointer-events-none')}
+      className={cn('absolute inset-0 rounded-16 overflow-hidden pointer-events-none')}
     >
       <div
         className='h-full bg-states-primary-alt-hover transition-none'
