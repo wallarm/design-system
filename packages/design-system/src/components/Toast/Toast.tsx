@@ -9,10 +9,11 @@ import { Loader } from '../Loader';
 import { ToastClose } from './ToastClose';
 import { ToastDescription } from './ToastDescription';
 import { ToastIcon } from './ToastIcon';
+import { ToastProgress } from './ToastProgress';
 import { ToastTitle } from './ToastTitle';
 
 const toastVariants = cva(
-  'group relative flex min-w-[256px] max-w-[560px] items-start gap-12 rounded-12 bg-slate-800 p-12 pl-16 shadow-lg transition-all',
+  'group relative flex min-w-[256px] max-w-[560px] items-start gap-12 rounded-16 bg-component-toast-bg p-12 pl-16 shadow-lg transition-all',
   {
     variants: {
       variant: {
@@ -49,6 +50,9 @@ const toastIconMap: Record<
   },
 };
 
+const SIMPLE_TOAST_DURATION_MS = 5000;
+const EXTENDED_TOAST_DURATION_MS = 10000;
+
 export interface ToastData {
   id: string;
   title?: string;
@@ -58,6 +62,7 @@ export interface ToastData {
   icon?: ReactNode;
   variant?: 'extended' | 'simple';
   closable?: boolean;
+  duration?: number;
   [key: string]: unknown; // Allow additional properties from Ark UI
 }
 
@@ -130,13 +135,18 @@ export const Toast = ({ toast }: ToastProps) => {
       className={cn(toastVariants({ variant: toastVariant }))}
     >
       <TestIdProvider value={toast.id}>
-        <div className={cn('flex w-full items-start gap-8 relative z-10')}>
+        <div
+          className={cn(
+            'flex w-full gap-8 relative z-10',
+            isSimple ? 'items-center' : 'items-start',
+          )}
+        >
           {toastIcon && <ToastIcon>{toastIcon}</ToastIcon>}
 
           <div
             className={cn(
               'flex-1 flex',
-              isSimple ? 'flex-row gap-16 items-start' : 'flex-col gap-8',
+              isSimple ? 'flex-row gap-16 items-center' : 'flex-col gap-8',
             )}
           >
             <div className='flex-1 py-2'>
@@ -151,6 +161,14 @@ export const Toast = ({ toast }: ToastProps) => {
 
           {closable && <ToastClose />}
         </div>
+
+        {toast.type !== 'loading' && (
+          <ToastProgress
+            duration={
+              toast.duration ?? (isSimple ? SIMPLE_TOAST_DURATION_MS : EXTENDED_TOAST_DURATION_MS)
+            }
+          />
+        )}
       </TestIdProvider>
     </ArkToast.Root>
   );
