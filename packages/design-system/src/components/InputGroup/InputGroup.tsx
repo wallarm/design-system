@@ -4,7 +4,7 @@ import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
 type InputGroupProps = HTMLAttributes<HTMLDivElement> & TestableProps;
 
-export const InputGroup: FC<InputGroupProps> = ({ 'data-testid': testId, ...props }) => (
+export const InputGroup: FC<InputGroupProps> = ({ 'data-testid': testId, className, ...props }) => (
   <TestIdProvider value={testId}>
     <div
       data-slot='input-group'
@@ -56,6 +56,7 @@ export const InputGroup: FC<InputGroupProps> = ({ 'data-testid': testId, ...prop
         'has-[[data-slot=input][aria-disabled=true]]:opacity-50',
         'has-[[data-slot=input]:disabled]:cursor-not-allowed',
         'has-[[data-slot=input][aria-disabled=true]]:cursor-not-allowed',
+        className,
       )}
       {...props}
     />

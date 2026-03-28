@@ -1,16 +1,20 @@
-import { forwardRef, type RefObject, useRef } from 'react';
-import { createCalendar } from '@internationalized/date';
-import { type AriaDateFieldProps, type DateValue, useDateField } from '@react-aria/datepicker';
-import { useLocale } from '@react-aria/i18n';
-import { useDateFieldState } from '@react-stately/datepicker';
-import { cn } from '../../utils/cn';
-import { useTemporalField } from '../TemporalCore';
-import { DateInputInternal } from './DateInputInternal';
-import type { DateInputBaseProps } from './types';
+import { forwardRef, type RefObject, useRef } from "react";
+import { createCalendar } from "@internationalized/date";
+import {
+  type AriaDateFieldProps,
+  type DateValue,
+  useDateField,
+} from "@react-aria/datepicker";
+import { useLocale } from "@react-aria/i18n";
+import { useDateFieldState } from "@react-stately/datepicker";
+import { cn } from "../../utils/cn";
+import { useTemporalField } from "../TemporalCore";
+import { DateInputInternal } from "./DateInputInternal";
+import type { DateInputBaseProps } from "./types";
 
 export type DateInputProps = Omit<
   AriaDateFieldProps<DateValue>,
-  'label' | 'description' | 'errorMessage'
+  "label" | "description" | "errorMessage"
 > &
   DateInputBaseProps & {
     /**
@@ -20,19 +24,20 @@ export type DateInputProps = Omit<
      * - 'minute': Date with hours and minutes
      * - 'second': Date with hours, minutes, and seconds
      */
-    granularity?: 'day' | 'hour' | 'minute' | 'second';
+    granularity?: "day" | "hour" | "minute" | "second";
   };
 
 export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
   (
     {
       icon,
+      size,
       value: controlledValue,
       defaultValue,
       onChange,
       error = false,
       disabled = false,
-      granularity = 'day',
+      granularity = "day",
       placeholder,
       showTimeDropdown,
       timeStep,
@@ -76,10 +81,11 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
     );
 
     return (
-      <div className={cn('min-w-256 flex-1', className)}>
+      <div className={cn("min-w-256 flex-1", className)}>
         <DateInputInternal
           {...fieldProps}
           icon={icon}
+          size={size}
           ref={finalRef}
           state={state}
           error={error}
@@ -88,11 +94,11 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
           showTimeDropdown={showTimeDropdown}
           timeStep={timeStep}
           hourCycle={hourCycle}
-          className={cn('w-full')}
+          className={cn("w-full")}
         />
       </div>
     );
   },
 );
 
-DateInput.displayName = 'DateInput';
+DateInput.displayName = "DateInput";

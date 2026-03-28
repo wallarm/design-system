@@ -24,6 +24,7 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
   (
     {
       icon,
+      size,
       value: controlledValue,
       defaultValue,
       onChange,
@@ -76,6 +77,7 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
         <DateInputInternal
           {...fieldProps}
           icon={icon}
+          size={size}
           ref={finalRef}
           state={state}
           error={error}

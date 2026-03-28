@@ -1,7 +1,11 @@
 import type { FC } from 'react';
 import type { SvgIconProps } from '../../icons';
 
+export type DateInputSize = 'default' | 'medium' | 'small'
+
 export interface DateInputBaseProps {
+  /** Size variant of the input. Default height is 36px, medium is 32px, small is 24px */
+  size?: DateInputSize
   /** Optional icon component to display at the start of the input */
   icon?: FC<SvgIconProps>;
   /** Whether the input has an error state. Shows error styling when true */

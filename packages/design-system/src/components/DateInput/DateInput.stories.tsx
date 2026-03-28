@@ -20,6 +20,11 @@ const meta: Meta<typeof DateInput> = {
     },
   },
   argTypes: {
+    size: {
+      control: 'select',
+      options: ['default', 'medium', 'small'],
+      description: 'Size variant of the input.',
+    },
     granularity: {
       control: 'select',
       options: ['day', 'hour', 'minute', 'second'],
@@ -55,6 +60,7 @@ const meta: Meta<typeof DateInput> = {
     },
   },
   args: {
+    size: 'default',
     granularity: 'day',
     error: false,
     disabled: false,

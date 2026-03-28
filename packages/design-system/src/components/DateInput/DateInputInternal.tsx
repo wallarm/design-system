@@ -1,10 +1,14 @@
-import { forwardRef, useCallback, useRef, useState } from 'react';
-import { CalendarDateTime, getLocalTimeZone, now } from '@internationalized/date';
-import type { TimeValue } from '@react-aria/datepicker';
-import type { DateFieldState, TimeFieldState } from '@react-stately/datepicker';
-import type { GroupDOMAttributes } from '@react-types/shared';
-import { cn } from '../../utils/cn';
-import { InputGroup, InputGroupAddon } from '../InputGroup';
+import { forwardRef, useCallback, useRef, useState } from "react";
+import {
+  CalendarDateTime,
+  getLocalTimeZone,
+  now,
+} from "@internationalized/date";
+import type { TimeValue } from "@react-aria/datepicker";
+import type { DateFieldState, TimeFieldState } from "@react-stately/datepicker";
+import type { GroupDOMAttributes } from "@react-types/shared";
+import { cn } from "../../utils/cn";
+import { InputGroup, InputGroupAddon } from "../InputGroup";
 import {
   TemporalClear,
   TemporalPlaceholder,
@@ -12,17 +16,28 @@ import {
   TimeDropdown,
   type TimeDropdownHandle,
   useTimeDropdownKeyCapture,
-} from '../TemporalCore';
-import type { DateInputBaseProps } from './types';
+} from "../TemporalCore";
+import type { DateInputBaseProps, DateInputSize } from "./types";
 
-export interface DateInputInternalProps extends GroupDOMAttributes, DateInputBaseProps {
+const sizeClasses: Record<DateInputSize, string> = {
+  default: "h-36",
+  medium: "h-32",
+  small: "h-24",
+};
+
+export interface DateInputInternalProps
+  extends GroupDOMAttributes, DateInputBaseProps {
   state: DateFieldState | TimeFieldState;
 }
 
-export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalProps>(
+export const DateInputInternal = forwardRef<
+  HTMLDivElement,
+  DateInputInternalProps
+>(
   (
     {
       state,
+      size = "default",
       icon: IconComponent,
       error,
       disabled,
@@ -37,15 +52,18 @@ export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalPro
     const dropdownRef = useRef<TimeDropdownHandle>(null);
     const [isFocused, setIsFocused] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const hasValue = state.segments.some(seg => seg.isEditable && !seg.isPlaceholder);
+    const hasValue = state.segments.some(
+      (seg) => seg.isEditable && !seg.isPlaceholder,
+    );
     const showPlaceholder = placeholder && !hasValue && !isFocused;
 
     // Check if input has time segments and date segments
     const hasTimeSegments = state.segments.some(
-      seg => seg.type === 'hour' || seg.type === 'minute',
+      (seg) => seg.type === "hour" || seg.type === "minute",
     );
     const hasDateSegments = state.segments.some(
-      seg => seg.type === 'year' || seg.type === 'month' || seg.type === 'day',
+      (seg) =>
+        seg.type === "year" || seg.type === "month" || seg.type === "day",
     );
 
     const handleClear = () => {
@@ -120,7 +138,7 @@ export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalPro
       state.value && hasTimeSegments ? (state.value as TimeValue) : null;
 
     return (
-      <InputGroup>
+      <InputGroup className={sizeClasses[size]}>
         {IconComponent && (
           <InputGroupAddon>
             <IconComponent />
@@ -128,15 +146,15 @@ export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalPro
         )}
 
         <div
-          className={cn('relative flex-1', !IconComponent && 'pl-12')}
+          className={cn("relative flex-1", !IconComponent && "pl-12")}
           onKeyDownCapture={handleKeyDownCapture}
         >
           {showPlaceholder && <TemporalPlaceholder text={placeholder} />}
           <TemporalSegmentGroup
             {...props}
             ref={ref}
-            data-slot='input'
-            className={cn('h-36', showPlaceholder && 'opacity-0')}
+            data-slot="input"
+            className={cn(sizeClasses[size], showPlaceholder && "opacity-0")}
             aria-invalid={error || undefined}
             aria-disabled={disabled || undefined}
             state={state}
@@ -159,7 +177,7 @@ export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalPro
         </div>
 
         {hasValue && (
-          <InputGroupAddon align='inline-end'>
+          <InputGroupAddon align="inline-end">
             <TemporalClear onClick={handleClear} disabled={disabled} />
           </InputGroupAddon>
         )}
