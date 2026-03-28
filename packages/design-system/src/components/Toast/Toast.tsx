@@ -9,6 +9,7 @@ import { Loader } from '../Loader';
 import { ToastClose } from './ToastClose';
 import { ToastDescription } from './ToastDescription';
 import { ToastIcon } from './ToastIcon';
+import { ToastProgress } from './ToastProgress';
 import { ToastTitle } from './ToastTitle';
 
 const toastVariants = cva(
@@ -49,6 +50,9 @@ const toastIconMap: Record<
   },
 };
 
+const SIMPLE_TOAST_DURATION_MS = 5000;
+const EXTENDED_TOAST_DURATION_MS = 10000;
+
 export interface ToastData {
   id: string;
   title?: string;
@@ -58,6 +62,7 @@ export interface ToastData {
   icon?: ReactNode;
   variant?: 'extended' | 'simple';
   closable?: boolean;
+  duration?: number;
   [key: string]: unknown; // Allow additional properties from Ark UI
 }
 
@@ -151,6 +156,15 @@ export const Toast = ({ toast }: ToastProps) => {
 
           {closable && <ToastClose />}
         </div>
+
+        {toast.type !== 'loading' && (
+          <ToastProgress
+            duration={
+              toast.duration ??
+              (isSimple ? SIMPLE_TOAST_DURATION_MS : EXTENDED_TOAST_DURATION_MS)
+            }
+          />
+        )}
       </TestIdProvider>
     </ArkToast.Root>
   );
