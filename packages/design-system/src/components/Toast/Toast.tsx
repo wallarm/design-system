@@ -135,7 +135,12 @@ export const Toast = ({ toast }: ToastProps) => {
       className={cn(toastVariants({ variant: toastVariant }))}
     >
       <TestIdProvider value={toast.id}>
-        <div className={cn('flex w-full gap-8 relative z-10', isSimple ? 'items-center' : 'items-start')}>
+        <div
+          className={cn(
+            'flex w-full gap-8 relative z-10',
+            isSimple ? 'items-center' : 'items-start',
+          )}
+        >
           {toastIcon && <ToastIcon>{toastIcon}</ToastIcon>}
 
           <div
@@ -160,8 +165,7 @@ export const Toast = ({ toast }: ToastProps) => {
         {toast.type !== 'loading' && (
           <ToastProgress
             duration={
-              toast.duration ??
-              (isSimple ? SIMPLE_TOAST_DURATION_MS : EXTENDED_TOAST_DURATION_MS)
+              toast.duration ?? (isSimple ? SIMPLE_TOAST_DURATION_MS : EXTENDED_TOAST_DURATION_MS)
             }
           />
         )}

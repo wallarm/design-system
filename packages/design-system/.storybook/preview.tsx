@@ -1,9 +1,9 @@
 import { type FC, useEffect, useState } from 'react';
-import "./react-aria-polyfill";
-import { withThemeByDataAttribute } from "@storybook/addon-themes";
-import type { Decorator, Preview } from "storybook-react-rsbuild";
-import { ThemeProvider, Toaster } from "../src";
-import "./preview.css";
+import './react-aria-polyfill';
+import { withThemeByDataAttribute } from '@storybook/addon-themes';
+import type { Decorator, Preview } from 'storybook-react-rsbuild';
+import { ThemeProvider, Toaster } from '../src';
+import './preview.css';
 
 let toasterMountCount = 0;
 
@@ -23,11 +23,11 @@ const SingletonToaster: FC = () => {
   return isFirst ? <Toaster /> : null;
 };
 
-const isDev = process.env.NODE_ENV === "development";
+const isDev = process.env.NODE_ENV === 'development';
 
 const preview: Preview = {
   parameters: {
-    layout: "centered",
+    layout: 'centered',
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -35,7 +35,7 @@ const preview: Preview = {
       },
     },
     options: {
-      initialActive: "canvas",
+      initialActive: 'canvas',
       layout: {
         isFullscreen: true,
         showNav: isDev,
@@ -43,27 +43,23 @@ const preview: Preview = {
         showToolbar: isDev,
       },
       storySort: {
-        order: [
-          "Documentation",
-          ["Patterns", { FilterInput: ["Composition", "*"] }],
-          "Components",
-        ],
+        order: ['Documentation', ['Patterns', { FilterInput: ['Composition', '*'] }], 'Components'],
       },
     },
   },
-  tags: ["autodocs"],
+  tags: ['autodocs'],
 };
 
 export const decorators: Decorator[] = [
   withThemeByDataAttribute({
     themes: {
-      light: "light",
-      dark: "dark",
+      light: 'light',
+      dark: 'dark',
     },
-    defaultTheme: "light",
-    attributeName: "data-theme",
+    defaultTheme: 'light',
+    attributeName: 'data-theme',
   }),
-  (Story) => (
+  Story => (
     <ThemeProvider>
       <Story />
       <SingletonToaster />
