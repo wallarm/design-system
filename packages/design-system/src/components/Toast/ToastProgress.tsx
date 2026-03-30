@@ -45,7 +45,7 @@ export const ToastProgress: FC<ToastProgressProps> = ({ duration }) => {
       className={cn('absolute inset-0 rounded-16 overflow-hidden pointer-events-none')}
     >
       <div
-        className='h-full bg-states-primary-alt-hover transition-none'
+        className='h-full bg-states-primary-alt-default-alt transition-none'
         style={{ width: `${progress * 100}%` }}
       />
     </div>
