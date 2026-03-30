@@ -19,6 +19,7 @@ export {
 export { buildContainerAnchoredRect, isMenuRelated } from './dom';
 export { getFieldValues, hasFieldValues } from './fields';
 export { filterAndSort } from './filterSort';
+export { getValueFilterText } from './menuFilterText';
 export {
   getOperatorFromLabel,
   getOperatorLabel,

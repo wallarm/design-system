@@ -19,6 +19,12 @@ interface UseChipEditingOptions {
   setSelectedField: (field: FieldMetadata | null) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
   setMenuState: (state: MenuState) => void;
+  upsertCondition: (
+    field: FieldMetadata,
+    operator: FilterOperator | undefined,
+    val: string | number | boolean | null | Array<string | number | boolean>,
+    editingChipId?: string | null,
+  ) => void;
 }
 
 // ── Pure helpers ────────────────────────────────────────────
@@ -33,6 +39,22 @@ const SEGMENT_TO_MENU: Record<ChipSegment, MenuState> = {
   attribute: 'field',
   operator: 'operator',
   value: 'value',
+};
+
+/**
+ * Determine the first incomplete or errored segment of a chip (attribute → operator → value).
+ * Returns the segment to resume building, or null if the chip is complete.
+ */
+const getFirstIncompleteSegment = (
+  condition: Condition,
+  fields: FieldMetadata[],
+): ChipSegment | null => {
+  const field = fields.find(f => f.name === condition.field);
+  if (!field || condition.error === 'attribute') return 'attribute';
+  if (!condition.operator) return 'operator';
+  if (condition.value === null || condition.value === '' || condition.error === 'value')
+    return 'value';
+  return null;
 };
 
 // ── Hook ───────────────────────────────────────────────────
@@ -51,6 +73,7 @@ export const useChipEditing = ({
   setSelectedField,
   setSelectedOperator,
   setMenuState,
+  upsertCondition,
 }: UseChipEditingOptions) => {
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
   const [editingSegment, setEditingSegment] = useState<ChipSegment | null>(null);
@@ -73,11 +96,23 @@ export const useChipEditing = ({
       if (!condition) return;
 
       const field = fieldsRef.current.find(f => f.name === condition.field);
-      // For unknown fields (error chips), allow attribute editing to pick a valid field
-      if (!field && segment !== 'attribute') return;
 
       const chip = chipsRef.current.find(c => c.id === chipId);
       if (!chip || chip.variant !== 'chip') return;
+
+      // If chip is incomplete/errored, redirect to the first missing segment
+      const incompleteSegment = condition.error
+        ? getFirstIncompleteSegment(condition, fieldsRef.current)
+        : null;
+      const targetSegment = incompleteSegment ?? segment;
+
+      // For unknown fields, only attribute editing is allowed
+      if (!field && targetSegment !== 'attribute') return;
+
+      // Clear error when resuming editing of an incomplete chip
+      if (incompleteSegment && field) {
+        upsertCondition(field, condition.operator, condition.value, chipId);
+      }
 
       const containerRect = containerRef.current?.getBoundingClientRect();
       setMenuOffset(containerRect ? anchorRect.left - containerRect.left : 0);
@@ -85,29 +120,29 @@ export const useChipEditing = ({
       setSelectedField(field ?? null);
 
       const rawOperator =
-        segment === 'value' || segment === 'operator'
+        targetSegment === 'value' || targetSegment === 'operator'
           ? (getOperatorFromLabel(chip.operator || '', field?.type ?? 'string') ??
             condition.operator)
           : null;
 
-      if (segment === 'value') {
-        setSelectedOperator(rawOperator);
+      if (targetSegment === 'value') {
+        setSelectedOperator(rawOperator ?? null);
       } else {
         setSelectedOperator(null);
       }
 
-      setEditingSegment(segment);
+      setEditingSegment(targetSegment);
       const segmentText: Record<ChipSegment, string> = {
         attribute: chip.attribute ?? '',
         operator: chip.operator ?? '',
         value: chip.value ?? '',
       };
-      setSegmentFilterText(segmentText[segment]);
+      setSegmentFilterText(segmentText[targetSegment]);
       setUserHasTyped(false);
 
-      setMenuState(SEGMENT_TO_MENU[segment]);
+      setMenuState(SEGMENT_TO_MENU[targetSegment]);
     },
-    [containerRef, setMenuOffset, setSelectedField, setSelectedOperator, setMenuState],
+    [containerRef, setMenuOffset, setSelectedField, setSelectedOperator, setMenuState, upsertCondition],
   );
 
   /** Reset segment-level editing state (shared by clearEditing and cancelSegmentEdit) */
@@ -142,6 +177,7 @@ export const useChipEditing = ({
     () => ({
       editingChipId,
       editingSegment,
+      setEditingSegment,
       segmentFilterText: segmentDisplayText,
       segmentMenuFilterText,
       setSegmentFilterText: handleSegmentFilterChange,

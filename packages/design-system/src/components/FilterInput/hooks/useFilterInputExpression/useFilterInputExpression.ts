@@ -23,6 +23,7 @@ interface ExpressionState {
 }
 
 const EMPTY_STATE: ExpressionState = { conditions: [], connectors: [] };
+const DEFAULT_CONNECTOR: 'and' = 'and';
 
 /** Remove the connector associated with a condition being deleted at `idx`. */
 const removeConnectorAtConditionIndex = (
@@ -36,6 +37,74 @@ const removeConnectorAtConditionIndex = (
     updated.splice(idx - 1, 1);
   }
   return updated;
+};
+
+/** Build a Condition object from input params */
+const buildCondition = (
+  field: FieldMetadata,
+  operator: FilterOperator | undefined,
+  value: string | number | boolean | null | Array<string | number | boolean>,
+  error?: ChipErrorSegment,
+  dateOrigin?: 'relative' | 'absolute',
+): Condition => ({
+  type: 'condition',
+  field: field.name,
+  ...(operator && { operator }),
+  value,
+  ...(error && { error }),
+  ...(dateOrigin && { dateOrigin }),
+});
+
+/** Insert or update a condition in the conditions array */
+const applyCondition = (
+  conditions: Condition[],
+  condition: Condition,
+  editingChipId?: string | null,
+  atIndex?: number,
+): Condition[] => {
+  if (editingChipId) {
+    const idx = chipIdToConditionIndex(editingChipId);
+    if (idx !== null && idx < conditions.length) {
+      const updated = [...conditions];
+      updated[idx] = condition;
+      return updated;
+    }
+    return [...conditions, condition];
+  }
+  if (atIndex != null && atIndex >= 0 && atIndex < conditions.length) {
+    const updated = [...conditions];
+    updated.splice(atIndex, 0, condition);
+    return updated;
+  }
+  return [...conditions, condition];
+};
+
+/** Add a connector when a new condition is inserted */
+const addConnectorIfNeeded = (
+  connectors: Array<'and' | 'or'>,
+  newConditionsLength: number,
+  editingChipId?: string | null,
+  atIndex?: number,
+  prevConditionsLength?: number,
+): Array<'and' | 'or'> => {
+  if (editingChipId || newConditionsLength <= 1) return connectors;
+
+  if (
+    atIndex != null &&
+    atIndex >= 0 &&
+    prevConditionsLength != null &&
+    atIndex < prevConditionsLength
+  ) {
+    const connIdx = Math.max(0, atIndex - 1);
+    const updated = [...connectors];
+    updated.splice(connIdx, 0, DEFAULT_CONNECTOR);
+    return updated;
+  }
+
+  const missing = newConditionsLength - 1 - connectors.length;
+  return missing > 0
+    ? [...connectors, ...new Array<'and'>(missing).fill(DEFAULT_CONNECTOR)]
+    : connectors;
 };
 
 export const useFilterInputExpression = ({
@@ -62,57 +131,24 @@ export const useFilterInputExpression = ({
   const upsertCondition = useCallback(
     (
       field: FieldMetadata,
-      operator: FilterOperator,
+      operator: FilterOperator | undefined,
       val: string | number | boolean | null | Array<string | number | boolean>,
       editingChipId?: string | null,
       atIndex?: number,
       error?: ChipErrorSegment,
       dateOrigin?: 'relative' | 'absolute',
     ) => {
-      const condition: Condition = {
-        type: 'condition',
-        field: field.name,
-        operator,
-        value: val,
-        ...(error && { error }),
-        ...(dateOrigin && { dateOrigin }),
-      };
+      const condition = buildCondition(field, operator, val, error, dateOrigin);
 
       setState(prev => {
-        let newConditions: Condition[];
-
-        if (editingChipId) {
-          const idx = chipIdToConditionIndex(editingChipId);
-          if (idx !== null && idx < prev.conditions.length) {
-            newConditions = [...prev.conditions];
-            newConditions[idx] = condition;
-          } else {
-            newConditions = [...prev.conditions, condition];
-          }
-        } else if (atIndex != null && atIndex >= 0 && atIndex < prev.conditions.length) {
-          newConditions = [...prev.conditions];
-          newConditions.splice(atIndex, 0, condition);
-        } else {
-          newConditions = [...prev.conditions, condition];
-        }
-
-        let newConnectors = prev.connectors;
-
-        // Add connector when inserting a new condition
-        if (!editingChipId && newConditions.length > 1) {
-          if (atIndex != null && atIndex >= 0 && atIndex < prev.conditions.length) {
-            const connIdx = Math.max(0, atIndex - 1);
-            const updated = [...prev.connectors];
-            updated.splice(connIdx, 0, 'and');
-            newConnectors = updated;
-          } else {
-            const missing = newConditions.length - 1 - prev.connectors.length;
-            newConnectors =
-              missing > 0
-                ? [...prev.connectors, ...new Array<'and'>(missing).fill('and')]
-                : prev.connectors;
-          }
-        }
+        const newConditions = applyCondition(prev.conditions, condition, editingChipId, atIndex);
+        const newConnectors = addConnectorIfNeeded(
+          prev.connectors,
+          newConditions.length,
+          editingChipId,
+          atIndex,
+          prev.conditions.length,
+        );
 
         const next = { conditions: newConditions, connectors: newConnectors };
         onChange?.(buildExpression(next.conditions, next.connectors));

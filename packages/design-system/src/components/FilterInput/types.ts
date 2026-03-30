@@ -88,7 +88,8 @@ export interface FieldMetadata {
 export interface Condition {
   type: 'condition';
   field: string;
-  operator: FilterOperator;
+  /** Operator may be absent when the chip was committed incomplete (blur during building) */
+  operator?: FilterOperator;
   value: string | number | boolean | null | Array<string | number | boolean>;
   /** Per-condition validation error: true = whole chip, 'attribute'/'value' = specific segment */
   error?: ChipErrorSegment;

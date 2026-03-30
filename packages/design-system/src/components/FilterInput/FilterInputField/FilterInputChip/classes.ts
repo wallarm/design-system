@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 
 /** Base chip container styles shared by FilterInputChip and FilterInputConnectorChip */
 export const chipVariants = cva(
-  'h-22 group/chip relative flex items-center justify-center px-4 py-0 border border-solid rounded-8 gap-4',
+  'h-22 group/chip relative flex items-center justify-center px-5 py-0 border border-solid rounded-8 gap-4',
   {
     variants: {
       error: {
@@ -52,7 +52,7 @@ export const segmentTextVariants = cva('truncate text-sm', {
 
 /** Remove button styles — hidden by default, shown on chip hover or button focus */
 export const removeButtonVariants = cva(
-  'absolute -right-[14px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 group-hover/chip:opacity-100 focus:opacity-100 transition-opacity',
+  'absolute -right-[13px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 group-hover/chip:opacity-100 focus:opacity-100 transition-opacity',
   {
     variants: {
       error: {

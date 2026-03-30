@@ -13,6 +13,8 @@ interface UseFocusManagementDeps {
   editingSegment: string | null;
   /** Ref set by FilterInputValueMenu — calls commitChecked() for multi-select before blur reset. Returns true if committed. */
   blurCommitRef: RefObject<(() => boolean) | null>;
+  /** Tries to commit a building chip's freeform value on blur. Returns true if committed. */
+  commitBuildingOnBlur: () => boolean;
   setIsFocused: (focused: boolean) => void;
   setMenuState: (state: MenuState) => void;
   resetMenuOffset: () => void;
@@ -28,6 +30,7 @@ export const useFocusManagement = ({
   inputRef,
   editingSegment,
   blurCommitRef,
+  commitBuildingOnBlur,
   setIsFocused,
   setMenuState,
   resetMenuOffset,
@@ -48,12 +51,13 @@ export const useFocusManagement = ({
       if (containerRef.current?.contains(related)) return;
       if (isMenuRelated(related)) return;
       setIsFocused(false);
-      // Commit pending multi-select values before resetting state.
-      // handleMultiCommit calls resetState internally, so skip the extra reset if committed.
-      const committed = blurCommitRef.current?.();
+      // Try to commit pending values before resetting state:
+      // 1. Multi-select checked values (via FilterInputValueMenu ref)
+      // 2. Building chip with freeform typed value
+      const committed = blurCommitRef.current?.() || commitBuildingOnBlur();
       if (!committed) resetState();
     },
-    [containerRef, blurCommitRef, resetState, setIsFocused],
+    [containerRef, blurCommitRef, commitBuildingOnBlur, resetState, setIsFocused],
   );
 
   // ── Auto-open field menu on initial focus when empty ──────
