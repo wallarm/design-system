@@ -159,6 +159,7 @@ export const useMenuFlow = ({
       }
 
       setSelectedOperator(operator);
+      setInputText('');
       setMenuState('value');
     },
     [
