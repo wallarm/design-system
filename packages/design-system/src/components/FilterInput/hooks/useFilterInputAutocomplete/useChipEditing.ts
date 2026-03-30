@@ -142,7 +142,14 @@ export const useChipEditing = ({
 
       setMenuState(SEGMENT_TO_MENU[targetSegment]);
     },
-    [containerRef, setMenuOffset, setSelectedField, setSelectedOperator, setMenuState, upsertCondition],
+    [
+      containerRef,
+      setMenuOffset,
+      setSelectedField,
+      setSelectedOperator,
+      setMenuState,
+      upsertCondition,
+    ],
   );
 
   /** Reset segment-level editing state (shared by clearEditing and cancelSegmentEdit) */

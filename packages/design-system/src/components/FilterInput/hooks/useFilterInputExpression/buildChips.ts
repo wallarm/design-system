@@ -149,9 +149,7 @@ export const buildChips = (
   if (!hasMixed) {
     return conditions.flatMap((_, i) => {
       const chip = makeConditionChip(i, conditions, fields, error);
-      return i > 0
-        ? [connectorChip(i, connectors[i - 1] ?? DEFAULT_CONNECTOR), chip]
-        : [chip];
+      return i > 0 ? [connectorChip(i, connectors[i - 1] ?? DEFAULT_CONNECTOR), chip] : [chip];
     });
   }
 

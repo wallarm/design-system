@@ -41,7 +41,10 @@ export const ChipSearchInput: FC = () => {
       />
       <span
         ref={sizerRef}
-        className={cn(segmentTextVariants({ variant: 'value' }), 'invisible absolute whitespace-pre')}
+        className={cn(
+          segmentTextVariants({ variant: 'value' }),
+          'invisible absolute whitespace-pre',
+        )}
         aria-hidden
       >
         {inputText || ' '}

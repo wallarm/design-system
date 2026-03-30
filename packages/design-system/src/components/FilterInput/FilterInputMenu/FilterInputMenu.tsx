@@ -1,6 +1,11 @@
 import type { FC, RefObject } from 'react';
 import type { ChipSegment } from '../FilterInputField/FilterInputChip';
-import { getFieldValues, getValueFilterText, isBetweenOperator, isMultiSelectOperator } from '../lib';
+import {
+  getFieldValues,
+  getValueFilterText,
+  isBetweenOperator,
+  isMultiSelectOperator,
+} from '../lib';
 import type { FieldMetadata, FilterOperator, MenuState } from '../types';
 import { FilterInputDateValueMenu } from './FilterInputDateValueMenu';
 import { FilterInputFieldMenu } from './FilterInputFieldMenu';
