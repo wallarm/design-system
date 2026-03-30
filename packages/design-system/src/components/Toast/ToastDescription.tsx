@@ -25,7 +25,7 @@ export const ToastDescription = forwardRef<HTMLDivElement, ToastDescriptionProps
     return (
       <OverflowTooltip>
         <OverflowTooltipTrigger>
-          <Text ref={ref} size='md' color='secondary-alt' lineClamp={4} data-testid={testId}>
+          <Text ref={ref} size='sm' color='secondary-alt' lineClamp={4} data-testid={testId}>
             {children}
           </Text>
         </OverflowTooltipTrigger>

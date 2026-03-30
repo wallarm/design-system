@@ -28,7 +28,7 @@ export const ToastTitle = forwardRef<HTMLDivElement, ToastTitleProps>(
         <OverflowTooltipTrigger>
           <Text
             ref={ref}
-            size='md'
+            size='sm'
             weight='medium'
             color='primary-alt'
             lineClamp={isSimple ? 1 : 2}
