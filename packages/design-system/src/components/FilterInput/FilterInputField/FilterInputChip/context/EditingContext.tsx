@@ -6,7 +6,7 @@ import {
   type ReactNode,
   useContext,
 } from 'react';
-import type { ChipSegment } from './FilterInputChip';
+import type { ChipSegment } from '../FilterInputChip';
 
 export interface EditingContextValue {
   editingChipId: string | null;

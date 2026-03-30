@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   EditingProvider,
   useEditingContext,
-} from '../FilterInputField/FilterInputChip/EditingContext';
+} from '../FilterInputField/FilterInputChip/context/EditingContext';
 import { FilterInputChip } from '../FilterInputField/FilterInputChip/FilterInputChip';
 
 /** Helper that renders a consumer and returns the context value */

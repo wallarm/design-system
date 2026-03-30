@@ -1,11 +1,14 @@
 import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import { segmentContainer, segmentTextVariants } from './classes';
+import { CHAR_WIDTH_PX } from './constants';
+import { MultiValueSegment } from './MultiValueSegment';
+import { useSizerWidth } from './model/useSizerWidth';
 
 type SegmentVariant = 'attribute' | 'operator' | 'value';
 
-type SegmentProps = HTMLAttributes<HTMLDivElement> & {
+export type SegmentProps = HTMLAttributes<HTMLDivElement> & {
   variant: SegmentVariant;
   children: string;
   error?: boolean;
@@ -14,6 +17,12 @@ type SegmentProps = HTMLAttributes<HTMLDivElement> & {
   onEditChange?: (text: string) => void;
   onEditKeyDown?: (e: KeyboardEvent<HTMLInputElement>) => void;
   onEditBlur?: (e: FocusEvent<HTMLInputElement>) => void;
+  /** Individual display parts for multi-value chips (value variant only) */
+  valueParts?: string[];
+  /** Separator between parts (default: ", ") */
+  valueSeparator?: string;
+  /** Indices of invalid values in valueParts */
+  errorValueIndices?: number[];
 };
 
 export const Segment: FC<SegmentProps> = ({
@@ -26,20 +35,21 @@ export const Segment: FC<SegmentProps> = ({
   onEditChange,
   onEditKeyDown,
   onEditBlur,
+  valueParts,
+  valueSeparator = ', ',
+  errorValueIndices,
   ...props
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const sizerRef = useRef<HTMLSpanElement>(null);
-  // Track last known text width so it's available when switching to edit mode
   const lastTextWidthRef = useRef<number>(0);
-  const [inputWidth, setInputWidth] = useState<number | undefined>(undefined);
 
   // Measure text width when content changes (only while not editing).
   // Uses getBoundingClientRect for sub-pixel precision to avoid layout shift.
   useEffect(() => {
     if (editing) return;
-    const width = textRef.current?.getBoundingClientRect().width ?? children.length * 8;
+    const width = textRef.current?.getBoundingClientRect().width ?? children.length * CHAR_WIDTH_PX;
     lastTextWidthRef.current = width;
   }, [editing, children]);
 
@@ -62,19 +72,30 @@ export const Segment: FC<SegmentProps> = ({
     };
   }, [editing]);
 
-  // Dynamically measure input width from hidden sizer span
-  useEffect(() => {
-    if (!editing) {
-      setInputWidth(undefined);
-      return;
-    }
-    const sizerWidth =
-      sizerRef.current?.getBoundingClientRect().width ?? (editText?.length ?? 0) * 8;
-    // Use max of original text width and current content, with a minimum of 20px
-    setInputWidth(Math.max(20, lastTextWidthRef.current, sizerWidth));
-  }, [editing, editText]);
+  const inputWidth = useSizerWidth({
+    sizerRef,
+    text: editText ?? '',
+  });
 
   const isInteractive = !!props.onClick;
+  const hasMultiValueErrors =
+    variant === 'value' &&
+    !!valueParts &&
+    !!errorValueIndices &&
+    errorValueIndices.length > 0 &&
+    !editing;
+
+  if (hasMultiValueErrors) {
+    return (
+      <MultiValueSegment
+        valueParts={valueParts!}
+        valueSeparator={valueSeparator}
+        errorValueIndices={errorValueIndices!}
+        className={className}
+        {...props}
+      />
+    );
+  }
 
   return (
     <div
@@ -95,11 +116,10 @@ export const Segment: FC<SegmentProps> = ({
             aria-label={`Filter ${variant}`}
             className={cn(
               segmentTextVariants({ variant, error }),
-              'bg-transparent border-none outline-none p-0 m-0',
+              'bg-transparent outline-none p-0 m-0',
             )}
-            style={{ width: `${inputWidth ?? Math.max(20, lastTextWidthRef.current)}px` }}
+            style={{ width: `${inputWidth}px` }}
           />
-          {/* Hidden sizer to measure text width */}
           <span
             ref={sizerRef}
             className={cn(

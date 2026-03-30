@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 
 /** Base chip container styles shared by FilterInputChip and FilterInputConnectorChip */
 export const chipVariants = cva(
-  'group/chip relative flex items-center justify-center pl-4 pr-0 py-0 border border-solid rounded-8',
+  'h-22 group/chip relative flex items-center justify-center px-4 py-0 border border-solid rounded-8 gap-4',
   {
     variants: {
       error: {
@@ -10,10 +10,13 @@ export const chipVariants = cva(
         false: 'bg-badge-badge-bg border-border-primary',
       },
       interactive: {
-        true: 'cursor-pointer px-4 h-24',
-        false: 'h-[22px]',
+        true: 'cursor-pointer',
+        false: '',
       },
     },
+    compoundVariants: [
+      { interactive: false, error: false, className: 'border-border-strong-primary' },
+    ],
     defaultVariants: {
       error: false,
       interactive: false,
@@ -22,7 +25,7 @@ export const chipVariants = cva(
 );
 
 /** Segment container */
-export const segmentContainer = 'flex flex-col justify-center overflow-hidden p-2 leading-none';
+export const segmentContainer = 'flex flex-col justify-center overflow-hidden leading-none';
 
 /** Segment text styles by variant */
 export const segmentTextVariants = cva('truncate text-sm', {
@@ -49,7 +52,7 @@ export const segmentTextVariants = cva('truncate text-sm', {
 
 /** Remove button styles — hidden by default, shown on chip hover or button focus */
 export const removeButtonVariants = cva(
-  'absolute -right-12 top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 group-hover/chip:opacity-100 focus:opacity-100 transition-opacity',
+  'absolute -right-[14px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 group-hover/chip:opacity-100 focus:opacity-100 transition-opacity',
   {
     variants: {
       error: {

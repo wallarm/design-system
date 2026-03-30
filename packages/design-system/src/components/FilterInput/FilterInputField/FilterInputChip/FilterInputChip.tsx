@@ -1,17 +1,17 @@
-import type { FC, HTMLAttributes, MouseEvent as ReactMouseEvent } from 'react';
+import type { FC, HTMLAttributes, MouseEvent as ReactMouseEvent, Ref } from 'react';
 import { useCallback, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import type { ChipErrorSegment } from '../../types';
+import { ChipSearchInput } from './ChipSearchInput';
 import { chipVariants } from './classes';
-import { useEditingContext } from './EditingContext';
+import { useEditingContext } from './context/EditingContext';
 import { FilterInputRemoveButton } from './FilterInputRemoveButton';
-import { OperatorSegment } from './OperatorSegment';
 import { Segment } from './Segment';
-import { ValueSegment } from './ValueSegment';
 
 export type ChipSegment = 'attribute' | 'operator' | 'value';
 
 export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+  ref?: Ref<HTMLDivElement>;
   chipId?: string;
   attribute: string;
   operator?: string;
@@ -26,6 +26,7 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
 }
 
 export const FilterInputChip: FC<FilterInputChipProps> = ({
+  ref,
   chipId,
   attribute,
   operator,
@@ -42,7 +43,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
 }) => {
   const interactive = !building;
   const hasError = !!error;
-  const chipRef = useRef<HTMLDivElement>(null);
+  const internalRef = useRef<HTMLDivElement>(null);
 
   const editing = useEditingContext();
   const isEditingThisChip = editing != null && chipId != null && editing.editingChipId === chipId;
@@ -51,11 +52,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   const handleSegmentClick = useCallback(
     (segment: ChipSegment, e: ReactMouseEvent) => {
       if (!onSegmentClick) return;
-      // Don't re-trigger when already editing this segment
       if (activeSegment === segment) return;
       e.stopPropagation();
-      // For attribute clicks, use the whole chip as anchor; otherwise use the clicked segment
-      const anchorEl = segment === 'attribute' ? chipRef.current : (e.currentTarget as HTMLElement);
+      const anchorEl =
+        segment === 'attribute' ? internalRef.current : (e.currentTarget as HTMLElement);
       if (!anchorEl) return;
       onSegmentClick(segment, anchorEl.getBoundingClientRect());
     },
@@ -75,7 +75,11 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
 
   return (
     <div
-      ref={chipRef}
+      ref={node => {
+        internalRef.current = node;
+        if (typeof ref === 'function') ref(node);
+        else if (ref) ref.current = node;
+      }}
       className={cn(chipVariants({ error: hasError, interactive }), 'max-w-[600px]', className)}
       data-slot='filter-input-condition-chip'
       {...props}
@@ -90,16 +94,18 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
         {attribute}
       </Segment>
       {operator && (
-        <OperatorSegment
+        <Segment
+          variant='operator'
           className='shrink-0'
           onClick={interactive ? e => handleSegmentClick('operator', e) : undefined}
         >
           {operator}
-        </OperatorSegment>
+        </Segment>
       )}
       {value && (
-        <ValueSegment
-          className='min-w-0 max-w-[400px]'
+        <Segment
+          variant='value'
+          className='shrink-0'
           error={activeSegment !== 'value' && (error === true || error === 'value')}
           valueParts={valueParts}
           valueSeparator={valueSeparator}
@@ -108,8 +114,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           {...segmentEditProps('value')}
         >
           {value}
-        </ValueSegment>
+        </Segment>
       )}
+
+      {building && <ChipSearchInput />}
 
       {onRemove && <FilterInputRemoveButton error={hasError} onRemove={onRemove} />}
     </div>
