@@ -1,3 +1,7 @@
+## <small>0.16.4 (2026-03-30)</small>
+
+* fix(toast): update styles (#66) ([359af2a](https://github.com/wallarm/design-system/commit/359af2a)), closes [#66](https://github.com/wallarm/design-system/issues/66)
+
 ## <small>0.16.3 (2026-03-27)</small>
 
 * fix(filter-input): preserve value when changing only the operator [AS-736] (#65) ([8f4b9de](https://github.com/wallarm/design-system/commit/8f4b9de)), closes [#65](https://github.com/wallarm/design-system/issues/65)
