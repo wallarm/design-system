@@ -28,7 +28,7 @@ export const TableBodyCell = <T,>({
   className,
   disablePinnedShadow,
 }: TableBodyCellProps<T>) => {
-  const { allLeafColumns } = useTableContext<T>();
+  const { allLeafColumns, masterColumnId } = useTableContext<T>();
   const testId = useTestId('body-cell');
   const column = cell.column;
   const isPinned = column.getIsPinned();
@@ -41,7 +41,7 @@ export const TableBodyCell = <T,>({
   const pinningStyles = getPinningStyles(column);
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
 
-  const isCut = meta?.resizeType === 'cut';
+  const isCut = column.id === masterColumnId || meta?.resizeType === 'cut';
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
 
   const hasActions = !!meta?.renderActions;

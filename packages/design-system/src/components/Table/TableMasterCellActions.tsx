@@ -27,7 +27,14 @@ export const TableMasterCellActions = ({
   return (
     <div
       ref={ref}
-      className={cn('absolute top-0 right-0 h-full', 'flex items-start pt-6 pr-6 pl-4 gap-2')}
+      className={cn(
+        'absolute top-0 right-0 h-full bg-bg-surface-2',
+        'before:absolute before:inset-0 before:pointer-events-none before:transition-colors',
+        'group-hover/row:before:bg-states-primary-hover',
+        'group-data-[selected]/row:before:bg-states-primary-active',
+        'group-data-[selected]/row:group-hover/row:before:bg-states-primary-hover',
+        'flex items-start pt-6 pr-6 pl-4 gap-2',
+      )}
     >
       {children}
     </div>

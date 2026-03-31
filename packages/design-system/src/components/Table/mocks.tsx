@@ -268,7 +268,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     cell: ({ row }) => (
       <OverflowTooltip>
         <OverflowTooltipTrigger asChild>
-          <Link size='md' type='table' weight='medium'>
+          <Link size='sm' type='table' weight='regular' href='#'>
             {row.original.objectName}
           </Link>
         </OverflowTooltipTrigger>
@@ -301,14 +301,14 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     header: 'Parameters',
     size: 220,
     enableSorting: true,
-    meta: { sortType: 'text' as const },
+    meta: { sortType: 'text' as const, resizeType: 'cut' as const },
     cell: ({ getValue }) => <InlineCodeSnippet code={getValue()} size='sm' copyable={false} />,
   }),
   securityColumnHelper.accessor('status', {
     header: 'Status',
     size: 130,
     enableSorting: true,
-    meta: { sortType: 'text' as const },
+    meta: { sortType: 'text' as const, resizeType: 'cut' as const },
     cell: ({ getValue }) => {
       const status = getValue();
       return (
@@ -327,7 +327,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     header: 'First detected',
     size: 160,
     enableSorting: true,
-    meta: { sortType: 'date' as const },
+    meta: { sortType: 'date' as const, resizeType: 'cut' as const },
     cell: ({ getValue }) => <FormatDateTime value={getValue()} format='relative' />,
   }),
   securityColumnHelper.accessor('cweId', {
@@ -345,7 +345,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     header: 'Last seen',
     size: 120,
     enableSorting: true,
-    meta: { sortType: 'date' as const },
+    meta: { sortType: 'date' as const, resizeType: 'cut' as const },
     cell: ({ getValue }) => (
       <Text size='sm' color='secondary'>
         {getValue()}

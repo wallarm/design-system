@@ -138,7 +138,7 @@ export const ColumnResizingWithPinning: StoryFn<typeof meta> = () => {
 
   return (
     <Table
-      className='max-w-800'
+      className='max-w-920'
       data={securityEvents}
       columns={securityColumns}
       getRowId={row => row.id}
@@ -157,7 +157,7 @@ export const ColumnPinning: StoryFn<typeof meta> = () => {
 
   return (
     <Table
-      className='max-w-800'
+      className='max-w-920'
       data={securityEvents}
       columns={securityColumns}
       getRowId={row => row.id}
@@ -616,7 +616,7 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
 
   return (
     <Table
-      className='max-w-800'
+      className='max-w-920'
       data={securityEvents}
       columns={columns}
       getRowId={row => row.id}
