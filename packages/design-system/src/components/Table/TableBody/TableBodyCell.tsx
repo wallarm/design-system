@@ -1,4 +1,3 @@
-import { useCallback, useState } from 'react';
 import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
@@ -45,14 +44,7 @@ export const TableBodyCell = <T,>({
 
   const hasActions = !!(meta?.renderPreviewAction || meta?.renderMenuAction || meta?.renderActions);
 
-  // Lazy activation: action buttons are only rendered after first hover
-  const [actionsActivated, setActionsActivated] = useState(false);
-  const handlePointerEnter = useCallback(() => {
-    if (!actionsActivated) setActionsActivated(true);
-  }, [actionsActivated]);
-
   const renderActions = () => {
-    if (!actionsActivated) return null;
     const legacy = meta?.renderActions?.(cell.row);
     if (legacy) return legacy;
     return (
@@ -66,10 +58,7 @@ export const TableBodyCell = <T,>({
   const renderContent = () => {
     if (isCut && hasActions) {
       return (
-        <div
-          className='flex items-center justify-between gap-2'
-          onPointerEnter={handlePointerEnter}
-        >
+        <div className='flex items-center justify-between gap-2'>
           <span className='min-w-0 [&>*]:block [&>*]:truncate'>{content}</span>
           <TableMasterCellActions>{renderActions()}</TableMasterCellActions>
         </div>
