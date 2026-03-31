@@ -132,6 +132,7 @@ export { OctagonAlert } from './OctagonAlert';
 export { PanelBottom } from './PanelBottom';
 export { PanelBottomOpen } from './PanelBottomOpen';
 export { PanelRight } from './PanelRight';
+export { PanelRightAnimated, type PanelRightAnimatedProps } from './PanelRightAnimated';
 export { PanelRightClose } from './PanelRightClose';
 export { PanelRightDashed } from './PanelRightDashed';
 export { PanelRightOpen } from './PanelRightOpen';

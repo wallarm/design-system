@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Copy, Ellipsis, Filter, FilterX, PanelRight, Trash2 } from '../../icons';
+import { Copy, Ellipsis, Filter, FilterX, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { InlineCodeSnippet } from '../CodeSnippet';
@@ -38,6 +38,7 @@ import {
 import { Table } from './Table';
 import { TableActionBar } from './TableActionBar';
 import { TableEmptyState } from './TableEmptyState';
+import { TablePreviewToggle } from './TablePreviewToggle';
 import type {
   TableColumnDef,
   TableColumnPinningState,
@@ -544,6 +545,7 @@ export const HeaderColumnDescription: StoryFn<typeof meta> = () => {
 export const MasterCellWithActions: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+  const [activePreviewId, setActivePreviewId] = useState<string | null>(null);
 
   const columns = useMemo<TableColumnDef<SecurityEvent>[]>(
     () =>
@@ -556,20 +558,14 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
                 size: 400,
                 resizeType: 'resize',
                 renderPreviewAction: (row: { original: SecurityEvent }) => (
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Button
-                        variant='ghost'
-                        color='neutral'
-                        size='small'
-                        onClick={() => alert(`Preview: ${row.original.objectName}`)}
-                        aria-label='Preview'
-                      >
-                        <PanelRight />
-                      </Button>
-                    </TooltipTrigger>
-                    <TooltipContent>Preview</TooltipContent>
-                  </Tooltip>
+                  <TablePreviewToggle
+                    active={activePreviewId === row.original.id}
+                    onClick={() =>
+                      setActivePreviewId(prev =>
+                        prev === row.original.id ? null : row.original.id,
+                      )
+                    }
+                  />
                 ),
                 renderMenuAction: (row: { original: SecurityEvent }) => (
                   <DropdownMenu>
@@ -611,7 +607,7 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
             }
           : col,
       ),
-    [],
+    [activePreviewId],
   );
 
   return (

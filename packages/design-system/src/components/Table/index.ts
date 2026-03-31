@@ -3,6 +3,7 @@ export type { TableColumnHelper } from './lib/createTableColumnHelper';
 export { Table } from './Table';
 export { TableActionBar } from './TableActionBar';
 export { TableEmptyState } from './TableEmptyState';
+export { TablePreviewToggle, type TablePreviewToggleProps } from './TablePreviewToggle';
 export { TableSettingsMenu } from './TableSettingsMenu';
 export type {
   TableAccessorColumnDef,
