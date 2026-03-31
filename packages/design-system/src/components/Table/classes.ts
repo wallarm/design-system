@@ -109,9 +109,6 @@ export const tableContainerVariants = cva(
 
 export const tableRowVariants = cva('transition-colors');
 
-/** Extra right padding (px) added to cell content so it doesn't hide behind actions */
-export const ACTIONS_PADDING_EXTRA = 4;
-
 /** Small icon button used in table header (sort, scroll, menu triggers) */
 export const tableHeaderButtonClass = cn(
   'w-16 h-16 shrink-0 hover:text-text-primary',

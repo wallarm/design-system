@@ -1,39 +1,18 @@
-import { type ReactNode, useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 import { cn } from '../../utils/cn';
 
 interface TableMasterCellActionsProps {
   children: ReactNode;
-  onWidthChange?: (width: number) => void;
 }
 
-export const TableMasterCellActions = ({
-  children,
-  onWidthChange,
-}: TableMasterCellActionsProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onWidthChange) return;
-
-    const observer = new ResizeObserver(entries => {
-      const entry = entries[0];
-      if (entry) onWidthChange(el.offsetWidth);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [onWidthChange]);
-
+export const TableMasterCellActions = ({ children }: TableMasterCellActionsProps) => {
   return (
     <div
-      ref={ref}
       className={cn(
-        'absolute top-0 right-0 h-full bg-bg-surface-2',
-        'before:absolute before:inset-0 before:pointer-events-none before:transition-colors',
-        'group-hover/row:before:bg-states-primary-hover',
-        'group-data-[selected]/row:before:bg-states-primary-active',
-        'group-data-[selected]/row:group-hover/row:before:bg-states-primary-hover',
-        'flex items-start pt-6 pr-6 pl-4 gap-2',
+        'shrink-0 flex items-center gap-2 overflow-hidden',
+        'max-w-0 group-hover/row:max-w-[200px] group-hover/row:pl-4',
+        'opacity-0 group-hover/row:opacity-100',
+        'transition-[max-width,opacity] duration-150',
       )}
     >
       {children}

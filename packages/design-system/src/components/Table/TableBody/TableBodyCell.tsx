@@ -1,8 +1,6 @@
-import { useCallback, useState } from 'react';
 import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
-import { ACTIONS_PADDING_EXTRA } from '../classes';
 import {
   getAlignClass,
   getExpandBorderClass,
@@ -45,8 +43,6 @@ export const TableBodyCell = <T,>({
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
 
   const hasActions = !!meta?.renderActions;
-  const [actionsWidth, setActionsWidth] = useState(0);
-  const handleActionsWidth = useCallback((width: number) => setActionsWidth(width), []);
 
   return (
     <Td
@@ -54,7 +50,6 @@ export const TableBodyCell = <T,>({
       className={cn(
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),
-        hasActions && 'relative',
         meta?.cellClassName,
         className,
       )}
@@ -67,21 +62,18 @@ export const TableBodyCell = <T,>({
         width: cell.column.getSize(),
         ...dndStyle,
         ...(isCut && { overflow: 'hidden' }),
-        ...(actionsWidth > 0 && { paddingRight: actionsWidth + ACTIONS_PADDING_EXTRA }),
       }}
       colSpan={colSpan}
     >
-      {isCut ? (
-        <div className='overflow-hidden' style={{ minWidth: column.columnDef.size }}>
-          {content}
+      {hasActions ? (
+        <div className='flex items-center'>
+          <div className='min-w-0 [&>*]:block [&>*]:truncate'>{content}</div>
+          <TableMasterCellActions>{meta.renderActions!(cell.row)}</TableMasterCellActions>
         </div>
+      ) : isCut ? (
+        <div className='overflow-hidden [&>*]:block [&>*]:truncate'>{content}</div>
       ) : (
         content
-      )}
-      {hasActions && (
-        <TableMasterCellActions onWidthChange={handleActionsWidth}>
-          {meta.renderActions!(cell.row)}
-        </TableMasterCellActions>
       )}
     </Td>
   );
