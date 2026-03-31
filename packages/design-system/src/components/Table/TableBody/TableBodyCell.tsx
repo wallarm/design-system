@@ -40,9 +40,30 @@ export const TableBodyCell = <T,>({
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
 
   const isCut = column.id === masterColumnId || meta?.resizeType === 'cut';
+  const hasActions = !!meta?.renderActions;
+
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
 
-  const hasActions = !!meta?.renderActions;
+  const renderContent = () => {
+    if (isCut && hasActions) {
+      return (
+        <div className='flex items-center justify-between gap-2'>
+          <span className='min-w-0 [&>*]:block [&>*]:truncate'>{content}</span>
+          <TableMasterCellActions>{meta.renderActions!(cell.row)}</TableMasterCellActions>
+        </div>
+      );
+    }
+
+    if (isCut) {
+      return (
+        <div className='overflow-hidden' style={{ minWidth: column.columnDef.size }}>
+          {content}
+        </div>
+      );
+    }
+
+    return content;
+  };
 
   return (
     <Td
@@ -50,6 +71,7 @@ export const TableBodyCell = <T,>({
       className={cn(
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),
+        isCut && !hasActions && 'pr-0',
         meta?.cellClassName,
         className,
       )}
@@ -65,16 +87,7 @@ export const TableBodyCell = <T,>({
       }}
       colSpan={colSpan}
     >
-      {hasActions ? (
-        <div className='flex items-center'>
-          <div className='min-w-0 [&>*]:block [&>*]:truncate'>{content}</div>
-          <TableMasterCellActions>{meta.renderActions!(cell.row)}</TableMasterCellActions>
-        </div>
-      ) : isCut ? (
-        <div className='overflow-hidden [&>*]:block [&>*]:truncate'>{content}</div>
-      ) : (
-        content
-      )}
+      {renderContent()}
     </Td>
   );
 };

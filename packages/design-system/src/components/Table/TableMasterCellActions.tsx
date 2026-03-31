@@ -9,13 +9,12 @@ export const TableMasterCellActions = ({ children }: TableMasterCellActionsProps
   return (
     <div
       className={cn(
-        'shrink-0 flex items-center gap-2 overflow-hidden',
-        'max-w-0 group-hover/row:max-w-[200px] group-hover/row:pl-4',
+        'shrink-0 grid grid-cols-[0fr] group-hover/row:grid-cols-[1fr]',
         'opacity-0 group-hover/row:opacity-100',
-        'transition-[max-width,opacity] duration-150',
+        'transition-[grid-template-columns,opacity] duration-150',
       )}
     >
-      {children}
+      <div className='overflow-hidden flex items-center gap-2'>{children}</div>
     </div>
   );
 };
