@@ -1,3 +1,7 @@
+## <small>0.16.5 (2026-03-31)</small>
+
+* fix(filter-input): chip UI bugs and improvements [AS-745] (#67) ([4c61a92](https://github.com/wallarm/design-system/commit/4c61a92)), closes [#67](https://github.com/wallarm/design-system/issues/67)
+
 ## <small>0.16.4 (2026-03-30)</small>
 
 * fix(toast): update styles (#66) ([359af2a](https://github.com/wallarm/design-system/commit/359af2a)), closes [#66](https://github.com/wallarm/design-system/issues/66)
