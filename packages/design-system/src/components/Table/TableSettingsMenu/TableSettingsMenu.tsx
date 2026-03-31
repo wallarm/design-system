@@ -140,7 +140,9 @@ export const TableSettingsMenu: FC = () => {
         'pl-6 pr-4 py-4',
         'rounded-tr-12',
       )}
-      style={{ height: hasTextDescription ? HEADER_HEIGHT_WITH_DESCRIPTION : DEFAULT_HEADER_HEIGHT }}
+      style={{
+        height: hasTextDescription ? HEADER_HEIGHT_WITH_DESCRIPTION : DEFAULT_HEADER_HEIGHT,
+      }}
     >
       <Tooltip disabled={menuOpen}>
         <TooltipTrigger asChild>
