@@ -40,16 +40,27 @@ export const TableBodyCell = <T,>({
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
 
   const isCut = column.id === masterColumnId || meta?.resizeType === 'cut';
-  const hasActions = !!meta?.renderActions;
-
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
+
+  // Support both new separated slots and legacy renderActions
+  const previewAction = meta?.renderPreviewAction?.(cell.row);
+  const menuAction = meta?.renderMenuAction?.(cell.row);
+  const legacyActions = meta?.renderActions?.(cell.row);
+  const hasActions = !!(previewAction || menuAction || legacyActions);
 
   const renderContent = () => {
     if (isCut && hasActions) {
       return (
         <div className='flex items-center justify-between gap-2'>
           <span className='min-w-0 [&>*]:block [&>*]:truncate'>{content}</span>
-          <TableMasterCellActions>{meta.renderActions!(cell.row)}</TableMasterCellActions>
+          <TableMasterCellActions>
+            {legacyActions ?? (
+              <>
+                {previewAction}
+                {menuAction}
+              </>
+            )}
+          </TableMasterCellActions>
         </div>
       );
     }
