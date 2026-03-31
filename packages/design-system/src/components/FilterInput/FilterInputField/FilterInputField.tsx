@@ -8,12 +8,11 @@ import { isMenuRelated } from '../lib';
 import { ChipsWithGaps, TrailingGap } from './ChipsWithGaps';
 import {
   ACTIONS_PADDING,
-  buildingChipWrapperClass,
   COLLAPSED_MAX_HEIGHT,
   filterInputContainerVariants,
   filterInputInnerVariants,
 } from './classes';
-import { EditingProvider } from './FilterInputChip/EditingContext';
+import { EditingProvider } from './FilterInputChip/context/EditingContext';
 import { FilterInputChip } from './FilterInputChip/FilterInputChip';
 import { FilterInputFieldActions } from './FilterInputFieldActions';
 import { FilterInputSearch } from './FilterInputSearch';
@@ -143,16 +142,14 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
               />
 
               {buildingChipData ? (
-                <div ref={buildingChipRef} className={buildingChipWrapperClass}>
-                  <FilterInputChip
-                    building
-                    attribute={buildingChipData.attribute ?? ''}
-                    operator={buildingChipData.operator}
-                    value={buildingChipData.value}
-                    className='border-none'
-                  />
-                  <FilterInputSearch hasContent />
-                </div>
+                <FilterInputChip
+                  ref={buildingChipRef}
+                  building
+                  attribute={buildingChipData.attribute ?? ''}
+                  operator={buildingChipData.operator}
+                  value={buildingChipData.value}
+                  className='mx-4'
+                />
               ) : (
                 <FilterInputSearch hasContent={hasContent} />
               )}

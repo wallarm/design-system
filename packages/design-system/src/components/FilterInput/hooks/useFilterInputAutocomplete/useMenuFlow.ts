@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
 import { useCallback, useRef } from 'react';
+import type { ChipSegment } from '../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,
   isBetweenOperator,
@@ -25,6 +26,7 @@ interface MenuFlowDeps {
   editing: {
     editingChipId: string | null;
     editingSegment: string | null;
+    setEditingSegment: (segment: ChipSegment | null) => void;
     setSegmentFilterText: (text: string) => void;
   };
   selectedField: FieldMetadata | null;
@@ -34,7 +36,7 @@ interface MenuFlowDeps {
   insertIndex: number;
   upsertCondition: (
     field: FieldMetadata,
-    operator: FilterOperator,
+    operator: FilterOperator | undefined,
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
     atIndex?: number,
@@ -43,6 +45,8 @@ interface MenuFlowDeps {
   ) => void;
   conditions: Condition[];
   resetState: (continueBuilding?: boolean) => void;
+  /** Try to commit the building chip on menu close. Returns true if committed. */
+  commitBuildingOnBlur: () => boolean;
   dateRange: { selectValue: (val: string) => string[] | null };
   setSelectedField: (f: FieldMetadata | null) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
@@ -61,6 +65,7 @@ export const useMenuFlow = ({
   upsertCondition,
   conditions,
   resetState,
+  commitBuildingOnBlur,
   dateRange,
   setSelectedField,
   setSelectedOperator,
@@ -72,12 +77,13 @@ export const useMenuFlow = ({
   const conditionsRef = useRef(conditions);
   conditionsRef.current = conditions;
 
-  // Ignore Ark UI close when focus is on our input or a segment inline-edit input
+  // Ignore Ark UI close when focus is on our input or a segment inline-edit input.
+  // Otherwise try to commit the incomplete building chip before resetting.
   const handleMenuClose = useCallback(() => {
     if (document.activeElement === inputRef.current) return;
     if ((document.activeElement as HTMLElement)?.closest?.('[data-slot^="segment-"]')) return;
-    resetState();
-  }, [resetState, inputRef]);
+    if (!commitBuildingOnBlur()) resetState();
+  }, [commitBuildingOnBlur, resetState, inputRef]);
 
   const handleFieldSelect = useCallback(
     (field: FieldMetadata) => {
@@ -124,26 +130,36 @@ export const useMenuFlow = ({
         return;
       }
 
-      // When editing only the operator of an existing chip, keep the current value
+      // When editing the operator of an existing chip:
+      // - Complete chip (has value): commit with new operator, keep value, done.
+      // - Incomplete chip (no value): update operator in place, continue to value selection.
       if (editing.editingChipId && editing.editingSegment === 'operator') {
         const idx = chipIdToConditionIndex(editing.editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
         if (condition) {
-          upsertCondition(
-            selectedField,
-            operator,
-            condition.value,
-            editing.editingChipId,
-            undefined,
-            undefined,
-            condition.dateOrigin,
-          );
-          resetState();
-          return;
+          const hasValue = condition.value !== null && condition.value !== '';
+          if (hasValue) {
+            upsertCondition(
+              selectedField,
+              operator,
+              condition.value,
+              editing.editingChipId,
+              undefined,
+              undefined,
+              condition.dateOrigin,
+            );
+            resetState();
+            return;
+          }
+          // Incomplete — persist operator without error, user is still building
+          upsertCondition(selectedField, operator, null, editing.editingChipId);
+          editing.setEditingSegment('value');
+          editing.setSegmentFilterText('');
         }
       }
 
       setSelectedOperator(operator);
+      setInputText('');
       setMenuState('value');
     },
     [

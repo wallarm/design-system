@@ -24,7 +24,7 @@ interface UseFilterInputAutocompleteOptions {
   chips: FilterInputChipData[];
   upsertCondition: (
     field: FieldMetadata,
-    operator: FilterOperator,
+    operator: FilterOperator | undefined,
     val: string | number | boolean | null | Array<string | number | boolean>,
     editingChipId?: string | null,
     atIndex?: number,
@@ -93,6 +93,7 @@ export const useFilterInputAutocomplete = ({
     setSelectedField,
     setSelectedOperator,
     setMenuState,
+    upsertCondition,
   });
 
   const dateRange = useDateRange();
@@ -126,6 +127,20 @@ export const useFilterInputAutocomplete = ({
     [editing, dateRange, inputRef, resetMenuOffset],
   );
 
+  // ── Blur commit for building chips ─────────────────────────
+  // When the user blurs or menu closes, commit the incomplete building chip with error
+  // instead of discarding it. Uses refs to avoid stale closures.
+
+  const selectedFieldRef = useRef(selectedField);
+  selectedFieldRef.current = selectedField;
+  const selectedOperatorRef = useRef(selectedOperator);
+  selectedOperatorRef.current = selectedOperator;
+  const inputTextRef = useRef(inputText);
+  inputTextRef.current = inputText;
+
+  // Ref so useMenuFlow can call it without circular dependency
+  const commitBuildingOnBlurRef = useRef<() => boolean>(() => false);
+
   // ── Menu flow handlers ────────────────────────────────────
 
   const {
@@ -148,6 +163,7 @@ export const useFilterInputAutocomplete = ({
     upsertCondition,
     conditions,
     resetState,
+    commitBuildingOnBlur: () => commitBuildingOnBlurRef.current(),
     dateRange,
     setSelectedField,
     setSelectedOperator,
@@ -177,6 +193,38 @@ export const useFilterInputAutocomplete = ({
     handleCustomValueCommit,
   });
 
+  // Now that handleCustomValueCommit exists, define the actual implementation
+  const commitBuildingOnBlur = useCallback((): boolean => {
+    const field = selectedFieldRef.current;
+    const operator = selectedOperatorRef.current;
+    const text = inputTextRef.current.trim();
+    if (!field) return false;
+
+    // Editing an existing chip — don't overwrite its value, just cancel editing
+    if (editing.editingChipId) return false;
+
+    // Has typed text — commit as custom value
+    if (operator && text) {
+      handleCustomValueCommit(text);
+      return true;
+    }
+
+    // New incomplete chip — commit with error
+    upsertCondition(
+      field,
+      operator ?? undefined,
+      null,
+      undefined,
+      effectiveInsertIndexRef.current,
+      true,
+    );
+    resetState();
+    return true;
+  }, [handleCustomValueCommit, editing, upsertCondition, resetState]);
+
+  // Keep the ref in sync
+  commitBuildingOnBlurRef.current = commitBuildingOnBlur;
+
   // ── Focus ─────────────────────────────────────────────────
 
   const { handleFocus, handleBlur } = useFocusManagement({
@@ -188,6 +236,7 @@ export const useFilterInputAutocomplete = ({
     inputRef,
     editingSegment: editing.editingSegment,
     blurCommitRef,
+    commitBuildingOnBlur,
     setIsFocused,
     setMenuState,
     resetMenuOffset,

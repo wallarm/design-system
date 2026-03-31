@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   EditingProvider,
   useEditingContext,
-} from '../FilterInputField/FilterInputChip/EditingContext';
+} from '../FilterInputField/FilterInputChip/context/EditingContext';
 import { FilterInputChip } from '../FilterInputField/FilterInputChip/FilterInputChip';
 
 /** Helper that renders a consumer and returns the context value */
@@ -103,7 +103,7 @@ describe('FilterInputChip with EditingContext', () => {
     expect(onChange).toHaveBeenCalledWith('new-value');
   });
 
-  it('does not show input for operator segment (operator is not inline-editable)', () => {
+  it('shows input for operator segment (inline-editable for filtering)', () => {
     render(
       <EditingProvider
         editingChipId='chip-0'
@@ -116,9 +116,9 @@ describe('FilterInputChip with EditingContext', () => {
         <FilterInputChip chipId='chip-0' attribute='IP' operator='is' value='1.2.3.4' />
       </EditingProvider>,
     );
-    // Operator segment never renders an input — only dropdown selection
-    expect(screen.queryByRole('textbox')).not.toBeInTheDocument();
-    expect(screen.getByText('is')).toBeInTheDocument();
+    const input = screen.getByRole('textbox');
+    expect(input).toBeInTheDocument();
+    expect(input).toHaveValue('is');
   });
 
   it('does not show input for non-matching segment', () => {

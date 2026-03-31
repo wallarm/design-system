@@ -5,7 +5,7 @@ import { cva } from 'class-variance-authority';
 // Each value maps to a CSS dimension used in the inner chip container.
 
 const VISIBLE_ROWS = 3;
-const CHIP_ROW_HEIGHT = 24; // chip h-24 (24px, border-box)
+const CHIP_ROW_HEIGHT = 22; // chip h-22 (22px, border-box)
 const ROW_GAP = 4; // gap-y-4 between rows
 const PADDING_Y = 16; // py-[8px] top (8px) + py-[8px] bottom (8px)
 const EDGE_GAP = 8; // visual gap from container edges to first/last chip row
@@ -71,17 +71,13 @@ export const filterInputInnerVariants = cva(
   },
 );
 
-/** Wrapper that visually groups the building chip and the filter input */
-export const buildingChipWrapperClass =
-  'flex items-center min-w-0 h-24 rounded-8 border border-solid border-border-strong-primary bg-badge-badge-bg ml-8';
-
 /** Native input element inside the query bar */
 export const filterInputInputVariants = cva(
   'h-24 border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0',
   {
     variants: {
       hasContent: {
-        true: 'mx-4',
+        true: 'ml-4',
         false: 'flex-1',
       },
     },
