@@ -6,12 +6,14 @@ interface DrawerRootProps {
   children: ReactNode;
   closeOnEscape: boolean;
   closeOnOutsideClick: boolean;
+  modal: boolean;
 }
 
 export const DrawerRoot: FC<DrawerRootProps> = ({
   children,
   closeOnEscape,
   closeOnOutsideClick,
+  modal,
 }) => {
   const { isOpen, onOpenChange } = useDrawerContext();
 
@@ -25,7 +27,7 @@ export const DrawerRoot: FC<DrawerRootProps> = ({
       onOpenChange={handleOpenChange}
       closeOnEscape={closeOnEscape}
       closeOnInteractOutside={closeOnOutsideClick}
-      modal
+      modal={modal}
       lazyMount
       unmountOnExit
     >

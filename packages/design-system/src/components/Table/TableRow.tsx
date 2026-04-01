@@ -4,7 +4,7 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
 import { Td, Tr } from './primitives';
-import { TableBodyCell } from './TableBody';
+import { TableBodyCell } from './TableBody/TableBodyCell';
 import { useTableContext } from './TableContext';
 import { TableRowExpanded } from './TableRowExpanded';
 
@@ -17,10 +17,11 @@ interface TableRowProps<T> {
 }
 
 const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<T>) => {
-  const { expandingEnabled } = useTableContext<T>();
+  const { expandingEnabled, previewRowId } = useTableContext<T>();
   const testId = useTestId('row');
   const isGroupParent = row.subRows.length > 0;
   const isSelected = isGroupParent ? row.getIsAllSubRowsSelected() : row.getIsSelected();
+  const isPreviewActive = previewRowId === row.id;
 
   if (isGroupParent) {
     const cells = row.getVisibleCells();
@@ -36,6 +37,7 @@ const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<
           data-testid={testId}
           className='group/row'
           data-selected={isSelected || undefined}
+          data-preview-active={isPreviewActive || undefined}
           aria-selected={isSelected || undefined}
         >
           {systemCells.map(cell => (
@@ -49,7 +51,7 @@ const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<
               key={cell.id}
               className={cn(
                 'border-b border-border-primary-light bg-bg-surface-2 overlay',
-                'group-hover/row:overlay-states-primary-hover group-data-selected/row:overlay-states-primary-active',
+                'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
               )}
               style={{ width: cell.column.getSize() }}
               aria-hidden='true'
@@ -69,6 +71,7 @@ const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<
         data-testid={testId}
         className='group/row'
         data-selected={isSelected || undefined}
+        data-preview-active={isPreviewActive || undefined}
         aria-selected={isSelected || undefined}
         data-depth={row.depth > 0 ? row.depth : undefined}
       >

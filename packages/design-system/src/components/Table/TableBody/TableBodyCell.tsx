@@ -12,6 +12,7 @@ import {
 import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableMasterCellActions } from '../TableMasterCellActions';
+import { TablePreviewToggle } from '../TablePreviewToggle';
 
 interface TableBodyCellProps<T> {
   cell: Cell<T, unknown>;
@@ -26,7 +27,8 @@ export const TableBodyCell = <T,>({
   className,
   disablePinnedShadow,
 }: TableBodyCellProps<T>) => {
-  const { allLeafColumns, masterColumnId } = useTableContext<T>();
+  const { allLeafColumns, masterColumnId, previewRowId, setPreviewRowId, renderPreviewContent } =
+    useTableContext<T>();
   const testId = useTestId('body-cell');
   const column = cell.column;
   const isPinned = column.getIsPinned();
@@ -42,14 +44,21 @@ export const TableBodyCell = <T,>({
   const isCut = column.id === masterColumnId || meta?.resizeType === 'cut';
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
 
-  const hasActions = !!(meta?.renderPreviewAction || meta?.renderMenuAction || meta?.renderActions);
+  const isMasterColumn = column.id === masterColumnId;
+  const hasAutoPreview = isMasterColumn && !!renderPreviewContent;
+  const hasActions = !!(hasAutoPreview || meta?.renderMenuAction);
 
   const renderActions = () => {
-    const legacy = meta?.renderActions?.(cell.row);
-    if (legacy) return legacy;
+    const rowId = cell.row.id;
+
     return (
       <>
-        {meta?.renderPreviewAction?.(cell.row)}
+        {hasAutoPreview && (
+          <TablePreviewToggle
+            active={previewRowId === rowId}
+            onClick={() => setPreviewRowId(previewRowId === rowId ? null : rowId)}
+          />
+        )}
         {meta?.renderMenuAction?.(cell.row)}
       </>
     );

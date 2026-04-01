@@ -1,7 +1,7 @@
 import type { CellContext, ColumnDef, Row, RowSelectionState, Table } from '@tanstack/react-table';
 import { useIsKeyPressed } from '../../../hooks';
 import { Checkbox, CheckboxIndicator } from '../../Checkbox';
-import { useTableContext } from '../TableContext';
+import { useTableContext } from '../TableContext/useTableContext';
 import { TABLE_SELECT_COLUMN_ID, TABLE_SELECT_COLUMN_WIDTH } from './constants';
 
 /**

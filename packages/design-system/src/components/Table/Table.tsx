@@ -1,6 +1,7 @@
 import { TestIdProvider } from '../../utils/testId';
 import { TableProvider } from './TableContext';
 import { TableInner } from './TableInner';
+import { TablePreviewDrawer } from './TablePreviewDrawer';
 import type { TableProps } from './types';
 
 export const Table = <T,>(props: TableProps<T>) => {
@@ -30,6 +31,7 @@ export const Table = <T,>(props: TableProps<T>) => {
         >
           {children}
         </TableInner>
+        <TablePreviewDrawer />
       </TestIdProvider>
     </TableProvider>
   );

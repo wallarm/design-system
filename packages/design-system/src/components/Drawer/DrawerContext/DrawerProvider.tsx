@@ -12,6 +12,8 @@ interface DrawerContextProviderProps {
   closeOnEscape: boolean;
   /** Overlay visibility (default: true) */
   overlay: boolean;
+  /** Whether the drawer is modal (default: true) */
+  modal: boolean;
   /** Width - number for pixels, string for percentage (e.g., "50%") */
   width?: number | string;
   /** Minimum width in pixels */
@@ -26,6 +28,7 @@ export const DrawerProvider: FC<DrawerContextProviderProps> = ({
   onOpenChange,
   closeOnEscape,
   overlay,
+  modal,
   width: initialWidth = DRAWER_SIZES.small,
   minWidth = DRAWER_WIDTH_CONSTRAINTS.min,
   maxWidth = DRAWER_WIDTH_CONSTRAINTS.max,
@@ -50,6 +53,7 @@ export const DrawerProvider: FC<DrawerContextProviderProps> = ({
     onOpenChange: handleOpenChange,
     closeOnEscape,
     overlay,
+    modal,
 
     // Size management
     width,
