@@ -319,7 +319,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       previewRowId,
       setPreviewRowId,
       renderPreviewContent: renderPreviewContent as
-        | ((row: Row<T>) => { title: ReactNode; content: ReactNode })
+        | ((row: Row<T>) => { title?: ReactNode; content: ReactNode })
         | undefined,
     }),
     [

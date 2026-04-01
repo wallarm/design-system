@@ -56,7 +56,7 @@ export interface TableContextValue<T> {
   // Preview drawer
   previewRowId: string | null;
   setPreviewRowId: (id: string | null) => void;
-  renderPreviewContent?: (row: Row<T>) => { title: ReactNode; content: ReactNode };
+  renderPreviewContent?: (row: Row<T>) => { title?: ReactNode; content: ReactNode };
 }
 
 export interface TableProviderProps<T> extends Omit<TableProps<T>, 'children' | 'aria-label'> {
