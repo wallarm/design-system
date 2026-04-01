@@ -1,3 +1,7 @@
+## <small>0.16.6 (2026-04-01)</small>
+
+* fix(table): table experience improvements [AS-582] (#68) ([233555b](https://github.com/wallarm/design-system/commit/233555b)), closes [#68](https://github.com/wallarm/design-system/issues/68)
+
 ## <small>0.16.5 (2026-03-31)</small>
 
 * fix(filter-input): chip UI bugs and improvements [AS-745] (#67) ([4c61a92](https://github.com/wallarm/design-system/commit/4c61a92)), closes [#67](https://github.com/wallarm/design-system/issues/67)
