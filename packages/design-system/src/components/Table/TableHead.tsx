@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { THead, Tr } from './primitives';
 import { useTableContext } from './TableContext';
@@ -13,7 +14,10 @@ export const TableHead: FC = () => {
     .some(col => col.columnDef.meta?.description?.type === 'text');
 
   return (
-    <THead className='sticky top-0 z-30 h-32' data-testid={testId}>
+    <THead
+      className={cn('sticky top-0 z-30', hasTextDescription ? 'h-48' : 'h-32')}
+      data-testid={testId}
+    >
       {table.getHeaderGroups().map(headerGroup => (
         <Tr key={headerGroup.id}>
           {headerGroup.headers.map(header => (

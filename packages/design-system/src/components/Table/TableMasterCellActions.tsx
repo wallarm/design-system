@@ -1,35 +1,20 @@
-import { type ReactNode, useEffect, useRef } from 'react';
+import type { ReactNode } from 'react';
 import { cn } from '../../utils/cn';
 
 interface TableMasterCellActionsProps {
   children: ReactNode;
-  onWidthChange?: (width: number) => void;
 }
 
-export const TableMasterCellActions = ({
-  children,
-  onWidthChange,
-}: TableMasterCellActionsProps) => {
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const el = ref.current;
-    if (!el || !onWidthChange) return;
-
-    const observer = new ResizeObserver(entries => {
-      const entry = entries[0];
-      if (entry) onWidthChange(el.offsetWidth);
-    });
-    observer.observe(el);
-    return () => observer.disconnect();
-  }, [onWidthChange]);
-
+export const TableMasterCellActions = ({ children }: TableMasterCellActionsProps) => {
   return (
     <div
-      ref={ref}
-      className={cn('absolute top-0 right-0 h-full', 'flex items-start pt-6 pr-6 pl-4 gap-2')}
+      className={cn(
+        'shrink-0 grid grid-cols-[0fr] group-hover/row:grid-cols-[1fr]',
+        'opacity-0 group-hover/row:opacity-100',
+        'transition-[grid-template-columns,opacity] duration-150',
+      )}
     >
-      {children}
+      <div className='overflow-hidden flex items-center gap-2'>{children}</div>
     </div>
   );
 };

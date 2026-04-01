@@ -24,8 +24,14 @@ declare module '@tanstack/react-table' {
     description?: { type: 'text' | 'tooltip'; content: string };
     /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
     resizeType?: 'cut' | 'resize';
-    /** Render action buttons shown on hover in body cells */
+    /** Render action buttons shown on hover in body cells
+     * @deprecated Use `renderPreviewAction` and `renderMenuAction` for separated slots
+     */
     renderActions?: (row: Row<TData>) => ReactNode;
+    /** Render the preview toggle button shown on hover (panel-right icon) */
+    renderPreviewAction?: (row: Row<TData>) => ReactNode;
+    /** Render the three-dots contextual menu shown on hover */
+    renderMenuAction?: (row: Row<TData>) => ReactNode;
   }
 }
 
@@ -101,8 +107,14 @@ export interface TableColumnMeta<T = unknown> {
   description?: { type: 'text' | 'tooltip'; content: string };
   /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
   resizeType?: 'cut' | 'resize';
-  /** Render action buttons shown on hover in body cells */
+  /** Render action buttons shown on hover in body cells
+   * @deprecated Use `renderPreviewAction` and `renderMenuAction` for separated slots
+   */
   renderActions?: (row: TableRow<T>) => ReactNode;
+  /** Render the preview toggle button shown on hover (panel-right icon) */
+  renderPreviewAction?: (row: TableRow<T>) => ReactNode;
+  /** Render the three-dots contextual menu shown on hover */
+  renderMenuAction?: (row: TableRow<T>) => ReactNode;
 }
 
 /** Shared column properties */

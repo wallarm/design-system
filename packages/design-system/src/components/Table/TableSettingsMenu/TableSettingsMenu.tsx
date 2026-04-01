@@ -1,4 +1,4 @@
-import { type FC, useEffect, useMemo, useState } from 'react';
+import { type FC, useMemo, useState } from 'react';
 import {
   closestCenter,
   DndContext,
@@ -35,6 +35,7 @@ import { useTableContext } from '../TableContext';
 import { TableSettingsMenuItem } from './TableSettingsMenuItem';
 
 const DEFAULT_HEADER_HEIGHT = 34;
+const HEADER_HEIGHT_WITH_DESCRIPTION = 50;
 
 export const TableSettingsMenu: FC = () => {
   const testId = useTestId('settings-menu');
@@ -47,24 +48,14 @@ export const TableSettingsMenu: FC = () => {
     defaultColumnOrder,
     alwaysPinnedLeft,
     masterColumnId,
-    theadRef,
   } = ctx;
+
+  const hasTextDescription = table
+    .getAllLeafColumns()
+    .some(col => col.columnDef.meta?.description?.type === 'text');
 
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
-  const [theadHeight, setTheadHeight] = useState<number | undefined>(undefined);
-
-  useEffect(() => {
-    const el = theadRef.current;
-    if (!el) return;
-
-    const ro = new ResizeObserver(entries => {
-      const entry = entries[0];
-      if (entry) setTheadHeight(entry.contentRect.height);
-    });
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, [theadRef]);
 
   // Filter out utility columns (_selection, _expand) — they shouldn't appear in settings
   const allColumns = table
@@ -149,7 +140,9 @@ export const TableSettingsMenu: FC = () => {
         'pl-6 pr-4 py-4',
         'rounded-tr-12',
       )}
-      style={{ height: theadHeight ? `${theadHeight + 1}px` : DEFAULT_HEADER_HEIGHT }}
+      style={{
+        height: hasTextDescription ? HEADER_HEIGHT_WITH_DESCRIPTION : DEFAULT_HEADER_HEIGHT,
+      }}
     >
       <Tooltip disabled={menuOpen}>
         <TooltipTrigger asChild>

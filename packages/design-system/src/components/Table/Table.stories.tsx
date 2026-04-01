@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Copy, Ellipsis, Filter, FilterX, PanelRight, Trash2 } from '../../icons';
+import { Copy, Ellipsis, Filter, FilterX, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { InlineCodeSnippet } from '../CodeSnippet';
@@ -38,6 +38,7 @@ import {
 import { Table } from './Table';
 import { TableActionBar } from './TableActionBar';
 import { TableEmptyState } from './TableEmptyState';
+import { TablePreviewToggle } from './TablePreviewToggle';
 import type {
   TableColumnDef,
   TableColumnPinningState,
@@ -138,7 +139,7 @@ export const ColumnResizingWithPinning: StoryFn<typeof meta> = () => {
 
   return (
     <Table
-      className='max-w-800'
+      className='max-w-920'
       data={securityEvents}
       columns={securityColumns}
       getRowId={row => row.id}
@@ -157,7 +158,7 @@ export const ColumnPinning: StoryFn<typeof meta> = () => {
 
   return (
     <Table
-      className='max-w-800'
+      className='max-w-920'
       data={securityEvents}
       columns={securityColumns}
       getRowId={row => row.id}
@@ -544,6 +545,7 @@ export const HeaderColumnDescription: StoryFn<typeof meta> = () => {
 export const MasterCellWithActions: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+  const [activePreviewId, setActivePreviewId] = useState<string | null>(null);
 
   const columns = useMemo<TableColumnDef<SecurityEvent>[]>(
     () =>
@@ -555,68 +557,62 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
                 ...col.meta,
                 size: 400,
                 resizeType: 'resize',
-                renderActions: (row: { original: SecurityEvent }) => (
-                  <>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant='ghost'
-                          color='neutral'
-                          size='small'
-                          onClick={() => alert(`Preview: ${row.original.objectName}`)}
-                          aria-label='Preview'
-                        >
-                          <PanelRight />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Preview</TooltipContent>
-                    </Tooltip>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant='ghost' color='neutral' size='small' aria-label='More'>
-                          <Ellipsis />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent>
-                        <DropdownMenuItem
-                          onSelect={() => navigator.clipboard.writeText(row.original.objectName)}
-                        >
-                          <DropdownMenuItemIcon>
-                            <Copy />
-                          </DropdownMenuItemIcon>
-                          <DropdownMenuItemText>Copy name</DropdownMenuItemText>
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem
-                          onSelect={() => alert(`Filter: ${row.original.objectName}`)}
-                        >
-                          <DropdownMenuItemIcon>
-                            <Filter />
-                          </DropdownMenuItemIcon>
-                          <DropdownMenuItemText>Show only</DropdownMenuItemText>
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onSelect={() => alert(`Exclude: ${row.original.objectName}`)}
-                        >
-                          <DropdownMenuItemIcon>
-                            <FilterX />
-                          </DropdownMenuItemIcon>
-                          <DropdownMenuItemText>Exclude</DropdownMenuItemText>
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </>
+                renderPreviewAction: (row: { original: SecurityEvent }) => (
+                  <TablePreviewToggle
+                    active={activePreviewId === row.original.id}
+                    onClick={() =>
+                      setActivePreviewId(prev =>
+                        prev === row.original.id ? null : row.original.id,
+                      )
+                    }
+                  />
+                ),
+                renderMenuAction: (row: { original: SecurityEvent }) => (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant='ghost' color='neutral' size='small' aria-label='More'>
+                        <Ellipsis />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onSelect={() => navigator.clipboard.writeText(row.original.objectName)}
+                      >
+                        <DropdownMenuItemIcon>
+                          <Copy />
+                        </DropdownMenuItemIcon>
+                        <DropdownMenuItemText>Copy name</DropdownMenuItemText>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        onSelect={() => alert(`Filter: ${row.original.objectName}`)}
+                      >
+                        <DropdownMenuItemIcon>
+                          <Filter />
+                        </DropdownMenuItemIcon>
+                        <DropdownMenuItemText>Show only</DropdownMenuItemText>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onSelect={() => alert(`Exclude: ${row.original.objectName}`)}
+                      >
+                        <DropdownMenuItemIcon>
+                          <FilterX />
+                        </DropdownMenuItemIcon>
+                        <DropdownMenuItemText>Exclude</DropdownMenuItemText>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 ),
               },
             }
           : col,
       ),
-    [],
+    [activePreviewId],
   );
 
   return (
     <Table
-      className='max-w-800'
+      className='max-w-920'
       data={securityEvents}
       columns={columns}
       getRowId={row => row.id}

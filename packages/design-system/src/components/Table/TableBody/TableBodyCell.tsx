@@ -1,8 +1,6 @@
-import { useCallback, useState } from 'react';
 import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
-import { ACTIONS_PADDING_EXTRA } from '../classes';
 import {
   getAlignClass,
   getExpandBorderClass,
@@ -28,7 +26,7 @@ export const TableBodyCell = <T,>({
   className,
   disablePinnedShadow,
 }: TableBodyCellProps<T>) => {
-  const { allLeafColumns } = useTableContext<T>();
+  const { allLeafColumns, masterColumnId } = useTableContext<T>();
   const testId = useTestId('body-cell');
   const column = cell.column;
   const isPinned = column.getIsPinned();
@@ -41,12 +39,42 @@ export const TableBodyCell = <T,>({
   const pinningStyles = getPinningStyles(column);
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
 
-  const isCut = meta?.resizeType === 'cut';
+  const isCut = column.id === masterColumnId || meta?.resizeType === 'cut';
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
 
-  const hasActions = !!meta?.renderActions;
-  const [actionsWidth, setActionsWidth] = useState(0);
-  const handleActionsWidth = useCallback((width: number) => setActionsWidth(width), []);
+  const hasActions = !!(meta?.renderPreviewAction || meta?.renderMenuAction || meta?.renderActions);
+
+  const renderActions = () => {
+    const legacy = meta?.renderActions?.(cell.row);
+    if (legacy) return legacy;
+    return (
+      <>
+        {meta?.renderPreviewAction?.(cell.row)}
+        {meta?.renderMenuAction?.(cell.row)}
+      </>
+    );
+  };
+
+  const renderContent = () => {
+    if (isCut && hasActions) {
+      return (
+        <div className='flex items-center justify-between gap-2'>
+          <span className='min-w-0 [&>*]:block [&>*]:truncate'>{content}</span>
+          <TableMasterCellActions>{renderActions()}</TableMasterCellActions>
+        </div>
+      );
+    }
+
+    if (isCut) {
+      return (
+        <div className='overflow-hidden' style={{ minWidth: column.columnDef.size }}>
+          {content}
+        </div>
+      );
+    }
+
+    return content;
+  };
 
   return (
     <Td
@@ -54,7 +82,7 @@ export const TableBodyCell = <T,>({
       className={cn(
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),
-        hasActions && 'relative',
+        isCut && 'pr-0',
         meta?.cellClassName,
         className,
       )}
@@ -67,22 +95,10 @@ export const TableBodyCell = <T,>({
         width: cell.column.getSize(),
         ...dndStyle,
         ...(isCut && { overflow: 'hidden' }),
-        ...(actionsWidth > 0 && { paddingRight: actionsWidth + ACTIONS_PADDING_EXTRA }),
       }}
       colSpan={colSpan}
     >
-      {isCut ? (
-        <div className='overflow-hidden' style={{ minWidth: column.columnDef.size }}>
-          {content}
-        </div>
-      ) : (
-        content
-      )}
-      {hasActions && (
-        <TableMasterCellActions onWidthChange={handleActionsWidth}>
-          {meta.renderActions!(cell.row)}
-        </TableMasterCellActions>
-      )}
+      {renderContent()}
     </Td>
   );
 };
