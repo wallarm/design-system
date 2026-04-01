@@ -1,3 +1,7 @@
+## 0.17.0 (2026-04-01)
+
+* feat(table): preview drawer with toggle button [AS-801] (#69) ([c1a84a2](https://github.com/wallarm/design-system/commit/c1a84a2)), closes [#69](https://github.com/wallarm/design-system/issues/69)
+
 ## <small>0.16.6 (2026-04-01)</small>
 
 * fix(table): table experience improvements [AS-582] (#68) ([233555b](https://github.com/wallarm/design-system/commit/233555b)), closes [#68](https://github.com/wallarm/design-system/issues/68)
