@@ -82,7 +82,7 @@ export const TableBodyCell = <T,>({
       className={cn(
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),
-        isCut && !hasActions && 'pr-0',
+        isCut && 'pr-0',
         meta?.cellClassName,
         className,
       )}
