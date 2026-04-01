@@ -4,6 +4,7 @@ export interface DrawerContextValue {
   onOpenChange: (open: boolean) => void;
   closeOnEscape: boolean;
   overlay: boolean;
+  modal: boolean;
 
   // Size management
   width: number | string;

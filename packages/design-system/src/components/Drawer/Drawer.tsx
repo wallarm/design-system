@@ -15,6 +15,8 @@ export interface DrawerProps extends TestableProps {
   closeOnOutsideClick?: boolean;
   /** Overlay visibility (default: true) */
   overlay?: boolean;
+  /** Whether the drawer is modal — blocks interaction with the rest of the page (default: true) */
+  modal?: boolean;
   /** Width - number for pixels, string for percentage (e.g., "50%") */
   width?: number | string;
   /** Minimum width in pixels */
@@ -30,6 +32,7 @@ export const Drawer: FC<DrawerProps> = ({
   closeOnEscape = true,
   closeOnOutsideClick = true,
   overlay = true,
+  modal = true,
   width,
   minWidth,
   maxWidth,
@@ -40,11 +43,16 @@ export const Drawer: FC<DrawerProps> = ({
     onOpenChange={onOpenChange}
     closeOnEscape={closeOnEscape}
     overlay={overlay}
+    modal={modal}
     width={width}
     minWidth={minWidth}
     maxWidth={maxWidth}
   >
-    <DrawerRoot closeOnEscape={closeOnEscape} closeOnOutsideClick={closeOnOutsideClick}>
+    <DrawerRoot
+      closeOnEscape={closeOnEscape}
+      closeOnOutsideClick={closeOnOutsideClick}
+      modal={modal}
+    >
       <TestIdProvider value={testId}>{children}</TestIdProvider>
     </DrawerRoot>
   </DrawerProvider>

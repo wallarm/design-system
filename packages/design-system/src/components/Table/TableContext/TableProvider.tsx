@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   closestCenter,
   DndContext,
@@ -80,6 +80,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     overscan = TABLE_VIRTUALIZATION_OVERSCAN,
     onEndReached,
     onEndReachedThreshold,
+    renderPreviewContent,
   } = props;
 
   // Feature detection
@@ -283,6 +284,9 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
   const theadRef = useRef<HTMLTableSectionElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  // Preview drawer state
+  const [previewRowId, setPreviewRowId] = useState<string | null>(null);
+
   // Context value
   const contextValue: TableContextValue<T> = useMemo(
     () => ({
@@ -312,6 +316,11 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       containerRef,
       onEndReached,
       onEndReachedThreshold,
+      previewRowId,
+      setPreviewRowId,
+      renderPreviewContent: renderPreviewContent as
+        | ((row: Row<T>) => { title: ReactNode; content: ReactNode })
+        | undefined,
     }),
     [
       table,
@@ -337,6 +346,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       masterColumnId,
       onEndReached,
       onEndReachedThreshold,
+      previewRowId,
+      renderPreviewContent,
     ],
   );
 

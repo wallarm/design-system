@@ -64,6 +64,8 @@ export const tableBodyCellVariants = cva(
     'group-hover/row:overlay-states-primary-hover',
     'group-data-[selected]/row:overlay-states-primary-active',
     'group-data-[selected]/row:group-hover/row:overlay-states-primary-hover',
+    'group-data-[preview-active]/row:overlay-states-primary-active',
+    'group-data-[preview-active]/row:group-hover/row:overlay-states-primary-hover',
     '[&:has([data-state=open][data-part=context-trigger])]:ring-2',
     '[&:has([data-state=open][data-part=context-trigger])]:ring-inset',
     '[&:has([data-state=open][data-part=context-trigger])]:ring-border-strong-brand',
