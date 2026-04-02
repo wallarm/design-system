@@ -191,6 +191,56 @@ export const InteractiveDeleteExample: StoryFn = () => {
 };
 
 // ============================================================================
+// Disabled Chip Variants
+// ============================================================================
+
+/**
+ * Disabled chip — dimmed, not clickable, no remove button.
+ * Used for locked filter conditions (e.g. drill-down context).
+ */
+export const Disabled = Template.bind({});
+Disabled.args = {
+  attribute: 'IP Address',
+  operator: 'is',
+  value: '34.74.73.20',
+  disabled: true,
+};
+
+/**
+ * Disabled chip with onRemove — remove button is still hidden.
+ */
+export const DisabledWithOnRemove = Template.bind({});
+DisabledWithOnRemove.args = {
+  attribute: 'Host',
+  operator: 'is',
+  value: 'api.example.com',
+  disabled: true,
+  onRemove: () => alert('This should never fire'),
+};
+
+/**
+ * Mix of disabled and interactive chips.
+ */
+export const DisabledAndInteractiveMix: StoryFn = () => (
+  <div className='flex items-center gap-4'>
+    <FilterInputChip
+      attribute='IP Address'
+      operator='is'
+      value='34.74.73.20'
+      disabled
+      onRemove={() => {}}
+    />
+    <FilterInputConnectorChip variant='and' />
+    <FilterInputChip
+      attribute='Country'
+      operator='is'
+      value='US'
+      onRemove={() => alert('Removed Country filter')}
+    />
+  </div>
+);
+
+// ============================================================================
 // Connector Variants
 // ============================================================================
 
@@ -245,6 +295,21 @@ export const AllStatesShowcase: StoryFn = () => (
           operator='operator'
           value='Value'
           error
+          onRemove={() => {}}
+        />
+      </div>
+    </div>
+
+    {/* Disabled chip variants */}
+    <div>
+      <h3 className='text-sm font-medium text-text-primary mb-2'>Disabled Chip</h3>
+      <div className='flex items-center gap-2 flex-wrap'>
+        <FilterInputChip attribute='IP Address' operator='is' value='34.74.73.20' disabled />
+        <FilterInputChip
+          attribute='Host'
+          operator='is'
+          value='api.example.com'
+          disabled
           onRemove={() => {}}
         />
       </div>

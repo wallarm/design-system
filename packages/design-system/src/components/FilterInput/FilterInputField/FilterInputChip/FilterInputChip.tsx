@@ -21,6 +21,8 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
   valueSeparator?: string;
   errorValueIndices?: number[];
   building?: boolean;
+  /** When true, the chip cannot be edited or removed (dimmed appearance) */
+  disabled?: boolean;
   onRemove?: () => void;
   onSegmentClick?: (segment: ChipSegment, anchorRect: DOMRect) => void;
 }
@@ -36,12 +38,13 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   valueSeparator,
   errorValueIndices,
   building = false,
+  disabled = false,
   onRemove,
   onSegmentClick,
   className,
   ...props
 }) => {
-  const interactive = !building;
+  const interactive = !building && !disabled;
   const hasError = !!error;
   const internalRef = useRef<HTMLDivElement>(null);
 
@@ -85,7 +88,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   return (
     <div
       ref={setRefs}
-      className={cn(chipVariants({ error: hasError, interactive }), 'max-w-[600px]', className)}
+      className={cn(chipVariants({ error: hasError, interactive, disabled }), 'max-w-[600px]', className)}
       data-slot='filter-input-condition-chip'
       {...props}
     >
@@ -125,7 +128,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
 
       {building && <ChipSearchInput />}
 
-      {onRemove && <FilterInputRemoveButton error={hasError} onRemove={onRemove} />}
+      {onRemove && !disabled && <FilterInputRemoveButton error={hasError} onRemove={onRemove} />}
     </div>
   );
 };

@@ -24,6 +24,8 @@ export interface FilterInputChipData {
   valueSeparator?: string;
   /** Indices of invalid values in a multi-value chip (e.g. "in" operator) */
   errorValueIndices?: number[];
+  /** When true, the chip cannot be edited or removed */
+  disabled?: boolean;
 }
 
 /**
@@ -95,6 +97,8 @@ export interface Condition {
   error?: ChipErrorSegment;
   /** For date fields: tracks whether the value originated as relative preset or absolute date */
   dateOrigin?: 'relative' | 'absolute';
+  /** When true, the condition cannot be edited or removed */
+  disabled?: boolean;
 }
 
 /**

@@ -199,3 +199,63 @@ export const ErrorWithValue: Story = {
     );
   },
 };
+
+/**
+ * Disabled chips cannot be edited or removed.
+ * They appear dimmed and do not react to clicks.
+ * Useful for locked filter conditions (e.g. drill-down context in investigation flows).
+ */
+export const WithDisabledChips: Story = {
+  render: () => {
+    const [expression, setExpression] = useState<ExprNode | null>({
+      type: 'group',
+      operator: 'and',
+      children: [
+        { type: 'condition', field: 'country', operator: '=', value: 'US', disabled: true },
+        { type: 'condition', field: 'status', operator: '=', value: 'blocked', disabled: true },
+        { type: 'condition', field: 'priority', operator: '>', value: 5 },
+      ],
+    });
+
+    return (
+      <>
+        <FilterInput
+          fields={sampleFields}
+          value={expression}
+          onChange={setExpression}
+          placeholder='Add more filters...'
+        />
+        {expression && (
+          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+            <pre>{JSON.stringify(expression, null, 2)}</pre>
+          </div>
+        )}
+      </>
+    );
+  },
+};
+
+/**
+ * All chips disabled — clear button removes nothing, input still allows adding new chips.
+ */
+export const AllChipsDisabled: Story = {
+  render: () => {
+    const [expression, setExpression] = useState<ExprNode | null>({
+      type: 'group',
+      operator: 'and',
+      children: [
+        { type: 'condition', field: 'status', operator: '=', value: 'registered', disabled: true },
+        { type: 'condition', field: 'country', operator: 'in', value: ['US', 'DE'], disabled: true },
+      ],
+    });
+
+    return (
+      <FilterInput
+        fields={sampleFields}
+        value={expression}
+        onChange={setExpression}
+        placeholder='Add more filters...'
+      />
+    );
+  },
+};

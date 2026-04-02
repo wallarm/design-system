@@ -13,6 +13,10 @@ export const chipVariants = cva(
         true: 'cursor-pointer',
         false: '',
       },
+      disabled: {
+        true: 'opacity-50 cursor-default',
+        false: '',
+      },
     },
     compoundVariants: [
       { interactive: false, error: false, className: 'border-border-strong-primary' },
@@ -20,6 +24,7 @@ export const chipVariants = cva(
     defaultVariants: {
       error: false,
       interactive: false,
+      disabled: false,
     },
   },
 );

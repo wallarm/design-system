@@ -1,7 +1,7 @@
 import type { ChangeEvent, KeyboardEvent, MutableRefObject, RefObject } from 'react';
 import { useCallback, useRef } from 'react';
 import { getOperatorFromLabel, hasFieldValues, OPERATOR_SYMBOLS } from '../../lib';
-import type { FieldMetadata, FilterOperator, MenuState } from '../../types';
+import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface UseInputHandlersDeps {
   inputText: string;
@@ -10,6 +10,7 @@ interface UseInputHandlersDeps {
   isFocused: boolean;
   fields: FieldMetadata[];
   inputRef: RefObject<HTMLInputElement | null>;
+  conditionsRef: MutableRefObject<Condition[]>;
   conditionsLengthRef: MutableRefObject<number>;
   effectiveInsertIndexRef: MutableRefObject<number>;
   setInputText: (text: string) => void;
@@ -29,6 +30,7 @@ export const useInputHandlers = ({
   isFocused,
   fields,
   inputRef,
+  conditionsRef,
   conditionsLengthRef,
   effectiveInsertIndexRef,
   setInputText,
@@ -133,7 +135,7 @@ export const useInputHandlers = ({
       ) {
         e.preventDefault();
         const removeIdx = effectiveInsertIndexRef.current - 1;
-        if (removeIdx >= 0) {
+        if (removeIdx >= 0 && !conditionsRef.current[removeIdx]?.disabled) {
           removeConditionAtIndex(removeIdx);
           setInsertIndex(prev => {
             const eff = prev ?? conditionsLengthRef.current;
