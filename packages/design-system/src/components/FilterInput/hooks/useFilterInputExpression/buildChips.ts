@@ -40,6 +40,7 @@ const buildBaseChip = (i: number, condition: Condition, field: FieldMetadata | u
   operator: condition.operator
     ? getOperatorLabel(condition.operator, field?.type || DEFAULT_FIELD_TYPE)
     : undefined,
+  ...(condition.disabled && { disabled: true }),
 });
 
 /** Build chip for a date range condition (between) */

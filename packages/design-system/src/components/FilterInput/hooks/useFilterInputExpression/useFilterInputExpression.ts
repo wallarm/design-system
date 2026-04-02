@@ -164,6 +164,9 @@ export const useFilterInputExpression = ({
       if (idx === null) return;
 
       setState(prev => {
+        // Do not remove disabled conditions
+        if (prev.conditions[idx]?.disabled) return prev;
+
         const newConditions = prev.conditions.filter((_, i) => i !== idx);
         const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
 
@@ -179,6 +182,8 @@ export const useFilterInputExpression = ({
     (idx: number) => {
       setState(prev => {
         if (idx < 0 || idx >= prev.conditions.length) return prev;
+        // Do not remove disabled conditions
+        if (prev.conditions[idx]?.disabled) return prev;
         const newConditions = prev.conditions.filter((_, i) => i !== idx);
         const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
 
@@ -191,8 +196,17 @@ export const useFilterInputExpression = ({
   );
 
   const clearAll = useCallback(() => {
-    setState(EMPTY_STATE);
-    onChange?.(null);
+    setState(prev => {
+      const disabledConditions = prev.conditions.filter(c => c.disabled);
+      if (disabledConditions.length === 0) {
+        onChange?.(null);
+        return EMPTY_STATE;
+      }
+      // Keep disabled conditions and their connectors
+      const next = { conditions: disabledConditions, connectors: [] as Array<'and' | 'or'> };
+      onChange?.(buildExpression(next.conditions, next.connectors));
+      return next;
+    });
   }, [onChange]);
 
   const setConnectorValue = useCallback(

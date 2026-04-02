@@ -68,6 +68,8 @@ export const useFilterInputAutocomplete = ({
   // Refs keep values fresh for callbacks to avoid stale closures and unnecessary recreation
   const effectiveInsertIndexRef = useRef(effectiveInsertIndex);
   effectiveInsertIndexRef.current = effectiveInsertIndex;
+  const conditionsRef = useRef(conditions);
+  conditionsRef.current = conditions;
   const conditionsLengthRef = useRef(conditions.length);
   conditionsLengthRef.current = conditions.length;
 
@@ -181,6 +183,7 @@ export const useFilterInputAutocomplete = ({
     isFocused,
     fields,
     inputRef,
+    conditionsRef,
     conditionsLengthRef,
     effectiveInsertIndexRef,
     setInputText,
