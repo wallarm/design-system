@@ -1,3 +1,7 @@
+## 0.18.0 (2026-04-02)
+
+* feat(filter-input): add disabled chip support [AS-801] (#71) ([0dbb922](https://github.com/wallarm/design-system/commit/0dbb922)), closes [#71](https://github.com/wallarm/design-system/issues/71)
+
 ## 0.17.0 (2026-04-01)
 
 * feat(table): preview drawer with toggle button [AS-801] (#69) ([c1a84a2](https://github.com/wallarm/design-system/commit/c1a84a2)), closes [#69](https://github.com/wallarm/design-system/issues/69)
