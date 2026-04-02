@@ -88,7 +88,11 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   return (
     <div
       ref={setRefs}
-      className={cn(chipVariants({ error: hasError, interactive, disabled }), 'max-w-[600px]', className)}
+      className={cn(
+        chipVariants({ error: hasError, interactive, disabled }),
+        'max-w-[600px]',
+        className,
+      )}
       data-slot='filter-input-condition-chip'
       {...props}
     >

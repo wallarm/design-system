@@ -228,7 +228,7 @@ export const DisabledAndInteractiveMix: StoryFn = () => (
       operator='is'
       value='34.74.73.20'
       disabled
-      onRemove={() => {}}
+      onRemove={() => undefined}
     />
     <FilterInputConnectorChip variant='and' />
     <FilterInputChip
@@ -310,7 +310,7 @@ export const AllStatesShowcase: StoryFn = () => (
           operator='is'
           value='api.example.com'
           disabled
-          onRemove={() => {}}
+          onRemove={() => undefined}
         />
       </div>
     </div>

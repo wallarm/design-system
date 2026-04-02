@@ -51,7 +51,11 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
             errorValueIndices={chip.errorValueIndices}
             disabled={chip.disabled}
             onRemove={chip.disabled ? undefined : () => onChipRemove(chip.id)}
-            onSegmentClick={chip.disabled ? undefined : (segment, anchorRect) => onChipClick(chip.id, segment, anchorRect)}
+            onSegmentClick={
+              chip.disabled
+                ? undefined
+                : (segment, anchorRect) => onChipClick(chip.id, segment, anchorRect)
+            }
           />
         </div>,
       );

@@ -245,7 +245,13 @@ export const AllChipsDisabled: Story = {
       operator: 'and',
       children: [
         { type: 'condition', field: 'status', operator: '=', value: 'registered', disabled: true },
-        { type: 'condition', field: 'country', operator: 'in', value: ['US', 'DE'], disabled: true },
+        {
+          type: 'condition',
+          field: 'country',
+          operator: 'in',
+          value: ['US', 'DE'],
+          disabled: true,
+        },
       ],
     });
 

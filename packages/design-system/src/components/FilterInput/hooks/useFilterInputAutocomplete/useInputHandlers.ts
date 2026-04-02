@@ -157,6 +157,7 @@ export const useInputHandlers = ({
       setInputText,
       setMenuState,
       setInsertIndex,
+      conditionsRef,
       conditionsLengthRef,
       effectiveInsertIndexRef,
     ],
