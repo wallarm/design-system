@@ -1,4 +1,4 @@
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef } from 'react';
 import {
   closestCenter,
   DndContext,
@@ -81,6 +81,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     onEndReached,
     onEndReachedThreshold,
     renderPreviewContent,
+    previewRowId: previewRowIdProp,
+    onPreviewRowChange,
   } = props;
 
   // Feature detection
@@ -284,8 +286,18 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
   const theadRef = useRef<HTMLTableSectionElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Preview drawer state
-  const [previewRowId, setPreviewRowId] = useState<string | null>(null);
+  // Preview drawer state (controlled/uncontrolled)
+  const [previewRowId = null, setPreviewRowIdInternal] = useControlled<string | null>({
+    controlled: previewRowIdProp,
+    default: null,
+  });
+  const setPreviewRowId = useCallback(
+    (id: string | null) => {
+      setPreviewRowIdInternal(id);
+      onPreviewRowChange?.(id);
+    },
+    [setPreviewRowIdInternal, onPreviewRowChange],
+  );
 
   // Context value
   const contextValue: TableContextValue<T> = useMemo(

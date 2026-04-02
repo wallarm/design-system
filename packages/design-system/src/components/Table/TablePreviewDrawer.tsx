@@ -28,11 +28,9 @@ export const TablePreviewDrawer: FC = () => {
     >
       {displayPreview && (
         <DrawerContent>
-          {displayPreview.title && (
-            <DrawerHeader>
-              <DrawerTitle>{displayPreview.title}</DrawerTitle>
-            </DrawerHeader>
-          )}
+          <DrawerHeader>
+            {displayPreview.title && <DrawerTitle>{displayPreview.title}</DrawerTitle>}
+          </DrawerHeader>
           <DrawerBody>{displayPreview.content}</DrawerBody>
         </DrawerContent>
       )}

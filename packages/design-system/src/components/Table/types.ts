@@ -213,6 +213,10 @@ export interface TableProps<T> extends TestableProps {
 
   // --- Preview drawer ---
   /** Render preview drawer for a row. Returns title and body content.
-   *  When provided, a preview toggle button is automatically added to master cell actions. */
+   *  When provided, clicking the master cell toggles the preview drawer. */
   renderPreviewContent?: (row: TableRow<T>) => { title?: ReactNode; content: ReactNode };
+  /** Controlled preview row ID. Pass `null` to close. */
+  previewRowId?: string | null;
+  /** Callback when preview row changes (open/close/swap). */
+  onPreviewRowChange?: (rowId: string | null) => void;
 }

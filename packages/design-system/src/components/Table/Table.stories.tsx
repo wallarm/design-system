@@ -657,6 +657,65 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
   );
 };
 
+export const MasterCellWithPreviewDrawer: StoryFn<typeof meta> = () => {
+  const [sorting, setSorting] = useState<TableSortingState>([]);
+
+  const data = useMemo(
+    () =>
+      Array.from({ length: 4 }, (_, batch) =>
+        securityEvents.map(row => ({
+          ...row,
+          id: `${row.id}-${batch}`,
+          objectName: batch === 0 ? row.objectName : `${row.objectName} (${batch + 1})`,
+        })),
+      ).flat(),
+    [],
+  );
+
+  return (
+    <Table
+      className='max-w-920'
+      data={data}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      renderPreviewContent={row => ({
+        title: row.original.objectName,
+        content: (
+          <VStack gap={16}>
+            <HStack gap={8}>
+              <Badge
+                variant='dotted'
+                color={row.original.status === 'Blocked' ? 'red' : 'yellow'}
+                type='secondary'
+                size='medium'
+              >
+                {row.original.status}
+              </Badge>
+              <InlineCodeSnippet code={row.original.parameter} size='sm' copyable={false} />
+            </HStack>
+            <VStack gap={4}>
+              <Text size='sm' color='secondary'>
+                Source: {row.original.sourceCountry} · {row.original.sourceProvider}
+              </Text>
+              <Text size='sm' color='secondary'>
+                First detected: {row.original.firstDetected}
+              </Text>
+              <Text size='sm' color='secondary'>
+                Last seen: {row.original.lastSeen}
+              </Text>
+              <Text size='sm' color='secondary'>
+                Security: {row.original.cweId}
+              </Text>
+            </VStack>
+          </VStack>
+        ),
+      })}
+    />
+  );
+};
+
 export const FullFeatured: StoryFn<typeof meta> = () => {
   const data = useMemo(() => createLargeGroupedData(12, 50), []);
 

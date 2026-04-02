@@ -12,7 +12,6 @@ import {
 import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableMasterCellActions } from '../TableMasterCellActions';
-import { TablePreviewToggle } from '../TablePreviewToggle';
 
 interface TableBodyCellProps<T> {
   cell: Cell<T, unknown>;
@@ -45,23 +44,14 @@ export const TableBodyCell = <T,>({
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
 
   const isMasterColumn = column.id === masterColumnId;
-  const hasAutoPreview = isMasterColumn && !!renderPreviewContent;
-  const hasActions = !!(hasAutoPreview || meta?.renderMenuAction);
+  const hasPreview = isMasterColumn && !!renderPreviewContent;
+  const hasMenuAction = !!meta?.renderMenuAction;
+  const hasActions = hasMenuAction;
 
-  const renderActions = () => {
+  const handleMasterCellClick = () => {
+    if (!hasPreview) return;
     const rowId = cell.row.id;
-
-    return (
-      <>
-        {hasAutoPreview && (
-          <TablePreviewToggle
-            active={previewRowId === rowId}
-            onClick={() => setPreviewRowId(previewRowId === rowId ? null : rowId)}
-          />
-        )}
-        {meta?.renderMenuAction?.(cell.row)}
-      </>
-    );
+    setPreviewRowId(previewRowId === rowId ? null : rowId);
   };
 
   const renderContent = () => {
@@ -69,7 +59,7 @@ export const TableBodyCell = <T,>({
       return (
         <div className='flex items-center justify-between gap-2'>
           <span className='min-w-0 [&>*]:block [&>*]:truncate'>{content}</span>
-          <TableMasterCellActions>{renderActions()}</TableMasterCellActions>
+          <TableMasterCellActions>{meta?.renderMenuAction?.(cell.row)}</TableMasterCellActions>
         </div>
       );
     }
@@ -92,6 +82,7 @@ export const TableBodyCell = <T,>({
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),
         isCut && 'pr-0',
+        hasPreview && 'cursor-pointer',
         meta?.cellClassName,
         className,
       )}
@@ -99,6 +90,7 @@ export const TableBodyCell = <T,>({
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}
       ref={canDnd ? setNodeRef : undefined}
+      onClick={hasPreview ? handleMasterCellClick : undefined}
       style={{
         ...pinningStyles,
         width: cell.column.getSize(),
