@@ -107,6 +107,7 @@ export { LayoutPanelLeft } from './LayoutPanelLeft';
 export { LayoutPanelTop } from './LayoutPanelTop';
 export { LayoutTemplate } from './LayoutTemplate';
 export { LibraryBig } from './LibraryBig';
+export { Link } from './Link';
 export { Loader } from './Loader';
 export { LoaderCircle } from './LoaderCircle';
 export { Lock } from './Lock';
