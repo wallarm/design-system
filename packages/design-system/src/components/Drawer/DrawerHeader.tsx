@@ -19,7 +19,7 @@ export const DrawerHeader: FC<DrawerHeaderProps> = ({ children, ref }) => {
       className={cn(
         'relative shrink-0 w-full',
         'bg-bg-surface-2',
-        'flex items-center justify-between gap-12',
+        'flex items-start justify-between gap-12',
         'pt-16 pb-12 pl-24 pr-16',
         'rounded-t-12',
         'outline-none',
