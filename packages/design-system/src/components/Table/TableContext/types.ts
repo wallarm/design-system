@@ -59,6 +59,7 @@ export interface TableContextValue<T> {
   renderPreviewHeader?: (row: Row<T>) => ReactNode;
   renderPreviewContent?: (row: Row<T>) => ReactNode;
   previewTrigger: 'master' | 'button';
+  previewTooltipText: string;
 }
 
 export interface TableProviderProps<T> extends Omit<TableProps<T>, 'children' | 'aria-label'> {

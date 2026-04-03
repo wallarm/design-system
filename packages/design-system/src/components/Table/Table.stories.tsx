@@ -613,9 +613,11 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
       onSortingChange={setSorting}
       columnSizing={columnSizing}
       onColumnSizingChange={setColumnSizing}
-      previewTrigger='button'
-      renderPreviewHeader={renderSecurityPreviewHeader}
-      renderPreviewContent={renderSecurityPreview}
+      preview={{
+        trigger: 'button',
+        renderHeader: renderSecurityPreviewHeader,
+        renderContent: renderSecurityPreview,
+      }}
     />
   );
 };
@@ -658,7 +660,7 @@ export const MasterCellWithPreviewDrawer: StoryFn<typeof meta> = () => {
       getRowId={row => row.id}
       sorting={sorting}
       onSortingChange={setSorting}
-      renderPreviewContent={renderSecurityPreviewWithTitle}
+      preview={{ renderContent: renderSecurityPreviewWithTitle }}
     />
   );
 };

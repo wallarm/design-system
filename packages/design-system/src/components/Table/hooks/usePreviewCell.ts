@@ -6,8 +6,14 @@ import { useTableContext } from '../TableContext';
  * Returns flags and a click handler based on `previewTrigger` mode.
  */
 export const usePreviewCell = <T>(columnId: string, rowId: string) => {
-  const { masterColumnId, previewRowId, setPreviewRowId, renderPreviewContent, previewTrigger } =
-    useTableContext<T>();
+  const {
+    masterColumnId,
+    previewRowId,
+    setPreviewRowId,
+    renderPreviewContent,
+    previewTrigger,
+    previewTooltipText,
+  } = useTableContext<T>();
 
   const isMasterColumn = columnId === masterColumnId;
   const hasPreview = isMasterColumn && !!renderPreviewContent;
@@ -28,5 +34,7 @@ export const usePreviewCell = <T>(columnId: string, rowId: string) => {
     isActive,
     /** Toggle preview for this row (open/close) */
     togglePreview,
+    /** Tooltip text for master cell hover */
+    tooltipText: hasPreview ? previewTooltipText : undefined,
   };
 };

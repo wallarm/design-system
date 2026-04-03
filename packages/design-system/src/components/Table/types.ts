@@ -216,16 +216,24 @@ export interface TableProps<T> extends TestableProps {
   onEndReachedThreshold?: number;
 
   // --- Preview drawer ---
-  /** Render preview drawer header for a row. Rendered inside DrawerHeader. */
-  renderPreviewHeader?: (row: TableRow<T>) => ReactNode;
-  /** Render preview drawer content for a row. */
-  renderPreviewContent?: (row: TableRow<T>) => ReactNode;
+  /** Preview drawer configuration */
+  preview?: TablePreview<T>;
+}
+
+/** Preview drawer configuration */
+export interface TablePreview<T> {
+  /** Render drawer header for a row */
+  renderHeader?: (row: TableRow<T>) => ReactNode;
+  /** Render drawer content for a row */
+  renderContent: (row: TableRow<T>) => ReactNode;
   /** How the preview drawer is triggered:
    *  - `'master'` — clicking the master cell toggles the drawer (default)
    *  - `'button'` — a toggle button appears in master cell actions on hover */
-  previewTrigger?: 'master' | 'button';
+  trigger?: 'master' | 'button';
+  /** Tooltip text on master cell hover (default: 'Open preview') */
+  tooltipText?: string;
   /** Controlled preview row ID. Pass `null` to close. */
-  previewRowId?: string | null;
+  rowId?: string | null;
   /** Callback when preview row changes (open/close/swap). */
-  onPreviewRowChange?: (rowId: string | null) => void;
+  onRowChange?: (rowId: string | null) => void;
 }
