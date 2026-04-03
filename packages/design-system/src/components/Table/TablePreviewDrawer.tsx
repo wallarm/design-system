@@ -25,6 +25,7 @@ export const TablePreviewDrawer: FC = () => {
       modal={false}
       overlay={false}
       closeOnOutsideClick={false}
+      width={960}
     >
       <DrawerContent>
         <DrawerHeader>
