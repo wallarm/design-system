@@ -1,3 +1,7 @@
+## 0.19.0 (2026-04-03)
+
+* feat(table): master cell preview drawer [AS-801] (#75) ([349712e](https://github.com/wallarm/design-system/commit/349712e)), closes [#75](https://github.com/wallarm/design-system/issues/75)
+
 ## 0.18.0 (2026-04-02)
 
 * feat(filter-input): add disabled chip support [AS-801] (#71) ([0dbb922](https://github.com/wallarm/design-system/commit/0dbb922)), closes [#71](https://github.com/wallarm/design-system/issues/71)
