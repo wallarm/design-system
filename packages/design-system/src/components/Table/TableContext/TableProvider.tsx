@@ -81,6 +81,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     onEndReached,
     onEndReachedThreshold,
     renderPreviewContent,
+    previewTrigger = 'master',
     previewRowId: previewRowIdProp,
     onPreviewRowChange,
   } = props;
@@ -330,9 +331,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       onEndReachedThreshold,
       previewRowId,
       setPreviewRowId,
-      renderPreviewContent: renderPreviewContent as
-        | ((row: Row<T>) => { title?: ReactNode; content: ReactNode })
-        | undefined,
+      renderPreviewContent: renderPreviewContent as ((row: Row<T>) => ReactNode) | undefined,
+      previewTrigger,
     }),
     [
       table,
@@ -360,6 +360,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       onEndReachedThreshold,
       previewRowId,
       renderPreviewContent,
+      previewTrigger,
     ],
   );
 

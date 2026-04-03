@@ -23,7 +23,7 @@ import {
   OverflowTooltipContent,
   OverflowTooltipTrigger,
 } from '../OverflowTooltip';
-import { HStack } from '../Stack';
+import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { createTableColumnHelper } from './lib';
 import type { TableColumnDef } from './types';
@@ -610,6 +610,50 @@ export const createLargeGroupedData = (
 // ---------------------------------------------------------------------------
 // Large flat data — for a Virtualized story
 // ---------------------------------------------------------------------------
+
+/** Shared preview drawer content for security events */
+export const renderSecurityPreview = (row: { original: SecurityEvent }) => (
+  <VStack gap={16}>
+    <Text size='lg' weight='medium'>
+      {row.original.objectName}
+    </Text>
+    <HStack gap={8}>
+      <Badge
+        variant='dotted'
+        color={row.original.status === 'Blocked' ? 'red' : 'yellow'}
+        type='secondary'
+        size='medium'
+      >
+        {row.original.status}
+      </Badge>
+      <InlineCodeSnippet code={row.original.parameter} size='sm' copyable={false} />
+    </HStack>
+    <VStack gap={4}>
+      <Text size='sm' color='secondary'>
+        Source: {row.original.sourceCountry} · {row.original.sourceProvider}
+      </Text>
+      <Text size='sm' color='secondary'>
+        First detected: {row.original.firstDetected}
+      </Text>
+      <Text size='sm' color='secondary'>
+        Last seen: {row.original.lastSeen}
+      </Text>
+      <Text size='sm' color='secondary'>
+        Security: {row.original.cweId}
+      </Text>
+    </VStack>
+  </VStack>
+);
+
+/** Duplicate securityEvents N times with unique IDs */
+export const multiplySecurityEvents = (times = 4): SecurityEvent[] =>
+  Array.from({ length: times }, (_, batch) =>
+    securityEvents.map(row => ({
+      ...row,
+      id: `${row.id}-${batch}`,
+      objectName: batch === 0 ? row.objectName : `${row.objectName} (${batch + 1})`,
+    })),
+  ).flat();
 
 export const createLargeSecurityEvents = (count = 1000): SecurityEvent[] =>
   Array.from({ length: count }, (_, i) => {

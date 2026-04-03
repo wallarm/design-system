@@ -24,6 +24,8 @@ declare module '@tanstack/react-table' {
     description?: { type: 'text' | 'tooltip'; content: string };
     /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
     resizeType?: 'cut' | 'resize';
+    /** Render the preview toggle button shown on hover */
+    renderPreviewAction?: (row: Row<TData>) => ReactNode;
     /** Render the three-dots contextual menu shown on hover */
     renderMenuAction?: (row: Row<TData>) => ReactNode;
   }
@@ -101,6 +103,8 @@ export interface TableColumnMeta<T = unknown> {
   description?: { type: 'text' | 'tooltip'; content: string };
   /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
   resizeType?: 'cut' | 'resize';
+  /** Render the preview toggle button shown on hover */
+  renderPreviewAction?: (row: TableRow<T>) => ReactNode;
   /** Render the three-dots contextual menu shown on hover */
   renderMenuAction?: (row: TableRow<T>) => ReactNode;
 }
@@ -212,9 +216,12 @@ export interface TableProps<T> extends TestableProps {
   onEndReachedThreshold?: number;
 
   // --- Preview drawer ---
-  /** Render preview drawer for a row. Returns title and body content.
-   *  When provided, clicking the master cell toggles the preview drawer. */
-  renderPreviewContent?: (row: TableRow<T>) => { title?: ReactNode; content: ReactNode };
+  /** Render preview drawer content for a row. */
+  renderPreviewContent?: (row: TableRow<T>) => ReactNode;
+  /** How the preview drawer is triggered:
+   *  - `'master'` — clicking the master cell toggles the drawer (default)
+   *  - `'button'` — a toggle button appears in master cell actions on hover */
+  previewTrigger?: 'master' | 'button';
   /** Controlled preview row ID. Pass `null` to close. */
   previewRowId?: string | null;
   /** Callback when preview row changes (open/close/swap). */

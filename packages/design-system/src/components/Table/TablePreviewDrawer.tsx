@@ -1,6 +1,6 @@
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import { useRef } from 'react';
-import { Drawer, DrawerBody, DrawerContent, DrawerHeader, DrawerTitle } from '../Drawer';
+import { Drawer, DrawerBody, DrawerContent, DrawerHeader } from '../Drawer';
 import { useTableContext } from './TableContext';
 
 export const TablePreviewDrawer: FC = () => {
@@ -10,7 +10,7 @@ export const TablePreviewDrawer: FC = () => {
   const preview = row && renderPreviewContent ? renderPreviewContent(row) : undefined;
 
   // Keep the last valid preview so drawer content doesn't flash empty during close animation
-  const lastPreviewRef = useRef(preview);
+  const lastPreviewRef = useRef<ReactNode>(null);
   if (preview) lastPreviewRef.current = preview;
   const displayPreview = preview ?? lastPreviewRef.current;
 
@@ -26,14 +26,12 @@ export const TablePreviewDrawer: FC = () => {
       overlay={false}
       closeOnOutsideClick={false}
     >
-      {displayPreview && (
-        <DrawerContent>
-          <DrawerHeader>
-            {displayPreview.title && <DrawerTitle>{displayPreview.title}</DrawerTitle>}
-          </DrawerHeader>
-          <DrawerBody>{displayPreview.content}</DrawerBody>
-        </DrawerContent>
-      )}
+      <DrawerContent>
+        <DrawerHeader>
+          <span />
+        </DrawerHeader>
+        <DrawerBody>{displayPreview}</DrawerBody>
+      </DrawerContent>
     </Drawer>
   );
 };
