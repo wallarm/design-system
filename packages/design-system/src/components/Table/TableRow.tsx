@@ -17,11 +17,11 @@ interface TableRowProps<T> {
 }
 
 const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<T>) => {
-  const { expandingEnabled, previewRowId } = useTableContext<T>();
+  const { expandingEnabled, preview } = useTableContext<T>();
   const testId = useTestId('row');
   const isGroupParent = row.subRows.length > 0;
   const isSelected = isGroupParent ? row.getIsAllSubRowsSelected() : row.getIsSelected();
-  const isPreviewActive = previewRowId === row.id;
+  const isPreviewActive = preview.rowId === row.id;
 
   if (isGroupParent) {
     const cells = row.getVisibleCells();
