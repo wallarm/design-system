@@ -216,6 +216,8 @@ export interface TableProps<T> extends TestableProps {
   onEndReachedThreshold?: number;
 
   // --- Preview drawer ---
+  /** Render preview drawer header for a row. Rendered inside DrawerHeader. */
+  renderPreviewHeader?: (row: TableRow<T>) => ReactNode;
   /** Render preview drawer content for a row. */
   renderPreviewContent?: (row: TableRow<T>) => ReactNode;
   /** How the preview drawer is triggered:
