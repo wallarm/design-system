@@ -4,6 +4,7 @@ import { abbreviateNumber } from '../../utils/abbreviateNumber';
 import { Badge } from '../Badge';
 import { InlineCodeSnippet } from '../CodeSnippet';
 import type { CountryCode } from '../Country';
+import { DrawerHeader } from '../Drawer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -611,12 +612,29 @@ export const createLargeGroupedData = (
 // Large flat data — for a Virtualized story
 // ---------------------------------------------------------------------------
 
-/** Shared preview drawer content for security events */
-export const renderSecurityPreview = (row: { original: SecurityEvent }) => (
-  <VStack gap={16}>
+/** Shared preview drawer header for security events */
+export const renderSecurityPreviewHeader = (row: { original: SecurityEvent }) => (
+  <DrawerHeader>
     <Text size='lg' weight='medium'>
       {row.original.objectName}
     </Text>
+  </DrawerHeader>
+);
+
+/** Preview drawer content for security events */
+const SecurityPreviewContent = ({
+  row,
+  showTitle,
+}: {
+  row: { original: SecurityEvent };
+  showTitle?: boolean;
+}) => (
+  <VStack gap={16}>
+    {showTitle && (
+      <Text size='lg' weight='medium'>
+        {row.original.objectName}
+      </Text>
+    )}
     <HStack gap={8}>
       <Badge
         variant='dotted'
@@ -643,6 +661,18 @@ export const renderSecurityPreview = (row: { original: SecurityEvent }) => (
       </Text>
     </VStack>
   </VStack>
+);
+
+SecurityPreviewContent.displayName = 'SecurityPreviewContent';
+
+/** Preview content for use with header (objectName shown in header) */
+export const renderSecurityPreview = (row: { original: SecurityEvent }) => (
+  <SecurityPreviewContent row={row} />
+);
+
+/** Preview content for use without header (includes objectName) */
+export const renderSecurityPreviewWithTitle = (row: { original: SecurityEvent }) => (
+  <SecurityPreviewContent row={row} showTitle />
 );
 
 /** Duplicate securityEvents N times with unique IDs */

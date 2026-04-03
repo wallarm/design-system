@@ -56,6 +56,7 @@ export interface TableContextValue<T> {
   // Preview drawer
   previewRowId: string | null;
   setPreviewRowId: (id: string | null) => void;
+  renderPreviewHeader?: (row: Row<T>) => ReactNode;
   renderPreviewContent?: (row: Row<T>) => ReactNode;
   previewTrigger: 'master' | 'button';
 }
