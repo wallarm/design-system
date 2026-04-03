@@ -90,7 +90,7 @@ export const TableBodyCell = <T,>({
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),
         isCut && 'pr-0',
-        isMasterTrigger && 'cursor-pointer',
+        (isMasterTrigger || tooltipText) && 'cursor-pointer',
         meta?.cellClassName,
         className,
       )}

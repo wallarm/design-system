@@ -3,7 +3,7 @@ import { useTableContext } from '../TableContext';
 
 /**
  * Encapsulates preview drawer logic for a body cell.
- * Returns flags and a click handler based on `previewTrigger` mode.
+ * Returns flags and a click handler based on `preview.trigger` mode.
  */
 export const usePreviewCell = <T>(columnId: string, rowId: string) => {
   const { masterColumnId, preview } = useTableContext<T>();

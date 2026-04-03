@@ -12,11 +12,11 @@ export const TablePreviewDrawer: FC = () => {
 
   // Keep the last valid preview so drawer content doesn't flash empty during close animation
   const lastHeaderRef = useRef<ReactNode>(null);
-  const lastPreviewRef = useRef<ReactNode>(null);
+  const lastContentRef = useRef<ReactNode>(null);
   if (header) lastHeaderRef.current = header;
-  if (content) lastPreviewRef.current = content;
+  if (content) lastContentRef.current = content;
   const displayHeader = header ?? lastHeaderRef.current;
-  const displayContent = content ?? lastPreviewRef.current;
+  const displayContent = content ?? lastContentRef.current;
 
   if (!previewCtx.renderContent) return null;
 
