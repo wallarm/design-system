@@ -1,3 +1,7 @@
+## 0.20.0 (2026-04-03)
+
+* feat(icons): add Zap and Sheet icons (#77) ([c750ea6](https://github.com/wallarm/design-system/commit/c750ea6)), closes [#77](https://github.com/wallarm/design-system/issues/77)
+
 ## <small>0.19.1 (2026-04-03)</small>
 
 * fix(table): use DrawerHeader with close button in preview drawer (#76) ([4756040](https://github.com/wallarm/design-system/commit/4756040)), closes [#76](https://github.com/wallarm/design-system/issues/76)
