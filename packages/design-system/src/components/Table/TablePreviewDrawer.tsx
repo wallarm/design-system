@@ -4,20 +4,11 @@ import { Drawer, DrawerBody, DrawerContent, DrawerHeader } from '../Drawer';
 import { useTableContext } from './TableContext';
 
 export const TablePreviewDrawer: FC = () => {
-  const {
-    table,
-    previewRowId,
-    setPreviewRowId,
-    renderPreviewHeader,
-    renderPreviewContent,
-    previewTrigger,
-  } = useTableContext();
+  const { table, previewRowId, setPreviewRowId, renderPreviewHeader, renderPreviewContent } =
+    useTableContext();
 
   const row = previewRowId ? table.getRowModel().rowsById[previewRowId] : undefined;
-  const header =
-    row && renderPreviewHeader && previewTrigger === 'button'
-      ? renderPreviewHeader(row)
-      : undefined;
+  const header = row && renderPreviewHeader ? renderPreviewHeader(row) : undefined;
   const preview = row && renderPreviewContent ? renderPreviewContent(row) : undefined;
 
   // Keep the last valid preview so drawer content doesn't flash empty during close animation
