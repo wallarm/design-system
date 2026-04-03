@@ -18,7 +18,6 @@ import {
 } from '../DropdownMenu';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import {
   createLargeGroupedData,
   createLargeSecurityEvents,
@@ -27,6 +26,8 @@ import {
   headerColumnIds,
   headerColumns,
   METHOD_COLORS,
+  multiplySecurityEvents,
+  renderSecurityPreview,
   type SecurityEvent,
   type SecurityHeaderEntry,
   securityColumnHelper,
@@ -545,18 +546,7 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
 
-  // 4x the data by duplicating with unique IDs
-  const data = useMemo(
-    () =>
-      Array.from({ length: 4 }, (_, batch) =>
-        securityEvents.map(row => ({
-          ...row,
-          id: `${row.id}-${batch}`,
-          objectName: batch === 0 ? row.objectName : `${row.objectName} (${batch + 1})`,
-        })),
-      ).flat(),
-    [],
-  );
+  const data = useMemo(() => multiplySecurityEvents(), []);
 
   const columns = useMemo<TableColumnDef<SecurityEvent>[]>(
     () =>
@@ -621,38 +611,51 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
       onSortingChange={setSorting}
       columnSizing={columnSizing}
       onColumnSizingChange={setColumnSizing}
-      renderPreviewContent={row => ({
-        title: row.original.objectName,
-        content: (
-          <VStack gap={16}>
-            <HStack gap={8}>
-              <Badge
-                variant='dotted'
-                color={row.original.status === 'Blocked' ? 'red' : 'yellow'}
-                type='secondary'
-                size='medium'
-              >
-                {row.original.status}
-              </Badge>
-              <InlineCodeSnippet code={row.original.parameter} size='sm' copyable={false} />
-            </HStack>
-            <VStack gap={4}>
-              <Text size='sm' color='secondary'>
-                Source: {row.original.sourceCountry} · {row.original.sourceProvider}
-              </Text>
-              <Text size='sm' color='secondary'>
-                First detected: {row.original.firstDetected}
-              </Text>
-              <Text size='sm' color='secondary'>
-                Last seen: {row.original.lastSeen}
-              </Text>
-              <Text size='sm' color='secondary'>
-                Security: {row.original.cweId}
-              </Text>
-            </VStack>
-          </VStack>
-        ),
-      })}
+      previewTrigger='button'
+      renderPreviewContent={renderSecurityPreview}
+    />
+  );
+};
+
+export const MasterCellWithPreviewDrawer: StoryFn<typeof meta> = () => {
+  const [sorting, setSorting] = useState<TableSortingState>([]);
+
+  const data = useMemo(
+    () =>
+      Array.from({ length: 4 }, (_, batch) =>
+        securityEvents.map(row => ({
+          ...row,
+          id: `${row.id}-${batch}`,
+          objectName: batch === 0 ? row.objectName : `${row.objectName} (${batch + 1})`,
+        })),
+      ).flat(),
+    [],
+  );
+
+  const columns = useMemo<TableColumnDef<SecurityEvent>[]>(
+    () =>
+      securityColumns.map((col, i) =>
+        i === 0
+          ? {
+              ...col,
+              cell: ({ row }: { row: { original: SecurityEvent } }) => (
+                <Text size='xs'>{row.original.objectName}</Text>
+              ),
+            }
+          : col,
+      ),
+    [],
+  );
+
+  return (
+    <Table
+      className='max-w-920'
+      data={data}
+      columns={columns}
+      getRowId={row => row.id}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      renderPreviewContent={renderSecurityPreview}
     />
   );
 };

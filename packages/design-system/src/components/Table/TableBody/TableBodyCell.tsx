@@ -1,6 +1,7 @@
 import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
+import { usePreviewCell } from '../hooks';
 import {
   getAlignClass,
   getExpandBorderClass,
@@ -27,8 +28,7 @@ export const TableBodyCell = <T,>({
   className,
   disablePinnedShadow,
 }: TableBodyCellProps<T>) => {
-  const { allLeafColumns, masterColumnId, previewRowId, setPreviewRowId, renderPreviewContent } =
-    useTableContext<T>();
+  const { allLeafColumns, masterColumnId } = useTableContext<T>();
   const testId = useTestId('body-cell');
   const column = cell.column;
   const isPinned = column.getIsPinned();
@@ -37,39 +37,27 @@ export const TableBodyCell = <T,>({
   const isExpandedToggle = isExpandColumn && (cell.row.getIsExpanded() || cell.row.depth > 0);
 
   const { canDnd, setNodeRef, dndStyle } = useColumnDnd(column);
-
   const pinningStyles = getPinningStyles(column);
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
+  const { isMasterTrigger, isButtonTrigger, isActive, togglePreview } = usePreviewCell<T>(
+    column.id,
+    cell.row.id,
+  );
 
   const isCut = column.id === masterColumnId || meta?.resizeType === 'cut';
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
-
-  const isMasterColumn = column.id === masterColumnId;
-  const hasAutoPreview = isMasterColumn && !!renderPreviewContent;
-  const hasActions = !!(hasAutoPreview || meta?.renderMenuAction);
-
-  const renderActions = () => {
-    const rowId = cell.row.id;
-
-    return (
-      <>
-        {hasAutoPreview && (
-          <TablePreviewToggle
-            active={previewRowId === rowId}
-            onClick={() => setPreviewRowId(previewRowId === rowId ? null : rowId)}
-          />
-        )}
-        {meta?.renderMenuAction?.(cell.row)}
-      </>
-    );
-  };
+  const hasActions = isButtonTrigger || !!meta?.renderPreviewAction || !!meta?.renderMenuAction;
 
   const renderContent = () => {
     if (isCut && hasActions) {
       return (
         <div className='flex items-center justify-between gap-2'>
           <span className='min-w-0 [&>*]:block [&>*]:truncate'>{content}</span>
-          <TableMasterCellActions>{renderActions()}</TableMasterCellActions>
+          <TableMasterCellActions>
+            {isButtonTrigger && <TablePreviewToggle active={isActive} onClick={togglePreview} />}
+            {meta?.renderPreviewAction?.(cell.row)}
+            {meta?.renderMenuAction?.(cell.row)}
+          </TableMasterCellActions>
         </div>
       );
     }
@@ -92,6 +80,7 @@ export const TableBodyCell = <T,>({
         getAlignClass(meta),
         getExpandBorderClass(isExpandColumn, cell.row.depth),
         isCut && 'pr-0',
+        isMasterTrigger && 'cursor-pointer',
         meta?.cellClassName,
         className,
       )}
@@ -99,6 +88,7 @@ export const TableBodyCell = <T,>({
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}
       ref={canDnd ? setNodeRef : undefined}
+      onClick={isMasterTrigger ? togglePreview : undefined}
       style={{
         ...pinningStyles,
         width: cell.column.getSize(),
