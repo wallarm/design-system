@@ -28,6 +28,8 @@ import {
   METHOD_COLORS,
   multiplySecurityEvents,
   renderSecurityPreview,
+  renderSecurityPreviewHeader,
+  renderSecurityPreviewWithTitle,
   type SecurityEvent,
   type SecurityHeaderEntry,
   securityColumnHelper,
@@ -611,8 +613,11 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
       onSortingChange={setSorting}
       columnSizing={columnSizing}
       onColumnSizingChange={setColumnSizing}
-      previewTrigger='button'
-      renderPreviewContent={renderSecurityPreview}
+      preview={{
+        trigger: 'button',
+        renderHeader: renderSecurityPreviewHeader,
+        renderContent: renderSecurityPreview,
+      }}
     />
   );
 };
@@ -655,7 +660,7 @@ export const MasterCellWithPreviewDrawer: StoryFn<typeof meta> = () => {
       getRowId={row => row.id}
       sorting={sorting}
       onSortingChange={setSorting}
-      renderPreviewContent={renderSecurityPreview}
+      preview={{ renderContent: renderSecurityPreviewWithTitle }}
     />
   );
 };

@@ -17,6 +17,7 @@ export type {
   TableExpandedState,
   TableGroupingState,
   TableOnChangeFn,
+  TablePreview,
   TableProps,
   TableRow,
   TableRowSelectionState,

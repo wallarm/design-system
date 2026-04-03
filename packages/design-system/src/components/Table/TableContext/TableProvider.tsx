@@ -80,11 +80,15 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     overscan = TABLE_VIRTUALIZATION_OVERSCAN,
     onEndReached,
     onEndReachedThreshold,
-    renderPreviewContent,
-    previewTrigger = 'master',
-    previewRowId: previewRowIdProp,
-    onPreviewRowChange,
+    preview,
   } = props;
+
+  const renderPreviewHeader = preview?.renderHeader;
+  const renderPreviewContent = preview?.renderContent;
+  const previewTrigger = preview?.trigger ?? 'master';
+  const previewTooltipText = preview?.tooltipText ?? 'Open preview';
+  const previewRowIdProp = preview?.rowId;
+  const onPreviewRowChange = preview?.onRowChange;
 
   // Feature detection
   const sortingEnabled = !!onSortingChange;
@@ -329,10 +333,14 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       containerRef,
       onEndReached,
       onEndReachedThreshold,
-      previewRowId,
-      setPreviewRowId,
-      renderPreviewContent: renderPreviewContent as ((row: Row<T>) => ReactNode) | undefined,
-      previewTrigger,
+      preview: {
+        rowId: previewRowId,
+        setRowId: setPreviewRowId,
+        renderHeader: renderPreviewHeader as ((row: Row<T>) => ReactNode) | undefined,
+        renderContent: renderPreviewContent as ((row: Row<T>) => ReactNode) | undefined,
+        trigger: previewTrigger,
+        tooltipText: previewTooltipText,
+      },
     }),
     [
       table,
@@ -359,8 +367,11 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       onEndReached,
       onEndReachedThreshold,
       previewRowId,
+      setPreviewRowId,
+      renderPreviewHeader,
       renderPreviewContent,
       previewTrigger,
+      previewTooltipText,
     ],
   );
 

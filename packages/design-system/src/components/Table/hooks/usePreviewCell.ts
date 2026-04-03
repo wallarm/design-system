@@ -3,21 +3,20 @@ import { useTableContext } from '../TableContext';
 
 /**
  * Encapsulates preview drawer logic for a body cell.
- * Returns flags and a click handler based on `previewTrigger` mode.
+ * Returns flags and a click handler based on `preview.trigger` mode.
  */
 export const usePreviewCell = <T>(columnId: string, rowId: string) => {
-  const { masterColumnId, previewRowId, setPreviewRowId, renderPreviewContent, previewTrigger } =
-    useTableContext<T>();
+  const { masterColumnId, preview } = useTableContext<T>();
 
   const isMasterColumn = columnId === masterColumnId;
-  const hasPreview = isMasterColumn && !!renderPreviewContent;
-  const isMasterTrigger = hasPreview && previewTrigger === 'master';
-  const isButtonTrigger = hasPreview && previewTrigger === 'button';
-  const isActive = previewRowId === rowId;
+  const hasPreview = isMasterColumn && !!preview.renderContent;
+  const isMasterTrigger = hasPreview && preview.trigger === 'master';
+  const isButtonTrigger = hasPreview && preview.trigger === 'button';
+  const isActive = preview.rowId === rowId;
 
   const togglePreview = useCallback(() => {
-    setPreviewRowId(isActive ? null : rowId);
-  }, [setPreviewRowId, isActive, rowId]);
+    preview.setRowId(isActive ? null : rowId);
+  }, [preview.setRowId, isActive, rowId]);
 
   return {
     /** Preview opens by clicking the master cell */
@@ -28,5 +27,7 @@ export const usePreviewCell = <T>(columnId: string, rowId: string) => {
     isActive,
     /** Toggle preview for this row (open/close) */
     togglePreview,
+    /** Tooltip text for master cell hover */
+    tooltipText: hasPreview ? preview.tooltipText : undefined,
   };
 };

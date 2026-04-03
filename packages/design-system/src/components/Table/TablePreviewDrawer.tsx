@@ -4,23 +4,27 @@ import { Drawer, DrawerBody, DrawerContent, DrawerHeader } from '../Drawer';
 import { useTableContext } from './TableContext';
 
 export const TablePreviewDrawer: FC = () => {
-  const { table, previewRowId, setPreviewRowId, renderPreviewContent } = useTableContext();
+  const { table, preview: previewCtx } = useTableContext();
 
-  const row = previewRowId ? table.getRowModel().rowsById[previewRowId] : undefined;
-  const preview = row && renderPreviewContent ? renderPreviewContent(row) : undefined;
+  const row = previewCtx.rowId ? table.getRowModel().rowsById[previewCtx.rowId] : undefined;
+  const header = row && previewCtx.renderHeader ? previewCtx.renderHeader(row) : undefined;
+  const content = row && previewCtx.renderContent ? previewCtx.renderContent(row) : undefined;
 
   // Keep the last valid preview so drawer content doesn't flash empty during close animation
-  const lastPreviewRef = useRef<ReactNode>(null);
-  if (preview) lastPreviewRef.current = preview;
-  const displayPreview = preview ?? lastPreviewRef.current;
+  const lastHeaderRef = useRef<ReactNode>(null);
+  const lastContentRef = useRef<ReactNode>(null);
+  if (header) lastHeaderRef.current = header;
+  if (content) lastContentRef.current = content;
+  const displayHeader = header ?? lastHeaderRef.current;
+  const displayContent = content ?? lastContentRef.current;
 
-  if (!renderPreviewContent) return null;
+  if (!previewCtx.renderContent) return null;
 
   return (
     <Drawer
       open={!!row}
       onOpenChange={open => {
-        if (!open) setPreviewRowId(null);
+        if (!open) previewCtx.setRowId(null);
       }}
       modal={false}
       overlay={false}
@@ -28,10 +32,12 @@ export const TablePreviewDrawer: FC = () => {
       width={960}
     >
       <DrawerContent>
-        <DrawerHeader>
-          <span />
-        </DrawerHeader>
-        <DrawerBody>{displayPreview}</DrawerBody>
+        {displayHeader ?? (
+          <DrawerHeader>
+            <span />
+          </DrawerHeader>
+        )}
+        <DrawerBody>{displayContent}</DrawerBody>
       </DrawerContent>
     </Drawer>
   );

@@ -54,10 +54,14 @@ export interface TableContextValue<T> {
   onEndReachedThreshold?: number;
 
   // Preview drawer
-  previewRowId: string | null;
-  setPreviewRowId: (id: string | null) => void;
-  renderPreviewContent?: (row: Row<T>) => ReactNode;
-  previewTrigger: 'master' | 'button';
+  preview: {
+    rowId: string | null;
+    setRowId: (id: string | null) => void;
+    renderHeader?: (row: Row<T>) => ReactNode;
+    renderContent?: (row: Row<T>) => ReactNode;
+    trigger: 'master' | 'button';
+    tooltipText: string;
+  };
 }
 
 export interface TableProviderProps<T> extends Omit<TableProps<T>, 'children' | 'aria-label'> {
