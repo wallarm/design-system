@@ -1,3 +1,7 @@
+## <small>0.19.1 (2026-04-03)</small>
+
+* fix(table): use DrawerHeader with close button in preview drawer (#76) ([4756040](https://github.com/wallarm/design-system/commit/4756040)), closes [#76](https://github.com/wallarm/design-system/issues/76)
+
 ## 0.19.0 (2026-04-03)
 
 * feat(table): master cell preview drawer [AS-801] (#75) ([349712e](https://github.com/wallarm/design-system/commit/349712e)), closes [#75](https://github.com/wallarm/design-system/issues/75)
