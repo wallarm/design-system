@@ -7,7 +7,7 @@ import { FilterInputField } from './FilterInputField';
 import { FilterInputMenu } from './FilterInputMenu/FilterInputMenu';
 import { useFilterInputAutocomplete, useFilterInputExpression } from './hooks';
 import { buildExpression } from './hooks/useFilterInputExpression/expression';
-import { FilterParseError, parseExpression, serializeExpression } from './lib';
+import { isFilterParseError, parseExpression, serializeExpression } from './lib';
 import type { ExprNode, FieldMetadata } from './types';
 
 export interface FilterInputProps
@@ -267,7 +267,7 @@ export const FilterInput: FC<FilterInputProps> = ({
         setAllSelected(false);
         setPasteError(null);
       } catch (err) {
-        if (err instanceof FilterParseError) {
+        if (isFilterParseError(err)) {
           setPasteError(err.message);
         } else {
           setPasteError('Failed to parse filter text');

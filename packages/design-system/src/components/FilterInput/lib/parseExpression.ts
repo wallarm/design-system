@@ -4,12 +4,21 @@ import type { Condition, ExprNode, FieldMetadata, FilterOperator } from '../type
 // Error
 // ---------------------------------------------------------------------------
 
-export class FilterParseError extends Error {
-  constructor(message: string) {
-    super(message);
-    this.name = 'FilterParseError';
-  }
+export interface FilterParseError {
+  readonly _tag: 'FilterParseError';
+  readonly message: string;
 }
+
+export const FilterParseError = (message: string): FilterParseError => ({
+  _tag: 'FilterParseError',
+  message,
+});
+
+export const isFilterParseError = (value: unknown): value is FilterParseError =>
+  typeof value === 'object' &&
+  value !== null &&
+  '_tag' in value &&
+  value._tag === 'FilterParseError';
 
 // ---------------------------------------------------------------------------
 // Tokens
@@ -125,7 +134,7 @@ const tokenize = (input: string): Token[] => {
       continue;
     }
 
-    throw new FilterParseError(`Unexpected character '${ch}' at position ${i}`);
+    throw FilterParseError(`Unexpected character '${ch}' at position ${i}`);
   }
 
   return tokens;
@@ -145,7 +154,7 @@ const peek = (s: ParserState): Token | undefined => s.tokens[s.pos];
 
 const advance = (s: ParserState): Token => {
   const token = s.tokens[s.pos];
-  if (!token) throw new FilterParseError('Unexpected end of input');
+  if (!token) throw FilterParseError('Unexpected end of input');
   s.pos++;
   return token;
 };
@@ -154,24 +163,24 @@ const expect = (s: ParserState, type: TokenType): Token => {
   const token = peek(s);
   if (!token || token.type !== type) {
     const found = token ? `'${token.value}' at position ${token.pos}` : 'end of input';
-    throw new FilterParseError(`Expected ${type}, found ${found}`);
+    throw FilterParseError(`Expected ${type}, found ${found}`);
   }
   return advance(s);
 };
 
 const validateField = (s: ParserState, name: string): void => {
   if (!s.fields.some(f => f.name === name)) {
-    throw new FilterParseError(`Unknown field: ${name}`);
+    throw FilterParseError(`Unknown field: ${name}`);
   }
 };
 
 const validateOperator = (s: ParserState, op: string, fieldName: string): FilterOperator => {
   if (!OPERATORS.has(op)) {
-    throw new FilterParseError(`Unknown operator: ${op}`);
+    throw FilterParseError(`Unknown operator: ${op}`);
   }
   const field = s.fields.find(f => f.name === fieldName);
   if (field?.operators && !field.operators.includes(op as FilterOperator)) {
-    throw new FilterParseError(`Operator '${op}' is not allowed for field '${fieldName}'`);
+    throw FilterParseError(`Operator '${op}' is not allowed for field '${fieldName}'`);
   }
   return op as FilterOperator;
 };
@@ -204,7 +213,7 @@ const parseCondition = (s: ParserState): Condition => {
 
   const opToken = peek(s);
   if (!opToken || opToken.type !== 'OPERATOR') {
-    throw new FilterParseError(`Expected operator after field '${fieldToken.value}'`);
+    throw FilterParseError(`Expected operator after field '${fieldToken.value}'`);
   }
   advance(s);
 
@@ -262,7 +271,7 @@ const parseFactor = (s: ParserState): ExprNode => {
     }
 
     const found = next ? `'${next.value}' at position ${next.pos}` : 'end of input';
-    throw new FilterParseError(`Expected ')' or connector after condition, found ${found}`);
+    throw FilterParseError(`Expected ')' or connector after condition, found ${found}`);
   }
 
   // Bare condition without parens
@@ -271,7 +280,7 @@ const parseFactor = (s: ParserState): ExprNode => {
   }
 
   const token = peek(s);
-  throw new FilterParseError(
+  throw FilterParseError(
     token
       ? `Unexpected token '${token.value}' at position ${token.pos}`
       : 'Unexpected end of input',
@@ -322,19 +331,17 @@ const parseExpr = (s: ParserState): ExprNode => {
  */
 export const parseExpression = (text: string, fields: FieldMetadata[]): ExprNode => {
   const trimmed = text.trim();
-  if (!trimmed) throw new FilterParseError('Empty filter text');
+  if (!trimmed) throw FilterParseError('Empty filter text');
 
   const tokens = tokenize(trimmed);
-  if (tokens.length === 0) throw new FilterParseError('Empty filter text');
+  if (tokens.length === 0) throw FilterParseError('Empty filter text');
 
   const state: ParserState = { tokens, pos: 0, fields };
   const expr = parseExpr(state);
 
   if (state.pos < tokens.length) {
     const remaining = tokens[state.pos]!;
-    throw new FilterParseError(
-      `Unexpected token '${remaining.value}' at position ${remaining.pos}`,
-    );
+    throw FilterParseError(`Unexpected token '${remaining.value}' at position ${remaining.pos}`);
   }
 
   return expr;

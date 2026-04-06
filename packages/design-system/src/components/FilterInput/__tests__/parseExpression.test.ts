@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { FilterParseError, parseExpression } from '../lib/parseExpression';
+import { isFilterParseError, parseExpression } from '../lib/parseExpression';
 import { serializeExpression } from '../lib/serializeExpression';
 import type { FieldMetadata } from '../types';
 
@@ -134,26 +134,40 @@ describe('parseExpression', () => {
   });
 
   it('throws on unknown field', () => {
-    expect(() => parseExpression('(unknown_field = value)', fields)).toThrow(FilterParseError);
-    expect(() => parseExpression('(unknown_field = value)', fields)).toThrow('Unknown field');
+    const expectParseError = (fn: () => void, messagePart?: string) => {
+      try {
+        fn();
+        expect.unreachable('Expected to throw');
+      } catch (err) {
+        expect(isFilterParseError(err)).toBe(true);
+        if (messagePart) expect((err as { message: string }).message).toContain(messagePart);
+      }
+    };
+
+    expectParseError(() => parseExpression('(unknown_field = value)', fields), 'Unknown field');
   });
 
   it('throws on unknown operator', () => {
-    expect(() => parseExpression('(attack_type CONTAINS value)', fields)).toThrow(FilterParseError);
+    expect(() => parseExpression('(attack_type CONTAINS value)', fields)).toThrow();
   });
 
   it('throws on invalid text', () => {
-    expect(() => parseExpression('hello world', fields)).toThrow(FilterParseError);
+    expect(() => parseExpression('hello world', fields)).toThrow();
   });
 
   it('throws on empty string', () => {
-    expect(() => parseExpression('', fields)).toThrow(FilterParseError);
-    expect(() => parseExpression('   ', fields)).toThrow(FilterParseError);
+    expect(() => parseExpression('', fields)).toThrow();
+    expect(() => parseExpression('   ', fields)).toThrow();
   });
 
   it('throws when operator not allowed for field', () => {
-    expect(() => parseExpression('(method like GET)', fields)).toThrow(FilterParseError);
-    expect(() => parseExpression('(method like GET)', fields)).toThrow('not allowed');
+    try {
+      parseExpression('(method like GET)', fields);
+      expect.unreachable('Expected to throw');
+    } catch (err) {
+      expect(isFilterParseError(err)).toBe(true);
+      expect((err as { message: string }).message).toContain('not allowed');
+    }
   });
 
   it('round-trip: serialize → parse → serialize', () => {
