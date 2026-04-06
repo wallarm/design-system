@@ -1,7 +1,7 @@
 import type { MouseEvent, RefObject } from 'react';
 import { useCallback, useRef } from 'react';
-import { CHIP_ID_PREFIX, DRAG_THRESHOLD } from './constants';
-import { clearDragAttributes, isChipInRange } from './dom';
+import { DRAG_THRESHOLD } from './constants';
+import { areAllConditionsDragged, clearDragAttributes, updateDragSelection } from './dom';
 
 interface UseDragSelectionOptions {
   chipRegistryRef: RefObject<Map<string, HTMLElement>>;
@@ -34,14 +34,11 @@ export const useDragSelection = ({
           document.body.style.userSelect = 'none';
         }
 
-        const registry = chipRegistryRef.current;
-        const hasSelected = [...registry.values()].reduce((found, chip) => {
-          const inRange = isChipInRange(chip, dragStartXRef.current, moveEvent.clientX);
-          if (inRange) chip.setAttribute('data-drag-selected', '');
-          else chip.removeAttribute('data-drag-selected');
-          return found || inRange;
-        }, false);
-
+        const hasSelected = updateDragSelection(
+          chipRegistryRef.current,
+          dragStartXRef.current,
+          moveEvent.clientX,
+        );
         if (hasSelected) inputRef.current?.blur();
       };
 
@@ -53,14 +50,7 @@ export const useDragSelection = ({
         if (!isDraggingRef.current) return;
 
         const registry = chipRegistryRef.current;
-        const conditionEntries = [...registry.entries()].filter(([id]) =>
-          id.startsWith(CHIP_ID_PREFIX),
-        );
-        const allDragged =
-          conditionEntries.length > 0 &&
-          conditionEntries.every(([, el]) => el.hasAttribute('data-drag-selected'));
-
-        if (allDragged) {
+        if (areAllConditionsDragged(registry)) {
           clearDragAttributes(registry);
           onSelectAll();
         }
