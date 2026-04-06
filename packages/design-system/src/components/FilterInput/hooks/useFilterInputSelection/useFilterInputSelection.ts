@@ -4,7 +4,12 @@ import { isFilterParseError, parseExpression, serializeExpression } from '../../
 import type { Condition, ExprNode, FieldMetadata } from '../../types';
 import { buildExpression } from '../useFilterInputExpression/expression';
 import { DRAG_THRESHOLD, PASTE_ERROR_TIMEOUT } from './constants';
-import { clearDragAttributes, hasDragSelection, isChipInRange } from './dom';
+import {
+  clearDragAttributes,
+  getSelectedConditionIndices,
+  hasDragSelection,
+  isChipInRange,
+} from './dom';
 
 interface UseFilterInputSelectionOptions {
   conditions: Condition[];
@@ -150,10 +155,23 @@ export const useFilterInputSelection = ({
     (e: ClipboardEvent<HTMLDivElement>) => {
       if (conditions.length === 0) return;
       e.preventDefault();
+
+      // If drag-selected, copy only those conditions
+      const selectedIndices = getSelectedConditionIndices(chips);
+      if (selectedIndices.length > 0) {
+        const selected = selectedIndices.map(i => conditions[i]).filter(Boolean);
+        const selectedConnectors =
+          selected.length > 1 ? new Array<'and'>(selected.length - 1).fill('and') : [];
+        const text = serializeExpression(buildExpression(selected, selectedConnectors));
+        e.clipboardData.setData('text/plain', text);
+        return;
+      }
+
+      // allSelected or no drag selection — copy all
       const text = serializeExpression(buildExpression(conditions, connectors));
       e.clipboardData.setData('text/plain', text);
     },
-    [conditions, connectors],
+    [conditions, connectors, chips],
   );
 
   const handlePaste = useCallback(

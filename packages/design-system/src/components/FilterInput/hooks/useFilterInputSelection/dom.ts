@@ -17,3 +17,15 @@ export const hasDragSelection = (chips: Map<string, HTMLElement>): boolean => {
   }
   return false;
 };
+
+/** Get condition indices of drag-selected chips (chip-0, chip-2 → [0, 2]) */
+export const getSelectedConditionIndices = (chips: Map<string, HTMLElement>): number[] => {
+  const indices: number[] = [];
+  for (const [id, el] of chips.entries()) {
+    if (!id.startsWith('chip-')) continue;
+    if (!el.hasAttribute('data-drag-selected')) continue;
+    const index = Number(id.slice(5));
+    if (!Number.isNaN(index)) indices.push(index);
+  }
+  return indices.sort((a, b) => a - b);
+};

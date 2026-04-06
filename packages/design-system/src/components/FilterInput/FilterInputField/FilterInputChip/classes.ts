@@ -2,7 +2,13 @@ import { cva } from 'class-variance-authority';
 
 /** Base chip container styles shared by FilterInputChip and FilterInputConnectorChip */
 export const chipVariants = cva(
-  'h-22 group/chip relative flex items-center justify-center px-5 py-0 border border-solid rounded-8 gap-4 group-data-[selected-all]/filter-input:ring-2 group-data-[selected-all]/filter-input:ring-focus-primary group-data-[selected-all]/filter-input:bg-bg-light-info group-data-[selected-all]/filter-input:border-border-info [[data-drag-selected]_&]:ring-2 [[data-drag-selected]_&]:ring-focus-primary [[data-drag-selected]_&]:bg-bg-light-info [[data-drag-selected]_&]:border-border-info',
+  [
+    'h-22 group/chip relative flex items-center justify-center px-5 py-0 border border-solid rounded-8 gap-4',
+    // Select-all highlight (Ctrl+A)
+    'group-data-[selected-all]/filter-input:bg-bg-light-info group-data-[selected-all]/filter-input:border-border-info',
+    // Drag-selection highlight (mouse drag)
+    '[[data-drag-selected]_&]:bg-bg-light-info [[data-drag-selected]_&]:border-border-info',
+  ].join(' '),
   {
     variants: {
       error: {
@@ -57,7 +63,11 @@ export const segmentTextVariants = cva('truncate text-sm', {
 
 /** Remove button styles — hidden by default, shown on chip hover or button focus */
 export const removeButtonVariants = cva(
-  'absolute -right-[13px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 group-hover/chip:opacity-100 focus:opacity-100 transition-opacity',
+  [
+    'absolute -right-[13px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 group-hover/chip:opacity-100 focus:opacity-100 transition-opacity',
+    // Hide remove button when chip is selected
+    'group-data-[selected-all]/filter-input:!opacity-0 [[data-drag-selected]_&]:!opacity-0',
+  ].join(' '),
   {
     variants: {
       error: {
