@@ -11,8 +11,35 @@ interface UseSelectionClipboardOptions {
   chipRegistryRef: RefObject<Map<string, HTMLElement>>;
   clearSelection: () => void;
   setPasteError: (error: string | null) => void;
+  setInputText: (text: string) => void;
   onChange?: (expression: ExprNode | null) => void;
 }
+
+/** Convert technical parse error into a user-friendly message */
+const formatPasteError = (err: unknown): string => {
+  if (!isFilterParseError(err)) return 'Could not parse the pasted filter text';
+
+  const msg = err.message;
+
+  if (msg.startsWith('Unknown field:')) {
+    const field = msg.replace('Unknown field: ', '');
+    return `Unknown filter field "${field}". Check the field name and try again.`;
+  }
+
+  if (msg.includes('not allowed for field')) {
+    return `${msg}. Check the operator and try again.`;
+  }
+
+  if (msg.startsWith('Expected')) {
+    return `Invalid filter format: ${msg.toLowerCase()}. Expected format: (field operator value) AND (field operator value)`;
+  }
+
+  if (msg === 'Empty filter text') {
+    return 'The pasted text is empty';
+  }
+
+  return `Could not parse filter: ${msg}`;
+};
 
 export const useSelectionClipboard = ({
   conditions,
@@ -21,6 +48,7 @@ export const useSelectionClipboard = ({
   chipRegistryRef,
   clearSelection,
   setPasteError,
+  setInputText,
   onChange,
 }: UseSelectionClipboardOptions) => {
   const handleCopy = useCallback(
@@ -45,11 +73,14 @@ export const useSelectionClipboard = ({
         const expr = parseExpression(text, fields);
         onChange?.(expr);
         clearSelection();
+        setPasteError(null);
       } catch (err) {
-        setPasteError(isFilterParseError(err) ? err.message : 'Failed to parse filter text');
+        // Keep the pasted text visible in the input so the user can see/edit it
+        setInputText(text);
+        setPasteError(formatPasteError(err));
       }
     },
-    [fields, onChange, clearSelection, setPasteError],
+    [fields, onChange, clearSelection, setPasteError, setInputText],
   );
 
   return { handleCopy, handlePaste };

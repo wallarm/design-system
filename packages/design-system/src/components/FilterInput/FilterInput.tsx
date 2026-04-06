@@ -82,6 +82,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     chipRegistryRef,
     inputRef,
     clearAll,
+    setInputText: autocomplete.setInputText,
     onChange,
   });
 

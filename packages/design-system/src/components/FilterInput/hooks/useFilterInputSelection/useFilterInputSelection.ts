@@ -1,7 +1,6 @@
 import type { RefObject } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import type { Condition, ExprNode, FieldMetadata } from '../../types';
-import { PASTE_ERROR_TIMEOUT } from './constants';
 import { clearDragAttributes } from './dom';
 import { useDragSelection } from './useDragSelection';
 import { useSelectionClipboard } from './useSelectionClipboard';
@@ -14,6 +13,7 @@ interface UseFilterInputSelectionOptions {
   chipRegistryRef: RefObject<Map<string, HTMLElement>>;
   inputRef: RefObject<HTMLInputElement | null>;
   clearAll: () => void;
+  setInputText: (text: string) => void;
   onChange?: (expression: ExprNode | null) => void;
 }
 
@@ -24,6 +24,7 @@ export const useFilterInputSelection = ({
   chipRegistryRef,
   inputRef,
   clearAll,
+  setInputText,
   onChange,
 }: UseFilterInputSelectionOptions) => {
   const [allSelected, setAllSelected] = useState(false);
@@ -36,13 +37,6 @@ export const useFilterInputSelection = ({
     setPasteError(null);
     clearDragAttributes(chipRegistryRef.current);
   }, [chipRegistryRef]);
-
-  // Auto-clear paste error
-  useEffect(() => {
-    if (!pasteError) return;
-    const timer = setTimeout(() => setPasteError(null), PASTE_ERROR_TIMEOUT);
-    return () => clearTimeout(timer);
-  }, [pasteError]);
 
   const { handleMouseDown } = useDragSelection({
     chipRegistryRef,
@@ -67,6 +61,7 @@ export const useFilterInputSelection = ({
     chipRegistryRef,
     clearSelection,
     setPasteError,
+    setInputText,
     onChange,
   });
 
