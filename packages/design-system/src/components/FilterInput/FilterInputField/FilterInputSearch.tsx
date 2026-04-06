@@ -10,7 +10,13 @@ interface FilterInputSearchProps {
   minWidth?: number;
 }
 
-export const FilterInputSearch: FC<FilterInputSearchProps> = ({ hasContent, minWidth = 8 }) => {
+/** Minimum input width in px — enough for one wide char + cursor */
+const MIN_INPUT_WIDTH = 20;
+
+export const FilterInputSearch: FC<FilterInputSearchProps> = ({
+  hasContent,
+  minWidth = MIN_INPUT_WIDTH,
+}) => {
   const {
     inputText,
     inputRef,
@@ -38,7 +44,7 @@ export const FilterInputSearch: FC<FilterInputSearchProps> = ({ hasContent, minW
       placeholder={hasContent ? undefined : placeholder}
       style={
         hasContent
-          ? { width: `${Math.max(minWidth, inputText.length * CHAR_WIDTH_PX)}px` }
+          ? { width: `${Math.max(minWidth, (inputText.length + 1) * CHAR_WIDTH_PX)}px` }
           : undefined
       }
       className={filterInputInputVariants({ hasContent })}
