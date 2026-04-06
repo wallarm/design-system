@@ -1,5 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
-import { useMemo, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { FilterInputProvider, useFilterInputContextValue } from './FilterInputContext';
 import { FilterInputErrors, parseFilterInputErrors } from './FilterInputErrors';
@@ -35,6 +35,12 @@ export const FilterInput: FC<FilterInputProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const buildingChipRef = useRef<HTMLDivElement>(null);
+  const chipRegistryRef = useRef<Map<string, HTMLElement>>(new Map());
+
+  const registerChipRef = useCallback((id: string, el: HTMLElement | null) => {
+    if (el) chipRegistryRef.current.set(id, el);
+    else chipRegistryRef.current.delete(id);
+  }, []);
 
   const {
     conditions,
@@ -73,7 +79,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     conditions,
     connectors,
     fields,
-    containerRef,
+    chipRegistryRef,
     inputRef,
     clearAll,
     onChange,
@@ -87,6 +93,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     placeholder,
     error,
     showKeyboardHint,
+    registerChipRef,
   });
 
   // ── Errors ────────────────────────────────────────────────

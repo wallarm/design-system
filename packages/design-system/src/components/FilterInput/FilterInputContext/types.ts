@@ -44,4 +44,6 @@ export interface FilterInputContextValue {
   menuRef: RefObject<HTMLDivElement | null>;
   /** Close autocomplete menu (used by connector chip to enforce single-dropdown constraint) */
   closeAutocompleteMenu: () => void;
+  /** Register/unregister a chip DOM element for selection tracking */
+  registerChipRef: (id: string, el: HTMLElement | null) => void;
 }

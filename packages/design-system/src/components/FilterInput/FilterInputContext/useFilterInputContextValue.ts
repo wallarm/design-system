@@ -38,6 +38,7 @@ interface UseFilterInputContextValueOptions {
   placeholder: string;
   error: boolean;
   showKeyboardHint: boolean;
+  registerChipRef: (id: string, el: HTMLElement | null) => void;
 }
 
 export const useFilterInputContextValue = ({
@@ -48,6 +49,7 @@ export const useFilterInputContextValue = ({
   placeholder,
   error,
   showKeyboardHint,
+  registerChipRef,
 }: UseFilterInputContextValueOptions): FilterInputContextValue =>
   useMemo(
     () => ({
@@ -79,6 +81,7 @@ export const useFilterInputContextValue = ({
       onCustomAttributeCommit: autocomplete.handleCustomAttributeCommit,
       menuRef: autocomplete.menuRef,
       closeAutocompleteMenu: autocomplete.closeAutocompleteMenu,
+      registerChipRef,
     }),
     [
       chips,
@@ -104,6 +107,7 @@ export const useFilterInputContextValue = ({
       autocomplete.handleCustomAttributeCommit,
       autocomplete.menuRef,
       autocomplete.closeAutocompleteMenu,
+      registerChipRef,
       buildingChipRef,
       inputRef,
       placeholder,

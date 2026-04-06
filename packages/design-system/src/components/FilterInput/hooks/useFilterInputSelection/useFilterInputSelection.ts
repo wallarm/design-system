@@ -1,51 +1,16 @@
 import type { ClipboardEvent, KeyboardEvent, MouseEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { isFilterParseError, parseExpression, serializeExpression } from '../lib';
-import type { Condition, ExprNode, FieldMetadata } from '../types';
-import { buildExpression } from './useFilterInputExpression/expression';
-
-// ---------------------------------------------------------------------------
-// Constants
-// ---------------------------------------------------------------------------
-
-const PASTE_ERROR_TIMEOUT = 5000;
-const DRAG_THRESHOLD = 4;
-const CHIP_SELECTOR =
-  '[data-slot="filter-input-condition-chip"], [data-slot="filter-input-connector-chip"]';
-
-// ---------------------------------------------------------------------------
-// DOM helpers
-// ---------------------------------------------------------------------------
-
-const getChipElements = (container: HTMLElement): HTMLElement[] =>
-  Array.from(container.querySelectorAll<HTMLElement>(CHIP_SELECTOR));
-
-const isChipInRange = (chip: HTMLElement, x1: number, x2: number): boolean => {
-  const rect = chip.getBoundingClientRect();
-  const center = rect.left + rect.width / 2;
-  const minX = Math.min(x1, x2);
-  const maxX = Math.max(x1, x2);
-  return center >= minX && center <= maxX;
-};
-
-const clearDragAttributes = (container: HTMLElement) => {
-  for (const chip of getChipElements(container)) {
-    chip.removeAttribute('data-drag-selected');
-  }
-};
-
-const hasDragSelection = (container: HTMLElement | null): boolean =>
-  !!container?.querySelector('[data-drag-selected]');
-
-// ---------------------------------------------------------------------------
-// Hook
-// ---------------------------------------------------------------------------
+import { isFilterParseError, parseExpression, serializeExpression } from '../../lib';
+import type { Condition, ExprNode, FieldMetadata } from '../../types';
+import { buildExpression } from '../useFilterInputExpression/expression';
+import { DRAG_THRESHOLD, PASTE_ERROR_TIMEOUT } from './constants';
+import { clearDragAttributes, hasDragSelection, isChipInRange } from './dom';
 
 interface UseFilterInputSelectionOptions {
   conditions: Condition[];
   connectors: Array<'and' | 'or'>;
   fields: FieldMetadata[];
-  containerRef: RefObject<HTMLDivElement | null>;
+  chipRegistryRef: RefObject<Map<string, HTMLElement>>;
   inputRef: RefObject<HTMLInputElement | null>;
   clearAll: () => void;
   onChange?: (expression: ExprNode | null) => void;
@@ -55,7 +20,7 @@ export const useFilterInputSelection = ({
   conditions,
   connectors,
   fields,
-  containerRef,
+  chipRegistryRef,
   inputRef,
   clearAll,
   onChange,
@@ -65,15 +30,16 @@ export const useFilterInputSelection = ({
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
 
+  const chips = chipRegistryRef.current;
+
   // ── Clear ──────────────────────────────────────────────────
 
   const clearSelection = useCallback(() => {
     setAllSelected(false);
     setPasteError(null);
-    if (containerRef.current) clearDragAttributes(containerRef.current);
-  }, [containerRef]);
+    clearDragAttributes(chips);
+  }, [chips]);
 
-  // Auto-clear paste error
   useEffect(() => {
     if (!pasteError) return;
     const timer = setTimeout(() => setPasteError(null), PASTE_ERROR_TIMEOUT);
@@ -99,10 +65,8 @@ export const useFilterInputSelection = ({
           document.body.style.userSelect = 'none';
         }
 
-        if (!containerRef.current) return;
-
         let hasSelected = false;
-        for (const chip of getChipElements(containerRef.current)) {
+        for (const chip of chips.values()) {
           if (isChipInRange(chip, dragStartXRef.current, moveEvent.clientX)) {
             chip.setAttribute('data-drag-selected', '');
             hasSelected = true;
@@ -119,18 +83,19 @@ export const useFilterInputSelection = ({
         document.removeEventListener('mouseup', handleMouseUp);
         document.body.style.userSelect = '';
 
-        if (!isDraggingRef.current || !containerRef.current) return;
+        if (!isDraggingRef.current) return;
 
-        // If all condition chips are dragged — promote to allSelected mode
-        const all = containerRef.current.querySelectorAll(
-          '[data-slot="filter-input-condition-chip"]',
-        );
-        const selected = containerRef.current.querySelectorAll(
-          '[data-slot="filter-input-condition-chip"][data-drag-selected]',
-        );
+        // If all condition chips (chip-*) are dragged — promote to allSelected
+        let conditionCount = 0;
+        let selectedCount = 0;
+        for (const [id, el] of chips.entries()) {
+          if (!id.startsWith('chip-')) continue;
+          conditionCount++;
+          if (el.hasAttribute('data-drag-selected')) selectedCount++;
+        }
 
-        if (selected.length === all.length && all.length > 0) {
-          clearDragAttributes(containerRef.current);
+        if (selectedCount === conditionCount && conditionCount > 0) {
+          clearDragAttributes(chips);
           setAllSelected(true);
         }
 
@@ -140,7 +105,7 @@ export const useFilterInputSelection = ({
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     },
-    [containerRef, inputRef],
+    [chips, inputRef],
   );
 
   // ── Keyboard ───────────────────────────────────────────────
@@ -148,9 +113,8 @@ export const useFilterInputSelection = ({
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
       const isMod = e.metaKey || e.ctrlKey;
-      const hasSelection = allSelected || hasDragSelection(containerRef.current);
+      const hasSelection = allSelected || hasDragSelection(chips);
 
-      // Ctrl+A — select all
       if (isMod && e.key === 'a' && conditions.length > 0) {
         e.preventDefault();
         clearSelection();
@@ -159,7 +123,6 @@ export const useFilterInputSelection = ({
         return;
       }
 
-      // Delete/Backspace — remove selected (non-disabled)
       if (hasSelection && (e.key === 'Delete' || e.key === 'Backspace')) {
         e.preventDefault();
         clearAll();
@@ -167,7 +130,6 @@ export const useFilterInputSelection = ({
         return;
       }
 
-      // Escape — deselect
       if (hasSelection && e.key === 'Escape') {
         e.preventDefault();
         clearSelection();
@@ -175,12 +137,11 @@ export const useFilterInputSelection = ({
         return;
       }
 
-      // Any other key — deselect
       if (hasSelection && !isMod) {
         clearSelection();
       }
     },
-    [allSelected, conditions.length, containerRef, inputRef, clearAll, clearSelection],
+    [allSelected, conditions.length, chips, inputRef, clearAll, clearSelection],
   );
 
   // ── Clipboard ──────────────────────────────────────────────
