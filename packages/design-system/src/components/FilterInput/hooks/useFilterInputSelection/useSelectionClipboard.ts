@@ -90,5 +90,34 @@ export const useSelectionClipboard = ({
     [fields, onChange, clearSelection, setPasteError, setInputText, closeMenu],
   );
 
-  return { handleCopy, handlePaste };
+  /** Re-parse input text while user edits after a failed paste */
+  const retryParse = useCallback(
+    (text: string) => {
+      const trimmed = text.trim();
+
+      // Empty input — clear error
+      if (!trimmed) {
+        setPasteError(null);
+        return;
+      }
+
+      // Only attempt parsing if text looks like a filter expression
+      if (!trimmed.includes('(') && !trimmed.includes('=') && !trimmed.includes(' in ')) {
+        return;
+      }
+
+      try {
+        const expr = parseExpression(trimmed, fields);
+        onChange?.(expr);
+        setInputText('');
+        closeMenu();
+        setPasteError(null);
+      } catch (err) {
+        setPasteError(formatPasteError(err));
+      }
+    },
+    [fields, onChange, setPasteError, setInputText, closeMenu],
+  );
+
+  return { handleCopy, handlePaste, retryParse };
 };

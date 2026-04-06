@@ -76,6 +76,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     handleKeyDown,
     handleCopy,
     handlePaste,
+    retryParse,
   } = useFilterInputSelection({
     conditions,
     connectors,
@@ -103,6 +104,11 @@ export const FilterInput: FC<FilterInputProps> = ({
   useEffect(() => {
     if (pasteError) dismissPasteError();
   }, [conditions.length]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Re-parse input text while user edits after a failed paste
+  useEffect(() => {
+    if (pasteError) retryParse(autocomplete.inputText);
+  }, [autocomplete.inputText]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Errors ────────────────────────────────────────────────
 

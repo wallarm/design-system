@@ -57,7 +57,7 @@ export const useFilterInputSelection = ({
     onSelectAll,
   });
 
-  const { handleCopy, handlePaste } = useSelectionClipboard({
+  const { handleCopy, handlePaste, retryParse } = useSelectionClipboard({
     conditions,
     connectors,
     fields,
@@ -78,5 +78,6 @@ export const useFilterInputSelection = ({
     handleKeyDown,
     handleCopy,
     handlePaste,
+    retryParse,
   };
 };
