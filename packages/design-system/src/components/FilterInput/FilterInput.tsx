@@ -83,6 +83,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     inputRef,
     clearAll,
     setInputText: autocomplete.setInputText,
+    closeMenu: autocomplete.closeAutocompleteMenu,
     onChange,
   });
 

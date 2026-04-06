@@ -17,6 +17,29 @@ const fields: FieldMetadata[] = [
     type: 'enum',
     operators: ['=', '!=', 'in', 'not_in'],
   },
+  {
+    name: 'status',
+    label: 'Status',
+    type: 'enum',
+    operators: ['=', '!=', 'in'],
+    values: [
+      { value: 'registered', label: 'Registered' },
+      { value: 'blocked', label: 'Blocked' },
+      { value: 'active', label: 'Active' },
+    ],
+  },
+  {
+    name: 'protocol',
+    label: 'Protocol',
+    type: 'string',
+    options: ['HTTP', 'HTTPS', 'WS', 'WSS'],
+  },
+  {
+    name: 'tag',
+    label: 'Tag',
+    type: 'string',
+    options: [],
+  },
 ];
 
 describe('parseExpression', () => {
@@ -181,5 +204,89 @@ describe('parseExpression', () => {
   it('case-insensitive AND/OR', () => {
     const expr = parseExpression('(attack_type = sqli) and (host = a)', fields);
     expect(expr.type).toBe('group');
+  });
+
+  // ── Value validation ────────────────────────────────────────
+
+  it('accepts valid values for field with values', () => {
+    const expr = parseExpression('(status = registered)', fields);
+    expect(expr).toEqual({
+      type: 'condition',
+      field: 'status',
+      operator: '=',
+      value: 'registered',
+    });
+  });
+
+  it('throws on invalid single value for field with values', () => {
+    try {
+      parseExpression('(status = fdf)', fields);
+      expect.unreachable('Expected to throw');
+    } catch (err) {
+      expect(isFilterParseError(err)).toBe(true);
+      expect((err as { message: string }).message).toContain('"fdf"');
+      expect((err as { message: string }).message).toContain('status');
+    }
+  });
+
+  it('throws on invalid value in multi-value list', () => {
+    try {
+      parseExpression('(status in [registered, fdf])', fields);
+      expect.unreachable('Expected to throw');
+    } catch (err) {
+      expect(isFilterParseError(err)).toBe(true);
+      expect((err as { message: string }).message).toContain('"fdf"');
+    }
+  });
+
+  it('throws on multiple invalid values', () => {
+    try {
+      parseExpression('(status in [registered, fdf, xyz])', fields);
+      expect.unreachable('Expected to throw');
+    } catch (err) {
+      expect(isFilterParseError(err)).toBe(true);
+      expect((err as { message: string }).message).toContain('"fdf"');
+      expect((err as { message: string }).message).toContain('"xyz"');
+    }
+  });
+
+  it('accepts valid values for field with options', () => {
+    const expr = parseExpression('(protocol = HTTPS)', fields);
+    expect(expr).toEqual({
+      type: 'condition',
+      field: 'protocol',
+      operator: '=',
+      value: 'HTTPS',
+    });
+  });
+
+  it('throws on invalid value for field with options', () => {
+    try {
+      parseExpression('(protocol = FTP)', fields);
+      expect.unreachable('Expected to throw');
+    } catch (err) {
+      expect(isFilterParseError(err)).toBe(true);
+      expect((err as { message: string }).message).toContain('"FTP"');
+    }
+  });
+
+  it('allows any value for field with empty options (freeform)', () => {
+    const expr = parseExpression('(tag = anything_goes)', fields);
+    expect(expr).toEqual({
+      type: 'condition',
+      field: 'tag',
+      operator: '=',
+      value: 'anything_goes',
+    });
+  });
+
+  it('allows any value for field without values or options', () => {
+    const expr = parseExpression('(host = any.host.com)', fields);
+    expect(expr).toEqual({
+      type: 'condition',
+      field: 'host',
+      operator: '=',
+      value: 'any.host.com',
+    });
   });
 });

@@ -14,6 +14,7 @@ interface UseFilterInputSelectionOptions {
   inputRef: RefObject<HTMLInputElement | null>;
   clearAll: () => void;
   setInputText: (text: string) => void;
+  closeMenu: () => void;
   onChange?: (expression: ExprNode | null) => void;
 }
 
@@ -25,6 +26,7 @@ export const useFilterInputSelection = ({
   inputRef,
   clearAll,
   setInputText,
+  closeMenu,
   onChange,
 }: UseFilterInputSelectionOptions) => {
   const [allSelected, setAllSelected] = useState(false);
@@ -62,6 +64,7 @@ export const useFilterInputSelection = ({
     clearSelection,
     setPasteError,
     setInputText,
+    closeMenu,
     onChange,
   });
 

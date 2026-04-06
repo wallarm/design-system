@@ -12,6 +12,7 @@ interface UseSelectionClipboardOptions {
   clearSelection: () => void;
   setPasteError: (error: string | null) => void;
   setInputText: (text: string) => void;
+  closeMenu: () => void;
   onChange?: (expression: ExprNode | null) => void;
 }
 
@@ -28,6 +29,10 @@ const formatPasteError = (err: unknown): string => {
 
   if (msg.includes('not allowed for field')) {
     return `${msg}. Check the operator and try again.`;
+  }
+
+  if (msg.startsWith('Invalid value')) {
+    return `${msg}. Check the allowed values and try again.`;
   }
 
   if (msg.startsWith('Expected')) {
@@ -49,6 +54,7 @@ export const useSelectionClipboard = ({
   clearSelection,
   setPasteError,
   setInputText,
+  closeMenu,
   onChange,
 }: UseSelectionClipboardOptions) => {
   const handleCopy = useCallback(
@@ -77,10 +83,11 @@ export const useSelectionClipboard = ({
       } catch (err) {
         // Keep the pasted text visible in the input so the user can see/edit it
         setInputText(text);
+        closeMenu();
         setPasteError(formatPasteError(err));
       }
     },
-    [fields, onChange, clearSelection, setPasteError, setInputText],
+    [fields, onChange, clearSelection, setPasteError, setInputText, closeMenu],
   );
 
   return { handleCopy, handlePaste };
