@@ -27,3 +27,5 @@ export {
   isMultiSelectOperator,
   isNoValueOperator,
 } from './operators';
+export { FilterParseError, parseExpression } from './parseExpression';
+export { serializeExpression } from './serializeExpression';
