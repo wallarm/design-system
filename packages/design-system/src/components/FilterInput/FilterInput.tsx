@@ -1,5 +1,5 @@
 import type { FC, HTMLAttributes } from 'react';
-import { useCallback, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { FilterInputProvider, useFilterInputContextValue } from './FilterInputContext';
 import { FilterInputErrors, parseFilterInputErrors } from './FilterInputErrors';
@@ -71,6 +71,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     allSelected,
     pasteError,
     clearSelection,
+    dismissPasteError,
     handleMouseDown,
     handleKeyDown,
     handleCopy,
@@ -97,6 +98,11 @@ export const FilterInput: FC<FilterInputProps> = ({
     showKeyboardHint,
     registerChipRef,
   });
+
+  // Dismiss paste error when expression changes (chip created/removed/cleared)
+  useEffect(() => {
+    if (pasteError) dismissPasteError();
+  }, [conditions.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Errors ────────────────────────────────────────────────
 

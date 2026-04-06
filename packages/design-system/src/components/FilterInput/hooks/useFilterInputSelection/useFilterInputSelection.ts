@@ -36,9 +36,10 @@ export const useFilterInputSelection = ({
 
   const clearSelection = useCallback(() => {
     setAllSelected(false);
-    setPasteError(null);
     clearDragAttributes(chipRegistryRef.current);
   }, [chipRegistryRef]);
+
+  const dismissPasteError = useCallback(() => setPasteError(null), []);
 
   const { handleMouseDown } = useDragSelection({
     chipRegistryRef,
@@ -72,6 +73,7 @@ export const useFilterInputSelection = ({
     allSelected,
     pasteError,
     clearSelection,
+    dismissPasteError,
     handleMouseDown,
     handleKeyDown,
     handleCopy,
