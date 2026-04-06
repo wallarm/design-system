@@ -1,9 +1,8 @@
 export const isChipInRange = (chip: HTMLElement, x1: number, x2: number): boolean => {
   const rect = chip.getBoundingClientRect();
-  const center = rect.left + rect.width / 2;
   const minX = Math.min(x1, x2);
   const maxX = Math.max(x1, x2);
-  return center >= minX && center <= maxX;
+  return rect.left <= maxX && rect.right >= minX;
 };
 
 export const clearDragAttributes = (chips: Map<string, HTMLElement>) => {
