@@ -77,7 +77,7 @@ export const filterInputInputVariants = cva(
   {
     variants: {
       hasContent: {
-        true: 'ml-4',
+        true: 'ml-4 shrink-0',
         false: 'flex-1',
       },
     },
