@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import { useCallback, useState } from 'react';
 import type { Condition, ExprNode, FieldMetadata } from '../../types';
-import { clearDragAttributes } from './dom';
+import { clearDragAttributes } from './lib';
 import { useDragSelection } from './useDragSelection';
 import { useSelectionClipboard } from './useSelectionClipboard';
 import { useSelectionKeyboard } from './useSelectionKeyboard';

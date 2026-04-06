@@ -1,6 +1,6 @@
-import { serializeExpression } from '../../lib';
-import type { Condition } from '../../types';
-import { buildExpression } from '../useFilterInputExpression/expression';
+import { serializeExpression } from '../../../lib';
+import type { Condition } from '../../../types';
+import { buildExpression } from '../../useFilterInputExpression/expression';
 import { getSelectedConditionIndices } from './dom';
 
 /** Serialize selected (drag) or all conditions into a text string */

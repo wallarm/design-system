@@ -1,6 +1,6 @@
 import type { KeyboardEvent, RefObject } from 'react';
 import { useCallback } from 'react';
-import { hasDragSelection } from './dom';
+import { hasDragSelection } from './lib';
 
 interface UseSelectionKeyboardOptions {
   allSelected: boolean;

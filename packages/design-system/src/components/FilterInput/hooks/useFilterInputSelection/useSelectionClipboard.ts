@@ -2,7 +2,7 @@ import type { ClipboardEvent, RefObject } from 'react';
 import { useCallback } from 'react';
 import { isFilterParseError, parseExpression } from '../../lib';
 import type { Condition, ExprNode, FieldMetadata } from '../../types';
-import { serializeSelectedOrAll } from './serialize';
+import { serializeSelectedOrAll } from './lib';
 
 interface UseSelectionClipboardOptions {
   conditions: Condition[];

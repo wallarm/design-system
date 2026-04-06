@@ -1,7 +1,11 @@
 import type { MouseEvent, RefObject } from 'react';
 import { useCallback, useRef } from 'react';
-import { DRAG_THRESHOLD } from './constants';
-import { areAllConditionsDragged, clearDragAttributes, updateDragSelection } from './dom';
+import {
+  areAllConditionsDragged,
+  clearDragAttributes,
+  DRAG_THRESHOLD,
+  updateDragSelection,
+} from './lib';
 
 interface UseDragSelectionOptions {
   chipRegistryRef: RefObject<Map<string, HTMLElement>>;
