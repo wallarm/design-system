@@ -69,15 +69,12 @@ export const useFilterInputSelection = ({
         }
 
         const registry = chipRegistryRef.current;
-        let hasSelected = false;
-        for (const chip of registry.values()) {
-          if (isChipInRange(chip, dragStartXRef.current, moveEvent.clientX)) {
-            chip.setAttribute('data-drag-selected', '');
-            hasSelected = true;
-          } else {
-            chip.removeAttribute('data-drag-selected');
-          }
-        }
+        const hasSelected = [...registry.values()].reduce((found, chip) => {
+          const inRange = isChipInRange(chip, dragStartXRef.current, moveEvent.clientX);
+          if (inRange) chip.setAttribute('data-drag-selected', '');
+          else chip.removeAttribute('data-drag-selected');
+          return found || inRange;
+        }, false);
 
         if (hasSelected) inputRef.current?.blur();
       };
@@ -92,15 +89,14 @@ export const useFilterInputSelection = ({
         const registry = chipRegistryRef.current;
 
         // If all condition chips are dragged — promote to allSelected
-        let conditionCount = 0;
-        let selectedCount = 0;
-        for (const [id, el] of registry.entries()) {
-          if (!id.startsWith(CHIP_ID_PREFIX)) continue;
-          conditionCount++;
-          if (el.hasAttribute('data-drag-selected')) selectedCount++;
-        }
+        const conditionEntries = [...registry.entries()].filter(([id]) =>
+          id.startsWith(CHIP_ID_PREFIX),
+        );
+        const allDragged =
+          conditionEntries.length > 0 &&
+          conditionEntries.every(([, el]) => el.hasAttribute('data-drag-selected'));
 
-        if (selectedCount === conditionCount && conditionCount > 0) {
+        if (allDragged) {
           clearDragAttributes(registry);
           setAllSelected(true);
         }
@@ -162,13 +158,10 @@ export const useFilterInputSelection = ({
       if (selectedIndices.length > 0) {
         const selected = selectedIndices.flatMap(i => (conditions[i] ? [conditions[i]] : []));
         // Preserve connectors between consecutive selected indices
-        const selectedConnectors: Array<'and' | 'or'> = [];
-        for (let i = 1; i < selectedIndices.length; i++) {
-          const prevIdx = selectedIndices[i - 1]!;
-          // Use the connector that sits between prevIdx and prevIdx+1
-          // connectors[n] is the connector between condition[n] and condition[n+1]
-          selectedConnectors.push(connectors[prevIdx] ?? 'and');
-        }
+        // connectors[n] is the connector between condition[n] and condition[n+1]
+        const selectedConnectors = selectedIndices
+          .slice(1)
+          .map((_, i) => connectors[selectedIndices[i]!] ?? 'and');
         const text = serializeExpression(buildExpression(selected, selectedConnectors));
         e.clipboardData.setData('text/plain', text);
         return;
