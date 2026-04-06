@@ -2,7 +2,7 @@ import { cva } from 'class-variance-authority';
 
 /** Base chip container styles shared by FilterInputChip and FilterInputConnectorChip */
 export const chipVariants = cva(
-  'h-22 group/chip relative flex items-center justify-center px-5 py-0 border border-solid rounded-8 gap-4 group-data-[selected-all]/filter-input:ring-2 group-data-[selected-all]/filter-input:ring-focus-primary group-data-[selected-all]/filter-input:bg-bg-light-info group-data-[selected-all]/filter-input:border-border-info data-[drag-selected]:ring-2 data-[drag-selected]:ring-focus-primary data-[drag-selected]:bg-bg-light-info data-[drag-selected]:border-border-info',
+  'h-22 group/chip relative flex items-center justify-center px-5 py-0 border border-solid rounded-8 gap-4 group-data-[selected-all]/filter-input:ring-2 group-data-[selected-all]/filter-input:ring-focus-primary group-data-[selected-all]/filter-input:bg-bg-light-info group-data-[selected-all]/filter-input:border-border-info [[data-drag-selected]_&]:ring-2 [[data-drag-selected]_&]:ring-focus-primary [[data-drag-selected]_&]:bg-bg-light-info [[data-drag-selected]_&]:border-border-info',
   {
     variants: {
       error: {
