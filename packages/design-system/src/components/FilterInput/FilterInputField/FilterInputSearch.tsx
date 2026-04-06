@@ -2,15 +2,15 @@ import type { FC } from 'react';
 import { useFilterInputContext } from '../FilterInputContext';
 import { filterInputInputVariants } from './classes';
 
-/** Approximate width of a single character in px (text-sm monospace) */
-const CHAR_WIDTH_PX = 8;
+/** Approximate max width of a single character in px (text-sm, accounts for wide chars like W/M) */
+const CHAR_WIDTH_PX = 10;
 
 interface FilterInputSearchProps {
   hasContent: boolean;
   minWidth?: number;
 }
 
-export const FilterInputSearch: FC<FilterInputSearchProps> = ({ hasContent, minWidth = 4 }) => {
+export const FilterInputSearch: FC<FilterInputSearchProps> = ({ hasContent, minWidth = 8 }) => {
   const {
     inputText,
     inputRef,
