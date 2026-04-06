@@ -127,9 +127,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     <div
       ref={containerRef}
       className={cn('group/filter-input relative flex w-full flex-col gap-4', className)}
-      onFocus={e => {
-        autocomplete.handleFocus(e.nativeEvent);
-      }}
+      onFocus={autocomplete.handleFocus as unknown as React.FocusEventHandler<HTMLDivElement>}
       onBlur={autocomplete.handleBlur}
       onClick={allSelected ? clearSelection : undefined}
       onKeyDown={handleKeyDown}
