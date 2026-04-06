@@ -3,7 +3,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { isFilterParseError, parseExpression, serializeExpression } from '../../lib';
 import type { Condition, ExprNode, FieldMetadata } from '../../types';
 import { buildExpression } from '../useFilterInputExpression/expression';
-import { DRAG_THRESHOLD, PASTE_ERROR_TIMEOUT } from './constants';
+import { CHIP_ID_PREFIX, DRAG_THRESHOLD, PASTE_ERROR_TIMEOUT } from './constants';
 import {
   clearDragAttributes,
   getSelectedConditionIndices,
@@ -35,15 +35,13 @@ export const useFilterInputSelection = ({
   const isDraggingRef = useRef(false);
   const dragStartXRef = useRef(0);
 
-  const chips = chipRegistryRef.current;
-
   // ── Clear ──────────────────────────────────────────────────
 
   const clearSelection = useCallback(() => {
     setAllSelected(false);
     setPasteError(null);
-    clearDragAttributes(chips);
-  }, [chips]);
+    clearDragAttributes(chipRegistryRef.current);
+  }, [chipRegistryRef]);
 
   useEffect(() => {
     if (!pasteError) return;
@@ -70,8 +68,9 @@ export const useFilterInputSelection = ({
           document.body.style.userSelect = 'none';
         }
 
+        const registry = chipRegistryRef.current;
         let hasSelected = false;
-        for (const chip of chips.values()) {
+        for (const chip of registry.values()) {
           if (isChipInRange(chip, dragStartXRef.current, moveEvent.clientX)) {
             chip.setAttribute('data-drag-selected', '');
             hasSelected = true;
@@ -90,17 +89,19 @@ export const useFilterInputSelection = ({
 
         if (!isDraggingRef.current) return;
 
-        // If all condition chips (chip-*) are dragged — promote to allSelected
+        const registry = chipRegistryRef.current;
+
+        // If all condition chips are dragged — promote to allSelected
         let conditionCount = 0;
         let selectedCount = 0;
-        for (const [id, el] of chips.entries()) {
-          if (!id.startsWith('chip-')) continue;
+        for (const [id, el] of registry.entries()) {
+          if (!id.startsWith(CHIP_ID_PREFIX)) continue;
           conditionCount++;
           if (el.hasAttribute('data-drag-selected')) selectedCount++;
         }
 
         if (selectedCount === conditionCount && conditionCount > 0) {
-          clearDragAttributes(chips);
+          clearDragAttributes(registry);
           setAllSelected(true);
         }
 
@@ -110,7 +111,7 @@ export const useFilterInputSelection = ({
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     },
-    [chips, inputRef],
+    [chipRegistryRef, inputRef],
   );
 
   // ── Keyboard ───────────────────────────────────────────────
@@ -118,7 +119,7 @@ export const useFilterInputSelection = ({
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLDivElement>) => {
       const isMod = e.metaKey || e.ctrlKey;
-      const hasSelection = allSelected || hasDragSelection(chips);
+      const hasSelection = allSelected || hasDragSelection(chipRegistryRef.current);
 
       if (isMod && e.key === 'a' && conditions.length > 0) {
         e.preventDefault();
@@ -146,7 +147,7 @@ export const useFilterInputSelection = ({
         clearSelection();
       }
     },
-    [allSelected, conditions.length, chips, inputRef, clearAll, clearSelection],
+    [allSelected, conditions.length, chipRegistryRef, inputRef, clearAll, clearSelection],
   );
 
   // ── Clipboard ──────────────────────────────────────────────
@@ -156,12 +157,18 @@ export const useFilterInputSelection = ({
       if (conditions.length === 0) return;
       e.preventDefault();
 
-      // If drag-selected, copy only those conditions
-      const selectedIndices = getSelectedConditionIndices(chips);
+      // If drag-selected, copy only those conditions with their original connectors
+      const selectedIndices = getSelectedConditionIndices(chipRegistryRef.current);
       if (selectedIndices.length > 0) {
-        const selected = selectedIndices.map(i => conditions[i]).filter(Boolean);
-        const selectedConnectors =
-          selected.length > 1 ? new Array<'and'>(selected.length - 1).fill('and') : [];
+        const selected = selectedIndices.flatMap(i => (conditions[i] ? [conditions[i]] : []));
+        // Preserve connectors between consecutive selected indices
+        const selectedConnectors: Array<'and' | 'or'> = [];
+        for (let i = 1; i < selectedIndices.length; i++) {
+          const prevIdx = selectedIndices[i - 1]!;
+          // Use the connector that sits between prevIdx and prevIdx+1
+          // connectors[n] is the connector between condition[n] and condition[n+1]
+          selectedConnectors.push(connectors[prevIdx] ?? 'and');
+        }
         const text = serializeExpression(buildExpression(selected, selectedConnectors));
         e.clipboardData.setData('text/plain', text);
         return;
@@ -171,7 +178,7 @@ export const useFilterInputSelection = ({
       const text = serializeExpression(buildExpression(conditions, connectors));
       e.clipboardData.setData('text/plain', text);
     },
-    [conditions, connectors, chips],
+    [conditions, connectors, chipRegistryRef],
   );
 
   const handlePaste = useCallback(

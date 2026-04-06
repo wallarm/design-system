@@ -1,3 +1,7 @@
+import { CHIP_ID_PREFIX } from './constants';
+
+const DRAG_ATTR = 'data-drag-selected';
+
 export const isChipInRange = (chip: HTMLElement, x1: number, x2: number): boolean => {
   const rect = chip.getBoundingClientRect();
   const minX = Math.min(x1, x2);
@@ -7,13 +11,13 @@ export const isChipInRange = (chip: HTMLElement, x1: number, x2: number): boolea
 
 export const clearDragAttributes = (chips: Map<string, HTMLElement>) => {
   for (const chip of chips.values()) {
-    chip.removeAttribute('data-drag-selected');
+    chip.removeAttribute(DRAG_ATTR);
   }
 };
 
 export const hasDragSelection = (chips: Map<string, HTMLElement>): boolean => {
   for (const chip of chips.values()) {
-    if (chip.hasAttribute('data-drag-selected')) return true;
+    if (chip.hasAttribute(DRAG_ATTR)) return true;
   }
   return false;
 };
@@ -22,9 +26,9 @@ export const hasDragSelection = (chips: Map<string, HTMLElement>): boolean => {
 export const getSelectedConditionIndices = (chips: Map<string, HTMLElement>): number[] => {
   const indices: number[] = [];
   for (const [id, el] of chips.entries()) {
-    if (!id.startsWith('chip-')) continue;
-    if (!el.hasAttribute('data-drag-selected')) continue;
-    const index = Number(id.slice(5));
+    if (!id.startsWith(CHIP_ID_PREFIX)) continue;
+    if (!el.hasAttribute(DRAG_ATTR)) continue;
+    const index = Number(id.slice(CHIP_ID_PREFIX.length));
     if (!Number.isNaN(index)) indices.push(index);
   }
   return indices.sort((a, b) => a - b);
