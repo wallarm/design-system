@@ -5,18 +5,14 @@ import { filterInputInputVariants } from './classes';
 /** Approximate max width of a single character in px (text-sm, accounts for wide chars like W/M) */
 const CHAR_WIDTH_PX = 10;
 
-interface FilterInputSearchProps {
-  hasContent: boolean;
-  minWidth?: number;
-}
-
 /** Minimum input width in px — enough for one wide char + cursor */
 const MIN_INPUT_WIDTH = 20;
 
-export const FilterInputSearch: FC<FilterInputSearchProps> = ({
-  hasContent,
-  minWidth = MIN_INPUT_WIDTH,
-}) => {
+interface FilterInputSearchProps {
+  hasContent: boolean;
+}
+
+export const FilterInputSearch: FC<FilterInputSearchProps> = ({ hasContent }) => {
   const {
     inputText,
     inputRef,
@@ -44,7 +40,7 @@ export const FilterInputSearch: FC<FilterInputSearchProps> = ({
       placeholder={hasContent ? undefined : placeholder}
       style={
         hasContent
-          ? { width: `${Math.max(minWidth, (inputText.length + 1) * CHAR_WIDTH_PX)}px` }
+          ? { width: `${Math.max(MIN_INPUT_WIDTH, (inputText.length + 1) * CHAR_WIDTH_PX)}px` }
           : undefined
       }
       className={filterInputInputVariants({ hasContent })}
