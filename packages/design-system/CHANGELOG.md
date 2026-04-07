@@ -1,3 +1,7 @@
+## 0.21.0 (2026-04-07)
+
+* feat(filter-input): filter copy/paste with selection and validation [AS-809] (#78) ([b3dc77e](https://github.com/wallarm/design-system/commit/b3dc77e)), closes [#78](https://github.com/wallarm/design-system/issues/78)
+
 ## 0.20.0 (2026-04-03)
 
 * feat(icons): add Zap and Sheet icons (#77) ([c750ea6](https://github.com/wallarm/design-system/commit/c750ea6)), closes [#77](https://github.com/wallarm/design-system/issues/77)
