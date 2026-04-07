@@ -132,9 +132,12 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
     menuRef,
   });
 
+  // Hide menu when filter text is non-empty but no fields match (e.g. pasted invalid text)
+  const hasResults = filteredFields.length > 0 || !filterText;
+
   return (
     <DropdownMenu
-      open={open}
+      open={open && hasResults}
       onOpenChange={onOpenChange}
       closeOnSelect={false}
       positioning={positioning}

@@ -2,15 +2,17 @@ import type { FC } from 'react';
 import { useFilterInputContext } from '../FilterInputContext';
 import { filterInputInputVariants } from './classes';
 
-/** Approximate width of a single character in px (text-sm monospace) */
-const CHAR_WIDTH_PX = 8;
+/** Approximate max width of a single character in px (text-sm, accounts for wide chars like W/M) */
+const CHAR_WIDTH_PX = 10;
+
+/** Minimum input width in px — enough for one wide char + cursor */
+const MIN_INPUT_WIDTH = 20;
 
 interface FilterInputSearchProps {
   hasContent: boolean;
-  minWidth?: number;
 }
 
-export const FilterInputSearch: FC<FilterInputSearchProps> = ({ hasContent, minWidth = 4 }) => {
+export const FilterInputSearch: FC<FilterInputSearchProps> = ({ hasContent }) => {
   const {
     inputText,
     inputRef,
@@ -38,7 +40,7 @@ export const FilterInputSearch: FC<FilterInputSearchProps> = ({ hasContent, minW
       placeholder={hasContent ? undefined : placeholder}
       style={
         hasContent
-          ? { width: `${Math.max(minWidth, inputText.length * CHAR_WIDTH_PX)}px` }
+          ? { width: `${Math.max(MIN_INPUT_WIDTH, (inputText.length + 1) * CHAR_WIDTH_PX)}px` }
           : undefined
       }
       className={filterInputInputVariants({ hasContent })}

@@ -10,6 +10,13 @@ export {
   type FilterInputValueMenuProps,
   type ValueOption,
 } from './FilterInputMenu';
+// Utilities
+export {
+  type FilterParseError,
+  isFilterParseError,
+  parseExpression,
+  serializeExpression,
+} from './lib';
 // Types
 export type {
   Condition,

@@ -1,4 +1,5 @@
-import type { FC, ReactNode } from 'react';
+import { type FC, type ReactNode, useCallback } from 'react';
+import { useFilterInputContext } from '../FilterInputContext';
 import { CONNECTOR_ID_PATTERN } from '../lib';
 import type { FilterInputChipData } from '../types';
 import type { ChipSegment } from './FilterInputChip';
@@ -29,6 +30,12 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
   onChipRemove,
   onGapClick,
 }) => {
+  const { registerChipRef } = useFilterInputContext();
+  const chipRef = useCallback(
+    (id: string) => (el: HTMLDivElement | null) => registerChipRef(id, el),
+    [registerChipRef],
+  );
+
   const elements: ReactNode[] = [];
   let connectorIndex = 0;
   const connectorCount = chips.filter(c => c.variant === 'and' || c.variant === 'or').length;
@@ -39,7 +46,7 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
 
     if (isCondition) {
       elements.push(
-        <div key={chip.id} className='shrink-0 cursor-pointer hover:z-10'>
+        <div key={chip.id} ref={chipRef(chip.id)} className='shrink-0 cursor-pointer hover:z-10'>
           <FilterInputChip
             chipId={chip.id}
             attribute={chip.attribute ?? ''}
@@ -71,7 +78,7 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
         );
       }
       elements.push(
-        <div key={chip.id} className='shrink-0'>
+        <div key={chip.id} ref={chipRef(chip.id)} className='shrink-0'>
           <FilterInputConnectorChip
             chipId={chip.id}
             variant={chip.variant as 'and' | 'or'}

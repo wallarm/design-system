@@ -351,5 +351,6 @@ export const useFilterInputAutocomplete = ({
     menuRef,
     closeAutocompleteMenu,
     blurCommitRef,
+    setInputText,
   };
 };
