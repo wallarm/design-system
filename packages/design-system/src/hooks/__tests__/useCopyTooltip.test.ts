@@ -66,8 +66,8 @@ describe('useCopyTooltip', () => {
 
     // keepOpen is false after timeout, hovering is false → tooltipOpen false
     expect(result.current.tooltipOpen).toBe(false);
-    // copied remains true until hover resets it
-    expect(result.current.copied).toBe(true);
+    // copied is also reset after timeout
+    expect(result.current.copied).toBe(false);
   });
 
   it('resets copied when onTooltipOpenChange is called with true after copy', () => {
