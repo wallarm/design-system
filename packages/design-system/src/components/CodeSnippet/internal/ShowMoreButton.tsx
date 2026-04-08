@@ -6,9 +6,9 @@ import { MIN_HIDDEN_LINES_THRESHOLD } from '../CodeSnippetContext';
 import { useCodeSnippet } from '../hooks';
 
 export const ShowMoreButton: FC = () => {
-  const { totalLines, maxLines, isExpanded, setIsExpanded } = useCodeSnippet();
+  const { displayItems, maxLines, isExpanded, setIsExpanded } = useCodeSnippet();
 
-  const hiddenLines = totalLines - maxLines;
+  const hiddenLines = displayItems.length - maxLines;
 
   if (maxLines <= 0 || hiddenLines < MIN_HIDDEN_LINES_THRESHOLD) return null;
 

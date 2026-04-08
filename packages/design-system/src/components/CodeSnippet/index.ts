@@ -49,3 +49,11 @@ export { CodeSnippetWrapButton, type CodeSnippetWrapButtonProps } from './CodeSn
 export { useAdapter, useCodeSnippet } from './hooks';
 // Inline variant
 export { InlineCodeSnippet, type InlineCodeSnippetProps } from './InlineCodeSnippet';
+// Fold types and utilities
+export { type FoldRegion } from './lib/foldUtils';
+export {
+  getHttpFolds,
+  HTTP_FOLD_ID,
+  type HttpFoldOptions,
+  type HttpFoldSectionOptions,
+} from './lib/httpFolds';

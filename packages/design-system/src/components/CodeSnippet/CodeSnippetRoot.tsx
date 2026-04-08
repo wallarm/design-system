@@ -11,9 +11,11 @@ import {
   type CodeSnippetContextValue,
   type CodeSnippetSize,
   type LineConfig,
+  MIN_HIDDEN_LINES_THRESHOLD,
 } from './CodeSnippetContext';
 import { useAdapter } from './hooks';
 import { ShowMoreButton } from './internal/ShowMoreButton';
+import { buildDisplayItems, type FoldRegion, validateFolds } from './lib/foldUtils';
 
 const codeSnippetRootVariants = cva(
   [
@@ -64,20 +66,25 @@ export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippe
     wrapLines?: boolean;
     /** Max lines before collapsing (for ShowMore) */
     maxLines?: number;
+    /** Foldable regions that can be collapsed/expanded */
+    folds?: FoldRegion[];
     /** Callback when code is copied */
     onCopy?: (code: string) => void;
     /** Child components */
     children?: ReactNode;
   };
 
+const EMPTY_LINES: Record<number, LineConfig> = {};
+
 export const CodeSnippetRoot = <TLanguage extends string = string>({
   code,
   language = 'text' as TLanguage,
   size = 'sm',
-  lines = {},
+  lines = EMPTY_LINES,
   startingLineNumber = 1,
   wrapLines: initialWrapLines = false,
   maxLines = 0,
+  folds: foldsProp,
   onCopy,
   className,
   children,
@@ -147,6 +154,46 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
 
   const totalLines = tokens?.length ?? code.split('\n').length;
 
+  const validatedFolds = useMemo(
+    () => (foldsProp ? validateFolds(foldsProp, totalLines, startingLineNumber) : []),
+    [foldsProp, totalLines, startingLineNumber],
+  );
+
+  const computeCollapsedFolds = useCallback((folds: FoldRegion[] | undefined) => {
+    if (!folds) return new Set<string>();
+    return new Set(folds.filter(f => f.defaultCollapsed !== false).map(f => f.id));
+  }, []);
+
+  const [collapsedFolds, setCollapsedFolds] = useState(() => computeCollapsedFolds(foldsProp));
+
+  // Re-initialize when folds prop identity changes (e.g. tab switch)
+  useEffect(() => {
+    setCollapsedFolds(computeCollapsedFolds(foldsProp));
+  }, [foldsProp, computeCollapsedFolds]);
+
+  const toggleFold = useCallback((foldId: string) => {
+    setCollapsedFolds(prev => {
+      const next = new Set(prev);
+      if (next.has(foldId)) {
+        next.delete(foldId);
+      } else {
+        next.add(foldId);
+      }
+      return next;
+    });
+  }, []);
+
+  const displayItems = useMemo(
+    () => buildDisplayItems(totalLines, validatedFolds, collapsedFolds, startingLineNumber),
+    [totalLines, validatedFolds, collapsedFolds, startingLineNumber],
+  );
+
+  const visibleDisplayItems = useMemo(() => {
+    const hiddenRows = displayItems.length - maxLines;
+    const shouldClip = maxLines > 0 && !isExpanded && hiddenRows >= MIN_HIDDEN_LINES_THRESHOLD;
+    return shouldClip ? displayItems.slice(0, maxLines) : displayItems;
+  }, [displayItems, maxLines, isExpanded]);
+
   const contextValue = useMemo<CodeSnippetContextValue<TLanguage>>(
     () => ({
       code,
@@ -160,6 +207,11 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       showLineNumbers: false,
       lines: new Map(Object.entries(lines).map(([k, v]) => [Number(k), v])),
       totalLines,
+      displayItems,
+      visibleDisplayItems,
+      folds: validatedFolds,
+      collapsedFolds,
+      toggleFold,
       isExpanded,
       maxLines,
       isFullscreen,
@@ -179,6 +231,11 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       startingLineNumber,
       lines,
       totalLines,
+      displayItems,
+      visibleDisplayItems,
+      validatedFolds,
+      collapsedFolds,
+      toggleFold,
       isExpanded,
       maxLines,
       isFullscreen,
