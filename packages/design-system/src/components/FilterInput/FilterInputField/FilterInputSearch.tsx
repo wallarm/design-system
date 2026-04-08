@@ -6,7 +6,7 @@ import { filterInputInputVariants } from './classes';
 const CHAR_WIDTH_PX = 10;
 
 /** Minimum input width in px — enough for one wide char + cursor */
-const MIN_INPUT_WIDTH = 20;
+const MIN_INPUT_WIDTH = 4;
 
 interface FilterInputSearchProps {
   hasContent: boolean;
