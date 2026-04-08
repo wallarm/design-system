@@ -126,7 +126,7 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
         data-slot='code-snippet-content'
         data-testid={testId}
         className={cn(
-          'min-h-0',
+          'min-h-0 overscroll-none',
           wrapLines ? 'overflow-y-auto overflow-x-hidden' : 'overflow-auto',
           className,
         )}
@@ -141,7 +141,7 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
     <div
       data-slot='code-snippet-content'
       data-testid={testId}
-      className={cn('min-h-0', className)}
+      className={cn('min-h-0 [&_[data-part=viewport]]:overscroll-none', className)}
       {...props}
     >
       <ScrollArea>
