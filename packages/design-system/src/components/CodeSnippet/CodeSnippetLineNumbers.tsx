@@ -13,7 +13,7 @@ export const CodeSnippetLineNumbers: FC<CodeSnippetLineNumbersProps> = ({
   ...props
 }) => {
   const testId = useTestId('line-numbers');
-  const { tokens, startingLineNumber, lines, size } = useCodeSnippet();
+  const { tokens, visibleDisplayItems, lines, size } = useCodeSnippet();
 
   const lineHeightClass = SIZE_LINE_HEIGHT_CLASSES[size];
 
@@ -28,22 +28,23 @@ export const CodeSnippetLineNumbers: FC<CodeSnippetLineNumbersProps> = ({
       className={cn('flex flex-col text-text-secondary select-none text-right', className)}
       {...props}
     >
-      {tokens.map((_, index) => {
-        const lineNumber = startingLineNumber + index;
-        const lineConfig = lines.get(lineNumber);
+      {visibleDisplayItems.map(item => {
+        if (item.type === 'fold-summary') {
+          return (
+            <span key={`fold-${item.fold.id}`} className={cn(lineHeightClass, 'px-8')}>
+              {item.fold.startLine}
+            </span>
+          );
+        }
+        const lineConfig = lines.get(item.lineNumber);
         const colorStyles = lineConfig?.color ? LINE_COLOR_STYLES[lineConfig.color] : undefined;
 
         return (
           <span
-            key={lineNumber}
-            className={cn(
-              lineHeightClass,
-              'px-8',
-              colorStyles?.text,
-              colorStyles?.bg,
-            )}
+            key={item.lineNumber}
+            className={cn(lineHeightClass, 'px-8', colorStyles?.text, colorStyles?.bg)}
           >
-            {lineNumber}
+            {item.lineNumber}
           </span>
         );
       })}

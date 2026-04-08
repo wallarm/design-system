@@ -762,3 +762,134 @@ export const ShowMore: StoryFn<typeof meta> = () => (
     </div>
   </div>
 );
+
+// --- Folding stories ---
+
+import { getHttpFolds } from './lib/httpFolds';
+
+const foldableRequestCode = `GET /api/v2/users HTTP/1.1
+Host: api.example.com
+Accept: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiJ9
+X-Request-ID: abc-123
+Content-Type: application/json
+Cache-Control: no-cache
+
+{
+  "filter": {
+    "status": "active",
+    "role": "admin"
+  },
+  "pagination": {
+    "page": 1,
+    "limit": 50
+  }
+}`;
+
+const foldableResponseCode = `HTTP/1.1 200 OK
+Content-Type: application/json; charset=utf-8
+X-Request-ID: abc-123
+X-RateLimit-Remaining: 98
+Cache-Control: private, max-age=0
+
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "Alice",
+      "role": "admin",
+      "status": "active"
+    },
+    {
+      "id": 2,
+      "name": "Bob",
+      "role": "admin",
+      "status": "active"
+    }
+  ],
+  "meta": {
+    "total": 2,
+    "page": 1,
+    "limit": 50
+  }
+}`;
+
+/**
+ * HTTP Request with foldable headers and body using `getHttpFolds`.
+ */
+export const HTTPRequestWithFolding: StoryFn<typeof meta> = () => (
+  <CodeSnippetRoot
+    code={foldableRequestCode}
+    language='text'
+    folds={getHttpFolds(foldableRequestCode)}
+  >
+    <CodeSnippetContent>
+      <CodeSnippetLineNumbers />
+      <CodeSnippetCode />
+    </CodeSnippetContent>
+  </CodeSnippetRoot>
+);
+
+/**
+ * HTTP Response with foldable headers and body using `getHttpFolds`.
+ */
+export const HTTPResponseWithFolding: StoryFn<typeof meta> = () => (
+  <CodeSnippetRoot
+    code={foldableResponseCode}
+    language='text'
+    folds={getHttpFolds(foldableResponseCode)}
+  >
+    <CodeSnippetContent>
+      <CodeSnippetLineNumbers />
+      <CodeSnippetCode />
+    </CodeSnippetContent>
+  </CodeSnippetRoot>
+);
+
+/**
+ * Folds combined with line highlights — colors and decorations
+ * on folded lines are hidden when collapsed, visible when expanded.
+ */
+export const WithFoldingExpanded: StoryFn<typeof meta> = () => (
+  <CodeSnippetRoot
+    code={foldableRequestCode}
+    language='text'
+    folds={getHttpFolds(foldableRequestCode, {
+      headers: { defaultCollapsed: false },
+      body: { defaultCollapsed: false },
+    })}
+    lines={{
+      3: { color: 'warning' },
+      4: { color: 'danger', ranges: [{ start: 14, end: 42, color: 'danger' }] },
+      10: { color: 'info' },
+      11: { color: 'info' },
+    }}
+  >
+    <CodeSnippetContent>
+      <CodeSnippetLineNumbers />
+      <CodeSnippetCode />
+    </CodeSnippetContent>
+  </CodeSnippetRoot>
+);
+
+/**
+ * Folds combined with maxLines (ShowMore) and a custom startingLineNumber.
+ * Fold line numbers are absolute — `getHttpFolds` accepts `startingLineNumber`
+ * to offset them automatically.
+ */
+export const WithFoldingAndShowMore: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot
+      code={foldableResponseCode}
+      language='http'
+      startingLineNumber={100}
+      maxLines={6}
+      folds={getHttpFolds(foldableResponseCode, { startingLineNumber: 100 })}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);

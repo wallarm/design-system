@@ -18,7 +18,8 @@
       "!**/dist",
       "!**/node_modules",
       "!**/storybook-static",
-      "!**/*.gen.ts"
+      "!**/*.gen.ts",
+      "!**/playwright-report"
     ]
   }
 }

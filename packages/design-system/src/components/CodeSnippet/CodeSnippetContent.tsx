@@ -20,6 +20,7 @@ import { CodeSnippetContext } from './CodeSnippetContext';
 import { useCodeSnippet } from './hooks';
 import { CodeSnippetHighlights } from './internal/CodeSnippetHighlights';
 import { ColorStickColumn } from './internal/ColorStickColumn';
+import { FoldColumn } from './internal/FoldColumn';
 import { PrefixColumn } from './internal/PrefixColumn';
 import { SIZE_LINE_HEIGHT_CLASSES } from './lib/lineStyles';
 
@@ -41,11 +42,11 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
 }) => {
   const testId = useTestId('content');
   const context = useCodeSnippet();
-  const { wrapLines, lines, totalLines, startingLineNumber, size } = context;
+  const { wrapLines, lines, visibleDisplayItems, folds, size } = context;
 
+  const hasFolds = folds.length > 0;
   const hasHighlights = Array.from(lines.values()).some(config => config.color != null);
   const hasAnyPrefix = Array.from(lines.values()).some(config => config.prefix != null);
-  const lineCount = totalLines;
   const lineHeightClass = SIZE_LINE_HEIGHT_CLASSES[size];
 
   // Separate line numbers from other children
@@ -62,7 +63,7 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
   );
 
   const hasLineNumbers = Boolean(lineNumbersElement);
-  const needsGutterElements = hasHighlights || hasLineNumbers || hasAnyPrefix;
+  const needsGutterElements = hasHighlights || hasLineNumbers || hasAnyPrefix || hasFolds;
   // When wrapLines is true, render gutter elements (color stick, line numbers, prefix) inline with each code line
   const useInlineGutter = wrapLines && needsGutterElements;
   // Gutter column only needed when NOT wrapping
@@ -89,17 +90,16 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
         >
           {hasHighlights && (
             <ColorStickColumn
-              lineCount={lineCount}
-              startingLineNumber={startingLineNumber}
+              visibleDisplayItems={visibleDisplayItems}
               lines={lines}
               lineHeightClass={lineHeightClass}
             />
           )}
           {lineNumbersElement}
+          {hasFolds && <FoldColumn />}
           {hasAnyPrefix && (
             <PrefixColumn
-              lineCount={lineCount}
-              startingLineNumber={startingLineNumber}
+              visibleDisplayItems={visibleDisplayItems}
               lines={lines}
               lineHeightClass={lineHeightClass}
             />

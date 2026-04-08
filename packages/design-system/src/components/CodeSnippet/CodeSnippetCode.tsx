@@ -1,8 +1,9 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
 import { useTestId } from '../../utils/testId';
-import { MIN_HIDDEN_LINES_THRESHOLD } from './CodeSnippetContext';
 import { useCodeSnippet } from './hooks';
 import { CodeContent, CodeLine, TokenizedCodeLine } from './internal';
+import { FoldSummaryLine } from './internal/FoldSummaryLine';
+import type { DisplayItem } from './lib/foldUtils';
 import { SIZE_LINE_HEIGHT_CLASSES } from './lib/lineStyles';
 import { splitTextByRanges } from './lib/lineUtils';
 
@@ -17,39 +18,45 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
     tokens,
     isLoading,
     wrapLines,
-    startingLineNumber,
     lines,
     size,
     inlineGutter,
     showLineNumbers,
-    totalLines,
-    maxLines,
-    isExpanded,
+    visibleDisplayItems,
+    toggleFold,
   } = useCodeSnippet();
 
   const lineHeightClass = SIZE_LINE_HEIGHT_CLASSES[size];
-  const hiddenLines = totalLines - maxLines;
-  const shouldClip = maxLines > 0 && !isExpanded && hiddenLines >= MIN_HIDDEN_LINES_THRESHOLD;
+
+  const renderFoldSummary = (item: Extract<DisplayItem, { type: 'fold-summary' }>) => (
+    <FoldSummaryLine
+      key={`fold-${item.fold.id}`}
+      fold={item.fold}
+      lineCount={item.lineCount}
+      lineHeightClass={lineHeightClass}
+      onToggle={() => toggleFold(item.fold.id)}
+    />
+  );
 
   // Show loading state or plain code if tokens not ready
   if (isLoading || !tokens) {
     const codeLines = code.split('\n');
-    const visibleLines = shouldClip ? codeLines.slice(0, maxLines) : codeLines;
     return (
       <CodeContent wrapLines={wrapLines} className={className} {...props} data-testid={testId}>
-        {visibleLines.map((line, index) => {
-          const lineNumber = startingLineNumber + index;
-          const lineConfig = lines.get(lineNumber);
+        {visibleDisplayItems.map(item => {
+          if (item.type === 'fold-summary') return renderFoldSummary(item);
+          const line = codeLines[item.index] ?? '';
+          const lineConfig = lines.get(item.lineNumber);
           const ranges = lineConfig?.ranges;
           const hasRanges = ranges && ranges.length > 0;
 
           return (
             <CodeLine
-              key={lineNumber}
+              key={item.lineNumber}
               lineConfig={lineConfig}
               lineHeightClass={lineHeightClass}
               showInlineGutter={inlineGutter}
-              lineNumber={showLineNumbers ? lineNumber : undefined}
+              lineNumber={showLineNumbers ? item.lineNumber : undefined}
             >
               {hasRanges
                 ? splitTextByRanges(line, ranges, lineConfig?.color).map((segment, i) => (
@@ -65,20 +72,20 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
     );
   }
 
-  const visibleTokens = shouldClip ? tokens.slice(0, maxLines) : tokens;
-
   return (
     <CodeContent wrapLines={wrapLines} className={className} {...props} data-testid={testId}>
-      {visibleTokens.map((lineTokens, index) => {
-        const lineNumber = startingLineNumber + index;
+      {visibleDisplayItems.map(item => {
+        if (item.type === 'fold-summary') return renderFoldSummary(item);
+        const lineTokens = tokens[item.index];
+        if (!lineTokens) return null;
         return (
           <TokenizedCodeLine
-            key={lineNumber}
+            key={item.lineNumber}
             tokens={lineTokens}
-            lineConfig={lines.get(lineNumber)}
+            lineConfig={lines.get(item.lineNumber)}
             lineHeightClass={lineHeightClass}
             showInlineGutter={inlineGutter}
-            lineNumber={showLineNumbers ? lineNumber : undefined}
+            lineNumber={showLineNumbers ? item.lineNumber : undefined}
           />
         );
       })}

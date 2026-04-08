@@ -1,6 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { createContext } from 'react';
 import type { SyntaxAdapter, Token } from './adapters/types';
+import type { DisplayItem, FoldRegion } from './lib/foldUtils';
 
 export type CodeSnippetSize = 'sm' | 'md' | 'lg';
 
@@ -53,6 +54,17 @@ export type CodeSnippetContextValue<TLanguage extends string = string> = {
 
   // Line count
   totalLines: number;
+
+  // Display items (unified iteration abstraction)
+  /** All display items (post-fold, pre-clip). Used for ShowMore counting. */
+  displayItems: DisplayItem[];
+  /** Display items clipped to maxLines. All rendering components should iterate this. */
+  visibleDisplayItems: DisplayItem[];
+
+  // Folding
+  folds: FoldRegion[];
+  collapsedFolds: Set<string>;
+  toggleFold: (foldId: string) => void;
 
   // Expand/collapse
   isExpanded: boolean;
