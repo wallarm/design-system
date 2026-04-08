@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { Condition, ExprNode, FieldMetadata } from '../../types';
 import { clearDragAttributes, hasDragSelection } from './lib';
 import { useDragSelection } from './useDragSelection';
@@ -44,22 +44,25 @@ export const useFilterInputSelection = ({
   const dismissPasteError = useCallback(() => setPasteError(null), []);
 
   // Clear chip selection when clicking outside the filter input
+  const allSelectedRef = useRef(false);
+  allSelectedRef.current = allSelected;
+
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (!containerRef.current?.contains(e.target as Node)) {
-        if (allSelected || hasDragSelection(chipRegistryRef.current)) {
+        if (allSelectedRef.current || hasDragSelection(chipRegistryRef.current)) {
           clearSelection();
         }
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [allSelected, containerRef, chipRegistryRef, clearSelection]);
+  }, [containerRef, chipRegistryRef, clearSelection]);
 
   const { handleMouseDown } = useDragSelection({
     chipRegistryRef,
     inputRef,
-    onSelectAll,
+    closeMenu,
   });
 
   const { handleKeyDown } = useSelectionKeyboard({

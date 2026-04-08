@@ -174,14 +174,12 @@ const attackFields: FieldMetadata[] = [
     operators: ['=', '!=', 'in'],
     values: [
       {
-        value: 'sess_abc123def456sess_abc123def456sess_abc123def456sess_abc123def456',
-        label: 'sess_abc123def456sess_abc123def456sess_abc123def456sess_abc123def456',
+        value: 'sess_a1b2c3d4-e5f6-7890-abcd-ef1234567890',
+        label: 'sess_a1b2c3d4-e5f6-7890-abcd-ef1234567890',
       },
       {
-        value:
-          'sess_789ghi012jklsess_789ghi012jklsess_789ghi012jklsess_789ghi012jklsess_789ghi012jkl',
-        label:
-          'sess_789ghi012jklsess_789ghi012jklsess_789ghi012jklsess_789ghi012jklsess_789ghi012jkl',
+        value: 'sess_f8e7d6c5-b4a3-2109-8765-432109abcdef',
+        label: 'sess_f8e7d6c5-b4a3-2109-8765-432109abcdef',
       },
     ],
   },
