@@ -22,7 +22,7 @@ export const PrefixColumn: FC<{
             key={lineNumber}
             className={cn(
               lineHeightClass,
-              'flex h-lh items-center justify-center px-8 bg-bg-primary',
+              'flex h-lh items-center justify-center px-8',
               colorStyles?.text,
               colorStyles?.bg,
             )}

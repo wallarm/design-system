@@ -24,7 +24,7 @@ type VariantStyles = {
 const inlineCodeSnippetVariants = cva(
   [
     'inline-flex items-center',
-    'bg-component-code-snippet-bg',
+    'code-snippet-bg',
     'rounded-6',
     'font-mono font-normal',
     'text-syntax-no-syntax',

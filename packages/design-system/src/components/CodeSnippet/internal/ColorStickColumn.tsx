@@ -23,7 +23,6 @@ export const ColorStickColumn: FC<{
             className={cn(
               lineHeightClass,
               'border-l-2 pl-12',
-              'bg-bg-primary',
               colorStyles?.border ?? 'border-transparent',
               colorStyles?.bg,
             )}

@@ -1,0 +1,8 @@
+@utility code-snippet-bg {
+    background:
+        linear-gradient(
+            var(--color-component-code-snippet-bg),
+            var(--color-component-code-snippet-bg)
+        ),
+        var(--color-bg-page-bg);
+}

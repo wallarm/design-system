@@ -14,7 +14,7 @@ export const CodeSnippetActions: FC<CodeSnippetActionsProps> = ({ className, ref
       ref={ref}
       data-slot='code-snippet-actions'
       data-testid={testId}
-      className={cn('flex items-center gap-4 ml-auto px-6 rounded-tr-6', className)}
+      className={cn('flex items-center gap-4 ml-auto px-6 rounded-tr-6 code-snippet-bg', className)}
       {...props}
     />
   );

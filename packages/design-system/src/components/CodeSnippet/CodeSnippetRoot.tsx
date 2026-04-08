@@ -18,7 +18,7 @@ import { ShowMoreButton } from './internal/ShowMoreButton';
 const codeSnippetRootVariants = cva(
   [
     'relative',
-    'bg-component-code-snippet-bg',
+    'code-snippet-bg',
     'rounded-6',
     'font-mono',
     'text-syntax-no-syntax',
