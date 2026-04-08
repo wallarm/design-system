@@ -81,6 +81,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     conditions,
     connectors,
     fields,
+    containerRef,
     chipRegistryRef,
     inputRef,
     clearAll,

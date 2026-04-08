@@ -1,16 +1,17 @@
 import type { Condition, ExprNode, Group } from '../types';
 
+const quoteValue = (v: string | number | boolean): string => `"${v}"`;
+
 const serializeValue = (condition: Condition): string => {
   if (condition.operator === 'is_null' || condition.operator === 'is_not_null') {
     return '';
   }
 
   if (Array.isArray(condition.value)) {
-    const parts = condition.value.map(String);
-    return `[${parts.join(', ')}]`;
+    return `[${condition.value.map(quoteValue).join(', ')}]`;
   }
 
-  return String(condition.value ?? '');
+  return quoteValue(condition.value ?? '');
 };
 
 const serializeCondition = (condition: Condition): string => {

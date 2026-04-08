@@ -86,6 +86,17 @@ export const tokenize = (input: string): Token[] => {
       continue;
     }
 
+    if (ch === '"' || ch === "'") {
+      const quote = ch;
+      const start = i;
+      i++;
+      while (i < input.length && input[i] !== quote) i++;
+      if (i >= input.length) throw FilterParseError(`Unterminated string at position ${start}`);
+      tokens.push({ type: 'IDENT', value: input.slice(start + 1, i), pos: start });
+      i++;
+      continue;
+    }
+
     if (isIdentChar(ch)) {
       const start = i;
       while (i < input.length && isIdentChar(input[i]!)) i++;

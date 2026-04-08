@@ -65,7 +65,8 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
           {inputChildren}
           <ScrollArea className={cn('flex flex-col min-h-0')} style={{ position: 'static' }}>
             <ScrollAreaViewport>
-              <ScrollAreaContent className={cn('flex flex-col gap-1')}>
+              {/* !min-w-0 overrides Ark UI inline min-width:fit-content that causes horizontal scroll expansion with long content */}
+              <ScrollAreaContent className={cn('flex flex-col gap-1 !min-w-0')}>
                 {menuChildren}
               </ScrollAreaContent>
             </ScrollAreaViewport>

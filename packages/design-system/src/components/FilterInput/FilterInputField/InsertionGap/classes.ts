@@ -1,6 +1,6 @@
 /** Insertion gap button */
 export const insertionGapButton =
-  'group relative z-20 flex h-24 w-8 shrink-0 cursor-text items-center justify-center';
+  'group relative z-20 flex h-24 w-4 shrink-0 cursor-text items-center justify-center';
 
 /** Insertion gap divider indicator */
 export const insertionGapDivider =

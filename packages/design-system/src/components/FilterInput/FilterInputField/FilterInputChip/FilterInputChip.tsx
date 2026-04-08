@@ -90,7 +90,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       ref={setRefs}
       className={cn(
         chipVariants({ error: hasError, interactive, disabled }),
-        'max-w-[600px]',
+        'max-w-[320px]',
         className,
       )}
       data-slot='filter-input-condition-chip'
@@ -118,7 +118,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       {(value || activeSegment === 'value') && (
         <Segment
           variant='value'
-          className='shrink-0'
+          className='min-w-0'
           error={activeSegment !== 'value' && (error === true || error === 'value')}
           valueParts={valueParts}
           valueSeparator={valueSeparator}
