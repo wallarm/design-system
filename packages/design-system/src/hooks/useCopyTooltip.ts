@@ -51,7 +51,10 @@ export function useCopyTooltip({
       setCopied(true);
       setKeepOpen(true);
       clearTimer();
-      timerRef.current = setTimeout(() => setKeepOpen(false), 2000);
+      timerRef.current = setTimeout(() => {
+        setKeepOpen(false);
+        setCopied(false);
+      }, 2000);
     },
     [enabled, text, clearTimer],
   );
@@ -63,6 +66,7 @@ export function useCopyTooltip({
     let listenerAdded = false;
     const dismiss = () => {
       setKeepOpen(false);
+      setCopied(false);
       clearTimer();
     };
     const frame = requestAnimationFrame(() => {
