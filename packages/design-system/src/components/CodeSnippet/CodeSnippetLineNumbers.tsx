@@ -38,7 +38,7 @@ export const CodeSnippetLineNumbers: FC<CodeSnippetLineNumbersProps> = ({
             key={lineNumber}
             className={cn(
               lineHeightClass,
-              'px-8 bg-bg-primary',
+              'px-8',
               colorStyles?.text,
               colorStyles?.bg,
             )}
