@@ -68,7 +68,7 @@ const findByReadingOrder = (entries: VisualEntry[], x: number, y: number): numbe
   if (exactIdx !== -1) return exactIdx;
 
   // Find the last chip whose row is above the cursor, or same row with center left of cursor
-  const chipHeight = entries[0].rect.height;
+  const chipHeight = entries[0]!.rect.height;
   const lastBefore = entries.reduce((best, entry, i) => {
     const cy = (entry.rect.top + entry.rect.bottom) / 2;
     const cx = (entry.rect.left + entry.rect.right) / 2;
@@ -100,7 +100,7 @@ export const resolveAnchorChipId = (
   const conditions = getVisualEntries(registry).filter(e => e.id.startsWith(CHIP_ID_PREFIX));
   if (conditions.length === 0) return null;
   const idx = findClosestByDistance(conditions, x, y);
-  return idx >= 0 ? conditions[idx].id : null;
+  return idx >= 0 ? conditions[idx]!.id : null;
 };
 
 // ── Drag selection ───────────────────────────────────────────
@@ -130,8 +130,8 @@ export const updateDragSelection = (
   const minIdx = Math.min(anchorIdx, endIdx);
   const maxIdx = Math.max(anchorIdx, endIdx);
 
-  const firstAll = conditions[minIdx].allIdx;
-  const lastAll = conditions[maxIdx].allIdx;
+  const firstAll = conditions[minIdx]!.allIdx;
+  const lastAll = conditions[maxIdx]!.allIdx;
 
   let found = false;
   all.forEach((entry, i) => {

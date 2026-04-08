@@ -194,7 +194,7 @@ describe('parseExpression', () => {
   });
 
   it('round-trip: serialize → parse → serialize', () => {
-    const original = '(attack_type in [sqli, xss]) AND (host != staging.example.com)';
+    const original = '(attack_type in ["sqli", "xss"]) AND (host != "staging.example.com")';
     const parsed = parseExpression(original, fields);
     const reserialized = serializeExpression(parsed);
     const reparsed = parseExpression(reserialized, fields);
