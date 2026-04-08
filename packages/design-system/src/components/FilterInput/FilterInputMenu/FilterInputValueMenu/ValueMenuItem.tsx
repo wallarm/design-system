@@ -1,7 +1,8 @@
 import type { FC } from 'react';
 import { ChevronRight } from '../../../../icons/ChevronRight';
 import { Checkmark } from '../../../Checkmark';
-import { DropdownMenuItem, DropdownMenuItemText } from '../../../DropdownMenu';
+import { DropdownMenuItem } from '../../../DropdownMenu';
+import { Text } from '../../../Text';
 import type { ValueOption } from './FilterInputValueMenu';
 
 interface ValueMenuItemProps {
@@ -32,19 +33,23 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
         style={{ backgroundColor: option.badge.color }}
       >
         <div className='size-6 rounded-full bg-current' />
-        <span className='leading-4 text-ellipsis'>{option.badge.text}</span>
+        <span className='min-w-0 truncate leading-4'>{option.badge.text}</span>
       </div>
     ) : (
-      <DropdownMenuItemText>{option.label}</DropdownMenuItemText>
+      <div className='min-w-0'>
+        <Text size='sm' truncate>
+          {option.label}
+        </Text>
+      </div>
     )}
 
     {/* Checkbox for multi-select, checkmark for single-select */}
     {multiSelect ? (
-      <div className='flex items-start justify-end py-2 ml-auto'>
+      <div className='flex shrink-0 items-start justify-end py-2 ml-auto'>
         <Checkmark checkedState={isChecked} />
       </div>
     ) : isChecked ? (
-      <div className='flex items-start justify-end py-2 ml-auto'>
+      <div className='flex shrink-0 items-start justify-end py-2 ml-auto'>
         <Checkmark checkedState={true} />
       </div>
     ) : null}
