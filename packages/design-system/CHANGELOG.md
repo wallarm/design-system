@@ -1,3 +1,7 @@
+## <small>0.21.1 (2026-04-08)</small>
+
+* fix(filter-input): truncate long values and fix chip drag selection [AS-820] (#79) ([b14b987](https://github.com/wallarm/design-system/commit/b14b987)), closes [#79](https://github.com/wallarm/design-system/issues/79)
+
 ## 0.21.0 (2026-04-07)
 
 * feat(filter-input): filter copy/paste with selection and validation [AS-809] (#78) ([b3dc77e](https://github.com/wallarm/design-system/commit/b3dc77e)), closes [#78](https://github.com/wallarm/design-system/issues/78)
