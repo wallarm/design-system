@@ -665,8 +665,8 @@ export const IconsInText: Story = {
             Warning <TriangleAlert size='inherit' /> inherits text-warning
           </p>
           <p className='text-sm text-text-primary'>
-            Mixed: primary text with{' '}
-            <TriangleAlert size='inherit' className='text-text-danger' /> explicit danger icon
+            Mixed: primary text with <TriangleAlert size='inherit' className='text-text-danger' />{' '}
+            explicit danger icon
           </p>
         </VStack>
       </VStack>
