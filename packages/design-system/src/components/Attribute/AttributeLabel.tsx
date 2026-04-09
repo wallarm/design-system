@@ -3,9 +3,7 @@ import { Info } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Text } from '../Text';
-import { Tooltip } from '../Tooltip';
-import { TooltipContent } from '../Tooltip/TooltipContent';
-import { TooltipTrigger } from '../Tooltip/TooltipTrigger';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
 export interface AttributeLabelProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
@@ -24,7 +22,11 @@ export interface AttributeLabelProps extends HTMLAttributes<HTMLDivElement> {
 const InfoIcon: FC<{ info: ReactNode }> = ({ info }) => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <button type='button' className='inline-flex text-text-secondary cursor-help'>
+      <button
+        type='button'
+        aria-label='Info'
+        className='inline-flex text-text-secondary cursor-help'
+      >
         <Info size='xs' />
       </button>
     </TooltipTrigger>
