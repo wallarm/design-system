@@ -20,6 +20,8 @@ export {
   AttributeLabel,
   type AttributeLabelProps,
   type AttributeProps,
+  AttributeValue,
+  type AttributeValueProps,
 } from './components/Attribute';
 export { Badge, type BadgeProps } from './components/Badge';
 export { Button, type ButtonProps } from './components/Button';
