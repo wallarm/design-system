@@ -173,65 +173,72 @@ export const WithLink_Value: StoryFn<AttributeProps> = () => (
 export const Composition: StoryFn<AttributeProps> = () => (
   <div className='grid grid-cols-2 gap-x-8 gap-y-0 w-[874px]'>
     <Attribute>
-      <AttributeLabel info='Request timestamp'>Created at</AttributeLabel>
-      <AttributeValue>
-        <Text size='sm'>April 9, 2026, 14:32</Text>
-      </AttributeValue>
-    </Attribute>
-
-    <Attribute>
       <AttributeLabel>Status</AttributeLabel>
       <AttributeValue>
-        <Badge color='green'>Active</Badge>
+        <Badge color='red' variant='dotted'>
+          Blocked
+        </Badge>
       </AttributeValue>
     </Attribute>
 
     <Attribute>
-      <AttributeLabel>Source IP</AttributeLabel>
+      <AttributeLabel>First seen</AttributeLabel>
       <AttributeValue>
-        <Text size='sm'>34.74.73.20</Text>
+        <Text size='sm' decoration='dashed'>
+          Week ago
+        </Text>
       </AttributeValue>
     </Attribute>
 
     <Attribute>
-      <AttributeLabel>Country</AttributeLabel>
+      <AttributeLabel>Attack type</AttributeLabel>
       <AttributeValue>
-        <Text size='sm'>Poland</Text>
-      </AttributeValue>
-    </Attribute>
-
-    <Attribute>
-      <AttributeLabel description='Not yet assigned'>Region</AttributeLabel>
-      <AttributeValue />
-    </Attribute>
-
-    <Attribute loading>
-      <AttributeLabel>Processing time</AttributeLabel>
-      <AttributeValue />
-    </Attribute>
-
-    <Attribute>
-      <AttributeLabel>Tags</AttributeLabel>
-      <AttributeValue>
-        <div className='flex items-center gap-4'>
-          <Badge color='slate'>production</Badge>
-          <Badge color='slate'>us-east-1</Badge>
+        <div className='flex items-center gap-4 flex-wrap'>
+          <Badge color='slate'>XSS</Badge>
+          <Badge color='slate'>BOLA</Badge>
+          <Badge color='slate'>SQL Injection</Badge>
+          <Badge color='slate'>Scanner</Badge>
+          <Badge color='slate'>+5</Badge>
         </div>
       </AttributeValue>
     </Attribute>
 
     <Attribute>
-      <AttributeLabel
-        link={
-          <Link href='#' size='md'>
-            Docs
-          </Link>
-        }
-      >
-        Rule ID
-      </AttributeLabel>
+      <AttributeLabel>Last seen</AttributeLabel>
       <AttributeValue>
-        <Text size='sm'>rule-7842</Text>
+        <Text size='sm'>2 Apr, 2026 14:03</Text>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Sessions</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>3 sessions</Text>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Users</AttributeLabel>
+      <AttributeValue>
+        <div className='flex items-center gap-4'>
+          <Text size='sm'>artem@acme.com, uxd@acme.com</Text>
+          <Badge color='slate'>+3</Badge>
+        </div>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>IPs</AttributeLabel>
+      <AttributeValue>
+        <div className='flex items-center gap-4 flex-wrap col-span-2'>
+          <Text size='sm'>142.198.167.52</Text>
+          <Badge color='sky'>Azure</Badge>
+          <Text size='sm'>34.74.73.20</Text>
+          <Badge color='amber'>AWS</Badge>
+          <Text size='sm'>34.74.73.20</Text>
+          <Badge color='teal'>GCP</Badge>
+          <Badge color='slate'>+5</Badge>
+        </div>
       </AttributeValue>
     </Attribute>
   </div>
