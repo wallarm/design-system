@@ -5,6 +5,7 @@ import { cn } from '../utils/cn';
 const iconVariants = cva('', {
   variants: {
     size: {
+      inherit: 'icon-inherit',
       xs: 'icon-xs',
       sm: 'icon-sm',
       md: 'icon-md',
@@ -14,7 +15,7 @@ const iconVariants = cva('', {
     },
   },
   defaultVariants: {
-    size: 'md',
+    size: 'inherit',
   },
 });
 
@@ -35,20 +36,27 @@ export type SvgIconProps = SvgIconNativeProps & SvgIconVariantProps & SvgIconBas
 export const SvgIcon: FC<SvgIconProps> = ({
   children,
   title,
-  size = 'md',
+  size = 'inherit',
   className,
   ref,
   ...props
-}) => (
-  <svg
-    ref={ref}
-    xmlns='http://www.w3.org/2000/svg'
-    {...props}
-    className={cn(iconVariants({ size }), className)}
-  >
-    <title>{title}</title>
-    {children}
-  </svg>
-);
+}) => {
+  const isDecorative = !title;
+
+  return (
+    <svg
+      ref={ref}
+      xmlns='http://www.w3.org/2000/svg'
+      aria-hidden={isDecorative}
+      focusable={false}
+      {...(title && { role: 'img' })}
+      {...props}
+      className={cn(iconVariants({ size }), className)}
+    >
+      {title && <title>{title}</title>}
+      {children}
+    </svg>
+  );
+};
 
 SvgIcon.displayName = 'SvgIcon';
