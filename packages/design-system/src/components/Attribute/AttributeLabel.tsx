@@ -27,7 +27,7 @@ const InfoIcon: FC<{ info: ReactNode }> = ({ info }) => (
         aria-label='Info'
         className='inline-flex text-text-secondary cursor-help'
       >
-        <Info size='xs' />
+        <Info size='md' />
       </button>
     </TooltipTrigger>
     <TooltipContent>{info}</TooltipContent>
