@@ -171,7 +171,7 @@ export const WithLink_Value: StoryFn<AttributeProps> = () => (
 );
 
 export const Composition: StoryFn<AttributeProps> = () => (
-  <div className='grid grid-cols-2 gap-x-8 gap-y-0 w-[874px]'>
+  <div className='grid grid-cols-2 gap-x-8 gap-y-16 w-[874px]'>
     <Attribute>
       <AttributeLabel>Status</AttributeLabel>
       <AttributeValue>
