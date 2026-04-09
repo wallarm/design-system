@@ -6,6 +6,7 @@ const splitButtonStory = createStoryHelper('actions-splitbutton', [
   'Variants',
   'Sizes',
   'Content',
+  'With Popover',
 ] as const);
 
 test.describe('Component: SplitButton', () => {
@@ -27,6 +28,11 @@ test.describe('Component: SplitButton', () => {
 
     test('Should render all content variations correctly', async ({ page }) => {
       await splitButtonStory.goto(page, 'Content');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render with popover trigger correctly', async ({ page }) => {
+      await splitButtonStory.goto(page, 'With Popover');
       await expect(page).toHaveScreenshot();
     });
   });

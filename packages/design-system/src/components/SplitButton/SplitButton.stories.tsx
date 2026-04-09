@@ -3,7 +3,11 @@ import { ChevronDown, CircleDashed } from '../../icons';
 import { Button } from '../Button';
 import { Heading } from '../Heading';
 import { NumericBadge } from '../NumericBadge';
+import { Popover } from '../Popover';
+import { PopoverContent } from '../Popover/PopoverContent';
+import { PopoverTrigger } from '../Popover/PopoverTrigger';
 import { HStack, VStack } from '../Stack';
+import { Text } from '../Text';
 import { SplitButton } from './SplitButton';
 
 const meta = {
@@ -255,4 +259,26 @@ export const Content: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
   </VStack>
+);
+
+export const WithPopover: StoryFn<typeof meta> = () => (
+  <Popover>
+    <SplitButton data-testid='split-button-popover'>
+      <Button variant='primary' color='brand'>
+        Save
+      </Button>
+      <PopoverTrigger asChild>
+        <Button variant='primary' color='brand'>
+          <ChevronDown />
+        </Button>
+      </PopoverTrigger>
+    </SplitButton>
+    <PopoverContent>
+      <VStack>
+        <Text>Save as draft</Text>
+        <Text>Save and publish</Text>
+        <Text>Save as template</Text>
+      </VStack>
+    </PopoverContent>
+  </Popover>
 );
