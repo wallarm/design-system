@@ -1,6 +1,8 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Badge } from '../Badge';
 import { Code } from '../Code';
+import { FormatDateTime } from '../FormatDateTime';
+import { Ip } from '../Ip';
 import { Link } from '../Link';
 import { Text } from '../Text';
 import { Attribute, type AttributeProps } from './Attribute';
@@ -165,6 +167,28 @@ export const WithLink_Value: StoryFn<AttributeProps> = () => (
         <Link href='#' size='md'>
           View full report
         </Link>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const WithDateTime: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute>
+      <AttributeLabel>Created at</AttributeLabel>
+      <AttributeValue>
+        <FormatDateTime value='2026-04-02T14:03:00Z' />
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const WithIP: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute>
+      <AttributeLabel>Source IP</AttributeLabel>
+      <AttributeValue>
+        <Ip>142.198.167.52</Ip>
       </AttributeValue>
     </Attribute>
   </div>
