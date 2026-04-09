@@ -139,6 +139,7 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 4. ❌ Skip tests before committing
 5. ❌ Force push to main branch
 6. ❌ Delete files without confirmation
+7. ❌ Overwrite syntax highlight token mappings (`--color-syntax-*`) in `semantic.css` to match Figma — these are code-managed, not Figma-sourced. The underlying palette hex values (e.g. `--color-blue-700`) may be updated from Figma, but the semantic mapping (e.g. `keyword → blue-700`) must not change without explicit developer approval
 
 ### Always Do
 
