@@ -53,13 +53,11 @@ interface SplitButtonProps extends ComponentPropsWithRef<'div'>, TestableProps {
 
 Always `gap-1` (1px) between buttons.
 
-Border-radius is managed via nested CSS selectors targeting `[data-slot=button]`:
+Border-radius is managed via `:first-child`/`:last-child` selectors on direct children:
 - First child → `rounded-r-none` (remove right border-radius)
 - Last child → `rounded-l-none` (remove left border-radius)
 
-Selectors are duplicated for two cases:
-- Direct Button child: `> :first-child[data-slot=button]`
-- Button inside a wrapper (PopoverTrigger asChild): `> :first-child [data-slot=button]`
+Note: ButtonBase does not have `data-slot="button"`, so we target children directly. `PopoverTrigger asChild` renders no wrapper element, so both buttons are always direct children.
 
 ```ts
 // classes.ts
@@ -67,8 +65,8 @@ import { cva } from 'class-variance-authority'
 
 export const splitButtonVariants = cva([
   'inline-flex items-center gap-1',
-  '[&>:first-child_[data-slot=button]]:rounded-r-none [&>:first-child[data-slot=button]]:rounded-r-none',
-  '[&>:last-child_[data-slot=button]]:rounded-l-none [&>:last-child[data-slot=button]]:rounded-l-none',
+  '[&>:first-child]:rounded-r-none',
+  '[&>:last-child]:rounded-l-none',
 ])
 ```
 
