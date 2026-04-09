@@ -217,25 +217,30 @@
 
     /* ========================================
    * SYNTAX COLORS
+   * ⚠️  CODE-MANAGED — DO NOT SYNC FROM FIGMA
+   * These token-to-color mappings are intentionally decoupled from Figma.
+   * The underlying palette values (e.g. --color-slate-900's hex) may change,
+   * but the mapping here (e.g. keyword → purple-600) must not be overwritten
+   * by Figma design token imports or AI-assisted Figma syncs.
    * ======================================== */
     --color-syntax-no-syntax: var(--color-slate-900);
 
-    /* Syntax Highlighting — base tokens (Figma source of truth) */
-    --color-syntax-keyword: var(--color-violet-700);
+    /* Syntax Highlighting — base tokens (One Light / GitHub Light family) */
+    --color-syntax-keyword: var(--color-purple-600);
     --color-syntax-function: var(--color-blue-600);
-    --color-syntax-string: var(--color-amber-700);
-    --color-syntax-number-boolean: var(--color-orange-700);
-    --color-syntax-tag: var(--color-teal-700);
-    --color-syntax-attribute: var(--color-orange-700);
-    --color-syntax-comment: var(--color-slate-500);
-    --color-syntax-type: var(--color-indigo-800);
-    --color-syntax-operator: var(--color-slate-600);
-    --color-syntax-variable: var(--color-green-700);
+    --color-syntax-string: var(--color-green-600);
+    --color-syntax-number-boolean: var(--color-amber-700);
+    --color-syntax-tag: var(--color-red-600);
+    --color-syntax-attribute: var(--color-amber-700);
+    --color-syntax-comment: var(--color-slate-400);
+    --color-syntax-type: var(--color-yellow-700);
+    --color-syntax-operator: var(--color-slate-700);
+    --color-syntax-variable: var(--color-red-600);
 
     /* Syntax Highlighting — aliases for CodeToken mapping */
     --color-syntax-number: var(--color-syntax-number-boolean);
-    --color-syntax-boolean: var(--color-syntax-number-boolean);
-    --color-syntax-constant: var(--color-syntax-number-boolean);
+    --color-syntax-boolean: var(--color-syntax-keyword);
+    --color-syntax-constant: var(--color-syntax-keyword);
     --color-syntax-builtin: var(--color-syntax-keyword);
     --color-syntax-class-name: var(--color-syntax-type);
     --color-syntax-property: var(--color-syntax-variable);
@@ -607,25 +612,27 @@
 
     /* ========================================
      * SYNTAX COLORS
+     * ⚠️  CODE-MANAGED — DO NOT SYNC FROM FIGMA
+     * See light-mode comment above for details.
      * ======================================== */
     --color-syntax-no-syntax: var(--color-slate-200);
 
-    /* Syntax Highlighting — base tokens (Figma source of truth) */
-    --color-syntax-keyword: var(--color-violet-300);
-    --color-syntax-function: var(--color-blue-300);
-    --color-syntax-string: var(--color-amber-300);
-    --color-syntax-number-boolean: var(--color-orange-300);
-    --color-syntax-tag: var(--color-teal-300);
-    --color-syntax-attribute: var(--color-orange-300);
-    --color-syntax-comment: var(--color-slate-400);
-    --color-syntax-type: var(--color-indigo-300);
-    --color-syntax-operator: var(--color-slate-400);
-    --color-syntax-variable: var(--color-green-300);
+    /* Syntax Highlighting — base tokens (One Dark Pro / Dark+ family) */
+    --color-syntax-keyword: var(--color-purple-400);
+    --color-syntax-function: var(--color-blue-400);
+    --color-syntax-string: var(--color-green-300);
+    --color-syntax-number-boolean: var(--color-amber-300);
+    --color-syntax-tag: var(--color-red-400);
+    --color-syntax-attribute: var(--color-amber-300);
+    --color-syntax-comment: var(--color-slate-500);
+    --color-syntax-type: var(--color-yellow-300);
+    --color-syntax-operator: var(--color-slate-300);
+    --color-syntax-variable: var(--color-red-300);
 
     /* Syntax Highlighting — aliases for CodeToken mapping */
     --color-syntax-number: var(--color-syntax-number-boolean);
-    --color-syntax-boolean: var(--color-syntax-number-boolean);
-    --color-syntax-constant: var(--color-syntax-number-boolean);
+    --color-syntax-boolean: var(--color-syntax-keyword);
+    --color-syntax-constant: var(--color-syntax-keyword);
     --color-syntax-builtin: var(--color-syntax-keyword);
     --color-syntax-class-name: var(--color-syntax-type);
     --color-syntax-property: var(--color-syntax-variable);
