@@ -5,7 +5,7 @@ const splitButtonStory = createStoryHelper('actions-splitbutton', [
   'Default',
   'Variants',
   'Sizes',
-  'With Icon',
+  'Content',
 ] as const);
 
 test.describe('Component: SplitButton', () => {
@@ -25,8 +25,8 @@ test.describe('Component: SplitButton', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render with icons correctly', async ({ page }) => {
-      await splitButtonStory.goto(page, 'With Icon');
+    test('Should render all content variations correctly', async ({ page }) => {
+      await splitButtonStory.goto(page, 'Content');
       await expect(page).toHaveScreenshot();
     });
   });

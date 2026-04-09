@@ -2,6 +2,7 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { ChevronDown, CircleDashed } from '../../icons';
 import { Button } from '../Button';
 import { Heading } from '../Heading';
+import { NumericBadge } from '../NumericBadge';
 import { HStack, VStack } from '../Stack';
 import { SplitButton } from './SplitButton';
 
@@ -131,45 +132,124 @@ export const Sizes: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
-export const WithIcon: StoryFn<typeof meta> = () => (
+export const Content: StoryFn<typeof meta> = () => (
   <VStack>
-    <Heading>With left icon</Heading>
-    <HStack>
+    <Heading>Text only</Heading>
+    <HStack align='end'>
       <SplitButton>
-        <Button variant='primary' color='brand'>
-          <CircleDashed />
-          Button
+        <Button variant='primary' color='brand' size='large'>
+          Large
         </Button>
-        <Button variant='primary' color='brand'>
+        <Button variant='primary' color='brand' size='large'>
           <ChevronDown />
         </Button>
       </SplitButton>
       <SplitButton>
-        <Button variant='outline' color='neutral'>
-          <CircleDashed />
-          Button
+        <Button variant='outline' color='neutral' size='large'>
+          Large
         </Button>
-        <Button variant='outline' color='neutral'>
+        <Button variant='outline' color='neutral' size='large'>
+          <ChevronDown />
+        </Button>
+      </SplitButton>
+      <SplitButton>
+        <Button variant='secondary' color='neutral' size='large'>
+          Large
+        </Button>
+        <Button variant='secondary' color='neutral' size='large'>
           <ChevronDown />
         </Button>
       </SplitButton>
     </HStack>
 
-    <Heading>Icon only action</Heading>
-    <HStack>
+    <Heading>Icon + Text</Heading>
+    <HStack align='end'>
       <SplitButton>
-        <Button variant='primary' color='brand'>
+        <Button variant='primary' color='brand' size='large'>
           <CircleDashed />
+          Large
         </Button>
-        <Button variant='primary' color='brand'>
+        <Button variant='primary' color='brand' size='large'>
           <ChevronDown />
         </Button>
       </SplitButton>
       <SplitButton>
-        <Button variant='outline' color='neutral'>
+        <Button variant='outline' color='neutral' size='large'>
+          <CircleDashed />
+          Large
+        </Button>
+        <Button variant='outline' color='neutral' size='large'>
+          <ChevronDown />
+        </Button>
+      </SplitButton>
+      <SplitButton>
+        <Button variant='secondary' color='neutral' size='large'>
+          <CircleDashed />
+          Large
+        </Button>
+        <Button variant='secondary' color='neutral' size='large'>
+          <ChevronDown />
+        </Button>
+      </SplitButton>
+    </HStack>
+
+    <Heading>Icon + Text + Badge</Heading>
+    <HStack align='end'>
+      <SplitButton>
+        <Button variant='primary' color='brand' size='large'>
+          <CircleDashed />
+          Large
+          <NumericBadge type='primary'>1</NumericBadge>
+        </Button>
+        <Button variant='primary' color='brand' size='large'>
+          <ChevronDown />
+        </Button>
+      </SplitButton>
+      <SplitButton>
+        <Button variant='outline' color='neutral' size='large'>
+          <CircleDashed />
+          Large
+          <NumericBadge type='outline'>1</NumericBadge>
+        </Button>
+        <Button variant='outline' color='neutral' size='large'>
+          <ChevronDown />
+        </Button>
+      </SplitButton>
+      <SplitButton>
+        <Button variant='secondary' color='neutral' size='large'>
+          <CircleDashed />
+          Large
+          <NumericBadge type='outline'>1</NumericBadge>
+        </Button>
+        <Button variant='secondary' color='neutral' size='large'>
+          <ChevronDown />
+        </Button>
+      </SplitButton>
+    </HStack>
+
+    <Heading>Icon only</Heading>
+    <HStack align='end'>
+      <SplitButton>
+        <Button variant='primary' color='brand' size='large'>
           <CircleDashed />
         </Button>
-        <Button variant='outline' color='neutral'>
+        <Button variant='primary' color='brand' size='large'>
+          <ChevronDown />
+        </Button>
+      </SplitButton>
+      <SplitButton>
+        <Button variant='outline' color='neutral' size='large'>
+          <CircleDashed />
+        </Button>
+        <Button variant='outline' color='neutral' size='large'>
+          <ChevronDown />
+        </Button>
+      </SplitButton>
+      <SplitButton>
+        <Button variant='secondary' color='neutral' size='large'>
+          <CircleDashed />
+        </Button>
+        <Button variant='secondary' color='neutral' size='large'>
           <ChevronDown />
         </Button>
       </SplitButton>
