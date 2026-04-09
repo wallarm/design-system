@@ -36,6 +36,7 @@ jobs:
       should-update-screenshots: ${{ steps.check-screenshots.outputs.should_update }}
       should-skip-e2e: ${{ steps.check-e2e-skip.outputs.should_skip }}
       should-release-mcp: ${{ steps.check-mcp.outputs.should_release }}
+      playwright-version: ${{ env.PLAYWRIGHT_VERSION }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -233,6 +234,9 @@ jobs:
   e2e:
     name: E2E Tests (shard ${{ matrix.shard }})
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.setup.outputs.playwright-version }}-noble
+      options: --shm-size=2gb
     needs: [setup, build]
     if: |
       needs.setup.outputs.should-update-screenshots != 'true' &&
@@ -271,21 +275,6 @@ jobs:
 
       - name: Build config packages
         run: pnpm --filter="./packages/configs/*" build
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-
-      - name: Install Playwright system deps
-        run: pnpm exec playwright install-deps chromium
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Download Storybook artifact
         uses: actions/download-artifact@v4
@@ -381,6 +370,9 @@ jobs:
   e2e-update-screenshots:
     name: Update Screenshots (shard ${{ matrix.shard }})
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v${{ needs.setup.outputs.playwright-version }}-noble
+      options: --shm-size=2gb
     needs: [setup, build]
     if: needs.setup.outputs.should-update-screenshots == 'true'
     strategy:
@@ -417,21 +409,6 @@ jobs:
 
       - name: Build config packages
         run: pnpm --filter="./packages/configs/*" build
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
-
-      - name: Install Playwright browsers
-        run: pnpm exec playwright install --with-deps chromium
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-
-      - name: Install Playwright system deps
-        run: pnpm exec playwright install-deps chromium
-        if: steps.playwright-cache.outputs.cache-hit == 'true'
 
       - name: Download Storybook artifact
         uses: actions/download-artifact@v4
