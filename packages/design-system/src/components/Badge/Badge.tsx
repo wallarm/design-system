@@ -45,6 +45,7 @@ export const Badge: FC<BadgeProps> = ({
       textVariant,
       isIconOnly: isIconOnly(children),
     }),
+    onClick ? 'cursor-pointer' : '',
     className,
   );
 
