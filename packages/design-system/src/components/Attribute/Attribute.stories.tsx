@@ -108,7 +108,7 @@ export const Empty: StoryFn<AttributeProps> = () => (
 );
 
 export const Loading: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-0'>
+  <div className='w-[400px] flex flex-col gap-8'>
     <Attribute loading>
       <AttributeLabel>Created at</AttributeLabel>
       <AttributeValue />
