@@ -15,8 +15,10 @@ const getToasts = (page: Page) => page.locator('[data-scope="toast"][data-part="
 const getToastCloseButton = (page: Page) =>
   getToasts(page).first().getByRole('button', { name: 'Close' });
 
-const initToast = async (page: Page, name: string) => {
-  await page.getByRole('button', { name }).click();
+/** Click a static (secondary variant) button to create a toast without progress animation */
+const initStaticToast = async (page: Page, name: string) => {
+  const staticSection = page.getByText('Static (for screenshots)').locator('..');
+  await staticSection.getByRole('button', { name }).click();
 };
 
 const verifyAndClose = async (page: Page) => {
@@ -30,37 +32,37 @@ test.describe('Toast Component', () => {
   test.describe('View - All Types', () => {
     test('Success toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initToast(page, 'Success Toast');
+      await initStaticToast(page, 'Success Toast');
       await verifyAndClose(page);
     });
 
     test('Error toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initToast(page, 'Error Toast');
+      await initStaticToast(page, 'Error Toast');
       await verifyAndClose(page);
     });
 
     test('Warning toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initToast(page, 'Warning Toast');
+      await initStaticToast(page, 'Warning Toast');
       await verifyAndClose(page);
     });
 
     test('Info toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initToast(page, 'Info Toast');
+      await initStaticToast(page, 'Info Toast');
       await verifyAndClose(page);
     });
 
     test('Loading toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initToast(page, 'Loading Toast');
+      await initStaticToast(page, 'Loading Toast');
       await verifyAndClose(page);
     });
 
     test('Default toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initToast(page, 'Default Toast');
+      await initStaticToast(page, 'Default Toast');
       await verifyAndClose(page);
     });
   });
@@ -69,10 +71,10 @@ test.describe('Toast Component', () => {
     test('Update toast - loading to success', async ({ page }) => {
       await toastStory.goto(page, 'Update Loading To Success');
 
-      await initToast(page, 'Create loading toast');
+      await initStaticToast(page, 'Create loading toast');
       await expect(getToasts(page)).toBeVisible();
 
-      await initToast(page, 'Update to success');
+      await initStaticToast(page, 'Update to success');
       await verifyAndClose(page);
     });
   });
@@ -80,7 +82,7 @@ test.describe('Toast Component', () => {
   test.describe('Simple With Actions', () => {
     test('Simple toast with actions - single', async ({ page }) => {
       await toastStory.goto(page, 'Simple With Actions');
-      await page.getByRole('button', { name: 'Simple Toast with Action' }).click();
+      await initStaticToast(page, 'Simple Toast with Action');
 
       const toast = getToasts(page);
       await toast.waitFor();
@@ -93,7 +95,7 @@ test.describe('Toast Component', () => {
 
     test('Simple toast with actions - double', async ({ page }) => {
       await toastStory.goto(page, 'Simple With Actions');
-      await page.getByRole('button', { name: 'Simple Toast with Two Actions' }).click();
+      await initStaticToast(page, 'Simple Toast with Two Actions');
 
       const toast = getToasts(page);
       await toast.waitFor();
@@ -113,7 +115,7 @@ test.describe('Toast Component', () => {
   test.describe('Extended Variant With Actions', () => {
     test('Extended toast with actions - single', async ({ page }) => {
       await toastStory.goto(page, 'Extended With Actions');
-      await page.getByRole('button', { name: 'Extended Toast with Action' }).click();
+      await initStaticToast(page, 'Extended Toast with Action');
 
       const toast = getToasts(page);
       await toast.waitFor();
@@ -126,7 +128,7 @@ test.describe('Toast Component', () => {
 
     test('Extended toast with actions - double', async ({ page }) => {
       await toastStory.goto(page, 'Extended With Actions');
-      await page.getByRole('button', { name: 'Extended Toast with Two Actions' }).click();
+      await initStaticToast(page, 'Extended Toast with Two Actions');
 
       const toast = getToasts(page).first();
       await expect(toast).toBeVisible();
@@ -144,13 +146,13 @@ test.describe('Toast Component', () => {
   test.describe('Long Text', () => {
     test('Long text - simple toast', async ({ page }) => {
       await toastStory.goto(page, 'Long Text');
-      await page.getByRole('button', { name: 'Simple with long title' }).click();
+      await initStaticToast(page, 'Simple with long title');
       await verifyAndClose(page);
     });
 
     test('Long text - extended toast', async ({ page }) => {
       await toastStory.goto(page, 'Long Text');
-      await page.getByRole('button', { name: 'Extended with long text' }).click();
+      await initStaticToast(page, 'Extended with long text');
       await verifyAndClose(page);
     });
   });
@@ -158,13 +160,13 @@ test.describe('Toast Component', () => {
   test.describe('Custom Icon', () => {
     test('Custom icon - own color', async ({ page }) => {
       await toastStory.goto(page, 'Custom Icon');
-      await page.getByRole('button', { name: 'Custom Icon with own color' }).click();
+      await initStaticToast(page, 'Custom Icon with own color');
       await verifyAndClose(page);
     });
 
     test('Custom icon - without color', async ({ page }) => {
       await toastStory.goto(page, 'Custom Icon');
-      await page.getByRole('button', { name: 'Custom Icon without color' }).click();
+      await initStaticToast(page, 'Custom Icon without color');
       await verifyAndClose(page);
     });
   });
@@ -172,7 +174,7 @@ test.describe('Toast Component', () => {
   test.describe('Close Button', () => {
     test('Close button - keyboard accessible', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initToast(page, 'Success Toast');
+      await initStaticToast(page, 'Success Toast');
       const toast = getToasts(page).first();
       await expect(toast).toBeVisible();
 
@@ -187,7 +189,7 @@ test.describe('Toast Component', () => {
 
     test('Non-closable toast - no close button visible', async ({ page }) => {
       await toastStory.goto(page, 'Without Close Button');
-      await initToast(page, 'Non-closable Toast');
+      await initStaticToast(page, 'Non-closable Toast');
 
       const toast = getToasts(page);
       await expect(toast).toBeVisible();

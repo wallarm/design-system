@@ -17,7 +17,7 @@ export const PrefixColumn: FC<{
           return (
             <span
               key={`fold-${item.fold.id}`}
-              className={cn(lineHeightClass, 'flex h-lh items-center justify-center px-8')}
+              className={cn(lineHeightClass, 'px-8 text-center')}
             />
           );
         }
@@ -28,12 +28,7 @@ export const PrefixColumn: FC<{
         return (
           <span
             key={item.lineNumber}
-            className={cn(
-              lineHeightClass,
-              'flex h-lh items-center justify-center px-8',
-              colorStyles?.text,
-              colorStyles?.bg,
-            )}
+            className={cn(lineHeightClass, 'px-8 text-center', colorStyles?.text, colorStyles?.bg)}
           >
             {lineConfig?.prefix}
           </span>
