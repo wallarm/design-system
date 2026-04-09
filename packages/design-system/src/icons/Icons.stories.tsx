@@ -583,8 +583,9 @@ const iconSizes: SvgIconSize[] = ['xs', 'sm', 'md', 'lg', 'xl'];
 /**
  * Demonstrates how icons behave inside text at different text and icon sizes.
  *
- * - **Inherit (1em)**: icon scales with font size via `className="size-[1em]"`
+ * - **Inherit (1em)**: icon scales with font size via `size="current"`
  * - **Fixed sizes**: icon stays at its fixed pixel size regardless of text size
+ * - **Color inheritance**: icon inherits text color, can be overridden
  */
 export const IconsInText: Story = {
   render: () => (
@@ -592,12 +593,12 @@ export const IconsInText: Story = {
       {/* Inherit size */}
       <VStack gap={8} align='stretch'>
         <Text weight='bold' size='sm' color='secondary'>
-          Inherit size — icon should scale with text
+          Inherit size — icon scales with text via size=&quot;inherit&quot;
         </Text>
         <VStack gap={4} align='start'>
           {textSizes.map(({ label, className }) => (
             <p key={label} className={`${className} text-text-primary`}>
-              Warning: {label} text <TriangleAlert /> with inherited icon
+              Warning: {label} text <TriangleAlert size='inherit' /> with inherited icon
             </p>
           ))}
         </VStack>
@@ -642,14 +643,42 @@ export const IconsInText: Story = {
         </div>
       </VStack>
 
+      {/* Color inheritance */}
+      <VStack gap={8} align='stretch'>
+        <Text weight='bold' size='sm' color='secondary'>
+          Color inheritance — icon inherits text color
+        </Text>
+        <VStack gap={4} align='start'>
+          <p className='text-sm text-text-primary'>
+            Default <TriangleAlert size='inherit' /> inherits text-primary
+          </p>
+          <p className='text-sm text-text-secondary'>
+            Secondary <Info size='inherit' /> inherits text-secondary
+          </p>
+          <p className='text-sm text-text-danger'>
+            Danger <TriangleAlert size='inherit' /> inherits text-danger
+          </p>
+          <p className='text-sm text-text-success'>
+            Success <CircleCheck size='inherit' /> inherits text-success
+          </p>
+          <p className='text-sm text-text-warning'>
+            Warning <TriangleAlert size='inherit' /> inherits text-warning
+          </p>
+          <p className='text-sm text-text-primary'>
+            Mixed: primary text with{' '}
+            <TriangleAlert size='inherit' className='text-text-danger' /> explicit danger icon
+          </p>
+        </VStack>
+      </VStack>
+
       {/* Multiline paragraph */}
       <VStack gap={8} align='stretch'>
         <Text weight='bold' size='sm' color='secondary'>
           Icon in flowing text (baseline alignment)
         </Text>
         <p className='text-sm text-text-primary' style={{ maxWidth: '400px' }}>
-          Click the <TriangleAlert /> icon to see warnings. You can also check <Info /> for more
-          details about the issue.
+          Click the <TriangleAlert size='inherit' /> icon to see warnings. You can also check{' '}
+          <Info size='inherit' /> for more details about the issue.
         </p>
       </VStack>
     </VStack>

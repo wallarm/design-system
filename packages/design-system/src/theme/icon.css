@@ -10,4 +10,15 @@
 @utility icon-* {
     width: --value(--icon-*);
     height: --value(--icon-*);
+    vertical-align: --value(--icon-valign, -0.125em);
+    display: inline-block;
+    flex-shrink: 0;
+}
+
+@utility icon-inherit {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.125em;
+    display: inline-block;
+    flex-shrink: 0;
 }
