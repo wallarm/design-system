@@ -281,6 +281,7 @@ export {
 } from './components/Select';
 export { Separator, type SeparatorProps } from './components/Separator';
 export { Skeleton, type SkeletonProps } from './components/Skeleton';
+export { SplitButton, type SplitButtonProps } from './components/SplitButton';
 export {
   HStack,
   type HStackProps,
