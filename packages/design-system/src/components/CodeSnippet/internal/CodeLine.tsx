@@ -63,12 +63,7 @@ export const CodeLine: FC<CodeLineProps> = ({
           )}
           {/* Prefix */}
           {lineConfig?.prefix !== undefined && (
-            <span
-              className={cn(
-                'shrink-0 select-none px-8 text-center flex items-center justify-center',
-                colorStyles?.text,
-              )}
-            >
+            <span className={cn('shrink-0 select-none px-8 text-center', colorStyles?.text)}>
               {lineConfig.prefix}
             </span>
           )}
