@@ -17,6 +17,8 @@ export {
 } from './components/Alert';
 export {
   Attribute,
+  AttributeLabel,
+  type AttributeLabelProps,
   type AttributeProps,
 } from './components/Attribute';
 export { Badge, type BadgeProps } from './components/Badge';
