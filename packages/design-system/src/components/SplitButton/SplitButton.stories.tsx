@@ -199,7 +199,7 @@ export const Content: StoryFn<typeof meta> = () => (
         <Button variant='primary' color='brand' size='large'>
           <CircleDashed />
           Large
-          <NumericBadge type='primary'>1</NumericBadge>
+          <NumericBadge type='outline'>1</NumericBadge>
         </Button>
         <Button variant='primary' color='brand' size='large'>
           <ChevronDown />
