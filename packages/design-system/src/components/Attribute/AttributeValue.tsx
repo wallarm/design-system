@@ -26,7 +26,7 @@ export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, classNa
       ref={ref}
       data-testid={testId}
       data-slot='attribute-value'
-      className={cn('pt-4 min-h-[28px]', className)}
+      className={cn('pt-4 min-h-[28px] flex items-center', className)}
     >
       {isEmpty(children) ? (
         <Text size='sm' color='secondary'>
