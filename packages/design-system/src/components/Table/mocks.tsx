@@ -622,19 +622,8 @@ export const renderSecurityPreviewHeader = (row: { original: SecurityEvent }) =>
 );
 
 /** Preview drawer content for security events */
-const SecurityPreviewContent = ({
-  row,
-  showTitle,
-}: {
-  row: { original: SecurityEvent };
-  showTitle?: boolean;
-}) => (
+const SecurityPreviewContent = ({ row }: { row: { original: SecurityEvent } }) => (
   <VStack gap={16}>
-    {showTitle && (
-      <Text size='lg' weight='medium'>
-        {row.original.objectName}
-      </Text>
-    )}
     <HStack gap={8}>
       <Badge
         variant='dotted'
