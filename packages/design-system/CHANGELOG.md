@@ -1,3 +1,7 @@
+## 0.23.0 (2026-04-10)
+
+* feat(attribute): add Attribute compound component [WDS-74] (#82) ([a3426fd](https://github.com/wallarm/design-system/commit/a3426fd)), closes [#82](https://github.com/wallarm/design-system/issues/82)
+
 ## <small>0.22.1 (2026-04-10)</small>
 
 * test: update Tour and Icons E2E screenshots for Docker container rendering ([b7d3c38](https://github.com/wallarm/design-system/commit/b7d3c38))
