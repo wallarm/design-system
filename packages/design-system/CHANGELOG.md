@@ -1,3 +1,7 @@
+## 0.22.0 (2026-04-10)
+
+* feat(split-button): add SplitButton component [WDS-101] (#81) ([8a4f9da](https://github.com/wallarm/design-system/commit/8a4f9da)), closes [#81](https://github.com/wallarm/design-system/issues/81)
+
 ## <small>0.21.1 (2026-04-08)</small>
 
 * fix(filter-input): truncate long values and fix chip drag selection [AS-820] (#79) ([b14b987](https://github.com/wallarm/design-system/commit/b14b987)), closes [#79](https://github.com/wallarm/design-system/issues/79)
