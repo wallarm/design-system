@@ -1,3 +1,8 @@
+## <small>0.23.1 (2026-04-10)</small>
+
+* test: WDS-100 Update tests with new icons behavior ([b628eda](https://github.com/wallarm/design-system/commit/b628eda))
+* fix(icons): WDS-100 Fix default icon behavior ([f89c6de](https://github.com/wallarm/design-system/commit/f89c6de))
+
 ## 0.23.0 (2026-04-10)
 
 * feat(attribute): add Attribute compound component [WDS-74] (#82) ([a3426fd](https://github.com/wallarm/design-system/commit/a3426fd)), closes [#82](https://github.com/wallarm/design-system/issues/82)
