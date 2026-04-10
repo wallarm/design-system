@@ -22,13 +22,9 @@ export interface AttributeLabelProps extends HTMLAttributes<HTMLDivElement> {
 const InfoIcon: FC<{ info: ReactNode }> = ({ info }) => (
   <Tooltip>
     <TooltipTrigger asChild>
-      <button
-        type='button'
-        aria-label='Info'
-        className='inline-flex text-text-secondary cursor-help'
-      >
+      <span className='inline-flex text-text-secondary cursor-help'>
         <Info size='md' />
-      </button>
+      </span>
     </TooltipTrigger>
     <TooltipContent>{info}</TooltipContent>
   </Tooltip>
