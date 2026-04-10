@@ -85,7 +85,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
 
   const onMasterCellClick = masterCellClick?.onMasterCellClick;
   const masterCellActiveRowId = masterCellClick?.activeRowId ?? null;
-  const masterCellTooltipText = masterCellClick?.tooltipText ?? 'Open preview';
+  const masterCellTooltipText = masterCellClick?.tooltipText ?? 'Open details';
 
   // Feature detection
   const sortingEnabled = !!onSortingChange;

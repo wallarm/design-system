@@ -2,7 +2,7 @@ import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
-import { usePreviewCell } from '../hooks';
+import { useMasterCell } from '../hooks';
 import {
   getAlignClass,
   getExpandBorderClass,
@@ -39,7 +39,7 @@ export const TableBodyCell = <T,>({
   const { canDnd, setNodeRef, dndStyle } = useColumnDnd(column);
   const pinningStyles = getPinningStyles(column);
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
-  const { isMasterTrigger, togglePreview, tooltipText } = usePreviewCell<T>(column.id, cell.row.id);
+  const { isMasterTrigger, handleClick, tooltipText } = useMasterCell<T>(column.id, cell.row.id);
 
   const isCut = column.id === masterColumnId || meta?.resizeType === 'cut';
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
@@ -92,7 +92,7 @@ export const TableBodyCell = <T,>({
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}
       ref={canDnd ? setNodeRef : undefined}
-      onClick={isMasterTrigger ? togglePreview : undefined}
+      onClick={isMasterTrigger ? handleClick : undefined}
       style={{
         ...pinningStyles,
         width: cell.column.getSize(),

@@ -5,7 +5,7 @@ import { useTableContext } from '../TableContext';
  * Encapsulates master cell click logic for a body cell.
  * Returns flags and a click handler for the master column.
  */
-export const usePreviewCell = <T>(columnId: string, rowId: string) => {
+export const useMasterCell = <T>(columnId: string, rowId: string) => {
   const { masterColumnId, masterCell } = useTableContext<T>();
 
   const isMasterColumn = columnId === masterColumnId;
@@ -22,7 +22,7 @@ export const usePreviewCell = <T>(columnId: string, rowId: string) => {
     /** This row is currently active (highlighted) */
     isActive,
     /** Fire master cell click for this row */
-    togglePreview: handleClick,
+    handleClick,
     /** Tooltip text for master cell hover */
     tooltipText: hasMasterClick ? masterCell.tooltipText : undefined,
   };
