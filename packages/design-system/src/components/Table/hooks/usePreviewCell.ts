@@ -2,32 +2,28 @@ import { useCallback } from 'react';
 import { useTableContext } from '../TableContext';
 
 /**
- * Encapsulates preview drawer logic for a body cell.
- * Returns flags and a click handler based on `preview.trigger` mode.
+ * Encapsulates master cell click logic for a body cell.
+ * Returns flags and a click handler for the master column.
  */
 export const usePreviewCell = <T>(columnId: string, rowId: string) => {
-  const { masterColumnId, preview } = useTableContext<T>();
+  const { masterColumnId, masterCell } = useTableContext<T>();
 
   const isMasterColumn = columnId === masterColumnId;
-  const hasPreview = isMasterColumn && !!preview.renderContent;
-  const isMasterTrigger = hasPreview && preview.trigger === 'master';
-  const isButtonTrigger = hasPreview && preview.trigger === 'button';
-  const isActive = preview.rowId === rowId;
+  const hasMasterClick = isMasterColumn && !!masterCell.onMasterCellClick;
+  const isActive = masterCell.activeRowId === rowId;
 
-  const togglePreview = useCallback(() => {
-    preview.setRowId(isActive ? null : rowId);
-  }, [preview.setRowId, isActive, rowId]);
+  const handleClick = useCallback(() => {
+    masterCell.onMasterCellClick?.(rowId);
+  }, [masterCell.onMasterCellClick, rowId]);
 
   return {
-    /** Preview opens by clicking the master cell */
-    isMasterTrigger,
-    /** Preview opens via a toggle button in actions */
-    isButtonTrigger,
-    /** This row is currently shown in the preview drawer */
+    /** Master cell click is enabled */
+    isMasterTrigger: hasMasterClick,
+    /** This row is currently active (highlighted) */
     isActive,
-    /** Toggle preview for this row (open/close) */
-    togglePreview,
+    /** Fire master cell click for this row */
+    togglePreview: handleClick,
     /** Tooltip text for master cell hover */
-    tooltipText: hasPreview ? preview.tooltipText : undefined,
+    tooltipText: hasMasterClick ? masterCell.tooltipText : undefined,
   };
 };

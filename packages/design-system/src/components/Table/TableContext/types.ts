@@ -53,13 +53,10 @@ export interface TableContextValue<T> {
   onEndReached?: () => void;
   onEndReachedThreshold?: number;
 
-  // Preview drawer
-  preview: {
-    rowId: string | null;
-    setRowId: (id: string | null) => void;
-    renderHeader?: (row: Row<T>) => ReactNode;
-    renderContent?: (row: Row<T>) => ReactNode;
-    trigger: 'master' | 'button';
+  // Master cell click
+  masterCell: {
+    activeRowId: string | null;
+    onMasterCellClick?: (rowId: string) => void;
     tooltipText: string;
   };
 }
