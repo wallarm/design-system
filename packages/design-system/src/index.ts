@@ -15,6 +15,18 @@ export {
   AlertTitle,
   type AlertTitleProps,
 } from './components/Alert';
+export {
+  Attribute,
+  AttributeLabel,
+  AttributeLabelDescription,
+  type AttributeLabelDescriptionProps,
+  AttributeLabelInfo,
+  type AttributeLabelInfoProps,
+  type AttributeLabelProps,
+  type AttributeProps,
+  AttributeValue,
+  type AttributeValueProps,
+} from './components/Attribute';
 export { Badge, type BadgeProps } from './components/Badge';
 export { Button, type ButtonProps } from './components/Button';
 export {
