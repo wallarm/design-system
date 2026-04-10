@@ -82,11 +82,9 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     onEndReachedThreshold,
     onMasterCellClick,
     activeRowId: activeRowIdProp,
-    masterCellTooltipText: masterCellTooltipTextProp,
   } = props;
 
   const masterCellActiveRowId = activeRowIdProp ?? null;
-  const masterCellTooltipText = masterCellTooltipTextProp ?? 'Open details';
 
   // Feature detection
   const sortingEnabled = !!onSortingChange;
@@ -318,11 +316,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       containerRef,
       onEndReached,
       onEndReachedThreshold,
-      masterCell: {
-        activeRowId: masterCellActiveRowId,
-        onMasterCellClick,
-        tooltipText: masterCellTooltipText,
-      },
+      onMasterCellClick,
+      activeRowId: masterCellActiveRowId,
     }),
     [
       table,
@@ -350,7 +345,6 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       onEndReachedThreshold,
       masterCellActiveRowId,
       onMasterCellClick,
-      masterCellTooltipText,
     ],
   );
 

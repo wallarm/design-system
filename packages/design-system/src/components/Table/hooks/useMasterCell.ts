@@ -6,14 +6,14 @@ import { useTableContext } from '../TableContext';
  * Returns flags and a click handler for the master column.
  */
 export const useMasterCell = <T>(columnId: string, rowId: string) => {
-  const { masterColumnId, masterCell } = useTableContext<T>();
+  const { masterColumnId, onMasterCellClick } = useTableContext<T>();
 
   const isMasterColumn = columnId === masterColumnId;
-  const hasMasterClick = isMasterColumn && !!masterCell.onMasterCellClick;
+  const hasMasterClick = isMasterColumn && !!onMasterCellClick;
 
   const handleClick = useCallback(() => {
-    masterCell.onMasterCellClick?.(rowId);
-  }, [masterCell.onMasterCellClick, rowId]);
+    onMasterCellClick?.(rowId);
+  }, [onMasterCellClick, rowId]);
 
   return {
     /** Master cell click is enabled */
@@ -21,6 +21,6 @@ export const useMasterCell = <T>(columnId: string, rowId: string) => {
     /** Fire master cell click for this row */
     handleClick,
     /** Tooltip text for master cell hover */
-    tooltipText: hasMasterClick ? masterCell.tooltipText : undefined,
+    tooltipText: hasMasterClick ? 'Open details' : undefined,
   };
 };

@@ -216,6 +216,4 @@ export interface TableProps<T> extends TestableProps {
   onMasterCellClick?: (rowId: string) => void;
   /** ID of the currently active (highlighted) row, or null. Controls row highlighting via data-preview-active attribute. */
   activeRowId?: string | null;
-  /** Tooltip text shown on master cell hover (default: 'Open details') */
-  masterCellTooltipText?: string;
 }

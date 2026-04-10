@@ -54,11 +54,8 @@ export interface TableContextValue<T> {
   onEndReachedThreshold?: number;
 
   // Master cell click
-  masterCell: {
-    activeRowId: string | null;
-    onMasterCellClick?: (rowId: string) => void;
-    tooltipText: string;
-  };
+  onMasterCellClick?: (rowId: string) => void;
+  activeRowId: string | null;
 }
 
 export interface TableProviderProps<T> extends Omit<TableProps<T>, 'children' | 'aria-label'> {
