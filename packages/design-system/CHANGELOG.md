@@ -1,3 +1,14 @@
+## <small>0.22.1 (2026-04-10)</small>
+
+* test: update Tour and Icons E2E screenshots for Docker container rendering ([b7d3c38](https://github.com/wallarm/design-system/commit/b7d3c38))
+* 🖼️ Update screenshots ([bc7610c](https://github.com/wallarm/design-system/commit/bc7610c))
+* fix(code-snippet): disable elastic overscroll for scroll areas ([f4ecaec](https://github.com/wallarm/design-system/commit/f4ecaec))
+* fix(code-snippet): reset copy button icon after timeout ([a5afb03](https://github.com/wallarm/design-system/commit/a5afb03))
+* fix(code-snippet): update syntax highlight colors to match editor themes [update-screenshots] ([b502323](https://github.com/wallarm/design-system/commit/b502323))
+* fix(code-snippet): WDS-72 Fix background color ([430b542](https://github.com/wallarm/design-system/commit/430b542))
+* fix(code-snippet): WDS-72 Folding api ([dcf4dd3](https://github.com/wallarm/design-system/commit/dcf4dd3))
+* ci: use Playwright Docker container for E2E tests [update-screenshots] ([a26f62c](https://github.com/wallarm/design-system/commit/a26f62c))
+
 ## 0.22.0 (2026-04-10)
 
 * feat(split-button): add SplitButton component [WDS-101] (#81) ([8a4f9da](https://github.com/wallarm/design-system/commit/8a4f9da)), closes [#81](https://github.com/wallarm/design-system/issues/81)
