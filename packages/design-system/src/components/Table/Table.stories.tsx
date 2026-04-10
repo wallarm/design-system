@@ -663,10 +663,8 @@ export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
         getRowId={row => row.id}
         sorting={sorting}
         onSortingChange={setSorting}
-        masterCellClick={{
-          onMasterCellClick: handleMasterCellClick,
-          activeRowId,
-        }}
+        onMasterCellClick={handleMasterCellClick}
+        activeRowId={activeRowId}
       />
       <Drawer
         open={!!activeRow}

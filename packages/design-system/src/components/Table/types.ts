@@ -212,16 +212,10 @@ export interface TableProps<T> extends TestableProps {
   onEndReachedThreshold?: number;
 
   // --- Master cell click ---
-  /** Master cell click configuration */
-  masterCellClick?: TableMasterCellClick;
-}
-
-/** Master cell click configuration */
-export interface TableMasterCellClick {
   /** Callback fired when the master cell is clicked. Receives the row ID. */
-  onMasterCellClick: (rowId: string) => void;
+  onMasterCellClick?: (rowId: string) => void;
   /** ID of the currently active (highlighted) row, or null. Controls row highlighting via data-preview-active attribute. */
   activeRowId?: string | null;
   /** Tooltip text shown on master cell hover (default: 'Open details') */
-  tooltipText?: string;
+  masterCellTooltipText?: string;
 }

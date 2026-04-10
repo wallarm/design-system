@@ -80,12 +80,13 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     overscan = TABLE_VIRTUALIZATION_OVERSCAN,
     onEndReached,
     onEndReachedThreshold,
-    masterCellClick,
+    onMasterCellClick,
+    activeRowId: activeRowIdProp,
+    masterCellTooltipText: masterCellTooltipTextProp,
   } = props;
 
-  const onMasterCellClick = masterCellClick?.onMasterCellClick;
-  const masterCellActiveRowId = masterCellClick?.activeRowId ?? null;
-  const masterCellTooltipText = masterCellClick?.tooltipText ?? 'Open details';
+  const masterCellActiveRowId = activeRowIdProp ?? null;
+  const masterCellTooltipText = masterCellTooltipTextProp ?? 'Open details';
 
   // Feature detection
   const sortingEnabled = !!onSortingChange;

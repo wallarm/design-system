@@ -15,7 +15,6 @@ export type {
   TableDisplayColumnDef,
   TableExpandedState,
   TableGroupingState,
-  TableMasterCellClick,
   TableOnChangeFn,
   TableProps,
   TableRow,
