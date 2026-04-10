@@ -665,9 +665,9 @@ const SecurityPreviewContent = ({
 
 SecurityPreviewContent.displayName = 'SecurityPreviewContent';
 
-/** Preview content for use without header (includes objectName) */
-export const renderSecurityPreviewWithTitle = (row: { original: SecurityEvent }) => (
-  <SecurityPreviewContent row={row} showTitle />
+/** Preview content (without title — title shown in DrawerHeader) */
+export const renderSecurityPreviewContent = (row: { original: SecurityEvent }) => (
+  <SecurityPreviewContent row={row} />
 );
 
 /** Duplicate securityEvents N times with unique IDs */

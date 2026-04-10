@@ -28,8 +28,8 @@ import {
   headerColumns,
   METHOD_COLORS,
   multiplySecurityEvents,
+  renderSecurityPreviewContent,
   renderSecurityPreviewHeader,
-  renderSecurityPreviewWithTitle,
   type SecurityEvent,
   type SecurityHeaderEntry,
   securityColumnHelper,
@@ -685,7 +685,7 @@ export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
             </DrawerHeader>
           )}
           <DrawerBody>
-            {activeRow && renderSecurityPreviewWithTitle({ original: activeRow })}
+            {activeRow && renderSecurityPreviewContent({ original: activeRow })}
           </DrawerBody>
         </DrawerContent>
       </Drawer>
