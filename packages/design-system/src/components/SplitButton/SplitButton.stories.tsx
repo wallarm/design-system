@@ -1,13 +1,15 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { ChevronDown, CircleDashed } from '../../icons';
 import { Button } from '../Button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../DropdownMenu';
 import { Heading } from '../Heading';
 import { NumericBadge } from '../NumericBadge';
-import { Popover } from '../Popover';
-import { PopoverContent } from '../Popover/PopoverContent';
-import { PopoverTrigger } from '../Popover/PopoverTrigger';
 import { HStack, VStack } from '../Stack';
-import { Text } from '../Text';
 import { SplitButton } from './SplitButton';
 
 const meta = {
@@ -104,6 +106,34 @@ export const Variants: StoryFn<typeof meta> = () => (
         </Button>
       </SplitButton>
     </HStack>
+
+    <Heading className='text-text-primary-alt'>Ghost / Neutral Alt</Heading>
+    <div className='flex flex-col gap-16 rounded-lg bg-component-tooltip-bg p-8'>
+      <HStack>
+        <SplitButton>
+          <Button variant='ghost' color='neutral-alt'>
+            Button
+          </Button>
+          <Button variant='ghost' color='neutral-alt'>
+            <ChevronDown />
+          </Button>
+        </SplitButton>
+      </HStack>
+    </div>
+
+    <Heading className='text-text-primary-alt'>Secondary / Neutral Alt</Heading>
+    <div className='flex flex-col gap-16 rounded-lg bg-component-tooltip-bg p-8'>
+      <HStack>
+        <SplitButton>
+          <Button variant='secondary' color='neutral-alt'>
+            Button
+          </Button>
+          <Button variant='secondary' color='neutral-alt'>
+            <ChevronDown />
+          </Button>
+        </SplitButton>
+      </HStack>
+    </div>
   </VStack>
 );
 
@@ -261,24 +291,22 @@ export const Content: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
-export const WithPopover: StoryFn<typeof meta> = () => (
-  <Popover>
-    <SplitButton data-testid='split-button-popover'>
+export const WithDropdownMenu: StoryFn<typeof meta> = () => (
+  <DropdownMenu>
+    <SplitButton data-testid='split-button-dropdown'>
       <Button variant='primary' color='brand'>
         Save
       </Button>
-      <PopoverTrigger asChild>
+      <DropdownMenuTrigger asChild>
         <Button variant='primary' color='brand'>
           <ChevronDown />
         </Button>
-      </PopoverTrigger>
+      </DropdownMenuTrigger>
     </SplitButton>
-    <PopoverContent>
-      <VStack>
-        <Text>Save as draft</Text>
-        <Text>Save and publish</Text>
-        <Text>Save as template</Text>
-      </VStack>
-    </PopoverContent>
-  </Popover>
+    <DropdownMenuContent>
+      <DropdownMenuItem value='draft'>Save as draft</DropdownMenuItem>
+      <DropdownMenuItem value='publish'>Save and publish</DropdownMenuItem>
+      <DropdownMenuItem value='template'>Save as template</DropdownMenuItem>
+    </DropdownMenuContent>
+  </DropdownMenu>
 );
