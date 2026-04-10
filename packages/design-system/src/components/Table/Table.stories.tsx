@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Ellipsis, Filter, FilterX, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { InlineCodeSnippet } from '../CodeSnippet';
+import { Drawer, DrawerBody, DrawerContent, DrawerHeader } from '../Drawer';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,9 +28,8 @@ import {
   headerColumns,
   METHOD_COLORS,
   multiplySecurityEvents,
-  renderSecurityPreview,
+  renderSecurityPreviewContent,
   renderSecurityPreviewHeader,
-  renderSecurityPreviewWithTitle,
   type SecurityEvent,
   type SecurityHeaderEntry,
   securityColumnHelper,
@@ -613,17 +613,13 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
       onSortingChange={setSorting}
       columnSizing={columnSizing}
       onColumnSizingChange={setColumnSizing}
-      preview={{
-        trigger: 'button',
-        renderHeader: renderSecurityPreviewHeader,
-        renderContent: renderSecurityPreview,
-      }}
     />
   );
 };
 
-export const MasterCellWithPreviewDrawer: StoryFn<typeof meta> = () => {
+export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
 
   const data = useMemo(
     () =>
@@ -652,16 +648,48 @@ export const MasterCellWithPreviewDrawer: StoryFn<typeof meta> = () => {
     [],
   );
 
+  const handleMasterCellClick = useCallback((rowId: string) => {
+    setActiveRowId(prev => (prev === rowId ? null : rowId));
+  }, []);
+
+  const activeRow = useMemo(() => data.find(d => d.id === activeRowId), [data, activeRowId]);
+
   return (
-    <Table
-      className='max-w-920'
-      data={data}
-      columns={columns}
-      getRowId={row => row.id}
-      sorting={sorting}
-      onSortingChange={setSorting}
-      preview={{ renderContent: renderSecurityPreviewWithTitle }}
-    />
+    <>
+      <Table
+        className='max-w-920'
+        data={data}
+        columns={columns}
+        getRowId={row => row.id}
+        sorting={sorting}
+        onSortingChange={setSorting}
+        onMasterCellClick={handleMasterCellClick}
+        activeRowId={activeRowId}
+      />
+      <Drawer
+        open={!!activeRow}
+        onOpenChange={open => {
+          if (!open) setActiveRowId(null);
+        }}
+        modal={false}
+        overlay={false}
+        closeOnOutsideClick={false}
+        width={960}
+      >
+        <DrawerContent>
+          {activeRow ? (
+            renderSecurityPreviewHeader({ original: activeRow })
+          ) : (
+            <DrawerHeader>
+              <span />
+            </DrawerHeader>
+          )}
+          <DrawerBody>
+            {activeRow && renderSecurityPreviewContent({ original: activeRow })}
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+    </>
   );
 };
 

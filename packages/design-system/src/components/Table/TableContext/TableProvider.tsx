@@ -80,15 +80,11 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     overscan = TABLE_VIRTUALIZATION_OVERSCAN,
     onEndReached,
     onEndReachedThreshold,
-    preview,
+    onMasterCellClick,
+    activeRowId: activeRowIdProp,
   } = props;
 
-  const renderPreviewHeader = preview?.renderHeader;
-  const renderPreviewContent = preview?.renderContent;
-  const previewTrigger = preview?.trigger ?? 'master';
-  const previewTooltipText = preview?.tooltipText ?? 'Open preview';
-  const previewRowIdProp = preview?.rowId;
-  const onPreviewRowChange = preview?.onRowChange;
+  const masterCellActiveRowId = activeRowIdProp ?? null;
 
   // Feature detection
   const sortingEnabled = !!onSortingChange;
@@ -291,19 +287,6 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
   const theadRef = useRef<HTMLTableSectionElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
 
-  // Preview drawer state (controlled/uncontrolled)
-  const [previewRowId = null, setPreviewRowIdInternal] = useControlled<string | null>({
-    controlled: previewRowIdProp,
-    default: null,
-  });
-  const setPreviewRowId = useCallback(
-    (id: string | null) => {
-      setPreviewRowIdInternal(id);
-      onPreviewRowChange?.(id);
-    },
-    [setPreviewRowIdInternal, onPreviewRowChange],
-  );
-
   // Context value
   const contextValue: TableContextValue<T> = useMemo(
     () => ({
@@ -333,14 +316,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       containerRef,
       onEndReached,
       onEndReachedThreshold,
-      preview: {
-        rowId: previewRowId,
-        setRowId: setPreviewRowId,
-        renderHeader: renderPreviewHeader as ((row: Row<T>) => ReactNode) | undefined,
-        renderContent: renderPreviewContent as ((row: Row<T>) => ReactNode) | undefined,
-        trigger: previewTrigger,
-        tooltipText: previewTooltipText,
-      },
+      onMasterCellClick,
+      activeRowId: masterCellActiveRowId,
     }),
     [
       table,
@@ -366,12 +343,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       masterColumnId,
       onEndReached,
       onEndReachedThreshold,
-      previewRowId,
-      setPreviewRowId,
-      renderPreviewHeader,
-      renderPreviewContent,
-      previewTrigger,
-      previewTooltipText,
+      masterCellActiveRowId,
+      onMasterCellClick,
     ],
   );
 

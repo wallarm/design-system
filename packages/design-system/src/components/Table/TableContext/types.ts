@@ -53,15 +53,9 @@ export interface TableContextValue<T> {
   onEndReached?: () => void;
   onEndReachedThreshold?: number;
 
-  // Preview drawer
-  preview: {
-    rowId: string | null;
-    setRowId: (id: string | null) => void;
-    renderHeader?: (row: Row<T>) => ReactNode;
-    renderContent?: (row: Row<T>) => ReactNode;
-    trigger: 'master' | 'button';
-    tooltipText: string;
-  };
+  // Master cell click
+  onMasterCellClick?: (rowId: string) => void;
+  activeRowId: string | null;
 }
 
 export interface TableProviderProps<T> extends Omit<TableProps<T>, 'children' | 'aria-label'> {

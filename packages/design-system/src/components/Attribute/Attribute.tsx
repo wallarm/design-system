@@ -25,14 +25,12 @@ export const Attribute: FC<AttributeProps> = ({
         ref={ref}
         data-testid={testId}
         data-slot='attribute'
-        className={cn('flex flex-col', className)}
+        className={cn('flex flex-col', loading && 'gap-4 py-2', className)}
       >
         {loading ? (
           <>
             <Skeleton width='82px' height='16px' rounded={6} />
-            <div className='pt-4'>
-              <Skeleton width='100%' height='24px' rounded={6} />
-            </div>
+            <Skeleton width='100%' height='24px' rounded={6} />
           </>
         ) : (
           children

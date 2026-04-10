@@ -2,7 +2,7 @@ import { type Cell, flexRender } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
-import { usePreviewCell } from '../hooks';
+import { useMasterCell } from '../hooks';
 import {
   getAlignClass,
   getExpandBorderClass,
@@ -14,7 +14,6 @@ import {
 import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableMasterCellActions } from '../TableMasterCellActions';
-import { TablePreviewToggle } from '../TablePreviewToggle';
 
 interface TableBodyCellProps<T> {
   cell: Cell<T, unknown>;
@@ -40,12 +39,11 @@ export const TableBodyCell = <T,>({
   const { canDnd, setNodeRef, dndStyle } = useColumnDnd(column);
   const pinningStyles = getPinningStyles(column);
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
-  const { isMasterTrigger, isButtonTrigger, isActive, togglePreview, tooltipText } =
-    usePreviewCell<T>(column.id, cell.row.id);
+  const { isMasterTrigger, handleClick, tooltipText } = useMasterCell<T>(column.id, cell.row.id);
 
   const isCut = column.id === masterColumnId || meta?.resizeType === 'cut';
   const content = flexRender(cell.column.columnDef.cell, cell.getContext());
-  const hasActions = isButtonTrigger || !!meta?.renderPreviewAction || !!meta?.renderMenuAction;
+  const hasActions = !!meta?.renderMenuAction;
 
   const renderContent = () => {
     const wrappedContent = tooltipText ? (
@@ -63,11 +61,7 @@ export const TableBodyCell = <T,>({
       return (
         <div className='flex items-center justify-between gap-2'>
           {wrappedContent}
-          <TableMasterCellActions>
-            {isButtonTrigger && <TablePreviewToggle active={isActive} onClick={togglePreview} />}
-            {meta?.renderPreviewAction?.(cell.row)}
-            {meta?.renderMenuAction?.(cell.row)}
-          </TableMasterCellActions>
+          <TableMasterCellActions>{meta?.renderMenuAction?.(cell.row)}</TableMasterCellActions>
         </div>
       );
     }
@@ -98,7 +92,7 @@ export const TableBodyCell = <T,>({
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}
       ref={canDnd ? setNodeRef : undefined}
-      onClick={isMasterTrigger ? togglePreview : undefined}
+      onClick={isMasterTrigger ? handleClick : undefined}
       style={{
         ...pinningStyles,
         width: cell.column.getSize(),

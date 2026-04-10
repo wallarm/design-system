@@ -1,9 +1,11 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Badge } from '../Badge';
 import { Code } from '../Code';
+import { InlineCodeSnippet } from '../CodeSnippet';
 import { FormatDateTime } from '../FormatDateTime';
-import { Ip } from '../Ip';
+import { Ip, IpAddress, IpCountry, IpList, IpProvider } from '../Ip';
 import { Link } from '../Link';
+import { Tag } from '../Tag';
 import { Text } from '../Text';
 import { Attribute, type AttributeProps } from './Attribute';
 import { AttributeLabel } from './AttributeLabel';
@@ -147,10 +149,10 @@ export const WithTags: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>Tags</AttributeLabel>
       <AttributeValue>
-        <div className='flex items-center gap-4'>
-          <Badge color='slate'>production</Badge>
-          <Badge color='slate'>us-east-1</Badge>
-          <Badge color='slate'>critical</Badge>
+        <div className='flex items-center gap-4 flex-wrap'>
+          <Tag>production</Tag>
+          <Tag>us-east-1</Tag>
+          <Tag>critical</Tag>
         </div>
       </AttributeValue>
     </Attribute>
@@ -158,9 +160,15 @@ export const WithTags: StoryFn<AttributeProps> = () => (
 );
 
 export const WithCodeSnippet: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
+  <div className='w-[400px] flex flex-col gap-16'>
     <Attribute>
-      <AttributeLabel>Payload</AttributeLabel>
+      <AttributeLabel>Payload (inline)</AttributeLabel>
+      <AttributeValue>
+        <InlineCodeSnippet code='{ "action": "login", "user_id": 42 }' size='sm' />
+      </AttributeValue>
+    </Attribute>
+    <Attribute>
+      <AttributeLabel>Payload (code)</AttributeLabel>
       <AttributeValue>
         <Code size='s'>{'{ "action": "login", "user_id": 42 }'}</Code>
       </AttributeValue>
@@ -182,11 +190,17 @@ export const WithLink_Value: StoryFn<AttributeProps> = () => (
 );
 
 export const WithDateTime: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
+  <div className='w-[400px] flex flex-col gap-16'>
     <Attribute>
-      <AttributeLabel>Created at</AttributeLabel>
+      <AttributeLabel>Created at (relative)</AttributeLabel>
       <AttributeValue>
         <FormatDateTime value='2026-04-02T14:03:00Z' />
+      </AttributeValue>
+    </Attribute>
+    <Attribute>
+      <AttributeLabel>Created at (absolute)</AttributeLabel>
+      <AttributeValue>
+        <FormatDateTime value='2026-04-02T14:03:00Z' format='datetime' />
       </AttributeValue>
     </Attribute>
   </div>
@@ -197,7 +211,11 @@ export const WithIP: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>Source IP</AttributeLabel>
       <AttributeValue>
-        <Ip>142.198.167.52</Ip>
+        <Ip>
+          <IpCountry code='US' />
+          <IpAddress>142.198.167.52</IpAddress>
+          <IpProvider>Azure</IpProvider>
+        </Ip>
       </AttributeValue>
     </Attribute>
   </div>
@@ -217,9 +235,7 @@ export const Composition: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>First seen</AttributeLabel>
       <AttributeValue>
-        <Text size='sm' decoration='dashed'>
-          Week ago
-        </Text>
+        <FormatDateTime value='2026-04-03T10:15:00Z' />
       </AttributeValue>
     </Attribute>
 
@@ -227,19 +243,12 @@ export const Composition: StoryFn<AttributeProps> = () => (
       <AttributeLabel>Attack type</AttributeLabel>
       <AttributeValue>
         <div className='flex items-center gap-4 flex-wrap'>
-          <Badge color='slate'>XSS</Badge>
-          <Badge color='slate'>BOLA</Badge>
-          <Badge color='slate'>SQL Injection</Badge>
-          <Badge color='slate'>Scanner</Badge>
-          <Badge color='slate'>+5</Badge>
+          <Tag>XSS</Tag>
+          <Tag>BOLA</Tag>
+          <Tag>SQL Injection</Tag>
+          <Tag>Scanner</Tag>
+          <Tag>+5</Tag>
         </div>
-      </AttributeValue>
-    </Attribute>
-
-    <Attribute>
-      <AttributeLabel>Last seen</AttributeLabel>
-      <AttributeValue>
-        <Text size='sm'>2 Apr, 2026 14:03</Text>
       </AttributeValue>
     </Attribute>
 
@@ -255,7 +264,7 @@ export const Composition: StoryFn<AttributeProps> = () => (
       <AttributeValue>
         <div className='flex items-center gap-4'>
           <Text size='sm'>artem@acme.com, uxd@acme.com</Text>
-          <Badge color='slate'>+3</Badge>
+          <Tag>+3</Tag>
         </div>
       </AttributeValue>
     </Attribute>
@@ -263,15 +272,31 @@ export const Composition: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>IPs</AttributeLabel>
       <AttributeValue>
-        <div className='flex items-center gap-4 flex-wrap col-span-2'>
-          <Text size='sm'>142.198.167.52</Text>
-          <Badge color='sky'>Azure</Badge>
-          <Text size='sm'>34.74.73.20</Text>
-          <Badge color='amber'>AWS</Badge>
-          <Text size='sm'>34.74.73.20</Text>
-          <Badge color='teal'>GCP</Badge>
-          <Badge color='slate'>+5</Badge>
-        </div>
+        <IpList>
+          <Ip>
+            <IpCountry code='US' />
+            <IpAddress>142.198.167.52</IpAddress>
+            <IpProvider>Azure</IpProvider>
+          </Ip>
+          <Ip>
+            <IpCountry code='US' />
+            <IpAddress>34.74.73.20</IpAddress>
+            <IpProvider>AWS</IpProvider>
+          </Ip>
+          <Ip>
+            <IpCountry code='DE' />
+            <IpAddress>34.74.73.20</IpAddress>
+            <IpProvider>GCP</IpProvider>
+          </Ip>
+          <Ip>
+            <IpCountry code='NL' />
+            <IpAddress>10.0.0.1</IpAddress>
+          </Ip>
+          <Ip>
+            <IpCountry code='JP' />
+            <IpAddress>192.168.1.1</IpAddress>
+          </Ip>
+        </IpList>
       </AttributeValue>
     </Attribute>
   </div>
