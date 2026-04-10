@@ -18,6 +18,10 @@ export {
 export {
   Attribute,
   AttributeLabel,
+  AttributeLabelDescription,
+  type AttributeLabelDescriptionProps,
+  AttributeLabelInfo,
+  type AttributeLabelInfoProps,
   type AttributeLabelProps,
   type AttributeProps,
   AttributeValue,

@@ -7,6 +7,8 @@ import { Link } from '../Link';
 import { Text } from '../Text';
 import { Attribute, type AttributeProps } from './Attribute';
 import { AttributeLabel } from './AttributeLabel';
+import { AttributeLabelDescription } from './AttributeLabelDescription';
+import { AttributeLabelInfo } from './AttributeLabelInfo';
 import { AttributeValue } from './AttributeValue';
 
 const meta = {
@@ -14,6 +16,8 @@ const meta = {
   component: Attribute,
   subcomponents: {
     AttributeLabel,
+    AttributeLabelDescription,
+    AttributeLabelInfo,
     AttributeValue,
   },
   parameters: {
@@ -45,8 +49,11 @@ export const Default: StoryFn<AttributeProps> = () => (
 export const WithDescription: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute>
-      <AttributeLabel description='The time when the request was first received'>
+      <AttributeLabel>
         Created at
+        <AttributeLabelDescription>
+          The time when the request was first received
+        </AttributeLabelDescription>
       </AttributeLabel>
       <AttributeValue>
         <Text size='sm'>April 9, 2026, 14:32</Text>
@@ -58,8 +65,9 @@ export const WithDescription: StoryFn<AttributeProps> = () => (
 export const WithInfoRight: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute>
-      <AttributeLabel info='Unique identifier assigned to each incoming request'>
+      <AttributeLabel>
         Request ID
+        <AttributeLabelInfo>Unique identifier assigned to each incoming request</AttributeLabelInfo>
       </AttributeLabel>
       <AttributeValue>
         <Text size='sm'>abc-123-def-456</Text>
@@ -71,7 +79,8 @@ export const WithInfoRight: StoryFn<AttributeProps> = () => (
 export const WithInfoLeft: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute>
-      <AttributeLabel info='Unique identifier assigned to each incoming request' infoSide='left'>
+      <AttributeLabel>
+        <AttributeLabelInfo>Unique identifier assigned to each incoming request</AttributeLabelInfo>
         Request ID
       </AttributeLabel>
       <AttributeValue>
@@ -84,14 +93,11 @@ export const WithInfoLeft: StoryFn<AttributeProps> = () => (
 export const WithLink: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute>
-      <AttributeLabel
-        link={
-          <Link href='#' size='md'>
-            View docs
-          </Link>
-        }
-      >
+      <AttributeLabel>
         Source
+        <Link href='#' size='md'>
+          View docs
+        </Link>
       </AttributeLabel>
       <AttributeValue>
         <Text size='sm'>API Gateway</Text>
@@ -103,7 +109,10 @@ export const WithLink: StoryFn<AttributeProps> = () => (
 export const Empty: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute>
-      <AttributeLabel description='Not yet assigned'>Region</AttributeLabel>
+      <AttributeLabel>
+        Region
+        <AttributeLabelDescription>Not yet assigned</AttributeLabelDescription>
+      </AttributeLabel>
       <AttributeValue />
     </Attribute>
   </div>
