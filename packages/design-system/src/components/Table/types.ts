@@ -222,6 +222,6 @@ export interface TableMasterCellClick {
   onMasterCellClick: (rowId: string) => void;
   /** ID of the currently active (highlighted) row, or null. Controls row highlighting via data-preview-active attribute. */
   activeRowId?: string | null;
-  /** Tooltip text shown on master cell hover (default: 'Open preview') */
+  /** Tooltip text shown on master cell hover (default: 'Open details') */
   tooltipText?: string;
 }

@@ -665,11 +665,6 @@ const SecurityPreviewContent = ({
 
 SecurityPreviewContent.displayName = 'SecurityPreviewContent';
 
-/** Preview content for use with header (objectName shown in header) */
-export const renderSecurityPreview = (row: { original: SecurityEvent }) => (
-  <SecurityPreviewContent row={row} />
-);
-
 /** Preview content for use without header (includes objectName) */
 export const renderSecurityPreviewWithTitle = (row: { original: SecurityEvent }) => (
   <SecurityPreviewContent row={row} showTitle />

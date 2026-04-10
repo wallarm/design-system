@@ -10,7 +10,6 @@ export const useMasterCell = <T>(columnId: string, rowId: string) => {
 
   const isMasterColumn = columnId === masterColumnId;
   const hasMasterClick = isMasterColumn && !!masterCell.onMasterCellClick;
-  const isActive = masterCell.activeRowId === rowId;
 
   const handleClick = useCallback(() => {
     masterCell.onMasterCellClick?.(rowId);
@@ -19,8 +18,6 @@ export const useMasterCell = <T>(columnId: string, rowId: string) => {
   return {
     /** Master cell click is enabled */
     isMasterTrigger: hasMasterClick,
-    /** This row is currently active (highlighted) */
-    isActive,
     /** Fire master cell click for this row */
     handleClick,
     /** Tooltip text for master cell hover */
