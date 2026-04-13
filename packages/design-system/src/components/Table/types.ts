@@ -24,8 +24,6 @@ declare module '@tanstack/react-table' {
     description?: { type: 'text' | 'tooltip'; content: string };
     /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
     resizeType?: 'cut' | 'resize';
-    /** Render the preview toggle button shown on hover */
-    renderPreviewAction?: (row: Row<TData>) => ReactNode;
     /** Render the three-dots contextual menu shown on hover */
     renderMenuAction?: (row: Row<TData>) => ReactNode;
   }
@@ -103,8 +101,6 @@ export interface TableColumnMeta<T = unknown> {
   description?: { type: 'text' | 'tooltip'; content: string };
   /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
   resizeType?: 'cut' | 'resize';
-  /** Render the preview toggle button shown on hover */
-  renderPreviewAction?: (row: TableRow<T>) => ReactNode;
   /** Render the three-dots contextual menu shown on hover */
   renderMenuAction?: (row: TableRow<T>) => ReactNode;
 }
@@ -215,25 +211,9 @@ export interface TableProps<T> extends TestableProps {
   /** Distance from the bottom (in px) to trigger onEndReached (default: 200) */
   onEndReachedThreshold?: number;
 
-  // --- Preview drawer ---
-  /** Preview drawer configuration */
-  preview?: TablePreview<T>;
-}
-
-/** Preview drawer configuration */
-export interface TablePreview<T> {
-  /** Render drawer header for a row */
-  renderHeader?: (row: TableRow<T>) => ReactNode;
-  /** Render drawer content for a row */
-  renderContent: (row: TableRow<T>) => ReactNode;
-  /** How the preview drawer is triggered:
-   *  - `'master'` — clicking the master cell toggles the drawer (default)
-   *  - `'button'` — a toggle button appears in master cell actions on hover */
-  trigger?: 'master' | 'button';
-  /** Tooltip text on master cell hover (default: 'Open preview') */
-  tooltipText?: string;
-  /** Controlled preview row ID. Pass `null` to close. */
-  rowId?: string | null;
-  /** Callback when preview row changes (open/close/swap). */
-  onRowChange?: (rowId: string | null) => void;
+  // --- Master cell click ---
+  /** Callback fired when the master cell is clicked. Receives the row ID. */
+  onMasterCellClick?: (rowId: string) => void;
+  /** ID of the currently active (highlighted) row, or null. Controls row highlighting via data-preview-active attribute. */
+  activeRowId?: string | null;
 }

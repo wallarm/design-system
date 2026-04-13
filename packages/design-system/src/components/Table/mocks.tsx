@@ -622,19 +622,8 @@ export const renderSecurityPreviewHeader = (row: { original: SecurityEvent }) =>
 );
 
 /** Preview drawer content for security events */
-const SecurityPreviewContent = ({
-  row,
-  showTitle,
-}: {
-  row: { original: SecurityEvent };
-  showTitle?: boolean;
-}) => (
+const SecurityPreviewContent = ({ row }: { row: { original: SecurityEvent } }) => (
   <VStack gap={16}>
-    {showTitle && (
-      <Text size='lg' weight='medium'>
-        {row.original.objectName}
-      </Text>
-    )}
     <HStack gap={8}>
       <Badge
         variant='dotted'
@@ -665,14 +654,9 @@ const SecurityPreviewContent = ({
 
 SecurityPreviewContent.displayName = 'SecurityPreviewContent';
 
-/** Preview content for use with header (objectName shown in header) */
-export const renderSecurityPreview = (row: { original: SecurityEvent }) => (
+/** Preview content (without title — title shown in DrawerHeader) */
+export const renderSecurityPreviewContent = (row: { original: SecurityEvent }) => (
   <SecurityPreviewContent row={row} />
-);
-
-/** Preview content for use without header (includes objectName) */
-export const renderSecurityPreviewWithTitle = (row: { original: SecurityEvent }) => (
-  <SecurityPreviewContent row={row} showTitle />
 );
 
 /** Duplicate securityEvents N times with unique IDs */
