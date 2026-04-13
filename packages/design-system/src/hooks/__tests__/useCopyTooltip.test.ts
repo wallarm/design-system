@@ -35,7 +35,6 @@ describe('useCopyTooltip', () => {
 
     expect(result.current.copied).toBe(false);
     expect(result.current.tooltipOpen).toBe(false);
-    expect(result.current.isSupported).toBe(true);
   });
 
   it('sets copied and tooltipOpen after handleCopy', () => {

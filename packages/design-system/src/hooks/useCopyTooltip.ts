@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-
-const isClipboardSupported =
-  typeof navigator !== 'undefined' &&
-  typeof navigator.clipboard !== 'undefined' &&
-  typeof navigator.clipboard.writeText === 'function';
+import { copyText } from '../utils/copyText';
 
 interface UseCopyTooltipOptions {
   text: string;
@@ -11,7 +7,6 @@ interface UseCopyTooltipOptions {
 }
 
 interface UseCopyTooltipReturn {
-  isSupported: boolean;
   copied: boolean;
   tooltipOpen: boolean;
   onTooltipOpenChange: (open: boolean) => void;
@@ -46,8 +41,8 @@ export function useCopyTooltip({
   const handleCopy = useCallback(
     (event: { stopPropagation: () => void }) => {
       event.stopPropagation();
-      if (!enabled || !isClipboardSupported) return;
-      navigator.clipboard.writeText(text);
+      if (!enabled) return;
+      copyText(text);
       setCopied(true);
       setKeepOpen(true);
       clearTimer();
@@ -84,7 +79,6 @@ export function useCopyTooltip({
   useEffect(() => clearTimer, [clearTimer]);
 
   return {
-    isSupported: isClipboardSupported,
     copied,
     tooltipOpen,
     onTooltipOpenChange,

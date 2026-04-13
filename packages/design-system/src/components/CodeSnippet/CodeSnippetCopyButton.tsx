@@ -17,7 +17,7 @@ export const CodeSnippetCopyButton: FC<CodeSnippetCopyButtonProps> = ({
 }) => {
   const testId = useTestId('copy-button');
   const { code } = useCodeSnippet();
-  const { isSupported, copied, tooltipOpen, onTooltipOpenChange, handleCopy } = useCopyTooltip({
+  const { copied, tooltipOpen, onTooltipOpenChange, handleCopy } = useCopyTooltip({
     text: code,
   });
 
@@ -25,8 +25,6 @@ export const CodeSnippetCopyButton: FC<CodeSnippetCopyButtonProps> = ({
     handleCopy(event);
     onClick?.(event);
   };
-
-  if (!isSupported) return null;
 
   return (
     <Tooltip open={tooltipOpen} onOpenChange={onTooltipOpenChange} closeOnPointerDown={false}>

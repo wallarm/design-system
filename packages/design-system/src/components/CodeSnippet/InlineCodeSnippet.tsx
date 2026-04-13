@@ -66,13 +66,11 @@ export const InlineCodeSnippet: FC<InlineCodeSnippetProps> = props => {
     ref,
     ...otherProps
   } = props;
-  const { isSupported, copied, tooltipOpen, onTooltipOpenChange, handleCopy } = useCopyTooltip({
+  const { copied, tooltipOpen, onTooltipOpenChange, handleCopy } = useCopyTooltip({
     text: code,
     enabled: copyable,
   });
   const Comp = asChild ? Slot : 'code';
-
-  const isCopyable = copyable && isSupported;
 
   const handleClick: MouseEventHandler<HTMLElement> = event => {
     handleCopy(event);
@@ -83,7 +81,7 @@ export const InlineCodeSnippet: FC<InlineCodeSnippetProps> = props => {
     <Comp
       ref={ref}
       data-slot='inline-code-snippet'
-      className={cn(inlineCodeSnippetVariants({ size, copyable: isCopyable }), className)}
+      className={cn(inlineCodeSnippetVariants({ size, copyable }), className)}
       {...otherProps}
       onClick={handleClick}
     >
@@ -91,7 +89,7 @@ export const InlineCodeSnippet: FC<InlineCodeSnippetProps> = props => {
     </Comp>
   );
 
-  if (!isCopyable) {
+  if (!copyable) {
     return codeElement;
   }
 
