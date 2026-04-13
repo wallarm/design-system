@@ -1,3 +1,9 @@
+## <small>0.23.3 (2026-04-13)</small>
+
+* test(code-snippet): Update screenshots ([fd286aa](https://github.com/wallarm/design-system/commit/fd286aa))
+* fix(code-snippet): WDS-72 Don't hide Copy button ([12c605f](https://github.com/wallarm/design-system/commit/12c605f))
+* fix(code-snippet): WDS-72 Fix folding with wrap lines ([b12e266](https://github.com/wallarm/design-system/commit/b12e266))
+
 ## <small>0.23.2 (2026-04-13)</small>
 
 * fix: release SplitButton and Attribute fixes from #84 ([8737809](https://github.com/wallarm/design-system/commit/8737809)), closes [#84](https://github.com/wallarm/design-system/issues/84)
