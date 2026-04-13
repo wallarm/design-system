@@ -1,3 +1,10 @@
+## <small>0.23.2 (2026-04-13)</small>
+
+* fix: release SplitButton and Attribute fixes from #84 ([8737809](https://github.com/wallarm/design-system/commit/8737809)), closes [#84](https://github.com/wallarm/design-system/issues/84)
+* 🖼️ Update screenshots ([c37dd23](https://github.com/wallarm/design-system/commit/c37dd23))
+* test: regenerate stale screenshots [update-screenshots] ([dd0a04f](https://github.com/wallarm/design-system/commit/dd0a04f)), closes [#84](https://github.com/wallarm/design-system/issues/84)
+* refactor(table): decouple Preview Drawer from Table component [AS-848] (#84) ([b588554](https://github.com/wallarm/design-system/commit/b588554)), closes [#84](https://github.com/wallarm/design-system/issues/84)
+
 ## <small>0.23.1 (2026-04-10)</small>
 
 * test: WDS-100 Update tests with new icons behavior ([b628eda](https://github.com/wallarm/design-system/commit/b628eda))
