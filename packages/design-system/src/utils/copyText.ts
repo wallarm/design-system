@@ -11,6 +11,7 @@ function fallbackCopy(text: string): boolean {
   textarea.style.left = '-9999px';
   textarea.setAttribute('aria-hidden', 'true');
   textarea.tabIndex = -1;
+  textarea.readOnly = true;
   document.body.appendChild(textarea);
   textarea.select();
   try {

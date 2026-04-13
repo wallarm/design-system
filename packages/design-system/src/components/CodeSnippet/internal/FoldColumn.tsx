@@ -1,5 +1,4 @@
 import type { FC } from 'react';
-import { useMemo } from 'react';
 import { cn } from '../../../utils/cn';
 import { useCodeSnippet } from '../hooks';
 import { LINE_COLOR_STYLES, SIZE_LINE_HEIGHT_CLASSES } from '../lib/lineStyles';
@@ -7,10 +6,9 @@ import { FoldToggle } from './FoldToggle';
 
 /** Fold toggle column — renders fold chevrons for each row */
 export const FoldColumn: FC = () => {
-  const { visibleDisplayItems, folds, collapsedFolds, toggleFold, size, lines } = useCodeSnippet();
+  const { visibleDisplayItems, foldByStartLine, collapsedFolds, toggleFold, size, lines } =
+    useCodeSnippet();
   const lineHeightClass = SIZE_LINE_HEIGHT_CLASSES[size];
-
-  const foldByStartLine = useMemo(() => new Map(folds.map(f => [f.startLine, f])), [folds]);
 
   return (
     <div className='flex flex-col select-none' data-slot='code-snippet-fold'>

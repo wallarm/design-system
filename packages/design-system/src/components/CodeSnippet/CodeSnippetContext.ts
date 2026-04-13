@@ -63,6 +63,8 @@ export type CodeSnippetContextValue<TLanguage extends string = string> = {
 
   // Folding
   folds: FoldRegion[];
+  /** Fold regions indexed by their start line for O(1) lookup */
+  foldByStartLine: Map<number, FoldRegion>;
   collapsedFolds: Set<string>;
   toggleFold: (foldId: string) => void;
 

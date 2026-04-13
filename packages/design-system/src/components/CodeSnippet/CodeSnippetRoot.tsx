@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { copyText } from '../../utils/copyText';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { plainAdapter } from './adapters/plain';
 import type { SyntaxAdapter, Token } from './adapters/types';
@@ -148,7 +149,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   }, [isFullscreen]);
 
   const copyToClipboard = useCallback(async () => {
-    await navigator.clipboard.writeText(code);
+    await copyText(code);
     onCopy?.(code);
   }, [code, onCopy]);
 
@@ -161,7 +162,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
 
   const computeCollapsedFolds = useCallback((folds: FoldRegion[] | undefined) => {
     if (!folds) return new Set<string>();
-    return new Set(folds.filter(f => f.defaultCollapsed !== false).map(f => f.id));
+    return new Set(folds.filter(f => f.defaultCollapsed === true).map(f => f.id));
   }, []);
 
   const [collapsedFolds, setCollapsedFolds] = useState(() => computeCollapsedFolds(foldsProp));
@@ -182,6 +183,11 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       return next;
     });
   }, []);
+
+  const foldByStartLine = useMemo(
+    () => new Map(validatedFolds.map(f => [f.startLine, f])),
+    [validatedFolds],
+  );
 
   const displayItems = useMemo(
     () => buildDisplayItems(totalLines, validatedFolds, collapsedFolds, startingLineNumber),
@@ -210,6 +216,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       displayItems,
       visibleDisplayItems,
       folds: validatedFolds,
+      foldByStartLine,
       collapsedFolds,
       toggleFold,
       isExpanded,
@@ -234,6 +241,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       displayItems,
       visibleDisplayItems,
       validatedFolds,
+      foldByStartLine,
       collapsedFolds,
       toggleFold,
       isExpanded,

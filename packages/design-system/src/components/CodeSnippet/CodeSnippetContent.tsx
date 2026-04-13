@@ -141,7 +141,13 @@ export const CodeSnippetContent: FC<CodeSnippetContentProps> = ({
     <div
       data-slot='code-snippet-content'
       data-testid={testId}
-      className={cn('min-h-0 [&_[data-part=viewport]]:overscroll-none', className)}
+      className={cn(
+        'min-h-0',
+        '[&_[data-part=viewport]]:overscroll-none',
+        // overflow:clip doesn't create a scroll container, so wheel events pass through to the page
+        '[&_[data-part=viewport]:not([data-overflow-x]):not([data-overflow-y])]:!overflow-clip',
+        className,
+      )}
       {...props}
     >
       <ScrollArea>

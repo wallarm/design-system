@@ -17,6 +17,7 @@ import { CodeSnippetTab } from './CodeSnippetTab';
 import { CodeSnippetTabs } from './CodeSnippetTabs';
 import { CodeSnippetTitle } from './CodeSnippetTitle';
 import { CodeSnippetWrapButton } from './CodeSnippetWrapButton';
+import { getHttpFolds } from './lib/httpFolds';
 
 const meta = {
   title: 'Data display/CodeSnippet/CodeSnippet',
@@ -314,10 +315,21 @@ export default greeting;`;
 
 /**
  * Line wrapping enabled for long lines.
+ * Includes examples with annotations and folds in wrap mode.
  */
 export const LineWrapping: StoryFn<typeof meta> = () => {
   const longCode = `const veryLongVariableName = "This is a very long string that will demonstrate line wrapping behavior when the content exceeds the container width";
 console.log(veryLongVariableName);`;
+
+  const httpCode = `GET /api/v2/users?page=1&limit=20&filter=active&sort=name&order=asc&include=profile,settings HTTP/1.1
+Host: api.wallarm.com
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIn0
+Content-Type: application/json
+Accept: application/json
+
+{
+  "filter": { "status": "active", "role": "admin" }
+}`;
 
   return (
     <VStack gap={16}>
@@ -375,6 +387,37 @@ console.log(veryLongVariableName);`;
               1: { color: 'danger', prefix: '-' },
               2: { color: 'success', prefix: '+' },
             }}
+          >
+            <CodeSnippetContent>
+              <CodeSnippetLineNumbers />
+              <CodeSnippetCode />
+            </CodeSnippetContent>
+          </CodeSnippetRoot>
+        </div>
+      </VStack>
+      <VStack align='start' gap={4}>
+        <span className='text-xs text-text-secondary font-medium'>Folds without wrapping</span>
+        <div style={{ maxWidth: '600px' }}>
+          <CodeSnippetRoot
+            code={httpCode}
+            language='text'
+            folds={getHttpFolds(httpCode, { headers: { defaultCollapsed: true } })}
+          >
+            <CodeSnippetContent>
+              <CodeSnippetLineNumbers />
+              <CodeSnippetCode />
+            </CodeSnippetContent>
+          </CodeSnippetRoot>
+        </div>
+      </VStack>
+      <VStack align='start' gap={4}>
+        <span className='text-xs text-text-secondary font-medium'>Folds with wrapping</span>
+        <div style={{ maxWidth: '600px' }}>
+          <CodeSnippetRoot
+            code={httpCode}
+            language='text'
+            wrapLines
+            folds={getHttpFolds(httpCode, { headers: { defaultCollapsed: true } })}
           >
             <CodeSnippetContent>
               <CodeSnippetLineNumbers />
@@ -765,8 +808,6 @@ export const ShowMore: StoryFn<typeof meta> = () => (
 
 // --- Folding stories ---
 
-import { getHttpFolds } from './lib/httpFolds';
-
 const foldableRequestCode = `GET /api/v2/users HTTP/1.1
 Host: api.example.com
 Accept: application/json
@@ -854,10 +895,7 @@ export const WithFoldingExpanded: StoryFn<typeof meta> = () => (
   <CodeSnippetRoot
     code={foldableRequestCode}
     language='text'
-    folds={getHttpFolds(foldableRequestCode, {
-      headers: { defaultCollapsed: false },
-      body: { defaultCollapsed: false },
-    })}
+    folds={getHttpFolds(foldableRequestCode)}
     lines={{
       3: { color: 'warning' },
       4: { color: 'danger', ranges: [{ start: 14, end: 42, color: 'danger' }] },
