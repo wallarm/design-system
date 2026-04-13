@@ -1,8 +1,10 @@
 import type { FC, ReactNode } from 'react';
 import { cn } from '../../../utils/cn';
 import type { LineConfig } from '../CodeSnippetContext';
+import type { FoldRegion } from '../lib/foldUtils';
 import { LINE_COLOR_STYLES } from '../lib/lineStyles';
 import { getLineTextStyles } from '../lib/lineUtils';
+import { FoldToggle } from './FoldToggle';
 
 export type CodeLineProps = {
   lineConfig: LineConfig | undefined;
@@ -11,6 +13,14 @@ export type CodeLineProps = {
   showInlineGutter?: boolean;
   /** Line number to display (only shown when showInlineGutter is true) */
   lineNumber?: number;
+  /** Fold region starting at this line (only shown when showInlineGutter is true) */
+  fold?: FoldRegion;
+  /** Whether the fold is collapsed */
+  isFoldCollapsed?: boolean;
+  /** Callback to toggle the fold */
+  onFoldToggle?: () => void;
+  /** Whether any folds exist (used to render consistent-width spacer) */
+  hasFolds?: boolean;
   children: ReactNode;
 };
 
@@ -20,6 +30,10 @@ export const CodeLine: FC<CodeLineProps> = ({
   lineHeightClass,
   showInlineGutter = false,
   lineNumber,
+  fold,
+  isFoldCollapsed,
+  onFoldToggle,
+  hasFolds = false,
   children,
 }) => {
   const {
@@ -46,7 +60,8 @@ export const CodeLine: FC<CodeLineProps> = ({
           {/* Color stick */}
           <span
             className={cn(
-              'shrink-0 self-stretch border-l-2 pl-12',
+              'shrink-0 self-stretch border-l-2',
+              !hasFolds && 'pl-12',
               colorStyles?.border ?? 'border-transparent',
             )}
           />
@@ -59,6 +74,20 @@ export const CodeLine: FC<CodeLineProps> = ({
               )}
             >
               {lineNumber}
+            </span>
+          )}
+          {/* Fold toggle */}
+          {hasFolds && (
+            <span className='shrink-0 flex items-center justify-center px-4'>
+              {fold && onFoldToggle ? (
+                <FoldToggle
+                  fold={fold}
+                  isCollapsed={isFoldCollapsed ?? false}
+                  onToggle={onFoldToggle}
+                />
+              ) : (
+                <span className='w-16 h-16' />
+              )}
             </span>
           )}
           {/* Prefix */}

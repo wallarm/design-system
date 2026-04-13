@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import type { Token } from '../adapters/types';
 import type { LineConfig } from '../CodeSnippetContext';
+import type { FoldRegion } from '../lib/foldUtils';
 import { getLineTextStyles, splitTokensByRanges } from '../lib/lineUtils';
 import { CodeLine } from './CodeLine';
 import { CodeToken } from './CodeToken';
@@ -13,6 +14,14 @@ export type TokenizedCodeLineProps = {
   showInlineGutter?: boolean;
   /** Line number to display (only shown when showInlineGutter is true) */
   lineNumber?: number;
+  /** Fold region starting at this line */
+  fold?: FoldRegion;
+  /** Whether the fold is collapsed */
+  isFoldCollapsed?: boolean;
+  /** Callback to toggle the fold */
+  onFoldToggle?: () => void;
+  /** Whether any folds exist */
+  hasFolds?: boolean;
 };
 
 /** Renders a line of tokenized code with syntax highlighting */
@@ -22,6 +31,10 @@ export const TokenizedCodeLine: FC<TokenizedCodeLineProps> = ({
   lineHeightClass,
   showInlineGutter,
   lineNumber,
+  fold,
+  isFoldCollapsed,
+  onFoldToggle,
+  hasFolds,
 }) => {
   const { colorClass } = getLineTextStyles(lineConfig);
   const ranges = lineConfig?.ranges;
@@ -35,6 +48,10 @@ export const TokenizedCodeLine: FC<TokenizedCodeLineProps> = ({
         lineHeightClass={lineHeightClass}
         showInlineGutter={showInlineGutter}
         lineNumber={lineNumber}
+        fold={fold}
+        isFoldCollapsed={isFoldCollapsed}
+        onFoldToggle={onFoldToggle}
+        hasFolds={hasFolds}
       >
         {enrichedTokens.map((token, i) => (
           <CodeToken
@@ -54,6 +71,10 @@ export const TokenizedCodeLine: FC<TokenizedCodeLineProps> = ({
       lineHeightClass={lineHeightClass}
       showInlineGutter={showInlineGutter}
       lineNumber={lineNumber}
+      fold={fold}
+      isFoldCollapsed={isFoldCollapsed}
+      onFoldToggle={onFoldToggle}
+      hasFolds={hasFolds}
     >
       {tokens.map((token, i) => (
         <CodeToken key={i} token={token} colorClass={colorClass} />

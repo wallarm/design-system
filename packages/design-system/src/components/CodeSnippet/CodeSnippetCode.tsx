@@ -2,8 +2,8 @@ import type { FC, HTMLAttributes, Ref } from 'react';
 import { useTestId } from '../../utils/testId';
 import { useCodeSnippet } from './hooks';
 import { CodeContent, CodeLine, TokenizedCodeLine } from './internal';
-import { FoldSummaryLine } from './internal/FoldSummaryLine';
 import type { DisplayItem } from './lib/foldUtils';
+import { getFoldSummaryLabel } from './lib/foldUtils';
 import { SIZE_LINE_HEIGHT_CLASSES } from './lib/lineStyles';
 import { splitTextByRanges } from './lib/lineUtils';
 
@@ -23,20 +23,54 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
     inlineGutter,
     showLineNumbers,
     visibleDisplayItems,
+    folds,
+    foldByStartLine,
+    collapsedFolds,
     toggleFold,
   } = useCodeSnippet();
 
   const lineHeightClass = SIZE_LINE_HEIGHT_CLASSES[size];
+  const hasFolds = folds.length > 0;
 
-  const renderFoldSummary = (item: Extract<DisplayItem, { type: 'fold-summary' }>) => (
-    <FoldSummaryLine
-      key={`fold-${item.fold.id}`}
-      fold={item.fold}
-      lineCount={item.lineCount}
-      lineHeightClass={lineHeightClass}
-      onToggle={() => toggleFold(item.fold.id)}
-    />
-  );
+  const getFoldProps = (lineNumber: number) => {
+    if (!inlineGutter || !hasFolds) return {};
+    const fold = foldByStartLine.get(lineNumber);
+    return {
+      fold,
+      isFoldCollapsed: fold ? collapsedFolds.has(fold.id) : undefined,
+      onFoldToggle: fold ? () => toggleFold(fold.id) : undefined,
+      hasFolds: true,
+    };
+  };
+
+  const renderFoldSummary = (item: Extract<DisplayItem, { type: 'fold-summary' }>) => {
+    const label = getFoldSummaryLabel(item.fold, item.lineCount);
+    return (
+      <CodeLine
+        key={`fold-${item.fold.id}`}
+        lineConfig={undefined}
+        lineHeightClass={lineHeightClass}
+        showInlineGutter={inlineGutter}
+        lineNumber={showLineNumbers ? item.fold.startLine : undefined}
+        fold={inlineGutter ? item.fold : undefined}
+        isFoldCollapsed={inlineGutter || undefined}
+        onFoldToggle={inlineGutter ? () => toggleFold(item.fold.id) : undefined}
+        hasFolds={inlineGutter && hasFolds}
+      >
+        <button
+          type='button'
+          className='inline-flex items-center cursor-pointer select-none'
+          aria-expanded={false}
+          aria-label={`Collapsed region: ${label}, ${item.lineCount} lines`}
+          onClick={() => toggleFold(item.fold.id)}
+        >
+          <span className='inline-flex items-center rounded-2 border border-border-secondary px-6 text-xs leading-sm text-text-secondary hover:text-text-primary transition-colors'>
+            {label}
+          </span>
+        </button>
+      </CodeLine>
+    );
+  };
 
   // Show loading state or plain code if tokens not ready
   if (isLoading || !tokens) {
@@ -57,6 +91,7 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
               lineHeightClass={lineHeightClass}
               showInlineGutter={inlineGutter}
               lineNumber={showLineNumbers ? item.lineNumber : undefined}
+              {...getFoldProps(item.lineNumber)}
             >
               {hasRanges
                 ? splitTextByRanges(line, ranges, lineConfig?.color).map((segment, i) => (
@@ -86,6 +121,7 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
             lineHeightClass={lineHeightClass}
             showInlineGutter={inlineGutter}
             lineNumber={showLineNumbers ? item.lineNumber : undefined}
+            {...getFoldProps(item.lineNumber)}
           />
         );
       })}

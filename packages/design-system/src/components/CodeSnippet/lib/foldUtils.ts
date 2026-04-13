@@ -7,7 +7,7 @@ export type FoldRegion = {
   endLine: number;
   /** Optional label for the collapsed summary. When omitted, auto-generated from line count. */
   label?: string;
-  /** Whether the fold starts collapsed. Default: true */
+  /** Whether the fold starts collapsed. Default: false */
   defaultCollapsed?: boolean;
 };
 
