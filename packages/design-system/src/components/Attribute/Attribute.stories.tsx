@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { Copy, Filter } from '../../icons';
 import { Badge } from '../Badge';
 import { Code } from '../Code';
 import { InlineCodeSnippet } from '../CodeSnippet';
@@ -8,6 +9,10 @@ import { Link } from '../Link';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
 import { Attribute, type AttributeProps } from './Attribute';
+import { AttributeActions } from './AttributeActions';
+import { AttributeActionsContent } from './AttributeActionsContent';
+import { AttributeActionsItem } from './AttributeActionsItem';
+import { AttributeActionsTarget } from './AttributeActionsTarget';
 import { AttributeLabel } from './AttributeLabel';
 import { AttributeLabelDescription } from './AttributeLabelDescription';
 import { AttributeLabelInfo } from './AttributeLabelInfo';
@@ -21,6 +26,10 @@ const meta = {
     AttributeLabelDescription,
     AttributeLabelInfo,
     AttributeValue,
+    AttributeActions,
+    AttributeActionsTarget,
+    AttributeActionsContent,
+    AttributeActionsItem,
   },
   parameters: {
     layout: 'centered',
@@ -297,6 +306,39 @@ export const Composition: StoryFn<AttributeProps> = () => (
             <IpAddress>192.168.1.1</IpAddress>
           </Ip>
         </IpList>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const WithActions: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute data-testid='attribute-with-actions'>
+      <AttributeLabel>Source IP</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Text size='sm'>142.198.167.52</Text>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              icon={<Filter />}
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              icon={<Copy />}
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
       </AttributeValue>
     </Attribute>
   </div>
