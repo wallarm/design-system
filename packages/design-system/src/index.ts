@@ -17,6 +17,14 @@ export {
 } from './components/Alert';
 export {
   Attribute,
+  AttributeActions,
+  AttributeActionsContent,
+  type AttributeActionsContentProps,
+  AttributeActionsItem,
+  type AttributeActionsItemProps,
+  type AttributeActionsProps,
+  AttributeActionsTarget,
+  type AttributeActionsTargetProps,
   AttributeLabel,
   AttributeLabelDescription,
   type AttributeLabelDescriptionProps,

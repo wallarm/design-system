@@ -1,4 +1,11 @@
 export { Attribute, type AttributeProps } from './Attribute';
+export { AttributeActions, type AttributeActionsProps } from './AttributeActions';
+export {
+  AttributeActionsContent,
+  type AttributeActionsContentProps,
+} from './AttributeActionsContent';
+export { AttributeActionsItem, type AttributeActionsItemProps } from './AttributeActionsItem';
+export { AttributeActionsTarget, type AttributeActionsTargetProps } from './AttributeActionsTarget';
 export { AttributeLabel, type AttributeLabelProps } from './AttributeLabel';
 export {
   AttributeLabelDescription,
