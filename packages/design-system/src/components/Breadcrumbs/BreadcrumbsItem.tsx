@@ -13,7 +13,7 @@ import { useTestId } from '../../utils/testId';
 const breadcrumbsItemVariants = cva(
   [
     'flex items-center gap-4 min-h-[20px] px-4 py-0 rounded-6',
-    'text-sm leading-5 whitespace-nowrap transition-colors font-sans-display',
+    'text-sm whitespace-nowrap transition-colors font-sans-display',
     'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
     'cursor-pointer',
   ],
