@@ -1,4 +1,5 @@
 @source "../components";
+@source "../icons";
 
 @import './colors/primary.css';
 @import './colors/secondary.css';
