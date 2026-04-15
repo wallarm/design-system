@@ -313,10 +313,10 @@ export const Composition: StoryFn<AttributeProps> = () => (
 
 export const WithActions: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
-    <Attribute data-testid='attribute-with-actions'>
+    <Attribute>
       <AttributeLabel>Source IP</AttributeLabel>
       <AttributeValue>
-        <AttributeActions>
+        <AttributeActions data-testid='attribute-with-actions'>
           <AttributeActionsTarget>
             <Text size='sm'>142.198.167.52</Text>
           </AttributeActionsTarget>

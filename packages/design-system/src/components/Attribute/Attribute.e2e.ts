@@ -44,7 +44,7 @@ test.describe('Component: Attribute', () => {
   });
 
   test.describe('Accessibility', () => {
-    test('Target should be keyboard-operable', async ({ page }) => {
+    test('Should open menu via keyboard Enter key', async ({ page }) => {
       await attributeStory.goto(page, 'WithActions');
       const target = page.getByTestId('attribute-with-actions--target');
       await target.focus();
