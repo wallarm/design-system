@@ -1,3 +1,7 @@
+## 0.24.0 (2026-04-15)
+
+* feat(attribute): add AttributeActions compound component (#86) ([6df945d](https://github.com/wallarm/design-system/commit/6df945d)), closes [#86](https://github.com/wallarm/design-system/issues/86)
+
 ## <small>0.23.3 (2026-04-13)</small>
 
 * test(code-snippet): Update screenshots ([fd286aa](https://github.com/wallarm/design-system/commit/fd286aa))
