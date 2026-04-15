@@ -81,13 +81,13 @@ test.describe('Component: Dialog', () => {
       await dialogStory.goto(page, 'Basic');
       await openDialog(page);
 
-      // Dispatch a pointerdown event on the backdrop to trigger Ark UI's
-      // closeOnInteractOutside. Normal clicks are blocked because <html>
-      // intercepts pointer events when a modal dialog is open (inert).
-      // dispatchEvent bypasses Playwright's actionability checks entirely.
+      // Force-click the backdrop corner to trigger Ark UI's DismissableLayer.
+      // A real pointerdown (trusted event) is required — synthetic events via
+      // dispatchEvent are ignored by the layer's listener. Position (10, 10)
+      // hits backdrop only, away from the centered dialog content.
       await page
         .locator('[data-scope="dialog"][data-part="backdrop"]')
-        .dispatchEvent('pointerdown');
+        .click({ force: true, position: { x: 10, y: 10 } });
       await expect(getDialogContent(page)).toBeHidden();
     });
 
