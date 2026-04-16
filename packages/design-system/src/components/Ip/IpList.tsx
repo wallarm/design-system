@@ -161,7 +161,7 @@ const IpListHorizontal: FC<IpListHorizontalProps> = ({
 };
 
 const IpListSeparator: FC = () => (
-  <span aria-hidden='true' className='text-text-muted select-none shrink-0'>
+  <span aria-hidden='true' className='text-text-tertiary select-none shrink-0'>
     ·
   </span>
 );
