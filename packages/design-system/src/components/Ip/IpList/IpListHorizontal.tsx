@@ -1,91 +1,26 @@
 import {
-  Children,
   type ComponentProps,
   type FC,
   Fragment,
   type ReactElement,
+  type ReactNode,
   type Ref,
 } from 'react';
-import { Slot } from '@radix-ui/react-slot';
-import { useOverflowItems } from '../../hooks';
-import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
-import { Badge } from '../Badge';
-import { Link } from '../Link';
-import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
-import { VStack } from '../Stack';
-import { checkHasCountry } from './utils/checkHasCountry';
+import { useOverflowItems } from '../../../hooks';
+import { cn } from '../../../utils/cn';
+import { Badge } from '../../Badge';
+import { Popover, PopoverContent, PopoverTrigger } from '../../Popover';
+import { VStack } from '../../Stack';
 
-type IpListNativeProps = ComponentProps<'div'>;
-
-type IpListType = 'vertical' | 'horizontal';
-
-interface IpListBaseProps {
-  ref?: Ref<HTMLDivElement>;
-  asChild?: boolean;
-  type?: IpListType;
-}
-
-export type IpListProps = IpListNativeProps & IpListBaseProps;
-
-export const IpList: FC<IpListProps> = ({
-  ref,
-  asChild = false,
-  type = 'vertical',
-  className,
-  children,
-  ...props
-}) => {
-  const testId = useTestId('list');
-  const items = Children.toArray(children);
-
-  if (items.length === 0) return null;
-
-  if (type === 'horizontal') {
-    return (
-      <IpListHorizontal ref={ref} testId={testId} items={items} className={className} {...props} />
-    );
-  }
-
-  const [first, ...rest] = items;
-  const Comp = asChild ? Slot : 'div';
-  const hasCountry = checkHasCountry(first);
-
-  return (
-    <Comp
-      {...props}
-      ref={ref}
-      data-slot='ip-list'
-      data-type='vertical'
-      data-testid={testId}
-      className={cn('flex flex-col min-w-0 max-w-full', className)}
-    >
-      {first}
-
-      {rest.length > 0 && (
-        <Popover>
-          <PopoverTrigger asChild>
-            <Link size='sm' type='muted' className={cn(hasCountry && 'ml-26')}>
-              +{rest.length} address{rest.length > 1 ? 'es' : ''}
-            </Link>
-          </PopoverTrigger>
-
-          <PopoverContent minHeight='auto' maxHeight='320px' minWidth='auto'>
-            <VStack gap={8}>{rest}</VStack>
-          </PopoverContent>
-        </Popover>
-      )}
-    </Comp>
-  );
-};
-
-interface IpListHorizontalProps extends ComponentProps<'div'> {
+export interface IpListHorizontalProps extends ComponentProps<'div'> {
   ref?: Ref<HTMLDivElement>;
   testId?: string;
-  items: ReturnType<typeof Children.toArray>;
+  items: ReactNode[];
 }
 
-const IpListHorizontal: FC<IpListHorizontalProps> = ({
+const OVERFLOW_RESERVE_SPACE = 56;
+
+export const IpListHorizontal: FC<IpListHorizontalProps> = ({
   ref,
   testId,
   items,
@@ -101,10 +36,10 @@ const IpListHorizontal: FC<IpListHorizontalProps> = ({
           +{hidden.length}
         </Badge>
       ) as ReactElement,
-    reserveSpace: 56,
+    reserveSpace: OVERFLOW_RESERVE_SPACE,
   });
 
-  const overflowTestId = testId ? `${testId}-overflow-trigger` : undefined;
+  const overflowTriggerTestId = testId ? `${testId}-overflow-trigger` : undefined;
   const overflowContentTestId = testId ? `${testId}-overflow-content` : undefined;
 
   return (
@@ -139,7 +74,7 @@ const IpListHorizontal: FC<IpListHorizontalProps> = ({
                   color='slate'
                   size='medium'
                   className='shrink-0 cursor-pointer'
-                  data-testid={overflowTestId}
+                  data-testid={overflowTriggerTestId}
                 >
                   +{hiddenItems.length}
                 </Badge>
@@ -159,6 +94,8 @@ const IpListHorizontal: FC<IpListHorizontalProps> = ({
     </>
   );
 };
+
+IpListHorizontal.displayName = 'IpListHorizontal';
 
 const IpListSeparator: FC = () => (
   <span aria-hidden='true' className='text-text-tertiary select-none shrink-0'>
