@@ -1,3 +1,8 @@
+## <small>0.24.1 (2026-04-16)</small>
+
+* fix(code-snippet): WDS-72 visual fixes. Delete border, add italic ([c24d251](https://github.com/wallarm/design-system/commit/c24d251))
+* fix(icons): Icon sizes generation ([5784f41](https://github.com/wallarm/design-system/commit/5784f41))
+
 ## 0.24.0 (2026-04-15)
 
 * feat(attribute): add AttributeActions compound component (#86) ([6df945d](https://github.com/wallarm/design-system/commit/6df945d)), closes [#86](https://github.com/wallarm/design-system/issues/86)
