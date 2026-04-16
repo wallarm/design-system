@@ -36,7 +36,7 @@ test.describe('Ip Component', () => {
     await ipStory.goto(page, 'Horizontal Multiple');
 
     const trigger = page.locator(
-      '[data-slot="ip-list"][data-type="horizontal"] [data-slot="badge"]',
+      '[data-slot="ip-list"][data-type="horizontal"] [data-scope="popover"][data-part="trigger"]',
     );
     await trigger.click();
 
