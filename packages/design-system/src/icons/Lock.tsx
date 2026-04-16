@@ -3,26 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const Lock: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <rect
-      width='18'
-      height='11'
-      x='3'
-      y='11'
-      rx='2'
-      ry='2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M7 11V7a5 5 0 0 1 10 0v4'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M20 13C20 12.4477 19.5523 12 19 12H5C4.44772 12 4 12.4477 4 13V20C4 20.5523 4.44772 21 5 21H19C19.5523 21 20 20.5523 20 20V13ZM16 7C16 5.93913 15.5783 4.92202 14.8281 4.17188C14.078 3.42173 13.0609 3 12 3C10.9391 3 9.92202 3.42173 9.17188 4.17188C8.42173 4.92202 8 5.93913 8 7V10H16V7ZM18 10H19C20.6569 10 22 11.3431 22 13V20C22 21.6569 20.6569 23 19 23H5C3.34315 23 2 21.6569 2 20V13C2 11.3431 3.34315 10 5 10H6V7C6 5.4087 6.63259 3.88303 7.75781 2.75781C8.88303 1.63259 10.4087 1 12 1C13.5913 1 15.117 1.63259 16.2422 2.75781C17.3674 3.88303 18 5.4087 18 7V10Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

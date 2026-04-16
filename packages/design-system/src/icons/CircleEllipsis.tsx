@@ -4,42 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const CircleEllipsis: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10z'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='12'
-      cy='12'
-      r='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='19'
-      cy='12'
-      r='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='5'
-      cy='12'
-      r='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M12 1C18.0751 1 23 5.92487 23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1ZM12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12C21 7.02944 16.9706 3 12 3ZM7.00977 11C7.56205 11 8.00977 11.4477 8.00977 12C8.00977 12.5523 7.56205 13 7.00977 13H7C6.44772 13 6 12.5523 6 12C6 11.4477 6.44772 11 7 11H7.00977ZM12.0098 11C12.5621 11 13.0098 11.4477 13.0098 12C13.0098 12.5523 12.5621 13 12.0098 13H12C11.4477 13 11 12.5523 11 12C11 11.4477 11.4477 11 12 11H12.0098ZM17.0098 11C17.562 11 18.0098 11.4477 18.0098 12C18.0098 12.5523 17.562 13 17.0098 13H17C16.4477 13 16 12.5523 16 12C16 11.4477 16.4477 11 17 11H17.0098Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

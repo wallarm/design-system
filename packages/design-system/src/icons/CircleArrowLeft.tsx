@@ -3,31 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const CircleArrowLeft: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <circle
-      cx='12'
-      cy='12'
-      r='10'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M12 8l-4 4 4 4'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M16 12H8'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12ZM11.293 7.29297C11.6835 6.90244 12.3165 6.90244 12.707 7.29297C13.0976 7.68349 13.0976 8.31651 12.707 8.70703L10.4141 11H16C16.5523 11 17 11.4477 17 12C17 12.5523 16.5523 13 16 13H10.4141L12.707 15.293C13.0976 15.6835 13.0976 16.3165 12.707 16.707C12.3165 17.0976 11.6835 17.0976 11.293 16.707L7.29297 12.707C6.90244 12.3165 6.90244 11.6835 7.29297 11.293L11.293 7.29297ZM23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

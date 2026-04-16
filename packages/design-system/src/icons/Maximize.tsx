@@ -4,36 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const Maximize: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M8 3H5a2 2 0 0 0-2 2v3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M16 3h3a2 2 0 0 1 2 2v3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M3 16v3a2 2 0 0 0 2 2h3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M21 16v3a2 2 0 0 1-2 2h-3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M2 19V16C2 15.4477 2.44772 15 3 15C3.55228 15 4 15.4477 4 16V19C4 19.2652 4.10543 19.5195 4.29297 19.707C4.48051 19.8946 4.73478 20 5 20H8C8.55228 20 9 20.4477 9 21C9 21.5523 8.55228 22 8 22H5C4.20435 22 3.44151 21.6837 2.87891 21.1211C2.3163 20.5585 2 19.7957 2 19ZM20 19V16C20 15.4477 20.4477 15 21 15C21.5523 15 22 15.4477 22 16V19C22 19.7957 21.6837 20.5585 21.1211 21.1211C20.5585 21.6837 19.7957 22 19 22H16C15.4477 22 15 21.5523 15 21C15 20.4477 15.4477 20 16 20H19C19.2652 20 19.5195 19.8946 19.707 19.707C19.8946 19.5195 20 19.2652 20 19ZM2 8V5C2 4.20435 2.3163 3.44152 2.87891 2.87891C3.44152 2.3163 4.20435 2 5 2H8C8.55228 2 9 2.44772 9 3C9 3.55228 8.55228 4 8 4H5C4.73478 4 4.4805 4.10543 4.29297 4.29297C4.10543 4.4805 4 4.73478 4 5V8C4 8.55228 3.55228 9 3 9C2.44772 9 2 8.55228 2 8ZM20 8V5C20 4.73478 19.8946 4.48051 19.707 4.29297C19.5195 4.10543 19.2652 4 19 4H16C15.4477 4 15 3.55228 15 3C15 2.44772 15.4477 2 16 2H19C19.7957 2 20.5585 2.3163 21.1211 2.87891C21.6837 3.44151 22 4.20435 22 5V8C22 8.55228 21.5523 9 21 9C20.4477 9 20 8.55228 20 8Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

@@ -3,37 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const PanelRightOpen: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <rect
-      width='7'
-      height='18'
-      x='3'
-      y='3'
-      rx='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <rect
-      width='7'
-      height='18'
-      x='14'
-      y='3'
-      rx='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='m7 10-3 3 3 3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M20 5C20 4.44771 19.5523 4 19 4H16V20H19C19.5523 20 20 19.5523 20 19V5ZM9.29297 8.29297C9.68349 7.90244 10.3165 7.90244 10.707 8.29297C11.0976 8.68349 11.0976 9.31651 10.707 9.70703L8.41406 12L10.707 14.293C11.0976 14.6835 11.0976 15.3165 10.707 15.707C10.3165 16.0976 9.68349 16.0976 9.29297 15.707L6.29297 12.707C5.90244 12.3165 5.90244 11.6835 6.29297 11.293L9.29297 8.29297ZM4 19C4 19.5523 4.44771 20 5 20H14V4H5C4.44772 4 4 4.44772 4 5V19ZM22 19C22 20.6569 20.6569 22 19 22H5C3.34315 22 2 20.6569 2 19V5C2 3.34315 3.34315 2 5 2H19C20.6569 2 22 3.34315 22 5V19Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );
