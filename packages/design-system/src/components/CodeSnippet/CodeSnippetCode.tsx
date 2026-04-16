@@ -64,7 +64,7 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
           aria-label={`Collapsed region: ${label}, ${item.lineCount} lines`}
           onClick={() => toggleFold(item.fold.id)}
         >
-          <span className='inline-flex items-center rounded-2 border border-border-secondary px-6 text-xs leading-sm text-text-secondary hover:text-text-primary transition-colors'>
+          <span className='inline-flex items-center italic text-text-secondary hover:text-text-primary transition-colors'>
             {label}
           </span>
         </button>
