@@ -1,8 +1,8 @@
 import type { FC, HTMLAttributes } from 'react';
 import type { CheckboxCheckedState } from '@ark-ui/react/checkbox';
-import { Check, CheckboxIndeterminate } from '../../icons';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
+import { CheckIcon, IndeterminateIcon } from './icons';
 
 type CheckmarkNativeProps = HTMLAttributes<HTMLDivElement>;
 
@@ -54,9 +54,9 @@ export const Checkmark: FC<CheckmarkProps> = ({ checkedState = false, ...props }
     {...props}
   >
     {checkedState === 'indeterminate' ? (
-      <CheckboxIndeterminate />
+      <IndeterminateIcon />
     ) : checkedState ? (
-      <Check />
+      <CheckIcon />
     ) : (
       false
     )}
