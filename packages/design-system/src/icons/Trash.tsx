@@ -4,28 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const Trash: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M3 6h18'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M18 7H6V20C6 20.1748 6.09738 20.4333 6.33203 20.668C6.56669 20.9026 6.82523 21 7 21H17C17.1748 21 17.4333 20.9026 17.668 20.668C17.9026 20.4333 18 20.1748 18 20V7ZM15 4C15 3.82523 14.9026 3.56669 14.668 3.33203C14.4333 3.09738 14.1748 3 14 3H10C9.82523 3 9.56669 3.09738 9.33203 3.33203C9.09738 3.56669 9 3.82523 9 4V5H15V4ZM17 5H21C21.5523 5 22 5.44772 22 6C22 6.55228 21.5523 7 21 7H20V20C20 20.8252 19.5974 21.5667 19.082 22.082C18.5667 22.5974 17.8252 23 17 23H7C6.17477 23 5.43331 22.5974 4.91797 22.082C4.40262 21.5667 4 20.8252 4 20V7H3C2.44772 7 2 6.55228 2 6C2 5.44772 2.44772 5 3 5H7V4C7 3.17477 7.40262 2.43331 7.91797 1.91797C8.43331 1.40262 9.17477 1 10 1H14C14.8252 1 15.5667 1.40262 16.082 1.91797C16.5974 2.43331 17 3.17477 17 4V5Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

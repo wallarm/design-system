@@ -4,20 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const X: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M18 6 6 18'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='m6 6 12 12'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M17.293 5.29297C17.6835 4.90245 18.3165 4.90245 18.707 5.29297C19.0975 5.68349 19.0975 6.31651 18.707 6.70703L13.414 12L18.707 17.293C19.0975 17.6835 19.0975 18.3165 18.707 18.707C18.3165 19.0976 17.6835 19.0976 17.293 18.707L12 13.4141L6.70702 18.707C6.31649 19.0976 5.68348 19.0976 5.29295 18.707C4.90243 18.3165 4.90243 17.6835 5.29295 17.293L10.5859 12L5.29295 6.70703C4.90243 6.31651 4.90243 5.68349 5.29295 5.29297C5.68348 4.90245 6.31649 4.90245 6.70702 5.29297L12 10.5859L17.293 5.29297Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

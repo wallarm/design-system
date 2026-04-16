@@ -4,20 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const Home: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <polyline
-      points='9,22 9,12 15,12 15,22'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M15 11C15.5523 11 16 11.4477 16 12V21H19C19.2652 21 19.5195 20.8946 19.707 20.707C19.8946 20.5195 20 20.2652 20 20V9.48828L12 3.2666L4 9.48828V20C4 20.2652 4.10543 20.5195 4.29297 20.707C4.48051 20.8946 4.73478 21 5 21H8V12C8 11.4477 8.44772 11 9 11H15ZM10 21H14V13H10V21ZM22 20C22 20.7957 21.6837 21.5585 21.1211 22.1211C20.5585 22.6837 19.7957 23 19 23H5C4.20435 23 3.44151 22.6837 2.87891 22.1211C2.3163 21.5585 2 20.7957 2 20V9C2 8.69155 2.14236 8.4004 2.38574 8.21094L11.3857 1.21094C11.7469 0.930074 12.2531 0.930074 12.6143 1.21094L21.6143 8.21094C21.8576 8.4004 22 8.69155 22 9V20Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

@@ -3,33 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const ZoomOut: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <circle
-      cx='11'
-      cy='11'
-      r='8'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M21 21l-4.35-4.35'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <line
-      x1='8'
-      x2='14'
-      y1='11'
-      y2='11'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
+      d='M18 11C18 7.13401 14.866 4 11 4C7.13401 4 4 7.13401 4 11C4 14.866 7.13401 18 11 18C12.89 18 14.6038 17.2497 15.8633 16.0322C15.8877 16.0012 15.9138 15.971 15.9424 15.9424C15.971 15.9138 16.0012 15.8877 16.0322 15.8633C17.2497 14.6038 18 12.89 18 11ZM14 10C14.5523 10 15 10.4477 15 11C15 11.5523 14.5523 12 14 12H8C7.44772 12 7 11.5523 7 11C7 10.4477 7.44772 10 8 10H14ZM20 11C20 13.1247 19.2616 15.0757 18.0303 16.6152L21.707 20.293C22.0975 20.6835 22.0975 21.3165 21.707 21.707C21.3165 22.0975 20.6835 22.0975 20.293 21.707L16.6152 18.0303C15.0757 19.2616 13.1247 20 11 20C6.02944 20 2 15.9706 2 11C2 6.02944 6.02944 2 11 2C15.9706 2 20 6.02944 20 11Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

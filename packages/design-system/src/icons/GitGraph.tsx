@@ -3,59 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const GitGraph: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <circle
-      cx='5'
-      cy='6'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M5 9v6'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='5'
-      cy='18'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M12 3v18'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='19'
-      cy='6'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M16 15.7A9 9 0 0 0 19 9'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M7 18C7 16.8954 6.10457 16 5 16C3.89543 16 3 16.8954 3 18C3 19.1046 3.89543 20 5 20C6.10457 20 7 19.1046 7 18ZM11 21V3C11 2.44772 11.4477 2 12 2C12.5523 2 13 2.44772 13 3V21C13 21.5523 12.5523 22 12 22C11.4477 22 11 21.5523 11 21ZM21 6C21 4.89543 20.1046 4 19 4C17.8954 4 17 4.89543 17 6C17 7.10457 17.8954 8 19 8C20.1046 8 21 7.10457 21 6ZM7 6C7 4.89543 6.10457 4 5 4C3.89543 4 3 4.89543 3 6C3 7.10457 3.89543 8 5 8C6.10457 8 7 7.10457 7 6ZM9 6C9 7.86384 7.72523 9.42998 6 9.87402V14.126C7.72523 14.57 9 16.1362 9 18C9 20.2091 7.20914 22 5 22C2.79086 22 1 20.2091 1 18C1 16.1362 2.27477 14.57 4 14.126V9.87402C2.27477 9.42998 1 7.86384 1 6C1 3.79086 2.79086 2 5 2C7.20914 2 9 3.79086 9 6ZM23 6C23 7.87953 21.7034 9.45512 19.9561 9.88379C19.8574 10.9852 19.5805 12.0651 19.127 13.0781C18.5526 14.3608 17.7144 15.5084 16.667 16.4453C16.2553 16.8135 15.6231 16.7779 15.2549 16.3662C14.8869 15.9547 14.9218 15.3233 15.333 14.9551C16.171 14.2055 16.8423 13.2869 17.3018 12.2607C17.6433 11.4979 17.8618 10.6877 17.9521 9.86035C16.2514 9.3998 15 7.84647 15 6C15 3.79086 16.7909 2 19 2C21.2091 2 23 3.79086 23 6Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

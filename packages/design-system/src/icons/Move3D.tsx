@@ -4,36 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const Move3D: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M5 3v16h16'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M2 21 22 1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M9 2 7 6l-4-2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M21 14 18 22l-2-4'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M4.36914 2.22462C4.76192 1.90427 5.34092 1.92686 5.70703 2.29298L8.70703 5.29298C9.09756 5.6835 9.09756 6.31652 8.70703 6.70704C8.31651 7.09757 7.68349 7.09757 7.29297 6.70704L6 5.41407V16.5859L10.293 12.293C10.6835 11.9025 11.3165 11.9025 11.707 12.293C12.0976 12.6835 12.0976 13.3165 11.707 13.707L7.41406 18H18.5859L17.293 16.707C16.9024 16.3165 16.9024 15.6835 17.293 15.293C17.6835 14.9025 18.3165 14.9025 18.707 15.293L21.707 18.293C22.0976 18.6835 22.0976 19.3165 21.707 19.707L18.707 22.707C18.3165 23.0976 17.6835 23.0976 17.293 22.707C16.9024 22.3165 16.9024 21.6835 17.293 21.293L18.5859 20H5C4.44772 20 4 19.5523 4 19V5.41407L2.70703 6.70704C2.31651 7.09757 1.68349 7.09757 1.29297 6.70704C0.902445 6.31652 0.902445 5.6835 1.29297 5.29298L4.29297 2.29298L4.36914 2.22462Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

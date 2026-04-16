@@ -3,13 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const Filter: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <polygon
-      points='22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+    <path
+      d='M22 2C22.3893 2 22.7434 2.22594 22.9072 2.5791C23.071 2.93219 23.0149 3.34825 22.7637 3.64551L15 12.8252V21C15 21.3466 14.8202 21.6684 14.5254 21.8506C14.2306 22.0327 13.8626 22.0495 13.5527 21.8945L9.55274 19.8945C9.21395 19.7251 9 19.3788 9 19V12.8252L1.23633 3.64551C0.985067 3.34825 0.928964 2.93219 1.09278 2.5791C1.25663 2.22594 1.61068 2 2 2H22ZM10.7637 11.8145C10.9162 11.9949 11 12.2236 11 12.46V18.3818L13 19.3818V12.46C13 12.2236 13.0838 11.9949 13.2363 11.8145L19.8447 4H4.15528L10.7637 11.8145Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

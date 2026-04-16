@@ -3,57 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const GitPullRequestArrow: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <circle
-      cx='5'
-      cy='6'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M5 9v12'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='m15 9-3-3 3-3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M12 6h5a2 2 0 0 1 2 2v3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M19 15v6'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='19'
-      cy='18'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M7 6C7 4.89543 6.10457 4 5 4C3.89543 4 3 4.89543 3 6C3 7.10457 3.89543 8 5 8C6.10457 8 7 7.10457 7 6ZM21 18C21 16.8954 20.1046 16 19 16C17.8954 16 17 16.8954 17 18C17 19.1046 17.8954 20 19 20C20.1046 20 21 19.1046 21 18ZM23 18C23 20.2091 21.2091 22 19 22C16.7909 22 15 20.2091 15 18C15 16.1362 16.2748 14.57 18 14.126V8C18 7.73478 17.8946 7.48051 17.707 7.29297C17.5429 7.12883 17.3276 7.02757 17.0986 7.00488L17 7H14.4141L15.707 8.29297C16.0976 8.68349 16.0976 9.31651 15.707 9.70703C15.3165 10.0976 14.6835 10.0976 14.293 9.70703L11.293 6.70703C10.9024 6.31651 10.9024 5.68349 11.293 5.29297L14.293 2.29297C14.6835 1.90244 15.3165 1.90244 15.707 2.29297C16.0976 2.68349 16.0976 3.31651 15.707 3.70703L14.4141 5H17C17.7957 5 18.5585 5.3163 19.1211 5.87891C19.6837 6.44151 20 7.20435 20 8V14.126C21.7252 14.57 23 16.1362 23 18ZM9 6C9 7.86384 7.72523 9.42998 6 9.87402V21C6 21.5523 5.55228 22 5 22C4.44772 22 4 21.5523 4 21V9.87402C2.27477 9.42998 1 7.86384 1 6C1 3.79086 2.79086 2 5 2C7.20914 2 9 3.79086 9 6Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

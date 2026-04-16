@@ -4,36 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const RefreshCcw: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M21 3v5h-5'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M8 16H3v5'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M20 12C20 9.87827 19.1575 7.84306 17.6572 6.34277C16.1574 4.84294 14.123 4.00052 12.002 4C9.74462 4.00896 7.57808 4.88999 5.95508 6.45898L5.41406 7H8C8.55228 7 9 7.44772 9 8C9 8.55228 8.55228 9 8 9H3C2.44772 9 2 8.55228 2 8V3C2 2.44772 2.44772 2 3 2C3.55228 2 4 2.44772 4 3V5.58594L4.55273 5.0332L4.94629 4.66992C6.89242 2.96203 9.39524 2.00982 11.9961 2H12L12.4961 2.0127C14.9676 2.13537 17.3132 3.17061 19.0713 4.92871C20.9467 6.80407 22 9.34784 22 12C22 12.5523 21.5523 13 21 13C20.4477 13 20 12.5523 20 12ZM22 21C22 21.5523 21.5523 22 21 22C20.4477 22 20 21.5523 20 21V18.4141L19.4473 18.9668L19.0537 19.3301C17.1076 21.038 14.6048 21.9902 12.0039 22H12C9.34784 22 6.80407 20.9467 4.92871 19.0713C3.05335 17.1959 2 14.6522 2 12C2 11.4477 2.44772 11 3 11C3.55228 11 4 11.4477 4 12C4 14.1217 4.84248 16.1569 6.34277 17.6572C7.84237 19.1568 9.8764 19.9982 11.9971 19.999C14.2548 19.9903 16.4217 19.1102 18.0449 17.541L18.5859 17H16C15.4477 17 15 16.5523 15 16C15 15.4477 15.4477 15 16 15H21C21.5523 15 22 15.4477 22 16V21Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

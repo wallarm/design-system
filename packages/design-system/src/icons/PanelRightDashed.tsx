@@ -3,49 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const PanelRightDashed: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <rect
-      width='18'
-      height='18'
-      x='3'
-      y='3'
-      rx='2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M15 14v1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M15 19v2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M15 3v2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M15 9v1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M14 15V14C14 13.4477 14.4477 13 15 13C15.5523 13 16 13.4477 16 14V15C16 15.5523 15.5523 16 15 16C14.4477 16 14 15.5523 14 15ZM14 10V9C14 8.44772 14.4477 8 15 8C15.5523 8 16 8.44772 16 9V10C16 10.5523 15.5523 11 15 11C14.4477 11 14 10.5523 14 10ZM14 5V4H5C4.44772 4 4 4.44772 4 5V19C4 19.5523 4.44771 20 5 20H14V19C14 18.4477 14.4477 18 15 18C15.5523 18 16 18.4477 16 19V20H19C19.5523 20 20 19.5523 20 19V5C20 4.44771 19.5523 4 19 4H16V5C16 5.55228 15.5523 6 15 6C14.4477 6 14 5.55228 14 5ZM22 19C22 20.6569 20.6569 22 19 22H5C3.34315 22 2 20.6569 2 19V5C2 3.34315 3.34315 2 5 2H19C20.6569 2 22 3.34315 22 5V19Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

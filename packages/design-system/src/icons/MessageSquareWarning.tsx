@@ -4,28 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const MessageSquareWarning: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M12 7v2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M12 13h.01'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M20 5C20 4.73478 19.8946 4.48051 19.707 4.29297C19.5195 4.10543 19.2652 4 19 4H5C4.73478 4 4.4805 4.10543 4.29297 4.29297C4.10543 4.4805 4 4.73478 4 5V18.5859L6.29297 16.293L6.36621 16.2266C6.54417 16.0807 6.76791 16 7 16H19C19.2652 16 19.5195 15.8946 19.707 15.707C19.8946 15.5195 20 15.2652 20 15V5ZM12.0098 12C12.5621 12 13.0098 12.4477 13.0098 13C13.0098 13.5523 12.5621 14 12.0098 14H12C11.4477 14 11 13.5523 11 13C11 12.4477 11.4477 12 12 12H12.0098ZM11 9V7C11 6.44772 11.4477 6 12 6C12.5523 6 13 6.44772 13 7V9C13 9.55228 12.5523 10 12 10C11.4477 10 11 9.55228 11 9ZM22 15C22 15.7957 21.6837 16.5585 21.1211 17.1211C20.5585 17.6837 19.7957 18 19 18H7.41406L3.70703 21.707C3.42103 21.993 2.99086 22.0786 2.61719 21.9238C2.24359 21.769 2 21.4044 2 21V5C2 4.20435 2.3163 3.44152 2.87891 2.87891C3.44152 2.3163 4.20435 2 5 2H19C19.7957 2 20.5585 2.3163 21.1211 2.87891C21.6837 3.44151 22 4.20435 22 5V15Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

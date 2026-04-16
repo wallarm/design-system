@@ -4,20 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const ArrowBigUpDash: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M9 19h6v-6h4l-7-7-7 7h4v6Z'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M9 22h6'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M15 18C15.5523 18 16 18.4477 16 19C16 19.5523 15.5523 20 15 20H9C8.44772 20 8 19.5523 8 19C8 18.4477 8.44772 18 9 18H15ZM11.3691 4.22462C11.7619 3.90427 12.3409 3.92686 12.707 4.29298L19.707 11.293C19.993 11.579 20.0786 12.0091 19.9238 12.3828C19.769 12.7564 19.4044 13 19 13H16V15C16 15.5523 15.5523 16 15 16H9C8.44772 16 8 15.5523 8 15V13H5C4.59559 13 4.23099 12.7564 4.07617 12.3828C3.92139 12.0091 4.00697 11.579 4.29297 11.293L11.293 4.29298L11.3691 4.22462ZM7.41406 11H9C9.55229 11 10 11.4477 10 12V14H14V12C14 11.4477 14.4477 11 15 11H16.5859L12 6.41407L7.41406 11Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

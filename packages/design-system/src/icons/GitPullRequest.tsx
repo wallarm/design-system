@@ -3,41 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const GitPullRequest: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <circle
-      cx='18'
-      cy='18'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='6'
-      cy='6'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M13 6h3a2 2 0 0 1 2 2v7'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M6 9v12'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M8 6C8 4.89543 7.10457 4 6 4C4.89543 4 4 4.89543 4 6C4 7.10457 4.89543 8 6 8C7.10457 8 8 7.10457 8 6ZM20 18C20 16.8954 19.1046 16 18 16C16.8954 16 16 16.8954 16 18C16 19.1046 16.8954 20 18 20C19.1046 20 20 19.1046 20 18ZM22 18C22 20.2091 20.2091 22 18 22C15.7909 22 14 20.2091 14 18C14 16.1362 15.2748 14.57 17 14.126V8C17 7.73478 16.8946 7.48051 16.707 7.29297C16.5429 7.12883 16.3276 7.02757 16.0986 7.00488L16 7H13C12.4477 7 12 6.55228 12 6C12 5.44772 12.4477 5 13 5H16C16.7956 5 17.5585 5.3163 18.1211 5.87891C18.6837 6.44151 19 7.20435 19 8V14.126C20.7252 14.57 22 16.1362 22 18ZM10 6C10 7.86384 8.72523 9.42998 7 9.87402V21C7 21.5523 6.55228 22 6 22C5.44772 22 5 21.5523 5 21V9.87402C3.27477 9.42998 2 7.86384 2 6C2 3.79086 3.79086 2 6 2C8.20914 2 10 3.79086 10 6Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

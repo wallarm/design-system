@@ -3,53 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const LayoutDashboard: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <rect
-      width='7'
-      height='9'
-      x='3'
-      y='3'
-      rx='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <rect
-      width='7'
-      height='5'
-      x='14'
-      y='3'
-      rx='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <rect
-      width='7'
-      height='9'
-      x='14'
-      y='12'
-      rx='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <rect
-      width='7'
-      height='5'
-      x='3'
-      y='16'
-      rx='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+    <path
+      d='M4 17V20H9V17H4ZM15 13V20H20V13H15ZM4 4V11H9V4H4ZM15 4V7H20V4H15ZM11 20C11 21.1046 10.1046 22 9 22H4C2.89543 22 2 21.1046 2 20V17C2 15.8954 2.89543 15 4 15H9C10.1046 15 11 15.8954 11 17V20ZM22 20C22 21.1046 21.1046 22 20 22H15C13.8954 22 13 21.1046 13 20V13C13 11.8954 13.8954 11 15 11H20C21.1046 11 22 11.8954 22 13V20ZM11 11C11 12.1046 10.1046 13 9 13H4C2.89543 13 2 12.1046 2 11V4C2 2.89543 2.89543 2 4 2H9C10.1046 2 11 2.89543 11 4V11ZM22 7C22 8.10457 21.1046 9 20 9H15C13.8954 9 13 8.10457 13 7V4C13 2.89543 13.8954 2 15 2H20C21.1046 2 22 2.89543 22 4V7Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );
