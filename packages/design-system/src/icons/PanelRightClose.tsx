@@ -3,33 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const PanelRightClose: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <rect
-      width='18'
-      height='18'
-      x='3'
-      y='3'
-      rx='2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M15 3v18'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='m8 9 3 3-3 3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M20 5C20 4.44771 19.5523 4 19 4H16V20H19C19.5523 20 20 19.5523 20 19V5ZM7.29297 8.29297C7.68349 7.90244 8.31651 7.90244 8.70703 8.29297L11.707 11.293C12.0976 11.6835 12.0976 12.3165 11.707 12.707L8.70703 15.707C8.31651 16.0976 7.68349 16.0976 7.29297 15.707C6.90244 15.3165 6.90244 14.6835 7.29297 14.293L9.58594 12L7.29297 9.70703C6.90244 9.31651 6.90244 8.68349 7.29297 8.29297ZM4 19C4 19.5523 4.44771 20 5 20H14V4H5C4.44772 4 4 4.44772 4 5V19ZM22 19C22 20.6569 20.6569 22 19 22H5C3.34315 22 2 20.6569 2 19V5C2 3.34315 3.34315 2 5 2H19C20.6569 2 22 3.34315 22 5V19Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

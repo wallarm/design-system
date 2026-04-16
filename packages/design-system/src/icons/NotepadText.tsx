@@ -4,64 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const NotepadText: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M8 2v4'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M12 2v4'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M16 2v4'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <rect
-      width='16'
-      height='18'
-      x='4'
-      y='4'
-      rx='2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M8 10h6'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M8 14h8'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M8 18h5'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M13 17C13.5523 17 14 17.4477 14 18C14 18.5523 13.5523 19 13 19H8C7.44772 19 7 18.5523 7 18C7 17.4477 7.44772 17 8 17H13ZM16 13C16.5523 13 17 13.4477 17 14C17 14.5523 16.5523 15 16 15H8C7.44772 15 7 14.5523 7 14C7 13.4477 7.44772 13 8 13H16ZM14 9C14.5523 9 15 9.44771 15 10C15 10.5523 14.5523 11 14 11H8C7.44772 11 7 10.5523 7 10C7 9.44771 7.44772 9 8 9H14ZM15 6V5H13V6C13 6.55228 12.5523 7 12 7C11.4477 7 11 6.55228 11 6V5H9V6C9 6.55228 8.55228 7 8 7C7.44772 7 7 6.55228 7 6V5H6C5.44772 5 5 5.44772 5 6V20C5 20.5523 5.44771 21 6 21H18C18.5523 21 19 20.5523 19 20V6C19 5.44772 18.5523 5 18 5H17V6C17 6.55228 16.5523 7 16 7C15.4477 7 15 6.55228 15 6ZM21 20C21 21.6569 19.6569 23 18 23H6C4.34315 23 3 21.6569 3 20V6C3 4.34315 4.34315 3 6 3H7V2C7 1.44772 7.44772 1 8 1C8.55228 1 9 1.44772 9 2V3H11V2C11 1.44772 11.4477 1 12 1C12.5523 1 13 1.44772 13 2V3H15V2C15 1.44772 15.4477 1 16 1C16.5523 1 17 1.44772 17 2V3H18C19.6569 3 21 4.34315 21 6V20Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

@@ -4,20 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const ChevronsRight: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='m13 17 5-5-5-5'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='m6 17 5-5-5-5'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M5.29297 6.29295C5.68349 5.90243 6.31651 5.90243 6.70703 6.29295L11.707 11.293C12.0976 11.6835 12.0976 12.3165 11.707 12.707L6.70703 17.707C6.31651 18.0975 5.68349 18.0975 5.29297 17.707C4.90245 17.3165 4.90245 16.6835 5.29297 16.293L9.58594 12L5.29297 7.70702C4.90245 7.31649 4.90245 6.68348 5.29297 6.29295ZM12.293 6.29295C12.6835 5.90243 13.3165 5.90243 13.707 6.29295L18.707 11.293C19.0976 11.6835 19.0976 12.3165 18.707 12.707L13.707 17.707C13.3165 18.0975 12.6835 18.0975 12.293 17.707C11.9024 17.3165 11.9024 16.6835 12.293 16.293L16.5859 12L12.293 7.70702C11.9024 7.31649 11.9024 6.68348 12.293 6.29295Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

@@ -3,49 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const LibraryBig: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <rect
-      width='8'
-      height='18'
-      x='3'
-      y='3'
-      rx='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='m7 3 .2 3a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L19 3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <rect
-      width='2'
-      height='14'
-      x='13'
-      y='7'
-      rx='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <rect
-      width='2'
-      height='10'
-      x='17'
-      y='11'
-      rx='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M10 4H8V20H10V4ZM12.0703 4.72852C12.0686 4.72967 12.0661 4.73283 12.0625 4.73633C12.0547 4.74391 12.0471 4.75355 12.042 4.76367L17.5303 19.9307C17.5315 19.9324 17.5334 19.9347 17.5361 19.9375C17.5438 19.9455 17.5541 19.9529 17.5645 19.958L19.4287 19.2705C19.4303 19.2695 19.4335 19.2676 19.4375 19.2637C19.4455 19.2559 19.4529 19.2458 19.458 19.2354L13.9717 4.07129C13.9707 4.06975 13.968 4.06677 13.9639 4.0625C13.956 4.0544 13.9461 4.04611 13.9355 4.04102L12.0703 4.72852ZM12 20C12 21.1046 11.1046 22 10 22H4C2.89543 22 2 21.1046 2 20V4C2 2.89543 2.89543 2 4 2H10C10.6438 2 11.2143 2.30587 11.5801 2.77832L13.2549 2.16211V2.16309C14.2573 1.77816 15.3114 2.31387 15.749 3.15527L15.8291 3.32812L15.8408 3.35938L21.3408 18.5596H21.3389C21.7458 19.6278 21.1089 20.754 20.1719 21.1289C20.1634 21.1323 20.1541 21.1355 20.1455 21.1387L18.2461 21.8379L18.2451 21.8359C17.1756 22.2466 16.0474 21.6101 15.6719 20.6719C15.6678 20.6617 15.6639 20.6509 15.6602 20.6406L12 10.5244V20ZM4 20H6V4H4V20Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

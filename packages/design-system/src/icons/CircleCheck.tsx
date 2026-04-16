@@ -4,20 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const CircleCheck: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M22 11.08V12a10 10 0 1 1-5.93-9.14'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='m9 11 3 3L22 4'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12ZM14.293 9.29297C14.6835 8.90244 15.3165 8.90244 15.707 9.29297C16.0976 9.68349 16.0976 10.3165 15.707 10.707L11.707 14.707C11.3165 15.0976 10.6835 15.0976 10.293 14.707L8.29297 12.707C7.90244 12.3165 7.90244 11.6835 8.29297 11.293C8.68349 10.9024 9.31651 10.9024 9.70703 11.293L11 12.5859L14.293 9.29297ZM23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

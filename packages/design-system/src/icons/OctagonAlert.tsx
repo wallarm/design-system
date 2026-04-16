@@ -3,33 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const OctagonAlert: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <polygon
-      points='7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <line
-      x1='12'
-      x2='12'
-      y1='8'
-      y2='12'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-    />
-    <line
-      x1='12'
-      x2='12.01'
-      y1='16'
-      y2='16'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
+    <path
+      d='M16.1396 1C16.4048 1 16.6592 1.10554 16.8467 1.29297L22.707 7.15332C22.8945 7.34084 23 7.59522 23 7.86035V16.1396C23 16.4048 22.8945 16.6592 22.707 16.8467L16.8467 22.707C16.6592 22.8945 16.4048 23 16.1396 23H7.86035C7.59522 23 7.34084 22.8945 7.15332 22.707L1.29297 16.8467C1.10554 16.6592 1 16.4048 1 16.1396V7.86035L1.00488 7.76074C1.02769 7.53206 1.12908 7.31729 1.29297 7.15332L7.15332 1.29297L7.22656 1.22656C7.40448 1.08084 7.62835 1 7.86035 1H16.1396ZM3 8.27441V15.7256L8.27441 21H15.7256L21 15.7256V8.27441L15.7256 3H8.27441L3 8.27441ZM12.0098 15C12.5621 15 13.0098 15.4477 13.0098 16C13.0098 16.5523 12.5621 17 12.0098 17H12C11.4477 17 11 16.5523 11 16C11 15.4477 11.4477 15 12 15H12.0098ZM11 12V8C11 7.44772 11.4477 7 12 7C12.5523 7 13 7.44772 13 8V12C13 12.5523 12.5523 13 12 13C11.4477 13 11 12.5523 11 12Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

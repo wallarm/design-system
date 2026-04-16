@@ -3,33 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const GitMerge: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <circle
-      cx='18'
-      cy='18'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='6'
-      cy='6'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M6 21V9a9 9 0 0 0 9 9'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M20 18C20 16.8954 19.1046 16 18 16C16.8954 16 16 16.8954 16 18C16 19.1046 16.8954 20 18 20C19.1046 20 20 19.1046 20 18ZM8 6C8 4.89543 7.10457 4 6 4C4.89543 4 4 4.89543 4 6C4 7.10457 4.89543 8 6 8C7.10457 8 8 7.10457 8 6ZM10 6C10 7.8468 8.74811 9.40011 7.04688 9.86035C7.24212 11.6657 8.04669 13.3611 9.34277 14.6572C10.6386 15.9531 12.3337 16.7567 14.1387 16.9521C14.5991 15.2513 16.1534 14 18 14C20.2091 14 22 15.7909 22 18C22 20.2091 20.2091 22 18 22C16.1211 22 14.5455 20.7044 14.1162 18.958C11.7881 18.7515 9.59456 17.7371 7.92871 16.0713C7.59177 15.7343 7.28254 15.3749 7 14.998V21C7 21.5523 6.55228 22 6 22C5.44772 22 5 21.5523 5 21V9.87402C3.27477 9.42998 2 7.86384 2 6C2 3.79086 3.79086 2 6 2C8.20914 2 10 3.79086 10 6Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

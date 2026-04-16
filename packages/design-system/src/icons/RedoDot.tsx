@@ -3,31 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const RedoDot: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <circle
-      cx='12'
-      cy='17'
-      r='1'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M21 7v6h-6'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M3 17a9 9 0 0 1 9-9 9 9 0 0 1 6 2.3l3 2.7'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M10 17C10 15.8954 10.8954 15 12 15C13.1046 15 14 15.8954 14 17C14 18.1046 13.1046 19 12 19C10.8954 19 10 18.1046 10 17ZM2 17C2 14.3478 3.05335 11.8041 4.92871 9.92871C6.80407 8.05335 9.34784 7 12 7H12.001C14.3082 7.00235 16.539 7.8019 18.3184 9.25586L18.668 9.55566L18.6689 9.55664L20 10.7539V7C20 6.44772 20.4477 6 21 6C21.5523 6 22 6.44772 22 7V13C22 13.5523 21.5523 14 21 14H15C14.4477 14 14 13.5523 14 13C14 12.4477 14.4477 12 15 12H18.3945L17.332 11.0439C15.8664 9.72966 13.9676 9.00201 11.999 9C9.87764 9.00026 7.84283 9.84271 6.34277 11.3428C4.84248 12.8431 4 14.8783 4 17C4 17.5523 3.55228 18 3 18C2.44772 18 2 17.5523 2 17Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

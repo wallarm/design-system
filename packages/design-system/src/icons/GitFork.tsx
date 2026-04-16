@@ -3,51 +3,9 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 
 export const GitFork: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
-    <circle
-      cx='12'
-      cy='18'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='6'
-      cy='6'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <circle
-      cx='18'
-      cy='6'
-      r='3'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
     <path
-      d='M18 9v2a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V9'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='M12 13v2'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M14 18C14 16.8954 13.1046 16 12 16C10.8954 16 10 16.8954 10 18C10 19.1046 10.8954 20 12 20C13.1046 20 14 19.1046 14 18ZM8 6C8 4.89543 7.10457 4 6 4C4.89543 4 4 4.89543 4 6C4 7.10457 4.89543 8 6 8C7.10457 8 8 7.10457 8 6ZM20 6C20 4.89543 19.1046 4 18 4C16.8954 4 16 4.89543 16 6C16 7.10457 16.8954 8 18 8C19.1046 8 20 7.10457 20 6ZM22 6C22 7.86384 20.7252 9.42998 19 9.87402V11C19 11.5272 18.8194 12.0439 18.4316 12.4316C18.0439 12.8194 17.5272 13 17 13H13V14.126C14.7252 14.57 16 16.1362 16 18C16 20.2091 14.2091 22 12 22C9.79086 22 8 20.2091 8 18C8 16.1362 9.27477 14.57 11 14.126V13H7C6.47275 13 5.95614 12.8194 5.56836 12.4316C5.18058 12.0439 5 11.5272 5 11V9.87402C3.27477 9.42998 2 7.86384 2 6C2 3.79086 3.79086 2 6 2C8.20914 2 10 3.79086 10 6C10 7.86384 8.72523 9.42998 7 9.87402V11H17V9.87402C15.2748 9.42998 14 7.86384 14 6C14 3.79086 15.7909 2 18 2C20.2091 2 22 3.79086 22 6Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

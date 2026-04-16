@@ -4,20 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const CircleChevronDown: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10z'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='m8 10 4 4 4-4'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M21 12C21 7.02944 16.9706 3 12 3C7.02944 3 3 7.02944 3 12C3 16.9706 7.02944 21 12 21C16.9706 21 21 16.9706 21 12ZM15.293 9.29297C15.6835 8.90244 16.3165 8.90244 16.707 9.29297C17.0976 9.68349 17.0976 10.3165 16.707 10.707L12.707 14.707C12.3165 15.0976 11.6835 15.0976 11.293 14.707L7.29297 10.707C6.90244 10.3165 6.90244 9.68349 7.29297 9.29297C7.68349 8.90244 8.31651 8.90244 8.70703 9.29297L12 12.5859L15.293 9.29297ZM23 12C23 18.0751 18.0751 23 12 23C5.92487 23 1 18.0751 1 12C1 5.92487 5.92487 1 12 1C18.0751 1 23 5.92487 23 12Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );

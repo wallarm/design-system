@@ -4,20 +4,8 @@ import { SvgIcon, type SvgIconProps } from './SvgIcon';
 export const ChevronsDown: FC<SvgIconProps> = props => (
   <SvgIcon {...props} viewBox='0 0 24 24'>
     <path
-      d='m7 13 5 5 5-5'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
-    />
-    <path
-      d='m7 6 5 5 5-5'
-      stroke='currentColor'
-      strokeWidth='2'
-      strokeLinecap='round'
-      strokeLinejoin='round'
-      fill='none'
+      d='M16.293 12.293C16.6835 11.9024 17.3165 11.9024 17.707 12.293C18.0975 12.6835 18.0975 13.3165 17.707 13.707L12.707 18.707C12.3165 19.0975 11.6835 19.0975 11.293 18.707L6.29295 13.707C5.90243 13.3165 5.90243 12.6835 6.29295 12.293C6.68348 11.9024 7.31649 11.9024 7.70702 12.293L12 16.5859L16.293 12.293ZM16.293 5.29295C16.6835 4.90243 17.3165 4.90243 17.707 5.29295C18.0975 5.68348 18.0975 6.31649 17.707 6.70702L12.707 11.707C12.3165 12.0975 11.6835 12.0975 11.293 11.707L6.29295 6.70702C5.90243 6.31649 5.90243 5.68348 6.29295 5.29295C6.68348 4.90243 7.31649 4.90243 7.70702 5.29295L12 9.58592L16.293 5.29295Z'
+      fill='currentColor'
     />
   </SvgIcon>
 );
