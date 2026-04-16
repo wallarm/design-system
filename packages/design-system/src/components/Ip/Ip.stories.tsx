@@ -53,7 +53,51 @@ export const Basic: StoryFn = () => (
   </div>
 );
 
-export const MultipleAddresses: StoryFn = () => (
+export const HorizontalMultiple: StoryFn = () => (
+  <div style={{ width: 600 }}>
+    <IpList type='horizontal'>
+      <Ip>
+        <IpCountry code='ES' />
+        <IpAddress>142.198.167.52</IpAddress>
+        <IpProvider>Azure</IpProvider>
+      </Ip>
+      <Ip>
+        <IpCountry code='US' />
+        <IpAddress>34.74.73.20</IpAddress>
+        <IpProvider>AWS</IpProvider>
+      </Ip>
+      <Ip>
+        <IpCountry code='MY' />
+        <IpAddress>34.74.73.21</IpAddress>
+        <IpProvider>GCP</IpProvider>
+      </Ip>
+      <Ip>
+        <IpCountry code='US' />
+        <IpAddress>34.74.73.22</IpAddress>
+        <IpProvider>AWS</IpProvider>
+      </Ip>
+      <Ip>
+        <IpCountry code='MY' />
+        <IpAddress>34.74.73.23</IpAddress>
+        <IpProvider>GCP</IpProvider>
+      </Ip>
+      <Ip>
+        <IpCountry code='DE' />
+        <IpAddress>77.88.8.8</IpAddress>
+      </Ip>
+      <Ip>
+        <IpCountry code='NL' />
+        <IpAddress>20.33.0.0</IpAddress>
+      </Ip>
+      <Ip>
+        <IpCountry code='JP' />
+        <IpAddress>192.168.1.1</IpAddress>
+      </Ip>
+    </IpList>
+  </div>
+);
+
+export const VerticalMultiple: StoryFn = () => (
   <VStack gap={12}>
     <IpList>
       <Ip>
