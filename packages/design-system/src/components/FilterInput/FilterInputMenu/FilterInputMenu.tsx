@@ -74,7 +74,11 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
   // Operator: filter by typed text from main input (building) or segment input (inline editing)
   const operatorFilterText = editingSegment === 'operator' ? segmentMenuFilterText : inputText;
 
-  const selectedFieldValues = selectedField ? getFieldValues(selectedField) : [];
+  // Raw input for `getSuggestions` callbacks — not stripped of operator/delimiters.
+  // We pass the same signal that `getValueFilterText` would later filter the static list by.
+  const valueInputText = editingSegment === 'value' ? segmentMenuFilterText : inputText;
+
+  const selectedFieldValues = selectedField ? getFieldValues(selectedField, valueInputText) : [];
   const valueFilterText = getValueFilterText(
     editingSegment,
     inputText,
