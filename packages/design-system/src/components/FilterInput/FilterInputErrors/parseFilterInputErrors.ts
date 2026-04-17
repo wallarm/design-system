@@ -1,5 +1,5 @@
 import { isValidFieldValue } from '../hooks/useFilterInputAutocomplete/valueCommitHelpers';
-import { getFieldValues } from '../lib';
+import { getFieldValues, hasStaticAllowlist } from '../lib';
 import type { Condition, FieldMetadata } from '../types';
 
 /**
@@ -24,7 +24,7 @@ export const parseFilterInputErrors = (
         break;
 
       case 'value': {
-        if (field && Array.isArray(condition.value)) {
+        if (field && hasStaticAllowlist(field) && Array.isArray(condition.value)) {
           const fv = getFieldValues(field);
           if (fv.length > 0) {
             const invalidValues = condition.value.filter(v => !isValidFieldValue(fv, v));

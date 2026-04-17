@@ -1,5 +1,10 @@
 import { MIN_DATE_STRING_LENGTH } from '../../FilterInputMenu/FilterInputDateValueMenu/constants';
-import { chipIdToConditionIndex, getFieldValues, isDatePreset } from '../../lib';
+import {
+  chipIdToConditionIndex,
+  getFieldValues,
+  hasStaticAllowlist,
+  isDatePreset,
+} from '../../lib';
 import type { Condition, FieldMetadata, FieldValueOption, FilterOperator } from '../../types';
 
 /** Find a field value option matching by label or value (case-insensitive) */
@@ -24,6 +29,7 @@ export const getInvalidValueIndices = (
   field: FieldMetadata,
   values: Array<string | number | boolean>,
 ): number[] => {
+  if (!hasStaticAllowlist(field)) return [];
   const fv = getFieldValues(field);
   if (fv.length === 0) return [];
   return values.reduce<number[]>((acc, v, idx) => {
@@ -58,7 +64,7 @@ export const resolveSingleValue = (
   const match = findMatchingFieldValue(fv, trimmed);
   return {
     resolved: match ? match.value : trimmed,
-    error: fv.length > 0 && !match ? true : undefined,
+    error: hasStaticAllowlist(field) && fv.length > 0 && !match ? true : undefined,
   };
 };
 

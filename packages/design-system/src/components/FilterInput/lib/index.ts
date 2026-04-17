@@ -17,7 +17,7 @@ export {
   VARIANT_LABELS,
 } from './constants';
 export { buildContainerAnchoredRect, isMenuRelated } from './dom';
-export { getFieldValues, hasFieldValues } from './fields';
+export { getFieldValues, hasFieldValues, hasStaticAllowlist } from './fields';
 export { filterAndSort } from './filterSort';
 export { getValueFilterText } from './menuFilterText';
 export {

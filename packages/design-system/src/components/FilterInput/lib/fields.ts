@@ -24,3 +24,14 @@ export const hasFieldValues = (field: FieldMetadata): boolean => {
   if ((field.values ?? []).length > 0) return true;
   return (field.options?.length ?? 0) > 0;
 };
+
+/**
+ * Whether the field has an exhaustive static allowlist of accepted values.
+ * Used by validation code to decide whether to reject values outside the list.
+ * Fields with `getSuggestions` return false — their suggestion list is a hint,
+ * not an allowlist (consumer may accept freeform values that aren't currently suggested).
+ */
+export const hasStaticAllowlist = (field: FieldMetadata): boolean => {
+  if ((field.values?.length ?? 0) > 0) return true;
+  return (field.options?.length ?? 0) > 0;
+};
