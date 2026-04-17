@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { FilterInput } from '../FilterInput';
-import type { Condition, Group } from '../types';
+import type { Condition, FieldMetadata, Group } from '../types';
 
 const sampleFields = [
   {
@@ -190,6 +190,110 @@ describe('FilterInput', () => {
       render(<FilterInput fields={sampleFields} />);
       const input = screen.getByRole('combobox');
       expect(input).toHaveAttribute('aria-autocomplete', 'list');
+    });
+  });
+
+  describe('getSuggestions-backed fields (AS-877)', () => {
+    const staticCodeField: FieldMetadata = {
+      name: 'code',
+      label: 'Status code',
+      type: 'enum',
+      values: [
+        { value: '200', label: '200 OK' },
+        { value: '404', label: '404 Not Found' },
+      ],
+    };
+
+    const dynamicCodeField: FieldMetadata = {
+      name: 'code',
+      label: 'Status code',
+      type: 'integer',
+      getSuggestions: (t: string) => [{ value: `${t || '2'}00`, label: `${t || '2'}00` }],
+    };
+
+    it('renders a specific invalid-value error for static-allowlist field', () => {
+      const condition: Condition = {
+        type: 'condition',
+        field: 'code',
+        operator: 'in',
+        value: ['200', 'bogus'],
+        error: 'value',
+      };
+
+      render(<FilterInput fields={[staticCodeField]} value={condition} />);
+
+      expect(screen.getByText('Invalid value for Status code: bogus')).toBeInTheDocument();
+    });
+
+    it('renders a generic invalid-value error for dynamic (getSuggestions) field', () => {
+      const condition: Condition = {
+        type: 'condition',
+        field: 'code',
+        operator: 'in',
+        value: ['bogus'],
+        error: 'value',
+      };
+
+      render(<FilterInput fields={[dynamicCodeField]} value={condition} />);
+
+      expect(screen.getByText('Invalid value for Status code')).toBeInTheDocument();
+      // Must NOT include the specific value — the list is a hint, not an allowlist.
+      expect(screen.queryByText('Invalid value for Status code: bogus')).not.toBeInTheDocument();
+    });
+
+    it('does not render any error for dynamic field without per-condition error flag', () => {
+      // Consumer accepts arbitrary values (e.g. free-typed status code '429').
+      // Without an `error: 'value'` marker set by the consumer, we expect no alert.
+      const condition: Condition = {
+        type: 'condition',
+        field: 'code',
+        operator: '=',
+        value: '429',
+      };
+
+      render(<FilterInput fields={[dynamicCodeField]} value={condition} />);
+
+      expect(screen.queryByText(/Invalid value for Status code/)).not.toBeInTheDocument();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
+    });
+
+    it('does not call getSuggestions during initial render of a committed chip', () => {
+      const spy = vi.fn(() => [{ value: 'only', label: 'Only' }]);
+      const field: FieldMetadata = {
+        name: 'code',
+        label: 'Status code',
+        type: 'integer',
+        getSuggestions: spy,
+      };
+      const condition: Condition = {
+        type: 'condition',
+        field: 'code',
+        operator: '=',
+        value: '429',
+      };
+
+      render(<FilterInput fields={[field]} value={condition} />);
+
+      // With no selected field + no open menu, the autocomplete pipeline should not
+      // prefetch suggestions. This pins the "dynamic fields don't run on every render"
+      // behavior — if anyone adds a blanket getFieldValues() call at FilterInput top level,
+      // this test will fail.
+      expect(spy).not.toHaveBeenCalled();
+    });
+
+    it('renders chip for dynamic field without attempting to validate value against static list', () => {
+      const condition: Condition = {
+        type: 'condition',
+        field: 'code',
+        operator: '=',
+        value: '429',
+      };
+
+      render(<FilterInput fields={[dynamicCodeField]} value={condition} />);
+
+      // Chip renders with the free-typed value — validation does not flag it.
+      expect(screen.getByText('Status code')).toBeInTheDocument();
+      expect(screen.getByText('429')).toBeInTheDocument();
     });
   });
 });
