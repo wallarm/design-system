@@ -322,19 +322,19 @@ export const WithActions: StoryFn<AttributeProps> = () => (
           </AttributeActionsTarget>
           <AttributeActionsContent>
             <AttributeActionsItem
-              icon={<Filter />}
               onSelect={() => {
                 /* story mock */
               }}
             >
+              <Filter />
               Investigate by this value
             </AttributeActionsItem>
             <AttributeActionsItem
-              icon={<Copy />}
               onSelect={() => {
                 /* story mock */
               }}
             >
+              <Copy />
               Copy value
             </AttributeActionsItem>
           </AttributeActionsContent>
@@ -353,19 +353,19 @@ export const WithActions: StoryFn<AttributeProps> = () => (
           </AttributeActionsTarget>
           <AttributeActionsContent>
             <AttributeActionsItem
-              icon={<Filter />}
               onSelect={() => {
                 /* story mock */
               }}
             >
+              <Filter />
               Investigate by this value
             </AttributeActionsItem>
             <AttributeActionsItem
-              icon={<Copy />}
               onSelect={() => {
                 /* story mock */
               }}
             >
+              <Copy />
               Copy value
             </AttributeActionsItem>
           </AttributeActionsContent>
@@ -397,19 +397,19 @@ export const WithActions: StoryFn<AttributeProps> = () => (
           </AttributeActionsTarget>
           <AttributeActionsContent>
             <AttributeActionsItem
-              icon={<Filter />}
               onSelect={() => {
                 /* story mock */
               }}
             >
+              <Filter />
               Investigate by this value
             </AttributeActionsItem>
             <AttributeActionsItem
-              icon={<Copy />}
               onSelect={() => {
                 /* story mock */
               }}
             >
+              <Copy />
               Copy value
             </AttributeActionsItem>
           </AttributeActionsContent>
