@@ -1,18 +1,26 @@
 import type { FieldMetadata, FieldValueOption } from '../types';
 
 /**
- * Get normalized value options for a field.
- * `values` (full FieldValueOption[]) takes precedence over `options` (string[] shorthand).
- * `options` strings are converted to `{ value: s, label: s }`.
+ * Get value options for a field.
+ * Priority: `getSuggestions(inputText)` > `values` > `options` (converted to `{value, label}`).
  */
-export const getFieldValues = (field: FieldMetadata): FieldValueOption[] => {
+export const getFieldValues = (
+  field: FieldMetadata,
+  inputText: string = '',
+): FieldValueOption[] => {
+  if (field.getSuggestions) return field.getSuggestions(inputText);
   const fromValues = field.values ?? [];
-  const fromOptions = field.options?.map(s => ({ value: s, label: s })) ?? [];
-  return fromValues.length > 0 ? fromValues : fromOptions;
+  if (fromValues.length > 0) return fromValues;
+  return field.options?.map(s => ({ value: s, label: s })) ?? [];
 };
 
 /**
- * Check if a field has predefined values (from `values` or `options`).
- * Returns false for freeform fields (`options: []` or no values at all).
+ * Check whether a field has a source of value suggestions — dynamic callback, static
+ * `values`, or `options`. Used to decide whether to render a value dropdown at all.
+ * Fields with `getSuggestions` always get a dropdown (empty list is still a list).
  */
-export const hasFieldValues = (field: FieldMetadata): boolean => getFieldValues(field).length > 0;
+export const hasFieldValues = (field: FieldMetadata): boolean => {
+  if (field.getSuggestions) return true;
+  if ((field.values ?? []).length > 0) return true;
+  return (field.options?.length ?? 0) > 0;
+};
