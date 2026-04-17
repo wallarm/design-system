@@ -32,6 +32,7 @@ export const hasFieldValues = (field: FieldMetadata): boolean => {
  * not an allowlist (consumer may accept freeform values that aren't currently suggested).
  */
 export const hasStaticAllowlist = (field: FieldMetadata): boolean => {
+  if (field.getSuggestions) return false;
   if ((field.values?.length ?? 0) > 0) return true;
   return (field.options?.length ?? 0) > 0;
 };
