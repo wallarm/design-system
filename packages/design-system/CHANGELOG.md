@@ -1,3 +1,8 @@
+## <small>0.25.1 (2026-04-17)</small>
+
+* fix(icons): WDS-103 update icons ([36712b1](https://github.com/wallarm/design-system/commit/36712b1))
+* fix(icons): WDS-103 use for the checkmark own icons ([db15b4c](https://github.com/wallarm/design-system/commit/db15b4c))
+
 ## 0.25.0 (2026-04-17)
 
 * feat(ip): add horizontal IpList type (#88) ([ba9b15c](https://github.com/wallarm/design-system/commit/ba9b15c)), closes [#88](https://github.com/wallarm/design-system/issues/88)
