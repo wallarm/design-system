@@ -55,7 +55,7 @@ export const Basic: StoryFn = () => (
 
 export const HorizontalMultiple: StoryFn = () => (
   <div style={{ width: 600 }}>
-    <IpList type='horizontal'>
+    <IpList type='horizontal' data-testid='horizontal-ips'>
       <Ip>
         <IpCountry code='ES' />
         <IpAddress>142.198.167.52</IpAddress>

@@ -1,30 +1,30 @@
-import { Children, type ComponentProps, type FC, type Ref } from 'react';
+import { Children, type ComponentProps, type FC, isValidElement, type Ref } from 'react';
 import { useTestId } from '../../../utils/testId';
 import { IpListHorizontal } from './IpListHorizontal';
 import { IpListVertical } from './IpListVertical';
 
 type IpListNativeProps = ComponentProps<'div'>;
 
-type IpListType = 'vertical' | 'horizontal';
+type IpListVariantProps =
+  | { type?: 'vertical'; asChild?: boolean }
+  | { type: 'horizontal'; asChild?: never };
 
-interface IpListBaseProps {
+type IpListBaseProps = IpListVariantProps & {
   ref?: Ref<HTMLDivElement>;
-  asChild?: boolean;
-  type?: IpListType;
-}
+};
 
 export type IpListProps = IpListNativeProps & IpListBaseProps;
 
 export const IpList: FC<IpListProps> = ({
   ref,
-  asChild = false,
   type = 'vertical',
+  asChild,
   className,
   children,
   ...props
 }) => {
   const testId = useTestId('list');
-  const items = Children.toArray(children);
+  const items = Children.toArray(children).filter(isValidElement);
 
   if (items.length === 0) return null;
 

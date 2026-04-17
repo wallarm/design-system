@@ -35,9 +35,7 @@ test.describe('Ip Component', () => {
   test('Horizontal Multiple - popover open', async ({ page }) => {
     await ipStory.goto(page, 'Horizontal Multiple');
 
-    const trigger = page.locator(
-      '[data-slot="ip-list"][data-type="horizontal"] [data-scope="popover"][data-part="trigger"]',
-    );
+    const trigger = page.getByTestId('horizontal-ips-overflow-trigger');
     await trigger.click();
 
     const popover = page.locator('[data-scope="popover"][data-part="content"]');

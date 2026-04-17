@@ -2,24 +2,18 @@ import { Children, type ComponentProps, type FC, isValidElement, type ReactNode 
 import { DropdownMenuItem, DropdownMenuItemIcon, DropdownMenuItemText } from '../DropdownMenu';
 
 export interface AttributeActionsItemProps extends ComponentProps<typeof DropdownMenuItem> {
-  /** Icon element followed by label text — icon is auto-detected. */
+  /** First child element is rendered as the leading icon; the rest becomes label text. */
   children: ReactNode;
 }
 
-const isIconLike = (child: ReactNode): boolean => {
-  if (!isValidElement(child)) return false;
-  return typeof child.type === 'function' || child.type === 'svg';
-};
-
 export const AttributeActionsItem: FC<AttributeActionsItemProps> = ({ children, ...props }) => {
-  const items = Children.toArray(children);
-  const icon = items.find(isIconLike);
-  const rest = icon ? items.filter(item => item !== icon) : items;
+  const [first, ...rest] = Children.toArray(children);
+  const hasIcon = isValidElement(first);
 
   return (
     <DropdownMenuItem {...props}>
-      {icon && <DropdownMenuItemIcon>{icon}</DropdownMenuItemIcon>}
-      <DropdownMenuItemText>{rest}</DropdownMenuItemText>
+      {hasIcon && <DropdownMenuItemIcon>{first}</DropdownMenuItemIcon>}
+      <DropdownMenuItemText>{hasIcon ? rest : children}</DropdownMenuItemText>
     </DropdownMenuItem>
   );
 };

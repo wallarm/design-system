@@ -1,4 +1,4 @@
-import type { ComponentProps, FC, ReactNode, Ref } from 'react';
+import type { ComponentProps, FC, ReactElement, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '../../../utils/cn';
 import { Link } from '../../Link';
@@ -10,7 +10,7 @@ export interface IpListVerticalProps extends ComponentProps<'div'> {
   ref?: Ref<HTMLDivElement>;
   asChild?: boolean;
   testId?: string;
-  items: ReactNode[];
+  items: ReactElement[];
 }
 
 export const IpListVertical: FC<IpListVerticalProps> = ({
