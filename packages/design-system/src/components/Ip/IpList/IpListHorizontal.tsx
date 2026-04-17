@@ -11,6 +11,8 @@ import { cn } from '../../../utils/cn';
 import { Badge } from '../../Badge';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover';
 import { VStack } from '../../Stack';
+import { IpListSeparator } from './IpListSeparator';
+import { mergeRefs } from './mergeRefs';
 
 export interface IpListHorizontalProps extends ComponentProps<'div'> {
   ref?: Ref<HTMLDivElement>;
@@ -47,11 +49,7 @@ export const IpListHorizontal: FC<IpListHorizontalProps> = ({
       <MeasurementContainer />
       <div
         {...props}
-        ref={node => {
-          containerRef.current = node;
-          if (typeof ref === 'function') ref(node);
-          else if (ref) ref.current = node;
-        }}
+        ref={mergeRefs(containerRef, ref)}
         data-slot='ip-list'
         data-type='horizontal'
         data-testid={testId}
@@ -96,9 +94,3 @@ export const IpListHorizontal: FC<IpListHorizontalProps> = ({
 };
 
 IpListHorizontal.displayName = 'IpListHorizontal';
-
-const IpListSeparator: FC = () => (
-  <span aria-hidden='true' className='text-text-tertiary select-none shrink-0'>
-    ·
-  </span>
-);
