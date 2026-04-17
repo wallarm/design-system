@@ -78,6 +78,13 @@ export interface FieldMetadata {
    * Empty array `[]` means freeform input — no dropdown, user types any value.
    */
   options?: string[];
+  /**
+   * Optional callback to compute value suggestions dynamically from the current
+   * input text. When provided, takes precedence over `values` and `options`.
+   * The returned list is still post-filtered by `filterAndSort`, so prefix/includes
+   * matching still applies — return items that contain the input text.
+   */
+  getSuggestions?: (inputText: string) => FieldValueOption[];
 }
 
 /**
