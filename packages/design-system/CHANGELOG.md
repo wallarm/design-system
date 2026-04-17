@@ -1,3 +1,7 @@
+## 0.25.0 (2026-04-17)
+
+* feat(ip): add horizontal IpList type (#88) ([ba9b15c](https://github.com/wallarm/design-system/commit/ba9b15c)), closes [#88](https://github.com/wallarm/design-system/issues/88)
+
 ## <small>0.24.1 (2026-04-16)</small>
 
 * fix(code-snippet): WDS-72 visual fixes. Delete border, add italic ([c24d251](https://github.com/wallarm/design-system/commit/c24d251))
