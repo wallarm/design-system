@@ -24,9 +24,10 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
         data-testid={testId}
         data-slot='attribute-actions-target'
         className={cn(
-          '-mx-4 -my-6 block w-full cursor-pointer rounded-8 px-6 py-4 transition-colors',
+          '-mx-4 -my-6 flex w-full cursor-pointer items-center rounded-8 px-6 py-4 transition-colors',
           'hover:bg-states-primary-hover active:bg-states-primary-pressed',
           'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
+          '[&_*]:pointer-events-none',
           className,
         )}
       >

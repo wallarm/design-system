@@ -312,7 +312,7 @@ export const Composition: StoryFn<AttributeProps> = () => (
 );
 
 export const WithActions: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
+  <div className='w-[400px] flex flex-col gap-16'>
     <Attribute>
       <AttributeLabel>Source IP</AttributeLabel>
       <AttributeValue>
@@ -322,19 +322,94 @@ export const WithActions: StoryFn<AttributeProps> = () => (
           </AttributeActionsTarget>
           <AttributeActionsContent>
             <AttributeActionsItem
-              icon={<Filter />}
               onSelect={() => {
                 /* story mock */
               }}
             >
+              <Filter />
               Investigate by this value
             </AttributeActionsItem>
             <AttributeActionsItem
-              icon={<Copy />}
               onSelect={() => {
                 /* story mock */
               }}
             >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Badge color='red' variant='dotted'>
+              Blocked
+            </Badge>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>IPs</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <IpList>
+              <Ip>
+                <IpCountry code='US' />
+                <IpAddress>142.198.167.52</IpAddress>
+                <IpProvider>Azure</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='DE' />
+                <IpAddress>34.74.73.20</IpAddress>
+                <IpProvider>GCP</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='NL' />
+                <IpAddress>10.0.0.1</IpAddress>
+              </Ip>
+            </IpList>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
               Copy value
             </AttributeActionsItem>
           </AttributeActionsContent>

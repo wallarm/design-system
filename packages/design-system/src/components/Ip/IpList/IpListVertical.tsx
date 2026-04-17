@@ -1,45 +1,28 @@
-import {
-  Children,
-  type ComponentProps,
-  type FC,
-  isValidElement,
-  type PropsWithChildren,
-  type Ref,
-} from 'react';
+import type { ComponentProps, FC, ReactElement, Ref } from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
-import { Badge } from '../Badge';
-import { Link } from '../Link';
-import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
-import { VStack } from '../Stack';
-import { IpCountry } from './IpCountry';
-import { checkHasCountry } from './utils/checkHasCountry';
+import { cn } from '../../../utils/cn';
+import { Link } from '../../Link';
+import { Popover, PopoverContent, PopoverTrigger } from '../../Popover';
+import { VStack } from '../../Stack';
+import { checkHasCountry } from './checkHasCountry';
 
-type IpListNativeProps = ComponentProps<'div'>;
-
-interface IpListBaseProps {
+export interface IpListVerticalProps extends ComponentProps<'div'> {
   ref?: Ref<HTMLDivElement>;
   asChild?: boolean;
+  testId?: string;
+  items: ReactElement[];
 }
 
-export type IpListProps = IpListNativeProps & IpListBaseProps;
-
-export const IpList: FC<IpListProps> = ({
+export const IpListVertical: FC<IpListVerticalProps> = ({
   ref,
   asChild = false,
+  testId,
+  items,
   className,
-  children,
   ...props
 }) => {
-  const testId = useTestId('list');
-  const items = Children.toArray(children);
   const [first, ...rest] = items;
-
-  if (!first) return null;
-
   const Comp = asChild ? Slot : 'div';
-
   const hasCountry = checkHasCountry(first);
 
   return (
@@ -47,6 +30,7 @@ export const IpList: FC<IpListProps> = ({
       {...props}
       ref={ref}
       data-slot='ip-list'
+      data-type='vertical'
       data-testid={testId}
       className={cn('flex flex-col min-w-0 max-w-full', className)}
     >
@@ -68,3 +52,5 @@ export const IpList: FC<IpListProps> = ({
     </Comp>
   );
 };
+
+IpListVertical.displayName = 'IpListVertical';
