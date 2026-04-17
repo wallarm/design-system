@@ -2,9 +2,10 @@ import { type ComponentProps, type FC, Fragment, type ReactElement, type Ref } f
 import { composeRefs } from '@radix-ui/react-compose-refs';
 import { useOverflowItems } from '../../../hooks';
 import { cn } from '../../../utils/cn';
-import { Badge } from '../../Badge';
 import { Popover, PopoverContent, PopoverTrigger } from '../../Popover';
 import { VStack } from '../../Stack';
+import { OVERFLOW_RESERVE_SPACE } from './constants';
+import { IpListOverflowBadge } from './IpListOverflowBadge';
 import { IpListSeparator } from './IpListSeparator';
 
 export interface IpListHorizontalProps extends ComponentProps<'div'> {
@@ -12,9 +13,6 @@ export interface IpListHorizontalProps extends ComponentProps<'div'> {
   testId?: string;
   items: ReactElement[];
 }
-
-/** Approx width of the `+N` Badge with gap; hook also measures dynamically when overflowRenderer is provided. */
-const OVERFLOW_RESERVE_SPACE = 56;
 
 export const IpListHorizontal: FC<IpListHorizontalProps> = ({
   ref,
@@ -26,11 +24,7 @@ export const IpListHorizontal: FC<IpListHorizontalProps> = ({
   const { containerRef, visibleItems, hiddenItems, MeasurementContainer } = useOverflowItems({
     items,
     renderItem: item => item,
-    overflowRenderer: hidden => (
-      <Badge type='secondary' color='slate' size='medium'>
-        +{hidden.length}
-      </Badge>
-    ),
+    overflowRenderer: hidden => <IpListOverflowBadge count={hidden.length} />,
     reserveSpace: OVERFLOW_RESERVE_SPACE,
   });
 
@@ -60,15 +54,11 @@ export const IpListHorizontal: FC<IpListHorizontalProps> = ({
             <IpListSeparator />
             <Popover>
               <PopoverTrigger asChild>
-                <Badge
-                  type='secondary'
-                  color='slate'
-                  size='medium'
-                  className='shrink-0 cursor-pointer'
+                <IpListOverflowBadge
+                  count={hiddenItems.length}
+                  className='cursor-pointer'
                   data-testid={overflowTriggerTestId}
-                >
-                  +{hiddenItems.length}
-                </Badge>
+                />
               </PopoverTrigger>
               <PopoverContent
                 minHeight='auto'
