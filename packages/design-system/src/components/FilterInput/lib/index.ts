@@ -6,6 +6,7 @@ export {
   isDatePreset,
 } from '../FilterInputMenu/FilterInputDateValueMenu/constants';
 export { applyAcceptChar } from './applyAcceptChar';
+export { applyFieldPresets } from './applyFieldPresets';
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
 export {
   CONNECTOR_ID_PATTERN,

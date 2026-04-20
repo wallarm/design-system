@@ -62,6 +62,14 @@ export interface FieldValueOption {
 }
 
 /**
+ * Built-in field presets. Setting `preset` on a `FieldMetadata` wires the
+ * corresponding factory helpers into `acceptChar` / `normalize` /
+ * `getSuggestions` / `validate` automatically. Consumer-supplied callbacks
+ * always win over the preset.
+ */
+export type FieldPreset = 'status_code';
+
+/**
  * Field Metadata Interface
  * Matches backend structure for field definitions
  */
@@ -73,6 +81,12 @@ export interface FieldMetadata {
   operators?: FilterOperator[];
   default?: string | number | boolean;
   values?: FieldValueOption[];
+  /**
+   * Built-in DS preset that wires masking / validation / suggestions without
+   * requiring the consumer to import the factory helpers themselves. Any
+   * callback explicitly provided on this `FieldMetadata` wins over the preset.
+   */
+  preset?: FieldPreset;
   /**
    * Shorthand for simple string values (e.g. `["GET", "POST", "PUT"]`).
    * Automatically converted to `FieldValueOption[]` where `value === label`.

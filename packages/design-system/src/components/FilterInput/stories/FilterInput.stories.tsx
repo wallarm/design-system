@@ -296,3 +296,24 @@ export const HTTPStatusCodeSuggestions: Story = {
     placeholder: 'Type to filter by status code...',
   },
 };
+
+/**
+ * Same HTTP status code field, wired via the built-in `preset: 'status_code'`
+ * instead of importing the four factory helpers explicitly. The preset fills
+ * in `acceptChar` / `normalize` / `getSuggestions` / `validate` automatically;
+ * any explicit callback on the field still wins. See AS-877.
+ */
+export const HTTPStatusCodePreset: Story = {
+  args: {
+    fields: [
+      {
+        name: 'response_code',
+        label: 'Status code',
+        type: 'integer',
+        operators: ['=', '!=', 'in'],
+        preset: 'status_code',
+      },
+    ],
+    placeholder: 'Type to filter by status code...',
+  },
+};
