@@ -115,7 +115,7 @@ describe('createStatusCodeSuggestions', () => {
     const suggest = createStatusCodeSuggestions({ codes: ['1', '2', '3', '4', '5'] });
     const byValue = Object.fromEntries(suggest('').map(o => [o.value, o.badge?.color]));
     expect(byValue).toEqual({
-      '1XX': 'teal',
+      '1XX': 'sky',
       '2XX': 'green',
       '3XX': 'blue',
       '4XX': 'amber',

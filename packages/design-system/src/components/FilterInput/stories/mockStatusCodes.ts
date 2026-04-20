@@ -4,10 +4,12 @@
  * real backend produces. See AS-877 design spec.
  */
 export const MOCK_STATUS_CODES: string[] = [
+  '1',
   '2',
   '3',
   '4',
   '5',
+  '101',
   '200',
   '201',
   '301',

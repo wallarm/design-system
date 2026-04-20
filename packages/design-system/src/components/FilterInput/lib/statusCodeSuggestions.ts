@@ -4,7 +4,7 @@ import type { FieldValueOption } from '../types';
 const VALID_MASK_ROOTS = new Set(['1', '2', '3', '4', '5']);
 
 const HTTP_CLASS_BADGE_COLOR: Record<string, BadgeColor> = {
-  '1': 'teal',
+  '1': 'sky',
   '2': 'green',
   '3': 'blue',
   '4': 'amber',

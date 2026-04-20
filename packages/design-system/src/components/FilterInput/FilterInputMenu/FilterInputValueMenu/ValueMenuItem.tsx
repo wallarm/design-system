@@ -29,7 +29,7 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
   >
     {/* Badge */}
     {option.badge ? (
-      <Badge color={option.badge.color} type='solid' variant='default'>
+      <Badge color={option.badge.color} type='secondary' variant='default'>
         {option.badge.text}
       </Badge>
     ) : (
