@@ -8,7 +8,14 @@ interface TemporalClearProps {
 }
 
 export const TemporalClear: FC<TemporalClearProps> = ({ onClick, disabled = false }) => (
-  <Button variant='ghost' color='neutral' size='small' onClick={onClick} disabled={disabled}>
+  <Button
+    variant='ghost'
+    color='neutral'
+    size='small'
+    onClick={onClick}
+    disabled={disabled}
+    className='-mr-4'
+  >
     <X />
   </Button>
 );
