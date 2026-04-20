@@ -94,13 +94,18 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
     blurCommitRef,
   });
 
-  // For multi-select, ensure checked items are always visible (even when filtered out)
-  // and always appear first for stable ordering.
+  // For multi-select, ensure checked items are always visible (even when filtered out,
+  // or when suggestions have shifted to a set that no longer includes them) and always
+  // appear first for stable ordering. Checked values missing from the current `values`
+  // list are rendered as plain-text entries so the user can still see and deselect them.
   const displayValues = useMemo(() => {
     if (!multiSelect) return filteredValues;
     const checkedSet = new Set(checkedValues.map(String));
     if (checkedSet.size === 0) return filteredValues;
-    const checkedItems = values.filter(v => checkedSet.has(String(v.value)));
+    const checkedItems = checkedValues.map(v => {
+      const match = values.find(opt => String(opt.value) === String(v));
+      return match ?? { value: v, label: String(v) };
+    });
     const uncheckedFiltered = filteredValues.filter(v => !checkedSet.has(String(v.value)));
     return [...checkedItems, ...uncheckedFiltered];
   }, [filteredValues, values, multiSelect, checkedValues]);
