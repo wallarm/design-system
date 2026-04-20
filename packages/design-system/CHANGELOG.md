@@ -1,3 +1,28 @@
+## 0.26.0 (2026-04-20)
+
+* test(filter-input): AS-877 add skipped e2e for status code mask menu ([6113980](https://github.com/wallarm/design-system/commit/6113980))
+* test(filter-input): AS-877 cover defensive filtering of backend codes ([73c3336](https://github.com/wallarm/design-system/commit/73c3336))
+* test(filter-input): AS-877 cover getSuggestions + hasStaticAllowlist contract ([88696be](https://github.com/wallarm/design-system/commit/88696be))
+* fix(filter-input): AS-877 avoid string|undefined from norm[0] ([2678b4e](https://github.com/wallarm/design-system/commit/2678b4e))
+* fix(filter-input): AS-877 bypass allowlist validation for getSuggestions-backed fields ([9f826d7](https://github.com/wallarm/design-system/commit/9f826d7))
+* fix(filter-input): AS-877 drop indicator dot from value menu badge ([48e31bc](https://github.com/wallarm/design-system/commit/48e31bc))
+* fix(filter-input): AS-877 hasStaticAllowlist returns false when getSuggestions is defined ([fa58c4e](https://github.com/wallarm/design-system/commit/fa58c4e))
+* docs(filter-input): AS-877 add HTTPStatusCodeSuggestions story ([523996c](https://github.com/wallarm/design-system/commit/523996c))
+* docs(filter-input): AS-877 design spec for status code suggestions helper ([f9a398a](https://github.com/wallarm/design-system/commit/f9a398a))
+* docs(filter-input): AS-877 implementation plan for status code suggestions ([4b0f132](https://github.com/wallarm/design-system/commit/4b0f132))
+* docs(filter-input): AS-877 wire status code suggestions in composition story ([00ad39c](https://github.com/wallarm/design-system/commit/00ad39c))
+* docs(filter-input): AS-877 wire status code suggestions in field menu story ([7923fc1](https://github.com/wallarm/design-system/commit/7923fc1))
+* chore(filter-input): AS-877 add shared status-code mock for stories ([4a24c9d](https://github.com/wallarm/design-system/commit/4a24c9d))
+* feat(filter-input): AS-877 add getSuggestions callback to FieldMetadata ([effa126](https://github.com/wallarm/design-system/commit/effa126))
+* feat(filter-input): AS-877 attach HTTP-class color badge to status masks ([7607b88](https://github.com/wallarm/design-system/commit/7607b88))
+* feat(filter-input): AS-877 make getFieldValues accept inputText and prefer getSuggestions ([649f17e](https://github.com/wallarm/design-system/commit/649f17e))
+* feat(filter-input): AS-877 narrow status code mask by typed digits ([0110aa0](https://github.com/wallarm/design-system/commit/0110aa0))
+* feat(filter-input): AS-877 pass input text to getFieldValues for dynamic suggestions ([d49c6f8](https://github.com/wallarm/design-system/commit/d49c6f8))
+* feat(filter-input): AS-877 publicly export createStatusCodeSuggestions ([943e477](https://github.com/wallarm/design-system/commit/943e477))
+* feat(filter-input): AS-877 sanitize input for status code suggestions ([0fb5f72](https://github.com/wallarm/design-system/commit/0fb5f72))
+* feat(filter-input): AS-877 scaffold createStatusCodeSuggestions helper ([35d2929](https://github.com/wallarm/design-system/commit/35d2929))
+* refactor(filter-input): AS-877 throw instead of silent fallback on badge color ([f7a068f](https://github.com/wallarm/design-system/commit/f7a068f))
+
 ## <small>0.25.1 (2026-04-17)</small>
 
 * fix(icons): WDS-103 update icons ([36712b1](https://github.com/wallarm/design-system/commit/36712b1))
