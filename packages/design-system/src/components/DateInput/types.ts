@@ -1,8 +1,8 @@
 import type { InputGroupSize } from '../InputGroup';
 
 export interface DateInputBaseProps {
-  /** Whether to show the leading icon. Default: true */
-  showIcon?: boolean;
+  /** Whether the input has a leading icon. Default: true */
+  hasIcon?: boolean;
   /** Whether the input has an error state. Shows error styling when true */
   error?: boolean;
   /** Whether the input is disabled. Prevents user interaction when true */

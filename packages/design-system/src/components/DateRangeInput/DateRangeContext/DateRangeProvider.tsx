@@ -42,12 +42,12 @@ export const DateRangeProvider = forwardRef<HTMLDivElement, DateRangeProviderPro
       placeholder = getDefaultTemporalPlaceholder({ granularity, isRange: true }),
       showTimeDropdown,
       timeStep,
-      showIcon = true,
+      hasIcon = true,
       size,
     },
     forwardedRef,
   ) => {
-    const icon = showIcon ? Calendar : undefined;
+    const icon = hasIcon ? Calendar : undefined;
     const ref = useRef<HTMLDivElement>(null);
     const finalRef = (forwardedRef || ref) as RefObject<HTMLDivElement | null>;
     const startRef = useRef<HTMLDivElement>(null);

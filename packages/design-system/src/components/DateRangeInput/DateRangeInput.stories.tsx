@@ -47,7 +47,7 @@ const meta: Meta<typeof DateRangeInput> = {
       control: 'text',
       description: 'Placeholder text shown in both start and end fields when no value is selected.',
     },
-    showIcon: {
+    hasIcon: {
       control: 'boolean',
       description: 'Whether to show the leading calendar icon. Default: true.',
     },
@@ -71,7 +71,7 @@ const meta: Meta<typeof DateRangeInput> = {
     error: false,
     disabled: false,
     readOnly: false,
-    showIcon: true,
+    hasIcon: true,
     showTimeDropdown: false,
     timeStep: undefined,
     size: 'default',
@@ -105,7 +105,7 @@ export const WithIcon: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Without icon
       </Text>
-      <DateRangeInput showIcon={false} defaultValue={defaultValue} />
+      <DateRangeInput hasIcon={false} defaultValue={defaultValue} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
@@ -209,7 +209,7 @@ export const Filled: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Without icon
       </Text>
-      <DateRangeInput showIcon={false} defaultValue={sampleRange} />
+      <DateRangeInput hasIcon={false} defaultValue={sampleRange} />
     </VStack>
   </VStack>
 );
