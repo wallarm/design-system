@@ -209,6 +209,7 @@ export const TimeDropdown = forwardRef<TimeDropdownHandle, TimeDropdownProps>(
                     className={cn(
                       dropdownMenuItemVariants({ variant: 'default' }),
                       'gap-4',
+                      isCurrentValue && !isKeyboardSelected && 'bg-states-primary-active',
                       isKeyboardSelected && 'bg-states-primary-hover',
                       isKeyboardNavigating &&
                         !isKeyboardSelected &&

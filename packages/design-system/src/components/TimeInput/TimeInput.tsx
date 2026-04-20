@@ -2,6 +2,7 @@ import { forwardRef, type RefObject, useRef } from 'react';
 import { type AriaTimeFieldProps, type TimeValue, useTimeField } from '@react-aria/datepicker';
 import { useLocale } from '@react-aria/i18n';
 import { useTimeFieldState } from '@react-stately/datepicker';
+import { Clock } from '../../icons';
 import { DateInputInternal } from '../DateInput';
 import type { DateInputBaseProps } from '../DateInput/types';
 import { getDefaultTemporalPlaceholder, useTemporalField } from '../TemporalCore';
@@ -23,7 +24,7 @@ export type TimeInputProps = Omit<
 export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
   (
     {
-      icon,
+      icon = Clock,
       value: controlledValue,
       defaultValue,
       onChange,
