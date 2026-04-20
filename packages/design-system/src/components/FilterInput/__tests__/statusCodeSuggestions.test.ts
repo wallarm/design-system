@@ -4,7 +4,7 @@ import {
   createStatusCodeNormalizer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
-} from '../lib/statusCodeSuggestions';
+} from '../lib/statusCode';
 
 describe('createStatusCodeSuggestions', () => {
   it('returns all available masks for empty input', () => {

@@ -7,7 +7,7 @@ import {
   createStatusCodeNormalizer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
-} from '../lib/statusCodeSuggestions';
+} from '../lib/statusCode';
 import type { ExprNode, FieldMetadata } from '../types';
 import { MOCK_STATUS_CODES } from './mockStatusCodes';
 
