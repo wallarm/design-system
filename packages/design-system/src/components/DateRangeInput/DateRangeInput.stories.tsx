@@ -1,14 +1,9 @@
-import { CalendarDateTime } from '@internationalized/date';
+import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Calendar } from '../../icons';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
-import { DateRangeProvider } from './DateRangeContext';
-import { DateRangeEnd } from './DateRangeEnd';
-import { DateRangeGroup } from './DateRangeGroup';
 import { DateRangeInput } from './DateRangeInput';
-import { DateRangeSeparator } from './DateRangeSeparator';
-import { DateRangeStart } from './DateRangeStart';
 import type { DateRangeInputProps } from './types';
 
 const meta: Meta<typeof DateRangeInput> = {
@@ -88,6 +83,16 @@ const defaultValue = {
   end: new CalendarDateTime(2024, 3, 22),
 };
 
+const sampleRange = {
+  start: new CalendarDate(2026, 1, 1),
+  end: new CalendarDate(2026, 1, 16),
+};
+
+const sampleRangeDateTime = {
+  start: new CalendarDateTime(2026, 1, 1, 22, 0),
+  end: new CalendarDateTime(2026, 1, 16, 22, 0),
+};
+
 export const Basic: StoryFn<typeof meta> = args => {
   return <DateRangeInput {...(args as DateRangeInputProps)} />;
 };
@@ -115,42 +120,95 @@ export const States: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Default
       </Text>
-      <DateRangeInput icon={Calendar} placeholder='Select date' />
+      <DateRangeInput icon={Calendar} />
+      <DateRangeInput icon={Calendar} defaultValue={sampleRange} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         Disabled
       </Text>
-      <DateRangeInput icon={Calendar} placeholder='Select date' disabled />
+      <DateRangeInput icon={Calendar} disabled />
+      <DateRangeInput icon={Calendar} disabled defaultValue={sampleRange} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         Error
       </Text>
-      <DateRangeInput icon={Calendar} placeholder='Select date' error />
+      <DateRangeInput icon={Calendar} error />
+      <DateRangeInput icon={Calendar} error defaultValue={sampleRange} />
     </VStack>
   </HStack>
 );
 
 export const Sizes: StoryFn<typeof meta> = () => (
+  <HStack gap={24}>
+    <VStack gap={16}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Default (36px)
+        </Text>
+        <DateRangeInput icon={Calendar} size='default' />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Medium (32px)
+        </Text>
+        <DateRangeInput icon={Calendar} size='medium' />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Small (24px)
+        </Text>
+        <DateRangeInput icon={Calendar} size='small' />
+      </VStack>
+    </VStack>
+    <VStack gap={16}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Default filled
+        </Text>
+        <DateRangeInput icon={Calendar} size='default' defaultValue={sampleRange} />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Medium filled
+        </Text>
+        <DateRangeInput icon={Calendar} size='medium' defaultValue={sampleRange} />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Small filled
+        </Text>
+        <DateRangeInput icon={Calendar} size='small' defaultValue={sampleRange} />
+      </VStack>
+    </VStack>
+  </HStack>
+);
+
+export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
-        Default (36px)
+        Date range
       </Text>
-      <DateRangeInput icon={Calendar} size='default' />
+      <DateRangeInput icon={Calendar} defaultValue={sampleRange} />
     </VStack>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
-        Medium (32px)
+        Date + time range (24h)
       </Text>
-      <DateRangeInput icon={Calendar} size='medium' />
+      <DateRangeInput
+        icon={Calendar}
+        granularity='minute'
+        hourCycle={24}
+        defaultValue={sampleRangeDateTime}
+      />
     </VStack>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
-        Small (24px)
+        Without icon
       </Text>
-      <DateRangeInput icon={Calendar} size='small' />
+      <DateRangeInput defaultValue={sampleRange} />
     </VStack>
   </VStack>
 );

@@ -72,12 +72,14 @@ export const TemporalSegment: FC<TemporalSegmentProps> = ({
     );
   }
 
-  // Always show short month names when value is present
+  // Always show short month names when value is present; force AM/PM uppercase
   const displayText =
     displayOverride ??
     (segment.type === 'month' && segment.value != null && !segment.isPlaceholder
       ? getMonthSegmentText(segment.value, segment.placeholder)
-      : segment.text);
+      : segment.type === 'dayPeriod' && !segment.isPlaceholder
+        ? segment.text.toUpperCase()
+        : segment.text);
 
   return (
     <span
