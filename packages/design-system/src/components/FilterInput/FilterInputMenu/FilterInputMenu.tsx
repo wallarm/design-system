@@ -1,6 +1,7 @@
 import type { FC, RefObject } from 'react';
 import type { ChipSegment } from '../FilterInputField/FilterInputChip';
 import {
+  getCurrentValueTokenText,
   getFieldValues,
   getValueFilterText,
   isBetweenOperator,
@@ -74,15 +75,19 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
   // Operator: filter by typed text from main input (building) or segment input (inline editing)
   const operatorFilterText = editingSegment === 'operator' ? segmentMenuFilterText : inputText;
 
-  // Raw input for `getSuggestions` callbacks — not stripped of operator/delimiters.
-  // We pass the same signal that `getValueFilterText` would later filter the static list by.
-  const valueInputText = editingSegment === 'value' ? segmentMenuFilterText : inputText;
-
-  const selectedFieldValues = selectedField ? getFieldValues(selectedField, valueInputText) : [];
-  const valueFilterText = getValueFilterText(
+  // The active token the user is currently typing. For multi-select operators this
+  // strips prior comma-committed values so `getSuggestions` and the dropdown filter
+  // both see only the in-progress token. Single-value operators get the raw input.
+  const currentTokenText = getCurrentValueTokenText(
     editingSegment,
     inputText,
     segmentMenuFilterText,
+    selectedOperator,
+  );
+
+  const selectedFieldValues = selectedField ? getFieldValues(selectedField, currentTokenText) : [];
+  const valueFilterText = getValueFilterText(
+    currentTokenText,
     selectedOperator,
     selectedFieldValues,
   );
