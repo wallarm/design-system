@@ -220,8 +220,17 @@ export const useMenuFlow = ({
   const handleBuildingValueChange = useCallback(
     (preview: string | undefined) => {
       setBuildingMultiValue(preview);
+      // After each multi-select toggle, reset the typing surface so the dropdown
+      // shows all options + already-checked items for the next selection. In
+      // building mode that's the main input; in inline segment editing it's the
+      // segment filter text.
+      if (editing.editingSegment === 'value') {
+        editing.setSegmentFilterText('');
+      } else {
+        setInputText('');
+      }
     },
-    [setBuildingMultiValue],
+    [setBuildingMultiValue, setInputText, editing],
   );
 
   /** Range select (between + calendar) */
