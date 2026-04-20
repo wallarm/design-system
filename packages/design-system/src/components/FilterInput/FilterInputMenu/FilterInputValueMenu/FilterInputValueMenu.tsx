@@ -36,6 +36,9 @@ export interface FilterInputValueMenuProps {
   width?: 'standard' | 'compact' | number;
   positioning?: Record<string, unknown>;
   onBuildingValueChange?: (preview: string | undefined) => void;
+  /** Fires on explicit multi-select toggle (click or keyboard) — use to react
+   *  only to user-initiated toggles, not to initialization. */
+  onItemToggle?: () => void;
   /** Ref to the query bar input — ArrowUp on first item returns focus here */
   inputRef?: RefObject<HTMLInputElement | null>;
   /** Text to filter values by label */
@@ -60,6 +63,7 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
   width = 'standard',
   positioning,
   onBuildingValueChange,
+  onItemToggle,
   inputRef,
   filterText = '',
   menuRef,
@@ -89,6 +93,7 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
     onEscape,
     onOpenChange,
     onBuildingValueChange,
+    onItemToggle,
     inputRef,
     menuRef,
     blurCommitRef,
