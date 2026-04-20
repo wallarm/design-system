@@ -19,7 +19,7 @@ const segmentVariants = cva(
   cn(
     'relative outline-none text-left',
     'font-sans text-sm transition-all',
-    'focus:bg-states-primary-pressed',
+    'focus:bg-bg-fill-brand focus:text-text-primary-alt',
     'focus:outline-none',
   ),
   {
