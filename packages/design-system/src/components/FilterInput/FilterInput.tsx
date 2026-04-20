@@ -10,7 +10,7 @@ import {
   useFilterInputExpression,
   useFilterInputSelection,
 } from './hooks';
-import { applyFieldPresets } from './lib/applyFieldPresets';
+import { applyKnownFieldHelpers } from './lib/applyKnownFieldHelpers';
 import type { ExprNode, FieldMetadata } from './types';
 
 export interface FilterInputProps
@@ -43,7 +43,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     else chipRegistryRef.current.delete(id);
   }, []);
 
-  const fields = useMemo(() => applyFieldPresets(rawFields), [rawFields]);
+  const fields = useMemo(() => applyKnownFieldHelpers(rawFields), [rawFields]);
 
   const {
     conditions,

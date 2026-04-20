@@ -1,19 +1,19 @@
 import { describe, expect, it, vi } from 'vitest';
-import { applyFieldPresets } from '../lib/applyFieldPresets';
+import { applyKnownFieldHelpers } from '../lib/applyKnownFieldHelpers';
 import type { FieldMetadata } from '../types';
 
-describe('applyFieldPresets', () => {
-  it('leaves fields without a preset untouched', () => {
+describe('applyKnownFieldHelpers', () => {
+  it('leaves unknown fields untouched', () => {
     const fields: FieldMetadata[] = [
       { name: 'country', label: 'Country', type: 'string' },
       { name: 'priority', label: 'Priority', type: 'integer' },
     ];
-    expect(applyFieldPresets(fields)).toBe(fields);
+    expect(applyKnownFieldHelpers(fields)).toBe(fields);
   });
 
-  it('wires all four helpers when preset is status_code', () => {
-    const [field] = applyFieldPresets([
-      { name: 'response_code', label: 'Status', type: 'integer', preset: 'status_code' },
+  it('wires all four helpers for a field named status_code', () => {
+    const [field] = applyKnownFieldHelpers([
+      { name: 'status_code', label: 'Status', type: 'integer' },
     ]);
     expect(typeof field.acceptChar).toBe('function');
     expect(typeof field.normalize).toBe('function');
@@ -22,8 +22,8 @@ describe('applyFieldPresets', () => {
   });
 
   it('produces status-code suggestions on empty input', () => {
-    const [field] = applyFieldPresets([
-      { name: 'response_code', label: 'Status', type: 'integer', preset: 'status_code' },
+    const [field] = applyKnownFieldHelpers([
+      { name: 'status_code', label: 'Status', type: 'integer' },
     ]);
     expect(field.getSuggestions?.('').map(o => o.value)).toEqual([
       '1XX',
@@ -34,26 +34,29 @@ describe('applyFieldPresets', () => {
     ]);
   });
 
-  it('lets a consumer-supplied callback win over the preset', () => {
+  it('lets a consumer-supplied callback win over the auto-wired helper', () => {
     const customValidate = vi.fn(() => false);
-    const [field] = applyFieldPresets([
+    const [field] = applyKnownFieldHelpers([
       {
-        name: 'response_code',
+        name: 'status_code',
         label: 'Status',
         type: 'integer',
-        preset: 'status_code',
         validate: customValidate,
       },
     ]);
     expect(field.validate).toBe(customValidate);
-    // The remaining helpers are still filled in by the preset.
     expect(typeof field.acceptChar).toBe('function');
     expect(typeof field.normalize).toBe('function');
     expect(typeof field.getSuggestions).toBe('function');
   });
 
-  it('returns the same array reference when no preset applies', () => {
-    const fields: FieldMetadata[] = [{ name: 'country', label: 'Country', type: 'string' }];
-    expect(applyFieldPresets(fields)).toBe(fields);
+  it('does not wire helpers for fields with a different name', () => {
+    const [field] = applyKnownFieldHelpers([
+      { name: 'response_code', label: 'Response', type: 'integer' },
+    ]);
+    expect(field.acceptChar).toBeUndefined();
+    expect(field.normalize).toBeUndefined();
+    expect(field.getSuggestions).toBeUndefined();
+    expect(field.validate).toBeUndefined();
   });
 });

@@ -26,7 +26,6 @@ export type {
   Condition,
   ExprNode,
   FieldMetadata,
-  FieldPreset,
   FieldType,
   FieldValueOption,
   FilterInputChipData,

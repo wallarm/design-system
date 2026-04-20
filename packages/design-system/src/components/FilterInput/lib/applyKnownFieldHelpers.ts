@@ -1,4 +1,4 @@
-import type { FieldMetadata, FieldPreset } from '../types';
+import type { FieldMetadata } from '../types';
 import {
   createStatusCodeInputFilter,
   createStatusCodeNormalizer,
@@ -6,12 +6,18 @@ import {
   createStatusCodeValidator,
 } from './statusCode';
 
-type PresetHelpers = Pick<
+type FieldHelpers = Pick<
   FieldMetadata,
   'acceptChar' | 'normalize' | 'getSuggestions' | 'validate'
 >;
 
-const PRESET_HELPERS: Record<FieldPreset, () => PresetHelpers> = {
+/**
+ * Known field names that auto-wire DS helpers. Keyed by `FieldMetadata.name`
+ * — when a field with this name is passed to `FilterInput` without explicit
+ * helpers, the factories below fill in `acceptChar` / `normalize` /
+ * `getSuggestions` / `validate`. Consumer-supplied callbacks always win.
+ */
+const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
   status_code: () => ({
     acceptChar: createStatusCodeInputFilter(),
     normalize: createStatusCodeNormalizer(),
@@ -20,18 +26,12 @@ const PRESET_HELPERS: Record<FieldPreset, () => PresetHelpers> = {
   }),
 };
 
-/**
- * Resolve `FieldMetadata.preset` into concrete helpers. Consumer-supplied
- * callbacks (`acceptChar` / `normalize` / `getSuggestions` / `validate`)
- * always win over the preset so individual fields can still override parts
- * of a preset when needed.
- */
-export const applyFieldPresets = (fields: FieldMetadata[]): FieldMetadata[] => {
+export const applyKnownFieldHelpers = (fields: FieldMetadata[]): FieldMetadata[] => {
   let changed = false;
   const out = fields.map(field => {
-    if (!field.preset) return field;
-    const helpers = PRESET_HELPERS[field.preset]?.();
-    if (!helpers) return field;
+    const factory = KNOWN_FIELD_HELPERS[field.name];
+    if (!factory) return field;
+    const helpers = factory();
     changed = true;
     return {
       ...field,
