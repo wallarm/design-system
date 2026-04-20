@@ -34,6 +34,7 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
       showTimeDropdown,
       timeStep,
       hourCycle,
+      size,
       ...props
     },
     forwardedRef,
@@ -84,6 +85,7 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
           showTimeDropdown={showTimeDropdown}
           timeStep={timeStep}
           hourCycle={hourCycle}
+          size={size}
         />
       </div>
     );

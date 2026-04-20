@@ -137,7 +137,7 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
 
     return (
       <div
-        className={cn('relative flex-1', !hasIcon && 'pl-12')}
+        className={cn('relative flex-1 h-full', !hasIcon && 'pl-12')}
         onKeyDownCapture={handleKeyDownCapture}
         onClick={handleClick}
       >
@@ -145,7 +145,7 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
           {...fieldProps}
           ref={ref}
           data-slot='input'
-          className={cn('h-36')}
+          className={cn('h-full')}
           aria-disabled={disabled || undefined}
           aria-invalid={error || undefined}
           data-field-type={type}

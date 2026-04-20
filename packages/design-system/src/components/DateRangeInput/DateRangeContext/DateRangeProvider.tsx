@@ -43,6 +43,7 @@ export const DateRangeProvider = forwardRef<HTMLDivElement, DateRangeProviderPro
       showTimeDropdown,
       timeStep,
       icon,
+      size,
     },
     forwardedRef,
   ) => {
@@ -128,6 +129,7 @@ export const DateRangeProvider = forwardRef<HTMLDivElement, DateRangeProviderPro
           timeStep,
           hourCycle,
           icon,
+          size,
         }}
       >
         {children}

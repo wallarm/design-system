@@ -49,6 +49,11 @@ const meta: Meta<typeof TimeInput> = {
       control: 'number',
       description: 'Time interval in minutes for dropdown options.',
     },
+    size: {
+      control: 'select',
+      options: ['default', 'medium', 'small'],
+      description: 'Visual size: default (36px), medium (32px), small (24px).',
+    },
   },
   args: {
     granularity: 'minute',
@@ -57,6 +62,7 @@ const meta: Meta<typeof TimeInput> = {
     icon: Clock,
     showTimeDropdown: false,
     timeStep: undefined,
+    size: 'default',
   },
 };
 
@@ -83,6 +89,29 @@ export const States: StoryFn<typeof meta> = () => (
       <TimeInput icon={Clock} error defaultValue={new Time(14, 30)} />
     </VStack>
   </HStack>
+);
+
+export const Sizes: StoryFn<typeof meta> = () => (
+  <VStack gap={16}>
+    <VStack gap={4}>
+      <Text size='sm' color='secondary'>
+        Default (36px)
+      </Text>
+      <TimeInput icon={Clock} size='default' />
+    </VStack>
+    <VStack gap={4}>
+      <Text size='sm' color='secondary'>
+        Medium (32px)
+      </Text>
+      <TimeInput icon={Clock} size='medium' />
+    </VStack>
+    <VStack gap={4}>
+      <Text size='sm' color='secondary'>
+        Small (24px)
+      </Text>
+      <TimeInput icon={Clock} size='small' />
+    </VStack>
+  </VStack>
 );
 
 export const Granularity: StoryFn<typeof meta> = () => (

@@ -37,7 +37,7 @@ export const DateRangeInputInternal: FC<DateRangeInputInternalProps> = ({
 
   if (!context) return null;
 
-  const { startFieldProps, startRef, endFieldProps, endRef, disabled, placeholder } = context;
+  const { startFieldProps, startRef, endFieldProps, endRef, disabled, placeholder, size } = context;
 
   const showPlaceholder = Boolean(placeholder && !hasAnyValue && !isFocused);
 
@@ -47,7 +47,7 @@ export const DateRangeInputInternal: FC<DateRangeInputInternalProps> = ({
       onFocusCapture={handleFocusCapture}
       onBlurCapture={handleBlurCapture}
     >
-      <InputGroup>
+      <InputGroup size={size}>
         {IconComponent && (
           <InputGroupAddon>
             <IconComponent />

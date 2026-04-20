@@ -37,6 +37,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
       showTimeDropdown,
       timeStep,
       hourCycle,
+      size,
       className,
       ...props
     },
@@ -88,6 +89,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
           showTimeDropdown={showTimeDropdown}
           timeStep={timeStep}
           hourCycle={hourCycle}
+          size={size}
           className={cn('w-full')}
         />
       </div>
