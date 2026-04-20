@@ -76,40 +76,86 @@ export const States: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
+        Default
+      </Text>
+      <TimeInput />
+      <TimeInput defaultValue={new Time(22, 0)} />
+    </VStack>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
         Disabled
       </Text>
-      <TimeInput placeholder='Disabled empty' disabled />
+      <TimeInput disabled />
       <TimeInput disabled defaultValue={new Time(14, 30)} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         Error
       </Text>
-      <TimeInput placeholder='Error empty' error />
+      <TimeInput error />
       <TimeInput error defaultValue={new Time(14, 30)} />
     </VStack>
   </HStack>
 );
 
 export const Sizes: StoryFn<typeof meta> = () => (
+  <HStack gap={24}>
+    <VStack gap={16}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Default (36px)
+        </Text>
+        <TimeInput size='default' />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Medium (32px)
+        </Text>
+        <TimeInput size='medium' />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Small (24px)
+        </Text>
+        <TimeInput size='small' />
+      </VStack>
+    </VStack>
+    <VStack gap={16}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Default filled
+        </Text>
+        <TimeInput size='default' defaultValue={new Time(22, 0)} />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Medium filled
+        </Text>
+        <TimeInput size='medium' defaultValue={new Time(22, 0)} />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Small filled
+        </Text>
+        <TimeInput size='small' defaultValue={new Time(22, 0)} />
+      </VStack>
+    </VStack>
+  </HStack>
+);
+
+export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
-        Default (36px)
+        24-hour
       </Text>
-      <TimeInput size='default' />
+      <TimeInput hourCycle={24} defaultValue={new Time(22, 0)} />
     </VStack>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
-        Medium (32px)
+        12-hour
       </Text>
-      <TimeInput size='medium' />
-    </VStack>
-    <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        Small (24px)
-      </Text>
-      <TimeInput size='small' />
+      <TimeInput hourCycle={12} defaultValue={new Time(22, 0)} />
     </VStack>
   </VStack>
 );
