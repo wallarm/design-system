@@ -1,0 +1,92 @@
+import { expect, test } from '@playwright/test';
+import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
+
+const dateRangeInputStory = createStoryHelper('inputs-date-daterangeinput', [
+  'Basic',
+  'With Icon',
+  'States',
+  'Sizes',
+  'Filled',
+  'Granularity',
+] as const);
+
+test.describe('Component: DateRangeInput', () => {
+  test.describe('Visual', () => {
+    test('Should render basic date range input correctly', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Basic');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render with icon and without icon correctly', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'With Icon');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render all states correctly', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'States');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render all size variants correctly', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Sizes');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render filled date range and datetime range correctly', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Filled');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render all granularity variants correctly', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Granularity');
+      await expect(page).toHaveScreenshot();
+    });
+  });
+
+  test.describe('Interactions', () => {
+    test('Should show focus highlight on start segment when clicked', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'States');
+      const startDaySegment = page
+        .locator('[data-field-type="start"] [data-segment="day"]')
+        .first();
+
+      await startDaySegment.click();
+      await expect(startDaySegment).toBeFocused();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render separator as text arrow between fields', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Filled');
+      const separator = page.locator('[data-slot="date-range-group"] > span').first();
+
+      await expect(separator).toHaveText('→');
+    });
+
+    test('Should accept typed digits into the start day segment', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'States');
+      const startDaySegment = page
+        .locator('[data-field-type="start"] [data-segment="day"]')
+        .first();
+
+      await startDaySegment.focus();
+      await page.keyboard.type('10');
+
+      await expect(startDaySegment).toHaveText('10');
+    });
+  });
+
+  test.describe('Accessibility', () => {
+    test('Should move from start to end segments via ArrowRight', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'States');
+      const startYearSegment = page
+        .locator('[data-field-type="start"] [data-segment="year"]')
+        .first();
+      const endDaySegment = page.locator('[data-field-type="end"] [data-segment="day"]').first();
+
+      await startYearSegment.focus();
+      await page.keyboard.press('ArrowRight');
+
+      await expect(endDaySegment).toBeFocused();
+    });
+  });
+});
