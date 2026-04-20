@@ -1,4 +1,4 @@
-import { useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import type { ValueOption } from './FilterInputValueMenu';
 
 type ConditionValue = string | number | boolean;
@@ -38,10 +38,17 @@ export const useValueMenuDisplayValues = ({
   checkedValues,
   highlightValue,
 }: UseValueMenuDisplayValuesOptions): ValueOption[] => {
+  // Stash every option we have ever rendered so we can still present it
+  // (with its badge/label) after the parent's `values` list narrows away
+  // from it. Writing via effect keeps render strict-mode / concurrent safe —
+  // the one-render lag is invisible because a freshly-seen option is always
+  // already present in `values` for the same render that first uses it.
   const optionMemoryRef = useRef<Map<string, ValueOption>>(new Map());
-  for (const opt of values) {
-    optionMemoryRef.current.set(String(opt.value), opt);
-  }
+  useEffect(() => {
+    for (const opt of values) {
+      optionMemoryRef.current.set(String(opt.value), opt);
+    }
+  }, [values]);
 
   return useMemo(() => {
     const selectedList: ConditionValue[] = multiSelect

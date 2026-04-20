@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
-import { chipIdToConditionIndex } from '../../lib';
+import { applyAcceptChar, chipIdToConditionIndex } from '../../lib';
 import type {
   ChipErrorSegment,
   Condition,
@@ -349,15 +349,10 @@ export const useFilterInputAutocomplete = ({
     handleSegmentFilterChange: (text: string) => {
       // Mirror the main-input character filter when editing a value segment
       // so the same acceptChar rule applies in both entry paths.
-      if (editing.editingSegment === 'value' && selectedField?.acceptChar) {
-        const accept = selectedField.acceptChar;
-        const filtered = Array.from(text)
-          .filter(c => c === ',' || c === ' ' || accept(c))
-          .join('');
-        editing.setSegmentFilterText(filtered);
-        return;
-      }
-      editing.setSegmentFilterText(text);
+      const accept = selectedField?.acceptChar;
+      const next =
+        editing.editingSegment === 'value' && accept ? applyAcceptChar(text, accept) : text;
+      editing.setSegmentFilterText(next);
     },
     cancelSegmentEdit: editing.cancelSegmentEdit,
     handleCustomValueCommit,

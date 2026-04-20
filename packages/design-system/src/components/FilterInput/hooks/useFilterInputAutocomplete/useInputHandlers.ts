@@ -1,6 +1,6 @@
 import type { ChangeEvent, KeyboardEvent, MutableRefObject, RefObject } from 'react';
 import { useCallback, useRef } from 'react';
-import { getOperatorFromLabel, hasFieldValues, OPERATOR_SYMBOLS } from '../../lib';
+import { applyAcceptChar, getOperatorFromLabel, hasFieldValues, OPERATOR_SYMBOLS } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface UseInputHandlersDeps {
@@ -48,13 +48,9 @@ export const useInputHandlers = ({
     (e: ChangeEvent<HTMLInputElement>) => {
       let text = e.target.value;
       // When the user is entering a value for a field that specifies a
-      // per-character filter, strip everything that isn't allowed. Commas and
-      // spaces survive so multi-select delimiters still work.
+      // per-character filter, strip everything that isn't allowed.
       if (menuState === 'value' && selectedField?.acceptChar) {
-        const accept = selectedField.acceptChar;
-        text = Array.from(text)
-          .filter(c => c === ',' || c === ' ' || accept(c))
-          .join('');
+        text = applyAcceptChar(text, selectedField.acceptChar);
         if (text !== e.target.value) {
           e.target.value = text;
         }

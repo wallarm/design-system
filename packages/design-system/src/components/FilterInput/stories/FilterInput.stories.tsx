@@ -285,6 +285,9 @@ export const HTTPStatusCodeSuggestions: Story = {
         name: 'response_code',
         label: 'Status code',
         type: 'integer',
+        // Mask values are strings ("4XX", "40X"), so numeric comparison
+        // operators would be meaningless — restrict to equality/containment.
+        operators: ['=', '!=', 'in'],
         getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
         validate: createStatusCodeValidator(),
         acceptChar: createStatusCodeInputFilter(),

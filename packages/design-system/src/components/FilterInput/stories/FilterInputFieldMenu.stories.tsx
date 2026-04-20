@@ -229,7 +229,7 @@ export const WithRecentFields: Story = {
         type: 'integer',
         description: 'HTTP response status code',
         getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
-        validate: createStatusCodeValidator({ codes: MOCK_STATUS_CODES }),
+        validate: createStatusCodeValidator(),
       },
       {
         name: 'location',
@@ -308,7 +308,7 @@ export const WithRecentAndSuggestions: Story = {
         type: 'integer',
         description: 'HTTP response status code',
         getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
-        validate: createStatusCodeValidator({ codes: MOCK_STATUS_CODES }),
+        validate: createStatusCodeValidator(),
       },
       {
         name: 'endpoint',

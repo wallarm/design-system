@@ -1,4 +1,4 @@
-import type { FC, RefObject } from 'react';
+import { type FC, type RefObject, useMemo } from 'react';
 import type { ChipSegment } from '../FilterInputField/FilterInputChip';
 import {
   getCurrentValueTokenText,
@@ -90,12 +90,15 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
   // Pass committed chip values to getSuggestions so helpers that style values
   // (e.g. status codes with class-color badges) can keep selected entries
   // branded even when the input-driven suggestions have narrowed to masks.
-  const selectedContext = {
-    selectedValues: [
-      ...editingMultiValues,
-      ...(editingSingleValue != null ? [editingSingleValue] : []),
-    ],
-  };
+  const selectedContext = useMemo(
+    () => ({
+      selectedValues: [
+        ...editingMultiValues,
+        ...(editingSingleValue != null ? [editingSingleValue] : []),
+      ],
+    }),
+    [editingMultiValues, editingSingleValue],
+  );
   const selectedFieldValues = selectedField
     ? getFieldValues(selectedField, currentTokenText, selectedContext)
     : [];

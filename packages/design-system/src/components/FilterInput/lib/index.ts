@@ -5,6 +5,7 @@ export {
   getDateDisplayLabel,
   isDatePreset,
 } from '../FilterInputMenu/FilterInputDateValueMenu/constants';
+export { applyAcceptChar } from './applyAcceptChar';
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
 export {
   CONNECTOR_ID_PATTERN,
