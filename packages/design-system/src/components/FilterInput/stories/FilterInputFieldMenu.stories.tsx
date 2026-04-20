@@ -1,6 +1,8 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterInputFieldMenu } from '../FilterInputMenu';
 import {
+  createStatusCodeInputFilter,
+  createStatusCodeNormalizer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
 } from '../lib/statusCodeSuggestions';
@@ -57,7 +59,9 @@ const sampleFields: FieldMetadata[] = [
     type: 'integer',
     description: 'HTTP response status code',
     getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
-    validate: createStatusCodeValidator({ codes: MOCK_STATUS_CODES }),
+    validate: createStatusCodeValidator(),
+    acceptChar: createStatusCodeInputFilter(),
+    normalize: createStatusCodeNormalizer(),
   },
   {
     name: 'impact',

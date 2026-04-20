@@ -3,6 +3,8 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterInput } from '../FilterInput';
 import {
+  createStatusCodeInputFilter,
+  createStatusCodeNormalizer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
 } from '../lib/statusCodeSuggestions';
@@ -104,7 +106,9 @@ const attackFields: FieldMetadata[] = [
       { value: 503, label: '503 Service Unavailable' },
     ],
     getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
-    validate: createStatusCodeValidator({ codes: MOCK_STATUS_CODES }),
+    validate: createStatusCodeValidator(),
+    acceptChar: createStatusCodeInputFilter(),
+    normalize: createStatusCodeNormalizer(),
   },
   {
     name: 'protocol',

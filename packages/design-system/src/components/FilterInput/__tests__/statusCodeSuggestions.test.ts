@@ -1,5 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
+  createStatusCodeInputFilter,
+  createStatusCodeNormalizer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
 } from '../lib/statusCodeSuggestions';
@@ -228,5 +230,54 @@ describe('createStatusCodeValidator', () => {
     // "1" is not in the provided codes, but 1xx is still a valid HTTP class.
     expect(bound('101')).toBe(false);
     expect(bound('1XX')).toBe(false);
+  });
+});
+
+describe('createStatusCodeInputFilter', () => {
+  const accept = createStatusCodeInputFilter();
+
+  it.each(['0', '1', '9', 'x', 'X'])('accepts %s', c => {
+    expect(accept(c)).toBe(true);
+  });
+
+  it.each(['a', 'Z', '-', '.', ' ', '/', '5x'])('rejects %s', c => {
+    expect(accept(c)).toBe(false);
+  });
+});
+
+describe('createStatusCodeNormalizer', () => {
+  const normalize = createStatusCodeNormalizer();
+
+  it.each([
+    ['2', '2XX'],
+    ['5', '5XX'],
+    ['22', '22X'],
+    ['40', '40X'],
+    ['222', '222'],
+    ['4XX', '4XX'],
+    ['40X', '40X'],
+    ['2x', '2XX'],
+    ['4xx', '4XX'],
+    ['40x', '40X'],
+  ])('pads "%s" to "%s"', (input, expected) => {
+    expect(normalize(input)).toBe(expected);
+  });
+
+  it('leaves unrecognised input untouched so validate can flag it', () => {
+    expect(normalize('abc')).toBe('abc');
+    expect(normalize('X20')).toBe('X20');
+    expect(normalize('4040')).toBe('4040');
+    expect(normalize('')).toBe('');
+  });
+
+  it('passes through non-string primitives unchanged', () => {
+    expect(normalize(true)).toBe(true);
+    expect(normalize(false)).toBe(false);
+  });
+
+  it('normalizes numeric shorthand', () => {
+    expect(normalize(4)).toBe('4XX');
+    expect(normalize(40)).toBe('40X');
+    expect(normalize(401)).toBe('401');
   });
 });

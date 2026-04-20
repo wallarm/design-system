@@ -101,6 +101,21 @@ export interface FieldMetadata {
    * (e.g. HTTP status code must be 3 chars, first digit in [1..5]).
    */
   validate?: (value: string | number | boolean) => boolean;
+  /**
+   * Optional per-character input filter. When the user is entering a value
+   * for this field (building or inline-editing the value segment), any
+   * character for which this returns `false` is stripped from the input
+   * on change. Separators that the filter should preserve (comma, space)
+   * are allowed through unconditionally.
+   */
+  acceptChar?: (char: string) => boolean;
+  /**
+   * Optional value normalizer. Runs on commit (after Enter / blur) before
+   * `validate`, so consumers can auto-complete partial input — e.g. a status
+   * code helper can turn "2" into "2XX" or "22" into "22X". Multi-select
+   * commits apply this per token.
+   */
+  normalize?: (value: string | number | boolean) => string | number | boolean;
 }
 
 /**

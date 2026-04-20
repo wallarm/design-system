@@ -30,6 +30,8 @@ export {
 export { type FilterParseError, isFilterParseError, parseExpression } from './parseExpression';
 export { serializeExpression } from './serializeExpression';
 export {
+  createStatusCodeInputFilter,
+  createStatusCodeNormalizer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
   type StatusCodeSuggestionsOptions,

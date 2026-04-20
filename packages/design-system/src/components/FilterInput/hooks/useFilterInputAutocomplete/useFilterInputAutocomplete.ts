@@ -346,7 +346,19 @@ export const useFilterInputAutocomplete = ({
     editingSegment: editing.editingSegment,
     segmentFilterText: editing.segmentFilterText,
     segmentMenuFilterText: editing.segmentMenuFilterText,
-    handleSegmentFilterChange: editing.setSegmentFilterText,
+    handleSegmentFilterChange: (text: string) => {
+      // Mirror the main-input character filter when editing a value segment
+      // so the same acceptChar rule applies in both entry paths.
+      if (editing.editingSegment === 'value' && selectedField?.acceptChar) {
+        const accept = selectedField.acceptChar;
+        const filtered = Array.from(text)
+          .filter(c => c === ',' || c === ' ' || accept(c))
+          .join('');
+        editing.setSegmentFilterText(filtered);
+        return;
+      }
+      editing.setSegmentFilterText(text);
+    },
     cancelSegmentEdit: editing.cancelSegmentEdit,
     handleCustomValueCommit,
     handleCustomAttributeCommit,

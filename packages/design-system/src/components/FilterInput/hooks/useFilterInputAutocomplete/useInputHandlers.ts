@@ -46,7 +46,19 @@ export const useInputHandlers = ({
 
   const handleInputChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      const text = e.target.value;
+      let text = e.target.value;
+      // When the user is entering a value for a field that specifies a
+      // per-character filter, strip everything that isn't allowed. Commas and
+      // spaces survive so multi-select delimiters still work.
+      if (menuState === 'value' && selectedField?.acceptChar) {
+        const accept = selectedField.acceptChar;
+        text = Array.from(text)
+          .filter(c => c === ',' || c === ' ' || accept(c))
+          .join('');
+        if (text !== e.target.value) {
+          e.target.value = text;
+        }
+      }
       setInputText(text);
 
       if (text && !selectedField) {
@@ -55,7 +67,7 @@ export const useInputHandlers = ({
         setMenuState(isFocused && conditionsLengthRef.current === 0 ? 'field' : 'closed');
       }
     },
-    [selectedField, isFocused, setInputText, setMenuState, conditionsLengthRef],
+    [menuState, selectedField, isFocused, setInputText, setMenuState, conditionsLengthRef],
   );
 
   const handleInputClick = useCallback(() => {

@@ -69,7 +69,10 @@ export const resolveSingleValue = (
 ): { resolved: string | number | boolean; error: boolean | undefined } => {
   const fv = getFieldValues(field);
   const match = findMatchingFieldValue(fv, trimmed);
-  const resolved = match ? match.value : trimmed;
+  const raw = match ? match.value : trimmed;
+  // Apply field-provided normalization (e.g. pad partial status codes) before
+  // validation runs — the normalized form is what ends up in the chip.
+  const resolved = field.normalize ? field.normalize(raw) : raw;
   // Custom validator trumps the static-allowlist check.
   if (field.validate) {
     return { resolved, error: field.validate(resolved) ? true : undefined };
@@ -89,7 +92,9 @@ export const resolveMultiValues = (
     .split(',')
     .map(s => s.trim())
     .filter(Boolean);
-  const resolved = parts.map(part => resolveFieldValue(field, part));
+  const raw = parts.map(part => resolveFieldValue(field, part));
+  // Apply field-provided normalization per token (e.g. "2, 3" → "2XX, 3XX").
+  const resolved = field.normalize ? raw.map(v => field.normalize!(v)) : raw;
   const error = getInvalidValueIndices(field, resolved).length > 0 ? true : undefined;
   return { resolved, error };
 };

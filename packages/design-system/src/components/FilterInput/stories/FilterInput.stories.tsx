@@ -3,6 +3,8 @@ import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterInput } from '../FilterInput';
 import {
+  createStatusCodeInputFilter,
+  createStatusCodeNormalizer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
 } from '../lib/statusCodeSuggestions';
@@ -284,7 +286,9 @@ export const HTTPStatusCodeSuggestions: Story = {
         label: 'Status code',
         type: 'integer',
         getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
-        validate: createStatusCodeValidator({ codes: MOCK_STATUS_CODES }),
+        validate: createStatusCodeValidator(),
+        acceptChar: createStatusCodeInputFilter(),
+        normalize: createStatusCodeNormalizer(),
       },
     ],
     placeholder: 'Type to filter by status code...',
