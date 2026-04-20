@@ -9,7 +9,7 @@ const meta: Meta<typeof DateRangeInput> = {
   title: 'Inputs Date/DateRangeInput',
   component: DateRangeInput,
   parameters: {
-    layout: 'centered',
+    layout: 'padded',
     docs: {
       description: {
         component:
@@ -17,6 +17,13 @@ const meta: Meta<typeof DateRangeInput> = {
       },
     },
   },
+  decorators: [
+    Story => (
+      <div style={{ minHeight: 360, paddingBottom: 280 }}>
+        <Story />
+      </div>
+    ),
+  ],
   tags: ['alpha'],
   argTypes: {
     granularity: {

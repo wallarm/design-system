@@ -13,7 +13,7 @@ const meta: Meta<typeof DateInput> = {
   title: 'Inputs Date/DateInput',
   component: DateInput,
   parameters: {
-    layout: 'centered',
+    layout: 'padded',
     docs: {
       description: {
         component:
@@ -21,6 +21,13 @@ const meta: Meta<typeof DateInput> = {
       },
     },
   },
+  decorators: [
+    Story => (
+      <div style={{ minHeight: 360, paddingBottom: 280 }}>
+        <Story />
+      </div>
+    ),
+  ],
   argTypes: {
     granularity: {
       control: 'select',
