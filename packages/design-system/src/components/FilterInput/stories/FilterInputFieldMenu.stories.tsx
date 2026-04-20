@@ -1,6 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterInputFieldMenu } from '../FilterInputMenu';
-import { createStatusCodeSuggestions } from '../lib/statusCodeSuggestions';
+import {
+  createStatusCodeSuggestions,
+  createStatusCodeValidator,
+} from '../lib/statusCodeSuggestions';
 import type { FieldMetadata } from '../types';
 import { MOCK_STATUS_CODES } from './mockStatusCodes';
 
@@ -54,6 +57,7 @@ const sampleFields: FieldMetadata[] = [
     type: 'integer',
     description: 'HTTP response status code',
     getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+    validate: createStatusCodeValidator({ codes: MOCK_STATUS_CODES }),
   },
   {
     name: 'impact',
@@ -221,6 +225,7 @@ export const WithRecentFields: Story = {
         type: 'integer',
         description: 'HTTP response status code',
         getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+        validate: createStatusCodeValidator({ codes: MOCK_STATUS_CODES }),
       },
       {
         name: 'location',
@@ -299,6 +304,7 @@ export const WithRecentAndSuggestions: Story = {
         type: 'integer',
         description: 'HTTP response status code',
         getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+        validate: createStatusCodeValidator({ codes: MOCK_STATUS_CODES }),
       },
       {
         name: 'endpoint',

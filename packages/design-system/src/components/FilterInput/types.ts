@@ -94,6 +94,13 @@ export interface FieldMetadata {
     inputText: string,
     context?: { selectedValues?: Array<string | number | boolean> },
   ) => FieldValueOption[];
+  /**
+   * Optional freeform-value validator. When provided, it runs in place of the
+   * static-allowlist check — return `true` to mark the value invalid. Useful
+   * for fields that accept arbitrary input but still have format rules
+   * (e.g. HTTP status code must be 3 chars, first digit in [1..5]).
+   */
+  validate?: (value: string | number | boolean) => boolean;
 }
 
 /**

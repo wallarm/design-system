@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { createStatusCodeSuggestions } from '../lib/statusCodeSuggestions';
+import {
+  createStatusCodeSuggestions,
+  createStatusCodeValidator,
+} from '../lib/statusCodeSuggestions';
 
 describe('createStatusCodeSuggestions', () => {
   it('returns all available masks for empty input', () => {
@@ -182,5 +185,47 @@ describe('createStatusCodeSuggestions', () => {
       expect(first.value).toBe('2XX');
       expect(first.badge?.color).toBe('green');
     });
+  });
+});
+
+describe('createStatusCodeValidator', () => {
+  const isInvalid = createStatusCodeValidator({ codes: ['2', '3', '4', '5'] });
+
+  it.each([
+    ['200', false],
+    ['404', false],
+    ['503', false],
+    ['4XX', false],
+    ['40X', false],
+    ['2XX', false],
+  ])('accepts valid status code or mask %s', (value, expected) => {
+    expect(isInvalid(value)).toBe(expected);
+  });
+
+  it.each([
+    ['4040', 'four digits'],
+    ['40', 'two digits'],
+    ['4', 'single digit'],
+    ['', 'empty'],
+    ['4a', 'non-digit chars'],
+    ['abc', 'letters only'],
+    ['XXX', 'no digit anchor'],
+    ['601', 'class outside maskRoots (6)'],
+    ['101', 'class outside maskRoots (1 not in codes)'],
+    ['4X0', 'mask with digit after X'],
+  ])('rejects invalid input %s (%s)', value => {
+    expect(isInvalid(value)).toBe(true);
+  });
+
+  it('accepts 1 as a valid class when codes include it', () => {
+    const isInvalidWith1 = createStatusCodeValidator({ codes: ['1', '2', '3', '4', '5'] });
+    expect(isInvalidWith1('101')).toBe(false);
+    expect(isInvalidWith1('1XX')).toBe(false);
+  });
+
+  it('rejects everything when codes is empty', () => {
+    const isInvalidEmpty = createStatusCodeValidator({ codes: [] });
+    expect(isInvalidEmpty('404')).toBe(true);
+    expect(isInvalidEmpty('4XX')).toBe(true);
   });
 });

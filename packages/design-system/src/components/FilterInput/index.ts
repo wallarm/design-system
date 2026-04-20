@@ -13,6 +13,7 @@ export {
 // Utilities
 export {
   createStatusCodeSuggestions,
+  createStatusCodeValidator,
   type FilterParseError,
   isFilterParseError,
   parseExpression,

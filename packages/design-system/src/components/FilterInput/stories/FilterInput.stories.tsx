@@ -2,7 +2,10 @@ import type React from 'react';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterInput } from '../FilterInput';
-import { createStatusCodeSuggestions } from '../lib/statusCodeSuggestions';
+import {
+  createStatusCodeSuggestions,
+  createStatusCodeValidator,
+} from '../lib/statusCodeSuggestions';
 import type { ExprNode, FieldMetadata } from '../types';
 import { MOCK_STATUS_CODES } from './mockStatusCodes';
 
@@ -281,6 +284,7 @@ export const HTTPStatusCodeSuggestions: Story = {
         label: 'Status code',
         type: 'integer',
         getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+        validate: createStatusCodeValidator({ codes: MOCK_STATUS_CODES }),
       },
     ],
     placeholder: 'Type to filter by status code...',

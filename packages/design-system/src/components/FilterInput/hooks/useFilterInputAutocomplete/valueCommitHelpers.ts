@@ -29,6 +29,13 @@ export const getInvalidValueIndices = (
   field: FieldMetadata,
   values: Array<string | number | boolean>,
 ): number[] => {
+  // A custom validator trumps the static-allowlist check.
+  if (field.validate) {
+    return values.reduce<number[]>((acc, v, idx) => {
+      if (field.validate!(v)) acc.push(idx);
+      return acc;
+    }, []);
+  }
   if (!hasStaticAllowlist(field)) return [];
   const fv = getFieldValues(field);
   if (fv.length === 0) return [];

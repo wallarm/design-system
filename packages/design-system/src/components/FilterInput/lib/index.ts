@@ -31,5 +31,6 @@ export { type FilterParseError, isFilterParseError, parseExpression } from './pa
 export { serializeExpression } from './serializeExpression';
 export {
   createStatusCodeSuggestions,
+  createStatusCodeValidator,
   type StatusCodeSuggestionsOptions,
 } from './statusCodeSuggestions';

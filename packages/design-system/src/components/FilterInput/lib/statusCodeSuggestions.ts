@@ -20,6 +20,25 @@ export interface StatusCodeSuggestionsOptions {
   codes?: string[];
 }
 
+/**
+ * Build a validator that matches the same legal shapes the suggestion list
+ * proposes: a 3-character status code or mask whose leading digit is one of
+ * the configured `maskRoots`. Accepts `NNN`, `NNX`, or `NXX`. Returns `true`
+ * when the value is invalid (matching the `FieldMetadata.validate` contract).
+ */
+export const createStatusCodeValidator = (
+  options?: StatusCodeSuggestionsOptions,
+): ((value: string | number | boolean) => boolean) => {
+  const maskRoots = (options?.codes ?? []).filter(c => c.length === 1 && VALID_MASK_ROOTS.has(c));
+  return value => {
+    const s = String(value);
+    if (s.length !== 3) return true;
+    if (!maskRoots.includes(s.charAt(0))) return true;
+    // positions 2-3: either both 'X' (NXX), digit + 'X' (NNX), or both digits (NNN)
+    return !/^(XX|\dX|\d\d)$/.test(s.slice(1));
+  };
+};
+
 export const createStatusCodeSuggestions = (
   options?: StatusCodeSuggestionsOptions,
 ): ((
