@@ -182,22 +182,28 @@ export const Granularity: StoryFn<typeof meta> = () => (
 );
 
 export const TimeDropdownSteps: StoryFn<typeof meta> = () => (
-  <HStack gap={24}>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        12-hour format
-      </Text>
-      <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={12} />
-      <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={12} />
-      <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={12} />
-    </VStack>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        24-hour format
-      </Text>
-      <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={24} />
-      <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={24} />
-      <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={24} />
-    </VStack>
-  </HStack>
+  <div style={{ paddingBottom: 360 }}>
+    <HStack gap={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          12-hour format
+        </Text>
+        <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={12} />
+        <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={12} />
+        <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={12} />
+      </VStack>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          24-hour format
+        </Text>
+        <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={24} />
+        <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={24} />
+        <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={24} />
+      </VStack>
+    </HStack>
+  </div>
 );
+
+TimeDropdownSteps.parameters = {
+  layout: 'padded',
+};
