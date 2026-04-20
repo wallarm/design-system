@@ -50,4 +50,57 @@ describe('createStatusCodeSuggestions', () => {
     expect(suggest('  4  ').map(o => o.value)).toEqual(['4XX']);
     expect(suggest('  ').map(o => o.value)).toEqual(['2XX', '3XX', '4XX', '5XX']);
   });
+
+  it('ignores 3-char entries and other lengths in codes', () => {
+    const suggest = createStatusCodeSuggestions({
+      codes: ['2', '3', '4', '5', '200', '201', '40', '4040', '', '404'],
+    });
+    expect(suggest('').map(o => o.value)).toEqual(['2XX', '3XX', '4XX', '5XX']);
+  });
+
+  it('ignores 1-char entries outside the valid HTTP range', () => {
+    const suggest = createStatusCodeSuggestions({
+      codes: ['0', '2', '4', '6', '9', 'a'],
+    });
+    expect(suggest('').map(o => o.value)).toEqual(['2XX', '4XX']);
+  });
+
+  it('returns empty when codes is undefined', () => {
+    const suggest = createStatusCodeSuggestions();
+    expect(suggest('')).toEqual([]);
+    expect(suggest('4')).toEqual([]);
+    expect(suggest('40')).toEqual([]);
+  });
+
+  it('returns empty when codes is an empty array', () => {
+    const suggest = createStatusCodeSuggestions({ codes: [] });
+    expect(suggest('')).toEqual([]);
+    expect(suggest('4')).toEqual([]);
+  });
+
+  it('accepts the full backend example and shows only available masks', () => {
+    const suggest = createStatusCodeSuggestions({
+      codes: [
+        '2',
+        '3',
+        '4',
+        '5',
+        '200',
+        '201',
+        '301',
+        '302',
+        '400',
+        '401',
+        '403',
+        '404',
+        '500',
+        '502',
+        '503',
+      ],
+    });
+    expect(suggest('').map(o => o.value)).toEqual(['2XX', '3XX', '4XX', '5XX']);
+    expect(suggest('4').map(o => o.value)).toEqual(['4XX']);
+    expect(suggest('40').map(o => o.value)).toEqual(['40X']);
+    expect(suggest('1')).toEqual([]);
+  });
 });
