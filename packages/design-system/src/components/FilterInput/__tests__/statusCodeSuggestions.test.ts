@@ -32,9 +32,23 @@ describe('createStatusCodeSuggestions', () => {
     expect(suggest('10')).toEqual([]);
   });
 
-  it('returns empty when input has three or more digits', () => {
+  it('returns the typed 3-digit code as a selectable option when its class is known', () => {
     const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
-    expect(suggest('401')).toEqual([]);
+    const [option] = suggest('401');
+    expect(option.value).toBe('401');
+    expect(option.label).toBe('401');
+    expect(option.badge?.color).toBe('amber');
+    expect(option.badge?.text).toBe('401');
+  });
+
+  it('returns empty for a 3-digit input whose class is not in maskRoots', () => {
+    const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
+    expect(suggest('101')).toEqual([]);
+    expect(suggest('601')).toEqual([]);
+  });
+
+  it('returns empty when input has four or more digits', () => {
+    const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
     expect(suggest('4040')).toEqual([]);
   });
 
@@ -101,6 +115,7 @@ describe('createStatusCodeSuggestions', () => {
     expect(suggest('').map(o => o.value)).toEqual(['2XX', '3XX', '4XX', '5XX']);
     expect(suggest('4').map(o => o.value)).toEqual(['4XX']);
     expect(suggest('40').map(o => o.value)).toEqual(['40X']);
+    expect(suggest('401').map(o => o.value)).toEqual(['401']);
     expect(suggest('1')).toEqual([]);
   });
 

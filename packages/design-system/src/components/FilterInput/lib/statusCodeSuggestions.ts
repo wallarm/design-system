@@ -53,6 +53,7 @@ export const createStatusCodeSuggestions = (
 
     if (norm.length === 1) return [makeMask(`${norm}XX`)];
     if (norm.length === 2) return [makeMask(`${norm}X`)];
+    if (norm.length === 3) return [makeMask(norm)];
     return [];
   };
 };
