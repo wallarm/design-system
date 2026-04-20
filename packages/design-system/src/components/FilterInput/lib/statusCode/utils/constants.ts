@@ -1,4 +1,4 @@
-import type { BadgeColor } from '../../../Badge';
+import type { BadgeColor } from '../../../../Badge';
 
 /** The five valid HTTP status-code classes, used both for suggestion-building
  *  and validation. Backed by the standard HTTP spec, independent of what the

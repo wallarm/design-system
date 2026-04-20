@@ -1,4 +1,4 @@
-import type { FieldValueOption } from '../../types';
+import type { FieldValueOption } from '../../../types';
 import { HTTP_CLASS_BADGE_COLOR } from './constants';
 
 /** Build a `FieldValueOption` for a status-code mask or concrete code. Badge

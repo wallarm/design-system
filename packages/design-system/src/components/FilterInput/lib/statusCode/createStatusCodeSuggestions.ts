@@ -1,8 +1,10 @@
 import type { FieldValueOption } from '../../types';
-import { canonicalizeStatusCodeInput } from './canonicalize';
-import { makeMask } from './makeMask';
-import { getMaskRoots } from './maskRoots';
-import type { StatusCodeSuggestionsOptions } from './types';
+import {
+  canonicalizeStatusCodeInput,
+  getMaskRoots,
+  makeMask,
+  type StatusCodeSuggestionsOptions,
+} from './utils';
 
 /**
  * Build the `getSuggestions` callback for an HTTP status code field. The

@@ -1,5 +1,4 @@
-import { STATUS_CODE_LENGTH, VALID_MASK_ROOTS } from './constants';
-import type { StatusCodeSuggestionsOptions } from './types';
+import { STATUS_CODE_LENGTH, type StatusCodeSuggestionsOptions, VALID_MASK_ROOTS } from './utils';
 
 /**
  * Build a validator for the HTTP status code field. Accepts only 3-character
