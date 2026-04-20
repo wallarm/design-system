@@ -2,11 +2,15 @@ import type { FieldMetadata } from '../types';
 import {
   createStatusCodeInputFilter,
   createStatusCodeNormalizer,
+  createStatusCodeSerializer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
 } from './statusCode';
 
-type FieldHelpers = Pick<FieldMetadata, 'acceptChar' | 'normalize' | 'getSuggestions' | 'validate'>;
+type FieldHelpers = Pick<
+  FieldMetadata,
+  'acceptChar' | 'normalize' | 'getSuggestions' | 'validate' | 'serializeValue'
+>;
 
 /**
  * Known field names that auto-wire DS helpers. Keyed by `FieldMetadata.name`
@@ -20,6 +24,7 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
     normalize: createStatusCodeNormalizer(),
     getSuggestions: createStatusCodeSuggestions(),
     validate: createStatusCodeValidator(),
+    serializeValue: createStatusCodeSerializer(),
   }),
 };
 
@@ -55,6 +60,7 @@ export const applyKnownFieldHelpers = (fields: FieldMetadata[]): FieldMetadata[]
       normalize: field.normalize ?? helpers.normalize,
       getSuggestions: field.getSuggestions ?? helpers.getSuggestions,
       validate: field.validate ?? helpers.validate,
+      serializeValue: field.serializeValue ?? helpers.serializeValue,
     };
   });
   return changed ? out : fields;

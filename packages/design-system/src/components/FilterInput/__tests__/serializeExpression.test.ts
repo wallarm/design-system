@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { serializeExpression } from '../lib/serializeExpression';
-import type { Condition, ExprNode, Group } from '../types';
+import { createStatusCodeSerializer } from '../lib/statusCode';
+import type { Condition, ExprNode, FieldMetadata, Group } from '../types';
 
 const cond = (
   field: string,
@@ -106,5 +107,37 @@ describe('serializeExpression', () => {
       cond('c', '=', '3'),
     );
     expect(serializeExpression(expr)).toBe('(a = "1") AND (b = "2") OR (c = "3")');
+  });
+
+  describe('with fields that carry serializeValue', () => {
+    const fields: FieldMetadata[] = [
+      {
+        name: 'status_code',
+        label: 'Status Code',
+        type: 'integer',
+        serializeValue: createStatusCodeSerializer(),
+      },
+      { name: 'country', label: 'Country', type: 'string' },
+    ];
+
+    it('applies the transform to single-value conditions', () => {
+      const expr = cond('status_code', '=', '2XX');
+      expect(serializeExpression(expr, fields)).toBe('(status_code = "2")');
+    });
+
+    it('applies the transform element-wise to multi-value conditions', () => {
+      const expr = cond('status_code', 'in', ['2XX', '40X', '401']);
+      expect(serializeExpression(expr, fields)).toBe('(status_code in ["2", "40", "401"])');
+    });
+
+    it('leaves other fields untouched', () => {
+      const expr = group('and', cond('country', '=', 'US'), cond('status_code', '=', '4XX'));
+      expect(serializeExpression(expr, fields)).toBe('(country = "US") AND (status_code = "4")');
+    });
+
+    it('is a no-op when fields is omitted (UI-facing form preserved)', () => {
+      const expr = cond('status_code', '=', '2XX');
+      expect(serializeExpression(expr)).toBe('(status_code = "2XX")');
+    });
   });
 });
