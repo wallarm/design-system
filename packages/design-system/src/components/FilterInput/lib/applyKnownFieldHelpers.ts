@@ -6,10 +6,7 @@ import {
   createStatusCodeValidator,
 } from './statusCode';
 
-type FieldHelpers = Pick<
-  FieldMetadata,
-  'acceptChar' | 'normalize' | 'getSuggestions' | 'validate'
->;
+type FieldHelpers = Pick<FieldMetadata, 'acceptChar' | 'normalize' | 'getSuggestions' | 'validate'>;
 
 /**
  * Known field names that auto-wire DS helpers. Keyed by `FieldMetadata.name`
