@@ -1,5 +1,4 @@
-import { forwardRef, type ReactNode, type RefObject, useCallback, useRef } from 'react';
-import { CalendarDate } from '@internationalized/date';
+import { forwardRef, type ReactNode, type RefObject, useRef } from 'react';
 import { useDateRangePicker } from '@react-aria/datepicker';
 import { useDateRangePickerState } from '@react-stately/datepicker';
 import { getDefaultTemporalPlaceholder, useTemporalField } from '../../TemporalCore';
@@ -58,38 +57,9 @@ export const DateRangeProvider = forwardRef<HTMLDivElement, DateRangeProviderPro
       onChange,
     });
 
-    // Wrap onChange to validate range order
-    const handleChangeWithValidation = useCallback(
-      (newValue: typeof value) => {
-        // Handle undefined
-        if (newValue === undefined) {
-          handleChange(null);
-          return;
-        }
-
-        // Ensure end date is not before start date
-        if (newValue?.start && newValue?.end) {
-          const startDate = new CalendarDate(
-            newValue.start.year,
-            newValue.start.month,
-            newValue.start.day,
-          );
-          const endDate = new CalendarDate(newValue.end.year, newValue.end.month, newValue.end.day);
-
-          // If end is before start, don't update
-          if (endDate.compare(startDate) < 0) {
-            return;
-          }
-        }
-
-        handleChange(newValue);
-      },
-      [handleChange],
-    );
-
     const state = useDateRangePickerState({
       value,
-      onChange: handleChangeWithValidation,
+      onChange: newValue => handleChange(newValue ?? null),
       isDisabled: disabled,
       isReadOnly: readOnly,
       granularity,
