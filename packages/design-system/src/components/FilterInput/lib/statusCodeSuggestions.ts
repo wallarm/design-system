@@ -24,14 +24,19 @@ export const createStatusCodeSuggestions = (
 ): ((inputText: string) => FieldValueOption[]) => {
   const maskRoots = (options?.codes ?? []).filter(c => c.length === 1 && VALID_MASK_ROOTS.has(c));
 
-  const makeMask = (label: string): FieldValueOption => ({
-    value: label,
-    label,
-    badge: {
-      color: HTTP_CLASS_BADGE_COLOR[label.charAt(0)] ?? '',
-      text: label,
-    },
-  });
+  const makeMask = (label: string): FieldValueOption => {
+    const color = HTTP_CLASS_BADGE_COLOR[label.charAt(0)];
+    if (!color) {
+      // Unreachable — makeMask is only called with labels whose leading digit
+      // came from maskRoots (filtered to [1..5] at factory time).
+      throw new Error(`statusCodeSuggestions: no badge color for mask "${label}"`);
+    }
+    return {
+      value: label,
+      label,
+      badge: { color, text: label },
+    };
+  };
 
   return (inputText: string): FieldValueOption[] => {
     const norm = inputText.trim();
