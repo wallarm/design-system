@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import type { SvgIconProps } from '../../icons';
+import type { InputGroupSize } from '../InputGroup';
 
 export interface DateInputBaseProps {
   /** Optional icon component to display at the start of the input */
@@ -16,6 +17,8 @@ export interface DateInputBaseProps {
   timeStep?: number;
   /** Hour cycle for time display: 12-hour (AM/PM) or 24-hour format */
   hourCycle?: 12 | 24;
+  /** Visual size of the input. Default: 'default' (36px) */
+  size?: InputGroupSize;
 
   /**
    * className prop

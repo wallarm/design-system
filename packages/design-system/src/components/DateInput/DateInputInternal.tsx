@@ -30,6 +30,7 @@ export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalPro
       showTimeDropdown,
       timeStep = 30,
       hourCycle,
+      size = 'default',
       ...props
     },
     ref,
@@ -120,7 +121,7 @@ export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalPro
       state.value && hasTimeSegments ? (state.value as TimeValue) : null;
 
     return (
-      <InputGroup>
+      <InputGroup size={size}>
         {IconComponent && (
           <InputGroupAddon>
             <IconComponent />
@@ -128,7 +129,7 @@ export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalPro
         )}
 
         <div
-          className={cn('relative flex-1', !IconComponent && 'pl-12')}
+          className={cn('relative flex-1 h-full', !IconComponent && 'pl-12')}
           onKeyDownCapture={handleKeyDownCapture}
         >
           {showPlaceholder && <TemporalPlaceholder text={placeholder} />}
@@ -136,7 +137,7 @@ export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalPro
             {...props}
             ref={ref}
             data-slot='input'
-            className={cn('h-36', showPlaceholder && 'opacity-0')}
+            className={cn('h-full', showPlaceholder && 'opacity-0')}
             aria-invalid={error || undefined}
             aria-disabled={disabled || undefined}
             state={state}

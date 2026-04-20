@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import type { DateValue } from '@react-aria/datepicker';
 import type { RangeValue } from '@react-types/shared';
 import type { SvgIconProps } from '../../icons';
+import type { InputGroupSize } from '../InputGroup';
 
 export interface DateRangeBaseProps {
   /** Optional icon component to display at the start of the input */
@@ -18,6 +19,8 @@ export interface DateRangeBaseProps {
   showTimeDropdown?: boolean;
   /** Time interval in minutes for dropdown options. Default: 30 */
   timeStep?: number;
+  /** Visual size of the input. Default: 'default' (36px) */
+  size?: InputGroupSize;
 }
 
 export interface DateRangeInputProps extends DateRangeBaseProps {
