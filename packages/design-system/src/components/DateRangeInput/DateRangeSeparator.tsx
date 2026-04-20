@@ -15,7 +15,7 @@ import { cn } from '../../utils/cn';
  */
 export const DateRangeSeparator: FC = () => {
   return (
-    <span className={cn('text-sm text-text-primary select-none')} aria-hidden='true'>
+    <span className={cn('text-sm text-text-secondary select-none')} aria-hidden='true'>
       →
     </span>
   );
