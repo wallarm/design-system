@@ -30,7 +30,7 @@ export const createStatusCodeSuggestions = (
       return maskRoots.includes(norm) ? [makeMask(`${norm}XX`)] : [];
     }
     if (norm.length === 2) {
-      const d1 = norm[0];
+      const d1 = norm.slice(0, 1);
       return maskRoots.includes(d1) ? [makeMask(`${norm}X`)] : [];
     }
     return [];
