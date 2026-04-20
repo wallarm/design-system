@@ -1,4 +1,5 @@
 import { type FC, type FocusEvent, useCallback, useState } from 'react';
+import type { SvgIconProps } from '../../icons';
 import { cn } from '../../utils/cn';
 import { InputGroup, InputGroupAddon } from '../InputGroup';
 import { TemporalClear, TemporalPlaceholder } from '../TemporalCore';
@@ -6,9 +7,10 @@ import { useDateRangeContext } from './DateRangeContext';
 import { DateRangeGroup } from './DateRangeGroup';
 import { DateRangeSegmentGroup } from './DateRangeSegmentGroup';
 import { DateRangeSeparator } from './DateRangeSeparator';
-import type { DateRangeBaseProps } from './types';
 
-export type DateRangeInputInternalProps = Pick<DateRangeBaseProps, 'icon'>;
+export interface DateRangeInputInternalProps {
+  icon?: FC<SvgIconProps>;
+}
 
 export const DateRangeInputInternal: FC<DateRangeInputInternalProps> = ({
   icon: IconComponent,

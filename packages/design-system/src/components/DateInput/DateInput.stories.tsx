@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { CalendarDate, CalendarDateTime, getLocalTimeZone, today } from '@internationalized/date';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Calendar } from '../../icons';
 import { Field, FieldAction, FieldDescription, FieldError, FieldLabel } from '../Field';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
@@ -47,6 +46,10 @@ const meta: Meta<typeof DateInput> = {
       control: 'text',
       description: 'Placeholder text shown when no value is selected.',
     },
+    showIcon: {
+      control: 'boolean',
+      description: 'Whether to show the leading calendar icon. Default: true.',
+    },
     showTimeDropdown: {
       control: 'boolean',
       description:
@@ -66,7 +69,7 @@ const meta: Meta<typeof DateInput> = {
     granularity: 'day',
     error: false,
     disabled: false,
-    icon: Calendar,
+    showIcon: true,
     showTimeDropdown: false,
     timeStep: undefined,
     size: 'default',
@@ -85,13 +88,13 @@ export const WithIcon: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Without icon
       </Text>
-      <DateInput />
+      <DateInput showIcon={false} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         With icon
       </Text>
-      <DateInput icon={Calendar} />
+      <DateInput />
     </VStack>
   </HStack>
 );
@@ -102,22 +105,22 @@ export const States: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Default
       </Text>
-      <DateInput icon={Calendar} />
-      <DateInput icon={Calendar} defaultValue={sampleDate} />
+      <DateInput />
+      <DateInput defaultValue={sampleDate} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         Disabled
       </Text>
-      <DateInput icon={Calendar} disabled />
-      <DateInput icon={Calendar} disabled defaultValue={sampleDate} />
+      <DateInput disabled />
+      <DateInput disabled defaultValue={sampleDate} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         Error
       </Text>
-      <DateInput icon={Calendar} error />
-      <DateInput icon={Calendar} error defaultValue={sampleDate} />
+      <DateInput error />
+      <DateInput error defaultValue={sampleDate} />
     </VStack>
   </HStack>
 );
@@ -129,19 +132,19 @@ export const Sizes: StoryFn<typeof meta> = () => (
         <Text size='sm' color='secondary'>
           Default (36px)
         </Text>
-        <DateInput icon={Calendar} size='default' />
+        <DateInput size='default' />
       </VStack>
       <VStack gap={4}>
         <Text size='sm' color='secondary'>
           Medium (32px)
         </Text>
-        <DateInput icon={Calendar} size='medium' />
+        <DateInput size='medium' />
       </VStack>
       <VStack gap={4}>
         <Text size='sm' color='secondary'>
           Small (24px)
         </Text>
-        <DateInput icon={Calendar} size='small' />
+        <DateInput size='small' />
       </VStack>
     </VStack>
     <VStack gap={16}>
@@ -149,19 +152,19 @@ export const Sizes: StoryFn<typeof meta> = () => (
         <Text size='sm' color='secondary'>
           Default filled
         </Text>
-        <DateInput icon={Calendar} size='default' defaultValue={sampleDate} />
+        <DateInput size='default' defaultValue={sampleDate} />
       </VStack>
       <VStack gap={4}>
         <Text size='sm' color='secondary'>
           Medium filled
         </Text>
-        <DateInput icon={Calendar} size='medium' defaultValue={sampleDate} />
+        <DateInput size='medium' defaultValue={sampleDate} />
       </VStack>
       <VStack gap={4}>
         <Text size='sm' color='secondary'>
           Small filled
         </Text>
-        <DateInput icon={Calendar} size='small' defaultValue={sampleDate} />
+        <DateInput size='small' defaultValue={sampleDate} />
       </VStack>
     </VStack>
   </HStack>
@@ -173,14 +176,13 @@ export const Filled: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Date
       </Text>
-      <DateInput icon={Calendar} defaultValue={sampleDate} />
+      <DateInput defaultValue={sampleDate} />
     </VStack>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
         Date + time (24h)
       </Text>
       <DateInput
-        icon={Calendar}
         granularity='minute'
         hourCycle={24}
         defaultValue={sampleDateTime}
@@ -191,7 +193,6 @@ export const Filled: StoryFn<typeof meta> = () => (
         Date + time (12h)
       </Text>
       <DateInput
-        icon={Calendar}
         granularity='minute'
         hourCycle={12}
         defaultValue={sampleDateTime}
@@ -201,7 +202,7 @@ export const Filled: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Without icon
       </Text>
-      <DateInput defaultValue={sampleDate} />
+      <DateInput showIcon={false} defaultValue={sampleDate} />
     </VStack>
   </VStack>
 );
@@ -212,19 +213,19 @@ export const Granularity: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         12-hour format
       </Text>
-      <DateInput icon={Calendar} placeholder='day' granularity='day' hourCycle={12} />
-      <DateInput icon={Calendar} placeholder='hour' granularity='hour' hourCycle={12} />
-      <DateInput icon={Calendar} placeholder='minute' granularity='minute' hourCycle={12} />
-      <DateInput icon={Calendar} placeholder='second' granularity='second' hourCycle={12} />
+      <DateInput placeholder='day' granularity='day' hourCycle={12} />
+      <DateInput placeholder='hour' granularity='hour' hourCycle={12} />
+      <DateInput placeholder='minute' granularity='minute' hourCycle={12} />
+      <DateInput placeholder='second' granularity='second' hourCycle={12} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         24-hour format
       </Text>
-      <DateInput icon={Calendar} placeholder='day' granularity='day' hourCycle={24} />
-      <DateInput icon={Calendar} placeholder='hour' granularity='hour' hourCycle={24} />
-      <DateInput icon={Calendar} placeholder='minute' granularity='minute' hourCycle={24} />
-      <DateInput icon={Calendar} placeholder='second' granularity='second' hourCycle={24} />
+      <DateInput placeholder='day' granularity='day' hourCycle={24} />
+      <DateInput placeholder='hour' granularity='hour' hourCycle={24} />
+      <DateInput placeholder='minute' granularity='minute' hourCycle={24} />
+      <DateInput placeholder='second' granularity='second' hourCycle={24} />
     </VStack>
   </HStack>
 );
@@ -244,13 +245,13 @@ export const WithFieldComponents: StoryFn<typeof meta> = () => {
           Label
           <FieldAction onClick={handleSetNow}>Set now</FieldAction>
         </FieldLabel>
-        <DateInput icon={Calendar} placeholder='Select a date' value={value} onChange={setValue} />
+        <DateInput placeholder='Select a date' value={value} onChange={setValue} />
         <FieldDescription>This is an input description.</FieldDescription>
       </Field>
 
       <Field invalid>
         <FieldLabel>Label</FieldLabel>
-        <DateInput icon={Calendar} error value={errorValue} onChange={setErrorValue} />
+        <DateInput error value={errorValue} onChange={setErrorValue} />
         <FieldError>An error message.</FieldError>
       </Field>
     </VStack>

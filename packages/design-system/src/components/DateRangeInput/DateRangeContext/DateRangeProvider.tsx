@@ -1,6 +1,7 @@
 import { forwardRef, type ReactNode, type RefObject, useRef } from 'react';
 import { useDateRangePicker } from '@react-aria/datepicker';
 import { useDateRangePickerState } from '@react-stately/datepicker';
+import { Calendar } from '../../../icons';
 import { getDefaultTemporalPlaceholder, useTemporalField } from '../../TemporalCore';
 import type { DateRangeInputProps } from '../types';
 import { DateRangeContext } from './context';
@@ -41,11 +42,12 @@ export const DateRangeProvider = forwardRef<HTMLDivElement, DateRangeProviderPro
       placeholder = getDefaultTemporalPlaceholder({ granularity, isRange: true }),
       showTimeDropdown,
       timeStep,
-      icon,
+      showIcon = true,
       size,
     },
     forwardedRef,
   ) => {
+    const icon = showIcon ? Calendar : undefined;
     const ref = useRef<HTMLDivElement>(null);
     const finalRef = (forwardedRef || ref) as RefObject<HTMLDivElement | null>;
     const startRef = useRef<HTMLDivElement>(null);

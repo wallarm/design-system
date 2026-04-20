@@ -1,6 +1,5 @@
 import { Time } from '@internationalized/date';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Clock } from '../../icons';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { TimeInput } from './TimeInput';
@@ -48,6 +47,10 @@ const meta: Meta<typeof TimeInput> = {
       control: 'text',
       description: 'Placeholder text shown when no value is selected.',
     },
+    showIcon: {
+      control: 'boolean',
+      description: 'Whether to show the leading clock icon. Default: true.',
+    },
     showTimeDropdown: {
       control: 'boolean',
       description: 'Show dropdown for time selection with arrow navigation.',
@@ -66,7 +69,7 @@ const meta: Meta<typeof TimeInput> = {
     granularity: 'minute',
     error: false,
     disabled: false,
-    icon: Clock,
+    showIcon: true,
     showTimeDropdown: false,
     timeStep: undefined,
     size: 'default',

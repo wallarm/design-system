@@ -1,10 +1,8 @@
-import type { FC } from 'react';
-import type { SvgIconProps } from '../../icons';
 import type { InputGroupSize } from '../InputGroup';
 
 export interface DateInputBaseProps {
-  /** Optional icon component to display at the start of the input */
-  icon?: FC<SvgIconProps>;
+  /** Whether to show the leading icon. Default: true */
+  showIcon?: boolean;
   /** Whether the input has an error state. Shows error styling when true */
   error?: boolean;
   /** Whether the input is disabled. Prevents user interaction when true */

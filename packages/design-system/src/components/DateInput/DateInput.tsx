@@ -3,6 +3,7 @@ import { createCalendar } from '@internationalized/date';
 import { type AriaDateFieldProps, type DateValue, useDateField } from '@react-aria/datepicker';
 import { useLocale } from '@react-aria/i18n';
 import { useDateFieldState } from '@react-stately/datepicker';
+import { Calendar } from '../../icons';
 import { cn } from '../../utils/cn';
 import { getDefaultTemporalPlaceholder, useTemporalField } from '../TemporalCore';
 import { DateInputInternal } from './DateInputInternal';
@@ -26,7 +27,7 @@ export type DateInputProps = Omit<
 export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
   (
     {
-      icon,
+      showIcon = true,
       value: controlledValue,
       defaultValue,
       onChange,
@@ -80,7 +81,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
       <div className={cn('min-w-256 flex-1', className)}>
         <DateInputInternal
           {...fieldProps}
-          icon={icon}
+          icon={showIcon ? Calendar : undefined}
           ref={finalRef}
           state={state}
           error={error}

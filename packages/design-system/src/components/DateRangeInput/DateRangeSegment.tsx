@@ -1,14 +1,14 @@
 import type { FC, ReactNode } from 'react';
-import type { DateInputBaseProps } from '../DateInput';
 import { InputGroup, InputGroupAddon } from '../InputGroup';
 import { useDateRangeContext } from './DateRangeContext';
 
-interface DateRangeSegmentProps extends Pick<DateInputBaseProps, 'icon'> {
+interface DateRangeSegmentProps {
   children: ReactNode;
 }
 
-export const DateRangeSegment: FC<DateRangeSegmentProps> = ({ children, icon: IconComponent }) => {
+export const DateRangeSegment: FC<DateRangeSegmentProps> = ({ children }) => {
   const context = useDateRangeContext();
+  const IconComponent = context?.icon;
 
   return (
     <InputGroup size={context?.size}>

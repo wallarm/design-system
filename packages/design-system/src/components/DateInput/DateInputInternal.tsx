@@ -1,8 +1,9 @@
-import { forwardRef, useCallback, useRef, useState } from 'react';
+import { type FC, forwardRef, useCallback, useRef, useState } from 'react';
 import { CalendarDateTime, getLocalTimeZone, now } from '@internationalized/date';
 import type { TimeValue } from '@react-aria/datepicker';
 import type { DateFieldState, TimeFieldState } from '@react-stately/datepicker';
 import type { GroupDOMAttributes } from '@react-types/shared';
+import type { SvgIconProps } from '../../icons';
 import { cn } from '../../utils/cn';
 import { InputGroup, InputGroupAddon } from '../InputGroup';
 import {
@@ -17,6 +18,7 @@ import type { DateInputBaseProps } from './types';
 
 export interface DateInputInternalProps extends GroupDOMAttributes, DateInputBaseProps {
   state: DateFieldState | TimeFieldState;
+  icon?: FC<SvgIconProps>;
 }
 
 export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalProps>(

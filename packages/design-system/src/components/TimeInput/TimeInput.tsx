@@ -24,7 +24,7 @@ export type TimeInputProps = Omit<
 export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
   (
     {
-      icon = Clock,
+      showIcon = true,
       value: controlledValue,
       defaultValue,
       onChange,
@@ -77,7 +77,7 @@ export const TimeInput = forwardRef<HTMLDivElement, TimeInputProps>(
       <div className='min-w-156'>
         <DateInputInternal
           {...fieldProps}
-          icon={icon}
+          icon={showIcon ? Clock : undefined}
           ref={finalRef}
           state={state}
           error={error}

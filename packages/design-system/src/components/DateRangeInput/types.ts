@@ -1,12 +1,10 @@
-import type { FC } from 'react';
 import type { DateValue } from '@react-aria/datepicker';
 import type { RangeValue } from '@react-types/shared';
-import type { SvgIconProps } from '../../icons';
 import type { InputGroupSize } from '../InputGroup';
 
 export interface DateRangeBaseProps {
-  /** Optional icon component to display at the start of the input */
-  icon?: FC<SvgIconProps>;
+  /** Whether to show the leading calendar icon. Default: true */
+  showIcon?: boolean;
   /** Whether the input has an error state. Shows error styling when true */
   error?: boolean;
   /** Whether the input is disabled. Prevents user interaction when true */

@@ -1,4 +1,5 @@
 import { forwardRef } from 'react';
+import { Calendar } from '../../icons';
 import { DateRangeProvider } from './DateRangeContext';
 import { DateRangeInputInternal } from './DateRangeInputInternal';
 import type { DateRangeInputProps } from './types';
@@ -32,9 +33,10 @@ import type { DateRangeInputProps } from './types';
  * </DateRangeProvider>
  */
 export const DateRangeInput = forwardRef<HTMLDivElement, DateRangeInputProps>(
-  ({ icon, ...props }, ref) => {
+  ({ showIcon = true, ...props }, ref) => {
+    const icon = showIcon ? Calendar : undefined;
     return (
-      <DateRangeProvider {...props} icon={icon} ref={ref}>
+      <DateRangeProvider {...props} showIcon={showIcon} ref={ref}>
         <DateRangeInputInternal icon={icon} />
       </DateRangeProvider>
     );
