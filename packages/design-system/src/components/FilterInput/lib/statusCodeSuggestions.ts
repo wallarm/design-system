@@ -21,19 +21,29 @@ export interface StatusCodeSuggestionsOptions {
 }
 
 /**
- * Build a validator that matches the same legal shapes the suggestion list
- * proposes: a 3-character status code or mask whose leading digit is one of
- * the configured `maskRoots`. Accepts `NNN`, `NNX`, or `NXX`. Returns `true`
- * when the value is invalid (matching the `FieldMetadata.validate` contract).
+ * Build a validator for the HTTP status code field. Accepts only 3-character
+ * values whose leading digit is a valid HTTP class (`[1..5]`) and whose
+ * remaining two characters form one of:
+ *   - `XX` (mask like `4XX`)
+ *   - `dX` (narrowed mask like `40X`)
+ *   - `dd` (concrete code like `401`)
+ *
+ * Returns `true` when the value is invalid, matching the
+ * `FieldMetadata.validate` contract.
+ *
+ * The `options` argument is accepted for API symmetry with
+ * `createStatusCodeSuggestions` (same wiring on the field), but validity is
+ * bound to the static `[1..5]` HTTP class range rather than `codes` — the
+ * backend's available-data list doesn't narrow what the user may legitimately
+ * type.
  */
 export const createStatusCodeValidator = (
-  options?: StatusCodeSuggestionsOptions,
+  _options?: StatusCodeSuggestionsOptions,
 ): ((value: string | number | boolean) => boolean) => {
-  const maskRoots = (options?.codes ?? []).filter(c => c.length === 1 && VALID_MASK_ROOTS.has(c));
   return value => {
     const s = String(value);
     if (s.length !== 3) return true;
-    if (!maskRoots.includes(s.charAt(0))) return true;
+    if (!VALID_MASK_ROOTS.has(s.charAt(0))) return true;
     // positions 2-3: either both 'X' (NXX), digit + 'X' (NNX), or both digits (NNN)
     return !/^(XX|\dX|\d\d)$/.test(s.slice(1));
   };

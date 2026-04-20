@@ -189,15 +189,20 @@ describe('createStatusCodeSuggestions', () => {
 });
 
 describe('createStatusCodeValidator', () => {
-  const isInvalid = createStatusCodeValidator({ codes: ['2', '3', '4', '5'] });
+  const isInvalid = createStatusCodeValidator();
 
   it.each([
+    ['101', false],
     ['200', false],
+    ['301', false],
     ['404', false],
     ['503', false],
-    ['4XX', false],
-    ['40X', false],
+    ['1XX', false],
     ['2XX', false],
+    ['3XX', false],
+    ['4XX', false],
+    ['5XX', false],
+    ['40X', false],
   ])('accepts valid status code or mask %s', (value, expected) => {
     expect(isInvalid(value)).toBe(expected);
   });
@@ -210,22 +215,18 @@ describe('createStatusCodeValidator', () => {
     ['4a', 'non-digit chars'],
     ['abc', 'letters only'],
     ['XXX', 'no digit anchor'],
-    ['601', 'class outside maskRoots (6)'],
-    ['101', 'class outside maskRoots (1 not in codes)'],
+    ['601', 'class 6 outside [1..5]'],
+    ['001', 'class 0 outside [1..5]'],
+    ['901', 'class 9 outside [1..5]'],
     ['4X0', 'mask with digit after X'],
   ])('rejects invalid input %s (%s)', value => {
     expect(isInvalid(value)).toBe(true);
   });
 
-  it('accepts 1 as a valid class when codes include it', () => {
-    const isInvalidWith1 = createStatusCodeValidator({ codes: ['1', '2', '3', '4', '5'] });
-    expect(isInvalidWith1('101')).toBe(false);
-    expect(isInvalidWith1('1XX')).toBe(false);
-  });
-
-  it('rejects everything when codes is empty', () => {
-    const isInvalidEmpty = createStatusCodeValidator({ codes: [] });
-    expect(isInvalidEmpty('404')).toBe(true);
-    expect(isInvalidEmpty('4XX')).toBe(true);
+  it('ignores codes option — validity is tied to the static [1..5] class range', () => {
+    const bound = createStatusCodeValidator({ codes: ['2', '3', '4', '5'] });
+    // "1" is not in the provided codes, but 1xx is still a valid HTTP class.
+    expect(bound('101')).toBe(false);
+    expect(bound('1XX')).toBe(false);
   });
 });
