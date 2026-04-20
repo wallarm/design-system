@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getLocalTimeZone, now, today } from '@internationalized/date';
+import { getLocalTimeZone, today } from '@internationalized/date';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Calendar } from '../../icons';
 import { Field, FieldAction, FieldDescription, FieldError, FieldLabel } from '../Field';
@@ -59,7 +59,6 @@ const meta: Meta<typeof DateInput> = {
     error: false,
     disabled: false,
     icon: Calendar,
-    placeholder: '',
     showTimeDropdown: false,
     timeStep: undefined,
   },

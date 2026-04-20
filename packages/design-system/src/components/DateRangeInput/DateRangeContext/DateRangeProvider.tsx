@@ -2,7 +2,7 @@ import { forwardRef, type ReactNode, type RefObject, useCallback, useRef } from 
 import { CalendarDate } from '@internationalized/date';
 import { useDateRangePicker } from '@react-aria/datepicker';
 import { useDateRangePickerState } from '@react-stately/datepicker';
-import { useTemporalField } from '../../TemporalCore';
+import { getDefaultTemporalPlaceholder, useTemporalField } from '../../TemporalCore';
 import type { DateRangeInputProps } from '../types';
 import { DateRangeContext } from './context';
 
@@ -39,7 +39,7 @@ export const DateRangeProvider = forwardRef<HTMLDivElement, DateRangeProviderPro
       readOnly = false,
       granularity = 'day',
       hourCycle,
-      placeholder,
+      placeholder = getDefaultTemporalPlaceholder({ granularity, isRange: true }),
       showTimeDropdown,
       timeStep,
       icon,

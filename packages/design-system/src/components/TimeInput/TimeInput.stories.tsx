@@ -55,7 +55,6 @@ const meta: Meta<typeof TimeInput> = {
     error: false,
     disabled: false,
     icon: Clock,
-    placeholder: '',
     showTimeDropdown: false,
     timeStep: undefined,
   },
