@@ -69,7 +69,6 @@ const meta: Meta<typeof DateRangeInput> = {
     disabled: false,
     readOnly: false,
     icon: Calendar,
-    placeholder: '',
     showTimeDropdown: false,
     timeStep: undefined,
     size: 'default',

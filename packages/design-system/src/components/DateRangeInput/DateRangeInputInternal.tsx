@@ -54,7 +54,7 @@ export const DateRangeInputInternal: FC<DateRangeInputInternalProps> = ({
           </InputGroupAddon>
         )}
 
-        <DateRangeGroup className={cn(!IconComponent && 'pl-12')}>
+        <DateRangeGroup>
           {showPlaceholder && placeholder && (
             <TemporalPlaceholder text={placeholder} className={cn(!IconComponent && 'pl-12')} />
           )}

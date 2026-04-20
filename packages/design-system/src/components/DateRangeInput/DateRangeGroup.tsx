@@ -13,10 +13,9 @@ const dateRangeGroupVariants = cva(
 
 interface DateRangeGroupProps {
   children: ReactNode;
-  className?: string;
 }
 
-export const DateRangeGroup: FC<DateRangeGroupProps> = ({ children, className }) => {
+export const DateRangeGroup: FC<DateRangeGroupProps> = ({ children }) => {
   const context = useDateRangeContext();
   const { groupProps = {}, finalRef, disabled, error } = context ?? {};
 
@@ -25,7 +24,7 @@ export const DateRangeGroup: FC<DateRangeGroupProps> = ({ children, className })
       {...groupProps}
       ref={finalRef}
       data-slot='date-range-group'
-      className={cn(dateRangeGroupVariants(), className)}
+      className={cn(dateRangeGroupVariants())}
       data-disabled={disabled || undefined}
       aria-disabled={disabled || undefined}
       aria-invalid={error || undefined}
