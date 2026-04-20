@@ -8,7 +8,7 @@ const meta: Meta<typeof TimeInput> = {
   title: 'Inputs Date/TimeInput',
   component: TimeInput,
   parameters: {
-    layout: 'padded',
+    layout: 'centered',
     docs: {
       description: {
         component:
@@ -16,13 +16,6 @@ const meta: Meta<typeof TimeInput> = {
       },
     },
   },
-  decorators: [
-    Story => (
-      <div style={{ minHeight: 360, paddingBottom: 280 }}>
-        <Story />
-      </div>
-    ),
-  ],
   argTypes: {
     granularity: {
       control: 'select',
@@ -78,9 +71,19 @@ const meta: Meta<typeof TimeInput> = {
 
 export default meta;
 
+const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
+  Story => (
+    <div style={{ minHeight: 360, paddingBottom: 280 }}>
+      <Story />
+    </div>
+  ),
+];
+
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
   return <TimeInput {...args} />;
 };
+Basic.decorators = dropdownRoom;
+Basic.parameters = { layout: 'padded' };
 
 export const States: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
@@ -211,3 +214,5 @@ export const TimeDropdownSteps: StoryFn<typeof meta> = () => (
     </VStack>
   </HStack>
 );
+TimeDropdownSteps.decorators = dropdownRoom;
+TimeDropdownSteps.parameters = { layout: 'padded' };

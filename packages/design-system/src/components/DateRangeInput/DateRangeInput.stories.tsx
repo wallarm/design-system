@@ -9,7 +9,7 @@ const meta: Meta<typeof DateRangeInput> = {
   title: 'Inputs Date/DateRangeInput',
   component: DateRangeInput,
   parameters: {
-    layout: 'padded',
+    layout: 'centered',
     docs: {
       description: {
         component:
@@ -17,13 +17,6 @@ const meta: Meta<typeof DateRangeInput> = {
       },
     },
   },
-  decorators: [
-    Story => (
-      <div style={{ minHeight: 360, paddingBottom: 280 }}>
-        <Story />
-      </div>
-    ),
-  ],
   tags: ['alpha'],
   argTypes: {
     granularity: {
@@ -102,9 +95,19 @@ const sampleRangeDateTime = {
   end: new CalendarDateTime(2026, 1, 16, 22, 0),
 };
 
+const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
+  Story => (
+    <div style={{ minHeight: 360, paddingBottom: 280 }}>
+      <Story />
+    </div>
+  ),
+];
+
 export const Basic: StoryFn<typeof meta> = args => {
   return <DateRangeInput {...(args as DateRangeInputProps)} />;
 };
+Basic.decorators = dropdownRoom;
+Basic.parameters = { layout: 'padded' };
 
 export const WithIcon: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
