@@ -35,9 +35,9 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
  * Reserved names and what they auto-attach (unless the consumer already
  * provided a value for that slot):
  *
- * | `name`        | Attaches                                                             |
- * | ------------- | -------------------------------------------------------------------- |
- * | `status_code` | HTTP status code: `acceptChar`, `normalize`, `getSuggestions`, `validate` |
+ * | `name`        | Attaches                                                                                   |
+ * | ------------- | ------------------------------------------------------------------------------------------ |
+ * | `status_code` | HTTP status code: `acceptChar`, `normalize`, `getSuggestions`, `validate`, `serializeValue` |
  *
  * Consumer-supplied callbacks always win over the auto-wired ones. If the
  * backend uses a different name (e.g. `http_status_code`), the helpers are

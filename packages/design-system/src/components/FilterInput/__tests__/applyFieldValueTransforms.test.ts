@@ -101,6 +101,67 @@ describe('applyFieldValueTransforms', () => {
     };
     expect(applyFieldValueTransforms(expr, [statusField])).toBe(expr);
   });
+
+  it('recurses through nested groups and transforms only the matching leaf', () => {
+    const innerUnchanged: ExprNode = {
+      type: 'condition',
+      field: 'country',
+      operator: '=',
+      value: 'US',
+    };
+    const innerStatus: ExprNode = {
+      type: 'condition',
+      field: 'status_code',
+      operator: '=',
+      value: '4XX',
+    };
+    const nestedGroup: ExprNode = {
+      type: 'group',
+      operator: 'or',
+      children: [innerUnchanged, innerStatus],
+    };
+    const outer: ExprNode = {
+      type: 'group',
+      operator: 'and',
+      children: [nestedGroup, { type: 'condition', field: 'country', operator: '=', value: 'DE' }],
+    };
+    const out = applyFieldValueTransforms(outer, [statusField, otherField]);
+    expect(out).not.toBe(outer);
+    // Outer group is a new reference (one descendant changed)
+    if (out?.type !== 'group') throw new Error('expected group');
+    expect(out.children[0]).not.toBe(nestedGroup); // inner group cloned (it changed)
+    expect(out.children[1]).toBe(outer.children[1]); // sibling leaf identity preserved
+    expect((out.children[0] as typeof nestedGroup).children[0]).toBe(innerUnchanged); // unchanged leaf identity preserved
+    expect(out).toEqual({
+      type: 'group',
+      operator: 'and',
+      children: [
+        {
+          type: 'group',
+          operator: 'or',
+          children: [
+            { type: 'condition', field: 'country', operator: '=', value: 'US' },
+            { type: 'condition', field: 'status_code', operator: '=', value: '4' },
+          ],
+        },
+        { type: 'condition', field: 'country', operator: '=', value: 'DE' },
+      ],
+    });
+  });
+
+  it('preserves identity of nested groups when nothing inside changed', () => {
+    const inner: ExprNode = {
+      type: 'group',
+      operator: 'or',
+      children: [{ type: 'condition', field: 'country', operator: '=', value: 'US' }],
+    };
+    const outer: ExprNode = {
+      type: 'group',
+      operator: 'and',
+      children: [inner],
+    };
+    expect(applyFieldValueTransforms(outer, [statusField, otherField])).toBe(outer);
+  });
 });
 
 describe('createStatusCodeSerializer', () => {

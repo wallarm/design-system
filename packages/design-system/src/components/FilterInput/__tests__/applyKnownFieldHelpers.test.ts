@@ -11,7 +11,7 @@ describe('applyKnownFieldHelpers', () => {
     expect(applyKnownFieldHelpers(fields)).toBe(fields);
   });
 
-  it('wires all four helpers for a field named status_code', () => {
+  it('wires all five helpers for a field named status_code', () => {
     const [field] = applyKnownFieldHelpers([
       { name: 'status_code', label: 'Status', type: 'integer' },
     ]);
@@ -19,6 +19,7 @@ describe('applyKnownFieldHelpers', () => {
     expect(typeof field.normalize).toBe('function');
     expect(typeof field.getSuggestions).toBe('function');
     expect(typeof field.validate).toBe('function');
+    expect(typeof field.serializeValue).toBe('function');
   });
 
   it('produces status-code suggestions on empty input', () => {
@@ -69,5 +70,15 @@ describe('applyKnownFieldHelpers', () => {
     expect(field.normalize).toBeUndefined();
     expect(field.getSuggestions).toBeUndefined();
     expect(field.validate).toBeUndefined();
+    expect(field.serializeValue).toBeUndefined();
+  });
+
+  it('strips trailing X on the wired serializeValue', () => {
+    const [field] = applyKnownFieldHelpers([
+      { name: 'status_code', label: 'Status', type: 'integer' },
+    ]);
+    expect(field.serializeValue?.('2XX')).toBe('2');
+    expect(field.serializeValue?.('22X')).toBe('22');
+    expect(field.serializeValue?.('222')).toBe('222');
   });
 });
