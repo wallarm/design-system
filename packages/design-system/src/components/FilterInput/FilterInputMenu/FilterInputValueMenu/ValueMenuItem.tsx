@@ -32,7 +32,6 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
         className='flex items-center gap-4 px-6 py-2 rounded-4 text-xs font-medium max-w-[320px] min-h-[20px] overflow-clip'
         style={{ backgroundColor: option.badge.color }}
       >
-        <div className='size-6 rounded-full bg-current' />
         <span className='min-w-0 truncate leading-4'>{option.badge.text}</span>
       </div>
     ) : (
