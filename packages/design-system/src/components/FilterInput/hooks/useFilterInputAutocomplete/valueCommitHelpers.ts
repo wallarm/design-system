@@ -69,8 +69,13 @@ export const resolveSingleValue = (
 ): { resolved: string | number | boolean; error: boolean | undefined } => {
   const fv = getFieldValues(field);
   const match = findMatchingFieldValue(fv, trimmed);
+  const resolved = match ? match.value : trimmed;
+  // Custom validator trumps the static-allowlist check.
+  if (field.validate) {
+    return { resolved, error: field.validate(resolved) ? true : undefined };
+  }
   return {
-    resolved: match ? match.value : trimmed,
+    resolved,
     error: hasStaticAllowlist(field) && fv.length > 0 && !match ? true : undefined,
   };
 };
