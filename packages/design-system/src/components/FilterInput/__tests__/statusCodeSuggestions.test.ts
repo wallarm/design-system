@@ -103,4 +103,31 @@ describe('createStatusCodeSuggestions', () => {
     expect(suggest('40').map(o => o.value)).toEqual(['40X']);
     expect(suggest('1')).toEqual([]);
   });
+
+  it('attaches a badge with the mask string as text', () => {
+    const suggest = createStatusCodeSuggestions({ codes: ['4'] });
+    const [mask] = suggest('');
+    expect(mask.badge).toBeDefined();
+    expect(mask.badge?.text).toBe('4XX');
+  });
+
+  it('derives badge color from the leading digit', () => {
+    const suggest = createStatusCodeSuggestions({ codes: ['1', '2', '3', '4', '5'] });
+    const byValue = Object.fromEntries(suggest('').map(o => [o.value, o.badge?.color]));
+    expect(byValue).toEqual({
+      '1XX': 'var(--color-bg-light-success)',
+      '2XX': 'var(--color-bg-success)',
+      '3XX': 'var(--color-bg-info)',
+      '4XX': 'var(--color-bg-warning)',
+      '5XX': 'var(--color-bg-danger)',
+    });
+  });
+
+  it('preserves leading-digit color on 2-digit masks', () => {
+    const suggest = createStatusCodeSuggestions({ codes: ['4'] });
+    const [mask] = suggest('40');
+    expect(mask.value).toBe('40X');
+    expect(mask.badge?.color).toBe('var(--color-bg-warning)');
+    expect(mask.badge?.text).toBe('40X');
+  });
 });

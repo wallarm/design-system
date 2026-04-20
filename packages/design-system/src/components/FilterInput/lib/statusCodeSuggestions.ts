@@ -2,6 +2,14 @@ import type { FieldValueOption } from '../types';
 
 const VALID_MASK_ROOTS = new Set(['1', '2', '3', '4', '5']);
 
+const HTTP_CLASS_BADGE_COLOR: Record<string, string> = {
+  '1': 'var(--color-bg-light-success)',
+  '2': 'var(--color-bg-success)',
+  '3': 'var(--color-bg-info)',
+  '4': 'var(--color-bg-warning)',
+  '5': 'var(--color-bg-danger)',
+};
+
 export interface StatusCodeSuggestionsOptions {
   /**
    * Raw backend status-code list. The helper keeps only 1-char entries in
@@ -19,6 +27,10 @@ export const createStatusCodeSuggestions = (
   const makeMask = (label: string): FieldValueOption => ({
     value: label,
     label,
+    badge: {
+      color: HTTP_CLASS_BADGE_COLOR[label.charAt(0)] ?? '',
+      text: label,
+    },
   });
 
   return (inputText: string): FieldValueOption[] => {
