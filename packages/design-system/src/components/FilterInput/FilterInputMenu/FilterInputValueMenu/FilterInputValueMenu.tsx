@@ -99,21 +99,30 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
     blurCommitRef,
   });
 
-  // For multi-select, ensure checked items are always visible (even when filtered out,
-  // or when suggestions have shifted to a set that no longer includes them) and always
-  // appear first for stable ordering. Checked values missing from the current `values`
-  // list are rendered as plain-text entries so the user can still see and deselect them.
+  // Ensure the currently-selected value(s) are always visible and pinned at the top,
+  // even when suggestions have shifted to a set that no longer includes them
+  // (e.g. a concrete status code "345" when suggestions are masks). Selected values
+  // missing from the current `values` list are rendered as plain-text fallbacks so
+  // the user can still see and toggle them.
   const displayValues = useMemo(() => {
-    if (!multiSelect) return filteredValues;
-    const checkedSet = new Set(checkedValues.map(String));
-    if (checkedSet.size === 0) return filteredValues;
-    const checkedItems = checkedValues.map(v => {
+    const selectedSet = multiSelect
+      ? new Set(checkedValues.map(String))
+      : highlightValue != null
+        ? new Set([String(highlightValue)])
+        : new Set<string>();
+    if (selectedSet.size === 0) return filteredValues;
+    const selectedList: ConditionValue[] = multiSelect
+      ? checkedValues
+      : highlightValue != null
+        ? [highlightValue]
+        : [];
+    const selectedItems = selectedList.map(v => {
       const match = values.find(opt => String(opt.value) === String(v));
       return match ?? { value: v, label: String(v) };
     });
-    const uncheckedFiltered = filteredValues.filter(v => !checkedSet.has(String(v.value)));
-    return [...checkedItems, ...uncheckedFiltered];
-  }, [filteredValues, values, multiSelect, checkedValues]);
+    const restFiltered = filteredValues.filter(v => !selectedSet.has(String(v.value)));
+    return [...selectedItems, ...restFiltered];
+  }, [filteredValues, values, multiSelect, checkedValues, highlightValue]);
 
   const widthClass = width === 'compact' ? 'w-[172px]' : 'w-[300px]';
   const widthStyle = typeof width === 'number' ? { width: `${width}px` } : undefined;
