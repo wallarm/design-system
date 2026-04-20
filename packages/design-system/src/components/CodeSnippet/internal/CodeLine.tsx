@@ -21,6 +21,8 @@ export type CodeLineProps = {
   onFoldToggle?: () => void;
   /** Whether any folds exist (used to render consistent-width spacer) */
   hasFolds?: boolean;
+  /** Columns (in monospace chars) for fold guide lines — one span per column */
+  guideColumns?: number[];
   children: ReactNode;
 };
 
@@ -34,6 +36,7 @@ export const CodeLine: FC<CodeLineProps> = ({
   isFoldCollapsed,
   onFoldToggle,
   hasFolds = false,
+  guideColumns,
   children,
 }) => {
   const {
@@ -45,11 +48,16 @@ export const CodeLine: FC<CodeLineProps> = ({
 
   const colorStyles = lineConfig?.color ? LINE_COLOR_STYLES[lineConfig.color] : undefined;
 
+  const hasGuide = guideColumns !== undefined && guideColumns.length > 0;
+
   return (
     <div
       className={cn(
         lineHeightClass,
-        showInlineGutter && 'flex',
+        // Force flex row when a guide is present so the content span stretches
+        // to full row height — without this, the span's intrinsic font-box
+        // height leaves vertical gaps between consecutive line guides.
+        (showInlineGutter || hasGuide) && 'flex',
         // Apply background highlight when inline gutter is shown
         showInlineGutter && colorStyles?.bg,
       )}
@@ -101,12 +109,22 @@ export const CodeLine: FC<CodeLineProps> = ({
       <span
         className={cn(
           'flex-1',
+          hasGuide && 'relative',
           showInlineGutter && 'pr-12',
           colorClass,
           textStyleClass,
           lineClassName,
         )}
       >
+        {hasGuide &&
+          guideColumns.map(col => (
+            <span
+              key={col}
+              aria-hidden
+              className='pointer-events-none absolute inset-y-0 w-px bg-border-primary'
+              style={{ left: `calc(${col} * 1ch)` }}
+            />
+          ))}
         {children}
       </span>
     </div>

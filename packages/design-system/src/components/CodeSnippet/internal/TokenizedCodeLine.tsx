@@ -22,6 +22,8 @@ export type TokenizedCodeLineProps = {
   onFoldToggle?: () => void;
   /** Whether any folds exist */
   hasFolds?: boolean;
+  /** Columns (in monospace chars) where fold guide lines should render. */
+  guideColumns?: number[];
 };
 
 /** Renders a line of tokenized code with syntax highlighting */
@@ -35,6 +37,7 @@ export const TokenizedCodeLine: FC<TokenizedCodeLineProps> = ({
   isFoldCollapsed,
   onFoldToggle,
   hasFolds,
+  guideColumns,
 }) => {
   const { colorClass } = getLineTextStyles(lineConfig);
   const ranges = lineConfig?.ranges;
@@ -52,6 +55,7 @@ export const TokenizedCodeLine: FC<TokenizedCodeLineProps> = ({
         isFoldCollapsed={isFoldCollapsed}
         onFoldToggle={onFoldToggle}
         hasFolds={hasFolds}
+        guideColumns={guideColumns}
       >
         {enrichedTokens.map((token, i) => (
           <CodeToken
@@ -75,6 +79,7 @@ export const TokenizedCodeLine: FC<TokenizedCodeLineProps> = ({
       isFoldCollapsed={isFoldCollapsed}
       onFoldToggle={onFoldToggle}
       hasFolds={hasFolds}
+      guideColumns={guideColumns}
     >
       {tokens.map((token, i) => (
         <CodeToken key={i} token={token} colorClass={colorClass} />

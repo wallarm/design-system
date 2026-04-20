@@ -23,6 +23,19 @@ export function getFoldSummaryLabel(fold: FoldRegion, lineCount: number): string
  * Validates fold regions and returns a clean, sorted list.
  * Dev: logs warnings for invalid folds. Prod: silently filters them out.
  */
+/** True when `outer` strictly contains `inner` (equal ranges are NOT strict). */
+function strictlyContains(outer: FoldRegion, inner: FoldRegion): boolean {
+  return (
+    outer.startLine <= inner.startLine &&
+    outer.endLine >= inner.endLine &&
+    (outer.startLine < inner.startLine || outer.endLine > inner.endLine)
+  );
+}
+
+function intersects(a: FoldRegion, b: FoldRegion): boolean {
+  return a.startLine <= b.endLine && a.endLine >= b.startLine;
+}
+
 export function validateFolds(
   folds: FoldRegion[],
   totalLines: number,
@@ -61,12 +74,17 @@ export function validateFolds(
       continue;
     }
 
-    const overlaps = valid.some(
-      existing => fold.startLine <= existing.endLine && fold.endLine >= existing.startLine,
-    );
-    if (overlaps) {
+    // Allow strict containment (nested folds), reject partial overlap and
+    // identical ranges (ambiguous which is the parent).
+    const badOverlap = valid.some(existing => {
+      if (!intersects(fold, existing)) return false;
+      return !strictlyContains(fold, existing) && !strictlyContains(existing, fold);
+    });
+    if (badOverlap) {
       if (isDev) {
-        console.warn(`[CodeSnippet] Fold "${fold.id}": overlaps with an existing fold. Skipping.`);
+        console.warn(
+          `[CodeSnippet] Fold "${fold.id}": partially overlaps an existing fold (neither strictly contains the other). Skipping.`,
+        );
       }
       continue;
     }
@@ -76,6 +94,42 @@ export function validateFolds(
   }
 
   return valid;
+}
+
+export type FoldNode = {
+  fold: FoldRegion;
+  children: FoldNode[];
+};
+
+/**
+ * Build a forest of folds from a validated flat list. Folds are nested when
+ * one strictly contains another. Siblings are independent folds at the same
+ * depth.
+ */
+export function buildFoldTree(folds: FoldRegion[]): FoldNode[] {
+  // Outermost folds first — at the same startLine, the one that ends later
+  // is the parent of the one that ends earlier.
+  const sorted = [...folds].sort((a, b) => a.startLine - b.startLine || b.endLine - a.endLine);
+
+  const roots: FoldNode[] = [];
+  const stack: FoldNode[] = [];
+
+  for (const fold of sorted) {
+    let top = stack[stack.length - 1];
+    while (top && !strictlyContains(top.fold, fold)) {
+      stack.pop();
+      top = stack[stack.length - 1];
+    }
+    const node: FoldNode = { fold, children: [] };
+    if (top) {
+      top.children.push(node);
+    } else {
+      roots.push(node);
+    }
+    stack.push(node);
+  }
+
+  return roots;
 }
 
 export function buildDisplayItems(
@@ -92,55 +146,50 @@ export function buildDisplayItems(
     }));
   }
 
-  // Folds are already sorted by startLine from validateFolds
+  const tree = buildFoldTree(folds);
   const items: DisplayItem[] = [];
-  let currentIndex = 0;
 
-  for (const fold of folds) {
-    const foldStartIndex = fold.startLine - startingLineNumber;
-    const foldEndIndex = fold.endLine - startingLineNumber;
+  const emitLine = (index: number) => {
+    items.push({ type: 'line', index, lineNumber: startingLineNumber + index });
+  };
 
-    // Add lines before this fold
-    while (currentIndex < foldStartIndex) {
-      items.push({
-        type: 'line',
-        index: currentIndex,
-        lineNumber: startingLineNumber + currentIndex,
-      });
-      currentIndex++;
-    }
+  // Emit display items for the range [startIdx, endIdx) descending into
+  // child fold nodes in order. Children are assumed sorted by startLine.
+  const emitRange = (startIdx: number, endIdx: number, nodes: FoldNode[]) => {
+    let cursor = startIdx;
 
-    if (collapsedFolds.has(fold.id)) {
-      // Collapsed: emit fold summary
-      const lineCount = fold.endLine - fold.startLine + 1;
-      items.push({
-        type: 'fold-summary',
-        fold,
-        lineCount,
-      });
-    } else {
-      // Expanded: emit all lines in range
-      for (let i = foldStartIndex; i <= foldEndIndex; i++) {
-        items.push({
-          type: 'line',
-          index: i,
-          lineNumber: startingLineNumber + i,
-        });
+    for (const node of nodes) {
+      const foldStartIdx = node.fold.startLine - startingLineNumber;
+      const foldEndIdx = node.fold.endLine - startingLineNumber;
+
+      // Lines before this fold (inside the parent's content, outside child)
+      while (cursor < foldStartIdx) {
+        emitLine(cursor);
+        cursor++;
       }
+
+      if (collapsedFolds.has(node.fold.id)) {
+        items.push({
+          type: 'fold-summary',
+          fold: node.fold,
+          lineCount: node.fold.endLine - node.fold.startLine + 1,
+        });
+      } else {
+        // Header line belongs to the current fold, not to any of its children
+        emitLine(foldStartIdx);
+        // Recurse into the fold's body — child folds live inside [header+1, end]
+        emitRange(foldStartIdx + 1, foldEndIdx + 1, node.children);
+      }
+
+      cursor = foldEndIdx + 1;
     }
 
-    currentIndex = foldEndIndex + 1;
-  }
+    while (cursor < endIdx) {
+      emitLine(cursor);
+      cursor++;
+    }
+  };
 
-  // Add remaining lines after last fold
-  while (currentIndex < totalLines) {
-    items.push({
-      type: 'line',
-      index: currentIndex,
-      lineNumber: startingLineNumber + currentIndex,
-    });
-    currentIndex++;
-  }
-
+  emitRange(0, totalLines, tree);
   return items;
 }

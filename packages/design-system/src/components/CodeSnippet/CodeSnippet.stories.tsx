@@ -931,3 +931,257 @@ export const WithFoldingAndShowMore: StoryFn<typeof meta> = () => (
     </CodeSnippetRoot>
   </CodeSnippetAdapterProvider>
 );
+
+// Sample with two parallel fold blocks — each fold draws its own continuous
+// vertical guide at the column where its body content starts.
+const foldedPython = `class Service:
+    def process(payload):
+        if not payload.get("enabled"):
+            return None
+        return compute(payload)
+
+    def compute(payload):
+        items = payload.get("items", [])
+        return [transform(i) for i in items]
+
+    def transform(item):
+        return {"id": item.id, "value": item.value}`;
+
+const foldedPythonFolds = [
+  { id: 'process', startLine: 2, endLine: 5 },
+  { id: 'compute', startLine: 7, endLine: 9 },
+  { id: 'transform', startLine: 11, endLine: 12 },
+];
+
+/**
+ * Each fold region renders a single continuous guide line at its content's
+ * indent column. Guides only appear when folds are configured — without folds
+ * the feature is a no-op by design.
+ */
+export const WithIndentGuides: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot code={foldedPython} language='python' folds={foldedPythonFolds}>
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);
+
+/**
+ * Guides collapse with their fold — when a fold is collapsed, its rows are
+ * replaced by a summary and the guide naturally disappears until re-expanded.
+ */
+export const IndentGuidesWithCollapsedFold: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot
+      code={foldedPython}
+      language='python'
+      folds={[
+        { id: 'process', startLine: 2, endLine: 5, defaultCollapsed: true },
+        { id: 'compute', startLine: 7, endLine: 9 },
+        { id: 'transform', startLine: 11, endLine: 12 },
+      ]}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);
+
+// HTTP request with a foldable JSON body — shows the request/body boundary.
+const httpRequestWithBodyCode = `POST /api/v1/users HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer xxx
+
+{
+  "name": "Alice",
+  "email": "alice@example.com",
+  "roles": ["admin", "user"]
+}`;
+
+/** HTTP request: JSON body folds under the headers block. */
+export const IndentGuidesHttp: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot
+      code={httpRequestWithBodyCode}
+      language='http'
+      folds={[{ id: 'body', startLine: 6, endLine: 10 }]}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);
+
+const htmlIndentCode = `<html>
+  <head>
+    <title>Demo</title>
+    <meta charset="utf-8" />
+  </head>
+  <body>
+    <main>
+      <h1>Welcome</h1>
+      <p>Lorem ipsum dolor sit amet.</p>
+    </main>
+  </body>
+</html>`;
+
+/** HTML: head + body blocks fold; nested main block gets its own guide. */
+export const IndentGuidesHtml: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot
+      code={htmlIndentCode}
+      language='html'
+      folds={[
+        { id: 'head', startLine: 2, endLine: 5 },
+        { id: 'body', startLine: 6, endLine: 11 },
+      ]}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);
+
+const jsonIndentCode = `{
+  "name": "demo",
+  "version": "1.0.0",
+  "dependencies": {
+    "react": "^19.0.0",
+    "typescript": "^5.0.0"
+  },
+  "scripts": {
+    "build": "vite build",
+    "test": "vitest"
+  }
+}`;
+
+/** JSON: two sibling object folds (`dependencies`, `scripts`). */
+export const IndentGuidesJson: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot
+      code={jsonIndentCode}
+      language='json'
+      folds={[
+        { id: 'deps', startLine: 4, endLine: 7 },
+        { id: 'scripts', startLine: 8, endLine: 11 },
+      ]}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);
+
+const yamlIndentCode = `version: "3.9"
+services:
+  api:
+    image: wallarm/api:latest
+    ports:
+      - "8080:8080"
+    environment:
+      LOG_LEVEL: info
+      FEATURE_FLAGS: "x,y,z"
+  worker:
+    image: wallarm/worker:latest
+    restart: unless-stopped`;
+
+/** YAML: compose-style block with two siblings `api` and `worker`. */
+export const IndentGuidesYaml: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot
+      code={yamlIndentCode}
+      language='yaml'
+      folds={[
+        { id: 'api', startLine: 3, endLine: 9 },
+        { id: 'worker', startLine: 10, endLine: 12 },
+      ]}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);
+
+// Nested folds: outer `class` fold contains inner `method` folds. Each level
+// renders its own guide line at its own indent column, giving a multi-layer
+// structural view.
+const classWithNestedFoldsCode = `class UserService:
+    def get_user(self, uid):
+        if not self._cache.has(uid):
+            user = self._repo.fetch(uid)
+            self._cache.put(uid, user)
+        return self._cache.get(uid)
+
+    def create_user(self, payload):
+        validated = self._validator.check(payload)
+        if validated.ok:
+            return self._repo.insert(validated.data)
+        raise ValueError(validated.errors)
+
+    def _warmup(self):
+        for uid in self._repo.list_ids():
+            self._cache.put(uid, self._repo.fetch(uid))`;
+
+/**
+ * Nested folds: the outer `class` fold wraps three inner method folds. Inner
+ * methods get their own guide column; the outer fold guide stays continuous
+ * through the method headers.
+ */
+export const IndentGuidesNestedFolds: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot
+      code={classWithNestedFoldsCode}
+      language='python'
+      folds={[
+        { id: 'class', startLine: 1, endLine: 16 },
+        { id: 'get', startLine: 2, endLine: 6 },
+        { id: 'create', startLine: 8, endLine: 12 },
+        { id: 'warmup', startLine: 14, endLine: 16 },
+      ]}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);
+
+/**
+ * Guides compose with per-line color backgrounds — the guide sliver sits
+ * inside the content span over the colored line background but under the text.
+ */
+export const IndentGuidesWithLineHighlights: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <CodeSnippetRoot
+      code={foldedPython}
+      language='python'
+      folds={foldedPythonFolds}
+      lines={{
+        3: { color: 'warning' },
+        4: { color: 'danger' },
+        8: { color: 'info' },
+        9: { color: 'info' },
+      }}
+    >
+      <CodeSnippetContent>
+        <CodeSnippetLineNumbers />
+        <CodeSnippetCode />
+      </CodeSnippetContent>
+    </CodeSnippetRoot>
+  </CodeSnippetAdapterProvider>
+);

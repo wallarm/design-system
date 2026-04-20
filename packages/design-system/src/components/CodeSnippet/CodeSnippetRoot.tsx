@@ -67,7 +67,11 @@ export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippe
     wrapLines?: boolean;
     /** Max lines before collapsing (for ShowMore) */
     maxLines?: number;
-    /** Foldable regions that can be collapsed/expanded */
+    /**
+     * Foldable regions that can be collapsed/expanded. When set, each fold
+     * automatically renders a continuous vertical guide line at its content's
+     * indent column — indent guides are intrinsic to the folding UI.
+     */
     folds?: FoldRegion[];
     /** Callback when code is copied */
     onCopy?: (code: string) => void;
