@@ -29,3 +29,7 @@ export {
 } from './operators';
 export { type FilterParseError, isFilterParseError, parseExpression } from './parseExpression';
 export { serializeExpression } from './serializeExpression';
+export {
+  createStatusCodeSuggestions,
+  type StatusCodeSuggestionsOptions,
+} from './statusCodeSuggestions';
