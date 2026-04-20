@@ -5,6 +5,16 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { getMonthSegmentText } from './utils';
 
+function resolveSegmentText(segment: DateSegment): string {
+  if (segment.type === 'month' && segment.value != null && !segment.isPlaceholder) {
+    return getMonthSegmentText(segment.value, segment.placeholder);
+  }
+  if (segment.type === 'dayPeriod' && !segment.isPlaceholder) {
+    return segment.text.toUpperCase();
+  }
+  return segment.text;
+}
+
 const segmentVariants = cva(
   cn(
     'relative outline-none text-left',
@@ -72,14 +82,7 @@ export const TemporalSegment: FC<TemporalSegmentProps> = ({
     );
   }
 
-  // Always show short month names when value is present; force AM/PM uppercase
-  const displayText =
-    displayOverride ??
-    (segment.type === 'month' && segment.value != null && !segment.isPlaceholder
-      ? getMonthSegmentText(segment.value, segment.placeholder)
-      : segment.type === 'dayPeriod' && !segment.isPlaceholder
-        ? segment.text.toUpperCase()
-        : segment.text);
+  const displayText = displayOverride ?? resolveSegmentText(segment);
 
   return (
     <span
