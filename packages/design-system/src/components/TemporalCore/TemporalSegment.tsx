@@ -9,7 +9,7 @@ const segmentVariants = cva(
   cn(
     'relative outline-none text-left',
     'font-sans text-sm transition-all',
-    'focus:bg-bg-fill-brand focus:text-text-primary-alt',
+    'focus:bg-states-primary-pressed',
     'focus:outline-none',
   ),
   {
@@ -19,7 +19,7 @@ const segmentVariants = cva(
         false: 'text-text-primary',
       },
       disabled: {
-        true: 'cursor-not-allowed opacity-50',
+        true: 'cursor-not-allowed',
         false: 'hover:bg-states-primary-default-alt cursor-text',
       },
       type: {
