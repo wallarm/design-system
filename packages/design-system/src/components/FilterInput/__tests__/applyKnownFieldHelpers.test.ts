@@ -45,9 +45,20 @@ describe('applyKnownFieldHelpers', () => {
       },
     ]);
     expect(field.validate).toBe(customValidate);
-    expect(typeof field.acceptChar).toBe('function');
-    expect(typeof field.normalize).toBe('function');
-    expect(typeof field.getSuggestions).toBe('function');
+    // The non-overridden slots must still be the helper-supplied behavior,
+    // not merely "any function" — verify via observable behavior that would
+    // only come from createStatusCodeSuggestions / createStatusCodeInputFilter /
+    // createStatusCodeNormalizer.
+    expect(field.getSuggestions?.('').map(o => o.value)).toEqual([
+      '1XX',
+      '2XX',
+      '3XX',
+      '4XX',
+      '5XX',
+    ]);
+    expect(field.acceptChar?.('4')).toBe(true);
+    expect(field.acceptChar?.('a')).toBe(false);
+    expect(field.normalize?.('4')).toBe('4XX');
   });
 
   it('does not wire helpers for fields with a different name', () => {

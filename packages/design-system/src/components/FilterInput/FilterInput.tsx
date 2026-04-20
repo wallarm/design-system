@@ -15,6 +15,20 @@ import type { ExprNode, FieldMetadata } from './types';
 
 export interface FilterInputProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
+  /**
+   * Filter-field configurations driving the autocomplete. Most fields are
+   * passed through as-is, but a few names are **reserved** and auto-wired
+   * with design-system helpers (`acceptChar` / `normalize` / `getSuggestions`
+   * / `validate`). Current reserved names:
+   *
+   *   - `status_code` — HTTP status code field (mask suggestions, format
+   *     validation, digit-or-X input filter, partial-input normalization).
+   *
+   * Consumer-supplied callbacks always override the auto-wiring, so you can
+   * opt out per-field. For the same helpers on a field with a different
+   * `name`, import the factories (`createStatusCodeSuggestions`, …) and
+   * attach them manually.
+   */
   fields?: FieldMetadata[];
   value?: ExprNode | null;
   onChange?: (expression: ExprNode | null) => void;

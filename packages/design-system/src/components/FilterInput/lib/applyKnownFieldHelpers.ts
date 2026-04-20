@@ -23,6 +23,25 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
   }),
 };
 
+/**
+ * Decorate `fields` in place with design-system helpers for known field names.
+ * `FilterInput` calls this on the `fields` prop before rendering.
+ *
+ * Reserved names and what they auto-attach (unless the consumer already
+ * provided a value for that slot):
+ *
+ * | `name`        | Attaches                                                             |
+ * | ------------- | -------------------------------------------------------------------- |
+ * | `status_code` | HTTP status code: `acceptChar`, `normalize`, `getSuggestions`, `validate` |
+ *
+ * Consumer-supplied callbacks always win over the auto-wired ones. If the
+ * backend uses a different name (e.g. `http_status_code`), the helpers are
+ * NOT applied — the consumer must either rename the field to match or wire
+ * the factories (`createStatusCode*`) manually.
+ *
+ * The returned array has **reference-stable identity** when no field matches,
+ * so downstream `useMemo` that depends on it does not invalidate unnecessarily.
+ */
 export const applyKnownFieldHelpers = (fields: FieldMetadata[]): FieldMetadata[] => {
   let changed = false;
   const out = fields.map(field => {
