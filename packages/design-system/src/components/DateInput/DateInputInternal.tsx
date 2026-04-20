@@ -132,7 +132,9 @@ export const DateInputInternal = forwardRef<HTMLDivElement, DateInputInternalPro
           className={cn('relative flex-1 h-full', !IconComponent && 'pl-12')}
           onKeyDownCapture={handleKeyDownCapture}
         >
-          {showPlaceholder && <TemporalPlaceholder text={placeholder} />}
+          {showPlaceholder && (
+            <TemporalPlaceholder text={placeholder} className={cn(!IconComponent && 'pl-12')} />
+          )}
           <TemporalSegmentGroup
             {...props}
             ref={ref}
