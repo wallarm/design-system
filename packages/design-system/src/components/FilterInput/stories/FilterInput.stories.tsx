@@ -9,7 +9,6 @@ import {
   createStatusCodeValidator,
 } from '../lib/statusCode';
 import type { ExprNode, FieldMetadata } from '../types';
-import { MOCK_STATUS_CODES } from './mockStatusCodes';
 
 const meta = {
   title: 'Patterns/FilterInput/FilterInput',
@@ -288,7 +287,7 @@ export const HTTPStatusCodeSuggestions: Story = {
         // Mask values are strings ("4XX", "40X"), so numeric comparison
         // operators would be meaningless — restrict to equality/containment.
         operators: ['=', '!=', 'in'],
-        getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+        getSuggestions: createStatusCodeSuggestions(),
         validate: createStatusCodeValidator(),
         acceptChar: createStatusCodeInputFilter(),
         normalize: createStatusCodeNormalizer(),

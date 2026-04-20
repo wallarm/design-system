@@ -1,4 +1,4 @@
-import { MASK_PLACEHOLDER, STATUS_CODE_LENGTH } from './constants';
+import { MASK_PLACEHOLDER, MASK_ROOTS, STATUS_CODE_LENGTH } from './constants';
 
 /**
  * Normalize the user-typed input (up to 3 chars, digits + X, case-insensitive)
@@ -16,16 +16,16 @@ import { MASK_PLACEHOLDER, STATUS_CODE_LENGTH } from './constants';
  * Rejected:
  *   "3X0"            (digit after placeholder)
  *   "X30"            (starts with placeholder)
- *   "6..."           (leading digit not in `maskRoots`)
+ *   "6..."           (leading digit outside the `[1..5]` HTTP class range)
  *   "ab..."          (non-digit, non-X)
  */
-export const canonicalizeStatusCodeInput = (input: string, maskRoots: string[]): string | null => {
+export const canonicalizeStatusCodeInput = (input: string): string | null => {
   const s = input.toUpperCase();
   if (s.length === 0 || s.length > STATUS_CODE_LENGTH) return null;
   if (!/^[\dX]+$/.test(s)) return null;
 
   const d1 = s.charAt(0);
-  if (d1 === MASK_PLACEHOLDER || !maskRoots.includes(d1)) return null;
+  if (d1 === MASK_PLACEHOLDER || !MASK_ROOTS.includes(d1)) return null;
 
   if (s.length === 1) return `${d1}XX`;
 

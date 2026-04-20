@@ -2,9 +2,7 @@ export { canonicalizeStatusCodeInput } from './canonicalize';
 export {
   HTTP_CLASS_BADGE_COLOR,
   MASK_PLACEHOLDER,
+  MASK_ROOTS,
   STATUS_CODE_LENGTH,
-  VALID_MASK_ROOTS,
 } from './constants';
 export { makeMask } from './makeMask';
-export { getMaskRoots } from './maskRoots';
-export type { StatusCodeSuggestionsOptions } from './types';

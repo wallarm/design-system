@@ -19,7 +19,6 @@ export {
   type FilterParseError,
   isFilterParseError,
   parseExpression,
-  type StatusCodeSuggestionsOptions,
   serializeExpression,
 } from './lib';
 // Types

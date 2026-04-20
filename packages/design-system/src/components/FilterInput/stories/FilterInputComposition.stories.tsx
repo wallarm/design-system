@@ -9,7 +9,6 @@ import {
   createStatusCodeValidator,
 } from '../lib/statusCode';
 import type { ExprNode, FieldMetadata } from '../types';
-import { MOCK_STATUS_CODES } from './mockStatusCodes';
 
 const meta = {
   title: 'Patterns/FilterInput/Composition',
@@ -105,7 +104,7 @@ const attackFields: FieldMetadata[] = [
       { value: 502, label: '502 Bad Gateway' },
       { value: 503, label: '503 Service Unavailable' },
     ],
-    getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+    getSuggestions: createStatusCodeSuggestions(),
     validate: createStatusCodeValidator(),
     acceptChar: createStatusCodeInputFilter(),
     normalize: createStatusCodeNormalizer(),

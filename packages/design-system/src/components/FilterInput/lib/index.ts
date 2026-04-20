@@ -35,5 +35,4 @@ export {
   createStatusCodeNormalizer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
-  type StatusCodeSuggestionsOptions,
 } from './statusCode';

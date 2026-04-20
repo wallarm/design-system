@@ -7,7 +7,6 @@ import {
   createStatusCodeValidator,
 } from '../lib/statusCode';
 import type { FieldMetadata } from '../types';
-import { MOCK_STATUS_CODES } from './mockStatusCodes';
 
 const meta = {
   title: 'Patterns/FilterInput/FilterInputFieldMenu',
@@ -58,7 +57,7 @@ const sampleFields: FieldMetadata[] = [
     label: 'HTTP status code',
     type: 'integer',
     description: 'HTTP response status code',
-    getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+    getSuggestions: createStatusCodeSuggestions(),
     validate: createStatusCodeValidator(),
     acceptChar: createStatusCodeInputFilter(),
     normalize: createStatusCodeNormalizer(),
@@ -228,7 +227,7 @@ export const WithRecentFields: Story = {
         label: 'HTTP status code',
         type: 'integer',
         description: 'HTTP response status code',
-        getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+        getSuggestions: createStatusCodeSuggestions(),
         validate: createStatusCodeValidator(),
       },
       {
@@ -307,7 +306,7 @@ export const WithRecentAndSuggestions: Story = {
         label: 'HTTP status code',
         type: 'integer',
         description: 'HTTP response status code',
-        getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+        getSuggestions: createStatusCodeSuggestions(),
         validate: createStatusCodeValidator(),
       },
       {
