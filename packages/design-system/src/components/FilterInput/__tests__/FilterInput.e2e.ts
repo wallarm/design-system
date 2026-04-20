@@ -8,10 +8,27 @@ const filterFieldStory = createStoryHelper('patterns-filterinput-filterinput', [
   'With Preset Value',
   'With Multi Condition Preset',
   'Error With Value',
+  'HTTP Status Code Suggestions',
 ] as const);
 
 // TODO: Enable after baseline screenshots are generated and menu flow is stabilized
 test.describe.skip('Component: FilterInput', () => {
+  test.describe('Visual', () => {
+    test('Should render status code mask menu correctly', async ({ page }) => {
+      await filterFieldStory.goto(page, 'HTTP Status Code Suggestions');
+      const field = page.locator('[data-slot="filter-input"]');
+
+      await field.click();
+      // Pick the Status code field from the field menu, then the "is" operator,
+      // to surface the value menu with mask suggestions.
+      await page.getByRole('menuitem', { name: /status code/i }).click();
+      await page.getByRole('menuitem', { name: /^is$/i }).click();
+
+      const menu = page.getByRole('menu').last();
+      await expect(menu).toHaveScreenshot('status-code-mask-menu.png');
+    });
+  });
+
   test.describe('Interactions', () => {
     test('Should focus field when clicked', async ({ page }) => {
       await filterFieldStory.goto(page, 'With Preset Value');
