@@ -31,4 +31,23 @@ describe('createStatusCodeSuggestions', () => {
     expect(suggest('70')).toEqual([]);
     expect(suggest('10')).toEqual([]);
   });
+
+  it('returns empty when input has three or more digits', () => {
+    const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
+    expect(suggest('401')).toEqual([]);
+    expect(suggest('4040')).toEqual([]);
+  });
+
+  it('returns empty when input contains non-digit characters', () => {
+    const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
+    expect(suggest('4a')).toEqual([]);
+    expect(suggest('abc')).toEqual([]);
+    expect(suggest('4.')).toEqual([]);
+  });
+
+  it('trims surrounding whitespace before matching', () => {
+    const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
+    expect(suggest('  4  ').map(o => o.value)).toEqual(['4XX']);
+    expect(suggest('  ').map(o => o.value)).toEqual(['2XX', '3XX', '4XX', '5XX']);
+  });
 });

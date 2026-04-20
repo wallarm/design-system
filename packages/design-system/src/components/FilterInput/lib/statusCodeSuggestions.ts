@@ -23,16 +23,18 @@ export const createStatusCodeSuggestions = (
 
   return (inputText: string): FieldValueOption[] => {
     const norm = inputText.trim();
+    if (norm.length > 3) return [];
+    if (norm.length > 0 && !/^\d+$/.test(norm)) return [];
+
     if (norm.length === 0) {
       return maskRoots.map(d => makeMask(`${d}XX`));
     }
-    if (norm.length === 1) {
-      return maskRoots.includes(norm) ? [makeMask(`${norm}XX`)] : [];
-    }
-    if (norm.length === 2) {
-      const d1 = norm.slice(0, 1);
-      return maskRoots.includes(d1) ? [makeMask(`${norm}X`)] : [];
-    }
+
+    const d1 = norm.charAt(0);
+    if (!maskRoots.includes(d1)) return [];
+
+    if (norm.length === 1) return [makeMask(`${norm}XX`)];
+    if (norm.length === 2) return [makeMask(`${norm}X`)];
     return [];
   };
 };
