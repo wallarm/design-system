@@ -1,13 +1,14 @@
+import type { BadgeColor } from '../../Badge';
 import type { FieldValueOption } from '../types';
 
 const VALID_MASK_ROOTS = new Set(['1', '2', '3', '4', '5']);
 
-const HTTP_CLASS_BADGE_COLOR: Record<string, string> = {
-  '1': 'var(--color-bg-light-success)',
-  '2': 'var(--color-bg-success)',
-  '3': 'var(--color-bg-info)',
-  '4': 'var(--color-bg-warning)',
-  '5': 'var(--color-bg-danger)',
+const HTTP_CLASS_BADGE_COLOR: Record<string, BadgeColor> = {
+  '1': 'teal',
+  '2': 'green',
+  '3': 'blue',
+  '4': 'amber',
+  '5': 'red',
 };
 
 export interface StatusCodeSuggestionsOptions {

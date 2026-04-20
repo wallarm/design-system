@@ -1,5 +1,6 @@
 import { type FC, type RefObject, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
+import type { BadgeColor } from '../../../Badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,7 +17,7 @@ import { ValueMenuItem } from './ValueMenuItem';
 export interface ValueOption {
   value: string | number | boolean;
   label: string;
-  badge?: { color: string; text: string };
+  badge?: { color: BadgeColor; text: string };
   hasSubmenu?: boolean;
 }
 

@@ -115,11 +115,11 @@ describe('createStatusCodeSuggestions', () => {
     const suggest = createStatusCodeSuggestions({ codes: ['1', '2', '3', '4', '5'] });
     const byValue = Object.fromEntries(suggest('').map(o => [o.value, o.badge?.color]));
     expect(byValue).toEqual({
-      '1XX': 'var(--color-bg-light-success)',
-      '2XX': 'var(--color-bg-success)',
-      '3XX': 'var(--color-bg-info)',
-      '4XX': 'var(--color-bg-warning)',
-      '5XX': 'var(--color-bg-danger)',
+      '1XX': 'teal',
+      '2XX': 'green',
+      '3XX': 'blue',
+      '4XX': 'amber',
+      '5XX': 'red',
     });
   });
 
@@ -127,7 +127,7 @@ describe('createStatusCodeSuggestions', () => {
     const suggest = createStatusCodeSuggestions({ codes: ['4'] });
     const [mask] = suggest('40');
     expect(mask.value).toBe('40X');
-    expect(mask.badge?.color).toBe('var(--color-bg-warning)');
+    expect(mask.badge?.color).toBe('amber');
     expect(mask.badge?.text).toBe('40X');
   });
 });

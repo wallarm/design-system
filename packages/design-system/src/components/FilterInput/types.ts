@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import type { BadgeColor } from '../Badge';
 
 /**
  * FilterInput Chip Variant Types
@@ -57,7 +58,7 @@ export type FilterOperator =
 export interface FieldValueOption {
   value: string | number | boolean;
   label: string;
-  badge?: { color: string; text: string };
+  badge?: { color: BadgeColor; text: string };
 }
 
 /**
