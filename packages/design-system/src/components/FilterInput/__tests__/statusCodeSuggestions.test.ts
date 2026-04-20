@@ -145,4 +145,42 @@ describe('createStatusCodeSuggestions', () => {
     expect(mask.badge?.color).toBe('amber');
     expect(mask.badge?.text).toBe('40X');
   });
+
+  describe('selectedValues context', () => {
+    it('prepends committed values as badged options ahead of masks', () => {
+      const suggest = createStatusCodeSuggestions({ codes: ['1', '2', '3', '4', '5'] });
+      const result = suggest('', { selectedValues: ['234'] });
+      expect(result.map(o => o.value)).toEqual(['234', '1XX', '2XX', '3XX', '4XX', '5XX']);
+      const [selected] = result;
+      expect(selected.badge).toEqual({ color: 'green', text: '234' });
+    });
+
+    it('does not duplicate an entry when the committed value matches the primary', () => {
+      const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
+      const result = suggest('401', { selectedValues: ['401'] });
+      expect(result.map(o => o.value)).toEqual(['401']);
+    });
+
+    it('filters out committed values whose class is outside maskRoots', () => {
+      // maskRoots derived from codes = {2,3,4,5}. '180' starts with '1' → dropped.
+      // '567' starts with '5' → kept as a badged selected option.
+      const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
+      const result = suggest('', { selectedValues: ['180', '567'] });
+      expect(result.map(o => o.value)).toEqual(['567', '2XX', '3XX', '4XX', '5XX']);
+    });
+
+    it('keeps committed values visible even when the input is invalid', () => {
+      const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
+      const result = suggest('abc', { selectedValues: ['234'] });
+      expect(result.map(o => o.value)).toEqual(['234']);
+    });
+
+    it('resolves committed mask strings with their badge', () => {
+      const suggest = createStatusCodeSuggestions({ codes: ['2', '3', '4', '5'] });
+      const result = suggest('', { selectedValues: ['2XX'] });
+      const [first] = result;
+      expect(first.value).toBe('2XX');
+      expect(first.badge?.color).toBe('green');
+    });
+  });
 });

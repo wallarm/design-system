@@ -103,7 +103,7 @@ describe('fields.ts helpers', () => {
       const field = baseField({ getSuggestions: spy });
       const result = getFieldValues(field);
       expect(spy).toHaveBeenCalledTimes(1);
-      expect(spy).toHaveBeenCalledWith('');
+      expect(spy).toHaveBeenCalledWith('', undefined);
       expect(result).toEqual([{ value: 'x', label: 'X' }]);
     });
 
@@ -111,8 +111,15 @@ describe('fields.ts helpers', () => {
       const spy = vi.fn((t: string) => [{ value: `${t}XX`, label: `${t}XX` }]);
       const field = baseField({ getSuggestions: spy });
       const result = getFieldValues(field, '4');
-      expect(spy).toHaveBeenCalledWith('4');
+      expect(spy).toHaveBeenCalledWith('4', undefined);
       expect(result).toEqual([{ value: '4XX', label: '4XX' }]);
+    });
+
+    it('forwards context.selectedValues to getSuggestions', () => {
+      const spy = vi.fn(() => [{ value: 'x', label: 'X' }]);
+      const field = baseField({ getSuggestions: spy });
+      getFieldValues(field, '4', { selectedValues: ['234'] });
+      expect(spy).toHaveBeenCalledWith('4', { selectedValues: ['234'] });
     });
 
     it('prefers getSuggestions over values when both are defined', () => {
@@ -120,7 +127,7 @@ describe('fields.ts helpers', () => {
       const spy = vi.fn(() => [{ value: 'fromCallback', label: 'From Callback' }]);
       const field = baseField({ values, getSuggestions: spy });
       expect(getFieldValues(field)).toEqual([{ value: 'fromCallback', label: 'From Callback' }]);
-      expect(spy).toHaveBeenCalledWith('');
+      expect(spy).toHaveBeenCalledWith('', undefined);
     });
 
     it('prefers getSuggestions over options when both are defined', () => {

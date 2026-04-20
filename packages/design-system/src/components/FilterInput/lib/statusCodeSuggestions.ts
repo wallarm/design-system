@@ -22,7 +22,10 @@ export interface StatusCodeSuggestionsOptions {
 
 export const createStatusCodeSuggestions = (
   options?: StatusCodeSuggestionsOptions,
-): ((inputText: string) => FieldValueOption[]) => {
+): ((
+  inputText: string,
+  context?: { selectedValues?: Array<string | number | boolean> },
+) => FieldValueOption[]) => {
   const maskRoots = (options?.codes ?? []).filter(c => c.length === 1 && VALID_MASK_ROOTS.has(c));
 
   const makeMask = (label: string): FieldValueOption => {
@@ -39,21 +42,37 @@ export const createStatusCodeSuggestions = (
     };
   };
 
-  return (inputText: string): FieldValueOption[] => {
+  /** Build FieldValueOptions for already-committed chip values so the menu can
+   *  render them with their canonical badge even when the input-driven list
+   *  has narrowed to masks. Skips anything that isn't a valid status code. */
+  const resolveSelected = (selectedValues?: Array<string | number | boolean>): FieldValueOption[] =>
+    (selectedValues ?? [])
+      .map(v => String(v))
+      .filter(s => /^\d[\dX]{0,2}$/.test(s) && maskRoots.includes(s.charAt(0)))
+      .map(s => makeMask(s));
+
+  return (inputText, context) => {
     const norm = inputText.trim();
-    if (norm.length > 3) return [];
-    if (norm.length > 0 && !/^\d+$/.test(norm)) return [];
+    const selected = resolveSelected(context?.selectedValues);
+    const seen = new Set(selected.map(o => String(o.value)));
+    const merge = (primary: FieldValueOption[]): FieldValueOption[] => [
+      ...selected,
+      ...primary.filter(o => !seen.has(String(o.value))),
+    ];
+
+    if (norm.length > 3) return selected;
+    if (norm.length > 0 && !/^\d+$/.test(norm)) return selected;
 
     if (norm.length === 0) {
-      return maskRoots.map(d => makeMask(`${d}XX`));
+      return merge(maskRoots.map(d => makeMask(`${d}XX`)));
     }
 
     const d1 = norm.charAt(0);
-    if (!maskRoots.includes(d1)) return [];
+    if (!maskRoots.includes(d1)) return selected;
 
-    if (norm.length === 1) return [makeMask(`${norm}XX`)];
-    if (norm.length === 2) return [makeMask(`${norm}X`)];
-    if (norm.length === 3) return [makeMask(norm)];
-    return [];
+    if (norm.length === 1) return merge([makeMask(`${norm}XX`)]);
+    if (norm.length === 2) return merge([makeMask(`${norm}X`)]);
+    if (norm.length === 3) return merge([makeMask(norm)]);
+    return selected;
   };
 };

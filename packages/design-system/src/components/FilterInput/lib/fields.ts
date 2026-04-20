@@ -2,13 +2,18 @@ import type { FieldMetadata, FieldValueOption } from '../types';
 
 /**
  * Get value options for a field.
- * Priority: `getSuggestions(inputText)` > `values` > `options` (converted to `{value, label}`).
+ * Priority: `getSuggestions(inputText, context)` > `values` > `options` (converted to `{value, label}`).
+ *
+ * `context.selectedValues` is forwarded to `getSuggestions` so helpers can
+ * include the currently-committed values in their output (e.g. to preserve a
+ * badge style on a concrete code once suggestions have narrowed to masks).
  */
 export const getFieldValues = (
   field: FieldMetadata,
   inputText: string = '',
+  context?: { selectedValues?: Array<string | number | boolean> },
 ): FieldValueOption[] => {
-  if (field.getSuggestions) return field.getSuggestions(inputText);
+  if (field.getSuggestions) return field.getSuggestions(inputText, context);
   const fromValues = field.values ?? [];
   if (fromValues.length > 0) return fromValues;
   return field.options?.map(s => ({ value: s, label: s })) ?? [];

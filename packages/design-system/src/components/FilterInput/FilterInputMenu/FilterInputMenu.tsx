@@ -87,7 +87,18 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
     selectedOperator,
   );
 
-  const selectedFieldValues = selectedField ? getFieldValues(selectedField, currentTokenText) : [];
+  // Pass committed chip values to getSuggestions so helpers that style values
+  // (e.g. status codes with class-color badges) can keep selected entries
+  // branded even when the input-driven suggestions have narrowed to masks.
+  const selectedContext = {
+    selectedValues: [
+      ...editingMultiValues,
+      ...(editingSingleValue != null ? [editingSingleValue] : []),
+    ],
+  };
+  const selectedFieldValues = selectedField
+    ? getFieldValues(selectedField, currentTokenText, selectedContext)
+    : [];
   const valueFilterText = getValueFilterText(
     currentTokenText,
     selectedOperator,

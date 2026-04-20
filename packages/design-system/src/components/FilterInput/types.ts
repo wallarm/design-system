@@ -84,8 +84,16 @@ export interface FieldMetadata {
    * input text. When provided, takes precedence over `values` and `options`.
    * The returned list is still post-filtered by `filterAndSort`, so prefix/includes
    * matching still applies — return items that contain the input text.
+   *
+   * The optional `context.selectedValues` carries any values already committed
+   * to the chip (in single- or multi-select form) so the helper can include
+   * them in its output with their canonical presentation (e.g. a badge color)
+   * even when they fall outside the current input-driven suggestions.
    */
-  getSuggestions?: (inputText: string) => FieldValueOption[];
+  getSuggestions?: (
+    inputText: string,
+    context?: { selectedValues?: Array<string | number | boolean> },
+  ) => FieldValueOption[];
 }
 
 /**
