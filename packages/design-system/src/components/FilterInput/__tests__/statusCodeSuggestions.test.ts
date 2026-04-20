@@ -70,6 +70,29 @@ describe('createStatusCodeSuggestions', () => {
     expect(suggest('  ').map(o => o.value)).toEqual(['2XX', '3XX', '4XX', '5XX']);
   });
 
+  describe('with X as placeholder in the typed input', () => {
+    const suggest = createStatusCodeSuggestions({ codes: ['1', '2', '3', '4', '5'] });
+
+    it.each([
+      ['3X', '3XX'],
+      ['3x', '3XX'],
+      ['3XX', '3XX'],
+      ['3xx', '3XX'],
+      ['4X', '4XX'],
+      ['1XX', '1XX'],
+      ['30X', '30X'],
+      ['30x', '30X'],
+    ])('expands "%s" to mask "%s"', (input, mask) => {
+      const [option] = suggest(input);
+      expect(option.value).toBe(mask);
+    });
+
+    it('rejects inputs where X appears before a digit', () => {
+      expect(suggest('3X0')).toEqual([]);
+      expect(suggest('X30')).toEqual([]);
+    });
+  });
+
   it('ignores 3-char entries and other lengths in codes', () => {
     const suggest = createStatusCodeSuggestions({
       codes: ['2', '3', '4', '5', '200', '201', '40', '4040', '', '404'],

@@ -111,6 +111,32 @@ export const createStatusCodeSuggestions = (
       .filter(s => /^\d[\dX]{0,2}$/.test(s) && maskRoots.includes(s.charAt(0)))
       .map(s => makeMask(s));
 
+  /**
+   * Normalize the typed input into the canonical mask it represents, or
+   * return `null` if the shape isn't a valid status-code fragment. Accepts
+   * partial forms like "3", "3X", "3XX", "30", "30X", "301" (case-insensitive
+   * on `X`). Rejects anything with an `X` followed by a digit, or a leading
+   * digit outside `maskRoots`.
+   */
+  const canonicalize = (norm: string): string | null => {
+    const s = norm.toUpperCase();
+    if (s.length === 0 || s.length > 3) return null;
+    if (!/^[\dX]+$/.test(s)) return null;
+    const d1 = s.charAt(0);
+    if (d1 === 'X' || !maskRoots.includes(d1)) return null;
+    if (s.length === 1) return `${d1}XX`;
+    const c2 = s.charAt(1);
+    if (c2 === 'X') {
+      // Once an X appears, only more X's may follow.
+      if (s.length === 3 && s.charAt(2) !== 'X') return null;
+      return `${d1}XX`;
+    }
+    if (s.length === 2) return `${d1}${c2}X`;
+    const c3 = s.charAt(2);
+    if (c3 === 'X') return `${d1}${c2}X`;
+    return `${d1}${c2}${c3}`;
+  };
+
   return (inputText, context) => {
     const norm = inputText.trim();
     const selected = resolveSelected(context?.selectedValues);
@@ -120,19 +146,12 @@ export const createStatusCodeSuggestions = (
       ...primary.filter(o => !seen.has(String(o.value))),
     ];
 
-    if (norm.length > 3) return selected;
-    if (norm.length > 0 && !/^\d+$/.test(norm)) return selected;
-
     if (norm.length === 0) {
       return merge(maskRoots.map(d => makeMask(`${d}XX`)));
     }
 
-    const d1 = norm.charAt(0);
-    if (!maskRoots.includes(d1)) return selected;
-
-    if (norm.length === 1) return merge([makeMask(`${norm}XX`)]);
-    if (norm.length === 2) return merge([makeMask(`${norm}X`)]);
-    if (norm.length === 3) return merge([makeMask(norm)]);
-    return selected;
+    const mask = canonicalize(norm);
+    if (!mask) return selected;
+    return merge([makeMask(mask)]);
   };
 };
