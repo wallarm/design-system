@@ -199,12 +199,28 @@ export const useMenuFlow = ({
     [selectedField, selectedOperator, editing, dateRange, insertIndex, upsertCondition, resetState],
   );
 
+  /** Multi-select commit: receives final array from FilterInputValueMenu */
+  const handleMultiCommit = useCallback(
+    (values: Array<string | number | boolean>) => {
+      if (!selectedField || !selectedOperator || values.length === 0) return;
+      const isEditing = !!editing.editingChipId;
+      upsertCondition(
+        selectedField,
+        selectedOperator,
+        values,
+        editing.editingChipId,
+        isEditing ? undefined : insertIndex,
+      );
+      resetState(!isEditing);
+    },
+    [selectedField, selectedOperator, editing, insertIndex, upsertCondition, resetState],
+  );
+
   /**
    * In building mode the first live toggle inserts a brand-new chip at
    * `insertIndex`; every subsequent toggle within the same open dropdown
-   * (and the final close/blur commit) must *replace* that chip, not insert
-   * again. We stash the chip ID on first live insert and reuse it until the
-   * menu session ends.
+   * must *replace* that chip, not insert again. We stash the chip ID on
+   * first live insert and reuse it until the menu session ends.
    */
   const liveChipIdRef = useRef<string | null>(null);
   useEffect(() => {
@@ -212,28 +228,6 @@ export const useMenuFlow = ({
     // or when the user pivots to a different chip. Clear the reuse anchor.
     liveChipIdRef.current = null;
   }, [selectedField, selectedOperator, editing.editingChipId]);
-
-  /** Multi-select commit: receives final array from FilterInputValueMenu on
-   *  close / blur. If the live-update path has already inserted the chip,
-   *  reuse that ID so the commit replaces in place instead of inserting
-   *  a duplicate. */
-  const handleMultiCommit = useCallback(
-    (values: Array<string | number | boolean>) => {
-      if (!selectedField || !selectedOperator || values.length === 0) return;
-      const isEditing = !!editing.editingChipId;
-      const chipId = editing.editingChipId ?? liveChipIdRef.current;
-      upsertCondition(
-        selectedField,
-        selectedOperator,
-        values,
-        chipId,
-        chipId ? undefined : insertIndex,
-      );
-      liveChipIdRef.current = null;
-      resetState(!isEditing);
-    },
-    [selectedField, selectedOperator, editing, insertIndex, upsertCondition, resetState],
-  );
 
   /** Mirror every toggle into the condition live so the chip value updates
    *  while the dropdown is still open. Unlike handleMultiCommit, this does

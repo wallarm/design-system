@@ -82,14 +82,11 @@ export const useValueMenuState = ({
   onMultiValuesChangeRef.current = onMultiValuesChange;
 
   const toggleValue = (val: ConditionValue) => {
-    // Derive `next` from the ref (kept in sync with state) and fire the
-    // side-effect callback outside the state updater. Running it inside
-    // the updater would re-fire it in strict-mode double renders and
-    // duplicate every upsert.
-    const prev = checkedValuesRef.current;
-    const next = prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val];
-    setCheckedValues(next);
-    onMultiValuesChangeRef.current?.(next);
+    setCheckedValues(prev => {
+      const next = prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val];
+      onMultiValuesChangeRef.current?.(next);
+      return next;
+    });
   };
 
   const onCommitRef = useRef(onCommit);
