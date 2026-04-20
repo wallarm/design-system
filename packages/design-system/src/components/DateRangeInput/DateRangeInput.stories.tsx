@@ -209,11 +209,7 @@ export const Filled: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Date + time range (24h)
       </Text>
-      <DateRangeInput
-        granularity='minute'
-        hourCycle={24}
-        defaultValue={sampleRangeDateTime}
-      />
+      <DateRangeInput granularity='minute' hourCycle={24} defaultValue={sampleRangeDateTime} />
     </VStack>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
