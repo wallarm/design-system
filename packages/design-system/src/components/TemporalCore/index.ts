@@ -5,3 +5,4 @@ export { TemporalSegmentGroup } from './TemporalSegmentGroup';
 export { TimeDropdown, type TimeDropdownHandle } from './TimeDropdown';
 export { useTemporalField } from './useTemporalField';
 export { useTimeDropdownKeyCapture } from './useTimeDropdownKeyCapture';
+export { getDefaultTemporalPlaceholder, type TemporalGranularity } from './utils';

@@ -4,7 +4,7 @@ import { type AriaDateFieldProps, type DateValue, useDateField } from '@react-ar
 import { useLocale } from '@react-aria/i18n';
 import { useDateFieldState } from '@react-stately/datepicker';
 import { cn } from '../../utils/cn';
-import { useTemporalField } from '../TemporalCore';
+import { getDefaultTemporalPlaceholder, useTemporalField } from '../TemporalCore';
 import { DateInputInternal } from './DateInputInternal';
 import type { DateInputBaseProps } from './types';
 
@@ -33,7 +33,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
       error = false,
       disabled = false,
       granularity = 'day',
-      placeholder,
+      placeholder = getDefaultTemporalPlaceholder({ granularity }),
       showTimeDropdown,
       timeStep,
       hourCycle,

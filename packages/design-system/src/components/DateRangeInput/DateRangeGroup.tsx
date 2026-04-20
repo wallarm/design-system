@@ -5,7 +5,7 @@ import { useDateRangeContext } from './DateRangeContext';
 
 const dateRangeGroupVariants = cva(
   cn(
-    'group/temporal flex-1 h-full flex items-center gap-4',
+    'relative group/temporal flex-1 h-full flex items-center gap-4',
     'focus-within:outline-none',
     'data-disabled:opacity-50 data-disabled:cursor-not-allowed',
   ),

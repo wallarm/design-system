@@ -7,7 +7,6 @@ import { useDateFieldState } from '@react-stately/datepicker';
 import type { AriaDatePickerProps, DateValue } from '@react-types/datepicker';
 import { cn } from '../../utils/cn';
 import {
-  TemporalPlaceholder,
   TemporalSegmentGroup,
   TimeDropdown,
   type TimeDropdownHandle,
@@ -28,7 +27,6 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
       disabled = false,
       error = false,
       readOnly = false,
-      placeholder,
       showTimeDropdown,
       timeStep = 30,
       hourCycle,
@@ -37,7 +35,6 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
     const { locale } = useLocale();
 
     const dropdownRef = useRef<TimeDropdownHandle>(null);
-    const [isFocused, setIsFocused] = useState(false);
     const [isDropdownOpen, setIsDropdownOpen] = useState(false);
     const blurTimeoutRef = useRef<number | null>(null);
 
@@ -52,7 +49,6 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
     const { fieldProps } = useDateField(props, fieldState, ref as RefObject<HTMLDivElement>);
 
     const hasPartialValue = fieldState.segments.some(seg => seg.isEditable && !seg.isPlaceholder);
-    const showPlaceholder = placeholder && !hasPartialValue && !isFocused;
 
     useEffect(() => {
       onHasPartialValueChange?.(hasPartialValue);
@@ -67,8 +63,6 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
     );
 
     const handleFocus = () => {
-      setIsFocused(true);
-      // Clear any pending blur timeout
       if (blurTimeoutRef.current) {
         clearTimeout(blurTimeoutRef.current);
         blurTimeoutRef.current = null;
@@ -82,8 +76,6 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
     };
 
     const handleBlur = () => {
-      setIsFocused(false);
-      // Delay closing to allow clicks to complete
       blurTimeoutRef.current = window.setTimeout(() => {
         setIsDropdownOpen(false);
       }, 200);
@@ -149,14 +141,11 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
         onKeyDownCapture={handleKeyDownCapture}
         onClick={handleClick}
       >
-        {showPlaceholder && (
-          <TemporalPlaceholder text={placeholder} className='overflow-hidden text-ellipsis' />
-        )}
         <TemporalSegmentGroup
           {...fieldProps}
           ref={ref}
           data-slot='input'
-          className={cn('h-36', showPlaceholder && 'opacity-0')}
+          className={cn('h-36')}
           aria-disabled={disabled || undefined}
           aria-invalid={error || undefined}
           data-field-type={type}
