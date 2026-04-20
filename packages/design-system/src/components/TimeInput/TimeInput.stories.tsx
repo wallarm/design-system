@@ -9,7 +9,7 @@ const meta: Meta<typeof TimeInput> = {
   title: 'Inputs Date/TimeInput',
   component: TimeInput,
   parameters: {
-    layout: 'centered',
+    layout: 'padded',
     docs: {
       description: {
         component:
@@ -17,6 +17,13 @@ const meta: Meta<typeof TimeInput> = {
       },
     },
   },
+  decorators: [
+    Story => (
+      <div style={{ minHeight: 360, paddingBottom: 280 }}>
+        <Story />
+      </div>
+    ),
+  ],
   argTypes: {
     granularity: {
       control: 'select',
@@ -182,28 +189,22 @@ export const Granularity: StoryFn<typeof meta> = () => (
 );
 
 export const TimeDropdownSteps: StoryFn<typeof meta> = () => (
-  <div style={{ paddingBottom: 360 }}>
-    <HStack gap={24}>
-      <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour format
-        </Text>
-        <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={12} />
-        <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={12} />
-        <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={12} />
-      </VStack>
-      <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour format
-        </Text>
-        <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={24} />
-        <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={24} />
-        <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={24} />
-      </VStack>
-    </HStack>
-  </div>
+  <HStack gap={24}>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        12-hour format
+      </Text>
+      <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={12} />
+      <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={12} />
+      <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={12} />
+    </VStack>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        24-hour format
+      </Text>
+      <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={24} />
+      <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={24} />
+      <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={24} />
+    </VStack>
+  </HStack>
 );
-
-TimeDropdownSteps.parameters = {
-  layout: 'padded',
-};
