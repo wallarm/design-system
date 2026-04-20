@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useRef } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import type { ChipSegment } from '../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,
@@ -216,26 +216,44 @@ export const useMenuFlow = ({
     [selectedField, selectedOperator, editing, insertIndex, upsertCondition, resetState],
   );
 
+  /**
+   * In building mode the first live toggle inserts a brand-new chip at
+   * `insertIndex`; every subsequent toggle within the same open dropdown
+   * must *replace* that chip, not insert again. We stash the chip ID on
+   * first live insert and reuse it until the menu session ends.
+   */
+  const liveChipIdRef = useRef<string | null>(null);
+  useEffect(() => {
+    // A session ends when building mode resets (no selectedField/operator)
+    // or when the user pivots to a different chip. Clear the reuse anchor.
+    liveChipIdRef.current = null;
+  }, [selectedField, selectedOperator, editing.editingChipId]);
+
   /** Mirror every toggle into the condition live so the chip value updates
    *  while the dropdown is still open. Unlike handleMultiCommit, this does
    *  NOT reset menu state — the user keeps interacting with the same menu. */
   const handleMultiLiveChange = useCallback(
     (values: Array<string | number | boolean>) => {
       if (!selectedField || !selectedOperator) return;
-      const isEditing = !!editing.editingChipId;
       if (values.length === 0) {
         // Live-clearing the set would either delete the chip or leave it
         // with an empty value array. Prefer to keep the last committed
         // value in place until the user explicitly commits on close.
         return;
       }
+      const liveChipId = editing.editingChipId ?? liveChipIdRef.current;
       upsertCondition(
         selectedField,
         selectedOperator,
         values,
-        editing.editingChipId,
-        isEditing ? undefined : insertIndex,
+        liveChipId,
+        liveChipId ? undefined : insertIndex,
       );
+      if (!liveChipId) {
+        // New chip was just inserted at `insertIndex`; remember its ID so
+        // follow-up toggles replace it instead of inserting again.
+        liveChipIdRef.current = `chip-${insertIndex}`;
+      }
     },
     [selectedField, selectedOperator, editing, insertIndex, upsertCondition],
   );
