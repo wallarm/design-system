@@ -22,10 +22,6 @@ interface UseValueMenuStateOptions {
    *  on mount with the initial preview — use this when you need to react only
    *  to actual user-initiated toggles. */
   onItemToggle?: () => void;
-  /** Fires on every multi-select toggle with the full checked set *after* the
-   *  toggle has been applied. Parents use it to keep the chip's condition
-   *  value in sync with the menu state while the dropdown remains open. */
-  onMultiValuesChange?: (values: ConditionValue[]) => void;
   inputRef?: RefObject<HTMLInputElement | null>;
   menuRef?: RefObject<HTMLDivElement | null>;
   /** Ref to register blur commit function — called by blur handler before state reset. Returns true if committed. */
@@ -44,7 +40,6 @@ export const useValueMenuState = ({
   onOpenChange,
   onBuildingValueChange,
   onItemToggle,
-  onMultiValuesChange,
   inputRef,
   menuRef,
   blurCommitRef,
@@ -78,15 +73,8 @@ export const useValueMenuState = ({
     }
   }, [initialValues, open]);
 
-  const onMultiValuesChangeRef = useRef(onMultiValuesChange);
-  onMultiValuesChangeRef.current = onMultiValuesChange;
-
   const toggleValue = (val: ConditionValue) => {
-    setCheckedValues(prev => {
-      const next = prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val];
-      onMultiValuesChangeRef.current?.(next);
-      return next;
-    });
+    setCheckedValues(prev => (prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]));
   };
 
   const onCommitRef = useRef(onCommit);

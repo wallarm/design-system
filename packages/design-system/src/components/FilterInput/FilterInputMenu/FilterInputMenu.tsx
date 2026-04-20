@@ -33,7 +33,6 @@ export interface FilterInputAutocompleteState {
   handleMenuDiscard: () => void;
   handleBuildingValueChange: (preview: string | undefined) => void;
   handleMultiSelectToggle: () => void;
-  handleMultiLiveChange: (values: Array<string | number | boolean>) => void;
   // Inline segment editing
   segmentFilterText: string;
   segmentMenuFilterText: string;
@@ -68,7 +67,6 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
     handleMenuDiscard,
     handleBuildingValueChange,
     handleMultiSelectToggle,
-    handleMultiLiveChange,
     segmentMenuFilterText,
     editingSegment,
     blurCommitRef,
@@ -175,7 +173,6 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
               positioning={menuPositioning}
               onBuildingValueChange={handleBuildingValueChange}
               onItemToggle={handleMultiSelectToggle}
-              onMultiValuesChange={handleMultiLiveChange}
               inputRef={inputRef}
               menuRef={menuRef}
               filterText={valueFilterText}

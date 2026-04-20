@@ -216,30 +216,6 @@ export const useMenuFlow = ({
     [selectedField, selectedOperator, editing, insertIndex, upsertCondition, resetState],
   );
 
-  /** Mirror every toggle into the condition live so the chip value updates
-   *  while the dropdown is still open. Unlike handleMultiCommit, this does
-   *  NOT reset menu state — the user keeps interacting with the same menu. */
-  const handleMultiLiveChange = useCallback(
-    (values: Array<string | number | boolean>) => {
-      if (!selectedField || !selectedOperator) return;
-      const isEditing = !!editing.editingChipId;
-      if (values.length === 0) {
-        // Live-clearing the set would either delete the chip or leave it
-        // with an empty value array. Prefer to keep the last committed
-        // value in place until the user explicitly commits on close.
-        return;
-      }
-      upsertCondition(
-        selectedField,
-        selectedOperator,
-        values,
-        editing.editingChipId,
-        isEditing ? undefined : insertIndex,
-      );
-    },
-    [selectedField, selectedOperator, editing, insertIndex, upsertCondition],
-  );
-
   /** Building value preview from FilterInputValueMenu multi-select */
   const handleBuildingValueChange = useCallback(
     (preview: string | undefined) => {
@@ -394,7 +370,6 @@ export const useMenuFlow = ({
     handleOperatorSelect,
     handleValueSelect,
     handleMultiCommit,
-    handleMultiLiveChange,
     handleBuildingValueChange,
     handleMultiSelectToggle,
     handleRangeSelect,

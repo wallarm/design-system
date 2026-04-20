@@ -34,10 +34,6 @@ export interface FilterInputValueMenuProps {
   /** Fires on explicit multi-select toggle (click or keyboard) — use to react
    *  only to user-initiated toggles, not to initialization. */
   onItemToggle?: () => void;
-  /** Fires on every multi-select toggle with the post-toggle checked set.
-   *  Parents use it to keep the chip's condition value live while the
-   *  dropdown is still open. */
-  onMultiValuesChange?: (values: ConditionValue[]) => void;
   /** Ref to the query bar input — ArrowUp on first item returns focus here */
   inputRef?: RefObject<HTMLInputElement | null>;
   /** Text to filter values by label */
@@ -63,7 +59,6 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
   positioning,
   onBuildingValueChange,
   onItemToggle,
-  onMultiValuesChange,
   inputRef,
   filterText = '',
   menuRef,
@@ -94,7 +89,6 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
     onOpenChange,
     onBuildingValueChange,
     onItemToggle,
-    onMultiValuesChange,
     inputRef,
     menuRef,
     blurCommitRef,
