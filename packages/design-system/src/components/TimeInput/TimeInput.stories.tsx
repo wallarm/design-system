@@ -78,15 +78,15 @@ export const States: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Disabled
       </Text>
-      <TimeInput icon={Clock} placeholder='Disabled empty' disabled />
-      <TimeInput icon={Clock} disabled defaultValue={new Time(14, 30)} />
+      <TimeInput placeholder='Disabled empty' disabled />
+      <TimeInput disabled defaultValue={new Time(14, 30)} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         Error
       </Text>
-      <TimeInput icon={Clock} placeholder='Error empty' error />
-      <TimeInput icon={Clock} error defaultValue={new Time(14, 30)} />
+      <TimeInput placeholder='Error empty' error />
+      <TimeInput error defaultValue={new Time(14, 30)} />
     </VStack>
   </HStack>
 );
@@ -97,19 +97,19 @@ export const Sizes: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Default (36px)
       </Text>
-      <TimeInput icon={Clock} size='default' />
+      <TimeInput size='default' />
     </VStack>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
         Medium (32px)
       </Text>
-      <TimeInput icon={Clock} size='medium' />
+      <TimeInput size='medium' />
     </VStack>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
         Small (24px)
       </Text>
-      <TimeInput icon={Clock} size='small' />
+      <TimeInput size='small' />
     </VStack>
   </VStack>
 );
@@ -120,17 +120,17 @@ export const Granularity: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         12-hour format
       </Text>
-      <TimeInput icon={Clock} placeholder='hour' granularity='hour' hourCycle={12} />
-      <TimeInput icon={Clock} placeholder='hour:min' granularity='minute' hourCycle={12} />
-      <TimeInput icon={Clock} placeholder='hour:min:sec' granularity='second' hourCycle={12} />
+      <TimeInput placeholder='hour' granularity='hour' hourCycle={12} />
+      <TimeInput placeholder='hour:min' granularity='minute' hourCycle={12} />
+      <TimeInput placeholder='hour:min:sec' granularity='second' hourCycle={12} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         24-hour format
       </Text>
-      <TimeInput icon={Clock} placeholder='hour' granularity='hour' hourCycle={24} />
-      <TimeInput icon={Clock} placeholder='hour:min' granularity='minute' hourCycle={24} />
-      <TimeInput icon={Clock} placeholder='hour:min:sec' granularity='second' hourCycle={24} />
+      <TimeInput placeholder='hour' granularity='hour' hourCycle={24} />
+      <TimeInput placeholder='hour:min' granularity='minute' hourCycle={24} />
+      <TimeInput placeholder='hour:min:sec' granularity='second' hourCycle={24} />
     </VStack>
   </HStack>
 );
@@ -141,53 +141,17 @@ export const TimeDropdownSteps: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         12-hour format
       </Text>
-      <TimeInput
-        icon={Clock}
-        placeholder='Every 15 min'
-        showTimeDropdown
-        timeStep={15}
-        hourCycle={12}
-      />
-      <TimeInput
-        icon={Clock}
-        placeholder='Every 30 min'
-        showTimeDropdown
-        timeStep={30}
-        hourCycle={12}
-      />
-      <TimeInput
-        icon={Clock}
-        placeholder='Every 60 min'
-        showTimeDropdown
-        timeStep={60}
-        hourCycle={12}
-      />
+      <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={12} />
+      <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={12} />
+      <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={12} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         24-hour format
       </Text>
-      <TimeInput
-        icon={Clock}
-        placeholder='Every 15 min'
-        showTimeDropdown
-        timeStep={15}
-        hourCycle={24}
-      />
-      <TimeInput
-        icon={Clock}
-        placeholder='Every 30 min'
-        showTimeDropdown
-        timeStep={30}
-        hourCycle={24}
-      />
-      <TimeInput
-        icon={Clock}
-        placeholder='Every 60 min'
-        showTimeDropdown
-        timeStep={60}
-        hourCycle={24}
-      />
+      <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={24} />
+      <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={24} />
+      <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={24} />
     </VStack>
   </HStack>
 );
