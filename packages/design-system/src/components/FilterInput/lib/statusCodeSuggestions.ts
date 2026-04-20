@@ -26,6 +26,13 @@ export const createStatusCodeSuggestions = (
     if (norm.length === 0) {
       return maskRoots.map(d => makeMask(`${d}XX`));
     }
+    if (norm.length === 1) {
+      return maskRoots.includes(norm) ? [makeMask(`${norm}XX`)] : [];
+    }
+    if (norm.length === 2) {
+      const d1 = norm[0];
+      return maskRoots.includes(d1) ? [makeMask(`${norm}X`)] : [];
+    }
     return [];
   };
 };
