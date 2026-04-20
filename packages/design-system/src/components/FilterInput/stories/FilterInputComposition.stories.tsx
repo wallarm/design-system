@@ -2,7 +2,9 @@ import type React from 'react';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterInput } from '../FilterInput';
+import { createStatusCodeSuggestions } from '../lib/statusCodeSuggestions';
 import type { ExprNode, FieldMetadata } from '../types';
+import { MOCK_STATUS_CODES } from './mockStatusCodes';
 
 const meta = {
   title: 'Patterns/FilterInput/Composition',
@@ -98,6 +100,7 @@ const attackFields: FieldMetadata[] = [
       { value: 502, label: '502 Bad Gateway' },
       { value: 503, label: '503 Service Unavailable' },
     ],
+    getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
   },
   {
     name: 'protocol',
