@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
-import { applyAcceptChar, chipIdToConditionIndex } from '../../lib';
+import { applyAcceptChar, chipIdToConditionIndex, isMultiSelectOperator } from '../../lib';
 import type {
   ChipErrorSegment,
   Condition,
@@ -207,6 +207,11 @@ export const useFilterInputAutocomplete = ({
 
     // Editing an existing chip — don't overwrite its value, just cancel editing
     if (editing.editingChipId) return false;
+
+    // Multi-select has its own commit pipeline (blurCommitRef → handleMultiCommit,
+    // plus the live-update path). Skip the error-chip insertion here so we don't
+    // add a phantom second chip alongside the one live-update already created.
+    if (operator && isMultiSelectOperator(operator)) return false;
 
     // Has typed text — commit as custom value
     if (operator && text) {
