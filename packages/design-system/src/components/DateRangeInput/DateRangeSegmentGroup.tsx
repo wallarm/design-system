@@ -137,7 +137,7 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
 
     return (
       <div
-        className={cn('relative h-full', !hasIcon && 'pl-12')}
+        className={cn('relative h-full', !hasIcon && type === 'start' && 'pl-12')}
         onKeyDownCapture={handleKeyDownCapture}
         onClick={handleClick}
       >
