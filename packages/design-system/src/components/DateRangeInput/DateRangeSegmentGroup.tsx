@@ -67,6 +67,9 @@ export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegment
         clearTimeout(blurTimeoutRef.current);
         blurTimeoutRef.current = null;
       }
+      if (showTimeDropdown && hasTimeSegments) {
+        setIsDropdownOpen(true);
+      }
     };
 
     const handleClick = () => {
