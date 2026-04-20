@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react';
-import type { BadgeColor } from '../Badge';
 
 /**
  * FilterInput Chip Variant Types
@@ -58,7 +57,7 @@ export type FilterOperator =
 export interface FieldValueOption {
   value: string | number | boolean;
   label: string;
-  badge?: { color: BadgeColor; text: string };
+  badge?: { color: string; text: string };
 }
 
 /**
@@ -79,43 +78,6 @@ export interface FieldMetadata {
    * Empty array `[]` means freeform input — no dropdown, user types any value.
    */
   options?: string[];
-  /**
-   * Optional callback to compute value suggestions dynamically from the current
-   * input text. When provided, takes precedence over `values` and `options`.
-   * The returned list is still post-filtered by `filterAndSort`, so prefix/includes
-   * matching still applies — return items that contain the input text.
-   *
-   * The optional `context.selectedValues` carries any values already committed
-   * to the chip (in single- or multi-select form) so the helper can include
-   * them in its output with their canonical presentation (e.g. a badge color)
-   * even when they fall outside the current input-driven suggestions.
-   */
-  getSuggestions?: (
-    inputText: string,
-    context?: { selectedValues?: Array<string | number | boolean> },
-  ) => FieldValueOption[];
-  /**
-   * Optional freeform-value validator. When provided, it runs in place of the
-   * static-allowlist check — return `true` to mark the value invalid. Useful
-   * for fields that accept arbitrary input but still have format rules
-   * (e.g. HTTP status code must be 3 chars, first digit in [1..5]).
-   */
-  validate?: (value: string | number | boolean) => boolean;
-  /**
-   * Optional per-character input filter. When the user is entering a value
-   * for this field (building or inline-editing the value segment), any
-   * character for which this returns `false` is stripped from the input
-   * on change. Separators that the filter should preserve (comma, space)
-   * are allowed through unconditionally.
-   */
-  acceptChar?: (char: string) => boolean;
-  /**
-   * Optional value normalizer. Runs on commit (after Enter / blur) before
-   * `validate`, so consumers can auto-complete partial input — e.g. a status
-   * code helper can turn "2" into "2XX" or "22" into "22X". Multi-select
-   * commits apply this per token.
-   */
-  normalize?: (value: string | number | boolean) => string | number | boolean;
 }
 
 /**

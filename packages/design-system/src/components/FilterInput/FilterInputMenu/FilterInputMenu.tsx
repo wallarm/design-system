@@ -1,7 +1,6 @@
-import { type FC, type RefObject, useMemo } from 'react';
+import type { FC, RefObject } from 'react';
 import type { ChipSegment } from '../FilterInputField/FilterInputChip';
 import {
-  getCurrentValueTokenText,
   getFieldValues,
   getValueFilterText,
   isBetweenOperator,
@@ -32,7 +31,6 @@ export interface FilterInputAutocompleteState {
   handleMenuClose: () => void;
   handleMenuDiscard: () => void;
   handleBuildingValueChange: (preview: string | undefined) => void;
-  handleMultiSelectToggle: () => void;
   // Inline segment editing
   segmentFilterText: string;
   segmentMenuFilterText: string;
@@ -66,7 +64,6 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
     handleMenuClose,
     handleMenuDiscard,
     handleBuildingValueChange,
-    handleMultiSelectToggle,
     segmentMenuFilterText,
     editingSegment,
     blurCommitRef,
@@ -77,33 +74,11 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
   // Operator: filter by typed text from main input (building) or segment input (inline editing)
   const operatorFilterText = editingSegment === 'operator' ? segmentMenuFilterText : inputText;
 
-  // The active token the user is currently typing. For multi-select operators this
-  // strips prior comma-committed values so `getSuggestions` and the dropdown filter
-  // both see only the in-progress token. Single-value operators get the raw input.
-  const currentTokenText = getCurrentValueTokenText(
+  const selectedFieldValues = selectedField ? getFieldValues(selectedField) : [];
+  const valueFilterText = getValueFilterText(
     editingSegment,
     inputText,
     segmentMenuFilterText,
-    selectedOperator,
-  );
-
-  // Pass committed chip values to getSuggestions so helpers that style values
-  // (e.g. status codes with class-color badges) can keep selected entries
-  // branded even when the input-driven suggestions have narrowed to masks.
-  const selectedContext = useMemo(
-    () => ({
-      selectedValues: [
-        ...editingMultiValues,
-        ...(editingSingleValue != null ? [editingSingleValue] : []),
-      ],
-    }),
-    [editingMultiValues, editingSingleValue],
-  );
-  const selectedFieldValues = selectedField
-    ? getFieldValues(selectedField, currentTokenText, selectedContext)
-    : [];
-  const valueFilterText = getValueFilterText(
-    currentTokenText,
     selectedOperator,
     selectedFieldValues,
   );
@@ -172,7 +147,6 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
               highlightValue={editingSingleValue}
               positioning={menuPositioning}
               onBuildingValueChange={handleBuildingValueChange}
-              onItemToggle={handleMultiSelectToggle}
               inputRef={inputRef}
               menuRef={menuRef}
               filterText={valueFilterText}

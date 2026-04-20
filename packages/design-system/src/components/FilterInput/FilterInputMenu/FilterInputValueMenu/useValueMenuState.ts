@@ -17,11 +17,6 @@ interface UseValueMenuStateOptions {
   onEscape?: () => void;
   onOpenChange?: (open: boolean) => void;
   onBuildingValueChange?: (preview: string | undefined) => void;
-  /** Fires whenever the user explicitly toggles an item in multi-select mode
-   *  (click or keyboard). Distinct from onBuildingValueChange, which also fires
-   *  on mount with the initial preview — use this when you need to react only
-   *  to actual user-initiated toggles. */
-  onItemToggle?: () => void;
   inputRef?: RefObject<HTMLInputElement | null>;
   menuRef?: RefObject<HTMLDivElement | null>;
   /** Ref to register blur commit function — called by blur handler before state reset. Returns true if committed. */
@@ -39,7 +34,6 @@ export const useValueMenuState = ({
   onEscape,
   onOpenChange,
   onBuildingValueChange,
-  onItemToggle,
   inputRef,
   menuRef,
   blurCommitRef,
@@ -110,7 +104,6 @@ export const useValueMenuState = ({
   const handleItemSelect = (item: FilterInputDropdownItem) => {
     if (multiSelect) {
       toggleValue(item.value as ConditionValue);
-      onItemToggle?.();
     } else {
       onSelect(item.value as ConditionValue);
     }

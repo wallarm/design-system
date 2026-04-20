@@ -113,63 +113,6 @@ describe('deriveAutocompleteValues', () => {
 
       expect(result.editingMultiValues).toEqual(['active']);
     });
-
-    it('preserves all values for dynamic (getSuggestions) field even with error', () => {
-      const dynamicField: FieldMetadata = {
-        name: 'code',
-        label: 'Status code',
-        type: 'integer',
-        getSuggestions: () => [{ value: '200', label: '200 OK' }],
-      };
-      const result = deriveAutocompleteValues({
-        editingChipId: 'chip-0',
-        selectedField: dynamicField,
-        selectedOperator: 'in',
-        conditions: [
-          {
-            type: 'condition',
-            field: 'code',
-            operator: 'in',
-            value: ['429', 'anything'],
-            error: true,
-          },
-        ],
-        buildingMultiValue: undefined,
-        dateRangeFromValue: undefined,
-      });
-
-      // Bypass: hasStaticAllowlist is false for dynamic fields, so filtering does not run.
-      expect(result.editingMultiValues).toEqual(['429', 'anything']);
-    });
-
-    it('preserves all values for dynamic field even when values are also defined', () => {
-      // getSuggestions wins; static values would have filtered out '429' but we skip that path.
-      const mixedField: FieldMetadata = {
-        name: 'code',
-        label: 'Status code',
-        type: 'integer',
-        values: [{ value: '200', label: '200 OK' }],
-        getSuggestions: () => [],
-      };
-      const result = deriveAutocompleteValues({
-        editingChipId: 'chip-0',
-        selectedField: mixedField,
-        selectedOperator: 'in',
-        conditions: [
-          {
-            type: 'condition',
-            field: 'code',
-            operator: 'in',
-            value: ['200', '429'],
-            error: true,
-          },
-        ],
-        buildingMultiValue: undefined,
-        dateRangeFromValue: undefined,
-      });
-
-      expect(result.editingMultiValues).toEqual(['200', '429']);
-    });
   });
 
   describe('non-multi-select returns empty', () => {

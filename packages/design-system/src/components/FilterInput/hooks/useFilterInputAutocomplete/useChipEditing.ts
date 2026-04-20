@@ -175,14 +175,6 @@ export const useChipEditing = ({
     setUserHasTyped(true);
   }, []);
 
-  /** Resets only the "userHasTyped" flag so the dropdown filter widens back
-   *  to all options, while the displayed segment text (the committed value
-   *  the user is editing) stays visible on the chip. Used by multi-select
-   *  toggle so the chip doesn't flicker to empty between clicks. */
-  const resetSegmentTyping = useCallback(() => {
-    setUserHasTyped(false);
-  }, []);
-
   // Text shown in the inline input
   const segmentDisplayText = segmentFilterText;
   // Text used for dropdown filtering — empty until user types
@@ -196,7 +188,6 @@ export const useChipEditing = ({
       segmentFilterText: segmentDisplayText,
       segmentMenuFilterText,
       setSegmentFilterText: handleSegmentFilterChange,
-      resetSegmentTyping,
       handleChipClick,
       clearEditing,
       cancelSegmentEdit,
@@ -207,7 +198,6 @@ export const useChipEditing = ({
       segmentDisplayText,
       segmentMenuFilterText,
       handleSegmentFilterChange,
-      resetSegmentTyping,
       handleChipClick,
       clearEditing,
       cancelSegmentEdit,

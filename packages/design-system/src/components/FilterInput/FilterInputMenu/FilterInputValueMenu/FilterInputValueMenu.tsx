@@ -1,18 +1,22 @@
 import { type FC, type RefObject, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
-import type { BadgeColor } from '../../../Badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup } from '../../../DropdownMenu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuFooter,
+  DropdownMenuGroup,
+} from '../../../DropdownMenu';
+import { Kbd } from '../../../Kbd/Kbd';
+import { KbdGroup } from '../../../Kbd/KbdGroup';
 import { filterAndSort } from '../../lib';
 import { MenuEmptyState } from '../MenuEmptyState';
-import { useValueMenuDisplayValues } from './useValueMenuDisplayValues';
 import { useValueMenuState } from './useValueMenuState';
-import { ValueMenuFooter } from './ValueMenuFooter';
 import { ValueMenuItem } from './ValueMenuItem';
 
 export interface ValueOption {
   value: string | number | boolean;
   label: string;
-  badge?: { color: BadgeColor; text: string };
+  badge?: { color: string; text: string };
   hasSubmenu?: boolean;
 }
 
@@ -31,9 +35,6 @@ export interface FilterInputValueMenuProps {
   width?: 'standard' | 'compact' | number;
   positioning?: Record<string, unknown>;
   onBuildingValueChange?: (preview: string | undefined) => void;
-  /** Fires on explicit multi-select toggle (click or keyboard) — use to react
-   *  only to user-initiated toggles, not to initialization. */
-  onItemToggle?: () => void;
   /** Ref to the query bar input — ArrowUp on first item returns focus here */
   inputRef?: RefObject<HTMLInputElement | null>;
   /** Text to filter values by label */
@@ -58,7 +59,6 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
   width = 'standard',
   positioning,
   onBuildingValueChange,
-  onItemToggle,
   inputRef,
   filterText = '',
   menuRef,
@@ -88,19 +88,21 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
     onEscape,
     onOpenChange,
     onBuildingValueChange,
-    onItemToggle,
     inputRef,
     menuRef,
     blurCommitRef,
   });
 
-  const displayValues = useValueMenuDisplayValues({
-    values,
-    filteredValues,
-    multiSelect,
-    checkedValues,
-    highlightValue,
-  });
+  // For multi-select, ensure checked items are always visible (even when filtered out)
+  // and always appear first for stable ordering.
+  const displayValues = useMemo(() => {
+    if (!multiSelect) return filteredValues;
+    const checkedSet = new Set(checkedValues.map(String));
+    if (checkedSet.size === 0) return filteredValues;
+    const checkedItems = values.filter(v => checkedSet.has(String(v.value)));
+    const uncheckedFiltered = filteredValues.filter(v => !checkedSet.has(String(v.value)));
+    return [...checkedItems, ...uncheckedFiltered];
+  }, [filteredValues, values, multiSelect, checkedValues]);
 
   const widthClass = width === 'compact' ? 'w-[172px]' : 'w-[300px]';
   const widthStyle = typeof width === 'number' ? { width: `${width}px` } : undefined;
@@ -141,7 +143,42 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
         ) : (
           <MenuEmptyState />
         )}
-        <ValueMenuFooter multiSelect={multiSelect} />
+        <DropdownMenuFooter>
+          {multiSelect ? (
+            <>
+              <span className='flex items-center gap-4'>
+                <KbdGroup>
+                  <Kbd>↵</Kbd>
+                </KbdGroup>
+                to select
+              </span>
+              <span className='flex items-center gap-4'>
+                <KbdGroup>
+                  <Kbd>⌘</Kbd>
+                  <Kbd>↑</Kbd>
+                  <Kbd>↓</Kbd>
+                </KbdGroup>
+                to multi-select
+              </span>
+            </>
+          ) : (
+            <>
+              <span className='flex items-center gap-4'>
+                <KbdGroup>
+                  <Kbd>↑</Kbd>
+                  <Kbd>↓</Kbd>
+                </KbdGroup>
+                to navigate
+              </span>
+              <span className='flex items-center gap-4'>
+                <KbdGroup>
+                  <Kbd>↵</Kbd>
+                </KbdGroup>
+                to select
+              </span>
+            </>
+          )}
+        </DropdownMenuFooter>
       </DropdownMenuContent>
     </DropdownMenu>
   );

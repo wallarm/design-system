@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
-import { applyAcceptChar, chipIdToConditionIndex } from '../../lib';
+import { chipIdToConditionIndex } from '../../lib';
 import type {
   ChipErrorSegment,
   Condition,
@@ -152,7 +152,6 @@ export const useFilterInputAutocomplete = ({
     handleValueSelect,
     handleMultiCommit,
     handleBuildingValueChange,
-    handleMultiSelectToggle,
     handleRangeSelect,
     handleCustomValueCommit,
     handleCustomAttributeCommit,
@@ -326,7 +325,6 @@ export const useFilterInputAutocomplete = ({
     handleValueSelect,
     handleMultiCommit,
     handleBuildingValueChange,
-    handleMultiSelectToggle,
     handleMenuClose,
     handleMenuDiscard: resetState,
     handleChipClick: editing.handleChipClick,
@@ -346,14 +344,7 @@ export const useFilterInputAutocomplete = ({
     editingSegment: editing.editingSegment,
     segmentFilterText: editing.segmentFilterText,
     segmentMenuFilterText: editing.segmentMenuFilterText,
-    handleSegmentFilterChange: (text: string) => {
-      // Mirror the main-input character filter when editing a value segment
-      // so the same acceptChar rule applies in both entry paths.
-      const accept = selectedField?.acceptChar;
-      const next =
-        editing.editingSegment === 'value' && accept ? applyAcceptChar(text, accept) : text;
-      editing.setSegmentFilterText(next);
-    },
+    handleSegmentFilterChange: editing.setSegmentFilterText,
     cancelSegmentEdit: editing.cancelSegmentEdit,
     handleCustomValueCommit,
     handleCustomAttributeCommit,

@@ -28,7 +28,6 @@ interface MenuFlowDeps {
     editingSegment: string | null;
     setEditingSegment: (segment: ChipSegment | null) => void;
     setSegmentFilterText: (text: string) => void;
-    resetSegmentTyping: () => void;
   };
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
@@ -225,21 +224,6 @@ export const useMenuFlow = ({
     [setBuildingMultiValue],
   );
 
-  /** Fires only on explicit multi-select toggle (not on mount). Resets the
-   *  *dropdown filter source* so the menu shows all options + already-checked
-   *  items for the next selection, without wiping what the user sees.
-   *  - Building mode: clear the main input (nothing is rendered from it).
-   *  - Segment-edit mode: reset the typing flag only. The displayed segment
-   *    text (the original chip value being edited) stays visible on the chip
-   *    so there's no flicker to an empty string between clicks. */
-  const handleMultiSelectToggle = useCallback(() => {
-    if (editing.editingSegment === 'value') {
-      editing.resetSegmentTyping();
-    } else {
-      setInputText('');
-    }
-  }, [editing, setInputText]);
-
   /** Range select (between + calendar) */
   const handleRangeSelect = useCallback(
     (from: string, to: string) => {
@@ -375,7 +359,6 @@ export const useMenuFlow = ({
     handleValueSelect,
     handleMultiCommit,
     handleBuildingValueChange,
-    handleMultiSelectToggle,
     handleRangeSelect,
     handleCustomValueCommit,
     handleCustomAttributeCommit,

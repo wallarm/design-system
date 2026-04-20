@@ -4,7 +4,6 @@ import {
   getDateDisplayLabel,
   getFieldValues,
   getOperatorLabel,
-  hasStaticAllowlist,
   isMultiSelectOperator,
 } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator } from '../../types';
@@ -65,7 +64,7 @@ export const deriveAutocompleteValues = ({
       : editingCondition.value != null
         ? [editingCondition.value]
         : [];
-    if (editingCondition.error && selectedField && hasStaticAllowlist(selectedField)) {
+    if (editingCondition.error && selectedField) {
       const fieldValues = getFieldValues(selectedField);
       if (fieldValues.length > 0) {
         return values.filter(v => fieldValues.some(opt => opt.value === v));

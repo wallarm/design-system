@@ -1,6 +1,5 @@
 import type { FC } from 'react';
 import { ChevronRight } from '../../../../icons/ChevronRight';
-import { Badge } from '../../../Badge';
 import { Checkmark } from '../../../Checkmark';
 import { DropdownMenuItem } from '../../../DropdownMenu';
 import { Text } from '../../../Text';
@@ -29,9 +28,13 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
   >
     {/* Badge */}
     {option.badge ? (
-      <Badge color={option.badge.color} type='secondary' variant='default'>
-        {option.badge.text}
-      </Badge>
+      <div
+        className='flex items-center gap-4 px-6 py-2 rounded-4 text-xs font-medium max-w-[320px] min-h-[20px] overflow-clip'
+        style={{ backgroundColor: option.badge.color }}
+      >
+        <div className='size-6 rounded-full bg-current' />
+        <span className='min-w-0 truncate leading-4'>{option.badge.text}</span>
+      </div>
     ) : (
       <div className='min-w-0'>
         <Text size='sm' truncate>

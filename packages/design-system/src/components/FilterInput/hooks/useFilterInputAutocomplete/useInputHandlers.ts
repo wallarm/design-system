@@ -1,6 +1,6 @@
 import type { ChangeEvent, KeyboardEvent, MutableRefObject, RefObject } from 'react';
 import { useCallback, useRef } from 'react';
-import { applyAcceptChar, getOperatorFromLabel, hasFieldValues, OPERATOR_SYMBOLS } from '../../lib';
+import { getOperatorFromLabel, hasFieldValues, OPERATOR_SYMBOLS } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface UseInputHandlersDeps {
@@ -46,15 +46,7 @@ export const useInputHandlers = ({
 
   const handleInputChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
-      let text = e.target.value;
-      // When the user is entering a value for a field that specifies a
-      // per-character filter, strip everything that isn't allowed.
-      if (menuState === 'value' && selectedField?.acceptChar) {
-        text = applyAcceptChar(text, selectedField.acceptChar);
-        if (text !== e.target.value) {
-          e.target.value = text;
-        }
-      }
+      const text = e.target.value;
       setInputText(text);
 
       if (text && !selectedField) {
@@ -63,7 +55,7 @@ export const useInputHandlers = ({
         setMenuState(isFocused && conditionsLengthRef.current === 0 ? 'field' : 'closed');
       }
     },
-    [menuState, selectedField, isFocused, setInputText, setMenuState, conditionsLengthRef],
+    [selectedField, isFocused, setInputText, setMenuState, conditionsLengthRef],
   );
 
   const handleInputClick = useCallback(() => {

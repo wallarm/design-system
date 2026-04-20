@@ -5,7 +5,6 @@ export {
   getDateDisplayLabel,
   isDatePreset,
 } from '../FilterInputMenu/FilterInputDateValueMenu/constants';
-export { applyAcceptChar } from './applyAcceptChar';
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
 export {
   CONNECTOR_ID_PATTERN,
@@ -18,9 +17,9 @@ export {
   VARIANT_LABELS,
 } from './constants';
 export { buildContainerAnchoredRect, isMenuRelated } from './dom';
-export { getFieldValues, hasFieldValues, hasStaticAllowlist } from './fields';
+export { getFieldValues, hasFieldValues } from './fields';
 export { filterAndSort } from './filterSort';
-export { getCurrentValueTokenText, getValueFilterText } from './menuFilterText';
+export { getValueFilterText } from './menuFilterText';
 export {
   getOperatorFromLabel,
   getOperatorLabel,
@@ -30,10 +29,3 @@ export {
 } from './operators';
 export { type FilterParseError, isFilterParseError, parseExpression } from './parseExpression';
 export { serializeExpression } from './serializeExpression';
-export {
-  createStatusCodeInputFilter,
-  createStatusCodeNormalizer,
-  createStatusCodeSuggestions,
-  createStatusCodeValidator,
-  type StatusCodeSuggestionsOptions,
-} from './statusCode';

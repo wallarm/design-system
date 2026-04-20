@@ -1,10 +1,5 @@
 import { MIN_DATE_STRING_LENGTH } from '../../FilterInputMenu/FilterInputDateValueMenu/constants';
-import {
-  chipIdToConditionIndex,
-  getFieldValues,
-  hasStaticAllowlist,
-  isDatePreset,
-} from '../../lib';
+import { chipIdToConditionIndex, getFieldValues, isDatePreset } from '../../lib';
 import type { Condition, FieldMetadata, FieldValueOption, FilterOperator } from '../../types';
 
 /** Find a field value option matching by label or value (case-insensitive) */
@@ -29,14 +24,6 @@ export const getInvalidValueIndices = (
   field: FieldMetadata,
   values: Array<string | number | boolean>,
 ): number[] => {
-  // A custom validator trumps the static-allowlist check.
-  if (field.validate) {
-    return values.reduce<number[]>((acc, v, idx) => {
-      if (field.validate!(v)) acc.push(idx);
-      return acc;
-    }, []);
-  }
-  if (!hasStaticAllowlist(field)) return [];
   const fv = getFieldValues(field);
   if (fv.length === 0) return [];
   return values.reduce<number[]>((acc, v, idx) => {
@@ -69,17 +56,9 @@ export const resolveSingleValue = (
 ): { resolved: string | number | boolean; error: boolean | undefined } => {
   const fv = getFieldValues(field);
   const match = findMatchingFieldValue(fv, trimmed);
-  const raw = match ? match.value : trimmed;
-  // Apply field-provided normalization (e.g. pad partial status codes) before
-  // validation runs — the normalized form is what ends up in the chip.
-  const resolved = field.normalize ? field.normalize(raw) : raw;
-  // Custom validator trumps the static-allowlist check.
-  if (field.validate) {
-    return { resolved, error: field.validate(resolved) ? true : undefined };
-  }
   return {
-    resolved,
-    error: hasStaticAllowlist(field) && fv.length > 0 && !match ? true : undefined,
+    resolved: match ? match.value : trimmed,
+    error: fv.length > 0 && !match ? true : undefined,
   };
 };
 
@@ -92,9 +71,7 @@ export const resolveMultiValues = (
     .split(',')
     .map(s => s.trim())
     .filter(Boolean);
-  const raw = parts.map(part => resolveFieldValue(field, part));
-  // Apply field-provided normalization per token (e.g. "2, 3" → "2XX, 3XX").
-  const resolved = field.normalize ? raw.map(v => field.normalize!(v)) : raw;
+  const resolved = parts.map(part => resolveFieldValue(field, part));
   const error = getInvalidValueIndices(field, resolved).length > 0 ? true : undefined;
   return { resolved, error };
 };
