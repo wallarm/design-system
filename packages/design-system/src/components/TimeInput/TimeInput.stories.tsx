@@ -47,7 +47,7 @@ const meta: Meta<typeof TimeInput> = {
       control: 'text',
       description: 'Placeholder text shown when no value is selected.',
     },
-    hasIcon: {
+    showIcon: {
       control: 'boolean',
       description: 'Whether to show the leading clock icon. Default: true.',
     },
@@ -69,7 +69,7 @@ const meta: Meta<typeof TimeInput> = {
     granularity: 'minute',
     error: false,
     disabled: false,
-    hasIcon: true,
+    showIcon: true,
     showTimeDropdown: false,
     timeStep: undefined,
     size: 'default',

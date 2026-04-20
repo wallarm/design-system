@@ -53,7 +53,7 @@ const meta: Meta<typeof DateInput> = {
       control: 'text',
       description: 'Placeholder text shown when no value is selected.',
     },
-    hasIcon: {
+    showIcon: {
       control: 'boolean',
       description: 'Whether to show the leading calendar icon. Default: true.',
     },
@@ -76,7 +76,7 @@ const meta: Meta<typeof DateInput> = {
     granularity: 'day',
     error: false,
     disabled: false,
-    hasIcon: true,
+    showIcon: true,
     showTimeDropdown: false,
     timeStep: undefined,
     size: 'default',
@@ -95,7 +95,7 @@ export const WithIcon: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Without icon
       </Text>
-      <DateInput hasIcon={false} />
+      <DateInput showIcon={false} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
@@ -209,7 +209,7 @@ export const Filled: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Without icon
       </Text>
-      <DateInput hasIcon={false} defaultValue={sampleDate} />
+      <DateInput showIcon={false} defaultValue={sampleDate} />
     </VStack>
   </VStack>
 );

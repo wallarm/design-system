@@ -27,7 +27,7 @@ export type DateInputProps = Omit<
 export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
   (
     {
-      hasIcon = true,
+      showIcon = true,
       value: controlledValue,
       defaultValue,
       onChange,
@@ -81,7 +81,7 @@ export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
       <div className={cn('min-w-256 flex-1', className)}>
         <DateInputInternal
           {...fieldProps}
-          icon={hasIcon ? Calendar : undefined}
+          icon={showIcon ? Calendar : undefined}
           ref={finalRef}
           state={state}
           error={error}
