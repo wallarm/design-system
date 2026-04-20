@@ -9,7 +9,7 @@ function resolveSegmentText(segment: DateSegment): string {
   if (segment.type === 'month' && segment.value != null && !segment.isPlaceholder) {
     return getMonthSegmentText(segment.value, segment.placeholder);
   }
-  if (segment.type === 'dayPeriod' && !segment.isPlaceholder) {
+  if (segment.type === 'dayPeriod') {
     return segment.text.toUpperCase();
   }
   return segment.text;
