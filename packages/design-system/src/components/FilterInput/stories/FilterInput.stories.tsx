@@ -2,7 +2,9 @@ import type React from 'react';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { FilterInput } from '../FilterInput';
+import { createStatusCodeSuggestions } from '../lib/statusCodeSuggestions';
 import type { ExprNode, FieldMetadata } from '../types';
+import { MOCK_STATUS_CODES } from './mockStatusCodes';
 
 const meta = {
   title: 'Patterns/FilterInput/FilterInput',
@@ -263,5 +265,24 @@ export const AllChipsDisabled: Story = {
         placeholder='Add more filters...'
       />
     );
+  },
+};
+
+/**
+ * HTTP status code field using createStatusCodeSuggestions for mask-only
+ * suggestions. Empty input shows all masks available in the data; typing a
+ * digit narrows the suggestion (e.g. "4" → 4XX, "40" → 40X). See AS-877.
+ */
+export const HTTPStatusCodeSuggestions: Story = {
+  args: {
+    fields: [
+      {
+        name: 'response_code',
+        label: 'Status code',
+        type: 'integer',
+        getSuggestions: createStatusCodeSuggestions({ codes: MOCK_STATUS_CODES }),
+      },
+    ],
+    placeholder: 'Type to filter by status code...',
   },
 };
