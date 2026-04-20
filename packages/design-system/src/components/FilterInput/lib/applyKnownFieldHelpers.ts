@@ -15,8 +15,9 @@ type FieldHelpers = Pick<
 /**
  * Known field names that auto-wire DS helpers. Keyed by `FieldMetadata.name`
  * — when a field with this name is passed to `FilterInput` without explicit
- * helpers, the factories below fill in `acceptChar` / `normalize` /
- * `getSuggestions` / `validate`. Consumer-supplied callbacks always win.
+ * helpers, the factories below fill each slot declared by `FieldHelpers`
+ * above. Consumer-supplied callbacks always win. See the reserved-name
+ * table on `applyKnownFieldHelpers` for the current slot roster per name.
  */
 const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
   status_code: () => ({
