@@ -1,17 +1,11 @@
 import { type FC, type RefObject, useMemo, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import type { BadgeColor } from '../../../Badge';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuFooter,
-  DropdownMenuGroup,
-} from '../../../DropdownMenu';
-import { Kbd } from '../../../Kbd/Kbd';
-import { KbdGroup } from '../../../Kbd/KbdGroup';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup } from '../../../DropdownMenu';
 import { filterAndSort } from '../../lib';
 import { MenuEmptyState } from '../MenuEmptyState';
 import { useValueMenuState } from './useValueMenuState';
+import { ValueMenuFooter } from './ValueMenuFooter';
 import { ValueMenuItem } from './ValueMenuItem';
 
 export interface ValueOption {
@@ -177,42 +171,7 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
         ) : (
           <MenuEmptyState />
         )}
-        <DropdownMenuFooter>
-          {multiSelect ? (
-            <>
-              <span className='flex items-center gap-4'>
-                <KbdGroup>
-                  <Kbd>↵</Kbd>
-                </KbdGroup>
-                to select
-              </span>
-              <span className='flex items-center gap-4'>
-                <KbdGroup>
-                  <Kbd>⌘</Kbd>
-                  <Kbd>↑</Kbd>
-                  <Kbd>↓</Kbd>
-                </KbdGroup>
-                to multi-select
-              </span>
-            </>
-          ) : (
-            <>
-              <span className='flex items-center gap-4'>
-                <KbdGroup>
-                  <Kbd>↑</Kbd>
-                  <Kbd>↓</Kbd>
-                </KbdGroup>
-                to navigate
-              </span>
-              <span className='flex items-center gap-4'>
-                <KbdGroup>
-                  <Kbd>↵</Kbd>
-                </KbdGroup>
-                to select
-              </span>
-            </>
-          )}
-        </DropdownMenuFooter>
+        <ValueMenuFooter multiSelect={multiSelect} />
       </DropdownMenuContent>
     </DropdownMenu>
   );
