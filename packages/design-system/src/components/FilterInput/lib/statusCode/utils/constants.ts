@@ -1,9 +1,13 @@
 import type { BadgeColor } from '../../../../Badge';
 
 /** The five valid HTTP status-code classes, used both for suggestion-building
- *  and validation. Backed by the standard HTTP spec, independent of what the
- *  backend happens to carry. */
-export const VALID_MASK_ROOTS = new Set(['1', '2', '3', '4', '5']);
+ *  and validation. Backed by the standard HTTP spec — entirely frontend-driven,
+ *  independent of what the backend config carries.
+ *
+ *  Typed as `readonly string[]` (not `as const`) so `.includes(someString)`
+ *  stays callable without casting; declaration-file generation rejects the
+ *  tuple-narrowed overload of `.includes`. */
+export const MASK_ROOTS: readonly string[] = ['1', '2', '3', '4', '5'];
 
 /** Badge color per HTTP class, keyed by the leading digit. Derived from the
  *  AS-877 Figma designs: informational greys, success greens, redirect blues,

@@ -4,6 +4,14 @@
 **Branch:** `feature/AS-877-filter-input-getsuggestions`
 **Date:** 2026-04-20
 
+> **Post-ship revision (PR #92):** the backend no longer supplies a `codes` list —
+> the HTTP class range `[1..5]` is fixed on the frontend. `createStatusCodeSuggestions`
+> and `createStatusCodeValidator` now take no arguments. `StatusCodeSuggestionsOptions`
+> and `getMaskRoots` are gone. The rest of this document still describes the
+> original design; reading notes below that mention `codes` / `maskRoots`
+> should be interpreted against the fixed `MASK_ROOTS = ['1','2','3','4','5']`
+> constant instead.
+
 ## Context
 
 The `FilterInput` component already supports dynamic value suggestions via `FieldMetadata.getSuggestions(inputText: string): FieldValueOption[]`. This is the infrastructure landed on the current branch.

@@ -12,14 +12,15 @@ export {
 } from './FilterInputMenu';
 // Utilities
 export {
+  applyFieldValueTransforms,
   createStatusCodeInputFilter,
   createStatusCodeNormalizer,
+  createStatusCodeSerializer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
   type FilterParseError,
   isFilterParseError,
   parseExpression,
-  type StatusCodeSuggestionsOptions,
   serializeExpression,
 } from './lib';
 // Types

@@ -1,4 +1,5 @@
-import type { Condition, ExprNode, Group } from '../types';
+import type { Condition, ExprNode, FieldMetadata, Group } from '../types';
+import { applyFieldValueTransforms } from './applyFieldValueTransforms';
 
 const quoteValue = (v: string | number | boolean): string => `"${v}"`;
 
@@ -49,8 +50,20 @@ const serializeNode = (node: ExprNode, isTopLevel: boolean): string => {
 /**
  * Serialize an expression tree to a canonical text string.
  * Top-level conditions are sorted alphabetically by field name.
+ *
+ * **Pass `fields` when the output targets the backend.** Per-field
+ * `serializeValue` hooks run first, so values like the status-code mask
+ * `"2XX"` become `"2"` in the emitted string. Omitting `fields` keeps the
+ * UI-facing values verbatim — useful for clipboard round-trip, debug
+ * display, or any case where the output feeds `parseExpression` back. If
+ * you forget `fields` on the path to the backend, the placeholder `X`s
+ * ride through silently — name the backend call-site helper explicitly
+ * (e.g. `const query = serializeExpression(expr, fields)`) to make the
+ * intent obvious at callsite.
  */
-export const serializeExpression = (expr: ExprNode | null): string => {
+export const serializeExpression = (expr: ExprNode | null, fields?: FieldMetadata[]): string => {
   if (!expr) return '';
-  return serializeNode(expr, true);
+  const normalized = fields ? applyFieldValueTransforms(expr, fields) : expr;
+  if (!normalized) return '';
+  return serializeNode(normalized, true);
 };

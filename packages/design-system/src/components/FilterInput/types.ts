@@ -116,6 +116,15 @@ export interface FieldMetadata {
    * commits apply this per token.
    */
   normalize?: (value: string | number | boolean) => string | number | boolean;
+  /**
+   * Optional backend-value transformer. The UI stores whatever
+   * `normalize` produced (e.g. `"2XX"`), but some backends want a
+   * stripped form (e.g. `"2"`). Pass the expression tree through
+   * `applyFieldValueTransforms(expr, fields)` — or a string through
+   * `serializeExpression(expr, fields)` — to apply this hook when
+   * emitting the query. Display in the chip is unaffected.
+   */
+  serializeValue?: (value: string | number | boolean) => string | number | boolean;
 }
 
 /**

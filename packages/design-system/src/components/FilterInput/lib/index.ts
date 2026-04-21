@@ -6,6 +6,8 @@ export {
   isDatePreset,
 } from '../FilterInputMenu/FilterInputDateValueMenu/constants';
 export { applyAcceptChar } from './applyAcceptChar';
+export { applyFieldValueTransforms } from './applyFieldValueTransforms';
+export { applyKnownFieldHelpers } from './applyKnownFieldHelpers';
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
 export {
   CONNECTOR_ID_PATTERN,
@@ -33,7 +35,7 @@ export { serializeExpression } from './serializeExpression';
 export {
   createStatusCodeInputFilter,
   createStatusCodeNormalizer,
+  createStatusCodeSerializer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
-  type StatusCodeSuggestionsOptions,
 } from './statusCode';
