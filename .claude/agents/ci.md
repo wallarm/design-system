@@ -51,7 +51,7 @@ check-pr-title (on PR only)
 
 ```yaml
 NODE_VERSION: "24"
-PNPM_VERSION: "10.29.3"
+PNPM_VERSION: "10.33.2"
 PLAYWRIGHT_VERSION: "1.58.0"
 ```
 

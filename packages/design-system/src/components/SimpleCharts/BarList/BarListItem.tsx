@@ -9,6 +9,7 @@ import {
 } from 'react';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
+import { clamp01 } from '../lib/clamp01';
 import { BarListContext, BarListItemContext, type BarListItemContextValue } from './BarListContext';
 import { barListItemVariants } from './classes';
 
@@ -22,12 +23,6 @@ export interface BarListItemProps extends HTMLAttributes<HTMLDivElement> {
    */
   selected?: boolean;
 }
-
-const clamp01 = (n: number) => {
-  if (n < 0) return 0;
-  if (n > 1) return 1;
-  return n;
-};
 
 export const BarListItem: FC<BarListItemProps> = ({
   value,

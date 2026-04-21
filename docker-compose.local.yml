@@ -26,7 +26,7 @@ services:
       - -c
       - |
         echo 'Setting up pnpm...' &&
-        npm install -g pnpm@10.29.3 &&
+        npm install -g pnpm@10.33.2 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Building playwright-config...' &&
@@ -67,7 +67,7 @@ services:
       - -c
       - |
         echo 'Setting up pnpm...' &&
-        npm install -g pnpm@10.29.3 &&
+        npm install -g pnpm@10.33.2 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Building playwright-config...' &&
@@ -104,7 +104,7 @@ services:
       - -c
       - |
         echo 'Setting up pnpm...' &&
-        npm install -g pnpm@10.29.3 &&
+        npm install -g pnpm@10.33.2 &&
         echo 'Installing dependencies...' &&
         pnpm install --frozen-lockfile &&
         echo 'Building playwright-config...' &&

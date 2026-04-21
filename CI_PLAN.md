@@ -9,7 +9,7 @@ This document describes the CI/CD pipeline architecture for the Wallarm Design S
 ### Environment Requirements
 
 - **Node.js**: v24+
-- **pnpm**: 10.22.0
+- **pnpm**: 10.33.2
 - **Docker**: Latest stable version
 - **GitHub Actions**: Ubuntu latest runner
 
@@ -52,7 +52,7 @@ Manages dependencies and caching for optimal performance.
 **Key Features**:
 
 - Node.js v24 setup
-- pnpm v10.22.0 with caching
+- pnpm v10.33.2 with caching
 - Dependency installation with frozen lockfile
 - Screenshot update detection
 
@@ -152,7 +152,7 @@ on:
 
 env:
   NODE_VERSION: '24'
-  PNPM_VERSION: '10.22.0'
+  PNPM_VERSION: '10.33.2'
 ```
 
 ### Docker Configuration

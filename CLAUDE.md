@@ -13,7 +13,7 @@ You are an expert AI assistant for the Wallarm monorepo project. This is a moder
 - **Styling**: Tailwind CSS
 - **Testing**: Vitest (unit), Playwright (E2E)
 - **Documentation**: Storybook 10+
-- **Package Manager**: pnpm 10.29.3
+- **Package Manager**: pnpm 10.33.2
 - **Monorepo Tool**: Turborepo
 - **CI/CD**: GitHub Actions with sharded testing
 - **Containerization**: Docker with multi-stage builds
@@ -89,7 +89,7 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 ### CI/CD Environment
 
 - **Node.js**: v24
-- **pnpm**: v10.22.0
+- **pnpm**: v10.33.2
 - **Playwright**: v1.58.0-noble
 - **Runners**: Ubuntu latest
 - **Container Registry**: ghcr.io/wallarm/
