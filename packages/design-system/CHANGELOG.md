@@ -1,3 +1,8 @@
+## <small>0.27.1 (2026-04-21)</small>
+
+* fix(filter-input): AS-877 release after squash-merged refactor ([2584918](https://github.com/wallarm/design-system/commit/2584918)), closes [#92](https://github.com/wallarm/design-system/issues/92)
+* refactor(filter-input): AS-877 drop codes option — status-code masks are frontend-driven (#92) ([e38859a](https://github.com/wallarm/design-system/commit/e38859a)), closes [#92](https://github.com/wallarm/design-system/issues/92)
+
 ## 0.27.0 (2026-04-20)
 
 * fix(filter-input): AS-877 dedupe live-created chip on multi-select close ([c34d2e4](https://github.com/wallarm/design-system/commit/c34d2e4))
