@@ -1,3 +1,7 @@
+## 0.28.0 (2026-04-22)
+
+* feat(simple-charts): WDS-90 Charts container and BarList ([95a9ec2](https://github.com/wallarm/design-system/commit/95a9ec2))
+
 ## <small>0.27.1 (2026-04-21)</small>
 
 * fix(filter-input): AS-877 release after squash-merged refactor ([2584918](https://github.com/wallarm/design-system/commit/2584918)), closes [#92](https://github.com/wallarm/design-system/issues/92)
