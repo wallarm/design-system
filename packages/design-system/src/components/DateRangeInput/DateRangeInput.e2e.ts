@@ -8,6 +8,7 @@ const dateRangeInputStory = createStoryHelper('inputs-date-daterangeinput', [
   'Sizes',
   'Filled',
   'Granularity',
+  'Date Order Comparison',
 ] as const);
 
 test.describe('Component: DateRangeInput', () => {
@@ -39,6 +40,11 @@ test.describe('Component: DateRangeInput', () => {
 
     test('Should render all granularity variants correctly', async ({ page }) => {
       await dateRangeInputStory.goto(page, 'Granularity');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render day-first and month-first orders side by side', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Date Order Comparison');
       await expect(page).toHaveScreenshot();
     });
   });

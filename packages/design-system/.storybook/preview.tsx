@@ -2,7 +2,7 @@ import { type FC, useEffect, useState } from 'react';
 import './react-aria-polyfill';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Decorator, Preview } from 'storybook-react-rsbuild';
-import { ThemeProvider, Toaster } from '../src';
+import { DateFormatProvider, type DateOrder, ThemeProvider, Toaster } from '../src';
 import './preview.css';
 
 let toasterMountCount = 0;
@@ -47,6 +47,21 @@ const preview: Preview = {
       },
     },
   },
+  globalTypes: {
+    dateOrder: {
+      name: 'Date order',
+      description: 'Segment order for every temporal input and calendar',
+      defaultValue: 'day-first',
+      toolbar: {
+        icon: 'calendar',
+        items: [
+          { value: 'day-first', title: 'Day first (24 Apr, 2026)' },
+          { value: 'month-first', title: 'Month first (Apr 24, 2026)' },
+        ],
+        dynamicTitle: true,
+      },
+    },
+  },
   tags: ['autodocs'],
 };
 
@@ -59,12 +74,17 @@ export const decorators: Decorator[] = [
     defaultTheme: 'light',
     attributeName: 'data-theme',
   }),
-  Story => (
-    <ThemeProvider>
-      <Story />
-      <SingletonToaster />
-    </ThemeProvider>
-  ),
+  (Story, context) => {
+    const dateOrder = (context.globals.dateOrder as DateOrder | undefined) ?? 'day-first';
+    return (
+      <ThemeProvider>
+        <DateFormatProvider order={dateOrder}>
+          <Story />
+        </DateFormatProvider>
+        <SingletonToaster />
+      </ThemeProvider>
+    );
+  },
 ];
 
 export default preview;

@@ -3,6 +3,7 @@ import type { DateFieldState, DateSegment, TimeFieldState } from '@react-stately
 import type { GroupDOMAttributes } from '@react-types/shared';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
+import { type DateOrder, useDateFormat } from '../DateFormatProvider';
 import { TemporalSegment } from './TemporalSegment';
 
 export interface TemporalSegmentGroupProps extends GroupDOMAttributes {
@@ -36,17 +37,21 @@ const Literal = ({ text, disabled }: { text: string; disabled?: boolean }) => (
 );
 
 /**
- * Build the normalized segment list enforcing "d MMM, yyyy HH:mm" order
- * regardless of the browser locale.
+ * Build the normalized segment list.
  *
- * - Date segments are reordered: day → month → year
- * - Custom separators: " " between day/month, ", " before year
- * - Time segments (hour, minute, second, dayPeriod + their ":" literals) are appended
- * - Time-only inputs (no date parts) are rendered as-is
+ * Order follows `DateFormatProvider` (default `day-first`):
+ *   - `day-first`  → day → " " → month → ", " → year → time
+ *   - `month-first`→ month → " " → day → ", " → year → time
+ *
+ * Year always trails the two order-sensitive segments, separated by ", ".
+ * Time segments (hour, minute, second, dayPeriod + their ":" literals) are
+ * appended after a space, preserving react-aria's internal literal order.
+ * Time-only inputs (no date parts) render segments as-is.
  */
 function buildParts(
   segments: DateSegment[],
   state: DateFieldState | TimeFieldState,
+  order: DateOrder,
   disabled?: boolean,
   readOnly?: boolean,
   keyPrefix = '',
@@ -70,22 +75,22 @@ function buildParts(
     ));
   }
 
-  // Extract time segments: everything from first 'hour' segment to the end,
-  // preserving internal literals (":", " ", etc.)
   const hourIdx = segments.findIndex(s => s.type === 'hour');
   const timeSegments = hourIdx >= 0 ? segments.slice(hourIdx) : [];
 
   const parts: ReactNode[] = [];
 
-  // Day (strip leading zero: "01" → "1")
-  if (day) {
+  // Day rendering strips leading zero ("01" → "1"); react-aria keeps it
+  // because `shouldForceLeadingZeros: true` is set on the state.
+  const renderDay = (dayKey: string) => {
+    if (!day) return;
     const dayOverride =
       !day.isPlaceholder && day.text.length === 2 && day.text[0] === '0'
         ? day.text.slice(1)
         : undefined;
     parts.push(
       <TemporalSegment
-        key={`${keyPrefix}day`}
+        key={dayKey}
         segment={day}
         state={state}
         disabled={disabled}
@@ -93,23 +98,36 @@ function buildParts(
         displayOverride={dayOverride}
       />,
     );
-  }
+  };
 
-  // " " + Month
-  if (month) {
-    parts.push(<Literal key={`${keyPrefix}sep-dm`} text=' ' disabled={disabled} />);
+  const renderMonth = (monthKey: string) => {
+    if (!month) return;
     parts.push(
       <TemporalSegment
-        key={`${keyPrefix}month`}
+        key={monthKey}
         segment={month}
         state={state}
         disabled={disabled}
         readOnly={readOnly}
       />,
     );
+  };
+
+  if (order === 'month-first') {
+    renderMonth(`${keyPrefix}month`);
+    if (month && day) {
+      parts.push(<Literal key={`${keyPrefix}sep-md`} text=' ' disabled={disabled} />);
+    }
+    renderDay(`${keyPrefix}day`);
+  } else {
+    renderDay(`${keyPrefix}day`);
+    if (day && month) {
+      parts.push(<Literal key={`${keyPrefix}sep-dm`} text=' ' disabled={disabled} />);
+    }
+    renderMonth(`${keyPrefix}month`);
   }
 
-  // ", " + Year
+  // ", " + Year (same in both orders)
   if (year) {
     parts.push(<Literal key={`${keyPrefix}sep-my`} text=', ' disabled={disabled} />);
     parts.push(
@@ -144,7 +162,8 @@ function buildParts(
 
 export const TemporalSegmentGroup = forwardRef<HTMLDivElement, TemporalSegmentGroupProps>(
   ({ state, disabled, readOnly, className, segmentKeyPrefix = '', ...props }, ref) => {
-    const parts = buildParts(state.segments, state, disabled, readOnly, segmentKeyPrefix);
+    const { order } = useDateFormat();
+    const parts = buildParts(state.segments, state, order, disabled, readOnly, segmentKeyPrefix);
 
     return (
       <div {...props} ref={ref} className={cn('flex items-center gap-0.5', className)}>

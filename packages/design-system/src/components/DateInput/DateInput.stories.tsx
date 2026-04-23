@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CalendarDate, CalendarDateTime, getLocalTimeZone, today } from '../../index';
+import { DateFormatProvider } from '../DateFormatProvider';
 import { Field, FieldAction, FieldDescription, FieldError, FieldLabel } from '../Field';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
@@ -259,3 +260,34 @@ export const WithFieldComponents: StoryFn<typeof meta> = () => {
     </VStack>
   );
 };
+
+/**
+ * Demonstrates both segment orders side by side. Each column wraps its
+ * DateInputs in a scoped `DateFormatProvider` — in real apps the provider
+ * is mounted once near the root and the whole tree picks up a single order.
+ */
+export const DateOrderComparison: StoryFn<typeof meta> = () => (
+  <HStack gap={32}>
+    <DateFormatProvider order='day-first'>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          Day first — DD MMM YYYY
+        </Text>
+        <DateInput />
+        <DateInput defaultValue={sampleDate} />
+        <DateInput granularity='minute' hourCycle={24} defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='month-first'>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          Month first — MMM DD YYYY
+        </Text>
+        <DateInput />
+        <DateInput defaultValue={sampleDate} />
+        <DateInput granularity='minute' hourCycle={24} defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+  </HStack>
+);
+DateOrderComparison.parameters = { layout: 'padded' };

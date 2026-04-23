@@ -9,6 +9,7 @@ const dateInputStory = createStoryHelper('inputs-date-dateinput', [
   'Filled',
   'Granularity',
   'With Field Components',
+  'Date Order Comparison',
 ] as const);
 
 test.describe('Component: DateInput', () => {
@@ -45,6 +46,11 @@ test.describe('Component: DateInput', () => {
 
     test('Should render with field components correctly', async ({ page }) => {
       await dateInputStory.goto(page, 'With Field Components');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render day-first and month-first orders side by side', async ({ page }) => {
+      await dateInputStory.goto(page, 'Date Order Comparison');
       await expect(page).toHaveScreenshot();
     });
   });
