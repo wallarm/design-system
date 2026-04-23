@@ -239,8 +239,10 @@ export const Granularity: StoryFn<typeof meta> = () => (
 );
 
 export const WithFieldComponents: StoryFn<typeof meta> = () => {
-  const [value, setValue] = useState<any>(null);
-  const [errorValue, setErrorValue] = useState<any>(today(getLocalTimeZone()));
+  // With `granularity='day'` the runtime value is always a CalendarDate —
+  // onChange gets cast on the way in so app state stays narrowly typed.
+  const [value, setValue] = useState<CalendarDate | null>(null);
+  const [errorValue, setErrorValue] = useState<CalendarDate | null>(today(getLocalTimeZone()));
 
   const handleSetNow = () => {
     setValue(today(getLocalTimeZone()));
@@ -253,13 +255,21 @@ export const WithFieldComponents: StoryFn<typeof meta> = () => {
           Label
           <FieldAction onClick={handleSetNow}>Set now</FieldAction>
         </FieldLabel>
-        <DateInput placeholder='Select a date' value={value} onChange={setValue} />
+        <DateInput
+          placeholder='Select a date'
+          value={value}
+          onChange={v => setValue(v as CalendarDate | null)}
+        />
         <FieldDescription>This is an input description.</FieldDescription>
       </Field>
 
       <Field invalid>
         <FieldLabel>Label</FieldLabel>
-        <DateInput error value={errorValue} onChange={setErrorValue} />
+        <DateInput
+          error
+          value={errorValue}
+          onChange={v => setErrorValue(v as CalendarDate | null)}
+        />
         <FieldError>An error message.</FieldError>
       </Field>
     </VStack>

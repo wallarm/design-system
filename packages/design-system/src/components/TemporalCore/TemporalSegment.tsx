@@ -29,10 +29,14 @@ const segmentVariants = cva(
       },
       // Focus styling is tied to editability: editable segments get the
       // brand blue fill + alt-colour text that make keyboard focus obvious.
-      // Literal / read-only segments keep the surrounding text colour so
-      // focus doesn't make the value invisible (alt text on transparent bg).
+      // Literal / read-only segments keep the surrounding text colour (so
+      // focus doesn't make the value invisible) and show a focus-visible
+      // ring so keyboard users can still see where focus landed.
       type: {
-        literal: 'text-text-primary select-none hover:bg-transparent focus:bg-transparent',
+        literal: cn(
+          'text-text-primary select-none hover:bg-transparent focus:bg-transparent rounded-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-primary',
+        ),
         editable: 'px-1 focus:bg-bg-fill-brand focus:text-text-primary-alt',
       },
     },
