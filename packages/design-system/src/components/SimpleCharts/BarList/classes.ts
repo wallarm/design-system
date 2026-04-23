@@ -90,10 +90,34 @@ export const barListValueClasses = [
   'pointer-events-none',
 ].join(' ');
 
-export const barListPercentClasses = [
-  'inline-block text-right min-w-32',
-  'text-text-secondary font-medium',
-].join(' ');
+export const barListPercentVariants = cva(
+  ['inline-block text-right min-w-32', 'font-medium'].join(' '),
+  {
+    variants: {
+      variant: {
+        split: 'text-text-primary',
+        muted: 'text-text-secondary',
+        inherit: 'text-inherit',
+      },
+    },
+    defaultVariants: {
+      variant: 'split',
+    },
+  },
+);
+
+export const barListPercentSymbolVariants = cva('', {
+  variants: {
+    variant: {
+      split: 'text-text-secondary',
+      muted: '',
+      inherit: '',
+    },
+  },
+  defaultVariants: {
+    variant: 'split',
+  },
+});
 
 export const barListSkeletonRowClasses = ['relative h-32 w-full', 'flex items-center px-8'].join(
   ' ',

@@ -8,7 +8,7 @@ const barListStory = createStoryHelper('data-display-simplecharts-barlist', [
   'Custom Colors',
   'Percentage',
   'Percent Digits',
-  'Percent Override',
+  'Percent Variants',
   'Truncated Labels',
   'Overflow',
   'Invalid Max',
@@ -78,6 +78,11 @@ test.describe('BarList', () => {
 
     test('Loading', async ({ page }) => {
       await barListStory.goto(page, 'Loading');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('PercentVariants', async ({ page }) => {
+      await barListStory.goto(page, 'Percent Variants');
       await expect(page).toHaveScreenshot();
     });
   });
@@ -190,12 +195,18 @@ test.describe('BarList', () => {
       await expect(firstPercent).toHaveText(/^\d+\.\d%$/);
     });
 
-    test('Should render BarListPercent children instead of the auto-formatted share', async ({
+    test('Should color the value and the % symbol independently in split variant', async ({
       page,
     }) => {
-      await barListStory.goto(page, 'Percent Override');
-      const firstPercent = page.locator('[data-slot=bar-list-percent]').first();
-      await expect(firstPercent).toHaveText('Custom');
+      await barListStory.goto(page, 'Percent Variants');
+      // Split is the default variant and the first chart in PercentVariants.
+      const splitChart = page.locator('[data-slot=chart]').first();
+      const firstPercent = splitChart.locator('[data-slot=bar-list-percent]').first();
+      const symbol = firstPercent.locator('[data-slot=bar-list-percent-symbol]');
+
+      const valueColor = await firstPercent.evaluate(el => getComputedStyle(el).color);
+      const symbolColor = await symbol.evaluate(el => getComputedStyle(el).color);
+      expect(valueColor).not.toEqual(symbolColor);
     });
 
     test('Should not set role=button or tabIndex on a non-interactive row', async ({ page }) => {
