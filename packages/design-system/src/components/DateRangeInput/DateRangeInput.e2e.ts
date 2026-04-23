@@ -99,6 +99,19 @@ test.describe('Component: DateRangeInput', () => {
       const clearButton = page.locator('[data-slot="date-range-input"] button[type="button"]');
       await expect(clearButton).toHaveCount(0);
     });
+
+    test('Should keep segment text visible when focused in read-only mode', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Read Only');
+      const daySegment = page
+        .locator('[data-slot="date-range-input"] [data-field-type="start"] [data-segment="day"]')
+        .first();
+      const expectedText = await daySegment.textContent();
+
+      await daySegment.focus();
+      await expect(daySegment).toBeFocused();
+      await expect(page).toHaveScreenshot();
+      await expect(daySegment).toHaveText(expectedText ?? '');
+    });
   });
 
   test.describe('Accessibility', () => {

@@ -101,6 +101,19 @@ test.describe('Component: DateInput', () => {
       const clearButton = page.locator('[data-slot="date-input"] button[type="button"]');
       await expect(clearButton).toHaveCount(0);
     });
+
+    test('Should keep segment text visible when focused in read-only mode', async ({ page }) => {
+      await dateInputStory.goto(page, 'Read Only');
+      const daySegment = page.locator('[data-slot="date-input"] [data-segment="day"]').first();
+      const expectedText = await daySegment.textContent();
+
+      await daySegment.focus();
+      await expect(daySegment).toBeFocused();
+      // Regression guard: focusing a read-only segment used to apply alt-colour
+      // text on a transparent background, making the value invisible.
+      await expect(page).toHaveScreenshot();
+      await expect(daySegment).toHaveText(expectedText ?? '');
+    });
   });
 
   test.describe('Accessibility', () => {

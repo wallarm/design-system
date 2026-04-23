@@ -16,12 +16,7 @@ function resolveSegmentText(segment: DateSegment): string {
 }
 
 const segmentVariants = cva(
-  cn(
-    'relative outline-none text-left',
-    'font-sans text-sm transition-all',
-    'focus:bg-bg-fill-brand focus:text-text-primary-alt',
-    'focus:outline-none',
-  ),
+  cn('relative outline-none text-left', 'font-sans text-sm transition-all', 'focus:outline-none'),
   {
     variants: {
       isPlaceholder: {
@@ -32,9 +27,13 @@ const segmentVariants = cva(
         true: 'cursor-not-allowed',
         false: 'hover:bg-states-primary-default-alt cursor-text',
       },
+      // Focus styling is tied to editability: editable segments get the
+      // brand blue fill + alt-colour text that make keyboard focus obvious.
+      // Literal / read-only segments keep the surrounding text colour so
+      // focus doesn't make the value invisible (alt text on transparent bg).
       type: {
         literal: 'text-text-primary select-none hover:bg-transparent focus:bg-transparent',
-        editable: 'px-1',
+        editable: 'px-1 focus:bg-bg-fill-brand focus:text-text-primary-alt',
       },
     },
     defaultVariants: {
@@ -71,10 +70,12 @@ export const TemporalSegment: FC<TemporalSegmentProps> = ({
   if (isLiteral) {
     return (
       <span
-        className={segmentVariants({
-          type: 'literal',
-          disabled,
-        })}
+        className={cn(
+          segmentVariants({
+            type: 'literal',
+            disabled,
+          }),
+        )}
         aria-hidden='true'
       >
         {displayOverride ?? segment.text}
@@ -88,11 +89,13 @@ export const TemporalSegment: FC<TemporalSegmentProps> = ({
     <span
       {...segmentProps}
       ref={ref}
-      className={segmentVariants({
-        type: isEditable ? 'editable' : 'literal',
-        isPlaceholder: segment.isPlaceholder,
-        disabled: disabled || !isEditable,
-      })}
+      className={cn(
+        segmentVariants({
+          type: isEditable ? 'editable' : 'literal',
+          isPlaceholder: segment.isPlaceholder,
+          disabled: disabled || !isEditable,
+        }),
+      )}
       data-segment={segment.type}
       data-placeholder={segment.isPlaceholder || undefined}
     >
