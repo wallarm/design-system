@@ -4,26 +4,12 @@ import { DateRangeSegmentGroup } from './DateRangeSegmentGroup';
 
 /**
  * Renders the end date/time input field for a date range.
- * Must be used within DateRangeProvider context.
- *
- * Displays editable segments for the end date and optionally time,
- * depending on the granularity set in DateRangeProvider.
- *
- * @example
- * <DateRangeProvider value={range} onChange={setRange}>
- *   <DateRangeStartValue />
- *   <DateRangeSeparator />
- *   <DateRangeEndValue />
- * </DateRangeProvider>
+ * Must be used within `DateRangeProvider` — `useDateRangeContext` will throw
+ * if rendered outside.
  */
 export const DateRangeEndValue: FC = () => {
-  const context = useDateRangeContext();
-
-  if (!context) {
-    return null;
-  }
-
-  const { endFieldProps, endRef } = context;
-
+  const { endFieldProps, endRef } = useDateRangeContext();
   return <DateRangeSegmentGroup {...endFieldProps} ref={endRef} type='end' />;
 };
+
+DateRangeEndValue.displayName = 'DateRangeEndValue';

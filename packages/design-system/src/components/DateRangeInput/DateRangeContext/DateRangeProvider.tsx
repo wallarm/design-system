@@ -1,111 +1,117 @@
-import { forwardRef, type ReactNode, type RefObject, useRef } from 'react';
+import { type FC, type ReactNode, type Ref, useRef } from 'react';
+import { composeRefs } from '@radix-ui/react-compose-refs';
 import { useDateRangePicker } from '@react-aria/datepicker';
 import { useDateRangePickerState } from '@react-stately/datepicker';
 import { Calendar } from '../../../icons';
 import { getDefaultTemporalPlaceholder, useTemporalField } from '../../TemporalCore';
-import type { DateRangeInputProps } from '../types';
+import type { DateRangeInputFlatProps, DateRangeInputProps } from '../types';
 import { DateRangeContext } from './context';
 
-interface DateRangeProviderProps extends DateRangeInputProps {
-  /** Children components (typically DateRangeStartValue, DateRangeSeparator, DateRangeEndValue) */
+/**
+ * `DateRangeInputProps` is a discriminated union, so `interface … extends`
+ * can't widen it — use an intersection type instead.
+ */
+type DateRangeProviderProps = DateRangeInputProps & {
+  /**
+   * Compound children — typically `DateRangeStartValue`, `DateRangeSeparator`,
+   * `DateRangeEndValue`, or a custom composition using those + `useDateRangeContext`.
+   */
   children: ReactNode;
-}
+  ref?: Ref<HTMLDivElement>;
+};
 
 /**
- * Context provider for date range input compound components.
- * Manages shared state and behavior for start/end date fields.
- * Automatically validates that end date is not before start date.
+ * Context provider for the date range compound API.
  *
- * Use this for custom composition of date range inputs with full control over layout.
+ * Use this when you need a custom layout around the start/end fields. For
+ * the default integrated rendering, use `DateRangeInput` which wraps this.
  *
  * @example
- * // Custom layout with icon and custom separator
- * <DateRangeProvider value={range} onChange={setRange} granularity="minute">
- *   <CalendarIcon />
+ * <DateRangeProvider value={range} onChange={setRange}>
  *   <DateRangeStartValue />
- *   <span>to</span>
+ *   <DateRangeSeparator />
  *   <DateRangeEndValue />
  * </DateRangeProvider>
  */
-export const DateRangeProvider = forwardRef<HTMLDivElement, DateRangeProviderProps>(
-  (
+export const DateRangeProvider: FC<DateRangeProviderProps> = props => {
+  const {
+    children,
+    ref,
+    value: controlledValue,
+    defaultValue,
+    onChange,
+    error = false,
+    disabled = false,
+    readOnly = false,
+    granularity = 'day',
+    hourCycle,
+    placeholder,
+    showTimeDropdown,
+    timeStep = 30,
+    showIcon = true,
+    size = 'default',
+  } = props as DateRangeInputFlatProps & { children: ReactNode; ref?: Ref<HTMLDivElement> };
+
+  const resolvedPlaceholder =
+    placeholder ?? getDefaultTemporalPlaceholder({ granularity, isRange: true });
+  const icon = showIcon ? Calendar : undefined;
+
+  const internalRef = useRef<HTMLDivElement>(null);
+  const startRef = useRef<HTMLDivElement>(null);
+  const endRef = useRef<HTMLDivElement>(null);
+
+  const { value, onChange: handleChange } = useTemporalField({
+    value: controlledValue,
+    defaultValue,
+    onChange,
+  });
+
+  const state = useDateRangePickerState({
+    value,
+    onChange: newValue => handleChange(newValue ?? null),
+    isDisabled: disabled,
+    isReadOnly: readOnly,
+    granularity,
+    hourCycle,
+    shouldForceLeadingZeros: true,
+  });
+
+  const { groupProps, startFieldProps, endFieldProps } = useDateRangePicker(
     {
-      children,
-      value: controlledValue,
-      defaultValue,
-      onChange,
-      error = false,
-      disabled = false,
-      readOnly = false,
-      granularity = 'day',
-      hourCycle,
-      placeholder = getDefaultTemporalPlaceholder({ granularity, isRange: true }),
-      showTimeDropdown,
-      timeStep,
-      showIcon = true,
-      size,
-    },
-    forwardedRef,
-  ) => {
-    const icon = showIcon ? Calendar : undefined;
-    const ref = useRef<HTMLDivElement>(null);
-    const finalRef = (forwardedRef || ref) as RefObject<HTMLDivElement | null>;
-    const startRef = useRef<HTMLDivElement>(null);
-    const endRef = useRef<HTMLDivElement>(null);
-
-    const { value, onChange: handleChange } = useTemporalField({
-      value: controlledValue,
-      defaultValue,
-      onChange,
-    });
-
-    const state = useDateRangePickerState({
       value,
-      onChange: newValue => handleChange(newValue ?? null),
       isDisabled: disabled,
       isReadOnly: readOnly,
       granularity,
       hourCycle,
-      shouldForceLeadingZeros: true,
-      shouldCloseOnSelect: false,
-    });
+    },
+    state,
+    internalRef,
+  );
 
-    const { groupProps, startFieldProps, endFieldProps } = useDateRangePicker(
-      {
-        value,
-        isDisabled: disabled,
-        isReadOnly: readOnly,
-        granularity,
+  return (
+    <DateRangeContext.Provider
+      value={{
+        finalRef: composeRefs(internalRef, ref),
+        startRef,
+        endRef,
+        groupProps,
+        startFieldProps,
+        endFieldProps,
+        state,
+        disabled,
+        readOnly,
+        error,
+        placeholder: resolvedPlaceholder,
+        showTimeDropdown,
+        timeStep,
         hourCycle,
-        shouldForceLeadingZeros: true,
-      },
-      state,
-      finalRef,
-    );
+        icon,
+        size,
+      }}
+    >
+      {children}
+    </DateRangeContext.Provider>
+  );
+};
 
-    return (
-      <DateRangeContext.Provider
-        value={{
-          finalRef,
-          startRef,
-          endRef,
-          groupProps,
-          startFieldProps,
-          endFieldProps,
-          state,
-          disabled,
-          readOnly,
-          error,
-          placeholder,
-          showTimeDropdown,
-          timeStep,
-          hourCycle,
-          icon,
-          size,
-        }}
-      >
-        {children}
-      </DateRangeContext.Provider>
-    );
-  },
-);
+DateRangeProvider.displayName = 'DateRangeProvider';

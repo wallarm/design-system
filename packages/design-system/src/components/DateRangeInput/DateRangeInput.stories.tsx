@@ -1,5 +1,5 @@
-import { CalendarDate, CalendarDateTime } from '@internationalized/date';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { CalendarDate, CalendarDateTime } from '../../index';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { DateRangeInput } from './DateRangeInput';

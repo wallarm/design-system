@@ -16,8 +16,7 @@ interface DateRangeGroupProps {
 }
 
 export const DateRangeGroup: FC<DateRangeGroupProps> = ({ children }) => {
-  const context = useDateRangeContext();
-  const { groupProps = {}, finalRef, disabled, error } = context ?? {};
+  const { groupProps, finalRef, disabled, error } = useDateRangeContext();
 
   return (
     <div

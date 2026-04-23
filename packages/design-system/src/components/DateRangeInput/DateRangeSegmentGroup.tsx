@@ -1,5 +1,14 @@
-import { forwardRef, type RefObject, useCallback, useEffect, useRef, useState } from 'react';
+import {
+  type FC,
+  type FocusEvent,
+  type Ref,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
 import { CalendarDateTime, createCalendar, getLocalTimeZone, now } from '@internationalized/date';
+import { composeRefs } from '@radix-ui/react-compose-refs';
 import type { TimeValue } from '@react-aria/datepicker';
 import { useDateField } from '@react-aria/datepicker';
 import { useLocale } from '@react-aria/i18n';
@@ -16,164 +25,149 @@ import { useDateRangeContext } from './DateRangeContext';
 
 export interface DateRangeSegmentGroupProps extends AriaDatePickerProps<DateValue> {
   type: 'start' | 'end';
-  /** Called when partial value presence changes (any editable segment is filled) */
+  /** Called when partial value presence changes (any editable segment is filled). */
   onHasPartialValueChange?: (hasPartialValue: boolean) => void;
+  ref?: Ref<HTMLDivElement>;
 }
 
-export const DateRangeSegmentGroup = forwardRef<HTMLDivElement, DateRangeSegmentGroupProps>(
-  ({ type, onHasPartialValueChange, ...props }, ref) => {
-    const context = useDateRangeContext();
-    const {
-      disabled = false,
-      error = false,
-      readOnly = false,
-      showTimeDropdown,
-      timeStep = 30,
-      hourCycle,
-      icon,
-    } = context ?? {};
-    const { locale } = useLocale();
+export const DateRangeSegmentGroup: FC<DateRangeSegmentGroupProps> = ({
+  type,
+  onHasPartialValueChange,
+  ref,
+  ...props
+}) => {
+  const {
+    state: rangeState,
+    disabled = false,
+    error = false,
+    readOnly = false,
+    showTimeDropdown,
+    timeStep = 30,
+    hourCycle,
+    icon,
+  } = useDateRangeContext();
+  const { locale } = useLocale();
 
-    const dropdownRef = useRef<TimeDropdownHandle>(null);
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false);
-    const blurTimeoutRef = useRef<number | null>(null);
+  const dropdownRef = useRef<TimeDropdownHandle>(null);
+  const internalRef = useRef<HTMLDivElement>(null);
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-    const fieldState = useDateFieldState({
-      ...props,
-      locale,
-      createCalendar,
-      hourCycle,
-      shouldForceLeadingZeros: true,
-    });
+  const fieldState = useDateFieldState({
+    ...props,
+    locale,
+    createCalendar,
+    hourCycle,
+    shouldForceLeadingZeros: true,
+  });
 
-    const { fieldProps } = useDateField(props, fieldState, ref as RefObject<HTMLDivElement>);
+  const { fieldProps } = useDateField(props, fieldState, internalRef);
 
-    const hasPartialValue = fieldState.segments.some(seg => seg.isEditable && !seg.isPlaceholder);
+  const hasPartialValue = fieldState.segments.some(seg => seg.isEditable && !seg.isPlaceholder);
 
-    useEffect(() => {
-      onHasPartialValueChange?.(hasPartialValue);
-    }, [hasPartialValue, onHasPartialValueChange]);
+  useEffect(() => {
+    onHasPartialValueChange?.(hasPartialValue);
+  }, [hasPartialValue, onHasPartialValueChange]);
 
-    // Check if input has time segments and date segments
-    const hasTimeSegments = fieldState.segments.some(
-      seg => seg.type === 'hour' || seg.type === 'minute',
-    );
-    const hasDateSegments = fieldState.segments.some(
-      seg => seg.type === 'year' || seg.type === 'month' || seg.type === 'day',
-    );
+  const hasTimeSegments = fieldState.segments.some(
+    seg => seg.type === 'hour' || seg.type === 'minute',
+  );
 
-    const handleFocus = () => {
-      if (blurTimeoutRef.current) {
-        clearTimeout(blurTimeoutRef.current);
-        blurTimeoutRef.current = null;
-      }
-      if (showTimeDropdown && hasTimeSegments) {
-        setIsDropdownOpen(true);
-      }
-    };
+  const handleContainerFocus = () => {
+    if (showTimeDropdown && hasTimeSegments) {
+      setIsDropdownOpen(true);
+    }
+  };
 
-    const handleClick = () => {
-      if (showTimeDropdown && hasTimeSegments && !isDropdownOpen) {
-        setIsDropdownOpen(true);
-      }
-    };
+  const handleContainerBlur = (e: FocusEvent<HTMLDivElement>) => {
+    // Keep the dropdown open while focus moves between descendants
+    // (segment → segment, or segment → dropdown item).
+    if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+      setIsDropdownOpen(false);
+    }
+  };
 
-    const handleBlur = () => {
-      blurTimeoutRef.current = window.setTimeout(() => {
-        setIsDropdownOpen(false);
-      }, 200);
-    };
+  const handleClick = () => {
+    if (showTimeDropdown && hasTimeSegments && !isDropdownOpen) {
+      setIsDropdownOpen(true);
+    }
+  };
 
-    const handleTimeSelect = useCallback(
-      (timeValue: TimeValue) => {
-        // Clear blur timeout to prevent delayed close
-        if (blurTimeoutRef.current) {
-          clearTimeout(blurTimeoutRef.current);
-          blurTimeoutRef.current = null;
-        }
+  const handleTimeSelect = useCallback(
+    (timeValue: TimeValue) => {
+      const current = fieldState.value;
+      // `hour` in value narrows DateValue → CalendarDateTime | ZonedDateTime,
+      // whose `.set({ hour, minute, ... })` signatures are compatible.
+      const next =
+        current && 'hour' in current
+          ? current.set({
+              hour: timeValue.hour,
+              minute: timeValue.minute,
+              second: 0,
+              millisecond: 0,
+            })
+          : anchorTimeToToday(timeValue);
+      rangeState.setDateTime(type, next);
+      setIsDropdownOpen(false);
+    },
+    [fieldState.value, rangeState, type],
+  );
 
-        if (!context?.state) return;
+  const handleKeyDownCapture = useTimeDropdownKeyCapture({
+    enabled: Boolean(showTimeDropdown),
+    isOpen: isDropdownOpen,
+    dropdownRef,
+    onOpen: () => setIsDropdownOpen(true),
+  });
 
-        if (fieldState.value) {
-          const newValue = fieldState.value.set({
-            hour: timeValue.hour,
-            minute: timeValue.minute,
-            second: 0,
-            millisecond: 0,
-          });
-          context.state.setDateTime(type, newValue as any);
-        } else if (hasDateSegments) {
-          const today = now(getLocalTimeZone());
-          const newValue = new CalendarDateTime(
-            today.year,
-            today.month,
-            today.day,
-            timeValue.hour,
-            timeValue.minute,
-            0,
-          );
-          context.state.setDateTime(type, newValue as any);
-        } else {
-          fieldState.setValue(timeValue as any);
-        }
+  const currentTimeValue: TimeValue | null =
+    fieldState.value && hasTimeSegments ? (fieldState.value as TimeValue) : null;
 
-        // Close dropdown after selection
-        setIsDropdownOpen(false);
-      },
-      [context, fieldState, hasDateSegments, type],
-    );
+  const hasIcon = Boolean(icon);
 
-    const handleKeyDownCapture = useTimeDropdownKeyCapture({
-      enabled: Boolean(showTimeDropdown),
-      isOpen: isDropdownOpen,
-      dropdownRef,
-      onOpen: () => setIsDropdownOpen(true),
-    });
+  return (
+    <div
+      className={cn('relative h-full', !hasIcon && type === 'start' && 'pl-12')}
+      onKeyDownCapture={handleKeyDownCapture}
+      onClick={handleClick}
+      onFocus={handleContainerFocus}
+      onBlur={handleContainerBlur}
+    >
+      <TemporalSegmentGroup
+        {...fieldProps}
+        ref={composeRefs(internalRef, ref)}
+        data-slot='input'
+        className={cn('h-full')}
+        aria-disabled={disabled || undefined}
+        aria-invalid={error || undefined}
+        data-field-type={type}
+        state={fieldState}
+        disabled={disabled}
+        readOnly={readOnly}
+        segmentKeyPrefix={`${type}-`}
+      />
 
-    const currentTimeValue: TimeValue | null =
-      fieldState.value && hasTimeSegments ? (fieldState.value as TimeValue) : null;
-
-    // Apply left padding when there's no icon
-    // In integrated view, wrapper CSS removes padding from end field
-    // In compound pattern, each field is separate and needs padding
-    const hasIcon = Boolean(icon);
-
-    return (
-      <div
-        className={cn('relative h-full', !hasIcon && type === 'start' && 'pl-12')}
-        onKeyDownCapture={handleKeyDownCapture}
-        onClick={handleClick}
-      >
-        <TemporalSegmentGroup
-          {...fieldProps}
-          ref={ref}
-          data-slot='input'
-          className={cn('h-full')}
-          aria-disabled={disabled || undefined}
-          aria-invalid={error || undefined}
-          data-field-type={type}
-          state={fieldState}
-          disabled={disabled}
-          readOnly={readOnly}
-          segmentKeyPrefix={`${type}-`}
-          onFocus={handleFocus}
-          onBlur={handleBlur}
+      {showTimeDropdown && hasTimeSegments && (
+        <TimeDropdown
+          ref={dropdownRef}
+          isOpen={isDropdownOpen}
+          timeStep={timeStep}
+          hourCycle={hourCycle}
+          value={currentTimeValue}
+          onSelect={handleTimeSelect}
+          onClose={() => setIsDropdownOpen(false)}
         />
+      )}
+    </div>
+  );
+};
 
-        {showTimeDropdown && hasTimeSegments && (
-          <TimeDropdown
-            ref={dropdownRef}
-            isOpen={isDropdownOpen}
-            timeStep={timeStep}
-            hourCycle={hourCycle}
-            value={currentTimeValue}
-            onSelect={handleTimeSelect}
-            onClose={() => setIsDropdownOpen(false)}
-          />
-        )}
-      </div>
-    );
-  },
-);
+/**
+ * Anchor a bare time to today — used as the seed CalendarDateTime when the
+ * range field hasn't got a value yet but the user picks a time from the dropdown.
+ */
+function anchorTimeToToday(timeValue: TimeValue): CalendarDateTime {
+  const t = now(getLocalTimeZone());
+  return new CalendarDateTime(t.year, t.month, t.day, timeValue.hour, timeValue.minute, 0);
+}
 
-DateRangeSegmentGroup.displayName = 'DateRangeSegmentField';
+DateRangeSegmentGroup.displayName = 'DateRangeSegmentGroup';

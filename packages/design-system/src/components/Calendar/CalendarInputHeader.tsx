@@ -54,12 +54,7 @@ const SingleDateInputInner: FC<{
 
   return (
     <div className='flex flex-1' onKeyDown={e => e.stopPropagation()}>
-      <DateInput
-        value={inputValue}
-        onChange={handleChange}
-        readOnly={readonly}
-        granularity='day'
-      />
+      <DateInput value={inputValue} onChange={handleChange} readOnly={readonly} granularity='day' />
     </div>
   );
 };
