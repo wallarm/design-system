@@ -1,5 +1,5 @@
-import { Time } from '@internationalized/date';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { Time } from '../../index';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { TimeInput } from './TimeInput';

@@ -57,7 +57,7 @@ const SingleDateInputInner: FC<{
       <DateInput
         value={inputValue}
         onChange={handleChange}
-        isReadOnly={readonly}
+        readOnly={readonly}
         granularity='day'
       />
     </div>
@@ -122,7 +122,7 @@ const RangeDateInputInner: FC<{
       <DateInput
         value={startValue}
         onChange={handleStartChange}
-        isReadOnly={readonly}
+        readOnly={readonly}
         granularity='day'
       />
       {/* Arrow positioned absolutely in center per Figma design */}
@@ -132,7 +132,7 @@ const RangeDateInputInner: FC<{
       <DateInput
         value={endValue}
         onChange={handleEndChange}
-        isReadOnly={readonly}
+        readOnly={readonly}
         granularity='day'
       />
     </div>

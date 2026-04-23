@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { CalendarDate, CalendarDateTime, getLocalTimeZone, today } from '@internationalized/date';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { CalendarDate, CalendarDateTime, getLocalTimeZone, today } from '../../index';
 import { Field, FieldAction, FieldDescription, FieldError, FieldLabel } from '../Field';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';

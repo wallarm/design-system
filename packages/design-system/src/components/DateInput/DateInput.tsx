@@ -1,101 +1,141 @@
-import { forwardRef, type RefObject, useRef } from 'react';
+import { type FC, type Ref, useRef } from 'react';
 import { createCalendar } from '@internationalized/date';
-import { type AriaDateFieldProps, type DateValue, useDateField } from '@react-aria/datepicker';
+import { composeRefs } from '@radix-ui/react-compose-refs';
+import { type DateValue, useDateField } from '@react-aria/datepicker';
 import { useLocale } from '@react-aria/i18n';
 import { useDateFieldState } from '@react-stately/datepicker';
 import { Calendar } from '../../icons';
 import { cn } from '../../utils/cn';
-import { getDefaultTemporalPlaceholder, useTemporalField } from '../TemporalCore';
-import { DateInputInternal } from './DateInputInternal';
-import type { DateInputBaseProps } from './types';
+import { TestIdProvider } from '../../utils/testId';
+import { getDefaultTemporalPlaceholder, type TemporalGranularity } from '../TemporalCore';
+import { DateInputInternal } from './internal';
+import type { DateInputCommonProps, DateInputTimeProps } from './types';
 
-export type DateInputProps = Omit<
-  AriaDateFieldProps<DateValue>,
-  'label' | 'description' | 'errorMessage'
-> &
-  DateInputBaseProps & {
-    /**
-     * Determines the smallest unit of time that can be edited.
-     * - 'day': Date only (default)
-     * - 'hour': Date with hours
-     * - 'minute': Date with hours and minutes
-     * - 'second': Date with hours, minutes, and seconds
-     */
-    granularity?: 'day' | 'hour' | 'minute' | 'second';
-  };
+/**
+ * Subset of `@react-aria/datepicker`'s `AriaDateFieldProps` surfaced by DateInput.
+ *
+ * Declared explicitly (not via `Omit<AriaDateFieldProps, ...>`) so the DS public
+ * type doesn't track React-Aria's evolution — props are added here intentionally.
+ */
+interface DateInputAriaSubset {
+  value?: DateValue | null;
+  defaultValue?: DateValue | null;
+  onChange?: (value: DateValue | null) => void;
+  minValue?: DateValue;
+  maxValue?: DateValue;
+  placeholderValue?: DateValue;
+  name?: string;
+  autoFocus?: boolean;
+  /** Marks the field as required in assistive tech and HTML form validation. */
+  isRequired?: boolean;
+  ref?: Ref<HTMLDivElement>;
+}
 
-export const DateInput = forwardRef<HTMLDivElement, DateInputProps>(
-  (
+type DateOnlyGranularity = {
+  granularity?: 'day';
+  hourCycle?: never;
+  showTimeDropdown?: never;
+  timeStep?: never;
+};
+
+type DateTimeGranularity = {
+  granularity: Exclude<TemporalGranularity, 'day'>;
+} & DateInputTimeProps;
+
+export type DateInputProps = DateInputCommonProps &
+  DateInputAriaSubset &
+  (DateOnlyGranularity | DateTimeGranularity);
+
+export const DateInput: FC<DateInputProps> = props => {
+  const {
+    'data-testid': testId,
+    showIcon = true,
+    value: controlledValue,
+    defaultValue,
+    onChange,
+    error = false,
+    disabled = false,
+    readOnly = false,
+    isRequired,
+    granularity = 'day',
+    hourCycle,
+    showTimeDropdown,
+    timeStep = 30,
+    placeholder,
+    size = 'default',
+    minValue,
+    maxValue,
+    placeholderValue,
+    name,
+    autoFocus,
+    ref,
+    ...wrapperProps
+  } = props as DateInputCommonProps &
+    DateInputAriaSubset & {
+      granularity?: TemporalGranularity;
+    } & DateInputTimeProps;
+
+  const resolvedPlaceholder = placeholder ?? getDefaultTemporalPlaceholder({ granularity });
+
+  const { locale } = useLocale();
+  const internalRef = useRef<HTMLDivElement>(null);
+
+  const state = useDateFieldState({
+    value: controlledValue,
+    defaultValue,
+    onChange,
+    minValue,
+    maxValue,
+    placeholderValue,
+    isRequired,
+    locale,
+    isDisabled: disabled,
+    isInvalid: error,
+    isReadOnly: readOnly,
+    granularity,
+    hourCycle,
+    createCalendar,
+    shouldForceLeadingZeros: true,
+  });
+
+  const { fieldProps } = useDateField(
     {
-      showIcon = true,
-      value: controlledValue,
-      defaultValue,
-      onChange,
-      error = false,
-      disabled = false,
-      granularity = 'day',
-      placeholder = getDefaultTemporalPlaceholder({ granularity }),
-      showTimeDropdown,
-      timeStep,
-      hourCycle,
-      size,
-      className,
-      ...props
-    },
-    forwardedRef,
-  ) => {
-    const { locale } = useLocale();
-    const ref = useRef<HTMLDivElement>(null);
-    const finalRef = (forwardedRef || ref) as RefObject<HTMLDivElement>;
-
-    const { value, onChange: handleChange } = useTemporalField({
-      value: controlledValue,
-      defaultValue,
-      onChange,
-    });
-
-    const state = useDateFieldState({
-      ...props,
-      value,
-      onChange: handleChange,
-      locale,
+      name,
+      autoFocus,
       isDisabled: disabled,
       isInvalid: error,
-      granularity,
-      hourCycle,
-      createCalendar,
-      shouldForceLeadingZeros: true,
-    });
+      isReadOnly: readOnly,
+      isRequired,
+    },
+    state,
+    internalRef,
+  );
 
-    const { fieldProps } = useDateField(
-      {
-        ...props,
-        isDisabled: disabled,
-        isInvalid: error,
-      },
-      state,
-      finalRef,
-    );
-
-    return (
-      <div className={cn('min-w-256 flex-1', className)}>
+  return (
+    <div
+      {...wrapperProps}
+      data-slot='date-input'
+      data-testid={testId}
+      className={cn('min-w-256 flex-1', wrapperProps.className)}
+    >
+      <TestIdProvider value={testId}>
         <DateInputInternal
           {...fieldProps}
           icon={showIcon ? Calendar : undefined}
-          ref={finalRef}
+          ref={composeRefs(internalRef, ref)}
           state={state}
           error={error}
           disabled={disabled}
-          placeholder={placeholder}
+          readOnly={readOnly}
+          placeholder={resolvedPlaceholder}
           showTimeDropdown={showTimeDropdown}
           timeStep={timeStep}
           hourCycle={hourCycle}
           size={size}
-          className={cn('w-full')}
         />
-      </div>
-    );
-  },
-);
+      </TestIdProvider>
+    </div>
+  );
+};
 
 DateInput.displayName = 'DateInput';

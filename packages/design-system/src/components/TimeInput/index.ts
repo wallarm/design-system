@@ -1,1 +1,1 @@
-export { TimeInput } from './TimeInput';
+export { TimeInput, type TimeInputProps } from './TimeInput';
