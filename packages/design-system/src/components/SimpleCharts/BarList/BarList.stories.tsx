@@ -17,6 +17,7 @@ import {
   OverflowTooltipContent,
   OverflowTooltipTrigger,
 } from '../../OverflowTooltip';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { Chart } from '../Chart/Chart';
 import { ChartActions } from '../Chart/ChartActions';
 import { ChartHeader } from '../Chart/ChartHeader';
@@ -112,36 +113,50 @@ export const Default: StoryFn<typeof meta> = () => {
           <ChartTitle>Top 5 Endpoints</ChartTitle>
           <ChartActions alwaysVisible={filtered !== null}>
             {filtered !== null && (
-              <Button
-                variant='ghost'
-                color='neutral'
-                size='small'
-                aria-label='Clear filter'
-                onClick={() => setFiltered(null)}
-              >
-                <FilterX />
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    color='neutral'
+                    size='small'
+                    aria-label='Clear filter'
+                    onClick={() => setFiltered(null)}
+                  >
+                    <FilterX />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Remove filter</TooltipContent>
+              </Tooltip>
             )}
-            <Button variant='ghost' color='neutral' size='small' aria-label='Settings'>
-              <Settings />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant='ghost' color='neutral' size='small' aria-label='Settings'>
+                  <Settings />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Change data source</TooltipContent>
+            </Tooltip>
           </ChartActions>
         </ChartHeader>
-        <BarList max={chartSum(baseRows)}>
+        <BarList max={chartSum(rows)}>
           {rows.map(row => (
-            <BarListItem
-              key={row.name}
-              value={row.value}
-              selected={filtered === row.name}
-              onClick={() => setFiltered(filtered === row.name ? null : row.name)}
-            >
-              <BarListBar />
-              <BarListLabel>{row.name}</BarListLabel>
-              <BarListValue>
-                {formatValue(row.value)}
-                <BarListPercent />
-              </BarListValue>
-            </BarListItem>
+            <Tooltip key={row.name}>
+              <TooltipTrigger asChild>
+                <BarListItem
+                  value={row.value}
+                  selected={filtered === row.name}
+                  onClick={() => setFiltered(filtered === row.name ? null : row.name)}
+                >
+                  <BarListBar />
+                  <BarListLabel>{row.name}</BarListLabel>
+                  <BarListValue>
+                    {formatValue(row.value)}
+                    <BarListPercent />
+                  </BarListValue>
+                </BarListItem>
+              </TooltipTrigger>
+              <TooltipContent>Click to filter</TooltipContent>
+            </Tooltip>
           ))}
         </BarList>
       </Chart>
@@ -244,19 +259,23 @@ export const Selectable: StoryFn<typeof meta> = () => {
         </ChartHeader>
         <BarList max={chartSum(baseRows)}>
           {baseRows.map(row => (
-            <BarListItem
-              key={row.name}
-              value={row.value}
-              selected={selected === row.name}
-              onClick={() => setSelected(selected === row.name ? null : row.name)}
-            >
-              <BarListBar />
-              <BarListLabel>{row.name}</BarListLabel>
-              <BarListValue>
-                {formatValue(row.value)}
-                <BarListPercent />
-              </BarListValue>
-            </BarListItem>
+            <Tooltip key={row.name}>
+              <TooltipTrigger asChild>
+                <BarListItem
+                  value={row.value}
+                  selected={selected === row.name}
+                  onClick={() => setSelected(selected === row.name ? null : row.name)}
+                >
+                  <BarListBar />
+                  <BarListLabel>{row.name}</BarListLabel>
+                  <BarListValue>
+                    {formatValue(row.value)}
+                    <BarListPercent />
+                  </BarListValue>
+                </BarListItem>
+              </TooltipTrigger>
+              <TooltipContent>Click to filter</TooltipContent>
+            </Tooltip>
           ))}
         </BarList>
       </Chart>
@@ -274,7 +293,12 @@ export const TruncatedLabels: StoryFn<typeof meta> = () => (
         {longLabelRows.map(row => (
           <BarListItem key={row.name} value={row.value}>
             <BarListBar />
-            <BarListLabel>{row.name}</BarListLabel>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <BarListLabel className='pointer-events-auto'>{row.name}</BarListLabel>
+              </TooltipTrigger>
+              <TooltipContent>Example of custom description</TooltipContent>
+            </Tooltip>
             <BarListValue>
               {formatValue(row.value)}
               <BarListPercent />
@@ -359,20 +383,25 @@ export const DataVariants: StoryFn<typeof meta> = () => {
           <ChartTitle>{current.title}</ChartTitle>
           <ChartActions>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant='ghost' color='neutral' size='small' aria-label='Settings'>
-                  <Settings />
-                </Button>
-              </DropdownMenuTrigger>
+              <Tooltip>
+                <DropdownMenuTrigger asChild>
+                  <TooltipTrigger asChild>
+                    <Button variant='ghost' color='neutral' size='small' aria-label='Settings'>
+                      <Settings />
+                    </Button>
+                  </TooltipTrigger>
+                </DropdownMenuTrigger>
+                <TooltipContent>Change data source</TooltipContent>
+              </Tooltip>
               <DropdownMenuContent>
                 <DropdownMenuLabel>Data source</DropdownMenuLabel>
                 <DropdownMenuGroup>
                   {(Object.keys(datasets) as DatasetKey[]).map(k => (
                     <DropdownMenuItem key={k} onSelect={() => setKey(k)}>
+                      <span className='flex-1'>{datasets[k].title}</span>
                       <DropdownMenuItemIcon>
                         <Check className={cn(key !== k && 'opacity-0')} />
                       </DropdownMenuItemIcon>
-                      {datasets[k].title}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuGroup>

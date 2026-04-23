@@ -1,6 +1,6 @@
 import { cva } from 'class-variance-authority';
 
-export const barListRootClasses = ['flex flex-col w-full', 'py-4'].join(' ');
+export const barListRootClasses = ['flex flex-col w-full pb-2'].join(' ');
 
 export const barListItemVariants = cva(
   [

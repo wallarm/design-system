@@ -23,17 +23,18 @@ export const chartEmptyClasses = [
   'text-center',
 ].join(' ');
 
-export const chartActionsVariants = cva(
-  ['flex items-center gap-4 ml-auto', 'transition-opacity'].join(' '),
-  {
-    variants: {
-      alwaysVisible: {
-        true: 'opacity-100',
-        false: 'opacity-0 group-hover/chart:opacity-100 group-focus-within/chart:opacity-100',
-      },
-    },
-    defaultVariants: {
-      alwaysVisible: false,
+export const chartActionsVariants = cva('flex items-center gap-4 ml-auto', {
+  variants: {
+    alwaysVisible: {
+      true: '',
+      false: [
+        'w-0 overflow-hidden opacity-0 pointer-events-none',
+        'group-hover/chart:w-auto group-hover/chart:overflow-visible group-hover/chart:opacity-100 group-hover/chart:pointer-events-auto',
+        'group-focus-within/chart:w-auto group-focus-within/chart:overflow-visible group-focus-within/chart:opacity-100 group-focus-within/chart:pointer-events-auto',
+      ].join(' '),
     },
   },
-);
+  defaultVariants: {
+    alwaysVisible: false,
+  },
+});

@@ -19,7 +19,7 @@ Compound component:
 - `Chart` — root surface.
 - `ChartHeader` — 32px bar, renders title + actions side by side.
 - `ChartTitle` — text slot; single line, truncates with ellipsis.
-- `ChartActions` — right-aligned button cluster; fades in on card hover/focus by default.
+- `ChartActions` — right-aligned button cluster; revealed on card hover/focus by default, and takes no layout space while hidden so the title has the full header width.
 - `ChartEmpty` — centered placeholder for the body when there is no data. Defaults to "No data"; pass children to override.
 
 ### Sizing
@@ -54,7 +54,7 @@ Children override the default "No data" label for filter-specific messaging (e.g
 
 ### `ChartActions.alwaysVisible`
 
-`ChartActions` fades in on `group-hover/chart` and `group-focus-within/chart`. Pass `alwaysVisible` to override this — required when the action represents active chart state (e.g. an active "Remove filter" button) that should not be hidden.
+`ChartActions` is collapsed to `w-0` with `opacity-0 pointer-events-none` by default and expands to `w-auto opacity-100` on `group-hover/chart` and `group-focus-within/chart`. Because the cluster takes no layout space while idle, `ChartTitle` occupies the whole header width and only truncates (shifts left) when the actions actually appear. The buttons stay in the tab order the whole time — pressing `Tab` into the card expands the cluster via `focus-within` so keyboard users can reach them without hovering. Pass `alwaysVisible` to keep the cluster in the layout permanently — required when the action represents active chart state (e.g. an active "Remove filter" button) that should not be hidden.
 
 ## Data model
 
@@ -64,10 +64,10 @@ None — `Chart` is a presentational container. Chart content lives in its child
 
 | State               | Trigger                                      | Behaviour                                                                                                                                          |
 | ------------------- | -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Default             | —                                            | Surface + border + min-height only.                                                                                                                |
-| Hover (card-hover)  | Pointer enters any part of the card          | `ChartActions` transitions from `opacity-0` to `opacity-100`.                                                                                      |
+| Default             | —                                            | Surface + border + min-height only. `ChartActions` is collapsed (`w-0 opacity-0 pointer-events-none`), so `ChartTitle` has the full header width. Buttons remain focusable via Tab. |
+| Hover (card-hover)  | Pointer enters any part of the card          | `ChartActions` expands to `w-auto opacity-100` and the title shifts left / truncates to make room.                                                 |
 | Focus-within        | Keyboard focus lands on any child            | Same as hover — actions become visible so keyboard users can reach them.                                                                           |
-| Actions always-on   | `<ChartActions alwaysVisible />`             | Actions stay at `opacity-100` regardless of hover/focus. Use this when the action itself represents an active state (filtered, selected, pinned). |
+| Actions always-on   | `<ChartActions alwaysVisible />`             | Actions stay in the flow at full width regardless of hover/focus. Use this when the action itself represents an active state (filtered, selected, pinned). |
 
 ## Interactions
 
@@ -77,7 +77,7 @@ Children (buttons, tooltips, dropdowns) own their own interactions and can use t
 
 ## Edge cases & unclear states
 
-- **Long title.** `ChartTitle` has `truncate` applied — overflowing text is cut with an ellipsis so `ChartActions` always has room. Wrap the title in a tooltip if the full string needs to be discoverable.
+- **Long title.** `ChartTitle` has `truncate` + `flex-1 min-w-0` applied, so it claims the full header width until `ChartActions` appears. At that point the title shrinks and is cut with an ellipsis. Wrap the title in a tooltip if the full string needs to be discoverable.
 - **No actions cluster.** `ChartHeader` uses `justify-between`, so a title alone flows left and the right side stays empty; `ChartActions` can be omitted entirely.
 - **Nested `group/*` utilities.** The root uses the namespaced group `group/chart` so it does not clash with unrelated `group-hover:*` rules from parent or child components.
 - **Hover reveal vs. touch devices.** On touch, `:hover` is simulated on tap, so actions become reachable but not discoverable. Consider `alwaysVisible` on touch-first screens.
