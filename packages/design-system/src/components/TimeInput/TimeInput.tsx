@@ -7,8 +7,11 @@ import { Clock } from '../../icons';
 import { cn } from '../../utils/cn';
 import { TestIdProvider } from '../../utils/testId';
 import { DateInputInternal } from '../DateInput/internal';
-import type { DateInputCommonProps, DateInputTimeProps } from '../DateInput/types';
-import { getDefaultTemporalPlaceholder } from '../TemporalCore';
+import {
+  getDefaultTemporalPlaceholder,
+  type TemporalInputCommonProps,
+  type TemporalInputTimeProps,
+} from '../TemporalCore';
 
 type TimeInputGranularity = 'hour' | 'minute' | 'second';
 
@@ -31,9 +34,9 @@ interface TimeInputAriaSubset {
   ref?: Ref<HTMLDivElement>;
 }
 
-export type TimeInputProps = DateInputCommonProps &
+export type TimeInputProps = TemporalInputCommonProps &
   TimeInputAriaSubset &
-  DateInputTimeProps & {
+  TemporalInputTimeProps & {
     /**
      * Smallest editable unit.
      * - 'hour': hours only

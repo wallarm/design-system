@@ -1,3 +1,8 @@
+export {
+  type TemporalInputCommonProps,
+  type TemporalInputSize,
+  type TemporalInputTimeProps,
+} from './props';
 export { TemporalClear } from './TemporalClear';
 export { TemporalPlaceholder } from './TemporalPlaceholder';
 export { TemporalSegment } from './TemporalSegment';

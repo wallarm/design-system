@@ -4,7 +4,7 @@ import type { DateRangePickerState } from '@react-stately/datepicker';
 import type { AriaDatePickerProps } from '@react-types/datepicker';
 import type { GroupDOMAttributes } from '@react-types/shared';
 import type { SvgIconProps } from '../../../icons';
-import type { DateRangeInputSize } from '../types';
+import type { TemporalInputSize } from '../../TemporalCore';
 
 export interface DateRangeContextValue {
   groupProps: GroupDOMAttributes;
@@ -24,5 +24,5 @@ export interface DateRangeContextValue {
   timeStep?: number;
   hourCycle?: 12 | 24;
   icon?: FC<SvgIconProps>;
-  size?: DateRangeInputSize;
+  size?: TemporalInputSize;
 }

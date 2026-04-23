@@ -8,22 +8,24 @@ import { cn } from '../../../utils/cn';
 import { InputGroup, InputGroupAddon } from '../../InputGroup';
 import {
   TemporalClear,
+  type TemporalInputSize,
+  type TemporalInputTimeProps,
   TemporalPlaceholder,
   TemporalSegmentGroup,
   TimeDropdown,
   type TimeDropdownHandle,
   useTimeDropdownKeyCapture,
 } from '../../TemporalCore';
-import type { DateInputSize, DateInputTimeProps } from '../types';
 
 /**
- * Internal props — intentionally narrow. `DateInputCommonProps` is not extended
- * here because it pulls in `HTMLAttributes<HTMLDivElement>`, whose `onAbort`
- * handler collides with the one in `@react-types/shared`'s `GroupDOMAttributes`.
- * The outer `DateInput` / `TimeInput` wrappers own the HTML-attribute surface;
- * this internal only consumes the specific concerns it actually renders.
+ * Internal props — intentionally narrow. `TemporalInputCommonProps` is not
+ * extended here because it pulls in `HTMLAttributes<HTMLDivElement>`, whose
+ * `onAbort` handler collides with the one in `@react-types/shared`'s
+ * `GroupDOMAttributes`. The outer `DateInput` / `TimeInput` wrappers own the
+ * HTML-attribute surface; this internal only consumes the specific concerns
+ * it actually renders.
  */
-interface DateInputInternalProps extends GroupDOMAttributes, DateInputTimeProps {
+interface DateInputInternalProps extends GroupDOMAttributes, TemporalInputTimeProps {
   state: DateFieldState | TimeFieldState;
   icon?: FC<SvgIconProps>;
   ref?: Ref<HTMLDivElement>;
@@ -31,7 +33,7 @@ interface DateInputInternalProps extends GroupDOMAttributes, DateInputTimeProps 
   disabled?: boolean;
   readOnly?: boolean;
   placeholder?: string;
-  size?: DateInputSize;
+  size?: TemporalInputSize;
 }
 
 /**

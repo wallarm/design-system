@@ -7,9 +7,13 @@ import { useDateFieldState } from '@react-stately/datepicker';
 import { Calendar } from '../../icons';
 import { cn } from '../../utils/cn';
 import { TestIdProvider } from '../../utils/testId';
-import { getDefaultTemporalPlaceholder, type TemporalGranularity } from '../TemporalCore';
+import {
+  getDefaultTemporalPlaceholder,
+  type TemporalGranularity,
+  type TemporalInputCommonProps,
+  type TemporalInputTimeProps,
+} from '../TemporalCore';
 import { DateInputInternal } from './internal';
-import type { DateInputCommonProps, DateInputTimeProps } from './types';
 
 /**
  * Subset of `@react-aria/datepicker`'s `AriaDateFieldProps` surfaced by DateInput.
@@ -40,9 +44,9 @@ type DateOnlyGranularity = {
 
 type DateTimeGranularity = {
   granularity: Exclude<TemporalGranularity, 'day'>;
-} & DateInputTimeProps;
+} & TemporalInputTimeProps;
 
-export type DateInputProps = DateInputCommonProps &
+export type DateInputProps = TemporalInputCommonProps &
   DateInputAriaSubset &
   (DateOnlyGranularity | DateTimeGranularity);
 
@@ -70,10 +74,10 @@ export const DateInput: FC<DateInputProps> = props => {
     autoFocus,
     ref,
     ...wrapperProps
-  } = props as DateInputCommonProps &
+  } = props as TemporalInputCommonProps &
     DateInputAriaSubset & {
       granularity?: TemporalGranularity;
-    } & DateInputTimeProps;
+    } & TemporalInputTimeProps;
 
   const resolvedPlaceholder = placeholder ?? getDefaultTemporalPlaceholder({ granularity });
 

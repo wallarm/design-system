@@ -2,19 +2,18 @@ import type { HTMLAttributes } from 'react';
 import type { TestableProps } from '../../utils/testId';
 
 /**
- * Visual size of the date/time input. Mirrors InputGroup sizes.
+ * Visual size of a temporal input. Mirrors InputGroup sizes.
  */
-export type DateInputSize = 'default' | 'medium' | 'small';
+export type TemporalInputSize = 'default' | 'medium' | 'small';
 
 /**
- * Props shared by DateInput and TimeInput root wrappers.
- *
- * `HTMLAttributes<HTMLDivElement>` provides `id`, `style`, `aria-*`, `data-*`,
- * mouse/keyboard handlers and friends on the root wrapper. `onChange` and
- * `defaultValue` are omitted because date/time inputs redefine them with
- * domain-specific value types.
+ * Props shared by every temporal input root wrapper — DateInput, TimeInput,
+ * DateRangeInput. Extends `HTMLAttributes<HTMLDivElement>` so consumers can
+ * set `id`, `style`, `aria-*`, `data-*`, event handlers on the outer element.
+ * `onChange` and `defaultValue` are omitted because each input redefines
+ * them with its domain-specific value type.
  */
-export interface DateInputCommonProps
+export interface TemporalInputCommonProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange' | 'defaultValue'>,
     TestableProps {
   /** Whether to show the leading icon. Default: true. */
@@ -28,14 +27,15 @@ export interface DateInputCommonProps
   /** Placeholder shown when no value is selected. */
   placeholder?: string;
   /** Visual size. Default: 'default' (36px). */
-  size?: DateInputSize;
+  size?: TemporalInputSize;
 }
 
 /**
  * Props describing time-segment behaviour. Applied when the input surfaces
- * time segments — TimeInput, or DateInput with a time granularity.
+ * time segments — TimeInput, or DateInput / DateRangeInput with a time
+ * granularity.
  */
-export interface DateInputTimeProps {
+export interface TemporalInputTimeProps {
   /**
    * Hour cycle for time display — 12-hour (AM/PM) or 24-hour.
    * When omitted, the browser locale decides.
