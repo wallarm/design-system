@@ -299,3 +299,25 @@ export const HourCycleByContext: StoryFn<typeof meta> = () => (
   </HStack>
 );
 HourCycleByContext.parameters = { layout: 'padded' };
+
+/**
+ * `readOnly` shows a value but removes every edit affordance — typing is
+ * ignored (react-aria), and the trailing clear "×" is not rendered at all.
+ */
+export const ReadOnly: StoryFn<typeof meta> = () => (
+  <HStack gap={24}>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        Date range
+      </Text>
+      <DateRangeInput readOnly defaultValue={sampleRange} />
+    </VStack>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        Date + time range
+      </Text>
+      <DateRangeInput readOnly granularity='minute' defaultValue={sampleRangeDateTime} />
+    </VStack>
+  </HStack>
+);
+ReadOnly.parameters = { layout: 'padded' };

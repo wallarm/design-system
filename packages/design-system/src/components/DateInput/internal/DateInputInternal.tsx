@@ -173,7 +173,7 @@ export const DateInputInternal: FC<DateInputInternalProps> = ({
         )}
       </div>
 
-      {hasValue && (
+      {hasValue && !readOnly && (
         <InputGroupAddon align='inline-end'>
           <TemporalClear onClick={handleClear} disabled={disabled} />
         </InputGroupAddon>

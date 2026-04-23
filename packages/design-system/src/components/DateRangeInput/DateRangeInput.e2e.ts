@@ -10,6 +10,7 @@ const dateRangeInputStory = createStoryHelper('inputs-date-daterangeinput', [
   'Granularity',
   'Date Order Comparison',
   'Hour Cycle By Context',
+  'Read Only',
 ] as const);
 
 test.describe('Component: DateRangeInput', () => {
@@ -53,6 +54,11 @@ test.describe('Component: DateRangeInput', () => {
       await dateRangeInputStory.goto(page, 'Hour Cycle By Context');
       await expect(page).toHaveScreenshot();
     });
+
+    test('Should render read-only state without a clear button', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Read Only');
+      await expect(page).toHaveScreenshot();
+    });
   });
 
   test.describe('Interactions', () => {
@@ -84,6 +90,14 @@ test.describe('Component: DateRangeInput', () => {
       await page.keyboard.type('10');
 
       await expect(startDaySegment).toHaveText('10');
+    });
+
+    test('Should not render a clear button in read-only mode', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Read Only');
+      // The clear button is the only click-path to setValue(null) — verifying
+      // it's absent guarantees the value can't be wiped by a user click.
+      const clearButton = page.locator('[data-slot="date-range-input"] button[type="button"]');
+      await expect(clearButton).toHaveCount(0);
     });
   });
 

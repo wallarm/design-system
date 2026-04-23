@@ -24,6 +24,7 @@ export const DateRangeInputInternal: FC = () => {
     endFieldProps,
     endRef,
     disabled,
+    readOnly,
     placeholder,
     size,
   } = useDateRangeContext();
@@ -88,14 +89,16 @@ export const DateRangeInputInternal: FC = () => {
           </div>
         </DateRangeGroup>
 
-        <InputGroupAddon align='inline-end'>
-          <div className={cn(!hasAnyValue && 'invisible')}>
-            {/* When the button is invisible we also disable it — this removes it
-                from tab order and from the accessibility tree so users don't
-                Tab into a no-op control. */}
-            <TemporalClear onClick={handleClear} disabled={disabled || !hasAnyValue} />
-          </div>
-        </InputGroupAddon>
+        {!readOnly && (
+          <InputGroupAddon align='inline-end'>
+            <div className={cn(!hasAnyValue && 'invisible')}>
+              {/* When the button is invisible we also disable it — this removes it
+                  from tab order and from the accessibility tree so users don't
+                  Tab into a no-op control. */}
+              <TemporalClear onClick={handleClear} disabled={disabled || !hasAnyValue} />
+            </div>
+          </InputGroupAddon>
+        )}
       </InputGroup>
     </div>
   );

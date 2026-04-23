@@ -31,6 +31,10 @@ const meta: Meta<typeof TimeInput> = {
       control: 'boolean',
       description: 'Whether the input is disabled.',
     },
+    readOnly: {
+      control: 'boolean',
+      description: 'Whether the input is read-only. Displays value but prevents editing.',
+    },
     placeholder: {
       control: 'text',
       description: 'Placeholder text shown when no value is selected.',
@@ -57,6 +61,7 @@ const meta: Meta<typeof TimeInput> = {
     granularity: 'minute',
     error: false,
     disabled: false,
+    readOnly: false,
     showIcon: true,
     size: 'default',
   },
@@ -221,3 +226,35 @@ export const TimeDropdownSteps: StoryFn<typeof meta> = () => (
 );
 TimeDropdownSteps.decorators = dropdownRoom;
 TimeDropdownSteps.parameters = { layout: 'padded' };
+
+/**
+ * `readOnly` shows a value but removes every edit affordance — typing is
+ * ignored (react-aria), and the clear "×" is not rendered at all.
+ */
+export const ReadOnly: StoryFn<typeof meta> = () => (
+  <HStack gap={24}>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        Locale
+      </Text>
+      <TimeInput readOnly defaultValue={new Time(22, 0)} />
+    </VStack>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          12-hour
+        </Text>
+        <TimeInput readOnly defaultValue={new Time(22, 0)} />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          24-hour
+        </Text>
+        <TimeInput readOnly defaultValue={new Time(22, 0)} />
+      </VStack>
+    </DateFormatProvider>
+  </HStack>
+);
+ReadOnly.parameters = { layout: 'padded' };

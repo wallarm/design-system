@@ -37,6 +37,10 @@ const meta: Meta<typeof DateInput> = {
       control: 'boolean',
       description: 'Whether the input is disabled.',
     },
+    readOnly: {
+      control: 'boolean',
+      description: 'Whether the input is read-only. Displays value but prevents editing.',
+    },
     placeholder: {
       control: 'text',
       description: 'Placeholder text shown when no value is selected.',
@@ -64,6 +68,7 @@ const meta: Meta<typeof DateInput> = {
     granularity: 'day',
     error: false,
     disabled: false,
+    readOnly: false,
     showIcon: true,
     size: 'default',
   },
@@ -320,3 +325,26 @@ export const HourCycleByContext: StoryFn<typeof meta> = () => (
   </HStack>
 );
 HourCycleByContext.parameters = { layout: 'padded' };
+
+/**
+ * `readOnly` shows a value but removes every edit affordance — typing is
+ * ignored (react-aria), and the clear "×" is not rendered at all so users
+ * can't wipe the value.
+ */
+export const ReadOnly: StoryFn<typeof meta> = () => (
+  <HStack gap={24}>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        Date
+      </Text>
+      <DateInput readOnly defaultValue={sampleDate} />
+    </VStack>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        Date + time
+      </Text>
+      <DateInput readOnly granularity='minute' defaultValue={sampleDateTime} />
+    </VStack>
+  </HStack>
+);
+ReadOnly.parameters = { layout: 'padded' };

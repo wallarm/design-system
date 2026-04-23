@@ -8,6 +8,7 @@ const timeInputStory = createStoryHelper('inputs-date-timeinput', [
   'Filled',
   'Granularity',
   'Time Dropdown Steps',
+  'Read Only',
 ] as const);
 
 test.describe('Component: TimeInput', () => {
@@ -39,6 +40,11 @@ test.describe('Component: TimeInput', () => {
 
     test('Should render time dropdown steps correctly', async ({ page }) => {
       await timeInputStory.goto(page, 'Time Dropdown Steps');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render read-only state without a clear button', async ({ page }) => {
+      await timeInputStory.goto(page, 'Read Only');
       await expect(page).toHaveScreenshot();
     });
   });
@@ -78,6 +84,12 @@ test.describe('Component: TimeInput', () => {
       const dropdown = page.getByRole('listbox', { name: 'Time selection' }).first();
 
       await expect(dropdown).toBeVisible();
+    });
+
+    test('Should not render a clear button in read-only mode', async ({ page }) => {
+      await timeInputStory.goto(page, 'Read Only');
+      const clearButton = page.locator('[data-slot="time-input"] button[type="button"]');
+      await expect(clearButton).toHaveCount(0);
     });
   });
 

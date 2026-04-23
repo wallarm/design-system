@@ -11,6 +11,7 @@ const dateInputStory = createStoryHelper('inputs-date-dateinput', [
   'With Field Components',
   'Date Order Comparison',
   'Hour Cycle By Context',
+  'Read Only',
 ] as const);
 
 test.describe('Component: DateInput', () => {
@@ -59,6 +60,11 @@ test.describe('Component: DateInput', () => {
       await dateInputStory.goto(page, 'Hour Cycle By Context');
       await expect(page).toHaveScreenshot();
     });
+
+    test('Should render read-only state without a clear button', async ({ page }) => {
+      await dateInputStory.goto(page, 'Read Only');
+      await expect(page).toHaveScreenshot();
+    });
   });
 
   test.describe('Interactions', () => {
@@ -86,6 +92,14 @@ test.describe('Component: DateInput', () => {
       const dayPeriodSegment = page.locator('[data-segment="dayPeriod"]').first();
 
       await expect(dayPeriodSegment).toHaveText(/^(AM|PM)$/);
+    });
+
+    test('Should not render a clear button in read-only mode', async ({ page }) => {
+      await dateInputStory.goto(page, 'Read Only');
+      // X icon inside the clear button is the only way to trigger setValue(null) —
+      // verifying it's absent guarantees the value can't be wiped by a click.
+      const clearButton = page.locator('[data-slot="date-input"] button[type="button"]');
+      await expect(clearButton).toHaveCount(0);
     });
   });
 
