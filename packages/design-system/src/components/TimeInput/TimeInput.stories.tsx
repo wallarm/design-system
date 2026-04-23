@@ -1,5 +1,6 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Time } from '../../index';
+import { DateFormatProvider } from '../DateFormatProvider';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { TimeInput } from './TimeInput';
@@ -21,12 +22,6 @@ const meta: Meta<typeof TimeInput> = {
       control: 'select',
       options: ['hour', 'minute', 'second'],
       description: 'Determines the smallest unit of time that can be edited.',
-    },
-    hourCycle: {
-      control: 'select',
-      options: [12, 24],
-      description:
-        'Force 12-hour (AM/PM) or 24-hour format. When not set, the hour cycle is determined by the browser locale (e.g. en-US → 12h, en-GB → 24h).',
     },
     error: {
       control: 'boolean',
@@ -63,8 +58,6 @@ const meta: Meta<typeof TimeInput> = {
     error: false,
     disabled: false,
     showIcon: true,
-    showTimeDropdown: false,
-    timeStep: undefined,
     size: 'default',
   },
 };
@@ -158,60 +151,72 @@ export const Sizes: StoryFn<typeof meta> = () => (
 
 export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
-    <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        24-hour
-      </Text>
-      <TimeInput hourCycle={24} defaultValue={new Time(22, 0)} />
-    </VStack>
-    <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        12-hour
-      </Text>
-      <TimeInput hourCycle={12} defaultValue={new Time(22, 0)} />
-    </VStack>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          24-hour
+        </Text>
+        <TimeInput defaultValue={new Time(22, 0)} />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          12-hour
+        </Text>
+        <TimeInput defaultValue={new Time(22, 0)} />
+      </VStack>
+    </DateFormatProvider>
   </VStack>
 );
 
 export const Granularity: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        12-hour format
-      </Text>
-      <TimeInput placeholder='hour' granularity='hour' hourCycle={12} />
-      <TimeInput placeholder='hour:min' granularity='minute' hourCycle={12} />
-      <TimeInput placeholder='hour:min:sec' granularity='second' hourCycle={12} />
-    </VStack>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        24-hour format
-      </Text>
-      <TimeInput placeholder='hour' granularity='hour' hourCycle={24} />
-      <TimeInput placeholder='hour:min' granularity='minute' hourCycle={24} />
-      <TimeInput placeholder='hour:min:sec' granularity='second' hourCycle={24} />
-    </VStack>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          12-hour format
+        </Text>
+        <TimeInput placeholder='hour' granularity='hour' />
+        <TimeInput placeholder='hour:min' granularity='minute' />
+        <TimeInput placeholder='hour:min:sec' granularity='second' />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          24-hour format
+        </Text>
+        <TimeInput placeholder='hour' granularity='hour' />
+        <TimeInput placeholder='hour:min' granularity='minute' />
+        <TimeInput placeholder='hour:min:sec' granularity='second' />
+      </VStack>
+    </DateFormatProvider>
   </HStack>
 );
 
 export const TimeDropdownSteps: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        12-hour format
-      </Text>
-      <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={12} />
-      <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={12} />
-      <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={12} />
-    </VStack>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        24-hour format
-      </Text>
-      <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} hourCycle={24} />
-      <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} hourCycle={24} />
-      <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} hourCycle={24} />
-    </VStack>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          12-hour format
+        </Text>
+        <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} />
+        <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} />
+        <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          24-hour format
+        </Text>
+        <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} />
+        <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} />
+        <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} />
+      </VStack>
+    </DateFormatProvider>
   </HStack>
 );
 TimeDropdownSteps.decorators = dropdownRoom;

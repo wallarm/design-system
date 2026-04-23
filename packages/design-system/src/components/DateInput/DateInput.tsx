@@ -38,7 +38,6 @@ interface DateInputAriaSubset {
 
 type DateOnlyGranularity = {
   granularity?: 'day';
-  hourCycle?: never;
   showTimeDropdown?: never;
   timeStep?: never;
 };
@@ -63,7 +62,6 @@ export const DateInput: FC<DateInputProps> = props => {
     readOnly = false,
     isRequired,
     granularity = 'day',
-    hourCycle,
     showTimeDropdown,
     timeStep = 30,
     placeholder,
@@ -82,10 +80,10 @@ export const DateInput: FC<DateInputProps> = props => {
 
   const resolvedPlaceholder = placeholder ?? getDefaultTemporalPlaceholder({ granularity });
 
-  // App-level `hourCycle` from DateFormatProvider is the default; the prop
-  // wins when explicitly set so a single input can still opt out.
-  const { hourCycle: contextHourCycle } = useDateFormat();
-  const resolvedHourCycle = hourCycle ?? contextHourCycle;
+  // `hourCycle` is an app-level concern — sourced exclusively from
+  // `DateFormatProvider`. When no provider is mounted, undefined means
+  // "let the browser locale decide" (react-aria's default).
+  const { hourCycle: resolvedHourCycle } = useDateFormat();
 
   const { locale } = useLocale();
   const internalRef = useRef<HTMLDivElement>(null);

@@ -19,7 +19,6 @@ interface DateRangeValueProps {
 
 type DateOnlyGranularity = {
   granularity?: 'day';
-  hourCycle?: never;
   showTimeDropdown?: never;
   timeStep?: never;
 };

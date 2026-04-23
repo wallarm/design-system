@@ -45,7 +45,6 @@ export const DateRangeProvider: FC<DateRangeProviderProps> = props => {
     disabled = false,
     readOnly = false,
     granularity = 'day',
-    hourCycle,
     placeholder,
     showTimeDropdown,
     timeStep = 30,
@@ -57,10 +56,10 @@ export const DateRangeProvider: FC<DateRangeProviderProps> = props => {
     placeholder ?? getDefaultTemporalPlaceholder({ granularity, isRange: true });
   const icon = showIcon ? Calendar : undefined;
 
-  // App-level `hourCycle` from DateFormatProvider is the default; the prop
-  // wins when explicitly set so a single range input can still opt out.
-  const { hourCycle: contextHourCycle } = useDateFormat();
-  const resolvedHourCycle = hourCycle ?? contextHourCycle;
+  // `hourCycle` is an app-level concern — sourced exclusively from
+  // `DateFormatProvider`. When no provider is mounted, undefined means
+  // "let the browser locale decide" (react-aria's default).
+  const { hourCycle: resolvedHourCycle } = useDateFormat();
 
   const internalRef = useRef<HTMLDivElement>(null);
   const startRef = useRef<HTMLDivElement>(null);
@@ -78,7 +77,7 @@ export const DateRangeProvider: FC<DateRangeProviderProps> = props => {
     isDisabled: disabled,
     isReadOnly: readOnly,
     granularity,
-    hourCycle,
+    hourCycle: resolvedHourCycle,
     shouldForceLeadingZeros: true,
   });
 

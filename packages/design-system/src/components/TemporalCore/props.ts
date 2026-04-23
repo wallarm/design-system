@@ -31,16 +31,15 @@ export interface TemporalInputCommonProps
 }
 
 /**
- * Props describing time-segment behaviour. Applied when the input surfaces
- * time segments — TimeInput, or DateInput / DateRangeInput with a time
- * granularity.
+ * Per-input time behaviour knobs that are not app-wide.
+ *
+ * `hourCycle` intentionally lives on `DateFormatProvider`, not here — the
+ * 12/24-hour choice is a product-wide preference, set once at the app root
+ * and consumed via `useDateFormat`. The props below, by contrast, describe
+ * per-component UI decisions (this specific input shows a dropdown; that
+ * one uses 15-minute steps).
  */
 export interface TemporalInputTimeProps {
-  /**
-   * Hour cycle for time display — 12-hour (AM/PM) or 24-hour.
-   * When omitted, the browser locale decides.
-   */
-  hourCycle?: 12 | 24;
   /** Show dropdown for time selection with arrow navigation. */
   showTimeDropdown?: boolean;
   /** Time interval in minutes for dropdown options. Default: 30. */

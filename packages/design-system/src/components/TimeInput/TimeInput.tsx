@@ -58,7 +58,6 @@ export const TimeInput: FC<TimeInputProps> = ({
   readOnly = false,
   isRequired,
   granularity = 'minute',
-  hourCycle,
   showTimeDropdown,
   timeStep = 30,
   placeholder,
@@ -73,10 +72,10 @@ export const TimeInput: FC<TimeInputProps> = ({
 }) => {
   const resolvedPlaceholder = placeholder ?? getDefaultTemporalPlaceholder({ isTimeOnly: true });
 
-  // App-level `hourCycle` from DateFormatProvider is the default; the prop
-  // wins when explicitly set so a single input can still opt out.
-  const { hourCycle: contextHourCycle } = useDateFormat();
-  const resolvedHourCycle = hourCycle ?? contextHourCycle;
+  // `hourCycle` is an app-level concern — sourced exclusively from
+  // `DateFormatProvider`. When no provider is mounted, undefined means
+  // "let the browser locale decide" (react-aria's default).
+  const { hourCycle: resolvedHourCycle } = useDateFormat();
 
   const { locale } = useLocale();
   const internalRef = useRef<HTMLDivElement>(null);

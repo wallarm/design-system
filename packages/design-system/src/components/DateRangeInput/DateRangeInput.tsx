@@ -21,8 +21,8 @@ import type { DateRangeInputFlatProps, DateRangeInputProps } from './types';
  * <DateRangeInput value={range} onChange={setRange} />
  *
  * @example
- * // With time, 24-hour format
- * <DateRangeInput granularity='minute' hourCycle={24} value={range} onChange={setRange} />
+ * // With time — hour cycle comes from DateFormatProvider
+ * <DateRangeInput granularity='minute' value={range} onChange={setRange} />
  */
 export const DateRangeInput: FC<DateRangeInputProps> = props => {
   const {
@@ -41,7 +41,6 @@ export const DateRangeInput: FC<DateRangeInputProps> = props => {
     placeholder,
     size,
     granularity,
-    hourCycle,
     showTimeDropdown,
     timeStep,
     // Everything else (id, style, aria-*, event handlers from HTMLAttributes)
@@ -68,11 +67,10 @@ export const DateRangeInput: FC<DateRangeInputProps> = props => {
           readOnly={readOnly}
           placeholder={placeholder}
           size={size}
-          {...({ granularity, hourCycle, showTimeDropdown, timeStep } as
+          {...({ granularity, showTimeDropdown, timeStep } as
             | { granularity?: 'day' }
             | {
                 granularity: 'hour' | 'minute' | 'second';
-                hourCycle?: 12 | 24;
                 showTimeDropdown?: boolean;
                 timeStep?: number;
               })}

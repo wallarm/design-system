@@ -26,12 +26,6 @@ const meta: Meta<typeof DateRangeInput> = {
       description:
         'Determines the smallest unit of time that can be edited. `day` shows date only, `hour`/`minute`/`second` add time segments to both start and end fields.',
     },
-    hourCycle: {
-      control: 'select',
-      options: [12, 24],
-      description:
-        'Force 12-hour (AM/PM) or 24-hour format. When not set, the hour cycle is determined by the browser locale.',
-    },
     error: {
       control: 'boolean',
       description: 'Whether the input has an error state.',
@@ -73,8 +67,6 @@ const meta: Meta<typeof DateRangeInput> = {
     disabled: false,
     readOnly: false,
     showIcon: true,
-    showTimeDropdown: false,
-    timeStep: undefined,
     size: 'default',
   },
 };
@@ -206,12 +198,14 @@ export const Filled: StoryFn<typeof meta> = () => (
       </Text>
       <DateRangeInput defaultValue={sampleRange} />
     </VStack>
-    <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        Date + time range (24h)
-      </Text>
-      <DateRangeInput granularity='minute' hourCycle={24} defaultValue={sampleRangeDateTime} />
-    </VStack>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Date + time range (24h)
+        </Text>
+        <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
+      </VStack>
+    </DateFormatProvider>
     <VStack gap={4}>
       <Text size='sm' color='secondary'>
         Without icon
@@ -223,24 +217,28 @@ export const Filled: StoryFn<typeof meta> = () => (
 
 export const Granularity: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        12-hour format
-      </Text>
-      <DateRangeInput placeholder='day' granularity='day' hourCycle={12} />
-      <DateRangeInput placeholder='hour' granularity='hour' hourCycle={12} />
-      <DateRangeInput placeholder='minute' granularity='minute' hourCycle={12} />
-      <DateRangeInput placeholder='second' granularity='second' hourCycle={12} />
-    </VStack>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        24-hour format
-      </Text>
-      <DateRangeInput placeholder='day' granularity='day' hourCycle={24} />
-      <DateRangeInput placeholder='hour' granularity='hour' hourCycle={24} />
-      <DateRangeInput placeholder='minute' granularity='minute' hourCycle={24} />
-      <DateRangeInput placeholder='second' granularity='second' hourCycle={24} />
-    </VStack>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          12-hour format
+        </Text>
+        <DateRangeInput placeholder='day' granularity='day' />
+        <DateRangeInput placeholder='hour' granularity='hour' />
+        <DateRangeInput placeholder='minute' granularity='minute' />
+        <DateRangeInput placeholder='second' granularity='second' />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          24-hour format
+        </Text>
+        <DateRangeInput placeholder='day' granularity='day' />
+        <DateRangeInput placeholder='hour' granularity='hour' />
+        <DateRangeInput placeholder='minute' granularity='minute' />
+        <DateRangeInput placeholder='second' granularity='second' />
+      </VStack>
+    </DateFormatProvider>
   </HStack>
 );
 
@@ -259,7 +257,7 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
         </Text>
         <DateRangeInput />
         <DateRangeInput defaultValue={sampleRange} />
-        <DateRangeInput granularity='minute' hourCycle={24} defaultValue={sampleRangeDateTime} />
+        <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
       </VStack>
     </DateFormatProvider>
     <DateFormatProvider order='month-first'>
@@ -269,7 +267,7 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
         </Text>
         <DateRangeInput />
         <DateRangeInput defaultValue={sampleRange} />
-        <DateRangeInput granularity='minute' hourCycle={24} defaultValue={sampleRangeDateTime} />
+        <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
       </VStack>
     </DateFormatProvider>
   </HStack>

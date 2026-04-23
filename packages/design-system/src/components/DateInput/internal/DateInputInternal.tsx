@@ -34,6 +34,12 @@ interface DateInputInternalProps extends GroupDOMAttributes, TemporalInputTimePr
   readOnly?: boolean;
   placeholder?: string;
   size?: TemporalInputSize;
+  /**
+   * Resolved hour cycle. The public `DateInput` / `TimeInput` wrappers read
+   * this from `DateFormatProvider` and pass it down — it isn't a public
+   * prop on those components.
+   */
+  hourCycle?: 12 | 24;
 }
 
 /**
