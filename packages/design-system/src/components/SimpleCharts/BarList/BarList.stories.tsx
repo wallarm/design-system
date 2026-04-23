@@ -177,7 +177,7 @@ export const Colored: StoryFn<typeof meta> = () => (
             <BarListLabel>{row.name}</BarListLabel>
             <BarListValue>
               {formatValue(row.value)}
-              <BarListPercent />
+              <BarListPercent variant='muted' />
             </BarListValue>
           </BarListItem>
         ))}
@@ -207,7 +207,7 @@ export const CustomColors: StoryFn<typeof meta> = () => (
             <BarListLabel>{row.name}</BarListLabel>
             <BarListValue>
               {formatValue(row.value)}
-              <BarListPercent />
+              <BarListPercent variant='muted' />
             </BarListValue>
           </BarListItem>
         ))}
@@ -270,7 +270,7 @@ export const Selectable: StoryFn<typeof meta> = () => {
                   <BarListLabel>{row.name}</BarListLabel>
                   <BarListValue>
                     {formatValue(row.value)}
-                    <BarListPercent />
+                    <BarListPercent variant='muted' />
                   </BarListValue>
                 </BarListItem>
               </TooltipTrigger>
@@ -301,7 +301,7 @@ export const TruncatedLabels: StoryFn<typeof meta> = () => (
             </Tooltip>
             <BarListValue>
               {formatValue(row.value)}
-              <BarListPercent />
+              <BarListPercent variant='muted' />
             </BarListValue>
           </BarListItem>
         ))}
@@ -328,7 +328,7 @@ export const TruncatedLabelsWithTooltip: StoryFn<typeof meta> = () => (
             </OverflowTooltip>
             <BarListValue>
               {formatValue(row.value)}
-              <BarListPercent />
+              <BarListPercent variant='muted' />
             </BarListValue>
           </BarListItem>
         ))}
@@ -360,7 +360,7 @@ const datasets: Record<DatasetKey, Dataset> = {
     renderValue: row => (
       <BarListValue>
         {formatValue(row.value)}
-        <BarListPercent />
+        <BarListPercent variant='muted' />
       </BarListValue>
     ),
   },
@@ -453,7 +453,7 @@ export const Overflow: StoryFn<typeof meta> = () => (
             <BarListLabel>{row.name}</BarListLabel>
             <BarListValue>
               {formatValue(row.value)}
-              <BarListPercent />
+              <BarListPercent variant='muted' />
             </BarListValue>
           </BarListItem>
         ))}
@@ -475,7 +475,7 @@ export const InvalidMax: StoryFn<typeof meta> = () => (
             <BarListLabel>{row.name}</BarListLabel>
             <BarListValue>
               {formatValue(row.value)}
-              <BarListPercent />
+              <BarListPercent variant='muted' />
             </BarListValue>
           </BarListItem>
         ))}
@@ -497,7 +497,7 @@ export const PercentDigits: StoryFn<typeof meta> = () => (
             <BarListLabel>{row.name}</BarListLabel>
             <BarListValue>
               {formatValue(row.value)}
-              <BarListPercent digits={1} />
+              <BarListPercent digits={1} variant='muted' />
             </BarListValue>
           </BarListItem>
         ))}
@@ -506,11 +506,11 @@ export const PercentDigits: StoryFn<typeof meta> = () => (
   </div>
 );
 
-export const PercentOverride: StoryFn<typeof meta> = () => (
-  <div className='w-400'>
+export const PercentVariants: StoryFn<typeof meta> = () => (
+  <div className='flex flex-col gap-16 w-400'>
     <Chart>
       <ChartHeader>
-        <ChartTitle>Custom percent content</ChartTitle>
+        <ChartTitle>Split — value primary, % secondary (default)</ChartTitle>
       </ChartHeader>
       <BarList max={chartSum(baseRows)}>
         {baseRows.map(row => (
@@ -519,7 +519,43 @@ export const PercentOverride: StoryFn<typeof meta> = () => (
             <BarListLabel>{row.name}</BarListLabel>
             <BarListValue>
               {formatValue(row.value)}
-              <BarListPercent>Custom</BarListPercent>
+              <BarListPercent variant='split' />
+            </BarListValue>
+          </BarListItem>
+        ))}
+      </BarList>
+    </Chart>
+
+    <Chart>
+      <ChartHeader>
+        <ChartTitle>Muted — both tokens secondary</ChartTitle>
+      </ChartHeader>
+      <BarList max={chartSum(baseRows)}>
+        {baseRows.map(row => (
+          <BarListItem key={row.name} value={row.value}>
+            <BarListBar />
+            <BarListLabel>{row.name}</BarListLabel>
+            <BarListValue>
+              {formatValue(row.value)}
+              <BarListPercent variant='muted' />
+            </BarListValue>
+          </BarListItem>
+        ))}
+      </BarList>
+    </Chart>
+
+    <Chart>
+      <ChartHeader>
+        <ChartTitle>Inherit — follows BarListValue color</ChartTitle>
+      </ChartHeader>
+      <BarList max={chartSum(baseRows)}>
+        {baseRows.map(row => (
+          <BarListItem key={row.name} value={row.value}>
+            <BarListBar />
+            <BarListLabel>{row.name}</BarListLabel>
+            <BarListValue>
+              {formatValue(row.value)}
+              <BarListPercent variant='inherit' />
             </BarListValue>
           </BarListItem>
         ))}

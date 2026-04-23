@@ -21,7 +21,7 @@ Compound component:
 - `BarListBar` — the coloured fill. Absolute-positioned under label/value. Accepts `color` from `ChartColor` (each variant renders a 16% alpha overlay of the palette's `500` hue — matching the default slate bar which is `bg-states-primary-pressed` = `slate-500 @ 16%`). Translucent fills let the row's hover / focus tint layer through the bar so interactive state stays visible. For any colour outside the palette, pass a Tailwind `bg-*` utility via `className` (e.g. `<BarListBar className='bg-sky-500/16' />`); `tailwind-merge` resolves the conflict in favour of the explicit class.
 - `BarListLabel` — left-side label slot.
 - `BarListValue` — right-side value slot; place `BarListPercent` inside to get the auto-formatted share.
-- `BarListPercent` — reads `value / max` from context and renders `NN%`. Accepts `digits`.
+- `BarListPercent` — reads `value / max` from context and renders `NN%`. Accepts `digits` and `variant` (`split` | `muted` | `inherit`; default `split`). The value and the `%` symbol are rendered as separate spans (`data-slot='bar-list-percent'` on the root, `data-slot='bar-list-percent-symbol'` on the `%`) so the `split` variant — which matches Figma — can color them independently. `children` override the auto-formatted content when a caller needs full control.
 - `BarListSkeleton` — standalone loading view; use it instead of `BarList` while data is loading.
 
 ## Data model
@@ -64,6 +64,7 @@ Compound component:
 - **Zero values** — `value = 0` renders an empty bar and `0%`. No special "no data" treatment.
 - **Mount animation** — bars transition their width (`duration-300 ease-out`). React mounts them with their final inline style, so without opt-in the first paint would already show the end state; the transition still runs for subsequent width changes (e.g. filtering).
 - **`BarListPercent` without a parent `BarListItem`** — renders `0%`. There is no runtime error.
+- **`BarListPercent` color variants** — `split` (default, matches Figma) colors the numeric value with `text-text-primary` and the `%` symbol with `text-text-secondary`, giving the row a "value > unit" hierarchy. `muted` pulls both tokens down to `text-text-secondary` when the percent should read as a single de-emphasized label. `inherit` drops both colors so the percent follows whatever color `BarListValue` (or any ancestor) sets — useful when a row needs to read as a single colored token.
 
 ## Accessibility notes
 
