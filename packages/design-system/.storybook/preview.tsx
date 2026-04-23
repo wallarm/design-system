@@ -61,6 +61,20 @@ const preview: Preview = {
         dynamicTitle: true,
       },
     },
+    hourCycle: {
+      name: 'Hour cycle',
+      description: 'Time format for every temporal input and time dropdown',
+      defaultValue: 'locale',
+      toolbar: {
+        icon: 'time',
+        items: [
+          { value: 'locale', title: 'Locale default' },
+          { value: '12', title: '12-hour (AM/PM)' },
+          { value: '24', title: '24-hour' },
+        ],
+        dynamicTitle: true,
+      },
+    },
   },
   tags: ['autodocs'],
 };
@@ -76,9 +90,11 @@ export const decorators: Decorator[] = [
   }),
   (Story, context) => {
     const dateOrder = (context.globals.dateOrder as DateOrder | undefined) ?? 'day-first';
+    const hourCycleGlobal = context.globals.hourCycle as '12' | '24' | 'locale' | undefined;
+    const hourCycle = hourCycleGlobal === '12' ? 12 : hourCycleGlobal === '24' ? 24 : undefined;
     return (
       <ThemeProvider>
-        <DateFormatProvider order={dateOrder}>
+        <DateFormatProvider order={dateOrder} hourCycle={hourCycle}>
           <Story />
         </DateFormatProvider>
         <SingletonToaster />

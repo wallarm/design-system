@@ -9,6 +9,7 @@ const dateRangeInputStory = createStoryHelper('inputs-date-daterangeinput', [
   'Filled',
   'Granularity',
   'Date Order Comparison',
+  'Hour Cycle By Context',
 ] as const);
 
 test.describe('Component: DateRangeInput', () => {
@@ -45,6 +46,11 @@ test.describe('Component: DateRangeInput', () => {
 
     test('Should render day-first and month-first orders side by side', async ({ page }) => {
       await dateRangeInputStory.goto(page, 'Date Order Comparison');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render 12h and 24h cycles driven by DateFormatProvider', async ({ page }) => {
+      await dateRangeInputStory.goto(page, 'Hour Cycle By Context');
       await expect(page).toHaveScreenshot();
     });
   });

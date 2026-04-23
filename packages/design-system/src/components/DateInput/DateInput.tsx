@@ -7,6 +7,7 @@ import { useDateFieldState } from '@react-stately/datepicker';
 import { Calendar } from '../../icons';
 import { cn } from '../../utils/cn';
 import { TestIdProvider } from '../../utils/testId';
+import { useDateFormat } from '../DateFormatProvider';
 import {
   getDefaultTemporalPlaceholder,
   type TemporalGranularity,
@@ -81,6 +82,11 @@ export const DateInput: FC<DateInputProps> = props => {
 
   const resolvedPlaceholder = placeholder ?? getDefaultTemporalPlaceholder({ granularity });
 
+  // App-level `hourCycle` from DateFormatProvider is the default; the prop
+  // wins when explicitly set so a single input can still opt out.
+  const { hourCycle: contextHourCycle } = useDateFormat();
+  const resolvedHourCycle = hourCycle ?? contextHourCycle;
+
   const { locale } = useLocale();
   const internalRef = useRef<HTMLDivElement>(null);
 
@@ -97,7 +103,7 @@ export const DateInput: FC<DateInputProps> = props => {
     isInvalid: error,
     isReadOnly: readOnly,
     granularity,
-    hourCycle,
+    hourCycle: resolvedHourCycle,
     createCalendar,
     shouldForceLeadingZeros: true,
   });
@@ -134,7 +140,7 @@ export const DateInput: FC<DateInputProps> = props => {
           placeholder={resolvedPlaceholder}
           showTimeDropdown={showTimeDropdown}
           timeStep={timeStep}
-          hourCycle={hourCycle}
+          hourCycle={resolvedHourCycle}
           size={size}
         />
       </TestIdProvider>

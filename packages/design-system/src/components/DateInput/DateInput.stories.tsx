@@ -291,3 +291,32 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
   </HStack>
 );
 DateOrderComparison.parameters = { layout: 'padded' };
+
+/**
+ * Demonstrates `hourCycle` picked up from `DateFormatProvider`, not passed
+ * per input. Left column wraps in `hourCycle={12}`, right in `hourCycle={24}`;
+ * no `hourCycle` prop on the individual DateInputs.
+ */
+export const HourCycleByContext: StoryFn<typeof meta> = () => (
+  <HStack gap={32}>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          12-hour (AM/PM)
+        </Text>
+        <DateInput granularity='minute' defaultValue={sampleDateTime} />
+        <DateInput granularity='second' defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          24-hour
+        </Text>
+        <DateInput granularity='minute' defaultValue={sampleDateTime} />
+        <DateInput granularity='second' defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+  </HStack>
+);
+HourCycleByContext.parameters = { layout: 'padded' };

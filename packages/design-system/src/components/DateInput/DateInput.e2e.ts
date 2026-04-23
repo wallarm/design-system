@@ -10,6 +10,7 @@ const dateInputStory = createStoryHelper('inputs-date-dateinput', [
   'Granularity',
   'With Field Components',
   'Date Order Comparison',
+  'Hour Cycle By Context',
 ] as const);
 
 test.describe('Component: DateInput', () => {
@@ -51,6 +52,11 @@ test.describe('Component: DateInput', () => {
 
     test('Should render day-first and month-first orders side by side', async ({ page }) => {
       await dateInputStory.goto(page, 'Date Order Comparison');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render 12h and 24h cycles driven by DateFormatProvider', async ({ page }) => {
+      await dateInputStory.goto(page, 'Hour Cycle By Context');
       await expect(page).toHaveScreenshot();
     });
   });

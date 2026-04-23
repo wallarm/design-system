@@ -14,6 +14,14 @@ export type DateOrder = 'day-first' | 'month-first';
 
 export interface DateFormatContextValue {
   order: DateOrder;
+  /**
+   * App-wide hour cycle — `12` (AM/PM) or `24`. When `undefined`, the
+   * browser locale decides (react-aria's default).
+   *
+   * Individual inputs can still override with an `hourCycle` prop for
+   * per-component exceptions. Precedence: prop > context > locale.
+   */
+  hourCycle?: 12 | 24;
 }
 
 export const DateFormatContext = createContext<DateFormatContextValue | undefined>(undefined);

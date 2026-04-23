@@ -3,6 +3,7 @@ import { composeRefs } from '@radix-ui/react-compose-refs';
 import { useDateRangePicker } from '@react-aria/datepicker';
 import { useDateRangePickerState } from '@react-stately/datepicker';
 import { Calendar } from '../../../icons';
+import { useDateFormat } from '../../DateFormatProvider';
 import { getDefaultTemporalPlaceholder, useTemporalField } from '../../TemporalCore';
 import type { DateRangeInputFlatProps, DateRangeInputProps } from '../types';
 import { DateRangeContext } from './context';
@@ -56,6 +57,11 @@ export const DateRangeProvider: FC<DateRangeProviderProps> = props => {
     placeholder ?? getDefaultTemporalPlaceholder({ granularity, isRange: true });
   const icon = showIcon ? Calendar : undefined;
 
+  // App-level `hourCycle` from DateFormatProvider is the default; the prop
+  // wins when explicitly set so a single range input can still opt out.
+  const { hourCycle: contextHourCycle } = useDateFormat();
+  const resolvedHourCycle = hourCycle ?? contextHourCycle;
+
   const internalRef = useRef<HTMLDivElement>(null);
   const startRef = useRef<HTMLDivElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
@@ -82,7 +88,7 @@ export const DateRangeProvider: FC<DateRangeProviderProps> = props => {
       isDisabled: disabled,
       isReadOnly: readOnly,
       granularity,
-      hourCycle,
+      hourCycle: resolvedHourCycle,
     },
     state,
     internalRef,
@@ -104,7 +110,7 @@ export const DateRangeProvider: FC<DateRangeProviderProps> = props => {
         placeholder: resolvedPlaceholder,
         showTimeDropdown,
         timeStep,
-        hourCycle,
+        hourCycle: resolvedHourCycle,
         icon,
         size,
       }}
