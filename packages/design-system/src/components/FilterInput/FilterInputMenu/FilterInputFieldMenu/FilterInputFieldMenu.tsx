@@ -121,7 +121,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
     }
   };
 
-  const { highlightedValue, onHighlightChange } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange, registerItem } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: handleItemSelect,
@@ -151,11 +151,20 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
         data-filter-input-menu='true'
       >
         {!filterText && showRecent && (
-          <RecentSection conditions={limitedRecentConditions} fields={fields} onSelect={onSelect} />
+          <RecentSection
+            conditions={limitedRecentConditions}
+            fields={fields}
+            onSelect={onSelect}
+            registerItem={registerItem}
+          />
         )}
 
         {!filterText && showSuggestions && !showRecent && (
-          <SuggestionsSection fields={suggestedFields} onSelect={onSelect} />
+          <SuggestionsSection
+            fields={suggestedFields}
+            onSelect={onSelect}
+            registerItem={registerItem}
+          />
         )}
 
         {filteredFields.length > 0 ? (
@@ -164,6 +173,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
               <DropdownMenuItem
                 key={field.name}
                 value={`field-${field.name}`}
+                ref={registerItem(`field-${field.name}`)}
                 onSelect={() => onSelect(field)}
               >
                 <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
@@ -175,7 +185,11 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
         )}
 
         {!filterText && (onSelectAnd || onSelectOr) && (
-          <OperatorsSection onSelectAnd={onSelectAnd} onSelectOr={onSelectOr} />
+          <OperatorsSection
+            onSelectAnd={onSelectAnd}
+            onSelectOr={onSelectOr}
+            registerItem={registerItem}
+          />
         )}
 
         <DropdownMenuFooter>
