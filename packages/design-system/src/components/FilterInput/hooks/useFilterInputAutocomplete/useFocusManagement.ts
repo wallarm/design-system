@@ -56,8 +56,17 @@ export const useFocusManagement = ({
       // 2. Building chip with freeform typed value
       const committed = blurCommitRef.current?.() || commitBuildingOnBlur();
       if (!committed) resetState();
+      // resetState / commit chain above may have refocused our input via
+      // inputRef.current?.focus() in several sub-paths (value commit, clear,
+      // etc.). Honor the user's blur intent by restoring focus to where they
+      // actually clicked, or explicitly blurring if they clicked somewhere
+      // non-focusable (null relatedTarget / plain div / body). AS-882.
+      related?.focus();
+      if (document.activeElement === inputRef.current) {
+        inputRef.current?.blur();
+      }
     },
-    [containerRef, blurCommitRef, commitBuildingOnBlur, resetState, setIsFocused],
+    [containerRef, blurCommitRef, commitBuildingOnBlur, resetState, setIsFocused, inputRef],
   );
 
   // ── Auto-open field menu on initial focus when empty ──────
