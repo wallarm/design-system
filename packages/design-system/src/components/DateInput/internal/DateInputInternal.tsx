@@ -150,9 +150,10 @@ export const DateInputInternal: FC<DateInputInternalProps> = ({
           {...props}
           ref={ref}
           data-slot='input'
-          className={cn('h-full', showPlaceholder && 'opacity-0')}
+          className={cn('h-full', showPlaceholder && 'opacity-0', readOnly && 'cursor-not-allowed')}
           aria-invalid={error || undefined}
           aria-disabled={disabled || undefined}
+          data-readonly={readOnly || undefined}
           state={state}
           disabled={disabled}
           readOnly={readOnly}

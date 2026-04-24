@@ -30,13 +30,10 @@ const segmentVariants = cva(
       // Focus styling is tied to editability: editable segments get the
       // brand blue fill + alt-colour text that make keyboard focus obvious.
       // Literal / read-only segments keep the surrounding text colour (so
-      // focus doesn't make the value invisible) and show a focus-visible
-      // ring so keyboard users can still see where focus landed.
+      // focus doesn't make the value invisible).
       type: {
-        literal: cn(
+        literal:
           'text-text-primary select-none hover:bg-transparent focus:bg-transparent rounded-2',
-          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-primary',
-        ),
         editable: 'px-1 focus:bg-bg-fill-brand focus:text-text-primary-alt',
       },
     },
@@ -70,24 +67,30 @@ export const TemporalSegment: FC<TemporalSegmentProps> = ({
 
   const isLiteral = segment.type === 'literal';
   const isEditable = segment.isEditable && !readOnly;
+  const displayText = displayOverride ?? (isLiteral ? segment.text : resolveSegmentText(segment));
 
-  if (isLiteral) {
+  // Non-interactive rendering: true literals OR readOnly segments.
+  // Skip `segmentProps` so react-aria can't make the span focusable/tabbable.
+  if (isLiteral || !isEditable) {
+    const isReadOnlySegment = !isLiteral && !isEditable && !disabled;
     return (
       <span
         className={cn(
           segmentVariants({
             type: 'literal',
+            isPlaceholder: !isLiteral && segment.isPlaceholder,
             disabled,
           }),
+          isReadOnlySegment && 'cursor-not-allowed',
         )}
+        data-segment={!isLiteral ? segment.type : undefined}
+        data-placeholder={!isLiteral && segment.isPlaceholder ? true : undefined}
         aria-hidden='true'
       >
-        {displayOverride ?? segment.text}
+        {displayText}
       </span>
     );
   }
-
-  const displayText = displayOverride ?? resolveSegmentText(segment);
 
   return (
     <span
@@ -95,9 +98,9 @@ export const TemporalSegment: FC<TemporalSegmentProps> = ({
       ref={ref}
       className={cn(
         segmentVariants({
-          type: isEditable ? 'editable' : 'literal',
+          type: 'editable',
           isPlaceholder: segment.isPlaceholder,
-          disabled: disabled || !isEditable,
+          disabled,
         }),
       )}
       data-segment={segment.type}
