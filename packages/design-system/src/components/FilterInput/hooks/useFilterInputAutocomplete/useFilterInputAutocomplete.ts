@@ -225,6 +225,16 @@ export const useFilterInputAutocomplete = ({
     // Editing an existing chip — don't overwrite its value, just cancel editing
     if (editing.editingChipId) return false;
 
+    // Snapshot + clear refs synchronously so concurrent callers (two
+    // onOpenChange(false) from Ark UI menus during a state transition +
+    // a blur in the same tick) short-circuit on re-entry instead of creating
+    // duplicate error chips. resetState() clears state through setters, but
+    // those refs update only on the next render — sync re-entry would still
+    // see stale refs without this.
+    selectedFieldRef.current = null;
+    selectedOperatorRef.current = null;
+    inputTextRef.current = '';
+
     // Has typed text — commit as custom value
     if (operator && text) {
       handleCustomValueCommit(text);
