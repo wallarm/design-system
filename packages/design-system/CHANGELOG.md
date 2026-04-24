@@ -1,3 +1,10 @@
+## 0.29.0 (2026-04-24)
+
+* test(e2e): stabilize overlay-click + fix separator selector ([c2a9b4a](https://github.com/wallarm/design-system/commit/c2a9b4a))
+* fix(simple-charts): WDS-90 BarList fix percent color ([19f7889](https://github.com/wallarm/design-system/commit/19f7889))
+* fix(simple-charts): WDS-90 BarList fixes ([e569f4b](https://github.com/wallarm/design-system/commit/e569f4b))
+* feat(data-input): align date/range/time inputs with Figma [WDS-96] (#93) ([484e833](https://github.com/wallarm/design-system/commit/484e833)), closes [#93](https://github.com/wallarm/design-system/issues/93)
+
 ## 0.28.0 (2026-04-22)
 
 * feat(simple-charts): WDS-90 Charts container and BarList ([95a9ec2](https://github.com/wallarm/design-system/commit/95a9ec2))
