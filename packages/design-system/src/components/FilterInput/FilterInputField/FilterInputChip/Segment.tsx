@@ -1,5 +1,5 @@
 import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
-import { useContext, useEffect, useRef } from 'react';
+import { useCallback, useContext, useEffect, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import { FilterInputContext } from '../../FilterInputContext/FilterInputContext';
 import { segmentContainer, segmentTextVariants } from './classes';
@@ -7,7 +7,13 @@ import { CHAR_WIDTH_PX } from './constants';
 import { MultiValueSegment } from './MultiValueSegment';
 import { useSizerWidth } from './model/useSizerWidth';
 
-type SegmentVariant = 'attribute' | 'operator' | 'value';
+const SEGMENT_VARIANT = {
+  attribute: 'attribute',
+  operator: 'operator',
+  value: 'value',
+} as const;
+
+type SegmentVariant = (typeof SEGMENT_VARIANT)[keyof typeof SEGMENT_VARIANT];
 
 export type SegmentProps = HTMLAttributes<HTMLDivElement> & {
   variant: SegmentVariant;
@@ -51,9 +57,9 @@ export const Segment: FC<SegmentProps> = ({
   // a FilterInputProvider (e.g. in isolated unit tests).
   const filterInputContext = useContext(FilterInputContext);
   const segmentInputRef =
-    variant === 'attribute'
+    variant === SEGMENT_VARIANT.attribute
       ? filterInputContext?.segmentAttributeInputRef
-      : variant === 'value'
+      : variant === SEGMENT_VARIANT.value
         ? filterInputContext?.segmentValueInputRef
         : null;
   const lastTextWidthRef = useRef<number>(0);
@@ -71,17 +77,16 @@ export const Segment: FC<SegmentProps> = ({
   // If Ark UI changes its focus timing, this workaround may need updating.
   useEffect(() => {
     if (!editing) return;
-    let outer = 0;
-    let inner = 0;
-    outer = requestAnimationFrame(() => {
-      inner = requestAnimationFrame(() => {
+    let innerFrame = 0;
+    const outerFrame = requestAnimationFrame(() => {
+      innerFrame = requestAnimationFrame(() => {
         inputRef.current?.focus();
         inputRef.current?.select();
       });
     });
     return () => {
-      cancelAnimationFrame(outer);
-      cancelAnimationFrame(inner);
+      cancelAnimationFrame(outerFrame);
+      cancelAnimationFrame(innerFrame);
     };
   }, [editing]);
 
@@ -90,9 +95,17 @@ export const Segment: FC<SegmentProps> = ({
     text: editText ?? '',
   });
 
+  const setInputRef = useCallback(
+    (node: HTMLInputElement | null) => {
+      inputRef.current = node;
+      if (segmentInputRef) segmentInputRef.current = node;
+    },
+    [segmentInputRef],
+  );
+
   const isInteractive = !!props.onClick;
   const hasMultiValueErrors =
-    variant === 'value' &&
+    variant === SEGMENT_VARIANT.value &&
     !!valueParts &&
     !!errorValueIndices &&
     errorValueIndices.length > 0 &&
@@ -120,10 +133,7 @@ export const Segment: FC<SegmentProps> = ({
       {editing ? (
         <>
           <input
-            ref={node => {
-              inputRef.current = node;
-              if (segmentInputRef) segmentInputRef.current = node;
-            }}
+            ref={setInputRef}
             size={1}
             value={editText ?? ''}
             onChange={e => onEditChange?.(e.target.value)}
