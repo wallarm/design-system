@@ -148,6 +148,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
         ref={menuRef}
         className={cn('w-[300px] max-h-[430px]', className)}
         data-slot='filter-input-field-menu'
+        data-filter-input-menu=''
       >
         {!filterText && showRecent && (
           <RecentSection conditions={limitedRecentConditions} fields={fields} onSelect={onSelect} />
