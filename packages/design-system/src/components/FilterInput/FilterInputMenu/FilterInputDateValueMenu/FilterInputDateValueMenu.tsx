@@ -91,7 +91,7 @@ export const FilterInputDateValueMenu: FC<FilterInputDateValueMenuProps> = ({
       <DropdownMenuContent
         ref={menuRef}
         className={cn('w-fit', className)}
-        data-filter-input-menu=''
+        data-filter-input-menu='true'
         onKeyDown={e => {
           if (e.key === 'Escape') {
             e.preventDefault();

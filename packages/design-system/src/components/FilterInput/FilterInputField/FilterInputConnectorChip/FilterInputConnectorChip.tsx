@@ -78,7 +78,7 @@ export const FilterInputConnectorChip: FC<FilterInputConnectorChipProps> = ({
           </div>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className='w-auto min-w-64'>
+      <DropdownMenuContent className='w-auto min-w-64' data-filter-input-menu='true'>
         <DropdownMenuItem value='and' onSelect={() => onChange(chipId, 'and')}>
           <DropdownMenuItemIcon>
             <CirclePlus />

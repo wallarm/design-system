@@ -149,7 +149,7 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
       <DropdownMenuContent
         ref={menuRef}
         className={cn('w-256 max-h-[430px]', className)}
-        data-filter-input-menu=''
+        data-filter-input-menu='true'
       >
         {filteredGroups.length > 0 ? (
           filteredGroups.map((group, groupIdx) => (

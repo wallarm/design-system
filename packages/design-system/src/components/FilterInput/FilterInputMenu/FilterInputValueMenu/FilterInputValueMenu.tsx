@@ -118,7 +118,7 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
         ref={menuRef}
         className={cn(widthClass, 'max-h-[430px]', className)}
         style={widthStyle}
-        data-filter-input-menu=''
+        data-filter-input-menu='true'
       >
         {displayValues.length > 0 ? (
           <DropdownMenuGroup>

@@ -1,6 +1,7 @@
 import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
-import { useEffect, useRef } from 'react';
+import { useContext, useEffect, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
+import { FilterInputContext } from '../../FilterInputContext/FilterInputContext';
 import { segmentContainer, segmentTextVariants } from './classes';
 import { CHAR_WIDTH_PX } from './constants';
 import { MultiValueSegment } from './MultiValueSegment';
@@ -43,6 +44,18 @@ export const Segment: FC<SegmentProps> = ({
   const textRef = useRef<HTMLParagraphElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
   const sizerRef = useRef<HTMLSpanElement>(null);
+
+  // Attach this segment's input ref into the context ref registry so
+  // useFocusManagement can focus it directly without a querySelector.
+  // Uses useContext directly (null-safe) to support rendering Segment outside
+  // a FilterInputProvider (e.g. in isolated unit tests).
+  const filterInputContext = useContext(FilterInputContext);
+  const segmentInputRef =
+    variant === 'attribute'
+      ? filterInputContext?.segmentAttributeInputRef
+      : variant === 'value'
+        ? filterInputContext?.segmentValueInputRef
+        : null;
   const lastTextWidthRef = useRef<number>(0);
 
   // Measure text width when content changes (only while not editing).
@@ -107,7 +120,10 @@ export const Segment: FC<SegmentProps> = ({
       {editing ? (
         <>
           <input
-            ref={inputRef}
+            ref={node => {
+              inputRef.current = node;
+              if (segmentInputRef) segmentInputRef.current = node;
+            }}
             size={1}
             value={editText ?? ''}
             onChange={e => onEditChange?.(e.target.value)}
