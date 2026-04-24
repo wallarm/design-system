@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
-import { applyAcceptChar, chipIdToConditionIndex } from '../../lib';
+import { applyAcceptChar, chipIdToConditionIndex, isMenuRelated } from '../../lib';
 import type {
   ChipErrorSegment,
   Condition,
@@ -124,9 +124,22 @@ export const useFilterInputAutocomplete = ({
       } else {
         doReset();
       }
-      inputRef.current?.focus();
+
+      // Only return focus to the input when it still "belongs" to us — active
+      // element is inside our container, inside a FilterInput-owned menu, the
+      // body, or null. If the user moved focus elsewhere (e.g. tenant switcher),
+      // honor their intent and leave it there. AS-882.
+      const active = document.activeElement as HTMLElement | null;
+      const stayedInside =
+        !active ||
+        active === document.body ||
+        containerRef.current?.contains(active) ||
+        isMenuRelated(active);
+      if (stayedInside) {
+        inputRef.current?.focus();
+      }
     },
-    [editing, dateRange, inputRef, resetMenuOffset],
+    [editing, dateRange, inputRef, containerRef, resetMenuOffset],
   );
 
   // ── Blur commit for building chips ─────────────────────────
