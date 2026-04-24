@@ -76,6 +76,11 @@ export const useFilterInputAutocomplete = ({
   // Ref for multi-select blur commit: set by FilterInputValueMenu when open in multi-select mode
   const blurCommitRef = useRef<(() => boolean) | null>(null);
 
+  // Refs for inline segment inputs — used by useFocusManagement to focus
+  // the correct input without a DOM querySelector.
+  const segmentAttributeInputRef = useRef<HTMLInputElement>(null);
+  const segmentValueInputRef = useRef<HTMLInputElement>(null);
+
   // ── Child hooks ───────────────────────────────────────────
 
   const { menuPositioning, setMenuOffset, resetMenuOffset } = useMenuPositioning({
@@ -130,8 +135,10 @@ export const useFilterInputAutocomplete = ({
       // body, or null. If the user moved focus elsewhere (e.g. tenant switcher),
       // honor their intent and leave it there. AS-882.
       const active = document.activeElement as HTMLElement | null;
+      // body-focus policy: here, body means activeElement just dropped because
+      // a chip/menu was removed on re-render — keep focus in the input. Contrast
+      // with useFocusManagement's rAF guard, which treats body-focus as outside.
       const stayedInside =
-        !active ||
         active === document.body ||
         containerRef.current?.contains(active) ||
         isMenuRelated(active);
@@ -252,6 +259,8 @@ export const useFilterInputAutocomplete = ({
     containerRef,
     inputRef,
     editingSegment: editing.editingSegment,
+    segmentAttributeInputRef,
+    segmentValueInputRef,
     blurCommitRef,
     commitBuildingOnBlur,
     setIsFocused,
@@ -374,5 +383,7 @@ export const useFilterInputAutocomplete = ({
     closeAutocompleteMenu,
     blurCommitRef,
     setInputText,
+    segmentAttributeInputRef,
+    segmentValueInputRef,
   };
 };

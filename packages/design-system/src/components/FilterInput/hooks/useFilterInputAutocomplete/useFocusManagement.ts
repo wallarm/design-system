@@ -1,6 +1,7 @@
 import type { FocusEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import { isMenuRelated } from '../../lib';
+import type { ChipSegment } from '../../FilterInputField/FilterInputChip';
 import type { MenuState } from '../../types';
 
 interface UseFocusManagementDeps {
@@ -10,7 +11,11 @@ interface UseFocusManagementDeps {
   inputText: string;
   containerRef: RefObject<HTMLElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
-  editingSegment: string | null;
+  editingSegment: ChipSegment | null;
+  /** Direct ref to the attribute segment <input> when editing — avoids querySelector. */
+  segmentAttributeInputRef: RefObject<HTMLInputElement | null>;
+  /** Direct ref to the value segment <input> when editing — avoids querySelector. */
+  segmentValueInputRef: RefObject<HTMLInputElement | null>;
   /** Ref set by FilterInputValueMenu — calls commitChecked() for multi-select before blur reset. Returns true if committed. */
   blurCommitRef: RefObject<(() => boolean) | null>;
   /** Tries to commit a building chip's freeform value on blur. Returns true if committed. */
@@ -29,6 +34,8 @@ export const useFocusManagement = ({
   containerRef,
   inputRef,
   editingSegment,
+  segmentAttributeInputRef,
+  segmentValueInputRef,
   blurCommitRef,
   commitBuildingOnBlur,
   setIsFocused,
@@ -100,13 +107,20 @@ export const useFocusManagement = ({
         const container = containerRef.current;
         if (!container) return;
         const active = document.activeElement as HTMLElement | null;
+        // body-focus policy: here, body means the user moved focus outside —
+        // don't recapture. Contrast with resetState in useFilterInputAutocomplete,
+        // which treats body-focus as "stayed inside" (DOM just re-rendered).
         if (active && !container.contains(active) && !isMenuRelated(active)) return;
 
         if (editingSegment) {
-          // Redirect focus to the segment input, beating Ark UI's focus steal
-          const segmentInput = container.querySelector<HTMLInputElement>(
-            `[data-slot="segment-${editingSegment}"] input`,
-          );
+          // Redirect focus to the segment input via ref, beating Ark UI's focus steal.
+          // segmentAttributeInputRef / segmentValueInputRef are attached by Segment.tsx.
+          const segmentInput =
+            editingSegment === 'attribute'
+              ? segmentAttributeInputRef.current
+              : editingSegment === 'value'
+                ? segmentValueInputRef.current
+                : null;
           if (segmentInput && document.activeElement !== segmentInput) {
             segmentInput.focus();
             segmentInput.select();
@@ -123,7 +137,7 @@ export const useFocusManagement = ({
       cancelAnimationFrame(outerRaf);
       cancelAnimationFrame(innerRaf);
     };
-  }, [menuState, isFocused, inputRef, editingSegment, containerRef]);
+  }, [menuState, isFocused, inputRef, editingSegment, containerRef, segmentAttributeInputRef, segmentValueInputRef]);
 
   return { handleFocus, handleBlur };
 };
