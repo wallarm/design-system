@@ -139,9 +139,7 @@ export const useFilterInputAutocomplete = ({
       // a chip/menu was removed on re-render — keep focus in the input. Contrast
       // with useFocusManagement's rAF guard, which treats body-focus as outside.
       const stayedInside =
-        active === document.body ||
-        containerRef.current?.contains(active) ||
-        isMenuRelated(active);
+        active === document.body || containerRef.current?.contains(active) || isMenuRelated(active);
       if (stayedInside) {
         inputRef.current?.focus();
       }

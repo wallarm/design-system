@@ -1,7 +1,7 @@
 import type { FocusEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
-import { isMenuRelated } from '../../lib';
 import type { ChipSegment } from '../../FilterInputField/FilterInputChip';
+import { isMenuRelated } from '../../lib';
 import type { MenuState } from '../../types';
 
 interface UseFocusManagementDeps {
@@ -137,7 +137,15 @@ export const useFocusManagement = ({
       cancelAnimationFrame(outerRaf);
       cancelAnimationFrame(innerRaf);
     };
-  }, [menuState, isFocused, inputRef, editingSegment, containerRef, segmentAttributeInputRef, segmentValueInputRef]);
+  }, [
+    menuState,
+    isFocused,
+    inputRef,
+    editingSegment,
+    containerRef,
+    segmentAttributeInputRef,
+    segmentValueInputRef,
+  ]);
 
   return { handleFocus, handleBlur };
 };
