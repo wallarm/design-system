@@ -374,6 +374,7 @@ const datasets: Record<DatasetKey, Dataset> = {
 
 export const DataVariants: StoryFn<typeof meta> = () => {
   const [key, setKey] = useState<DatasetKey>('values');
+  const [menuOpen, setMenuOpen] = useState(false);
   const current = datasets[key];
 
   return (
@@ -381,32 +382,34 @@ export const DataVariants: StoryFn<typeof meta> = () => {
       <Chart>
         <ChartHeader>
           <ChartTitle>{current.title}</ChartTitle>
-          <ChartActions>
-            <DropdownMenu>
-              <Tooltip>
-                <DropdownMenuTrigger asChild>
-                  <TooltipTrigger asChild>
-                    <Button variant='ghost' color='neutral' size='small' aria-label='Settings'>
-                      <Settings />
-                    </Button>
-                  </TooltipTrigger>
-                </DropdownMenuTrigger>
-                <TooltipContent>Change data source</TooltipContent>
-              </Tooltip>
-              <DropdownMenuContent>
-                <DropdownMenuLabel>Data source</DropdownMenuLabel>
-                <DropdownMenuGroup>
-                  {(Object.keys(datasets) as DatasetKey[]).map(k => (
-                    <DropdownMenuItem key={k} onSelect={() => setKey(k)}>
-                      <span className='flex-1'>{datasets[k].title}</span>
-                      <DropdownMenuItemIcon>
-                        <Check className={cn(key !== k && 'opacity-0')} />
-                      </DropdownMenuItemIcon>
-                    </DropdownMenuItem>
-                  ))}
-                </DropdownMenuGroup>
-              </DropdownMenuContent>
-            </DropdownMenu>
+          <ChartActions alwaysVisible={menuOpen}>
+            <Tooltip disabled={menuOpen}>
+              <TooltipTrigger asChild>
+                <span className='inline-flex'>
+                  <DropdownMenu onOpenChange={setMenuOpen}>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant='ghost' color='neutral' size='small' aria-label='Settings'>
+                        <Settings />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuLabel>Data source</DropdownMenuLabel>
+                      <DropdownMenuGroup>
+                        {(Object.keys(datasets) as DatasetKey[]).map(k => (
+                          <DropdownMenuItem key={k} onSelect={() => setKey(k)}>
+                            <span className='flex-1'>{datasets[k].title}</span>
+                            <DropdownMenuItemIcon>
+                              <Check className={cn(key !== k && 'opacity-0')} />
+                            </DropdownMenuItemIcon>
+                          </DropdownMenuItem>
+                        ))}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>Change data source</TooltipContent>
+            </Tooltip>
           </ChartActions>
         </ChartHeader>
         <BarList max={current.max}>
