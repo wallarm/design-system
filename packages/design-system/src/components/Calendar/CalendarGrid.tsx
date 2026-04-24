@@ -37,7 +37,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
         const targetMonth = visibleRange.start.month;
 
         return (
-          <DatePicker.View view='day' className='flex flex-col gap-8'>
+          <DatePicker.View view='day' className='flex flex-col'>
             <CalendarHeader
               showArrows={showArrows}
               showJumpToToday={showJumpToToday}
