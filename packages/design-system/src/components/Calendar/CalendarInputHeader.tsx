@@ -54,12 +54,7 @@ const SingleDateInputInner: FC<{
 
   return (
     <div className='flex flex-1' onKeyDown={e => e.stopPropagation()}>
-      <DateInput
-        value={inputValue}
-        onChange={handleChange}
-        isReadOnly={readonly}
-        granularity='day'
-      />
+      <DateInput value={inputValue} onChange={handleChange} readOnly={readonly} granularity='day' />
     </div>
   );
 };
@@ -122,7 +117,7 @@ const RangeDateInputInner: FC<{
       <DateInput
         value={startValue}
         onChange={handleStartChange}
-        isReadOnly={readonly}
+        readOnly={readonly}
         granularity='day'
       />
       {/* Arrow positioned absolutely in center per Figma design */}
@@ -132,7 +127,7 @@ const RangeDateInputInner: FC<{
       <DateInput
         value={endValue}
         onChange={handleEndChange}
-        isReadOnly={readonly}
+        readOnly={readonly}
         granularity='day'
       />
     </div>

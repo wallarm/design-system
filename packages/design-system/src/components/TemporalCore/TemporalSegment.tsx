@@ -5,13 +5,18 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { getMonthSegmentText } from './utils';
 
+function resolveSegmentText(segment: DateSegment): string {
+  if (segment.type === 'month' && segment.value != null && !segment.isPlaceholder) {
+    return getMonthSegmentText(segment.value, segment.placeholder);
+  }
+  if (segment.type === 'dayPeriod') {
+    return segment.text.toUpperCase();
+  }
+  return segment.text;
+}
+
 const segmentVariants = cva(
-  cn(
-    'relative outline-none text-left',
-    'font-sans text-sm transition-all',
-    'focus:bg-bg-fill-brand focus:text-text-primary-alt',
-    'focus:outline-none',
-  ),
+  cn('relative outline-none text-left', 'font-sans text-sm transition-all', 'focus:outline-none'),
   {
     variants: {
       isPlaceholder: {
@@ -19,12 +24,20 @@ const segmentVariants = cva(
         false: 'text-text-primary',
       },
       disabled: {
-        true: 'cursor-not-allowed opacity-50',
+        true: 'cursor-not-allowed',
         false: 'hover:bg-states-primary-default-alt cursor-text',
       },
+      // Focus styling is tied to editability: editable segments get the
+      // brand blue fill + alt-colour text that make keyboard focus obvious.
+      // Literal / read-only segments keep the surrounding text colour (so
+      // focus doesn't make the value invisible) and show a focus-visible
+      // ring so keyboard users can still see where focus landed.
       type: {
-        literal: 'text-text-primary select-none hover:bg-transparent focus:bg-transparent',
-        editable: 'px-1',
+        literal: cn(
+          'text-text-primary select-none hover:bg-transparent focus:bg-transparent rounded-2',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-focus-primary',
+        ),
+        editable: 'px-1 focus:bg-bg-fill-brand focus:text-text-primary-alt',
       },
     },
     defaultVariants: {
@@ -61,10 +74,12 @@ export const TemporalSegment: FC<TemporalSegmentProps> = ({
   if (isLiteral) {
     return (
       <span
-        className={segmentVariants({
-          type: 'literal',
-          disabled,
-        })}
+        className={cn(
+          segmentVariants({
+            type: 'literal',
+            disabled,
+          }),
+        )}
         aria-hidden='true'
       >
         {displayOverride ?? segment.text}
@@ -72,22 +87,19 @@ export const TemporalSegment: FC<TemporalSegmentProps> = ({
     );
   }
 
-  // Always show short month names when value is present
-  const displayText =
-    displayOverride ??
-    (segment.type === 'month' && segment.value != null && !segment.isPlaceholder
-      ? getMonthSegmentText(segment.value, segment.placeholder)
-      : segment.text);
+  const displayText = displayOverride ?? resolveSegmentText(segment);
 
   return (
     <span
       {...segmentProps}
       ref={ref}
-      className={segmentVariants({
-        type: isEditable ? 'editable' : 'literal',
-        isPlaceholder: segment.isPlaceholder,
-        disabled: disabled || !isEditable,
-      })}
+      className={cn(
+        segmentVariants({
+          type: isEditable ? 'editable' : 'literal',
+          isPlaceholder: segment.isPlaceholder,
+          disabled: disabled || !isEditable,
+        }),
+      )}
       data-segment={segment.type}
       data-placeholder={segment.isPlaceholder || undefined}
     >

@@ -1,11 +1,14 @@
 import { useState } from 'react';
-import { getLocalTimeZone, now, today } from '@internationalized/date';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Calendar } from '../../icons';
+import { CalendarDate, CalendarDateTime, getLocalTimeZone, today } from '../../index';
+import { DateFormatProvider } from '../DateFormatProvider';
 import { Field, FieldAction, FieldDescription, FieldError, FieldLabel } from '../Field';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { DateInput } from './DateInput';
+
+const sampleDate = new CalendarDate(2026, 1, 1);
+const sampleDateTime = new CalendarDateTime(2026, 1, 1, 22, 0);
 
 const meta: Meta<typeof DateInput> = {
   title: 'Inputs Date/DateInput',
@@ -26,12 +29,6 @@ const meta: Meta<typeof DateInput> = {
       description:
         'Determines the smallest unit of time that can be edited. `day` shows date only, `hour`/`minute`/`second` add time segments.',
     },
-    hourCycle: {
-      control: 'select',
-      options: [12, 24],
-      description:
-        'Force 12-hour (AM/PM) or 24-hour format. When not set, the hour cycle is determined by the browser locale.',
-    },
     error: {
       control: 'boolean',
       description: 'Whether the input has an error state.',
@@ -40,9 +37,17 @@ const meta: Meta<typeof DateInput> = {
       control: 'boolean',
       description: 'Whether the input is disabled.',
     },
+    readOnly: {
+      control: 'boolean',
+      description: 'Whether the input is read-only. Displays value but prevents editing.',
+    },
     placeholder: {
       control: 'text',
       description: 'Placeholder text shown when no value is selected.',
+    },
+    showIcon: {
+      control: 'boolean',
+      description: 'Whether to show the leading calendar icon. Default: true.',
     },
     showTimeDropdown: {
       control: 'boolean',
@@ -53,23 +58,37 @@ const meta: Meta<typeof DateInput> = {
       control: 'number',
       description: 'Time interval in minutes for dropdown options.',
     },
+    size: {
+      control: 'select',
+      options: ['default', 'medium', 'small'],
+      description: 'Visual size: default (36px), medium (32px), small (24px).',
+    },
   },
   args: {
     granularity: 'day',
     error: false,
     disabled: false,
-    icon: Calendar,
-    placeholder: '',
-    showTimeDropdown: false,
-    timeStep: undefined,
+    readOnly: false,
+    showIcon: true,
+    size: 'default',
   },
 };
 
 export default meta;
 
+const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
+  Story => (
+    <div style={{ minHeight: 360, paddingBottom: 280 }}>
+      <Story />
+    </div>
+  ),
+];
+
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
   return <DateInput {...args} />;
 };
+Basic.decorators = dropdownRoom;
+Basic.parameters = { layout: 'padded' };
 
 export const WithIcon: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
@@ -77,13 +96,13 @@ export const WithIcon: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Without icon
       </Text>
-      <DateInput />
+      <DateInput showIcon={false} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         With icon
       </Text>
-      <DateInput icon={Calendar} />
+      <DateInput />
     </VStack>
   </HStack>
 );
@@ -94,49 +113,136 @@ export const States: StoryFn<typeof meta> = () => (
       <Text size='sm' color='secondary'>
         Default
       </Text>
-      <DateInput icon={Calendar} placeholder='Select a date' />
+      <DateInput />
+      <DateInput defaultValue={sampleDate} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         Disabled
       </Text>
-      <DateInput icon={Calendar} placeholder='Select a date' disabled />
+      <DateInput disabled />
+      <DateInput disabled defaultValue={sampleDate} />
     </VStack>
     <VStack gap={12}>
       <Text size='sm' color='secondary'>
         Error
       </Text>
-      <DateInput icon={Calendar} placeholder='Select a date' error />
+      <DateInput error />
+      <DateInput error defaultValue={sampleDate} />
     </VStack>
   </HStack>
+);
+
+export const Sizes: StoryFn<typeof meta> = () => (
+  <HStack gap={24}>
+    <VStack gap={16}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Default (36px)
+        </Text>
+        <DateInput size='default' />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Medium (32px)
+        </Text>
+        <DateInput size='medium' />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Small (24px)
+        </Text>
+        <DateInput size='small' />
+      </VStack>
+    </VStack>
+    <VStack gap={16}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Default filled
+        </Text>
+        <DateInput size='default' defaultValue={sampleDate} />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Medium filled
+        </Text>
+        <DateInput size='medium' defaultValue={sampleDate} />
+      </VStack>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Small filled
+        </Text>
+        <DateInput size='small' defaultValue={sampleDate} />
+      </VStack>
+    </VStack>
+  </HStack>
+);
+
+export const Filled: StoryFn<typeof meta> = () => (
+  <VStack gap={16}>
+    <VStack gap={4}>
+      <Text size='sm' color='secondary'>
+        Date
+      </Text>
+      <DateInput defaultValue={sampleDate} />
+    </VStack>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Date + time (24h)
+        </Text>
+        <DateInput granularity='minute' defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <VStack gap={4}>
+        <Text size='sm' color='secondary'>
+          Date + time (12h)
+        </Text>
+        <DateInput granularity='minute' defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+    <VStack gap={4}>
+      <Text size='sm' color='secondary'>
+        Without icon
+      </Text>
+      <DateInput showIcon={false} defaultValue={sampleDate} />
+    </VStack>
+  </VStack>
 );
 
 export const Granularity: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        12-hour format
-      </Text>
-      <DateInput icon={Calendar} placeholder='day' granularity='day' hourCycle={12} />
-      <DateInput icon={Calendar} placeholder='hour' granularity='hour' hourCycle={12} />
-      <DateInput icon={Calendar} placeholder='minute' granularity='minute' hourCycle={12} />
-      <DateInput icon={Calendar} placeholder='second' granularity='second' hourCycle={12} />
-    </VStack>
-    <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        24-hour format
-      </Text>
-      <DateInput icon={Calendar} placeholder='day' granularity='day' hourCycle={24} />
-      <DateInput icon={Calendar} placeholder='hour' granularity='hour' hourCycle={24} />
-      <DateInput icon={Calendar} placeholder='minute' granularity='minute' hourCycle={24} />
-      <DateInput icon={Calendar} placeholder='second' granularity='second' hourCycle={24} />
-    </VStack>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          12-hour format
+        </Text>
+        <DateInput placeholder='day' granularity='day' />
+        <DateInput placeholder='hour' granularity='hour' />
+        <DateInput placeholder='minute' granularity='minute' />
+        <DateInput placeholder='second' granularity='second' />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          24-hour format
+        </Text>
+        <DateInput placeholder='day' granularity='day' />
+        <DateInput placeholder='hour' granularity='hour' />
+        <DateInput placeholder='minute' granularity='minute' />
+        <DateInput placeholder='second' granularity='second' />
+      </VStack>
+    </DateFormatProvider>
   </HStack>
 );
 
 export const WithFieldComponents: StoryFn<typeof meta> = () => {
-  const [value, setValue] = useState<any>(null);
-  const [errorValue, setErrorValue] = useState<any>(today(getLocalTimeZone()));
+  // With `granularity='day'` the runtime value is always a CalendarDate —
+  // onChange gets cast on the way in so app state stays narrowly typed.
+  const [value, setValue] = useState<CalendarDate | null>(null);
+  const [errorValue, setErrorValue] = useState<CalendarDate | null>(today(getLocalTimeZone()));
 
   const handleSetNow = () => {
     setValue(today(getLocalTimeZone()));
@@ -149,15 +255,106 @@ export const WithFieldComponents: StoryFn<typeof meta> = () => {
           Label
           <FieldAction onClick={handleSetNow}>Set now</FieldAction>
         </FieldLabel>
-        <DateInput icon={Calendar} placeholder='Select a date' value={value} onChange={setValue} />
+        <DateInput
+          placeholder='Select a date'
+          value={value}
+          onChange={v => setValue(v as CalendarDate | null)}
+        />
         <FieldDescription>This is an input description.</FieldDescription>
       </Field>
 
       <Field invalid>
         <FieldLabel>Label</FieldLabel>
-        <DateInput icon={Calendar} error value={errorValue} onChange={setErrorValue} />
+        <DateInput
+          error
+          value={errorValue}
+          onChange={v => setErrorValue(v as CalendarDate | null)}
+        />
         <FieldError>An error message.</FieldError>
       </Field>
     </VStack>
   );
 };
+
+/**
+ * Demonstrates both segment orders side by side. Each column wraps its
+ * DateInputs in a scoped `DateFormatProvider` — in real apps the provider
+ * is mounted once near the root and the whole tree picks up a single order.
+ */
+export const DateOrderComparison: StoryFn<typeof meta> = () => (
+  <HStack gap={32}>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          Day first — DD MMM YYYY
+        </Text>
+        <DateInput />
+        <DateInput defaultValue={sampleDate} />
+        <DateInput granularity='minute' defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='month-first' hourCycle={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          Month first — MMM DD YYYY
+        </Text>
+        <DateInput />
+        <DateInput defaultValue={sampleDate} />
+        <DateInput granularity='minute' defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+  </HStack>
+);
+DateOrderComparison.parameters = { layout: 'padded' };
+
+/**
+ * Demonstrates `hourCycle` picked up from `DateFormatProvider`, not passed
+ * per input. Left column wraps in `hourCycle={12}`, right in `hourCycle={24}`;
+ * no `hourCycle` prop on the individual DateInputs.
+ */
+export const HourCycleByContext: StoryFn<typeof meta> = () => (
+  <HStack gap={32}>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          12-hour (AM/PM)
+        </Text>
+        <DateInput granularity='minute' defaultValue={sampleDateTime} />
+        <DateInput granularity='second' defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <VStack gap={12}>
+        <Text size='sm' color='secondary'>
+          24-hour
+        </Text>
+        <DateInput granularity='minute' defaultValue={sampleDateTime} />
+        <DateInput granularity='second' defaultValue={sampleDateTime} />
+      </VStack>
+    </DateFormatProvider>
+  </HStack>
+);
+HourCycleByContext.parameters = { layout: 'padded' };
+
+/**
+ * `readOnly` shows a value but removes every edit affordance — typing is
+ * ignored (react-aria), and the clear "×" is not rendered at all so users
+ * can't wipe the value.
+ */
+export const ReadOnly: StoryFn<typeof meta> = () => (
+  <HStack gap={24}>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        Date
+      </Text>
+      <DateInput readOnly defaultValue={sampleDate} />
+    </VStack>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        Date + time
+      </Text>
+      <DateInput readOnly granularity='minute' defaultValue={sampleDateTime} />
+    </VStack>
+  </HStack>
+);
+ReadOnly.parameters = { layout: 'padded' };

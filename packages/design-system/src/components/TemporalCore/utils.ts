@@ -15,3 +15,23 @@ export function getMonthSegmentText(value: number | null, placeholder = 'MM'): s
 
   return getMonthName(value);
 }
+
+export type TemporalGranularity = 'day' | 'hour' | 'minute' | 'second';
+
+interface DefaultPlaceholderOptions {
+  granularity?: TemporalGranularity;
+  isRange?: boolean;
+  isTimeOnly?: boolean;
+}
+
+export function getDefaultTemporalPlaceholder({
+  granularity,
+  isRange = false,
+  isTimeOnly = false,
+}: DefaultPlaceholderOptions): string {
+  if (isTimeOnly) return 'Select time';
+  if (granularity === 'day' || granularity === undefined) {
+    return isRange ? 'Select a date range' : 'Select a date';
+  }
+  return isRange ? 'Select date and time range' : 'Select date and time';
+}

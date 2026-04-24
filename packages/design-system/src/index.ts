@@ -1,3 +1,26 @@
+/**
+ * Re-export of `@internationalized/date` primitives — the runtime value types
+ * used by DateInput / TimeInput / DateRangeInput. Re-exporting from the DS
+ * barrel gives consumers a single import surface and lets us swap the
+ * underlying library later without breaking every caller.
+ *
+ * Note: `DateValue` is intentionally not re-exported here to avoid colliding
+ * with `Calendar`'s own `DateValue` type. Consumers can type state with the
+ * concrete classes (e.g. `useState<CalendarDate | null>`) — TypeScript
+ * narrows the union automatically.
+ */
+export {
+  CalendarDate,
+  CalendarDateTime,
+  getLocalTimeZone,
+  parseDate,
+  parseDateTime,
+  parseTime,
+  parseZonedDateTime,
+  Time,
+  today,
+  ZonedDateTime,
+} from '@internationalized/date';
 export {
   Alert,
   AlertClose,
@@ -112,6 +135,13 @@ export {
   type CountryNameProps,
   type CountryProps,
 } from './components/Country';
+export {
+  type DateFormatContextValue,
+  DateFormatProvider,
+  type DateFormatProviderProps,
+  type DateOrder,
+  useDateFormat,
+} from './components/DateFormatProvider';
 export { DateInput, type DateInputProps } from './components/DateInput';
 export {
   DateRangeEndValue,
@@ -361,7 +391,7 @@ export {
   ThemeProvider,
   useTheme,
 } from './components/ThemeProvider';
-export { TimeInput } from './components/TimeInput';
+export { TimeInput, type TimeInputProps } from './components/TimeInput';
 export { Toast, ToastActions, Toaster, toaster } from './components/Toast';
 export {
   ToggleButton,

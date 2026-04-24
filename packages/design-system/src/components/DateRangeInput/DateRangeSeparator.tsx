@@ -1,9 +1,9 @@
 import type { FC } from 'react';
-import { ArrowRight } from '../../icons';
 import { cn } from '../../utils/cn';
 
 /**
- * Visual separator (arrow icon) between start and end date fields in a date range input.
+ * Visual separator between start and end date fields in a date range input.
+ * Renders a Unicode right arrow as plain text.
  * Used within DateRangeProvider for custom compositions.
  *
  * @example
@@ -15,8 +15,8 @@ import { cn } from '../../utils/cn';
  */
 export const DateRangeSeparator: FC = () => {
   return (
-    <span className={cn('text-icon-secondary select-none')} aria-hidden='true'>
-      <ArrowRight size='md' />
+    <span className={cn('text-sm text-text-secondary select-none')} aria-hidden='true'>
+      →
     </span>
   );
 };
