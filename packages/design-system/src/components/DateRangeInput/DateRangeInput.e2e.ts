@@ -75,7 +75,7 @@ test.describe('Component: DateRangeInput', () => {
 
     test('Should render separator as text arrow between fields', async ({ page }) => {
       await dateRangeInputStory.goto(page, 'Filled');
-      const separator = page.locator('[data-slot="date-range-group"] > span').first();
+      const separator = page.locator('[data-slot="date-range-separator"]').first();
 
       await expect(separator).toHaveText('→');
     });
