@@ -41,6 +41,18 @@ export const useKeyboardNav = ({
   const [activeIndex, setActiveIndex] = useState(-1);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
+  // Registry of menu item DOM elements keyed by item id — populated via
+  // registerItem callback ref (see return value). Avoids querySelector lookup.
+  const itemRegistryRef = useRef<Map<string, HTMLElement>>(new Map());
+
+  const registerItem = useCallback(
+    (id: string) => (el: HTMLElement | null) => {
+      if (el) itemRegistryRef.current.set(id, el);
+      else itemRegistryRef.current.delete(id);
+    },
+    [],
+  );
+
   // Mutable ref for the latest index — avoids stale closures in navigate
   const activeIndexRef = useRef(-1);
 
@@ -115,11 +127,7 @@ export const useKeyboardNav = ({
     const itemId = list[next]?.id;
     if (itemId) {
       requestAnimationFrame(() => {
-        const container = stateRef.current.menuRef?.current;
-        const el = container?.querySelector<HTMLElement>(
-          `[role="menuitem"][data-value="${CSS.escape(itemId)}"]`,
-        );
-        el?.scrollIntoView({ block: 'nearest' });
+        itemRegistryRef.current.get(itemId)?.scrollIntoView({ block: 'nearest' });
       });
     }
 
@@ -323,17 +331,13 @@ export const useKeyboardNav = ({
       setActiveIndex(idx);
       activeIndexRef.current = idx;
     }
-    // Scroll highlighted item into view
-    const container = stateRef.current.menuRef?.current;
-    const el = container?.querySelector<HTMLElement>(
-      `[role="menuitem"][data-value="${CSS.escape(details.highlightedValue)}"]`,
-    );
-    el?.scrollIntoView({ block: 'nearest' });
+    // Scroll highlighted item into view via the registry
+    itemRegistryRef.current.get(details.highlightedValue)?.scrollIntoView({ block: 'nearest' });
   }, []);
 
   // Empty string (not null) so DropdownMenu always passes it to Ark UI,
   // preventing Ark's default auto-highlight of the first item when focus is elsewhere.
   const highlightedValue = items[activeIndex]?.id ?? '';
 
-  return { activeIndex, setActiveIndex, highlightedValue, onHighlightChange, pendingIds };
+  return { activeIndex, setActiveIndex, highlightedValue, onHighlightChange, pendingIds, registerItem };
 };

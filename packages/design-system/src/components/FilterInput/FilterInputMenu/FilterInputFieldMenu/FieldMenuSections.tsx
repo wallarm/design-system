@@ -17,9 +17,15 @@ interface RecentSectionProps {
   conditions: Condition[];
   fields: FieldMetadata[];
   onSelect: (field: FieldMetadata) => void;
+  registerItem: (id: string) => (el: HTMLElement | null) => void;
 }
 
-export const RecentSection: FC<RecentSectionProps> = ({ conditions, fields, onSelect }) => (
+export const RecentSection: FC<RecentSectionProps> = ({
+  conditions,
+  fields,
+  onSelect,
+  registerItem,
+}) => (
   <>
     <DropdownMenuLabel>Recent</DropdownMenuLabel>
     <DropdownMenuGroup>
@@ -33,6 +39,7 @@ export const RecentSection: FC<RecentSectionProps> = ({ conditions, fields, onSe
           <DropdownMenuItem
             key={`recent-${index}`}
             value={`recent-${index}`}
+            ref={registerItem(`recent-${index}`)}
             onSelect={() => {
               if (fieldMeta) onSelect(fieldMeta);
             }}
@@ -57,9 +64,14 @@ RecentSection.displayName = 'RecentSection';
 interface SuggestionsSectionProps {
   fields: FieldMetadata[];
   onSelect: (field: FieldMetadata) => void;
+  registerItem: (id: string) => (el: HTMLElement | null) => void;
 }
 
-export const SuggestionsSection: FC<SuggestionsSectionProps> = ({ fields, onSelect }) => (
+export const SuggestionsSection: FC<SuggestionsSectionProps> = ({
+  fields,
+  onSelect,
+  registerItem,
+}) => (
   <>
     <DropdownMenuLabel>Suggestions</DropdownMenuLabel>
     <DropdownMenuGroup>
@@ -67,6 +79,7 @@ export const SuggestionsSection: FC<SuggestionsSectionProps> = ({ fields, onSele
         <DropdownMenuItem
           key={`suggested-${index}`}
           value={`suggested-${index}`}
+          ref={registerItem(`suggested-${index}`)}
           onSelect={() => onSelect(field)}
         >
           <span className='flex gap-2 items-center text-sm'>
@@ -88,13 +101,18 @@ SuggestionsSection.displayName = 'SuggestionsSection';
 interface OperatorsSectionProps {
   onSelectAnd?: () => void;
   onSelectOr?: () => void;
+  registerItem: (id: string) => (el: HTMLElement | null) => void;
 }
 
-export const OperatorsSection: FC<OperatorsSectionProps> = ({ onSelectAnd, onSelectOr }) => (
+export const OperatorsSection: FC<OperatorsSectionProps> = ({
+  onSelectAnd,
+  onSelectOr,
+  registerItem,
+}) => (
   <>
     <DropdownMenuSeparator />
     {onSelectAnd && (
-      <DropdownMenuItem value='and' onSelect={() => onSelectAnd()}>
+      <DropdownMenuItem value='and' ref={registerItem('and')} onSelect={() => onSelectAnd()}>
         <DropdownMenuItemIcon>
           <CirclePlus />
         </DropdownMenuItemIcon>
@@ -102,7 +120,7 @@ export const OperatorsSection: FC<OperatorsSectionProps> = ({ onSelectAnd, onSel
       </DropdownMenuItem>
     )}
     {onSelectOr && (
-      <DropdownMenuItem value='or' onSelect={() => onSelectOr()}>
+      <DropdownMenuItem value='or' ref={registerItem('or')} onSelect={() => onSelectOr()}>
         <DropdownMenuItemIcon>
           <CircleSlash />
         </DropdownMenuItemIcon>

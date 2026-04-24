@@ -76,6 +76,7 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
     highlightedValue,
     onHighlightChange,
     pendingIds,
+    registerItem,
     handleItemSelect,
   } = useValueMenuState({
     values: filteredValues,
@@ -129,6 +130,7 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
                 isChecked={selectedValues.includes(option.value)}
                 isPending={pendingIds.has(String(option.value))}
                 multiSelect={multiSelect}
+                registerItem={registerItem}
                 onSelect={() =>
                   handleItemSelect({
                     id: String(option.value),

@@ -121,7 +121,7 @@ export const useValueMenuState = ({
     onOpenChange?.(false);
   };
 
-  const { highlightedValue, onHighlightChange, pendingIds } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange, pendingIds, registerItem } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: handleItemSelect,
@@ -155,6 +155,7 @@ export const useValueMenuState = ({
     highlightedValue,
     onHighlightChange,
     pendingIds,
+    registerItem,
     commitChecked,
     handleItemSelect,
   };

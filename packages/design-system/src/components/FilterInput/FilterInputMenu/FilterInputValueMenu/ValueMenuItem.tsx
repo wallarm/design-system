@@ -12,6 +12,7 @@ interface ValueMenuItemProps {
   isPending: boolean;
   multiSelect: boolean;
   onSelect: () => void;
+  registerItem?: (id: string) => (el: HTMLElement | null) => void;
 }
 
 export const ValueMenuItem: FC<ValueMenuItemProps> = ({
@@ -20,10 +21,12 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
   isPending,
   multiSelect,
   onSelect,
+  registerItem,
 }) => (
   <DropdownMenuItem
     key={String(option.value)}
     value={String(option.value)}
+    ref={registerItem?.(String(option.value))}
     onSelect={onSelect}
     className={isPending ? 'bg-states-primary-hover' : undefined}
   >

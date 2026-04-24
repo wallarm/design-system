@@ -126,7 +126,7 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
     [filteredGroups, fieldType],
   );
 
-  const { highlightedValue, onHighlightChange } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange, registerItem } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: item => onSelect(item.value as FilterOperator),
@@ -159,6 +159,7 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
                   <DropdownMenuItem
                     key={operator}
                     value={operator}
+                    ref={registerItem(operator)}
                     onSelect={() => onSelect(operator)}
                   >
                     <DropdownMenuItemText>
