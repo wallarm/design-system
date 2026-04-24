@@ -339,5 +339,12 @@ export const useKeyboardNav = ({
   // preventing Ark's default auto-highlight of the first item when focus is elsewhere.
   const highlightedValue = items[activeIndex]?.id ?? '';
 
-  return { activeIndex, setActiveIndex, highlightedValue, onHighlightChange, pendingIds, registerItem };
+  return {
+    activeIndex,
+    setActiveIndex,
+    highlightedValue,
+    onHighlightChange,
+    pendingIds,
+    registerItem,
+  };
 };
