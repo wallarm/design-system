@@ -18,7 +18,7 @@ export const CalendarGrids = forwardRef<HTMLDivElement, CalendarGridsProps>(
     const { isRange } = useCalendarContext();
 
     return (
-      <div ref={ref} className={cn('flex px-12 pb-8', isRange && 'gap-12', className)}>
+      <div ref={ref} className={cn('flex px-12 pb-8 pt-12', isRange && 'gap-12', className)}>
         <CalendarGrid showArrows={!isRange} showJumpToToday={!isRange} />
         {isRange && <CalendarGrid showArrows showJumpToToday monthOffset={1} />}
       </div>
