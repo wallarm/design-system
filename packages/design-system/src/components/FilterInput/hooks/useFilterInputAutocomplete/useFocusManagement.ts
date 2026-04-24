@@ -79,14 +79,23 @@ export const useFocusManagement = ({
 
   useEffect(() => {
     if (menuState === 'closed') return;
+    if (!isFocused) return;
 
     let outerRaf = 0;
     let innerRaf = 0;
     outerRaf = requestAnimationFrame(() => {
       innerRaf = requestAnimationFrame(() => {
+        // Re-check at execution time: focus may have moved outside the component
+        // while rAFs were queued (e.g. user clicked a tenant switcher). Don't
+        // recapture in that case — AS-882.
+        const container = containerRef.current;
+        if (!container) return;
+        const active = document.activeElement as HTMLElement | null;
+        if (active && !container.contains(active) && !isMenuRelated(active)) return;
+
         if (editingSegment) {
           // Redirect focus to the segment input, beating Ark UI's focus steal
-          const segmentInput = containerRef.current?.querySelector<HTMLInputElement>(
+          const segmentInput = container.querySelector<HTMLInputElement>(
             `[data-slot="segment-${editingSegment}"] input`,
           );
           if (segmentInput && document.activeElement !== segmentInput) {
@@ -105,7 +114,7 @@ export const useFocusManagement = ({
       cancelAnimationFrame(outerRaf);
       cancelAnimationFrame(innerRaf);
     };
-  }, [menuState, inputRef, editingSegment, containerRef]);
+  }, [menuState, isFocused, inputRef, editingSegment, containerRef]);
 
   return { handleFocus, handleBlur };
 };
