@@ -15,10 +15,12 @@ export const CalendarKeyboardHints = forwardRef<HTMLDivElement, CalendarKeyboard
   ({ className }, ref) => (
     <div ref={ref} className={cn('flex items-center gap-12', className)}>
       <div className='flex items-center gap-4'>
-        <Kbd size='small'>&larr;</Kbd>
-        <Kbd size='small'>&uarr;</Kbd>
-        <Kbd size='small'>&darr;</Kbd>
-        <Kbd size='small'>&rarr;</Kbd>
+        <div className='flex items-center gap-2'>
+          <Kbd size='small'>&larr;</Kbd>
+          <Kbd size='small'>&uarr;</Kbd>
+          <Kbd size='small'>&darr;</Kbd>
+          <Kbd size='small'>&rarr;</Kbd>
+        </div>
         <span className='font-sans font-medium text-xs text-text-secondary'>to navigate</span>
       </div>
       <div className='flex items-center gap-4'>
@@ -26,7 +28,7 @@ export const CalendarKeyboardHints = forwardRef<HTMLDivElement, CalendarKeyboard
         <span className='font-sans font-medium text-xs text-text-secondary'>to select</span>
       </div>
       <div className='flex items-center gap-4'>
-        <Kbd size='small'>Esc</Kbd>
+        <Kbd size='small'>ESC</Kbd>
         <span className='font-sans font-medium text-xs text-text-secondary'>to close</span>
       </div>
     </div>
