@@ -80,14 +80,19 @@ test.describe('Component: Dialog', () => {
     test('Should close dialog when overlay is clicked', async ({ page }) => {
       await dialogStory.goto(page, 'Basic');
       await openDialog(page);
+      await expect(getDialogContent(page)).toBeVisible();
 
       // Force-click the backdrop corner to trigger Ark UI's DismissableLayer.
       // A real pointerdown (trusted event) is required — synthetic events via
       // dispatchEvent are ignored by the layer's listener. Position (10, 10)
       // hits backdrop only, away from the centered dialog content.
-      await page
-        .locator('[data-scope="dialog"][data-part="backdrop"]')
-        .click({ force: true, position: { x: 10, y: 10 } });
+      // Wait for the backdrop's open-animation to finish and its pointerdown
+      // listener to attach before clicking — otherwise the click can land
+      // before DismissableLayer is wired up.
+      const backdrop = page.locator('[data-scope="dialog"][data-part="backdrop"]');
+      await expect(backdrop).toBeVisible();
+      await expect(backdrop).toHaveAttribute('data-state', 'open');
+      await backdrop.click({ force: true, position: { x: 10, y: 10 } });
       await expect(getDialogContent(page)).toBeHidden();
     });
 
