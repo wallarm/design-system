@@ -103,7 +103,7 @@ export const CalendarHeader: FC<CalendarHeaderProps> = ({
                               api.setFocusedValue(todayDate as unknown as DateValue);
                             }}
                           >
-                            <JumpToTodayIcon size='sm' />
+                            <JumpToTodayIcon size='md' />
                           </Button>
                         </TooltipTrigger>
                         <TooltipContent>Jump to today</TooltipContent>
@@ -126,7 +126,7 @@ export const CalendarHeader: FC<CalendarHeaderProps> = ({
                               size='small'
                               aria-label='Previous month'
                             >
-                              <ArrowLeft size='sm' />
+                              <ArrowLeft size='md' />
                             </Button>
                           </DatePicker.PrevTrigger>
                         </TooltipTrigger>
@@ -141,7 +141,7 @@ export const CalendarHeader: FC<CalendarHeaderProps> = ({
                               size='small'
                               aria-label='Next month'
                             >
-                              <ArrowRight size='sm' />
+                              <ArrowRight size='md' />
                             </Button>
                           </DatePicker.NextTrigger>
                         </TooltipTrigger>
