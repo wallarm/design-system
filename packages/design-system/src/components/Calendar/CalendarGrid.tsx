@@ -126,7 +126,8 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                                   'text-text-secondary',
                                   (cellState.inRange || cellState.inHoveredRange) &&
                                     'bg-states-primary-pressed',
-                                  cellState.selected && 'bg-bg-fill-brand text-text-primary-alt',
+                                  cellState.selected &&
+                                    'bg-bg-fill-brand text-text-primary-alt font-medium',
                                 )}
                               >
                                 {day.day}
@@ -163,7 +164,8 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                                   'text-text-primary',
                                   (cellState.inRange || cellState.inHoveredRange) &&
                                     'bg-states-primary-pressed',
-                                  cellState.selected && 'bg-bg-fill-brand text-text-primary-alt',
+                                  cellState.selected &&
+                                    'bg-bg-fill-brand text-text-primary-alt font-medium',
                                 )}
                               >
                                 {day.day}
@@ -171,7 +173,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                               {isToday && (
                                 <span
                                   className={cn(
-                                    'absolute bottom-4 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full',
+                                    'absolute bottom-7 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full',
                                     'bg-bg-fill-brand',
                                     cellState.selected && 'bg-text-primary-alt',
                                   )}
@@ -202,7 +204,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                                 'w-36 h-36 rounded-8',
                                 'font-mono text-sm leading-sm',
                                 'transition-colors',
-                                '[[data-selected]_&]:bg-bg-fill-brand [[data-selected]_&]:text-text-primary-alt',
+                                '[[data-selected]_&]:bg-bg-fill-brand [[data-selected]_&]:text-text-primary-alt [[data-selected]_&]:font-medium',
                                 '[[data-in-range]_&]:bg-states-primary-pressed',
                                 '[[data-outside-range]_&]:text-text-secondary',
                                 '[[data-disabled]_&]:cursor-not-allowed [[data-disabled]_&]:line-through [[data-disabled]_&]:text-text-secondary',
@@ -219,7 +221,7 @@ export const CalendarGrid: FC<CalendarGridProps> = ({
                             {isToday && (
                               <span
                                 className={cn(
-                                  'absolute bottom-4 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full',
+                                  'absolute bottom-7 left-1/2 -translate-x-1/2 w-4 h-4 rounded-full',
                                   'bg-bg-fill-brand',
                                   '[[data-selected]_&]:bg-text-primary-alt',
                                 )}

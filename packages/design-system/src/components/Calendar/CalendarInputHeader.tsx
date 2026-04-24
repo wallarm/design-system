@@ -1,7 +1,6 @@
 import { type FC, useCallback } from 'react';
 import { DatePicker, type UseDatePickerReturn } from '@ark-ui/react';
 import type { DateValue as ReactAriaDateValue } from '@react-aria/datepicker';
-import { ArrowRight } from '../../icons';
 import { cn } from '../../utils/cn';
 import { DateInput } from '../DateInput';
 import { useCalendarContext } from './CalendarContext';
@@ -120,10 +119,12 @@ const RangeDateInputInner: FC<{
         readOnly={readonly}
         granularity='day'
       />
-      {/* Arrow positioned absolutely in center per Figma design */}
-      <div className='flex items-center justify-center shrink-0 basis-20' aria-hidden='true'>
-        <ArrowRight size='md' />
-      </div>
+      <span
+        className='flex items-center justify-center shrink-0 basis-20 font-sans text-sm leading-sm text-text-secondary'
+        aria-hidden='true'
+      >
+        →
+      </span>
       <DateInput
         value={endValue}
         onChange={handleEndChange}
