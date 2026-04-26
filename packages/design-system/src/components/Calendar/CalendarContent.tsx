@@ -20,7 +20,7 @@ export const CalendarContent = forwardRef<HTMLDivElement, CalendarContentProps>(
         <DatePicker.Content
           ref={ref}
           className={cn(
-            'flex bg-bg-surface-1 rounded-12 shadow-lg',
+            'flex bg-bg-surface-2 rounded-12 shadow-md',
             'border border-border-primary-light',
             // Animation (same as DropdownMenu/Popover)
             'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',

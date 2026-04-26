@@ -24,26 +24,26 @@ export const inputGroupVariants = cva(
 
     // Static state
     'border border-border-primary outline-none shadow-xs transition-[color,border,box-shadow]',
-    'has-[[data-slot=input]:not(:disabled):not([aria-disabled=true]):not(:focus-visible)]:hover:border-component-border-input-hover',
+    'has-[[data-slot=input]:not(:disabled):not([aria-disabled=true]):not([data-readonly=true]):not(:focus-visible)]:hover:border-component-border-input-hover',
 
     // Focus state.
     'focus-visible:ring-focus-primary',
-    'has-[[data-slot=input]:focus-visible]:ring-3',
-    'has-[[data-slot=input]:focus-visible]:ring-focus-primary',
-    'has-[[data-slot=input]:focus-visible]:border-border-strong-primary',
+    'has-[[data-slot=input]:not([data-readonly=true]):focus-visible]:ring-3',
+    'has-[[data-slot=input]:not([data-readonly=true]):focus-visible]:ring-focus-primary',
+    'has-[[data-slot=input]:not([data-readonly=true]):focus-visible]:border-border-strong-primary',
 
     'focus-within:ring-focus-primary',
-    'has-[[data-slot=input]:focus-within]:ring-3',
-    'has-[[data-slot=input]:focus-within]:ring-focus-primary',
-    'has-[[data-slot=input]:focus-within]:border-border-strong-primary',
+    'has-[[data-slot=input]:not([data-readonly=true]):focus-within]:ring-3',
+    'has-[[data-slot=input]:not([data-readonly=true]):focus-within]:ring-focus-primary',
+    'has-[[data-slot=input]:not([data-readonly=true]):focus-within]:border-border-strong-primary',
 
     // Error state.
     'has-[[data-slot][aria-invalid=true]]:border-border-strong-danger',
     'has-[[data-slot][aria-invalid=true]]:ring-focus-destructive',
-    'has-[[data-slot][aria-invalid=true]:not(:disabled):not([aria-disabled=true])]:hover:border-border-strong-danger',
-    'has-[[data-slot][aria-invalid=true]:not(:disabled):not([aria-disabled=true])]:hover:ring-3',
-    'has-[[data-slot][aria-invalid=true]:not(:disabled):not([aria-disabled=true])]:hover:ring-focus-destructive-hover',
-    'has-[[data-slot][aria-invalid=true]:not(:disabled):not([aria-disabled=true])]:*:data-[slot=input]:hover:ring-0',
+    'has-[[data-slot][aria-invalid=true]:not(:disabled):not([aria-disabled=true]):not([data-readonly=true])]:hover:border-border-strong-danger',
+    'has-[[data-slot][aria-invalid=true]:not(:disabled):not([aria-disabled=true]):not([data-readonly=true])]:hover:ring-3',
+    'has-[[data-slot][aria-invalid=true]:not(:disabled):not([aria-disabled=true]):not([data-readonly=true])]:hover:ring-focus-destructive-hover',
+    'has-[[data-slot][aria-invalid=true]:not(:disabled):not([aria-disabled=true]):not([data-readonly=true])]:*:data-[slot=input]:hover:ring-0',
 
     // Disabled state.
     'has-[[data-slot=input]:disabled]:opacity-50',

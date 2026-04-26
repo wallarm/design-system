@@ -136,9 +136,10 @@ export const DateRangeSegmentGroup: FC<DateRangeSegmentGroupProps> = ({
         {...fieldProps}
         ref={composeRefs(internalRef, ref)}
         data-slot='input'
-        className={cn('h-full')}
+        className={cn('h-full', readOnly && 'cursor-not-allowed')}
         aria-disabled={disabled || undefined}
         aria-invalid={error || undefined}
+        data-readonly={readOnly || undefined}
         data-field-type={type}
         state={fieldState}
         disabled={disabled}
