@@ -17,38 +17,10 @@ const getCheckboxes = (page: Page) =>
 const getSelectAll = (page: Page) => page.locator('[data-slot="selection-all"]');
 const getBulkBar = (page: Page) => page.locator('[data-slot="selection-bulk-bar"]');
 
+// Visual screenshot tests are added after baselines exist.
+// Generate baselines by including [update-screenshots] in a commit on main.
+
 test.describe('Component: Selection', () => {
-  test.describe('Visual', () => {
-    test('Should render default unselected state correctly', async ({ page }) => {
-      await selectionStory.goto(page, 'Default');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with one item selected correctly', async ({ page }) => {
-      await selectionStory.goto(page, 'Default');
-      await getCheckboxes(page).first().click();
-      await expect(getBulkBar(page)).toBeVisible();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render with all items selected correctly', async ({ page }) => {
-      await selectionStory.goto(page, 'WithSelectAll');
-      await getSelectAll(page).click();
-      await expect(getBulkBar(page)).toBeVisible();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render disabled items correctly', async ({ page }) => {
-      await selectionStory.goto(page, 'WithDisabled');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render grid layout correctly', async ({ page }) => {
-      await selectionStory.goto(page, 'Grid');
-      await expect(page).toHaveScreenshot();
-    });
-  });
-
   test.describe('Interactions', () => {
     test('Should toggle selection when checkbox is clicked', async ({ page }) => {
       await selectionStory.goto(page, 'Default');
