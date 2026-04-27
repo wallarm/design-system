@@ -5,9 +5,13 @@ import { useSelectionContext } from './useSelectionContext';
 
 export interface SelectionAllProps {
   'data-testid'?: string;
+  'aria-label'?: string;
 }
 
-export const SelectionAll: FC<SelectionAllProps> = ({ 'data-testid': testIdProp }) => {
+export const SelectionAll: FC<SelectionAllProps> = ({
+  'data-testid': testIdProp,
+  'aria-label': ariaLabel = 'Select all',
+}) => {
   const { isAllSelected, isIndeterminate, enabledItemIds, selectAll, clear } =
     useSelectionContext();
   const fallbackTestId = useTestId('all');
@@ -17,6 +21,7 @@ export const SelectionAll: FC<SelectionAllProps> = ({ 'data-testid': testIdProp 
     <Checkbox
       data-testid={testId}
       data-slot='selection-all'
+      aria-label={ariaLabel}
       checked={isIndeterminate ? 'indeterminate' : isAllSelected}
       disabled={enabledItemIds.length === 0}
       onCheckedChange={() => (isAllSelected ? clear() : selectAll())}
