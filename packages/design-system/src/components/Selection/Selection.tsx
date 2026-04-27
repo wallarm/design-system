@@ -1,24 +1,9 @@
-import { type FC, type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
-import { Popover as ArkUiPopover } from '@ark-ui/react/popover';
+import { type ReactNode, useCallback, useMemo, useRef, useState } from 'react';
 import { useIsKeyPressed } from '../../hooks/useIsKeyPressed';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { SelectionContext, type SelectionContextValue } from './SelectionContext';
 import { useSelectionState } from './useSelectionState';
-
-const SELECTION_BULKBAR_HEIGHT = 52;
-const SELECTION_BULKBAR_OFFSET = 32;
-
-const SELECTION_BULKBAR_POSITIONING: ArkUiPopover.RootProps['positioning'] = Object.freeze({
-  strategy: 'fixed',
-  placement: 'bottom',
-  gutter: 32,
-  overlap: true,
-  flip: false,
-  offset: {
-    mainAxis: -(SELECTION_BULKBAR_HEIGHT + SELECTION_BULKBAR_OFFSET),
-  },
-});
 
 export interface SelectionProps<T> extends TestableProps {
   /** Source array — used for select-all and shift-click range ordering. */
@@ -110,20 +95,13 @@ export const Selection = <T,>({
   return (
     <SelectionContext.Provider value={ctxValue}>
       <TestIdProvider value={testId}>
-        <ArkUiPopover.Root
-          open={value.length > 0}
-          closeOnInteractOutside={false}
-          portalled={false}
-          positioning={SELECTION_BULKBAR_POSITIONING}
+        <div
+          data-slot='selection'
+          data-testid={testId}
+          className={cn('outline-none', className)}
         >
-          <ArkUiPopover.Anchor
-            data-slot='selection'
-            data-testid={testId}
-            className={cn('relative outline-none', className)}
-          >
-            {children}
-          </ArkUiPopover.Anchor>
-        </ArkUiPopover.Root>
+          {children}
+        </div>
       </TestIdProvider>
     </SelectionContext.Provider>
   );
