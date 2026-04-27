@@ -26,11 +26,22 @@ export const SelectionItem: FC<SelectionItemProps> = ({
     return registerDisabled(itemId, disabled);
   }, [itemId, disabled, registerDisabled]);
 
+  // Shift-click toggles a range. We handle it on the wrapper because
+  // browsers suppress the label→input forwarding when modifier keys are
+  // held, so ARK's onCheckedChange never fires for shift-clicks.
+  const handleClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (disabled || !e.shiftKey) return;
+    e.preventDefault();
+    e.stopPropagation();
+    toggleItem(itemId, { shiftKey: true });
+  };
+
   return (
     <div
       data-slot='selection-item'
       data-selected={selected || undefined}
       className={cn(selectionItemVariants(), className)}
+      onClickCapture={handleClickCapture}
     >
       <Checkbox checked={selected} disabled={disabled} onCheckedChange={() => toggleItem(itemId)}>
         <CheckboxIndicator />

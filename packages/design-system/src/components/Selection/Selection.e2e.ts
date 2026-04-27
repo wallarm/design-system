@@ -3,13 +3,13 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const selectionStory = createStoryHelper('data-display-selection', [
   'Default',
-  'WithSelectAll',
+  'With Select All',
   'Grid',
-  'WithDisabled',
-  'RangeSelection',
-  'BulkActions',
-  'EmptyAndPartial',
-  'WithoutBulkBar',
+  'With Disabled',
+  'Range Selection',
+  'Bulk Actions',
+  'Empty And Partial',
+  'Without Bulk Bar',
 ] as const);
 
 // `role="checkbox"` lives on ark-ui's hidden input; click targets the visible label.
@@ -33,7 +33,7 @@ test.describe('Component: Selection', () => {
     });
 
     test('Should select all when SelectionAll is clicked', async ({ page }) => {
-      await selectionStory.goto(page, 'WithSelectAll');
+      await selectionStory.goto(page, 'With Select All');
       await getSelectAll(page).click();
       const checkboxes = getCheckboxes(page);
       const count = await checkboxes.count();
@@ -45,18 +45,16 @@ test.describe('Component: Selection', () => {
     test('Should clear selection via Clear link in bulk bar', async ({ page }) => {
       await selectionStory.goto(page, 'Default');
       await getCheckboxes(page).first().click();
-      await getBulkBar(page).getByRole('link', { name: 'Clear' }).click();
+      await getBulkBar(page).getByText('Clear', { exact: true }).click();
       await expect(getCheckboxes(page).first()).toHaveAttribute('data-state', 'unchecked');
       await expect(getBulkBar(page)).toBeHidden();
     });
 
     test('Should select range when shift-clicking', async ({ page }) => {
-      await selectionStory.goto(page, 'RangeSelection');
+      await selectionStory.goto(page, 'Range Selection');
       const checkboxes = getCheckboxes(page);
       await checkboxes.nth(0).click();
-      await page.keyboard.down('Shift');
-      await checkboxes.nth(2).click();
-      await page.keyboard.up('Shift');
+      await checkboxes.nth(2).click({ modifiers: ['Shift'] });
 
       await expect(checkboxes.nth(0)).toHaveAttribute('data-state', 'checked');
       await expect(checkboxes.nth(1)).toHaveAttribute('data-state', 'checked');
@@ -64,7 +62,7 @@ test.describe('Component: Selection', () => {
     });
 
     test('Should not toggle disabled items', async ({ page }) => {
-      await selectionStory.goto(page, 'WithDisabled');
+      await selectionStory.goto(page, 'With Disabled');
       const lockedCheckbox = page.locator('[data-slot="selection-item"]').last().locator('label');
       await expect(lockedCheckbox).toHaveAttribute('data-disabled', '');
     });
@@ -86,7 +84,7 @@ test.describe('Component: Selection', () => {
     });
 
     test('Should expose mixed aria state on indeterminate SelectionAll', async ({ page }) => {
-      await selectionStory.goto(page, 'WithSelectAll');
+      await selectionStory.goto(page, 'With Select All');
       await getCheckboxes(page).first().click();
       await expect(getSelectAll(page)).toHaveAttribute('data-state', 'indeterminate');
     });
