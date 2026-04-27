@@ -10,7 +10,7 @@ const SELECTION_BULKBAR_HEIGHT = 52;
 const SELECTION_BULKBAR_OFFSET = 32;
 
 const SELECTION_BULKBAR_POSITIONING: ArkUiPopover.RootProps['positioning'] = Object.freeze({
-  strategy: 'absolute',
+  strategy: 'fixed',
   placement: 'bottom',
   gutter: 32,
   overlap: true,
