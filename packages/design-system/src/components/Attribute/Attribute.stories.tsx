@@ -542,3 +542,16 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
     </div>
   </div>
 );
+
+export const HorizontalLoading: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-8'>
+    <Attribute orientation='horizontal' loading>
+      <AttributeLabel>Created at</AttributeLabel>
+      <AttributeValue />
+    </Attribute>
+    <Attribute orientation='horizontal' loading>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue />
+    </Attribute>
+  </div>
+);
