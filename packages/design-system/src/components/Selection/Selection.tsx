@@ -84,6 +84,7 @@ export const Selection = <T,>({
     () => ({
       itemIds: state.itemIds,
       enabledItemIds: state.enabledItemIds,
+      selectedIds: state.selectedIds,
       isSelected: state.isSelected,
       isAllSelected: state.isAllSelected,
       isIndeterminate: state.isIndeterminate,
@@ -95,6 +96,7 @@ export const Selection = <T,>({
     [
       state.itemIds,
       state.enabledItemIds,
+      state.selectedIds,
       state.isSelected,
       state.isAllSelected,
       state.isIndeterminate,
