@@ -102,17 +102,15 @@ test.describe('Component: DateInput', () => {
       await expect(clearButton).toHaveCount(0);
     });
 
-    test('Should keep segment text visible when focused in read-only mode', async ({ page }) => {
+    test('Should not allow focusing segments in read-only mode', async ({ page }) => {
       await dateInputStory.goto(page, 'Read Only');
       const daySegment = page.locator('[data-slot="date-input"] [data-segment="day"]').first();
-      const expectedText = await daySegment.textContent();
 
-      await daySegment.focus();
-      await expect(daySegment).toBeFocused();
-      // Regression guard: focusing a read-only segment used to apply alt-colour
-      // text on a transparent background, making the value invisible.
-      await expect(page).toHaveScreenshot();
-      await expect(daySegment).toHaveText(expectedText ?? '');
+      await expect(daySegment).toHaveAttribute('aria-hidden', 'true');
+      await expect(daySegment).not.toHaveAttribute('tabindex', /.*/);
+
+      await daySegment.focus().catch(() => undefined);
+      await expect(daySegment).not.toBeFocused();
     });
   });
 
