@@ -38,10 +38,10 @@ export const SelectionBulkBar: FC<SelectionBulkBarProps> = ({
           data-slot='selection-bulk-bar'
           data-testid={testId}
           className={cn(
-            'z-[200] flex flex-nowrap items-center gap-8',
+            'z-[200] flex w-fit flex-nowrap items-center gap-8',
             isInDrawer
-              ? 'absolute inset-x-12 bottom-12 justify-between'
-              : 'fixed bottom-32 left-1/2 -translate-x-1/2 w-fit max-w-[calc(100vw-32px)]',
+              ? 'absolute bottom-12 left-1/2 -translate-x-1/2 max-w-[calc(100%-24px)]'
+              : 'fixed bottom-32 left-1/2 -translate-x-1/2 max-w-[calc(100vw-32px)]',
             'bg-component-toast-bg rounded-16 shadow-lg',
             'pl-12 pr-8 py-8',
             // Keep bulk actions on a single row even when the bar is narrow
