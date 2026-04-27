@@ -456,7 +456,7 @@ export const HorizontalValueTruncation: StoryFn<AttributeProps> = () => (
     <Attribute orientation='horizontal'>
       <AttributeLabel>Users</AttributeLabel>
       <AttributeValue>
-        <Text size='sm'>
+        <Text size='sm' truncate>
           artem@acme.com, uxd@acme.com, ops@acme.com, security@acme.com, admin@acme.com
         </Text>
       </AttributeValue>
