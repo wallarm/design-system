@@ -15,7 +15,7 @@ export const SelectionBulkBarSummary: FC = () => {
       data-testid={testId}
       className='flex flex-nowrap items-center gap-16 p-8 whitespace-nowrap'
     >
-      <Text size='sm' color='primary-alt' weight='medium' className='whitespace-nowrap'>
+      <Text size='sm' color='primary-alt' weight='medium' truncate>
         {count} selected
       </Text>
 
