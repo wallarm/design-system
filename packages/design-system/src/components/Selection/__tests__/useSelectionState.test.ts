@@ -11,7 +11,7 @@ const getItemId = (item: Item) => item.id;
 
 const setup = (initial: string[] = []) => {
   const onChange = vi.fn();
-  let value = initial;
+  const value = initial;
   const { result, rerender } = renderHook(
     ({ value }) =>
       useSelectionState({
@@ -109,6 +109,57 @@ describe('useSelectionState', () => {
       expect(result.current.isAllSelected).toBe(false);
       expect(result.current.isIndeterminate).toBe(false);
       expect(result.current.isSelected('ghost')).toBe(true);
+    });
+  });
+
+  describe('disabled support', () => {
+    const setupWithDisabled = (initial: string[], disabled: string[]) => {
+      const onChange = vi.fn();
+      const value = initial;
+      const { result, rerender } = renderHook(
+        ({ value, disabledIds }) =>
+          useSelectionState({
+            items,
+            getItemId,
+            value,
+            disabledIds,
+            onChange: ids => {
+              value = ids;
+              onChange(ids);
+            },
+          }),
+        { initialProps: { value, disabledIds: new Set(disabled) } },
+      );
+      return { result, onChange, rerender };
+    };
+
+    it('toggleItem on disabled id is a no-op', () => {
+      const { result, onChange } = setupWithDisabled([], ['b']);
+      act(() => result.current.toggleItem('b'));
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('selectAll excludes disabled ids', () => {
+      const { result, onChange } = setupWithDisabled([], ['b', 'd']);
+      act(() => result.current.selectAll());
+      expect(onChange).toHaveBeenCalledWith(['a', 'c']);
+    });
+
+    it('isAllSelected true when all enabled selected (some disabled)', () => {
+      const { result } = setupWithDisabled(['a', 'c'], ['b', 'd']);
+      expect(result.current.isAllSelected).toBe(true);
+      expect(result.current.isIndeterminate).toBe(false);
+    });
+
+    it('isAllSelected false when all items disabled', () => {
+      const { result } = setupWithDisabled([], ['a', 'b', 'c', 'd']);
+      expect(result.current.isAllSelected).toBe(false);
+      expect(result.current.isIndeterminate).toBe(false);
+    });
+
+    it('exposes enabledItemIds preserving order', () => {
+      const { result } = setupWithDisabled([], ['b']);
+      expect(result.current.enabledItemIds).toEqual(['a', 'c', 'd']);
     });
   });
 });

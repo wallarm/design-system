@@ -1,3 +1,4 @@
+// packages/design-system/src/components/Selection/useSelectionState.ts
 import { useCallback, useMemo } from 'react';
 
 export interface UseSelectionStateParams<T> {
@@ -5,10 +6,13 @@ export interface UseSelectionStateParams<T> {
   getItemId: (item: T) => string;
   value: string[];
   onChange: (ids: string[]) => void;
+  /** Set of itemIds that cannot be toggled and are excluded from selectAll. */
+  disabledIds?: Set<string>;
 }
 
 export interface UseSelectionStateResult {
   itemIds: string[];
+  enabledItemIds: string[];
   selectedIds: Set<string>;
   isSelected: (id: string) => boolean;
   isAllSelected: boolean;
@@ -18,32 +22,41 @@ export interface UseSelectionStateResult {
   clear: () => void;
 }
 
+const EMPTY_DISABLED: ReadonlySet<string> = new Set();
+
 export const useSelectionState = <T>({
   items,
   getItemId,
   value,
   onChange,
+  disabledIds,
 }: UseSelectionStateParams<T>): UseSelectionStateResult => {
   const itemIds = useMemo(() => items.map(getItemId), [items, getItemId]);
   const itemIdSet = useMemo(() => new Set(itemIds), [itemIds]);
+  const disabled = disabledIds ?? EMPTY_DISABLED;
+
+  const enabledItemIds = useMemo(
+    () => itemIds.filter(id => !disabled.has(id)),
+    [itemIds, disabled],
+  );
+
   const selectedIds = useMemo(() => new Set(value), [value]);
 
   const isSelected = useCallback((id: string) => selectedIds.has(id), [selectedIds]);
 
-  const validSelectedCount = useMemo(() => {
+  const enabledSelectedCount = useMemo(() => {
     let n = 0;
-    for (const id of selectedIds) if (itemIdSet.has(id)) n++;
+    for (const id of enabledItemIds) if (selectedIds.has(id)) n++;
     return n;
-  }, [selectedIds, itemIdSet]);
+  }, [enabledItemIds, selectedIds]);
 
-  const isAllSelected = itemIds.length > 0 && validSelectedCount === itemIds.length;
-  const isIndeterminate = validSelectedCount > 0 && validSelectedCount < itemIds.length;
+  const isAllSelected = enabledItemIds.length > 0 && enabledSelectedCount === enabledItemIds.length;
+  const isIndeterminate = enabledSelectedCount > 0 && enabledSelectedCount < enabledItemIds.length;
 
   const emitOrdered = useCallback(
     (ids: Set<string>) => {
       const next: string[] = [];
       for (const id of itemIds) if (ids.has(id)) next.push(id);
-      // preserve any "stale" ids that were already in `value` but not in items
       for (const id of value) if (!itemIdSet.has(id) && ids.has(id)) next.push(id);
       onChange(next);
     },
@@ -53,17 +66,18 @@ export const useSelectionState = <T>({
   const toggleItem = useCallback(
     (id: string) => {
       if (!itemIdSet.has(id)) return;
+      if (disabled.has(id)) return;
       const next = new Set(selectedIds);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       emitOrdered(next);
     },
-    [itemIdSet, selectedIds, emitOrdered],
+    [itemIdSet, disabled, selectedIds, emitOrdered],
   );
 
   const selectAll = useCallback(() => {
-    emitOrdered(new Set(itemIds));
-  }, [itemIds, emitOrdered]);
+    emitOrdered(new Set(enabledItemIds));
+  }, [enabledItemIds, emitOrdered]);
 
   const clear = useCallback(() => {
     onChange([]);
@@ -71,6 +85,7 @@ export const useSelectionState = <T>({
 
   return {
     itemIds,
+    enabledItemIds,
     selectedIds,
     isSelected,
     isAllSelected,
