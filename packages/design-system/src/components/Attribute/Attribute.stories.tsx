@@ -555,3 +555,67 @@ export const HorizontalLoading: StoryFn<AttributeProps> = () => (
     </Attribute>
   </div>
 );
+
+export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-8'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Source IP</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions data-testid='attribute-horizontal-with-actions'>
+          <AttributeActionsTarget>
+            <Text size='sm'>142.198.167.52</Text>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Badge color='red' variant='dotted'>
+              Blocked
+            </Badge>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
