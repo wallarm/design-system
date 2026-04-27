@@ -1,5 +1,5 @@
 // packages/design-system/src/components/Selection/useSelectionState.ts
-import { useCallback, useMemo } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 export interface UseSelectionStateParams<T> {
   items: T[];
@@ -10,6 +10,10 @@ export interface UseSelectionStateParams<T> {
   disabledIds?: Set<string>;
 }
 
+export interface ToggleItemOptions {
+  shiftKey?: boolean;
+}
+
 export interface UseSelectionStateResult {
   itemIds: string[];
   enabledItemIds: string[];
@@ -17,7 +21,7 @@ export interface UseSelectionStateResult {
   isSelected: (id: string) => boolean;
   isAllSelected: boolean;
   isIndeterminate: boolean;
-  toggleItem: (id: string) => void;
+  toggleItem: (id: string, opts?: ToggleItemOptions) => void;
   selectAll: () => void;
   clear: () => void;
 }
@@ -41,6 +45,7 @@ export const useSelectionState = <T>({
   );
 
   const selectedIds = useMemo(() => new Set(value), [value]);
+  const lastToggledIdRef = useRef<string | null>(null);
 
   const isSelected = useCallback((id: string) => selectedIds.has(id), [selectedIds]);
 
@@ -64,15 +69,40 @@ export const useSelectionState = <T>({
   );
 
   const toggleItem = useCallback(
-    (id: string) => {
+    (id: string, opts?: ToggleItemOptions) => {
       if (!itemIdSet.has(id)) return;
       if (disabled.has(id)) return;
+
+      const lastId = lastToggledIdRef.current;
+      const wantsRange = !!opts?.shiftKey && lastId !== null && lastId !== id;
+
+      if (wantsRange) {
+        const fromIdx = itemIds.indexOf(lastId);
+        const toIdx = itemIds.indexOf(id);
+        if (fromIdx !== -1 && toIdx !== -1) {
+          const start = Math.min(fromIdx, toIdx);
+          const end = Math.max(fromIdx, toIdx);
+          const selecting = !selectedIds.has(id);
+          const next = new Set(selectedIds);
+          for (let i = start; i <= end; i++) {
+            const rangeId = itemIds[i];
+            if (disabled.has(rangeId)) continue;
+            if (selecting) next.add(rangeId);
+            else next.delete(rangeId);
+          }
+          emitOrdered(next);
+          lastToggledIdRef.current = id;
+          return;
+        }
+      }
+
       const next = new Set(selectedIds);
       if (next.has(id)) next.delete(id);
       else next.add(id);
       emitOrdered(next);
+      lastToggledIdRef.current = id;
     },
-    [itemIdSet, disabled, selectedIds, emitOrdered],
+    [itemIdSet, disabled, itemIds, selectedIds, emitOrdered],
   );
 
   const selectAll = useCallback(() => {

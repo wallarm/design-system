@@ -11,25 +11,25 @@ const getItemId = (item: Item) => item.id;
 
 const setup = (initial: string[] = []) => {
   const onChange = vi.fn();
-  const value = initial;
+  let currentValue: string[] = initial;
   const { result, rerender } = renderHook(
-    ({ value }) =>
+    ({ value }: { value: string[] }) =>
       useSelectionState({
         items,
         getItemId,
         value,
         onChange: ids => {
-          value = ids;
+          currentValue = ids;
           onChange(ids);
         },
       }),
-    { initialProps: { value } },
+    { initialProps: { value: currentValue } },
   );
   return {
     result,
     onChange,
-    rerender: () => rerender({ value }),
-    getValue: () => value,
+    rerender: () => rerender({ value: currentValue }),
+    getValue: () => currentValue,
   };
 };
 
@@ -115,22 +115,27 @@ describe('useSelectionState', () => {
   describe('disabled support', () => {
     const setupWithDisabled = (initial: string[], disabled: string[]) => {
       const onChange = vi.fn();
-      const value = initial;
+      let currentValue: string[] = initial;
+      const disabledIds = new Set(disabled);
       const { result, rerender } = renderHook(
-        ({ value, disabledIds }) =>
+        ({ value, disabledIds }: { value: string[]; disabledIds: Set<string> }) =>
           useSelectionState({
             items,
             getItemId,
             value,
             disabledIds,
             onChange: ids => {
-              value = ids;
+              currentValue = ids;
               onChange(ids);
             },
           }),
-        { initialProps: { value, disabledIds: new Set(disabled) } },
+        { initialProps: { value: currentValue, disabledIds } },
       );
-      return { result, onChange, rerender };
+      return {
+        result,
+        onChange,
+        rerender: () => rerender({ value: currentValue, disabledIds }),
+      };
     };
 
     it('toggleItem on disabled id is a no-op', () => {
@@ -160,6 +165,101 @@ describe('useSelectionState', () => {
     it('exposes enabledItemIds preserving order', () => {
       const { result } = setupWithDisabled([], ['b']);
       expect(result.current.enabledItemIds).toEqual(['a', 'c', 'd']);
+    });
+  });
+
+  describe('shift+click range', () => {
+    it('selects diapason when shift-clicking unselected item after prior toggle', () => {
+      const { result, onChange, rerender } = setup();
+      act(() => result.current.toggleItem('a'));
+      rerender();
+      onChange.mockClear();
+      act(() => result.current.toggleItem('c', { shiftKey: true }));
+      expect(onChange).toHaveBeenCalledWith(['a', 'b', 'c']);
+    });
+
+    it('deselects diapason when shift-clicking selected item', () => {
+      const { result, onChange, rerender } = setup(['a', 'b', 'c', 'd']);
+      act(() => result.current.toggleItem('a'));
+      rerender();
+      onChange.mockClear();
+      act(() => result.current.toggleItem('c', { shiftKey: true }));
+      expect(onChange).toHaveBeenCalledWith(['d']);
+    });
+
+    it('falls back to single toggle when no prior lastToggledId', () => {
+      const { result, onChange } = setup();
+      act(() => result.current.toggleItem('c', { shiftKey: true }));
+      expect(onChange).toHaveBeenCalledWith(['c']);
+    });
+
+    it('falls back to single toggle when shift-clicking same id as last', () => {
+      const { result, onChange, rerender } = setup();
+      act(() => result.current.toggleItem('b'));
+      rerender();
+      onChange.mockClear();
+      act(() => result.current.toggleItem('b', { shiftKey: true }));
+      expect(onChange).toHaveBeenCalledWith([]);
+    });
+
+    it('range works in reverse direction', () => {
+      const { result, onChange, rerender } = setup();
+      act(() => result.current.toggleItem('d'));
+      rerender();
+      onChange.mockClear();
+      act(() => result.current.toggleItem('b', { shiftKey: true }));
+      expect(onChange).toHaveBeenCalledWith(['b', 'c', 'd']);
+    });
+
+    it('range skips disabled ids', () => {
+      const onChange = vi.fn();
+      const value: string[] = [];
+      const { result, rerender } = renderHook(
+        ({ value, disabledIds }) =>
+          useSelectionState({
+            items,
+            getItemId,
+            value,
+            disabledIds,
+            onChange: ids => {
+              value = ids;
+              onChange(ids);
+            },
+          }),
+        { initialProps: { value, disabledIds: new Set(['b']) } },
+      );
+      act(() => result.current.toggleItem('a'));
+      rerender({ value, disabledIds: new Set(['b']) });
+      onChange.mockClear();
+      act(() => result.current.toggleItem('c', { shiftKey: true }));
+      expect(onChange).toHaveBeenCalledWith(['a', 'c']);
+    });
+
+    it('does not update lastToggledId on a no-op (disabled)', () => {
+      const onChange = vi.fn();
+      const value: string[] = [];
+      const { result, rerender } = renderHook(
+        ({ value, disabledIds }) =>
+          useSelectionState({
+            items,
+            getItemId,
+            value,
+            disabledIds,
+            onChange: ids => {
+              value = ids;
+              onChange(ids);
+            },
+          }),
+        { initialProps: { value, disabledIds: new Set(['b']) } },
+      );
+      act(() => result.current.toggleItem('a'));
+      rerender({ value, disabledIds: new Set(['b']) });
+      act(() => result.current.toggleItem('b'));
+      rerender({ value, disabledIds: new Set(['b']) });
+      onChange.mockClear();
+      act(() => result.current.toggleItem('d', { shiftKey: true }));
+      // range should be from 'a' (last successful toggle), not 'b'
+      expect(onChange).toHaveBeenCalledWith(['a', 'c', 'd']);
     });
   });
 });
