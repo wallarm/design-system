@@ -23,7 +23,7 @@ export const SelectionBulkBar: FC<SelectionBulkBarProps> = ({
 
   return (
     <ArkUiPortal>
-      <ArkUiPopover.Positioner className='z-50'>
+      <ArkUiPopover.Positioner className='z-[calc(var(--drawer-positioner-z-index,50)+(var(--layer-index,0)*var(--drawer-level-ratio,20))+10)]'>
         <ArkUiPopover.Content
           role='toolbar'
           aria-label={ariaLabel}
