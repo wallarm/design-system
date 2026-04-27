@@ -331,6 +331,8 @@ export {
 } from './components/Select';
 export {
   Selection,
+  SelectionAll,
+  type SelectionAllProps,
   SelectionItem,
   type SelectionItemProps,
   type SelectionProps,
