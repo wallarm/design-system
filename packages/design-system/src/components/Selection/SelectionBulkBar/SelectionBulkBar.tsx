@@ -32,6 +32,9 @@ export const SelectionBulkBar: FC<SelectionBulkBarProps> = ({
           className={cn(
             'bg-component-toast-bg rounded-16 shadow-lg',
             'pl-12 pr-8 py-8',
+            // ButtonBase has min-w-0 + overflow-hidden — without this, action
+            // buttons can be flex-shrunk below their text width inside the bar.
+            '[&_button]:shrink-0 [&_button]:whitespace-nowrap',
             'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom data-[state=closed]:duration-150',
           )}
