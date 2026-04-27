@@ -11,8 +11,11 @@ export const SelectionBulkBarSummary: FC = () => {
   const count = selectedIds.size;
 
   return (
-    <div data-testid={testId} className='flex items-center gap-16 p-8'>
-      <Text size='sm' color='primary-alt' weight='medium'>
+    <div
+      data-testid={testId}
+      className='flex flex-nowrap items-center gap-16 p-8 whitespace-nowrap'
+    >
+      <Text size='sm' color='primary-alt' weight='medium' className='whitespace-nowrap'>
         {count} selected
       </Text>
 
@@ -22,6 +25,7 @@ export const SelectionBulkBarSummary: FC = () => {
           size='md'
           onClick={selectAll}
           disabled={isAllSelected}
+          className='whitespace-nowrap'
         >
           Select all
         </Link>

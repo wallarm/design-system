@@ -9,6 +9,7 @@ import {
   DrawerBody,
   DrawerContent,
   DrawerHeader,
+  DrawerResizeHandle,
   DrawerTitle,
   DrawerTrigger,
 } from '../Drawer';
@@ -314,26 +315,21 @@ export const WithoutBulkBar: StoryFn<typeof meta> = () => {
   );
 };
 
-
 export const InsideDrawer: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
-    <Drawer>
+    <Drawer width={720}>
       <DrawerTrigger asChild>
         <Button>Open drawer with selection</Button>
       </DrawerTrigger>
       <DrawerContent>
+        <DrawerResizeHandle />
         <DrawerHeader>
           <DrawerTitle>Clusters</DrawerTitle>
         </DrawerHeader>
         <DrawerBody>
-          <Selection
-            items={clusters}
-            getItemId={c => c.id}
-            value={selected}
-            onChange={setSelected}
-          >
+          <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
             <VStack gap={16}>
               <HStack gap={8} align='center'>
                 <SelectionAll />
@@ -383,4 +379,3 @@ export const InsideDrawer: StoryFn<typeof meta> = () => {
     </Drawer>
   );
 };
-

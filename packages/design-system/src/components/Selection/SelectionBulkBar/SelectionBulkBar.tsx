@@ -33,14 +33,14 @@ export const SelectionBulkBar: FC<SelectionBulkBarProps> = ({
         data-slot='selection-bulk-bar'
         data-testid={testId}
         className={cn(
-          'z-[200] flex items-center gap-40',
+          'z-[200] flex flex-nowrap items-center gap-8',
           isInDrawer
             ? 'absolute inset-x-12 bottom-12 justify-between'
             : 'fixed bottom-32 left-1/2 -translate-x-1/2 w-fit max-w-[calc(100vw-32px)]',
           'bg-component-toast-bg rounded-16 shadow-lg',
           'pl-12 pr-8 py-8',
-          // ButtonBase has min-w-0 + overflow-hidden — without this, action
-          // buttons would flex-shrink below their text width.
+          // Keep bulk actions on a single row even when the bar is narrow
+          // (e.g. in a small drawer); buttons overflow rather than wrap.
           '[&_button]:shrink-0 [&_button]:whitespace-nowrap',
           'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:slide-in-from-bottom data-[state=open]:duration-300',
           'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:slide-out-to-bottom data-[state=closed]:duration-150',
