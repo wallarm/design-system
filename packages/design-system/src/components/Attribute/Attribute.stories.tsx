@@ -418,3 +418,127 @@ export const WithActions: StoryFn<AttributeProps> = () => (
     </Attribute>
   </div>
 );
+
+export const Horizontal: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue>
+        <Badge color='red' variant='dotted'>
+          Blocked
+        </Badge>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalLabelTruncation: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-8'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Short</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>Fits in 160px label cell</Text>
+      </AttributeValue>
+    </Attribute>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>
+        This label text is much longer than 160 pixels and must be truncated
+      </AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>Value</Text>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalValueTruncation: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Users</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>
+          artem@acme.com, uxd@acme.com, ops@acme.com, security@acme.com, admin@acme.com
+        </Text>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalComposition: StoryFn<AttributeProps> = () => (
+  <div className='grid grid-cols-2 gap-x-8 gap-y-6 w-[874px]'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue>
+        <Badge color='red' variant='dotted'>
+          Blocked
+        </Badge>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>First seen</AttributeLabel>
+      <AttributeValue>
+        <FormatDateTime value='2026-04-03T10:15:00Z' />
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Attack type</AttributeLabel>
+      <AttributeValue>
+        <div className='flex items-center gap-4 flex-wrap'>
+          <Tag>XSS</Tag>
+          <Tag>BOLA</Tag>
+          <Tag>SQL Injection</Tag>
+          <Tag>Scanner</Tag>
+          <Tag>+5</Tag>
+        </div>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Last seen</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>2 Apr, 2026 14:03</Text>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Sessions</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>3 sessions</Text>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Users</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>artem@acme.com, uxd@acme.com</Text>
+      </AttributeValue>
+    </Attribute>
+
+    <div className='col-span-2'>
+      <Attribute orientation='horizontal'>
+        <AttributeLabel>IPs</AttributeLabel>
+        <AttributeValue>
+          <IpList>
+            <Ip>
+              <IpCountry code='US' />
+              <IpAddress>142.198.167.52</IpAddress>
+              <IpProvider>Azure</IpProvider>
+            </Ip>
+            <Ip>
+              <IpCountry code='US' />
+              <IpAddress>34.74.73.20</IpAddress>
+              <IpProvider>AWS</IpProvider>
+            </Ip>
+            <Ip>
+              <IpCountry code='DE' />
+              <IpAddress>34.74.73.20</IpAddress>
+              <IpProvider>GCP</IpProvider>
+            </Ip>
+          </IpList>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  </div>
+);
