@@ -100,17 +100,17 @@ test.describe('Component: DateRangeInput', () => {
       await expect(clearButton).toHaveCount(0);
     });
 
-    test('Should keep segment text visible when focused in read-only mode', async ({ page }) => {
+    test('Should not allow focusing segments in read-only mode', async ({ page }) => {
       await dateRangeInputStory.goto(page, 'Read Only');
       const daySegment = page
         .locator('[data-slot="date-range-input"] [data-field-type="start"] [data-segment="day"]')
         .first();
-      const expectedText = await daySegment.textContent();
 
-      await daySegment.focus();
-      await expect(daySegment).toBeFocused();
-      await expect(page).toHaveScreenshot();
-      await expect(daySegment).toHaveText(expectedText ?? '');
+      await expect(daySegment).toHaveAttribute('aria-hidden', 'true');
+      await expect(daySegment).not.toHaveAttribute('tabindex', /.*/);
+
+      await daySegment.focus().catch(() => undefined);
+      await expect(daySegment).not.toBeFocused();
     });
   });
 

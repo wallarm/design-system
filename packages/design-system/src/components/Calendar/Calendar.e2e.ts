@@ -16,10 +16,9 @@ const calendarStory = createStoryHelper('inputs-date-calendar', [
 
 /** Open the calendar popover by clicking the trigger button. */
 async function openCalendar(page: Page): Promise<void> {
-  await page
-    .getByRole('button', { name: /Select date/ })
-    .first()
-    .click();
+  // Ark UI's DatePicker.Trigger forces aria-label="Open calendar", overriding
+  // the visible button text — selecting by data-part is more stable.
+  await page.locator('[data-scope="date-picker"][data-part="trigger"]').first().click();
   // Popover animates in — wait for the grid to appear.
   await expect(
     page.locator('[data-scope="date-picker"][data-part="content"]').first(),
