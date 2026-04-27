@@ -84,8 +84,7 @@ export const useSelectionState = <T>({
           const end = Math.max(fromIdx, toIdx);
           const selecting = !selectedIds.has(id);
           const next = new Set(selectedIds);
-          for (let i = start; i <= end; i++) {
-            const rangeId = itemIds[i];
+          for (const rangeId of itemIds.slice(start, end + 1)) {
             if (disabled.has(rangeId)) continue;
             if (selecting) next.add(rangeId);
             else next.delete(rangeId);
