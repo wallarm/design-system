@@ -333,6 +333,8 @@ export {
   Selection,
   SelectionAll,
   type SelectionAllProps,
+  SelectionBulkBar,
+  type SelectionBulkBarProps,
   SelectionItem,
   type SelectionItemProps,
   type SelectionProps,
