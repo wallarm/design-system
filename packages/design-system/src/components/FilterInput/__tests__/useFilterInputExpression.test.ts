@@ -402,4 +402,92 @@ describe('useFilterInputExpression', () => {
       expect(result.current).not.toHaveProperty('removeLastCondition');
     });
   });
+
+  describe('replaceExpression (paste / external write) — AS-882', () => {
+    it('updates local state in uncontrolled mode (no value/onChange)', () => {
+      const { result } = renderHook(() => useFilterInputExpression({ fields, error: false }));
+
+      const expr: ExprNode = {
+        type: 'condition',
+        field: 'priority',
+        operator: 'in',
+        value: [1, 5],
+      };
+
+      act(() => {
+        result.current.replaceExpression(expr);
+      });
+
+      expect(result.current.conditions).toEqual([expr]);
+      expect(result.current.connectors).toEqual([]);
+    });
+
+    it('replaces existing conditions instead of appending', () => {
+      const initial: Condition = {
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      };
+      const { result } = renderHook(() =>
+        useFilterInputExpression({ fields, value: initial, error: false }),
+      );
+      expect(result.current.conditions).toHaveLength(1);
+
+      const replacement: Group = {
+        type: 'group',
+        operator: 'and',
+        children: [
+          { type: 'condition', field: 'priority', operator: '=', value: 1 },
+          { type: 'condition', field: 'priority', operator: '=', value: 5 },
+        ],
+      };
+
+      act(() => {
+        result.current.replaceExpression(replacement);
+      });
+
+      expect(result.current.conditions).toEqual(replacement.children);
+      expect(result.current.connectors).toEqual(['and']);
+    });
+
+    it('clears state when called with null', () => {
+      const initial: Condition = {
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      };
+      const { result } = renderHook(() =>
+        useFilterInputExpression({ fields, value: initial, error: false }),
+      );
+
+      act(() => {
+        result.current.replaceExpression(null);
+      });
+
+      expect(result.current.conditions).toEqual([]);
+      expect(result.current.connectors).toEqual([]);
+    });
+
+    it('also fires onChange in controlled mode', () => {
+      const onChange = vi.fn();
+      const { result } = renderHook(() =>
+        useFilterInputExpression({ fields, value: null, onChange, error: false }),
+      );
+
+      const expr: ExprNode = {
+        type: 'condition',
+        field: 'priority',
+        operator: '=',
+        value: 5,
+      };
+
+      act(() => {
+        result.current.replaceExpression(expr);
+      });
+
+      expect(onChange).toHaveBeenCalledWith(expr);
+    });
+  });
 });

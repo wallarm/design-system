@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import { useCallback, useRef } from 'react';
-import type { ChipErrorSegment, FieldMetadata, FilterOperator } from '../../types';
+import type { FieldMetadata, FilterOperator, UpsertCondition } from '../../types';
 
 interface UseBlurCommitDeps {
   selectedField: FieldMetadata | null;
@@ -9,15 +9,7 @@ interface UseBlurCommitDeps {
   editingChipId: string | null;
   effectiveInsertIndexRef: RefObject<number>;
   handleCustomValueCommit: (text: string) => void;
-  upsertCondition: (
-    field: FieldMetadata,
-    operator: FilterOperator | undefined,
-    val: string | number | boolean | null | Array<string | number | boolean>,
-    editingChipId?: string | null,
-    atIndex?: number,
-    error?: ChipErrorSegment,
-    dateOrigin?: 'relative' | 'absolute',
-  ) => void;
+  upsertCondition: UpsertCondition;
   resetState: () => void;
   /**
    * Indirection ref consumed by useMenuFlow to break the circular dependency
@@ -58,32 +50,44 @@ export const useBlurCommit = ({
   const inputTextRef = useRef(inputText);
   inputTextRef.current = inputText;
 
+  // Dedicated re-entry flag — survives any state-churn that the ref-clearing
+  // snapshot below cannot guard against (e.g. a synchronous re-render kicked
+  // by upsertCondition that writes selectedFieldRef.current back from props
+  // before this call returns). Mirrors handlingBlurRef in useFocusManagement.
+  const committingRef = useRef(false);
+
   const commitBuildingOnBlur = useCallback((): boolean => {
+    if (committingRef.current) return false;
     const field = selectedFieldRef.current;
     const operator = selectedOperatorRef.current;
     const text = inputTextRef.current.trim();
     if (!field) return false;
     if (editingChipId) return false;
 
-    selectedFieldRef.current = null;
-    selectedOperatorRef.current = null;
-    inputTextRef.current = '';
+    committingRef.current = true;
+    try {
+      selectedFieldRef.current = null;
+      selectedOperatorRef.current = null;
+      inputTextRef.current = '';
 
-    if (operator && text) {
-      handleCustomValueCommit(text);
+      if (operator && text) {
+        handleCustomValueCommit(text);
+        return true;
+      }
+
+      upsertCondition(
+        field,
+        operator ?? undefined,
+        null,
+        undefined,
+        effectiveInsertIndexRef.current,
+        true,
+      );
+      resetState();
       return true;
+    } finally {
+      committingRef.current = false;
     }
-
-    upsertCondition(
-      field,
-      operator ?? undefined,
-      null,
-      undefined,
-      effectiveInsertIndexRef.current,
-      true,
-    );
-    resetState();
-    return true;
   }, [
     editingChipId,
     handleCustomValueCommit,

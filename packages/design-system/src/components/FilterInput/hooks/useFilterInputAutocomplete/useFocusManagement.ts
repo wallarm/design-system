@@ -123,23 +123,22 @@ export const useFocusManagement = ({
         const container = containerRef.current;
         if (!container) return;
         const active = document.activeElement as HTMLElement | null;
-        // body-focus policy: here, body means the user moved focus outside —
-        // don't recapture. Contrast with resetState in useFilterInputAutocomplete,
-        // which treats body-focus as "stayed inside" (DOM just re-rendered).
+        // Body-focus policy: HERE body means "user clicked outside" (e.g. tenant
+        // switcher, a non-focusable region of the page) — DO NOT recapture.
+        // The opposite policy lives in useResetState, which treats body-focus as
+        // "DOM just re-rendered, focus dropped" and refocuses. See the long
+        // comment on useResetState for the full reasoning. AS-882.
         if (active && !container.contains(active) && !isMenuRelated(active)) return;
 
         if (editingSegment) {
           // Redirect focus to the segment's inline input via the registry, beating
-          // Ark UI's focus steal. Refs are attached by Segment.tsx for every variant
-          // (attribute / operator / value).
-          const segmentInput =
-            editingSegment === SEGMENT_VARIANT.attribute
-              ? segmentAttributeInputRef.current
-              : editingSegment === SEGMENT_VARIANT.operator
-                ? segmentOperatorInputRef.current
-                : editingSegment === SEGMENT_VARIANT.value
-                  ? segmentValueInputRef.current
-                  : null;
+          // Ark UI's focus steal. Refs are attached by Segment.tsx for every variant.
+          const segmentInputRefs: Record<ChipSegment, RefObject<HTMLInputElement | null>> = {
+            [SEGMENT_VARIANT.attribute]: segmentAttributeInputRef,
+            [SEGMENT_VARIANT.operator]: segmentOperatorInputRef,
+            [SEGMENT_VARIANT.value]: segmentValueInputRef,
+          };
+          const segmentInput = segmentInputRefs[editingSegment]?.current ?? null;
           if (segmentInput && document.activeElement !== segmentInput) {
             segmentInput.focus();
             segmentInput.select();

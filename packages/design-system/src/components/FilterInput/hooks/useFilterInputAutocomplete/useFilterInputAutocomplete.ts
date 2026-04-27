@@ -4,12 +4,12 @@ import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
 import { applyAcceptChar } from '../../lib';
 import type {
-  ChipErrorSegment,
   Condition,
   FieldMetadata,
   FilterInputChipData,
   FilterOperator,
   MenuState,
+  UpsertCondition,
 } from '../../types';
 import { deriveAutocompleteValues } from './deriveAutocompleteValues';
 import { useBlurCommit } from './useBlurCommit';
@@ -25,15 +25,7 @@ interface UseFilterInputAutocompleteOptions {
   fields: FieldMetadata[];
   conditions: Condition[];
   chips: FilterInputChipData[];
-  upsertCondition: (
-    field: FieldMetadata,
-    operator: FilterOperator | undefined,
-    val: string | number | boolean | null | Array<string | number | boolean>,
-    editingChipId?: string | null,
-    atIndex?: number,
-    error?: ChipErrorSegment,
-    dateOrigin?: 'relative' | 'absolute',
-  ) => void;
+  upsertCondition: UpsertCondition;
   removeCondition: (chipId: string) => void;
   removeConditionAtIndex: (index: number) => void;
   clearAll: () => void;

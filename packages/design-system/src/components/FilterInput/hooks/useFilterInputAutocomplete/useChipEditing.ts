@@ -8,6 +8,7 @@ import type {
   FilterInputChipData,
   FilterOperator,
   MenuState,
+  UpsertCondition,
 } from '../../types';
 
 interface UseChipEditingOptions {
@@ -19,12 +20,7 @@ interface UseChipEditingOptions {
   setSelectedField: (field: FieldMetadata | null) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
   setMenuState: (state: MenuState) => void;
-  upsertCondition: (
-    field: FieldMetadata,
-    operator: FilterOperator | undefined,
-    val: string | number | boolean | null | Array<string | number | boolean>,
-    editingChipId?: string | null,
-  ) => void;
+  upsertCondition: UpsertCondition;
 }
 
 // ── Pure helpers ────────────────────────────────────────────

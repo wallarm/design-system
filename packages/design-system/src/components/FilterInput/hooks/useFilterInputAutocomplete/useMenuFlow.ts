@@ -8,11 +8,11 @@ import {
   isNoValueOperator,
 } from '../../lib';
 import type {
-  ChipErrorSegment,
   Condition,
   FieldMetadata,
   FilterOperator,
   MenuState,
+  UpsertCondition,
 } from '../../types';
 import {
   resolveDateRangeValue,
@@ -35,15 +35,7 @@ interface MenuFlowDeps {
   fields: FieldMetadata[];
   inputRef: RefObject<HTMLInputElement | null>;
   insertIndex: number;
-  upsertCondition: (
-    field: FieldMetadata,
-    operator: FilterOperator | undefined,
-    val: string | number | boolean | null | Array<string | number | boolean>,
-    editingChipId?: string | null,
-    atIndex?: number,
-    error?: ChipErrorSegment,
-    dateOrigin?: 'relative' | 'absolute',
-  ) => void;
+  upsertCondition: UpsertCondition;
   conditions: Condition[];
   resetState: (continueBuilding?: boolean) => void;
   /** Try to commit the building chip on menu close. Returns true if committed. */

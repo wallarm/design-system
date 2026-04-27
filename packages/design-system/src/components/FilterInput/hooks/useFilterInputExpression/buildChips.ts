@@ -1,5 +1,5 @@
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { getDateDisplayLabel, getOperatorLabel } from '../../lib';
+import { findOptionByValue, getDateDisplayLabel, getOperatorLabel } from '../../lib';
 import type { ChipErrorSegment, Condition, FieldMetadata, FilterInputChipData } from '../../types';
 import { getInvalidValueIndices } from '../useFilterInputAutocomplete/valueCommitHelpers';
 
@@ -28,12 +28,9 @@ const makeEmptyChip = (i: number, error: boolean): FilterInputChipData =>
 /** Resolve display value for a single-value condition */
 const resolveDisplayValue = (condition: Condition, field: FieldMetadata | undefined): string => {
   const raw = String(condition.value ?? '');
-  if (!field?.values) return raw;
-  // Loose match: parser/serializer round-trip turns numeric values like 5 into the
-  // string "5" (e.g. for an `integer` field with `values: [{value: 5, label: 'Medium'}]`).
-  // Strict `===` would miss that match and fall back to the raw "5" instead of the label.
-  const opt = field.values.find(o => String(o.value) === raw);
-  return opt?.label ?? raw;
+  return (
+    findOptionByValue(field, condition.value as string | number | boolean | null)?.label ?? raw
+  );
 };
 
 /** Build base chip data shared by all condition types */
@@ -93,11 +90,7 @@ const buildMultiValueChip = (
   chipError: ChipErrorSegment | undefined,
 ): FilterInputChipData => {
   const values = condition.value as Array<string | number | boolean>;
-  // Loose match by stringified value — see resolveDisplayValue for the why.
-  const valueParts = values.map(v => {
-    const key = String(v);
-    return field?.values?.find(opt => String(opt.value) === key)?.label ?? key;
-  });
+  const valueParts = values.map(v => findOptionByValue(field, v)?.label ?? String(v));
   const invalidIndices = field ? getInvalidValueIndices(field, values) : [];
   return {
     ...baseChip,

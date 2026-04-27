@@ -22,11 +22,22 @@ interface UseResetStateDeps {
 /**
  * Resets all autocomplete state and conditionally returns focus to the main input.
  *
- * Focus restoration policy: only refocus when activeElement still "belongs" to us
- * — inside container, inside a FilterInput-owned menu, or `document.body`. The
- * body case here means activeElement just dropped because a chip/menu was removed
- * on re-render — keep focus in the input. Contrast with useFocusManagement's rAF
- * guard, which treats body-focus as outside. AS-882.
+ * ── Body-focus policy (READ THIS) ─────────────────────────────────────────────
+ * `document.activeElement === document.body` is treated **as "stayed inside"** here
+ * — i.e. we DO refocus the main input. The reasoning: state mutations in
+ * `doReset()` (e.g. `editing.clearEditing()`) can synchronously unmount the
+ * element that previously had focus (a chip's inline input, a menu item), and
+ * the browser drops focus to body in that case. We want to honor "user is still
+ * working in the FilterInput" intent and put the caret back in the input.
+ *
+ * The opposite policy lives in `useFocusManagement.ts`'s rAF effect: there,
+ * body-focus means "user clicked outside" (e.g. tenant switcher) and we MUST
+ * NOT recapture. The two policies coexist because the triggers are different
+ * (state-driven re-render vs. genuine outside click).
+ *
+ * If you find yourself unifying these — make sure the "DOM dropped focus on
+ * re-render" case still refocuses, otherwise resetState during commit chains
+ * breaks. AS-882.
  */
 export const useResetState = ({
   editing,
@@ -41,8 +52,8 @@ export const useResetState = ({
   setInsertIndex,
   setInsertAfterConnector,
   setMenuState,
-}: UseResetStateDeps) =>
-  useCallback(
+}: UseResetStateDeps) => {
+  const resetState = useCallback(
     (continueBuilding = false) => {
       const doReset = () => {
         setInputText('');
@@ -87,3 +98,6 @@ export const useResetState = ({
       setMenuState,
     ],
   );
+
+  return resetState;
+};
