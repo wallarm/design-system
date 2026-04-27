@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
+import { useAttributeOrientation } from './AttributeOrientationContext';
 
 export interface AttributeLabelProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
@@ -9,6 +10,8 @@ export interface AttributeLabelProps extends HTMLAttributes<HTMLDivElement> {
 
 export const AttributeLabel: FC<AttributeLabelProps> = ({ ref, children, className, ...props }) => {
   const testId = useTestId('label');
+  const orientation = useAttributeOrientation();
+  const isHorizontal = orientation === 'horizontal';
 
   return (
     <div
@@ -17,7 +20,10 @@ export const AttributeLabel: FC<AttributeLabelProps> = ({ ref, children, classNa
       data-testid={testId}
       data-slot='attribute-label'
       className={cn(
-        'flex items-center gap-4 flex-wrap font-sans-display text-sm font-normal text-text-secondary',
+        'font-sans-display text-sm font-normal text-text-secondary',
+        isHorizontal
+          ? 'flex items-center min-w-[100px] max-w-[160px] w-[160px] py-4 shrink-0 truncate'
+          : 'flex items-center gap-4 flex-wrap',
         className,
       )}
     >
