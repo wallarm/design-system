@@ -52,7 +52,7 @@ export const Attribute: FC<AttributeProps> = ({
             isHorizontal ? (
               <>
                 <AttributeLabel>
-                  <Skeleton width='82px' height='16px' rounded={6} />
+                  <Skeleton width='100px' height='16px' rounded={6} />
                 </AttributeLabel>
                 <AttributeValue>
                   <Skeleton width='100%' height='16px' rounded={6} />
@@ -60,7 +60,7 @@ export const Attribute: FC<AttributeProps> = ({
               </>
             ) : (
               <>
-                <Skeleton width='82px' height='16px' rounded={6} />
+                <Skeleton width='100px' height='16px' rounded={6} />
                 <Skeleton width='100%' height='24px' rounded={6} />
               </>
             )
