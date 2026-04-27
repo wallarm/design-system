@@ -520,7 +520,7 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
       <Attribute orientation='horizontal'>
         <AttributeLabel>IPs</AttributeLabel>
         <AttributeValue>
-          <IpList>
+          <IpList type='horizontal'>
             <Ip>
               <IpCountry code='US' />
               <IpAddress>142.198.167.52</IpAddress>
