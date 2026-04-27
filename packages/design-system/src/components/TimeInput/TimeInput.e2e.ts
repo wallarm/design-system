@@ -92,15 +92,15 @@ test.describe('Component: TimeInput', () => {
       await expect(clearButton).toHaveCount(0);
     });
 
-    test('Should keep segment text visible when focused in read-only mode', async ({ page }) => {
+    test('Should not allow focusing segments in read-only mode', async ({ page }) => {
       await timeInputStory.goto(page, 'Read Only');
       const hourSegment = page.locator('[data-slot="time-input"] [data-segment="hour"]').first();
-      const expectedText = await hourSegment.textContent();
 
-      await hourSegment.focus();
-      await expect(hourSegment).toBeFocused();
-      await expect(page).toHaveScreenshot();
-      await expect(hourSegment).toHaveText(expectedText ?? '');
+      await expect(hourSegment).toHaveAttribute('aria-hidden', 'true');
+      await expect(hourSegment).not.toHaveAttribute('tabindex', /.*/);
+
+      await hourSegment.focus().catch(() => undefined);
+      await expect(hourSegment).not.toBeFocused();
     });
   });
 
