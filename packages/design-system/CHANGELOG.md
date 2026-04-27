@@ -1,3 +1,7 @@
+## <small>0.29.2 (2026-04-27)</small>
+
+* fix(filter-input): AS-882 stop stealing focus on outside click (#98) ([4da1e35](https://github.com/wallarm/design-system/commit/4da1e35)), closes [#98](https://github.com/wallarm/design-system/issues/98)
+
 ## <small>0.29.1 (2026-04-27)</small>
 
 * test(date-time-input): assert read-only segments are non-focusable (#100) ([0c06906](https://github.com/wallarm/design-system/commit/0c06906)), closes [#100](https://github.com/wallarm/design-system/issues/100)
