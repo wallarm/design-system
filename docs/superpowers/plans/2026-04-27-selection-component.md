@@ -99,7 +99,7 @@ export { Separator, type SeparatorProps } from './components/Separator';
 
 - [ ] **Step 4: Verify typecheck**
 
-Run: `pnpm --filter @wallarm/design-system typecheck`
+Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS (no new errors)
 
 - [ ] **Step 5: Format and commit**
@@ -242,7 +242,7 @@ describe('useSelectionState', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run: `pnpm --filter @wallarm/design-system test -- useSelectionState`
+Run: `pnpm --filter @wallarm-org/design-system test -- useSelectionState`
 Expected: FAIL — `Cannot find module '../useSelectionState'`
 
 - [ ] **Step 3: Implement `useSelectionState` (basic version, no shift/disabled yet)**
@@ -335,7 +335,7 @@ export const useSelectionState = <T>({
 
 - [ ] **Step 4: Run test to verify it passes**
 
-Run: `pnpm --filter @wallarm/design-system test -- useSelectionState`
+Run: `pnpm --filter @wallarm-org/design-system test -- useSelectionState`
 Expected: PASS for all tests in this task.
 
 - [ ] **Step 5: Format and commit**
@@ -415,7 +415,7 @@ describe('disabled support', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `pnpm --filter @wallarm/design-system test -- useSelectionState`
+Run: `pnpm --filter @wallarm-org/design-system test -- useSelectionState`
 Expected: FAIL — `disabledIds` not recognized; `enabledItemIds` undefined.
 
 - [ ] **Step 3: Update `useSelectionState` to accept `disabledIds` and expose `enabledItemIds`**
@@ -526,7 +526,7 @@ export const useSelectionState = <T>({
 
 - [ ] **Step 4: Run tests to verify all pass**
 
-Run: `pnpm --filter @wallarm/design-system test -- useSelectionState`
+Run: `pnpm --filter @wallarm-org/design-system test -- useSelectionState`
 Expected: PASS (basic + disabled).
 
 - [ ] **Step 5: Format and commit**
@@ -650,7 +650,7 @@ describe('shift+click range', () => {
 
 - [ ] **Step 2: Run tests to verify they fail**
 
-Run: `pnpm --filter @wallarm/design-system test -- useSelectionState`
+Run: `pnpm --filter @wallarm-org/design-system test -- useSelectionState`
 Expected: FAIL — `toggleItem` does not accept second arg / range not implemented.
 
 - [ ] **Step 3: Update `useSelectionState` for shift-range**
@@ -791,7 +791,7 @@ export const useSelectionState = <T>({
 
 - [ ] **Step 4: Run tests to verify all pass**
 
-Run: `pnpm --filter @wallarm/design-system test -- useSelectionState`
+Run: `pnpm --filter @wallarm-org/design-system test -- useSelectionState`
 Expected: PASS (basic + disabled + range).
 
 - [ ] **Step 5: Format and commit**
@@ -855,7 +855,7 @@ export const useSelectionContext = (): SelectionContextValue => {
 
 - [ ] **Step 3: Verify typecheck**
 
-Run: `pnpm --filter @wallarm/design-system typecheck`
+Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
 - [ ] **Step 4: Format and commit**
@@ -1013,7 +1013,7 @@ Selection.displayName = 'Selection';
 
 - [ ] **Step 2: Verify typecheck**
 
-Run: `pnpm --filter @wallarm/design-system typecheck`
+Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
 - [ ] **Step 3: Format and commit**
@@ -1126,7 +1126,7 @@ export {
 
 - [ ] **Step 5: Verify typecheck**
 
-Run: `pnpm --filter @wallarm/design-system typecheck`
+Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
 - [ ] **Step 6: Format and commit**
@@ -1208,7 +1208,7 @@ export {
 
 - [ ] **Step 4: Verify typecheck**
 
-Run: `pnpm --filter @wallarm/design-system typecheck`
+Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
 - [ ] **Step 5: Format and commit**
@@ -1336,7 +1336,7 @@ SelectionBulkBarSummary.displayName = 'SelectionBulkBarSummary';
 
 - [ ] **Step 4: Verify typecheck**
 
-Run: `pnpm --filter @wallarm/design-system typecheck`
+Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
 - [ ] **Step 5: Format and commit**
@@ -1452,7 +1452,7 @@ export {
 
 - [ ] **Step 5: Verify typecheck**
 
-Run: `pnpm --filter @wallarm/design-system typecheck`
+Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
 - [ ] **Step 6: Format and commit**
@@ -1831,7 +1831,7 @@ export const WithoutBulkBar: StoryFn<typeof meta> = () => {
 
 - [ ] **Step 2: Verify Storybook builds and stories appear**
 
-Run: `pnpm --filter @wallarm/design-system storybook` (manually) or `pnpm --filter @wallarm/design-system build-storybook` for a non-interactive check.
+Run: `pnpm --filter @wallarm-org/design-system storybook` (manually) or `pnpm --filter @wallarm-org/design-system build-storybook` for a non-interactive check.
 Expected: stories listed under `Data Display / Selection`.
 
 - [ ] **Step 3: Format and commit**
@@ -1984,12 +1984,12 @@ test.describe('Component: Selection', () => {
 
 - [ ] **Step 2: Run E2E to generate baselines**
 
-Run: `pnpm --filter @wallarm/design-system test:e2e -- Selection`
+Run: `pnpm --filter @wallarm-org/design-system test:e2e -- Selection`
 Expected first run: visual tests fail (no snapshots yet) — generate with the project's screenshot-update flow (e.g., commit message `[update-screenshots]` on main per CLAUDE.md), or run with `--update-snapshots` locally.
 
 - [ ] **Step 3: Update snapshots locally and verify**
 
-Run: `pnpm --filter @wallarm/design-system test:e2e -- Selection --update-snapshots`
+Run: `pnpm --filter @wallarm-org/design-system test:e2e -- Selection --update-snapshots`
 Then re-run without flag — Expected: PASS.
 
 - [ ] **Step 4: Format and commit**
@@ -2006,7 +2006,7 @@ git commit -m "test(selection): add E2E coverage for Selection component [AS-884
 
 - [ ] **Step 1: Full typecheck**
 
-Run: `pnpm --filter @wallarm/design-system typecheck`
+Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
 - [ ] **Step 2: Lint**
@@ -2016,15 +2016,15 @@ Expected: PASS.
 
 - [ ] **Step 3: Unit tests**
 
-Run: `pnpm --filter @wallarm/design-system test`
+Run: `pnpm --filter @wallarm-org/design-system test`
 Expected: All `useSelectionState` tests pass alongside the rest of the suite.
 
 - [ ] **Step 4: Storybook smoke**
 
-Run: `pnpm --filter @wallarm/design-system build-storybook`
+Run: `pnpm --filter @wallarm-org/design-system build-storybook`
 Expected: build succeeds; `Data Display/Selection` stories present.
 
 - [ ] **Step 5: E2E**
 
-Run: `pnpm --filter @wallarm/design-system test:e2e -- Selection`
+Run: `pnpm --filter @wallarm-org/design-system test:e2e -- Selection`
 Expected: all tests pass with committed snapshots.
