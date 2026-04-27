@@ -1,4 +1,4 @@
-export { DrawerContentContext, useOptionalDrawerContentRef } from './DrawerContentContext';
+export { DrawerContentContext, useOptionalDrawerContentScope } from './DrawerContentContext';
 export { DrawerContext } from './DrawerContext';
 export { DrawerProvider } from './DrawerProvider';
 export type { DrawerContextValue } from './types';

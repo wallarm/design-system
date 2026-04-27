@@ -1,4 +1,4 @@
-import { type FC, type ReactNode, type Ref, useCallback, useRef } from 'react';
+import { type FC, type ReactNode, type Ref, useCallback, useMemo, useState } from 'react';
 import { Dialog } from '@ark-ui/react/dialog';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -17,15 +17,24 @@ export interface DrawerContentProps {
 export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }) => {
   const testId = useTestId('content');
   const { width, isResizing, overlay } = useDrawerContext();
-  const contentRef = useRef<HTMLDivElement | null>(null);
+  // State (not just a ref) so descendants re-render once the panel mounts.
+  const [contentEl, setContentEl] = useState<HTMLDivElement | null>(null);
+  // React 19 cleanup-returning ref callback: React invokes the returned
+  // cleanup on detach instead of calling us again with `null`.
   const setRef = useCallback(
     (node: HTMLDivElement | null) => {
-      contentRef.current = node;
+      setContentEl(node);
       if (typeof ref === 'function') ref(node);
       else if (ref) ref.current = node;
+      return () => {
+        setContentEl(null);
+        if (typeof ref === 'function') ref(null);
+        else if (ref) ref.current = null;
+      };
     },
     [ref],
   );
+  const scope = useMemo(() => ({ element: contentEl }), [contentEl]);
 
   return (
     <DrawerPortal>
@@ -47,9 +56,7 @@ export const DrawerContent: FC<DrawerContentProps> = ({ children, asChild, ref }
           style={{ width }}
           asChild={asChild}
         >
-          <DrawerContentContext.Provider value={contentRef}>
-            {children}
-          </DrawerContentContext.Provider>
+          <DrawerContentContext.Provider value={scope}>{children}</DrawerContentContext.Provider>
         </Dialog.Content>
       </DrawerPositioner>
     </DrawerPortal>
