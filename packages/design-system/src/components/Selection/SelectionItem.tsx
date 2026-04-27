@@ -26,11 +26,15 @@ export const SelectionItem: FC<SelectionItemProps> = ({
     return registerDisabled(itemId, disabled);
   }, [itemId, disabled, registerDisabled]);
 
-  // Shift-click toggles a range. We handle it on the wrapper because
-  // browsers suppress the label→input forwarding when modifier keys are
-  // held, so ARK's onCheckedChange never fires for shift-clicks.
+  // Shift-click toggles a range. The browser suppresses the label→input
+  // forwarding click when a modifier key is held (verified in Chromium),
+  // so ARK's onCheckedChange never fires. Intercept on the wrapper, but
+  // only for label/wrapper targets — not the hidden input itself, where
+  // keyboard Shift+Space already toggles the state and ARK fires
+  // onCheckedChange on its own.
   const handleClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
     if (disabled || !e.shiftKey) return;
+    if (e.target instanceof HTMLInputElement) return;
     e.preventDefault();
     e.stopPropagation();
     toggleItem(itemId, { shiftKey: true });
