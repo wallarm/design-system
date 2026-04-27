@@ -6,6 +6,7 @@ interface UseSelectionKeyboardOptions {
   allSelected: boolean;
   conditionsCount: number;
   chipRegistryRef: RefObject<Map<string, HTMLElement>>;
+  containerRef: RefObject<HTMLDivElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
   clearAll: () => void;
   clearSelection: () => void;
@@ -16,6 +17,7 @@ export const useSelectionKeyboard = ({
   allSelected,
   conditionsCount,
   chipRegistryRef,
+  containerRef,
   inputRef,
   clearAll,
   clearSelection,
@@ -31,7 +33,10 @@ export const useSelectionKeyboard = ({
         e.preventDefault();
         clearSelection();
         onSelectAll();
-        inputRef.current?.blur();
+        // Focus the container (tabIndex=-1) instead of blurring the input — this
+        // moves the caret off the input visually but keeps focus inside our React
+        // subtree, so subsequent Ctrl+C / Ctrl+V still hit onCopy / onPaste.
+        containerRef.current?.focus();
         return;
       }
 
@@ -60,6 +65,7 @@ export const useSelectionKeyboard = ({
       allSelected,
       conditionsCount,
       chipRegistryRef,
+      containerRef,
       inputRef,
       clearAll,
       clearSelection,

@@ -67,6 +67,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     removeCondition,
     removeConditionAtIndex,
     clearAll,
+    replaceExpression,
     setConnectorValue,
   } = useFilterInputExpression({ fields, value, onChange, error });
 
@@ -104,7 +105,9 @@ export const FilterInput: FC<FilterInputProps> = ({
     clearAll,
     setInputText: autocomplete.setInputText,
     closeMenu: autocomplete.closeAutocompleteMenu,
-    onChange,
+    replaceExpression,
+    // handleMenuDiscard === resetState — wipes insertIndex / selectedField / menuState / …
+    resetAutocompleteState: autocomplete.handleMenuDiscard,
   });
 
   const contextValue = useFilterInputContextValue({
@@ -145,6 +148,11 @@ export const FilterInput: FC<FilterInputProps> = ({
     <div
       ref={containerRef}
       className={cn('group/filter-input relative flex w-full flex-col gap-4', className)}
+      // tabIndex=-1 lets us programmatically focus the container during select-all
+      // (Ctrl+A) so copy/paste events still target a node inside the React subtree —
+      // otherwise blurring the input drops focus to <body>, which is outside the
+      // FilterInput's onCopy/onPaste handlers.
+      tabIndex={-1}
       onFocus={autocomplete.handleFocus as unknown as React.FocusEventHandler<HTMLDivElement>}
       onBlur={autocomplete.handleBlur}
       onClick={allSelected ? clearSelection : undefined}

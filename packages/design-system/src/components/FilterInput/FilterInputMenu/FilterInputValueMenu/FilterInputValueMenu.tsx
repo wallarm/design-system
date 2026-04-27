@@ -127,7 +127,11 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
               <ValueMenuItem
                 key={String(option.value)}
                 option={option}
-                isChecked={selectedValues.includes(option.value)}
+                // Loose match by String() — values may be strings after parser round-trip
+                // (e.g. integer field with values [{value: 1, label: 'Low'}] gets
+                // condition.value = ["1"] from clipboard paste). Strict `.includes` would
+                // miss the match (1 !== "1") and the item would render as unchecked.
+                isChecked={selectedValues.some(v => String(v) === String(option.value))}
                 isPending={pendingIds.has(String(option.value))}
                 multiSelect={multiSelect}
                 registerItem={registerItem}

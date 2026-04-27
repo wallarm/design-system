@@ -13,7 +13,14 @@ interface UseSelectionClipboardOptions {
   setPasteError: (error: string | null) => void;
   setInputText: (text: string) => void;
   closeMenu: () => void;
-  onChange?: (expression: ExprNode | null) => void;
+  /** Replace the whole expression. Updates local state so paste works in uncontrolled mode too. */
+  replaceExpression: (expression: ExprNode | null) => void;
+  /**
+   * Reset transient autocomplete state (insertIndex, selectedField/Operator, menuState, etc.)
+   * after a successful paste — otherwise a stale `insertIndex` from a prior gap-click or
+   * Backspace puts the input cursor between newly-pasted chips instead of at the end.
+   */
+  resetAutocompleteState: () => void;
 }
 
 /** Convert technical parse error into a user-friendly message */
@@ -55,7 +62,8 @@ export const useSelectionClipboard = ({
   setPasteError,
   setInputText,
   closeMenu,
-  onChange,
+  replaceExpression,
+  resetAutocompleteState,
 }: UseSelectionClipboardOptions) => {
   const handleCopy = useCallback(
     (e: ClipboardEvent<HTMLDivElement>) => {
@@ -77,7 +85,9 @@ export const useSelectionClipboard = ({
 
       try {
         const expr = parseExpression(text, fields);
-        onChange?.(expr);
+        replaceExpression(expr);
+        // Drop stale insertIndex etc. so the input lands at the end of the new chip list
+        resetAutocompleteState();
         clearSelection();
         setPasteError(null);
       } catch (err) {
@@ -87,7 +97,15 @@ export const useSelectionClipboard = ({
         setPasteError(formatPasteError(err));
       }
     },
-    [fields, onChange, clearSelection, setPasteError, setInputText, closeMenu],
+    [
+      fields,
+      replaceExpression,
+      resetAutocompleteState,
+      clearSelection,
+      setPasteError,
+      setInputText,
+      closeMenu,
+    ],
   );
 
   /** Re-parse input text while user edits after a failed paste */
@@ -108,7 +126,8 @@ export const useSelectionClipboard = ({
 
       try {
         const expr = parseExpression(trimmed, fields);
-        onChange?.(expr);
+        replaceExpression(expr);
+        resetAutocompleteState();
         setInputText('');
         closeMenu();
         setPasteError(null);
@@ -116,7 +135,7 @@ export const useSelectionClipboard = ({
         setPasteError(formatPasteError(err));
       }
     },
-    [fields, onChange, setPasteError, setInputText, closeMenu],
+    [fields, replaceExpression, resetAutocompleteState, setPasteError, setInputText, closeMenu],
   );
 
   return { handleCopy, handlePaste, retryParse };

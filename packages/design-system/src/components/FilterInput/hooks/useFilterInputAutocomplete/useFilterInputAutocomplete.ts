@@ -1,8 +1,8 @@
 import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from 'react';
-import { flushSync } from 'react-dom';
+import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
-import { applyAcceptChar, chipIdToConditionIndex, isMenuRelated } from '../../lib';
+import { applyAcceptChar } from '../../lib';
 import type {
   ChipErrorSegment,
   Condition,
@@ -12,11 +12,14 @@ import type {
   MenuState,
 } from '../../types';
 import { deriveAutocompleteValues } from './deriveAutocompleteValues';
+import { useBlurCommit } from './useBlurCommit';
+import { useChipActions } from './useChipActions';
 import { useChipEditing } from './useChipEditing';
 import { useFocusManagement } from './useFocusManagement';
 import { useInputHandlers } from './useInputHandlers';
 import { useMenuFlow } from './useMenuFlow';
 import { useMenuPositioning } from './useMenuPositioning';
+import { useResetState } from './useResetState';
 
 interface UseFilterInputAutocompleteOptions {
   fields: FieldMetadata[];
@@ -73,13 +76,17 @@ export const useFilterInputAutocomplete = ({
   const conditionsLengthRef = useRef(conditions.length);
   conditionsLengthRef.current = conditions.length;
 
-  // Ref for multi-select blur commit: set by FilterInputValueMenu when open in multi-select mode
+  // Multi-select blur commit ref — set by FilterInputValueMenu when open in multi-select mode
   const blurCommitRef = useRef<(() => boolean) | null>(null);
 
-  // Refs for inline segment inputs — used by useFocusManagement to focus
-  // the correct input without a DOM querySelector.
+  // Inline segment input refs — used by useFocusManagement to focus the right input
   const segmentAttributeInputRef = useRef<HTMLInputElement>(null);
+  const segmentOperatorInputRef = useRef<HTMLInputElement>(null);
   const segmentValueInputRef = useRef<HTMLInputElement>(null);
+
+  // Indirection ref breaks the circular dep useMenuFlow ↔ useBlurCommit:
+  // useMenuFlow calls through this ref, useBlurCommit assigns its callback to it.
+  const commitBuildingOnBlurRef = useRef<() => boolean>(() => false);
 
   // ── Child hooks ───────────────────────────────────────────
 
@@ -105,63 +112,20 @@ export const useFilterInputAutocomplete = ({
 
   const dateRange = useDateRange();
 
-  // ── State reset ───────────────────────────────────────────
-
-  const resetState = useCallback(
-    (continueBuilding = false) => {
-      const doReset = () => {
-        setInputText('');
-        setSelectedField(null);
-        setSelectedOperator(null);
-        editing.clearEditing();
-        dateRange.reset();
-        setBuildingMultiValue(undefined);
-        setInsertIndex(null);
-        setInsertAfterConnector(false);
-        resetMenuOffset();
-        setMenuState('closed');
-      };
-
-      if (continueBuilding) {
-        // flushSync commits DOM update (input moves to new position) before reopening the menu
-        flushSync(doReset);
-        setMenuState('field');
-      } else {
-        doReset();
-      }
-
-      // Only return focus to the input when it still "belongs" to us — active
-      // element is inside our container, inside a FilterInput-owned menu, the
-      // body, or null. If the user moved focus elsewhere (e.g. tenant switcher),
-      // honor their intent and leave it there. AS-882.
-      const active = document.activeElement as HTMLElement | null;
-      // body-focus policy: here, body means activeElement just dropped because
-      // a chip/menu was removed on re-render — keep focus in the input. Contrast
-      // with useFocusManagement's rAF guard, which treats body-focus as outside.
-      const stayedInside =
-        active === document.body || containerRef.current?.contains(active) || isMenuRelated(active);
-      if (stayedInside) {
-        inputRef.current?.focus();
-      }
-    },
-    [editing, dateRange, inputRef, containerRef, resetMenuOffset],
-  );
-
-  // ── Blur commit for building chips ─────────────────────────
-  // When the user blurs or menu closes, commit the incomplete building chip with error
-  // instead of discarding it. Uses refs to avoid stale closures.
-
-  const selectedFieldRef = useRef(selectedField);
-  selectedFieldRef.current = selectedField;
-  const selectedOperatorRef = useRef(selectedOperator);
-  selectedOperatorRef.current = selectedOperator;
-  const inputTextRef = useRef(inputText);
-  inputTextRef.current = inputText;
-
-  // Ref so useMenuFlow can call it without circular dependency
-  const commitBuildingOnBlurRef = useRef<() => boolean>(() => false);
-
-  // ── Menu flow handlers ────────────────────────────────────
+  const resetState = useResetState({
+    editing,
+    dateRange,
+    containerRef,
+    inputRef,
+    resetMenuOffset,
+    setInputText,
+    setSelectedField,
+    setSelectedOperator,
+    setBuildingMultiValue,
+    setInsertIndex,
+    setInsertAfterConnector,
+    setMenuState,
+  });
 
   const {
     handleMenuClose,
@@ -193,8 +157,6 @@ export const useFilterInputAutocomplete = ({
     setBuildingMultiValue,
   });
 
-  // ── Input handlers ──────────────────────────────────────────
-
   const { handleInputChange, handleInputClick, handleKeyDown, menuRef } = useInputHandlers({
     inputText,
     menuState,
@@ -215,49 +177,17 @@ export const useFilterInputAutocomplete = ({
     handleCustomValueCommit,
   });
 
-  // Now that handleCustomValueCommit exists, define the actual implementation
-  const commitBuildingOnBlur = useCallback((): boolean => {
-    const field = selectedFieldRef.current;
-    const operator = selectedOperatorRef.current;
-    const text = inputTextRef.current.trim();
-    if (!field) return false;
-
-    // Editing an existing chip — don't overwrite its value, just cancel editing
-    if (editing.editingChipId) return false;
-
-    // Snapshot + clear refs synchronously so concurrent callers (two
-    // onOpenChange(false) from Ark UI menus during a state transition +
-    // a blur in the same tick) short-circuit on re-entry instead of creating
-    // duplicate error chips. resetState() clears state through setters, but
-    // those refs update only on the next render — sync re-entry would still
-    // see stale refs without this.
-    selectedFieldRef.current = null;
-    selectedOperatorRef.current = null;
-    inputTextRef.current = '';
-
-    // Has typed text — commit as custom value
-    if (operator && text) {
-      handleCustomValueCommit(text);
-      return true;
-    }
-
-    // New incomplete chip — commit with error
-    upsertCondition(
-      field,
-      operator ?? undefined,
-      null,
-      undefined,
-      effectiveInsertIndexRef.current,
-      true,
-    );
-    resetState();
-    return true;
-  }, [handleCustomValueCommit, editing, upsertCondition, resetState]);
-
-  // Keep the ref in sync
-  commitBuildingOnBlurRef.current = commitBuildingOnBlur;
-
-  // ── Focus ─────────────────────────────────────────────────
+  const commitBuildingOnBlur = useBlurCommit({
+    selectedField,
+    selectedOperator,
+    inputText,
+    editingChipId: editing.editingChipId,
+    effectiveInsertIndexRef,
+    handleCustomValueCommit,
+    upsertCondition,
+    resetState,
+    commitBuildingOnBlurRef,
+  });
 
   const { handleFocus, handleBlur } = useFocusManagement({
     menuState,
@@ -268,6 +198,7 @@ export const useFilterInputAutocomplete = ({
     inputRef,
     editingSegment: editing.editingSegment,
     segmentAttributeInputRef,
+    segmentOperatorInputRef,
     segmentValueInputRef,
     blurCommitRef,
     commitBuildingOnBlur,
@@ -277,50 +208,17 @@ export const useFilterInputAutocomplete = ({
     resetState,
   });
 
-  // ── Chip management ───────────────────────────────────────
-
-  const handleChipRemove = useCallback(
-    (chipId: string) => {
-      const chipCondIdx = chipIdToConditionIndex(chipId);
-      if (chipCondIdx !== null && chipCondIdx < effectiveInsertIndexRef.current) {
-        setInsertIndex(prev => (prev != null ? prev - 1 : prev));
-      }
-      removeCondition(chipId);
-      resetMenuOffset();
-      setMenuState('closed');
-      inputRef.current?.focus();
-    },
-    [removeCondition, resetMenuOffset, inputRef],
-  );
-
-  const handleClear = useCallback(() => {
-    clearAll();
-    resetState();
-  }, [clearAll, resetState]);
-
-  // ── Gap click (insertion between chips) ─────────────────────
-
-  const handleGapClick = useCallback(
-    (conditionIndex: number, afterConnector: boolean) => {
-      // flushSync commits DOM update (input moves to gap position) before reopening the menu.
-      // setMenuState('closed') inside + setMenuState('field') outside is intentional:
-      // the menu must fully unmount so getAnchorRect reads the new input position.
-      flushSync(() => {
-        setInsertIndex(conditionIndex);
-        setInsertAfterConnector(afterConnector);
-        resetMenuOffset();
-        setMenuState('closed');
-      });
-      setMenuState('field');
-      inputRef.current?.focus();
-    },
-    [resetMenuOffset, inputRef],
-  );
-
-  // ── Close menu (for external consumers like connector chip) ──
-  const closeAutocompleteMenu = useCallback(() => {
-    setMenuState('closed');
-  }, []);
+  const { handleChipRemove, handleClear, handleGapClick, closeAutocompleteMenu } = useChipActions({
+    effectiveInsertIndexRef,
+    inputRef,
+    removeCondition,
+    clearAll,
+    resetMenuOffset,
+    resetState,
+    setInsertIndex,
+    setInsertAfterConnector,
+    setMenuState,
+  });
 
   // ── Derived values ────────────────────────────────────────
 
@@ -333,8 +231,24 @@ export const useFilterInputAutocomplete = ({
       buildingMultiValue,
       dateRangeFromValue: dateRange.fromValue,
       segmentFilterText:
-        editing.editingSegment === 'value' ? editing.segmentMenuFilterText : undefined,
+        editing.editingSegment === SEGMENT_VARIANT.value
+          ? editing.segmentMenuFilterText
+          : undefined,
     });
+
+  // Mirror the main-input acceptChar rule when editing a value segment so both
+  // entry paths (building input + inline segment edit) apply the same filter.
+  const handleSegmentFilterChange = useCallback(
+    (text: string) => {
+      const accept = selectedField?.acceptChar;
+      const next =
+        editing.editingSegment === SEGMENT_VARIANT.value && accept
+          ? applyAcceptChar(text, accept)
+          : text;
+      editing.setSegmentFilterText(next);
+    },
+    [selectedField, editing],
+  );
 
   // ── Public API ────────────────────────────────────────────
 
@@ -376,14 +290,7 @@ export const useFilterInputAutocomplete = ({
     editingSegment: editing.editingSegment,
     segmentFilterText: editing.segmentFilterText,
     segmentMenuFilterText: editing.segmentMenuFilterText,
-    handleSegmentFilterChange: (text: string) => {
-      // Mirror the main-input character filter when editing a value segment
-      // so the same acceptChar rule applies in both entry paths.
-      const accept = selectedField?.acceptChar;
-      const next =
-        editing.editingSegment === 'value' && accept ? applyAcceptChar(text, accept) : text;
-      editing.setSegmentFilterText(next);
-    },
+    handleSegmentFilterChange,
     cancelSegmentEdit: editing.cancelSegmentEdit,
     handleCustomValueCommit,
     handleCustomAttributeCommit,
@@ -392,6 +299,7 @@ export const useFilterInputAutocomplete = ({
     blurCommitRef,
     setInputText,
     segmentAttributeInputRef,
+    segmentOperatorInputRef,
     segmentValueInputRef,
   };
 };

@@ -6,14 +6,7 @@ import { segmentContainer, segmentTextVariants } from './classes';
 import { CHAR_WIDTH_PX } from './constants';
 import { MultiValueSegment } from './MultiValueSegment';
 import { useSizerWidth } from './model/useSizerWidth';
-
-const SEGMENT_VARIANT = {
-  attribute: 'attribute',
-  operator: 'operator',
-  value: 'value',
-} as const;
-
-type SegmentVariant = (typeof SEGMENT_VARIANT)[keyof typeof SEGMENT_VARIANT];
+import { SEGMENT_VARIANT, type SegmentVariant } from './segmentVariant';
 
 export type SegmentProps = HTMLAttributes<HTMLDivElement> & {
   variant: SegmentVariant;
@@ -59,9 +52,11 @@ export const Segment: FC<SegmentProps> = ({
   const segmentInputRef =
     variant === SEGMENT_VARIANT.attribute
       ? filterInputContext?.segmentAttributeInputRef
-      : variant === SEGMENT_VARIANT.value
-        ? filterInputContext?.segmentValueInputRef
-        : null;
+      : variant === SEGMENT_VARIANT.operator
+        ? filterInputContext?.segmentOperatorInputRef
+        : variant === SEGMENT_VARIANT.value
+          ? filterInputContext?.segmentValueInputRef
+          : null;
   const lastTextWidthRef = useRef<number>(0);
 
   // Measure text width when content changes (only while not editing).

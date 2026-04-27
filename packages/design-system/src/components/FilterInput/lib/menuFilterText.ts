@@ -1,3 +1,4 @@
+import { SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
 import type { FieldValueOption, FilterOperator } from '../types';
 import { isMultiSelectOperator } from './operators';
 
@@ -18,7 +19,7 @@ export const getCurrentValueTokenText = (
   segmentMenuFilterText: string,
   selectedOperator: FilterOperator | null,
 ): string => {
-  const raw = editingSegment === 'value' ? segmentMenuFilterText : inputText;
+  const raw = editingSegment === SEGMENT_VARIANT.value ? segmentMenuFilterText : inputText;
   if (!isMultiSelectOperator(selectedOperator)) return raw;
   return raw.split(',').pop()?.trim() ?? '';
 };

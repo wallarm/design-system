@@ -14,6 +14,7 @@ import {
 } from './classes';
 import { EditingProvider } from './FilterInputChip/context/EditingContext';
 import { FilterInputChip } from './FilterInputChip/FilterInputChip';
+import { SEGMENT_VARIANT } from './FilterInputChip/segmentVariant';
 import { FilterInputFieldActions } from './FilterInputFieldActions';
 import { FilterInputSearch } from './FilterInputSearch';
 import { useChipsSplitting } from './hooks/useChipsSplitting';
@@ -69,12 +70,12 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
         return;
       }
       if (e.key === 'Enter' && !e.defaultPrevented) {
-        if (editingSegment === 'value') {
+        if (editingSegment === SEGMENT_VARIANT.value) {
           e.preventDefault();
           onCustomValueCommit(segmentFilterText);
           return;
         }
-        if (editingSegment === 'attribute') {
+        if (editingSegment === SEGMENT_VARIANT.attribute) {
           e.preventDefault();
           onCustomAttributeCommit(segmentFilterText);
           return;

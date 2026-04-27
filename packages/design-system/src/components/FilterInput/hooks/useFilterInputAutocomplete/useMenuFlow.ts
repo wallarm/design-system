@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import { useCallback, useRef } from 'react';
-import type { ChipSegment } from '../../FilterInputField/FilterInputChip';
+import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,
   isBetweenOperator,
@@ -89,7 +89,7 @@ export const useMenuFlow = ({
   const handleFieldSelect = useCallback(
     (field: FieldMetadata) => {
       // When editing an existing chip's attribute — update field, keep operator/value
-      if (editing.editingChipId && editing.editingSegment === 'attribute') {
+      if (editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.attribute) {
         const idx = chipIdToConditionIndex(editing.editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
         if (condition) {
@@ -100,7 +100,7 @@ export const useMenuFlow = ({
             condition.value,
             editing.editingChipId,
             undefined,
-            hasValueError ? 'value' : undefined,
+            hasValueError ? SEGMENT_VARIANT.value : undefined,
             condition.dateOrigin,
           );
         }
@@ -134,7 +134,7 @@ export const useMenuFlow = ({
       // When editing the operator of an existing chip:
       // - Complete chip (has value): commit with new operator, keep value, done.
       // - Incomplete chip (no value): update operator in place, continue to value selection.
-      if (editing.editingChipId && editing.editingSegment === 'operator') {
+      if (editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.operator) {
         const idx = chipIdToConditionIndex(editing.editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
         if (condition) {
@@ -154,7 +154,7 @@ export const useMenuFlow = ({
           }
           // Incomplete — persist operator without error, user is still building
           upsertCondition(selectedField, operator, null, editing.editingChipId);
-          editing.setEditingSegment('value');
+          editing.setEditingSegment(SEGMENT_VARIANT.value);
           editing.setSegmentFilterText('');
         }
       }
@@ -233,7 +233,7 @@ export const useMenuFlow = ({
    *    text (the original chip value being edited) stays visible on the chip
    *    so there's no flicker to an empty string between clicks. */
   const handleMultiSelectToggle = useCallback(() => {
-    if (editing.editingSegment === 'value') {
+    if (editing.editingSegment === SEGMENT_VARIANT.value) {
       editing.resetSegmentTyping();
     } else {
       setInputText('');
@@ -272,7 +272,7 @@ export const useMenuFlow = ({
           resolved,
           editing.editingChipId,
           isEditing ? undefined : insertIndex,
-          error ? 'value' : undefined,
+          error ? SEGMENT_VARIANT.value : undefined,
         );
       } else if (selectedField.type === 'date') {
         // Handle "between" date ranges: parse "Mar 5, 2026 – Mar 15, 2026" → ["2026-03-05", "2026-03-15"]
@@ -284,7 +284,7 @@ export const useMenuFlow = ({
             rangeValue ?? trimmed,
             editing.editingChipId,
             isEditing ? undefined : insertIndex,
-            rangeValue ? undefined : 'value',
+            rangeValue ? undefined : SEGMENT_VARIANT.value,
             'absolute',
           );
         } else {
@@ -299,7 +299,7 @@ export const useMenuFlow = ({
             trimmed,
             editing.editingChipId,
             isEditing ? undefined : insertIndex,
-            error ? 'value' : undefined,
+            error ? SEGMENT_VARIANT.value : undefined,
             dateOrigin,
           );
         }
@@ -311,7 +311,7 @@ export const useMenuFlow = ({
           resolved,
           editing.editingChipId,
           isEditing ? undefined : insertIndex,
-          error ? 'value' : undefined,
+          error ? SEGMENT_VARIANT.value : undefined,
         );
       }
       resetState(!isEditing);
@@ -343,7 +343,7 @@ export const useMenuFlow = ({
           condition.value,
           editing.editingChipId,
           undefined,
-          hasValueError ? 'value' : undefined,
+          hasValueError ? SEGMENT_VARIANT.value : undefined,
           condition.dateOrigin,
         );
       } else {
@@ -359,7 +359,7 @@ export const useMenuFlow = ({
           condition.value,
           editing.editingChipId,
           undefined,
-          'attribute',
+          SEGMENT_VARIANT.attribute,
           condition.dateOrigin,
         );
       }

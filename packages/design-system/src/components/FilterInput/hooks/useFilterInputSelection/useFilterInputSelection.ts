@@ -16,7 +16,10 @@ interface UseFilterInputSelectionOptions {
   clearAll: () => void;
   setInputText: (text: string) => void;
   closeMenu: () => void;
-  onChange?: (expression: ExprNode | null) => void;
+  /** Replace the entire expression — used by paste so local state stays in sync even when uncontrolled. */
+  replaceExpression: (expression: ExprNode | null) => void;
+  /** Reset transient autocomplete state after paste (insertIndex, selectedField, menuState, …). */
+  resetAutocompleteState: () => void;
 }
 
 export const useFilterInputSelection = ({
@@ -29,7 +32,8 @@ export const useFilterInputSelection = ({
   clearAll,
   setInputText,
   closeMenu,
-  onChange,
+  replaceExpression,
+  resetAutocompleteState,
 }: UseFilterInputSelectionOptions) => {
   const [allSelected, setAllSelected] = useState(false);
   const [pasteError, setPasteError] = useState<string | null>(null);
@@ -69,6 +73,7 @@ export const useFilterInputSelection = ({
     allSelected,
     conditionsCount: conditions.length,
     chipRegistryRef,
+    containerRef,
     inputRef,
     clearAll,
     clearSelection,
@@ -84,7 +89,8 @@ export const useFilterInputSelection = ({
     setPasteError,
     setInputText,
     closeMenu,
-    onChange,
+    replaceExpression,
+    resetAutocompleteState,
   });
 
   return {

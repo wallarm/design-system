@@ -1,5 +1,5 @@
 import { type FC, type RefObject, useMemo } from 'react';
-import type { ChipSegment } from '../FilterInputField/FilterInputChip';
+import { type ChipSegment, SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
 import {
   getCurrentValueTokenText,
   getFieldValues,
@@ -73,9 +73,11 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
   } = autocomplete;
 
   // Route filter text: use menu filter text (empty until user types) when editing, otherwise main input
-  const fieldFilterText = editingSegment === 'attribute' ? segmentMenuFilterText : inputText;
+  const fieldFilterText =
+    editingSegment === SEGMENT_VARIANT.attribute ? segmentMenuFilterText : inputText;
   // Operator: filter by typed text from main input (building) or segment input (inline editing)
-  const operatorFilterText = editingSegment === 'operator' ? segmentMenuFilterText : inputText;
+  const operatorFilterText =
+    editingSegment === SEGMENT_VARIANT.operator ? segmentMenuFilterText : inputText;
 
   // The active token the user is currently typing. For multi-select operators this
   // strips prior comma-committed values so `getSuggestions` and the dropdown filter

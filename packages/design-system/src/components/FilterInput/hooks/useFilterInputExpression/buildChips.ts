@@ -1,3 +1,4 @@
+import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { getDateDisplayLabel, getOperatorLabel } from '../../lib';
 import type { ChipErrorSegment, Condition, FieldMetadata, FilterInputChipData } from '../../types';
 import { getInvalidValueIndices } from '../useFilterInputAutocomplete/valueCommitHelpers';
@@ -28,7 +29,10 @@ const makeEmptyChip = (i: number, error: boolean): FilterInputChipData =>
 const resolveDisplayValue = (condition: Condition, field: FieldMetadata | undefined): string => {
   const raw = String(condition.value ?? '');
   if (!field?.values) return raw;
-  const opt = field.values.find(o => o.value === condition.value);
+  // Loose match: parser/serializer round-trip turns numeric values like 5 into the
+  // string "5" (e.g. for an `integer` field with `values: [{value: 5, label: 'Medium'}]`).
+  // Strict `===` would miss that match and fall back to the raw "5" instead of the label.
+  const opt = field.values.find(o => String(o.value) === raw);
   return opt?.label ?? raw;
 };
 
@@ -58,7 +62,7 @@ const buildDateRangeChip = (
   return {
     ...baseChip,
     value: parts.join(DATE_RANGE_SEPARATOR),
-    error: chipError || (invalidIndices.length > 0 ? 'value' : undefined),
+    error: chipError || (invalidIndices.length > 0 ? SEGMENT_VARIANT.value : undefined),
     ...(invalidIndices.length > 0 && {
       valueParts: parts,
       valueSeparator: DATE_RANGE_SEPARATOR,
@@ -77,7 +81,7 @@ const buildDateChip = (
   return {
     ...baseChip,
     value: displayValue,
-    error: chipError || (displayValue === INVALID_DATE ? 'value' : undefined),
+    error: chipError || (displayValue === INVALID_DATE ? SEGMENT_VARIANT.value : undefined),
   };
 };
 
@@ -89,14 +93,16 @@ const buildMultiValueChip = (
   chipError: ChipErrorSegment | undefined,
 ): FilterInputChipData => {
   const values = condition.value as Array<string | number | boolean>;
-  const valueParts = values.map(
-    v => field?.values?.find(opt => opt.value === v)?.label ?? String(v),
-  );
+  // Loose match by stringified value — see resolveDisplayValue for the why.
+  const valueParts = values.map(v => {
+    const key = String(v);
+    return field?.values?.find(opt => String(opt.value) === key)?.label ?? key;
+  });
   const invalidIndices = field ? getInvalidValueIndices(field, values) : [];
   return {
     ...baseChip,
     value: valueParts.join(MULTI_VALUE_SEPARATOR),
-    error: chipError || (invalidIndices.length > 0 ? 'value' : undefined),
+    error: chipError || (invalidIndices.length > 0 ? SEGMENT_VARIANT.value : undefined),
     ...(valueParts.length > 1 && { valueParts }),
     ...(invalidIndices.length > 0 && { errorValueIndices: invalidIndices }),
   };
