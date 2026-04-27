@@ -1,3 +1,9 @@
+## <small>0.29.1 (2026-04-27)</small>
+
+* test(date-time-input): assert read-only segments are non-focusable (#100) ([0c06906](https://github.com/wallarm/design-system/commit/0c06906)), closes [#100](https://github.com/wallarm/design-system/issues/100)
+* fix(calendar): align Calendar with Figma and harden readOnly [WDS-71]  (#99) ([bc96f82](https://github.com/wallarm/design-system/commit/bc96f82)), closes [#99](https://github.com/wallarm/design-system/issues/99)
+* fix(simple-charts): WDS-90 fix BarList tooltip + dropdown nesting ([725e1d7](https://github.com/wallarm/design-system/commit/725e1d7))
+
 ## 0.29.0 (2026-04-24)
 
 * test(e2e): stabilize overlay-click + fix separator selector ([c2a9b4a](https://github.com/wallarm/design-system/commit/c2a9b4a))
