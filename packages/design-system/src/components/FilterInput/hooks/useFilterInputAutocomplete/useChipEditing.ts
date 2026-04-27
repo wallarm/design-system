@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
-import type { ChipSegment } from '../../FilterInputField/FilterInputChip';
+import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { chipIdToConditionIndex, getOperatorFromLabel } from '../../lib';
 import type {
   Condition,
@@ -8,6 +8,7 @@ import type {
   FilterInputChipData,
   FilterOperator,
   MenuState,
+  UpsertCondition,
 } from '../../types';
 
 interface UseChipEditingOptions {
@@ -19,12 +20,7 @@ interface UseChipEditingOptions {
   setSelectedField: (field: FieldMetadata | null) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
   setMenuState: (state: MenuState) => void;
-  upsertCondition: (
-    field: FieldMetadata,
-    operator: FilterOperator | undefined,
-    val: string | number | boolean | null | Array<string | number | boolean>,
-    editingChipId?: string | null,
-  ) => void;
+  upsertCondition: UpsertCondition;
 }
 
 // ── Pure helpers ────────────────────────────────────────────
@@ -50,10 +46,14 @@ const getFirstIncompleteSegment = (
   fields: FieldMetadata[],
 ): ChipSegment | null => {
   const field = fields.find(f => f.name === condition.field);
-  if (!field || condition.error === 'attribute') return 'attribute';
-  if (!condition.operator) return 'operator';
-  if (condition.value === null || condition.value === '' || condition.error === 'value')
-    return 'value';
+  if (!field || condition.error === SEGMENT_VARIANT.attribute) return SEGMENT_VARIANT.attribute;
+  if (!condition.operator) return SEGMENT_VARIANT.operator;
+  if (
+    condition.value === null ||
+    condition.value === '' ||
+    condition.error === SEGMENT_VARIANT.value
+  )
+    return SEGMENT_VARIANT.value;
   return null;
 };
 
@@ -107,7 +107,7 @@ export const useChipEditing = ({
       const targetSegment = incompleteSegment ?? segment;
 
       // For unknown fields, only attribute editing is allowed
-      if (!field && targetSegment !== 'attribute') return;
+      if (!field && targetSegment !== SEGMENT_VARIANT.attribute) return;
 
       // Clear error when resuming editing of an incomplete chip
       if (incompleteSegment && field) {
@@ -120,12 +120,12 @@ export const useChipEditing = ({
       setSelectedField(field ?? null);
 
       const rawOperator =
-        targetSegment === 'value' || targetSegment === 'operator'
+        targetSegment === SEGMENT_VARIANT.value || targetSegment === SEGMENT_VARIANT.operator
           ? (getOperatorFromLabel(chip.operator || '', field?.type ?? 'string') ??
             condition.operator)
           : null;
 
-      if (targetSegment === 'value') {
+      if (targetSegment === SEGMENT_VARIANT.value) {
         setSelectedOperator(rawOperator ?? null);
       } else {
         setSelectedOperator(null);

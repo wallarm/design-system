@@ -12,6 +12,21 @@ export type FilterInputChipVariant = 'chip' | 'and' | 'or' | '(' | ')';
 /** Which segment of a chip has an error: attribute or value (true = whole chip) */
 export type ChipErrorSegment = boolean | 'attribute' | 'value';
 
+/**
+ * Shared signature of the upsertCondition callback owned by useFilterInputExpression.
+ * Re-declared in several option interfaces — exported here to keep the source of
+ * truth single-rooted (changes to the signature reach all consumers).
+ */
+export type UpsertCondition = (
+  field: FieldMetadata,
+  operator: FilterOperator | undefined,
+  val: string | number | boolean | null | Array<string | number | boolean>,
+  editingChipId?: string | null,
+  atIndex?: number,
+  error?: ChipErrorSegment,
+  dateOrigin?: 'relative' | 'absolute',
+) => void;
+
 export interface FilterInputChipData {
   id: string;
   variant: FilterInputChipVariant;

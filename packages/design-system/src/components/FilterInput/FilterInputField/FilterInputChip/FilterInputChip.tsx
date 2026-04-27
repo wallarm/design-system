@@ -7,8 +7,9 @@ import { chipVariants } from './classes';
 import { useEditingContext } from './context/EditingContext';
 import { FilterInputRemoveButton } from './FilterInputRemoveButton';
 import { Segment } from './Segment';
+import { SEGMENT_VARIANT, type SegmentVariant } from './segmentVariant';
 
-export type ChipSegment = 'attribute' | 'operator' | 'value';
+export type ChipSegment = SegmentVariant;
 
 export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   ref?: Ref<HTMLDivElement>;
@@ -58,7 +59,9 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       if (activeSegment === segment) return;
       e.stopPropagation();
       const anchorEl =
-        segment === 'attribute' ? internalRef.current : (e.currentTarget as HTMLElement);
+        segment === SEGMENT_VARIANT.attribute
+          ? internalRef.current
+          : (e.currentTarget as HTMLElement);
       if (!anchorEl) return;
       onSegmentClick(segment, anchorEl.getBoundingClientRect());
     },
@@ -97,34 +100,37 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       {...props}
     >
       <Segment
-        variant='attribute'
+        variant={SEGMENT_VARIANT.attribute}
         className='shrink-0'
-        error={error === true || error === 'attribute'}
-        onClick={interactive ? e => handleSegmentClick('attribute', e) : undefined}
-        {...segmentEditProps('attribute')}
+        error={error === true || error === SEGMENT_VARIANT.attribute}
+        onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.attribute, e) : undefined}
+        {...segmentEditProps(SEGMENT_VARIANT.attribute)}
       >
         {attribute}
       </Segment>
-      {(operator || activeSegment === 'operator') && (
+      {(operator || activeSegment === SEGMENT_VARIANT.operator) && (
         <Segment
-          variant='operator'
+          variant={SEGMENT_VARIANT.operator}
           className='shrink-0'
-          onClick={interactive ? e => handleSegmentClick('operator', e) : undefined}
-          {...segmentEditProps('operator')}
+          onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.operator, e) : undefined}
+          {...segmentEditProps(SEGMENT_VARIANT.operator)}
         >
           {operator ?? ''}
         </Segment>
       )}
-      {(value || activeSegment === 'value') && (
+      {(value || activeSegment === SEGMENT_VARIANT.value) && (
         <Segment
-          variant='value'
+          variant={SEGMENT_VARIANT.value}
           className='min-w-0'
-          error={activeSegment !== 'value' && (error === true || error === 'value')}
+          error={
+            activeSegment !== SEGMENT_VARIANT.value &&
+            (error === true || error === SEGMENT_VARIANT.value)
+          }
           valueParts={valueParts}
           valueSeparator={valueSeparator}
           errorValueIndices={errorValueIndices}
-          onClick={interactive ? e => handleSegmentClick('value', e) : undefined}
-          {...segmentEditProps('value')}
+          onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.value, e) : undefined}
+          {...segmentEditProps(SEGMENT_VARIANT.value)}
         >
           {value ?? ''}
         </Segment>

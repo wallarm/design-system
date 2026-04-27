@@ -11,3 +11,4 @@ export {
 export { type ChipSegment, FilterInputChip, type FilterInputChipProps } from './FilterInputChip';
 export { FilterInputRemoveButton } from './FilterInputRemoveButton';
 export { Segment, type SegmentProps } from './Segment';
+export { SEGMENT_VARIANT, type SegmentVariant } from './segmentVariant';

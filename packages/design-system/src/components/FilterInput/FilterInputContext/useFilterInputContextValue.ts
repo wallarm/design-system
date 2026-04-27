@@ -28,6 +28,9 @@ interface AutocompleteForContext {
   handleCustomAttributeCommit: (customText: string) => void;
   menuRef: RefObject<HTMLDivElement | null>;
   closeAutocompleteMenu: () => void;
+  segmentAttributeInputRef: RefObject<HTMLInputElement | null>;
+  segmentOperatorInputRef: RefObject<HTMLInputElement | null>;
+  segmentValueInputRef: RefObject<HTMLInputElement | null>;
 }
 
 interface UseFilterInputContextValueOptions {
@@ -82,6 +85,9 @@ export const useFilterInputContextValue = ({
       menuRef: autocomplete.menuRef,
       closeAutocompleteMenu: autocomplete.closeAutocompleteMenu,
       registerChipRef,
+      segmentAttributeInputRef: autocomplete.segmentAttributeInputRef,
+      segmentOperatorInputRef: autocomplete.segmentOperatorInputRef,
+      segmentValueInputRef: autocomplete.segmentValueInputRef,
     }),
     [
       chips,
@@ -107,6 +113,9 @@ export const useFilterInputContextValue = ({
       autocomplete.handleCustomAttributeCommit,
       autocomplete.menuRef,
       autocomplete.closeAutocompleteMenu,
+      autocomplete.segmentAttributeInputRef,
+      autocomplete.segmentOperatorInputRef,
+      autocomplete.segmentValueInputRef,
       registerChipRef,
       buildingChipRef,
       inputRef,

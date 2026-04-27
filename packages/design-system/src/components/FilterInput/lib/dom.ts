@@ -1,11 +1,14 @@
-/** Check if an element belongs to a menu/portal overlay (dropdown, date-picker, etc.) */
+/**
+ * Check if an element belongs to a FilterInput-owned menu/portal overlay.
+ *
+ * Menus are marked with `data-filter-input-menu` on their `DropdownMenuContent`
+ * root. Generic Ark UI selectors (`[role="menu"]`, `[data-part="content"]`,
+ * `[data-scope="date-picker"]`) intentionally DO NOT match — otherwise blur
+ * handlers mistake unrelated page popups (tenant switcher, other dropdowns)
+ * for FilterInput's own menu and refuse to close. See AS-882.
+ */
 export const isMenuRelated = (el: HTMLElement | null): boolean =>
-  !!(
-    el?.closest('[role="menu"]') ||
-    el?.closest('[data-scope="menu"]') ||
-    el?.closest('[data-scope="date-picker"]') ||
-    el?.closest('[data-part="content"]')
-  );
+  !!el?.closest('[data-filter-input-menu]');
 
 /**
  * Build a DOMRect-compatible object anchored vertically to the container

@@ -1,3 +1,4 @@
+import { SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
 import { isValidFieldValue } from '../hooks/useFilterInputAutocomplete/valueCommitHelpers';
 import { getFieldValues, hasStaticAllowlist } from '../lib';
 import type { Condition, FieldMetadata } from '../types';
@@ -19,11 +20,11 @@ export const parseFilterInputErrors = (
     const label = field?.label || condition.field;
 
     switch (condition.error) {
-      case 'attribute':
+      case SEGMENT_VARIANT.attribute:
         errors.push(`Unknown field ${condition.field}`);
         break;
 
-      case 'value': {
+      case SEGMENT_VARIANT.value: {
         if (field?.validate) {
           const values = Array.isArray(condition.value) ? condition.value : [condition.value];
           const invalidValues = values.filter(

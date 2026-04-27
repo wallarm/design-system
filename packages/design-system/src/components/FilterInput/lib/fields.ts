@@ -1,6 +1,23 @@
 import type { FieldMetadata, FieldValueOption } from '../types';
 
 /**
+ * Find an option in `field.values` matching the given value, using stringified
+ * comparison. Loose-match is required because parser/serializer round-trip
+ * coerces typed primitives to strings (e.g. integer field value `5` → string
+ * `"5"` after `(field = "5")` parses back), and strict `===` would miss the
+ * canonical option. Returns undefined when there is no match or the field
+ * has no `values` allowlist.
+ */
+export const findOptionByValue = (
+  field: FieldMetadata | undefined,
+  value: string | number | boolean | null | undefined,
+): FieldValueOption | undefined => {
+  if (!field?.values || value == null) return undefined;
+  const key = String(value);
+  return field.values.find(opt => String(opt.value) === key);
+};
+
+/**
  * Get value options for a field.
  * Priority: `getSuggestions(inputText, context)` > `values` > `options` (converted to `{value, label}`).
  *

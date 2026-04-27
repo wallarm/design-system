@@ -76,6 +76,7 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
     highlightedValue,
     onHighlightChange,
     pendingIds,
+    registerItem,
     handleItemSelect,
   } = useValueMenuState({
     values: filteredValues,
@@ -118,6 +119,7 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
         ref={menuRef}
         className={cn(widthClass, 'max-h-[430px]', className)}
         style={widthStyle}
+        data-filter-input-menu='true'
       >
         {displayValues.length > 0 ? (
           <DropdownMenuGroup>
@@ -125,9 +127,14 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
               <ValueMenuItem
                 key={String(option.value)}
                 option={option}
-                isChecked={selectedValues.includes(option.value)}
+                // Loose match by String() — values may be strings after parser round-trip
+                // (e.g. integer field with values [{value: 1, label: 'Low'}] gets
+                // condition.value = ["1"] from clipboard paste). Strict `.includes` would
+                // miss the match (1 !== "1") and the item would render as unchecked.
+                isChecked={selectedValues.some(v => String(v) === String(option.value))}
                 isPending={pendingIds.has(String(option.value))}
                 multiSelect={multiSelect}
+                registerItem={registerItem}
                 onSelect={() =>
                   handleItemSelect({
                     id: String(option.value),

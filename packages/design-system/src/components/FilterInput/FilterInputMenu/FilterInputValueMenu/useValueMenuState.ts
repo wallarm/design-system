@@ -74,7 +74,14 @@ export const useValueMenuState = ({
   }, [initialValues, open]);
 
   const toggleValue = (val: ConditionValue) => {
-    setCheckedValues(prev => (prev.includes(val) ? prev.filter(v => v !== val) : [...prev, val]));
+    setCheckedValues(prev => {
+      // Loose match — checkedValues may contain stringified copies after a parser
+      // round-trip (e.g. "1" from clipboard paste vs the option's canonical 1).
+      // Strict `.includes` would miss the match and add a duplicate instead of toggling off.
+      const key = String(val);
+      const exists = prev.some(v => String(v) === key);
+      return exists ? prev.filter(v => String(v) !== key) : [...prev, val];
+    });
   };
 
   const onCommitRef = useRef(onCommit);
@@ -121,7 +128,7 @@ export const useValueMenuState = ({
     onOpenChange?.(false);
   };
 
-  const { highlightedValue, onHighlightChange, pendingIds } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange, pendingIds, registerItem } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: handleItemSelect,
@@ -155,6 +162,7 @@ export const useValueMenuState = ({
     highlightedValue,
     onHighlightChange,
     pendingIds,
+    registerItem,
     commitChecked,
     handleItemSelect,
   };

@@ -46,4 +46,10 @@ export interface FilterInputContextValue {
   closeAutocompleteMenu: () => void;
   /** Register/unregister a chip DOM element for selection tracking */
   registerChipRef: (id: string, el: HTMLElement | null) => void;
+  /** Direct ref to the attribute segment <input> — attached by Segment when editing. */
+  segmentAttributeInputRef: RefObject<HTMLInputElement | null>;
+  /** Direct ref to the operator segment <input> — attached by Segment when editing. */
+  segmentOperatorInputRef: RefObject<HTMLInputElement | null>;
+  /** Direct ref to the value segment <input> — attached by Segment when editing. */
+  segmentValueInputRef: RefObject<HTMLInputElement | null>;
 }

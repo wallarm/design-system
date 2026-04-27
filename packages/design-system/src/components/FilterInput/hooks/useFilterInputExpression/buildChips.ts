@@ -1,4 +1,5 @@
-import { getDateDisplayLabel, getOperatorLabel } from '../../lib';
+import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
+import { findOptionByValue, getDateDisplayLabel, getOperatorLabel } from '../../lib';
 import type { ChipErrorSegment, Condition, FieldMetadata, FilterInputChipData } from '../../types';
 import { getInvalidValueIndices } from '../useFilterInputAutocomplete/valueCommitHelpers';
 
@@ -27,9 +28,9 @@ const makeEmptyChip = (i: number, error: boolean): FilterInputChipData =>
 /** Resolve display value for a single-value condition */
 const resolveDisplayValue = (condition: Condition, field: FieldMetadata | undefined): string => {
   const raw = String(condition.value ?? '');
-  if (!field?.values) return raw;
-  const opt = field.values.find(o => o.value === condition.value);
-  return opt?.label ?? raw;
+  return (
+    findOptionByValue(field, condition.value as string | number | boolean | null)?.label ?? raw
+  );
 };
 
 /** Build base chip data shared by all condition types */
@@ -58,7 +59,7 @@ const buildDateRangeChip = (
   return {
     ...baseChip,
     value: parts.join(DATE_RANGE_SEPARATOR),
-    error: chipError || (invalidIndices.length > 0 ? 'value' : undefined),
+    error: chipError || (invalidIndices.length > 0 ? SEGMENT_VARIANT.value : undefined),
     ...(invalidIndices.length > 0 && {
       valueParts: parts,
       valueSeparator: DATE_RANGE_SEPARATOR,
@@ -77,7 +78,7 @@ const buildDateChip = (
   return {
     ...baseChip,
     value: displayValue,
-    error: chipError || (displayValue === INVALID_DATE ? 'value' : undefined),
+    error: chipError || (displayValue === INVALID_DATE ? SEGMENT_VARIANT.value : undefined),
   };
 };
 
@@ -89,14 +90,12 @@ const buildMultiValueChip = (
   chipError: ChipErrorSegment | undefined,
 ): FilterInputChipData => {
   const values = condition.value as Array<string | number | boolean>;
-  const valueParts = values.map(
-    v => field?.values?.find(opt => opt.value === v)?.label ?? String(v),
-  );
+  const valueParts = values.map(v => findOptionByValue(field, v)?.label ?? String(v));
   const invalidIndices = field ? getInvalidValueIndices(field, values) : [];
   return {
     ...baseChip,
     value: valueParts.join(MULTI_VALUE_SEPARATOR),
-    error: chipError || (invalidIndices.length > 0 ? 'value' : undefined),
+    error: chipError || (invalidIndices.length > 0 ? SEGMENT_VARIANT.value : undefined),
     ...(valueParts.length > 1 && { valueParts }),
     ...(invalidIndices.length > 0 && { errorValueIndices: invalidIndices }),
   };

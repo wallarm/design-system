@@ -209,6 +209,20 @@ export const useFilterInputExpression = ({
     });
   }, [onChange]);
 
+  /**
+   * Replace the entire expression at once. Used by paste — keeps local state in
+   * sync even when the component is uncontrolled (no parent-supplied `value`),
+   * mirroring the upsertCondition / removeCondition / clearAll pattern.
+   */
+  const replaceExpression = useCallback(
+    (expr: ExprNode | null) => {
+      const result = expressionToConditions(expr);
+      setState({ conditions: result.conditions, connectors: result.connectors });
+      onChange?.(expr);
+    },
+    [onChange],
+  );
+
   const setConnectorValue = useCallback(
     (connectorId: string, value: 'and' | 'or') => {
       const match = connectorId.match(CONNECTOR_ID_PATTERN);
@@ -237,6 +251,7 @@ export const useFilterInputExpression = ({
     removeCondition,
     removeConditionAtIndex,
     clearAll,
+    replaceExpression,
     setConnectorValue,
   };
 };
