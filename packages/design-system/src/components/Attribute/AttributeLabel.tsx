@@ -22,7 +22,7 @@ export const AttributeLabel: FC<AttributeLabelProps> = ({ ref, children, classNa
       className={cn(
         'font-sans-display text-sm font-normal text-text-secondary',
         isHorizontal
-          ? 'flex items-center min-w-[100px] max-w-[160px] w-[160px] py-4 shrink-0 truncate'
+          ? 'block min-w-[100px] max-w-[160px] w-[160px] py-4 shrink-0 truncate'
           : 'flex items-center gap-4 flex-wrap',
         className,
       )}

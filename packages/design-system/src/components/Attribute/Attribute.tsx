@@ -50,7 +50,7 @@ export const Attribute: FC<AttributeProps> = ({
           {loading ? (
             isHorizontal ? (
               <>
-                <Skeleton width='82px' height='16px' rounded={6} />
+                <Skeleton width='100px' height='16px' rounded={6} />
                 <Skeleton width='100%' height='16px' rounded={6} />
               </>
             ) : (
