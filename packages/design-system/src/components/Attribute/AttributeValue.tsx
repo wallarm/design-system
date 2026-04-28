@@ -10,14 +10,11 @@ export interface AttributeValueProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
 }
 
-function isEmptyChildren(children: ReactNode): boolean {
-  return (
-    children === undefined ||
-    children === null ||
-    children === false ||
-    Children.count(children) === 0
-  );
-}
+const isEmptyChildren = (children: ReactNode): boolean =>
+  children === undefined ||
+  children === null ||
+  children === false ||
+  Children.count(children) === 0;
 
 export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, className, ...props }) => {
   const testId = useTestId('value');
