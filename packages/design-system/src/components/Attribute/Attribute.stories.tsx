@@ -6,6 +6,8 @@ import { InlineCodeSnippet } from '../CodeSnippet';
 import { FormatDateTime } from '../FormatDateTime';
 import { Ip, IpAddress, IpCountry, IpList, IpProvider } from '../Ip';
 import { Link } from '../Link';
+import { OverflowList } from '../OverflowList';
+import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
 import { Attribute, type AttributeProps } from './Attribute';
@@ -45,6 +47,23 @@ const meta = {
 } satisfies Meta<typeof Attribute>;
 
 export default meta;
+
+const renderOverflowPopover = (items: string[]) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <Tag>+{items.length}</Tag>
+    </PopoverTrigger>
+    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
+      <div className='flex flex-col gap-4'>
+        {items.map(item => (
+          <Text key={item} size='sm'>
+            {item}
+          </Text>
+        ))}
+      </div>
+    </PopoverContent>
+  </Popover>
+);
 
 export const Default: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
@@ -158,11 +177,12 @@ export const WithTags: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>Tags</AttributeLabel>
       <AttributeValue>
-        <div className='flex items-center gap-4 flex-wrap'>
-          <Tag>production</Tag>
-          <Tag>us-east-1</Tag>
-          <Tag>critical</Tag>
-        </div>
+        <OverflowList
+          className='gap-4'
+          items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
       </AttributeValue>
     </Attribute>
   </div>
@@ -244,20 +264,19 @@ export const Composition: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>First seen</AttributeLabel>
       <AttributeValue>
-        <FormatDateTime value='2026-04-03T10:15:00Z' />
+        <FormatDateTime value='2026-04-03T10:15:00Z' format='relative' />
       </AttributeValue>
     </Attribute>
 
     <Attribute>
       <AttributeLabel>Attack type</AttributeLabel>
       <AttributeValue>
-        <div className='flex items-center gap-4 flex-wrap'>
-          <Tag>XSS</Tag>
-          <Tag>BOLA</Tag>
-          <Tag>SQL Injection</Tag>
-          <Tag>Scanner</Tag>
-          <Tag>+5</Tag>
-        </div>
+        <OverflowList
+          className='gap-4'
+          items={['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR']}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
       </AttributeValue>
     </Attribute>
 
@@ -271,10 +290,18 @@ export const Composition: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>Users</AttributeLabel>
       <AttributeValue>
-        <div className='flex items-center gap-4'>
-          <Text size='sm'>artem@acme.com, uxd@acme.com</Text>
-          <Tag>+3</Tag>
-        </div>
+        <OverflowList
+          className='gap-4'
+          items={[
+            'artem@acme.com',
+            'uxd@acme.com',
+            'ops@acme.com',
+            'security@acme.com',
+            'admin@acme.com',
+          ]}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
       </AttributeValue>
     </Attribute>
 
@@ -478,27 +505,26 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
     <Attribute orientation='horizontal'>
       <AttributeLabel>First seen</AttributeLabel>
       <AttributeValue>
-        <FormatDateTime value='2026-04-03T10:15:00Z' />
+        <FormatDateTime value='2026-04-03T10:15:00Z' format='relative' />
       </AttributeValue>
     </Attribute>
 
     <Attribute orientation='horizontal'>
       <AttributeLabel>Attack type</AttributeLabel>
       <AttributeValue>
-        <div className='flex items-center gap-4 flex-wrap'>
-          <Tag>XSS</Tag>
-          <Tag>BOLA</Tag>
-          <Tag>SQL Injection</Tag>
-          <Tag>Scanner</Tag>
-          <Tag>+5</Tag>
-        </div>
+        <OverflowList
+          className='gap-4'
+          items={['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR']}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
       </AttributeValue>
     </Attribute>
 
     <Attribute orientation='horizontal'>
       <AttributeLabel>Last seen</AttributeLabel>
       <AttributeValue>
-        <Text size='sm'>2 Apr, 2026 14:03</Text>
+        <FormatDateTime value='2025-04-02T14:03:00Z' format='date' />
       </AttributeValue>
     </Attribute>
 
@@ -512,7 +538,18 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
     <Attribute orientation='horizontal'>
       <AttributeLabel>Users</AttributeLabel>
       <AttributeValue>
-        <Text size='sm'>artem@acme.com, uxd@acme.com</Text>
+        <OverflowList
+          className='gap-4'
+          items={[
+            'artem@acme.com',
+            'uxd@acme.com',
+            'ops@acme.com',
+            'security@acme.com',
+            'admin@acme.com',
+          ]}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
       </AttributeValue>
     </Attribute>
 
