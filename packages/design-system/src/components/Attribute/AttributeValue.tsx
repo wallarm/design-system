@@ -24,7 +24,8 @@ export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, classNa
   const orientation = useAttributeOrientation();
   const isEmptyAttribute = useAttributeEmpty();
   const isHorizontal = orientation === 'horizontal';
-  const showPlaceholder = isEmptyAttribute || isEmptyChildren(children);
+  const hasEmptyChildren = isEmptyChildren(children);
+  const showPlaceholder = isEmptyAttribute || hasEmptyChildren;
 
   return (
     <div

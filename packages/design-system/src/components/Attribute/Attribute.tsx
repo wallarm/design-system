@@ -14,8 +14,9 @@ export interface AttributeProps extends HTMLAttributes<HTMLDivElement>, Testable
   loading?: boolean;
   /**
    * When true, `AttributeValue` renders the em-dash placeholder instead of its
-   * children, and any `AttributeEmptyDescription` inside the tree becomes
-   * visible. Ignored while `loading` is true (skeleton wins).
+   * children, and any `AttributeEmptyDescription` inside the tree renders
+   * (it returns `null` otherwise). Ignored while `loading` is true (skeleton
+   * wins).
    */
   isEmpty?: boolean;
   /**

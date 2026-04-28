@@ -8,12 +8,13 @@ export interface AttributeEmptyDescriptionProps extends HTMLAttributes<HTMLParag
 }
 
 /**
- * Description shown next to the label only while the surrounding `Attribute`
- * is in the `isEmpty` state. Renders nothing otherwise. Internally a thin
- * conditional wrapper around `AttributeLabelDescription` — same layout, same
- * styling, just gated by `isEmpty`.
+ * Description shown only while the surrounding `Attribute` is in the
+ * `isEmpty` state. Renders `null` otherwise. Internally a thin conditional
+ * wrapper around `AttributeLabelDescription` — same layout, same styling,
+ * just gated by `isEmpty`.
  *
- * Place it inside `AttributeLabel`:
+ * Typically placed inside `<AttributeLabel>`; works anywhere inside an
+ * `<Attribute>` since the visibility comes from context.
  *
  * ```tsx
  * <Attribute isEmpty>
