@@ -329,6 +329,17 @@ export {
   SelectSearchInput,
   SelectSeparator,
 } from './components/Select';
+export {
+  Selection,
+  SelectionAll,
+  type SelectionAllProps,
+  SelectionBulkBar,
+  type SelectionBulkBarPlacement,
+  type SelectionBulkBarProps,
+  SelectionItem,
+  type SelectionItemProps,
+  type SelectionProps,
+} from './components/Selection';
 export { Separator, type SeparatorProps } from './components/Separator';
 export { Skeleton, type SkeletonProps } from './components/Skeleton';
 export { SplitButton, type SplitButtonProps } from './components/SplitButton';
