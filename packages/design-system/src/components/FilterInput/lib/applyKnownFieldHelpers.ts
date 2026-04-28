@@ -13,11 +13,9 @@ type FieldHelpers = Pick<
 >;
 
 /**
- * Known field names that auto-wire DS helpers. Keyed by `FieldMetadata.name`
- * — when a field with this name is passed to `FilterInput` without explicit
- * helpers, the factories below fill each slot declared by `FieldHelpers`
- * above. Consumer-supplied callbacks always win. See the reserved-name
- * table on `applyKnownFieldHelpers` for the current slot roster per name.
+ * Reserved field names whose helper contract is owned by the design system.
+ * Keyed by `FieldMetadata.name`; the factories produce the DS-supplied
+ * implementation for every slot declared by `FieldHelpers` above.
  */
 const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
   status_code: () => ({
@@ -33,17 +31,21 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
  * Decorate `fields` in place with design-system helpers for known field names.
  * `FilterInput` calls this on the `fields` prop before rendering.
  *
- * Reserved names and what they auto-attach (unless the consumer already
- * provided a value for that slot):
+ * Reserved names and what the design system owns:
  *
- * | `name`        | Attaches                                                                                   |
+ * | `name`        | DS owns                                                                                    |
  * | ------------- | ------------------------------------------------------------------------------------------ |
  * | `status_code` | HTTP status code: `acceptChar`, `normalize`, `getSuggestions`, `validate`, `serializeValue` |
  *
- * Consumer-supplied callbacks always win over the auto-wired ones. If the
- * backend uses a different name (e.g. `http_status_code`), the helpers are
- * NOT applied — the consumer must either rename the field to match or wire
- * the factories (`createStatusCode*`) manually.
+ * For reserved names, DS-supplied callbacks **override** any consumer-supplied
+ * value for the same slot. This is intentional: the field semantics (mask
+ * range `1XX..5XX`, accepted characters, backend form) are fixed by the
+ * design system. Consumer-supplied `options`/`getSuggestions` would otherwise
+ * fight the canonical mask UX.
+ *
+ * If the backend uses a different name (e.g. `http_status_code`), the helpers
+ * are NOT applied — the consumer must either rename the field to match or
+ * wire the factories (`createStatusCode*`) manually.
  *
  * The returned array has **reference-stable identity** when no field matches,
  * so downstream `useMemo` that depends on it does not invalidate unnecessarily.
@@ -57,12 +59,25 @@ export const applyKnownFieldHelpers = (fields: FieldMetadata[]): FieldMetadata[]
     changed = true;
     return {
       ...field,
-      acceptChar: field.acceptChar ?? helpers.acceptChar,
-      normalize: field.normalize ?? helpers.normalize,
-      getSuggestions: field.getSuggestions ?? helpers.getSuggestions,
-      validate: field.validate ?? helpers.validate,
-      serializeValue: field.serializeValue ?? helpers.serializeValue,
+      acceptChar: helpers.acceptChar,
+      normalize: helpers.normalize,
+      getSuggestions: helpers.getSuggestions,
+      validate: helpers.validate,
+      serializeValue: helpers.serializeValue,
     };
   });
   return changed ? out : fields;
 };
+
+/**
+ * Look up the backend-form serializer for a reserved field name. Returns
+ * `undefined` for unknown names. Useful for consumers that hold their own
+ * expression shape (not DS `ExprNode`) but need to apply the same backend
+ * transform that the FilterInput's `serializeValue` slot would produce — so
+ * they can drive the lookup off the field name without hard-coding which
+ * names are reserved.
+ */
+export const getKnownFieldSerializer = (
+  fieldName: string,
+): NonNullable<FieldMetadata['serializeValue']> | undefined =>
+  KNOWN_FIELD_HELPERS[fieldName]?.().serializeValue;

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
-import { applyKnownFieldHelpers } from '../lib/applyKnownFieldHelpers';
+import { applyKnownFieldHelpers, getKnownFieldSerializer } from '../lib/applyKnownFieldHelpers';
 import type { FieldMetadata } from '../types';
 
 describe('applyKnownFieldHelpers', () => {
@@ -35,21 +35,23 @@ describe('applyKnownFieldHelpers', () => {
     ]);
   });
 
-  it('lets a consumer-supplied callback win over the auto-wired helper', () => {
+  it('overrides consumer-supplied callbacks for reserved names', () => {
     const customValidate = vi.fn(() => false);
+    const customSuggestions = vi.fn(() => [{ value: '200', label: '200' }]);
     const [field] = applyKnownFieldHelpers([
       {
         name: 'status_code',
         label: 'Status',
         type: 'integer',
         validate: customValidate,
+        getSuggestions: customSuggestions,
       },
     ]);
-    expect(field.validate).toBe(customValidate);
-    // The non-overridden slots must still be the helper-supplied behavior,
-    // not merely "any function" — verify via observable behavior that would
-    // only come from createStatusCodeSuggestions / createStatusCodeInputFilter /
-    // createStatusCodeNormalizer.
+    // DS-supplied callbacks win; the consumer's are discarded so the canonical
+    // mask UX (acceptChar / normalize / getSuggestions / validate) and the
+    // backend serialization are not fightable from the outside.
+    expect(field.validate).not.toBe(customValidate);
+    expect(field.getSuggestions).not.toBe(customSuggestions);
     expect(field.getSuggestions?.('').map(o => o.value)).toEqual([
       '1XX',
       '2XX',
@@ -60,6 +62,14 @@ describe('applyKnownFieldHelpers', () => {
     expect(field.acceptChar?.('4')).toBe(true);
     expect(field.acceptChar?.('a')).toBe(false);
     expect(field.normalize?.('4')).toBe('4XX');
+  });
+
+  it('exposes the reserved-field serializer by name', () => {
+    const serialize = getKnownFieldSerializer('status_code');
+    expect(serialize?.('2XX')).toBe('2');
+    expect(serialize?.('22X')).toBe('22');
+    expect(serialize?.('222')).toBe('222');
+    expect(getKnownFieldSerializer('country')).toBeUndefined();
   });
 
   it('does not wire helpers for fields with a different name', () => {
