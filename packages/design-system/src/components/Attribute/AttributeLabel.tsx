@@ -1,23 +1,49 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
+import { useAttributeOrientation } from './AttributeOrientationContext';
+
+const MIN_LABEL_WIDTH = 100;
+const MAX_LABEL_WIDTH = 256;
+
+const HORIZONTAL_CLAMP_STYLE = {
+  minWidth: `${MIN_LABEL_WIDTH}px`,
+  maxWidth: `${MAX_LABEL_WIDTH}px`,
+} as const;
 
 export interface AttributeLabelProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
+  /**
+   * Width of the label cell in horizontal orientation, in pixels.
+   * Defaults to MIN_LABEL_WIDTH. Clamped to [MIN_LABEL_WIDTH, MAX_LABEL_WIDTH].
+   * Ignored in vertical orientation.
+   */
+  width?: number;
   children?: ReactNode;
 }
 
-export const AttributeLabel: FC<AttributeLabelProps> = ({ ref, children, className, ...props }) => {
+export const AttributeLabel: FC<AttributeLabelProps> = ({
+  ref,
+  children,
+  className,
+  width = MIN_LABEL_WIDTH,
+  style,
+  ...props
+}) => {
   const testId = useTestId('label');
+  const orientation = useAttributeOrientation();
+  const isHorizontal = orientation === 'horizontal';
 
   return (
     <div
       {...props}
       ref={ref}
+      style={isHorizontal ? { ...style, ...HORIZONTAL_CLAMP_STYLE, width: `${width}px` } : style}
       data-testid={testId}
       data-slot='attribute-label'
       className={cn(
-        'flex items-center gap-4 flex-wrap font-sans-display text-sm font-normal text-text-secondary',
+        'font-sans-display text-sm font-normal text-text-secondary',
+        isHorizontal ? 'block py-4 shrink-0 truncate' : 'flex items-center gap-4 flex-wrap',
         className,
       )}
     >

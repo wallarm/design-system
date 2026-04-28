@@ -6,6 +6,8 @@ import { InlineCodeSnippet } from '../CodeSnippet';
 import { FormatDateTime } from '../FormatDateTime';
 import { Ip, IpAddress, IpCountry, IpList, IpProvider } from '../Ip';
 import { Link } from '../Link';
+import { OverflowList } from '../OverflowList';
+import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
 import { Attribute, type AttributeProps } from './Attribute';
@@ -45,6 +47,23 @@ const meta = {
 } satisfies Meta<typeof Attribute>;
 
 export default meta;
+
+const renderOverflowPopover = (items: string[]) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <Tag>+{items.length}</Tag>
+    </PopoverTrigger>
+    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
+      <div className='flex flex-col gap-4'>
+        {items.map(item => (
+          <Text key={item} size='sm'>
+            {item}
+          </Text>
+        ))}
+      </div>
+    </PopoverContent>
+  </Popover>
+);
 
 export const Default: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
@@ -158,11 +177,12 @@ export const WithTags: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>Tags</AttributeLabel>
       <AttributeValue>
-        <div className='flex items-center gap-4 flex-wrap'>
-          <Tag>production</Tag>
-          <Tag>us-east-1</Tag>
-          <Tag>critical</Tag>
-        </div>
+        <OverflowList
+          className='gap-4'
+          items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
       </AttributeValue>
     </Attribute>
   </div>
@@ -244,20 +264,19 @@ export const Composition: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>First seen</AttributeLabel>
       <AttributeValue>
-        <FormatDateTime value='2026-04-03T10:15:00Z' />
+        <FormatDateTime value='2026-04-03T10:15:00Z' format='relative' />
       </AttributeValue>
     </Attribute>
 
     <Attribute>
       <AttributeLabel>Attack type</AttributeLabel>
       <AttributeValue>
-        <div className='flex items-center gap-4 flex-wrap'>
-          <Tag>XSS</Tag>
-          <Tag>BOLA</Tag>
-          <Tag>SQL Injection</Tag>
-          <Tag>Scanner</Tag>
-          <Tag>+5</Tag>
-        </div>
+        <OverflowList
+          className='gap-4'
+          items={['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR']}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
       </AttributeValue>
     </Attribute>
 
@@ -271,10 +290,18 @@ export const Composition: StoryFn<AttributeProps> = () => (
     <Attribute>
       <AttributeLabel>Users</AttributeLabel>
       <AttributeValue>
-        <div className='flex items-center gap-4'>
-          <Text size='sm'>artem@acme.com, uxd@acme.com</Text>
-          <Tag>+3</Tag>
-        </div>
+        <OverflowList
+          className='gap-4'
+          items={[
+            'artem@acme.com',
+            'uxd@acme.com',
+            'ops@acme.com',
+            'security@acme.com',
+            'admin@acme.com',
+          ]}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
       </AttributeValue>
     </Attribute>
 
@@ -394,6 +421,217 @@ export const WithActions: StoryFn<AttributeProps> = () => (
                 <IpAddress>10.0.0.1</IpAddress>
               </Ip>
             </IpList>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const Horizontal: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue>
+        <Badge color='red' variant='dotted'>
+          Blocked
+        </Badge>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalLabelTruncation: StoryFn<AttributeProps> = () => (
+  <div className='w-[500px] flex flex-col gap-8'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel width={256}>Short</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>Fits in 256px label cell</Text>
+      </AttributeValue>
+    </Attribute>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel width={256}>
+        This label text is much longer than 256 pixels and must be truncated
+      </AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>Value</Text>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalValueTruncation: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Users</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm' truncate>
+          artem@acme.com, uxd@acme.com, ops@acme.com, security@acme.com, admin@acme.com
+        </Text>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalComposition: StoryFn<AttributeProps> = () => (
+  <div className='grid grid-cols-2 gap-x-8 gap-y-6 w-[874px]'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue>
+        <Badge color='red' variant='dotted'>
+          Blocked
+        </Badge>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>First seen</AttributeLabel>
+      <AttributeValue>
+        <FormatDateTime value='2026-04-03T10:15:00Z' format='relative' />
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Attack type</AttributeLabel>
+      <AttributeValue>
+        <OverflowList
+          className='gap-4'
+          items={['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR']}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Last seen</AttributeLabel>
+      <AttributeValue>
+        <FormatDateTime value='2025-04-02T14:03:00Z' format='date' />
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Sessions</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>3 sessions</Text>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Users</AttributeLabel>
+      <AttributeValue>
+        <OverflowList
+          className='gap-4'
+          items={[
+            'artem@acme.com',
+            'uxd@acme.com',
+            'ops@acme.com',
+            'security@acme.com',
+            'admin@acme.com',
+          ]}
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
+      </AttributeValue>
+    </Attribute>
+
+    <div className='col-span-2'>
+      <Attribute orientation='horizontal'>
+        <AttributeLabel>IPs</AttributeLabel>
+        <AttributeValue>
+          <IpList type='horizontal'>
+            <Ip>
+              <IpCountry code='US' />
+              <IpAddress>142.198.167.52</IpAddress>
+              <IpProvider>Azure</IpProvider>
+            </Ip>
+            <Ip>
+              <IpCountry code='US' />
+              <IpAddress>34.74.73.20</IpAddress>
+              <IpProvider>AWS</IpProvider>
+            </Ip>
+            <Ip>
+              <IpCountry code='DE' />
+              <IpAddress>34.74.73.20</IpAddress>
+              <IpProvider>GCP</IpProvider>
+            </Ip>
+          </IpList>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  </div>
+);
+
+export const HorizontalLoading: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-8'>
+    <Attribute orientation='horizontal' loading>
+      <AttributeLabel>Created at</AttributeLabel>
+      <AttributeValue />
+    </Attribute>
+    <Attribute orientation='horizontal' loading>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue />
+    </Attribute>
+  </div>
+);
+
+export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-8'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Source IP</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions data-testid='attribute-horizontal-with-actions'>
+          <AttributeActionsTarget>
+            <Text size='sm'>142.198.167.52</Text>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Badge color='red' variant='dotted'>
+              Blocked
+            </Badge>
           </AttributeActionsTarget>
           <AttributeActionsContent>
             <AttributeActionsItem
