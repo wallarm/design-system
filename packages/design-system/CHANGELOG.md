@@ -1,3 +1,7 @@
+## 0.30.0 (2026-04-28)
+
+* feat(selection): add Selection compound component [AS-884] (#101) ([2a352f9](https://github.com/wallarm/design-system/commit/2a352f9)), closes [#101](https://github.com/wallarm/design-system/issues/101)
+
 ## <small>0.29.2 (2026-04-27)</small>
 
 * fix(filter-input): AS-882 stop stealing focus on outside click (#98) ([4da1e35](https://github.com/wallarm/design-system/commit/4da1e35)), closes [#98](https://github.com/wallarm/design-system/issues/98)
