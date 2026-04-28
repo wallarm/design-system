@@ -6,11 +6,17 @@ import { useAttributeOrientation } from './AttributeOrientationContext';
 const MIN_LABEL_WIDTH = 100;
 const MAX_LABEL_WIDTH = 256;
 
+const HORIZONTAL_CLAMP_STYLE = {
+  minWidth: `${MIN_LABEL_WIDTH}px`,
+  maxWidth: `${MAX_LABEL_WIDTH}px`,
+} as const;
+
 export interface AttributeLabelProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
   /**
    * Width of the label cell in horizontal orientation, in pixels.
-   * Defaults to 100. Clamped to [100, 256]. Ignored in vertical orientation.
+   * Defaults to MIN_LABEL_WIDTH. Clamped to [MIN_LABEL_WIDTH, MAX_LABEL_WIDTH].
+   * Ignored in vertical orientation.
    */
   width?: number;
   children?: ReactNode;
@@ -32,16 +38,7 @@ export const AttributeLabel: FC<AttributeLabelProps> = ({
     <div
       {...props}
       ref={ref}
-      style={
-        isHorizontal
-          ? {
-              ...style,
-              width: `${width}px`,
-              minWidth: `${MIN_LABEL_WIDTH}px`,
-              maxWidth: `${MAX_LABEL_WIDTH}px`,
-            }
-          : style
-      }
+      style={isHorizontal ? { ...style, ...HORIZONTAL_CLAMP_STYLE, width: `${width}px` } : style}
       data-testid={testId}
       data-slot='attribute-label'
       className={cn(
