@@ -1,3 +1,7 @@
+## 0.31.0 (2026-04-28)
+
+* feat(attribute): WDS-74 add horizontal orientation (#102) ([799127d](https://github.com/wallarm/design-system/commit/799127d)), closes [#102](https://github.com/wallarm/design-system/issues/102)
+
 ## 0.30.0 (2026-04-28)
 
 * feat(selection): add Selection compound component [AS-884] (#101) ([2a352f9](https://github.com/wallarm/design-system/commit/2a352f9)), closes [#101](https://github.com/wallarm/design-system/issues/101)
