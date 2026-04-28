@@ -1,13 +1,11 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
-import { Skeleton } from '../Skeleton';
-import { AttributeLabel } from './AttributeLabel';
+import { AttributeLoading } from './AttributeLoading';
 import {
   type AttributeOrientation,
   AttributeOrientationProvider,
 } from './AttributeOrientationContext';
-import { AttributeValue } from './AttributeValue';
 
 export interface AttributeProps extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
@@ -44,29 +42,10 @@ export const Attribute: FC<AttributeProps> = ({
           data-orientation={orientation}
           className={cn(
             isHorizontal ? 'flex flex-row items-start gap-4' : 'flex flex-col',
-            loading && !isHorizontal && 'gap-4 py-2',
             className,
           )}
         >
-          {loading ? (
-            isHorizontal ? (
-              <>
-                <AttributeLabel>
-                  <Skeleton width='100px' height='16px' rounded={6} />
-                </AttributeLabel>
-                <AttributeValue>
-                  <Skeleton width='100%' height='16px' rounded={6} />
-                </AttributeValue>
-              </>
-            ) : (
-              <>
-                <Skeleton width='100px' height='16px' rounded={6} />
-                <Skeleton width='100%' height='24px' rounded={6} />
-              </>
-            )
-          ) : (
-            children
-          )}
+          {loading ? <AttributeLoading /> : children}
         </div>
       </AttributeOrientationProvider>
     </TestIdProvider>
