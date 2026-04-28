@@ -1,1 +1,5 @@
-export { SelectionBulkBar, type SelectionBulkBarProps } from './SelectionBulkBar';
+export {
+  SelectionBulkBar,
+  type SelectionBulkBarPlacement,
+  type SelectionBulkBarProps,
+} from './SelectionBulkBar';

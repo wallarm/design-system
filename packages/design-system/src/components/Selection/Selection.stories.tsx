@@ -324,12 +324,12 @@ export const InsideDrawer: StoryFn<typeof meta> = () => {
         <Button>Open drawer with selection</Button>
       </DrawerTrigger>
       <DrawerContent>
-        <DrawerResizeHandle />
-        <DrawerHeader>
-          <DrawerTitle>Clusters</DrawerTitle>
-        </DrawerHeader>
-        <DrawerBody>
-          <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+        <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+          <DrawerResizeHandle />
+          <DrawerHeader>
+            <DrawerTitle>Clusters</DrawerTitle>
+          </DrawerHeader>
+          <DrawerBody>
             <VStack gap={16}>
               <HStack gap={8} align='center'>
                 <SelectionAll />
@@ -346,35 +346,35 @@ export const InsideDrawer: StoryFn<typeof meta> = () => {
                 ))}
               </VStack>
             </VStack>
+          </DrawerBody>
 
-            <SelectionBulkBar>
-              <Button
-                variant='secondary'
-                color='neutral-alt'
-                size='large'
-                onClick={() => alert(`Duplicate ${selected.length}`)}
-              >
-                <Copy /> Duplicate
-              </Button>
-              <Button
-                variant='secondary'
-                color='neutral-alt'
-                size='large'
-                onClick={() => alert(`Move ${selected.length}`)}
-              >
-                <Folder /> Move
-              </Button>
-              <Button
-                variant='secondary'
-                color='destructive'
-                size='large'
-                onClick={() => alert(`Delete ${selected.length}`)}
-              >
-                <Trash2 /> Delete
-              </Button>
-            </SelectionBulkBar>
-          </Selection>
-        </DrawerBody>
+          <SelectionBulkBar placement='absolute'>
+            <Button
+              variant='secondary'
+              color='neutral-alt'
+              size='large'
+              onClick={() => alert(`Duplicate ${selected.length}`)}
+            >
+              <Copy /> Duplicate
+            </Button>
+            <Button
+              variant='secondary'
+              color='neutral-alt'
+              size='large'
+              onClick={() => alert(`Move ${selected.length}`)}
+            >
+              <Folder /> Move
+            </Button>
+            <Button
+              variant='secondary'
+              color='destructive'
+              size='large'
+              onClick={() => alert(`Delete ${selected.length}`)}
+            >
+              <Trash2 /> Delete
+            </Button>
+          </SelectionBulkBar>
+        </Selection>
       </DrawerContent>
     </Drawer>
   );

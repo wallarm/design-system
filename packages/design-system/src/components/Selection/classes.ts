@@ -20,11 +20,14 @@ export const selectionBulkBarVariants = cva(
   {
     variants: {
       placement: {
-        // 48 = DrawerBody horizontal padding (px-24) × 2, so the bar's max
-        // width aligns with the body content's left/right edges.
-        drawer: 'absolute bottom-12 left-1/2 -translate-x-1/2 max-w-[calc(100%-48px)]',
+        // Anchored to the nearest positioned ancestor — useful for embedding
+        // inside a Drawer or any other relatively positioned container.
+        absolute: 'absolute bottom-12 left-1/2 -translate-x-1/2 max-w-[calc(100%-48px)]',
         floating: 'fixed bottom-32 left-1/2 -translate-x-1/2 max-w-[calc(100vw-32px)]',
       },
+    },
+    defaultVariants: {
+      placement: 'floating',
     },
   },
 );

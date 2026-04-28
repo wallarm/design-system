@@ -1,8 +1,7 @@
-import { type FC, type ReactNode, type RefObject, useMemo } from 'react';
+import type { FC, ReactNode } from 'react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { Presence as ArkUiPresence } from '@ark-ui/react/presence';
 import { useTestId } from '../../../utils/testId';
-import { useOptionalDrawerContentScope } from '../../Drawer/DrawerContext';
 import { HStack } from '../../Stack';
 import { selectionBulkBarVariants } from '../classes';
 import { useSelectionContext } from '../useSelectionContext';
@@ -11,58 +10,58 @@ import { SelectionBulkBarSummary } from './SelectionBulkBarSummary';
 const TEST_ID_SLOT = 'bulk-bar';
 const DEFAULT_ARIA_LABEL = 'Bulk actions';
 
+export type SelectionBulkBarPlacement = 'floating' | 'absolute';
+
 export interface SelectionBulkBarProps {
   /** Override the toolbar accessible name. Defaults to "Bulk actions". */
   'aria-label'?: string;
   'data-testid'?: string;
+  /**
+   * How the bar is positioned.
+   *
+   * - `'floating'` (default): portaled to `document.body` and pinned to the
+   *   bottom of the viewport with `position: fixed`. Use for page-level
+   *   selection lists.
+   * - `'absolute'`: rendered in place with `position: absolute`. Anchors to
+   *   the nearest positioned ancestor — wrap the bar in a relatively
+   *   positioned container (e.g. a Drawer panel) when using this mode.
+   */
+  placement?: SelectionBulkBarPlacement;
   children?: ReactNode;
 }
 
 export const SelectionBulkBar: FC<SelectionBulkBarProps> = ({
   'aria-label': ariaLabel = DEFAULT_ARIA_LABEL,
   'data-testid': testIdProp,
+  placement = 'floating',
   children,
 }) => {
   const { selectedIds } = useSelectionContext();
   const fallbackTestId = useTestId(TEST_ID_SLOT);
   const testId = testIdProp ?? fallbackTestId;
-  // When rendered inside a DrawerContent panel, anchor the bar to the
-  // panel itself (not body, not the inner ScrollArea) so it stays pinned
-  // while DrawerBody scrolls and never overlaps a DrawerFooter.
-  const drawerScope = useOptionalDrawerContentScope();
-  const isInDrawer = drawerScope !== null;
-  const placement = isInDrawer ? 'drawer' : 'floating';
 
-  // Build a fresh ref every time the panel element changes so ARK Portal's
-  // `[props.container]` effect re-runs and resyncs to the new container.
-  const containerRef = useMemo<RefObject<HTMLElement | null>>(
-    () => ({ current: drawerScope?.element ?? null }),
-    [drawerScope?.element],
+  const bar = (
+    <ArkUiPresence present={selectedIds.size > 0} asChild>
+      <div
+        role='toolbar'
+        aria-label={ariaLabel}
+        data-slot='selection-bulk-bar'
+        data-testid={testId}
+        className={selectionBulkBarVariants({ placement })}
+      >
+        <SelectionBulkBarSummary />
+        <HStack gap={8} align='center'>
+          {children}
+        </HStack>
+      </div>
+    </ArkUiPresence>
   );
 
-  // Wait for the panel to mount before portaling. Otherwise ARK Portal's
-  // first render reads `containerRef.current === null`, falls back to
-  // document.body, and we'd briefly flash the bar there.
-  if (isInDrawer && !drawerScope.element) return null;
+  if (placement === 'floating') {
+    return <ArkUiPortal>{bar}</ArkUiPortal>;
+  }
 
-  return (
-    <ArkUiPortal container={containerRef}>
-      <ArkUiPresence present={selectedIds.size > 0} asChild>
-        <div
-          role='toolbar'
-          aria-label={ariaLabel}
-          data-slot='selection-bulk-bar'
-          data-testid={testId}
-          className={selectionBulkBarVariants({ placement })}
-        >
-          <SelectionBulkBarSummary />
-          <HStack gap={8} align='center'>
-            {children}
-          </HStack>
-        </div>
-      </ArkUiPresence>
-    </ArkUiPortal>
-  );
+  return bar;
 };
 
 SelectionBulkBar.displayName = 'SelectionBulkBar';

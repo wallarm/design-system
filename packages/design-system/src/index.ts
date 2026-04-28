@@ -334,6 +334,7 @@ export {
   SelectionAll,
   type SelectionAllProps,
   SelectionBulkBar,
+  type SelectionBulkBarPlacement,
   type SelectionBulkBarProps,
   SelectionItem,
   type SelectionItemProps,
