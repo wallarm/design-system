@@ -2,6 +2,7 @@ import { Children, type FC, type HTMLAttributes, type ReactNode, type Ref } from
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Text } from '../Text';
+import { useAttributeEmpty } from './AttributeEmptyContext';
 import { useAttributeOrientation } from './AttributeOrientationContext';
 
 export interface AttributeValueProps extends HTMLAttributes<HTMLDivElement> {
@@ -9,7 +10,7 @@ export interface AttributeValueProps extends HTMLAttributes<HTMLDivElement> {
   children?: ReactNode;
 }
 
-function isEmpty(children: ReactNode): boolean {
+function isEmptyChildren(children: ReactNode): boolean {
   return (
     children === undefined ||
     children === null ||
@@ -21,7 +22,9 @@ function isEmpty(children: ReactNode): boolean {
 export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, className, ...props }) => {
   const testId = useTestId('value');
   const orientation = useAttributeOrientation();
+  const isEmptyAttribute = useAttributeEmpty();
   const isHorizontal = orientation === 'horizontal';
+  const showPlaceholder = isEmptyAttribute || isEmptyChildren(children);
 
   return (
     <div
@@ -35,7 +38,7 @@ export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, classNa
         className,
       )}
     >
-      {isEmpty(children) ? (
+      {showPlaceholder ? (
         <Text size='sm' color='secondary'>
           &mdash;
         </Text>

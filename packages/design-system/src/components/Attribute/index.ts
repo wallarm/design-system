@@ -1,5 +1,10 @@
 export { Attribute, type AttributeProps } from './Attribute';
 export { AttributeActions, type AttributeActionsProps } from './AttributeActions';
+export { useAttributeEmpty } from './AttributeEmptyContext';
+export {
+  AttributeEmptyDescription,
+  type AttributeEmptyDescriptionProps,
+} from './AttributeEmptyDescription';
 export {
   AttributeActionsContent,
   type AttributeActionsContentProps,

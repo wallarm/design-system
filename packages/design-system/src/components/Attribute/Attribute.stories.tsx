@@ -15,6 +15,7 @@ import { AttributeActions } from './AttributeActions';
 import { AttributeActionsContent } from './AttributeActionsContent';
 import { AttributeActionsItem } from './AttributeActionsItem';
 import { AttributeActionsTarget } from './AttributeActionsTarget';
+import { AttributeEmptyDescription } from './AttributeEmptyDescription';
 import { AttributeLabel } from './AttributeLabel';
 import { AttributeLabelDescription } from './AttributeLabelDescription';
 import { AttributeLabelInfo } from './AttributeLabelInfo';
@@ -28,6 +29,7 @@ const meta = {
     AttributeLabelDescription,
     AttributeLabelInfo,
     AttributeValue,
+    AttributeEmptyDescription,
     AttributeActions,
     AttributeActionsTarget,
     AttributeActionsContent,
@@ -136,12 +138,51 @@ export const WithLink: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * All empty-state variants in vertical orientation:
+ *   1. Manual composition — `AttributeLabelDescription` always visible, value
+ *      composed by the consumer (no `isEmpty` flag).
+ *   2. `isEmpty` alone — value becomes em-dash, `AttributeValue` children are
+ *      ignored, label stays bare.
+ *   3. `isEmpty` + `<AttributeEmptyDescription>` — description renders only
+ *      while `isEmpty` is true; outside that state it returns null.
+ *   4. Same as (3), with `ReactNode` content (text + link) inside the
+ *      description.
+ */
 export const Empty: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
+  <div className='w-[400px] flex flex-col gap-16'>
     <Attribute>
       <AttributeLabel>
         Region
-        <AttributeLabelDescription>Not yet assigned</AttributeLabelDescription>
+        <AttributeLabelDescription>Manual composition</AttributeLabelDescription>
+      </AttributeLabel>
+      <AttributeValue />
+    </Attribute>
+
+    <Attribute isEmpty>
+      <AttributeLabel>Region</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>This text is replaced by the em-dash placeholder</Text>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute isEmpty>
+      <AttributeLabel>
+        Owner
+        <AttributeEmptyDescription>Not yet assigned</AttributeEmptyDescription>
+      </AttributeLabel>
+      <AttributeValue />
+    </Attribute>
+
+    <Attribute isEmpty>
+      <AttributeLabel>
+        SSO provider
+        <AttributeEmptyDescription>
+          Not connected —{' '}
+          <Link href='#' size='md'>
+            set up integration
+          </Link>
+        </AttributeEmptyDescription>
       </AttributeLabel>
       <AttributeValue />
     </Attribute>
@@ -588,6 +629,51 @@ export const HorizontalLoading: StoryFn<AttributeProps> = () => (
     </Attribute>
     <Attribute orientation='horizontal' loading>
       <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue />
+    </Attribute>
+  </div>
+);
+
+/**
+ * All empty-state variants in horizontal orientation. Same four cases as
+ * `Empty`, just with `orientation='horizontal'` and `AttributeLabel width=160`
+ * to leave room for descriptions (DS clamp: 100..256px).
+ */
+export const HorizontalEmpty: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-8'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel width={160}>
+        Region
+        <AttributeLabelDescription>Manual composition</AttributeLabelDescription>
+      </AttributeLabel>
+      <AttributeValue />
+    </Attribute>
+
+    <Attribute orientation='horizontal' isEmpty>
+      <AttributeLabel width={160}>Region</AttributeLabel>
+      <AttributeValue>
+        <Text size='sm'>This text is replaced by the em-dash placeholder</Text>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal' isEmpty>
+      <AttributeLabel width={160}>
+        Owner
+        <AttributeEmptyDescription>Not yet assigned</AttributeEmptyDescription>
+      </AttributeLabel>
+      <AttributeValue />
+    </Attribute>
+
+    <Attribute orientation='horizontal' isEmpty>
+      <AttributeLabel width={160}>
+        SSO provider
+        <AttributeEmptyDescription>
+          Not connected —{' '}
+          <Link href='#' size='md'>
+            set up integration
+          </Link>
+        </AttributeEmptyDescription>
+      </AttributeLabel>
       <AttributeValue />
     </Attribute>
   </div>
