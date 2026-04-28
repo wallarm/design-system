@@ -1,3 +1,7 @@
+## 0.32.0 (2026-04-28)
+
+* feat(simple-charts): WDS-90 PieChart ([1f507c1](https://github.com/wallarm/design-system/commit/1f507c1))
+
 ## <small>0.31.1 (2026-04-28)</small>
 
 * revert(release): re-enable releasedLabels in @semantic-release/github ([b901233](https://github.com/wallarm/design-system/commit/b901233))
