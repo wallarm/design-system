@@ -23,8 +23,10 @@ export interface SelectionBulkBarProps {
    *   bottom of the viewport with `position: fixed`. Use for page-level
    *   selection lists.
    * - `'absolute'`: rendered in place with `position: absolute`. Anchors to
-   *   the nearest positioned ancestor — wrap the bar in a relatively
-   *   positioned container (e.g. a Drawer panel) when using this mode.
+   *   the nearest positioned ancestor — by default the enclosing `Selection`
+   *   root (which is `position: relative`), so the bar pins to the bottom of
+   *   the selection area. Use this inside a Drawer or any other bounded
+   *   container.
    */
   placement?: SelectionBulkBarPlacement;
   children?: ReactNode;

@@ -324,7 +324,13 @@ export const InsideDrawer: StoryFn<typeof meta> = () => {
         <Button>Open drawer with selection</Button>
       </DrawerTrigger>
       <DrawerContent>
-        <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+        <Selection
+          items={clusters}
+          getItemId={c => c.id}
+          value={selected}
+          onChange={setSelected}
+          className='flex min-h-0 flex-1 flex-col'
+        >
           <DrawerResizeHandle />
           <DrawerHeader>
             <DrawerTitle>Clusters</DrawerTitle>

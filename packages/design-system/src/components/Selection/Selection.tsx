@@ -95,7 +95,11 @@ export const Selection = <T,>({
   return (
     <SelectionContext.Provider value={ctxValue}>
       <TestIdProvider value={testId}>
-        <div data-slot='selection' data-testid={testId} className={cn('outline-none', className)}>
+        <div
+          data-slot='selection'
+          data-testid={testId}
+          className={cn('relative outline-none', className)}
+        >
           {children}
         </div>
       </TestIdProvider>
