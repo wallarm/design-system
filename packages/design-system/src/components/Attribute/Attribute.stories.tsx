@@ -433,16 +433,16 @@ export const Horizontal: StoryFn<AttributeProps> = () => (
 );
 
 export const HorizontalLabelTruncation: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-8'>
+  <div className='w-[500px] flex flex-col gap-8'>
     <Attribute orientation='horizontal'>
-      <AttributeLabel>Short</AttributeLabel>
+      <AttributeLabel width={256}>Short</AttributeLabel>
       <AttributeValue>
-        <Text size='sm'>Fits in 160px label cell</Text>
+        <Text size='sm'>Fits in 256px label cell</Text>
       </AttributeValue>
     </Attribute>
     <Attribute orientation='horizontal'>
-      <AttributeLabel>
-        This label text is much longer than 160 pixels and must be truncated
+      <AttributeLabel width={256}>
+        This label text is much longer than 256 pixels and must be truncated
       </AttributeLabel>
       <AttributeValue>
         <Text size='sm'>Value</Text>
