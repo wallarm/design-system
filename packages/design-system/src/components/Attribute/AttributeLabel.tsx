@@ -3,6 +3,9 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { useAttributeOrientation } from './AttributeOrientationContext';
 
+const MIN_LABEL_WIDTH = 100;
+const MAX_LABEL_WIDTH = 256;
+
 export interface AttributeLabelProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
   /**
@@ -17,7 +20,7 @@ export const AttributeLabel: FC<AttributeLabelProps> = ({
   ref,
   children,
   className,
-  width = 100,
+  width = MIN_LABEL_WIDTH,
   style,
   ...props
 }) => {
@@ -29,14 +32,21 @@ export const AttributeLabel: FC<AttributeLabelProps> = ({
     <div
       {...props}
       ref={ref}
-      style={isHorizontal ? { ...style, width: `${width}px` } : style}
+      style={
+        isHorizontal
+          ? {
+              ...style,
+              width: `${width}px`,
+              minWidth: `${MIN_LABEL_WIDTH}px`,
+              maxWidth: `${MAX_LABEL_WIDTH}px`,
+            }
+          : style
+      }
       data-testid={testId}
       data-slot='attribute-label'
       className={cn(
         'font-sans-display text-sm font-normal text-text-secondary',
-        isHorizontal
-          ? 'block min-w-[100px] max-w-[256px] py-4 shrink-0 truncate'
-          : 'flex items-center gap-4 flex-wrap',
+        isHorizontal ? 'block py-4 shrink-0 truncate' : 'flex items-center gap-4 flex-wrap',
         className,
       )}
     >
