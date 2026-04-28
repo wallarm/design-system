@@ -7,7 +7,7 @@ export {
 } from '../FilterInputMenu/FilterInputDateValueMenu/constants';
 export { applyAcceptChar } from './applyAcceptChar';
 export { applyFieldValueTransforms } from './applyFieldValueTransforms';
-export { applyKnownFieldHelpers } from './applyKnownFieldHelpers';
+export { applyKnownFieldHelpers, getKnownFieldSerializer } from './applyKnownFieldHelpers';
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
 export {
   CONNECTOR_ID_PATTERN,

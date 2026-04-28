@@ -19,6 +19,7 @@ export {
   createStatusCodeSuggestions,
   createStatusCodeValidator,
   type FilterParseError,
+  getKnownFieldSerializer,
   isFilterParseError,
   parseExpression,
   serializeExpression,

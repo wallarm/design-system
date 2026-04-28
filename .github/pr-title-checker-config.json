@@ -14,7 +14,7 @@
       "chore: ",
       "ci: "
     ],
-    "regexp": "^(#)?(feat|fix|docs|style|refactor|test|chore|ci)(\\(.*\\))?:?\\s.+",
+    "regexp": "^(#)?(feat|fix|docs|style|refactor|test|chore|ci)(\\(.*\\))?!?:?\\s.+",
     "ignoreLabels": ["skip-title-check"]
   },
   "MESSAGES": {
