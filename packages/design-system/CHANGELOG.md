@@ -1,3 +1,8 @@
+## <small>0.31.1 (2026-04-28)</small>
+
+* revert(release): re-enable releasedLabels in @semantic-release/github ([b901233](https://github.com/wallarm/design-system/commit/b901233))
+* fix(filter-input)!: AS-882 reserved field names own all helper slots … (#103) ([60dc502](https://github.com/wallarm/design-system/commit/60dc502)), closes [#103](https://github.com/wallarm/design-system/issues/103)
+
 ## 0.31.0 (2026-04-28)
 
 * feat(attribute): WDS-74 add horizontal orientation (#102) ([799127d](https://github.com/wallarm/design-system/commit/799127d)), closes [#102](https://github.com/wallarm/design-system/issues/102)
