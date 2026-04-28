@@ -82,7 +82,7 @@ export function defineConfig({
         : []),
       [
         '@semantic-release/github',
-        { successComment, failComment: false, releasedLabels: false },
+        { successComment, failComment: false },
       ],
     ],
   };
