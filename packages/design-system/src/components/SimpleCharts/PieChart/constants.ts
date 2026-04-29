@@ -7,8 +7,8 @@ import type { ChartColor } from '../types';
 // the value + label.
 export const PIE_DONUT_SIZE = 120;
 export const PIE_DONUT_OUTER_RADIUS = 60;
-export const PIE_DONUT_INNER_RADIUS = 44;
-export const PIE_DONUT_CORNER_RADIUS = 4;
+export const PIE_DONUT_INNER_RADIUS = 48;
+export const PIE_DONUT_CORNER_RADIUS = 2;
 export const PIE_DONUT_PADDING_ANGLE = 2;
 
 // Mount animation. 400 ms is the sweet spot for entrance: fast enough to feel

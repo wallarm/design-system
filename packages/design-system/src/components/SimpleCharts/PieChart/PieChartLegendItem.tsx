@@ -14,6 +14,7 @@ import { useTestId } from '../../../utils/testId';
 import { clamp01 } from '../lib/clamp01';
 import { pieChartLegendItemVariants } from './classes';
 import {
+  isHoverSyncTarget,
   PieChartActiveContext,
   PieChartDataContext,
   PieChartItemContext,
@@ -97,6 +98,8 @@ export const PieChartLegendItem: FC<PieChartLegendItemProps> = ({
     (event: MouseEvent<HTMLDivElement>) => {
       onMouseLeave?.(event);
       if (event.defaultPrevented) return;
+      // See `isHoverSyncTarget` in PieChartContext for the flicker rationale.
+      if (isHoverSyncTarget(event.relatedTarget)) return;
       setActive?.(null);
     },
     [onMouseLeave, setActive],
@@ -115,6 +118,7 @@ export const PieChartLegendItem: FC<PieChartLegendItemProps> = ({
     (event: FocusEvent<HTMLDivElement>) => {
       onBlur?.(event);
       if (event.defaultPrevented) return;
+      if (isHoverSyncTarget(event.relatedTarget)) return;
       setActive?.(null);
     },
     [onBlur, setActive],

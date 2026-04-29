@@ -32,6 +32,7 @@ export {
   PieChart,
   PieChartCenter,
   PieChartCenterLabel,
+  type PieChartCenterLabelPluralRules,
   type PieChartCenterLabelProps,
   type PieChartCenterProps,
   PieChartCenterValue,

@@ -41,10 +41,10 @@ interface Row extends PieChartDatum {
 
 const baseRows: Row[] = [
   { name: '4XX', value: 35, color: 'amber', badgeColor: 'amber' },
-  { name: '2XX', value: 30, color: 'green', badgeColor: 'green' },
+  { name: '2XX', value: 31, color: 'green', badgeColor: 'green' },
   { name: '5XX', value: 15, color: 'red', badgeColor: 'red' },
-  { name: '3XX', value: 12, color: 'blue', badgeColor: 'blue' },
-  { name: '1XX', value: 8, color: 'slate', badgeColor: 'slate' },
+  { name: '3XX', value: 18, color: 'blue', badgeColor: 'blue' },
+  { name: '1XX', value: 1, color: 'slate', badgeColor: 'slate' },
 ];
 
 const longLabelRows: Row[] = [
@@ -162,10 +162,10 @@ export const Default: StoryFn<typeof meta> = () => {
         <PieChart data={visibleRows} total={visibleTotal}>
           <PieChartDonut>
             <PieChartCenter>
-              <PieChartCenterValue>
+              <PieChartCenterValue formatHoveredValue={d => formatValue(d.value)}>
                 {formatValue(filtered ? visibleTotal : total)}
               </PieChartCenterValue>
-              <PieChartCenterLabel>requests</PieChartCenterLabel>
+              <PieChartCenterLabel pluralize={{ one: 'request', other: 'requests' }} />
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>

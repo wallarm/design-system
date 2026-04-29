@@ -62,6 +62,19 @@ export interface PieChartItemContextValue {
 
 export const EMPTY_SELECTION: Set<string> = new Set();
 
+/**
+ * DOM selector for elements whose `mouseEnter`/`focus` will set `activeName`
+ * (legend rows and donut slices). Used by the matching `mouseLeave`/`blur`
+ * handlers to skip the `setActive(null)` clear when the cursor/focus is moving
+ * directly to another sibling — without this guard, React renders an
+ * intermediate `null` frame between the leave and enter, which flickers the
+ * centre value on every row/slice crossing.
+ */
+const HOVER_SYNC_SELECTOR = '[data-slot="pie-chart-legend-item"], [data-slot="pie-chart-slice"]';
+
+export const isHoverSyncTarget = (target: EventTarget | null | undefined): boolean =>
+  target instanceof Element && target.closest(HOVER_SYNC_SELECTOR) !== null;
+
 export const PieChartDataContext = createContext<PieChartDataContextValue | null>(null);
 export const PieChartActiveContext = createContext<PieChartActiveContextValue>({
   activeName: null,
