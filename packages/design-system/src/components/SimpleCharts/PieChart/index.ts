@@ -3,6 +3,7 @@ export { PieChart, type PieChartProps } from './PieChart';
 export {
   PieChartCenter,
   PieChartCenterLabel,
+  type PieChartCenterLabelPluralRules,
   type PieChartCenterLabelProps,
   type PieChartCenterProps,
   PieChartCenterValue,

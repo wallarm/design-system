@@ -222,6 +222,27 @@ test.describe('PieChart', () => {
       await expect(page.locator('[data-slot=pie-chart-legend-percent]')).toContainText('100');
     });
 
+    test('Should swap centre value to the hovered slice value', async ({ page }) => {
+      await pieChartStory.goto(page, 'Default');
+      await page.waitForTimeout(PIE_ANIMATION_MS);
+      const centreValue = page.locator('[data-slot=pie-chart-center-value]');
+      // Total of baseRows = 100; 5XX = 15.
+      await expect(centreValue).toContainText('100');
+      await expect(centreValue).not.toHaveAttribute('data-hovered', 'true');
+
+      await page.locator('[data-slot=pie-chart-legend-item][data-name="5XX"]').hover();
+
+      await expect(centreValue).toContainText('15');
+      await expect(centreValue).toHaveAttribute('data-hovered', 'true');
+    });
+
+    test('Should pluralize the centre label based on the active value', async ({ page }) => {
+      await pieChartStory.goto(page, 'Default');
+      await page.waitForTimeout(PIE_ANIMATION_MS);
+      // Default uses `{ one: 'request', other: 'requests' }`; total = 100 → plural.
+      await expect(page.locator('[data-slot=pie-chart-center-label]')).toHaveText('requests');
+    });
+
     test('Should not set role=button on a non-interactive row', async ({ page }) => {
       await pieChartStory.goto(page, 'Two Slices');
       const row = page.locator('[data-slot=pie-chart-legend-item]').first();

@@ -2,6 +2,7 @@ import {
   type FC,
   type HTMLAttributes,
   type ReactElement,
+  type MouseEvent as ReactMouseEvent,
   type Ref,
   useCallback,
   useContext,
@@ -21,6 +22,7 @@ import {
   PIE_SLICE_FILL,
 } from './constants';
 import {
+  isHoverSyncTarget,
   PieChartActiveContext,
   PieChartDataContext,
   type PieChartDatum,
@@ -68,9 +70,16 @@ export const PieChartDonut: FC<PieChartDonutProps> = ({
     [dataCtx],
   );
 
-  const handleLeave = useCallback(() => {
-    dataCtx?.setActive(null);
-  }, [dataCtx]);
+  const handleLeave = useCallback(
+    // Recharts passes (data, index, event) on Pie's leave; we only need
+    // `relatedTarget`. See `isHoverSyncTarget` in PieChartContext for the
+    // flicker rationale.
+    (_data: unknown, _index: number, event?: ReactMouseEvent) => {
+      if (event && isHoverSyncTarget(event.relatedTarget)) return;
+      dataCtx?.setActive(null);
+    },
+    [dataCtx],
+  );
 
   const isValidTotal = !!dataCtx?.isValidTotal;
   const isMultiSlice = isValidTotal && dataCtx.data.length > 1;
