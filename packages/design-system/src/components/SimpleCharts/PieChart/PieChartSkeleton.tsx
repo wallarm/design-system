@@ -50,7 +50,13 @@ export const PieChartSkeleton: FC<PieChartSkeletonProps> = ({
         className={cn(pieChartRootClasses, className)}
       >
         <div className={cn(pieChartDonutClasses, 'flex items-center justify-center')}>
-          <Skeleton width='120px' height='120px' rounded='full' />
+          {/* 48px transparent disc keeps the ring metrics in sync with `PIE_DONUT_INNER_RADIUS`. */}
+          <Skeleton
+            width='120px'
+            height='120px'
+            rounded='full'
+            className='mask-[radial-gradient(circle,transparent_48px,#000_49px)]'
+          />
         </div>
         <div className={cn(pieChartLegendClasses, 'gap-8 pl-0 pr-12 py-12')}>
           {Array.from({ length: rows }, (_, i) => (
