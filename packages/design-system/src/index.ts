@@ -269,6 +269,13 @@ export {
   type OverflowTooltipContentProps,
   type OverflowTooltipProps,
 } from './components/OverflowTooltip';
+export {
+  type CopyFormatData,
+  formatAsFilter,
+  type HttpMethod,
+  ParameterPath,
+  type ParameterPathProps,
+} from './components/ParameterPath';
 export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
 export {
   Radio,
