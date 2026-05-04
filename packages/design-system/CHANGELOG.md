@@ -1,3 +1,8 @@
+## <small>0.32.1 (2026-05-04)</small>
+
+* fix(simple-charts): WDS-90 PieChart skeleton ([9c16f22](https://github.com/wallarm/design-system/commit/9c16f22))
+* fix(simple-charts): WDS-90 PieChart value on hover ([32dcd9e](https://github.com/wallarm/design-system/commit/32dcd9e))
+
 ## 0.32.0 (2026-04-28)
 
 * feat(simple-charts): WDS-90 PieChart ([1f507c1](https://github.com/wallarm/design-system/commit/1f507c1))
