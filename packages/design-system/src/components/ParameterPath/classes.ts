@@ -17,9 +17,10 @@ export const segmentVariants = cva(
 
 export const encodingVariants = cva([
   'flex items-center justify-center shrink-0 gap-2',
-  'rounded-8 border-1 border-dashed border-border-primary',
-  'px-4 py-2',
+  'h-20 rounded-8 border-1 border-dashed border-border-primary',
+  'px-4',
   'font-mono text-xs leading-4 text-text-secondary',
+  '[&_svg]:icon-sm',
 ]);
 
 export const jointVariants = cva('flex items-center shrink-0 p-2 text-icon-secondary');
