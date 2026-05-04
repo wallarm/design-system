@@ -106,3 +106,51 @@ describe('ParameterPath truncation rendering', () => {
     expect(within(v).getByText('gamma')).toBeInTheDocument();
   });
 });
+
+describe('ParameterPath copy', () => {
+  it('overrides clipboard text with formatAsFilter on copy event', () => {
+    const { container } = render(
+      <ParameterPath
+        method='POST'
+        segments={['JSON', 'nginx_config']}
+        encoding='BASE64'
+        data-testid='pp'
+      />,
+    );
+
+    const setData = vi.fn();
+    const event = new Event('copy', { bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'clipboardData', { value: { setData }, writable: false });
+
+    container.querySelector('[data-slot="parameter-path"]')!.dispatchEvent(event);
+
+    expect(setData).toHaveBeenCalledWith(
+      'text/plain',
+      'method = "POST" AND parameter = "JSON.nginx_config" AND encoding = "BASE64"',
+    );
+    expect(event.defaultPrevented).toBe(true);
+  });
+
+  it('uses custom copyFormat callback when provided', () => {
+    const copyFormat = vi.fn(() => 'CUSTOM');
+    const { container } = render(
+      <ParameterPath
+        method='GET'
+        segments={['query', 'filter']}
+        copyFormat={copyFormat}
+        data-testid='pp'
+      />,
+    );
+    const setData = vi.fn();
+    const event = new Event('copy', { bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'clipboardData', { value: { setData }, writable: false });
+    container.querySelector('[data-slot="parameter-path"]')!.dispatchEvent(event);
+
+    expect(copyFormat).toHaveBeenCalledWith({
+      method: 'GET',
+      segments: ['query', 'filter'],
+      encoding: undefined,
+    });
+    expect(setData).toHaveBeenCalledWith('text/plain', 'CUSTOM');
+  });
+});

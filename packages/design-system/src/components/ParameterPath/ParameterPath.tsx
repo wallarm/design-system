@@ -1,8 +1,9 @@
-import type { FC, ReactNode } from 'react';
-import { useRef } from 'react';
+import type { ClipboardEvent, FC, ReactNode } from 'react';
+import { useCallback, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { TestIdProvider } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
+import { formatAsFilter } from './formatAsFilter';
 import { ParameterPathEllipsis } from './ParameterPathEllipsis';
 import { ParameterPathEncoding } from './ParameterPathEncoding';
 import { ParameterPathJoint } from './ParameterPathJoint';
@@ -29,11 +30,21 @@ export const ParameterPath: FC<ParameterPathProps> = ({
   segments,
   encoding,
   attack = false,
-  copyFormat: _copyFormat,
+  copyFormat = formatAsFilter,
   className,
   'data-testid': testId,
   ...rest
 }) => {
+  const handleCopy = useCallback(
+    (event: ClipboardEvent<HTMLDivElement>) => {
+      const text = copyFormat({ method, segments, encoding });
+      if (!text) return;
+      event.preventDefault();
+      event.clipboardData.setData('text/plain', text);
+    },
+    [copyFormat, method, segments, encoding],
+  );
+
   const containerRef = useRef<HTMLDivElement>(null);
   const measurementRef = useRef<HTMLDivElement>(null);
 
@@ -152,6 +163,7 @@ export const ParameterPath: FC<ParameterPathProps> = ({
         data-slot='parameter-path'
         data-truncated={isTruncated || undefined}
         ref={ref}
+        onCopy={handleCopy}
         className={cn('relative flex items-center min-w-0', className)}
       >
         {visibleRow}
