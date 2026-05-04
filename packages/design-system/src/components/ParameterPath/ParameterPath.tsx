@@ -155,30 +155,31 @@ export const ParameterPath: FC<ParameterPathProps> = ({
     </div>
   );
 
-  const root = (
-    <TestIdProvider value={testId}>
-      <div
-        {...rest}
-        data-testid={testId}
-        data-slot='parameter-path'
-        data-truncated={isTruncated || undefined}
-        ref={ref}
-        onCopy={handleCopy}
-        className={cn('relative flex items-center min-w-0', className)}
-      >
-        {visibleRow}
-        {measurementRow}
-      </div>
-    </TestIdProvider>
-  );
-
-  if (!isTruncated) return root;
-
+  // The Tooltip wrapper is always rendered to keep the DOM tree stable across
+  // truncation toggles. Conditionally wrapping in <Tooltip> would remount the
+  // visible row, which would tear down the ResizeObserver in `useContainerWidth`
+  // and freeze the measured container width — preventing truncation from ever
+  // settling. Instead, we render Tooltip permanently and toggle `disabled`.
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>{root}</TooltipTrigger>
-      <TooltipContent>{buildFullPathLabel(method, segments, encoding)}</TooltipContent>
-    </Tooltip>
+    <TestIdProvider value={testId}>
+      <Tooltip disabled={!isTruncated}>
+        <TooltipTrigger asChild>
+          <div
+            {...rest}
+            data-testid={testId}
+            data-slot='parameter-path'
+            data-truncated={isTruncated || undefined}
+            ref={ref}
+            onCopy={handleCopy}
+            className={cn('relative flex items-center min-w-0', className)}
+          >
+            {visibleRow}
+            {measurementRow}
+          </div>
+        </TooltipTrigger>
+        <TooltipContent>{buildFullPathLabel(method, segments, encoding)}</TooltipContent>
+      </Tooltip>
+    </TestIdProvider>
   );
 };
 

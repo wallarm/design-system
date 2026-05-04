@@ -58,11 +58,7 @@ test.describe('Component: ParameterPath', () => {
   });
 
   test.describe('Interactions', () => {
-    // TODO(WDS-107): truncation hook does not fire in real browsers — `data-truncated`
-    // never becomes "true" so the Radix Tooltip wrapper is not applied. Unit tests pass
-    // because jsdom returns 0 for `getBoundingClientRect`. Re-enable once the truncation
-    // logic correctly reacts to real-DOM container width.
-    test.fixme('Should show full path tooltip when truncated', async ({ page }) => {
+    test('Should show full path tooltip when truncated', async ({ page }) => {
       await parameterPathStory.goto(page, 'Deep Nested Truncated');
 
       const path = page.locator('[data-slot="parameter-path"]');
