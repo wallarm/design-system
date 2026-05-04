@@ -45,4 +45,16 @@ describe('formatAsFilter', () => {
 
     expect(() => parseExpression(text, fields)).not.toThrow();
   });
+
+  it('switches to single quotes when value contains a double quote', () => {
+    expect(formatAsFilter({ segments: ['weird"name'] })).toBe(`parameter = 'weird"name'`);
+  });
+
+  it('keeps double quotes when value contains a single quote', () => {
+    expect(formatAsFilter({ segments: ["it's"] })).toBe(`parameter = "it's"`);
+  });
+
+  it('drops embedded double quotes when both quote kinds are present', () => {
+    expect(formatAsFilter({ segments: [`a"b'c`] })).toBe(`parameter = "ab'c"`);
+  });
 });

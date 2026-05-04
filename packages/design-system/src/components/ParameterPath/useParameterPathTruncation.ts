@@ -6,7 +6,7 @@ interface ComputeArgs {
   methodWidth: number;
   encodingWidth: number;
   segmentWidths: number[];
-  jointWidth: number;
+  jointsWidth: number;
 }
 
 interface TruncationResult {
@@ -19,7 +19,7 @@ export const computeTruncation = ({
   methodWidth,
   encodingWidth,
   segmentWidths,
-  jointWidth,
+  jointsWidth,
 }: ComputeArgs): TruncationResult => {
   const segCount = segmentWidths.length;
   const allIndices = Array.from({ length: segCount }, (_, i) => i);
@@ -28,20 +28,23 @@ export const computeTruncation = ({
     return { isTruncated: false, visibleSegmentIndices: allIndices };
   }
 
-  const jointsCount =
-    (methodWidth > 0 ? 1 : 0) + Math.max(0, segCount - 1) + (encodingWidth > 0 ? 1 : 0);
   const totalWidth =
-    methodWidth +
-    encodingWidth +
-    segmentWidths.reduce((acc, w) => acc + w, 0) +
-    jointsCount * jointWidth;
+    methodWidth + encodingWidth + segmentWidths.reduce((acc, w) => acc + w, 0) + jointsWidth;
 
   if (totalWidth <= containerWidth) {
     return { isTruncated: false, visibleSegmentIndices: allIndices };
   }
 
+  // Policy: when the path overflows we always collapse the middle and keep
+  // only `[first, …, last]`. There is no fallback for the case where even
+  // `first → ellipsis → last (→ encoding)` is too wide — the parent's
+  // `overflow-hidden` then clips the row. This matches the design intent;
+  // a more granular policy can be added if narrow containers become common.
   return { isTruncated: true, visibleSegmentIndices: [0, segCount - 1] };
 };
+
+const indicesEqual = (a: number[], b: number[]): boolean =>
+  a.length === b.length && a.every((v, i) => v === b[i]);
 
 interface UseTruncationArgs {
   containerRef: RefObject<HTMLElement | null>;
@@ -74,22 +77,27 @@ export const useParameterPathTruncation = ({
 
     const methodEl = root.querySelector<HTMLElement>('[data-measure="method"]');
     const encodingEl = root.querySelector<HTMLElement>('[data-measure="encoding"]');
-    const jointEl = root.querySelector<HTMLElement>('[data-measure="joint"]');
+    const jointEls = Array.from(root.querySelectorAll<HTMLElement>('[data-measure="joint"]'));
     const segmentEls = Array.from(root.querySelectorAll<HTMLElement>('[data-measure="segment"]'));
 
     const segmentWidths = segmentEls.map(el => el.getBoundingClientRect().width);
     const methodWidth = hasMethod && methodEl ? methodEl.getBoundingClientRect().width : 0;
     const encodingWidth = hasEncoding && encodingEl ? encodingEl.getBoundingClientRect().width : 0;
-    const jointWidth = jointEl ? jointEl.getBoundingClientRect().width : 0;
+    const jointsWidth = jointEls.reduce((acc, el) => acc + el.getBoundingClientRect().width, 0);
 
-    setResult(
-      computeTruncation({
-        containerWidth,
-        methodWidth,
-        encodingWidth,
-        segmentWidths,
-        jointWidth,
-      }),
+    const next = computeTruncation({
+      containerWidth,
+      methodWidth,
+      encodingWidth,
+      segmentWidths,
+      jointsWidth,
+    });
+
+    setResult(prev =>
+      prev.isTruncated === next.isTruncated &&
+      indicesEqual(prev.visibleSegmentIndices, next.visibleSegmentIndices)
+        ? prev
+        : next,
     );
   }, [containerWidth, segmentCount, hasMethod, hasEncoding, measurementRef]);
 

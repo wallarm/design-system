@@ -55,16 +55,11 @@ export const ParameterPath: FC<ParameterPathProps> = ({
         : indices;
 
     const items: ReactNode[] = [];
+    const measure = (slot: string) => (forMeasurement ? slot : undefined);
 
     if (method) {
       items.push(
-        <span
-          key='method'
-          data-measure={forMeasurement ? 'method' : undefined}
-          className='flex items-center'
-        >
-          <ParameterPathMethod method={method} />
-        </span>,
+        <ParameterPathMethod key='method' method={method} data-measure={measure('method')} />,
       );
     }
 
@@ -77,9 +72,7 @@ export const ParameterPath: FC<ParameterPathProps> = ({
       const showJointBefore = !(isFirstShown && !method);
       if (showJointBefore) {
         items.push(
-          <span key={`j-${segIndex}-pre`} data-measure={forMeasurement ? 'joint' : undefined}>
-            <ParameterPathJoint />
-          </span>,
+          <ParameterPathJoint key={`j-${segIndex}-pre`} data-measure={measure('joint')} />,
         );
       }
 
@@ -87,40 +80,31 @@ export const ParameterPath: FC<ParameterPathProps> = ({
         !forMeasurement && indices !== null && position === 0 && visibleIdx.length === 2;
 
       items.push(
-        <span
+        <ParameterPathSegment
           key={`s-${segIndex}`}
-          data-measure={forMeasurement ? 'segment' : undefined}
-          data-testid={!forMeasurement && testId ? `${testId}--segment-${segIndex}` : undefined}
+          index={segIndex}
+          variant={isLast ? 'highlighted' : 'default'}
+          withZap={isLast && attack}
+          data-measure={measure('segment')}
         >
-          <ParameterPathSegment
-            variant={isLast ? 'highlighted' : 'default'}
-            withZap={isLast && attack}
-          >
-            {value}
-          </ParameterPathSegment>
-        </span>,
+          {value}
+        </ParameterPathSegment>,
       );
 
       if (isCollapsedBoundary) {
         items.push(
-          <span key='ellipsis-joint-pre'>
-            <ParameterPathJoint />
-          </span>,
-          <span key='ellipsis'>
-            <ParameterPathEllipsis />
-          </span>,
+          <ParameterPathJoint key='ellipsis-joint-pre' />,
+          <ParameterPathEllipsis key='ellipsis' />,
         );
       }
     });
 
     if (encoding) {
       items.push(
-        <span key='enc-joint' data-measure={forMeasurement ? 'joint' : undefined}>
-          <ParameterPathJoint />
-        </span>,
-        <span key='enc' data-measure={forMeasurement ? 'encoding' : undefined}>
-          <ParameterPathEncoding>{encoding}</ParameterPathEncoding>
-        </span>,
+        <ParameterPathJoint key='enc-joint' data-measure={measure('joint')} />,
+        <ParameterPathEncoding key='enc' data-measure={measure('encoding')}>
+          {encoding}
+        </ParameterPathEncoding>,
       );
     }
 
@@ -137,6 +121,8 @@ export const ParameterPath: FC<ParameterPathProps> = ({
     </div>
   );
 
+  // Suppress test-ids inside the off-screen measurement row so queries against
+  // `data-testid` resolve to a single (visible) match rather than two duplicates.
   const measurementRow = (
     <div
       ref={measurementRef}
@@ -144,7 +130,7 @@ export const ParameterPath: FC<ParameterPathProps> = ({
       aria-hidden='true'
       className='flex items-center gap-0 absolute left-[-9999px] top-0 invisible pointer-events-none'
     >
-      {renderRow(true)}
+      <TestIdProvider value={undefined}>{renderRow(true)}</TestIdProvider>
     </div>
   );
 
@@ -153,26 +139,29 @@ export const ParameterPath: FC<ParameterPathProps> = ({
   // visible row, which would tear down the ResizeObserver in `useContainerWidth`
   // and freeze the measured container width — preventing truncation from ever
   // settling. Instead, we render Tooltip permanently and toggle `disabled`.
+  // The outer Tooltip uses its own TestIdProvider for its sub-components, which
+  // would clobber our context to `undefined` here. Re-establish the provider
+  // inside TooltipTrigger so sub-components see the parent's `data-testid`.
   return (
-    <TestIdProvider value={testId}>
-      <Tooltip disabled={!isTruncated}>
-        <TooltipTrigger asChild>
-          <div
-            {...rest}
-            data-testid={testId}
-            data-slot='parameter-path'
-            data-truncated={isTruncated || undefined}
-            ref={ref}
-            onCopy={handleCopy}
-            className={cn('relative flex items-center min-w-0', className)}
-          >
+    <Tooltip disabled={!isTruncated}>
+      <TooltipTrigger asChild>
+        <div
+          {...rest}
+          data-testid={testId}
+          data-slot='parameter-path'
+          data-truncated={isTruncated || undefined}
+          ref={ref}
+          onCopy={handleCopy}
+          className={cn('relative flex items-center min-w-0', className)}
+        >
+          <TestIdProvider value={testId}>
             {visibleRow}
             {measurementRow}
-          </div>
-        </TooltipTrigger>
-        <TooltipContent>{buildFullPathLabel(method, segments, encoding)}</TooltipContent>
-      </Tooltip>
-    </TestIdProvider>
+          </TestIdProvider>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent>{buildFullPathLabel(method, segments, encoding)}</TooltipContent>
+    </Tooltip>
   );
 };
 

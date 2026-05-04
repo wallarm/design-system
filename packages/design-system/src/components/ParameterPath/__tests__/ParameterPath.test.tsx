@@ -47,10 +47,11 @@ describe('ParameterPath', () => {
 
   it('marks the last segment as highlighted', () => {
     render(<ParameterPath segments={['JSON', 'nginx_config']} data-testid='pp' />);
-    const segments = screen.getAllByTestId(/pp--segment-/);
+    const v = visible('pp');
+    const segments = within(v).getAllByTestId(/pp--segment-/);
     expect(segments).toHaveLength(2);
-    expect(segments.at(-1)?.firstElementChild).toHaveAttribute('data-variant', 'highlighted');
-    expect(segments[0]?.firstElementChild).toHaveAttribute('data-variant', 'default');
+    expect(segments.at(-1)).toHaveAttribute('data-variant', 'highlighted');
+    expect(segments[0]).toHaveAttribute('data-variant', 'default');
   });
 
   it('shows zap icon on highlighted segment when attack=true', () => {
@@ -152,5 +153,62 @@ describe('ParameterPath copy', () => {
       encoding: undefined,
     });
     expect(setData).toHaveBeenCalledWith('text/plain', 'CUSTOM');
+  });
+
+  it('falls through to native copy when copyFormat returns an empty string', () => {
+    const copyFormat = vi.fn(() => '');
+    const { container } = render(
+      <ParameterPath segments={['a']} copyFormat={copyFormat} data-testid='pp' />,
+    );
+    const setData = vi.fn();
+    const event = new Event('copy', { bubbles: true, cancelable: true });
+    Object.defineProperty(event, 'clipboardData', { value: { setData }, writable: false });
+    container.querySelector('[data-slot="parameter-path"]')!.dispatchEvent(event);
+
+    expect(copyFormat).toHaveBeenCalled();
+    expect(setData).not.toHaveBeenCalled();
+    expect(event.defaultPrevented).toBe(false);
+  });
+});
+
+describe('ParameterPath edge cases', () => {
+  it('renders nothing meaningful with empty segments and no method/encoding', () => {
+    const { container } = render(<ParameterPath segments={[]} data-testid='pp' />);
+    const v = container.querySelector('[data-row="visible"]');
+    expect(v?.children.length).toBe(0);
+  });
+
+  it('does not render zap when attack=true but there are no segments', () => {
+    const { container } = render(<ParameterPath segments={[]} attack data-testid='pp' />);
+    expect(container.querySelector('[data-slot="parameter-path-segment"] svg')).toBeNull();
+  });
+
+  it('renders single segment as highlighted with attack zap', () => {
+    const { container } = render(
+      <ParameterPath method='GET' segments={['only']} attack data-testid='pp' />,
+    );
+    const seg = container.querySelector('[data-slot="parameter-path-segment"]');
+    expect(seg).toHaveAttribute('data-variant', 'highlighted');
+    expect(seg?.querySelector('svg')).toBeTruthy();
+  });
+
+  it('cascades data-testid to method, encoding, and ellipsis sub-components', () => {
+    vi.mocked(useParameterPathTruncation).mockReturnValue({
+      isTruncated: true,
+      visibleSegmentIndices: [0, 3],
+    });
+    render(
+      <ParameterPath
+        method='POST'
+        segments={['multi', 'a', 'b', 'tail']}
+        encoding='BASE64'
+        data-testid='pp'
+      />,
+    );
+    expect(screen.getByTestId('pp--method')).toBeInTheDocument();
+    expect(screen.getByTestId('pp--encoding')).toBeInTheDocument();
+    expect(screen.getByTestId('pp--ellipsis')).toBeInTheDocument();
+    expect(screen.getByTestId('pp--segment-0')).toBeInTheDocument();
+    expect(screen.getByTestId('pp--segment-3')).toBeInTheDocument();
   });
 });

@@ -9,7 +9,7 @@ describe('computeTruncation', () => {
         methodWidth: 50,
         encodingWidth: 0,
         segmentWidths: [40, 60, 80],
-        jointWidth: 16,
+        jointsWidth: 64,
       }),
     ).toEqual({ isTruncated: false, visibleSegmentIndices: [0, 1, 2] });
   });
@@ -21,7 +21,7 @@ describe('computeTruncation', () => {
         methodWidth: 50,
         encodingWidth: 0,
         segmentWidths: [40, 200, 200, 200, 80],
-        jointWidth: 16,
+        jointsWidth: 64,
       }),
     ).toEqual({ isTruncated: true, visibleSegmentIndices: [0, 4] });
   });
@@ -33,7 +33,7 @@ describe('computeTruncation', () => {
         methodWidth: 50,
         encodingWidth: 0,
         segmentWidths: [200, 200],
-        jointWidth: 16,
+        jointsWidth: 64,
       }),
     ).toEqual({ isTruncated: false, visibleSegmentIndices: [0, 1] });
   });
@@ -44,7 +44,7 @@ describe('computeTruncation', () => {
       methodWidth: 50,
       encodingWidth: 80,
       segmentWidths: [40, 100, 100, 100, 60],
-      jointWidth: 16,
+      jointsWidth: 64,
     });
     expect(result.isTruncated).toBe(true);
     expect(result.visibleSegmentIndices).toEqual([0, 4]);
@@ -57,7 +57,7 @@ describe('computeTruncation', () => {
         methodWidth: 0,
         encodingWidth: 0,
         segmentWidths: [500],
-        jointWidth: 16,
+        jointsWidth: 64,
       }),
     ).toEqual({ isTruncated: false, visibleSegmentIndices: [0] });
   });
@@ -69,7 +69,7 @@ describe('computeTruncation', () => {
         methodWidth: 50,
         encodingWidth: 0,
         segmentWidths: [],
-        jointWidth: 16,
+        jointsWidth: 64,
       }),
     ).toEqual({ isTruncated: false, visibleSegmentIndices: [] });
   });

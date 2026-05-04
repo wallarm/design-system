@@ -26,6 +26,6 @@ export const jointVariants = cva('flex items-center shrink-0 p-2 text-icon-secon
 
 export const ellipsisVariants = cva([
   'flex items-center justify-center shrink-0',
-  'min-h-5 px-2 gap-2',
+  'h-20 px-2 gap-2',
   'text-text-secondary',
 ]);
