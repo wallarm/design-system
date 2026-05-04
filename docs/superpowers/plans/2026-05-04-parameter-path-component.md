@@ -112,14 +112,14 @@ Default `formatAsFilter` (в `formatAsFilter.ts`):
 ```ts
 export const formatAsFilter = ({ method, segments, encoding }: CopyFormatData): string => {
   const parts: string[] = []
-  if (method) parts.push(`method == "${method}"`)
-  if (segments.length > 0) parts.push(`parameter == "${segments.join('.')}"`)
-  if (encoding) parts.push(`encoding == "${encoding}"`)
+  if (method) parts.push(`method = "${method}"`)
+  if (segments.length > 0) parts.push(`parameter = "${segments.join('.')}"`)
+  if (encoding) parts.push(`encoding = "${encoding}"`)
   return parts.join(' AND ')
 }
 ```
 
-> Этот формат — sensible default для FilterInput (синтаксис `(field op "value")` совместим с `serializeExpression`). Потребитель платформы перекрывает через `copyFormat` если поля называются иначе.
+> Этот формат — sensible default для FilterInput (синтаксис `field = "value"` совместим с грамматикой `parseExpression` — оператор `=`, не `==`). Потребитель платформы перекрывает через `copyFormat` если поля называются иначе.
 
 ---
 
@@ -229,18 +229,18 @@ describe('formatAsFilter', () => {
         segments: ['JSON', 'nginx_config'],
         encoding: 'BASE64',
       }),
-    ).toBe('method == "POST" AND parameter == "JSON.nginx_config" AND encoding == "BASE64"')
+    ).toBe('method = "POST" AND parameter = "JSON.nginx_config" AND encoding = "BASE64"')
   })
 
   it('skips method when omitted (e.g. SOAP/MCP)', () => {
     expect(formatAsFilter({ segments: ['cookie', 'session_id'] })).toBe(
-      'parameter == "cookie.session_id"',
+      'parameter = "cookie.session_id"',
     )
   })
 
   it('skips encoding clause when not present', () => {
     expect(formatAsFilter({ method: 'GET', segments: ['query', 'filter'] })).toBe(
-      'method == "GET" AND parameter == "query.filter"',
+      'method = "GET" AND parameter = "query.filter"',
     )
   })
 
@@ -266,15 +266,19 @@ import type { CopyFormatData } from './types'
 
 /**
  * Default Cmd+C serializer. Produces a FilterInput-compatible expression:
- * `method == "POST" AND parameter == "a.b" AND encoding == "BASE64"`.
+ * `method = "POST" AND parameter = "a.b" AND encoding = "BASE64"`.
  *
  * Override via `copyFormat` prop if the consuming platform uses different field names.
+ *
+ * Note: values are not escaped — callers must ensure that `method`, `segments`,
+ * and `encoding` do not contain unescaped double quotes. This matches the
+ * FilterInput grammar's existing limitation around quoted identifiers.
  */
 export const formatAsFilter = ({ method, segments, encoding }: CopyFormatData): string => {
   const parts: string[] = []
-  if (method) parts.push(`method == "${method}"`)
-  if (segments.length > 0) parts.push(`parameter == "${segments.join('.')}"`)
-  if (encoding) parts.push(`encoding == "${encoding}"`)
+  if (method) parts.push(`method = "${method}"`)
+  if (segments.length > 0) parts.push(`parameter = "${segments.join('.')}"`)
+  if (encoding) parts.push(`encoding = "${encoding}"`)
   return parts.join(' AND ')
 }
 ```
@@ -1281,7 +1285,7 @@ describe('ParameterPath copy', () => {
 
     expect(setData).toHaveBeenCalledWith(
       'text/plain',
-      'method == "POST" AND parameter == "JSON.nginx_config" AND encoding == "BASE64"',
+      'method = "POST" AND parameter = "JSON.nginx_config" AND encoding = "BASE64"',
     )
     expect(event.defaultPrevented).toBe(true)
   })
@@ -1557,7 +1561,7 @@ test.describe('ParameterPath', () => {
       await page.keyboard.press('Control+C')
       const clip = await page.evaluate(() => navigator.clipboard.readText())
       expect(clip).toBe(
-        'method == "POST" AND parameter == "JSON.nginx_config" AND encoding == "BASE64"',
+        'method = "POST" AND parameter = "JSON.nginx_config" AND encoding = "BASE64"',
       )
     })
   })
