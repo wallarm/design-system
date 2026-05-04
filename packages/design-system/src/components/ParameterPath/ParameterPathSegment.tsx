@@ -26,7 +26,7 @@ export const ParameterPathSegment: FC<ParameterPathSegmentProps> = ({
   >
     {children}
     {withZap && variant === 'highlighted' ? (
-      <Zap size='sm' className='size-3 text-icon-warning' aria-hidden='true' />
+      <Zap size='sm' className='text-icon-danger' aria-hidden='true' />
     ) : null}
   </span>
 );

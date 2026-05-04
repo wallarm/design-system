@@ -3,6 +3,7 @@ import { useCallback, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { TestIdProvider } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
+import { buildFullPathLabel } from './buildFullPathLabel';
 import { formatAsFilter } from './formatAsFilter';
 import { ParameterPathEllipsis } from './ParameterPathEllipsis';
 import { ParameterPathEncoding } from './ParameterPathEncoding';
@@ -11,18 +12,6 @@ import { ParameterPathMethod } from './ParameterPathMethod';
 import { ParameterPathSegment } from './ParameterPathSegment';
 import type { ParameterPathProps } from './types';
 import { useParameterPathTruncation } from './useParameterPathTruncation';
-
-const buildFullPathLabel = (
-  method: ParameterPathProps['method'],
-  segments: string[],
-  encoding?: string,
-): string => {
-  const parts: string[] = [];
-  if (method) parts.push(method);
-  parts.push(...segments);
-  if (encoding) parts.push(encoding);
-  return parts.join(' › ');
-};
 
 export const ParameterPath: FC<ParameterPathProps> = ({
   ref,
@@ -69,7 +58,11 @@ export const ParameterPath: FC<ParameterPathProps> = ({
 
     if (method) {
       items.push(
-        <span key='method' data-measure={forMeasurement ? 'method' : undefined}>
+        <span
+          key='method'
+          data-measure={forMeasurement ? 'method' : undefined}
+          className='flex items-center'
+        >
           <ParameterPathMethod method={method} />
         </span>,
       );
