@@ -793,5 +793,99 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
         </AttributeActions>
       </AttributeValue>
     </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Payload</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <InlineCodeSnippet code='{ "action": "login", "user_id": 42 }' size='sm' />
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Documentation</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Link href='#' size='md'>
+              View full report
+            </Link>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Tags</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <OverflowList
+              className='gap-4'
+              items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
+              itemRenderer={item => <Tag key={item}>{item}</Tag>}
+              overflowRenderer={renderOverflowPopover}
+            />
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
   </div>
 );
