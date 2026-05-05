@@ -9,23 +9,9 @@ export interface CopyFormatData {
   encoding?: string;
 }
 
-/**
- * Props for `ParameterPath`.
- *
- * **Test IDs.** Pass `data-testid` and child slots derive their own ids via
- * `TestIdProvider`. Slot suffixes:
- * - `--method`
- * - `--segment-N` (N = zero-based index in `segments`)
- * - `--encoding`
- * - `--ellipsis` (only present when truncated)
- *
- * **Cmd/Ctrl+C copy.** Copy is implemented via the native `onCopy` handler,
- * which fires only when the user has a non-empty selection inside the root.
- * The component renders inside a normal `<div>`, so the default text
- * selection works — but **do not place `ParameterPath` inside an ancestor
- * with `user-select: none`**, or copy will silently fall back to the
- * (empty) browser default. Override the serializer with `copyFormat`.
- */
+// Cmd/Ctrl+C uses the native onCopy handler, which needs a real text selection.
+// Do not place ParameterPath inside a `user-select: none` ancestor or copy
+// silently falls back to the empty browser default.
 export interface ParameterPathProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onCopy'>,
     TestableProps {

@@ -121,8 +121,7 @@ export const ParameterPath: FC<ParameterPathProps> = ({
     </div>
   );
 
-  // Suppress test-ids inside the off-screen measurement row so queries against
-  // `data-testid` resolve to a single (visible) match rather than two duplicates.
+  // Suppress test-ids in the measurement row so queries match only the visible one.
   const measurementRow = (
     <div
       ref={measurementRef}
@@ -134,14 +133,10 @@ export const ParameterPath: FC<ParameterPathProps> = ({
     </div>
   );
 
-  // The Tooltip wrapper is always rendered to keep the DOM tree stable across
-  // truncation toggles. Conditionally wrapping in <Tooltip> would remount the
-  // visible row, which would tear down the ResizeObserver in `useContainerWidth`
-  // and freeze the measured container width — preventing truncation from ever
-  // settling. Instead, we render Tooltip permanently and toggle `disabled`.
-  // The outer Tooltip uses its own TestIdProvider for its sub-components, which
-  // would clobber our context to `undefined` here. Re-establish the provider
-  // inside TooltipTrigger so sub-components see the parent's `data-testid`.
+  // Tooltip is mounted unconditionally and toggled via `disabled` — conditional
+  // wrapping would remount the visible row and tear down the ResizeObserver,
+  // freezing truncation. The inner TestIdProvider re-establishes our testId
+  // because Tooltip's own provider would otherwise clobber it.
   return (
     <Tooltip disabled={!isTruncated}>
       <TooltipTrigger asChild>

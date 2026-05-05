@@ -35,11 +35,8 @@ export const computeTruncation = ({
     return { isTruncated: false, visibleSegmentIndices: allIndices };
   }
 
-  // Policy: when the path overflows we always collapse the middle and keep
-  // only `[first, …, last]`. There is no fallback for the case where even
-  // `first → ellipsis → last (→ encoding)` is too wide — the parent's
-  // `overflow-hidden` then clips the row. This matches the design intent;
-  // a more granular policy can be added if narrow containers become common.
+  // On overflow always collapse to [first, …, last]; if even that is too wide
+  // the parent's `overflow-hidden` clips the row.
   return { isTruncated: true, visibleSegmentIndices: [0, segCount - 1] };
 };
 
@@ -54,10 +51,6 @@ interface UseTruncationArgs {
   hasEncoding: boolean;
 }
 
-/**
- * Measures rendered segments inside `measurementRef` (a hidden full-width clone),
- * watches `containerRef` width via ResizeObserver, and returns truncation state.
- */
 export const useParameterPathTruncation = ({
   containerRef,
   measurementRef,

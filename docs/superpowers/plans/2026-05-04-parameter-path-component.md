@@ -2,38 +2,38 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Реализовать компонент `ParameterPath` (WDS-107) — горизонтальную цепочку «HTTP-метод → сегменты пути → encoding», с авто-сворачиванием середины при переполнении контейнера и кастомным Cmd+C в формате FilterInput.
+**Goal:** Implement the `ParameterPath` component (WDS-107) — a horizontal chain "HTTP method → path segments → encoding" with auto-collapsed middle when the container overflows and a custom Cmd+C handler that emits a FilterInput-compatible expression.
 
 **Architecture:**
 
-- Один публичный компонент с prop-API (`method`, `segments`, `encoding`, `attack`, `copyFormat`). Внутри — приватные sub-компоненты (`Joint`, `Segment`, `Encoding`, `Ellipsis`, `Method`) для читаемости и `data-slot`-разметки.
-- Truncation = собственный хук на `ResizeObserver`: невидимое измерение всех сегментов в полную длину, затем выбор «первый + … + последний» при overflow. Метод и encoding не сворачиваются.
-- Copy = слушатель `oncopy` на корне, переопределяет `clipboardData` строкой в формате FilterInput. Default-сериализатор внутри пакета, переопределяется через `copyFormat`.
-- Tooltip с полным путём — только когда truncated, оборачивает корень.
+- A single public component with a prop API (`method`, `segments`, `encoding`, `attack`, `copyFormat`). Internally it composes private sub-components (`Joint`, `Segment`, `Encoding`, `Ellipsis`, `Method`) for readability and `data-slot` markup.
+- Truncation = a dedicated `ResizeObserver`-based hook: an off-screen measurement of every segment at full width, then "first + … + last" selection on overflow. Method and encoding are never collapsed.
+- Copy = an `oncopy` listener on the root that overrides `clipboardData` with a FilterInput-formatted string. The default serializer ships in this package and can be overridden via `copyFormat`.
+- A tooltip with the full path is shown only when the row is truncated; it wraps the root.
 
-**Tech Stack:** React 19 + TypeScript strict, Tailwind, CVA, существующие компоненты `Badge`, `Tooltip`, иконки `ChevronRight`, `Ellipsis` (как `…`), `Zap`. Хук `useContainerWidth` (уже есть в `Table/lib`) — переиспользуем.
+**Tech Stack:** React 19 + strict TypeScript, Tailwind, CVA, existing components `Badge`, `Tooltip`, icons `ChevronRight`, `Ellipsis` (as `…`), `Zap`. The `useContainerWidth` hook (already in `Table/lib`) is reused.
 
 ---
 
 ## File Structure
 
-Создаём в `packages/design-system/src/components/ParameterPath/`:
+Create files under `packages/design-system/src/components/ParameterPath/`:
 
-| Файл | Ответственность |
-|------|-----------------|
-| `ParameterPath.tsx` | Корневой компонент. Оркестрирует измерение, truncation, copy-handler, tooltip-обёртку. |
-| `ParameterPathMethod.tsx` | Внутренний рендер `Badge` для HTTP-метода. |
-| `ParameterPathSegment.tsx` | Сегмент пути. Варианты: `default`, `highlighted`. Опциональная иконка `Zap`. |
-| `ParameterPathEncoding.tsx` | Хвостовая dashed-пилюля с mono-шрифтом. |
-| `ParameterPathJoint.tsx` | Разделитель `ChevronRight`. |
-| `ParameterPathEllipsis.tsx` | `…` для свёрнутых сегментов. |
-| `classes.ts` | CVA для `Segment` и `Encoding`. |
-| `constants.ts` | Маппинг `HttpMethod → BadgeColor`, список методов. |
+| File | Responsibility |
+|------|----------------|
+| `ParameterPath.tsx` | Root component. Orchestrates measurement, truncation, copy handler, tooltip wrapping. |
+| `ParameterPathMethod.tsx` | Internal `Badge` render for the HTTP method. |
+| `ParameterPathSegment.tsx` | Path segment. Variants: `default`, `highlighted`. Optional `Zap` icon. |
+| `ParameterPathEncoding.tsx` | Trailing dashed pill in mono font. |
+| `ParameterPathJoint.tsx` | `ChevronRight` separator. |
+| `ParameterPathEllipsis.tsx` | `…` for collapsed segments. |
+| `classes.ts` | CVA variants for `Segment` and `Encoding`. |
+| `constants.ts` | `HttpMethod → BadgeColor` mapping, list of methods. |
 | `types.ts` | `HttpMethod`, `ParameterPathProps`, `CopyFormatData`. |
-| `useParameterPathTruncation.ts` | Хук: измеряет сегменты, возвращает `visibleIndices` + `isTruncated`. |
-| `formatAsFilter.ts` | Default-сериализатор для Cmd+C. |
-| `index.ts` | Экспорт `ParameterPath` + типов. |
-| `ParameterPath.stories.tsx` | Storybook: 6 стори по Figma + `Playground`. |
+| `useParameterPathTruncation.ts` | Hook: measures segments, returns `visibleIndices` + `isTruncated`. |
+| `formatAsFilter.ts` | Default Cmd+C serializer. |
+| `index.ts` | Exports `ParameterPath` + types. |
+| `ParameterPath.stories.tsx` | Storybook: 6 stories per Figma + `Playground`. |
 | `ParameterPath.e2e.ts` | Playwright: screenshots, interactions, a11y. |
 
 ---
@@ -57,24 +57,24 @@ export interface ParameterPathProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'onCopy'>,
     TestableProps {
   ref?: Ref<HTMLDivElement>
-  /** HTTP-метод. Если не задан — секция метода не рендерится. */
+  /** HTTP method. When omitted the method section is not rendered. */
   method?: HttpMethod
-  /** Сегменты пути. Последний — терминальный (highlighted). */
+  /** Path segments. The last segment is terminal (highlighted). */
   segments: string[]
-  /** Хвостовой encoding-маркер (BASE64, URL, HEX, …). */
+  /** Trailing encoding marker (BASE64, URL, HEX, …). */
   encoding?: string
-  /** Если true — на терминальном сегменте показывается иконка Zap. */
+  /** When true, a Zap icon is shown on the terminal segment. */
   attack?: boolean
   /**
-   * Сериализатор для Cmd+C. Получает все исходные данные пути (не усечённые),
-   * возвращает строку, которую можно вставить в FilterInput.
-   * Default: `formatAsFilter` из этого пакета.
+   * Cmd+C serializer. Receives the original (un-truncated) path data and
+   * returns a string suitable for pasting into FilterInput.
+   * Default: `formatAsFilter` from this package.
    */
   copyFormat?: (data: CopyFormatData) => string
 }
 ```
 
-**Пример:**
+**Example:**
 
 ```tsx
 <ParameterPath
@@ -89,25 +89,25 @@ export interface ParameterPathProps
 
 ## Truncation algorithm
 
-Вход: список «измеримых элементов» в порядке рендера: `[Method?, Joint?, Segment_0, Joint, Segment_1, …, Segment_N-1, Joint?, Encoding?]` (joint вставляется между двумя соседями).
+Input: a list of "measurable elements" in render order: `[Method?, Joint?, Segment_0, Joint, Segment_1, …, Segment_N-1, Joint?, Encoding?]` (joints sit between every pair of neighbours).
 
-Алгоритм (выполняется в `useParameterPathTruncation`):
+Algorithm (executed inside `useParameterPathTruncation`):
 
-1. На первом проходе скрытым DOM-узлом отрендерить ВСЕ элементы и измерить ширину каждого через `getBoundingClientRect`.
-2. Получить `containerWidth` через `useContainerWidth`.
-3. Сумма всех ширин ≤ `containerWidth` → `isTruncated = false`, `visibleIndices = [0..N-1]`.
-4. Иначе — `isTruncated = true`. `Method` и `Encoding` всегда видимы. Из `segments` оставляем `segments[0]` + `…` + `segments[N-1]`. (При `N <= 2` truncation не имеет смысла — оставляем как есть.)
-5. Если даже сокращённая версия не вмещается — рендерим как есть; внешний `overflow-hidden` обрежет правый край (это покрывается screenshot-тестом «narrow container»).
+1. On the first pass render every element inside a hidden DOM node and measure each width via `getBoundingClientRect`.
+2. Read `containerWidth` via `useContainerWidth`.
+3. Sum of all widths ≤ `containerWidth` → `isTruncated = false`, `visibleIndices = [0..N-1]`.
+4. Otherwise → `isTruncated = true`. `Method` and `Encoding` always stay visible. From `segments` we keep `segments[0]` + `…` + `segments[N-1]`. (When `N <= 2` truncation is meaningless — render as is.)
+5. If even the collapsed version doesn't fit — render anyway; the outer `overflow-hidden` will clip the right edge (this case is covered by the "narrow container" screenshot test).
 
-Tooltip с полным путём (`segments.join(' > ')` + encoding) показывается ТОЛЬКО когда `isTruncated === true`.
+The full-path tooltip (`segments.join(' > ')` + encoding) is shown ONLY when `isTruncated === true`.
 
 ---
 
 ## Copy behaviour
 
-На корневом `<div>` подписываемся на `onCopy`. Если выделение пользователя пересекает наш узел — вызываем `event.preventDefault()` и кладём в `event.clipboardData` строку, полученную из `copyFormat({ method, segments, encoding })`.
+We subscribe to `onCopy` on the root `<div>`. If the user's selection intersects our subtree we call `event.preventDefault()` and write the string returned by `copyFormat({ method, segments, encoding })` into `event.clipboardData`.
 
-Default `formatAsFilter` (в `formatAsFilter.ts`):
+Default `formatAsFilter` (in `formatAsFilter.ts`):
 
 ```ts
 export const formatAsFilter = ({ method, segments, encoding }: CopyFormatData): string => {
@@ -119,20 +119,20 @@ export const formatAsFilter = ({ method, segments, encoding }: CopyFormatData): 
 }
 ```
 
-> Этот формат — sensible default для FilterInput (синтаксис `field = "value"` совместим с грамматикой `parseExpression` — оператор `=`, не `==`). Потребитель платформы перекрывает через `copyFormat` если поля называются иначе.
+> This format is a sensible default for FilterInput (the `field = "value"` syntax is compatible with the `parseExpression` grammar — operator `=`, not `==`). Platform consumers can override it via `copyFormat` if their fields are named differently.
 
 ---
 
 ## Tasks
 
-### Task 1: Каркас и типы
+### Task 1: Scaffold and types
 
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/types.ts`
 - Create: `packages/design-system/src/components/ParameterPath/constants.ts`
 - Create: `packages/design-system/src/components/ParameterPath/index.ts`
 
-- [ ] **Step 1: Создать `types.ts`**
+- [ ] **Step 1: Create `types.ts`**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/types.ts
@@ -166,7 +166,7 @@ export interface ParameterPathProps
 }
 ```
 
-- [ ] **Step 2: Создать `constants.ts` с маппингом методов на цвета `Badge`**
+- [ ] **Step 2: Create `constants.ts` mapping methods to `Badge` colours**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/constants.ts
@@ -184,20 +184,20 @@ export const HTTP_METHOD_COLOR: Record<HttpMethod, BadgeColor> = {
 }
 ```
 
-- [ ] **Step 3: Заглушка `index.ts`**
+- [ ] **Step 3: Stub `index.ts`**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/index.ts
 export type { HttpMethod, ParameterPathProps, CopyFormatData } from './types'
 ```
 
-- [ ] **Step 4: Запустить typecheck — должен пройти**
+- [ ] **Step 4: Run typecheck — must pass**
 
 ```bash
 cd packages/design-system && pnpm typecheck
 ```
 
-Expected: success (никаких ошибок).
+Expected: success (no errors).
 
 - [ ] **Step 5: Commit**
 
@@ -214,7 +214,7 @@ git commit -m "feat(parameter-path): scaffold WDS-107 component types and consta
 - Create: `packages/design-system/src/components/ParameterPath/formatAsFilter.ts`
 - Test: `packages/design-system/src/components/ParameterPath/__tests__/formatAsFilter.test.ts`
 
-- [ ] **Step 1: Написать падающий тест**
+- [ ] **Step 1: Write a failing test**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/__tests__/formatAsFilter.test.ts
@@ -250,7 +250,7 @@ describe('formatAsFilter', () => {
 })
 ```
 
-- [ ] **Step 2: Запустить — упасть из-за отсутствия модуля**
+- [ ] **Step 2: Run — fails because the module is missing**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/__tests__/formatAsFilter.test.ts
@@ -258,7 +258,7 @@ cd packages/design-system && pnpm vitest run src/components/ParameterPath/__test
 
 Expected: FAIL — `Cannot find module '../formatAsFilter'`.
 
-- [ ] **Step 3: Реализовать `formatAsFilter.ts`**
+- [ ] **Step 3: Implement `formatAsFilter.ts`**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/formatAsFilter.ts
@@ -283,7 +283,7 @@ export const formatAsFilter = ({ method, segments, encoding }: CopyFormatData): 
 }
 ```
 
-- [ ] **Step 4: Тест проходит**
+- [ ] **Step 4: Test passes**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/__tests__/formatAsFilter.test.ts
@@ -301,12 +301,12 @@ git commit -m "feat(parameter-path): add default filter-format clipboard seriali
 
 ---
 
-### Task 3: CVA-классы для сегментов и encoding
+### Task 3: CVA classes for segments and encoding
 
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/classes.ts`
 
-- [ ] **Step 1: Создать `classes.ts`**
+- [ ] **Step 1: Create `classes.ts`**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/classes.ts
@@ -343,7 +343,7 @@ export const ellipsisVariants = cva([
 ])
 ```
 
-- [ ] **Step 2: Запустить typecheck**
+- [ ] **Step 2: Run typecheck**
 
 ```bash
 cd packages/design-system && pnpm typecheck
@@ -360,12 +360,12 @@ git commit -m "feat(parameter-path): add CVA variants for segments, encoding, jo
 
 ---
 
-### Task 4: Sub-компонент `ParameterPathJoint`
+### Task 4: Sub-component `ParameterPathJoint`
 
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/ParameterPathJoint.tsx`
 
-- [ ] **Step 1: Реализовать**
+- [ ] **Step 1: Implement**
 
 ```tsx
 // packages/design-system/src/components/ParameterPath/ParameterPathJoint.tsx
@@ -404,12 +404,12 @@ git commit -m "feat(parameter-path): add joint (chevron separator) sub-component
 
 ---
 
-### Task 5: Sub-компонент `ParameterPathSegment`
+### Task 5: Sub-component `ParameterPathSegment`
 
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/ParameterPathSegment.tsx`
 
-- [ ] **Step 1: Реализовать**
+- [ ] **Step 1: Implement**
 
 ```tsx
 // packages/design-system/src/components/ParameterPath/ParameterPathSegment.tsx
@@ -419,11 +419,11 @@ import { cn } from '../../utils/cn'
 import { segmentVariants } from './classes'
 
 interface ParameterPathSegmentProps {
-  /** Текст сегмента. */
+  /** Segment text. */
   children: string
-  /** `default` для промежуточных, `highlighted` для терминального. */
+  /** `default` for intermediate segments, `highlighted` for the terminal one. */
   variant?: 'default' | 'highlighted'
-  /** Показать иконку Zap (только на highlighted, в attack-контексте). */
+  /** Show the Zap icon (only on highlighted, in the attack context). */
   withZap?: boolean
   className?: string
 }
@@ -466,12 +466,12 @@ git commit -m "feat(parameter-path): add segment sub-component with default/high
 
 ---
 
-### Task 6: Sub-компонент `ParameterPathEncoding`
+### Task 6: Sub-component `ParameterPathEncoding`
 
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/ParameterPathEncoding.tsx`
 
-- [ ] **Step 1: Реализовать**
+- [ ] **Step 1: Implement**
 
 ```tsx
 // packages/design-system/src/components/ParameterPath/ParameterPathEncoding.tsx
@@ -513,7 +513,7 @@ git commit -m "feat(parameter-path): add encoding tail sub-component"
 
 ---
 
-### Task 7: Sub-компоненты `ParameterPathEllipsis` и `ParameterPathMethod`
+### Task 7: Sub-components `ParameterPathEllipsis` and `ParameterPathMethod`
 
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/ParameterPathEllipsis.tsx`
@@ -591,15 +591,15 @@ git commit -m "feat(parameter-path): add ellipsis and method sub-components"
 
 ---
 
-### Task 8: Хук `useParameterPathTruncation`
+### Task 8: `useParameterPathTruncation` hook
 
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/useParameterPathTruncation.ts`
 - Test: `packages/design-system/src/components/ParameterPath/__tests__/useParameterPathTruncation.test.ts`
 
-> Алгоритм: на вход — массив рефов измерительных узлов и `containerWidth`. Возвращает `{ isTruncated, visibleSegmentIndices }`. Логика: если суммарная ширина всех элементов ≤ ширине контейнера → не обрезаем. Иначе — оставляем segments[0] и segments[N-1], середина уходит в `…`. При `segments.length <= 2` — truncation невозможен.
+> Algorithm: input is an array of refs to measurement nodes plus `containerWidth`. Returns `{ isTruncated, visibleSegmentIndices }`. Logic: if the total width of all elements ≤ container width → no truncation. Otherwise keep `segments[0]` and `segments[N-1]`; the middle becomes `…`. When `segments.length <= 2` truncation is impossible.
 
-- [ ] **Step 1: Падающий тест (чисто-функциональная часть алгоритма)**
+- [ ] **Step 1: Failing test (pure-functional part of the algorithm)**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/__tests__/useParameterPathTruncation.test.ts
@@ -681,15 +681,15 @@ describe('computeTruncation', () => {
 })
 ```
 
-- [ ] **Step 2: Запустить — упасть**
+- [ ] **Step 2: Run — fails**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/__tests__/useParameterPathTruncation.test.ts
 ```
 
-Expected: FAIL — модуль не найден.
+Expected: FAIL — module not found.
 
-- [ ] **Step 3: Реализовать `useParameterPathTruncation.ts` с экспортом чистой функции и хука**
+- [ ] **Step 3: Implement `useParameterPathTruncation.ts`, exporting both the pure function and the hook**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/useParameterPathTruncation.ts
@@ -795,7 +795,7 @@ export const useParameterPathTruncation = ({
 }
 ```
 
-- [ ] **Step 4: Тесты проходят**
+- [ ] **Step 4: Tests pass**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/__tests__/useParameterPathTruncation.test.ts
@@ -813,16 +813,16 @@ git commit -m "feat(parameter-path): add truncation algorithm and hook"
 
 ---
 
-### Task 9: Корневой `ParameterPath.tsx` (рендер без truncation)
+### Task 9: Root `ParameterPath.tsx` (render without truncation)
 
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/ParameterPath.tsx`
 - Modify: `packages/design-system/src/components/ParameterPath/index.ts`
 - Test: `packages/design-system/src/components/ParameterPath/__tests__/ParameterPath.test.tsx`
 
-> На этом шаге собираем компонент без логики truncation/copy: метод + сегменты + encoding + tooltip с полным путём (всегда). Truncation добавится в Task 10, copy — в Task 11.
+> At this step we assemble the component without truncation/copy logic: method + segments + encoding + an always-on full-path tooltip. Truncation is added in Task 10, copy in Task 11.
 
-- [ ] **Step 1: Падающий unit-тест (рендер базовой структуры)**
+- [ ] **Step 1: Failing unit test (basic structure rendering)**
 
 ```tsx
 // packages/design-system/src/components/ParameterPath/__tests__/ParameterPath.test.tsx
@@ -877,7 +877,7 @@ describe('ParameterPath', () => {
 })
 ```
 
-- [ ] **Step 2: Запустить — упасть**
+- [ ] **Step 2: Run — fails**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/__tests__/ParameterPath.test.tsx
@@ -885,7 +885,7 @@ cd packages/design-system && pnpm vitest run src/components/ParameterPath/__test
 
 Expected: FAIL.
 
-- [ ] **Step 3: Реализовать `ParameterPath.tsx` (без truncation/copy — будет в следующих задачах)**
+- [ ] **Step 3: Implement `ParameterPath.tsx` (without truncation/copy — added in later tasks)**
 
 ```tsx
 // packages/design-system/src/components/ParameterPath/ParameterPath.tsx
@@ -959,7 +959,7 @@ export const ParameterPath: FC<ParameterPathProps> = ({
 ParameterPath.displayName = 'ParameterPath'
 ```
 
-- [ ] **Step 4: Обновить `index.ts`**
+- [ ] **Step 4: Update `index.ts`**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/index.ts
@@ -968,9 +968,9 @@ export { formatAsFilter } from './formatAsFilter'
 export type { HttpMethod, ParameterPathProps, CopyFormatData } from './types'
 ```
 
-- [ ] **Step 5: Зарегистрировать в корневом `src/index.ts`**
+- [ ] **Step 5: Register in the root `src/index.ts`**
 
-Open `packages/design-system/src/index.ts`, найти алфавитное место (после `OverflowTooltip`/перед `Polymorphic`) и добавить:
+Open `packages/design-system/src/index.ts`, find the alphabetical spot (after `OverflowTooltip`/before `Polymorphic`) and add:
 
 ```ts
 export {
@@ -982,13 +982,13 @@ export {
 } from './components/ParameterPath'
 ```
 
-- [ ] **Step 6: Тесты проходят**
+- [ ] **Step 6: Tests pass**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/
 ```
 
-Expected: PASS, все ранее добавленные тесты + 5 новых.
+Expected: PASS, all previously added tests + 5 new ones.
 
 - [ ] **Step 7: Commit**
 
@@ -999,17 +999,17 @@ git commit -m "feat(parameter-path): assemble root component without truncation"
 
 ---
 
-### Task 10: Truncation в корневом компоненте
+### Task 10: Truncation in the root component
 
 **Files:**
 - Modify: `packages/design-system/src/components/ParameterPath/ParameterPath.tsx`
-- Test: `packages/design-system/src/components/ParameterPath/__tests__/ParameterPath.test.tsx` (расширить)
+- Test: `packages/design-system/src/components/ParameterPath/__tests__/ParameterPath.test.tsx` (extend)
 
-> Стратегия: рендерим скрытый «измерительный» клон (полный путь, `position:absolute; visibility:hidden; pointer-events:none; left:-9999px`) с `data-measure` атрибутами на корневых узлах. Хук `useParameterPathTruncation` получает рефы и возвращает `{ isTruncated, visibleSegmentIndices }`. Видимый ряд использует эти индексы.
+> Strategy: render a hidden "measurement" clone (full path, `position:absolute; visibility:hidden; pointer-events:none; left:-9999px`) with `data-measure` attributes on the root nodes. The `useParameterPathTruncation` hook gets refs and returns `{ isTruncated, visibleSegmentIndices }`. The visible row consumes those indices.
 
-- [ ] **Step 1: Дополнить тест — структурно проверить, что `useParameterPathTruncation` вызывается и состояние обрабатывается**
+- [ ] **Step 1: Extend the test — structurally verify that `useParameterPathTruncation` is invoked and its state is consumed**
 
-Добавить в `ParameterPath.test.tsx`:
+Append to `ParameterPath.test.tsx`:
 
 ```tsx
 import { vi } from 'vitest'
@@ -1058,15 +1058,15 @@ describe('ParameterPath truncation rendering', () => {
 })
 ```
 
-- [ ] **Step 2: Запустить — упасть**
+- [ ] **Step 2: Run — fails**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/__tests__/ParameterPath.test.tsx
 ```
 
-Expected: FAIL — `Collapsed segments` не найден / лишние сегменты в DOM.
+Expected: FAIL — "Collapsed segments" not found / extra segments in DOM.
 
-- [ ] **Step 3: Переписать `ParameterPath.tsx` с двумя «дорожками» рендера: измерительная (скрытая, всегда полная) и видимая (по `visibleSegmentIndices`)**
+- [ ] **Step 3: Rewrite `ParameterPath.tsx` with two render "tracks": measurement (hidden, always full) and visible (driven by `visibleSegmentIndices`)**
 
 ```tsx
 // packages/design-system/src/components/ParameterPath/ParameterPath.tsx
@@ -1240,7 +1240,7 @@ export const ParameterPath: FC<ParameterPathProps> = ({
 ParameterPath.displayName = 'ParameterPath'
 ```
 
-- [ ] **Step 4: Тесты проходят**
+- [ ] **Step 4: Tests pass**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/
@@ -1257,13 +1257,13 @@ git commit -m "feat(parameter-path): wire ResizeObserver truncation with tooltip
 
 ---
 
-### Task 11: Cmd+C → формат фильтра
+### Task 11: Cmd+C → filter format
 
 **Files:**
 - Modify: `packages/design-system/src/components/ParameterPath/ParameterPath.tsx`
-- Test: `packages/design-system/src/components/ParameterPath/__tests__/ParameterPath.test.tsx` (расширить)
+- Test: `packages/design-system/src/components/ParameterPath/__tests__/ParameterPath.test.tsx` (extend)
 
-- [ ] **Step 1: Падающий тест на копирование**
+- [ ] **Step 1: Failing copy test**
 
 ```tsx
 describe('ParameterPath copy', () => {
@@ -1315,7 +1315,7 @@ describe('ParameterPath copy', () => {
 })
 ```
 
-- [ ] **Step 2: Запустить — упасть**
+- [ ] **Step 2: Run — fails**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/__tests__/ParameterPath.test.tsx
@@ -1323,9 +1323,9 @@ cd packages/design-system && pnpm vitest run src/components/ParameterPath/__test
 
 Expected: FAIL.
 
-- [ ] **Step 3: Подключить обработчик `onCopy` в корневом `<div>`**
+- [ ] **Step 3: Wire the `onCopy` handler on the root `<div>`**
 
-В `ParameterPath.tsx` импортировать `formatAsFilter`, добавить `useCallback`, вместо `copyFormat: _copyFormat` использовать реальный prop:
+In `ParameterPath.tsx` import `formatAsFilter`, add `useCallback`, and replace `copyFormat: _copyFormat` with the actual prop:
 
 ```tsx
 import { useCallback, useRef } from 'react'
@@ -1350,13 +1350,13 @@ export const ParameterPath: FC<ParameterPathProps> = ({
   )
 
   // ...
-  // на корневом div добавить onCopy={handleCopy}
+  // add onCopy={handleCopy} to the root div
 }
 ```
 
-(Удалить нижнее подчёркивание у `copyFormat`, так как теперь используется.)
+(Drop the leading underscore on `copyFormat` since it is now used.)
 
-- [ ] **Step 4: Тесты проходят**
+- [ ] **Step 4: Tests pass**
 
 ```bash
 cd packages/design-system && pnpm vitest run src/components/ParameterPath/
@@ -1379,7 +1379,7 @@ git commit -m "feat(parameter-path): wire Cmd+C to filter-format clipboard paylo
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/ParameterPath.stories.tsx`
 
-- [ ] **Step 1: Создать стори по 6 кейсам из Figma**
+- [ ] **Step 1: Build stories for the 6 Figma cases**
 
 ```tsx
 // packages/design-system/src/components/ParameterPath/ParameterPath.stories.tsx
@@ -1468,13 +1468,13 @@ export const Gallery: StoryFn<typeof meta> = () => (
 )
 ```
 
-- [ ] **Step 2: Стартануть Storybook и проверить визуально**
+- [ ] **Step 2: Start Storybook and verify visually**
 
 ```bash
 cd packages/design-system && pnpm storybook
 ```
 
-Expected: на `/?path=/story/data-display-parameterpath--gallery` все 6 кейсов рендерятся как в Figma; truncated-вариант показывает `…` и tooltip при ховере.
+Expected: at `/?path=/story/data-display-parameterpath--gallery` all 6 cases render the way Figma shows them; the truncated variant displays `…` and a tooltip on hover.
 
 - [ ] **Step 3: Commit**
 
@@ -1490,9 +1490,9 @@ git commit -m "docs(parameter-path): add Storybook stories matching Figma"
 **Files:**
 - Create: `packages/design-system/src/components/ParameterPath/ParameterPath.e2e.ts`
 
-> Перед написанием тестов прочитать `docs/e2e-test-rules.md` и следовать правилам именования / структуры.
+> Before writing tests, read `docs/e2e-test-rules.md` and follow the naming/structure rules.
 
-- [ ] **Step 1: Создать E2E**
+- [ ] **Step 1: Create the E2E spec**
 
 ```ts
 // packages/design-system/src/components/ParameterPath/ParameterPath.e2e.ts
@@ -1576,15 +1576,15 @@ test.describe('ParameterPath', () => {
 })
 ```
 
-- [ ] **Step 2: Сгенерировать снимки**
+- [ ] **Step 2: Generate snapshots**
 
 ```bash
 cd packages/design-system && pnpm test:e2e --update-snapshots src/components/ParameterPath/ParameterPath.e2e.ts
 ```
 
-Expected: создаётся `ParameterPath.e2e.ts-snapshots/` с PNG.
+Expected: a `ParameterPath.e2e.ts-snapshots/` directory with PNG files is created.
 
-- [ ] **Step 3: Прогнать без обновления — должно быть зелено**
+- [ ] **Step 3: Re-run without `--update-snapshots` — must be green**
 
 ```bash
 cd packages/design-system && pnpm test:e2e src/components/ParameterPath/ParameterPath.e2e.ts
@@ -1602,9 +1602,9 @@ git commit -m "test(parameter-path): add E2E coverage (screenshots, copy, toolti
 
 ---
 
-### Task 14: Финальная проверка качества
+### Task 14: Final quality gate
 
-- [ ] **Step 1: Lint+format**
+- [ ] **Step 1: Lint + format**
 
 ```bash
 npx biome check --write packages/design-system/src/components/ParameterPath/
@@ -1612,7 +1612,7 @@ npx biome check --write packages/design-system/src/components/ParameterPath/
 
 Expected: no errors.
 
-- [ ] **Step 2: Полный typecheck + unit тесты**
+- [ ] **Step 2: Full typecheck + unit tests**
 
 ```bash
 cd packages/design-system && pnpm typecheck && pnpm test
@@ -1620,29 +1620,29 @@ cd packages/design-system && pnpm typecheck && pnpm test
 
 Expected: PASS.
 
-- [ ] **Step 3: Если biome что-то поправил — закоммитить**
+- [ ] **Step 3: If biome auto-fixed anything, commit it**
 
 ```bash
 git add -u packages/design-system/src/components/ParameterPath/
 git diff --cached --quiet || git commit -m "style(parameter-path): biome formatting"
 ```
 
-- [ ] **Step 4: Открыть Pull Request**
+- [ ] **Step 4: Open a Pull Request**
 
 ```bash
 gh pr create \
   --title "feat(parameter-path): WDS-107 ParameterPath component" \
   --body "$(cat <<'EOF'
 ## Summary
-- Новый компонент `ParameterPath` для отображения «HTTP-метод → путь → encoding» в attack/parameter-контекстах.
-- Авто-truncation середины через `ResizeObserver` (первый и точка-цель всегда видимы), tooltip с полным путём.
-- Cmd+C копирует строку в формате FilterInput (override через `copyFormat`).
+- New `ParameterPath` component for rendering "HTTP method → path → encoding" in attack/parameter contexts.
+- Auto-truncation of the middle via `ResizeObserver` (first segment and the target are always visible), tooltip with the full path.
+- Cmd+C copies a FilterInput-formatted string (override via `copyFormat`).
 
 ## Test plan
 - [ ] `pnpm vitest run src/components/ParameterPath/`
 - [ ] `pnpm test:e2e src/components/ParameterPath/ParameterPath.e2e.ts`
-- [ ] Storybook: проверить визуально все 6 стори + Gallery, ховер на truncated показывает tooltip
-- [ ] Cmd+C вставляется в FilterInput без ошибок парсинга
+- [ ] Storybook: visually verify all 6 stories + Gallery; hover over truncated displays a tooltip
+- [ ] Cmd+C pastes into FilterInput without parsing errors
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)
 EOF
@@ -1653,31 +1653,31 @@ EOF
 
 ## Open questions / future iterations
 
-Эти пункты НЕ входят в скоуп v1 — обсуждались в Slack, но пользователь явно выбрал упрощённый API:
+These items are NOT in scope for v1 — they came up in Slack but the user explicitly chose the simplified API:
 
-1. **Декодеры в середине пути.** Сейчас encoding — только хвост. Если потребуется — расширим до `segments: Array<string | { kind: 'decoder', value: string }>` без ломки существующего API.
-2. **Цепочка нескольких декодеров на хвосте** (`Base64 > Base64`, `Percent > HTMLJS`). Расширение `encoding` до `string | string[]` — не ломающее.
-3. **Прогрессивное сворачивание.** Текущий алгоритм — бинарный (всё помещается / коллапс середины). Можно добавить пошаговое сворачивание от центра наружу — но Figma показывает только бинарный кейс.
+1. **Decoders in the middle of the path.** Right now encoding is only the tail. If needed we can extend to `segments: Array<string | { kind: 'decoder', value: string }>` without breaking the existing API.
+2. **Chained tail decoders** (`Base64 > Base64`, `Percent > HTMLJS`). Extending `encoding` to `string | string[]` is non-breaking.
+3. **Progressive collapsing.** The current algorithm is binary (all fits / collapse middle). We could collapse step-by-step from the centre outward — but Figma only specifies the binary case.
 
 ---
 
 ## Self-Review
 
 **1. Spec coverage:**
-- HTTP-метод как Badge → Task 7 (`ParameterPathMethod`).
-- Сегменты пути с разделителями `>` → Tasks 4, 5, 9.
-- Highlighted последний сегмент + Zap → Task 5, 9.
-- Encoding-хвост → Task 6, 9.
-- Truncation середины при overflow + tooltip → Tasks 8, 10.
-- Cmd+C → формат фильтра → Tasks 2, 11.
-- Все варианты из Figma → Task 12 (Storybook).
-- Skip http-method для SOAP/MCP → Task 9 (тест `does not render method section`).
+- HTTP method as Badge → Task 7 (`ParameterPathMethod`).
+- Path segments with `>` separators → Tasks 4, 5, 9.
+- Highlighted last segment + Zap → Tasks 5, 9.
+- Encoding tail → Tasks 6, 9.
+- Middle truncation on overflow + tooltip → Tasks 8, 10.
+- Cmd+C → filter format → Tasks 2, 11.
+- All Figma variants → Task 12 (Storybook).
+- Skip http-method for SOAP/MCP → Task 9 (test `does not render method section`).
 
-**2. Placeholder scan:** проверено — все код-блоки заполнены, нет `TODO/TBD/...later`, нет «similar to Task N».
+**2. Placeholder scan:** verified — every code block is filled, no `TODO/TBD/...later`, no "similar to Task N".
 
 **3. Type consistency:**
-- `HttpMethod` — единое определение в `types.ts`, переиспользуется в `constants.ts` и сторях.
-- `CopyFormatData` — экспорт из `types.ts`, используется в `formatAsFilter` и в prop `copyFormat`.
-- `ParameterPathProps` — единый источник для `index.ts` и `ParameterPath.tsx`.
-- `computeTruncation` ↔ `useParameterPathTruncation` ↔ `ParameterPath.tsx` — все используют одинаковое имя поля `visibleSegmentIndices`.
-- `data-slot` значения консистентны: `parameter-path`, `parameter-path-segment`, `parameter-path-method`, `parameter-path-encoding`, `parameter-path-joint`, `parameter-path-ellipsis`.
+- `HttpMethod` — single definition in `types.ts`, reused in `constants.ts` and the stories.
+- `CopyFormatData` — exported from `types.ts`, used in `formatAsFilter` and the `copyFormat` prop.
+- `ParameterPathProps` — single source for `index.ts` and `ParameterPath.tsx`.
+- `computeTruncation` ↔ `useParameterPathTruncation` ↔ `ParameterPath.tsx` — all share the field name `visibleSegmentIndices`.
+- `data-slot` values are consistent: `parameter-path`, `parameter-path-segment`, `parameter-path-method`, `parameter-path-encoding`, `parameter-path-joint`, `parameter-path-ellipsis`.

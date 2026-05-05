@@ -5,16 +5,11 @@ import { useTestId } from '../../utils/testId';
 import { segmentVariants } from './classes';
 
 interface ParameterPathSegmentProps extends HTMLAttributes<HTMLSpanElement> {
-  /** Текст сегмента. */
   children: string;
-  /** `default` для промежуточных, `highlighted` для терминального. */
   variant?: 'default' | 'highlighted';
-  /** Показать иконку Zap (только на highlighted, в attack-контексте). */
+  /** Show the Zap icon — only honored when `variant='highlighted'`. */
   withZap?: boolean;
-  /**
-   * Индекс сегмента в пути. Используется для derive-теста-id вида `segment-N`.
-   * Опционально: при использовании сегмента вне ParameterPath можно опустить.
-   */
+  /** Segment index in the path; used to derive a `segment-N` test id. */
   index?: number;
 }
 
