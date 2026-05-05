@@ -1,8 +1,13 @@
+import type { FC } from 'react';
 import { useSelectContext } from '@ark-ui/react/select';
 import { Tag, TagClose } from '../../Tag';
 import type { SelectDataItem } from '../types';
 
-export const SelectInputItemRenderer = (item: SelectDataItem) => {
+type SelectInputItemRendererProps = {
+  item: SelectDataItem;
+};
+
+export const SelectInputItemRenderer: FC<SelectInputItemRendererProps> = ({ item }) => {
   const { value, setValue } = useSelectContext();
 
   const handleRemove = () => {
@@ -14,7 +19,7 @@ export const SelectInputItemRenderer = (item: SelectDataItem) => {
   const Icon = item.icon;
 
   return (
-    <Tag key={item.value} size='large'>
+    <Tag size='large'>
       {Icon && <Icon />}
 
       {item.label}

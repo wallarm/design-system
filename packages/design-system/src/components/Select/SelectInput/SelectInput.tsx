@@ -104,7 +104,7 @@ export const SelectInput: FC<SelectInputProps> = ({ placeholder = 'Choose...' })
             <OverflowList
               className='flex items-center gap-4 flex-1 h-full pl-6 overflow-hidden'
               items={selectedItems}
-              itemRenderer={SelectInputItemRenderer}
+              itemRenderer={item => <SelectInputItemRenderer key={item.value} item={item} />}
               overflowRenderer={SelectInputOverflowRenderer}
             />
           ) : (
