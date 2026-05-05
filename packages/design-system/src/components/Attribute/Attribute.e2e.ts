@@ -8,6 +8,8 @@ const attributeStory = createStoryHelper('data-display-attribute', [
   'Horizontal Composition',
   'Horizontal Loading',
   'Horizontal With Actions',
+  'Horizontal With Actions Badge',
+  'Horizontal With Actions Tags',
   'Horizontal With Actions Ip Overflow',
 ] as const);
 
@@ -91,6 +93,34 @@ test.describe('Component: Attribute', () => {
 
       await expect(target).toBeVisible();
       await target.click();
+
+      await expect(dropdownContent).toBeVisible();
+    });
+
+    test('Should open actions dropdown when clicking a decorative Badge value', async ({
+      page,
+    }) => {
+      await attributeStory.goto(page, 'Horizontal With Actions Badge');
+
+      const badge = page.locator('[data-slot="badge"]').first();
+      const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
+
+      await expect(badge).toBeVisible();
+      await badge.click();
+
+      await expect(dropdownContent).toBeVisible();
+    });
+
+    test('Should open actions dropdown when clicking a decorative Tag inside an OverflowList', async ({
+      page,
+    }) => {
+      await attributeStory.goto(page, 'Horizontal With Actions Tags');
+
+      const tag = page.locator('[data-slot="tag"]:visible').first();
+      const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
+
+      await expect(tag).toBeVisible();
+      await tag.click();
 
       await expect(dropdownContent).toBeVisible();
     });

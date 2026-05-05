@@ -18,6 +18,7 @@ const INTERACTIVE_SELECTOR = [
   'select',
   'textarea',
   '[contenteditable="true"]',
+  '[aria-haspopup]',
   '[data-attribute-actions-skip]',
 ].join(',');
 

@@ -890,6 +890,79 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+export const HorizontalWithActionsBadge: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute orientation='horizontal' data-testid='attr-badge'>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Badge color='red' variant='dotted'>
+              Blocked
+            </Badge>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalWithActionsTags: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute orientation='horizontal' data-testid='attr-tags'>
+      <AttributeLabel>Tags</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <OverflowList
+              className='gap-4'
+              items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
+              itemRenderer={item => <Tag key={item}>{item}</Tag>}
+              overflowRenderer={renderOverflowPopover}
+            />
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
 export const HorizontalWithActionsIpOverflow: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute orientation='horizontal' data-testid='attr-ip-overflow'>
