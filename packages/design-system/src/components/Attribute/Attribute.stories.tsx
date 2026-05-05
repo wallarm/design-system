@@ -740,5 +740,282 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
         </AttributeActions>
       </AttributeValue>
     </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>IPs</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <IpList type='horizontal'>
+              <Ip>
+                <IpCountry code='US' />
+                <IpAddress>142.198.167.52</IpAddress>
+                <IpProvider>Azure</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='US' />
+                <IpAddress>34.74.73.20</IpAddress>
+                <IpProvider>AWS</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='DE' />
+                <IpAddress>34.74.73.20</IpAddress>
+                <IpProvider>GCP</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='NL' />
+                <IpAddress>10.0.0.1</IpAddress>
+              </Ip>
+              <Ip>
+                <IpCountry code='JP' />
+                <IpAddress>192.168.1.1</IpAddress>
+              </Ip>
+            </IpList>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Payload</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <InlineCodeSnippet code='{ "action": "login", "user_id": 42 }' size='sm' />
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Documentation</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Link href='#' size='md'>
+              View full report
+            </Link>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Tags</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <OverflowList
+              className='gap-4'
+              items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
+              itemRenderer={item => <Tag key={item}>{item}</Tag>}
+              overflowRenderer={renderOverflowPopover}
+            />
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalWithActionsBadge: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute orientation='horizontal' data-testid='attr-badge'>
+      <AttributeLabel>Status</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Badge color='red' variant='dotted'>
+              Blocked
+            </Badge>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalWithActionsTags: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute orientation='horizontal' data-testid='attr-tags'>
+      <AttributeLabel>Tags</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <OverflowList
+              className='gap-4'
+              items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
+              itemRenderer={item => <Tag key={item}>{item}</Tag>}
+              overflowRenderer={renderOverflowPopover}
+            />
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const HorizontalWithActionsIpOverflow: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute orientation='horizontal' data-testid='attr-ip-overflow'>
+      <AttributeLabel>IPs</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <IpList type='horizontal'>
+              <Ip>
+                <IpCountry code='US' />
+                <IpAddress>142.198.167.52</IpAddress>
+                <IpProvider>Azure</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='US' />
+                <IpAddress>34.74.73.20</IpAddress>
+                <IpProvider>AWS</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='DE' />
+                <IpAddress>34.74.73.20</IpAddress>
+                <IpProvider>GCP</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='NL' />
+                <IpAddress>10.0.0.1</IpAddress>
+              </Ip>
+              <Ip>
+                <IpCountry code='JP' />
+                <IpAddress>192.168.1.1</IpAddress>
+              </Ip>
+            </IpList>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
   </div>
 );

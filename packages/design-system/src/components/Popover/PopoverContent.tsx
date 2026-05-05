@@ -23,6 +23,7 @@ export interface PopoverContentProps {
   maxHeight?: PopoverSizeDimension;
   minWidth?: PopoverSizeDimension;
   maxWidth?: PopoverSizeDimension;
+  'data-testid'?: string;
 }
 
 export const PopoverContent: FC<PopoverContentProps> = ({
@@ -31,8 +32,10 @@ export const PopoverContent: FC<PopoverContentProps> = ({
   maxHeight = POPOVER_MAX_HEIGHT,
   minWidth = POPOVER_MIN_WIDTH,
   maxWidth = POPOVER_MAX_WIDTH,
+  'data-testid': testIdProp,
 }) => {
-  const testId = useTestId('content');
+  const contextTestId = useTestId('content');
+  const testId = testIdProp ?? contextTestId;
   const { getContentProps } = usePopoverContext();
   const { id } = getContentProps();
 
