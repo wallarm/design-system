@@ -48,10 +48,12 @@ export const Badge: FC<BadgeProps> = ({
     className,
   );
 
-  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    onClick?.(event);
-  };
+  const handleClick = onClick
+    ? (event: MouseEvent<HTMLDivElement>) => {
+        event.stopPropagation();
+        onClick(event);
+      }
+    : undefined;
 
   const Comp = asChild ? Slot : 'div';
 

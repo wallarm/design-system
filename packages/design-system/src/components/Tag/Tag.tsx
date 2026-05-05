@@ -54,10 +54,12 @@ export const Tag: FC<TagProps> = ({
 }) => {
   const Comp = asChild ? Slot : 'div';
 
-  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-    onClick?.(event);
-  };
+  const handleClick = onClick
+    ? (event: MouseEvent<HTMLDivElement>) => {
+        event.stopPropagation();
+        onClick(event);
+      }
+    : undefined;
   return (
     <TestIdProvider value={testId}>
       <Comp
