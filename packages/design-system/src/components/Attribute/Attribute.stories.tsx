@@ -740,5 +740,58 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
         </AttributeActions>
       </AttributeValue>
     </Attribute>
+
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>IPs</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <IpList type='horizontal'>
+              <Ip>
+                <IpCountry code='US' />
+                <IpAddress>142.198.167.52</IpAddress>
+                <IpProvider>Azure</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='US' />
+                <IpAddress>34.74.73.20</IpAddress>
+                <IpProvider>AWS</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='DE' />
+                <IpAddress>34.74.73.20</IpAddress>
+                <IpProvider>GCP</IpProvider>
+              </Ip>
+              <Ip>
+                <IpCountry code='NL' />
+                <IpAddress>10.0.0.1</IpAddress>
+              </Ip>
+              <Ip>
+                <IpCountry code='JP' />
+                <IpAddress>192.168.1.1</IpAddress>
+              </Ip>
+            </IpList>
+          </AttributeActionsTarget>
+          <AttributeActionsContent>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Filter />
+              Investigate by this value
+            </AttributeActionsItem>
+            <AttributeActionsItem
+              onSelect={() => {
+                /* story mock */
+              }}
+            >
+              <Copy />
+              Copy value
+            </AttributeActionsItem>
+          </AttributeActionsContent>
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
   </div>
 );
