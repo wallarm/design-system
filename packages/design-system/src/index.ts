@@ -295,6 +295,13 @@ export {
   type RadioProps,
 } from './components/Radio';
 export {
+  getResponseCodeCategory,
+  RESPONSE_CODE_COLOR,
+  ResponseCode,
+  type ResponseCodeCategory,
+  type ResponseCodeProps,
+} from './components/ResponseCode';
+export {
   ScrollArea,
   ScrollAreaContent,
   type ScrollAreaContentProps,
