@@ -3,7 +3,7 @@ import { Badge, type BadgeProps } from '../Badge';
 import { HTTP_METHOD_COLOR, OTHER_METHOD_COLOR } from './constants';
 import type { HttpMethodName } from './types';
 
-export interface HttpMethodProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
+export interface HttpMethodProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /**
    * HTTP method to render. Known values from `HttpMethodName` get a dedicated
    * color via `HTTP_METHOD_COLOR`; any other string renders in slate as the
@@ -12,7 +12,7 @@ export interface HttpMethodProps extends Omit<HTMLAttributes<HTMLSpanElement>, '
   method: HttpMethodName | (string & {});
   /** Badge size — defaults to `medium`. */
   size?: BadgeProps['size'];
-  ref?: Ref<HTMLSpanElement>;
+  ref?: Ref<HTMLDivElement>;
 }
 
 const isKnownMethod = (method: string): method is HttpMethodName =>

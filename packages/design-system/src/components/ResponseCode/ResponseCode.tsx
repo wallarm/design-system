@@ -2,7 +2,7 @@ import type { FC, HTMLAttributes, Ref } from 'react';
 import { Badge, type BadgeProps } from '../Badge';
 import { getResponseCodeCategory, RESPONSE_CODE_COLOR } from './constants';
 
-export interface ResponseCodeProps extends Omit<HTMLAttributes<HTMLSpanElement>, 'children'> {
+export interface ResponseCodeProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   /**
    * HTTP response status code. The category (1xx/2xx/3xx/4xx/5xx) is derived
    * from the first digit and decides the Badge color via `RESPONSE_CODE_COLOR`.
@@ -11,7 +11,7 @@ export interface ResponseCodeProps extends Omit<HTMLAttributes<HTMLSpanElement>,
   code: number | string;
   /** Badge size — defaults to `medium`. */
   size?: BadgeProps['size'];
-  ref?: Ref<HTMLSpanElement>;
+  ref?: Ref<HTMLDivElement>;
 }
 
 /**
