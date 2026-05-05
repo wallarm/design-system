@@ -1,7 +1,7 @@
-import type { HttpMethod } from './types';
+import type { HttpMethodName } from '../HttpMethod';
 
 export const buildFullPathLabel = (
-  method: HttpMethod | undefined,
+  method: HttpMethodName | undefined,
   segments: string[],
   encoding?: string,
 ): string => {

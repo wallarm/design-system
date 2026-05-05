@@ -1,7 +1,7 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import type { HttpMethodName } from '../HttpMethod';
 import { VStack } from '../Stack';
 import { ParameterPath } from './ParameterPath';
-import type { HttpMethod } from './types';
 
 const meta = {
   title: 'Data Display/ParameterPath',
@@ -54,7 +54,7 @@ export const NoMethod: StoryFn<typeof meta> = () => (
 
 export const Playground: StoryFn<typeof meta> = args => <ParameterPath {...args} />;
 Playground.args = {
-  method: 'POST' satisfies HttpMethod,
+  method: 'POST' satisfies HttpMethodName,
   segments: ['JSON', 'nginx_config'],
   encoding: 'BASE64',
   attack: true,

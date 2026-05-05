@@ -229,6 +229,13 @@ export {
 export { Flex, type FlexProps } from './components/Flex';
 export { FormatDateTime, type FormatDateTimeProps } from './components/FormatDateTime';
 export { Heading, type HeadingProps } from './components/Heading';
+export {
+  HTTP_METHOD_COLOR,
+  HTTP_METHODS,
+  HttpMethod,
+  type HttpMethodName,
+  type HttpMethodProps,
+} from './components/HttpMethod';
 export { Input, type InputProps } from './components/Input';
 export {
   InputGroup,
@@ -272,7 +279,6 @@ export {
 export {
   type CopyFormatData,
   formatAsFilter,
-  type HttpMethod,
   ParameterPath,
   type ParameterPathProps,
 } from './components/ParameterPath';
