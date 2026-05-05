@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../DropdownMenu';
+import { HttpMethod } from '../HttpMethod';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import {
@@ -26,7 +27,6 @@ import {
   groupedHeaderData,
   headerColumnIds,
   headerColumns,
-  METHOD_COLORS,
   multiplySecurityEvents,
   renderSecurityPreviewContent,
   renderSecurityPreviewHeader,
@@ -284,14 +284,7 @@ export const RowExpanding: StoryFn<typeof meta> = () => {
                 Endpoint
               </Text>
               <HStack gap={4}>
-                <Badge
-                  color={METHOD_COLORS[row.original.endpointMethod] ?? 'slate'}
-                  type='secondary'
-                  size='medium'
-                  textVariant='code'
-                >
-                  {row.original.endpointMethod}
-                </Badge>
+                <HttpMethod method={row.original.endpointMethod} />
                 <Text size='sm'>{row.original.endpointPath}</Text>
               </HStack>
             </VStack>

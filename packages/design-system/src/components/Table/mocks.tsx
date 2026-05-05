@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
 } from '../DropdownMenu';
 import { FormatDateTime } from '../FormatDateTime';
+import { HttpMethod, type HttpMethodName } from '../HttpMethod';
 import { Ip, IpAddress, IpCountry, IpProvider, type SourceKey, sourceLabels } from '../Ip';
 import { Link } from '../Link';
 import {
@@ -47,7 +48,7 @@ export interface SecurityEvent {
   firstDetected: string;
   cweId: string;
   lastSeen: string;
-  endpointMethod: string;
+  endpointMethod: HttpMethodName;
   endpointPath: string;
 }
 
@@ -68,14 +69,6 @@ export interface SecurityHeaderEntry {
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
-
-export const METHOD_COLORS: Record<string, 'green' | 'blue' | 'amber' | 'red' | 'violet'> = {
-  GET: 'green',
-  POST: 'blue',
-  PUT: 'amber',
-  PATCH: 'violet',
-  DELETE: 'red',
-};
 
 // ---------------------------------------------------------------------------
 // Security Events — flat data
@@ -359,14 +352,7 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
     size: 220,
     cell: ({ row }) => (
       <HStack gap={6}>
-        <Badge
-          color={METHOD_COLORS[row.original.endpointMethod] ?? 'slate'}
-          type='secondary'
-          size='medium'
-          textVariant='code'
-        >
-          {row.original.endpointMethod}
-        </Badge>
+        <HttpMethod method={row.original.endpointMethod} />
         <Text size='sm' truncate>
           {row.original.endpointPath}
         </Text>

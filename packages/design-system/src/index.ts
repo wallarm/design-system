@@ -229,6 +229,13 @@ export {
 export { Flex, type FlexProps } from './components/Flex';
 export { FormatDateTime, type FormatDateTimeProps } from './components/FormatDateTime';
 export { Heading, type HeadingProps } from './components/Heading';
+export {
+  HTTP_METHOD_COLOR,
+  HTTP_METHODS,
+  HttpMethod,
+  type HttpMethodName,
+  type HttpMethodProps,
+} from './components/HttpMethod';
 export { Input, type InputProps } from './components/Input';
 export {
   InputGroup,
@@ -269,6 +276,12 @@ export {
   type OverflowTooltipContentProps,
   type OverflowTooltipProps,
 } from './components/OverflowTooltip';
+export {
+  type CopyFormatData,
+  formatAsFilter,
+  ParameterPath,
+  type ParameterPathProps,
+} from './components/ParameterPath';
 export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
 export {
   Radio,
@@ -281,6 +294,13 @@ export {
   type RadioLabelProps,
   type RadioProps,
 } from './components/Radio';
+export {
+  getResponseCodeCategory,
+  RESPONSE_CODE_COLOR,
+  ResponseCode,
+  type ResponseCodeCategory,
+  type ResponseCodeProps,
+} from './components/ResponseCode';
 export {
   ScrollArea,
   ScrollAreaContent,
