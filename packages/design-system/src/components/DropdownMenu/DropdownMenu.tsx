@@ -57,25 +57,27 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
 
   const ctx = useMemo(() => ({ isNested: true }), []);
 
+  const root = (
+    <Menu.Root
+      {...props}
+      positioning={positioning ?? defaultPositioning}
+      {...(anchorPoint != null && { anchorPoint })}
+      {...(highlightedValue != null && { highlightedValue })}
+      {...(closeOnSelect != null && { closeOnSelect })}
+      {...(onHighlightChange != null && { onHighlightChange })}
+      open={open}
+      defaultOpen={defaultOpen}
+      onOpenChange={handleOpenChange}
+      lazyMount
+      unmountOnExit
+    >
+      {children}
+    </Menu.Root>
+  );
+
   return (
     <DropdownMenuContext value={ctx}>
-      <TestIdProvider value={testId}>
-        <Menu.Root
-          {...props}
-          positioning={positioning ?? defaultPositioning}
-          {...(anchorPoint != null && { anchorPoint })}
-          {...(highlightedValue != null && { highlightedValue })}
-          {...(closeOnSelect != null && { closeOnSelect })}
-          {...(onHighlightChange != null && { onHighlightChange })}
-          open={open}
-          defaultOpen={defaultOpen}
-          onOpenChange={handleOpenChange}
-          lazyMount
-          unmountOnExit
-        >
-          {children}
-        </Menu.Root>
-      </TestIdProvider>
+      {testId ? <TestIdProvider value={testId}>{root}</TestIdProvider> : root}
     </DropdownMenuContext>
   );
 };

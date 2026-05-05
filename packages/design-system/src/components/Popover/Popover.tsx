@@ -25,19 +25,19 @@ export const Popover: FC<PopoverProps> = ({
     onOpenChange?.(open);
   };
 
-  return (
-    <TestIdProvider value={testId}>
-      <ArkUiPopover.Root
-        positioning={POPOVER_POSITIONING_DEFAULT}
-        open={open}
-        onOpenChange={handleOpenChange}
-        lazyMount
-        unmountOnExit
-      >
-        {children}
-      </ArkUiPopover.Root>
-    </TestIdProvider>
+  const root = (
+    <ArkUiPopover.Root
+      positioning={POPOVER_POSITIONING_DEFAULT}
+      open={open}
+      onOpenChange={handleOpenChange}
+      lazyMount
+      unmountOnExit
+    >
+      {children}
+    </ArkUiPopover.Root>
   );
+
+  return testId ? <TestIdProvider value={testId}>{root}</TestIdProvider> : root;
 };
 
 Popover.displayName = 'Popover';
