@@ -66,11 +66,15 @@ textarea,
 
 ### Handlers
 
-Implemented on the `AttributeActionsTarget` root element using the **capture phase** so they run before Radix's own handlers (Radix attaches handlers via `asChild` on the same node, so capture-phase listeners on the same node still fire first):
+`<DropdownMenuTrigger asChild>` clones our target div and merges event props through Radix's `Slot` / `composeEventHandlers`: when we pass `onPointerDown`, our handler runs first; Radix's own handler runs after, but only if `event.defaultPrevented === false`.
 
-- `onPointerDownCapture` → if internal-interactive → `event.preventDefault()` (Radix's `DropdownMenuTrigger` opens on pointerdown by default; preventDefault stops it).
-- `onClickCapture` → same check, same `preventDefault()` (defense in depth and keeps non-pointer activation paths consistent).
-- `onKeyDownCapture` → if `event.key` is `Enter` or `Space` and internal-interactive → `event.preventDefault()`.
+So we attach plain (bubble-phase) handlers on the target div:
+
+- `onPointerDown` → if internal-interactive → `event.preventDefault()`. Radix's pointerdown then skips opening the dropdown.
+- `onClick` → same check, same `preventDefault()` (covers activation paths that don't go through pointerdown — e.g. some Radix-internal navigation, synthetic clicks).
+- `onKeyDown` → if `event.key` is `Enter` or `' '` and internal-interactive → `event.preventDefault()`.
+
+Crucially, the inner interactive element's own handler (e.g. `+N` badge's `Popover` trigger on `pointerdown`) has already fired in the bubble phase **before** the event reaches our target div, so it is unaffected by our `preventDefault`. Only Radix's own handler on the target div — which composes after ours and respects `defaultPrevented` — is suppressed.
 
 We **do not** call `stopPropagation`. The internal interactive element handles its own event normally; we only block Radix from opening the dropdown.
 
@@ -112,7 +116,7 @@ Existing stories (`WithActions`, `HorizontalWithActions`) wrap `Text` or `Badge`
   - Drop `[&_*]:pointer-events-none`.
   - Replace `-my-6` with `-my-4` in the className so hover background corners are not clipped.
   - Add a small helper (in the same file) that computes "is this event from an internal interactive descendant of `currentTarget`?".
-  - Add `onPointerDownCapture`, `onClickCapture`, `onKeyDownCapture` handlers that compose with any handlers passed via `...props`.
+  - Add `onPointerDown`, `onClick`, `onKeyDown` handlers that compose with any handlers passed via `...props`.
 
 No other component files change.
 
