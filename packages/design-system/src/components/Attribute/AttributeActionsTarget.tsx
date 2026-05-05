@@ -72,7 +72,7 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         className={cn(
-          '-mx-4 -my-4 flex w-full cursor-pointer items-center rounded-8 px-6 py-4 transition-colors',
+          '-my-4 flex w-full cursor-pointer items-center rounded-8 px-6 py-4 transition-colors',
           'hover:bg-states-primary-hover active:bg-states-primary-pressed',
           'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
           className,
