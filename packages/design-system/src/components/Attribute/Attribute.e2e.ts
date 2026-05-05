@@ -37,6 +37,18 @@ test.describe('Component: Attribute', () => {
       await attributeStory.goto(page, 'Horizontal Loading');
       await expect(page).toHaveScreenshot();
     });
+
+    test('Should render hover state with full rounded corners on the actions target', async ({
+      page,
+    }) => {
+      await attributeStory.goto(page, 'Horizontal With Actions Ip Overflow');
+      const target = page.getByTestId('attr-ip-overflow--target');
+      // Hover an empty area (right edge) to keep the IpList +N popover closed.
+      const box = await target.boundingBox();
+      if (!box) throw new Error('target box not measurable');
+      await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2);
+      await expect(page).toHaveScreenshot();
+    });
   });
 
   test.describe('Interactions', () => {
