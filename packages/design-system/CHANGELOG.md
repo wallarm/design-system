@@ -1,3 +1,7 @@
+## 0.33.0 (2026-05-05)
+
+* feat(parameter-path): add ParameterPath component (WDS-107) (#106) ([2d3c615](https://github.com/wallarm/design-system/commit/2d3c615)), closes [#106](https://github.com/wallarm/design-system/issues/106)
+
 ## <small>0.32.1 (2026-05-04)</small>
 
 * fix(simple-charts): WDS-90 PieChart skeleton ([9c16f22](https://github.com/wallarm/design-system/commit/9c16f22))
