@@ -2,7 +2,7 @@ import type { FC, HTMLAttributes, MouseEvent, PropsWithChildren, Ref } from 'rea
 import { Slot } from '@radix-ui/react-slot';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
-import { type TestableProps, TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { type BadgeProps, badgeVariants } from '../Badge';
 
 const tagVariants = cva(
@@ -49,9 +49,11 @@ export const Tag: FC<TagProps> = ({
   asChild = false,
   children,
   onClick,
-  'data-testid': testId,
+  'data-testid': testIdProp,
   ...props
 }) => {
+  const inheritedTestId = useTestId();
+  const testId = testIdProp ?? inheritedTestId;
   const Comp = asChild ? Slot : 'div';
 
   const handleClick = onClick

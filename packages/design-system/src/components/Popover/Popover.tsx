@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { Popover as ArkUiPopover } from '@ark-ui/react';
-import { type TestableProps, TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 
 export interface PopoverProps extends TestableProps {
   children: ReactNode;
@@ -19,25 +19,28 @@ export const Popover: FC<PopoverProps> = ({
   children,
   open,
   onOpenChange,
-  'data-testid': testId,
+  'data-testid': testIdProp,
 }) => {
+  const inheritedTestId = useTestId();
+  const testId = testIdProp ?? inheritedTestId;
+
   const handleOpenChange = ({ open }: ArkUiPopover.OpenChangeDetails) => {
     onOpenChange?.(open);
   };
 
-  const root = (
-    <ArkUiPopover.Root
-      positioning={POPOVER_POSITIONING_DEFAULT}
-      open={open}
-      onOpenChange={handleOpenChange}
-      lazyMount
-      unmountOnExit
-    >
-      {children}
-    </ArkUiPopover.Root>
+  return (
+    <TestIdProvider value={testId}>
+      <ArkUiPopover.Root
+        positioning={POPOVER_POSITIONING_DEFAULT}
+        open={open}
+        onOpenChange={handleOpenChange}
+        lazyMount
+        unmountOnExit
+      >
+        {children}
+      </ArkUiPopover.Root>
+    </TestIdProvider>
   );
-
-  return testId ? <TestIdProvider value={testId}>{root}</TestIdProvider> : root;
 };
 
 Popover.displayName = 'Popover';

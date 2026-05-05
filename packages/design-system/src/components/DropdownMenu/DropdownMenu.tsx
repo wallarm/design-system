@@ -1,6 +1,6 @@
 import { type FC, type ReactNode, useMemo } from 'react';
 import { Menu } from '@ark-ui/react/menu';
-import { type TestableProps, TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { DropdownMenuContext, useDropdownMenuContext } from './DropdownMenuContext';
 
 interface DropdownMenuProps extends TestableProps {
@@ -43,9 +43,11 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
   highlightedValue,
   onHighlightChange,
   closeOnSelect,
-  'data-testid': testId,
+  'data-testid': testIdProp,
   ...props
 }) => {
+  const inheritedTestId = useTestId();
+  const testId = testIdProp ?? inheritedTestId;
   const parent = useDropdownMenuContext();
   const isNested = parent !== null;
 
@@ -77,7 +79,7 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
 
   return (
     <DropdownMenuContext value={ctx}>
-      {testId ? <TestIdProvider value={testId}>{root}</TestIdProvider> : root}
+      <TestIdProvider value={testId}>{root}</TestIdProvider>
     </DropdownMenuContext>
   );
 };

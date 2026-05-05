@@ -33,15 +33,20 @@ const TestIdContext = createContext<string | undefined>(undefined);
 export const TestIdProvider = TestIdContext.Provider;
 
 /**
- * Returns a derived `data-testid` for a sub-component slot.
+ * Returns a derived `data-testid` for a sub-component slot, or the
+ * cascade base itself when no slot is provided.
  *
- * Format: `{baseTestId}--{slot}` (e.g. `"login-error--close"`)
+ * - `useTestId('close')` → `"{base}--close"` (sub-component pattern)
+ * - `useTestId()` → `"{base}"` (transparent wrapper pattern — useful for
+ *   compound roots that pass through their parent's cascade without
+ *   adding their own slot segment)
  *
  * Returns `undefined` when no parent `TestIdProvider` exists or
  * when no `data-testid` was passed to the root component,
  * keeping the DOM clean.
  */
-export function useTestId(slot: string): string | undefined {
+export function useTestId(slot?: string): string | undefined {
   const base = useContext(TestIdContext);
-  return base ? `${base}--${slot}` : undefined;
+  if (!base) return undefined;
+  return slot ? `${base}--${slot}` : base;
 }
