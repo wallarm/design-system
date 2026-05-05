@@ -1,19 +1,20 @@
+import { getResponseCodeCategory, RESPONSE_CODE_COLOR } from '../../../../ResponseCode';
 import type { FieldValueOption } from '../../../types';
-import { HTTP_CLASS_BADGE_COLOR } from './constants';
 
 /** Build a `FieldValueOption` for a status-code mask or concrete code. Badge
- *  color is derived from the leading digit via `HTTP_CLASS_BADGE_COLOR`.
- *  Throws if the leading digit has no color mapping — this is unreachable in
- *  practice because callers gate on `maskRoots`, but the check is kept as a
- *  safety net so a future refactor can't silently emit a colorless pill. */
+ *  color is derived via the shared `ResponseCode` primitive so the two stay
+ *  in sync. Throws if the input falls outside the 1XX–5XX classes — this is
+ *  unreachable in practice because callers gate on `maskRoots`, but the check
+ *  is kept as a safety net so a future refactor can't silently emit a
+ *  colorless pill. */
 export const makeMask = (label: string): FieldValueOption => {
-  const color = HTTP_CLASS_BADGE_COLOR[label.charAt(0)];
-  if (!color) {
+  const category = getResponseCodeCategory(label);
+  if (category === 'unknown') {
     throw new Error(`statusCode: no badge color for mask "${label}"`);
   }
   return {
     value: label,
     label,
-    badge: { color, text: label },
+    badge: { color: RESPONSE_CODE_COLOR[category], text: label },
   };
 };

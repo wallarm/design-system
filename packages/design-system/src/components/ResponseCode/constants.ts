@@ -27,13 +27,19 @@ const CATEGORY_BY_LEADING_DIGIT: Record<string, ResponseCodeCategory> = {
 
 /**
  * Returns the category bucket for a given numeric or string status code.
- * Recognizes exact numbers (`200`, `404`) as well as wildcard groups
- * (`"2XX"`, `"4xx"`) — anything else falls through to `unknown`.
+ * Recognizes:
+ *   - exact numbers (`200`, `404`) via the standard 100–599 range
+ *   - wildcard groups (`"2XX"`, `"4xx"`)
+ *   - partial masks (`"40X"`, `"12X"`) used by FilterInput suggestions
+ * Anything else falls through to `unknown`.
  */
 export const getResponseCodeCategory = (code: number | string): ResponseCodeCategory => {
-  if (typeof code === 'string') {
-    const wildcard = code.trim().match(/^([1-5])[xX]{2}$/);
-    if (wildcard?.[1]) return CATEGORY_BY_LEADING_DIGIT[wildcard[1]] ?? 'unknown';
+  // String inputs containing the `X` placeholder are treated as masks: the
+  // category is decided by the leading digit and the rest is ignored.
+  if (typeof code === 'string' && /[xX]/.test(code)) {
+    const mask = code.trim().match(/^([1-5])[\dxX]*$/);
+    if (mask?.[1]) return CATEGORY_BY_LEADING_DIGIT[mask[1]] ?? 'unknown';
+    return 'unknown';
   }
   const numeric = typeof code === 'number' ? code : Number.parseInt(code, 10);
   if (!Number.isFinite(numeric)) return 'unknown';
