@@ -3,6 +3,17 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { DropdownMenuTrigger } from '../DropdownMenu';
 
+// Descendants matching this selector are treated as their own interactive zone:
+// clicking them does not open the AttributeActions dropdown.
+//
+// `[aria-haspopup]` covers Ark UI / Radix popover, menu, and dialog triggers
+// composed via Slot (`asChild`), which don't always carry `role="button"` but
+// do set aria-haspopup. Self-match is filtered out by the `match !== currentTarget`
+// guard in `isFromInternalInteractive` (Zag's own Menu.Trigger sets aria-haspopup
+// on the AttributeActionsTarget div itself).
+//
+// `[data-attribute-actions-skip]` is an internal escape hatch for non-standard
+// interactive zones inside the value. Not part of the public API.
 const INTERACTIVE_SELECTOR = [
   'a[href]',
   'button',

@@ -40,7 +40,7 @@ For all standard interactive elements (anchors, buttons, form controls, ARIA-but
 
 `AttributeActionsTarget` decides per-event whether the click belongs to it or to an internal interactive descendant.
 
-A descendant is considered **internal-interactive** when `event.target.closest(SELECTOR)` returns an element that is a strict descendant of the target root (i.e. not the root itself).
+A descendant is considered **internal-interactive** when `event.target.closest(SELECTOR)` returns an element that is a strict descendant of the target root (i.e. not the root itself — important because Zag's `Menu.Trigger` puts `aria-haspopup` on the target div, which would otherwise self-match).
 
 `SELECTOR`:
 
@@ -59,24 +59,31 @@ input,
 select,
 textarea,
 [contenteditable="true"],
+[aria-haspopup],
 [data-attribute-actions-skip]
 ```
 
-`[data-attribute-actions-skip]` is an opt-in escape hatch for consumers who need to mark a non-standard interactive zone (we do not document it as public API yet — it exists so we can extend without a breaking change).
+- `[aria-haspopup]` covers any popover / menu / dialog trigger composed via Ark UI Slot (`asChild`) — those triggers don't always carry `role="button"` but always set `aria-haspopup`. Required because once `Tag`/`Badge` stopped swallowing clicks unconditionally, Zag's popover trigger can no longer rely on `stopPropagation` to suppress the dropdown — we have to detect it instead.
+- `[data-attribute-actions-skip]` is an internal escape hatch for non-standard interactive zones. Marked `@internal` in the component JSDoc; not part of the public API.
 
 ### Handlers
 
-`<DropdownMenuTrigger asChild>` clones our target div and merges event props through Radix's `Slot` / `composeEventHandlers`: when we pass `onPointerDown`, our handler runs first; Radix's own handler runs after, but only if `event.defaultPrevented === false`.
+The dropdown is **Park UI / Ark UI / Zag** — not Radix. `<DropdownMenuTrigger asChild>` runs Ark UI's `withAsChild`, which clones the rendered child via `cloneElement(child, mergeProps(restProps, child.props))`. Ark UI's `mergeProps` composes event props with `callAll(...handlers)` — the user-supplied handler runs first; the Zag-supplied handler runs after. Zag's `Menu.Trigger` opens on `click` and `keydown` (Enter / Space) — **not** pointerdown — and explicitly checks `if (event.defaultPrevented) return` before sending the open event.
 
 So we attach plain (bubble-phase) handlers on the target div:
 
-- `onPointerDown` → if internal-interactive → `event.preventDefault()`. Radix's pointerdown then skips opening the dropdown.
-- `onClick` → same check, same `preventDefault()` (covers activation paths that don't go through pointerdown — e.g. some Radix-internal navigation, synthetic clicks).
-- `onKeyDown` → if `event.key` is `Enter` or `' '` and internal-interactive → `event.preventDefault()`.
+- `onClick` → if internal-interactive → `event.preventDefault()`. Zag's `onClick` then skips opening.
+- `onKeyDown` → if `event.key` is `Enter` or `' '` and internal-interactive → `event.preventDefault()`. Zag's `onKeyDown` then skips opening.
 
-Crucially, the inner interactive element's own handler (e.g. `+N` badge's `Popover` trigger on `pointerdown`) has already fired in the bubble phase **before** the event reaches our target div, so it is unaffected by our `preventDefault`. Only Radix's own handler on the target div — which composes after ours and respects `defaultPrevented` — is suppressed.
+We do **not** add an `onPointerDown` handler — Zag does not open on pointerdown, so it would be dead code.
 
-We **do not** call `stopPropagation`. The internal interactive element handles its own event normally; we only block Radix from opening the dropdown.
+Crucially, the inner interactive element's own handler (e.g. `+N` badge's `Popover` trigger on `click`) has already fired in the bubble phase **before** the event reaches our target div, so it is unaffected by our `preventDefault`. Only Zag's own handler on the target div — which composes after ours via `callAll` and respects `defaultPrevented` — is suppressed.
+
+We do **not** call `stopPropagation`. The internal interactive element handles its own event normally; we only block Zag from opening the dropdown.
+
+#### `Tag` and `Badge` `stopPropagation`
+
+`Tag` and `Badge` previously called `event.stopPropagation()` unconditionally inside their click handler, which made decorative tags/badges swallow clicks meant for any clickable wrapper (the very pattern this spec relies on). Both components now only attach a click handler when they receive a consumer `onClick` prop. When wrapped in `<PopoverTrigger asChild>` / similar Ark UI triggers, the wrapper's `onClick` is injected via Ark's `withAsChild` → `cloneElement`, so Tag/Badge's handler does fire (and rightly stops propagation for trigger semantics). Decorative usage no longer attaches any handler at all and clicks bubble naturally up to `AttributeActionsTarget`.
 
 ### Pointer-events change
 
@@ -89,7 +96,7 @@ Stays as-is. The whole target is still the dropdown's hit zone visually. Interna
 ### Keyboard navigation
 
 - Tab order: target → each internal-interactive descendant → next attribute. Native, no extra wiring.
-- `Enter` / `Space` on the target itself: opens the dropdown (Radix default).
+- `Enter` / `Space` on the target itself: opens the dropdown (Zag default).
 - `Enter` / `Space` on an internal descendant: triggers that descendant; the capture handler suppresses the dropdown.
 
 ### Hover-background rounded corners
