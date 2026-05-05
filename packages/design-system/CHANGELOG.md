@@ -1,3 +1,7 @@
+## <small>0.33.1 (2026-05-05)</small>
+
+* fix(attribute): WDS-74 nested interactivity inside actions target (#107) ([0fd5d8a](https://github.com/wallarm/design-system/commit/0fd5d8a)), closes [#107](https://github.com/wallarm/design-system/issues/107)
+
 ## 0.33.0 (2026-05-05)
 
 * feat(parameter-path): add ParameterPath component (WDS-107) (#106) ([2d3c615](https://github.com/wallarm/design-system/commit/2d3c615)), closes [#106](https://github.com/wallarm/design-system/issues/106)
