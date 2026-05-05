@@ -17,8 +17,24 @@ export const RESPONSE_CODE_COLOR: Record<ResponseCodeCategory, BadgeColor> = {
   unknown: 'slate',
 };
 
-/** Returns the category bucket for a given numeric or string status code. */
+const CATEGORY_BY_LEADING_DIGIT: Record<string, ResponseCodeCategory> = {
+  '1': 'informational',
+  '2': 'success',
+  '3': 'redirection',
+  '4': 'client-error',
+  '5': 'server-error',
+};
+
+/**
+ * Returns the category bucket for a given numeric or string status code.
+ * Recognizes exact numbers (`200`, `404`) as well as wildcard groups
+ * (`"2XX"`, `"4xx"`) — anything else falls through to `unknown`.
+ */
 export const getResponseCodeCategory = (code: number | string): ResponseCodeCategory => {
+  if (typeof code === 'string') {
+    const wildcard = code.trim().match(/^([1-5])[xX]{2}$/);
+    if (wildcard?.[1]) return CATEGORY_BY_LEADING_DIGIT[wildcard[1]] ?? 'unknown';
+  }
   const numeric = typeof code === 'number' ? code : Number.parseInt(code, 10);
   if (!Number.isFinite(numeric)) return 'unknown';
   if (numeric >= 100 && numeric < 200) return 'informational';

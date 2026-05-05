@@ -86,6 +86,16 @@ export const Sizes: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+export const WildcardGroups: StoryFn<typeof meta> = () => (
+  <VStack align='start' gap={8}>
+    <ResponseCode code='1XX' />
+    <ResponseCode code='2XX' />
+    <ResponseCode code='3XX' />
+    <ResponseCode code='4XX' />
+    <ResponseCode code='5XX' />
+  </VStack>
+);
+
 export const UnknownCodeFallsBackToSlate: StoryFn<typeof meta> = () => (
   <HStack align='center' gap={8}>
     <ResponseCode code={0} />

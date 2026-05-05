@@ -6,6 +6,7 @@ const responseCodeStory = createStoryHelper('data-display-responsecode', [
   'All Categories',
   'Real World Codes',
   'Sizes',
+  'Wildcard Groups',
   'Unknown Code Falls Back To Slate',
 ] as const);
 
@@ -23,6 +24,11 @@ test.describe('Component: ResponseCode', () => {
 
     test('Should render medium and large sizes', async ({ page }) => {
       await responseCodeStory.goto(page, 'Sizes');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render wildcard groups (1XX–5XX) per category', async ({ page }) => {
+      await responseCodeStory.goto(page, 'Wildcard Groups');
       await expect(page).toHaveScreenshot();
     });
 
