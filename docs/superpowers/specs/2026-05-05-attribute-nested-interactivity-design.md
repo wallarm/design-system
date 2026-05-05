@@ -88,6 +88,20 @@ Stays as-is. The whole target is still the dropdown's hit zone visually. Interna
 - `Enter` / `Space` on the target itself: opens the dropdown (Radix default).
 - `Enter` / `Space` on an internal descendant: triggers that descendant; the capture handler suppresses the dropdown.
 
+### Hover-background rounded corners
+
+The current `AttributeActionsTarget` uses `-mx-4 -my-6 ... px-6 py-4 rounded-8`. The vertical bleed (`-my-6` = −24px) exceeds `AttributeValue`'s vertical padding in both orientations:
+
+- Horizontal: `AttributeValue` is `py-4 truncate` (16px padding + `overflow:hidden`) → top/bottom of the target are clipped → rounded corners appear square.
+- Vertical: `AttributeValue` is `pt-4 min-h-[28px]` (no `overflow:hidden`, but the target's negative top margin paints over the label region) → visually uneven.
+
+Fix: align target vertical bleed to `AttributeValue`'s padding in each orientation so all four corners of the hover background render fully.
+
+- Horizontal: change target `-my-6` → `-my-4` (matches AttributeValue `py-4`). Horizontal bleed `-mx-4` and `px-6` stay (AttributeValue has no horizontal padding, so target legitimately extends a bit past its edges; this is not clipped because the row-level container does not `overflow:hidden`).
+- Vertical: AttributeValue is `pt-4 min-h-[28px]`. Target's `-my-6` should not paint above the label gap. Reduce to `-my-4` here as well for symmetry; the hover area still spans the full value row.
+
+End state: target uses `-mx-4 -my-4 ... px-6 py-4 rounded-8` in both orientations; rounded corners are visible on all four sides.
+
 ### Backward compatibility
 
 Existing stories (`WithActions`, `HorizontalWithActions`) wrap `Text` or `Badge` — neither matches the SELECTOR — so behavior is unchanged. The newly added IPs example in `HorizontalWithActions` becomes the regression case for the new behavior.
@@ -96,6 +110,7 @@ Existing stories (`WithActions`, `HorizontalWithActions`) wrap `Text` or `Badge`
 
 - `packages/design-system/src/components/Attribute/AttributeActionsTarget.tsx`
   - Drop `[&_*]:pointer-events-none`.
+  - Replace `-my-6` with `-my-4` in the className so hover background corners are not clipped.
   - Add a small helper (in the same file) that computes "is this event from an internal interactive descendant of `currentTarget`?".
   - Add `onPointerDownCapture`, `onClickCapture`, `onKeyDownCapture` handlers that compose with any handlers passed via `...props`.
 
@@ -122,6 +137,10 @@ Add a section under "Interaction":
 3. **Existing simple-text case still opens the dropdown.**
    - `Source IP` row from the same story (wraps a plain `Text`).
    - Click anywhere on it → dropdown opens. (Regression guard.)
+
+### Screenshot tests
+
+Update the `HorizontalWithActions` screenshot baseline to cover the hover state showing fully rounded corners on all four sides for at least one row (the existing `--hover` snapshot pattern, if present, or a new snapshot named accordingly).
 
 ### Unit / component tests
 
