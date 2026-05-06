@@ -165,7 +165,10 @@ export const Default: StoryFn<typeof meta> = () => {
               <PieChartCenterValue formatHoveredValue={d => formatValue(d.value)}>
                 {formatValue(filtered ? visibleTotal : total)}
               </PieChartCenterValue>
-              <PieChartCenterLabel pluralize={{ one: 'request', other: 'requests' }} />
+              <PieChartCenterLabel
+                className='whitespace-nowrap'
+                pluralize={{ one: 'request', other: 'requests' }}
+              />
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>
@@ -241,7 +244,7 @@ export const Selectable: StoryFn<typeof meta> = () => {
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>{formatValue(total)}</PieChartCenterValue>
-              <PieChartCenterLabel>requests</PieChartCenterLabel>
+              <PieChartCenterLabel className='whitespace-nowrap'>requests</PieChartCenterLabel>
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>
@@ -284,7 +287,7 @@ export const TruncatedLabels: StoryFn<typeof meta> = () => {
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>{formatValue(total)}</PieChartCenterValue>
-              <PieChartCenterLabel>requests</PieChartCenterLabel>
+              <PieChartCenterLabel className='whitespace-nowrap'>requests</PieChartCenterLabel>
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>
@@ -325,7 +328,7 @@ export const TruncatedLabelsWithTooltip: StoryFn<typeof meta> = () => {
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>{formatValue(total)}</PieChartCenterValue>
-              <PieChartCenterLabel>requests</PieChartCenterLabel>
+              <PieChartCenterLabel className='whitespace-nowrap'>requests</PieChartCenterLabel>
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>
@@ -376,7 +379,7 @@ export const SingleSlice: StoryFn<typeof meta> = () => {
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>23</PieChartCenterValue>
-              <PieChartCenterLabel>requests</PieChartCenterLabel>
+              <PieChartCenterLabel className='whitespace-nowrap'>requests</PieChartCenterLabel>
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>
@@ -414,7 +417,7 @@ export const TwoSlices: StoryFn<typeof meta> = () => {
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>100</PieChartCenterValue>
-              <PieChartCenterLabel>requests</PieChartCenterLabel>
+              <PieChartCenterLabel className='whitespace-nowrap'>requests</PieChartCenterLabel>
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>
@@ -466,7 +469,7 @@ export const CustomColors: StoryFn<typeof meta> = () => {
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>{formatValue(total)}</PieChartCenterValue>
-              <PieChartCenterLabel>requests</PieChartCenterLabel>
+              <PieChartCenterLabel className='whitespace-nowrap'>requests</PieChartCenterLabel>
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>
@@ -501,7 +504,7 @@ export const ZeroTotal: StoryFn<typeof meta> = () => {
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>0</PieChartCenterValue>
-              <PieChartCenterLabel>requests</PieChartCenterLabel>
+              <PieChartCenterLabel className='whitespace-nowrap'>requests</PieChartCenterLabel>
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>
@@ -577,7 +580,7 @@ export const WidthVariants: StoryFn<typeof meta> = () => {
           <PieChartDonut>
             <PieChartCenter>
               <PieChartCenterValue>{formatValue(total)}</PieChartCenterValue>
-              <PieChartCenterLabel>requests</PieChartCenterLabel>
+              <PieChartCenterLabel className='whitespace-nowrap'>requests</PieChartCenterLabel>
             </PieChartCenter>
           </PieChartDonut>
           <PieChartLegend>
@@ -612,7 +615,7 @@ export const PercentVariants: StoryFn<typeof meta> = () => {
         <PieChartDonut>
           <PieChartCenter>
             <PieChartCenterValue>{formatValue(total)}</PieChartCenterValue>
-            <PieChartCenterLabel>requests</PieChartCenterLabel>
+            <PieChartCenterLabel className='whitespace-nowrap'>requests</PieChartCenterLabel>
           </PieChartCenter>
         </PieChartDonut>
         <PieChartLegend>
