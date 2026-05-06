@@ -16,37 +16,38 @@ const pieChartStory = createStoryHelper('data-display-simplecharts-piechart', [
   'Palette',
 ] as const);
 
-// `PIE_DONUT_ANIMATION_DURATION` is 400ms with begin=0; wait a hair past it.
-const PIE_ANIMATION_MS = 500;
 // Number of rows in the `Default` story dataset (`baseRows` in PieChart.stories.tsx).
 const DEFAULT_SLICE_COUNT = 5;
+
+// Force `prefers-reduced-motion: reduce` for every test in this file. Recharts
+// runs `<Pie>` with `isAnimationActive='auto'`, which honours the media query
+// and skips the 400ms sector sweep entirely — so the screenshot reflects the
+// final state from the first paint instead of needing an arbitrary sleep.
+test.beforeEach(async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+});
 
 test.describe('PieChart', () => {
   test.describe('Screenshots', () => {
     test('Default', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('Hovered (legend → slice)', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await page.locator('[data-slot=pie-chart-legend-item]').nth(2).hover();
       await expect(page).toHaveScreenshot();
     });
 
     test('Selected', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await page.locator('[data-slot=pie-chart-legend-item]').nth(2).click();
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('Focus', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       // First Tab → Settings action; second Tab → first legend row.
       await page.keyboard.press('Tab');
       await page.keyboard.press('Tab');
@@ -60,72 +61,59 @@ test.describe('PieChart', () => {
 
     test('SingleSlice', async ({ page }) => {
       await pieChartStory.goto(page, 'Single Slice');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('TwoSlices', async ({ page }) => {
       await pieChartStory.goto(page, 'Two Slices');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('CustomColors', async ({ page }) => {
       await pieChartStory.goto(page, 'Custom Colors');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('TruncatedLabels', async ({ page }) => {
       await pieChartStory.goto(page, 'Truncated Labels');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('Selectable - DefaultSelected', async ({ page }) => {
       await pieChartStory.goto(page, 'Selectable');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('Selectable - MultiSelected', async ({ page }) => {
       await pieChartStory.goto(page, 'Selectable');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       // Add 2XX to the default {4XX} so the screenshot captures the multi-selection
       // dim — non-selected slices/rows fade, selected ones stay bright.
       await page.locator('[data-slot=pie-chart-legend-item][data-name="2XX"]').click();
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('Selectable - NoneSelected', async ({ page }) => {
       await pieChartStory.goto(page, 'Selectable');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       // Clear the default 4XX selection — every slice/row should return to full opacity.
       await page.getByRole('button', { name: 'Clear selection' }).click();
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('Selectable - Hovered', async ({ page }) => {
       await pieChartStory.goto(page, 'Selectable');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       // Hover takes precedence over selection — only the hovered row stays bright,
       // even when 4XX is the default selection.
       await page.locator('[data-slot=pie-chart-legend-item][data-name="5XX"]').hover();
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('ZeroTotal', async ({ page }) => {
       await pieChartStory.goto(page, 'Zero Total');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
 
     test('PercentVariants', async ({ page }) => {
       await pieChartStory.goto(page, 'Percent Variants');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       await expect(page).toHaveScreenshot();
     });
   });
@@ -133,7 +121,6 @@ test.describe('PieChart', () => {
   test.describe('Interactions', () => {
     test('Should mark a row as selected when clicked', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       const row = page.locator('[data-slot=pie-chart-legend-item]').first();
       await expect(row).not.toHaveAttribute('aria-current', 'true');
       await row.click();
@@ -158,7 +145,6 @@ test.describe('PieChart', () => {
 
     test('Should sync hover from legend row to donut slice', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
 
       const targetName = '5XX';
       const row = page.locator(`[data-slot=pie-chart-legend-item][data-name="${targetName}"]`);
@@ -177,7 +163,6 @@ test.describe('PieChart', () => {
 
     test('Should reset hover state when leaving a legend row', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
 
       const row = page.locator('[data-slot=pie-chart-legend-item]').first();
       await row.hover();
@@ -201,7 +186,6 @@ test.describe('PieChart', () => {
       page,
     }) => {
       await pieChartStory.goto(page, 'Zero Total');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       // Hovering the donut wrapper propagates into the placeholder SVG path beneath
       // the cursor — same browser hit-test path as a real user. `.hover()` on the
       // <path> directly is unreliable: recharts' animation pipeline can briefly
@@ -215,7 +199,6 @@ test.describe('PieChart', () => {
       page,
     }) => {
       await pieChartStory.goto(page, 'Single Slice');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       const slices = page.locator('[data-slot=pie-chart-slice]');
       await expect(slices).toHaveCount(1);
       await expect(page.locator('[data-slot=pie-chart-legend-item]')).toHaveCount(1);
@@ -224,7 +207,6 @@ test.describe('PieChart', () => {
 
     test('Should swap centre value to the hovered slice value', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       const centreValue = page.locator('[data-slot=pie-chart-center-value]');
       // Total of baseRows = 100; 5XX = 15.
       await expect(centreValue).toContainText('100');
@@ -238,7 +220,6 @@ test.describe('PieChart', () => {
 
     test('Should pluralize the centre label based on the active value', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       // Default uses `{ one: 'request', other: 'requests' }`; total = 100 → plural.
       await expect(page.locator('[data-slot=pie-chart-center-label]')).toHaveText('requests');
     });
@@ -260,7 +241,6 @@ test.describe('PieChart', () => {
 
     test('Should reach the first interactive row via forward Tab', async ({ page }) => {
       await pieChartStory.goto(page, 'Default');
-      await page.waitForTimeout(PIE_ANIMATION_MS);
       const row = page.locator('[data-slot=pie-chart-legend-item]').first();
       // Don't hardcode the Tab count: preceding tab stops include Storybook chrome,
       // the Settings action button (whose 0-width hidden state has browser-specific

@@ -1,4 +1,4 @@
-import type { ChartColor } from '../types';
+export { CHART_PALETTE_FILL as PIE_SLICE_FILL } from '../lib/chartPalette';
 
 // Donut geometry — Figma 7490-122167. The SVG is `PIE_DONUT_SIZE` square; the
 // wrapper adds 24px horizontal + 8px vertical padding (in `pieChartDonutClasses`)
@@ -17,20 +17,3 @@ export const PIE_DONUT_PADDING_ANGLE = 2;
 // the instant the chart mounts (recharts' default 400 ms delay just looks like lag).
 export const PIE_DONUT_ANIMATION_DURATION = 400;
 export const PIE_DONUT_ANIMATION_BEGIN = 0;
-
-// Slate uses the badge "dark-alt" token so it renders as a legible mid-grey on
-// white surfaces, matching the Figma "1XX" slice.
-export const PIE_SLICE_FILL: Record<ChartColor, string> = {
-  brand: 'var(--color-w-orange-500)',
-  blue: 'var(--color-blue-500)',
-  green: 'var(--color-green-500)',
-  red: 'var(--color-red-500)',
-  amber: 'var(--color-amber-500)',
-  purple: 'var(--color-purple-500)',
-  slate: 'var(--color-badge-slate-dark-alt)',
-  teal: 'var(--color-teal-500)',
-  cyan: 'var(--color-cyan-500)',
-  indigo: 'var(--color-indigo-500)',
-  pink: 'var(--color-pink-500)',
-  rose: 'var(--color-rose-500)',
-};
