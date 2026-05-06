@@ -96,7 +96,7 @@ export const formatTimeOnly = (date: Date): string => {
 /**
  * Format timezone as "GMT+N" or "UTC".
  */
-const formatTimezone = (date: Date): string => {
+export const formatTimezone = (date: Date): string => {
   const offset = -date.getTimezoneOffset();
   if (offset === 0) return 'UTC';
   const sign = offset > 0 ? '+' : '-';
