@@ -1,19 +1,12 @@
 import type { FC, HTMLAttributes, KeyboardEvent, MouseEvent, ReactNode, Ref } from 'react';
+import { useMenuContext } from '@ark-ui/react/menu';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { DropdownMenuTrigger } from '../DropdownMenu';
 
-// Descendants matching this selector are treated as their own interactive zone:
-// clicking them does not open the AttributeActions dropdown.
-//
-// `[aria-haspopup]` covers Ark UI / Radix popover, menu, and dialog triggers
-// composed via Slot (`asChild`), which don't always carry `role="button"` but
-// do set aria-haspopup. Self-match is filtered out by the `match !== currentTarget`
-// guard in `isFromInternalInteractive` (Zag's own Menu.Trigger sets aria-haspopup
-// on the AttributeActionsTarget div itself).
-//
-// `[data-attribute-actions-skip]` is an internal escape hatch for non-standard
-// interactive zones inside the value. Not part of the public API.
+// Descendants matching this selector are nested interactive zones — clicks on
+// them run their own behavior and do not open the dropdown.
+// `data-attribute-actions-skip` is an internal escape hatch (not public API).
 const INTERACTIVE_SELECTOR = [
   'a[href]',
   'button',
@@ -31,6 +24,7 @@ const INTERACTIVE_SELECTOR = [
   '[contenteditable="true"]',
   '[aria-haspopup]',
   '[data-attribute-actions-skip]',
+  '[data-slot="inline-code-snippet"]',
 ].join(',');
 
 const isFromInternalInteractive = (
@@ -45,6 +39,16 @@ const isFromInternalInteractive = (
 export interface AttributeActionsTargetProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
   children: ReactNode;
+  /**
+   * When true, clicks/keydown on nested interactive descendants (links, buttons,
+   * InlineCodeSnippet, etc.) are intercepted: their own handlers do not run and
+   * only the AttributeActions dropdown opens.
+   *
+   * Default `false` — only the descendant's behavior fires; the dropdown stays
+   * closed when interacting with the descendant directly, and opens only when
+   * clicking the surrounding target area.
+   */
+  disableNestedInteractive?: boolean;
 }
 
 export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
@@ -53,13 +57,17 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
   className,
   onClick,
   onKeyDown,
+  onKeyDownCapture,
+  disableNestedInteractive = false,
   ...props
 }) => {
   const testId = useTestId('target');
+  const menu = useMenuContext();
 
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     onClick?.(event);
     if (event.defaultPrevented) return;
+    if (disableNestedInteractive) return;
     if (isFromInternalInteractive(event)) {
       event.preventDefault();
     }
@@ -68,9 +76,21 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     onKeyDown?.(event);
     if (event.defaultPrevented) return;
+    if (disableNestedInteractive) return;
     if ((event.key === 'Enter' || event.key === ' ') && isFromInternalInteractive(event)) {
       event.preventDefault();
     }
+  };
+
+  const handleKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
+    onKeyDownCapture?.(event);
+    if (event.defaultPrevented) return;
+    if (!disableNestedInteractive) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+    if (!isFromInternalInteractive(event)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    menu.setOpen(true);
   };
 
   return (
@@ -82,10 +102,12 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
         data-slot='attribute-actions-target'
         onClick={handleClick}
         onKeyDown={handleKeyDown}
+        onKeyDownCapture={handleKeyDownCapture}
         className={cn(
           '-my-4 flex w-full cursor-pointer items-center rounded-8 px-6 py-4 transition-colors',
           'hover:bg-states-primary-hover active:bg-states-primary-pressed',
           'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
+          disableNestedInteractive && '[&_*]:pointer-events-none',
           className,
         )}
       >

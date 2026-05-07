@@ -67,6 +67,27 @@ const renderOverflowPopover = (items: string[]) => (
   </Popover>
 );
 
+const renderActionsItems = () => (
+  <AttributeActionsContent>
+    <AttributeActionsItem
+      onSelect={() => {
+        /* story mock */
+      }}
+    >
+      <Filter />
+      Investigate by this value
+    </AttributeActionsItem>
+    <AttributeActionsItem
+      onSelect={() => {
+        /* story mock */
+      }}
+    >
+      <Copy />
+      Copy value
+    </AttributeActionsItem>
+  </AttributeActionsContent>
+);
+
 export const Default: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute>
@@ -94,8 +115,8 @@ export const WithDescription: StoryFn<AttributeProps> = () => (
   </div>
 );
 
-export const WithInfoRight: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
+export const WithInfo: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-16'>
     <Attribute>
       <AttributeLabel>
         Request ID
@@ -105,11 +126,7 @@ export const WithInfoRight: StoryFn<AttributeProps> = () => (
         <Text size='sm'>abc-123-def-456</Text>
       </AttributeValue>
     </Attribute>
-  </div>
-);
 
-export const WithInfoLeft: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
     <Attribute>
       <AttributeLabel>
         <AttributeLabelInfo>Unique identifier assigned to each incoming request</AttributeLabelInfo>
@@ -202,95 +219,6 @@ export const Loading: StoryFn<AttributeProps> = () => (
   </div>
 );
 
-export const WithBadge: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
-    <Attribute>
-      <AttributeLabel>Status</AttributeLabel>
-      <AttributeValue>
-        <Badge color='green'>Active</Badge>
-      </AttributeValue>
-    </Attribute>
-  </div>
-);
-
-export const WithTags: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
-    <Attribute>
-      <AttributeLabel>Tags</AttributeLabel>
-      <AttributeValue>
-        <OverflowList
-          className='gap-4'
-          items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
-          itemRenderer={item => <Tag key={item}>{item}</Tag>}
-          overflowRenderer={renderOverflowPopover}
-        />
-      </AttributeValue>
-    </Attribute>
-  </div>
-);
-
-export const WithCodeSnippet: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-16'>
-    <Attribute>
-      <AttributeLabel>Payload (inline)</AttributeLabel>
-      <AttributeValue>
-        <InlineCodeSnippet code='{ "action": "login", "user_id": 42 }' size='sm' />
-      </AttributeValue>
-    </Attribute>
-    <Attribute>
-      <AttributeLabel>Payload (code)</AttributeLabel>
-      <AttributeValue>
-        <Code size='s'>{'{ "action": "login", "user_id": 42 }'}</Code>
-      </AttributeValue>
-    </Attribute>
-  </div>
-);
-
-export const WithLink_Value: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
-    <Attribute>
-      <AttributeLabel>Documentation</AttributeLabel>
-      <AttributeValue>
-        <Link href='#' size='md'>
-          View full report
-        </Link>
-      </AttributeValue>
-    </Attribute>
-  </div>
-);
-
-export const WithDateTime: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-16'>
-    <Attribute>
-      <AttributeLabel>Created at (relative)</AttributeLabel>
-      <AttributeValue>
-        <FormatDateTime value='2026-04-02T14:03:00Z' />
-      </AttributeValue>
-    </Attribute>
-    <Attribute>
-      <AttributeLabel>Created at (absolute)</AttributeLabel>
-      <AttributeValue>
-        <FormatDateTime value='2026-04-02T14:03:00Z' format='datetime' />
-      </AttributeValue>
-    </Attribute>
-  </div>
-);
-
-export const WithIP: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
-    <Attribute>
-      <AttributeLabel>Source IP</AttributeLabel>
-      <AttributeValue>
-        <Ip>
-          <IpCountry code='US' />
-          <IpAddress>142.198.167.52</IpAddress>
-          <IpProvider>Azure</IpProvider>
-        </Ip>
-      </AttributeValue>
-    </Attribute>
-  </div>
-);
-
 export const Composition: StoryFn<AttributeProps> = () => (
   <div className='grid grid-cols-2 gap-x-8 gap-y-16 w-[874px]'>
     <Attribute>
@@ -376,67 +304,136 @@ export const Composition: StoryFn<AttributeProps> = () => (
         </IpList>
       </AttributeValue>
     </Attribute>
-  </div>
-);
 
-export const WithActions: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-16'>
     <Attribute>
       <AttributeLabel>Source IP</AttributeLabel>
       <AttributeValue>
-        <AttributeActions data-testid='attribute-with-actions'>
-          <AttributeActionsTarget>
-            <Text size='sm'>142.198.167.52</Text>
-          </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
-        </AttributeActions>
+        <Ip>
+          <IpCountry code='US' />
+          <IpAddress>142.198.167.52</IpAddress>
+          <IpProvider>Azure</IpProvider>
+        </Ip>
       </AttributeValue>
     </Attribute>
 
     <Attribute>
+      <AttributeLabel>Created at</AttributeLabel>
+      <AttributeValue>
+        <FormatDateTime value='2026-04-02T14:03:00Z' format='datetime' />
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Documentation</AttributeLabel>
+      <AttributeValue>
+        <Link href='#' size='md'>
+          View full report
+        </Link>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Payload (inline)</AttributeLabel>
+      <AttributeValue>
+        <InlineCodeSnippet code='{ "action": "login", "user_id": 42 }' size='sm' />
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Payload (code)</AttributeLabel>
+      <AttributeValue>
+        <Code size='s'>{'{ "action": "login", "user_id": 42 }'}</Code>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const WithActions: StoryFn<AttributeProps> = () => (
+  <div className='grid grid-cols-2 gap-x-8 gap-y-16 w-[874px]'>
+    <Attribute>
       <AttributeLabel>Status</AttributeLabel>
       <AttributeValue>
-        <AttributeActions>
+        <AttributeActions data-testid='attribute-with-actions'>
           <AttributeActionsTarget>
             <Badge color='red' variant='dotted'>
               Blocked
             </Badge>
           </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
+          {renderActionsItems()}
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>First seen</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <FormatDateTime value='2026-04-03T10:15:00Z' format='relative' />
+          </AttributeActionsTarget>
+          {renderActionsItems()}
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Attack type</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <OverflowList
+              className='gap-4'
+              items={[
+                'XSS',
+                'BOLA',
+                'SQL Injection',
+                'Scanner',
+                'CSRF',
+                'XXE',
+                'RCE',
+                'LFI',
+                'IDOR',
+              ]}
+              itemRenderer={item => <Tag key={item}>{item}</Tag>}
+              overflowRenderer={renderOverflowPopover}
+            />
+          </AttributeActionsTarget>
+          {renderActionsItems()}
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Sessions</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Text size='sm'>3 sessions</Text>
+          </AttributeActionsTarget>
+          {renderActionsItems()}
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Users</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <OverflowList
+              className='gap-4'
+              items={[
+                'artem@acme.com',
+                'uxd@acme.com',
+                'ops@acme.com',
+                'security@acme.com',
+                'admin@acme.com',
+              ]}
+              itemRenderer={item => <Tag key={item}>{item}</Tag>}
+              overflowRenderer={renderOverflowPopover}
+            />
+          </AttributeActionsTarget>
+          {renderActionsItems()}
         </AttributeActions>
       </AttributeValue>
     </Attribute>
@@ -453,6 +450,11 @@ export const WithActions: StoryFn<AttributeProps> = () => (
                 <IpProvider>Azure</IpProvider>
               </Ip>
               <Ip>
+                <IpCountry code='US' />
+                <IpAddress>34.74.73.20</IpAddress>
+                <IpProvider>AWS</IpProvider>
+              </Ip>
+              <Ip>
                 <IpCountry code='DE' />
                 <IpAddress>34.74.73.20</IpAddress>
                 <IpProvider>GCP</IpProvider>
@@ -461,26 +463,79 @@ export const WithActions: StoryFn<AttributeProps> = () => (
                 <IpCountry code='NL' />
                 <IpAddress>10.0.0.1</IpAddress>
               </Ip>
+              <Ip>
+                <IpCountry code='JP' />
+                <IpAddress>192.168.1.1</IpAddress>
+              </Ip>
             </IpList>
           </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
+          {renderActionsItems()}
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Source IP</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Ip>
+              <IpCountry code='US' />
+              <IpAddress>142.198.167.52</IpAddress>
+              <IpProvider>Azure</IpProvider>
+            </Ip>
+          </AttributeActionsTarget>
+          {renderActionsItems()}
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Created at</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <FormatDateTime value='2026-04-02T14:03:00Z' format='datetime' />
+          </AttributeActionsTarget>
+          {renderActionsItems()}
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Documentation</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Link href='#' size='md'>
+              View full report
+            </Link>
+          </AttributeActionsTarget>
+          {renderActionsItems()}
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Payload (inline)</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <InlineCodeSnippet code='{ "action": "login", "user_id": 42 }' size='sm' />
+          </AttributeActionsTarget>
+          {renderActionsItems()}
+        </AttributeActions>
+      </AttributeValue>
+    </Attribute>
+
+    <Attribute>
+      <AttributeLabel>Payload (code)</AttributeLabel>
+      <AttributeValue>
+        <AttributeActions>
+          <AttributeActionsTarget>
+            <Code size='s'>{'{ "action": "login", "user_id": 42 }'}</Code>
+          </AttributeActionsTarget>
+          {renderActionsItems()}
         </AttributeActions>
       </AttributeValue>
     </Attribute>
@@ -500,7 +555,7 @@ export const Horizontal: StoryFn<AttributeProps> = () => (
   </div>
 );
 
-export const HorizontalLabelTruncation: StoryFn<AttributeProps> = () => (
+export const HorizontalTruncation: StoryFn<AttributeProps> = () => (
   <div className='w-[500px] flex flex-col gap-8'>
     <Attribute orientation='horizontal'>
       <AttributeLabel width={256}>Short</AttributeLabel>
@@ -516,11 +571,6 @@ export const HorizontalLabelTruncation: StoryFn<AttributeProps> = () => (
         <Text size='sm'>Value</Text>
       </AttributeValue>
     </Attribute>
-  </div>
-);
-
-export const HorizontalValueTruncation: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
     <Attribute orientation='horizontal'>
       <AttributeLabel>Users</AttributeLabel>
       <AttributeValue>
@@ -679,33 +729,16 @@ export const HorizontalEmpty: StoryFn<AttributeProps> = () => (
   </div>
 );
 
-export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px] flex flex-col gap-8'>
+const renderActionsAttributes = (disableNestedInteractive: boolean) => (
+  <>
     <Attribute orientation='horizontal'>
       <AttributeLabel>Source IP</AttributeLabel>
       <AttributeValue>
-        <AttributeActions data-testid='attribute-horizontal-with-actions'>
-          <AttributeActionsTarget>
+        <AttributeActions data-testid='attr-source-ip'>
+          <AttributeActionsTarget disableNestedInteractive={disableNestedInteractive}>
             <Text size='sm'>142.198.167.52</Text>
           </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
+          {renderActionsItems()}
         </AttributeActions>
       </AttributeValue>
     </Attribute>
@@ -713,30 +746,13 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
     <Attribute orientation='horizontal'>
       <AttributeLabel>Status</AttributeLabel>
       <AttributeValue>
-        <AttributeActions>
-          <AttributeActionsTarget>
+        <AttributeActions data-testid='attr-badge'>
+          <AttributeActionsTarget disableNestedInteractive={disableNestedInteractive}>
             <Badge color='red' variant='dotted'>
               Blocked
             </Badge>
           </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
+          {renderActionsItems()}
         </AttributeActions>
       </AttributeValue>
     </Attribute>
@@ -744,8 +760,8 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
     <Attribute orientation='horizontal'>
       <AttributeLabel>IPs</AttributeLabel>
       <AttributeValue>
-        <AttributeActions>
-          <AttributeActionsTarget>
+        <AttributeActions data-testid='attr-ip-overflow'>
+          <AttributeActionsTarget disableNestedInteractive={disableNestedInteractive}>
             <IpList type='horizontal'>
               <Ip>
                 <IpCountry code='US' />
@@ -772,24 +788,7 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
               </Ip>
             </IpList>
           </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
+          {renderActionsItems()}
         </AttributeActions>
       </AttributeValue>
     </Attribute>
@@ -797,28 +796,11 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
     <Attribute orientation='horizontal'>
       <AttributeLabel>Payload</AttributeLabel>
       <AttributeValue>
-        <AttributeActions>
-          <AttributeActionsTarget>
+        <AttributeActions data-testid='attr-code-snippet'>
+          <AttributeActionsTarget disableNestedInteractive={disableNestedInteractive}>
             <InlineCodeSnippet code='{ "action": "login", "user_id": 42 }' size='sm' />
           </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
+          {renderActionsItems()}
         </AttributeActions>
       </AttributeValue>
     </Attribute>
@@ -826,30 +808,13 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
     <Attribute orientation='horizontal'>
       <AttributeLabel>Documentation</AttributeLabel>
       <AttributeValue>
-        <AttributeActions>
-          <AttributeActionsTarget>
+        <AttributeActions data-testid='attr-link'>
+          <AttributeActionsTarget disableNestedInteractive={disableNestedInteractive}>
             <Link href='#' size='md'>
               View full report
             </Link>
           </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
+          {renderActionsItems()}
         </AttributeActions>
       </AttributeValue>
     </Attribute>
@@ -857,8 +822,8 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
     <Attribute orientation='horizontal'>
       <AttributeLabel>Tags</AttributeLabel>
       <AttributeValue>
-        <AttributeActions>
-          <AttributeActionsTarget>
+        <AttributeActions data-testid='attr-tags'>
+          <AttributeActionsTarget disableNestedInteractive={disableNestedInteractive}>
             <OverflowList
               className='gap-4'
               items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
@@ -866,156 +831,20 @@ export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
               overflowRenderer={renderOverflowPopover}
             />
           </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
+          {renderActionsItems()}
         </AttributeActions>
       </AttributeValue>
     </Attribute>
-  </div>
+  </>
 );
 
-export const HorizontalWithActionsBadge: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
-    <Attribute orientation='horizontal' data-testid='attr-badge'>
-      <AttributeLabel>Status</AttributeLabel>
-      <AttributeValue>
-        <AttributeActions>
-          <AttributeActionsTarget>
-            <Badge color='red' variant='dotted'>
-              Blocked
-            </Badge>
-          </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
-        </AttributeActions>
-      </AttributeValue>
-    </Attribute>
-  </div>
+export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-8'>{renderActionsAttributes(false)}</div>
 );
+HorizontalWithActions.storyName = 'Horizontal With Actions (default — copy on text, menu outside)';
 
-export const HorizontalWithActionsTags: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
-    <Attribute orientation='horizontal' data-testid='attr-tags'>
-      <AttributeLabel>Tags</AttributeLabel>
-      <AttributeValue>
-        <AttributeActions>
-          <AttributeActionsTarget>
-            <OverflowList
-              className='gap-4'
-              items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
-              itemRenderer={item => <Tag key={item}>{item}</Tag>}
-              overflowRenderer={renderOverflowPopover}
-            />
-          </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
-        </AttributeActions>
-      </AttributeValue>
-    </Attribute>
-  </div>
+export const HorizontalWithActionsMenuOnly: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px] flex flex-col gap-8'>{renderActionsAttributes(true)}</div>
 );
-
-export const HorizontalWithActionsIpOverflow: StoryFn<AttributeProps> = () => (
-  <div className='w-[400px]'>
-    <Attribute orientation='horizontal' data-testid='attr-ip-overflow'>
-      <AttributeLabel>IPs</AttributeLabel>
-      <AttributeValue>
-        <AttributeActions>
-          <AttributeActionsTarget>
-            <IpList type='horizontal'>
-              <Ip>
-                <IpCountry code='US' />
-                <IpAddress>142.198.167.52</IpAddress>
-                <IpProvider>Azure</IpProvider>
-              </Ip>
-              <Ip>
-                <IpCountry code='US' />
-                <IpAddress>34.74.73.20</IpAddress>
-                <IpProvider>AWS</IpProvider>
-              </Ip>
-              <Ip>
-                <IpCountry code='DE' />
-                <IpAddress>34.74.73.20</IpAddress>
-                <IpProvider>GCP</IpProvider>
-              </Ip>
-              <Ip>
-                <IpCountry code='NL' />
-                <IpAddress>10.0.0.1</IpAddress>
-              </Ip>
-              <Ip>
-                <IpCountry code='JP' />
-                <IpAddress>192.168.1.1</IpAddress>
-              </Ip>
-            </IpList>
-          </AttributeActionsTarget>
-          <AttributeActionsContent>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Filter />
-              Investigate by this value
-            </AttributeActionsItem>
-            <AttributeActionsItem
-              onSelect={() => {
-                /* story mock */
-              }}
-            >
-              <Copy />
-              Copy value
-            </AttributeActionsItem>
-          </AttributeActionsContent>
-        </AttributeActions>
-      </AttributeValue>
-    </Attribute>
-  </div>
-);
+HorizontalWithActionsMenuOnly.storyName =
+  'Horizontal With Actions (disableNestedInteractive — menu only)';

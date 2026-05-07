@@ -3,14 +3,11 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const attributeStory = createStoryHelper('data-display-attribute', [
   'Horizontal',
-  'Horizontal Label Truncation',
-  'Horizontal Value Truncation',
+  'Horizontal Truncation',
   'Horizontal Composition',
   'Horizontal Loading',
   'Horizontal With Actions',
-  'Horizontal With Actions Badge',
-  'Horizontal With Actions Tags',
-  'Horizontal With Actions Ip Overflow',
+  'Horizontal With Actions Menu Only',
 ] as const);
 
 test.describe('Component: Attribute', () => {
@@ -20,13 +17,8 @@ test.describe('Component: Attribute', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render horizontal label truncation correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Horizontal Label Truncation');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render horizontal value truncation correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Horizontal Value Truncation');
+    test('Should render horizontal truncation correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Horizontal Truncation');
       await expect(page).toHaveScreenshot();
     });
 
@@ -43,9 +35,8 @@ test.describe('Component: Attribute', () => {
     test('Should render hover state with full rounded corners on the actions target', async ({
       page,
     }) => {
-      await attributeStory.goto(page, 'Horizontal With Actions Ip Overflow');
+      await attributeStory.goto(page, 'Horizontal With Actions Menu Only');
       const target = page.getByTestId('attr-ip-overflow--target');
-      // Hover an empty area (right edge) to keep the IpList +N popover closed.
       const box = await target.boundingBox();
       if (!box) throw new Error('target box not measurable');
       await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2);
@@ -54,24 +45,10 @@ test.describe('Component: Attribute', () => {
   });
 
   test.describe('Interactions', () => {
-    test('Should open IP overflow popover when +N badge is clicked', async ({ page }) => {
-      await attributeStory.goto(page, 'Horizontal With Actions Ip Overflow');
-
-      const overflowTrigger = page.getByTestId('attr-ip-overflow--list-overflow-trigger');
-      const overflowContent = page.getByTestId('attr-ip-overflow--list-overflow-content');
-      const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
-
-      await expect(overflowTrigger).toBeVisible();
-      await overflowTrigger.click();
-
-      await expect(overflowContent).toBeVisible();
-      await expect(dropdownContent).toBeHidden();
-    });
-
     test('Should open actions dropdown when clicking a non-interactive area of the value', async ({
       page,
     }) => {
-      await attributeStory.goto(page, 'Horizontal With Actions Ip Overflow');
+      await attributeStory.goto(page, 'Horizontal With Actions Menu Only');
 
       const target = page.getByTestId('attr-ip-overflow--target');
       const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
@@ -86,9 +63,7 @@ test.describe('Component: Attribute', () => {
     test('Should open actions dropdown when clicking a plain-text value', async ({ page }) => {
       await attributeStory.goto(page, 'Horizontal With Actions');
 
-      // Source IP row uses data-testid="attribute-horizontal-with-actions" on AttributeActions.
-      // After the TestId cascade fix, AttributeActionsTarget derives "...--target" from it.
-      const target = page.getByTestId('attribute-horizontal-with-actions--target');
+      const target = page.getByTestId('attr-source-ip--target');
       const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
 
       await expect(target).toBeVisible();
@@ -100,7 +75,7 @@ test.describe('Component: Attribute', () => {
     test('Should open actions dropdown when clicking a decorative Badge value', async ({
       page,
     }) => {
-      await attributeStory.goto(page, 'Horizontal With Actions Badge');
+      await attributeStory.goto(page, 'Horizontal With Actions Menu Only');
 
       const badge = page.locator('[data-slot="badge"]').first();
       const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
@@ -114,7 +89,7 @@ test.describe('Component: Attribute', () => {
     test('Should open actions dropdown when clicking a decorative Tag inside an OverflowList', async ({
       page,
     }) => {
-      await attributeStory.goto(page, 'Horizontal With Actions Tags');
+      await attributeStory.goto(page, 'Horizontal With Actions Menu Only');
 
       const tag = page.locator('[data-slot="tag"]:visible').first();
       const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
