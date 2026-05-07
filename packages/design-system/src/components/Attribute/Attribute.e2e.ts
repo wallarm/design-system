@@ -99,5 +99,21 @@ test.describe('Component: Attribute', () => {
 
       await expect(dropdownContent).toBeVisible();
     });
+
+    test('Should open IP overflow popover and not the dropdown in default mode', async ({
+      page,
+    }) => {
+      await attributeStory.goto(page, 'Horizontal With Actions');
+
+      const overflowTrigger = page.getByTestId('attr-ip-overflow--list-overflow-trigger');
+      const overflowContent = page.getByTestId('attr-ip-overflow--list-overflow-content');
+      const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
+
+      await expect(overflowTrigger).toBeVisible();
+      await overflowTrigger.click();
+
+      await expect(overflowContent).toBeVisible();
+      await expect(dropdownContent).toBeHidden();
+    });
   });
 });
