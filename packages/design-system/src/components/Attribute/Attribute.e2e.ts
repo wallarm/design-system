@@ -75,7 +75,7 @@ test.describe('Component: Attribute', () => {
     test('Should open actions dropdown when clicking a decorative Badge value', async ({
       page,
     }) => {
-      await attributeStory.goto(page, 'Horizontal With Actions Menu Only');
+      await attributeStory.goto(page, 'Horizontal With Actions');
 
       const badge = page.locator('[data-slot="badge"]').first();
       const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
@@ -89,7 +89,7 @@ test.describe('Component: Attribute', () => {
     test('Should open actions dropdown when clicking a decorative Tag inside an OverflowList', async ({
       page,
     }) => {
-      await attributeStory.goto(page, 'Horizontal With Actions Menu Only');
+      await attributeStory.goto(page, 'Horizontal With Actions');
 
       const tag = page.locator('[data-slot="tag"]:visible').first();
       const dropdownContent = page.locator('[data-scope="menu"][data-part="content"]');
