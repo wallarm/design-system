@@ -3,17 +3,13 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { DropdownMenuTrigger } from '../DropdownMenu';
 
-// Descendants matching this selector are treated as their own interactive zone:
-// clicking them does not open the AttributeActions dropdown.
-//
-// `[aria-haspopup]` covers Ark UI / Radix popover, menu, and dialog triggers
-// composed via Slot (`asChild`), which don't always carry `role="button"` but
-// do set aria-haspopup. Self-match is filtered out by the `match !== currentTarget`
-// guard in `isFromInternalInteractive` (Zag's own Menu.Trigger sets aria-haspopup
-// on the AttributeActionsTarget div itself).
-//
-// `[data-attribute-actions-skip]` is an internal escape hatch for non-standard
-// interactive zones inside the value. Not part of the public API.
+// Descendants matching this selector are nested interactive zones — clicks on
+// them run their own behavior and do not open the dropdown.
+// `[aria-haspopup]` covers Ark UI / Radix popover, menu and dialog triggers
+// composed via Slot (asChild) — they don't always carry role="button" but
+// always set aria-haspopup. Self-match is filtered by `match !== currentTarget`
+// because Zag's Menu.Trigger sets aria-haspopup on this same div.
+// `[data-attribute-actions-skip]` is an internal escape hatch (not public API).
 const INTERACTIVE_SELECTOR = [
   'a[href]',
   'button',
@@ -31,6 +27,7 @@ const INTERACTIVE_SELECTOR = [
   '[contenteditable="true"]',
   '[aria-haspopup]',
   '[data-attribute-actions-skip]',
+  '[data-slot="inline-code-snippet"]',
 ].join(',');
 
 const isFromInternalInteractive = (
@@ -45,6 +42,16 @@ const isFromInternalInteractive = (
 export interface AttributeActionsTargetProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
   children: ReactNode;
+  /**
+   * When true, descendants are rendered `inert` — they cannot be clicked,
+   * focused, or read by assistive tech as actionable. Any interaction with the
+   * target (mouse or keyboard) opens the AttributeActions dropdown.
+   *
+   * Default `false` — descendants keep their own behavior; clicking them does
+   * not open the dropdown. The dropdown opens only when the surrounding target
+   * area is clicked.
+   */
+  disableNestedInteractive?: boolean;
 }
 
 export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
@@ -53,6 +60,7 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
   className,
   onClick,
   onKeyDown,
+  disableNestedInteractive = false,
   ...props
 }) => {
   const testId = useTestId('target');
@@ -60,6 +68,7 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
   const handleClick = (event: MouseEvent<HTMLDivElement>) => {
     onClick?.(event);
     if (event.defaultPrevented) return;
+    if (disableNestedInteractive) return;
     if (isFromInternalInteractive(event)) {
       event.preventDefault();
     }
@@ -68,6 +77,7 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     onKeyDown?.(event);
     if (event.defaultPrevented) return;
+    if (disableNestedInteractive) return;
     if ((event.key === 'Enter' || event.key === ' ') && isFromInternalInteractive(event)) {
       event.preventDefault();
     }
@@ -89,7 +99,9 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
           className,
         )}
       >
-        {children}
+        <div className='contents' inert={disableNestedInteractive || undefined}>
+          {children}
+        </div>
       </div>
     </DropdownMenuTrigger>
   );
