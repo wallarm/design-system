@@ -152,22 +152,12 @@ export const useChipEditing = ({
     ],
   );
 
-  /** Reset segment-level editing state (shared by clearEditing and cancelSegmentEdit) */
-  const resetSegmentState = useCallback(() => {
+  const clearEditing = useCallback(() => {
+    setEditingChipId(null);
     setEditingSegment(null);
     setSegmentFilterText('');
     setUserHasTyped(false);
   }, []);
-
-  const clearEditing = useCallback(() => {
-    setEditingChipId(null);
-    resetSegmentState();
-  }, [resetSegmentState]);
-
-  const cancelSegmentEdit = useCallback(() => {
-    resetSegmentState();
-    setMenuState('closed');
-  }, [resetSegmentState, setMenuState]);
 
   /** Wraps setSegmentFilterText to track user typing */
   const handleSegmentFilterChange = useCallback((text: string) => {
@@ -199,7 +189,6 @@ export const useChipEditing = ({
       resetSegmentTyping,
       handleChipClick,
       clearEditing,
-      cancelSegmentEdit,
     }),
     [
       editingChipId,
@@ -210,7 +199,6 @@ export const useChipEditing = ({
       resetSegmentTyping,
       handleChipClick,
       clearEditing,
-      cancelSegmentEdit,
     ],
   );
 };

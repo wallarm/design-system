@@ -193,6 +193,43 @@ describe('FilterInput', () => {
     });
   });
 
+  describe('AS-929: state leak after segment edit cancel', () => {
+    it('reopens field menu after editing a value segment, blurring, and removing the chip', async () => {
+      const user = userEvent.setup();
+      const condition: Condition = {
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      };
+
+      render(<FilterInput fields={sampleFields} value={condition} />);
+
+      const input = screen.getByRole('combobox');
+
+      // Step 1: Click value segment to enter editing mode.
+      const valueSegment = screen.getByRole('button', { name: /Edit filter value/i });
+      await user.click(valueSegment);
+
+      // Sanity: segment is now an editable input.
+      const segmentInput = screen.getByLabelText('Filter value');
+      expect(segmentInput.tagName).toBe('INPUT');
+
+      // Step 2: Blur the segment by focusing back to the main input
+      // (cursor leaves the value segment but stays inside FilterInput).
+      input.focus();
+
+      // Step 3: Remove the chip via the X button.
+      const removeButton = screen.getByRole('button', { name: 'Remove filter' });
+      await user.click(removeButton);
+
+      // Step 4: Click the main input — the field dropdown must reopen.
+      await user.click(input);
+
+      expect(input).toHaveAttribute('aria-expanded', 'true');
+    });
+  });
+
   describe('getSuggestions-backed fields (AS-877)', () => {
     const staticCodeField: FieldMetadata = {
       name: 'code',
