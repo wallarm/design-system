@@ -228,6 +228,36 @@ describe('FilterInput', () => {
 
       expect(input).toHaveAttribute('aria-expanded', 'true');
     });
+
+    it('reopens field menu after Escape cancels a value segment edit and the chip is removed', async () => {
+      const user = userEvent.setup();
+      const condition: Condition = {
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      };
+
+      render(<FilterInput fields={sampleFields} value={condition} />);
+
+      const input = screen.getByRole('combobox');
+
+      const valueSegment = screen.getByRole('button', { name: /Edit filter value/i });
+      await user.click(valueSegment);
+
+      // Cancel segment edit via Escape — same code path as blur, but a
+      // different entry point (handleSegmentEditKeyDown). Pinning the post-
+      // Escape state guards against the editing-state leak resurfacing on
+      // either trigger.
+      await user.keyboard('{Escape}');
+
+      const removeButton = screen.getByRole('button', { name: 'Remove filter' });
+      await user.click(removeButton);
+
+      await user.click(input);
+
+      expect(input).toHaveAttribute('aria-expanded', 'true');
+    });
   });
 
   describe('getSuggestions-backed fields (AS-877)', () => {
