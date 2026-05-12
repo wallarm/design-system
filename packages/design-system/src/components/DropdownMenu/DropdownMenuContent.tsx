@@ -17,7 +17,7 @@ import {
   ScrollAreaScrollbar,
   ScrollAreaViewport,
 } from '../ScrollArea';
-import { dropdownMenuClassNames } from './classes';
+import { dropdownMenuClassNames, dropdownPositionerClassName } from './classes';
 import { DropdownMenuFooter } from './DropdownMenuFooter';
 import { DropdownMenuInput } from './DropdownMenuInput';
 
@@ -50,7 +50,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
 
   return (
     <Portal>
-      <Menu.Positioner>
+      <Menu.Positioner className={dropdownPositionerClassName}>
         <Menu.Content
           ref={ref}
           data-testid={testId}

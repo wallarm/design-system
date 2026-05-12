@@ -1,16 +1,27 @@
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
+/**
+ * Layer-aware z-index applied to the *positioner* element of floating
+ * surfaces (Menu.Positioner / Select.Positioner). The positioner is where
+ * floating-ui sets `position: absolute; transform: translate(...)`, which
+ * creates a stacking context — so we have to set z-index *here*, not on the
+ * Content inside, otherwise the dropdown stacks below any sibling stacking
+ * context at the same level (e.g. a Drawer positioner at z-50).
+ *
+ * Formula mirrors the Drawer / Dialog positioners. Values come from
+ * src/theme/components/drawer.css (--drawer-positioner-z-index = 50,
+ * --drawer-level-ratio = 20, --layer-index defaulted to 0 on :root). Zag's
+ * dismissable layer stack overrides --layer-index inline on the rendered
+ * content node when nested in a parent dismissable layer.
+ */
+export const dropdownPositionerClassName =
+  'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index)*var(--drawer-level-ratio)))]';
+
 export const dropdownMenuClassNames = cn(
   // Dimensions
   'flex flex-col gap-1 min-w-128',
-  // Leveling and scrolling — layer-aware so dropdowns opened inside a Drawer
-  // or Dialog stack above their parent surface. Mirrors the formula used in
-  // drawer/dialog positioners. The CSS variables resolve via :root defaults
-  // declared in src/theme/components/drawer.css (--drawer-positioner-z-index,
-  // --drawer-level-ratio, --layer-index), and Zag's dismissable layer stack
-  // overrides --layer-index inline on the rendered content when nested.
-  'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index)*var(--drawer-level-ratio)))]',
+  // Scrolling
   'overflow-y-auto overflow-x-hidden outline-none',
   // Visual
   'rounded-12 border border-border-primary-light bg-bg-surface-2 p-8 font-sans text-text-primary shadow-md outline-none',

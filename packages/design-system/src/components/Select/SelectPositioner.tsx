@@ -2,13 +2,13 @@ import type { FC } from 'react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
 import { cn } from '../../utils/cn';
-import { dropdownMenuClassNames } from '../DropdownMenu';
+import { dropdownMenuClassNames, dropdownPositionerClassName } from '../DropdownMenu';
 
 type SelectPositionerProps = ArkUiSelect.PositionerProps;
 
 export const SelectPositioner: FC<SelectPositionerProps> = ({ className, children, ...props }) => (
   <ArkUiPortal>
-    <ArkUiSelect.Positioner {...props} className='outline-none'>
+    <ArkUiSelect.Positioner {...props} className={cn('outline-none', dropdownPositionerClassName)}>
       <ArkUiSelect.Content
         className={cn(
           dropdownMenuClassNames,

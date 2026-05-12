@@ -2,6 +2,7 @@ export {
   dropdownMenuClassNames,
   dropdownMenuItemVariants,
   dropdownMenuLabelVariants,
+  dropdownPositionerClassName,
 } from './classes';
 export { DropdownMenu } from './DropdownMenu';
 export { DropdownMenuContent } from './DropdownMenuContent';
