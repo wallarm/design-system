@@ -5,4 +5,10 @@
     --drawer-pushed-back-scale: 0.98;
     --drawer-pushed-back-ratio: 0.02;
     --drawer-pushed-back-offset: 60px;
+    /* Default layer index for floating content (DropdownMenu, Select, Combobox)
+       rendered outside a dismissable parent. Zag's layer stack overrides this
+       inline on the rendered content node when the floating element is
+       nested inside a Drawer/Dialog, so the calc in dropdownMenuClassNames
+       resolves to the correct stacking order in both cases. */
+    --layer-index: 0;
 }

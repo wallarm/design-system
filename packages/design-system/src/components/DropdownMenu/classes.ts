@@ -4,13 +4,13 @@ import { cn } from '../../utils/cn';
 export const dropdownMenuClassNames = cn(
   // Dimensions
   'flex flex-col gap-1 min-w-128',
-  // Leveling and scrolling — layer-aware so dropdowns opened inside a Drawer or
-  // Dialog stack above their parent surface. Falls back to z-50 when used
-  // standalone (no parent layer => --layer-index defaults to 0). Mirrors the
-  // formula used in drawer/dialog positioners; values come from
-  // src/theme/components/drawer.css (--drawer-positioner-z-index = 50,
-  // --drawer-level-ratio = 20).
-  'z-[calc(var(--drawer-positioner-z-index,50)+(var(--layer-index,0)*var(--drawer-level-ratio,20)))]',
+  // Leveling and scrolling — layer-aware so dropdowns opened inside a Drawer
+  // or Dialog stack above their parent surface. Mirrors the formula used in
+  // drawer/dialog positioners. The CSS variables resolve via :root defaults
+  // declared in src/theme/components/drawer.css (--drawer-positioner-z-index,
+  // --drawer-level-ratio, --layer-index), and Zag's dismissable layer stack
+  // overrides --layer-index inline on the rendered content when nested.
+  'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index)*var(--drawer-level-ratio)))]',
   'overflow-y-auto overflow-x-hidden outline-none',
   // Visual
   'rounded-12 border border-border-primary-light bg-bg-surface-2 p-8 font-sans text-text-primary shadow-md outline-none',
