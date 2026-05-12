@@ -1,49 +1,20 @@
 import type { FC } from 'react';
 import { useTestId } from '../../../utils/testId';
-import { Link } from '../../Link';
-import { HStack } from '../../Stack';
-import { Text } from '../../Text';
+import { BulkBarSummary } from '../../BulkBar/BulkBarSummary';
 import { useTableContext } from '../TableContext';
 
 export const TableActionBarSelection: FC = () => {
   const { table } = useTableContext();
   const testId = useTestId('action-bar-selection');
-  const count = Object.keys(table.getState().rowSelection).length;
-  const allSelected = table.getIsAllRowsSelected();
-
-  const handleSelectAll = () => {
-    table.toggleAllRowsSelected(true);
-  };
-
-  const handleClear = () => {
-    table.resetRowSelection();
-  };
 
   return (
-    <div data-testid={testId} className='flex items-center gap-16 p-8'>
-      <Text size='sm' color='primary-alt' weight='medium'>
-        {count} selected
-      </Text>
-
-      <HStack gap={6}>
-        <Link
-          type={allSelected ? 'muted' : 'alt'}
-          size='md'
-          onClick={handleSelectAll}
-          disabled={allSelected}
-        >
-          Select all
-        </Link>
-
-        <Text size='sm' color='tertiary-alt' weight='medium'>
-          ·
-        </Text>
-
-        <Link type='alt' size='md' onClick={handleClear}>
-          Clear
-        </Link>
-      </HStack>
-    </div>
+    <BulkBarSummary
+      data-testid={testId}
+      count={Object.keys(table.getState().rowSelection).length}
+      isAllSelected={table.getIsAllRowsSelected()}
+      onSelectAll={() => table.toggleAllRowsSelected(true)}
+      onClear={() => table.resetRowSelection()}
+    />
   );
 };
 

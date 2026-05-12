@@ -242,6 +242,18 @@ export const useFilterInputAutocomplete = ({
     [selectedField, editing],
   );
 
+  // Cancel segment edit must clear ALL autocomplete state, not just the
+  // segment-level state. Leaving `selectedField` / `selectedOperator` /
+  // `editingChipId` set after a blur-cancel leaks "building" state into the
+  // main input: handleInputClick gates on `!selectedField` and would refuse
+  // to reopen the field menu when the user clicks back into the input. AS-929.
+  const cancelSegmentEdit = useCallback(() => {
+    setSelectedField(null);
+    setSelectedOperator(null);
+    editing.clearEditing();
+    setMenuState('closed');
+  }, [editing]);
+
   // ── Public API ────────────────────────────────────────────
 
   return {
@@ -283,7 +295,7 @@ export const useFilterInputAutocomplete = ({
     segmentFilterText: editing.segmentFilterText,
     segmentMenuFilterText: editing.segmentMenuFilterText,
     handleSegmentFilterChange,
-    cancelSegmentEdit: editing.cancelSegmentEdit,
+    cancelSegmentEdit,
     handleCustomValueCommit,
     handleCustomAttributeCommit,
     menuRef,
