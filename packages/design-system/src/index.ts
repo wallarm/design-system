@@ -39,6 +39,16 @@ export {
   type AlertTitleProps,
 } from './components/Alert';
 export {
+  AppShell,
+  AppShellHeader,
+  type AppShellHeaderProps,
+  type AppShellProps,
+  AppShellRail,
+  type AppShellRailProps,
+  AppShellRemote,
+  type AppShellRemoteProps,
+} from './components/AppShell';
+export {
   Attribute,
   AttributeActions,
   AttributeActionsContent,
@@ -265,6 +275,18 @@ export {
 export { Kbd, KbdGroup } from './components/Kbd';
 export { Link, type LinkProps } from './components/Link';
 export { Loader, type LoaderProps } from './components/Loader';
+export {
+  NavRail,
+  NavRailBody,
+  type NavRailBodyProps,
+  NavRailFooter,
+  type NavRailFooterProps,
+  NavRailItem,
+  type NavRailItemProps,
+  type NavRailProps,
+  NavRailSeparator,
+  type NavRailSeparatorProps,
+} from './components/NavRail';
 export { NumberInput, type NumberInputProps } from './components/NumberInput';
 export {
   NumericBadge,
@@ -434,6 +456,14 @@ export {
   type TooltipProps,
   TooltipTrigger,
 } from './components/Tooltip';
+export {
+  TopHeader,
+  TopHeaderActions,
+  type TopHeaderActionsProps,
+  TopHeaderLogo,
+  type TopHeaderLogoProps,
+  type TopHeaderProps,
+} from './components/TopHeader';
 export {
   type BeaconStepEffectOptions,
   beaconStepEffect,
