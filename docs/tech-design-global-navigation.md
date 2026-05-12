@@ -7,21 +7,20 @@
 
 ## 1. Overview
 
-Global Navigation is the Wallarm Console navigation system, split between MFE Host and MFE Remote. It consists of three physical zones on the screen:
+Global Navigation is the Wallarm Console navigation system, split between MFE Host and MFE Remote. It consists of three visual zones on the screen:
 
 | Zone | Owner | Description |
 |------|-------|-------------|
 | **Top Header** | Host | Logo, global search, tenant switcher, limits, docs, notifications, AI assistant |
-| **L1 Sidebar** | Host | Product-level navigation. Has two modes: **expanded** (icon + text, ~200px) on the Home page without L2, and **collapsed** (icons only, ~64px) when the L2 product panel is open |
-| **L2+ Sidebar** (navigation panel) | Remote | Panel with a text-based menu within the selected product. Supports infinite drill-down with content replacement |
-| **Breadcrumb** | Remote | Breadcrumbs above the content area. Segments can be links, scope-switcher dropdowns, or static text depending on the section context |
+| **L1 Sidebar** | Host | Product-level navigation. Has two modes: **expanded** (icon + text, ~200px) on the Home page, and **collapsed** (icons only, ~64px) when a product is active |
+| **Remote Area** | Remote | Single opaque slot. Remote owns its internal layout: L2+ navigation panel, breadcrumb, and content area. Host has no knowledge of this subdivision |
 
 **Mode with L2 (product page) — L1 collapsed:**
 ```
 ┌──────────────────────────────────────────────────────────────┐
 │  [Logo]      [Search ⌘K]   [Tenant ˅] [limits] [?] [bell] [AI] │  ← Host: TopHeader
-├─────┬────────────┬───────────────────────────────────────────┤
-│ ic  │ Product    │  Breadcrumb: Product > Segment > Page     │  ← Remote: Breadcrumb
+├─────┬────────────────────────────────────────────────────────┤
+│ ic  │ Product    │  Breadcrumb: Product > Segment > Page     │
 │ ic  │────────────│───────────────────────────────────────────│
 │ ic  │ ← Back     │                                           │
 │ ic  │ Entity     │           Content Area                    │
@@ -31,9 +30,11 @@ Global Navigation is the Wallarm Console navigation system, split between MFE Ho
 │     │ Group ˅    │                                           │
 │ ic  │  └ Child   │                                           │
 │ AV  │            │                                           │
-├─────┴────────────┴───────────────────────────────────────────┤
-│ Host: L1 (collapsed) │   Remote: L2+ Panel + Content         │
-└──────────────────────────────────────────────────────────────┘
+├─────┼────────────┴───────────────────────────────────────────┤
+│Host │           Remote Area (single opaque slot)              │
+│ L1  │  Remote decides its own internal layout via             │
+│     │  RemoteShell: panel + breadcrumb + content              │
+└─────┴────────────────────────────────────────────────────────┘
 ```
 
 **Mode without L2 (Home) — L1 expanded:**
@@ -52,7 +53,7 @@ Global Navigation is the Wallarm Console navigation system, split between MFE Ho
 │ ic  Settings │                                               │
 │ AV  User     │                                               │
 ├──────────────┴───────────────────────────────────────────────┤
-│ Host: L1 (expanded, ~200px)  │  Content (no L2 panel)        │
+│ Host: L1 (expanded, ~200px)  │  Content (no Remote area)     │
 └──────────────────────────────────────────────────────────────┘
 ```
 
@@ -66,15 +67,17 @@ L1 has **two display modes** that switch automatically:
 
 | Mode | Width | Content | When active |
 |------|-------|---------|-------------|
-| **Expanded** | ~200px | Icon + text label | Home page (no L2 panel present) |
-| **Collapsed** | ~64px | Icon only | Any product page (L2 panel is open) |
+| **Expanded** | ~200px | Icon + text label | Home page (no product active) |
+| **Collapsed** | ~64px | Icon only | Any product page (Remote area is active) |
 
 **L1 elements (examples):**
 - Home (link to root page)
-- Recent (button → popover with visit history)
+- Recent (button → popover with recently visited **products** only, not individual pages)
 - Product sections (links to default product pages)
 - Settings (link, pinned to bottom)
 - User avatar (button → dropdown menu, pinned to bottom)
+
+> **Note — Recent:** Phase 1 delivers the Recent UI only (popover shell, list layout), without a data implementation. The data strategy — how Host learns which products were recently active — is deferred. Host already holds product registration info (root link, name, manifest address) for each MFE, which is sufficient to build the Recent list once a tracking mechanism is chosen. A `RecentApi` event bus was considered and rejected: Remotes could spam events, and the Host can derive the active product from the URL's first segment without any Remote cooperation.
 
 **Keyboard shortcuts:**
 Each L1 element has a bound keyboard shortcut in chord-sequence format (e.g., `G` then `E`). The shortcut is shown in the tooltip on hover in collapsed mode and next to the label in expanded mode.
@@ -84,20 +87,20 @@ Each L1 element has a bound keyboard shortcut in chord-sequence format (e.g., `G
 - `hover` — background highlight + tooltip with name and keyboard shortcut
 - `active` — colored accent background, current product
 
-**Behavior:** Clicking a product element navigates to the product's default page. L1 switches to collapsed mode, and the L2 panel appears with the selected product's menu.
+**Behavior:** Clicking a product element navigates to the product's default page. L1 switches to collapsed mode, and the Remote area becomes active.
 
 ### 2.2. L2 — Product Menu (Remote)
 
-Panel ~240px wide, appears when a product is selected in L1. Contains:
+Panel ~240px wide, rendered by Remote inside the Remote area. Contains:
 - **Heading** (product name)
 - **Flat list** of navigation elements
 
 **L2 element types:**
 | Type | Description | Example |
 |------|-------------|---------|
-| `link` | Direct link → navigation | Leaf page of a section (overview, list, dashboard) |
+| `link` | Direct link → navigation to a terminal page | Leaf page (Overview, Settings) |
+| `drill` | Link to an entity list. Selecting a specific entity triggers a **drill-down** — the panel replaces its content with the next level | Entity list that drills into entity detail |
 | `group` | Expandable section (accordion) with nested links. Supports arbitrary nesting (group within group) | Parent category ˅ → child pages |
-| `drill` | Link to an entity list; when a specific entity is selected, the menu "drills down" to L3 | Entity list → specific entity |
 
 **Element states:**
 - `default`
@@ -122,10 +125,11 @@ Product Name                 ← Parent Section     ← back button (button, NOT
                                ...
 ```
 
-**Back button:**
-- Displays `← {parent section name}` (e.g., `← {Section A}`)
-- Click does **NOT trigger routing** — it only visually returns the L2 panel to the previous menu level
-- URL and content area remain unchanged
+**Back button — three invariants:**
+
+1. **Multi-level:** The back button can be pressed multiple times, all the way to the root level (L2) of the product. At the root level, the button is hidden (there is nowhere to go further).
+2. **In-memory only:** Peek state does not survive refresh and is not written to the URL or `history.state`.
+3. **Reset on navigation:** Any actual navigation — clicking a link in the panel, browser back/forward, or changing products in L1 — resets peek depth to 0, snapping the panel back to the level that matches the current URL.
 
 **Recursion:** L3 can have its own drill-down elements, going to L4, L5, and beyond. Each level works on the same principle — the back button returns to the previous menu level without changing the URL.
 
@@ -140,7 +144,7 @@ The breadcrumb is built from segments, each segment's type determined by the sec
 | Segment type | Visual | Behavior | When used |
 |-------------|--------|----------|-----------|
 | `link` | Text link | Click → navigates to page | Product (first segment), or entity with its own page |
-| `scope-switcher` | Text + chevron ˅ | Click → dropdown with sibling entity list for scope switching | Entity from a drill-down level that has siblings available for switching |
+| `scope-switcher` | Text + chevron ˅ | Click → dropdown with sibling entity list for scope switching | Entity from a `drill` node in the nav config — the explicit `type: 'drill'` is the signal for rendering a scope-switcher |
 | `static` | Plain text | No action | Last segment (current page), and intermediate segments from accordion groups that have no pages of their own |
 
 ### 3.2. Breadcrumb Examples
@@ -151,7 +155,7 @@ Product  >  Entity A ˅  >  Entity B ˅  >  Page
   ↑            ↑               ↑            ↑
  link     scope-switcher  scope-switcher  static
 ```
-A scope-switcher appears when the segment represents a specific entity selected from a list (drill-down) and it has siblings (other entities of the same type) that can be switched between.
+A scope-switcher appears when the segment corresponds to a `drill` node in the nav config — the explicit `type: 'drill'` is the declarative signal for `matchNav` to produce a scope-switcher breadcrumb segment.
 
 **Accordion nesting without scope-switcher:**
 ```
@@ -188,11 +192,10 @@ Each item contains: name + description/metadata (optional). Selecting another it
 
 ```
 AppShell/
-├── AppShell.tsx                 — root layout: grid with header, rail, panel, content zones
-├── AppShellHeader.tsx           — top header (slot)
+├── AppShell.tsx                 — root layout: grid with header, rail, remote-area zones
+├── AppShellHeader.tsx           — top header slot
 ├── AppShellRail.tsx             — container for L1 icon rail
-├── AppShellPanel.tsx            — container for L2+ panel
-├── AppShellContent.tsx          — main content area
+├── AppShellRemote.tsx           — single opaque slot for Remote MFE
 ├── classes.ts
 ├── types.ts
 └── index.ts
@@ -215,16 +218,30 @@ TopHeader/
 ### 4.2. Remote Components (design system)
 
 ```
+RemoteShell/
+├── RemoteShell.tsx              — Remote-internal layout: panel + breadcrumb + content
+├── RemoteShellPanel.tsx         — slot for NavPanel
+├── RemoteShellBreadcrumb.tsx    — slot for Breadcrumbs
+├── RemoteShellContent.tsx       — slot for page content
+├── classes.ts
+└── index.ts
+
 NavPanel/
 ├── NavPanel.tsx                 — root container for L2+ panel
 ├── NavPanelHeader.tsx           — level heading (product/entity name)
 ├── NavPanelBack.tsx             — "← back" button (visual level switch only)
 ├── NavPanelItem.tsx             — navigation element (link | button)
 ├── NavPanelGroup.tsx            — expandable group (accordion)
+├── NavPanelGroupLabel.tsx       — composable label area for groups
 ├── NavPanelGroupItem.tsx        — element within a group
 ├── NavPanelDivider.tsx          — divider
 ├── classes.ts
 ├── types.ts
+└── index.ts
+
+PageTitle/
+├── PageTitle.tsx                — semantic page title, publishes to NavLabelsContext
+├── NavLabelsContext.tsx          — context for label overrides
 └── index.ts
 ```
 
@@ -250,7 +267,7 @@ Breadcrumbs/ (extending existing)
   </AppShellHeader>
 
   <AppShellRail>
-    {/* collapsed={true} when L2 panel is open, false on Home */}
+    {/* collapsed={true} when a product is active */}
     <NavRail collapsed={hasActiveProduct}>
       <NavRailItem icon={HomeIcon} label="Home" href="/" />
       <NavRailItem icon={ClockIcon} label="Recent" onClick={openRecent} />
@@ -259,190 +276,153 @@ Breadcrumbs/ (extending existing)
       <NavRailItem icon={ProductBIcon} label="Product B" shortcut={['G', 'B']} href="/product-b" />
       {/* ...other products... */}
       <NavRailSeparator />
-      <NavRailItem icon={SettingsIcon} label="Settings" shortcut={['G', 'S']} href="/settings" pinned="bottom" />
-      <NavRailItem icon={UserAvatar} label="User" onClick={openUserMenu} pinned="bottom" />
+      {/* Pinned-to-bottom items are positioned by the rail's composition (flexbox/spacer), not via a per-item prop */}
+      <NavRailItem icon={SettingsIcon} label="Settings" shortcut={['G', 'S']} href="/settings" />
+      <NavRailItem icon={UserAvatar} label="User" onClick={openUserMenu} />
     </NavRail>
   </AppShellRail>
 
-  <AppShellPanel>
-    {/* Remote MFE renders here via slot/portal */}
-    <NavPanel>
-      <NavPanelBack onClick={goBackLevel}>{parentSectionLabel}</NavPanelBack>
-      <NavPanelHeader>{entityName}</NavPanelHeader>
-      <NavPanelItem href="..." active>Overview</NavPanelItem>
-      <NavPanelItem href="...">Sub-section A</NavPanelItem>
-      <NavPanelItem href="...">Sub-section B</NavPanelItem>
-      <NavPanelGroup label="Group">
-        <NavPanelGroupItem href="...">Child A</NavPanelGroupItem>
-        <NavPanelGroupItem href="...">Child B</NavPanelGroupItem>
-      </NavPanelGroup>
-    </NavPanel>
-  </AppShellPanel>
-
-  <AppShellContent>
-    {/* Remote MFE renders breadcrumb + page content */}
-    <Breadcrumbs>
-      <BreadcrumbsItem href="...">Product</BreadcrumbsItem>
-      {/* scope-switcher — only if the segment represents a drill-down entity */}
-      <BreadcrumbsScopeSwitcher value={currentId} items={siblings} onSelect={handleScopeSwitch}>
-        {entityName}
-      </BreadcrumbsScopeSwitcher>
-      {/* static — for accordion groups without their own pages */}
-      <BreadcrumbsItem>Current Page</BreadcrumbsItem>
-    </Breadcrumbs>
-    {children}
-  </AppShellContent>
+  <AppShellRemote>
+    {/* Remote MFE renders here — Host has no knowledge of internal layout */}
+  </AppShellRemote>
 </AppShell>
+
+{/* Remote (inside AppShellRemote slot) */}
+<ProductNav config={productANavConfig}>
+  <RemoteShell>
+    <RemoteShellPanel>
+      <NavPanel>
+        <NavPanelBack onClick={goBackLevel}>{parentSectionLabel}</NavPanelBack>
+        <NavPanelHeader>{entityName}</NavPanelHeader>
+        <NavPanelItem href="..." active>Overview</NavPanelItem>
+        <NavPanelItem href="...">Sub-section A</NavPanelItem>
+        <NavPanelItem href="...">Sub-section B</NavPanelItem>
+        <NavPanelGroup>
+          <NavPanelGroupLabel>Group</NavPanelGroupLabel>
+          <NavPanelGroupItem href="...">Child A</NavPanelGroupItem>
+          <NavPanelGroupItem href="...">Child B</NavPanelGroupItem>
+        </NavPanelGroup>
+      </NavPanel>
+    </RemoteShellPanel>
+
+    <RemoteShellBreadcrumb>
+      <Breadcrumbs>
+        <BreadcrumbsItem href="...">Product</BreadcrumbsItem>
+        {/* scope-switcher — only if the segment represents a drill-down entity */}
+        <BreadcrumbsScopeSwitcher value={currentId} items={siblings} onSelect={handleScopeSwitch}>
+          {entityName}
+        </BreadcrumbsScopeSwitcher>
+        {/* static — for accordion groups without their own pages */}
+        <BreadcrumbsItem>Current Page</BreadcrumbsItem>
+      </Breadcrumbs>
+    </RemoteShellBreadcrumb>
+
+    <RemoteShellContent>
+      {/* Product's own router renders the page */}
+      <ProductRouter />
+    </RemoteShellContent>
+  </RemoteShell>
+</ProductNav>
 ```
 
 ---
 
-## 5. Drill-Down State Management (Remote)
+## 5. Navigation State Model
 
-### 5.1. Menu Data Model
+### 5.1. Principle: Derived from Pathname
+
+The navigation stack is **not stored as state** — it is computed from the URL on every render. The only mutable piece of state is `peekDepth`.
 
 ```typescript
-/** A single navigation element */
-interface NavItem {
-  /** Unique ID */
-  id: string
-  /** Display label */
-  label: string
-  /** Icon (optional, for L1 or visual emphasis only) */
-  icon?: ComponentType<SvgIconProps>
-  /** URL for routing. If absent — the element is a group or drill trigger */
-  href?: string
-  /** Nested elements for an accordion group (expand/collapse within current level) */
-  children?: NavItem[]
-  /** If true — click does not navigate but "drills" the menu into the next level */
-  drill?: boolean
-}
-
-/** Configuration for a single drill-down level */
-interface NavLevel {
-  /** Level heading (entity name) */
+/** Computed navigation stack entry */
+interface NavStackEntry {
+  /** Level heading (product name or entity name) */
   title: string
-  /** Parent section name (for back button). Null at L2 (product root level) */
+  /** Parent section name (for back button). Null at root L2 level */
   parentLabel: string | null
   /** Menu items at this level */
-  items: NavItem[]
+  items: NavConfigNode[]
+  /** Active item ID within this level */
+  activeItemId: string | null
 }
+
+/**
+ * Pure function: pathname + config → full navigation stack.
+ * Called on every render via useMemo.
+ */
+function parseStackFromPath(pathname: string, config: NavConfig): NavStackEntry[]
 ```
 
-### 5.2. Level Stack
+### 5.2. peekDepth
 
-The Remote MFE maintains a **level stack** for drill-down navigation in the sidebar:
+`peekDepth` is the only mutable state in the navigation system:
 
 ```typescript
-interface NavPanelState {
-  /** Menu level stack. The last element is the currently displayed level */
-  levels: NavLevel[]
-}
+const [peekDepth, setPeekDepth] = useState(0);
+// Reset peek on any real navigation
+useEffect(() => { setPeekDepth(0) }, [pathname])
 
-// Example stack for navigation: Product > Section A > Entity 1 > Section B > Entity 2
-const state: NavPanelState = {
-  levels: [
-    { title: 'Product',   parentLabel: null,          items: [/* product root menu */] },
-    { title: 'Entity 1',  parentLabel: 'Section A',   items: [/* Entity 1 menu */] },
-    { title: 'Entity 2',  parentLabel: 'Section B',   items: [/* Entity 2 menu */] },
-  ]
-}
+const maxDepth = navStack.length - 1
+const visible  = navStack[maxDepth - peekDepth]
+const parent   = navStack[maxDepth - peekDepth - 1] // undefined at root → hide back
+
+const goBack = () => setPeekDepth(d => Math.min(d + 1, maxDepth))
 ```
 
-**Operations:**
-| Action | Mutation | Routing |
-|--------|---------|---------|
-| Click on drill element (selecting entity from list) | `levels.push(newLevel)` | Yes — navigates to entity's default page |
-| Click on back button | `levels.pop()` | **No** — visual menu switch only |
-| Click on link within current level | — (active item changes) | Yes — normal navigation |
-| Click on L1 (different product) | `levels = [newProductRoot]` | Yes — navigates to another product |
+- **Range:** `0` (current level — matches URL) to `navStack.length - 1` (root L2 product level)
+- **Back button:** increments `peekDepth` by 1
+- **Hidden at root:** back button is hidden when `peekDepth === navStack.length - 1`
 
-### 5.3. Stack-URL Synchronization
+The panel renders `navStack[navStack.length - 1 - peekDepth]`.
 
-On direct URL access (deep link, refresh), the Remote MFE must reconstruct the stack from the URL:
+**Breadcrumb and content always render from `navStack[navStack.length - 1]`** (the URL-matched level) — they do not subscribe to `peekDepth`. Peek changes re-render only the panel.
 
-```
-URL: /{product}/{section-a}/{entity-1}/{section-b}/{entity-2}/{page}
+### 5.3. peekDepth Reset
 
-Parsing:
-  /{product}                    → L2: product root menu
-  /{section-a}/{entity-1}       → L3: drill into specific entity from section-a
-  /{section-b}/{entity-2}       → L4: drill into specific entity from section-b
-  /{page}                       → active item within L4
+`peekDepth` resets to `0` on any of:
+- Clicking a link in the panel (URL changes)
+- Browser back/forward (URL changes)
+- Changing products in L1 (URL changes)
+- Page refresh (`useState` initializes to `0`)
 
-Result: stack of 3 levels, current — entity-2, active item — page
-```
+Implementation: `useEffect(() => { setPeekDepth(0) }, [pathname])`
 
-Each Remote MFE defines a **route segments → drill levels mapping** based on its route configuration.
+### 5.4. Deep Links and Refresh
+
+Navigation state is fully derived from pathname, so deep links and refresh land on the correct level without any reconstruction. `peekDepth` always starts at `0`.
+
+Each Remote MFE defines a route segments → drill levels mapping in its config. The parser (`parseStackFromPath`) is shared and the same for all products.
 
 ---
 
-## 6. Host ↔ Remote Contract
+## 6. Host ↔ Remote Boundary
 
-### 6.1. Host Provides
+Host and Remote are fully independent applications. They do not communicate directly. Both react to URL changes independently.
 
-```typescript
-interface HostShellContract {
-  /** Slot for rendering the L2+ panel */
-  panelSlot: HTMLElement | PortalTarget
+### 6.1. Shared Medium
 
-  /** Slot for rendering the breadcrumb */
-  breadcrumbSlot: HTMLElement | PortalTarget
+The **only** shared medium is the **pathname**. Host reads the first segment to determine the active product. Remote reads the full path to determine the active page and drill-down stack.
 
-  /** Slot for rendering the main content */
-  contentSlot: HTMLElement | PortalTarget
+### 6.2. Cross-Cutting Concerns
 
-  /** Currently active product (so Remote knows its context) */
-  activeProduct: string
+Cross-cutting concerns (navigation function, tenant, theme) are provided by `@wallarm/sdk` as part of `SdkContextValue`, not by Host directly.
 
-  /** Navigation callback (through host router) */
-  navigate: (path: string) => void
-}
-```
+### 6.3. Host Responsibility
 
-### 6.2. Remote Provides (registration on mount)
+- Rendering `AppShell`, `TopHeader`, `NavRail`
+- Determining active product from the URL's first segment
+- Providing a single opaque Remote-area slot (`AppShellRemote`)
+- Global navigation (switching between products via L1)
 
-```typescript
-interface RemoteNavRegistration {
-  /** Product ID (must match L1 item id) */
-  productId: string
+### 6.4. Remote Responsibility
 
-  /** Default route when product is selected in L1 */
-  defaultRoute: string
-
-  /** Navigation panel render function */
-  renderPanel: (container: HTMLElement) => Disposable
-
-  /** Breadcrumb render function */
-  renderBreadcrumb: (container: HTMLElement) => Disposable
-}
-```
-
-### 6.3. Communication
-
-The strategy depends on the MFE framework (Module Federation, single-spa, etc.), but the contract remains the same:
-
-```
-Host                              Remote
- │                                  │
- │  mount(panelSlot, contentSlot)   │
- │ ────────────────────────────────>│
- │                                  │
- │  Remote renders NavPanel         │
- │  into panelSlot, Breadcrumb      │
- │  into breadcrumbSlot             │
- │                                  │
- │  navigate('/{product}/{section}') │
- │ <────────────────────────────────│  (Remote asks Host to navigate)
- │                                  │
- │  URL changed event               │
- │ ────────────────────────────────>│  (Remote reacts to URL change)
- │                                  │
- │  Back button click               │
- │  (NO navigation, only            │
- │   levels.pop() within Remote)    │
- │                                  │
-```
+- Rendering its own internal layout via `RemoteShell` (panel, breadcrumb, content)
+- Rendering `NavPanel` with all drill-down levels
+- Computing the navigation stack from pathname + config
+- Managing `peekDepth` (the only mutable nav state)
+- Rendering `Breadcrumbs` with scope-switcher segments
+- Rendering page content via its own router
+- Mapping URL → navigation state via `parseStackFromPath`
 
 ---
 
@@ -459,11 +439,11 @@ interface AppShellProps {
 
 CSS Grid layout:
 ```
-grid-template-columns: auto auto 1fr
+grid-template-columns: auto 1fr
 grid-template-rows: auto 1fr
 grid-template-areas:
-  "header  header  header"
-  "rail    panel   content"
+  "header  header"
+  "rail    remote"
 ```
 
 ### 7.2. NavRail
@@ -490,11 +470,11 @@ interface NavRailItemProps {
   onClick?: () => void
   /** Currently active element */
   active?: boolean
-  /** Pin to bottom of rail */
-  pinned?: 'bottom'
   className?: string
 }
 ```
+
+Layout note: pinned-to-bottom items (Settings, User) are positioned by the rail's composition using flexbox/spacer, not via a per-item prop. The container owns the layout — standard pattern for compound components.
 
 ### 7.3. NavPanel
 
@@ -526,21 +506,22 @@ interface NavPanelItemProps {
   active?: boolean
   /** Icon (optional) */
   icon?: ComponentType<SvgIconProps>
-  /** Show chevron (for drill elements indicating nesting) */
-  hasChildren?: boolean
   children: ReactNode
 }
 
 interface NavPanelGroupProps {
-  /** Group label */
-  label: string
   /** Controlled expand state */
   expanded?: boolean
   /** Default state */
   defaultExpanded?: boolean
   /** Toggle callback */
   onExpandedChange?: (expanded: boolean) => void
-  /** Can contain NavPanelGroupItem, NavPanelItem, and nested NavPanelGroup */
+  /** Contains NavPanelGroupLabel, NavPanelGroupItem, NavPanelItem, and nested NavPanelGroup */
+  children: ReactNode
+}
+
+interface NavPanelGroupLabelProps {
+  /** Composable label area — can contain icon, text, badge, tooltip, etc. */
   children: ReactNode
 }
 
@@ -551,17 +532,42 @@ interface NavPanelGroupItemProps {
   children: ReactNode
 }
 
-// Example of nested groups (accordion within accordion):
-// <NavPanelGroup label="Category">
+// Example of composable group label (icon + badge):
+// <NavPanelGroup>
+//   <NavPanelGroupLabel>
+//     <Icon /> Category <Badge>3</Badge>
+//   </NavPanelGroupLabel>
 //   <NavPanelGroupItem href="...">Page A</NavPanelGroupItem>
-//   <NavPanelGroup label="Sub-category">
+//   <NavPanelGroup>
+//     <NavPanelGroupLabel>Sub-category</NavPanelGroupLabel>
 //     <NavPanelGroupItem href="...">Page B</NavPanelGroupItem>
 //     <NavPanelGroupItem href="...">Page C</NavPanelGroupItem>
 //   </NavPanelGroup>
 // </NavPanelGroup>
 ```
 
-### 7.4. BreadcrumbsScopeSwitcher (Breadcrumbs Extension)
+### 7.4. RemoteShell
+
+```typescript
+interface RemoteShellProps {
+  children: ReactNode
+  className?: string
+}
+
+// Sub-components: RemoteShellPanel, RemoteShellBreadcrumb, RemoteShellContent
+// Each accepts children: ReactNode and optional className
+```
+
+CSS Grid layout (inside Remote area):
+```
+grid-template-columns: auto 1fr
+grid-template-rows: auto 1fr
+grid-template-areas:
+  "panel  breadcrumb"
+  "panel  content"
+```
+
+### 7.5. BreadcrumbsScopeSwitcher (Breadcrumbs Extension)
 
 ```typescript
 interface ScopeSwitcherItem {
@@ -653,38 +659,35 @@ All colors via design tokens (Tailwind), no hardcoded values:
 ## 10. Host ↔ Remote Boundary: Who Renders What
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│ HOST renders:                                               │
-│  ┌────────────────────────────────────────────────────────┐ │
-│  │ TopHeader (logo, search, tenant, actions)              │ │
-│  └────────────────────────────────────────────────────────┘ │
-│  ┌────┐ ┌──────────────────────────────────────────────────┐│
-│  │ L1 │ │                                                  ││
-│  │Rail│ │  ┌────────────┐  ┌────────────────────────────┐  ││
-│  │    │ │  │ REMOTE:    │  │ REMOTE:                    │  ││
-│  │ H  │ │  │ NavPanel   │  │ Breadcrumb                 │  ││
-│  │ O  │ │  │ (L2+ menu) │  │─────────────────────────── │  ││
-│  │ S  │ │  │            │  │                             │  ││
-│  │ T  │ │  │            │  │ REMOTE:                    │  ││
-│  │    │ │  │            │  │ Page Content               │  ││
-│  │    │ │  │            │  │                             │  ││
-│  │    │ │  └────────────┘  └────────────────────────────┘  ││
-│  └────┘ └──────────────────────────────────────────────────┘│
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────┐
+│ HOST renders:                                                │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ TopHeader (logo, search, tenant, actions)              │  │
+│  └────────────────────────────────────────────────────────┘  │
+│  ┌────┐ ┌────────────────────────────────────────────────┐   │
+│  │ L1 │ │                                                │   │
+│  │Rail│ │       REMOTE AREA (single opaque slot)         │   │
+│  │    │ │                                                │   │
+│  │ H  │ │  Remote owns its internal layout:              │   │
+│  │ O  │ │  ┌────────────┬───────────────────────────┐    │   │
+│  │ S  │ │  │ NavPanel   │ Breadcrumb                │    │   │
+│  │ T  │ │  │ (L2+ menu) │─────────────────────────  │    │   │
+│  │    │ │  │            │ Page Content               │    │   │
+│  │    │ │  │            │                            │    │   │
+│  │    │ │  └────────────┴───────────────────────────┘    │   │
+│  └────┘ └────────────────────────────────────────────────┘   │
+└──────────────────────────────────────────────────────────────┘
 ```
 
-**Host is responsible for:**
-- Rendering `AppShell`, `TopHeader`, `NavRail`
-- Determining active product by URL
-- Providing slots for Remote (panel, breadcrumb, content)
-- Global navigation (switching between products)
+**Host knows:**
+- Its own L1 config (product list)
+- Active product (derived from URL's first segment)
+- Nothing about Remote internals (panel, breadcrumb, pages)
 
-**Remote is responsible for:**
-- Rendering `NavPanel` with all drill-down levels
-- Managing the level stack (`levels[]`)
-- Rendering `Breadcrumbs` with scope-switcher
-- Rendering page content
-- Mapping URL → menu state on deep link / refresh
+**Remote knows:**
+- Its own nav config (menu structure)
+- Full pathname (for stack computation and routing)
+- Nothing about Host or other Remotes
 
 ---
 
@@ -692,38 +695,38 @@ All colors via design tokens (Tailwind), no hardcoded values:
 
 ### 11.1. Deep Link / Page Refresh
 
-On direct navigation to a deep URL (e.g., `/{product}/{section}/{entity}/{sub-section}/{sub-entity}/{page}`):
-1. Host determines the active product by the first URL segment
-2. Remote MFE mounts
-3. Remote parses the full URL, builds a stack of N levels based on the route segments → drill levels mapping
-4. NavPanel renders the **last level** of the stack but preserves the entire history for back navigation
+Navigation state is fully derived from pathname, so deep links and refresh land on the correct level without any reconstruction. `peekDepth` starts at `0`.
 
 ### 11.2. Browser Back/Forward
 
-Browser navigation changes the URL → Remote synchronizes the stack. If the new URL belongs to a higher level, the stack is truncated.
+Browser navigation changes pathname → `parseStackFromPath` recomputes → UI updates. `peekDepth` resets to `0` via `useEffect([pathname])`.
 
 ### 11.3. Scope Switching via Breadcrumb
 
 When switching scope through a breadcrumb scope-switcher (e.g., from Entity A to Entity B):
 1. URL changes: `/{product}/{section}/{entity-a}/...` → `/{product}/{section}/{entity-b}/...`
 2. If Entity B does not have the same nested path — Remote redirects to Entity B's default page
-3. The stack is rebuilt from the root
+3. The stack is recomputed from the new pathname
 
 ### 11.4. No L2 (Home Page)
 
-On Home (`/`) there is no L2 panel. `AppShellPanel` is hidden, L1 switches to expanded mode (icon + text). The content area takes the full width minus L1 expanded.
+On Home (`/`) there is no Remote area active. L1 switches to expanded mode (icon + text). The content area takes the full width minus L1 expanded.
 
 ### 11.5. Expandable Group + Drill
 
 Expandable group (accordion) and drill are different mechanisms:
 - **Group**: reveals nested elements inline, staying on the same level. Groups can be nested (group within group), creating a multi-level accordion hierarchy
-- **Drill**: completely replaces panel content with a new level when a specific entity is selected from a list
+- **Drill**: completely replaces panel content with a new level when a specific entity is selected from a list. Represented as `type: 'drill'` in the nav config — the explicit type signals `matchNav` to produce a `scope-switcher` breadcrumb segment for that level
 
 Both can coexist at the same level simultaneously.
 
 ### 11.6. Breadcrumb for Accordion Nesting
 
-When the active page is inside nested accordion groups, the breadcrumb reflects the full nesting hierarchy, but intermediate segments (group names) are rendered as static text rather than links or scope-switchers, because groups have no pages of their own. A scope-switcher in the breadcrumb appears **only** for drill-down entities that have siblings available for switching.
+When the active page is inside nested accordion groups, the breadcrumb reflects the full nesting hierarchy, but intermediate segments (group names) are rendered as static text rather than links or scope-switchers, because groups have no pages of their own. A scope-switcher in the breadcrumb appears **only** for `drill` nodes in the nav config — the explicit type is the signal.
+
+### 11.7. URL Backward Compatibility
+
+The nav config defines `path` segments that `matchNav` uses to locate the active node. If a product reorganizes its navigation tree (moves a page between groups, renames a section) but wants old URLs to keep working, this is handled by the product's own router — not the nav config. The router can define redirects from legacy paths to current paths; `matchNav` will then match against the final (redirected) pathname as usual. The nav config describes the current tree structure, not URL history.
 
 ---
 
@@ -731,46 +734,68 @@ When the active page is inside nested accordion groups, the breadcrumb reflects 
 
 ### 12.1. Motivation
 
-Each Remote MFE should describe its navigation structure once — as a static config. From this config, the following are automatically generated:
+Each Remote MFE should describe its navigation structure once — as a static config. From this config, the following are automatically derived:
 - NavPanel (L2+ sidebar) with all levels, groups, and drill-down
 - Breadcrumb with correct segment types (link / scope-switcher / static)
-- Routing (which page component to render for each path)
-- Drill-down stack (restoration from URL on deep link)
+- Drill-down stack (computed from URL via `parseStackFromPath`)
 
-The consumer (Remote MFE) does not assemble these parts manually — it passes the config to a `<ProductNav>` wrapper that handles all orchestration.
+Routing (which component renders for which URL) is a separate subsystem owned by the product's router (TanStack Router, React Router, etc.) and is **not** part of the nav config.
 
 ### 12.2. Config Schema
+
+The nav config is a **fully serializable** tree of strings — no React components, no async functions, no runtime closures. This means it can be validated, hot-reloaded, and in principle loaded from a backend or be tenant-specific without a code release.
 
 ```typescript
 /**
  * Root product navigation config.
- * Defined as a module-level constant (outside components) for a stable reference.
+ * Defined as a module-level constant (outside components).
+ * Must be JSON-serializable.
  */
-interface ProductNavConfig {
+interface NavConfig {
+  /** Product label (shown in panel header at root level) */
+  productLabel: string
   /** Navigation elements for the product's root level (L2) */
   items: NavConfigNode[]
 }
 
 /**
  * A single navigation tree node.
- * Can be a leaf page, an accordion group, or a drill-down section.
+ * Can be a link (terminal page), a drill (entity with nested levels),
+ * or an accordion group.
  */
-type NavConfigNode = NavConfigLeaf | NavConfigGroup | NavConfigDrill
+type NavConfigNode = NavConfigLink | NavConfigDrill | NavConfigGroup
 
-/** Leaf: a terminal page with a component */
-interface NavConfigLeaf {
-  type: 'leaf'
+/** Link: a terminal page with its own URL segment */
+interface NavConfigLink {
+  type: 'link'
   /** Unique ID within the level */
   id: string
   /** Display label in menu and breadcrumb */
   label: string
   /** URL path segment (e.g., 'overview', 'settings') */
   path: string
+}
+
+/**
+ * Drill: a section where selecting a specific entity replaces the panel
+ * with the next level. The explicit `type: 'drill'` signals `matchNav`
+ * to produce a `scope-switcher` breadcrumb segment for that level.
+ */
+interface NavConfigDrill {
+  type: 'drill'
+  /** Unique ID within the level */
+  id: string
+  /** Display label in menu and breadcrumb */
+  label: string
+  /** URL path segment for the entity list (e.g., 'entities') */
+  path: string
   /**
-   * Lazy-loaded page component.
-   * Uses React.lazy for code splitting.
+   * URL parameter name for entity ID (e.g., 'entityId').
+   * Forms route: `{path}/:${param}/...`
    */
-  page: LazyExoticComponent<ComponentType>
+  param: string
+  /** Navigation elements within the entity (next drill level) */
+  children: NavConfigNode[]
 }
 
 /** Group: accordion group without its own page */
@@ -778,41 +803,10 @@ interface NavConfigGroup {
   type: 'group'
   id: string
   label: string
-  /** Nested elements (leaf, group, or drill) */
+  /** Nested elements (link, drill, or group) */
   children: NavConfigNode[]
   /** Expanded by default */
   defaultExpanded?: boolean
-}
-
-/**
- * Drill: a section where entering a specific entity
- * causes the menu to "drill down" to a new level.
- */
-interface NavConfigDrill {
-  type: 'drill'
-  id: string
-  label: string
-  /** URL path segment for the entity list (e.g., 'data-planes') */
-  path: string
-  /** List page component (entity table) */
-  page: LazyExoticComponent<ComponentType>
-  /**
-   * URL parameter for entity ID (e.g., 'dataPlaneId').
-   * Forms route: `{path}/:${param}/...`
-   */
-  param: string
-  /**
-   * Entity metadata resolver by ID (for panel heading and breadcrumb).
-   * Called on drill-down or when restoring from URL.
-   */
-  resolveEntity: (id: string) => Promise<{ label: string }> | { label: string }
-  /**
-   * Sibling entity loader for scope-switcher in breadcrumb.
-   * If not provided — breadcrumb segment renders as a link, not a scope-switcher.
-   */
-  resolveSiblings?: () => Promise<ScopeSwitcherItem[]>
-  /** Navigation elements within the entity (next level) */
-  children: NavConfigNode[]
 }
 ```
 
@@ -821,51 +815,42 @@ interface NavConfigDrill {
 ```typescript
 // products/product-a/nav.config.ts
 // Defined at module level — stable reference, not recreated on re-render.
+// Fully JSON-serializable: no React components, no closures.
 
-import { lazy } from 'react'
-
-export const productANavConfig: ProductNavConfig = {
+export const productANavConfig: NavConfig = {
+  productLabel: 'Product A',
   items: [
     {
-      type: 'leaf',
+      type: 'link',
       id: 'overview',
       label: 'Overview',
       path: 'overview',
-      page: lazy(() => import('./pages/Overview')),
     },
     {
       type: 'drill',
       id: 'entities',
       label: 'Entities',
       path: 'entities',
-      page: lazy(() => import('./pages/EntityList')),
       param: 'entityId',
-      resolveEntity: (id) => fetchEntity(id),
-      resolveSiblings: () => fetchAllEntities(),
       children: [
         {
-          type: 'leaf',
+          type: 'link',
           id: 'entity-overview',
           label: 'Overview',
           path: 'overview',
-          page: lazy(() => import('./pages/EntityOverview')),
         },
         {
           type: 'drill',
           id: 'sub-entities',
           label: 'Sub-entities',
           path: 'sub-entities',
-          page: lazy(() => import('./pages/SubEntityList')),
           param: 'subEntityId',
-          resolveEntity: (id) => fetchSubEntity(id),
-          resolveSiblings: () => fetchSubEntities(),
           children: [
             {
-              type: 'leaf',
+              type: 'link',
               id: 'sub-entity-detail',
               label: 'Detail',
               path: 'detail',
-              page: lazy(() => import('./pages/SubEntityDetail')),
             },
           ],
         },
@@ -875,18 +860,16 @@ export const productANavConfig: ProductNavConfig = {
           label: 'Operations',
           children: [
             {
-              type: 'leaf',
+              type: 'link',
               id: 'logs',
               label: 'Logs',
               path: 'logs',
-              page: lazy(() => import('./pages/Logs')),
             },
             {
-              type: 'leaf',
+              type: 'link',
               id: 'metrics',
               label: 'Metrics',
               path: 'metrics',
-              page: lazy(() => import('./pages/Metrics')),
             },
           ],
         },
@@ -898,11 +881,10 @@ export const productANavConfig: ProductNavConfig = {
       label: 'Category',
       children: [
         {
-          type: 'leaf',
+          type: 'link',
           id: 'page-a',
           label: 'Page A',
           path: 'page-a',
-          page: lazy(() => import('./pages/PageA')),
         },
         {
           type: 'group',
@@ -910,11 +892,10 @@ export const productANavConfig: ProductNavConfig = {
           label: 'Sub-category',
           children: [
             {
-              type: 'leaf',
+              type: 'link',
               id: 'page-b',
               label: 'Page B',
               path: 'page-b',
-              page: lazy(() => import('./pages/PageB')),
             },
           ],
         },
@@ -929,375 +910,170 @@ export const productANavConfig: ProductNavConfig = {
 ```tsx
 // products/product-a/App.tsx
 
-import { ProductNav } from '@wallarm/design-system'
+import { ProductNav, RemoteShell, RemoteShellPanel, RemoteShellBreadcrumb, RemoteShellContent } from '@wallarm/design-system'
+import { useProductNav } from '@wallarm/design-system'
 import { productANavConfig } from './nav.config'
+import { ProductRouter } from './router'
 
 /**
- * The entire Remote MFE reduces to wrapping config around layout.
- * ProductNav handles:
- * - rendering NavPanel into panelSlot
- * - rendering Breadcrumbs into breadcrumbSlot
- * - routing + Suspense for lazy-loaded pages
- * - drill-down stack and its URL synchronization
+ * ProductNav provides nav config context + NavLabelsContext.
+ * useProductNav() hook computes the derived state (stack, breadcrumb segments).
+ * Routing is handled entirely by the product's own router.
  */
 export const ProductAApp = () => (
   <ProductNav config={productANavConfig}>
-    {/* Optional layout around routed content */}
-    <ProductNav.Content />
+    <ProductALayout />
   </ProductNav>
 )
+
+const ProductALayout = () => {
+  const { navStack, peekDepth, setPeekDepth, breadcrumbSegments } = useProductNav()
+  const currentLevel = navStack[navStack.length - 1 - peekDepth]
+
+  return (
+    <RemoteShell>
+      <RemoteShellPanel>
+        <NavPanel>
+          {currentLevel.parentLabel && (
+            <NavPanelBack onClick={() => setPeekDepth(d => d + 1)}>
+              {currentLevel.parentLabel}
+            </NavPanelBack>
+          )}
+          <NavPanelHeader>{currentLevel.title}</NavPanelHeader>
+          {/* render currentLevel.items */}
+        </NavPanel>
+      </RemoteShellPanel>
+
+      <RemoteShellBreadcrumb>
+        <Breadcrumbs>
+          {/* render breadcrumbSegments */}
+        </Breadcrumbs>
+      </RemoteShellBreadcrumb>
+
+      <RemoteShellContent>
+        <ProductRouter />
+      </RemoteShellContent>
+    </RemoteShell>
+  )
+}
 ```
 
-`<ProductNav.Content />` is the slot where the current page renders (resolved by URL from config). Everything else (panel, breadcrumb) renders into Host slots automatically.
+Two fully independent subsystems: one knows the navigation tree, the other knows URL → component. They share only pathname.
 
-### 12.5. How the Config Produces UI
+### 12.5. matchNav: Path Matching
 
-All navigation UI is automatically derived from the config. Mapping below:
+With `page` removed from the config, generating a route tree from the nav config is neither possible nor needed — routes live in the product's router independently. What remains: **path matching to determine the active node in the menu**.
 
-```
-ProductNavConfig
-  │
-  ├─→ Route tree (flat list of paths for router)
-  │     Built by recursive traversal: leaf.path, drill.path/:param + children
-  │     Result: [{pattern: 'overview', page: Overview}, {pattern: 'entities', page: EntityList},
-  │              {pattern: 'entities/:entityId/overview', page: EntityOverview}, ...]
-  │
-  ├─→ NavPanel state (current menu level)
-  │     Determined by matching current URL against route tree.
-  │     Drill levels form the stack. The last level renders in the sidebar.
-  │     Groups render as accordions within the level.
-  │
-  └─→ Breadcrumb segments
-        Built from the path from config root to current page:
-        - drill node → scope-switcher (if resolveSiblings exists) or link
-        - group node → static (no own page)
-        - leaf node (last) → static (current page)
-```
-
-### 12.6. ProductNav Internal Architecture
-
-```
-<ProductNav config={config}>
-  │
-  ├─ ConfigParser           — parses config → route tree + nav tree once (memoized)
-  │
-  ├─ URLSynchronizer        — listens to URL, matches against route tree, computes:
-  │    │                      • activePath (path to current leaf in config tree)
-  │    │                      • drillStack (stack of drill levels)
-  │    │                      • breadcrumbSegments
-  │    │
-  │    ├─→ NavPanelContext   — {currentLevel, drillStack, expandedGroups}
-  │    ├─→ BreadcrumbContext — {segments[]}
-  │    └─→ RouteContext      — {activePage, params}
-  │
-  ├─ <Portal to={panelSlot}>
-  │    └─ NavPanelRenderer   — subscribes ONLY to NavPanelContext
-  │
-  ├─ <Portal to={breadcrumbSlot}>
-  │    └─ BreadcrumbRenderer — subscribes ONLY to BreadcrumbContext
-  │
-  └─ <ProductNav.Content>
-       └─ PageRenderer       — subscribes ONLY to RouteContext
-            └─ <Suspense>
-                 └─ activePage (lazy component)
-```
-
-### 12.7. Re-render Optimization
-
-Primary goal: when navigating between pages **within the same level** (e.g., Overview → Settings within one entity), **only the content** re-renders, while the sidebar and breadcrumb update surgically (active state only).
-
-#### 12.7.1. Context Splitting
-
-Three independent contexts ensure that changes in one navigation part do not cause re-renders in others:
+The nav config describes the **navigation tree**, not the URL schema. `matchNav` maps the current pathname to a position in the tree, but the URL structure is owned by the product's router. If a product needs to reorganize its tree while preserving old URLs, it handles this through router-level redirects — `matchNav` always works against the final resolved pathname (see §11.7).
 
 ```typescript
 /**
- * Sidebar panel context.
- * Changes only on: drill-down / back / expand-collapse of groups.
- * Does NOT change when navigating between pages within the same level.
+ * Pure function. Matches pathname against nav config.
+ * Serves two purposes:
+ * 1. Building the drill stack for NavPanel
+ * 2. Building the segments for Breadcrumb
+ *
+ * Called via useMemo on every pathname change.
  */
-const NavPanelContext = createContext<{
-  /** Items of the current (last) level */
-  currentItems: NavConfigNode[]
-  /** Active element ID */
-  activeItemId: string
-  /** Current level heading */
-  title: string
-  /** Back button label (null at root level) */
-  parentLabel: string | null
-  /** Callback for back navigation (pop stack) */
-  goBack: () => void
-  /** Expanded/collapsed state for each group */
-  expandedGroups: Record<string, boolean>
-  /** Toggle group */
-  toggleGroup: (id: string) => void
-}>()
-
-/**
- * Breadcrumb context.
- * Changes on any navigation (active segment updates).
- * Lightweight object — array of segments.
- */
-const BreadcrumbContext = createContext<{
-  segments: BreadcrumbSegment[]
-}>()
-
-/**
- * Routing context.
- * Changes on every navigation. Contains only page ID and params.
- * The page component itself is resolved via a stable ref to the route tree.
- */
-const RouteContext = createContext<{
-  pageId: string
-  params: Record<string, string>
-}>()
+function matchNav(pathname: string, config: NavConfig): {
+  /** Full drill stack from root to current level */
+  navStack: NavStackEntry[]
+  /** Breadcrumb segments */
+  breadcrumbSegments: BreadcrumbSegment[]
+  /** Active item ID within the current level */
+  activeItemId: string | null
+}
 ```
 
-#### 12.7.2. Stable References and Memoization
-
-```typescript
-// 1. Config — module-level constant, never recreated
-//    (defined in nav.config.ts outside components)
-
-// 2. Route tree and nav tree — computed once from config
-const { routeTree, navTree } = useMemo(() => parseConfig(config), [config])
-
-// 3. Callbacks — stable via useCallback with ref deps
-const goBack = useCallback(() => {
-  drillStackRef.current = drillStackRef.current.slice(0, -1)
-  setDrillStack(drillStackRef.current)
-}, [])
-
-const toggleGroup = useCallback((id: string) => {
-  setExpandedGroups(prev => ({ ...prev, [id]: !prev[id] }))
-}, [])
-
-// 4. Contexts — recreated ONLY when relevant data changes
-const panelValue = useMemo(
-  () => ({ currentItems, activeItemId, title, parentLabel, goBack, expandedGroups, toggleGroup }),
-  [currentItems, activeItemId, title, parentLabel, expandedGroups]
-  // goBack and toggleGroup are stable — not in deps
-)
+Result for the config example (§12.3):
 ```
-
-#### 12.7.3. Re-render Matrix
-
-What exactly re-renders for each type of action:
-
-| User action | NavPanel | Breadcrumb | Page Content |
-|------------|----------|------------|--------------|
-| Navigation within same level (Overview → Settings) | **active item only** (1) | **last segment** (2) | **full** (3) |
-| Drill-down (selecting entity from list) | **full** (new level) | **full** (new segments) | **full** (new page) |
-| Back button (pop level) | **full** (previous level) | None (4) | None (4) |
-| Expand/collapse group | **group only** (5) | None | None |
-| Scope switch via breadcrumb | **full** | **full** | **full** |
+URL: /overview                                       → stack: [root], active: overview
+URL: /entities                                       → stack: [root], active: entities
+URL: /entities/E1/overview                           → stack: [root, E1], active: entity-overview
+URL: /entities/E1/sub-entities                       → stack: [root, E1], active: sub-entities
+URL: /entities/E1/sub-entities/S2/detail             → stack: [root, E1, S2], active: sub-entity-detail
+URL: /entities/E1/logs                               → stack: [root, E1], active: logs
+URL: /page-a                                         → stack: [root], active: page-a
+URL: /page-b                                         → stack: [root], active: page-b
+```
 
 Notes:
-1. Thanks to `React.memo` on `NavPanelItem` — only the item whose `active` changed re-renders
-2. Breadcrumb segments — array with structural sharing: only the last element changes
-3. Lazy-loaded via `Suspense` — new page is loaded on demand
-4. Back button does not change URL or content — only sidebar re-renders
-5. `NavPanelGroup` is isolated via its own `memo` + local state
+- `link` creates a single URL segment (`{path}`)
+- `drill` creates a URL segment with a dynamic parameter (`{path}/:${param}/...`) and pushes a new level onto the stack
+- `group` does not create a URL segment — its children are promoted to the parent's level. Accordion groups are purely visual menu organization
 
-#### 12.7.4. Re-render Minimization Techniques
+### 12.6. PageTitle Component
 
-**a) Memo on each NavPanelItem:**
+Once `resolveEntity` / `resolveSiblings` are removed from the config, the question arises: where does NavPanel get the heading and Breadcrumb get the label for the current page?
+
+The answer is a new primitive in the DS: a `<PageTitle>` component.
+
 ```tsx
-const NavPanelItem = memo<NavPanelItemProps>(({ id, label, href, active }) => {
-  return (
-    <a href={href} data-active={active} className={cn(itemVariants({ active }))}>
-      {label}
-    </a>
-  )
-})
-```
-When `activeItemId` changes, exactly 2 items re-render: the old one (active → false) and the new one (false → active).
-
-**b) Page resolver outside context:**
-```tsx
-// PageRenderer subscribes to RouteContext, but the lazy component
-// is resolved via a stable Map (routeTree), not through context.
-const PageRenderer = memo(() => {
-  const { pageId, params } = useContext(RouteContext)
-  const PageComponent = routeTreeRef.current.get(pageId)?.page
-
-  return (
-    <Suspense fallback={<PageSkeleton />}>
-      {PageComponent && <PageComponent {...params} />}
-    </Suspense>
-  )
-})
-```
-
-**c) Batched state updates for drill-down:**
-During drill-down, 3 states change simultaneously (stack, breadcrumb, route). React 18+ automatically batches setState, but for guaranteed batching we use a `flushSync`-free pattern:
-```typescript
-// Single setState via reducer — one re-render for all three contexts
-const [navState, dispatch] = useReducer(navReducer, initialState)
-
-// drill-down = single action
-dispatch({ type: 'DRILL_INTO', entityId, entityMeta, childItems })
-```
-
-**d) Async resolve without blocking UI:**
-`resolveEntity` and `resolveSiblings` are asynchronous. During loading:
-- NavPanel shows a skeleton heading
-- Breadcrumb scope-switcher shows the current ID as label (replaced with resolved label when ready)
-- Content renders independently (does not wait for sidebar resolve)
-
-```typescript
-// useEntityResolver — loads metadata without blocking navigation
-const { label, isLoading } = useEntityResolver(drillNode.resolveEntity, entityId)
-```
-
-### 12.8. Route Tree Generation from Config
-
-The config is recursively transformed into a flat list of route patterns:
-
-```typescript
-function buildRoutes(
-  nodes: NavConfigNode[],
-  parentPath: string = ''
-): RouteEntry[] {
-  const routes: RouteEntry[] = []
-
-  for (const node of nodes) {
-    switch (node.type) {
-      case 'leaf':
-        routes.push({
-          pattern: `${parentPath}/${node.path}`,
-          pageId: node.id,
-          page: node.page,
-        })
-        break
-
-      case 'group':
-        // Group has no own path segment — its children inherit parentPath
-        routes.push(...buildRoutes(node.children, parentPath))
-        break
-
-      case 'drill':
-        // List page
-        routes.push({
-          pattern: `${parentPath}/${node.path}`,
-          pageId: node.id,
-          page: node.page,
-        })
-        // Pages within entity
-        routes.push(
-          ...buildRoutes(node.children, `${parentPath}/${node.path}/:${node.param}`)
-        )
-        break
-    }
-  }
-
-  return routes
+interface PageTitleProps {
+  /**
+   * Explicit override for the page/entity title.
+   * If omitted, the label is read from the matched nav config node.
+   */
+  children?: ReactNode
 }
 ```
 
-Result for the example in 12.3:
-```
-/overview                                        → Overview
-/entities                                        → EntityList
-/entities/:entityId/overview                     → EntityOverview
-/entities/:entityId/sub-entities                 → SubEntityList
-/entities/:entityId/sub-entities/:subEntityId/detail → SubEntityDetail
-/entities/:entityId/logs                         → Logs
-/entities/:entityId/metrics                      → Metrics
-/page-a                                          → PageA
-/page-b                                          → PageB
-```
+**Behavior:**
+- **Without `children`:** reads the current pathname, calls `matchNav(pathname, config)`, and returns the matched leaf node's `label` from config.
+- **With `children`:** uses the provided value, ignoring the config label.
 
-Note: `group` does not create a URL segment — its children are promoted to the parent's level. This matches the prototype behavior where accordion groups are purely visual menu organization.
+The result is published into `NavLabelsContext` — a single source of truth. NavPanel's heading and the last Breadcrumb segment subscribe to this context and render the final label as `context.override ?? matchedNode.label`.
 
-### 12.9. Breadcrumb Generation from Config and URL
+**Layering:**
+- Both `<PageTitle>` and `NavLabelsContext` live entirely inside Remote. They never cross the Host/Remote boundary.
+- NavPanel and Breadcrumbs are also Remote-owned, rendered through `<RemoteShell>`. They read from the same context.
+- Host has no concept of Remote-internal labels.
 
-The breadcrumb is built by traversing from the current matched route back to the config root:
+**Important:** `<PageTitle>` is not a variant of the existing `<Heading>`. `Heading` is responsible for typography (size, weight, color). `PageTitle` is responsible for the semantic "what is the current page called." These roles are orthogonal — merging them would blur the semantic contract.
 
-```typescript
-function buildBreadcrumb(
-  matchedPath: MatchedPathNode[],  // path from root to current leaf in config tree
-): BreadcrumbSegment[] {
-  const segments: BreadcrumbSegment[] = []
+### 12.7. Deferred: Dynamic Drill-Segment Labels and Siblings
 
-  for (const node of matchedPath) {
-    switch (node.configNode.type) {
-      case 'leaf':
-        // Last segment — always static
-        segments.push({ type: 'static', label: node.configNode.label })
-        break
+Two problems remain unsolved for dynamic entities:
 
-      case 'drill':
-        // Drill level: scope-switcher (if resolveSiblings exists) or link
-        if (node.configNode.resolveSiblings) {
-          segments.push({
-            type: 'scope-switcher',
-            label: node.resolvedEntityLabel,
-            loadSiblings: node.configNode.resolveSiblings,
-            currentId: node.entityId,
-          })
-        } else {
-          segments.push({
-            type: 'link',
-            label: node.resolvedEntityLabel,
-            href: node.href,
-          })
-        }
-        break
+1. **Intermediate drill-segment names in the breadcrumb** (e.g., the name of `E1` in `/entities/E1/sub/E2/page`).
+2. **Siblings list** for the scope-switcher dropdown.
 
-      case 'group':
-        // Group — always static (no own page)
-        segments.push({ type: 'static', label: node.configNode.label })
-        break
-    }
-  }
+Both problems share the same shape — "a layout publishes data for a specific drill node" — and should be designed together as a single companion primitive (something like `useNavNode(nodeId, { label, loadSiblings })`), not split into two independent APIs.
 
-  return segments
-}
-```
+**Deferred** until a concrete product use case appears.
 
-### 12.10. Navigation Lifecycle (Full Flow)
+### 12.8. Architecture Overview
 
 ```
-1. Remote MFE mounts
-   │
-   ├─ ProductNav receives config (stable reference)
-   ├─ ConfigParser computes routeTree + navTree (once, useMemo)
-   │
-2. URLSynchronizer reads current URL
-   │
-   ├─ Matches URL against routeTree → determines activePage + params
-   ├─ Traverses navTree → builds drillStack, breadcrumbSegments
-   ├─ For each drill level, calls resolveEntity(param) → async label
-   │
-3. Context initialization (single batch via useReducer)
-   │
-   ├─ NavPanelContext ← {currentItems, activeItemId, title, ...}
-   ├─ BreadcrumbContext ← {segments}
-   └─ RouteContext ← {pageId, params}
-   │
-4. Rendering
-   │
-   ├─ NavPanelRenderer → portal into panelSlot → renders sidebar
-   ├─ BreadcrumbRenderer → portal into breadcrumbSlot → renders breadcrumbs
-   └─ PageRenderer → renders lazy page in <Suspense>
-   │
-5. User navigation
-   │
-   ├─ Click on link in sidebar → URL changes → goto 2 (URLSynchronizer reacts)
-   ├─ Drill-down → dispatch(DRILL_INTO) → URL changes → panel re-renders (new level)
-   ├─ Back button → dispatch(POP_LEVEL) → panel re-renders (previous level), URL does NOT change
-   └─ Scope switch → URL changes → goto 2 (full resynchronization)
+<RemoteShell>                              ← Remote-internal layout primitive (DS export)
+  │
+  ├─ <RemoteShellPanel>                    ← internal slot, NOT a Host slot
+  │    └─ NavPanel (drillStack, peekDepth state)
+  │
+  ├─ <RemoteShellBreadcrumb>               ← internal slot, NOT a Host slot
+  │    └─ Breadcrumbs (segments)
+  │
+  └─ <RemoteShellContent>
+       └─ <ProductRouter />                ← product's own router renders the page
+
+<ProductNav config={navConfig}>            ← thin orchestrator inside Remote
+  └─ matchNav(pathname, config)            — pure function, useMemo
+        ├─→ navStack          → NavPanel
+        └─→ breadcrumbSegments → Breadcrumbs
 ```
+
+Host's `AppShell` exposes only Header, Rail, and a single Remote-area slot. Host knows nothing about Remote-internal layout (panel, breadcrumb) or Remote-internal labels (entity names, page titles, breadcrumb segments). The only navigation knowledge Host has is its own L1 config — the list of products and the active product (the latter derived from pathname).
 
 ---
 
 ## 13. Implementation Order
 
 ### Phase 1: Layout & Shell
-- `AppShell` (grid layout with 4 zones)
-- `AppShellHeader`, `AppShellRail`, `AppShellPanel`, `AppShellContent`
+- `AppShell` (grid layout with 3 zones: header, rail, remote-area)
+- `AppShellHeader`, `AppShellRail`, `AppShellRemote`
 - `TopHeader`, `TopHeaderLogo`, `TopHeaderActions`
+- `RemoteShell` (grid layout: panel, breadcrumb, content)
+- `RemoteShellPanel`, `RemoteShellBreadcrumb`, `RemoteShellContent`
 
 ### Phase 2: L1 Navigation
 - `NavRail`, `NavRailItem`, `NavRailSeparator`
@@ -1308,7 +1084,7 @@ function buildBreadcrumb(
 
 ### Phase 3: L2+ Navigation Panel
 - `NavPanel`, `NavPanelHeader`, `NavPanelItem`
-- `NavPanelGroup`, `NavPanelGroupItem` (accordion)
+- `NavPanelGroup`, `NavPanelGroupLabel`, `NavPanelGroupItem` (accordion)
 - `NavPanelBack` (back button without navigation)
 - Drill-down / back slide transition animations
 
@@ -1316,18 +1092,14 @@ function buildBreadcrumb(
 - `BreadcrumbsScopeSwitcher` — new component within Breadcrumbs
 - Dropdown with checkmark on current item and metadata
 
-### Phase 5: Config-driven ProductNav
-- `ProductNav` wrapper with ConfigParser, URLSynchronizer
-- Context splitting (NavPanelContext, BreadcrumbContext, RouteContext)
-- Route tree generation from config
-- Breadcrumb generation from config
-- useReducer for batched state updates
-- `useEntityResolver` for async resolve without blocking UI
-- Memo optimization for NavPanelItem, PageRenderer
+### Phase 5: Config-driven Navigation
+- `matchNav` pure function (pathname + config → stack + segments)
+- `useProductNav` hook
+- `NavLabelsContext` and `<PageTitle>` component
+- `peekDepth` state management
 
 ### Phase 6: Integration & Polish
-- Host ↔ Remote contract (slots, events)
-- Deep link restoration (stack reconstruction from URL via config)
-- Browser history sync
+- Deep link verification (stack derived from pathname — works by default)
+- Browser history sync (`peekDepth` reset on pathname change)
 - Keyboard navigation
 - E2E tests
