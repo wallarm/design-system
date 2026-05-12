@@ -1,26 +1,22 @@
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 
-/**
- * Layer-aware z-index applied to the *positioner* element of floating
- * surfaces (Menu.Positioner / Select.Positioner). The positioner is where
- * floating-ui sets `position: absolute; transform: translate(...)`, which
- * creates a stacking context — so we have to set z-index *here*, not on the
- * Content inside, otherwise the dropdown stacks below any sibling stacking
- * context at the same level (e.g. a Drawer positioner at z-50).
- *
- * Formula mirrors the Drawer / Dialog positioners. Values come from
- * src/theme/components/drawer.css (--drawer-positioner-z-index = 50,
- * --drawer-level-ratio = 20, --layer-index defaulted to 0 on :root). Zag's
- * dismissable layer stack overrides --layer-index inline on the rendered
- * content node when nested in a parent dismissable layer.
- */
-export const dropdownPositionerClassName =
-  'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index)*var(--drawer-level-ratio)))]';
-
 export const dropdownMenuClassNames = cn(
   // Dimensions
   'flex flex-col gap-1 min-w-128',
+  // Layer-aware z-index — set HERE on the content (not the positioner)
+  // because @zag-js/popper sets an inline `style.zIndex = var(--z-index)` on
+  // the positioner element which would override any class-based z-index
+  // there. Popper reads `getComputedStyle(content).zIndex` and propagates it
+  // up via the `--z-index` CSS variable, so the positioner ends up at the
+  // same z-index as the content.
+  //
+  // Formula mirrors the Drawer / Dialog positioners. Values come from
+  // src/theme/components/drawer.css (--drawer-positioner-z-index = 50,
+  // --drawer-level-ratio = 20, --layer-index defaulted to 0 on :root). Zag's
+  // dismissable layer stack overrides --layer-index inline on the rendered
+  // content node when nested in a parent dismissable layer.
+  'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index)*var(--drawer-level-ratio)))]',
   // Scrolling
   'overflow-y-auto overflow-x-hidden outline-none',
   // Visual
