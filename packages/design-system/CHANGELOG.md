@@ -1,3 +1,7 @@
+## <small>0.34.1 (2026-05-12)</small>
+
+* fix(filter-input): AS-929 reset autocomplete state on segment edit cancel (#110) ([059b45a](https://github.com/wallarm/design-system/commit/059b45a)), closes [#110](https://github.com/wallarm/design-system/issues/110)
+
 ## 0.34.0 (2026-05-07)
 
 * feat(attribute): AS-958 disableNestedInteractive prop on AttributeActionsTarget (#109) ([cef1398](https://github.com/wallarm/design-system/commit/cef1398)), closes [#109](https://github.com/wallarm/design-system/issues/109)
