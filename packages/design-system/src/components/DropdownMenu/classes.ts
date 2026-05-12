@@ -16,7 +16,17 @@ export const dropdownMenuClassNames = cn(
   // --drawer-level-ratio = 20, --layer-index defaulted to 0 on :root). Zag's
   // dismissable layer stack overrides --layer-index inline on the rendered
   // content node when nested in a parent dismissable layer.
-  'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index)*var(--drawer-level-ratio)))]',
+  //
+  // !important so the calc wins against any parent selector that might
+  // otherwise lower the dropdown below the drawer's z-50 positioner. Popper
+  // reads the computed value here regardless of !important on the source
+  // rule and propagates it up to the positioner via --z-index.
+  '!z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index)*var(--drawer-level-ratio)))]',
+  // Force a stacking context on Content so its z-index is actually used by
+  // the browser for stacking (z-index has no effect on a position:static
+  // element). `position: relative` + the explicit z-index above guarantees
+  // the computed style popper reads is the value we expect.
+  'relative',
   // Scrolling
   'overflow-y-auto overflow-x-hidden outline-none',
   // Visual
