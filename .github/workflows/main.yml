@@ -585,6 +585,73 @@ jobs:
           name: built-packages
           path: packages
 
+      - name: Clean stale RC tags after force-push
+        if: github.ref_name != 'main'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin --tags --force
+          git fetch origin refs/notes/semantic-release:refs/notes/semantic-release 2>/dev/null || true
+
+          RC_SUFFIX="rc-$(echo '${{ github.ref_name }}' | sed 's/[\\/_]/-/g')"
+          MERGE_BASE=$(git merge-base origin/main HEAD)
+          BRANCH_NAME="${{ github.ref_name }}"
+          echo "RC suffix: ${RC_SUFFIX}"
+          echo "Merge base: ${MERGE_BASE}"
+
+          # 1) Delete stale git tags (unreachable after rebase)
+          TAGS=$(git tag -l "*-${RC_SUFFIX}.*")
+          if [ -n "$TAGS" ]; then
+            echo "Found RC tags:"
+            for TAG in $TAGS; do
+              TAG_COMMIT=$(git rev-list -n 1 "$TAG" 2>/dev/null || true)
+              if [ -n "$TAG_COMMIT" ] && git merge-base --is-ancestor "$TAG_COMMIT" HEAD 2>/dev/null; then
+                echo "  keep $TAG (reachable from HEAD)"
+                continue
+              fi
+              echo "  delete $TAG (unreachable after rebase)"
+              gh release delete "$TAG" --yes 2>/dev/null || true
+              git push origin ":refs/tags/$TAG" 2>/dev/null || true
+              git tag -d "$TAG" 2>/dev/null || true
+            done
+          fi
+
+          # 2) Recover tags published to npm but missing from git
+          for PKG in "@wallarm-org/design-system" "@wallarm-org/mcp"; do
+            TAG_PREFIX="v"
+            [ "$PKG" = "@wallarm-org/mcp" ] && TAG_PREFIX="mcp-v"
+
+            NPM_VERSIONS=$(npm view "$PKG" versions --json 2>/dev/null \
+              | jq -r 'if type == "array" then .[] else . end' \
+              | grep -- "-${RC_SUFFIX}\." || true)
+
+            for VER in $NPM_VERSIONS; do
+              TAG="${TAG_PREFIX}${VER}"
+              if ! git tag -l "$TAG" | grep -q .; then
+                echo "  restore $TAG → ${MERGE_BASE}"
+                git tag "$TAG" "$MERGE_BASE"
+              fi
+            done
+          done
+
+          # 3) Ensure ALL RC tags have semantic-release channel notes
+          NOTES_CHANGED=false
+          for TAG in $(git tag -l "*-${RC_SUFFIX}.*"); do
+            if ! git notes --ref semantic-release show "$TAG" &>/dev/null; then
+              echo "  add note to $TAG"
+              git notes --ref semantic-release add -f \
+                -m "{\"channels\":[\"${BRANCH_NAME}\"]}" "$TAG"
+              NOTES_CHANGED=true
+            fi
+          done
+
+          if [ "$NOTES_CHANGED" = "true" ]; then
+            echo "Pushing semantic-release notes to remote"
+            git push origin refs/notes/semantic-release 2>/dev/null || true
+          fi
+
       - name: Release design-system
         run: pnpm semantic-release
         env:
