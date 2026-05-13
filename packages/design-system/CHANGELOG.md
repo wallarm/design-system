@@ -1,3 +1,9 @@
+## 0.35.0 (2026-05-13)
+
+* feat: [CORE-2327] nav tech design ([6603609](https://github.com/wallarm/design-system/commit/6603609))
+* feat: [CORE-2343] app shell ([7437a87](https://github.com/wallarm/design-system/commit/7437a87))
+* feat: workflow fix ([d43809d](https://github.com/wallarm/design-system/commit/d43809d))
+
 ## <small>0.34.1 (2026-05-12)</small>
 
 * fix(filter-input): AS-929 reset autocomplete state on segment edit cancel (#110) ([059b45a](https://github.com/wallarm/design-system/commit/059b45a)), closes [#110](https://github.com/wallarm/design-system/issues/110)
