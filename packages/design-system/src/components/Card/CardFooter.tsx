@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import { Children } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -18,6 +19,8 @@ export const CardFooter: FC<CardFooterProps> = ({
 }) => {
   const Comp = asChild ? Slot : 'div';
   const testId = useTestId('footer');
+  const childCount = Children.count(children);
+  const justifyClass = childCount > 1 ? 'justify-between' : 'justify-end';
 
   return (
     <Comp
@@ -25,7 +28,7 @@ export const CardFooter: FC<CardFooterProps> = ({
       ref={ref}
       data-slot='card-footer'
       data-testid={testId}
-      className={cn('mt-auto flex items-center justify-end gap-8 px-16', className)}
+      className={cn('mt-auto flex items-center gap-12 px-16', justifyClass, className)}
     >
       {children}
     </Comp>

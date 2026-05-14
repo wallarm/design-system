@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 
 export const cardVariants = cva(
-  'flex flex-col gap-8 rounded-8 border-1 shadow-sm min-w-[240px] overflow-hidden py-16 transition-colors duration-200',
+  'flex flex-col gap-8 rounded-8 border-1 shadow-sm min-w-[240px] overflow-hidden py-16 transition-colors duration-200 h-full text-sm',
   {
     variants: {
       color: {
