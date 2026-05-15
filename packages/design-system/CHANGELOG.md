@@ -1,3 +1,7 @@
+## <small>0.38.1 (2026-05-15)</small>
+
+* fix(calendar): AS-971 add z-50 so popover renders above table headers (#120) ([3772df0](https://github.com/wallarm/design-system/commit/3772df0)), closes [#120](https://github.com/wallarm/design-system/issues/120)
+
 ## 0.38.0 (2026-05-15)
 
 * feat(accordion): AS-962 add Accordion component (#119) ([2b5d278](https://github.com/wallarm/design-system/commit/2b5d278)), closes [#119](https://github.com/wallarm/design-system/issues/119)
