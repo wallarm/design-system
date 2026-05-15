@@ -5,6 +5,10 @@ import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { AccordionSharedContextProvider, type AccordionVariant } from './AccordionContext';
 import { accordionRootVariants } from './classes';
 
+export interface AccordionValueChangeDetails {
+  value: string[];
+}
+
 export interface AccordionProps extends TestableProps {
   children: ReactNode;
   /** Visual variant of the accordion */
@@ -18,7 +22,7 @@ export interface AccordionProps extends TestableProps {
   /** Initial expanded item values for uncontrolled usage */
   defaultValue?: string[];
   /** Callback fired when expanded items change */
-  onChange?: (value: string[]) => void;
+  onValueChange?: (details: AccordionValueChangeDetails) => void;
   /** Disable all interaction */
   disabled?: boolean;
   className?: string;
@@ -30,9 +34,9 @@ export interface AccordionProps extends TestableProps {
  * Three variants:
  * - `primary` — lightweight row, 40px height, base font.
  * - `secondary` — compact row, 24px height, small muted text.
- * - `section` — bordered panel with title, optional actions and content area.
+ * - `section` — bordered panel with title, optional `AccordionActions` and content area.
  *
- * Compose with `AccordionItem`, `AccordionTrigger`, and `AccordionContent`.
+ * Compose with `AccordionItem`, `AccordionTrigger`, `AccordionActions`, and `AccordionContent`.
  */
 export const Accordion: FC<AccordionProps> = ({
   children,
@@ -41,26 +45,23 @@ export const Accordion: FC<AccordionProps> = ({
   collapsible = true,
   value,
   defaultValue,
-  onChange,
+  onValueChange,
   disabled,
   className,
   'data-testid': testId,
 }) => {
-  const handleChange = ({ value }: { value: string[] }) => {
-    onChange?.(value);
-  };
-
   return (
     <AccordionSharedContextProvider value={{ variant }}>
       <ArkUiAccordion.Root
-        className={cn(accordionRootVariants({ variant }), className)}
+        data-slot='accordion'
         data-testid={testId}
         data-variant={variant}
+        className={cn(accordionRootVariants(), className)}
         multiple={multiple}
         collapsible={collapsible}
         value={value}
         defaultValue={defaultValue}
-        onValueChange={handleChange}
+        onValueChange={onValueChange}
         disabled={disabled}
       >
         <TestIdProvider value={testId}>{children}</TestIdProvider>

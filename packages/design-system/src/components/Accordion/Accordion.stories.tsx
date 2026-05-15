@@ -4,6 +4,7 @@ import { Button } from '../Button';
 import { NumericBadge } from '../NumericBadge';
 import { Text } from '../Text';
 import { Accordion, type AccordionProps } from './Accordion';
+import { AccordionActions } from './AccordionActions';
 import { AccordionContent } from './AccordionContent';
 import { AccordionItem } from './AccordionItem';
 import { AccordionTrigger } from './AccordionTrigger';
@@ -14,6 +15,7 @@ const meta = {
   subcomponents: {
     AccordionItem,
     AccordionTrigger,
+    AccordionActions,
     AccordionContent,
   },
   parameters: {
@@ -21,11 +23,11 @@ const meta = {
     docs: {
       description: {
         component:
-          'Accordion component for progressive disclosure. Use `primary`/`secondary` variants for lightweight inline collapse, and `section` for bordered panels with title slots and actions.',
+          'Accordion compound component built on Ark UI. Use `primary`/`secondary` for lightweight inline collapse, `section` for bordered panels. Pair `section` with `AccordionActions` to render buttons next to the toggle without nesting them inside the trigger.',
       },
     },
   },
-  args: { onChange: fn() },
+  args: { onValueChange: fn() },
   argTypes: {
     variant: {
       control: 'select',
@@ -111,38 +113,47 @@ export const SectionWithActions: StoryFn<AccordionProps> = args => (
       data-testid='accordion-section-actions'
     >
       <AccordionItem value='1'>
-        <AccordionTrigger
-          actions={
-            <>
-              <Button variant='ghost' size='small'>
-                Delete
-              </Button>
-              <Button variant='outline' size='small'>
-                Edit
-              </Button>
-            </>
-          }
-        >
+        <AccordionTrigger>
           Title <NumericBadge>2</NumericBadge>
         </AccordionTrigger>
+        <AccordionActions>
+          <Button variant='ghost' size='small'>
+            Delete
+          </Button>
+          <Button variant='outline' size='small'>
+            Edit
+          </Button>
+        </AccordionActions>
         <AccordionContent>
           <Text>{sampleText}</Text>
         </AccordionContent>
       </AccordionItem>
       <AccordionItem value='2'>
-        <AccordionTrigger
-          actions={
-            <>
-              <Button variant='ghost' size='small'>
-                Delete
-              </Button>
-              <Button variant='outline' size='small'>
-                Edit
-              </Button>
-            </>
-          }
-        >
+        <AccordionTrigger>
           Title <NumericBadge>2</NumericBadge>
+        </AccordionTrigger>
+        <AccordionActions>
+          <Button variant='ghost' size='small'>
+            Delete
+          </Button>
+          <Button variant='outline' size='small'>
+            Edit
+          </Button>
+        </AccordionActions>
+        <AccordionContent>
+          <Text>{sampleText}</Text>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  </div>
+);
+
+export const LongTitle: StoryFn<AccordionProps> = args => (
+  <div className='w-320'>
+    <Accordion {...args} variant='section' data-testid='accordion-long-title'>
+      <AccordionItem value='1'>
+        <AccordionTrigger>
+          A really long title that should truncate gracefully without breaking the layout
         </AccordionTrigger>
         <AccordionContent>
           <Text>{sampleText}</Text>
