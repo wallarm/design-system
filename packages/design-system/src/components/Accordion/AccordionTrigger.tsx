@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
+import type { FC, ReactNode, Ref } from 'react';
 import { Accordion as ArkUiAccordion } from '@ark-ui/react/accordion';
 import { ChevronDown, ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
@@ -10,8 +10,7 @@ import {
   accordionTriggerVariants,
 } from './classes';
 
-export interface AccordionTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'type'> {
+export interface AccordionTriggerProps extends Omit<ArkUiAccordion.ItemTriggerProps, 'type'> {
   ref?: Ref<HTMLButtonElement>;
   children: ReactNode;
 }
@@ -44,15 +43,13 @@ export const AccordionTrigger: FC<AccordionTriggerProps> = ({
     >
       {variant === 'section' ? (
         <>
-          <span className={cn(accordionTriggerTitleVariants(), '[&>*]:align-middle [&>*+*]:ms-8')}>
-            {children}
-          </span>
+          <span className={cn(accordionTriggerTitleVariants({ variant }))}>{children}</span>
           {indicator}
         </>
       ) : (
         <>
           {indicator}
-          <span className={cn(accordionTriggerTitleVariants())}>{children}</span>
+          <span className={cn(accordionTriggerTitleVariants({ variant }))}>{children}</span>
         </>
       )}
     </ArkUiAccordion.ItemTrigger>

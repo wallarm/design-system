@@ -5,9 +5,7 @@ import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { AccordionContextProvider, type AccordionVariant } from './AccordionContext';
 import { accordionRootVariants } from './classes';
 
-export interface AccordionValueChangeDetails {
-  value: string[];
-}
+export type AccordionValueChangeDetails = ArkUiAccordion.ValueChangeDetails;
 
 export interface AccordionProps extends TestableProps {
   children: ReactNode;

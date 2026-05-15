@@ -5,7 +5,7 @@
  * `--height` CSS variable while `data-state` toggles between `open` and
  * `closed`. The keyframes animate height between `0` and that measured value.
  */
-@keyframes accordion-down {
+@keyframes ds-accordion-down {
     from {
         height: 0;
     }
@@ -14,7 +14,7 @@
     }
 }
 
-@keyframes accordion-up {
+@keyframes ds-accordion-up {
     from {
         height: var(--height);
     }

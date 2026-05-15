@@ -6,7 +6,8 @@ const accordionStory = createStoryHelper('data-display-accordion', [
   'Secondary',
   'Section',
   'Section With Actions',
-  'Long Title',
+  'Long Title Primary',
+  'Long Title Secondary',
   'Multiple',
   'Disabled',
 ] as const);
@@ -35,8 +36,13 @@ test.describe('Component: Accordion', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render long title truncated correctly', async ({ page }) => {
-      await accordionStory.goto(page, 'Long Title');
+    test('Should render long title truncated in primary variant', async ({ page }) => {
+      await accordionStory.goto(page, 'Long Title Primary');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render long title truncated in secondary variant', async ({ page }) => {
+      await accordionStory.goto(page, 'Long Title Secondary');
       await expect(page).toHaveScreenshot();
     });
 
@@ -131,6 +137,25 @@ test.describe('Component: Accordion', () => {
       const controlsId = await trigger.getAttribute('aria-controls');
       expect(controlsId).toBeTruthy();
       await expect(page.locator(`[id="${controlsId}"]`)).toHaveAttribute('role', 'region');
+    });
+
+    test('Should move focus across triggers with ArrowDown/ArrowUp/Home/End', async ({ page }) => {
+      await accordionStory.goto(page, 'Multiple');
+      const triggerA = getTrigger(page, 'Section A');
+      const triggerB = getTrigger(page, 'Section B');
+      const triggerC = getTrigger(page, 'Section C');
+
+      await triggerA.focus();
+      await page.keyboard.press('ArrowDown');
+      await expect(triggerB).toBeFocused();
+      await page.keyboard.press('ArrowDown');
+      await expect(triggerC).toBeFocused();
+      await page.keyboard.press('ArrowUp');
+      await expect(triggerB).toBeFocused();
+      await page.keyboard.press('End');
+      await expect(triggerC).toBeFocused();
+      await page.keyboard.press('Home');
+      await expect(triggerA).toBeFocused();
     });
   });
 });

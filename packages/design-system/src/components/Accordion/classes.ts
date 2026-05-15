@@ -51,7 +51,16 @@ export const accordionActionsVariants = cva(
   cn('flex items-center gap-4 col-start-2 row-start-1 pl-8 shrink-0'),
 );
 
-export const accordionTriggerTitleVariants = cva('block flex-1 min-w-0 truncate text-left');
+export const accordionTriggerTitleVariants = cva('block flex-1 min-w-0 truncate text-left', {
+  variants: {
+    variant: {
+      primary: '',
+      secondary: '',
+      section: '[&>*]:align-middle [&>*+*]:ms-8',
+    },
+  },
+  defaultVariants: { variant: 'primary' },
+});
 
 export const accordionIndicatorVariants = cva(
   cn(
@@ -74,8 +83,8 @@ export const accordionIndicatorVariants = cva(
 export const accordionContentVariants = cva(
   cn(
     'overflow-hidden',
-    'data-[state=open]:animate-[accordion-down_220ms_cubic-bezier(0.4,0,0.2,1)]',
-    'data-[state=closed]:animate-[accordion-up_220ms_cubic-bezier(0.4,0,0.2,1)]',
+    'data-[state=open]:animate-[ds-accordion-down_220ms_cubic-bezier(0.4,0,0.2,1)]',
+    'data-[state=closed]:animate-[ds-accordion-up_220ms_cubic-bezier(0.4,0,0.2,1)]',
     'motion-reduce:animate-none',
   ),
   {
@@ -90,13 +99,4 @@ export const accordionContentVariants = cva(
   },
 );
 
-export const accordionContentInnerVariants = cva('', {
-  variants: {
-    variant: {
-      primary: 'pt-8',
-      secondary: 'pt-8',
-      section: 'pt-8',
-    },
-  },
-  defaultVariants: { variant: 'primary' },
-});
+export const accordionContentInnerVariants = cva('pt-8');

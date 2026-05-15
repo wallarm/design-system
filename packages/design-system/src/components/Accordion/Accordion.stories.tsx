@@ -35,6 +35,8 @@ const meta = {
     },
     multiple: { control: 'boolean' },
     collapsible: { control: 'boolean' },
+    disabled: { control: 'boolean' },
+    defaultValue: { control: 'object' },
   },
 } satisfies Meta<typeof Accordion>;
 
@@ -148,13 +150,27 @@ export const SectionWithActions: StoryFn<AccordionProps> = args => (
   </div>
 );
 
-export const LongTitle: StoryFn<AccordionProps> = args => (
+const longTitleText =
+  'A really long title that should truncate gracefully without breaking the layout';
+
+export const LongTitlePrimary: StoryFn<AccordionProps> = args => (
   <div className='w-320'>
-    <Accordion {...args} variant='section' data-testid='accordion-long-title'>
+    <Accordion {...args} variant='primary' data-testid='accordion-long-title-primary'>
       <AccordionItem value='1'>
-        <AccordionTrigger>
-          A really long title that should truncate gracefully without breaking the layout
-        </AccordionTrigger>
+        <AccordionTrigger>{longTitleText}</AccordionTrigger>
+        <AccordionContent>
+          <Text>{sampleText}</Text>
+        </AccordionContent>
+      </AccordionItem>
+    </Accordion>
+  </div>
+);
+
+export const LongTitleSecondary: StoryFn<AccordionProps> = args => (
+  <div className='w-320'>
+    <Accordion {...args} variant='secondary' data-testid='accordion-long-title-secondary'>
+      <AccordionItem value='1'>
+        <AccordionTrigger>{longTitleText}</AccordionTrigger>
         <AccordionContent>
           <Text>{sampleText}</Text>
         </AccordionContent>
