@@ -40,7 +40,12 @@ export const IpListHorizontal: FC<IpListHorizontalProps> = ({
         data-slot='ip-list'
         data-type='horizontal'
         data-testid={testId}
-        className={cn('flex items-center gap-6 min-w-0 max-w-full', className)}
+        // `w-full` pins the container width to its parent track. Without it
+        // the container is content-sized: once items collapse into `+N` the
+        // container stays narrow even when the surrounding column expands, so
+        // `useOverflowItems` never observes a size change and never reflows
+        // visible items back. `min-w-0` keeps it shrinkable below content.
+        className={cn('flex items-center gap-6 w-full min-w-0 max-w-full', className)}
       >
         {visibleItems.map((item, i) => (
           // biome-ignore lint/suspicious/noArrayIndexKey: order-preserving prefix slice from useOverflowItems

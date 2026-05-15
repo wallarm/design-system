@@ -93,7 +93,12 @@ export const AttributeActionsTarget: FC<AttributeActionsTargetProps> = ({
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         className={cn(
-          '-my-4 flex w-full cursor-pointer items-center rounded-8 px-6 py-4 transition-colors',
+          // `min-w-0` lets the target shrink below its content size — without
+          // it, flex children fall back to `min-width: auto` (content-based),
+          // so width-aware descendants (e.g. `IpList type="horizontal"`,
+          // `OverflowList`) read a content-derived width and never re-measure
+          // when the surrounding column shrinks.
+          '-my-4 flex w-full min-w-0 cursor-pointer items-center rounded-8 px-6 py-4 transition-colors',
           'hover:bg-states-primary-hover active:bg-states-primary-pressed',
           'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
           className,
