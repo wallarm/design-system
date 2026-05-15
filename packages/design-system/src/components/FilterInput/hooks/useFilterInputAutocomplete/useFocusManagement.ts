@@ -87,7 +87,18 @@ export const useFocusManagement = ({
         // If neither committed AND there's an incomplete building chip alive,
         // preserve it — blur should not destroy in-progress work.
         const committed = blurCommitRef.current?.() || commitBuildingOnBlur();
-        if (!committed && !hasIncompleteBuilding()) resetState();
+        if (!committed) {
+          if (hasIncompleteBuilding()) {
+            // Preserve in-progress building chip, but always close any
+            // dropdown — the menu may have leaked open if Ark UI's outside-
+            // click handler bailed out (e.g. activeElement was still the
+            // input). A consistent closed menu lets the refocus path
+            // re-open at the right segment.
+            setMenuState('closed');
+          } else {
+            resetState();
+          }
+        }
         // resetState / commit chain above may have refocused our input via
         // inputRef.current?.focus() in several sub-paths (value commit, clear,
         // etc.). Honor the user's blur intent by restoring focus to where they
@@ -108,6 +119,7 @@ export const useFocusManagement = ({
       hasIncompleteBuilding,
       resetState,
       setIsFocused,
+      setMenuState,
       inputRef,
     ],
   );
