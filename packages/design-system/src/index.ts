@@ -22,6 +22,17 @@ export {
   ZonedDateTime,
 } from '@internationalized/date';
 export {
+  Accordion,
+  AccordionContent,
+  type AccordionContentProps,
+  AccordionItem,
+  type AccordionItemProps,
+  type AccordionProps,
+  AccordionTrigger,
+  type AccordionTriggerProps,
+  type AccordionVariant,
+} from './components/Accordion';
+export {
   Alert,
   AlertClose,
   type AlertCloseProps,

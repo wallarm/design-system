@@ -1,0 +1,24 @@
+/**
+ * Expand/collapse keyframes for the Accordion content.
+ *
+ * Zag/Ark UI exposes the measured content size on the content element as the
+ * `--height` CSS variable while `data-state` toggles between `open` and
+ * `closed`. The keyframes animate height between `0` and that measured value.
+ */
+@keyframes accordion-down {
+    from {
+        height: 0;
+    }
+    to {
+        height: var(--height);
+    }
+}
+
+@keyframes accordion-up {
+    from {
+        height: var(--height);
+    }
+    to {
+        height: 0;
+    }
+}
