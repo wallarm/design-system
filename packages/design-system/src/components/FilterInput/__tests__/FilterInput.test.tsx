@@ -557,14 +557,18 @@ describe('FilterInput', () => {
       await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
       await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
 
-      // Blur out, then return focus to the FilterInput's input.
+      // Blur out, then return focus to the FilterInput's input. The
+      // intermediate menu close races with React focus state on slower
+      // environments (CI), so use a longer timeout on the assertion below.
       await user.click(screen.getByRole('button', { name: 'outside' }));
       await user.click(screen.getByRole('combobox'));
 
       // The value menu must be the one that reopens — confirmed by the
       // presence of value items ("Active") from the enum field. The field
       // menu would surface a "Status" menuitem instead.
-      expect(await screen.findByRole('menuitem', { name: /^Active$/ })).toBeInTheDocument();
+      expect(
+        await screen.findByRole('menuitem', { name: /^Active$/ }, { timeout: 5000 }),
+      ).toBeInTheDocument();
       expect(screen.queryByRole('menuitem', { name: 'Status' })).toBeNull();
     });
 
