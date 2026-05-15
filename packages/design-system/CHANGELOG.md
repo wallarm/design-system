@@ -1,3 +1,7 @@
+## 0.37.0 (2026-05-15)
+
+* feat(filter-input): AS-970 commit chip only when fully built, allow re-editing segments (#118) ([0c90f91](https://github.com/wallarm/design-system/commit/0c90f91)), closes [#118](https://github.com/wallarm/design-system/issues/118)
+
 ## 0.36.0 (2026-05-15)
 
 * fix(popover): AS-1005 contain wheel chaining inside ScrollArea viewport (#117) ([867381e](https://github.com/wallarm/design-system/commit/867381e)), closes [#117](https://github.com/wallarm/design-system/issues/117)
