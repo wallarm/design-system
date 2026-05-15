@@ -43,6 +43,7 @@ export interface FilterInputContextValue {
   onCancelSegmentEdit: () => void;
   onCustomValueCommit: (customText: string) => void;
   onCustomAttributeCommit: (customText: string) => void;
+  onCustomOperatorCommit: (customText: string) => void;
   /** Ref to the currently open menu content element */
   menuRef: RefObject<HTMLDivElement | null>;
   /** Close autocomplete menu (used by connector chip to enforce single-dropdown constraint) */

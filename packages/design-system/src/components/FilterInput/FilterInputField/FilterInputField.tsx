@@ -43,6 +43,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     onCancelSegmentEdit,
     onCustomValueCommit,
     onCustomAttributeCommit,
+    onCustomOperatorCommit,
     menuRef,
   } = useFilterInputContext();
 
@@ -81,6 +82,11 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
           onCustomAttributeCommit(segmentFilterText);
           return;
         }
+        if (editingSegment === SEGMENT_VARIANT.operator) {
+          e.preventDefault();
+          onCustomOperatorCommit(segmentFilterText);
+          return;
+        }
       }
       if (e.key === 'ArrowDown') {
         e.preventDefault();
@@ -93,6 +99,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
       segmentFilterText,
       onCustomValueCommit,
       onCustomAttributeCommit,
+      onCustomOperatorCommit,
       menuRef,
     ],
   );
@@ -147,7 +154,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
                 <FilterInputChip
                   ref={buildingChipRef}
                   building
-                  attribute={buildingChipData.attribute ?? ''}
+                  attribute={buildingChipData.attribute}
                   operator={buildingChipData.operator}
                   value={buildingChipData.value}
                   onSegmentClick={onBuildingChipClick}

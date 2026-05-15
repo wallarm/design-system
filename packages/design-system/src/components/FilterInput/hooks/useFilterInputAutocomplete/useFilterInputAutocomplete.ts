@@ -130,6 +130,7 @@ export const useFilterInputAutocomplete = ({
     handleRangeSelect,
     handleCustomValueCommit,
     handleCustomAttributeCommit,
+    handleCustomOperatorCommit,
   } = useMenuFlow({
     editing,
     selectedField,
@@ -367,6 +368,7 @@ export const useFilterInputAutocomplete = ({
     cancelSegmentEdit,
     handleCustomValueCommit,
     handleCustomAttributeCommit,
+    handleCustomOperatorCommit,
     menuRef,
     closeAutocompleteMenu,
     blurCommitRef,

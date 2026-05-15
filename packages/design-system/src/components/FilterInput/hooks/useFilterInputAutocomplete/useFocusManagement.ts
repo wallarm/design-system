@@ -122,10 +122,18 @@ export const useFocusManagement = ({
   //   2. Empty initial focus — when there's nothing to resume and the input
   //      is empty + no chips exist, open the field menu so the user can
   //      start building.
+  //
+  // Skip entirely while a segment inline-edit is active — the segment click
+  // handler has already opened the segment-specific menu, and we must not
+  // overwrite it on the focus tick that fired the same gesture.
 
   const prevFocusedRef = useRef(false);
   useEffect(() => {
     if (!isFocused || prevFocusedRef.current) {
+      prevFocusedRef.current = isFocused;
+      return;
+    }
+    if (editingSegment) {
       prevFocusedRef.current = isFocused;
       return;
     }
@@ -143,6 +151,7 @@ export const useFocusManagement = ({
     inputText,
     selectedField,
     selectedOperator,
+    editingSegment,
     resetMenuOffset,
     setMenuState,
   ]);

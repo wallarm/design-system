@@ -3,11 +3,14 @@ import { useCallback, useRef } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,
+  getFieldOperators,
+  getOperatorFromLabel,
   isBetweenOperator,
   isMultiSelectOperator,
   isNoValueOperator,
   isOperatorAllowedForField,
   isValueShapeCompatible,
+  OPERATOR_SYMBOLS,
 } from '../../lib';
 import type {
   Condition,
@@ -75,13 +78,26 @@ export const useMenuFlow = ({
   // Ignore Ark UI close when focus is on our input or a segment inline-edit input.
   // Otherwise: try to commit the building chip if it's fully built; if not
   // built, preserve the in-progress state instead of wiping it via resetState.
+  // Either way (committed or preserved), keep React's menuState aligned with
+  // the now-closed menu so the controlled `open` prop doesn't drift.
   const handleMenuClose = useCallback(() => {
     if (document.activeElement === inputRef.current) return;
     if ((document.activeElement as HTMLElement)?.closest?.('[data-slot^="segment-"]')) return;
     if (commitBuildingOnBlur()) return;
     const hasIncompleteBuilding = selectedField !== null && !editing.editingChipId;
-    if (!hasIncompleteBuilding) resetState();
-  }, [commitBuildingOnBlur, resetState, inputRef, selectedField, editing.editingChipId]);
+    if (hasIncompleteBuilding) {
+      setMenuState('closed');
+      return;
+    }
+    resetState();
+  }, [
+    commitBuildingOnBlur,
+    resetState,
+    inputRef,
+    selectedField,
+    editing.editingChipId,
+    setMenuState,
+  ]);
 
   const handleFieldSelect = useCallback(
     (field: FieldMetadata) => {
@@ -141,8 +157,8 @@ export const useMenuFlow = ({
 
       // Inline-edit of the building chip's operator — keep value preview
       // when the shape (multi/between/no-value) is unchanged, otherwise drop
-      // it. No-value operators close the menu and let the user commit by
-      // blur/Enter; commit happens through the normal building flow.
+      // it. No-value operators auto-commit on the spot (their placeholder
+      // satisfies isBuildingComplete), matching the first-pass flow.
       const isBuildingEdit =
         !editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.operator;
       if (isBuildingEdit) {
@@ -422,6 +438,35 @@ export const useMenuFlow = ({
     [editing, fields, upsertCondition, resetState, handleFieldSelect],
   );
 
+  /**
+   * Commit a custom typed operator (from inline segment editing) by matching
+   * the text against the field's allowed operator labels, raw keys, or
+   * symbols. Mirrors the main-input Enter logic in useInputHandlers, so the
+   * keyboard flow is symmetric between attribute, operator, and value
+   * segments. Unmatched text is ignored.
+   */
+  const handleCustomOperatorCommit = useCallback(
+    (customText: string) => {
+      if (!selectedField || !customText.trim()) return;
+      const trimmed = customText.trim();
+      const allowed = getFieldOperators(selectedField);
+      let matched: FilterOperator | null = getOperatorFromLabel(trimmed, selectedField.type);
+      if (!matched) {
+        const symbolMatch = allowed.find(
+          op => OPERATOR_SYMBOLS[op].toLowerCase() === trimmed.toLowerCase(),
+        );
+        if (symbolMatch) matched = symbolMatch;
+      }
+      if (!matched) {
+        const rawMatch = allowed.find(op => op.toLowerCase() === trimmed.toLowerCase());
+        if (rawMatch) matched = rawMatch;
+      }
+      if (!matched || !isOperatorAllowedForField(selectedField, matched)) return;
+      handleOperatorSelect(matched);
+    },
+    [selectedField, handleOperatorSelect],
+  );
+
   return {
     handleMenuClose,
     handleFieldSelect,
@@ -432,6 +477,7 @@ export const useMenuFlow = ({
     handleMultiSelectToggle,
     handleRangeSelect,
     handleCustomValueCommit,
+    handleCustomOperatorCommit,
     handleCustomAttributeCommit,
   };
 };

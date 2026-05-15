@@ -27,6 +27,7 @@ interface AutocompleteForContext {
   cancelSegmentEdit: () => void;
   handleCustomValueCommit: (customText: string) => void;
   handleCustomAttributeCommit: (customText: string) => void;
+  handleCustomOperatorCommit: (customText: string) => void;
   menuRef: RefObject<HTMLDivElement | null>;
   closeAutocompleteMenu: () => void;
   segmentAttributeInputRef: RefObject<HTMLInputElement | null>;
@@ -84,6 +85,7 @@ export const useFilterInputContextValue = ({
       onCancelSegmentEdit: autocomplete.cancelSegmentEdit,
       onCustomValueCommit: autocomplete.handleCustomValueCommit,
       onCustomAttributeCommit: autocomplete.handleCustomAttributeCommit,
+      onCustomOperatorCommit: autocomplete.handleCustomOperatorCommit,
       menuRef: autocomplete.menuRef,
       closeAutocompleteMenu: autocomplete.closeAutocompleteMenu,
       registerChipRef,
@@ -114,6 +116,7 @@ export const useFilterInputContextValue = ({
       autocomplete.cancelSegmentEdit,
       autocomplete.handleCustomValueCommit,
       autocomplete.handleCustomAttributeCommit,
+      autocomplete.handleCustomOperatorCommit,
       autocomplete.menuRef,
       autocomplete.closeAutocompleteMenu,
       autocomplete.segmentAttributeInputRef,

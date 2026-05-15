@@ -174,6 +174,9 @@ export const useChipEditing = ({
    * downstream consumers can branch on.
    */
   const startBuildingEdit = useCallback((segment: ChipSegment, currentText: string) => {
+    // Defensive reset: editingChipId should already be null in the building
+    // flow, but the marker (chipId null, segment set) is load-bearing for
+    // downstream branching — pin it explicitly.
     setEditingChipId(null);
     setEditingSegment(segment);
     setSegmentFilterText(currentText);
