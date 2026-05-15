@@ -33,6 +33,8 @@ export {
   isNoValueOperator,
   isOperatorAllowedForField,
   isValueShapeCompatible,
+  NO_VALUE_PLACEHOLDER,
+  nextBuildingMenu,
 } from './operators';
 export { type FilterParseError, isFilterParseError, parseExpression } from './parseExpression';
 export { serializeExpression } from './serializeExpression';

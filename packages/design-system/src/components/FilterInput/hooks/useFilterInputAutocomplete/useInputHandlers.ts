@@ -1,6 +1,12 @@
 import type { ChangeEvent, KeyboardEvent, MutableRefObject, RefObject } from 'react';
 import { useCallback, useRef } from 'react';
-import { applyAcceptChar, getOperatorFromLabel, hasFieldValues, OPERATOR_SYMBOLS } from '../../lib';
+import {
+  applyAcceptChar,
+  getOperatorFromLabel,
+  hasFieldValues,
+  nextBuildingMenu,
+  OPERATOR_SYMBOLS,
+} from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface UseInputHandlersDeps {
@@ -73,15 +79,10 @@ export const useInputHandlers = ({
   const handleInputClick = useCallback(() => {
     inputRef.current?.focus();
     if (menuState !== 'closed') return;
-    if (!selectedField) {
-      resetMenuOffset();
-      setMenuState('field');
-      return;
-    }
-    // Building chip alive — resume at the next missing segment so the user
-    // doesn't have to re-pick the filter they already chose.
+    // Either start a fresh chip (no building yet) or resume an in-progress
+    // one at the next missing segment — the helper handles both.
     resetMenuOffset();
-    setMenuState(selectedOperator ? 'value' : 'operator');
+    setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
   }, [menuState, selectedField, selectedOperator, resetMenuOffset, inputRef, setMenuState]);
 
   const handleKeyDown = useCallback(

@@ -1,7 +1,7 @@
 import type { FocusEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { isMenuRelated } from '../../lib';
+import { isMenuRelated, nextBuildingMenu } from '../../lib';
 import type { FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface UseFocusManagementDeps {
@@ -139,7 +139,7 @@ export const useFocusManagement = ({
     }
     if (selectedField) {
       resetMenuOffset();
-      setMenuState(selectedOperator ? 'value' : 'operator');
+      setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
     } else if (conditionsLength === 0 && inputText === '') {
       resetMenuOffset();
       setMenuState('field');

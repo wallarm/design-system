@@ -7,12 +7,8 @@ import {
   hasStaticAllowlist,
   isMultiSelectOperator,
   isNoValueOperator,
+  NO_VALUE_PLACEHOLDER,
 } from '../../lib';
-
-/** Keep in sync with NO_VALUE_PLACEHOLDER in buildChips.ts so committed and
- *  in-progress chips render the same filler. */
-const NO_VALUE_PLACEHOLDER = '—';
-
 import type { Condition, FieldMetadata, FilterOperator } from '../../types';
 
 interface DeriveOptions {

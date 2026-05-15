@@ -1,4 +1,4 @@
-import type { FieldMetadata, FieldType, FilterOperator } from '../types';
+import type { FieldMetadata, FieldType, FilterOperator, MenuState } from '../types';
 import {
   MULTI_SELECT_OPERATORS,
   NO_VALUE_OPERATORS,
@@ -6,6 +6,14 @@ import {
   OPERATOR_LABELS_BY_TYPE,
   OPERATORS_BY_TYPE,
 } from './constants';
+
+/**
+ * Filler text shown in the value slot of no-value operator chips so every
+ * chip visually has three segments. Kept here next to `isNoValueOperator`
+ * so committed (buildChips) and building-preview (deriveAutocompleteValues)
+ * paths can never drift.
+ */
+export const NO_VALUE_PLACEHOLDER = '—';
 
 /**
  * Helper to get operator label for specific field type
@@ -49,6 +57,21 @@ export const isOperatorAllowedForField = (
   field: FieldMetadata,
   operator: FilterOperator,
 ): boolean => getFieldOperators(field).includes(operator);
+
+/**
+ * The menu that should open to continue building a chip from its current
+ * state. Returns null when the chip is fully built and nothing should open.
+ * Reused by the refocus path (useFocusManagement) and the main-input click
+ * path (useInputHandlers) so both stay in sync.
+ */
+export const nextBuildingMenu = (
+  field: FieldMetadata | null,
+  operator: FilterOperator | null,
+): MenuState | null => {
+  if (!field) return 'field';
+  if (!operator) return 'operator';
+  return 'value';
+};
 
 /**
  * Decide whether the in-progress (field, operator, value) triple is fully

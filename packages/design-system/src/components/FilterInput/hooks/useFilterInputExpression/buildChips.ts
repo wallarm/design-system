@@ -4,6 +4,7 @@ import {
   getDateDisplayLabel,
   getOperatorLabel,
   isNoValueOperator,
+  NO_VALUE_PLACEHOLDER,
 } from '../../lib';
 import type { ChipErrorSegment, Condition, FieldMetadata, FilterInputChipData } from '../../types';
 import { getInvalidValueIndices } from '../useFilterInputAutocomplete/valueCommitHelpers';
@@ -13,9 +14,6 @@ const DATE_RANGE_SEPARATOR = ' – ';
 const MULTI_VALUE_SEPARATOR = ', ';
 const DEFAULT_FIELD_TYPE = 'string';
 const DEFAULT_CONNECTOR = 'and';
-/** Filler text shown in the value slot of no-value operator chips so every
- *  chip visually has three segments (attribute + operator + value). */
-const NO_VALUE_PLACEHOLDER = '—';
 
 const chipId = (i: number) => `chip-${i}`;
 const connectorChip = (i: number, variant: 'and' | 'or'): FilterInputChipData =>
