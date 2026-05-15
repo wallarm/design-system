@@ -130,7 +130,7 @@ test.describe('Component: Accordion', () => {
 
       const controlsId = await trigger.getAttribute('aria-controls');
       expect(controlsId).toBeTruthy();
-      await expect(page.locator(`#${controlsId}`)).toHaveAttribute('role', 'region');
+      await expect(page.locator(`[id="${controlsId}"]`)).toHaveAttribute('role', 'region');
     });
   });
 });
