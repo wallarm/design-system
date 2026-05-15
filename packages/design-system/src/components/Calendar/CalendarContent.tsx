@@ -22,6 +22,7 @@ export const CalendarContent = forwardRef<HTMLDivElement, CalendarContentProps>(
           className={cn(
             'flex bg-bg-surface-2 rounded-12 shadow-md',
             'border border-border-primary-light',
+            'z-50',
             // Animation (same as DropdownMenu/Popover)
             'data-[state=open]:animate-in data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95',
             'data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95',
