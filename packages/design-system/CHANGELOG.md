@@ -1,3 +1,8 @@
+## 0.36.0 (2026-05-15)
+
+* fix(popover): AS-1005 contain wheel chaining inside ScrollArea viewport (#117) ([867381e](https://github.com/wallarm/design-system/commit/867381e)), closes [#117](https://github.com/wallarm/design-system/issues/117)
+* feat(simple-charts): WDS-90 LineChart ([42cdd22](https://github.com/wallarm/design-system/commit/42cdd22))
+
 ## 0.35.0 (2026-05-13)
 
 * feat: [CORE-2327] nav tech design ([6603609](https://github.com/wallarm/design-system/commit/6603609))
