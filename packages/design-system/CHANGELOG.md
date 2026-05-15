@@ -1,3 +1,7 @@
+## 0.38.0 (2026-05-15)
+
+* feat(accordion): AS-962 add Accordion component (#119) ([2b5d278](https://github.com/wallarm/design-system/commit/2b5d278)), closes [#119](https://github.com/wallarm/design-system/issues/119)
+
 ## 0.37.0 (2026-05-15)
 
 * feat(filter-input): AS-970 commit chip only when fully built, allow re-editing segments (#118) ([0c90f91](https://github.com/wallarm/design-system/commit/0c90f91)), closes [#118](https://github.com/wallarm/design-system/issues/118)
