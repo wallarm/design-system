@@ -98,7 +98,14 @@ const OverflowListComponent = <T,>({
   return (
     <>
       <MeasurementContainer />
-      <div ref={containerRef} className={cn('flex min-w-0', className)} {...props}>
+      {/*
+       * `w-full` pins the container width to its parent track. Without it the
+       * container is content-sized: once items collapse into the overflow
+       * indicator the container stays narrow even when the surrounding column
+       * expands, so `useOverflowItems` never observes a size change and never
+       * reflows visible items back. `min-w-0` keeps it shrinkable below content.
+       */}
+      <div ref={containerRef} className={cn('flex w-full min-w-0', className)} {...props}>
         {collapseFrom === 'start' && overflowElement}
         {visibleElements}
         {collapseFrom === 'end' && overflowElement}
