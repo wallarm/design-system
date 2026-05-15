@@ -2,7 +2,7 @@ import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Accordion as ArkUiAccordion } from '@ark-ui/react/accordion';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { useAccordionSharedContext } from './AccordionContext';
+import { useAccordionContext } from './AccordionContext';
 import { accordionItemVariants } from './classes';
 
 export interface AccordionItemProps extends HTMLAttributes<HTMLDivElement> {
@@ -22,7 +22,7 @@ export const AccordionItem: FC<AccordionItemProps> = ({
   className,
   ...rest
 }) => {
-  const { variant } = useAccordionSharedContext();
+  const { variant } = useAccordionContext();
   const testId = useTestId(`item-${value}`);
 
   return (

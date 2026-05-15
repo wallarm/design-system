@@ -2,7 +2,7 @@ import type { FC, ReactNode } from 'react';
 import { Accordion as ArkUiAccordion } from '@ark-ui/react/accordion';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
-import { AccordionSharedContextProvider, type AccordionVariant } from './AccordionContext';
+import { AccordionContextProvider, type AccordionVariant } from './AccordionContext';
 import { accordionRootVariants } from './classes';
 
 export interface AccordionValueChangeDetails {
@@ -51,7 +51,7 @@ export const Accordion: FC<AccordionProps> = ({
   'data-testid': testId,
 }) => {
   return (
-    <AccordionSharedContextProvider value={{ variant }}>
+    <AccordionContextProvider variant={variant}>
       <ArkUiAccordion.Root
         data-slot='accordion'
         data-testid={testId}
@@ -66,7 +66,7 @@ export const Accordion: FC<AccordionProps> = ({
       >
         <TestIdProvider value={testId}>{children}</TestIdProvider>
       </ArkUiAccordion.Root>
-    </AccordionSharedContextProvider>
+    </AccordionContextProvider>
   );
 };
 

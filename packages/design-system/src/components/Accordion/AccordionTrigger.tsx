@@ -3,7 +3,7 @@ import { Accordion as ArkUiAccordion } from '@ark-ui/react/accordion';
 import { ChevronDown, ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { useAccordionSharedContext } from './AccordionContext';
+import { useAccordionContext } from './AccordionContext';
 import {
   accordionIndicatorVariants,
   accordionTriggerTitleVariants,
@@ -22,7 +22,7 @@ export const AccordionTrigger: FC<AccordionTriggerProps> = ({
   className,
   ...rest
 }) => {
-  const { variant } = useAccordionSharedContext();
+  const { variant } = useAccordionContext();
   const testId = useTestId('trigger');
 
   const indicator = (
