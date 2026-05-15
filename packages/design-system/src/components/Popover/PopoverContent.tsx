@@ -70,6 +70,12 @@ export const PopoverContent: FC<PopoverContentProps> = ({
             'max-h-[clamp(var(--popover-min-height),var(--available-height),var(--popover-max-height))]',
             // Visual
             'p-12 bg-bg-surface-2 rounded-12 border border-border-primary-light shadow-md text-text-primary z-50',
+            // Contain wheel chaining on the inner ScrollArea viewport so wheel
+            // events past the scroll boundary don't propagate to whatever
+            // scrollable lives below — popovers are portaled and frequently
+            // open above a non-modal surface (e.g. a `modal={false}` Drawer),
+            // where chained scroll would otherwise move the page underneath.
+            '[&_[data-part=viewport]]:overscroll-contain',
             // Animations
             'animate-in fade-in-0 zoom-in-95 origin-[--radix-tooltip-content-transform-origin]',
             // Animation closed
