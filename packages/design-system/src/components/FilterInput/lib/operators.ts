@@ -1,9 +1,10 @@
-import type { FieldType, FilterOperator } from '../types';
+import type { FieldMetadata, FieldType, FilterOperator } from '../types';
 import {
   MULTI_SELECT_OPERATORS,
   NO_VALUE_OPERATORS,
   OPERATOR_LABELS,
   OPERATOR_LABELS_BY_TYPE,
+  OPERATORS_BY_TYPE,
 } from './constants';
 
 /**
@@ -38,3 +39,30 @@ export const isNoValueOperator = (op: FilterOperator): boolean =>
 
 /** Check if operator is a between/range operator */
 export const isBetweenOperator = (op: FilterOperator | null): boolean => op === 'between';
+
+/** Get the list of operators a field allows (custom override or full type list) */
+export const getFieldOperators = (field: FieldMetadata): FilterOperator[] =>
+  field.operators ?? OPERATORS_BY_TYPE[field.type].flat();
+
+/** Check whether an operator is supported by a field's type/override list */
+export const isOperatorAllowedForField = (
+  field: FieldMetadata,
+  operator: FilterOperator,
+): boolean => getFieldOperators(field).includes(operator);
+
+/**
+ * Check whether two operators handle values in compatible shapes
+ * (multi-select / between / no-value categories match), meaning a value
+ * preview built for `a` can be reused as-is for `b`.
+ */
+export const isValueShapeCompatible = (
+  a: FilterOperator | null,
+  b: FilterOperator | null,
+): boolean => {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (isMultiSelectOperator(a) !== isMultiSelectOperator(b)) return false;
+  if (isBetweenOperator(a) !== isBetweenOperator(b)) return false;
+  if (isNoValueOperator(a) !== isNoValueOperator(b)) return false;
+  return true;
+};

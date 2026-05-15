@@ -106,8 +106,10 @@ export const FilterInput: FC<FilterInputProps> = ({
     setInputText: autocomplete.setInputText,
     closeMenu: autocomplete.closeAutocompleteMenu,
     replaceExpression,
-    // handleMenuDiscard === resetState — wipes insertIndex / selectedField / menuState / …
-    resetAutocompleteState: autocomplete.handleMenuDiscard,
+    // Paste replaces the whole expression, so any in-progress building (incl.
+    // segment inline-edit) must be scrapped — go through the unconditional
+    // reset, not handleMenuDiscard which now preserves building-edit state.
+    resetAutocompleteState: autocomplete.resetAutocompleteState,
   });
 
   const contextValue = useFilterInputContextValue({

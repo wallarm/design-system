@@ -45,12 +45,18 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   className,
   ...props
 }) => {
-  const interactive = !building && !disabled;
+  const interactive = !disabled;
   const hasError = !!error;
   const internalRef = useRef<HTMLDivElement>(null);
 
   const editing = useEditingContext();
-  const isEditingThisChip = editing != null && chipId != null && editing.editingChipId === chipId;
+  // A building chip has no chipId; inline-edit on it is signalled by editing
+  // state where editingChipId is null but a segment is set. For committed
+  // chips, match on chipId as before.
+  const isEditingThisChip =
+    editing != null &&
+    editing.editingSegment != null &&
+    (building ? editing.editingChipId == null : chipId != null && editing.editingChipId === chipId);
   const activeSegment = isEditingThisChip ? editing.editingSegment : null;
 
   const handleSegmentClick = useCallback(
@@ -92,7 +98,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
     <div
       ref={setRefs}
       className={cn(
-        chipVariants({ error: hasError, interactive, disabled }),
+        chipVariants({ error: hasError, interactive, disabled, building }),
         'max-w-[320px]',
         className,
       )}
@@ -136,7 +142,9 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
         </Segment>
       )}
 
-      {building && <ChipSearchInput />}
+      {/* While a building segment is in inline-edit, hide the trailing search
+          input — focus and typing live in the segment input instead. */}
+      {building && !isEditingThisChip && <ChipSearchInput />}
 
       {onRemove && !disabled && <FilterInputRemoveButton error={hasError} onRemove={onRemove} />}
     </div>

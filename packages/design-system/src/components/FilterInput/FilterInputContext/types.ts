@@ -29,6 +29,9 @@ export interface FilterInputContextValue {
   onInputClick: () => void;
   onGapClick: (conditionIndex: number, afterConnector: boolean) => void;
   onChipClick: (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => void;
+  /** Click on a segment of the *building* (in-progress) chip — re-opens the
+   *  corresponding menu and enters inline-edit without committing the chip. */
+  onBuildingChipClick: (segment: ChipSegment, anchorRect: DOMRect) => void;
   onConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   onChipRemove: (chipId: string) => void;
   onClear: () => void;

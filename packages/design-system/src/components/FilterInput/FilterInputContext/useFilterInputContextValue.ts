@@ -12,6 +12,7 @@ interface AutocompleteForContext {
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleInputClick: () => void;
   handleChipClick: (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => void;
+  handleBuildingChipClick: (segment: ChipSegment, anchorRect: DOMRect) => void;
   handleConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   handleChipRemove: (chipId: string) => void;
   handleClear: () => void;
@@ -72,6 +73,7 @@ export const useFilterInputContextValue = ({
       onInputKeyDown: autocomplete.handleKeyDown,
       onInputClick: autocomplete.handleInputClick,
       onChipClick: autocomplete.handleChipClick,
+      onBuildingChipClick: autocomplete.handleBuildingChipClick,
       onConnectorChange: autocomplete.handleConnectorChange,
       onChipRemove: autocomplete.handleChipRemove,
       onClear: autocomplete.handleClear,
@@ -101,6 +103,7 @@ export const useFilterInputContextValue = ({
       autocomplete.handleKeyDown,
       autocomplete.handleInputClick,
       autocomplete.handleChipClick,
+      autocomplete.handleBuildingChipClick,
       autocomplete.handleConnectorChange,
       autocomplete.handleChipRemove,
       autocomplete.handleClear,

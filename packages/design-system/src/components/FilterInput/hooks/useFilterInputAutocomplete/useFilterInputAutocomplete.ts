@@ -1,8 +1,8 @@
 import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from 'react';
-import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
+import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
-import { applyAcceptChar } from '../../lib';
+import { applyAcceptChar, getOperatorLabel } from '../../lib';
 import type {
   Condition,
   FieldMetadata,
@@ -247,12 +247,72 @@ export const useFilterInputAutocomplete = ({
   // `editingChipId` set after a blur-cancel leaks "building" state into the
   // main input: handleInputClick gates on `!selectedField` and would refuse
   // to reopen the field menu when the user clicks back into the input. AS-929.
+  //
+  // EXCEPTION: when cancelling an inline-edit on the *building* chip
+  // (`editingChipId === null` while a segment is being edited), we must
+  // preserve `selectedField` / `selectedOperator` / value preview — the user
+  // is still building and just bailed out of changing one segment.
   const cancelSegmentEdit = useCallback(() => {
+    const isBuildingEdit = !editing.editingChipId && editing.editingSegment !== null;
+    if (isBuildingEdit) {
+      editing.clearEditing();
+      setMenuState('closed');
+      return;
+    }
     setSelectedField(null);
     setSelectedOperator(null);
     editing.clearEditing();
     setMenuState('closed');
   }, [editing]);
+
+  /**
+   * Escape from a menu: when the user is inline-editing a *building* chip
+   * segment, preserve `selectedField`/`selectedOperator`/value preview so the
+   * chip survives. In any other case fall back to the existing destructive
+   * `resetState` behavior (matches committed-chip editing UX).
+   */
+  const handleMenuDiscard = useCallback(() => {
+    const isBuildingEdit = !editing.editingChipId && editing.editingSegment !== null;
+    if (isBuildingEdit) {
+      editing.clearEditing();
+      setMenuState('closed');
+      return;
+    }
+    resetState();
+  }, [editing, resetState]);
+
+  /**
+   * Click on a segment of the *building* chip — enter inline-edit on that
+   * segment and reopen the corresponding menu. Existing downstream state
+   * (operator, value preview) is preserved here; compatibility checks run
+   * only when the user actually picks a new value via handleFieldSelect /
+   * handleOperatorSelect.
+   */
+  const handleBuildingChipClick = useCallback(
+    (segment: ChipSegment, anchorRect: DOMRect) => {
+      if (!selectedField) return;
+      const containerRect = containerRef.current?.getBoundingClientRect();
+      setMenuOffset(containerRect ? anchorRect.left - containerRect.left : 0);
+      const initialText =
+        segment === SEGMENT_VARIANT.attribute
+          ? selectedField.label
+          : segment === SEGMENT_VARIANT.operator
+            ? selectedOperator
+              ? getOperatorLabel(selectedOperator, selectedField.type)
+              : ''
+            : (buildingMultiValue ?? '');
+      editing.startBuildingEdit(segment, initialText);
+      setInputText('');
+      setMenuState(
+        segment === SEGMENT_VARIANT.attribute
+          ? 'field'
+          : segment === SEGMENT_VARIANT.operator
+            ? 'operator'
+            : 'value',
+      );
+    },
+    [selectedField, selectedOperator, buildingMultiValue, containerRef, setMenuOffset, editing],
+  );
 
   // ── Public API ────────────────────────────────────────────
 
@@ -276,8 +336,13 @@ export const useFilterInputAutocomplete = ({
     handleBuildingValueChange,
     handleMultiSelectToggle,
     handleMenuClose,
-    handleMenuDiscard: resetState,
+    handleMenuDiscard,
+    /** Hard reset of autocomplete state — used by paste/clipboard flows where
+     *  the conditions array is replaced and any in-progress building must be
+     *  scrapped, regardless of inline-edit mode. */
+    resetAutocompleteState: resetState,
     handleChipClick: editing.handleChipClick,
+    handleBuildingChipClick,
     handleConnectorChange: setConnectorValue,
     handleChipRemove,
     handleClear,

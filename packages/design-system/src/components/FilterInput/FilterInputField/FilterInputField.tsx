@@ -33,6 +33,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     onInputClick,
     onGapClick,
     onChipClick,
+    onBuildingChipClick,
     onConnectorChange,
     onChipRemove,
     editingChipId,
@@ -149,6 +150,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
                   attribute={buildingChipData.attribute ?? ''}
                   operator={buildingChipData.operator}
                   value={buildingChipData.value}
+                  onSegmentClick={onBuildingChipClick}
                   className='mx-4'
                 />
               ) : (

@@ -29,14 +29,18 @@ export const chipVariants = cva(
         true: 'opacity-50 cursor-default',
         false: '',
       },
+      /** Visual marker for an in-progress (not yet committed) building chip. */
+      building: {
+        true: '',
+        false: '',
+      },
     },
-    compoundVariants: [
-      { interactive: false, error: false, className: 'border-border-strong-primary' },
-    ],
+    compoundVariants: [{ building: true, error: false, className: 'border-border-strong-primary' }],
     defaultVariants: {
       error: false,
       interactive: false,
       disabled: false,
+      building: false,
     },
   },
 );

@@ -159,6 +159,19 @@ export const useChipEditing = ({
     setUserHasTyped(false);
   }, []);
 
+  /**
+   * Enter inline-edit on a *building* chip segment. Unlike `handleChipClick`
+   * there is no committed chip yet, so `editingChipId` stays null — that
+   * combination (segment set, chipId null) is the building-edit marker
+   * downstream consumers can branch on.
+   */
+  const startBuildingEdit = useCallback((segment: ChipSegment, currentText: string) => {
+    setEditingChipId(null);
+    setEditingSegment(segment);
+    setSegmentFilterText(currentText);
+    setUserHasTyped(false);
+  }, []);
+
   /** Wraps setSegmentFilterText to track user typing */
   const handleSegmentFilterChange = useCallback((text: string) => {
     setSegmentFilterText(text);
@@ -188,6 +201,7 @@ export const useChipEditing = ({
       setSegmentFilterText: handleSegmentFilterChange,
       resetSegmentTyping,
       handleChipClick,
+      startBuildingEdit,
       clearEditing,
     }),
     [
@@ -198,6 +212,7 @@ export const useChipEditing = ({
       handleSegmentFilterChange,
       resetSegmentTyping,
       handleChipClick,
+      startBuildingEdit,
       clearEditing,
     ],
   );

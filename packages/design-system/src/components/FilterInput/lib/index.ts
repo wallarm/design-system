@@ -24,11 +24,14 @@ export { findOptionByValue, getFieldValues, hasFieldValues, hasStaticAllowlist }
 export { filterAndSort } from './filterSort';
 export { getCurrentValueTokenText, getValueFilterText } from './menuFilterText';
 export {
+  getFieldOperators,
   getOperatorFromLabel,
   getOperatorLabel,
   isBetweenOperator,
   isMultiSelectOperator,
   isNoValueOperator,
+  isOperatorAllowedForField,
+  isValueShapeCompatible,
 } from './operators';
 export { type FilterParseError, isFilterParseError, parseExpression } from './parseExpression';
 export { serializeExpression } from './serializeExpression';

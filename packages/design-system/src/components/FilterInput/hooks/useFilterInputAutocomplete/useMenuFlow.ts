@@ -6,6 +6,8 @@ import {
   isBetweenOperator,
   isMultiSelectOperator,
   isNoValueOperator,
+  isOperatorAllowedForField,
+  isValueShapeCompatible,
 } from '../../lib';
 import type {
   Condition,
@@ -99,16 +101,61 @@ export const useMenuFlow = ({
         resetState();
         return;
       }
+      // Inline-edit of the building chip's attribute — keep operator if the
+      // new field still allows it, keep value preview untouched (validation
+      // happens at commit time, not here).
+      const isBuildingEdit =
+        !editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.attribute;
+      if (isBuildingEdit) {
+        setSelectedField(field);
+        const keepOperator = selectedOperator
+          ? isOperatorAllowedForField(field, selectedOperator)
+          : false;
+        if (!keepOperator) setSelectedOperator(null);
+        editing.clearEditing();
+        setMenuState(keepOperator ? 'value' : 'operator');
+        return;
+      }
       setSelectedField(field);
       setInputText('');
       setMenuState('operator');
     },
-    [editing, upsertCondition, resetState, setSelectedField, setInputText, setMenuState],
+    [
+      editing,
+      selectedOperator,
+      upsertCondition,
+      resetState,
+      setSelectedField,
+      setSelectedOperator,
+      setInputText,
+      setMenuState,
+    ],
   );
 
   const handleOperatorSelect = useCallback(
     (operator: FilterOperator) => {
       if (!selectedField) return;
+
+      // Inline-edit of the building chip's operator — keep value preview
+      // when the shape (multi/between/no-value) is unchanged, otherwise drop
+      // it. No-value operators close the menu and let the user commit by
+      // blur/Enter; commit happens through the normal building flow.
+      const isBuildingEdit =
+        !editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.operator;
+      if (isBuildingEdit) {
+        const shapeCompatible = isValueShapeCompatible(selectedOperator, operator);
+        if (!shapeCompatible) setBuildingMultiValue(undefined);
+        setSelectedOperator(operator);
+        editing.clearEditing();
+        if (isNoValueOperator(operator)) {
+          // Commit the no-value chip immediately, matching first-pass flow.
+          upsertCondition(selectedField, operator, null, null, insertIndex);
+          resetState(true);
+          return;
+        }
+        setMenuState('value');
+        return;
+      }
 
       if (isNoValueOperator(operator)) {
         const isEditing = !!editing.editingChipId;
@@ -158,11 +205,14 @@ export const useMenuFlow = ({
     [
       editing,
       selectedField,
+      selectedOperator,
       insertIndex,
       upsertCondition,
       resetState,
       setSelectedOperator,
       setMenuState,
+      setBuildingMultiValue,
+      setInputText,
     ],
   );
 
@@ -314,11 +364,8 @@ export const useMenuFlow = ({
   /** Commit a custom typed attribute (from inline segment editing) */
   const handleCustomAttributeCommit = useCallback(
     (customText: string) => {
-      if (!editing.editingChipId || !customText.trim()) return;
+      if (!customText.trim()) return;
       const trimmed = customText.trim();
-      const idx = chipIdToConditionIndex(editing.editingChipId);
-      const condition = idx !== null ? conditionsRef.current[idx] : null;
-      if (!condition) return;
 
       // Try to match the typed text to a known field
       const matchedField = fields.find(
@@ -326,6 +373,18 @@ export const useMenuFlow = ({
           f.label.toLowerCase() === trimmed.toLowerCase() ||
           f.name.toLowerCase() === trimmed.toLowerCase(),
       );
+
+      // Inline-edit of the building chip's attribute — route through
+      // handleFieldSelect so operator-preservation logic is shared. Unknown
+      // text in building mode is ignored (no errored chip created).
+      if (!editing.editingChipId) {
+        if (matchedField) handleFieldSelect(matchedField);
+        return;
+      }
+
+      const idx = chipIdToConditionIndex(editing.editingChipId);
+      const condition = idx !== null ? conditionsRef.current[idx] : null;
+      if (!condition) return;
 
       if (matchedField) {
         const hasValueError = validateValueForField(matchedField, condition.value);
@@ -357,7 +416,7 @@ export const useMenuFlow = ({
       }
       resetState();
     },
-    [editing, fields, upsertCondition, resetState],
+    [editing, fields, upsertCondition, resetState, handleFieldSelect],
   );
 
   return {
