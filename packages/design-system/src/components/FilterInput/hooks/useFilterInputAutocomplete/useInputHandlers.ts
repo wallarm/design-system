@@ -7,6 +7,9 @@ interface UseInputHandlersDeps {
   inputText: string;
   menuState: MenuState;
   selectedField: FieldMetadata | null;
+  /** Needed so a click into the main input while a building chip is alive
+   *  resumes at the next missing segment instead of doing nothing. */
+  selectedOperator: FilterOperator | null;
   isFocused: boolean;
   fields: FieldMetadata[];
   inputRef: RefObject<HTMLInputElement | null>;
@@ -27,6 +30,7 @@ export const useInputHandlers = ({
   inputText,
   menuState,
   selectedField,
+  selectedOperator,
   isFocused,
   fields,
   inputRef,
@@ -68,11 +72,17 @@ export const useInputHandlers = ({
 
   const handleInputClick = useCallback(() => {
     inputRef.current?.focus();
-    if (menuState === 'closed' && !selectedField) {
+    if (menuState !== 'closed') return;
+    if (!selectedField) {
       resetMenuOffset();
       setMenuState('field');
+      return;
     }
-  }, [menuState, selectedField, resetMenuOffset, inputRef, setMenuState]);
+    // Building chip alive — resume at the next missing segment so the user
+    // doesn't have to re-pick the filter they already chose.
+    resetMenuOffset();
+    setMenuState(selectedOperator ? 'value' : 'operator');
+  }, [menuState, selectedField, selectedOperator, resetMenuOffset, inputRef, setMenuState]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {

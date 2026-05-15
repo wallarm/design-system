@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { chipIdToConditionIndex, getOperatorFromLabel } from '../../lib';
+import { chipIdToConditionIndex, getOperatorFromLabel, isNoValueOperator } from '../../lib';
 import type {
   Condition,
   FieldMetadata,
@@ -104,7 +104,15 @@ export const useChipEditing = ({
       const incompleteSegment = condition.error
         ? getFirstIncompleteSegment(condition, fieldsRef.current)
         : null;
-      const targetSegment = incompleteSegment ?? segment;
+      // No-value operator chips have a placeholder value segment — clicking
+      // it has no real meaning, so reroute to the operator segment (the user
+      // most likely wants to switch to a value-bearing operator).
+      const isPlaceholderValueClick =
+        segment === SEGMENT_VARIANT.value &&
+        condition.operator != null &&
+        isNoValueOperator(condition.operator);
+      const targetSegment =
+        incompleteSegment ?? (isPlaceholderValueClick ? SEGMENT_VARIANT.operator : segment);
 
       // For unknown fields, only attribute editing is allowed
       if (!field && targetSegment !== SEGMENT_VARIANT.attribute) return;

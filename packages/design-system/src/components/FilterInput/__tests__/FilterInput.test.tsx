@@ -476,4 +476,112 @@ describe('FilterInput', () => {
       expect(onChange).not.toHaveBeenCalled();
     });
   });
+
+  describe('commit only when fully built', () => {
+    const fields: FieldMetadata[] = [
+      {
+        name: 'status',
+        label: 'Status',
+        type: 'enum',
+        values: [
+          { value: 'active', label: 'Active' },
+          { value: 'pending', label: 'Pending' },
+        ],
+      },
+      { name: 'description', label: 'Description', type: 'string' },
+    ];
+
+    it('does not commit an incomplete building chip on blur', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      const { container } = render(
+        <div>
+          <FilterInput fields={fields} onChange={onChange} />
+          <button type='button'>outside</button>
+        </div>,
+      );
+
+      // Build only filter + operator (no value yet).
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
+
+      // Blur the whole FilterInput by clicking the outside button.
+      await user.click(screen.getByRole('button', { name: 'outside' }));
+
+      // Building chip survives — attribute + operator visible, no onChange.
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(chip).toBeInTheDocument();
+      expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
+      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is');
+      // No value segment in the chip — chip is still in `building` state.
+      expect(chip.querySelector('[data-slot="segment-value"]')).toBeNull();
+      expect(onChange).not.toHaveBeenCalled();
+    });
+
+    it('auto-commits when the third (value) segment is chosen', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<FilterInput fields={fields} onChange={onChange} />);
+
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
+      await user.click(await screen.findByRole('menuitem', { name: /^Active$/ }));
+
+      // Single condition committed — onChange called with that condition.
+      expect(onChange).toHaveBeenCalled();
+      const lastCall = onChange.mock.calls.at(-1)![0];
+      expect(lastCall).toMatchObject({
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      });
+    });
+
+    it('reopens the value menu (not field) when focus returns to an incomplete building chip', async () => {
+      const user = userEvent.setup();
+      render(
+        <div>
+          <FilterInput fields={fields} />
+          <button type='button'>outside</button>
+        </div>,
+      );
+
+      // Build attribute + operator, leaving the value missing.
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
+
+      // Blur out, then return focus to the FilterInput's input.
+      await user.click(screen.getByRole('button', { name: 'outside' }));
+      await user.click(screen.getByRole('combobox'));
+
+      // The value menu must be the one that reopens — confirmed by the
+      // presence of value items ("Active") from the enum field. The field
+      // menu would surface a "Status" menuitem instead.
+      expect(await screen.findByRole('menuitem', { name: /^Active$/ })).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Status' })).toBeNull();
+    });
+
+    it('renders a value placeholder for no-value operator chips', () => {
+      // Pre-committed no-value chip (consumer-provided value) — chip must
+      // visually show three segments with the value slot filled by "—".
+      const { container } = render(
+        <FilterInput
+          fields={fields}
+          value={{ type: 'condition', field: 'status', operator: 'is_null', value: null }}
+        />,
+      );
+
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
+      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is set');
+      expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('—');
+    });
+  });
 });

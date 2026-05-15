@@ -28,6 +28,7 @@ export {
   getOperatorFromLabel,
   getOperatorLabel,
   isBetweenOperator,
+  isBuildingComplete,
   isMultiSelectOperator,
   isNoValueOperator,
   isOperatorAllowedForField,

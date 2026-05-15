@@ -6,7 +6,13 @@ import {
   getOperatorLabel,
   hasStaticAllowlist,
   isMultiSelectOperator,
+  isNoValueOperator,
 } from '../../lib';
+
+/** Keep in sync with NO_VALUE_PLACEHOLDER in buildChips.ts so committed and
+ *  in-progress chips render the same filler. */
+const NO_VALUE_PLACEHOLDER = '—';
+
 import type { Condition, FieldMetadata, FilterOperator } from '../../types';
 
 interface DeriveOptions {
@@ -101,6 +107,9 @@ export const deriveAutocompleteValues = ({
     if (dateRangeFromValue && selectedOperator === 'between') {
       return `${getDateDisplayLabel(dateRangeFromValue)} – ...`;
     }
+    // No-value operator: show a placeholder so the in-progress chip already
+    // looks complete (3 segments) before the immediate auto-commit.
+    if (selectedOperator && isNoValueOperator(selectedOperator)) return NO_VALUE_PLACEHOLDER;
     return undefined;
   })();
 

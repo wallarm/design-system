@@ -74,6 +74,18 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
     [onSegmentClick, activeSegment],
   );
 
+  /**
+   * Suppress focus change on mousedown so clicking a segment doesn't drop
+   * focus to <body>. For a *building* chip that's load-bearing: a body-focus
+   * blur on FilterInput fires `commitBuildingOnBlur`, which would persist the
+   * in-progress chip as an errored condition before our click handler can
+   * enter inline-edit mode. The inline-edit input is focused programmatically
+   * after re-render via useFocusManagement's double-rAF effect.
+   */
+  const handleSegmentMouseDown = useCallback((e: ReactMouseEvent) => {
+    e.preventDefault();
+  }, []);
+
   const segmentEditProps = (segment: ChipSegment) =>
     isEditingThisChip && editing.editingSegment === segment
       ? {
@@ -110,6 +122,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
         className='shrink-0'
         error={error === true || error === SEGMENT_VARIANT.attribute}
         onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.attribute, e) : undefined}
+        onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
         {...segmentEditProps(SEGMENT_VARIANT.attribute)}
       >
         {attribute}
@@ -119,6 +132,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           variant={SEGMENT_VARIANT.operator}
           className='shrink-0'
           onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.operator, e) : undefined}
+          onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
           {...segmentEditProps(SEGMENT_VARIANT.operator)}
         >
           {operator ?? ''}
@@ -136,6 +150,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           valueSeparator={valueSeparator}
           errorValueIndices={errorValueIndices}
           onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.value, e) : undefined}
+          onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
           {...segmentEditProps(SEGMENT_VARIANT.value)}
         >
           {value ?? ''}

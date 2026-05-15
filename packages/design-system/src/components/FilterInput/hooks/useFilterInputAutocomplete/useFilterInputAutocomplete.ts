@@ -153,6 +153,7 @@ export const useFilterInputAutocomplete = ({
     inputText,
     menuState,
     selectedField,
+    selectedOperator,
     isFocused,
     fields,
     inputRef,
@@ -169,7 +170,7 @@ export const useFilterInputAutocomplete = ({
     handleCustomValueCommit,
   });
 
-  const commitBuildingOnBlur = useBlurCommit({
+  const { commitBuildingOnBlur, hasIncompleteBuilding } = useBlurCommit({
     selectedField,
     selectedOperator,
     inputText,
@@ -186,6 +187,8 @@ export const useFilterInputAutocomplete = ({
     isFocused,
     conditionsLength: conditions.length,
     inputText,
+    selectedField,
+    selectedOperator,
     containerRef,
     inputRef,
     editingSegment: editing.editingSegment,
@@ -194,6 +197,7 @@ export const useFilterInputAutocomplete = ({
     segmentValueInputRef,
     blurCommitRef,
     commitBuildingOnBlur,
+    hasIncompleteBuilding,
     setIsFocused,
     setMenuState,
     resetMenuOffset,

@@ -1,5 +1,10 @@
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { findOptionByValue, getDateDisplayLabel, getOperatorLabel } from '../../lib';
+import {
+  findOptionByValue,
+  getDateDisplayLabel,
+  getOperatorLabel,
+  isNoValueOperator,
+} from '../../lib';
 import type { ChipErrorSegment, Condition, FieldMetadata, FilterInputChipData } from '../../types';
 import { getInvalidValueIndices } from '../useFilterInputAutocomplete/valueCommitHelpers';
 
@@ -8,6 +13,9 @@ const DATE_RANGE_SEPARATOR = ' – ';
 const MULTI_VALUE_SEPARATOR = ', ';
 const DEFAULT_FIELD_TYPE = 'string';
 const DEFAULT_CONNECTOR = 'and';
+/** Filler text shown in the value slot of no-value operator chips so every
+ *  chip visually has three segments (attribute + operator + value). */
+const NO_VALUE_PLACEHOLDER = '—';
 
 const chipId = (i: number) => `chip-${i}`;
 const connectorChip = (i: number, variant: 'and' | 'or'): FilterInputChipData =>
@@ -114,6 +122,13 @@ const makeConditionChip = (
   const chipError: ChipErrorSegment | undefined = condition.error || (error ? true : undefined);
   const field = fields.find(f => f.name === condition.field);
   const baseChip = buildBaseChip(i, condition, field);
+
+  // No-value operators (is_null / is_not_null) carry no real value — render a
+  // visual placeholder so the chip still has three segments. Skip the
+  // type-specific branches below; they assume a real value exists.
+  if (condition.operator && isNoValueOperator(condition.operator)) {
+    return { ...baseChip, value: NO_VALUE_PLACEHOLDER, error: chipError };
+  }
 
   if (field?.type === 'date') {
     return Array.isArray(condition.value)

@@ -51,6 +51,24 @@ export const isOperatorAllowedForField = (
 ): boolean => getFieldOperators(field).includes(operator);
 
 /**
+ * Decide whether the in-progress (field, operator, value) triple is fully
+ * built — i.e. has all the segments the chip needs. No-value operators
+ * (is_null / is_not_null) are complete without a value: the chip renders a
+ * value-placeholder in that slot so it still visually has three segments.
+ */
+export const isBuildingComplete = (
+  field: FieldMetadata | null,
+  operator: FilterOperator | null,
+  value: string | number | boolean | Array<string | number | boolean> | null | undefined,
+): boolean => {
+  if (!field || !operator) return false;
+  if (isNoValueOperator(operator)) return true;
+  if (value == null) return false;
+  if (Array.isArray(value)) return value.length > 0;
+  return value !== '';
+};
+
+/**
  * Check whether two operators handle values in compatible shapes
  * (multi-select / between / no-value categories match), meaning a value
  * preview built for `a` can be reused as-is for `b`.

@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
 import { useCallback, useRef } from 'react';
+import { isBuildingComplete, isNoValueOperator } from '../../lib';
 import type { FieldMetadata, FilterOperator, UpsertCondition } from '../../types';
 
 interface UseBlurCommitDeps {
@@ -64,25 +65,25 @@ export const useBlurCommit = ({
     if (!field) return false;
     if (editingChipId) return false;
 
+    // Only commit on blur if the chip is fully built. An incomplete chip is
+    // preserved in `building` state — the caller (handleBlur / handleMenuClose)
+    // is expected to skip resetState in that case.
+    const hasTypedValue = !!operator && !isNoValueOperator(operator) && text.length > 0;
+    if (!isBuildingComplete(field, operator, null) && !hasTypedValue) return false;
+
     committingRef.current = true;
     try {
       selectedFieldRef.current = null;
       selectedOperatorRef.current = null;
       inputTextRef.current = '';
 
-      if (operator && text) {
+      if (hasTypedValue) {
         handleCustomValueCommit(text);
         return true;
       }
 
-      upsertCondition(
-        field,
-        operator ?? undefined,
-        null,
-        undefined,
-        effectiveInsertIndexRef.current,
-        true,
-      );
+      // No-value operator: commit cleanly (chip displays value-placeholder)
+      upsertCondition(field, operator!, null, undefined, effectiveInsertIndexRef.current);
       resetState();
       return true;
     } finally {
@@ -98,5 +99,15 @@ export const useBlurCommit = ({
 
   commitBuildingOnBlurRef.current = commitBuildingOnBlur;
 
-  return commitBuildingOnBlur;
+  /**
+   * True iff there's an in-progress building chip that hasn't been committed
+   * yet. Used by blur/menu-close paths to skip resetState — otherwise they
+   * would wipe `selectedField`/`selectedOperator` and the chip would vanish.
+   */
+  const hasIncompleteBuilding = useCallback(
+    (): boolean => selectedFieldRef.current !== null && !editingChipId,
+    [editingChipId],
+  );
+
+  return { commitBuildingOnBlur, hasIncompleteBuilding };
 };

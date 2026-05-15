@@ -73,12 +73,15 @@ export const useMenuFlow = ({
   conditionsRef.current = conditions;
 
   // Ignore Ark UI close when focus is on our input or a segment inline-edit input.
-  // Otherwise try to commit the incomplete building chip before resetting.
+  // Otherwise: try to commit the building chip if it's fully built; if not
+  // built, preserve the in-progress state instead of wiping it via resetState.
   const handleMenuClose = useCallback(() => {
     if (document.activeElement === inputRef.current) return;
     if ((document.activeElement as HTMLElement)?.closest?.('[data-slot^="segment-"]')) return;
-    if (!commitBuildingOnBlur()) resetState();
-  }, [commitBuildingOnBlur, resetState, inputRef]);
+    if (commitBuildingOnBlur()) return;
+    const hasIncompleteBuilding = selectedField !== null && !editing.editingChipId;
+    if (!hasIncompleteBuilding) resetState();
+  }, [commitBuildingOnBlur, resetState, inputRef, selectedField, editing.editingChipId]);
 
   const handleFieldSelect = useCallback(
     (field: FieldMetadata) => {
