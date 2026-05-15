@@ -51,7 +51,7 @@ export const accordionActionsVariants = cva(
   cn('flex items-center gap-4 col-start-2 row-start-1 pl-8 shrink-0'),
 );
 
-export const accordionTriggerTitleVariants = cva('min-w-0 truncate');
+export const accordionTriggerTitleVariants = cva('block flex-1 min-w-0 truncate text-left');
 
 export const accordionIndicatorVariants = cva(
   cn(

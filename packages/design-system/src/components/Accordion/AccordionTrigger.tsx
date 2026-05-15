@@ -44,7 +44,7 @@ export const AccordionTrigger: FC<AccordionTriggerProps> = ({
     >
       {variant === 'section' ? (
         <>
-          <span className={cn(accordionTriggerTitleVariants(), 'flex items-center gap-8')}>
+          <span className={cn(accordionTriggerTitleVariants(), '[&>*]:align-middle [&>*+*]:ms-8')}>
             {children}
           </span>
           {indicator}
