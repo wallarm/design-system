@@ -98,7 +98,14 @@ export function useOverflowItems<T>({
               }
             }
 
-            dynamicReserveSpace = tempDiv.offsetWidth + gap;
+            // `tempDiv` only carries the inherited font, not the badge's
+            // padding/border/typography — so its `offsetWidth` is the raw
+            // text width of "+1" and severely underestimates a real
+            // overflow indicator (a "+N" badge with padding is easily 2-3×
+            // wider). Treat caller-supplied `reserveSpace` as a floor so
+            // chrome around the text is accounted for even when the rough
+            // text measurement comes in smaller.
+            dynamicReserveSpace = Math.max(reserveSpace, tempDiv.offsetWidth + gap);
             document.body.removeChild(tempDiv);
           } catch {
             // Fallback to static reserveSpace
