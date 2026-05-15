@@ -19,6 +19,7 @@
 @import './components/dialog.css';
 @import './components/tour.css';
 @import './components/skeleton.css';
+@import './components/accordion.css';
 
 [data-scope='scroll-area'][data-part='viewport'] {
     scrollbar-width: none;
