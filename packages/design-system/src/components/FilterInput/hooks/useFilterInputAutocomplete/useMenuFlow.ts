@@ -34,6 +34,9 @@ interface MenuFlowDeps {
     setEditingSegment: (segment: ChipSegment | null) => void;
     setSegmentFilterText: (text: string) => void;
     resetSegmentTyping: () => void;
+    /** Exit inline-edit and the building-edit marker. Called when switching
+     *  filter/operator in the building chip lands on the next menu. */
+    clearEditing: () => void;
   };
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
