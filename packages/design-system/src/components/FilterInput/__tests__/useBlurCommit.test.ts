@@ -45,10 +45,16 @@ const setupHook = (
     });
   });
 
-  return { commit: result.current, upsertCondition, handleCustomValueCommit, resetState };
+  return {
+    commit: result.current.commitBuildingOnBlur,
+    hasIncompleteBuilding: result.current.hasIncompleteBuilding,
+    upsertCondition,
+    handleCustomValueCommit,
+    resetState,
+  };
 };
 
-describe('useBlurCommit — AS-882', () => {
+describe('useBlurCommit', () => {
   it('returns false and does nothing when no field is selected', () => {
     const { commit, upsertCondition, resetState } = setupHook({ selectedField: null });
     expect(commit()).toBe(false);
@@ -79,11 +85,35 @@ describe('useBlurCommit — AS-882', () => {
     expect(upsertCondition).not.toHaveBeenCalled();
   });
 
-  it('commits as error chip when there is no operator or no text', () => {
+  // AS-970 behavior switch: blur on an incomplete chip no longer commits it
+  // as errored. The chip is preserved in `building` state (selectedField /
+  // selectedOperator stay), and resetState is skipped by the caller because
+  // `hasIncompleteBuilding()` is true.
+  it('returns false and preserves state when there is no operator or no text', () => {
+    const upsertCondition = vi.fn();
+    const resetState = vi.fn();
+    const { commit, hasIncompleteBuilding } = setupHook({
+      selectedOperator: null,
+      inputText: '',
+      upsertCondition,
+      resetState,
+    });
+
+    expect(commit()).toBe(false);
+    expect(upsertCondition).not.toHaveBeenCalled();
+    expect(resetState).not.toHaveBeenCalled();
+    // Caller uses this to skip its own resetState — building chip survives.
+    expect(hasIncompleteBuilding()).toBe(true);
+  });
+
+  // No-value operators (is_null / is_not_null) — semantically complete with
+  // just attribute + operator, so blur commits them cleanly (the chip shows
+  // a value-placeholder for the third slot).
+  it('commits cleanly when the operator is a no-value operator', () => {
     const upsertCondition = vi.fn();
     const resetState = vi.fn();
     const { commit } = setupHook({
-      selectedOperator: null,
+      selectedOperator: 'is_null',
       inputText: '',
       upsertCondition,
       resetState,
@@ -91,41 +121,12 @@ describe('useBlurCommit — AS-882', () => {
 
     expect(commit()).toBe(true);
     expect(upsertCondition).toHaveBeenCalledTimes(1);
-    expect(upsertCondition).toHaveBeenCalledWith(field, undefined, null, undefined, 0, true);
+    expect(upsertCondition).toHaveBeenCalledWith(field, 'is_null', null, undefined, 0);
     expect(resetState).toHaveBeenCalledTimes(1);
   });
 
-  it('re-entry guard: a second synchronous call short-circuits to false', () => {
-    let reentryResult: boolean | undefined;
-    const upsertCondition = vi.fn(() => {
-      // simulate reentrant call — e.g. a state setter triggers another commit
-      // before the outer call returns
-      reentryResult = commitFn();
-    });
-    let commitFn: () => boolean = () => false;
-    const { commit } = setupHook({
-      selectedOperator: null,
-      inputText: '',
-      upsertCondition,
-    });
-    commitFn = commit;
-
-    expect(commit()).toBe(true);
-    expect(upsertCondition).toHaveBeenCalledTimes(1);
-    expect(reentryResult).toBe(false);
-  });
-
-  it('re-entry guard releases after the outer call returns', () => {
-    const { commit } = setupHook({
-      selectedOperator: null,
-      inputText: '',
-    });
-
-    expect(commit()).toBe(true);
-
-    // Refs were cleared, so a second top-level call returns false (no field).
-    // The guard itself is no longer set — verify by checking we can re-establish
-    // state and commit again. Easiest proxy: nothing else throws/recurses.
-    expect(commit()).toBe(false);
+  it('hasIncompleteBuilding is false when no building is in progress', () => {
+    const { hasIncompleteBuilding } = setupHook({ selectedField: null });
+    expect(hasIncompleteBuilding()).toBe(false);
   });
 });

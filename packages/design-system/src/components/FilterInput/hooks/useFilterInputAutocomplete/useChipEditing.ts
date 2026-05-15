@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { chipIdToConditionIndex, getOperatorFromLabel } from '../../lib';
+import { chipIdToConditionIndex, getOperatorFromLabel, isNoValueOperator } from '../../lib';
 import type {
   Condition,
   FieldMetadata,
@@ -104,7 +104,15 @@ export const useChipEditing = ({
       const incompleteSegment = condition.error
         ? getFirstIncompleteSegment(condition, fieldsRef.current)
         : null;
-      const targetSegment = incompleteSegment ?? segment;
+      // No-value operator chips have a placeholder value segment — clicking
+      // it has no real meaning, so reroute to the operator segment (the user
+      // most likely wants to switch to a value-bearing operator).
+      const isPlaceholderValueClick =
+        segment === SEGMENT_VARIANT.value &&
+        condition.operator != null &&
+        isNoValueOperator(condition.operator);
+      const targetSegment =
+        incompleteSegment ?? (isPlaceholderValueClick ? SEGMENT_VARIANT.operator : segment);
 
       // For unknown fields, only attribute editing is allowed
       if (!field && targetSegment !== SEGMENT_VARIANT.attribute) return;
@@ -159,6 +167,22 @@ export const useChipEditing = ({
     setUserHasTyped(false);
   }, []);
 
+  /**
+   * Enter inline-edit on a *building* chip segment. Unlike `handleChipClick`
+   * there is no committed chip yet, so `editingChipId` stays null — that
+   * combination (segment set, chipId null) is the building-edit marker
+   * downstream consumers can branch on.
+   */
+  const startBuildingEdit = useCallback((segment: ChipSegment, currentText: string) => {
+    // Defensive reset: editingChipId should already be null in the building
+    // flow, but the marker (chipId null, segment set) is load-bearing for
+    // downstream branching — pin it explicitly.
+    setEditingChipId(null);
+    setEditingSegment(segment);
+    setSegmentFilterText(currentText);
+    setUserHasTyped(false);
+  }, []);
+
   /** Wraps setSegmentFilterText to track user typing */
   const handleSegmentFilterChange = useCallback((text: string) => {
     setSegmentFilterText(text);
@@ -188,6 +212,7 @@ export const useChipEditing = ({
       setSegmentFilterText: handleSegmentFilterChange,
       resetSegmentTyping,
       handleChipClick,
+      startBuildingEdit,
       clearEditing,
     }),
     [
@@ -198,6 +223,7 @@ export const useChipEditing = ({
       handleSegmentFilterChange,
       resetSegmentTyping,
       handleChipClick,
+      startBuildingEdit,
       clearEditing,
     ],
   );

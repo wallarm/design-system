@@ -3,9 +3,14 @@ import { useCallback, useRef } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,
+  getFieldOperators,
+  getOperatorFromLabel,
   isBetweenOperator,
   isMultiSelectOperator,
   isNoValueOperator,
+  isOperatorAllowedForField,
+  isValueShapeCompatible,
+  OPERATOR_SYMBOLS,
 } from '../../lib';
 import type {
   Condition,
@@ -29,6 +34,9 @@ interface MenuFlowDeps {
     setEditingSegment: (segment: ChipSegment | null) => void;
     setSegmentFilterText: (text: string) => void;
     resetSegmentTyping: () => void;
+    /** Exit inline-edit and the building-edit marker. Called when switching
+     *  filter/operator in the building chip lands on the next menu. */
+    clearEditing: () => void;
   };
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
@@ -71,12 +79,28 @@ export const useMenuFlow = ({
   conditionsRef.current = conditions;
 
   // Ignore Ark UI close when focus is on our input or a segment inline-edit input.
-  // Otherwise try to commit the incomplete building chip before resetting.
+  // Otherwise: try to commit the building chip if it's fully built; if not
+  // built, preserve the in-progress state instead of wiping it via resetState.
+  // Either way (committed or preserved), keep React's menuState aligned with
+  // the now-closed menu so the controlled `open` prop doesn't drift.
   const handleMenuClose = useCallback(() => {
     if (document.activeElement === inputRef.current) return;
     if ((document.activeElement as HTMLElement)?.closest?.('[data-slot^="segment-"]')) return;
-    if (!commitBuildingOnBlur()) resetState();
-  }, [commitBuildingOnBlur, resetState, inputRef]);
+    if (commitBuildingOnBlur()) return;
+    const hasIncompleteBuilding = selectedField !== null && !editing.editingChipId;
+    if (hasIncompleteBuilding) {
+      setMenuState('closed');
+      return;
+    }
+    resetState();
+  }, [
+    commitBuildingOnBlur,
+    resetState,
+    inputRef,
+    selectedField,
+    editing.editingChipId,
+    setMenuState,
+  ]);
 
   const handleFieldSelect = useCallback(
     (field: FieldMetadata) => {
@@ -99,16 +123,61 @@ export const useMenuFlow = ({
         resetState();
         return;
       }
+      // Inline-edit of the building chip's attribute — keep operator if the
+      // new field still allows it, keep value preview untouched (validation
+      // happens at commit time, not here).
+      const isBuildingEdit =
+        !editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.attribute;
+      if (isBuildingEdit) {
+        setSelectedField(field);
+        const keepOperator = selectedOperator
+          ? isOperatorAllowedForField(field, selectedOperator)
+          : false;
+        if (!keepOperator) setSelectedOperator(null);
+        editing.clearEditing();
+        setMenuState(keepOperator ? 'value' : 'operator');
+        return;
+      }
       setSelectedField(field);
       setInputText('');
       setMenuState('operator');
     },
-    [editing, upsertCondition, resetState, setSelectedField, setInputText, setMenuState],
+    [
+      editing,
+      selectedOperator,
+      upsertCondition,
+      resetState,
+      setSelectedField,
+      setSelectedOperator,
+      setInputText,
+      setMenuState,
+    ],
   );
 
   const handleOperatorSelect = useCallback(
     (operator: FilterOperator) => {
       if (!selectedField) return;
+
+      // Inline-edit of the building chip's operator — keep value preview
+      // when the shape (multi/between/no-value) is unchanged, otherwise drop
+      // it. No-value operators auto-commit on the spot (their placeholder
+      // satisfies isBuildingComplete), matching the first-pass flow.
+      const isBuildingEdit =
+        !editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.operator;
+      if (isBuildingEdit) {
+        const shapeCompatible = isValueShapeCompatible(selectedOperator, operator);
+        if (!shapeCompatible) setBuildingMultiValue(undefined);
+        setSelectedOperator(operator);
+        editing.clearEditing();
+        if (isNoValueOperator(operator)) {
+          // Commit the no-value chip immediately, matching first-pass flow.
+          upsertCondition(selectedField, operator, null, null, insertIndex);
+          resetState(true);
+          return;
+        }
+        setMenuState('value');
+        return;
+      }
 
       if (isNoValueOperator(operator)) {
         const isEditing = !!editing.editingChipId;
@@ -158,11 +227,14 @@ export const useMenuFlow = ({
     [
       editing,
       selectedField,
+      selectedOperator,
       insertIndex,
       upsertCondition,
       resetState,
       setSelectedOperator,
       setMenuState,
+      setBuildingMultiValue,
+      setInputText,
     ],
   );
 
@@ -314,11 +386,8 @@ export const useMenuFlow = ({
   /** Commit a custom typed attribute (from inline segment editing) */
   const handleCustomAttributeCommit = useCallback(
     (customText: string) => {
-      if (!editing.editingChipId || !customText.trim()) return;
+      if (!customText.trim()) return;
       const trimmed = customText.trim();
-      const idx = chipIdToConditionIndex(editing.editingChipId);
-      const condition = idx !== null ? conditionsRef.current[idx] : null;
-      if (!condition) return;
 
       // Try to match the typed text to a known field
       const matchedField = fields.find(
@@ -326,6 +395,18 @@ export const useMenuFlow = ({
           f.label.toLowerCase() === trimmed.toLowerCase() ||
           f.name.toLowerCase() === trimmed.toLowerCase(),
       );
+
+      // Inline-edit of the building chip's attribute — route through
+      // handleFieldSelect so operator-preservation logic is shared. Unknown
+      // text in building mode is ignored (no errored chip created).
+      if (!editing.editingChipId) {
+        if (matchedField) handleFieldSelect(matchedField);
+        return;
+      }
+
+      const idx = chipIdToConditionIndex(editing.editingChipId);
+      const condition = idx !== null ? conditionsRef.current[idx] : null;
+      if (!condition) return;
 
       if (matchedField) {
         const hasValueError = validateValueForField(matchedField, condition.value);
@@ -357,7 +438,36 @@ export const useMenuFlow = ({
       }
       resetState();
     },
-    [editing, fields, upsertCondition, resetState],
+    [editing, fields, upsertCondition, resetState, handleFieldSelect],
+  );
+
+  /**
+   * Commit a custom typed operator (from inline segment editing) by matching
+   * the text against the field's allowed operator labels, raw keys, or
+   * symbols. Mirrors the main-input Enter logic in useInputHandlers, so the
+   * keyboard flow is symmetric between attribute, operator, and value
+   * segments. Unmatched text is ignored.
+   */
+  const handleCustomOperatorCommit = useCallback(
+    (customText: string) => {
+      if (!selectedField || !customText.trim()) return;
+      const trimmed = customText.trim();
+      const allowed = getFieldOperators(selectedField);
+      let matched: FilterOperator | null = getOperatorFromLabel(trimmed, selectedField.type);
+      if (!matched) {
+        const symbolMatch = allowed.find(
+          op => OPERATOR_SYMBOLS[op].toLowerCase() === trimmed.toLowerCase(),
+        );
+        if (symbolMatch) matched = symbolMatch;
+      }
+      if (!matched) {
+        const rawMatch = allowed.find(op => op.toLowerCase() === trimmed.toLowerCase());
+        if (rawMatch) matched = rawMatch;
+      }
+      if (!matched || !isOperatorAllowedForField(selectedField, matched)) return;
+      handleOperatorSelect(matched);
+    },
+    [selectedField, handleOperatorSelect],
   );
 
   return {
@@ -370,6 +480,7 @@ export const useMenuFlow = ({
     handleMultiSelectToggle,
     handleRangeSelect,
     handleCustomValueCommit,
+    handleCustomOperatorCommit,
     handleCustomAttributeCommit,
   };
 };

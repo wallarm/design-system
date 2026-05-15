@@ -84,4 +84,23 @@ describe('buildChips — loose-match label resolution (AS-882)', () => {
       expect(chip?.valueParts).toEqual(['Low', '99']);
     });
   });
+
+  // No-value operators (is_null / is_not_null) carry no real value, but the
+  // chip must still render three segments — the value slot is filled by a
+  // visual placeholder so building and committed chips look uniform.
+  describe('no-value operator placeholder', () => {
+    it('renders placeholder value for is_null', () => {
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'tag', operator: 'is_null', value: null },
+      ];
+      expect(findChip(buildChips(conditions, [], fields, false))?.value).toBe('—');
+    });
+
+    it('renders placeholder value for is_not_null', () => {
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'tag', operator: 'is_not_null', value: null },
+      ];
+      expect(findChip(buildChips(conditions, [], fields, false))?.value).toBe('—');
+    });
+  });
 });

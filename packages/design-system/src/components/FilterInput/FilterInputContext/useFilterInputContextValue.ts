@@ -12,6 +12,7 @@ interface AutocompleteForContext {
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleInputClick: () => void;
   handleChipClick: (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => void;
+  handleBuildingChipClick: (segment: ChipSegment, anchorRect: DOMRect) => void;
   handleConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   handleChipRemove: (chipId: string) => void;
   handleClear: () => void;
@@ -26,6 +27,7 @@ interface AutocompleteForContext {
   cancelSegmentEdit: () => void;
   handleCustomValueCommit: (customText: string) => void;
   handleCustomAttributeCommit: (customText: string) => void;
+  handleCustomOperatorCommit: (customText: string) => void;
   menuRef: RefObject<HTMLDivElement | null>;
   closeAutocompleteMenu: () => void;
   segmentAttributeInputRef: RefObject<HTMLInputElement | null>;
@@ -72,6 +74,7 @@ export const useFilterInputContextValue = ({
       onInputKeyDown: autocomplete.handleKeyDown,
       onInputClick: autocomplete.handleInputClick,
       onChipClick: autocomplete.handleChipClick,
+      onBuildingChipClick: autocomplete.handleBuildingChipClick,
       onConnectorChange: autocomplete.handleConnectorChange,
       onChipRemove: autocomplete.handleChipRemove,
       onClear: autocomplete.handleClear,
@@ -82,6 +85,7 @@ export const useFilterInputContextValue = ({
       onCancelSegmentEdit: autocomplete.cancelSegmentEdit,
       onCustomValueCommit: autocomplete.handleCustomValueCommit,
       onCustomAttributeCommit: autocomplete.handleCustomAttributeCommit,
+      onCustomOperatorCommit: autocomplete.handleCustomOperatorCommit,
       menuRef: autocomplete.menuRef,
       closeAutocompleteMenu: autocomplete.closeAutocompleteMenu,
       registerChipRef,
@@ -101,6 +105,7 @@ export const useFilterInputContextValue = ({
       autocomplete.handleKeyDown,
       autocomplete.handleInputClick,
       autocomplete.handleChipClick,
+      autocomplete.handleBuildingChipClick,
       autocomplete.handleConnectorChange,
       autocomplete.handleChipRemove,
       autocomplete.handleClear,
@@ -111,6 +116,7 @@ export const useFilterInputContextValue = ({
       autocomplete.cancelSegmentEdit,
       autocomplete.handleCustomValueCommit,
       autocomplete.handleCustomAttributeCommit,
+      autocomplete.handleCustomOperatorCommit,
       autocomplete.menuRef,
       autocomplete.closeAutocompleteMenu,
       autocomplete.segmentAttributeInputRef,

@@ -1,5 +1,11 @@
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { findOptionByValue, getDateDisplayLabel, getOperatorLabel } from '../../lib';
+import {
+  findOptionByValue,
+  getDateDisplayLabel,
+  getOperatorLabel,
+  isNoValueOperator,
+  NO_VALUE_PLACEHOLDER,
+} from '../../lib';
 import type { ChipErrorSegment, Condition, FieldMetadata, FilterInputChipData } from '../../types';
 import { getInvalidValueIndices } from '../useFilterInputAutocomplete/valueCommitHelpers';
 
@@ -114,6 +120,13 @@ const makeConditionChip = (
   const chipError: ChipErrorSegment | undefined = condition.error || (error ? true : undefined);
   const field = fields.find(f => f.name === condition.field);
   const baseChip = buildBaseChip(i, condition, field);
+
+  // No-value operators (is_null / is_not_null) carry no real value — render a
+  // visual placeholder so the chip still has three segments. Skip the
+  // type-specific branches below; they assume a real value exists.
+  if (condition.operator && isNoValueOperator(condition.operator)) {
+    return { ...baseChip, value: NO_VALUE_PLACEHOLDER, error: chipError };
+  }
 
   if (field?.type === 'date') {
     return Array.isArray(condition.value)

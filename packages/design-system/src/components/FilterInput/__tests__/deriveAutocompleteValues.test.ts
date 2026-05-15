@@ -290,5 +290,25 @@ describe('deriveAutocompleteValues', () => {
       expect(result.isBuilding).toBe(false);
       expect(result.buildingChipData).toBeNull();
     });
+
+    // Building preview must surface the placeholder so the in-progress chip
+    // looks complete (3 segments) for no-value operators — see also the
+    // matching committed-chip case in buildChips.test.ts.
+    it('fills value with placeholder for no-value operators', () => {
+      const result = deriveAutocompleteValues({
+        editingChipId: null,
+        selectedField: statusField,
+        selectedOperator: 'is_null',
+        conditions: [],
+        buildingMultiValue: undefined,
+        dateRangeFromValue: undefined,
+      });
+
+      expect(result.buildingChipData).toEqual({
+        attribute: 'Status',
+        operator: 'is set',
+        value: '—',
+      });
+    });
   });
 });

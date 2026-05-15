@@ -1,12 +1,21 @@
 import type { ChangeEvent, KeyboardEvent, MutableRefObject, RefObject } from 'react';
 import { useCallback, useRef } from 'react';
-import { applyAcceptChar, getOperatorFromLabel, hasFieldValues, OPERATOR_SYMBOLS } from '../../lib';
+import {
+  applyAcceptChar,
+  getOperatorFromLabel,
+  hasFieldValues,
+  nextBuildingMenu,
+  OPERATOR_SYMBOLS,
+} from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface UseInputHandlersDeps {
   inputText: string;
   menuState: MenuState;
   selectedField: FieldMetadata | null;
+  /** Needed so a click into the main input while a building chip is alive
+   *  resumes at the next missing segment instead of doing nothing. */
+  selectedOperator: FilterOperator | null;
   isFocused: boolean;
   fields: FieldMetadata[];
   inputRef: RefObject<HTMLInputElement | null>;
@@ -27,6 +36,7 @@ export const useInputHandlers = ({
   inputText,
   menuState,
   selectedField,
+  selectedOperator,
   isFocused,
   fields,
   inputRef,
@@ -68,11 +78,12 @@ export const useInputHandlers = ({
 
   const handleInputClick = useCallback(() => {
     inputRef.current?.focus();
-    if (menuState === 'closed' && !selectedField) {
-      resetMenuOffset();
-      setMenuState('field');
-    }
-  }, [menuState, selectedField, resetMenuOffset, inputRef, setMenuState]);
+    if (menuState !== 'closed') return;
+    // Either start a fresh chip (no building yet) or resume an in-progress
+    // one at the next missing segment — the helper handles both.
+    resetMenuOffset();
+    setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
+  }, [menuState, selectedField, selectedOperator, resetMenuOffset, inputRef, setMenuState]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {

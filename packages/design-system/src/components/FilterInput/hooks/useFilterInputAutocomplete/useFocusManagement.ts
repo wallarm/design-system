@@ -1,14 +1,18 @@
 import type { FocusEvent, RefObject } from 'react';
 import { useCallback, useEffect, useRef } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { isMenuRelated } from '../../lib';
-import type { MenuState } from '../../types';
+import { isMenuRelated, nextBuildingMenu } from '../../lib';
+import type { FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface UseFocusManagementDeps {
   menuState: MenuState;
   isFocused: boolean;
   conditionsLength: number;
   inputText: string;
+  /** In-progress building-chip state — needed so refocus resumes at the next
+   *  missing segment instead of (incorrectly) reopening the field menu. */
+  selectedField: FieldMetadata | null;
+  selectedOperator: FilterOperator | null;
   containerRef: RefObject<HTMLElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
   editingSegment: ChipSegment | null;
@@ -22,6 +26,9 @@ interface UseFocusManagementDeps {
   blurCommitRef: RefObject<(() => boolean) | null>;
   /** Tries to commit a building chip's freeform value on blur. Returns true if committed. */
   commitBuildingOnBlur: () => boolean;
+  /** True if there's an in-progress building chip that the blur/close path
+   *  must preserve (skip resetState). */
+  hasIncompleteBuilding: () => boolean;
   setIsFocused: (focused: boolean) => void;
   setMenuState: (state: MenuState) => void;
   resetMenuOffset: () => void;
@@ -33,6 +40,8 @@ export const useFocusManagement = ({
   isFocused,
   conditionsLength,
   inputText,
+  selectedField,
+  selectedOperator,
   containerRef,
   inputRef,
   editingSegment,
@@ -41,6 +50,7 @@ export const useFocusManagement = ({
   segmentValueInputRef,
   blurCommitRef,
   commitBuildingOnBlur,
+  hasIncompleteBuilding,
   setIsFocused,
   setMenuState,
   resetMenuOffset,
@@ -73,9 +83,22 @@ export const useFocusManagement = ({
         setIsFocused(false);
         // Try to commit pending values before resetting state:
         // 1. Multi-select checked values (via FilterInputValueMenu ref)
-        // 2. Building chip with freeform typed value
+        // 2. Building chip with freeform typed value (commit only when complete)
+        // If neither committed AND there's an incomplete building chip alive,
+        // preserve it — blur should not destroy in-progress work.
         const committed = blurCommitRef.current?.() || commitBuildingOnBlur();
-        if (!committed) resetState();
+        if (!committed) {
+          if (hasIncompleteBuilding()) {
+            // Preserve in-progress building chip, but always close any
+            // dropdown — the menu may have leaked open if Ark UI's outside-
+            // click handler bailed out (e.g. activeElement was still the
+            // input). A consistent closed menu lets the refocus path
+            // re-open at the right segment.
+            setMenuState('closed');
+          } else {
+            resetState();
+          }
+        }
         // resetState / commit chain above may have refocused our input via
         // inputRef.current?.focus() in several sub-paths (value commit, clear,
         // etc.). Honor the user's blur intent by restoring focus to where they
@@ -89,19 +112,61 @@ export const useFocusManagement = ({
         handlingBlurRef.current = false;
       }
     },
-    [containerRef, blurCommitRef, commitBuildingOnBlur, resetState, setIsFocused, inputRef],
+    [
+      containerRef,
+      blurCommitRef,
+      commitBuildingOnBlur,
+      hasIncompleteBuilding,
+      resetState,
+      setIsFocused,
+      setMenuState,
+      inputRef,
+    ],
   );
 
-  // ── Auto-open field menu on initial focus when empty ──────
+  // ── Auto-open menu on focus ───────────────────────────────
+  //
+  // Two cases:
+  //   1. Resume a building chip — when focus returns and a building chip is
+  //      mid-progress (selectedField set, not editing a committed chip),
+  //      reopen the menu for the first missing segment (operator if no
+  //      operator chosen yet, otherwise value).
+  //   2. Empty initial focus — when there's nothing to resume and the input
+  //      is empty + no chips exist, open the field menu so the user can
+  //      start building.
+  //
+  // Skip entirely while a segment inline-edit is active — the segment click
+  // handler has already opened the segment-specific menu, and we must not
+  // overwrite it on the focus tick that fired the same gesture.
 
   const prevFocusedRef = useRef(false);
   useEffect(() => {
-    if (isFocused && !prevFocusedRef.current && conditionsLength === 0 && inputText === '') {
+    if (!isFocused || prevFocusedRef.current) {
+      prevFocusedRef.current = isFocused;
+      return;
+    }
+    if (editingSegment) {
+      prevFocusedRef.current = isFocused;
+      return;
+    }
+    if (selectedField) {
+      resetMenuOffset();
+      setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
+    } else if (conditionsLength === 0 && inputText === '') {
       resetMenuOffset();
       setMenuState('field');
     }
     prevFocusedRef.current = isFocused;
-  }, [isFocused, conditionsLength, inputText, resetMenuOffset, setMenuState]);
+  }, [
+    isFocused,
+    conditionsLength,
+    inputText,
+    selectedField,
+    selectedOperator,
+    editingSegment,
+    resetMenuOffset,
+    setMenuState,
+  ]);
 
   // ── Prevent Ark UI focus steal on menu open ──────────────
   // Ark UI Menu (zag.js) steals focus via single rAF when a menu mounts.
