@@ -31,10 +31,19 @@ export const useEndReached = ({
   const firedRef = useRef(false);
   const lastFiredAtRef = useRef(0);
 
+  // Latest-callback ref: re-running the effect on `onEndReached` identity
+  // changes (e.g. re-memoized when `isFetching` flips) races with `firedRef`
+  // and fires twice per page.
+  const onEndReachedRef = useRef(onEndReached);
   useEffect(() => {
-    if (!onEndReached) return;
+    onEndReachedRef.current = onEndReached;
+  });
 
+  useEffect(() => {
     const check = () => {
+      const callback = onEndReachedRef.current;
+      if (!callback) return;
+
       let scrollTop: number;
       let clientHeight: number;
       let scrollHeight: number;
@@ -58,7 +67,7 @@ export const useEndReached = ({
         if (!firedRef.current && now - lastFiredAtRef.current >= COOLDOWN_MS) {
           firedRef.current = true;
           lastFiredAtRef.current = now;
-          onEndReached();
+          callback();
         }
       } else {
         firedRef.current = false;
@@ -69,11 +78,11 @@ export const useEndReached = ({
     if (!target) return;
 
     target.addEventListener('scroll', check, { passive: true });
-    // Check immediately in case already at the bottom
+    // Check immediately in case content already fits the viewport on mount.
     check();
 
     return () => {
       target.removeEventListener('scroll', check);
     };
-  }, [mode, scrollRef, onEndReached, threshold]);
+  }, [mode, scrollRef, threshold]);
 };
