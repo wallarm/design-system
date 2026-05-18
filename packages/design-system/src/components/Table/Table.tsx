@@ -1,5 +1,6 @@
 import { TestIdProvider } from '../../utils/testId';
 import { TableProvider } from './TableContext';
+import { TableImperativeBridge } from './TableImperativeBridge';
 import { TableInner } from './TableInner';
 import type { TableProps } from './types';
 
@@ -11,6 +12,7 @@ export const Table = <T,>(props: TableProps<T>) => {
     className,
     'aria-label': ariaLabel,
     'data-testid': testId,
+    ref,
     ...providerProps
   } = props;
 
@@ -19,6 +21,7 @@ export const Table = <T,>(props: TableProps<T>) => {
 
   return (
     <TableProvider data={data} isLoading={isLoading} {...providerProps}>
+      {ref ? <TableImperativeBridge handleRef={ref} /> : null}
       <TestIdProvider value={testId}>
         <TableInner
           isEmpty={isEmpty}

@@ -34,6 +34,7 @@ const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<
         <Tr
           ref={ref}
           data-index={dataIndex}
+          data-row-id={row.id}
           data-testid={testId}
           className='group/row'
           data-selected={isSelected || undefined}
@@ -68,6 +69,7 @@ const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<
       <Tr
         ref={ref}
         data-index={dataIndex}
+        data-row-id={row.id}
         data-testid={testId}
         className='group/row'
         data-selected={isSelected || undefined}

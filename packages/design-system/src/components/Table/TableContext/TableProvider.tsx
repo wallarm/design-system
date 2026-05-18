@@ -43,7 +43,7 @@ import {
   TABLE_VIRTUALIZATION_OVERSCAN,
 } from '../lib';
 import { TableContext } from './TableContext';
-import type { TableContextValue, TableProviderProps } from './types';
+import type { TableContextValue, TableProviderProps, TableVirtualizerInstance } from './types';
 
 export const TableProvider = <T,>(props: TableProviderProps<T>) => {
   const {
@@ -286,6 +286,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
   const lastSelectedRowIndexRef = useRef<number | null>(null);
   const theadRef = useRef<HTMLTableSectionElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
+  const virtualizerRef = useRef<TableVirtualizerInstance | null>(null);
 
   // Context value
   const contextValue: TableContextValue<T> = useMemo(
@@ -314,6 +316,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       lastSelectedRowIndexRef,
       theadRef,
       containerRef,
+      tbodyRef,
+      virtualizerRef,
       onEndReached,
       onEndReachedThreshold,
       onMasterCellClick,

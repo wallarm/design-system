@@ -1,6 +1,17 @@
 import type { ReactNode, RefObject } from 'react';
 import type { Column, Row, Table as TanStackTable, VisibilityState } from '@tanstack/react-table';
+import type { Virtualizer } from '@tanstack/react-virtual';
 import type { TableProps, TableVirtualized } from '../types';
+
+/**
+ * Union covers both virtualizer flavors used by the Table (`useVirtualizer`
+ * with HTMLElement scroll container and `useWindowVirtualizer` with Window).
+ * Lives behind `TableHandle` — consumers never touch this directly.
+ */
+export type TableVirtualizerInstance =
+  | Virtualizer<Window, Element>
+  | Virtualizer<HTMLElement, Element>
+  | Virtualizer<Element, Element>;
 
 export interface TableContextValue<T> {
   table: TanStackTable<T>;
@@ -48,6 +59,18 @@ export interface TableContextValue<T> {
 
   // Container ref for scoping keyboard handlers
   containerRef: RefObject<HTMLDivElement | null>;
+
+  // Ref to the <tbody> element — populated by whichever body component
+  // mounts (virtualized window, virtualized container, or non-virt).
+  // Used by `TableHandle.scrollToRow` to resolve a row element by
+  // `data-row-id` in non-virtualized mode.
+  tbodyRef: RefObject<HTMLTableSectionElement | null>;
+
+  // Ref to the active virtualizer instance, or null when the non-virt body
+  // is mounted. Used by `TableHandle.scrollToRow` to call `scrollToIndex`.
+  // Body components assign this during render, never inside an effect, so
+  // the ref is current on first commit.
+  virtualizerRef: RefObject<TableVirtualizerInstance | null>;
 
   // Infinite scroll
   onEndReached?: () => void;

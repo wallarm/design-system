@@ -1,4 +1,4 @@
-import { type FC, useCallback, useRef } from 'react';
+import { type FC, useCallback, useEffect } from 'react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
@@ -8,8 +8,7 @@ import { useResetVirtualizerOnDataChange } from './useResetVirtualizerOnDataChan
 import { useSmoothScrollOnSort } from './useSmoothScrollOnSort';
 
 export const TableBodyVirtualizedWindow: FC = () => {
-  const { table, estimateRowHeight, overscan } = useTableContext();
-  const tbodyRef = useRef<HTMLTableSectionElement>(null);
+  const { table, estimateRowHeight, overscan, tbodyRef, virtualizerRef } = useTableContext();
 
   const virtualizer = useWindowVirtualizer({
     count: table.getRowModel().rows.length,
@@ -17,6 +16,19 @@ export const TableBodyVirtualizedWindow: FC = () => {
     overscan: overscan ?? TABLE_VIRTUALIZATION_OVERSCAN,
     scrollMargin: tbodyRef.current ? getDocumentOffsetTop(tbodyRef.current) : 0,
   });
+
+  // Publish to the table-level handle. Render-time assignment is safe — refs
+  // don't trigger re-renders and the value is idempotent across renders.
+  virtualizerRef.current = virtualizer;
+
+  // Clear on unmount so any `scrollToRow` call landing between this body's
+  // unmount and a successor body's first render doesn't act on a dead
+  // virtualizer instance.
+  useEffect(() => {
+    return () => {
+      virtualizerRef.current = null;
+    };
+  }, [virtualizerRef]);
 
   useResetVirtualizerOnDataChange(table, virtualizer);
 

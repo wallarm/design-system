@@ -192,6 +192,41 @@ Enabled by passing `virtualized`. Renders only visible rows for large datasets.
 | `estimateRowHeight` | `(index: number) => number` | — | Row height estimate for variable-size virtualization; if not provided, height is measured automatically |
 | `overscan` | `number` | `5` | Number of rows rendered outside the visible area (buffer) |
 
+### Imperative handle (`ref`)
+
+`<Table>` accepts a `ref` of type `TableHandle` that exposes a single method:
+
+```ts
+interface TableHandle {
+  scrollToRow(
+    id: string,
+    opts?: {
+      align?: 'start' | 'center' | 'end' | 'auto'; // default 'auto'
+      behavior?: 'auto' | 'smooth';                // default 'auto'
+    },
+  ): boolean;
+}
+```
+
+The method returns `true` when the row is found in the current row model and a scroll is initiated, `false` when the id is not in the current rows or the virtualizer has not yet mounted. Callers own retry/pagination — Table does not try to load more pages on its behalf.
+
+In virtualized mode (`virtualized='container'` or `'window'`) the method calls `virtualizer.scrollToIndex` on the underlying TanStack instance — this is the only reliable way to scroll to a row that is outside the currently rendered window. In non-virtualized mode it falls back to a `scrollIntoView` lookup by `[data-row-id]` on the `<tr>` element.
+
+```tsx
+const tableRef = useRef<TableHandle>(null);
+
+useEffect(() => {
+  if (!targetId) return;
+  // Retries on the next frame if the virtualizer hasn't mounted yet.
+  if (!tableRef.current?.scrollToRow(targetId, { align: 'auto' })) {
+    const r = requestAnimationFrame(() => tableRef.current?.scrollToRow(targetId));
+    return () => cancelAnimationFrame(r);
+  }
+}, [targetId]);
+
+return <Table ref={tableRef} ... />;
+```
+
 ### Controlled / Uncontrolled
 
 All interactive states work in two modes via the `useControlled` hook:
@@ -392,6 +427,9 @@ TableGroupRow, TableExpandedRow
 TableCellContextMenu
 TableSettingsMenu
 createSelectionColumn
+
+// Imperative API types
+TableHandle, TableScrollToRowOptions
 
 // Re-export from @tanstack/react-table
 createColumnHelper, ColumnDef, Row,
