@@ -5,7 +5,9 @@ import {
   Fragment,
   type ReactNode,
   type Ref,
+  useRef,
 } from 'react';
+import { composeRefs } from '@radix-ui/react-compose-refs';
 import { Slot } from '@radix-ui/react-slot';
 import type { SvgIconProps } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
@@ -16,6 +18,7 @@ import { TooltipContent } from '../Tooltip/TooltipContent';
 import { TooltipTrigger } from '../Tooltip/TooltipTrigger';
 import { navRailItemVariants } from './classes';
 import { useNavRailContext } from './NavRailContext';
+import { useShortcut } from './useShortcut';
 
 export interface NavRailItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   ref?: Ref<HTMLAnchorElement>;
@@ -40,11 +43,14 @@ export const NavRailItem: FC<NavRailItemProps> = ({
   const { collapsed } = useNavRailContext();
   const testId = useTestId('item');
   const Comp = asChild ? Slot : 'a';
+  const internalRef = useRef<HTMLAnchorElement>(null);
+
+  useShortcut(shortcut, internalRef);
 
   const element = (
     <Comp
       {...props}
-      ref={ref}
+      ref={composeRefs(internalRef, ref)}
       aria-current={active ? ('page' as const) : undefined}
       data-slot='nav-rail-item'
       data-testid={testId}
@@ -66,7 +72,9 @@ export const NavRailItem: FC<NavRailItemProps> = ({
 
   return (
     <Tooltip positioning={{ placement: 'right' }}>
-      <TooltipTrigger asChild>{element}</TooltipTrigger>
+      <TooltipTrigger asChild>
+        {props['aria-haspopup'] ? <span className='flex flex-1'>{element}</span> : element}
+      </TooltipTrigger>
       <TooltipContent>
         {label}{' '}
         {shortcut &&

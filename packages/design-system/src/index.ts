@@ -83,6 +83,19 @@ export {
   type AttributeValueProps,
 } from './components/Attribute';
 export { Badge, type BadgeProps } from './components/Badge';
+export {
+  Breadcrumbs,
+  BreadcrumbsEllipsis,
+  type BreadcrumbsEllipsisProps,
+  BreadcrumbsItem,
+  type BreadcrumbsItemProps,
+  type BreadcrumbsProps,
+  BreadcrumbsScopeSwitcher,
+  type BreadcrumbsScopeSwitcherProps,
+  BreadcrumbsSeparator,
+  type BreadcrumbsSeparatorProps,
+  type ScopeSwitcherItem,
+} from './components/Breadcrumbs';
 export { Button, type ButtonProps } from './components/Button';
 export {
   Calendar,
@@ -327,6 +340,27 @@ export {
 } from './components/ParameterPath';
 export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
 export {
+  type BreadcrumbSegment,
+  findDrillNode,
+  findFirstLinkPath,
+  type MatchNavResult,
+  matchNav,
+  type NavConfig,
+  type NavConfigDrill,
+  type NavConfigGroup,
+  type NavConfigLink,
+  type NavConfigNode,
+  type NavStackEntry,
+  ProductNav,
+  ProductNavBreadcrumbs,
+  type ProductNavContextValue,
+  ProductNavPanel,
+  type ProductNavProps,
+  type UseProductNavResult,
+  useProductNav,
+  useProductNavContext,
+} from './components/ProductNav';
+export {
   Radio,
   RadioDescription,
   type RadioDescriptionProps,
@@ -337,6 +371,16 @@ export {
   type RadioLabelProps,
   type RadioProps,
 } from './components/Radio';
+export {
+  RemoteShell,
+  RemoteShellBreadcrumb,
+  type RemoteShellBreadcrumbProps,
+  RemoteShellContent,
+  type RemoteShellContentProps,
+  RemoteShellPanel,
+  type RemoteShellPanelProps,
+  type RemoteShellProps,
+} from './components/RemoteShell';
 export {
   getResponseCodeCategory,
   RESPONSE_CODE_COLOR,

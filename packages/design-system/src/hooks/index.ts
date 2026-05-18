@@ -1,3 +1,4 @@
+export { useArrowNav } from './useArrowNav';
 export { useControlled } from './useControlled';
 export { useCopyToClipboard } from './useCopyToClipboard';
 export { useCopyTooltip } from './useCopyTooltip';

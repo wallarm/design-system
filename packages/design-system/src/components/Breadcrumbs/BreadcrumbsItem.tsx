@@ -82,8 +82,13 @@ export const BreadcrumbsItem: FC<BreadcrumbsItemProps> = ({
 }) => {
   const testId = useTestId('item');
   const isLink = href && !isCurrent;
+  const isInteractive = !!href || !!onClick;
 
-  const commonClasses = cn(breadcrumbsItemVariants({ isCurrent }), className);
+  const commonClasses = cn(
+    breadcrumbsItemVariants({ isCurrent }),
+    !isInteractive && 'cursor-default hover:bg-transparent active:bg-transparent',
+    className,
+  );
 
   return (
     <li>
