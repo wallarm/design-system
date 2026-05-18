@@ -1,3 +1,7 @@
+## <small>0.38.2 (2026-05-18)</small>
+
+* fix(table): WDS-116 prevent double onEndReached fire during pagination ([0b4ff83](https://github.com/wallarm/design-system/commit/0b4ff83))
+
 ## <small>0.38.1 (2026-05-15)</small>
 
 * fix(calendar): AS-971 add z-50 so popover renders above table headers (#120) ([3772df0](https://github.com/wallarm/design-system/commit/3772df0)), closes [#120](https://github.com/wallarm/design-system/issues/120)
