@@ -1,3 +1,7 @@
+## 0.39.0 (2026-05-18)
+
+* feat(table): AS-950 expose scrollToRow imperative handle (#122) ([1c46f22](https://github.com/wallarm/design-system/commit/1c46f22)), closes [#122](https://github.com/wallarm/design-system/issues/122)
+
 ## <small>0.38.2 (2026-05-18)</small>
 
 * fix(table): WDS-116 prevent double onEndReached fire during pagination ([0b4ff83](https://github.com/wallarm/design-system/commit/0b4ff83))
