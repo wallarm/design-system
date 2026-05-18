@@ -1,6 +1,7 @@
 import { type FC, type ReactNode, useContext, useEffect, useMemo, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { ReferenceArea } from 'recharts';
+import { ReferenceArea, usePlotArea } from 'recharts';
+import { formatChartDateTime } from '../lib/timeFormatters';
 import { lineChartZoomCursorPopoverClasses } from './classes';
 import { useZoomPendingListeners } from './hooks/useZoomPendingListeners';
 import {
@@ -11,10 +12,13 @@ import {
 import { LineChartZoomPopover } from './LineChartZoomPopover';
 import { LineChartZoomPopoverConfirm } from './LineChartZoomPopoverConfirm';
 import { LineChartZoomPopoverRange } from './LineChartZoomPopoverRange';
-import { formatRange as defaultFormatRange } from './lib/formatRange';
+import { formatRange } from './lib/formatRange';
+
+// `|| String(value)` keeps the popover readable when the X axis isn't a
+// timestamp — `formatChartDateTime` returns `''` for non-numeric values.
+const defaultFormatRange = formatRange(value => formatChartDateTime(value) || String(value));
 
 const POPOVER_OFFSET_X = 12;
-const POPOVER_OFFSET_Y = 12;
 
 export interface LineChartZoomBrushProps {
   /** When `true` the zoom interaction is removed entirely. */
@@ -55,6 +59,19 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
   const dataCtx = useContext(LineChartDataContext);
   const zoomCtx = useContext(LineChartZoomContext);
   const popoverRef = useRef<HTMLDivElement>(null);
+  const plotArea = usePlotArea();
+  const rootRef = zoomCtx?.rootRef;
+
+  // Recomputed only when recharts re-measures the plot, not on every drag
+  // mousemove — `getBoundingClientRect` forces synchronous layout and we
+  // otherwise pay it 60Hz while the user is dragging.
+  const centerY = useMemo(() => {
+    if (!plotArea || !rootRef?.current) return null;
+    const surface = rootRef.current.querySelector('.recharts-surface');
+    if (!surface) return null;
+    const rect = surface.getBoundingClientRect();
+    return rect.top + plotArea.y + plotArea.height / 2;
+  }, [plotArea, rootRef]);
 
   // Register that zoom is active so `<LineChartBody>` flips its cursor and
   // captures pointer events. Counted (not boolean) inside the context so this
@@ -69,7 +86,6 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
   const pending = zoomCtx?.pending ?? null;
   const cancelPending = zoomCtx?.cancelPending;
   const confirmZoom = zoomCtx?.confirmZoom;
-  const rootRef = zoomCtx?.rootRef;
 
   // Pending-state contract: click-outside dismisses, Enter confirms, Escape
   // cancels. The keydown half is scoped to events whose target is inside this
@@ -87,8 +103,8 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
     onCancel: cancelPending,
   });
 
-  // Resolve the visible selection range — drag takes priority over pending
-  // because `startDrag` clears pending; both can never be set at once.
+  // `startDrag` clears pending, so the two are mutually exclusive — `drag`
+  // wins purely as a safety net against state races.
   const range = useMemo<LineChartZoomRange | null>(() => {
     if (drag && dataCtx) {
       const lo = Math.min(drag.startIndex, drag.endIndex);
@@ -106,15 +122,11 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
 
   if (disabled || !dataCtx || !zoomCtx) return null;
 
-  // Popover position — locked at the cursor for both drag (live) and pending
-  // (last position on release). The `pointer-events` toggle is what flips the
-  // popover between "informational while dragging" and "interactive after
-  // release" — the button is unclickable during drag (the mouse button is
-  // already held anyway), and pointer-events:auto only kicks in once the drag
-  // ends and the pending popover takes over.
   const popoverPosition = drag ?? pending ?? null;
   const isPending = pending !== null;
 
+  // `pointer-events:none` during drag — the confirm button must be inert while
+  // the mouse button is still held, or clicking it would re-trigger a drag.
   const popoverContent =
     range && popoverPosition ? (
       <div
@@ -123,9 +135,9 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
         data-zoom-state={isPending ? 'pending' : 'dragging'}
         className={lineChartZoomCursorPopoverClasses}
         style={{
-          top: popoverPosition.clientY - POPOVER_OFFSET_Y,
+          top: centerY ?? popoverPosition.clientY,
           left: popoverPosition.clientX + POPOVER_OFFSET_X,
-          transform: 'translateY(-100%)',
+          transform: 'translateY(-50%)',
           pointerEvents: isPending ? 'auto' : 'none',
         }}
         // React events bubble through portals back to React ancestors. Without
@@ -153,8 +165,7 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
           // surface so the gray reads as a chart-system colour, not random.
           fill='var(--color-states-primary-hover)'
           fillOpacity={1}
-          stroke='var(--color-border-primary-light)'
-          strokeOpacity={1}
+          stroke='none'
           ifOverflow='visible'
         />
       ) : null}

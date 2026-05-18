@@ -9,7 +9,9 @@ const jitter = (i: number, seed: number, salt: number): number => {
 };
 
 export const genHourly = (count: number, seed = 1): LineChartDatum[] => {
-  const start = Date.UTC(2025, 0, 1, 0, 0, 0);
+  // Local-time anchor so the first sample reads `00:00` in the viewer's
+  // timezone instead of drifting by the UTC offset.
+  const start = new Date(2025, 0, 1, 0, 0, 0).getTime();
   const out: LineChartDatum[] = [];
   for (let i = 0; i < count; i++) {
     const t = start + i * 60 * 60 * 1000;
@@ -28,7 +30,7 @@ export const genHourly = (count: number, seed = 1): LineChartDatum[] => {
 };
 
 export const genDaily = (count: number): LineChartDatum[] => {
-  const start = Date.UTC(2024, 0, 1, 0, 0, 0);
+  const start = new Date(2024, 0, 1, 0, 0, 0).getTime();
   const out: LineChartDatum[] = [];
   for (let i = 0; i < count; i++) {
     const t = start + i * 24 * 60 * 60 * 1000;
@@ -66,7 +68,7 @@ export const dailyData60 = genDaily(60);
 export const hourlyData1000 = genHourly(1000);
 
 export const singlePointData: LineChartDatum[] = [
-  { timestamp: Date.UTC(2025, 0, 1, 12, 0, 0), requests: 142 },
+  { timestamp: new Date(2025, 0, 1, 12, 0, 0).getTime(), requests: 142 },
 ];
 
 export const dataWithErrorGaps: LineChartDatum[] = hourlyData24.map((d, i) => {

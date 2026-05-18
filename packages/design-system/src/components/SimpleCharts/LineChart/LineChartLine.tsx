@@ -2,7 +2,6 @@ import { type FC, type MouseEvent, useContext, useEffect } from 'react';
 import { Line } from 'recharts';
 import type { CurveMouseEventHandler } from 'recharts/types/shape/Curve';
 import {
-  LINE_ACTIVE_DOT_RADIUS,
   LINE_ANIMATION_BEGIN,
   LINE_ANIMATION_DURATION,
   LINE_DASH_DASHARRAY,
@@ -86,7 +85,7 @@ export const LineChartLine: FC<LineChartLineProps> = ({
       strokeLinecap='round'
       strokeLinejoin='round'
       dot={false}
-      activeDot={{ r: LINE_ACTIVE_DOT_RADIUS, stroke, strokeWidth: 0 }}
+      activeDot={false}
       opacity={opacity}
       connectNulls={connectNulls}
       isAnimationActive={disableAnimation ? false : 'auto'}
