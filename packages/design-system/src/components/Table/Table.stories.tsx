@@ -445,7 +445,7 @@ export const ScrollToRow: StoryFn<typeof meta> = () => {
   const scroll = (index: number, align: 'start' | 'center' | 'end' | 'auto' = 'center') => {
     const row = largeData[index];
     if (!row) return;
-    const ok = tableRef.current?.scrollToRow(row.id, { align, behavior: 'smooth' });
+    const ok = tableRef.current?.scrollToRow(row.id, { align, behavior: 'smooth' }) ?? false;
     setLastResult(`scrollToRow("${row.id}", { align: "${align}" }) → ${ok}`);
   };
 
@@ -458,7 +458,7 @@ export const ScrollToRow: StoryFn<typeof meta> = () => {
         <Button
           variant='ghost'
           onClick={() => {
-            const ok = tableRef.current?.scrollToRow('does-not-exist');
+            const ok = tableRef.current?.scrollToRow('does-not-exist') ?? false;
             setLastResult(`scrollToRow("does-not-exist") → ${ok}`);
           }}
         >

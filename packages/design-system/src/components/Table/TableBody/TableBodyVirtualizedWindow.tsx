@@ -1,4 +1,4 @@
-import { type FC, useCallback } from 'react';
+import { type FC, useCallback, useEffect } from 'react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
 import { TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
@@ -20,6 +20,15 @@ export const TableBodyVirtualizedWindow: FC = () => {
   // Publish to the table-level handle. Render-time assignment is safe — refs
   // don't trigger re-renders and the value is idempotent across renders.
   virtualizerRef.current = virtualizer;
+
+  // Clear on unmount so any `scrollToRow` call landing between this body's
+  // unmount and a successor body's first render doesn't act on a dead
+  // virtualizer instance.
+  useEffect(() => {
+    return () => {
+      virtualizerRef.current = null;
+    };
+  }, [virtualizerRef]);
 
   useResetVirtualizerOnDataChange(table, virtualizer);
 

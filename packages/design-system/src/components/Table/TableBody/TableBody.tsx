@@ -21,8 +21,9 @@ export const TableBody: FC = () => {
     return <TableBodyVirtualizedContainer />;
   }
 
-  // Non-virtualized path: clear the virtualizer handle so `scrollToRow`
-  // falls back to DOM lookup.
+  // Non-virtualized render path (also: empty-data fallback for virtualized
+  // tables) — clear the virtualizer handle so `scrollToRow` falls back to
+  // DOM lookup via `data-row-id`.
   virtualizerRef.current = null;
 
   return (

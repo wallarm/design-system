@@ -160,7 +160,7 @@ const scrollToRow: TableHandle['scrollToRow'] = (id, opts = {}) => {
 - `packages/design-system/src/components/Table/types.ts` — `TableHandle`, `TableScrollToRowOptions` exports; widen `TableProps` to allow `ref`.
 - `packages/design-system/src/components/Table/Table.tsx` — destructure `ref` from props, mount `TableImperativeBridge` inside `TableProvider`.
 - `packages/design-system/src/components/Table/TableImperativeBridge.tsx` — new file; reads context, calls `useImperativeHandle`.
-- `packages/design-system/src/components/Table/TableContext/TableContext.ts` — add `virtualizerRef`, `tbodyRef` to context type.
+- `packages/design-system/src/components/Table/TableContext/types.ts` — add `virtualizerRef`, `tbodyRef`, and the `TableVirtualizerInstance` union to the context type.
 - `packages/design-system/src/components/Table/TableContext/TableProvider.tsx` — create the refs.
 - `packages/design-system/src/components/Table/TableBody/TableBodyVirtualizedWindow.tsx` — use context refs; write virtualizer.
 - `packages/design-system/src/components/Table/TableBody/TableBodyVirtualizedContainer.tsx` — same.
