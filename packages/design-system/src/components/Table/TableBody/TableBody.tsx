@@ -8,7 +8,7 @@ import { TableBodyVirtualizedContainer } from './TableBodyVirtualizedContainer';
 import { TableBodyVirtualizedWindow } from './TableBodyVirtualizedWindow';
 
 export const TableBody: FC = () => {
-  const { table, isLoading, virtualized } = useTableContext();
+  const { table, isLoading, virtualized, tbodyRef, virtualizerRef } = useTableContext();
   const testId = useTestId('body');
   const rows = table.getRowModel().rows;
   const hasData = rows.length > 0;
@@ -21,8 +21,12 @@ export const TableBody: FC = () => {
     return <TableBodyVirtualizedContainer />;
   }
 
+  // Non-virtualized path: clear the virtualizer handle so `scrollToRow`
+  // falls back to DOM lookup.
+  virtualizerRef.current = null;
+
   return (
-    <TBody data-testid={testId}>
+    <TBody ref={tbodyRef} data-testid={testId}>
       {rows.map(row => {
         return <TableRow key={row.id} row={row} />;
       })}

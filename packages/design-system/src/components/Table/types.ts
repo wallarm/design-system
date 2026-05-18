@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { ReactNode, Ref } from 'react';
 import type { Row, RowData } from '@tanstack/react-table';
 import type { TestableProps } from '../../utils/testId';
 
@@ -59,6 +59,31 @@ export type TableVisibilityState = Record<string, boolean>;
 
 /** State updater — value or functional update */
 export type TableUpdater<T> = T | ((prev: T) => T);
+
+/** Options for the imperative `scrollToRow` method */
+export interface TableScrollToRowOptions {
+  /** Alignment within the viewport. Default: 'auto'. */
+  align?: 'start' | 'center' | 'end' | 'auto';
+  /** Scroll behavior. Default: 'auto'. */
+  behavior?: 'auto' | 'smooth';
+}
+
+/**
+ * Imperative handle exposed via `ref` on `<Table>`. The only supported way
+ * to programmatically scroll the table to a row that may be outside the
+ * currently rendered virtual window.
+ */
+export interface TableHandle {
+  /**
+   * Scrolls to the row with the given id.
+   *
+   * Returns `true` if the row was found in the current row model and a
+   * scroll was initiated. Returns `false` if the id is not in the current
+   * rows or the virtualizer has not yet mounted — the caller decides
+   * whether to load more pages or retry on the next frame.
+   */
+  scrollToRow(id: string, opts?: TableScrollToRowOptions): boolean;
+}
 
 /** onChange callback */
 export type TableOnChangeFn<T> = (updaterOrValue: TableUpdater<T>) => void;
@@ -216,4 +241,7 @@ export interface TableProps<T> extends TestableProps {
   onMasterCellClick?: (rowId: string) => void;
   /** ID of the currently active (highlighted) row, or null. Controls row highlighting via data-preview-active attribute. */
   activeRowId?: string | null;
+
+  /** Imperative handle — exposes `scrollToRow(id, opts)`. See {@link TableHandle}. */
+  ref?: Ref<TableHandle>;
 }

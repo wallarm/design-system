@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Ellipsis, Filter, FilterX, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
@@ -46,6 +46,7 @@ import type {
   TableColumnPinningState,
   TableColumnSizingState,
   TableExpandedState,
+  TableHandle,
   TableRowSelectionState,
   TableSortingState,
   TableVisibilityState,
@@ -433,6 +434,51 @@ export const WindowVirtualization: StoryFn<typeof meta> = () => {
       columnSizing={columnSizing}
       onColumnSizingChange={setColumnSizing}
     />
+  );
+};
+
+export const ScrollToRow: StoryFn<typeof meta> = () => {
+  const largeData = useMemo(() => createLargeSecurityEvents(1000), []);
+  const tableRef = useRef<TableHandle>(null);
+  const [lastResult, setLastResult] = useState<string | null>(null);
+
+  const scroll = (index: number, align: 'start' | 'center' | 'end' | 'auto' = 'center') => {
+    const row = largeData[index];
+    if (!row) return;
+    const ok = tableRef.current?.scrollToRow(row.id, { align, behavior: 'smooth' });
+    setLastResult(`scrollToRow("${row.id}", { align: "${align}" }) → ${ok}`);
+  };
+
+  return (
+    <VStack gap='md'>
+      <HStack gap='sm'>
+        <Button onClick={() => scroll(0, 'start')}>Top</Button>
+        <Button onClick={() => scroll(499, 'center')}>Middle</Button>
+        <Button onClick={() => scroll(999, 'end')}>Bottom</Button>
+        <Button
+          variant='ghost'
+          onClick={() => {
+            const ok = tableRef.current?.scrollToRow('does-not-exist');
+            setLastResult(`scrollToRow("does-not-exist") → ${ok}`);
+          }}
+        >
+          Missing id (returns false)
+        </Button>
+      </HStack>
+      {lastResult && (
+        <Text size='sm' color='secondary'>
+          {lastResult}
+        </Text>
+      )}
+      <Table
+        ref={tableRef}
+        className='h-500'
+        data={largeData}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='container'
+      />
+    </VStack>
   );
 };
 
