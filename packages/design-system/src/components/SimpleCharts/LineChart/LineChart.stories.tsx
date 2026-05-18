@@ -5,6 +5,7 @@ import { formatFullNumber } from '../../../utils/abbreviateNumber';
 import { Button } from '../../Button';
 import { Skeleton } from '../../Skeleton';
 import { HStack } from '../../Stack';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { Chart } from '../Chart/Chart';
 import { ChartActions } from '../Chart/ChartActions';
 import { ChartHeader } from '../Chart/ChartHeader';
@@ -26,6 +27,7 @@ import { LineChartTooltip } from './LineChartTooltip';
 import { LineChartXAxis } from './LineChartXAxis';
 import { LineChartYAxis } from './LineChartYAxis';
 import { LineChartZoomBrush } from './LineChartZoomBrush';
+import { formatRange } from './lib/formatRange';
 import {
   customColorSeries,
   dailyData60,
@@ -472,36 +474,55 @@ LegendPlacements.parameters = {
 export const Filterable: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   const [hidden, setHidden] = useState<string[]>([]);
+  // First click on a fully-visible chart isolates the clicked series (hides
+  // every other one); after that, clicks toggle individual series in and out.
   const toggle = (key: string) => {
-    setHidden(prev => (prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]));
+    setHidden(prev => {
+      if (prev.length === 0) return multiSeries.filter(s => s.key !== key).map(s => s.key);
+      if (prev.includes(key)) return prev.filter(k => k !== key);
+      return [...prev, key];
+    });
   };
+  const filtered = hidden.length > 0;
 
   return (
     <div className='w-560'>
       <Chart>
         <ChartHeader>
-          <ChartTitle>Click a row to toggle</ChartTitle>
-          <ChartActions alwaysVisible={hidden.length > 0}>
-            {hidden.length > 0 && (
-              <Button
-                variant='ghost'
-                color='neutral'
-                size='small'
-                aria-label='Clear filter'
-                onClick={() => setHidden([])}
-              >
-                <FilterX />
-              </Button>
+          <ChartTitle>Click a row to isolate, click another to add</ChartTitle>
+          <ChartActions alwaysVisible={filtered}>
+            {filtered && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant='ghost'
+                    color='neutral'
+                    size='small'
+                    aria-label='Clear filter'
+                    onClick={() => setHidden([])}
+                  >
+                    <FilterX />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Remove filter</TooltipContent>
+              </Tooltip>
             )}
           </ChartActions>
         </ChartHeader>
         <LineChart data={hourlyData24} series={multiSeries} xKey='timestamp' filteredKeys={hidden}>
           <LineChartLegend>
             {multiSeries.map(s => (
-              <LineChartLegendItem key={s.key} seriesKey={s.key} onClick={() => toggle(s.key)}>
-                <LineChartHoverPopoverDot color={s.color} />
-                <span className='text-xs font-mono text-text-primary'>{s.label}</span>
-              </LineChartLegendItem>
+              <Tooltip key={s.key}>
+                <TooltipTrigger asChild>
+                  <LineChartLegendItem seriesKey={s.key} onClick={() => toggle(s.key)}>
+                    <LineChartHoverPopoverDot color={s.color} />
+                    <span className='text-xs font-mono text-text-primary'>{s.label}</span>
+                  </LineChartLegendItem>
+                </TooltipTrigger>
+                <TooltipContent>
+                  {hidden.includes(s.key) ? 'Remove filter' : 'Click to filter'}
+                </TooltipContent>
+              </Tooltip>
             ))}
           </LineChartLegend>
           <LineChartBody>
@@ -597,12 +618,14 @@ export const CrossChartHoverSync: StoryFn<typeof meta> = () => {
 };
 
 const ZoomControlledChart = () => {
-  const { formatDate, formatDateWithTimezone, formatDateRange } = useChartTimeFormatters();
+  const { formatDate, formatDateWithTimezone } = useChartTimeFormatters();
   const [range, setRange] = useState<LineChartZoomRange | null>(null);
   const visibleData = useMemo(() => {
     if (!range) return dailyData60;
     return dailyData60.slice(range.fromIndex, range.toIndex + 1);
   }, [range]);
+  // Daily data — time is always 00:00 so the zoom popover renders date-only.
+  const formatDateOnlyRange = useMemo(() => formatRange(formatDate), [formatDate]);
 
   return (
     <Chart>
@@ -610,15 +633,20 @@ const ZoomControlledChart = () => {
         <ChartTitle>Drag on the plot, then click "Zoom in" — Esc to cancel</ChartTitle>
         <ChartActions alwaysVisible={range !== null}>
           {range !== null && (
-            <Button
-              variant='ghost'
-              color='neutral'
-              size='small'
-              aria-label='Reset zoom'
-              onClick={() => setRange(null)}
-            >
-              <ZoomOut />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='ghost'
+                  color='neutral'
+                  size='small'
+                  aria-label='Reset time selection'
+                  onClick={() => setRange(null)}
+                >
+                  <ZoomOut />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Reset time selection</TooltipContent>
+            </Tooltip>
           )}
         </ChartActions>
       </ChartHeader>
@@ -632,7 +660,7 @@ const ZoomControlledChart = () => {
             <LineChartLine key={s.key} seriesKey={s.key} />
           ))}
           <LineChartTooltip xTickFormatter={formatDateWithTimezone} />
-          <LineChartZoomBrush formatRange={formatDateRange} />
+          <LineChartZoomBrush formatRange={formatDateOnlyRange} />
         </LineChartBody>
       </LineChart>
     </Chart>
@@ -808,16 +836,21 @@ const RefreshingChart = ({
       <ChartHeader>
         <ChartTitle>{title}</ChartTitle>
         <ChartActions alwaysVisible>
-          <Button
-            variant='ghost'
-            color='neutral'
-            size='small'
-            aria-label='Refresh'
-            disabled={loading}
-            onClick={() => setLoading(true)}
-          >
-            <RefreshCcw />
-          </Button>
+          <Tooltip disabled={loading}>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                color='neutral'
+                size='small'
+                aria-label='Reload'
+                disabled={loading}
+                onClick={() => setLoading(true)}
+              >
+                <RefreshCcw />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Reload</TooltipContent>
+          </Tooltip>
         </ChartActions>
       </ChartHeader>
       {loading ? (
@@ -868,7 +901,8 @@ Empty.parameters = {
 };
 
 const LongTimeRangeChart = () => {
-  const { formatDate, formatDateWithTimezone, formatDateRange } = useChartTimeFormatters();
+  const { formatDate, formatDateTime, formatDateTimeWithTimezone } = useChartTimeFormatters();
+  const formatDateTimeRangeText = useMemo(() => formatRange(formatDateTime), [formatDateTime]);
   const [range, setRange] = useState<LineChartZoomRange | null>(null);
   const visibleData = useMemo(() => {
     if (!range) return hourlyData1000;
@@ -881,15 +915,20 @@ const LongTimeRangeChart = () => {
         <ChartTitle>1,000 hourly samples — drag to zoom</ChartTitle>
         <ChartActions alwaysVisible={range !== null}>
           {range !== null && (
-            <Button
-              variant='ghost'
-              color='neutral'
-              size='small'
-              aria-label='Reset zoom'
-              onClick={() => setRange(null)}
-            >
-              <ZoomOut />
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant='ghost'
+                  color='neutral'
+                  size='small'
+                  aria-label='Reset time selection'
+                  onClick={() => setRange(null)}
+                >
+                  <ZoomOut />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Reset time selection</TooltipContent>
+            </Tooltip>
           )}
         </ChartActions>
       </ChartHeader>
@@ -909,8 +948,8 @@ const LongTimeRangeChart = () => {
           {multiSeries.map(s => (
             <LineChartLine key={s.key} seriesKey={s.key} disableAnimation />
           ))}
-          <LineChartTooltip xTickFormatter={formatDateWithTimezone} />
-          <LineChartZoomBrush formatRange={formatDateRange} />
+          <LineChartTooltip xTickFormatter={formatDateTimeWithTimezone} />
+          <LineChartZoomBrush formatRange={formatDateTimeRangeText} />
         </LineChartBody>
       </LineChart>
     </Chart>

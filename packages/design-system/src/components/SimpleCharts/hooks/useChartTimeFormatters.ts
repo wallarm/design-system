@@ -18,8 +18,6 @@ export interface ChartTimeFormatters {
   formatHourWithTimezone: (value: unknown) => ReactNode;
   formatDateWithTimezone: (value: unknown) => ReactNode;
   formatDateTimeWithTimezone: (value: unknown) => ReactNode;
-  /** `from → to` using `formatDate`. Suitable for `<LineChartZoomBrush formatRange>`. */
-  formatDateRange: (range: { from: unknown; to: unknown }) => string;
 }
 
 /**
@@ -45,7 +43,6 @@ export const useChartTimeFormatters = (): ChartTimeFormatters => {
       formatHourWithTimezone: withTimezoneChip(formatHour),
       formatDateWithTimezone: withTimezoneChip(formatDate),
       formatDateTimeWithTimezone: withTimezoneChip(formatDateTime),
-      formatDateRange: ({ from, to }) => `${formatDate(from)} → ${formatDate(to)}`,
     };
   }, [order, resolvedHourCycle]);
 };

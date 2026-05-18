@@ -1,8 +1,9 @@
 import { type FC, useContext } from 'react';
 import { XAxis } from 'recharts';
 import type { TickFormatter } from 'recharts/types/cartesian/CartesianAxis';
-import { LINE_AXIS_TICK_TEXT_PROPS } from './constants';
+import type { XAxisTickContentProps } from 'recharts/types/util/types';
 import { LineChartDataContext } from './LineChartContext';
+import { renderAxisTick } from './lib/renderAxisTick';
 
 /**
  * Tick-spacing preset. Maps to `minTickGap` so callers don't have to think in
@@ -69,6 +70,13 @@ const AXIS_LINE_PROPS = {
   stroke: 'var(--color-border-primary-light)',
 } as const;
 
+// Anchor edge tick labels inward so they cannot overflow the plot area.
+const renderTick = renderAxisTick<XAxisTickContentProps>(({ index, visibleTicksCount }) => {
+  if (index === 0) return { anchor: 'start' };
+  if (index === visibleTicksCount - 1) return { anchor: 'end' };
+  return {};
+});
+
 // Recharts requires `<XAxis>` to be a direct child of `<RechartsLineChart>`.
 // In v3 the axis self-registers via Redux dispatch, so wrapping it inside this
 // component still wires up correctly when the wrapper is mounted anywhere
@@ -76,7 +84,10 @@ const AXIS_LINE_PROPS = {
 export const LineChartXAxis: FC<LineChartXAxisProps> = ({
   tickFormatter,
   density,
-  interval,
+  // Default to `preserveStartEnd` so the first and last data ticks always
+  // render at the plot edges — paired with the edge-anchor override in
+  // `renderTick`, the first label sits flush-left and the last flush-right.
+  interval = 'preserveStartEnd',
   tickCount,
   ticks,
   minTickGap,
@@ -96,7 +107,7 @@ export const LineChartXAxis: FC<LineChartXAxisProps> = ({
       type={type}
       tickLine={false}
       axisLine={axisLine ? AXIS_LINE_PROPS : false}
-      tick={hideTicks ? false : LINE_AXIS_TICK_TEXT_PROPS}
+      tick={hideTicks ? false : renderTick}
       tickFormatter={tickFormatter as TickFormatter | undefined}
       interval={interval}
       tickCount={tickCount}

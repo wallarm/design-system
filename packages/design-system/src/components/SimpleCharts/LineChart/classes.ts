@@ -22,10 +22,13 @@ export const lineChartBodyZoomEnabledClasses = [
 // `top`/`left` are applied inline so the popover tracks each mousemove frame.
 export const lineChartZoomCursorPopoverClasses = ['fixed z-30 pointer-events-none'].join(' ');
 
+// `[&:last-child]:pb-8` adds breathing room when the legend is placed below
+// the body (last JSX child of `<LineChart>`); otherwise it sits ~2px from the
+// chart's bottom border.
 export const lineChartLegendVariants = cva('flex', {
   variants: {
     orientation: {
-      horizontal: 'flex-row flex-wrap items-center gap-6 pl-12 py-2',
+      horizontal: 'flex-row flex-wrap items-center gap-6 pl-12 py-2 [&:last-child]:pb-8',
       vertical: 'flex-col gap-6 px-12 py-2 max-w-160',
     },
     align: {

@@ -1,7 +1,7 @@
 import { type FC, type ReactNode, useContext, useMemo } from 'react';
 import { Tooltip, type TooltipContentProps, usePlotArea } from 'recharts';
 import { lineChartTooltipCenterClasses } from './classes';
-import { HOVER_POPOVER_TOP } from './constants';
+import { HOVER_POPOVER_TOP, LINE_CURSOR_DASHARRAY } from './constants';
 import {
   LineChartDataContext,
   type LineChartDatum,
@@ -44,11 +44,11 @@ export interface LineChartTooltipProps {
   xTickFormatter?: (value: unknown) => ReactNode;
 }
 
-// Vertical guideline that follows the cursor (Figma `7527-32438` shows it dashed).
+// Tokens match Figma `7527-32438` line-selection sub-node `7473:101831`.
 const TOOLTIP_CURSOR = {
-  stroke: 'var(--color-border-primary-light)',
+  stroke: 'var(--color-border-strong-primary)',
   strokeWidth: 1,
-  strokeDasharray: '4 4',
+  strokeDasharray: LINE_CURSOR_DASHARRAY,
 } as const;
 
 // Keep the popover inside the plot at chart edges — without this recharts

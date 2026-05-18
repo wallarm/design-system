@@ -5,9 +5,9 @@ export {
 
 export const LINE_STROKE_WIDTH = 2;
 export const LINE_DASH_DASHARRAY = '6 4';
-export const LINE_ACTIVE_DOT_RADIUS = 4;
 
 export const LINE_GRID_DASHARRAY = '4 4';
+export const LINE_CURSOR_DASHARRAY = '4 2';
 
 export const LINE_ANIMATION_DURATION = 400;
 export const LINE_ANIMATION_BEGIN = 0;

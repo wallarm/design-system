@@ -77,42 +77,47 @@ test.describe('LineChart', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Filterable - OneHidden', async ({ page }) => {
+    test('Filterable - Isolated', async ({ page }) => {
       await lineChartStory.goto(page, 'Filterable');
+      // First click on the Filterable story isolates the clicked series.
       await page.locator('[data-slot=line-chart-legend-item][data-key="errors"]').click();
       // Move the cursor away so the hover state doesn't leak into the screenshot.
       await page.locator('[data-slot=chart-title]').hover();
-      await expect(page.locator('[data-slot=line-chart-line][data-key="errors"]')).toHaveCount(0);
+      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(1);
+      await expect(page.locator('[data-slot=line-chart-line][data-key="errors"]')).toHaveCount(1);
       await expect(page).toHaveScreenshot();
     });
 
-    test('Filterable - AllHidden', async ({ page }) => {
+    test('Filterable - PartiallyShown', async ({ page }) => {
       await lineChartStory.goto(page, 'Filterable');
-      for (const key of ['requests', 'errors', 'latency']) {
-        await page.locator(`[data-slot=line-chart-legend-item][data-key="${key}"]`).click();
-      }
+      // Click to isolate `requests`, then click `latency` to add it to the
+      // visible set — leaving `errors` as the only hidden series.
+      await page.locator('[data-slot=line-chart-legend-item][data-key="requests"]').click();
+      await page.locator('[data-slot=line-chart-legend-item][data-key="latency"]').click();
       await page.locator('[data-slot=chart-title]').hover();
-      // No lines remain — grid + axes + dimmed legend.
-      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(0);
+      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(2);
+      await expect(page.locator('[data-slot=line-chart-line][data-key="errors"]')).toHaveCount(0);
       await expect(page).toHaveScreenshot();
     });
   });
 
   test.describe('Interactions', () => {
-    test('Should hide the matching line when a legend row is clicked', async ({ page }) => {
+    test('Should isolate the matching line when a legend row is clicked', async ({ page }) => {
       await lineChartStory.goto(page, 'Filterable');
       const row = page.locator('[data-slot=line-chart-legend-item][data-key="errors"]');
       const line = page.locator('[data-slot=line-chart-line][data-key="errors"]');
       await expect(row).toHaveAttribute('aria-current', 'true');
-      await expect(line).toHaveCount(1);
+      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(3);
 
       await row.click();
 
-      await expect(row).not.toHaveAttribute('aria-current', 'true');
-      await expect(line).toHaveCount(0);
+      await expect(row).toHaveAttribute('aria-current', 'true');
+      await expect(line).toHaveCount(1);
+      // Siblings are hidden — only the clicked series remains.
+      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(1);
     });
 
-    test('Should toggle the matching line when Enter is pressed on a focused legend row', async ({
+    test('Should isolate the matching line when Enter is pressed on a focused legend row', async ({
       page,
     }) => {
       await lineChartStory.goto(page, 'Filterable');
@@ -120,11 +125,12 @@ test.describe('LineChart', () => {
       const line = page.locator('[data-slot=line-chart-line][data-key="errors"]');
       await row.focus();
       await page.keyboard.press('Enter');
-      await expect(row).not.toHaveAttribute('aria-current', 'true');
-      await expect(line).toHaveCount(0);
+      await expect(row).toHaveAttribute('aria-current', 'true');
+      await expect(line).toHaveCount(1);
+      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(1);
     });
 
-    test('Should toggle the matching line when Space is pressed on a focused legend row', async ({
+    test('Should isolate the matching line when Space is pressed on a focused legend row', async ({
       page,
     }) => {
       await lineChartStory.goto(page, 'Filterable');
@@ -132,8 +138,9 @@ test.describe('LineChart', () => {
       const line = page.locator('[data-slot=line-chart-line][data-key="latency"]');
       await row.focus();
       await page.keyboard.press(' ');
-      await expect(row).not.toHaveAttribute('aria-current', 'true');
-      await expect(line).toHaveCount(0);
+      await expect(row).toHaveAttribute('aria-current', 'true');
+      await expect(line).toHaveCount(1);
+      await expect(page.locator('[data-slot=line-chart-line]')).toHaveCount(1);
     });
 
     test('Should sync data-active from a hovered legend row to the matching line', async ({
@@ -190,6 +197,52 @@ test.describe('LineChart', () => {
 
       expect(samples[1]).toBe(samples[0]);
       expect(samples[2]).toBe(samples[0]);
+    });
+
+    test('Should lock the zoom popover Y across cursor positions and across drag/pending states', async ({
+      page,
+    }) => {
+      await lineChartStory.goto(page, 'Zoom');
+
+      const body = page.locator('[data-slot=line-chart-body]');
+      const bodyBox = await body.boundingBox();
+      if (!bodyBox) throw new Error('chart body has no bounding box');
+
+      const popover = page.locator('[data-slot=line-chart-zoom-cursor-popover]');
+
+      // Press near the left edge at plot-middle Y, then sweep across the plot
+      // with three different cursor Ys (upper band → middle → lower band). The
+      // popover Y must stay locked to the plot centre regardless of cursor Y,
+      // both while dragging and after release (pending state).
+      await page.mouse.move(bodyBox.x + bodyBox.width * 0.2, bodyBox.y + bodyBox.height * 0.5);
+      await page.mouse.down();
+
+      const samples: number[] = [];
+
+      for (const [ratioX, ratioY] of [
+        [0.4, 0.2],
+        [0.55, 0.5],
+        [0.7, 0.8],
+      ] as const) {
+        await page.mouse.move(
+          bodyBox.x + bodyBox.width * ratioX,
+          bodyBox.y + bodyBox.height * ratioY,
+        );
+        await expect(popover).toHaveAttribute('data-zoom-state', 'dragging');
+        const box = await popover.boundingBox();
+        if (!box) throw new Error('popover has no bounding box');
+        samples.push(Math.round(box.y));
+      }
+
+      await page.mouse.up();
+      await expect(popover).toHaveAttribute('data-zoom-state', 'pending');
+      const pendingBox = await popover.boundingBox();
+      if (!pendingBox) throw new Error('popover has no bounding box');
+      samples.push(Math.round(pendingBox.y));
+
+      expect(samples[1]).toBe(samples[0]);
+      expect(samples[2]).toBe(samples[0]);
+      expect(samples[3]).toBe(samples[0]);
     });
   });
 
