@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { type AnchorBounds, toAnchorBounds } from '../../lib';
 import { useAutoCleanupDetachedElement } from '../useAutoCleanupDetachedElement';
 import { useFilterInputPositioning } from '../useFilterInputPositioning';
@@ -27,8 +27,9 @@ interface UseMenuPositioningOptions {
  *   1. Explicit element passed via `setMenuAnchor` — set when a chip segment is
  *      clicked, including the Backspace cascade.
  *   2. Building chip ref (for operator/value menus while a chip is being built).
- *   3. Input ref (for the field menu, before a chip exists).
- *   4. Container rect (fallback).
+ *   3. Input ref — only when chips are already committed (the input has shifted
+ *      past them, so the dropdown follows the input's live position).
+ *   4. Container rect — the empty/initial state, flush with the field's border.
  *
  * Three signal sources keep Ark UI in sync with the live anchor:
  *   - `useResizeTracker` — width changes inside a segment as the user types.
@@ -54,26 +55,38 @@ export const useMenuPositioning = ({
 
   const tick = useResizeTracker(editingEl, buildingChipRef.current, containerRef.current);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: tick is a force-recompute dep
+  // Ark UI / zag.js captures `getAnchorRect` on first menu attach and reuses
+  // it across repositions — closures of reactive state would go stale.
+  // Read everything dynamic through this ref so the function stays stable.
+  const anchorStateRef = useRef({ editingEl, isBuilding, chipsCount });
+  anchorStateRef.current = { editingEl, isBuilding, chipsCount };
+
   const getAnchorBounds = useCallback(
     (containerRect: DOMRect): AnchorBounds => {
+      const { editingEl: el, isBuilding: building, chipsCount: count } = anchorStateRef.current;
       // isConnected guards a parent that reordered/removed the chip via the
-      // controlled value prop — detached editingEl returns zero rect.
-      if (editingEl?.isConnected) return toAnchorBounds(editingEl.getBoundingClientRect());
-      if (isBuilding && buildingChipRef.current) {
+      // controlled value prop — detached el returns zero rect.
+      if (el?.isConnected) return toAnchorBounds(el.getBoundingClientRect());
+      if (building && buildingChipRef.current) {
         return toAnchorBounds(buildingChipRef.current.getBoundingClientRect());
       }
-      if (inputRef?.current) return toAnchorBounds(inputRef.current.getBoundingClientRect());
+      // With committed chips the input sits past them — anchor to the input so
+      // the dropdown tracks its live left edge. With no chips the input's left
+      // is just the field's inner padding, which visually detaches the dropdown
+      // from the field border — fall through to the container instead.
+      if (count > 0 && inputRef?.current) {
+        return toAnchorBounds(inputRef.current.getBoundingClientRect());
+      }
       return toAnchorBounds(containerRect);
     },
-    [editingEl, isBuilding, buildingChipRef, inputRef, tick],
+    [buildingChipRef, inputRef],
   );
 
   const menuPositioning = useFilterInputPositioning(
     { containerRef, getAnchorBounds },
-    // Recompute on insertIndex change or chip count change (sibling reflow
-    // shifts positions without resizing — ResizeObserver alone misses it).
-    [insertIndex, chipsCount],
+    // Recompute on insertIndex change, chip count change, or any tracked
+    // element resize — these shift positions without firing window resize.
+    [insertIndex, chipsCount, tick],
   );
 
   return { menuPositioning, setMenuAnchor, resetMenuAnchor };
