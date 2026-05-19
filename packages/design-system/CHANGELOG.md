@@ -1,3 +1,7 @@
+## <small>0.39.1 (2026-05-19)</small>
+
+* fix(simple-charts): WDS-90 LineChart fixes ([c6fd779](https://github.com/wallarm/design-system/commit/c6fd779))
+
 ## 0.39.0 (2026-05-18)
 
 * feat(table): AS-950 expose scrollToRow imperative handle (#122) ([1c46f22](https://github.com/wallarm/design-system/commit/1c46f22)), closes [#122](https://github.com/wallarm/design-system/issues/122)
