@@ -28,19 +28,16 @@ export const useSelectionKeyboard = ({
       const isMod = e.metaKey || e.ctrlKey;
       const hasSelection = allSelected || hasDragSelection(chipRegistryRef.current);
 
-      // Ctrl+A — select all
       if (isMod && e.key === 'a' && conditionsCount > 0) {
         e.preventDefault();
         clearSelection();
         onSelectAll();
-        // Focus the container (tabIndex=-1) instead of blurring the input — this
-        // moves the caret off the input visually but keeps focus inside our React
-        // subtree, so subsequent Ctrl+C / Ctrl+V still hit onCopy / onPaste.
+        // Focus container (tabIndex=-1) so Ctrl+C/V still hit onCopy/onPaste
+        // while the caret moves off the input.
         containerRef.current?.focus();
         return;
       }
 
-      // Delete/Backspace — remove selected (non-disabled)
       if (hasSelection && (e.key === 'Delete' || e.key === 'Backspace')) {
         e.preventDefault();
         clearAll();
@@ -48,7 +45,6 @@ export const useSelectionKeyboard = ({
         return;
       }
 
-      // Escape — deselect
       if (hasSelection && e.key === 'Escape') {
         e.preventDefault();
         clearSelection();
@@ -56,7 +52,7 @@ export const useSelectionKeyboard = ({
         return;
       }
 
-      // Any other key — deselect
+      // Any other key deselects.
       if (hasSelection && !isMod) {
         clearSelection();
       }

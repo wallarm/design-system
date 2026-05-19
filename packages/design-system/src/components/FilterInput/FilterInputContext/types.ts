@@ -29,14 +29,11 @@ export interface FilterInputContextValue {
   onInputClick: () => void;
   onGapClick: (conditionIndex: number, afterConnector: boolean) => void;
   onChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
-  /** Click on a segment of the *building* (in-progress) chip — re-opens the
-   *  corresponding menu and enters inline-edit without committing the chip. */
+  /** Click on a building-chip segment — reopens its menu and enters inline-edit. */
   onBuildingChipClick: (segment: ChipSegment, anchorEl: HTMLElement) => void;
-  /** Switch the inline-edit to a different segment within the chip currently
-   *  being edited — used by Backspace-on-empty to walk back through segments. */
+  /** Move inline-edit to another segment of the edited chip (Backspace cascade). */
   onSwitchEditSegment: (targetSegment: ChipSegment) => boolean;
-  /** Remove the chip currently being edited inline — used by Backspace on an
-   *  empty attribute segment when operator/value are absent. */
+  /** Remove the inline-edited chip — Backspace on empty attribute w/o op/value. */
   onRemoveEditingChip: () => void;
   onConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   onChipRemove: (chipId: string) => void;
@@ -52,14 +49,14 @@ export interface FilterInputContextValue {
   onCustomOperatorCommit: (customText: string) => void;
   /** Ref to the currently open menu content element */
   menuRef: RefObject<HTMLDivElement | null>;
-  /** Close autocomplete menu (used by connector chip to enforce single-dropdown constraint) */
+  /** Close autocomplete menu (connector chip enforces single-dropdown). */
   closeAutocompleteMenu: () => void;
-  /** Register/unregister a chip DOM element for selection tracking */
+  /** Register/unregister a chip DOM element for selection tracking. */
   registerChipRef: (id: string, el: HTMLElement | null) => void;
-  /** Direct ref to the attribute segment <input> — attached by Segment when editing. */
+  /** Attribute segment input ref — set by Segment when editing. */
   segmentAttributeInputRef: RefObject<HTMLInputElement | null>;
-  /** Direct ref to the operator segment <input> — attached by Segment when editing. */
+  /** Operator segment input ref — set by Segment when editing. */
   segmentOperatorInputRef: RefObject<HTMLInputElement | null>;
-  /** Direct ref to the value segment <input> — attached by Segment when editing. */
+  /** Value segment input ref — set by Segment when editing. */
   segmentValueInputRef: RefObject<HTMLInputElement | null>;
 }

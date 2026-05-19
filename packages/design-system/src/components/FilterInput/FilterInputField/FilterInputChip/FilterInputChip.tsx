@@ -50,9 +50,8 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   const internalRef = useRef<HTMLDivElement>(null);
 
   const editing = useEditingContext();
-  // A building chip has no chipId; inline-edit on it is signalled by editing
-  // state where editingChipId is null but a segment is set. For committed
-  // chips, match on chipId as before.
+  // Building chip has no chipId; inline-edit signal is editingChipId null
+  // + segment set. Committed chips match on chipId.
   const isEditingThisChip =
     editing != null &&
     editing.editingSegment != null &&
@@ -64,12 +63,9 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       if (!onSegmentClick) return;
       if (activeSegment === segment) return;
       e.stopPropagation();
-      // Anchor the dropdown to the chip itself rather than the specific segment.
-      // Segments can be removed from the DOM mid-cascade (e.g. Backspace on
-      // value clears the value segment, then the operator one). If the dropdown
-      // were anchored to a now-detached segment the floating position falls back
-      // to a stale rect and the menu visibly jumps. The chip element stays
-      // mounted for the entire edit, so anchoring to it keeps the menu stable.
+      // Anchor to the chip, not the segment: segments can be unmounted
+      // mid-cascade (Backspace clears value/operator), leaving the floating
+      // menu pinned to a stale rect. The chip stays mounted throughout edit.
       const anchorEl = internalRef.current;
       if (!anchorEl) return;
       onSegmentClick(segment, anchorEl);
@@ -78,12 +74,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   );
 
   /**
-   * Suppress focus change on mousedown so clicking a segment doesn't drop
-   * focus to <body>. For a *building* chip that's load-bearing: a body-focus
-   * blur on FilterInput fires `commitBuildingOnBlur`, which would persist the
-   * in-progress chip as an errored condition before our click handler can
-   * enter inline-edit mode. The inline-edit input is focused programmatically
-   * after re-render via useFocusManagement's double-rAF effect.
+   * Suppress focus drop to <body> on segment mousedown. Load-bearing for
+   * building chips: body-blur fires commitBuildingOnBlur and would persist
+   * the chip as errored before inline-edit starts. The inline-edit input is
+   * focused after re-render by useFocusManagement's double-rAF effect.
    */
   const handleSegmentMouseDown = useCallback((e: ReactMouseEvent) => {
     e.preventDefault();
@@ -160,8 +154,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
         </Segment>
       )}
 
-      {/* While a building segment is in inline-edit, hide the trailing search
-          input — focus and typing live in the segment input instead. */}
+      {/* Hide trailing search input during inline-edit — focus is in the segment. */}
       {building && !isEditingThisChip && <ChipSearchInput />}
 
       {onRemove && !disabled && <FilterInputRemoveButton error={hasError} onRemove={onRemove} />}

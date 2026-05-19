@@ -41,7 +41,7 @@ export const getInvalidValueIndices = (
 
 /** Check if condition value(s) are valid for the given field. Returns true if error. */
 export const validateValueForField = (field: FieldMetadata, value: Condition['value']): boolean => {
-  // Null value (no-value operators) is always valid
+  // Null value (no-value operators) is always valid.
   if (value == null) return false;
   const values = Array.isArray(value) ? value : [value];
   return getInvalidValueIndices(field, values).length > 0;

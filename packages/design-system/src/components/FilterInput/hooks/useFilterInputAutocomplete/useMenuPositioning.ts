@@ -12,10 +12,8 @@ interface UseMenuPositioningOptions {
   inputRef?: RefObject<HTMLElement | null>;
   isBuilding: boolean;
   insertIndex: number;
-  /** Number of committed chips — used as a recompute trigger when chips are
-   *  added/removed. ResizeObserver only catches size changes, not sibling
-   *  reflow, so without this the building chip can shift after a sibling
-   *  is removed and the dropdown is left at the old position. */
+  /** Committed chip count — recompute trigger for sibling reflow (ResizeObserver
+   *  misses it; without this the dropdown sticks at the old position). */
   chipsCount: number;
 }
 
@@ -55,10 +53,8 @@ export const useMenuPositioning = ({
   // biome-ignore lint/correctness/useExhaustiveDependencies: tick is a force-recompute dep
   const getAnchorBounds = useCallback(
     (containerRect: DOMRect): AnchorBounds => {
-      // `isConnected` guards against a parent reordering / removing the chip
-      // via the controlled `value` prop while inline-edit is active —
-      // `editingEl` would still be truthy but point at a detached node, and
-      // `getBoundingClientRect()` on a detached node returns all-zeroes.
+      // isConnected guards a parent that reordered/removed the chip via the
+      // controlled value prop — detached editingEl returns zero rect.
       if (editingEl?.isConnected) return toAnchorBounds(editingEl.getBoundingClientRect());
       if (isBuilding && buildingChipRef.current) {
         return toAnchorBounds(buildingChipRef.current.getBoundingClientRect());
@@ -71,9 +67,8 @@ export const useMenuPositioning = ({
 
   const menuPositioning = useFilterInputPositioning(
     { containerRef, getAnchorBounds },
-    // Force recalculation when the input moves between chips (insertIndex) or
-    // when the number of chips changes — the latter shifts sibling positions
-    // without changing their size, so ResizeObserver alone misses it.
+    // Recompute on insertIndex change or chip count change (sibling reflow
+    // shifts positions without resizing — ResizeObserver alone misses it).
     [insertIndex, chipsCount],
   );
 

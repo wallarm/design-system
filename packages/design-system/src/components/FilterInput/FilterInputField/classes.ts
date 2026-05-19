@@ -1,15 +1,12 @@
 import { cva } from 'class-variance-authority';
 
-// ── Collapsed max-height calculation ──────────────────────
-// The query bar collapses to show at most VISIBLE_ROWS rows of chips.
-// Each value maps to a CSS dimension used in the inner chip container.
-
+// Collapsed query bar shows at most VISIBLE_ROWS chip rows.
 const VISIBLE_ROWS = 3;
-const CHIP_ROW_HEIGHT = 22; // chip h-22 (22px, border-box)
-const ROW_GAP = 4; // gap-y-4 between rows
-const PADDING_Y = 16; // py-[8px] top (8px) + py-[8px] bottom (8px)
-const EDGE_GAP = 8; // visual gap from container edges to first/last chip row
-const CONTAINER_BORDER = 2; // outer input border: 1px top + 1px bottom
+const CHIP_ROW_HEIGHT = 22; // chip h-22 (border-box)
+const ROW_GAP = 4; // gap-y-4
+const PADDING_Y = 16; // py-[8px] top + bottom
+const EDGE_GAP = 8; // container edge → first/last row
+const CONTAINER_BORDER = 2; // outer input border (1px × 2)
 
 /** Max height (px) of the inner chip area when the query bar is collapsed. */
 export const COLLAPSED_MAX_HEIGHT =
@@ -19,19 +16,15 @@ export const COLLAPSED_MAX_HEIGHT =
   EDGE_GAP +
   CONTAINER_BORDER;
 
-// ── Action buttons padding ────────────────────────────────
-// Reserve horizontal space so chips don't render behind the
-// absolutely-positioned action buttons (expand/collapse + clear).
-
-const BUTTON_SIZE = 24; // Button size="small" icon-only = 24×24
+// Reserve horizontal space so chips don't render behind the absolutely-
+// positioned action buttons (expand/collapse + clear).
+const BUTTON_SIZE = 24; // Button size="small" icon-only
 const BUTTON_COUNT = 2; // expand/collapse + clear
-const BUTTON_GAP = 8; // gap-8 between buttons
-const ACTIONS_RIGHT = 8; // right-8 offset of the actions container
+const BUTTON_GAP = 8;
+const ACTIONS_RIGHT = 8;
 
 /** Right padding (px) applied to the chip area when content is present. */
 export const ACTIONS_PADDING = BUTTON_COUNT * BUTTON_SIZE + BUTTON_GAP + ACTIONS_RIGHT;
-
-// ── CVA variants ──────────────────────────────────────────
 
 /** Outer filter-input container (combobox wrapper) */
 export const filterInputContainerVariants = cva(

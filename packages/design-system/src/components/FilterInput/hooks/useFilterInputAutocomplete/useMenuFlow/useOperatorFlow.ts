@@ -34,10 +34,8 @@ export const useOperatorFlow = ({
     (operator: FilterOperator) => {
       if (!selectedField) return;
 
-      // Inline-edit of the building chip's operator — keep value preview
-      // when the shape (multi/between/no-value) is unchanged, otherwise drop
-      // it. No-value operators auto-commit on the spot (their placeholder
-      // satisfies isBuildingComplete), matching the first-pass flow.
+      // Inline-edit of building chip operator: keep value preview if shape
+      // (multi/between/no-value) unchanged; no-value operators auto-commit.
       const isBuildingEdit =
         !editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.operator;
       if (isBuildingEdit) {
@@ -46,7 +44,6 @@ export const useOperatorFlow = ({
         setSelectedOperator(operator);
         editing.clearEditing();
         if (isNoValueOperator(operator)) {
-          // Commit the no-value chip immediately, matching first-pass flow.
           upsertCondition(selectedField, operator, null, null, insertIndex);
           resetState(true);
           return;
@@ -68,9 +65,8 @@ export const useOperatorFlow = ({
         return;
       }
 
-      // When editing the operator of an existing chip:
-      // - Complete chip (has value): commit with new operator, keep value, done.
-      // - Incomplete chip (no value): update operator in place, continue to value selection.
+      // Editing operator of existing chip: complete chip commits with new
+      // operator+value; incomplete persists operator and moves to value.
       if (editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.operator) {
         const idx = chipIdToConditionIndex(editing.editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
@@ -89,7 +85,7 @@ export const useOperatorFlow = ({
             resetState();
             return;
           }
-          // Incomplete — persist operator without error, user is still building
+          // Incomplete — persist operator without error.
           upsertCondition(selectedField, operator, null, editing.editingChipId);
           editing.setEditingSegment(SEGMENT_VARIANT.value);
           editing.setSegmentFilterText('');
@@ -116,11 +112,8 @@ export const useOperatorFlow = ({
   );
 
   /**
-   * Commit a custom typed operator (from inline segment editing) by matching
-   * the text against the field's allowed operator labels, raw keys, or
-   * symbols. Mirrors the main-input Enter logic in useInputHandlers, so the
-   * keyboard flow is symmetric between attribute, operator, and value
-   * segments. Unmatched text is ignored.
+   * Commit a typed operator from inline segment editing by matching against
+   * the field's labels, raw keys, or symbols. Unmatched text is ignored.
    */
   const handleCustomOperatorCommit = useCallback(
     (customText: string) => {

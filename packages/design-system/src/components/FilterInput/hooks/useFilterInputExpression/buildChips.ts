@@ -121,9 +121,8 @@ const makeConditionChip = (
   const field = fields.find(f => f.name === condition.field);
   const baseChip = buildBaseChip(i, condition, field);
 
-  // No-value operators (is_null / is_not_null) carry no real value — render a
-  // visual placeholder so the chip still has three segments. Skip the
-  // type-specific branches below; they assume a real value exists.
+  // No-value operators (is_null/is_not_null) render a placeholder so the chip
+  // still has three segments; type-specific branches below assume a real value.
   if (condition.operator && isNoValueOperator(condition.operator)) {
     return { ...baseChip, value: NO_VALUE_PLACEHOLDER, error: chipError };
   }
@@ -166,7 +165,7 @@ export const buildChips = (
     });
   }
 
-  // Mixed AND/OR — split into AND-groups, wrap groups of 2+ in parentheses
+  // Mixed AND/OR — split into AND-groups, wrap groups of 2+ in parens.
   const groups = connectors.reduce<number[][]>(
     (acc, conn, i) => {
       if (conn === 'or') {

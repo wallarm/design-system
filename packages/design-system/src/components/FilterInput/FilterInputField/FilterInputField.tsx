@@ -101,7 +101,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
           className='h-auto flex-1 min-w-0'
           style={{ maxHeight: !isExpanded ? COLLAPSED_MAX_HEIGHT : undefined }}
         >
-          {/* Inline style overrides hardcoded h-full in ScrollAreaViewport (className is stripped) */}
+          {/* Inline style overrides h-full in ScrollAreaViewport (className is stripped). */}
           <ScrollAreaViewport style={{ height: 'auto', maxHeight: 'inherit' }}>
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
             <div

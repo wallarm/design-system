@@ -26,10 +26,9 @@ export const resolveSingleValue = (
   const fv = getFieldValues(field);
   const match = findMatchingFieldValue(fv, trimmed);
   const raw = match ? match.value : trimmed;
-  // Apply field-provided normalization (e.g. pad partial status codes) before
-  // validation runs — the normalized form is what ends up in the chip.
+  // Normalize before validation — normalized form is what ends up in the chip.
   const resolved = field.normalize ? field.normalize(raw) : raw;
-  // Custom validator trumps the static-allowlist check.
+  // Custom validator trumps static-allowlist check.
   if (field.validate) {
     return { resolved, error: field.validate(resolved) ? true : undefined };
   }
@@ -49,7 +48,7 @@ export const resolveMultiValues = (
     .map(s => s.trim())
     .filter(Boolean);
   const raw = parts.map(part => resolveFieldValue(field, part));
-  // Apply field-provided normalization per token (e.g. "2, 3" → "2XX, 3XX").
+  // Normalize per token (e.g. "2, 3" → "2XX, 3XX").
   const resolved = field.normalize ? raw.map(v => field.normalize!(v)) : raw;
   const error = getInvalidValueIndices(field, resolved).length > 0 ? true : undefined;
   return { resolved, error };
@@ -61,7 +60,6 @@ export const resolveMultiValues = (
  */
 export const displayDateToIso = (display: string): string | null => {
   if (!display || display.length < MIN_DATE_STRING_LENGTH) return null;
-  // Try ISO format first — already valid
   if (/^\d{4}-\d{2}-\d{2}$/.test(display)) return display;
   const date = new Date(display);
   if (Number.isNaN(date.getTime())) return null;
@@ -102,7 +100,7 @@ export const resolveDateValue = (
     }
   }
   const isValidPreset = isDatePreset(trimmed);
-  // Reject short strings that Date() parses loosely (e.g. '2' → 2001-02-01)
+  // Reject short strings Date() parses loosely (e.g. '2' → 2001-02-01).
   const isValidDate =
     !isValidPreset &&
     trimmed.length >= MIN_DATE_STRING_LENGTH &&

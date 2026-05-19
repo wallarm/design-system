@@ -62,15 +62,12 @@ export const useChipActions = ({
 
   const handleGapClick = useCallback(
     (conditionIndex: number, afterConnector: boolean) => {
-      // A gap click is a deliberate "start a new chip at this position"
-      // gesture — drop any in-progress building chip first. With AS-970,
-      // building chips are long-lived (they survive blur), so without this
-      // reset the gap click would relocate the half-built chip to a new
-      // index and open the field menu on top of it.
+      // Drop any in-progress building chip first — AS-970 made them
+      // long-lived, so without this reset the gap click would relocate
+      // the half-built chip to the new index.
       resetState();
-      // flushSync commits DOM update (input moves to gap position) before reopening the menu.
-      // setMenuState('closed') inside + setMenuState('field') outside is intentional:
-      // the menu must fully unmount so getAnchorRect reads the new input position.
+      // Unmount the menu (flushSync + closed-then-field) so getAnchorRect
+      // reads the new input position after the DOM commits.
       flushSync(() => {
         setInsertIndex(conditionIndex);
         setInsertAfterConnector(afterConnector);

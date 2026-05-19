@@ -6,13 +6,8 @@ interface UseAutocompleteStateOptions {
 }
 
 /**
- * Owns the entire useState / useRef surface of the autocomplete hook. Splitting
- * this out of the orchestrator keeps `useFilterInputAutocomplete` focused on
- * wiring sub-hooks together rather than reading 30 lines of declarations.
- *
- * Each ref intentionally mirrors a piece of state — sub-hooks read the ref
- * synchronously to avoid re-creating callbacks on every keystroke that mutates
- * conditions / insertIndex / etc.
+ * Owns the useState/useRef surface of the autocomplete hook. Refs mirror
+ * state so sub-hooks read synchronously without recreating callbacks.
  */
 export const useAutocompleteState = ({ conditions }: UseAutocompleteStateOptions) => {
   const [inputText, setInputText] = useState('');
@@ -25,7 +20,7 @@ export const useAutocompleteState = ({ conditions }: UseAutocompleteStateOptions
   const [insertAfterConnector, setInsertAfterConnector] = useState(false);
   const effectiveInsertIndex = insertIndex ?? conditions.length;
 
-  // Refs keep values fresh for callbacks to avoid stale closures and unnecessary recreation
+  // Fresh values for callbacks (avoids stale closures).
   const effectiveInsertIndexRef = useRef(effectiveInsertIndex);
   effectiveInsertIndexRef.current = effectiveInsertIndex;
   const conditionsRef = useRef(conditions);
@@ -33,16 +28,15 @@ export const useAutocompleteState = ({ conditions }: UseAutocompleteStateOptions
   const conditionsLengthRef = useRef(conditions.length);
   conditionsLengthRef.current = conditions.length;
 
-  // Multi-select blur commit ref — set by FilterInputValueMenu when open in multi-select mode
+  // Set by FilterInputValueMenu when open in multi-select.
   const blurCommitRef = useRef<(() => boolean) | null>(null);
 
-  // Inline segment input refs — used by useFocusManagement to focus the right input
+  // Inline segment input refs (used by useFocusManagement).
   const segmentAttributeInputRef = useRef<HTMLInputElement>(null);
   const segmentOperatorInputRef = useRef<HTMLInputElement>(null);
   const segmentValueInputRef = useRef<HTMLInputElement>(null);
 
-  // Indirection ref breaks the circular dep useMenuFlow ↔ useBlurCommit:
-  // useMenuFlow calls through this ref, useBlurCommit assigns its callback to it.
+  // Indirection ref breaks the useMenuFlow ↔ useBlurCommit cycle.
   const commitBuildingOnBlurRef = useRef<() => boolean>(() => false);
 
   return {

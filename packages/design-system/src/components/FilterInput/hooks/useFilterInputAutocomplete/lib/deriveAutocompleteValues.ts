@@ -18,7 +18,7 @@ interface DeriveOptions {
   conditions: Condition[];
   buildingMultiValue: string | undefined;
   dateRangeFromValue: string | null | undefined;
-  /** Segment text when inline-editing a value — used to derive checked values from text */
+  /** Segment text when inline-editing a value. */
   segmentFilterText?: string;
 }
 
@@ -53,15 +53,13 @@ export const deriveAutocompleteValues = ({
   const isBuilding = selectedField !== null && !editingChipId;
   const editingCondition = getEditingCondition(editingChipId, conditions);
 
-  // ── Editing values for FilterInputValueMenu ────────────────
   const editingMultiValues = (() => {
     if (!editingCondition || !selectedOperator || !isMultiSelectOperator(selectedOperator))
       return [];
 
-    // Always derive from committed condition values.
-    // Segment text is NOT used here to avoid a circular dependency:
-    // segmentFilterText → editingMultiValues → initialValues → checkedValues
-    // → buildingMultiValue → setSegmentFilterText → loop
+    // Derive from committed condition values only — using segmentFilterText
+    // would create a loop: segmentFilterText → editingMultiValues →
+    // initialValues → checkedValues → buildingMultiValue → setSegmentFilterText.
     const values = Array.isArray(editingCondition.value)
       ? editingCondition.value
       : editingCondition.value != null
@@ -84,7 +82,6 @@ export const deriveAutocompleteValues = ({
     return undefined;
   })();
 
-  // Range date values for "between" date editing
   const editingDateRange: [string, string] | undefined = (() => {
     if (
       !editingCondition ||
@@ -97,14 +94,12 @@ export const deriveAutocompleteValues = ({
     return [String(editingCondition.value[0]), String(editingCondition.value[1])];
   })();
 
-  // ── Building chip preview ───────────────────────────────
   const buildingValue = (() => {
     if (buildingMultiValue) return buildingMultiValue;
     if (dateRangeFromValue && selectedOperator === 'between') {
       return `${getDateDisplayLabel(dateRangeFromValue)} – ...`;
     }
-    // No-value operator: show a placeholder so the in-progress chip already
-    // looks complete (3 segments) before the immediate auto-commit.
+    // Placeholder makes no-value chip look complete before auto-commit.
     if (selectedOperator && isNoValueOperator(selectedOperator)) return NO_VALUE_PLACEHOLDER;
     return undefined;
   })();

@@ -48,18 +48,11 @@ const serializeNode = (node: ExprNode, isTopLevel: boolean): string => {
 };
 
 /**
- * Serialize an expression tree to a canonical text string.
- * Top-level conditions are sorted alphabetically by field name.
- *
- * **Pass `fields` when the output targets the backend.** Per-field
- * `serializeValue` hooks run first, so values like the status-code mask
- * `"2XX"` become `"2"` in the emitted string. Omitting `fields` keeps the
- * UI-facing values verbatim — useful for clipboard round-trip, debug
- * display, or any case where the output feeds `parseExpression` back. If
- * you forget `fields` on the path to the backend, the placeholder `X`s
- * ride through silently — name the backend call-site helper explicitly
- * (e.g. `const query = serializeExpression(expr, fields)`) to make the
- * intent obvious at callsite.
+ * Serialize an expression tree to canonical text. Top-level conditions sort
+ * by field name. Pass `fields` for backend output — per-field `serializeValue`
+ * runs first (e.g. `"2XX"` → `"2"`). Omitting `fields` keeps UI-facing values
+ * verbatim (clipboard round-trip, parseExpression input). Forgetting `fields`
+ * on the backend path silently emits placeholder Xs.
  */
 export const serializeExpression = (expr: ExprNode | null, fields?: FieldMetadata[]): string => {
   if (!expr) return '';

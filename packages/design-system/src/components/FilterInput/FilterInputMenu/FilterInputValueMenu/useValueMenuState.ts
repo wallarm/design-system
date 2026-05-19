@@ -17,14 +17,12 @@ interface UseValueMenuStateOptions {
   onEscape?: () => void;
   onOpenChange?: (open: boolean) => void;
   onBuildingValueChange?: (preview: string | undefined) => void;
-  /** Fires whenever the user explicitly toggles an item in multi-select mode
-   *  (click or keyboard). Distinct from onBuildingValueChange, which also fires
-   *  on mount with the initial preview — use this when you need to react only
-   *  to actual user-initiated toggles. */
+  /** Fires only on user-initiated toggles in multi-select (unlike
+   *  onBuildingValueChange which also fires on mount). */
   onItemToggle?: () => void;
   inputRef?: RefObject<HTMLInputElement | null>;
   menuRef?: RefObject<HTMLDivElement | null>;
-  /** Ref to register blur commit function — called by blur handler before state reset. Returns true if committed. */
+  /** Register blur commit fn — called by blur handler before state reset. */
   blurCommitRef?: RefObject<(() => boolean) | null>;
 }
 
@@ -44,13 +42,11 @@ export const useValueMenuState = ({
   menuRef,
   blurCommitRef,
 }: UseValueMenuStateOptions) => {
-  // ── Multi-select internal state ─────────────────────────
   const [checkedValues, setCheckedValues] = useState<ConditionValue[]>(initialValues);
-  // Single source of truth: ref is always synced declaratively from state
   const checkedValuesRef = useRef(checkedValues);
   checkedValuesRef.current = checkedValues;
 
-  // Reset checked values on open transition
+  // Reset checked values on open transition.
   const prevOpenRef = useRef(false);
   const initialValuesRef = useRef(initialValues);
   initialValuesRef.current = initialValues;
@@ -61,8 +57,8 @@ export const useValueMenuState = ({
     prevOpenRef.current = open;
   }, [open]);
 
-  // Sync checked values when initialValues change while menu is already open
-  // (e.g., user edits segment text to remove a value — dropdown should uncheck it)
+  // Sync checked values when initialValues change while menu stays open
+  // (e.g., user edits segment text to remove a value).
   const prevSerializedRef = useRef('');
   useEffect(() => {
     const serialized = initialValues.map(String).sort().join('\0');
@@ -75,9 +71,8 @@ export const useValueMenuState = ({
 
   const toggleValue = (val: ConditionValue) => {
     setCheckedValues(prev => {
-      // Loose match — checkedValues may contain stringified copies after a parser
-      // round-trip (e.g. "1" from clipboard paste vs the option's canonical 1).
-      // Strict `.includes` would miss the match and add a duplicate instead of toggling off.
+      // Loose match — checkedValues may be stringified after parser round-trip
+      // (e.g. "1" from paste vs canonical 1); strict .includes would dupe.
       const key = String(val);
       const exists = prev.some(v => String(v) === key);
       return exists ? prev.filter(v => String(v) !== key) : [...prev, val];
@@ -95,7 +90,7 @@ export const useValueMenuState = ({
     return false;
   }, []);
 
-  // Register blur commit function so the blur handler can commit before resetting state
+  // Register blur commit so the blur handler can commit before state reset.
   useEffect(() => {
     if (!blurCommitRef) return;
     if (open && multiSelect) {
@@ -108,7 +103,6 @@ export const useValueMenuState = ({
     };
   }, [open, multiSelect, blurCommitRef, commitChecked]);
 
-  // ── Flat items for keyboard nav ─────────────────────────
   const flatItems: FilterInputDropdownItem[] = useMemo(
     () => values.map(opt => ({ id: String(opt.value), label: opt.label, value: opt.value })),
     [values],
@@ -139,14 +133,12 @@ export const useValueMenuState = ({
     menuRef,
   });
 
-  // ── Selected values for display ─────────────────────────
   const selectedValues = multiSelect
     ? checkedValues
     : highlightValue != null
       ? [highlightValue]
       : [];
 
-  // ── Building value preview ──────────────────────────────
   const buildingMultiValue =
     multiSelect && checkedValues.length > 0
       ? checkedValues.map(v => values.find(opt => opt.value === v)?.label ?? String(v)).join(', ')

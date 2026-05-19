@@ -115,7 +115,7 @@ export const useFilterInputExpression = ({
 }: UseFilterInputExpressionOptions) => {
   const [state, setState] = useState<ExpressionState>(EMPTY_STATE);
 
-  // Sync conditions with value prop (controlled mode)
+  // Sync conditions with value prop (controlled mode).
   useEffect(() => {
     if (value !== undefined) {
       const result = expressionToConditions(value);
@@ -164,7 +164,6 @@ export const useFilterInputExpression = ({
       if (idx === null) return;
 
       setState(prev => {
-        // Do not remove disabled conditions
         if (prev.conditions[idx]?.disabled) return prev;
 
         const newConditions = prev.conditions.filter((_, i) => i !== idx);
@@ -182,7 +181,6 @@ export const useFilterInputExpression = ({
     (idx: number) => {
       setState(prev => {
         if (idx < 0 || idx >= prev.conditions.length) return prev;
-        // Do not remove disabled conditions
         if (prev.conditions[idx]?.disabled) return prev;
         const newConditions = prev.conditions.filter((_, i) => i !== idx);
         const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
@@ -202,18 +200,15 @@ export const useFilterInputExpression = ({
         onChange?.(null);
         return EMPTY_STATE;
       }
-      // Keep disabled conditions and their connectors
+      // Keep disabled conditions and their connectors.
       const next = { conditions: disabledConditions, connectors: [] as Array<'and' | 'or'> };
       onChange?.(buildExpression(next.conditions, next.connectors));
       return next;
     });
   }, [onChange]);
 
-  /**
-   * Replace the entire expression at once. Used by paste — keeps local state in
-   * sync even when the component is uncontrolled (no parent-supplied `value`),
-   * mirroring the upsertCondition / removeCondition / clearAll pattern.
-   */
+  /** Replace the entire expression (paste path). Mirrors the upsert/remove
+   *  pattern so uncontrolled components stay in sync. */
   const replaceExpression = useCallback(
     (expr: ExprNode | null) => {
       const result = expressionToConditions(expr);

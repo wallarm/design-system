@@ -77,13 +77,9 @@ export const useValueFlow = ({
     [setBuildingMultiValue],
   );
 
-  /** Fires only on explicit multi-select toggle (not on mount). Resets the
-   *  *dropdown filter source* so the menu shows all options + already-checked
-   *  items for the next selection, without wiping what the user sees.
-   *  - Building mode: clear the main input (nothing is rendered from it).
-   *  - Segment-edit mode: reset the typing flag only. The displayed segment
-   *    text (the original chip value being edited) stays visible on the chip
-   *    so there's no flicker to an empty string between clicks. */
+  /** Multi-select toggle: reset dropdown filter source so menu shows all
+   *  options. Segment-edit only resets the typing flag (preserves displayed
+   *  chip text — prevents flicker between clicks). */
   const handleMultiSelectToggle = useCallback(() => {
     if (editing.editingSegment === SEGMENT_VARIANT.value) {
       editing.resetSegmentTyping();
@@ -127,7 +123,7 @@ export const useValueFlow = ({
           error ? SEGMENT_VARIANT.value : undefined,
         );
       } else if (selectedField.type === 'date') {
-        // Handle "between" date ranges: parse "Mar 5, 2026 – Mar 15, 2026" → ["2026-03-05", "2026-03-15"]
+        // Parse "Mar 5, 2026 – Mar 15, 2026" → ["2026-03-05", "2026-03-15"].
         if (isBetweenOperator(selectedOperator)) {
           const rangeValue = resolveDateRangeValue(trimmed);
           upsertCondition(

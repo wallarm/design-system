@@ -28,27 +28,18 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
 };
 
 /**
- * Decorate `fields` in place with design-system helpers for known field names.
- * `FilterInput` calls this on the `fields` prop before rendering.
+ * Decorate `fields` with design-system helpers for reserved names. DS-supplied
+ * callbacks **override** consumer values for the same slot — the field
+ * semantics (mask range, accepted chars, backend form) are fixed by DS.
  *
- * Reserved names and what the design system owns:
+ * Reserved names:
+ * | `name`        | DS owns                                                  |
+ * | ------------- | -------------------------------------------------------- |
+ * | `status_code` | acceptChar, normalize, getSuggestions, validate, serializeValue |
  *
- * | `name`        | DS owns                                                                                    |
- * | ------------- | ------------------------------------------------------------------------------------------ |
- * | `status_code` | HTTP status code: `acceptChar`, `normalize`, `getSuggestions`, `validate`, `serializeValue` |
- *
- * For reserved names, DS-supplied callbacks **override** any consumer-supplied
- * value for the same slot. This is intentional: the field semantics (mask
- * range `1XX..5XX`, accepted characters, backend form) are fixed by the
- * design system. Consumer-supplied `options`/`getSuggestions` would otherwise
- * fight the canonical mask UX.
- *
- * If the backend uses a different name (e.g. `http_status_code`), the helpers
- * are NOT applied — the consumer must either rename the field to match or
- * wire the factories (`createStatusCode*`) manually.
- *
- * The returned array has **reference-stable identity** when no field matches,
- * so downstream `useMemo` that depends on it does not invalidate unnecessarily.
+ * Backend with a different name (e.g. `http_status_code`) must either rename
+ * or wire factories (`createStatusCode*`) manually. Returns the input array
+ * by reference when no field matches (stable identity for downstream memos).
  */
 export const applyKnownFieldHelpers = (fields: FieldMetadata[]): FieldMetadata[] => {
   let changed = false;
@@ -70,12 +61,9 @@ export const applyKnownFieldHelpers = (fields: FieldMetadata[]): FieldMetadata[]
 };
 
 /**
- * Look up the backend-form serializer for a reserved field name. Returns
- * `undefined` for unknown names. Useful for consumers that hold their own
- * expression shape (not DS `ExprNode`) but need to apply the same backend
- * transform that the FilterInput's `serializeValue` slot would produce — so
- * they can drive the lookup off the field name without hard-coding which
- * names are reserved.
+ * Look up the backend-form serializer for a reserved field name; returns
+ * undefined for unknown names. For consumers that hold their own expression
+ * shape but want the same transform as FilterInput's `serializeValue`.
  */
 export const getKnownFieldSerializer = (
   fieldName: string,

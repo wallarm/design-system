@@ -10,9 +10,8 @@ export const tryParseDateValue = (value: string | undefined): DateValue | undefi
     return parseDate(value);
   } catch {
     try {
-      // Fallback: try native Date (e.g. "Mar 6, 2026")
-      // Use LOCAL date components (getFullYear/getMonth/getDate) — NOT toISOString()
-      // which converts to UTC and can shift the date by ±1 day depending on timezone.
+      // Fallback: native Date for "Mar 6, 2026". Use LOCAL components — not
+      // toISOString(), which converts to UTC and can shift the date ±1 day.
       const date = new Date(value);
       if (Number.isNaN(date.getTime())) return undefined;
       const y = date.getFullYear();

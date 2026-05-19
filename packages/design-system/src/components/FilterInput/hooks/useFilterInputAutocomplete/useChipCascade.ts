@@ -67,12 +67,8 @@ export const useChipCascade = ({
   setBuildingMultiValue,
   setInsertIndex,
 }: UseChipCascadeOptions) => {
-  // Menu repositioning during cascade is handled automatically: the dropdown
-  // is anchored to the chip element (not the individual segment), so walking
-  // between sibling segments of the same chip doesn't require an explicit
-  // reposition step. The chip's ResizeObserver in useMenuPositioning catches
-  // any width shift caused by the segment swap and triggers a recompute.
-
+  // Menu is anchored to the chip (not segment) so sibling-segment cascade
+  // needs no explicit reposition; ResizeObserver catches width shifts.
   const switchEditSegment = useCallback(
     (targetSegment: ChipSegment): boolean => {
       const sourceSegment = editing.editingSegment;
@@ -81,11 +77,9 @@ export const useChipCascade = ({
 
       if (isBuildingEdit) {
         if (!selectedField) return false;
-        // Clear ONLY the source segment's data — mirrors the committed-chip
-        // path where the operator-cascade preserves condition.value.
-        // buildingMultiValue (the value preview) stays put when the user
-        // walked off the operator; downstream operator-select shape checks
-        // will discard it if the new operator is incompatible.
+        // Clear only the source segment's data (mirrors committed-chip path).
+        // buildingMultiValue stays put on operator cascade; downstream
+        // operator-select discards it if the new operator is incompatible.
         if (sourceSegment === SEGMENT_VARIANT.value) {
           setBuildingMultiValue(undefined);
         } else if (sourceSegment === SEGMENT_VARIANT.operator) {
@@ -111,13 +105,10 @@ export const useChipCascade = ({
       const condition = idx !== null ? conditionsRef.current[idx] : null;
       const field = condition ? fields.find(f => f.name === condition.field) : null;
 
-      // Clear ONLY the segment data the user is leaving — adjacent segments
-      // are preserved (matches "what was not deleted should not be deleted").
-      // Without a field we can't upsert, so fall back to a plain segment
-      // switch in that case. The empty-attribute removal check downstream
-      // handles cleanup once attribute is wiped too (it gates on !operator
-      // rather than no-op-and-no-value, so an orphan value cannot keep a
-      // chip alive after cascade past operator).
+      // Clear only the segment being left — adjacent segments preserved
+      // ("what was not deleted should not be deleted"). Falls back to plain
+      // switch without a field. Downstream empty-attribute check gates on
+      // !operator, so orphan value cannot keep the chip alive.
       if (condition && field) {
         if (sourceSegment === SEGMENT_VARIANT.value) {
           upsertCondition(
@@ -142,8 +133,8 @@ export const useChipCascade = ({
         }
       }
 
-      // Load the target segment's still-present text into the inline-edit so
-      // the next Backspace deletes a char of it (per "gap then deletion" spec).
+      // Load target segment's existing text so next Backspace deletes a char
+      // of it (per "gap then deletion" spec).
       const targetText =
         targetSegment === SEGMENT_VARIANT.attribute
           ? (chip.attribute ?? '')

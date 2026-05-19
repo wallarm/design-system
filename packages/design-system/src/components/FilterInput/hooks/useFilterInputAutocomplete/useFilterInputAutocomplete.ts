@@ -279,9 +279,7 @@ export const useFilterInputAutocomplete = ({
     handleMultiSelectToggle,
     handleMenuClose,
     handleMenuDiscard,
-    /** Hard reset of autocomplete state — used by paste/clipboard flows where
-     *  the conditions array is replaced and any in-progress building must be
-     *  scrapped, regardless of inline-edit mode. */
+    /** Hard reset for paste/clipboard flows — scraps in-progress building. */
     resetAutocompleteState: resetState,
     handleChipClick: editing.handleChipClick,
     handleBuildingChipClick,

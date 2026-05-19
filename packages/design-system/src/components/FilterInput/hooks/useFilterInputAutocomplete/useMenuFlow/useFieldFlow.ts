@@ -27,17 +27,13 @@ export const useFieldFlow = ({
 }: MenuFlowInternalDeps) => {
   const handleFieldSelect = useCallback(
     (field: FieldMetadata) => {
-      // When editing an existing chip's attribute — update field, keep operator/value
+      // Editing existing chip's attribute — keep operator/value.
       if (editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.attribute) {
         const idx = chipIdToConditionIndex(editing.editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
         if (condition) {
-          // Post-cascade incomplete chip (operator was cleared by Backspace
-          // cascade): keep inline-edit alive on the same chip and continue
-          // building inline — transition to operator selection. Value is
-          // preserved when the cascaded-from-operator path left it intact;
-          // existing field-switch logic on a complete chip behaves the same
-          // way (validateValueForField runs only on commit, not here).
+          // Post-cascade incomplete chip (operator cleared by Backspace
+          // cascade): keep inline-edit alive and transition to operator.
           if (!condition.operator) {
             upsertCondition(
               field,
@@ -50,9 +46,8 @@ export const useFieldFlow = ({
             );
             setSelectedField(field);
             setSelectedOperator(null);
-            // switchEditSegment also resets userHasTyped — the user has not
-            // typed anything in the new operator input yet, so the next
-            // keystroke should widen the menu (matches first-edit behavior).
+            // switchEditSegment resets userHasTyped so the next keystroke
+            // widens the menu (matches first-edit behavior).
             editing.switchEditSegment(SEGMENT_VARIANT.operator, '');
             setMenuState('operator');
             return;
@@ -71,9 +66,8 @@ export const useFieldFlow = ({
         resetState();
         return;
       }
-      // Inline-edit of the building chip's attribute — keep operator if the
-      // new field still allows it, keep value preview untouched (validation
-      // happens at commit time, not here).
+      // Inline-edit of building chip attribute — keep operator if still
+      // allowed; value preview is untouched (validation runs at commit).
       const isBuildingEdit =
         !editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.attribute;
       if (isBuildingEdit) {
@@ -108,16 +102,14 @@ export const useFieldFlow = ({
       if (!customText.trim()) return;
       const trimmed = customText.trim();
 
-      // Try to match the typed text to a known field
       const matchedField = fields.find(
         f =>
           f.label.toLowerCase() === trimmed.toLowerCase() ||
           f.name.toLowerCase() === trimmed.toLowerCase(),
       );
 
-      // Inline-edit of the building chip's attribute — route through
-      // handleFieldSelect so operator-preservation logic is shared. Unknown
-      // text in building mode is ignored (no errored chip created).
+      // Building-chip inline-edit: route through handleFieldSelect to share
+      // operator-preservation; unknown text is ignored (no errored chip).
       if (!editing.editingChipId) {
         if (matchedField) handleFieldSelect(matchedField);
         return;
@@ -128,23 +120,18 @@ export const useFieldFlow = ({
       if (!condition) return;
 
       if (matchedField) {
-        // Route through handleFieldSelect so post-cascade (incomplete chip)
-        // logic is shared — keeps inline-edit alive and transitions to
-        // operator selection when operator was previously cleared.
+        // Route through handleFieldSelect to share post-cascade logic.
         handleFieldSelect(matchedField);
         return;
       }
-      // Unknown field — create a synthetic FieldMetadata and mark attribute as error
+      // Unknown field — synthetic FieldMetadata, mark attribute as errored.
       const syntheticField: FieldMetadata = {
         name: trimmed,
         label: trimmed,
         type: 'string',
       };
-      // Post-cascade incomplete chip — keep inline-edit alive after the
-      // synthetic commit so the user can finish building (mirrors the
-      // matched-field branch above). Without this, an unknown attribute
-      // typed mid-cascade would freeze the chip in an errored, operator-
-      // less state with no inline path to recover.
+      // Post-cascade incomplete chip: keep inline-edit alive after synthetic
+      // commit so the user can finish building (mirrors matched-field branch).
       if (!condition.operator) {
         upsertCondition(
           syntheticField,

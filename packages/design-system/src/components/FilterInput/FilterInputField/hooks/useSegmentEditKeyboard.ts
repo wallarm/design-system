@@ -56,20 +56,15 @@ export const useSegmentEditKeyboard = ({
         return;
       }
       if (e.key === 'Backspace' && segmentFilterText === '') {
-        // Empty-segment Backspace: walk back through chip segments. On the
-        // attribute when operator+value are absent — remove the chip entirely.
-        // Otherwise move inline-edit to the previous segment (cursor lands at
-        // the end of its text on the next render); the user's next keystroke
-        // edits that segment normally.
+        // Empty-segment Backspace walks the cascade. On attribute with no
+        // operator, remove the chip entirely (value-only orphans are invalid).
         if (editingSegment === SEGMENT_VARIANT.attribute) {
           const chipForEdit = editingChipId
             ? chips.find(c => c.id === editingChipId && c.variant === 'chip')
             : null;
           const operator = chipForEdit?.operator ?? buildingChipData?.operator ?? '';
-          // No operator means the chip is invalid no matter what value it
-          // carries — a value-only orphan can be left behind by an operator-
-          // segment cascade that preserves value. Gate removal on operator
-          // alone so the cascade can complete through an empty attribute.
+          // Gate removal on operator alone (a value-only orphan can be left
+          // by operator-cascade that preserves value).
           if (!operator) {
             e.preventDefault();
             onRemoveEditingChip();
@@ -105,10 +100,9 @@ export const useSegmentEditKeyboard = ({
         }
       }
       if (e.key === 'ArrowDown') {
-        // For list menus, useKeyboardNav's window-capture handler stops the
-        // event before it reaches this React handler — focus stays on the
-        // segment input (combobox). For menus without useKeyboardNav (date
-        // picker), focus moves into the menu so its internal nav works.
+        // List menus are intercepted by useKeyboardNav's capture handler
+        // (focus stays here). Menus without it (date picker) reach this and
+        // we hand DOM focus over.
         e.preventDefault();
         menuRef.current?.focus();
       }

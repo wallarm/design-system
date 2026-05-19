@@ -22,10 +22,10 @@ export const DATE_PRESETS: DatePreset[] = [
 /** Check if a value string is a relative date preset (e.g. "30m", "7d") */
 export const isDatePreset = (value: string): boolean => /^\d+[mhd]$/.test(value);
 
-/** Format a date string for chip display (e.g. "Mar 4, 2026").
- *  Handles both ISO (YYYY-MM-DD, parsed as UTC) and locale formats (parsed as local time). */
+/** Format a date string for chip display (e.g. "Mar 4, 2026"). ISO parsed as
+ *  UTC, locale strings as local time. */
 export const formatDateForChip = (value: string): string => {
-  // ISO date-only: parse components directly — avoids timezone ambiguity
+  // ISO date-only: parse components to avoid timezone ambiguity.
   const isoMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
   if (isoMatch) {
     const d = new Date(Date.UTC(+isoMatch[1]!, +isoMatch[2]! - 1, +isoMatch[3]!));
@@ -36,7 +36,7 @@ export const formatDateForChip = (value: string): string => {
       timeZone: 'UTC',
     });
   }
-  // Locale or other format: native Date parsing, display in local timezone
+  // Locale/other format: native Date, displayed in local timezone.
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleDateString('en-US', {

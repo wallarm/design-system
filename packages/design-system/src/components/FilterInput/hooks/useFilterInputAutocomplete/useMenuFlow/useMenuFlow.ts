@@ -21,7 +21,7 @@ export const useMenuFlow = (deps: MenuFlowDeps) => {
     setMenuState,
   } = deps;
 
-  // Ref keeps conditions fresh for callbacks without adding to dependency arrays
+  // Fresh conditions for callbacks without padding dependency arrays.
   const conditionsRef = useRef(conditions);
   conditionsRef.current = conditions;
 
@@ -38,11 +38,9 @@ export const useMenuFlow = (deps: MenuFlowDeps) => {
     handleCustomValueCommit,
   } = useValueFlow(internalDeps);
 
-  // Ignore Ark UI close when focus is on our input or a segment inline-edit input.
-  // Otherwise: try to commit the building chip if it's fully built; if not
-  // built, preserve the in-progress state instead of wiping it via resetState.
-  // Either way (committed or preserved), keep React's menuState aligned with
-  // the now-closed menu so the controlled `open` prop doesn't drift.
+  // Ignore Ark UI close while focus is on our input/segment. Otherwise commit
+  // a fully-built building chip or preserve it; keep menuState aligned so the
+  // controlled `open` prop doesn't drift.
   const handleMenuClose = useCallback(() => {
     if (document.activeElement === inputRef.current) return;
     if ((document.activeElement as HTMLElement)?.closest?.('[data-slot^="segment-"]')) return;

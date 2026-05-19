@@ -2,8 +2,6 @@ import { CHIP_ID_PREFIX } from './constants';
 
 const DRAG_ATTR = 'data-drag-selected';
 
-// ── Helpers ──────────────────────────────────────────────────
-
 export const clearDragAttributes = (chips: Map<string, HTMLElement>) => {
   [...chips.values()].forEach(chip => chip.removeAttribute(DRAG_ATTR));
 };
@@ -18,8 +16,6 @@ export const getSelectedConditionIndices = (chips: Map<string, HTMLElement>): nu
     .map(([id]) => Number(id.slice(CHIP_ID_PREFIX.length)))
     .filter(index => !Number.isNaN(index))
     .sort((a, b) => a - b);
-
-// ── Visual sorting ───────────────────────────────────────────
 
 interface VisualEntry {
   id: string;
@@ -61,13 +57,12 @@ const findClosestByDistance = (entries: VisualEntry[], x: number, y: number): nu
 const findByReadingOrder = (entries: VisualEntry[], x: number, y: number): number => {
   if (entries.length === 0) return -1;
 
-  // First check for exact hit (cursor inside a chip rect)
   const exactIdx = entries.findIndex(
     e => x >= e.rect.left && x <= e.rect.right && y >= e.rect.top && y <= e.rect.bottom,
   );
   if (exactIdx !== -1) return exactIdx;
 
-  // Find the last chip whose row is above the cursor, or same row with center left of cursor
+  // Last chip whose row is above cursor, or same row with center left of cursor.
   const chipHeight = entries[0]!.rect.height;
   const lastBefore = entries.reduce((best, entry, i) => {
     const cy = (entry.rect.top + entry.rect.bottom) / 2;
@@ -81,34 +76,29 @@ const findByReadingOrder = (entries: VisualEntry[], x: number, y: number): numbe
   return lastBefore >= 0 ? lastBefore : findClosestByDistance(entries, x, y);
 };
 
-// ── Anchor resolution ────────────────────────────────────────
-
-/** Resolve the condition chip ID at the mousedown point (called once per drag). */
+/** Resolve the condition chip ID at the mousedown point (once per drag). */
 export const resolveAnchorChipId = (
   registry: Map<string, HTMLElement>,
   target: HTMLElement,
   x: number,
   y: number,
 ): string | null => {
-  // Prefer exact DOM hit: walk up from target to find a registered condition chip
+  // Prefer exact DOM hit; fall back to closest by visual distance.
   const hit = [...registry.entries()].find(
     ([id, el]) => id.startsWith(CHIP_ID_PREFIX) && el.contains(target),
   );
   if (hit) return hit[0];
 
-  // Fallback: find closest condition chip by visual distance
   const conditions = getVisualEntries(registry).filter(e => e.id.startsWith(CHIP_ID_PREFIX));
   if (conditions.length === 0) return null;
   const idx = findClosestByDistance(conditions, x, y);
   return idx >= 0 ? conditions[idx]!.id : null;
 };
 
-// ── Drag selection ───────────────────────────────────────────
-
 /**
- * Mark chips as drag-selected from a fixed anchor chip to the current cursor position.
- * Both anchor and end are resolved in the same visually-sorted array so indices always match.
- * Connectors between selected condition chips are included automatically.
+ * Mark chips drag-selected from anchor to cursor. Both ends resolve in the
+ * same visually-sorted array so indices match; intermediate connectors are
+ * included automatically.
  */
 export const updateDragSelection = (
   all: VisualEntry[],

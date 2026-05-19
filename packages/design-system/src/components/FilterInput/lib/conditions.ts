@@ -22,10 +22,10 @@ export const findChipSplitIndex = (
     if (chips[i]!.variant === 'chip') {
       if (conditionCount === conditionInsertIndex) {
         if (afterConnector) {
-          // Split right at the condition chip (after its connector)
+          // Split at the condition chip (after its connector).
           return i;
         }
-        // Split before the connector that precedes this chip
+        // Split before the preceding connector.
         if (
           i > 0 &&
           chips[i - 1]!.variant !== 'chip' &&

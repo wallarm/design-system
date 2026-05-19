@@ -1,14 +1,9 @@
 import { useEffect, useReducer } from 'react';
 
 /**
- * Observes up to three elements with a single ResizeObserver and returns a
- * counter that increments on every resize. Use it as a memo/effect dep to force
- * a recompute when any tracked element changes size — typical use is to keep a
- * floating UI (dropdown, tooltip) aligned with a target whose width depends on
- * dynamic content (e.g. text inside a chip segment).
- *
- * Null entries are skipped, so refs and conditionally rendered elements can be
- * passed directly without filtering.
+ * Observes up to three elements with one ResizeObserver and returns a counter
+ * that increments on every resize — use as a memo/effect dep to force
+ * recompute when a tracked element changes size. Null entries are skipped.
  */
 export const useResizeTracker = (
   el1: HTMLElement | null,
@@ -18,8 +13,7 @@ export const useResizeTracker = (
   const [tick, bump] = useReducer((x: number) => x + 1, 0);
 
   useEffect(() => {
-    // Skip detached nodes — observing them would leak the observer and a
-    // detached node's size never changes, so the observer would never fire.
+    // Skip detached nodes — observing would leak and never fire.
     const targets = [el1, el2, el3].filter((el): el is HTMLElement => el != null && el.isConnected);
     if (targets.length === 0) return;
     const observer = new ResizeObserver(() => bump());

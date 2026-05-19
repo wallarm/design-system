@@ -43,8 +43,7 @@ export const useSegmentEditFlow = ({
   setMenuState,
   setMenuAnchor,
 }: UseSegmentEditFlowOptions) => {
-  // Mirror the main-input acceptChar rule when editing a value segment so both
-  // entry paths (building input + inline segment edit) apply the same filter.
+  // Mirror main-input acceptChar rule for inline value-segment edits.
   const handleSegmentFilterChange = useCallback(
     (text: string) => {
       const accept = selectedField?.acceptChar;
@@ -57,16 +56,11 @@ export const useSegmentEditFlow = ({
     [selectedField, editing],
   );
 
-  // Cancel segment edit must clear ALL autocomplete state, not just the
-  // segment-level state. Leaving `selectedField` / `selectedOperator` /
-  // `editingChipId` set after a blur-cancel leaks "building" state into the
-  // main input: handleInputClick gates on `!selectedField` and would refuse
-  // to reopen the field menu when the user clicks back into the input. AS-929.
-  //
-  // EXCEPTION: when cancelling an inline-edit on the *building* chip
-  // (`editingChipId === null` while a segment is being edited), we must
-  // preserve `selectedField` / `selectedOperator` / value preview — the user
-  // is still building and just bailed out of changing one segment.
+  // Clear ALL autocomplete state on segment-edit cancel — leaving
+  // selectedField/Operator set leaks "building" state and handleInputClick
+  // (gated on !selectedField) won't reopen the field menu. AS-929.
+  // Exception: building-chip inline-edit (chipId null + segment set) must
+  // preserve selectedField/Operator/value preview — user is still building.
   const cancelSegmentEdit = useCallback(() => {
     const isBuildingEdit = !editing.editingChipId && editing.editingSegment !== null;
     if (isBuildingEdit) {
@@ -81,10 +75,8 @@ export const useSegmentEditFlow = ({
   }, [editing, setSelectedField, setSelectedOperator, setMenuState]);
 
   /**
-   * Escape from a menu: when the user is inline-editing a *building* chip
-   * segment, preserve `selectedField`/`selectedOperator`/value preview so the
-   * chip survives. In any other case fall back to the existing destructive
-   * `resetState` behavior (matches committed-chip editing UX).
+   * Menu Escape: preserve building-chip state when inline-editing a building
+   * segment; otherwise fall back to destructive resetState.
    */
   const handleMenuDiscard = useCallback(() => {
     const isBuildingEdit = !editing.editingChipId && editing.editingSegment !== null;
@@ -97,11 +89,8 @@ export const useSegmentEditFlow = ({
   }, [editing, resetState, setMenuState]);
 
   /**
-   * Click on a segment of the *building* chip — enter inline-edit on that
-   * segment and reopen the corresponding menu. Existing downstream state
-   * (operator, value preview) is preserved here; compatibility checks run
-   * only when the user actually picks a new value via handleFieldSelect /
-   * handleOperatorSelect.
+   * Building-chip segment click: enter inline-edit and reopen its menu.
+   * Compatibility checks run only on actual selection downstream.
    */
   const handleBuildingChipClick = useCallback(
     (segment: ChipSegment, anchorEl: HTMLElement) => {

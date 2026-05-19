@@ -15,11 +15,8 @@ interface UseSelectionClipboardOptions {
   closeMenu: () => void;
   /** Replace the whole expression. Updates local state so paste works in uncontrolled mode too. */
   replaceExpression: (expression: ExprNode | null) => void;
-  /**
-   * Reset transient autocomplete state (insertIndex, selectedField/Operator, menuState, etc.)
-   * after a successful paste — otherwise a stale `insertIndex` from a prior gap-click or
-   * Backspace puts the input cursor between newly-pasted chips instead of at the end.
-   */
+  /** Reset transient autocomplete state after paste; otherwise stale
+   *  insertIndex puts the cursor between newly-pasted chips. */
   resetAutocompleteState: () => void;
 }
 
@@ -86,12 +83,12 @@ export const useSelectionClipboard = ({
       try {
         const expr = parseExpression(text, fields);
         replaceExpression(expr);
-        // Drop stale insertIndex etc. so the input lands at the end of the new chip list
+        // Drop stale insertIndex so input lands at end of new chip list.
         resetAutocompleteState();
         clearSelection();
         setPasteError(null);
       } catch (err) {
-        // Keep the pasted text visible in the input so the user can see/edit it
+        // Keep pasted text visible so the user can see/edit it.
         setInputText(text);
         closeMenu();
         setPasteError(formatPasteError(err));
@@ -113,13 +110,12 @@ export const useSelectionClipboard = ({
     (text: string) => {
       const trimmed = text.trim();
 
-      // Empty input — clear error
       if (!trimmed) {
         setPasteError(null);
         return;
       }
 
-      // Only attempt parsing if text looks like a filter expression
+      // Skip unless text looks like a filter expression.
       if (!trimmed.includes('(') && !trimmed.includes('=') && !trimmed.includes(' in ')) {
         return;
       }

@@ -26,8 +26,6 @@ interface UseChipEditingOptions {
   upsertCondition: UpsertCondition;
 }
 
-// ── Pure helpers ────────────────────────────────────────────
-
 /** Resolve chip ID → Condition */
 const getConditionByChipId = (chipId: string, conditions: Condition[]): Condition | null => {
   const idx = chipIdToConditionIndex(chipId);
@@ -35,8 +33,8 @@ const getConditionByChipId = (chipId: string, conditions: Condition[]): Conditio
 };
 
 /**
- * Determine the first incomplete or errored segment of a chip (attribute → operator → value).
- * Returns the segment to resume building, or null if the chip is complete.
+ * Returns the first incomplete/errored segment to resume building, or null
+ * if the chip is complete (attribute → operator → value).
  */
 const getFirstIncompleteSegment = (
   condition: Condition,
@@ -54,12 +52,9 @@ const getFirstIncompleteSegment = (
   return null;
 };
 
-// ── Hook ───────────────────────────────────────────────────
-
 /**
- * Manages editing of existing filter chips.
- * Handles chip click → open appropriate menu based on segment,
- * then advances through the full flow (field → operator → value).
+ * Manages editing of existing filter chips. Chip click opens the appropriate
+ * menu based on segment, then advances through field → operator → value.
  */
 export const useChipEditing = ({
   conditions,
@@ -74,10 +69,10 @@ export const useChipEditing = ({
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
   const [editingSegment, setEditingSegment] = useState<ChipSegment | null>(null);
   const [segmentFilterText, setSegmentFilterText] = useState('');
-  // Tracks whether user has typed since opening edit — suppresses filtering until first keystroke
+  // Suppresses filtering until first keystroke after edit opens.
   const [userHasTyped, setUserHasTyped] = useState(false);
 
-  // Refs keep data fresh for callbacks without causing callback recreation
+  // Refs keep data fresh in callbacks without recreating them.
   const conditionsRef = useRef(conditions);
   conditionsRef.current = conditions;
   const chipsRef = useRef(chips);
@@ -96,13 +91,12 @@ export const useChipEditing = ({
       const chip = chipsRef.current.find(c => c.id === chipId);
       if (!chip || chip.variant !== 'chip') return;
 
-      // If chip is incomplete/errored, redirect to the first missing segment
+      // Errored chips redirect to the first missing segment.
       const incompleteSegment = condition.error
         ? getFirstIncompleteSegment(condition, fieldsRef.current)
         : null;
-      // No-value operator chips have a placeholder value segment — clicking
-      // it has no real meaning, so reroute to the operator segment (the user
-      // most likely wants to switch to a value-bearing operator).
+      // No-value operator's placeholder value segment reroutes to operator
+      // (user most likely wants to switch to a value-bearing operator).
       const isPlaceholderValueClick =
         segment === SEGMENT_VARIANT.value &&
         condition.operator != null &&
@@ -156,15 +150,11 @@ export const useChipEditing = ({
   }, []);
 
   /**
-   * Enter inline-edit on a *building* chip segment. Unlike `handleChipClick`
-   * there is no committed chip yet, so `editingChipId` stays null — that
-   * combination (segment set, chipId null) is the building-edit marker
-   * downstream consumers can branch on.
+   * Enter inline-edit on a building chip segment. The (chipId null, segment
+   * set) pair is the building-edit marker downstream consumers branch on.
    */
   const startBuildingEdit = useCallback((segment: ChipSegment, currentText: string) => {
-    // Defensive reset: editingChipId should already be null in the building
-    // flow, but the marker (chipId null, segment set) is load-bearing for
-    // downstream branching — pin it explicitly.
+    // Pin chipId to null explicitly — the marker is load-bearing downstream.
     setEditingChipId(null);
     setEditingSegment(segment);
     setSegmentFilterText(currentText);
@@ -172,10 +162,8 @@ export const useChipEditing = ({
   }, []);
 
   /**
-   * Switch the inline-edit target to a different segment of the *same*
-   * committed chip — keeps editingChipId, resets the typed-flag so the
-   * dropdown widens back to all options. For building-chip switches use
-   * `startBuildingEdit` instead (which also clears editingChipId).
+   * Switch inline-edit to a different segment of the *same* committed chip.
+   * For building-chip switches use `startBuildingEdit` (clears editingChipId).
    */
   const switchEditSegment = useCallback((segment: ChipSegment, currentText: string) => {
     setEditingSegment(segment);
@@ -189,17 +177,14 @@ export const useChipEditing = ({
     setUserHasTyped(true);
   }, []);
 
-  /** Resets only the "userHasTyped" flag so the dropdown filter widens back
-   *  to all options, while the displayed segment text (the committed value
-   *  the user is editing) stays visible on the chip. Used by multi-select
-   *  toggle so the chip doesn't flicker to empty between clicks. */
+  /** Resets userHasTyped so the dropdown widens back to all options while
+   *  segment text stays visible — used by multi-select to prevent flicker. */
   const resetSegmentTyping = useCallback(() => {
     setUserHasTyped(false);
   }, []);
 
-  // Text shown in the inline input
   const segmentDisplayText = segmentFilterText;
-  // Text used for dropdown filtering — empty until user types
+  // Dropdown filter text — empty until user types.
   const segmentMenuFilterText = userHasTyped ? segmentFilterText : '';
 
   return useMemo(

@@ -32,7 +32,7 @@ export interface FilterInputFieldMenuProps {
   positioning?: Record<string, unknown>;
   /** Ref to the query bar input — ArrowUp on first item returns focus here */
   inputRef?: RefObject<HTMLInputElement | null>;
-  /** Ref to the menu content element — shared across menus for focus management */
+  /** Ref to the menu content (shared across menus for focus management). */
   menuRef?: RefObject<HTMLDivElement | null>;
   className?: string;
 }
@@ -132,7 +132,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
     menuRef,
   });
 
-  // Hide menu when filter text is non-empty but no fields match (e.g. pasted invalid text)
+  // Hide menu when filter text matches nothing (e.g. pasted invalid text).
   const hasResults = filteredFields.length > 0 || !filterText;
 
   return (

@@ -45,8 +45,8 @@ export const FilterInputConnectorChip: FC<FilterInputConnectorChipProps> = ({
     [closeAutocompleteMenu],
   );
 
-  // Reset local open state when autocomplete menu opens to prevent flash
-  // during flushSync transitions (close → field) where menuOpen briefly goes false
+  // Reset local open when autocomplete opens — prevents flash during flushSync
+  // close→field transitions where menuOpen briefly goes false.
   useEffect(() => {
     if (menuOpen) setOpen(false);
   }, [menuOpen]);

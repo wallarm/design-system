@@ -16,9 +16,9 @@ interface UseFilterInputSelectionOptions {
   clearAll: () => void;
   setInputText: (text: string) => void;
   closeMenu: () => void;
-  /** Replace the entire expression — used by paste so local state stays in sync even when uncontrolled. */
+  /** Replace the entire expression (paste path keeps local state in sync). */
   replaceExpression: (expression: ExprNode | null) => void;
-  /** Reset transient autocomplete state after paste (insertIndex, selectedField, menuState, …). */
+  /** Reset transient autocomplete state after paste. */
   resetAutocompleteState: () => void;
 }
 
@@ -47,7 +47,7 @@ export const useFilterInputSelection = ({
 
   const dismissPasteError = useCallback(() => setPasteError(null), []);
 
-  // Clear chip selection when clicking outside the filter input
+  // Clear chip selection when clicking outside the filter input.
   const allSelectedRef = useRef(false);
   allSelectedRef.current = allSelected;
 

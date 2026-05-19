@@ -16,18 +16,15 @@ import type { ExprNode, FieldMetadata } from './types';
 export interface FilterInputProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /**
-   * Filter-field configurations driving the autocomplete. Most fields are
-   * passed through as-is, but a few names are **reserved** and auto-wired
-   * with design-system helpers (`acceptChar` / `normalize` / `getSuggestions`
-   * / `validate`). Current reserved names:
+   * Filter-field configurations driving the autocomplete. A few names are
+   * **reserved** and auto-wired with design-system helpers (consumer-supplied
+   * callbacks always override the auto-wiring):
    *
    *   - `status_code` — HTTP status code field (mask suggestions, format
    *     validation, digit-or-X input filter, partial-input normalization).
    *
-   * Consumer-supplied callbacks always override the auto-wiring, so you can
-   * opt out per-field. For the same helpers on a field with a different
-   * `name`, import the factories (`createStatusCodeSuggestions`, …) and
-   * attach them manually.
+   * For the same helpers on a different `name`, import the factories
+   * (`createStatusCodeSuggestions`, …) and attach them manually.
    */
   fields?: FieldMetadata[];
   value?: ExprNode | null;
@@ -106,9 +103,8 @@ export const FilterInput: FC<FilterInputProps> = ({
     setInputText: autocomplete.setInputText,
     closeMenu: autocomplete.closeAutocompleteMenu,
     replaceExpression,
-    // Paste replaces the whole expression, so any in-progress building (incl.
-    // segment inline-edit) must be scrapped — go through the unconditional
-    // reset, not handleMenuDiscard which now preserves building-edit state.
+    // Paste replaces the whole expression — must scrap in-progress building
+    // (incl. segment inline-edit); handleMenuDiscard now preserves that state.
     resetAutocompleteState: autocomplete.resetAutocompleteState,
   });
 
@@ -133,8 +129,6 @@ export const FilterInput: FC<FilterInputProps> = ({
     if (pasteError) retryParse(autocomplete.inputText);
   }, [autocomplete.inputText]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // ── Errors ────────────────────────────────────────────────
-
   const fieldErrors = useMemo(
     () => parseFilterInputErrors(conditions, fields),
     [conditions, fields],
@@ -144,16 +138,12 @@ export const FilterInput: FC<FilterInputProps> = ({
     [pasteError, fieldErrors],
   );
 
-  // ── Render ─────────────────────────────────────────────────
-
   return (
     <div
       ref={containerRef}
       className={cn('group/filter-input relative flex w-full flex-col gap-4', className)}
-      // tabIndex=-1 lets us programmatically focus the container during select-all
-      // (Ctrl+A) so copy/paste events still target a node inside the React subtree —
-      // otherwise blurring the input drops focus to <body>, which is outside the
-      // FilterInput's onCopy/onPaste handlers.
+      // tabIndex=-1 keeps Ctrl+A focus inside the React subtree so onCopy/onPaste
+      // still fire (focusing <body> would bypass these handlers).
       tabIndex={-1}
       onFocus={autocomplete.handleFocus as unknown as React.FocusEventHandler<HTMLDivElement>}
       onBlur={autocomplete.handleBlur}

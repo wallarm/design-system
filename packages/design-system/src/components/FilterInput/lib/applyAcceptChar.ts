@@ -1,8 +1,7 @@
 /**
- * Strip characters from `text` that fail the field's `acceptChar` predicate.
- * Commas and spaces always pass through so multi-select delimiters keep
- * working. Returns the original string unchanged when no filtering was
- * needed, so callers can cheaply compare identity to detect a no-op.
+ * Strip chars failing `acceptChar`. Commas/spaces pass through (multi-select
+ * delimiters). Returns the same string when no filtering happens, so callers
+ * can identity-compare to detect a no-op.
  */
 export const applyAcceptChar = (text: string, acceptChar: (c: string) => boolean): string => {
   const filtered = Array.from(text)

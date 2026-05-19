@@ -19,9 +19,8 @@ export const FilterInputErrors: FC<FilterInputErrorsProps> = ({ errors }) => {
       <AlertIcon />
       <AlertContent>
         <AlertTitle>{title}</AlertTitle>
-        {/* Rendered directly inside AlertContent (a <div>) instead of AlertDescription —
-            AlertDescription wraps its children in <Text> (<p>), and a <ul> inside <p>
-            is invalid HTML and triggers a hydration error. */}
+        {/* Skip AlertDescription: it wraps in <p>, and <ul> inside <p> is
+            invalid HTML and triggers a hydration error. */}
         <ul className='list-disc ms-[21px] text-sm text-text-secondary'>
           {errors.map((err, idx) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: errors may repeat (same message for different chips); idx disambiguates

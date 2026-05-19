@@ -31,16 +31,15 @@ export interface FilterInputValueMenuProps {
   width?: 'standard' | 'compact' | number;
   positioning?: Record<string, unknown>;
   onBuildingValueChange?: (preview: string | undefined) => void;
-  /** Fires on explicit multi-select toggle (click or keyboard) — use to react
-   *  only to user-initiated toggles, not to initialization. */
+  /** Fires only on user-initiated multi-select toggle (not on init). */
   onItemToggle?: () => void;
-  /** Ref to the query bar input — ArrowUp on first item returns focus here */
+  /** Query bar input — ArrowUp on first item returns focus here. */
   inputRef?: RefObject<HTMLInputElement | null>;
-  /** Text to filter values by label */
+  /** Filter values by label. */
   filterText?: string;
-  /** Ref to the menu content element — shared across menus for focus management */
+  /** Menu content ref (shared across menus for focus management). */
   menuRef?: RefObject<HTMLDivElement | null>;
-  /** Ref set by this component to allow blur handler to commit multi-select values */
+  /** Set here so blur handler can commit multi-select values. */
   blurCommitRef?: RefObject<(() => boolean) | null>;
   className?: string;
 }
@@ -127,10 +126,8 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
               <ValueMenuItem
                 key={String(option.value)}
                 option={option}
-                // Loose match by String() — values may be strings after parser round-trip
-                // (e.g. integer field with values [{value: 1, label: 'Low'}] gets
-                // condition.value = ["1"] from clipboard paste). Strict `.includes` would
-                // miss the match (1 !== "1") and the item would render as unchecked.
+                // Loose match — values may be stringified after parser round-trip
+                // (e.g. pasted "1" vs canonical 1); strict .includes would miss it.
                 isChecked={selectedValues.some(v => String(v) === String(option.value))}
                 isPending={pendingIds.has(String(option.value))}
                 multiSelect={multiSelect}
