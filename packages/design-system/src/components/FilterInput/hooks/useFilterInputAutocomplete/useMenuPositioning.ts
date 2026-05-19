@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { type AnchorBounds, toAnchorBounds } from '../../lib';
 import { useFilterInputPositioning } from '../useFilterInputPositioning';
 import { useResizeTracker } from '../useResizeTracker';
@@ -36,6 +36,15 @@ export const useMenuPositioning = ({
 }: UseMenuPositioningOptions) => {
   const [editingEl, setMenuAnchor] = useState<HTMLElement | null>(null);
   const resetMenuAnchor = useCallback(() => setMenuAnchor(null), []);
+
+  // Auto-clear the captured anchor as soon as its DOM node leaves the tree.
+  // This catches paths where a chip is removed (Clear button, last Backspace
+  // cascade, controlled-value prop change) but the anchor reset is missed —
+  // without this the dropdown would keep aligning to a stale chip rect on the
+  // next menu open instead of falling through to the input/container anchor.
+  useEffect(() => {
+    if (editingEl && !editingEl.isConnected) setMenuAnchor(null);
+  });
 
   const tick = useResizeTracker(editingEl, buildingChipRef.current, containerRef.current);
 
