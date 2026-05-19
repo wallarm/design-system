@@ -12,6 +12,9 @@ export interface MenuFlowDeps {
   editing: {
     editingChipId: string | null;
     editingSegment: string | null;
+    /** Pre-derived chipId === null && segment !== null marker — single source
+     *  of truth, avoids re-deriving in every consumer. */
+    isBuildingEdit: boolean;
     setEditingSegment: (segment: ChipSegment | null) => void;
     setSegmentFilterText: (text: string) => void;
     resetSegmentTyping: () => void;

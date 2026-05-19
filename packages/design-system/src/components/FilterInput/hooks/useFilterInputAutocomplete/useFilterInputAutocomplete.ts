@@ -78,6 +78,7 @@ export const useFilterInputAutocomplete = ({
     isBuilding: selectedField !== null,
     insertIndex: effectiveInsertIndex,
     chipsCount: chips.length,
+    isMenuOpen: menuState !== 'closed',
   });
 
   const editing = useChipEditing({

@@ -7,15 +7,27 @@ import { useEffect } from 'react';
  * the element via a controlled prop change while the state still holds it,
  * downstream consumers can otherwise read a stale rect from a detached node.
  *
- * The effect runs on every render with no deps so transitions to "detached"
- * are caught regardless of which prop change triggered them. The callback
- * is expected to be cheap and idempotent (typically setState(null)).
+ * Detection is via a MutationObserver on documentElement (subtree childList),
+ * so detachment caused by any reconciliation is caught synchronously after
+ * commit — without re-running on every parent render.
  */
 export const useAutoCleanupDetachedElement = (
   el: HTMLElement | null,
   onDetached: () => void,
 ): void => {
   useEffect(() => {
-    if (el && !el.isConnected) onDetached();
-  });
+    if (!el) return;
+    if (!el.isConnected) {
+      onDetached();
+      return;
+    }
+    if (typeof MutationObserver === 'undefined') return;
+    const root = el.ownerDocument?.documentElement;
+    if (!root) return;
+    const observer = new MutationObserver(() => {
+      if (!el.isConnected) onDetached();
+    });
+    observer.observe(root, { childList: true, subtree: true });
+    return () => observer.disconnect();
+  }, [el, onDetached]);
 };

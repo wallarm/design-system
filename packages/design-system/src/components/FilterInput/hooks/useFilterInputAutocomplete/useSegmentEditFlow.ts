@@ -8,6 +8,7 @@ interface UseSegmentEditFlowOptions {
   editing: {
     editingChipId: string | null;
     editingSegment: ChipSegment | null;
+    isBuildingEdit: boolean;
     setSegmentFilterText: (text: string) => void;
     startBuildingEdit: (segment: ChipSegment, currentText: string) => void;
     clearEditing: () => void;
@@ -43,50 +44,49 @@ export const useSegmentEditFlow = ({
   setMenuState,
   setMenuAnchor,
 }: UseSegmentEditFlowOptions) => {
+  const { editingSegment, isBuildingEdit, setSegmentFilterText, startBuildingEdit, clearEditing } =
+    editing;
+
   // Mirror main-input acceptChar rule for inline value-segment edits.
   const handleSegmentFilterChange = useCallback(
     (text: string) => {
       const accept = selectedField?.acceptChar;
       const next =
-        editing.editingSegment === SEGMENT_VARIANT.value && accept
-          ? applyAcceptChar(text, accept)
-          : text;
-      editing.setSegmentFilterText(next);
+        editingSegment === SEGMENT_VARIANT.value && accept ? applyAcceptChar(text, accept) : text;
+      setSegmentFilterText(next);
     },
-    [selectedField, editing],
+    [selectedField, editingSegment, setSegmentFilterText],
   );
 
   // Clear ALL autocomplete state on segment-edit cancel — leaving
   // selectedField/Operator set leaks "building" state and handleInputClick
   // (gated on !selectedField) won't reopen the field menu. AS-929.
-  // Exception: building-chip inline-edit (chipId null + segment set) must
-  // preserve selectedField/Operator/value preview — user is still building.
+  // Exception: building-chip inline-edit must preserve selectedField/Operator/
+  // value preview — user is still building.
   const cancelSegmentEdit = useCallback(() => {
-    const isBuildingEdit = !editing.editingChipId && editing.editingSegment !== null;
     if (isBuildingEdit) {
-      editing.clearEditing();
+      clearEditing();
       setMenuState('closed');
       return;
     }
     setSelectedField(null);
     setSelectedOperator(null);
-    editing.clearEditing();
+    clearEditing();
     setMenuState('closed');
-  }, [editing, setSelectedField, setSelectedOperator, setMenuState]);
+  }, [isBuildingEdit, clearEditing, setSelectedField, setSelectedOperator, setMenuState]);
 
   /**
    * Menu Escape: preserve building-chip state when inline-editing a building
    * segment; otherwise fall back to destructive resetState.
    */
   const handleMenuDiscard = useCallback(() => {
-    const isBuildingEdit = !editing.editingChipId && editing.editingSegment !== null;
     if (isBuildingEdit) {
-      editing.clearEditing();
+      clearEditing();
       setMenuState('closed');
       return;
     }
     resetState();
-  }, [editing, resetState, setMenuState]);
+  }, [isBuildingEdit, clearEditing, resetState, setMenuState]);
 
   /**
    * Building-chip segment click: enter inline-edit and reopen its menu.
@@ -102,7 +102,7 @@ export const useSegmentEditFlow = ({
         selectedOperator,
         buildingMultiValue,
       );
-      editing.startBuildingEdit(segment, initialText);
+      startBuildingEdit(segment, initialText);
       setInputText('');
       setMenuState(SEGMENT_TO_MENU[segment]);
     },
@@ -111,7 +111,7 @@ export const useSegmentEditFlow = ({
       selectedOperator,
       buildingMultiValue,
       setMenuAnchor,
-      editing,
+      startBuildingEdit,
       setInputText,
       setMenuState,
     ],

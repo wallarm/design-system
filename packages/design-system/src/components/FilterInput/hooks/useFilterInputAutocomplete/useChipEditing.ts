@@ -186,11 +186,15 @@ export const useChipEditing = ({
   const segmentDisplayText = segmentFilterText;
   // Dropdown filter text — empty until user types.
   const segmentMenuFilterText = userHasTyped ? segmentFilterText : '';
+  // Inline-edit of a building chip segment (chipId null + segment set). Used by
+  // consumers to branch on building-vs-committed flow without recomputing.
+  const isBuildingEdit = editingChipId === null && editingSegment !== null;
 
   return useMemo(
     () => ({
       editingChipId,
       editingSegment,
+      isBuildingEdit,
       setEditingSegment,
       segmentFilterText: segmentDisplayText,
       segmentMenuFilterText,
@@ -204,6 +208,7 @@ export const useChipEditing = ({
     [
       editingChipId,
       editingSegment,
+      isBuildingEdit,
       segmentDisplayText,
       segmentMenuFilterText,
       handleSegmentFilterChange,

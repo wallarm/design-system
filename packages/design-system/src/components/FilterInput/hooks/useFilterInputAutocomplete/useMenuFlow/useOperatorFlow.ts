@@ -30,19 +30,26 @@ export const useOperatorFlow = ({
   setBuildingMultiValue,
   setInputText,
 }: MenuFlowInternalDeps) => {
+  const {
+    editingChipId,
+    editingSegment,
+    isBuildingEdit,
+    setEditingSegment,
+    setSegmentFilterText,
+    clearEditing,
+  } = editing;
+
   const handleOperatorSelect = useCallback(
     (operator: FilterOperator) => {
       if (!selectedField) return;
 
       // Inline-edit of building chip operator: keep value preview if shape
       // (multi/between/no-value) unchanged; no-value operators auto-commit.
-      const isBuildingEdit =
-        !editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.operator;
-      if (isBuildingEdit) {
+      if (isBuildingEdit && editingSegment === SEGMENT_VARIANT.operator) {
         const shapeCompatible = isValueShapeCompatible(selectedOperator, operator);
         if (!shapeCompatible) setBuildingMultiValue(undefined);
         setSelectedOperator(operator);
-        editing.clearEditing();
+        clearEditing();
         if (isNoValueOperator(operator)) {
           upsertCondition(selectedField, operator, null, null, insertIndex);
           resetState(true);
@@ -53,12 +60,12 @@ export const useOperatorFlow = ({
       }
 
       if (isNoValueOperator(operator)) {
-        const isEditing = !!editing.editingChipId;
+        const isEditing = !!editingChipId;
         upsertCondition(
           selectedField,
           operator,
           null,
-          editing.editingChipId,
+          editingChipId,
           isEditing ? undefined : insertIndex,
         );
         resetState(!isEditing);
@@ -67,8 +74,8 @@ export const useOperatorFlow = ({
 
       // Editing operator of existing chip: complete chip commits with new
       // operator+value; incomplete persists operator and moves to value.
-      if (editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.operator) {
-        const idx = chipIdToConditionIndex(editing.editingChipId);
+      if (editingChipId && editingSegment === SEGMENT_VARIANT.operator) {
+        const idx = chipIdToConditionIndex(editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
         if (condition) {
           const hasValue = condition.value !== null && condition.value !== '';
@@ -77,7 +84,7 @@ export const useOperatorFlow = ({
               selectedField,
               operator,
               condition.value,
-              editing.editingChipId,
+              editingChipId,
               undefined,
               undefined,
               condition.dateOrigin,
@@ -86,9 +93,9 @@ export const useOperatorFlow = ({
             return;
           }
           // Incomplete — persist operator without error.
-          upsertCondition(selectedField, operator, null, editing.editingChipId);
-          editing.setEditingSegment(SEGMENT_VARIANT.value);
-          editing.setSegmentFilterText('');
+          upsertCondition(selectedField, operator, null, editingChipId);
+          setEditingSegment(SEGMENT_VARIANT.value);
+          setSegmentFilterText('');
         }
       }
 
@@ -97,7 +104,12 @@ export const useOperatorFlow = ({
       setMenuState('value');
     },
     [
-      editing,
+      editingChipId,
+      editingSegment,
+      isBuildingEdit,
+      setEditingSegment,
+      setSegmentFilterText,
+      clearEditing,
       selectedField,
       selectedOperator,
       insertIndex,

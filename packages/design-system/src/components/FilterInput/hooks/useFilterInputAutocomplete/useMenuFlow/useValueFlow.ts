@@ -26,6 +26,8 @@ export const useValueFlow = ({
   setBuildingMultiValue,
   setInputText,
 }: MenuFlowInternalDeps) => {
+  const { editingChipId, editingSegment, resetSegmentTyping } = editing;
+
   /** Single-select value (including date presets, between date collection) */
   const handleValueSelect = useCallback(
     (val: string | number | boolean) => {
@@ -34,39 +36,47 @@ export const useValueFlow = ({
       if (isBetweenOperator(selectedOperator) && selectedField.type === 'date') {
         const result = dateRange.selectValue(String(val));
         if (!result) return;
-        upsertCondition(selectedField, selectedOperator, result, editing.editingChipId);
-        resetState(!editing.editingChipId);
+        upsertCondition(selectedField, selectedOperator, result, editingChipId);
+        resetState(!editingChipId);
         return;
       }
 
-      const isEditing = !!editing.editingChipId;
+      const isEditing = !!editingChipId;
       upsertCondition(
         selectedField,
         selectedOperator,
         val,
-        editing.editingChipId,
+        editingChipId,
         isEditing ? undefined : insertIndex,
       );
       resetState(!isEditing);
     },
-    [selectedField, selectedOperator, editing, dateRange, insertIndex, upsertCondition, resetState],
+    [
+      selectedField,
+      selectedOperator,
+      editingChipId,
+      dateRange,
+      insertIndex,
+      upsertCondition,
+      resetState,
+    ],
   );
 
   /** Multi-select commit: receives final array from FilterInputValueMenu */
   const handleMultiCommit = useCallback(
     (values: Array<string | number | boolean>) => {
       if (!selectedField || !selectedOperator || values.length === 0) return;
-      const isEditing = !!editing.editingChipId;
+      const isEditing = !!editingChipId;
       upsertCondition(
         selectedField,
         selectedOperator,
         values,
-        editing.editingChipId,
+        editingChipId,
         isEditing ? undefined : insertIndex,
       );
       resetState(!isEditing);
     },
-    [selectedField, selectedOperator, editing, insertIndex, upsertCondition, resetState],
+    [selectedField, selectedOperator, editingChipId, insertIndex, upsertCondition, resetState],
   );
 
   /** Building value preview from FilterInputValueMenu multi-select */
@@ -81,28 +91,28 @@ export const useValueFlow = ({
    *  options. Segment-edit only resets the typing flag (preserves displayed
    *  chip text — prevents flicker between clicks). */
   const handleMultiSelectToggle = useCallback(() => {
-    if (editing.editingSegment === SEGMENT_VARIANT.value) {
-      editing.resetSegmentTyping();
+    if (editingSegment === SEGMENT_VARIANT.value) {
+      resetSegmentTyping();
     } else {
       setInputText('');
     }
-  }, [editing, setInputText]);
+  }, [editingSegment, resetSegmentTyping, setInputText]);
 
   /** Range select (between + calendar) */
   const handleRangeSelect = useCallback(
     (from: string, to: string) => {
       if (!selectedField || !selectedOperator) return;
-      const isEditing = !!editing.editingChipId;
+      const isEditing = !!editingChipId;
       upsertCondition(
         selectedField,
         selectedOperator,
         [from, to],
-        editing.editingChipId,
+        editingChipId,
         isEditing ? undefined : insertIndex,
       );
       resetState(!isEditing);
     },
-    [selectedField, selectedOperator, editing, insertIndex, upsertCondition, resetState],
+    [selectedField, selectedOperator, editingChipId, insertIndex, upsertCondition, resetState],
   );
 
   /** Commit a custom typed value (from inline segment editing or freeform input) */
@@ -110,7 +120,7 @@ export const useValueFlow = ({
     (customText: string) => {
       if (!selectedField || !selectedOperator || !customText.trim()) return;
       const trimmed = customText.trim();
-      const isEditing = !!editing.editingChipId;
+      const isEditing = !!editingChipId;
 
       if (isMultiSelectOperator(selectedOperator)) {
         const { resolved, error } = resolveMultiValues(selectedField, trimmed);
@@ -118,7 +128,7 @@ export const useValueFlow = ({
           selectedField,
           selectedOperator,
           resolved,
-          editing.editingChipId,
+          editingChipId,
           isEditing ? undefined : insertIndex,
           error ? SEGMENT_VARIANT.value : undefined,
         );
@@ -130,7 +140,7 @@ export const useValueFlow = ({
             selectedField,
             selectedOperator,
             rangeValue ?? trimmed,
-            editing.editingChipId,
+            editingChipId,
             isEditing ? undefined : insertIndex,
             rangeValue ? undefined : SEGMENT_VARIANT.value,
             'absolute',
@@ -138,14 +148,14 @@ export const useValueFlow = ({
         } else {
           const { error, dateOrigin } = resolveDateValue(
             trimmed,
-            editing.editingChipId,
+            editingChipId,
             conditionsRef.current,
           );
           upsertCondition(
             selectedField,
             selectedOperator,
             trimmed,
-            editing.editingChipId,
+            editingChipId,
             isEditing ? undefined : insertIndex,
             error ? SEGMENT_VARIANT.value : undefined,
             dateOrigin,
@@ -157,7 +167,7 @@ export const useValueFlow = ({
           selectedField,
           selectedOperator,
           resolved,
-          editing.editingChipId,
+          editingChipId,
           isEditing ? undefined : insertIndex,
           error ? SEGMENT_VARIANT.value : undefined,
         );
@@ -167,7 +177,7 @@ export const useValueFlow = ({
     [
       selectedField,
       selectedOperator,
-      editing,
+      editingChipId,
       insertIndex,
       conditionsRef,
       upsertCondition,

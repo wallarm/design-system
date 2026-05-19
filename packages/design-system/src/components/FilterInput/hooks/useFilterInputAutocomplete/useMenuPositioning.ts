@@ -15,6 +15,9 @@ interface UseMenuPositioningOptions {
   /** Committed chip count — recompute trigger for sibling reflow (ResizeObserver
    *  misses it; without this the dropdown sticks at the old position). */
   chipsCount: number;
+  /** Menu is currently visible — gates the synthetic resize so a chip add/remove
+   *  while the menu is closed doesn't wake page-wide resize listeners. */
+  isMenuOpen: boolean;
 }
 
 /**
@@ -41,12 +44,13 @@ export const useMenuPositioning = ({
   isBuilding,
   insertIndex,
   chipsCount,
+  isMenuOpen,
 }: UseMenuPositioningOptions) => {
   const [editingEl, setMenuAnchor] = useState<HTMLElement | null>(null);
   const resetMenuAnchor = useCallback(() => setMenuAnchor(null), []);
 
   useAutoCleanupDetachedElement(editingEl, resetMenuAnchor);
-  useFloatingRecomputeOn(chipsCount);
+  useFloatingRecomputeOn(chipsCount, isMenuOpen);
 
   const tick = useResizeTracker(editingEl, buildingChipRef.current, containerRef.current);
 

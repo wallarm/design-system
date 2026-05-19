@@ -25,11 +25,14 @@ export const useFieldFlow = ({
   setInputText,
   setMenuState,
 }: MenuFlowInternalDeps) => {
+  const { editingChipId, editingSegment, isBuildingEdit, switchEditSegment, clearEditing } =
+    editing;
+
   const handleFieldSelect = useCallback(
     (field: FieldMetadata) => {
       // Editing existing chip's attribute — keep operator/value.
-      if (editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.attribute) {
-        const idx = chipIdToConditionIndex(editing.editingChipId);
+      if (editingChipId && editingSegment === SEGMENT_VARIANT.attribute) {
+        const idx = chipIdToConditionIndex(editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
         if (condition) {
           // Post-cascade incomplete chip (operator cleared by Backspace
@@ -39,7 +42,7 @@ export const useFieldFlow = ({
               field,
               undefined,
               condition.value,
-              editing.editingChipId,
+              editingChipId,
               undefined,
               undefined,
               condition.dateOrigin,
@@ -48,7 +51,7 @@ export const useFieldFlow = ({
             setSelectedOperator(null);
             // switchEditSegment resets userHasTyped so the next keystroke
             // widens the menu (matches first-edit behavior).
-            editing.switchEditSegment(SEGMENT_VARIANT.operator, '');
+            switchEditSegment(SEGMENT_VARIANT.operator, '');
             setMenuState('operator');
             return;
           }
@@ -57,7 +60,7 @@ export const useFieldFlow = ({
             field,
             condition.operator,
             condition.value,
-            editing.editingChipId,
+            editingChipId,
             undefined,
             hasValueError ? SEGMENT_VARIANT.value : undefined,
             condition.dateOrigin,
@@ -68,15 +71,13 @@ export const useFieldFlow = ({
       }
       // Inline-edit of building chip attribute — keep operator if still
       // allowed; value preview is untouched (validation runs at commit).
-      const isBuildingEdit =
-        !editing.editingChipId && editing.editingSegment === SEGMENT_VARIANT.attribute;
-      if (isBuildingEdit) {
+      if (isBuildingEdit && editingSegment === SEGMENT_VARIANT.attribute) {
         setSelectedField(field);
         const keepOperator = selectedOperator
           ? isOperatorAllowedForField(field, selectedOperator)
           : false;
         if (!keepOperator) setSelectedOperator(null);
-        editing.clearEditing();
+        clearEditing();
         setMenuState(keepOperator ? 'value' : 'operator');
         return;
       }
@@ -85,7 +86,11 @@ export const useFieldFlow = ({
       setMenuState('operator');
     },
     [
-      editing,
+      editingChipId,
+      editingSegment,
+      isBuildingEdit,
+      switchEditSegment,
+      clearEditing,
       selectedOperator,
       conditionsRef,
       upsertCondition,
@@ -110,12 +115,12 @@ export const useFieldFlow = ({
 
       // Building-chip inline-edit: route through handleFieldSelect to share
       // operator-preservation; unknown text is ignored (no errored chip).
-      if (!editing.editingChipId) {
+      if (!editingChipId) {
         if (matchedField) handleFieldSelect(matchedField);
         return;
       }
 
-      const idx = chipIdToConditionIndex(editing.editingChipId);
+      const idx = chipIdToConditionIndex(editingChipId);
       const condition = idx !== null ? conditionsRef.current[idx] : null;
       if (!condition) return;
 
@@ -137,14 +142,14 @@ export const useFieldFlow = ({
           syntheticField,
           undefined,
           condition.value,
-          editing.editingChipId,
+          editingChipId,
           undefined,
           SEGMENT_VARIANT.attribute,
           condition.dateOrigin,
         );
         setSelectedField(syntheticField);
         setSelectedOperator(null);
-        editing.switchEditSegment(SEGMENT_VARIANT.operator, '');
+        switchEditSegment(SEGMENT_VARIANT.operator, '');
         setMenuState('operator');
         return;
       }
@@ -152,7 +157,7 @@ export const useFieldFlow = ({
         syntheticField,
         condition.operator,
         condition.value,
-        editing.editingChipId,
+        editingChipId,
         undefined,
         SEGMENT_VARIANT.attribute,
         condition.dateOrigin,
@@ -160,7 +165,8 @@ export const useFieldFlow = ({
       resetState();
     },
     [
-      editing,
+      editingChipId,
+      switchEditSegment,
       fields,
       conditionsRef,
       upsertCondition,

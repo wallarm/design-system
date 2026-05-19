@@ -22,7 +22,6 @@ export const useFilterInputPositioning = (
   { anchorRef, containerRef, getAnchorBounds }: UseFilterInputPositioningProps,
   deps: unknown[] = [],
 ) =>
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useMemo(
     () => ({
       placement: 'bottom-start' as const,
@@ -40,6 +39,5 @@ export const useFilterInputPositioning = (
         return buildAnchoredRect(anchor, containerRect);
       },
     }),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [anchorRef, containerRef, getAnchorBounds, ...deps],
   );

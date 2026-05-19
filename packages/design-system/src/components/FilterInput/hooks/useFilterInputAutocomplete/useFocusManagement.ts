@@ -143,6 +143,29 @@ export const useFocusManagement = ({
     setMenuState,
   ]);
 
+  // Two coordinated focus-retention mechanisms — they target the same input
+  // ref but fire on disjoint triggers so they never race:
+  //
+  //   1. Double-rAF (below): one-shot recapture after menu open. Fires once
+  //      per (menuState, isFocused, editingSegment) transition.
+  //   2. focusin listener (further below): continuous guard against zag.js's
+  //      pointer-driven focusMenu. Skips form-control targets, so when (1)
+  //      focuses our input the listener no-ops.
+  //
+  // Invariant: both call `el.focus()` on the same element only if focus is
+  // not already there (idempotent guard `document.activeElement === dest`),
+  // so a focus loop is impossible regardless of ordering.
+
+  const segmentInputRefsMap = useMemo(
+    () =>
+      ({
+        [SEGMENT_VARIANT.attribute]: segmentAttributeInputRef,
+        [SEGMENT_VARIANT.operator]: segmentOperatorInputRef,
+        [SEGMENT_VARIANT.value]: segmentValueInputRef,
+      }) satisfies Record<ChipSegment, RefObject<HTMLInputElement | null>>,
+    [segmentAttributeInputRef, segmentOperatorInputRef, segmentValueInputRef],
+  );
+
   // Prevent Ark UI focus steal on menu open: zag.js Menu redirects focus via
   // single rAF on mount; double rAF runs after that redirect. Fragile — breaks
   // if Ark UI changes its focus timing.
@@ -164,37 +187,20 @@ export const useFocusManagement = ({
         // dropped after re-render, refocus). AS-882.
         if (active && !container.contains(active) && !isMenuRelated(active)) return;
 
-        if (editingSegment) {
-          // Redirect focus to the segment's inline input (refs attached by Segment.tsx).
-          const segmentInputRefs: Record<ChipSegment, RefObject<HTMLInputElement | null>> = {
-            [SEGMENT_VARIANT.attribute]: segmentAttributeInputRef,
-            [SEGMENT_VARIANT.operator]: segmentOperatorInputRef,
-            [SEGMENT_VARIANT.value]: segmentValueInputRef,
-          };
-          const segmentInput = segmentInputRefs[editingSegment]?.current ?? null;
-          if (segmentInput && document.activeElement !== segmentInput) {
-            segmentInput.focus();
-            segmentInput.select();
-          }
-        } else if (document.activeElement !== inputRef.current) {
-          inputRef.current?.focus();
-        }
+        const dest = editingSegment
+          ? (segmentInputRefsMap[editingSegment]?.current ?? null)
+          : inputRef.current;
+        if (!dest) return;
+        if (document.activeElement === dest) return;
+        dest.focus();
+        if (editingSegment) dest.select();
       });
     });
     return () => {
       cancelAnimationFrame(outerRaf);
       cancelAnimationFrame(innerRaf);
     };
-  }, [
-    menuState,
-    isFocused,
-    inputRef,
-    editingSegment,
-    containerRef,
-    segmentAttributeInputRef,
-    segmentOperatorInputRef,
-    segmentValueInputRef,
-  ]);
+  }, [menuState, isFocused, inputRef, editingSegment, containerRef, segmentInputRefsMap]);
 
   // Keep focus on chip input while pointer hovers menu items: zag.js fires
   // focusMenu on ITEM_POINTERMOVE, moving DOM focus into Menu.Content. For the
@@ -204,16 +210,6 @@ export const useFocusManagement = ({
   // menuRef (shared across three menus, can be null mid-transition).
   // Guards: skip the date picker (its calendar owns focus) and deliberate
   // clicks on interactive controls.
-  const segmentInputRefsMap = useMemo(
-    () =>
-      ({
-        [SEGMENT_VARIANT.attribute]: segmentAttributeInputRef,
-        [SEGMENT_VARIANT.operator]: segmentOperatorInputRef,
-        [SEGMENT_VARIANT.value]: segmentValueInputRef,
-      }) satisfies Record<ChipSegment, RefObject<HTMLInputElement | null>>,
-    [segmentAttributeInputRef, segmentOperatorInputRef, segmentValueInputRef],
-  );
-
   useEffect(() => {
     if (menuState === 'closed') return;
     if (!isFocused) return;
@@ -225,6 +221,9 @@ export const useFocusManagement = ({
       if (!menu) return;
       if (menu.querySelector('[data-scope="date-picker"]')) return;
       const tag = targetEl.tagName;
+      // Form controls own their focus; this also covers our own inputs (the
+      // double-rAF effect above lands on one of these), so the two mechanisms
+      // never compete on the same target.
       if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
 
       const dest = editingSegment ? segmentInputRefsMap[editingSegment]?.current : inputRef.current;

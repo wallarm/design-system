@@ -16,6 +16,7 @@ interface UseChipCascadeOptions {
   editing: {
     editingChipId: string | null;
     editingSegment: ChipSegment | null;
+    isBuildingEdit: boolean;
     startBuildingEdit: (segment: ChipSegment, currentText: string) => void;
     switchEditSegment: (segment: ChipSegment, currentText: string) => void;
   };
@@ -67,13 +68,19 @@ export const useChipCascade = ({
   setBuildingMultiValue,
   setInsertIndex,
 }: UseChipCascadeOptions) => {
+  const {
+    editingChipId,
+    editingSegment,
+    isBuildingEdit,
+    startBuildingEdit,
+    switchEditSegment: editingSwitchSegment,
+  } = editing;
   // Menu is anchored to the chip (not segment) so sibling-segment cascade
   // needs no explicit reposition; ResizeObserver catches width shifts.
   const switchEditSegment = useCallback(
     (targetSegment: ChipSegment): boolean => {
-      const sourceSegment = editing.editingSegment;
+      const sourceSegment = editingSegment;
       if (sourceSegment === null) return false;
-      const isBuildingEdit = !editing.editingChipId;
 
       if (isBuildingEdit) {
         if (!selectedField) return false;
@@ -91,13 +98,13 @@ export const useChipCascade = ({
           selectedOperator,
           buildingMultiValue,
         );
-        editing.startBuildingEdit(targetSegment, initialText);
+        startBuildingEdit(targetSegment, initialText);
         setInputText('');
         setMenuState(SEGMENT_TO_MENU[targetSegment]);
         return true;
       }
 
-      const editingId = editing.editingChipId;
+      const editingId = editingChipId;
       if (!editingId) return false;
       const chip = chips.find(c => c.id === editingId);
       if (!chip || chip.variant !== 'chip') return false;
@@ -141,12 +148,16 @@ export const useChipCascade = ({
           : targetSegment === SEGMENT_VARIANT.operator
             ? (chip.operator ?? '')
             : '';
-      editing.switchEditSegment(targetSegment, targetText);
+      editingSwitchSegment(targetSegment, targetText);
       setMenuState(SEGMENT_TO_MENU[targetSegment]);
       return true;
     },
     [
-      editing,
+      editingChipId,
+      editingSegment,
+      isBuildingEdit,
+      startBuildingEdit,
+      editingSwitchSegment,
       selectedField,
       selectedOperator,
       buildingMultiValue,
@@ -162,19 +173,25 @@ export const useChipCascade = ({
   );
 
   const removeEditingChip = useCallback(() => {
-    if (editing.editingSegment === null) return;
-    const editingId = editing.editingChipId;
-    if (!editingId) {
+    if (editingSegment === null) return;
+    if (!editingChipId) {
       resetState();
       return;
     }
-    const chipCondIdx = chipIdToConditionIndex(editingId);
+    const chipCondIdx = chipIdToConditionIndex(editingChipId);
     if (chipCondIdx !== null && chipCondIdx < effectiveInsertIndexRef.current) {
       setInsertIndex(prev => (prev != null ? prev - 1 : prev));
     }
-    removeCondition(editingId);
+    removeCondition(editingChipId);
     resetState();
-  }, [editing, removeCondition, resetState, effectiveInsertIndexRef, setInsertIndex]);
+  }, [
+    editingChipId,
+    editingSegment,
+    removeCondition,
+    resetState,
+    effectiveInsertIndexRef,
+    setInsertIndex,
+  ]);
 
   const stepBackBuildingMenu = useCallback(
     (current: 'field' | 'operator' | 'value') => {
@@ -183,6 +200,8 @@ export const useChipCascade = ({
         return;
       }
       if (current === 'value') {
+        // Mirror switchEditSegment(value→operator): clear the just-vacated
+        // value preview, surface operator inline-edit.
         setBuildingMultiValue(undefined);
         setInputText('');
         const operatorText = getInitialSegmentText(
@@ -191,15 +210,17 @@ export const useChipCascade = ({
           selectedOperator,
           buildingMultiValue,
         );
-        editing.startBuildingEdit(SEGMENT_VARIANT.operator, operatorText);
+        startBuildingEdit(SEGMENT_VARIANT.operator, operatorText);
         setMenuState('operator');
         return;
       }
       if (current === 'operator') {
+        // Mirror switchEditSegment(operator→attribute): clear operator only;
+        // buildingMultiValue stays put — downstream field/operator-select
+        // discards it if the new operator is incompatible.
         setSelectedOperator(null);
-        setBuildingMultiValue(undefined);
         setInputText('');
-        editing.startBuildingEdit(SEGMENT_VARIANT.attribute, selectedField.label);
+        startBuildingEdit(SEGMENT_VARIANT.attribute, selectedField.label);
         setMenuState('field');
         return;
       }
@@ -209,7 +230,7 @@ export const useChipCascade = ({
       selectedField,
       selectedOperator,
       buildingMultiValue,
-      editing,
+      startBuildingEdit,
       resetState,
       setBuildingMultiValue,
       setInputText,

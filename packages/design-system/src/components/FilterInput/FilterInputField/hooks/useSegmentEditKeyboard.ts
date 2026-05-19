@@ -56,6 +56,10 @@ export const useSegmentEditKeyboard = ({
         return;
       }
       if (e.key === 'Backspace' && segmentFilterText === '') {
+        // IME-composition Backspace is for character composition, not segment
+        // navigation. Auto-repeat would burn through every segment in one hold
+        // and silently delete the chip — gate on first press only.
+        if (e.nativeEvent.isComposing || e.repeat) return;
         // Empty-segment Backspace walks the cascade. On attribute with no
         // operator, remove the chip entirely (value-only orphans are invalid).
         if (editingSegment === SEGMENT_VARIANT.attribute) {
