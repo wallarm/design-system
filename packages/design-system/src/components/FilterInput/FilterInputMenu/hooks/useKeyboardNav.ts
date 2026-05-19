@@ -241,8 +241,7 @@ export const useKeyboardNav = ({
       const isSegmentInput = (e.target as HTMLElement)?.closest?.('[data-slot^="segment-"]');
       if (isSegmentInput) {
         const isEnterWithHighlight = e.key === 'Enter' && activeIndexRef.current >= 0;
-        const isNavOrClose =
-          e.key === 'Escape' || e.key === 'ArrowDown' || e.key === 'ArrowUp';
+        const isNavOrClose = e.key === 'Escape' || e.key === 'ArrowDown' || e.key === 'ArrowUp';
         if (!isNavOrClose && !isEnterWithHighlight) return;
       }
 

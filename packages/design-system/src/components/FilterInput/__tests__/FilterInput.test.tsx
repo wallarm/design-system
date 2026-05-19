@@ -891,4 +891,96 @@ describe('FilterInput', () => {
       expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
     });
   });
+
+  describe('ArrowDown + Enter selects highlighted menu item from emptied segment', () => {
+    // After clearing a segment's text via Backspace the dropdown re-opens
+    // (filtered to all items). Arrow-navigating and pressing Enter must
+    // commit the highlighted item — without this guard Enter would fall
+    // through to the segment's onKeyDown and try to commit the empty
+    // typed text, stranding the user mid-flow.
+    const fields: FieldMetadata[] = [
+      {
+        name: 'status',
+        label: 'Status',
+        type: 'enum',
+        values: [
+          { value: 'active', label: 'Active' },
+          { value: 'pending', label: 'Pending' },
+        ],
+      },
+      {
+        name: 'role',
+        label: 'Role',
+        type: 'enum',
+        values: [
+          { value: 'admin', label: 'Admin' },
+          { value: 'user', label: 'User' },
+        ],
+      },
+    ];
+
+    it('selects highlighted field after emptying the attribute segment', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <FilterInput
+          fields={fields}
+          value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Edit filter attribute/i }));
+      const segInput = screen.getByLabelText('Filter attribute') as HTMLInputElement;
+      fireEvent.change(segInput, { target: { value: '' } });
+
+      // Two ArrowDowns — first highlights "Status" (already selected), second
+      // moves to "Role". Picking Role lets us assert the segment actually
+      // committed via Enter rather than just staying on the original value.
+      await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
+
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Role');
+    });
+
+    it('selects highlighted operator after emptying the operator segment', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <FilterInput
+          fields={fields}
+          value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Edit filter operator/i }));
+      const segInput = screen.getByLabelText('Filter operator') as HTMLInputElement;
+      fireEvent.change(segInput, { target: { value: '' } });
+
+      await user.keyboard('{ArrowDown}{Enter}');
+
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      // First operator in the enum list is `is =` — picking it must update
+      // the chip's operator segment.
+      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is');
+    });
+
+    it('selects highlighted value after emptying the value segment', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <FilterInput
+          fields={fields}
+          value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Edit filter value/i }));
+      const segInput = screen.getByLabelText('Filter value') as HTMLInputElement;
+      fireEvent.change(segInput, { target: { value: '' } });
+
+      await user.keyboard('{ArrowDown}{Enter}');
+
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      // First value in the enum list is `Active` — picking it keeps the
+      // chip valid (value is committed, not silently dropped).
+      expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('Active');
+    });
+  });
 });
