@@ -233,11 +233,18 @@ export const useKeyboardNav = ({
       }
 
       // ── Focus is on a segment inline-edit input ──
-      // Only intercept ArrowDown/Up (menu navigation) and Escape (close).
-      // Enter must propagate to the segment's onKeyDown for value commit.
+      // Intercept ArrowDown/Up (menu navigation) and Escape (close). Enter is
+      // intercepted only when a menu item is highlighted (selects it); without
+      // a highlight Enter propagates to the segment's onKeyDown for free-form
+      // value commit. Otherwise pressing Enter after arrow-navigating the menu
+      // would commit the unrelated typed text instead of the highlighted item.
       const isSegmentInput = (e.target as HTMLElement)?.closest?.('[data-slot^="segment-"]');
-      if (isSegmentInput && e.key !== 'Escape' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp')
-        return;
+      if (isSegmentInput) {
+        const isEnterWithHighlight = e.key === 'Enter' && activeIndexRef.current >= 0;
+        const isNavOrClose =
+          e.key === 'Escape' || e.key === 'ArrowDown' || e.key === 'ArrowUp';
+        if (!isNavOrClose && !isEnterWithHighlight) return;
+      }
 
       // ── Focus is on the input ─────────────────────────────
       const {

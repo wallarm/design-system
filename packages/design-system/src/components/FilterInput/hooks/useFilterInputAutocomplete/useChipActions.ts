@@ -9,7 +9,7 @@ interface UseChipActionsDeps {
   inputRef: RefObject<HTMLInputElement | null>;
   removeCondition: (chipId: string) => void;
   clearAll: () => void;
-  resetMenuOffset: () => void;
+  resetMenuAnchor: () => void;
   resetState: () => void;
   setInsertIndex: Dispatch<SetStateAction<number | null>>;
   setInsertAfterConnector: Dispatch<SetStateAction<boolean>>;
@@ -28,7 +28,7 @@ export const useChipActions = ({
   inputRef,
   removeCondition,
   clearAll,
-  resetMenuOffset,
+  resetMenuAnchor,
   resetState,
   setInsertIndex,
   setInsertAfterConnector,
@@ -41,13 +41,13 @@ export const useChipActions = ({
         setInsertIndex(prev => (prev != null ? prev - 1 : prev));
       }
       removeCondition(chipId);
-      resetMenuOffset();
+      resetMenuAnchor();
       setMenuState('closed');
       inputRef.current?.focus();
     },
     [
       removeCondition,
-      resetMenuOffset,
+      resetMenuAnchor,
       inputRef,
       effectiveInsertIndexRef,
       setInsertIndex,
@@ -74,13 +74,13 @@ export const useChipActions = ({
       flushSync(() => {
         setInsertIndex(conditionIndex);
         setInsertAfterConnector(afterConnector);
-        resetMenuOffset();
+        resetMenuAnchor();
         setMenuState('closed');
       });
       setMenuState('field');
       inputRef.current?.focus();
     },
-    [resetState, resetMenuOffset, inputRef, setInsertIndex, setInsertAfterConnector, setMenuState],
+    [resetState, resetMenuAnchor, inputRef, setInsertIndex, setInsertAfterConnector, setMenuState],
   );
 
   const closeAutocompleteMenu = useCallback(() => {

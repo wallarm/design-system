@@ -10,22 +10,30 @@
 export const isMenuRelated = (el: HTMLElement | null): boolean =>
   !!el?.closest('[data-filter-input-menu]');
 
+export interface AnchorBounds {
+  top: number;
+  bottom: number;
+  left: number;
+}
+
 /**
- * Build a DOMRect-compatible object anchored vertically to the container
- * and horizontally to the given left position. Used by all FilterInput dropdowns
- * so they share the same vertical gap from the container bottom edge.
+ * Build a DOMRect-compatible object from the active anchor element's vertical
+ * bounds and left edge, keeping the right edge at the container's right so the
+ * dropdown can still expand to the full container width. Used by all FilterInput
+ * dropdowns so they sit flush below the element the user is interacting with
+ * (chip segment, building chip or input) rather than below the whole container.
  */
-export const buildContainerAnchoredRect = (
+export const buildAnchoredRect = (
+  anchor: AnchorBounds,
   containerRect: DOMRect,
-  anchorLeft: number,
   anchorRight = containerRect.right,
 ) => ({
-  x: anchorLeft,
-  y: containerRect.top,
-  width: anchorRight - anchorLeft,
-  height: containerRect.height,
-  top: containerRect.top,
-  bottom: containerRect.bottom,
-  left: anchorLeft,
+  x: anchor.left,
+  y: anchor.top,
+  width: anchorRight - anchor.left,
+  height: anchor.bottom - anchor.top,
+  top: anchor.top,
+  bottom: anchor.bottom,
+  left: anchor.left,
   right: anchorRight,
 });

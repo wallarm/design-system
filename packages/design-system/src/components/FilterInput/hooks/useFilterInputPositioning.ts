@@ -1,23 +1,25 @@
 import type { RefObject } from 'react';
 import { useMemo } from 'react';
-import { buildContainerAnchoredRect, QUERY_BAR_SELECTOR } from '../lib';
+import { type AnchorBounds, buildAnchoredRect, QUERY_BAR_SELECTOR } from '../lib';
 
 interface UseFilterInputPositioningProps {
   /** Ref to the trigger element (used for X anchor and container lookup via closest) */
   anchorRef?: RefObject<HTMLElement | null>;
   /** Explicit container ref (skips closest lookup) */
   containerRef?: RefObject<HTMLElement | null>;
-  /** Override horizontal anchor calculation (receives containerRect, returns left px) */
-  getAnchorLeft?: (containerRect: DOMRect) => number;
+  /** Override anchor calculation (receives containerRect, returns vertical/left bounds) */
+  getAnchorBounds?: (containerRect: DOMRect) => AnchorBounds;
 }
 
 /**
  * Shared positioning hook for all FilterInput dropdowns.
- * Anchors vertically to the query bar container and horizontally to the trigger element.
+ * Anchors the dropdown to the active element (chip segment, building chip, input
+ * or trigger) so it sits flush below the element being interacted with. Falls
+ * back to the trigger element's rect, then to the query bar container.
  * @param deps - extra values that force positioning recalculation (e.g. insertIndex)
  */
 export const useFilterInputPositioning = (
-  { anchorRef, containerRef, getAnchorLeft }: UseFilterInputPositioningProps,
+  { anchorRef, containerRef, getAnchorBounds }: UseFilterInputPositioningProps,
   deps: unknown[] = [],
 ) =>
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -31,13 +33,27 @@ export const useFilterInputPositioning = (
         const containerRect = containerEl?.getBoundingClientRect();
         if (!containerRect) return null;
 
-        const left = getAnchorLeft
-          ? getAnchorLeft(containerRect)
-          : (anchorRef?.current?.getBoundingClientRect().left ?? containerRect.left);
+        let anchor: AnchorBounds;
+        if (getAnchorBounds) {
+          anchor = getAnchorBounds(containerRect);
+        } else if (anchorRef?.current) {
+          const triggerRect = anchorRef.current.getBoundingClientRect();
+          anchor = {
+            top: triggerRect.top,
+            bottom: triggerRect.bottom,
+            left: triggerRect.left,
+          };
+        } else {
+          anchor = {
+            top: containerRect.top,
+            bottom: containerRect.bottom,
+            left: containerRect.left,
+          };
+        }
 
-        return buildContainerAnchoredRect(containerRect, left);
+        return buildAnchoredRect(anchor, containerRect);
       },
     }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [anchorRef, containerRef, getAnchorLeft, ...deps],
+    [anchorRef, containerRef, getAnchorBounds, ...deps],
   );

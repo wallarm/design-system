@@ -1,4 +1,3 @@
-import type { RefObject } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
@@ -20,8 +19,7 @@ interface UseChipEditingOptions {
   conditions: Condition[];
   chips: FilterInputChipData[];
   fields: FieldMetadata[];
-  containerRef: RefObject<HTMLElement | null>;
-  setMenuOffset: (offset: number) => void;
+  setMenuAnchor: (el: HTMLElement | null) => void;
   setSelectedField: (field: FieldMetadata | null) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
   setMenuState: (state: MenuState) => void;
@@ -67,8 +65,7 @@ export const useChipEditing = ({
   conditions,
   chips,
   fields,
-  containerRef,
-  setMenuOffset,
+  setMenuAnchor,
   setSelectedField,
   setSelectedOperator,
   setMenuState,
@@ -88,9 +85,9 @@ export const useChipEditing = ({
   const fieldsRef = useRef(fields);
   fieldsRef.current = fields;
 
-  /** Handle chip segment click — receives pre-computed segment and anchorRect from FilterInputChip */
+  /** Handle chip segment click — receives pre-computed segment and anchor element from FilterInputChip */
   const handleChipClick = useCallback(
-    (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => {
+    (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => {
       const condition = getConditionByChipId(chipId, conditionsRef.current);
       if (!condition) return;
 
@@ -121,8 +118,7 @@ export const useChipEditing = ({
         upsertCondition(field, condition.operator, condition.value, chipId);
       }
 
-      const containerRect = containerRef.current?.getBoundingClientRect();
-      setMenuOffset(containerRect ? anchorRect.left - containerRect.left : 0);
+      setMenuAnchor(anchorEl);
       setEditingChipId(chipId);
       setSelectedField(field ?? null);
 
@@ -149,14 +145,7 @@ export const useChipEditing = ({
 
       setMenuState(SEGMENT_TO_MENU[targetSegment]);
     },
-    [
-      containerRef,
-      setMenuOffset,
-      setSelectedField,
-      setSelectedOperator,
-      setMenuState,
-      upsertCondition,
-    ],
+    [setMenuAnchor, setSelectedField, setSelectedOperator, setMenuState, upsertCondition],
   );
 
   const clearEditing = useCallback(() => {

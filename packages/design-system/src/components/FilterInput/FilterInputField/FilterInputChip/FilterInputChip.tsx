@@ -25,7 +25,7 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
   /** When true, the chip cannot be edited or removed (dimmed appearance) */
   disabled?: boolean;
   onRemove?: () => void;
-  onSegmentClick?: (segment: ChipSegment, anchorRect: DOMRect) => void;
+  onSegmentClick?: (segment: ChipSegment, anchorEl: HTMLElement) => void;
 }
 
 export const FilterInputChip: FC<FilterInputChipProps> = ({
@@ -64,12 +64,15 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       if (!onSegmentClick) return;
       if (activeSegment === segment) return;
       e.stopPropagation();
-      const anchorEl =
-        segment === SEGMENT_VARIANT.attribute
-          ? internalRef.current
-          : (e.currentTarget as HTMLElement);
+      // Anchor the dropdown to the chip itself rather than the specific segment.
+      // Segments can be removed from the DOM mid-cascade (e.g. Backspace on
+      // value clears the value segment, then the operator one). If the dropdown
+      // were anchored to a now-detached segment the floating position falls back
+      // to a stale rect and the menu visibly jumps. The chip element stays
+      // mounted for the entire edit, so anchoring to it keeps the menu stable.
+      const anchorEl = internalRef.current;
       if (!anchorEl) return;
-      onSegmentClick(segment, anchorEl.getBoundingClientRect());
+      onSegmentClick(segment, anchorEl);
     },
     [onSegmentClick, activeSegment],
   );

@@ -31,7 +31,7 @@ interface UseFocusManagementDeps {
   hasIncompleteBuilding: () => boolean;
   setIsFocused: (focused: boolean) => void;
   setMenuState: (state: MenuState) => void;
-  resetMenuOffset: () => void;
+  resetMenuAnchor: () => void;
   resetState: (continueBuilding?: boolean) => void;
 }
 
@@ -53,7 +53,7 @@ export const useFocusManagement = ({
   hasIncompleteBuilding,
   setIsFocused,
   setMenuState,
-  resetMenuOffset,
+  resetMenuAnchor,
   resetState,
 }: UseFocusManagementDeps) => {
   const handleFocus = useCallback(
@@ -150,10 +150,10 @@ export const useFocusManagement = ({
       return;
     }
     if (selectedField) {
-      resetMenuOffset();
+      resetMenuAnchor();
       setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
     } else if (conditionsLength === 0 && inputText === '') {
-      resetMenuOffset();
+      resetMenuAnchor();
       setMenuState('field');
     }
     prevFocusedRef.current = isFocused;
@@ -164,7 +164,7 @@ export const useFocusManagement = ({
     selectedField,
     selectedOperator,
     editingSegment,
-    resetMenuOffset,
+    resetMenuAnchor,
     setMenuState,
   ]);
 

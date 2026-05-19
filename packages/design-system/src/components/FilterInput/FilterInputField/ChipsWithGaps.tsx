@@ -61,7 +61,7 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
             onSegmentClick={
               chip.disabled
                 ? undefined
-                : (segment, anchorRect) => onChipClick(chip.id, segment, anchorRect)
+                : (segment, anchorEl) => onChipClick(chip.id, segment, anchorEl)
             }
           />
         </div>,

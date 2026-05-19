@@ -9,7 +9,7 @@ interface UseResetStateDeps {
   dateRange: { reset: () => void };
   containerRef: RefObject<HTMLElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
-  resetMenuOffset: () => void;
+  resetMenuAnchor: () => void;
   setInputText: Dispatch<SetStateAction<string>>;
   setSelectedField: Dispatch<SetStateAction<FieldMetadata | null>>;
   setSelectedOperator: Dispatch<SetStateAction<FilterOperator | null>>;
@@ -44,7 +44,7 @@ export const useResetState = ({
   dateRange,
   containerRef,
   inputRef,
-  resetMenuOffset,
+  resetMenuAnchor,
   setInputText,
   setSelectedField,
   setSelectedOperator,
@@ -64,7 +64,7 @@ export const useResetState = ({
         setBuildingMultiValue(undefined);
         setInsertIndex(null);
         setInsertAfterConnector(false);
-        resetMenuOffset();
+        resetMenuAnchor();
         setMenuState('closed');
       };
 
@@ -88,7 +88,7 @@ export const useResetState = ({
       dateRange,
       inputRef,
       containerRef,
-      resetMenuOffset,
+      resetMenuAnchor,
       setInputText,
       setSelectedField,
       setSelectedOperator,

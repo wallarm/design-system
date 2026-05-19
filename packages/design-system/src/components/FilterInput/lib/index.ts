@@ -19,7 +19,7 @@ export {
   QUERY_BAR_SELECTOR,
   VARIANT_LABELS,
 } from './constants';
-export { buildContainerAnchoredRect, isMenuRelated } from './dom';
+export { type AnchorBounds, buildAnchoredRect, isMenuRelated } from './dom';
 export { findOptionByValue, getFieldValues, hasFieldValues, hasStaticAllowlist } from './fields';
 export { filterAndSort } from './filterSort';
 export { getCurrentValueTokenText, getValueFilterText } from './menuFilterText';

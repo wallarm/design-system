@@ -67,6 +67,12 @@ export const useChipCascade = ({
   setBuildingMultiValue,
   setInsertIndex,
 }: UseChipCascadeOptions) => {
+  // Menu repositioning during cascade is handled automatically: the dropdown
+  // is anchored to the chip element (not the individual segment), so walking
+  // between sibling segments of the same chip doesn't require an explicit
+  // reposition step. The chip's ResizeObserver in useMenuPositioning catches
+  // any width shift caused by the segment swap and triggers a recompute.
+
   const switchEditSegment = useCallback(
     (targetSegment: ChipSegment): boolean => {
       const sourceSegment = editing.editingSegment;

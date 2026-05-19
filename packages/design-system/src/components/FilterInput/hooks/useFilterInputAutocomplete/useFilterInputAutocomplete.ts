@@ -84,7 +84,7 @@ export const useFilterInputAutocomplete = ({
 
   // ── Child hooks ───────────────────────────────────────────
 
-  const { menuPositioning, setMenuOffset, resetMenuOffset } = useMenuPositioning({
+  const { menuPositioning, setMenuAnchor, resetMenuAnchor } = useMenuPositioning({
     containerRef,
     buildingChipRef,
     inputRef,
@@ -96,8 +96,7 @@ export const useFilterInputAutocomplete = ({
     conditions,
     chips,
     fields,
-    containerRef,
-    setMenuOffset,
+    setMenuAnchor,
     setSelectedField,
     setSelectedOperator,
     setMenuState,
@@ -111,7 +110,7 @@ export const useFilterInputAutocomplete = ({
     dateRange,
     containerRef,
     inputRef,
-    resetMenuOffset,
+    resetMenuAnchor,
     setInputText,
     setSelectedField,
     setSelectedOperator,
@@ -185,7 +184,7 @@ export const useFilterInputAutocomplete = ({
     setInputText,
     setMenuState,
     setInsertIndex,
-    resetMenuOffset,
+    resetMenuAnchor,
     removeConditionAtIndex,
     handleFieldSelect,
     handleOperatorSelect,
@@ -223,7 +222,7 @@ export const useFilterInputAutocomplete = ({
     hasIncompleteBuilding,
     setIsFocused,
     setMenuState,
-    resetMenuOffset,
+    resetMenuAnchor,
     resetState,
   });
 
@@ -232,7 +231,7 @@ export const useFilterInputAutocomplete = ({
     inputRef,
     removeCondition,
     clearAll,
-    resetMenuOffset,
+    resetMenuAnchor,
     resetState,
     setInsertIndex,
     setInsertAfterConnector,
@@ -316,10 +315,9 @@ export const useFilterInputAutocomplete = ({
    * handleOperatorSelect.
    */
   const handleBuildingChipClick = useCallback(
-    (segment: ChipSegment, anchorRect: DOMRect) => {
+    (segment: ChipSegment, anchorEl: HTMLElement) => {
       if (!selectedField) return;
-      const containerRect = containerRef.current?.getBoundingClientRect();
-      setMenuOffset(containerRect ? anchorRect.left - containerRect.left : 0);
+      setMenuAnchor(anchorEl);
       const initialText = getInitialSegmentText(
         segment,
         selectedField,
@@ -330,7 +328,7 @@ export const useFilterInputAutocomplete = ({
       setInputText('');
       setMenuState(SEGMENT_TO_MENU[segment]);
     },
-    [selectedField, selectedOperator, buildingMultiValue, containerRef, setMenuOffset, editing],
+    [selectedField, selectedOperator, buildingMultiValue, setMenuAnchor, editing],
   );
 
   // ── Public API ────────────────────────────────────────────

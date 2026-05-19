@@ -27,7 +27,7 @@ interface UseInputHandlersDeps {
   setInputText: (text: string) => void;
   setMenuState: (state: MenuState) => void;
   setInsertIndex: (fn: (prev: number | null) => number) => void;
-  resetMenuOffset: () => void;
+  resetMenuAnchor: () => void;
   removeConditionAtIndex: (index: number) => void;
   handleFieldSelect: (field: FieldMetadata) => void;
   handleOperatorSelect: (operator: FilterOperator) => void;
@@ -53,7 +53,7 @@ export const useInputHandlers = ({
   setInputText,
   setMenuState,
   setInsertIndex,
-  resetMenuOffset,
+  resetMenuAnchor,
   removeConditionAtIndex,
   handleFieldSelect,
   handleOperatorSelect,
@@ -89,9 +89,9 @@ export const useInputHandlers = ({
     if (menuState !== 'closed') return;
     // Either start a fresh chip (no building yet) or resume an in-progress
     // one at the next missing segment — the helper handles both.
-    resetMenuOffset();
+    resetMenuAnchor();
     setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
-  }, [menuState, selectedField, selectedOperator, resetMenuOffset, inputRef, setMenuState]);
+  }, [menuState, selectedField, selectedOperator, resetMenuAnchor, inputRef, setMenuState]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -103,7 +103,7 @@ export const useInputHandlers = ({
           // / 'operator' / 'field' depending on the in-progress building chip,
           // matching the behavior of the refocus path in useFocusManagement.
           e.preventDefault();
-          resetMenuOffset();
+          resetMenuAnchor();
           setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
           return;
         }
@@ -200,7 +200,7 @@ export const useInputHandlers = ({
           // Enter selects it. Without this the menu would stay closed and
           // a single ArrowDown would only open it, requiring a second
           // press to highlight before Enter could select anything.
-          resetMenuOffset();
+          resetMenuAnchor();
           setMenuState('field');
         }
       }
@@ -222,7 +222,7 @@ export const useInputHandlers = ({
       conditionsLengthRef,
       effectiveInsertIndexRef,
       stepBackBuildingMenu,
-      resetMenuOffset,
+      resetMenuAnchor,
     ],
   );
 

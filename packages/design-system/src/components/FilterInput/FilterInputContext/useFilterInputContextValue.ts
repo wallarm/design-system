@@ -11,8 +11,8 @@ interface AutocompleteForContext {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleInputClick: () => void;
-  handleChipClick: (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => void;
-  handleBuildingChipClick: (segment: ChipSegment, anchorRect: DOMRect) => void;
+  handleChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
+  handleBuildingChipClick: (segment: ChipSegment, anchorEl: HTMLElement) => void;
   switchEditSegment: (targetSegment: ChipSegment) => boolean;
   removeEditingChip: () => void;
   handleConnectorChange: (chipId: string, value: 'and' | 'or') => void;
