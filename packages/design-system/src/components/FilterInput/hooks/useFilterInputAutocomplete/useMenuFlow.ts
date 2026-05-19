@@ -109,6 +109,18 @@ export const useMenuFlow = ({
         const idx = chipIdToConditionIndex(editing.editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
         if (condition) {
+          // Post-cascade incomplete chip (operator was cleared by Backspace
+          // cascade): keep inline-edit alive on the same chip and continue
+          // building inline — transition to operator selection.
+          if (!condition.operator) {
+            upsertCondition(field, undefined, null, editing.editingChipId);
+            setSelectedField(field);
+            setSelectedOperator(null);
+            editing.setEditingSegment(SEGMENT_VARIANT.operator);
+            editing.setSegmentFilterText('');
+            setMenuState('operator');
+            return;
+          }
           const hasValueError = validateValueForField(field, condition.value);
           upsertCondition(
             field,
@@ -409,33 +421,27 @@ export const useMenuFlow = ({
       if (!condition) return;
 
       if (matchedField) {
-        const hasValueError = validateValueForField(matchedField, condition.value);
-        upsertCondition(
-          matchedField,
-          condition.operator,
-          condition.value,
-          editing.editingChipId,
-          undefined,
-          hasValueError ? SEGMENT_VARIANT.value : undefined,
-          condition.dateOrigin,
-        );
-      } else {
-        // Unknown field — create a synthetic FieldMetadata and mark attribute as error
-        const syntheticField: FieldMetadata = {
-          name: trimmed,
-          label: trimmed,
-          type: 'string',
-        };
-        upsertCondition(
-          syntheticField,
-          condition.operator,
-          condition.value,
-          editing.editingChipId,
-          undefined,
-          SEGMENT_VARIANT.attribute,
-          condition.dateOrigin,
-        );
+        // Route through handleFieldSelect so post-cascade (incomplete chip)
+        // logic is shared — keeps inline-edit alive and transitions to
+        // operator selection when operator was previously cleared.
+        handleFieldSelect(matchedField);
+        return;
       }
+      // Unknown field — create a synthetic FieldMetadata and mark attribute as error
+      const syntheticField: FieldMetadata = {
+        name: trimmed,
+        label: trimmed,
+        type: 'string',
+      };
+      upsertCondition(
+        syntheticField,
+        condition.operator,
+        condition.value,
+        editing.editingChipId,
+        undefined,
+        SEGMENT_VARIANT.attribute,
+        condition.dateOrigin,
+      );
       resetState();
     },
     [editing, fields, upsertCondition, resetState, handleFieldSelect],

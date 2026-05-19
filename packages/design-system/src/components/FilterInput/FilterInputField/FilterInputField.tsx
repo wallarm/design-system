@@ -44,6 +44,8 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     onCustomValueCommit,
     onCustomAttributeCommit,
     onCustomOperatorCommit,
+    onSwitchEditSegment,
+    onRemoveEditingChip,
     menuRef,
   } = useFilterInputContext();
 
@@ -70,6 +72,35 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
         e.preventDefault();
         onCancelSegmentEdit();
         return;
+      }
+      if (e.key === 'Backspace' && segmentFilterText === '') {
+        // Empty-segment Backspace: walk back through chip segments. On the
+        // attribute when operator+value are absent — remove the chip entirely.
+        // Otherwise move inline-edit to the previous segment (cursor lands at
+        // the end of its text on the next render); the user's next keystroke
+        // edits that segment normally.
+        if (editingSegment === SEGMENT_VARIANT.attribute) {
+          const chipForEdit = editingChipId
+            ? chips.find(c => c.id === editingChipId && c.variant === 'chip')
+            : null;
+          const operator = chipForEdit?.operator ?? buildingChipData?.operator ?? '';
+          const value = chipForEdit?.value ?? buildingChipData?.value ?? '';
+          if (!operator && !value) {
+            e.preventDefault();
+            onRemoveEditingChip();
+          }
+          return;
+        }
+        if (editingSegment === SEGMENT_VARIANT.operator) {
+          e.preventDefault();
+          onSwitchEditSegment(SEGMENT_VARIANT.attribute);
+          return;
+        }
+        if (editingSegment === SEGMENT_VARIANT.value) {
+          e.preventDefault();
+          onSwitchEditSegment(SEGMENT_VARIANT.operator);
+          return;
+        }
       }
       if (e.key === 'Enter' && !e.defaultPrevented) {
         if (editingSegment === SEGMENT_VARIANT.value) {
@@ -100,6 +131,11 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
       onCustomValueCommit,
       onCustomAttributeCommit,
       onCustomOperatorCommit,
+      onSwitchEditSegment,
+      onRemoveEditingChip,
+      editingChipId,
+      chips,
+      buildingChipData,
       menuRef,
     ],
   );

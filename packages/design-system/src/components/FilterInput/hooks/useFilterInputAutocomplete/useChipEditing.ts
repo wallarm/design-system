@@ -183,6 +183,18 @@ export const useChipEditing = ({
     setUserHasTyped(false);
   }, []);
 
+  /**
+   * Switch the inline-edit target to a different segment of the *same*
+   * committed chip — keeps editingChipId, resets the typed-flag so the
+   * dropdown widens back to all options. For building-chip switches use
+   * `startBuildingEdit` instead (which also clears editingChipId).
+   */
+  const switchEditSegment = useCallback((segment: ChipSegment, currentText: string) => {
+    setEditingSegment(segment);
+    setSegmentFilterText(currentText);
+    setUserHasTyped(false);
+  }, []);
+
   /** Wraps setSegmentFilterText to track user typing */
   const handleSegmentFilterChange = useCallback((text: string) => {
     setSegmentFilterText(text);
@@ -213,6 +225,7 @@ export const useChipEditing = ({
       resetSegmentTyping,
       handleChipClick,
       startBuildingEdit,
+      switchEditSegment,
       clearEditing,
     }),
     [
@@ -224,6 +237,7 @@ export const useChipEditing = ({
       resetSegmentTyping,
       handleChipClick,
       startBuildingEdit,
+      switchEditSegment,
       clearEditing,
     ],
   );

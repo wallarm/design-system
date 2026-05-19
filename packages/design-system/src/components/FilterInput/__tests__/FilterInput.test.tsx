@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { FilterInput } from '../FilterInput';
@@ -586,6 +586,167 @@ describe('FilterInput', () => {
       expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
       expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is set');
       expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('—');
+    });
+  });
+
+  describe('Backspace cascade in chip segments', () => {
+    // Pins the cascading-Backspace UX:
+    //   1) Empty inline-edit + Backspace walks one segment to the left
+    //      (value → operator → attribute), erasing the source segment's
+    //      data so it does not re-appear on the next render.
+    //   2) Once the cascade reaches an empty attribute (op/value already
+    //      cleared) the chip is removed entirely.
+    //   3) From the main input during building, the same Backspace lands
+    //      the user in inline-edit of the previous segment with its text
+    //      pre-selected — so a single Backspace wipes the segment.
+    const fields: FieldMetadata[] = [
+      {
+        name: 'status',
+        label: 'Status',
+        type: 'enum',
+        values: [
+          { value: 'active', label: 'Active' },
+          { value: 'pending', label: 'Pending' },
+        ],
+      },
+    ];
+
+    // Segment.tsx uses double-rAF to focus its input on enter-edit; userEvent
+    // does not block on those rAFs between events, so in tests we drive the
+    // segment input directly. fireEvent.change empties it (the browser would
+    // do this via select-all + Backspace), then a keyDown triggers the
+    // empty-segment cascade. This keeps the assertions on the real handler
+    // chain without depending on real-time rAF callbacks.
+    const pressBackspaceOn = (el: HTMLElement) => {
+      (el as HTMLInputElement).focus();
+      fireEvent.keyDown(el, { key: 'Backspace', code: 'Backspace' });
+    };
+    const clearSegment = (label: string) => {
+      const segInput = screen.getByLabelText(label) as HTMLInputElement;
+      fireEvent.change(segInput, { target: { value: '' } });
+      pressBackspaceOn(segInput);
+    };
+
+    it('cascades from value inline-edit to operator on empty Backspace and clears the value', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <FilterInput
+          fields={fields}
+          value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Edit filter value/i }));
+      clearSegment('Filter value');
+
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      // Operator is now in inline-edit (its <input> is rendered).
+      expect(chip.querySelector('[data-slot="segment-operator"] input')).not.toBeNull();
+      // Value segment is gone — the chip data was cleared on cascade so it
+      // does not re-render its previous committed text.
+      expect(chip.querySelector('[data-slot="segment-value"]')).toBeNull();
+    });
+
+    it('removes the chip when the cascade reaches an empty attribute', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <FilterInput
+          fields={fields}
+          value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Edit filter value/i }));
+      clearSegment('Filter value');
+      clearSegment('Filter operator');
+      clearSegment('Filter attribute');
+
+      expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
+    });
+
+    it('does not remove the chip when Backspace empties attribute while operator and value are still present', async () => {
+      const user = userEvent.setup();
+      const { container } = render(
+        <FilterInput
+          fields={fields}
+          value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Edit filter attribute/i }));
+      clearSegment('Filter attribute');
+
+      // Operator/value still committed — cascade off attribute is suppressed.
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+      expect(chip).not.toBeNull();
+    });
+
+    it('keeps inline-edit alive when a field is selected after the chip was cascaded clear', async () => {
+      // After cascading through all segments the committed chip has no
+      // operator/value; selecting a field must NOT commit it as
+      // attribute-only — it should transition to operator selection so the
+      // user can finish building.
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(
+        <FilterInput
+          fields={fields}
+          value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
+          onChange={onChange}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Edit filter value/i }));
+      clearSegment('Filter value');
+      clearSegment('Filter operator');
+
+      // Attribute is now in inline-edit and field menu is open. Pick "Status".
+      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+
+      // The operator menu must open — confirmed by the operator menuitem.
+      expect(await screen.findByRole('menuitem', { name: /^is =$/ })).toBeInTheDocument();
+    });
+
+    it('steps back from the value menu into operator inline-edit when main-input Backspace fires on empty input', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<FilterInput fields={fields} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
+
+      // After picking operator the live combobox is the ChipSearchInput
+      // inside the building chip — the original FilterInputSearch is
+      // unmounted. Re-query so we drive a node still in the React tree.
+      pressBackspaceOn(screen.getByRole('combobox'));
+
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(chip.querySelector('[data-slot="segment-operator"] input')).not.toBeNull();
+    });
+
+    it('steps back from the operator menu into attribute inline-edit when main-input Backspace fires on empty input', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<FilterInput fields={fields} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+
+      pressBackspaceOn(screen.getByRole('combobox'));
+
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(chip.querySelector('[data-slot="segment-attribute"] input')).not.toBeNull();
+    });
+
+    it('removes the building chip when the attribute is wiped via the step-back-into-edit cascade', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<FilterInput fields={fields} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+      pressBackspaceOn(screen.getByRole('combobox'));
+      clearSegment('Filter attribute');
+
+      expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
     });
   });
 });

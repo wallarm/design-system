@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
-import { applyAcceptChar, getOperatorLabel } from '../../lib';
+import { applyAcceptChar, chipIdToConditionIndex, getOperatorLabel } from '../../lib';
 import type {
   Condition,
   FieldMetadata,
@@ -150,6 +150,44 @@ export const useFilterInputAutocomplete = ({
     setBuildingMultiValue,
   });
 
+  /**
+   * Main-input Backspace cascade for the building chip: drop into inline-edit
+   * on the previous segment with its current text pre-selected (consistent
+   * with the segment-click + cascade flow). User can immediately Backspace to
+   * wipe the segment and continue cascading; when the attribute segment is
+   * wiped via that flow, removeEditingChip tears the building chip down.
+   * At the field step (only attribute, no segment to step into) tear the
+   * whole building down directly.
+   */
+  const stepBackBuildingMenu = useCallback(
+    (current: 'field' | 'operator' | 'value') => {
+      if (!selectedField) {
+        resetState();
+        return;
+      }
+      if (current === 'value') {
+        setBuildingMultiValue(undefined);
+        setInputText('');
+        const operatorText = selectedOperator
+          ? getOperatorLabel(selectedOperator, selectedField.type)
+          : '';
+        editing.startBuildingEdit(SEGMENT_VARIANT.operator, operatorText);
+        setMenuState('operator');
+        return;
+      }
+      if (current === 'operator') {
+        setSelectedOperator(null);
+        setBuildingMultiValue(undefined);
+        setInputText('');
+        editing.startBuildingEdit(SEGMENT_VARIANT.attribute, selectedField.label);
+        setMenuState('field');
+        return;
+      }
+      resetState();
+    },
+    [selectedField, selectedOperator, editing, resetState],
+  );
+
   const { handleInputChange, handleInputClick, handleKeyDown, menuRef } = useInputHandlers({
     inputText,
     menuState,
@@ -169,6 +207,7 @@ export const useFilterInputAutocomplete = ({
     handleFieldSelect,
     handleOperatorSelect,
     handleCustomValueCommit,
+    stepBackBuildingMenu,
   });
 
   const { commitBuildingOnBlur, hasIncompleteBuilding } = useBlurCommit({
@@ -293,6 +332,110 @@ export const useFilterInputAutocomplete = ({
    * only when the user actually picks a new value via handleFieldSelect /
    * handleOperatorSelect.
    */
+  /**
+   * Walk inline-edit one segment to the left within the chip currently being
+   * edited (Backspace on an empty segment input). The source segment's
+   * underlying chip data is cleared so the deletion persists past the switch
+   * (otherwise the just-emptied segment would re-render its committed text).
+   * For committed chips the value-clear is routed through upsertCondition;
+   * leaving operator also clears value since value shape depends on operator.
+   * Returns true if a switch was performed.
+   */
+  const switchEditSegment = useCallback(
+    (targetSegment: ChipSegment): boolean => {
+      const sourceSegment = editing.editingSegment;
+      if (sourceSegment === null) return false;
+      const isBuildingEdit = !editing.editingChipId;
+      const menuForSegment: Record<ChipSegment, MenuState> = {
+        attribute: 'field',
+        operator: 'operator',
+        value: 'value',
+      };
+
+      if (isBuildingEdit) {
+        if (!selectedField) return false;
+        // Clear chip data for the segment we're leaving so it doesn't re-appear.
+        if (sourceSegment === SEGMENT_VARIANT.value) {
+          setBuildingMultiValue(undefined);
+        } else if (sourceSegment === SEGMENT_VARIANT.operator) {
+          setSelectedOperator(null);
+          setBuildingMultiValue(undefined);
+        }
+        const initialText =
+          targetSegment === SEGMENT_VARIANT.attribute
+            ? selectedField.label
+            : targetSegment === SEGMENT_VARIANT.operator
+              ? selectedOperator
+                ? getOperatorLabel(selectedOperator, selectedField.type)
+                : ''
+              : (buildingMultiValue ?? '');
+        editing.startBuildingEdit(targetSegment, initialText);
+        setInputText('');
+        setMenuState(menuForSegment[targetSegment]);
+        return true;
+      }
+
+      const editingId = editing.editingChipId!;
+      const chip = chips.find(c => c.id === editingId);
+      if (!chip || chip.variant !== 'chip') return false;
+      const idx = chipIdToConditionIndex(editingId);
+      const condition = idx !== null ? conditionsRef.current[idx] : null;
+      const field = condition ? fields.find(f => f.name === condition.field) : null;
+
+      // Clear chip data for the segment we're leaving. Without a field we
+      // can't upsert, so fall back to a plain segment switch in that case.
+      if (condition && field) {
+        if (sourceSegment === SEGMENT_VARIANT.value) {
+          upsertCondition(
+            field,
+            condition.operator,
+            null,
+            editingId,
+            undefined,
+            undefined,
+            condition.dateOrigin,
+          );
+        } else if (sourceSegment === SEGMENT_VARIANT.operator) {
+          upsertCondition(field, undefined, null, editingId, undefined, undefined, undefined);
+        }
+      }
+
+      // Load the target segment's still-present text into the inline-edit so
+      // the next Backspace deletes a char of it (per "gap then deletion" spec).
+      const targetText =
+        targetSegment === SEGMENT_VARIANT.attribute
+          ? (chip.attribute ?? '')
+          : targetSegment === SEGMENT_VARIANT.operator
+            ? (chip.operator ?? '')
+            : '';
+      editing.switchEditSegment(targetSegment, targetText);
+      setMenuState(menuForSegment[targetSegment]);
+      return true;
+    },
+    [editing, selectedField, selectedOperator, buildingMultiValue, chips, fields, upsertCondition],
+  );
+
+  /**
+   * Remove the chip currently being edited (Backspace on an empty attribute
+   * segment when operator/value are absent). Handles both the building flow
+   * (drop in-progress state) and committed chips (remove the condition,
+   * adjusting insertIndex like handleChipRemove does).
+   */
+  const removeEditingChip = useCallback(() => {
+    if (editing.editingSegment === null) return;
+    const editingId = editing.editingChipId;
+    if (!editingId) {
+      resetState();
+      return;
+    }
+    const chipCondIdx = chipIdToConditionIndex(editingId);
+    if (chipCondIdx !== null && chipCondIdx < effectiveInsertIndexRef.current) {
+      setInsertIndex(prev => (prev != null ? prev - 1 : prev));
+    }
+    removeCondition(editingId);
+    resetState();
+  }, [editing, removeCondition, resetState]);
+
   const handleBuildingChipClick = useCallback(
     (segment: ChipSegment, anchorRect: DOMRect) => {
       if (!selectedField) return;
@@ -348,6 +491,8 @@ export const useFilterInputAutocomplete = ({
     resetAutocompleteState: resetState,
     handleChipClick: editing.handleChipClick,
     handleBuildingChipClick,
+    switchEditSegment,
+    removeEditingChip,
     handleConnectorChange: setConnectorValue,
     handleChipRemove,
     handleClear,

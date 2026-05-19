@@ -9,6 +9,8 @@ import {
 } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
+type BuildingStep = 'field' | 'operator' | 'value';
+
 interface UseInputHandlersDeps {
   inputText: string;
   menuState: MenuState;
@@ -30,6 +32,11 @@ interface UseInputHandlersDeps {
   handleFieldSelect: (field: FieldMetadata) => void;
   handleOperatorSelect: (operator: FilterOperator) => void;
   handleCustomValueCommit: (text: string) => void;
+  /** Step the building chip one segment back (value → operator → field).
+   *  Called on Backspace from an empty main input while a building chip is
+   *  alive. At the field step (only attribute remains) it tears the chip
+   *  down entirely. */
+  stepBackBuildingMenu: (current: BuildingStep) => void;
 }
 
 export const useInputHandlers = ({
@@ -51,6 +58,7 @@ export const useInputHandlers = ({
   handleFieldSelect,
   handleOperatorSelect,
   handleCustomValueCommit,
+  stepBackBuildingMenu,
 }: UseInputHandlersDeps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -146,22 +154,32 @@ export const useInputHandlers = ({
         return;
       }
 
-      if (
-        e.key === 'Backspace' &&
-        !e.repeat &&
-        inputText === '' &&
-        conditionsLengthRef.current > 0
-      ) {
-        e.preventDefault();
-        const removeIdx = effectiveInsertIndexRef.current - 1;
-        if (removeIdx >= 0 && !conditionsRef.current[removeIdx]?.disabled) {
-          removeConditionAtIndex(removeIdx);
-          setInsertIndex(prev => {
-            const eff = prev ?? conditionsLengthRef.current;
-            return eff > 0 ? eff - 1 : 0;
-          });
+      if (e.key === 'Backspace' && !e.repeat && inputText === '') {
+        // Building cascade in main input: empty Backspace steps the menu back
+        // (value → operator → field), then tears the building chip down.
+        // Takes precedence over the "remove previous chip" branch — while a
+        // building chip is alive, Backspace navigates within it rather than
+        // jumping to a committed sibling.
+        if (
+          selectedField &&
+          (menuState === 'value' || menuState === 'operator' || menuState === 'field')
+        ) {
+          e.preventDefault();
+          stepBackBuildingMenu(menuState);
+          return;
         }
-        setMenuState('closed');
+        if (conditionsLengthRef.current > 0) {
+          e.preventDefault();
+          const removeIdx = effectiveInsertIndexRef.current - 1;
+          if (removeIdx >= 0 && !conditionsRef.current[removeIdx]?.disabled) {
+            removeConditionAtIndex(removeIdx);
+            setInsertIndex(prev => {
+              const eff = prev ?? conditionsLengthRef.current;
+              return eff > 0 ? eff - 1 : 0;
+            });
+          }
+          setMenuState('closed');
+        }
       }
     },
     [
@@ -179,6 +197,7 @@ export const useInputHandlers = ({
       conditionsRef,
       conditionsLengthRef,
       effectiveInsertIndexRef,
+      stepBackBuildingMenu,
     ],
   );
 

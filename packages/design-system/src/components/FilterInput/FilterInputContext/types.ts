@@ -32,6 +32,12 @@ export interface FilterInputContextValue {
   /** Click on a segment of the *building* (in-progress) chip — re-opens the
    *  corresponding menu and enters inline-edit without committing the chip. */
   onBuildingChipClick: (segment: ChipSegment, anchorRect: DOMRect) => void;
+  /** Switch the inline-edit to a different segment within the chip currently
+   *  being edited — used by Backspace-on-empty to walk back through segments. */
+  onSwitchEditSegment: (targetSegment: ChipSegment) => boolean;
+  /** Remove the chip currently being edited inline — used by Backspace on an
+   *  empty attribute segment when operator/value are absent. */
+  onRemoveEditingChip: () => void;
   onConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   onChipRemove: (chipId: string) => void;
   onClear: () => void;
