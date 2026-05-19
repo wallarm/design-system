@@ -1,7 +1,9 @@
 import type { RefObject } from 'react';
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { type AnchorBounds, toAnchorBounds } from '../../lib';
+import { useAutoCleanupDetachedElement } from '../useAutoCleanupDetachedElement';
 import { useFilterInputPositioning } from '../useFilterInputPositioning';
+import { useFloatingRecomputeOn } from '../useFloatingRecomputeOn';
 import { useResizeTracker } from '../useResizeTracker';
 
 interface UseMenuPositioningOptions {
@@ -27,10 +29,12 @@ interface UseMenuPositioningOptions {
  *   3. Input ref (for the field menu, before a chip exists).
  *   4. Container rect (fallback).
  *
- * The active element is observed by `useResizeTracker` so when its width
- * changes — typing in a segment, segments swapping during cascade — the menu
- * follows. The tick is part of `getAnchorBounds` deps, forcing Ark UI to
- * recompute the floating position.
+ * Three signal sources keep Ark UI in sync with the live anchor:
+ *   - `useResizeTracker` — width changes inside a segment as the user types.
+ *   - `useFloatingRecomputeOn(chipsCount)` — sibling reflow when chips are
+ *     added/removed (no element resized, so the resize observer is silent).
+ *   - `useAutoCleanupDetachedElement` — drops the captured anchor as soon as
+ *     its DOM node leaves the tree (e.g. controlled-value prop removed it).
  */
 export const useMenuPositioning = ({
   containerRef,
@@ -43,31 +47,10 @@ export const useMenuPositioning = ({
   const [editingEl, setMenuAnchor] = useState<HTMLElement | null>(null);
   const resetMenuAnchor = useCallback(() => setMenuAnchor(null), []);
 
-  // Auto-clear the captured anchor as soon as its DOM node leaves the tree.
-  // This catches paths where a chip is removed (Clear button, last Backspace
-  // cascade, controlled-value prop change) but the anchor reset is missed —
-  // without this the dropdown would keep aligning to a stale chip rect on the
-  // next menu open instead of falling through to the input/container anchor.
-  useEffect(() => {
-    if (editingEl && !editingEl.isConnected) setMenuAnchor(null);
-  });
+  useAutoCleanupDetachedElement(editingEl, resetMenuAnchor);
+  useFloatingRecomputeOn(chipsCount);
 
   const tick = useResizeTracker(editingEl, buildingChipRef.current, containerRef.current);
-
-  // Sibling reflow after chip add/remove doesn't change any element's own size,
-  // so ResizeObserver stays silent and floating-ui's autoUpdate (which listens
-  // to scroll + element resize) never triggers — the dropdown lags one paint
-  // behind the cursor. Dispatching a synthetic window resize during the layout
-  // phase pokes floating-ui to recompute synchronously, before the browser
-  // paints the new chip layout, so the menu stays glued to the anchor.
-  //
-  // useLayoutEffect (not useEffect) is load-bearing: useEffect fires after
-  // paint, which is exactly the lag we're trying to remove.
-  useLayoutEffect(() => {
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new Event('resize'));
-    }
-  }, [chipsCount]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: tick is a force-recompute dep
   const getAnchorBounds = useCallback(
