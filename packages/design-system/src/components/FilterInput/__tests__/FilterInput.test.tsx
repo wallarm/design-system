@@ -4,6 +4,15 @@ import { describe, expect, it, vi } from 'vitest';
 import { FilterInput } from '../FilterInput';
 import type { Condition, FieldMetadata, Group } from '../types';
 
+/**
+ * Default findByRole timeout (1s) flakes under CI shard load because Ark UI
+ * defers menu mount a frame after the state transition. Use this helper for
+ * any menuitem we expect to appear after a click that opens or transitions a
+ * menu — it widens the timeout uniformly.
+ */
+const findMenuitem = (name: RegExp | string) =>
+  screen.findByRole('menuitem', { name }, { timeout: 5000 });
+
 const sampleFields = [
   {
     name: 'status',
@@ -284,9 +293,7 @@ describe('FilterInput', () => {
       await waitFor(() => {
         expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
       });
-      expect(
-        await screen.findByRole('menuitem', { name: 'Status' }, { timeout: 2000 }),
-      ).toBeInTheDocument();
+      expect(await findMenuitem('Status')).toBeInTheDocument();
     });
 
     // Defense-in-depth: even if some path leaves the menu closed (e.g. a
@@ -305,9 +312,7 @@ describe('FilterInput', () => {
       input.focus();
       // Now press ArrowDown while menu is closed.
       fireEvent.keyDown(input, { key: 'ArrowDown' });
-      expect(
-        await screen.findByRole('menuitem', { name: 'Status' }, { timeout: 2000 }),
-      ).toBeInTheDocument();
+      expect(await findMenuitem('Status')).toBeInTheDocument();
     });
   });
 
@@ -516,11 +521,10 @@ describe('FilterInput', () => {
     const startBuildingThroughOperator = async (user: ReturnType<typeof userEvent.setup>) => {
       const input = screen.getByRole('combobox');
       await user.click(input);
-      // findByRole (async) — Ark UI menu mount is deferred a frame after the
-      // state transition. CI jsdom under shard load needs the longer timeout
-      // (default 1s; passes locally but flakes intermittently in CI).
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }, { timeout: 5000 }));
-      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }, { timeout: 5000 }));
+      // findMenuitem widens timeout — Ark UI defers menu mount and CI flakes
+      // intermittently on the default 1s.
+      await user.click(await findMenuitem('Status'));
+      await user.click(await findMenuitem(/^is =$/));
     };
 
     it('lets the user reopen the field menu by clicking the building chip attribute', async () => {
@@ -549,7 +553,7 @@ describe('FilterInput', () => {
       // Switch from Status to Role — both are enum/string-shaped, so the
       // previously chosen "is" operator must survive the switch.
       await user.click(await screen.findByRole('button', { name: /Edit filter attribute/i }));
-      await user.click(await screen.findByRole('menuitem', { name: 'Role' }));
+      await user.click(await findMenuitem('Role'));
 
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
       expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Role');
@@ -564,11 +568,11 @@ describe('FilterInput', () => {
       // so switching to Created at must drop the operator.
       const input = screen.getByRole('combobox');
       await user.click(input);
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
-      await user.click(await screen.findByRole('menuitem', { name: /^is any of IN$/ }));
+      await user.click(await findMenuitem('Status'));
+      await user.click(await findMenuitem(/^is any of IN$/));
 
       await user.click(await screen.findByRole('button', { name: /Edit filter attribute/i }));
-      await user.click(await screen.findByRole('menuitem', { name: 'Created at' }));
+      await user.click(await findMenuitem('Created at'));
 
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
       expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Created at');
@@ -623,19 +627,23 @@ describe('FilterInput', () => {
       // Build only filter + operator (no value yet).
       const input = screen.getByRole('combobox');
       await user.click(input);
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
-      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
+      await user.click(await findMenuitem('Status'));
+      await user.click(await findMenuitem(/^is =$/));
 
       // Blur the whole FilterInput by clicking the outside button.
       await user.click(screen.getByRole('button', { name: 'outside' }));
 
       // Building chip survives — attribute + operator visible, no onChange.
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip).toBeInTheDocument();
-      expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
-      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is');
-      // No value segment in the chip — chip is still in `building` state.
-      expect(chip.querySelector('[data-slot="segment-value"]')).toBeNull();
+      // waitFor — the blur path runs through useBlurCommit + resetState
+      // asynchronously; under jsdom load the chip rerender lands a tick later.
+      await waitFor(() => {
+        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+        expect(chip).not.toBeNull();
+        expect(chip!.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
+        expect(chip!.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is');
+        // Chip is still in `building` state — no value segment.
+        expect(chip!.querySelector('[data-slot="segment-value"]')).toBeNull();
+      });
       expect(onChange).not.toHaveBeenCalled();
     });
 
@@ -646,9 +654,9 @@ describe('FilterInput', () => {
 
       const input = screen.getByRole('combobox');
       await user.click(input);
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
-      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
-      await user.click(await screen.findByRole('menuitem', { name: /^Active$/ }));
+      await user.click(await findMenuitem('Status'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.click(await findMenuitem(/^Active$/));
 
       // Single condition committed — onChange called with that condition.
       expect(onChange).toHaveBeenCalled();
@@ -673,8 +681,8 @@ describe('FilterInput', () => {
       // Build attribute + operator, leaving the value missing.
       const input = screen.getByRole('combobox');
       await user.click(input);
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
-      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
+      await user.click(await findMenuitem('Status'));
+      await user.click(await findMenuitem(/^is =$/));
 
       // Blur out, then return focus to the FilterInput's input. The
       // intermediate menu close races with React focus state on slower
@@ -685,9 +693,7 @@ describe('FilterInput', () => {
       // The value menu must be the one that reopens — confirmed by the
       // presence of value items ("Active") from the enum field. The field
       // menu would surface a "Status" menuitem instead.
-      expect(
-        await screen.findByRole('menuitem', { name: /^Active$/ }, { timeout: 5000 }),
-      ).toBeInTheDocument();
+      expect(await findMenuitem(/^Active$/)).toBeInTheDocument();
       expect(screen.queryByRole('menuitem', { name: 'Status' })).toBeNull();
     });
 
@@ -844,10 +850,10 @@ describe('FilterInput', () => {
       clearSegment('Filter operator');
 
       // Attribute is now in inline-edit and field menu is open. Pick "Status".
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+      await user.click(await findMenuitem('Status'));
 
       // The operator menu must open — confirmed by the operator menuitem.
-      expect(await screen.findByRole('menuitem', { name: /^is =$/ })).toBeInTheDocument();
+      expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
     });
 
     it('steps back from the value menu into operator inline-edit when main-input Backspace fires on empty input', async () => {
@@ -855,8 +861,8 @@ describe('FilterInput', () => {
       const { container } = render(<FilterInput fields={fields} />);
 
       await user.click(screen.getByRole('combobox'));
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
-      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
+      await user.click(await findMenuitem('Status'));
+      await user.click(await findMenuitem(/^is =$/));
 
       // After picking operator the live combobox is the ChipSearchInput
       // inside the building chip — the original FilterInputSearch is
@@ -872,12 +878,16 @@ describe('FilterInput', () => {
       const { container } = render(<FilterInput fields={fields} />);
 
       await user.click(screen.getByRole('combobox'));
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+      await user.click(await findMenuitem('Status'));
 
       pressBackspaceOn(screen.getByRole('combobox'));
 
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(chip.querySelector('[data-slot="segment-attribute"] input')).not.toBeNull();
+      // waitFor — the cascade triggers a chain of state updates and React
+      // renders that don't all flush synchronously under jsdom load.
+      await waitFor(() => {
+        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+        expect(chip.querySelector('[data-slot="segment-attribute"] input')).not.toBeNull();
+      });
     });
 
     it('removes the building chip when the attribute is wiped via the step-back-into-edit cascade', async () => {
@@ -885,11 +895,19 @@ describe('FilterInput', () => {
       const { container } = render(<FilterInput fields={fields} />);
 
       await user.click(screen.getByRole('combobox'));
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
+      await user.click(await findMenuitem('Status'));
       pressBackspaceOn(screen.getByRole('combobox'));
+      // Wait for the step-back to land in attribute inline-edit before clearing
+      // it — without this clearSegment runs against the wrong segment under
+      // jsdom load.
+      await waitFor(() => {
+        expect(screen.getByLabelText('Filter attribute')).toBeInTheDocument();
+      });
       clearSegment('Filter attribute');
 
-      expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
+      await waitFor(() => {
+        expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
+      });
     });
   });
 
