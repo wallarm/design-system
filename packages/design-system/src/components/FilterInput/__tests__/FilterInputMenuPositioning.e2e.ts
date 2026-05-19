@@ -19,7 +19,14 @@ test.describe('Component: FilterInput - Menu Positioning', () => {
 
       await expect(chips).toHaveCount(2);
 
-      await input.click();
+      // Dispatch click via DOM — a real pointer click would be intercepted
+      // by the trailing chip's hover-delete overlay. The handler is gated on
+      // `menuState === 'closed'`, not on the focus auto-open path (which
+      // requires zero conditions), so we need a real click event.
+      await input.evaluate(el => {
+        (el as HTMLInputElement).focus();
+        (el as HTMLInputElement).click();
+      });
       await expect(fieldMenu).toBeVisible({ timeout: 5000 });
 
       const inputBefore = await input.boundingBox();
