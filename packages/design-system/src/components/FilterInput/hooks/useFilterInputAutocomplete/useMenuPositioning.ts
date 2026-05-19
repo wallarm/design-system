@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
 import { type AnchorBounds, toAnchorBounds } from '../../lib';
 import { useFilterInputPositioning } from '../useFilterInputPositioning';
 import { useResizeTracker } from '../useResizeTracker';
@@ -52,11 +52,22 @@ export const useMenuPositioning = ({
     if (editingEl && !editingEl.isConnected) setMenuAnchor(null);
   });
 
-  // Container goes first so its child-list mutations (chip add/remove) drive
-  // the MutationObserver inside useResizeTracker — sibling reflow can shift the
-  // building chip / input without changing any element's size, and ResizeObserver
-  // alone would miss that.
-  const tick = useResizeTracker(containerRef.current, editingEl, buildingChipRef.current);
+  const tick = useResizeTracker(editingEl, buildingChipRef.current, containerRef.current);
+
+  // Sibling reflow after chip add/remove doesn't change any element's own size,
+  // so ResizeObserver stays silent and floating-ui's autoUpdate (which listens
+  // to scroll + element resize) never triggers — the dropdown lags one paint
+  // behind the cursor. Dispatching a synthetic window resize during the layout
+  // phase pokes floating-ui to recompute synchronously, before the browser
+  // paints the new chip layout, so the menu stays glued to the anchor.
+  //
+  // useLayoutEffect (not useEffect) is load-bearing: useEffect fires after
+  // paint, which is exactly the lag we're trying to remove.
+  useLayoutEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new Event('resize'));
+    }
+  }, [chipsCount]);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: tick is a force-recompute dep
   const getAnchorBounds = useCallback(
