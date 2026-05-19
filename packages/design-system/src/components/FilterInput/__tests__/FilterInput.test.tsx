@@ -193,6 +193,73 @@ describe('FilterInput', () => {
     });
   });
 
+  describe('AS-983: focus stays in input while pointer hovers menu items', () => {
+    // zag.js Menu's `focusMenu` action (fired on ITEM_POINTERMOVE) moves DOM
+    // focus into Menu.Content (or its first tabbable — e.g. ScrollAreaViewport)
+    // every time the mouse hovers a menu item. For the combobox pattern we
+    // implement, that steals focus from the chip input and hides the caret.
+    // The focusin guard in useFocusManagement must bounce focus back to the
+    // input. We simulate the focus steal by calling `.focus()` directly on a
+    // non-interactive descendant of the menu — jsdom doesn't reliably fire
+    // pointermove → focusMenu via mouse helpers, so we exercise the guard
+    // directly. See AS-983.
+
+    it('bounces focus back to the main input when menu container receives focus', async () => {
+      const user = userEvent.setup();
+      render(<FilterInput fields={sampleFields} />);
+
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+
+      // Field menu should be open.
+      const menu = await screen.findByRole('menu');
+      expect(menu).toBeInTheDocument();
+
+      // Simulate zag.js focusMenu stealing focus to Menu.Content.
+      (menu as HTMLElement).focus();
+
+      // The guard listens on document focusin and synchronously restores focus.
+      expect(document.activeElement).toBe(input);
+    });
+
+    it('still bounces focus when a non-interactive descendant inside the menu is focused', async () => {
+      const user = userEvent.setup();
+      render(<FilterInput fields={sampleFields} />);
+
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+
+      const menu = await screen.findByRole('menu');
+      // Pick any non-button/input descendant — guard should still redirect.
+      const innerDiv = menu.querySelector('div[role="presentation"], div:not([role])');
+      expect(innerDiv).toBeTruthy();
+      // Force it focusable so .focus() works in jsdom regardless of tabindex.
+      (innerDiv as HTMLElement).setAttribute('tabindex', '-1');
+      (innerDiv as HTMLElement).focus();
+
+      expect(document.activeElement).toBe(input);
+    });
+
+    it('does NOT bounce focus away from a deliberate click on a button inside the menu', async () => {
+      const user = userEvent.setup();
+      render(<FilterInput fields={sampleFields} />);
+
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+
+      const menu = await screen.findByRole('menu');
+      // Inject a button into the menu and focus it — the guard must let
+      // deliberate clicks on interactive controls through (date picker
+      // Apply button, calendar arrows, etc.).
+      const button = document.createElement('button');
+      button.type = 'button';
+      menu.appendChild(button);
+      button.focus();
+
+      expect(document.activeElement).toBe(button);
+    });
+  });
+
   describe('AS-929: state leak after segment edit cancel', () => {
     it('reopens field menu after editing a value segment, blurring, and removing the chip', async () => {
       const user = userEvent.setup();

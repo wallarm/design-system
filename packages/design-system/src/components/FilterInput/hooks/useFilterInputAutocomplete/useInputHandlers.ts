@@ -96,6 +96,12 @@ export const useInputHandlers = ({
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key === 'ArrowDown' && menuState !== 'closed') {
+        // For list menus (field/operator/value), useKeyboardNav's window-capture
+        // listener intercepts first and stopPropagation() prevents this React
+        // handler from running — DOM focus stays on the input (combobox).
+        // For menus without useKeyboardNav (e.g. date picker), event reaches
+        // here and we hand DOM focus to the menu so its internal keyboard nav
+        // can take over (calendar arrow navigation, Apply button, etc.).
         e.preventDefault();
         menuRef.current?.focus();
         return;

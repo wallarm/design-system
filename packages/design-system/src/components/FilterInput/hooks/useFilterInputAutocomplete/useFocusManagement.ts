@@ -1,5 +1,5 @@
 import type { FocusEvent, RefObject } from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { isMenuRelated, nextBuildingMenu } from '../../lib';
 import type { FieldMetadata, FilterOperator, MenuState } from '../../types';
@@ -227,6 +227,63 @@ export const useFocusManagement = ({
     segmentOperatorInputRef,
     segmentValueInputRef,
   ]);
+
+  // ── Keep focus on chip input while pointer hovers menu items ──
+  //
+  // zag.js Menu fires `focusMenu` on ITEM_POINTERMOVE — every mouse hover over
+  // a menu item moves DOM focus inside Menu.Content via raf(). The exact focus
+  // target depends on what's tabbable inside: with overflow, ScrollArea's
+  // viewport (role="presentation", tabIndex=0) wins; without overflow, focus
+  // lands on Menu.Content itself. For the combobox pattern we want here
+  // (focus stays on input, items highlighted via controlled `highlightedValue`),
+  // both are wrong.
+  //
+  // Listener lives on `document` so it survives menu unmount/remount. The
+  // active menu is resolved via DOM (`closest('[data-filter-input-menu]')`)
+  // rather than a React ref — `menuRef` is shared between field/operator/value
+  // menus and React's commit ordering can leave `.current` null mid-transition.
+  //
+  // Guards:
+  //  - Skip the date picker entirely — its calendar owns DOM focus for arrow
+  //    navigation, the Apply button, presets etc.
+  //  - Skip deliberate clicks on interactive controls (buttons, inputs) so
+  //    we don't fight a user that actually clicked something in the menu.
+  const segmentInputRefsMap = useMemo(
+    () =>
+      ({
+        [SEGMENT_VARIANT.attribute]: segmentAttributeInputRef,
+        [SEGMENT_VARIANT.operator]: segmentOperatorInputRef,
+        [SEGMENT_VARIANT.value]: segmentValueInputRef,
+      }) satisfies Record<ChipSegment, RefObject<HTMLInputElement | null>>,
+    [segmentAttributeInputRef, segmentOperatorInputRef, segmentValueInputRef],
+  );
+
+  useEffect(() => {
+    if (menuState === 'closed') return;
+    if (!isFocused) return;
+
+    const handleFocusIn = (e: globalThis.FocusEvent) => {
+      const targetEl = e.target as HTMLElement | null;
+      if (!targetEl) return;
+      // Resolve the currently-open FilterInput menu from the DOM rather than
+      // relying on `menuRef.current` — the ref is shared across three menus
+      // (field/operator/value) and React's commit order can leave it `null`
+      // mid-transition. Look at the focusin target's ancestry instead.
+      const menu = targetEl.closest('[data-filter-input-menu]') as HTMLElement | null;
+      if (!menu) return;
+      if (menu.querySelector('[data-scope="date-picker"]')) return;
+      const tag = targetEl.tagName;
+      if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+      const dest = editingSegment ? segmentInputRefsMap[editingSegment]?.current : inputRef.current;
+      if (!dest) return;
+      if (document.activeElement === dest) return;
+      dest.focus({ preventScroll: true });
+    };
+
+    document.addEventListener('focusin', handleFocusIn);
+    return () => document.removeEventListener('focusin', handleFocusIn);
+  }, [menuState, isFocused, editingSegment, inputRef, segmentInputRefsMap]);
 
   return { handleFocus, handleBlur };
 };

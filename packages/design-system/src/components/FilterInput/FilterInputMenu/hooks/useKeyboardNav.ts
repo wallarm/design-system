@@ -255,11 +255,13 @@ export const useKeyboardNav = ({
             handleModArrow(e);
             break;
           }
-          // Plain arrow from input → navigate to first/last item and focus the menu
+          // Plain arrow from input → navigate the controlled highlightedValue.
+          // DOM focus stays on the input (combobox pattern); subsequent key
+          // events still hit this window-capture listener and take the
+          // "Focus is on the input" branch.
           e.preventDefault();
           e.stopPropagation();
           navigate(e.key === 'ArrowDown' ? 1 : -1);
-          stateRef.current.menuRef?.current?.focus();
           break;
         }
 

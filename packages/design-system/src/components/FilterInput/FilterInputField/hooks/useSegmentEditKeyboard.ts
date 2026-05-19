@@ -28,7 +28,8 @@ interface UseSegmentEditKeyboardOptions {
  *   attribute) and, if the attribute is empty with no operator/value left,
  *   removes the chip.
  * - Enter commits the typed text via the segment-specific commit callback.
- * - ArrowDown moves focus into the open menu.
+ * - ArrowDown is intercepted (preventDefault) but focus stays on the input —
+ *   highlight navigation runs through useKeyboardNav's window-capture listener.
  *
  * Returns the keydown + blur handlers fed to `EditingProvider` so every
  * segment input dispatches through the same logic.
@@ -104,6 +105,10 @@ export const useSegmentEditKeyboard = ({
         }
       }
       if (e.key === 'ArrowDown') {
+        // For list menus, useKeyboardNav's window-capture handler stops the
+        // event before it reaches this React handler — focus stays on the
+        // segment input (combobox). For menus without useKeyboardNav (date
+        // picker), focus moves into the menu so its internal nav works.
         e.preventDefault();
         menuRef.current?.focus();
       }
