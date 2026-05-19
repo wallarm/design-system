@@ -75,12 +75,15 @@ export const useChipCascade = ({
 
       if (isBuildingEdit) {
         if (!selectedField) return false;
-        // Clear chip data for the segment we're leaving so it doesn't re-appear.
+        // Clear ONLY the source segment's data — mirrors the committed-chip
+        // path where the operator-cascade preserves condition.value.
+        // buildingMultiValue (the value preview) stays put when the user
+        // walked off the operator; downstream operator-select shape checks
+        // will discard it if the new operator is incompatible.
         if (sourceSegment === SEGMENT_VARIANT.value) {
           setBuildingMultiValue(undefined);
         } else if (sourceSegment === SEGMENT_VARIANT.operator) {
           setSelectedOperator(null);
-          setBuildingMultiValue(undefined);
         }
         const initialText = getInitialSegmentText(
           targetSegment,

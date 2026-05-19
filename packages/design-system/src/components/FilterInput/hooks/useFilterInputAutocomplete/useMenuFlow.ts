@@ -34,6 +34,9 @@ interface MenuFlowDeps {
     setEditingSegment: (segment: ChipSegment | null) => void;
     setSegmentFilterText: (text: string) => void;
     resetSegmentTyping: () => void;
+    /** Switch inline-edit to another segment of the same committed chip,
+     *  loading its text and resetting the user-typed flag in one step. */
+    switchEditSegment: (segment: ChipSegment, currentText: string) => void;
     /** Exit inline-edit and the building-edit marker. Called when switching
      *  filter/operator in the building chip lands on the next menu. */
     clearEditing: () => void;
@@ -127,8 +130,10 @@ export const useMenuFlow = ({
             );
             setSelectedField(field);
             setSelectedOperator(null);
-            editing.setEditingSegment(SEGMENT_VARIANT.operator);
-            editing.setSegmentFilterText('');
+            // switchEditSegment also resets userHasTyped — the user has not
+            // typed anything in the new operator input yet, so the next
+            // keystroke should widen the menu (matches first-edit behavior).
+            editing.switchEditSegment(SEGMENT_VARIANT.operator, '');
             setMenuState('operator');
             return;
           }
@@ -444,6 +449,27 @@ export const useMenuFlow = ({
         label: trimmed,
         type: 'string',
       };
+      // Post-cascade incomplete chip — keep inline-edit alive after the
+      // synthetic commit so the user can finish building (mirrors the
+      // matched-field branch above). Without this, an unknown attribute
+      // typed mid-cascade would freeze the chip in an errored, operator-
+      // less state with no inline path to recover.
+      if (!condition.operator) {
+        upsertCondition(
+          syntheticField,
+          undefined,
+          condition.value,
+          editing.editingChipId,
+          undefined,
+          SEGMENT_VARIANT.attribute,
+          condition.dateOrigin,
+        );
+        setSelectedField(syntheticField);
+        setSelectedOperator(null);
+        editing.switchEditSegment(SEGMENT_VARIANT.operator, '');
+        setMenuState('operator');
+        return;
+      }
       upsertCondition(
         syntheticField,
         condition.operator,
@@ -455,7 +481,16 @@ export const useMenuFlow = ({
       );
       resetState();
     },
-    [editing, fields, upsertCondition, resetState, handleFieldSelect],
+    [
+      editing,
+      fields,
+      upsertCondition,
+      resetState,
+      handleFieldSelect,
+      setSelectedField,
+      setSelectedOperator,
+      setMenuState,
+    ],
   );
 
   /**
