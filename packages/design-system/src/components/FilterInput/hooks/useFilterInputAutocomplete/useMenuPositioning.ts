@@ -10,6 +10,11 @@ interface UseMenuPositioningOptions {
   inputRef?: RefObject<HTMLElement | null>;
   isBuilding: boolean;
   insertIndex: number;
+  /** Number of committed chips — used as a recompute trigger when chips are
+   *  added/removed. ResizeObserver only catches size changes, not sibling
+   *  reflow, so without this the building chip can shift after a sibling
+   *  is removed and the dropdown is left at the old position. */
+  chipsCount: number;
 }
 
 /**
@@ -33,6 +38,7 @@ export const useMenuPositioning = ({
   inputRef,
   isBuilding,
   insertIndex,
+  chipsCount,
 }: UseMenuPositioningOptions) => {
   const [editingEl, setMenuAnchor] = useState<HTMLElement | null>(null);
   const resetMenuAnchor = useCallback(() => setMenuAnchor(null), []);
@@ -67,8 +73,10 @@ export const useMenuPositioning = ({
 
   const menuPositioning = useFilterInputPositioning(
     { containerRef, getAnchorBounds },
-    // insertIndex forces recalculation when input moves between chips
-    [insertIndex],
+    // Force recalculation when the input moves between chips (insertIndex) or
+    // when the number of chips changes — the latter shifts sibling positions
+    // without changing their size, so ResizeObserver alone misses it.
+    [insertIndex, chipsCount],
   );
 
   return { menuPositioning, setMenuAnchor, resetMenuAnchor };
