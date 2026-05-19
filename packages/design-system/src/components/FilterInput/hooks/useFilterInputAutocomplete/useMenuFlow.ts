@@ -111,9 +111,20 @@ export const useMenuFlow = ({
         if (condition) {
           // Post-cascade incomplete chip (operator was cleared by Backspace
           // cascade): keep inline-edit alive on the same chip and continue
-          // building inline — transition to operator selection.
+          // building inline — transition to operator selection. Value is
+          // preserved when the cascaded-from-operator path left it intact;
+          // existing field-switch logic on a complete chip behaves the same
+          // way (validateValueForField runs only on commit, not here).
           if (!condition.operator) {
-            upsertCondition(field, undefined, null, editing.editingChipId);
+            upsertCondition(
+              field,
+              undefined,
+              condition.value,
+              editing.editingChipId,
+              undefined,
+              undefined,
+              condition.dateOrigin,
+            );
             setSelectedField(field);
             setSelectedOperator(null);
             editing.setEditingSegment(SEGMENT_VARIANT.operator);

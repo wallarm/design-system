@@ -94,15 +94,21 @@ export const useChipCascade = ({
         return true;
       }
 
-      const editingId = editing.editingChipId!;
+      const editingId = editing.editingChipId;
+      if (!editingId) return false;
       const chip = chips.find(c => c.id === editingId);
       if (!chip || chip.variant !== 'chip') return false;
       const idx = chipIdToConditionIndex(editingId);
       const condition = idx !== null ? conditionsRef.current[idx] : null;
       const field = condition ? fields.find(f => f.name === condition.field) : null;
 
-      // Clear chip data for the segment we're leaving. Without a field we
-      // can't upsert, so fall back to a plain segment switch in that case.
+      // Clear ONLY the segment data the user is leaving — adjacent segments
+      // are preserved (matches "what was not deleted should not be deleted").
+      // Without a field we can't upsert, so fall back to a plain segment
+      // switch in that case. The empty-attribute removal check downstream
+      // handles cleanup once attribute is wiped too (it gates on !operator
+      // rather than no-op-and-no-value, so an orphan value cannot keep a
+      // chip alive after cascade past operator).
       if (condition && field) {
         if (sourceSegment === SEGMENT_VARIANT.value) {
           upsertCondition(
@@ -115,7 +121,15 @@ export const useChipCascade = ({
             condition.dateOrigin,
           );
         } else if (sourceSegment === SEGMENT_VARIANT.operator) {
-          upsertCondition(field, undefined, null, editingId, undefined, undefined, undefined);
+          upsertCondition(
+            field,
+            undefined,
+            condition.value,
+            editingId,
+            undefined,
+            undefined,
+            condition.dateOrigin,
+          );
         }
       }
 

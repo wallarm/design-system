@@ -65,8 +65,11 @@ export const useSegmentEditKeyboard = ({
             ? chips.find(c => c.id === editingChipId && c.variant === 'chip')
             : null;
           const operator = chipForEdit?.operator ?? buildingChipData?.operator ?? '';
-          const value = chipForEdit?.value ?? buildingChipData?.value ?? '';
-          if (!operator && !value) {
+          // No operator means the chip is invalid no matter what value it
+          // carries — a value-only orphan can be left behind by an operator-
+          // segment cascade that preserves value. Gate removal on operator
+          // alone so the cascade can complete through an empty attribute.
+          if (!operator) {
             e.preventDefault();
             onRemoveEditingChip();
           }

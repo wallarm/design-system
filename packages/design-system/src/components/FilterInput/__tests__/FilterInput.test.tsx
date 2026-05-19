@@ -664,6 +664,30 @@ describe('FilterInput', () => {
       expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
     });
 
+    it('preserves the value when the cascade walks from operator inline-edit to attribute', async () => {
+      // Cascading off the operator segment only clears the operator — the
+      // user did not touch the value, so it stays committed (renders as a
+      // sole-value chip in this in-between state).
+      const user = userEvent.setup();
+      const { container } = render(
+        <FilterInput
+          fields={fields}
+          value={{ type: 'condition', field: 'status', operator: '=', value: 'active' }}
+        />,
+      );
+
+      await user.click(screen.getByRole('button', { name: /Edit filter operator/i }));
+      clearSegment('Filter operator');
+
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      // Attribute is now in inline-edit (its <input> is rendered).
+      expect(chip.querySelector('[data-slot="segment-attribute"] input')).not.toBeNull();
+      // Operator is gone — its data was cleared on cascade.
+      expect(chip.querySelector('[data-slot="segment-operator"]')).toBeNull();
+      // Value survives — the user did not delete it.
+      expect(chip.querySelector('[data-slot="segment-value"]')?.textContent).toBe('Active');
+    });
+
     it('does not remove the chip when Backspace empties attribute while operator and value are still present', async () => {
       const user = userEvent.setup();
       const { container } = render(
