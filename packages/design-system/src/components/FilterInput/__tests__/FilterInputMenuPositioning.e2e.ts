@@ -14,7 +14,7 @@ test.describe('Component: FilterInput - Menu Positioning', () => {
 
       const field = page.locator('[data-slot="filter-input"]');
       const input = field.locator('input[type="text"]');
-      const chips = page.locator('[data-slot="filter-input-chip"]');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
       const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
 
       await expect(chips).toHaveCount(2);
