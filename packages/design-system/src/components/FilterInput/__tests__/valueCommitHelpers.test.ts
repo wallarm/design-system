@@ -1,15 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   displayDateToIso,
-  getInvalidValueIndices,
-  isValidFieldValue,
   resolveDateRangeValue,
   resolveDateValue,
   resolveFieldValue,
   resolveMultiValues,
   resolveSingleValue,
-  validateValueForField,
-} from '../hooks/useFilterInputAutocomplete/valueCommitHelpers';
+} from '../hooks/useFilterInputAutocomplete/lib';
+import { getInvalidValueIndices, isValidFieldValue, validateValueForField } from '../lib';
 import type { Condition, FieldMetadata } from '../types';
 
 const enumField: FieldMetadata = {

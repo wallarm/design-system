@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { deriveAutocompleteValues } from '../hooks/useFilterInputAutocomplete/deriveAutocompleteValues';
+import { deriveAutocompleteValues } from '../hooks/useFilterInputAutocomplete/lib';
 import type { Condition, FieldMetadata } from '../types';
 
 const statusField: FieldMetadata = {

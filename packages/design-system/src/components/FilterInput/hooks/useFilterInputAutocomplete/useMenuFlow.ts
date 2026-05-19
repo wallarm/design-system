@@ -11,6 +11,7 @@ import {
   isOperatorAllowedForField,
   isValueShapeCompatible,
   OPERATOR_SYMBOLS,
+  validateValueForField,
 } from '../../lib';
 import type {
   Condition,
@@ -24,8 +25,7 @@ import {
   resolveDateValue,
   resolveMultiValues,
   resolveSingleValue,
-  validateValueForField,
-} from './valueCommitHelpers';
+} from './lib';
 
 interface MenuFlowDeps {
   editing: {

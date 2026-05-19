@@ -10,7 +10,7 @@ import type {
   MenuState,
   UpsertCondition,
 } from '../../types';
-import { getInitialSegmentText } from './getInitialSegmentText';
+import { getInitialSegmentText } from './lib';
 
 interface UseChipCascadeOptions {
   editing: {

@@ -1,6 +1,6 @@
-import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { getOperatorLabel } from '../../lib';
-import type { FieldMetadata, FilterOperator } from '../../types';
+import { type ChipSegment, SEGMENT_VARIANT } from '../../../FilterInputField/FilterInputChip';
+import { getOperatorLabel } from '../../../lib';
+import type { FieldMetadata, FilterOperator } from '../../../types';
 
 /**
  * Initial text shown in a building chip's inline-edit input for the given

@@ -11,8 +11,7 @@ import type {
   MenuState,
   UpsertCondition,
 } from '../../types';
-import { deriveAutocompleteValues } from './deriveAutocompleteValues';
-import { getInitialSegmentText } from './getInitialSegmentText';
+import { deriveAutocompleteValues, getInitialSegmentText } from './lib';
 import { useBlurCommit } from './useBlurCommit';
 import { useChipActions } from './useChipActions';
 import { useChipCascade } from './useChipCascade';

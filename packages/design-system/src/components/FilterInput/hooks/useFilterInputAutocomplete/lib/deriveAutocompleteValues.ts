@@ -1,4 +1,4 @@
-import type { BuildingChipData } from '../../FilterInputContext/types';
+import type { BuildingChipData } from '../../../FilterInputContext/types';
 import {
   chipIdToConditionIndex,
   getDateDisplayLabel,
@@ -8,8 +8,8 @@ import {
   isMultiSelectOperator,
   isNoValueOperator,
   NO_VALUE_PLACEHOLDER,
-} from '../../lib';
-import type { Condition, FieldMetadata, FilterOperator } from '../../types';
+} from '../../../lib';
+import type { Condition, FieldMetadata, FilterOperator } from '../../../types';
 
 interface DeriveOptions {
   editingChipId: string | null;

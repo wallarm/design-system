@@ -2,12 +2,12 @@ import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
   findOptionByValue,
   getDateDisplayLabel,
+  getInvalidValueIndices,
   getOperatorLabel,
   isNoValueOperator,
   NO_VALUE_PLACEHOLDER,
 } from '../../lib';
 import type { ChipErrorSegment, Condition, FieldMetadata, FilterInputChipData } from '../../types';
-import { getInvalidValueIndices } from '../useFilterInputAutocomplete/valueCommitHelpers';
 
 const INVALID_DATE = 'Invalid Date';
 const DATE_RANGE_SEPARATOR = ' – ';
