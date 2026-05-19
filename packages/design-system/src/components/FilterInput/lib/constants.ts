@@ -15,6 +15,14 @@ export const CONNECTOR_ID_PATTERN = /^connector-(\d+)$/;
 /** DOM selector for the FilterInput root element. */
 export const QUERY_BAR_SELECTOR = '[data-slot="filter-input"]';
 
+/** Gap between the dropdown and the field border in the empty/initial state. */
+export const MENU_BASE_GUTTER = 4;
+
+/** Extra vertical offset added to the anchor's bottom when the dropdown is
+ *  anchored to a chip / input — total visual gap becomes
+ *  MENU_BASE_GUTTER + MENU_CHIP_GUTTER_OFFSET (12). */
+export const MENU_CHIP_GUTTER_OFFSET = 8;
+
 /** Labels for non-chip filter chip variants (connectors, brackets). */
 export const VARIANT_LABELS: Partial<Record<FilterInputChipVariant, string>> = {
   and: 'AND',

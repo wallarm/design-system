@@ -11,6 +11,8 @@ export { applyKnownFieldHelpers, getKnownFieldSerializer } from './applyKnownFie
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
 export {
   CONNECTOR_ID_PATTERN,
+  MENU_BASE_GUTTER,
+  MENU_CHIP_GUTTER_OFFSET,
   NO_VALUE_OPERATORS,
   OPERATOR_LABELS,
   OPERATOR_LABELS_BY_TYPE,

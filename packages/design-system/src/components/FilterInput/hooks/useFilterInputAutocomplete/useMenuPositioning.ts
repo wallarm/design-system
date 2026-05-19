@@ -1,6 +1,12 @@
 import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from 'react';
-import { type AnchorBounds, QUERY_BAR_SELECTOR, toAnchorBounds } from '../../lib';
+import {
+  type AnchorBounds,
+  MENU_BASE_GUTTER,
+  MENU_CHIP_GUTTER_OFFSET,
+  QUERY_BAR_SELECTOR,
+  toAnchorBounds,
+} from '../../lib';
 import { useAutoCleanupDetachedElement } from '../useAutoCleanupDetachedElement';
 import { useFilterInputPositioning } from '../useFilterInputPositioning';
 import { useFloatingRecomputeOn } from '../useFloatingRecomputeOn';
@@ -61,11 +67,10 @@ export const useMenuPositioning = ({
   const anchorStateRef = useRef({ editingEl, isBuilding, chipsCount });
   anchorStateRef.current = { editingEl, isBuilding, chipsCount };
 
-  // +8 added to anchor.bottom in the chip-anchored branches: positioning.gutter
-  // alone can't switch reactively (Ark UI captures it once), but getAnchorRect
-  // is re-read on every reposition, so this is where the dynamic gap lives.
-  const CHIP_GUTTER_OFFSET = 8;
-
+  // MENU_CHIP_GUTTER_OFFSET added to anchor.bottom in the chip-anchored
+  // branches: positioning.gutter alone can't switch reactively (Ark UI captures
+  // it once), but getAnchorRect is re-read on every reposition, so this is
+  // where the dynamic gap lives.
   const getAnchorBounds = useCallback(
     (containerRect: DOMRect): AnchorBounds => {
       const { editingEl: el, isBuilding: building, chipsCount: count } = anchorStateRef.current;
@@ -82,7 +87,7 @@ export const useMenuPositioning = ({
             ? toAnchorBounds(inputRef.current.getBoundingClientRect())
             : null;
       if (chipAnchor) {
-        return { ...chipAnchor, bottom: chipAnchor.bottom + CHIP_GUTTER_OFFSET };
+        return { ...chipAnchor, bottom: chipAnchor.bottom + MENU_CHIP_GUTTER_OFFSET };
       }
       // No chips, no editing — anchor to the bordered field so the dropdown is
       // flush with its border. The outer container may extend past the field
@@ -93,12 +98,13 @@ export const useMenuPositioning = ({
     [containerRef, buildingChipRef, inputRef],
   );
 
-  // Effective vertical gap: 4px in the empty state, 12px from a chip / input.
-  // Ark UI captures `positioning.gutter` on first mount and ignores later prop
-  // changes, so the +8 chip offset is baked into anchor.bottom inside
-  // getAnchorBounds above (read on every reposition via getAnchorRect).
+  // Effective vertical gap: MENU_BASE_GUTTER in the empty state, +
+  // MENU_CHIP_GUTTER_OFFSET (baked into anchor.bottom) when anchored to a chip
+  // / input. Ark UI captures positioning.gutter on first mount, so only this
+  // base value can travel through the prop; the dynamic offset lives in
+  // getAnchorRect (re-read on every reposition).
   const menuPositioning = useFilterInputPositioning(
-    { containerRef, getAnchorBounds, gutter: 4 },
+    { containerRef, getAnchorBounds, gutter: MENU_BASE_GUTTER },
     // Recompute on insertIndex change, chip count change, or any tracked
     // element resize — these shift positions without firing window resize.
     [insertIndex, chipsCount, tick],
