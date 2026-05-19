@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { FilterInput } from '../FilterInput';
@@ -257,6 +257,46 @@ describe('FilterInput', () => {
       button.focus();
 
       expect(document.activeElement).toBe(button);
+    });
+  });
+
+  describe('ArrowDown re-opens menu when closed', () => {
+    // Backspace on the main input with no in-progress chip removes the
+    // previous committed chip and sets `menuState='closed'` (see
+    // useInputHandlers Backspace branch). The natural follow-up gesture is
+    // ArrowDown to start a new condition — historically that did nothing
+    // because the ArrowDown handler bailed out when the menu was closed.
+    it('opens the field menu on ArrowDown after a chip is deleted with Backspace', async () => {
+      const user = userEvent.setup();
+      const condition: Condition = {
+        type: 'condition',
+        field: 'status',
+        operator: '=',
+        value: 'active',
+      };
+      const { container } = render(<FilterInput fields={sampleFields} value={condition} />);
+
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+      // Backspace from the empty main input removes the previous chip and
+      // closes the menu (see useInputHandlers Backspace branch).
+      await user.keyboard('{Backspace}');
+
+      // Wait for the chip to actually be removed — settles the async React
+      // state update so the subsequent ArrowDown sees `menuState='closed'`.
+      await waitFor(() => {
+        expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
+      });
+
+      // ArrowDown must reopen the field menu so the user can keep building
+      // with the keyboard alone. fireEvent over userEvent because the test
+      // only needs to assert the menu-state transition, not the full
+      // keyboard pipeline — userEvent's async batching produced flakes
+      // around the chip-removal + state-reopen seam.
+      fireEvent.keyDown(input, { key: 'ArrowDown' });
+      expect(
+        await screen.findByRole('menuitem', { name: 'Status' }, { timeout: 2000 }),
+      ).toBeInTheDocument();
     });
   });
 

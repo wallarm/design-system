@@ -95,7 +95,18 @@ export const useInputHandlers = ({
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowDown' && menuState !== 'closed') {
+      if (e.key === 'ArrowDown') {
+        if (menuState === 'closed') {
+          // Re-open the appropriate menu when the user presses ArrowDown on a
+          // closed dropdown (e.g. after Backspace tears down a committed chip
+          // and sets menuState='closed'). nextBuildingMenu resolves to 'value'
+          // / 'operator' / 'field' depending on the in-progress building chip,
+          // matching the behavior of the refocus path in useFocusManagement.
+          e.preventDefault();
+          resetMenuOffset();
+          setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
+          return;
+        }
         // For list menus (field/operator/value), useKeyboardNav's window-capture
         // listener intercepts first and stopPropagation() prevents this React
         // handler from running — DOM focus stays on the input (combobox).
@@ -193,6 +204,7 @@ export const useInputHandlers = ({
       removeConditionAtIndex,
       menuState,
       selectedField,
+      selectedOperator,
       fields,
       handleFieldSelect,
       handleOperatorSelect,
@@ -204,6 +216,7 @@ export const useInputHandlers = ({
       conditionsLengthRef,
       effectiveInsertIndexRef,
       stepBackBuildingMenu,
+      resetMenuOffset,
     ],
   );
 
