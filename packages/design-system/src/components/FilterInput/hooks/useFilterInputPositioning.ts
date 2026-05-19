@@ -25,7 +25,7 @@ export const useFilterInputPositioning = (
   useMemo(
     () => ({
       placement: 'bottom-start' as const,
-      gutter: 4,
+      gutter: 16,
       getAnchorRect: () => {
         const containerEl =
           containerRef?.current ?? anchorRef?.current?.closest<HTMLElement>(QUERY_BAR_SELECTOR);

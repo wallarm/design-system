@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import { useCallback, useRef, useState } from 'react';
-import { type AnchorBounds, toAnchorBounds } from '../../lib';
+import { type AnchorBounds, QUERY_BAR_SELECTOR, toAnchorBounds } from '../../lib';
 import { useAutoCleanupDetachedElement } from '../useAutoCleanupDetachedElement';
 import { useFilterInputPositioning } from '../useFilterInputPositioning';
 import { useFloatingRecomputeOn } from '../useFloatingRecomputeOn';
@@ -66,20 +66,23 @@ export const useMenuPositioning = ({
       const { editingEl: el, isBuilding: building, chipsCount: count } = anchorStateRef.current;
       // isConnected guards a parent that reordered/removed the chip via the
       // controlled value prop — detached el returns zero rect.
+      // Anchor (both axes) is the chip/input the user is interacting with so
+      // the dropdown sits flush below it — important on multi-row layouts where
+      // a chip on the first row must not anchor to the field's bottom edge.
       if (el?.isConnected) return toAnchorBounds(el.getBoundingClientRect());
       if (building && buildingChipRef.current) {
         return toAnchorBounds(buildingChipRef.current.getBoundingClientRect());
       }
-      // With committed chips the input sits past them — anchor to the input so
-      // the dropdown tracks its live left edge. With no chips the input's left
-      // is just the field's inner padding, which visually detaches the dropdown
-      // from the field border — fall through to the container instead.
       if (count > 0 && inputRef?.current) {
         return toAnchorBounds(inputRef.current.getBoundingClientRect());
       }
-      return toAnchorBounds(containerRect);
+      // No chips, no editing — anchor to the bordered field so the dropdown is
+      // flush with its border. The outer container may extend past the field
+      // (error rows below), so resolve the field explicitly.
+      const fieldEl = containerRef.current?.querySelector<HTMLElement>(QUERY_BAR_SELECTOR) ?? null;
+      return toAnchorBounds(fieldEl?.getBoundingClientRect() ?? containerRect);
     },
-    [buildingChipRef, inputRef],
+    [containerRef, buildingChipRef, inputRef],
   );
 
   const menuPositioning = useFilterInputPositioning(
