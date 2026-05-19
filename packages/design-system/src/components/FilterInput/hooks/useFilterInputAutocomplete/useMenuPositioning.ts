@@ -52,7 +52,11 @@ export const useMenuPositioning = ({
     if (editingEl && !editingEl.isConnected) setMenuAnchor(null);
   });
 
-  const tick = useResizeTracker(editingEl, buildingChipRef.current, containerRef.current);
+  // Container goes first so its child-list mutations (chip add/remove) drive
+  // the MutationObserver inside useResizeTracker — sibling reflow can shift the
+  // building chip / input without changing any element's size, and ResizeObserver
+  // alone would miss that.
+  const tick = useResizeTracker(containerRef.current, editingEl, buildingChipRef.current);
 
   // biome-ignore lint/correctness/useExhaustiveDependencies: tick is a force-recompute dep
   const getAnchorBounds = useCallback(

@@ -7,6 +7,12 @@ import { useEffect, useReducer } from 'react';
  * floating UI (dropdown, tooltip) aligned with a target whose width depends on
  * dynamic content (e.g. text inside a chip segment).
  *
+ * The first element is additionally watched with a MutationObserver
+ * (childList + subtree). ResizeObserver alone misses sibling reflow caused by
+ * adding/removing a child of the *same* size — the parent's outer box stays
+ * put while inner items shift. Watching for DOM mutations on the host element
+ * catches those cases too, so a floating UI anchored to a sibling reflows along.
+ *
  * Null entries are skipped, so refs and conditionally rendered elements can be
  * passed directly without filtering.
  */
@@ -22,9 +28,19 @@ export const useResizeTracker = (
     // detached node's size never changes, so the observer would never fire.
     const targets = [el1, el2, el3].filter((el): el is HTMLElement => el != null && el.isConnected);
     if (targets.length === 0) return;
-    const observer = new ResizeObserver(() => bump());
-    for (const el of targets) observer.observe(el);
-    return () => observer.disconnect();
+    const resizeObserver = new ResizeObserver(() => bump());
+    for (const el of targets) resizeObserver.observe(el);
+
+    // Watch the first (host-most) element for child add/remove — covers the
+    // case where a sibling chip is removed and the anchor element shifts
+    // without changing size.
+    const mutationObserver = new MutationObserver(() => bump());
+    mutationObserver.observe(targets[0]!, { childList: true, subtree: true });
+
+    return () => {
+      resizeObserver.disconnect();
+      mutationObserver.disconnect();
+    };
   }, [el1, el2, el3]);
 
   return tick;
