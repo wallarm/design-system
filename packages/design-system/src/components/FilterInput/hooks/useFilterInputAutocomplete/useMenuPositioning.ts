@@ -39,10 +39,14 @@ export const useMenuPositioning = ({
 
   const tick = useResizeTracker(editingEl, buildingChipRef.current, containerRef.current);
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: tick triggers recompute
+  // biome-ignore lint/correctness/useExhaustiveDependencies: tick is a force-recompute dep
   const getAnchorBounds = useCallback(
     (containerRect: DOMRect): AnchorBounds => {
-      if (editingEl) return toAnchorBounds(editingEl.getBoundingClientRect());
+      // `isConnected` guards against a parent reordering / removing the chip
+      // via the controlled `value` prop while inline-edit is active —
+      // `editingEl` would still be truthy but point at a detached node, and
+      // `getBoundingClientRect()` on a detached node returns all-zeroes.
+      if (editingEl?.isConnected) return toAnchorBounds(editingEl.getBoundingClientRect());
       if (isBuilding && buildingChipRef.current) {
         return toAnchorBounds(buildingChipRef.current.getBoundingClientRect());
       }

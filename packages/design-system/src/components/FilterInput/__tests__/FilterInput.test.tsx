@@ -954,12 +954,13 @@ describe('FilterInput', () => {
       const segInput = screen.getByLabelText('Filter operator') as HTMLInputElement;
       fireEvent.change(segInput, { target: { value: '' } });
 
-      await user.keyboard('{ArrowDown}{Enter}');
+      // Two ArrowDowns to land on the *second* operator (`is not`) so the
+      // assertion can distinguish a real Enter-commit from a no-op that
+      // would have left the original `=` (`is`) in place.
+      await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
 
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      // First operator in the enum list is `is =` — picking it must update
-      // the chip's operator segment.
-      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is');
+      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is not');
     });
 
     it('selects highlighted value after emptying the value segment', async () => {
@@ -975,12 +976,13 @@ describe('FilterInput', () => {
       const segInput = screen.getByLabelText('Filter value') as HTMLInputElement;
       fireEvent.change(segInput, { target: { value: '' } });
 
-      await user.keyboard('{ArrowDown}{Enter}');
+      // Two ArrowDowns to land on `Pending` (the non-default value) so the
+      // assertion proves Enter actually committed rather than leaving the
+      // original `active` (`Active`) untouched.
+      await user.keyboard('{ArrowDown}{ArrowDown}{Enter}');
 
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      // First value in the enum list is `Active` — picking it keeps the
-      // chip valid (value is committed, not silently dropped).
-      expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('Active');
+      expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('Pending');
     });
   });
 });
