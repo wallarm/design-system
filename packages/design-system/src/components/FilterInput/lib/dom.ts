@@ -16,6 +16,13 @@ export interface AnchorBounds {
   left: number;
 }
 
+/** Extract anchor bounds from a DOMRect (right edge is computed at build time). */
+export const toAnchorBounds = (rect: DOMRect): AnchorBounds => ({
+  top: rect.top,
+  bottom: rect.bottom,
+  left: rect.left,
+});
+
 /**
  * Build a DOMRect-compatible object from the active anchor element's vertical
  * bounds and left edge, keeping the right edge at the container's right so the

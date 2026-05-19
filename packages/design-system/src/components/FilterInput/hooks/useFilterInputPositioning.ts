@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import { useMemo } from 'react';
-import { type AnchorBounds, buildAnchoredRect, QUERY_BAR_SELECTOR } from '../lib';
+import { type AnchorBounds, buildAnchoredRect, QUERY_BAR_SELECTOR, toAnchorBounds } from '../lib';
 
 interface UseFilterInputPositioningProps {
   /** Ref to the trigger element (used for X anchor and container lookup via closest) */
@@ -33,23 +33,9 @@ export const useFilterInputPositioning = (
         const containerRect = containerEl?.getBoundingClientRect();
         if (!containerRect) return null;
 
-        let anchor: AnchorBounds;
-        if (getAnchorBounds) {
-          anchor = getAnchorBounds(containerRect);
-        } else if (anchorRef?.current) {
-          const triggerRect = anchorRef.current.getBoundingClientRect();
-          anchor = {
-            top: triggerRect.top,
-            bottom: triggerRect.bottom,
-            left: triggerRect.left,
-          };
-        } else {
-          anchor = {
-            top: containerRect.top,
-            bottom: containerRect.bottom,
-            left: containerRect.left,
-          };
-        }
+        const anchor = getAnchorBounds
+          ? getAnchorBounds(containerRect)
+          : toAnchorBounds(anchorRef?.current?.getBoundingClientRect() ?? containerRect);
 
         return buildAnchoredRect(anchor, containerRect);
       },
