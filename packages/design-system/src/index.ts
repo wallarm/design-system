@@ -290,6 +290,13 @@ export { Kbd, KbdGroup } from './components/Kbd';
 export { Link, type LinkProps } from './components/Link';
 export { Loader, type LoaderProps } from './components/Loader';
 export {
+  Logo,
+  type LogoProps,
+  type LogoSize,
+  type LogoStyle,
+  type LogoType,
+} from './components/Logo';
+export {
   NavRail,
   NavRailBody,
   type NavRailBodyProps,
