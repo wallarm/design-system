@@ -516,10 +516,11 @@ describe('FilterInput', () => {
     const startBuildingThroughOperator = async (user: ReturnType<typeof userEvent.setup>) => {
       const input = screen.getByRole('combobox');
       await user.click(input);
-      // Use findByRole (async) — Ark UI menu mount is deferred a frame after
-      // the state transition, so the menuitem isn't synchronously available.
-      await user.click(await screen.findByRole('menuitem', { name: 'Status' }));
-      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }));
+      // findByRole (async) — Ark UI menu mount is deferred a frame after the
+      // state transition. CI jsdom under shard load needs the longer timeout
+      // (default 1s; passes locally but flakes intermittently in CI).
+      await user.click(await screen.findByRole('menuitem', { name: 'Status' }, { timeout: 5000 }));
+      await user.click(await screen.findByRole('menuitem', { name: /^is =$/ }, { timeout: 5000 }));
     };
 
     it('lets the user reopen the field menu by clicking the building chip attribute', async () => {
