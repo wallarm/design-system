@@ -195,7 +195,13 @@ export const useInputHandlers = ({
               return eff > 0 ? eff - 1 : 0;
             });
           }
-          setMenuState('closed');
+          // Reopen the field menu so the user can keep building with the
+          // keyboard alone. The next ArrowDown highlights the first item;
+          // Enter selects it. Without this the menu would stay closed and
+          // a single ArrowDown would only open it, requiring a second
+          // press to highlight before Enter could select anything.
+          resetMenuOffset();
+          setMenuState('field');
         }
       }
     },

@@ -260,13 +260,11 @@ describe('FilterInput', () => {
     });
   });
 
-  describe('ArrowDown re-opens menu when closed', () => {
-    // Backspace on the main input with no in-progress chip removes the
-    // previous committed chip and sets `menuState='closed'` (see
-    // useInputHandlers Backspace branch). The natural follow-up gesture is
-    // ArrowDown to start a new condition — historically that did nothing
-    // because the ArrowDown handler bailed out when the menu was closed.
-    it('opens the field menu on ArrowDown after a chip is deleted with Backspace', async () => {
+  describe('Keyboard flow stays alive after Backspace removes a chip', () => {
+    // Without this guard the user would be stranded: after Backspace deletes
+    // the previous chip the dropdown stays closed, so the natural follow-up
+    // (ArrowDown to navigate, Enter to select) does nothing.
+    it('reopens the field menu immediately after Backspace removes the previous chip', async () => {
       const user = userEvent.setup();
       const condition: Condition = {
         type: 'condition',
@@ -278,21 +276,34 @@ describe('FilterInput', () => {
 
       const input = screen.getByRole('combobox');
       await user.click(input);
-      // Backspace from the empty main input removes the previous chip and
-      // closes the menu (see useInputHandlers Backspace branch).
+      // Backspace from the empty main input removes the previous chip.
       await user.keyboard('{Backspace}');
 
-      // Wait for the chip to actually be removed — settles the async React
-      // state update so the subsequent ArrowDown sees `menuState='closed'`.
+      // The chip must be gone AND the field menu must already be open so
+      // ArrowDown highlights the first item on a single keypress.
       await waitFor(() => {
         expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).toBeNull();
       });
+      expect(
+        await screen.findByRole('menuitem', { name: 'Status' }, { timeout: 2000 }),
+      ).toBeInTheDocument();
+    });
 
-      // ArrowDown must reopen the field menu so the user can keep building
-      // with the keyboard alone. fireEvent over userEvent because the test
-      // only needs to assert the menu-state transition, not the full
-      // keyboard pipeline — userEvent's async batching produced flakes
-      // around the chip-removal + state-reopen seam.
+    // Defense-in-depth: even if some path leaves the menu closed (e.g. a
+    // future refactor), ArrowDown on a closed menu must reopen it via
+    // nextBuildingMenu so the keyboard flow never deadlocks.
+    it('reopens the menu on ArrowDown when state is closed and input is empty', async () => {
+      const user = userEvent.setup();
+      render(<FilterInput fields={sampleFields} />);
+
+      const input = screen.getByRole('combobox');
+      // Focus the container without going through onClick (which opens the
+      // menu): blur immediately so menuState lands on 'closed' with the
+      // input still focused.
+      input.focus();
+      input.blur();
+      input.focus();
+      // Now press ArrowDown while menu is closed.
       fireEvent.keyDown(input, { key: 'ArrowDown' });
       expect(
         await screen.findByRole('menuitem', { name: 'Status' }, { timeout: 2000 }),
