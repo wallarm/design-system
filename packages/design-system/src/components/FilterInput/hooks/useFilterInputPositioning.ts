@@ -9,6 +9,8 @@ interface UseFilterInputPositioningProps {
   containerRef?: RefObject<HTMLElement | null>;
   /** Override anchor calculation (receives containerRect, returns vertical/left bounds) */
   getAnchorBounds?: (containerRect: DOMRect) => AnchorBounds;
+  /** Vertical gap below the anchor. Defaults to 12. */
+  gutter?: number;
 }
 
 /**
@@ -19,13 +21,13 @@ interface UseFilterInputPositioningProps {
  * @param deps - extra values that force positioning recalculation (e.g. insertIndex)
  */
 export const useFilterInputPositioning = (
-  { anchorRef, containerRef, getAnchorBounds }: UseFilterInputPositioningProps,
+  { anchorRef, containerRef, getAnchorBounds, gutter = 12 }: UseFilterInputPositioningProps,
   deps: unknown[] = [],
 ) =>
   useMemo(
     () => ({
       placement: 'bottom-start' as const,
-      gutter: 16,
+      gutter,
       getAnchorRect: () => {
         const containerEl =
           containerRef?.current ?? anchorRef?.current?.closest<HTMLElement>(QUERY_BAR_SELECTOR);
@@ -39,5 +41,5 @@ export const useFilterInputPositioning = (
         return buildAnchoredRect(anchor, containerRect);
       },
     }),
-    [anchorRef, containerRef, getAnchorBounds, ...deps],
+    [anchorRef, containerRef, getAnchorBounds, gutter, ...deps],
   );
