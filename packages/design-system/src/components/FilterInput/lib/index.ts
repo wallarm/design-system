@@ -37,6 +37,7 @@ export {
   nextBuildingMenu,
 } from './operators';
 export { type FilterParseError, isFilterParseError, parseExpression } from './parseExpression';
+export { SEGMENT_TO_MENU } from './segmentMenu';
 export { serializeExpression } from './serializeExpression';
 export {
   createStatusCodeInputFilter,

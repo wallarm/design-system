@@ -1,10 +1,8 @@
-import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
-import { useCallback } from 'react';
+import type { FC, HTMLAttributes } from 'react';
 import { cn } from '../../../utils/cn';
 import { inputVariants } from '../../Input/classes';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
 import { useFilterInputContext } from '../FilterInputContext';
-import { isMenuRelated } from '../lib';
 import { ChipsWithGaps, TrailingGap } from './ChipsWithGaps';
 import {
   ACTIONS_PADDING,
@@ -14,11 +12,11 @@ import {
 } from './classes';
 import { EditingProvider } from './FilterInputChip/context/EditingContext';
 import { FilterInputChip } from './FilterInputChip/FilterInputChip';
-import { SEGMENT_VARIANT } from './FilterInputChip/segmentVariant';
 import { FilterInputFieldActions } from './FilterInputFieldActions';
 import { FilterInputSearch } from './FilterInputSearch';
 import { useChipsSplitting } from './hooks/useChipsSplitting';
 import { useExpandCollapse } from './hooks/useExpandCollapse';
+import { useSegmentEditKeyboard } from './hooks/useSegmentEditKeyboard';
 
 type FilterInputFieldProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
 
@@ -66,86 +64,20 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     onGapClick,
   } as const;
 
-  const handleSegmentEditKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onCancelSegmentEdit();
-        return;
-      }
-      if (e.key === 'Backspace' && segmentFilterText === '') {
-        // Empty-segment Backspace: walk back through chip segments. On the
-        // attribute when operator+value are absent — remove the chip entirely.
-        // Otherwise move inline-edit to the previous segment (cursor lands at
-        // the end of its text on the next render); the user's next keystroke
-        // edits that segment normally.
-        if (editingSegment === SEGMENT_VARIANT.attribute) {
-          const chipForEdit = editingChipId
-            ? chips.find(c => c.id === editingChipId && c.variant === 'chip')
-            : null;
-          const operator = chipForEdit?.operator ?? buildingChipData?.operator ?? '';
-          const value = chipForEdit?.value ?? buildingChipData?.value ?? '';
-          if (!operator && !value) {
-            e.preventDefault();
-            onRemoveEditingChip();
-          }
-          return;
-        }
-        if (editingSegment === SEGMENT_VARIANT.operator) {
-          e.preventDefault();
-          onSwitchEditSegment(SEGMENT_VARIANT.attribute);
-          return;
-        }
-        if (editingSegment === SEGMENT_VARIANT.value) {
-          e.preventDefault();
-          onSwitchEditSegment(SEGMENT_VARIANT.operator);
-          return;
-        }
-      }
-      if (e.key === 'Enter' && !e.defaultPrevented) {
-        if (editingSegment === SEGMENT_VARIANT.value) {
-          e.preventDefault();
-          onCustomValueCommit(segmentFilterText);
-          return;
-        }
-        if (editingSegment === SEGMENT_VARIANT.attribute) {
-          e.preventDefault();
-          onCustomAttributeCommit(segmentFilterText);
-          return;
-        }
-        if (editingSegment === SEGMENT_VARIANT.operator) {
-          e.preventDefault();
-          onCustomOperatorCommit(segmentFilterText);
-          return;
-        }
-      }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        menuRef.current?.focus();
-      }
-    },
-    [
-      onCancelSegmentEdit,
-      editingSegment,
-      segmentFilterText,
-      onCustomValueCommit,
-      onCustomAttributeCommit,
-      onCustomOperatorCommit,
-      onSwitchEditSegment,
-      onRemoveEditingChip,
-      editingChipId,
-      chips,
-      buildingChipData,
-      menuRef,
-    ],
-  );
-
-  const handleSegmentEditBlur = useCallback(
-    (e: FocusEvent<HTMLInputElement>) => {
-      if (!isMenuRelated(e.relatedTarget as HTMLElement | null)) onCancelSegmentEdit();
-    },
-    [onCancelSegmentEdit],
-  );
+  const { handleSegmentEditKeyDown, handleSegmentEditBlur } = useSegmentEditKeyboard({
+    editingChipId,
+    editingSegment,
+    segmentFilterText,
+    chips,
+    buildingChipData,
+    menuRef,
+    onCancelSegmentEdit,
+    onCustomValueCommit,
+    onCustomAttributeCommit,
+    onCustomOperatorCommit,
+    onSwitchEditSegment,
+    onRemoveEditingChip,
+  });
 
   return (
     <EditingProvider

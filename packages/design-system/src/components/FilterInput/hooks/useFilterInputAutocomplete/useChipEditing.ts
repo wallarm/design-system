@@ -1,7 +1,12 @@
 import type { RefObject } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { chipIdToConditionIndex, getOperatorFromLabel, isNoValueOperator } from '../../lib';
+import {
+  chipIdToConditionIndex,
+  getOperatorFromLabel,
+  isNoValueOperator,
+  SEGMENT_TO_MENU,
+} from '../../lib';
 import type {
   Condition,
   FieldMetadata,
@@ -29,12 +34,6 @@ interface UseChipEditingOptions {
 const getConditionByChipId = (chipId: string, conditions: Condition[]): Condition | null => {
   const idx = chipIdToConditionIndex(chipId);
   return idx !== null ? (conditions[idx] ?? null) : null;
-};
-
-const SEGMENT_TO_MENU: Record<ChipSegment, MenuState> = {
-  attribute: 'field',
-  operator: 'operator',
-  value: 'value',
 };
 
 /**
