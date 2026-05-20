@@ -1,4 +1,4 @@
-import { useCallback, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 import type { MenuFlowDeps } from './types';
 import { useFieldFlow } from './useFieldFlow';
 import { useOperatorFlow } from './useOperatorFlow';
@@ -21,9 +21,13 @@ export const useMenuFlow = (deps: MenuFlowDeps) => {
     setMenuState,
   } = deps;
 
-  // Fresh conditions for callbacks without padding dependency arrays.
+  // Fresh conditions for callbacks without padding dependency arrays. Mirrored
+  // in a layout effect — sub-hook callbacks read this ref only inside event
+  // handlers, which fire after commit, so they always see the latest value.
   const conditionsRef = useRef(conditions);
-  conditionsRef.current = conditions;
+  useLayoutEffect(() => {
+    conditionsRef.current = conditions;
+  });
 
   const internalDeps = { ...deps, conditionsRef };
 

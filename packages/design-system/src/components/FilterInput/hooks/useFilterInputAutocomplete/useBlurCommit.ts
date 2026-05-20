@@ -1,5 +1,5 @@
 import type { RefObject } from 'react';
-import { useCallback, useRef } from 'react';
+import { useCallback, useLayoutEffect, useRef } from 'react';
 import { isBuildingComplete, isNoValueOperator } from '../../lib';
 import type { FieldMetadata, FilterOperator, UpsertCondition } from '../../types';
 
@@ -34,11 +34,13 @@ export const useBlurCommit = ({
   commitBuildingOnBlurRef,
 }: UseBlurCommitDeps) => {
   const selectedFieldRef = useRef(selectedField);
-  selectedFieldRef.current = selectedField;
   const selectedOperatorRef = useRef(selectedOperator);
-  selectedOperatorRef.current = selectedOperator;
   const inputTextRef = useRef(inputText);
-  inputTextRef.current = inputText;
+  useLayoutEffect(() => {
+    selectedFieldRef.current = selectedField;
+    selectedOperatorRef.current = selectedOperator;
+    inputTextRef.current = inputText;
+  });
 
   // Re-entry flag survives state churn the ref snapshot can't guard (e.g.
   // upsertCondition triggers re-render that rewrites refs from props before
@@ -84,7 +86,12 @@ export const useBlurCommit = ({
     effectiveInsertIndexRef,
   ]);
 
-  commitBuildingOnBlurRef.current = commitBuildingOnBlur;
+  // Mirrored in a layout effect — keeps useMenuFlow ↔ useBlurCommit cycle
+  // observable to event handlers (which run post-commit) without mutating
+  // refs during render.
+  useLayoutEffect(() => {
+    commitBuildingOnBlurRef.current = commitBuildingOnBlur;
+  }, [commitBuildingOnBlur, commitBuildingOnBlurRef]);
 
   /** True if a building chip is alive; tells blur/menu-close to skip resetState. */
   const hasIncompleteBuilding = useCallback(

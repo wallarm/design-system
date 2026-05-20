@@ -145,7 +145,6 @@ export const useFilterInputAutocomplete = ({
     chips,
     fields,
     conditionsRef,
-    effectiveInsertIndexRef,
     selectedField,
     selectedOperator,
     buildingMultiValue,
@@ -156,7 +155,6 @@ export const useFilterInputAutocomplete = ({
     setMenuState,
     setSelectedOperator,
     setBuildingMultiValue,
-    setInsertIndex,
   });
 
   const { handleInputChange, handleInputClick, handleKeyDown, menuRef } = useInputHandlers({

@@ -7,9 +7,10 @@ import { useEffect } from 'react';
  * the element via a controlled prop change while the state still holds it,
  * downstream consumers can otherwise read a stale rect from a detached node.
  *
- * Detection is via a MutationObserver on documentElement (subtree childList),
- * so detachment caused by any reconciliation is caught synchronously after
- * commit — without re-running on every parent render.
+ * The MutationObserver is scoped to `el.parentElement` (subtree+childList) so
+ * unrelated mutations elsewhere on the page don't wake the callback. If the
+ * parent itself is removed in the same tick `el.parentElement` is null and we
+ * fall back to `documentElement` to keep the safety net.
  */
 export const useAutoCleanupDetachedElement = (
   el: HTMLElement | null,
@@ -22,7 +23,7 @@ export const useAutoCleanupDetachedElement = (
       return;
     }
     if (typeof MutationObserver === 'undefined') return;
-    const root = el.ownerDocument?.documentElement;
+    const root = el.parentElement ?? el.ownerDocument?.documentElement;
     if (!root) return;
     const observer = new MutationObserver(() => {
       if (!el.isConnected) onDetached();

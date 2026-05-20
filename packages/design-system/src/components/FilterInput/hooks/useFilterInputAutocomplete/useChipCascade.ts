@@ -1,4 +1,4 @@
-import type { MutableRefObject, RefObject } from 'react';
+import type { MutableRefObject } from 'react';
 import { useCallback } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { chipIdToConditionIndex, SEGMENT_TO_MENU } from '../../lib';
@@ -23,7 +23,6 @@ interface UseChipCascadeOptions {
   chips: FilterInputChipData[];
   fields: FieldMetadata[];
   conditionsRef: MutableRefObject<Condition[]>;
-  effectiveInsertIndexRef: RefObject<number>;
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
   buildingMultiValue: string | undefined;
@@ -34,7 +33,6 @@ interface UseChipCascadeOptions {
   setMenuState: (state: MenuState) => void;
   setSelectedOperator: (op: FilterOperator | null) => void;
   setBuildingMultiValue: (val: string | undefined) => void;
-  setInsertIndex: (fn: (prev: number | null) => number | null) => void;
 }
 
 /**
@@ -55,7 +53,6 @@ export const useChipCascade = ({
   chips,
   fields,
   conditionsRef,
-  effectiveInsertIndexRef,
   selectedField,
   selectedOperator,
   buildingMultiValue,
@@ -66,7 +63,6 @@ export const useChipCascade = ({
   setMenuState,
   setSelectedOperator,
   setBuildingMultiValue,
-  setInsertIndex,
 }: UseChipCascadeOptions) => {
   const {
     editingChipId,
@@ -178,20 +174,13 @@ export const useChipCascade = ({
       resetState();
       return;
     }
-    const chipCondIdx = chipIdToConditionIndex(editingChipId);
-    if (chipCondIdx !== null && chipCondIdx < effectiveInsertIndexRef.current) {
-      setInsertIndex(prev => (prev != null ? prev - 1 : prev));
-    }
+    // No insertIndex compensation here: cascade-delete exits the edit flow,
+    // so resetState() drops the cursor back to "after last condition" — which
+    // is the expected idle position. Compare to useChipActions.handleChipRemove,
+    // where the cursor must stay put because the user didn't enter edit mode.
     removeCondition(editingChipId);
     resetState();
-  }, [
-    editingChipId,
-    editingSegment,
-    removeCondition,
-    resetState,
-    effectiveInsertIndexRef,
-    setInsertIndex,
-  ]);
+  }, [editingChipId, editingSegment, removeCondition, resetState]);
 
   const stepBackBuildingMenu = useCallback(
     (current: 'field' | 'operator' | 'value') => {

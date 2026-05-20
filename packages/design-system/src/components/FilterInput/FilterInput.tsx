@@ -17,14 +17,16 @@ export interface FilterInputProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
   /**
    * Filter-field configurations driving the autocomplete. A few names are
-   * **reserved** and auto-wired with design-system helpers (consumer-supplied
-   * callbacks always override the auto-wiring):
+   * **reserved** and auto-wired with design-system helpers — DS-supplied
+   * callbacks **override** consumer values for the reserved slots, because
+   * the field semantics (mask range, accepted chars, backend form) are fixed
+   * by DS:
    *
    *   - `status_code` — HTTP status code field (mask suggestions, format
    *     validation, digit-or-X input filter, partial-input normalization).
    *
-   * For the same helpers on a different `name`, import the factories
-   * (`createStatusCodeSuggestions`, …) and attach them manually.
+   * To opt out, use a different `name` and attach the factories
+   * (`createStatusCodeSuggestions`, …) manually.
    */
   fields?: FieldMetadata[];
   value?: ExprNode | null;

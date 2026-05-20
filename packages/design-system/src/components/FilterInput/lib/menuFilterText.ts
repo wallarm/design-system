@@ -1,4 +1,4 @@
-import { SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
+import { type ChipSegment, SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
 import type { FieldValueOption, FilterOperator } from '../types';
 import { isMultiSelectOperator } from './operators';
 
@@ -8,7 +8,7 @@ import { isMultiSelectOperator } from './operators';
  * Single-value operators get the raw input.
  */
 export const getCurrentValueTokenText = (
-  editingSegment: string | null,
+  editingSegment: ChipSegment | null,
   inputText: string,
   segmentMenuFilterText: string,
   selectedOperator: FilterOperator | null,

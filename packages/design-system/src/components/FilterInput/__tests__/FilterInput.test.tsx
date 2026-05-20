@@ -8,10 +8,12 @@ import type { Condition, FieldMetadata, Group } from '../types';
  * Default findByRole timeout (1s) flakes under CI shard load because Ark UI
  * defers menu mount a frame after the state transition. Use this helper for
  * any menuitem we expect to appear after a click that opens or transitions a
- * menu — it widens the timeout uniformly.
+ * menu — it widens the timeout uniformly. 10s is calibrated to absorb the
+ * worst-case full-file run where userEvent + Ark UI mount + jsdom layout
+ * stack up; tests still finish in <1s on a happy path.
  */
 const findMenuitem = (name: RegExp | string) =>
-  screen.findByRole('menuitem', { name }, { timeout: 5000 });
+  screen.findByRole('menuitem', { name }, { timeout: 10000 });
 
 const sampleFields = [
   {

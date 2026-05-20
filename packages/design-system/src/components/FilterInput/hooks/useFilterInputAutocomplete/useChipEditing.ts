@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,
@@ -72,13 +72,17 @@ export const useChipEditing = ({
   // Suppresses filtering until first keystroke after edit opens.
   const [userHasTyped, setUserHasTyped] = useState(false);
 
-  // Refs keep data fresh in callbacks without recreating them.
+  // Refs keep data fresh in callbacks without recreating them. Mirroring runs
+  // in a layout effect so callbacks fired between commit and paint still read
+  // the latest values (event handlers are scheduled after, so they see them).
   const conditionsRef = useRef(conditions);
-  conditionsRef.current = conditions;
   const chipsRef = useRef(chips);
-  chipsRef.current = chips;
   const fieldsRef = useRef(fields);
-  fieldsRef.current = fields;
+  useLayoutEffect(() => {
+    conditionsRef.current = conditions;
+    chipsRef.current = chips;
+    fieldsRef.current = fields;
+  });
 
   /** Handle chip segment click — receives pre-computed segment and anchor element from FilterInputChip */
   const handleChipClick = useCallback(

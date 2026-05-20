@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useLayoutEffect, useRef, useState } from 'react';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
 interface UseAutocompleteStateOptions {
@@ -20,13 +20,17 @@ export const useAutocompleteState = ({ conditions }: UseAutocompleteStateOptions
   const [insertAfterConnector, setInsertAfterConnector] = useState(false);
   const effectiveInsertIndex = insertIndex ?? conditions.length;
 
-  // Fresh values for callbacks (avoids stale closures).
+  // Fresh values for callbacks (avoids stale closures). Mirrored in a
+  // layout effect so sub-hooks reading these refs in their own layout-phase
+  // effects still observe the latest value before the browser paints.
   const effectiveInsertIndexRef = useRef(effectiveInsertIndex);
-  effectiveInsertIndexRef.current = effectiveInsertIndex;
   const conditionsRef = useRef(conditions);
-  conditionsRef.current = conditions;
   const conditionsLengthRef = useRef(conditions.length);
-  conditionsLengthRef.current = conditions.length;
+  useLayoutEffect(() => {
+    effectiveInsertIndexRef.current = effectiveInsertIndex;
+    conditionsRef.current = conditions;
+    conditionsLengthRef.current = conditions.length;
+  });
 
   // Set by FilterInputValueMenu when open in multi-select.
   const blurCommitRef = useRef<(() => boolean) | null>(null);
