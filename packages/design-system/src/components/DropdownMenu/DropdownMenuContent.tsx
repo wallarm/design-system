@@ -9,7 +9,7 @@ import {
 import { Menu } from '@ark-ui/react/menu';
 import { Portal } from '@ark-ui/react/portal';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { TestIdProvider, useTestId } from '../../utils/testId';
 import {
   ScrollArea,
   ScrollAreaContent,
@@ -33,6 +33,10 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
   ...props
 }) => {
   const testId = useTestId('content');
+  // ScrollArea wraps menu items in its own TestIdProvider (value scoped to ScrollArea's
+  // own data-testid prop, which is unset here) — that blocks DropdownMenu's cascade
+  // from reaching menu items. Re-establish the cascade explicitly for the children.
+  const cascadeBase = useTestId();
   const childArray = Children.toArray(children);
   const inputChildren = childArray.filter(
     child => isValidElement(child) && child.type === DropdownMenuInput,
@@ -67,7 +71,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
             <ScrollAreaViewport>
               {/* !min-w-0 overrides Ark UI inline min-width:fit-content that causes horizontal scroll expansion with long content */}
               <ScrollAreaContent className={cn('flex flex-col gap-1 !min-w-0')}>
-                {menuChildren}
+                <TestIdProvider value={cascadeBase}>{menuChildren}</TestIdProvider>
               </ScrollAreaContent>
             </ScrollAreaViewport>
             <ScrollAreaScrollbar />
