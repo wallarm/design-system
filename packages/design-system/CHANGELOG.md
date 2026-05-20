@@ -1,3 +1,7 @@
+## 0.41.0 (2026-05-20)
+
+* feat: [WDS-118] logo ([4a934f2](https://github.com/wallarm/design-system/commit/4a934f2))
+
 ## 0.40.0 (2026-05-20)
 
 * fix(dropdown-menu): restore testid cascade through ScrollArea wrapper (#127) ([fb44084](https://github.com/wallarm/design-system/commit/fb44084)), closes [#127](https://github.com/wallarm/design-system/issues/127)
