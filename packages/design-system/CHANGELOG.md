@@ -1,3 +1,8 @@
+## 0.40.0 (2026-05-20)
+
+* fix(dropdown-menu): restore testid cascade through ScrollArea wrapper (#127) ([fb44084](https://github.com/wallarm/design-system/commit/fb44084)), closes [#127](https://github.com/wallarm/design-system/issues/127)
+* feat(dropdown-menu): add CheckboxItem and RadioGroup sub-components (#126) ([54b0f7f](https://github.com/wallarm/design-system/commit/54b0f7f)), closes [#126](https://github.com/wallarm/design-system/issues/126)
+
 ## <small>0.39.1 (2026-05-19)</small>
 
 * fix(simple-charts): WDS-90 LineChart fixes ([c6fd779](https://github.com/wallarm/design-system/commit/c6fd779))
