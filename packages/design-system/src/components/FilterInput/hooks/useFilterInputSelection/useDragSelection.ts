@@ -26,8 +26,8 @@ export const useDragSelection = ({
     (e: MouseEvent<HTMLDivElement>) => {
       if (e.button !== 0) return;
       const target = e.target as HTMLElement;
-      // Allow drag to start from buttons (InsertionGap, chip remove) — their click
-      // handlers fire on mouseup and won't conflict with drag (4px threshold).
+      // Drag may start from buttons — click handlers fire on mouseup; 4px
+      // drag threshold prevents conflict.
       if (target.closest(DRAG_IGNORE_SELECTOR)) return;
 
       dragStartXRef.current = e.clientX;
@@ -39,7 +39,7 @@ export const useDragSelection = ({
         e.clientX,
         e.clientY,
       );
-      // Cache visual entries once per drag — rects don't change during drag
+      // Cache rects once — they don't change during a drag.
       visualEntriesRef.current = getVisualEntries(chipRegistryRef.current);
 
       const handleMouseMove = (moveEvent: globalThis.MouseEvent) => {

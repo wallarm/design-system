@@ -37,7 +37,7 @@ export interface FilterInputAutocompleteState {
   segmentFilterText: string;
   segmentMenuFilterText: string;
   editingSegment: ChipSegment | null;
-  /** Ref for multi-select blur commit — set by value menu, called by blur handler */
+  /** Multi-select blur commit; set by value menu, called by blur handler. */
   blurCommitRef: RefObject<(() => boolean) | null>;
 }
 
@@ -72,16 +72,14 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
     blurCommitRef,
   } = autocomplete;
 
-  // Route filter text: use menu filter text (empty until user types) when editing, otherwise main input
+  // Route filter text: segment input when editing, main input otherwise.
   const fieldFilterText =
     editingSegment === SEGMENT_VARIANT.attribute ? segmentMenuFilterText : inputText;
-  // Operator: filter by typed text from main input (building) or segment input (inline editing)
   const operatorFilterText =
     editingSegment === SEGMENT_VARIANT.operator ? segmentMenuFilterText : inputText;
 
-  // The active token the user is currently typing. For multi-select operators this
-  // strips prior comma-committed values so `getSuggestions` and the dropdown filter
-  // both see only the in-progress token. Single-value operators get the raw input.
+  // Active token: for multi-select operators, strips prior comma-committed
+  // values so getSuggestions and dropdown filter see only the in-progress one.
   const currentTokenText = getCurrentValueTokenText(
     editingSegment,
     inputText,
@@ -89,9 +87,8 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
     selectedOperator,
   );
 
-  // Pass committed chip values to getSuggestions so helpers that style values
-  // (e.g. status codes with class-color badges) can keep selected entries
-  // branded even when the input-driven suggestions have narrowed to masks.
+  // Pass committed chip values to getSuggestions so value-styling helpers
+  // (e.g. status-code badges) stay branded even when suggestions narrow.
   const selectedContext = useMemo(
     () => ({
       selectedValues: [
@@ -160,7 +157,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
             filterText={valueFilterText}
           />
         ) : (
-          // Freeform fields (no predefined values) skip the dropdown — user types and presses Enter
+          // Freeform fields (no options) skip the dropdown — Enter to commit.
           hasValueOptions && (
             <FilterInputValueMenu
               values={selectedFieldValues}

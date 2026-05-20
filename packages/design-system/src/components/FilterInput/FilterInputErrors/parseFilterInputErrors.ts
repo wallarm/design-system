@@ -1,6 +1,5 @@
 import { SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
-import { isValidFieldValue } from '../hooks/useFilterInputAutocomplete/valueCommitHelpers';
-import { getFieldValues, hasStaticAllowlist } from '../lib';
+import { getFieldValues, hasStaticAllowlist, isValidFieldValue } from '../lib';
 import type { Condition, FieldMetadata } from '../types';
 
 /**

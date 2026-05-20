@@ -1,31 +1,41 @@
 /**
- * Check if an element belongs to a FilterInput-owned menu/portal overlay.
- *
- * Menus are marked with `data-filter-input-menu` on their `DropdownMenuContent`
- * root. Generic Ark UI selectors (`[role="menu"]`, `[data-part="content"]`,
- * `[data-scope="date-picker"]`) intentionally DO NOT match — otherwise blur
- * handlers mistake unrelated page popups (tenant switcher, other dropdowns)
- * for FilterInput's own menu and refuse to close. See AS-882.
+ * True if element belongs to a FilterInput-owned menu overlay. Marked by
+ * `data-filter-input-menu` on DropdownMenuContent — generic Ark UI selectors
+ * are intentionally NOT used so blur handlers don't confuse unrelated page
+ * popups (tenant switcher etc.) for FilterInput's own menu. AS-882.
  */
 export const isMenuRelated = (el: HTMLElement | null): boolean =>
   !!el?.closest('[data-filter-input-menu]');
 
+export interface AnchorBounds {
+  top: number;
+  bottom: number;
+  left: number;
+}
+
+/** Extract anchor bounds from a DOMRect (right edge is computed at build time). */
+export const toAnchorBounds = (rect: DOMRect): AnchorBounds => ({
+  top: rect.top,
+  bottom: rect.bottom,
+  left: rect.left,
+});
+
 /**
- * Build a DOMRect-compatible object anchored vertically to the container
- * and horizontally to the given left position. Used by all FilterInput dropdowns
- * so they share the same vertical gap from the container bottom edge.
+ * Build a DOMRect-compatible object from the anchor's vertical bounds + left
+ * edge; right edge stays at the container's right so the dropdown can expand
+ * to full container width below the actual interaction target.
  */
-export const buildContainerAnchoredRect = (
+export const buildAnchoredRect = (
+  anchor: AnchorBounds,
   containerRect: DOMRect,
-  anchorLeft: number,
   anchorRight = containerRect.right,
 ) => ({
-  x: anchorLeft,
-  y: containerRect.top,
-  width: anchorRight - anchorLeft,
-  height: containerRect.height,
-  top: containerRect.top,
-  bottom: containerRect.bottom,
-  left: anchorLeft,
+  x: anchor.left,
+  y: anchor.top,
+  width: anchorRight - anchor.left,
+  height: anchor.bottom - anchor.top,
+  top: anchor.top,
+  bottom: anchor.bottom,
+  left: anchor.left,
   right: anchorRight,
 });

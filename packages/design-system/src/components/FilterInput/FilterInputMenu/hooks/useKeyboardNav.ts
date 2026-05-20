@@ -14,7 +14,7 @@ interface UseKeyboardNavOptions {
   arrowRightSelectsActive?: boolean;
   /** When provided, ArrowUp on the first item returns focus to this input */
   inputRef?: RefObject<HTMLInputElement | null>;
-  /** Ref to the menu content element — used for scoped queries and focus management */
+  /** Ref to the menu content element for scoped queries. */
   menuRef?: RefObject<HTMLDivElement | null>;
 }
 
@@ -41,8 +41,7 @@ export const useKeyboardNav = ({
   const [activeIndex, setActiveIndex] = useState(-1);
   const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
-  // Registry of menu item DOM elements keyed by item id — populated via
-  // registerItem callback ref (see return value). Avoids querySelector lookup.
+  // Item DOM registry keyed by id — avoids querySelector lookup.
   const itemRegistryRef = useRef<Map<string, HTMLElement>>(new Map());
 
   const registerItem = useCallback(
@@ -53,7 +52,7 @@ export const useKeyboardNav = ({
     [],
   );
 
-  // Mutable ref for the latest index — avoids stale closures in navigate
+  // Mutable ref to avoid stale closures in navigate.
   const activeIndexRef = useRef(-1);
 
   const pendingIdsRef = useRef(pendingIds);
@@ -80,7 +79,6 @@ export const useKeyboardNav = ({
     menuRef,
   };
 
-  // Reset when menu opens
   const prevOpenRef = useRef(open);
   const prevItemsLenRef = useRef(items.length);
   useEffect(() => {
@@ -92,7 +90,7 @@ export const useKeyboardNav = ({
     prevOpenRef.current = open;
   }, [open]);
 
-  // Clamp activeIndex when items list changes (e.g. filtering)
+  // Clamp activeIndex when items list changes (e.g. filtering).
   useEffect(() => {
     if (items.length !== prevItemsLenRef.current) {
       prevItemsLenRef.current = items.length;
@@ -104,13 +102,12 @@ export const useKeyboardNav = ({
     }
   }, [items.length]);
 
-  // Navigate to next enabled item, returns the new index synchronously
+  // Navigate to next enabled item; returns the new index synchronously.
   const navigate = useCallback((direction: 1 | -1): number => {
     const { items: list } = stateRef.current;
     const total = list.length;
     if (total === 0) return activeIndexRef.current;
 
-    // First navigation — start from the beginning (down) or end (up)
     const current = activeIndexRef.current;
     const start =
       current === -1 ? (direction === 1 ? 0 : total - 1) : (current + direction + total) % total;
@@ -123,7 +120,7 @@ export const useKeyboardNav = ({
     activeIndexRef.current = next;
     setActiveIndex(next);
 
-    // Scroll the highlighted item into view (deferred so Ark UI applies data-highlighted first)
+    // Deferred so Ark UI applies data-highlighted before we scroll.
     const itemId = list[next]?.id;
     if (itemId) {
       requestAnimationFrame(() => {
@@ -134,15 +131,14 @@ export const useKeyboardNav = ({
     return next;
   }, []);
 
-  // Cmd/Ctrl+Arrow multi-select helper — marks current + next items as pending
+  // Cmd/Ctrl+Arrow multi-select: marks current + next items as pending.
   const suppressHighlightRef = useRef(false);
   const handleModArrow = useCallback(
     (e: KeyboardEvent) => {
       const { items: list } = stateRef.current;
       e.preventDefault();
-      // stopImmediatePropagation prevents other capture-phase listeners on window
-      // (e.g. Ark UI / zag.js) from also processing Cmd+Arrow as "jump to end".
-      // Side-effect: any other global Cmd+Arrow listeners on window won't fire.
+      // stopImmediatePropagation prevents zag.js from treating Cmd+Arrow as
+      // "jump to end". Side-effect: other global Cmd+Arrow listeners won't fire.
       e.stopImmediatePropagation();
       suppressHighlightRef.current = true;
       const currentItem = list[activeIndexRef.current];
@@ -154,8 +150,8 @@ export const useKeyboardNav = ({
         if (nextItem && !nextItem.disabled) next.add(nextItem.id);
         return next;
       });
-      // Assumes Ark UI fires onHighlightChange within the same frame as the
-      // controlled-prop update. If Ark UI defers further, this window is too short.
+      // Assumes Ark UI fires onHighlightChange this frame; if it defers further,
+      // this rAF window is too short.
       requestAnimationFrame(() => {
         suppressHighlightRef.current = false;
       });
@@ -168,19 +164,16 @@ export const useKeyboardNav = ({
     if (!open) return;
 
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only intercept events from *our* FilterInput menu, not from nested dropdowns (e.g. connector chip)
+      // Only intercept events from our FilterInput menu, not nested dropdowns.
       const target = e.target as HTMLElement | null;
       const inMenu = menuRef?.current?.contains(target);
       const isMod = e.metaKey || e.ctrlKey;
 
-      // ── Focus is inside the menu ──────────────────────────
       if (inMenu) {
-        // Cmd+Arrow → multi-select (intercept before Ark UI)
         if (isMod && (e.key === 'ArrowDown' || e.key === 'ArrowUp')) {
           handleModArrow(e);
           return;
         }
-        // Enter with pending items → select all pending, then commit
         if (e.key === 'Enter' && pendingIdsRef.current.size > 0) {
           e.preventDefault();
           e.stopPropagation();
@@ -190,11 +183,10 @@ export const useKeyboardNav = ({
             if (item && !item.disabled) select(item);
           });
           setPendingIds(new Set());
-          // Defer commit so toggled state is flushed first
+          // Defer commit so toggled state is flushed first.
           queueMicrotask(() => commit?.());
           return;
         }
-        // ArrowRight → select active item and advance, or commit checked values
         if (e.key === 'ArrowRight') {
           const {
             onArrowRight: arrowRight,
@@ -213,7 +205,6 @@ export const useKeyboardNav = ({
             setPendingIds(new Set());
             queueMicrotask(() => arrowRight());
           } else if (selectsActive && activeIndexRef.current >= 0) {
-            // Single-select: select highlighted item (onSelect handler advances the flow)
             const item = list[activeIndexRef.current];
             if (item && !item.disabled) select(item);
           } else {
@@ -221,25 +212,26 @@ export const useKeyboardNav = ({
           }
           return;
         }
-        // ArrowUp on first item → return focus to input
+        // ArrowUp on first item returns focus to input.
         const { inputRef: iRef } = stateRef.current;
         if (e.key === 'ArrowUp' && iRef?.current && activeIndexRef.current === 0) {
           e.preventDefault();
           e.stopPropagation();
           iRef.current.focus();
         }
-        // Everything else — let Ark UI handle natively
         return;
       }
 
-      // ── Focus is on a segment inline-edit input ──
-      // Only intercept ArrowDown/Up (menu navigation) and Escape (close).
-      // Enter must propagate to the segment's onKeyDown for value commit.
+      // Segment inline-edit input: intercept arrows/Escape and Enter only when
+      // an item is highlighted — otherwise Enter must reach the segment for
+      // free-form value commit instead of selecting an unrelated menu item.
       const isSegmentInput = (e.target as HTMLElement)?.closest?.('[data-slot^="segment-"]');
-      if (isSegmentInput && e.key !== 'Escape' && e.key !== 'ArrowDown' && e.key !== 'ArrowUp')
-        return;
+      if (isSegmentInput) {
+        const isEnterWithHighlight = e.key === 'Enter' && activeIndexRef.current >= 0;
+        const isNavOrClose = e.key === 'Escape' || e.key === 'ArrowDown' || e.key === 'ArrowUp';
+        if (!isNavOrClose && !isEnterWithHighlight) return;
+      }
 
-      // ── Focus is on the input ─────────────────────────────
       const {
         items: list,
         onSelect: select,
@@ -255,11 +247,11 @@ export const useKeyboardNav = ({
             handleModArrow(e);
             break;
           }
-          // Plain arrow from input → navigate to first/last item and focus the menu
+          // Combobox pattern: navigate controlled highlightedValue while DOM
+          // focus stays on the input.
           e.preventDefault();
           e.stopPropagation();
           navigate(e.key === 'ArrowDown' ? 1 : -1);
-          stateRef.current.menuRef?.current?.focus();
           break;
         }
 
@@ -280,8 +272,8 @@ export const useKeyboardNav = ({
             const item = list[activeIndexRef.current];
             if (item && !item.disabled) select(item);
           }
-          // No pending items and no active selection — let event propagate
-          // (e.g. segment input handles Enter for custom value commit)
+          // No pending or active item — let Enter propagate so segment input
+          // can handle custom value commit.
           break;
         }
 
@@ -320,23 +312,21 @@ export const useKeyboardNav = ({
     return () => window.removeEventListener('keydown', handleKeyDown, true);
   }, [open, navigate, handleModArrow, menuRef]);
 
-  // Sync mouse hover / Ark UI keyboard nav with our state + scroll into view
+  // Sync mouse hover / Ark UI keyboard nav with our state + scroll into view.
   const onHighlightChange = useCallback((details: { highlightedValue: string | null }) => {
     if (!details.highlightedValue) return;
-    // During multi-select (Cmd+Arrow), ignore external highlight changes from Ark UI
-    // — our navigate() already set the correct activeIndex
+    // During Cmd+Arrow multi-select, navigate() owns activeIndex.
     if (suppressHighlightRef.current) return;
     const idx = stateRef.current.items.findIndex(item => item.id === details.highlightedValue);
     if (idx >= 0) {
       setActiveIndex(idx);
       activeIndexRef.current = idx;
     }
-    // Scroll highlighted item into view via the registry
     itemRegistryRef.current.get(details.highlightedValue)?.scrollIntoView({ block: 'nearest' });
   }, []);
 
-  // Empty string (not null) so DropdownMenu always passes it to Ark UI,
-  // preventing Ark's default auto-highlight of the first item when focus is elsewhere.
+  // Empty string (not null) prevents Ark UI from auto-highlighting the first
+  // item when focus is elsewhere.
   const highlightedValue = items[activeIndex]?.id ?? '';
 
   return {

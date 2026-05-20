@@ -12,8 +12,7 @@ export const buildExpression = (
   if (conditions.length === 0) return null;
   if (conditions.length === 1) return conditions[0] ?? null;
 
-  // Split conditions into AND-groups separated by OR connectors
-  // Invariant: connectors.length === conditions.length - 1
+  // AND-groups separated by OR. Invariant: connectors.length === conditions.length - 1.
   const first = conditions[0];
   if (!first) return null;
 
@@ -31,7 +30,6 @@ export const buildExpression = (
     [[first]],
   );
 
-  // Wrap each AND-group into a node
   const andNodes = orGroups.map<ExprNode>(group =>
     group.length === 1 && group[0] ? group[0] : { type: 'group', operator: 'and', children: group },
   );

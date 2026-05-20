@@ -11,6 +11,8 @@ export { applyKnownFieldHelpers, getKnownFieldSerializer } from './applyKnownFie
 export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
 export {
   CONNECTOR_ID_PATTERN,
+  MENU_BASE_GUTTER,
+  MENU_CHIP_GUTTER_OFFSET,
   NO_VALUE_OPERATORS,
   OPERATOR_LABELS,
   OPERATOR_LABELS_BY_TYPE,
@@ -19,7 +21,7 @@ export {
   QUERY_BAR_SELECTOR,
   VARIANT_LABELS,
 } from './constants';
-export { buildContainerAnchoredRect, isMenuRelated } from './dom';
+export { type AnchorBounds, buildAnchoredRect, isMenuRelated, toAnchorBounds } from './dom';
 export { findOptionByValue, getFieldValues, hasFieldValues, hasStaticAllowlist } from './fields';
 export { filterAndSort } from './filterSort';
 export { getCurrentValueTokenText, getValueFilterText } from './menuFilterText';
@@ -37,6 +39,7 @@ export {
   nextBuildingMenu,
 } from './operators';
 export { type FilterParseError, isFilterParseError, parseExpression } from './parseExpression';
+export { SEGMENT_TO_MENU } from './segmentMenu';
 export { serializeExpression } from './serializeExpression';
 export {
   createStatusCodeInputFilter,
@@ -45,3 +48,9 @@ export {
   createStatusCodeSuggestions,
   createStatusCodeValidator,
 } from './statusCode';
+export {
+  findMatchingFieldValue,
+  getInvalidValueIndices,
+  isValidFieldValue,
+  validateValueForField,
+} from './validation';

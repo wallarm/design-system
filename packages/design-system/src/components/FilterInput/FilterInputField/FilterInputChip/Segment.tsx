@@ -44,10 +44,9 @@ export const Segment: FC<SegmentProps> = ({
   const inputRef = useRef<HTMLInputElement>(null);
   const sizerRef = useRef<HTMLSpanElement>(null);
 
-  // Attach this segment's input ref into the context ref registry so
-  // useFocusManagement can focus it directly without a querySelector.
-  // Uses useContext directly (null-safe) to support rendering Segment outside
-  // a FilterInputProvider (e.g. in isolated unit tests).
+  // Register segment input in the context ref registry so useFocusManagement
+  // can focus it without querySelector. useContext (null-safe) tolerates
+  // rendering Segment outside FilterInputProvider in unit tests.
   const filterInputContext = useContext(FilterInputContext);
   const segmentInputRef =
     variant === SEGMENT_VARIANT.attribute
@@ -59,17 +58,15 @@ export const Segment: FC<SegmentProps> = ({
           : null;
   const lastTextWidthRef = useRef<number>(0);
 
-  // Measure text width when content changes (only while not editing).
-  // Uses getBoundingClientRect for sub-pixel precision to avoid layout shift.
+  // Sub-pixel-precise width measurement (avoids layout shift) when not editing.
   useEffect(() => {
     if (editing) return;
     const width = textRef.current?.getBoundingClientRect().width ?? children.length * CHAR_WIDTH_PX;
     lastTextWidthRef.current = width;
   }, [editing, children]);
 
-  // Auto-focus when entering edit mode.
-  // Double rAF is needed to beat Ark UI's focus steal via zag.js (which uses single rAF).
-  // If Ark UI changes its focus timing, this workaround may need updating.
+  // Auto-focus on entering edit: double rAF beats Ark UI/zag.js focus steal
+  // (single rAF). Fragile if Ark UI changes its focus timing.
   useEffect(() => {
     if (!editing) return;
     let innerFrame = 0;

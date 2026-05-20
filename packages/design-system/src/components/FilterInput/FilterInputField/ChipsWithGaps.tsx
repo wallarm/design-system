@@ -11,7 +11,7 @@ interface ChipsWithGapsProps {
   chips: FilterInputChipData[];
   hideLeadingGap?: boolean;
   hideTrailingGap?: boolean;
-  onChipClick: (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => void;
+  onChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
   onConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   onChipRemove: (chipId: string) => void;
   onGapClick: (conditionIndex: number, afterConnector: boolean) => void;
@@ -61,7 +61,7 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
             onSegmentClick={
               chip.disabled
                 ? undefined
-                : (segment, anchorRect) => onChipClick(chip.id, segment, anchorRect)
+                : (segment, anchorEl) => onChipClick(chip.id, segment, anchorEl)
             }
           />
         </div>,

@@ -8,31 +8,24 @@ import {
 } from './constants';
 
 /**
- * Filler text shown in the value slot of no-value operator chips so every
- * chip visually has three segments. Kept here next to `isNoValueOperator`
- * so committed (buildChips) and building-preview (deriveAutocompleteValues)
- * paths can never drift.
+ * Placeholder in no-value operator chips so every chip visually has 3
+ * segments. Co-located with isNoValueOperator so committed and
+ * building-preview paths can't drift.
  */
 export const NO_VALUE_PLACEHOLDER = '—';
 
-/**
- * Helper to get operator label for specific field type
- */
+/** Get operator label for a specific field type. */
 export const getOperatorLabel = (operator: FilterOperator, fieldType: FieldType): string =>
   OPERATOR_LABELS_BY_TYPE[fieldType]?.[operator] ?? OPERATOR_LABELS[operator];
 
-/**
- * Reverse lookup: get raw FilterOperator from its display label and field type
- */
+/** Reverse lookup: FilterOperator from display label and field type. */
 export const getOperatorFromLabel = (
   label: string,
   fieldType: FieldType,
 ): FilterOperator | null => {
-  // Check type-specific labels first (more specific)
   const typeLabels = OPERATOR_LABELS_BY_TYPE[fieldType];
   const typeMatch = Object.entries(typeLabels).find(([, lbl]) => lbl === label);
   if (typeMatch) return typeMatch[0] as FilterOperator;
-  // Fall back to generic labels
   const genericMatch = Object.entries(OPERATOR_LABELS).find(([, lbl]) => lbl === label);
   return genericMatch ? (genericMatch[0] as FilterOperator) : null;
 };
@@ -59,10 +52,8 @@ export const isOperatorAllowedForField = (
 ): boolean => getFieldOperators(field).includes(operator);
 
 /**
- * The menu that should open to continue building a chip from its current
- * state. Returns null when the chip is fully built and nothing should open.
- * Reused by the refocus path (useFocusManagement) and the main-input click
- * path (useInputHandlers) so both stay in sync.
+ * Next menu to open to continue building a chip; null when fully built.
+ * Shared by useFocusManagement (refocus) and useInputHandlers (click).
  */
 export const nextBuildingMenu = (
   field: FieldMetadata | null,
@@ -74,10 +65,8 @@ export const nextBuildingMenu = (
 };
 
 /**
- * Decide whether the in-progress (field, operator, value) triple is fully
- * built — i.e. has all the segments the chip needs. No-value operators
- * (is_null / is_not_null) are complete without a value: the chip renders a
- * value-placeholder in that slot so it still visually has three segments.
+ * True if the in-progress (field, operator, value) triple has all segments.
+ * No-value operators (is_null/is_not_null) are complete without a value.
  */
 export const isBuildingComplete = (
   field: FieldMetadata | null,
@@ -92,9 +81,8 @@ export const isBuildingComplete = (
 };
 
 /**
- * Check whether two operators handle values in compatible shapes
- * (multi-select / between / no-value categories match), meaning a value
- * preview built for `a` can be reused as-is for `b`.
+ * True when two operators share value shape (multi-select/between/no-value
+ * categories match) — a value preview built for `a` is reusable for `b`.
  */
 export const isValueShapeCompatible = (
   a: FilterOperator | null,

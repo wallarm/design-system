@@ -1,33 +1,29 @@
 import type { FieldType, FilterInputChipVariant, FilterOperator } from '../types';
 
-/**
- * Operators that require no value (unary)
- */
+/** Operators that require no value (unary). */
 export const NO_VALUE_OPERATORS: readonly FilterOperator[] = ['is_null', 'is_not_null'] as const;
 
-/**
- * Operators that support multi-select values
- */
+/** Operators that support multi-select values. */
 export const MULTI_SELECT_OPERATORS: readonly FilterOperator[] = ['in', 'not_in'] as const;
 
-/**
- * Pattern to extract condition index from chip ID (e.g. "chip-2" → 2)
- */
+/** Extract condition index from chip ID (e.g. "chip-2" → 2). */
 export const CHIP_ID_PATTERN = /^chip-(\d+)$/;
 
-/**
- * Pattern to extract condition index from connector ID (e.g. "connector-2" → 2)
- */
+/** Extract condition index from connector ID. */
 export const CONNECTOR_ID_PATTERN = /^connector-(\d+)$/;
 
-/**
- * DOM selector for the FilterInput root element
- */
+/** DOM selector for the FilterInput root element. */
 export const QUERY_BAR_SELECTOR = '[data-slot="filter-input"]';
 
-/**
- * Labels for non-chip filter chip variants (connectors, brackets)
- */
+/** Gap between the dropdown and the field border in the empty/initial state. */
+export const MENU_BASE_GUTTER = 4;
+
+/** Extra vertical offset added to the anchor's bottom when the dropdown is
+ *  anchored to a chip / input — total visual gap becomes
+ *  MENU_BASE_GUTTER + MENU_CHIP_GUTTER_OFFSET (12). */
+export const MENU_CHIP_GUTTER_OFFSET = 8;
+
+/** Labels for non-chip filter chip variants (connectors, brackets). */
 export const VARIANT_LABELS: Partial<Record<FilterInputChipVariant, string>> = {
   and: 'AND',
   or: 'OR',
@@ -35,10 +31,7 @@ export const VARIANT_LABELS: Partial<Record<FilterInputChipVariant, string>> = {
   ')': ')',
 };
 
-/**
- * Operator Symbol Mapping
- * Maps operators to their raw symbol displayed on the right side of menus
- */
+/** Raw operator symbols shown on the right side of menus. */
 export const OPERATOR_SYMBOLS: Record<FilterOperator, string> = {
   '=': '=',
   '!=': '!=',
@@ -55,10 +48,7 @@ export const OPERATOR_SYMBOLS: Record<FilterOperator, string> = {
   between: '<>',
 };
 
-/**
- * Operator Label Mapping
- * Maps operator symbols to human-readable labels
- */
+/** Human-readable labels for operator symbols. */
 export const OPERATOR_LABELS: Record<FilterOperator, string> = {
   '=': 'is',
   '!=': 'is not',
@@ -70,17 +60,14 @@ export const OPERATOR_LABELS: Record<FilterOperator, string> = {
   not_like: 'not like',
   in: 'is any of',
   not_in: 'is not any of',
-  // ⚠️ Inverted labels: Wallarm API uses is_null to mean "field has a value" (IS SET).
-  // This is opposite to SQL semantics. Keep in sync with backend API contract.
+  // Wallarm API: is_null means "field has a value" (IS SET) — opposite of
+  // SQL semantics. Keep in sync with backend API contract.
   is_null: 'is set',
   is_not_null: 'is not set',
   between: 'between',
 };
 
-/**
- * Field type-specific operator labels
- * Some operators have different labels depending on field type
- */
+/** Field-type-specific operator labels (some override the generic ones). */
 export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOperator, string>>> = {
   string: {
     '=': 'is',
@@ -131,10 +118,7 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
   },
 };
 
-/**
- * Operators by Field Type Mapping (with groups for separators)
- * Maps field types to their available operators, grouped logically
- */
+/** Operators per field type, grouped for menu separators. */
 export const OPERATORS_BY_TYPE: Record<FieldType, FilterOperator[][]> = {
   string: [
     ['=', '!=', 'in', 'like', 'not_like'],

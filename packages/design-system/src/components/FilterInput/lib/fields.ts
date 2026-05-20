@@ -1,12 +1,9 @@
 import type { FieldMetadata, FieldValueOption } from '../types';
 
 /**
- * Find an option in `field.values` matching the given value, using stringified
- * comparison. Loose-match is required because parser/serializer round-trip
- * coerces typed primitives to strings (e.g. integer field value `5` → string
- * `"5"` after `(field = "5")` parses back), and strict `===` would miss the
- * canonical option. Returns undefined when there is no match or the field
- * has no `values` allowlist.
+ * Find an option in `field.values` matching the value (stringified compare).
+ * Loose-match needed because parser/serializer round-trip stringifies typed
+ * primitives (5 → "5") and strict === would miss the canonical option.
  */
 export const findOptionByValue = (
   field: FieldMetadata | undefined,
@@ -18,12 +15,9 @@ export const findOptionByValue = (
 };
 
 /**
- * Get value options for a field.
- * Priority: `getSuggestions(inputText, context)` > `values` > `options` (converted to `{value, label}`).
- *
- * `context.selectedValues` is forwarded to `getSuggestions` so helpers can
- * include the currently-committed values in their output (e.g. to preserve a
- * badge style on a concrete code once suggestions have narrowed to masks).
+ * Get value options for a field — priority: getSuggestions > values > options.
+ * `context.selectedValues` lets helpers preserve a committed value's badge
+ * style once suggestions have narrowed.
  */
 export const getFieldValues = (
   field: FieldMetadata,
@@ -37,9 +31,8 @@ export const getFieldValues = (
 };
 
 /**
- * Check whether a field has a source of value suggestions — dynamic callback, static
- * `values`, or `options`. Used to decide whether to render a value dropdown at all.
- * Fields with `getSuggestions` always get a dropdown (empty list is still a list).
+ * True if a field has any value suggestions (dynamic, values, or options).
+ * Decides whether to render a value dropdown. getSuggestions always yields one.
  */
 export const hasFieldValues = (field: FieldMetadata): boolean => {
   if (field.getSuggestions) return true;
@@ -48,10 +41,8 @@ export const hasFieldValues = (field: FieldMetadata): boolean => {
 };
 
 /**
- * Whether the field has an exhaustive static allowlist of accepted values.
- * Used by validation code to decide whether to reject values outside the list.
- * Fields with `getSuggestions` return false — their suggestion list is a hint,
- * not an allowlist (consumer may accept freeform values that aren't currently suggested).
+ * True if the field has an exhaustive static allowlist. getSuggestions
+ * fields return false — their list is a hint, not a strict allowlist.
  */
 export const hasStaticAllowlist = (field: FieldMetadata): boolean => {
   if (field.getSuggestions) return false;

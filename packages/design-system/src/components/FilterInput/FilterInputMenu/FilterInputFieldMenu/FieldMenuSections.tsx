@@ -11,8 +11,6 @@ import {
 } from '../../../DropdownMenu';
 import type { Condition, FieldMetadata } from '../../types';
 
-// ── Recent conditions section ────────────────────────────
-
 interface RecentSectionProps {
   conditions: Condition[];
   fields: FieldMetadata[];
@@ -59,8 +57,6 @@ export const RecentSection: FC<RecentSectionProps> = ({
 
 RecentSection.displayName = 'RecentSection';
 
-// ── Suggested fields section ─────────────────────────────
-
 interface SuggestionsSectionProps {
   fields: FieldMetadata[];
   onSelect: (field: FieldMetadata) => void;
@@ -95,8 +91,6 @@ export const SuggestionsSection: FC<SuggestionsSectionProps> = ({
 );
 
 SuggestionsSection.displayName = 'SuggestionsSection';
-
-// ── AND/OR operators section ─────────────────────────────
 
 interface OperatorsSectionProps {
   onSelectAnd?: () => void;

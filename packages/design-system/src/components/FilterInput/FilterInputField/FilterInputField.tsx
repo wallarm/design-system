@@ -1,10 +1,8 @@
-import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
-import { useCallback } from 'react';
+import type { FC, HTMLAttributes } from 'react';
 import { cn } from '../../../utils/cn';
 import { inputVariants } from '../../Input/classes';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
 import { useFilterInputContext } from '../FilterInputContext';
-import { isMenuRelated } from '../lib';
 import { ChipsWithGaps, TrailingGap } from './ChipsWithGaps';
 import {
   ACTIONS_PADDING,
@@ -14,11 +12,11 @@ import {
 } from './classes';
 import { EditingProvider } from './FilterInputChip/context/EditingContext';
 import { FilterInputChip } from './FilterInputChip/FilterInputChip';
-import { SEGMENT_VARIANT } from './FilterInputChip/segmentVariant';
 import { FilterInputFieldActions } from './FilterInputFieldActions';
 import { FilterInputSearch } from './FilterInputSearch';
 import { useChipsSplitting } from './hooks/useChipsSplitting';
 import { useExpandCollapse } from './hooks/useExpandCollapse';
+import { useSegmentEditKeyboard } from './hooks/useSegmentEditKeyboard';
 
 type FilterInputFieldProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
 
@@ -44,6 +42,8 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     onCustomValueCommit,
     onCustomAttributeCommit,
     onCustomOperatorCommit,
+    onSwitchEditSegment,
+    onRemoveEditingChip,
     menuRef,
   } = useFilterInputContext();
 
@@ -64,52 +64,20 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     onGapClick,
   } as const;
 
-  const handleSegmentEditKeyDown = useCallback(
-    (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        onCancelSegmentEdit();
-        return;
-      }
-      if (e.key === 'Enter' && !e.defaultPrevented) {
-        if (editingSegment === SEGMENT_VARIANT.value) {
-          e.preventDefault();
-          onCustomValueCommit(segmentFilterText);
-          return;
-        }
-        if (editingSegment === SEGMENT_VARIANT.attribute) {
-          e.preventDefault();
-          onCustomAttributeCommit(segmentFilterText);
-          return;
-        }
-        if (editingSegment === SEGMENT_VARIANT.operator) {
-          e.preventDefault();
-          onCustomOperatorCommit(segmentFilterText);
-          return;
-        }
-      }
-      if (e.key === 'ArrowDown') {
-        e.preventDefault();
-        menuRef.current?.focus();
-      }
-    },
-    [
-      onCancelSegmentEdit,
-      editingSegment,
-      segmentFilterText,
-      onCustomValueCommit,
-      onCustomAttributeCommit,
-      onCustomOperatorCommit,
-      menuRef,
-    ],
-  );
-
-  const handleSegmentEditBlur = useCallback(
-    (e: FocusEvent<HTMLInputElement>) => {
-      if (!isMenuRelated(e.relatedTarget as HTMLElement | null)) onCancelSegmentEdit();
-    },
-    [onCancelSegmentEdit],
-  );
+  const { handleSegmentEditKeyDown, handleSegmentEditBlur } = useSegmentEditKeyboard({
+    editingChipId,
+    editingSegment,
+    segmentFilterText,
+    chips,
+    buildingChipData,
+    menuRef,
+    onCancelSegmentEdit,
+    onCustomValueCommit,
+    onCustomAttributeCommit,
+    onCustomOperatorCommit,
+    onSwitchEditSegment,
+    onRemoveEditingChip,
+  });
 
   return (
     <EditingProvider
@@ -133,7 +101,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
           className='h-auto flex-1 min-w-0'
           style={{ maxHeight: !isExpanded ? COLLAPSED_MAX_HEIGHT : undefined }}
         >
-          {/* Inline style overrides hardcoded h-full in ScrollAreaViewport (className is stripped) */}
+          {/* Inline style overrides h-full in ScrollAreaViewport (className is stripped). */}
           <ScrollAreaViewport style={{ height: 'auto', maxHeight: 'inherit' }}>
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
             <div

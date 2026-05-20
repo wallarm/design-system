@@ -1,5 +1,5 @@
 import type { FocusEvent, RefObject } from 'react';
-import { useCallback, useEffect, useRef } from 'react';
+import { useCallback, useEffect, useMemo, useRef } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { isMenuRelated, nextBuildingMenu } from '../../lib';
 import type { FieldMetadata, FilterOperator, MenuState } from '../../types';
@@ -9,29 +9,27 @@ interface UseFocusManagementDeps {
   isFocused: boolean;
   conditionsLength: number;
   inputText: string;
-  /** In-progress building-chip state — needed so refocus resumes at the next
-   *  missing segment instead of (incorrectly) reopening the field menu. */
+  /** In-progress building-chip state — refocus resumes at next missing segment. */
   selectedField: FieldMetadata | null;
   selectedOperator: FilterOperator | null;
   containerRef: RefObject<HTMLElement | null>;
   inputRef: RefObject<HTMLInputElement | null>;
   editingSegment: ChipSegment | null;
-  /** Direct ref to the attribute segment <input> when editing — avoids querySelector. */
+  /** Direct ref to the attribute segment input when editing. */
   segmentAttributeInputRef: RefObject<HTMLInputElement | null>;
-  /** Direct ref to the operator segment <input> when editing — avoids querySelector. */
+  /** Direct ref to the operator segment input when editing. */
   segmentOperatorInputRef: RefObject<HTMLInputElement | null>;
-  /** Direct ref to the value segment <input> when editing — avoids querySelector. */
+  /** Direct ref to the value segment input when editing. */
   segmentValueInputRef: RefObject<HTMLInputElement | null>;
-  /** Ref set by FilterInputValueMenu — calls commitChecked() for multi-select before blur reset. Returns true if committed. */
+  /** Set by FilterInputValueMenu — commits multi-select checked values on blur. */
   blurCommitRef: RefObject<(() => boolean) | null>;
-  /** Tries to commit a building chip's freeform value on blur. Returns true if committed. */
+  /** Commits a building chip's freeform value on blur. Returns true if committed. */
   commitBuildingOnBlur: () => boolean;
-  /** True if there's an in-progress building chip that the blur/close path
-   *  must preserve (skip resetState). */
+  /** In-progress building chip exists — blur/close must preserve it (skip resetState). */
   hasIncompleteBuilding: () => boolean;
   setIsFocused: (focused: boolean) => void;
   setMenuState: (state: MenuState) => void;
-  resetMenuOffset: () => void;
+  resetMenuAnchor: () => void;
   resetState: (continueBuilding?: boolean) => void;
 }
 
@@ -53,7 +51,7 @@ export const useFocusManagement = ({
   hasIncompleteBuilding,
   setIsFocused,
   setMenuState,
-  resetMenuOffset,
+  resetMenuAnchor,
   resetState,
 }: UseFocusManagementDeps) => {
   const handleFocus = useCallback(
@@ -65,11 +63,8 @@ export const useFocusManagement = ({
     [setIsFocused],
   );
 
-  // Re-entry guard: handleBlur calls resetState (which may refocus the input)
-  // and then explicitly blurs to honor outside-click intent. That synchronous
-  // blur fires another blur event → handleBlur again → resetState refocuses →
-  // explicit blur → infinite recursion → stack overflow. The guard short-circuits
-  // the recursive entry. AS-882.
+  // Re-entry guard: handleBlur's resetState→refocus→explicit-blur loop would
+  // recursively re-fire blur and overflow the stack. AS-882.
   const handlingBlurRef = useRef(false);
 
   const handleBlur = useCallback(
@@ -81,29 +76,21 @@ export const useFocusManagement = ({
       handlingBlurRef.current = true;
       try {
         setIsFocused(false);
-        // Try to commit pending values before resetting state:
-        // 1. Multi-select checked values (via FilterInputValueMenu ref)
-        // 2. Building chip with freeform typed value (commit only when complete)
-        // If neither committed AND there's an incomplete building chip alive,
-        // preserve it — blur should not destroy in-progress work.
+        // Try multi-select commit, then freeform building commit. If neither
+        // fires and a building chip is incomplete, preserve it (blur shouldn't
+        // destroy in-progress work) but force-close the menu in case Ark UI's
+        // outside-click handler bailed out.
         const committed = blurCommitRef.current?.() || commitBuildingOnBlur();
         if (!committed) {
           if (hasIncompleteBuilding()) {
-            // Preserve in-progress building chip, but always close any
-            // dropdown — the menu may have leaked open if Ark UI's outside-
-            // click handler bailed out (e.g. activeElement was still the
-            // input). A consistent closed menu lets the refocus path
-            // re-open at the right segment.
             setMenuState('closed');
           } else {
             resetState();
           }
         }
-        // resetState / commit chain above may have refocused our input via
-        // inputRef.current?.focus() in several sub-paths (value commit, clear,
-        // etc.). Honor the user's blur intent by restoring focus to where they
-        // actually clicked, or explicitly blurring if they clicked somewhere
-        // non-focusable (null relatedTarget / plain div / body). AS-882.
+        // commit chain above may have refocused our input; honor user blur
+        // intent by restoring focus to where they clicked (or blurring if it
+        // was non-focusable). AS-882.
         related?.focus();
         if (document.activeElement === inputRef.current) {
           inputRef.current?.blur();
@@ -124,21 +111,9 @@ export const useFocusManagement = ({
     ],
   );
 
-  // ── Auto-open menu on focus ───────────────────────────────
-  //
-  // Two cases:
-  //   1. Resume a building chip — when focus returns and a building chip is
-  //      mid-progress (selectedField set, not editing a committed chip),
-  //      reopen the menu for the first missing segment (operator if no
-  //      operator chosen yet, otherwise value).
-  //   2. Empty initial focus — when there's nothing to resume and the input
-  //      is empty + no chips exist, open the field menu so the user can
-  //      start building.
-  //
-  // Skip entirely while a segment inline-edit is active — the segment click
-  // handler has already opened the segment-specific menu, and we must not
-  // overwrite it on the focus tick that fired the same gesture.
-
+  // Auto-open menu on focus: resume a building chip at its next missing
+  // segment, or open the field menu when input is empty. Skipped during
+  // segment inline-edit — segment click already opened the right menu.
   const prevFocusedRef = useRef(false);
   useEffect(() => {
     if (!isFocused || prevFocusedRef.current) {
@@ -150,10 +125,10 @@ export const useFocusManagement = ({
       return;
     }
     if (selectedField) {
-      resetMenuOffset();
+      resetMenuAnchor();
       setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
     } else if (conditionsLength === 0 && inputText === '') {
-      resetMenuOffset();
+      resetMenuAnchor();
       setMenuState('field');
     }
     prevFocusedRef.current = isFocused;
@@ -164,16 +139,36 @@ export const useFocusManagement = ({
     selectedField,
     selectedOperator,
     editingSegment,
-    resetMenuOffset,
+    resetMenuAnchor,
     setMenuState,
   ]);
 
-  // ── Prevent Ark UI focus steal on menu open ──────────────
-  // Ark UI Menu (zag.js) steals focus via single rAF when a menu mounts.
-  // Double rAF beats this by executing after zag's focus redirect.
-  // ⚠️ Fragile: if Ark UI changes its focus timing, this workaround may break.
-  // After redirect, ArrowDown can freely move focus to the menu.
+  // Two coordinated focus-retention mechanisms — they target the same input
+  // ref but fire on disjoint triggers so they never race:
+  //
+  //   1. Double-rAF (below): one-shot recapture after menu open. Fires once
+  //      per (menuState, isFocused, editingSegment) transition.
+  //   2. focusin listener (further below): continuous guard against zag.js's
+  //      pointer-driven focusMenu. Skips form-control targets, so when (1)
+  //      focuses our input the listener no-ops.
+  //
+  // Invariant: both call `el.focus()` on the same element only if focus is
+  // not already there (idempotent guard `document.activeElement === dest`),
+  // so a focus loop is impossible regardless of ordering.
 
+  const segmentInputRefsMap = useMemo(
+    () =>
+      ({
+        [SEGMENT_VARIANT.attribute]: segmentAttributeInputRef,
+        [SEGMENT_VARIANT.operator]: segmentOperatorInputRef,
+        [SEGMENT_VARIANT.value]: segmentValueInputRef,
+      }) satisfies Record<ChipSegment, RefObject<HTMLInputElement | null>>,
+    [segmentAttributeInputRef, segmentOperatorInputRef, segmentValueInputRef],
+  );
+
+  // Prevent Ark UI focus steal on menu open: zag.js Menu redirects focus via
+  // single rAF on mount; double rAF runs after that redirect. Fragile — breaks
+  // if Ark UI changes its focus timing.
   useEffect(() => {
     if (menuState === 'closed') return;
     if (!isFocused) return;
@@ -182,51 +177,64 @@ export const useFocusManagement = ({
     let innerRaf = 0;
     outerRaf = requestAnimationFrame(() => {
       innerRaf = requestAnimationFrame(() => {
-        // Re-check at execution time: focus may have moved outside the component
-        // while rAFs were queued (e.g. user clicked a tenant switcher). Don't
-        // recapture in that case — AS-882.
+        // Re-check focus at exec time — user may have clicked outside while
+        // rAFs were queued; don't recapture in that case. AS-882.
         const container = containerRef.current;
         if (!container) return;
         const active = document.activeElement as HTMLElement | null;
-        // Body-focus policy: HERE body means "user clicked outside" (e.g. tenant
-        // switcher, a non-focusable region of the page) — DO NOT recapture.
-        // The opposite policy lives in useResetState, which treats body-focus as
-        // "DOM just re-rendered, focus dropped" and refocuses. See the long
-        // comment on useResetState for the full reasoning. AS-882.
+        // Body-focus policy: here body means "user clicked outside" — do NOT
+        // recapture. useResetState applies the opposite policy (body = focus
+        // dropped after re-render, refocus). AS-882.
         if (active && !container.contains(active) && !isMenuRelated(active)) return;
 
-        if (editingSegment) {
-          // Redirect focus to the segment's inline input via the registry, beating
-          // Ark UI's focus steal. Refs are attached by Segment.tsx for every variant.
-          const segmentInputRefs: Record<ChipSegment, RefObject<HTMLInputElement | null>> = {
-            [SEGMENT_VARIANT.attribute]: segmentAttributeInputRef,
-            [SEGMENT_VARIANT.operator]: segmentOperatorInputRef,
-            [SEGMENT_VARIANT.value]: segmentValueInputRef,
-          };
-          const segmentInput = segmentInputRefs[editingSegment]?.current ?? null;
-          if (segmentInput && document.activeElement !== segmentInput) {
-            segmentInput.focus();
-            segmentInput.select();
-          }
-        } else if (document.activeElement !== inputRef.current) {
-          inputRef.current?.focus();
-        }
+        const dest = editingSegment
+          ? (segmentInputRefsMap[editingSegment]?.current ?? null)
+          : inputRef.current;
+        if (!dest) return;
+        if (document.activeElement === dest) return;
+        dest.focus();
+        if (editingSegment) dest.select();
       });
     });
     return () => {
       cancelAnimationFrame(outerRaf);
       cancelAnimationFrame(innerRaf);
     };
-  }, [
-    menuState,
-    isFocused,
-    inputRef,
-    editingSegment,
-    containerRef,
-    segmentAttributeInputRef,
-    segmentOperatorInputRef,
-    segmentValueInputRef,
-  ]);
+  }, [menuState, isFocused, inputRef, editingSegment, containerRef, segmentInputRefsMap]);
+
+  // Keep focus on chip input while pointer hovers menu items: zag.js fires
+  // focusMenu on ITEM_POINTERMOVE, moving DOM focus into Menu.Content. For the
+  // combobox pattern (focus on input, items highlighted via controlled
+  // highlightedValue), redirect focus back. Listener is on `document` so it
+  // survives menu unmount/remount; active menu resolved via DOM rather than
+  // menuRef (shared across three menus, can be null mid-transition).
+  // Guards: skip the date picker (its calendar owns focus) and deliberate
+  // clicks on interactive controls.
+  useEffect(() => {
+    if (menuState === 'closed') return;
+    if (!isFocused) return;
+
+    const handleFocusIn = (e: globalThis.FocusEvent) => {
+      const targetEl = e.target as HTMLElement | null;
+      if (!targetEl) return;
+      const menu = targetEl.closest('[data-filter-input-menu]') as HTMLElement | null;
+      if (!menu) return;
+      if (menu.querySelector('[data-scope="date-picker"]')) return;
+      const tag = targetEl.tagName;
+      // Form controls own their focus; this also covers our own inputs (the
+      // double-rAF effect above lands on one of these), so the two mechanisms
+      // never compete on the same target.
+      if (tag === 'BUTTON' || tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+
+      const dest = editingSegment ? segmentInputRefsMap[editingSegment]?.current : inputRef.current;
+      if (!dest) return;
+      if (document.activeElement === dest) return;
+      dest.focus({ preventScroll: true });
+    };
+
+    document.addEventListener('focusin', handleFocusIn);
+    return () => document.removeEventListener('focusin', handleFocusIn);
+  }, [menuState, isFocused, editingSegment, inputRef, segmentInputRefsMap]);
 
   return { handleFocus, handleBlur };
 };

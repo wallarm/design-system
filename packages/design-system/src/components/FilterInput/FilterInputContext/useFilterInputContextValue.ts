@@ -11,8 +11,10 @@ interface AutocompleteForContext {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleInputClick: () => void;
-  handleChipClick: (chipId: string, segment: ChipSegment, anchorRect: DOMRect) => void;
-  handleBuildingChipClick: (segment: ChipSegment, anchorRect: DOMRect) => void;
+  handleChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
+  handleBuildingChipClick: (segment: ChipSegment, anchorEl: HTMLElement) => void;
+  switchEditSegment: (targetSegment: ChipSegment) => boolean;
+  removeEditingChip: () => void;
   handleConnectorChange: (chipId: string, value: 'and' | 'or') => void;
   handleChipRemove: (chipId: string) => void;
   handleClear: () => void;
@@ -75,6 +77,8 @@ export const useFilterInputContextValue = ({
       onInputClick: autocomplete.handleInputClick,
       onChipClick: autocomplete.handleChipClick,
       onBuildingChipClick: autocomplete.handleBuildingChipClick,
+      onSwitchEditSegment: autocomplete.switchEditSegment,
+      onRemoveEditingChip: autocomplete.removeEditingChip,
       onConnectorChange: autocomplete.handleConnectorChange,
       onChipRemove: autocomplete.handleChipRemove,
       onClear: autocomplete.handleClear,
@@ -106,6 +110,8 @@ export const useFilterInputContextValue = ({
       autocomplete.handleInputClick,
       autocomplete.handleChipClick,
       autocomplete.handleBuildingChipClick,
+      autocomplete.switchEditSegment,
+      autocomplete.removeEditingChip,
       autocomplete.handleConnectorChange,
       autocomplete.handleChipRemove,
       autocomplete.handleClear,

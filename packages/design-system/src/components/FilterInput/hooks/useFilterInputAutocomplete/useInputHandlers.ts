@@ -9,12 +9,13 @@ import {
 } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 
+type BuildingStep = 'field' | 'operator' | 'value';
+
 interface UseInputHandlersDeps {
   inputText: string;
   menuState: MenuState;
   selectedField: FieldMetadata | null;
-  /** Needed so a click into the main input while a building chip is alive
-   *  resumes at the next missing segment instead of doing nothing. */
+  /** Lets click resume at the next missing segment of a live building chip. */
   selectedOperator: FilterOperator | null;
   isFocused: boolean;
   fields: FieldMetadata[];
@@ -25,11 +26,13 @@ interface UseInputHandlersDeps {
   setInputText: (text: string) => void;
   setMenuState: (state: MenuState) => void;
   setInsertIndex: (fn: (prev: number | null) => number) => void;
-  resetMenuOffset: () => void;
+  resetMenuAnchor: () => void;
   removeConditionAtIndex: (index: number) => void;
   handleFieldSelect: (field: FieldMetadata) => void;
   handleOperatorSelect: (operator: FilterOperator) => void;
   handleCustomValueCommit: (text: string) => void;
+  /** Step building chip back one segment; tears it down at the field step. */
+  stepBackBuildingMenu: (current: BuildingStep) => void;
 }
 
 export const useInputHandlers = ({
@@ -46,19 +49,19 @@ export const useInputHandlers = ({
   setInputText,
   setMenuState,
   setInsertIndex,
-  resetMenuOffset,
+  resetMenuAnchor,
   removeConditionAtIndex,
   handleFieldSelect,
   handleOperatorSelect,
   handleCustomValueCommit,
+  stepBackBuildingMenu,
 }: UseInputHandlersDeps) => {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleInputChange = useCallback(
     (e: ChangeEvent<HTMLInputElement>) => {
       let text = e.target.value;
-      // When the user is entering a value for a field that specifies a
-      // per-character filter, strip everything that isn't allowed.
+      // Apply field-level acceptChar filter when entering a value.
       if (menuState === 'value' && selectedField?.acceptChar) {
         text = applyAcceptChar(text, selectedField.acceptChar);
         if (text !== e.target.value) {
@@ -79,15 +82,25 @@ export const useInputHandlers = ({
   const handleInputClick = useCallback(() => {
     inputRef.current?.focus();
     if (menuState !== 'closed') return;
-    // Either start a fresh chip (no building yet) or resume an in-progress
-    // one at the next missing segment — the helper handles both.
-    resetMenuOffset();
+    // Start a fresh chip or resume at next missing segment.
+    resetMenuAnchor();
     setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
-  }, [menuState, selectedField, selectedOperator, resetMenuOffset, inputRef, setMenuState]);
+  }, [menuState, selectedField, selectedOperator, resetMenuAnchor, inputRef, setMenuState]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'ArrowDown' && menuState !== 'closed') {
+      if (e.key === 'ArrowDown') {
+        if (menuState === 'closed') {
+          // Re-open the next building menu (e.g. after Backspace tore down a
+          // chip and set menuState='closed').
+          e.preventDefault();
+          resetMenuAnchor();
+          setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
+          return;
+        }
+        // List menus are handled by useKeyboardNav's capture listener which
+        // stops propagation. Menus without it (date picker) reach here and we
+        // hand DOM focus over so their internal keyboard nav can take over.
         e.preventDefault();
         menuRef.current?.focus();
         return;
@@ -107,19 +120,16 @@ export const useInputHandlers = ({
         }
       }
 
-      // Enter on operator menu: match typed text to operator label or symbol
+      // Enter on operator menu: match typed text by label, symbol, or raw key.
       if (e.key === 'Enter' && menuState === 'operator' && selectedField && inputText.trim()) {
         const trimmed = inputText.trim();
-        // Try matching by label first ("is", "greater", etc.)
         let matched = getOperatorFromLabel(trimmed, selectedField.type);
-        // Try matching by symbol ("=", "!=", ">", "~", "IN", etc.)
         if (!matched) {
           const symbolMatch = Object.entries(OPERATOR_SYMBOLS).find(
             ([, sym]) => sym.toLowerCase() === trimmed.toLowerCase(),
           );
           if (symbolMatch) matched = symbolMatch[0] as FilterOperator;
         }
-        // Try matching by raw operator key ("like", "not_like", etc.)
         if (!matched) {
           const allOperators = selectedField.operators ?? [];
           const rawMatch = allOperators.find(op => op.toLowerCase() === trimmed.toLowerCase());
@@ -146,22 +156,32 @@ export const useInputHandlers = ({
         return;
       }
 
-      if (
-        e.key === 'Backspace' &&
-        !e.repeat &&
-        inputText === '' &&
-        conditionsLengthRef.current > 0
-      ) {
-        e.preventDefault();
-        const removeIdx = effectiveInsertIndexRef.current - 1;
-        if (removeIdx >= 0 && !conditionsRef.current[removeIdx]?.disabled) {
-          removeConditionAtIndex(removeIdx);
-          setInsertIndex(prev => {
-            const eff = prev ?? conditionsLengthRef.current;
-            return eff > 0 ? eff - 1 : 0;
-          });
+      if (e.key === 'Backspace' && !e.repeat && inputText === '') {
+        // While a building chip is alive, Backspace steps its menu back
+        // (value → operator → field) rather than removing a committed sibling.
+        if (
+          selectedField &&
+          (menuState === 'value' || menuState === 'operator' || menuState === 'field')
+        ) {
+          e.preventDefault();
+          stepBackBuildingMenu(menuState);
+          return;
         }
-        setMenuState('closed');
+        if (conditionsLengthRef.current > 0) {
+          e.preventDefault();
+          const removeIdx = effectiveInsertIndexRef.current - 1;
+          if (removeIdx >= 0 && !conditionsRef.current[removeIdx]?.disabled) {
+            removeConditionAtIndex(removeIdx);
+            setInsertIndex(prev => {
+              const eff = prev ?? conditionsLengthRef.current;
+              return eff > 0 ? eff - 1 : 0;
+            });
+          }
+          // Reopen field menu so the next ArrowDown highlights the first item
+          // and Enter selects it (otherwise ArrowDown only opens the menu).
+          resetMenuAnchor();
+          setMenuState('field');
+        }
       }
     },
     [
@@ -169,6 +189,7 @@ export const useInputHandlers = ({
       removeConditionAtIndex,
       menuState,
       selectedField,
+      selectedOperator,
       fields,
       handleFieldSelect,
       handleOperatorSelect,
@@ -179,6 +200,8 @@ export const useInputHandlers = ({
       conditionsRef,
       conditionsLengthRef,
       effectiveInsertIndexRef,
+      stepBackBuildingMenu,
+      resetMenuAnchor,
     ],
   );
 

@@ -1,57 +1,13 @@
-import { MIN_DATE_STRING_LENGTH } from '../../FilterInputMenu/FilterInputDateValueMenu/constants';
+import { MIN_DATE_STRING_LENGTH } from '../../../FilterInputMenu/FilterInputDateValueMenu/constants';
 import {
   chipIdToConditionIndex,
+  findMatchingFieldValue,
   getFieldValues,
+  getInvalidValueIndices,
   hasStaticAllowlist,
   isDatePreset,
-} from '../../lib';
-import type { Condition, FieldMetadata, FieldValueOption, FilterOperator } from '../../types';
-
-/** Find a field value option matching by label or value (case-insensitive) */
-const findMatchingFieldValue = (fieldValues: FieldValueOption[], text: string) =>
-  fieldValues.find(
-    v =>
-      v.label.toLowerCase() === text.toLowerCase() ||
-      String(v.value).toLowerCase() === text.toLowerCase(),
-  );
-
-/** Check if a single value matches any option in the field's values list */
-export const isValidFieldValue = (
-  fieldValues: FieldValueOption[],
-  v: string | number | boolean,
-): boolean =>
-  fieldValues.some(
-    opt => opt.value === v || String(opt.value).toLowerCase() === String(v).toLowerCase(),
-  );
-
-/** Return indices of values that don't match any field option. Empty array = all valid. */
-export const getInvalidValueIndices = (
-  field: FieldMetadata,
-  values: Array<string | number | boolean>,
-): number[] => {
-  // A custom validator trumps the static-allowlist check.
-  if (field.validate) {
-    return values.reduce<number[]>((acc, v, idx) => {
-      if (field.validate!(v)) acc.push(idx);
-      return acc;
-    }, []);
-  }
-  if (!hasStaticAllowlist(field)) return [];
-  const fv = getFieldValues(field);
-  if (fv.length === 0) return [];
-  return values.reduce<number[]>((acc, v, idx) => {
-    if (!isValidFieldValue(fv, v)) acc.push(idx);
-    return acc;
-  }, []);
-};
-
-/** Check if condition value(s) are valid for the given field. Returns true if error. */
-export const validateValueForField = (field: FieldMetadata, value: Condition['value']): boolean => {
-  // Null value (no-value operators) is always valid
-  if (value == null) return false;
-  const values = Array.isArray(value) ? value : [value];
-  return getInvalidValueIndices(field, values).length > 0;
-};
+} from '../../../lib';
+import type { Condition, FieldMetadata, FilterOperator } from '../../../types';
 
 /** Resolve a text input to the actual field value (e.g. label "Active" → value "active") */
 export const resolveFieldValue = (
@@ -70,10 +26,9 @@ export const resolveSingleValue = (
   const fv = getFieldValues(field);
   const match = findMatchingFieldValue(fv, trimmed);
   const raw = match ? match.value : trimmed;
-  // Apply field-provided normalization (e.g. pad partial status codes) before
-  // validation runs — the normalized form is what ends up in the chip.
+  // Normalize before validation — normalized form is what ends up in the chip.
   const resolved = field.normalize ? field.normalize(raw) : raw;
-  // Custom validator trumps the static-allowlist check.
+  // Custom validator trumps static-allowlist check.
   if (field.validate) {
     return { resolved, error: field.validate(resolved) ? true : undefined };
   }
@@ -93,7 +48,7 @@ export const resolveMultiValues = (
     .map(s => s.trim())
     .filter(Boolean);
   const raw = parts.map(part => resolveFieldValue(field, part));
-  // Apply field-provided normalization per token (e.g. "2, 3" → "2XX, 3XX").
+  // Normalize per token (e.g. "2, 3" → "2XX, 3XX").
   const resolved = field.normalize ? raw.map(v => field.normalize!(v)) : raw;
   const error = getInvalidValueIndices(field, resolved).length > 0 ? true : undefined;
   return { resolved, error };
@@ -105,7 +60,6 @@ export const resolveMultiValues = (
  */
 export const displayDateToIso = (display: string): string | null => {
   if (!display || display.length < MIN_DATE_STRING_LENGTH) return null;
-  // Try ISO format first — already valid
   if (/^\d{4}-\d{2}-\d{2}$/.test(display)) return display;
   const date = new Date(display);
   if (Number.isNaN(date.getTime())) return null;
@@ -146,7 +100,7 @@ export const resolveDateValue = (
     }
   }
   const isValidPreset = isDatePreset(trimmed);
-  // Reject short strings that Date() parses loosely (e.g. '2' → 2001-02-01)
+  // Reject short strings Date() parses loosely (e.g. '2' → 2001-02-01).
   const isValidDate =
     !isValidPreset &&
     trimmed.length >= MIN_DATE_STRING_LENGTH &&

@@ -1,20 +1,14 @@
-import { SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
+import { type ChipSegment, SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
 import type { FieldValueOption, FilterOperator } from '../types';
 import { isMultiSelectOperator } from './operators';
 
 /**
- * Derive the "current value token" — the substring the user is actively typing.
- *
- * For multi-select operators (like `in` / `any of`), the field input may contain
- * a comma-separated list such as `"2XX, 3XX, 4"`. Only the last token (`"4"`)
- * represents the value currently being composed; prior tokens are already
- * committed as checked items. Callers use this to feed both `getSuggestions`
- * and the dropdown's filter/sort so the active token drives the menu.
- *
- * For single-value operators the raw input is returned unchanged.
+ * The substring the user is actively typing. For multi-select operators with
+ * comma-separated input ("2XX, 3XX, 4"), returns only the last token ("4").
+ * Single-value operators get the raw input.
  */
 export const getCurrentValueTokenText = (
-  editingSegment: string | null,
+  editingSegment: ChipSegment | null,
   inputText: string,
   segmentMenuFilterText: string,
   selectedOperator: FilterOperator | null,
@@ -25,14 +19,9 @@ export const getCurrentValueTokenText = (
 };
 
 /**
- * Derive the filter text for the value menu.
- *
- * For multi-select operators, uses the current value token (the one the user
- * is actively typing). If that token already matches a known value, returns
- * `''` so the dropdown shows all options — the user just finished a selection
- * and is about to start the next one.
- *
- * For single-value operators, returns the token as-is.
+ * Filter text for the value menu. Multi-select: returns the current token, or
+ * '' when it already matches a known value (just-completed selection).
+ * Single-value: returns token as-is.
  */
 export const getValueFilterText = (
   currentTokenText: string,
@@ -42,7 +31,7 @@ export const getValueFilterText = (
   if (!isMultiSelectOperator(selectedOperator)) return currentTokenText;
   if (!currentTokenText) return '';
 
-  // If the last token matches a field value label/value, it's a completed selection — don't filter
+  // Completed selection — don't filter.
   if (fieldValues.length > 0) {
     const isKnownValue = fieldValues.some(
       v =>

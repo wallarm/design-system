@@ -16,20 +16,10 @@ interface UseValueMenuDisplayValuesOptions {
 }
 
 /**
- * Compose the final dropdown list shown to the user.
- *
- * The parent helper (`values`) is free to change shape between renders — for
- * instance a dynamic `getSuggestions` may narrow its result after a selection
- * is made. This hook keeps the user's currently-selected entries pinned at
- * the top of the list with a stable presentation:
- *
- *  1. Every option the menu has ever rendered is remembered in a `Map` keyed
- *     by value. When a selected entry is no longer in the current `values`,
- *     the remembered option (with its original label/badge) is used.
- *  2. If nothing has been seen for that value either, a plain-text option is
- *     fabricated so the user can still see and toggle it.
- *  3. Unchecked items come from `filteredValues` (already filter-sorted) so
- *     the search query still applies to them.
+ * Compose the dropdown list, pinning selected entries at the top.
+ * Remembers every option ever rendered so a narrowed `values` (e.g. dynamic
+ * getSuggestions) can still display the selected label/badge; fabricates a
+ * plain-text option as last resort. Unselected items still respect the filter.
  */
 export const useValueMenuDisplayValues = ({
   values,
@@ -38,11 +28,10 @@ export const useValueMenuDisplayValues = ({
   checkedValues,
   highlightValue,
 }: UseValueMenuDisplayValuesOptions): ValueOption[] => {
-  // Stash every option we have ever rendered so we can still present it
-  // (with its badge/label) after the parent's `values` list narrows away
-  // from it. Writing via effect keeps render strict-mode / concurrent safe —
-  // the one-render lag is invisible because a freshly-seen option is always
-  // already present in `values` for the same render that first uses it.
+  // Stash every option seen so we can still render it (with badge/label)
+  // after `values` narrows. Write via effect for strict-mode safety — the
+  // one-render lag is invisible because a freshly-seen option is already in
+  // `values` for the render that first uses it.
   const optionMemoryRef = useRef<Map<string, ValueOption>>(new Map());
   useEffect(() => {
     for (const opt of values) {
