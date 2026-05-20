@@ -1,8 +1,10 @@
+import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CirclePlus, Earth, LayoutTemplate, Maximize, Plus } from '../../icons';
 import { Button } from '../Button';
 import { Kbd, KbdGroup } from '../Kbd';
 import { DropdownMenu } from './DropdownMenu';
+import { DropdownMenuCheckboxItem } from './DropdownMenuCheckboxItem';
 import { DropdownMenuContent } from './DropdownMenuContent';
 import { DropdownMenuContextTrigger } from './DropdownMenuContextTrigger';
 import { DropdownMenuFooter } from './DropdownMenuFooter';
@@ -13,6 +15,8 @@ import { DropdownMenuItemDescription } from './DropdownMenuItemDescription';
 import { DropdownMenuItemIcon } from './DropdownMenuItemIcon';
 import { DropdownMenuItemText } from './DropdownMenuItemText';
 import { DropdownMenuLabel } from './DropdownMenuLabel';
+import { DropdownMenuRadioGroup } from './DropdownMenuRadioGroup';
+import { DropdownMenuRadioItem } from './DropdownMenuRadioItem';
 import { DropdownMenuSeparator } from './DropdownMenuSeparator';
 import { DropdownMenuShortcut } from './DropdownMenuShortcut';
 import { DropdownMenuTrigger } from './DropdownMenuTrigger';
@@ -36,6 +40,9 @@ const meta = {
     DropdownMenuTriggerItem,
     DropdownMenuContextTrigger,
     DropdownMenuFooter,
+    DropdownMenuCheckboxItem,
+    DropdownMenuRadioGroup,
+    DropdownMenuRadioItem,
   },
   parameters: {
     layout: 'centered',
@@ -406,3 +413,103 @@ export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
     </DropdownMenuContent>
   </DropdownMenu>
 );
+
+export const WithCheckboxItems: StoryFn<typeof meta> = () => {
+  const [bold, setBold] = useState(true);
+  const [italic, setItalic] = useState(false);
+  const [underline, setUnderline] = useState(true);
+
+  return (
+    <DropdownMenu data-testid='dropdown-menu'>
+      <DropdownMenuTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          Text style
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Text style</DropdownMenuLabel>
+        <DropdownMenuCheckboxItem checked={bold} onCheckedChange={setBold}>
+          Bold
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={italic} onCheckedChange={setItalic}>
+          Italic
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={underline} onCheckedChange={setUnderline}>
+          Underline
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={false} disabled>
+          Strikethrough
+        </DropdownMenuCheckboxItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+export const WithRadioGroup: StoryFn<typeof meta> = () => {
+  const [view, setView] = useState('list');
+
+  const handleViewChange = (details: { value: string }) => {
+    setView(details.value);
+  };
+
+  return (
+    <DropdownMenu data-testid='dropdown-menu'>
+      <DropdownMenuTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          View mode
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>View mode</DropdownMenuLabel>
+        <DropdownMenuRadioGroup value={view} onValueChange={handleViewChange}>
+          <DropdownMenuRadioItem value='list'>List</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value='grid'>Grid</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value='compact' disabled>
+            Compact
+          </DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
+
+export const WithMixedSelectionItems: StoryFn<typeof meta> = () => {
+  const [bold, setBold] = useState(true);
+  const [italic, setItalic] = useState(false);
+  const [view, setView] = useState('list');
+
+  const handleViewChange = (details: { value: string }) => {
+    setView(details.value);
+  };
+
+  return (
+    <DropdownMenu data-testid='dropdown-menu'>
+      <DropdownMenuTrigger asChild>
+        <Button variant='outline' color='neutral'>
+          Editor settings
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent>
+        <DropdownMenuLabel>Text style</DropdownMenuLabel>
+        <DropdownMenuCheckboxItem checked={bold} onCheckedChange={setBold}>
+          Bold
+        </DropdownMenuCheckboxItem>
+        <DropdownMenuCheckboxItem checked={italic} onCheckedChange={setItalic}>
+          Italic
+        </DropdownMenuCheckboxItem>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuLabel>View mode</DropdownMenuLabel>
+        <DropdownMenuRadioGroup value={view} onValueChange={handleViewChange}>
+          <DropdownMenuRadioItem value='list'>List</DropdownMenuRadioItem>
+          <DropdownMenuRadioItem value='grid'>Grid</DropdownMenuRadioItem>
+        </DropdownMenuRadioGroup>
+
+        <DropdownMenuSeparator />
+
+        <DropdownMenuItem variant='destructive'>Reset to defaults</DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+};
