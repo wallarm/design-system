@@ -1,3 +1,7 @@
+## 0.42.0 (2026-05-20)
+
+* feat(filter-input): AS-982 cascade Backspace through chip segments (#124) ([d8be5a3](https://github.com/wallarm/design-system/commit/d8be5a3)), closes [#124](https://github.com/wallarm/design-system/issues/124)
+
 ## 0.41.0 (2026-05-20)
 
 * feat: [WDS-118] logo ([4a934f2](https://github.com/wallarm/design-system/commit/4a934f2))
