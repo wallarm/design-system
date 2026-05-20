@@ -62,6 +62,15 @@ export const dropdownMenuItemVariants = cva(
   },
 );
 
+export const dropdownMenuItemIndicatorClassName = cn(
+  // Layout: pushed to the right edge after children
+  'ml-auto flex items-center justify-center',
+  // Dimensions
+  'size-16 shrink-0',
+  // Icon — inherits color from item variant via text-current
+  '[&_svg]:icon-md [&_svg]:shrink-0 [&_svg]:text-current',
+);
+
 export const dropdownMenuLabelVariants = cva(
   'flex justify-between gap-8 px-8 pt-8 pb-2 text-xs font-medium text-text-secondary',
   {

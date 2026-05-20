@@ -4,6 +4,10 @@ export {
   dropdownMenuLabelVariants,
 } from './classes';
 export { DropdownMenu } from './DropdownMenu';
+export {
+  DropdownMenuCheckboxItem,
+  type DropdownMenuCheckboxItemProps,
+} from './DropdownMenuCheckboxItem';
 export { DropdownMenuContent } from './DropdownMenuContent';
 export { DropdownMenuContextTrigger } from './DropdownMenuContextTrigger';
 export { DropdownMenuFooter } from './DropdownMenuFooter';
@@ -15,6 +19,14 @@ export { DropdownMenuItemDescription } from './DropdownMenuItemDescription';
 export { DropdownMenuItemIcon } from './DropdownMenuItemIcon';
 export { DropdownMenuItemText } from './DropdownMenuItemText';
 export { DropdownMenuLabel } from './DropdownMenuLabel';
+export {
+  DropdownMenuRadioGroup,
+  type DropdownMenuRadioGroupProps,
+} from './DropdownMenuRadioGroup';
+export {
+  DropdownMenuRadioItem,
+  type DropdownMenuRadioItemProps,
+} from './DropdownMenuRadioItem';
 export { DropdownMenuSeparator } from './DropdownMenuSeparator';
 export { DropdownMenuShortcut } from './DropdownMenuShortcut';
 export { DropdownMenuTrigger } from './DropdownMenuTrigger';
