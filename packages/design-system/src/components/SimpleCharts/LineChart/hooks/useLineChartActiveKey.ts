@@ -64,14 +64,20 @@ export const useLineChartActiveKey = ({
   // Refs are synced during render so parent-driven external resets flow through.
   const lastActiveKeyRef = useRef<string | null | undefined>(undefined);
   lastActiveKeyRef.current = activeKey;
+  // Consumer callback held behind a ref so `setActiveKey` stays referentially
+  // stable. Without this, an inline `onActiveKeyChange` from the caller
+  // invalidates `setActiveKey`, which cascades into `LineChartDataContext`
+  // and re-renders every chart consumer on every parent render.
+  const onActiveKeyChangeRef = useRef(onActiveKeyChange);
+  onActiveKeyChangeRef.current = onActiveKeyChange;
   const setActiveKey = useCallback(
     (key: string | null) => {
       if (lastActiveKeyRef.current === key) return;
       lastActiveKeyRef.current = key;
       setInternalActiveKey(key);
-      onActiveKeyChange?.(key);
+      onActiveKeyChangeRef.current?.(key);
     },
-    [setInternalActiveKey, onActiveKeyChange],
+    [setInternalActiveKey],
   );
 
   return { activeKey, setActiveKey };

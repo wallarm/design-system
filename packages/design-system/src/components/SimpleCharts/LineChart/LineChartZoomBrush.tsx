@@ -1,12 +1,4 @@
-import {
-  type FC,
-  type ReactNode,
-  useContext,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { type FC, type ReactNode, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { ReferenceArea, usePlotArea } from 'recharts';
 import { formatChartDateTime } from '../lib/timeFormatters';
@@ -107,20 +99,28 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
     };
   }, [isPopoverOpen, rootRef]);
 
-  // Single live rect read per render. Stale `centerY` would surface as a
-  // popover sliding off-screen when the page scrolls; reading on every
-  // mousemove would thrash 60Hz layout, so we gate re-reads to `scrollTick`
-  // bumps and popover open/close transitions.
-  const liveGeometry = useMemo(() => {
-    if (!isPopoverOpen || !plotArea || !rootRef?.current) return null;
+  // Reading on every mousemove would thrash 60Hz layout, so re-reads are
+  // gated on `scrollTick` bumps and popover open/close. The cache latches the
+  // last truthy reading inside the memo: recharts can momentarily return a
+  // null `plotArea` while re-measuring mid-drag, and without the fallback
+  // the popover would drop to the cursor `clientY` for that one frame.
+  const cachedGeometryRef = useRef<{ centerY: number; left: number } | null>(null);
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `scrollTick` invalidates the memo on scroll without being read directly
+  const popoverGeometry = useMemo(() => {
+    if (!isPopoverOpen) {
+      cachedGeometryRef.current = null;
+      return null;
+    }
+    if (!plotArea || !rootRef?.current) return cachedGeometryRef.current;
     const surface = rootRef.current.querySelector(RECHARTS_SURFACE);
-    if (!surface) return null;
+    if (!surface) return cachedGeometryRef.current;
     const rect = surface.getBoundingClientRect();
-    return {
+    const next = {
       centerY: rect.top + plotArea.y + plotArea.height / 2,
       left: rect.left,
     };
-    // biome-ignore lint/correctness/useExhaustiveDependencies: scrollTick re-reads the rect on scroll
+    cachedGeometryRef.current = next;
+    return next;
   }, [isPopoverOpen, plotArea, rootRef, scrollTick]);
 
   // Captured once when pending begins, cleared when it ends. Combined with
@@ -134,10 +134,10 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
     return surface.getBoundingClientRect().left;
   }, [isPending, rootRef]);
 
-  const centerY = liveGeometry?.centerY ?? null;
+  const centerY = popoverGeometry?.centerY ?? null;
   const pendingScrollDeltaX =
-    isPending && pendingAnchorLeft !== null && liveGeometry
-      ? liveGeometry.left - pendingAnchorLeft
+    isPending && pendingAnchorLeft !== null && popoverGeometry
+      ? popoverGeometry.left - pendingAnchorLeft
       : 0;
 
   // Register that zoom is active so `<LineChartBody>` flips its cursor and

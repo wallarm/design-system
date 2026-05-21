@@ -204,6 +204,14 @@ test.describe('LineChart', () => {
     }) => {
       await lineChartStory.goto(page, 'Zoom');
 
+      // Wait for recharts to render the line paths — without this, the first
+      // mousedown can race the chart's initial measurement: `usePlotArea`
+      // returns null, the brush's `startDrag` reads a null `activeTooltipIndex`
+      // and bails, and the popover never reaches the `dragging` state. The
+      // chart's `<Line>` SVG path only appears after recharts has measured the
+      // plot, so waiting on it is a reliable readiness signal.
+      await page.locator('.recharts-curve').first().waitFor({ state: 'attached' });
+
       const body = page.locator('[data-slot=line-chart-body]');
       const bodyBox = await body.boundingBox();
       if (!bodyBox) throw new Error('chart body has no bounding box');
@@ -214,8 +222,16 @@ test.describe('LineChart', () => {
       // with three different cursor Ys (upper band → middle → lower band). The
       // popover Y must stay locked to the plot centre regardless of cursor Y,
       // both while dragging and after release (pending state).
-      await page.mouse.move(bodyBox.x + bodyBox.width * 0.2, bodyBox.y + bodyBox.height * 0.5);
+      // The initial cursor position is offset right of the Y-axis tick column
+      // (~10% of body width) so the mousedown lands inside the plot rather
+      // than on the axis label gutter — recharts only emits an
+      // `activeTooltipIndex` when the cursor is over the plot rect.
+      await page.mouse.move(bodyBox.x + bodyBox.width * 0.25, bodyBox.y + bodyBox.height * 0.5);
       await page.mouse.down();
+      // Nudge the cursor so recharts dispatches a mousemove before the first
+      // assertion — keeps the popover from racing the initial drag state.
+      await page.mouse.move(bodyBox.x + bodyBox.width * 0.3, bodyBox.y + bodyBox.height * 0.5);
+      await expect(popover).toHaveAttribute('data-zoom-state', 'dragging');
 
       const samples: number[] = [];
 

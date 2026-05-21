@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { type RefObject, useCallback, useEffect, useRef, useState } from 'react';
 import type {
   LineChartDatum,
   LineChartZoomDragState,
@@ -20,6 +20,12 @@ interface UseLineChartZoomStateResult {
   cancelPending: () => void;
 }
 
+interface PendingDragUpdate {
+  index?: number;
+  clientX?: number;
+  clientY?: number;
+}
+
 /**
  * Two-phase zoom selection state machine.
  *
@@ -34,6 +40,12 @@ interface UseLineChartZoomStateResult {
  * `useZoomDragListeners` so the popover keeps tracking when the cursor leaves
  * the SVG and a mouseup outside the chart still releases into pending.
  *
+ * Drag updates from recharts (`updateDrag` — carries index+coords) and from
+ * the window listener (`handleDragMove` — coords only) both write into a
+ * single pending-frame buffer and flush together on the next animation frame.
+ * That collapses the two motion paths into one React commit per frame and
+ * keeps state writes off the synchronous mousemove path.
+ *
  * Dataset changes invalidate cached indices on both `drag` and `pending`, so
  * both reset whenever `data` or `xKey` flips — otherwise a stale range could
  * be committed against a refreshed dataset.
@@ -41,11 +53,11 @@ interface UseLineChartZoomStateResult {
 export const useLineChartZoomState = ({
   data,
   xKey,
-  onZoomChange,
+  onZoomChangeRef,
 }: {
   data: LineChartDatum[];
   xKey: string;
-  onZoomChange: ((range: LineChartZoomRange | null) => void) | undefined;
+  onZoomChangeRef: RefObject<((range: LineChartZoomRange | null) => void) | undefined>;
 }): UseLineChartZoomStateResult => {
   const [zoomEnabledCount, setZoomEnabledCount] = useState(0);
   const [zoomDrag, setZoomDrag] = useState<LineChartZoomDragState | null>(null);
@@ -56,34 +68,81 @@ export const useLineChartZoomState = ({
     return () => setZoomEnabledCount(n => n - 1);
   }, []);
 
-  // A new drag implicitly discards any prior unconfirmed pending range.
-  const startDrag = useCallback((index: number, clientX: number, clientY: number) => {
-    setZoomPending(null);
-    setZoomDrag({ startIndex: index, endIndex: index, clientX, clientY });
-  }, []);
+  // Pending mousemove buffer + scheduled rAF id. Two motion paths feed in (recharts
+  // tooltip + window mousemove); both write here and the next animation frame
+  // commits a single state update.
+  const pendingDragRef = useRef<PendingDragUpdate | null>(null);
+  const rafIdRef = useRef<number | null>(null);
 
-  const updateDrag = useCallback((index: number, clientX: number, clientY: number) => {
+  const flushPendingDrag = useCallback(() => {
+    rafIdRef.current = null;
+    const buffered = pendingDragRef.current;
+    if (!buffered) return;
+    pendingDragRef.current = null;
     setZoomDrag(prev => {
       if (!prev) return null;
-      if (prev.endIndex === index && prev.clientX === clientX && prev.clientY === clientY) {
+      const endIndex = buffered.index ?? prev.endIndex;
+      const clientX = buffered.clientX ?? prev.clientX;
+      const clientY = buffered.clientY ?? prev.clientY;
+      if (prev.endIndex === endIndex && prev.clientX === clientX && prev.clientY === clientY) {
         return prev;
       }
-      return { startIndex: prev.startIndex, endIndex: index, clientX, clientY };
+      return { startIndex: prev.startIndex, endIndex, clientX, clientY };
     });
   }, []);
 
-  const cancelDrag = useCallback(() => {
-    setZoomDrag(null);
+  const scheduleFlush = useCallback(() => {
+    if (rafIdRef.current !== null) return;
+    rafIdRef.current = requestAnimationFrame(flushPendingDrag);
+  }, [flushPendingDrag]);
+
+  const cancelScheduledFlush = useCallback(() => {
+    if (rafIdRef.current !== null) {
+      cancelAnimationFrame(rafIdRef.current);
+      rafIdRef.current = null;
+    }
+    pendingDragRef.current = null;
   }, []);
+
+  // A new drag implicitly discards any prior unconfirmed pending range and any
+  // mid-flight rAF buffer from a previous drag session.
+  const startDrag = useCallback(
+    (index: number, clientX: number, clientY: number) => {
+      cancelScheduledFlush();
+      setZoomPending(null);
+      setZoomDrag({ startIndex: index, endIndex: index, clientX, clientY });
+    },
+    [cancelScheduledFlush],
+  );
+
+  const updateDrag = useCallback(
+    (index: number, clientX: number, clientY: number) => {
+      pendingDragRef.current = { ...pendingDragRef.current, index, clientX, clientY };
+      scheduleFlush();
+    },
+    [scheduleFlush],
+  );
+
+  const cancelDrag = useCallback(() => {
+    cancelScheduledFlush();
+    setZoomDrag(null);
+  }, [cancelScheduledFlush]);
 
   // Releases drag → pending without emitting onZoomChange (user still confirms
   // via the popover). Single-index drags (plain clicks) are dropped to avoid
-  // surfacing a popover for a zero-width range.
+  // surfacing a popover for a zero-width range. Any in-flight rAF buffer is
+  // merged in so the release reflects the final cursor position even if the
+  // last mousemove hasn't been committed yet.
   const endDrag = useCallback(() => {
+    const buffered = pendingDragRef.current;
+    cancelScheduledFlush();
     setZoomDrag(currentDrag => {
       if (!currentDrag) return null;
-      const lo = Math.min(currentDrag.startIndex, currentDrag.endIndex);
-      const hi = Math.max(currentDrag.startIndex, currentDrag.endIndex);
+      const endIndex = buffered?.index ?? currentDrag.endIndex;
+      const clientX = buffered?.clientX ?? currentDrag.clientX;
+      const clientY = buffered?.clientY ?? currentDrag.clientY;
+      const lo = Math.min(currentDrag.startIndex, endIndex);
+      const hi = Math.max(currentDrag.startIndex, endIndex);
       if (lo === hi) return null;
       const fromDatum = data[lo];
       const toDatum = data[hi];
@@ -92,20 +151,20 @@ export const useLineChartZoomState = ({
       if (from != null && to != null) {
         setZoomPending({
           range: { fromIndex: lo, toIndex: hi, from, to },
-          clientX: currentDrag.clientX,
-          clientY: currentDrag.clientY,
+          clientX,
+          clientY,
         });
       }
       return null;
     });
-  }, [data, xKey]);
+  }, [data, xKey, cancelScheduledFlush]);
 
   const confirmZoom = useCallback(() => {
     setZoomPending(currentPending => {
-      if (currentPending) onZoomChange?.(currentPending.range);
+      if (currentPending) onZoomChangeRef.current?.(currentPending.range);
       return null;
     });
-  }, [onZoomChange]);
+  }, [onZoomChangeRef]);
 
   const cancelPending = useCallback(() => {
     setZoomPending(null);
@@ -115,22 +174,32 @@ export const useLineChartZoomState = ({
   // both so a stale range can't be committed against a refreshed dataset.
   // biome-ignore lint/correctness/useExhaustiveDependencies: data/xKey are triggers, not read inside
   useEffect(() => {
+    cancelScheduledFlush();
     setZoomDrag(null);
     setZoomPending(null);
-  }, [data, xKey]);
+  }, [data, xKey, cancelScheduledFlush]);
+
+  // Cancel any pending rAF on unmount so the callback doesn't fire against a
+  // stale closure / unmounted component.
+  useEffect(() => () => cancelScheduledFlush(), [cancelScheduledFlush]);
 
   // Window-level listeners so the popover tracks the cursor outside the SVG
   // and `mouseup` outside the chart still releases into pending. Escape
-  // mid-drag cancels outright (no pending popover).
+  // mid-drag cancels outright (no pending popover). `handleDragMove` writes
+  // into the same rAF buffer as `updateDrag` so both paths produce one commit
+  // per frame.
   const isZoomDragging = zoomDrag !== null;
-  const handleDragMove = useCallback((clientX: number, clientY: number) => {
-    setZoomDrag(prev => {
-      if (!prev) return null;
-      if (prev.clientX === clientX && prev.clientY === clientY) return prev;
-      return { ...prev, clientX, clientY };
-    });
-  }, []);
-  const handleDragEscape = useCallback(() => setZoomDrag(null), []);
+  const handleDragMove = useCallback(
+    (clientX: number, clientY: number) => {
+      pendingDragRef.current = { ...pendingDragRef.current, clientX, clientY };
+      scheduleFlush();
+    },
+    [scheduleFlush],
+  );
+  const handleDragEscape = useCallback(() => {
+    cancelScheduledFlush();
+    setZoomDrag(null);
+  }, [cancelScheduledFlush]);
   useZoomDragListeners({
     enabled: isZoomDragging,
     onMove: handleDragMove,
