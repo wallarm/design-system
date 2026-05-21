@@ -95,3 +95,71 @@ test.describe.skip('Component: FilterInput', () => {
     });
   });
 });
+
+// AS-1022 — wrapper-click and blur-outside paths must commit an in-progress
+// multi-select building chip. The test lives outside the broader describe.skip
+// because the screenshot blocker doesn't apply to interaction assertions, and
+// the bug is a synchronous-event race subtle enough to need a CI guard.
+test.describe('Component: FilterInput — AS-1022 wrapper-click commit', () => {
+  test.describe('Interactions', () => {
+    // Build an in-progress multi-select chip: Status code "in" with two values
+    // checked. Returns once the building chip preview shows both labels so the
+    // calling test can act on a known state.
+    async function setupMultiSelectBuilding(
+      page: Parameters<Parameters<typeof test>[1]>[0]['page'],
+    ) {
+      await filterFieldStory.goto(page, 'HTTP Status Code Suggestions');
+      const input = page.locator('input[type="text"]');
+      await input.click();
+      await page.getByRole('menuitem', { name: /^status code$/i }).click();
+      await page.getByRole('menuitem', { name: /^in IN$/i }).click();
+      await page.getByRole('menuitem', { name: /^1XX$/ }).click();
+      await page.getByRole('menuitem', { name: /^3XX$/ }).click();
+
+      const buildingChip = page.locator('[data-slot="filter-input-condition-chip"][data-building]');
+      await expect(buildingChip).toContainText('1XX, 3XX');
+    }
+
+    test('Should preserve checked multi-select values when wrapper is clicked', async ({
+      page,
+    }) => {
+      // The bug: Ark UI's dismissable closes the value menu on the same
+      // pointerdown, racing the onClick handler. The previous open-gated
+      // blurCommitRef would already be null by the time handleAreaClick read
+      // it, and the chip would commit empty.
+      await setupMultiSelectBuilding(page);
+
+      // Click the inner div's top padding band — well to the left of the
+      // ACTIONS_PADDING (64px) action-button zone, above the chip row. This
+      // is unambiguously empty inner-content area; the wrapper/inner onClick
+      // delegators both route to handleAreaClick from here.
+      const wrapper = page.locator('[data-slot="filter-input"]');
+      const box = await wrapper.boundingBox();
+      expect(box).toBeTruthy();
+      await page.mouse.click(box!.x + box!.width / 2, box!.y + 4);
+
+      const conditionChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      await expect(conditionChip).not.toHaveAttribute('data-building', '');
+      await expect(conditionChip).toContainText('1XX, 3XX');
+    });
+
+    test('Should commit checked multi-select values when focus leaves the field', async ({
+      page,
+    }) => {
+      // Sibling smoke for the wrapper-click path: blurring out of the field
+      // entirely (focus moves to <body>) used to drop the checked values
+      // because blurCommitRef was already null from the same outside-click
+      // sequence. With the ref armed while the value menu is mounted, blur
+      // commits the chip just like the wrapper click does.
+      await setupMultiSelectBuilding(page);
+
+      // Click far outside the FilterInput — viewport corner is reliably
+      // outside the field's bounding box for all reasonable viewports.
+      await page.mouse.click(2, 2);
+
+      const conditionChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      await expect(conditionChip).not.toHaveAttribute('data-building', '');
+      await expect(conditionChip).toContainText('1XX, 3XX');
+    });
+  });
+});

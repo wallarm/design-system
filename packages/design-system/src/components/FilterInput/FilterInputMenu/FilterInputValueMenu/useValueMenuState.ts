@@ -46,28 +46,19 @@ export const useValueMenuState = ({
   const checkedValuesRef = useRef(checkedValues);
   checkedValuesRef.current = checkedValues;
 
-  // Reset checked values on open transition.
-  const prevOpenRef = useRef(false);
-  const initialValuesRef = useRef(initialValues);
-  initialValuesRef.current = initialValues;
-  useEffect(() => {
-    if (open && !prevOpenRef.current) {
-      setCheckedValues(initialValuesRef.current);
-    }
-    prevOpenRef.current = open;
-  }, [open]);
-
-  // Sync checked values when initialValues change while menu stays open
-  // (e.g., user edits segment text to remove a value).
-  const prevSerializedRef = useRef('');
+  // Reset checkedValues only when the editing context changes (initialValues
+  // serial changes). Resetting on every open false→true transition would wipe
+  // user-entered toggles in a building session — Ark UI's outside-click during
+  // a click on the FilterInput area calls `onOpenChange(false)` even when
+  // combobox focus retention keeps the menu effectively open, and the next
+  // re-open would discard the in-progress multi-select.
+  const prevSerializedRef = useRef<string | null>(null);
   useEffect(() => {
     const serialized = initialValues.map(String).sort().join('\0');
     if (serialized === prevSerializedRef.current) return;
     prevSerializedRef.current = serialized;
-    if (open && prevOpenRef.current) {
-      setCheckedValues(initialValues);
-    }
-  }, [initialValues, open]);
+    setCheckedValues(initialValues);
+  }, [initialValues]);
 
   const toggleValue = (val: ConditionValue) => {
     setCheckedValues(prev => {
@@ -82,18 +73,35 @@ export const useValueMenuState = ({
   const onCommitRef = useRef(onCommit);
   onCommitRef.current = onCommit;
 
+  // Re-entry guard: blurCommitRef is read by both handleAreaClick and
+  // handleBlur in the same event sequence. Cleanup that nulls the ref runs in
+  // the next commit phase, so a back-to-back read in the current tick would
+  // re-commit the same checked values. Mirror the discipline in useBlurCommit.
+  const committingRef = useRef(false);
+
   const commitChecked = useCallback((): boolean => {
-    if (checkedValuesRef.current.length > 0 && onCommitRef.current) {
+    if (committingRef.current) return false;
+    if (checkedValuesRef.current.length === 0 || !onCommitRef.current) return false;
+    committingRef.current = true;
+    try {
       onCommitRef.current(checkedValuesRef.current);
       return true;
+    } finally {
+      committingRef.current = false;
     }
-    return false;
   }, []);
 
-  // Register blur commit so the blur handler can commit before state reset.
+  // Register blur/area-click commit while the value menu is mounted in
+  // multi-select mode. NOT gated on `open`: Ark UI's outside-click during a
+  // click on the FilterInput area flips `open` to false before our onClick
+  // handler runs, and a gated ref would already be null by the time
+  // handleAreaClick reads it — the in-progress multi-select would silently
+  // fall through to the force-commit branch and lose the checked values.
+  // `commitChecked` guards on `checkedValuesRef.current.length > 0` so leaving
+  // the ref armed while closed never commits an empty set.
   useEffect(() => {
     if (!blurCommitRef) return;
-    if (open && multiSelect) {
+    if (multiSelect) {
       blurCommitRef.current = commitChecked;
     } else {
       blurCommitRef.current = null;
@@ -101,7 +109,7 @@ export const useValueMenuState = ({
     return () => {
       blurCommitRef.current = null;
     };
-  }, [open, multiSelect, blurCommitRef, commitChecked]);
+  }, [multiSelect, blurCommitRef, commitChecked]);
 
   const flatItems: FilterInputDropdownItem[] = useMemo(
     () => values.map(opt => ({ id: String(opt.value), label: opt.label, value: opt.value })),

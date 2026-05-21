@@ -1,7 +1,8 @@
 import type { RefObject } from 'react';
 import { useCallback, useLayoutEffect, useRef } from 'react';
+import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { isBuildingComplete, isNoValueOperator } from '../../lib';
-import type { FieldMetadata, FilterOperator, UpsertCondition } from '../../types';
+import type { ChipErrorSegment, FieldMetadata, FilterOperator, UpsertCondition } from '../../types';
 
 interface UseBlurCommitDeps {
   selectedField: FieldMetadata | null;
@@ -14,6 +15,8 @@ interface UseBlurCommitDeps {
   resetState: () => void;
   /** Indirection ref breaking the useMenuFlow ↔ useBlurCommit cycle. */
   commitBuildingOnBlurRef: RefObject<() => boolean>;
+  /** Same indirection for force-commit (area-click → incomplete becomes error). */
+  commitBuildingForceRef: RefObject<() => boolean>;
 }
 
 /**
@@ -32,6 +35,7 @@ export const useBlurCommit = ({
   upsertCondition,
   resetState,
   commitBuildingOnBlurRef,
+  commitBuildingForceRef,
 }: UseBlurCommitDeps) => {
   const selectedFieldRef = useRef(selectedField);
   const selectedOperatorRef = useRef(selectedOperator);
@@ -99,5 +103,69 @@ export const useBlurCommit = ({
     [editingChipId],
   );
 
+  /**
+   * Force-commit the in-progress building chip even when incomplete. Used by
+   * area clicks where the user signals "wrap this up" — missing segments
+   * land as error markers so the chip stays editable in place. Distinct from
+   * `commitBuildingOnBlur`, which preserves incomplete chips on true blur.
+   */
+  const commitBuildingForce = useCallback((): boolean => {
+    if (committingRef.current) return false;
+    const field = selectedFieldRef.current;
+    const operator = selectedOperatorRef.current;
+    const text = inputTextRef.current.trim();
+    if (!field) return false;
+    if (editingChipId) return false;
+
+    committingRef.current = true;
+    try {
+      selectedFieldRef.current = null;
+      selectedOperatorRef.current = null;
+      inputTextRef.current = '';
+
+      const hasTypedValue = !!operator && !isNoValueOperator(operator) && text.length > 0;
+      if (hasTypedValue) {
+        handleCustomValueCommit(text);
+        return true;
+      }
+      if (isBuildingComplete(field, operator, null)) {
+        upsertCondition(field, operator!, null, undefined, effectiveInsertIndexRef.current);
+        resetState();
+        return true;
+      }
+      // Operator present but value empty → flag the value segment so the
+      // renderer highlights that slot. Operator missing → no per-segment
+      // error variant exists (ChipErrorSegment is `boolean | 'attribute' |
+      // 'value'`), so mark the whole chip as error — user can click into any
+      // segment to fix.
+      const errorSegment: ChipErrorSegment = operator ? SEGMENT_VARIANT.value : true;
+      upsertCondition(
+        field,
+        operator ?? undefined,
+        null,
+        undefined,
+        effectiveInsertIndexRef.current,
+        errorSegment,
+      );
+      resetState();
+      return true;
+    } finally {
+      committingRef.current = false;
+    }
+  }, [
+    editingChipId,
+    handleCustomValueCommit,
+    upsertCondition,
+    resetState,
+    effectiveInsertIndexRef,
+  ]);
+
+  useLayoutEffect(() => {
+    commitBuildingForceRef.current = commitBuildingForce;
+  }, [commitBuildingForce, commitBuildingForceRef]);
+
+  // commitBuildingForce is reached exclusively through commitBuildingForceRef
+  // (set in the useLayoutEffect above) — handleAreaClick reads it that way to
+  // break the useMenuFlow ↔ useBlurCommit dep cycle.
   return { commitBuildingOnBlur, hasIncompleteBuilding };
 };

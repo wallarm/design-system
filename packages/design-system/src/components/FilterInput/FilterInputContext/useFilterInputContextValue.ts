@@ -11,6 +11,7 @@ interface AutocompleteForContext {
   handleInputChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   handleKeyDown: (e: React.KeyboardEvent<HTMLInputElement>) => void;
   handleInputClick: () => void;
+  handleAreaClick: () => void;
   handleChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
   handleBuildingChipClick: (segment: ChipSegment, anchorEl: HTMLElement) => void;
   switchEditSegment: (targetSegment: ChipSegment) => boolean;
@@ -75,6 +76,7 @@ export const useFilterInputContextValue = ({
       onGapClick: autocomplete.handleGapClick,
       onInputKeyDown: autocomplete.handleKeyDown,
       onInputClick: autocomplete.handleInputClick,
+      onAreaClick: autocomplete.handleAreaClick,
       onChipClick: autocomplete.handleChipClick,
       onBuildingChipClick: autocomplete.handleBuildingChipClick,
       onSwitchEditSegment: autocomplete.switchEditSegment,
@@ -108,6 +110,7 @@ export const useFilterInputContextValue = ({
       autocomplete.handleGapClick,
       autocomplete.handleKeyDown,
       autocomplete.handleInputClick,
+      autocomplete.handleAreaClick,
       autocomplete.handleChipClick,
       autocomplete.handleBuildingChipClick,
       autocomplete.switchEditSegment,

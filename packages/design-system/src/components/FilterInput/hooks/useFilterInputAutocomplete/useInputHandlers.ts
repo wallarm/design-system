@@ -20,6 +20,10 @@ interface UseInputHandlersDeps {
   isFocused: boolean;
   fields: FieldMetadata[];
   inputRef: RefObject<HTMLInputElement | null>;
+  /** Multi-select checked-values commit; set by value menu while open. */
+  blurCommitRef: RefObject<(() => boolean) | null>;
+  /** Building-chip force-commit (incomplete → error chip); filled by useBlurCommit. */
+  commitBuildingForceRef: RefObject<() => boolean>;
   conditionsRef: MutableRefObject<Condition[]>;
   conditionsLengthRef: MutableRefObject<number>;
   effectiveInsertIndexRef: MutableRefObject<number>;
@@ -43,6 +47,8 @@ export const useInputHandlers = ({
   isFocused,
   fields,
   inputRef,
+  blurCommitRef,
+  commitBuildingForceRef,
   conditionsRef,
   conditionsLengthRef,
   effectiveInsertIndexRef,
@@ -86,6 +92,16 @@ export const useInputHandlers = ({
     resetMenuAnchor();
     setMenuState(nextBuildingMenu(selectedField, selectedOperator)!);
   }, [menuState, selectedField, selectedOperator, resetMenuAnchor, inputRef, setMenuState]);
+
+  // Click on the FilterInput area commits the in-progress building chip:
+  // multi-select checked values first, then a force-commit that turns any
+  // incomplete state into an error chip (so missing segments stay visible and
+  // editable in place). Falls back to handleInputClick when nothing to commit.
+  const handleAreaClick = useCallback(() => {
+    if (blurCommitRef.current?.()) return;
+    if (commitBuildingForceRef.current()) return;
+    handleInputClick();
+  }, [blurCommitRef, commitBuildingForceRef, handleInputClick]);
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
@@ -205,5 +221,5 @@ export const useInputHandlers = ({
     ],
   );
 
-  return { handleInputChange, handleInputClick, handleKeyDown, menuRef };
+  return { handleInputChange, handleInputClick, handleAreaClick, handleKeyDown, menuRef };
 };

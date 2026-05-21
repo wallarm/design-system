@@ -28,7 +28,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     insertIndex,
     insertAfterConnector,
     error,
-    onInputClick,
+    onAreaClick,
     onGapClick,
     onChipClick,
     onBuildingChipClick,
@@ -95,6 +95,22 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
           className,
         )}
         data-slot='filter-input'
+        // biome-ignore lint/a11y/useKeyWithClickEvents: native input semantics — keyboard reaches the inner combobox; this delegates pointer clicks on the wrapper to the area handler so multi-select commits trigger when users click the field's border/scroll-area.
+        onClick={e => {
+          // Wrapper-level click delegation for the gaps the inner content
+          // doesn't cover — the field's border, the ScrollArea root, the
+          // scrollbar strip. The inner-content onClick handles its own area;
+          // skip here to avoid double-firing onAreaClick.
+          const t = e.target as HTMLElement;
+          if (t.closest('[data-filter-input-inner]')) return;
+          if (
+            t.closest(
+              '[data-slot^="segment-"], button, input, [data-slot="filter-input-chip-delete"]',
+            )
+          )
+            return;
+          onAreaClick();
+        }}
         {...props}
       >
         <ScrollArea
@@ -106,10 +122,28 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
             {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
             <div
               ref={innerRef}
+              data-filter-input-inner=''
               className={cn(filterInputInnerVariants({ hasContent }))}
               style={{ paddingRight: hasContent ? ACTIONS_PADDING : undefined }}
               onClick={e => {
-                if (e.target === e.currentTarget) onInputClick();
+                // Area click: the empty area itself, or the building chip's
+                // padding/border (anywhere the user might aim "outside the
+                // menu" while still inside the field). Skip interactive
+                // children — segments, gap buttons, inline input, action
+                // buttons — and committed chips, which the drag-selection +
+                // segment-click handlers own.
+                const t = e.target as HTMLElement;
+                if (t === e.currentTarget) {
+                  onAreaClick();
+                  return;
+                }
+                if (
+                  t.closest(
+                    '[data-slot^="segment-"], button, input, [data-slot="filter-input-chip-delete"]',
+                  )
+                )
+                  return;
+                if (t.closest('[data-building]')) onAreaClick();
               }}
             >
               <ChipsWithGaps
