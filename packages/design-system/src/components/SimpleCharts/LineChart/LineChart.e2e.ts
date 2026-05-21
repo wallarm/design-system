@@ -244,6 +244,64 @@ test.describe('LineChart', () => {
       expect(samples[2]).toBe(samples[0]);
       expect(samples[3]).toBe(samples[0]);
     });
+
+    test('Should keep the zoom popover anchored to the chart while the page scrolls', async ({
+      page,
+    }) => {
+      const SCROLL_BY = 120;
+      await lineChartStory.goto(page, 'Zoom');
+      // Force the page taller than the viewport so scrollBy has somewhere to
+      // go. Reset on teardown so the bottom-padding doesn't bleed into a
+      // sibling test that reuses the same page context.
+      await page.evaluate(() => {
+        document.body.dataset.scrollAnchorTest = '1';
+        document.body.style.minHeight = '200vh';
+      });
+
+      try {
+        const body = page.locator('[data-slot=line-chart-body]');
+        const bodyBox = await body.boundingBox();
+        if (!bodyBox) throw new Error('chart body has no bounding box');
+
+        await page.mouse.move(bodyBox.x + bodyBox.width * 0.2, bodyBox.y + bodyBox.height * 0.5);
+        await page.mouse.down();
+        await page.mouse.move(bodyBox.x + bodyBox.width * 0.7, bodyBox.y + bodyBox.height * 0.5);
+        await page.mouse.up();
+
+        const popover = page.locator('[data-slot=line-chart-zoom-cursor-popover]');
+        await expect(popover).toHaveAttribute('data-zoom-state', 'pending');
+
+        const surface = page.locator('.recharts-surface');
+        const popoverBefore = await popover.boundingBox();
+        const surfaceBefore = await surface.boundingBox();
+        if (!popoverBefore || !surfaceBefore) throw new Error('missing bounding box');
+        const offsetBefore = {
+          x: popoverBefore.x - surfaceBefore.x,
+          y: popoverBefore.y - surfaceBefore.y,
+        };
+
+        await page.evaluate(amount => window.scrollBy(0, amount), SCROLL_BY);
+
+        const popoverAfter = await popover.boundingBox();
+        const surfaceAfter = await surface.boundingBox();
+        if (!popoverAfter || !surfaceAfter) throw new Error('missing bounding box after scroll');
+        const offsetAfter = {
+          x: popoverAfter.x - surfaceAfter.x,
+          y: popoverAfter.y - surfaceAfter.y,
+        };
+
+        // Sanity: the chart should have shifted up by the full scroll amount.
+        expect(Math.round(surfaceBefore.y - surfaceAfter.y)).toBe(SCROLL_BY);
+        // The popover's offset relative to the chart must stay constant.
+        expect(Math.round(offsetAfter.x)).toBe(Math.round(offsetBefore.x));
+        expect(Math.round(offsetAfter.y)).toBe(Math.round(offsetBefore.y));
+      } finally {
+        await page.evaluate(() => {
+          document.body.style.minHeight = '';
+          delete document.body.dataset.scrollAnchorTest;
+        });
+      }
+    });
   });
 
   test.describe('Accessibility', () => {

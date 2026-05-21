@@ -1,4 +1,12 @@
-import { type FC, type ReactNode, useContext, useEffect, useMemo, useRef } from 'react';
+import {
+  type FC,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { createPortal } from 'react-dom';
 import { ReferenceArea, usePlotArea } from 'recharts';
 import { formatChartDateTime } from '../lib/timeFormatters';
@@ -19,6 +27,8 @@ import { formatRange } from './lib/formatRange';
 const defaultFormatRange = formatRange(value => formatChartDateTime(value) || String(value));
 
 const POPOVER_OFFSET_X = 12;
+
+const RECHARTS_SURFACE = '.recharts-surface';
 
 export interface LineChartZoomBrushProps {
   /** When `true` the zoom interaction is removed entirely. */
@@ -62,16 +72,73 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
   const plotArea = usePlotArea();
   const rootRef = zoomCtx?.rootRef;
 
-  // Recomputed only when recharts re-measures the plot, not on every drag
-  // mousemove — `getBoundingClientRect` forces synchronous layout and we
-  // otherwise pay it 60Hz while the user is dragging.
-  const centerY = useMemo(() => {
-    if (!plotArea || !rootRef?.current) return null;
-    const surface = rootRef.current.querySelector('.recharts-surface');
+  const drag = zoomCtx?.drag ?? null;
+  const pending = zoomCtx?.pending ?? null;
+  const cancelPending = zoomCtx?.cancelPending;
+  const confirmZoom = zoomCtx?.confirmZoom;
+
+  const isPopoverOpen = drag !== null || pending !== null;
+  const isPending = pending !== null;
+
+  // Re-render on scroll/resize while the popover is open, so the memoised
+  // viewport rect re-reads. Without this, the portal's `position: fixed`
+  // pins the popover to viewport while the chart slides away on page scroll.
+  // The handler short-circuits when the chart didn't actually move — scrolls
+  // on unrelated subtrees (sidebars, code panels) skip the React re-render.
+  const [scrollTick, setScrollTick] = useState(0);
+  useEffect(() => {
+    if (!isPopoverOpen) return;
+    let lastTop: number | null = null;
+    let lastLeft: number | null = null;
+    const onScroll = () => {
+      const surface = rootRef?.current?.querySelector(RECHARTS_SURFACE);
+      if (!surface) return;
+      const { top, left } = surface.getBoundingClientRect();
+      if (top === lastTop && left === lastLeft) return;
+      lastTop = top;
+      lastLeft = left;
+      setScrollTick(n => n + 1);
+    };
+    window.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    window.addEventListener('resize', onScroll);
+    return () => {
+      window.removeEventListener('scroll', onScroll, { capture: true });
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [isPopoverOpen, rootRef]);
+
+  // Single live rect read per render. Stale `centerY` would surface as a
+  // popover sliding off-screen when the page scrolls; reading on every
+  // mousemove would thrash 60Hz layout, so we gate re-reads to `scrollTick`
+  // bumps and popover open/close transitions.
+  const liveGeometry = useMemo(() => {
+    if (!isPopoverOpen || !plotArea || !rootRef?.current) return null;
+    const surface = rootRef.current.querySelector(RECHARTS_SURFACE);
     if (!surface) return null;
     const rect = surface.getBoundingClientRect();
-    return rect.top + plotArea.y + plotArea.height / 2;
-  }, [plotArea, rootRef]);
+    return {
+      centerY: rect.top + plotArea.y + plotArea.height / 2,
+      left: rect.left,
+    };
+    // biome-ignore lint/correctness/useExhaustiveDependencies: scrollTick re-reads the rect on scroll
+  }, [isPopoverOpen, plotArea, rootRef, scrollTick]);
+
+  // Captured once when pending begins, cleared when it ends. Combined with
+  // the live left below to shift the popover by the chart's horizontal scroll
+  // delta — keeps it anchored to the plot column instead of the viewport.
+  // Drag doesn't need this: mousemove keeps `clientX` fresh.
+  const pendingAnchorLeft = useMemo(() => {
+    if (!isPending || !rootRef?.current) return null;
+    const surface = rootRef.current.querySelector(RECHARTS_SURFACE);
+    if (!surface) return null;
+    return surface.getBoundingClientRect().left;
+  }, [isPending, rootRef]);
+
+  const centerY = liveGeometry?.centerY ?? null;
+  const pendingScrollDeltaX =
+    isPending && pendingAnchorLeft !== null && liveGeometry
+      ? liveGeometry.left - pendingAnchorLeft
+      : 0;
 
   // Register that zoom is active so `<LineChartBody>` flips its cursor and
   // captures pointer events. Counted (not boolean) inside the context so this
@@ -81,11 +148,6 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
     if (disabled || !registerEnabled) return;
     return registerEnabled();
   }, [disabled, registerEnabled]);
-
-  const drag = zoomCtx?.drag ?? null;
-  const pending = zoomCtx?.pending ?? null;
-  const cancelPending = zoomCtx?.cancelPending;
-  const confirmZoom = zoomCtx?.confirmZoom;
 
   // Pending-state contract: click-outside dismisses, Enter confirms, Escape
   // cancels. The keydown half is scoped to events whose target is inside this
@@ -123,7 +185,6 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
   if (disabled || !dataCtx || !zoomCtx) return null;
 
   const popoverPosition = drag ?? pending ?? null;
-  const isPending = pending !== null;
 
   // `pointer-events:none` during drag — the confirm button must be inert while
   // the mouse button is still held, or clicking it would re-trigger a drag.
@@ -136,7 +197,7 @@ export const LineChartZoomBrush: FC<LineChartZoomBrushProps> = ({
         className={lineChartZoomCursorPopoverClasses}
         style={{
           top: centerY ?? popoverPosition.clientY,
-          left: popoverPosition.clientX + POPOVER_OFFSET_X,
+          left: popoverPosition.clientX + pendingScrollDeltaX + POPOVER_OFFSET_X,
           transform: 'translateY(-50%)',
           pointerEvents: isPending ? 'auto' : 'none',
         }}
