@@ -1,3 +1,9 @@
+## <small>0.44.1 (2026-05-21)</small>
+
+* fix(simple-charts): WDS-90 Fix LineChart zoom tooltip ([b28699e](https://github.com/wallarm/design-system/commit/b28699e))
+* fix(simple-charts): WDS-90 Fix LineChart zoom tooltip ([d2450cf](https://github.com/wallarm/design-system/commit/d2450cf))
+* docs(simple-charts): WDS-90 LineChart stories order ([d36f9ec](https://github.com/wallarm/design-system/commit/d36f9ec))
+
 ## 0.44.0 (2026-05-21)
 
 * feat: [CORE-2352] remote shell and nav ([6bd3a68](https://github.com/wallarm/design-system/commit/6bd3a68))
