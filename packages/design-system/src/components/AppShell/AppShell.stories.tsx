@@ -7,7 +7,6 @@ import {
   ChevronDown,
   CircleDashed,
   CircleHelp,
-  History,
   Home,
   LayoutPanelLeft,
   Settings,
@@ -27,12 +26,23 @@ import {
   DropdownMenuTriggerItem,
 } from '../DropdownMenu';
 import { Kbd } from '../Kbd';
+import { Logo } from '../Logo';
 import { NavRail, NavRailBody, NavRailFooter, NavRailItem, NavRailSeparator } from '../NavRail';
+import { findFirstLinkPath, pushPathname, useLocationPathname } from '../ProductNav';
 import { TopHeader, TopHeaderActions, TopHeaderLogo, TopHeaderSeparator } from '../TopHeader';
 import { AppShell, type AppShellProps } from './AppShell';
 import { AppShellHeader } from './AppShellHeader';
 import { AppShellRail } from './AppShellRail';
 import { AppShellRemote } from './AppShellRemote';
+import {
+  aiHypervisorNavConfig,
+  ConfigRemote,
+  edgeNavConfig,
+  HomeContent,
+  infraDiscoveryNavConfig,
+  securityTestingNavConfig,
+  settingsNavConfig,
+} from './story-content';
 
 const meta = {
   title: 'Navigation/AppShell',
@@ -64,6 +74,43 @@ export default meta;
 type SidebarMode = 'adaptive' | 'expanded';
 
 const USER_NAME = 'Meow Meow';
+
+const KNOWN_PRODUCTS = [
+  'home',
+  'edge',
+  'ai-hypervisor',
+  'infra-discovery',
+  'security-testing',
+  'settings',
+] as const;
+
+type Product = (typeof KNOWN_PRODUCTS)[number];
+
+const PRODUCT_CONFIGS: Record<Exclude<Product, 'home'>, { config: typeof edgeNavConfig }> = {
+  edge: { config: edgeNavConfig },
+  'ai-hypervisor': { config: aiHypervisorNavConfig },
+  'infra-discovery': { config: infraDiscoveryNavConfig },
+  'security-testing': { config: securityTestingNavConfig },
+  settings: { config: settingsNavConfig },
+};
+
+function deriveProduct(pathname: string): Product {
+  const segment = pathname.split('/').filter(Boolean)[0];
+  if (segment && (KNOWN_PRODUCTS as readonly string[]).includes(segment)) {
+    return segment as Product;
+  }
+  return 'home';
+}
+
+function navigateToProduct(product: Product) {
+  if (product === 'home') {
+    pushPathname('/home');
+    return;
+  }
+  const { config } = PRODUCT_CONFIGS[product];
+  const firstPath = findFirstLinkPath(config.items) ?? '';
+  pushPathname(`/${product}/${firstPath}`);
+}
 
 const AccountDropdown = ({
   sidebarMode,
@@ -127,18 +174,24 @@ const AccountDropdown = ({
   );
 };
 
+const RemoteForProduct = ({ product }: { product: Product }) => {
+  if (product === 'home') return <HomeContent />;
+  const { config } = PRODUCT_CONFIGS[product];
+  return <ConfigRemote config={config} basePath={`/${product}`} />;
+};
+
 export const Basic: StoryFn<AppShellProps> = () => {
-  const [activeItem, setActiveItem] = useState('home');
+  const pathname = useLocationPathname();
+  const activeProduct = deriveProduct(pathname);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
-  const collapsed = sidebarMode === 'adaptive' && activeItem !== 'home';
+  const collapsed = sidebarMode === 'adaptive' && activeProduct !== 'home';
 
   return (
     <AppShell>
       <AppShellHeader>
         <TopHeader>
           <TopHeaderLogo href='/'>
-            <CircleDashed size='lg' />
-            Wallarm
+            <Logo size='md' />
           </TopHeaderLogo>
           <TopHeaderActions>
             <Button variant='ghost' size='small' color='neutral'>
@@ -164,6 +217,7 @@ export const Basic: StoryFn<AppShellProps> = () => {
           </TopHeaderActions>
         </TopHeader>
       </AppShellHeader>
+
       <AppShellRail>
         <NavRail collapsed={collapsed}>
           <NavRailBody>
@@ -171,37 +225,37 @@ export const Basic: StoryFn<AppShellProps> = () => {
               icon={Home}
               label='Home'
               shortcut={['G', 'H']}
-              active={activeItem === 'home'}
-              onClick={() => setActiveItem('home')}
-            />
-            <NavRailItem
-              icon={History}
-              label='Recent'
-              shortcut={['G', 'R']}
-              active={activeItem === 'recent'}
-              onClick={() => setActiveItem('recent')}
+              active={activeProduct === 'home'}
+              onClick={() => navigateToProduct('home')}
             />
             <NavRailSeparator />
             <NavRailItem
               icon={CircleDashed}
               label='Edge'
               shortcut={['G', 'E']}
-              active={activeItem === 'edge'}
-              onClick={() => setActiveItem('edge')}
+              active={activeProduct === 'edge'}
+              onClick={() => navigateToProduct('edge')}
             />
             <NavRailItem
               icon={CircleDashed}
               label='AI Hypervisor'
               shortcut={['G', 'A']}
-              active={activeItem === 'ai-hypervisor'}
-              onClick={() => setActiveItem('ai-hypervisor')}
+              active={activeProduct === 'ai-hypervisor'}
+              onClick={() => navigateToProduct('ai-hypervisor')}
             />
             <NavRailItem
               icon={CircleDashed}
               label='Infra Discovery'
               shortcut={['G', 'I']}
-              active={activeItem === 'infra-discovery'}
-              onClick={() => setActiveItem('infra-discovery')}
+              active={activeProduct === 'infra-discovery'}
+              onClick={() => navigateToProduct('infra-discovery')}
+            />
+            <NavRailItem
+              icon={CircleDashed}
+              label='Security Testing'
+              shortcut={['G', 'T']}
+              active={activeProduct === 'security-testing'}
+              onClick={() => navigateToProduct('security-testing')}
             />
           </NavRailBody>
           <NavRailFooter>
@@ -209,20 +263,16 @@ export const Basic: StoryFn<AppShellProps> = () => {
               icon={Settings}
               label='Settings'
               shortcut={['G', 'S']}
-              active={activeItem === 'settings'}
-              onClick={() => setActiveItem('settings')}
+              active={activeProduct === 'settings'}
+              onClick={() => navigateToProduct('settings')}
             />
             <AccountDropdown sidebarMode={sidebarMode} onSidebarModeChange={setSidebarMode} />
           </NavRailFooter>
         </NavRail>
       </AppShellRail>
+
       <AppShellRemote>
-        <div className='p-24'>
-          <h2 className='text-lg font-semibold capitalize'>{activeItem}</h2>
-          <p className='mt-8 text-sm text-text-secondary'>
-            Click items to navigate. Use the header button to toggle collapsed state.
-          </p>
-        </div>
+        <RemoteForProduct product={activeProduct} />
       </AppShellRemote>
     </AppShell>
   );
