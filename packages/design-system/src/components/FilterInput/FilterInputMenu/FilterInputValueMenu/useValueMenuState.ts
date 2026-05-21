@@ -73,12 +73,22 @@ export const useValueMenuState = ({
   const onCommitRef = useRef(onCommit);
   onCommitRef.current = onCommit;
 
+  // Re-entry guard: blurCommitRef is read by both handleAreaClick and
+  // handleBlur in the same event sequence. Cleanup that nulls the ref runs in
+  // the next commit phase, so a back-to-back read in the current tick would
+  // re-commit the same checked values. Mirror the discipline in useBlurCommit.
+  const committingRef = useRef(false);
+
   const commitChecked = useCallback((): boolean => {
-    if (checkedValuesRef.current.length > 0 && onCommitRef.current) {
+    if (committingRef.current) return false;
+    if (checkedValuesRef.current.length === 0 || !onCommitRef.current) return false;
+    committingRef.current = true;
+    try {
       onCommitRef.current(checkedValuesRef.current);
       return true;
+    } finally {
+      committingRef.current = false;
     }
-    return false;
   }, []);
 
   // Register blur/area-click commit while the value menu is mounted in

@@ -161,5 +161,8 @@ export const useBlurCommit = ({
     commitBuildingForceRef.current = commitBuildingForce;
   }, [commitBuildingForce, commitBuildingForceRef]);
 
-  return { commitBuildingOnBlur, commitBuildingForce, hasIncompleteBuilding };
+  // commitBuildingForce is reached exclusively through commitBuildingForceRef
+  // (set in the useLayoutEffect above) — handleAreaClick reads it that way to
+  // break the useMenuFlow ↔ useBlurCommit dep cycle.
+  return { commitBuildingOnBlur, hasIncompleteBuilding };
 };
