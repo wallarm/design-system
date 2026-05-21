@@ -454,6 +454,7 @@ export {
 } from './components/Selection';
 export { Separator, type SeparatorProps } from './components/Separator';
 export { Skeleton, type SkeletonProps } from './components/Skeleton';
+export { SplashScreen, type SplashScreenProps } from './components/SplashScreen';
 export { SplitButton, type SplitButtonProps } from './components/SplitButton';
 export {
   HStack,
