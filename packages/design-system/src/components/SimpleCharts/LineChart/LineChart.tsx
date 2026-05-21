@@ -123,14 +123,17 @@ export function LineChart<T extends LineChartDatum = LineChartDatum>({
     seriesByKey,
   });
 
-  const emitZoom = useCallback(
-    (range: LineChartZoomRange | null) => {
-      onZoomChange?.(range);
-    },
-    [onZoomChange],
-  );
+  // Consumer callback held behind a ref so `emitZoom` (and `useLineChartZoomState`'s
+  // `confirmZoom`) stay referentially stable. Otherwise an inline
+  // `onZoomChange` invalidates `dataValue` and re-renders every context
+  // consumer on each parent render.
+  const onZoomChangeRef = useRef(onZoomChange);
+  onZoomChangeRef.current = onZoomChange;
+  const emitZoom = useCallback((range: LineChartZoomRange | null) => {
+    onZoomChangeRef.current?.(range);
+  }, []);
 
-  const zoom = useLineChartZoomState({ data, xKey, onZoomChange });
+  const zoom = useLineChartZoomState({ data, xKey, onZoomChangeRef });
 
   const hiddenSet = useMemo<ReadonlySet<string>>(() => {
     if (!filteredKeys?.length) return EMPTY_HIDDEN_SET;
