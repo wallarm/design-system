@@ -43,7 +43,13 @@ const preview: Preview = {
         showToolbar: isDev,
       },
       storySort: {
-        order: ['Documentation', ['Patterns', { FilterInput: ['Composition', '*'] }], 'Components'],
+        order: [
+          'Documentation',
+          ['Patterns', { FilterInput: ['Composition', '*'] }],
+          'Components',
+          'Data display',
+          ['SimpleCharts', ['Overview', 'BarList', 'PieChart', 'LineChart', 'Chart']],
+        ],
       },
     },
   },
