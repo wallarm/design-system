@@ -1,3 +1,8 @@
+## 0.44.0 (2026-05-21)
+
+* feat: [CORE-2352] remote shell and nav ([6bd3a68](https://github.com/wallarm/design-system/commit/6bd3a68))
+* feat: [CORE-2353] remote nav config example ([d819105](https://github.com/wallarm/design-system/commit/d819105))
+
 ## 0.43.0 (2026-05-21)
 
 * feat(filter-input): AS-1022 commit in-progress chip on wrapper click (#129) ([44747ed](https://github.com/wallarm/design-system/commit/44747ed)), closes [#129](https://github.com/wallarm/design-system/issues/129)
