@@ -1,0 +1,40 @@
+@keyframes progress-indeterminate {
+    0% {
+        left: 90%;
+        width: 10%;
+    }
+    20% {
+        left: 100%;
+        width: 0%;
+    }
+    25% {
+        left: 100%;
+        width: 5%;
+    }
+    40% {
+        left: 0%;
+        width: 5%;
+    }
+    50% {
+        left: 0%;
+        width: 0%;
+    }
+    65% {
+        left: 0%;
+        width: 50%;
+    }
+    85% {
+        left: 20%;
+        width: 70%;
+    }
+    100% {
+        left: 90%;
+        width: 30%;
+    }
+}
+
+[data-scope='progress'][data-part='range'][data-state='indeterminate'] {
+    position: absolute;
+    transition: none;
+    animation: progress-indeterminate 3.5s infinite;
+}

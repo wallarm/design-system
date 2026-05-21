@@ -361,6 +361,11 @@ export {
   useProductNavContext,
 } from './components/ProductNav';
 export {
+  Progress,
+  type ProgressColor,
+  type ProgressProps,
+} from './components/Progress';
+export {
   Radio,
   RadioDescription,
   type RadioDescriptionProps,
