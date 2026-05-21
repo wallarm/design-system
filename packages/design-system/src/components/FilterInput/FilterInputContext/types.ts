@@ -27,6 +27,9 @@ export interface FilterInputContextValue {
   onInputChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onInputKeyDown: (e: KeyboardEvent<HTMLInputElement>) => void;
   onInputClick: () => void;
+  /** Click on the FilterInput's empty area (not the inline input). Commits an
+   *  in-progress multi-select chip before falling back to onInputClick logic. */
+  onAreaClick: () => void;
   onGapClick: (conditionIndex: number, afterConnector: boolean) => void;
   onChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
   /** Click on a building-chip segment — reopens its menu and enters inline-edit. */

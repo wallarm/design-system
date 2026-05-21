@@ -43,6 +43,10 @@ export const useAutocompleteState = ({ conditions }: UseAutocompleteStateOptions
   // Indirection ref breaks the useMenuFlow ↔ useBlurCommit cycle.
   const commitBuildingOnBlurRef = useRef<() => boolean>(() => false);
 
+  // Same indirection for the area-click commit (force-commit variant —
+  // promotes incomplete building chips to error chips). Mirrored by useBlurCommit.
+  const commitBuildingForceRef = useRef<() => boolean>(() => false);
+
   return {
     inputText,
     setInputText,
@@ -69,5 +73,6 @@ export const useAutocompleteState = ({ conditions }: UseAutocompleteStateOptions
     segmentOperatorInputRef,
     segmentValueInputRef,
     commitBuildingOnBlurRef,
+    commitBuildingForceRef,
   };
 };

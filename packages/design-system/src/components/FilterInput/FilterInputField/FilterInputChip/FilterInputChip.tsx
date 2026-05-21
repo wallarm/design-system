@@ -112,6 +112,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
         className,
       )}
       data-slot='filter-input-condition-chip'
+      {...(building && { 'data-building': '' })}
       {...props}
     >
       <Segment

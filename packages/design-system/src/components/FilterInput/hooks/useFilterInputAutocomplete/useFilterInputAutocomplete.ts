@@ -69,6 +69,7 @@ export const useFilterInputAutocomplete = ({
     segmentOperatorInputRef,
     segmentValueInputRef,
     commitBuildingOnBlurRef,
+    commitBuildingForceRef,
   } = state;
 
   const { menuPositioning, setMenuAnchor, resetMenuAnchor } = useMenuPositioning({
@@ -157,27 +158,30 @@ export const useFilterInputAutocomplete = ({
     setBuildingMultiValue,
   });
 
-  const { handleInputChange, handleInputClick, handleKeyDown, menuRef } = useInputHandlers({
-    inputText,
-    menuState,
-    selectedField,
-    selectedOperator,
-    isFocused,
-    fields,
-    inputRef,
-    conditionsRef,
-    conditionsLengthRef,
-    effectiveInsertIndexRef,
-    setInputText,
-    setMenuState,
-    setInsertIndex,
-    resetMenuAnchor,
-    removeConditionAtIndex,
-    handleFieldSelect,
-    handleOperatorSelect,
-    handleCustomValueCommit,
-    stepBackBuildingMenu,
-  });
+  const { handleInputChange, handleInputClick, handleAreaClick, handleKeyDown, menuRef } =
+    useInputHandlers({
+      inputText,
+      menuState,
+      selectedField,
+      selectedOperator,
+      isFocused,
+      fields,
+      inputRef,
+      blurCommitRef,
+      commitBuildingForceRef,
+      conditionsRef,
+      conditionsLengthRef,
+      effectiveInsertIndexRef,
+      setInputText,
+      setMenuState,
+      setInsertIndex,
+      resetMenuAnchor,
+      removeConditionAtIndex,
+      handleFieldSelect,
+      handleOperatorSelect,
+      handleCustomValueCommit,
+      stepBackBuildingMenu,
+    });
 
   const { commitBuildingOnBlur, hasIncompleteBuilding } = useBlurCommit({
     selectedField,
@@ -189,6 +193,7 @@ export const useFilterInputAutocomplete = ({
     upsertCondition,
     resetState,
     commitBuildingOnBlurRef,
+    commitBuildingForceRef,
   });
 
   const { handleFocus, handleBlur } = useFocusManagement({
@@ -289,6 +294,7 @@ export const useFilterInputAutocomplete = ({
     handleClear,
     handleKeyDown,
     handleInputClick,
+    handleAreaClick,
     handleGapClick,
     handleFocus,
     handleBlur,

@@ -32,6 +32,7 @@ const setupHook = (
   const { result } = renderHook(() => {
     const effectiveInsertIndexRef = useRef(0);
     const commitBuildingOnBlurRef = useRef<() => boolean>(() => false);
+    const commitBuildingForceRef = useRef<() => boolean>(() => false);
     return useBlurCommit({
       selectedField,
       selectedOperator,
@@ -42,6 +43,7 @@ const setupHook = (
       upsertCondition,
       resetState,
       commitBuildingOnBlurRef,
+      commitBuildingForceRef,
     });
   });
 
