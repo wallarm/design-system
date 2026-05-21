@@ -2,7 +2,7 @@ import type { RefObject } from 'react';
 import { useCallback, useLayoutEffect, useRef } from 'react';
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { isBuildingComplete, isNoValueOperator } from '../../lib';
-import type { FieldMetadata, FilterOperator, UpsertCondition } from '../../types';
+import type { ChipErrorSegment, FieldMetadata, FilterOperator, UpsertCondition } from '../../types';
 
 interface UseBlurCommitDeps {
   selectedField: FieldMetadata | null;
@@ -133,9 +133,12 @@ export const useBlurCommit = ({
         resetState();
         return true;
       }
-      // Operator missing → mark operator as error; operator present but value
-      // empty → mark value as error. Both render an editable error chip.
-      const errorSegment = operator ? SEGMENT_VARIANT.value : SEGMENT_VARIANT.operator;
+      // Operator present but value empty → flag the value segment so the
+      // renderer highlights that slot. Operator missing → no per-segment
+      // error variant exists (ChipErrorSegment is `boolean | 'attribute' |
+      // 'value'`), so mark the whole chip as error — user can click into any
+      // segment to fix.
+      const errorSegment: ChipErrorSegment = operator ? SEGMENT_VARIANT.value : true;
       upsertCondition(
         field,
         operator ?? undefined,
