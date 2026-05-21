@@ -1,3 +1,7 @@
+## 0.43.0 (2026-05-21)
+
+* feat(filter-input): AS-1022 commit in-progress chip on wrapper click (#129) ([44747ed](https://github.com/wallarm/design-system/commit/44747ed)), closes [#129](https://github.com/wallarm/design-system/issues/129)
+
 ## 0.42.0 (2026-05-20)
 
 * feat(filter-input): AS-982 cascade Backspace through chip segments (#124) ([d8be5a3](https://github.com/wallarm/design-system/commit/d8be5a3)), closes [#124](https://github.com/wallarm/design-system/issues/124)
