@@ -1,3 +1,8 @@
+## 0.45.0 (2026-05-22)
+
+* feat: [WDS-120] SplashScreen ([689b3eb](https://github.com/wallarm/design-system/commit/689b3eb))
+* feat: [WDS-121] Progress ([32b528a](https://github.com/wallarm/design-system/commit/32b528a))
+
 ## <small>0.44.1 (2026-05-21)</small>
 
 * fix(simple-charts): WDS-90 Fix LineChart zoom tooltip ([b28699e](https://github.com/wallarm/design-system/commit/b28699e))
