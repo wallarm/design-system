@@ -1,3 +1,8 @@
+## 0.46.0 (2026-05-25)
+
+* feat: [WDS-120] SplashScreen ([a6fe052](https://github.com/wallarm/design-system/commit/a6fe052))
+* feat: [WDS-121] Progress ([244015b](https://github.com/wallarm/design-system/commit/244015b))
+
 ## <small>0.45.1 (2026-05-25)</small>
 
 * fix(table): WDS-125 add manualSorting to disable client-side sort (#132) ([4f179ef](https://github.com/wallarm/design-system/commit/4f179ef)), closes [#132](https://github.com/wallarm/design-system/issues/132)
