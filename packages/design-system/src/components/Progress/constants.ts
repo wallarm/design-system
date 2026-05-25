@@ -1,4 +1,5 @@
 export const ProgressColorEnum = {
+  Brand: 'brand',
   Slate: 'slate',
   Red: 'red',
   WOrange: 'w-orange',
