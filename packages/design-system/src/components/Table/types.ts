@@ -189,6 +189,15 @@ export interface TableProps<T> extends TestableProps {
   // --- Sorting ---
   sorting?: TableSortingState;
   onSortingChange?: TableOnChangeFn<TableSortingState>;
+  /**
+   * When `true`, disables TanStack's client-side sort. The table renders rows
+   * in the order they appear in `data` and only fires `onSortingChange` on
+   * header clicks. Use this when sorting is performed server-side and the
+   * server returns pre-sorted rows.
+   *
+   * Default: `false` (client-side sort via TanStack's `getSortedRowModel`).
+   */
+  manualSorting?: boolean;
 
   // --- Row Selection ---
   rowSelection?: TableRowSelectionState;
