@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { cn } from '../../utils/cn';
 import { Logo } from '../Logo';
 import { Progress } from '../Progress';
+import { splashContentVariants, splashLogoVariants, splashProgressVariants } from './classes';
 
 type Phase = 'enter-start' | 'entered' | 'exiting' | 'exited';
 
@@ -41,6 +42,8 @@ export const SplashScreen: FC<SplashScreenProps> = ({
 
   if (phase === 'exited') return null;
 
+  const animPhase = phase as Exclude<Phase, 'exited'>;
+
   return (
     <div
       {...props}
@@ -49,21 +52,15 @@ export const SplashScreen: FC<SplashScreenProps> = ({
       className='h-full w-full flex items-center justify-center'
     >
       <div
-        className={cn(
-          'flex h-max w-max flex-col items-center justify-center gap-12',
-          phase === 'enter-start' && 'opacity-0 translate-y-12',
-          phase === 'entered' && 'opacity-100 translate-y-0 transition-all duration-500 ease-out',
-          phase === 'exiting' && 'opacity-0 transition-opacity duration-300 ease-out',
-          className,
-        )}
+        className={cn(splashContentVariants({ phase: animPhase }), className)}
         onTransitionEnd={() => {
           if (phase === 'exiting') {
             setPhase('exited');
           }
         }}
       >
-        <Logo />
-        <Progress value={null} size='sm' />
+        <Logo className={splashLogoVariants({ phase: animPhase })} />
+        <Progress value={null} className={splashProgressVariants({ phase: animPhase })} />
       </div>
     </div>
   );
