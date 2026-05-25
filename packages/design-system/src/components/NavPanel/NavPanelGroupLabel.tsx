@@ -35,7 +35,7 @@ export const NavPanelGroupLabel: FC<NavPanelGroupLabelProps> = ({
       onClick={toggle}
       style={{ paddingLeft: 8 + depth * 24 }}
       className={cn(
-        'overlay flex h-32 shrink-0 w-full cursor-pointer items-center gap-8 rounded-6 py-8 pr-8 text-sm text-text-secondary transition-colors outline-none hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
+        'overlay flex h-32 shrink-0 w-full cursor-pointer items-center gap-8 rounded-6 py-8 pr-8 text-sm text-text-primary opacity-64 transition-colors outline-none hover:opacity-100 hover:overlay-states-primary-hover focus-visible:opacity-100 focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
         className,
       )}
     >
@@ -48,7 +48,7 @@ export const NavPanelGroupLabel: FC<NavPanelGroupLabelProps> = ({
         {children}
       </Text>
       <ChevronRight
-        size='sm'
+        size='xs'
         className={cn('shrink-0 transition-transform duration-150', expanded && 'rotate-90')}
       />
     </button>

@@ -22,7 +22,7 @@ export const RemoteShell: FC<RemoteShellProps> = ({
         data-slot='remote-shell'
         data-testid={testId}
         className={cn(
-          'grid h-full overflow-hidden [grid-template-areas:"panel_breadcrumb""panel_content"] [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr]',
+          'grid h-full overflow-hidden overscroll-none [grid-template-areas:"panel_breadcrumb""panel_content"] [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr]',
           className,
         )}
       >

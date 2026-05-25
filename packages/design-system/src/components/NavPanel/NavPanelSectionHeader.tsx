@@ -22,7 +22,7 @@ export const NavPanelSectionHeader: FC<NavPanelSectionHeaderProps> = ({
       ref={ref}
       data-slot='nav-panel-section-header'
       data-testid={testId}
-      className={cn('flex shrink-0 items-center px-8 pt-6', className)}
+      className={cn('flex h-26 shrink-0 items-center px-8 pt-8 pb-2', className)}
     >
       <Text size='xs' weight='medium' color='secondary'>
         {children}

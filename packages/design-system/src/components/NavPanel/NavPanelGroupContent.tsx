@@ -32,7 +32,7 @@ export const NavPanelGroupContent: FC<NavPanelGroupContentProps> = ({
       )}
     >
       <div
-        className='absolute top-0 bottom-0 w-px bg-border-primary'
+        className='absolute top-0 bottom-0 w-px bg-border-primary-light'
         style={{ left: depth * 16 + parentDepth * 8 }}
       />
       <NavPanelDepthContext.Provider value={depth}>

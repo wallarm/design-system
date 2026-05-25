@@ -19,14 +19,28 @@ export const edgeNavConfig: NavConfig = {
         { id: 'edge-us', label: 'Edge US', description: 'US edge nodes' },
       ],
       children: [
-        { type: 'link', id: 'dp-overview', label: 'Overview', path: 'overview' },
-        { type: 'link', id: 'dp-nodes', label: 'Nodes', path: 'nodes' },
-        { type: 'link', id: 'dp-services', label: 'Services', path: 'services' },
-        { type: 'link', id: 'dp-govern', label: 'Govern', path: 'govern' },
+        {
+          type: 'link',
+          id: 'dp-overview',
+          label: 'Overview',
+          path: 'overview',
+          icon: CircleDashed,
+        },
+        { type: 'link', id: 'dp-nodes', label: 'Nodes', path: 'nodes', icon: CircleDashed },
+        {
+          type: 'link',
+          id: 'dp-services',
+          label: 'Services',
+          path: 'services',
+          icon: CircleDashed,
+          dividerAfter: true,
+        },
+        { type: 'link', id: 'dp-govern', label: 'Govern', path: 'govern', icon: CircleDashed },
         {
           type: 'group',
           id: 'dp-operations',
           label: 'Operations',
+          icon: CircleDashed,
           children: [
             {
               type: 'link',
@@ -39,7 +53,14 @@ export const edgeNavConfig: NavConfig = {
         },
       ],
     },
-    { type: 'link', id: 'dashboards', label: 'Dashboards', path: 'dashboards', icon: CircleDashed },
+    {
+      type: 'link',
+      id: 'dashboards',
+      label: 'Dashboards',
+      path: 'dashboards',
+      icon: CircleDashed,
+      dividerAfter: true,
+    },
     { type: 'section-header', id: 'section-detect', label: 'Detect & Respond' },
     {
       type: 'group',

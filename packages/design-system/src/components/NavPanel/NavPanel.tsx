@@ -94,12 +94,12 @@ export const NavPanel: FC<NavPanelProps> = ({
             data-testid={testId}
             style={{ width }}
             className={cn(
-              'relative h-full shrink-0 border-r border-border-primary pt-8',
+              'relative h-full shrink-0 border-r border-border-primary-light pt-8',
               isResizing && 'select-none',
               className,
             )}
           >
-            <div className='flex h-full flex-col gap-2 overflow-y-auto [scrollbar-width:thin] px-8 pb-8'>
+            <div className='flex h-full flex-col gap-2 overflow-y-auto overscroll-none [scrollbar-width:thin] px-8 pb-8'>
               {children}
             </div>
             <NavPanelResizeHandle />
@@ -118,7 +118,7 @@ export const NavPanel: FC<NavPanelProps> = ({
         data-slot='nav-panel'
         data-testid={testId}
         className={cn(
-          'flex h-full w-[216px] shrink-0 flex-col gap-2 overflow-y-auto [scrollbar-width:thin] border-r border-border-primary p-8',
+          'flex h-full w-[216px] shrink-0 flex-col gap-2 overflow-y-auto overscroll-none [scrollbar-width:thin] border-r border-border-primary-light p-8',
           className,
         )}
       >

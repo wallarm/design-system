@@ -1,45 +1,29 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import {
-  ArrowRight,
-  Bell,
-  Check,
-  ChevronDown,
-  CircleDashed,
-  CircleHelp,
-  Home,
-  LayoutPanelLeft,
-  Settings,
-  SlidersHorizontal,
-  User,
-} from '../../icons';
+import { Bell, ChevronUpDown, CircleDashed, Home, Settings } from '../../icons';
 import { Button } from '../Button';
 import { Code } from '../Code';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuItemIcon,
-  DropdownMenuItemText,
-  DropdownMenuShortcut,
-  DropdownMenuTrigger,
-  DropdownMenuTriggerItem,
-} from '../DropdownMenu';
 import { Kbd } from '../Kbd';
 import { Logo } from '../Logo';
 import { NavRail, NavRailBody, NavRailFooter, NavRailItem, NavRailSeparator } from '../NavRail';
 import { findFirstLinkPath, pushPathname, useLocationPathname } from '../ProductNav';
+import { Text } from '../Text';
+import { useTheme } from '../ThemeProvider';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { TopHeader, TopHeaderActions, TopHeaderLogo, TopHeaderSeparator } from '../TopHeader';
 import { AppShell, type AppShellProps } from './AppShell';
 import { AppShellHeader } from './AppShellHeader';
 import { AppShellRail } from './AppShellRail';
 import { AppShellRemote } from './AppShellRemote';
 import {
+  AccountDropdown,
   aiHypervisorNavConfig,
   ConfigRemote,
   edgeNavConfig,
   HomeContent,
   infraDiscoveryNavConfig,
+  QuickHelpDropdown,
+  type SidebarMode,
   securityTestingNavConfig,
   settingsNavConfig,
 } from './story-content';
@@ -70,10 +54,6 @@ const meta = {
 } satisfies Meta<typeof AppShell>;
 
 export default meta;
-
-type SidebarMode = 'adaptive' | 'expanded';
-
-const USER_NAME = 'Meow Meow';
 
 const KNOWN_PRODUCTS = [
   'home',
@@ -112,68 +92,6 @@ function navigateToProduct(product: Product) {
   pushPathname(`/${product}/${firstPath}`);
 }
 
-const AccountDropdown = ({
-  sidebarMode,
-  onSidebarModeChange,
-}: {
-  sidebarMode: SidebarMode;
-  onSidebarModeChange: (mode: SidebarMode) => void;
-}) => {
-  return (
-    <DropdownMenu positioning={{ placement: 'right-end', gutter: 8 }}>
-      <DropdownMenuTrigger asChild>
-        <NavRailItem icon={User} label={USER_NAME} />
-      </DropdownMenuTrigger>
-      <DropdownMenuContent>
-        <DropdownMenuItem>
-          <DropdownMenuItemIcon>
-            <CircleDashed />
-          </DropdownMenuItemIcon>
-          <DropdownMenuItemText>Profile</DropdownMenuItemText>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <DropdownMenuItemIcon>
-            <SlidersHorizontal />
-          </DropdownMenuItemIcon>
-          <DropdownMenuItemText>Theme</DropdownMenuItemText>
-        </DropdownMenuItem>
-        <DropdownMenu>
-          <DropdownMenuTriggerItem>
-            <DropdownMenuItemIcon>
-              <LayoutPanelLeft />
-            </DropdownMenuItemIcon>
-            <DropdownMenuItemText>Sidebar mode</DropdownMenuItemText>
-          </DropdownMenuTriggerItem>
-          <DropdownMenuContent>
-            <DropdownMenuItem onSelect={() => onSidebarModeChange('adaptive')}>
-              <DropdownMenuItemText>Adaptive</DropdownMenuItemText>
-              {sidebarMode === 'adaptive' && (
-                <DropdownMenuShortcut>
-                  <Check />
-                </DropdownMenuShortcut>
-              )}
-            </DropdownMenuItem>
-            <DropdownMenuItem onSelect={() => onSidebarModeChange('expanded')}>
-              <DropdownMenuItemText>Always expanded</DropdownMenuItemText>
-              {sidebarMode === 'expanded' && (
-                <DropdownMenuShortcut>
-                  <Check />
-                </DropdownMenuShortcut>
-              )}
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <DropdownMenuItem>
-          <DropdownMenuItemIcon>
-            <ArrowRight />
-          </DropdownMenuItemIcon>
-          <DropdownMenuItemText>Sign out</DropdownMenuItemText>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
 const RemoteForProduct = ({ product }: { product: Product }) => {
   if (product === 'home') return <HomeContent />;
   const { config } = PRODUCT_CONFIGS[product];
@@ -184,6 +102,7 @@ export const Basic: StoryFn<AppShellProps> = () => {
   const pathname = useLocationPathname();
   const activeProduct = deriveProduct(pathname);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
+  const { theme, setTheme } = useTheme();
   const collapsed = sidebarMode === 'adaptive' && activeProduct !== 'home';
 
   return (
@@ -193,6 +112,7 @@ export const Basic: StoryFn<AppShellProps> = () => {
           <TopHeaderLogo href='/'>
             <Logo size='md' />
           </TopHeaderLogo>
+
           <TopHeaderActions>
             <Button variant='ghost' size='small' color='neutral'>
               <Code size='s' color='secondary'>
@@ -200,20 +120,30 @@ export const Basic: StoryFn<AppShellProps> = () => {
               </Code>
               <Kbd size='small'>⌘K</Kbd>
             </Button>
+
             <TopHeaderSeparator />
+
             <Button variant='ghost' size='small' color='neutral'>
-              Tenant Name
+              <Text size='xs' weight='medium'>
+                Tenant Name
+              </Text>
+              <span className='text-text-tertiary'>•</span>
               <Code size='s' color='secondary'>
-                · 12345
+                12345
               </Code>
-              <ChevronDown size='sm' />
+              <ChevronUpDown className='!icon-sm' />
             </Button>
-            <Button variant='ghost' size='small' color='neutral' aria-label='Notifications'>
-              <Bell size='sm' />
-            </Button>
-            <Button variant='ghost' size='small' color='neutral' aria-label='Help'>
-              <CircleHelp size='sm' />
-            </Button>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant='ghost' size='small' color='neutral' aria-label='Wallarm Updates'>
+                  <Bell />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Wallarm updates</TooltipContent>
+            </Tooltip>
+
+            <QuickHelpDropdown />
           </TopHeaderActions>
         </TopHeader>
       </AppShellHeader>
@@ -266,7 +196,12 @@ export const Basic: StoryFn<AppShellProps> = () => {
               active={activeProduct === 'settings'}
               onClick={() => navigateToProduct('settings')}
             />
-            <AccountDropdown sidebarMode={sidebarMode} onSidebarModeChange={setSidebarMode} />
+            <AccountDropdown
+              sidebarMode={sidebarMode}
+              onSidebarModeChange={setSidebarMode}
+              theme={theme}
+              onThemeChange={setTheme}
+            />
           </NavRailFooter>
         </NavRail>
       </AppShellRail>

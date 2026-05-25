@@ -22,10 +22,12 @@ function renderNavItems(
   onDrillClick?: (drill: NavConfigDrill) => void,
   level: 'root' | 'group' = 'root',
 ): ReactNode {
-  return items.map(item => {
+  const result: ReactNode[] = [];
+
+  for (const item of items) {
     if (item.type === 'link') {
       const Item = level === 'group' ? NavPanelGroupItem : NavPanelItem;
-      return (
+      result.push(
         <Item
           key={item.id}
           icon={item.icon}
@@ -33,28 +35,22 @@ function renderNavItems(
           onClick={() => onNavigate(item.path)}
         >
           {item.label}
-        </Item>
+        </Item>,
       );
-    }
-
-    if (item.type === 'group') {
-      return (
+    } else if (item.type === 'group') {
+      result.push(
         <NavPanelGroup key={item.id} defaultExpanded={item.defaultExpanded}>
           <NavPanelGroupLabel icon={item.icon}>{item.label}</NavPanelGroupLabel>
           <NavPanelGroupContent>
             {renderNavItems(item.children, activeItemId, onNavigate, onDrillClick, 'group')}
           </NavPanelGroupContent>
-        </NavPanelGroup>
+        </NavPanelGroup>,
       );
-    }
-
-    if (item.type === 'section-header') {
-      return <NavPanelSectionHeader key={item.id}>{item.label}</NavPanelSectionHeader>;
-    }
-
-    if (item.type === 'drill') {
+    } else if (item.type === 'section-header') {
+      result.push(<NavPanelSectionHeader key={item.id}>{item.label}</NavPanelSectionHeader>);
+    } else if (item.type === 'drill') {
       const Item = level === 'group' ? NavPanelGroupItem : NavPanelItem;
-      return (
+      result.push(
         <Item
           key={item.id}
           icon={item.icon}
@@ -62,12 +58,16 @@ function renderNavItems(
           onClick={() => onDrillClick?.(item)}
         >
           {item.label}
-        </Item>
+        </Item>,
       );
     }
 
-    return null;
-  });
+    if (item.dividerAfter) {
+      result.push(<NavPanelDivider key={`divider-${item.id}`} />);
+    }
+  }
+
+  return result;
 }
 
 type ProductNavPanelProps = { resizable?: boolean };
@@ -79,19 +79,10 @@ export const ProductNavPanel: FC<ProductNavPanelProps> = ({ resizable }) => {
   const currentEntry = navStack[Math.min(drillLevel, navStack.length - 1)]!;
 
   if (drillLevel === 0) {
-    const itemsWithDividers: ReactNode[] = [];
-    for (const item of config.items) {
-      itemsWithDividers.push(
-        ...([renderNavItems([item], effectiveActiveItemId, navigate, drillInto)] as ReactNode[]),
-      );
-      if (item.dividerAfter) {
-        itemsWithDividers.push(<NavPanelDivider key={`divider-${item.id}`} />);
-      }
-    }
     return (
       <NavPanel resizable={resizable}>
         <NavPanelHeader>{config.productLabel}</NavPanelHeader>
-        {itemsWithDividers}
+        {renderNavItems(config.items, effectiveActiveItemId, navigate, drillInto)}
       </NavPanel>
     );
   }
@@ -103,8 +94,11 @@ export const ProductNavPanel: FC<ProductNavPanelProps> = ({ resizable }) => {
 
   return (
     <NavPanel resizable={resizable}>
-      <NavPanelHeader>{currentEntry.title}</NavPanelHeader>
-      <NavPanelBack onClick={goBack}>{backLabel}</NavPanelBack>
+      <div className='sticky top-0 z-10 flex flex-col gap-2 bg-bg-surface-1'>
+        <NavPanelHeader>{currentEntry.title}</NavPanelHeader>
+        <NavPanelBack onClick={goBack}>{backLabel}</NavPanelBack>
+        <NavPanelDivider />
+      </div>
       {renderNavItems(currentEntry.items, effectiveActiveItemId, navigate, drillInto)}
     </NavPanel>
   );

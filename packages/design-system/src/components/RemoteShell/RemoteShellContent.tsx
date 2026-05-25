@@ -22,7 +22,7 @@ export const RemoteShellContent: FC<RemoteShellContentProps> = ({
       data-slot='remote-shell-content'
       data-testid={testId}
       className={cn(
-        '[grid-area:content] min-h-0 overflow-auto px-24 py-16 [scrollbar-width:thin]',
+        '[grid-area:content] min-h-0 overflow-auto overscroll-none px-24 py-16 [scrollbar-width:thin]',
         className,
       )}
     >
