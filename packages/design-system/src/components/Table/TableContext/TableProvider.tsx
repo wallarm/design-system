@@ -56,6 +56,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
 
     sorting: sortingProp,
     onSortingChange,
+    manualSorting = false,
     rowSelection: rowSelectionProp,
     onRowSelectionChange,
     columnSizing: columnSizingProp,
@@ -236,7 +237,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     getRowId,
     getSubRows,
     getCoreRowModel: getCoreRowModel(),
-    ...(sortingEnabled && { getSortedRowModel: getSortedRowModel() }),
+    ...(sortingEnabled && !manualSorting && { getSortedRowModel: getSortedRowModel() }),
+    manualSorting,
     ...(groupingEnabled && { getGroupedRowModel: getGroupedRowModel() }),
     ...(groupingEnabled || expandingEnabled ? { getExpandedRowModel: getExpandedRowModel() } : {}),
     state: {

@@ -113,6 +113,7 @@ Enabled by passing `onSortingChange`. Per-column control via `enableSorting` in 
 |------|------|-------------|
 | `sorting` | `SortingState` | Sorting state (controlled) |
 | `onSortingChange` | `OnChangeFn<SortingState>` | Callback on sorting change |
+| `manualSorting` | `boolean` | Disable client-side sort; render `data` as-is and only fire `onSortingChange`. Use for server-side sorting. Default: `false` |
 
 ### Row Selection
 
@@ -242,7 +243,8 @@ All interactive states work in two modes via the `useControlled` hook:
 - **Disabled** by default for all columns
 - Visual indication in the header: asc / desc / unsorted icons
 - Header with sorting becomes clickable (interactive variant via CVA)
-- Client-side sorting out of the box; server-side — via controlled state (consumer fetches data on `onSortingChange`)
+- Client-side sorting out of the box: rows are sorted via TanStack's `getSortedRowModel` whenever `onSortingChange` is provided
+- Server-side sorting: pass `manualSorting` (with controlled `sorting` + `onSortingChange`). Sort UI fires `onSortingChange`, the consumer fetches pre-sorted data, and the table renders it unchanged — no client-side re-sort
 
 ### 2. Row Selection
 - Implemented via a checkbox column — manually or through the `createSelectionColumn<T>()` helper

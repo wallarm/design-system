@@ -91,6 +91,40 @@ export const Sorting: StoryFn<typeof meta> = () => {
   );
 };
 
+// Demo of server-side sorting: the consumer (this story) owns sort. TanStack
+// only fires `onSortingChange`; we re-derive `data` ourselves to mimic a
+// re-fetch that returns pre-sorted rows.
+const sortSecurityEvents = (sorting: TableSortingState): SecurityEvent[] => {
+  if (sorting.length === 0) return securityEvents;
+  const { id, desc } = sorting[0]!;
+  const key = id as keyof SecurityEvent;
+  const direction = desc ? -1 : 1;
+  return [...securityEvents].sort((a, b) => {
+    const av = a[key];
+    const bv = b[key];
+    if (av < bv) return -1 * direction;
+    if (av > bv) return 1 * direction;
+    return 0;
+  });
+};
+
+export const ManualSorting: StoryFn<typeof meta> = () => {
+  const [sorting, setSorting] = useState<TableSortingState>([]);
+  const data = useMemo(() => sortSecurityEvents(sorting), [sorting]);
+
+  return (
+    <Table
+      data={data}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      manualSorting
+      data-testid='manual-sort-table'
+    />
+  );
+};
+
 export const LoadingState: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} isLoading />
 );
