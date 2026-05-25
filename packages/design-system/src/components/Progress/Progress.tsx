@@ -18,11 +18,11 @@ export interface ProgressProps extends TestableProps {
 }
 
 export const Progress: FC<ProgressProps> = ({
-  value = 0,
+  value,
   min = 0,
   max = 100,
-  size = 'md',
-  color = 'w-orange',
+  size = 'xs',
+  color = 'brand',
   showLabel = false,
   className,
   'data-testid': testId,
@@ -32,6 +32,7 @@ export const Progress: FC<ProgressProps> = ({
     <ArkUiProgress.Root
       ref={ref}
       value={value}
+      defaultValue={value}
       min={min}
       max={max}
       data-slot='progress'

@@ -2,6 +2,7 @@ import { cva } from 'class-variance-authority';
 import type { ProgressColor } from './types';
 
 const progressColorMap: Record<ProgressColor, string> = {
+  brand: 'bg-bg-fill-brand',
   slate: 'bg-badge-slate-strong',
   red: 'bg-badge-red-strong',
   'w-orange': 'bg-badge-w-orange-strong',
@@ -26,6 +27,7 @@ const progressColorMap: Record<ProgressColor, string> = {
 };
 
 const trackColorMap: Record<ProgressColor, string> = {
+  brand: 'bg-bg-brand',
   slate: 'bg-badge-slate-light',
   red: 'bg-badge-red-light',
   'w-orange': 'bg-badge-w-orange-light',
@@ -52,6 +54,7 @@ const trackColorMap: Record<ProgressColor, string> = {
 export const progressTrackVariants = cva('relative w-full overflow-hidden', {
   variants: {
     size: {
+      xs: 'h-2 rounded-full',
       sm: 'h-4 rounded-2',
       md: 'h-8 rounded-4',
       lg: 'h-12 rounded-6',
@@ -59,14 +62,15 @@ export const progressTrackVariants = cva('relative w-full overflow-hidden', {
     color: trackColorMap,
   },
   defaultVariants: {
-    size: 'md',
-    color: 'w-orange',
+    size: 'xs',
+    color: 'brand',
   },
 });
 
 export const progressRangeVariants = cva('h-full transition-all duration-300 ease-out', {
   variants: {
     size: {
+      xs: 'rounded-full',
       sm: 'rounded-2',
       md: 'rounded-4',
       lg: 'rounded-6',
@@ -74,7 +78,7 @@ export const progressRangeVariants = cva('h-full transition-all duration-300 eas
     color: progressColorMap,
   },
   defaultVariants: {
-    size: 'md',
-    color: 'w-orange',
+    size: 'xs',
+    color: 'brand',
   },
 });

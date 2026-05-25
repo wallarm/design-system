@@ -23,7 +23,7 @@ const meta = {
     },
     size: {
       control: 'select',
-      options: ['sm', 'md', 'lg'],
+      options: ['xs', 'sm', 'md', 'lg'],
     },
     color: {
       control: 'select',
@@ -47,8 +47,8 @@ Basic.args = {
   value: 70,
   min: 0,
   max: 100,
-  size: 'md',
-  color: 'w-orange',
+  size: 'xs',
+  color: 'brand',
   showLabel: false,
 };
 
@@ -56,17 +56,30 @@ export const Sizes: StoryFn<typeof meta> = () => (
   <div className='w-300'>
     <HStack gap={12}>
       <VStack align='end'>
+        <Text truncate>XSmall (default)</Text>
         <Text truncate>Small</Text>
-        <Text truncate>Medium (default)</Text>
+        <Text truncate>Medium</Text>
         <Text truncate>Large</Text>
       </VStack>
 
       <VStack fullWidth justify='between' style={{ height: 'stretch' }}>
-        <Progress value={20} size='sm' />
-        <Progress value={40} size='md' />
-        <Progress value={60} size='lg' />
+        <Progress value={20} size='xs' />
+        <Progress value={40} size='sm' />
+        <Progress value={60} size='md' />
+        <Progress value={80} size='lg' />
       </VStack>
     </HStack>
+  </div>
+);
+
+export const WithLabel: StoryFn<typeof meta> = () => (
+  <div className='w-280'>
+    <VStack>
+      <Progress value={20} showLabel />
+      <Progress value={40} showLabel size='sm' />
+      <Progress value={60} showLabel size='md' />
+      <Progress value={80} showLabel size='lg' />
+    </VStack>
   </div>
 );
 
@@ -86,21 +99,12 @@ export const Colors: StoryFn<typeof meta> = () => (
             value={index + 1}
             max={Object.entries(ProgressColorEnum).length}
             color={color}
+            size='sm'
             className='flex-1'
           />
         ))}
       </VStack>
     </HStack>
-  </div>
-);
-
-export const WithLabel: StoryFn<typeof meta> = () => (
-  <div className='w-280'>
-    <VStack>
-      <Progress value={25} size='sm' showLabel />
-      <Progress value={50} showLabel color='green' />
-      <Progress value={75} showLabel color='pink' size='lg' />
-    </VStack>
   </div>
 );
 
