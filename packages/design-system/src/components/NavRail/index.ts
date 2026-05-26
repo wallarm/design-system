@@ -4,3 +4,4 @@ export { useNavRailContext } from './NavRailContext';
 export { NavRailFooter, type NavRailFooterProps } from './NavRailFooter';
 export { NavRailItem, type NavRailItemProps } from './NavRailItem';
 export { NavRailSeparator, type NavRailSeparatorProps } from './NavRailSeparator';
+export { NavRailSkeleton, type NavRailSkeletonProps } from './NavRailSkeleton';

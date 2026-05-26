@@ -17,7 +17,7 @@ export const AppShellRemote: FC<AppShellRemoteProps> = ({ ref, className, childr
       data-slot='app-shell-remote'
       data-testid={testId}
       className={cn(
-        '[grid-area:remote] overflow-auto overscroll-none rounded-tl-12 border border-border-primary-light bg-bg-page-bg',
+        '[grid-area:remote] relative overflow-auto overscroll-none rounded-tl-12 border border-border-primary-light bg-bg-page-bg',
         className,
       )}
     >

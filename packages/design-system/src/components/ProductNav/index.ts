@@ -1,3 +1,4 @@
+export { NavPanelSkeleton, type NavPanelSkeletonProps } from '../NavPanel';
 export { type MatchNavResult, matchNav } from './matchNav';
 export { findDrillNode, findFirstLinkPath } from './navUtils';
 export { ProductNav, type ProductNavProps } from './ProductNav';
