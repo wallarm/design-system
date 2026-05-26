@@ -1,3 +1,7 @@
+## 0.47.0 (2026-05-26)
+
+* feat: [WDS-110] Shell ([27df8c3](https://github.com/wallarm/design-system/commit/27df8c3))
+
 ## 0.46.0 (2026-05-25)
 
 * feat: [WDS-120] SplashScreen ([a6fe052](https://github.com/wallarm/design-system/commit/a6fe052))
