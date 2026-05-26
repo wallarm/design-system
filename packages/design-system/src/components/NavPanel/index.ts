@@ -8,3 +8,4 @@ export { NavPanelGroupLabel, type NavPanelGroupLabelProps } from './NavPanelGrou
 export { NavPanelHeader, type NavPanelHeaderProps } from './NavPanelHeader';
 export { NavPanelItem, type NavPanelItemProps } from './NavPanelItem';
 export { NavPanelSectionHeader, type NavPanelSectionHeaderProps } from './NavPanelSectionHeader';
+export { NavPanelSkeleton, type NavPanelSkeletonProps } from './NavPanelSkeleton';

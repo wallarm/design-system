@@ -5,8 +5,16 @@ import { Button } from '../Button';
 import { Code } from '../Code';
 import { Kbd } from '../Kbd';
 import { Logo } from '../Logo';
-import { NavRail, NavRailBody, NavRailFooter, NavRailItem, NavRailSeparator } from '../NavRail';
-import { findFirstLinkPath, pushPathname, useLocationPathname } from '../ProductNav';
+import {
+  NavRail,
+  NavRailBody,
+  NavRailFooter,
+  NavRailItem,
+  NavRailSeparator,
+  NavRailSkeleton,
+} from '../NavRail';
+import { useLocationPathname } from '../ProductNav';
+import { Skeleton } from '../Skeleton';
 import { Text } from '../Text';
 import { useTheme } from '../ThemeProvider';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
@@ -17,15 +25,12 @@ import { AppShellRail } from './AppShellRail';
 import { AppShellRemote } from './AppShellRemote';
 import {
   AccountDropdown,
-  aiHypervisorNavConfig,
-  ConfigRemote,
-  edgeNavConfig,
-  HomeContent,
-  infraDiscoveryNavConfig,
+  deriveProduct,
+  navigateToProduct,
   QuickHelpDropdown,
+  RecentDropdown,
+  RemoteForProduct,
   type SidebarMode,
-  securityTestingNavConfig,
-  settingsNavConfig,
 } from './story-content';
 
 const meta = {
@@ -55,52 +60,11 @@ const meta = {
 
 export default meta;
 
-const KNOWN_PRODUCTS = [
-  'home',
-  'edge',
-  'ai-hypervisor',
-  'infra-discovery',
-  'security-testing',
-  'settings',
-] as const;
-
-type Product = (typeof KNOWN_PRODUCTS)[number];
-
-const PRODUCT_CONFIGS: Record<Exclude<Product, 'home'>, { config: typeof edgeNavConfig }> = {
-  edge: { config: edgeNavConfig },
-  'ai-hypervisor': { config: aiHypervisorNavConfig },
-  'infra-discovery': { config: infraDiscoveryNavConfig },
-  'security-testing': { config: securityTestingNavConfig },
-  settings: { config: settingsNavConfig },
-};
-
-function deriveProduct(pathname: string): Product {
-  const segment = pathname.split('/').filter(Boolean)[0];
-  if (segment && (KNOWN_PRODUCTS as readonly string[]).includes(segment)) {
-    return segment as Product;
-  }
-  return 'home';
-}
-
-function navigateToProduct(product: Product) {
-  if (product === 'home') {
-    pushPathname('/home');
-    return;
-  }
-  const { config } = PRODUCT_CONFIGS[product];
-  const firstPath = findFirstLinkPath(config.items) ?? '';
-  pushPathname(`/${product}/${firstPath}`);
-}
-
-const RemoteForProduct = ({ product }: { product: Product }) => {
-  if (product === 'home') return <HomeContent />;
-  const { config } = PRODUCT_CONFIGS[product];
-  return <ConfigRemote config={config} basePath={`/${product}`} />;
-};
-
 export const Basic: StoryFn<AppShellProps> = () => {
   const pathname = useLocationPathname();
   const activeProduct = deriveProduct(pathname);
+
+  const [loading, setLoading] = useState(true);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
   const { theme, setTheme } = useTheme();
   const collapsed = sidebarMode === 'adaptive' && activeProduct !== 'home';
@@ -114,25 +78,40 @@ export const Basic: StoryFn<AppShellProps> = () => {
           </TopHeaderLogo>
 
           <TopHeaderActions>
-            <Button variant='ghost' size='small' color='neutral'>
-              <Code size='s' color='secondary'>
-                Search Wallarm
-              </Code>
-              <Kbd size='small'>⌘K</Kbd>
-            </Button>
+            {loading ? (
+              <>
+                <Skeleton width='150px' height='20px' rounded={6} />
+                <TopHeaderSeparator />
+                <Skeleton width='150px' height='20px' rounded={6} />
+              </>
+            ) : (
+              <>
+                <Button
+                  variant='ghost'
+                  size='small'
+                  color='neutral'
+                  className='p-4 gap-6 rounded-6'
+                >
+                  <Code size='s' color='secondary'>
+                    Search Wallarm
+                  </Code>
+                  <Kbd size='xsmall'>⌘ K</Kbd>
+                </Button>
 
-            <TopHeaderSeparator />
+                <TopHeaderSeparator />
 
-            <Button variant='ghost' size='small' color='neutral'>
-              <Text size='xs' weight='medium'>
-                Tenant Name
-              </Text>
-              <span className='text-text-tertiary'>•</span>
-              <Code size='s' color='secondary'>
-                12345
-              </Code>
-              <ChevronUpDown className='!icon-sm' />
-            </Button>
+                <Button variant='ghost' size='small' color='neutral' className='py-4 rounded-6'>
+                  <Text size='xs' weight='medium'>
+                    Tenant Name
+                  </Text>
+                  <span className='text-text-tertiary mx-[-2px]'>•</span>
+                  <Code size='s' color='secondary'>
+                    12345
+                  </Code>
+                  <ChevronUpDown className='!icon-sm' />
+                </Button>
+              </>
+            )}
 
             <Tooltip>
               <TooltipTrigger asChild>
@@ -158,36 +137,46 @@ export const Basic: StoryFn<AppShellProps> = () => {
               active={activeProduct === 'home'}
               onClick={() => navigateToProduct('home')}
             />
+            <RecentDropdown />
+
             <NavRailSeparator />
-            <NavRailItem
-              icon={CircleDashed}
-              label='Edge'
-              shortcut={['G', 'E']}
-              active={activeProduct === 'edge'}
-              onClick={() => navigateToProduct('edge')}
-            />
-            <NavRailItem
-              icon={CircleDashed}
-              label='AI Hypervisor'
-              shortcut={['G', 'A']}
-              active={activeProduct === 'ai-hypervisor'}
-              onClick={() => navigateToProduct('ai-hypervisor')}
-            />
-            <NavRailItem
-              icon={CircleDashed}
-              label='Infra Discovery'
-              shortcut={['G', 'I']}
-              active={activeProduct === 'infra-discovery'}
-              onClick={() => navigateToProduct('infra-discovery')}
-            />
-            <NavRailItem
-              icon={CircleDashed}
-              label='Security Testing'
-              shortcut={['G', 'T']}
-              active={activeProduct === 'security-testing'}
-              onClick={() => navigateToProduct('security-testing')}
-            />
+
+            {loading ? (
+              <NavRailSkeleton />
+            ) : (
+              <>
+                <NavRailItem
+                  icon={CircleDashed}
+                  label='Edge'
+                  shortcut={['G', 'E']}
+                  active={activeProduct === 'edge'}
+                  onClick={() => navigateToProduct('edge')}
+                />
+                <NavRailItem
+                  icon={CircleDashed}
+                  label='AI Hypervisor'
+                  shortcut={['G', 'A']}
+                  active={activeProduct === 'ai-hypervisor'}
+                  onClick={() => navigateToProduct('ai-hypervisor')}
+                />
+                <NavRailItem
+                  icon={CircleDashed}
+                  label='Infra Discovery'
+                  shortcut={['G', 'I']}
+                  active={activeProduct === 'infra-discovery'}
+                  onClick={() => navigateToProduct('infra-discovery')}
+                />
+                <NavRailItem
+                  icon={CircleDashed}
+                  label='Security Testing'
+                  shortcut={['G', 'T']}
+                  active={activeProduct === 'security-testing'}
+                  onClick={() => navigateToProduct('security-testing')}
+                />
+              </>
+            )}
           </NavRailBody>
+
           <NavRailFooter>
             <NavRailItem
               icon={Settings}
@@ -207,6 +196,12 @@ export const Basic: StoryFn<AppShellProps> = () => {
       </AppShellRail>
 
       <AppShellRemote>
+        <div className='absolute top-4 right-4 z-10'>
+          <Button variant='ghost' size='small' color='neutral' onClick={() => setLoading(v => !v)}>
+            {loading ? 'Finish loading' : 'Start loading'}
+          </Button>
+        </div>
+
         <RemoteForProduct product={activeProduct} />
       </AppShellRemote>
     </AppShell>

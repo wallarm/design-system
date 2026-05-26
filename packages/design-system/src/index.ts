@@ -320,6 +320,8 @@ export {
   type NavRailProps,
   NavRailSeparator,
   type NavRailSeparatorProps,
+  NavRailSkeleton,
+  type NavRailSkeletonProps,
 } from './components/NavRail';
 export { NumberInput, type NumberInputProps } from './components/NumberInput';
 export {
@@ -350,6 +352,8 @@ export {
   type NavConfigGroup,
   type NavConfigLink,
   type NavConfigNode,
+  NavPanelSkeleton,
+  type NavPanelSkeletonProps,
   type NavStackEntry,
   ProductNav,
   ProductNavBreadcrumbs,

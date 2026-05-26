@@ -14,6 +14,7 @@ const kbdVariants = cva(
   {
     variants: {
       size: {
+        xsmall: 'h-16 min-w-20 p-2',
         small: 'h-20 min-w-20 p-4',
         medium: 'h-24 min-w-24 p-6',
       },

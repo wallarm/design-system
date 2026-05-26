@@ -1,6 +1,7 @@
 export { AccountDropdown, type SidebarMode } from './_storyAccountDropdown';
-export { ConfigRemote } from './_storyConfigRenderer';
+export { RemoteForProduct } from './_storyConfigRenderer';
 export { HomeContent } from './_storyHomeContent';
+export { deriveProduct, navigateToProduct } from './_storyLib';
 export {
   aiHypervisorNavConfig,
   edgeNavConfig,
@@ -9,3 +10,4 @@ export {
   settingsNavConfig,
 } from './_storyNavConfigs';
 export { QuickHelpDropdown } from './_storyQuickHelpDropdown';
+export { RecentDropdown } from './_storyRecentDropdown';
