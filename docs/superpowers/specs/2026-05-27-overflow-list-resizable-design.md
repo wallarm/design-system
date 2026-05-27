@@ -1,109 +1,108 @@
-# AS-1033 — OverflowList в ресайзабл-контейнерах
+# AS-1033 — OverflowList in resizable containers
 
-**Дата:** 2026-05-27
-**Тикет:** [AS-1033](https://wallarm.atlassian.net/browse/AS-1033)
-**Статус:** дизайн утверждён
+**Date:** 2026-05-27
+**Ticket:** [AS-1033](https://wallarm.atlassian.net/browse/AS-1033)
+**Status:** design approved
 
-## Проблема
+## Problem
 
-`OverflowList` (через хук `useOverflowItems`) должен корректно и плавно
-перекомпоновываться, когда ширина контейнера меняется в реальном времени:
-внутри ресайзабл-дровера (`DrawerResizeHandle`) и в ячейке ресайзабл-колонки
-таблицы (TanStack column resizing). Сейчас при перетаскивании ручки ресайза
-интерфейс «подвисает».
+`OverflowList` (via the `useOverflowItems` hook) must reflow correctly and
+smoothly when the container width changes in real time: inside a resizable
+drawer (`DrawerResizeHandle`) and in a resizable table column cell (TanStack
+column resizing). Today, dragging the resize handle makes the UI "freeze".
 
-## Корневые причины
+## Root causes
 
-| # | Где | Проблема |
+| # | Where | Problem |
 |---|-----|----------|
-| 1 | `hooks/useOverflowItems.tsx:84-109` | На **каждый тик** `ResizeObserver` внутри цикла создаётся/вставляется/удаляется временный DOM (`document.createElement` → `appendChild` → чтение `offsetWidth` → `removeChild`). Принудительный синхронный reflow на каждый кадр перетаскивания — главный источник лагов. |
-| 2 | `hooks/useOverflowItems.tsx:131` | Callback `ResizeObserver` выполняется синхронно много раз в секунду и вызывает `setState`, что провоцирует новый layout, который снова наблюдает RO. Нет батчинга через `requestAnimationFrame` — риск warning «ResizeObserver loop completed with undelivered notifications». |
-| 3 | `hooks/useOverflowItems.tsx:64` | `getComputedStyle(container)` на каждый тик — лишний forced style recalc. |
-| 4 | `components/OverflowList/OverflowList.tsx:39,47` | `items.indexOf(item)` в рендерере вызывается на каждый элемент → O(n²) на рендер. |
-| 5 | `components/OverflowList/OverflowList.tsx:78-82` | `useMemo` используется как side-effect для `onOverflow` — небезопасно в React 19 (выполняется во время рендера). |
-| 6 | `hooks/useOverflowItems.tsx:144` | `MeasurementContainer` — инлайн-компонент, пересоздаётся каждый рендер. |
+| 1 | `hooks/useOverflowItems.tsx:84-109` | On **every tick** of `ResizeObserver`, a temporary DOM node is created/inserted/removed inside the loop (`document.createElement` → `appendChild` → reading `offsetWidth` → `removeChild`). The forced synchronous reflow on every drag frame is the main source of lag. |
+| 2 | `hooks/useOverflowItems.tsx:131` | The `ResizeObserver` callback runs synchronously many times per second and calls `setState`, which triggers a new layout, which is again observed by the RO. There is no batching via `requestAnimationFrame` — risk of the "ResizeObserver loop completed with undelivered notifications" warning. |
+| 3 | `hooks/useOverflowItems.tsx:64` | `getComputedStyle(container)` on every tick — an unnecessary forced style recalc. |
+| 4 | `components/OverflowList/OverflowList.tsx:39,47` | `items.indexOf(item)` is called in the renderer for every item → O(n²) per render. |
+| 5 | `components/OverflowList/OverflowList.tsx:78-82` | `useMemo` is used as a side-effect for `onOverflow` — unsafe in React 19 (it runs during render). |
+| 6 | `hooks/useOverflowItems.tsx:144` | `MeasurementContainer` is an inline component, recreated on every render. |
 
-## Подход
+## Approach
 
-Выбран: **оптимизация текущего движка** (скрытый слой измерения +
-`ResizeObserver`), без перехода на IntersectionObserver.
+Chosen: **optimize the current engine** (hidden measurement layer +
+`ResizeObserver`), without switching to IntersectionObserver.
 
-Принципы (best practices из ресёрча — см. «Источники»):
-- **Разделить read и write**: внутри resize-callback — только чтение/арифметика
-  по кэшу, никакого создания/удаления DOM.
-- **rAF-батчинг**: всю работу из callback `ResizeObserver` выносим в один
-  `requestAnimationFrame`, коалесцируя несколько нотификаций кадра в один проход.
-- **Кэш измерений**: ширины элементов, gap и ширину индикатора `+N` меряем один
-  раз (при смене `items`/рендереров), а не на каждый тик ресайза.
+Principles (best practices from the research — see "Sources"):
+- **Separate read and write**: inside the resize callback — only reads/arithmetic
+  against the cache, no DOM creation/removal.
+- **rAF batching**: move all work out of the `ResizeObserver` callback into a single
+  `requestAnimationFrame`, coalescing multiple frame notifications into one pass.
+- **Measurement cache**: item widths, gap, and the `+N` indicator width are measured
+  once (when `items`/renderers change), not on every resize tick.
 
-### Изменения в `useOverflowItems`
+### Changes in `useOverflowItems`
 
-1. **Мерить индикатор через слой измерения**, а не temp-DOM. Рендерим
-   overflow-индикатор в скрытом контейнере со своим ref и меряем его
-   `offsetWidth` один раз. Весь блок `document.createElement` (строки ~84-109)
-   удаляется.
-2. **Кэш измерений**: ширины элементов + gap + ширина индикатора хранятся в ref;
-   пересчёт только при изменении `items`/рендереров.
-3. **rAF-троттлинг `ResizeObserver`**: callback планирует один
-   `requestAnimationFrame`, в котором выполняется `calculateVisibleItems`;
-   pending rAF отменяется в cleanup. Это документированный фикс и от jank,
-   и от warning'а «ResizeObserver loop».
-4. **gap читаем один раз** на этапе измерения, не на каждый тик.
-5. **Guard на setState**: `setVisibleCount` вызывается только если значение
-   реально изменилось — меньше ререндеров и нет RO-feedback-петли.
-6. `MeasurementContainer` стабилизируем через `useCallback`.
+1. **Measure the indicator via the measurement layer**, not a temp DOM node. Render
+   the overflow indicator in a hidden container with its own ref and measure its
+   `offsetWidth` once. The entire `document.createElement` block (lines ~84-109)
+   is removed.
+2. **Measurement cache**: item widths + gap + indicator width are stored in a ref;
+   recompute only when `items`/renderers change.
+3. **rAF throttling of `ResizeObserver`**: the callback schedules a single
+   `requestAnimationFrame` that runs `calculateVisibleItems`; the pending rAF is
+   cancelled in cleanup. This is the documented fix for both jank and the
+   "ResizeObserver loop" warning.
+4. **Read gap once** during the measurement phase, not on every tick.
+5. **Guard on setState**: `setVisibleCount` is called only if the value actually
+   changed — fewer re-renders and no RO feedback loop.
+6. Stabilize `MeasurementContainer` via `useCallback`.
 
-### Изменения в `OverflowList`
+### Changes in `OverflowList`
 
-1. Карта `item → index` через `useMemo` (или прямой `map` по индексам) вместо
-   `indexOf` — убираем O(n²).
-2. `onOverflow` переносим из `useMemo` в `useEffect`.
-3. Overflow-индикатор передаётся хуку для измерения через уже существующий
-   `overflowRenderer`.
+1. An `item → index` map via `useMemo` (or a direct `map` over indices) instead of
+   `indexOf` — removes the O(n²).
+2. Move `onOverflow` from `useMemo` into `useEffect`.
+3. The overflow indicator is passed to the hook for measurement via the already
+   existing `overflowRenderer`.
 
-### Совместимость API
+### API compatibility
 
-Публичные сигнатуры `OverflowListProps` и `useOverflowItems` **не меняются**.
-`reserveSpace` становится fallback-полом (используется, пока реальный индикатор
-не измерен, либо когда `overflowRenderer` не задан). Существующие потребители —
-`Attribute`, `SelectInput` — продолжают работать без изменений.
+The public signatures of `OverflowListProps` and `useOverflowItems` **do not change**.
+`reserveSpace` becomes a fallback floor (used until the real indicator is measured,
+or when `overflowRenderer` is not provided). Existing consumers —
+`Attribute`, `SelectInput` — keep working without changes.
 
-## Демо (Storybook)
+## Demo (Storybook)
 
-- **Drawer** (`Drawer.stories.tsx`): новая стори `ResizableWithOverflowList` —
-  дровер с `DrawerResizeHandle`, в теле `Attribute` с `OverflowList` тегов;
-  перетаскивание ручки реально перекомпоновывает список.
-- **Table** (`Table.stories.tsx`): новая стори `ColumnResizingWithOverflowList` —
-  колонка, чья ячейка рендерит `OverflowList` над `row.original.tags` (набор
-  тегов расширяется в `mocks.tsx` для видимого overflow), с включённым ресайзом
-  колонок.
-- **OverflowList** (новый файл `OverflowList.stories.tsx`): `Basic`,
-  `CollapseFromStart`, `MinVisibleItems` и `ResizableContainer` (обёртка с CSS
-  `resize: horizontal`) для standalone-демо живой перекомпоновки.
+- **Drawer** (`Drawer.stories.tsx`): a new `ResizableWithOverflowList` story — a
+  drawer with `DrawerResizeHandle`, with an `Attribute` containing an `OverflowList`
+  of tags in its body; dragging the handle actually reflows the list.
+- **Table** (`Table.stories.tsx`): a new `ColumnResizingWithOverflowList` story — a
+  column whose cell renders an `OverflowList` over `row.original.tags` (the tag set
+  is extended in `mocks.tsx` to make the overflow visible), with column resizing
+  enabled.
+- **OverflowList** (new file `OverflowList.stories.tsx`): `Basic`,
+  `CollapseFromStart`, `MinVisibleItems`, and `ResizableContainer` (a wrapper with CSS
+  `resize: horizontal`) for a standalone demo of live reflow.
 
-## Тесты
+## Tests
 
-- **Component (Vitest + Testing Library)**: логика с замоканными `offsetWidth` и
-  `ResizeObserver` — корректность карты индексов, `minVisibleItems`,
-  срабатывание `onOverflow` через `useEffect`.
-- **E2E (Playwright)** по правилам `docs/e2e-test-rules.md`:
-  - standalone resizable-стори: сжать контейнер → появляется `+N`, растёт
-    hiddenCount; растянуть → элементы возвращаются;
-  - drag ручки дровера → перекомпоновка;
-  - drag ресайза колонки таблицы → перекомпоновка ячейки;
-  - визуальные скриншоты узких/широких состояний.
+- **Component (Vitest + Testing Library)**: logic with mocked `offsetWidth` and
+  `ResizeObserver` — correctness of the index map, `minVisibleItems`, and that
+  `onOverflow` fires via `useEffect`.
+- **E2E (Playwright)** per the `docs/e2e-test-rules.md` rules:
+  - standalone resizable story: shrink the container → `+N` appears, hiddenCount
+    grows; widen it → items come back;
+  - drag the drawer handle → reflow;
+  - drag the table column resize → cell reflow;
+  - visual screenshots of narrow/wide states.
 
-## Критерии готовности
+## Acceptance criteria
 
-1. При перетаскивании ручки ресайза дровера и колонки таблицы нет видимых
-   подвисаний; внутри resize-callback не создаётся/не удаляется DOM.
-2. `OverflowList` корректно сворачивает/разворачивает элементы при изменении
-   ширины контейнера в обе стороны.
-3. Нет O(n²) и нет side-effect в `useMemo`.
-4. Демо-стори добавлены в Drawer, Table и отдельный `OverflowList.stories.tsx`.
-5. Component- и E2E-тесты зелёные; lint/typecheck без ошибок.
+1. Dragging the drawer resize handle and the table column shows no visible freezes;
+   no DOM is created/removed inside the resize callback.
+2. `OverflowList` correctly collapses/expands items when the container width changes
+   in both directions.
+3. No O(n²) and no side-effect in `useMemo`.
+4. Demo stories added to Drawer, Table, and a separate `OverflowList.stories.tsx`.
+5. Component and E2E tests are green; lint/typecheck without errors.
 
-## Источники (ресёрч производительности)
+## Sources (performance research)
 
 - [MDN — ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/ResizeObserver)
 - [Avoiding pitfalls with the resize event (OpenReplay)](https://blog.openreplay.com/avoiding-resize-event-pitfalls-js/)

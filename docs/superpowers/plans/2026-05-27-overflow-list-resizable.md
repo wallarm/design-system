@@ -1,43 +1,43 @@
-# OverflowList в ресайзабл-контейнерах — Implementation Plan
+# OverflowList in resizable containers — Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Сделать `OverflowList` плавным при ресайзе контейнера (дровер, ячейка таблицы), убрав DOM-операции из resize-callback, и добавить демо-стори + тесты.
+**Goal:** Make `OverflowList` smooth when its container is resized (drawer, table cell) by removing DOM operations from the resize callback, and add demo stories + tests.
 
-**Architecture:** Чистая арифметика расчёта видимых элементов выносится в отдельную тестируемую функцию `calculateVisibleCount`. Хук `useOverflowItems` меряет ширины (включая индикатор `+N`) один раз через скрытый слой измерения, кэширует их, а `ResizeObserver` через `requestAnimationFrame` запускает только пересчёт по кэшу. `OverflowList` избавляется от O(n²) `indexOf` и `useMemo`-side-effect.
+**Architecture:** The pure arithmetic of computing visible items is extracted into a separate testable function `calculateVisibleCount`. The `useOverflowItems` hook measures widths (including the `+N` indicator) once via a hidden measurement layer, caches them, and `ResizeObserver` (through `requestAnimationFrame`) only triggers a recompute from the cache. `OverflowList` drops the O(n²) `indexOf` and the `useMemo` side-effect.
 
 **Tech Stack:** React 19, TypeScript (strict), Vitest + Testing Library (unit/component), Playwright (E2E), Storybook 10, Biome.
 
-**Ветка:** `feature/AS-1033` (уже создана, спека закоммичена).
+**Branch:** `feature/AS-1033` (already created, spec committed).
 
 ---
 
 ## File Structure
 
-| Файл | Ответственность | Действие |
+| File | Responsibility | Action |
 |------|-----------------|----------|
-| `packages/design-system/src/hooks/useOverflowItems.helpers.ts` | Чистая функция `calculateVisibleCount` — без DOM | Create |
-| `packages/design-system/src/hooks/__tests__/useOverflowItems.helpers.test.ts` | Unit-тесты чистой функции | Create |
-| `packages/design-system/src/hooks/useOverflowItems.tsx` | Кэш измерений + rAF-троттлинг RO | Modify |
-| `packages/design-system/src/components/OverflowList/OverflowList.tsx` | Index-map вместо `indexOf`, `onOverflow` в `useEffect` | Modify |
-| `packages/design-system/src/components/OverflowList/__tests__/OverflowList.test.tsx` | Component-тесты с замоканным хуком | Create |
-| `packages/design-system/src/components/OverflowList/OverflowList.stories.tsx` | Стори, включая `ResizableContainer` | Create |
-| `packages/design-system/src/components/OverflowList/OverflowList.e2e.ts` | E2E reflow при изменении ширины | Create |
-| `packages/design-system/src/components/Drawer/Drawer.stories.tsx` | Стори `ResizableWithOverflowList` | Modify |
-| `packages/design-system/src/components/Table/mocks.tsx` | Расширить `tags` для видимого overflow | Modify |
-| `packages/design-system/src/components/Table/Table.stories.tsx` | Стори `ColumnResizingWithOverflowList` | Modify |
+| `packages/design-system/src/hooks/useOverflowItems.helpers.ts` | Pure function `calculateVisibleCount` — no DOM | Create |
+| `packages/design-system/src/hooks/__tests__/useOverflowItems.helpers.test.ts` | Unit tests for the pure function | Create |
+| `packages/design-system/src/hooks/useOverflowItems.tsx` | Measurement cache + rAF throttling of RO | Modify |
+| `packages/design-system/src/components/OverflowList/OverflowList.tsx` | Index map instead of `indexOf`, `onOverflow` in `useEffect` | Modify |
+| `packages/design-system/src/components/OverflowList/__tests__/OverflowList.test.tsx` | Component tests with a mocked hook | Create |
+| `packages/design-system/src/components/OverflowList/OverflowList.stories.tsx` | Stories, including `ResizableContainer` | Create |
+| `packages/design-system/src/components/OverflowList/OverflowList.e2e.ts` | E2E reflow on width change | Create |
+| `packages/design-system/src/components/Drawer/Drawer.stories.tsx` | `ResizableWithOverflowList` story | Modify |
+| `packages/design-system/src/components/Table/mocks.tsx` | Extend `tags` for a visible overflow | Modify |
+| `packages/design-system/src/components/Table/Table.stories.tsx` | `ColumnResizingWithOverflowList` story | Modify |
 
-> **Биом перед каждым коммитом:** запускать `npx biome check --write <изменённые файлы>` и коммитить отформатированный результат (преференс пользователя).
+> **Biome before every commit:** run `npx biome check --write <changed files>` and commit the formatted result (user preference).
 
 ---
 
-## Task 1: Чистая функция `calculateVisibleCount` (TDD)
+## Task 1: Pure function `calculateVisibleCount` (TDD)
 
 **Files:**
 - Create: `packages/design-system/src/hooks/useOverflowItems.helpers.ts`
 - Test: `packages/design-system/src/hooks/__tests__/useOverflowItems.helpers.test.ts`
 
-- [ ] **Step 1: Написать падающий тест**
+- [ ] **Step 1: Write a failing test**
 
 `packages/design-system/src/hooks/__tests__/useOverflowItems.helpers.test.ts`:
 
@@ -100,31 +100,30 @@ describe('calculateVisibleCount', () => {
 });
 ```
 
-- [ ] **Step 2: Запустить тест — убедиться, что падает**
+- [ ] **Step 2: Run the test — confirm it fails**
 
 Run: `pnpm --filter @wallarm-org/design-system test -- useOverflowItems.helpers`
-Expected: FAIL — `calculateVisibleCount` не определён / модуль не найден.
+Expected: FAIL — `calculateVisibleCount` is not defined / module not found.
 
-- [ ] **Step 3: Реализовать функцию**
+- [ ] **Step 3: Implement the function**
 
 `packages/design-system/src/hooks/useOverflowItems.helpers.ts`:
 
 ```ts
 export interface CalculateVisibleCountParams {
-  /** Ширина каждого элемента в порядке источника (px). */
+  /** Width of each item in source order (px). */
   itemWidths: number[];
-  /** Gap между flex-детьми контейнера (px). */
+  /** Gap between the container's flex children (px). */
   gap: number;
-  /** Доступная ширина контейнера (px). */
+  /** Available container width (px). */
   availableWidth: number;
-  /** Изменённая ширина индикатора "+N" (px); fallback — reserveSpace. */
+  /** Measured width of the "+N" indicator (px); fallback — reserveSpace. */
   indicatorWidth: number;
 }
 
 /**
- * Чистая арифметика: сколько ведущих элементов помещается до того, как
- * потребуется индикатор переполнения. Не трогает DOM — безопасно вызывать
- * на каждый кадр ресайза.
+ * Pure arithmetic: how many leading items fit before an overflow indicator
+ * is required. Does not touch the DOM — safe to call on every resize frame.
  */
 export function calculateVisibleCount({
   itemWidths,
@@ -135,14 +134,14 @@ export function calculateVisibleCount({
   if (itemWidths.length === 0) return 0;
   if (availableWidth <= 0) return itemWidths.length;
 
-  // Первый проход: помещается ли всё без индикатора?
+  // First pass: does everything fit without an indicator?
   let total = 0;
   for (let i = 0; i < itemWidths.length; i++) {
     total += itemWidths[i] + (i > 0 ? gap : 0);
   }
   if (total <= availableWidth) return itemWidths.length;
 
-  // Второй проход: резервируем место под индикатор, считаем что влезает.
+  // Second pass: reserve space for the indicator, count what fits.
   const maxWidth = availableWidth - indicatorWidth - gap;
   let accumulated = 0;
   let count = 0;
@@ -155,16 +154,16 @@ export function calculateVisibleCount({
       break;
     }
   }
-  return Math.max(count, 1); // всегда показываем минимум один
+  return Math.max(count, 1); // always show at least one
 }
 ```
 
-- [ ] **Step 4: Запустить тест — убедиться, что проходит**
+- [ ] **Step 4: Run the test — confirm it passes**
 
 Run: `pnpm --filter @wallarm-org/design-system test -- useOverflowItems.helpers`
-Expected: PASS (5 тестов).
+Expected: PASS (5 tests).
 
-- [ ] **Step 5: Коммит**
+- [ ] **Step 5: Commit**
 
 ```bash
 npx biome check --write packages/design-system/src/hooks/useOverflowItems.helpers.ts packages/design-system/src/hooks/__tests__/useOverflowItems.helpers.test.ts
@@ -174,14 +173,14 @@ git commit -m "feat(overflow-list): AS-1033 pure calculateVisibleCount helper"
 
 ---
 
-## Task 2: Рефактор `useOverflowItems` на кэш + rAF
+## Task 2: Refactor `useOverflowItems` to cache + rAF
 
 **Files:**
-- Modify: `packages/design-system/src/hooks/useOverflowItems.tsx` (полная замена тела)
+- Modify: `packages/design-system/src/hooks/useOverflowItems.tsx` (full body replacement)
 
-Цель: убрать `document.createElement`-блок и `getComputedStyle` из resize-пути; мерить ширины (включая индикатор) один раз; `ResizeObserver` через `requestAnimationFrame` запускает только `recompute` по кэшу.
+Goal: remove the `document.createElement` block and `getComputedStyle` from the resize path; measure widths (including the indicator) once; `ResizeObserver` (through `requestAnimationFrame`) only triggers a `recompute` from the cache.
 
-- [ ] **Step 1: Заменить содержимое файла**
+- [ ] **Step 1: Replace the file contents**
 
 `packages/design-system/src/hooks/useOverflowItems.tsx`:
 
@@ -223,18 +222,18 @@ export function useOverflowItems<T>({
   const containerRef = useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = useState(items.length);
 
-  // Скрытый слой измерения: refs на каждый элемент + ref на индикатор "+N".
+  // Hidden measurement layer: refs for each item + a ref for the "+N" indicator.
   const measurementRefs = useRef<(HTMLElement | null)[]>([]);
   const indicatorRef = useRef<HTMLDivElement | null>(null);
 
-  // Кэш измерений — читается один раз на смену items/рендереров, не на тик ресайза.
+  // Measurement cache — read once when items/renderers change, not on a resize tick.
   const cacheRef = useRef<{ widths: number[]; gap: number; indicatorWidth: number }>({
     widths: [],
     gap: 0,
     indicatorWidth: reserveSpace,
   });
 
-  // Чистый пересчёт из кэша + текущей ширины контейнера. Никаких записей в DOM.
+  // Pure recompute from the cache + current container width. No DOM writes.
   const recompute = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -254,7 +253,7 @@ export function useOverflowItems<T>({
     setVisibleCount(prev => (prev === next ? prev : next));
   }, [items.length]);
 
-  // Измеряем один раз при смене items/рендереров. Только чтение DOM.
+  // Measure once when items/renderers change. DOM reads only.
   useLayoutEffect(() => {
     const container = containerRef.current;
 
@@ -275,8 +274,8 @@ export function useOverflowItems<T>({
     recompute();
   }, [items, renderItem, renderMeasurementItem, overflowRenderer, reserveSpace, recompute]);
 
-  // Наблюдаем за ресайзом контейнера; тяжёлую работу откладываем в rAF,
-  // коалесцируя несколько нотификаций кадра в один пересчёт.
+  // Observe container resize; defer the heavy work into rAF,
+  // coalescing several frame notifications into one recompute.
   useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
@@ -301,7 +300,7 @@ export function useOverflowItems<T>({
   const hiddenItems = items.slice(visibleCount);
   const hiddenCount = hiddenItems.length;
 
-  // Стабильный компонент слоя измерения — не пересоздаётся каждый рендер.
+  // Stable measurement-layer component — not recreated on every render.
   const MeasurementContainer = useCallback(() => {
     if (items.length === 0) return null;
 
@@ -343,20 +342,20 @@ export function useOverflowItems<T>({
 }
 ```
 
-- [ ] **Step 2: Проверить типы и lint**
+- [ ] **Step 2: Check types and lint**
 
 Run: `pnpm --filter @wallarm-org/design-system typecheck`
-Expected: PASS — нет ошибок типов.
+Expected: PASS — no type errors.
 
 Run: `npx biome check packages/design-system/src/hooks/useOverflowItems.tsx`
-Expected: нет ошибок (предупреждения форматирования исправит `--write` ниже).
+Expected: no errors (formatting warnings will be fixed by `--write` below).
 
-- [ ] **Step 3: Прогнать unit-тесты хелпера (регрессия)**
+- [ ] **Step 3: Run the helper unit tests (regression)**
 
 Run: `pnpm --filter @wallarm-org/design-system test -- useOverflowItems`
 Expected: PASS.
 
-- [ ] **Step 4: Коммит**
+- [ ] **Step 4: Commit**
 
 ```bash
 npx biome check --write packages/design-system/src/hooks/useOverflowItems.tsx
@@ -366,14 +365,14 @@ git commit -m "perf(overflow-list): AS-1033 cache measurements, rAF-throttle Res
 
 ---
 
-## Task 3: Оптимизация `OverflowList` (index-map + useEffect)
+## Task 3: Optimize `OverflowList` (index map + useEffect)
 
 **Files:**
 - Modify: `packages/design-system/src/components/OverflowList/OverflowList.tsx`
 
-- [ ] **Step 1: Обновить импорты React**
+- [ ] **Step 1: Update the React imports**
 
-Заменить строки 1-8 (импорт из `react`):
+Replace lines 1-8 (the `react` import):
 
 ```tsx
 import {
@@ -387,12 +386,12 @@ import {
 } from 'react';
 ```
 
-- [ ] **Step 2: Заменить `indexOf`-рендереры на index-map (строки 36-51)**
+- [ ] **Step 2: Replace the `indexOf` renderers with an index map (lines 36-51)**
 
-Удалить блок `memoizedItemRenderer` + `memoizedMeasurementRenderer` (текущие строки 36-51) и вставить:
+Delete the `memoizedItemRenderer` + `memoizedMeasurementRenderer` block (current lines 36-51) and insert:
 
 ```tsx
-  // Карта item → index строится один раз: убирает O(n²) от indexOf в рендерере.
+  // Build the item → index map once: removes the O(n²) from indexOf in the renderer.
   const indexMap = useMemo(() => {
     const map = new Map<T, number>();
     items.forEach((item, index) => {
@@ -412,9 +411,9 @@ import {
   );
 ```
 
-- [ ] **Step 3: Заменить `useMemo`-side-effect для `onOverflow` (строки 77-82)**
+- [ ] **Step 3: Replace the `useMemo` side-effect for `onOverflow` (lines 77-82)**
 
-Удалить блок:
+Delete the block:
 
 ```tsx
   // Call onOverflow when hidden items change
@@ -425,10 +424,10 @@ import {
   }, [finalHiddenItems, onOverflow]);
 ```
 
-И вставить вместо него:
+And insert in its place:
 
 ```tsx
-  // Сообщаем о переполнении как side-effect, а не во время рендера.
+  // Report overflow as a side-effect, not during render.
   useEffect(() => {
     if (onOverflow && finalHiddenItems.length > 0) {
       onOverflow(finalHiddenItems);
@@ -436,12 +435,12 @@ import {
   }, [finalHiddenItems, onOverflow]);
 ```
 
-- [ ] **Step 4: Проверить типы**
+- [ ] **Step 4: Check types**
 
 Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
-- [ ] **Step 5: Коммит**
+- [ ] **Step 5: Commit**
 
 ```bash
 npx biome check --write packages/design-system/src/components/OverflowList/OverflowList.tsx
@@ -451,14 +450,14 @@ git commit -m "perf(overflow-list): AS-1033 drop O(n^2) indexOf, move onOverflow
 
 ---
 
-## Task 4: Component-тесты `OverflowList` (TDD, замоканный хук)
+## Task 4: Component tests for `OverflowList` (TDD, mocked hook)
 
 **Files:**
 - Create: `packages/design-system/src/components/OverflowList/__tests__/OverflowList.test.tsx`
 
-> В jsdom `offsetWidth` = 0 и `ResizeObserver` замокан no-op (см. `vitest.setup.ts`), поэтому реальный обсчёт не воспроизводится. Мокаем `useOverflowItems`, как сделано в `ParameterPath.test.tsx`, и проверяем логику самого `OverflowList`.
+> In jsdom, `offsetWidth` = 0 and `ResizeObserver` is mocked as a no-op (see `vitest.setup.ts`), so the real computation cannot be reproduced. We mock `useOverflowItems`, as done in `ParameterPath.test.tsx`, and test the `OverflowList` logic itself.
 
-- [ ] **Step 1: Написать падающие тесты**
+- [ ] **Step 1: Write the failing tests**
 
 `packages/design-system/src/components/OverflowList/__tests__/OverflowList.test.tsx`:
 
@@ -541,7 +540,7 @@ describe('OverflowList', () => {
         overflowRenderer={overflowRenderer}
       />,
     );
-    // 'c' и 'd' имеют индексы 2 и 3 в исходном массиве.
+    // 'c' and 'd' are at indices 2 and 3 in the source array.
     expect(indices).toEqual([2, 3]);
   });
 
@@ -560,7 +559,7 @@ describe('OverflowList', () => {
   });
 
   it('expands visible items up to minVisibleItems', () => {
-    // Хук вернул только 1 видимый, но minVisibleItems=3 → ожидаем 3 первых.
+    // The hook returned only 1 visible item, but minVisibleItems=3 → expect the first 3.
     mockHook(['a'], ['b', 'c', 'd']);
     render(
       <OverflowList
@@ -577,12 +576,12 @@ describe('OverflowList', () => {
 });
 ```
 
-- [ ] **Step 2: Запустить тесты — убедиться, что они зелёные (логика уже реализована в Task 3)**
+- [ ] **Step 2: Run the tests — confirm they are green (the logic is already implemented in Task 3)**
 
 Run: `pnpm --filter @wallarm-org/design-system test -- OverflowList.test`
-Expected: PASS (6 тестов). Если `minVisibleItems`-тест падает — это регрессия логики из строк 60-73 `OverflowList.tsx`; перепроверить, что блок `finalVisibleItems`/`finalHiddenItems` сохранён без изменений.
+Expected: PASS (6 tests). If the `minVisibleItems` test fails — that is a regression of the logic in lines 60-73 of `OverflowList.tsx`; recheck that the `finalVisibleItems`/`finalHiddenItems` block is preserved unchanged.
 
-- [ ] **Step 3: Коммит**
+- [ ] **Step 3: Commit**
 
 ```bash
 npx biome check --write packages/design-system/src/components/OverflowList/__tests__/OverflowList.test.tsx
@@ -592,12 +591,12 @@ git commit -m "test(overflow-list): AS-1033 component tests for overflow + min v
 
 ---
 
-## Task 5: Стори `OverflowList.stories.tsx`
+## Task 5: `OverflowList.stories.tsx` story
 
 **Files:**
 - Create: `packages/design-system/src/components/OverflowList/OverflowList.stories.tsx`
 
-- [ ] **Step 1: Создать файл стори**
+- [ ] **Step 1: Create the story file**
 
 `packages/design-system/src/components/OverflowList/OverflowList.stories.tsx`:
 
@@ -641,7 +640,7 @@ const renderOverflowPopover = (items: string[]) => (
   </Popover>
 );
 
-/** Базовый список — в широком контейнере влезают все элементы. */
+/** Basic list — all items fit in a wide container. */
 export const Basic: StoryFn = () => (
   <div className='w-640'>
     <OverflowList
@@ -653,7 +652,7 @@ export const Basic: StoryFn = () => (
   </div>
 );
 
-/** Узкий контейнер — большая часть элементов уходит в "+N". */
+/** Narrow container — most items collapse into "+N". */
 export const Collapsed: StoryFn = () => (
   <div className='w-200'>
     <OverflowList
@@ -665,7 +664,7 @@ export const Collapsed: StoryFn = () => (
   </div>
 );
 
-/** Сворачивание с начала списка. */
+/** Collapse from the start of the list. */
 export const CollapseFromStart: StoryFn = () => (
   <div className='w-240'>
     <OverflowList
@@ -678,7 +677,7 @@ export const CollapseFromStart: StoryFn = () => (
   </div>
 );
 
-/** Гарантированный минимум видимых элементов. */
+/** Guaranteed minimum of visible items. */
 export const MinVisibleItems: StoryFn = () => (
   <div className='w-160'>
     <OverflowList
@@ -692,8 +691,8 @@ export const MinVisibleItems: StoryFn = () => (
 );
 
 /**
- * Ресайзабл-контейнер: тяни за правый нижний угол рамки, чтобы увидеть живую
- * перекомпоновку. `data-testid` используется в E2E для программного ресайза.
+ * Resizable container: drag the bottom-right corner of the frame to see live
+ * reflow. `data-testid` is used in E2E for programmatic resizing.
  */
 export const ResizableContainer: StoryFn = () => (
   <div
@@ -711,16 +710,16 @@ export const ResizableContainer: StoryFn = () => (
 );
 ```
 
-> Если Tailwind-классов ширины `w-640`/`w-200`/`w-240`/`w-160` нет в конфиге — заменить на inline `style={{ width: N }}`. Проверить наличие: `grep -R "w-640\|w-200" packages/design-system/src` или классов в сборке Storybook.
+> If the width Tailwind classes `w-640`/`w-200`/`w-240`/`w-160` are not in the config — replace them with inline `style={{ width: N }}`. Check their presence: `grep -R "w-640\|w-200" packages/design-system/src` or look for the classes in the Storybook build.
 
-- [ ] **Step 2: Проверить, что Storybook собирает стори**
+- [ ] **Step 2: Verify that Storybook builds the stories**
 
 Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
-Опционально вручную: `pnpm --filter @wallarm-org/design-system storybook` → открыть `Data Display/OverflowList/Resizable Container`, потянуть угол рамки, убедиться в плавной перекомпоновке без подвисаний.
+Optionally by hand: `pnpm --filter @wallarm-org/design-system storybook` → open `Data Display/OverflowList/Resizable Container`, drag the frame corner, confirm smooth reflow without freezes.
 
-- [ ] **Step 3: Коммит**
+- [ ] **Step 3: Commit**
 
 ```bash
 npx biome check --write packages/design-system/src/components/OverflowList/OverflowList.stories.tsx
@@ -730,14 +729,14 @@ git commit -m "docs(overflow-list): AS-1033 stories incl. resizable container de
 
 ---
 
-## Task 6: E2E `OverflowList.e2e.ts` (детерминированный ресайз)
+## Task 6: E2E `OverflowList.e2e.ts` (deterministic resize)
 
 **Files:**
 - Create: `packages/design-system/src/components/OverflowList/OverflowList.e2e.ts`
 
-> Изменение `style.width` обёртки через `evaluate` запускает `ResizeObserver` детерминированно — не зависим от drag-флака. Story id: `data-display-overflowlist` (Storybook слугифицирует title `Data Display/OverflowList`).
+> Changing the wrapper's `style.width` via `evaluate` triggers `ResizeObserver` deterministically — independent of drag flakiness. Story id: `data-display-overflowlist` (Storybook slugifies the title `Data Display/OverflowList`).
 
-- [ ] **Step 1: Написать E2E-тест**
+- [ ] **Step 1: Write the E2E test**
 
 `packages/design-system/src/components/OverflowList/OverflowList.e2e.ts`:
 
@@ -758,7 +757,7 @@ const setWrapperWidth = (page: Page, width: number) =>
       (el as HTMLElement).style.width = `${w}px`;
     }, width);
 
-// Видимые теги — это элементы в основном контейнере, кроме поповер-триггера "+N".
+// Visible tags are the items in the main container, except the "+N" popover trigger.
 const getVisibleTagCount = (page: Page) =>
   page.locator('[data-slot="overflow-list"] [data-slot="tag"]').count();
 
@@ -804,16 +803,16 @@ test.describe('Component: OverflowList', () => {
 });
 ```
 
-> Перед запуском подтвердить, что у `OverflowList` корневой `div` имеет `data-slot="overflow-list"`, а `Tag` — `data-slot="tag"`. Если slug у `OverflowList` отсутствует (в текущем коде его нет — см. `OverflowList.tsx:108`), добавить `data-slot='overflow-list'` к корневому `div` в `OverflowList.tsx` в рамках этого таска и закоммитить вместе. Проверить slug `Tag`: `grep -n "data-slot" packages/design-system/src/components/Tag/Tag.tsx`.
+> Before running, confirm that `OverflowList`'s root `div` has `data-slot="overflow-list"` and that `Tag` has `data-slot="tag"`. If `OverflowList` has no slug (the current code does not — see `OverflowList.tsx:108`), add `data-slot='overflow-list'` to the root `div` in `OverflowList.tsx` as part of this task and commit it together. Check the `Tag` slug: `grep -n "data-slot" packages/design-system/src/components/Tag/Tag.tsx`.
 
-- [ ] **Step 2: При необходимости добавить `data-slot` в `OverflowList.tsx`**
+- [ ] **Step 2: If needed, add `data-slot` to `OverflowList.tsx`**
 
-Если корневой `div` (строка ~108) без `data-slot`, заменить:
+If the root `div` (line ~108) has no `data-slot`, replace:
 
 ```tsx
       <div ref={containerRef} className={cn('flex w-full min-w-0', className)} {...props}>
 ```
-на:
+with:
 ```tsx
       <div
         ref={containerRef}
@@ -823,14 +822,14 @@ test.describe('Component: OverflowList', () => {
       >
 ```
 
-Скорректировать локаторы в тесте под реальные `data-slot` значения (`Tag` может использовать другой slug — поправить селектор `getVisibleTagCount`).
+Adjust the test locators to the real `data-slot` values (`Tag` may use a different slug — fix the `getVisibleTagCount` selector).
 
-- [ ] **Step 3: Запустить E2E (требует поднятого Storybook)**
+- [ ] **Step 3: Run E2E (requires a running Storybook)**
 
-Run (локально): `pnpm --filter @wallarm-org/design-system test:e2e -- OverflowList`
-Expected: PASS. При первом прогоне визуальных тестов сгенерировать снапшоты (см. README/CI: коммит с `[update-screenshots]` на main или локальный `--update-snapshots`).
+Run (locally): `pnpm --filter @wallarm-org/design-system test:e2e -- OverflowList`
+Expected: PASS. On the first run of the visual tests, generate the snapshots (see README/CI: a commit with `[update-screenshots]` on main or a local `--update-snapshots`).
 
-- [ ] **Step 4: Коммит**
+- [ ] **Step 4: Commit**
 
 ```bash
 npx biome check --write packages/design-system/src/components/OverflowList/OverflowList.e2e.ts packages/design-system/src/components/OverflowList/OverflowList.tsx
@@ -840,14 +839,14 @@ git commit -m "test(overflow-list): AS-1033 e2e reflow on container resize"
 
 ---
 
-## Task 7: Стори `ResizableWithOverflowList` в Drawer
+## Task 7: `ResizableWithOverflowList` story in Drawer
 
 **Files:**
 - Modify: `packages/design-system/src/components/Drawer/Drawer.stories.tsx`
 
-- [ ] **Step 1: Добавить импорты в шапку стори-файла**
+- [ ] **Step 1: Add imports to the top of the story file**
 
-В блок импортов `Drawer.stories.tsx` добавить (рядом с существующими импортами компонентов):
+Add to the imports block in `Drawer.stories.tsx` (next to the existing component imports):
 
 ```tsx
 import { Attribute, AttributeLabel, AttributeValue } from '../Attribute';
@@ -856,9 +855,9 @@ import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Tag } from '../Tag';
 ```
 
-> Проверить точные пути/имена экспортов: `grep -n "export" packages/design-system/src/components/Attribute/index.ts`. Если `Attribute*` экспортируются иначе — поправить импорт.
+> Check the exact paths/export names: `grep -n "export" packages/design-system/src/components/Attribute/index.ts`. If `Attribute*` is exported differently — fix the import.
 
-- [ ] **Step 2: Добавить стори в конец файла (перед закрытием, после `Resizable`)**
+- [ ] **Step 2: Add the story at the end of the file (before the close, after `Resizable`)**
 
 ```tsx
 const DRAWER_TAGS = [
@@ -918,14 +917,14 @@ export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => (
 );
 ```
 
-> Проверить API `Drawer`: поддерживает ли `defaultOpen`. Если нет — использовать контролируемое состояние через `useState`, как в существующих стори (`open`/`onOpenChange`). Сверить с уже написанной стори `Resizable` в этом файле и повторить её паттерн открытия.
+> Check the `Drawer` API: does it support `defaultOpen`. If not — use controlled state via `useState`, like in the existing stories (`open`/`onOpenChange`). Cross-check with the already written `Resizable` story in this file and reuse its open pattern.
 
-- [ ] **Step 3: Проверить типы**
+- [ ] **Step 3: Check types**
 
 Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
-- [ ] **Step 4: Коммит**
+- [ ] **Step 4: Commit**
 
 ```bash
 npx biome check --write packages/design-system/src/components/Drawer/Drawer.stories.tsx
@@ -935,26 +934,26 @@ git commit -m "docs(drawer): AS-1033 resizable drawer story with OverflowList"
 
 ---
 
-## Task 8: Стори `ColumnResizingWithOverflowList` в Table
+## Task 8: `ColumnResizingWithOverflowList` story in Table
 
 **Files:**
 - Modify: `packages/design-system/src/components/Table/mocks.tsx`
 - Modify: `packages/design-system/src/components/Table/Table.stories.tsx`
 
-- [ ] **Step 1: Расширить `tags` в моках для видимого overflow**
+- [ ] **Step 1: Extend `tags` in the mocks for a visible overflow**
 
-В `packages/design-system/src/components/Table/mocks.tsx` массив `securityEvents` сейчас у всех строк `tags: ['api-abuse', 'account-takeover']`. Заменить (для всех вхождений) на более длинный набор, чтобы overflow был заметен:
+In `packages/design-system/src/components/Table/mocks.tsx`, the `securityEvents` array currently has `tags: ['api-abuse', 'account-takeover']` for all rows. Replace (for all occurrences) with a longer set so the overflow is noticeable:
 
 ```tsx
     tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
 ```
 
-Run для проверки числа вхождений: `grep -c "tags: \['api-abuse'" packages/design-system/src/components/Table/mocks.tsx`
-Заменить все через редактор/replace_all.
+Run to check the number of occurrences: `grep -c "tags: \['api-abuse'" packages/design-system/src/components/Table/mocks.tsx`
+Replace all via the editor/replace_all.
 
-- [ ] **Step 2: Добавить стори в `Table.stories.tsx` (рядом с `ColumnResizing`, после строки ~169)**
+- [ ] **Step 2: Add the story to `Table.stories.tsx` (next to `ColumnResizing`, after line ~169)**
 
-Сначала в шапку файла добавить импорты:
+First add imports to the top of the file:
 
 ```tsx
 import { OverflowList } from '../OverflowList';
@@ -962,7 +961,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Tag } from '../Tag';
 ```
 
-Затем стори:
+Then the story:
 
 ```tsx
 const renderTableTagsOverflow = (items: string[]) => (
@@ -1017,14 +1016,14 @@ export const ColumnResizingWithOverflowList: StoryFn<typeof meta> = () => {
 };
 ```
 
-> Проверить, что `SecurityEvent`, `TableColumnDef`, `TableColumnSizingState`, `securityColumns`, `securityEvents` уже импортированы в `Table.stories.tsx` (см. существующие `ColumnResizing`/`DynamicColumns` стори — `grep -n "TableColumnDef\|SecurityEvent\|TableColumnSizingState" packages/design-system/src/components/Table/Table.stories.tsx`). Если чего-то нет — добавить в импорты из `./mocks` и `./types`. Сверить точную форму `cell`/`TableColumnDef` с уже существующими стори, использующими `useMemo<TableColumnDef<...>[]>` (строки ~567, ~626, ~709).
+> Check that `SecurityEvent`, `TableColumnDef`, `TableColumnSizingState`, `securityColumns`, `securityEvents` are already imported in `Table.stories.tsx` (see the existing `ColumnResizing`/`DynamicColumns` stories — `grep -n "TableColumnDef\|SecurityEvent\|TableColumnSizingState" packages/design-system/src/components/Table/Table.stories.tsx`). If something is missing — add it to the imports from `./mocks` and `./types`. Cross-check the exact shape of `cell`/`TableColumnDef` with the existing stories that use `useMemo<TableColumnDef<...>[]>` (lines ~567, ~626, ~709).
 
-- [ ] **Step 3: Проверить типы**
+- [ ] **Step 3: Check types**
 
 Run: `pnpm --filter @wallarm-org/design-system typecheck`
 Expected: PASS.
 
-- [ ] **Step 4: Коммит**
+- [ ] **Step 4: Commit**
 
 ```bash
 npx biome check --write packages/design-system/src/components/Table/mocks.tsx packages/design-system/src/components/Table/Table.stories.tsx
@@ -1034,17 +1033,17 @@ git commit -m "docs(table): AS-1033 resizable column story with OverflowList"
 
 ---
 
-## Task 9: E2E drag-ресайз для Drawer и Table
+## Task 9: E2E drag-resize for Drawer and Table
 
 **Files:**
 - Modify: `packages/design-system/src/components/Drawer/Drawer.e2e.ts`
 - Modify: `packages/design-system/src/components/Table/Table.e2e.ts`
 
-> Drag через `page.mouse` детерминирован при достаточном смещении. Локаторы: ручка дровера — `TooltipTrigger` с `cursor-col-resize`; ресайз колонки — `data-testid`, оканчивающийся на `--resize` (см. `TableResizeHandler.tsx`, `useTestId('resize')`). Перед написанием подтвердить реальные testid/роли через `grep`.
+> Drag via `page.mouse` is deterministic with a sufficient offset. Locators: the drawer handle is a `TooltipTrigger` with `cursor-col-resize`; column resize is a `data-testid` ending in `--resize` (see `TableResizeHandler.tsx`, `useTestId('resize')`). Before writing, confirm the real testids/roles via `grep`.
 
-- [ ] **Step 1: Drawer — interaction-тест ресайза**
+- [ ] **Step 1: Drawer — resize interaction test**
 
-Добавить в `Drawer.e2e.ts` (в существующий `test.describe('Component: Drawer')`, секция `Interactions`; добавить story в `createStoryHelper`-массив: `'Resizable With Overflow List'`):
+Add to `Drawer.e2e.ts` (in the existing `test.describe('Component: Drawer')`, the `Interactions` section; add the story to the `createStoryHelper` array: `'Resizable With Overflow List'`):
 
 ```ts
 test.describe('Interactions', () => {
@@ -1057,7 +1056,7 @@ test.describe('Interactions', () => {
     const box = await dialog.boundingBox();
     if (!box) throw new Error('drawer dialog not found');
 
-    // Тянем левую ручку вправо → дровер сужается.
+    // Drag the left handle to the right → the drawer narrows.
     await page.mouse.move(box.x, box.y + box.height / 2);
     await page.mouse.down();
     await page.mouse.move(box.x + 250, box.y + box.height / 2, { steps: 10 });
@@ -1070,11 +1069,11 @@ test.describe('Interactions', () => {
 });
 ```
 
-> Сверить селектор тегов с реальными `data-slot` (как в Task 6). Если у дровера несколько `dialog`-ролей — уточнить локатор.
+> Cross-check the tag selector against the real `data-slot` (as in Task 6). If the drawer has multiple `dialog` roles — narrow the locator.
 
-- [ ] **Step 2: Table — interaction-тест ресайза колонки**
+- [ ] **Step 2: Table — column resize interaction test**
 
-Добавить в `Table.e2e.ts` тест-файл (если в нём нет `createStoryHelper` — создать по образцу `Drawer.e2e.ts`; story slug таблицы — `data-display-table` или согласно `meta.title`, проверить `grep -n "title:" packages/design-system/src/components/Table/Table.stories.tsx`):
+Add to the `Table.e2e.ts` test file (if it has no `createStoryHelper` — create one modeled on `Drawer.e2e.ts`; the table story slug is `data-display-table` or per `meta.title`, check `grep -n "title:" packages/design-system/src/components/Table/Table.stories.tsx`):
 
 ```ts
 import { expect, test } from '@playwright/test';
@@ -1117,14 +1116,14 @@ test.describe('Component: Table', () => {
 });
 ```
 
-> Заменить `<table-story-slug>` на реальный slug. Если у таблицы нет `data-testid` на таблице/стори — `createStoryHelper` всё равно работает по story-id. Упростить локатор подсчёта тегов до первого `[data-slot="overflow-list"]`, если xpath окажется хрупким.
+> Replace `<table-story-slug>` with the real slug. If the table has no `data-testid` on the table/story — `createStoryHelper` still works by story id. Simplify the tag-count locator to the first `[data-slot="overflow-list"]` if the xpath turns out to be fragile.
 
-- [ ] **Step 3: Запустить E2E**
+- [ ] **Step 3: Run E2E**
 
 Run: `pnpm --filter @wallarm-org/design-system test:e2e -- Drawer Table`
-Expected: PASS. При флаке drag — увеличить `steps` и/или добавить `await page.waitForTimeout(50)` между фазами мыши.
+Expected: PASS. If the drag is flaky — increase `steps` and/or add `await page.waitForTimeout(50)` between the mouse phases.
 
-- [ ] **Step 4: Коммит**
+- [ ] **Step 4: Commit**
 
 ```bash
 npx biome check --write packages/design-system/src/components/Drawer/Drawer.e2e.ts packages/design-system/src/components/Table/Table.e2e.ts
@@ -1134,11 +1133,11 @@ git commit -m "test(drawer,table): AS-1033 e2e reflow OverflowList on resize"
 
 ---
 
-## Task 10: Финальная проверка качества
+## Task 10: Final quality check
 
-**Files:** нет (только проверки)
+**Files:** none (checks only)
 
-- [ ] **Step 1: Полный typecheck + lint + unit-тесты**
+- [ ] **Step 1: Full typecheck + lint + unit tests**
 
 Run:
 ```bash
@@ -1146,42 +1145,42 @@ pnpm --filter @wallarm-org/design-system typecheck
 npx biome check packages/design-system/src
 pnpm --filter @wallarm-org/design-system test
 ```
-Expected: всё зелёное, 0 ошибок lint/типов.
+Expected: all green, 0 lint/type errors.
 
-- [ ] **Step 2: Регрессия потребителей `OverflowList`**
+- [ ] **Step 2: Regression of `OverflowList` consumers**
 
-Вручную убедиться (Storybook), что `Attribute` (`Data Display/Attribute`) и `Select` (multiple) с `OverflowList` отображаются корректно — API не сломан.
+Manually confirm (Storybook) that `Attribute` (`Data Display/Attribute`) and `Select` (multiple) with `OverflowList` render correctly — the API is not broken.
 
-- [ ] **Step 3: Создать PR**
+- [ ] **Step 3: Create the PR**
 
 ```bash
 git push -u origin feature/AS-1033
-gh pr create --title "feat(overflow-list): AS-1033 resizable container support" --body "<описание>"
+gh pr create --title "feat(overflow-list): AS-1033 resizable container support" --body "<description>"
 ```
 
-> Заголовок PR — conventional commit (валидируется CI). Тело — что сделано + ссылка на спеку и тикет.
+> The PR title is a conventional commit (validated by CI). The body — what was done + a link to the spec and the ticket.
 
 ---
 
-## Self-Review (заполнено автором плана)
+## Self-Review (filled in by the plan author)
 
-**Покрытие спеки:**
-- Причина #1 (temp-DOM) → Task 2 (удаление блока). ✅
-- Причина #2 (rAF-троттлинг RO) → Task 2. ✅
-- Причина #3 (getComputedStyle per tick) → Task 2 (gap читается один раз). ✅
-- Причина #4 (O(n²) indexOf) → Task 3. ✅
-- Причина #5 (useMemo side-effect) → Task 3. ✅
-- Причина #6 (инлайн MeasurementContainer) → Task 2 (`useCallback`). ✅
-- Демо Drawer → Task 7; Table → Task 8; standalone → Task 5. ✅
-- Component-тесты → Task 4; E2E → Task 6 (standalone), Task 9 (drag). ✅
-- Совместимость API → Task 10 Step 2. ✅
+**Spec coverage:**
+- Cause #1 (temp DOM) → Task 2 (block removed). ✅
+- Cause #2 (rAF throttling of RO) → Task 2. ✅
+- Cause #3 (getComputedStyle per tick) → Task 2 (gap read once). ✅
+- Cause #4 (O(n²) indexOf) → Task 3. ✅
+- Cause #5 (useMemo side-effect) → Task 3. ✅
+- Cause #6 (inline MeasurementContainer) → Task 2 (`useCallback`). ✅
+- Drawer demo → Task 7; Table → Task 8; standalone → Task 5. ✅
+- Component tests → Task 4; E2E → Task 6 (standalone), Task 9 (drag). ✅
+- API compatibility → Task 10 Step 2. ✅
 
-**Типы/сигнатуры:** `calculateVisibleCount`/`CalculateVisibleCountParams` определены в Task 1 и используются в Task 2 без расхождений. `UseOverflowItemsOptions`/`Result` не меняются.
+**Types/signatures:** `calculateVisibleCount`/`CalculateVisibleCountParams` are defined in Task 1 and used in Task 2 without discrepancies. `UseOverflowItemsOptions`/`Result` do not change.
 
-**Известные риски (помечены в тасках):**
-- Tailwind-классы ширины в Task 5 могут отсутствовать → fallback на inline `style`.
-- `data-slot` у `OverflowList`/`Tag` нужно подтвердить перед E2E (Task 6 Step 2 добавляет slug при отсутствии).
-- Drag-E2E в Task 9 потенциально флаки → указаны меры (steps, поллинг).
-- API открытия `Drawer` (`defaultOpen` vs controlled) — сверить в Task 7.
-- Story-slug таблицы — подтвердить в Task 9.
+**Known risks (flagged in the tasks):**
+- The width Tailwind classes in Task 5 may be missing → fallback to inline `style`.
+- The `data-slot` on `OverflowList`/`Tag` must be confirmed before E2E (Task 6 Step 2 adds the slug if missing).
+- The drag E2E in Task 9 is potentially flaky → mitigations noted (steps, polling).
+- The `Drawer` open API (`defaultOpen` vs controlled) — verify in Task 7.
+- The table story slug — confirm in Task 9.
 ```
