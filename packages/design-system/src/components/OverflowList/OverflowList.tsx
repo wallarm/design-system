@@ -4,6 +4,7 @@ import {
   type ReactElement,
   type ReactNode,
   useCallback,
+  useEffect,
   useMemo,
 } from 'react';
 import { useOverflowItems } from '../../hooks';
@@ -33,21 +34,24 @@ const OverflowListComponent = <T,>({
   onOverflow,
   ...props
 }: OverflowListProps<T>) => {
-  // Memoize render functions to prevent unnecessary re-renders
+  // Build an item→index map once so the renderer is O(1) instead of O(n) per
+  // item (the old items.indexOf made rendering O(n²)).
+  const indexMap = useMemo(() => {
+    const map = new Map<T, number>();
+    items.forEach((item, index) => {
+      if (!map.has(item)) map.set(item, index);
+    });
+    return map;
+  }, [items]);
+
   const memoizedItemRenderer = useCallback(
-    (item: T) => {
-      const index = items.indexOf(item);
-      return itemRenderer(item, index);
-    },
-    [items, itemRenderer],
+    (item: T) => itemRenderer(item, indexMap.get(item) ?? 0),
+    [indexMap, itemRenderer],
   );
 
   const memoizedMeasurementRenderer = useCallback(
-    (item: T) => {
-      const index = items.indexOf(item);
-      return itemRenderer(item, index) as ReactElement;
-    },
-    [items, itemRenderer],
+    (item: T) => itemRenderer(item, indexMap.get(item) ?? 0) as ReactElement,
+    [indexMap, itemRenderer],
   );
 
   const { containerRef, visibleItems, hiddenItems, MeasurementContainer } = useOverflowItems({
@@ -74,8 +78,8 @@ const OverflowListComponent = <T,>({
 
   const finalHiddenCount = finalHiddenItems.length;
 
-  // Call onOverflow when hidden items change
-  useMemo(() => {
+  // Notify about overflow as a side-effect, not during render.
+  useEffect(() => {
     if (onOverflow && finalHiddenItems.length > 0) {
       onOverflow(finalHiddenItems);
     }
