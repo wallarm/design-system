@@ -1,18 +1,17 @@
 export interface CalculateVisibleCountParams {
-  /** Ширина каждого элемента в порядке источника (px). */
+  /** Width of each item in source order (px). */
   itemWidths: number[];
-  /** Gap между flex-детьми контейнера (px). */
+  /** Gap between flex children of the container (px). */
   gap: number;
-  /** Доступная ширина контейнера (px). */
+  /** Available width of the container (px). */
   availableWidth: number;
-  /** Измеренная ширина индикатора "+N" (px); fallback — reserveSpace. */
+  /** Measured width of the '+N' indicator (px); fallback — reserveSpace. */
   indicatorWidth: number;
 }
 
 /**
- * Чистая арифметика: сколько ведущих элементов помещается до того, как
- * потребуется индикатор переполнения. Не трогает DOM — безопасно вызывать
- * на каждый кадр ресайза.
+ * Pure arithmetic: how many leading items fit before an overflow indicator
+ * is required. Does not touch the DOM — safe to call on every resize frame.
  */
 export function calculateVisibleCount({
   itemWidths,
@@ -23,14 +22,14 @@ export function calculateVisibleCount({
   if (itemWidths.length === 0) return 0;
   if (availableWidth <= 0) return itemWidths.length;
 
-  // Первый проход: помещается ли всё без индикатора?
+  // First pass: do all items fit without an indicator?
   let total = 0;
   for (let i = 0; i < itemWidths.length; i++) {
     total += itemWidths[i] + (i > 0 ? gap : 0);
   }
   if (total <= availableWidth) return itemWidths.length;
 
-  // Второй проход: резервируем место под индикатор, считаем что влезает.
+  // Second pass: reserve space for the indicator and count what fits.
   const maxWidth = availableWidth - indicatorWidth - gap;
   let accumulated = 0;
   let count = 0;
@@ -43,5 +42,5 @@ export function calculateVisibleCount({
       break;
     }
   }
-  return Math.max(count, 1); // всегда показываем минимум один
+  return Math.max(count, 1); // always show at least one item
 }
