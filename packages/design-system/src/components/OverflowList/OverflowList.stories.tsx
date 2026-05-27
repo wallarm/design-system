@@ -83,7 +83,9 @@ const renderOverflowPopoverInline = (items: string[]) => (
     <PopoverContent minWidth='auto' minHeight='auto' maxWidth='unset'>
       <div className='flex flex-row flex-nowrap gap-4'>
         {items.map(item => (
-          <Tag key={item}>{item}</Tag>
+          <Tag key={item} className='shrink-0 whitespace-nowrap'>
+            {item}
+          </Tag>
         ))}
       </div>
     </PopoverContent>
