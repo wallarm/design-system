@@ -25,7 +25,7 @@ export function calculateVisibleCount({
   // First pass: do all items fit without an indicator?
   let total = 0;
   for (let i = 0; i < itemWidths.length; i++) {
-    total += itemWidths[i] + (i > 0 ? gap : 0);
+    total += (itemWidths[i] ?? 0) + (i > 0 ? gap : 0);
   }
   if (total <= availableWidth) return itemWidths.length;
 
@@ -34,7 +34,7 @@ export function calculateVisibleCount({
   let accumulated = 0;
   let count = 0;
   for (let i = 0; i < itemWidths.length; i++) {
-    const widthWithGap = itemWidths[i] + (i > 0 ? gap : 0);
+    const widthWithGap = (itemWidths[i] ?? 0) + (i > 0 ? gap : 0);
     if (accumulated + widthWithGap <= maxWidth || i === 0) {
       accumulated += widthWithGap;
       count++;
