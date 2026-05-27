@@ -109,7 +109,12 @@ const OverflowListComponent = <T,>({
        * expands, so `useOverflowItems` never observes a size change and never
        * reflows visible items back. `min-w-0` keeps it shrinkable below content.
        */}
-      <div ref={containerRef} className={cn('flex w-full min-w-0', className)} {...props}>
+      <div
+        ref={containerRef}
+        data-slot='overflow-list'
+        className={cn('flex w-full min-w-0', className)}
+        {...props}
+      >
         {collapseFrom === 'start' && overflowElement}
         {visibleElements}
         {collapseFrom === 'end' && overflowElement}
