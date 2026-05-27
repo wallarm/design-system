@@ -1,0 +1,40 @@
+@keyframes ds-nav-drill-forward {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(-100%);
+    }
+}
+
+@keyframes ds-nav-drill-backward {
+    from {
+        transform: translateX(-100%);
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+@keyframes ds-nav-blur-out {
+    from {
+        filter: blur(0);
+        opacity: 1;
+    }
+    to {
+        filter: blur(2px);
+        opacity: 0.4;
+    }
+}
+
+/* Per-panel blur: entering panel sharpens in */
+@keyframes ds-nav-blur-in {
+    from {
+        filter: blur(2px);
+        opacity: 0.4;
+    }
+    to {
+        filter: blur(0);
+        opacity: 1;
+    }
+}

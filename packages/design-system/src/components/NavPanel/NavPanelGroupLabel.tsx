@@ -48,7 +48,7 @@ export const NavPanelGroupLabel: FC<NavPanelGroupLabelProps> = ({
         {children}
       </Text>
       <ChevronRight
-        size='xs'
+        size='md'
         className={cn('shrink-0 transition-transform duration-150', expanded && 'rotate-90')}
       />
     </button>

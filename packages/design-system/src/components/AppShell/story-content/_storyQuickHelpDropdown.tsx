@@ -18,14 +18,22 @@ import {
   DropdownMenuTrigger,
 } from '../../DropdownMenu';
 import { Text } from '../../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 
 export const QuickHelpDropdown = () => (
   <DropdownMenu positioning={{ placement: 'bottom-end', gutter: 4 }}>
-    <DropdownMenuTrigger asChild>
-      <Button variant='ghost' size='small' color='neutral' aria-label='Quick Help'>
-        <CircleHelp />
-      </Button>
-    </DropdownMenuTrigger>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span className='inline-flex'>
+          <DropdownMenuTrigger asChild>
+            <Button variant='ghost' size='small' color='neutral' aria-label='Quick Help'>
+              <CircleHelp />
+            </Button>
+          </DropdownMenuTrigger>
+        </span>
+      </TooltipTrigger>
+      <TooltipContent>Quick help</TooltipContent>
+    </Tooltip>
 
     <DropdownMenuContent className='w-320'>
       <DropdownMenuItem onSelect={() => window.open('https://docs.wallarm.com/', '_blank')}>

@@ -1,7 +1,7 @@
 import { cva } from 'class-variance-authority';
 
 export const navRailVariants = cva(
-  'flex h-full shrink-0 flex-col overflow-hidden px-8 py-6 transition-[width] duration-200 ease-in-out',
+  'flex h-full shrink-0 flex-col overflow-hidden px-8 pt-6 pb-12 transition-[width] duration-200 ease-in-out',
   {
     variants: {
       collapsed: {
@@ -14,7 +14,7 @@ export const navRailVariants = cva(
 );
 
 export const navRailItemVariants = cva(
-  'overlay flex h-32 w-full cursor-pointer items-center rounded-6 p-8 text-sm transition-colors outline-none',
+  'overlay flex h-32 w-full cursor-pointer items-center rounded-6 p-8 text-sm transition-colors outline-none data-[state=open]:overlay-states-primary-active data-[state=open]:text-text-primary',
   {
     variants: {
       active: {

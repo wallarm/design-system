@@ -23,17 +23,16 @@ export interface ConfigRemoteProps {
 }
 
 const PageContent: FC = () => {
-  const { config, breadcrumbSegments } = useProductNavContext();
+  const { breadcrumbSegments } = useProductNavContext();
 
   const lastSegment = breadcrumbSegments[breadcrumbSegments.length - 1];
-  const pageTitle = lastSegment?.label ?? config.productLabel;
+  const pageTitle = lastSegment?.label ?? '';
+  const fullPath = breadcrumbSegments.map(s => s.label).join(' / ');
 
   return (
     <>
       <h1 className='text-xl font-semibold text-text-primary'>{pageTitle}</h1>
-      <p className='mt-8 text-sm text-text-secondary'>
-        Placeholder page for {config.productLabel} / {pageTitle}.
-      </p>
+      <p className='mt-8 text-sm text-text-secondary'>Placeholder page for {fullPath}.</p>
     </>
   );
 };
