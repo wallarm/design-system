@@ -1,10 +1,14 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { PanelRight } from '../../icons';
+import { Attribute, AttributeLabel, AttributeValue } from '../Attribute';
 import { Button } from '../Button';
+import { OverflowList } from '../OverflowList';
+import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { HStack, VStack } from '../Stack';
 import { Switch, SwitchControl, SwitchLabel } from '../Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../Tabs';
+import { Tag } from '../Tag';
 import { Text } from '../Text';
 import { DRAWER_SIZES, DRAWER_WIDTH_CONSTRAINTS } from './constants';
 import { Drawer, type DrawerProps } from './Drawer';
@@ -336,6 +340,62 @@ export const Resizable: StoryFn<DrawerProps> = () => {
     </VStack>
   );
 };
+
+const DRAWER_TAGS = [
+  'api-abuse',
+  'account-takeover',
+  'credential-stuffing',
+  'XSS',
+  'SQL Injection',
+  'CSRF',
+  'scanner',
+  'brute-force',
+  'data-exfiltration',
+];
+
+const renderDrawerOverflow = (items: string[]) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <Tag>+{items.length}</Tag>
+    </PopoverTrigger>
+    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
+      <div className='flex flex-col gap-4'>
+        {items.map(item => (
+          <Tag key={item}>{item}</Tag>
+        ))}
+      </div>
+    </PopoverContent>
+  </Popover>
+);
+
+/** Resizable drawer with an OverflowList — drag the left edge to reflow tags. */
+export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => (
+  <Drawer width={480}>
+    <DrawerTrigger asChild>
+      <Button>Open Resizable Drawer with OverflowList</Button>
+    </DrawerTrigger>
+    <DrawerContent>
+      <DrawerResizeHandle />
+      <DrawerHeader>
+        <DrawerTitle>Resizable Drawer with OverflowList</DrawerTitle>
+      </DrawerHeader>
+      <DrawerBody>
+        <p className='mb-16'>Drag the left edge — the tag list reflows live.</p>
+        <Attribute>
+          <AttributeLabel>Attack types</AttributeLabel>
+          <AttributeValue>
+            <OverflowList
+              className='gap-4'
+              items={DRAWER_TAGS}
+              itemRenderer={item => <Tag key={item}>{item}</Tag>}
+              overflowRenderer={renderDrawerOverflow}
+            />
+          </AttributeValue>
+        </Attribute>
+      </DrawerBody>
+    </DrawerContent>
+  </Drawer>
+);
 
 /** Drawer with scrollable content */
 export const Scrollable: StoryFn<DrawerProps> = () => {
