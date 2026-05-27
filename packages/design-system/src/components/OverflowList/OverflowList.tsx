@@ -36,7 +36,8 @@ const OverflowListComponent = <T,>({
   ...props
 }: OverflowListProps<T>) => {
   // Build an item→index map once so the renderer is O(1) instead of O(n) per
-  // item (the old items.indexOf made rendering O(n²)).
+  // item (the old items.indexOf made rendering O(n²)). Duplicate items map to
+  // their first occurrence — same semantics as the previous indexOf.
   const indexMap = useMemo(() => {
     const map = new Map<T, number>();
     items.forEach((item, index) => {
