@@ -11,6 +11,11 @@ import {
 import { useOverflowItems } from '../../hooks';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
+import {
+  areItemsShallowEqual,
+  OVERFLOW_RESERVE_SPACE,
+  resolveVisibleItems,
+} from './OverflowList.helpers';
 
 type CollapseDirection = 'start' | 'end';
 
@@ -60,23 +65,14 @@ const OverflowListComponent = <T,>({
     items,
     renderItem: memoizedMeasurementRenderer,
     overflowRenderer: items => overflowRenderer(items) as ReactElement,
-    reserveSpace: 80,
+    reserveSpace: OVERFLOW_RESERVE_SPACE,
   });
 
-  // Adjust visible items based on minVisibleItems
-  const finalVisibleItems = useMemo(() => {
-    if (visibleItems.length < minVisibleItems && items.length >= minVisibleItems) {
-      return items.slice(0, minVisibleItems);
-    }
-    return visibleItems;
-  }, [visibleItems, minVisibleItems, items]);
-
-  const finalHiddenItems = useMemo(() => {
-    if (finalVisibleItems.length !== visibleItems.length) {
-      return items.slice(finalVisibleItems.length);
-    }
-    return hiddenItems;
-  }, [finalVisibleItems.length, visibleItems.length, items, hiddenItems]);
+  // Apply the minVisibleItems floor to the engine's split.
+  const { visibleItems: finalVisibleItems, hiddenItems: finalHiddenItems } = useMemo(
+    () => resolveVisibleItems({ items, visibleItems, hiddenItems, minVisibleItems }),
+    [items, visibleItems, hiddenItems, minVisibleItems],
+  );
 
   const finalHiddenCount = finalHiddenItems.length;
 
@@ -90,12 +86,7 @@ const OverflowListComponent = <T,>({
       prevHiddenRef.current = finalHiddenItems;
       return;
     }
-    const prev = prevHiddenRef.current;
-    const changed =
-      !prev ||
-      prev.length !== finalHiddenItems.length ||
-      finalHiddenItems.some((item, index) => item !== prev[index]);
-    if (changed) {
+    if (!areItemsShallowEqual(prevHiddenRef.current, finalHiddenItems)) {
       onOverflow(finalHiddenItems);
     }
     prevHiddenRef.current = finalHiddenItems;
