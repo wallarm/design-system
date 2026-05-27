@@ -369,33 +369,37 @@ const renderDrawerOverflow = (items: string[]) => (
 );
 
 /** Resizable drawer with an OverflowList — drag the left edge to reflow tags. */
-export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => (
-  <Drawer width={480}>
-    <DrawerTrigger asChild>
-      <Button>Open Resizable Drawer with OverflowList</Button>
-    </DrawerTrigger>
-    <DrawerContent>
-      <DrawerResizeHandle />
-      <DrawerHeader>
-        <DrawerTitle>Resizable Drawer with OverflowList</DrawerTitle>
-      </DrawerHeader>
-      <DrawerBody>
-        <p className='mb-16'>Drag the left edge — the tag list reflows live.</p>
-        <Attribute>
-          <AttributeLabel>Attack types</AttributeLabel>
-          <AttributeValue>
-            <OverflowList
-              className='gap-4'
-              items={DRAWER_TAGS}
-              itemRenderer={item => <Tag key={item}>{item}</Tag>}
-              overflowRenderer={renderDrawerOverflow}
-            />
-          </AttributeValue>
-        </Attribute>
-      </DrawerBody>
-    </DrawerContent>
-  </Drawer>
-);
+export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <Drawer width={480} open={open} onOpenChange={setOpen}>
+      <DrawerTrigger asChild>
+        <Button>Open Resizable Drawer with OverflowList</Button>
+      </DrawerTrigger>
+      <DrawerContent>
+        <DrawerResizeHandle />
+        <DrawerHeader>
+          <DrawerTitle>Resizable Drawer with OverflowList</DrawerTitle>
+        </DrawerHeader>
+        <DrawerBody>
+          <p className='mb-16'>Drag the left edge — the tag list reflows live.</p>
+          <Attribute>
+            <AttributeLabel>Attack types</AttributeLabel>
+            <AttributeValue>
+              <OverflowList
+                className='gap-4'
+                items={DRAWER_TAGS}
+                itemRenderer={item => <Tag key={item}>{item}</Tag>}
+                overflowRenderer={renderDrawerOverflow}
+              />
+            </AttributeValue>
+          </Attribute>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
+};
 
 /** Drawer with scrollable content */
 export const Scrollable: StoryFn<DrawerProps> = () => {

@@ -124,8 +124,8 @@ test.describe('Component: Drawer', () => {
 
     test('Should reflow the OverflowList when the drawer is resized wider', async ({ page }) => {
       await drawerStory.goto(page, 'Resizable With Overflow List');
-      await page.getByRole('button', { name: /Open Resizable Drawer with OverflowList/i }).click();
 
+      // The story opens the drawer by default, so no trigger click is needed.
       const dialog = page.getByRole('dialog');
       await expect(dialog).toBeVisible();
 

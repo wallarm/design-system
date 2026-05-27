@@ -92,14 +92,22 @@ const renderOverflowPopoverInline = (items: string[]) => (
   </Popover>
 );
 
-/** Guaranteed minimum number of visible items. */
+/**
+ * Guaranteed minimum number of visible items. The container is deliberately
+ * narrow: `minVisibleItems={1}` keeps at least one tag visible (the rest
+ * collapse into "+N") even when the space is tight.
+ */
 export const MinVisibleItems: StoryFn = () => (
-  <div className='w-160'>
+  <div className='w-160 overflow-hidden rounded-2 border border-border-primary p-12'>
     <OverflowList
       className='gap-4'
-      minVisibleItems={3}
+      minVisibleItems={1}
       items={TAGS}
-      itemRenderer={item => <Tag key={item}>{item}</Tag>}
+      itemRenderer={item => (
+        <Tag key={item} className='shrink-0 whitespace-nowrap'>
+          {item}
+        </Tag>
+      )}
       overflowRenderer={renderOverflowPopoverInline}
     />
   </div>
