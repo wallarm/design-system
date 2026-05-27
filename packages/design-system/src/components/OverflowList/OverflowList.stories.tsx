@@ -74,6 +74,22 @@ export const CollapseFromStart: StoryFn = () => (
   </div>
 );
 
+/** Overflow popover that lays hidden items out in a single row. */
+const renderOverflowPopoverInline = (items: string[]) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <Tag>+{items.length}</Tag>
+    </PopoverTrigger>
+    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='unset'>
+      <div className='flex flex-row flex-nowrap gap-4'>
+        {items.map(item => (
+          <Tag key={item}>{item}</Tag>
+        ))}
+      </div>
+    </PopoverContent>
+  </Popover>
+);
+
 /** Guaranteed minimum number of visible items. */
 export const MinVisibleItems: StoryFn = () => (
   <div className='w-160'>
@@ -82,7 +98,7 @@ export const MinVisibleItems: StoryFn = () => (
       minVisibleItems={3}
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowRenderer={renderOverflowPopover}
+      overflowRenderer={renderOverflowPopoverInline}
     />
   </div>
 );
