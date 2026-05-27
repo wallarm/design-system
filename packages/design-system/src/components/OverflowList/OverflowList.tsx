@@ -6,6 +6,7 @@ import {
   useCallback,
   useEffect,
   useMemo,
+  useRef,
 } from 'react';
 import { useOverflowItems } from '../../hooks';
 import { cn } from '../../utils/cn';
@@ -78,11 +79,25 @@ const OverflowListComponent = <T,>({
 
   const finalHiddenCount = finalHiddenItems.length;
 
-  // Notify about overflow as a side-effect, not during render.
+  // Notify about overflow as a side-effect, not during render. `finalHiddenItems`
+  // gets a fresh array identity every render (it derives from `items.slice(...)`),
+  // so guard against re-invoking `onOverflow` unless the hidden set actually
+  // changed — otherwise a consumer that sets state in `onOverflow` would loop.
+  const prevHiddenRef = useRef<T[] | null>(null);
   useEffect(() => {
-    if (onOverflow && finalHiddenItems.length > 0) {
+    if (!onOverflow || finalHiddenItems.length === 0) {
+      prevHiddenRef.current = finalHiddenItems;
+      return;
+    }
+    const prev = prevHiddenRef.current;
+    const changed =
+      !prev ||
+      prev.length !== finalHiddenItems.length ||
+      finalHiddenItems.some((item, index) => item !== prev[index]);
+    if (changed) {
       onOverflow(finalHiddenItems);
     }
+    prevHiddenRef.current = finalHiddenItems;
   }, [finalHiddenItems, onOverflow]);
 
   // Render overflow element
