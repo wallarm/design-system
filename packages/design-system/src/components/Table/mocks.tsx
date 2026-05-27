@@ -78,7 +78,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '1',
     objectName: 'Rate limiting abuse on the payment endpoint',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: false,
     requests: 22000,
     sourceIp: '34.74.73.20',
@@ -95,7 +95,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '2',
     objectName: 'Mass assignment vulnerability in user profile',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: false,
     requests: 25000,
     sourceIp: '34.74.73.20',
@@ -112,7 +112,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '3',
     objectName: 'Insecure direct object reference in user data',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: true,
     requests: 30000,
     sourceIp: '34.74.73.20',
@@ -129,7 +129,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '4',
     objectName: 'Improper error handling leading to info leak',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: true,
     requests: 35000,
     sourceIp: '34.74.73.20',
@@ -146,7 +146,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '5',
     objectName: 'Broken authentication in the login API',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: true,
     requests: 20000,
     sourceIp: '34.74.73.20',
@@ -163,7 +163,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '6',
     objectName: 'Lack of resource validation in file upload',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: false,
     requests: 40000,
     sourceIp: '34.74.73.20',
@@ -180,7 +180,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '7',
     objectName: 'Server-side request forgery in image proxy',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: false,
     requests: 50000,
     sourceIp: '34.74.73.20',
@@ -197,7 +197,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '8',
     objectName: 'Unvalidated redirects and forwards in auth flow',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: true,
     requests: 75000,
     sourceIp: '34.74.73.20',
@@ -214,7 +214,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '9',
     objectName: 'SQL injection in the user ID',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: false,
     requests: 15000,
     sourceIp: '34.74.73.20',
@@ -231,7 +231,7 @@ export const securityEvents: SecurityEvent[] = [
   {
     id: '10',
     objectName: 'Cross-site scripting in the API endpoint',
-    tags: ['api-abuse', 'account-takeover'],
+    tags: ['api-abuse', 'account-takeover', 'credential-stuffing', 'scanner', 'brute-force'],
     isActive: false,
     requests: 18000,
     sourceIp: '34.74.73.20',

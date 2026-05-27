@@ -18,7 +18,10 @@ import {
   DropdownMenuTrigger,
 } from '../DropdownMenu';
 import { HttpMethod } from '../HttpMethod';
+import { OverflowList } from '../OverflowList';
+import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { HStack, VStack } from '../Stack';
+import { Tag } from '../Tag';
 import { Text } from '../Text';
 import {
   createLargeGroupedData,
@@ -161,6 +164,57 @@ export const ColumnResizing: StoryFn<typeof meta> = () => {
     <Table
       data={securityEvents}
       columns={securityColumns}
+      getRowId={row => row.id}
+      columnSizing={columnSizing}
+      onColumnSizingChange={setColumnSizing}
+    />
+  );
+};
+
+const renderTableTagsOverflow = (items: string[]) => (
+  <Popover>
+    <PopoverTrigger asChild>
+      <Tag>+{items.length}</Tag>
+    </PopoverTrigger>
+    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
+      <div className='flex flex-col gap-4'>
+        {items.map(item => (
+          <Tag key={item}>{item}</Tag>
+        ))}
+      </div>
+    </PopoverContent>
+  </Popover>
+);
+
+/** Resizable column whose cell hosts an OverflowList — resize it to reflow tags. */
+export const ColumnResizingWithOverflowList: StoryFn<typeof meta> = () => {
+  const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+
+  const columns = useMemo<TableColumnDef<SecurityEvent>[]>(
+    () => [
+      ...securityColumns.slice(0, 1),
+      securityColumnHelper.display({
+        id: 'tags',
+        header: 'Tags',
+        size: 240,
+        cell: ({ row }) => (
+          <OverflowList
+            className='gap-4'
+            items={row.original.tags}
+            itemRenderer={(item: string) => <Tag key={item}>{item}</Tag>}
+            overflowRenderer={renderTableTagsOverflow}
+          />
+        ),
+      }),
+      ...securityColumns.slice(1),
+    ],
+    [],
+  );
+
+  return (
+    <Table
+      data={securityEvents}
+      columns={columns}
       getRowId={row => row.id}
       columnSizing={columnSizing}
       onColumnSizingChange={setColumnSizing}
