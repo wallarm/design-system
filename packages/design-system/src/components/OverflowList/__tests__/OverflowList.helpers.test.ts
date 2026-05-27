@@ -36,6 +36,27 @@ describe('resolveVisibleItems', () => {
     expect(result).toEqual({ visibleItems: ['a', 'b'], hiddenItems: ['c', 'd'] });
   });
 
+  it('keeps the same array references in the no-op branch (no render churn)', () => {
+    // Identity matters: returning fresh arrays here would re-trigger downstream
+    // memos and the onOverflow guard on every render.
+    const visibleItems = ['a', 'b'];
+    const hiddenItems = ['c', 'd'];
+    const result = resolveVisibleItems({ items, visibleItems, hiddenItems, minVisibleItems: 2 });
+    expect(result.visibleItems).toBe(visibleItems);
+    expect(result.hiddenItems).toBe(hiddenItems);
+  });
+
+  it('slices positionally for duplicate items in the floor branch', () => {
+    const dupes = ['a', 'a', 'b', 'a'];
+    const result = resolveVisibleItems({
+      items: dupes,
+      visibleItems: ['a'],
+      hiddenItems: ['a', 'b', 'a'],
+      minVisibleItems: 3,
+    });
+    expect(result).toEqual({ visibleItems: ['a', 'a', 'b'], hiddenItems: ['a'] });
+  });
+
   it('forces the first minVisibleItems visible when the engine collapses below the floor', () => {
     const result = resolveVisibleItems({
       items,

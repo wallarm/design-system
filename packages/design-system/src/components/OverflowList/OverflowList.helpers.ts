@@ -3,9 +3,10 @@
 export const OVERFLOW_RESERVE_SPACE = 80;
 
 /**
- * Shallow item-by-item equality for two lists. Used to guard `onOverflow` from
- * re-firing when the hidden set keeps a fresh array identity but the same
- * contents. A `null` previous list is treated as "not equal".
+ * Shallow item-by-item equality for two lists. Order-sensitive — items must
+ * match at the same index. Used to guard `onOverflow` from re-firing when the
+ * hidden set keeps a fresh array identity but the same contents. A `null`
+ * previous list is treated as "not equal".
  */
 export function areItemsShallowEqual<T>(prev: T[] | null, next: T[]): boolean {
   if (!prev || prev.length !== next.length) return false;
