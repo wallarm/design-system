@@ -1,8 +1,12 @@
-import { CircleDashed } from '../../../icons';
+import { CircleDashed, Filter, Plus } from '../../../icons';
 import type { NavConfig } from '../../ProductNav';
 
 export const edgeNavConfig: NavConfig = {
   productLabel: 'Edge',
+  headerActions: [
+    { icon: Filter, label: 'Filter', onClick: () => alert('Filter clicked') },
+    { icon: Plus, label: 'Add', onClick: () => alert('Add clicked') },
+  ],
   items: [
     { type: 'link', id: 'overview', label: 'Overview', path: 'overview', icon: CircleDashed },
     {
@@ -26,7 +30,43 @@ export const edgeNavConfig: NavConfig = {
           path: 'overview',
           icon: CircleDashed,
         },
-        { type: 'link', id: 'dp-nodes', label: 'Nodes', path: 'nodes', icon: CircleDashed },
+        {
+          type: 'drill',
+          id: 'dp-nodes',
+          label: 'Nodes',
+          path: 'nodes',
+          icon: CircleDashed,
+          param: 'nodeId',
+          entities: [
+            { id: 'node-1', label: 'Node 1', description: 'Primary node' },
+            { id: 'node-2', label: 'Node 2', description: 'Secondary node' },
+            { id: 'node-3', label: 'Node 3', description: 'Tertiary node' },
+          ],
+          children: [
+            {
+              type: 'link',
+              id: 'node-overview',
+              label: 'Overview',
+              path: 'overview',
+              icon: CircleDashed,
+            },
+            {
+              type: 'link',
+              id: 'node-metrics',
+              label: 'Metrics',
+              path: 'metrics',
+              icon: CircleDashed,
+            },
+            { type: 'link', id: 'node-logs', label: 'Logs', path: 'logs', icon: CircleDashed },
+            {
+              type: 'link',
+              id: 'node-config',
+              label: 'Configuration',
+              path: 'config',
+              icon: CircleDashed,
+            },
+          ],
+        },
         {
           type: 'link',
           id: 'dp-services',
@@ -262,6 +302,7 @@ export const aiHypervisorNavConfig: NavConfig = {
 
 export const infraDiscoveryNavConfig: NavConfig = {
   productLabel: 'Infra Discovery',
+  headerActions: [{ icon: Filter, label: 'Filter', onClick: () => alert('Filter clicked') }],
   items: [
     { type: 'link', id: 'overview', label: 'Overview', path: 'overview', icon: CircleDashed },
     {

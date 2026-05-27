@@ -3,6 +3,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuItemContent,
   DropdownMenuItemIcon,
   DropdownMenuItemText,
   DropdownMenuSeparator,
@@ -41,7 +42,7 @@ export const AccountDropdown = ({
   theme: Theme;
   onThemeChange: (theme: Theme) => void;
 }) => (
-  <DropdownMenu positioning={{ placement: 'right-end', gutter: 8 }}>
+  <DropdownMenu positioning={{ placement: 'right-end', gutter: 6, offset: { crossAxis: 12 } }}>
     <DropdownMenuTrigger asChild>
       <NavRailItem icon={User} label={USER_NAME} />
     </DropdownMenuTrigger>
@@ -72,14 +73,14 @@ export const AccountDropdown = ({
           <DropdownMenuItemIcon>
             <PencilRuler />
           </DropdownMenuItemIcon>
-          <DropdownMenuItemText>
-            Theme:{' '}
-            <Text size='sm' weight='medium' style={{ display: 'inline' }}>
+          <DropdownMenuItemContent>
+            <DropdownMenuItemText>Theme</DropdownMenuItemText>
+            <Text size='xs' color='secondary'>
               {THEME_LABELS[theme]}
             </Text>
-          </DropdownMenuItemText>
+          </DropdownMenuItemContent>
         </DropdownMenuTriggerItem>
-        <DropdownMenuContent className='w-200'>
+        <DropdownMenuContent className='w-132'>
           <DropdownMenuItem onSelect={() => onThemeChange('light')}>
             <DropdownMenuItemText>Light</DropdownMenuItemText>
             {theme === 'light' && (
@@ -103,12 +104,12 @@ export const AccountDropdown = ({
           <DropdownMenuItemIcon>
             <PanelLeftDashed />
           </DropdownMenuItemIcon>
-          <DropdownMenuItemText>
-            Sidebar mode:{' '}
-            <Text size='sm' weight='medium' style={{ display: 'inline' }}>
+          <DropdownMenuItemContent>
+            <DropdownMenuItemText>Sidebar mode</DropdownMenuItemText>
+            <Text size='xs' color='secondary'>
               {SIDEBAR_MODE_LABELS[sidebarMode]}
             </Text>
-          </DropdownMenuItemText>
+          </DropdownMenuItemContent>
         </DropdownMenuTriggerItem>
         <DropdownMenuContent className='w-200'>
           <DropdownMenuItem onSelect={() => onSidebarModeChange('adaptive')}>

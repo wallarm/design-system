@@ -9,7 +9,7 @@ import { useTestId } from '../../utils/testId';
 const tooltipContentVariants = cva(
   [
     // Base
-    'py-4 rounded-8 bg-component-tooltip-bg text-text-primary-alt-fixed text-xs font-medium',
+    'py-4 rounded-8 bg-component-tooltip-bg text-text-primary-alt text-xs font-medium',
     // Behavior
     'z-50 overflow-hidden',
     // Animation base
@@ -25,7 +25,7 @@ const tooltipContentVariants = cva(
     // Animation top
     'data-[side=top]:slide-in-from-bottom-2',
     // Kbd behavior
-    '[&>[data-slot=kbd]]:bg-component-kbi-tooltip-bg [&>[data-slot=kbd]]:border-0 [&>[data-slot=kbd]]:text-text-primary-alt-fixed',
+    '[&>[data-slot=kbd]]:bg-component-kbi-tooltip-bg [&>[data-slot=kbd]]:border-0 [&>[data-slot=kbd]]:text-text-primary-alt',
   ],
   {
     variants: {

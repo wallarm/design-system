@@ -11,6 +11,7 @@ export type {
   NavConfig,
   NavConfigDrill,
   NavConfigGroup,
+  NavConfigHeaderAction,
   NavConfigLink,
   NavConfigNode,
   NavConfigSectionHeader,

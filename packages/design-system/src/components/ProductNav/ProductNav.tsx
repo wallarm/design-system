@@ -78,11 +78,16 @@ export const ProductNav: FC<ProductNavProps> = ({ config, basePath, onNavigate, 
   const drillInto = useCallback(
     (drill: NavConfigDrill) => {
       setVisualDrillLevel(null);
+      const segments = pathname
+        .replace(/^\/+|\/+$/g, '')
+        .split('/')
+        .filter(Boolean);
+      const prefixSegments = segments.slice(0, effectiveDrillLevel * 2);
       const defaultEntity = drill.entities?.[0]?.id ?? 'default';
       const firstChildPath = findFirstLinkPath(drill.children) ?? '';
-      setPathname(`/${drill.path}/${defaultEntity}/${firstChildPath}`);
+      setPathname(`/${[...prefixSegments, drill.path, defaultEntity, firstChildPath].join('/')}`);
     },
-    [setPathname],
+    [effectiveDrillLevel, pathname, setPathname],
   );
 
   const goBack = useCallback(() => {
