@@ -66,7 +66,7 @@ test.describe('Component: Table', () => {
       const tagsHeader = page.getByRole('columnheader', { name: 'Tags' });
       await expect(tagsHeader).toBeVisible();
 
-      const handle = tagsHeader.locator('[class*="cursor-col-resize"]').first();
+      const handle = tagsHeader.locator('[data-slot="resize-handle"]');
       const box = await handle.boundingBox();
       if (!box) throw new Error('Tags column resize handle not found');
 

@@ -120,6 +120,8 @@ export const DrawerResizeHandle: FC<DrawerResizeHandleProps> = ({ ref }) => {
     <Tooltip positioning={{ placement: 'left' }} open={isHovered && !isDragging}>
       <TooltipTrigger
         ref={ref}
+        data-slot='resize-handle'
+        data-resizing={isDragging || undefined}
         className={cn(drawerResizeHandleVariants({ barIsVisible }))}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}

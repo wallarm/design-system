@@ -29,6 +29,7 @@ export const TableResizeHandler = <T,>({ header }: TableResizeHandlerProps<T>) =
       onMouseDown={header.getResizeHandler()}
       onTouchStart={header.getResizeHandler()}
       className={cn(tableResizeHandlerVariants())}
+      data-slot='resize-handle'
       data-testid={testId}
       data-resizing={header.column.getIsResizing() || undefined}
       tabIndex={-1}
