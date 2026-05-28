@@ -74,7 +74,7 @@ export const Basic: StoryFn<AppShellProps> = () => {
       <AppShellHeader>
         <TopHeader>
           <TopHeaderLogo href='/'>
-            <Logo size='md' />
+            <Logo className='h-[15px]' />
           </TopHeaderLogo>
 
           <TopHeaderActions>

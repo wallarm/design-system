@@ -10,6 +10,7 @@ export interface PageProps extends HTMLAttributes<HTMLDivElement>, TestableProps
   title?: string;
   fullSize?: boolean;
   fixedHeight?: boolean;
+  contained?: boolean;
   children?: ReactNode;
 }
 
@@ -31,6 +32,7 @@ export const Page: FC<PageProps> = ({
   title,
   fullSize,
   fixedHeight,
+  contained,
   children,
   className,
   'data-testid': testId,
@@ -51,7 +53,13 @@ export const Page: FC<PageProps> = ({
         ref={ref}
         data-testid={testId}
         data-slot='page'
-        className={cn('flex flex-col', fixedHeight && 'h-full', className)}
+        className={cn(
+          'flex flex-col',
+          fixedHeight && 'h-full',
+          contained &&
+            'max-h-screen max-w-screen overflow-auto overscroll-none [scrollbar-width:thin]',
+          className,
+        )}
       >
         {children}
       </div>

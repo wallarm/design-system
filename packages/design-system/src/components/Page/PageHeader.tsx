@@ -4,9 +4,10 @@ import { useTestId } from '../../utils/testId';
 
 export interface PageHeaderProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
+  sticky?: boolean;
 }
 
-export const PageHeader: FC<PageHeaderProps> = ({ ref, children, className, ...props }) => {
+export const PageHeader: FC<PageHeaderProps> = ({ ref, sticky, children, className, ...props }) => {
   const testId = useTestId('header');
 
   return (
@@ -15,7 +16,11 @@ export const PageHeader: FC<PageHeaderProps> = ({ ref, children, className, ...p
       ref={ref}
       data-testid={testId}
       data-slot='page-header'
-      className={cn('flex items-center justify-between px-24 py-16 gap-16', className)}
+      className={cn(
+        'flex items-center px-24 py-16 gap-12',
+        sticky && 'sticky top-0 z-10 bg-bg-primary',
+        className,
+      )}
     >
       {children}
     </div>

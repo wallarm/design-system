@@ -58,7 +58,7 @@ export const Logo: FC<LogoProps> = ({
     {(type === 'wordmark' || type === 'full') && (
       <g
         className={WORDMARK_COLOR[color]}
-        transform={type === 'full' ? 'translate(38, 0)' : undefined}
+        transform={type === 'full' ? 'translate(44, 0)' : undefined}
       >
         <LogoWordmarkPath />
       </g>
