@@ -70,11 +70,11 @@ export const matchNav = (pathname: string, config: NavConfig): MatchNavResult =>
 
   navStack.push(rootEntry);
 
-  // First breadcrumb segment is always a link to root
+  // First breadcrumb segment is always a link to the product root
   breadcrumbSegments.push({
     type: 'link',
     label: config.productLabel,
-    href: '/',
+    href: config.productPath,
   });
 
   let segmentIndex = 0;

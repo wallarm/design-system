@@ -1,8 +1,9 @@
 import { CircleDashed, Filter, Plus } from '../../../icons';
-import type { NavConfig } from '../../ProductNav';
+import type { NavConfig } from '../../RemoteShell';
 
 export const edgeNavConfig: NavConfig = {
   productLabel: 'Edge',
+  productPath: '/edge',
   headerActions: [
     { icon: Filter, label: 'Filter', onClick: () => alert('Filter clicked') },
     { icon: Plus, label: 'Add', onClick: () => alert('Add clicked') },
@@ -216,6 +217,7 @@ export const edgeNavConfig: NavConfig = {
 
 export const aiHypervisorNavConfig: NavConfig = {
   productLabel: 'AI Hypervisor',
+  productPath: '/ai-hypervisor',
   items: [
     { type: 'link', id: 'heatmap', label: 'Heatmap', path: 'heatmap', icon: CircleDashed },
     { type: 'link', id: 'registry', label: 'Registry', path: 'registry', icon: CircleDashed },
@@ -302,6 +304,7 @@ export const aiHypervisorNavConfig: NavConfig = {
 
 export const infraDiscoveryNavConfig: NavConfig = {
   productLabel: 'Infra Discovery',
+  productPath: '/infra-discovery',
   headerActions: [{ icon: Filter, label: 'Filter', onClick: () => alert('Filter clicked') }],
   items: [
     { type: 'link', id: 'overview', label: 'Overview', path: 'overview', icon: CircleDashed },
@@ -358,6 +361,7 @@ export const infraDiscoveryNavConfig: NavConfig = {
 
 export const securityTestingNavConfig: NavConfig = {
   productLabel: 'Security Testing',
+  productPath: '/security-testing',
   items: [
     { type: 'link', id: 'overview', label: 'Overview', path: 'overview', icon: CircleDashed },
     {
@@ -393,6 +397,7 @@ export const securityTestingNavConfig: NavConfig = {
 
 export const settingsNavConfig: NavConfig = {
   productLabel: 'Settings',
+  productPath: '/settings',
   items: [
     { type: 'link', id: 'profile', label: 'Profile', path: 'profile', icon: CircleDashed },
     { type: 'link', id: 'general', label: 'General', path: 'general', icon: CircleDashed },

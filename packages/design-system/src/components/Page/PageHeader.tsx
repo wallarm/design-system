@@ -17,8 +17,8 @@ export const PageHeader: FC<PageHeaderProps> = ({ ref, sticky, children, classNa
       data-testid={testId}
       data-slot='page-header'
       className={cn(
-        'flex items-center px-24 py-16 gap-12',
-        sticky && 'sticky top-0 z-10 bg-bg-primary',
+        'flex items-center px-16 pb-16 gap-12',
+        sticky && 'sticky top-0 z-10 bg-bg-surface-2',
         className,
       )}
     >

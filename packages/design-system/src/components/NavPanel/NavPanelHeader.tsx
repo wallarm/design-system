@@ -17,7 +17,7 @@ export const NavPanelHeader: FC<NavPanelHeaderProps> = ({ ref, className, childr
       ref={ref}
       data-slot='nav-panel-header'
       data-testid={testId}
-      className={cn('sticky top-0 z-10 flex shrink-0 items-center p-4', className)}
+      className={cn('sticky top-0 z-10 flex shrink-0 items-center p-4 bg-bg-surface-2', className)}
     >
       <Text size='sm' weight='medium'>
         {children}

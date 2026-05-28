@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-import type { NavConfigHeaderAction } from './types';
+import type { NavConfigHeaderAction } from './model';
 
 export type HeaderActionsProps = {
   actions: NavConfigHeaderAction[];
