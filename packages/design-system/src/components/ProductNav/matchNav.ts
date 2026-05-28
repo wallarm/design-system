@@ -106,6 +106,7 @@ export const matchNav = (pathname: string, config: NavConfig): MatchNavResult =>
     }
 
     if (match.type === 'drill') {
+      const drillStartIndex = segmentIndex;
       currentStackEntry.activeItemId = match.id;
       segmentIndex++;
 
@@ -128,13 +129,18 @@ export const matchNav = (pathname: string, config: NavConfig): MatchNavResult =>
       const entityLabel = matchedEntity?.label ?? paramValue;
 
       // Build scope items from drill entities (if provided)
+      const prefixSegments = segments.slice(0, drillStartIndex);
       const childPath = segments.slice(segmentIndex).join('/');
-      const scopeItems = match.entities?.map(e => ({
-        id: e.id,
-        label: e.label,
-        description: e.description,
-        href: childPath ? `/${match.path}/${e.id}/${childPath}` : `/${match.path}/${e.id}`,
-      }));
+      const scopeItems = match.entities?.map(e => {
+        const parts = [...prefixSegments, match.path, e.id];
+        if (childPath) parts.push(childPath);
+        return {
+          id: e.id,
+          label: e.label,
+          description: e.description,
+          href: `/${parts.join('/')}`,
+        };
+      });
 
       // Scope-switcher breadcrumb for drill
       breadcrumbSegments.push({

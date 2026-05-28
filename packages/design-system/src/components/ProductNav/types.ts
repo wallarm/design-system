@@ -1,9 +1,17 @@
 import type { ComponentType } from 'react';
 import type { SvgIconProps } from '../../icons/SvgIcon';
 
+export interface NavConfigHeaderAction {
+  icon: ComponentType<SvgIconProps>;
+  label: string;
+  onClick?: () => void;
+  disabled?: boolean;
+}
+
 export interface NavConfig {
   productLabel: string;
   items: NavConfigNode[];
+  headerActions?: NavConfigHeaderAction[];
 }
 
 export type NavConfigNode =

@@ -1,3 +1,12 @@
+## 0.49.0 (2026-05-28)
+
+* feat: Page component ([3a3599a](https://github.com/wallarm/design-system/commit/3a3599a))
+
+## 0.48.0 (2026-05-27)
+
+* feat: [WDS-110] Shell ([47c8eec](https://github.com/wallarm/design-system/commit/47c8eec))
+* feat: [WDS-110] Shell ([cdf931d](https://github.com/wallarm/design-system/commit/cdf931d))
+
 ## 0.47.0 (2026-05-26)
 
 * feat: [WDS-110] Shell ([27df8c3](https://github.com/wallarm/design-system/commit/27df8c3))
