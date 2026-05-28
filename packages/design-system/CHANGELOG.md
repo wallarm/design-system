@@ -1,3 +1,7 @@
+## 0.50.0 (2026-05-28)
+
+* feat(overflow-list): AS-1033 resizable container support (#136) ([11dbec2](https://github.com/wallarm/design-system/commit/11dbec2)), closes [#136](https://github.com/wallarm/design-system/issues/136)
+
 ## 0.49.0 (2026-05-28)
 
 * feat: Page component ([3a3599a](https://github.com/wallarm/design-system/commit/3a3599a))
