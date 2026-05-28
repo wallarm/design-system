@@ -1,5 +1,5 @@
-import type { ReactElement } from 'react';
-import { render, screen } from '@testing-library/react';
+import { type ReactElement, useState } from 'react';
+import { act, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 vi.mock('../../../hooks', () => ({
@@ -100,6 +100,71 @@ describe('OverflowList', () => {
       />,
     );
     expect(onOverflow).toHaveBeenCalledWith(['b', 'c', 'd']);
+  });
+
+  it('does not re-fire onOverflow when the hidden set is unchanged but the array identity is fresh', () => {
+    // finalHiddenItems is derived via items.slice(visibleCount), so its identity
+    // changes every render. Without the shallow-equality guard, a parent that
+    // sets state in onOverflow would cause an infinite render loop.
+    mockHook(['a'], ['b', 'c', 'd']);
+    const onOverflow = vi.fn();
+
+    // OverflowList is memoized; force re-render via parent state and pass a new
+    // `items` array each time so the memo's shallow-equality check on `items` is
+    // bypassed and the inner hook runs again with a freshly-built hidden array.
+    let trigger: (() => void) | null = null;
+    const Harness = () => {
+      const [tick, setTick] = useState(0);
+      trigger = () => setTick(t => t + 1);
+      return (
+        <OverflowList
+          items={[...items, `tick-${tick}` as never].slice(0, items.length)}
+          itemRenderer={itemRenderer}
+          overflowRenderer={overflowRenderer}
+          onOverflow={onOverflow}
+        />
+      );
+    };
+
+    render(<Harness />);
+    expect(onOverflow).toHaveBeenCalledTimes(1);
+
+    act(() => {
+      mockHook(['a'], ['b', 'c', 'd']);
+      trigger?.();
+    });
+
+    expect(onOverflow).toHaveBeenCalledTimes(1);
+  });
+
+  it('fires onOverflow again when the hidden set actually changes', () => {
+    mockHook(['a'], ['b', 'c', 'd']);
+    const onOverflow = vi.fn();
+
+    let trigger: (() => void) | null = null;
+    const Harness = () => {
+      const [tick, setTick] = useState(0);
+      trigger = () => setTick(t => t + 1);
+      return (
+        <OverflowList
+          items={[...items, `tick-${tick}` as never].slice(0, items.length)}
+          itemRenderer={itemRenderer}
+          overflowRenderer={overflowRenderer}
+          onOverflow={onOverflow}
+        />
+      );
+    };
+
+    render(<Harness />);
+    expect(onOverflow).toHaveBeenNthCalledWith(1, ['b', 'c', 'd']);
+
+    act(() => {
+      mockHook(['a', 'b'], ['c', 'd']);
+      trigger?.();
+    });
+
+    expect(onOverflow).toHaveBeenCalledTimes(2);
+    expect(onOverflow).toHaveBeenNthCalledWith(2, ['c', 'd']);
   });
 
   it('expands visible items up to minVisibleItems', () => {
