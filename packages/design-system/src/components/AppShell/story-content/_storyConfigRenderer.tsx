@@ -1,5 +1,6 @@
 import { type FC, useEffect, useState } from 'react';
 import { NavPanel, NavPanelHeader } from '../../NavPanel';
+import { Page, PageContent, PageHeader, PageTitle } from '../../Page';
 import {
   type NavConfig,
   NavPanelSkeleton,
@@ -22,7 +23,7 @@ export interface ConfigRemoteProps {
   basePath?: string;
 }
 
-const PageContent: FC = () => {
+const RemotePageContent: FC = () => {
   const { breadcrumbSegments } = useProductNavContext();
 
   const lastSegment = breadcrumbSegments[breadcrumbSegments.length - 1];
@@ -30,10 +31,14 @@ const PageContent: FC = () => {
   const fullPath = breadcrumbSegments.map(s => s.label).join(' / ');
 
   return (
-    <>
-      <h1 className='text-xl font-semibold text-text-primary'>{pageTitle}</h1>
-      <p className='mt-8 text-sm text-text-secondary'>Placeholder page for {fullPath}.</p>
-    </>
+    <Page title={pageTitle} fixedHeight>
+      <PageHeader>
+        <PageTitle>{pageTitle}</PageTitle>
+      </PageHeader>
+      <PageContent>
+        <p className='text-sm text-text-secondary'>Placeholder page for {fullPath}.</p>
+      </PageContent>
+    </Page>
   );
 };
 
@@ -73,7 +78,7 @@ const ConfigRemote: FC<ConfigRemoteProps> = ({ config, basePath }) => {
           <ProductNavBreadcrumbs />
         </RemoteShellBreadcrumb>
         <RemoteShellContent>
-          <PageContent />
+          <RemotePageContent />
         </RemoteShellContent>
       </RemoteShell>
     </ProductNav>

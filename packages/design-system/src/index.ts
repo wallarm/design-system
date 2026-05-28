@@ -335,6 +335,22 @@ export {
   type OverflowTooltipProps,
 } from './components/OverflowTooltip';
 export {
+  Page,
+  PageActions,
+  type PageActionsProps,
+  PageContent,
+  type PageContentProps,
+  PageHeader,
+  type PageHeaderProps,
+  type PageHostContextValue,
+  PageHostProvider,
+  type PageLayoutOptions,
+  type PageProps,
+  PageTitle,
+  type PageTitleProps,
+  usePageHost,
+} from './components/Page';
+export {
   type CopyFormatData,
   formatAsFilter,
   ParameterPath,
