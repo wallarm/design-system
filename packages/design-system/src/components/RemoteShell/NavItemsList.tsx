@@ -8,7 +8,7 @@ import {
   NavPanelItem,
   NavPanelSectionHeader,
 } from '../NavPanel';
-import type { NavConfigDrill, NavConfigNode } from './types';
+import type { NavConfigDrill, NavConfigNode } from './model/types';
 
 export type NavItemsListProps = {
   items: NavConfigNode[];

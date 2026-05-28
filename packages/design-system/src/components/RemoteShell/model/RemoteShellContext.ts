@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 import type { BreadcrumbSegment, NavConfig, NavConfigDrill, NavStackEntry } from './types';
 
-export interface ProductNavContextValue {
+export interface RemoteShellContextValue {
   config: NavConfig;
   pathname: string;
   navStack: NavStackEntry[];
@@ -21,14 +21,14 @@ export interface ProductNavContextValue {
   navigateTo: (href: string) => void;
 }
 
-const ProductNavCtx = createContext<ProductNavContextValue | null>(null);
+const RemoteShellCtx = createContext<RemoteShellContextValue | null>(null);
 
-export const ProductNavContextProvider = ProductNavCtx.Provider;
+export const RemoteShellContextProvider = RemoteShellCtx.Provider;
 
-export function useProductNavContext(): ProductNavContextValue {
-  const ctx = useContext(ProductNavCtx);
+export function useRemoteShellContext(): RemoteShellContextValue {
+  const ctx = useContext(RemoteShellCtx);
   if (!ctx) {
-    throw new Error('useProductNavContext must be used within a ProductNav provider');
+    throw new Error('useRemoteShellContext must be used within a RemoteShell with a config prop');
   }
   return ctx;
 }

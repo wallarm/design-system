@@ -358,29 +358,6 @@ export {
 } from './components/ParameterPath';
 export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
 export {
-  type BreadcrumbSegment,
-  findDrillNode,
-  findFirstLinkPath,
-  type MatchNavResult,
-  matchNav,
-  type NavConfig,
-  type NavConfigDrill,
-  type NavConfigGroup,
-  type NavConfigLink,
-  type NavConfigNode,
-  NavPanelSkeleton,
-  type NavPanelSkeletonProps,
-  type NavStackEntry,
-  ProductNav,
-  ProductNavBreadcrumbs,
-  type ProductNavContextValue,
-  ProductNavPanel,
-  type ProductNavProps,
-  type UseProductNavResult,
-  useProductNav,
-  useProductNavContext,
-} from './components/ProductNav';
-export {
   Progress,
   type ProgressColor,
   type ProgressProps,
@@ -397,14 +374,26 @@ export {
   type RadioProps,
 } from './components/Radio';
 export {
+  type BreadcrumbSegment,
+  findFirstLinkPath,
+  type NavConfig,
+  type NavConfigDrill,
+  type NavConfigGroup,
+  type NavConfigLink,
+  type NavConfigNode,
+  type NavStackEntry,
+  pushPathname,
   RemoteShell,
   RemoteShellBreadcrumb,
   type RemoteShellBreadcrumbProps,
   RemoteShellContent,
   type RemoteShellContentProps,
+  type RemoteShellContextValue,
   RemoteShellPanel,
   type RemoteShellPanelProps,
   type RemoteShellProps,
+  useLocationPathname,
+  useRemoteShellContext,
 } from './components/RemoteShell';
 export {
   getResponseCodeCategory,

@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react';
-import type { SvgIconProps } from '../../icons/SvgIcon';
+import type { SvgIconProps } from '../../../icons/SvgIcon';
 
 export interface NavConfigHeaderAction {
   icon: ComponentType<SvgIconProps>;
@@ -10,6 +10,7 @@ export interface NavConfigHeaderAction {
 
 export interface NavConfig {
   productLabel: string;
+  productPath: string;
   items: NavConfigNode[];
   headerActions?: NavConfigHeaderAction[];
 }
@@ -40,7 +41,6 @@ export interface NavConfigDrill {
   icon?: ComponentType<SvgIconProps>;
   /** Available entities for the drill scope-switcher dropdown */
   entities?: { id: string; label: string; description?: string }[];
-  /** Render a visual divider after this item */
   dividerAfter?: boolean;
 }
 
@@ -51,7 +51,6 @@ export interface NavConfigGroup {
   children: NavConfigNode[];
   icon?: ComponentType<SvgIconProps>;
   defaultExpanded?: boolean;
-  /** Render a visual divider after this item */
   dividerAfter?: boolean;
 }
 

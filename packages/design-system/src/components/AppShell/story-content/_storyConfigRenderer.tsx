@@ -1,19 +1,12 @@
 import { type FC, useEffect, useState } from 'react';
-import { NavPanel, NavPanelHeader } from '../../NavPanel';
 import { Page, PageContent, PageHeader, PageTitle } from '../../Page';
 import {
   type NavConfig,
-  NavPanelSkeleton,
-  ProductNav,
-  ProductNavBreadcrumbs,
-  ProductNavPanel,
-  useProductNavContext,
-} from '../../ProductNav';
-import {
   RemoteShell,
   RemoteShellBreadcrumb,
   RemoteShellContent,
   RemoteShellPanel,
+  useRemoteShellContext,
 } from '../../RemoteShell';
 import { HomeContent } from './_storyHomeContent';
 import { PRODUCT_CONFIGS, type Product } from './_storyLib';
@@ -24,7 +17,7 @@ export interface ConfigRemoteProps {
 }
 
 const RemotePageContent: FC = () => {
-  const { breadcrumbSegments } = useProductNavContext();
+  const { breadcrumbSegments } = useRemoteShellContext();
 
   const lastSegment = breadcrumbSegments[breadcrumbSegments.length - 1];
   const pageTitle = lastSegment?.label ?? '';
@@ -55,33 +48,23 @@ const ConfigRemote: FC<ConfigRemoteProps> = ({ config, basePath }) => {
     return () => clearTimeout(timer);
   }, [config.productLabel]);
 
-  if (loading)
-    return (
-      <RemoteShell>
-        <RemoteShellPanel>
-          <NavPanel>
-            <NavPanelHeader>{config.productLabel}</NavPanelHeader>
-            <NavPanelSkeleton count={6} />
-          </NavPanel>
-        </RemoteShellPanel>
-        <RemoteShellContent />
-      </RemoteShell>
-    );
-
   return (
-    <ProductNav config={config} basePath={basePath}>
-      <RemoteShell>
-        <RemoteShellPanel>
-          <ProductNavPanel resizable />
-        </RemoteShellPanel>
-        <RemoteShellBreadcrumb>
-          <ProductNavBreadcrumbs />
-        </RemoteShellBreadcrumb>
-        <RemoteShellContent>
-          <RemotePageContent />
-        </RemoteShellContent>
-      </RemoteShell>
-    </ProductNav>
+    <RemoteShell config={config} basePath={basePath}>
+      {loading ? (
+        <>
+          <RemoteShellPanel isLoading />
+          <RemoteShellContent isLoading />
+        </>
+      ) : (
+        <>
+          <RemoteShellPanel resizable />
+          <RemoteShellBreadcrumb />
+          <RemoteShellContent>
+            <RemotePageContent />
+          </RemoteShellContent>
+        </>
+      )}
+    </RemoteShell>
   );
 };
 

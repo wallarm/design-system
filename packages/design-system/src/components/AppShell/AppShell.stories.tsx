@@ -13,7 +13,7 @@ import {
   NavRailSeparator,
   NavRailSkeleton,
 } from '../NavRail';
-import { useLocationPathname } from '../ProductNav';
+import { useLocationPathname } from '../RemoteShell';
 import { Skeleton } from '../Skeleton';
 import { Text } from '../Text';
 import { useTheme } from '../ThemeProvider';

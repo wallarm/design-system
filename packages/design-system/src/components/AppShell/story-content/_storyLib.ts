@@ -1,4 +1,4 @@
-import { findFirstLinkPath, pushPathname } from '../../ProductNav';
+import { findFirstLinkPath, pushPathname } from '../../RemoteShell';
 import {
   aiHypervisorNavConfig,
   edgeNavConfig,
