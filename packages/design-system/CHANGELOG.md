@@ -1,3 +1,7 @@
+## <small>0.50.1 (2026-05-28)</small>
+
+* fix: Shell component ([3848cad](https://github.com/wallarm/design-system/commit/3848cad))
+
 ## 0.50.0 (2026-05-28)
 
 * feat(overflow-list): AS-1033 resizable container support (#136) ([11dbec2](https://github.com/wallarm/design-system/commit/11dbec2)), closes [#136](https://github.com/wallarm/design-system/issues/136)
