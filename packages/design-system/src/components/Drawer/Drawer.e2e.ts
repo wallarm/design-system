@@ -14,6 +14,7 @@ const drawerStory = createStoryHelper('overlay-drawer', [
   'No Overlay',
   'With Nested',
   'With Tabs',
+  'Resizable With Overflow List',
 ] as const);
 
 const getDrawerContent = (page: Page) => page.getByTestId('drawer--content');
@@ -119,6 +120,47 @@ test.describe('Component: Drawer', () => {
 
       await page.getByRole('button', { name: '2nd level drawer' }).click();
       await expect(page.getByText('[Level 2] Detail View')).toBeVisible();
+    });
+
+    test('Should reflow the OverflowList when the drawer is resized wider', async ({ page }) => {
+      await drawerStory.goto(page, 'Resizable With Overflow List');
+
+      // The story opens the drawer by default, so no trigger click is needed.
+      const dialog = page.getByRole('dialog');
+      await expect(dialog).toBeVisible();
+
+      const countVisibleTags = () =>
+        page
+          .getByRole('dialog')
+          .locator('[data-slot="overflow-list"] [data-slot="tag"]')
+          .filter({ hasNotText: /^\+\d+$/ })
+          .count();
+
+      const before = await countVisibleTags();
+      expect(before).toBeGreaterThan(0);
+
+      const handle = dialog.locator('[data-slot="resize-handle"]');
+      const box = await handle.boundingBox();
+      if (!box) throw new Error('Resize handle not found');
+
+      const startX = box.x + box.width / 2;
+      const startY = box.y + box.height / 2;
+      // Drawer starts at width=480; the handle is on its left edge. Dragging the
+      // mouse 400px left increases width to ~880px (delta = startX - clientX),
+      // safely within the [400, 1130] min/max at the 1280px CI viewport.
+      const targetX = startX - 400;
+
+      await handle.hover();
+      await page.mouse.down();
+      // Wait for DrawerResizeHandle to flip data-resizing="true" — same handshake
+      // as the Table test below. More reliable than a fixed timeout.
+      await expect(handle).toHaveAttribute('data-resizing', 'true');
+
+      // Move left to widen the drawer (delta = startX - clientX becomes positive → width increases)
+      await page.mouse.move(targetX, startY, { steps: 20 });
+      await page.mouse.up();
+
+      await expect.poll(countVisibleTags, { timeout: 5000 }).toBeGreaterThan(before);
     });
   });
 
