@@ -1,4 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { Badge } from '../Badge';
 import { Button } from '../Button';
 import { Page, type PageProps } from './Page';
 import { PageActions } from './PageActions';
@@ -46,9 +47,11 @@ export default meta;
 
 export const Basic: StoryFn<PageProps> = () => {
   return (
-    <Page name='full-featured' fullSize>
+    <Page name='full-featured' fullSize fixedHeight>
       <PageHeader>
         <PageTitle>Page title</PageTitle>
+
+        <Badge>1000</Badge>
 
         <PageActions>
           <Button variant='secondary' color='neutral' size='small'>
@@ -60,6 +63,31 @@ export const Basic: StoryFn<PageProps> = () => {
 
       <PageContent>
         <p>Full-featured page with header actions, tabs (including disabled), and content area.</p>
+      </PageContent>
+    </Page>
+  );
+};
+
+export const StickyHeader: StoryFn<PageProps> = () => {
+  return (
+    <Page name='sticky-header' contained>
+      <PageHeader sticky>
+        <PageTitle>Sticky header</PageTitle>
+
+        <PageActions>
+          <Button variant='secondary' color='neutral' size='small'>
+            Export
+          </Button>
+          <Button size='small'>Settings</Button>
+        </PageActions>
+      </PageHeader>
+
+      <PageContent>
+        {Array.from({ length: 40 }, (_, i) => (
+          <p key={`row-${i + 1}`} className='py-8'>
+            Content row {i + 1}
+          </p>
+        ))}
       </PageContent>
     </Page>
   );
