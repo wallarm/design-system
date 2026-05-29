@@ -85,93 +85,89 @@ test.describe('Component: Table', () => {
 
       await expect.poll(countVisibleTagsInFirstRow, { timeout: 5000 }).toBeGreaterThan(before);
     });
-  });
 
-  test.describe('BidirectionalInfiniteScroll', () => {
-    test.describe('Visual', () => {
-      test('Should render the bidirectional infinite scroll table correctly', async ({ page }) => {
-        await tableStory.goto(page, 'Bidirectional Infinite Scroll');
+    test('Should prepend older rows without a visible scroll jump when scrolled to the top', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Bidirectional Infinite Scroll');
 
-        const scrollContainer = page.locator('[data-table-scroll-container]');
-        await expect(scrollContainer).toBeVisible();
+      const scrollContainer = page.locator('[data-table-scroll-container]');
+      await expect(scrollContainer).toBeVisible();
 
-        // Wait for the initial loading to finish (status line no longer shows "— loading...")
-        await expect(page.getByText('— loading...')).toBeHidden({ timeout: 3000 });
+      // Wait for the initial anchor to be rendered and loading to settle
+      await expect(page.getByText('— loading...')).toBeHidden({ timeout: 3000 });
 
-        await expect(page).toHaveScreenshot();
+      // Count initial rows and pick a stable reference row that is currently visible
+      const rows = scrollContainer.locator('[data-row-id]');
+      const initialRowCount = await rows.count();
+      expect(initialRowCount).toBeGreaterThan(0);
+
+      // Use the middle row as scroll anchor reference (it should remain visible after prepend)
+      const referenceRow = rows.nth(Math.floor(initialRowCount / 2));
+      const rowId = await referenceRow.getAttribute('data-row-id');
+      expect(rowId).toBeTruthy();
+
+      const boxBefore = await referenceRow.boundingBox();
+      expect(boxBefore).not.toBeNull();
+
+      // Scroll the container to the very top to trigger onStartReached
+      await scrollContainer.evaluate((el: HTMLElement) => {
+        el.scrollTop = 0;
       });
+
+      // Wait for new rows to be prepended (row count increases)
+      await expect
+        .poll(() => scrollContainer.locator('[data-row-id]').count(), { timeout: 3000 })
+        .toBeGreaterThan(initialRowCount);
+
+      // The reference row should still exist and its Y position must not have jumped
+      const referenceRowAfter = scrollContainer.locator(`[data-row-id="${rowId}"]`);
+      await expect(referenceRowAfter).toBeVisible();
+
+      const boxAfter = await referenceRowAfter.boundingBox();
+      expect(boxAfter).not.toBeNull();
+
+      // usePrependScrollAnchor guarantees the viewport does not jump: the row's
+      // on-screen Y coordinate must not change by more than 4px.
+      expect(Math.abs(boxAfter!.y - boxBefore!.y)).toBeLessThanOrEqual(4);
     });
 
-    test.describe('Interactions', () => {
-      test('Should prepend older rows without a visible scroll jump when scrolled to the top', async ({
-        page,
-      }) => {
-        await tableStory.goto(page, 'Bidirectional Infinite Scroll');
+    test('Should append newer rows when scrolled to the bottom', async ({ page }) => {
+      await tableStory.goto(page, 'Bidirectional Infinite Scroll');
 
-        const scrollContainer = page.locator('[data-table-scroll-container]');
-        await expect(scrollContainer).toBeVisible();
+      const scrollContainer = page.locator('[data-table-scroll-container]');
+      await expect(scrollContainer).toBeVisible();
 
-        // Wait for the initial anchor to be rendered and loading to settle
-        await expect(page.getByText('— loading...')).toBeHidden({ timeout: 3000 });
+      // Wait for the initial loading to settle
+      await expect(page.getByText('— loading...')).toBeHidden({ timeout: 3000 });
 
-        // Count initial rows and pick a stable reference row that is currently visible
-        const rows = scrollContainer.locator('[data-row-id]');
-        const initialRowCount = await rows.count();
-        expect(initialRowCount).toBeGreaterThan(0);
+      const rows = scrollContainer.locator('[data-row-id]');
+      const initialRowCount = await rows.count();
+      expect(initialRowCount).toBeGreaterThan(0);
 
-        // Use the middle row as scroll anchor reference (it should remain visible after prepend)
-        const referenceRow = rows.nth(Math.floor(initialRowCount / 2));
-        const rowId = await referenceRow.getAttribute('data-row-id');
-        expect(rowId).toBeTruthy();
-
-        const boxBefore = await referenceRow.boundingBox();
-        expect(boxBefore).not.toBeNull();
-
-        // Scroll the container to the very top to trigger onStartReached
-        await scrollContainer.evaluate((el: HTMLElement) => {
-          el.scrollTop = 0;
-        });
-
-        // Wait for new rows to be prepended (row count increases)
-        await expect
-          .poll(() => scrollContainer.locator('[data-row-id]').count(), { timeout: 3000 })
-          .toBeGreaterThan(initialRowCount);
-
-        // The reference row should still exist and its Y position must not have jumped
-        const referencRowAfter = scrollContainer.locator(`[data-row-id="${rowId}"]`);
-        await expect(referencRowAfter).toBeVisible();
-
-        const boxAfter = await referencRowAfter.boundingBox();
-        expect(boxAfter).not.toBeNull();
-
-        // usePrependScrollAnchor guarantees the viewport does not jump: the row's
-        // on-screen Y coordinate must not change by more than 4px.
-        expect(Math.abs(boxAfter!.y - boxBefore!.y)).toBeLessThanOrEqual(4);
+      // Scroll the container to the very bottom to trigger onEndReached
+      await scrollContainer.evaluate((el: HTMLElement) => {
+        el.scrollTop = el.scrollHeight;
       });
 
-      test('Should append newer rows when scrolled to the bottom', async ({ page }) => {
-        await tableStory.goto(page, 'Bidirectional Infinite Scroll');
+      // Wait for new rows to be appended (row count increases)
+      await expect
+        .poll(() => scrollContainer.locator('[data-row-id]').count(), { timeout: 3000 })
+        .toBeGreaterThan(initialRowCount);
+    });
+  });
 
-        const scrollContainer = page.locator('[data-table-scroll-container]');
-        await expect(scrollContainer).toBeVisible();
+  test.describe('Visual', () => {
+    test('Should render the bidirectional infinite scroll table correctly', async ({ page }) => {
+      await tableStory.goto(page, 'Bidirectional Infinite Scroll');
 
-        // Wait for the initial loading to settle
-        await expect(page.getByText('— loading...')).toBeHidden({ timeout: 3000 });
+      const scrollContainer = page.locator('[data-table-scroll-container]');
+      await expect(scrollContainer).toBeVisible();
 
-        const rows = scrollContainer.locator('[data-row-id]');
-        const initialRowCount = await rows.count();
-        expect(initialRowCount).toBeGreaterThan(0);
+      // Wait for the initial loading to finish (status line no longer shows "— loading...")
+      await expect(page.getByText('— loading...')).toBeHidden({ timeout: 3000 });
 
-        // Scroll the container to the very bottom to trigger onEndReached
-        await scrollContainer.evaluate((el: HTMLElement) => {
-          el.scrollTop = el.scrollHeight;
-        });
-
-        // Wait for new rows to be appended (row count increases)
-        await expect
-          .poll(() => scrollContainer.locator('[data-row-id]').count(), { timeout: 3000 })
-          .toBeGreaterThan(initialRowCount);
-      });
+      await expect(page).toHaveScreenshot();
     });
   });
 });
