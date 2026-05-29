@@ -87,7 +87,7 @@ describe('useScrollEdge', () => {
     el.scrollTop = 500;
     el.fire();
     el.scrollTop = 0;
-    Date.now = vi.fn(() => 10_500);
+    vi.spyOn(Date, 'now').mockReturnValue(10_500);
     el.fire();
     expect(onReached).toHaveBeenCalledTimes(2);
   });

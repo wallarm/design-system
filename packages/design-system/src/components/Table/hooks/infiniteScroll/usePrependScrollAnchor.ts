@@ -18,13 +18,20 @@ export const usePrependScrollAnchor = ({
   rows,
 }: UsePrependScrollAnchorOptions) => {
   const prevFirstRowIdRef = useRef<string | undefined>(rows[0]?.id);
-  const prevScrollHeightRef = useRef(0);
+  const prevScrollHeightRef = useRef<number | null>(null);
 
   useLayoutEffect(() => {
     const getScrollHeight = () =>
       mode === 'window'
         ? document.documentElement.scrollHeight
         : (scrollRef?.current?.scrollHeight ?? 0);
+
+    // Seed the baseline on first run — there is no previous height to diff against.
+    if (prevScrollHeightRef.current === null) {
+      prevScrollHeightRef.current = getScrollHeight();
+      prevFirstRowIdRef.current = rows[0]?.id;
+      return;
+    }
 
     if (detectDataChange(prevFirstRowIdRef.current, rows) === 'prepend') {
       const delta = getScrollHeight() - prevScrollHeightRef.current;

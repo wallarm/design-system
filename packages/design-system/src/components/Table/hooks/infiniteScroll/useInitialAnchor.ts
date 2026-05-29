@@ -36,7 +36,8 @@ export const useInitialAnchor = ({
 
     virtualizer.scrollToIndex(index, { align: 'center' });
     doneRef.current = true;
-    requestAnimationFrame(() => setReady(true));
+    const raf = requestAnimationFrame(() => setReady(true));
+    return () => cancelAnimationFrame(raf);
   }, [initialScrollToRowId, rows, virtualizerRef]);
 
   return ready;

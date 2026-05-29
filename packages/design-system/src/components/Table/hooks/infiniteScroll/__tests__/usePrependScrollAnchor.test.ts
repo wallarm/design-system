@@ -2,12 +2,11 @@ import { renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { usePrependScrollAnchor } from '../usePrependScrollAnchor';
 
-const el = { scrollTop: 0, scrollHeight: 1000 } as HTMLElement;
+const makeEl = (scrollHeight: number) => ({ scrollTop: 0, scrollHeight }) as HTMLElement;
 
 describe('usePrependScrollAnchor', () => {
   it('compensates scrollTop by the height delta when rows are prepended', () => {
-    el.scrollTop = 0;
-    el.scrollHeight = 1000;
+    const el = makeEl(1000);
     const scrollRef = { current: el };
 
     const { rerender } = renderHook(
@@ -23,8 +22,7 @@ describe('usePrependScrollAnchor', () => {
   });
 
   it('does not touch scrollTop on a full replacement', () => {
-    el.scrollTop = 0;
-    el.scrollHeight = 1000;
+    const el = makeEl(1000);
     const scrollRef = { current: el };
 
     const { rerender } = renderHook(
