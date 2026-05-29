@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { ParameterPath } from '../ParameterPath';
 
@@ -105,6 +105,135 @@ describe('ParameterPath truncation rendering', () => {
     expect(within(v).getByText('alpha')).toBeInTheDocument();
     expect(within(v).getByText('beta')).toBeInTheDocument();
     expect(within(v).getByText('gamma')).toBeInTheDocument();
+  });
+});
+
+describe('ParameterPath expandable', () => {
+  const longSegments = ['multipart', 'a', 'b', 'c', 'd', 'get'];
+
+  const mockTruncated = () =>
+    vi.mocked(useParameterPathTruncation).mockReturnValue({
+      isTruncated: true,
+      visibleSegmentIndices: [0, 5],
+    });
+
+  it('is not interactive when expandable is omitted, even while truncated', () => {
+    mockTruncated();
+    render(<ParameterPath method='POST' segments={longSegments} data-testid='pp' />);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    const v = visible('pp');
+    expect(within(v).getByLabelText('Collapsed segments')).toBeInTheDocument();
+    expect(within(v).queryByText('b')).not.toBeInTheDocument();
+  });
+
+  it('is not interactive when the path fits (not truncated)', () => {
+    vi.mocked(useParameterPathTruncation).mockReturnValue({
+      isTruncated: false,
+      visibleSegmentIndices: [0, 1, 2],
+    });
+    render(<ParameterPath segments={['alpha', 'beta', 'gamma']} expandable data-testid='pp' />);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+
+  it('expands to the full path on click and collapses again on a second click (uncontrolled)', () => {
+    mockTruncated();
+    render(<ParameterPath method='POST' segments={longSegments} expandable data-testid='pp' />);
+
+    const trigger = screen.getByRole('button');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(within(visible('pp')).queryByText('b')).not.toBeInTheDocument();
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    const expandedRow = visible('pp');
+    expect(within(expandedRow).getByText('b')).toBeInTheDocument();
+    expect(within(expandedRow).getByText('c')).toBeInTheDocument();
+    expect(within(expandedRow).queryByLabelText('Collapsed segments')).not.toBeInTheDocument();
+
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    const collapsedRow = visible('pp');
+    expect(within(collapsedRow).queryByText('b')).not.toBeInTheDocument();
+    expect(within(collapsedRow).getByLabelText('Collapsed segments')).toBeInTheDocument();
+  });
+
+  it('honours defaultExpanded for the initial uncontrolled state', () => {
+    mockTruncated();
+    render(
+      <ParameterPath
+        method='POST'
+        segments={longSegments}
+        expandable
+        defaultExpanded
+        data-testid='pp'
+      />,
+    );
+    const trigger = screen.getByRole('button');
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(within(visible('pp')).getByText('b')).toBeInTheDocument();
+  });
+
+  it.each(['Enter', ' '])('toggles via keyboard (%s)', key => {
+    mockTruncated();
+    render(<ParameterPath method='POST' segments={longSegments} expandable data-testid='pp' />);
+    const trigger = screen.getByRole('button');
+    fireEvent.keyDown(trigger, { key });
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(within(visible('pp')).getByText('d')).toBeInTheDocument();
+  });
+
+  it('does not toggle when the click ends a text selection', () => {
+    mockTruncated();
+    const getSelection = vi
+      .spyOn(window, 'getSelection')
+      .mockReturnValue({ toString: () => 'multipart' } as unknown as Selection);
+    render(<ParameterPath method='POST' segments={longSegments} expandable data-testid='pp' />);
+
+    const trigger = screen.getByRole('button');
+    fireEvent.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(within(visible('pp')).queryByText('b')).not.toBeInTheDocument();
+    getSelection.mockRestore();
+  });
+
+  describe('controlled', () => {
+    it('reflects the controlled expanded prop and does not self-manage state', () => {
+      mockTruncated();
+      const onExpandedChange = vi.fn();
+      const { rerender } = render(
+        <ParameterPath
+          method='POST'
+          segments={longSegments}
+          expandable
+          expanded={false}
+          onExpandedChange={onExpandedChange}
+          data-testid='pp'
+        />,
+      );
+
+      const trigger = screen.getByRole('button');
+      expect(trigger).toHaveAttribute('aria-expanded', 'false');
+
+      // Click reports the requested next state but does NOT expand on its own.
+      fireEvent.click(trigger);
+      expect(onExpandedChange).toHaveBeenCalledWith(true);
+      expect(screen.getByRole('button')).toHaveAttribute('aria-expanded', 'false');
+      expect(within(visible('pp')).queryByText('b')).not.toBeInTheDocument();
+
+      // Parent drives the state.
+      rerender(
+        <ParameterPath
+          method='POST'
+          segments={longSegments}
+          expandable
+          expanded
+          onExpandedChange={onExpandedChange}
+          data-testid='pp'
+        />,
+      );
+      expect(screen.getByRole('button')).toHaveAttribute('aria-expanded', 'true');
+      expect(within(visible('pp')).getByText('b')).toBeInTheDocument();
+    });
   });
 });
 

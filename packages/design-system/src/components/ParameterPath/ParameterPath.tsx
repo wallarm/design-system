@@ -1,5 +1,5 @@
-import type { ClipboardEvent, FC, ReactNode } from 'react';
-import { useCallback, useRef } from 'react';
+import type { ClipboardEvent, FC, KeyboardEvent, ReactNode } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { cn } from '../../utils/cn';
 import { TestIdProvider } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
@@ -19,11 +19,27 @@ export const ParameterPath: FC<ParameterPathProps> = ({
   segments,
   encoding,
   attack = false,
+  expandable = false,
+  expanded,
+  defaultExpanded = false,
+  onExpandedChange,
   copyFormat = formatAsFilter,
   className,
   'data-testid': testId,
   ...rest
 }) => {
+  const isControlled = expanded !== undefined;
+  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
+  const expandedState = isControlled ? expanded : internalExpanded;
+
+  const setExpanded = useCallback(
+    (next: boolean) => {
+      if (!isControlled) setInternalExpanded(next);
+      onExpandedChange?.(next);
+    },
+    [isControlled, onExpandedChange],
+  );
+
   const handleCopy = useCallback(
     (event: ClipboardEvent<HTMLDivElement>) => {
       const text = copyFormat({ method, segments, encoding });
@@ -46,7 +62,30 @@ export const ParameterPath: FC<ParameterPathProps> = ({
   });
 
   const lastIndex = segments.length - 1;
-  const indices = isTruncated && segments.length > 2 ? visibleSegmentIndices : null;
+  const collapsible = isTruncated && segments.length > 2;
+  // `expandable` gates the click affordance; `expandedState` is the open/closed
+  // state. A path that fits is never truncated, so expanding it is a no-op.
+  const isExpanded = expandedState && collapsible;
+  const interactive = expandable && collapsible;
+  const indices = collapsible && !isExpanded ? visibleSegmentIndices : null;
+
+  const toggleExpanded = useCallback(() => {
+    // A click that ends a text selection should copy, not toggle.
+    if (typeof window !== 'undefined' && (window.getSelection()?.toString().length ?? 0) > 0) {
+      return;
+    }
+    setExpanded(!isExpanded);
+  }, [isExpanded, setExpanded]);
+
+  const handleKeyDown = useCallback(
+    (event: KeyboardEvent<HTMLDivElement>) => {
+      if (event.key === 'Enter' || event.key === ' ') {
+        event.preventDefault();
+        setExpanded(!isExpanded);
+      }
+    },
+    [isExpanded, setExpanded],
+  );
 
   const renderRow = (forMeasurement: boolean): ReactNode => {
     const visibleIdx =
@@ -115,7 +154,12 @@ export const ParameterPath: FC<ParameterPathProps> = ({
     <div
       ref={containerRef}
       data-row='visible'
-      className='flex items-center gap-0 min-w-0 overflow-hidden'
+      className={cn(
+        'flex items-center gap-0 min-w-0',
+        // The row can't fit horizontally when expanded, so let it wrap to show
+        // every segment inline instead of clipping.
+        isExpanded ? 'flex-wrap' : 'overflow-hidden',
+      )}
     >
       {renderRow(false)}
     </div>
@@ -138,16 +182,26 @@ export const ParameterPath: FC<ParameterPathProps> = ({
   // freezing truncation. The inner TestIdProvider re-establishes our testId
   // because Tooltip's own provider would otherwise clobber it.
   return (
-    <Tooltip disabled={!isTruncated}>
+    <Tooltip disabled={!isTruncated || isExpanded}>
       <TooltipTrigger asChild>
         <div
           {...rest}
           data-testid={testId}
           data-slot='parameter-path'
           data-truncated={isTruncated || undefined}
+          data-expanded={isExpanded || undefined}
           ref={ref}
           onCopy={handleCopy}
-          className={cn('relative flex items-center min-w-0', className)}
+          role={interactive ? 'button' : undefined}
+          tabIndex={interactive ? 0 : undefined}
+          aria-expanded={interactive ? isExpanded : undefined}
+          onClick={interactive ? toggleExpanded : undefined}
+          onKeyDown={interactive ? handleKeyDown : undefined}
+          className={cn(
+            'relative flex items-center min-w-0',
+            interactive && 'cursor-pointer',
+            className,
+          )}
         >
           <TestIdProvider value={testId}>
             {visibleRow}

@@ -10,6 +10,7 @@ const parameterPathStory = createStoryHelper('data-display-parameterpath', [
   'Deep Nested Truncated',
   'No Method',
   'Gallery',
+  'Expandable Truncated',
 ] as const);
 
 test.describe('Component: ParameterPath', () => {
@@ -79,6 +80,31 @@ test.describe('Component: ParameterPath', () => {
       // Wait briefly to let any tooltip render if it were going to.
       await page.waitForTimeout(500);
       await expect(page.getByRole('tooltip')).toHaveCount(0);
+    });
+
+    test('Should expand a truncated path on click and collapse it again', async ({ page }) => {
+      await parameterPathStory.goto(page, 'Expandable Truncated');
+
+      const path = page.locator('[data-slot="parameter-path"]');
+      const ellipsis = page.locator('[data-slot="parameter-path-ellipsis"]');
+
+      // Collapsed: ellipsis shown, inner segments hidden.
+      await expect(ellipsis).toBeVisible();
+      await expect(page.getByText('json_doc', { exact: true })).toHaveCount(0);
+      await expect(path).toHaveAttribute('aria-expanded', 'false');
+
+      // Expand.
+      await path.click();
+      await expect(path).toHaveAttribute('aria-expanded', 'true');
+      await expect(ellipsis).toHaveCount(0);
+      await expect(page.getByText('json_doc', { exact: true })).toBeVisible();
+      await expect(page.getByText('qwerty_doc', { exact: true })).toBeVisible();
+
+      // Collapse again.
+      await path.click();
+      await expect(path).toHaveAttribute('aria-expanded', 'false');
+      await expect(ellipsis).toBeVisible();
+      await expect(page.getByText('json_doc', { exact: true })).toHaveCount(0);
     });
 
     test('Should copy filter-format text on Cmd+C', async ({ page, browserName }) => {
