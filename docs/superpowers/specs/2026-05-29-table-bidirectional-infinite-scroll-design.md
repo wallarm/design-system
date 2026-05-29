@@ -153,9 +153,10 @@ hooks/infiniteScroll/
   `TABLE_END_REACHED_THRESHOLD`) и вынести cooldown из хука в `SCROLL_EDGE_COOLDOWN_MS = 200`
   (сейчас локальная `COOLDOWN_MS` внутри `useEndReached`).
 - `lib/detectDataChange.ts`: чистый предикат `detectDataChange(prevFirstRowId, rows): 'prepend' |
-  'replace' | 'append' | 'none'`. Единый источник логики «prepend vs полная замена» — используется
+  'replace' | 'none'`. Единый источник логики «prepend vs полная замена» — используется
   и в `usePrependScrollAnchor` (4.2), и в `useResetVirtualizerOnDataChange` (4.4); убирает
-  дублирование детекта.
+  дублирование детекта. (`append` и «без изменений» сворачиваются в `'none'` — ни один потребитель
+  их не различает.)
 - `lib/getRowKey.ts`: helper `getRowKey(rows, index)` для `getItemKey` (4.3) — общий для обоих
   виртуалайзеров вместо инлайна в двух местах.
 
