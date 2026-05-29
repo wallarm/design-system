@@ -15,15 +15,14 @@ export const useResetVirtualizerOnDataChange = (
     | Virtualizer<Window, Element>
     | Virtualizer<HTMLElement, Element>,
 ) => {
-  const rows = table.getRowModel().rows;
-  const firstRowId = rows[0]?.id;
+  const firstRowId = table.getRowModel().rows[0]?.id;
   const prevFirstRowIdRef = useRef(firstRowId);
 
   useEffect(() => {
-    if (prevFirstRowIdRef.current !== firstRowId) {
-      const change = detectDataChange(prevFirstRowIdRef.current, rows);
-      prevFirstRowIdRef.current = firstRowId;
-      if (change === 'replace') virtualizer.measure();
-    }
-  }, [firstRowId, rows, virtualizer]);
+    if (prevFirstRowIdRef.current === firstRowId) return;
+    const rows = table.getRowModel().rows;
+    const change = detectDataChange(prevFirstRowIdRef.current, rows);
+    prevFirstRowIdRef.current = firstRowId;
+    if (change === 'replace') virtualizer.measure();
+  }, [firstRowId, table, virtualizer]);
 };
