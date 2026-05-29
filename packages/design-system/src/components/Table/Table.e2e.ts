@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const tableStory = createStoryHelper('data-display-table', [
@@ -6,6 +6,15 @@ const tableStory = createStoryHelper('data-display-table', [
   'Column Resizing With Overflow List',
   'Bidirectional Infinite Scroll',
 ] as const);
+
+// The Bidirectional story header renders "Window of {N} rows around the anchor".
+// Under `virtualized='container'` the rendered `[data-row-id]` count stays bounded
+// by the viewport, so it does NOT grow when a page is fetched — the loaded window
+// size is the reliable signal that prepend/append actually pulled more rows.
+const readWindowSize = async (page: Page): Promise<number> => {
+  const text = await page.getByText(/Window of \d+ rows/).textContent();
+  return Number(text?.match(/Window of (\d+) rows/)?.[1] ?? 0);
+};
 
 test.describe('Component: Table', () => {
   test.describe('Interactions', () => {
@@ -110,15 +119,20 @@ test.describe('Component: Table', () => {
       const boxBefore = await referenceRow.boundingBox();
       expect(boxBefore).not.toBeNull();
 
+      const initialWindowSize = await readWindowSize(page);
+      expect(initialWindowSize).toBeGreaterThan(0);
+
       // Scroll the container to the very top to trigger onStartReached
       await scrollContainer.evaluate((el: HTMLElement) => {
         el.scrollTop = 0;
       });
 
-      // Wait for new rows to be prepended (row count increases)
+      // Wait for older rows to be prepended. The rendered row count is bounded by
+      // the viewport under container virtualization, so assert the loaded window
+      // grew instead.
       await expect
-        .poll(() => scrollContainer.locator('[data-row-id]').count(), { timeout: 3000 })
-        .toBeGreaterThan(initialRowCount);
+        .poll(() => readWindowSize(page), { timeout: 3000 })
+        .toBeGreaterThan(initialWindowSize);
 
       // The reference row should still exist and its Y position must not have jumped
       const referenceRowAfter = scrollContainer.locator(`[data-row-id="${rowId}"]`);
@@ -145,15 +159,20 @@ test.describe('Component: Table', () => {
       const initialRowCount = await rows.count();
       expect(initialRowCount).toBeGreaterThan(0);
 
+      const initialWindowSize = await readWindowSize(page);
+      expect(initialWindowSize).toBeGreaterThan(0);
+
       // Scroll the container to the very bottom to trigger onEndReached
       await scrollContainer.evaluate((el: HTMLElement) => {
         el.scrollTop = el.scrollHeight;
       });
 
-      // Wait for new rows to be appended (row count increases)
+      // Wait for newer rows to be appended. The rendered row count is bounded by
+      // the viewport under container virtualization, so assert the loaded window
+      // grew instead.
       await expect
-        .poll(() => scrollContainer.locator('[data-row-id]').count(), { timeout: 3000 })
-        .toBeGreaterThan(initialRowCount);
+        .poll(() => readWindowSize(page), { timeout: 3000 })
+        .toBeGreaterThan(initialWindowSize);
     });
   });
 
