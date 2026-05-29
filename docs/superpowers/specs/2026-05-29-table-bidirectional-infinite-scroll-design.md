@@ -1,226 +1,225 @@
-# Двунаправленный бесконечный скролл в Table
+# Bidirectional Infinite Scroll in Table
 
-**Дата:** 2026-05-29
-**Статус:** Утверждён дизайн, готов к плану реализации
-**Компонент:** `packages/design-system/src/components/Table`
+**Date:** 2026-05-29
+**Status:** Design approved, ready for implementation plan
+**Component:** `packages/design-system/src/components/Table`
 
-## 1. Цель и принципы
+## 1. Goal and Principles
 
-Добавить подгрузку строк **вверх** (по новому параметру ручки `prev_cursor`) симметрично к
-существующей подгрузке **вниз** (`next_cursor`). Дополнительно — открывать таблицу вокруг
-произвольной anchor-строки и скроллить в обе стороны без «прыжков» вьюпорта.
+Add upward row loading (via a new `prev_cursor` endpoint parameter) symmetric to the existing
+downward loading (`next_cursor`). Additionally — open the table around an arbitrary anchor row and
+scroll in both directions without viewport "jumps".
 
-Данные и курсоры остаются на стороне приложения (consumer-managed, как сейчас). Table отвечает
-только за:
-- детект приближения к краю (верх/низ);
-- scroll anchoring при добавлении строк сверху (prepend);
-- начальное позиционирование на anchor-строке.
+Data and cursors remain on the application side (consumer-managed, as today). The Table is only
+responsible for:
+- detecting proximity to an edge (top/bottom);
+- scroll anchoring when rows are prepended;
+- positioning the initial anchor row.
 
-Сохранение/восстановление курсоров (URL/storage) — на стороне приложения.
+Saving/restoring cursors (URL/storage) is on the application side.
 
-## 2. Контекст и текущая реализация
+## 2. Context and Current Implementation
 
-- Стек: **TanStack Table 8.21.3** + **TanStack Virtual 3.13.18**. TanStack Query нет — fetching
-  целиком на потребителе.
-- Скролл вниз: хук `hooks/useEndReached.ts` слушает `scroll`, при `distanceToBottom <= threshold`
-  зовёт `onEndReached`. Потребитель сам добавляет строки в `data`.
-- Виртуалайзеры (`TableBody/TableBodyVirtualizedContainer.tsx`, `TableBodyVirtualizedWindow.tsx`)
-  **не задают `getItemKey`** → ключи по индексу.
-- `TableBody/useResetVirtualizerOnDataChange.ts` зовёт `virtualizer.measure()` при любой смене id
-  первой строки.
-- Imperative handle `TableHandle.scrollToRow(id, opts)` уже существует.
+- Stack: **TanStack Table 8.21.3** + **TanStack Virtual 3.13.18**. No TanStack Query — fetching is
+  entirely consumer-driven.
+- Downward scroll: the `hooks/useEndReached.ts` hook listens to `scroll` and calls `onEndReached`
+  when `distanceToBottom <= threshold`. The consumer appends rows to `data` itself.
+- The virtualizers (`TableBody/TableBodyVirtualizedContainer.tsx`,
+  `TableBodyVirtualizedWindow.tsx`) **do not set `getItemKey`** → keys are index-based.
+- `TableBody/useResetVirtualizerOnDataChange.ts` calls `virtualizer.measure()` on any change of the
+  first row id.
+- The imperative handle `TableHandle.scrollToRow(id, opts)` already exists.
 
-### Решение по библиотеке
+### Library decision
 
-Нативные опции TanStack Virtual `anchorTo: 'end'` / `followOnAppend` появились только в
-`@tanstack/virtual-core@3.16.0` (в нашем `@tanstack/react-virtual@3.13.18` их нет) и заточены под
-always-end-anchored ленты (чаты/логи). Наш кейс — двунаправленный скролл с произвольным якорем,
-поэтому выбран **ручной scroll anchoring на текущей версии** без апгрейда зависимостей.
-`@ark-ui/react` в Table не используется и к скроллу отношения не имеет.
+The native TanStack Virtual options `anchorTo: 'end'` / `followOnAppend` only appeared in
+`@tanstack/virtual-core@3.16.0` (our `@tanstack/react-virtual@3.13.18` doesn't have them) and are
+built for always-end-anchored feeds (chats/logs). Our case is bidirectional scroll with an arbitrary
+anchor, so we chose **manual scroll anchoring on the current version** with no dependency upgrade.
+`@ark-ui/react` is not used in Table and is unrelated to scrolling.
 
-## 3. Публичный API (добавления в `TableProps<T>`)
+## 3. Public API (additions to `TableProps<T>`)
 
 ```ts
 // --- Infinite scroll (bidirectional) ---
-/** Вызывается при скролле к началу (верху) таблицы */
+/** Called when the user scrolls near the start (top) of the table */
 onStartReached?: () => void
-/** Дистанция от верха (px) для срабатывания onStartReached (default: 200) */
+/** Distance from the top (px) to trigger onStartReached (default: 200) */
 onStartReachedThreshold?: number
 
-// существующие — без изменений:
+// existing — unchanged:
 onEndReached?: () => void
 onEndReachedThreshold?: number
 
 /**
- * Row id для начального позиционирования. Если задан — таблица скроллит к этой строке
- * на маунте и армит детекторы краёв только ПОСЛЕ того, как начальный скролл устоялся.
- * Для deep-link в середину датасета с двунаправленной подгрузкой.
+ * Row id to anchor the initial scroll position to. When set, the table scrolls this row into view
+ * on mount and arms the edge detectors only AFTER that initial scroll has settled. For deep-linking
+ * into the middle of a dataset with bidirectional loading.
  */
 initialScrollToRowId?: string
 ```
 
-Поведение `onEndReached` / `onEndReachedThreshold` / `scrollToRow(id)` не меняется.
-Тип `TableContextValue<T>` расширяется зеркально (`onStartReached`, `onStartReachedThreshold`,
-`initialScrollToRowId`), `TableProvider` прокидывает их в контекст.
+The behavior of `onEndReached` / `onEndReachedThreshold` / `scrollToRow(id)` does not change.
+`TableContextValue<T>` is extended symmetrically (`onStartReached`, `onStartReachedThreshold`,
+`initialScrollToRowId`), and `TableProvider` threads them into the context.
 
-## 4. Внутренняя архитектура
+## 4. Internal Architecture
 
-### 4.1. Детект края — рефактор `useEndReached` → `useScrollEdge`
+### 4.1. Edge detection — refactor `useEndReached` → `useScrollEdge`
 
-Обобщить `useEndReached.ts` до `useScrollEdge({ edge: 'start' | 'end', mode, scrollRef, onReached, threshold })`:
-- `edge: 'end'` — как сейчас: `distanceToBottom <= threshold`.
-- `edge: 'start'` — `scrollTop <= threshold`; ре-арм при `scrollTop > threshold`.
-- Тот же cooldown-гард (`SCROLL_EDGE_COOLDOWN_MS`, см. 4.6) и latest-callback ref.
+Generalize `useEndReached.ts` into `useScrollEdge({ edge: 'start' | 'end', mode, scrollRef, onReached, threshold })`:
+- `edge: 'end'` — as today: `distanceToBottom <= threshold`.
+- `edge: 'start'` — `scrollTop <= threshold`; re-arm at `scrollTop > threshold`.
+- Same cooldown guard (`SCROLL_EDGE_COOLDOWN_MS`, see 4.6) and latest-callback ref.
 
-Внутри слайса вызывается дважды (для `start` и `end`); наружу обёрнут оркестратором
-`useInfiniteScroll` (см. 4.6), который и потребляют `TableInnerContainer` / `TableInnerWindow`.
+Within the slice it is called twice (for `start` and `end`); externally it is wrapped by the
+`useInfiniteScroll` orchestrator (see 4.6), which `TableInnerContainer` / `TableInnerWindow` consume.
 
-### 4.2. Scroll anchoring при prepend — новый хук `usePrependScrollAnchor`
+### 4.2. Scroll anchoring on prepend — new hook `usePrependScrollAnchor`
 
-В `useLayoutEffect` (до отрисовки, без мерцания):
-- держим `prevFirstRowId` и `prevScrollHeight` в ref-ах, обновляемых в конце каждого layout-эффекта;
-- если id первой строки сменился **и** прежняя первая строка всё ещё присутствует в новом наборе →
-  это prepend (а не полная замена);
-- считаем `delta = newScrollHeight − prevScrollHeight` и компенсируем:
+The main part. In a `useLayoutEffect` (before paint, no flicker):
+- keep `prevFirstRowId` and `prevScrollHeight` in refs, updated at the end of each layout effect;
+- if the first row id changed **and** the previous first row is still present in the new set → it's
+  a prepend (not a full replacement);
+- compute `delta = newScrollHeight − prevScrollHeight` and compensate:
   - container: `scrollEl.scrollTop += delta`;
   - window: `window.scrollBy(0, delta)`.
 
-Использует фактический `scrollHeight`, поэтому устойчив к ошибкам оценки высоты строк.
+Uses the actual `scrollHeight`, so it is robust against row-height estimate errors.
 
-### 4.3. `getItemKey` в виртуалайзерах
+### 4.3. `getItemKey` on the virtualizers
 
-Добавить в `TableBodyVirtualizedContainer` и `TableBodyVirtualizedWindow`:
+Add to `TableBodyVirtualizedContainer` and `TableBodyVirtualizedWindow`:
 ```ts
 getItemKey: useCallback(
   (index) => table.getRowModel().rows[index]?.id ?? index,
   [table],
 )
 ```
-Без этого кэш измерений привязан к индексу и мисметчится при prepend.
+Without this, the measurement cache is keyed by index and gets mismatched on prepend.
 
 ### 4.4. `useResetVirtualizerOnDataChange` — prepend-aware
 
-Различать:
-- прежняя первая строка **исчезла** из набора → новый датасет → `virtualizer.measure()` (как сейчас);
-- прежняя первая строка **сместилась вниз** (есть в наборе) → prepend → не сбрасываем измерения,
-  отдаём anchoring-хуку.
+Distinguish:
+- the previous first row **disappeared** from the set → new dataset → `virtualizer.measure()` (as today);
+- the previous first row **shifted down** (still present) → prepend → keep measurements, hand off to
+  the anchoring hook.
 
-### 4.5. Арминг при `initialScrollToRowId`
+### 4.5. Arming with `initialScrollToRowId`
 
-Когда проп задан:
-- подавить немедленный `check()` на маунте в `useScrollEdge`;
-- скроллить к строке через `virtualizer.scrollToIndex` (или `scrollToRow`);
-- `readyRef` флипается в `true` на следующем кадре; детекторы краёв срабатывают только после этого.
+When the prop is set:
+- suppress the immediate on-mount `check()` in `useScrollEdge`;
+- scroll to the row via `virtualizer.scrollToIndex` (or `scrollToRow`);
+- `readyRef` flips to `true` on the next frame; edge detectors fire only after that.
 
-Иначе на старте (`scrollTop = 0`) мгновенно стрельнёт `onStartReached`.
+Otherwise, at mount (`scrollTop = 0`) `onStartReached` would fire immediately.
 
-## 4.6. Организация файлов (FSD-проверка)
+## 4.6. File organization (FSD check)
 
-Явного FSD-конфига в репозитории нет, но Table уже следует послойной структуре с
-однонаправленными зависимостями и публичным API через `index.ts`-барреллы. Новая логика
-встраивается в эту же модель и сама проверяется по принципам FSD: высокая связность внутри
-слайса, низкая связанность между слайсами, импорты только «вниз».
+There is no explicit FSD config in the repo, but Table already follows a layered structure with
+one-directional dependencies and a public API via `index.ts` barrels. The new logic fits the same
+model and is itself checked against FSD principles: high cohesion within a slice, low coupling
+between slices, imports only "downward".
 
-### Слои и направление зависимостей (сверху вниз, импорты только вниз)
+### Layers and dependency direction (top to bottom, imports only downward)
 ```
-Table.tsx / TableProvider      (корень — собирает всё)
-  └─ TableInner/* , TableBody/* (потребляют хуки и lib)
-       └─ hooks/infiniteScroll/* (логика фичи; зависит только от lib + react + virtual-core types)
-            └─ lib/*             (чистые helpers и константы; без импортов из компонентов/хуков)
+Table.tsx / TableProvider      (root — assembles everything)
+  └─ TableInner/* , TableBody/* (consume hooks and lib)
+       └─ hooks/infiniteScroll/* (feature logic; depends only on lib + react + virtual-core types)
+            └─ lib/*             (pure helpers and constants; no imports from components/hooks)
                  └─ primitives/* (TBody/Td/Tr/...)
 ```
-Запрет: `hooks/` и `lib/` не импортируют из `TableInner`/`TableBody`/корня — нужные элементы и
-значения передаются аргументами (refs, callbacks). Внутренние файлы слайса наружу Table не
-реэкспортируются — публичная поверхность только пропсы в корневом `index.ts`.
+Forbidden: `hooks/` and `lib/` do not import from `TableInner`/`TableBody`/root — the elements and
+values they need are passed as arguments (refs, callbacks). The slice's internal files are not
+re-exported outside Table — the public surface is only the props in the root `index.ts`.
 
-### Группировка в папку: `hooks/infiniteScroll/`
-Вся логика фичи когезивна → объединяется в один слайс-папку с единственным публичным экспортом:
+### Folder grouping: `hooks/infiniteScroll/`
+All feature logic is cohesive → grouped into one slice folder with a single public export:
 ```
 hooks/infiniteScroll/
-  useInfiniteScroll.ts        # оркестратор: композит start/end + anchor + initial-anchor
-  useScrollEdge.ts            # детект края (рефактор useEndReached, edge: 'start' | 'end')
-  usePrependScrollAnchor.ts   # дельта-компенсация scrollTop при prepend
-  useInitialAnchor.ts         # initialScrollToRowId: scrollToIndex + арминг (readyRef)
-  types.ts                    # локальные типы слайса
-  index.ts                    # реэкспорт только useInfiniteScroll
+  useInfiniteScroll.ts        # orchestrator: composite start/end + anchor + initial-anchor
+  useScrollEdge.ts            # edge detection (refactor of useEndReached, edge: 'start' | 'end')
+  usePrependScrollAnchor.ts   # scrollTop delta compensation on prepend
+  useInitialAnchor.ts         # initialScrollToRowId: scrollToIndex + arming (readyRef)
+  types.ts                    # slice-local types
+  index.ts                    # re-exports only useInfiniteScroll
 ```
-`TableInnerContainer` и `TableInnerWindow` вместо двух прямых вызовов `useEndReached` зовут один
-`useInfiniteScroll({ mode, scrollRef, ... })` — это убирает дублирование и прячет внутренние хуки.
-`hooks/index.ts` экспортирует `useInfiniteScroll` (вместо `useEndReached`).
+Instead of two direct `useEndReached` calls, `TableInnerContainer` and `TableInnerWindow` call a
+single `useInfiniteScroll({ mode, scrollRef, ... })` — this removes duplication and hides the
+internal hooks. `hooks/index.ts` exports `useInfiniteScroll` (instead of `useEndReached`).
 
-### Вынос в `lib/` (чистые, переиспользуемые единицы)
-- `lib/constants.ts`: добавить `TABLE_START_REACHED_THRESHOLD = 200` (зеркало
-  `TABLE_END_REACHED_THRESHOLD`) и вынести cooldown из хука в `SCROLL_EDGE_COOLDOWN_MS = 200`
-  (сейчас локальная `COOLDOWN_MS` внутри `useEndReached`).
-- `lib/detectDataChange.ts`: чистый предикат `detectDataChange(prevFirstRowId, rows): 'prepend' |
-  'replace' | 'none'`. Единый источник логики «prepend vs полная замена» — используется
-  и в `usePrependScrollAnchor` (4.2), и в `useResetVirtualizerOnDataChange` (4.4); убирает
-  дублирование детекта. (`append` и «без изменений» сворачиваются в `'none'` — ни один потребитель
-  их не различает.)
-- `lib/getRowKey.ts`: helper `getRowKey(rows, index)` для `getItemKey` (4.3) — общий для обоих
-  виртуалайзеров вместо инлайна в двух местах.
+### Extraction into `lib/` (pure, reusable units)
+- `lib/constants.ts`: add `TABLE_START_REACHED_THRESHOLD = 200` (mirror of
+  `TABLE_END_REACHED_THRESHOLD`) and extract the cooldown out of the hook into
+  `SCROLL_EDGE_COOLDOWN_MS = 200` (currently a local `COOLDOWN_MS` inside `useEndReached`).
+- `lib/detectDataChange.ts`: pure predicate `detectDataChange(prevFirstRowId, rows): 'prepend' |
+  'replace' | 'none'`. Single source for the "prepend vs full replacement" logic — used by both
+  `usePrependScrollAnchor` (4.2) and `useResetVirtualizerOnDataChange` (4.4); removes detection
+  duplication. (`append` and "no change" collapse into `'none'` — no consumer distinguishes them.)
+- `lib/getRowKey.ts`: helper `getRowKey(rows, index)` for `getItemKey` (4.3) — shared by both
+  virtualizers instead of inlining in two places.
 
-Всё новое экспортируется через соответствующие `index.ts` (`lib/index.ts`, `hooks/index.ts`,
+Everything new is exported via the corresponding `index.ts` files (`lib/index.ts`, `hooks/index.ts`,
 `hooks/infiniteScroll/index.ts`).
 
-### Компоненты
-Новые компоненты не требуются: индикатор загрузки сверху — на стороне потребителя (раздел 8.2),
-скелетоны переиспользуют существующий `TableLoadingState`. Если в будущем понадобится top-loader —
-он добавляется отдельным компонентом в папку Table, а не инлайном.
+### Components
+No new components are needed: the top loading indicator is on the consumer side (section 8.2),
+skeletons reuse the existing `TableLoadingState`. If a top-loader is needed in the future, it should
+be added as a separate component in the Table folder, not inlined.
 
-### Комментарии
-Минимальные и лаконичные: короткий однострочный JSDoc на каждый новый хук/helper (как в текущих
-`useEndReached`, `constants.ts`), без построчных комментариев и без описания очевидного. Объяснять
-только неочевидное (напр. почему `useLayoutEffect`, почему latest-callback ref).
+### Comments
+Minimal and concise: a short one-line JSDoc on each new hook/helper (like the current
+`useEndReached`, `constants.ts`), no per-line comments and no describing the obvious. Explain only
+the non-obvious (e.g. why `useLayoutEffect`, why the latest-callback ref).
 
-## 5. Потоки данных
+## 5. Data Flow
 
-### Top-down (без изменений)
-Первая страница → скролл вниз → `onEndReached` → потребитель аппендит по `next_cursor`.
+### Top-down (unchanged)
+First page → scroll down → `onEndReached` → consumer appends via `next_cursor`.
 
-### Deep-link двунаправленный
-1. Потребитель грузит окно вокруг anchor (используя `prev_cursor` и `next_cursor` относительно якоря).
-2. Передаёт `data` + `initialScrollToRowId={anchorId}`.
-3. Таблица скроллит к якорю, армит детекторы.
-4. Скролл вверх → `onStartReached` → потребитель prepend'ит старую страницу (`prev_cursor`) →
-   anchor-хук компенсирует `scrollTop`, прыжка нет.
-5. Скролл вниз → `onEndReached` → append (`next_cursor`).
+### Deep-link bidirectional
+1. Consumer loads a window around the anchor (using `prev_cursor` and `next_cursor` relative to the anchor).
+2. Passes `data` + `initialScrollToRowId={anchorId}`.
+3. The table scrolls to the anchor and arms the detectors.
+4. Scroll up → `onStartReached` → consumer prepends the older page (`prev_cursor`) → the anchor hook
+   compensates `scrollTop`, no jump.
+5. Scroll down → `onEndReached` → append (`next_cursor`).
 
-## 6. Краевые случаи
+## 6. Edge Cases
 
-- Датасет меньше вьюпорта (оба края сразу): cooldown + ре-арм + потребительские гарды `hasPrev`/`hasNext`
-  предотвращают зацикливание вызовов.
-- Смена сортировки/фильтра = полная замена набора → reset-путь (см. 4.4), скролл к верху, детекторы
-  переармятся.
-- Non-virtualized режим: anchor-хук работает на scroll-контейнере; `getItemKey` неприменим.
-- Window-режим: компенсация через позицию окна с учётом контента над таблицей; основной
-  протестированный путь — `container`.
+- Dataset smaller than the viewport (both edges at once): cooldown + re-arm + consumer guards
+  `hasPrev`/`hasNext` prevent a call loop.
+- Sorting/filter change = full dataset replacement → reset path (see 4.4), scroll to top, detectors
+  re-arm.
+- Non-virtualized mode: the anchor hook works on the scroll container; `getItemKey` is not applicable.
+- Window mode: compensation via window position, accounting for content above the table; the main
+  tested path is `container`.
 
-## 7. Тестирование
+## 7. Testing
 
 - **Unit (Vitest):**
-  - `lib/detectDataChange`: чистый предикат — основной носитель логики prepend/replace/append/none.
-  - `useScrollEdge`: fire/re-arm/cooldown для `start` и `end`.
-  - `usePrependScrollAnchor`: дельта-математика компенсации `scrollTop`.
-  - `useResetVirtualizerOnDataChange`: reset (replace) vs prepend через `detectDataChange`.
+  - `lib/detectDataChange`: pure predicate — the main carrier of the prepend/replace/append/none logic.
+  - `useScrollEdge`: fire/re-arm/cooldown for `start` and `end`.
+  - `usePrependScrollAnchor`: `scrollTop` compensation delta math.
+  - `useResetVirtualizerOnDataChange`: reset (replace) vs prepend via `detectDataChange`.
 - **E2E (Playwright)** — `Table.e2e.ts`:
-  - Новая стори `BidirectionalInfiniteScroll` + `useBidirectionalData` в `mocks.tsx` (отдаёт
-    prev/next-курсоры, `fetchPrevPage` / `fetchNextPage`, `initialAnchor`).
-  - Сценарии: скролл вверх грузит старые без прыжка (anchor-строка остаётся в вьюпорте), скролл вниз
-    грузит новые, комбинированно.
-  - Визуальные скриншоты.
+  - New story `BidirectionalInfiniteScroll` + `useBidirectionalData` in `mocks.tsx` (exposes
+    prev/next cursors, `fetchPrevPage` / `fetchNextPage`, `initialAnchor`).
+  - Scenarios: scrolling up loads older rows without a jump (the anchor row stays in the viewport),
+    scrolling down loads newer rows, combined.
+  - Visual screenshots.
 
-## 8. Принятые решения по открытым вопросам
+## 8. Decisions on Open Questions
 
-1. Рефактор `useEndReached` → параметризованный `useScrollEdge` (вместо хука-близнеца), чтобы логика
-   start/end не разъезжалась.
-2. Индикатор загрузки сверху — на стороне потребителя (YAGNI); его высота попадает в `scrollHeight`
-   delta, так что anchoring остаётся корректным.
-3. `initialScrollToRowId` добавляется как новый проп — чисто решает гонку арминга, не полагаясь на
-   тайминг imperative `scrollToRow`.
+1. Refactor `useEndReached` → parameterized `useScrollEdge` (instead of a twin hook), so the
+   start/end logic does not drift.
+2. Top loading indicator — on the consumer side (YAGNI); its height is included in the `scrollHeight`
+   delta, so anchoring stays correct.
+3. `initialScrollToRowId` is added as a new prop — it cleanly resolves the arming race, without
+   relying on the timing of the imperative `scrollToRow`.
 
-## 9. Вне скоупа
+## 9. Out of Scope
 
-- Сохранение/восстановление курсоров в URL/storage (на стороне приложения).
-- Апгрейд `@tanstack/react-virtual` / нативный `anchorTo`.
-- Горизонтальный бесконечный скролл.
+- Saving/restoring cursors in URL/storage (application side).
+- Upgrading `@tanstack/react-virtual` / native `anchorTo`.
+- Horizontal infinite scroll.
