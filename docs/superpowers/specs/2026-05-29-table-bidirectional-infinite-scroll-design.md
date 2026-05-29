@@ -70,9 +70,10 @@ initialScrollToRowId?: string
 Обобщить `useEndReached.ts` до `useScrollEdge({ edge: 'start' | 'end', mode, scrollRef, onReached, threshold })`:
 - `edge: 'end'` — как сейчас: `distanceToBottom <= threshold`.
 - `edge: 'start'` — `scrollTop <= threshold`; ре-арм при `scrollTop > threshold`.
-- Тот же cooldown-гард (`COOLDOWN_MS = 200`) и latest-callback ref.
+- Тот же cooldown-гард (`SCROLL_EDGE_COOLDOWN_MS`, см. 4.6) и latest-callback ref.
 
-`TableInnerContainer` / `TableInnerWindow` вызывают хук дважды — для `start` и `end`.
+Внутри слайса вызывается дважды (для `start` и `end`); наружу обёрнут оркестратором
+`useInfiniteScroll` (см. 4.6), который и потребляют `TableInnerContainer` / `TableInnerWindow`.
 
 ### 4.2. Scroll anchoring при prepend — новый хук `usePrependScrollAnchor`
 
@@ -113,6 +114,64 @@ getItemKey: useCallback(
 
 Иначе на старте (`scrollTop = 0`) мгновенно стрельнёт `onStartReached`.
 
+## 4.6. Организация файлов (FSD-проверка)
+
+Явного FSD-конфига в репозитории нет, но Table уже следует послойной структуре с
+однонаправленными зависимостями и публичным API через `index.ts`-барреллы. Новая логика
+встраивается в эту же модель и сама проверяется по принципам FSD: высокая связность внутри
+слайса, низкая связанность между слайсами, импорты только «вниз».
+
+### Слои и направление зависимостей (сверху вниз, импорты только вниз)
+```
+Table.tsx / TableProvider      (корень — собирает всё)
+  └─ TableInner/* , TableBody/* (потребляют хуки и lib)
+       └─ hooks/infiniteScroll/* (логика фичи; зависит только от lib + react + virtual-core types)
+            └─ lib/*             (чистые helpers и константы; без импортов из компонентов/хуков)
+                 └─ primitives/* (TBody/Td/Tr/...)
+```
+Запрет: `hooks/` и `lib/` не импортируют из `TableInner`/`TableBody`/корня — нужные элементы и
+значения передаются аргументами (refs, callbacks). Внутренние файлы слайса наружу Table не
+реэкспортируются — публичная поверхность только пропсы в корневом `index.ts`.
+
+### Группировка в папку: `hooks/infiniteScroll/`
+Вся логика фичи когезивна → объединяется в один слайс-папку с единственным публичным экспортом:
+```
+hooks/infiniteScroll/
+  useInfiniteScroll.ts        # оркестратор: композит start/end + anchor + initial-anchor
+  useScrollEdge.ts            # детект края (рефактор useEndReached, edge: 'start' | 'end')
+  usePrependScrollAnchor.ts   # дельта-компенсация scrollTop при prepend
+  useInitialAnchor.ts         # initialScrollToRowId: scrollToIndex + арминг (readyRef)
+  types.ts                    # локальные типы слайса
+  index.ts                    # реэкспорт только useInfiniteScroll
+```
+`TableInnerContainer` и `TableInnerWindow` вместо двух прямых вызовов `useEndReached` зовут один
+`useInfiniteScroll({ mode, scrollRef, ... })` — это убирает дублирование и прячет внутренние хуки.
+`hooks/index.ts` экспортирует `useInfiniteScroll` (вместо `useEndReached`).
+
+### Вынос в `lib/` (чистые, переиспользуемые единицы)
+- `lib/constants.ts`: добавить `TABLE_START_REACHED_THRESHOLD = 200` (зеркало
+  `TABLE_END_REACHED_THRESHOLD`) и вынести cooldown из хука в `SCROLL_EDGE_COOLDOWN_MS = 200`
+  (сейчас локальная `COOLDOWN_MS` внутри `useEndReached`).
+- `lib/detectDataChange.ts`: чистый предикат `detectDataChange(prevFirstRowId, rows): 'prepend' |
+  'replace' | 'append' | 'none'`. Единый источник логики «prepend vs полная замена» — используется
+  и в `usePrependScrollAnchor` (4.2), и в `useResetVirtualizerOnDataChange` (4.4); убирает
+  дублирование детекта.
+- `lib/getRowKey.ts`: helper `getRowKey(rows, index)` для `getItemKey` (4.3) — общий для обоих
+  виртуалайзеров вместо инлайна в двух местах.
+
+Всё новое экспортируется через соответствующие `index.ts` (`lib/index.ts`, `hooks/index.ts`,
+`hooks/infiniteScroll/index.ts`).
+
+### Компоненты
+Новые компоненты не требуются: индикатор загрузки сверху — на стороне потребителя (раздел 8.2),
+скелетоны переиспользуют существующий `TableLoadingState`. Если в будущем понадобится top-loader —
+он добавляется отдельным компонентом в папку Table, а не инлайном.
+
+### Комментарии
+Минимальные и лаконичные: короткий однострочный JSDoc на каждый новый хук/helper (как в текущих
+`useEndReached`, `constants.ts`), без построчных комментариев и без описания очевидного. Объяснять
+только неочевидное (напр. почему `useLayoutEffect`, почему latest-callback ref).
+
 ## 5. Потоки данных
 
 ### Top-down (без изменений)
@@ -139,9 +198,10 @@ getItemKey: useCallback(
 ## 7. Тестирование
 
 - **Unit (Vitest):**
+  - `lib/detectDataChange`: чистый предикат — основной носитель логики prepend/replace/append/none.
   - `useScrollEdge`: fire/re-arm/cooldown для `start` и `end`.
-  - `usePrependScrollAnchor`: дельта-математика, детект prepend vs полной замены.
-  - `useResetVirtualizerOnDataChange`: reset vs prepend.
+  - `usePrependScrollAnchor`: дельта-математика компенсации `scrollTop`.
+  - `useResetVirtualizerOnDataChange`: reset (replace) vs prepend через `detectDataChange`.
 - **E2E (Playwright)** — `Table.e2e.ts`:
   - Новая стори `BidirectionalInfiniteScroll` + `useBidirectionalData` в `mocks.tsx` (отдаёт
     prev/next-курсоры, `fetchPrevPage` / `fetchNextPage`, `initialAnchor`).
