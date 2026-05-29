@@ -819,6 +819,9 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
 
 const INFINITE_PAGE_SIZE = 50;
 const INFINITE_MAX_ITEMS = 500;
+const BIDIRECTIONAL_TOTAL = 500;
+const BIDIRECTIONAL_PAGE_SIZE = 50;
+const BIDIRECTIONAL_INITIAL_ANCHOR_INDEX = 250;
 
 export const useInfiniteData = () => {
   const allData = useMemo(() => createLargeSecurityEvents(INFINITE_MAX_ITEMS), []);
@@ -838,4 +841,49 @@ export const useInfiniteData = () => {
   }, [isFetching, hasMore, allData]);
 
   return { data, isFetching, hasMore, totalItems: INFINITE_MAX_ITEMS, fetchNextPage };
+};
+
+/**
+ * Mock for bidirectional infinite scroll: opens a window around an anchor row
+ * and exposes cursor-style fetchers for both directions.
+ */
+export const useBidirectionalData = () => {
+  const allData = useMemo(() => createLargeSecurityEvents(BIDIRECTIONAL_TOTAL), []);
+
+  const initialStart = Math.max(0, BIDIRECTIONAL_INITIAL_ANCHOR_INDEX - BIDIRECTIONAL_PAGE_SIZE);
+  const initialEnd = Math.min(
+    allData.length,
+    BIDIRECTIONAL_INITIAL_ANCHOR_INDEX + BIDIRECTIONAL_PAGE_SIZE,
+  );
+
+  const [range, setRange] = useState({ start: initialStart, end: initialEnd });
+  const [isFetching, setIsFetching] = useState(false);
+
+  const data = useMemo(() => allData.slice(range.start, range.end), [allData, range]);
+  const anchorId = allData[BIDIRECTIONAL_INITIAL_ANCHOR_INDEX]?.id;
+  const hasPrev = range.start > 0;
+  const hasNext = range.end < allData.length;
+
+  const fetchPrevPage = useCallback(() => {
+    if (isFetching || range.start <= 0) return;
+    setIsFetching(true);
+    setTimeout(() => {
+      setRange(prev => ({ ...prev, start: Math.max(0, prev.start - BIDIRECTIONAL_PAGE_SIZE) }));
+      setIsFetching(false);
+    }, 400);
+  }, [isFetching, range.start]);
+
+  const fetchNextPage = useCallback(() => {
+    if (isFetching || range.end >= allData.length) return;
+    setIsFetching(true);
+    setTimeout(() => {
+      setRange(prev => ({
+        ...prev,
+        end: Math.min(allData.length, prev.end + BIDIRECTIONAL_PAGE_SIZE),
+      }));
+      setIsFetching(false);
+    }, 400);
+  }, [isFetching, range.end, allData.length]);
+
+  return { data, anchorId, isFetching, hasPrev, hasNext, fetchPrevPage, fetchNextPage };
 };
