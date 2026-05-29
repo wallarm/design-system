@@ -163,9 +163,9 @@ test.describe('Component: Table', () => {
 
       const scrollContainer = page.locator('[data-table-scroll-container]');
       await expect(scrollContainer).toBeVisible();
-
-      // Wait for the initial loading to finish (status line no longer shows "— loading...")
-      await expect(page.getByText('— loading...')).toBeHidden({ timeout: 3000 });
+      await expect(scrollContainer.locator('[data-row-id]').first()).toBeVisible();
+      // Initial anchor scroll centers a mid-window row → viewport is no longer at the top.
+      await expect.poll(() => scrollContainer.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
 
       await expect(page).toHaveScreenshot();
     });

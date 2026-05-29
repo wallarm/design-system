@@ -25,7 +25,9 @@ export const useInitialAnchor = ({
 
     const virtualizer = virtualizerRef.current;
     if (!virtualizer) {
-      // Non-virtualized — nothing to gate; arm immediately.
+      // Non-virtualized — no virtualizer to scroll; arm immediately. Consumers
+      // needing an initial scroll in this mode should use the imperative
+      // scrollToRow handle.
       doneRef.current = true;
       setReady(true);
       return;
