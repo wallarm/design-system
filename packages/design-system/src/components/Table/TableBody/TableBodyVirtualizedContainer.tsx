@@ -1,6 +1,6 @@
 import { type FC, useCallback, useEffect } from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
-import { TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
+import { getRowKey, TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
 import { TableBodyVirtualizedCore } from './TableBodyVirtualizedCore';
 import { useResetVirtualizerOnDataChange } from './useResetVirtualizerOnDataChange';
@@ -19,6 +19,7 @@ export const TableBodyVirtualizedContainer: FC = () => {
     getScrollElement,
     estimateSize: estimateRowHeight ?? (() => 40),
     overscan: overscan ?? TABLE_VIRTUALIZATION_OVERSCAN,
+    getItemKey: useCallback((index: number) => getRowKey(table.getRowModel().rows, index), [table]),
   });
 
   // Publish to the table-level handle. Render-time assignment is safe — refs

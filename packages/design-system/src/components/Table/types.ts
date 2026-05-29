@@ -239,11 +239,21 @@ export interface TableProps<T> extends TestableProps {
   estimateRowHeight?: (index: number) => number;
   overscan?: number;
 
-  // --- Infinite scroll ---
-  /** Callback fired when the user scrolls near the end of the table */
+  // --- Infinite scroll (bidirectional) ---
+  /** Callback fired when the user scrolls near the end (bottom) of the table */
   onEndReached?: () => void;
   /** Distance from the bottom (in px) to trigger onEndReached (default: 200) */
   onEndReachedThreshold?: number;
+  /** Callback fired when the user scrolls near the start (top) of the table */
+  onStartReached?: () => void;
+  /** Distance from the top (in px) to trigger onStartReached (default: 200) */
+  onStartReachedThreshold?: number;
+  /**
+   * Row id to anchor the initial scroll position to. The table scrolls this row
+   * into view on mount and arms the edge detectors only after that initial
+   * scroll settles. Use for deep-linking into the middle of a dataset.
+   */
+  initialScrollToRowId?: string;
 
   // --- Master cell click ---
   /** Callback fired when the master cell is clicked. Receives the row ID. */

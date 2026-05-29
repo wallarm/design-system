@@ -72,9 +72,12 @@ export interface TableContextValue<T> {
   // the ref is current on first commit.
   virtualizerRef: RefObject<TableVirtualizerInstance | null>;
 
-  // Infinite scroll
+  // Infinite scroll (bidirectional)
   onEndReached?: () => void;
   onEndReachedThreshold?: number;
+  onStartReached?: () => void;
+  onStartReachedThreshold?: number;
+  initialScrollToRowId?: string;
 
   // Master cell click
   onMasterCellClick?: (rowId: string) => void;
