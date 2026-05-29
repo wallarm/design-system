@@ -80,6 +80,8 @@ export const useScrollEdge = ({
     const target = mode === 'window' ? window : scrollRef?.current;
     if (!target) return;
 
+    // `enabled` is read via ref, so flipping it does not re-run this effect —
+    // re-arming after the initial-anchor gate opens relies on the next scroll event.
     target.addEventListener('scroll', check, { passive: true });
     check();
 
