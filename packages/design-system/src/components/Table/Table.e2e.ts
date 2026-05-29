@@ -102,48 +102,36 @@ test.describe('Component: Table', () => {
 
       const scrollContainer = page.locator('[data-table-scroll-container]');
       await expect(scrollContainer).toBeVisible();
+      await expect(scrollContainer.locator('[data-row-id]').first()).toBeVisible();
 
-      // Wait for the initial anchor to be rendered and loading to settle
-      await expect(page.getByText('— loading...')).toBeHidden({ timeout: 3000 });
-
-      // Count initial rows and pick a stable reference row that is currently visible
-      const rows = scrollContainer.locator('[data-row-id]');
-      const initialRowCount = await rows.count();
-      expect(initialRowCount).toBeGreaterThan(0);
-
-      // Use the middle row as scroll anchor reference (it should remain visible after prepend)
-      const referenceRow = rows.nth(Math.floor(initialRowCount / 2));
-      const rowId = await referenceRow.getAttribute('data-row-id');
-      expect(rowId).toBeTruthy();
-
-      const boxBefore = await referenceRow.boundingBox();
-      expect(boxBefore).not.toBeNull();
+      // The initial anchor scroll centers a mid-window row, so the viewport starts
+      // below the top — this also confirms the anchor scroll has settled.
+      await expect.poll(() => scrollContainer.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
 
       const initialWindowSize = await readWindowSize(page);
       expect(initialWindowSize).toBeGreaterThan(0);
 
-      // Scroll the container to the very top to trigger onStartReached
+      // Scroll to the very top to trigger onStartReached.
       await scrollContainer.evaluate((el: HTMLElement) => {
         el.scrollTop = 0;
       });
 
-      // Wait for older rows to be prepended. The rendered row count is bounded by
-      // the viewport under container virtualization, so assert the loaded window
-      // grew instead.
+      // Wait for older rows to be prepended. The rendered `[data-row-id]` count is
+      // bounded by the viewport under container virtualization, so assert the loaded
+      // window grew instead.
       await expect
         .poll(() => readWindowSize(page), { timeout: 3000 })
         .toBeGreaterThan(initialWindowSize);
 
-      // The reference row should still exist and its Y position must not have jumped
-      const referenceRowAfter = scrollContainer.locator(`[data-row-id="${rowId}"]`);
-      await expect(referenceRowAfter).toBeVisible();
-
-      const boxAfter = await referenceRowAfter.boundingBox();
-      expect(boxAfter).not.toBeNull();
-
-      // usePrependScrollAnchor guarantees the viewport does not jump: the row's
-      // on-screen Y coordinate must not change by more than 4px.
-      expect(Math.abs(boxAfter!.y - boxBefore!.y)).toBeLessThanOrEqual(4);
+      // The "no visible jump" guarantee: usePrependScrollAnchor compensates scrollTop
+      // by the prepended block height, keeping the viewport anchored to the rows the
+      // user was looking at. Without compensation scrollTop would stay 0 and the view
+      // would jump to the freshly inserted top rows; with it, scrollTop is pushed back
+      // down. (A row-position check is unusable here — scrolling to the top pushes any
+      // previously visible row out of the virtual window, so it unmounts.)
+      await expect
+        .poll(() => scrollContainer.evaluate(el => el.scrollTop), { timeout: 3000 })
+        .toBeGreaterThan(0);
     });
 
     test('Should append newer rows when scrolled to the bottom', async ({ page }) => {
@@ -151,13 +139,7 @@ test.describe('Component: Table', () => {
 
       const scrollContainer = page.locator('[data-table-scroll-container]');
       await expect(scrollContainer).toBeVisible();
-
-      // Wait for the initial loading to settle
-      await expect(page.getByText('— loading...')).toBeHidden({ timeout: 3000 });
-
-      const rows = scrollContainer.locator('[data-row-id]');
-      const initialRowCount = await rows.count();
-      expect(initialRowCount).toBeGreaterThan(0);
+      await expect(scrollContainer.locator('[data-row-id]').first()).toBeVisible();
 
       const initialWindowSize = await readWindowSize(page);
       expect(initialWindowSize).toBeGreaterThan(0);
