@@ -3,6 +3,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const overflowStory = createStoryHelper('data-display-overflowlist', [
   'Resizable Container',
+  'Hidden Remeasure',
 ] as const);
 
 const setWrapperWidth = (page: Page, width: number) =>
@@ -48,6 +49,36 @@ test.describe('Component: OverflowList', () => {
       await setWrapperWidth(page, 760);
 
       await expect.poll(() => getVisibleItemTagCount(page)).toBeGreaterThan(narrow);
+    });
+
+    test('Should stay collapsed after being hidden (display:none) and shown again', async ({
+      page,
+    }) => {
+      await overflowStory.goto(page, 'Hidden Remeasure');
+
+      // Collapsed in the narrow container: fewer than all 9 tags, with a "+N".
+      await expect.poll(() => getVisibleItemTagCount(page)).toBeLessThan(9);
+      const collapsed = await getVisibleItemTagCount(page);
+      await expect(getOverflowIndicator(page)).toBeVisible();
+
+      const setDisplay = (value: string) =>
+        page.getByTestId('hide-wrapper').evaluate((el, v) => {
+          (el as HTMLElement).style.display = v;
+        }, value);
+
+      // Hide via the DOM — no React re-render of the list, mirroring the
+      // keep-alive tab switch (only a className flips).
+      await setDisplay('none');
+      // Force a re-render while hidden so the list re-measures at zero width —
+      // this is what poisoned the width cache before the fix.
+      await page.getByTestId('force-rerender').click();
+      // Show again via the DOM: only the ResizeObserver fires, not a React
+      // render. The list must reflow back to the collapsed split, not expand to
+      // every item and overflow the row.
+      await setDisplay('');
+
+      await expect.poll(() => getVisibleItemTagCount(page)).toBe(collapsed);
+      await expect(getOverflowIndicator(page)).toBeVisible();
     });
   });
 });

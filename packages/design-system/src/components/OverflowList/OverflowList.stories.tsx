@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Tag } from '../Tag';
@@ -112,6 +113,38 @@ export const MinVisibleItems: StoryFn = () => (
     />
   </div>
 );
+
+/**
+ * Reproduces the keep-alive `display:none` regression. Visibility is toggled via
+ * the DOM (not React state) so showing the list does NOT re-render it — exactly
+ * like the keep-alive tab switch, where only a `className` flips and the
+ * ResizeObserver, not a React render, drives the reflow. The "rerender" button
+ * forces a re-measure while hidden (at zero width). After hide → rerender →
+ * show, the list must stay collapsed, not expand to every item and overflow.
+ */
+export const HiddenRemeasure: StoryFn = () => {
+  const [, setTick] = useState(0);
+  return (
+    <div className='flex flex-col gap-12'>
+      <button type='button' data-testid='force-rerender' onClick={() => setTick(t => t + 1)}>
+        rerender
+      </button>
+      <div data-testid='hide-wrapper' className='w-200'>
+        <OverflowList
+          className='gap-4'
+          items={TAGS}
+          // Intentionally inline (not hoisted): the fresh identity each render
+          // defeats OverflowList's memo on the "rerender" click, so the layout
+          // effect re-runs while hidden and flags a pending re-measure — the
+          // exact condition the e2e exercises. Hoisting this would silently
+          // neuter the regression test.
+          itemRenderer={item => <Tag key={item}>{item}</Tag>}
+          overflowRenderer={renderOverflowPopover}
+        />
+      </div>
+    </div>
+  );
+};
 
 /**
  * Resizable container: drag the bottom-right corner of the box to see the list
