@@ -10,6 +10,7 @@ const parameterPathStory = createStoryHelper('data-display-parameterpath', [
   'Deep Nested Truncated',
   'No Method',
   'Gallery',
+  'Expandable Truncated',
 ] as const);
 
 test.describe('Component: ParameterPath', () => {
@@ -79,6 +80,34 @@ test.describe('Component: ParameterPath', () => {
       // Wait briefly to let any tooltip render if it were going to.
       await page.waitForTimeout(500);
       await expect(page.getByRole('tooltip')).toHaveCount(0);
+    });
+
+    test('Should render the full path inline without truncation in a wide container', async ({
+      page,
+    }) => {
+      // The 'Expandable Truncated' story uses a wide (720px) container in which
+      // the full path fits, so it never truncates. With no truncation the
+      // `expandable` affordance is inert: no ellipsis, not interactive, and a
+      // click does not toggle an expanded state.
+      await parameterPathStory.goto(page, 'Expandable Truncated');
+
+      const path = page.locator('[data-slot="parameter-path"]');
+      // Scope text queries to the visible row: the off-screen measurement row
+      // always renders every segment to measure widths, so a global text query
+      // would also match its hidden copy.
+      const visibleRow = path.locator('[data-row="visible"]');
+      const ellipsis = visibleRow.locator('[data-slot="parameter-path-ellipsis"]');
+
+      // Full path shown inline: no ellipsis, every segment visible.
+      await expect(ellipsis).toHaveCount(0);
+      await expect(visibleRow.getByText('json_doc', { exact: true })).toBeVisible();
+      await expect(visibleRow.getByText('qwerty_doc', { exact: true })).toBeVisible();
+
+      // Not interactive — no expand/collapse affordance when nothing is truncated.
+      await expect(path).not.toHaveAttribute('aria-expanded');
+      await path.click();
+      await expect(path).not.toHaveAttribute('aria-expanded');
+      await expect(ellipsis).toHaveCount(0);
     });
 
     test('Should copy filter-format text on Cmd+C', async ({ page, browserName }) => {

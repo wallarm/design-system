@@ -13,6 +13,8 @@ const meta = {
       options: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD', 'OPTIONS', undefined],
     },
     attack: { control: 'boolean' },
+    expandable: { control: 'boolean' },
+    defaultExpanded: { control: 'boolean' },
   },
 } satisfies Meta<typeof ParameterPath>;
 
@@ -50,6 +52,17 @@ export const DeepNestedTruncated: StoryFn<typeof meta> = () => (
 
 export const NoMethod: StoryFn<typeof meta> = () => (
   <ParameterPath segments={['cookie', 'session_id']} attack />
+);
+
+export const ExpandableTruncated: StoryFn<typeof meta> = () => (
+  <div style={{ width: 720, display: 'flex', justifyContent: 'center' }}>
+    <ParameterPath
+      method='POST'
+      segments={['multipart', 'json_abc', 'json_doc', 'qwerty_doc', 'hash', 'formData', 'get']}
+      attack
+      expandable
+    />
+  </div>
 );
 
 export const Playground: StoryFn<typeof meta> = args => <ParameterPath {...args} />;
