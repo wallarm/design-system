@@ -1,3 +1,7 @@
+## <small>0.50.2 (2026-06-01)</small>
+
+* fix: Shell component ([63857c2](https://github.com/wallarm/design-system/commit/63857c2))
+
 ## <small>0.50.1 (2026-05-28)</small>
 
 * fix: Shell component ([3848cad](https://github.com/wallarm/design-system/commit/3848cad))
