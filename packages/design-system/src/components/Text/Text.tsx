@@ -33,6 +33,9 @@ const textVariants = cva('font-sans-display break-words', {
       center: 'text-center',
       right: 'text-right',
     },
+    inline: {
+      true: 'inline',
+    },
     grow: {
       true: 'flex-1 w-full',
     },
@@ -49,6 +52,12 @@ const textVariants = cva('font-sans-display break-words', {
       snug: 'leading-snug',
       normal: 'leading-normal',
       relaxed: 'leading-relaxed',
+    },
+    textTransform: {
+      uppercase: 'uppercase',
+      lowercase: 'lowercase',
+      capitalize: 'capitalize',
+      none: 'normal-case',
     },
   },
 });
@@ -71,11 +80,13 @@ export const Text: FC<PropsWithChildren<TextProps>> = ({
   color = 'inherit',
   truncate = false,
   asChild = false,
+  inline,
   grow = false,
   align,
   decoration,
   lineHeight,
   lineClamp,
+  textTransform,
   ...props
 }) => {
   const Comp = asChild ? Slot : 'p';
@@ -85,7 +96,18 @@ export const Text: FC<PropsWithChildren<TextProps>> = ({
     <Comp
       {...props}
       className={cn(
-        textVariants({ size, weight, color, truncate, align, grow, decoration, lineHeight }),
+        textVariants({
+          size,
+          weight,
+          color,
+          inline,
+          truncate,
+          align,
+          grow,
+          decoration,
+          lineHeight,
+          textTransform,
+        }),
         lineClampClass,
       )}
     />
