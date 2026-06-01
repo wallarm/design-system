@@ -72,7 +72,9 @@ export function useOverflowItems<T>({
 
   // True when a measurement was requested but the subtree wasn't laid out yet
   // (a `display:none` ancestor makes every offsetWidth read 0). The ResizeObserver
-  // performs the deferred measurement once the element becomes visible.
+  // performs the deferred measurement once the element becomes visible — this hinges
+  // on display:none firing a resize on hide/show (it does; visibility:hidden keeps a
+  // real width so it never reaches this path, content-visibility is out of scope).
   const pendingMeasureRef = useRef(false);
 
   // Read the hidden measurement layer into the cache. DOM reads only. Returns
@@ -89,6 +91,13 @@ export function useOverflowItems<T>({
     cacheRef.current = { widths, gap, indicatorWidth };
     return true;
   }, [items, reserveSpace]);
+
+  // Latest-ref so the ResizeObserver can reach `measure` without depending on its
+  // identity: `measure` changes whenever `items` change, and listing it as an
+  // effect dependency would tear down and re-subscribe the observer on every items
+  // change — each re-subscribe firing a redundant initial callback.
+  const measureRef = useRef(measure);
+  measureRef.current = measure;
 
   // Measure once when items/renderers change. DOM reads only.
   // biome-ignore lint/correctness/useExhaustiveDependencies: renderItem/renderMeasurementItem/overflowRenderer are not called inside the effect but determine what the hidden measurement layer renders, so a change to them must invalidate the cached DOM widths and re-measure
@@ -131,7 +140,7 @@ export function useOverflowItems<T>({
         frame = 0;
         // First real layout after being measured while hidden: capture the widths
         // now (offsetWidth is non-zero again) before recomputing.
-        if (pendingMeasureRef.current && measure()) {
+        if (pendingMeasureRef.current && measureRef.current()) {
           pendingMeasureRef.current = false;
         }
         recompute();
@@ -143,7 +152,7 @@ export function useOverflowItems<T>({
       if (frame) cancelAnimationFrame(frame);
       observer.disconnect();
     };
-  }, [recompute, measure]);
+  }, [recompute]);
 
   const visibleItems = items.slice(0, visibleCount);
   const hiddenItems = items.slice(visibleCount);
