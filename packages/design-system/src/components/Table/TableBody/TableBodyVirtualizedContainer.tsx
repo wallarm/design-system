@@ -19,13 +19,15 @@ export const TableBodyVirtualizedContainer: FC = () => {
     getScrollElement,
     estimateSize: estimateRowHeight ?? (() => 40),
     overscan: overscan ?? TABLE_VIRTUALIZATION_OVERSCAN,
-    // Variable-height rows report a size delta on every (re)measure. The default
-    // reaction is scrollTo() to pin content — but that scroll emits scroll events
-    // that retrigger onEndReached, creating a runaway auto-load loop and blank gaps
-    // on scroll-up. Opting out leaves the scroll position put; rows above simply
-    // reflow, which is far less disruptive than the feedback loop.
-    shouldAdjustScrollPositionOnItemSizeChange: () => false,
   });
+
+  // Variable-height rows report a size delta on every (re)measure. The default
+  // reaction is scrollTo() to pin content — but that scroll emits scroll events
+  // that retrigger onEndReached, creating a runaway auto-load loop and blank gaps
+  // on scroll-up. Opting out leaves the scroll position put; rows above simply
+  // reflow, which is far less disruptive than the feedback loop. It's an instance
+  // field, not a constructor option, so it's set here rather than passed in.
+  virtualizer.shouldAdjustScrollPositionOnItemSizeChange = () => false;
 
   // Publish to the table-level handle. Render-time assignment is safe — refs
   // don't trigger re-renders and the value is idempotent across renders.
