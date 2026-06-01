@@ -1,3 +1,7 @@
+## 0.51.0 (2026-06-01)
+
+* feat(parameter-path): add expandable prop for click-to-expand truncat… (#142) ([5d31265](https://github.com/wallarm/design-system/commit/5d31265)), closes [#142](https://github.com/wallarm/design-system/issues/142)
+
 ## <small>0.50.2 (2026-06-01)</small>
 
 * fix: Shell component ([63857c2](https://github.com/wallarm/design-system/commit/63857c2))
