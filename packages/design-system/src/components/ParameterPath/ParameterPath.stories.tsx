@@ -55,7 +55,7 @@ export const NoMethod: StoryFn<typeof meta> = () => (
 );
 
 export const ExpandableTruncated: StoryFn<typeof meta> = () => (
-  <div style={{ width: 280 }}>
+  <div style={{ width: 720, display: 'flex', justifyContent: 'center' }}>
     <ParameterPath
       method='POST'
       segments={['multipart', 'json_abc', 'json_doc', 'qwerty_doc', 'hash', 'formData', 'get']}

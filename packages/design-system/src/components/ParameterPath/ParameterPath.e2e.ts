@@ -82,7 +82,13 @@ test.describe('Component: ParameterPath', () => {
       await expect(page.getByRole('tooltip')).toHaveCount(0);
     });
 
-    test('Should expand a truncated path on click and collapse it again', async ({ page }) => {
+    test('Should render the full path inline without truncation in a wide container', async ({
+      page,
+    }) => {
+      // The 'Expandable Truncated' story uses a wide (720px) container in which
+      // the full path fits, so it never truncates. With no truncation the
+      // `expandable` affordance is inert: no ellipsis, not interactive, and a
+      // click does not toggle an expanded state.
       await parameterPathStory.goto(page, 'Expandable Truncated');
 
       const path = page.locator('[data-slot="parameter-path"]');
@@ -92,23 +98,16 @@ test.describe('Component: ParameterPath', () => {
       const visibleRow = path.locator('[data-row="visible"]');
       const ellipsis = visibleRow.locator('[data-slot="parameter-path-ellipsis"]');
 
-      // Collapsed: ellipsis shown, inner segments hidden.
-      await expect(ellipsis).toBeVisible();
-      await expect(visibleRow.getByText('json_doc', { exact: true })).toHaveCount(0);
-      await expect(path).toHaveAttribute('aria-expanded', 'false');
-
-      // Expand.
-      await path.click();
-      await expect(path).toHaveAttribute('aria-expanded', 'true');
+      // Full path shown inline: no ellipsis, every segment visible.
       await expect(ellipsis).toHaveCount(0);
       await expect(visibleRow.getByText('json_doc', { exact: true })).toBeVisible();
       await expect(visibleRow.getByText('qwerty_doc', { exact: true })).toBeVisible();
 
-      // Collapse again.
+      // Not interactive — no expand/collapse affordance when nothing is truncated.
+      await expect(path).not.toHaveAttribute('aria-expanded');
       await path.click();
-      await expect(path).toHaveAttribute('aria-expanded', 'false');
-      await expect(ellipsis).toBeVisible();
-      await expect(visibleRow.getByText('json_doc', { exact: true })).toHaveCount(0);
+      await expect(path).not.toHaveAttribute('aria-expanded');
+      await expect(ellipsis).toHaveCount(0);
     });
 
     test('Should copy filter-format text on Cmd+C', async ({ page, browserName }) => {
