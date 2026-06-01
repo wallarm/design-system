@@ -1,15 +1,14 @@
-import type { ClipboardEvent, FC, KeyboardEvent, ReactNode } from 'react';
-import { useCallback, useRef, useState } from 'react';
+import type { ClipboardEvent, FC, KeyboardEvent } from 'react';
+import { useCallback, useRef } from 'react';
+import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
+import { hasTextSelection } from '../../utils/hasTextSelection';
 import { TestIdProvider } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { buildFullPathLabel } from './buildFullPathLabel';
+import { EXPAND_KEYS } from './constants';
 import { formatAsFilter } from './formatAsFilter';
-import { ParameterPathEllipsis } from './ParameterPathEllipsis';
-import { ParameterPathEncoding } from './ParameterPathEncoding';
-import { ParameterPathJoint } from './ParameterPathJoint';
-import { ParameterPathMethod } from './ParameterPathMethod';
-import { ParameterPathSegment } from './ParameterPathSegment';
+import { ParameterPathRow } from './ParameterPathRow';
 import type { ParameterPathProps } from './types';
 import { useParameterPathTruncation } from './useParameterPathTruncation';
 
@@ -28,16 +27,17 @@ export const ParameterPath: FC<ParameterPathProps> = ({
   'data-testid': testId,
   ...rest
 }) => {
-  const isControlled = expanded !== undefined;
-  const [internalExpanded, setInternalExpanded] = useState(defaultExpanded);
-  const expandedState = isControlled ? expanded : internalExpanded;
+  const [expandedState, setExpandedUncontrolled] = useControlled({
+    controlled: expanded,
+    default: defaultExpanded,
+  });
 
   const setExpanded = useCallback(
     (next: boolean) => {
-      if (!isControlled) setInternalExpanded(next);
+      setExpandedUncontrolled(next);
       onExpandedChange?.(next);
     },
-    [isControlled, onExpandedChange],
+    [setExpandedUncontrolled, onExpandedChange],
   );
 
   const handleCopy = useCallback(
@@ -61,120 +61,27 @@ export const ParameterPath: FC<ParameterPathProps> = ({
     hasEncoding: Boolean(encoding),
   });
 
-  const lastIndex = segments.length - 1;
   const collapsible = isTruncated && segments.length > 2;
   // `expandable` gates the click affordance; `expandedState` is the open/closed
   // state. A path that fits is never truncated, so expanding it is a no-op.
-  const isExpanded = expandedState && collapsible;
+  const isExpanded = Boolean(expandedState) && collapsible;
   const interactive = expandable && collapsible;
   const indices = collapsible && !isExpanded ? visibleSegmentIndices : null;
 
   const toggleExpanded = useCallback(() => {
     // A click that ends a text selection should copy, not toggle.
-    if (typeof window !== 'undefined' && (window.getSelection()?.toString().length ?? 0) > 0) {
-      return;
-    }
+    if (hasTextSelection()) return;
     setExpanded(!isExpanded);
   }, [isExpanded, setExpanded]);
 
   const handleKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
-      if (event.key === 'Enter' || event.key === ' ') {
+      if (EXPAND_KEYS.includes(event.key)) {
         event.preventDefault();
         setExpanded(!isExpanded);
       }
     },
     [isExpanded, setExpanded],
-  );
-
-  const renderRow = (forMeasurement: boolean): ReactNode => {
-    const visibleIdx =
-      forMeasurement || indices === null
-        ? Array.from({ length: segments.length }, (_, i) => i)
-        : indices;
-
-    const items: ReactNode[] = [];
-    const measure = (slot: string) => (forMeasurement ? slot : undefined);
-
-    if (method) {
-      items.push(
-        <ParameterPathMethod key='method' method={method} data-measure={measure('method')} />,
-      );
-    }
-
-    visibleIdx.forEach((segIndex, position) => {
-      const value = segments[segIndex];
-      if (value === undefined) return;
-      const isLast = segIndex === lastIndex;
-      const isFirstShown = position === 0;
-
-      const showJointBefore = !(isFirstShown && !method);
-      if (showJointBefore) {
-        items.push(
-          <ParameterPathJoint key={`j-${segIndex}-pre`} data-measure={measure('joint')} />,
-        );
-      }
-
-      const isCollapsedBoundary =
-        !forMeasurement && indices !== null && position === 0 && visibleIdx.length === 2;
-
-      items.push(
-        <ParameterPathSegment
-          key={`s-${segIndex}`}
-          index={segIndex}
-          variant={isLast ? 'highlighted' : 'default'}
-          withZap={isLast && attack}
-          data-measure={measure('segment')}
-        >
-          {value}
-        </ParameterPathSegment>,
-      );
-
-      if (isCollapsedBoundary) {
-        items.push(
-          <ParameterPathJoint key='ellipsis-joint-pre' />,
-          <ParameterPathEllipsis key='ellipsis' />,
-        );
-      }
-    });
-
-    if (encoding) {
-      items.push(
-        <ParameterPathJoint key='enc-joint' data-measure={measure('joint')} />,
-        <ParameterPathEncoding key='enc' data-measure={measure('encoding')}>
-          {encoding}
-        </ParameterPathEncoding>,
-      );
-    }
-
-    return items;
-  };
-
-  const visibleRow = (
-    <div
-      ref={containerRef}
-      data-row='visible'
-      className={cn(
-        'flex items-center gap-0 min-w-0',
-        // The row can't fit horizontally when expanded, so let it wrap to show
-        // every segment inline instead of clipping.
-        isExpanded ? 'flex-wrap' : 'overflow-hidden',
-      )}
-    >
-      {renderRow(false)}
-    </div>
-  );
-
-  // Suppress test-ids in the measurement row so queries match only the visible one.
-  const measurementRow = (
-    <div
-      ref={measurementRef}
-      data-row='measure'
-      aria-hidden='true'
-      className='flex items-center gap-0 absolute left-[-9999px] top-0 invisible pointer-events-none'
-    >
-      <TestIdProvider value={undefined}>{renderRow(true)}</TestIdProvider>
-    </div>
   );
 
   // Tooltip is mounted unconditionally and toggled via `disabled` — conditional
@@ -204,8 +111,25 @@ export const ParameterPath: FC<ParameterPathProps> = ({
           )}
         >
           <TestIdProvider value={testId}>
-            {visibleRow}
-            {measurementRow}
+            <ParameterPathRow
+              ref={containerRef}
+              forMeasurement={false}
+              isExpanded={isExpanded}
+              indices={indices}
+              method={method}
+              segments={segments}
+              encoding={encoding}
+              attack={attack}
+            />
+            <ParameterPathRow
+              ref={measurementRef}
+              forMeasurement
+              indices={null}
+              method={method}
+              segments={segments}
+              encoding={encoding}
+              attack={attack}
+            />
           </TestIdProvider>
         </div>
       </TooltipTrigger>

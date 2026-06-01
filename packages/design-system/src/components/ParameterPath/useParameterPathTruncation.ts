@@ -1,5 +1,7 @@
 import { type RefObject, useLayoutEffect, useState } from 'react';
+import { range } from '../../utils/range';
 import { useContainerWidth } from '../Table/lib/useContainerWidth';
+import { MEASURE } from './constants';
 
 interface ComputeArgs {
   containerWidth: number;
@@ -22,7 +24,7 @@ export const computeTruncation = ({
   jointsWidth,
 }: ComputeArgs): TruncationResult => {
   const segCount = segmentWidths.length;
-  const allIndices = Array.from({ length: segCount }, (_, i) => i);
+  const allIndices = range(segCount);
 
   if (segCount <= 2 || containerWidth <= 0) {
     return { isTruncated: false, visibleSegmentIndices: allIndices };
@@ -61,17 +63,21 @@ export const useParameterPathTruncation = ({
   const containerWidth = useContainerWidth(containerRef);
   const [result, setResult] = useState<TruncationResult>({
     isTruncated: false,
-    visibleSegmentIndices: Array.from({ length: segmentCount }, (_, i) => i),
+    visibleSegmentIndices: range(segmentCount),
   });
 
   useLayoutEffect(() => {
     const root = measurementRef.current;
     if (!root) return;
 
-    const methodEl = root.querySelector<HTMLElement>('[data-measure="method"]');
-    const encodingEl = root.querySelector<HTMLElement>('[data-measure="encoding"]');
-    const jointEls = Array.from(root.querySelectorAll<HTMLElement>('[data-measure="joint"]'));
-    const segmentEls = Array.from(root.querySelectorAll<HTMLElement>('[data-measure="segment"]'));
+    const methodEl = root.querySelector<HTMLElement>(`[data-measure="${MEASURE.method}"]`);
+    const encodingEl = root.querySelector<HTMLElement>(`[data-measure="${MEASURE.encoding}"]`);
+    const jointEls = Array.from(
+      root.querySelectorAll<HTMLElement>(`[data-measure="${MEASURE.joint}"]`),
+    );
+    const segmentEls = Array.from(
+      root.querySelectorAll<HTMLElement>(`[data-measure="${MEASURE.segment}"]`),
+    );
 
     const segmentWidths = segmentEls.map(el => el.getBoundingClientRect().width);
     const methodWidth = hasMethod && methodEl ? methodEl.getBoundingClientRect().width : 0;
