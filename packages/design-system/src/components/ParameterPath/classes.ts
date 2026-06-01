@@ -3,8 +3,7 @@ import { cva } from 'class-variance-authority';
 export const rowVariants = cva('flex items-center gap-0 min-w-0', {
   variants: {
     expanded: {
-      // The row can't fit horizontally when expanded, so let it wrap to show
-      // every segment inline instead of clipping.
+      // Expanded wraps (won't fit on one line); collapsed clips.
       true: 'flex-wrap',
       false: 'overflow-hidden',
     },

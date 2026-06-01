@@ -16,15 +16,12 @@ interface ParameterPathRowProps {
   segments: string[];
   encoding?: string;
   attack: boolean;
-  /**
-   * The offscreen measurement row renders every segment (tagged with
-   * `data-measure`) so the truncation hook can read widths; the visible row
-   * renders only the segments in `indices`.
-   */
+  // Measurement row renders+tags every segment for width measurement;
+  // visible row renders only `indices`.
   forMeasurement: boolean;
-  /** Visible segment indices when collapsed; `null` shows every segment. */
+  // Visible segment indices when collapsed; `null` shows every segment.
   indices: number[] | null;
-  /** Visible row only: an expanded path wraps instead of clipping. */
+  // Visible row only: an expanded path wraps instead of clipping.
   isExpanded?: boolean;
 }
 
@@ -96,8 +93,7 @@ export const ParameterPathRow: FC<ParameterPathRowProps> = ({
   }
 
   if (forMeasurement) {
-    // Suppress test-ids in the measurement row so queries match only the visible
-    // one. Positioned offscreen and hidden — it exists purely to measure widths.
+    // Offscreen width-measuring copy; test-ids suppressed so queries hit the visible row only.
     return (
       <div
         ref={ref}
