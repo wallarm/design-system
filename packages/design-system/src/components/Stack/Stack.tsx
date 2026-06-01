@@ -76,7 +76,7 @@ const stackVariants = cva('', {
   },
 });
 
-type StackNativeProps = Omit<HTMLAttributes<HTMLDivElement>, 'className'>;
+type StackNativeProps = HTMLAttributes<HTMLDivElement>;
 
 type StackVariantProps = VariantProps<typeof stackVariants>;
 
@@ -98,6 +98,7 @@ export const Stack: FC<StackProps> = ({
   flexGrow,
   flexShrink,
   asChild = false,
+  className,
   children,
   ...props
 }) => {
@@ -128,6 +129,7 @@ export const Stack: FC<StackProps> = ({
           flexGrow,
           flexShrink,
         }),
+        className,
       )}
     >
       {clones}
