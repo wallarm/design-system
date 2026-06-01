@@ -55,7 +55,7 @@ const buttonVariants = cva('', {
       color: 'neutral',
       variant: 'ghost',
       className:
-        'bg-transparent border-1 border-transparent hover:not-disabled:bg-states-primary-hover active:not-disabled:bg-states-primary-pressed focus-visible:border-border-primary data-[focus=true]:border-border-primary',
+        'bg-transparent border-1 border-transparent hover:not-disabled:bg-states-primary-hover active:not-disabled:bg-states-primary-pressed focus-visible:border-border-primary data-[focus=true]:border-border-primary data-[state=open]:bg-states-primary-hover data-[state=open]:ring-0 data-[state=open]:border-transparent',
     },
     {
       color: 'neutral',

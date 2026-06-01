@@ -16,7 +16,10 @@ export const NavRailBody: FC<NavRailBodyProps> = ({ ref, className, children, ..
       ref={ref}
       data-slot='nav-rail-body'
       data-testid={testId}
-      className={cn('flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto', className)}
+      className={cn(
+        'flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto overscroll-none [scrollbar-width:thin]',
+        className,
+      )}
     >
       {children}
     </div>

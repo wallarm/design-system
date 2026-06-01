@@ -43,7 +43,7 @@ export const AccountDropdown = ({
   onThemeChange: (theme: Theme) => void;
 }) => (
   <DropdownMenu positioning={{ placement: 'right-end', gutter: 6, offset: { crossAxis: 12 } }}>
-    <DropdownMenuTrigger asChild>
+    <DropdownMenuTrigger>
       <NavRailItem icon={User} label={USER_NAME} />
     </DropdownMenuTrigger>
     <DropdownMenuContent className='w-256'>

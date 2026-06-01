@@ -16,6 +16,7 @@ export const HeaderActions: FC<HeaderActionsProps> = ({ actions }) => (
             variant='ghost'
             size='small'
             color='neutral'
+            className='my-[-2px]'
             aria-label={label}
             onClick={onClick}
             disabled={disabled}

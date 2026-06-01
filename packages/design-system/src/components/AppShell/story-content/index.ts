@@ -11,3 +11,4 @@ export {
 } from './_storyNavConfigs';
 export { QuickHelpDropdown } from './_storyQuickHelpDropdown';
 export { RecentDropdown } from './_storyRecentDropdown';
+export { WallarmLogo } from './_storyWallarmLogo';

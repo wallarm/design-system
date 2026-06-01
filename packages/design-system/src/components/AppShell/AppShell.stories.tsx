@@ -4,7 +4,6 @@ import { Bell, ChevronUpDown, CircleDashed, Home, Settings } from '../../icons';
 import { Button } from '../Button';
 import { Code } from '../Code';
 import { Kbd } from '../Kbd';
-import { Logo } from '../Logo';
 import {
   NavRail,
   NavRailBody,
@@ -31,6 +30,7 @@ import {
   RecentDropdown,
   RemoteForProduct,
   type SidebarMode,
+  WallarmLogo,
 } from './story-content';
 
 const meta = {
@@ -74,7 +74,7 @@ export const Basic: StoryFn<AppShellProps> = () => {
       <AppShellHeader>
         <TopHeader>
           <TopHeaderLogo href='/'>
-            <Logo className='h-[15px]' />
+            <WallarmLogo />
           </TopHeaderLogo>
 
           <TopHeaderActions>
