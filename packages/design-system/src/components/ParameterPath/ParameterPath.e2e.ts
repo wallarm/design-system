@@ -86,25 +86,29 @@ test.describe('Component: ParameterPath', () => {
       await parameterPathStory.goto(page, 'Expandable Truncated');
 
       const path = page.locator('[data-slot="parameter-path"]');
-      const ellipsis = page.locator('[data-slot="parameter-path-ellipsis"]');
+      // Scope text queries to the visible row: the off-screen measurement row
+      // always renders every segment to measure widths, so a global text query
+      // would also match its hidden copy.
+      const visibleRow = path.locator('[data-row="visible"]');
+      const ellipsis = visibleRow.locator('[data-slot="parameter-path-ellipsis"]');
 
       // Collapsed: ellipsis shown, inner segments hidden.
       await expect(ellipsis).toBeVisible();
-      await expect(page.getByText('json_doc', { exact: true })).toHaveCount(0);
+      await expect(visibleRow.getByText('json_doc', { exact: true })).toHaveCount(0);
       await expect(path).toHaveAttribute('aria-expanded', 'false');
 
       // Expand.
       await path.click();
       await expect(path).toHaveAttribute('aria-expanded', 'true');
       await expect(ellipsis).toHaveCount(0);
-      await expect(page.getByText('json_doc', { exact: true })).toBeVisible();
-      await expect(page.getByText('qwerty_doc', { exact: true })).toBeVisible();
+      await expect(visibleRow.getByText('json_doc', { exact: true })).toBeVisible();
+      await expect(visibleRow.getByText('qwerty_doc', { exact: true })).toBeVisible();
 
       // Collapse again.
       await path.click();
       await expect(path).toHaveAttribute('aria-expanded', 'false');
       await expect(ellipsis).toBeVisible();
-      await expect(page.getByText('json_doc', { exact: true })).toHaveCount(0);
+      await expect(visibleRow.getByText('json_doc', { exact: true })).toHaveCount(0);
     });
 
     test('Should copy filter-format text on Cmd+C', async ({ page, browserName }) => {
