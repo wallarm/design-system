@@ -21,7 +21,7 @@ export const TopHeader: FC<TopHeaderProps> = ({
         ref={ref}
         data-slot='top-header'
         data-testid={testId}
-        className={cn('flex items-center justify-between pl-8 pr-12 py-6', className)}
+        className={cn('flex items-center justify-between pl-7 pr-12 py-6', className)}
       >
         {children}
       </div>

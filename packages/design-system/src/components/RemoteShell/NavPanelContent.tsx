@@ -21,7 +21,7 @@ export const NavPanelContent: FC<NavPanelContentProps> = ({ level: rawLevel }) =
     return (
       <>
         {hasHeaderActions ? (
-          <div className='sticky top-0 z-10 flex shrink-0 items-center justify-between p-4 bg-bg-surface-2'>
+          <div className='sticky top-0 z-10 flex shrink-0 items-center justify-between pt-2 pl-4 pb-4 bg-bg-surface-2'>
             <Text size='sm' weight='medium'>
               {config.productLabel}
             </Text>
