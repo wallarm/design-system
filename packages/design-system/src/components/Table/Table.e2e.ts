@@ -5,6 +5,7 @@ const tableStory = createStoryHelper('data-display-table', [
   'Manual Sorting',
   'Column Resizing With Overflow List',
   'Bidirectional Infinite Scroll',
+  'Bidirectional Infinite Scroll Window',
 ] as const);
 
 // The Bidirectional story header renders "Window of {N} rows around the anchor".
@@ -131,6 +132,36 @@ test.describe('Component: Table', () => {
       // previously visible row out of the virtual window, so it unmounts.)
       await expect
         .poll(() => scrollContainer.evaluate(el => el.scrollTop), { timeout: 3000 })
+        .toBeGreaterThan(0);
+    });
+
+    test('Should prepend older rows without a visible scroll jump in window mode', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Bidirectional Infinite Scroll Window');
+
+      await expect(page.locator('[data-row-id]').first()).toBeVisible();
+
+      // The initial anchor scroll centers a mid-window row, so the document
+      // starts scrolled below the top — confirms the anchor scroll has settled.
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+
+      const initialWindowSize = await readWindowSize(page);
+      expect(initialWindowSize).toBeGreaterThan(0);
+
+      // Scroll the document to the very top to trigger onStartReached.
+      await page.evaluate(() => window.scrollTo(0, 0));
+
+      await expect
+        .poll(() => readWindowSize(page), { timeout: 3000 })
+        .toBeGreaterThan(initialWindowSize);
+
+      // Window-mode compensation: the whole document scrollHeight is shared
+      // with content outside the table (the story header), which is exactly
+      // what skewed the old scrollHeight-diff delta. The offset-based delta
+      // must push scrollY back down by the prepended block height only.
+      await expect
+        .poll(() => page.evaluate(() => window.scrollY), { timeout: 3000 })
         .toBeGreaterThan(0);
     });
 
