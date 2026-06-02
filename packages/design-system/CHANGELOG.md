@@ -1,3 +1,7 @@
+## <small>0.51.2 (2026-06-02)</small>
+
+* fix: shell bg ([0ae896c](https://github.com/wallarm/design-system/commit/0ae896c))
+
 ## <small>0.51.1 (2026-06-01)</small>
 
 * fix: card styles ([21b6b34](https://github.com/wallarm/design-system/commit/21b6b34))
