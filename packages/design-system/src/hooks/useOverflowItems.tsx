@@ -58,7 +58,15 @@ export function useOverflowItems<T>({
   const containerRef = useRef<HTMLDivElement>(null);
   const [visibleCount, setVisibleCount] = useState(() => {
     const cached = items.length > 0 ? crossMountCache.get(items) : undefined;
-    return cached ? Math.min(cached.lastCount, items.length) : items.length;
+    if (cached) return Math.min(cached.lastCount, items.length);
+    // First-ever mount: the count is corrected pre-paint by the measurement
+    // below, so the initial value is never visible — it only determines how
+    // much DOM the first commit builds. Starting with everything visible made
+    // every cell render its full item list just to collapse it to a couple of
+    // items (thousands of wasted insert+remove pairs per scroll in a
+    // virtualized table). Start minimal and let the measurement grow it:
+    // appends are cheap, removals are not.
+    return Math.min(items.length, 1);
   });
 
   // Lets `recompute` update the cache entry of whatever items are current,
