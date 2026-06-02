@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import { calculateVisibleCount } from './useOverflowItems.helpers';
+import { scheduleOverflowMeasurement } from './useOverflowItems.scheduler';
 
 export interface UseOverflowItemsOptions<T> {
   items: T[];
@@ -46,9 +47,10 @@ export function useOverflowItems<T>({
     indicatorWidth: reserveSpace,
   });
 
-  // Pure recompute from the cache + current container width. No DOM writes —
-  // safe to run on every resize frame.
-  const recompute = useCallback(() => {
+  // Pure recompute from the cache + container width. No DOM writes — safe to
+  // run on every resize frame. Pass `availableWidth` when it was already read
+  // in a batched read phase to keep that phase free of interleaved reads.
+  const recompute = useCallback((availableWidth?: number) => {
     const container = containerRef.current;
     if (!container) return;
 
@@ -58,29 +60,40 @@ export function useOverflowItems<T>({
     const next = calculateVisibleCount({
       itemWidths: widths,
       gap,
-      availableWidth: container.offsetWidth,
+      availableWidth: availableWidth ?? container.offsetWidth,
       indicatorWidth,
     });
     setVisibleCount(prev => (prev === next ? prev : next));
   }, []);
 
-  // Measure once when items/renderers change. DOM reads only.
+  // Measure when items/renderers change. Reads are deferred into a shared
+  // pre-paint microtask batch: measuring synchronously here forces a reflow
+  // per hook instance, because each instance's setState flushes before the
+  // next instance's layout effect reads the DOM (see the scheduler module).
   // biome-ignore lint/correctness/useExhaustiveDependencies: renderItem/renderMeasurementItem/overflowRenderer are not called inside the effect but determine what the hidden measurement layer renders, so a change to them must invalidate the cached DOM widths and re-measure
   useLayoutEffect(() => {
-    const container = containerRef.current;
-
     if (items.length === 0) {
       cacheRef.current = { widths: [], gap: 0, indicatorWidth: reserveSpace };
       setVisibleCount(0);
       return;
     }
 
-    const gap = container ? Number.parseFloat(getComputedStyle(container).gap || '0') || 0 : 0;
-    const widths = measurementRefs.current.slice(0, items.length).map(ref => ref?.offsetWidth ?? 0);
-    const indicatorWidth = indicatorRef.current?.offsetWidth || reserveSpace;
+    return scheduleOverflowMeasurement(() => {
+      // Read phase: DOM reads only, no state updates.
+      const container = containerRef.current;
+      const gap = container ? Number.parseFloat(getComputedStyle(container).gap || '0') || 0 : 0;
+      const widths = measurementRefs.current
+        .slice(0, items.length)
+        .map(ref => ref?.offsetWidth ?? 0);
+      const indicatorWidth = indicatorRef.current?.offsetWidth || reserveSpace;
+      const availableWidth = container?.offsetWidth ?? 0;
 
-    cacheRef.current = { widths, gap, indicatorWidth };
-    recompute();
+      // Write phase: cache + state update, no DOM reads.
+      return () => {
+        cacheRef.current = { widths, gap, indicatorWidth };
+        recompute(availableWidth);
+      };
+    });
   }, [items, renderItem, renderMeasurementItem, overflowRenderer, reserveSpace, recompute]);
 
   // Observe container resize; defer heavy work into a single rAF, coalescing
