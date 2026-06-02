@@ -12,6 +12,7 @@ interface UseInfiniteScrollOptions<T> {
   scrollRef?: RefObject<HTMLElement | null>;
   table: Table<T>;
   virtualizerRef: RefObject<TableVirtualizerInstance | null>;
+  tbodyRef?: RefObject<HTMLTableSectionElement | null>;
   onStartReached?: () => void;
   onStartReachedThreshold?: number;
   onEndReached?: () => void;
@@ -25,6 +26,7 @@ export const useInfiniteScroll = <T>({
   scrollRef,
   table,
   virtualizerRef,
+  tbodyRef,
   onStartReached,
   onStartReachedThreshold,
   onEndReached,
@@ -35,7 +37,7 @@ export const useInfiniteScroll = <T>({
 
   const ready = useInitialAnchor({ initialScrollToRowId, rows, virtualizerRef });
 
-  usePrependScrollAnchor({ mode, scrollRef, rows, virtualizerRef });
+  usePrependScrollAnchor({ mode, scrollRef, rows, virtualizerRef, tbodyRef });
 
   useScrollEdge({
     edge: 'start',

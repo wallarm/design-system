@@ -16,6 +16,7 @@ export type TableVirtualizerInstance =
 export interface TableContextValue<T> {
   table: TanStackTable<T>;
   isLoading: boolean;
+  isLoadingPrevious: boolean;
   skeletonCount: number;
 
   // Feature flags (derived from props)

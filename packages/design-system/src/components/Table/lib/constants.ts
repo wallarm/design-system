@@ -1,4 +1,8 @@
 export const TABLE_SKELETON_ROWS = 12;
+/** Start-edge (prepend) loader is intentionally short: it only signals
+ * "loading above" at the boundary, and its full height pushes the visible
+ * rows down when it appears. */
+export const TABLE_PREPEND_SKELETON_ROWS = 6;
 export const TABLE_VIRTUALIZATION_OVERSCAN = 6;
 export const TABLE_MIN_COLUMN_WIDTH = 96;
 

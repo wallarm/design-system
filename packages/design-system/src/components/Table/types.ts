@@ -175,6 +175,12 @@ export interface TableProps<T> extends TestableProps {
   columns: TableColumnDef<T>[];
   /** Show skeleton rows */
   isLoading?: boolean;
+  /**
+   * Show skeleton rows above the first row while a previous page is being
+   * fetched (bidirectional infinite scroll — the start-edge counterpart of
+   * `isLoading`). Pair with `onStartReached`.
+   */
+  isLoadingPrevious?: boolean;
   /** Number of skeleton rows to display when loading (default: 6) */
   skeletonCount?: number;
   /** Slot for TableActionBar, TableEmptyState, and other compound components */

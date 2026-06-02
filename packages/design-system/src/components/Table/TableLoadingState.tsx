@@ -4,18 +4,34 @@ import { Skeleton } from '../Skeleton';
 import { Td, Tr } from './primitives';
 import { useTableContext } from './TableContext';
 
-export const TableLoadingState: FC = () => {
+interface TableLoadingStateProps {
+  /**
+   * Which edge of the table the skeletons represent. 'end' (default) is the
+   * classic bottom loader; 'start' marks the prepend loader rendered above the
+   * rows while a previous page loads — it gets its own test id and a data
+   * attribute the scroll-shift compensation measures.
+   */
+  position?: 'start' | 'end';
+  /** Number of skeleton rows; defaults to the table-level skeletonCount. */
+  count?: number;
+}
+
+export const TableLoadingState: FC<TableLoadingStateProps> = ({ position = 'end', count }) => {
   const { table, skeletonCount } = useTableContext();
-  const testId = useTestId('loading');
+  const testId = useTestId(position === 'start' ? 'loading-start' : 'loading');
   const columns = table.getVisibleLeafColumns();
 
   return (
     <>
-      {Array.from({ length: skeletonCount }, (_, rowIdx) => {
+      {Array.from({ length: count ?? skeletonCount }, (_, rowIdx) => {
         const key = `skeleton-${rowIdx}`;
 
         return (
-          <Tr key={key} data-testid={rowIdx === 0 ? testId : undefined}>
+          <Tr
+            key={key}
+            data-testid={rowIdx === 0 ? testId : undefined}
+            data-loading-position={position}
+          >
             {columns.map(column => (
               <Td
                 key={column.id}

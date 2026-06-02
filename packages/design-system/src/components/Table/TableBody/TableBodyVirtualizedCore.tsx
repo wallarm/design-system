@@ -1,6 +1,7 @@
 import type { FC, RefObject } from 'react';
 import type { Virtualizer } from '@tanstack/react-virtual';
 import { useTestId } from '../../../utils/testId';
+import { TABLE_PREPEND_SKELETON_ROWS } from '../lib';
 import { TBody, Td, Tr } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableLoadingState } from '../TableLoadingState';
@@ -18,7 +19,7 @@ export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
   tbodyRef,
   virtualizer,
 }) => {
-  const { table, isLoading } = useTableContext();
+  const { table, isLoading, isLoadingPrevious } = useTableContext();
   const testId = useTestId('body');
   const virtualRows = virtualizer.getVirtualItems();
   const totalSize = virtualizer.getTotalSize();
@@ -29,6 +30,12 @@ export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
 
   return (
     <TBody ref={tbodyRef} data-testid={testId}>
+      {/* The prepend loader lives above the top spacer: the spacer stands in
+       * for off-screen rows, so skeletons go where even earlier content will
+       * appear — visible only when the user is scrolled to the very start. */}
+      {isLoadingPrevious && (
+        <TableLoadingState position='start' count={TABLE_PREPEND_SKELETON_ROWS} />
+      )}
       {virtualRows.length > 0 && (
         <Tr key='spacer-top'>
           <Td

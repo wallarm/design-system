@@ -50,6 +50,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     data,
     columns,
     isLoading = false,
+    isLoadingPrevious = false,
     skeletonCount = TABLE_SKELETON_ROWS,
     children,
     getRowId,
@@ -299,6 +300,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     () => ({
       table,
       isLoading,
+      isLoadingPrevious,
       skeletonCount,
       sortingEnabled,
       selectionEnabled,
@@ -334,6 +336,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     [
       table,
       isLoading,
+      isLoadingPrevious,
       skeletonCount,
       sortingEnabled,
       selectionEnabled,

@@ -25,6 +25,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   const {
     table,
     virtualizerRef,
+    tbodyRef,
     onEndReached,
     onEndReachedThreshold,
     onStartReached,
@@ -40,6 +41,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
     mode: 'window',
     table,
     virtualizerRef,
+    tbodyRef,
     onEndReached,
     onEndReachedThreshold,
     onStartReached,
