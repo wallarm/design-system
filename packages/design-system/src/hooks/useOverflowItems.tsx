@@ -39,6 +39,13 @@ export function useOverflowItems<T>({
   // Hidden measurement layer: a ref per item + a ref for the '+N' indicator.
   const measurementRefs = useRef<(HTMLElement | null)[]>([]);
   const indicatorRef = useRef<HTMLDivElement | null>(null);
+  // The layer's wrapper. `visibility: hidden` content still participates in
+  // every layout pass, and the layer duplicates each item — on large tables
+  // it dwarfs the visible content. So outside of an actual measurement the
+  // layer is `display: none`d (imperatively — React state here would re-render
+  // consumers, whose inline renderer props would re-trigger the measurement
+  // effect, looping forever).
+  const measurementLayerRef = useRef<HTMLDivElement | null>(null);
 
   // Measurement cache — read once when items/renderers change, never per resize tick.
   const cacheRef = useRef<{ widths: number[]; gap: number; indicatorWidth: number }>({
@@ -78,6 +85,11 @@ export function useOverflowItems<T>({
       return;
     }
 
+    // Re-enable layout for the layer so the reads below see real widths. This
+    // is a DOM write, but it happens in the commit phase — strictly before any
+    // instance's batched read phase runs.
+    measurementLayerRef.current?.style.removeProperty('display');
+
     return scheduleOverflowMeasurement(() => {
       // Read phase: DOM reads only, no state updates.
       const container = containerRef.current;
@@ -92,6 +104,10 @@ export function useOverflowItems<T>({
       return () => {
         cacheRef.current = { widths, gap, indicatorWidth };
         recompute(availableWidth);
+        // Measurement done — exclude the duplicate content from subsequent
+        // layout passes. Resize recomputes run off the cache and never need
+        // this DOM again until items/renderers change.
+        measurementLayerRef.current?.style.setProperty('display', 'none');
       };
     });
   }, [items, renderItem, renderMeasurementItem, overflowRenderer, reserveSpace, recompute]);
@@ -129,7 +145,11 @@ export function useOverflowItems<T>({
     const renderMeasure = renderMeasurementItem || renderItem;
 
     return (
-      <div className='absolute invisible pointer-events-none' aria-hidden='true'>
+      <div
+        ref={measurementLayerRef}
+        className='absolute invisible pointer-events-none'
+        aria-hidden='true'
+      >
         {items.map((item, index) => {
           const key = `${index}`;
           return (
