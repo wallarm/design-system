@@ -37,6 +37,9 @@ export const usePrependScrollAnchor = ({
 
     // measurementsCache is keyed by row id (getItemKey), so measured sizes
     // survive a prepend and `start` offsets stay attached to the right rows.
+    // Both the baseline and the post-prepend offset come from the same
+    // list-relative coordinate space, so constant terms (paddingStart, the
+    // table's own document offset in window mode) cancel out in the delta.
     const getFirstRowStart = () => {
       const start = virtualizerRef?.current?.measurementsCache[0]?.start;
       return typeof start === 'number' ? start : null;
