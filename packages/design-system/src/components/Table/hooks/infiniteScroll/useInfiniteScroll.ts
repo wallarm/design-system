@@ -35,7 +35,7 @@ export const useInfiniteScroll = <T>({
 
   const ready = useInitialAnchor({ initialScrollToRowId, rows, virtualizerRef });
 
-  usePrependScrollAnchor({ mode, scrollRef, rows });
+  usePrependScrollAnchor({ mode, scrollRef, rows, virtualizerRef });
 
   useScrollEdge({
     edge: 'start',
