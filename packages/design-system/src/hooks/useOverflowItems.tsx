@@ -26,6 +26,28 @@ export interface UseOverflowItemsResult<T> {
   MeasurementContainer: () => ReactElement | null;
 }
 
+interface MeasurementCacheEntry {
+  widths: number[];
+  gap: number;
+  indicatorWidth: number;
+  /** Last computed visible count — seeds state on remount so a returning
+   * cell renders its final shape immediately instead of all items. */
+  lastCount: number;
+}
+
+// Measurements survive unmount, keyed by the items array identity. In a
+// virtualized table rows constantly leave and re-enter the render window;
+// without this cache every re-entering cell re-renders its full item list
+// plus a hidden measurement copy, measures, then collapses — hundreds of
+// wasted DOM mutations per scroll step. Item data lives in stable stores
+// (SWR et al.), so array identity is a reliable key; an unstable identity
+// just misses the cache and measures again. Widths are content-derived, so
+// a renderer that draws the same items differently would hit a stale entry —
+// DS renderers are static in practice, and the pre-cache behavior re-measured
+// on every consumer render only because inline renderer props made identity
+// meaningless as a change signal anyway.
+const crossMountCache = new WeakMap<readonly unknown[], MeasurementCacheEntry>();
+
 export function useOverflowItems<T>({
   items,
   renderItem,
@@ -34,7 +56,15 @@ export function useOverflowItems<T>({
   reserveSpace = 60,
 }: UseOverflowItemsOptions<T>): UseOverflowItemsResult<T> {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [visibleCount, setVisibleCount] = useState(items.length);
+  const [visibleCount, setVisibleCount] = useState(() => {
+    const cached = items.length > 0 ? crossMountCache.get(items) : undefined;
+    return cached ? Math.min(cached.lastCount, items.length) : items.length;
+  });
+
+  // Lets `recompute` update the cache entry of whatever items are current,
+  // without being recreated (it's a dependency of both effects below).
+  const itemsRef = useRef(items);
+  itemsRef.current = items;
 
   // Hidden measurement layer: a ref per item + a ref for the '+N' indicator.
   const measurementRefs = useRef<(HTMLElement | null)[]>([]);
@@ -70,6 +100,10 @@ export function useOverflowItems<T>({
       availableWidth: availableWidth ?? container.offsetWidth,
       indicatorWidth,
     });
+    const entry = crossMountCache.get(itemsRef.current);
+    if (entry) {
+      entry.lastCount = next;
+    }
     setVisibleCount(prev => (prev === next ? prev : next));
   }, []);
 
@@ -83,6 +117,18 @@ export function useOverflowItems<T>({
       cacheRef.current = { widths: [], gap: 0, indicatorWidth: reserveSpace };
       setVisibleCount(0);
       return;
+    }
+
+    const cached = crossMountCache.get(items);
+    if (cached) {
+      // Widths are known from a previous mount — no measurement layer in the
+      // tree, nothing to measure. Only the container width is needed, and even
+      // that read goes through the batch to stay clear of commit-time writes.
+      cacheRef.current = cached;
+      return scheduleOverflowMeasurement(() => {
+        const availableWidth = containerRef.current?.offsetWidth ?? 0;
+        return () => recompute(availableWidth);
+      });
     }
 
     // Re-enable layout for the layer so the reads below see real widths. This
@@ -102,8 +148,10 @@ export function useOverflowItems<T>({
 
       // Write phase: cache + state update, no DOM reads.
       return () => {
-        cacheRef.current = { widths, gap, indicatorWidth };
-        recompute(availableWidth);
+        const entry = { widths, gap, indicatorWidth, lastCount: items.length };
+        cacheRef.current = entry;
+        crossMountCache.set(items, entry);
+        recompute(availableWidth); // also refreshes entry.lastCount
         // Measurement done — exclude the duplicate content from subsequent
         // layout passes. Resize recomputes run off the cache and never need
         // this DOM again until items/renderers change.
@@ -138,9 +186,10 @@ export function useOverflowItems<T>({
   const hiddenItems = items.slice(visibleCount);
   const hiddenCount = hiddenItems.length;
 
-  // Stable measurement-layer component — not recreated on every render.
+  // Measurement-layer component. Skipped entirely when widths are already
+  // known from a previous mount of the same items array.
   const MeasurementContainer = useCallback(() => {
-    if (items.length === 0) return null;
+    if (items.length === 0 || crossMountCache.has(items)) return null;
 
     const renderMeasure = renderMeasurementItem || renderItem;
 
