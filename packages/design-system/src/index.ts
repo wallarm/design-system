@@ -53,6 +53,10 @@ export {
   type AlertTitleProps,
 } from './components/Alert';
 export {
+  AnimatedBackground,
+  type AnimatedBackgroundProps,
+} from './components/AnimatedBackground';
+export {
   AppShell,
   AppShellHeader,
   type AppShellHeaderProps,
