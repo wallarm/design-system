@@ -17,15 +17,15 @@ import { measureElement, type Virtualizer } from '@tanstack/react-virtual';
  * With an entry we defer to the default, which uses `borderBoxSize` and
  * never touches layout.
  */
-export function measureRowElement<TScrollElement extends Element | Window>(
+export const measureRowElement = <TScrollElement extends Element | Window>(
   element: Element,
   entry: ResizeObserverEntry | undefined,
   instance: Virtualizer<TScrollElement, Element>,
-): number {
+): number => {
   if (entry) {
     return measureElement(element, entry, instance);
   }
 
   const index = instance.indexFromElement(element);
   return instance.measurementsCache[index]?.size ?? instance.options.estimateSize(index);
-}
+};

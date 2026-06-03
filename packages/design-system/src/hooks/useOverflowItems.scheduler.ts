@@ -17,7 +17,7 @@ type ReadPhase = () => WritePhase;
 const queue = new Set<ReadPhase>();
 let flushScheduled = false;
 
-function flush(): void {
+const flush = (): void => {
   flushScheduled = false;
   const reads = Array.from(queue);
   queue.clear();
@@ -42,14 +42,14 @@ function flush(): void {
       // A single failing setState must not block the remaining instances.
     }
   }
-}
+};
 
 /**
  * Queue a measurement for the next pre-paint flush. Returns a cancel
  * function — call it on effect cleanup so unmounted or re-rendered
  * instances never measure stale refs.
  */
-export function scheduleOverflowMeasurement(read: ReadPhase): () => void {
+export const scheduleOverflowMeasurement = (read: ReadPhase): (() => void) => {
   queue.add(read);
   if (!flushScheduled) {
     flushScheduled = true;
@@ -58,4 +58,4 @@ export function scheduleOverflowMeasurement(read: ReadPhase): () => void {
   return () => {
     queue.delete(read);
   };
-}
+};
