@@ -11,10 +11,8 @@ import { scheduleOverflowMeasurement, type WritePhase } from './useOverflowItems
 
 export interface UseOverflowItemsOptions<T> {
   /**
-   * Invariant: a given `items` array identity must always render to the same
-   * widths. Measurements are cached by array identity regardless of the
-   * renderers/reserveSpace, so changing those to alter widths needs a fresh
-   * array.
+   * Invariant: measurements are cached by array identity, so changing the
+   * renderers/reserveSpace to alter widths needs a fresh array.
    */
   items: T[];
   renderItem: (item: T) => ReactElement;
@@ -36,14 +34,12 @@ interface MeasurementCacheEntry {
   widths: number[];
   gap: number;
   indicatorWidth: number;
-  /** Last visible count — seeds state on remount so a returning cell renders
-   * its final shape immediately. */
+  /** Last visible count — seeds state on remount. */
   lastCount: number;
 }
 
-// Measurements survive unmount, keyed by items identity — virtualized rows
-// remount constantly, and re-measuring each on re-entry costs hundreds of DOM
-// mutations per scroll. An unstable identity simply misses and re-measures.
+// Survives unmount (virtualized rows remount constantly); an unstable items
+// identity simply misses and re-measures.
 const crossMountCache = new WeakMap<readonly unknown[], MeasurementCacheEntry>();
 
 export function useOverflowItems<T>({
@@ -57,9 +53,7 @@ export function useOverflowItems<T>({
   const [visibleCount, setVisibleCount] = useState(() => {
     const cached = items.length > 0 ? crossMountCache.get(items) : undefined;
     if (cached) return Math.min(cached.lastCount, items.length);
-    // Corrected pre-paint, so never seen — but starting expanded builds the
-    // full list just to collapse it (thousands of insert+remove per scroll).
-    // Start minimal and let the measurement grow it: appends are cheap.
+    // Start minimal and let the measurement grow it — appends are cheap.
     return Math.min(items.length, 1);
   });
 
@@ -70,9 +64,8 @@ export function useOverflowItems<T>({
   // Hidden measurement layer: a ref per item + a ref for the '+N' indicator.
   const measurementRefs = useRef<(HTMLElement | null)[]>([]);
   const indicatorRef = useRef<HTMLDivElement | null>(null);
-  // `visibility:hidden` still costs layout and the layer duplicates every item,
-  // so it's `display:none`d between measurements — imperatively, since React
-  // state would re-render consumers and re-trigger the measure effect forever.
+  // `display:none`d between measurements — imperatively, since React state
+  // would re-render consumers and re-trigger the measure effect forever.
   const measurementLayerRef = useRef<HTMLDivElement | null>(null);
 
   // Measurement cache — read once when items/renderers change, never per resize tick.
@@ -89,10 +82,7 @@ export function useOverflowItems<T>({
     const container = containerRef.current;
     if (!container) return;
 
-    // Not laid out (e.g. a `display:none` ancestor): offsetWidth is 0. Bail so we
-    // neither expand to every item (calculateVisibleCount treats availableWidth<=0
-    // as "everything fits") nor measure against a zero-width cache — keep the last
-    // good split until the element is visible again.
+    // Hidden (display:none ancestor): keep the last good split until visible.
     if (container.offsetWidth === 0) return;
 
     const { widths, gap, indicatorWidth } = cacheRef.current;
@@ -111,23 +101,19 @@ export function useOverflowItems<T>({
     setVisibleCount(prev => (prev === next ? prev : next));
   }, []);
 
-  // True when a measurement was requested but the subtree wasn't laid out yet
-  // (a `display:none` ancestor makes every offsetWidth read 0). The ResizeObserver
-  // performs the deferred measurement once the element becomes visible — this hinges
-  // on display:none firing a resize on hide/show (it does; visibility:hidden keeps a
-  // real width so it never reaches this path, content-visibility is out of scope).
+  // Measurement requested while the subtree wasn't laid out (display:none
+  // ancestor) — the ResizeObserver performs it once the element is shown.
   const pendingMeasureRef = useRef(false);
 
   // Shared read→write pass for the batch scheduler: reads the layer, returns
   // the write that commits the caches + state and drops the layer from layout.
-  // Not laid out (display:none ancestor: every offsetWidth read is 0) — the
-  // write only flags the measurement as pending, so the caches are never
-  // poisoned with zero widths. A null container is NOT deferred: without one
-  // the observer is never attached, so a deferred measurement would never run.
   const measure = useCallback((): WritePhase => {
     // Read phase: DOM reads only, no state updates.
     const container = containerRef.current;
 
+    // Hidden: every offsetWidth read is 0 — defer instead of poisoning the
+    // caches. A null container is NOT deferred: without one the observer is
+    // never attached, so a deferred measurement would never run.
     if (container && container.offsetWidth === 0) {
       return () => {
         pendingMeasureRef.current = true;
@@ -146,21 +132,18 @@ export function useOverflowItems<T>({
       cacheRef.current = entry;
       crossMountCache.set(items, entry);
       recompute(availableWidth); // also refreshes entry.lastCount
-      // Done — drop the duplicate content from layout; recomputes use cache.
+      // Done — drop the duplicate content from layout.
       measurementLayerRef.current?.style.setProperty('display', 'none');
     };
   }, [items, reserveSpace, recompute]);
 
-  // Latest-ref so the ResizeObserver can reach `measure` without depending on its
-  // identity: `measure` changes whenever `items` change, and listing it as an
-  // effect dependency would tear down and re-subscribe the observer on every items
-  // change — each re-subscribe firing a redundant initial callback.
+  // Latest-ref so the observer reaches `measure` without re-subscribing on
+  // every items change.
   const measureRef = useRef(measure);
   measureRef.current = measure;
 
-  // Measure on items/renderer change. Reads are batched into one pre-paint
-  // microtask (see scheduler) — measuring sync here reflows per instance.
-  // biome-ignore lint/correctness/useExhaustiveDependencies: the renderers aren't called here but decide what the measurement layer renders, so they must invalidate the cached widths
+  // Measure on items/renderer change, batched via the scheduler.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: the renderers decide what the measurement layer renders, so they must invalidate the cached widths
   useLayoutEffect(() => {
     if (items.length === 0) {
       cacheRef.current = { widths: [], gap: 0, indicatorWidth: reserveSpace, lastCount: 0 };
@@ -180,8 +163,7 @@ export function useOverflowItems<T>({
       });
     }
 
-    // Re-show the layer (commit-phase write, before any batched read) so the
-    // reads below see real widths.
+    // Re-show the layer before any batched read so it has real widths.
     measurementLayerRef.current?.style.removeProperty('display');
 
     return scheduleOverflowMeasurement(measure);
@@ -206,11 +188,8 @@ export function useOverflowItems<T>({
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        // First real layout after being measured while hidden: run the deferred
-        // measurement through the shared batch so N instances revealed in the
-        // same frame do all reads, then all writes — no interleaved reflows.
-        // Its write phase recomputes; the queue dedupes by function identity,
-        // so overlapping with a still-scheduled effect pass runs it once.
+        // First real layout after a hidden measure: run it through the shared
+        // batch (its write recomputes; the queue dedupes by identity).
         if (pendingMeasureRef.current) {
           cancelDeferred = scheduleOverflowMeasurement(measureRef.current);
           return;
@@ -231,8 +210,7 @@ export function useOverflowItems<T>({
   const hiddenItems = items.slice(visibleCount);
   const hiddenCount = hiddenItems.length;
 
-  // Measurement-layer component. Skipped entirely when widths are already
-  // known from a previous mount of the same items array.
+  // Measurement layer; skipped when widths are already cached cross-mount.
   const MeasurementContainer = useCallback(() => {
     if (items.length === 0 || crossMountCache.has(items)) return null;
 
