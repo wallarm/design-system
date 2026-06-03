@@ -29,7 +29,7 @@ export const Halftone: StoryFn<AnimatedBackgroundProps> = () => (
 );
 
 export const WithCard: StoryFn<AnimatedBackgroundProps> = () => (
-  <div className='relative h-full w-full'>
+  <div className='relative h-screen w-screen'>
     <AnimatedBackground />
 
     <Card className='absolute top-1/2 left-1/2 -translate-1/2 w-[300px] h-max'>
@@ -44,3 +44,7 @@ export const WithCard: StoryFn<AnimatedBackgroundProps> = () => (
     </Card>
   </div>
 );
+
+WithCard.parameters = {
+  layout: 'fullscreen',
+};

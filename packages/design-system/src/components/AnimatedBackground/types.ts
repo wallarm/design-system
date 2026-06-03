@@ -22,5 +22,4 @@ export interface EngineOptions {
   dotColorVar: string;
   accentColorVar: string;
   baseColorVar: string;
-  sweepColorVar: string;
 }

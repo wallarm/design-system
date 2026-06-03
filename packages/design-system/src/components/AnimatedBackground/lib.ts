@@ -22,9 +22,8 @@ export const resolveOptions = (props: AnimatedBackgroundProps): EngineOptions =>
     bloomAlpha: props.bloomAlpha ?? 0.2,
     maxDotSize: props.maxDotSize ?? d.maxDotSize,
     tilt: props.tilt ?? 16,
-    dotColorVar: props.dotColorVar ?? '--login-bg-dot',
-    accentColorVar: props.accentColorVar ?? '--login-bg-accent',
-    baseColorVar: props.baseColorVar ?? '--login-bg-base',
-    sweepColorVar: props.sweepColorVar ?? '--login-bg-sweep',
+    dotColorVar: props.dotColorVar ?? '--animated-bg-dot',
+    accentColorVar: props.accentColorVar ?? '--animated-bg-accent-dot',
+    baseColorVar: props.baseColorVar ?? '--color-component-app-shell-bg',
   };
 };

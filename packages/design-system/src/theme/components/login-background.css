@@ -1,13 +1,9 @@
 :root {
-    --login-bg-dot: var(--color-slate-600);
-    --login-bg-accent: var(--color-red-500);
-    --login-bg-base: var(--color-slate-50);
-    --login-bg-sweep: var(--color-slate-950);
+    --animated-bg-dot: var(--color-slate-500);
+    --animated-bg-accent-dot: var(--color-red-400);
 }
 
 [data-theme="dark"] {
-    --login-bg-dot: var(--color-slate-400);
-    --login-bg-accent: var(--color-red-200);
-    --login-bg-base: var(--color-slate-950);
-    --login-bg-sweep: var(--color-slate-50);
+    --animated-bg-dot: var(--color-slate-500);
+    --animated-bg-accent-dot: var(--color-red-400);
 }
