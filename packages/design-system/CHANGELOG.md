@@ -1,3 +1,7 @@
+## <small>0.53.1 (2026-06-03)</small>
+
+* fix(overflow-list): keep collapsed split across display:none hide/show (#146) ([8d3086d](https://github.com/wallarm/design-system/commit/8d3086d)), closes [#146](https://github.com/wallarm/design-system/issues/146)
+
 ## 0.53.0 (2026-06-03)
 
 * feat: WDS-127 animated bg ([3a50a94](https://github.com/wallarm/design-system/commit/3a50a94))
