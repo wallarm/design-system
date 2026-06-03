@@ -1,8 +1,9 @@
 import { type FC, useCallback, useEffect } from 'react';
 import { useWindowVirtualizer } from '@tanstack/react-virtual';
-import { TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
+import { getRowKey, TABLE_VIRTUALIZATION_OVERSCAN } from '../lib';
 import { useTableContext } from '../TableContext';
 import { getDocumentOffsetTop } from './lib/getDocumentOffsetTop';
+import { measureRowElement } from './lib/measureRowElement';
 import { TableBodyVirtualizedCore } from './TableBodyVirtualizedCore';
 import { useResetVirtualizerOnDataChange } from './useResetVirtualizerOnDataChange';
 import { useSmoothScrollOnSort } from './useSmoothScrollOnSort';
@@ -15,6 +16,8 @@ export const TableBodyVirtualizedWindow: FC = () => {
     estimateSize: estimateRowHeight ?? (() => 40),
     overscan: overscan ?? TABLE_VIRTUALIZATION_OVERSCAN,
     scrollMargin: tbodyRef.current ? getDocumentOffsetTop(tbodyRef.current) : 0,
+    getItemKey: useCallback((index: number) => getRowKey(table.getRowModel().rows, index), [table]),
+    measureElement: measureRowElement,
   });
 
   // Publish to the table-level handle. Render-time assignment is safe — refs

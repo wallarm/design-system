@@ -16,6 +16,7 @@ export type TableVirtualizerInstance =
 export interface TableContextValue<T> {
   table: TanStackTable<T>;
   isLoading: boolean;
+  isLoadingPrevious: boolean;
   skeletonCount: number;
 
   // Feature flags (derived from props)
@@ -54,9 +55,6 @@ export interface TableContextValue<T> {
   // Cannot be hidden, reordered, or unpinned.
   masterColumnId: string | null;
 
-  // Ref to the <thead> element for measuring header height
-  theadRef: RefObject<HTMLTableSectionElement | null>;
-
   // Container ref for scoping keyboard handlers
   containerRef: RefObject<HTMLDivElement | null>;
 
@@ -72,9 +70,12 @@ export interface TableContextValue<T> {
   // the ref is current on first commit.
   virtualizerRef: RefObject<TableVirtualizerInstance | null>;
 
-  // Infinite scroll
+  // Infinite scroll (bidirectional)
   onEndReached?: () => void;
   onEndReachedThreshold?: number;
+  onStartReached?: () => void;
+  onStartReachedThreshold?: number;
+  initialScrollToRowId?: string;
 
   // Master cell click
   onMasterCellClick?: (rowId: string) => void;

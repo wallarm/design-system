@@ -8,7 +8,7 @@ import {
   ScrollAreaViewport,
 } from '../../ScrollArea';
 import { tableContainerVariants } from '../classes';
-import { useEndReached } from '../hooks';
+import { useInfiniteScroll } from '../hooks';
 import { useContainerWidth } from '../lib';
 import { TableBody } from '../TableBody';
 import { TableColGroup } from '../TableColGroup';
@@ -31,16 +31,32 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
   ariaLabel,
   children,
 }) => {
-  const { containerRef, table, onEndReached, onEndReachedThreshold } = useTableContext();
+  const {
+    containerRef,
+    table,
+    virtualizerRef,
+    tbodyRef,
+    onEndReached,
+    onEndReachedThreshold,
+    onStartReached,
+    onStartReachedThreshold,
+    initialScrollToRowId,
+  } = useTableContext();
   const testId = useTestId('container');
   const scrollRootRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(containerRef);
 
-  useEndReached({
+  useInfiniteScroll({
     mode: 'container',
     scrollRef: containerRef,
+    table,
+    virtualizerRef,
+    tbodyRef,
     onEndReached,
-    threshold: onEndReachedThreshold,
+    onEndReachedThreshold,
+    onStartReached,
+    onStartReachedThreshold,
+    initialScrollToRowId,
   });
 
   useEffect(() => {

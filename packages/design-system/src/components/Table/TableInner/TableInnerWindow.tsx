@@ -1,7 +1,7 @@
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
 import { useTestId } from '../../../utils/testId';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
-import { useEndReached } from '../hooks';
+import { useInfiniteScroll } from '../hooks';
 import { useContainerWidth } from '../lib';
 import { TableBody } from '../TableBody';
 import { TableColGroup } from '../TableColGroup';
@@ -22,16 +22,31 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   ariaLabel,
   children,
 }) => {
-  const { table, onEndReached, onEndReachedThreshold } = useTableContext();
+  const {
+    table,
+    virtualizerRef,
+    tbodyRef,
+    onEndReached,
+    onEndReachedThreshold,
+    onStartReached,
+    onStartReachedThreshold,
+    initialScrollToRowId,
+  } = useTableContext();
   const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(rootRef);
 
-  useEndReached({
+  useInfiniteScroll({
     mode: 'window',
+    table,
+    virtualizerRef,
+    tbodyRef,
     onEndReached,
-    threshold: onEndReachedThreshold,
+    onEndReachedThreshold,
+    onStartReached,
+    onStartReachedThreshold,
+    initialScrollToRowId,
   });
 
   useEffect(() => {
