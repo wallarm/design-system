@@ -76,10 +76,11 @@ export function useOverflowItems<T>({
   const measurementLayerRef = useRef<HTMLDivElement | null>(null);
 
   // Measurement cache — read once when items/renderers change, never per resize tick.
-  const cacheRef = useRef<{ widths: number[]; gap: number; indicatorWidth: number }>({
+  const cacheRef = useRef<MeasurementCacheEntry>({
     widths: [],
     gap: 0,
     indicatorWidth: reserveSpace,
+    lastCount: 0,
   });
 
   // Pure recompute from the cache — no DOM writes, safe per resize frame. Pass
@@ -149,7 +150,7 @@ export function useOverflowItems<T>({
   // biome-ignore lint/correctness/useExhaustiveDependencies: the renderers aren't called here but decide what the measurement layer renders, so they must invalidate the cached widths
   useLayoutEffect(() => {
     if (items.length === 0) {
-      cacheRef.current = { widths: [], gap: 0, indicatorWidth: reserveSpace };
+      cacheRef.current = { widths: [], gap: 0, indicatorWidth: reserveSpace, lastCount: 0 };
       setVisibleCount(0);
       pendingMeasureRef.current = false;
       return;
@@ -216,7 +217,9 @@ export function useOverflowItems<T>({
       frame = requestAnimationFrame(() => {
         frame = 0;
         // First real layout after being measured while hidden: capture the widths
-        // now (offsetWidth is non-zero again) before recomputing.
+        // now (offsetWidth is non-zero again) before recomputing. May overlap with
+        // a still-scheduled write phase on reveal — both are idempotent (same
+        // widths, same cache entry, same layer hide), so the double run is safe.
         if (pendingMeasureRef.current && measureRef.current()) {
           pendingMeasureRef.current = false;
         }
