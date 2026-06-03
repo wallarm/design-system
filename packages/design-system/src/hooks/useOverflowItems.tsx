@@ -7,7 +7,7 @@ import {
   useState,
 } from 'react';
 import { calculateVisibleCount } from './useOverflowItems.helpers';
-import { scheduleOverflowMeasurement } from './useOverflowItems.scheduler';
+import { scheduleOverflowMeasurement, type WritePhase } from './useOverflowItems.scheduler';
 
 export interface UseOverflowItemsOptions<T> {
   /**
@@ -118,25 +118,38 @@ export function useOverflowItems<T>({
   // real width so it never reaches this path, content-visibility is out of scope).
   const pendingMeasureRef = useRef(false);
 
-  // Read the measurement layer into the caches, then drop it from layout. DOM
-  // reads + style writes only — `recompute` follows separately. Returns false
-  // (without touching the caches) when the subtree isn't laid out, so we never
-  // poison them with zero widths.
-  const measure = useCallback(() => {
+  // Shared read→write pass for the batch scheduler: reads the layer, returns
+  // the write that commits the caches + state and drops the layer from layout.
+  // Not laid out (display:none ancestor: every offsetWidth read is 0) — the
+  // write only flags the measurement as pending, so the caches are never
+  // poisoned with zero widths. A null container is NOT deferred: without one
+  // the observer is never attached, so a deferred measurement would never run.
+  const measure = useCallback((): WritePhase => {
+    // Read phase: DOM reads only, no state updates.
     const container = containerRef.current;
-    if (!container || container.offsetWidth === 0) return false;
 
-    const gap = Number.parseFloat(getComputedStyle(container).gap || '0') || 0;
+    if (container && container.offsetWidth === 0) {
+      return () => {
+        pendingMeasureRef.current = true;
+      };
+    }
+
+    const gap = container ? Number.parseFloat(getComputedStyle(container).gap || '0') || 0 : 0;
     const widths = measurementRefs.current.slice(0, items.length).map(ref => ref?.offsetWidth ?? 0);
     const indicatorWidth = indicatorRef.current?.offsetWidth || reserveSpace;
+    const availableWidth = container?.offsetWidth ?? 0;
 
-    const entry = { widths, gap, indicatorWidth, lastCount: items.length };
-    cacheRef.current = entry;
-    crossMountCache.set(items, entry);
-    // Done — drop the duplicate content from layout; recomputes use cache.
-    measurementLayerRef.current?.style.setProperty('display', 'none');
-    return true;
-  }, [items, reserveSpace]);
+    // Write phase: caches + state update, no DOM reads.
+    return () => {
+      pendingMeasureRef.current = false;
+      const entry = { widths, gap, indicatorWidth, lastCount: items.length };
+      cacheRef.current = entry;
+      crossMountCache.set(items, entry);
+      recompute(availableWidth); // also refreshes entry.lastCount
+      // Done — drop the duplicate content from layout; recomputes use cache.
+      measurementLayerRef.current?.style.setProperty('display', 'none');
+    };
+  }, [items, reserveSpace, recompute]);
 
   // Latest-ref so the ResizeObserver can reach `measure` without depending on its
   // identity: `measure` changes whenever `items` change, and listing it as an
@@ -171,40 +184,16 @@ export function useOverflowItems<T>({
     // reads below see real widths.
     measurementLayerRef.current?.style.removeProperty('display');
 
-    return scheduleOverflowMeasurement(() => {
-      // Read phase: DOM reads only, no state updates.
-      const container = containerRef.current;
-
-      // Not laid out (display:none ancestor): every read returns 0. Keep the
-      // previous caches and the layer, and defer the real measurement to the
-      // ResizeObserver, which fires when the element is shown. A null container
-      // is NOT deferred — without one the observer is never attached, so the
-      // deferred measurement would never run.
-      if (container && container.offsetWidth === 0) {
-        return () => {
-          pendingMeasureRef.current = true;
-        };
-      }
-
-      const gap = container ? Number.parseFloat(getComputedStyle(container).gap || '0') || 0 : 0;
-      const widths = measurementRefs.current
-        .slice(0, items.length)
-        .map(ref => ref?.offsetWidth ?? 0);
-      const indicatorWidth = indicatorRef.current?.offsetWidth || reserveSpace;
-      const availableWidth = container?.offsetWidth ?? 0;
-
-      // Write phase: cache + state update, no DOM reads.
-      return () => {
-        pendingMeasureRef.current = false;
-        const entry = { widths, gap, indicatorWidth, lastCount: items.length };
-        cacheRef.current = entry;
-        crossMountCache.set(items, entry);
-        recompute(availableWidth); // also refreshes entry.lastCount
-        // Done — drop the duplicate content from layout; recomputes use cache.
-        measurementLayerRef.current?.style.setProperty('display', 'none');
-      };
-    });
-  }, [items, renderItem, renderMeasurementItem, overflowRenderer, reserveSpace, recompute]);
+    return scheduleOverflowMeasurement(measure);
+  }, [
+    items,
+    renderItem,
+    renderMeasurementItem,
+    overflowRenderer,
+    reserveSpace,
+    recompute,
+    measure,
+  ]);
 
   // Observe resize; coalesce notifications into one recompute per frame.
   useLayoutEffect(() => {
@@ -212,16 +201,19 @@ export function useOverflowItems<T>({
     if (!container) return;
 
     let frame = 0;
+    let cancelDeferred: (() => void) | undefined;
     const observer = new ResizeObserver(() => {
       if (frame) return;
       frame = requestAnimationFrame(() => {
         frame = 0;
-        // First real layout after being measured while hidden: capture the widths
-        // now (offsetWidth is non-zero again) before recomputing. May overlap with
-        // a still-scheduled write phase on reveal — both are idempotent (same
-        // widths, same cache entry, same layer hide), so the double run is safe.
-        if (pendingMeasureRef.current && measureRef.current()) {
-          pendingMeasureRef.current = false;
+        // First real layout after being measured while hidden: run the deferred
+        // measurement through the shared batch so N instances revealed in the
+        // same frame do all reads, then all writes — no interleaved reflows.
+        // Its write phase recomputes; the queue dedupes by function identity,
+        // so overlapping with a still-scheduled effect pass runs it once.
+        if (pendingMeasureRef.current) {
+          cancelDeferred = scheduleOverflowMeasurement(measureRef.current);
+          return;
         }
         recompute();
       });
@@ -230,6 +222,7 @@ export function useOverflowItems<T>({
 
     return () => {
       if (frame) cancelAnimationFrame(frame);
+      cancelDeferred?.();
       observer.disconnect();
     };
   }, [recompute]);
