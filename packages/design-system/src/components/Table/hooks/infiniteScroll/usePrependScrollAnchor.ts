@@ -109,6 +109,12 @@ export const usePrependScrollAnchor = ({
         }
       } else if (prevScrollHeightRef.current !== null) {
         const delta = getScrollHeight() - prevScrollHeightRef.current;
+        // `> 0`, not `!== 0`: this fallback runs only without a virtualizer
+        // (no per-row offsets), where scrollHeight already nets the
+        // prepend against any collapsing skeleton block. If that net is
+        // non-positive (page shorter than the skeletons) we deliberately
+        // don't scroll up — better a tiny static gap than a jump in the
+        // direction the user wasn't moving.
         if (delta > 0) {
           if (mode === 'window') window.scrollBy(0, delta);
           else if (scrollRef?.current) scrollRef.current.scrollTop += delta;
