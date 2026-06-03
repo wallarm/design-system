@@ -631,36 +631,8 @@ export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
   return (
     <VStack gap={8}>
       <Text size='sm' color='secondary'>
-        Anchored mid-dataset — scroll up to prepend earlier rows (top skeletons), down to append
-        later ones (bottom skeletons). The viewport stays pinned across a prepend. {data.length}{' '}
-        rows loaded
-        {!hasPrev && ' — at start'}
-        {!hasNext && ' — at end'}
-      </Text>
-      <Table
-        className='h-500'
-        data={data}
-        columns={securityColumns}
-        getRowId={row => row.id}
-        virtualized='container'
-        initialScrollToRowId={anchorId}
-        isLoading={isFetchingNext}
-        isLoadingPrevious={isFetchingPrev}
-        onStartReached={fetchPrevPage}
-        onEndReached={fetchNextPage}
-      />
-    </VStack>
-  );
-};
-
-export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
-  const { data, anchorId, isFetching, hasPrev, hasNext, fetchPrevPage, fetchNextPage } =
-    useBidirectionalData();
-
-  return (
-    <VStack gap={8}>
-      <Text size='sm' color='secondary'>
-        Window of {data.length} rows around the anchor {isFetching && '— loading...'}
+        Window of {data.length} rows around the anchor — scroll up for top skeletons, down for
+        bottom ones{(isFetchingPrev || isFetchingNext) && ' — loading...'}
         {!hasPrev && ' — top reached'}
         {!hasNext && ' — bottom reached'}
       </Text>
@@ -670,7 +642,8 @@ export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
         columns={securityColumns}
         getRowId={row => row.id}
         virtualized='container'
-        isLoading={isFetching}
+        isLoading={isFetchingNext}
+        isLoadingPrevious={isFetchingPrev}
         initialScrollToRowId={anchorId}
         onStartReached={fetchPrevPage}
         onStartReachedThreshold={200}
@@ -685,13 +658,22 @@ export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
 // scrolls — the regression mode for prepend compensation, where unrelated page
 // content shares the scrollHeight the old delta diffed against.
 export const BidirectionalInfiniteScrollWindow: StoryFn<typeof meta> = () => {
-  const { data, anchorId, isFetching, hasPrev, hasNext, fetchPrevPage, fetchNextPage } =
-    useBidirectionalData();
+  const {
+    data,
+    anchorId,
+    isFetchingPrev,
+    isFetchingNext,
+    hasPrev,
+    hasNext,
+    fetchPrevPage,
+    fetchNextPage,
+  } = useBidirectionalData();
 
   return (
     <VStack gap={8}>
       <Text size='sm' color='secondary'>
-        Window of {data.length} rows around the anchor {isFetching && '— loading...'}
+        Window of {data.length} rows around the anchor
+        {(isFetchingPrev || isFetchingNext) && ' — loading...'}
         {!hasPrev && ' — top reached'}
         {!hasNext && ' — bottom reached'}
       </Text>
@@ -700,7 +682,8 @@ export const BidirectionalInfiniteScrollWindow: StoryFn<typeof meta> = () => {
         columns={securityColumns}
         getRowId={row => row.id}
         virtualized='window'
-        isLoading={isFetching}
+        isLoading={isFetchingNext}
+        isLoadingPrevious={isFetchingPrev}
         initialScrollToRowId={anchorId}
         onStartReached={fetchPrevPage}
         onStartReachedThreshold={200}
