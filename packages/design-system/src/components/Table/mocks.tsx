@@ -857,7 +857,10 @@ export const useBidirectionalData = () => {
   );
 
   const [range, setRange] = useState({ start: initialStart, end: initialEnd });
-  const [isFetching, setIsFetching] = useState(false);
+  // Separate flags so each direction drives only its own loader, mirroring a
+  // real bidirectional source where scroll-up and scroll-down fetch in parallel.
+  const [isFetchingPrev, setIsFetchingPrev] = useState(false);
+  const [isFetchingNext, setIsFetchingNext] = useState(false);
 
   const data = useMemo(() => allData.slice(range.start, range.end), [allData, range]);
   const anchorId = allData[BIDIRECTIONAL_INITIAL_ANCHOR_INDEX]?.id;
@@ -865,25 +868,34 @@ export const useBidirectionalData = () => {
   const hasNext = range.end < allData.length;
 
   const fetchPrevPage = useCallback(() => {
-    if (isFetching || range.start <= 0) return;
-    setIsFetching(true);
+    if (isFetchingPrev || range.start <= 0) return;
+    setIsFetchingPrev(true);
     setTimeout(() => {
       setRange(prev => ({ ...prev, start: Math.max(0, prev.start - BIDIRECTIONAL_PAGE_SIZE) }));
-      setIsFetching(false);
-    }, 400);
-  }, [isFetching, range.start]);
+      setIsFetchingPrev(false);
+    }, 600);
+  }, [isFetchingPrev, range.start]);
 
   const fetchNextPage = useCallback(() => {
-    if (isFetching || range.end >= allData.length) return;
-    setIsFetching(true);
+    if (isFetchingNext || range.end >= allData.length) return;
+    setIsFetchingNext(true);
     setTimeout(() => {
       setRange(prev => ({
         ...prev,
         end: Math.min(allData.length, prev.end + BIDIRECTIONAL_PAGE_SIZE),
       }));
-      setIsFetching(false);
-    }, 400);
-  }, [isFetching, range.end, allData.length]);
+      setIsFetchingNext(false);
+    }, 600);
+  }, [isFetchingNext, range.end, allData.length]);
 
-  return { data, anchorId, isFetching, hasPrev, hasNext, fetchPrevPage, fetchNextPage };
+  return {
+    data,
+    anchorId,
+    isFetchingPrev,
+    isFetchingNext,
+    hasPrev,
+    hasNext,
+    fetchPrevPage,
+    fetchNextPage,
+  };
 };

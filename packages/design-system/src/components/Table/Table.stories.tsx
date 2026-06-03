@@ -617,6 +617,43 @@ export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
 };
 
 export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
+  const {
+    data,
+    anchorId,
+    isFetchingPrev,
+    isFetchingNext,
+    hasPrev,
+    hasNext,
+    fetchPrevPage,
+    fetchNextPage,
+  } = useBidirectionalData();
+
+  return (
+    <VStack gap={8}>
+      <Text size='sm' color='secondary'>
+        Anchored mid-dataset — scroll up to prepend earlier rows (top skeletons), down to append
+        later ones (bottom skeletons). The viewport stays pinned across a prepend. {data.length}{' '}
+        rows loaded
+        {!hasPrev && ' — at start'}
+        {!hasNext && ' — at end'}
+      </Text>
+      <Table
+        className='h-500'
+        data={data}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='container'
+        initialScrollToRowId={anchorId}
+        isLoading={isFetchingNext}
+        isLoadingPrevious={isFetchingPrev}
+        onStartReached={fetchPrevPage}
+        onEndReached={fetchNextPage}
+      />
+    </VStack>
+  );
+};
+
+export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
   const { data, anchorId, isFetching, hasPrev, hasNext, fetchPrevPage, fetchNextPage } =
     useBidirectionalData();
 
