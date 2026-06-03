@@ -33,8 +33,6 @@ export interface AnimatedBackgroundProps
   accentColorVar?: string;
   /** CSS custom-property name for the base fill. */
   baseColorVar?: string;
-  /** CSS custom-property name for the clean leading-edge scan line. */
-  sweepColorVar?: string;
   /** Force a single static frame (also auto-true under reduced motion). */
   paused?: boolean;
 }
