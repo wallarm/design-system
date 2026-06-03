@@ -1,17 +1,68 @@
 import { type ReactElement, useState } from 'react';
 import { act, render } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { useOverflowItems } from '../useOverflowItems';
 
-// Guards the imperative measurement-layer display toggle. jsdom offsetWidth=0
-// keeps every item visible, so we assert only the layer's display lifecycle.
+// Guards the imperative measurement-layer display toggle. jsdom has no layout,
+// so offsetWidth is stubbed: non-zero means "laid out" (the measurement lands
+// and the layer hides), zero means "display:none ancestor" (the measurement is
+// deferred and the layer must stay for the ResizeObserver to read later).
+
+let mockOffsetWidth = 200;
+const originalOffsetWidth = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'offsetWidth');
+Object.defineProperty(HTMLElement.prototype, 'offsetWidth', {
+  configurable: true,
+  get: () => mockOffsetWidth,
+});
+afterAll(() => {
+  if (originalOffsetWidth) {
+    Object.defineProperty(HTMLElement.prototype, 'offsetWidth', originalOffsetWidth);
+  }
+});
+beforeEach(() => {
+  mockOffsetWidth = 200;
+});
+
+// Capture ResizeObserver instances so tests can simulate the resize a real
+// browser fires when a `display:none` ancestor is shown again — the setup-file
+// mock is a no-op, so the reveal path needs manual firing.
+const resizeObservers = new Set<CapturingResizeObserver>();
+class CapturingResizeObserver {
+  private readonly targets = new Set<Element>();
+  constructor(private readonly callback: ResizeObserverCallback) {
+    resizeObservers.add(this);
+  }
+  observe(target: Element) {
+    this.targets.add(target);
+  }
+  unobserve(target: Element) {
+    this.targets.delete(target);
+  }
+  disconnect() {
+    resizeObservers.delete(this);
+  }
+  fire() {
+    const entries = Array.from(this.targets, target => ({ target }) as ResizeObserverEntry);
+    this.callback(entries, this as unknown as ResizeObserver);
+  }
+}
+global.ResizeObserver = CapturingResizeObserver as unknown as typeof ResizeObserver;
+
+const fireResize = () =>
+  act(async () => {
+    for (const observer of resizeObservers) observer.fire();
+  });
 
 const renderItem = (item: string): ReactElement => <span>{item}</span>;
 
 const Harness = ({ items }: { items: string[] }) => {
-  const { MeasurementContainer } = useOverflowItems({ items, renderItem });
+  const { containerRef, visibleCount, MeasurementContainer } = useOverflowItems({
+    items,
+    renderItem,
+  });
   return (
-    <div data-testid='root'>
+    <div data-testid='root' ref={containerRef}>
+      <span data-testid='visible-count'>{visibleCount}</span>
       <MeasurementContainer />
     </div>
   );
@@ -87,5 +138,43 @@ describe('useOverflowItems measurement layer', () => {
     await flushScheduler();
 
     expect(getLayer(wrap)).toBeNull();
+  });
+
+  it('keeps the layer when measured while hidden (deferred to the ResizeObserver)', async () => {
+    // display:none ancestor: every offsetWidth read is 0.
+    mockOffsetWidth = 0;
+    const { getByTestId } = render(<Harness items={['a', 'b', 'c']} />);
+    const root = getByTestId('root');
+
+    await flushScheduler();
+
+    // The measurement could not land — the layer must survive so the deferred
+    // measurement (ResizeObserver on reveal) has something to read.
+    expect(getLayer(root)?.style.display).not.toBe('none');
+  });
+
+  it('recovers the collapsed split after hide → re-measure while hidden → reveal', async () => {
+    // Container 200, three 200px items, 60px indicator fallback: only 1 fits.
+    const { getByTestId, rerender } = render(<Harness items={['a', 'b', 'c']} />);
+    await flushScheduler();
+    expect(getByTestId('visible-count').textContent).toBe('1');
+
+    // Hide via a display:none ancestor: every offsetWidth read is 0. A re-render
+    // with a fresh items identity forces a re-measure in that state — the exact
+    // condition that used to poison the width cache with zeros (AS-1071).
+    mockOffsetWidth = 0;
+    rerender(<Harness items={['a', 'b', 'c'].slice()} />);
+    await flushScheduler();
+    // Deferred: the split is untouched, the layer awaits the real measurement.
+    expect(getByTestId('visible-count').textContent).toBe('1');
+
+    // Reveal: only the ResizeObserver fires (no React render). The deferred
+    // measurement must land and keep the collapsed split — not expand to all 3.
+    mockOffsetWidth = 200;
+    await fireResize();
+    await flushScheduler();
+
+    expect(getByTestId('visible-count').textContent).toBe('1');
+    expect(getLayer(getByTestId('root'))?.style.display).toBe('none');
   });
 });

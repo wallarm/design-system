@@ -6,8 +6,15 @@
  * clean layout, then all writes — React batches them, no interleaving.
  */
 
-type WritePhase = () => void;
-type ReadPhase = () => WritePhase;
+/** Write phase of a batched measurement: state + style writes, no DOM reads. */
+export interface WritePhase {
+  (): void;
+}
+
+/** Read phase: DOM reads only; returns the write to run after all reads. */
+export interface ReadPhase {
+  (): WritePhase;
+}
 
 const queue = new Set<ReadPhase>();
 let flushScheduled = false;
