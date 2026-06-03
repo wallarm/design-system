@@ -10,6 +10,21 @@ import { calculateVisibleCount } from './useOverflowItems.helpers';
 import { scheduleOverflowMeasurement } from './useOverflowItems.scheduler';
 
 export interface UseOverflowItemsOptions<T> {
+  /**
+   * Items to lay out. Measurements are cached across unmount/remount keyed by
+   * this array's identity (see the cross-mount cache below), which encodes an
+   * invariant callers must respect:
+   *
+   * **A given `items` array identity must always render to the same widths.**
+   * The cache is reused whenever the same array reference returns, regardless
+   * of `renderItem`/`renderMeasurementItem`/`overflowRenderer`/`reserveSpace`.
+   * So if you change the renderer (or reserveSpace) to produce a *different*
+   * width for the same items, you must also pass a fresh `items` array, or the
+   * cached widths will be stale. In practice item widths are content-derived
+   * and renderers are static, so a new array identity is the natural signal
+   * that widths changed — but a caller that memoizes `items` independently of
+   * its renderer must keep this in mind.
+   */
   items: T[];
   renderItem: (item: T) => ReactElement;
   renderMeasurementItem?: (item: T) => ReactElement;

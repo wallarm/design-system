@@ -22,11 +22,25 @@ function flush(): void {
   const reads = Array.from(queue);
   queue.clear();
   // Phase 1: all DOM reads against clean layout — nothing writes in between.
-  const writes = reads.map(read => read());
+  // Isolated per instance: one read throwing must not drop the rest of the
+  // batch (they've already been dequeued and won't be retried).
+  const writes: WritePhase[] = [];
+  for (const read of reads) {
+    try {
+      writes.push(read());
+    } catch {
+      // Skip this instance's write; a stale/detached read shouldn't starve
+      // the others. Its next render re-schedules a fresh measurement.
+    }
+  }
   // Phase 2: state updates. React 18+ flushes them in its own later
   // microtask, so the DOM stays untouched throughout phase 1.
   for (const write of writes) {
-    write();
+    try {
+      write();
+    } catch {
+      // A single failing setState must not block the remaining instances.
+    }
   }
 }
 
