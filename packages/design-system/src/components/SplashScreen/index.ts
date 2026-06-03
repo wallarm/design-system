@@ -1,1 +1,2 @@
-export { SplashScreen, type SplashScreenProps } from './SplashScreen';
+export { SplashScreen } from './SplashScreen';
+export type { SplashScreenProps, SplashScreenShrinkTarget } from './types';
