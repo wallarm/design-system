@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import { calculateVisibleCount } from './useOverflowItems.helpers';
+import { observeOverflowResize } from './useOverflowItems.observer';
 import { scheduleOverflowMeasurement, type WritePhase } from './useOverflowItems.scheduler';
 
 export interface UseOverflowItemsOptions<T> {
@@ -82,8 +83,9 @@ export function useOverflowItems<T>({
     const container = containerRef.current;
     if (!container) return;
 
+    const width = availableWidth ?? container.offsetWidth;
     // Hidden (display:none ancestor): keep the last good split until visible.
-    if (container.offsetWidth === 0) return;
+    if (width === 0) return;
 
     const { widths, gap, indicatorWidth } = cacheRef.current;
     if (widths.length === 0) return;
@@ -91,7 +93,7 @@ export function useOverflowItems<T>({
     const next = calculateVisibleCount({
       itemWidths: widths,
       gap,
-      availableWidth: availableWidth ?? container.offsetWidth,
+      availableWidth: width,
       indicatorWidth,
     });
     const entry = crossMountCache.get(itemsRef.current);
@@ -142,6 +144,12 @@ export function useOverflowItems<T>({
   const measureRef = useRef(measure);
   measureRef.current = measure;
 
+  // Read→write recompute for resize ticks and cached items.
+  const recomputeRead = useCallback((): WritePhase => {
+    const availableWidth = containerRef.current?.offsetWidth ?? 0;
+    return () => recompute(availableWidth);
+  }, [recompute]);
+
   // Measure on items/renderer change, batched via the scheduler.
   // biome-ignore lint/correctness/useExhaustiveDependencies: the renderers decide what the measurement layer renders, so they must invalidate the cached widths
   useLayoutEffect(() => {
@@ -157,10 +165,7 @@ export function useOverflowItems<T>({
       // Widths known — no layer rendered, only re-read the container width.
       cacheRef.current = cached;
       pendingMeasureRef.current = false;
-      return scheduleOverflowMeasurement(() => {
-        const availableWidth = containerRef.current?.offsetWidth ?? 0;
-        return () => recompute(availableWidth);
-      });
+      return scheduleOverflowMeasurement(recomputeRead);
     }
 
     // Re-show the layer before any batched read so it has real widths.
@@ -173,38 +178,30 @@ export function useOverflowItems<T>({
     renderMeasurementItem,
     overflowRenderer,
     reserveSpace,
-    recompute,
+    recomputeRead,
     measure,
   ]);
 
-  // Observe resize; coalesce notifications into one recompute per frame.
+  // Observe resize via the shared observer. It fires pre-paint and delivers
+  // every instance in one callback, so measurements scheduled here flush in a
+  // single batch before the frame paints — a reveal never shows a stale split.
   useLayoutEffect(() => {
     const container = containerRef.current;
     if (!container) return;
 
-    let frame = 0;
-    let cancelDeferred: (() => void) | undefined;
-    const observer = new ResizeObserver(() => {
-      if (frame) return;
-      frame = requestAnimationFrame(() => {
-        frame = 0;
-        // First real layout after a hidden measure: run it through the shared
-        // batch (its write recomputes; the queue dedupes by identity).
-        if (pendingMeasureRef.current) {
-          cancelDeferred = scheduleOverflowMeasurement(measureRef.current);
-          return;
-        }
-        recompute();
-      });
+    let cancelScheduled: (() => void) | undefined;
+    const unobserve = observeOverflowResize(container, () => {
+      // A hidden-time measure runs deferred; otherwise just recompute.
+      cancelScheduled = pendingMeasureRef.current
+        ? scheduleOverflowMeasurement(measureRef.current)
+        : scheduleOverflowMeasurement(recomputeRead);
     });
-    observer.observe(container);
 
     return () => {
-      if (frame) cancelAnimationFrame(frame);
-      cancelDeferred?.();
-      observer.disconnect();
+      cancelScheduled?.();
+      unobserve();
     };
-  }, [recompute]);
+  }, [recomputeRead]);
 
   const visibleItems = items.slice(0, visibleCount);
   const hiddenItems = items.slice(visibleCount);

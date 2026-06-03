@@ -28,27 +28,25 @@ beforeEach(() => {
 // mock is a no-op, so the reveal path needs manual firing.
 const resizeObservers = new Set<CapturingResizeObserver>();
 class CapturingResizeObserver {
+  private readonly targets = new Set<Element>();
   constructor(private readonly callback: ResizeObserverCallback) {
     resizeObservers.add(this);
   }
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
-  observe() {}
-  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
-  unobserve() {}
+  observe(target: Element) {
+    this.targets.add(target);
+  }
+  unobserve(target: Element) {
+    this.targets.delete(target);
+  }
   disconnect() {
     resizeObservers.delete(this);
   }
   fire() {
-    this.callback([], this as unknown as ResizeObserver);
+    const entries = Array.from(this.targets, target => ({ target }) as ResizeObserverEntry);
+    this.callback(entries, this as unknown as ResizeObserver);
   }
 }
 global.ResizeObserver = CapturingResizeObserver as unknown as typeof ResizeObserver;
-
-// The observer coalesces into requestAnimationFrame; jsdom has no frames, so
-// emulate one with a macrotask that flushScheduler() awaits.
-global.requestAnimationFrame = (cb: FrameRequestCallback) =>
-  setTimeout(() => cb(0), 0) as unknown as number;
-global.cancelAnimationFrame = (id: number) => clearTimeout(id);
 
 const fireResize = () =>
   act(async () => {
