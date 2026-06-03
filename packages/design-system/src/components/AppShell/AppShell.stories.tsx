@@ -66,11 +66,12 @@ export const Basic: StoryFn<AppShellProps> = () => {
 
   const [loading, setLoading] = useState(true);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
+  const [revealKey, setRevealKey] = useState(0);
   const { theme, setTheme } = useTheme();
   const collapsed = sidebarMode === 'adaptive' && activeProduct !== 'home';
 
   return (
-    <AppShell>
+    <AppShell key={revealKey} reveal>
       <AppShellHeader>
         <TopHeader>
           <TopHeaderLogo href='/'>
@@ -196,9 +197,18 @@ export const Basic: StoryFn<AppShellProps> = () => {
       </AppShellRail>
 
       <AppShellRemote>
-        <div className='absolute top-4 right-4 z-10'>
+        <div className='flex gap-8 absolute top-4 right-4 z-10'>
           <Button variant='ghost' size='small' color='neutral' onClick={() => setLoading(v => !v)}>
             {loading ? 'Finish loading' : 'Start loading'}
+          </Button>
+
+          <Button
+            variant='ghost'
+            size='small'
+            color='neutral'
+            onClick={() => setRevealKey(k => k + 1)}
+          >
+            Replay animation
           </Button>
         </div>
 
