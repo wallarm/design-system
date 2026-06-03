@@ -1,4 +1,6 @@
 export const TABLE_SKELETON_ROWS = 12;
+/** Short on purpose: the prepend loader's height pushes visible rows down. */
+export const TABLE_PREPEND_SKELETON_ROWS = 6;
 export const TABLE_VIRTUALIZATION_OVERSCAN = 6;
 export const TABLE_MIN_COLUMN_WIDTH = 96;
 
@@ -9,6 +11,10 @@ export const TABLE_EXPAND_COLUMN_ID = '_expand';
 export const TABLE_EXPAND_COLUMN_WIDTH = 33;
 
 export const TABLE_END_REACHED_THRESHOLD = 200;
+export const TABLE_START_REACHED_THRESHOLD = 200;
+
+/** Minimum time (ms) between successive edge-reached callbacks. */
+export const SCROLL_EDGE_COOLDOWN_MS = 200;
 
 /** Sort types that default to right-aligned columns */
 const RIGHT_ALIGNED_SORT_TYPES = new Set(['number', 'score', 'size']);

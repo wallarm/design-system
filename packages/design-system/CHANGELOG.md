@@ -1,3 +1,21 @@
+## 0.52.0 (2026-06-03)
+
+* feat(table): AS-1026 bidirectional infinite scroll (#140) ([fff6fd2](https://github.com/wallarm/design-system/commit/fff6fd2)), closes [#140](https://github.com/wallarm/design-system/issues/140)
+
+## <small>0.51.2 (2026-06-02)</small>
+
+* fix: shell bg ([0ae896c](https://github.com/wallarm/design-system/commit/0ae896c))
+
+## <small>0.51.1 (2026-06-01)</small>
+
+* fix: card styles ([21b6b34](https://github.com/wallarm/design-system/commit/21b6b34))
+* fix: card tests ([340f220](https://github.com/wallarm/design-system/commit/340f220))
+* fix: card tests [update-screenshots] ([deb4717](https://github.com/wallarm/design-system/commit/deb4717))
+* fix: Shell component ([a146b5a](https://github.com/wallarm/design-system/commit/a146b5a))
+* fix: stack props [update-screenshots] ([da30ffc](https://github.com/wallarm/design-system/commit/da30ffc))
+* fix: text props ([2bbd37c](https://github.com/wallarm/design-system/commit/2bbd37c))
+* 🖼️ Update screenshots ([2bddb40](https://github.com/wallarm/design-system/commit/2bddb40))
+
 ## 0.51.0 (2026-06-01)
 
 * feat(parameter-path): add expandable prop for click-to-expand truncat… (#142) ([5d31265](https://github.com/wallarm/design-system/commit/5d31265)), closes [#142](https://github.com/wallarm/design-system/issues/142)

@@ -819,6 +819,9 @@ export const fullFeaturedColumns: TableColumnDef<SecurityHeaderEntry>[] = header
 
 const INFINITE_PAGE_SIZE = 50;
 const INFINITE_MAX_ITEMS = 500;
+const BIDIRECTIONAL_TOTAL = 500;
+const BIDIRECTIONAL_PAGE_SIZE = 50;
+const BIDIRECTIONAL_INITIAL_ANCHOR_INDEX = 250;
 
 export const useInfiniteData = () => {
   const allData = useMemo(() => createLargeSecurityEvents(INFINITE_MAX_ITEMS), []);
@@ -838,4 +841,61 @@ export const useInfiniteData = () => {
   }, [isFetching, hasMore, allData]);
 
   return { data, isFetching, hasMore, totalItems: INFINITE_MAX_ITEMS, fetchNextPage };
+};
+
+/**
+ * Mock for bidirectional infinite scroll: opens a window around an anchor row
+ * and exposes cursor-style fetchers for both directions.
+ */
+export const useBidirectionalData = () => {
+  const allData = useMemo(() => createLargeSecurityEvents(BIDIRECTIONAL_TOTAL), []);
+
+  const initialStart = Math.max(0, BIDIRECTIONAL_INITIAL_ANCHOR_INDEX - BIDIRECTIONAL_PAGE_SIZE);
+  const initialEnd = Math.min(
+    allData.length,
+    BIDIRECTIONAL_INITIAL_ANCHOR_INDEX + BIDIRECTIONAL_PAGE_SIZE,
+  );
+
+  const [range, setRange] = useState({ start: initialStart, end: initialEnd });
+  // Separate flags so each direction drives only its own loader, mirroring a
+  // real bidirectional source where scroll-up and scroll-down fetch in parallel.
+  const [isFetchingPrev, setIsFetchingPrev] = useState(false);
+  const [isFetchingNext, setIsFetchingNext] = useState(false);
+
+  const data = useMemo(() => allData.slice(range.start, range.end), [allData, range]);
+  const anchorId = allData[BIDIRECTIONAL_INITIAL_ANCHOR_INDEX]?.id;
+  const hasPrev = range.start > 0;
+  const hasNext = range.end < allData.length;
+
+  const fetchPrevPage = useCallback(() => {
+    if (isFetchingPrev || range.start <= 0) return;
+    setIsFetchingPrev(true);
+    setTimeout(() => {
+      setRange(prev => ({ ...prev, start: Math.max(0, prev.start - BIDIRECTIONAL_PAGE_SIZE) }));
+      setIsFetchingPrev(false);
+    }, 600);
+  }, [isFetchingPrev, range.start]);
+
+  const fetchNextPage = useCallback(() => {
+    if (isFetchingNext || range.end >= allData.length) return;
+    setIsFetchingNext(true);
+    setTimeout(() => {
+      setRange(prev => ({
+        ...prev,
+        end: Math.min(allData.length, prev.end + BIDIRECTIONAL_PAGE_SIZE),
+      }));
+      setIsFetchingNext(false);
+    }, 600);
+  }, [isFetchingNext, range.end, allData.length]);
+
+  return {
+    data,
+    anchorId,
+    isFetchingPrev,
+    isFetchingNext,
+    hasPrev,
+    hasNext,
+    fetchPrevPage,
+    fetchNextPage,
+  };
 };

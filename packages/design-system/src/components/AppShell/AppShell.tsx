@@ -22,7 +22,7 @@ export const AppShell: FC<AppShellProps> = ({
         data-slot='app-shell'
         data-testid={testId}
         className={cn(
-          'grid h-screen overscroll-none [grid-template-areas:"header_header""rail_remote"] [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr] bg-bg-surface-5',
+          'grid h-screen overscroll-none [grid-template-areas:"header_header""rail_remote"] [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr] bg-component-app-shell-bg',
           className,
         )}
       >

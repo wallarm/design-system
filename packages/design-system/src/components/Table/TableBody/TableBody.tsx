@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useTestId } from '../../../utils/testId';
+import { TABLE_PREPEND_SKELETON_ROWS } from '../lib';
 import { TBody } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableLoadingState } from '../TableLoadingState';
@@ -8,7 +9,8 @@ import { TableBodyVirtualizedContainer } from './TableBodyVirtualizedContainer';
 import { TableBodyVirtualizedWindow } from './TableBodyVirtualizedWindow';
 
 export const TableBody: FC = () => {
-  const { table, isLoading, virtualized, tbodyRef, virtualizerRef } = useTableContext();
+  const { table, isLoading, isLoadingPrevious, virtualized, tbodyRef, virtualizerRef } =
+    useTableContext();
   const testId = useTestId('body');
   const rows = table.getRowModel().rows;
   const hasData = rows.length > 0;
@@ -28,6 +30,9 @@ export const TableBody: FC = () => {
 
   return (
     <TBody ref={tbodyRef} data-testid={testId}>
+      {isLoadingPrevious && (
+        <TableLoadingState position='start' count={TABLE_PREPEND_SKELETON_ROWS} />
+      )}
       {rows.map(row => {
         return <TableRow key={row.id} row={row} />;
       })}

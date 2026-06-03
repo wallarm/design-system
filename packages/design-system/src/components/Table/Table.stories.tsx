@@ -39,6 +39,7 @@ import {
   securityColumnIds,
   securityColumns,
   securityEvents,
+  useBidirectionalData,
   useInfiniteData,
 } from './mocks';
 import { Table } from './Table';
@@ -610,6 +611,84 @@ export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
         isLoading={isFetching}
         onEndReached={fetchNextPage}
         onEndReachedThreshold={300}
+      />
+    </VStack>
+  );
+};
+
+export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
+  const {
+    data,
+    anchorId,
+    isFetchingPrev,
+    isFetchingNext,
+    hasPrev,
+    hasNext,
+    fetchPrevPage,
+    fetchNextPage,
+  } = useBidirectionalData();
+
+  return (
+    <VStack gap={8}>
+      <Text size='sm' color='secondary'>
+        Window of {data.length} rows around the anchor — scroll up for top skeletons, down for
+        bottom ones{(isFetchingPrev || isFetchingNext) && ' — loading...'}
+        {!hasPrev && ' — top reached'}
+        {!hasNext && ' — bottom reached'}
+      </Text>
+      <Table
+        className='h-500'
+        data={data}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='container'
+        isLoading={isFetchingNext}
+        isLoadingPrevious={isFetchingPrev}
+        initialScrollToRowId={anchorId}
+        onStartReached={fetchPrevPage}
+        onStartReachedThreshold={200}
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={200}
+      />
+    </VStack>
+  );
+};
+
+// Same dataset/anchor as BidirectionalInfiniteScroll, but the document itself
+// scrolls — the regression mode for prepend compensation, where unrelated page
+// content shares the scrollHeight the old delta diffed against.
+export const BidirectionalInfiniteScrollWindow: StoryFn<typeof meta> = () => {
+  const {
+    data,
+    anchorId,
+    isFetchingPrev,
+    isFetchingNext,
+    hasPrev,
+    hasNext,
+    fetchPrevPage,
+    fetchNextPage,
+  } = useBidirectionalData();
+
+  return (
+    <VStack gap={8}>
+      <Text size='sm' color='secondary'>
+        Window of {data.length} rows around the anchor
+        {(isFetchingPrev || isFetchingNext) && ' — loading...'}
+        {!hasPrev && ' — top reached'}
+        {!hasNext && ' — bottom reached'}
+      </Text>
+      <Table
+        data={data}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='window'
+        isLoading={isFetchingNext}
+        isLoadingPrevious={isFetchingPrev}
+        initialScrollToRowId={anchorId}
+        onStartReached={fetchPrevPage}
+        onStartReachedThreshold={200}
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={200}
       />
     </VStack>
   );

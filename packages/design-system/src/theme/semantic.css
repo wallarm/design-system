@@ -214,6 +214,7 @@
     --color-component-toast-ic-warning: var(--color-amber-400);
     --color-component-toast-ic-success: var(--color-green-400);
     --color-component-toast-ic-info: var(--color-blue-400);
+    --color-component-app-shell-bg: var(--color-slate-100);
 
     /* ========================================
    * SYNTAX COLORS
@@ -609,6 +610,7 @@
     --color-component-toast-ic-warning: var(--color-amber-600);
     --color-component-toast-ic-success: var(--color-green-600);
     --color-component-toast-ic-info: var(--color-blue-600);
+    --color-component-app-shell-bg: var(--color-slate-975);
 
     /* ========================================
      * SYNTAX COLORS

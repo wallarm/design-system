@@ -50,6 +50,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     data,
     columns,
     isLoading = false,
+    isLoadingPrevious = false,
     skeletonCount = TABLE_SKELETON_ROWS,
     children,
     getRowId,
@@ -81,6 +82,9 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     overscan = TABLE_VIRTUALIZATION_OVERSCAN,
     onEndReached,
     onEndReachedThreshold,
+    onStartReached,
+    onStartReachedThreshold,
+    initialScrollToRowId,
     onMasterCellClick,
     activeRowId: activeRowIdProp,
   } = props;
@@ -286,7 +290,6 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
 
   // Refs (stable across renders)
   const lastSelectedRowIndexRef = useRef<number | null>(null);
-  const theadRef = useRef<HTMLTableSectionElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
   const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
   const virtualizerRef = useRef<TableVirtualizerInstance | null>(null);
@@ -296,6 +299,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     () => ({
       table,
       isLoading,
+      isLoadingPrevious,
       skeletonCount,
       sortingEnabled,
       selectionEnabled,
@@ -316,18 +320,21 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       alwaysPinnedLeft,
       masterColumnId,
       lastSelectedRowIndexRef,
-      theadRef,
       containerRef,
       tbodyRef,
       virtualizerRef,
       onEndReached,
       onEndReachedThreshold,
+      onStartReached,
+      onStartReachedThreshold,
+      initialScrollToRowId,
       onMasterCellClick,
       activeRowId: masterCellActiveRowId,
     }),
     [
       table,
       isLoading,
+      isLoadingPrevious,
       skeletonCount,
       sortingEnabled,
       selectionEnabled,
@@ -349,6 +356,9 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       masterColumnId,
       onEndReached,
       onEndReachedThreshold,
+      onStartReached,
+      onStartReachedThreshold,
+      initialScrollToRowId,
       masterCellActiveRowId,
       onMasterCellClick,
     ],
