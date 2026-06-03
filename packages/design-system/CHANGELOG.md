@@ -1,3 +1,7 @@
+## 0.52.0 (2026-06-03)
+
+* feat(table): AS-1026 bidirectional infinite scroll (#140) ([fff6fd2](https://github.com/wallarm/design-system/commit/fff6fd2)), closes [#140](https://github.com/wallarm/design-system/issues/140)
+
 ## <small>0.51.2 (2026-06-02)</small>
 
 * fix: shell bg ([0ae896c](https://github.com/wallarm/design-system/commit/0ae896c))
