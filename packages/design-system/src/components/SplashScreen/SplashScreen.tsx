@@ -1,67 +1,62 @@
-import type { FC, HTMLAttributes, Ref } from 'react';
-import { useEffect, useState } from 'react';
+import type { FC } from 'react';
 import { cn } from '../../utils/cn';
 import { Logo } from '../Logo';
 import { Progress } from '../Progress';
-import { splashContentVariants, splashLogoVariants, splashProgressVariants } from './classes';
-
-type Phase = 'enter-start' | 'entered' | 'exiting' | 'exited';
-
-export interface SplashScreenProps extends HTMLAttributes<HTMLDivElement> {
-  ref?: Ref<HTMLDivElement>;
-  visible?: boolean;
-}
+import {
+  splashContainerVariants,
+  splashContentVariants,
+  splashLogoVariants,
+  splashProgressVariants,
+} from './classes';
+import { getContainerStyle, SPLASH_PHASES } from './lib';
+import type { ContentPhase, PhaseType, SplashScreenProps } from './types';
+import { useSplashPhase } from './useSplashPhase';
 
 export const SplashScreen: FC<SplashScreenProps> = ({
   ref,
   visible = true,
+  shrinkTarget,
   className,
+  children,
   ...props
 }) => {
-  const [phase, setPhase] = useState<Phase>(visible ? 'enter-start' : 'exited');
-
-  useEffect(() => {
-    if (visible) {
-      setPhase('enter-start');
-
-      let inner: number;
-      const outer = requestAnimationFrame(() => {
-        inner = requestAnimationFrame(() => {
-          setPhase('entered');
-        });
-      });
-
-      return () => {
-        cancelAnimationFrame(outer);
-        cancelAnimationFrame(inner);
-      };
-    }
-
-    setPhase(prev => (prev === 'exited' || prev === 'enter-start' ? 'exited' : 'exiting'));
-  }, [visible]);
+  const { phase, childrenRevealed, handleContainerTransitionEnd, handleContentTransitionEnd } =
+    useSplashPhase(visible, shrinkTarget);
 
   if (phase === 'exited') return null;
 
-  const animPhase = phase as Exclude<Phase, 'exited'>;
+  const containerPhase = phase as Exclude<PhaseType, 'exited'>;
+  const contentPhase = phase as ContentPhase;
 
   return (
     <div
       {...props}
       data-slot='splash-screen'
       ref={ref}
-      className='h-full w-full flex items-center justify-center'
+      className={cn(splashContainerVariants({ phase: containerPhase }), className)}
+      style={getContainerStyle(phase, shrinkTarget)}
+      onTransitionEnd={handleContainerTransitionEnd}
     >
-      <div
-        className={cn(splashContentVariants({ phase: animPhase }), className)}
-        onTransitionEnd={() => {
-          if (phase === 'exiting') {
-            setPhase('exited');
-          }
-        }}
-      >
-        <Logo className={splashLogoVariants({ phase: animPhase })} />
-        <Progress value={null} className={splashProgressVariants({ phase: animPhase })} />
-      </div>
+      {SPLASH_PHASES[contentPhase] && (
+        <div
+          className={splashContentVariants({ phase: contentPhase })}
+          onTransitionEnd={handleContentTransitionEnd}
+        >
+          <Logo className={splashLogoVariants({ phase: contentPhase })} />
+          <Progress value={null} className={splashProgressVariants({ phase: contentPhase })} />
+        </div>
+      )}
+
+      {phase === 'settled' && children && (
+        <div
+          className={cn(
+            'h-full w-full transition-opacity duration-300',
+            childrenRevealed ? 'opacity-100' : 'opacity-0',
+          )}
+        >
+          {children}
+        </div>
+      )}
     </div>
   );
 };
