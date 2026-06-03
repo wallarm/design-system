@@ -3,13 +3,8 @@ import { act, render } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { useOverflowItems } from '../useOverflowItems';
 
-/**
- * Guards the imperative measurement-layer display toggle — the riskiest part
- * of the overflow perf stack (a DOM mutation done outside React, easy for a
- * future edit to silently break). jsdom reports offsetWidth=0, so
- * calculateVisibleCount keeps every item visible; we only assert the layer's
- * `display` lifecycle, not the split.
- */
+// Guards the imperative measurement-layer display toggle. jsdom offsetWidth=0
+// keeps every item visible, so we assert only the layer's display lifecycle.
 
 const renderItem = (item: string): ReactElement => <span>{item}</span>;
 

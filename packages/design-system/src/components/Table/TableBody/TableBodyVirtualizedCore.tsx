@@ -30,9 +30,7 @@ export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
 
   return (
     <TBody ref={tbodyRef} data-testid={testId}>
-      {/* The prepend loader lives above the top spacer: the spacer stands in
-       * for off-screen rows, so skeletons go where even earlier content will
-       * appear — visible only when the user is scrolled to the very start. */}
+      {/* Above the top spacer — only on screen when scrolled to the very start. */}
       {isLoadingPrevious && (
         <TableLoadingState position='start' count={TABLE_PREPEND_SKELETON_ROWS} />
       )}

@@ -13,20 +13,16 @@ interface UsePrependScrollAnchorOptions {
 }
 
 /**
- * Keeps the viewport visually stable when rows are prepended. The prepended
- * height is read as how far the previously-first row moved down the virtual
- * list (its `start` offset delta) — unlike a scrollHeight diff, that is immune
- * to unrelated layout changes elsewhere on the page, which matters in `window`
- * mode where the whole document height is shared. Falls back to the
- * scrollHeight diff when the virtualizer or the row is unavailable. Runs in a
- * layout effect so the adjustment lands before paint (no flicker).
+ * Keeps the viewport stable across a prepend, in a layout effect (pre-paint, no
+ * flicker). Delta = how far the previously-first row moved down the virtual list
+ * (`start` offset) — immune to unrelated page-height changes, unlike a
+ * scrollHeight diff, which matters in `window` mode. Falls back to scrollHeight
+ * when there's no virtualizer.
  *
- * The start-edge loading skeletons (`isLoadingPrevious`) live above the rows
- * but outside the virtual list, so the row-offset delta can't see them. Their
- * height is tracked per commit (the effect deliberately has no dependency
- * array): when a prepend lands in the same commit that unmounts them, the
- * block's collapse joins the adjustment — otherwise the viewport would land
- * short by exactly the skeleton block.
+ * Start-edge skeletons (`isLoadingPrevious`) sit above the rows but outside the
+ * virtual list, so the offset delta can't see them; their height is tracked per
+ * commit (hence no dep array) and its collapse joins the delta when the prepend
+ * lands in the same commit.
  */
 export const usePrependScrollAnchor = ({
   mode,
@@ -64,11 +60,9 @@ export const usePrependScrollAnchor = ({
       return prevLoaderRef.current.height;
     };
 
-    // measurementsCache is keyed by row id (getItemKey), so measured sizes
-    // survive a prepend and `start` offsets stay attached to the right rows.
-    // Both the baseline and the post-prepend offset come from the same
-    // list-relative coordinate space, so constant terms (paddingStart, the
-    // table's own document offset in window mode) cancel out in the delta.
+    // measurementsCache is keyed by row id, so `start` offsets survive a
+    // prepend; baseline and post-prepend offset share one coordinate space, so
+    // constant terms cancel in the delta.
     const getFirstRowStart = () => {
       const start = virtualizerRef?.current?.measurementsCache[0]?.start;
       return typeof start === 'number' ? start : null;
@@ -98,9 +92,8 @@ export const usePrependScrollAnchor = ({
         index >= 0 && typeof newStart === 'number' && prevFirstRowStartRef.current !== null;
       if (useVirtualDelta) {
         const rowDelta = (newStart as number) - (prevFirstRowStartRef.current as number);
-        // Usually negative: the skeleton block collapses in the commit the
-        // page it stood in for arrives. The scrollHeight fallback includes
-        // this term by construction; the virtual-offset path adds it here.
+        // Usually negative — the skeleton block collapses as its page arrives;
+        // the offset path adds it (the scrollHeight fallback nets it already).
         const loaderDelta = getStartLoaderHeight() - prevLoaderHeight;
         const delta = rowDelta + loaderDelta;
         if (delta !== 0) {
@@ -109,12 +102,8 @@ export const usePrependScrollAnchor = ({
         }
       } else if (prevScrollHeightRef.current !== null) {
         const delta = getScrollHeight() - prevScrollHeightRef.current;
-        // `> 0`, not `!== 0`: this fallback runs only without a virtualizer
-        // (no per-row offsets), where scrollHeight already nets the
-        // prepend against any collapsing skeleton block. If that net is
-        // non-positive (page shorter than the skeletons) we deliberately
-        // don't scroll up — better a tiny static gap than a jump in the
-        // direction the user wasn't moving.
+        // `> 0`: a non-positive net (page shorter than the skeletons) is left
+        // uncorrected — a tiny static gap beats a jump the wrong way.
         if (delta > 0) {
           if (mode === 'window') window.scrollBy(0, delta);
           else if (scrollRef?.current) scrollRef.current.scrollTop += delta;

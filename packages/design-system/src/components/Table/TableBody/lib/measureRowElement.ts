@@ -1,21 +1,12 @@
 import { measureElement, type Virtualizer } from '@tanstack/react-virtual';
 
 /**
- * Row-measurement function for the table virtualizers.
- *
- * TanStack's default reads `offsetHeight` when called without a
- * ResizeObserver entry — which is exactly the initial measurement on row
- * mount, in the middle of React's commit, right after fresh DOM mutations.
- * Every such read forces a full-document reflow, and a chunk of new rows
- * pays it per row while scrolling.
- *
- * The synchronous read is redundant: `observe()` is guaranteed to deliver an
- * initial entry with `borderBoxSize` in the same frame, post-layout — a free
- * measurement. So without an entry we return the size the virtualizer
- * already assumes for the item (cached measurement or estimate), making the
- * mount-time call a no-op, and let the observer entry supply the real size.
- * With an entry we defer to the default, which uses `borderBoxSize` and
- * never touches layout.
+ * Row-measurement for the table virtualizers. TanStack's default reads
+ * `offsetHeight` when called without a ResizeObserver entry — i.e. on row
+ * mount mid-commit, forcing a reflow per new row while scrolling. That read is
+ * redundant: `observe()` delivers an initial `borderBoxSize` entry the same
+ * frame, post-layout. So entry-less we return the assumed size (cache/estimate)
+ * — a no-op — and let the observer entry supply the real one.
  */
 export const measureRowElement = <TScrollElement extends Element | Window>(
   element: Element,

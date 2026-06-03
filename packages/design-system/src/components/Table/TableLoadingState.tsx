@@ -6,10 +6,9 @@ import { useTableContext } from './TableContext';
 
 interface TableLoadingStateProps {
   /**
-   * Which edge of the table the skeletons represent. 'end' (default) is the
-   * classic bottom loader; 'start' marks the prepend loader rendered above the
-   * rows while a previous page loads — it gets its own test id and a data
-   * attribute the scroll-shift compensation measures.
+   * Edge the skeletons sit at. 'end' (default) is the bottom loader; 'start'
+   * is the prepend loader above the rows — own test id + a data attribute the
+   * scroll compensation measures.
    */
   position?: 'start' | 'end';
   /** Number of skeleton rows; defaults to the table-level skeletonCount. */
