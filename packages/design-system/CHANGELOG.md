@@ -1,3 +1,7 @@
+## 0.53.0 (2026-06-03)
+
+* feat: WDS-127 animated bg ([3a50a94](https://github.com/wallarm/design-system/commit/3a50a94))
+
 ## 0.52.0 (2026-06-03)
 
 * feat(table): AS-1026 bidirectional infinite scroll (#140) ([fff6fd2](https://github.com/wallarm/design-system/commit/fff6fd2)), closes [#140](https://github.com/wallarm/design-system/issues/140)
