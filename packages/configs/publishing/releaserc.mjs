@@ -82,12 +82,7 @@ export function defineConfig({
         : []),
       [
         '@semantic-release/github',
-        // `releasedLabels: false` disables the per-release issue/PR label. The
-        // default template (`released on @${channel}`) interpolates the branch
-        // name as the prerelease channel, and GitHub rejects label names over 50
-        // chars — so any long-named `fix/*` or `feature/*` branch failed the
-        // release "success" step with a 422 even though publish succeeded.
-        { successComment, failComment: false, releasedLabels: false },
+        { successComment, failComment: false },
       ],
     ],
   };
