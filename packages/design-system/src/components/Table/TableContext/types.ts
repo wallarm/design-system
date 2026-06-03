@@ -55,9 +55,6 @@ export interface TableContextValue<T> {
   // Cannot be hidden, reordered, or unpinned.
   masterColumnId: string | null;
 
-  // Ref to the <thead> element for measuring header height
-  theadRef: RefObject<HTMLTableSectionElement | null>;
-
   // Container ref for scoping keyboard handlers
   containerRef: RefObject<HTMLDivElement | null>;
 
