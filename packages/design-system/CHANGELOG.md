@@ -1,3 +1,7 @@
+## 0.55.0 (2026-06-04)
+
+* feat: WDS-128 shell animation ([1201cb4](https://github.com/wallarm/design-system/commit/1201cb4))
+
 ## 0.54.0 (2026-06-04)
 
 * feat: animated bg ([fa61525](https://github.com/wallarm/design-system/commit/fa61525))
