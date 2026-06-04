@@ -19,7 +19,7 @@ export const AppShellRail: FC<AppShellRailProps> = ({ ref, className, children, 
       data-slot='app-shell-rail'
       data-testid={testId}
       className={cn(
-        '[grid-area:rail] transition-opacity duration-200 ease-in-out',
+        '[grid-area:rail] transition-opacity duration-500 ease-in-out',
         !appeared && 'opacity-0',
         className,
       )}
