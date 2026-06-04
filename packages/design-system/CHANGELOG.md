@@ -1,3 +1,9 @@
+## 0.54.0 (2026-06-04)
+
+* feat: animated bg ([fa61525](https://github.com/wallarm/design-system/commit/fa61525))
+* feat: shell animation ([fc7d4cf](https://github.com/wallarm/design-system/commit/fc7d4cf))
+* feat: splash screen animation ([3ca892c](https://github.com/wallarm/design-system/commit/3ca892c))
+
 ## <small>0.53.1 (2026-06-03)</small>
 
 * fix(overflow-list): keep collapsed split across display:none hide/show (#146) ([8d3086d](https://github.com/wallarm/design-system/commit/8d3086d)), closes [#146](https://github.com/wallarm/design-system/issues/146)
