@@ -1,6 +1,7 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
-import { AnimatedBackground, type AnimatedBackgroundProps } from './AnimatedBackground';
+import { AnimatedBackground } from './AnimatedBackground';
+import type { AnimatedBackgroundProps } from './module';
 
 const meta = {
   title: 'Layout/AnimatedBackground',
@@ -30,7 +31,7 @@ export const Halftone: StoryFn<AnimatedBackgroundProps> = () => (
 
 export const WithCard: StoryFn<AnimatedBackgroundProps> = () => (
   <div className='relative h-screen w-screen'>
-    <AnimatedBackground />
+    <AnimatedBackground game />
 
     <Card className='absolute top-1/2 left-1/2 -translate-1/2 w-[300px] h-max'>
       <CardHeader>

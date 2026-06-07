@@ -1,0 +1,136 @@
+import type { CSSProperties, FC } from 'react';
+import { cn } from '../../utils/cn';
+import type { GameStats } from './module';
+
+const dotColor = 'var(--animated-bg-dot)';
+const caughtColor = 'var(--animated-bg-caught-dot)';
+
+const labelStyle: CSSProperties = {
+  fontFeatureSettings: '"liga" 0',
+  color: dotColor,
+};
+
+interface GameHudProps {
+  caught: number;
+  armed: boolean;
+  roundOver: boolean;
+  stats: GameStats;
+  accuracy: number;
+  faced: number;
+  catchKey: number;
+  gateTarget: number;
+  onTryAgain: () => void;
+}
+
+export const GameHud: FC<GameHudProps> = ({
+  caught,
+  armed,
+  roundOver,
+  stats,
+  accuracy,
+  faced,
+  catchKey,
+  gateTarget,
+  onTryAgain,
+}) => {
+  const showCounter = caught > 0;
+
+  return (
+    <>
+      {showCounter && (
+        <div
+          className='fixed top-24 right-24 flex flex-col items-end gap-6 font-mono pointer-events-none'
+          style={{ animation: 'hud-in 0.3s ease-out' }}
+        >
+          <div
+            className={cn(
+              'flex flex-col items-center justify-center border',
+              armed ? 'h-113 w-119' : 'h-52 w-119',
+            )}
+            style={{
+              borderColor: dotColor,
+              backgroundColor: `color-mix(in srgb, ${dotColor} 8%, transparent)`,
+            }}
+          >
+            {armed ? (
+              <>
+                <div className='flex flex-col items-center gap-4'>
+                  <span
+                    className='text-base leading-xl font-bold'
+                    style={{ fontFeatureSettings: '"tnum"', color: caughtColor }}
+                  >
+                    {stats.stopped}
+                    <span className='opacity-45'> / {faced}</span>
+                  </span>
+                  <span className='text-xs leading-xs uppercase' style={labelStyle}>
+                    HIT
+                  </span>
+                </div>
+                <div className='h-px w-full my-8' style={{ backgroundColor: dotColor }} />
+                <div className='flex flex-col items-center gap-4'>
+                  <span
+                    className='text-base leading-xl font-bold'
+                    style={{ fontFeatureSettings: '"tnum"', color: caughtColor }}
+                  >
+                    {accuracy}%
+                  </span>
+                  <span className='text-xs leading-xs uppercase' style={labelStyle}>
+                    SCORE
+                  </span>
+                </div>
+              </>
+            ) : (
+              <div className='flex flex-col items-center gap-4'>
+                <span
+                  key={catchKey}
+                  className='text-base leading-xl font-bold'
+                  style={{
+                    fontFeatureSettings: '"tnum"',
+                    animation: 'catch-pop 0.25s ease-out',
+                    color: caughtColor,
+                  }}
+                >
+                  {caught}
+                  <span className='opacity-45'> / {gateTarget}</span>
+                </span>
+                <span className='text-xs leading-xs uppercase' style={labelStyle}>
+                  INSERT COIN
+                </span>
+              </div>
+            )}
+          </div>
+
+          {roundOver && (
+            <button
+              type='button'
+              className='pointer-events-auto text-2xs leading-sm font-mono uppercase underline underline-offset-4 hover:text-[var(--animated-bg-accent-dot)]'
+              style={{ color: dotColor }}
+              onClick={onTryAgain}
+            >
+              Try again
+            </button>
+          )}
+
+          {armed && !roundOver && (
+            <span className='text-2xs leading-sm' style={{ color: dotColor }}>
+              {'← → move · space fire · esc to exit'}
+            </span>
+          )}
+        </div>
+      )}
+
+      {caught > 0 && !armed && (
+        <div
+          className='fixed bottom-24 left-1/2 -translate-x-1/2 text-xs pointer-events-none'
+          style={{ animation: 'hud-in 0.3s ease-out', color: dotColor }}
+        >
+          {
+            'Click the red anomalies \u2014 catch 5 to arm the cannon, then \u2190 \u2192 move \u00B7 space fire'
+          }
+        </div>
+      )}
+    </>
+  );
+};
+
+GameHud.displayName = 'GameHud';
