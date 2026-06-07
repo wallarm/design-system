@@ -1,5 +1,4 @@
-import type { AnimatedBackgroundProps } from './AnimatedBackground';
-import type { EngineOptions, Texture } from './types';
+import type { AnimatedBackgroundProps, EngineOptions, Texture } from './types';
 
 const LOGIN_BG_DEFAULTS: Record<
   Texture,
@@ -25,5 +24,6 @@ export const resolveOptions = (props: AnimatedBackgroundProps): EngineOptions =>
     dotColorVar: props.dotColorVar ?? '--animated-bg-dot',
     accentColorVar: props.accentColorVar ?? '--animated-bg-accent-dot',
     baseColorVar: props.baseColorVar ?? '--color-component-app-shell-bg',
+    caughtColorVar: props.caughtColorVar ?? '--animated-bg-caught-dot',
   };
 };
