@@ -283,6 +283,7 @@ export {
   InputGroupAddon,
   InputGroupText,
 } from './components/InputGroup';
+export { OTPInput, type OTPInputProps } from './components/InputOTP';
 export {
   type DatacenterKey,
   datacenters,
