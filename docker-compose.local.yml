@@ -20,6 +20,7 @@ services:
       - CI=false
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
       - PLAYWRIGHT_ARGS
+      - STORYBOOK_URL
     network_mode: host
     command:
       - sh
@@ -61,6 +62,7 @@ services:
       - CI=false
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
       - PLAYWRIGHT_ARGS
+      - STORYBOOK_URL
     network_mode: host
     command:
       - sh
@@ -98,6 +100,7 @@ services:
       - CI=false
       - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
       - PLAYWRIGHT_ARGS
+      - STORYBOOK_URL
     network_mode: host
     command:
       - sh
