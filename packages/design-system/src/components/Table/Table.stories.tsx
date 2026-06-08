@@ -44,7 +44,16 @@ import {
 } from './mocks';
 import { Table } from './Table';
 import { TableActionBar } from './TableActionBar';
+import {
+  TableColumnMenu,
+  TableColumnMenuHideItem,
+  TableColumnMenuMoveLeftItem,
+  TableColumnMenuMoveRightItem,
+  TableColumnMenuPinItem,
+  TableColumnMenuSortItem,
+} from './TableColumnMenu';
 import { TableEmptyState } from './TableEmptyState';
+import { TableSortTrigger } from './TableSortTrigger';
 import type {
   TableColumnDef,
   TableColumnPinningState,
@@ -126,6 +135,322 @@ export const ManualSorting: StoryFn<typeof meta> = () => {
       manualSorting
       data-testid='manual-sort-table'
     />
+  );
+};
+
+// Showcase: every analytics seam exposed by `<Table>` today, end-to-end.
+//
+// DOM seams (attribute lands on the real interactive target, document-level
+// SDKs resolve via `closest('[data-analytics-id]')`):
+//   • Sort trigger        — `<TableSortTrigger column={...} data-analytics-id=...>`
+//                           rendered as a direct child of `header(ctx)`.
+//   • Column header menu  — `<TableColumnMenu column={...} data-analytics-id=...>`
+//                           on the trigger button, plus per-item analytics on
+//                           `<TableColumnMenuSortItem>`, `<TableColumnMenuPinItem>`,
+//                           `<TableColumnMenuHideItem>`, `<TableColumnMenuMoveLeftItem>`,
+//                           `<TableColumnMenuMoveRightItem>`.
+//   • Cell content        — consumer JSX from `column.cell(ctx)`; analytics
+//                           sit on the rendered `<a>` / `<button>`.
+//   • Per-row actions     — consumer JSX from `meta.renderMenuAction(row)`;
+//                           analytics sit on the trigger and each menu item.
+//   • TableActionBar      — consumer-rendered bulk action buttons (children).
+//   • Expanded row        — consumer JSX from `renderExpandedRow(row)`.
+//   • Wrapper testid      — `<Table data-testid=...>` lands on the
+//                           scroll-container `<div>`.
+//
+// Callback seams (state-level signal; richer than a click event because the
+// payload carries the resulting state — direction, visibility, order, etc.):
+//   • `onSortingChange(u)`             — resulting sort column + direction
+//   • `onRowSelectionChange(u)`        — selected row map
+//   • `onExpandedChange(u)`            — expanded row map
+//   • `onColumnVisibilityChange(u)`    — visibility map (Settings menu)
+//   • `onColumnOrderChange(u)`         — column order (Settings menu DnD)
+//   • `onColumnPinningChange(u)`       — pin state (column-header menu)
+//   • `onColumnSizingChange(u)`        — final width (resize handle)
+//   • `onMasterCellClick(rowId)`       — master-cell click
+//
+// Pending DS work (no DOM seam yet — callback-only): selection checkbox,
+// expand toggle, master-cell click, resize handle, horizontal scroll
+// buttons, settings menu trigger / items.
+export const WithAnalytics: StoryFn<typeof meta> = () => {
+  const [sorting, setSorting] = useState<TableSortingState>([]);
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+  const [expanded, setExpanded] = useState<TableExpandedState>({});
+  const [columnVisibility, setColumnVisibility] = useState<TableVisibilityState>({});
+  const [columnOrder, setColumnOrder] = useState<string[]>([]);
+  const [columnPinning, setColumnPinning] = useState<TableColumnPinningState>({});
+  const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
+
+  // Pretend SDK call — every analytics signal in this story funnels through
+  // it so the Storybook actions panel shows one consistent stream.
+  const track = useCallback(
+    (event: string, props?: Record<string, unknown>) =>
+      // biome-ignore lint/suspicious/noConsole: demo story stand-in for an SDK call
+      console.info('[analytics]', event, props ?? {}),
+    [],
+  );
+
+  const columnsWithAnalytics = useMemo<TableColumnDef<SecurityEvent>[]>(
+    () => [
+      // Master column — sortable header, link cell with analytics, per-row
+      // menu action with analytics on every menu item.
+      securityColumnHelper.accessor('objectName', {
+        header: ({ column }) => (
+          <TableSortTrigger
+            column={column}
+            data-analytics-id='SECURITY_SORT_OBJECT_NAME'
+            data-analytics-props='{"surface":"events-table"}'
+          >
+            Object name
+          </TableSortTrigger>
+        ),
+        size: 320,
+        enableSorting: true,
+        meta: {
+          sortType: 'text' as const,
+          resizeType: 'cut' as const,
+          renderMenuAction: row => (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant='ghost'
+                  color='neutral'
+                  size='small'
+                  aria-label='Row actions'
+                  data-analytics-id='SECURITY_ROW_MENU_OPEN'
+                  data-analytics-props={`{"rowId":"${row.original.id}"}`}
+                >
+                  <Ellipsis />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem
+                  data-analytics-id='SECURITY_ROW_COPY_NAME'
+                  data-analytics-props={`{"rowId":"${row.original.id}"}`}
+                  onSelect={() => navigator.clipboard.writeText(row.original.objectName)}
+                >
+                  <DropdownMenuItemIcon>
+                    <Copy />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Copy name</DropdownMenuItemText>
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  data-analytics-id='SECURITY_ROW_FILTER'
+                  data-analytics-props={`{"rowId":"${row.original.id}"}`}
+                  onSelect={() => track('SECURITY_ROW_FILTER_APPLIED', { rowId: row.original.id })}
+                >
+                  <DropdownMenuItemIcon>
+                    <Filter />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Show only</DropdownMenuItemText>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  data-analytics-id='SECURITY_ROW_EXCLUDE'
+                  data-analytics-props={`{"rowId":"${row.original.id}"}`}
+                  onSelect={() => track('SECURITY_ROW_EXCLUDE_APPLIED', { rowId: row.original.id })}
+                >
+                  <DropdownMenuItemIcon>
+                    <FilterX />
+                  </DropdownMenuItemIcon>
+                  <DropdownMenuItemText>Exclude</DropdownMenuItemText>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ),
+        },
+        cell: ({ row }) => (
+          <a
+            href={`#/events/${row.original.id}`}
+            data-analytics-id='SECURITY_ROW_OPEN'
+            data-analytics-props={`{"rowId":"${row.original.id}"}`}
+          >
+            {row.original.objectName}
+          </a>
+        ),
+      }),
+      // Other sortable columns — each one declares its own sort target.
+      securityColumnHelper.accessor('requests', {
+        header: ({ column }) => (
+          <TableSortTrigger column={column} data-analytics-id='SECURITY_SORT_REQUESTS'>
+            Requests
+          </TableSortTrigger>
+        ),
+        size: 140,
+        enableSorting: true,
+      }),
+      securityColumnHelper.accessor('sourceIp', {
+        header: ({ column }) => (
+          <TableSortTrigger column={column} data-analytics-id='SECURITY_SORT_SOURCE_IP'>
+            Source
+          </TableSortTrigger>
+        ),
+        size: 180,
+        enableSorting: true,
+        meta: { sortType: 'text' as const },
+      }),
+      // Status column — demonstrates the column header menu seam with
+      // per-item analytics, rendered as a sibling of the sort trigger inside
+      // a Fragment.
+      securityColumnHelper.accessor('status', {
+        header: ({ column }) => (
+          <>
+            <TableSortTrigger column={column} data-analytics-id='SECURITY_SORT_STATUS'>
+              Status
+            </TableSortTrigger>
+            <TableColumnMenu column={column} data-analytics-id='SECURITY_COLMENU_STATUS'>
+              <TableColumnMenuSortItem
+                direction='asc'
+                data-analytics-id='SECURITY_COLMENU_STATUS_SORT_ASC'
+              />
+              <TableColumnMenuSortItem
+                direction='desc'
+                data-analytics-id='SECURITY_COLMENU_STATUS_SORT_DESC'
+              />
+              <TableColumnMenuPinItem data-analytics-id='SECURITY_COLMENU_STATUS_PIN' />
+              <TableColumnMenuHideItem data-analytics-id='SECURITY_COLMENU_STATUS_HIDE' />
+              <TableColumnMenuMoveLeftItem data-analytics-id='SECURITY_COLMENU_STATUS_MOVE_LEFT' />
+              <TableColumnMenuMoveRightItem data-analytics-id='SECURITY_COLMENU_STATUS_MOVE_RIGHT' />
+            </TableColumnMenu>
+          </>
+        ),
+        size: 130,
+        enableSorting: true,
+        meta: { sortType: 'text' as const, resizeType: 'cut' as const },
+      }),
+      securityColumnHelper.accessor('firstDetected', {
+        header: ({ column }) => (
+          <TableSortTrigger column={column} data-analytics-id='SECURITY_SORT_FIRST_DETECTED'>
+            First detected
+          </TableSortTrigger>
+        ),
+        size: 160,
+        enableSorting: true,
+        meta: { sortType: 'date' as const, resizeType: 'cut' as const },
+      }),
+    ],
+    [track],
+  );
+
+  return (
+    <Table
+      data-testid='security-events-table'
+      data={securityEvents}
+      columns={columnsWithAnalytics}
+      getRowId={row => row.id}
+      // Sort: DOM seam on the icon (TableSortTrigger) + callback for direction.
+      sorting={sorting}
+      onSortingChange={updater => {
+        setSorting(prev => {
+          const next = typeof updater === 'function' ? updater(prev) : updater;
+          track('SECURITY_TABLE_SORT_CHANGED', { columnId: next[0]?.id, desc: !!next[0]?.desc });
+          return next;
+        });
+      }}
+      // Selection / expand / settings menu — no DOM seam yet; callbacks carry
+      // the resulting state.
+      rowSelection={rowSelection}
+      onRowSelectionChange={updater => {
+        setRowSelection(prev => {
+          const next = typeof updater === 'function' ? updater(prev) : updater;
+          track('SECURITY_TABLE_SELECTION_CHANGED', { selectedIds: Object.keys(next) });
+          return next;
+        });
+      }}
+      expanded={expanded}
+      onExpandedChange={updater => {
+        setExpanded(prev => {
+          const next = typeof updater === 'function' ? updater(prev) : updater;
+          track('SECURITY_TABLE_EXPAND_CHANGED', { state: next });
+          return next;
+        });
+      }}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={updater => {
+        setColumnVisibility(prev => {
+          const next = typeof updater === 'function' ? updater(prev) : updater;
+          track('SECURITY_TABLE_COLUMNS_VISIBILITY_CHANGED', next);
+          return next;
+        });
+      }}
+      columnOrder={columnOrder}
+      onColumnOrderChange={updater => {
+        setColumnOrder(prev => {
+          const next = typeof updater === 'function' ? updater(prev) : updater;
+          track('SECURITY_TABLE_COLUMNS_REORDERED', { order: next });
+          return next;
+        });
+      }}
+      columnPinning={columnPinning}
+      onColumnPinningChange={updater => {
+        setColumnPinning(prev => {
+          const next = typeof updater === 'function' ? updater(prev) : updater;
+          track('SECURITY_TABLE_COLUMNS_PINNED', next);
+          return next;
+        });
+      }}
+      columnSizing={columnSizing}
+      onColumnSizingChange={updater => {
+        setColumnSizing(prev => {
+          const next = typeof updater === 'function' ? updater(prev) : updater;
+          track('SECURITY_TABLE_COLUMN_RESIZED', next);
+          return next;
+        });
+      }}
+      onMasterCellClick={rowId => track('SECURITY_TABLE_MASTER_CELL_CLICKED', { rowId })}
+      renderExpandedRow={row => (
+        <div className='p-16 bg-states-primary-default-alt rounded-8'>
+          <HStack justify='between' align='center'>
+            <VStack gap={2}>
+              <Text size='xs' color='secondary'>
+                Source IP
+              </Text>
+              <Text size='sm'>{row.original.sourceIp}</Text>
+            </VStack>
+            <Button
+              variant='outline'
+              color='neutral'
+              size='small'
+              data-analytics-id='SECURITY_EXPANDED_VIEW_DETAILS'
+              data-analytics-props={`{"rowId":"${row.original.id}"}`}
+              onClick={() =>
+                track('SECURITY_EXPANDED_VIEW_DETAILS_CLICKED', { rowId: row.original.id })
+              }
+            >
+              View full details
+            </Button>
+          </HStack>
+        </div>
+      )}
+    >
+      <TableActionBar>
+        <Button
+          variant='ghost'
+          color='neutral-alt'
+          data-analytics-id='SECURITY_BULK_DUPLICATE'
+          data-analytics-props={`{"count":${Object.keys(rowSelection).length}}`}
+          onClick={() =>
+            track('SECURITY_BULK_DUPLICATE_CLICKED', {
+              selectedIds: Object.keys(rowSelection),
+            })
+          }
+        >
+          <Copy /> Duplicate
+        </Button>
+        <Button
+          color='brand'
+          data-analytics-id='SECURITY_BULK_DELETE'
+          data-analytics-props={`{"count":${Object.keys(rowSelection).length}}`}
+          onClick={() =>
+            track('SECURITY_BULK_DELETE_CLICKED', {
+              selectedIds: Object.keys(rowSelection),
+            })
+          }
+        >
+          <Trash2 /> Delete
+        </Button>
+      </TableActionBar>
+    </Table>
   );
 };
 

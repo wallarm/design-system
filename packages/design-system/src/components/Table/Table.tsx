@@ -1,7 +1,10 @@
+import type { ComponentType } from 'react';
 import { TestIdProvider } from '../../utils/testId';
+import { containsDirectChild } from './lib';
 import { TableProvider } from './TableContext';
 import { TableImperativeBridge } from './TableImperativeBridge';
 import { TableInner } from './TableInner';
+import { TableSettingsMenu } from './TableSettingsMenu';
 import type { TableProps } from './types';
 
 export const Table = <T,>(props: TableProps<T>) => {
@@ -18,6 +21,10 @@ export const Table = <T,>(props: TableProps<T>) => {
 
   const isEmpty = data.length === 0 && !isLoading;
   const showSettings = !!props.onColumnVisibilityChange || !!props.onColumnOrderChange;
+  const hasConsumerSettingsMenu = containsDirectChild(
+    children,
+    TableSettingsMenu as ComponentType<unknown>,
+  );
 
   return (
     <TableProvider data={data} isLoading={isLoading} {...providerProps}>
@@ -27,6 +34,7 @@ export const Table = <T,>(props: TableProps<T>) => {
           isEmpty={isEmpty}
           virtualized={props.virtualized}
           showSettings={showSettings}
+          hasConsumerSettingsMenu={hasConsumerSettingsMenu}
           ariaLabel={ariaLabel}
           className={className}
           data-testid={testId}

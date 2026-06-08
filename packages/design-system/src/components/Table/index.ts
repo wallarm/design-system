@@ -2,8 +2,32 @@ export { createTableColumnHelper } from './lib';
 export type { TableColumnHelper } from './lib/createTableColumnHelper';
 export { Table } from './Table';
 export { TableActionBar } from './TableActionBar';
+export {
+  TableColumnMenu,
+  TableColumnMenuHideItem,
+  type TableColumnMenuHideItemProps,
+  TableColumnMenuMoveLeftItem,
+  type TableColumnMenuMoveLeftItemProps,
+  TableColumnMenuMoveRightItem,
+  type TableColumnMenuMoveRightItemProps,
+  TableColumnMenuPinItem,
+  type TableColumnMenuPinItemProps,
+  type TableColumnMenuProps,
+  TableColumnMenuSortItem,
+  type TableColumnMenuSortItemProps,
+} from './TableColumnMenu';
 export { TableEmptyState } from './TableEmptyState';
-export { TableSettingsMenu } from './TableSettingsMenu';
+export {
+  TableSettingsMenu,
+  TableSettingsMenuItem,
+  type TableSettingsMenuItemProps,
+  type TableSettingsMenuProps,
+  TableSettingsMenuReset,
+  type TableSettingsMenuResetProps,
+  TableSettingsMenuSearch,
+  type TableSettingsMenuSearchProps,
+} from './TableSettingsMenu';
+export { TableSortTrigger, type TableSortTriggerProps } from './TableSortTrigger';
 export type {
   TableAccessorColumnDef,
   TableCellContext,

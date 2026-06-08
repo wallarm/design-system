@@ -1,31 +1,41 @@
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import type { Column } from '@tanstack/react-table';
 import { GripVertical } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
-import { Switch, SwitchControl, SwitchLabel } from '../../Switch';
+import { Switch, SwitchControl, SwitchLabel, type SwitchProps } from '../../Switch';
 import { useTableContext } from '../TableContext';
 
-interface TableSettingsMenuItemProps<T> {
-  column: Column<T, unknown>;
-  canDrag: boolean;
+export interface TableSettingsMenuItemProps
+  extends Omit<SwitchProps, 'checked' | 'onCheckedChange' | 'disabled' | 'children'> {
+  /** Column id from the table's column definitions. */
+  columnId: string;
 }
 
-export const TableSettingsMenuItem = <T,>({ column, canDrag }: TableSettingsMenuItemProps<T>) => {
-  const { masterColumnId } = useTableContext();
-  const testId = useTestId('settings-menu-item');
+export const TableSettingsMenuItem = ({
+  columnId,
+  className,
+  'data-testid': testIdProp,
+  ...rest
+}: TableSettingsMenuItemProps) => {
+  const { masterColumnId, columnDndEnabled, table } = useTableContext();
+  const slotTestId = useTestId('settings-menu-item');
+  const switchTestId = useTestId(`settings-menu-item-${columnId}`, testIdProp);
+
+  const column = table.getColumn(columnId);
+
+  const isMasterColumn = column?.id === masterColumnId;
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: columnId,
+    disabled: isMasterColumn || !columnDndEnabled,
+  });
+
+  // Guard against a consumer-supplied override that targets a non-existent column.
+  if (!column) return null;
 
   const isVisible = column.getIsVisible();
   const canHide = column.getCanHide();
   const header = typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id;
-
-  const isMasterColumn = column.id === masterColumnId;
-
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
-    id: column.id,
-    disabled: isMasterColumn || !canDrag,
-  });
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -37,7 +47,7 @@ export const TableSettingsMenuItem = <T,>({ column, canDrag }: TableSettingsMenu
     <div
       ref={setNodeRef}
       style={style}
-      data-testid={testId}
+      data-testid={slotTestId}
       className={cn(
         'relative flex items-center w-full rounded-6 pl-20 pr-8 py-6',
         'hover:bg-states-primary-hover transition-colors',
@@ -51,21 +61,24 @@ export const TableSettingsMenuItem = <T,>({ column, canDrag }: TableSettingsMenu
         )}
         {...attributes}
         {...listeners}
-        data-disabled={isMasterColumn || !canDrag || undefined}
+        data-disabled={isMasterColumn || !columnDndEnabled || undefined}
       >
         <GripVertical size='sm' />
       </span>
 
       <Switch
-        className={cn('flex-1')}
+        {...rest}
+        data-testid={switchTestId}
+        className={cn('flex-1', className)}
         checked={isVisible}
         onCheckedChange={details => column.toggleVisibility(details.checked)}
         disabled={isMasterColumn || !canHide}
       >
         <SwitchLabel className={cn('flex-1 truncate')}>{header}</SwitchLabel>
-
         <SwitchControl />
       </Switch>
     </div>
   );
 };
+
+TableSettingsMenuItem.displayName = 'TableSettingsMenuItem';

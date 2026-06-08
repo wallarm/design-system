@@ -1,3 +1,4 @@
+export { collectDirectChildren } from './collectDirectChildren';
 export {
   getAlignClass,
   getExpandBorderClass,
@@ -14,6 +15,7 @@ export {
   TABLE_START_REACHED_THRESHOLD,
   TABLE_VIRTUALIZATION_OVERSCAN,
 } from './constants';
+export { containsDirectChild } from './containsDirectChild';
 export { createExpandColumn } from './createExpandColumn';
 export { createSelectionColumn } from './createSelectionColumn';
 export { createTableColumnHelper } from './createTableColumnHelper';
