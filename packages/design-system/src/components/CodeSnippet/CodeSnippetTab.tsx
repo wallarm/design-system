@@ -1,21 +1,16 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import { useTestId } from '../../utils/testId';
-import { TabsTrigger } from '../Tabs';
+import { TabsTrigger, type TabsTriggerProps } from '../Tabs/TabsTrigger';
 
-export type CodeSnippetTabProps = {
-  value: string;
-  disabled?: boolean;
-  children: ReactNode;
-};
+export type CodeSnippetTabProps = TabsTriggerProps;
 
-export const CodeSnippetTab: FC<CodeSnippetTabProps> = ({ value, disabled, children }) => {
-  const testId = useTestId('tab');
+export const CodeSnippetTab: FC<CodeSnippetTabProps> = ({
+  'data-testid': testIdProp,
+  ...rest
+}) => {
+  const contextTestId = useTestId('tab');
 
-  return (
-    <TabsTrigger value={value} disabled={disabled} data-testid={testId}>
-      {children}
-    </TabsTrigger>
-  );
+  return <TabsTrigger {...rest} data-testid={testIdProp ?? contextTestId} />;
 };
 
 CodeSnippetTab.displayName = 'CodeSnippetTab';
