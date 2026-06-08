@@ -1,3 +1,9 @@
+## 0.56.0 (2026-06-08)
+
+* 🖼️ Update screenshots ([61d0adf](https://github.com/wallarm/design-system/commit/61d0adf))
+* fix: WDS-130 animated bg [update-screenshots] ([9096af0](https://github.com/wallarm/design-system/commit/9096af0))
+* feat: WDS-129 otp input ([091be7c](https://github.com/wallarm/design-system/commit/091be7c))
+
 ## <small>0.55.1 (2026-06-08)</small>
 
 * fix: WDS-130 animated bg ([570cd17](https://github.com/wallarm/design-system/commit/570cd17))
