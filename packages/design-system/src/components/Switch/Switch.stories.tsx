@@ -18,8 +18,8 @@ const meta = {
 
 export default meta;
 
-export const Basic: StoryFn<typeof meta> = () => (
-  <Switch data-testid='switch'>
+export const Basic: StoryFn<typeof meta> = args => (
+  <Switch {...args} data-testid='switch'>
     <SwitchControl />
     <SwitchLabel>Enable notifications </SwitchLabel>
   </Switch>
