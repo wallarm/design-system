@@ -76,6 +76,7 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
     dots: [],
     opts,
     tanTilt: Math.tan((options.tilt * Math.PI) / 180),
+    exclusionBox: null,
   };
   const game = createGameLogic(host);
 
@@ -133,11 +134,18 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
   /* ---------- clean texture ---------- */
 
   function drawClean(t: number) {
-    const { w, h, dots, tanTilt } = host;
+    const { w, h, dots, tanTilt, exclusionBox } = host;
     const sx = sweepX(t, w, opts.sweepPeriod);
     const intensity = opts.intensity;
 
+    // Precompute card exclusion rect (centered on canvas).
+    const exL = exclusionBox ? (w - exclusionBox.width) / 2 : 0;
+    const exR = exclusionBox ? (w + exclusionBox.width) / 2 : 0;
+    const exT = exclusionBox ? (h - exclusionBox.height) / 2 : 0;
+    const exB = exclusionBox ? (h + exclusionBox.height) / 2 : 0;
+
     for (const dot of dots) {
+      if (exclusionBox && dot.x >= exL && dot.x <= exR && dot.y >= exT && dot.y <= exB) continue;
       const dist = Math.abs(dot.x - (sx + (h / 2 - dot.y) * tanTilt));
       const inBloom = dist < opts.bloomRadius;
       const alpha = inBloom
@@ -156,7 +164,9 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
     const sweepAt = (y: number) => sx + (h / 2 - y) * tanTilt;
     if (t - lastLatch > opts.anomalyInterval && Math.random() < SPAWN_PROBABILITY && dots.length) {
       const cand = dots[(Math.random() * dots.length) | 0]!;
-      if (cand.x < sweepAt(cand.y) - SWEEP_OFFSET_GUARD) {
+      if (exclusionBox && cand.x >= exL && cand.x <= exR && cand.y >= exT && cand.y <= exB) {
+        // skip — candidate is under the card
+      } else if (cand.x < sweepAt(cand.y) - SWEEP_OFFSET_GUARD) {
         lastLatch = t;
         latched.push({ x: cand.x, y: cand.y, t0: t });
       }

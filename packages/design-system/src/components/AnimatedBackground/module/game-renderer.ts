@@ -49,13 +49,19 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
 
   function drawGameDots(t: number): void {
     const { ctx, dotPalette, accentPalette } = rc;
-    const { w, h, dots, opts, tanTilt } = host;
+    const { w, h, dots, opts, tanTilt, exclusionBox } = host;
     const sx = sweepX(t, w, opts.sweepPeriod);
     const intensity = opts.intensity;
     const halfCap = opts.maxDotSize / 2;
     const liveAnomalies = game.anomalies;
     const aLen = liveAnomalies.length;
     const isIdle = game.gameMode === 'idle';
+
+    // Precompute card exclusion rect (centered on canvas).
+    const exL = exclusionBox ? (w - exclusionBox.width) / 2 : 0;
+    const exR = exclusionBox ? (w + exclusionBox.width) / 2 : 0;
+    const exT = exclusionBox ? (h - exclusionBox.height) / 2 : 0;
+    const exB = exclusionBox ? (h + exclusionBox.height) / 2 : 0;
 
     // Pre-compute envelope and revealed flag per anomaly once per frame,
     // saving ~120k Math.sin calls/frame when many dots x anomalies.
@@ -78,6 +84,7 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
     }
 
     for (const dot of dots) {
+      if (exclusionBox && dot.x >= exL && dot.x <= exR && dot.y >= exT && dot.y <= exB) continue;
       const sxAt = sx + (h / 2 - dot.y) * tanTilt;
       const amb =
         AMB_SCALE *

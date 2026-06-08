@@ -31,9 +31,9 @@ export const Halftone: StoryFn<AnimatedBackgroundProps> = () => (
 
 export const WithCard: StoryFn<AnimatedBackgroundProps> = () => (
   <div className='relative h-screen w-screen'>
-    <AnimatedBackground game />
+    <AnimatedBackground game excludeCardSize={{ width: 300, height: 200 }} />
 
-    <Card className='absolute top-1/2 left-1/2 -translate-1/2 w-[300px] h-max'>
+    <Card className='absolute top-1/2 left-1/2 -translate-1/2 w-[300px] h-[200px]'>
       <CardHeader>
         <CardTitle>Sign In</CardTitle>
       </CardHeader>
