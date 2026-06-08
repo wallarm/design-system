@@ -1,11 +1,17 @@
-import type { FC, ReactNode } from 'react';
+import { Children, type FC, isValidElement, type ReactElement, type ReactNode } from 'react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { Presence as ArkUiPresence } from '@ark-ui/react/presence';
 import { useTestId } from '../../../utils/testId';
+import {
+  BulkBarSummary,
+  BulkBarSummaryClear,
+  BulkBarSummaryCount,
+  BulkBarSummarySelectAll,
+  BulkBarSummarySeparator,
+} from '../../BulkBar';
 import { HStack } from '../../Stack';
 import { selectionBulkBarVariants } from '../classes';
 import { useSelectionContext } from '../useSelectionContext';
-import { SelectionBulkBarSummary } from './SelectionBulkBarSummary';
 
 const TEST_ID_SLOT = 'bulk-bar';
 const DEFAULT_ARIA_LABEL = 'Bulk actions';
@@ -32,6 +38,41 @@ export interface SelectionBulkBarProps {
   children?: ReactNode;
 }
 
+interface PartitionedChildren {
+  summary: ReactElement | undefined;
+  actions: ReactNode[];
+}
+
+const partitionChildren = (children: ReactNode): PartitionedChildren => {
+  let summary: ReactElement | undefined;
+  const actions: ReactNode[] = [];
+
+  for (const child of Children.toArray(children)) {
+    if (isValidElement(child) && child.type === BulkBarSummary && !summary) {
+      summary = child;
+      continue;
+    }
+    actions.push(child);
+  }
+
+  return { summary, actions };
+};
+
+const DefaultSummary: FC = () => {
+  const { selectedIds, isAllSelected, selectAll, clear } = useSelectionContext();
+
+  return (
+    <BulkBarSummary>
+      <BulkBarSummaryCount count={selectedIds.size} />
+      <HStack gap={6}>
+        <BulkBarSummarySelectAll onClick={selectAll} disabled={isAllSelected} />
+        <BulkBarSummarySeparator />
+        <BulkBarSummaryClear onClick={clear} />
+      </HStack>
+    </BulkBarSummary>
+  );
+};
+
 export const SelectionBulkBar: FC<SelectionBulkBarProps> = ({
   'aria-label': ariaLabel = DEFAULT_ARIA_LABEL,
   'data-testid': testIdProp,
@@ -39,8 +80,12 @@ export const SelectionBulkBar: FC<SelectionBulkBarProps> = ({
   children,
 }) => {
   const { selectedIds } = useSelectionContext();
-  const fallbackTestId = useTestId(TEST_ID_SLOT);
-  const testId = testIdProp ?? fallbackTestId;
+  const testId = useTestId(TEST_ID_SLOT, testIdProp);
+
+  // Consumer composes a custom <BulkBarSummary> for analytics-tagged links;
+  // anything else (action buttons) lives in the right-hand HStack. Without
+  // an explicit summary, render the Selection-wired default.
+  const { summary, actions } = partitionChildren(children);
 
   const bar = (
     <ArkUiPresence present={selectedIds.size > 0} asChild>
@@ -51,9 +96,9 @@ export const SelectionBulkBar: FC<SelectionBulkBarProps> = ({
         data-testid={testId}
         className={selectionBulkBarVariants({ placement })}
       >
-        <SelectionBulkBarSummary />
+        {summary ?? <DefaultSummary />}
         <HStack gap={8} align='center'>
-          {children}
+          {actions}
         </HStack>
       </div>
     </ArkUiPresence>

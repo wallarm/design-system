@@ -461,9 +461,11 @@ export {
   SelectionBulkBar,
   type SelectionBulkBarPlacement,
   type SelectionBulkBarProps,
+  type SelectionContextValue,
   SelectionItem,
   type SelectionItemProps,
   type SelectionProps,
+  useSelectionContext,
 } from './components/Selection';
 export { Separator, type SeparatorProps } from './components/Separator';
 export { Skeleton, type SkeletonProps } from './components/Skeleton';
