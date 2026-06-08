@@ -15,9 +15,10 @@ export const SelectClearTrigger: FC<SelectClearTriggerProps> = ({
   type = 'default',
   size = 'sm',
   weight = 'medium',
+  'data-testid': testIdProp,
   ...props
 }) => {
-  const testId = useTestId('clear-trigger');
+  const testId = useTestId('clear-trigger', testIdProp);
 
   return (
     <ArkUiSelect.ClearTrigger

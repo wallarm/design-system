@@ -1,13 +1,17 @@
-import type { FC, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, FC, ReactNode } from 'react';
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { segmentedControlItemClassNamesBase } from '../SegmentedControl';
 
-export interface SegmentedTabsTriggerProps {
+type SegmentedTabsTriggerNativeProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'value' | 'children'
+>;
+
+export interface SegmentedTabsTriggerProps extends SegmentedTabsTriggerNativeProps, TestableProps {
   children: ReactNode;
   value: string;
-  disabled?: boolean;
   asChild?: boolean;
   /** Show a small brand-colored dot indicator next to the tab label */
   indicator?: boolean;
@@ -19,12 +23,16 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
   disabled = false,
   asChild = false,
   indicator = false,
+  className,
+  'data-testid': testIdProp,
+  ...rest
 }) => {
-  const testId = useTestId('trigger');
+  const contextTestId = useTestId('trigger');
 
   return (
     <ArkUiTabs.Trigger
-      data-testid={testId}
+      {...rest}
+      data-testid={testIdProp ?? contextTestId}
       className={cn(
         segmentedControlItemClassNamesBase,
         'group z-1',
@@ -68,6 +76,7 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
 
         // selected text
         'data-selected:text-text-primary',
+        className,
       )}
       value={value}
       disabled={disabled}
@@ -84,3 +93,5 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
     </ArkUiTabs.Trigger>
   );
 };
+
+SegmentedTabsTrigger.displayName = 'SegmentedTabsTrigger';

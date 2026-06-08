@@ -3,7 +3,7 @@ import { Menu } from '@ark-ui/react/menu';
 import type { VariantProps } from 'class-variance-authority';
 import { Check } from '../../icons';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { dropdownMenuItemVariants } from './classes';
 import { DropdownMenuItemIndicator } from './DropdownMenuItemIndicator';
 
@@ -11,7 +11,8 @@ type DropdownMenuRadioItemVariantsProps = VariantProps<typeof dropdownMenuItemVa
 
 export interface DropdownMenuRadioItemProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
-    DropdownMenuRadioItemVariantsProps {
+    DropdownMenuRadioItemVariantsProps,
+    TestableProps {
   /** Required — identifies this radio within the group */
   value: string;
   disabled?: boolean;
@@ -26,9 +27,10 @@ export const DropdownMenuRadioItem: FC<DropdownMenuRadioItemProps> = ({
   closeOnSelect,
   variant = 'default',
   className,
+  'data-testid': testIdProp,
   ...props
 }) => {
-  const testId = useTestId('radio-item');
+  const testId = useTestId('radio-item', testIdProp);
 
   return (
     <Menu.RadioItem

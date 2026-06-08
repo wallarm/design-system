@@ -1,31 +1,36 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
 import { Menu } from '@ark-ui/react/menu';
 import { ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { dropdownMenuItemVariants } from './classes';
 import type { DropdownMenuItemVariantsProps } from './DropdownMenuItem';
 
-interface DropdownMenuTriggerProps
-  extends HTMLAttributes<HTMLButtonElement>,
-    DropdownMenuItemVariantsProps {
+export interface DropdownMenuTriggerItemProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
+    DropdownMenuItemVariantsProps,
+    TestableProps {
   children: ReactNode;
   asChild?: boolean;
   inset?: boolean;
   ref?: Ref<HTMLButtonElement>;
 }
 
-export const DropdownMenuTriggerItem: FC<DropdownMenuTriggerProps> = ({
+export const DropdownMenuTriggerItem: FC<DropdownMenuTriggerItemProps> = ({
   variant = 'default',
   inset = false,
   children,
+  className,
+  'data-testid': testIdProp,
+  ...rest
 }) => {
-  const testId = useTestId('trigger-item');
+  const testId = useTestId('trigger-item', testIdProp);
 
   return (
     <Menu.TriggerItem
+      {...rest}
       data-testid={testId}
-      className={cn(dropdownMenuItemVariants({ variant, inset }))}
+      className={cn(dropdownMenuItemVariants({ variant, inset }), className)}
     >
       {children}
 

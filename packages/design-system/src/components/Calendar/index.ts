@@ -16,7 +16,7 @@ export { CalendarGrids, type CalendarGridsProps } from './CalendarGrids';
 export { CalendarHeader } from './CalendarHeader';
 export { CalendarInputHeader, type CalendarInputHeaderProps } from './CalendarInputHeader';
 export { CalendarKeyboardHints, type CalendarKeyboardHintsProps } from './CalendarKeyboardHints';
-export { CalendarPresetItem } from './CalendarPresetItem';
+export { CalendarPresetItem, type CalendarPresetItemProps } from './CalendarPresetItem';
 export { CalendarPresets, type CalendarPresetsProps } from './CalendarPresets';
 export { CalendarResetButton, type CalendarResetButtonProps } from './CalendarResetButton';
 export { CalendarTrigger, type CalendarTriggerProps } from './CalendarTrigger';

@@ -8,7 +8,7 @@ import {
   useRef,
 } from 'react';
 import { composeRefs } from '@radix-ui/react-compose-refs';
-import { Slot } from '@radix-ui/react-slot';
+import { Slot, Slottable } from '@radix-ui/react-slot';
 import type { SvgIconProps } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -38,10 +38,11 @@ export const NavRailItem: FC<NavRailItemProps> = ({
   active = false,
   className,
   children,
+  'data-testid': testIdProp,
   ...props
 }) => {
   const { collapsed } = useNavRailContext();
-  const testId = useTestId('item');
+  const contextTestId = useTestId('item');
   const Comp = asChild ? Slot : 'a';
   const internalRef = useRef<HTMLAnchorElement>(null);
 
@@ -53,7 +54,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
       ref={composeRefs(internalRef, ref)}
       aria-current={active ? ('page' as const) : undefined}
       data-slot='nav-rail-item'
-      data-testid={testId}
+      data-testid={testIdProp ?? contextTestId}
       className={cn(navRailItemVariants({ active }), className)}
     >
       <span className='flex shrink-0 items-center justify-center'>
@@ -66,7 +67,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
           {label}
         </span>
       )}
-      {children}
+      <Slottable>{children}</Slottable>
     </Comp>
   );
 

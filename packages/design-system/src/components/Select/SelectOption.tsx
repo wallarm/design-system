@@ -17,8 +17,12 @@ type SelectOptionProps = SelectOptionNativeProps &
   SelectOptionVariantsProps &
   SelectOptionBaseProps;
 
-export const SelectOption: FC<SelectOptionProps> = ({ variant = 'default', ...props }) => {
-  const testId = useTestId('option');
+export const SelectOption: FC<SelectOptionProps> = ({
+  variant = 'default',
+  'data-testid': testIdProp,
+  ...props
+}) => {
+  const testId = useTestId('option', testIdProp);
 
   return (
     <ArkUiSelect.Item

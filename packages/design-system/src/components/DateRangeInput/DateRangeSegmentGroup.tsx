@@ -1,6 +1,8 @@
 import {
   type FC,
   type FocusEvent,
+  type HTMLAttributes,
+  type MouseEvent,
   type Ref,
   useCallback,
   useEffect,
@@ -28,12 +30,24 @@ export interface DateRangeSegmentGroupProps extends AriaDatePickerProps<DateValu
   /** Called when partial value presence changes (any editable segment is filled). */
   onHasPartialValueChange?: (hasPartialValue: boolean) => void;
   ref?: Ref<HTMLDivElement>;
+  /**
+   * Consumer HTML attributes (e.g. `data-analytics-id`, `data-analytics-props`,
+   * `data-testid`, `aria-*`, `id`) that land on the field's wrapper `<div>`.
+   * Provides the per-field analytics seam used by `DateRangeStartValue` and
+   * `DateRangeEndValue` in the compound API.
+   */
+  wrapperHtmlProps?: HTMLAttributes<HTMLDivElement> & {
+    'data-testid'?: string;
+    'data-analytics-id'?: string;
+    'data-analytics-props'?: string;
+  };
 }
 
 export const DateRangeSegmentGroup: FC<DateRangeSegmentGroupProps> = ({
   type,
   onHasPartialValueChange,
   ref,
+  wrapperHtmlProps,
   ...props
 }) => {
   const {
@@ -124,13 +138,47 @@ export const DateRangeSegmentGroup: FC<DateRangeSegmentGroupProps> = ({
 
   const hasIcon = Boolean(icon);
 
+  // Compose consumer's HTML attrs with the DS-owned wrapper handlers. Each
+  // composed handler runs the consumer's first; if the consumer cancels via
+  // `event.preventDefault()`, the internal DS handler is skipped. This is the
+  // same composition pattern used in the rest of the design system.
+  const {
+    className: consumerClassName,
+    onClick: consumerOnClick,
+    onFocus: consumerOnFocus,
+    onBlur: consumerOnBlur,
+    onKeyDownCapture: consumerOnKeyDownCapture,
+    ...consumerWrapperRest
+  } = wrapperHtmlProps ?? {};
+
+  const composedOnClick = (event: MouseEvent<HTMLDivElement>) => {
+    consumerOnClick?.(event);
+    if (!event.defaultPrevented) handleClick();
+  };
+
+  const composedOnFocus = (event: FocusEvent<HTMLDivElement>) => {
+    consumerOnFocus?.(event);
+    if (!event.defaultPrevented) handleContainerFocus();
+  };
+
+  const composedOnBlur = (event: FocusEvent<HTMLDivElement>) => {
+    consumerOnBlur?.(event);
+    if (!event.defaultPrevented) handleContainerBlur(event);
+  };
+
+  const composedOnKeyDownCapture: typeof handleKeyDownCapture = event => {
+    consumerOnKeyDownCapture?.(event);
+    if (!event.defaultPrevented) handleKeyDownCapture(event);
+  };
+
   return (
     <div
-      className={cn('relative h-full', !hasIcon && type === 'start' && 'pl-12')}
-      onKeyDownCapture={handleKeyDownCapture}
-      onClick={handleClick}
-      onFocus={handleContainerFocus}
-      onBlur={handleContainerBlur}
+      {...consumerWrapperRest}
+      className={cn('relative h-full', !hasIcon && type === 'start' && 'pl-12', consumerClassName)}
+      onKeyDownCapture={composedOnKeyDownCapture}
+      onClick={composedOnClick}
+      onFocus={composedOnFocus}
+      onBlur={composedOnBlur}
     >
       <TemporalSegmentGroup
         {...fieldProps}
