@@ -11,14 +11,19 @@ import type { EngineOptions, GameStats } from './types';
 
 // constants
 export const ROUND_ATTACKS = 100;
-export const MAX_TARGETS = 6;
+export const MAX_TARGETS = 8;
 export const MAX_BULLETS = 24;
 export const BULLET_SPEED = 720;
-export const FIRE_CADENCE = 0.18;
-export const CANNON_SPEED = 420;
-export const TARGET_LIFE = 4.0;
-export const ARMED_SPAWN = 0.55;
-export const HIT_R2 = 22 * 22;
+export const FIRE_CADENCE = 0.28;
+export const CANNON_SPEED = 350;
+export const TARGET_LIFE = 2.8;
+export const ARMED_SPAWN = 0.4;
+export const HIT_R2 = 16 * 16;
+
+// progressive difficulty — end-of-round values
+export const TARGET_LIFE_END = 1.6;
+export const ARMED_SPAWN_END = 0.2;
+export const MAX_TARGETS_END = 12;
 export const CLICK_RADIUS = 52;
 export const REVEAL_DELAY = 0.3;
 export const ARM_RISE = 0.45;
@@ -84,6 +89,7 @@ export interface GameEngineHost {
   dots: Dot[];
   opts: EngineOptions;
   tanTilt: number; // cached Math.tan(tilt * PI / 180)
+  exclusionBox: { width: number; height: number } | null;
 }
 
 export interface GameLogic {
@@ -352,17 +358,24 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
 
   function spawnTargets(t: number) {
     const sinceArm = t - state.armT;
+    // progressive difficulty: interpolate from start → end over the round
+    const progress = Math.min(roundSpawned / ROUND_ATTACKS, 1);
+    const p = progress * progress; // ease-in: first half gentle, second half ramps hard
+    const curSpawnInterval = ARMED_SPAWN + (ARMED_SPAWN_END - ARMED_SPAWN) * p;
+    const curMaxTargets = Math.round(MAX_TARGETS + (MAX_TARGETS_END - MAX_TARGETS) * p);
+    const curLife = TARGET_LIFE + (TARGET_LIFE_END - TARGET_LIFE) * p;
+
     if (
       sinceArm > FIRST_SPAWN_DELAY &&
       roundSpawned < ROUND_ATTACKS &&
-      t - lastSpawn >= ARMED_SPAWN
+      t - lastSpawn >= curSpawnInterval
     ) {
       let liveCount = 0;
       for (const anomaly of anomalies) if (!anomaly.caught) liveCount++;
-      if (liveCount < MAX_TARGETS) {
+      if (liveCount < curMaxTargets) {
         const pos = spawnRing();
         if (pos) {
-          anomalies.push({ x: pos.x, y: pos.y, t0: t, life: TARGET_LIFE, caught: false });
+          anomalies.push({ x: pos.x, y: pos.y, t0: t, life: curLife, caught: false });
           roundSpawned += 1;
           lastSpawn = t;
         }
@@ -542,12 +555,15 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
   function setExclusion(box: { width: number; height: number } | null) {
     if (!box) {
       exclusionBox = null;
+      host.exclusionBox = null;
       return;
     }
-    exclusionBox = {
+    const val = {
       width: Math.min(box.width, host.w),
       height: Math.min(box.height, host.h),
     };
+    exclusionBox = val;
+    host.exclusionBox = val;
   }
 
   return {
