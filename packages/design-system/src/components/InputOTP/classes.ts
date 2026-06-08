@@ -1,6 +1,6 @@
 import { cn } from '../../utils/cn';
 
-export const otpInputGroupClassName = cn('flex items-center rounded-12 shadow-xs');
+export const otpInputGroupClassName = cn('flex items-center rounded-8 shadow-xs');
 
 export const otpInputCellClassName = cn(
   // Size & layout
@@ -12,7 +12,7 @@ export const otpInputCellClassName = cn(
   // Collapse borders between adjacent cells
   '[&:not(:first-child)]:-ml-px',
   // Rounded corners on group edges
-  'first:rounded-l-12 last:rounded-r-12',
+  'first:rounded-l-8 last:rounded-r-8',
   // Transition
   'transition-[color,border,box-shadow]',
   // Hover (non-disabled, non-focused, non-invalid)
