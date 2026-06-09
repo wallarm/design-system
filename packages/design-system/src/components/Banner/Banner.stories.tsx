@@ -47,6 +47,71 @@ const meta = {
 
 export default meta;
 
+interface BannerControlArgs extends BannerProps {
+  leftIcon: boolean;
+  description: boolean;
+  inlineAction: boolean;
+  actions: boolean;
+  closable: boolean;
+  title: string;
+  text: string;
+}
+
+/**
+ * Interactive preview — toggle the controls below to compose the banner.
+ */
+export const Default: StoryFn<BannerControlArgs> = ({
+  color,
+  leftIcon,
+  description,
+  inlineAction,
+  actions,
+  closable,
+  title,
+  text,
+}) => (
+  <Banner color={color}>
+    {leftIcon && <BannerIcon />}
+    <BannerContent>
+      <BannerTitle action={inlineAction ? <BannerLink href='#'>Action</BannerLink> : undefined}>
+        {title}
+      </BannerTitle>
+      {description && <BannerDescription>{text}</BannerDescription>}
+    </BannerContent>
+    {(actions || closable) && (
+      <BannerControls>
+        {actions && (
+          <Button variant='secondary' color='neutral' size='small'>
+            Button
+          </Button>
+        )}
+        {closable && <BannerClose />}
+      </BannerControls>
+    )}
+  </Banner>
+);
+
+Default.args = {
+  color: 'primary',
+  leftIcon: true,
+  description: false,
+  inlineAction: false,
+  actions: false,
+  closable: false,
+  title: 'Message goes here',
+  text: 'Description goes here',
+};
+
+Default.argTypes = {
+  leftIcon: { control: 'boolean', description: 'Show the leading icon' },
+  description: { control: 'boolean', description: 'Show the description line' },
+  inlineAction: { control: 'boolean', description: 'Show an inline action link in the title' },
+  actions: { control: 'boolean', description: 'Show a trailing action button' },
+  closable: { control: 'boolean', description: 'Show the close button' },
+  title: { control: 'text', description: 'Title (message) text' },
+  text: { control: 'text', description: 'Description text' },
+};
+
 export const AllColors: StoryFn<BannerProps> = () => (
   <div className='flex flex-col gap-16'>
     <Banner color='primary'>
@@ -160,20 +225,3 @@ export const NoIcon: StoryFn<BannerProps> = () => (
     </BannerControls>
   </Banner>
 );
-
-export const Playground: StoryFn<BannerProps> = args => (
-  <Banner {...args}>
-    <BannerIcon />
-    <BannerContent>
-      <BannerTitle action={<BannerLink href='#'>Action</BannerLink>}>Message goes here</BannerTitle>
-      <BannerDescription>Description goes here</BannerDescription>
-    </BannerContent>
-    <BannerControls>
-      <BannerClose />
-    </BannerControls>
-  </Banner>
-);
-
-Playground.args = {
-  color: 'primary',
-};
