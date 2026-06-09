@@ -37,7 +37,7 @@ export const BannerTitle: FC<BannerTitleProps> = ({
   const color = useBannerColor();
 
   return (
-    <div className='flex flex-wrap items-center gap-8 min-h-5 w-full'>
+    <div className='flex flex-wrap items-center gap-8 w-full'>
       <OverflowTooltip>
         <OverflowTooltipTrigger>
           <p

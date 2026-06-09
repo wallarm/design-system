@@ -30,7 +30,9 @@ export const bannerVariants = cva(
   },
 );
 
-export const bannerTitleVariants = cva('text-sm font-medium truncate', {
+// `py-2` keeps the title 24px tall (20px line-height + 2+2), matching the icon
+// block so the banner height is identical with and without a leading icon.
+export const bannerTitleVariants = cva('text-sm font-medium truncate py-2', {
   variants: {
     color: {
       primary: 'text-text-primary-alt',
