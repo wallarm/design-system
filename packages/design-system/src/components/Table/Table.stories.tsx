@@ -2,6 +2,12 @@ import { useCallback, useMemo, useRef, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Ellipsis, Filter, FilterX, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
+import {
+  BulkBarSummaryClear,
+  BulkBarSummaryCount,
+  BulkBarSummarySelectAll,
+  BulkBarSummarySeparator,
+} from '../BulkBar';
 import { Button } from '../Button';
 import { InlineCodeSnippet } from '../CodeSnippet';
 import { Drawer, DrawerBody, DrawerContent, DrawerHeader } from '../Drawer';
@@ -43,7 +49,7 @@ import {
   useInfiniteData,
 } from './mocks';
 import { Table } from './Table';
-import { TableActionBar } from './TableActionBar';
+import { TableActionBar, TableActionBarSelection } from './TableActionBar';
 import {
   TableColumnMenu,
   TableColumnMenuHideItem,
@@ -159,6 +165,10 @@ export const ManualSorting: StoryFn<typeof meta> = () => {
 //   • Per-row actions     — consumer JSX from `meta.renderMenuAction(row)`;
 //                           analytics sit on the trigger and each menu item.
 //   • TableActionBar      — consumer-rendered bulk action buttons (children).
+//   • Selection summary   — `<TableActionBarSelection>` override composed from
+//                           `<BulkBarSummarySelectAll>` / `<BulkBarSummaryClear>`;
+//                           analytics sit on the real "Select all" / "Clear"
+//                           `<button>`s (DS keeps toggle / reset wiring).
 //   • Scroll controls     — `<TableScrollHandler>` as a `Table` child, with
 //                           `<TableScrollHandlerLeft>` / `<TableScrollHandlerRight>`
 //                           carrying analytics; portaled into the master header.
@@ -431,6 +441,25 @@ export const WithAnalytics: StoryFn<typeof meta> = () => {
       )}
     >
       <TableActionBar>
+        {/*
+          Selection summary — override the default block to attach analytics to
+          the "Select all" / "Clear" controls. The DS keeps the wiring (toggle /
+          reset, disabled, count); the consumer onClick runs first and feeds the
+          same `track` stream (call preventDefault() to skip the DS action).
+        */}
+        <TableActionBarSelection>
+          <BulkBarSummaryCount />
+          <BulkBarSummarySelectAll
+            data-analytics-id='SECURITY_BULK_SELECT_ALL'
+            onClick={() => track('SECURITY_BULK_SELECT_ALL_CLICKED')}
+          />
+          <BulkBarSummarySeparator />
+          <BulkBarSummaryClear
+            data-analytics-id='SECURITY_BULK_CLEAR'
+            onClick={() => track('SECURITY_BULK_CLEAR_CLICKED')}
+          />
+        </TableActionBarSelection>
+
         <Button
           variant='ghost'
           color='neutral-alt'

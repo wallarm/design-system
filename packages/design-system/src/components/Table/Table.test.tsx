@@ -1,12 +1,19 @@
-import type { ReactNode } from 'react';
+import type { FC, ReactNode } from 'react';
 import { createRef, useState } from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
+import {
+  BulkBarSummaryClear,
+  BulkBarSummaryCount,
+  BulkBarSummarySelectAll,
+  BulkBarSummarySeparator,
+} from '../BulkBar';
 import { Button } from '../Button';
 import { createTableColumnHelper } from './lib';
 import { Table } from './Table';
+import { TableActionBar, TableActionBarSelection } from './TableActionBar';
 import {
   TableColumnMenu,
   TableColumnMenuHideItem,
@@ -27,7 +34,7 @@ import {
   TableSettingsMenuSearch,
 } from './TableSettingsMenu';
 import { TableSortTrigger } from './TableSortTrigger';
-import type { TableSortingState } from './types';
+import type { TableRowSelectionState, TableSortingState } from './types';
 
 // Table is a compound API; the canonical analytics seams are:
 //   1. Consumer-rendered cell content via `column.cell(ctx)` render-prop
@@ -1022,5 +1029,117 @@ describe('TableScrollHandler: table-level composition analytics', () => {
 
     const right = await screen.findByRole('button', { name: 'Scroll right' });
     expect(right).not.toHaveAttribute('data-analytics-id');
+  });
+});
+
+describe('TableActionBarSelection: bulk action-bar composition analytics', () => {
+  // The action bar (a Popover) only opens with a non-empty selection; seed one
+  // and keep it controlled so the bar mounts.
+  const SelectionHarness: FC<{ children?: ReactNode }> = ({ children }) => {
+    const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({ '1': true });
+    return (
+      <Table<Row>
+        data={data}
+        columns={baseColumns}
+        data-testid='table'
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+      >
+        <TableActionBar>{children}</TableActionBar>
+      </Table>
+    );
+  };
+
+  it('lands data-analytics-id and verbatim data-analytics-props on the real <button>s', async () => {
+    render(
+      <SelectionHarness>
+        <TableActionBarSelection>
+          <BulkBarSummaryCount />
+          <BulkBarSummarySelectAll
+            data-testid='bulk-select-all'
+            data-analytics-id='BULK_SELECT_ALL'
+            data-analytics-props='{"area":"users"}'
+          />
+          <BulkBarSummarySeparator />
+          <BulkBarSummaryClear data-testid='bulk-clear' data-analytics-id='BULK_CLEAR' />
+        </TableActionBarSelection>
+      </SelectionHarness>,
+    );
+
+    const selectAll = await screen.findByTestId('bulk-select-all');
+    const clear = await screen.findByTestId('bulk-clear');
+    expect(selectAll.tagName).toBe('BUTTON');
+    expect(clear.tagName).toBe('BUTTON');
+    expect(selectAll).toHaveAttribute('data-analytics-id', 'BULK_SELECT_ALL');
+    // Opaque payload forwarded byte-for-byte.
+    expect(selectAll).toHaveAttribute('data-analytics-props', '{"area":"users"}');
+    expect(clear).toHaveAttribute('data-analytics-id', 'BULK_CLEAR');
+  });
+
+  it('resolves a real click to its analytics-id and still runs the DS action', async () => {
+    const captured = captureAnalyticsClicks();
+    render(
+      <SelectionHarness>
+        <TableActionBarSelection>
+          <BulkBarSummarySelectAll
+            data-testid='bulk-select-all'
+            data-analytics-id='BULK_SELECT_ALL'
+          />
+          <BulkBarSummaryClear data-testid='bulk-clear' data-analytics-id='BULK_CLEAR' />
+        </TableActionBarSelection>
+      </SelectionHarness>,
+    );
+
+    // Seeded selection is a single row → "Select all" is enabled.
+    await userEvent.click(await screen.findByTestId('bulk-select-all'));
+    expect(captured).toHaveBeenCalledWith('BULK_SELECT_ALL');
+    // DS action ran: every row is now selected.
+    expect(screen.getAllByRole('checkbox').every(cb => (cb as HTMLInputElement).checked)).toBe(
+      true,
+    );
+  });
+
+  it('composes the consumer onClick before the DS action; preventDefault opts out', async () => {
+    const consumerClick = vi.fn();
+    render(
+      <SelectionHarness>
+        <TableActionBarSelection>
+          <BulkBarSummaryClear
+            data-testid='bulk-clear'
+            data-analytics-id='BULK_CLEAR'
+            onClick={e => {
+              consumerClick();
+              e.preventDefault();
+            }}
+          />
+        </TableActionBarSelection>
+      </SelectionHarness>,
+    );
+
+    const clear = await screen.findByTestId('bulk-clear');
+    await userEvent.click(clear);
+
+    expect(consumerClick).toHaveBeenCalledTimes(1);
+    // preventDefault skipped resetRowSelection → the seeded row stays selected.
+    expect(screen.getAllByRole('checkbox').some(cb => (cb as HTMLInputElement).checked)).toBe(true);
+  });
+
+  it('injects the live selection count into BulkBarSummaryCount', async () => {
+    render(
+      <SelectionHarness>
+        <TableActionBarSelection>
+          <BulkBarSummaryCount data-testid='bulk-count' />
+        </TableActionBarSelection>
+      </SelectionHarness>,
+    );
+
+    expect(await screen.findByTestId('bulk-count')).toHaveTextContent('1 selected');
+  });
+
+  it('renders the default block (no analytics) when no override is supplied', async () => {
+    render(<SelectionHarness />);
+
+    const selectAll = await screen.findByRole('button', { name: 'Select all' });
+    expect(selectAll).not.toHaveAttribute('data-analytics-id');
   });
 });

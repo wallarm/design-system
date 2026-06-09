@@ -1,7 +1,22 @@
+export {
+  BulkBarSummary,
+  BulkBarSummaryClear,
+  type BulkBarSummaryClearProps,
+  BulkBarSummaryCount,
+  type BulkBarSummaryCountProps,
+  type BulkBarSummaryProps,
+  BulkBarSummarySelectAll,
+  type BulkBarSummarySelectAllProps,
+  BulkBarSummarySeparator,
+} from '../BulkBar';
 export { createTableColumnHelper } from './lib';
 export type { TableColumnHelper } from './lib/createTableColumnHelper';
 export { Table } from './Table';
-export { TableActionBar } from './TableActionBar';
+export {
+  TableActionBar,
+  TableActionBarSelection,
+  type TableActionBarSelectionProps,
+} from './TableActionBar';
 export {
   TableColumnMenu,
   TableColumnMenuHideItem,
