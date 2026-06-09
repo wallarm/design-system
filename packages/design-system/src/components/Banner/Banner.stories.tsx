@@ -108,9 +108,15 @@ Default.args = {
 };
 
 Default.argTypes = {
-  customIcon: { control: 'boolean', description: 'Override with a custom icon' },
+  customIcon: {
+    control: 'boolean',
+    description: 'Override with a custom icon',
+  },
   description: { control: 'boolean', description: 'Show the description line' },
-  inlineAction: { control: 'boolean', description: 'Show an inline action link in the title' },
+  inlineAction: {
+    control: 'boolean',
+    description: 'Show an inline action link in the title',
+  },
   actions: { control: 'boolean', description: 'Show a trailing action button' },
   closable: { control: 'boolean', description: 'Show the close button' },
   title: { control: 'text', description: 'Title (message) text' },
@@ -219,10 +225,10 @@ export const WithActions: StoryFn<BannerProps> = () => (
       <BannerTitle>Your subscription has expired</BannerTitle>
     </BannerContent>
     <BannerControls>
-      <Button variant='secondary' color='neutral' size='small'>
+      <Button variant='outline' color='neutral' size='small'>
         Dismiss
       </Button>
-      <Button variant='secondary' color='neutral' size='small'>
+      <Button variant='outline' color='neutral' size='small'>
         Renew
       </Button>
     </BannerControls>
