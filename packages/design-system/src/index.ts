@@ -88,6 +88,25 @@ export {
 } from './components/Attribute';
 export { Badge, type BadgeProps } from './components/Badge';
 export {
+  Banner,
+  BannerClose,
+  type BannerCloseProps,
+  type BannerColor,
+  BannerContent,
+  type BannerContentProps,
+  BannerControls,
+  type BannerControlsProps,
+  BannerDescription,
+  type BannerDescriptionProps,
+  BannerIcon,
+  type BannerIconProps,
+  BannerLink,
+  type BannerLinkProps,
+  type BannerProps,
+  BannerTitle,
+  type BannerTitleProps,
+} from './components/Banner';
+export {
   Breadcrumbs,
   BreadcrumbsEllipsis,
   type BreadcrumbsEllipsisProps,
