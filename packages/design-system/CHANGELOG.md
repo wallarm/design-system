@@ -1,3 +1,8 @@
+## <small>0.56.1 (2026-06-09)</small>
+
+* fix: WDS-129 otp ([56d0ccb](https://github.com/wallarm/design-system/commit/56d0ccb))
+* fix: WDS-129 otp [update-screenshots] ([30c8106](https://github.com/wallarm/design-system/commit/30c8106))
+
 ## 0.56.0 (2026-06-08)
 
 * 🖼️ Update screenshots ([61d0adf](https://github.com/wallarm/design-system/commit/61d0adf))
