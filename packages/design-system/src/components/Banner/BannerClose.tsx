@@ -3,7 +3,6 @@ import { X } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-import { useBannerVariant } from './BannerContext';
 
 export interface BannerCloseProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
@@ -15,12 +14,12 @@ export interface BannerCloseProps
 /**
  * Close button for Banner.
  *
- * Renders a ghost icon button with a "Close" tooltip. The icon color adapts to
- * the variant so it stays legible on the dark primary banner.
+ * Renders an outline icon button (white background with a border) and a "Close"
+ * tooltip. The same style is used across all variants — it stays legible on both
+ * the light variants and the dark primary banner.
  */
 export const BannerClose: FC<BannerCloseProps> = ({ ref, onClick, ...props }) => {
   const testId = useTestId('close');
-  const variant = useBannerVariant();
 
   return (
     <Tooltip>
@@ -29,8 +28,8 @@ export const BannerClose: FC<BannerCloseProps> = ({ ref, onClick, ...props }) =>
           {...props}
           ref={ref}
           data-testid={testId}
-          variant='ghost'
-          color={variant === 'primary' ? 'neutral-alt' : 'neutral'}
+          variant='outline'
+          color='neutral'
           size='small'
           aria-label='close'
           onClick={onClick}
