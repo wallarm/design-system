@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { Megaphone } from '../../icons';
 import { Button } from '../Button';
 import { Banner, type BannerProps } from './Banner';
 import { BannerClose } from './BannerClose';
@@ -187,6 +188,23 @@ export const LongText: StoryFn<BannerProps> = () => (
         conditions, not individual user actions. The voice should be institutional and factual, even
         when the situation is urgent. Every word must earn its place within the 2-line budget, but
         one line is more preferred.
+      </BannerTitle>
+    </BannerContent>
+    <BannerControls>
+      <BannerClose />
+    </BannerControls>
+  </Banner>
+);
+
+/**
+ * Override the default variant icon by passing a custom one to `BannerIcon`.
+ */
+export const CustomIcon: StoryFn<BannerProps> = () => (
+  <Banner variant='secondary'>
+    <BannerIcon icon={<Megaphone size='lg' className='text-icon-brand' />} />
+    <BannerContent>
+      <BannerTitle action={<BannerLink href='#'>View plans</BannerLink>}>
+        New features are now available on the Pro plan
       </BannerTitle>
     </BannerContent>
     <BannerControls>
