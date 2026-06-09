@@ -9,6 +9,10 @@ Element.prototype.scrollIntoView = () => {};
 // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
 Element.prototype.scrollTo = (() => {}) as Element['scrollTo'];
 
+// Mock scrollBy which jsdom omits; the Table horizontal scroll controls call it.
+// biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+Element.prototype.scrollBy = (() => {}) as Element['scrollBy'];
+
 // Mock IntersectionObserver which is not implemented in jsdom
 global.IntersectionObserver = class IntersectionObserver {
   readonly root = null;

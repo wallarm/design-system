@@ -53,6 +53,11 @@ import {
   TableColumnMenuSortItem,
 } from './TableColumnMenu';
 import { TableEmptyState } from './TableEmptyState';
+import {
+  TableScrollHandler,
+  TableScrollHandlerLeft,
+  TableScrollHandlerRight,
+} from './TableScrollHandler';
 import { TableSortTrigger } from './TableSortTrigger';
 import type {
   TableColumnDef,
@@ -154,6 +159,9 @@ export const ManualSorting: StoryFn<typeof meta> = () => {
 //   • Per-row actions     — consumer JSX from `meta.renderMenuAction(row)`;
 //                           analytics sit on the trigger and each menu item.
 //   • TableActionBar      — consumer-rendered bulk action buttons (children).
+//   • Scroll controls     — `<TableScrollHandler>` as a `Table` child, with
+//                           `<TableScrollHandlerLeft>` / `<TableScrollHandlerRight>`
+//                           carrying analytics; portaled into the master header.
 //   • Expanded row        — consumer JSX from `renderExpandedRow(row)`.
 //   • Wrapper testid      — `<Table data-testid=...>` lands on the
 //                           scroll-container `<div>`.
@@ -170,8 +178,7 @@ export const ManualSorting: StoryFn<typeof meta> = () => {
 //   • `onMasterCellClick(rowId)`       — master-cell click
 //
 // Pending DS work (no DOM seam yet — callback-only): selection checkbox,
-// expand toggle, master-cell click, resize handle, horizontal scroll
-// buttons, settings menu trigger / items.
+// expand toggle, master-cell click, resize handle.
 export const WithAnalytics: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
@@ -450,6 +457,11 @@ export const WithAnalytics: StoryFn<typeof meta> = () => {
           <Trash2 /> Delete
         </Button>
       </TableActionBar>
+
+      <TableScrollHandler>
+        <TableScrollHandlerLeft data-analytics-id='SECURITY_SCROLL_LEFT' />
+        <TableScrollHandlerRight data-analytics-id='SECURITY_SCROLL_RIGHT' />
+      </TableScrollHandler>
     </Table>
   );
 };

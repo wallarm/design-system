@@ -19,7 +19,7 @@ import { Th } from './primitives';
 import { TableColumnMenu } from './TableColumnMenu';
 import { useTableContext } from './TableContext';
 import { TableResizeHandler } from './TableResizeHandler';
-import { TableScrollHandler } from './TableScrollHandler';
+import { TableScrollHandlerSlot } from './TableScrollHandlerSlot';
 import { TableSortHandler } from './TableSortHandler';
 import { TableSortTrigger } from './TableSortTrigger';
 
@@ -66,7 +66,7 @@ export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellP
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
 
   const { canDnd, setNodeRef, dndStyle, attributes, listeners } = useColumnDnd(column);
-  const { hasOverflow, atStart, atEnd } = useHorizontalScrollState(containerRef, isMasterColumn);
+  const { hasOverflow } = useHorizontalScrollState(containerRef, isMasterColumn);
 
   // Call a functional header inline (instead of `flexRender`) so we can
   // introspect what the consumer returned — `flexRender` wraps the function
@@ -181,7 +181,7 @@ export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellP
             </span>
           )}
 
-          {isMasterColumn && hasOverflow && <TableScrollHandler atStart={atStart} atEnd={atEnd} />}
+          {isMasterColumn && hasOverflow && <TableScrollHandlerSlot />}
         </HStack>
       )}
 

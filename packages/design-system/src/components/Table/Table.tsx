@@ -4,6 +4,7 @@ import { containsDirectChild } from './lib';
 import { TableProvider } from './TableContext';
 import { TableImperativeBridge } from './TableImperativeBridge';
 import { TableInner } from './TableInner';
+import { TableScrollHandler } from './TableScrollHandler';
 import { TableSettingsMenu } from './TableSettingsMenu';
 import type { TableProps } from './types';
 
@@ -25,6 +26,10 @@ export const Table = <T,>(props: TableProps<T>) => {
     children,
     TableSettingsMenu as ComponentType<unknown>,
   );
+  const hasConsumerScrollHandler = containsDirectChild(
+    children,
+    TableScrollHandler as ComponentType<unknown>,
+  );
 
   return (
     <TableProvider data={data} isLoading={isLoading} {...providerProps}>
@@ -35,6 +40,7 @@ export const Table = <T,>(props: TableProps<T>) => {
           virtualized={props.virtualized}
           showSettings={showSettings}
           hasConsumerSettingsMenu={hasConsumerSettingsMenu}
+          hasConsumerScrollHandler={hasConsumerScrollHandler}
           ariaLabel={ariaLabel}
           className={className}
           data-testid={testId}

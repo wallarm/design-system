@@ -18,6 +18,14 @@ export {
 } from './TableColumnMenu';
 export { TableEmptyState } from './TableEmptyState';
 export {
+  TableScrollHandler,
+  TableScrollHandlerLeft,
+  type TableScrollHandlerLeftProps,
+  type TableScrollHandlerProps,
+  TableScrollHandlerRight,
+  type TableScrollHandlerRightProps,
+} from './TableScrollHandler';
+export {
   TableSettingsMenu,
   TableSettingsMenuItem,
   type TableSettingsMenuItemProps,

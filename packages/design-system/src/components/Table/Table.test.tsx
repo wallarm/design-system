@@ -2,7 +2,7 @@ import type { ReactNode } from 'react';
 import { createRef, useState } from 'react';
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Button } from '../Button';
 import { createTableColumnHelper } from './lib';
@@ -15,6 +15,11 @@ import {
   TableColumnMenuPinItem,
   TableColumnMenuSortItem,
 } from './TableColumnMenu';
+import {
+  TableScrollHandler,
+  TableScrollHandlerLeft,
+  TableScrollHandlerRight,
+} from './TableScrollHandler';
 import {
   TableSettingsMenu,
   TableSettingsMenuItem,
@@ -924,5 +929,98 @@ describe('TableSettingsMenu items: partial-override analytics', () => {
     expect(screen.getByTestId('table--settings-menu-reset')).not.toHaveAttribute(
       'data-analytics-id',
     );
+  });
+});
+
+describe('TableScrollHandler: table-level composition analytics', () => {
+  interface ScrollRow {
+    id: string;
+    name: string;
+    a: string;
+    b: string;
+  }
+
+  const scrollData: ScrollRow[] = [{ id: '1', name: 'Alpha', a: 'x', b: 'y' }];
+  const scrollHelper = createTableColumnHelper<ScrollRow>();
+  const scrollColumns = [
+    scrollHelper.accessor('name', { header: 'Name', size: 320 }),
+    scrollHelper.accessor('a', { header: 'A' }),
+    scrollHelper.accessor('b', { header: 'B' }),
+  ];
+
+  let restores: Array<() => void> = [];
+
+  // jsdom reports 0 for layout dims; force horizontal overflow so the master
+  // column mounts the scroll-controls anchor slot.
+  const forceOverflow = () => {
+    const props = ['scrollWidth', 'clientWidth'] as const;
+    const values: Record<(typeof props)[number], number> = { scrollWidth: 1000, clientWidth: 400 };
+    restores = props.map(prop => {
+      const desc = Object.getOwnPropertyDescriptor(HTMLElement.prototype, prop);
+      Object.defineProperty(HTMLElement.prototype, prop, {
+        configurable: true,
+        value: values[prop],
+      });
+      return () => {
+        if (desc) Object.defineProperty(HTMLElement.prototype, prop, desc);
+        else delete (HTMLElement.prototype as Record<string, unknown>)[prop];
+      };
+    });
+  };
+
+  afterEach(() => {
+    restores.forEach(restore => restore());
+    restores = [];
+  });
+
+  it('lands analytics on the real scroll <button>s (table-level child)', async () => {
+    forceOverflow();
+    render(
+      <Table<ScrollRow> data={scrollData} columns={scrollColumns} data-testid='table'>
+        <TableScrollHandler>
+          <TableScrollHandlerLeft data-testid='scroll-left' data-analytics-id='TBL_SCROLL_LEFT' />
+          <TableScrollHandlerRight
+            data-testid='scroll-right'
+            data-analytics-id='TBL_SCROLL_RIGHT'
+            data-analytics-props='{"area":"users"}'
+          />
+        </TableScrollHandler>
+      </Table>,
+    );
+
+    const left = await screen.findByTestId('scroll-left');
+    const right = await screen.findByTestId('scroll-right');
+    expect(left.tagName).toBe('BUTTON');
+    expect(left).toHaveAttribute('data-analytics-id', 'TBL_SCROLL_LEFT');
+    expect(right).toHaveAttribute('data-analytics-id', 'TBL_SCROLL_RIGHT');
+    // Opaque payload forwarded byte-for-byte.
+    expect(right).toHaveAttribute('data-analytics-props', '{"area":"users"}');
+  });
+
+  it('resolves a real click on an enabled control to its analytics-id', async () => {
+    forceOverflow();
+    const captured = captureAnalyticsClicks();
+    render(
+      <Table<ScrollRow> data={scrollData} columns={scrollColumns} data-testid='table'>
+        <TableScrollHandler>
+          <TableScrollHandlerRight
+            data-testid='scroll-right'
+            data-analytics-id='TBL_SCROLL_RIGHT'
+          />
+        </TableScrollHandler>
+      </Table>,
+    );
+
+    // atStart=true → left disabled; atEnd=false → right enabled.
+    await userEvent.click(await screen.findByTestId('scroll-right'));
+    expect(captured).toHaveBeenCalledWith('TBL_SCROLL_RIGHT');
+  });
+
+  it('renders default controls (no analytics) when no consumer handler is supplied', async () => {
+    forceOverflow();
+    render(<Table<ScrollRow> data={scrollData} columns={scrollColumns} data-testid='table' />);
+
+    const right = await screen.findByRole('button', { name: 'Scroll right' });
+    expect(right).not.toHaveAttribute('data-analytics-id');
   });
 });
