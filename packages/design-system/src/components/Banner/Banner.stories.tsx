@@ -174,6 +174,27 @@ export const WithInlineLink: StoryFn<BannerProps> = () => (
   </Banner>
 );
 
+/**
+ * Long messages wrap and clamp to a maximum of two lines, then truncate with an
+ * ellipsis. A tooltip reveals the full text on hover. One line is preferred.
+ */
+export const LongText: StoryFn<BannerProps> = () => (
+  <Banner color='primary'>
+    <BannerIcon />
+    <BannerContent>
+      <BannerTitle lineClamp={2}>
+        Banner will render at most two lines before truncating the text. Banners address system-wide
+        conditions, not individual user actions. The voice should be institutional and factual, even
+        when the situation is urgent. Every word must earn its place within the 2-line budget, but
+        one line is more preferred.
+      </BannerTitle>
+    </BannerContent>
+    <BannerControls>
+      <BannerClose />
+    </BannerControls>
+  </Banner>
+);
+
 export const WithActions: StoryFn<BannerProps> = () => (
   <Banner color='destructive'>
     <BannerIcon />

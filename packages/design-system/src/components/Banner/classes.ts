@@ -30,9 +30,11 @@ export const bannerVariants = cva(
   },
 );
 
-// `py-2` keeps the title 24px tall (20px line-height + 2+2), matching the icon
-// block so the banner height is identical with and without a leading icon.
-export const bannerTitleVariants = cva('text-sm font-medium truncate py-2', {
+// `py-2` keeps a single-line title 24px tall (20px line-height + 2+2), matching
+// the icon block so the banner height is identical with and without a leading
+// icon. Truncation (`truncate` for 1 line / `line-clamp-N` for more) is applied
+// by the component based on the `lineClamp` prop.
+export const bannerTitleVariants = cva('text-sm font-medium py-2 min-w-0 max-w-full', {
   variants: {
     color: {
       primary: 'text-text-primary-alt',

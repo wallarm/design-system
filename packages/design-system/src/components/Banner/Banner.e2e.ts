@@ -6,6 +6,7 @@ const bannerStory = createStoryHelper('messaging-banner', [
   'All Colors',
   'With Description',
   'With Inline Link',
+  'Long Text',
   'With Actions',
   'Closable',
   'No Icon',
@@ -29,6 +30,11 @@ test.describe('Banner Component', () => {
 
     test('With inline link', async ({ page }) => {
       await bannerStory.goto(page, 'With Inline Link');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Long text clamped to two lines', async ({ page }) => {
+      await bannerStory.goto(page, 'Long Text');
       await expect(page).toHaveScreenshot();
     });
 
