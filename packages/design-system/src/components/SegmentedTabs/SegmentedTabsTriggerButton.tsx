@@ -12,12 +12,12 @@ export const SegmentedTabsTriggerButton: FC<SegmentedTabsTriggerButtonProps> = (
   'data-testid': testIdProp,
   ...props
 }) => {
-  const contextTestId = useTestId('trigger-button');
+  const testId = useTestId('trigger-button', testIdProp);
 
   return (
     <Button
       {...props}
-      data-testid={testIdProp ?? contextTestId}
+      data-testid={testId}
       as='span'
       variant='ghost'
       color='neutral'

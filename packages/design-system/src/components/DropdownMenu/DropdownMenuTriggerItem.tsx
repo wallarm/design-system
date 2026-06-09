@@ -1,4 +1,4 @@
-import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
+import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Menu } from '@ark-ui/react/menu';
 import { ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
@@ -7,13 +7,13 @@ import { dropdownMenuItemVariants } from './classes';
 import type { DropdownMenuItemVariantsProps } from './DropdownMenuItem';
 
 export interface DropdownMenuTriggerItemProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children'>,
     DropdownMenuItemVariantsProps,
     TestableProps {
   children: ReactNode;
   asChild?: boolean;
   inset?: boolean;
-  ref?: Ref<HTMLButtonElement>;
+  ref?: Ref<HTMLDivElement>;
 }
 
 export const DropdownMenuTriggerItem: FC<DropdownMenuTriggerItemProps> = ({

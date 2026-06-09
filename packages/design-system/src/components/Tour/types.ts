@@ -3,6 +3,8 @@ import type { Tour as ArkUiTour } from '@ark-ui/react';
 
 export type TourStepDetails = ArkUiTour.StepDetails;
 
+export type TourStepEffectArgs = ArkUiTour.StepEffectArgs;
+
 /**
  * A footer action button definition. Extends Ark UI's `StepAction` (label +
  * action type) with arbitrary native `<button>` HTML attributes so consumers

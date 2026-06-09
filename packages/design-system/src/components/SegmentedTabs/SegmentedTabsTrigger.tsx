@@ -27,12 +27,12 @@ export const SegmentedTabsTrigger: FC<SegmentedTabsTriggerProps> = ({
   'data-testid': testIdProp,
   ...rest
 }) => {
-  const contextTestId = useTestId('trigger');
+  const testId = useTestId('trigger', testIdProp);
 
   return (
     <ArkUiTabs.Trigger
       {...rest}
-      data-testid={testIdProp ?? contextTestId}
+      data-testid={testId}
       className={cn(
         segmentedControlItemClassNamesBase,
         'group z-1',

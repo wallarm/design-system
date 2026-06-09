@@ -13,15 +13,15 @@ import {
  * arbitrary wrapper elements). Used to gather consumer-supplied override
  * sub-components from a compound component's children.
  */
-export const collectDirectChildren = (
+export const collectDirectChildren = <P>(
   node: ReactNode,
-  target: ComponentType<unknown>,
-): ReactElement[] => {
-  const result: ReactElement[] = [];
+  target: ComponentType<P>,
+): ReactElement<P>[] => {
+  const result: ReactElement<P>[] = [];
   for (const child of Children.toArray(node)) {
     if (!isValidElement(child)) continue;
     if (child.type === target) {
-      result.push(child);
+      result.push(child as ReactElement<P>);
     } else if (child.type === Fragment) {
       const fragmentChildren = (child.props as { children?: ReactNode }).children;
       result.push(...collectDirectChildren(fragmentChildren, target));

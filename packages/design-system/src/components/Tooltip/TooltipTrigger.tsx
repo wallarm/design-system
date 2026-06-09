@@ -1,10 +1,11 @@
 import type { ComponentPropsWithoutRef, ComponentRef, FC, Ref } from 'react';
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
-export type TooltipTriggerProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Trigger> & {
-  ref?: Ref<ComponentRef<typeof ArkUiTooltip.Trigger>>;
-};
+export type TooltipTriggerProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Trigger> &
+  TestableProps & {
+    ref?: Ref<ComponentRef<typeof ArkUiTooltip.Trigger>>;
+  };
 
 export const TooltipTrigger: FC<TooltipTriggerProps> = ({
   ref,

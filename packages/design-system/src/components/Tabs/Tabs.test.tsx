@@ -41,11 +41,7 @@ describe('Attribute pass-through', () => {
     render(
       <Tabs defaultValue='one'>
         <TabsList>
-          <TabsTrigger
-            value='one'
-            data-analytics-id='OPEN_TAB_ONE'
-            data-analytics-props={payload}
-          >
+          <TabsTrigger value='one' data-analytics-id='OPEN_TAB_ONE' data-analytics-props={payload}>
             One
           </TabsTrigger>
         </TabsList>

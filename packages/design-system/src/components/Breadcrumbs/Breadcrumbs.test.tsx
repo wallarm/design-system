@@ -9,11 +9,7 @@ describe('Attribute pass-through', () => {
   it('forwards data-analytics-id to the link branch <a>', () => {
     render(
       <Breadcrumbs>
-        <BreadcrumbsItem
-          href='/products'
-          data-testid='item-link'
-          data-analytics-id='NAV_PRODUCTS'
-        >
+        <BreadcrumbsItem href='/products' data-testid='item-link' data-analytics-id='NAV_PRODUCTS'>
           Products
         </BreadcrumbsItem>
         <BreadcrumbsItem data-testid='item-current'>Current</BreadcrumbsItem>
@@ -29,11 +25,7 @@ describe('Attribute pass-through', () => {
   it('forwards data-analytics-id to the button branch <button>', () => {
     render(
       <Breadcrumbs>
-        <BreadcrumbsItem
-          data-testid='item-button'
-          data-analytics-id='NAV_ROOT'
-          onClick={vi.fn()}
-        >
+        <BreadcrumbsItem data-testid='item-button' data-analytics-id='NAV_ROOT' onClick={vi.fn()}>
           Root
         </BreadcrumbsItem>
         <BreadcrumbsItem data-testid='item-current'>Current</BreadcrumbsItem>

@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Tag } from './Tag';
 import { TagClose } from './TagClose';
 
@@ -101,8 +102,7 @@ describe('Handler composition', () => {
   });
 
   it('clicks on TagClose bubble to document for SDK click capture', async () => {
-    const documentClick = vi.fn();
-    document.addEventListener('click', documentClick);
+    const onAnalyticsClick = captureAnalyticsClicks();
 
     render(
       <Tag>
@@ -113,7 +113,6 @@ describe('Handler composition', () => {
 
     await userEvent.click(screen.getByTestId('close'));
 
-    expect(documentClick).toHaveBeenCalled();
-    document.removeEventListener('click', documentClick);
+    expect(onAnalyticsClick).toHaveBeenCalledWith('TAG_REMOVE');
   });
 });

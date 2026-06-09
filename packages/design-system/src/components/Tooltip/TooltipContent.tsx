@@ -4,7 +4,7 @@ import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
 const tooltipContentVariants = cva(
   [
@@ -37,9 +37,10 @@ const tooltipContentVariants = cva(
   },
 );
 
-export type TooltipContentProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Content> & {
-  ref?: Ref<ComponentRef<typeof ArkUiTooltip.Content>>;
-};
+export type TooltipContentProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Content> &
+  TestableProps & {
+    ref?: Ref<ComponentRef<typeof ArkUiTooltip.Content>>;
+  };
 
 export const TooltipContent: FC<TooltipContentProps> = ({
   children,

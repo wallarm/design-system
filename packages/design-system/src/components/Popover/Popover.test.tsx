@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Button } from '../Button';
 import { Popover } from './Popover';
 import { PopoverContent } from './PopoverContent';
@@ -93,8 +94,7 @@ describe('Handler composition', () => {
   });
 
   it('clicks on a Button inside PopoverContent bubble for SDK click capture', async () => {
-    const documentClick = vi.fn();
-    document.addEventListener('click', documentClick);
+    const onAnalyticsClick = captureAnalyticsClicks();
 
     render(
       <Popover open>
@@ -110,7 +110,6 @@ describe('Handler composition', () => {
     const inner = await screen.findByTestId('inner');
     await userEvent.click(inner);
 
-    expect(documentClick).toHaveBeenCalled();
-    document.removeEventListener('click', documentClick);
+    expect(onAnalyticsClick).toHaveBeenCalledWith('POPOVER_ACTION');
   });
 });

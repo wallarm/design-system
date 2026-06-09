@@ -11,7 +11,7 @@ import { composeRefs } from '@radix-ui/react-compose-refs';
 import { Slot, Slottable } from '@radix-ui/react-slot';
 import type { SvgIconProps } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { Kbd } from '../Kbd';
 import { Tooltip } from '../Tooltip';
 import { TooltipContent } from '../Tooltip/TooltipContent';
@@ -20,7 +20,7 @@ import { navRailItemVariants } from './classes';
 import { useNavRailContext } from './NavRailContext';
 import { useShortcut } from './useShortcut';
 
-export interface NavRailItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface NavRailItemProps extends AnchorHTMLAttributes<HTMLAnchorElement>, TestableProps {
   ref?: Ref<HTMLAnchorElement>;
   asChild?: boolean;
   icon: ComponentType<SvgIconProps>;
@@ -42,7 +42,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
   ...props
 }) => {
   const { collapsed } = useNavRailContext();
-  const contextTestId = useTestId('item');
+  const testId = useTestId('item', testIdProp);
   const Comp = asChild ? Slot : 'a';
   const internalRef = useRef<HTMLAnchorElement>(null);
 
@@ -54,7 +54,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
       ref={composeRefs(internalRef, ref)}
       aria-current={active ? ('page' as const) : undefined}
       data-slot='nav-rail-item'
-      data-testid={testIdProp ?? contextTestId}
+      data-testid={testId}
       className={cn(navRailItemVariants({ active }), className)}
     >
       <span className='flex shrink-0 items-center justify-center'>

@@ -8,8 +8,7 @@ const bulkBarStory = createStoryHelper('data-display-selection', [
 ] as const);
 
 // `role="checkbox"` lives on ark-ui's hidden input; the label is the click target.
-const getCheckboxes = (page: Page) =>
-  page.locator('[data-slot="selection-item"]').locator('label');
+const getCheckboxes = (page: Page) => page.locator('[data-slot="selection-item"]').locator('label');
 const getBulkBarBySlot = (page: Page) => page.locator('[data-slot="selection-bulk-bar"]');
 const getBulkBar = (page: Page) => page.getByTestId('selection-bulk-bar');
 const getCount = (page: Page) => page.getByTestId('bulk-count');

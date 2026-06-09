@@ -5,7 +5,7 @@ import { Text } from '../Text';
 type TextOwnProps = Pick<ComponentPropsWithoutRef<typeof Text>, 'size' | 'color' | 'weight'>;
 
 export interface BulkBarSummaryCountProps
-  extends Omit<ComponentPropsWithoutRef<'p'>, 'children'>,
+  extends Omit<ComponentPropsWithoutRef<'p'>, 'children' | 'color'>,
     TextOwnProps,
     TestableProps {
   /** Renders the default "{count} selected" label. */

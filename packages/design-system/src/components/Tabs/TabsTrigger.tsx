@@ -28,7 +28,7 @@ export const TabsTrigger: FC<TabsTriggerProps> = ({
   'data-testid': testIdProp,
   ...rest
 }) => {
-  const contextTestId = useTestId('trigger');
+  const testId = useTestId('trigger', testIdProp);
   const { scrollRef, size } = useTabsSharedContext();
 
   const handleFocus = (e: FocusEvent<HTMLButtonElement>) => {
@@ -60,7 +60,7 @@ export const TabsTrigger: FC<TabsTriggerProps> = ({
     <ArkUiTabs.Trigger
       {...rest}
       className={cn(tabsTriggerVariants({ size }), className)}
-      data-testid={testIdProp ?? contextTestId}
+      data-testid={testId}
       value={value}
       disabled={disabled}
       asChild={asChild}

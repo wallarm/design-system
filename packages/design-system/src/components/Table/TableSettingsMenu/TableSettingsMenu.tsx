@@ -127,6 +127,16 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
   // Show separator only when there are user-pinned columns beyond master
   const hasUserPinned = pinnedColumns.some(col => col.id !== masterColumnId);
 
+  // Render a column row, preferring a consumer-supplied override for that id.
+  const renderColumnItem = (col: (typeof pinnedColumns)[number]) => {
+    const override = itemOverrides.get(col.id);
+    return override ? (
+      cloneElement(override, { key: col.id })
+    ) : (
+      <TableSettingsMenuItem key={col.id} columnId={col.id} />
+    );
+  };
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
@@ -194,25 +204,11 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
                       >
                         {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
 
-                        {pinnedColumns.map(col => {
-                          const override = itemOverrides.get(col.id);
-                          return override ? (
-                            cloneElement(override, { key: col.id })
-                          ) : (
-                            <TableSettingsMenuItem key={col.id} columnId={col.id} />
-                          );
-                        })}
+                        {pinnedColumns.map(renderColumnItem)}
 
                         {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
 
-                        {unpinnedColumns.map(col => {
-                          const override = itemOverrides.get(col.id);
-                          return override ? (
-                            cloneElement(override, { key: col.id })
-                          ) : (
-                            <TableSettingsMenuItem key={col.id} columnId={col.id} />
-                          );
-                        })}
+                        {unpinnedColumns.map(renderColumnItem)}
                       </SortableContext>
                     </DndContext>
                   </VStack>

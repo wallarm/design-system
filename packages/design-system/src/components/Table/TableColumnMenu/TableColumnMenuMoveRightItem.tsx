@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { arrayMove } from '@dnd-kit/sortable';
 import { ArrowRight } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
 import { useTableContext } from '../TableContext';
@@ -37,11 +38,7 @@ export const TableColumnMenuMoveRightItem: FC<TableColumnMenuMoveRightItemProps>
     const fromIdx = currentOrder.indexOf(column.id);
     const toIdx = fromIdx + 1;
     if (toIdx >= currentOrder.length) return;
-    const newOrder = [...currentOrder];
-    const temp = newOrder[fromIdx];
-    newOrder[fromIdx] = newOrder[toIdx]!;
-    newOrder[toIdx] = temp!;
-    ctx.setColumnOrder(newOrder);
+    ctx.setColumnOrder(arrayMove(currentOrder, fromIdx, toIdx));
   };
 
   return (

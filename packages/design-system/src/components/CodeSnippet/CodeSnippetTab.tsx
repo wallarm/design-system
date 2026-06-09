@@ -4,13 +4,10 @@ import { TabsTrigger, type TabsTriggerProps } from '../Tabs/TabsTrigger';
 
 export type CodeSnippetTabProps = TabsTriggerProps;
 
-export const CodeSnippetTab: FC<CodeSnippetTabProps> = ({
-  'data-testid': testIdProp,
-  ...rest
-}) => {
-  const contextTestId = useTestId('tab');
+export const CodeSnippetTab: FC<CodeSnippetTabProps> = ({ 'data-testid': testIdProp, ...rest }) => {
+  const testId = useTestId('tab', testIdProp);
 
-  return <TabsTrigger {...rest} data-testid={testIdProp ?? contextTestId} />;
+  return <TabsTrigger {...rest} data-testid={testId} />;
 };
 
 CodeSnippetTab.displayName = 'CodeSnippetTab';

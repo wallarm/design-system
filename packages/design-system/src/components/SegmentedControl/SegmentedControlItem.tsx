@@ -34,7 +34,7 @@ export const SegmentedControlItem: FC<PropsWithChildren<SegmentedControlItemProp
   'data-testid': testIdProp,
   ...rest
 }) => {
-  const contextTestId = useTestId('item');
+  const testId = useTestId('item', testIdProp);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLLabelElement>) => {
     onKeyDown?.(event);
@@ -52,7 +52,7 @@ export const SegmentedControlItem: FC<PropsWithChildren<SegmentedControlItemProp
       ref={ref}
       value={value}
       disabled={disabled}
-      data-testid={testIdProp ?? contextTestId}
+      data-testid={testId}
       tabIndex={disabled ? -1 : 0}
       onKeyDown={handleKeyDown}
       className={cn(

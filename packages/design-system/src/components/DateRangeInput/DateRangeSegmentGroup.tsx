@@ -2,6 +2,7 @@ import {
   type FC,
   type FocusEvent,
   type HTMLAttributes,
+  type KeyboardEvent,
   type MouseEvent,
   type Ref,
   useCallback,
@@ -166,7 +167,7 @@ export const DateRangeSegmentGroup: FC<DateRangeSegmentGroupProps> = ({
     if (!event.defaultPrevented) handleContainerBlur(event);
   };
 
-  const composedOnKeyDownCapture: typeof handleKeyDownCapture = event => {
+  const composedOnKeyDownCapture = (event: KeyboardEvent<HTMLDivElement>) => {
     consumerOnKeyDownCapture?.(event);
     if (!event.defaultPrevented) handleKeyDownCapture(event);
   };
