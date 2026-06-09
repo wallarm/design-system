@@ -21,12 +21,16 @@ export const otpInputCellClassName = cn(
   '[&:not([data-disabled]):not(:focus):not([data-invalid])]:hover:border-component-border-input-hover',
   // Focus (non-disabled, non-invalid)
   '[&:not([data-disabled]):not([data-invalid])]:focus:relative',
-  '[&:not([data-disabled]):not([data-invalid])]:focus:z-10',
+  '[&:not([data-disabled]):not([data-invalid])]:focus:z-15',
   '[&:not([data-disabled]):not([data-invalid])]:focus:border-border-strong-primary',
+  '[&:not([data-disabled]):not([data-invalid])]:focus:ring-3',
+  '[&:not([data-disabled]):not([data-invalid])]:focus:ring-focus-primary',
   // Invalid
   'data-invalid:border-border-strong-danger',
   '[&[data-invalid]:not([data-disabled])]:focus:relative',
   '[&[data-invalid]:not([data-disabled])]:focus:z-10',
+  '[&[data-invalid]:not([data-disabled])]:focus:ring-3',
+  '[&[data-invalid]:not([data-disabled])]:focus:ring-focus-destructive',
   // Disabled
   'data-disabled:cursor-not-allowed data-disabled:opacity-50',
 );
