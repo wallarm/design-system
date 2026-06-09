@@ -3,7 +3,7 @@ import { X } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-import { useBannerColor } from './BannerContext';
+import { useBannerVariant } from './BannerContext';
 
 export interface BannerCloseProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> {
@@ -20,7 +20,7 @@ export interface BannerCloseProps
  */
 export const BannerClose: FC<BannerCloseProps> = ({ ref, onClick, ...props }) => {
   const testId = useTestId('close');
-  const color = useBannerColor();
+  const variant = useBannerVariant();
 
   return (
     <Tooltip>
@@ -30,7 +30,7 @@ export const BannerClose: FC<BannerCloseProps> = ({ ref, onClick, ...props }) =>
           ref={ref}
           data-testid={testId}
           variant='ghost'
-          color={color === 'primary' ? 'neutral-alt' : 'neutral'}
+          color={variant === 'primary' ? 'neutral-alt' : 'neutral'}
           size='small'
           aria-label='close'
           onClick={onClick}

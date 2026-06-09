@@ -91,7 +91,6 @@ export {
   Banner,
   BannerClose,
   type BannerCloseProps,
-  type BannerColor,
   BannerContent,
   type BannerContentProps,
   BannerControls,
@@ -105,6 +104,7 @@ export {
   type BannerProps,
   BannerTitle,
   type BannerTitleProps,
+  type BannerVariant,
 } from './components/Banner';
 export {
   Breadcrumbs,

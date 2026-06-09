@@ -1,6 +1,6 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
-import type { BannerColor } from './Banner';
+import type { BannerVariant } from './Banner';
 
 const bannerStory = createStoryHelper('messaging-banner', [
   'All Colors',
@@ -13,8 +13,8 @@ const bannerStory = createStoryHelper('messaging-banner', [
 ] as const);
 
 const getBanners = (page: Page) => page.getByRole('status');
-const getBannerByColor = (page: Page, color: BannerColor) =>
-  page.getByRole('status').and(page.locator(`[data-color="${color}"]`));
+const getBannerByVariant = (page: Page, variant: BannerVariant) =>
+  page.getByRole('status').and(page.locator(`[data-variant="${variant}"]`));
 
 test.describe('Banner Component', () => {
   test.describe('View', () => {
@@ -53,7 +53,7 @@ test.describe('Banner Component', () => {
     test('Inline link is rendered and clickable', async ({ page }) => {
       await bannerStory.goto(page, 'With Inline Link');
 
-      const link = getBannerByColor(page, 'warning').getByRole('link', {
+      const link = getBannerByVariant(page, 'warning').getByRole('link', {
         name: 'Learn more',
       });
       await expect(link).toBeVisible();
@@ -71,7 +71,7 @@ test.describe('Banner Component', () => {
     });
 
     test('Close button - clicked dismisses banner', async ({ page }) => {
-      const banner = getBannerByColor(page, 'primary');
+      const banner = getBannerByVariant(page, 'primary');
       await expect(banner).toBeVisible();
 
       await banner.getByRole('button', { name: 'close' }).click();
@@ -81,7 +81,7 @@ test.describe('Banner Component', () => {
     });
 
     test('Close button - keyboard accessible', async ({ page }) => {
-      const banner = getBannerByColor(page, 'primary');
+      const banner = getBannerByVariant(page, 'primary');
       const closeButton = banner.getByRole('button', { name: 'close' });
       await closeButton.focus();
       await expect(closeButton).toBeFocused();
@@ -96,7 +96,7 @@ test.describe('Banner Component', () => {
     test('Action buttons are clickable', async ({ page }) => {
       await bannerStory.goto(page, 'With Actions');
 
-      const banner = getBannerByColor(page, 'destructive');
+      const banner = getBannerByVariant(page, 'destructive');
       const renewButton = banner.getByRole('button', { name: 'Renew' });
       await expect(renewButton).toBeEnabled();
       await renewButton.click();

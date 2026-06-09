@@ -12,7 +12,7 @@ import { BannerTitle } from './BannerTitle';
 const figmaNodeUrl =
   'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7688-3741';
 
-const typeToColor = {
+const typeToVariant = {
   Primary: 'primary',
   Secondary: 'secondary',
   Destructive: 'destructive',
@@ -22,7 +22,7 @@ const typeToColor = {
 
 figma.connect(Banner, figmaNodeUrl, {
   props: {
-    color: figma.enum('Type', typeToColor),
+    variant: figma.enum('Type', typeToVariant),
     leftIcon: figma.boolean('leftIcon'),
     description: figma.boolean('description'),
     inlineAction: figma.boolean('inlineAction'),
@@ -32,7 +32,7 @@ figma.connect(Banner, figmaNodeUrl, {
     text: figma.string('text'),
   },
   example: ({
-    color,
+    variant,
     leftIcon,
     description,
     inlineAction,
@@ -41,7 +41,7 @@ figma.connect(Banner, figmaNodeUrl, {
     title,
     text,
   }) => (
-    <Banner color={color}>
+    <Banner variant={variant}>
       {leftIcon && <BannerIcon />}
       <BannerContent>
         <BannerTitle action={inlineAction && <BannerLink href='#'>Link</BannerLink>}>

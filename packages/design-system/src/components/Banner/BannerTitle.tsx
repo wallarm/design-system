@@ -6,7 +6,7 @@ import {
   OverflowTooltipContent,
   OverflowTooltipTrigger,
 } from '../OverflowTooltip';
-import { useBannerColor } from './BannerContext';
+import { useBannerVariant } from './BannerContext';
 import { bannerTitleVariants } from './classes';
 
 export interface BannerTitleProps extends Omit<HTMLAttributes<HTMLDivElement>, 'title'> {
@@ -41,7 +41,7 @@ export const BannerTitle: FC<BannerTitleProps> = ({
   ...props
 }) => {
   const testId = useTestId('title');
-  const color = useBannerColor();
+  const variant = useBannerVariant();
   const clampClass = lineClamp > 1 ? `line-clamp-${lineClamp}` : 'truncate';
 
   return (
@@ -52,7 +52,7 @@ export const BannerTitle: FC<BannerTitleProps> = ({
             {...props}
             ref={ref}
             data-testid={testId}
-            className={cn(bannerTitleVariants({ color }), clampClass, className)}
+            className={cn(bannerTitleVariants({ variant }), clampClass, className)}
           >
             {children}
           </p>

@@ -1,4 +1,4 @@
-export { Banner, type BannerColor, type BannerProps } from './Banner';
+export { Banner, type BannerProps, type BannerVariant } from './Banner';
 export { BannerClose, type BannerCloseProps } from './BannerClose';
 export { BannerContent, type BannerContentProps } from './BannerContent';
 export { BannerControls, type BannerControlsProps } from './BannerControls';

@@ -1,15 +1,15 @@
 import { createContext, useContext } from 'react';
-import type { BannerColor } from './classes';
+import type { BannerVariant } from './classes';
 
-const BannerColorContext = createContext<BannerColor>('primary');
+const BannerVariantContext = createContext<BannerVariant>('primary');
 
 /**
- * Provides the active Banner color variant to sub-components so they can
- * derive their own theme-aware tokens (text, icon, link, close) during render.
+ * Provides the active Banner variant to sub-components so they can derive their
+ * own theme-aware tokens (text, icon, link, close) during render.
  */
-export const BannerColorProvider = BannerColorContext.Provider;
+export const BannerVariantProvider = BannerVariantContext.Provider;
 
-/** Returns the color variant of the nearest parent Banner. */
-export function useBannerColor(): BannerColor {
-  return useContext(BannerColorContext);
+/** Returns the variant of the nearest parent Banner. */
+export function useBannerVariant(): BannerVariant {
+  return useContext(BannerVariantContext);
 }

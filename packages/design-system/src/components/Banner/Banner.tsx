@@ -2,18 +2,18 @@ import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
-import { BannerColorProvider } from './BannerContext';
-import { type BannerColor, bannerVariants } from './classes';
+import { BannerVariantProvider } from './BannerContext';
+import { type BannerVariant, bannerVariants } from './classes';
 
-export type { BannerColor };
+export type { BannerVariant };
 
 export interface BannerProps
-  extends Omit<VariantProps<typeof bannerVariants>, 'color'>,
-    Omit<HTMLAttributes<HTMLDivElement>, 'color'>,
+  extends Omit<VariantProps<typeof bannerVariants>, 'variant'>,
+    HTMLAttributes<HTMLDivElement>,
     TestableProps {
   ref?: Ref<HTMLDivElement>;
-  /** Color variant of the banner */
-  color?: BannerColor;
+  /** Visual variant of the banner */
+  variant?: BannerVariant;
   /** Banner content — compose with Banner sub-components */
   children?: ReactNode;
 }
@@ -26,20 +26,20 @@ export interface BannerProps
  * Banners persist until dismissed by the user or until the state that caused
  * them is resolved.
  *
- * Supports 5 color variants: primary (dark/neutral), secondary, destructive,
- * info, and warning. Compose with: BannerIcon, BannerContent, BannerTitle,
+ * Supports 5 variants: primary (dark/neutral), secondary, destructive, info,
+ * and warning. Compose with: BannerIcon, BannerContent, BannerTitle,
  * BannerDescription, BannerLink, BannerControls, BannerClose.
  */
 export const Banner: FC<BannerProps> = ({
   ref,
-  color = 'primary',
+  variant = 'primary',
   className,
   children,
   'data-testid': testId,
   ...props
 }) => {
   return (
-    <BannerColorProvider value={color}>
+    <BannerVariantProvider value={variant}>
       <TestIdProvider value={testId}>
         <div
           {...props}
@@ -47,13 +47,13 @@ export const Banner: FC<BannerProps> = ({
           role='status'
           data-slot='banner'
           data-testid={testId}
-          data-color={color}
-          className={cn(bannerVariants({ color }), className)}
+          data-variant={variant}
+          className={cn(bannerVariants({ variant }), className)}
         >
           {children}
         </div>
       </TestIdProvider>
-    </BannerColorProvider>
+    </BannerVariantProvider>
   );
 };
 

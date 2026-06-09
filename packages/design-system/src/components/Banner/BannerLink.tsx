@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { useTestId } from '../../utils/testId';
 import { Link, type LinkProps } from '../Link';
-import { useBannerColor } from './BannerContext';
+import { useBannerVariant } from './BannerContext';
 
 export type BannerLinkProps = Omit<LinkProps, 'type' | 'size'>;
 
@@ -14,13 +14,13 @@ export type BannerLinkProps = Omit<LinkProps, 'type' | 'size'>;
  */
 export const BannerLink: FC<BannerLinkProps> = ({ weight = 'regular', ...props }) => {
   const testId = useTestId('link');
-  const color = useBannerColor();
+  const variant = useBannerVariant();
 
   return (
     <Link
       {...props}
       data-testid={testId}
-      type={color === 'primary' ? 'alt' : 'default'}
+      type={variant === 'primary' ? 'alt' : 'default'}
       size='md'
       weight={weight}
     />

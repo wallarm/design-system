@@ -6,7 +6,7 @@ import {
   OverflowTooltipContent,
   OverflowTooltipTrigger,
 } from '../OverflowTooltip';
-import { useBannerColor } from './BannerContext';
+import { useBannerVariant } from './BannerContext';
 import { bannerDescriptionVariants } from './classes';
 
 export interface BannerDescriptionProps extends HTMLAttributes<HTMLParagraphElement> {
@@ -27,7 +27,7 @@ export const BannerDescription: FC<BannerDescriptionProps> = ({
   ...props
 }) => {
   const testId = useTestId('description');
-  const color = useBannerColor();
+  const variant = useBannerVariant();
 
   return (
     <OverflowTooltip>
@@ -36,7 +36,7 @@ export const BannerDescription: FC<BannerDescriptionProps> = ({
           {...props}
           ref={ref}
           data-testid={testId}
-          className={cn(bannerDescriptionVariants({ color }), 'truncate', className)}
+          className={cn(bannerDescriptionVariants({ variant }), 'truncate', className)}
         >
           {children}
         </p>

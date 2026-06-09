@@ -37,10 +37,10 @@ const meta = {
     },
   },
   argTypes: {
-    color: {
+    variant: {
       control: { type: 'select' },
       options: ['primary', 'secondary', 'destructive', 'info', 'warning'],
-      description: 'Color variant of the banner',
+      description: 'Visual variant of the banner',
     },
   },
 } satisfies Meta<typeof Banner>;
@@ -61,7 +61,7 @@ interface BannerControlArgs extends BannerProps {
  * Interactive preview — toggle the controls below to compose the banner.
  */
 export const Default: StoryFn<BannerControlArgs> = ({
-  color,
+  variant,
   leftIcon,
   description,
   inlineAction,
@@ -70,7 +70,7 @@ export const Default: StoryFn<BannerControlArgs> = ({
   title,
   text,
 }) => (
-  <Banner color={color}>
+  <Banner variant={variant}>
     {leftIcon && <BannerIcon />}
     <BannerContent>
       <BannerTitle action={inlineAction ? <BannerLink href='#'>Action</BannerLink> : undefined}>
@@ -92,7 +92,7 @@ export const Default: StoryFn<BannerControlArgs> = ({
 );
 
 Default.args = {
-  color: 'primary',
+  variant: 'primary',
   leftIcon: true,
   description: false,
   inlineAction: false,
@@ -114,35 +114,35 @@ Default.argTypes = {
 
 export const AllColors: StoryFn<BannerProps> = () => (
   <div className='flex flex-col gap-16'>
-    <Banner color='primary'>
+    <Banner variant='primary'>
       <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
     </Banner>
 
-    <Banner color='secondary'>
+    <Banner variant='secondary'>
       <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
     </Banner>
 
-    <Banner color='destructive'>
+    <Banner variant='destructive'>
       <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
     </Banner>
 
-    <Banner color='info'>
+    <Banner variant='info'>
       <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
     </Banner>
 
-    <Banner color='warning'>
+    <Banner variant='warning'>
       <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
@@ -152,7 +152,7 @@ export const AllColors: StoryFn<BannerProps> = () => (
 );
 
 export const WithDescription: StoryFn<BannerProps> = () => (
-  <Banner color='info'>
+  <Banner variant='info'>
     <BannerIcon />
     <BannerContent>
       <BannerTitle>Credential Stuffing Detection</BannerTitle>
@@ -164,7 +164,7 @@ export const WithDescription: StoryFn<BannerProps> = () => (
 );
 
 export const WithInlineLink: StoryFn<BannerProps> = () => (
-  <Banner color='warning'>
+  <Banner variant='warning'>
     <BannerIcon />
     <BannerContent>
       <BannerTitle action={<BannerLink href='#'>Learn more</BannerLink>}>
@@ -179,7 +179,7 @@ export const WithInlineLink: StoryFn<BannerProps> = () => (
  * ellipsis. A tooltip reveals the full text on hover. One line is preferred.
  */
 export const LongText: StoryFn<BannerProps> = () => (
-  <Banner color='primary'>
+  <Banner variant='primary'>
     <BannerIcon />
     <BannerContent>
       <BannerTitle lineClamp={2}>
@@ -196,7 +196,7 @@ export const LongText: StoryFn<BannerProps> = () => (
 );
 
 export const WithActions: StoryFn<BannerProps> = () => (
-  <Banner color='destructive'>
+  <Banner variant='destructive'>
     <BannerIcon />
     <BannerContent>
       <BannerTitle>Your subscription has expired</BannerTitle>
@@ -224,7 +224,7 @@ export const Closable: StoryFn<BannerProps> = () => {
   }
 
   return (
-    <Banner color='primary'>
+    <Banner variant='primary'>
       <BannerIcon />
       <BannerContent>
         <BannerTitle>A new version of the dashboard is available</BannerTitle>
@@ -237,7 +237,7 @@ export const Closable: StoryFn<BannerProps> = () => {
 };
 
 export const NoIcon: StoryFn<BannerProps> = () => (
-  <Banner color='secondary'>
+  <Banner variant='secondary'>
     <BannerContent>
       <BannerTitle>Scheduled maintenance is planned for this weekend</BannerTitle>
     </BannerContent>

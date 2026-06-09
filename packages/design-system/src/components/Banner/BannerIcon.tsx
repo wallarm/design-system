@@ -2,10 +2,10 @@ import type { ComponentType, FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { CircleDashed, Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { useBannerColor } from './BannerContext';
-import { type BannerColor, bannerIconVariants } from './classes';
+import { useBannerVariant } from './BannerContext';
+import { type BannerVariant, bannerIconVariants } from './classes';
 
-const iconMap: Record<BannerColor, ComponentType<SvgIconProps>> = {
+const iconMap: Record<BannerVariant, ComponentType<SvgIconProps>> = {
   primary: CircleDashed,
   secondary: CircleDashed,
   destructive: OctagonAlert,
@@ -27,8 +27,8 @@ export interface BannerIconProps extends Omit<HTMLAttributes<HTMLDivElement>, 'c
  */
 export const BannerIcon: FC<BannerIconProps> = ({ ref, icon, className, ...props }) => {
   const testId = useTestId('icon');
-  const color = useBannerColor();
-  const IconComponent = iconMap[color];
+  const variant = useBannerVariant();
+  const IconComponent = iconMap[variant];
 
   return (
     <div
@@ -37,7 +37,7 @@ export const BannerIcon: FC<BannerIconProps> = ({ ref, icon, className, ...props
       data-testid={testId}
       className={cn('flex items-center py-2 shrink-0', className)}
     >
-      {icon || <IconComponent size='lg' className={bannerIconVariants({ color })} />}
+      {icon || <IconComponent size='lg' className={bannerIconVariants({ variant })} />}
     </div>
   );
 };
