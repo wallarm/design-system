@@ -7,7 +7,6 @@ import { BannerClose } from './BannerClose';
 import { BannerContent } from './BannerContent';
 import { BannerControls } from './BannerControls';
 import { BannerDescription } from './BannerDescription';
-import { BannerIcon } from './BannerIcon';
 import { BannerLink } from './BannerLink';
 import { BannerTitle } from './BannerTitle';
 
@@ -19,7 +18,6 @@ const meta = {
     BannerContent,
     BannerControls,
     BannerDescription,
-    BannerIcon,
     BannerLink,
     BannerTitle,
   },
@@ -31,9 +29,11 @@ const meta = {
           'Banner displays a prominent, full-width message at the top of the page ' +
           '(above the header) to communicate system-wide status, announcements, warnings, ' +
           'errors, or promotional messages. Banners persist until dismissed by the user or ' +
-          'until the state that caused them is resolved. Supports 5 color variants: primary ' +
-          '(dark/neutral), secondary, destructive, info, and warning. Compose with: BannerIcon, ' +
-          'BannerContent, BannerTitle, BannerDescription, BannerLink, BannerControls, BannerClose.',
+          'until the state that caused them is resolved. Supports 5 variants: primary ' +
+          '(dark/neutral), secondary, destructive, info, and warning. The destructive, info, ' +
+          'and warning variants show a default icon; pass the `icon` prop to use a custom one ' +
+          '(or to add an icon to primary/secondary). Compose with: BannerContent, BannerTitle, ' +
+          'BannerDescription, BannerLink, BannerControls, BannerClose.',
       },
     },
   },
@@ -49,7 +49,7 @@ const meta = {
 export default meta;
 
 interface BannerControlArgs extends BannerProps {
-  leftIcon: boolean;
+  customIcon: boolean;
   description: boolean;
   inlineAction: boolean;
   actions: boolean;
@@ -60,10 +60,12 @@ interface BannerControlArgs extends BannerProps {
 
 /**
  * Interactive preview — toggle the controls below to compose the banner.
+ * The destructive, info, and warning variants show a default icon; enable
+ * "customIcon" to override it (and to add an icon to primary/secondary).
  */
 export const Default: StoryFn<BannerControlArgs> = ({
   variant,
-  leftIcon,
+  customIcon,
   description,
   inlineAction,
   actions,
@@ -71,8 +73,10 @@ export const Default: StoryFn<BannerControlArgs> = ({
   title,
   text,
 }) => (
-  <Banner variant={variant}>
-    {leftIcon && <BannerIcon />}
+  <Banner
+    variant={variant}
+    icon={customIcon ? <Megaphone size='lg' className='text-icon-brand' /> : undefined}
+  >
     <BannerContent>
       <BannerTitle action={inlineAction ? <BannerLink href='#'>Action</BannerLink> : undefined}>
         {title}
@@ -93,8 +97,8 @@ export const Default: StoryFn<BannerControlArgs> = ({
 );
 
 Default.args = {
-  variant: 'primary',
-  leftIcon: true,
+  variant: 'info',
+  customIcon: false,
   description: false,
   inlineAction: false,
   actions: false,
@@ -104,7 +108,7 @@ Default.args = {
 };
 
 Default.argTypes = {
-  leftIcon: { control: 'boolean', description: 'Show the leading icon' },
+  customIcon: { control: 'boolean', description: 'Override with a custom icon' },
   description: { control: 'boolean', description: 'Show the description line' },
   inlineAction: { control: 'boolean', description: 'Show an inline action link in the title' },
   actions: { control: 'boolean', description: 'Show a trailing action button' },
@@ -113,38 +117,37 @@ Default.argTypes = {
   text: { control: 'text', description: 'Description text' },
 };
 
+/**
+ * primary and secondary have no icon by default; destructive, info, and warning
+ * each render their own default icon.
+ */
 export const AllColors: StoryFn<BannerProps> = () => (
   <div className='flex flex-col gap-16'>
     <Banner variant='primary'>
-      <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
     </Banner>
 
     <Banner variant='secondary'>
-      <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
     </Banner>
 
     <Banner variant='destructive'>
-      <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
     </Banner>
 
     <Banner variant='info'>
-      <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
     </Banner>
 
     <Banner variant='warning'>
-      <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
@@ -154,7 +157,6 @@ export const AllColors: StoryFn<BannerProps> = () => (
 
 export const WithDescription: StoryFn<BannerProps> = () => (
   <Banner variant='info'>
-    <BannerIcon />
     <BannerContent>
       <BannerTitle>Credential Stuffing Detection</BannerTitle>
       <BannerDescription>
@@ -166,7 +168,6 @@ export const WithDescription: StoryFn<BannerProps> = () => (
 
 export const WithInlineLink: StoryFn<BannerProps> = () => (
   <Banner variant='warning'>
-    <BannerIcon />
     <BannerContent>
       <BannerTitle action={<BannerLink href='#'>Learn more</BannerLink>}>
         You have exceeded the monthly quota for your company
@@ -181,7 +182,6 @@ export const WithInlineLink: StoryFn<BannerProps> = () => (
  */
 export const LongText: StoryFn<BannerProps> = () => (
   <Banner variant='primary'>
-    <BannerIcon />
     <BannerContent>
       <BannerTitle lineClamp={2}>
         Banner will render at most two lines before truncating the text. Banners address system-wide
@@ -197,11 +197,11 @@ export const LongText: StoryFn<BannerProps> = () => (
 );
 
 /**
- * Override the default variant icon by passing a custom one to `BannerIcon`.
+ * Override the default variant icon (or add one to primary/secondary) by
+ * passing the `icon` prop to Banner.
  */
 export const CustomIcon: StoryFn<BannerProps> = () => (
-  <Banner variant='secondary'>
-    <BannerIcon icon={<Megaphone size='lg' className='text-icon-brand' />} />
+  <Banner variant='secondary' icon={<Megaphone size='lg' className='text-icon-brand' />}>
     <BannerContent>
       <BannerTitle action={<BannerLink href='#'>View plans</BannerLink>}>
         New features are now available on the Pro plan
@@ -215,7 +215,6 @@ export const CustomIcon: StoryFn<BannerProps> = () => (
 
 export const WithActions: StoryFn<BannerProps> = () => (
   <Banner variant='destructive'>
-    <BannerIcon />
     <BannerContent>
       <BannerTitle>Your subscription has expired</BannerTitle>
     </BannerContent>
@@ -243,7 +242,6 @@ export const Closable: StoryFn<BannerProps> = () => {
 
   return (
     <Banner variant='primary'>
-      <BannerIcon />
       <BannerContent>
         <BannerTitle>A new version of the dashboard is available</BannerTitle>
       </BannerContent>
@@ -253,14 +251,3 @@ export const Closable: StoryFn<BannerProps> = () => {
     </Banner>
   );
 };
-
-export const NoIcon: StoryFn<BannerProps> = () => (
-  <Banner variant='secondary'>
-    <BannerContent>
-      <BannerTitle>Scheduled maintenance is planned for this weekend</BannerTitle>
-    </BannerContent>
-    <BannerControls>
-      <BannerClose />
-    </BannerControls>
-  </Banner>
-);

@@ -5,7 +5,6 @@ import { BannerClose } from './BannerClose';
 import { BannerContent } from './BannerContent';
 import { BannerControls } from './BannerControls';
 import { BannerDescription } from './BannerDescription';
-import { BannerIcon } from './BannerIcon';
 import { BannerLink } from './BannerLink';
 import { BannerTitle } from './BannerTitle';
 
@@ -23,7 +22,6 @@ const typeToVariant = {
 figma.connect(Banner, figmaNodeUrl, {
   props: {
     variant: figma.enum('Type', typeToVariant),
-    leftIcon: figma.boolean('leftIcon'),
     description: figma.boolean('description'),
     inlineAction: figma.boolean('inlineAction'),
     rightActions: figma.boolean('rightActions'),
@@ -31,18 +29,8 @@ figma.connect(Banner, figmaNodeUrl, {
     title: figma.string('title'),
     text: figma.string('text'),
   },
-  example: ({
-    variant,
-    leftIcon,
-    description,
-    inlineAction,
-    rightActions,
-    closable,
-    title,
-    text,
-  }) => (
+  example: ({ variant, description, inlineAction, rightActions, closable, title, text }) => (
     <Banner variant={variant}>
-      {leftIcon && <BannerIcon />}
       <BannerContent>
         <BannerTitle action={inlineAction && <BannerLink href='#'>Link</BannerLink>}>
           {title}

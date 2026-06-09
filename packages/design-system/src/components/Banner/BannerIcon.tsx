@@ -1,43 +1,44 @@
-import type { ComponentType, FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { CircleDashed, Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
-import { cn } from '../../utils/cn';
+import type { ComponentType, FC, ReactNode } from 'react';
+import { Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { useBannerVariant } from './BannerContext';
 import { type BannerVariant, bannerIconVariants } from './classes';
 
-const iconMap: Record<BannerVariant, ComponentType<SvgIconProps>> = {
-  primary: CircleDashed,
-  secondary: CircleDashed,
+// Variants that show a default icon when none is provided. primary and
+// secondary have no default icon.
+const defaultIconMap: Partial<Record<BannerVariant, ComponentType<SvgIconProps>>> = {
   destructive: OctagonAlert,
   info: Info,
   warning: TriangleAlert,
 };
 
-export interface BannerIconProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
-  ref?: Ref<HTMLDivElement>;
-  /** Override the default icon for the variant */
+export interface BannerIconProps {
+  /** Custom icon — always overrides the variant default. */
   icon?: ReactNode;
 }
 
 /**
- * Leading icon for Banner.
+ * Leading icon for Banner — rendered internally by Banner, not part of the
+ * public API.
  *
- * Automatically displays the appropriate icon and color for the parent
- * Banner's variant. Can be overridden with a custom icon via the `icon` prop.
+ * The destructive, info, and warning variants show a default icon; primary and
+ * secondary show none. A custom `icon` (passed via Banner's `icon` prop) always
+ * overrides the default. Renders nothing when there is no icon to show.
  */
-export const BannerIcon: FC<BannerIconProps> = ({ ref, icon, className, ...props }) => {
+export const BannerIcon: FC<BannerIconProps> = ({ icon }) => {
   const testId = useTestId('icon');
   const variant = useBannerVariant();
-  const IconComponent = iconMap[variant];
+  const DefaultIcon = defaultIconMap[variant];
+
+  const content =
+    icon ??
+    (DefaultIcon ? <DefaultIcon size='lg' className={bannerIconVariants({ variant })} /> : null);
+
+  if (content == null) return null;
 
   return (
-    <div
-      {...props}
-      ref={ref}
-      data-testid={testId}
-      className={cn('flex items-center py-2 shrink-0', className)}
-    >
-      {icon || <IconComponent size='lg' className={bannerIconVariants({ variant })} />}
+    <div data-slot='banner-icon' data-testid={testId} className='flex items-center py-2 shrink-0'>
+      {content}
     </div>
   );
 };

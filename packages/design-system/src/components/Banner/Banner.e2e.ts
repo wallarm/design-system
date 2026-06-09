@@ -9,7 +9,6 @@ const bannerStory = createStoryHelper('messaging-banner', [
   'Long Text',
   'With Actions',
   'Closable',
-  'No Icon',
 ] as const);
 
 const getBanners = (page: Page) => page.getByRole('status');
@@ -40,11 +39,6 @@ test.describe('Banner Component', () => {
 
     test('With actions', async ({ page }) => {
       await bannerStory.goto(page, 'With Actions');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Without icon', async ({ page }) => {
-      await bannerStory.goto(page, 'No Icon');
       await expect(page).toHaveScreenshot();
     });
   });

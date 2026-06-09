@@ -3,6 +3,7 @@ import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { BannerVariantProvider } from './BannerContext';
+import { BannerIcon } from './BannerIcon';
 import { type BannerVariant, bannerVariants } from './classes';
 
 export type { BannerVariant };
@@ -14,6 +15,12 @@ export interface BannerProps
   ref?: Ref<HTMLDivElement>;
   /** Visual variant of the banner */
   variant?: BannerVariant;
+  /**
+   * Leading icon. The destructive, info, and warning variants render a default
+   * icon when this is omitted; primary and secondary render none. Passing an
+   * icon always overrides the default.
+   */
+  icon?: ReactNode;
   /** Banner content — compose with Banner sub-components */
   children?: ReactNode;
 }
@@ -27,12 +34,13 @@ export interface BannerProps
  * them is resolved.
  *
  * Supports 5 variants: primary (dark/neutral), secondary, destructive, info,
- * and warning. Compose with: BannerIcon, BannerContent, BannerTitle,
- * BannerDescription, BannerLink, BannerControls, BannerClose.
+ * and warning. Compose with: BannerContent, BannerTitle, BannerDescription,
+ * BannerLink, BannerControls, BannerClose.
  */
 export const Banner: FC<BannerProps> = ({
   ref,
   variant = 'primary',
+  icon,
   className,
   children,
   'data-testid': testId,
@@ -50,6 +58,7 @@ export const Banner: FC<BannerProps> = ({
           data-variant={variant}
           className={cn(bannerVariants({ variant }), className)}
         >
+          <BannerIcon icon={icon} />
           {children}
         </div>
       </TestIdProvider>
