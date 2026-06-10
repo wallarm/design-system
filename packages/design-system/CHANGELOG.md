@@ -1,3 +1,7 @@
+## 0.57.0 (2026-06-10)
+
+* feat: WDS-97 Banner component (#158) ([dbd0728](https://github.com/wallarm/design-system/commit/dbd0728)), closes [#158](https://github.com/wallarm/design-system/issues/158)
+
 ## <small>0.56.1 (2026-06-09)</small>
 
 * fix: WDS-129 otp ([56d0ccb](https://github.com/wallarm/design-system/commit/56d0ccb))
