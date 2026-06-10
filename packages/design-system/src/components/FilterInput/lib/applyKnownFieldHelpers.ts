@@ -28,8 +28,11 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
   }),
   // Country options are bundled in DS so the backend doesn't ship the full list.
   // A static allowlist gives label resolution (chip + menu) and validation.
+  // `getSuggestions` is cleared so the allowlist always wins (it would otherwise
+  // outrank `values` in getFieldValues and disable allowlist validation).
   country: () => ({
     values: COUNTRY_OPTIONS,
+    getSuggestions: undefined,
   }),
 };
 

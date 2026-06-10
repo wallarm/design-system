@@ -31,6 +31,9 @@ export const isValueOfType = (value: string | number | boolean, type: FieldType)
     case 'date': {
       const s = String(value).trim();
       if (s === '') return false;
+      // Note: a bare numeric string ("2026", "12") parses as a valid Date, so
+      // numeric-only values aren't flagged here — the target case is a text
+      // value (e.g. a host string) carried into a date field.
       return isDatePreset(s) || !Number.isNaN(new Date(s).getTime());
     }
     default:
