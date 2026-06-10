@@ -21,6 +21,7 @@ export {
   QUERY_BAR_SELECTOR,
   VARIANT_LABELS,
 } from './constants';
+export { COUNTRY_OPTIONS } from './country';
 export { type AnchorBounds, buildAnchoredRect, isMenuRelated, toAnchorBounds } from './dom';
 export {
   findOptionByValue,
