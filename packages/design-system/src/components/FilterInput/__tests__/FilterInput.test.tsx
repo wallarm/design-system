@@ -1,8 +1,9 @@
+import { useState } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { FilterInput } from '../FilterInput';
-import type { Condition, FieldMetadata, Group } from '../types';
+import type { Condition, ExprNode, FieldMetadata, Group } from '../types';
 
 /**
  * Default findByRole timeout (1s) flakes under CI shard load because Ark UI
@@ -1004,6 +1005,82 @@ describe('FilterInput', () => {
 
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
       expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('Pending');
+    });
+  });
+
+  // The `error` flag lives on the Condition. A consumer that round-trips the
+  // expression through a domain shape without an `error` slot (e.g. a backend
+  // query type) drops it; FilterInput must re-derive value errors on sync so
+  // they survive the round-trip and surface for values from any source.
+  describe('value error re-derivation on sync (AS-1085)', () => {
+    it('renders an invalid-value error for a static field loaded with an out-of-allowlist value', () => {
+      // No `error` flag on the incoming condition — must be derived.
+      const condition: Condition = {
+        type: 'condition',
+        field: 'priority',
+        operator: '=',
+        value: 'active', // not in priority values (Low=1, Medium=5)
+      };
+
+      render(<FilterInput fields={sampleFields} value={condition} />);
+
+      expect(screen.getByText(/Invalid value for Priority/i)).toBeInTheDocument();
+    });
+
+    it('shows the error after changing a chip field even when the consumer drops the error flag', async () => {
+      const user = userEvent.setup();
+
+      // Mimics my's converters: strip `error` on every round-trip.
+      const stripError = (node: ExprNode | null): ExprNode | null => {
+        if (!node) return null;
+        if (node.type === 'condition') {
+          const next = { ...node };
+          delete next.error;
+          return next;
+        }
+        return {
+          ...node,
+          children: node.children.map(stripError).filter((c): c is ExprNode => c !== null),
+        };
+      };
+
+      const Wrapper = () => {
+        const [value, setValue] = useState<ExprNode | null>({
+          type: 'condition',
+          field: 'status',
+          operator: '=',
+          value: 'active',
+        });
+        return (
+          <FilterInput
+            fields={sampleFields}
+            value={value}
+            onChange={next => setValue(stripError(next))}
+          />
+        );
+      };
+
+      render(<Wrapper />);
+
+      await user.click(await screen.findByRole('button', { name: /Edit filter attribute/i }));
+      await screen.findByRole('menuitem', { name: 'Priority' }, { timeout: 10000 });
+      await user.click(screen.getByRole('menuitem', { name: 'Priority' }));
+
+      expect(await screen.findByText(/Invalid value for Priority/i)).toBeInTheDocument();
+    });
+
+    it('does not flag a value that is valid for the new field', () => {
+      const condition: Condition = {
+        type: 'condition',
+        field: 'priority',
+        operator: '=',
+        value: 5, // Medium — valid
+      };
+
+      render(<FilterInput fields={sampleFields} value={condition} />);
+
+      expect(screen.queryByText(/Invalid value/i)).not.toBeInTheDocument();
+      expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
   });
 });

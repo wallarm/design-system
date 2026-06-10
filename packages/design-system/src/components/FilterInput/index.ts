@@ -23,6 +23,7 @@ export {
   isFilterParseError,
   parseExpression,
   serializeExpression,
+  validateValueForField,
 } from './lib';
 // Types
 export type {
