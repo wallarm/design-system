@@ -15,7 +15,8 @@ const meta = {
           'animation — a scan line crosses a dot grid, dots bloom as it passes, ' +
           'and occasional anomaly events flash in accent color. Two texture modes: ' +
           '`halftone` (variable-sized squares) and `clean` (small dots with bloom). ' +
-          'Purely decorative (`aria-hidden`), never intercepts pointer events.',
+          'Purely decorative (`aria-hidden`), never intercepts pointer events. ' +
+          'Content passed as `children` is centered above the canvas.',
       },
     },
   },
@@ -24,16 +25,16 @@ const meta = {
 export default meta;
 
 export const Halftone: StoryFn<AnimatedBackgroundProps> = () => (
-  <div className='h-[500px] w-full'>
-    <AnimatedBackground />
-  </div>
+  <AnimatedBackground className='h-[500px] w-full' />
 );
 
 export const WithCard: StoryFn<AnimatedBackgroundProps> = () => (
-  <div className='relative h-screen w-screen'>
-    <AnimatedBackground game excludeCardSize={{ width: 300, height: 200 }} />
-
-    <Card className='absolute top-1/2 left-1/2 -translate-1/2 w-[300px] h-[200px]'>
+  <AnimatedBackground
+    className='h-screen w-screen'
+    game
+    excludeCardSize={{ width: 300, height: 200 }}
+  >
+    <Card className='w-[300px] h-[200px]'>
       <CardHeader>
         <CardTitle>Sign In</CardTitle>
       </CardHeader>
@@ -43,9 +44,5 @@ export const WithCard: StoryFn<AnimatedBackgroundProps> = () => (
         </p>
       </CardContent>
     </Card>
-  </div>
+  </AnimatedBackground>
 );
-
-WithCard.parameters = {
-  layout: 'fullscreen',
-};

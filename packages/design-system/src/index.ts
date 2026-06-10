@@ -583,4 +583,5 @@ export {
   type WaitForStepEventOptions,
   waitForStepEvent,
 } from './components/Tour';
+export { UtilityPage, type UtilityPageProps } from './components/UtilityPage';
 export { type TestableProps, TestIdProvider, useTestId } from './utils/testId';
