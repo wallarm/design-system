@@ -174,9 +174,31 @@ describe('valueCommitHelpers', () => {
       expect(validateValueForField(boolField, 'maybe')).toBe(true);
     });
 
-    it('does not type-check freeform string or date fields', () => {
+    it('validates freeform date fields (preset or parseable date)', () => {
+      expect(validateValueForField(dateField, '7d')).toBe(false); // relative preset
+      expect(validateValueForField(dateField, '2026-03-05')).toBe(false); // absolute ISO
+      // a host string carried into a date field after a field change
+      expect(validateValueForField(dateField, 'example.com')).toBe(true);
+      expect(validateValueForField(dateField, 'none')).toBe(true);
+    });
+
+    it('does not type-check freeform string fields', () => {
       expect(validateValueForField(freeField, 'anything')).toBe(false);
-      expect(validateValueForField(dateField, 'last 24h')).toBe(false);
+    });
+
+    it('checks type first, then options, for an allowlisted typed field', () => {
+      const priority: FieldMetadata = {
+        name: 'priority',
+        label: 'Priority',
+        type: 'integer',
+        values: [
+          { value: 1, label: 'Low' },
+          { value: 5, label: 'High' },
+        ],
+      };
+      expect(validateValueForField(priority, '5')).toBe(false); // right type, in options
+      expect(validateValueForField(priority, '3')).toBe(true); // right type, not an option
+      expect(validateValueForField(priority, 'active')).toBe(true); // wrong type
     });
 
     it('still bypasses dynamic (getSuggestions) typed fields', () => {

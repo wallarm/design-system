@@ -1,14 +1,15 @@
+import { isDatePreset } from '../FilterInputMenu/FilterInputDateValueMenu/constants';
 import type { Condition, FieldMetadata, FieldType, FieldValueOption } from '../types';
 import { getFieldValues, hasStaticAllowlist } from './fields';
 
 /**
- * Whether a value conforms to a field's data type. Used for freeform fields
- * (no allowlist, no validator) so a value left over from a previous field — e.g.
- * a string carried into an `integer` field after a field change — is caught.
+ * Whether a value conforms to a field's data type. Catches a value left over
+ * from a previous field — e.g. a host string carried into a `date` field after
+ * a field change.
  *
- * `string`, `date` and `enum` are not type-checked here: any string is a valid
- * string; date values include relative presets and ISO forms that are unsafe to
- * validate generically; enum validity comes from its allowlist.
+ * `string` and `enum` are not type-checked: any string is a valid string, and
+ * enum validity comes from its allowlist. `date` accepts a relative preset
+ * (`7d`, `1h`, …) or any value `Date` can parse (ISO etc.).
  */
 export const isValueOfType = (value: string | number | boolean, type: FieldType): boolean => {
   switch (type) {
@@ -26,6 +27,11 @@ export const isValueOfType = (value: string | number | boolean, type: FieldType)
       if (typeof value === 'boolean') return true;
       const s = String(value).trim().toLowerCase();
       return s === 'true' || s === 'false';
+    }
+    case 'date': {
+      const s = String(value).trim();
+      if (s === '') return false;
+      return isDatePreset(s) || !Number.isNaN(new Date(s).getTime());
     }
     default:
       return true;
@@ -49,32 +55,41 @@ export const isValidFieldValue = (
     opt => opt.value === v || String(opt.value).toLowerCase() === String(v).toLowerCase(),
   );
 
-/** Return indices of values that don't match any field option. Empty array = all valid. */
+/**
+ * Return indices of invalid values. Empty array = all valid.
+ *
+ * Validation runs in two stages: first the value's data type, then — only if
+ * the type matches — membership in the field's options (when it has any). So a
+ * value can fail either because it's the wrong type (e.g. a string in a `date`
+ * field) or because it's the right type but not one of the allowed options.
+ */
 export const getInvalidValueIndices = (
   field: FieldMetadata,
   values: Array<string | number | boolean>,
 ): number[] => {
-  // A custom validator trumps the static-allowlist check.
+  // A custom validator trumps every built-in check.
   if (field.validate) {
     return values.reduce<number[]>((acc, v, idx) => {
       if (field.validate!(v)) acc.push(idx);
       return acc;
     }, []);
   }
-  if (!hasStaticAllowlist(field)) {
-    // Dynamic (getSuggestions) fields are consumer-owned — their list is a hint,
-    // not an allowlist — so no value is flagged.
-    if (field.getSuggestions) return [];
-    // Plain freeform field: validate each value against the field's data type.
-    return values.reduce<number[]>((acc, v, idx) => {
-      if (v != null && !isValueOfType(v, field.type)) acc.push(idx);
-      return acc;
-    }, []);
-  }
-  const fv = getFieldValues(field);
-  if (fv.length === 0) return [];
+  // Dynamic (getSuggestions) fields are consumer-owned — their list is a hint,
+  // not an allowlist — so nothing is flagged.
+  if (field.getSuggestions) return [];
+
+  const allowlist = hasStaticAllowlist(field) ? getFieldValues(field) : null;
   return values.reduce<number[]>((acc, v, idx) => {
-    if (!isValidFieldValue(fv, v)) acc.push(idx);
+    if (v == null) return acc;
+    // 1) Data type.
+    if (!isValueOfType(v, field.type)) {
+      acc.push(idx);
+      return acc;
+    }
+    // 2) Allowlist membership, when the field defines options.
+    if (allowlist && allowlist.length > 0 && !isValidFieldValue(allowlist, v)) {
+      acc.push(idx);
+    }
     return acc;
   }, []);
 };
