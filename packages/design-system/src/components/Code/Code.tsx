@@ -4,12 +4,13 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 
-const codeVariants = cva('font-mono leading-sm', {
+const codeVariants = cva('font-mono', {
   variants: {
     size: {
-      s: 'text-xs',
-      m: 'text-sm',
-      l: 'text-base',
+      xs: 'text-2xs leading-2xs',
+      s: 'text-xs leading-xs',
+      m: 'text-sm leading-sm',
+      l: 'text-base leading-sm',
     },
     weight: {
       light: 'font-light',

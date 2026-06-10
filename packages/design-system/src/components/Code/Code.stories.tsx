@@ -33,6 +33,9 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack align='start'>
+    <Code {...args} size='xs'>
+      console.log('Extra small code text');
+    </Code>
     <Code {...args} size='s'>
       console.log('Small code text');
     </Code>
