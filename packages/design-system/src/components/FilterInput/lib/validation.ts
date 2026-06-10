@@ -1,5 +1,36 @@
-import type { Condition, FieldMetadata, FieldValueOption } from '../types';
+import type { Condition, FieldMetadata, FieldType, FieldValueOption } from '../types';
 import { getFieldValues, hasStaticAllowlist } from './fields';
+
+/**
+ * Whether a value conforms to a field's data type. Used for freeform fields
+ * (no allowlist, no validator) so a value left over from a previous field — e.g.
+ * a string carried into an `integer` field after a field change — is caught.
+ *
+ * `string`, `date` and `enum` are not type-checked here: any string is a valid
+ * string; date values include relative presets and ISO forms that are unsafe to
+ * validate generically; enum validity comes from its allowlist.
+ */
+export const isValueOfType = (value: string | number | boolean, type: FieldType): boolean => {
+  switch (type) {
+    case 'integer': {
+      if (typeof value === 'number') return Number.isInteger(value);
+      const s = String(value).trim();
+      return s !== '' && /^-?\d+$/.test(s);
+    }
+    case 'float': {
+      if (typeof value === 'number') return Number.isFinite(value);
+      const s = String(value).trim();
+      return s !== '' && Number.isFinite(Number(s));
+    }
+    case 'boolean': {
+      if (typeof value === 'boolean') return true;
+      const s = String(value).trim().toLowerCase();
+      return s === 'true' || s === 'false';
+    }
+    default:
+      return true;
+  }
+};
 
 /** Find a field value option matching by label or value (case-insensitive) */
 export const findMatchingFieldValue = (fieldValues: FieldValueOption[], text: string) =>
@@ -30,7 +61,16 @@ export const getInvalidValueIndices = (
       return acc;
     }, []);
   }
-  if (!hasStaticAllowlist(field)) return [];
+  if (!hasStaticAllowlist(field)) {
+    // Dynamic (getSuggestions) fields are consumer-owned — their list is a hint,
+    // not an allowlist — so no value is flagged.
+    if (field.getSuggestions) return [];
+    // Plain freeform field: validate each value against the field's data type.
+    return values.reduce<number[]>((acc, v, idx) => {
+      if (v != null && !isValueOfType(v, field.type)) acc.push(idx);
+      return acc;
+    }, []);
+  }
   const fv = getFieldValues(field);
   if (fv.length === 0) return [];
   return values.reduce<number[]>((acc, v, idx) => {

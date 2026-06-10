@@ -1082,5 +1082,20 @@ describe('FilterInput', () => {
       expect(screen.queryByText(/Invalid value/i)).not.toBeInTheDocument();
       expect(screen.queryByRole('alert')).not.toBeInTheDocument();
     });
+
+    it('flags a type-mismatched value on a freeform field (no allowlist)', () => {
+      // A string value carried into an integer field — e.g. after a field change.
+      const portField: FieldMetadata = { name: 'port', label: 'Port', type: 'integer' };
+      const condition: Condition = {
+        type: 'condition',
+        field: 'port',
+        operator: '=',
+        value: 'active',
+      };
+
+      render(<FilterInput fields={[portField]} value={condition} />);
+
+      expect(screen.getByText(/Invalid value for Port/i)).toBeInTheDocument();
+    });
   });
 });

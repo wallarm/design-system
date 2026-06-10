@@ -1,11 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import {
-  CONNECTOR_ID_PATTERN,
-  chipIdToConditionIndex,
-  hasStaticAllowlist,
-  validateValueForField,
-} from '../../lib';
+import { CONNECTOR_ID_PATTERN, chipIdToConditionIndex, validateValueForField } from '../../lib';
 import type {
   ChipErrorSegment,
   Condition,
@@ -40,11 +35,12 @@ const DEFAULT_CONNECTOR: 'and' = 'and';
  * valid. Recomputing on sync keeps the error robust to round-trips and also
  * surfaces invalid values arriving from any source (initial load, share-links).
  *
- * Pure and idempotent. We only add or clear errors for fields whose validity
- * is *determinable* — a `validate` callback or a static allowlist. For dynamic
- * (`getSuggestions`) fields the suggestion list is a hint, not an allowlist, so
- * the `error` flag is consumer-owned and left untouched. Unknown-field
- * (`attribute`) errors and disabled conditions are likewise left untouched.
+ * Pure and idempotent. `validateValueForField` is the single source of truth —
+ * it covers `validate` callbacks, static allowlists, and the data type of plain
+ * freeform fields. Only pure-dynamic (`getSuggestions`, no validator) fields are
+ * skipped: their suggestion list is a hint, not an allowlist, so the `error`
+ * flag is consumer-owned. Unknown-field (`attribute`) errors and disabled
+ * conditions are likewise left untouched.
  */
 const revalidateConditions = (conditions: Condition[], fields: FieldMetadata[]): Condition[] =>
   conditions.map(condition => {
@@ -52,8 +48,8 @@ const revalidateConditions = (conditions: Condition[], fields: FieldMetadata[]):
     const field = fields.find(f => f.name === condition.field);
     // Unknown field — the attribute error is owned by the field-commit path.
     if (!field || condition.error === SEGMENT_VARIANT.attribute) return condition;
-    // Dynamic field with no validator — we can't judge validity; leave as-is.
-    if (!field.validate && !hasStaticAllowlist(field)) return condition;
+    // Pure-dynamic field — validity is consumer-owned; leave the flag as-is.
+    if (field.getSuggestions && !field.validate) return condition;
 
     if (validateValueForField(field, condition.value)) {
       return condition.error === SEGMENT_VARIANT.value

@@ -144,6 +144,52 @@ describe('valueCommitHelpers', () => {
     });
   });
 
+  describe('freeform field type validation', () => {
+    const intField: FieldMetadata = { name: 'port', label: 'Port', type: 'integer' };
+    const floatField: FieldMetadata = { name: 'ratio', label: 'Ratio', type: 'float' };
+    const boolField: FieldMetadata = { name: 'active', label: 'Active', type: 'boolean' };
+    const dateField: FieldMetadata = { name: 'seen', label: 'Seen', type: 'date' };
+
+    it('flags a non-integer value on a freeform integer field', () => {
+      // e.g. "active" carried over from a previous string field after a field change
+      expect(validateValueForField(intField, 'active')).toBe(true);
+      expect(getInvalidValueIndices(intField, ['8080', 'oops', '443'])).toEqual([1]);
+    });
+
+    it('accepts integer-looking values on a freeform integer field', () => {
+      expect(validateValueForField(intField, '8080')).toBe(false);
+      expect(validateValueForField(intField, '-5')).toBe(false);
+      expect(validateValueForField(intField, '5.5')).toBe(true);
+    });
+
+    it('validates freeform float fields', () => {
+      expect(validateValueForField(floatField, '1.5')).toBe(false);
+      expect(validateValueForField(floatField, '2')).toBe(false);
+      expect(validateValueForField(floatField, 'NaNoid')).toBe(true);
+    });
+
+    it('validates freeform boolean fields', () => {
+      expect(validateValueForField(boolField, 'true')).toBe(false);
+      expect(validateValueForField(boolField, 'FALSE')).toBe(false);
+      expect(validateValueForField(boolField, 'maybe')).toBe(true);
+    });
+
+    it('does not type-check freeform string or date fields', () => {
+      expect(validateValueForField(freeField, 'anything')).toBe(false);
+      expect(validateValueForField(dateField, 'last 24h')).toBe(false);
+    });
+
+    it('still bypasses dynamic (getSuggestions) typed fields', () => {
+      const dynamicInt: FieldMetadata = {
+        name: 'code',
+        label: 'Status code',
+        type: 'integer',
+        getSuggestions: t => [{ value: t, label: t }],
+      };
+      expect(validateValueForField(dynamicInt, 'not-a-number')).toBe(false);
+    });
+  });
+
   describe('resolveFieldValue', () => {
     it('resolves label to value', () => {
       expect(resolveFieldValue(enumField, 'Active')).toBe('active');
