@@ -22,7 +22,13 @@ export {
   VARIANT_LABELS,
 } from './constants';
 export { type AnchorBounds, buildAnchoredRect, isMenuRelated, toAnchorBounds } from './dom';
-export { findOptionByValue, getFieldValues, hasFieldValues, hasStaticAllowlist } from './fields';
+export {
+  findOptionByValue,
+  findValueLabelInFields,
+  getFieldValues,
+  hasFieldValues,
+  hasStaticAllowlist,
+} from './fields';
 export { filterAndSort } from './filterSort';
 export { getCurrentValueTokenText, getValueFilterText } from './menuFilterText';
 export {

@@ -1097,5 +1097,41 @@ describe('FilterInput', () => {
 
       expect(screen.getByText(/Invalid value for Port/i)).toBeInTheDocument();
     });
+
+    it('shows the borrowed label (not the raw value) for the selected item in the value menu', async () => {
+      const user = userEvent.setup();
+      const labelFields: FieldMetadata[] = [
+        {
+          name: 'attack_subtype',
+          label: 'Attack Subtype',
+          type: 'enum',
+          operators: ['in'],
+          values: [{ value: 'xss', label: 'XSS' }],
+        },
+        {
+          name: 'legacy',
+          label: 'Legacy',
+          type: 'enum',
+          values: [{ value: '__none__', label: 'None' }],
+        },
+      ];
+      // '__none__' is invalid for attack_subtype but Legacy labels it "None".
+      const condition: Condition = {
+        type: 'condition',
+        field: 'attack_subtype',
+        operator: 'in',
+        value: ['__none__'],
+        error: 'value',
+      };
+
+      render(<FilterInput fields={labelFields} value={condition} />);
+
+      await user.click(await screen.findByRole('button', { name: /Edit filter value/i }));
+
+      expect(
+        await screen.findByRole('menuitem', { name: /None/i }, { timeout: 10000 }),
+      ).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: '__none__' })).toBeNull();
+    });
   });
 });

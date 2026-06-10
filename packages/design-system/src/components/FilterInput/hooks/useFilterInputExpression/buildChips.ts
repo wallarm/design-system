@@ -1,6 +1,7 @@
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
   findOptionByValue,
+  findValueLabelInFields,
   getDateDisplayLabel,
   getInvalidValueIndices,
   getOperatorLabel,
@@ -51,12 +52,7 @@ const resolveValueLabel = (
   const own = findOptionByValue(field, value)?.label;
   if (own !== undefined) return own;
   if (!crossField) return undefined;
-  for (const f of fields) {
-    if (f === field) continue;
-    const label = findOptionByValue(f, value)?.label;
-    if (label !== undefined) return label;
-  }
-  return undefined;
+  return findValueLabelInFields(value, fields);
 };
 
 /** Resolve display value for a single-value condition */
