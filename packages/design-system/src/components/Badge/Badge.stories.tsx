@@ -52,6 +52,9 @@ export const Dotted: StoryFn<typeof meta> = ({ ...args }) => (
 
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack align='center' gap={8}>
+    <Badge {...args} size='small'>
+      Small
+    </Badge>
     <Badge {...args} size='medium'>
       Medium
     </Badge>
