@@ -85,6 +85,52 @@ describe('buildChips — loose-match label resolution (AS-882)', () => {
     });
   });
 
+  // After a field change the value may no longer match the new field, but its
+  // label still lives on the field it came from — an errored chip keeps showing
+  // the label rather than reverting to the raw value (AS-1085).
+  describe('cross-field label fallback for errored chip', () => {
+    it('resolves a single value via another field when the current field lacks it', () => {
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'priority', operator: '=', value: 'urgent', error: 'value' },
+      ];
+      // 'urgent' is not a priority option, but Tag defines it as "Urgent".
+      expect(findChip(buildChips(conditions, [], fields, false))?.value).toBe('Urgent');
+    });
+
+    it('resolves multi values via another field when the current field lacks them', () => {
+      const conditions: Condition[] = [
+        {
+          type: 'condition',
+          field: 'priority',
+          operator: 'in',
+          value: ['urgent', 'review'],
+          error: 'value',
+        },
+      ];
+      const chip = findChip(buildChips(conditions, [], fields, false));
+      expect(chip?.valueParts).toEqual(['Urgent', 'Review']);
+    });
+
+    it('still falls back to the raw value when no field defines it', () => {
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'priority', operator: '=', value: 'mystery', error: 'value' },
+      ];
+      expect(findChip(buildChips(conditions, [], fields, false))?.value).toBe('mystery');
+    });
+
+    it('does NOT borrow a label for a non-errored freeform value coinciding with another option', () => {
+      const withFreeform: FieldMetadata[] = [
+        ...fields,
+        { name: 'note', label: 'Note', type: 'string' }, // freeform, no options
+      ];
+      const conditions: Condition[] = [
+        // valid freeform value that happens to equal Tag's "review" option value
+        { type: 'condition', field: 'note', operator: '=', value: 'review' },
+      ];
+      expect(findChip(buildChips(conditions, [], withFreeform, false))?.value).toBe('review');
+    });
+  });
+
   // No-value operators (is_null / is_not_null) carry no real value, but the
   // chip must still render three segments — the value slot is filled by a
   // visual placeholder so building and committed chips look uniform.
