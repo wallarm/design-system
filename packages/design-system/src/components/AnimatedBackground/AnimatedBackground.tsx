@@ -8,9 +8,18 @@ import { createSweepEngine, resolveOptions, useGameKeyboard } from './module';
 const GATE_TARGET = 5;
 
 export const AnimatedBackground: FC<AnimatedBackgroundProps> = (props: AnimatedBackgroundProps) => {
-  const { ref, texture, paused, game = false, excludeCardSize, className, ...rest } = props;
+  const {
+    ref,
+    texture,
+    paused,
+    game = false,
+    excludeCardSize,
+    className,
+    children,
+    ...rest
+  } = props;
 
-  const internalRef = useRef<HTMLCanvasElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const engineRef = useRef<SweepEngine | null>(null);
   const reducedMotionRef = useRef<MediaQueryList | null>(null);
 
@@ -48,7 +57,7 @@ export const AnimatedBackground: FC<AnimatedBackgroundProps> = (props: AnimatedB
 
   // engine lifecycle
   useEffect(() => {
-    const canvas = internalRef.current;
+    const canvas = canvasRef.current;
     if (!canvas) return;
     const engine = createSweepEngine(canvas, optionsRef.current);
     engineRef.current = engine;
@@ -147,7 +156,7 @@ export const AnimatedBackground: FC<AnimatedBackgroundProps> = (props: AnimatedB
   const onPointerDown = useCallback(
     (e: React.PointerEvent<HTMLCanvasElement>) => {
       if (!game) return;
-      const canvas = internalRef.current;
+      const canvas = canvasRef.current;
       if (!canvas) return;
       const rect = canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
@@ -162,42 +171,62 @@ export const AnimatedBackground: FC<AnimatedBackgroundProps> = (props: AnimatedB
     engineRef.current?.startRound();
   }, []);
 
+  const gameHud = gameActive && (
+    <GameHud
+      caught={caught}
+      armed={armed}
+      roundOver={roundOver}
+      stats={stats}
+      accuracy={accuracy}
+      faced={faced}
+      catchKey={catchKey}
+      gateTarget={GATE_TARGET}
+      onTryAgain={handleTryAgain}
+    />
+  );
+
+  if (children == null) {
+    return (
+      <>
+        <canvas
+          data-slot='animated-background'
+          {...(rest as React.HTMLAttributes<HTMLCanvasElement>)}
+          ref={node => {
+            canvasRef.current = node;
+            if (typeof ref === 'function') ref(node as HTMLDivElement | null);
+            else if (ref) ref.current = node as HTMLDivElement | null;
+          }}
+          aria-hidden='true'
+          className={cn(
+            'h-full w-full pointer-events-none',
+            gameActive && 'pointer-events-auto',
+            className,
+          )}
+          onPointerDown={gameActive ? onPointerDown : undefined}
+        />
+        {gameHud}
+      </>
+    );
+  }
+
   return (
-    <>
+    <div data-slot='animated-background' {...rest} ref={ref} className={cn('relative', className)}>
       <canvas
-        {...rest}
-        ref={node => {
-          internalRef.current = node;
-          if (typeof ref === 'function') {
-            ref(node);
-          } else if (ref) {
-            ref.current = node;
-          }
-        }}
-        data-slot='animated-background'
+        ref={canvasRef}
         aria-hidden='true'
         className={cn(
-          'h-full w-full pointer-events-none',
+          'absolute inset-0 h-full w-full pointer-events-none',
           gameActive && 'pointer-events-auto',
-          className,
         )}
         onPointerDown={gameActive ? onPointerDown : undefined}
       />
 
-      {gameActive && (
-        <GameHud
-          caught={caught}
-          armed={armed}
-          roundOver={roundOver}
-          stats={stats}
-          accuracy={accuracy}
-          faced={faced}
-          catchKey={catchKey}
-          gateTarget={GATE_TARGET}
-          onTryAgain={handleTryAgain}
-        />
-      )}
-    </>
+      {gameHud}
+
+      <div className='pointer-events-none absolute inset-0 z-10 flex items-center justify-center'>
+        <div className='pointer-events-auto'>{children}</div>
+      </div>
+    </div>
   );
 };
 

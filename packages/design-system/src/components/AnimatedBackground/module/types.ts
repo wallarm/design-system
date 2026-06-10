@@ -1,10 +1,11 @@
-import type { CanvasHTMLAttributes, Ref } from 'react';
+import type { HTMLAttributes, ReactNode, Ref } from 'react';
 
 export type Texture = 'clean' | 'halftone';
 
-export interface AnimatedBackgroundProps
-  extends Omit<CanvasHTMLAttributes<HTMLCanvasElement>, 'children'> {
-  ref?: Ref<HTMLCanvasElement>;
+export interface AnimatedBackgroundProps extends HTMLAttributes<HTMLDivElement> {
+  ref?: Ref<HTMLDivElement>;
+  /** Content rendered centered above the animated canvas. */
+  children?: ReactNode;
   /** Variant A (`clean`) vs Variant B (`halftone`). */
   texture?: Texture;
   /** Grid cell size in px. */
