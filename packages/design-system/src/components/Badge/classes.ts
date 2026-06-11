@@ -7,15 +7,16 @@ type BadgeVariantsColorMap = Partial<{
   [K in BadgeColor]: string;
 }>;
 
-export const badgeVariants = cva('inline-flex items-center gap-4 rounded-8', {
+export const badgeVariants = cva('inline-flex items-center gap-4', {
   variants: {
     variant: {
       default: '',
       dotted: 'before:w-6 before:h-6 before:bg-current before:rounded-2',
     },
     size: {
-      medium: 'h-20 py-2 px-6 [&_svg]:icon-sm',
-      large: 'h-24 py-4 px-6 [&_svg]:icon-md',
+      small: 'h-16 py-2 px-4 [&_svg]:icon-xs rounded-6',
+      medium: 'h-20 py-2 px-6 [&_svg]:icon-sm rounded-8',
+      large: 'h-24 py-4 px-6 [&_svg]:icon-md rounded-8',
     },
     isIconOnly: {
       true: 'justify-center p-2',
@@ -41,6 +42,9 @@ export const badgeVariants = cva('inline-flex items-center gap-4 rounded-8', {
     textVariant: {
       default: 'font-sans-display text-xs font-medium',
       code: 'font-mono leading-sm text-xs font-medium',
+    },
+    isClickable: {
+      true: 'cursor-pointer',
     },
   },
   compoundVariants: [

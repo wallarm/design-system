@@ -44,6 +44,7 @@ export const Badge: FC<BadgeProps> = ({
       muted,
       textVariant,
       isIconOnly: isIconOnly(children),
+      isClickable: !!onClick,
     }),
     className,
   );
