@@ -1,3 +1,11 @@
+## <small>0.57.1 (2026-06-11)</small>
+
+* fix: WDS-122 numeric badge [update-screenshots] ([053c89d](https://github.com/wallarm/design-system/commit/053c89d))
+* fix: WDS-123 code ([fce9253](https://github.com/wallarm/design-system/commit/fce9253))
+* fix: WDS-124 badge ([5406ec7](https://github.com/wallarm/design-system/commit/5406ec7))
+* fix(filter-input): AS-1085 re-derive value errors on controlled sync (#159) ([be034a7](https://github.com/wallarm/design-system/commit/be034a7)), closes [#159](https://github.com/wallarm/design-system/issues/159)
+* 🖼️ Update screenshots ([d1fe76d](https://github.com/wallarm/design-system/commit/d1fe76d))
+
 ## 0.57.0 (2026-06-10)
 
 * feat: WDS-97 Banner component (#158) ([dbd0728](https://github.com/wallarm/design-system/commit/dbd0728)), closes [#158](https://github.com/wallarm/design-system/issues/158)
