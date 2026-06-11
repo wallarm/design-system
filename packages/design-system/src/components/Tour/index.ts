@@ -4,6 +4,7 @@ export {
   waitForStepEvent,
 } from './lib';
 export { Tour, type TourProps } from './Tour';
+export { TourClose, type TourCloseProps } from './TourClose';
 export type {
   TourStatusChangeDetails,
   TourStepAction,

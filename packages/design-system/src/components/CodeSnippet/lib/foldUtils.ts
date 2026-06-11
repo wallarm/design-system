@@ -1,3 +1,7 @@
+import type { ButtonHTMLAttributes } from 'react';
+
+export type FoldButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>;
+
 export type FoldRegion = {
   /** Unique identifier for this fold region */
   id: string;
@@ -9,6 +13,10 @@ export type FoldRegion = {
   label?: string;
   /** Whether the fold starts collapsed. Default: false */
   defaultCollapsed?: boolean;
+  /** Props forwarded to the fold gutter toggle button. */
+  toggleProps?: FoldButtonProps;
+  /** Props forwarded to the collapsed fold summary button. */
+  summaryProps?: FoldButtonProps;
 };
 
 export type DisplayItem =

@@ -1,9 +1,10 @@
 import { type FC, type HTMLAttributes, type Ref, useId } from 'react';
 import { Menu } from '@ark-ui/react/menu';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface DropdownMenuRadioGroupProps
-  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'> {
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onChange'>,
+    TestableProps {
   value?: string;
   onValueChange?: (details: { value: string }) => void;
   ref?: Ref<HTMLDivElement>;
@@ -12,15 +13,17 @@ export interface DropdownMenuRadioGroupProps
 export const DropdownMenuRadioGroup: FC<DropdownMenuRadioGroupProps> = ({
   value,
   onValueChange,
+  id: idProp,
+  'data-testid': testIdProp,
   ...props
 }) => {
-  const id = useId();
-  const testId = useTestId('radio-group');
+  const autoId = useId();
+  const testId = useTestId('radio-group', testIdProp);
 
   return (
     <Menu.RadioItemGroup
       {...props}
-      id={id}
+      id={idProp ?? autoId}
       value={value}
       onValueChange={onValueChange}
       data-testid={testId}

@@ -1,4 +1,5 @@
-import type { ComponentPropsWithRef, FC, MouseEventHandler } from 'react';
+import type { ComponentPropsWithRef, FC, MouseEventHandler, ReactElement } from 'react';
+import { cloneElement, isValidElement } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
 import { useCopyTooltip } from '../../hooks';
@@ -10,10 +11,12 @@ export interface InlineCodeSnippetProps extends Omit<ComponentPropsWithRef<'code
   code: string;
   /** Size variant */
   size?: 'sm' | 'md' | 'lg' | 'inherit';
-  /** Render as child element using Radix Slot */
+  /** Render as the React element passed via `children` instead of the default `<code>`. The `code` prop becomes the cloned element's content. */
   asChild?: boolean;
   /** Enable click to copy functionality (default: true) */
   copyable?: boolean;
+  /** Used only when `asChild` is true. Must be a single React element; the `code` prop is rendered as its children. */
+  children?: ReactElement;
 }
 
 type VariantStyles = {
@@ -64,30 +67,38 @@ export const InlineCodeSnippet: FC<InlineCodeSnippetProps> = props => {
     className,
     onClick,
     ref,
+    children,
     ...otherProps
   } = props;
   const { copied, tooltipOpen, onTooltipOpenChange, handleCopy } = useCopyTooltip({
     text: code,
     enabled: copyable,
   });
-  const Comp = asChild ? Slot : 'code';
 
   const handleClick: MouseEventHandler<HTMLElement> = event => {
-    handleCopy(event);
+    handleCopy();
     onClick?.(event);
   };
 
-  const codeElement = (
-    <Comp
-      ref={ref}
-      data-slot='inline-code-snippet'
-      className={cn(inlineCodeSnippetVariants({ size, copyable }), className)}
-      {...otherProps}
-      onClick={handleClick}
-    >
-      {code}
-    </Comp>
-  );
+  const sharedProps = {
+    ref,
+    'data-slot': 'inline-code-snippet',
+    // The copyable affordance handles its own click but is not a native
+    // interactive element, so it opts out of an enclosing clickable parent's
+    // delegated click (e.g. a clickable Card) instead of relying on the
+    // removed `stopPropagation()` that would block analytics click capture.
+    'data-ds-suppress-parent-click': copyable ? '' : undefined,
+    className: cn(inlineCodeSnippetVariants({ size, copyable }), className),
+    ...otherProps,
+    onClick: handleClick,
+  };
+
+  const codeElement =
+    asChild && isValidElement(children) ? (
+      <Slot {...sharedProps}>{cloneElement(children, {}, code)}</Slot>
+    ) : (
+      <code {...sharedProps}>{code}</code>
+    );
 
   if (!copyable) {
     return codeElement;

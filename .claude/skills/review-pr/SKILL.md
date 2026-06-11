@@ -40,6 +40,15 @@ For each changed file, evaluate against these categories:
 - [ ] Registered in main `src/index.ts` (new components)
 - [ ] Uses design tokens, not hardcoded colors/spacing
 
+#### Analytics-Readiness (for new/changed interactive targets)
+
+Does every new/changed interactive target satisfy the metrics contract? Full list in [`docs/metrics/contract.md`](../../../docs/metrics/contract.md) and [`docs/metrics/new-component-checklist.md`](../../../docs/metrics/new-component-checklist.md). The high-signal checks:
+
+- [ ] Element-specific attribute types on each target (not generic `HTMLAttributes<HTMLElement>`); `{...rest}` reaches the real DOM node
+- [ ] No analytics-named props (`analyticsId` / `analyticsProps`) or `slotProps`-style escape hatch added just for analytics; handlers compose (no silent replace, no blanket `stopPropagation`)
+- [ ] Metrics tests present per [`docs/metrics/testing-examples.md`](../../../docs/metrics/testing-examples.md) (id on real node, verbatim props, polymorphic/label-root/negative/persistence as applicable)
+- [ ] Any wrapper-level case or closed-target gap flagged with its workaround in the component folder
+
 #### Storybook Stories (for component changes)
 - [ ] Stories exist for all variants
 - [ ] Correct Storybook category in `title`

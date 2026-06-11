@@ -20,7 +20,6 @@ export const CodeSnippetFullscreenButton: FC<CodeSnippetFullscreenButtonProps> =
   const { isFullscreen, setIsFullscreen } = useCodeSnippet();
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
-    event.stopPropagation();
     setIsFullscreen(!isFullscreen);
     onClick?.(event);
   };

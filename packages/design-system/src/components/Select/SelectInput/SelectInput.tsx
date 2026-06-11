@@ -83,9 +83,18 @@ const selectInputVariants = cva(
   },
 );
 
-type SelectInputProps = Pick<SelectValueTextProps, 'placeholder'>;
+interface SelectInputBaseProps
+  extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'color'> {
+  'data-testid'?: string;
+}
 
-export const SelectInput: FC<SelectInputProps> = ({ placeholder = 'Choose...' }) => {
+type SelectInputProps = SelectInputBaseProps & Pick<SelectValueTextProps, 'placeholder'>;
+
+export const SelectInput: FC<SelectInputProps> = ({
+  placeholder = 'Choose...',
+  className,
+  ...rest
+}) => {
   const { selectedItems, disabled, multiple } = useSelectContext();
 
   const isEmpty = selectedItems.length <= 0;
@@ -94,9 +103,11 @@ export const SelectInput: FC<SelectInputProps> = ({ placeholder = 'Choose...' })
     <ArkUiSelect.Control className='w-full max-w-full'>
       <ArkUiSelect.Trigger asChild>
         <div
+          {...rest}
           className={cn(
             selectInputVariants({ empty: isEmpty, multiple }),
             'w-full max-w-full gap-8',
+            className,
           )}
           tabIndex={disabled ? -1 : 0}
         >

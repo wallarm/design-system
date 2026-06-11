@@ -1,15 +1,13 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
 import { cloneElement, isValidElement } from 'react';
 import { Menu, useMenuContext } from '@ark-ui/react/menu';
-import { useTestId } from '../../utils/testId';
-import type { DropdownMenuItemVariantsProps } from './DropdownMenuItem';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
-interface DropdownMenuTriggerProps
-  extends HTMLAttributes<HTMLButtonElement>,
-    DropdownMenuItemVariantsProps {
+export interface DropdownMenuTriggerProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
+    TestableProps {
   children: ReactNode;
   asChild?: boolean;
-  inset?: boolean;
   ref?: Ref<HTMLButtonElement>;
 }
 
@@ -32,13 +30,12 @@ const TriggerStateInjector: FC<{ children: ReactNode }> = ({ children }) => {
 };
 
 export const DropdownMenuTrigger: FC<DropdownMenuTriggerProps> = ({
-  variant = 'default',
-  inset = false,
   asChild,
   children,
+  'data-testid': testIdProp,
   ...props
 }) => {
-  const testId = useTestId('trigger');
+  const testId = useTestId('trigger', testIdProp);
 
   return (
     <Menu.Trigger {...props} asChild={asChild} data-testid={testId}>

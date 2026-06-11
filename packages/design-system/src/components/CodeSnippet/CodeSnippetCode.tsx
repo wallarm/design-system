@@ -1,4 +1,5 @@
-import type { FC, HTMLAttributes, Ref } from 'react';
+import type { FC, HTMLAttributes, MouseEventHandler, Ref } from 'react';
+import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { useCodeSnippet } from './hooks';
 import { CodeContent, CodeLine, TokenizedCodeLine } from './internal';
@@ -45,6 +46,17 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
 
   const renderFoldSummary = (item: Extract<DisplayItem, { type: 'fold-summary' }>) => {
     const label = getFoldSummaryLabel(item.fold, item.lineCount);
+    const {
+      className: summaryClassName,
+      onClick: consumerOnClick,
+      ...summaryProps
+    } = item.fold.summaryProps ?? {};
+
+    const handleSummaryClick: MouseEventHandler<HTMLButtonElement> = event => {
+      toggleFold(item.fold.id);
+      consumerOnClick?.(event);
+    };
+
     return (
       <CodeLine
         key={`fold-${item.fold.id}`}
@@ -59,10 +71,11 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
       >
         <button
           type='button'
-          className='inline-flex items-center cursor-pointer select-none'
+          className={cn('inline-flex items-center cursor-pointer select-none', summaryClassName)}
           aria-expanded={false}
           aria-label={`Collapsed region: ${label}, ${item.lineCount} lines`}
-          onClick={() => toggleFold(item.fold.id)}
+          {...summaryProps}
+          onClick={handleSummaryClick}
         >
           <span className='inline-flex items-center italic text-text-secondary hover:text-text-primary transition-colors'>
             {label}

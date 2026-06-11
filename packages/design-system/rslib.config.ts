@@ -20,6 +20,7 @@ export default defineConfig({
         '!./src/**/*.test.{ts,tsx}',
         '!./src/**/*.stories.{ts,tsx}',
         '!./src/**/*.e2e.{ts,tsx}',
+        '!./src/testUtils/**',
       ],
     },
     tsconfigPath: './tsconfig.app.json',

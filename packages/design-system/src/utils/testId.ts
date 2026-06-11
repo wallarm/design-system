@@ -37,6 +37,9 @@ export const TestIdProvider = TestIdContext.Provider;
  * cascade base itself when no slot is provided.
  *
  * - `useTestId('close')` → `"{base}--close"` (sub-component pattern)
+ * - `useTestId('close', consumerTestId)` → `consumerTestId` when defined,
+ *   else the slot-derived value (consumer override pattern — keeps
+ *   `'data-testid': testIdProp ?? contextTestId` to a single call)
  * - `useTestId()` → `"{base}"` (transparent wrapper pattern — useful for
  *   compound roots that pass through their parent's cascade without
  *   adding their own slot segment)
@@ -45,8 +48,9 @@ export const TestIdProvider = TestIdContext.Provider;
  * when no `data-testid` was passed to the root component,
  * keeping the DOM clean.
  */
-export function useTestId(slot?: string): string | undefined {
+export function useTestId(slot?: string, override?: string): string | undefined {
   const base = useContext(TestIdContext);
+  if (override !== undefined) return override;
   if (!base) return undefined;
   return slot ? `${base}--${slot}` : base;
 }

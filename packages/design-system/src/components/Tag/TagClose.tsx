@@ -1,19 +1,37 @@
-import type { FC, MouseEvent } from 'react';
+import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
 import { X } from '../../icons';
-import { useTestId } from '../../utils/testId';
+import { cn } from '../../utils/cn';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
-export interface TagCloseProps {
-  onClick?: (event: MouseEvent<SVGSVGElement>) => void;
+export interface TagCloseProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
+    TestableProps {
+  children?: ReactNode;
+  ref?: Ref<HTMLButtonElement>;
 }
 
-export const TagClose: FC<TagCloseProps> = ({ onClick }) => {
-  const testId = useTestId('close');
+export const TagClose: FC<TagCloseProps> = ({
+  children,
+  className,
+  'data-testid': testIdProp,
+  ref,
+  ...rest
+}) => {
+  const testId = useTestId('close', testIdProp);
 
-  const handleClick = (event: MouseEvent<SVGSVGElement>) => {
-    event.stopPropagation();
-
-    onClick?.(event);
-  };
-
-  return <X size='sm' data-slot='tag-close' data-testid={testId} onClick={handleClick} />;
+  return (
+    <button
+      type='button'
+      aria-label='Remove tag'
+      {...rest}
+      ref={ref}
+      data-slot='tag-close'
+      data-testid={testId}
+      className={cn('inline-flex items-center cursor-pointer focus:outline-none', className)}
+    >
+      {children ?? <X size='sm' />}
+    </button>
+  );
 };
+
+TagClose.displayName = 'TagClose';

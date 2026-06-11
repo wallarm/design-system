@@ -14,12 +14,13 @@ import { TableBody } from '../TableBody';
 import { TableColGroup } from '../TableColGroup';
 import { useTableContext } from '../TableContext';
 import { TableHead } from '../TableHead';
-import { TableSettingsMenu } from '../TableSettingsMenu';
+import { TableSettingsMenuSlot } from '../TableSettingsMenu';
 
 interface TableInnerContainerProps {
   isEmpty: boolean;
   virtualized?: 'container';
   showSettings: boolean;
+  hasConsumerSettingsMenu: boolean;
   ariaLabel?: string;
   children?: ReactNode;
 }
@@ -28,6 +29,7 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
   isEmpty,
   virtualized,
   showSettings,
+  hasConsumerSettingsMenu,
   ariaLabel,
   children,
 }) => {
@@ -99,7 +101,7 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
         <ScrollAreaScrollbar orientation='vertical' />
         <ScrollAreaCorner />
       </ScrollArea>
-      {showSettings && <TableSettingsMenu />}
+      {showSettings && <TableSettingsMenuSlot hasConsumerMenu={hasConsumerSettingsMenu} />}
     </>
   );
 };

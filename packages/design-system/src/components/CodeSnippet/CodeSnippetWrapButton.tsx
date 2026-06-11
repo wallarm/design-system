@@ -18,7 +18,6 @@ export const CodeSnippetWrapButton: FC<CodeSnippetWrapButtonProps> = ({
   const { wrapLines, setWrapLines } = useCodeSnippet();
 
   const handleToggle = (active: boolean, event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
     setWrapLines(active);
     onToggle?.(active, event);
   };
