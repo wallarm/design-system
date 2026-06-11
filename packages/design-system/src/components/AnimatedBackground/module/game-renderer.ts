@@ -1,3 +1,6 @@
+import type { CelDotParams } from './celebration';
+import { celDotEffect, computeCelFrameParams } from './celebration';
+import { drawCelebrationOverlay, getCelCannonOffset } from './celebration-renderer';
 import {
   AMB_SCALE,
   ANOMALY_ALPHA_BASE,
@@ -48,7 +51,7 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
   let revealedCache: boolean[] = [];
 
   function drawGameDots(t: number): void {
-    const { ctx, dotPalette, accentPalette } = rc;
+    const { ctx, dotPalette, accentPalette, caughtPalette } = rc;
     const { w, h, dots, opts, tanTilt, exclusionBox } = host;
     const sx = sweepX(t, w, opts.sweepPeriod);
     const intensity = opts.intensity;
@@ -56,6 +59,13 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
     const liveAnomalies = game.anomalies;
     const aLen = liveAnomalies.length;
     const isIdle = game.gameMode === 'idle';
+
+    // Celebration pre-pass — compute frame-level params once
+    const cel = game.cel;
+    let celParams: CelDotParams | null = null;
+    if (cel) {
+      celParams = computeCelFrameParams(cel, t, w, h);
+    }
 
     // Precompute card exclusion rect (centered on canvas).
     const exL = exclusionBox ? (w - exclusionBox.width) / 2 : 0;
@@ -83,7 +93,8 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
       }
     }
 
-    for (const dot of dots) {
+    for (let di = 0; di < dots.length; di++) {
+      const dot = dots[di]!;
       if (exclusionBox && dot.x >= exL && dot.x <= exR && dot.y >= exT && dot.y <= exB) continue;
       const sxAt = sx + (h / 2 - dot.y) * tanTilt;
       const amb =
@@ -115,14 +126,43 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
         if (ao > maxAo) maxAo = ao;
       }
 
-      const val = Math.min(1, Math.max(amb + bloom, maxAo));
-      if (val < MIN_DOT_VALUE) continue;
+      // Celebration per-dot effect
+      let celBoost = 0;
+      let celCol: string | null = null;
+      if (celParams) {
+        const eff = celDotEffect(di, dot.x, dot.y, celParams, w, h);
+        if (eff) {
+          celBoost = eff.celBoost;
+          celCol = eff.celCol;
+        }
+      }
 
-      const step = Math.round(val * 5);
+      const val = Math.min(1, Math.max(amb + bloom, maxAo));
+      // Modified early-continue: also consider celBoost
+      if (val < MIN_DOT_VALUE && celBoost < 0.02) continue;
+
+      const effVal = Math.min(1, val + celBoost);
+      const step = Math.round(effVal * 5);
       const half = Math.min(step * DOT_STEP_SCALE + DOT_STEP_BASE, halfCap);
 
+      // A live red anomaly still wins the pixel
       if (maxAo > ANOMALY_VIS_THRESHOLD) {
         ctx.fillStyle = accentPalette[alphaIdx(Math.min(1, ANOMALY_ALPHA_BASE + maxAo))]!;
+      } else if (celBoost > 0.02) {
+        // Celebration dot — render at full strength (ignore intensity)
+        const celAlpha = Math.min(1, 0.15 + effVal * 0.85);
+        if (celCol === '__caught__') {
+          ctx.fillStyle = caughtPalette[alphaIdx(celAlpha)]!;
+        } else if (celCol) {
+          // Rainbow or custom color
+          ctx.globalAlpha = celAlpha;
+          ctx.fillStyle = celCol;
+          ctx.fillRect(dot.x - half, dot.y - half, half * 2, half * 2);
+          ctx.globalAlpha = 1;
+          continue;
+        } else {
+          ctx.fillStyle = caughtPalette[alphaIdx(celAlpha)]!;
+        }
       } else {
         ctx.fillStyle =
           dotPalette[
@@ -173,9 +213,16 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
 
   function drawCannon(t: number): void {
     const { ctx, dotPalette } = rc;
-    if (game.gameMode !== 'armed' && game.gameMode !== 'over') return;
+    const cel = game.cel;
+    const hasCel = cel !== null;
 
-    if (game.gameMode === 'armed') {
+    // Draw cannon when armed, over, or when a celebration is active (demo idle field)
+    if (game.gameMode !== 'armed' && game.gameMode !== 'over' && !hasCel) return;
+
+    // Celebration cannon liftoff
+    const liftOffset = getCelCannonOffset(cel, game.cannonAway, t, host.h);
+
+    if (game.gameMode === 'armed' && !hasCel) {
       const riseP = Math.min(1, (t - game.armT) / ARM_RISE);
       const ease = 1 - (1 - riseP) * (1 - riseP);
       const offsetY = (1 - ease) * 40;
@@ -185,7 +232,14 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
       ctx.translate(0, offsetY);
     }
 
-    const baseY = host.h - CANNON_BASE_OFFSET;
+    const baseY = host.h - CANNON_BASE_OFFSET - liftOffset;
+    // Skip drawing if cannon is off-screen
+    if (baseY < -40) {
+      if (game.gameMode === 'armed' && !hasCel) {
+        ctx.restore();
+      }
+      return;
+    }
     const cx = Math.round(game.cannonX);
 
     ctx.fillStyle = dotPalette[ALPHA_STEPS]!;
@@ -193,7 +247,7 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
     ctx.fillRect(cx - 6, baseY - 6, 12, 6);
     ctx.fillRect(cx - 2, baseY - 12, 4, 6);
 
-    if (game.gameMode === 'armed') {
+    if (game.gameMode === 'armed' && !hasCel) {
       ctx.restore();
     }
   }
@@ -206,5 +260,11 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
     }
   }
 
-  return { drawGameDots, drawCaughtEffects, drawCannon, drawBullets };
+  function drawCelOverlay(t: number): void {
+    const cel = game.cel;
+    if (!cel) return;
+    drawCelebrationOverlay(rc, cel, t, host, game.fontLoaded);
+  }
+
+  return { drawGameDots, drawCaughtEffects, drawCannon, drawBullets, drawCelOverlay };
 }

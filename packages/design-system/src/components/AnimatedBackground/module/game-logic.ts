@@ -1,3 +1,5 @@
+import type { CelState } from './celebration';
+import { adjustCelebrationTimeMarkers, startCelebration, stepCelebration } from './celebration';
 import {
   ANOMALY_VIS_THRESHOLD,
   DOT_STEP_BASE,
@@ -87,6 +89,8 @@ export interface GameEngineHost {
   w: number;
   h: number;
   dots: Dot[];
+  gridCols: number;
+  gridSp: number;
   opts: EngineOptions;
   tanTilt: number; // cached Math.tan(tilt * PI / 180)
   exclusionBox: { width: number; height: number } | null;
@@ -103,8 +107,13 @@ export interface GameLogic {
   armT: number;
   fontLoaded: boolean;
 
+  // Celebration state (read by renderer)
+  cel: CelState | null;
+  cannonAway: boolean;
+
   // Simulation
   gameSim(t: number, dt: number): void;
+  stepCel(t: number, dt: number, caughtColor: string, dotColor: string): void;
   pruneCaughtEffects(t: number): void;
   adjustTimeMarkers(skip: number): void;
 
@@ -118,6 +127,7 @@ export interface GameLogic {
   setFiring(on: boolean): void;
   onStats(cb: (s: GameStats) => void): void;
   setExclusion(box: { width: number; height: number } | null): void;
+  celebrate(score: number): void;
 }
 
 // factory
@@ -128,6 +138,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     cannonX: 0,
     armT: 0,
     fontLoaded: false,
+    cel: null as CelState | null,
+    cannonAway: false,
   };
 
   const anomalies: Anomaly[] = [];
@@ -149,7 +161,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
   let statsCb: ((s: GameStats) => void) | null = null;
   let exclusionBox: { width: number; height: number } | null = null;
 
-  if (typeof document !== 'undefined') {
+  function loadFont() {
+    if (state.fontLoaded || typeof document === 'undefined') return;
     document.fonts
       .load('9px "Press Start 2P"')
       .then(() => {
@@ -265,6 +278,13 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     bullets.length = 0;
     firing = false;
     cannonDir = 0;
+
+    // Compute accuracy and start celebration
+    const faced = roundKills + roundEscaped;
+    const accuracy = faced > 0 ? Math.round((roundKills / faced) * 100) : 100;
+    const now = performance.now() / 1000;
+    state.cel = startCelebration(accuracy, now, host);
+
     emitStats();
   }
 
@@ -297,6 +317,11 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
   // --- gameSim sub-functions ---
 
   function idleSim(t: number) {
+    // Suppress idle spawns while a celebration is playing
+    if (state.cel) {
+      pruneExpired(t);
+      return;
+    }
     let liveCount = 0;
     for (const anomaly of anomalies) if (!anomaly.caught) liveCount++;
     if (liveCount < 2 && t - lastSpawn > host.opts.anomalyInterval) {
@@ -442,6 +467,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     for (const effect of caughtEffects) effect.t0 += skip;
     if (state.armT > 0) state.armT += skip;
     if (lastSpawn > -Infinity && lastSpawn !== 0) lastSpawn += skip;
+    if (state.cel) adjustCelebrationTimeMarkers(state.cel, skip);
   }
 
   // game API
@@ -450,6 +476,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     state.gameActive = active;
     if (active) {
       lastSpawn = -Infinity;
+      loadFont();
     } else {
       anomalies.length = 0;
       bullets.length = 0;
@@ -462,7 +489,21 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
       roundDone = false;
       firing = false;
       cannonDir = 0;
+      state.cel = null;
+      state.cannonAway = false;
     }
+  }
+
+  // External celebration replay (demo route)
+  function celebrate(score: number) {
+    const now = performance.now() / 1000;
+    // Clear any existing celebration
+    state.cel = null;
+    state.cannonAway = false;
+    anomalies.length = 0;
+    // Re-seed armT so cannon can rise in for the performance
+    state.armT = now;
+    state.cel = startCelebration(score, now, host);
   }
 
   function catchAt(x: number, y: number, running: boolean): boolean {
@@ -495,6 +536,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     if (mode === 'idle') {
       state.gameMode = 'idle';
       lastSpawn = -Infinity;
+      state.cel = null;
+      state.cannonAway = false;
     } else {
       state.gameMode = 'armed';
     }
@@ -516,6 +559,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     state.armT = now;
     lastSpawn = now;
     state.cannonX = w / 2;
+    state.cel = null;
+    state.cannonAway = false;
     emitStats();
   }
 
@@ -532,6 +577,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     firing = false;
     cannonDir = 0;
     lastSpawn = -Infinity;
+    state.cel = null;
+    state.cannonAway = false;
     emitStats();
   }
 
@@ -566,6 +613,14 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     host.exclusionBox = val;
   }
 
+  // Step celebration — called by engine with color strings from render context
+  function stepCel(t: number, dt: number, caughtColor: string, dotColor: string) {
+    if (!state.cel) return;
+    stepCelebration(state.cel, t, dt, host, caughtColor, dotColor);
+    // Latch cannonAway
+    if (state.cel.liftStarted) state.cannonAway = true;
+  }
+
   return {
     anomalies,
     bullets,
@@ -574,6 +629,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     gameSim,
     pruneCaughtEffects,
     adjustTimeMarkers,
+    stepCel,
 
     setGameActive,
     catchAt,
@@ -584,6 +640,20 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     setFiring,
     onStats,
     setExclusion,
+    celebrate,
+
+    get cel() {
+      return state.cel;
+    },
+    set cel(v: CelState | null) {
+      state.cel = v;
+    },
+    get cannonAway() {
+      return state.cannonAway;
+    },
+    set cannonAway(v: boolean) {
+      state.cannonAway = v;
+    },
 
     get gameActive() {
       return state.gameActive;
