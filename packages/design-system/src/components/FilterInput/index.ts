@@ -13,6 +13,7 @@ export {
 // Utilities
 export {
   applyFieldValueTransforms,
+  COUNTRY_OPTIONS,
   createStatusCodeInputFilter,
   createStatusCodeNormalizer,
   createStatusCodeSerializer,
@@ -23,6 +24,7 @@ export {
   isFilterParseError,
   parseExpression,
   serializeExpression,
+  validateValueForField,
 } from './lib';
 // Types
 export type {

@@ -1,14 +1,41 @@
 import { describe, expect, it, vi } from 'vitest';
 import { applyKnownFieldHelpers, getKnownFieldSerializer } from '../lib/applyKnownFieldHelpers';
+import { getInvalidValueIndices } from '../lib/validation';
 import type { FieldMetadata } from '../types';
 
 describe('applyKnownFieldHelpers', () => {
   it('leaves unknown fields untouched', () => {
     const fields: FieldMetadata[] = [
-      { name: 'country', label: 'Country', type: 'string' },
+      { name: 'region', label: 'Region', type: 'string' },
       { name: 'priority', label: 'Priority', type: 'integer' },
     ];
     expect(applyKnownFieldHelpers(fields)).toBe(fields);
+  });
+
+  describe('country', () => {
+    it('injects the bundled country allowlist, overriding backend options', () => {
+      const [field] = applyKnownFieldHelpers([
+        {
+          name: 'country',
+          label: 'Country',
+          type: 'string',
+          options: ['only-one-from-backend'],
+        },
+      ]);
+      expect(Array.isArray(field.values)).toBe(true);
+      expect(field.values!.length).toBeGreaterThan(200);
+      expect(field.values).toContainEqual({ value: 'US', label: 'United States' });
+      // No dynamic suggestions/validator — the static allowlist drives both.
+      expect(field.getSuggestions).toBeUndefined();
+    });
+
+    it('validates values against the bundled country allowlist', () => {
+      const [field] = applyKnownFieldHelpers([
+        { name: 'country', label: 'Country', type: 'string' },
+      ]);
+      expect(getInvalidValueIndices(field, ['US', 'DE'])).toEqual([]);
+      expect(getInvalidValueIndices(field, ['US', 'ZZ'])).toEqual([1]);
+    });
   });
 
   it('wires all five helpers for a field named status_code', () => {

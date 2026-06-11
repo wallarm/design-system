@@ -1,5 +1,10 @@
 import { describe, expect, it, vi } from 'vitest';
-import { getFieldValues, hasFieldValues, hasStaticAllowlist } from '../lib/fields';
+import {
+  findValueLabelInFields,
+  getFieldValues,
+  hasFieldValues,
+  hasStaticAllowlist,
+} from '../lib/fields';
 import type { FieldMetadata } from '../types';
 
 const baseField = (overrides: Partial<FieldMetadata> = {}): FieldMetadata => ({
@@ -140,6 +145,39 @@ describe('fields.ts helpers', () => {
       const values = [{ value: 'fromValues', label: 'From Values' }];
       const field = baseField({ values, getSuggestions: () => [] });
       expect(getFieldValues(field, 'anything')).toEqual([]);
+    });
+  });
+
+  describe('findValueLabelInFields', () => {
+    const allFields: FieldMetadata[] = [
+      baseField({
+        name: 'attack_subtype',
+        label: 'Attack Subtype',
+        values: [{ value: 'xss', label: 'XSS' }],
+      }),
+      baseField({
+        name: 'legacy',
+        label: 'Legacy',
+        values: [{ value: '__none__', label: 'None' }],
+      }),
+    ];
+
+    it('finds a value label defined on another field', () => {
+      expect(findValueLabelInFields('__none__', allFields)).toBe('None');
+    });
+
+    it('matches loosely on stringified value', () => {
+      const fields = [baseField({ values: [{ value: 5, label: 'Five' }] })];
+      expect(findValueLabelInFields('5', fields)).toBe('Five');
+    });
+
+    it('returns undefined when no field defines the value', () => {
+      expect(findValueLabelInFields('mystery', allFields)).toBeUndefined();
+    });
+
+    it('returns undefined for null/undefined value', () => {
+      expect(findValueLabelInFields(null, allFields)).toBeUndefined();
+      expect(findValueLabelInFields(undefined, allFields)).toBeUndefined();
     });
   });
 });

@@ -1,6 +1,7 @@
 import { type FC, type RefObject, useMemo } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
 import {
+  findValueLabelInFields,
   getCurrentValueTokenText,
   getFieldValues,
   getValueFilterText,
@@ -11,6 +12,7 @@ import type { FieldMetadata, FilterOperator, MenuState } from '../types';
 import { FilterInputDateValueMenu } from './FilterInputDateValueMenu';
 import { FilterInputFieldMenu } from './FilterInputFieldMenu';
 import { FilterInputOperatorMenu } from './FilterInputOperatorMenu';
+import type { ValueOption } from './FilterInputValueMenu';
 import { FilterInputValueMenu } from './FilterInputValueMenu';
 
 export interface FilterInputAutocompleteState {
@@ -101,11 +103,36 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
   const selectedFieldValues = selectedField
     ? getFieldValues(selectedField, currentTokenText, selectedContext)
     : [];
-  const valueFilterText = getValueFilterText(
-    currentTokenText,
-    selectedOperator,
-    selectedFieldValues,
-  );
+
+  // A selected value that the current field doesn't define (e.g. left over after
+  // a field change) renders with its raw value as label. Borrow its real label
+  // from the field it came from so the menu matches the chip.
+  const menuValues = useMemo<ValueOption[]>(() => {
+    const selected = [
+      ...editingMultiValues,
+      ...(editingSingleValue != null ? [editingSingleValue] : []),
+    ];
+    if (selected.length === 0) return selectedFieldValues;
+
+    const result = [...selectedFieldValues];
+    const indexByKey = new Map(result.map((o, i) => [String(o.value), i]));
+    for (const v of selected) {
+      const key = String(v);
+      const i = indexByKey.get(key);
+      // Already present with a real (non-raw) label — leave it.
+      if (i != null && result[i]!.label !== key) continue;
+      const label = findValueLabelInFields(v, fields);
+      if (label === undefined) continue;
+      if (i != null) result[i] = { ...result[i]!, value: v, label };
+      else {
+        result.push({ value: v, label });
+        indexByKey.set(key, result.length - 1);
+      }
+    }
+    return result;
+  }, [selectedFieldValues, editingMultiValues, editingSingleValue, fields]);
+
+  const valueFilterText = getValueFilterText(currentTokenText, selectedOperator, menuValues);
 
   const showOperatorMenu = !!selectedField;
   const showValueMenu = !!selectedField && !!selectedOperator;
@@ -160,7 +187,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
           // Freeform fields (no options) skip the dropdown — Enter to commit.
           hasValueOptions && (
             <FilterInputValueMenu
-              values={selectedFieldValues}
+              values={menuValues}
               open={menuState === 'value'}
               onSelect={handleValueSelect}
               onCommit={handleMultiCommit}

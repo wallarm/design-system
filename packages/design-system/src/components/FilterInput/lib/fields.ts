@@ -15,6 +15,25 @@ export const findOptionByValue = (
 };
 
 /**
+ * Find a value's human label across *all* fields' option lists. Used when a
+ * value isn't defined on its current field (e.g. after a field change) but its
+ * label still lives on the field it came from, so the chip and the value menu
+ * can both show the label instead of the raw value.
+ */
+export const findValueLabelInFields = (
+  value: string | number | boolean | null | undefined,
+  fields: FieldMetadata[],
+): string | undefined => {
+  if (value == null) return undefined;
+  const key = String(value);
+  for (const f of fields) {
+    const opt = f.values?.find(o => String(o.value) === key);
+    if (opt) return opt.label;
+  }
+  return undefined;
+};
+
+/**
  * Get value options for a field — priority: getSuggestions > values > options.
  * `context.selectedValues` lets helpers preserve a committed value's badge
  * style once suggestions have narrowed.

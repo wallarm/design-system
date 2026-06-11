@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { CONNECTOR_ID_PATTERN, chipIdToConditionIndex } from '../../lib';
+import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
+import { CONNECTOR_ID_PATTERN, chipIdToConditionIndex, validateValueForField } from '../../lib';
 import type {
   ChipErrorSegment,
   Condition,
@@ -24,6 +25,45 @@ interface ExpressionState {
 
 const EMPTY_STATE: ExpressionState = { conditions: [], connectors: [] };
 const DEFAULT_CONNECTOR: 'and' = 'and';
+
+/**
+ * Re-derive each condition's `value` error from its field's allowlist.
+ *
+ * The `error` flag lives on the Condition, so any consumer that round-trips the
+ * expression through a domain type without an `error` slot (e.g. a backend query
+ * shape) drops it — and the controlled re-sync would then render the chip as
+ * valid. Recomputing on sync keeps the error robust to round-trips and also
+ * surfaces invalid values arriving from any source (initial load, share-links).
+ *
+ * Pure and idempotent. `validateValueForField` is the single source of truth —
+ * it covers `validate` callbacks, static allowlists, and the data type of plain
+ * freeform fields. Only pure-dynamic (`getSuggestions`, no validator) fields are
+ * skipped: their suggestion list is a hint, not an allowlist, so the `error`
+ * flag is consumer-owned. Unknown-field (`attribute`) errors and disabled
+ * conditions are likewise left untouched.
+ */
+const revalidateConditions = (conditions: Condition[], fields: FieldMetadata[]): Condition[] =>
+  conditions.map(condition => {
+    if (condition.disabled) return condition;
+    const field = fields.find(f => f.name === condition.field);
+    // Unknown field — the attribute error is owned by the field-commit path.
+    if (!field || condition.error === SEGMENT_VARIANT.attribute) return condition;
+    // Pure-dynamic field — validity is consumer-owned; leave the flag as-is.
+    if (field.getSuggestions && !field.validate) return condition;
+
+    if (validateValueForField(field, condition.value)) {
+      return condition.error === SEGMENT_VARIANT.value
+        ? condition
+        : { ...condition, error: SEGMENT_VARIANT.value };
+    }
+    // Value is valid now — drop a stale value error if one was set.
+    if (condition.error === SEGMENT_VARIANT.value) {
+      const next = { ...condition };
+      delete next.error;
+      return next;
+    }
+    return condition;
+  });
 
 /** Remove the connector associated with a condition being deleted at `idx`. */
 const removeConnectorAtConditionIndex = (
@@ -115,13 +155,17 @@ export const useFilterInputExpression = ({
 }: UseFilterInputExpressionOptions) => {
   const [state, setState] = useState<ExpressionState>(EMPTY_STATE);
 
-  // Sync conditions with value prop (controlled mode).
+  // Sync conditions with value prop (controlled mode). Re-derive value errors
+  // so they survive a consumer round-trip that drops the `error` flag.
   useEffect(() => {
     if (value !== undefined) {
       const result = expressionToConditions(value);
-      setState({ conditions: result.conditions, connectors: result.connectors });
+      setState({
+        conditions: revalidateConditions(result.conditions, fields),
+        connectors: result.connectors,
+      });
     }
-  }, [value]);
+  }, [value, fields]);
 
   const chips = useMemo(
     () => buildChips(state.conditions, state.connectors, fields, error),

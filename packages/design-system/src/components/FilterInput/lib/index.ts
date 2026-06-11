@@ -21,8 +21,15 @@ export {
   QUERY_BAR_SELECTOR,
   VARIANT_LABELS,
 } from './constants';
+export { COUNTRY_OPTIONS } from './country';
 export { type AnchorBounds, buildAnchoredRect, isMenuRelated, toAnchorBounds } from './dom';
-export { findOptionByValue, getFieldValues, hasFieldValues, hasStaticAllowlist } from './fields';
+export {
+  findOptionByValue,
+  findValueLabelInFields,
+  getFieldValues,
+  hasFieldValues,
+  hasStaticAllowlist,
+} from './fields';
 export { filterAndSort } from './filterSort';
 export { getCurrentValueTokenText, getValueFilterText } from './menuFilterText';
 export {

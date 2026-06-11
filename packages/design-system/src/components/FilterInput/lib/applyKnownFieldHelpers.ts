@@ -1,4 +1,5 @@
 import type { FieldMetadata } from '../types';
+import { COUNTRY_OPTIONS } from './country';
 import {
   createStatusCodeInputFilter,
   createStatusCodeNormalizer,
@@ -9,7 +10,7 @@ import {
 
 type FieldHelpers = Pick<
   FieldMetadata,
-  'acceptChar' | 'normalize' | 'getSuggestions' | 'validate' | 'serializeValue'
+  'acceptChar' | 'normalize' | 'getSuggestions' | 'validate' | 'serializeValue' | 'values'
 >;
 
 /**
@@ -25,6 +26,14 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
     validate: createStatusCodeValidator(),
     serializeValue: createStatusCodeSerializer(),
   }),
+  // Country options are bundled in DS so the backend doesn't ship the full list.
+  // A static allowlist gives label resolution (chip + menu) and validation.
+  // `getSuggestions` is cleared so the allowlist always wins (it would otherwise
+  // outrank `values` in getFieldValues and disable allowlist validation).
+  country: () => ({
+    values: COUNTRY_OPTIONS,
+    getSuggestions: undefined,
+  }),
 };
 
 /**
@@ -36,26 +45,21 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
  * | `name`        | DS owns                                                  |
  * | ------------- | -------------------------------------------------------- |
  * | `status_code` | acceptChar, normalize, getSuggestions, validate, serializeValue |
+ * | `country`     | values (bundled ISO country allowlist)                   |
  *
- * Backend with a different name (e.g. `http_status_code`) must either rename
- * or wire factories (`createStatusCode*`) manually. Returns the input array
- * by reference when no field matches (stable identity for downstream memos).
+ * Backend with a different name (e.g. `http_status_code`) must either rename or
+ * wire the pieces manually (`createStatusCode*`, `COUNTRY_OPTIONS`). Only the
+ * slots a helper provides are overridden; others keep the consumer's value.
+ * Returns the input array by reference when no field matches (stable identity
+ * for downstream memos).
  */
 export const applyKnownFieldHelpers = (fields: FieldMetadata[]): FieldMetadata[] => {
   let changed = false;
   const out = fields.map(field => {
     const factory = KNOWN_FIELD_HELPERS[field.name];
     if (!factory) return field;
-    const helpers = factory();
     changed = true;
-    return {
-      ...field,
-      acceptChar: helpers.acceptChar,
-      normalize: helpers.normalize,
-      getSuggestions: helpers.getSuggestions,
-      validate: helpers.validate,
-      serializeValue: helpers.serializeValue,
-    };
+    return { ...field, ...factory() };
   });
   return changed ? out : fields;
 };
