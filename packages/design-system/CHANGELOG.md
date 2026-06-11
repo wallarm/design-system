@@ -1,3 +1,9 @@
+## 0.58.0 (2026-06-11)
+
+* 🖼️ Update screenshots ([bcf9243](https://github.com/wallarm/design-system/commit/bcf9243))
+* feat: WDS-136 utility ([fd2705a](https://github.com/wallarm/design-system/commit/fd2705a))
+* feat: WDS-136 utility [update-screenshots] ([1daffe3](https://github.com/wallarm/design-system/commit/1daffe3))
+
 ## <small>0.57.1 (2026-06-11)</small>
 
 * fix: WDS-122 numeric badge [update-screenshots] ([053c89d](https://github.com/wallarm/design-system/commit/053c89d))
