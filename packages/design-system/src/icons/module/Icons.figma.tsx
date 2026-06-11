@@ -139,7 +139,7 @@ import {
   X,
   ZoomIn,
   ZoomOut,
-} from './index';
+} from '../index';
 
 figma.connect(
   Activity,
