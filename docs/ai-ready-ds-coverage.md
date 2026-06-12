@@ -8,40 +8,41 @@
 1. Pick a **Deep**-tier row with no **Assignee** and put your name in it.
 2. Start a fresh chat, run `/describe-component <Name>`, and work through the skill.
 3. When the file is saved, set **Status** to ✅ and drop the **Doc** link in.
+4. Spotted a rule that generalizes beyond the component (density, color, interaction ownership…)? Park it in the [design-judgment backlog](./ai-ready-ds-judgment-backlog.md) — it seeds the foundations layer.
 
 **Status:** ✅ Done · 🟡 Partial / in progress · ☐ To do · ➖ N/A (not a documentable component)
 
 ## Snapshot
-- **Deep tier:** 2 done, 1 partial, 15 to do (+ 1 folded). ← the active batch
-- **Light tier:** 40, parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)).
+- **Deep tier:** 6 done, 1 partial, 11 to do (+ 1 folded). ← the active batch
+- **Light tier:** 3 done (Badge + Tag + NumericBadge — the chip-trio anchors), 37 parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)).
 - **Skip:** 20 (providers, layout/leaf primitives, internal plumbing).
 
 ## Tracker
 
 | Component | Tier | Status | Assignee | Doc | Notes |
 |---|---|---|---|---|---|
-| HttpMethod | Deep | ✅ Done | — | [.llm.md](../packages/design-system/src/components/HttpMethod/HttpMethod.llm.md) | Reference example |
+| HttpMethod | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/HttpMethod/HttpMethod.llm.md) | Reference example · revised 2026-06-12 with family rules (casing trap, text-only rendition, click parents) |
 | Selection | Deep | ✅ Done | — | [.llm.md](../packages/design-system/src/components/Selection/Selection.llm.md) | Covers the `SelectionBulkBar` pattern |
 | Table | Deep | 🟡 Partial | — | [.llm.md](../packages/design-system/src/components/Table/Table.llm.md) | Action bar only; columns/sort/density/scroll still TODO. Added to deep tier (not in original §8) |
 | BulkBar | Deep | ➖ Folded | — | — | Internal plumbing — guidance lives in **Selection** + **Table** |
 | AppShell | Deep | ☐ To do | — | — | |
 | Attribute | Deep | ☐ To do | — | — | |
 | Banner | Deep | ☐ To do | — | — | |
-| Country | Deep | ☐ To do | — | — | |
+| Country | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Country/Country.llm.md) | First compound in the family; sanctions flag-only / name-only forms |
 | FilterInput | Deep | ☐ To do | — | — | |
-| Ip | Deep | ☐ To do | — | — | |
+| Ip | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Ip/Ip.llm.md) | Richest compound yet: slot order, IpList overflow, neutral source chips, standalone IpProvider |
 | NavPanel | Deep | ☐ To do | — | — | |
 | NavRail | Deep | ☐ To do | — | — | |
-| ParameterPath | Deep | ☐ To do | — | — | |
+| ParameterPath | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/ParameterPath/ParameterPath.llm.md) | Not-for-URL-routes boundary; built-in copy→filter + truncation locks |
 | RemoteShell | Deep | ☐ To do | — | — | |
-| ResponseCode | Deep | ☐ To do | — | — | |
+| ResponseCode | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/ResponseCode/ResponseCode.llm.md) | Sibling of HttpMethod; adds mask + text-only-rendition guidance |
 | SimpleCharts | Deep | ☐ To do | — | — | |
 | SplitButton | Deep | ☐ To do | — | — | |
 | TopHeader | Deep | ☐ To do | — | — | |
 | Tour | Deep | ☐ To do | — | — | |
 | Accordion | Light | ☐ To do | — | — | |
 | Alert | Light | ☐ To do | — | — | |
-| Badge | Light | ☐ To do | — | — | |
+| Badge | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Badge/Badge.llm.md) | Base of the domain-chip family → got the full router treatment, not a Light note |
 | Breadcrumbs | Light | ☐ To do | — | — | |
 | Button | Light | ☐ To do | — | — | |
 | Calendar | Light | ☐ To do | — | — | |
@@ -60,7 +61,7 @@
 | InputOTP | Light | ☐ To do | — | — | |
 | Link | Light | ☐ To do | — | — | |
 | NumberInput | Light | ☐ To do | — | — | |
-| NumericBadge | Light | ☐ To do | — | — | |
+| NumericBadge | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/NumericBadge/NumericBadge.llm.md) | Counts chip; type = surface-driven (taste), 99+ cap, show-0 default, never clickable |
 | OverflowList | Light | ☐ To do | — | — | |
 | OverflowTooltip | Light | ☐ To do | — | — | |
 | Popover | Light | ☐ To do | — | — | |
@@ -73,7 +74,7 @@
 | Flex | Light | ☐ To do | — | — | Layout → defer to foundations |
 | Switch | Light | ☐ To do | — | — | |
 | Tabs | Light | ☐ To do | — | — | |
-| Tag | Light | ☐ To do | — | — | |
+| Tag | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Tag/Tag.llm.md) | The interactive chip; routes Tag vs SelectButtonTag vs FilterInput; Selectable = TBD |
 | Textarea | Light | ☐ To do | — | — | |
 | TimeInput | Light | ☐ To do | — | — | |
 | Toast | Light | ☐ To do | — | — | |
@@ -83,7 +84,7 @@
 | ButtonBase | Skip | ➖ N/A | — | — | Internal base for Button |
 | Checkmark | Skip | ➖ N/A | — | — | Leaf primitive |
 | DateFormatProvider | Skip | ➖ N/A | — | — | Provider |
-| FormatDateTime | Skip | ➖ N/A | — | — | Display utility |
+| FormatDateTime | Skip | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/FormatDateTime/FormatDateTime.llm.md) | Tier overridden by Artem — date hand-formatting is a top AI-invention zone |
 | Heading | Skip | ➖ N/A | — | — | Typography → foundations |
 | Kbd | Skip | ➖ N/A | — | — | Leaf primitive |
 | Loader | Skip | ➖ N/A | — | — | Leaf primitive |
