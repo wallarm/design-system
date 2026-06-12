@@ -13,7 +13,7 @@ You won't write these by hand. A skill drafts each one from the code and asks yo
 1. Open the `design-system` repo in **Claude Code**.
 2. Get on the shared branch — tell Claude: *"switch me to the `llm-design-context` branch and pull latest."*
    *(The skill lives on this branch for now, so you must be on it for `/describe-component` to work.)*
-3. From the coverage tracker, pick a component nobody else has claimed and put your name on it.
+3. From the [coverage tracker](./ai-ready-ds-coverage.md), pick a component nobody else has claimed and put your name on it.
 
 ## For each component — a fresh chat each time
 

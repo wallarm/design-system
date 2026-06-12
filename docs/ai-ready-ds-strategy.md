@@ -80,7 +80,7 @@ By how blind the AI is to them:
 ## 10. Contribution workflow
 
 - A shared **feature branch** (e.g. `ai-usage-docs`).
-- The two designers author files **piece by piece, in parallel**, using the skill — split by the tiering list (§8) so you don't collide. A simple **coverage tracker** (a checklist table in the branch) shows who's on what and what's done.
+- The two designers author files **piece by piece, in parallel**, using the skill — split by the tiering list (§8) so you don't collide. A simple **[coverage tracker](./ai-ready-ds-coverage.md)** (a checklist table in the branch) shows who's on what and what's done.
 - The **lead frontend engineer reviews** the branch **in chunks** (not all 79 at once) — checking technical correctness (component names, examples) while designers own the content/judgment.
 - Merge to `main` per approved chunk. The pipe then serves those sheets to every AI session.
 
@@ -95,7 +95,7 @@ By how blind the AI is to them:
 |---|---|---|---|
 | 1 | Agree on this plan | Artem + team | Sign-off |
 | 2 | Rewrite the `describe-component` skill | AI + Artem | Updated skill in repo |
-| 3 | Create coverage tracker + shared branch | Artem | Branch + checklist |
+| 3 | Create coverage tracker + shared branch | Artem | Branch + [checklist](./ai-ready-ds-coverage.md) ✅ |
 | 4 | Author the ~17 deep-tier sheets | 2 designers | `.llm.md` files |
 | 5 | Build the foundations layer | TBD | Always-on rules file |
 | 6 | Review + merge to `main` | FE lead | Coverage on `main` |
