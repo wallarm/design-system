@@ -1,5 +1,5 @@
 import type { MutableRefObject, RefObject } from 'react';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import type { SweepEngine } from './index';
 
 export const useGameKeyboard = (
@@ -8,7 +8,26 @@ export const useGameKeyboard = (
   armed: boolean,
   roundOver: boolean,
   hasStartedRoundRef: MutableRefObject<boolean>,
+  toggleSound: () => void,
 ): void => {
+  // shared handler for Escape + M — active in both armed and round-over states
+  const handleCommonKey = useCallback(
+    (e: KeyboardEvent): boolean => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        engineRef.current?.exitGame();
+        hasStartedRoundRef.current = false;
+        return true;
+      }
+      if (e.key === 'm' || e.key === 'M') {
+        toggleSound();
+        return true;
+      }
+      return false;
+    },
+    [engineRef, hasStartedRoundRef, toggleSound],
+  );
+
   // full controls — armed mode, round in progress
   useEffect(() => {
     if (!game || !armed || roundOver) return;
@@ -21,6 +40,7 @@ export const useGameKeyboard = (
     }
 
     function onKeyDown(e: KeyboardEvent) {
+      if (handleCommonKey(e)) return;
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
         held.left = true;
@@ -34,10 +54,6 @@ export const useGameKeyboard = (
         if (!e.repeat) {
           engineRef.current?.setFiring(true);
         }
-      } else if (e.key === 'Escape') {
-        e.preventDefault();
-        engineRef.current?.exitGame();
-        hasStartedRoundRef.current = false;
       }
     }
 
@@ -62,21 +78,17 @@ export const useGameKeyboard = (
       engineRef.current?.setFiring(false);
       engineRef.current?.setCannonDir(0);
     };
-  }, [game, armed, roundOver, engineRef, hasStartedRoundRef]);
+  }, [game, armed, roundOver, engineRef, handleCommonKey]);
 
-  // esc during results screen
+  // esc + sound toggle during results screen
   useEffect(() => {
     if (!game || !roundOver) return;
 
     function onKeyDown(e: KeyboardEvent) {
-      if (e.key === 'Escape') {
-        e.preventDefault();
-        engineRef.current?.exitGame();
-        hasStartedRoundRef.current = false;
-      }
+      handleCommonKey(e);
     }
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [game, roundOver, engineRef, hasStartedRoundRef]);
+  }, [game, roundOver, handleCommonKey]);
 };

@@ -1,6 +1,10 @@
+import { NOISE_FREQ_X, NOISE_FREQ_Y } from './constants';
+
 export interface Dot {
   x: number;
   y: number;
+  /** Pre-computed spatial noise phase: x * NOISE_FREQ_X + y * NOISE_FREQ_Y */
+  noiseSpatial: number;
 }
 
 export interface GridResult {
@@ -19,7 +23,7 @@ export function buildGrid(w: number, h: number, sp: number): GridResult {
   for (let y = safeSp / 2; y < h; y += safeSp) {
     let rowCols = 0;
     for (let x = safeSp / 2; x < w; x += safeSp) {
-      a.push({ x, y });
+      a.push({ x, y, noiseSpatial: x * NOISE_FREQ_X + y * NOISE_FREQ_Y });
       rowCols++;
     }
     if (cols === 0) cols = rowCols;

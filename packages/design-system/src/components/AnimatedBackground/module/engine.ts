@@ -61,6 +61,7 @@ export interface SweepEngine {
   onStats(cb: (s: GameStats) => void): void;
   setExclusion(box: { width: number; height: number } | null): void;
   celebrate(score: number): void;
+  setSound(on: boolean): void;
 }
 
 export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOptions): SweepEngine {
@@ -340,5 +341,6 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
       if (opts.texture !== 'halftone' || !running) return;
       game.celebrate(score);
     },
+    setSound: (on: boolean) => game.setSound(on),
   };
 }

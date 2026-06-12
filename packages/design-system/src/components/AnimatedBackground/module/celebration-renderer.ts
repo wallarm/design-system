@@ -2,6 +2,7 @@ import type { CelState } from './celebration';
 import { cannonLiftOffset, computeHeadlineY, headlineAlpha, headlineRise } from './celebration';
 import type { GameEngineHost } from './game-logic';
 import type { GameRenderCtx } from './game-renderer';
+import { easeOut } from './math';
 
 /* ------------------------------------------------------------------ */
 /*  Overlay drawing — particles, rockets, headline                     */
@@ -100,8 +101,4 @@ export function getCelCannonOffset(
 function snap(v: number, gridSp: number): number {
   if (gridSp <= 0) return v;
   return gridSp / 2 + Math.round((v - gridSp / 2) / gridSp) * gridSp;
-}
-
-function easeOut(t: number): number {
-  return 1 - (1 - t) * (1 - t);
 }

@@ -1,5 +1,10 @@
 import type { CelState } from './celebration';
-import { adjustCelebrationTimeMarkers, startCelebration, stepCelebration } from './celebration';
+import {
+  adjustCelebrationTimeMarkers,
+  startCelebration,
+  stepCelebration,
+  tierForScore,
+} from './celebration';
 import {
   ANOMALY_VIS_THRESHOLD,
   DOT_STEP_BASE,
@@ -9,6 +14,7 @@ import {
 } from './constants';
 import type { Dot } from './engine-grid';
 import { sweepX } from './engine-grid';
+import { playCoin, playFanfare, playPew, playPowerUp, playZap } from './sfx';
 import type { EngineOptions, GameStats } from './types';
 
 // constants
@@ -128,6 +134,7 @@ export interface GameLogic {
   onStats(cb: (s: GameStats) => void): void;
   setExclusion(box: { width: number; height: number } | null): void;
   celebrate(score: number): void;
+  setSound(on: boolean): void;
 }
 
 // factory
@@ -157,6 +164,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
   let roundDone = false;
 
   let lastSpawn = -Infinity;
+
+  let soundOn = false;
 
   let statsCb: ((s: GameStats) => void) | null = null;
   let exclusionBox: { width: number; height: number } | null = null;
@@ -267,7 +276,10 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
 
   function recordKill() {
     killTotal += 1;
-    if (state.gameMode === 'armed') roundKills += 1;
+    if (state.gameMode === 'armed') {
+      roundKills += 1;
+      if (soundOn) playZap();
+    } else if (soundOn) playCoin();
     emitStats();
   }
 
@@ -284,6 +296,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     const accuracy = faced > 0 ? Math.round((roundKills / faced) * 100) : 100;
     const now = performance.now() / 1000;
     state.cel = startCelebration(accuracy, now, host);
+
+    if (soundOn && tierForScore(accuracy) >= 1) playFanfare();
 
     emitStats();
   }
@@ -344,6 +358,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     if (firing && t - lastFire >= FIRE_CADENCE && bullets.length < MAX_BULLETS) {
       bullets.push({ x: state.cannonX, y: host.h - CANNON_BARREL_Y });
       lastFire = t;
+
+      if (soundOn) playPew();
     }
   }
 
@@ -470,6 +486,21 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     if (state.cel) adjustCelebrationTimeMarkers(state.cel, skip);
   }
 
+  // shared reset — clears round counters, pools and input state
+  function resetRoundState() {
+    roundKills = 0;
+    roundEscaped = 0;
+    roundSpawned = 0;
+    roundDone = false;
+    bullets.length = 0;
+    anomalies.length = 0;
+    caughtEffects.length = 0;
+    firing = false;
+    cannonDir = 0;
+    state.cel = null;
+    state.cannonAway = false;
+  }
+
   // game API
   function setGameActive(active: boolean) {
     if (state.gameActive === active) return;
@@ -478,19 +509,9 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
       lastSpawn = -Infinity;
       loadFont();
     } else {
-      anomalies.length = 0;
-      bullets.length = 0;
-      caughtEffects.length = 0;
+      resetRoundState();
       state.gameMode = 'idle';
       killTotal = 0;
-      roundKills = 0;
-      roundEscaped = 0;
-      roundSpawned = 0;
-      roundDone = false;
-      firing = false;
-      cannonDir = 0;
-      state.cel = null;
-      state.cannonAway = false;
     }
   }
 
@@ -504,6 +525,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     // Re-seed armT so cannon can rise in for the performance
     state.armT = now;
     state.cel = startCelebration(score, now, host);
+
+    if (soundOn && tierForScore(score) >= 1) playFanfare();
   }
 
   function catchAt(x: number, y: number, running: boolean): boolean {
@@ -544,41 +567,23 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
   }
 
   function startRound() {
-    const { w } = host;
     const now = performance.now() / 1000;
-    roundKills = 0;
-    roundEscaped = 0;
-    roundSpawned = 0;
-    roundDone = false;
+    resetRoundState();
     state.gameMode = 'armed';
-    bullets.length = 0;
-    anomalies.length = 0;
-    caughtEffects.length = 0;
-    firing = false;
-    cannonDir = 0;
     state.armT = now;
     lastSpawn = now;
-    state.cannonX = w / 2;
-    state.cel = null;
-    state.cannonAway = false;
+    state.cannonX = host.w / 2;
+
+    if (soundOn) playPowerUp();
+
     emitStats();
   }
 
   function exitGame() {
-    killTotal = 0;
-    roundKills = 0;
-    roundEscaped = 0;
-    roundSpawned = 0;
-    roundDone = false;
+    resetRoundState();
     state.gameMode = 'idle';
-    bullets.length = 0;
-    anomalies.length = 0;
-    caughtEffects.length = 0;
-    firing = false;
-    cannonDir = 0;
+    killTotal = 0;
     lastSpawn = -Infinity;
-    state.cel = null;
-    state.cannonAway = false;
     emitStats();
   }
 
@@ -597,6 +602,10 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
 
   function onStats(cb: (s: GameStats) => void) {
     statsCb = cb;
+  }
+
+  function setSound(on: boolean) {
+    soundOn = on;
   }
 
   function setExclusion(box: { width: number; height: number } | null) {
@@ -641,6 +650,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     onStats,
     setExclusion,
     celebrate,
+    setSound,
 
     get cel() {
       return state.cel;

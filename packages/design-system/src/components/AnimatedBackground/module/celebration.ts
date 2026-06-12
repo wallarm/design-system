@@ -1,5 +1,6 @@
 import type { GameEngineHost } from './game-logic';
 import { SPAWN_EDGE } from './game-logic';
+import { clamp01, easeIn, easeOut } from './math';
 
 /* ------------------------------------------------------------------ */
 /*  Tunables                                                           */
@@ -81,6 +82,9 @@ export const CEL_PAL = [
   'rgb(180,80,220)', // purple
   'rgb(255,100,180)', // pink
 ] as const;
+
+/** Sentinel value for celDotEffect — means "use caught-green palette". */
+export const CEL_CAUGHT_COL = '__caught__' as const;
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -705,7 +709,7 @@ export function celDotEffect(
         const revealProgress = clamp01(elapsed / CEL_SWEEP_DUR);
         if (revealProgress > 0) {
           boost = 1;
-          col = '__caught__';
+          col = CEL_CAUGHT_COL;
         }
       }
     }
@@ -721,7 +725,7 @@ export function celDotEffect(
     const waveVal = gauss * p.waveStrength;
     if (waveVal > boost) {
       boost = waveVal;
-      if (!isDigit) col = '__caught__';
+      if (!isDigit) col = CEL_CAUGHT_COL;
     }
   }
 
@@ -735,7 +739,7 @@ export function celDotEffect(
     const waveVal = gauss * p.blastStrength;
     if (waveVal > boost) {
       boost = waveVal;
-      if (!isDigit) col = '__caught__';
+      if (!isDigit) col = CEL_CAUGHT_COL;
     }
   }
 
@@ -752,17 +756,8 @@ export function celDotEffect(
     const pulseVal = gauss * CEL_BURST_STRENGTH * (1 - pe / pulse.dur);
     if (pulseVal > boost) {
       boost = pulseVal;
-      if (!isDigit) col = '__caught__';
+      if (!isDigit) col = CEL_CAUGHT_COL;
     }
-  }
-
-  // Sweep column (tier 2-4)
-  if (p.sweepActive && !isDigit) {
-    // This is a grey boost based on x-distance from sweep position
-    // sweepX is in glyph-column units; we need to map dotX similarly
-    // For simplicity, use a pixel-space gaussian centered on the sweep x
-    // Since sweepX tracks the score print, apply only near the score area
-    // Skip detailed column matching - just add a subtle sweep glow
   }
 
   // Rainbow wave (tier 4)
@@ -819,20 +814,4 @@ export function cannonLiftOffset(cel: CelState, t: number, h: number): number {
   const liftE = elapsed - CEL_LIFT_AT;
   if (liftE <= 0) return 0;
   return easeIn(clamp01(liftE / CEL_LIFT_DUR)) * (h + 120);
-}
-
-/* ------------------------------------------------------------------ */
-/*  Helpers                                                            */
-/* ------------------------------------------------------------------ */
-
-function easeOut(t: number): number {
-  return 1 - (1 - t) * (1 - t);
-}
-
-function easeIn(t: number): number {
-  return t * t;
-}
-
-function clamp01(v: number): number {
-  return v < 0 ? 0 : v > 1 ? 1 : v;
 }
