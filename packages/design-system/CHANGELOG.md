@@ -1,3 +1,8 @@
+## <small>0.58.1 (2026-06-12)</small>
+
+* 🖼️ Update screenshots ([aae68e1](https://github.com/wallarm/design-system/commit/aae68e1))
+* fix: icons layout [update-screenshots] ([2f5c84d](https://github.com/wallarm/design-system/commit/2f5c84d))
+
 ## 0.58.0 (2026-06-11)
 
 * 🖼️ Update screenshots ([bcf9243](https://github.com/wallarm/design-system/commit/bcf9243))
