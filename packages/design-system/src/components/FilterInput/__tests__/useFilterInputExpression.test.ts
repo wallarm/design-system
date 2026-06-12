@@ -394,6 +394,46 @@ describe('useFilterInputExpression', () => {
       expect(result.current.chips[2]!.variant).toBe('chip');
       expect(result.current.chips[2]!.attribute).toBe('Priority');
     });
+
+    it('overlays externalErrors onto chips and follows prop changes — AS-1134', () => {
+      const freeformFields: FieldMetadata[] = [
+        { name: 'host', label: 'Host', type: 'string' },
+        { name: 'path', label: 'Path', type: 'string' },
+      ];
+      const group: Group = {
+        type: 'group',
+        operator: 'and',
+        children: [
+          { type: 'condition', field: 'host', operator: '=', value: 'a.com' },
+          { type: 'condition', field: 'path', operator: '=', value: '/login' },
+        ],
+      };
+
+      const { result, rerender } = renderHook(
+        ({ externalErrors }: { externalErrors?: string[] }) =>
+          useFilterInputExpression({
+            fields: freeformFields,
+            value: group,
+            error: false,
+            externalErrors,
+          }),
+        { initialProps: { externalErrors: ['host'] } },
+      );
+
+      // chips = [host chip, connector, path chip]
+      expect(result.current.chips[0]!.error).toBe('value');
+      expect(result.current.chips[2]!.error).toBeUndefined();
+
+      // Guards the memo dependency: the marking must move when only the
+      // externalErrors prop changes (same value, same fields).
+      rerender({ externalErrors: ['path'] });
+      expect(result.current.chips[0]!.error).toBeUndefined();
+      expect(result.current.chips[2]!.error).toBe('value');
+
+      rerender({ externalErrors: undefined });
+      expect(result.current.chips[0]!.error).toBeUndefined();
+      expect(result.current.chips[2]!.error).toBeUndefined();
+    });
   });
 
   describe('removeLastCondition is removed', () => {

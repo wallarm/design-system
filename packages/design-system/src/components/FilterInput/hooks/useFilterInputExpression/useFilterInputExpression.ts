@@ -172,11 +172,10 @@ export const useFilterInputExpression = ({
 
   const chips = useMemo(
     () =>
-      buildChips(
-        applyExternalErrors(state.conditions, externalErrors),
-        state.connectors,
-        fields,
-        error,
+      applyExternalErrors(
+        buildChips(state.conditions, state.connectors, fields, error),
+        state.conditions,
+        externalErrors,
       ),
     [state.conditions, state.connectors, fields, error, externalErrors],
   );
