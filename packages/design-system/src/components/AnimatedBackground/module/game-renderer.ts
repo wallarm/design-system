@@ -1,5 +1,5 @@
 import type { CelDotParams } from './celebration';
-import { celDotEffect, computeCelFrameParams } from './celebration';
+import { CEL_CAUGHT_COL, celDotEffect, computeCelFrameParams } from './celebration';
 import { drawCelebrationOverlay, getCelCannonOffset } from './celebration-renderer';
 import {
   AMB_SCALE,
@@ -16,8 +16,6 @@ import {
   LABEL_SHADOW_ALPHA,
   MIN_DOT_VALUE,
   NOISE_FREQ_T,
-  NOISE_FREQ_X,
-  NOISE_FREQ_Y,
 } from './constants';
 import type { RGB } from './engine-colors';
 import { ALPHA_STEPS, alphaIdx } from './engine-colors';
@@ -97,9 +95,7 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
       const dot = dots[di]!;
       if (exclusionBox && dot.x >= exL && dot.x <= exR && dot.y >= exT && dot.y <= exB) continue;
       const sxAt = sx + (h / 2 - dot.y) * tanTilt;
-      const amb =
-        AMB_SCALE *
-        (0.5 + 0.5 * Math.sin(dot.x * NOISE_FREQ_X + dot.y * NOISE_FREQ_Y + t * NOISE_FREQ_T));
+      const amb = AMB_SCALE * (0.5 + 0.5 * Math.sin(dot.noiseSpatial + t * NOISE_FREQ_T));
       const distToSweep = Math.abs(dot.x - sxAt);
       const bloom =
         distToSweep < opts.bloomRadius
@@ -151,7 +147,7 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
       } else if (celBoost > 0.02) {
         // Celebration dot — render at full strength (ignore intensity)
         const celAlpha = Math.min(1, 0.15 + effVal * 0.85);
-        if (celCol === '__caught__') {
+        if (celCol === CEL_CAUGHT_COL) {
           ctx.fillStyle = caughtPalette[alphaIdx(celAlpha)]!;
         } else if (celCol) {
           // Rainbow or custom color

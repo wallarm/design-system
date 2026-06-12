@@ -19,6 +19,8 @@ interface UseGameReturn {
   hudElement: ReactElement | null;
   onEngineCreated: (engine: SweepEngine) => void;
   onEngineDestroyed: () => void;
+  soundOn: boolean;
+  toggleSound: () => void;
 }
 
 export const useGame = ({
@@ -39,6 +41,7 @@ export const useGame = ({
     done: false,
   });
   const [catchKey, setCatchKey] = useState(0);
+  const [soundOn, setSoundOn] = useState(true);
 
   useEffect(() => {
     gameRef.current = game;
@@ -80,6 +83,16 @@ export const useGame = ({
     );
   }, [exW, exH]);
 
+  // sound gate — only routes with the easter egg get sound
+  const soundCapable = game;
+  useEffect(() => {
+    engineRef.current?.setSound(soundCapable && soundOn);
+  }, [soundCapable, soundOn]);
+
+  const toggleSound = useCallback(() => {
+    setSoundOn(prev => !prev);
+  }, []);
+
   // arming effect — when caught reaches gate target, start round
   useEffect(() => {
     if (!game || !armed) return;
@@ -93,7 +106,7 @@ export const useGame = ({
   }, [game, armed]);
 
   // keyboard controls
-  useGameKeyboard(engineRef, game, armed, roundOver, hasStartedRoundRef);
+  useGameKeyboard(engineRef, game, armed, roundOver, hasStartedRoundRef, toggleSound);
 
   // click-to-catch — when game is enabled
   const onPointerDown = useCallback(
@@ -125,6 +138,7 @@ export const useGame = ({
       catchKey={catchKey}
       gateTarget={GATE_TARGET}
       onTryAgain={handleTryAgain}
+      soundOn={soundOn}
     />
   );
 
@@ -134,5 +148,7 @@ export const useGame = ({
     hudElement: gameActive ? hudElement : null,
     onEngineCreated,
     onEngineDestroyed,
+    soundOn,
+    toggleSound,
   };
 };
