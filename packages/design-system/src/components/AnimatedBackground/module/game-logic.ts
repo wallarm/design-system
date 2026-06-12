@@ -1,3 +1,10 @@
+import type { CelState } from './celebration';
+import {
+  adjustCelebrationTimeMarkers,
+  startCelebration,
+  stepCelebration,
+  tierForScore,
+} from './celebration';
 import {
   ANOMALY_VIS_THRESHOLD,
   DOT_STEP_BASE,
@@ -7,6 +14,7 @@ import {
 } from './constants';
 import type { Dot } from './engine-grid';
 import { sweepX } from './engine-grid';
+import { playCoin, playFanfare, playPew, playPowerUp, playZap } from './sfx';
 import type { EngineOptions, GameStats } from './types';
 
 // constants
@@ -87,6 +95,8 @@ export interface GameEngineHost {
   w: number;
   h: number;
   dots: Dot[];
+  gridCols: number;
+  gridSp: number;
   opts: EngineOptions;
   tanTilt: number; // cached Math.tan(tilt * PI / 180)
   exclusionBox: { width: number; height: number } | null;
@@ -103,8 +113,13 @@ export interface GameLogic {
   armT: number;
   fontLoaded: boolean;
 
+  // Celebration state (read by renderer)
+  cel: CelState | null;
+  cannonAway: boolean;
+
   // Simulation
   gameSim(t: number, dt: number): void;
+  stepCel(t: number, dt: number, caughtColor: string, dotColor: string): void;
   pruneCaughtEffects(t: number): void;
   adjustTimeMarkers(skip: number): void;
 
@@ -118,6 +133,8 @@ export interface GameLogic {
   setFiring(on: boolean): void;
   onStats(cb: (s: GameStats) => void): void;
   setExclusion(box: { width: number; height: number } | null): void;
+  celebrate(score: number): void;
+  setSound(on: boolean): void;
 }
 
 // factory
@@ -128,6 +145,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     cannonX: 0,
     armT: 0,
     fontLoaded: false,
+    cel: null as CelState | null,
+    cannonAway: false,
   };
 
   const anomalies: Anomaly[] = [];
@@ -146,10 +165,13 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
 
   let lastSpawn = -Infinity;
 
+  let soundOn = false;
+
   let statsCb: ((s: GameStats) => void) | null = null;
   let exclusionBox: { width: number; height: number } | null = null;
 
-  if (typeof document !== 'undefined') {
+  function loadFont() {
+    if (state.fontLoaded || typeof document === 'undefined') return;
     document.fonts
       .load('9px "Press Start 2P"')
       .then(() => {
@@ -254,7 +276,10 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
 
   function recordKill() {
     killTotal += 1;
-    if (state.gameMode === 'armed') roundKills += 1;
+    if (state.gameMode === 'armed') {
+      roundKills += 1;
+      if (soundOn) playZap();
+    } else if (soundOn) playCoin();
     emitStats();
   }
 
@@ -265,6 +290,15 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     bullets.length = 0;
     firing = false;
     cannonDir = 0;
+
+    // Compute accuracy and start celebration
+    const faced = roundKills + roundEscaped;
+    const accuracy = faced > 0 ? Math.round((roundKills / faced) * 100) : 100;
+    const now = performance.now() / 1000;
+    state.cel = startCelebration(accuracy, now, host);
+
+    if (soundOn && tierForScore(accuracy) >= 1) playFanfare();
+
     emitStats();
   }
 
@@ -297,6 +331,11 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
   // --- gameSim sub-functions ---
 
   function idleSim(t: number) {
+    // Suppress idle spawns while a celebration is playing
+    if (state.cel) {
+      pruneExpired(t);
+      return;
+    }
     let liveCount = 0;
     for (const anomaly of anomalies) if (!anomaly.caught) liveCount++;
     if (liveCount < 2 && t - lastSpawn > host.opts.anomalyInterval) {
@@ -319,6 +358,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     if (firing && t - lastFire >= FIRE_CADENCE && bullets.length < MAX_BULLETS) {
       bullets.push({ x: state.cannonX, y: host.h - CANNON_BARREL_Y });
       lastFire = t;
+
+      if (soundOn) playPew();
     }
   }
 
@@ -442,6 +483,22 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     for (const effect of caughtEffects) effect.t0 += skip;
     if (state.armT > 0) state.armT += skip;
     if (lastSpawn > -Infinity && lastSpawn !== 0) lastSpawn += skip;
+    if (state.cel) adjustCelebrationTimeMarkers(state.cel, skip);
+  }
+
+  // shared reset — clears round counters, pools and input state
+  function resetRoundState() {
+    roundKills = 0;
+    roundEscaped = 0;
+    roundSpawned = 0;
+    roundDone = false;
+    bullets.length = 0;
+    anomalies.length = 0;
+    caughtEffects.length = 0;
+    firing = false;
+    cannonDir = 0;
+    state.cel = null;
+    state.cannonAway = false;
   }
 
   // game API
@@ -450,19 +507,26 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     state.gameActive = active;
     if (active) {
       lastSpawn = -Infinity;
+      loadFont();
     } else {
-      anomalies.length = 0;
-      bullets.length = 0;
-      caughtEffects.length = 0;
+      resetRoundState();
       state.gameMode = 'idle';
       killTotal = 0;
-      roundKills = 0;
-      roundEscaped = 0;
-      roundSpawned = 0;
-      roundDone = false;
-      firing = false;
-      cannonDir = 0;
     }
+  }
+
+  // External celebration replay (demo route)
+  function celebrate(score: number) {
+    const now = performance.now() / 1000;
+    // Clear any existing celebration
+    state.cel = null;
+    state.cannonAway = false;
+    anomalies.length = 0;
+    // Re-seed armT so cannon can rise in for the performance
+    state.armT = now;
+    state.cel = startCelebration(score, now, host);
+
+    if (soundOn && tierForScore(score) >= 1) playFanfare();
   }
 
   function catchAt(x: number, y: number, running: boolean): boolean {
@@ -495,42 +559,30 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     if (mode === 'idle') {
       state.gameMode = 'idle';
       lastSpawn = -Infinity;
+      state.cel = null;
+      state.cannonAway = false;
     } else {
       state.gameMode = 'armed';
     }
   }
 
   function startRound() {
-    const { w } = host;
     const now = performance.now() / 1000;
-    roundKills = 0;
-    roundEscaped = 0;
-    roundSpawned = 0;
-    roundDone = false;
+    resetRoundState();
     state.gameMode = 'armed';
-    bullets.length = 0;
-    anomalies.length = 0;
-    caughtEffects.length = 0;
-    firing = false;
-    cannonDir = 0;
     state.armT = now;
     lastSpawn = now;
-    state.cannonX = w / 2;
+    state.cannonX = host.w / 2;
+
+    if (soundOn) playPowerUp();
+
     emitStats();
   }
 
   function exitGame() {
-    killTotal = 0;
-    roundKills = 0;
-    roundEscaped = 0;
-    roundSpawned = 0;
-    roundDone = false;
+    resetRoundState();
     state.gameMode = 'idle';
-    bullets.length = 0;
-    anomalies.length = 0;
-    caughtEffects.length = 0;
-    firing = false;
-    cannonDir = 0;
+    killTotal = 0;
     lastSpawn = -Infinity;
     emitStats();
   }
@@ -552,6 +604,10 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     statsCb = cb;
   }
 
+  function setSound(on: boolean) {
+    soundOn = on;
+  }
+
   function setExclusion(box: { width: number; height: number } | null) {
     if (!box) {
       exclusionBox = null;
@@ -566,6 +622,14 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     host.exclusionBox = val;
   }
 
+  // Step celebration — called by engine with color strings from render context
+  function stepCel(t: number, dt: number, caughtColor: string, dotColor: string) {
+    if (!state.cel) return;
+    stepCelebration(state.cel, t, dt, host, caughtColor, dotColor);
+    // Latch cannonAway
+    if (state.cel.liftStarted) state.cannonAway = true;
+  }
+
   return {
     anomalies,
     bullets,
@@ -574,6 +638,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     gameSim,
     pruneCaughtEffects,
     adjustTimeMarkers,
+    stepCel,
 
     setGameActive,
     catchAt,
@@ -584,6 +649,21 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     setFiring,
     onStats,
     setExclusion,
+    celebrate,
+    setSound,
+
+    get cel() {
+      return state.cel;
+    },
+    set cel(v: CelState | null) {
+      state.cel = v;
+    },
+    get cannonAway() {
+      return state.cannonAway;
+    },
+    set cannonAway(v: boolean) {
+      state.cannonAway = v;
+    },
 
     get gameActive() {
       return state.gameActive;
