@@ -1134,4 +1134,51 @@ describe('FilterInput', () => {
       expect(screen.queryByRole('menuitem', { name: '__none__' })).toBeNull();
     });
   });
+
+  describe('AS-1134: Enter commits free text on suggestions-only fields', () => {
+    const suggestionFields: FieldMetadata[] = [
+      {
+        name: 'host',
+        label: 'Host',
+        type: 'string',
+        options: ['a.example.com'],
+        strictValues: false,
+      },
+    ];
+
+    it('commits a typed value missing from options when strictValues is false', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<FilterInput fields={suggestionFields} onChange={onChange} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Host'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.keyboard('my-free-host.example.com{Enter}');
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            type: 'condition',
+            field: 'host',
+            operator: '=',
+            value: 'my-free-host.example.com',
+          }),
+        );
+      });
+    });
+
+    it('does not commit free text on a strict-allowlist field', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<FilterInput fields={sampleFields} onChange={onChange} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Status'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.keyboard('archived{Enter}');
+
+      expect(onChange).not.toHaveBeenCalled();
+    });
+  });
 });
