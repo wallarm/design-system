@@ -65,6 +65,9 @@ Hand a fresh subagent **only** the drafted `.llm.md` — no code, Figma, or Stor
 ### 5 · Save
 Write to `packages/design-system/src/components/{Name}/{Name}.llm.md`. It reaches the AI automatically on the next metadata build. Confirm to the designer that it's live, and tick it off the coverage tracker.
 
+### 6 · Park what the skill missed
+If anything about *this* run tripped the skill — a missing check, a wrong assumption, an off-script question you had to answer, a step that didn't fit — append a one-line row to [`REFINEMENTS.md`](REFINEMENTS.md). **Don't fix the skill mid-run** — park it and finish the component. The log is harvested into this skill periodically.
+
 ## The template
 
 See [references/llm-md-template.md](references/llm-md-template.md) — six sections, all judgment, omit any that would be generic.
@@ -75,3 +78,4 @@ See [references/llm-md-template.md](references/llm-md-template.md) — six secti
 - **Tier the depth.** Domain / blind-spot components get the full treatment; commodity primitives (`Button`, `Badge`, `Stack`) get a 3–4 line note or are skipped — don't pad them.
 - **Partial is fine.** An 80%-complete file with a couple of `TODO`s beats no file.
 - **Lead with "Reach for it when."** The most common AI failure on a novel component is not knowing it exists, so it hand-rolls instead — the existence cue is what prevents that.
+- **Self-improving.** Friction found during a run is parked in [`REFINEMENTS.md`](REFINEMENTS.md) (step 6) and folded back into this skill in a periodic harvest — never patch the skill mid-run.
