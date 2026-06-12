@@ -8,6 +8,7 @@ import type {
   FieldMetadata,
   FilterOperator,
 } from '../../types';
+import { applyExternalErrors } from './applyExternalErrors';
 import { buildChips } from './buildChips';
 import { buildExpression, expressionToConditions } from './expression';
 
@@ -16,6 +17,7 @@ interface UseFilterInputExpressionOptions {
   value?: ExprNode | null;
   onChange?: (expression: ExprNode | null) => void;
   error: boolean;
+  externalErrors?: string[];
 }
 
 interface ExpressionState {
@@ -152,6 +154,7 @@ export const useFilterInputExpression = ({
   value,
   onChange,
   error,
+  externalErrors,
 }: UseFilterInputExpressionOptions) => {
   const [state, setState] = useState<ExpressionState>(EMPTY_STATE);
 
@@ -168,8 +171,14 @@ export const useFilterInputExpression = ({
   }, [value, fields]);
 
   const chips = useMemo(
-    () => buildChips(state.conditions, state.connectors, fields, error),
-    [state.conditions, state.connectors, fields, error],
+    () =>
+      buildChips(
+        applyExternalErrors(state.conditions, externalErrors),
+        state.connectors,
+        fields,
+        error,
+      ),
+    [state.conditions, state.connectors, fields, error, externalErrors],
   );
 
   const upsertCondition = useCallback(
