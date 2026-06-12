@@ -23,6 +23,9 @@ function scoreComponent(component: ComponentMetadata, query: string): number {
   // Description contains query
   if (component.description?.toLowerCase().includes(q)) return 40;
 
+  // Usage guidance contains query — intent-based discovery ("when to use X")
+  if (component.usage?.toLowerCase().includes(q)) return 35;
+
   // Props contain query
   const propsMatch = component.props.some(
     p => p.name.toLowerCase().includes(q) || p.type.toLowerCase().includes(q),

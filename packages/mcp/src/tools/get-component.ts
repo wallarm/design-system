@@ -1,5 +1,11 @@
 import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-core';
 
+function stripLeadingH1(md: string): string {
+  // The .llm.md carries a top-level `# Name` heading for human reading; drop it
+  // so the guidance nests under the component's own H1 without a duplicate.
+  return md.replace(/^#\s+.*\r?\n+/, '');
+}
+
 export function getComponent(
   metadata: DesignSystemMetadata,
   name: string,
@@ -15,6 +21,11 @@ export function formatComponentDetails(component: ComponentMetadata): string {
     lines.push('', component.description);
   }
   lines.push('', `**Import:** \`import { ${component.name} } from '${component.importPath}'\``);
+
+  // Design-intent guidance (from <Component>.llm.md) — lead with the "when & why"
+  if (component.usage) {
+    lines.push('', '## Usage guidance', '', stripLeadingH1(component.usage));
+  }
 
   // Props
   if (component.props.length > 0) {

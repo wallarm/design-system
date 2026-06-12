@@ -37,6 +37,8 @@ export type ExampleMetadata = z.infer<typeof exampleMetadataSchema>;
 export const componentMetadataSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
+  /** Design-intent guidance authored in `<Component>.llm.md` — when / when-not, locked rules, composition, gotchas. Absent when no file exists. */
+  usage: z.string().optional(),
   importPath: z.string(),
   props: z.array(propMetadataSchema),
   variants: z.array(variantMetadataSchema),

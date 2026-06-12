@@ -62,9 +62,16 @@ const main = () => {
     const mainFile = project.getSourceFile(path.join(componentDir, `${name}.tsx`));
     const description = getComponentDescription(mainFile);
 
+    // Read design-intent guidance from <Component>.llm.md if present
+    const llmDocPath = path.join(componentDir, `${name}.llm.md`);
+    const usage = fs.existsSync(llmDocPath)
+      ? fs.readFileSync(llmDocPath, 'utf-8').trim()
+      : undefined;
+
     components.push({
       name,
       ...(description && { description }),
+      ...(usage && { usage }),
       importPath,
       props: mainProps,
       variants,
