@@ -58,6 +58,37 @@ describe('fields.ts helpers', () => {
     });
   });
 
+  describe('hasStaticAllowlist — strictValues', () => {
+    it('returns false when strictValues is false even if options are present', () => {
+      const field = baseField({
+        name: 'host',
+        label: 'Host',
+        type: 'string',
+        options: ['a.com'],
+        strictValues: false,
+      });
+      expect(hasStaticAllowlist(field)).toBe(false);
+    });
+
+    it('returns false when strictValues is false with values present', () => {
+      const field = baseField({
+        values: [{ value: 'Blocked', label: 'Blocked' }],
+        strictValues: false,
+      });
+      expect(hasStaticAllowlist(field)).toBe(false);
+    });
+
+    it('keeps allowlist behavior by default (strictValues undefined)', () => {
+      const field = baseField({ name: 'host', label: 'Host', type: 'string', options: ['a.com'] });
+      expect(hasStaticAllowlist(field)).toBe(true);
+    });
+
+    it('keeps allowlist behavior when strictValues is explicitly true', () => {
+      const field = baseField({ options: ['a'], strictValues: true });
+      expect(hasStaticAllowlist(field)).toBe(true);
+    });
+  });
+
   describe('hasFieldValues', () => {
     it('returns true when getSuggestions is defined (empty list is still a list)', () => {
       const field = baseField({ getSuggestions: () => [] });
