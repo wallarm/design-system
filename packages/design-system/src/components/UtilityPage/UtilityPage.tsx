@@ -27,14 +27,14 @@ export const UtilityPage: FC<UtilityPageProps> = ({
     data-slot='utility-page'
     className={cn('min-h-screen w-full bg-component-app-shell-bg', className)}
   >
-    <div className='flex w-[482px] flex-col items-center gap-32 rounded-12 border-1 border-border-primary-light bg-bg-surface-1 px-48 pt-32 pb-80 shadow-xs'>
-      <Logo type='full' size='lg' className='self-start mb-32' />
+    <div className='flex w-[482px] flex-col items-center gap-32 rounded-12 border-1 border-border-primary-light bg-bg-surface-1 px-48 pt-32 pb-80'>
+      <Logo type='full' size='md' className='self-start mb-32' />
 
-      <div className='w-full flex flex-col items-start gap-12'>
-        <h1 className='font-mono text-6xl font-medium text-text-primary'>{title}</h1>
+      <div className='w-full flex flex-col items-start'>
+        <h1 className='font-mono text-6xl leading-7xl font-medium text-text-primary'>{title}</h1>
 
-        <div className='flex flex-col items-start gap-4'>
-          <p className='text-lg font-medium text-text-primary'>{subtitle}</p>
+        <div className='flex flex-col items-start'>
+          <p className='text-lg leading-xl font-medium text-text-primary'>{subtitle}</p>
           <p className='text-sm text-text-secondary'>{description}</p>
         </div>
       </div>
