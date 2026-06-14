@@ -97,6 +97,8 @@ export {
   type BannerControlsProps,
   BannerDescription,
   type BannerDescriptionProps,
+  BannerIcon,
+  type BannerIconProps,
   BannerLink,
   type BannerLinkProps,
   type BannerProps,
