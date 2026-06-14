@@ -1,3 +1,9 @@
+## 0.60.0 (2026-06-14)
+
+* feat: WDS-136 utility page ([3e942d6](https://github.com/wallarm/design-system/commit/3e942d6))
+* feat: WDS-136 utility page [update-screenshots] ([8db7225](https://github.com/wallarm/design-system/commit/8db7225))
+* feat: WDS-97 compose BannerIcon as a child component (#166) ([598769d](https://github.com/wallarm/design-system/commit/598769d)), closes [#166](https://github.com/wallarm/design-system/issues/166)
+
 ## 0.59.0 (2026-06-13)
 
 * feat: WDS-127 animated bg ([4e6dc7c](https://github.com/wallarm/design-system/commit/4e6dc7c))
