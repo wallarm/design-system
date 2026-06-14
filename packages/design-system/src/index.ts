@@ -257,6 +257,15 @@ export {
   DropdownMenuTriggerItem,
 } from './components/DropdownMenu';
 export {
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateIllustration,
+  EmptyStateLink,
+  EmptyStateMessage,
+  EmptyStateTitle,
+} from './components/EmptyState';
+export {
   Field,
   FieldContent,
   FieldDescription,

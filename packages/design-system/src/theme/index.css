@@ -10,6 +10,7 @@
 @import './shadow.css';
 @import './spacing.css';
 @import './typography.css';
+@import './fonts/geist-pixel.css';
 @import './semantic.css';
 @import './focus.css';
 @import './icon.css';
