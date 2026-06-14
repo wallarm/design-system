@@ -133,14 +133,12 @@ Default.argTypes = {
 export const AllColors: StoryFn<BannerProps> = () => (
   <div className='flex flex-col gap-16'>
     <Banner variant='primary'>
-      <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
     </Banner>
 
     <Banner variant='secondary'>
-      <BannerIcon />
       <BannerContent>
         <BannerTitle>Message goes here</BannerTitle>
       </BannerContent>
