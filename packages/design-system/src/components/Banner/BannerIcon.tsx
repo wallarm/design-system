@@ -1,4 +1,4 @@
-import type { ComponentType, FC, ReactNode } from 'react';
+import type { ComponentType, FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { useBannerVariant } from './BannerContext';
@@ -12,20 +12,24 @@ const defaultIconMap: Partial<Record<BannerVariant, ComponentType<SvgIconProps>>
   warning: TriangleAlert,
 };
 
-export interface BannerIconProps {
-  /** Custom icon — always overrides the variant default. */
+export interface BannerIconProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+  ref?: Ref<HTMLDivElement>;
+  /** Override the default icon for the variant. */
   icon?: ReactNode;
 }
 
 /**
- * Leading icon for Banner — rendered internally by Banner, not part of the
- * public API.
+ * Leading icon for Banner — compose it as a child of Banner.
  *
- * The destructive, info, and warning variants show a default icon; primary and
- * secondary show none. A custom `icon` (passed via Banner's `icon` prop) always
- * overrides the default. Renders nothing when there is no icon to show.
+ * Automatically displays the appropriate icon based on the parent Banner's
+ * variant: destructive, info, and warning each render a default icon; primary
+ * and secondary render none. Pass a custom `icon` to override the default (or
+ * to add an icon to primary/secondary).
+ *
+ * Renders nothing when there is no icon to show — i.e. on a variant without a
+ * default icon and no custom `icon` provided.
  */
-export const BannerIcon: FC<BannerIconProps> = ({ icon }) => {
+export const BannerIcon: FC<BannerIconProps> = ({ ref, icon, ...props }) => {
   const testId = useTestId('icon');
   const variant = useBannerVariant();
   const DefaultIcon = defaultIconMap[variant];
@@ -37,7 +41,13 @@ export const BannerIcon: FC<BannerIconProps> = ({ icon }) => {
   if (content == null) return null;
 
   return (
-    <div data-slot='banner-icon' data-testid={testId} className='flex items-center py-2 shrink-0'>
+    <div
+      {...props}
+      ref={ref}
+      data-slot='banner-icon'
+      data-testid={testId}
+      className='flex items-center py-2 shrink-0'
+    >
       {content}
     </div>
   );

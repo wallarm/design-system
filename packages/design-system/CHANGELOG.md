@@ -1,3 +1,19 @@
+## 0.60.0 (2026-06-14)
+
+* feat: WDS-136 utility page ([3e942d6](https://github.com/wallarm/design-system/commit/3e942d6))
+* feat: WDS-136 utility page [update-screenshots] ([8db7225](https://github.com/wallarm/design-system/commit/8db7225))
+* feat: WDS-97 compose BannerIcon as a child component (#166) ([598769d](https://github.com/wallarm/design-system/commit/598769d)), closes [#166](https://github.com/wallarm/design-system/issues/166)
+
+## 0.59.0 (2026-06-13)
+
+* feat: WDS-127 animated bg ([4e6dc7c](https://github.com/wallarm/design-system/commit/4e6dc7c))
+* feat: WDS-127 sound ([9a6b65d](https://github.com/wallarm/design-system/commit/9a6b65d))
+
+## <small>0.58.1 (2026-06-12)</small>
+
+* 🖼️ Update screenshots ([aae68e1](https://github.com/wallarm/design-system/commit/aae68e1))
+* fix: icons layout [update-screenshots] ([2f5c84d](https://github.com/wallarm/design-system/commit/2f5c84d))
+
 ## 0.58.0 (2026-06-11)
 
 * 🖼️ Update screenshots ([bcf9243](https://github.com/wallarm/design-system/commit/bcf9243))

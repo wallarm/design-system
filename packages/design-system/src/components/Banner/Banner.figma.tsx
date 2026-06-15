@@ -5,6 +5,7 @@ import { BannerClose } from './BannerClose';
 import { BannerContent } from './BannerContent';
 import { BannerControls } from './BannerControls';
 import { BannerDescription } from './BannerDescription';
+import { BannerIcon } from './BannerIcon';
 import { BannerLink } from './BannerLink';
 import { BannerTitle } from './BannerTitle';
 
@@ -31,6 +32,7 @@ figma.connect(Banner, figmaNodeUrl, {
   },
   example: ({ variant, description, inlineAction, rightActions, closable, title, text }) => (
     <Banner variant={variant}>
+      <BannerIcon />
       <BannerContent>
         <BannerTitle action={inlineAction && <BannerLink href='#'>Link</BannerLink>}>
           {title}
