@@ -5,6 +5,7 @@ import {
   getDateDisplayLabel,
   getInvalidValueIndices,
   getOperatorLabel,
+  hasFieldValues,
   isNoValueOperator,
   NO_VALUE_PLACEHOLDER,
 } from '../../lib';
@@ -33,15 +34,17 @@ const makeEmptyChip = (i: number, error: boolean): FilterInputChipData =>
   }) as FilterInputChipData;
 
 /**
- * Resolve a value's display label: prefer the current field's option. When the
- * chip is errored on its value (`crossField`), fall back to any other field
- * that defines this value — after a field change the value no longer matches
- * the new field, but its human-readable label still lives on the field it came
- * from, so the errored chip keeps showing the label instead of the raw value.
+ * Resolve a value's display label: prefer the current field's option. Otherwise
+ * fall back to any other field that defines this value — after changing a chip's
+ * field the value no longer matches the new field, but its human-readable label
+ * still lives on the field it came from, so the chip keeps showing the label
+ * (e.g. `country = US` → field changed to `attack_type` still reads
+ * "United States") instead of the raw value.
  *
- * The cross-field search is gated on the value error on purpose: a freeform
- * field's value (no options) must stay raw even if it happens to coincide with
- * another field's option label.
+ * The cross-field search runs when the chip is errored (`crossField`, the strict
+ * AS-1085 path) or the current field offers its own value list. It is skipped
+ * for purely freeform fields (no options/values/suggestions) so a hand-typed
+ * value that happens to coincide with another field's option is never relabelled.
  */
 const resolveValueLabel = (
   value: string | number | boolean | null,
@@ -51,7 +54,7 @@ const resolveValueLabel = (
 ): string | undefined => {
   const own = findOptionByValue(field, value)?.label;
   if (own !== undefined) return own;
-  if (!crossField) return undefined;
+  if (!crossField && !(field && hasFieldValues(field))) return undefined;
   return findValueLabelInFields(value, fields);
 };
 

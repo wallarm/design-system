@@ -129,6 +129,28 @@ describe('buildChips — loose-match label resolution (AS-882)', () => {
       ];
       expect(findChip(buildChips(conditions, [], withFreeform, false))?.value).toBe('review');
     });
+
+    // Changing a chip from one option field to another carries the value over;
+    // with strictValues:false the chip is no longer errored, but an option field
+    // should still show the borrowed label rather than the raw value (AS-1134).
+    it('borrows the label for a non-errored value when the current field has its own values', () => {
+      const conditions: Condition[] = [
+        // 'urgent' is not a Priority option, but Priority has its own value list,
+        // and Tag defines 'urgent' as "Urgent".
+        { type: 'condition', field: 'priority', operator: '=', value: 'urgent' },
+      ];
+      expect(findChip(buildChips(conditions, [], fields, false))?.value).toBe('Urgent');
+    });
+
+    it('borrows labels for non-errored multi values when the current field has its own values', () => {
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'priority', operator: 'in', value: ['urgent', 'review'] },
+      ];
+      expect(findChip(buildChips(conditions, [], fields, false))?.valueParts).toEqual([
+        'Urgent',
+        'Review',
+      ]);
+    });
   });
 
   // No-value operators (is_null / is_not_null) carry no real value, but the
