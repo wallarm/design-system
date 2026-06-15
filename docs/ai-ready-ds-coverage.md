@@ -2,7 +2,7 @@
 
 > Who's writing which `<Component>.llm.md`, and what's done. Tiering comes from the [strategy §8](./ai-ready-ds-strategy.md#8-which-components-and-in-what-order-tiering); the how-to is in the [authoring guide](./ai-ready-ds-authoring-guide.md).
 >
-> **Last updated:** 2026-06-12
+> **Last updated:** 2026-06-15
 
 ## How to use this
 1. Pick a **Deep**-tier row with no **Assignee** and put your name in it.
@@ -13,8 +13,8 @@
 **Status:** ✅ Done · 🟡 Partial / in progress · ☐ To do · ➖ N/A (not a documentable component)
 
 ## Snapshot
-- **Deep tier:** 6 done, 1 partial, 11 to do (+ 1 folded). ← the active batch
-- **Light tier:** 3 done (Badge + Tag + NumericBadge — the chip-trio anchors), 37 parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)).
+- **Deep tier:** 8 done, 1 partial, 9 to do (+ 1 folded). ← the active batch
+- **Light tier:** 6 done (Badge + Tag + NumericBadge chip-trio + Toast + Alert + Dialog), 34 parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)).
 - **Skip:** 20 (providers, layout/leaf primitives, internal plumbing).
 
 ## Tracker
@@ -26,8 +26,8 @@
 | Table | Deep | 🟡 Partial | — | [.llm.md](../packages/design-system/src/components/Table/Table.llm.md) | Action bar only; columns/sort/density/scroll still TODO. Added to deep tier (not in original §8) |
 | BulkBar | Deep | ➖ Folded | — | — | Internal plumbing — guidance lives in **Selection** + **Table** |
 | AppShell | Deep | ☐ To do | — | — | |
-| Attribute | Deep | ☐ To do | — | — | |
-| Banner | Deep | ☐ To do | — | — | |
+| Attribute | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Attribute/Attribute.llm.md) | Object-metadata grid; read-only host for value-slot display components; `AttributeActions` for the click; flags Figma inline-edit + error state as not-yet-shipped |
+| Banner | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Banner/Banner.llm.md) | Page-top full-width system/account-wide notice; "still relevant on another page?" test splits Banner vs Alert; primary dark / secondary light, no success; one action pattern; institutional voice. Closes the messaging family (Toast/Alert/Banner; Dialog pending) |
 | Country | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Country/Country.llm.md) | First compound in the family; sanctions flag-only / name-only forms |
 | FilterInput | Deep | ☐ To do | — | — | |
 | Ip | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Ip/Ip.llm.md) | Richest compound yet: slot order, IpList overflow, neutral source chips, standalone IpProvider |
@@ -41,7 +41,7 @@
 | TopHeader | Deep | ☐ To do | — | — | |
 | Tour | Deep | ☐ To do | — | — | |
 | Accordion | Light | ☐ To do | — | — | |
-| Alert | Light | ☐ To do | — | — | |
+| Alert | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Alert/Alert.llm.md) | Inline/in-context messaging (in Drawer/Dialog/under header); messaging-ladder boundary vs Toast/Banner/Dialog/Field; locked semantic color+icon, secondary/small button recipe; actions top/bottom by width; 3 TBDs (loading/stepper/promo) |
 | Badge | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Badge/Badge.llm.md) | Base of the domain-chip family → got the full router treatment, not a Light note |
 | Breadcrumbs | Light | ☐ To do | — | — | |
 | Button | Light | ☐ To do | — | — | |
@@ -52,7 +52,7 @@
 | CodeSnippet | Light | ☐ To do | — | — | |
 | DateInput | Light | ☐ To do | — | — | |
 | DateRangeInput | Light | ☐ To do | — | — | |
-| Dialog | Light | ☐ To do | — | — | |
+| Dialog | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Dialog/Dialog.llm.md) | Reframed (Artem): a **layout** component, not messaging — centered modal twin of Drawer (wraps it, minus resize). Owns the overlay/layout ladder (Dialog→Drawer→page); destructive recipe; sizes 400/560/960. Export gotcha: not in root barrel, reachable via `/Dialog` subpath |
 | Drawer | Light | ☐ To do | — | — | |
 | DropdownMenu | Light | ☐ To do | — | — | |
 | Field | Light | ☐ To do | — | — | |
@@ -77,7 +77,7 @@
 | Tag | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Tag/Tag.llm.md) | The interactive chip; routes Tag vs SelectButtonTag vs FilterInput; Selectable = TBD |
 | Textarea | Light | ☐ To do | — | — | |
 | TimeInput | Light | ☐ To do | — | — | |
-| Toast | Light | ☐ To do | — | — | |
+| Toast | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Toast/Toast.llm.md) | Imperative `useToast`/`toaster` + one `Toaster`; boundary vs Dialog/Banner/Field; locked type-color/stacking/auto-dismiss; carries house microcopy → seeded the new [content-guidelines doc](./ai-ready-ds-content-guidelines.md) |
 | ToggleButton | Light | ☐ To do | — | — | |
 | Tooltip | Light | ☐ To do | — | — | |
 | AnimatedBackground | Skip | ➖ N/A | — | — | Decorative |
