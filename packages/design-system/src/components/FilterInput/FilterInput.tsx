@@ -41,6 +41,13 @@ export interface FilterInputProps
    * prop when the filter changes or the query succeeds.
    */
   externalErrors?: string[];
+  /**
+   * Notified whenever the set of validation messages FilterInput renders below
+   * the input changes (empty array = no visible error). Lets a consumer avoid
+   * stacking its own message (e.g. a backend-error alert) on top of one the
+   * input already shows. Pass a stable (memoized) callback.
+   */
+  onErrorsChange?: (errors: string[]) => void;
   showKeyboardHint?: boolean;
 }
 
@@ -51,6 +58,7 @@ export const FilterInput: FC<FilterInputProps> = ({
   placeholder = 'Type to filter...',
   error = false,
   externalErrors,
+  onErrorsChange,
   showKeyboardHint = false,
   className,
   ...props
@@ -148,6 +156,10 @@ export const FilterInput: FC<FilterInputProps> = ({
     () => (pasteError ? [pasteError, ...fieldErrors] : fieldErrors),
     [pasteError, fieldErrors],
   );
+
+  useEffect(() => {
+    onErrorsChange?.(errors);
+  }, [errors, onErrorsChange]);
 
   return (
     <div

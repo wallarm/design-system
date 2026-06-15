@@ -165,6 +165,32 @@ describe('FilterInput', () => {
     });
   });
 
+  describe('onErrorsChange (AS-1134)', () => {
+    it('reports validation messages and clears them when fixed', async () => {
+      const onErrorsChange = vi.fn();
+      const invalid: Condition = {
+        type: 'condition',
+        field: 'priority',
+        operator: '=',
+        value: 'abc',
+      };
+      const { rerender } = render(
+        <FilterInput fields={sampleFields} value={invalid} onErrorsChange={onErrorsChange} />,
+      );
+      await waitFor(() => {
+        expect(onErrorsChange).toHaveBeenLastCalledWith(
+          expect.arrayContaining([expect.stringMatching(/Priority/i)]),
+        );
+      });
+
+      const valid: Condition = { type: 'condition', field: 'priority', operator: '=', value: 5 };
+      rerender(<FilterInput fields={sampleFields} value={valid} onErrorsChange={onErrorsChange} />);
+      await waitFor(() => {
+        expect(onErrorsChange).toHaveBeenLastCalledWith([]);
+      });
+    });
+  });
+
   describe('input focus on empty space click', () => {
     it('has cursor-text wrapper that delegates clicks to input', () => {
       const condition: Condition = {
