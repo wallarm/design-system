@@ -118,25 +118,40 @@ describe('buildChips — loose-match label resolution (AS-882)', () => {
       expect(findChip(buildChips(conditions, [], fields, false))?.value).toBe('mystery');
     });
 
-    it('does NOT borrow a label for a non-errored freeform value coinciding with another option', () => {
+    // Changing a chip's field carries the value over even across data types and
+    // onto freeform fields; with strictValues:false the chip is no longer
+    // errored, but the value's label still lives on its origin field and is shown
+    // rather than the raw value (AS-1134). Trade-off: a value typed into a
+    // freeform field that happens to equal another field's option value is shown
+    // with that option's label.
+    it('borrows the label for a non-errored value carried onto a freeform field', () => {
       const withFreeform: FieldMetadata[] = [
         ...fields,
         { name: 'note', label: 'Note', type: 'string' }, // freeform, no options
       ];
       const conditions: Condition[] = [
-        // valid freeform value that happens to equal Tag's "review" option value
+        // value equals Tag's "review" option value → shows its label
         { type: 'condition', field: 'note', operator: '=', value: 'review' },
       ];
-      expect(findChip(buildChips(conditions, [], withFreeform, false))?.value).toBe('review');
+      expect(findChip(buildChips(conditions, [], withFreeform, false))?.value).toBe('Review');
     });
 
-    // Changing a chip from one option field to another carries the value over;
-    // with strictValues:false the chip is no longer errored, but an option field
-    // should still show the borrowed label rather than the raw value (AS-1134).
+    it('keeps the raw value when no field defines it', () => {
+      const withFreeform: FieldMetadata[] = [
+        ...fields,
+        { name: 'note', label: 'Note', type: 'string' },
+      ];
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'note', operator: '=', value: 'freeform text' },
+      ];
+      expect(findChip(buildChips(conditions, [], withFreeform, false))?.value).toBe(
+        'freeform text',
+      );
+    });
+
     it('borrows the label for a non-errored value when the current field has its own values', () => {
       const conditions: Condition[] = [
-        // 'urgent' is not a Priority option, but Priority has its own value list,
-        // and Tag defines 'urgent' as "Urgent".
+        // 'urgent' is not a Priority option, but Tag defines it as "Urgent".
         { type: 'condition', field: 'priority', operator: '=', value: 'urgent' },
       ];
       expect(findChip(buildChips(conditions, [], fields, false))?.value).toBe('Urgent');

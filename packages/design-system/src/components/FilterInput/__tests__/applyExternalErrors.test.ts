@@ -64,13 +64,13 @@ describe('applyExternalErrors', () => {
     expect(result[2]!.error).toBe('value');
   });
 
-  it('keeps a freeform raw value raw even when it matches another field option (no cross-field label)', () => {
-    // 'active' is the status field's option value (label 'Active'); the host
-    // field is freeform. An external error must not trigger buildChips'
-    // cross-field label borrowing — the chip keeps showing the raw value.
+  it('overlays the error without disturbing the chip value (cross-field label preserved)', () => {
+    // 'active' is the status field's option value (label 'Active'); buildChips
+    // now borrows that label for any field (AS-1134). The external-error overlay
+    // only sets the error flag — it never recomputes or clobbers the value.
     const conditions = [cond('host', { value: 'active' })];
     const result = applyExternalErrors(chipsFor(conditions), conditions, ['host']);
     expect(result[0]!.error).toBe('value');
-    expect(result[0]!.value).toBe('active');
+    expect(result[0]!.value).toBe('Active');
   });
 });
