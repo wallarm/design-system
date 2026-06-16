@@ -586,4 +586,10 @@ export {
   waitForStepEvent,
 } from './components/Tour';
 export { UtilityPage, type UtilityPageProps } from './components/UtilityPage';
+export {
+  WallyIcon,
+  type WallyIconProps,
+  type WallyIconSize,
+  type WallyIconStyle,
+} from './components/WallyIcon';
 export { type TestableProps, TestIdProvider, useTestId } from './utils/testId';
