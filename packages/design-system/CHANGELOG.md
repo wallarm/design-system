@@ -1,3 +1,7 @@
+## 0.61.0 (2026-06-16)
+
+* feat(filter-input): AS-1134 strictValues + externalErrors for backend-driven filter errors (#163) ([1642456](https://github.com/wallarm/design-system/commit/1642456)), closes [#163](https://github.com/wallarm/design-system/issues/163)
+
 ## 0.60.0 (2026-06-14)
 
 * feat: WDS-136 utility page ([3e942d6](https://github.com/wallarm/design-system/commit/3e942d6))
