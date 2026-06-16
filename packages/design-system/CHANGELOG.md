@@ -1,3 +1,8 @@
+## 0.62.0 (2026-06-16)
+
+* 🖼️ Update screenshots ([6b5eceb](https://github.com/wallarm/design-system/commit/6b5eceb))
+* feat: WDS-141 wally icons [update-screenshots] ([d341a8c](https://github.com/wallarm/design-system/commit/d341a8c))
+
 ## 0.61.0 (2026-06-16)
 
 * feat(filter-input): AS-1134 strictValues + externalErrors for backend-driven filter errors (#163) ([1642456](https://github.com/wallarm/design-system/commit/1642456)), closes [#163](https://github.com/wallarm/design-system/issues/163)
