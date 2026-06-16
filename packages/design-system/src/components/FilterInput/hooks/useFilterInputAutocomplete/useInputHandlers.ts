@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 import {
   applyAcceptChar,
   getOperatorFromLabel,
-  hasFieldValues,
+  hasStaticAllowlist,
   nextBuildingMenu,
   OPERATOR_SYMBOLS,
 } from '../../lib';
@@ -159,12 +159,16 @@ export const useInputHandlers = ({
         }
       }
 
-      // Enter commits freeform value when no predefined values exist
+      // Enter commits a freeform value unless the field is a strict allowlist.
+      // Suggestions-only fields (strictValues: false, getSuggestions) reach
+      // here when no menu item is highlighted — useKeyboardNav lets Enter
+      // propagate in that case — so typed text must commit instead of being
+      // swallowed (AS-1134).
       if (
         e.key === 'Enter' &&
         menuState === 'value' &&
         selectedField &&
-        !hasFieldValues(selectedField) &&
+        !hasStaticAllowlist(selectedField) &&
         inputText.trim()
       ) {
         e.preventDefault();
