@@ -2,7 +2,7 @@
 
 > Who's writing which `<Component>.llm.md`, and what's done. Tiering comes from the [strategy §8](./ai-ready-ds-strategy.md#8-which-components-and-in-what-order-tiering); the how-to is in the [authoring guide](./ai-ready-ds-authoring-guide.md).
 >
-> **Last updated:** 2026-06-15
+> **Last updated:** 2026-06-16
 
 ## How to use this
 1. Pick a **Deep**-tier row with no **Assignee** and put your name in it.
@@ -14,7 +14,7 @@
 
 ## Snapshot
 - **Deep tier:** 8 done, 1 partial, 9 to do (+ 1 folded). ← the active batch
-- **Light tier:** 6 done (Badge + Tag + NumericBadge chip-trio + Toast + Alert + Dialog), 34 parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)).
+- **Light tier:** 7 done (Badge + Tag + NumericBadge chip-trio + Toast + Alert + Dialog + Button), 33 parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)). Button got the full router treatment, not a Light note (Actions-family anchor).
 - **Skip:** 20 (providers, layout/leaf primitives, internal plumbing).
 
 ## Tracker
@@ -44,7 +44,7 @@
 | Alert | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Alert/Alert.llm.md) | Inline/in-context messaging (in Drawer/Dialog/under header); messaging-ladder boundary vs Toast/Banner/Dialog/Field; locked semantic color+icon, secondary/small button recipe; actions top/bottom by width; 3 TBDs (loading/stepper/promo) |
 | Badge | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Badge/Badge.llm.md) | Base of the domain-chip family → got the full router treatment, not a Light note |
 | Breadcrumbs | Light | ☐ To do | — | — | |
-| Button | Light | ☐ To do | — | — | |
+| Button | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Button/Button.llm.md) | Workhorse anchor of the Actions family → full router file (Button vs `Link`/`ToggleButton`/`SplitButton`/`Select`'s `SelectButton`). Locked **partial color×variant matrix**; two-axis **emphasis(`variant`)×intent(`color`)** model + one-primary-per-view; Save=`primary`/`brand`, Cancel=`ghost`/`neutral`; `neutral-alt` for dark surfaces (Toast). Figma node 36:2304 |
 | Calendar | Light | ☐ To do | — | — | |
 | Card | Light | ☐ To do | — | — | |
 | Checkbox | Light | ☐ To do | — | — | |
