@@ -1,3 +1,7 @@
+## 0.63.0 (2026-06-17)
+
+* feat(design-system): WDS-114 analytics-ready instrumentation across interactive components (#157) ([43c4923](https://github.com/wallarm/design-system/commit/43c4923)), closes [#157](https://github.com/wallarm/design-system/issues/157)
+
 ## 0.62.0 (2026-06-16)
 
 * 🖼️ Update screenshots ([6b5eceb](https://github.com/wallarm/design-system/commit/6b5eceb))
