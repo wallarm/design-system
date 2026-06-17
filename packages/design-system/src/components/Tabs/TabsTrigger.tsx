@@ -1,17 +1,20 @@
-import type { FC, FocusEvent, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, FC, FocusEvent, ReactNode } from 'react';
 import { Tabs as ArkUiTabs } from '@ark-ui/react/tabs';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { tabsTriggerVariants } from './classes';
 import { TABS_SCROLL_BUTTON_WIDTH } from './constants';
 import { useTabsSharedContext } from './TabsSharedContext';
 
-export interface TabsTriggerProps {
+type TabsTriggerNativeProps = Omit<
+  ButtonHTMLAttributes<HTMLButtonElement>,
+  'value' | 'onFocus' | 'children'
+>;
+
+export interface TabsTriggerProps extends TabsTriggerNativeProps, TestableProps {
   children: ReactNode;
   value: string;
-  disabled?: boolean;
   asChild?: boolean;
-  className?: string;
   onFocus?: (e: FocusEvent<HTMLButtonElement>) => void;
 }
 
@@ -22,11 +25,13 @@ export const TabsTrigger: FC<TabsTriggerProps> = ({
   asChild = false,
   className,
   onFocus,
+  'data-testid': testIdProp,
+  ...rest
 }) => {
-  const testId = useTestId('trigger');
+  const testId = useTestId('trigger', testIdProp);
   const { scrollRef, size } = useTabsSharedContext();
 
-  const handleFocus = (e: React.FocusEvent<HTMLButtonElement>) => {
+  const handleFocus = (e: FocusEvent<HTMLButtonElement>) => {
     onFocus?.(e);
 
     const el = e.currentTarget;
@@ -53,6 +58,7 @@ export const TabsTrigger: FC<TabsTriggerProps> = ({
 
   return (
     <ArkUiTabs.Trigger
+      {...rest}
       className={cn(tabsTriggerVariants({ size }), className)}
       data-testid={testId}
       value={value}

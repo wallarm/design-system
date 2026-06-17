@@ -22,7 +22,7 @@ export const CodeSnippetCopyButton: FC<CodeSnippetCopyButtonProps> = ({
   });
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
-    handleCopy(event);
+    handleCopy();
     onClick?.(event);
   };
 

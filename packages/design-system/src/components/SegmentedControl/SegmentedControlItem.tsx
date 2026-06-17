@@ -1,8 +1,13 @@
-import type { FC, KeyboardEvent, PropsWithChildren, Ref } from 'react';
+import type { FC, KeyboardEvent, LabelHTMLAttributes, PropsWithChildren, Ref } from 'react';
 import { SegmentGroup } from '@ark-ui/react/segment-group';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { segmentedControlItemClassNamesBase } from './classes';
+
+type SegmentedControlItemNativeProps = Omit<
+  LabelHTMLAttributes<HTMLLabelElement>,
+  'children' | 'onKeyDown'
+>;
 
 /**
  * Individual item within a SegmentedControl.
@@ -10,14 +15,13 @@ import { segmentedControlItemClassNamesBase } from './classes';
  * Built on Ark UI's SegmentGroup.Item with radio input behavior and accessibility.
  * Selection state is managed by the parent SegmentedControl.
  */
-export interface SegmentedControlItemProps {
+export interface SegmentedControlItemProps extends SegmentedControlItemNativeProps, TestableProps {
   /** Unique value that identifies this item */
   value: string;
   /** Whether this item is disabled */
   disabled?: boolean;
-  /** Additional CSS class */
-  className?: string;
   ref?: Ref<HTMLLabelElement>;
+  onKeyDown?: (event: KeyboardEvent<HTMLLabelElement>) => void;
 }
 
 export const SegmentedControlItem: FC<PropsWithChildren<SegmentedControlItemProps>> = ({
@@ -26,10 +30,16 @@ export const SegmentedControlItem: FC<PropsWithChildren<SegmentedControlItemProp
   disabled,
   children,
   ref,
+  onKeyDown,
+  'data-testid': testIdProp,
+  ...rest
 }) => {
-  const testId = useTestId('item');
+  const testId = useTestId('item', testIdProp);
 
   const handleKeyDown = (event: KeyboardEvent<HTMLLabelElement>) => {
+    onKeyDown?.(event);
+    if (event.defaultPrevented) return;
+
     if ((event.key === ' ' || event.key === 'Enter') && !disabled) {
       // Forward to hidden input by clicking the wrapper (which triggers Ark UI selection)
       event.currentTarget.click();
@@ -38,6 +48,7 @@ export const SegmentedControlItem: FC<PropsWithChildren<SegmentedControlItemProp
 
   return (
     <SegmentGroup.Item
+      {...rest}
       ref={ref}
       value={value}
       disabled={disabled}

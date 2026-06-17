@@ -28,8 +28,6 @@ describe('useCopyTooltip', () => {
     vi.useRealTimers();
   });
 
-  const mockEvent = { stopPropagation: vi.fn() };
-
   it('returns initial state', () => {
     const { result } = renderHook(() => useCopyTooltip({ text: 'hello' }));
 
@@ -41,20 +39,19 @@ describe('useCopyTooltip', () => {
     const { result } = renderHook(() => useCopyTooltip({ text: 'hello' }));
 
     act(() => {
-      result.current.handleCopy(mockEvent);
+      result.current.handleCopy();
     });
 
     expect(result.current.copied).toBe(true);
     expect(result.current.tooltipOpen).toBe(true);
     expect(writeTextMock).toHaveBeenCalledWith('hello');
-    expect(mockEvent.stopPropagation).toHaveBeenCalled();
   });
 
   it('auto-dismisses tooltipOpen after 2s timeout', () => {
     const { result } = renderHook(() => useCopyTooltip({ text: 'hello' }));
 
     act(() => {
-      result.current.handleCopy(mockEvent);
+      result.current.handleCopy();
     });
 
     expect(result.current.tooltipOpen).toBe(true);
@@ -74,7 +71,7 @@ describe('useCopyTooltip', () => {
 
     // Copy first
     act(() => {
-      result.current.handleCopy(mockEvent);
+      result.current.handleCopy();
     });
     expect(result.current.copied).toBe(true);
 
@@ -110,7 +107,7 @@ describe('useCopyTooltip', () => {
     const { result } = renderHook(() => useCopyTooltip({ text: 'hello', enabled: false }));
 
     act(() => {
-      result.current.handleCopy(mockEvent);
+      result.current.handleCopy();
     });
 
     expect(result.current.copied).toBe(false);
@@ -125,7 +122,7 @@ describe('useCopyTooltip', () => {
     const { result } = renderHook(() => useCopyTooltip({ text: 'hello' }));
 
     act(() => {
-      result.current.handleCopy(mockEvent);
+      result.current.handleCopy();
     });
     expect(result.current.tooltipOpen).toBe(true);
 
@@ -153,7 +150,7 @@ describe('useCopyTooltip', () => {
     rerender({ text: 'second' });
 
     act(() => {
-      result.current.handleCopy(mockEvent);
+      result.current.handleCopy();
     });
 
     expect(writeTextMock).toHaveBeenCalledWith('second');

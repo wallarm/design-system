@@ -1,3 +1,4 @@
+import type { ComponentType, ReactNode } from 'react';
 import { flexRender, type Header } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -6,6 +7,7 @@ import { Text } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useHorizontalScrollState } from './hooks';
 import {
+  containsDirectChild,
   getAlignClass,
   getPinningStyles,
   isLastPinnedLeft,
@@ -14,11 +16,12 @@ import {
   useColumnDnd,
 } from './lib';
 import { Th } from './primitives';
+import { TableColumnMenu } from './TableColumnMenu';
 import { useTableContext } from './TableContext';
-import { TableHeadCellMenu } from './TableHeadCellMenu';
 import { TableResizeHandler } from './TableResizeHandler';
-import { TableScrollHandler } from './TableScrollHandler';
+import { TableScrollHandlerSlot } from './TableScrollHandlerSlot';
 import { TableSortHandler } from './TableSortHandler';
+import { TableSortTrigger } from './TableSortTrigger';
 
 interface TableHeadCellProps<T> {
   header: Header<T, unknown>;
@@ -63,9 +66,26 @@ export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellP
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
 
   const { canDnd, setNodeRef, dndStyle, attributes, listeners } = useColumnDnd(column);
-  const { hasOverflow, atStart, atEnd } = useHorizontalScrollState(containerRef, isMasterColumn);
+  const { hasOverflow } = useHorizontalScrollState(containerRef, isMasterColumn);
 
-  const content = flexRender(header.column.columnDef.header, header.getContext());
+  // Call a functional header inline (instead of `flexRender`) so we can
+  // introspect what the consumer returned — `flexRender` wraps the function
+  // in `React.createElement()`, which hides the rendered tree behind another
+  // component layer and would defeat the `<TableSortTrigger>` opt-out scan.
+  // Header functions in TanStack are pure (props in, ReactNode out), so an
+  // inline call has no side effects.
+  const headerDef = header.column.columnDef.header;
+  const headerCtx = header.getContext();
+  const content: ReactNode =
+    typeof headerDef === 'function' ? headerDef(headerCtx) : flexRender(headerDef, headerCtx);
+  const hasCustomSortTrigger = containsDirectChild(
+    content,
+    TableSortTrigger as ComponentType<unknown>,
+  );
+  const hasCustomColumnMenu = containsDirectChild(
+    content,
+    TableColumnMenu as ComponentType<unknown>,
+  );
   const alignClass = getAlignClass(meta);
   const isRightAligned = alignClass === 'text-right';
 
@@ -126,27 +146,27 @@ export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellP
           align={isTextDescription ? 'start' : 'center'}
           justify={isRightAligned ? (hasMenu ? 'between' : 'end') : undefined}
         >
-          {isRightAligned && hasMenu && (
-            <span className='shrink-0 opacity-0 group-hover:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
-              <TableHeadCellMenu column={column} />
-            </span>
-          )}
+          {isRightAligned && hasMenu && !hasCustomColumnMenu && <TableColumnMenu column={column} />}
 
           <VStack gap={0} align={isRightAligned ? 'end' : undefined}>
-            <HStack gap={2}>
-              {isRightAligned && canSort && <TableSortHandler header={header} />}
+            {hasCustomSortTrigger || hasCustomColumnMenu ? (
+              content
+            ) : (
+              <HStack gap={2}>
+                {isRightAligned && canSort && <TableSortHandler header={header} />}
 
-              {isTooltipDescription ? (
-                <Tooltip>
-                  <TooltipTrigger asChild>{titleNode}</TooltipTrigger>
-                  <TooltipContent>{description.content}</TooltipContent>
-                </Tooltip>
-              ) : (
-                titleNode
-              )}
+                {isTooltipDescription ? (
+                  <Tooltip>
+                    <TooltipTrigger asChild>{titleNode}</TooltipTrigger>
+                    <TooltipContent>{description.content}</TooltipContent>
+                  </Tooltip>
+                ) : (
+                  titleNode
+                )}
 
-              {!isRightAligned && canSort && <TableSortHandler header={header} />}
-            </HStack>
+                {!isRightAligned && canSort && <TableSortHandler header={header} />}
+              </HStack>
+            )}
 
             {isTextDescription && (
               <Text size='xs' weight='regular' color='secondary' truncate>
@@ -155,13 +175,13 @@ export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellP
             )}
           </VStack>
 
-          {!isRightAligned && hasMenu && (
-            <span className='shrink-0 ml-auto opacity-0 group-hover:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
-              <TableHeadCellMenu column={column} />
+          {!isRightAligned && hasMenu && !hasCustomColumnMenu && (
+            <span className='ml-auto inline-flex'>
+              <TableColumnMenu column={column} />
             </span>
           )}
 
-          {isMasterColumn && hasOverflow && <TableScrollHandler atStart={atStart} atEnd={atEnd} />}
+          {isMasterColumn && hasOverflow && <TableScrollHandlerSlot />}
         </HStack>
       )}
 

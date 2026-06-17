@@ -41,6 +41,14 @@ export const Card: FC<CardProps> = ({
     const target = e.target as HTMLElement;
     const card = e.currentTarget;
 
+    // A descendant that handles its own click but is not a native interactive
+    // element (e.g. a click-to-copy InlineCodeSnippet rendered as a <code>)
+    // can opt out of the card's delegated click via `data-ds-suppress-parent-click`.
+    const suppressor = target.closest('[data-ds-suppress-parent-click]');
+    if (suppressor && card.contains(suppressor)) {
+      return;
+    }
+
     if (target !== card && target.closest(INTERACTIVE_SELECTORS) !== card) {
       return;
     }

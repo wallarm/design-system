@@ -1,6 +1,6 @@
 import type { FC, ReactNode } from 'react';
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
-import { type TestableProps, TestIdProvider } from '../../utils/testId';
+import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 
 export interface TooltipProps extends TestableProps {
   children: ReactNode;
@@ -37,8 +37,11 @@ export const Tooltip: FC<TooltipProps> = ({
   interactive,
   disabled,
   positioning,
-  'data-testid': testId,
+  'data-testid': testIdProp,
 }) => {
+  const inheritedTestId = useTestId();
+  const testId = testIdProp ?? inheritedTestId;
+
   const handleOpenChange = (details: ArkUiTooltip.OpenChangeDetails) => {
     onOpenChange?.(details.open);
   };

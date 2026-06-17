@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, ReactElement } from 'react';
 import { Portal, useTourContext } from '@ark-ui/react';
 import { TestIdProvider } from '../../utils/testId';
 import { TourBody } from './TourBody';
@@ -14,9 +14,15 @@ import { TourTitle } from './TourTitle';
 
 export interface TourInnerProps {
   testId?: string;
+  /**
+   * Optional consumer-supplied close control. When provided, replaces the
+   * auto-rendered `<TourClose />` so the consumer can attach analytics or
+   * other native HTML attributes to the underlying `<button>`.
+   */
+  customClose?: ReactElement;
 }
 
-export const TourInner: FC<TourInnerProps> = ({ testId }) => {
+export const TourInner: FC<TourInnerProps> = ({ testId, customClose }) => {
   const { step } = useTourContext();
 
   const overlayIsVisible = !!step && step.backdrop !== false;
@@ -37,7 +43,7 @@ export const TourInner: FC<TourInnerProps> = ({ testId }) => {
             </TourBody>
             <TourFooter />
 
-            <TourClose />
+            {customClose ?? <TourClose />}
           </TourContent>
         </TourPositioner>
       </Portal>

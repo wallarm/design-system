@@ -7,11 +7,12 @@ import { TableBody } from '../TableBody';
 import { TableColGroup } from '../TableColGroup';
 import { useTableContext } from '../TableContext';
 import { TableHead } from '../TableHead';
-import { TableSettingsMenu } from '../TableSettingsMenu';
+import { TableSettingsMenuSlot } from '../TableSettingsMenu';
 
 interface TableInnerWindowProps {
   isEmpty: boolean;
   showSettings: boolean;
+  hasConsumerSettingsMenu: boolean;
   ariaLabel?: string;
   children?: ReactNode;
 }
@@ -19,6 +20,7 @@ interface TableInnerWindowProps {
 export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   isEmpty,
   showSettings,
+  hasConsumerSettingsMenu,
   ariaLabel,
   children,
 }) => {
@@ -91,7 +93,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
         </ScrollAreaViewport>
         <ScrollAreaScrollbar orientation='horizontal' />
       </ScrollArea>
-      {showSettings && <TableSettingsMenu />}
+      {showSettings && <TableSettingsMenuSlot hasConsumerMenu={hasConsumerSettingsMenu} />}
     </div>
   );
 };

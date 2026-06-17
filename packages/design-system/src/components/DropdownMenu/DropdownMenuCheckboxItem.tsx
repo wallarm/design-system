@@ -3,7 +3,7 @@ import { Menu } from '@ark-ui/react/menu';
 import type { VariantProps } from 'class-variance-authority';
 import { Check } from '../../icons';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { dropdownMenuItemVariants } from './classes';
 import { DropdownMenuItemIndicator } from './DropdownMenuItemIndicator';
 
@@ -11,7 +11,8 @@ type DropdownMenuCheckboxItemVariantsProps = VariantProps<typeof dropdownMenuIte
 
 export interface DropdownMenuCheckboxItemProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'id'>,
-    DropdownMenuCheckboxItemVariantsProps {
+    DropdownMenuCheckboxItemVariantsProps,
+    TestableProps {
   checked: boolean;
   onCheckedChange?: (checked: boolean) => void;
   /** Optional — auto-generated via useId() if omitted */
@@ -30,10 +31,11 @@ export const DropdownMenuCheckboxItem: FC<DropdownMenuCheckboxItemProps> = ({
   closeOnSelect,
   variant = 'default',
   className,
+  'data-testid': testIdProp,
   ...props
 }) => {
   const autoId = useId();
-  const testId = useTestId('checkbox-item');
+  const testId = useTestId('checkbox-item', testIdProp);
 
   return (
     <Menu.CheckboxItem

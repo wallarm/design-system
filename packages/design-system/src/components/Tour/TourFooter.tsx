@@ -59,15 +59,24 @@ export const TourFooter: FC<TourFooterProps> = () => {
               <HStack align='center' gap={8}>
                 {preparedActions.map((action, index) => {
                   const isLast = index === preparedActions.length - 1;
+                  // `label` and `action` configure Ark's ActionTrigger; the
+                  // rest are native button HTML attrs (data-*, aria-*, id,
+                  // onClick, …) that must reach the final <button>.
+                  const { label, action: actionType, ...buttonProps } = action;
 
                   return (
-                    <ArkUiTour.ActionTrigger key={action.label} action={action} asChild>
+                    <ArkUiTour.ActionTrigger
+                      key={label}
+                      action={{ label, action: actionType }}
+                      asChild
+                    >
                       <Button
+                        {...buttonProps}
                         variant={isLast ? 'primary' : 'ghost'}
                         color={isLast ? 'brand' : type === 'tooltip' ? 'neutral-alt' : 'neutral'}
                         size={type === 'dialog' ? 'large' : 'small'}
                       >
-                        {action.label}
+                        {label}
                       </Button>
                     </ArkUiTour.ActionTrigger>
                   );

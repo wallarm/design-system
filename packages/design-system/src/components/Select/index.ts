@@ -14,6 +14,6 @@ export { SelectOptionDescription } from './SelectOptionDescription';
 export { SelectOptionIndicator } from './SelectOptionIndicator';
 export { SelectOptionText } from './SelectOptionText';
 export { SelectPositioner } from './SelectPositioner';
-export { SelectSearchInput } from './SelectSearchInput';
+export { SelectSearchInput, type SelectSearchInputProps } from './SelectSearchInput';
 export { SelectSeparator, type SelectSeparatorProps } from './SelectSeparator';
 export type { SelectDataItem } from './types';
