@@ -1,3 +1,8 @@
+## 0.64.0 (2026-06-18)
+
+* ci: trigger release for v0.64.0 [skip-e2e] ([10e8bd2](https://github.com/wallarm/design-system/commit/10e8bd2))
+* feat: WDS-73 empty state [update-screenshots] (#167) ([f0e145d](https://github.com/wallarm/design-system/commit/f0e145d)), closes [#167](https://github.com/wallarm/design-system/issues/167)
+
 ## 0.63.0 (2026-06-17)
 
 * feat(design-system): WDS-114 analytics-ready instrumentation across interactive components (#157) ([43c4923](https://github.com/wallarm/design-system/commit/43c4923)), closes [#157](https://github.com/wallarm/design-system/issues/157)
