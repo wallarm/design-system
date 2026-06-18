@@ -19,11 +19,11 @@ You need a menu of **actions, commands, or settings** hung off a control: a butt
 
 ## Composition
 Assemble from the shipped parts — don't hand-roll equivalents:
-- **Items** — `DropdownMenuItem`; add a leading `DropdownMenuItemIcon`, a two-line `DropdownMenuItemContent` (`…Text` + `…Description`), or a trailing `DropdownMenuShortcut` (holds a `Kbd`).
+- **Items** — `DropdownMenuItem`; add a leading `DropdownMenuItemIcon`, a two-line `DropdownMenuItemContent` (`…Text` + `…Description`), or a trailing `DropdownMenuShortcut` (a slot — put a `Kbd` / `KbdGroup` inside it).
 - **Selection** — `DropdownMenuCheckboxItem` (independent toggles) or `DropdownMenuRadioGroup` + `DropdownMenuRadioItem` (one-of-set).
 - **Submenu** — a nested `DropdownMenu` triggered by a `DropdownMenuTriggerItem`.
 - **Structure** — `DropdownMenuLabel` (section heading), `DropdownMenuGroup`, `DropdownMenuSeparator`.
-- **Search / footer** — `DropdownMenuInput` pins to the top (filter long lists); `DropdownMenuFooter` pins to the bottom (custom per-product content, e.g. key hints).
+- **Search / footer** — `DropdownMenuInput` pins a search box to the top to filter the **menu's own items** (a long list); `DropdownMenuFooter` pins custom per-product content to the bottom (e.g. `Kbd` key hints). A panel of *filter inputs* producing a result set isn't this — that's `Popover`.
 
 ## Pairs with
 - `Button` — the default trigger (`outline`/`neutral`) via `DropdownMenuTrigger asChild`; an icon button for "⋯" overflow.
