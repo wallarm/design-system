@@ -2,7 +2,7 @@
 
 > Who's writing which `<Component>.llm.md`, and what's done. Tiering comes from the [strategy §8](./ai-ready-ds-strategy.md#8-which-components-and-in-what-order-tiering); the how-to is in the [authoring guide](./ai-ready-ds-authoring-guide.md).
 >
-> **Last updated:** 2026-06-16
+> **Last updated:** 2026-06-18
 
 ## How to use this
 1. Pick a **Deep**-tier row with no **Assignee** and put your name in it.
@@ -13,8 +13,8 @@
 **Status:** ✅ Done · 🟡 Partial / in progress · ☐ To do · ➖ N/A (not a documentable component)
 
 ## Snapshot
-- **Deep tier:** 8 done, 1 partial, 9 to do (+ 1 folded). ← the active batch
-- **Light tier:** 7 done (Badge + Tag + NumericBadge chip-trio + Toast + Alert + Dialog + Button), 33 parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)). Button got the full router treatment, not a Light note (Actions-family anchor).
+- **Deep tier:** 9 done, 1 partial, 8 to do (+ 1 folded). ← the active batch
+- **Light tier:** 10 done (Badge + Tag + NumericBadge chip-trio + Toast + Alert + Dialog + Button + ToggleButton + DropdownMenu + Link), 30 parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)). Button + ToggleButton + DropdownMenu + Link got the full router treatment as Actions-family members, not Light notes. **Actions family now complete** (Button / SplitButton / ToggleButton / Link + DropdownMenu; `Select`'s `SelectButton` lands with Select).
 - **Skip:** 20 (providers, layout/leaf primitives, internal plumbing).
 
 ## Tracker
@@ -37,7 +37,7 @@
 | RemoteShell | Deep | ☐ To do | — | — | |
 | ResponseCode | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/ResponseCode/ResponseCode.llm.md) | Sibling of HttpMethod; adds mask + text-only-rendition guidance |
 | SimpleCharts | Deep | ☐ To do | — | — | |
-| SplitButton | Deep | ☐ To do | — | — | |
+| SplitButton | Deep | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/SplitButton/SplitButton.llm.md) | Actions-family sibling of Button; thin grouping **wrapper with no styling props** — variant/color/size live on the two child Buttons, both on one matrix cell; fused look automatic; chevron = `DropdownMenuTrigger asChild`, menu **composed not owned**; left = common action + menu of *variations*. Figma node 8485:8977 (Notes frame empty). Seeded judgment-backlog "grouping-wrapper discipline" row |
 | TopHeader | Deep | ☐ To do | — | — | |
 | Tour | Deep | ☐ To do | — | — | |
 | Accordion | Light | ☐ To do | — | — | |
@@ -54,12 +54,12 @@
 | DateRangeInput | Light | ☐ To do | — | — | |
 | Dialog | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Dialog/Dialog.llm.md) | Reframed (Artem): a **layout** component, not messaging — centered modal twin of Drawer (wraps it, minus resize). Owns the overlay/layout ladder (Dialog→Drawer→page); destructive recipe; sizes 400/560/960. Export gotcha: not in root barrel, reachable via `/Dialog` subpath |
 | Drawer | Light | ☐ To do | — | — | |
-| DropdownMenu | Light | ☐ To do | — | — | |
+| DropdownMenu | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/DropdownMenu/DropdownMenu.llm.md) | Actions-family; **trigger-agnostic** menu of commands (button / icon / right-click `DropdownMenuContextTrigger` / `anchorPoint`); boundary vs `Select` (form-field value) — but a menu *may* nest a value-pick (radio-group / submenu, e.g. Language); custom UI → `Popover`→`Dialog`/`Drawer`. Item intent = `variant` (destructive/brand), `onSelect` not onClick; portal/position/scroll automatic; **no size system (design-TBD)**; checkbox items stay open. 18 parts (Ark UI). Figma 267:5551 (Notes = design TODOs). Extended overlay-ladder backlog row |
 | Field | Light | ☐ To do | — | — | |
 | Input | Light | ☐ To do | — | — | |
 | InputGroup | Light | ☐ To do | — | — | |
 | InputOTP | Light | ☐ To do | — | — | |
-| Link | Light | ☐ To do | — | — | |
+| Link | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Link/Link.llm.md) | Actions-family **navigation** member (closes the family). Element-by-behavior boundary (navigates → Link; acts / no-`href` → Button; link-as-button → `Button asChild`); 4 semantic `type`s incl. niche `table` (master-cell title link, navigates to object); underline on hover only (color-only-at-rest = conscious WCAG 1.4.1 trade-off, parked); icons as children (trailing = affordance, leading = identifies destination); **no `newTab` prop** (native `target`+`rel`+icon+a11y name); size + weight match surrounding text. Workflow-assisted (enrich + draft + 5-lens verify). Figma 923:5271 |
 | NumberInput | Light | ☐ To do | — | — | |
 | NumericBadge | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/NumericBadge/NumericBadge.llm.md) | Counts chip; type = surface-driven (taste), 99+ cap, show-0 default, never clickable |
 | OverflowList | Light | ☐ To do | — | — | |
@@ -78,7 +78,7 @@
 | Textarea | Light | ☐ To do | — | — | |
 | TimeInput | Light | ☐ To do | — | — | |
 | Toast | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Toast/Toast.llm.md) | Imperative `useToast`/`toaster` + one `Toaster`; boundary vs Dialog/Banner/Field; locked type-color/stacking/auto-dismiss; carries house microcopy → seeded the new [content-guidelines doc](./ai-ready-ds-content-guidelines.md) |
-| ToggleButton | Light | ☐ To do | — | — | |
+| ToggleButton | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/ToggleButton/ToggleButton.llm.md) | Actions-family **stateful** sibling of Button — on/off pressed state via `active`+`onToggle` (**not** onClick); smaller matrix `outline`/`ghost` × `brand`/`neutral`; designer default **ghost/neutral** (code defaults outline/brand — flagged as possible code change); a set of toggles = **row of ToggleButtons, not SegmentedControl**; Switch=setting vs ToggleButton=press-to-flip. Figma 295:5732 (Documentation prose; Notes = 2 design TODOs). Flagged **aria-pressed a11y gap** → spawned fix task |
 | Tooltip | Light | ☐ To do | — | — | |
 | AnimatedBackground | Skip | ➖ N/A | — | — | Decorative |
 | ButtonBase | Skip | ➖ N/A | — | — | Internal base for Button |
