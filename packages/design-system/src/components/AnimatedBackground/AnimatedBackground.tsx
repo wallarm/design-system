@@ -128,7 +128,12 @@ export const AnimatedBackground: FC<AnimatedBackgroundProps> = (props: AnimatedB
   }
 
   return (
-    <div data-slot='animated-background' {...rest} ref={ref} className={cn('relative', className)}>
+    <div
+      data-slot='animated-background'
+      {...rest}
+      ref={ref}
+      className={cn('relative h-full w-full', className)}
+    >
       <canvas
         ref={canvasRef}
         aria-hidden='true'
