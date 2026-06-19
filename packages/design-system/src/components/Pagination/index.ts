@@ -9,5 +9,6 @@ export { PaginationEllipsis, type PaginationEllipsisProps } from './PaginationEl
 export { PaginationItem, type PaginationItemProps } from './PaginationItem';
 export { PaginationList, type PaginationListProps, type PaginationPage } from './PaginationList';
 export { PaginationNext, type PaginationNextProps } from './PaginationNext';
+export { PaginationPageSize, type PaginationPageSizeProps } from './PaginationPageSize';
 export { PaginationPrevious, type PaginationPreviousProps } from './PaginationPrevious';
 export type { PaginationAlign, PaginationSize } from './types';

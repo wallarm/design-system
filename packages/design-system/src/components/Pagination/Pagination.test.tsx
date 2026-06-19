@@ -6,6 +6,7 @@ import { PaginationEllipsis } from './PaginationEllipsis';
 import { PaginationItem } from './PaginationItem';
 import { PaginationList } from './PaginationList';
 import { PaginationNext } from './PaginationNext';
+import { PaginationPageSize } from './PaginationPageSize';
 import { PaginationPrevious } from './PaginationPrevious';
 
 describe('Pagination root', () => {
@@ -124,5 +125,27 @@ describe('Pagination prev/next', () => {
     );
     await userEvent.click(screen.getByRole('button', { name: /next/i }));
     expect(onPageChange).toHaveBeenCalledWith(expect.objectContaining({ page: 2 }));
+  });
+});
+
+describe('PaginationPageSize', () => {
+  it('renders the label and the current page size, and changes it', async () => {
+    const onPageSizeChange = vi.fn();
+    render(
+      <Pagination count={200} defaultPageSize={25} onPageSizeChange={onPageSizeChange}>
+        <PaginationPageSize options={[10, 25, 50]} data-testid='pg-page-size' />
+      </Pagination>,
+    );
+    expect(screen.getByText('Rows per page')).toBeInTheDocument();
+    // current value shown on the select trigger
+    // Ark Select uses aria-labelledby (not aria-label) so the combobox name is empty in jsdom;
+    // fall back to querying by testid: PaginationPageSize passes data-testid="pg-page-size" to
+    // Select, which provides it as TestIdContext, so SelectButton derives "pg-page-size--button"
+    const trigger = screen.getByTestId('pg-page-size--button');
+    expect(trigger).toHaveTextContent('25');
+
+    await userEvent.click(trigger);
+    await userEvent.click(await screen.findByRole('option', { name: '50' }));
+    expect(onPageSizeChange).toHaveBeenCalledWith(expect.objectContaining({ pageSize: 50 }));
   });
 });
