@@ -1,3 +1,7 @@
+## 0.65.0 (2026-06-19)
+
+* feat: WDS-127 animated bg ([ad1ef25](https://github.com/wallarm/design-system/commit/ad1ef25))
+
 ## <small>0.64.1 (2026-06-19)</small>
 
 * fix(design-system): remove mb-8 from SegmentedControl root (#170) ([2e7929b](https://github.com/wallarm/design-system/commit/2e7929b)), closes [#170](https://github.com/wallarm/design-system/issues/170)
