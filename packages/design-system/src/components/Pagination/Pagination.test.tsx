@@ -1,9 +1,12 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { userEvent } from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 import { Pagination } from './Pagination';
 import { PaginationEllipsis } from './PaginationEllipsis';
 import { PaginationItem } from './PaginationItem';
 import { PaginationList } from './PaginationList';
+import { PaginationNext } from './PaginationNext';
+import { PaginationPrevious } from './PaginationPrevious';
 
 describe('Pagination root', () => {
   it('renders a nav landmark with aria-label, data-slot and align class', () => {
@@ -90,11 +93,6 @@ describe('PaginationList', () => {
     expect(list.querySelectorAll('[data-slot="pagination-ellipsis"]')).toHaveLength(1);
   });
 });
-
-import { userEvent } from '@testing-library/user-event';
-import { vi } from 'vitest';
-import { PaginationNext } from './PaginationNext';
-import { PaginationPrevious } from './PaginationPrevious';
 
 describe('Pagination prev/next', () => {
   it('disables Previous on the first page and Next on the last', () => {
