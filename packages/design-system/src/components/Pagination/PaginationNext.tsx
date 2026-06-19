@@ -3,6 +3,7 @@ import { Pagination as ArkPagination } from '@ark-ui/react/pagination';
 import { ArrowRight } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
+import { PAGINATION_NEXT_LABEL } from './constants';
 import { usePaginationSizeContext } from './PaginationContext';
 
 export interface PaginationNextProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -24,7 +25,7 @@ export const PaginationNext: FC<PaginationNextProps> = ({ children, ...props }) 
         data-slot='pagination-next'
         data-testid={testId}
       >
-        {children ?? 'Next'}
+        {children ?? PAGINATION_NEXT_LABEL}
         <ArrowRight />
       </Button>
     </ArkPagination.NextTrigger>

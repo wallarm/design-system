@@ -4,8 +4,7 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { PaginationEllipsis } from './PaginationEllipsis';
 import { PaginationItem } from './PaginationItem';
-
-export type PaginationPage = { type: 'page'; value: number } | { type: 'ellipsis' };
+import type { PaginationPage } from './types';
 
 export interface PaginationListProps {
   className?: string;

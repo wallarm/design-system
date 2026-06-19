@@ -3,6 +3,7 @@ import { Pagination as ArkPagination } from '@ark-ui/react/pagination';
 import { ArrowLeft } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
+import { PAGINATION_PREVIOUS_LABEL } from './constants';
 import { usePaginationSizeContext } from './PaginationContext';
 
 export interface PaginationPreviousProps extends ButtonHTMLAttributes<HTMLButtonElement> {
@@ -25,7 +26,7 @@ export const PaginationPrevious: FC<PaginationPreviousProps> = ({ children, ...p
         data-testid={testId}
       >
         <ArrowLeft />
-        {children ?? 'Previous'}
+        {children ?? PAGINATION_PREVIOUS_LABEL}
       </Button>
     </ArkPagination.PrevTrigger>
   );

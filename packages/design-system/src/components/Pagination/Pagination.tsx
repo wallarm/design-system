@@ -3,17 +3,14 @@ import { Pagination as ArkPagination } from '@ark-ui/react/pagination';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { paginationVariants } from './classes';
+import { PAGINATION_ROOT_LABEL } from './constants';
 import { PaginationSizeProvider } from './PaginationContext';
-import type { PaginationAlign, PaginationSize } from './types';
-
-export interface PaginationPageChangeDetails {
-  page: number;
-  pageSize: number;
-}
-
-export interface PaginationPageSizeChangeDetails {
-  pageSize: number;
-}
+import type {
+  PaginationAlign,
+  PaginationPageChangeDetails,
+  PaginationPageSizeChangeDetails,
+  PaginationSize,
+} from './types';
 
 export interface PaginationProps extends TestableProps {
   /** Total number of data items (Ark `count`). */
@@ -34,7 +31,7 @@ export interface PaginationProps extends TestableProps {
   onPageSizeChange?: (details: PaginationPageSizeChangeDetails) => void;
   /** Trigger element type. @default 'button' */
   type?: 'button' | 'link';
-  getPageUrl?: (details: { page: number; pageSize: number }) => string;
+  getPageUrl?: (details: PaginationPageChangeDetails) => string;
   /** Visual size. @default 'medium' */
   size?: PaginationSize;
   /** Horizontal alignment of the row. @default 'left' */
@@ -52,7 +49,7 @@ export const Pagination: FC<PaginationProps> = ({
   children,
   ref,
   'data-testid': testId,
-  'aria-label': ariaLabel = 'Pagination',
+  'aria-label': ariaLabel = PAGINATION_ROOT_LABEL,
   ...arkProps
 }) => (
   <PaginationSizeProvider size={size}>

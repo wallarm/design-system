@@ -1,16 +1,19 @@
 import { type FC, useMemo } from 'react';
-import { createListCollection } from '@ark-ui/react/collection';
 import { usePaginationContext } from '@ark-ui/react/pagination';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { Select } from '../Select';
-import { SelectButton } from '../Select/SelectButton';
-import { SelectContent } from '../Select/SelectContent';
-import { SelectOption } from '../Select/SelectOption';
-import { SelectOptionText } from '../Select/SelectOptionText';
-import { SelectPositioner } from '../Select/SelectPositioner';
+import {
+  Select,
+  SelectButton,
+  SelectContent,
+  SelectOption,
+  SelectOptionText,
+  SelectPositioner,
+} from '../Select';
 import { Separator } from '../Separator';
 import { Text } from '../Text';
+import { PAGINATION_PAGE_SIZE_LABEL } from './constants';
+import { createPageSizeCollection } from './lib';
 
 export interface PaginationPageSizeProps {
   /** Selectable items-per-page values. */
@@ -23,20 +26,14 @@ export interface PaginationPageSizeProps {
 
 export const PaginationPageSize: FC<PaginationPageSizeProps> = ({
   options,
-  label = 'Rows per page',
+  label = PAGINATION_PAGE_SIZE_LABEL,
   className,
   'data-testid': testIdProp,
 }) => {
   const api = usePaginationContext();
   const testId = useTestId('page-size', testIdProp);
 
-  const collection = useMemo(
-    () =>
-      createListCollection({
-        items: options.map(value => ({ label: String(value), value: String(value) })),
-      }),
-    [options],
-  );
+  const collection = useMemo(() => createPageSizeCollection(options), [options]);
 
   return (
     <div className={cn('flex items-center gap-6', className)} data-slot='pagination-page-size'>
