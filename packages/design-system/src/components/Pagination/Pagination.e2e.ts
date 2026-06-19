@@ -10,6 +10,7 @@ const paginationStory = createStoryHelper('navigation-pagination', [
   'Alignment',
   'ManyPages',
   'Playground',
+  'InTable',
 ] as const);
 
 test.describe('Component: Pagination', () => {
@@ -51,6 +52,11 @@ test.describe('Component: Pagination', () => {
 
     test('Should render the interactive playground correctly', async ({ page }) => {
       await paginationStory.goto(page, 'Playground');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render a table with a pagination footer correctly', async ({ page }) => {
+      await paginationStory.goto(page, 'InTable');
       await expect(page).toHaveScreenshot();
     });
   });
