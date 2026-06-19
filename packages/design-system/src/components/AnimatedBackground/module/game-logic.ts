@@ -1,11 +1,5 @@
 import type { CelState } from './celebration';
 import {
-  adjustCelebrationTimeMarkers,
-  startCelebration,
-  stepCelebration,
-  tierForScore,
-} from './celebration';
-import {
   ANOMALY_VIS_THRESHOLD,
   DOT_STEP_BASE,
   DOT_STEP_SCALE,
@@ -14,7 +8,6 @@ import {
 } from './constants';
 import type { Dot } from './engine-grid';
 import { sweepX } from './engine-grid';
-import { playCoin, playFanfare, playPew, playPowerUp, playZap } from './sfx';
 import type { EngineOptions, GameStats } from './types';
 
 // constants
@@ -90,6 +83,26 @@ export interface CaughtEffect {
 
 export type GameMode = 'idle' | 'armed' | 'over';
 
+/** Plugin interface for lazily-loaded game modules (sfx + celebration). */
+export interface GamePlugins {
+  playCoin?(): void;
+  playZap?(): void;
+  playPew?(): void;
+  playPowerUp?(): void;
+  playFanfare?(): void;
+  startCelebration?(score: number, t: number, host: GameEngineHost): CelState | null;
+  stepCelebration?(
+    cel: CelState,
+    t: number,
+    dt: number,
+    host: GameEngineHost,
+    c1: string,
+    c2: string,
+  ): void;
+  adjustCelebrationTimeMarkers?(cel: CelState, skip: number): void;
+  tierForScore?(score: number): number;
+}
+
 // mutable state owned by engine, read by game logic
 export interface GameEngineHost {
   w: number;
@@ -135,6 +148,7 @@ export interface GameLogic {
   setExclusion(box: { width: number; height: number } | null): void;
   celebrate(score: number): void;
   setSound(on: boolean): void;
+  setPlugins(p: GamePlugins): void;
 }
 
 // factory
@@ -166,6 +180,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
   let lastSpawn = -Infinity;
 
   let soundOn = false;
+  let plugins: GamePlugins = {};
 
   let statsCb: ((s: GameStats) => void) | null = null;
   let exclusionBox: { width: number; height: number } | null = null;
@@ -278,8 +293,8 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     killTotal += 1;
     if (state.gameMode === 'armed') {
       roundKills += 1;
-      if (soundOn) playZap();
-    } else if (soundOn) playCoin();
+      if (soundOn) plugins.playZap?.();
+    } else if (soundOn) plugins.playCoin?.();
     emitStats();
   }
 
@@ -295,9 +310,9 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     const faced = roundKills + roundEscaped;
     const accuracy = faced > 0 ? Math.round((roundKills / faced) * 100) : 100;
     const now = performance.now() / 1000;
-    state.cel = startCelebration(accuracy, now, host);
+    state.cel = plugins.startCelebration?.(accuracy, now, host) ?? null;
 
-    if (soundOn && tierForScore(accuracy) >= 1) playFanfare();
+    if (soundOn && (plugins.tierForScore?.(accuracy) ?? 0) >= 1) plugins.playFanfare?.();
 
     emitStats();
   }
@@ -359,7 +374,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
       bullets.push({ x: state.cannonX, y: host.h - CANNON_BARREL_Y });
       lastFire = t;
 
-      if (soundOn) playPew();
+      if (soundOn) plugins.playPew?.();
     }
   }
 
@@ -483,7 +498,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     for (const effect of caughtEffects) effect.t0 += skip;
     if (state.armT > 0) state.armT += skip;
     if (lastSpawn > -Infinity && lastSpawn !== 0) lastSpawn += skip;
-    if (state.cel) adjustCelebrationTimeMarkers(state.cel, skip);
+    if (state.cel) plugins.adjustCelebrationTimeMarkers?.(state.cel, skip);
   }
 
   // shared reset — clears round counters, pools and input state
@@ -524,9 +539,9 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     anomalies.length = 0;
     // Re-seed armT so cannon can rise in for the performance
     state.armT = now;
-    state.cel = startCelebration(score, now, host);
+    state.cel = plugins.startCelebration?.(score, now, host) ?? null;
 
-    if (soundOn && tierForScore(score) >= 1) playFanfare();
+    if (soundOn && (plugins.tierForScore?.(score) ?? 0) >= 1) plugins.playFanfare?.();
   }
 
   function catchAt(x: number, y: number, running: boolean): boolean {
@@ -574,7 +589,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     lastSpawn = now;
     state.cannonX = host.w / 2;
 
-    if (soundOn) playPowerUp();
+    if (soundOn) plugins.playPowerUp?.();
 
     emitStats();
   }
@@ -625,7 +640,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
   // Step celebration — called by engine with color strings from render context
   function stepCel(t: number, dt: number, caughtColor: string, dotColor: string) {
     if (!state.cel) return;
-    stepCelebration(state.cel, t, dt, host, caughtColor, dotColor);
+    plugins.stepCelebration?.(state.cel, t, dt, host, caughtColor, dotColor);
     // Latch cannonAway
     if (state.cel.liftStarted) state.cannonAway = true;
   }
@@ -651,6 +666,9 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
     setExclusion,
     celebrate,
     setSound,
+    setPlugins(p: GamePlugins) {
+      plugins = p;
+    },
 
     get cel() {
       return state.cel;

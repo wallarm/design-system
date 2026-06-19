@@ -20,9 +20,9 @@ import {
   parseColor,
 } from './engine-colors';
 import { buildGrid, sweepX } from './engine-grid';
-import type { GameEngineHost } from './game-logic';
+import type { GameEngineHost, GamePlugins } from './game-logic';
 import { CANNON_HALF_W, createGameLogic } from './game-logic';
-import type { GameRenderCtx } from './game-renderer';
+import type { GameRenderCtx, RenderPlugins } from './game-renderer';
 import { createGameRenderer } from './game-renderer';
 import type { EngineOptions, GameStats } from './types';
 
@@ -62,6 +62,7 @@ export interface SweepEngine {
   setExclusion(box: { width: number; height: number } | null): void;
   celebrate(score: number): void;
   setSound(on: boolean): void;
+  setPlugins(plugins: { game: GamePlugins; render: RenderPlugins }): void;
 }
 
 export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOptions): SweepEngine {
@@ -342,5 +343,9 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
       game.celebrate(score);
     },
     setSound: (on: boolean) => game.setSound(on),
+    setPlugins: (p: { game: GamePlugins; render: RenderPlugins }) => {
+      game.setPlugins(p.game);
+      gr.setRenderPlugins(p.render);
+    },
   };
 }

@@ -80,6 +80,18 @@ export const useGameKeyboard = (
     };
   }, [game, armed, roundOver, engineRef, handleCommonKey]);
 
+  // esc + sound toggle during idle phase (before arming)
+  useEffect(() => {
+    if (!game || armed) return;
+
+    function onKeyDown(e: KeyboardEvent) {
+      handleCommonKey(e);
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [game, armed, handleCommonKey]);
+
   // esc + sound toggle during results screen
   useEffect(() => {
     if (!game || !roundOver) return;

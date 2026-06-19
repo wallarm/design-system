@@ -1,8 +1,19 @@
-import type { PointerEvent, ReactElement, RefObject } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { GameHud } from '../GameHud';
+import {
+  lazy,
+  type PointerEvent,
+  type ReactElement,
+  type RefObject,
+  Suspense,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { loadGamePlugins } from './game-plugins';
 import type { GameStats, SweepEngine } from './index';
 import { useGameKeyboard } from './useGameKeyboard';
+
+const LazyGameHud = lazy(() => import('../GameHud').then(m => ({ default: m.GameHud })));
 
 const GATE_TARGET = 5;
 
@@ -54,9 +65,33 @@ export const useGame = ({
   const faced = stats.stopped + stats.escaped;
   const accuracy = faced > 0 ? Math.round((stats.stopped / faced) * 100) : 100;
 
+  // track soundOn / isHalftone in refs so onEngineCreated can read the latest values
+  const soundOnRef = useRef(soundOn);
+  const isHalftoneRef = useRef(isHalftone);
+  useEffect(() => {
+    soundOnRef.current = soundOn;
+    isHalftoneRef.current = isHalftone;
+  });
+
   // bridge callbacks — called by the component's engine lifecycle
   const onEngineCreated = useCallback((engine: SweepEngine) => {
     engineRef.current = engine;
+
+    // sync sound state immediately
+    engine.setSound(gameRef.current && soundOnRef.current);
+
+    // sync game activation immediately
+    engine.setGameActive(gameRef.current && isHalftoneRef.current);
+
+    // load game plugins eagerly when game mode is active
+    if (gameRef.current) {
+      loadGamePlugins().then(plugins => {
+        if (engineRef.current === engine) {
+          engine.setPlugins(plugins);
+        }
+      });
+    }
+
     engine.onStats((s: GameStats) => {
       setStats(s);
       if (gameRef.current && !s.done) {
@@ -73,6 +108,22 @@ export const useGame = ({
   useEffect(() => {
     engineRef.current?.setGameActive(game && isHalftone);
   }, [game, isHalftone]);
+
+  // lazy-load game plugins
+  useEffect(() => {
+    if (!game) return;
+
+    let cancelled = false;
+
+    loadGamePlugins().then(plugins => {
+      if (cancelled) return;
+      engineRef.current?.setPlugins(plugins);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [game]);
 
   // card exclusion sync — compare by value to avoid re-runs on new object refs
   const exW = excludeCardSize?.width;
@@ -128,18 +179,20 @@ export const useGame = ({
   }, []);
 
   const hudElement = (
-    <GameHud
-      caught={caught}
-      armed={armed}
-      roundOver={roundOver}
-      stats={stats}
-      accuracy={accuracy}
-      faced={faced}
-      catchKey={catchKey}
-      gateTarget={GATE_TARGET}
-      onTryAgain={handleTryAgain}
-      soundOn={soundOn}
-    />
+    <Suspense fallback={null}>
+      <LazyGameHud
+        caught={caught}
+        armed={armed}
+        roundOver={roundOver}
+        stats={stats}
+        accuracy={accuracy}
+        faced={faced}
+        catchKey={catchKey}
+        gateTarget={GATE_TARGET}
+        onTryAgain={handleTryAgain}
+        soundOn={soundOn}
+      />
+    </Suspense>
   );
 
   return {
