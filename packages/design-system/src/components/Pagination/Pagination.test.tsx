@@ -395,11 +395,8 @@ describe('PaginationPageSize', () => {
       </Pagination>,
     );
     expect(screen.getByText('Rows per page')).toBeInTheDocument();
-    // current value shown on the select trigger
-    // Ark Select uses aria-labelledby (not aria-label) so the combobox name is empty in jsdom;
-    // fall back to querying by testid: PaginationPageSize passes data-testid="pg-page-size" to
-    // Select, which provides it as TestIdContext, so SelectButton derives "pg-page-size--button"
-    const trigger = screen.getByTestId('pg-page-size--button');
+    // the label is exposed as the combobox accessible name
+    const trigger = screen.getByRole('combobox', { name: /rows per page/i });
     expect(trigger).toHaveTextContent('25');
 
     await userEvent.click(trigger);
@@ -420,10 +417,10 @@ describe('PaginationPageSize', () => {
   it('renders every provided option in the dropdown', async () => {
     render(
       <Pagination count={200} defaultPageSize={25}>
-        <PaginationPageSize options={[10, 25, 50]} data-testid='pg-page-size' />
+        <PaginationPageSize options={[10, 25, 50]} />
       </Pagination>,
     );
-    await userEvent.click(screen.getByTestId('pg-page-size--button'));
+    await userEvent.click(screen.getByRole('combobox', { name: /rows per page/i }));
     expect(await screen.findByRole('option', { name: '10' })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: '25' })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: '50' })).toBeInTheDocument();

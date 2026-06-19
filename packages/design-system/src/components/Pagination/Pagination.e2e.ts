@@ -79,8 +79,7 @@ test.describe('Component: Pagination', () => {
 
     test('Should change the page size when a new option is selected', async ({ page }) => {
       await paginationStory.goto(page, 'Playground');
-      // There is only one combobox in this story (the page-size select)
-      const pageSizeSelect = page.getByRole('combobox');
+      const pageSizeSelect = page.getByRole('combobox', { name: /rows per page/i });
       await pageSizeSelect.click();
       await page.getByRole('option', { name: '50' }).click();
       await expect(pageSizeSelect).toHaveText(/50/);

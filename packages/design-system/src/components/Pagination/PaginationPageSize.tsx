@@ -45,10 +45,9 @@ export const PaginationPageSize: FC<PaginationPageSizeProps> = ({
           collection={collection}
           value={[String(api.pageSize)]}
           onValueChange={({ value }) => api.setPageSize(Number(value[0]))}
-          aria-label={label}
           data-testid={testId}
         >
-          <SelectButton />
+          <SelectButton aria-label={label} />
           <SelectPositioner>
             <SelectContent>
               {collection.items.map(item => (

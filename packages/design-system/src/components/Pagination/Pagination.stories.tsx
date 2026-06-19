@@ -131,7 +131,7 @@ interface ApiEndpoint {
 
 const METHODS = ['GET', 'POST', 'PUT', 'DELETE'] as const;
 
-const apiEndpoints: ApiEndpoint[] = Array.from({ length: 23 }, (_, i) => ({
+const apiEndpoints: ApiEndpoint[] = Array.from({ length: 47 }, (_, i) => ({
   id: `ep-${i + 1}`,
   method: METHODS[i % METHODS.length] as ApiEndpoint['method'],
   path: `/api/v2/resource/${i + 1}`,
