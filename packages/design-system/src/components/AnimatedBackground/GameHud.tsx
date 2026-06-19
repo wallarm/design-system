@@ -114,9 +114,7 @@ export const GameHud: FC<GameHudProps> = ({
           className='fixed bottom-24 left-1/2 -translate-x-1/2 text-xs pointer-events-none text-text-secondary'
           style={{ animation: 'hud-in 0.3s ease-out' }}
         >
-          {
-            'Click the red anomalies \u2014 catch 5 to arm the cannon, then \u2190 \u2192 move \u00B7 space fire'
-          }
+          {`Click the red anomalies \u2014 catch 5 to arm the cannon \u00B7 m sound ${soundOn ? 'off' : 'on'}`}
         </div>
       )}
     </>

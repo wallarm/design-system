@@ -11,49 +11,63 @@
 
 const MASTER_VOLUME = 0.06;
 
-let ctx: AudioContext | null = null;
+let ac: AudioContext | null = null;
 let master: GainNode | null = null;
 
-function ensureAudio(): { ac: AudioContext; out: GainNode } | null {
-  if (typeof window === 'undefined') return null;
-  if (!ctx) {
-    ctx = new AudioContext();
-    master = ctx.createGain();
+function ctx(): AudioContext | null {
+  if (typeof window === 'undefined' || !window.AudioContext) return null;
+  if (!ac) {
+    ac = new window.AudioContext();
+    master = ac.createGain();
     master.gain.value = MASTER_VOLUME;
-    master.connect(ctx.destination);
+    master.connect(ac.destination);
   }
-  if (ctx.state === 'suspended') {
-    ctx.resume();
-  }
-  if (!master) return null;
-  return { ac: ctx, out: master };
+  if (ac.state === 'suspended') ac.resume().catch(() => {});
+  return ac;
 }
 
-/** Schedule a sequence of equal-length square-wave notes and return the end time. */
-function scheduleNotes(
-  ac: AudioContext,
-  out: GainNode,
-  notes: number[],
-  step: number,
-  volume = 0.4,
-): number {
-  const now = ac.currentTime;
-  for (let i = 0; i < notes.length; i++) {
-    const t = now + i * step;
-    const osc = ac.createOscillator();
-    osc.type = 'square';
-    osc.frequency.value = notes[i]!;
+// One enveloped oscillator: type + pitch glide f0→f1 over dur seconds.
+function tone(type: OscillatorType, f0: number, f1: number, dur: number, vol: number, delay = 0) {
+  const a = ctx();
+  if (!a || !master) return;
+  const t0 = a.currentTime + delay;
+  const osc = a.createOscillator();
+  const gain = a.createGain();
+  osc.type = type;
+  osc.frequency.setValueAtTime(Math.max(1, f0), t0);
+  if (f1 !== f0) osc.frequency.exponentialRampToValueAtTime(Math.max(1, f1), t0 + dur);
+  gain.gain.setValueAtTime(vol, t0);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  osc.connect(gain);
+  gain.connect(master);
+  osc.start(t0);
+  osc.stop(t0 + dur + 0.02);
+}
 
-    const gain = ac.createGain();
-    gain.gain.setValueAtTime(volume, t);
-    gain.gain.setValueAtTime(volume, t + step * 0.85);
-    gain.gain.linearRampToValueAtTime(0, t + step);
-
-    osc.connect(gain).connect(out);
-    osc.start(t);
-    osc.stop(t + step);
-  }
-  return now + notes.length * step;
+// A short burst of band-passed white noise sweeping f0→f1 (the "crunch" layer).
+function hiss(dur: number, vol: number, f0: number, f1: number, delay = 0) {
+  const a = ctx();
+  if (!a || !master) return;
+  const t0 = a.currentTime + delay;
+  const n = Math.floor(a.sampleRate * dur);
+  const buf = a.createBuffer(1, n, a.sampleRate);
+  const data = buf.getChannelData(0);
+  for (let i = 0; i < n; i++) data[i] = Math.random() * 2 - 1;
+  const src = a.createBufferSource();
+  src.buffer = buf;
+  const filter = a.createBiquadFilter();
+  filter.type = 'bandpass';
+  filter.Q.value = 1.2;
+  filter.frequency.setValueAtTime(Math.max(1, f0), t0);
+  filter.frequency.exponentialRampToValueAtTime(Math.max(40, f1), t0 + dur);
+  const gain = a.createGain();
+  gain.gain.setValueAtTime(vol, t0);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+  src.connect(filter);
+  filter.connect(gain);
+  gain.connect(master);
+  src.start(t0);
+  src.stop(t0 + dur + 0.02);
 }
 
 /* ------------------------------------------------------------------ */
@@ -62,25 +76,7 @@ function scheduleNotes(
 /* ------------------------------------------------------------------ */
 
 export function playPew(): void {
-  const audio = ensureAudio();
-  if (!audio) return;
-  const { ac, out } = audio;
-
-  const now = ac.currentTime;
-  const dur = 0.08;
-
-  const osc = ac.createOscillator();
-  osc.type = 'square';
-  osc.frequency.setValueAtTime(980, now);
-  osc.frequency.linearRampToValueAtTime(180, now + dur);
-
-  const gain = ac.createGain();
-  gain.gain.setValueAtTime(0.5, now);
-  gain.gain.linearRampToValueAtTime(0, now + dur);
-
-  osc.connect(gain).connect(out);
-  osc.start(now);
-  osc.stop(now + dur);
+  tone('square', 980, 180, 0.08, 0.5);
 }
 
 /* ------------------------------------------------------------------ */
@@ -89,50 +85,8 @@ export function playPew(): void {
 /* ------------------------------------------------------------------ */
 
 export function playZap(): void {
-  const audio = ensureAudio();
-  if (!audio) return;
-  const { ac, out } = audio;
-
-  const now = ac.currentTime;
-
-  // Square component
-  const osc = ac.createOscillator();
-  osc.type = 'square';
-  osc.frequency.setValueAtTime(320, now);
-  osc.frequency.linearRampToValueAtTime(70, now + 0.06);
-
-  const oscGain = ac.createGain();
-  oscGain.gain.setValueAtTime(0.45, now);
-  oscGain.gain.linearRampToValueAtTime(0, now + 0.06);
-
-  osc.connect(oscGain).connect(out);
-  osc.start(now);
-  osc.stop(now + 0.06);
-
-  // Noise burst component
-  const bufLen = Math.ceil(ac.sampleRate * 0.07);
-  const buf = ac.createBuffer(1, bufLen, ac.sampleRate);
-  const data = buf.getChannelData(0);
-  for (let i = 0; i < bufLen; i++) {
-    data[i] = Math.random() * 2 - 1;
-  }
-
-  const noise = ac.createBufferSource();
-  noise.buffer = buf;
-
-  const bp = ac.createBiquadFilter();
-  bp.type = 'bandpass';
-  bp.frequency.setValueAtTime(1400, now);
-  bp.frequency.linearRampToValueAtTime(300, now + 0.07);
-  bp.Q.value = 2;
-
-  const noiseGain = ac.createGain();
-  noiseGain.gain.setValueAtTime(0.4, now);
-  noiseGain.gain.linearRampToValueAtTime(0, now + 0.07);
-
-  noise.connect(bp).connect(noiseGain).connect(out);
-  noise.start(now);
-  noise.stop(now + 0.07);
+  tone('square', 320, 70, 0.06, 0.45);
+  hiss(0.07, 0.3, 1400, 300);
 }
 
 /* ------------------------------------------------------------------ */
@@ -141,40 +95,8 @@ export function playZap(): void {
 /* ------------------------------------------------------------------ */
 
 export function playCoin(): void {
-  const audio = ensureAudio();
-  if (!audio) return;
-  const { ac, out } = audio;
-
-  const now = ac.currentTime;
-
-  // Note 1: B5 (988 Hz), 80 ms
-  const osc1 = ac.createOscillator();
-  osc1.type = 'square';
-  osc1.frequency.value = 988;
-
-  const gain1 = ac.createGain();
-  gain1.gain.setValueAtTime(0.4, now);
-  gain1.gain.setValueAtTime(0.4, now + 0.07);
-  gain1.gain.linearRampToValueAtTime(0, now + 0.08);
-
-  osc1.connect(gain1).connect(out);
-  osc1.start(now);
-  osc1.stop(now + 0.08);
-
-  // Note 2: E6 (1319 Hz), starts at 80 ms, lasts 380 ms
-  const osc2 = ac.createOscillator();
-  osc2.type = 'square';
-  osc2.frequency.value = 1319;
-
-  const gain2 = ac.createGain();
-  gain2.gain.setValueAtTime(0, now);
-  gain2.gain.setValueAtTime(0.4, now + 0.08);
-  gain2.gain.setValueAtTime(0.4, now + 0.38);
-  gain2.gain.linearRampToValueAtTime(0, now + 0.46);
-
-  osc2.connect(gain2).connect(out);
-  osc2.start(now + 0.08);
-  osc2.stop(now + 0.46);
+  tone('square', 988, 988, 0.08, 0.4);
+  tone('square', 1319, 1319, 0.38, 0.4, 0.08);
 }
 
 /* ------------------------------------------------------------------ */
@@ -183,9 +105,8 @@ export function playCoin(): void {
 /* ------------------------------------------------------------------ */
 
 export function playPowerUp(): void {
-  const audio = ensureAudio();
-  if (!audio) return;
-  scheduleNotes(audio.ac, audio.out, [392, 523, 659, 784], 0.06);
+  const notes = [392, 523, 659, 784];
+  for (let i = 0; i < notes.length; i++) tone('square', notes[i]!, notes[i]!, 0.07, 0.4, i * 0.06);
 }
 
 /* ------------------------------------------------------------------ */
@@ -194,23 +115,7 @@ export function playPowerUp(): void {
 /* ------------------------------------------------------------------ */
 
 export function playFanfare(): void {
-  const audio = ensureAudio();
-  if (!audio) return;
-  const { ac, out } = audio;
-
-  const finalT = scheduleNotes(ac, out, [523, 659, 784], 0.09);
-
-  // Final sustained C6
-  const osc = ac.createOscillator();
-  osc.type = 'square';
-  osc.frequency.value = 1046;
-
-  const gain = ac.createGain();
-  gain.gain.setValueAtTime(0.45, finalT);
-  gain.gain.setValueAtTime(0.45, finalT + 0.16);
-  gain.gain.linearRampToValueAtTime(0, finalT + 0.22);
-
-  osc.connect(gain).connect(out);
-  osc.start(finalT);
-  osc.stop(finalT + 0.22);
+  const notes = [523, 659, 784];
+  for (let i = 0; i < notes.length; i++) tone('square', notes[i]!, notes[i]!, 0.09, 0.4, i * 0.09);
+  tone('square', 1046, 1046, 0.22, 0.4, 0.27);
 }

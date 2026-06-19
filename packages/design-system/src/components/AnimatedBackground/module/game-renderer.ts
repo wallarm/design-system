@@ -1,6 +1,4 @@
-import type { CelDotParams } from './celebration';
-import { CEL_CAUGHT_COL, celDotEffect, computeCelFrameParams } from './celebration';
-import { drawCelebrationOverlay, getCelCannonOffset } from './celebration-renderer';
+import type { CelDotParams, CelState } from './celebration';
 import {
   AMB_SCALE,
   ANOMALY_ALPHA_BASE,
@@ -41,12 +39,35 @@ export interface GameRenderCtx {
   shadowPalette: string[];
 }
 
+/** Plugin interface for lazily-loaded celebration rendering modules. */
+export interface RenderPlugins {
+  CEL_CAUGHT_COL?: string;
+  celDotEffect?(
+    di: number,
+    x: number,
+    y: number,
+    params: CelDotParams,
+    w: number,
+    h: number,
+  ): { celBoost: number; celCol: string | null } | null;
+  computeCelFrameParams?(cel: CelState, t: number, w: number, h: number): CelDotParams | null;
+  drawCelebrationOverlay?(
+    rc: GameRenderCtx,
+    cel: CelState,
+    t: number,
+    host: GameEngineHost,
+    fontLoaded: boolean,
+  ): void;
+  getCelCannonOffset?(cel: CelState | null, cannonAway: boolean, t: number, h: number): number;
+}
+
 // factory
 export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: GameEngineHost) {
   // Pre-allocated arrays for per-frame anomaly envelope/visibility pre-computation.
   // Avoids allocating new arrays every frame.
   let envCache: number[] = [];
   let revealedCache: boolean[] = [];
+  let plugins: RenderPlugins = {};
 
   function drawGameDots(t: number): void {
     const { ctx, dotPalette, accentPalette, caughtPalette } = rc;
@@ -62,7 +83,7 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
     const cel = game.cel;
     let celParams: CelDotParams | null = null;
     if (cel) {
-      celParams = computeCelFrameParams(cel, t, w, h);
+      celParams = plugins.computeCelFrameParams?.(cel, t, w, h) ?? null;
     }
 
     // Precompute card exclusion rect (centered on canvas).
@@ -126,7 +147,7 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
       let celBoost = 0;
       let celCol: string | null = null;
       if (celParams) {
-        const eff = celDotEffect(di, dot.x, dot.y, celParams, w, h);
+        const eff = plugins.celDotEffect?.(di, dot.x, dot.y, celParams, w, h);
         if (eff) {
           celBoost = eff.celBoost;
           celCol = eff.celCol;
@@ -147,7 +168,7 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
       } else if (celBoost > 0.02) {
         // Celebration dot — render at full strength (ignore intensity)
         const celAlpha = Math.min(1, 0.15 + effVal * 0.85);
-        if (celCol === CEL_CAUGHT_COL) {
+        if (celCol === plugins.CEL_CAUGHT_COL) {
           ctx.fillStyle = caughtPalette[alphaIdx(celAlpha)]!;
         } else if (celCol) {
           // Rainbow or custom color
@@ -216,7 +237,7 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
     if (game.gameMode !== 'armed' && game.gameMode !== 'over' && !hasCel) return;
 
     // Celebration cannon liftoff
-    const liftOffset = getCelCannonOffset(cel, game.cannonAway, t, host.h);
+    const liftOffset = plugins.getCelCannonOffset?.(cel, game.cannonAway, t, host.h) ?? 0;
 
     if (game.gameMode === 'armed' && !hasCel) {
       const riseP = Math.min(1, (t - game.armT) / ARM_RISE);
@@ -259,8 +280,19 @@ export function createGameRenderer(rc: GameRenderCtx, game: GameLogic, host: Gam
   function drawCelOverlay(t: number): void {
     const cel = game.cel;
     if (!cel) return;
-    drawCelebrationOverlay(rc, cel, t, host, game.fontLoaded);
+    plugins.drawCelebrationOverlay?.(rc, cel, t, host, game.fontLoaded);
   }
 
-  return { drawGameDots, drawCaughtEffects, drawCannon, drawBullets, drawCelOverlay };
+  function setRenderPlugins(p: RenderPlugins) {
+    plugins = p;
+  }
+
+  return {
+    drawGameDots,
+    drawCaughtEffects,
+    drawCannon,
+    drawBullets,
+    drawCelOverlay,
+    setRenderPlugins,
+  };
 }
