@@ -1,3 +1,7 @@
+## <small>0.64.1 (2026-06-19)</small>
+
+* fix(design-system): remove mb-8 from SegmentedControl root (#170) ([2e7929b](https://github.com/wallarm/design-system/commit/2e7929b)), closes [#170](https://github.com/wallarm/design-system/issues/170)
+
 ## 0.64.0 (2026-06-18)
 
 * ci: trigger release for v0.64.0 [skip-e2e] ([10e8bd2](https://github.com/wallarm/design-system/commit/10e8bd2))
