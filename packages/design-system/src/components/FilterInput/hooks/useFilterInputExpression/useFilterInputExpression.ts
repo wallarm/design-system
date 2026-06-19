@@ -189,7 +189,36 @@ export const useFilterInputExpression = ({
       atIndex?: number,
       error?: ChipErrorSegment,
       dateOrigin?: 'relative' | 'absolute',
+      side?: 0 | 1,
     ) => {
+      // Paired triplet: merge onto the target condition's `pair` instead of
+      // replacing the base triplet. Target = the editing chip, or (while
+      // building) the last condition.
+      if (side === 1) {
+        setState(prev => {
+          const idx =
+            editingChipId != null
+              ? chipIdToConditionIndex(editingChipId)
+              : prev.conditions.length - 1;
+          if (idx == null || idx < 0 || idx >= prev.conditions.length) return prev;
+          const base = prev.conditions[idx]!;
+          const updated = [...prev.conditions];
+          updated[idx] = {
+            ...base,
+            pair: {
+              ...(operator && { operator }),
+              value: val,
+              ...(error && { error }),
+              ...(dateOrigin && { dateOrigin }),
+            },
+          };
+          const next = { conditions: updated, connectors: prev.connectors };
+          onChange?.(buildExpression(next.conditions, next.connectors));
+          return next;
+        });
+        return;
+      }
+
       const condition = buildCondition(field, operator, val, error, dateOrigin);
 
       setState(prev => {

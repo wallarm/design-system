@@ -25,6 +25,9 @@ export type UpsertCondition = (
   atIndex?: number,
   error?: ChipErrorSegment,
   dateOrigin?: 'relative' | 'absolute',
+  /** When 1, write the paired (second) triplet onto the target condition instead
+   *  of replacing the base triplet. Defaults to 0 (base triplet). */
+  side?: 0 | 1,
 ) => void;
 
 export interface FilterInputChipData {
