@@ -335,3 +335,43 @@ export const AllStatesShowcase: StoryFn = () => (
     </div>
   </div>
 );
+
+/**
+ * Paired (two-value) chip — two attribute/operator/value triplets joined by `;`.
+ * The second attribute is fixed by field config; both operators and values render.
+ */
+export const Paired: StoryFn<typeof meta> = () => (
+  <FilterInputChip
+    attribute='Context Param'
+    operator='is'
+    value='xxx'
+    pair={{ attribute: 'Value', operator: 'is', value: 'yyy' }}
+    onRemove={() => undefined}
+  />
+);
+
+/**
+ * Paired chip with an error on the required second value.
+ */
+export const PairedWithError: StoryFn<typeof meta> = () => (
+  <FilterInputChip
+    attribute='Context Param'
+    operator='is'
+    value='xxx'
+    pair={{ attribute: 'Value', operator: 'is', value: 'yyy', error: 'value' }}
+    onRemove={() => undefined}
+  />
+);
+
+/**
+ * Paired chip with long text to demonstrate truncation across both triplets.
+ */
+export const PairedWithLongText: StoryFn<typeof meta> = () => (
+  <FilterInputChip
+    attribute='Context Param With A Long Name'
+    operator='is'
+    value='a-very-long-first-value-that-truncates'
+    pair={{ attribute: 'Value', operator: 'is', value: 'a-very-long-second-value-that-truncates' }}
+    onRemove={() => undefined}
+  />
+);
