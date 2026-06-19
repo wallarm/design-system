@@ -28,14 +28,6 @@ export function useNavPanelGroupContext(): NavPanelGroupContextValue {
   return useContext(NavPanelGroupContext);
 }
 
-const NavPanelDepthContext = createContext(0);
-
-export function useNavPanelDepth(): number {
-  return useContext(NavPanelDepthContext);
-}
-
-export { NavPanelDepthContext };
-
 export interface NavPanelGroupProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   ref?: Ref<HTMLDivElement>;
   expanded?: boolean;

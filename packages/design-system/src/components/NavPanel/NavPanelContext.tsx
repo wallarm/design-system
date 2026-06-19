@@ -20,3 +20,30 @@ export function useNavPanelInternalContext(): NavPanelInternalContextValue {
   }
   return ctx;
 }
+
+// Depth context for nested NavPanelGroup indentation
+
+const NAV_PANEL_BASE_PADDING = 8;
+const NAV_PANEL_DEFAULT_INDENT = 24;
+
+interface NavPanelDepthContextValue {
+  depth: number;
+  indent: number;
+}
+
+const NavPanelDepthContext = createContext<NavPanelDepthContextValue>({
+  depth: 0,
+  indent: NAV_PANEL_DEFAULT_INDENT,
+});
+
+export const NavPanelDepthProvider = NavPanelDepthContext.Provider;
+
+export function useNavPanelDepth(): number {
+  return useContext(NavPanelDepthContext).depth;
+}
+
+export function useNavPanelIndent(): number {
+  return useContext(NavPanelDepthContext).indent;
+}
+
+export { NAV_PANEL_BASE_PADDING };
