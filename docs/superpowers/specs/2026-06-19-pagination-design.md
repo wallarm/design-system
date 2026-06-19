@@ -131,8 +131,8 @@ const [page, setPage] = useState(1);
   <PaginationNext />
 </Pagination>
 
-// SIMPLE  -> <PaginationPrevious /> + <PaginationNext />
-// LINKS ONLY -> <PaginationList />
+// SIMPLE  -> <PaginationList /> (page numbers only)
+// LINKS ONLY -> <PaginationPrevious /> + <PaginationNext /> (prev/next links only)
 
 // WITH ROWS-PER-PAGE
 <Pagination count={120} defaultPageSize={25} onPageChange={...}>
@@ -169,8 +169,8 @@ Plus barrel export block added to `packages/design-system/src/index.ts`.
 `satisfies Meta<typeof Pagination>`, imports from `storybook-react-rsbuild`.
 
 - `Full` — prev + numbers + next (medium)
-- `Simple` — prev + next only
-- `LinksOnly` — numbers only
+- `Simple` — page numbers only
+- `LinksOnly` — prev + next links only
 - `WithPageSize` — full bar incl. Rows-per-page
 - `Sizes` — medium vs small side by side
 - `Alignment` — left / center / right

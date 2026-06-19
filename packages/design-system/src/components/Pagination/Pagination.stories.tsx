@@ -33,16 +33,18 @@ export const Full: StoryFn<typeof Pagination> = () => (
   </Pagination>
 );
 
+// Simple = page numbers only (no prev/next links)
 export const Simple: StoryFn<typeof Pagination> = () => (
   <Pagination count={120} pageSize={10} defaultPage={2} align='center'>
-    <PaginationPrevious />
-    <PaginationNext />
+    <PaginationList />
   </Pagination>
 );
 
+// Links only = Previous/Next links only (no page numbers)
 export const LinksOnly: StoryFn<typeof Pagination> = () => (
   <Pagination count={120} pageSize={10} defaultPage={2} align='center'>
-    <PaginationList />
+    <PaginationPrevious />
+    <PaginationNext />
   </Pagination>
 );
 
