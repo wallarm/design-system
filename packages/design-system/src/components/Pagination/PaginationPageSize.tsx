@@ -44,11 +44,9 @@ export const PaginationPageSize: FC<PaginationPageSizeProps> = ({
       data-slot='pagination-page-size'
       data-testid={testId}
     >
-      <span className='whitespace-nowrap'>
-        <Text size='sm' weight='medium' color='primary'>
-          {label}
-        </Text>
-      </span>
+      <Text asChild size='sm' weight='medium' color='primary'>
+        <span className='whitespace-nowrap'>{label}</span>
+      </Text>
       <div className='w-fit'>
         <Select
           collection={collection}
