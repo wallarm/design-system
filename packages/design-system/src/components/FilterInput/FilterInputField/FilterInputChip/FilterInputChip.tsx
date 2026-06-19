@@ -1,15 +1,19 @@
 import type { FC, HTMLAttributes, MouseEvent as ReactMouseEvent, Ref } from 'react';
 import { useCallback, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
-import type { ChipErrorSegment } from '../../types';
+import type { ChipErrorSegment, FilterInputChipData } from '../../types';
 import { ChipSearchInput } from './ChipSearchInput';
 import { chipVariants } from './classes';
 import { useEditingContext } from './context/EditingContext';
 import { FilterInputRemoveButton } from './FilterInputRemoveButton';
+import { PairSeparator } from './PairSeparator';
 import { Segment } from './Segment';
 import { SEGMENT_VARIANT, type SegmentVariant } from './segmentVariant';
 
 export type ChipSegment = SegmentVariant;
+
+/** Editable segments of the paired (second) triplet. The paired attribute is fixed. */
+export type PairSegment = Extract<SegmentVariant, 'operator' | 'value'>;
 
 export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   ref?: Ref<HTMLDivElement>;
@@ -24,8 +28,12 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
   building?: boolean;
   /** When true, the chip cannot be edited or removed (dimmed appearance) */
   disabled?: boolean;
+  /** Second paired triplet (two-step fields). The paired attribute is fixed. */
+  pair?: FilterInputChipData['pair'];
   onRemove?: () => void;
   onSegmentClick?: (segment: ChipSegment, anchorEl: HTMLElement) => void;
+  /** Click on an editable paired segment (operator/value of the second triplet). */
+  onPairSegmentClick?: (segment: PairSegment, anchorEl: HTMLElement) => void;
 }
 
 export const FilterInputChip: FC<FilterInputChipProps> = ({
@@ -40,8 +48,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   errorValueIndices,
   building = false,
   disabled = false,
+  pair,
   onRemove,
   onSegmentClick,
+  onPairSegmentClick,
   className,
   ...props
 }) => {
@@ -71,6 +81,17 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       onSegmentClick(segment, anchorEl);
     },
     [onSegmentClick, activeSegment],
+  );
+
+  const handlePairSegmentClick = useCallback(
+    (segment: PairSegment, e: ReactMouseEvent) => {
+      if (!onPairSegmentClick) return;
+      e.stopPropagation();
+      const anchorEl = internalRef.current;
+      if (!anchorEl) return;
+      onPairSegmentClick(segment, anchorEl);
+    },
+    [onPairSegmentClick],
   );
 
   /**
@@ -153,6 +174,35 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
         >
           {value ?? ''}
         </Segment>
+      )}
+
+      {pair && (
+        <>
+          <PairSeparator />
+          {/* Paired attribute is fixed by config — non-interactive. */}
+          <Segment variant={SEGMENT_VARIANT.attribute} className='shrink-0'>
+            {pair.attribute}
+          </Segment>
+          {pair.operator && (
+            <Segment
+              variant={SEGMENT_VARIANT.operator}
+              className='shrink-0'
+              onClick={interactive ? e => handlePairSegmentClick('operator', e) : undefined}
+            >
+              {pair.operator}
+            </Segment>
+          )}
+          {pair.value != null && (
+            <Segment
+              variant={SEGMENT_VARIANT.value}
+              className='min-w-0'
+              error={pair.error === true || pair.error === SEGMENT_VARIANT.value}
+              onClick={interactive ? e => handlePairSegmentClick('value', e) : undefined}
+            >
+              {pair.value}
+            </Segment>
+          )}
+        </>
       )}
 
       {/* Hide trailing search input during inline-edit — focus is in the segment. */}
