@@ -132,8 +132,27 @@ const buildMultiValueChip = (
   };
 };
 
-/** Build a display chip for a single condition */
-const makeConditionChip = (
+/** Build the paired display triplet (second key-value) when present. */
+const buildPairChip = (
+  condition: Condition,
+  field: FieldMetadata | undefined,
+  fields: FieldMetadata[],
+): FilterInputChipData['pair'] => {
+  if (!condition.pair || !field?.pairedField) return undefined;
+  const pf = field.pairedField;
+  const { operator, value, error } = condition.pair;
+  return {
+    attribute: pf.label || pf.name,
+    operator: operator ? getOperatorLabel(operator, pf.type || DEFAULT_FIELD_TYPE) : undefined,
+    value:
+      resolveValueLabel(value as string | number | boolean | null, pf, fields) ??
+      String(value ?? ''),
+    ...(error && { error }),
+  };
+};
+
+/** Build a display chip for a single condition (without the paired triplet) */
+const makeConditionChipBase = (
   i: number,
   conditions: Condition[],
   fields: FieldMetadata[],
@@ -167,6 +186,21 @@ const makeConditionChip = (
     value: resolveDisplayValue(condition, field, fields),
     error: chipError,
   };
+};
+
+/** Build a display chip for a single condition, including the paired triplet. */
+const makeConditionChip = (
+  i: number,
+  conditions: Condition[],
+  fields: FieldMetadata[],
+  error: boolean,
+): FilterInputChipData => {
+  const base = makeConditionChipBase(i, conditions, fields, error);
+  const condition = conditions[i];
+  if (!condition) return base;
+  const field = fields.find(f => f.name === condition.field);
+  const pair = buildPairChip(condition, field, fields);
+  return pair ? { ...base, pair } : base;
 };
 
 /**
