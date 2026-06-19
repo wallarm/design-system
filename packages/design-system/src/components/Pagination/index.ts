@@ -5,4 +5,6 @@ export {
   type PaginationProps,
 } from './Pagination';
 export { usePaginationSizeContext } from './PaginationContext';
+export { PaginationEllipsis, type PaginationEllipsisProps } from './PaginationEllipsis';
+export { PaginationItem, type PaginationItemProps } from './PaginationItem';
 export type { PaginationAlign, PaginationSize } from './types';
