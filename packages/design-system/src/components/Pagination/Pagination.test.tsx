@@ -90,3 +90,41 @@ describe('PaginationList', () => {
     expect(list.querySelectorAll('[data-slot="pagination-ellipsis"]')).toHaveLength(1);
   });
 });
+
+import { userEvent } from '@testing-library/user-event';
+import { vi } from 'vitest';
+import { PaginationNext } from './PaginationNext';
+import { PaginationPrevious } from './PaginationPrevious';
+
+describe('Pagination prev/next', () => {
+  it('disables Previous on the first page and Next on the last', () => {
+    const { rerender } = render(
+      <Pagination count={30} pageSize={10} page={1}>
+        <PaginationPrevious />
+        <PaginationNext />
+      </Pagination>,
+    );
+    expect(screen.getByRole('button', { name: /previous/i })).toBeDisabled();
+    expect(screen.getByRole('button', { name: /next/i })).toBeEnabled();
+
+    rerender(
+      <Pagination count={30} pageSize={10} page={3}>
+        <PaginationPrevious />
+        <PaginationNext />
+      </Pagination>,
+    );
+    expect(screen.getByRole('button', { name: /next/i })).toBeDisabled();
+  });
+
+  it('calls onPageChange when Next is clicked', async () => {
+    const onPageChange = vi.fn();
+    render(
+      <Pagination count={30} pageSize={10} defaultPage={1} onPageChange={onPageChange}>
+        <PaginationPrevious />
+        <PaginationNext />
+      </Pagination>,
+    );
+    await userEvent.click(screen.getByRole('button', { name: /next/i }));
+    expect(onPageChange).toHaveBeenCalledWith(expect.objectContaining({ page: 2 }));
+  });
+});

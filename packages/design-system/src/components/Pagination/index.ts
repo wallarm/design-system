@@ -8,4 +8,6 @@ export { usePaginationSizeContext } from './PaginationContext';
 export { PaginationEllipsis, type PaginationEllipsisProps } from './PaginationEllipsis';
 export { PaginationItem, type PaginationItemProps } from './PaginationItem';
 export { PaginationList, type PaginationListProps, type PaginationPage } from './PaginationList';
+export { PaginationNext, type PaginationNextProps } from './PaginationNext';
+export { PaginationPrevious, type PaginationPreviousProps } from './PaginationPrevious';
 export type { PaginationAlign, PaginationSize } from './types';
