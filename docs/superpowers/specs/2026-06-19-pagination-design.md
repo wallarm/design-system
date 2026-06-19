@@ -13,127 +13,134 @@ Storybook stories.
 
 ## Design decisions (locked)
 
-- **API style: pure composition.** The root `Pagination` provides context + a
-  `<nav>` landmark; the consumer assembles the bar from exported sub-components.
-  The Figma "Type" (Full / Simple / Links only) is **not a prop** — it is
-  expressed by *which* sub-components are included.
-- **Range logic lives in a `usePagination` hook** (controlled + uncontrolled),
-  so pure composition stays ergonomic for large page counts. The hook is
-  optional; components render fine without it.
-- **Rows-per-page is a ready-made sub-component** `PaginationPageSize`, configured
-  by props (`value` / `options` / `onChange`) — the consumer drops it in rather
-  than hand-assembling `Select` + `Separator` + label.
-- **Ellipsis is non-interactive** — matches Figma (disabled look, `opacity-50`),
-  rendered as `aria-hidden` decoration.
-- **Semantics:** `nav > ul > li > button`. Active page gets `aria-current="page"`.
+- **Built on `@ark-ui/react/pagination`** (already a dependency, `5.31.0`, on
+  `@zag-js/pagination`). We wrap Ark's primitives exactly like `Tabs` wraps Ark
+  Tabs and `Select` wraps Ark Select. Ark owns all state, range math, the
+  ellipsis collapsing, disabled-at-bounds logic, and a11y (`<nav>` landmark +
+  `aria-current="page"`). **We do not write our own range algorithm.**
+- **Data model: Ark-native `count` + `pageSize`.** `count` = total number of data
+  *items*; `pageSize` = items per page; Ark derives `totalPages`. This makes the
+  "Rows per page" control native (the Select drives Ark's `pageSize`). We do
+  **not** invent a `pageCount` wrapper.
+- **API style: composition.** The Figma "Type" (Full / Simple / Links only) is
+  **not a prop** — it is expressed by *which* sub-components are included.
+- **Rows-per-page is a ready-made sub-component** `PaginationPageSize`; it reads
+  `pageSize` / `setPageSize` from Ark context, so the consumer only passes
+  `options`.
+- **Ellipsis is non-interactive** — Ark's `Ellipsis` is a `<div>`, matching Figma
+  (disabled look, `opacity-50`), rendered `aria-hidden`.
+- **Semantics:** `nav > ul > li > button`. `PaginationList` renders `<ul>`,
+  wrapping each Ark item/ellipsis in an `<li>`. Active page → Ark sets
+  `aria-current="page"` / `data-selected`.
+- **No custom hook export.** Ark already exports `usePagination` /
+  `usePaginationContext` for headless use; consumers can import those from the DS
+  if needed (re-exported from the barrel).
 
 ## Reused building blocks
 
 | Need | Reuse |
 |---|---|
-| Previous / Next buttons | `Button` (`variant="ghost"`, `color="neutral"`) + `ArrowLeft`/`ArrowRight` icons |
-| Page number buttons | `ToggleButton` (`variant="ghost"`, `color="neutral"`, `active`) |
-| Rows-per-page select | `Select` (+ `Separator` divider) |
-| Ellipsis glyph | `Ellipsis` icon from `../../icons` |
+| Root state machine, range, ellipsis, a11y | `@ark-ui/react/pagination` (`Pagination.Root`, `PrevTrigger`, `NextTrigger`, `Item`, `Ellipsis`, `Context`) |
+| Previous / Next buttons | Ark trigger `asChild` → `Button` (`variant="ghost"`, `color="neutral"`) + `ArrowLeft`/`ArrowRight` |
+| Page number buttons | styled Ark `Item` (`<button>`), toggle-button visual via CVA, active via `data-[selected]` |
+| Rows-per-page select | `Select` (small) + `Separator` divider, wired to Ark `pageSize` |
+| Ellipsis glyph | styled Ark `Ellipsis` (`<div>`) + `Ellipsis` icon from `../../icons` |
 
 Size mapping: Pagination `medium` → `ButtonBase` `medium` (32px); Pagination
-`small` → `ButtonBase` `small` (24px).
+`small` → `ButtonBase` `small` (24px). Page-number squares: 32px medium / 24px small.
 
 ## Exported API
 
 ```
-Pagination            // <nav aria-label>, size/align context, TestIdProvider
-PaginationPageSize    // "Rows per page" label + Select + vertical Separator
-PaginationPrevious    // ← Previous button
-PaginationList        // <ul> wrapper, gap-2
-PaginationItem        // page-number <li><button>, active -> aria-current
-PaginationEllipsis    // non-interactive "···"
-PaginationNext        // Next → button
-usePagination         // range/ellipsis hook
+Pagination            // wraps Ark Pagination.Root (<nav>), size/align context, TestIdProvider
+PaginationPageSize    // "Rows per page" label + Select + Separator, wired to Ark pageSize
+PaginationPrevious    // Ark PrevTrigger asChild -> Button + ArrowLeft
+PaginationList        // <ul>; maps Ark api.pages -> li > PaginationItem / PaginationEllipsis
+PaginationItem        // styled Ark Item (<button>); active via data-selected
+PaginationEllipsis    // styled Ark Ellipsis (<div>), non-interactive
+PaginationNext        // Ark NextTrigger asChild -> Button + ArrowRight
 ```
 
-All component Props types are exported alongside their component. Everything is
-re-exported from `packages/design-system/src/index.ts`.
+Re-export Ark's `usePagination` / `usePaginationContext` (+ detail types
+`PaginationPageChangeDetails`, `PaginationPageSizeChangeDetails`) from the DS
+barrel for headless use. All component Props types are exported alongside their
+component. Everything re-exported from `packages/design-system/src/index.ts`.
 
 ### `Pagination` props
 
+Ark-native (forwarded to `Pagination.Root`):
+- `count?: number` — total data items.
+- `pageSize?` / `defaultPageSize?` (Ark default `10`).
+- `page?` / `defaultPage?` (Ark default `1`).
+- `siblingCount?` (default `1`), `boundaryCount?` (default `1`).
+- `onPageChange?: (details: { page: number; pageSize: number }) => void`.
+- `onPageSizeChange?: (details: { pageSize: number }) => void`.
+- `type?: 'button' | 'link'` (default `'button'`) + `getPageUrl?` — link pagination.
+
+DS-specific:
 - `size?: 'medium' | 'small'` (default `'medium'`) — provided via context to children.
 - `align?: 'left' | 'center' | 'right'` (default `'left'`) — `justify-*` on the nav row.
-- `'aria-label'?: string` (default `'Pagination'`).
-- `+ TestableProps`, `ref?: Ref<HTMLElement>`, `...HTMLAttributes<HTMLElement>`.
+- `'aria-label'?: string` (default `'Pagination'`) → Ark `translations.rootLabel`.
+- `+ TestableProps`, `ref?: Ref<HTMLElement>`.
 
 ### Context
 
-`PaginationContext` carries `{ size }`. Sub-components read it via a
-`usePaginationContext()` hook to pick the matching `ButtonBase` size. Pattern
-mirrors `TabsSharedContext`.
+`PaginationContext` (ours) carries `{ size }`. Sub-components read it via
+`usePaginationSizeContext()` to pick the matching `ButtonBase` size. Pattern
+mirrors `TabsSharedContext`. (Distinct from Ark's `usePaginationContext`, which
+carries the pagination state/`pages`.)
 
-### Sub-component props (all forward `...rest` to the real interactive node)
+### Sub-component behaviour (all forward `...rest` to the real interactive node)
 
-- `PaginationItem`: `{ active?: boolean; disabled?: boolean; onClick?; children }`
-  → `<li><ToggleButton .../></li>`; fixed square (32px medium / 24px small);
-  `active` → `aria-current="page"` + ToggleButton `active`.
-- `PaginationPrevious` / `PaginationNext`: `{ disabled?; onClick?; children? }`
-  → `Button` ghost/neutral with leading/trailing arrow. Default label
-  "Previous"/"Next" (overridable via children).
-- `PaginationEllipsis`: decorative `<li aria-hidden>` square with `Ellipsis`
-  icon, `opacity-50`, non-interactive.
-- `PaginationList`: `<ul>` flex row, `gap-2`.
-- `PaginationPageSize`: `{ value; options: number[]; onChange?; label?: string }`
-  → label + `Select` (small) + vertical `Separator`. Placed first inside
-  `Pagination`.
-
-### `usePagination`
-
-```ts
-usePagination(options: {
-  count: number;            // total pages (pageCount)
-  page?: number;            // controlled current page (1-based)
-  defaultPage?: number;     // uncontrolled initial page (default 1)
-  onChange?: (page: number) => void;
-  siblingCount?: number;    // pages around current (default 1)
-  boundaryCount?: number;   // pages pinned at each end (default 1)
-}): {
-  page: number;
-  setPage: (page: number) => void;
-  items: Array<
-    | { type: 'page'; value: number; selected: boolean }
-    | { type: 'ellipsis'; key: string }
-  >;
-  isFirst: boolean;         // page === 1
-  isLast: boolean;          // page === count
-}
-```
-
-Range algorithm: always show `boundaryCount` pages at each end, `siblingCount`
-pages on each side of the current page, and collapse the gaps into a single
-`ellipsis` item. When there is no real gap (≤1 hidden page) render the page
-instead of an ellipsis (avoids "1 … 2" type artifacts).
+- `PaginationPrevious` / `PaginationNext`: `{ children?; ...buttonProps }`. Wrap
+  Ark `PrevTrigger` / `NextTrigger` with `asChild`, child is `Button`
+  ghost/neutral with leading/trailing arrow. Default label "Previous"/"Next"
+  (overridable via children). Ark applies `disabled` at the bounds automatically.
+- `PaginationList`: `{ children?: (page, api) => ReactNode }`. Renders `<ul>` flex
+  row, `gap-2`. Default: uses Ark `Pagination.Context` to map `api.pages` — for
+  each entry render `<li>` containing `PaginationItem` (`type:'page'`) or
+  `PaginationEllipsis` (`type:'ellipsis'`). Optional render-prop overrides the
+  mapping.
+- `PaginationItem`: `{ value: number; ...buttonProps }` → styled Ark `Item`
+  (fixed square 32px medium / 24px small). Active state via `data-[selected]`
+  (Ark also sets `aria-current="page"`). Visual matches ToggleButton ghost/neutral.
+- `PaginationEllipsis`: `{ index: number }` → styled Ark `Ellipsis` (`<div>`),
+  square, `opacity-50`, `aria-hidden`, contains `Ellipsis` icon. Non-interactive.
+- `PaginationPageSize`: `{ options: number[]; label?: string; ...rest }`. Reads
+  `pageSize` + `setPageSize` from Ark `usePaginationContext`. Renders `label`
+  (default "Rows per page") + `Select` (small) bound to `pageSize` + vertical
+  `Separator`. Placed first inside `Pagination`.
 
 ## Usage (the three Figma types)
 
 ```tsx
-const { items, page, setPage, isFirst, isLast } = usePagination({ count: 12, page, onChange: setPage });
+const [page, setPage] = useState(1);
 
 // FULL
-<Pagination size="medium" align="center" aria-label="Search results">
-  <PaginationPrevious disabled={isFirst} onClick={() => setPage(page - 1)} />
-  <PaginationList>
-    {items.map((it) =>
-      it.type === 'ellipsis' ? (
-        <PaginationEllipsis key={it.key} />
-      ) : (
-        <PaginationItem key={it.value} active={it.selected} onClick={() => setPage(it.value)}>
-          {it.value}
-        </PaginationItem>
-      ),
-    )}
-  </PaginationList>
-  <PaginationNext disabled={isLast} onClick={() => setPage(page + 1)} />
+<Pagination
+  count={120}
+  pageSize={10}
+  page={page}
+  siblingCount={1}
+  align="center"
+  aria-label="Search results"
+  onPageChange={({ page }) => setPage(page)}
+>
+  <PaginationPrevious />
+  <PaginationList />
+  <PaginationNext />
 </Pagination>
 
-// SIMPLE  -> only <PaginationPrevious /> + <PaginationNext />
-// LINKS ONLY -> only <PaginationList>...</PaginationList>
+// SIMPLE  -> <PaginationPrevious /> + <PaginationNext />
+// LINKS ONLY -> <PaginationList />
+
+// WITH ROWS-PER-PAGE
+<Pagination count={120} defaultPageSize={25} onPageChange={...}>
+  <PaginationPageSize options={[10, 25, 50]} />
+  <PaginationPrevious />
+  <PaginationList />
+  <PaginationNext />
+</Pagination>
 ```
 
 ## Files
@@ -141,16 +148,15 @@ const { items, page, setPage, isFirst, isLast } = usePagination({ count: 12, pag
 ```
 packages/design-system/src/components/Pagination/
   Pagination.tsx
-  PaginationContext.tsx
+  PaginationContext.tsx        // DS size context + usePaginationSizeContext
   PaginationList.tsx
   PaginationItem.tsx
   PaginationEllipsis.tsx
   PaginationPrevious.tsx
   PaginationNext.tsx
   PaginationPageSize.tsx
-  usePagination.ts
-  classes.ts            // CVA variants (item, list, ellipsis, nav align)
-  types.ts              // PaginationSize, PaginationAlign, item data types
+  classes.ts                   // CVA: item (square + active), ellipsis, root align
+  types.ts                     // PaginationSize, PaginationAlign
   index.ts
   Pagination.stories.tsx
   Pagination.test.tsx
@@ -168,8 +174,8 @@ Plus barrel export block added to `packages/design-system/src/index.ts`.
 - `WithPageSize` — full bar incl. Rows-per-page
 - `Sizes` — medium vs small side by side
 - `Alignment` — left / center / right
-- `ManyPages` — count=50 to show ellipsis collapsing
-- `Playground` — controlled via `useState` + `usePagination`
+- `ManyPages` — large `count` to show ellipsis collapsing
+- `Playground` — controlled via `useState` (`page` + `onPageChange`)
 
 ## Component rules compliance
 
@@ -185,18 +191,20 @@ Plus barrel export block added to `packages/design-system/src/index.ts`.
 
 ## Metrics / analytics-readiness
 
-Pure composition satisfies the contract natively: each interactive sub-component
-spreads `{...rest}` onto its real interactive DOM node (the `<button>` inside
-`Button` / `ToggleButton`), so consumer `data-analytics-id` /
-`data-analytics-props` land on the correct target with no analytics-specific DS
-props. `PaginationList` / `Pagination` / `PaginationEllipsis` are wrappers and
-forward their attrs to their own (non-interactive) nodes.
+Composition satisfies the contract natively: each interactive sub-component
+spreads `{...rest}` onto its real interactive DOM node (the `<button>` rendered by
+Ark `Item` / `PrevTrigger` / `NextTrigger`, reused via `Button`), so consumer
+`data-analytics-id` / `data-analytics-props` land on the correct target with no
+analytics-specific DS props. `PaginationList` / `Pagination` / `PaginationEllipsis`
+are wrappers and forward their attrs to their own (non-interactive) nodes.
 
 ## Testing
 
-- **Unit (`Pagination.test.tsx`)**: `usePagination` range math (boundaries,
-  ellipsis collapse, controlled/uncontrolled, clamping); `aria-current` on active
-  item; size context propagation; testid cascade; props forwarding to DOM.
+- **Unit (`Pagination.test.tsx`)**: renders correct page items + ellipsis for a
+  given `count`/`pageSize`/`siblingCount`; `aria-current` on active item;
+  prev/next disabled at bounds; `onPageChange` fires with the right page;
+  `PaginationPageSize` changes `pageSize` and fires `onPageSizeChange`; size
+  context propagation; testid cascade; props forwarding to DOM (analytics attrs).
 - **E2E (`Pagination.e2e.ts`)**: per `docs/e2e-test-rules.md` — Screenshot
   (Full/Simple/LinksOnly/WithPageSize × medium/small × alignments), Interaction
   (click page, prev/next, disabled bounds, page-size change), Accessibility.
@@ -204,4 +212,4 @@ forward their attrs to their own (non-interactive) nodes.
 ## Out of scope
 
 - No remote/data-fetching integration.
-- No URL/query-string syncing.
+- No URL/query-string syncing (beyond Ark's `type="link"` + `getPageUrl` passthrough).
