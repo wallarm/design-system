@@ -39,11 +39,7 @@ export const PaginationPageSize: FC<PaginationPageSizeProps> = ({
   );
 
   return (
-    <div
-      className={cn('flex items-center gap-6', className)}
-      data-slot='pagination-page-size'
-      data-testid={testId}
-    >
+    <div className={cn('flex items-center gap-6', className)} data-slot='pagination-page-size'>
       <Text asChild size='sm' weight='medium' color='primary'>
         <span className='whitespace-nowrap'>{label}</span>
       </Text>
