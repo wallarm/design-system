@@ -44,8 +44,13 @@ test.describe('Component: Pagination', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should collapse many pages with an ellipsis', async ({ page }) => {
+    test('Should render many pages with ellipsis correctly', async ({ page }) => {
       await paginationStory.goto(page, 'ManyPages');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the interactive playground correctly', async ({ page }) => {
+      await paginationStory.goto(page, 'Playground');
       await expect(page).toHaveScreenshot();
     });
   });
