@@ -23,7 +23,7 @@
 @import './components/accordion.css';
 @import './components/progress.css';
 @import './components/product-nav.css';
-@import './components/login-background.css';
+@import './components/animated-background.css';
 
 [data-scope='scroll-area'][data-part='viewport'] {
     scrollbar-width: none;
