@@ -1207,4 +1207,72 @@ describe('FilterInput', () => {
       expect(onChange).not.toHaveBeenCalled();
     });
   });
+
+  describe('paired field build cascade (AS-1160)', () => {
+    const pairedValueField: FieldMetadata = {
+      name: 'ctx_value',
+      label: 'Value',
+      type: 'enum',
+      values: [{ value: 'yyy', label: 'yyy' }],
+    };
+    const pairedFields: FieldMetadata[] = [
+      {
+        name: 'ctx_param',
+        label: 'Context Param',
+        type: 'enum',
+        values: [{ value: 'xxx', label: 'xxx' }],
+        pairedField: pairedValueField,
+      },
+    ];
+
+    it('reveals the second triplet as one building chip after the first value', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<FilterInput fields={pairedFields} />);
+
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+
+      // Side 0: field → operator → value.
+      await user.click(await findMenuitem('Context Param'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.click(await findMenuitem(/^xxx$/));
+
+      // The cascade advances into the paired second triplet: the SAME (building)
+      // chip now shows the first value, the paired attribute, and a ; separator —
+      // not a separate second chip.
+      await waitFor(() => {
+        const chip = container.querySelector('[data-building]');
+        expect(chip).not.toBeNull();
+        expect(chip!.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
+      });
+      const buildingChip = container.querySelector('[data-building]')!;
+      expect(
+        [...buildingChip.querySelectorAll('[data-slot="segment-attribute"]')].map(
+          n => n.textContent,
+        ),
+      ).toEqual(['Context Param', 'Value']);
+      expect(buildingChip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('xxx');
+      // The operator menu for the paired field is open (side 1 in progress).
+      expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
+    });
+
+    it('renders a committed paired condition as one chip with both triplets', () => {
+      const condition: Condition = {
+        type: 'condition',
+        field: 'ctx_param',
+        operator: '=',
+        value: 'xxx',
+        pair: { operator: '=', value: 'yyy' },
+      };
+      const { container } = render(<FilterInput fields={pairedFields} value={condition} />);
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(
+        [...chip.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
+      ).toEqual(['Context Param', 'Value']);
+      expect(
+        [...chip.querySelectorAll('[data-slot="segment-value"]')].map(n => n.textContent),
+      ).toEqual(['xxx', 'yyy']);
+      expect(chip.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
+    });
+  });
 });

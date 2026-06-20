@@ -6,6 +6,8 @@ export interface BuildingChipData {
   attribute: string;
   operator?: string;
   value?: string;
+  /** Paired second triplet shown while building a two-step field's second value. */
+  pair?: FilterInputChipData['pair'];
 }
 
 export interface FilterInputContextValue {

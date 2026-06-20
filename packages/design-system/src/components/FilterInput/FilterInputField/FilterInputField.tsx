@@ -159,6 +159,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
                   attribute={buildingChipData.attribute}
                   operator={buildingChipData.operator}
                   value={buildingChipData.value}
+                  pair={buildingChipData.pair}
                   onSegmentClick={onBuildingChipClick}
                   className='mx-4'
                 />

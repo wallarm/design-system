@@ -10,6 +10,7 @@ import {
   NO_VALUE_PLACEHOLDER,
 } from '../../../lib';
 import type { Condition, FieldMetadata, FilterOperator } from '../../../types';
+import type { BuildingBase } from '../useAutocompleteState';
 
 interface DeriveOptions {
   editingChipId: string | null;
@@ -20,7 +21,22 @@ interface DeriveOptions {
   dateRangeFromValue: string | null | undefined;
   /** Segment text when inline-editing a value. */
   segmentFilterText?: string;
+  /** Which triplet is being built: 0 = base, 1 = paired second. */
+  buildingSide?: 0 | 1;
+  /** Stashed base triplet while building the paired second value. */
+  buildingBase?: BuildingBase | null;
 }
+
+/** Resolve a scalar/array value to a display string via the field's allowlist. */
+const displayBaseValue = (
+  value: string | number | boolean | null | Array<string | number | boolean>,
+  field: FieldMetadata,
+): string => {
+  const options = getFieldValues(field);
+  const resolve = (v: string | number | boolean | null): string =>
+    options.find(opt => String(opt.value) === String(v))?.label ?? String(v ?? '');
+  return Array.isArray(value) ? value.map(resolve).join(', ') : resolve(value);
+};
 
 export interface DerivedAutocompleteValues {
   isBuilding: boolean;
@@ -49,6 +65,8 @@ export const deriveAutocompleteValues = ({
   buildingMultiValue,
   dateRangeFromValue,
   segmentFilterText,
+  buildingSide,
+  buildingBase,
 }: DeriveOptions): DerivedAutocompleteValues => {
   const isBuilding = selectedField !== null && !editingChipId;
   const editingCondition = getEditingCondition(editingChipId, conditions);
@@ -104,15 +122,33 @@ export const deriveAutocompleteValues = ({
     return undefined;
   })();
 
-  const buildingChipData: BuildingChipData | null = isBuilding
-    ? {
-        attribute: selectedField!.label,
-        operator: selectedOperator
-          ? getOperatorLabel(selectedOperator, selectedField!.type)
-          : undefined,
-        value: buildingValue,
-      }
-    : null;
+  // While building the paired second value, the base triplet is stashed and the
+  // active field/operator drive the *pair* segment — so render base from the
+  // stash and pair from the live selection. Keeps it one building chip.
+  const buildingChipData: BuildingChipData | null = !isBuilding
+    ? null
+    : buildingSide === 1 && buildingBase
+      ? {
+          attribute: buildingBase.field.label,
+          operator: buildingBase.operator
+            ? getOperatorLabel(buildingBase.operator, buildingBase.field.type)
+            : undefined,
+          value: displayBaseValue(buildingBase.value, buildingBase.field),
+          pair: {
+            attribute: selectedField!.label,
+            operator: selectedOperator
+              ? getOperatorLabel(selectedOperator, selectedField!.type)
+              : undefined,
+            value: buildingValue,
+          },
+        }
+      : {
+          attribute: selectedField!.label,
+          operator: selectedOperator
+            ? getOperatorLabel(selectedOperator, selectedField!.type)
+            : undefined,
+          value: buildingValue,
+        };
 
   return {
     isBuilding,

@@ -23,29 +23,126 @@ export const useValueFlow = ({
   conditionsRef,
   resetState,
   dateRange,
+  buildingSide,
+  setBuildingSide,
+  buildingBase,
+  setBuildingBase,
+  setSelectedField,
+  setSelectedOperator,
+  setMenuState,
   setBuildingMultiValue,
   setInputText,
 }: MenuFlowInternalDeps) => {
   const { editingChipId, editingSegment, resetSegmentTyping } = editing;
+
+  /**
+   * Building a paired field's base value: stash it and advance into the second
+   * triplet (swap to the paired field, reopen the operator menu) instead of
+   * committing. The base is committed together with the pair when the second
+   * value is chosen, so the whole thing stays one building chip. Returns true
+   * if it advanced.
+   */
+  const stashAndAdvance = useCallback(
+    (value: string | number | boolean | null | Array<string | number | boolean>): boolean => {
+      const pairedField = selectedField?.pairedField;
+      if (
+        buildingSide !== 0 ||
+        !pairedField ||
+        editingChipId ||
+        !selectedField ||
+        !selectedOperator
+      )
+        return false;
+      setBuildingBase({ field: selectedField, operator: selectedOperator, value });
+      setSelectedField(pairedField);
+      setSelectedOperator(null);
+      setBuildingSide(1);
+      setInputText('');
+      setMenuState('operator');
+      return true;
+    },
+    [
+      selectedField,
+      selectedOperator,
+      buildingSide,
+      editingChipId,
+      setBuildingBase,
+      setSelectedField,
+      setSelectedOperator,
+      setBuildingSide,
+      setInputText,
+      setMenuState,
+    ],
+  );
+
+  /**
+   * Committing a paired field's second value: persist the stashed base triplet
+   * and the pair as one condition, then reset. Returns true if it handled the
+   * commit.
+   */
+  const commitPairedSecond = useCallback(
+    (
+      value: string | number | boolean | null | Array<string | number | boolean>,
+      error?: 'value',
+      dateOrigin?: 'relative' | 'absolute',
+    ): boolean => {
+      if (buildingSide !== 1 || !buildingBase || !selectedField || !selectedOperator) return false;
+      upsertCondition(
+        buildingBase.field,
+        buildingBase.operator,
+        buildingBase.value,
+        null,
+        insertIndex,
+      );
+      upsertCondition(
+        selectedField,
+        selectedOperator,
+        value,
+        null,
+        undefined,
+        error,
+        dateOrigin,
+        1,
+      );
+      setBuildingBase(null);
+      setBuildingSide(0);
+      resetState(true);
+      return true;
+    },
+    [
+      buildingSide,
+      buildingBase,
+      selectedField,
+      selectedOperator,
+      insertIndex,
+      upsertCondition,
+      setBuildingBase,
+      setBuildingSide,
+      resetState,
+    ],
+  );
 
   /** Single-select value (including date presets, between date collection) */
   const handleValueSelect = useCallback(
     (val: string | number | boolean) => {
       if (!selectedField || !selectedOperator) return;
 
+      // Resolve the value to commit (date "between" collects across two calls).
+      let committedValue: string | number | boolean | null | Array<string | number | boolean> = val;
       if (isBetweenOperator(selectedOperator) && selectedField.type === 'date') {
         const result = dateRange.selectValue(String(val));
         if (!result) return;
-        upsertCondition(selectedField, selectedOperator, result, editingChipId);
-        resetState(!editingChipId);
-        return;
+        committedValue = result;
       }
+
+      if (stashAndAdvance(committedValue)) return;
+      if (commitPairedSecond(committedValue)) return;
 
       const isEditing = !!editingChipId;
       upsertCondition(
         selectedField,
         selectedOperator,
-        val,
+        committedValue,
         editingChipId,
         isEditing ? undefined : insertIndex,
       );
@@ -59,6 +156,8 @@ export const useValueFlow = ({
       insertIndex,
       upsertCondition,
       resetState,
+      stashAndAdvance,
+      commitPairedSecond,
     ],
   );
 
@@ -122,56 +221,48 @@ export const useValueFlow = ({
       const trimmed = customText.trim();
       const isEditing = !!editingChipId;
 
+      // Resolve the typed text to a value + per-segment error + date origin
+      // based on the field/operator shape.
+      let resolvedValue: string | number | boolean | null | Array<string | number | boolean> =
+        trimmed;
+      let valueError: 'value' | undefined;
+      let dateOrigin: 'relative' | 'absolute' | undefined;
+
       if (isMultiSelectOperator(selectedOperator)) {
         const { resolved, error } = resolveMultiValues(selectedField, trimmed);
-        upsertCondition(
-          selectedField,
-          selectedOperator,
-          resolved,
-          editingChipId,
-          isEditing ? undefined : insertIndex,
-          error ? SEGMENT_VARIANT.value : undefined,
-        );
+        resolvedValue = resolved;
+        valueError = error ? SEGMENT_VARIANT.value : undefined;
       } else if (selectedField.type === 'date') {
-        // Parse "Mar 5, 2026 – Mar 15, 2026" → ["2026-03-05", "2026-03-15"].
         if (isBetweenOperator(selectedOperator)) {
+          // Parse "Mar 5, 2026 – Mar 15, 2026" → ["2026-03-05", "2026-03-15"].
           const rangeValue = resolveDateRangeValue(trimmed);
-          upsertCondition(
-            selectedField,
-            selectedOperator,
-            rangeValue ?? trimmed,
-            editingChipId,
-            isEditing ? undefined : insertIndex,
-            rangeValue ? undefined : SEGMENT_VARIANT.value,
-            'absolute',
-          );
+          resolvedValue = rangeValue ?? trimmed;
+          valueError = rangeValue ? undefined : SEGMENT_VARIANT.value;
+          dateOrigin = 'absolute';
         } else {
-          const { error, dateOrigin } = resolveDateValue(
-            trimmed,
-            editingChipId,
-            conditionsRef.current,
-          );
-          upsertCondition(
-            selectedField,
-            selectedOperator,
-            trimmed,
-            editingChipId,
-            isEditing ? undefined : insertIndex,
-            error ? SEGMENT_VARIANT.value : undefined,
-            dateOrigin,
-          );
+          const resolved = resolveDateValue(trimmed, editingChipId, conditionsRef.current);
+          resolvedValue = trimmed;
+          valueError = resolved.error ? SEGMENT_VARIANT.value : undefined;
+          dateOrigin = resolved.dateOrigin;
         }
       } else {
         const { resolved, error } = resolveSingleValue(selectedField, trimmed);
-        upsertCondition(
-          selectedField,
-          selectedOperator,
-          resolved,
-          editingChipId,
-          isEditing ? undefined : insertIndex,
-          error ? SEGMENT_VARIANT.value : undefined,
-        );
+        resolvedValue = resolved;
+        valueError = error ? SEGMENT_VARIANT.value : undefined;
       }
+
+      if (stashAndAdvance(resolvedValue)) return;
+      if (commitPairedSecond(resolvedValue, valueError, dateOrigin)) return;
+
+      upsertCondition(
+        selectedField,
+        selectedOperator,
+        resolvedValue,
+        editingChipId,
+        isEditing ? undefined : insertIndex,
+        valueError,
+        dateOrigin,
+      );
       resetState(!isEditing);
     },
     [
@@ -182,6 +273,8 @@ export const useValueFlow = ({
       conditionsRef,
       upsertCondition,
       resetState,
+      stashAndAdvance,
+      commitPairedSecond,
     ],
   );
 

@@ -5,6 +5,13 @@ interface UseAutocompleteStateOptions {
   conditions: Condition[];
 }
 
+/** Base triplet stashed while building a paired chip's second value. */
+export interface BuildingBase {
+  field: FieldMetadata;
+  operator: FilterOperator | undefined;
+  value: string | number | boolean | null | Array<string | number | boolean>;
+}
+
 /**
  * Owns the useState/useRef surface of the autocomplete hook. Refs mirror
  * state so sub-hooks read synchronously without recreating callbacks.
@@ -16,6 +23,12 @@ export const useAutocompleteState = ({ conditions }: UseAutocompleteStateOptions
   const [selectedOperator, setSelectedOperator] = useState<FilterOperator | null>(null);
   const [isFocused, setIsFocused] = useState(false);
   const [buildingMultiValue, setBuildingMultiValue] = useState<string | undefined>(undefined);
+  // Which triplet of a paired chip is being built: 0 = base, 1 = paired second.
+  const [buildingSide, setBuildingSide] = useState<0 | 1>(0);
+  // Stashed base triplet while building the paired second value. The base is
+  // committed together with the pair only when the second value is chosen, so
+  // the whole thing renders as one building chip throughout (not two chips).
+  const [buildingBase, setBuildingBase] = useState<BuildingBase | null>(null);
   const [insertIndex, setInsertIndex] = useState<number | null>(null);
   const [insertAfterConnector, setInsertAfterConnector] = useState(false);
   const effectiveInsertIndex = insertIndex ?? conditions.length;
@@ -60,6 +73,10 @@ export const useAutocompleteState = ({ conditions }: UseAutocompleteStateOptions
     setIsFocused,
     buildingMultiValue,
     setBuildingMultiValue,
+    buildingSide,
+    setBuildingSide,
+    buildingBase,
+    setBuildingBase,
     insertIndex,
     setInsertIndex,
     insertAfterConnector,

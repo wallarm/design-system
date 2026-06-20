@@ -7,6 +7,7 @@ import type {
   MenuState,
   UpsertCondition,
 } from '../../../types';
+import type { BuildingBase } from '../useAutocompleteState';
 
 export interface MenuFlowDeps {
   editing: {
@@ -41,6 +42,12 @@ export interface MenuFlowDeps {
   setInputText: (text: string) => void;
   setMenuState: (state: MenuState) => void;
   setBuildingMultiValue: (val: string | undefined) => void;
+  /** Which triplet is being built: 0 = base, 1 = paired second. */
+  buildingSide: 0 | 1;
+  setBuildingSide: (side: 0 | 1) => void;
+  /** Base triplet stashed while building a paired chip's second value. */
+  buildingBase: BuildingBase | null;
+  setBuildingBase: (base: BuildingBase | null) => void;
 }
 
 /** Shared shape: each sub-hook receives the same deps plus a ref to `conditions`
