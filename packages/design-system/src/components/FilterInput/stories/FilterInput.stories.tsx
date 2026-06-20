@@ -316,3 +316,55 @@ export const HTTPStatusCodeByName: Story = {
     placeholder: 'Type to filter by status code...',
   },
 };
+
+/**
+ * Two-step "paired" field (AS-1160). A field with `pairedField` set captures two
+ * attribute/operator/value triplets in one chip (e.g. `Context Param is xxx ;
+ * Value is yyy`). Building it: pick the field, operator, and first value — the
+ * second triplet then appears for the paired value. Both operators are editable;
+ * the second value is required.
+ */
+const pairedFields: FieldMetadata[] = [
+  {
+    name: 'context_param',
+    label: 'Context Param',
+    type: 'enum',
+    options: ['header', 'cookie', 'query', 'body'],
+    pairedField: {
+      name: 'context_value',
+      label: 'Value',
+      type: 'string',
+      options: [],
+    },
+  },
+  { name: 'method', label: 'Method', type: 'enum', options: ['GET', 'POST', 'PUT', 'DELETE'] },
+];
+
+export const PairedField: Story = {
+  render: () => {
+    const ParentComponent = () => {
+      const [value, setValue] = useState<ExprNode | null>(null);
+      return <FilterInput fields={pairedFields} value={value} onChange={setValue} />;
+    };
+    return <ParentComponent />;
+  },
+};
+
+/**
+ * Paired field pre-populated with both values, rendered as one chip.
+ */
+export const PairedFieldPreset: Story = {
+  render: () => {
+    const ParentComponent = () => {
+      const [value, setValue] = useState<ExprNode | null>({
+        type: 'condition',
+        field: 'context_param',
+        operator: '=',
+        value: 'header',
+        pair: { operator: '=', value: 'authorization' },
+      });
+      return <FilterInput fields={pairedFields} value={value} onChange={setValue} />;
+    };
+    return <ParentComponent />;
+  },
+};
