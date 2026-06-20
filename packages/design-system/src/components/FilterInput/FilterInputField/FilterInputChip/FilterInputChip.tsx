@@ -104,8 +104,11 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
     e.preventDefault();
   }, []);
 
-  const segmentEditProps = (segment: ChipSegment) =>
-    isEditingThisChip && editing.editingSegment === segment
+  // Inline-edit props apply to the base triplet (side 0) or the paired triplet
+  // (side 1) — never both at once, so they share the segment input refs.
+  const editingSide = editing?.editingSide ?? 0;
+  const segmentEditProps = (segment: ChipSegment, side: 0 | 1 = 0) =>
+    isEditingThisChip && editing.editingSegment === segment && editingSide === side
       ? {
           editing: true as const,
           editText: editing.segmentFilterText,
@@ -114,6 +117,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           onEditBlur: editing.onSegmentEditBlur,
         }
       : {};
+  // Active segment on the base triplet (side 0) only — gates the base operator/
+  // value segments' "render while empty during edit" behavior.
+  const baseActiveSegment = editingSide === 0 ? activeSegment : null;
+  const pairActiveSegment = editingSide === 1 ? activeSegment : null;
 
   const setRefs = useCallback(
     (node: HTMLDivElement | null) => {
@@ -146,7 +153,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       >
         {attribute}
       </Segment>
-      {(operator || activeSegment === SEGMENT_VARIANT.operator) && (
+      {(operator || baseActiveSegment === SEGMENT_VARIANT.operator) && (
         <Segment
           variant={SEGMENT_VARIANT.operator}
           className='shrink-0'
@@ -157,12 +164,12 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           {operator ?? ''}
         </Segment>
       )}
-      {(value || activeSegment === SEGMENT_VARIANT.value) && (
+      {(value || baseActiveSegment === SEGMENT_VARIANT.value) && (
         <Segment
           variant={SEGMENT_VARIANT.value}
           className='min-w-0'
           error={
-            activeSegment !== SEGMENT_VARIANT.value &&
+            baseActiveSegment !== SEGMENT_VARIANT.value &&
             (error === true || error === SEGMENT_VARIANT.value)
           }
           valueParts={valueParts}
@@ -183,23 +190,28 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           <Segment variant={SEGMENT_VARIANT.attribute} className='shrink-0'>
             {pair.attribute}
           </Segment>
-          {pair.operator && (
+          {(pair.operator || pairActiveSegment === SEGMENT_VARIANT.operator) && (
             <Segment
               variant={SEGMENT_VARIANT.operator}
               className='shrink-0'
               onClick={interactive ? e => handlePairSegmentClick('operator', e) : undefined}
+              {...segmentEditProps(SEGMENT_VARIANT.operator, 1)}
             >
-              {pair.operator}
+              {pair.operator ?? ''}
             </Segment>
           )}
-          {pair.value != null && (
+          {(pair.value != null || pairActiveSegment === SEGMENT_VARIANT.value) && (
             <Segment
               variant={SEGMENT_VARIANT.value}
               className='min-w-0'
-              error={pair.error === true || pair.error === SEGMENT_VARIANT.value}
+              error={
+                pairActiveSegment !== SEGMENT_VARIANT.value &&
+                (pair.error === true || pair.error === SEGMENT_VARIANT.value)
+              }
               onClick={interactive ? e => handlePairSegmentClick('value', e) : undefined}
+              {...segmentEditProps(SEGMENT_VARIANT.value, 1)}
             >
-              {pair.value}
+              {pair.value ?? ''}
             </Segment>
           )}
         </>

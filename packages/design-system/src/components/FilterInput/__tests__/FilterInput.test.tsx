@@ -1256,6 +1256,26 @@ describe('FilterInput', () => {
       expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
     });
 
+    it('enters inline edit on the paired value segment when clicked', async () => {
+      const user = userEvent.setup();
+      const condition: Condition = {
+        type: 'condition',
+        field: 'ctx_param',
+        operator: '=',
+        value: 'xxx',
+        pair: { operator: '=', value: 'yyy' },
+      };
+      render(<FilterInput fields={pairedFields} value={condition} />);
+
+      await user.click(screen.getByText('yyy'));
+
+      // The paired value segment becomes an inline input seeded with its value;
+      // the base value stays display text.
+      const valueInput = await screen.findByLabelText('Filter value');
+      expect(valueInput).toHaveValue('yyy');
+      expect(screen.getByText('xxx')).toBeInTheDocument();
+    });
+
     it('renders a committed paired condition as one chip with both triplets', () => {
       const condition: Condition = {
         type: 'condition',

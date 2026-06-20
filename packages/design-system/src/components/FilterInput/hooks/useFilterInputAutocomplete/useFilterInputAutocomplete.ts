@@ -272,6 +272,7 @@ export const useFilterInputAutocomplete = ({
           : undefined,
       buildingSide,
       buildingBase,
+      editingSide: editing.editingSide,
     });
 
   return {
@@ -298,6 +299,7 @@ export const useFilterInputAutocomplete = ({
     /** Hard reset for paste/clipboard flows — scraps in-progress building. */
     resetAutocompleteState: resetState,
     handleChipClick: editing.handleChipClick,
+    handlePairChipClick: editing.handlePairChipClick,
     handleBuildingChipClick,
     switchEditSegment,
     removeEditingChip,
@@ -316,6 +318,7 @@ export const useFilterInputAutocomplete = ({
     // Inline segment editing
     editingChipId: editing.editingChipId,
     editingSegment: editing.editingSegment,
+    editingSide: editing.editingSide,
     segmentFilterText: editing.segmentFilterText,
     segmentMenuFilterText: editing.segmentMenuFilterText,
     handleSegmentFilterChange,

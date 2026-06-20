@@ -13,6 +13,8 @@ export interface MenuFlowDeps {
   editing: {
     editingChipId: string | null;
     editingSegment: ChipSegment | null;
+    /** Which triplet is being edited: 0 = base, 1 = paired second. */
+    editingSide: 0 | 1;
     /** Pre-derived chipId === null && segment !== null marker — single source
      *  of truth, avoids re-deriving in every consumer. */
     isBuildingEdit: boolean;

@@ -25,6 +25,8 @@ interface DeriveOptions {
   buildingSide?: 0 | 1;
   /** Stashed base triplet while building the paired second value. */
   buildingBase?: BuildingBase | null;
+  /** Which triplet is being edited: 0 = base, 1 = paired second. */
+  editingSide?: 0 | 1;
 }
 
 /** Resolve a scalar/array value to a display string via the field's allowlist. */
@@ -67,9 +69,20 @@ export const deriveAutocompleteValues = ({
   segmentFilterText,
   buildingSide,
   buildingBase,
+  editingSide,
 }: DeriveOptions): DerivedAutocompleteValues => {
   const isBuilding = selectedField !== null && !editingChipId;
-  const editingCondition = getEditingCondition(editingChipId, conditions);
+  const rawEditingCondition = getEditingCondition(editingChipId, conditions);
+  // Editing the paired second triplet: source the editing value/dateOrigin from
+  // the `pair` slot so the value menu pre-selects the pair's value, not the base.
+  const editingCondition =
+    rawEditingCondition && editingSide === 1 && rawEditingCondition.pair
+      ? {
+          ...rawEditingCondition,
+          value: rawEditingCondition.pair.value,
+          dateOrigin: rawEditingCondition.pair.dateOrigin,
+        }
+      : rawEditingCondition;
 
   const editingMultiValues = (() => {
     if (!editingCondition || !selectedOperator || !isMultiSelectOperator(selectedOperator))

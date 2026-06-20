@@ -33,7 +33,7 @@ export const useValueFlow = ({
   setBuildingMultiValue,
   setInputText,
 }: MenuFlowInternalDeps) => {
-  const { editingChipId, editingSegment, resetSegmentTyping } = editing;
+  const { editingChipId, editingSegment, editingSide, resetSegmentTyping } = editing;
 
   /**
    * Building a paired field's base value: stash it and advance into the second
@@ -139,12 +139,16 @@ export const useValueFlow = ({
       if (commitPairedSecond(committedValue)) return;
 
       const isEditing = !!editingChipId;
+      // Editing a paired second value writes to side 1; everything else side 0.
       upsertCondition(
         selectedField,
         selectedOperator,
         committedValue,
         editingChipId,
         isEditing ? undefined : insertIndex,
+        undefined,
+        undefined,
+        editingSide,
       );
       resetState(!isEditing);
     },
@@ -152,6 +156,7 @@ export const useValueFlow = ({
       selectedField,
       selectedOperator,
       editingChipId,
+      editingSide,
       dateRange,
       insertIndex,
       upsertCondition,
@@ -262,6 +267,7 @@ export const useValueFlow = ({
         isEditing ? undefined : insertIndex,
         valueError,
         dateOrigin,
+        editingSide,
       );
       resetState(!isEditing);
     },
@@ -269,6 +275,7 @@ export const useValueFlow = ({
       selectedField,
       selectedOperator,
       editingChipId,
+      editingSide,
       insertIndex,
       conditionsRef,
       upsertCondition,

@@ -36,6 +36,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     onChipRemove,
     editingChipId,
     editingSegment,
+    editingSide,
     segmentFilterText,
     onSegmentFilterChange,
     onCancelSegmentEdit,
@@ -83,6 +84,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     <EditingProvider
       editingChipId={editingChipId}
       editingSegment={editingSegment}
+      editingSide={editingSide}
       segmentFilterText={segmentFilterText}
       onSegmentFilterChange={onSegmentFilterChange}
       onSegmentEditKeyDown={handleSegmentEditKeyDown}

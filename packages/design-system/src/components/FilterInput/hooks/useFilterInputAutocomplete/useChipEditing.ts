@@ -68,6 +68,8 @@ export const useChipEditing = ({
 }: UseChipEditingOptions) => {
   const [editingChipId, setEditingChipId] = useState<string | null>(null);
   const [editingSegment, setEditingSegment] = useState<ChipSegment | null>(null);
+  // Which triplet is being edited: 0 = base, 1 = paired second.
+  const [editingSide, setEditingSide] = useState<0 | 1>(0);
   const [segmentFilterText, setSegmentFilterText] = useState('');
   // Suppresses filtering until first keystroke after edit opens.
   const [userHasTyped, setUserHasTyped] = useState(false);
@@ -141,14 +143,50 @@ export const useChipEditing = ({
       setSegmentFilterText(segmentText[targetSegment]);
       setUserHasTyped(false);
 
+      setEditingSide(0);
       setMenuState(SEGMENT_TO_MENU[targetSegment]);
     },
     [setMenuAnchor, setSelectedField, setSelectedOperator, setMenuState, upsertCondition],
   );
 
+  /**
+   * Edit an editable segment (operator/value) of a committed paired chip's
+   * second triplet. Seeds the paired field and (for value edits) the pair's
+   * current operator, then opens the matching menu anchored to the chip.
+   */
+  const handlePairChipClick = useCallback(
+    (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => {
+      const condition = getConditionByChipId(chipId, conditionsRef.current);
+      const field = condition && fieldsRef.current.find(f => f.name === condition.field);
+      const pairedField = field ? field.pairedField : undefined;
+      const chip = chipsRef.current.find(c => c.id === chipId);
+      if (!condition?.pair || !pairedField || !chip?.pair) return;
+
+      setMenuAnchor(anchorEl);
+      setEditingChipId(chipId);
+      setEditingSide(1);
+      setSelectedField(pairedField);
+
+      const rawOperator =
+        getOperatorFromLabel(chip.pair.operator || '', pairedField.type) ??
+        condition.pair.operator ??
+        null;
+      setSelectedOperator(segment === SEGMENT_VARIANT.value ? rawOperator : null);
+
+      setEditingSegment(segment);
+      setSegmentFilterText(
+        segment === SEGMENT_VARIANT.operator ? (chip.pair.operator ?? '') : (chip.pair.value ?? ''),
+      );
+      setUserHasTyped(false);
+      setMenuState(SEGMENT_TO_MENU[segment]);
+    },
+    [setMenuAnchor, setSelectedField, setSelectedOperator, setMenuState],
+  );
+
   const clearEditing = useCallback(() => {
     setEditingChipId(null);
     setEditingSegment(null);
+    setEditingSide(0);
     setSegmentFilterText('');
     setUserHasTyped(false);
   }, []);
@@ -161,6 +199,7 @@ export const useChipEditing = ({
     // Pin chipId to null explicitly — the marker is load-bearing downstream.
     setEditingChipId(null);
     setEditingSegment(segment);
+    setEditingSide(0);
     setSegmentFilterText(currentText);
     setUserHasTyped(false);
   }, []);
@@ -171,6 +210,7 @@ export const useChipEditing = ({
    */
   const switchEditSegment = useCallback((segment: ChipSegment, currentText: string) => {
     setEditingSegment(segment);
+    setEditingSide(0);
     setSegmentFilterText(currentText);
     setUserHasTyped(false);
   }, []);
@@ -198,6 +238,7 @@ export const useChipEditing = ({
     () => ({
       editingChipId,
       editingSegment,
+      editingSide,
       isBuildingEdit,
       setEditingSegment,
       segmentFilterText: segmentDisplayText,
@@ -205,6 +246,7 @@ export const useChipEditing = ({
       setSegmentFilterText: handleSegmentFilterChange,
       resetSegmentTyping,
       handleChipClick,
+      handlePairChipClick,
       startBuildingEdit,
       switchEditSegment,
       clearEditing,
@@ -212,12 +254,14 @@ export const useChipEditing = ({
     [
       editingChipId,
       editingSegment,
+      editingSide,
       isBuildingEdit,
       segmentDisplayText,
       segmentMenuFilterText,
       handleSegmentFilterChange,
       resetSegmentTyping,
       handleChipClick,
+      handlePairChipClick,
       startBuildingEdit,
       switchEditSegment,
       clearEditing,
