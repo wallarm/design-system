@@ -162,7 +162,7 @@ export const useFilterInputExpression = ({
   // so they survive a consumer round-trip that drops the `error` flag.
   useEffect(() => {
     if (value !== undefined) {
-      const result = expressionToConditions(value);
+      const result = expressionToConditions(value, fields);
       setState({
         conditions: revalidateConditions(result.conditions, fields),
         connectors: result.connectors,
@@ -213,7 +213,7 @@ export const useFilterInputExpression = ({
             },
           };
           const next = { conditions: updated, connectors: prev.connectors };
-          onChange?.(buildExpression(next.conditions, next.connectors));
+          onChange?.(buildExpression(next.conditions, next.connectors, fields));
           return next;
         });
         return;
@@ -232,11 +232,11 @@ export const useFilterInputExpression = ({
         );
 
         const next = { conditions: newConditions, connectors: newConnectors };
-        onChange?.(buildExpression(next.conditions, next.connectors));
+        onChange?.(buildExpression(next.conditions, next.connectors, fields));
         return next;
       });
     },
-    [onChange],
+    [onChange, fields],
   );
 
   const removeCondition = useCallback(
@@ -251,11 +251,11 @@ export const useFilterInputExpression = ({
         const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
 
         const next = { conditions: newConditions, connectors: newConnectors };
-        onChange?.(buildExpression(next.conditions, next.connectors));
+        onChange?.(buildExpression(next.conditions, next.connectors, fields));
         return next;
       });
     },
-    [onChange],
+    [onChange, fields],
   );
 
   const removeConditionAtIndex = useCallback(
@@ -267,11 +267,11 @@ export const useFilterInputExpression = ({
         const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
 
         const next = { conditions: newConditions, connectors: newConnectors };
-        onChange?.(buildExpression(next.conditions, next.connectors));
+        onChange?.(buildExpression(next.conditions, next.connectors, fields));
         return next;
       });
     },
-    [onChange],
+    [onChange, fields],
   );
 
   const clearAll = useCallback(() => {
@@ -283,20 +283,20 @@ export const useFilterInputExpression = ({
       }
       // Keep disabled conditions and their connectors.
       const next = { conditions: disabledConditions, connectors: [] as Array<'and' | 'or'> };
-      onChange?.(buildExpression(next.conditions, next.connectors));
+      onChange?.(buildExpression(next.conditions, next.connectors, fields));
       return next;
     });
-  }, [onChange]);
+  }, [onChange, fields]);
 
   /** Replace the entire expression (paste path). Mirrors the upsert/remove
    *  pattern so uncontrolled components stay in sync. */
   const replaceExpression = useCallback(
     (expr: ExprNode | null) => {
-      const result = expressionToConditions(expr);
+      const result = expressionToConditions(expr, fields);
       setState({ conditions: result.conditions, connectors: result.connectors });
       onChange?.(expr);
     },
-    [onChange],
+    [onChange, fields],
   );
 
   const setConnectorValue = useCallback(
@@ -312,11 +312,11 @@ export const useFilterInputExpression = ({
           updated[connectorIdx] = value;
         }
         const next = { conditions: prev.conditions, connectors: updated };
-        onChange?.(buildExpression(next.conditions, next.connectors));
+        onChange?.(buildExpression(next.conditions, next.connectors, fields));
         return next;
       });
     },
-    [onChange],
+    [onChange, fields],
   );
 
   return {
