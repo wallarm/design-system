@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { cn } from '../../utils/cn';
+import { cn } from '../../../utils/cn';
 import type { GameStats } from './module';
 
 interface GameHudProps {
