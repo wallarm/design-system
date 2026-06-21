@@ -1,6 +1,7 @@
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Info, LayoutGrid, LayoutTemplate, Search } from '../../icons';
+import { ArrowUp, Info, LayoutGrid, LayoutTemplate, Search, Settings2 } from '../../icons';
+import { Button } from '../Button';
 import { Input } from '../Input';
 import { Kbd } from '../Kbd';
 import { Loader } from '../Loader';
@@ -13,7 +14,8 @@ import {
   SelectOptionText,
   SelectPositioner,
 } from '../Select';
-import { VStack } from '../Stack';
+import { HStack, VStack } from '../Stack';
+import { Textarea } from '../Textarea';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { InputGroup } from './InputGroup';
 import { InputGroupAddon } from './InputGroupAddon';
@@ -142,6 +144,41 @@ export const WithTooltip: StoryFn<typeof meta> = () => (
       </Tooltip>
     </InputGroupAddon>
   </InputGroup>
+);
+
+export const WithTextarea: StoryFn<typeof meta> = () => (
+  <div style={{ width: 480 }}>
+    <VStack gap={12}>
+      <InputGroup>
+        <Textarea minRows={1} maxRows={5} placeholder='Type a message...' />
+      </InputGroup>
+
+      <InputGroup>
+        <Textarea minRows={1} maxRows={5} placeholder='Type a message...' />
+        <InputGroupAddon align='block-end'>
+          <HStack fullWidth align='center' justify='end'>
+            <Button variant='primary' color='brand' size='small'>
+              <ArrowUp />
+            </Button>
+          </HStack>
+        </InputGroupAddon>
+      </InputGroup>
+
+      <InputGroup>
+        <Textarea minRows={1} maxRows={5} placeholder='Type a message...' />
+        <InputGroupAddon align='block-end'>
+          <HStack fullWidth align='center' justify='between'>
+            <Button variant='secondary' size='small' color='neutral'>
+              <Settings2 />
+            </Button>
+            <Button variant='primary' color='brand' size='small'>
+              <ArrowUp />
+            </Button>
+          </HStack>
+        </InputGroupAddon>
+      </InputGroup>
+    </VStack>
+  </div>
 );
 
 export const WithSelect: StoryFn<typeof meta> = () => {
