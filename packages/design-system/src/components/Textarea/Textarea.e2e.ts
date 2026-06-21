@@ -8,6 +8,9 @@ const textareaStory = createStoryHelper('inputs-textarea', [
   'Disabled',
   'With Value',
   'With Error',
+  'Auto Resize',
+  'With Footer',
+  'With Footer Resizable',
 ] as const);
 
 test.describe('Component: Textarea', () => {
@@ -41,6 +44,21 @@ test.describe('Component: Textarea', () => {
       await textareaStory.goto(page, 'With Error');
       await expect(page).toHaveScreenshot();
     });
+
+    test('Should render auto-resize textarea correctly', async ({ page }) => {
+      await textareaStory.goto(page, 'Auto Resize');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render textarea with footer correctly', async ({ page }) => {
+      await textareaStory.goto(page, 'With Footer');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render textarea with resizable footer correctly', async ({ page }) => {
+      await textareaStory.goto(page, 'With Footer Resizable');
+      await expect(page).toHaveScreenshot();
+    });
   });
 
   test.describe('Interactions', () => {
@@ -57,6 +75,27 @@ test.describe('Component: Textarea', () => {
       await textarea.click();
       await expect(textarea).toBeFocused();
       await expect(page).toHaveScreenshot();
+    });
+
+    test('Should not accept input when disabled', async ({ page }) => {
+      await textareaStory.goto(page, 'Disabled');
+      const textarea = page.locator('textarea');
+      await expect(textarea).toBeDisabled();
+    });
+  });
+
+  test.describe('Accessibility', () => {
+    test('Should be focusable via Tab key', async ({ page }) => {
+      await textareaStory.goto(page, 'Basic');
+      await page.keyboard.press('Tab');
+      const textarea = page.getByTestId('textarea');
+      await expect(textarea).toBeFocused();
+    });
+
+    test('Should have aria-invalid when in error state', async ({ page }) => {
+      await textareaStory.goto(page, 'With Error');
+      const textarea = page.locator('textarea');
+      await expect(textarea).toHaveAttribute('aria-invalid', 'true');
     });
   });
 });

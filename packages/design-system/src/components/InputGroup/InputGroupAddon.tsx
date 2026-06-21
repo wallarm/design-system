@@ -27,6 +27,7 @@ const inputGroupAddonVariants = cva(
       align: {
         'inline-start': 'order-first pl-12 has-[>kbd]:pl-8',
         'inline-end': 'order-last pr-12 has-[>kbd]:pr-8',
+        'block-end': 'order-last w-full px-8 pb-8 h-auto justify-start',
       },
       variant: {
         outline: 'px-12 bg-states-primary-default-alt border-border-primary',
@@ -71,7 +72,7 @@ export const InputGroupAddon: FC<
       return;
     }
 
-    event.currentTarget.parentElement?.querySelector('input')?.focus();
+    event.currentTarget.parentElement?.querySelector<HTMLElement>('input, textarea')?.focus();
   };
 
   return (
