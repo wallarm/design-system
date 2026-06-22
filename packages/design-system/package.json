@@ -19,11 +19,11 @@
   ],
   "exports": {
     ".": {
-      "development": "./src/components/index.ts",
-      "types": "./dist/components/index.d.ts",
-      "import": "./dist/components/index.js",
-      "require": "./dist/components/index.js",
-      "default": "./dist/components/index.js"
+      "development": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "default": "./dist/index.js"
     },
     "./icons": {
       "development": "./src/icons/index.ts",
@@ -43,13 +43,6 @@
       "require": "./dist/metadata/components.json",
       "default": "./dist/metadata/components.json"
     },
-    "./lib/*": {
-      "development": "./src/lib/*.ts",
-      "types": "./dist/lib/*.d.ts",
-      "import": "./dist/lib/*.js",
-      "require": "./dist/lib/*.js",
-      "default": "./dist/lib/*.js"
-    },
     "./*": {
       "development": "./src/components/*/index.ts",
       "types": "./dist/components/*/index.d.ts",
@@ -61,9 +54,9 @@
   "files": [
     "dist"
   ],
-  "main": "dist/components/index.js",
-  "module": "dist/components/index.js",
-  "types": "dist/components/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "rslib build && pnpm generate-metadata",
     "generate-metadata": "tsx scripts/metadata/generate.ts",
