@@ -6,6 +6,10 @@ export {
 } from './AttributeActionsContent';
 export { AttributeActionsItem, type AttributeActionsItemProps } from './AttributeActionsItem';
 export { AttributeActionsTarget, type AttributeActionsTargetProps } from './AttributeActionsTarget';
+export {
+  AttributeEditableValue,
+  type AttributeEditableValueProps,
+} from './AttributeEditableValue';
 export { useAttributeEmpty } from './AttributeEmptyContext';
 export {
   AttributeEmptyDescription,

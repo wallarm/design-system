@@ -15,6 +15,7 @@ import { AttributeActions } from './AttributeActions';
 import { AttributeActionsContent } from './AttributeActionsContent';
 import { AttributeActionsItem } from './AttributeActionsItem';
 import { AttributeActionsTarget } from './AttributeActionsTarget';
+import { AttributeEditableValue } from './AttributeEditableValue';
 import { AttributeEmptyDescription } from './AttributeEmptyDescription';
 import { AttributeLabel } from './AttributeLabel';
 import { AttributeLabelDescription } from './AttributeLabelDescription';
@@ -848,3 +849,82 @@ export const HorizontalWithActionsMenuOnly: StoryFn<AttributeProps> = () => (
 );
 HorizontalWithActionsMenuOnly.storyName =
   'Horizontal With Actions (disableNestedInteractive — menu only)';
+
+// --- Inline edit (spike) -----------------------------------------------------
+// Seamless model: click (or focus + Enter) to edit, Enter / blur commits,
+// Esc cancels, empty commits as cancel. Optimistic with a brief "Saved" tick;
+// a rejected onCommit rolls back and shows an inline error.
+
+export const InlineEditText: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute>
+      <AttributeLabel>Endpoint name</AttributeLabel>
+      <AttributeValue>
+        <AttributeEditableValue
+          aria-label='Endpoint name'
+          defaultValue='Checkout API'
+          onCommit={() => new Promise<void>(resolve => setTimeout(resolve, 800))}
+        />
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+InlineEditText.storyName = 'Inline Edit — text (vertical)';
+
+export const InlineEditValidation: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute>
+      <AttributeLabel>Port</AttributeLabel>
+      <AttributeValue>
+        <AttributeEditableValue
+          aria-label='Port'
+          defaultValue='8443'
+          placeholder='1–65535'
+          validate={v =>
+            /^\d+$/.test(v) && Number(v) >= 1 && Number(v) <= 65535
+              ? null
+              : 'Enter a port between 1 and 65535.'
+          }
+          onCommit={() => new Promise<void>(resolve => setTimeout(resolve, 600))}
+        />
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+InlineEditValidation.storyName = 'Inline Edit — validation (try 70000)';
+
+export const InlineEditSaveError: StoryFn<AttributeProps> = () => (
+  <div className='w-[400px]'>
+    <Attribute>
+      <AttributeLabel>Owner</AttributeLabel>
+      <AttributeValue>
+        <AttributeEditableValue
+          aria-label='Owner'
+          defaultValue='a.miskevich'
+          onCommit={() =>
+            new Promise<void>((_, reject) =>
+              setTimeout(() => reject(new Error('mock failure')), 800),
+            )
+          }
+        />
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+InlineEditSaveError.storyName = 'Inline Edit — save failure (rollback)';
+
+export const HorizontalInlineEdit: StoryFn<AttributeProps> = () => (
+  <div className='w-[420px]'>
+    <Attribute orientation='horizontal'>
+      <AttributeLabel>Endpoint name</AttributeLabel>
+      <AttributeValue>
+        <AttributeEditableValue
+          aria-label='Endpoint name'
+          defaultValue='Checkout API'
+          onCommit={() => new Promise<void>(resolve => setTimeout(resolve, 800))}
+        />
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+HorizontalInlineEdit.storyName = 'Horizontal Inline Edit';
