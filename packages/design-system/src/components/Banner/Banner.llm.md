@@ -25,8 +25,9 @@ contact sales".)
   at the very top above the header. Never inline or boxed — that's `Alert`.
 - **`variant` drives bg + text + icon, semantically**: primary (dark, neutral),
   secondary (light, neutral), destructive (red), info (blue), warning (amber).
-  **No success.** destructive / info / warning auto-show an icon; primary / secondary
-  show none unless you pass `icon`.
+  **No success.** The icon is a composed **`BannerIcon`** child (not a `Banner` prop):
+  it defaults by variant for destructive / info / warning, none for primary / secondary,
+  and **only renders when `BannerIcon` is actually in the tree**.
 - **One action pattern only** — an inline `BannerLink` (in the title) **or** right-side
   buttons in `BannerControls`, never both.
 - **Light-mode only** (tagged "No dark-ui") — don't add dark-theme handling; primary
@@ -37,8 +38,10 @@ contact sales".)
 - **One line preferred, two max**, then truncate + tooltip (`lineClamp={2}`).
 
 ## Composition
-- `Banner` (variant + optional `icon`) › `BannerContent` (`BannerTitle` + optional
-  `BannerDescription`) › trailing `BannerControls` (buttons and/or `BannerClose`).
+- `Banner` (variant) › optional leading `BannerIcon` (auto icon by variant; optional
+  `icon` override) › `BannerContent` (`BannerTitle` + optional `BannerDescription`) ›
+  trailing `BannerControls` (buttons and/or `BannerClose`). The icon renders **only if
+  `BannerIcon` is composed in** — there is no `icon` prop on `Banner`.
 - Inline link: pass a `BannerLink` to `BannerTitle`'s `action` prop (color adapts to
   the variant).
 - A `BannerDescription`, when used, **adds new info** (consequence / impact) — not a
@@ -50,8 +53,9 @@ contact sales".)
   the default for **announcements & promo**. Semantic colors for status:
   `destructive` = critical account / billing (expired subscription), `warning` =
   caution (nearing quota), `info` = informational system notice.
-- **icon** — auto for destructive / info / warning; primary / secondary have none, so
-  add one for an announcement / promo (e.g. `Megaphone`).
+- **icon** — compose a `BannerIcon` (auto by variant for destructive / info / warning);
+  primary / secondary have none, so add `<BannerIcon icon={<Megaphone />} />` for an
+  announcement / promo.
 - **dismissible?** — add `BannerClose` when the user can dismiss it; omit while the
   condition still holds.
 

@@ -21,7 +21,7 @@ Unlike `Checkbox` / `Radio` / `Switch`, SegmentedControl is **not** individually
 ## Locked — don't override
 - **Value-only, single-select** — no multi-select; `onChange` swallows empty, so there's no "nothing selected" after the first pick — exactly one stays lit (ship one pre-selected).
 - **No size, color, or card variant** — there's no size prop (item height floors at 28px); the only knobs are `fullWidth` (equal-fill) and per-item `disabled`. Indicator, track, and state colors are token-driven — don't restyle per-item, don't hand-build the indicator.
-- **Built-in `mb-8`** bottom margin on the root — spacing is opinionated; override via `className` only if it breaks layout.
+- **No built-in outer margin** — the control adds no space around itself; the surrounding layout owns its spacing.
 
 ## Pairs with
 - `NumericBadge` — counts inside a segment (e.g. `Headers 33`); badge only the segments that need it.

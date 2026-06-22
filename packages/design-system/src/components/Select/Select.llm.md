@@ -29,7 +29,7 @@ Pick **exactly one** trigger per Select; all three open the same menu, look inte
 - A hidden native `<select>` is always rendered for form submission — don't add your own.
 - **`SelectButton` stays off the loud cells** — `variant` excludes `primary`, `color` excludes `destructive` (both at the type level); a trigger is never an action button. `disabled`/`loading` come only from the `Select` root, not the trigger.
 - **`loading` is cosmetic** (`SelectButton` spinner only) — it does **not** block opening, disable selection, or change the list. Async option loading and the empty/partial list are yours to manage.
-- **Menu width defaults to a 280–320px clamp**; value text truncates with an ellipsis. Usually trim the content — but you *may* widen it (e.g. up to ~440px) for a deliberately wide field whose values are genuinely long. That's a considered exception, not the default. Use **`SelectSeparator`, never `DropdownMenuSeparator`**, inside a Select (the latter reads a Menu context that doesn't exist and throws).
+- **Menu width defaults to a 240–320px clamp**; value text truncates with an ellipsis. Usually trim the content — but you *may* widen it (e.g. up to ~440px) for a deliberately wide field whose values are genuinely long. That's a considered exception, not the default. Use **`SelectSeparator`, never `DropdownMenuSeparator`**, inside a Select (the latter reads a Menu context that doesn't exist and throws).
 
 ## Composition
 Assemble from shipped parts — don't hand-roll equivalents:

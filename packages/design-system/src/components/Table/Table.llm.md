@@ -14,7 +14,7 @@ When rows are selectable and the user needs to act on the selection (delete, exp
 - Filters, column controls, or view toggles → those belong in the table toolbar/header, not the action bar.
 
 ## Locked — don't override
-- The bar surface, the summary row, and the show/hide animation are automatic — you only pass action buttons.
+- The bar surface and the show/hide animation are automatic, and the selection summary renders automatically — by default you only pass action buttons. (Advanced: pass a single `TableActionBarSelection` child, composed from the `BulkBarSummary*` primitives, to override the summary — e.g. to attach analytics to Select all / Clear; the DS still wires the count, toggle/reset, and disabled state.)
 - Never use the red `destructive` Button color in the bar — even Delete uses `brand` with a `Trash2` icon, not red.
 - Actions stay on one line.
 
