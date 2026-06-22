@@ -12,6 +12,7 @@ interface GameHudProps {
   catchKey: number;
   gateTarget: number;
   onTryAgain: () => void;
+  soundOn: boolean;
 }
 
 export const GameHud: FC<GameHudProps> = ({
@@ -24,6 +25,7 @@ export const GameHud: FC<GameHudProps> = ({
   catchKey,
   gateTarget,
   onTryAgain,
+  soundOn,
 }) => {
   const showCounter = caught > 0;
 
@@ -101,7 +103,7 @@ export const GameHud: FC<GameHudProps> = ({
 
           {armed && !roundOver && (
             <span className='text-2xs leading-sm text-text-secondary'>
-              {'← → move · space fire · esc to exit'}
+              {`\u2190 \u2192 move \u00B7 space fire \u00B7 esc exit \u00B7 m sound ${soundOn ? 'off' : 'on'}`}
             </span>
           )}
         </div>
@@ -112,9 +114,7 @@ export const GameHud: FC<GameHudProps> = ({
           className='fixed bottom-24 left-1/2 -translate-x-1/2 text-xs pointer-events-none text-text-secondary'
           style={{ animation: 'hud-in 0.3s ease-out' }}
         >
-          {
-            'Click the red anomalies \u2014 catch 5 to arm the cannon, then \u2190 \u2192 move \u00B7 space fire'
-          }
+          {`Click the red anomalies \u2014 catch 5 to arm the cannon \u00B7 m sound ${soundOn ? 'off' : 'on'}`}
         </div>
       )}
     </>

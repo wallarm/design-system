@@ -9,6 +9,8 @@
  * concrete classes (e.g. `useState<CalendarDate | null>`) — TypeScript
  * narrows the union automatically.
  */
+
+export { usePagination, usePaginationContext } from '@ark-ui/react/pagination';
 export {
   CalendarDate,
   CalendarDateTime,
@@ -97,6 +99,8 @@ export {
   type BannerControlsProps,
   BannerDescription,
   type BannerDescriptionProps,
+  BannerIcon,
+  type BannerIconProps,
   BannerLink,
   type BannerLinkProps,
   type BannerProps,
@@ -255,6 +259,15 @@ export {
   DropdownMenuTriggerItem,
 } from './components/DropdownMenu';
 export {
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateIllustration,
+  EmptyStateLink,
+  EmptyStateMessage,
+  EmptyStateTitle,
+} from './components/EmptyState';
+export {
   Field,
   FieldContent,
   FieldDescription,
@@ -373,6 +386,28 @@ export {
   usePageHost,
 } from './components/Page';
 export {
+  Pagination,
+  type PaginationAlign,
+  PaginationEllipsis,
+  type PaginationEllipsisProps,
+  PaginationItem,
+  type PaginationItemProps,
+  PaginationList,
+  type PaginationListProps,
+  PaginationNext,
+  type PaginationNextProps,
+  type PaginationPage,
+  type PaginationPageChangeDetails,
+  PaginationPageSize,
+  type PaginationPageSizeChangeDetails,
+  type PaginationPageSizeProps,
+  PaginationPrevious,
+  type PaginationPreviousProps,
+  type PaginationProps,
+  type PaginationSize,
+  usePaginationSizeContext,
+} from './components/Pagination';
+export {
   type CopyFormatData,
   formatAsFilter,
   ParameterPath,
@@ -479,9 +514,11 @@ export {
   SelectionBulkBar,
   type SelectionBulkBarPlacement,
   type SelectionBulkBarProps,
+  type SelectionContextValue,
   SelectionItem,
   type SelectionItemProps,
   type SelectionProps,
+  useSelectionContext,
 } from './components/Selection';
 export { Separator, type SeparatorProps } from './components/Separator';
 export { Skeleton, type SkeletonProps } from './components/Skeleton';
@@ -513,6 +550,18 @@ export {
   type TableColumnBase,
   type TableColumnDef,
   type TableColumnHelper,
+  TableColumnMenu,
+  TableColumnMenuHideItem,
+  type TableColumnMenuHideItemProps,
+  TableColumnMenuMoveLeftItem,
+  type TableColumnMenuMoveLeftItemProps,
+  TableColumnMenuMoveRightItem,
+  type TableColumnMenuMoveRightItemProps,
+  TableColumnMenuPinItem,
+  type TableColumnMenuPinItemProps,
+  type TableColumnMenuProps,
+  TableColumnMenuSortItem,
+  type TableColumnMenuSortItemProps,
   type TableColumnMeta,
   type TableColumnPinningState,
   type TableColumnSizingState,
@@ -528,6 +577,8 @@ export {
   type TableScrollToRowOptions,
   TableSettingsMenu,
   type TableSortingState,
+  TableSortTrigger,
+  type TableSortTriggerProps,
   type TableUpdater,
   type TableVisibilityState,
 } from './components/Table';
@@ -584,4 +635,10 @@ export {
   waitForStepEvent,
 } from './components/Tour';
 export { UtilityPage, type UtilityPageProps } from './components/UtilityPage';
+export {
+  WallyIcon,
+  type WallyIconProps,
+  type WallyIconSize,
+  type WallyIconStyle,
+} from './components/WallyIcon';
 export { type TestableProps, TestIdProvider, useTestId } from './utils/testId';

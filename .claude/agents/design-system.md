@@ -198,6 +198,18 @@ Always export each sub-component and its props type from `index.ts`.
 
 ---
 
+# Analytics-Readiness
+
+Every interactive component must be analytics-ready: consumer `data-*` / `aria-*` / `id` / `ref` / event props (canonically `data-analytics-id`, `data-analytics-props`) must land on the **real interactive DOM node**, not a wrapper. Don't restate the rules here — read and follow:
+
+- [`docs/metrics/contract.md`](../../docs/metrics/contract.md) — the canonical contract.
+- [`docs/metrics/new-component-checklist.md`](../../docs/metrics/new-component-checklist.md) — run before completing.
+- [`docs/metrics/testing-examples.md`](../../docs/metrics/testing-examples.md) — copy test shapes.
+
+The two that bite most often while implementing: **element-specific prop types** on every interactive target — never generic `HTMLAttributes<HTMLElement>` when the real target is a button/anchor/input/textarea (the `<div>` template above is generic only because its root is non-interactive); the checklist lists the exact type per element. And **no analytics-named props or escape hatches added just for analytics** — expose composition seams instead.
+
+---
+
 # Accessibility Requirements
 
 1. Use semantic HTML elements (`button`, `nav`, `main`, etc.)
@@ -231,3 +243,4 @@ Always export each sub-component and its props type from `index.ts`.
 - [ ] Component is registered in `src/index.ts`
 - [ ] No `any` types used
 - [ ] Accessibility requirements are met
+- [ ] Analytics-readiness: `docs/metrics/new-component-checklist.md` satisfied (element-specific typing, `{...rest}` to the real node, event composition, no analytics-specific props); any wrapper-level/gap recorded in the component folder

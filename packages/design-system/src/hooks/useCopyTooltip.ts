@@ -10,7 +10,7 @@ interface UseCopyTooltipReturn {
   copied: boolean;
   tooltipOpen: boolean;
   onTooltipOpenChange: (open: boolean) => void;
-  handleCopy: (event: { stopPropagation: () => void }) => void;
+  handleCopy: () => void;
 }
 
 export function useCopyTooltip({
@@ -38,21 +38,17 @@ export function useCopyTooltip({
     [copied],
   );
 
-  const handleCopy = useCallback(
-    (event: { stopPropagation: () => void }) => {
-      event.stopPropagation();
-      if (!enabled) return;
-      copyText(text);
-      setCopied(true);
-      setKeepOpen(true);
-      clearTimer();
-      timerRef.current = setTimeout(() => {
-        setKeepOpen(false);
-        setCopied(false);
-      }, 2000);
-    },
-    [enabled, text, clearTimer],
-  );
+  const handleCopy = useCallback(() => {
+    if (!enabled) return;
+    copyText(text);
+    setCopied(true);
+    setKeepOpen(true);
+    clearTimer();
+    timerRef.current = setTimeout(() => {
+      setKeepOpen(false);
+      setCopied(false);
+    }, 2000);
+  }, [enabled, text, clearTimer]);
 
   // Dismiss "Copied" tooltip on click outside.
   // Registered on next frame so the triggering pointerdown doesn't fire it.

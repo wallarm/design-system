@@ -67,6 +67,24 @@ describe('valueCommitHelpers', () => {
     });
   });
 
+  describe('getInvalidValueIndices — strictValues=false', () => {
+    const field: FieldMetadata = {
+      name: 'status_code',
+      label: 'Status code',
+      type: 'integer',
+      options: ['200', '404'],
+      strictValues: false,
+    };
+
+    it('does not flag a value missing from options', () => {
+      expect(getInvalidValueIndices(field, ['503'])).toEqual([]);
+    });
+
+    it('still flags a wrong-type value', () => {
+      expect(getInvalidValueIndices(field, ['abc'])).toEqual([0]);
+    });
+  });
+
   describe('bypass for getSuggestions-backed fields', () => {
     const dynamicField: FieldMetadata = {
       name: 'code',

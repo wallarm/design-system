@@ -1,65 +1,35 @@
-import type { FC, Ref } from 'react';
+import type { ComponentPropsWithoutRef, FC, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
-import { Link } from '../Link';
-import { HStack } from '../Stack';
-import { Text } from '../Text';
+import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 
-export interface BulkBarSummaryProps {
-  count: number;
-  isAllSelected: boolean;
-  onSelectAll: () => void;
-  onClear: () => void;
-  /**
-   * When true, prevent the summary from wrapping or being truncated by the
-   * container: truncate the "X selected" text and keep the Select-all link on
-   * a single line. Use when the bar can shrink (e.g. inside a Drawer).
-   * Defaults to `false` — actions then rely on the parent for layout.
-   */
-  nowrap?: boolean;
-  'data-testid'?: string;
+export interface BulkBarSummaryProps
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>,
+    TestableProps {
+  children: ReactNode;
   ref?: Ref<HTMLDivElement>;
 }
 
 export const BulkBarSummary: FC<BulkBarSummaryProps> = ({
-  count,
-  isAllSelected,
-  onSelectAll,
-  onClear,
-  nowrap = false,
-  'data-testid': testId,
+  children,
+  className,
   ref,
+  'data-testid': testIdProp,
+  ...rest
 }) => {
+  const testId = useTestId('bulk-bar-summary', testIdProp);
+
   return (
-    <div
-      ref={ref}
-      data-slot='bulk-bar-summary'
-      data-testid={testId}
-      className={cn('flex items-center gap-16 p-8', nowrap && 'flex-nowrap whitespace-nowrap')}
-    >
-      <Text size='sm' color='primary-alt' weight='medium' truncate={nowrap}>
-        {count} selected
-      </Text>
-
-      <HStack gap={6}>
-        <Link
-          type={isAllSelected ? 'muted' : 'alt'}
-          size='md'
-          onClick={onSelectAll}
-          disabled={isAllSelected}
-          className={cn(nowrap && 'whitespace-nowrap')}
-        >
-          Select all
-        </Link>
-
-        <Text size='sm' color='tertiary-alt' weight='medium'>
-          ·
-        </Text>
-
-        <Link type='alt' size='md' onClick={onClear}>
-          Clear
-        </Link>
-      </HStack>
-    </div>
+    <TestIdProvider value={testId}>
+      <div
+        {...rest}
+        ref={ref}
+        data-slot='bulk-bar-summary'
+        data-testid={testId}
+        className={cn('flex items-center gap-16 p-8', className)}
+      >
+        {children}
+      </div>
+    </TestIdProvider>
   );
 };
 

@@ -16,6 +16,7 @@
     "**/*.spec.*",
     "**/*.stories.*",
     "**/*.e2e.*",
+    "src/testUtils",
     "node_modules",
     "dist",
     "storybook-static"

@@ -33,25 +33,21 @@ const makeEmptyChip = (i: number, error: boolean): FilterInputChipData =>
   }) as FilterInputChipData;
 
 /**
- * Resolve a value's display label: prefer the current field's option. When the
- * chip is errored on its value (`crossField`), fall back to any other field
- * that defines this value — after a field change the value no longer matches
- * the new field, but its human-readable label still lives on the field it came
- * from, so the errored chip keeps showing the label instead of the raw value.
- *
- * The cross-field search is gated on the value error on purpose: a freeform
- * field's value (no options) must stay raw even if it happens to coincide with
- * another field's option label.
+ * Resolve a value's display label: prefer the current field's option, otherwise
+ * fall back to any other field that defines this value. After changing a chip's
+ * field — across data types too (e.g. `application_id = API Console` → field
+ * changed to `IP Address`) — the value no longer matches the new field, but its
+ * human-readable label still lives on the field it came from, so the chip keeps
+ * showing the label instead of the raw value. The fallback returns undefined
+ * when no field defines the value, so genuinely freeform values stay raw.
  */
 const resolveValueLabel = (
   value: string | number | boolean | null,
   field: FieldMetadata | undefined,
   fields: FieldMetadata[],
-  crossField: boolean,
 ): string | undefined => {
   const own = findOptionByValue(field, value)?.label;
   if (own !== undefined) return own;
-  if (!crossField) return undefined;
   return findValueLabelInFields(value, fields);
 };
 
@@ -60,16 +56,10 @@ const resolveDisplayValue = (
   condition: Condition,
   field: FieldMetadata | undefined,
   fields: FieldMetadata[],
-  crossField: boolean,
 ): string => {
   const raw = String(condition.value ?? '');
   return (
-    resolveValueLabel(
-      condition.value as string | number | boolean | null,
-      field,
-      fields,
-      crossField,
-    ) ?? raw
+    resolveValueLabel(condition.value as string | number | boolean | null, field, fields) ?? raw
   );
 };
 
@@ -129,10 +119,9 @@ const buildMultiValueChip = (
   field: FieldMetadata | undefined,
   fields: FieldMetadata[],
   chipError: ChipErrorSegment | undefined,
-  crossField: boolean,
 ): FilterInputChipData => {
   const values = condition.value as Array<string | number | boolean>;
-  const valueParts = values.map(v => resolveValueLabel(v, field, fields, crossField) ?? String(v));
+  const valueParts = values.map(v => resolveValueLabel(v, field, fields) ?? String(v));
   const invalidIndices = field ? getInvalidValueIndices(field, values) : [];
   return {
     ...baseChip,
@@ -156,9 +145,6 @@ const makeConditionChip = (
   const chipError: ChipErrorSegment | undefined = condition.error || (error ? true : undefined);
   const field = fields.find(f => f.name === condition.field);
   const baseChip = buildBaseChip(i, condition, field);
-  // Only an errored value may borrow its label from another field (see
-  // resolveValueLabel) — freeform values stay raw.
-  const crossField = chipError === SEGMENT_VARIANT.value || chipError === true;
 
   // No-value operators (is_null/is_not_null) render a placeholder so the chip
   // still has three segments; type-specific branches below assume a real value.
@@ -173,12 +159,12 @@ const makeConditionChip = (
   }
 
   if (Array.isArray(condition.value)) {
-    return buildMultiValueChip(baseChip, condition, field, fields, chipError, crossField);
+    return buildMultiValueChip(baseChip, condition, field, fields, chipError);
   }
 
   return {
     ...baseChip,
-    value: resolveDisplayValue(condition, field, fields, crossField),
+    value: resolveDisplayValue(condition, field, fields),
     error: chipError,
   };
 };

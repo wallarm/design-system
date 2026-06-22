@@ -4,6 +4,7 @@ import { Project } from 'ts-morph';
 import { fileURLToPath } from 'url';
 import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
+import { parseComponentDescription } from './parse-description.js';
 import { parseExamples } from './parse-examples.js';
 import { parseComponentProps } from './parse-props.js';
 import { parseTokens } from './parse-tokens.js';
@@ -12,21 +13,6 @@ import { parseVariantsForComponent } from './parse-variants.js';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT = path.resolve(__dirname, '../..');
-
-const getComponentDescription = (
-  sourceFile: ReturnType<Project['getSourceFile']>,
-): string | undefined => {
-  if (!sourceFile) return undefined;
-
-  // Look for JSDoc on the main exported component
-  for (const varDecl of sourceFile.getVariableStatements()) {
-    const jsDocs = varDecl.getJsDocs();
-    if (jsDocs.length > 0) {
-      return jsDocs.at(0)?.getDescription().trim();
-    }
-  }
-  return undefined;
-};
 
 const main = () => {
   console.log('Generating design system metadata...');
@@ -58,9 +44,7 @@ const main = () => {
     // Parse usage examples from stories
     const examples = parseExamples(project, componentDir, name);
 
-    // Get description from JSDoc on the main component file
-    const mainFile = project.getSourceFile(path.join(componentDir, `${name}.tsx`));
-    const description = getComponentDescription(mainFile);
+    const description = parseComponentDescription(project, componentDir, name);
 
     // Read design-intent guidance from <Component>.llm.md if present
     const llmDocPath = path.join(componentDir, `${name}.llm.md`);

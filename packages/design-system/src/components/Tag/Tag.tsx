@@ -58,7 +58,12 @@ export const Tag: FC<TagProps> = ({
 
   const handleClick = onClick
     ? (event: MouseEvent<HTMLDivElement>) => {
-        event.stopPropagation();
+        // Skip when the click originated from a nested interactive control
+        // (e.g. TagClose) so the remove button doesn't double-fire select.
+        const nested = (event.target as HTMLElement).closest('button, a, [role="button"]');
+        if (nested && nested !== event.currentTarget && event.currentTarget.contains(nested)) {
+          return;
+        }
         onClick(event);
       }
     : undefined;

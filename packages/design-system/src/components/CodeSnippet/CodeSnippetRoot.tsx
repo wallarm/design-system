@@ -1,5 +1,5 @@
-import type { HTMLAttributes, ReactNode, Ref } from 'react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { HTMLAttributes, ReactElement, ReactNode, Ref } from 'react';
+import { Children, isValidElement, useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
@@ -14,8 +14,8 @@ import {
   type LineConfig,
   MIN_HIDDEN_LINES_THRESHOLD,
 } from './CodeSnippetContext';
+import { CodeSnippetShowMoreButton } from './CodeSnippetShowMoreButton';
 import { useAdapter } from './hooks';
-import { ShowMoreButton } from './internal/ShowMoreButton';
 import { buildDisplayItems, type FoldRegion, validateFolds } from './lib/foldUtils';
 
 const codeSnippetRootVariants = cva(
@@ -65,7 +65,11 @@ export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippe
     startingLineNumber?: number;
     /** Enable line wrapping */
     wrapLines?: boolean;
-    /** Max lines before collapsing (for ShowMore) */
+    /**
+     * Max lines before collapsing.
+     * Root auto-renders the default show-more button unless a direct
+     * `CodeSnippetShowMoreButton` child is provided for button-level props.
+     */
     maxLines?: number;
     /** Foldable regions that can be collapsed/expanded */
     folds?: FoldRegion[];
@@ -77,6 +81,13 @@ export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippe
 
 const EMPTY_LINES: Record<number, LineConfig> = {};
 
+const isCodeSnippetShowMoreButton = (child: ReactNode): child is ReactElement =>
+  isValidElement(child) &&
+  (child.type as { displayName?: string })?.displayName === CodeSnippetShowMoreButton.displayName;
+
+/**
+ * Code block with syntax highlighting, actions, line numbers, folding, and maxLines collapse.
+ */
 export const CodeSnippetRoot = <TLanguage extends string = string>({
   code,
   language = 'text' as TLanguage,
@@ -194,6 +205,8 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     [totalLines, validatedFolds, collapsedFolds, startingLineNumber],
   );
 
+  const hasExplicitShowMoreButton = Children.toArray(children).some(isCodeSnippetShowMoreButton);
+
   const visibleDisplayItems = useMemo(() => {
     const hiddenRows = displayItems.length - maxLines;
     const shouldClip = maxLines > 0 && !isExpanded && hiddenRows >= MIN_HIDDEN_LINES_THRESHOLD;
@@ -263,7 +276,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       {...(!isFullscreen ? props : {})}
     >
       {children}
-      {maxLines > 0 && <ShowMoreButton />}
+      {maxLines > 0 && !hasExplicitShowMoreButton && <CodeSnippetShowMoreButton />}
     </div>
   );
 

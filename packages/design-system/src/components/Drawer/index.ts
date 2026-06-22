@@ -1,3 +1,4 @@
+export type { DialogInteractOutsideEvent as DrawerInteractOutsideEvent } from '@ark-ui/react/dialog';
 export { drawerContentVariants, drawerPositionerVariants } from './classes';
 export { Drawer, type DrawerProps } from './Drawer';
 export { DrawerBody, type DrawerBodyProps } from './DrawerBody';

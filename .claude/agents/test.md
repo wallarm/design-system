@@ -143,6 +143,27 @@ describe('Alert', () => {
 
 ---
 
+# Metrics / Analytics-Readiness Tests
+
+Every interactive component needs component tests (Vitest + Testing Library) proving consumer `data-*` / `aria-*` / `id` / event props reach the **real interactive DOM node**. **Copy the matching snippet from [`docs/metrics/testing-examples.md`](../../docs/metrics/testing-examples.md)** rather than writing from scratch; the required coverage per shape and the full testing rules live there and in [`docs/metrics/contract.md`](../../docs/metrics/contract.md).
+
+Cover, where applicable: id on the real node (check `tagName`), verbatim `data-analytics-props`, polymorphic (`asChild`) reaching the final child, label-root click-resolution via `captureAnalyticsClicks` / `closest()`, a negative assertion (attr not on a hidden input / non-clickable wrapper), and persistence across one state change. Wrapper-level tests (only when the component folder documents a wrapper-level decision) must say `wrapper` in the name and assert wrapper placement deliberately.
+
+## Locator Hygiene
+
+Never query by the same `data-*` attribute you are asserting. Locate the element with `data-testid`, `getByRole`, or `data-slot`, **then** assert the analytics attribute on it.
+
+```typescript
+// ✅ locate by role/testid, assert the analytics attr
+render(<Button data-testid='save' data-analytics-id='SAVE_CHANGES'>Save</Button>);
+expect(screen.getByTestId('save')).toHaveAttribute('data-analytics-id', 'SAVE_CHANGES');
+
+// ❌ never locate by the attribute under assertion
+// screen.getByAttribute('data-analytics-id', ...) — circular, proves nothing
+```
+
+---
+
 # E2E Tests (Playwright)
 
 ## When to Write E2E Tests

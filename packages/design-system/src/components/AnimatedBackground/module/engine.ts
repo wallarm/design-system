@@ -20,9 +20,9 @@ import {
   parseColor,
 } from './engine-colors';
 import { buildGrid, sweepX } from './engine-grid';
-import type { GameEngineHost } from './game-logic';
+import type { GameEngineHost, GamePlugins } from './game-logic';
 import { CANNON_HALF_W, createGameLogic } from './game-logic';
-import type { GameRenderCtx } from './game-renderer';
+import type { GameRenderCtx, RenderPlugins } from './game-renderer';
 import { createGameRenderer } from './game-renderer';
 import type { EngineOptions, GameStats } from './types';
 
@@ -60,6 +60,9 @@ export interface SweepEngine {
   setFiring(on: boolean): void;
   onStats(cb: (s: GameStats) => void): void;
   setExclusion(box: { width: number; height: number } | null): void;
+  celebrate(score: number): void;
+  setSound(on: boolean): void;
+  setPlugins(plugins: { game: GamePlugins; render: RenderPlugins }): void;
 }
 
 export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOptions): SweepEngine {
@@ -74,6 +77,8 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
     w: 0,
     h: 0,
     dots: [],
+    gridCols: 0,
+    gridSp: 0,
     opts,
     tanTilt: Math.tan((options.tilt * Math.PI) / 180),
     exclusionBox: null,
@@ -124,7 +129,10 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
     canvas.width = Math.round(host.w * dpr);
     canvas.height = Math.round(host.h * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    host.dots = buildGrid(host.w, host.h, opts.spacing);
+    const grid = buildGrid(host.w, host.h, opts.spacing);
+    host.dots = grid.dots;
+    host.gridCols = grid.cols;
+    host.gridSp = grid.sp;
     host.tanTilt = Math.tan((opts.tilt * Math.PI) / 180);
     resolveColors();
     game.cannonX = Math.max(CANNON_HALF_W, Math.min(host.w - CANNON_HALF_W, game.cannonX));
@@ -210,9 +218,10 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
     ctx.fillRect(0, 0, host.w, host.h);
     if (opts.texture === 'halftone') {
       drawHalftone(t);
-      gr.drawCaughtEffects(t);
       gr.drawCannon(t);
       gr.drawBullets();
+      gr.drawCelOverlay(t);
+      gr.drawCaughtEffects(t);
     } else {
       drawClean(t);
     }
@@ -237,6 +246,13 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
     lastFrameT = now;
 
     if (opts.texture === 'halftone') {
+      // Step celebration before gameSim so particles advance before drawing
+      game.stepCel(
+        now,
+        dt,
+        rc.caughtPalette[rc.caughtPalette.length - 1]!,
+        rc.dotPalette[rc.dotPalette.length - 1]!,
+      );
       game.gameSim(now, dt);
     }
 
@@ -289,7 +305,12 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
     opts = { ...opts, ...next };
     host.opts = opts;
     host.tanTilt = Math.tan((opts.tilt * Math.PI) / 180);
-    if (spacingChanged) host.dots = buildGrid(host.w, host.h, opts.spacing);
+    if (spacingChanged) {
+      const grid = buildGrid(host.w, host.h, opts.spacing);
+      host.dots = grid.dots;
+      host.gridCols = grid.cols;
+      host.gridSp = grid.sp;
+    }
     resolveColors();
     if (!running) renderStatic();
   }
@@ -317,5 +338,14 @@ export function createSweepEngine(canvas: HTMLCanvasElement, options: EngineOpti
     setFiring: (on: boolean) => game.setFiring(on),
     onStats: (cb: (s: GameStats) => void) => game.onStats(cb),
     setExclusion: (box: { width: number; height: number } | null) => game.setExclusion(box),
+    celebrate: (score: number) => {
+      if (opts.texture !== 'halftone' || !running) return;
+      game.celebrate(score);
+    },
+    setSound: (on: boolean) => game.setSound(on),
+    setPlugins: (p: { game: GamePlugins; render: RenderPlugins }) => {
+      game.setPlugins(p.game);
+      gr.setRenderPlugins(p.render);
+    },
   };
 }

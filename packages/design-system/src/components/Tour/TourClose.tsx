@@ -1,24 +1,34 @@
-import { forwardRef } from 'react';
+import type { FC, Ref } from 'react';
 import { Tour as ArkUiTour, useTourContext } from '@ark-ui/react';
 import { X } from '../../icons';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
-export type TourCloseProps = ArkUiTour.CloseTriggerProps;
+export interface TourCloseProps
+  extends Omit<ArkUiTour.CloseTriggerProps, 'children' | 'color'>,
+    TestableProps {
+  ref?: Ref<HTMLButtonElement>;
+}
 
-export const TourClose = forwardRef<HTMLButtonElement, TourCloseProps>((props, ref) => {
-  const testId = useTestId('close');
+export const TourClose: FC<TourCloseProps> = ({
+  ref,
+  className,
+  'data-testid': testIdProp,
+  ...rest
+}) => {
+  const testId = useTestId('close', testIdProp);
   const { step } = useTourContext();
   const type = step?.type === 'dialog' ? 'dialog' : 'tooltip';
 
   return (
     <Tooltip>
       <ArkUiTour.CloseTrigger
-        data-testid={testId}
-        className={cn('absolute top-14 right-16')}
+        {...rest}
         ref={ref}
+        data-testid={testId}
+        className={cn('absolute top-14 right-16', className)}
         asChild
       >
         <TooltipTrigger asChild>
@@ -35,6 +45,6 @@ export const TourClose = forwardRef<HTMLButtonElement, TourCloseProps>((props, r
       <TooltipContent>Close</TooltipContent>
     </Tooltip>
   );
-});
+};
 
 TourClose.displayName = 'TourClose';

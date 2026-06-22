@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { describe, expect, it } from 'vitest';
 import type { ComponentMetadata, DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
+import { parseComponentDescription } from '../parse-description.js';
 import { parseExamples } from '../parse-examples.js';
 import { parseComponentProps } from '../parse-props.js';
 import { parseTokens } from '../parse-tokens.js';
@@ -29,8 +30,10 @@ describe('metadata generation (integration)', () => {
     const { mainProps, subComponents } = parseComponentProps(project, dir, name);
     const variants = parseVariantsForComponent(project, dir, name);
     const examples = parseExamples(project, dir, name);
+    const description = parseComponentDescription(project, dir, name);
     return {
       name,
+      ...(description && { description }),
       importPath: `@wallarm-org/design-system/${name}`,
       props: mainProps,
       variants,
@@ -79,6 +82,15 @@ describe('metadata generation (integration)', () => {
     expect(button).toBeDefined();
     expect(button!.examples.length).toBeGreaterThan(0);
     expect(button!.examples[0]?.name).toBe('Basic');
+  });
+
+  it('CodeSnippet has a concise MCP description from CodeSnippetRoot JSDoc', () => {
+    const codeSnippet = components.find(c => c.name === 'CodeSnippet');
+
+    expect(codeSnippet).toBeDefined();
+    expect(codeSnippet!.description).toBe(
+      'Code block with syntax highlighting, actions, line numbers, folding, and maxLines collapse.',
+    );
   });
 
   it('all components have examples array', () => {

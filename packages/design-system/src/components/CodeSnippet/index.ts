@@ -41,6 +41,10 @@ export {
 export { CodeSnippetHeader, type CodeSnippetHeaderProps } from './CodeSnippetHeader';
 export { CodeSnippetLineNumbers, type CodeSnippetLineNumbersProps } from './CodeSnippetLineNumbers';
 export { CodeSnippetRoot, type CodeSnippetRootProps } from './CodeSnippetRoot';
+export {
+  CodeSnippetShowMoreButton,
+  type CodeSnippetShowMoreButtonProps,
+} from './CodeSnippetShowMoreButton';
 export { CodeSnippetTab, type CodeSnippetTabProps } from './CodeSnippetTab';
 export { CodeSnippetTabs, type CodeSnippetTabsProps } from './CodeSnippetTabs';
 export { CodeSnippetTitle, type CodeSnippetTitleProps } from './CodeSnippetTitle';
@@ -50,7 +54,7 @@ export { useAdapter, useCodeSnippet } from './hooks';
 // Inline variant
 export { InlineCodeSnippet, type InlineCodeSnippetProps } from './InlineCodeSnippet';
 // Fold types and utilities
-export { type FoldRegion } from './lib/foldUtils';
+export { type FoldButtonProps, type FoldRegion } from './lib/foldUtils';
 export {
   getHttpFolds,
   HTTP_FOLD_ID,

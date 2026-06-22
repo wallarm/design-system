@@ -95,6 +95,7 @@ export const BreadcrumbsItem: FC<BreadcrumbsItemProps> = ({
       {isLink ? (
         <a
           href={href}
+          onClick={onClick}
           className={commonClasses}
           aria-label={ariaLabel}
           data-testid={testId}

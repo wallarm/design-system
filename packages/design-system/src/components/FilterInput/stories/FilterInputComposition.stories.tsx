@@ -624,6 +624,46 @@ export const Default: Story = {
 };
 
 /**
+ * Same fields as `Default`, but every field sets `strictValues: false`, so its
+ * `values`/`options` act as *suggestions* rather than a strict allowlist: the
+ * dropdown still offers them, but any typed value commits without an
+ * "Invalid value" error and changing a chip's field never reddens the carried
+ * value. Data-type checks (a non-date in a `date` field) and explicit `validate`
+ * callbacks (e.g. `status_code` format) still apply.
+ *
+ * This mirrors the Attacks page, which treats backend schema options as samples
+ * and lets the backend reject truly invalid values.
+ */
+export const SuggestionsOnly: Story = {
+  render: () => {
+    const [expression, setExpression] = useState<ExprNode | null>(null);
+
+    const suggestionFields: FieldMetadata[] = attackFields.map(field => ({
+      ...field,
+      strictValues: false,
+    }));
+
+    return (
+      <>
+        <FilterInput
+          fields={suggestionFields}
+          value={expression}
+          onChange={setExpression}
+          placeholder='Type to filter — options are suggestions, free text allowed...'
+          showKeyboardHint
+        />
+
+        {expression && (
+          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+            <pre>{JSON.stringify(expression, null, 2)}</pre>
+          </div>
+        )}
+      </>
+    );
+  },
+};
+
+/**
  * Minimal example with fewer fields.
  * Supports multiple conditions with AND/OR — create several filters in a row.
  */

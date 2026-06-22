@@ -1,13 +1,12 @@
 import type { FC } from 'react';
-import { cn } from '../../utils/cn';
-import { Text } from '../Text';
+import { EmptyState, EmptyStateDescription, EmptyStateMessage } from '../EmptyState';
 
 export const SelectEmptyState: FC = () => (
-  <div className={cn('p-6 text-center')}>
-    <Text size='sm' color='secondary'>
-      No results
-    </Text>
-  </div>
+  <EmptyState type='no-results'>
+    <EmptyStateMessage>
+      <EmptyStateDescription>No results</EmptyStateDescription>
+    </EmptyStateMessage>
+  </EmptyState>
 );
 
 SelectEmptyState.displayName = 'SelectEmptyState';

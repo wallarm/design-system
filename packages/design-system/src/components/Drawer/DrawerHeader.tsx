@@ -1,4 +1,11 @@
-import type { FC, ReactNode, Ref } from 'react';
+import {
+  Children,
+  type FC,
+  isValidElement,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+} from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { DrawerClose } from './DrawerClose';
@@ -8,8 +15,12 @@ export interface DrawerHeaderProps {
   ref?: Ref<HTMLDivElement>;
 }
 
+const isDrawerClose = (child: ReactNode): child is ReactElement =>
+  isValidElement(child) && child.type === DrawerClose;
+
 export const DrawerHeader: FC<DrawerHeaderProps> = ({ children, ref }) => {
   const testId = useTestId('header');
+  const hasExplicitClose = Children.toArray(children).some(isDrawerClose);
 
   return (
     <div
@@ -27,7 +38,7 @@ export const DrawerHeader: FC<DrawerHeaderProps> = ({ children, ref }) => {
     >
       {children}
 
-      <DrawerClose />
+      {!hasExplicitClose && <DrawerClose />}
     </div>
   );
 };

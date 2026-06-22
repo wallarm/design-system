@@ -1,8 +1,8 @@
-import { type CSSProperties, type FC, type MouseEvent, type ReactNode, useMemo } from 'react';
+import { type CSSProperties, type FC, type HTMLAttributes, type ReactNode, useMemo } from 'react';
 import { Popover as ArkUiPopover, usePopoverContext } from '@ark-ui/react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import {
   ScrollArea,
   ScrollAreaContent,
@@ -17,13 +17,14 @@ import {
 } from './constants';
 import type { PopoverSizeDimension } from './types';
 
-export interface PopoverContentProps {
+export interface PopoverContentProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'id' | 'style'>,
+    TestableProps {
   children: ReactNode;
   minHeight?: PopoverSizeDimension;
   maxHeight?: PopoverSizeDimension;
   minWidth?: PopoverSizeDimension;
   maxWidth?: PopoverSizeDimension;
-  'data-testid'?: string;
 }
 
 export const PopoverContent: FC<PopoverContentProps> = ({
@@ -32,10 +33,11 @@ export const PopoverContent: FC<PopoverContentProps> = ({
   maxHeight = POPOVER_MAX_HEIGHT,
   minWidth = POPOVER_MIN_WIDTH,
   maxWidth = POPOVER_MAX_WIDTH,
+  className,
   'data-testid': testIdProp,
+  ...rest
 }) => {
-  const contextTestId = useTestId('content');
-  const testId = testIdProp ?? contextTestId;
+  const testId = useTestId('content', testIdProp);
   const { getContentProps } = usePopoverContext();
   const { id } = getContentProps();
 
@@ -50,14 +52,11 @@ export const PopoverContent: FC<PopoverContentProps> = ({
     [minHeight, maxHeight, minWidth, maxWidth],
   );
 
-  const handleClick = (event: MouseEvent<HTMLDivElement>) => {
-    event.stopPropagation();
-  };
-
   return (
     <ArkUiPortal>
       <ArkUiPopover.Positioner>
         <ArkUiPopover.Content
+          {...rest}
           id={id}
           data-testid={testId}
           style={style}
@@ -88,8 +87,8 @@ export const PopoverContent: FC<PopoverContentProps> = ({
             'data-[side=right]:slide-in-from-left-2',
             // Animation top
             'data-[side=top]:slide-in-from-bottom-2',
+            className,
           )}
-          onClick={handleClick}
           asChild
         >
           <ScrollArea ids={{ root: id }}>

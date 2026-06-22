@@ -95,6 +95,13 @@ export interface FieldMetadata {
    */
   options?: string[];
   /**
+   * When `false`, `values`/`options` are suggestions rather than an exhaustive
+   * allowlist: the dropdown still offers them, but any typed value commits
+   * without an allowlist error. Data-type validation (`isValueOfType`) still
+   * applies. Defaults to `true` (options are a strict allowlist).
+   */
+  strictValues?: boolean;
+  /**
    * Optional callback to compute value suggestions dynamically from the current
    * input text. When provided, takes precedence over `values` and `options`.
    * The returned list is still post-filtered by `filterAndSort`, so prefix/includes

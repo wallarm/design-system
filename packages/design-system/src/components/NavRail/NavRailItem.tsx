@@ -8,10 +8,10 @@ import {
   useRef,
 } from 'react';
 import { composeRefs } from '@radix-ui/react-compose-refs';
-import { Slot } from '@radix-ui/react-slot';
+import { Slot, Slottable } from '@radix-ui/react-slot';
 import type { SvgIconProps } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { Kbd } from '../Kbd';
 import { Tooltip } from '../Tooltip';
 import { TooltipContent } from '../Tooltip/TooltipContent';
@@ -20,7 +20,7 @@ import { navRailItemVariants } from './classes';
 import { useNavRailContext } from './NavRailContext';
 import { useShortcut } from './useShortcut';
 
-export interface NavRailItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
+export interface NavRailItemProps extends AnchorHTMLAttributes<HTMLAnchorElement>, TestableProps {
   ref?: Ref<HTMLAnchorElement>;
   asChild?: boolean;
   icon: ComponentType<SvgIconProps>;
@@ -38,10 +38,11 @@ export const NavRailItem: FC<NavRailItemProps> = ({
   active = false,
   className,
   children,
+  'data-testid': testIdProp,
   ...props
 }) => {
   const { collapsed } = useNavRailContext();
-  const testId = useTestId('item');
+  const testId = useTestId('item', testIdProp);
   const Comp = asChild ? Slot : 'a';
   const internalRef = useRef<HTMLAnchorElement>(null);
 
@@ -66,7 +67,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
           {label}
         </span>
       )}
-      {children}
+      <Slottable>{children}</Slottable>
     </Comp>
   );
 

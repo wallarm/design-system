@@ -1,10 +1,10 @@
-import type { ComponentPropsWithoutRef, ElementRef, FC, Ref } from 'react';
+import type { ComponentPropsWithoutRef, ComponentRef, FC, Ref } from 'react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { Tooltip as ArkUiTooltip } from '@ark-ui/react/tooltip';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { hasNonTextEnd } from '../../utils/hasNonTextEnd';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
 const tooltipContentVariants = cva(
   [
@@ -37,24 +37,31 @@ const tooltipContentVariants = cva(
   },
 );
 
-type TooltipContentProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Content> & {
-  ref?: Ref<ElementRef<typeof ArkUiTooltip.Content>>;
-};
+export type TooltipContentProps = ComponentPropsWithoutRef<typeof ArkUiTooltip.Content> &
+  TestableProps & {
+    ref?: Ref<ComponentRef<typeof ArkUiTooltip.Content>>;
+  };
 
-export const TooltipContent: FC<TooltipContentProps> = ({ children, className, ref, ...props }) => {
-  const testId = useTestId('content');
+export const TooltipContent: FC<TooltipContentProps> = ({
+  children,
+  className,
+  ref,
+  'data-testid': testIdProp,
+  ...props
+}) => {
+  const testId = useTestId('content', testIdProp);
 
   return (
     <ArkUiPortal>
       <ArkUiTooltip.Positioner>
         <ArkUiTooltip.Content
+          {...props}
           ref={ref}
           data-testid={testId}
           className={cn(
             tooltipContentVariants({ hasNonTextEnd: hasNonTextEnd(children) }),
             className,
           )}
-          {...props}
         >
           {children}
         </ArkUiTooltip.Content>

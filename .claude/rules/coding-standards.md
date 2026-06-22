@@ -27,7 +27,7 @@
 
 - Biome handles formatting — do not argue about style
 - Run `pnpm lint:fix` to auto-fix issues
-- Single quotes, no semicolons (configured in Biome)
+- Single quotes, semicolons required, trailing commas (configured in Biome)
 
 ## Git
 
