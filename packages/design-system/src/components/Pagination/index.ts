@@ -1,3 +1,4 @@
+export { useClientPagination } from './lib';
 export { Pagination, type PaginationProps } from './Pagination';
 export { usePaginationSizeContext } from './PaginationContext';
 export { PaginationEllipsis, type PaginationEllipsisProps } from './PaginationEllipsis';

@@ -1,8 +1,9 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { VStack } from '../Stack';
 import { createTableColumnHelper, Table, type TableColumnDef } from '../Table';
 import { Text } from '../Text';
+import { useClientPagination } from './lib';
 import { Pagination } from './Pagination';
 import { PaginationEllipsis } from './PaginationEllipsis';
 import { PaginationItem } from './PaginationItem';
@@ -51,7 +52,7 @@ export const LinksOnly: StoryFn<typeof Pagination> = () => (
 );
 
 export const WithPageSize: StoryFn<typeof Pagination> = () => (
-  <Pagination count={120} defaultPageSize={25} defaultPage={2} align='left'>
+  <Pagination count={120} defaultPageSize={25} defaultPage={2} align='right'>
     <PaginationPageSize options={[10, 25, 50]} />
     <PaginationPrevious />
     <PaginationList />
@@ -164,42 +165,16 @@ const endpointColumns: TableColumnDef<ApiEndpoint>[] = [
   }),
 ];
 
-/**
- * A table whose rows are paged by a Pagination footer: "Rows per page" on the
- * left, page navigation on the right. Changing the page or page size slices the
- * data set client-side (`count` = total rows, Ark derives the page count).
- */
+// "Rows per page" + page navigation share a right-aligned footer below the table.
 export const InTable: StoryFn<typeof Pagination> = () => {
-  const [page, setPage] = useState(1);
-  const [pageSize, setPageSize] = useState(10);
-
-  const count = apiEndpoints.length;
-  const totalPages = Math.max(1, Math.ceil(count / pageSize));
-  const currentPage = Math.min(page, totalPages);
-
-  const pageData = useMemo(() => {
-    const start = (currentPage - 1) * pageSize;
-    return apiEndpoints.slice(start, start + pageSize);
-  }, [currentPage, pageSize]);
+  const { pageData, ...pagination } = useClientPagination(apiEndpoints, 10);
 
   return (
     <div className='w-800'>
       <VStack gap={12}>
         <Table data={pageData} columns={endpointColumns} getRowId={row => row.id} />
-        <Pagination
-          count={count}
-          page={currentPage}
-          pageSize={pageSize}
-          aria-label='API endpoints'
-          onPageChange={({ page }) => setPage(page)}
-          onPageSizeChange={({ pageSize }) => {
-            setPageSize(pageSize);
-            setPage(1);
-          }}
-        >
+        <Pagination {...pagination} align='right' aria-label='API endpoints'>
           <PaginationPageSize options={[5, 10, 25]} />
-          {/* spacer pushes the navigation to the right edge of the footer */}
-          <div className='flex-1' />
           <PaginationPrevious />
           <PaginationList />
           <PaginationNext />
