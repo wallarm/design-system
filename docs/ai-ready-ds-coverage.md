@@ -2,7 +2,7 @@
 
 > Who's writing which `<Component>.llm.md`, and what's done. Tiering comes from the [strategy §8](./ai-ready-ds-strategy.md#8-which-components-and-in-what-order-tiering); the how-to is in the [authoring guide](./ai-ready-ds-authoring-guide.md).
 >
-> **Last updated:** 2026-06-19
+> **Last updated:** 2026-06-22
 
 ## How to use this
 1. Pick a **Deep**-tier row with no **Assignee** and put your name in it.
@@ -14,8 +14,8 @@
 
 ## Snapshot
 - **Deep tier:** 9 done, 1 partial, 8 to do (+ 1 folded). ← the active batch
-- **Light tier:** 18 done (Badge + Tag + NumericBadge chip-trio + Toast + Alert + Dialog + Button + ToggleButton + DropdownMenu + Link + Select + Field + Input + Textarea + Radio + Checkbox + Switch + SegmentedControl), 22 parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)). All got the full router treatment, not Light notes. **Actions family complete** (Button / SplitButton / ToggleButton / Link + DropdownMenu); **forms / inputs family underway** — Select + Field + Input + Textarea done, **pickers complete** (Radio + Checkbox + Switch + SegmentedControl); next: NumberInput (known field-context gap), then date/time inputs.
-- **Skip:** 20 (providers, layout/leaf primitives, internal plumbing).
+- **Light tier:** 18 done (Badge + Tag + NumericBadge chip-trio + Toast + Alert + Dialog + Button + ToggleButton + DropdownMenu + Link + Select + Field + Input + Textarea + Radio + Checkbox + Switch + SegmentedControl), 24 parked pending the "short note vs. skip" decision ([§13.4](./ai-ready-ds-strategy.md#13-decisions-to-confirm-together)). All got the full router treatment, not Light notes. **Actions family complete** (Button / SplitButton / ToggleButton / Link + DropdownMenu); **forms / inputs family underway** — Select + Field + Input + Textarea done, **pickers complete** (Radio + Checkbox + Switch + SegmentedControl); next: NumberInput (known field-context gap), then date/time inputs. **(main's v0.66 merged in — EmptyState / Pagination / WallyIcon now tracked; the new `BannerIcon` sub-component + the `BulkBarSummary*` primitives fold into Banner / Table / Selection, not their own files.)**
+- **Skip:** 21 (providers, layout/leaf primitives, internal plumbing).
 
 ## Tracker
 
@@ -54,6 +54,7 @@
 | DateRangeInput | Light | ☐ To do | — | — | |
 | Dialog | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Dialog/Dialog.llm.md) | Reframed (Artem): a **layout** component, not messaging — centered modal twin of Drawer (wraps it, minus resize). Owns the overlay/layout ladder (Dialog→Drawer→page); destructive recipe; sizes 400/560/960. Export gotcha: not in root barrel, reachable via `/Dialog` subpath |
 | Drawer | Light | ☐ To do | — | — | |
+| EmptyState | Light | ☐ To do | — | — | New from main (v0.66 merge) — empty / zero-data state |
 | DropdownMenu | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/DropdownMenu/DropdownMenu.llm.md) | Actions-family; **trigger-agnostic** menu of commands (button / icon / right-click `DropdownMenuContextTrigger` / `anchorPoint`); boundary vs `Select` (form-field value) — but a menu *may* nest a value-pick (radio-group / submenu, e.g. Language); custom UI → `Popover`→`Dialog`/`Drawer`. Item intent = `variant` (destructive/brand), `onSelect` not onClick; portal/position/scroll automatic; **no size system (design-TBD)**; checkbox items stay open. 18 parts (Ark UI). Figma 267:5551 (Notes = design TODOs). Extended overlay-ladder backlog row |
 | Field | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Field/Field.llm.md) | Full **router** file: one doc covers the single labelled field + grouping parts. **Route:** single field (`FieldLabel` + bare `Input`/`Textarea`/`Select` + `FieldDescription`/`FieldError`) / grouped controls answering ONE question → `FieldSet`+`FieldLegend` (real fieldset/legend = group's a11y name) / multi-field layout → `FieldGroup` (+ decorative `FieldTitle`/`FieldSeparator`, no semantics). Test: do the controls answer one question? **Boundaries:** self-labelling controls (Checkbox/Radio/Switch) don't take a `FieldLabel` (double-labels); `Input`/`Textarea`/`Select` ship no label → need Field; `FieldError` = bottom rung of the messaging ladder (form-level → Alert). **Locked:** auto id/htmlFor (Input/Textarea only — **NumberInput is the exception, doesn't consume context yet**), `required` single source, `FieldIndicator` zero-prop (`*`/`(Optional)`), `FieldError` fixed danger+alert, CheckboxGroup auto-fieldset, emergent spacing. **Traps:** invalid state is double-wired (`<Input error>` + `<FieldError>`); error replaces description (manual swap). Required/optional both sanctioned, consistent per form. Char counter + success state Figma-ahead → don't build. Figma node 91:2. **3 code issues for FE lead:** invalid double-wire, `aria-describedby` not tied, NumberInput no field-context. Workflow-assisted (8-agent grounding + 3-judge panel → all-HIGH, 1 code-aware fix) |
 | Input | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Input/Input.llm.md) | The single-line free-text control — a bare label-less `<input>` owning only its box (`h-36`, `w-full`, `error` is the ONLY variant, **no size axis**). **Router:** multi-line → `Textarea`; numeric + steppers → `NumberInput` (not `type=number`); pick-from-list → `Select`; fixed-length code → `InputOTP`; **adornments (icon/prefix/suffix/clear/password-toggle) → `InputGroup`, never props on Input**; no Search/Password component; no free-text tag/token input (multi-from-list → multiselect Select; filter → FilterInput). Needs a `Field` for label/description/error (auto-wires id/`required` via context — never hand-wire `id`/`htmlFor`); placeholder ≠ label. Validation = double-wire (`<Input error>` + `<FieldError>`). Figma node 94:49; Code Connect = 3 examples (default/error/disabled). **Bug spawned (`task_01ebec27`):** Input.tsx double prop-spread `{...mergedProps} {...props}` clobbers the Field-context merge (chained handlers dropped). Workflow-assisted (8-agent grounding + 3-judge panel → all-HIGH, code-aware clean) |
@@ -64,6 +65,7 @@
 | NumericBadge | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/NumericBadge/NumericBadge.llm.md) | Counts chip; type = surface-driven (taste), 99+ cap, show-0 default, never clickable |
 | OverflowList | Light | ☐ To do | — | — | |
 | OverflowTooltip | Light | ☐ To do | — | — | |
+| Pagination | Light | ☐ To do | — | — | New from main (v0.66 merge) — page navigation control |
 | Popover | Light | ☐ To do | — | — | |
 | Progress | Light | ☐ To do | — | — | |
 | Radio | Light | ✅ Done | Artem | [.llm.md](../packages/design-system/src/components/Radio/Radio.llm.md) | Single-select one-of-a-set picker (`RadioGroup` owns the value; each `Radio` self-labels via `RadioLabel`). **Always a group** — a lone Radio is meaningless (→ Checkbox/Switch). **Boundaries:** multi → Checkbox; long list / save space → Select (~5-or-fewer judgment, mirrors Select); single on/off → Switch; 2–4 inline view toggle → SegmentedControl; independent toggles → ToggleButton row. **Self-labels → no FieldLabel**; group name = `FieldSet`+`FieldLegend` (the legend IS the name); validation on the group, not per option. **Locked:** vertical column only, `variant='default'|'card'` on the group (a design-taste call, NOT description-driven; card text-only today), `RadioIndicator` zero-prop/manual, a description switches the item to a 2-col grid, locked typography. **Emphasis = a `Badge` in `RadioLabel`** (designer-confirmed; it's a flex row built for it), never recolor. Default-selection left to context (AI decides). Figma node 290:5712; 2 Code Connect files. Workflow-assisted (8-agent grounding + 3-judge panel → all-HIGH, code-aware clean) |
@@ -89,6 +91,7 @@
 | Kbd | Skip | ➖ N/A | — | — | Leaf primitive |
 | Loader | Skip | ➖ N/A | — | — | Leaf primitive |
 | Logo | Skip | ➖ N/A | — | — | Leaf primitive |
+| WallyIcon | Skip | ➖ N/A | — | — | Brand / mascot icon — decorative (new from main, v0.66) |
 | Overlay | Skip | ➖ N/A | — | — | Primitive behind modals/popovers |
 | Page | Skip | ➖ N/A | — | — | Layout shell → foundations |
 | Polymorphic | Skip | ➖ N/A | — | — | Render utility |
