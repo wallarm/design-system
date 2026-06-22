@@ -1,3 +1,8 @@
+## 0.66.0 (2026-06-22)
+
+* fix(design-system): correct Pagination e2e story ids (#176) ([a36663f](https://github.com/wallarm/design-system/commit/a36663f)), closes [#176](https://github.com/wallarm/design-system/issues/176)
+* feat: WDS-140 pagination (#171) ([4071e25](https://github.com/wallarm/design-system/commit/4071e25)), closes [#171](https://github.com/wallarm/design-system/issues/171)
+
 ## 0.65.0 (2026-06-19)
 
 * feat: WDS-127 animated bg ([ad1ef25](https://github.com/wallarm/design-system/commit/ad1ef25))
