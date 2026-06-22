@@ -1,3 +1,7 @@
+## <small>0.66.1 (2026-06-22)</small>
+
+* fix(design-system): correct root package exports to dist/index.js (#175) ([fbe0241](https://github.com/wallarm/design-system/commit/fbe0241)), closes [#175](https://github.com/wallarm/design-system/issues/175)
+
 ## 0.66.0 (2026-06-22)
 
 * fix(design-system): correct Pagination e2e story ids (#176) ([a36663f](https://github.com/wallarm/design-system/commit/a36663f)), closes [#176](https://github.com/wallarm/design-system/issues/176)
