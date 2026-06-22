@@ -25,6 +25,14 @@ import {
 } from '../DropdownMenu';
 import { HttpMethod } from '../HttpMethod';
 import { OverflowList } from '../OverflowList';
+import {
+  Pagination,
+  PaginationList,
+  PaginationNext,
+  PaginationPageSize,
+  PaginationPrevious,
+  useClientPagination,
+} from '../Pagination';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { HStack, VStack } from '../Stack';
 import { Tag } from '../Tag';
@@ -98,6 +106,24 @@ export const Basic: StoryFn<typeof meta> = () => {
       sorting={sorting}
       onSortingChange={setSorting}
     />
+  );
+};
+
+// "Rows per page" + page navigation share a right-aligned footer below the table.
+export const WithPagination: StoryFn<typeof meta> = () => {
+  const allData = useMemo(() => createLargeSecurityEvents(47), []);
+  const { pageData, ...pagination } = useClientPagination(allData, 10);
+
+  return (
+    <VStack gap={12}>
+      <Table data={pageData} columns={securityColumns} getRowId={row => row.id} />
+      <Pagination {...pagination} align='right' aria-label='Security events'>
+        <PaginationPageSize options={[10, 25, 50]} />
+        <PaginationPrevious />
+        <PaginationList />
+        <PaginationNext />
+      </Pagination>
+    </VStack>
   );
 };
 
