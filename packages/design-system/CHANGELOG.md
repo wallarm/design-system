@@ -1,3 +1,50 @@
+## 0.66.0 (2026-06-22)
+
+* fix(design-system): correct Pagination e2e story ids (#176) ([a36663f](https://github.com/wallarm/design-system/commit/a36663f)), closes [#176](https://github.com/wallarm/design-system/issues/176)
+* feat: WDS-140 pagination (#171) ([4071e25](https://github.com/wallarm/design-system/commit/4071e25)), closes [#171](https://github.com/wallarm/design-system/issues/171)
+
+## 0.65.0 (2026-06-19)
+
+* feat: WDS-127 animated bg ([ad1ef25](https://github.com/wallarm/design-system/commit/ad1ef25))
+
+## <small>0.64.1 (2026-06-19)</small>
+
+* fix(design-system): remove mb-8 from SegmentedControl root (#170) ([2e7929b](https://github.com/wallarm/design-system/commit/2e7929b)), closes [#170](https://github.com/wallarm/design-system/issues/170)
+
+## 0.64.0 (2026-06-18)
+
+* ci: trigger release for v0.64.0 [skip-e2e] ([10e8bd2](https://github.com/wallarm/design-system/commit/10e8bd2))
+* feat: WDS-73 empty state [update-screenshots] (#167) ([f0e145d](https://github.com/wallarm/design-system/commit/f0e145d)), closes [#167](https://github.com/wallarm/design-system/issues/167)
+
+## 0.63.0 (2026-06-17)
+
+* feat(design-system): WDS-114 analytics-ready instrumentation across interactive components (#157) ([43c4923](https://github.com/wallarm/design-system/commit/43c4923)), closes [#157](https://github.com/wallarm/design-system/issues/157)
+
+## 0.62.0 (2026-06-16)
+
+* 🖼️ Update screenshots ([6b5eceb](https://github.com/wallarm/design-system/commit/6b5eceb))
+* feat: WDS-141 wally icons [update-screenshots] ([d341a8c](https://github.com/wallarm/design-system/commit/d341a8c))
+
+## 0.61.0 (2026-06-16)
+
+* feat(filter-input): AS-1134 strictValues + externalErrors for backend-driven filter errors (#163) ([1642456](https://github.com/wallarm/design-system/commit/1642456)), closes [#163](https://github.com/wallarm/design-system/issues/163)
+
+## 0.60.0 (2026-06-14)
+
+* feat: WDS-136 utility page ([3e942d6](https://github.com/wallarm/design-system/commit/3e942d6))
+* feat: WDS-136 utility page [update-screenshots] ([8db7225](https://github.com/wallarm/design-system/commit/8db7225))
+* feat: WDS-97 compose BannerIcon as a child component (#166) ([598769d](https://github.com/wallarm/design-system/commit/598769d)), closes [#166](https://github.com/wallarm/design-system/issues/166)
+
+## 0.59.0 (2026-06-13)
+
+* feat: WDS-127 animated bg ([4e6dc7c](https://github.com/wallarm/design-system/commit/4e6dc7c))
+* feat: WDS-127 sound ([9a6b65d](https://github.com/wallarm/design-system/commit/9a6b65d))
+
+## <small>0.58.1 (2026-06-12)</small>
+
+* 🖼️ Update screenshots ([aae68e1](https://github.com/wallarm/design-system/commit/aae68e1))
+* fix: icons layout [update-screenshots] ([2f5c84d](https://github.com/wallarm/design-system/commit/2f5c84d))
+
 ## 0.58.0 (2026-06-11)
 
 * 🖼️ Update screenshots ([bcf9243](https://github.com/wallarm/design-system/commit/bcf9243))

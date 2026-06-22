@@ -1,24 +1,21 @@
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import type { ButtonHTMLAttributes, FC, ReactNode, Ref } from 'react';
 import { Menu } from '@ark-ui/react/menu';
-import { useTestId } from '../../utils/testId';
-import type { DropdownMenuItemVariantsProps } from './DropdownMenuItem';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
-interface DropdownMenuContextTriggerProps
-  extends HTMLAttributes<HTMLButtonElement>,
-    DropdownMenuItemVariantsProps {
+export interface DropdownMenuContextTriggerProps
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
+    TestableProps {
   children: ReactNode;
   asChild?: boolean;
-  inset?: boolean;
   ref?: Ref<HTMLButtonElement>;
 }
 
 export const DropdownMenuContextTrigger: FC<DropdownMenuContextTriggerProps> = ({
-  variant = 'default',
-  inset = false,
   children,
+  'data-testid': testIdProp,
   ...props
 }) => {
-  const testId = useTestId('context-trigger');
+  const testId = useTestId('context-trigger', testIdProp);
 
   return (
     <Menu.ContextTrigger {...props} data-testid={testId}>

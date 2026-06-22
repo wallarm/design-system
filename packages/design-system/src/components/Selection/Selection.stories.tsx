@@ -2,6 +2,13 @@ import { useEffect, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Folder, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
+import {
+  BulkBarSummary,
+  BulkBarSummaryClear,
+  BulkBarSummaryCount,
+  BulkBarSummarySelectAll,
+  BulkBarSummarySeparator,
+} from '../BulkBar';
 import { Button } from '../Button';
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../Card';
 import {
@@ -19,6 +26,7 @@ import { Selection } from './Selection';
 import { SelectionAll } from './SelectionAll';
 import { SelectionBulkBar } from './SelectionBulkBar';
 import { SelectionItem } from './SelectionItem';
+import { useSelectionContext } from './useSelectionContext';
 
 interface Cluster {
   id: string;
@@ -311,6 +319,62 @@ export const WithoutBulkBar: StoryFn<typeof meta> = () => {
           ))}
         </VStack>
       </VStack>
+    </Selection>
+  );
+};
+
+// `partitionChildren` inside SelectionBulkBar matches `<BulkBarSummary>` by
+// React element type, so the summary must be a direct JSX child of
+// SelectionBulkBar — wrapper components are opaque and would force the
+// default Selection-wired summary to render alongside.
+const CompoundToolbar = () => {
+  const { selectedIds, isAllSelected, selectAll, clear } = useSelectionContext();
+
+  return (
+    <SelectionBulkBar placement='absolute' data-testid='selection-bulk-bar'>
+      <BulkBarSummary>
+        <BulkBarSummaryCount count={selectedIds.size} data-testid='bulk-count' />
+        <HStack gap={6}>
+          <BulkBarSummarySelectAll
+            data-testid='bulk-select-all'
+            data-analytics-id='BULK_SELECT_ALL'
+            onClick={selectAll}
+            disabled={isAllSelected}
+          />
+          <BulkBarSummarySeparator />
+          <BulkBarSummaryClear
+            data-testid='bulk-clear'
+            data-analytics-id='BULK_CLEAR'
+            onClick={clear}
+          />
+        </HStack>
+      </BulkBarSummary>
+      <Button
+        data-testid='bulk-delete'
+        data-analytics-id='BULK_DELETE'
+        color='brand'
+        onClick={() => alert(`Delete ${selectedIds.size}`)}
+      >
+        <Trash2 /> Delete
+      </Button>
+    </SelectionBulkBar>
+  );
+};
+
+export const CompoundBulkBar: StoryFn<typeof meta> = () => {
+  const [selected, setSelected] = useState<string[]>([]);
+
+  return (
+    <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+      <VStack gap={12}>
+        {clusters.map(c => (
+          <SelectionItem key={c.id} itemId={c.id}>
+            <ClusterCard cluster={c} />
+          </SelectionItem>
+        ))}
+      </VStack>
+
+      <CompoundToolbar />
     </Selection>
   );
 };

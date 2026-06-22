@@ -61,9 +61,11 @@ export const hasFieldValues = (field: FieldMetadata): boolean => {
 
 /**
  * True if the field has an exhaustive static allowlist. getSuggestions
- * fields return false — their list is a hint, not a strict allowlist.
+ * fields and `strictValues: false` fields return false — their list is a
+ * hint, not a strict allowlist.
  */
 export const hasStaticAllowlist = (field: FieldMetadata): boolean => {
+  if (field.strictValues === false) return false;
   if (field.getSuggestions) return false;
   if ((field.values?.length ?? 0) > 0) return true;
   return (field.options?.length ?? 0) > 0;

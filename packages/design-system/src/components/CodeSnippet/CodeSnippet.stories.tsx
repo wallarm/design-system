@@ -13,6 +13,7 @@ import { CodeSnippetFullscreenButton } from './CodeSnippetFullscreenButton';
 import { CodeSnippetHeader } from './CodeSnippetHeader';
 import { CodeSnippetLineNumbers } from './CodeSnippetLineNumbers';
 import { CodeSnippetRoot } from './CodeSnippetRoot';
+import { CodeSnippetShowMoreButton } from './CodeSnippetShowMoreButton';
 import { CodeSnippetTab } from './CodeSnippetTab';
 import { CodeSnippetTabs } from './CodeSnippetTabs';
 import { CodeSnippetTitle } from './CodeSnippetTitle';
@@ -24,6 +25,12 @@ const meta = {
   component: CodeSnippetRoot,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          'CodeSnippet renders code with optional syntax highlighting, actions, line numbers, annotations, folding, fullscreen mode, wrapping, and maxLines-based show-more collapse. For ordinary collapsed snippets, set maxLines on CodeSnippetRoot and use the default auto-rendered show-more button. Add CodeSnippetShowMoreButton as a direct child only when the real show-more <button> needs consumer props such as data-analytics-id, data-testid, aria-* attributes, ref, event handlers, or Button props; CodeSnippetRoot then suppresses the auto-rendered default.',
+      },
+    },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=3087-29516&m=dev',
@@ -762,8 +769,10 @@ Cache-Control: no-cache`;
  * Show more / show less button to collapse long code snippets.
  * Matches Figma node 3092:19114.
  *
- * When `maxLines` is set, only the first N lines are shown.
- * The button shows the count of hidden lines and toggles expand/collapse.
+ * When `maxLines` is set, only the first N lines are shown and
+ * CodeSnippetRoot auto-renders the default button. Render
+ * CodeSnippetShowMoreButton yourself only when props must reach the real
+ * button, for example analytics attributes or an onClick handler.
  */
 const showMoreThresholdCode = `Host: inventory.example.com
 User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)
@@ -780,6 +789,8 @@ X-Request-ID: abc-def-ghi`;
  * First snippet (12 lines, maxLines=7) shows the button (5 hidden).
  * Second snippet (9 lines, maxLines=7) hides only 2 lines — below
  * the threshold of 3, so all lines are shown without the button.
+ * Third snippet provides an explicit CodeSnippetShowMoreButton for
+ * per-button analytics; root does not auto-render a second button.
  */
 export const ShowMore: StoryFn<typeof meta> = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '500px' }}>
@@ -801,6 +812,17 @@ export const ShowMore: StoryFn<typeof meta> = () => (
         <CodeSnippetContent>
           <CodeSnippetCode />
         </CodeSnippetContent>
+      </CodeSnippetRoot>
+    </div>
+    <div>
+      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>
+        Explicit CodeSnippetShowMoreButton for per-button analytics
+      </p>
+      <CodeSnippetRoot code={showMoreCode} language='text' maxLines={7}>
+        <CodeSnippetContent>
+          <CodeSnippetCode />
+        </CodeSnippetContent>
+        <CodeSnippetShowMoreButton data-analytics-id='CODE_SHOW_MORE' />
       </CodeSnippetRoot>
     </div>
   </div>

@@ -1,4 +1,5 @@
 import type { FC, ReactNode } from 'react';
+import type { DialogInteractOutsideEvent as DrawerInteractOutsideEvent } from '@ark-ui/react/dialog';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { DrawerProvider } from './DrawerContext';
 import { DrawerRoot } from './DrawerRoot';
@@ -23,6 +24,10 @@ export interface DrawerProps extends TestableProps {
   minWidth?: number;
   /** Maximum width in pixels */
   maxWidth?: number;
+  /** Fired when the user interacts outside the drawer (e.g. clicks the backdrop). */
+  onInteractOutside?: (event: DrawerInteractOutsideEvent) => void;
+  /** Fired when the user presses the Escape key while the drawer is open. */
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
 }
 
 export const Drawer: FC<DrawerProps> = ({
@@ -36,6 +41,8 @@ export const Drawer: FC<DrawerProps> = ({
   width,
   minWidth,
   maxWidth,
+  onInteractOutside,
+  onEscapeKeyDown,
   'data-testid': testId,
 }) => (
   <DrawerProvider
@@ -52,6 +59,8 @@ export const Drawer: FC<DrawerProps> = ({
       closeOnEscape={closeOnEscape}
       closeOnOutsideClick={closeOnOutsideClick}
       modal={modal}
+      onInteractOutside={onInteractOutside}
+      onEscapeKeyDown={onEscapeKeyDown}
     >
       <TestIdProvider value={testId}>{children}</TestIdProvider>
     </DrawerRoot>

@@ -171,11 +171,13 @@ Design the public API following these principles:
    - Behavior flags (disabled, readOnly, required)
    - Callbacks (onOpen, onClose, onChange, onSubmit)
 
-2. **Sub-component props** — Extend `HTMLAttributes<HTMLElement>`:
-   - Always include `ref?: Ref<HTMLElement>`
-   - Always include `className?: string`
-   - Always include `children?: ReactNode`
-   - Add `asChild?: boolean` only for polymorphic parts
+2. **Sub-component props** — extend the **element-specific** native attribute type of the rendered target, not the generic `HTMLAttributes<HTMLElement>`. The analytics-readiness contract (`.claude/rules/metrics.md`, `docs/metrics/contract.md`) requires this so arbitrary `data-*` / `aria-*` / `id` / `ref` / event props land on the real interactive node with the correct typing:
+   - Interactive `<button>` target → `ButtonHTMLAttributes<HTMLButtonElement>`
+   - Anchor `<a>` target → `AnchorHTMLAttributes<HTMLAnchorElement>`
+   - `<input>` / `<textarea>` target → `InputHTMLAttributes<HTMLInputElement>` / `TextareaHTMLAttributes<HTMLTextAreaElement>`
+   - Generic non-interactive container (`<div>`, `<span>` slot) → `HTMLAttributes<HTMLDivElement>` — the only case where the generic type is acceptable
+   - Always include `ref?: Ref<…>` for the matching element, `className?: string`, and `children?: ReactNode`
+   - Add `asChild?: boolean` only for polymorphic parts, and ensure attrs survive the `Slot` merge onto the final rendered child
 
 3. **Controlled vs Uncontrolled:**
    - Support both: `value` + `onChange` (controlled) and `defaultValue` (uncontrolled)
@@ -221,6 +223,18 @@ function useComponentNameState(props: ComponentNameProps): ComponentNameState;
 
 ---
 
+### Analytics-Readiness API Design
+
+Design every interactive component to be analytics-ready by construction — full contract in [`docs/metrics/contract.md`](../../docs/metrics/contract.md). The architecture decisions that matter at design time:
+
+- **Reachability** — every interactive target is the root element or an **exported sub-component** the consumer can render directly. Never bury a click target behind a config array, string label, or internal-only action list. Auto-rendered defaults (e.g. a close icon) get an explicit composition seam so consumers can substitute an analytics-bearing instance — choose the mechanism per component (exported sub-component, render prop, disable-default flag + child, or a children-scan opt-out, as in `DialogClose` / `TourClose` / `TableSettingsMenu`).
+- **Composition is the default seam** — never design `analyticsId` / `analyticsProps` props or an analytics provider, and don't add `slotProps` / `confirmButtonProps` *just* to thread analytics through. Multiple targets → multiple exported sub-components; a typed slot prop is acceptable only when it serves genuine composition and natively forwards attributes to a concrete target.
+- **Element-specific typing** (see Props Design) and **event composition** (compose, never replace consumer handlers) — the contract covers the rest.
+
+Produce an **Analytics targets** table in the design spec (see Phase 4): one row per interactive target with the rendered element, the exported sub-component (or root) that reaches it, the attribute type, and any declared gap.
+
+---
+
 ## Phase 4: Output Format
 
 Produce a **Design Specification** document with these sections:
@@ -262,6 +276,15 @@ interface ComponentNamePart1Props { ... }
 ```typescript
 interface ComponentNameContextValue { ... }
 ```
+
+### Analytics Targets (required for any interactive component)
+
+| Target | Rendered element | Reached via | Attribute type | Gap? |
+|--------|------------------|-------------|----------------|------|
+| Primary action | `<button>` | `ComponentNameTrigger` | `ButtonHTMLAttributes<HTMLButtonElement>` | None |
+| … | … | root / exported sub-component | … | document gap + workaround, or None |
+
+Confirm every interactive target is reachable (root or exported sub-component), uses element-specific typing, composes handlers, and needs no analytics-specific prop. Flag any wrapper-level or closed target explicitly with its workaround.
 
 ### 6. File Structure
 ```
@@ -342,3 +365,7 @@ Before designing, review these for consistency:
 - [ ] Keyboard interactions defined
 - [ ] Edge cases documented
 - [ ] File structure matches project conventions
+- [ ] Every interactive target is reachable (root or exported sub-component) — no buried click targets
+- [ ] Sub-component props use element-specific attribute types, not generic `HTMLAttributes<HTMLElement>`
+- [ ] No analytics-named props (`analyticsId` / `analyticsProps`) and no analytics provider; no `slotProps` / `confirmButtonProps` escape hatch added just for analytics
+- [ ] Analytics Targets table filled in, with any wrapper-level / closed target flagged + workaround

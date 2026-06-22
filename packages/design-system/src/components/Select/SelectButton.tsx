@@ -20,9 +20,10 @@ export const SelectButton: FC<SelectButtonProps> = ({
   placeholder = 'Choose...',
   variant = 'outline',
   color = 'neutral',
+  'data-testid': testIdProp,
   ...props
 }) => {
-  const testId = useTestId('button');
+  const testId = useTestId('button', testIdProp);
   const { loading } = useSelectSharedContext();
   const { disabled } = useSelectContext();
 

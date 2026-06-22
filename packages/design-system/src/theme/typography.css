@@ -8,6 +8,7 @@
     --font-mono:
         'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
         'Liberation Mono', 'Courier New', monospace;
+    --font-pixel: 'Geist Pixel', ui-sans-serif, system-ui, sans-serif;
     --font-serif: 'Inter', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 
     --font-weight-thin: 100;

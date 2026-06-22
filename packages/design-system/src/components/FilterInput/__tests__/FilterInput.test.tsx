@@ -165,6 +165,32 @@ describe('FilterInput', () => {
     });
   });
 
+  describe('onErrorsChange (AS-1134)', () => {
+    it('reports validation messages and clears them when fixed', async () => {
+      const onErrorsChange = vi.fn();
+      const invalid: Condition = {
+        type: 'condition',
+        field: 'priority',
+        operator: '=',
+        value: 'abc',
+      };
+      const { rerender } = render(
+        <FilterInput fields={sampleFields} value={invalid} onErrorsChange={onErrorsChange} />,
+      );
+      await waitFor(() => {
+        expect(onErrorsChange).toHaveBeenLastCalledWith(
+          expect.arrayContaining([expect.stringMatching(/Priority/i)]),
+        );
+      });
+
+      const valid: Condition = { type: 'condition', field: 'priority', operator: '=', value: 5 };
+      rerender(<FilterInput fields={sampleFields} value={valid} onErrorsChange={onErrorsChange} />);
+      await waitFor(() => {
+        expect(onErrorsChange).toHaveBeenLastCalledWith([]);
+      });
+    });
+  });
+
   describe('input focus on empty space click', () => {
     it('has cursor-text wrapper that delegates clicks to input', () => {
       const condition: Condition = {
@@ -1132,6 +1158,53 @@ describe('FilterInput', () => {
         await screen.findByRole('menuitem', { name: /None/i }, { timeout: 10000 }),
       ).toBeInTheDocument();
       expect(screen.queryByRole('menuitem', { name: '__none__' })).toBeNull();
+    });
+  });
+
+  describe('AS-1134: Enter commits free text on suggestions-only fields', () => {
+    const suggestionFields: FieldMetadata[] = [
+      {
+        name: 'host',
+        label: 'Host',
+        type: 'string',
+        options: ['a.example.com'],
+        strictValues: false,
+      },
+    ];
+
+    it('commits a typed value missing from options when strictValues is false', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<FilterInput fields={suggestionFields} onChange={onChange} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Host'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.keyboard('my-free-host.example.com{Enter}');
+
+      await waitFor(() => {
+        expect(onChange).toHaveBeenCalledWith(
+          expect.objectContaining({
+            type: 'condition',
+            field: 'host',
+            operator: '=',
+            value: 'my-free-host.example.com',
+          }),
+        );
+      });
+    });
+
+    it('does not commit free text on a strict-allowlist field', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      render(<FilterInput fields={sampleFields} onChange={onChange} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Status'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.keyboard('archived{Enter}');
+
+      expect(onChange).not.toHaveBeenCalled();
     });
   });
 });

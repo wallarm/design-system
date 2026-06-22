@@ -1,5 +1,8 @@
 import type { FC, ReactNode } from 'react';
-import { Dialog } from '@ark-ui/react/dialog';
+import {
+  Dialog,
+  type DialogInteractOutsideEvent as DrawerInteractOutsideEvent,
+} from '@ark-ui/react/dialog';
 import { useDrawerContext } from './DrawerContext';
 
 interface DrawerRootProps {
@@ -7,6 +10,8 @@ interface DrawerRootProps {
   closeOnEscape: boolean;
   closeOnOutsideClick: boolean;
   modal: boolean;
+  onInteractOutside?: (event: DrawerInteractOutsideEvent) => void;
+  onEscapeKeyDown?: (event: KeyboardEvent) => void;
 }
 
 export const DrawerRoot: FC<DrawerRootProps> = ({
@@ -14,6 +19,8 @@ export const DrawerRoot: FC<DrawerRootProps> = ({
   closeOnEscape,
   closeOnOutsideClick,
   modal,
+  onInteractOutside,
+  onEscapeKeyDown,
 }) => {
   const { isOpen, onOpenChange } = useDrawerContext();
 
@@ -28,6 +35,8 @@ export const DrawerRoot: FC<DrawerRootProps> = ({
       closeOnEscape={closeOnEscape}
       closeOnInteractOutside={closeOnOutsideClick}
       modal={modal}
+      onInteractOutside={onInteractOutside}
+      onEscapeKeyDown={onEscapeKeyDown}
       lazyMount
       unmountOnExit
     >

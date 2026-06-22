@@ -33,6 +33,21 @@ export interface FilterInputProps
   onChange?: (expression: ExprNode | null) => void;
   placeholder?: string;
   error?: boolean;
+  /**
+   * Field names whose values were rejected by the backend. Matching chips are
+   * rendered with a value error (red). Purely presentational: conditions and
+   * `onChange` output are unaffected, and the consumer is expected to render
+   * its own message (e.g. an alert with the backend error text) and clear the
+   * prop when the filter changes or the query succeeds.
+   */
+  externalErrors?: string[];
+  /**
+   * Notified whenever the set of validation messages FilterInput renders below
+   * the input changes (empty array = no visible error). Lets a consumer avoid
+   * stacking its own message (e.g. a backend-error alert) on top of one the
+   * input already shows. Pass a stable (memoized) callback.
+   */
+  onErrorsChange?: (errors: string[]) => void;
   showKeyboardHint?: boolean;
 }
 
@@ -42,6 +57,8 @@ export const FilterInput: FC<FilterInputProps> = ({
   onChange,
   placeholder = 'Type to filter...',
   error = false,
+  externalErrors,
+  onErrorsChange,
   showKeyboardHint = false,
   className,
   ...props
@@ -68,7 +85,7 @@ export const FilterInput: FC<FilterInputProps> = ({
     clearAll,
     replaceExpression,
     setConnectorValue,
-  } = useFilterInputExpression({ fields, value, onChange, error });
+  } = useFilterInputExpression({ fields, value, onChange, error, externalErrors });
 
   const autocomplete = useFilterInputAutocomplete({
     fields,
@@ -139,6 +156,10 @@ export const FilterInput: FC<FilterInputProps> = ({
     () => (pasteError ? [pasteError, ...fieldErrors] : fieldErrors),
     [pasteError, fieldErrors],
   );
+
+  useEffect(() => {
+    onErrorsChange?.(errors);
+  }, [errors, onErrorsChange]);
 
   return (
     <div

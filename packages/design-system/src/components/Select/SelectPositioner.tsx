@@ -14,7 +14,7 @@ export const SelectPositioner: FC<SelectPositionerProps> = ({ className, childre
           dropdownMenuClassNames,
           'flex flex-col',
           'h-full',
-          'min-w-280',
+          'min-w-240',
           'max-w-320',
           'max-h-(--available-height)',
           'p-0',
