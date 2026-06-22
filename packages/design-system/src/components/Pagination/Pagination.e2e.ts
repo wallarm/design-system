@@ -4,13 +4,13 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const paginationStory = createStoryHelper('navigation-pagination', [
   'Full',
   'Simple',
-  'LinksOnly',
-  'WithPageSize',
+  'Links Only',
+  'With Page Size',
   'Sizes',
   'Alignment',
-  'ManyPages',
+  'Many Pages',
   'Playground',
-  'InTable',
+  'In Table',
 ] as const);
 
 test.describe('Component: Pagination', () => {
@@ -26,12 +26,12 @@ test.describe('Component: Pagination', () => {
     });
 
     test('Should render links-only pagination correctly', async ({ page }) => {
-      await paginationStory.goto(page, 'LinksOnly');
+      await paginationStory.goto(page, 'Links Only');
       await expect(page).toHaveScreenshot();
     });
 
     test('Should render rows-per-page control correctly', async ({ page }) => {
-      await paginationStory.goto(page, 'WithPageSize');
+      await paginationStory.goto(page, 'With Page Size');
       await expect(page).toHaveScreenshot();
     });
 
@@ -46,7 +46,7 @@ test.describe('Component: Pagination', () => {
     });
 
     test('Should render many pages with ellipsis correctly', async ({ page }) => {
-      await paginationStory.goto(page, 'ManyPages');
+      await paginationStory.goto(page, 'Many Pages');
       await expect(page).toHaveScreenshot();
     });
 
@@ -56,7 +56,7 @@ test.describe('Component: Pagination', () => {
     });
 
     test('Should render a table with a pagination footer correctly', async ({ page }) => {
-      await paginationStory.goto(page, 'InTable');
+      await paginationStory.goto(page, 'In Table');
       await expect(page).toHaveScreenshot();
     });
   });
