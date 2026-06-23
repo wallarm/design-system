@@ -5,7 +5,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const componentsDir = path.join(__dirname, '../src/components');
 const packageJsonPath = path.join(__dirname, '../package.json');
 
 interface ExportConditions {
@@ -27,11 +26,10 @@ interface PackageJson {
 
 const packageJson: PackageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 
-const components = fs
-  .readdirSync(componentsDir, { withFileTypes: true })
-  .filter(dirent => dirent.isDirectory())
-  .map(dirent => dirent.name);
-
+// Per-component subpaths (`@wallarm-org/design-system/Button`) are covered by the
+// `./*` wildcard below — no need to enumerate every component. The wildcard is
+// resolved by any consumer using `moduleResolution` bundler/node16/nodenext,
+// which is the only setup that reads `exports` at all.
 const exports: PackageExports = {
   '.': {
     development: './src/index.ts',
@@ -53,24 +51,18 @@ const exports: PackageExports = {
     require: './dist/theme/index.css',
     default: './dist/theme/index.css',
   },
-};
-
-components.forEach(component => {
-  exports[`./${component}`] = {
-    development: `./src/components/${component}/index.ts`,
-    types: `./dist/components/${component}/index.d.ts`,
-    import: `./dist/components/${component}/index.js`,
-    require: `./dist/components/${component}/index.js`,
-    default: `./dist/components/${component}/index.js`,
-  };
-});
-
-exports['./*'] = {
-  development: './src/components/*/index.ts',
-  types: './dist/components/*/index.d.ts',
-  import: './dist/components/*/index.js',
-  require: './dist/components/*/index.js',
-  default: './dist/components/*/index.js',
+  './metadata': {
+    import: './dist/metadata/components.json',
+    require: './dist/metadata/components.json',
+    default: './dist/metadata/components.json',
+  },
+  './*': {
+    development: './src/components/*/index.ts',
+    types: './dist/components/*/index.d.ts',
+    import: './dist/components/*/index.js',
+    require: './dist/components/*/index.js',
+    default: './dist/components/*/index.js',
+  },
 };
 
 packageJson.exports = exports;
@@ -78,4 +70,4 @@ packageJson.exports = exports;
 // biome-ignore lint/style/useTemplate: just new line
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
 
-console.log(`Generated exports for ${components.length} components`);
+console.log('Generated package exports (root + icons + theme + metadata + ./* wildcard)');

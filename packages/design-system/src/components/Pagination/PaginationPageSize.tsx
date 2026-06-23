@@ -7,6 +7,7 @@ import {
   SelectButton,
   SelectContent,
   SelectOption,
+  SelectOptionIndicator,
   SelectOptionText,
   SelectPositioner,
 } from '../Select';
@@ -40,19 +41,20 @@ export const PaginationPageSize: FC<PaginationPageSizeProps> = ({
       <Text asChild size='sm' weight='medium' color='primary'>
         <span className='whitespace-nowrap'>{label}</span>
       </Text>
-      <div className='w-fit'>
+      <div className='w-60'>
         <Select
           collection={collection}
           value={[String(api.pageSize)]}
           onValueChange={({ value }) => api.setPageSize(Number(value[0]))}
           data-testid={testId}
         >
-          <SelectButton aria-label={label} />
-          <SelectPositioner>
+          <SelectButton size='medium' aria-label={label} />
+          <SelectPositioner className='min-w-0 w-88'>
             <SelectContent>
               {collection.items.map(item => (
                 <SelectOption key={item.value} item={item}>
                   <SelectOptionText>{item.label}</SelectOptionText>
+                  <SelectOptionIndicator />
                 </SelectOption>
               ))}
             </SelectContent>

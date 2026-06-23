@@ -12,6 +12,7 @@ type SelectButtonBaseProps = Omit<ButtonProps, 'variant' | 'color' | 'size' | 'd
 export interface SelectButtonVariantProps {
   variant?: Exclude<ButtonProps['variant'], 'primary'>;
   color?: Exclude<ButtonProps['color'], 'destructive'>;
+  size?: ButtonProps['size'];
 }
 
 type SelectButtonProps = SelectButtonBaseProps & SelectButtonVariantProps & SelectValueTextProps;
@@ -20,6 +21,7 @@ export const SelectButton: FC<SelectButtonProps> = ({
   placeholder = 'Choose...',
   variant = 'outline',
   color = 'neutral',
+  size = 'large',
   'data-testid': testIdProp,
   ...props
 }) => {
@@ -35,7 +37,7 @@ export const SelectButton: FC<SelectButtonProps> = ({
           data-testid={testId}
           variant={variant}
           color={color}
-          size='large'
+          size={size}
           loading={loading}
           disabled={disabled}
           fullWidth
