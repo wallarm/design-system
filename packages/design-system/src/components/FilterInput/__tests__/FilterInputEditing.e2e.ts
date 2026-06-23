@@ -228,7 +228,7 @@ test.describe.skip('Component: FilterInput - Editing', () => {
       await expect(highlightedItem).toHaveCount(1);
     });
 
-    test('Should show all multi-select options with selected at top during editing', async ({
+    test('Should show all multi-select options in original order during editing', async ({
       page,
     }) => {
       await compositionStory.goto(page, 'Default');
