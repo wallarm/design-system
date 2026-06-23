@@ -1,385 +1,419 @@
-# Filter System Design Reference
+---
+name: filter-field-design
+description: >-
+  Implementation and architecture reference for the FilterInput query-builder
+  component (config-driven field→operator→value autocomplete, expression-tree
+  model, chip rendering, and a Playwright testing guide). Use when building,
+  wiring, or testing FilterInput, or when you need its real component names,
+  import paths, props, types, or Storybook titles.
+---
 
-Comprehensive design documentation for Wallarm Filter System. This document describes all available components, mechanics, config-driven patterns, and testing guidelines.
+# FilterInput System Design Reference
+
+Implementation and architecture documentation for the Wallarm **FilterInput**
+query-builder. This document describes the public components, the config-driven
+mechanics, the expression-tree data model, chip rendering, and a Playwright
+testing guide.
+
+> **Companion doc:** `packages/design-system/src/components/FilterInput/FilterInput.llm.md`
+> is the **judgment / usage-intent** layer — *when* to reach for FilterInput,
+> when **not** to (a row of `Select`s for ≈3–5 facets), what's locked, and what
+> it pairs with. **This** doc is the **implementation / architecture** reference
+> (real names, paths, props, types, mechanics). Read the `.llm.md` for the
+> design decision; read this for the wiring.
 
 ---
 
 ## 🎯 Core Concept: Simple Config-Driven API
 
-**FilterField works by simply passing config from backend API** - no manual field definitions, no hardcoded values.
+**`FilterInput` works by passing a `fields` config** — no manual field
+definitions, no hardcoded operators, no hand-assembled chips. Each field's
+`type` decides which operators are offered; its `values` / `options` /
+`getSuggestions` drive value autocomplete.
 
-### Backend Integration Pattern
+The config is typically served from a backend query-metadata endpoint, but for
+a prototype you just hardcode the `fields` array and read the result from
+`onChange`.
 
-```typescript
-// 1. Fetch metadata from backend API
-const response = await fetch('/api/query-metadata');
-const metadata: QueryMetadata = await response.json();
+### Integration Pattern
 
-// 2. Pass fields directly to FilterField - that's it!
-<FilterField
-  fields={metadata.where_fields}  // Just pass the array from API!
-  onChange={(expression) => {
-    // Get parsed expression tree ready for API
-    console.log(expression);
-  }}
-/>
-```
+```tsx
+import { FilterInput } from '@wallarm-org/design-system';
+// or the subpath: import { FilterInput } from '@wallarm-org/design-system/FilterInput';
+import type { ExprNode, FieldMetadata } from '@wallarm-org/design-system';
+import { useState } from 'react';
 
-**Backend API Contract** (from `sessions-api/internal/wallarm/security_universal_queries/metadata.go`):
-
-```typescript
-interface QueryMetadata {
-  select_fields: SelectFieldMetadata[];  // For SELECT clause
-  group_by_fields: FieldMetadata[];      // For GROUP BY clause
-  where_fields: FieldMetadata[];         // For WHERE clause (filters)
-}
-
-interface FieldMetadata {
-  name: string;              // Field identifier (e.g., "attack_type")
-  label: string;             // Human-readable label (e.g., "Attack Type")
-  type: string;              // Field type: "string" | "integer" | "date" | "float" | "boolean" | "array"
-  description: string;       // Help text for tooltips
-  operators?: string[];      // Allowed operators (e.g., ["=", "!=", "in", "like"])
-  default?: boolean;         // Pre-select in table view
-}
-```
-
-**Complete working example:**
-```typescript
-import { FilterField } from '@wallarm/design-system';
+// fields ideally come from a backend query-metadata endpoint
+const whereFields: FieldMetadata[] = [
+  { name: 'last_seen', label: 'Last seen', type: 'date' },
+  {
+    name: 'status',
+    label: 'Status',
+    type: 'enum',
+    values: [
+      { value: 'registered', label: 'Registered' },
+      { value: 'blocked', label: 'Blocked' },
+    ],
+  },
+];
 
 function AttackFilters() {
-  const [metadata, setMetadata] = useState<QueryMetadata | null>(null);
   const [expression, setExpression] = useState<ExprNode | null>(null);
 
-  useEffect(() => {
-    // Fetch config from backend
-    fetch('/api/security/query-metadata')
-      .then(res => res.json())
-      .then(data => setMetadata(data));
-  }, []);
-
-  if (!metadata) return <div>Loading...</div>;
-
   return (
-    <FilterField
-      fields={metadata.where_fields}  // Config from backend!
+    <FilterInput
+      fields={whereFields}
       value={expression}
       onChange={(expr) => {
-        setExpression(expr);
-        // Send to API: POST /api/filters with expression tree
+        setExpression(expr); // ExprNode tree → your query API
       }}
-      placeholder="Filter attacks..."
+      placeholder="Filter attacks…"
     />
   );
 }
 ```
 
 **Key benefits:**
-- ✅ Zero manual configuration - backend defines all fields
-- ✅ No hardcoded operators - backend specifies per field type
-- ✅ Automatic validation - only valid operators shown
-- ✅ Single source of truth - metadata.go defines everything
-- ✅ Type-safe - full TypeScript support
+- ✅ Zero per-condition wiring — `FilterInput` manages its own state.
+- ✅ No hardcoded operators — the field `type` decides which operators appear.
+- ✅ Config is the single source of truth — values, suggestions, validation all
+  hang off `FieldMetadata`.
+- ✅ Type-safe — full TypeScript support, no `any`.
+- ✅ Output is a structured **expression tree** (`ExprNode`), not a string.
 
 ---
 
 ## 📚 Component Architecture
 
-### Core Components
+The component lives at
+`packages/design-system/src/components/FilterInput/`. Real nested structure:
 
-#### FilterField
-**Path:** `packages/design-system/src/components/filter/FilterField/FilterField.tsx`
-**Storybook:** [`Components/Filter/FilterField`](http://localhost:6006/?path=/story/components-filter-filterfield)
+- `FilterInput.tsx` — the main component + `FilterInputProps`.
+- `index.ts` — public exports.
+- `types.ts` — `FieldMetadata`, `ExprNode`, `Condition`, `Group`,
+  `FilterOperator`, `FieldType`, `FieldValueOption`, `FilterInputChipData`,
+  `FilterInputChipVariant`.
+- `FilterInputField/` — the chip strip, holding:
+  - `FilterInputChip/` — the attribute·operator·value chip (`FilterInputChip`).
+  - `FilterInputConnectorChip/` — the AND/OR/parenthesis connector chip.
+- `FilterInputMenu/` — the autocomplete menus:
+  - `FilterInputFieldMenu.tsx` — field-selection menu.
+  - `FilterInputOperatorMenu.tsx` — operator-selection menu.
+  - `FilterInputValueMenu/` — value-selection menu.
+  - `FilterInputDateValueMenu/` — date value / preset menu (date fields).
+- `FilterInputContext/` — internal React context wiring.
+- `hooks/` — autocomplete, expression, and selection hooks.
+- `lib/` — parser (`parseExpression/`), serializer, constants, validation,
+  field helpers, `statusCode/` factories.
+- `stories/` — Storybook stories (filed under **Patterns/**).
 
-**Main filter component - works directly with backend API config.**
+### Public exports (`index.ts`)
 
-**Config-driven mode (RECOMMENDED):**
 ```typescript
-<FilterField
-  fields={metadata.where_fields}  // From backend API
-  value={expression}
-  onChange={(expr) => console.log(expr)}
-/>
+// Components
+export { FilterInput, type FilterInputProps } from './FilterInput';
+export { FilterInputChip, type FilterInputChipProps } from './FilterInputField';
+export {
+  FilterInputFieldMenu, type FilterInputFieldMenuProps,
+  FilterInputOperatorMenu, type FilterInputOperatorMenuProps,
+  FilterInputValueMenu, type FilterInputValueMenuProps,
+  type ValueOption,
+} from './FilterInputMenu';
+
+// Utilities
+export {
+  applyFieldValueTransforms, COUNTRY_OPTIONS,
+  createStatusCodeInputFilter, createStatusCodeNormalizer,
+  createStatusCodeSerializer, createStatusCodeSuggestions,
+  createStatusCodeValidator,
+  type FilterParseError, getKnownFieldSerializer, isFilterParseError,
+  parseExpression, serializeExpression, validateValueForField,
+} from './lib';
+
+// Types
+export type {
+  Condition, ExprNode, FieldMetadata, FieldType, FieldValueOption,
+  FilterInputChipData, FilterInputChipVariant, FilterOperator, Group,
+} from './types';
 ```
 
-**Key Features:**
-- **Self-contained**: Internal state management, no manual wiring needed
-- **Config-driven**: Just pass `fields` from API, everything works automatically
-- Autocomplete menus (field → operator → value) handled internally
-- Expression parsing and chip creation automatic
-- Visual chips rendering (up to 3 visible, then placeholder hint)
-- Click chip to edit, hover to delete
-- Clear button (appears when chips exist)
-- Keyboard shortcuts (Backspace to delete, Escape to close menus)
+> `FilterInputDateValueMenu` is also exported from the `FilterInputMenu` barrel
+> for date fields; the menus are exported only for rare custom builds — in normal
+> use you render `<FilterInput>` and it wires the menus internally.
 
-**Props (Simplified API):**
+### Core Components
+
+#### FilterInput
+**Path:** `packages/design-system/src/components/FilterInput/FilterInput.tsx`
+**Storybook:** `Patterns/FilterInput/FilterInput`
+
+**Main filter component — self-contained, config-driven.** Pass `fields` and it
+handles autocomplete, chip creation/editing/removal, expression parsing, and
+error rendering automatically.
+
+**Key features:**
+- **Self-contained**: internal state management, no manual menu wiring.
+- **Config-driven**: pass `fields`; everything derives from it.
+- Autocomplete menus (field → operator → value, plus a date menu) handled
+  internally.
+- Expression parsing and chip creation automatic.
+- Visual chips with AND/OR connectors and parenthesis grouping; first chips
+  render inline, extras collapse to a hint; click-to-edit, hover-to-delete,
+  clear-all.
+- Keyboard support (menu navigation, Backspace to delete, Escape to close).
+- Select-all copies the whole query as a parseable string; paste re-parses it
+  (with parse-error handling).
+
+**Props — the real `FilterInputProps`** (verbatim shape from
+`FilterInput.tsx`). It extends
+`Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'>`:
+
 ```typescript
-interface FilterFieldProps {
-  // Required config from backend
-  fields?: FieldMetadata[];           // Fields from backend API
+interface FilterInputProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
+  fields?: FieldMetadata[];                  // field config (drives autocomplete)
+  value?: ExprNode | null;                   // controlled expression
+  onChange?: (expression: ExprNode | null) => void; // emits the expression tree
 
-  // Controlled mode (optional)
-  value?: ExprNode | null;            // Current expression
-  onChange?: (expression: ExprNode | null) => void;  // Callback on change
+  placeholder?: string;                      // default 'Type to filter...'
+  error?: boolean;                           // error styling on the whole input
 
-  // Optional styling
-  placeholder?: string;
-  error?: boolean;
-  showKeyboardHint?: boolean;
+  // Field names whose VALUES the backend rejected → matching chips painted red.
+  // Purely presentational: conditions and onChange output are unaffected. The
+  // consumer renders its own message (e.g. an Alert) and clears this when the
+  // filter changes or the query succeeds.
+  externalErrors?: string[];
+
+  // Notified whenever the set of validation messages FilterInput renders below
+  // the input changes (empty array = none). Lets a consumer avoid stacking its
+  // own message on top. Pass a stable (memoized) callback.
+  onErrorsChange?: (errors: string[]) => void;
+
+  showKeyboardHint?: boolean;                // default false
 }
 ```
 
-**How it works internally:**
-- User clicks/types → FilterMainMenu opens automatically
-- User selects field → FilterOperatorMenu opens automatically
-- User selects operator → FilterValueMenu opens automatically
-- User selects value → Chip created automatically
-- Expression parsed and onChange called automatically
+**How it works internally (the autocomplete cascade):**
+- User clicks/types → **`FilterInputFieldMenu`** opens (field selection).
+- User selects a field → **`FilterInputOperatorMenu`** opens (operators filtered
+  by field `type`).
+- User selects an operator → **`FilterInputValueMenu`** opens (or
+  **`FilterInputDateValueMenu`** for date fields).
+- User selects/commits a value → a chip is created, the expression is rebuilt,
+  and `onChange` fires.
 
-**Stories to reference:**
-- `Default` - Empty state with placeholder
-- `WithMultipleChips` - Multiple chips with AND/OR operators
-- `WithMoreThanThreeChips` - Shows 3 chips + placeholder hint
-- `ErrorWithChips` - Error state propagates to all chips
-- `InteractiveWithRemoval` - Chip deletion functionality
-- `HoverStateDemo` - Border color change on hover
-- `FocusStateDemo` - Focus ring with 3px spread
+**Stories to reference** (`Patterns/FilterInput/FilterInput`):
+- `Default` — empty state with placeholder.
+- `WithKeyboardHint` — keyboard hint shown.
+- `ErrorEmpty` — error styling, empty.
+- `WithPresetValue` — controlled `value` with a single condition.
+- `WithMultiConditionPreset` — multiple conditions joined with AND/OR.
+- `ErrorWithValue` — value-level error on a chip.
+- `WithDisabledChips` / `AllChipsDisabled` — non-editable/non-removable chips.
+- `HTTPStatusCodeSuggestions` / `HTTPStatusCodeByName` — the reserved
+  `status_code` field in action.
 
 ---
 
-#### FilterChip
-**Path:** `packages/design-system/src/components/filter/FilterChip/FilterChip.tsx`
-**Storybook:** [`Components/Filter/FilterChip`](http://localhost:6006/?path=/story/components-filter-filterchip)
+#### FilterInputChip
+**Path:** `packages/design-system/src/components/FilterInput/FilterInputField/FilterInputChip/FilterInputChip.tsx`
+**Storybook:** `Patterns/FilterInput/FilterInputChip`
 
-Visual representation of filter conditions and logical operators.
+Visual representation of a single filter **condition** (the
+attribute·operator·value chip). Logical operators and parentheses are rendered
+by a **separate** component, `FilterInputConnectorChip` (variants `and`, `or`,
+`(`, `)`).
 
-**Variants:**
-- `chip` - Attribute-Operator-Value display (uses segments internally)
-- `and` - AND logical operator
-- `or` - OR logical operator
-- `(` - Opening parenthesis
-- `)` - Closing parenthesis
-
-**Props:**
+**Props (`FilterInputChipProps`, extends `Omit<HTMLAttributes<HTMLDivElement>, 'children'>`):**
 ```typescript
-interface FilterChipProps {
-  variant: 'chip' | 'and' | 'or' | '(' | ')';
-  attribute?: string;  // For 'chip' variant
-  operator?: string;   // For 'chip' variant
-  value?: string;      // For 'chip' variant
-  error?: boolean;     // Red border + red background
-  onRemove?: () => void; // Shows delete button on hover
+interface FilterInputChipProps {
+  ref?: Ref<HTMLDivElement>;
+  chipId?: string;
+  attribute: string;          // field label
+  operator?: string;          // operator label (e.g. 'is')
+  value?: string;             // value display text
+  error?: ChipErrorSegment;   // boolean | 'attribute' | 'value'
+  valueParts?: string[];      // individual parts for multi-value chips
+  valueSeparator?: string;    // default ', '
+  errorValueIndices?: number[]; // invalid value indices (e.g. 'in' operator)
+  building?: boolean;         // mid-construction chip
+  disabled?: boolean;         // not editable / not removable (dimmed)
+  onRemove?: () => void;      // shows delete button on hover
+  onSegmentClick?: (segment: ChipSegment, anchorEl: HTMLElement) => void;
 }
 ```
 
-**Stories to reference:**
-- `Default` - Basic chip with attribute-operator-value
-- `CombinedWithAnd` - Chip + AND + Chip
-- `CombinedWithOr` - Chip + OR + Chip
-- `CombinedWithParentheses` - Complex grouped expression
-- `WithDeleteButton` - Hover to see delete button
-- `AllStatesShowcase` - Complete overview of all variants and states
+> `error` is a `ChipErrorSegment` (`boolean | 'attribute' | 'value'`), so an
+> error can target the whole chip or just one segment. This is richer than a
+> plain boolean.
+
+**Stories to reference** (`Patterns/FilterInput/FilterInputChip`):
+- `Default`, `WithError`, `WithLongText`, `RealisticExample` — chip states.
+- `AndOperator`, `OrOperator`, `OpeningParenthesis`, `ClosingParenthesis` —
+  connector-chip variants (rendered via `FilterInputConnectorChip`).
+- `CombinedWithAnd`, `CombinedWithOr`, `CombinedWithParentheses` — composed.
+- `WithDeleteButton`, `ErrorWithDelete`, `InteractiveDeleteExample` — removal.
+- `Disabled`, `DisabledWithOnRemove`, `DisabledAndInteractiveMix` — disabled.
+- `BuildingAttributeOnly`, `BuildingWithOperator`, `BuildingComplete` — the
+  in-progress (building) states.
+- `AllStatesShowcase` — overview of all variants and states.
 
 ---
 
 ### Menu Components
 
-#### FilterMainMenu
-**Path:** `packages/design-system/src/components/filter/FilterMainMenu/FilterMainMenu.tsx`
-**Storybook:** [`Components/Filter/FilterMainMenu`](http://localhost:6006/?path=/story/components-filter-filtermainmenu)
+In normal use these are wired internally by `FilterInput`; they are exported for
+rare custom builds and have their own stories.
 
-Dropdown menu for **field selection** (first step in autocomplete flow).
+#### FilterInputFieldMenu
+**Path:** `packages/design-system/src/components/FilterInput/FilterInputMenu/FilterInputFieldMenu/FilterInputFieldMenu.tsx`
+**Storybook:** `Patterns/FilterInput/FilterInputFieldMenu`
+
+Dropdown for **field selection** (first step in the cascade).
 
 **Features:**
-- Search input for filtering fields by label/name (case-insensitive)
-- Recent fields section (max 3, shown at top)
-- Suggested fields section
-- Keyboard navigation (Arrow Up/Down, Enter, Esc)
-- Keyboard hints at bottom
+- `filterText` filters fields by `label`/`name` (via `filterAndSort`).
+- Recent conditions section (max 3, shown when no filter text).
+- Suggested-fields section.
+- Keyboard navigation; can offer AND/OR connectors (`onSelectAnd` / `onSelectOr`).
 
-**Props:**
+**Props (`FilterInputFieldMenuProps`):**
 ```typescript
-interface FilterMainMenuProps {
-  fields: FieldMetadata[];           // All available fields
-  recentFields?: FieldMetadata[];    // Recently used (max 3)
-  suggestedFields?: FieldMetadata[]; // Commonly used
+interface FilterInputFieldMenuProps {
+  fields: FieldMetadata[];
+  filterText?: string;                 // input text used to filter fields
+  onSelect: (field: FieldMetadata) => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSelect: (field: FieldMetadata) => void;
+  recentConditions?: Condition[];      // recent (sliced to 3)
+  suggestedFields?: FieldMetadata[];
+  onSelectAnd?: () => void;
+  onSelectOr?: () => void;
+  onEscape?: () => void;
+  positioning?: Record<string, unknown>;
+  inputRef?: RefObject<HTMLInputElement | null>;
+  menuRef?: RefObject<HTMLDivElement | null>;
+  className?: string;
 }
 ```
 
-**Stories to reference:**
-- `Default` - Basic field list
-- `WithSearch` - Search/filter functionality
-- `WithRecentFields` - Recent section at top
-- `WithSuggestions` - Suggested section
-- `WithRecentAndSuggestions` - Full menu with all sections
-- `Interactive` - State management example
+**Stories:** `Default`, `FewFields`, `Closed`, `Interactive`, `WithSearch`,
+`WithRecentFields`, `WithSuggestions`, `WithRecentAndSuggestions`.
 
 ---
 
-#### FilterOperatorMenu
-**Path:** `packages/design-system/src/components/filter/FilterOperatorMenu/FilterOperatorMenu.tsx`
-**Storybook:** [`Components/Filter/FilterOperatorMenu`](http://localhost:6006/?path=/story/components-filter-filteroperatormenu)
+#### FilterInputOperatorMenu
+**Path:** `packages/design-system/src/components/FilterInput/FilterInputMenu/FilterInputOperatorMenu.tsx`
+**Storybook:** `Patterns/FilterInput/FilterInputOperatorMenu`
 
-Dropdown menu for **operator selection** (second step in autocomplete flow).
+Dropdown for **operator selection** (second step). Operators come from
+`OPERATORS_BY_TYPE[fieldType]` (grouped for separators); display labels come
+from `OPERATOR_LABELS` / `OPERATOR_LABELS_BY_TYPE` (via `getOperatorLabel`).
 
-**Features:**
-- Operators filtered by field type (uses `OPERATORS_BY_TYPE`)
-- Human-readable labels (uses `getOperatorLabel`)
-- Grouped operators with separators
-- Keyboard navigation and selection
-
-**Props:**
-```typescript
-interface FilterOperatorMenuProps {
-  fieldType: FieldType; // 'string' | 'integer' | 'date' | 'float' | 'boolean' | 'enum'
-  selectedOperator?: FilterOperator;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onSelect: (operator: FilterOperator) => void;
-}
-```
-
-**Operator groups by field type:**
-- **string**: `=, !=, like, not_like` | `is_null, is_not_null`
-- **integer**: `=, !=, >, <, >=, <=`
+**Operator groups by field type** (from `OPERATORS_BY_TYPE`):
+- **string**: `=, !=, in, like, not_like` | `is_null, is_not_null`
+- **integer**: `=, !=, >, <, >=, <=` | `in`
+- **float**: `=, !=, >, <, >=, <=`
 - **date**: `>, >=, <, <=, =, !=, between`
 - **boolean**: `=, !=, is_null, is_not_null`
 - **enum**: `=, !=, in, not_in` | `is_null, is_not_null`
 
-**Stories to reference:**
-- `StringType` - String field operators
-- `IntegerType` - Integer field operators
-- `DateType` - Date field operators
-- `BooleanType` - Boolean field operators
-- `EnumType` - Enum field operators
-- `KeyboardNavigation` - Keyboard usage example
+**Stories:** `StringType`, `IntegerType`, `FloatType`, `DateType`,
+`BooleanType`, `EnumType`, `Interactive`, `KeyboardNavigation`.
 
 ---
 
-#### FilterValueMenu
-**Path:** `packages/design-system/src/components/filter/FilterValueMenu/FilterValueMenu.tsx`
-**No Storybook yet** - Reference implementation only
+#### FilterInputValueMenu & FilterInputDateValueMenu
+**Paths:**
+`.../FilterInputMenu/FilterInputValueMenu/FilterInputValueMenu.tsx`
+`.../FilterInputMenu/FilterInputDateValueMenu/FilterInputDateValueMenu.tsx`
 
-Dropdown menu for **value selection** (third step in autocomplete flow).
-
-**Features:**
-- Enum values with optional badges (color + text)
-- Multi-select mode with checkboxes
-- Submenu support (hasSubmenu flag)
-- Config-driven values from `FieldMetadata.values`
-
-**Props:**
-```typescript
-interface FilterValueMenuProps {
-  values: ValueOption[];              // From FieldMetadata.values
-  onSelect: (value: string | number | boolean) => void;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  multiSelect?: boolean;              // Show checkboxes
-  selectedValues?: Array<string | number | boolean>;
-  width?: 'standard' | 'compact' | number;
-}
-
-interface ValueOption {
-  value: string | number | boolean;
-  label: string;
-  badge?: { color: string; text: string };
-  hasSubmenu?: boolean;
-}
-```
+Dropdowns for **value selection** (third step). The value menu lists options
+(with optional badges) and supports multi-select for `in` / `not_in`. Date
+fields use `FilterInputDateValueMenu`, which offers relative presets
+(`DATE_PRESETS`) plus absolute dates. Both are config-driven off `FieldMetadata`
+(`values` / `options` / `getSuggestions`). A `ValueOption` type is exported
+alongside the value menu.
 
 ---
 
-### Segment Components
+### Segments
 
-Visual building blocks for rendering chip content (attribute, operator, value).
+A chip's content is rendered from internal segment elements (CSS hooks for
+testing/styling — never use `data-slot` as a test selector):
+- `data-slot="segment-attribute"` — field/attribute label (left).
+- `data-slot="segment-operator"` — operator label (middle).
+- `data-slot="segment-value"` — value (right).
 
-#### SegmentAttribute
-**Path:** `packages/design-system/src/components/filter/segments/SegmentAttribute.tsx`
-**Storybook:** [`Filter/Segments/SegmentAttribute`](http://localhost:6006/?path=/story/filter-segments-segmentattribute)
-
-Displays field/attribute name (left part of chip).
-
-**Styling:**
-- Container: `flex flex-col justify-center leading-none overflow-hidden text-ellipsis whitespace-nowrap`
-- Text: `<p className='text-sm font-normal leading-5 overflow-hidden text-ellipsis'>`
-
-#### SegmentOperator
-**Path:** `packages/design-system/src/components/filter/segments/SegmentOperator.tsx`
-**Storybook:** [`Filter/Segments/SegmentOperator`](http://localhost:6006/?path=/story/filter-segments-segmentoperator)
-
-Displays operator label (middle part of chip).
-
-**Common operators:** `is`, `is not`, `contains`, `does not contain`, `greater than`, etc.
-
-#### SegmentValue
-**Path:** `packages/design-system/src/components/filter/segments/SegmentValue.tsx`
-**Storybook:** [`Filter/Segments/SegmentValue`](http://localhost:6006/?path=/story/filter-segments-segmentvalue)
-
-Displays value (right part of chip).
-
-**Stories to reference:**
-- `VariousValues` - Different value types (strings, IPs, dates, numbers)
+These are implemented by the internal `Segment` component under
+`FilterInputChip/`; they are not separately exported.
 
 ---
 
 ## 📊 Data Structures
 
 ### FieldMetadata
-**Comes directly from backend API** - defined in `sessions-api/internal/wallarm/security_universal_queries/metadata.go`
+The config that drives everything — matches the backend field-definition shape.
+Defined in `FilterInput/types.ts`:
 
 ```typescript
 interface FieldMetadata {
-  name: string;                    // Field identifier (e.g., 'attack_type')
-  label: string;                   // Display name (e.g., 'Attack Type')
-  type: string;                    // 'string' | 'integer' | 'date' | 'float' | 'boolean' | 'array'
-  description: string;             // Tooltip/help text
-  operators?: string[];            // Allowed operators from backend (e.g., ["=", "!=", "in", "like"])
-  default?: boolean;               // Pre-select in table view
-  values?: FieldValueOption[];     // **Optional** values for autocomplete (if provided by backend)
+  name: string;                 // field identifier (e.g. 'attack_type')
+  label: string;                // display name (e.g. 'Attack Type')
+  type: FieldType;              // 'string'|'integer'|'date'|'float'|'boolean'|'enum'
+  description?: string;         // tooltip/help text
+  operators?: FilterOperator[]; // restrict the offered operators
+  default?: string | number | boolean;
+  values?: FieldValueOption[];  // value options (with optional badges)
+
+  // Shorthand for simple string values (e.g. ['GET','POST']); converted to
+  // FieldValueOption[] where value === label. Empty array [] = freeform input.
+  options?: string[];
+
+  // When false, values/options are SUGGESTIONS, not an allowlist: the dropdown
+  // still offers them but any typed value commits without an allowlist error
+  // (data-type validation still applies). Defaults to true (strict allowlist).
+  strictValues?: boolean;
+
+  // Compute suggestions dynamically from the current input text. Takes
+  // precedence over values/options; result is still post-filtered.
+  getSuggestions?: (
+    inputText: string,
+    context?: { selectedValues?: Array<string | number | boolean> },
+  ) => FieldValueOption[];
+
+  // Freeform validator — runs in place of the static allowlist check.
+  // Return true to mark the value INVALID (e.g. status code must be 3 chars).
+  validate?: (value: string | number | boolean) => boolean;
+
+  // Per-character input filter while entering a value; chars returning false
+  // are stripped (separators like comma/space pass through).
+  acceptChar?: (char: string) => boolean;
+
+  // Value normalizer, runs on commit before validate (e.g. '2' → '2XX').
+  normalize?: (value: string | number | boolean) => string | number | boolean;
+
+  // Backend-value transformer applied when emitting the query (display is
+  // unaffected). Apply via applyFieldValueTransforms / serializeExpression.
+  serializeValue?: (value: string | number | boolean) => string | number | boolean;
 }
 
 interface FieldValueOption {
   value: string | number | boolean;
   label: string;
-  badge?: { color: string; text: string };  // Visual badge in dropdown
+  badge?: { color: BadgeColor; text: string };
 }
 ```
 
-**Real example from sessions-api metadata.go:**
-```go
-// Backend definition (Go)
-{
-    Name:        "attack_type",
-    Label:       "Attack Type",
-    Type:        "string",
-    Description: "Type of attack (sqli, xss, rce, etc.)",
-    Operators:   []string{"=", "!=", "in", "like"},
-    Default:     true,
-}
-```
-
-**Frontend receives (TypeScript):**
-```typescript
-// Fetched from /api/security/query-metadata
-{
-  name: "attack_type",
-  label: "Attack Type",
-  type: "string",
-  description: "Type of attack (sqli, xss, rce, etc.)",
-  operators: ["=", "!=", "in", "like"],
-  default: true
-}
-```
+> **`FieldType` is a closed union** —
+> `'string' | 'integer' | 'date' | 'float' | 'boolean' | 'enum'` (there is no
+> `'array'` type; multi-value comes from the `in` / `not_in` operators).
 
 ---
 
 ### ExprNode (Expression Tree)
-**Parsed filter expression** - represents the filter logic as a tree.
+`onChange` emits, and `value` controls, a recursive expression tree. Defined in
+`FilterInput/types.ts`:
 
 ```typescript
 type ExprNode = Condition | Group;
@@ -387,64 +421,72 @@ type ExprNode = Condition | Group;
 // Single condition: field operator value
 interface Condition {
   type: 'condition';
-  field: string;                           // e.g., 'attack_type'
-  operator: FilterOperator;                // e.g., '='
-  value: string | number | boolean | null; // e.g., 'sqli'
+  field: string;                    // e.g. 'attack_type'
+  operator?: FilterOperator;        // optional — absent if committed incomplete
+  value: string | number | boolean | null
+       | Array<string | number | boolean>; // array for in / not_in
+  error?: ChipErrorSegment;         // boolean | 'attribute' | 'value'
+  dateOrigin?: 'relative' | 'absolute'; // date fields only
+  disabled?: boolean;
 }
 
-// Group of conditions with AND/OR
+// Group of nodes joined with AND/OR
 interface Group {
   type: 'group';
   operator: 'and' | 'or';
-  children: ExprNode[];  // Recursive - can contain Conditions or nested Groups
+  children: ExprNode[];             // recursive: Conditions or nested Groups
 }
 ```
 
-**Example - Complex expression:**
+**Example — complex expression** (`attack_type = sqli AND (severity = critical OR severity = high)`):
 ```typescript
-// attack_type = sqli AND (severity = critical OR severity = high)
 {
   type: 'group',
   operator: 'and',
   children: [
-    {
-      type: 'condition',
-      field: 'attack_type',
-      operator: '=',
-      value: 'sqli'
-    },
+    { type: 'condition', field: 'attack_type', operator: '=', value: 'sqli' },
     {
       type: 'group',
       operator: 'or',
       children: [
         { type: 'condition', field: 'severity', operator: '=', value: 'critical' },
-        { type: 'condition', field: 'severity', operator: '=', value: 'high' }
-      ]
-    }
-  ]
+        { type: 'condition', field: 'severity', operator: '=', value: 'high' },
+      ],
+    },
+  ],
 }
 ```
 
 ---
 
-### FilterChipData
-**Visual representation** of expression nodes - passed to FilterField.
+### FilterInputChipData
+The internal view-model `FilterInput` derives from the expression to render
+chips. Defined in `FilterInput/types.ts`:
 
 ```typescript
-interface FilterChipData {
-  id: string;                              // Unique identifier
-  variant: 'chip' | 'and' | 'or' | '(' | ')';
-  attribute?: string;                      // For 'chip' variant
-  operator?: string;                       // For 'chip' variant
-  value?: string;                          // For 'chip' variant
-  error?: boolean;                         // Validation error flag
+type FilterInputChipVariant = 'chip' | 'and' | 'or' | '(' | ')';
+
+interface FilterInputChipData {
+  id: string;
+  variant: FilterInputChipVariant;
+  attribute?: string;          // 'chip' variant
+  operator?: string;           // 'chip' variant
+  value?: string;              // 'chip' variant
+  error?: ChipErrorSegment;    // boolean | 'attribute' | 'value'
+  valueParts?: string[];       // multi-value chips
+  valueSeparator?: string;     // default ', '
+  errorValueIndices?: number[];
+  disabled?: boolean;
 }
 ```
 
-**Conversion:** `ExprNode` → `FilterChipData[]`
+**Conversion (handled internally):** `ExprNode` → `FilterInputChipData[]`
 - `Condition` → `{ variant: 'chip', attribute, operator, value }`
-- `Group` with `operator: 'and'` → Insert `{ variant: 'and' }` between children
-- `Group` with `operator: 'or'` → Insert `{ variant: 'or' }` between children
+- `Group` (`and`/`or`) → its children's chips with `{ variant: 'and' | 'or' }`
+  connector chips inserted between them (nested groups add `'('`/`')'`).
+
+You don't build this yourself — `FilterInput` does. It's documented here so the
+data flow is legible.
 
 ---
 
@@ -452,618 +494,246 @@ interface FilterChipData {
 
 ### Autocomplete Flow
 
-**3-step config-driven autocomplete:**
+**3-step config-driven cascade** (all internal to `FilterInput`):
 
-1. **Field Selection** (FilterMainMenu)
-   - User starts typing or clicks input
-   - Show FilterMainMenu with all fields
-   - Filter fields by `field.label` or `field.name` (case-insensitive)
-   - User selects field → append field name to input
+1. **Field selection** (`FilterInputFieldMenu`) — user types/clicks → menu lists
+   fields, filtered by `label`/`name`. Selecting a field advances to operators.
+2. **Operator selection** (`FilterInputOperatorMenu`) — operators come from
+   `OPERATORS_BY_TYPE[field.type]`, labelled via `getOperatorLabel`. Selecting an
+   operator advances to values.
+3. **Value selection** (`FilterInputValueMenu`, or `FilterInputDateValueMenu`
+   for date fields) — options come from the field's `values` / `options` /
+   `getSuggestions`; badges render when present. Committing the value creates a
+   chip and rebuilds the expression.
 
-2. **Operator Selection** (FilterOperatorMenu)
-   - Detect field is complete (exists in fields config)
-   - Get field type: `fields.find(f => f.name === fieldName)?.type`
-   - Show FilterOperatorMenu with operators from `OPERATORS_BY_TYPE[fieldType]`
-   - Use `getOperatorLabel(operator, fieldType)` for display labels
-   - User selects operator → append operator to input
-
-3. **Value Selection** (FilterValueMenu)
-   - Detect operator is complete
-   - Get field's value options: `field.values`
-   - Show FilterValueMenu with config-driven values
-   - Support badges if `value.badge` exists
-   - User selects value → complete condition → create chip
-
-**No hardcoded values** - everything comes from `FieldMetadata` config.
+**No hardcoded values** — everything derives from `FieldMetadata`.
 
 ---
 
 ### Expression Parsing
 
-**Recursive descent parser** - converts text to expression tree.
+The parser converts query text into an `ExprNode` tree and validates fields,
+operators, and values against the `fields` config. It lives under
+`lib/parseExpression/` (`parser.ts` is the recursive-descent core, with a
+`tokenizer.ts` and `validators.ts`).
 
-**Entry point:** `parse(input: string): ParseResult`
+**Exported entry points** (from `index.ts` / `lib`):
+- **`parseExpression(text: string, fields: FieldMetadata[]): ExprNode`** —
+  parses text to a tree. **Throws `FilterParseError`** on invalid input (empty
+  text, unexpected tokens, invalid field/operator/value). Use
+  `isFilterParseError(err)` to narrow.
+- **`serializeExpression(expr: ExprNode | null, fields?: FieldMetadata[]): string`**
+  — serializes a tree back to query text, applying each field's `serializeValue`
+  when `fields` is passed.
+- **`validateValueForField(field: FieldMetadata, value): boolean`** — validates
+  a single value against a field (allowlist or `validate`).
+- **`applyFieldValueTransforms(expr, fields)`** — applies `serializeValue` across
+  a tree (the structured equivalent of `serializeExpression`).
 
-**Parser functions:**
-- `parseExpression()` - Recursive AND/OR handling
-- `parseCondition()` - Single condition parsing
-- `parseQuotedString()` - Quoted value support
+> There is **no** `parse()` function and no `ParseResult` object — the parser
+> throws on bad input and returns an `ExprNode` directly. `FilterInput` consumes
+> these internally; you rarely call them yourself.
 
-**Supported syntax:**
+**Supported text syntax** (round-trips with `serializeExpression`):
 ```
 status = active
 status = active AND priority > 5
 type = bug OR type = feature
 priority > 5 AND (status = active OR status = pending)
 title = "hello world"
-name = 'O\'Reilly'
 ```
 
-**Operators (ordered by length for correct matching):**
-```typescript
-const OPERATORS = ['>=', '<=', '!=', '=', '>', '<', 'like', 'not_like'];
-```
-
-**AND/OR keywords:**
-- Case-insensitive: `AND`, `and`, `OR`, `or`
-- Regex: `/^(and|AND)(\s+(.*))?$/i`
-- Group flattening: consecutive same-operator conditions → single Group
-
-**Incremental parsing:**
-- `ParseResult.isComplete` - whether expression is ready for chip creation
-- Incomplete examples: `"status"`, `"status ="`, `"status = active AND"`
+AND/OR keywords are case-insensitive; consecutive same-operator conditions
+flatten into a single `Group`.
 
 ---
 
-### Chip Rendering
+### Operator Labels
 
-**Convert ExprNode to visual chips:**
+Operator tokens are house-fixed to display words — pass the token, the UI renders
+the label. Don't relabel. From `lib/constants.ts`:
 
-```typescript
-function expressionToChips(expression: ExprNode | null): FilterChipData[] {
-  if (!expression) return [];
+`OPERATOR_LABELS` (the generic labels):
 
-  if (expression.type === 'condition') {
-    // Single condition → chip
-    return [{
-      id: generateId(),
-      variant: 'chip',
-      attribute: expression.field,
-      operator: getOperatorLabel(expression.operator, fieldType),
-      value: String(expression.value),
-    }];
-  }
+| token | label | token | label |
+|-------|-------|-------|-------|
+| `=` | is | `>` | greater |
+| `!=` | is not | `<` | less |
+| `in` | is any of | `>=` | greater or equal |
+| `not_in` | is not any of | `<=` | less or equal |
+| `is_null` | **is set** | `like` | like |
+| `is_not_null` | **is not set** | `not_like` | not like |
+| `between` | between | | |
 
-  if (expression.type === 'group') {
-    // Group → chips with AND/OR between
-    const chips: FilterChipData[] = [];
-    for (let i = 0; i < expression.children.length; i++) {
-      chips.push(...expressionToChips(expression.children[i]));
-      if (i < expression.children.length - 1) {
-        chips.push({
-          id: generateId(),
-          variant: expression.operator  // 'and' or 'or'
-        });
-      }
-    }
-    return chips;
-  }
-}
-```
+> Two non-obvious mappings: **`in` → "is any of"** (not "in" generically), and
+> **`is_null` → "is set"** / **`is_not_null` → "is not set"** — the Wallarm API's
+> `is_null` means "field has a value" (IS SET), the opposite of SQL. Keep in sync
+> with the backend contract.
 
-**Segment usage in chips:**
-```tsx
-<FilterChip
-  variant='chip'
-  attribute='Attack Type'
-  operator='is'
-  value='SQL Injection'
-/>
-
-// Internally renders:
-<SegmentAttribute>Attack Type</SegmentAttribute>
-<SegmentOperator>is</SegmentOperator>
-<SegmentValue>SQL Injection</SegmentValue>
-```
+`OPERATOR_LABELS_BY_TYPE` overrides some labels per field type — e.g. **date**
+relabels `>`→"after", `<`→"before", `>=`→"on or after", `<=`→"on or before",
+`between`→"in between"; **boolean** uses `=`→"is true", `!=`→"is false". The menu
+uses `getOperatorLabel(operator, fieldType)`, which prefers the per-type label.
 
 ---
 
-### Config-Driven Values
+### Reserved field: `status_code`
 
-**All values come from FieldMetadata** - no hardcoding.
+**`status_code` is a reserved field `name`.** When a field is named
+`status_code`, `FilterInput` (via `applyKnownFieldHelpers`) auto-wires HTTP
+status-code behavior and **DS-supplied callbacks override consumer values** for
+that field, because the semantics (mask range, accepted chars, backend form) are
+fixed by DS. The factories live in `lib/statusCode/` and are exported:
 
-**Example config:**
-```typescript
-const attackFields: FieldMetadata[] = [
-  {
-    name: 'attack_type',
-    label: 'Attack Type',
-    type: 'enum',
-    values: [
-      { value: 'sqli', label: 'SQL Injection', badge: { color: 'red', text: 'Critical' } },
-      { value: 'xss', label: 'Cross-Site Scripting', badge: { color: 'orange', text: 'High' } },
-    ],
-  },
-  {
-    name: 'severity',
-    label: 'Severity',
-    type: 'enum',
-    values: [
-      { value: 'critical', label: 'Critical', badge: { color: 'red', text: 'Critical' } },
-      { value: 'high', label: 'High', badge: { color: 'orange', text: 'High' } },
-    ],
-  },
-  {
-    name: 'ip_address',
-    label: 'IP Address',
-    type: 'string',
-    values: [
-      { value: '192.168.1.1', label: '192.168.1.1' },
-      { value: '10.0.0.1', label: '10.0.0.1' },
-    ],
-  },
-];
-```
+- `createStatusCodeSuggestions` — mask suggestions (e.g. `4XX`).
+- `createStatusCodeValidator` — format validation (3 chars, first digit 1–5).
+- `createStatusCodeInputFilter` — per-char filter (digits / `X`).
+- `createStatusCodeNormalizer` — partial-input normalization (`2` → `2XX`).
+- `createStatusCodeSerializer` — backend value form.
 
-**Usage in menus:**
-```typescript
-// Field menu
-<FilterMainMenu
-  fields={attackFields}
-  onSelect={(field) => { /* field.name, field.type */ }}
-/>
+To **opt out**, use a different `name` and attach the factories manually. See the
+`HTTPStatusCodeSuggestions` / `HTTPStatusCodeByName` stories for live examples.
 
-// Operator menu
-<FilterOperatorMenu
-  fieldType={selectedField.type}  // e.g., 'enum'
-  onSelect={(operator) => { /* operator */ }}
-/>
+---
 
-// Value menu
-<FilterValueMenu
-  values={selectedField.values}  // Config-driven!
-  onSelect={(value) => { /* value */ }}
-/>
-```
+### Errors
+
+Two error surfaces, both presentational:
+- **`error?: boolean`** — error styling on the whole input.
+- **`externalErrors?: string[]`** — field *names* whose values the backend
+  rejected; matching chips are painted red. The expression and `onChange` output
+  are unaffected. Pair with your own `Alert`, and clear the prop when the filter
+  changes or the query succeeds.
+- **`onErrorsChange?: (errors: string[])`** — fires whenever the set of messages
+  `FilterInput` renders below the input changes, so you don't stack your own
+  message on top of one it already shows. Pass a memoized callback.
 
 ---
 
 ## 🧪 Playwright Testing Guide
 
-### What to Test
+E2E specs live in `FilterInput/__tests__/` (`*.e2e.ts`). Follow
+`docs/e2e-test-rules.md` for file/naming conventions and `test.describe` grouping
+(Visual / Interactions / Accessibility).
 
-#### 1. Autocomplete Flow
-- **Field autocomplete**
-  - Type text → FilterMainMenu appears
-  - Filter fields by search text
-  - Click field → field name added to input
-  - Keyboard navigation (Arrow Up/Down, Enter)
+### Real DOM hooks
 
-- **Operator autocomplete**
-  - Complete field name → FilterOperatorMenu appears
-  - Operators filtered by field type
-  - Click operator → operator added to input
+`data-slot` values are CSS/test selectors (use these, **not** `data-testid`,
+unless a `data-testid` is explicitly passed):
+- `[data-slot="filter-input"]` — the root.
+- `[data-slot="filter-input-condition-chip"]` — an attribute·operator·value chip
+  (carries `[data-building]` while under construction).
+- `[data-slot="filter-input-connector-chip"]` — an AND/OR/parenthesis chip.
+- `[data-slot="filter-input-chip-delete"]` — a chip's delete button.
+- `[data-slot="filter-input-field-menu"]`, `[data-slot="filter-operator-menu"]` —
+  menus.
+- `[data-slot="segment-attribute"|"segment-operator"|"segment-value"]` — chip
+  segments.
 
-- **Value autocomplete**
-  - Complete operator → FilterValueMenu appears
-  - Values from config displayed
-  - Badges rendered correctly
-  - Click value → chip created
+### What to test
 
-#### 2. Chip Creation & Rendering
-- Complete condition creates chip
-- Chip displays correct attribute-operator-value
-- AND/OR chips appear between conditions
-- Error state propagates to chips
-- Max 3 chips visible, rest in placeholder
+1. **Autocomplete cascade** — type → field menu; pick field → operator menu
+   (operators match the field type); pick operator → value menu; pick value →
+   chip created and `onChange` emits the expression.
+2. **Chip rendering** — correct attribute/operator/value; AND/OR connector chips
+   between conditions; first chips inline, extras collapsed; value errors paint
+   the chip red.
+3. **Chip editing & deletion** — click a chip segment to edit; hover →
+   delete button; delete removes it; clear-all empties.
+4. **AND/OR logic** — parse `status = active AND priority > 5`,
+   `type = bug OR type = feature`, and grouped expressions.
+5. **Keyboard** — arrow navigation, Enter to select, Escape to close, Backspace
+   at input start to delete the previous chip.
+6. **Copy/paste** — select-all copies a parseable string; paste re-parses (and
+   shows a parse error on malformed input).
 
-#### 3. Chip Editing & Deletion
-- Click chip → converts to editable text
-- Hover chip → delete button appears
-- Click delete → chip removed
-- Clear all → all chips removed
+### How to test (Playwright)
 
-#### 4. AND/OR Logic
-- Parse `status = active AND priority > 5`
-- Parse `type = bug OR type = feature`
-- Parse multiple AND/OR conditions
-- Validate incomplete AND/OR (no second condition)
-
-#### 5. Keyboard Shortcuts
-- Arrow Up/Down - navigate menu
-- Enter - select item
-- Escape - close menu
-- Backspace at input start - delete previous chip
-
-#### 6. Error Handling
-- Invalid field name → error state
-- Invalid operator → error state
-- Empty value → incomplete state
-- Unbalanced parentheses → error state
-
----
-
-### How to Test
-
-#### Using Playwright MCP (chrome-devtools)
-
-**Basic interaction:**
+**Basic interaction** (Storybook story URL):
 ```typescript
-// Navigate to Storybook story
-await playwright.browser_navigate({
-  url: 'http://localhost:6006/?path=/story/components-filter-filterfield--interactive'
-});
+// Navigate to a FilterInput story
+await page.goto('http://localhost:6006/?path=/story/patterns-filterinput-filterinput--default');
 
-// Wait for component to load
-await playwright.browser_wait_for({
-  selector: '[data-testid="filter-field"]',
-  timeout: 5000
-});
+const root = page.locator('[data-slot="filter-input"]');
+await expect(root).toBeVisible();
 
-// Type into input
-await playwright.browser_click({ selector: 'input[type="text"]' });
-await playwright.browser_type({ text: 'attack' });
+// Type into the input
+await root.locator('input').click();
+await page.keyboard.type('status');
 
-// Wait for dropdown
-await playwright.browser_wait_for({
-  selector: '[role="menu"]',
-  state: 'visible'
-});
+// Field menu opens
+await expect(page.locator('[data-slot="filter-input-field-menu"]')).toBeVisible();
 
-// Click menu item
-await playwright.browser_click({ selector: '[role="menuitem"]:first-child' });
+// Pick the field (menu items are DropdownMenu items)
+await page.getByRole('menuitem', { name: /Status/i }).click();
 
-// Verify chip created
-const chipCount = await playwright.browser_evaluate({
-  script: 'document.querySelectorAll("[data-chip]").length'
-});
+// Operator menu opens; pick an operator
+await expect(page.locator('[data-slot="filter-operator-menu"]')).toBeVisible();
+await page.getByRole('menuitem', { name: /^is$/ }).click();
+
+// Value menu → pick a value → a condition chip appears
+await page.getByRole('menuitem', { name: /Blocked/i }).click();
+await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
 ```
 
 **Keyboard navigation:**
 ```typescript
-// Open menu
-await playwright.browser_click({ selector: 'input' });
-
-// Navigate with arrow keys
-await playwright.browser_press_key({ key: 'ArrowDown' });
-await playwright.browser_press_key({ key: 'ArrowDown' });
-await playwright.browser_press_key({ key: 'Enter' });
-
-// Close with Escape
-await playwright.browser_press_key({ key: 'Escape' });
+await page.locator('[data-slot="filter-input"] input').click();
+await page.keyboard.press('ArrowDown');
+await page.keyboard.press('ArrowDown');
+await page.keyboard.press('Enter');
+await page.keyboard.press('Escape');
 ```
 
-**Screenshot testing:**
+**Screenshot:**
 ```typescript
-// Take screenshot of menu
-const screenshot = await playwright.browser_take_screenshot({
-  selector: '[role="menu"]',
-  fullPage: false
-});
+await expect(page.locator('[data-slot="filter-input"]')).toHaveScreenshot();
 ```
 
----
-
-### Example Test Cases
-
-#### Test Case 1: Field Autocomplete
-```typescript
-test('should show field suggestions when typing', async () => {
-  // 1. Navigate to FilterField story
-  await navigate('Components/Filter/FilterField');
-
-  // 2. Type 'attack'
-  await click('input');
-  await type('attack');
-
-  // 3. Verify FilterMainMenu appears
-  await waitFor('[role="menu"]');
-
-  // 4. Verify 'Attack Type' in suggestions
-  const menuItems = await findAll('[role="menuitem"]');
-  expect(menuItems).toContainText('Attack Type');
-
-  // 5. Click 'Attack Type'
-  await click('[role="menuitem"]:has-text("Attack Type")');
-
-  // 6. Verify input value updated
-  const inputValue = await getValue('input');
-  expect(inputValue).toBe('attack_type ');
-});
-```
-
-#### Test Case 2: Complete Filter Creation
-```typescript
-test('should create chip for complete condition', async () => {
-  // 1. Navigate to story
-  await navigate('Components/Filter/FilterField');
-
-  // 2. Select field
-  await click('input');
-  await type('severity');
-  await click('[role="menuitem"]:has-text("Severity")');
-
-  // 3. Select operator
-  await waitFor('[role="menu"]');  // Operator menu appears
-  await click('[role="menuitem"]:has-text("is")');
-
-  // 4. Select value
-  await waitFor('[role="menu"]');  // Value menu appears
-  await click('[role="menuitem"]:has-text("Critical")');
-
-  // 5. Verify chip created
-  const chip = await waitFor('[data-chip]');
-  expect(chip).toContainText('Severity');
-  expect(chip).toContainText('is');
-  expect(chip).toContainText('Critical');
-});
-```
-
-#### Test Case 3: AND Logic
-```typescript
-test('should create AND chip between conditions', async () => {
-  // 1. Create first chip (severity = critical)
-  await createChip('severity', '=', 'critical');
-
-  // 2. Type AND
-  await type(' AND ');
-
-  // 3. Create second chip (attack_type = sqli)
-  await createChip('attack_type', '=', 'sqli');
-
-  // 4. Verify chips
-  const chips = await findAll('[data-chip]');
-  expect(chips).toHaveLength(3);  // chip + AND + chip
-  expect(chips[0]).toContainText('Severity is Critical');
-  expect(chips[1]).toContainText('AND');
-  expect(chips[2]).toContainText('Attack Type is SQL Injection');
-});
-```
-
-#### Test Case 4: Chip Editing
-```typescript
-test('should edit chip on click', async () => {
-  // 1. Create chip
-  await createChip('status', '=', 'active');
-
-  // 2. Click chip
-  const chip = await find('[data-chip]');
-  await click(chip);
-
-  // 3. Verify chip removed and text in input
-  const inputValue = await getValue('input');
-  expect(inputValue).toBe('status = active');
-
-  // 4. Verify dropdown appears (value menu)
-  await waitFor('[role="menu"]');
-});
-```
-
-#### Test Case 5: Error Propagation
-```typescript
-test('should propagate error to all chips', async () => {
-  // 1. Create multiple chips
-  await createChip('status', '=', 'active');
-  await type(' AND ');
-  await createChip('priority', '>', '5');
-
-  // 2. Set error state (via story controls or API)
-  await setError(true);
-
-  // 3. Verify all chips have error class
-  const chips = await findAll('[data-chip][data-variant="chip"]');
-  for (const chip of chips) {
-    expect(chip).toHaveClass('error');
-  }
-});
-```
-
----
-
-## 💡 Code Examples
-
-### Example 1: Complete FilterField Implementation
-
-```typescript
-import { useState, useCallback } from 'react';
-import { FilterField } from './FilterField';
-import { FilterMainMenu } from './FilterMainMenu';
-import { FilterOperatorMenu } from './FilterOperatorMenu';
-import { FilterValueMenu } from './FilterValueMenu';
-import { parse, type ParseResult } from './parser';
-import type { ExprNode, FieldMetadata, FilterChipData } from './types';
-
-// Config-driven field definitions
-const fields: FieldMetadata[] = [
-  {
-    name: 'attack_type',
-    label: 'Attack Type',
-    type: 'enum',
-    values: [
-      { value: 'sqli', label: 'SQL Injection', badge: { color: 'red', text: 'Critical' } },
-      { value: 'xss', label: 'XSS', badge: { color: 'orange', text: 'High' } },
-    ],
-  },
-  {
-    name: 'severity',
-    label: 'Severity',
-    type: 'enum',
-    values: [
-      { value: 'critical', label: 'Critical', badge: { color: 'red', text: 'Critical' } },
-      { value: 'high', label: 'High', badge: { color: 'orange', text: 'High' } },
-    ],
-  },
-];
-
-export function FilterExample() {
-  const [expression, setExpression] = useState<ExprNode | null>(null);
-  const [chips, setChips] = useState<FilterChipData[]>([]);
-  const [inputText, setInputText] = useState('');
-  const [showFieldMenu, setShowFieldMenu] = useState(false);
-  const [showOperatorMenu, setShowOperatorMenu] = useState(false);
-  const [showValueMenu, setShowValueMenu] = useState(false);
-
-  // Parse input and create chips
-  const handleInputChange = useCallback((text: string) => {
-    setInputText(text);
-    const result: ParseResult = parse(text);
-
-    if (result.isComplete && result.expression) {
-      setExpression(result.expression);
-      const newChips = expressionToChips(result.expression);
-      setChips(newChips);
-      setInputText('');  // Clear input after chip creation
-    }
-
-    // Show appropriate menu based on parsing state
-    analyzeInput(text);
-  }, [fields]);
-
-  return (
-    <div className="relative">
-      <FilterField
-        chips={chips.map(chip => ({
-          id: chip.id,
-          content: <FilterChip {...chip} />
-        }))}
-        placeholder="Type to filter..."
-        onChipClick={(chipId) => {
-          // Convert chip back to text for editing
-          const chip = chips.find(c => c.id === chipId);
-          if (chip && chip.variant === 'chip') {
-            setInputText(`${chip.attribute} ${chip.operator} ${chip.value}`);
-            setChips(chips.filter(c => c.id !== chipId));
-            setShowValueMenu(true);
-          }
-        }}
-        onChipRemove={(chipId) => {
-          setChips(chips.filter(c => c.id !== chipId));
-        }}
-        onClear={() => {
-          setChips([]);
-          setExpression(null);
-          setInputText('');
-        }}
-      />
-
-      {showFieldMenu && (
-        <FilterMainMenu
-          fields={fields}
-          open={showFieldMenu}
-          onSelect={(field) => {
-            setInputText(prev => prev + field.name + ' ');
-            setShowFieldMenu(false);
-            setShowOperatorMenu(true);
-          }}
-          onOpenChange={setShowFieldMenu}
-        />
-      )}
-
-      {showOperatorMenu && (
-        <FilterOperatorMenu
-          fieldType={selectedField?.type || 'string'}
-          open={showOperatorMenu}
-          onSelect={(operator) => {
-            setInputText(prev => prev + operator + ' ');
-            setShowOperatorMenu(false);
-            setShowValueMenu(true);
-          }}
-          onOpenChange={setShowOperatorMenu}
-        />
-      )}
-
-      {showValueMenu && (
-        <FilterValueMenu
-          values={selectedField?.values || []}
-          open={showValueMenu}
-          onSelect={(value) => {
-            setInputText(prev => prev + value);
-            setShowValueMenu(false);
-            handleInputChange(inputText + value);
-          }}
-          onOpenChange={setShowValueMenu}
-        />
-      )}
-    </div>
-  );
-}
-```
-
-### Example 2: Expression to Chips Conversion
-
-```typescript
-function expressionToChips(expression: ExprNode | null): FilterChipData[] {
-  if (!expression) return [];
-
-  const chips: FilterChipData[] = [];
-
-  function processNode(node: ExprNode) {
-    if (node.type === 'condition') {
-      const field = fields.find(f => f.name === node.field);
-      chips.push({
-        id: generateId(),
-        variant: 'chip',
-        attribute: field?.label || node.field,
-        operator: getOperatorLabel(node.operator, field?.type || 'string'),
-        value: String(node.value),
-      });
-    } else if (node.type === 'group') {
-      for (let i = 0; i < node.children.length; i++) {
-        processNode(node.children[i]);
-        if (i < node.children.length - 1) {
-          chips.push({
-            id: generateId(),
-            variant: node.operator,  // 'and' or 'or'
-          });
-        }
-      }
-    }
-  }
-
-  processNode(expression);
-  return chips;
-}
-```
+> Story paths follow the title slug: `Patterns/FilterInput/FilterInput` →
+> `patterns-filterinput-filterinput`, plus the kebab-cased story name (e.g.
+> `--default`, `--with-multi-condition-preset`).
 
 ---
 
 ## 📖 Reference Files
 
-### Parser
-- `filter/parser.ts` - Expression parsing logic
-  - Handles single condition parsing: `field operator value`
-  - Auto-detects value types (string, number, boolean, null)
-  - Supports quoted strings (single and double quotes)
-  - Operators: `=, !=, >, <, >=, <=, like, not_like, in, not_in, is_null, is_not_null, between`
-  - Used internally by FilterField for autocomplete
-
-### Type Definitions
-- `types.ts` - All TypeScript interfaces and types
-  - `FieldMetadata`, `ExprNode`, `Condition`, `Group`
-  - `FilterChipData`, `FilterOperator`, `FieldType`
-  - `OPERATORS_BY_TYPE`, `getOperatorLabel()`
-
-### Components
-- `FilterField/FilterField.tsx` - **Self-contained filter component** (integrates all menus internally)
-- `FilterChip/FilterChip.tsx` - Chip rendering (used by FilterField)
-- `FilterMainMenu/FilterMainMenu.tsx` - Field selection menu (used internally by FilterField)
-- `FilterOperatorMenu/FilterOperatorMenu.tsx` - Operator selection menu (used internally by FilterField)
-- `FilterValueMenu/FilterValueMenu.tsx` - Value selection menu (used internally by FilterField)
-- `segments/` - SegmentAttribute, SegmentOperator, SegmentValue (used by FilterChip)
+- `FilterInput.tsx` — main component + `FilterInputProps`.
+- `types.ts` — `FieldMetadata`, `ExprNode`, `Condition`, `Group`,
+  `FilterOperator`, `FieldType`, `FieldValueOption`, `FilterInputChipData`,
+  `FilterInputChipVariant`.
+- `lib/constants.ts` — `OPERATORS_BY_TYPE`, `OPERATOR_LABELS`,
+  `OPERATOR_LABELS_BY_TYPE`, `OPERATOR_SYMBOLS`.
+- `lib/parseExpression/` — `parseExpression` (parser core, tokenizer,
+  validators) + `FilterParseError`.
+- `lib/serializeExpression.ts`, `lib/validation.ts`,
+  `lib/applyFieldValueTransforms.ts` — serialize / validate / transform helpers.
+- `lib/statusCode/` — the reserved `status_code` factories.
+- `FilterInputField/FilterInputChip/` + `FilterInputConnectorChip/` — chips.
+- `FilterInputMenu/` — field / operator / value / date menus.
+- `stories/*.stories.tsx` — Storybook stories (filed under `Patterns/FilterInput`).
+- **`FilterInput.llm.md`** (component dir) — the usage/judgment companion.
 
 ---
 
 ## 🎯 Key Principles
 
-1. **Config-Driven** - No hardcoded values, everything from `FieldMetadata`
-2. **Type-Safe** - Full TypeScript coverage, strict types
-3. **Composable** - Small focused components that combine
-4. **Testable** - Clear separation of parsing, rendering, interaction
-5. **Accessible** - Keyboard navigation, ARIA roles, focus management
-6. **Incremental** - Graceful handling of incomplete input
+1. **Config-Driven** — no hardcoded values; everything from `FieldMetadata`.
+2. **Type-Safe** — full TypeScript coverage, strict types, no `any`.
+3. **Self-contained** — `FilterInput` owns its menus, parsing, and chip state;
+   sub-components are exported only for rare custom builds.
+4. **Tree, not string** — `onChange` emits an `ExprNode`; text serialization is a
+   reversible helper (`serializeExpression` / `parseExpression`).
+5. **Testable** — clear separation of parsing, rendering, and interaction; stable
+   `data-slot` hooks.
+6. **Accessible** — keyboard navigation, menu roles, focus management.
+7. **Incremental** — graceful handling of incomplete input (building chips,
+   per-segment errors).
 
 ---
 
-**Last updated:** 2026-03-03
-**Related PRD:** `ralph/prd.json` (US-001 through US-017)
-**Progress Log:** `scripts/ralph/progress.txt`
+**Last updated:** 2026-06-23
+This refresh corrected the March 2026 naming (the old `filter/FilterField`
+component was renamed/restructured to **`FilterInput`** under `Patterns/`); props
+`externalErrors` / `onErrorsChange` / `strictValues` and the reserved
+`status_code` behavior were added to match the current code.
