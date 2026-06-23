@@ -16,10 +16,19 @@ interface UseValueMenuDisplayValuesOptions {
 }
 
 /**
- * Compose the dropdown list, pinning selected entries at the top.
- * Remembers every option ever rendered so a narrowed `values` (e.g. dynamic
- * getSuggestions) can still display the selected label/badge; fabricates a
- * plain-text option as last resort. Unselected items still respect the filter.
+ * Compose the dropdown list.
+ *
+ * Single-select: pins the selected entry at the top so it is immediately
+ * visible even when the list is long.
+ *
+ * Multi-select: keeps the original `filteredValues` order so selecting an
+ * item does not cause the list to jump. Only checked items that are absent
+ * from `filteredValues` (e.g. after `values` narrowed via dynamic
+ * getSuggestions) are prepended at the top so they remain accessible.
+ *
+ * Remembers every option ever rendered so a narrowed `values` can still
+ * display the selected label/badge; fabricates a plain-text option as last
+ * resort.
  */
 export const useValueMenuDisplayValues = ({
   values,
@@ -47,6 +56,24 @@ export const useValueMenuDisplayValues = ({
         : [];
     if (selectedList.length === 0) return filteredValues;
 
+    if (multiSelect) {
+      // Preserve original list order. Only prepend checked items that are
+      // absent from filteredValues (values narrowed after selection).
+      const filteredSet = new Set(filteredValues.map(v => String(v.value)));
+      const orphaned = selectedList
+        .filter(v => !filteredSet.has(String(v)))
+        .map(v => {
+          const key = String(v);
+          return (
+            values.find(opt => String(opt.value) === key) ??
+            optionMemoryRef.current.get(key) ??
+            ({ value: v, label: key } as ValueOption)
+          );
+        });
+      return orphaned.length > 0 ? [...orphaned, ...filteredValues] : filteredValues;
+    }
+
+    // Single-select: pin the selected item at the top.
     const selectedSet = new Set(selectedList.map(String));
     const selectedItems = selectedList.map(v => {
       const key = String(v);
@@ -54,7 +81,7 @@ export const useValueMenuDisplayValues = ({
       if (match) return match;
       const remembered = optionMemoryRef.current.get(key);
       if (remembered) return remembered;
-      return { value: v, label: key };
+      return { value: v, label: key } as ValueOption;
     });
     const restFiltered = filteredValues.filter(v => !selectedSet.has(String(v.value)));
     return [...selectedItems, ...restFiltered];
