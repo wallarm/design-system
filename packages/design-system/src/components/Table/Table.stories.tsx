@@ -1,6 +1,6 @@
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Copy, Ellipsis, Filter, FilterX, Trash2 } from '../../icons';
+import { Copy, Database, Ellipsis, Filter, FilterX, SearchX, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
 import {
   BulkBarSummaryClear,
@@ -23,6 +23,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../DropdownMenu';
+import {
+  EmptyState,
+  EmptyStateActions,
+  EmptyStateDescription,
+  EmptyStateIllustration,
+  EmptyStateMessage,
+  EmptyStateTitle,
+} from '../EmptyState';
 import { HttpMethod } from '../HttpMethod';
 import { OverflowList } from '../OverflowList';
 import {
@@ -535,17 +543,60 @@ export const LoadingWithData: StoryFn<typeof meta> = () => (
   />
 );
 
-export const EmptyState: StoryFn<typeof meta> = () => (
+/**
+ * When `data` is empty and the table is not loading, the `TableEmptyState` slot
+ * renders its children. Compose the `EmptyState` component inside it to get the
+ * standard illustration / message / actions layout.
+ *
+ * Use `type='collection-empty'` when there is genuinely no data yet (nothing has
+ * been created), and offer a primary action that creates the first item.
+ */
+export const EmptyCollection: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} getRowId={row => row.id}>
     <TableEmptyState>
-      <VStack align='center' justify='center' gap={8}>
-        <Text size='sm' weight='medium' color='primary'>
-          No results found
-        </Text>
-        <Text size='sm' color='secondary'>
-          Try to apply different filter or reset it.
-        </Text>
-      </VStack>
+      <EmptyState type='collection-empty'>
+        <EmptyStateIllustration>
+          <Database size='lg' />
+        </EmptyStateIllustration>
+        <EmptyStateMessage>
+          <EmptyStateTitle>No events yet</EmptyStateTitle>
+          <EmptyStateDescription>
+            Security events will appear here as soon as Wallarm detects traffic.
+          </EmptyStateDescription>
+        </EmptyStateMessage>
+        <EmptyStateActions>
+          <Button size='medium'>Configure source</Button>
+        </EmptyStateActions>
+      </EmptyState>
+    </TableEmptyState>
+  </Table>
+);
+
+/**
+ * Use `type='no-results'` when data exists but the current filters or search
+ * matched nothing. Offer a neutral action that clears the filters rather than
+ * a primary "create" action.
+ */
+export const NoResults: StoryFn<typeof meta> = () => (
+  <Table data={[]} columns={securityColumns} getRowId={row => row.id}>
+    <TableEmptyState>
+      <EmptyState type='no-results'>
+        <EmptyStateIllustration>
+          <SearchX size='lg' />
+        </EmptyStateIllustration>
+        <EmptyStateMessage>
+          <EmptyStateTitle>No results found</EmptyStateTitle>
+          <EmptyStateDescription>
+            No events match your current filters. Try adjusting or resetting them.
+          </EmptyStateDescription>
+        </EmptyStateMessage>
+        <EmptyStateActions>
+          <Button size='medium' variant='outline' color='neutral'>
+            <FilterX />
+            Reset filters
+          </Button>
+        </EmptyStateActions>
+      </EmptyState>
     </TableEmptyState>
   </Table>
 );
@@ -931,8 +982,8 @@ export const ScrollToRow: StoryFn<typeof meta> = () => {
   };
 
   return (
-    <VStack gap='md'>
-      <HStack gap='sm'>
+    <VStack gap={8}>
+      <HStack gap={8}>
         <Button onClick={() => scroll(0, 'start')}>Top</Button>
         <Button onClick={() => scroll(499, 'center')}>Middle</Button>
         <Button onClick={() => scroll(999, 'end')}>Bottom</Button>

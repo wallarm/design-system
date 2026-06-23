@@ -1,7 +1,7 @@
 import type { CellContext, ColumnDef, Row, RowSelectionState, Table } from '@tanstack/react-table';
 import { useIsKeyPressed } from '../../../hooks';
 import { Checkbox, CheckboxIndicator } from '../../Checkbox';
-import { useTableContext } from '../TableContext/useTableContext';
+import { useTableContext } from '../TableContext';
 import { TABLE_SELECT_COLUMN_ID, TABLE_SELECT_COLUMN_WIDTH } from './constants';
 
 /**
@@ -109,11 +109,13 @@ export const createSelectionColumn = <T,>(): ColumnDef<T> => {
     header: ({ table }) => {
       const checked = table.getIsAllPageRowsSelected();
       const indeterminate = table.getIsSomePageRowsSelected();
+      const rowCount = table.getRowCount();
 
       return (
         <Checkbox
           checked={indeterminate ? 'indeterminate' : checked}
           onCheckedChange={() => table.toggleAllPageRowsSelected(!checked)}
+          disabled={rowCount === 0}
         >
           <CheckboxIndicator />
         </Checkbox>

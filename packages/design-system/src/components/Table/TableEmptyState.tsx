@@ -9,11 +9,11 @@ interface TableEmptyStateProps {
 
 export const TableEmptyState: FC<TableEmptyStateProps> = ({ children }) => {
   const testId = useTestId('empty-state');
-  const { table } = useTableContext();
+  const { table, isLoading } = useTableContext();
 
   const { rows } = table.getRowModel();
 
-  const tableIsEmpty = !rows.length;
+  const tableIsEmpty = !rows.length && !isLoading;
 
   if (!tableIsEmpty) return null;
 
