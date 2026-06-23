@@ -1,3 +1,7 @@
+## <small>0.66.3 (2026-06-23)</small>
+
+* fix(filter-input): AS-1146 preserve list order on multi-select item toggle (#180) ([467c9cc](https://github.com/wallarm/design-system/commit/467c9cc)), closes [#180](https://github.com/wallarm/design-system/issues/180)
+
 ## <small>0.66.2 (2026-06-23)</small>
 
 * fix(design-system): apply WDS-140 pagination design review (#177) ([6d88199](https://github.com/wallarm/design-system/commit/6d88199)), closes [#177](https://github.com/wallarm/design-system/issues/177)
