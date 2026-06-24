@@ -25,12 +25,19 @@ Rule of thumb (escalate as the content grows): lightweight decision / single fie
 ## Locked — don't override
 - **Centered, modal, portaled** — the overlay backdrop blocks the page by default and
   the positioner centers it. Don't hand-place it or restyle the overlay. (`Drawer` is
-  the side-anchored, resizable sibling; Dialog has no resize.)
-- **Structure**: `DialogContent` › `DialogHeader` (`DialogTitle` + close) ·
-  `DialogBody` (scrolls, with scroll separators) · `DialogFooter`
-  (`DialogFooterControls`). Footer buttons are **large**.
-- **Footer recipe**: Cancel = `ghost` / `neutral`; the confirm = `primary` — `brand`
-  normally, **destructive (red) for a delete**. One primary action, never two.
+  the side-anchored sibling — it can also run **non-modal** so the page stays usable, and
+  it **resizes**; Dialog is always modal and centered, with no resize.)
+- **Structure**: `DialogContent` › `DialogHeader` (`DialogTitle` + close; an info
+  `Tooltip` is the default header affordance) · `DialogBody` (scrolls, with scroll
+  separators) · `DialogFooter` (`DialogFooterControls`). Footer buttons are **large**.
+  Richer header content — a second line of tabs / segmented / progress / stepper, header
+  action buttons, or prev-next object paging — is **Figma-ahead; don't build it yet** (a
+  task that wants tabs / multiple sections is usually a `Drawer` or a page).
+- **Footer recipe**: `DialogFooterControls` holds the buttons (`placement='right'`) —
+  Cancel = `ghost` / `neutral`; the confirm = `primary` (`brand` normally, **red
+  destructive for a delete**). **One** primary action, never two. An optional **left**
+  cluster (`placement='left'`) can carry a secondary control beside the buttons — a
+  "Don't ask again" `Checkbox` or a `Switch`.
 
 ## Sizing / judgment calls
 - **size** — `small` (400) for a confirm / single field; `medium` (560, default) for a
