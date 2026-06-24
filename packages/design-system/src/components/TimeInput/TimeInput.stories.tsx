@@ -109,6 +109,30 @@ export const States: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
+/**
+ * `showIcon` toggles the leading clock icon. It defaults to `true`; pass
+ * `showIcon={false}` for a bare segmented field (e.g. dense tables or when a
+ * label already conveys the field's meaning).
+ */
+export const Icon: StoryFn<typeof meta> = () => (
+  <HStack gap={24}>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        With icon
+      </Text>
+      <TimeInput showIcon />
+      <TimeInput showIcon defaultValue={new Time(22, 0)} />
+    </VStack>
+    <VStack gap={12}>
+      <Text size='sm' color='secondary'>
+        Without icon
+      </Text>
+      <TimeInput showIcon={false} />
+      <TimeInput showIcon={false} defaultValue={new Time(22, 0)} />
+    </VStack>
+  </HStack>
+);
+
 export const Sizes: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={16}>

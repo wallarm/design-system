@@ -178,6 +178,28 @@ export const SingleWithInput: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
+/**
+ * Single calendar with a date **and time** input header. Pass `showTime` on
+ * `Calendar` to upgrade the header `DateInput` to minute granularity with a
+ * time dropdown — pick a day in the grid, then a time from the dropdown.
+ */
+export const SingleWithDateTime: StoryFn<typeof meta> = () => (
+  <Calendar type='single' showTime closeOnSelect={false}>
+    <CalendarTrigger>
+      <Button variant='outline' color='neutral'>
+        <CalendarIcon size='sm' />
+        Select date and time
+      </Button>
+    </CalendarTrigger>
+    <CalendarContent>
+      <CalendarBody>
+        <CalendarInputHeader />
+        <CalendarGrids />
+      </CalendarBody>
+    </CalendarContent>
+  </Calendar>
+);
+
 export const SingleWithPresets: StoryFn<typeof meta> = () => (
   <Calendar type='single' closeOnSelect={false}>
     <CalendarTrigger>
