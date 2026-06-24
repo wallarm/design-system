@@ -1,3 +1,7 @@
+## 0.67.0 (2026-06-24)
+
+* feat(filter-input): AS-1160 two-step paired filter (#174) ([94f4886](https://github.com/wallarm/design-system/commit/94f4886)), closes [#174](https://github.com/wallarm/design-system/issues/174)
+
 ## <small>0.66.3 (2026-06-23)</small>
 
 * fix(filter-input): AS-1146 preserve list order on multi-select item toggle (#180) ([467c9cc](https://github.com/wallarm/design-system/commit/467c9cc)), closes [#180](https://github.com/wallarm/design-system/issues/180)
