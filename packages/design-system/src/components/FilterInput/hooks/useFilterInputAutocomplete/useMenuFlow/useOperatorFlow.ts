@@ -29,6 +29,10 @@ export const useOperatorFlow = ({
   setMenuState,
   setBuildingMultiValue,
   setInputText,
+  buildingSide,
+  buildingBase,
+  setBuildingBase,
+  setBuildingSide,
 }: MenuFlowInternalDeps) => {
   const {
     editingChipId,
@@ -61,6 +65,24 @@ export const useOperatorFlow = ({
       }
 
       if (isNoValueOperator(operator)) {
+        // Building the paired second triplet: a no-value operator ("is set" /
+        // "is not set") completes the chip without a value. Commit the stashed
+        // base triplet, then write the pair (null value, side 1), then reset.
+        if (buildingSide === 1 && buildingBase && !editingChipId) {
+          upsertCondition(
+            buildingBase.field,
+            buildingBase.operator,
+            buildingBase.value,
+            null,
+            insertIndex,
+          );
+          upsertCondition(selectedField, operator, null, null, undefined, undefined, undefined, 1);
+          setBuildingBase(null);
+          setBuildingSide(0);
+          resetState(true);
+          return;
+        }
+
         const isEditing = !!editingChipId;
         upsertCondition(
           selectedField,
@@ -140,6 +162,10 @@ export const useOperatorFlow = ({
       setMenuState,
       setBuildingMultiValue,
       setInputText,
+      buildingSide,
+      buildingBase,
+      setBuildingBase,
+      setBuildingSide,
     ],
   );
 

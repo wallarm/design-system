@@ -141,12 +141,17 @@ const buildPairChip = (
   if (!condition.pair || !field?.pairedField) return undefined;
   const pf = field.pairedField;
   const { operator, value, error } = condition.pair;
+  // No-value operators ("is set"/"is not set") render the placeholder so the
+  // paired triplet keeps its three segments without a real value.
+  const displayValue =
+    operator && isNoValueOperator(operator)
+      ? NO_VALUE_PLACEHOLDER
+      : (resolveValueLabel(value as string | number | boolean | null, pf, fields) ??
+        String(value ?? ''));
   return {
     attribute: pf.label || pf.name,
     operator: operator ? getOperatorLabel(operator, pf.type || DEFAULT_FIELD_TYPE) : undefined,
-    value:
-      resolveValueLabel(value as string | number | boolean | null, pf, fields) ??
-      String(value ?? ''),
+    value: displayValue,
     ...(error && { error }),
   };
 };

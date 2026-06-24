@@ -43,8 +43,11 @@ export const OPERATOR_SYMBOLS: Record<FilterOperator, string> = {
   not_like: '!~',
   in: 'IN',
   not_in: 'NOT IN',
-  is_null: '= null',
-  is_not_null: '!= null',
+  // Wallarm API inverts SQL semantics: is_null = "is set" (value != null),
+  // is_not_null = "is not set" (value == null). The symbol hints follow the
+  // meaning, not the operator key.
+  is_null: '!= null',
+  is_not_null: '= null',
   between: '<>',
 };
 

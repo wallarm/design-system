@@ -1295,6 +1295,54 @@ describe('FilterInput', () => {
       expect(chip.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
     });
 
+    it('completes a paired chip when the Value operator is "is set" (no second value)', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      const setValueFields: FieldMetadata[] = [
+        {
+          name: 'ctx_param',
+          label: 'Context Param',
+          type: 'enum',
+          values: [{ value: 'xxx', label: 'xxx' }],
+          operators: ['=', '!='],
+          pairedField: {
+            name: 'ctx_value',
+            label: 'Value',
+            type: 'string',
+            operators: ['=', '!=', 'is_null', 'is_not_null'],
+          },
+        },
+      ];
+      const { container } = render(<FilterInput fields={setValueFields} onChange={onChange} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Context Param'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.click(await findMenuitem(/^xxx$/));
+      // Side 1 operator menu is open — choose "is set", which takes no value.
+      await user.click(await findMenuitem(/^is set != null$/));
+
+      // One committed chip carrying both triplets; the second has no value segment.
+      await waitFor(() => {
+        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+        expect(chip).not.toBeNull();
+        expect(chip!.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
+      });
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(
+        [...chip.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
+      ).toEqual(['Context Param', 'Value']);
+      // Emits one paired condition: ctx_param = xxx AND ctx_value is_null.
+      expect(onChange.mock.calls.at(-1)?.[0]).toEqual({
+        type: 'group',
+        operator: 'and',
+        children: [
+          { type: 'condition', field: 'ctx_param', operator: '=', value: 'xxx' },
+          { type: 'condition', field: 'ctx_value', operator: 'is_null', value: null },
+        ],
+      });
+    });
+
     it('stays a single chip with no second part when the base operator is "is not set"', async () => {
       const user = userEvent.setup();
       const onErrorsChange = vi.fn();
