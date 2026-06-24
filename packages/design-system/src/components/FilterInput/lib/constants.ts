@@ -43,11 +43,8 @@ export const OPERATOR_SYMBOLS: Record<FilterOperator, string> = {
   not_like: '!~',
   in: 'IN',
   not_in: 'NOT IN',
-  // Wallarm API inverts SQL semantics: is_null = "is set" (value != null),
-  // is_not_null = "is not set" (value == null). The symbol hints follow the
-  // meaning, not the operator key.
-  is_null: '!= null',
-  is_not_null: '= null',
+  is_null: '= null',
+  is_not_null: '!= null',
   between: '<>',
 };
 
@@ -76,8 +73,8 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
     in: 'in',
     like: 'like',
     not_like: 'not like',
-    is_null: 'is set',
-    is_not_null: 'is not set',
+    is_null: 'is not set',
+    is_not_null: 'is set',
   },
   integer: {
     '=': 'is',
@@ -108,14 +105,14 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
   boolean: {
     '=': 'is true',
     '!=': 'is false',
-    is_null: 'is set',
-    is_not_null: 'is not set',
+    is_null: 'is not set',
+    is_not_null: 'is set',
   },
   enum: {
     in: 'is any of',
     not_in: 'is not any of',
-    is_null: 'is set',
-    is_not_null: 'is not set',
+    is_null: 'is not set',
+    is_not_null: 'is set',
   },
 };
 
