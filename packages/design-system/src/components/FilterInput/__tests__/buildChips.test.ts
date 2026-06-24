@@ -221,7 +221,7 @@ describe('buildChips — paired field (AS-1160)', () => {
       },
     ];
     const chip = findChip(buildChips(conditions, [], pairedFields, false));
-    expect(chip?.pair).toEqual({ attribute: 'Value', operator: 'is set', value: '—' });
+    expect(chip?.pair).toEqual({ attribute: 'Value', operator: 'is not set', value: '—' });
   });
 
   it('omits pair when the field has no pairedField', () => {

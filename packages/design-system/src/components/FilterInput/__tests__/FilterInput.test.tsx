@@ -738,7 +738,7 @@ describe('FilterInput', () => {
 
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
       expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
-      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is set');
+      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is not set');
       expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('—');
     });
   });
@@ -1332,13 +1332,14 @@ describe('FilterInput', () => {
       expect(
         [...chip.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
       ).toEqual(['Context Param', 'Value']);
-      // Emits one paired condition: ctx_param = xxx AND ctx_value is_null.
+      // Emits one paired condition: ctx_param = xxx AND ctx_value is_not_null
+      // ("is set" maps to is_not_null).
       expect(onChange.mock.calls.at(-1)?.[0]).toEqual({
         type: 'group',
         operator: 'and',
         children: [
           { type: 'condition', field: 'ctx_param', operator: '=', value: 'xxx' },
-          { type: 'condition', field: 'ctx_value', operator: 'is_null', value: null },
+          { type: 'condition', field: 'ctx_value', operator: 'is_not_null', value: null },
         ],
       });
     });
@@ -1347,7 +1348,7 @@ describe('FilterInput', () => {
       const user = userEvent.setup();
       const onErrorsChange = vi.fn();
       const setOnlyFields: FieldMetadata[] = [
-        { ...pairedFields[0]!, operators: ['=', 'is_not_null'] },
+        { ...pairedFields[0]!, operators: ['=', 'is_null'] },
       ];
       const { container } = render(
         <FilterInput fields={setOnlyFields} onErrorsChange={onErrorsChange} />,
