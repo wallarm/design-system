@@ -1,3 +1,7 @@
+## <small>0.67.2 (2026-06-24)</small>
+
+* fix(filter-input): AS-1160 paired Context Param offers only "is" (#182) ([0aedc55](https://github.com/wallarm/design-system/commit/0aedc55)), closes [#182](https://github.com/wallarm/design-system/issues/182)
+
 ## <small>0.67.1 (2026-06-24)</small>
 
 * fix(filter-input): AS-1160 move "is set"/"is not set" to paired Value side (#181) ([9e3116d](https://github.com/wallarm/design-system/commit/9e3116d)), closes [#181](https://github.com/wallarm/design-system/issues/181)
