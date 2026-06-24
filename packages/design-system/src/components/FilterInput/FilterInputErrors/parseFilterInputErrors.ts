@@ -24,8 +24,11 @@ export const parseFilterInputErrors = (
   for (const condition of conditions) {
     const field = fields.find(f => f.name === condition.field);
 
-    // Paired (two-step) field: the second value is required.
-    if (field?.pairedField && isPairValueMissing(condition)) {
+    // Paired (two-step) field: the second value is required — unless the base
+    // operator takes no value (e.g. "is not set"), in which case the chip is a
+    // single-value filter and no paired triplet is built.
+    const baseIsNoValue = condition.operator != null && isNoValueOperator(condition.operator);
+    if (field?.pairedField && !baseIsNoValue && isPairValueMissing(condition)) {
       errors.push(`${field.pairedField.label} is required`);
     }
 

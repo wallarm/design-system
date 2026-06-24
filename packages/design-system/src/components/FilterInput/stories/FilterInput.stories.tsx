@@ -318,11 +318,13 @@ export const HTTPStatusCodeByName: Story = {
 };
 
 /**
- * Two-step "paired" field (AS-1160). A field with `pairedField` set captures two
- * attribute/operator/value triplets in one chip (e.g. `Context Param is xxx ;
- * Value is yyy`). Building it: pick the field, operator, and first value — the
- * second triplet then appears for the paired value. Both operators are editable;
- * the second value is required.
+ * Two-step "paired" field (AS-1160). `Context Param` offers two operators:
+ *
+ * - **is** — pick the key's value, then the second part (`Value`) appears with
+ *   its own operator and value, captured in one chip (`Context Param is xxx ;
+ *   Value is yyy`). The second value is required.
+ * - **is not set** — takes no value, so no second part appears; the chip stays a
+ *   single-value filter (`Context Param is not set`).
  */
 const pairedFields: FieldMetadata[] = [
   {
@@ -330,6 +332,8 @@ const pairedFields: FieldMetadata[] = [
     label: 'Context Param',
     type: 'enum',
     options: ['header', 'cookie', 'query', 'body'],
+    // "is" (=) reveals the paired second value; "is not set" stays single.
+    operators: ['=', 'is_not_null'],
     pairedField: {
       name: 'context_value',
       label: 'Value',

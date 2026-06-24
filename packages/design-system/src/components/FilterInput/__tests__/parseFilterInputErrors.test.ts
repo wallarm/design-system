@@ -151,5 +151,12 @@ describe('parseFilterInputErrors', () => {
       ];
       expect(parseFilterInputErrors(conditions, [ctxField])).toEqual([]);
     });
+
+    it('does not require the second value when the base operator is "is not set"', () => {
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'ctx_param', operator: 'is_not_null', value: null },
+      ];
+      expect(parseFilterInputErrors(conditions, [ctxField])).toEqual([]);
+    });
   });
 });
