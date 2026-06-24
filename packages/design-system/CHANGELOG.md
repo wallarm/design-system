@@ -1,3 +1,7 @@
+## <small>0.67.1 (2026-06-24)</small>
+
+* fix(filter-input): AS-1160 move "is set"/"is not set" to paired Value side (#181) ([9e3116d](https://github.com/wallarm/design-system/commit/9e3116d)), closes [#181](https://github.com/wallarm/design-system/issues/181)
+
 ## 0.67.0 (2026-06-24)
 
 * feat(filter-input): AS-1160 two-step paired filter (#174) ([94f4886](https://github.com/wallarm/design-system/commit/94f4886)), closes [#174](https://github.com/wallarm/design-system/issues/174)

@@ -1,6 +1,6 @@
 {
   "name": "@wallarm-org/design-system",
-  "version": "0.67.0",
+  "version": "0.67.1",
   "description": "Core design system library with React components and Storybook documentation",
   "publishConfig": {
     "access": "public",
