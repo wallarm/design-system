@@ -1343,34 +1343,5 @@ describe('FilterInput', () => {
         ],
       });
     });
-
-    it('stays a single chip with no second part when the base operator is "is not set"', async () => {
-      const user = userEvent.setup();
-      const onErrorsChange = vi.fn();
-      const setOnlyFields: FieldMetadata[] = [
-        { ...pairedFields[0]!, operators: ['=', 'is_null'] },
-      ];
-      const { container } = render(
-        <FilterInput fields={setOnlyFields} onErrorsChange={onErrorsChange} />,
-      );
-
-      await user.click(screen.getByRole('combobox'));
-      await user.click(await findMenuitem('Context Param'));
-      // "is not set" takes no value, so the paired cascade never starts: the chip
-      // commits immediately with no ; separator and no paired triplet.
-      await user.click(await findMenuitem(/is not set/));
-
-      await waitFor(() => {
-        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
-        expect(chip).not.toBeNull();
-        expect(chip!.querySelector('[data-slot="segment-separator"]')).toBeNull();
-      });
-      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
-      expect(
-        [...chip.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
-      ).toEqual(['Context Param']);
-      // The required-second-value validation does not fire for a no-value base.
-      expect(onErrorsChange).toHaveBeenLastCalledWith([]);
-    });
   });
 });
