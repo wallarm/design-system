@@ -1347,9 +1347,7 @@ describe('FilterInput', () => {
     it('stays a single chip with no second part when the base operator is "is not set"', async () => {
       const user = userEvent.setup();
       const onErrorsChange = vi.fn();
-      const setOnlyFields: FieldMetadata[] = [
-        { ...pairedFields[0]!, operators: ['=', 'is_null'] },
-      ];
+      const setOnlyFields: FieldMetadata[] = [{ ...pairedFields[0]!, operators: ['=', 'is_null'] }];
       const { container } = render(
         <FilterInput fields={setOnlyFields} onErrorsChange={onErrorsChange} />,
       );
