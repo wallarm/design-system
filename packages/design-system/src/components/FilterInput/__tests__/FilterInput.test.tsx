@@ -1320,7 +1320,7 @@ describe('FilterInput', () => {
       await user.click(await findMenuitem(/^is =$/));
       await user.click(await findMenuitem(/^xxx$/));
       // Side 1 operator menu is open — choose "is set", which takes no value.
-      await user.click(await findMenuitem(/^is set = null$/));
+      await user.click(await findMenuitem(/^is set != null$/));
 
       // One committed chip carrying both triplets; the second has no value segment.
       await waitFor(() => {
