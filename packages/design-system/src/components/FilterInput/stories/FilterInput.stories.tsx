@@ -318,13 +318,18 @@ export const HTTPStatusCodeByName: Story = {
 };
 
 /**
- * Two-step "paired" field (AS-1160). `Context Param` offers two operators:
+ * Two-step "paired" field (AS-1160). `Context Param` takes an `is` / `is not`
+ * operator plus a key, after which the second part (`Value`) **always** appears
+ * with its own operator and value — captured in one chip (`Context Param is
+ * header ; Value is yyy`).
  *
- * - **is** — pick the key's value, then the second part (`Value`) appears with
- *   its own operator and value, captured in one chip (`Context Param is xxx ;
- *   Value is yyy`). The second value is required.
- * - **is not set** — takes no value, so no second part appears; the chip stays a
- *   single-value filter (`Context Param is not set`).
+ * The `Value` part adds `like` / `not like` (substring match) plus `is set` /
+ * `is not set` operators. The last two take no value:
+ *
+ * - **Value is set** — the key's value is present (`!= null`).
+ * - **Value is not set** — the key's value is absent (`== null`).
+ *
+ * In those two cases the second value is not required; otherwise it is.
  */
 const pairedFields: FieldMetadata[] = [
   {
@@ -332,13 +337,16 @@ const pairedFields: FieldMetadata[] = [
     label: 'Context Param',
     type: 'enum',
     options: ['header', 'cookie', 'query', 'body'],
-    // "is" (=) reveals the paired second value; "is not set" stays single.
-    operators: ['=', 'is_not_null'],
+    // The param key always takes a value; the second part follows automatically.
+    operators: ['=', '!='],
     pairedField: {
       name: 'context_value',
       label: 'Value',
       type: 'string',
       options: [],
+      // "like"/"not like" match substrings; "is set"/"is not set" complete the
+      // chip without a second value.
+      operators: ['=', '!=', 'like', 'not_like', 'is_null', 'is_not_null'],
     },
   },
   { name: 'method', label: 'Method', type: 'enum', options: ['GET', 'POST', 'PUT', 'DELETE'] },
@@ -348,6 +356,27 @@ export const PairedField: Story = {
   render: () => {
     const ParentComponent = () => {
       const [value, setValue] = useState<ExprNode | null>(null);
+      return <FilterInput fields={pairedFields} value={value} onChange={setValue} />;
+    };
+    return <ParentComponent />;
+  },
+};
+
+/**
+ * Paired field whose `Value` uses the no-value `is set` operator — the chip
+ * reads `Context Param is header ; Value is set` with no second value.
+ */
+export const PairedFieldValueIsSet: Story = {
+  render: () => {
+    const ParentComponent = () => {
+      const [value, setValue] = useState<ExprNode | null>({
+        type: 'group',
+        operator: 'and',
+        children: [
+          { type: 'condition', field: 'context_param', operator: '=', value: 'header' },
+          { type: 'condition', field: 'context_value', operator: 'is_null', value: null },
+        ],
+      });
       return <FilterInput fields={pairedFields} value={value} onChange={setValue} />;
     };
     return <ParentComponent />;

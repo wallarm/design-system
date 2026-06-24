@@ -210,6 +210,20 @@ describe('buildChips — paired field (AS-1160)', () => {
     expect(chip?.pair).toEqual({ attribute: 'Value', operator: 'is', value: 'yyy' });
   });
 
+  it('renders the no-value placeholder for a paired "is set"/"is not set" operator', () => {
+    const conditions: Condition[] = [
+      {
+        type: 'condition',
+        field: 'ctx_param',
+        operator: '=',
+        value: 'xxx',
+        pair: { operator: 'is_null', value: null },
+      },
+    ];
+    const chip = findChip(buildChips(conditions, [], pairedFields, false));
+    expect(chip?.pair).toEqual({ attribute: 'Value', operator: 'is set', value: '—' });
+  });
+
   it('omits pair when the field has no pairedField', () => {
     const plainFields: FieldMetadata[] = [
       { name: 'ctx_param', label: 'Context Param', type: 'string' },
