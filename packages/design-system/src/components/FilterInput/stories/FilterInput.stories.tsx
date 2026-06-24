@@ -318,7 +318,7 @@ export const HTTPStatusCodeByName: Story = {
 };
 
 /**
- * Two-step "paired" field (AS-1160). `Context Param` takes an `is` / `is not`
+ * Two-step "paired" field (AS-1160). `Context Param` takes a single `is`
  * operator plus a key, after which the second part (`Value`) **always** appears
  * with its own operator and value — captured in one chip (`Context Param is
  * header ; Value is yyy`).
@@ -337,8 +337,9 @@ const pairedFields: FieldMetadata[] = [
     label: 'Context Param',
     type: 'enum',
     options: ['header', 'cookie', 'query', 'body'],
-    // The param key always takes a value; the second part follows automatically.
-    operators: ['=', '!='],
+    // The param key is always "is <key>" — there is no "is not"/"is not set" on
+    // the first part; the second part (Value) carries the real comparison.
+    operators: ['='],
     pairedField: {
       name: 'context_value',
       label: 'Value',
