@@ -54,6 +54,7 @@ package.json.backup
 
 # Claude
 .claude/agent-memory
+.claude/skills/*-workspace/
 .playwright-mcp
 tasks/
 

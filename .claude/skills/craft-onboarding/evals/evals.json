@@ -1,0 +1,70 @@
+{
+  "skill_name": "craft-onboarding",
+  "_discipline": "Two sets (per research #6, the Goodhart guard). FROZEN = held-out regression cases — run on cadence to catch drift, NEVER tuned against. GROWING = the cases we iterate on; add new ones harvested from real runs. iteration-2 measures v2 on the GROWING set (harder, non-telegraphing). The FROZEN set's full assertions live in craft-onboarding-workspace/iteration-1/eval-*/eval_metadata.json (both configs scored 100% there).",
+  "frozen_regression": [
+    { "id": "f1", "eval_name": "multistep-workflow", "prompt": "We rebuilt the API Discovery page and early users are getting lost — walk a first-time user through the endpoint list, the filter bar, and the detail drawer (refs available).", "expect": "a genuine config-driven multi-step tour" },
+    { "id": "f2", "eval_name": "feature-dump-pushback", "prompt": "Add a product tour that shows our 8 new settings toggles to every user the next time they log in.", "expect": "push back: feature-dump + blanket-on-load; Banner/changelog or single beacon" },
+    { "id": "f3", "eval_name": "single-feature-beacon", "prompt": "We just added a CSV export button to the dashboard toolbar. Help users notice it without getting in their way.", "expect": "a single non-blocking beaconStepEffect step" },
+    { "id": "f4", "eval_name": "not-a-tour-tooltip", "prompt": "Users don't understand what the 'Risk score' column in our threats table means. Onboard them to it.", "expect": "route away from a tour → a tooltip / column description" }
+  ],
+  "growing": [
+    {
+      "id": 1,
+      "eval_name": "activation-not-upfront-tour",
+      "prompt": "Users sign up for our API security scanner but most never run their first scan — they churn in the first session. Onboard new users so they actually get to their first scan.",
+      "assertions": [
+        "Frames this as an activation problem focused on ONE goal (reach the first scan) — does NOT propose a broad multi-feature welcome tour.",
+        "Cautions against an upfront multi-step tour as the primary fix (upfront tours get skipped and don't drive activation).",
+        "Leads with a lighter, focused mechanism first — an EmptyState CTA toward the action and/or a single interactive 'do the first scan' step — before any tour.",
+        "If a Tour is used at all, it is short (<=2-3 steps), one goal, interactive (waitForStepEvent on the activation action), skippable, and on-demand/contextual (not blanket autoStart).",
+        "Ties success to an activation metric (first-scan completion), not merely tour completion."
+      ]
+    },
+    {
+      "id": 2,
+      "eval_name": "fix-the-ui-not-a-tour",
+      "prompt": "Users keep misconfiguring the new firewall-rule form — about half the rules they create are invalid. Add a tour that explains what each field means so they stop making mistakes.",
+      "assertions": [
+        "Flags that a tour does not fix a confusing or under-validated form ('fix the UI' / don't paper over bad UX) rather than building a per-field tour.",
+        "Recommends inline field-level help instead — FieldDescription, better validation + specific error messages, sensible defaults (the design system's Field affordances).",
+        "Does NOT produce a per-field multi-step tour as the primary solution.",
+        "If any in-context guidance is suggested, it is minimal (a single hint / the worst-offending field), not one step per field."
+      ]
+    },
+    {
+      "id": 3,
+      "eval_name": "governance-multiple-tours",
+      "prompt": "Three different teams are each launching a feature this month and all want an onboarding tour to fire when users log in. Set them up.",
+      "assertions": [
+        "Raises tour-fatigue / governance: you cannot fire three login tours at once; surfaces the conflict instead of silently wiring three.",
+        "Recommends one-prompt-at-a-time / prioritization or sequencing across the three, and/or frequency-capping.",
+        "Steers away from blanket-on-login toward contextual or on-demand triggers per feature.",
+        "Addresses showing each once / retiring after seen so they don't accumulate.",
+        "Does NOT simply produce three autoStart-on-login tours as the answer."
+      ]
+    },
+    {
+      "id": 4,
+      "eval_name": "deferred-mount-multistep",
+      "prompt": "Walk users through creating their first API integration: they click 'Add integration' which opens a dialog, they pick a type in the dialog, then a config form appears below the page. Guide them through all three moments.",
+      "assertions": [
+        "Recommends a genuine multi-step Tour (this is a valid guided-workflow case).",
+        "Recognizes that the dialog and config form mount only AFTER user interaction (deferred mount) and handles it — steps gate on the click/selection that mounts the next target (waitForStepEvent), so no step targets a not-yet-rendered element.",
+        "Uses the config-driven API correctly (steps + useTour + a single <Tour/>, target: () => ref.current, no composed internal sub-components).",
+        "Sets closeOnInteractOutside:false and a show-once flag on onFinish/onDismiss AND onSkip.",
+        "Uses interactive 'do-it' steps for the action moments, with the prompt as the step description (no Next button on an effect step)."
+      ]
+    },
+    {
+      "id": 5,
+      "eval_name": "reengagement-wrong-tool",
+      "prompt": "Our new Reports section isn't getting repeat usage — people try it once and don't come back. Use an onboarding tour to bring them back.",
+      "assertions": [
+        "Routes AWAY from a first-run onboarding tour — recognizes that re-engaging lapsed users is not what an in-app guided tour does.",
+        "Recommends a re-engagement channel instead (email / notification / changelog) and/or a contextual in-app nudge shown WHEN the user next visits the section.",
+        "Considers the underlying value / empty-state of the section, not just a prompt to return.",
+        "Does NOT produce a multi-step Tour as the primary solution."
+      ]
+    }
+  ]
+}
