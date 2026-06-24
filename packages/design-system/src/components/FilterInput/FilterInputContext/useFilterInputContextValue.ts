@@ -13,6 +13,7 @@ interface AutocompleteForContext {
   handleInputClick: () => void;
   handleAreaClick: () => void;
   handleChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
+  handlePairChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
   handleBuildingChipClick: (segment: ChipSegment, anchorEl: HTMLElement) => void;
   switchEditSegment: (targetSegment: ChipSegment) => boolean;
   removeEditingChip: () => void;
@@ -25,6 +26,7 @@ interface AutocompleteForContext {
   // Inline segment editing
   editingChipId: string | null;
   editingSegment: ChipSegment | null;
+  editingSide: 0 | 1;
   segmentFilterText: string;
   handleSegmentFilterChange: (text: string) => void;
   cancelSegmentEdit: () => void;
@@ -78,6 +80,7 @@ export const useFilterInputContextValue = ({
       onInputClick: autocomplete.handleInputClick,
       onAreaClick: autocomplete.handleAreaClick,
       onChipClick: autocomplete.handleChipClick,
+      onPairChipClick: autocomplete.handlePairChipClick,
       onBuildingChipClick: autocomplete.handleBuildingChipClick,
       onSwitchEditSegment: autocomplete.switchEditSegment,
       onRemoveEditingChip: autocomplete.removeEditingChip,
@@ -86,6 +89,7 @@ export const useFilterInputContextValue = ({
       onClear: autocomplete.handleClear,
       editingChipId: autocomplete.editingChipId,
       editingSegment: autocomplete.editingSegment,
+      editingSide: autocomplete.editingSide,
       segmentFilterText: autocomplete.segmentFilterText,
       onSegmentFilterChange: autocomplete.handleSegmentFilterChange,
       onCancelSegmentEdit: autocomplete.cancelSegmentEdit,
@@ -112,6 +116,7 @@ export const useFilterInputContextValue = ({
       autocomplete.handleInputClick,
       autocomplete.handleAreaClick,
       autocomplete.handleChipClick,
+      autocomplete.handlePairChipClick,
       autocomplete.handleBuildingChipClick,
       autocomplete.switchEditSegment,
       autocomplete.removeEditingChip,
@@ -120,6 +125,7 @@ export const useFilterInputContextValue = ({
       autocomplete.handleClear,
       autocomplete.editingChipId,
       autocomplete.editingSegment,
+      autocomplete.editingSide,
       autocomplete.segmentFilterText,
       autocomplete.handleSegmentFilterChange,
       autocomplete.cancelSegmentEdit,

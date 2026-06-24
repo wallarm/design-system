@@ -25,6 +25,9 @@ export type UpsertCondition = (
   atIndex?: number,
   error?: ChipErrorSegment,
   dateOrigin?: 'relative' | 'absolute',
+  /** When 1, write the paired (second) triplet onto the target condition instead
+   *  of replacing the base triplet. Defaults to 0 (base triplet). */
+  side?: 0 | 1,
 ) => void;
 
 export interface FilterInputChipData {
@@ -42,6 +45,13 @@ export interface FilterInputChipData {
   errorValueIndices?: number[];
   /** When true, the chip cannot be edited or removed */
   disabled?: boolean;
+  /** Second paired triplet (display) for two-step fields. */
+  pair?: {
+    attribute: string;
+    operator?: string;
+    value?: string;
+    error?: ChipErrorSegment;
+  };
 }
 
 /**
@@ -147,6 +157,13 @@ export interface FieldMetadata {
    * emitting the query. Display in the chip is unaffected.
    */
   serializeValue?: (value: string | number | boolean) => string | number | boolean;
+  /**
+   * When set, this field is a two-step paired field: the chip holds a second
+   * attribute/operator/value triplet. The paired segment is a full field
+   * definition (label, type, operators, values, validate, …). Nesting is one
+   * level only — a pairedField's own `pairedField` is ignored.
+   */
+  pairedField?: FieldMetadata;
 }
 
 /**
@@ -168,6 +185,13 @@ export interface Condition {
   dateOrigin?: 'relative' | 'absolute';
   /** When true, the condition cannot be edited or removed */
   disabled?: boolean;
+  /** Second paired triplet. Present only for fields with `pairedField`. */
+  pair?: {
+    operator?: FilterOperator;
+    value: string | number | boolean | null | Array<string | number | boolean>;
+    error?: ChipErrorSegment;
+    dateOrigin?: 'relative' | 'absolute';
+  };
 }
 
 /**

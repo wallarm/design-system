@@ -36,6 +36,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     onChipRemove,
     editingChipId,
     editingSegment,
+    editingSide,
     segmentFilterText,
     onSegmentFilterChange,
     onCancelSegmentEdit,
@@ -83,6 +84,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     <EditingProvider
       editingChipId={editingChipId}
       editingSegment={editingSegment}
+      editingSide={editingSide}
       segmentFilterText={segmentFilterText}
       onSegmentFilterChange={onSegmentFilterChange}
       onSegmentEditKeyDown={handleSegmentEditKeyDown}
@@ -159,6 +161,7 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
                   attribute={buildingChipData.attribute}
                   operator={buildingChipData.operator}
                   value={buildingChipData.value}
+                  pair={buildingChipData.pair}
                   onSegmentClick={onBuildingChipClick}
                   className='mx-4'
                 />

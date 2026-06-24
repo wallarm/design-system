@@ -6,6 +6,8 @@ export interface BuildingChipData {
   attribute: string;
   operator?: string;
   value?: string;
+  /** Paired second triplet shown while building a two-step field's second value. */
+  pair?: FilterInputChipData['pair'];
 }
 
 export interface FilterInputContextValue {
@@ -32,6 +34,8 @@ export interface FilterInputContextValue {
   onAreaClick: () => void;
   onGapClick: (conditionIndex: number, afterConnector: boolean) => void;
   onChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
+  /** Click on an editable paired (second-triplet) segment — edits the pair. */
+  onPairChipClick: (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => void;
   /** Click on a building-chip segment — reopens its menu and enters inline-edit. */
   onBuildingChipClick: (segment: ChipSegment, anchorEl: HTMLElement) => void;
   /** Move inline-edit to another segment of the edited chip (Backspace cascade). */
@@ -44,6 +48,8 @@ export interface FilterInputContextValue {
   // Inline segment editing
   editingChipId: string | null;
   editingSegment: ChipSegment | null;
+  /** Which triplet is being edited: 0 = base, 1 = paired second. */
+  editingSide: 0 | 1;
   segmentFilterText: string;
   onSegmentFilterChange: (text: string) => void;
   onCancelSegmentEdit: () => void;

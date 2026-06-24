@@ -9,6 +9,8 @@ const filterFieldStory = createStoryHelper('patterns-filterinput-filterinput', [
   'With Multi Condition Preset',
   'Error With Value',
   'HTTP Status Code Suggestions',
+  'Paired Field',
+  'Paired Field Preset',
 ] as const);
 
 // TODO: Enable after baseline screenshots are generated and menu flow is stabilized
@@ -61,6 +63,32 @@ test.describe.skip('Component: FilterInput', () => {
 
       const chip = page.locator('[data-slot="filter-input-chip"]').first();
       await expect(chip).toBeVisible();
+    });
+
+    // AS-1160 — two-step paired chip.
+    test('Should reveal the second value after the first when building a paired field', async ({
+      page,
+    }) => {
+      await filterFieldStory.goto(page, 'Paired Field');
+      const field = page.locator('[data-slot="filter-input"]');
+      await field.click();
+
+      await page.getByRole('menuitem', { name: /^Context Param$/ }).click();
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+      await page.getByRole('menuitem', { name: /^header$/ }).click();
+
+      // The building chip now shows the paired attribute and the ; separator.
+      const buildingChip = page.locator('[data-slot="filter-input-condition-chip"][data-building]');
+      await expect(buildingChip.locator('[data-slot="segment-separator"]')).toBeVisible();
+      await expect(buildingChip).toContainText('Value');
+    });
+
+    test('Should render a preset paired condition as one chip', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Paired Field Preset');
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      await expect(chip.locator('[data-slot="segment-separator"]')).toBeVisible();
+      await expect(chip.locator('[data-slot="segment-attribute"]')).toHaveCount(2);
+      await expect(chip.locator('[data-slot="segment-value"]')).toHaveCount(2);
     });
   });
 

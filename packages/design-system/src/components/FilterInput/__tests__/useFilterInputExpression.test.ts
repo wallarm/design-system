@@ -119,6 +119,65 @@ describe('useFilterInputExpression', () => {
       expect(lastCall.children).toHaveLength(2);
     });
 
+    describe('paired triplet (AS-1160)', () => {
+      const pairedField: FieldMetadata = { name: 'ctx_value', label: 'Value', type: 'string' };
+      const ctxField: FieldMetadata = {
+        name: 'ctx_param',
+        label: 'Context Param',
+        type: 'string',
+        pairedField,
+      };
+      const pairedFields = [ctxField];
+
+      it('writes the paired triplet when side=1 targeting an existing chip', () => {
+        const onChange = vi.fn();
+        const { result } = renderHook(() =>
+          useFilterInputExpression({ fields: pairedFields, onChange, error: false }),
+        );
+        act(() => {
+          result.current.upsertCondition(ctxField, '=', 'xxx');
+        });
+        act(() => {
+          result.current.upsertCondition(
+            pairedField,
+            '=',
+            'yyy',
+            'chip-0',
+            undefined,
+            undefined,
+            undefined,
+            1,
+          );
+        });
+        expect(result.current.conditions).toHaveLength(1);
+        expect(result.current.conditions[0]!.pair).toEqual({ operator: '=', value: 'yyy' });
+      });
+
+      it('writes the paired triplet onto the last condition when building (no chipId)', () => {
+        const onChange = vi.fn();
+        const { result } = renderHook(() =>
+          useFilterInputExpression({ fields: pairedFields, onChange, error: false }),
+        );
+        act(() => {
+          result.current.upsertCondition(ctxField, '=', 'xxx');
+        });
+        act(() => {
+          result.current.upsertCondition(
+            pairedField,
+            '=',
+            'yyy',
+            null,
+            undefined,
+            undefined,
+            undefined,
+            1,
+          );
+        });
+        expect(result.current.conditions).toHaveLength(1);
+        expect(result.current.conditions[0]!.pair).toEqual({ operator: '=', value: 'yyy' });
+      });
+    });
+
     it('edits an existing condition by chipId', () => {
       const onChange = vi.fn();
       const { result } = renderHook(() =>

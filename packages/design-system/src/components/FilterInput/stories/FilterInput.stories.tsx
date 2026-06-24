@@ -316,3 +316,59 @@ export const HTTPStatusCodeByName: Story = {
     placeholder: 'Type to filter by status code...',
   },
 };
+
+/**
+ * Two-step "paired" field (AS-1160). `Context Param` offers two operators:
+ *
+ * - **is** — pick the key's value, then the second part (`Value`) appears with
+ *   its own operator and value, captured in one chip (`Context Param is xxx ;
+ *   Value is yyy`). The second value is required.
+ * - **is not set** — takes no value, so no second part appears; the chip stays a
+ *   single-value filter (`Context Param is not set`).
+ */
+const pairedFields: FieldMetadata[] = [
+  {
+    name: 'context_param',
+    label: 'Context Param',
+    type: 'enum',
+    options: ['header', 'cookie', 'query', 'body'],
+    // "is" (=) reveals the paired second value; "is not set" stays single.
+    operators: ['=', 'is_not_null'],
+    pairedField: {
+      name: 'context_value',
+      label: 'Value',
+      type: 'string',
+      options: [],
+    },
+  },
+  { name: 'method', label: 'Method', type: 'enum', options: ['GET', 'POST', 'PUT', 'DELETE'] },
+];
+
+export const PairedField: Story = {
+  render: () => {
+    const ParentComponent = () => {
+      const [value, setValue] = useState<ExprNode | null>(null);
+      return <FilterInput fields={pairedFields} value={value} onChange={setValue} />;
+    };
+    return <ParentComponent />;
+  },
+};
+
+/**
+ * Paired field pre-populated with both values, rendered as one chip.
+ */
+export const PairedFieldPreset: Story = {
+  render: () => {
+    const ParentComponent = () => {
+      const [value, setValue] = useState<ExprNode | null>({
+        type: 'condition',
+        field: 'context_param',
+        operator: '=',
+        value: 'header',
+        pair: { operator: '=', value: 'authorization' },
+      });
+      return <FilterInput fields={pairedFields} value={value} onChange={setValue} />;
+    };
+    return <ParentComponent />;
+  },
+};

@@ -14,6 +14,8 @@ interface UseResetStateDeps {
   setSelectedField: Dispatch<SetStateAction<FieldMetadata | null>>;
   setSelectedOperator: Dispatch<SetStateAction<FilterOperator | null>>;
   setBuildingMultiValue: Dispatch<SetStateAction<string | undefined>>;
+  setBuildingSide: (side: 0 | 1) => void;
+  setBuildingBase: (base: null) => void;
   setInsertIndex: Dispatch<SetStateAction<number | null>>;
   setInsertAfterConnector: Dispatch<SetStateAction<boolean>>;
   setMenuState: Dispatch<SetStateAction<MenuState>>;
@@ -40,6 +42,8 @@ export const useResetState = ({
   setSelectedField,
   setSelectedOperator,
   setBuildingMultiValue,
+  setBuildingSide,
+  setBuildingBase,
   setInsertIndex,
   setInsertAfterConnector,
   setMenuState,
@@ -53,6 +57,8 @@ export const useResetState = ({
         editing.clearEditing();
         dateRange.reset();
         setBuildingMultiValue(undefined);
+        setBuildingSide(0);
+        setBuildingBase(null);
         setInsertIndex(null);
         setInsertAfterConnector(false);
         resetMenuAnchor();
@@ -84,6 +90,8 @@ export const useResetState = ({
       setSelectedField,
       setSelectedOperator,
       setBuildingMultiValue,
+      setBuildingSide,
+      setBuildingBase,
       setInsertIndex,
       setInsertAfterConnector,
       setMenuState,

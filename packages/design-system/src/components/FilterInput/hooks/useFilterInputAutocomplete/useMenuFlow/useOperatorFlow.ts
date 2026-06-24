@@ -33,6 +33,7 @@ export const useOperatorFlow = ({
   const {
     editingChipId,
     editingSegment,
+    editingSide,
     isBuildingEdit,
     setEditingSegment,
     setSegmentFilterText,
@@ -67,33 +68,51 @@ export const useOperatorFlow = ({
           null,
           editingChipId,
           isEditing ? undefined : insertIndex,
+          undefined,
+          undefined,
+          editingSide,
         );
         resetState(!isEditing);
         return;
       }
 
       // Editing operator of existing chip: complete chip commits with new
-      // operator+value; incomplete persists operator and moves to value.
+      // operator+value; incomplete persists operator and moves to value. For a
+      // paired second triplet (editingSide 1), read/write the `pair` slot.
       if (editingChipId && editingSegment === SEGMENT_VARIANT.operator) {
         const idx = chipIdToConditionIndex(editingChipId);
         const condition = idx !== null ? conditionsRef.current[idx] : null;
         if (condition) {
-          const hasValue = condition.value !== null && condition.value !== '';
+          const currentValue = editingSide === 1 ? condition.pair?.value : condition.value;
+          const currentDateOrigin =
+            editingSide === 1 ? condition.pair?.dateOrigin : condition.dateOrigin;
+          const hasValue =
+            currentValue !== null && currentValue !== '' && currentValue !== undefined;
           if (hasValue) {
             upsertCondition(
               selectedField,
               operator,
-              condition.value,
+              currentValue,
               editingChipId,
               undefined,
               undefined,
-              condition.dateOrigin,
+              currentDateOrigin,
+              editingSide,
             );
             resetState();
             return;
           }
           // Incomplete — persist operator without error.
-          upsertCondition(selectedField, operator, null, editingChipId);
+          upsertCondition(
+            selectedField,
+            operator,
+            editingSide === 1 ? '' : null,
+            editingChipId,
+            undefined,
+            undefined,
+            undefined,
+            editingSide,
+          );
           setEditingSegment(SEGMENT_VARIANT.value);
           setSegmentFilterText('');
         }
@@ -106,6 +125,7 @@ export const useOperatorFlow = ({
     [
       editingChipId,
       editingSegment,
+      editingSide,
       isBuildingEdit,
       setEditingSegment,
       setSegmentFilterText,

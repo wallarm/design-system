@@ -187,3 +187,42 @@ describe('buildChips — loose-match label resolution (AS-882)', () => {
     });
   });
 });
+
+describe('buildChips — paired field (AS-1160)', () => {
+  const pairedField: FieldMetadata = { name: 'ctx_value', label: 'Value', type: 'string' };
+  const pairedFields: FieldMetadata[] = [
+    { name: 'ctx_param', label: 'Context Param', type: 'string', pairedField },
+  ];
+
+  it('emits a pair display triplet from condition.pair', () => {
+    const conditions: Condition[] = [
+      {
+        type: 'condition',
+        field: 'ctx_param',
+        operator: '=',
+        value: 'xxx',
+        pair: { operator: '=', value: 'yyy' },
+      },
+    ];
+    const chip = findChip(buildChips(conditions, [], pairedFields, false));
+    expect(chip?.attribute).toBe('Context Param');
+    expect(chip?.value).toBe('xxx');
+    expect(chip?.pair).toEqual({ attribute: 'Value', operator: 'is', value: 'yyy' });
+  });
+
+  it('omits pair when the field has no pairedField', () => {
+    const plainFields: FieldMetadata[] = [
+      { name: 'ctx_param', label: 'Context Param', type: 'string' },
+    ];
+    const conditions: Condition[] = [
+      {
+        type: 'condition',
+        field: 'ctx_param',
+        operator: '=',
+        value: 'xxx',
+        pair: { operator: '=', value: 'yyy' },
+      },
+    ];
+    expect(findChip(buildChips(conditions, [], plainFields, false))?.pair).toBeUndefined();
+  });
+});
