@@ -1,3 +1,31 @@
+## <small>0.66.3 (2026-06-23)</small>
+
+* fix(filter-input): AS-1146 preserve list order on multi-select item toggle (#180) ([467c9cc](https://github.com/wallarm/design-system/commit/467c9cc)), closes [#180](https://github.com/wallarm/design-system/issues/180)
+
+## <small>0.66.2 (2026-06-23)</small>
+
+* fix(design-system): apply WDS-140 pagination design review (#177) ([6d88199](https://github.com/wallarm/design-system/commit/6d88199)), closes [#177](https://github.com/wallarm/design-system/issues/177)
+* fix(design-system): polish Table empty state and document its usage (#179) ([0ef3a33](https://github.com/wallarm/design-system/commit/0ef3a33)), closes [#179](https://github.com/wallarm/design-system/issues/179)
+* 🖼️ Update screenshots ([e6b539f](https://github.com/wallarm/design-system/commit/e6b539f))
+* test(design-system): regenerate Pagination In Table screenshot [update-screenshots] ([e564d2f](https://github.com/wallarm/design-system/commit/e564d2f)), closes [#177](https://github.com/wallarm/design-system/issues/177)
+
+## <small>0.66.1 (2026-06-22)</small>
+
+* fix(design-system): correct root package exports to dist/index.js (#175) ([fbe0241](https://github.com/wallarm/design-system/commit/fbe0241)), closes [#175](https://github.com/wallarm/design-system/issues/175)
+
+## 0.66.0 (2026-06-22)
+
+* fix(design-system): correct Pagination e2e story ids (#176) ([a36663f](https://github.com/wallarm/design-system/commit/a36663f)), closes [#176](https://github.com/wallarm/design-system/issues/176)
+* feat: WDS-140 pagination (#171) ([4071e25](https://github.com/wallarm/design-system/commit/4071e25)), closes [#171](https://github.com/wallarm/design-system/issues/171)
+
+## 0.65.0 (2026-06-19)
+
+* feat: WDS-127 animated bg ([ad1ef25](https://github.com/wallarm/design-system/commit/ad1ef25))
+
+## <small>0.64.1 (2026-06-19)</small>
+
+* fix(design-system): remove mb-8 from SegmentedControl root (#170) ([2e7929b](https://github.com/wallarm/design-system/commit/2e7929b)), closes [#170](https://github.com/wallarm/design-system/issues/170)
+
 ## 0.64.0 (2026-06-18)
 
 * ci: trigger release for v0.64.0 [skip-e2e] ([10e8bd2](https://github.com/wallarm/design-system/commit/10e8bd2))

@@ -9,6 +9,8 @@
  * concrete classes (e.g. `useState<CalendarDate | null>`) — TypeScript
  * narrows the union automatically.
  */
+
+export { usePagination, usePaginationContext } from '@ark-ui/react/pagination';
 export {
   CalendarDate,
   CalendarDateTime,
@@ -383,6 +385,28 @@ export {
   type PageTitleProps,
   usePageHost,
 } from './components/Page';
+export {
+  Pagination,
+  type PaginationAlign,
+  PaginationEllipsis,
+  type PaginationEllipsisProps,
+  PaginationItem,
+  type PaginationItemProps,
+  PaginationList,
+  type PaginationListProps,
+  PaginationNext,
+  type PaginationNextProps,
+  type PaginationPage,
+  type PaginationPageChangeDetails,
+  PaginationPageSize,
+  type PaginationPageSizeChangeDetails,
+  type PaginationPageSizeProps,
+  PaginationPrevious,
+  type PaginationPreviousProps,
+  type PaginationProps,
+  type PaginationSize,
+  usePaginationSizeContext,
+} from './components/Pagination';
 export {
   type CopyFormatData,
   formatAsFilter,
