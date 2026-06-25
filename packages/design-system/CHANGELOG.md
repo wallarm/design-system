@@ -1,3 +1,13 @@
+## 0.68.0 (2026-06-25)
+
+* feat: WDS-142 animated bg - blur ([597a6fd](https://github.com/wallarm/design-system/commit/597a6fd))
+* feat: WDS-142 textarea ([b109e3e](https://github.com/wallarm/design-system/commit/b109e3e))
+* feat: WDS-142 textarea [update-screenshots] ([d08c9e0](https://github.com/wallarm/design-system/commit/d08c9e0))
+* feat: WDS-142 tree ([0a86aee](https://github.com/wallarm/design-system/commit/0a86aee))
+* feat: WDS-142 tree [update-screenshots] ([8ba8fcd](https://github.com/wallarm/design-system/commit/8ba8fcd))
+* feat(calendar): WDS-96 add datetime input header and time-input icon story (#186) ([3067602](https://github.com/wallarm/design-system/commit/3067602)), closes [#186](https://github.com/wallarm/design-system/issues/186)
+* 🖼️ Update screenshots ([53c0764](https://github.com/wallarm/design-system/commit/53c0764))
+
 ## <small>0.67.3 (2026-06-24)</small>
 
 * style(filter-input): AS-1160 fix Biome formatting to unblock CI lint (#185) ([365db0a](https://github.com/wallarm/design-system/commit/365db0a)), closes [#185](https://github.com/wallarm/design-system/issues/185)
