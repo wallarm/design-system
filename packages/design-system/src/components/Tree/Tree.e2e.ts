@@ -90,7 +90,7 @@ test.describe('Component: Tree', () => {
       const itemContent = page.locator('[data-slot="tree-item-content"]').nth(1);
 
       await expect(itemContent).toHaveAttribute('data-state', 'closed');
-      await itemHeader.focus();
+      await itemHeader.locator('button').focus();
       await page.keyboard.press('Enter');
       await expect(itemContent).toHaveAttribute('data-state', 'open');
     });

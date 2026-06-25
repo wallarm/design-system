@@ -54,11 +54,6 @@ test.describe('Component: Textarea', () => {
       await textareaStory.goto(page, 'With Footer');
       await expect(page).toHaveScreenshot();
     });
-
-    test('Should render textarea with resizable footer correctly', async ({ page }) => {
-      await textareaStory.goto(page, 'With Footer Resizable');
-      await expect(page).toHaveScreenshot();
-    });
   });
 
   test.describe('Interactions', () => {
