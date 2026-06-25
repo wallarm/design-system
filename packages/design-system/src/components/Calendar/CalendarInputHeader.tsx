@@ -1,5 +1,6 @@
-import { type FC, useCallback } from 'react';
+import { type FC, useCallback, useState } from 'react';
 import { DatePicker, type UseDatePickerReturn } from '@ark-ui/react';
+import { CalendarDateTime } from '@internationalized/date';
 import type { DateValue as ReactAriaDateValue } from '@react-aria/datepicker';
 import { cn } from '../../utils/cn';
 import { DateInput } from '../DateInput';
@@ -32,10 +33,37 @@ const toArkDateValue = (date: ReactAriaDateValue | null | undefined): DateValue 
  * Inner component for single date input that syncs with Ark UI DatePicker.
  * Uses controlled mode for reliable sync.
  */
+/**
+ * Promote a date-only value to a `CalendarDateTime` carrying `time`.
+ *
+ * The calendar grid only ever produces date-only `CalendarDate`s, but a
+ * `showTime` header renders a minute-granularity `DateInput` which rejects
+ * date-only values (`Invalid granularity minute`). Merging the last-known
+ * time keeps the picked time intact when the user jumps between days.
+ */
+const withTime = (
+  value: ReactAriaDateValue | null,
+  time: { hour: number; minute: number },
+): ReactAriaDateValue | null => {
+  if (!value) return null;
+  if ('hour' in value) return value;
+  return new CalendarDateTime(
+    value.year,
+    value.month,
+    value.day,
+    time.hour,
+    time.minute,
+  ) as unknown as ReactAriaDateValue;
+};
+
 const SingleDateInputInner: FC<{
   api: UseDatePickerReturn;
   readonly?: boolean;
-}> = ({ api, readonly }) => {
+  showTime?: boolean;
+}> = ({ api, readonly, showTime }) => {
+  // Last time the user picked — re-applied to grid-selected (date-only) days.
+  const [time, setTime] = useState({ hour: 0, minute: 0 });
+
   const handleChange = useCallback(
     (newValue: ReactAriaDateValue | null) => {
       const arkValue = toArkDateValue(newValue);
@@ -48,12 +76,37 @@ const SingleDateInputInner: FC<{
     [api],
   );
 
+  const handleDateTimeChange = useCallback(
+    (newValue: ReactAriaDateValue | null) => {
+      if (newValue && 'hour' in newValue) {
+        setTime({ hour: newValue.hour, minute: newValue.minute });
+      }
+      handleChange(newValue);
+    },
+    [handleChange],
+  );
+
   // Use null for controlled mode when no value (not undefined)
   const inputValue = toReactAriaDateValue(api.value[0]);
 
   return (
     <div className='flex flex-1' onKeyDown={e => e.stopPropagation()}>
-      <DateInput value={inputValue} onChange={handleChange} readOnly={readonly} granularity='day' />
+      {showTime ? (
+        <DateInput
+          value={withTime(inputValue, time)}
+          onChange={handleDateTimeChange}
+          readOnly={readonly}
+          granularity='minute'
+          showTimeDropdown
+        />
+      ) : (
+        <DateInput
+          value={inputValue}
+          onChange={handleChange}
+          readOnly={readonly}
+          granularity='day'
+        />
+      )}
     </div>
   );
 };
@@ -142,7 +195,7 @@ const RangeDateInputInner: FC<{
  * Automatically determines mode from CalendarContext.
  */
 export const CalendarInputHeader: FC<CalendarInputHeaderProps> = ({ className }) => {
-  const { isRange, readonly } = useCalendarContext();
+  const { isRange, readonly, showTime } = useCalendarContext();
 
   return (
     <div className={cn('flex flex-1 items-center', 'pt-20 pb-4 px-20', className)}>
@@ -151,7 +204,7 @@ export const CalendarInputHeader: FC<CalendarInputHeaderProps> = ({ className })
           isRange ? (
             <RangeDateInputInner api={api} readonly={readonly} />
           ) : (
-            <SingleDateInputInner api={api} readonly={readonly} />
+            <SingleDateInputInner api={api} readonly={readonly} showTime={showTime} />
           )
         }
       </DatePicker.Context>
