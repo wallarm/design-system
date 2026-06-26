@@ -203,8 +203,20 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       {pair && (
         <>
           <PairSeparator />
-          {/* Paired attribute is fixed by config — non-interactive. */}
-          <Segment variant={SEGMENT_VARIANT.attribute} className='shrink-0'>
+          {/* The paired attribute label ("Value") is fixed by config, so it is
+              normally non-interactive. But when the second triplet is still
+              incomplete its operator/value segments are empty (zero-width) and
+              can't be clicked — so make the label itself clickable to resume
+              entering the second part (AS-1179). */}
+          <Segment
+            variant={SEGMENT_VARIANT.attribute}
+            className='shrink-0'
+            onClick={
+              interactive && pair.error
+                ? e => handlePairSegmentClick(SEGMENT_VARIANT.value, e)
+                : undefined
+            }
+          >
             {pair.attribute}
           </Segment>
           {(pair.operator || pairActiveSegment === SEGMENT_VARIANT.operator) && (

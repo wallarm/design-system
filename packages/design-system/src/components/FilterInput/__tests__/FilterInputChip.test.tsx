@@ -266,6 +266,39 @@ describe('FilterInputChip building mode', () => {
       expect(baseValue?.className).toContain('shrink-0');
     });
 
+    it('makes the fixed "Value" label clickable to resume when the pair is incomplete (AS-1179)', async () => {
+      const user = userEvent.setup();
+      const onPairSegmentClick = vi.fn();
+      const { container, rerender } = render(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='header'
+          pair={{ attribute: 'Value', value: '', error: 'value' }}
+          onPairSegmentClick={onPairSegmentClick}
+        />,
+      );
+      // Second attribute segment = the paired "Value" label. With its operator/
+      // value segments empty (unclickable), it must itself be interactive so the
+      // user can resume the second part.
+      const pairAttr = () => container.querySelectorAll('[data-slot="segment-attribute"]')[1]!;
+      expect(pairAttr()).toHaveAttribute('role', 'button');
+      await user.click(pairAttr());
+      expect(onPairSegmentClick).toHaveBeenCalledWith('value', expect.anything());
+
+      // A complete pair keeps the label non-interactive.
+      rerender(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='header'
+          pair={{ attribute: 'Value', operator: 'is', value: 'yyy' }}
+          onPairSegmentClick={onPairSegmentClick}
+        />,
+      );
+      expect(pairAttr()).not.toHaveAttribute('role', 'button');
+    });
+
     it('renders the whole chip as errored when only the paired triplet errors (AS-1179)', () => {
       const { container } = render(
         <FilterInputChip
