@@ -181,7 +181,21 @@ const makeConditionChipBase = (
   const condition = conditions[i];
   if (!condition) return makeEmptyChip(i, error);
 
-  const chipError: ChipErrorSegment | undefined = condition.error || (error ? true : undefined);
+  // An incomplete committed chip (no operator, or a value-bearing operator with
+  // no value) reads as errored so it renders red while not being edited —
+  // matching the error banner. No-value operators ("is set") are complete.
+  // FilterInputChip suppresses the red while the chip is actively edited.
+  const incompleteError: ChipErrorSegment | undefined = !condition.operator
+    ? true
+    : isNoValueOperator(condition.operator)
+      ? undefined
+      : condition.value == null ||
+          condition.value === '' ||
+          (Array.isArray(condition.value) && condition.value.length === 0)
+        ? SEGMENT_VARIANT.value
+        : undefined;
+  const chipError: ChipErrorSegment | undefined =
+    condition.error || (error ? true : undefined) || incompleteError;
   const field = fields.find(f => f.name === condition.field);
   const baseChip = buildBaseChip(i, condition, field);
 

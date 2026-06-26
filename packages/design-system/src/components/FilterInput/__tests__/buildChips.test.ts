@@ -26,6 +26,34 @@ const fields: FieldMetadata[] = [
 
 const findChip = (chips: ReturnType<typeof buildChips>) => chips.find(c => c.variant === 'chip');
 
+describe('buildChips — incomplete chips read as errored (AS-1179)', () => {
+  it('flags a value-bearing operator with no value', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'priority', operator: '=', value: null },
+    ];
+    expect(findChip(buildChips(conditions, [], fields, false))?.error).toBe('value');
+  });
+
+  it('flags a chip with no operator as a whole-chip error', () => {
+    const conditions: Condition[] = [{ type: 'condition', field: 'priority', value: null }];
+    expect(findChip(buildChips(conditions, [], fields, false))?.error).toBe(true);
+  });
+
+  it('does not flag a no-value operator (is set) as errored', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'priority', operator: 'is_null', value: null },
+    ];
+    expect(findChip(buildChips(conditions, [], fields, false))?.error).toBeUndefined();
+  });
+
+  it('does not flag a complete chip', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'priority', operator: '=', value: 5 },
+    ];
+    expect(findChip(buildChips(conditions, [], fields, false))?.error).toBeUndefined();
+  });
+});
+
 describe('buildChips — loose-match label resolution (AS-882)', () => {
   describe('single-value condition', () => {
     it('resolves label when value is the canonical type (number)', () => {

@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { FilterInputProvider } from '../FilterInputContext/FilterInputProvider';
 import type { FilterInputContextValue } from '../FilterInputContext/types';
 import { FilterInputChip, FilterInputConnectorChip } from '../FilterInputField';
+import { EditingProvider } from '../FilterInputField/FilterInputChip/context/EditingContext';
 
 const mockContextValue: FilterInputContextValue = {
   chips: [],
@@ -117,6 +118,37 @@ describe('FilterInputChip', () => {
 
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
       expect(chip).toHaveClass('bg-badge-badge-bg', 'border-border-primary');
+    });
+
+    // An errored chip is red when idle, but while the user is editing it (fixing
+    // it) the red is suppressed so editing reads cleanly (AS-1179).
+    it('suppresses error styling while the chip is being edited', () => {
+      const { container, rerender } = render(
+        <FilterInputChip chipId='chip-0' attribute='Status' operator='is' value='' error='value' />,
+      );
+      const chip = () => container.querySelector('[data-slot="filter-input-condition-chip"]');
+      expect(chip()).toHaveClass('border-border-danger');
+
+      rerender(
+        <EditingProvider
+          editingChipId='chip-0'
+          editingSegment='value'
+          editingSide={0}
+          segmentFilterText=''
+          onSegmentFilterChange={() => {}}
+          onSegmentEditKeyDown={() => {}}
+          onSegmentEditBlur={() => {}}
+        >
+          <FilterInputChip
+            chipId='chip-0'
+            attribute='Status'
+            operator='is'
+            value=''
+            error='value'
+          />
+        </EditingProvider>,
+      );
+      expect(chip()).not.toHaveClass('border-border-danger');
     });
   });
 

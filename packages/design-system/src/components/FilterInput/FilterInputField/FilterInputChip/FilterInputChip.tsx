@@ -56,10 +56,6 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   ...props
 }) => {
   const interactive = !disabled;
-  // The whole chip reads as errored when EITHER triplet has an error — a paired
-  // chip missing its second value must stay red even though the base triplet is
-  // valid (the base segments themselves are reddened separately, per-segment).
-  const hasError = !!error || !!pair?.error;
   const internalRef = useRef<HTMLDivElement>(null);
 
   const editing = useEditingContext();
@@ -70,6 +66,16 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
     editing.editingSegment != null &&
     (building ? editing.editingChipId == null : chipId != null && editing.editingChipId === chipId);
   const activeSegment = isEditingThisChip ? editing.editingSegment : null;
+
+  // While the chip is actively edited the user is fixing it, so it must not read
+  // as errored; an incomplete/invalid committed chip turns red only once it is
+  // no longer in the editable state (AS-1179). The whole chip reads as errored
+  // when EITHER triplet has an error — a paired chip missing its second value
+  // stays red even though the base triplet is valid (base segments are reddened
+  // separately, per-segment).
+  const effectiveError = isEditingThisChip ? false : error;
+  const effectivePairError = isEditingThisChip ? undefined : pair?.error;
+  const hasError = !!effectiveError || !!effectivePairError;
 
   const handleSegmentClick = useCallback(
     (segment: ChipSegment, e: ReactMouseEvent) => {
@@ -149,7 +155,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       <Segment
         variant={SEGMENT_VARIANT.attribute}
         className='shrink-0'
-        error={error === true || error === SEGMENT_VARIANT.attribute}
+        error={effectiveError === true || effectiveError === SEGMENT_VARIANT.attribute}
         onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.attribute, e) : undefined}
         onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
         {...segmentEditProps(SEGMENT_VARIANT.attribute)}
@@ -176,7 +182,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           className={pair ? 'max-w-[140px] shrink-0' : 'min-w-0'}
           error={
             baseActiveSegment !== SEGMENT_VARIANT.value &&
-            (error === true || error === SEGMENT_VARIANT.value)
+            (effectiveError === true || effectiveError === SEGMENT_VARIANT.value)
           }
           valueParts={valueParts}
           valueSeparator={valueSeparator}
@@ -212,7 +218,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
               className='min-w-0'
               error={
                 pairActiveSegment !== SEGMENT_VARIANT.value &&
-                (pair.error === true || pair.error === SEGMENT_VARIANT.value)
+                (effectivePairError === true || effectivePairError === SEGMENT_VARIANT.value)
               }
               onClick={interactive ? e => handlePairSegmentClick('value', e) : undefined}
               {...segmentEditProps(SEGMENT_VARIANT.value, 1)}
