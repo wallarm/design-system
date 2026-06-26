@@ -80,6 +80,18 @@ describe('FilterInputChip', () => {
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
 
+  // The delete button is opacity-0 but overlays the chip's right edge and the
+  // field area next to it. Without pointer-events gating it silently eats clicks
+  // meant for the chip/input and deletes the chip (AS-1179).
+  it('does not capture pointer events while hidden (only on hover/focus)', () => {
+    const onRemove = vi.fn();
+    render(<FilterInputChip attribute='Test' onRemove={onRemove} />);
+    const deleteButton = screen.getByRole('button', { name: /remove filter/i });
+    expect(deleteButton.className).toContain('pointer-events-none');
+    expect(deleteButton.className).toContain('group-hover/chip:pointer-events-auto');
+    expect(deleteButton.className).toContain('focus:pointer-events-auto');
+  });
+
   it('does not show delete button when onRemove is not provided', async () => {
     const user = userEvent.setup();
 

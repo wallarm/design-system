@@ -176,6 +176,66 @@ describe('useFilterInputExpression', () => {
         expect(result.current.conditions).toHaveLength(1);
         expect(result.current.conditions[0]!.pair).toEqual({ operator: '=', value: 'yyy' });
       });
+
+      it('preserves the pair when editing the base side of a paired chip (AS-1179)', () => {
+        const onChange = vi.fn();
+        const { result } = renderHook(() =>
+          useFilterInputExpression({ fields: pairedFields, onChange, error: false }),
+        );
+        // Build a full paired chip: base "ctx_param = xxx" with pair "= yyy".
+        act(() => {
+          result.current.upsertCondition(ctxField, '=', 'xxx');
+        });
+        act(() => {
+          result.current.upsertCondition(
+            pairedField,
+            '=',
+            'yyy',
+            'chip-0',
+            undefined,
+            undefined,
+            undefined,
+            1,
+          );
+        });
+        // Change the base key (side 0) — the pair must survive, not be dropped.
+        act(() => {
+          result.current.upsertCondition(ctxField, '=', 'zzz', 'chip-0');
+        });
+        expect(result.current.conditions).toHaveLength(1);
+        expect(result.current.conditions[0]!.value).toBe('zzz');
+        expect(result.current.conditions[0]!.pair).toEqual({ operator: '=', value: 'yyy' });
+      });
+
+      it('drops the pair when the base field is changed to a different field', () => {
+        const onChange = vi.fn();
+        const otherField: FieldMetadata = { name: 'method', label: 'Method', type: 'string' };
+        const { result } = renderHook(() =>
+          useFilterInputExpression({ fields: [ctxField, otherField], onChange, error: false }),
+        );
+        act(() => {
+          result.current.upsertCondition(ctxField, '=', 'xxx');
+        });
+        act(() => {
+          result.current.upsertCondition(
+            pairedField,
+            '=',
+            'yyy',
+            'chip-0',
+            undefined,
+            undefined,
+            undefined,
+            1,
+          );
+        });
+        // Switching to an unrelated field discards the now-meaningless pair.
+        act(() => {
+          result.current.upsertCondition(otherField, '=', 'GET', 'chip-0');
+        });
+        expect(result.current.conditions).toHaveLength(1);
+        expect(result.current.conditions[0]!.field).toBe('method');
+        expect(result.current.conditions[0]!.pair).toBeUndefined();
+      });
     });
 
     it('edits an existing condition by chipId', () => {

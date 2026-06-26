@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
-import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
+import { useCallback } from 'react';
+import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
 import type { Condition, FieldMetadata, FilterInputChipData, UpsertCondition } from '../../types';
 import { deriveAutocompleteValues } from './lib';
@@ -13,6 +14,7 @@ import { useInputHandlers } from './useInputHandlers';
 import { useMenuFlow } from './useMenuFlow';
 import { useMenuPositioning } from './useMenuPositioning';
 import { useResetState } from './useResetState';
+import { useResumeBuilding } from './useResumeBuilding';
 import { useSegmentEditFlow } from './useSegmentEditFlow';
 
 interface UseFilterInputAutocompleteOptions {
@@ -202,6 +204,10 @@ export const useFilterInputAutocomplete = ({
     handleCustomValueCommit,
     upsertCondition,
     resetState,
+    buildingSide,
+    setBuildingSide,
+    buildingBase,
+    setBuildingBase,
     commitBuildingOnBlurRef,
     commitBuildingForceRef,
   });
@@ -258,6 +264,42 @@ export const useFilterInputAutocomplete = ({
     setMenuAnchor,
   });
 
+  // Clicking a committed-but-incomplete chip resumes its building cascade
+  // instead of inline-editing it (AS-1179). Wraps the chip click handlers so an
+  // incomplete chip rebuilds in place; a complete chip falls through to edit.
+  const tryResumeBuilding = useResumeBuilding({
+    conditions,
+    fields,
+    removeConditionAtIndex,
+    setInsertIndex,
+    setBuildingBase,
+    setBuildingSide,
+    setSelectedField,
+    setSelectedOperator,
+    setBuildingMultiValue,
+    setInputText,
+    setMenuState,
+    resetMenuAnchor,
+    clearEditing: editing.clearEditing,
+    inputRef,
+  });
+
+  const handleChipClick = useCallback(
+    (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => {
+      if (tryResumeBuilding(chipId)) return;
+      editing.handleChipClick(chipId, segment, anchorEl);
+    },
+    [tryResumeBuilding, editing.handleChipClick],
+  );
+
+  const handlePairChipClick = useCallback(
+    (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => {
+      if (tryResumeBuilding(chipId)) return;
+      editing.handlePairChipClick(chipId, segment, anchorEl);
+    },
+    [tryResumeBuilding, editing.handlePairChipClick],
+  );
+
   const { isBuilding, buildingChipData, editingMultiValues, editingSingleValue, editingDateRange } =
     deriveAutocompleteValues({
       editingChipId: editing.editingChipId,
@@ -298,8 +340,8 @@ export const useFilterInputAutocomplete = ({
     handleMenuDiscard,
     /** Hard reset for paste/clipboard flows — scraps in-progress building. */
     resetAutocompleteState: resetState,
-    handleChipClick: editing.handleChipClick,
-    handlePairChipClick: editing.handlePairChipClick,
+    handleChipClick,
+    handlePairChipClick,
     handleBuildingChipClick,
     switchEditSegment,
     removeEditingChip,

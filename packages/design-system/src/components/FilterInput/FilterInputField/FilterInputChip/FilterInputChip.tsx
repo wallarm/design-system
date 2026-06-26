@@ -167,7 +167,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       {(value || baseActiveSegment === SEGMENT_VARIANT.value) && (
         <Segment
           variant={SEGMENT_VARIANT.value}
-          className='min-w-0'
+          // In a paired chip the base value is the short "key" — keep it readable
+          // (capped, doesn't collapse) so a long paired value truncates instead of
+          // squeezing the key down to one letter. Standalone chips truncate as usual.
+          className={pair ? 'max-w-[140px] shrink-0' : 'min-w-0'}
           error={
             baseActiveSegment !== SEGMENT_VARIANT.value &&
             (error === true || error === SEGMENT_VARIANT.value)

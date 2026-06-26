@@ -238,6 +238,19 @@ export const useFilterInputExpression = ({
       }
 
       const condition = buildCondition(field, operator, val, error, dateOrigin);
+      // Editing the base side (side 0) of a paired chip rebuilds the condition
+      // from scratch, which would drop the second triplet. Carry the existing
+      // `pair` over when the field is unchanged (e.g. changing the key/value of
+      // "context_param is header ; Value = x" must keep the Value part). A field
+      // change is treated as a fresh condition, so its pair is intentionally not
+      // preserved.
+      if (editingChipId) {
+        const idx = chipIdToConditionIndex(editingChipId);
+        const prevCondition = idx !== null ? prev.conditions[idx] : undefined;
+        if (prevCondition?.pair && prevCondition.field === condition.field) {
+          condition.pair = prevCondition.pair;
+        }
+      }
       const newConditions = applyCondition(prev.conditions, condition, editingChipId, atIndex);
       const newConnectors = addConnectorIfNeeded(
         prev.connectors,
