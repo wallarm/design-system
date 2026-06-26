@@ -170,4 +170,52 @@ describe('FilterInputChip building mode', () => {
     const deleteButton = screen.queryByRole('button', { name: /remove filter/i });
     expect(deleteButton).not.toBeInTheDocument();
   });
+
+  describe('paired chip (AS-1160)', () => {
+    it('renders the second triplet and a ; separator', () => {
+      render(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='xxx'
+          pair={{ attribute: 'Value', operator: 'is', value: 'yyy' }}
+        />,
+      );
+      expect(screen.getByText('Context Param')).toBeInTheDocument();
+      expect(screen.getByText('xxx')).toBeInTheDocument();
+      expect(screen.getByText('Value')).toBeInTheDocument();
+      expect(screen.getByText('yyy')).toBeInTheDocument();
+      expect(screen.getByText(';')).toBeInTheDocument();
+    });
+
+    it('renders the separator as aria-hidden and non-interactive', () => {
+      const { container } = render(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='xxx'
+          pair={{ attribute: 'Value', operator: 'is', value: 'yyy' }}
+        />,
+      );
+      const separator = container.querySelector('[data-slot="segment-separator"]');
+      expect(separator).toBeInTheDocument();
+      expect(separator).toHaveAttribute('aria-hidden');
+    });
+
+    it('calls onPairSegmentClick when a paired value is clicked', async () => {
+      const user = userEvent.setup();
+      const onPairSegmentClick = vi.fn();
+      render(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='xxx'
+          pair={{ attribute: 'Value', operator: 'is', value: 'yyy' }}
+          onPairSegmentClick={onPairSegmentClick}
+        />,
+      );
+      await user.click(screen.getByText('yyy'));
+      expect(onPairSegmentClick).toHaveBeenCalledWith('value', expect.any(HTMLElement));
+    });
+  });
 });

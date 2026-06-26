@@ -40,3 +40,128 @@ describe('Attribute pass-through', () => {
     expect(textarea).toHaveAttribute('data-analytics-id', 'COMMENT_FIELD');
   });
 });
+
+describe('Rendering', () => {
+  it('renders data-slot="textarea" on the root element', () => {
+    const { container } = render(<Textarea />);
+    expect(container.querySelector('[data-slot="textarea"]')).toBeInTheDocument();
+  });
+
+  it('renders a native <textarea> element', () => {
+    render(<Textarea data-testid='textarea' />);
+    expect(screen.getByTestId('textarea').tagName).toBe('TEXTAREA');
+  });
+
+  it('applies placeholder text', () => {
+    render(<Textarea placeholder='Enter text...' />);
+    expect(screen.getByPlaceholderText('Enter text...')).toBeInTheDocument();
+  });
+});
+
+describe('Disabled state', () => {
+  it('sets disabled attribute on <textarea>', () => {
+    render(<Textarea data-testid='textarea' disabled />);
+    expect(screen.getByTestId('textarea')).toBeDisabled();
+  });
+
+  it('sets aria-disabled when disabled', () => {
+    render(<Textarea data-testid='textarea' disabled />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('aria-disabled', 'true');
+  });
+});
+
+describe('Error state', () => {
+  it('sets aria-invalid when error is true', () => {
+    render(<Textarea data-testid='textarea' error />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('does not set aria-invalid when error is false', () => {
+    render(<Textarea data-testid='textarea' />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('aria-invalid', 'false');
+  });
+});
+
+describe('Auto-resize mode', () => {
+  it('sets resize-none class when maxRows is provided', () => {
+    render(<Textarea data-testid='textarea' minRows={1} maxRows={5} />);
+    const textarea = screen.getByTestId('textarea');
+    expect(textarea.className).toContain('resize-none');
+  });
+
+  it('sets rows attribute from minRows', () => {
+    render(<Textarea data-testid='textarea' minRows={3} maxRows={5} />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('rows', '3');
+  });
+
+  it('defaults minRows to 1 when only maxRows is set', () => {
+    render(<Textarea data-testid='textarea' maxRows={5} />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('rows', '1');
+  });
+});
+
+describe('Rendering', () => {
+  it('renders data-slot="textarea" on the root element', () => {
+    const { container } = render(<Textarea />);
+    expect(container.querySelector('[data-slot="textarea"]')).toBeInTheDocument();
+  });
+
+  it('renders a native <textarea> element', () => {
+    render(<Textarea data-testid='textarea' />);
+    expect(screen.getByTestId('textarea').tagName).toBe('TEXTAREA');
+  });
+
+  it('applies placeholder text', () => {
+    render(<Textarea placeholder='Enter text...' />);
+    expect(screen.getByPlaceholderText('Enter text...')).toBeInTheDocument();
+  });
+
+  it('renders standalone without children prop', () => {
+    const { container } = render(<Textarea />);
+
+    expect(container.querySelector('[data-slot="textarea"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="textarea-footer"]')).not.toBeInTheDocument();
+  });
+});
+
+describe('Disabled state', () => {
+  it('sets disabled attribute on <textarea>', () => {
+    render(<Textarea data-testid='textarea' disabled />);
+    expect(screen.getByTestId('textarea')).toBeDisabled();
+  });
+
+  it('sets aria-disabled when disabled', () => {
+    render(<Textarea data-testid='textarea' disabled />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('aria-disabled', 'true');
+  });
+});
+
+describe('Error state', () => {
+  it('sets aria-invalid when error is true', () => {
+    render(<Textarea data-testid='textarea' error />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('aria-invalid', 'true');
+  });
+
+  it('does not set aria-invalid when error is false', () => {
+    render(<Textarea data-testid='textarea' />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('aria-invalid', 'false');
+  });
+});
+
+describe('Auto-resize mode', () => {
+  it('sets resize-none class when maxRows is provided', () => {
+    render(<Textarea data-testid='textarea' minRows={1} maxRows={5} />);
+    const textarea = screen.getByTestId('textarea');
+    expect(textarea.className).toContain('resize-none');
+  });
+
+  it('sets rows attribute from minRows', () => {
+    render(<Textarea data-testid='textarea' minRows={3} maxRows={5} />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('rows', '3');
+  });
+
+  it('defaults minRows to 1 when only maxRows is set', () => {
+    render(<Textarea data-testid='textarea' maxRows={5} />);
+    expect(screen.getByTestId('textarea')).toHaveAttribute('rows', '1');
+  });
+});

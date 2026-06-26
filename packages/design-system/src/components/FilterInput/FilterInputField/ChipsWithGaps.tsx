@@ -30,7 +30,7 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
   onChipRemove,
   onGapClick,
 }) => {
-  const { registerChipRef } = useFilterInputContext();
+  const { registerChipRef, onPairChipClick } = useFilterInputContext();
   const chipRef = useCallback(
     (id: string) => (el: HTMLDivElement | null) => registerChipRef(id, el),
     [registerChipRef],
@@ -57,11 +57,17 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
             valueSeparator={chip.valueSeparator}
             errorValueIndices={chip.errorValueIndices}
             disabled={chip.disabled}
+            pair={chip.pair}
             onRemove={chip.disabled ? undefined : () => onChipRemove(chip.id)}
             onSegmentClick={
               chip.disabled
                 ? undefined
                 : (segment, anchorEl) => onChipClick(chip.id, segment, anchorEl)
+            }
+            onPairSegmentClick={
+              chip.disabled
+                ? undefined
+                : (segment, anchorEl) => onPairChipClick(chip.id, segment, anchorEl)
             }
           />
         </div>,

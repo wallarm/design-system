@@ -41,6 +41,33 @@ export const isValueOfType = (value: string | number | boolean, type: FieldType)
   }
 };
 
+// String/enum fields don't constrain a value's data type, so any value typed
+// into them is indistinguishable from one carried over from another field.
+const UNTYPED_FIELD_TYPES = new Set<FieldType>(['string', 'enum']);
+
+/**
+ * Whether a chip/menu may borrow a value's human label from *another* field's
+ * options. Only consulted when the current field doesn't define the value
+ * itself.
+ *
+ * String/enum fields always may: a value carried over after a field change keeps
+ * the label it had on its origin field (accepted trade-off, AS-1134). Typed
+ * fields (integer/float/date/boolean) may borrow only for a value that is NOT a
+ * valid value of their own type — such a value must have been carried from a
+ * differently-typed field. A type-conforming value (e.g. `1` typed into the
+ * integer `total_requests` field) is a genuine user entry and must never be
+ * relabelled from an unrelated field that happens to define the same value
+ * (AS-1171).
+ */
+export const canBorrowCrossFieldLabel = (
+  field: FieldMetadata | null | undefined,
+  value: string | number | boolean | null | undefined,
+): boolean => {
+  if (value == null) return false;
+  if (!field || UNTYPED_FIELD_TYPES.has(field.type)) return true;
+  return !isValueOfType(value, field.type);
+};
+
 /** Find a field value option matching by label or value (case-insensitive) */
 export const findMatchingFieldValue = (fieldValues: FieldValueOption[], text: string) =>
   fieldValues.find(

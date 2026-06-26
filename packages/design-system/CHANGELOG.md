@@ -1,3 +1,34 @@
+## <small>0.68.1 (2026-06-26)</small>
+
+* fix(filter-input): AS-1171 keep type-conforming values raw in chips (#189) ([9bb0154](https://github.com/wallarm/design-system/commit/9bb0154)), closes [#189](https://github.com/wallarm/design-system/issues/189)
+
+## 0.68.0 (2026-06-25)
+
+* feat: WDS-142 animated bg - blur ([597a6fd](https://github.com/wallarm/design-system/commit/597a6fd))
+* feat: WDS-142 textarea ([b109e3e](https://github.com/wallarm/design-system/commit/b109e3e))
+* feat: WDS-142 textarea [update-screenshots] ([d08c9e0](https://github.com/wallarm/design-system/commit/d08c9e0))
+* feat: WDS-142 tree ([0a86aee](https://github.com/wallarm/design-system/commit/0a86aee))
+* feat: WDS-142 tree [update-screenshots] ([8ba8fcd](https://github.com/wallarm/design-system/commit/8ba8fcd))
+* feat(calendar): WDS-96 add datetime input header and time-input icon story (#186) ([3067602](https://github.com/wallarm/design-system/commit/3067602)), closes [#186](https://github.com/wallarm/design-system/issues/186)
+* 🖼️ Update screenshots ([53c0764](https://github.com/wallarm/design-system/commit/53c0764))
+
+## <small>0.67.3 (2026-06-24)</small>
+
+* style(filter-input): AS-1160 fix Biome formatting to unblock CI lint (#185) ([365db0a](https://github.com/wallarm/design-system/commit/365db0a)), closes [#185](https://github.com/wallarm/design-system/issues/185)
+* fix(filter-input): AS-1160 correct inverted is_null/is_not_null labels (#183) ([c2c4f1a](https://github.com/wallarm/design-system/commit/c2c4f1a)), closes [#183](https://github.com/wallarm/design-system/issues/183)
+
+## <small>0.67.2 (2026-06-24)</small>
+
+* fix(filter-input): AS-1160 paired Context Param offers only "is" (#182) ([0aedc55](https://github.com/wallarm/design-system/commit/0aedc55)), closes [#182](https://github.com/wallarm/design-system/issues/182)
+
+## <small>0.67.1 (2026-06-24)</small>
+
+* fix(filter-input): AS-1160 move "is set"/"is not set" to paired Value side (#181) ([9e3116d](https://github.com/wallarm/design-system/commit/9e3116d)), closes [#181](https://github.com/wallarm/design-system/issues/181)
+
+## 0.67.0 (2026-06-24)
+
+* feat(filter-input): AS-1160 two-step paired filter (#174) ([94f4886](https://github.com/wallarm/design-system/commit/94f4886)), closes [#174](https://github.com/wallarm/design-system/issues/174)
+
 ## <small>0.66.3 (2026-06-23)</small>
 
 * fix(filter-input): AS-1146 preserve list order on multi-select item toggle (#180) ([467c9cc](https://github.com/wallarm/design-system/commit/467c9cc)), closes [#180](https://github.com/wallarm/design-system/issues/180)

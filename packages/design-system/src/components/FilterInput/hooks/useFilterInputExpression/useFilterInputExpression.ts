@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { CONNECTOR_ID_PATTERN, chipIdToConditionIndex, validateValueForField } from '../../lib';
 import type {
@@ -158,15 +158,35 @@ export const useFilterInputExpression = ({
 }: UseFilterInputExpressionOptions) => {
   const [state, setState] = useState<ExpressionState>(EMPTY_STATE);
 
+  // Mirror of `state` kept in a ref so mutations read the latest value without a
+  // functional `setState` updater. Calling `onChange` from inside an updater
+  // fires the parent's setState during this component's render ("Cannot update a
+  // component while rendering a different component"); computing the next state
+  // here and emitting from the event handler avoids that.
+  const stateRef = useRef<ExpressionState>(state);
+
+  /** Commit the next state and (optionally) notify the consumer. Emitting is
+   *  skipped for the controlled-value sync, which must not echo back. */
+  const applyState = useCallback(
+    (next: ExpressionState, emit: boolean) => {
+      stateRef.current = next;
+      setState(next);
+      if (emit) onChange?.(buildExpression(next.conditions, next.connectors, fields));
+    },
+    [onChange, fields],
+  );
+
   // Sync conditions with value prop (controlled mode). Re-derive value errors
   // so they survive a consumer round-trip that drops the `error` flag.
   useEffect(() => {
     if (value !== undefined) {
-      const result = expressionToConditions(value);
-      setState({
+      const result = expressionToConditions(value, fields);
+      const next: ExpressionState = {
         conditions: revalidateConditions(result.conditions, fields),
         connectors: result.connectors,
-      });
+      };
+      stateRef.current = next;
+      setState(next);
     }
   }, [value, fields]);
 
@@ -189,25 +209,46 @@ export const useFilterInputExpression = ({
       atIndex?: number,
       error?: ChipErrorSegment,
       dateOrigin?: 'relative' | 'absolute',
+      side?: 0 | 1,
     ) => {
+      const prev = stateRef.current;
+
+      // Paired triplet: merge onto the target condition's `pair` instead of
+      // replacing the base triplet. Target = the editing chip, or (while
+      // building) the last condition.
+      if (side === 1) {
+        const idx =
+          editingChipId != null
+            ? chipIdToConditionIndex(editingChipId)
+            : prev.conditions.length - 1;
+        if (idx == null || idx < 0 || idx >= prev.conditions.length) return;
+        const base = prev.conditions[idx]!;
+        const updated = [...prev.conditions];
+        updated[idx] = {
+          ...base,
+          pair: {
+            ...(operator && { operator }),
+            value: val,
+            ...(error && { error }),
+            ...(dateOrigin && { dateOrigin }),
+          },
+        };
+        applyState({ conditions: updated, connectors: prev.connectors }, true);
+        return;
+      }
+
       const condition = buildCondition(field, operator, val, error, dateOrigin);
-
-      setState(prev => {
-        const newConditions = applyCondition(prev.conditions, condition, editingChipId, atIndex);
-        const newConnectors = addConnectorIfNeeded(
-          prev.connectors,
-          newConditions.length,
-          editingChipId,
-          atIndex,
-          prev.conditions.length,
-        );
-
-        const next = { conditions: newConditions, connectors: newConnectors };
-        onChange?.(buildExpression(next.conditions, next.connectors));
-        return next;
-      });
+      const newConditions = applyCondition(prev.conditions, condition, editingChipId, atIndex);
+      const newConnectors = addConnectorIfNeeded(
+        prev.connectors,
+        newConditions.length,
+        editingChipId,
+        atIndex,
+        prev.conditions.length,
+      );
+      applyState({ conditions: newConditions, connectors: newConnectors }, true);
     },
-    [onChange],
+    [applyState],
   );
 
   const removeCondition = useCallback(
@@ -215,59 +256,50 @@ export const useFilterInputExpression = ({
       const idx = chipIdToConditionIndex(chipId);
       if (idx === null) return;
 
-      setState(prev => {
-        if (prev.conditions[idx]?.disabled) return prev;
+      const prev = stateRef.current;
+      if (prev.conditions[idx]?.disabled) return;
 
-        const newConditions = prev.conditions.filter((_, i) => i !== idx);
-        const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
-
-        const next = { conditions: newConditions, connectors: newConnectors };
-        onChange?.(buildExpression(next.conditions, next.connectors));
-        return next;
-      });
+      const newConditions = prev.conditions.filter((_, i) => i !== idx);
+      const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
+      applyState({ conditions: newConditions, connectors: newConnectors }, true);
     },
-    [onChange],
+    [applyState],
   );
 
   const removeConditionAtIndex = useCallback(
     (idx: number) => {
-      setState(prev => {
-        if (idx < 0 || idx >= prev.conditions.length) return prev;
-        if (prev.conditions[idx]?.disabled) return prev;
-        const newConditions = prev.conditions.filter((_, i) => i !== idx);
-        const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
+      const prev = stateRef.current;
+      if (idx < 0 || idx >= prev.conditions.length) return;
+      if (prev.conditions[idx]?.disabled) return;
 
-        const next = { conditions: newConditions, connectors: newConnectors };
-        onChange?.(buildExpression(next.conditions, next.connectors));
-        return next;
-      });
+      const newConditions = prev.conditions.filter((_, i) => i !== idx);
+      const newConnectors = removeConnectorAtConditionIndex(prev.connectors, idx);
+      applyState({ conditions: newConditions, connectors: newConnectors }, true);
     },
-    [onChange],
+    [applyState],
   );
 
   const clearAll = useCallback(() => {
-    setState(prev => {
-      const disabledConditions = prev.conditions.filter(c => c.disabled);
-      if (disabledConditions.length === 0) {
-        onChange?.(null);
-        return EMPTY_STATE;
-      }
-      // Keep disabled conditions and their connectors.
-      const next = { conditions: disabledConditions, connectors: [] as Array<'and' | 'or'> };
-      onChange?.(buildExpression(next.conditions, next.connectors));
-      return next;
-    });
-  }, [onChange]);
+    const prev = stateRef.current;
+    const disabledConditions = prev.conditions.filter(c => c.disabled);
+    if (disabledConditions.length === 0) {
+      applyState(EMPTY_STATE, false);
+      onChange?.(null);
+      return;
+    }
+    // Keep disabled conditions and their connectors.
+    applyState({ conditions: disabledConditions, connectors: [] }, true);
+  }, [applyState, onChange]);
 
   /** Replace the entire expression (paste path). Mirrors the upsert/remove
    *  pattern so uncontrolled components stay in sync. */
   const replaceExpression = useCallback(
     (expr: ExprNode | null) => {
-      const result = expressionToConditions(expr);
-      setState({ conditions: result.conditions, connectors: result.connectors });
+      const result = expressionToConditions(expr, fields);
+      applyState({ conditions: result.conditions, connectors: result.connectors }, false);
       onChange?.(expr);
     },
-    [onChange],
+    [applyState, onChange, fields],
   );
 
   const setConnectorValue = useCallback(
@@ -277,17 +309,14 @@ export const useFilterInputExpression = ({
       const condIdx = Number(match[1]);
       const connectorIdx = condIdx - 1;
 
-      setState(prev => {
-        const updated = [...prev.connectors];
-        if (connectorIdx >= 0 && connectorIdx < updated.length) {
-          updated[connectorIdx] = value;
-        }
-        const next = { conditions: prev.conditions, connectors: updated };
-        onChange?.(buildExpression(next.conditions, next.connectors));
-        return next;
-      });
+      const prev = stateRef.current;
+      const updated = [...prev.connectors];
+      if (connectorIdx >= 0 && connectorIdx < updated.length) {
+        updated[connectorIdx] = value;
+      }
+      applyState({ conditions: prev.conditions, connectors: updated }, true);
     },
-    [onChange],
+    [applyState],
   );
 
   return {

@@ -56,6 +56,10 @@ export const useFilterInputAutocomplete = ({
     setIsFocused,
     buildingMultiValue,
     setBuildingMultiValue,
+    buildingSide,
+    setBuildingSide,
+    buildingBase,
+    setBuildingBase,
     insertIndex,
     setInsertIndex,
     insertAfterConnector,
@@ -105,6 +109,8 @@ export const useFilterInputAutocomplete = ({
     setSelectedField,
     setSelectedOperator,
     setBuildingMultiValue,
+    setBuildingSide,
+    setBuildingBase,
     setInsertIndex,
     setInsertAfterConnector,
     setMenuState,
@@ -139,6 +145,10 @@ export const useFilterInputAutocomplete = ({
     setInputText,
     setMenuState,
     setBuildingMultiValue,
+    buildingSide,
+    setBuildingSide,
+    buildingBase,
+    setBuildingBase,
   });
 
   const { switchEditSegment, removeEditingChip, stepBackBuildingMenu } = useChipCascade({
@@ -260,6 +270,9 @@ export const useFilterInputAutocomplete = ({
         editing.editingSegment === SEGMENT_VARIANT.value
           ? editing.segmentMenuFilterText
           : undefined,
+      buildingSide,
+      buildingBase,
+      editingSide: editing.editingSide,
     });
 
   return {
@@ -286,6 +299,7 @@ export const useFilterInputAutocomplete = ({
     /** Hard reset for paste/clipboard flows — scraps in-progress building. */
     resetAutocompleteState: resetState,
     handleChipClick: editing.handleChipClick,
+    handlePairChipClick: editing.handlePairChipClick,
     handleBuildingChipClick,
     switchEditSegment,
     removeEditingChip,
@@ -304,6 +318,7 @@ export const useFilterInputAutocomplete = ({
     // Inline segment editing
     editingChipId: editing.editingChipId,
     editingSegment: editing.editingSegment,
+    editingSide: editing.editingSide,
     segmentFilterText: editing.segmentFilterText,
     segmentMenuFilterText: editing.segmentMenuFilterText,
     handleSegmentFilterChange,

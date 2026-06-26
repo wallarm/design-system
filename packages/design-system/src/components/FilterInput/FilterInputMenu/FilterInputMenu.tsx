@@ -1,6 +1,7 @@
 import { type FC, type RefObject, useMemo } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
 import {
+  canBorrowCrossFieldLabel,
   findValueLabelInFields,
   getCurrentValueTokenText,
   getFieldValues,
@@ -121,6 +122,9 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
       const i = indexByKey.get(key);
       // Already present with a real (non-raw) label — leave it.
       if (i != null && result[i]!.label !== key) continue;
+      // A type-conforming value of a typed field is a genuine entry — don't
+      // relabel it from an unrelated field (AS-1171).
+      if (!canBorrowCrossFieldLabel(selectedField, v)) continue;
       const label = findValueLabelInFields(v, fields);
       if (label === undefined) continue;
       if (i != null) result[i] = { ...result[i]!, value: v, label };
@@ -130,7 +134,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
       }
     }
     return result;
-  }, [selectedFieldValues, editingMultiValues, editingSingleValue, fields]);
+  }, [selectedFieldValues, editingMultiValues, editingSingleValue, fields, selectedField]);
 
   const valueFilterText = getValueFilterText(currentTokenText, selectedOperator, menuValues);
 

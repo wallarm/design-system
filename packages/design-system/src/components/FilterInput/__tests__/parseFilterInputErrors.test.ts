@@ -109,4 +109,54 @@ describe('parseFilterInputErrors', () => {
       'Invalid value for Status: bogus, nope',
     ]);
   });
+
+  describe('paired field (AS-1160)', () => {
+    const pairedField: FieldMetadata = { name: 'ctx_value', label: 'Value', type: 'string' };
+    const ctxField: FieldMetadata = {
+      name: 'ctx_param',
+      label: 'Context Param',
+      type: 'string',
+      pairedField,
+    };
+
+    it('requires the second value when pair is missing', () => {
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'ctx_param', operator: '=', value: 'xxx' },
+      ];
+      expect(parseFilterInputErrors(conditions, [ctxField])).toEqual(['Value is required']);
+    });
+
+    it('requires the second value when pair value is empty', () => {
+      const conditions: Condition[] = [
+        {
+          type: 'condition',
+          field: 'ctx_param',
+          operator: '=',
+          value: 'xxx',
+          pair: { operator: '=', value: '' },
+        },
+      ];
+      expect(parseFilterInputErrors(conditions, [ctxField])).toEqual(['Value is required']);
+    });
+
+    it('passes when both values are present', () => {
+      const conditions: Condition[] = [
+        {
+          type: 'condition',
+          field: 'ctx_param',
+          operator: '=',
+          value: 'xxx',
+          pair: { operator: '=', value: 'yyy' },
+        },
+      ];
+      expect(parseFilterInputErrors(conditions, [ctxField])).toEqual([]);
+    });
+
+    it('does not require the second value when the base operator is "is not set"', () => {
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'ctx_param', operator: 'is_not_null', value: null },
+      ];
+      expect(parseFilterInputErrors(conditions, [ctxField])).toEqual([]);
+    });
+  });
 });

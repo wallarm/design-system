@@ -634,6 +634,18 @@ export {
   type WaitForStepEventOptions,
   waitForStepEvent,
 } from './components/Tour';
+export {
+  Tree,
+  TreeItem,
+  TreeItemContent,
+  type TreeItemContentProps,
+  TreeItemHeader,
+  type TreeItemHeaderProps,
+  type TreeItemProps,
+  type TreeProps,
+  useTreeDepth,
+  useTreeIndent,
+} from './components/Tree';
 export { UtilityPage, type UtilityPageProps } from './components/UtilityPage';
 export {
   WallyIcon,

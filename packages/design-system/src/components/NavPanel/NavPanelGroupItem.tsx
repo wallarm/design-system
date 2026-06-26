@@ -5,7 +5,7 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Text } from '../Text';
 import { navPanelGroupItemVariants } from './classes';
-import { useNavPanelDepth } from './NavPanelGroup';
+import { useNavPanelDepth, useNavPanelIndent } from './NavPanelContext';
 
 export interface NavPanelGroupItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   ref?: Ref<HTMLAnchorElement>;
@@ -26,6 +26,7 @@ export const NavPanelGroupItem: FC<NavPanelGroupItemProps> = ({
 }) => {
   const testId = useTestId('group-item');
   const depth = useNavPanelDepth();
+  const indent = useNavPanelIndent();
   const Comp = asChild ? Slot : 'a';
 
   return (
@@ -36,7 +37,7 @@ export const NavPanelGroupItem: FC<NavPanelGroupItemProps> = ({
       data-slot='nav-panel-group-item'
       data-testid={testId}
       className={cn(navPanelGroupItemVariants({ active }), className)}
-      style={{ paddingLeft: 8 + depth * 24 }}
+      style={{ paddingLeft: 8 + depth * indent }}
     >
       {Icon && (
         <span className='flex shrink-0 items-center justify-center'>

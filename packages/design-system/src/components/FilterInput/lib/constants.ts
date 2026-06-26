@@ -60,10 +60,8 @@ export const OPERATOR_LABELS: Record<FilterOperator, string> = {
   not_like: 'not like',
   in: 'is any of',
   not_in: 'is not any of',
-  // Wallarm API: is_null means "field has a value" (IS SET) — opposite of
-  // SQL semantics. Keep in sync with backend API contract.
-  is_null: 'is set',
-  is_not_null: 'is not set',
+  is_null: 'is not set',
+  is_not_null: 'is set',
   between: 'between',
 };
 
@@ -75,8 +73,8 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
     in: 'in',
     like: 'like',
     not_like: 'not like',
-    is_null: 'is set',
-    is_not_null: 'is not set',
+    is_null: 'is not set',
+    is_not_null: 'is set',
   },
   integer: {
     '=': 'is',
@@ -107,14 +105,14 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
   boolean: {
     '=': 'is true',
     '!=': 'is false',
-    is_null: 'is set',
-    is_not_null: 'is not set',
+    is_null: 'is not set',
+    is_not_null: 'is set',
   },
   enum: {
     in: 'is any of',
     not_in: 'is not any of',
-    is_null: 'is set',
-    is_not_null: 'is not set',
+    is_null: 'is not set',
+    is_not_null: 'is set',
   },
 };
 

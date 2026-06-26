@@ -306,7 +306,7 @@ describe('deriveAutocompleteValues', () => {
 
       expect(result.buildingChipData).toEqual({
         attribute: 'Status',
-        operator: 'is set',
+        operator: 'is not set',
         value: '—',
       });
     });

@@ -738,7 +738,7 @@ describe('FilterInput', () => {
 
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
       expect(chip.querySelector('[data-slot="segment-attribute"]')!.textContent).toBe('Status');
-      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is set');
+      expect(chip.querySelector('[data-slot="segment-operator"]')!.textContent).toBe('is not set');
       expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('—');
     });
   });
@@ -1205,6 +1205,143 @@ describe('FilterInput', () => {
       await user.keyboard('archived{Enter}');
 
       expect(onChange).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('paired field build cascade (AS-1160)', () => {
+    const pairedValueField: FieldMetadata = {
+      name: 'ctx_value',
+      label: 'Value',
+      type: 'enum',
+      values: [{ value: 'yyy', label: 'yyy' }],
+    };
+    const pairedFields: FieldMetadata[] = [
+      {
+        name: 'ctx_param',
+        label: 'Context Param',
+        type: 'enum',
+        values: [{ value: 'xxx', label: 'xxx' }],
+        pairedField: pairedValueField,
+      },
+    ];
+
+    it('reveals the second triplet as one building chip after the first value', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<FilterInput fields={pairedFields} />);
+
+      const input = screen.getByRole('combobox');
+      await user.click(input);
+
+      // Side 0: field → operator → value.
+      await user.click(await findMenuitem('Context Param'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.click(await findMenuitem(/^xxx$/));
+
+      // The cascade advances into the paired second triplet: the SAME (building)
+      // chip now shows the first value, the paired attribute, and a ; separator —
+      // not a separate second chip.
+      await waitFor(() => {
+        const chip = container.querySelector('[data-building]');
+        expect(chip).not.toBeNull();
+        expect(chip!.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
+      });
+      const buildingChip = container.querySelector('[data-building]')!;
+      expect(
+        [...buildingChip.querySelectorAll('[data-slot="segment-attribute"]')].map(
+          n => n.textContent,
+        ),
+      ).toEqual(['Context Param', 'Value']);
+      expect(buildingChip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('xxx');
+      // The operator menu for the paired field is open (side 1 in progress).
+      expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
+    });
+
+    it('enters inline edit on the paired value segment when clicked', async () => {
+      const user = userEvent.setup();
+      const condition: Condition = {
+        type: 'condition',
+        field: 'ctx_param',
+        operator: '=',
+        value: 'xxx',
+        pair: { operator: '=', value: 'yyy' },
+      };
+      render(<FilterInput fields={pairedFields} value={condition} />);
+
+      await user.click(screen.getByText('yyy'));
+
+      // The paired value segment becomes an inline input seeded with its value;
+      // the base value stays display text.
+      const valueInput = await screen.findByLabelText('Filter value');
+      expect(valueInput).toHaveValue('yyy');
+      expect(screen.getByText('xxx')).toBeInTheDocument();
+    });
+
+    it('renders a committed paired condition as one chip with both triplets', () => {
+      const condition: Condition = {
+        type: 'condition',
+        field: 'ctx_param',
+        operator: '=',
+        value: 'xxx',
+        pair: { operator: '=', value: 'yyy' },
+      };
+      const { container } = render(<FilterInput fields={pairedFields} value={condition} />);
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(
+        [...chip.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
+      ).toEqual(['Context Param', 'Value']);
+      expect(
+        [...chip.querySelectorAll('[data-slot="segment-value"]')].map(n => n.textContent),
+      ).toEqual(['xxx', 'yyy']);
+      expect(chip.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
+    });
+
+    it('completes a paired chip when the Value operator is "is set" (no second value)', async () => {
+      const user = userEvent.setup();
+      const onChange = vi.fn();
+      const setValueFields: FieldMetadata[] = [
+        {
+          name: 'ctx_param',
+          label: 'Context Param',
+          type: 'enum',
+          values: [{ value: 'xxx', label: 'xxx' }],
+          operators: ['=', '!='],
+          pairedField: {
+            name: 'ctx_value',
+            label: 'Value',
+            type: 'string',
+            operators: ['=', '!=', 'is_null', 'is_not_null'],
+          },
+        },
+      ];
+      const { container } = render(<FilterInput fields={setValueFields} onChange={onChange} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Context Param'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.click(await findMenuitem(/^xxx$/));
+      // Side 1 operator menu is open — choose "is set", which takes no value.
+      await user.click(await findMenuitem(/^is set != null$/));
+
+      // One committed chip carrying both triplets; the second has no value segment.
+      await waitFor(() => {
+        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+        expect(chip).not.toBeNull();
+        expect(chip!.querySelector('[data-slot="segment-separator"]')).not.toBeNull();
+      });
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(
+        [...chip.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
+      ).toEqual(['Context Param', 'Value']);
+      // Emits one paired condition: ctx_param = xxx AND ctx_value is_not_null
+      // ("is set" maps to is_not_null).
+      expect(onChange.mock.calls.at(-1)?.[0]).toEqual({
+        type: 'group',
+        operator: 'and',
+        children: [
+          { type: 'condition', field: 'ctx_param', operator: '=', value: 'xxx' },
+          { type: 'condition', field: 'ctx_value', operator: 'is_not_null', value: null },
+        ],
+      });
     });
   });
 });

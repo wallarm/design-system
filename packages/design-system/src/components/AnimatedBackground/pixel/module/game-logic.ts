@@ -179,7 +179,7 @@ export function createGameLogic(host: GameEngineHost): GameLogic {
 
   let lastSpawn = -Infinity;
 
-  let soundOn = false;
+  let soundOn = true;
   let plugins: GamePlugins = {};
 
   let statsCb: ((s: GameStats) => void) | null = null;

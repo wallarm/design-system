@@ -8,6 +8,7 @@ const calendarStory = createStoryHelper('inputs-date-calendar', [
   'Range With Input',
   'Range Full Featured',
   'Single With Input',
+  'Single With Date Time',
   'Single With Presets',
   'Single Readonly',
   'Range Readonly',
@@ -80,6 +81,14 @@ test.describe('Component: Calendar', () => {
 
     test('Should render single calendar with presets when opened', async ({ page }) => {
       await calendarStory.goto(page, 'Single With Presets');
+      await openCalendar(page);
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render single calendar with datetime input header when opened', async ({
+      page,
+    }) => {
+      await calendarStory.goto(page, 'Single With Date Time');
       await openCalendar(page);
       await expect(page).toHaveScreenshot();
     });

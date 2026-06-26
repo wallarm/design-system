@@ -1,5 +1,6 @@
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
+  canBorrowCrossFieldLabel,
   findOptionByValue,
   findValueLabelInFields,
   getDateDisplayLabel,
@@ -40,6 +41,11 @@ const makeEmptyChip = (i: number, error: boolean): FilterInputChipData =>
  * human-readable label still lives on the field it came from, so the chip keeps
  * showing the label instead of the raw value. The fallback returns undefined
  * when no field defines the value, so genuinely freeform values stay raw.
+ *
+ * The cross-field fallback is gated by `canBorrowCrossFieldLabel`: a value that
+ * is a valid entry of the current typed field (e.g. `1` in an integer field) is
+ * never relabelled from an unrelated field that happens to define the same value
+ * (AS-1171).
  */
 const resolveValueLabel = (
   value: string | number | boolean | null,
@@ -48,6 +54,7 @@ const resolveValueLabel = (
 ): string | undefined => {
   const own = findOptionByValue(field, value)?.label;
   if (own !== undefined) return own;
+  if (!canBorrowCrossFieldLabel(field, value)) return undefined;
   return findValueLabelInFields(value, fields);
 };
 
@@ -132,8 +139,32 @@ const buildMultiValueChip = (
   };
 };
 
-/** Build a display chip for a single condition */
-const makeConditionChip = (
+/** Build the paired display triplet (second key-value) when present. */
+const buildPairChip = (
+  condition: Condition,
+  field: FieldMetadata | undefined,
+  fields: FieldMetadata[],
+): FilterInputChipData['pair'] => {
+  if (!condition.pair || !field?.pairedField) return undefined;
+  const pf = field.pairedField;
+  const { operator, value, error } = condition.pair;
+  // No-value operators ("is set"/"is not set") render the placeholder so the
+  // paired triplet keeps its three segments without a real value.
+  const displayValue =
+    operator && isNoValueOperator(operator)
+      ? NO_VALUE_PLACEHOLDER
+      : (resolveValueLabel(value as string | number | boolean | null, pf, fields) ??
+        String(value ?? ''));
+  return {
+    attribute: pf.label || pf.name,
+    operator: operator ? getOperatorLabel(operator, pf.type || DEFAULT_FIELD_TYPE) : undefined,
+    value: displayValue,
+    ...(error && { error }),
+  };
+};
+
+/** Build a display chip for a single condition (without the paired triplet) */
+const makeConditionChipBase = (
   i: number,
   conditions: Condition[],
   fields: FieldMetadata[],
@@ -167,6 +198,21 @@ const makeConditionChip = (
     value: resolveDisplayValue(condition, field, fields),
     error: chipError,
   };
+};
+
+/** Build a display chip for a single condition, including the paired triplet. */
+const makeConditionChip = (
+  i: number,
+  conditions: Condition[],
+  fields: FieldMetadata[],
+  error: boolean,
+): FilterInputChipData => {
+  const base = makeConditionChipBase(i, conditions, fields, error);
+  const condition = conditions[i];
+  if (!condition) return base;
+  const field = fields.find(f => f.name === condition.field);
+  const pair = buildPairChip(condition, field, fields);
+  return pair ? { ...base, pair } : base;
 };
 
 /**
