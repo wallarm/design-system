@@ -200,6 +200,20 @@ describe('FilterInputChip building mode', () => {
       expect(screen.getByText(';')).toBeInTheDocument();
     });
 
+    it('renders the whole chip as errored when only the paired triplet errors (AS-1179)', () => {
+      const { container } = render(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='xxx'
+          pair={{ attribute: 'Value', operator: 'is', value: '', error: 'value' }}
+        />,
+      );
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+      // Container reflects the pair error even though the base triplet is valid.
+      expect(chip?.className).toContain('border-border-danger');
+    });
+
     it('renders the separator as aria-hidden and non-interactive', () => {
       const { container } = render(
         <FilterInputChip

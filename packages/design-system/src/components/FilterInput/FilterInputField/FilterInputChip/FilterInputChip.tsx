@@ -56,7 +56,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   ...props
 }) => {
   const interactive = !disabled;
-  const hasError = !!error;
+  // The whole chip reads as errored when EITHER triplet has an error — a paired
+  // chip missing its second value must stay red even though the base triplet is
+  // valid (the base segments themselves are reddened separately, per-segment).
+  const hasError = !!error || !!pair?.error;
   const internalRef = useRef<HTMLDivElement>(null);
 
   const editing = useEditingContext();

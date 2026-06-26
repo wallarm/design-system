@@ -155,11 +155,19 @@ const buildPairChip = (
       ? NO_VALUE_PLACEHOLDER
       : (resolveValueLabel(value as string | number | boolean | null, pf, fields) ??
         String(value ?? ''));
+  // The paired value is required unless the operator takes none ("is set"). When
+  // it is missing, flag the segment so the chip reads as errored — matching the
+  // "Value is required" message in the error banner (AS-1179). Keeps the chip red
+  // after a no-op edit instead of only showing the banner.
+  const valueRequiredButMissing =
+    !(operator && isNoValueOperator(operator)) &&
+    (value == null || value === '' || (Array.isArray(value) && value.length === 0));
+  const pairError = error || (valueRequiredButMissing ? SEGMENT_VARIANT.value : undefined);
   return {
     attribute: pf.label || pf.name,
     operator: operator ? getOperatorLabel(operator, pf.type || DEFAULT_FIELD_TYPE) : undefined,
     value: displayValue,
-    ...(error && { error }),
+    ...(pairError && { error: pairError }),
   };
 };
 
