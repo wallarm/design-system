@@ -1,3 +1,7 @@
+## <small>0.68.1 (2026-06-26)</small>
+
+* fix(filter-input): AS-1171 keep type-conforming values raw in chips (#189) ([9bb0154](https://github.com/wallarm/design-system/commit/9bb0154)), closes [#189](https://github.com/wallarm/design-system/issues/189)
+
 ## 0.68.0 (2026-06-25)
 
 * feat: WDS-142 animated bg - blur ([597a6fd](https://github.com/wallarm/design-system/commit/597a6fd))
