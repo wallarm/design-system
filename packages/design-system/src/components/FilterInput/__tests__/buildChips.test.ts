@@ -238,6 +238,17 @@ describe('buildChips — paired field (AS-1160)', () => {
     expect(chip?.pair).toEqual({ attribute: 'Value', operator: 'is', value: 'yyy' });
   });
 
+  it('renders a required (errored) Value for a base-complete chip with no pair (AS-1179)', () => {
+    const conditions: Condition[] = [
+      // Base key chosen, second triplet never started.
+      { type: 'condition', field: 'ctx_param', operator: '=', value: 'xxx' },
+    ];
+    const chip = findChip(buildChips(conditions, [], pairedFields, false));
+    // The chip surfaces a red Value segment so it matches the "Value is required"
+    // banner instead of looking complete.
+    expect(chip?.pair).toEqual({ attribute: 'Value', value: '', error: 'value' });
+  });
+
   it('flags the paired value as errored when it is required but missing (AS-1179)', () => {
     const conditions: Condition[] = [
       {

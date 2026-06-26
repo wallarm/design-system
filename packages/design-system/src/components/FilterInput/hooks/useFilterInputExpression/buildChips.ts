@@ -145,8 +145,26 @@ const buildPairChip = (
   field: FieldMetadata | undefined,
   fields: FieldMetadata[],
 ): FilterInputChipData['pair'] => {
-  if (!condition.pair || !field?.pairedField) return undefined;
+  if (!field?.pairedField) return undefined;
+  // A no-value base operator ("is not set") makes the chip a single-value filter
+  // — there is no second triplet.
+  if (condition.operator != null && isNoValueOperator(condition.operator)) return undefined;
   const pf = field.pairedField;
+
+  // No pair stored yet: once the base is complete, surface a required (errored)
+  // Value segment so the chip reads red and matches the "Value is required"
+  // banner. While the base itself is still incomplete its own error covers the
+  // chip, so no pair is shown.
+  if (!condition.pair) {
+    const baseComplete =
+      condition.operator != null &&
+      condition.value != null &&
+      condition.value !== '' &&
+      !(Array.isArray(condition.value) && condition.value.length === 0);
+    if (!baseComplete) return undefined;
+    return { attribute: pf.label || pf.name, value: '', error: SEGMENT_VARIANT.value };
+  }
+
   const { operator, value, error } = condition.pair;
   // No-value operators ("is set"/"is not set") render the placeholder so the
   // paired triplet keeps its three segments without a real value.
