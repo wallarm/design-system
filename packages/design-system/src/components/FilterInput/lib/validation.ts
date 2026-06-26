@@ -60,7 +60,7 @@ const UNTYPED_FIELD_TYPES = new Set<FieldType>(['string', 'enum']);
  * (AS-1171).
  */
 export const canBorrowCrossFieldLabel = (
-  field: FieldMetadata | undefined,
+  field: FieldMetadata | null | undefined,
   value: string | number | boolean | null | undefined,
 ): boolean => {
   if (value == null) return false;
