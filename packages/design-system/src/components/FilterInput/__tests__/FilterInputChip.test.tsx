@@ -232,6 +232,40 @@ describe('FilterInputChip building mode', () => {
       expect(screen.getByText(';')).toBeInTheDocument();
     });
 
+    it('caps a paired chip at 380px and a standalone chip at 320px (AS-1179)', () => {
+      const { container, rerender } = render(
+        <FilterInputChip attribute='Context Param' operator='is' value='header' />,
+      );
+      const chip = () => container.querySelector('[data-slot="filter-input-condition-chip"]');
+      expect(chip()?.className).toContain('max-w-[320px]');
+
+      rerender(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='header'
+          pair={{ attribute: 'Value', operator: 'is', value: 'x' }}
+        />,
+      );
+      expect(chip()?.className).toContain('max-w-[380px]');
+    });
+
+    it('caps the base value in a paired chip so a long key cannot hog the row (AS-1179)', () => {
+      const { container } = render(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='averylongcontextparameterkey'
+          pair={{ attribute: 'Value', operator: 'is', value: 'x' }}
+        />,
+      );
+      // The first value segment is the base "key"; it is capped + non-shrinking
+      // so the paired value keeps its share of the row.
+      const baseValue = container.querySelector('[data-slot="segment-value"]');
+      expect(baseValue?.className).toContain('max-w-[90px]');
+      expect(baseValue?.className).toContain('shrink-0');
+    });
+
     it('renders the whole chip as errored when only the paired triplet errors (AS-1179)', () => {
       const { container } = render(
         <FilterInputChip
