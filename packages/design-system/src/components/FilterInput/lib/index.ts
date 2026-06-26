@@ -56,6 +56,7 @@ export {
   createStatusCodeValidator,
 } from './statusCode';
 export {
+  canBorrowCrossFieldLabel,
   findMatchingFieldValue,
   getInvalidValueIndices,
   isValidFieldValue,

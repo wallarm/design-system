@@ -1,5 +1,6 @@
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import {
+  canBorrowCrossFieldLabel,
   findOptionByValue,
   findValueLabelInFields,
   getDateDisplayLabel,
@@ -40,6 +41,11 @@ const makeEmptyChip = (i: number, error: boolean): FilterInputChipData =>
  * human-readable label still lives on the field it came from, so the chip keeps
  * showing the label instead of the raw value. The fallback returns undefined
  * when no field defines the value, so genuinely freeform values stay raw.
+ *
+ * The cross-field fallback is gated by `canBorrowCrossFieldLabel`: a value that
+ * is a valid entry of the current typed field (e.g. `1` in an integer field) is
+ * never relabelled from an unrelated field that happens to define the same value
+ * (AS-1171).
  */
 const resolveValueLabel = (
   value: string | number | boolean | null,
@@ -48,6 +54,7 @@ const resolveValueLabel = (
 ): string | undefined => {
   const own = findOptionByValue(field, value)?.label;
   if (own !== undefined) return own;
+  if (!canBorrowCrossFieldLabel(field, value)) return undefined;
   return findValueLabelInFields(value, fields);
 };
 
