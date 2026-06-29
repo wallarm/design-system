@@ -11,9 +11,7 @@ export const tableLayoutHead = cn('sticky top-0 z-30');
 
 export const tableLayoutRow = cn('');
 
-const cellBase = cn(
-  'border-b border-r border-border-primary-light last:border-r-0 font-sans',
-);
+const cellBase = cn('border-b border-r border-border-primary-light last:border-r-0 font-sans');
 
 export const tableLayoutHeaderCell = cn(
   cellBase,
