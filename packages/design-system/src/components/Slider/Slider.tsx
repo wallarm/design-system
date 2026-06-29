@@ -79,7 +79,19 @@ type SliderRootConfig = Pick<
  */
 type SliderThumbPassThrough = Omit<
   ArkSlider.ThumbProps,
-  'index' | 'name' | 'children' | 'className' | 'asChild' | 'aria-label' | 'aria-labelledby'
+  // `value` / `defaultValue` belong to the Root machine config (above), never the
+  // thumb. The thumb is a `<div>` whose HTML `defaultValue` (`string | number |
+  // readonly string[]`) would otherwise intersect the Root's `number[]` in
+  // `SliderProps` and collapse the element type to `never`.
+  | 'index'
+  | 'name'
+  | 'children'
+  | 'className'
+  | 'asChild'
+  | 'aria-label'
+  | 'aria-labelledby'
+  | 'value'
+  | 'defaultValue'
 >;
 
 interface SliderOwnProps {
@@ -301,7 +313,7 @@ export const Slider: FC<SliderProps> = ({
               <ArkSlider.Track data-slot='slider-track' className={sliderTrackClassNames}>
                 <ArkSlider.Range data-slot='slider-range' className={sliderRangeClassNames} />
               </ArkSlider.Track>
-              {thumbValues.map((_, index) => {
+              {thumbValues.map((thumbValue, index) => {
                 const thumbEl = (
                   <ArkSlider.Thumb
                     // Primary thumb (index 0) carries the consumer pass-through + ref;
@@ -345,7 +357,7 @@ export const Slider: FC<SliderProps> = ({
                             this Ark version emits `data-placement` — so we add the
                             Figma 4px slide-up here, on the attribute that's live. */}
                         <TooltipContent className='data-[placement=top]:slide-in-from-bottom-[4px] data-[placement=bottom]:slide-in-from-top-[4px]'>
-                          {displayValue(api.value[index] ?? thumbValues[index])}
+                          {displayValue(api.value[index] ?? thumbValue)}
                         </TooltipContent>
                       </Tooltip>
                     ) : (
