@@ -65,11 +65,18 @@ describe('applyExternalErrors', () => {
   });
 
   it('overlays the error without disturbing the chip value (cross-field label preserved)', () => {
-    // 'active' is the status field's option value (label 'Active'); buildChips
-    // now borrows that label for any field (AS-1134). The external-error overlay
-    // only sets the error flag — it never recomputes or clobbers the value.
-    const conditions = [cond('host', { value: 'active' })];
-    const result = applyExternalErrors(chipsFor(conditions), conditions, ['host']);
+    // 'active' is foreign to the integer `count` field, so buildChips borrows
+    // its label ('Active') from the status field (AS-1085/AS-1134). The
+    // external-error overlay only sets the error flag — it never recomputes or
+    // clobbers the value.
+    const withCount: FieldMetadata[] = [
+      ...fields,
+      { name: 'count', label: 'Count', type: 'integer' },
+    ];
+    const conditions = [cond('count', { value: 'active' })];
+    const result = applyExternalErrors(buildChips(conditions, [], withCount, false), conditions, [
+      'count',
+    ]);
     expect(result[0]!.error).toBe('value');
     expect(result[0]!.value).toBe('Active');
   });

@@ -146,22 +146,21 @@ describe('buildChips — loose-match label resolution (AS-882)', () => {
       expect(findChip(buildChips(conditions, [], fields, false))?.value).toBe('mystery');
     });
 
-    // Changing a chip's field carries the value over even across data types and
-    // onto freeform fields; with strictValues:false the chip is no longer
-    // errored, but the value's label still lives on its origin field and is shown
-    // rather than the raw value (AS-1134). Trade-off: a value typed into a
-    // freeform field that happens to equal another field's option value is shown
-    // with that option's label.
-    it('borrows the label for a non-errored value carried onto a freeform field', () => {
+    // A value that is *valid* for a freeform field is a genuine entry — it stays
+    // raw even when it equals another field's option value. Borrowing only fires
+    // for values foreign to the current field, so an application name is never
+    // substituted into the freeform `total_requests` filter (AS-1171).
+    it('keeps a valid freeform value raw even when another field defines it', () => {
       const withFreeform: FieldMetadata[] = [
         ...fields,
         { name: 'note', label: 'Note', type: 'string' }, // freeform, no options
       ];
       const conditions: Condition[] = [
-        // value equals Tag's "review" option value → shows its label
+        // 'review' is a valid string for the freeform field → genuine entry,
+        // not relabelled from Tag's "Review" option.
         { type: 'condition', field: 'note', operator: '=', value: 'review' },
       ];
-      expect(findChip(buildChips(conditions, [], withFreeform, false))?.value).toBe('Review');
+      expect(findChip(buildChips(conditions, [], withFreeform, false))?.value).toBe('review');
     });
 
     it('keeps the raw value when no field defines it', () => {
@@ -193,6 +192,28 @@ describe('buildChips — loose-match label resolution (AS-882)', () => {
         'Urgent',
         'Review',
       ]);
+    });
+
+    // AS-1171: a number entered into a freeform numeric filter (`total_requests`)
+    // that coincides with an application id must show the number, not the
+    // application's name borrowed from the applications filter.
+    it('keeps a numeric value raw on a freeform field even when an id field defines it', () => {
+      const withApps: FieldMetadata[] = [
+        {
+          name: 'application_id',
+          label: 'Applications',
+          type: 'integer',
+          values: [
+            { value: 1, label: 'API Console' },
+            { value: 2, label: 'Auth Service' },
+          ],
+        },
+        { name: 'total_requests', label: 'Total requests', type: 'string' },
+      ];
+      const conditions: Condition[] = [
+        { type: 'condition', field: 'total_requests', operator: '=', value: '1' },
+      ];
+      expect(findChip(buildChips(conditions, [], withApps, false))?.value).toBe('1');
     });
   });
 

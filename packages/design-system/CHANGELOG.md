@@ -1,3 +1,8 @@
+## <small>0.68.2 (2026-06-29)</small>
+
+* fix(filter-input): AS-1171 cross-field label borrowing (#191) ([0a06b8e](https://github.com/wallarm/design-system/commit/0a06b8e)), closes [#191](https://github.com/wallarm/design-system/issues/191)
+* docs(filter-input): mirror new Attacks schema in Composition Default story (#190) ([77fec9d](https://github.com/wallarm/design-system/commit/77fec9d)), closes [#190](https://github.com/wallarm/design-system/issues/190)
+
 ## <small>0.68.1 (2026-06-26)</small>
 
 * fix(filter-input): AS-1171 keep type-conforming values raw in chips (#189) ([9bb0154](https://github.com/wallarm/design-system/commit/9bb0154)), closes [#189](https://github.com/wallarm/design-system/issues/189)
