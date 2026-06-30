@@ -89,8 +89,10 @@ export const AttributeEditControl: FC<AttributeEditControlProps> = ({
     if (event.defaultPrevented) return;
     // Ignore focus moves that stay inside the control.
     if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+    // `none`: the editor commits through its own events (e.g. a select/calendar
+    // closing) — blur must NOT cancel, or it would revert that committed value.
     if (submitsOnBlur) submit();
-    else cancel();
+    else if (submitMode !== 'none') cancel();
   };
 
   return (
