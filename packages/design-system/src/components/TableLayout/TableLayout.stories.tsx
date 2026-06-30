@@ -23,6 +23,17 @@ const meta = {
   component: TableLayout,
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component:
+          '`TableLayout` is the same table as `Table`, just assembled a different way — ' +
+          'you hand-write the row and cell markup instead of driving it from a column config. ' +
+          '**`Table` is the primary table component; use it by default.** Treat these stories as ' +
+          'an alternative, more technical reference — reach for `TableLayout` only when you ' +
+          'explicitly want markup-driven composition, or when `Table`’s data-driven API genuinely ' +
+          'cannot express the layout you need.',
+      },
+    },
   },
   tags: ['beta'],
 } satisfies Meta<typeof TableLayout>;

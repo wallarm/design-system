@@ -16,6 +16,15 @@ export interface TableLayoutProps extends Omit<ComponentPropsWithRef<'table'>, '
   controller?: TableLayoutColumnController;
 }
 
+/**
+ * Markup-driven table primitives — the same table as `Table`, just assembled a
+ * different way: you hand-write the row and cell markup instead of driving it
+ * from a column config.
+ *
+ * `Table` is the primary table component — use it by default. Reach for
+ * `TableLayout` only when you explicitly want this markup-driven approach, or
+ * when `Table`'s data-driven API genuinely cannot express the layout you need.
+ */
 export const TableLayout = forwardRef<TableLayoutHandle, TableLayoutProps>(
   ({ className, children, controller, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
