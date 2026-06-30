@@ -1004,7 +1004,6 @@ function TagsSelectEditor() {
 
 function DateEditor() {
   const { value, setValue, submit } = useAttributeEdit<DateValue | null>();
-  const dateValue = value instanceof CalendarDate ? value : null;
 
   return (
     <DateFormatProvider order='day-first' hourCycle={24}>
@@ -1019,8 +1018,11 @@ function DateEditor() {
         }}
       >
         <CalendarTrigger>
+          {/* Pass the value straight through — an `instanceof CalendarDate`
+              gate drops values produced by the Ark calendar (different
+              @internationalized/date copy), showing the placeholder instead. */}
           <DateInput
-            value={dateValue}
+            value={value ?? null}
             onChange={v => setValue(v)}
             granularity='day'
             showIcon={false}
@@ -1058,14 +1060,19 @@ function TimeEditor() {
 // here: mixing the react-aria DateInput with the Ark calendar fights over the
 // value and drops commits. The segmented input edits both date and time and
 // commits on blur (submitMode='blur').
+// Segmented date+time input. A calendar+time popover is intentionally not used:
+// every Calendar composition tried here either failed to open or dropped grid
+// commits (the Ark calendar's showTime grid does not emit a committable value,
+// and a react-aria DateInput trigger fights it). The segmented input edits both
+// date and time by typing and commits on blur (submitMode='blur'), pre-filled
+// with the current value.
 function DateTimeEditor() {
   const { value, setValue } = useAttributeEdit<CalendarDateTime | null>();
-  const dateValue = value instanceof CalendarDateTime ? value : null;
 
   return (
     <DateFormatProvider order='day-first' hourCycle={12}>
       <DateInput
-        value={dateValue}
+        value={value ?? null}
         onChange={v => setValue(v as CalendarDateTime | null)}
         granularity='minute'
         showIcon={false}
