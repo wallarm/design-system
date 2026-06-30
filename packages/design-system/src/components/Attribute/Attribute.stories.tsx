@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
+import { format } from 'date-fns';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Calendar, ChevronDown, Clock, Copy, Filter } from '../../icons';
 import type { DateValue } from '../../index';
@@ -1062,11 +1063,16 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
   const roleLabel = roleItems.find(i => i.value === (role[0] ?? ''))?.label ?? '';
   const rolesLabel = roles.map(v => roleItems.find(i => i.value === v)?.label ?? v).join(', ');
-  const dateLabel = date ? date.toString() : '—';
-  const timeLabel = time
-    ? `${String(time.hour).padStart(2, '0')}:${String(time.minute).padStart(2, '0')}`
+  const dateLabel = date
+    ? format(new Date(date.year, date.month - 1, date.day), 'd MMM, yyyy')
     : '—';
-  const dateTimeLabel = dateTime ? dateTime.toString() : '—';
+  const timeLabel = time ? format(new Date(2000, 0, 1, time.hour, time.minute), 'h:mm a') : '—';
+  const dateTimeLabel = dateTime
+    ? format(
+        new Date(dateTime.year, dateTime.month - 1, dateTime.day, dateTime.hour, dateTime.minute),
+        'd MMM, yyyy h:mm a',
+      )
+    : '—';
 
   const isHorizontal = orientation === 'horizontal';
 
@@ -1164,9 +1170,11 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
             activationMode='click'
           >
             <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
-              {tags.map(v => (
-                <Tag key={v}>{v}</Tag>
-              ))}
+              <span className='flex gap-4'>
+                {tags.map(v => (
+                  <Tag key={v}>{v}</Tag>
+                ))}
+              </span>
             </AttributeEditPreview>
             <AttributeEditControl>
               <TagsSelectEditor />
