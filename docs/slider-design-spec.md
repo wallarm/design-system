@@ -254,7 +254,22 @@ analytics-named props. For dual-handle, follow the closed-target guidance for tw
   <Slider.MarkerGroup />
 </Slider>
 ```
-(Names follow Ark's Slider parts; final surface to be settled during the component build.)
+**Final shipped surface (2026-06-30 compound rework, decision #13)** — a *lean* compound, not the full
+Ark decomposition sketched above. Track + range are rendered inside `SliderControl` (not exported as
+`SliderTrack` / `SliderRange`); ticks are `SliderMarks` (array prop), the readout is `SliderValue`, and the
+inline box is `SliderInput`. `marks` / `tooltip` / inline-input are **not** root props — `marks` lives on
+`<SliderMarks>`, `tooltip` on `<SliderThumb>`, and the box is `<SliderInput>`:
+
+```tsx
+<Slider value={value} onValueChange={setValue} min={0} max={100} error={hasError}>
+  <SliderControl>
+    <SliderThumb index={0} tooltip data-analytics-id="PRICE_MIN" />
+    <SliderThumb index={1} data-analytics-id="PRICE_MAX" />  {/* range: one thumb per entry */}
+    <SliderMarks marks={[{ value: 0, label: 'Low' }, …]} />
+  </SliderControl>
+  <SliderInput index={0} />   {/* optional inline boxes / SliderValue readout */}
+</Slider>
+```
 
 ---
 
