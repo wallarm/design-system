@@ -1,6 +1,13 @@
-import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent, ReactNode, Ref } from 'react';
-import { useCallback } from 'react';
-import { composeRefs } from '@radix-ui/react-compose-refs';
+import type {
+  FC,
+  FocusEvent,
+  HTMLAttributes,
+  KeyboardEvent,
+  MutableRefObject,
+  ReactNode,
+  Ref,
+} from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { useAttributeEdit } from './AttributeEditContext';
@@ -22,22 +29,35 @@ export const AttributeEditControl: FC<AttributeEditControlProps> = ({
 }) => {
   const testId = useTestId('edit-control');
   const { editing, submitMode, selectOnFocus, submit, cancel } = useAttributeEdit();
+  const divRef = useRef<HTMLDivElement | null>(null);
+  // Capture selectOnFocus in a ref so the mount-only effect reads the value at mount time
+  // without needing it in the dependency array.
+  const selectOnFocusRef = useRef(selectOnFocus);
+  selectOnFocusRef.current = selectOnFocus;
 
-  // Focus the first focusable descendant when the control mounts (edit start).
-  const focusRef = useCallback(
+  // Focus the first focusable descendant once when the control mounts (edit start).
+  // Using useEffect with empty deps ensures this runs only on mount, not on re-renders.
+  useEffect(() => {
+    const node = divRef.current;
+    if (!node) return;
+    const focusable = node.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+    if (!focusable) return;
+    focusable.focus();
+    if (
+      selectOnFocusRef.current &&
+      (focusable instanceof HTMLInputElement || focusable instanceof HTMLTextAreaElement)
+    ) {
+      focusable.select();
+    }
+  }, []);
+
+  const combinedRef = useCallback(
     (node: HTMLDivElement | null) => {
-      if (!node) return;
-      const focusable = node.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
-      if (!focusable) return;
-      focusable.focus();
-      if (
-        selectOnFocus &&
-        (focusable instanceof HTMLInputElement || focusable instanceof HTMLTextAreaElement)
-      ) {
-        focusable.select();
-      }
+      divRef.current = node;
+      if (typeof ref === 'function') ref(node);
+      else if (ref) (ref as MutableRefObject<HTMLDivElement | null>).current = node;
     },
-    [selectOnFocus],
+    [ref],
   );
 
   if (!editing) return null;
@@ -74,7 +94,7 @@ export const AttributeEditControl: FC<AttributeEditControlProps> = ({
   return (
     <div
       {...props}
-      ref={composeRefs(ref, focusRef)}
+      ref={combinedRef}
       data-testid={testId}
       data-slot='attribute-edit-control'
       onKeyDown={handleKeyDown}

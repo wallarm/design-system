@@ -74,6 +74,7 @@ export function AttributeEdit<T = unknown>({
     default: defaultEdit,
   });
   const [draft, setDraft] = useState<T>(committedValue as T);
+  const draftRef = useRef<T>(committedValue as T);
   const [autoStatus, setAutoStatus] = useState<AttributeEditStatus>('idle');
   const [autoError, setAutoError] = useState<string | undefined>(undefined);
 
@@ -100,6 +101,7 @@ export function AttributeEdit<T = unknown>({
 
   const handleSetValue = useCallback(
     (next: T) => {
+      draftRef.current = next;
       setDraft(next);
       onValueChange?.(next);
     },
@@ -108,6 +110,7 @@ export function AttributeEdit<T = unknown>({
 
   const edit_ = useCallback(() => {
     if (disabled || readOnly) return;
+    draftRef.current = committedValue as T;
     setDraft(committedValue as T);
     setAutoStatus('idle');
     setAutoError(undefined);
@@ -115,6 +118,7 @@ export function AttributeEdit<T = unknown>({
   }, [disabled, readOnly, committedValue, setEditingState]);
 
   const cancel = useCallback(() => {
+    draftRef.current = committedValue as T;
     setDraft(committedValue as T);
     setAutoStatus('idle');
     setAutoError(undefined);
@@ -123,14 +127,15 @@ export function AttributeEdit<T = unknown>({
   }, [committedValue, setEditingState, onValueRevert]);
 
   const submit = useCallback(() => {
-    const result = onValueCommit?.(draft);
+    const current = draftRef.current;
+    const result = onValueCommit?.(current);
     if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
       setAutoStatus('loading');
       setAutoError(undefined);
       Promise.resolve(result).then(
         () => {
           if (!mounted.current) return;
-          setCommitted(draft);
+          setCommitted(current);
           setEditingState(false);
           setAutoStatus('saved');
           if (savedTimer.current) clearTimeout(savedTimer.current);
@@ -146,9 +151,9 @@ export function AttributeEdit<T = unknown>({
       );
       return;
     }
-    setCommitted(draft);
+    setCommitted(current);
     setEditingState(false);
-  }, [onValueCommit, draft, setCommitted, setEditingState, savedDuration]);
+  }, [onValueCommit, setCommitted, setEditingState, savedDuration]);
 
   const contextValue = useMemo<AttributeEditContextValue<T>>(
     () => ({
