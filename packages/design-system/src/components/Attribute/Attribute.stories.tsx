@@ -918,6 +918,7 @@ function SelectEditor() {
 
   return (
     <Select
+      defaultOpen
       collection={collection}
       value={selected}
       onValueChange={details => setValue(details.value)}
@@ -947,6 +948,7 @@ function MultiSelectEditor() {
 
   return (
     <Select
+      defaultOpen
       collection={collection}
       multiple
       value={selected}
@@ -977,6 +979,7 @@ function TagsSelectEditor() {
 
   return (
     <Select
+      defaultOpen
       collection={collection}
       multiple
       value={selected}
