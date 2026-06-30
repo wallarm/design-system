@@ -1,4 +1,4 @@
-import { createContext, type MutableRefObject, type ReactNode, useContext } from 'react';
+import { createContext, type ReactNode, type RefObject, useContext } from 'react';
 import type { CalendarType, DateValue } from './types';
 
 export interface CalendarContextValue {
@@ -18,7 +18,7 @@ export interface CalendarContextValue {
    * survive a day change and so `Calendar`'s `onChange` can emit a full
    * `CalendarDateTime`. Undefined outside a `Calendar`.
    */
-  timeRef?: MutableRefObject<{ hour: number; minute: number }>;
+  timeRef?: RefObject<{ hour: number; minute: number }>;
   /**
    * Push a value straight to the consumer `onChange`, bypassing Ark's machine.
    * Ark's DatePicker dedupes its value by date (year/month/day) and silently

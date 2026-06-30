@@ -226,4 +226,8 @@ describe('showTime promotion', () => {
     expect(emitted.hour).toBe(14);
     expect(emitted.minute).toBe(30);
   });
+
+  // The header time-only commit path (editing the time segments) can't be
+  // driven in jsdom — react-aria date segments don't respond to synthetic key
+  // events. It's covered by the Attribute date-time e2e instead.
 });
