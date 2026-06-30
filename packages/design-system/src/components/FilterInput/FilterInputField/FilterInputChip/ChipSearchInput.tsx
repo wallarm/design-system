@@ -28,9 +28,7 @@ export const ChipSearchInput: FC = () => {
         ref={inputRef}
         type='text'
         role='combobox'
-        // size=1 drops the input's default ~20ch intrinsic min-width so it can
-        // shrink inside the chip; without it a long value can't shrink and spills
-        // past the chip border.
+        // Drops the input's default ~20ch min-width so it can shrink inside the chip.
         size={1}
         aria-expanded={menuOpen}
         aria-invalid={error}

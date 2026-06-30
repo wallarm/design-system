@@ -1,6 +1,6 @@
 import type { RefObject } from 'react';
 import { useCallback } from 'react';
-import { chipIdToConditionIndex, isNoValueOperator } from '../../lib';
+import { chipIdToConditionIndex, isEmptyFilterValue, isNoValueOperator } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 import type { BuildingBase } from './useAutocompleteState';
 
@@ -22,21 +22,14 @@ interface UseResumeBuildingDeps {
   inputRef: RefObject<HTMLInputElement | null>;
 }
 
-const isEmptyValue = (value: Condition['value'] | undefined): boolean =>
-  value == null || value === '' || (Array.isArray(value) && value.length === 0);
-
 /**
- * Resume building a committed-but-incomplete chip instead of inline-editing it.
+ * Resume building a committed-but-incomplete chip instead of inline-editing it,
+ * reopening the menu at the first missing step so the building cascade — incl.
+ * the paired second triplet — carries on. Makes "press anywhere → red chip →
+ * click to continue" work for paired fields (AS-1179).
  *
- * A chip left half-built (e.g. force-committed via an area click) keeps its
- * triplets but lacks a required value. Clicking it converts the committed
- * condition back into a building chip and reopens the menu at the first missing
- * step, so the normal building cascade carries on — including the paired
- * second triplet for two-step fields. This is what makes "press anywhere → red
- * chip → click to continue" work for paired fields (AS-1179).
- *
- * Returns a predicate: `true` when it took over (caller must not also run the
- * inline-edit handler), `false` when the chip is complete (edit it normally).
+ * Returns `true` when it took over (caller must skip inline-edit), `false` when
+ * the chip is complete (edit it normally).
  */
 export const useResumeBuilding = ({
   conditions,
@@ -67,7 +60,7 @@ export const useResumeBuilding = ({
       const baseOperatorMissing = !condition.operator;
       const baseOperatorTakesValue =
         condition.operator != null && !isNoValueOperator(condition.operator);
-      const baseValueMissing = baseOperatorTakesValue && isEmptyValue(condition.value);
+      const baseValueMissing = baseOperatorTakesValue && isEmptyFilterValue(condition.value);
 
       const startBuilding = (params: {
         base: BuildingBase | null;
@@ -91,16 +84,13 @@ export const useResumeBuilding = ({
         requestAnimationFrame(() => inputRef.current?.focus());
       };
 
-      // Operator missing (attribute-only chip): let inline-edit reopen the
-      // operator menu in place. It already advances operator → value on its own
-      // and — crucially — never removes the chip, so "click to continue" can't
-      // look like a deletion (AS-1179).
+      // Operator missing: inline-edit reopens the operator menu in place and
+      // never removes the chip, so leave it to the normal path (AS-1179).
       if (baseOperatorMissing) return false;
 
-      // Base value missing. Resume into the building cascade ONLY for a paired
-      // field, where picking the value must flow on into the second triplet —
-      // something inline-edit can't do. A plain field just reopens its value
-      // menu in place (no chip removal).
+      // Base value missing: resume the cascade only for paired fields (picking
+      // the value must flow into the second triplet); a plain field reopens its
+      // value menu in place.
       if (baseValueMissing) {
         if (!field.pairedField) return false;
         startBuilding({
@@ -119,7 +109,8 @@ export const useResumeBuilding = ({
         const pairOperator = condition.pair?.operator;
         const pairOperatorMissing = !pairOperator;
         const pairOperatorTakesValue = pairOperator != null && !isNoValueOperator(pairOperator);
-        const pairValueMissing = pairOperatorTakesValue && isEmptyValue(condition.pair?.value);
+        const pairValueMissing =
+          pairOperatorTakesValue && isEmptyFilterValue(condition.pair?.value);
 
         if (pairOperatorMissing || pairValueMissing) {
           startBuilding({

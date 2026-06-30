@@ -8,7 +8,12 @@ export {
 export { applyAcceptChar } from './applyAcceptChar';
 export { applyFieldValueTransforms } from './applyFieldValueTransforms';
 export { applyKnownFieldHelpers, getKnownFieldSerializer } from './applyKnownFieldHelpers';
-export { chipIdToConditionIndex, findChipSplitIndex } from './conditions';
+export {
+  chipIdToConditionIndex,
+  findChipSplitIndex,
+  incompleteTripletError,
+  isEmptyFilterValue,
+} from './conditions';
 export {
   CONNECTOR_ID_PATTERN,
   MENU_BASE_GUTTER,

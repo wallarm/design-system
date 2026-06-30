@@ -1,5 +1,12 @@
 import { SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
-import { getFieldValues, hasStaticAllowlist, isNoValueOperator, isValidFieldValue } from '../lib';
+import {
+  getFieldValues,
+  hasStaticAllowlist,
+  incompleteTripletError,
+  isEmptyFilterValue,
+  isNoValueOperator,
+  isValidFieldValue,
+} from '../lib';
 import type { Condition, FieldMetadata } from '../types';
 
 /** True when a paired field's required second value is absent or empty. */
@@ -7,8 +14,7 @@ const isPairValueMissing = (condition: Condition): boolean => {
   const pair = condition.pair;
   if (!pair) return true;
   if (pair.operator && isNoValueOperator(pair.operator)) return false;
-  const value = pair.value;
-  return value == null || value === '' || (Array.isArray(value) && value.length === 0);
+  return isEmptyFilterValue(pair.value);
 };
 
 /**
@@ -34,23 +40,16 @@ export const parseFilterInputErrors = (
 
     const label = field?.label || condition.field;
 
-    // A known non-paired field left incomplete (no operator, or a value-bearing
-    // operator with no value) reads red in the chip — so it must also surface a
-    // banner message: a red chip and an error message always exist together
-    // (AS-1179). Paired fields are covered by the pair check above; conditions
-    // carrying an explicit `error` flag fall through to the switch below.
-    if (field && !field.pairedField && !condition.error) {
-      const operatorMissing = !condition.operator;
-      const valueMissing =
-        !baseIsNoValue &&
-        !operatorMissing &&
-        (condition.value == null ||
-          condition.value === '' ||
-          (Array.isArray(condition.value) && condition.value.length === 0));
-      if (operatorMissing || valueMissing) {
-        errors.push(`${label} is incomplete`);
-        continue;
-      }
+    // A known non-paired field left incomplete reads red in the chip, so it must
+    // also surface a banner — red chip and error message always coexist (AS-1179).
+    if (
+      field &&
+      !field.pairedField &&
+      !condition.error &&
+      incompleteTripletError(condition.operator, condition.value)
+    ) {
+      errors.push(`${label} is incomplete`);
+      continue;
     }
 
     if (!condition.error) continue;
