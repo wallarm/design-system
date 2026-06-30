@@ -5,7 +5,14 @@ import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Field, FieldLabel } from '../Field';
 import { Slider } from './Slider';
 import { SliderControl } from './SliderControl';
+import { SliderMarks } from './SliderMarks';
 import { SliderThumb } from './SliderThumb';
+
+const MARKS = [
+  { value: 0, label: 'Low' },
+  { value: 50, label: 'Medium' },
+  { value: 100, label: 'High' },
+];
 
 // Ark renders each thumb as `[role="slider"]`, but keeps it `visibility:hidden`
 // until it can measure layout — which never happens under jsdom. So we locate
@@ -204,5 +211,51 @@ describe('Slider — data-testid cascade', () => {
   it('stays clean (no derived ids) when no data-testid is passed', () => {
     const { container } = render(<Single />);
     expect(getThumbs(container)[0]).not.toHaveAttribute('data-testid');
+  });
+});
+
+describe('Slider — marks / ordinal scale', () => {
+  it('renders a tick + label per mark', () => {
+    const { container } = render(
+      <Slider defaultValue={[50]} min={0} max={100} step={50}>
+        <SliderControl>
+          <SliderThumb aria-label='Volume' />
+          <SliderMarks marks={MARKS} />
+        </SliderControl>
+      </Slider>,
+    );
+    const markers = container.querySelectorAll('[data-slot="slider-marker"]');
+    expect(markers).toHaveLength(3);
+    expect(markers[1]).toHaveTextContent('Medium');
+  });
+
+  it('announces the mark label as aria-valuetext instead of the number', () => {
+    const { container } = render(
+      <Slider defaultValue={[50]} min={0} max={100} step={50}>
+        <SliderControl>
+          <SliderThumb aria-label='Risk level' />
+          <SliderMarks marks={MARKS} />
+        </SliderControl>
+      </Slider>,
+    );
+    expect(getThumbs(container)[0]).toHaveAttribute('aria-valuetext', 'Medium');
+  });
+
+  it('wires each marker as a clickable tick (click-to-jump value change is E2E-only)', () => {
+    // Ark's slider value machine needs real layout rects, so value mutation via
+    // setThumbValue is inert under jsdom — verified to be E2E territory (see
+    // Slider.e2e.ts "Should jump the nearest thumb when a tick label is clicked").
+    // Here we only assert the markers render as interactive targets.
+    render(
+      <Slider defaultValue={[50]} min={0} max={100} step={50}>
+        <SliderControl>
+          <SliderThumb aria-label='Risk level' />
+          <SliderMarks marks={MARKS} />
+        </SliderControl>
+      </Slider>,
+    );
+    const high = screen.getByText('High');
+    expect(high).toHaveAttribute('data-slot', 'slider-marker');
+    expect(() => fireEvent.click(high)).not.toThrow();
   });
 });

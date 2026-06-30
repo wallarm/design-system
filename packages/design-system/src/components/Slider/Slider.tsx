@@ -1,4 +1,4 @@
-import { type FC, type ReactNode, type Ref, useCallback, useMemo, useRef } from 'react';
+import { type FC, type ReactNode, type Ref, useCallback, useMemo, useState } from 'react';
 import { useFieldContext } from '@ark-ui/react/field';
 import { Slider as ArkSlider } from '@ark-ui/react/slider';
 import { cn } from '../../utils/cn';
@@ -6,6 +6,11 @@ import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { sliderVariants } from './classes';
 import { SliderRootContextProvider } from './SliderContext';
 import type { SliderMark } from './types';
+
+/** Shallow value-equality for marks, so re-registration with a fresh array literal is a no-op. */
+const sameMarks = (a: SliderMark[], b: SliderMark[]): boolean =>
+  a.length === b.length &&
+  a.every((mark, i) => mark.value === b[i]?.value && mark.label === b[i]?.label);
 
 /** Ark/Zag machine-config props forwarded to the headless `Slider.Root`. */
 type SliderRootConfig = Pick<
@@ -83,20 +88,25 @@ export const Slider: FC<SliderProps> = ({
   // Thumb COUNT is value-driven (Ark-native): controlled `value` wins, else `defaultValue`.
   const isRange = (value ?? defaultValue).length > 1;
 
-  // Marks published by <SliderMarks> (if any), read lazily for ordinal aria-valuetext.
-  const marksRef = useRef<SliderMark[]>([]);
-  const registerMarks = useCallback((marks: SliderMark[]) => {
-    marksRef.current = marks;
+  // Marks published by <SliderMarks> (if any). Kept in state — not a ref — because Ark
+  // computes the thumb's aria-valuetext from getAriaValueText DURING render, before any
+  // child effect runs; the registration setState (in a layout effect) re-renders the root
+  // synchronously pre-paint with the marks closed over, so the value text is right on the
+  // first commit. The identity guard makes re-registration with a fresh array literal a
+  // no-op (no render loop).
+  const [marks, setMarks] = useState<SliderMark[]>([]);
+  const registerMarks = useCallback((next: SliderMark[]) => {
+    setMarks(prev => (sameMarks(prev, next) ? prev : next));
   }, []);
 
   // Ordinal scale: announce a mark's label as aria-valuetext (requirements §7.1) unless
-  // the consumer supplies their own formatter. Reads marksRef at call time (post-mount).
+  // the consumer supplies their own formatter.
   const resolvedGetAriaValueText = useMemo(
     () =>
       getAriaValueText ??
       (({ value: v }: { value: number; index: number }) =>
-        marksRef.current.find(mark => mark.value === v)?.label ?? String(v)),
-    [getAriaValueText],
+        marks.find(mark => mark.value === v)?.label ?? String(v)),
+    [getAriaValueText, marks],
   );
 
   // Single value in a Field → the field label names the thumb (via aria-labelledby).
@@ -109,10 +119,10 @@ export const Slider: FC<SliderProps> = ({
       disabled: isDisabled,
       ariaDescribedby: field?.ariaDescribedby,
       fieldLabelId,
-      marksRef,
+      marks,
       registerMarks,
     }),
-    [isRange, invalid, isDisabled, field?.ariaDescribedby, fieldLabelId, registerMarks],
+    [isRange, invalid, isDisabled, field?.ariaDescribedby, fieldLabelId, marks, registerMarks],
   );
 
   return (

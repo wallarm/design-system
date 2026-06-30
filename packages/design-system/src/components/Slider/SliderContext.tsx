@@ -1,4 +1,4 @@
-import { createContext, type RefObject, useContext } from 'react';
+import { createContext, useContext } from 'react';
 import type { SliderMark } from './types';
 
 export interface SliderRootContextValue {
@@ -12,9 +12,13 @@ export interface SliderRootContextValue {
   ariaDescribedby?: string;
   /** Field label id — fallback accessible name for a single thumb with no explicit label. */
   fieldLabelId?: string;
-  /** Live marks published by `<SliderMarks>`; read for ordinal display + `aria-valuetext`. */
-  marksRef: RefObject<SliderMark[]>;
-  /** Called by `<SliderMarks>` to publish its marks to the root. */
+  /**
+   * Marks published by `<SliderMarks>`, mirrored into root state so `getAriaValueText`
+   * (and `SliderValue` / the thumb tooltip) resolve ordinal labels. Empty when there
+   * are no marks.
+   */
+  marks: SliderMark[];
+  /** Called by `<SliderMarks>` to publish its marks to the root (no-op if unchanged). */
   registerMarks: (marks: SliderMark[]) => void;
 }
 
