@@ -1019,7 +1019,12 @@ function DateEditor() {
         }}
       >
         <CalendarTrigger>
-          <DateInput value={dateValue} onChange={v => setValue(v)} granularity='day' />
+          <DateInput
+            value={dateValue}
+            onChange={v => setValue(v)}
+            granularity='day'
+            showIcon={false}
+          />
         </CalendarTrigger>
         <CalendarContent>
           <CalendarBody>
@@ -1062,6 +1067,7 @@ function DateTimeEditor() {
         value={dateValue}
         onChange={v => setValue(v as CalendarDateTime | null)}
         granularity='minute'
+        showIcon={false}
       />
     </DateFormatProvider>
   );
