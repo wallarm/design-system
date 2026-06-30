@@ -6,6 +6,7 @@ import { describe, expect, it, vi } from 'vitest';
 import { FilterInputProvider } from '../FilterInputContext/FilterInputProvider';
 import type { FilterInputContextValue } from '../FilterInputContext/types';
 import { FilterInputChip, FilterInputConnectorChip } from '../FilterInputField';
+import { EditingProvider } from '../FilterInputField/FilterInputChip/context/EditingContext';
 
 const mockContextValue: FilterInputContextValue = {
   chips: [],
@@ -80,6 +81,18 @@ describe('FilterInputChip', () => {
     expect(onRemove).toHaveBeenCalledTimes(1);
   });
 
+  // The delete button is opacity-0 but overlays the chip's right edge and the
+  // field area next to it. Without pointer-events gating it silently eats clicks
+  // meant for the chip/input and deletes the chip (AS-1179).
+  it('does not capture pointer events while hidden (only on hover/focus)', () => {
+    const onRemove = vi.fn();
+    render(<FilterInputChip attribute='Test' onRemove={onRemove} />);
+    const deleteButton = screen.getByRole('button', { name: /remove filter/i });
+    expect(deleteButton.className).toContain('pointer-events-none');
+    expect(deleteButton.className).toContain('group-hover/chip:pointer-events-auto');
+    expect(deleteButton.className).toContain('focus:pointer-events-auto');
+  });
+
   it('does not show delete button when onRemove is not provided', async () => {
     const user = userEvent.setup();
 
@@ -105,6 +118,37 @@ describe('FilterInputChip', () => {
 
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
       expect(chip).toHaveClass('bg-badge-badge-bg', 'border-border-primary');
+    });
+
+    // An errored chip is red when idle, but while the user is editing it (fixing
+    // it) the red is suppressed so editing reads cleanly (AS-1179).
+    it('suppresses error styling while the chip is being edited', () => {
+      const { container, rerender } = render(
+        <FilterInputChip chipId='chip-0' attribute='Status' operator='is' value='' error='value' />,
+      );
+      const chip = () => container.querySelector('[data-slot="filter-input-condition-chip"]');
+      expect(chip()).toHaveClass('border-border-danger');
+
+      rerender(
+        <EditingProvider
+          editingChipId='chip-0'
+          editingSegment='value'
+          editingSide={0}
+          segmentFilterText=''
+          onSegmentFilterChange={() => {}}
+          onSegmentEditKeyDown={() => {}}
+          onSegmentEditBlur={() => {}}
+        >
+          <FilterInputChip
+            chipId='chip-0'
+            attribute='Status'
+            operator='is'
+            value=''
+            error='value'
+          />
+        </EditingProvider>,
+      );
+      expect(chip()).not.toHaveClass('border-border-danger');
     });
   });
 
@@ -186,6 +230,87 @@ describe('FilterInputChip building mode', () => {
       expect(screen.getByText('Value')).toBeInTheDocument();
       expect(screen.getByText('yyy')).toBeInTheDocument();
       expect(screen.getByText(';')).toBeInTheDocument();
+    });
+
+    it('caps a paired chip at 380px and a standalone chip at 320px (AS-1179)', () => {
+      const { container, rerender } = render(
+        <FilterInputChip attribute='Context Param' operator='is' value='header' />,
+      );
+      const chip = () => container.querySelector('[data-slot="filter-input-condition-chip"]');
+      expect(chip()?.className).toContain('max-w-[320px]');
+
+      rerender(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='header'
+          pair={{ attribute: 'Value', operator: 'is', value: 'x' }}
+        />,
+      );
+      expect(chip()?.className).toContain('max-w-[380px]');
+    });
+
+    it('caps the base value in a paired chip so a long key cannot hog the row (AS-1179)', () => {
+      const { container } = render(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='averylongcontextparameterkey'
+          pair={{ attribute: 'Value', operator: 'is', value: 'x' }}
+        />,
+      );
+      // The first value segment is the base "key"; it is capped + non-shrinking
+      // so the paired value keeps its share of the row.
+      const baseValue = container.querySelector('[data-slot="segment-value"]');
+      expect(baseValue?.className).toContain('max-w-[90px]');
+      expect(baseValue?.className).toContain('shrink-0');
+    });
+
+    it('makes the fixed "Value" label clickable to resume when the pair is incomplete (AS-1179)', async () => {
+      const user = userEvent.setup();
+      const onPairSegmentClick = vi.fn();
+      const { container, rerender } = render(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='header'
+          pair={{ attribute: 'Value', value: '', error: 'value' }}
+          onPairSegmentClick={onPairSegmentClick}
+        />,
+      );
+      // Second attribute segment = the paired "Value" label. With its operator/
+      // value segments empty (unclickable), it must itself be interactive so the
+      // user can resume the second part.
+      const pairAttr = () => container.querySelectorAll('[data-slot="segment-attribute"]')[1]!;
+      expect(pairAttr()).toHaveAttribute('role', 'button');
+      await user.click(pairAttr());
+      expect(onPairSegmentClick).toHaveBeenCalledWith('value', expect.anything());
+
+      // A complete pair keeps the label non-interactive.
+      rerender(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='header'
+          pair={{ attribute: 'Value', operator: 'is', value: 'yyy' }}
+          onPairSegmentClick={onPairSegmentClick}
+        />,
+      );
+      expect(pairAttr()).not.toHaveAttribute('role', 'button');
+    });
+
+    it('renders the whole chip as errored when only the paired triplet errors (AS-1179)', () => {
+      const { container } = render(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='xxx'
+          pair={{ attribute: 'Value', operator: 'is', value: '', error: 'value' }}
+        />,
+      );
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+      // Container reflects the pair error even though the base triplet is valid.
+      expect(chip?.className).toContain('border-border-danger');
     });
 
     it('renders the separator as aria-hidden and non-interactive', () => {

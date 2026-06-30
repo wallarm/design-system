@@ -146,8 +146,26 @@ const buildPairChip = (
   field: FieldMetadata | undefined,
   fields: FieldMetadata[],
 ): FilterInputChipData['pair'] => {
-  if (!condition.pair || !field?.pairedField) return undefined;
+  if (!field?.pairedField) return undefined;
+  // A no-value base operator ("is not set") makes the chip a single-value filter
+  // — there is no second triplet.
+  if (condition.operator != null && isNoValueOperator(condition.operator)) return undefined;
   const pf = field.pairedField;
+
+  // No pair stored yet: once the base is complete, surface a required (errored)
+  // Value segment so the chip reads red and matches the "Value is required"
+  // banner. While the base itself is still incomplete its own error covers the
+  // chip, so no pair is shown.
+  if (!condition.pair) {
+    const baseComplete =
+      condition.operator != null &&
+      condition.value != null &&
+      condition.value !== '' &&
+      !(Array.isArray(condition.value) && condition.value.length === 0);
+    if (!baseComplete) return undefined;
+    return { attribute: pf.label || pf.name, value: '', error: SEGMENT_VARIANT.value };
+  }
+
   const { operator, value, error } = condition.pair;
   // No-value operators ("is set"/"is not set") render the placeholder so the
   // paired triplet keeps its three segments without a real value.
@@ -156,11 +174,19 @@ const buildPairChip = (
       ? NO_VALUE_PLACEHOLDER
       : (resolveValueLabel(value as string | number | boolean | null, pf, fields) ??
         String(value ?? ''));
+  // The paired value is required unless the operator takes none ("is set"). When
+  // it is missing, flag the segment so the chip reads as errored — matching the
+  // "Value is required" message in the error banner (AS-1179). Keeps the chip red
+  // after a no-op edit instead of only showing the banner.
+  const valueRequiredButMissing =
+    !(operator && isNoValueOperator(operator)) &&
+    (value == null || value === '' || (Array.isArray(value) && value.length === 0));
+  const pairError = error || (valueRequiredButMissing ? SEGMENT_VARIANT.value : undefined);
   return {
     attribute: pf.label || pf.name,
     operator: operator ? getOperatorLabel(operator, pf.type || DEFAULT_FIELD_TYPE) : undefined,
     value: displayValue,
-    ...(error && { error }),
+    ...(pairError && { error: pairError }),
   };
 };
 
@@ -174,7 +200,21 @@ const makeConditionChipBase = (
   const condition = conditions[i];
   if (!condition) return makeEmptyChip(i, error);
 
-  const chipError: ChipErrorSegment | undefined = condition.error || (error ? true : undefined);
+  // An incomplete committed chip (no operator, or a value-bearing operator with
+  // no value) reads as errored so it renders red while not being edited —
+  // matching the error banner. No-value operators ("is set") are complete.
+  // FilterInputChip suppresses the red while the chip is actively edited.
+  const incompleteError: ChipErrorSegment | undefined = !condition.operator
+    ? true
+    : isNoValueOperator(condition.operator)
+      ? undefined
+      : condition.value == null ||
+          condition.value === '' ||
+          (Array.isArray(condition.value) && condition.value.length === 0)
+        ? SEGMENT_VARIANT.value
+        : undefined;
+  const chipError: ChipErrorSegment | undefined =
+    condition.error || (error ? true : undefined) || incompleteError;
   const field = fields.find(f => f.name === condition.field);
   const baseChip = buildBaseChip(i, condition, field);
 

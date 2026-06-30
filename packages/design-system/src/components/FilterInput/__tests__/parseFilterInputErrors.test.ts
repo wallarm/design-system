@@ -34,6 +34,26 @@ describe('parseFilterInputErrors', () => {
     expect(parseFilterInputErrors(conditions, [staticField])).toEqual(['Unknown field unknown']);
   });
 
+  // A red incomplete chip must always have a banner entry (AS-1179).
+  it('reports an incomplete non-paired chip with a value-bearing operator but no value', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'status', operator: '=', value: null },
+    ];
+    expect(parseFilterInputErrors(conditions, [staticField])).toEqual(['Status is incomplete']);
+  });
+
+  it('reports an incomplete non-paired chip with no operator', () => {
+    const conditions: Condition[] = [{ type: 'condition', field: 'status', value: null }];
+    expect(parseFilterInputErrors(conditions, [staticField])).toEqual(['Status is incomplete']);
+  });
+
+  it('does not report a no-value operator chip as incomplete', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'status', operator: 'is_null', value: null },
+    ];
+    expect(parseFilterInputErrors(conditions, [staticField])).toEqual([]);
+  });
+
   it('lists invalid values for static-allowlist field', () => {
     const conditions: Condition[] = [
       {

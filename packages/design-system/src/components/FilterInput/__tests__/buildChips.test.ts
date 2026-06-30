@@ -26,6 +26,34 @@ const fields: FieldMetadata[] = [
 
 const findChip = (chips: ReturnType<typeof buildChips>) => chips.find(c => c.variant === 'chip');
 
+describe('buildChips — incomplete chips read as errored (AS-1179)', () => {
+  it('flags a value-bearing operator with no value', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'priority', operator: '=', value: null },
+    ];
+    expect(findChip(buildChips(conditions, [], fields, false))?.error).toBe('value');
+  });
+
+  it('flags a chip with no operator as a whole-chip error', () => {
+    const conditions: Condition[] = [{ type: 'condition', field: 'priority', value: null }];
+    expect(findChip(buildChips(conditions, [], fields, false))?.error).toBe(true);
+  });
+
+  it('does not flag a no-value operator (is set) as errored', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'priority', operator: 'is_null', value: null },
+    ];
+    expect(findChip(buildChips(conditions, [], fields, false))?.error).toBeUndefined();
+  });
+
+  it('does not flag a complete chip', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'priority', operator: '=', value: 5 },
+    ];
+    expect(findChip(buildChips(conditions, [], fields, false))?.error).toBeUndefined();
+  });
+});
+
 describe('buildChips — loose-match label resolution (AS-882)', () => {
   describe('single-value condition', () => {
     it('resolves label when value is the canonical type (number)', () => {
@@ -229,6 +257,48 @@ describe('buildChips — paired field (AS-1160)', () => {
     expect(chip?.attribute).toBe('Context Param');
     expect(chip?.value).toBe('xxx');
     expect(chip?.pair).toEqual({ attribute: 'Value', operator: 'is', value: 'yyy' });
+  });
+
+  it('renders a required (errored) Value for a base-complete chip with no pair (AS-1179)', () => {
+    const conditions: Condition[] = [
+      // Base key chosen, second triplet never started.
+      { type: 'condition', field: 'ctx_param', operator: '=', value: 'xxx' },
+    ];
+    const chip = findChip(buildChips(conditions, [], pairedFields, false));
+    // The chip surfaces a red Value segment so it matches the "Value is required"
+    // banner instead of looking complete.
+    expect(chip?.pair).toEqual({ attribute: 'Value', value: '', error: 'value' });
+  });
+
+  it('flags the paired value as errored when it is required but missing (AS-1179)', () => {
+    const conditions: Condition[] = [
+      {
+        type: 'condition',
+        field: 'ctx_param',
+        operator: '=',
+        value: 'xxx',
+        // Value operator chosen, but no value entered yet.
+        pair: { operator: '=', value: null },
+      },
+    ];
+    const chip = findChip(buildChips(conditions, [], pairedFields, false));
+    // The pair carries a value error so the chip renders red, matching the
+    // "Value is required" banner — even though condition.pair has no error flag.
+    expect(chip?.pair?.error).toBe('value');
+  });
+
+  it('does not flag a paired no-value operator as errored', () => {
+    const conditions: Condition[] = [
+      {
+        type: 'condition',
+        field: 'ctx_param',
+        operator: '=',
+        value: 'xxx',
+        pair: { operator: 'is_null', value: null },
+      },
+    ];
+    const chip = findChip(buildChips(conditions, [], pairedFields, false));
+    expect(chip?.pair?.error).toBeUndefined();
   });
 
   it('renders the no-value placeholder for a paired "is set"/"is not set" operator', () => {

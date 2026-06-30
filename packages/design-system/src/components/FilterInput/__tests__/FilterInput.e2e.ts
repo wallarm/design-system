@@ -11,6 +11,7 @@ const filterFieldStory = createStoryHelper('patterns-filterinput-filterinput', [
   'HTTP Status Code Suggestions',
   'Paired Field',
   'Paired Field Preset',
+  'Paired Field Value Is Set',
 ] as const);
 
 // TODO: Enable after baseline screenshots are generated and menu flow is stabilized
@@ -188,6 +189,133 @@ test.describe('Component: FilterInput — AS-1022 wrapper-click commit', () => {
       const conditionChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
       await expect(conditionChip).not.toHaveAttribute('data-building', '');
       await expect(conditionChip).toContainText('1XX, 3XX');
+    });
+  });
+});
+
+// AS-1179 — context-parameter (paired) chip bugs. Interaction-only assertions
+// (no screenshots), so this block runs in CI despite the screenshot-gated
+// describe.skip above — same rationale as the AS-1022 block. A red chip and an
+// error banner always travel together, so the banner (role="alert") plus the
+// field's aria-invalid are the stable proxies for "the chip turned red".
+test.describe('Component: FilterInput — AS-1179 paired chip', () => {
+  test.describe('Interactions', () => {
+    type E2EPage = Parameters<Parameters<typeof test>[1]>[0]['page'];
+
+    const getField = (page: E2EPage) => page.locator('[data-slot="filter-input"]');
+    const getChip = (page: E2EPage) =>
+      page.locator('[data-slot="filter-input-condition-chip"]').first();
+
+    // Build the base triplet "Context Param is <key>", leaving the paired Value
+    // operator menu open (the paired Value part always follows the key).
+    async function buildBase(page: E2EPage, key: string) {
+      await filterFieldStory.goto(page, 'Paired Field');
+      await getField(page).click();
+      await page.getByRole('menuitem', { name: /^Context Param$/ }).click();
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+      await page.getByRole('menuitem', { name: new RegExp(`^${key}$`) }).click();
+    }
+
+    // Build a complete chip "Context Param is <key> ; Value is <value>".
+    async function buildFullPair(page: E2EPage, key: string, value: string) {
+      await buildBase(page, key);
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+      await page.getByRole('combobox', { name: 'Filter value' }).fill(value);
+      await page.keyboard.press('Enter');
+      await expect(getChip(page)).not.toHaveAttribute('data-building', '');
+    }
+
+    // The fix: blurring out while the paired value is still empty must NOT
+    // silently drop the in-progress chip. It commits the already-valid base
+    // and flags the missing value, so the chip lands red with a "Value is
+    // required" banner — instead of an invisible, uncommitted draft. (The
+    // red chip and the banner always travel together; the banner is the
+    // stable proxy — aria-invalid on the root tracks the external `error`
+    // prop, not internally-detected validation errors.)
+    test('Should commit an errored chip when focus leaves with the paired value empty', async ({
+      page,
+    }) => {
+      await buildBase(page, 'header');
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+
+      await page.mouse.click(2, 2);
+
+      const chip = getChip(page);
+      await expect(chip).toBeVisible();
+      await expect(chip).not.toHaveAttribute('data-building', '');
+      await expect(chip).toContainText('header');
+      await expect(page.getByRole('alert')).toContainText('Value is required');
+    });
+
+    // The errored chip stays editable: clicking the fixed "Value" label reopens
+    // the value input, and entering a value clears the error (AS-1179 #1/#2).
+    test('Should resume an incomplete paired chip and clear the error when a value is entered', async ({
+      page,
+    }) => {
+      await buildBase(page, 'header');
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+      await page.mouse.click(2, 2);
+
+      const chip = getChip(page);
+      await expect(page.getByRole('alert')).toContainText('Value is required');
+
+      // The paired "Value" label (second attribute segment) is clickable while
+      // the pair is incomplete — it resumes editing at the missing value.
+      await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
+      await page.getByRole('combobox', { name: 'Filter value' }).fill('Mozilla');
+      await page.keyboard.press('Enter');
+      await page.mouse.click(2, 2);
+
+      await expect(page.getByRole('alert')).toHaveCount(0);
+      await expect(chip).toContainText('Mozilla');
+    });
+
+    // AS-1179 #4 — changing the parameter key of a complete paired chip keeps
+    // the chip and its second value (regression: the chip used to vanish).
+    test('Should keep the chip and its value when the parameter key is changed', async ({
+      page,
+    }) => {
+      await buildFullPair(page, 'header', 'authorization');
+      const chip = getChip(page);
+      await expect(chip).toContainText('header');
+      await expect(chip).toContainText('authorization');
+
+      // First value slot = the parameter key. Re-pick a different key.
+      await chip.locator('[data-slot="segment-value"]').first().click();
+      await page.getByRole('menuitem', { name: /^cookie$/ }).click();
+
+      await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
+      await expect(chip).toContainText('cookie');
+      await expect(chip).toContainText('authorization');
+    });
+
+    // AS-1179 #5 — switching a paired "Value is not set" back to "is" makes the
+    // now-required value missing, surfacing the standard required-value banner.
+    test('Should surface the required-value error when "is not set" is switched to "is"', async ({
+      page,
+    }) => {
+      await filterFieldStory.goto(page, 'Paired Field Value Is Set');
+      const chip = getChip(page);
+      // Preset chip ("Value is not set") is valid — no banner yet.
+      await expect(page.getByRole('alert')).toHaveCount(0);
+
+      // Second operator segment = the paired Value operator.
+      await chip.locator('[data-slot="segment-operator"]').nth(1).click();
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+      await page.mouse.click(2, 2);
+
+      await expect(page.getByRole('alert')).toContainText('Value is required');
+    });
+
+    // AS-1179 #3 — a long paired value can't grow the chip past its 380px cap.
+    test('Should cap the paired chip width when the value is very long', async ({ page }) => {
+      await buildFullPair(page, 'header', `Mozilla-5.0-${'x'.repeat(200)}`);
+      await page.mouse.click(2, 2);
+
+      const box = await getChip(page).boundingBox();
+      expect(box).toBeTruthy();
+      // 380px cap + border/padding tolerance.
+      expect(box!.width).toBeLessThanOrEqual(390);
     });
   });
 });

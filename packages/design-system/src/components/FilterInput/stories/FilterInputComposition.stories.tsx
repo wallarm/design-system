@@ -33,6 +33,32 @@ type Story = StoryObj<typeof meta>;
 
 // Real backend where_fields from sessions-api metadata with sample values
 const attackFields: FieldMetadata[] = [
+  // Two-step paired key→value field, mirroring how the `my` app builds the
+  // backend `context_param` (type:"key_value") field [AS-1160/AS-1179]: the base
+  // triplet always selects the parameter name with `=` (key names are
+  // suggestions, not an allowlist — backend validates), and the paired triplet
+  // matches its value (value comparison + presence checks).
+  {
+    name: 'context_param',
+    label: 'Context Parameter',
+    type: 'string',
+    description: 'Request context parameter matched by name, then by value',
+    operators: ['='],
+    values: [
+      { value: 'role', label: 'role' },
+      { value: 'tenant_id', label: 'tenant_id' },
+    ],
+    strictValues: false,
+    validate: () => false,
+    pairedField: {
+      name: 'context_param__value',
+      label: 'Value',
+      type: 'string',
+      operators: ['=', '!=', 'in', 'is_not_null', 'is_null'],
+      strictValues: false,
+      validate: () => false,
+    },
+  },
   {
     name: 'status',
     label: 'Status',

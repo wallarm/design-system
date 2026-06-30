@@ -71,9 +71,13 @@ export const segmentTextVariants = cva('truncate text-sm', {
   },
 });
 
-/** Remove button styles — hidden by default, shown on chip hover or button focus */
+/** Remove button styles — hidden by default, shown on chip hover or button focus.
+ *  It is `opacity-0` until hover/focus, but sits over the chip's right edge and the
+ *  field area just past it; `pointer-events-none` while invisible stops it from
+ *  swallowing clicks meant for the chip/input and silently deleting the chip
+ *  (AS-1179). Hover/focus restore both visibility and clickability. */
 export const removeButtonVariants = cva(
-  `absolute -right-[13px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 group-hover/chip:opacity-100 focus:opacity-100 transition-opacity ${hiddenWhenSelected}`,
+  `absolute -right-[13px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 pointer-events-none group-hover/chip:opacity-100 group-hover/chip:pointer-events-auto focus:opacity-100 focus:pointer-events-auto transition-opacity ${hiddenWhenSelected}`,
   {
     variants: {
       error: {

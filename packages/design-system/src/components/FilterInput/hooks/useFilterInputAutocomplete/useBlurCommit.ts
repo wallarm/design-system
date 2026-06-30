@@ -3,6 +3,7 @@ import { useCallback, useLayoutEffect, useRef } from 'react';
 import { SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { isBuildingComplete, isNoValueOperator } from '../../lib';
 import type { ChipErrorSegment, FieldMetadata, FilterOperator, UpsertCondition } from '../../types';
+import type { BuildingBase } from './useAutocompleteState';
 
 interface UseBlurCommitDeps {
   selectedField: FieldMetadata | null;
@@ -13,6 +14,12 @@ interface UseBlurCommitDeps {
   handleCustomValueCommit: (text: string) => void;
   upsertCondition: UpsertCondition;
   resetState: () => void;
+  /** Which triplet is being built: 0 = base, 1 = paired second. */
+  buildingSide: 0 | 1;
+  setBuildingSide: (side: 0 | 1) => void;
+  /** Base triplet stashed while building a paired chip's second value. */
+  buildingBase: BuildingBase | null;
+  setBuildingBase: (base: BuildingBase | null) => void;
   /** Indirection ref breaking the useMenuFlow ↔ useBlurCommit cycle. */
   commitBuildingOnBlurRef: RefObject<() => boolean>;
   /** Same indirection for force-commit (area-click → incomplete becomes error). */
@@ -34,22 +41,59 @@ export const useBlurCommit = ({
   handleCustomValueCommit,
   upsertCondition,
   resetState,
+  buildingSide,
+  setBuildingSide,
+  buildingBase,
+  setBuildingBase,
   commitBuildingOnBlurRef,
   commitBuildingForceRef,
 }: UseBlurCommitDeps) => {
   const selectedFieldRef = useRef(selectedField);
   const selectedOperatorRef = useRef(selectedOperator);
   const inputTextRef = useRef(inputText);
+  const buildingSideRef = useRef(buildingSide);
+  const buildingBaseRef = useRef(buildingBase);
   useLayoutEffect(() => {
     selectedFieldRef.current = selectedField;
     selectedOperatorRef.current = selectedOperator;
     inputTextRef.current = inputText;
+    buildingSideRef.current = buildingSide;
+    buildingBaseRef.current = buildingBase;
   });
 
   // Re-entry flag survives state churn the ref snapshot can't guard (e.g.
   // upsertCondition triggers re-render that rewrites refs from props before
   // this call returns). Mirrors handlingBlurRef in useFocusManagement.
   const committingRef = useRef(false);
+
+  /**
+   * Persist a stashed base triplet plus its incomplete paired second triplet
+   * as a single error chip: the base commits verbatim, the missing paired
+   * value lands as an error marker so the chip stays red and editable in
+   * place. Shared by blur and force-commit so both reach the identical result.
+   */
+  const commitPairedBaseWithErroredValue = useCallback(
+    (base: BuildingBase, field: FieldMetadata, operator: FilterOperator | null): void => {
+      upsertCondition(base.field, base.operator, base.value, null, effectiveInsertIndexRef.current);
+      // Operator present → flag the paired value slot; operator missing → no
+      // per-segment variant exists, so mark the whole pair as error.
+      const pairError: ChipErrorSegment = operator ? SEGMENT_VARIANT.value : true;
+      upsertCondition(
+        field,
+        operator ?? undefined,
+        null,
+        undefined,
+        undefined,
+        pairError,
+        undefined,
+        1,
+      );
+      setBuildingBase(null);
+      setBuildingSide(0);
+      resetState();
+    },
+    [upsertCondition, resetState, effectiveInsertIndexRef, setBuildingBase, setBuildingSide],
+  );
 
   const commitBuildingOnBlur = useCallback((): boolean => {
     if (committingRef.current) return false;
@@ -59,9 +103,31 @@ export const useBlurCommit = ({
     if (!field) return false;
     if (editingChipId) return false;
 
+    const hasTypedValue = !!operator && !isNoValueOperator(operator) && text.length > 0;
+
+    // Building the paired second triplet with no typed value: the base triplet
+    // is already a complete, valid condition, so a plain blur must persist it
+    // rather than silently dropping the whole draft. Commit the base and flag
+    // the still-missing paired value — the chip lands red and resumable with a
+    // "Value is required" notification, matching an existing chip whose value
+    // was cleared (AS-1179). AS-970 still preserves a *non-paired* incomplete
+    // chip as a draft via the early return below.
+    if (!hasTypedValue && buildingSideRef.current === 1 && buildingBaseRef.current) {
+      committingRef.current = true;
+      try {
+        const base = buildingBaseRef.current;
+        selectedFieldRef.current = null;
+        selectedOperatorRef.current = null;
+        inputTextRef.current = '';
+        commitPairedBaseWithErroredValue(base, field, operator);
+        return true;
+      } finally {
+        committingRef.current = false;
+      }
+    }
+
     // Commit only when fully built; caller skips resetState for incomplete
     // chips (preserved in `building` state).
-    const hasTypedValue = !!operator && !isNoValueOperator(operator) && text.length > 0;
     if (!isBuildingComplete(field, operator, null) && !hasTypedValue) return false;
 
     committingRef.current = true;
@@ -88,6 +154,7 @@ export const useBlurCommit = ({
     upsertCondition,
     resetState,
     effectiveInsertIndexRef,
+    commitPairedBaseWithErroredValue,
   ]);
 
   // Mirrored in a layout effect — keeps useMenuFlow ↔ useBlurCommit cycle
@@ -125,9 +192,21 @@ export const useBlurCommit = ({
 
       const hasTypedValue = !!operator && !isNoValueOperator(operator) && text.length > 0;
       if (hasTypedValue) {
+        // Typed paired value routes through handleCustomValueCommit →
+        // commitPairedSecond, which persists base + pair as one chip.
         handleCustomValueCommit(text);
         return true;
       }
+
+      // Building the paired second triplet with no typed value: persist the
+      // stashed base AND the (incomplete) pair as one chip, instead of dropping
+      // the base and committing the paired field as a broken standalone chip.
+      // The paired value is flagged so the chip stays editable in place.
+      if (buildingSideRef.current === 1 && buildingBaseRef.current) {
+        commitPairedBaseWithErroredValue(buildingBaseRef.current, field, operator);
+        return true;
+      }
+
       if (isBuildingComplete(field, operator, null)) {
         upsertCondition(field, operator!, null, undefined, effectiveInsertIndexRef.current);
         resetState();
@@ -158,6 +237,7 @@ export const useBlurCommit = ({
     upsertCondition,
     resetState,
     effectiveInsertIndexRef,
+    commitPairedBaseWithErroredValue,
   ]);
 
   useLayoutEffect(() => {

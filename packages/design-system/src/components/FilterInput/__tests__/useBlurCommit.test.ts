@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { renderHook } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import type { BuildingBase } from '../hooks/useFilterInputAutocomplete/useAutocompleteState';
 import { useBlurCommit } from '../hooks/useFilterInputAutocomplete/useBlurCommit';
 import type { FieldMetadata, FilterOperator } from '../types';
 
@@ -13,14 +14,20 @@ const setupHook = (
     selectedOperator?: FilterOperator | null;
     inputText?: string;
     editingChipId?: string | null;
+    buildingSide?: 0 | 1;
+    buildingBase?: BuildingBase | null;
     upsertCondition?: ReturnType<typeof vi.fn>;
     handleCustomValueCommit?: ReturnType<typeof vi.fn>;
     resetState?: ReturnType<typeof vi.fn>;
+    setBuildingSide?: ReturnType<typeof vi.fn>;
+    setBuildingBase?: ReturnType<typeof vi.fn>;
   } = {},
 ) => {
   const upsertCondition = overrides.upsertCondition ?? vi.fn();
   const handleCustomValueCommit = overrides.handleCustomValueCommit ?? vi.fn();
   const resetState = overrides.resetState ?? vi.fn();
+  const setBuildingSide = overrides.setBuildingSide ?? vi.fn();
+  const setBuildingBase = overrides.setBuildingBase ?? vi.fn();
 
   // Use `in` so that explicit `null` overrides win over the default —
   // `?? default` would silently coerce the explicit `null` back to default.
@@ -28,6 +35,8 @@ const setupHook = (
   const selectedOperator = 'selectedOperator' in overrides ? overrides.selectedOperator! : operator;
   const inputText = 'inputText' in overrides ? overrides.inputText! : '';
   const editingChipId = 'editingChipId' in overrides ? overrides.editingChipId! : null;
+  const buildingSide = overrides.buildingSide ?? 0;
+  const buildingBase = 'buildingBase' in overrides ? overrides.buildingBase! : null;
 
   const { result } = renderHook(() => {
     const effectiveInsertIndexRef = useRef(0);
@@ -42,6 +51,10 @@ const setupHook = (
       handleCustomValueCommit,
       upsertCondition,
       resetState,
+      buildingSide,
+      setBuildingSide,
+      buildingBase,
+      setBuildingBase,
       commitBuildingOnBlurRef,
       commitBuildingForceRef,
     });
@@ -53,6 +66,8 @@ const setupHook = (
     upsertCondition,
     handleCustomValueCommit,
     resetState,
+    setBuildingSide,
+    setBuildingBase,
   };
 };
 
@@ -130,5 +145,79 @@ describe('useBlurCommit', () => {
   it('hasIncompleteBuilding is false when no building is in progress', () => {
     const { hasIncompleteBuilding } = setupHook({ selectedField: null });
     expect(hasIncompleteBuilding()).toBe(false);
+  });
+
+  // AS-1179: building the paired *second* triplet is special — the base
+  // triplet is already a complete, valid condition. A plain blur must NOT
+  // drop the whole draft (as AS-970 does for a non-paired incomplete chip);
+  // instead it commits the base and flags the still-missing paired value as
+  // an error, so the chip lands red and resumable with a "Value is required"
+  // notification — matching an existing chip whose value was cleared.
+  describe('paired second triplet on blur (AS-1179)', () => {
+    const pairedField: FieldMetadata = {
+      name: 'context_param_value',
+      label: 'Value',
+      type: 'string',
+    };
+    const base: BuildingBase = {
+      field,
+      operator: '=',
+      value: 'USER-AGENT',
+    };
+
+    it('commits the base and flags the missing paired value as an error', () => {
+      const upsertCondition = vi.fn();
+      const resetState = vi.fn();
+      const setBuildingSide = vi.fn();
+      const setBuildingBase = vi.fn();
+      const { commit } = setupHook({
+        selectedField: pairedField,
+        selectedOperator: '=',
+        inputText: '',
+        buildingSide: 1,
+        buildingBase: base,
+        upsertCondition,
+        resetState,
+        setBuildingSide,
+        setBuildingBase,
+      });
+
+      expect(commit()).toBe(true);
+      // Base triplet committed verbatim.
+      expect(upsertCondition).toHaveBeenNthCalledWith(1, field, '=', 'USER-AGENT', null, 0);
+      // Paired value slot flagged so the renderer reddens that segment.
+      expect(upsertCondition).toHaveBeenNthCalledWith(
+        2,
+        pairedField,
+        '=',
+        null,
+        undefined,
+        undefined,
+        'value',
+        undefined,
+        1,
+      );
+      expect(setBuildingBase).toHaveBeenCalledWith(null);
+      expect(setBuildingSide).toHaveBeenCalledWith(0);
+      expect(resetState).toHaveBeenCalledTimes(1);
+    });
+
+    it('still commits a typed paired value as a custom value (no error flag)', () => {
+      const handleCustomValueCommit = vi.fn();
+      const upsertCondition = vi.fn();
+      const { commit } = setupHook({
+        selectedField: pairedField,
+        selectedOperator: '=',
+        inputText: 'Mozilla',
+        buildingSide: 1,
+        buildingBase: base,
+        handleCustomValueCommit,
+        upsertCondition,
+      });
+
+      expect(commit()).toBe(true);
+      expect(handleCustomValueCommit).toHaveBeenCalledWith('Mozilla');
+      expect(upsertCondition).not.toHaveBeenCalled();
+    });
   });
 });

@@ -32,9 +32,28 @@ export const parseFilterInputErrors = (
       errors.push(`${field.pairedField.label} is required`);
     }
 
-    if (!condition.error) continue;
-
     const label = field?.label || condition.field;
+
+    // A known non-paired field left incomplete (no operator, or a value-bearing
+    // operator with no value) reads red in the chip — so it must also surface a
+    // banner message: a red chip and an error message always exist together
+    // (AS-1179). Paired fields are covered by the pair check above; conditions
+    // carrying an explicit `error` flag fall through to the switch below.
+    if (field && !field.pairedField && !condition.error) {
+      const operatorMissing = !condition.operator;
+      const valueMissing =
+        !baseIsNoValue &&
+        !operatorMissing &&
+        (condition.value == null ||
+          condition.value === '' ||
+          (Array.isArray(condition.value) && condition.value.length === 0));
+      if (operatorMissing || valueMissing) {
+        errors.push(`${label} is incomplete`);
+        continue;
+      }
+    }
+
+    if (!condition.error) continue;
 
     switch (condition.error) {
       case SEGMENT_VARIANT.attribute:
