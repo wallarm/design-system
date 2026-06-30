@@ -17,6 +17,7 @@ export const TableLayoutHeaderCell = forwardRef<HTMLTableCellElement, TableLayou
   ({ className, columnId, style, children, ...props }, ref) => {
     const { getColumn, setColumnSize } = useTableLayoutContext();
     const resolved = columnId ? getColumn(columnId) : undefined;
+    if (resolved?.hidden) return null;
     const showResize = !!columnId && !!resolved?.resizable && !!setColumnSize;
     return (
       <th

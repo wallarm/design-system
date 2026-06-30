@@ -17,6 +17,7 @@ export const TableLayoutCell = forwardRef<HTMLTableCellElement, TableLayoutCellP
   ({ className, columnId, style, ...props }, ref) => {
     const { getColumn } = useTableLayoutContext();
     const resolved = columnId ? getColumn(columnId) : undefined;
+    if (resolved?.hidden) return null;
     return (
       <td
         ref={ref}

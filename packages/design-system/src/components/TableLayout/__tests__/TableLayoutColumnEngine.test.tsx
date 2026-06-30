@@ -106,6 +106,16 @@ describe('TableLayout column engine — pinning', () => {
   });
 });
 
+describe('TableLayout column engine — visibility', () => {
+  it('hides a column across colgroup, header, and body when visibility is false', () => {
+    const { container } = render(<HookTable visibility={{ gone: false }} />);
+    expect(screen.queryByRole('columnheader', { name: 'Gone' })).toBeNull();
+    expect(screen.queryByRole('cell', { name: 'x' })).toBeNull();
+    expect(screen.getByRole('columnheader', { name: 'Name' })).toBeInTheDocument();
+    expect(container.querySelectorAll('colgroup > col')).toHaveLength(2);
+  });
+});
+
 describe('TableLayout column engine — resize', () => {
   const Resizable = ({ onSizing }: { onSizing: (s: Record<string, number>) => void }) => {
     const { columns, controller } = useTableLayoutColumns(
