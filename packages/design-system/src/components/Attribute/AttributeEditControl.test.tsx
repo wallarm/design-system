@@ -4,6 +4,7 @@ import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { AttributeEdit } from './AttributeEdit';
 import { AttributeEditControl } from './AttributeEditControl';
+import { AttributeEditPreview } from './AttributeEditPreview';
 
 function ControlledInput() {
   return <input data-testid='editor' defaultValue='hello' />;
@@ -65,5 +66,18 @@ describe('AttributeEditControl', () => {
     );
     await userEvent.keyboard('{Escape}');
     expect(onRevert).toHaveBeenCalledTimes(1);
+  });
+
+  it('focuses the editor when entering edit via the preview (click flow)', async () => {
+    render(
+      <AttributeEdit defaultValue='hello' data-testid='attr'>
+        <AttributeEditPreview>hello</AttributeEditPreview>
+        <AttributeEditControl>
+          <input data-testid='editor' defaultValue='hello' />
+        </AttributeEditControl>
+      </AttributeEdit>,
+    );
+    await userEvent.click(screen.getByTestId('attr--edit-preview'));
+    expect(screen.getByTestId('editor')).toHaveFocus();
   });
 });
