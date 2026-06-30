@@ -1,4 +1,14 @@
 import '@testing-library/jest-dom/vitest';
+import { vi } from 'vitest';
+
+// @testing-library/dom's `jestFakeTimersAreEnabled()` checks `typeof jest !== 'undefined'`
+// to decide whether to use the fake-timer polling branch in `waitFor`. Under Vitest,
+// `jest` is not injected as a global, so that check always returns false — causing waitFor
+// to use real setInterval polling, which deadlocks when vi.useFakeTimers() is active.
+// Aliasing globalThis.jest to vi makes the detection work correctly:
+// waitFor's while-loop then calls jest.advanceTimersByTime (= vi.advanceTimersByTime)
+// between checks, allowing Promise microtasks to flush and assertions to pass.
+(globalThis as any).jest = vi;
 
 // Mock scrollIntoView which is not implemented in jsdom
 // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
