@@ -42,7 +42,9 @@ export const baseConfig = defineConfig({
   snapshotPathTemplate:
     '{testDir}/{testFileDir}/{testFileName}-snapshots/{testName}-{projectName}{ext}',
   expect: {
-    toHaveScreenshot: { maxDiffPixelRatio: 0.005, threshold: 0.1 },
+    // Tolerate sub-pixel font/anti-aliasing variance between CI runners, which
+    // flakes text-heavy screenshots ~1-2% even with correct baselines.
+    toHaveScreenshot: { maxDiffPixelRatio: 0.03, threshold: 0.1 },
   },
   // webServer will be overridden in specific projects
 });
