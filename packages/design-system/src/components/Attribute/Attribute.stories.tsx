@@ -6,10 +6,18 @@ import { Calendar, ChevronDown, Clock, Copy, Filter } from '../../icons';
 import type { DateValue } from '../../index';
 import { CalendarDate, CalendarDateTime, Time } from '../../index';
 import { Badge } from '../Badge';
+import { Button } from '../Button';
+import {
+  CalendarBody,
+  CalendarContent,
+  CalendarGrids,
+  CalendarInputHeader,
+  Calendar as CalendarPicker,
+  CalendarTrigger,
+} from '../Calendar';
 import { Code } from '../Code';
 import { InlineCodeSnippet } from '../CodeSnippet';
 import { DateFormatProvider } from '../DateFormatProvider';
-import { DateInput } from '../DateInput';
 import { FormatDateTime } from '../FormatDateTime';
 import { Ip, IpAddress, IpCountry, IpList, IpProvider } from '../Ip';
 import { Link } from '../Link';
@@ -993,19 +1001,31 @@ function TagsSelectEditor() {
 
 function DateEditor() {
   const { value, setValue, submit } = useAttributeEdit<DateValue | null>();
-  const dateValue = value instanceof CalendarDate ? value : null;
 
   return (
-    <DateFormatProvider order='day-first' hourCycle={24}>
-      <DateInput
-        value={dateValue}
-        onChange={v => {
-          setValue(v);
-          if (v !== null) submit();
-        }}
-        granularity='day'
-      />
-    </DateFormatProvider>
+    <CalendarPicker
+      type='single'
+      defaultOpen
+      closeOnSelect
+      value={value ? [value] : []}
+      onChange={next => setValue(next[0] ?? null)}
+      onOpenChange={open => {
+        if (!open) submit();
+      }}
+    >
+      <CalendarTrigger>
+        <Button variant='outline' color='neutral'>
+          <Calendar size='sm' />
+          Select date
+        </Button>
+      </CalendarTrigger>
+      <CalendarContent>
+        <CalendarBody>
+          <CalendarInputHeader />
+          <CalendarGrids />
+        </CalendarBody>
+      </CalendarContent>
+    </CalendarPicker>
   );
 }
 
@@ -1026,17 +1046,33 @@ function TimeEditor() {
 }
 
 function DateTimeEditor() {
-  const { value, setValue } = useAttributeEdit<CalendarDateTime | null>();
-  const dateValue = value instanceof CalendarDateTime ? value : null;
+  const { value, setValue, submit } = useAttributeEdit<CalendarDateTime | null>();
 
   return (
-    <DateFormatProvider order='day-first' hourCycle={24}>
-      <DateInput
-        value={dateValue}
-        onChange={v => setValue(v as CalendarDateTime | null)}
-        granularity='minute'
-      />
-    </DateFormatProvider>
+    <CalendarPicker
+      type='single'
+      showTime
+      closeOnSelect={false}
+      defaultOpen
+      value={value ? [value] : []}
+      onChange={next => setValue((next[0] as CalendarDateTime | undefined) ?? null)}
+      onOpenChange={open => {
+        if (!open) submit();
+      }}
+    >
+      <CalendarTrigger>
+        <Button variant='outline' color='neutral'>
+          <Calendar size='sm' />
+          Select date and time
+        </Button>
+      </CalendarTrigger>
+      <CalendarContent>
+        <CalendarBody>
+          <CalendarInputHeader />
+          <CalendarGrids />
+        </CalendarBody>
+      </CalendarContent>
+    </CalendarPicker>
   );
 }
 
