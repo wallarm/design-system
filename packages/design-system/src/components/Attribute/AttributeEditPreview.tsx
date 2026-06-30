@@ -37,6 +37,7 @@ export const AttributeEditPreview: FC<AttributeEditPreviewProps> = ({
 
   const handleFocus: HTMLAttributes<HTMLDivElement>['onFocus'] = event => {
     onFocus?.(event);
+    if (event.defaultPrevented) return;
     if (activatable && activationMode === 'focus') edit();
   };
 

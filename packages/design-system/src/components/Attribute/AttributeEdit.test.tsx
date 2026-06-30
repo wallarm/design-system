@@ -118,4 +118,17 @@ describe('AttributeEdit', () => {
     expect(screen.getByTestId('status')).toHaveTextContent('error');
     expect(screen.getByTestId('invalid')).toHaveTextContent('true');
   });
+
+  it('ignores submit while a commit is already in flight', async () => {
+    const onCommit = vi.fn(() => new Promise<void>(() => {})); // never resolves → stays loading
+    render(
+      <AttributeEdit defaultValue='hello' onValueCommit={onCommit}>
+        <Harness />
+      </AttributeEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('submit')); // → loading
+    await userEvent.click(screen.getByText('submit')); // ignored
+    expect(onCommit).toHaveBeenCalledTimes(1);
+  });
 });
