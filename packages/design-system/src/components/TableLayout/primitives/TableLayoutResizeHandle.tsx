@@ -52,12 +52,12 @@ export const TableLayoutResizeHandle = forwardRef<HTMLDivElement, TableLayoutRes
     };
 
     return (
+      // biome-ignore lint/a11y/useFocusableInteractive: separator is pointer-only; keyboard resize is out of scope
       <div
         ref={ref}
+        // biome-ignore lint/a11y/useAriaPropsForRole: aria-valuenow is invalid on a non-range separator — omitting is correct per ARIA spec
         role='separator'
-        tabIndex={0}
         aria-orientation='vertical'
-        aria-valuenow={0}
         data-slot='resize-handle'
         data-resizing={resizing || undefined}
         className={cn(tableLayoutResizeHandle, className)}

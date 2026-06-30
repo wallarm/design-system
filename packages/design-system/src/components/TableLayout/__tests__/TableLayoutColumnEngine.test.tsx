@@ -145,4 +145,41 @@ describe('TableLayout column engine — resize', () => {
     fireEvent(window, new (window as any).PointerEvent('pointerup', { clientX: 260 }));
     expect(onSizing).toHaveBeenCalledWith({ a: 180 }); // 120 + (260-200) = 180 ≥ minWidth
   });
+
+  it('fires onColumnSizingChange on pointermove in onChange mode', () => {
+    const onSizing = vi.fn();
+    const OnChangeResizable = () => {
+      const { columns, controller } = useTableLayoutColumns(
+        [{ columnId: 'a', width: 120, resizable: true }],
+        { columnResizeMode: 'onChange', onColumnSizingChange: onSizing },
+      );
+      return (
+        <TableLayout aria-label='Resize onChange' controller={controller}>
+          <TableLayoutColumnGroup>
+            {columns.map(c => (
+              <TableLayoutColumn key={c.columnId} {...c} />
+            ))}
+          </TableLayoutColumnGroup>
+          <TableLayoutHead>
+            <TableLayoutRow>
+              <TableLayoutHeaderCell columnId='a'>A</TableLayoutHeaderCell>
+            </TableLayoutRow>
+          </TableLayoutHead>
+          <TableLayoutBody>
+            <TableLayoutRow rowId='r1'>
+              <TableLayoutCell columnId='a'>x</TableLayoutCell>
+            </TableLayoutRow>
+          </TableLayoutBody>
+        </TableLayout>
+      );
+    };
+    render(<OnChangeResizable />);
+    const handle = document.querySelector('[data-slot="resize-handle"]') as HTMLElement;
+    expect(handle).not.toBeNull();
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: jsdom setPointerCapture mock
+    handle.setPointerCapture = () => {};
+    fireEvent.pointerDown(handle, { clientX: 200, pointerId: 1 });
+    fireEvent(window, new (window as any).PointerEvent('pointermove', { clientX: 240 }));
+    expect(onSizing).toHaveBeenCalledWith({ a: 160 }); // 120 + (240-200) = 160
+  });
 });
