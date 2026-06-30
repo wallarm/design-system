@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
+import { describe, expect, it, vi } from 'vitest';
 import {
   TableLayout,
   TableLayoutBody,
@@ -11,6 +11,17 @@ import {
   TableLayoutRow,
   useTableLayoutColumns,
 } from '..';
+
+if (!('PointerEvent' in window)) {
+  (window as any).PointerEvent = class extends Event {
+    clientX = 0;
+    pointerId = 0;
+    constructor(type: string, params: any = {}) {
+      super(type, params);
+      Object.assign(this, params);
+    }
+  };
+}
 
 const HookTable = ({ visibility }: { visibility?: Record<string, boolean> }) => {
   const { columns, controller } = useTableLayoutColumns(
@@ -92,5 +103,46 @@ describe('TableLayout column engine — pinning', () => {
     expect(b).toHaveStyle({ position: 'sticky', left: '100px' });
     expect(b.className).toContain('shadow-');
     expect(screen.getByRole('cell', { name: 'C' })).not.toHaveStyle({ position: 'sticky' });
+  });
+});
+
+describe('TableLayout column engine — resize', () => {
+  const Resizable = ({ onSizing }: { onSizing: (s: Record<string, number>) => void }) => {
+    const { columns, controller } = useTableLayoutColumns(
+      [{ columnId: 'a', width: 120, resizable: true, minWidth: 80 }],
+      { onColumnSizingChange: onSizing },
+    );
+    return (
+      <TableLayout aria-label='Resize' controller={controller}>
+        <TableLayoutColumnGroup>
+          {columns.map(c => (
+            <TableLayoutColumn key={c.columnId} {...c} />
+          ))}
+        </TableLayoutColumnGroup>
+        <TableLayoutHead>
+          <TableLayoutRow>
+            <TableLayoutHeaderCell columnId='a'>A</TableLayoutHeaderCell>
+          </TableLayoutRow>
+        </TableLayoutHead>
+        <TableLayoutBody>
+          <TableLayoutRow rowId='r1'>
+            <TableLayoutCell columnId='a'>x</TableLayoutCell>
+          </TableLayoutRow>
+        </TableLayoutBody>
+      </TableLayout>
+    );
+  };
+
+  it('fires onColumnSizingChange with the clamped width on pointer drag (onEnd)', () => {
+    const onSizing = vi.fn();
+    render(<Resizable onSizing={onSizing} />);
+    const handle = document.querySelector('[data-slot="resize-handle"]') as HTMLElement;
+    expect(handle).not.toBeNull();
+    // biome-ignore lint/suspicious/noEmptyBlockStatements: jsdom setPointerCapture mock
+    handle.setPointerCapture = () => {};
+    fireEvent.pointerDown(handle, { clientX: 200, pointerId: 1 });
+    fireEvent(window, new (window as any).PointerEvent('pointermove', { clientX: 260 }));
+    fireEvent(window, new (window as any).PointerEvent('pointerup', { clientX: 260 }));
+    expect(onSizing).toHaveBeenCalledWith({ a: 180 }); // 120 + (260-200) = 180 ≥ minWidth
   });
 });

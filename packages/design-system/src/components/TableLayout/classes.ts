@@ -31,3 +31,10 @@ export const tableLayoutLastPinnedLeft = cn(
   'shadow-[2px_0_4px_-2px_rgba(0,0,0,0.15)] [clip-path:inset(0_-8px_0_0)]',
 );
 export const tableLayoutFirstPinnedRight = cn('border-l border-border-primary-light');
+
+export const tableLayoutResizeHandle = cn(
+  'absolute top-0 bottom-0 right-0 w-8 translate-x-4 z-30',
+  'cursor-col-resize select-none touch-none',
+  'opacity-0 hover:opacity-100 data-[resizing]:opacity-100 transition-opacity',
+  'before:absolute before:inset-y-4 before:right-4 before:w-2 before:rounded-2 before:bg-bg-fill-brand',
+);

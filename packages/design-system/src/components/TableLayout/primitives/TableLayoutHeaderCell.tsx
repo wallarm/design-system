@@ -7,21 +7,24 @@ import {
   tableLayoutPinned,
 } from '../classes';
 import { useTableLayoutContext } from '../TableLayoutContext';
+import { TableLayoutResizeHandle } from './TableLayoutResizeHandle';
 
 export interface TableLayoutHeaderCellProps extends ComponentPropsWithRef<'th'> {
   columnId?: string;
 }
 
 export const TableLayoutHeaderCell = forwardRef<HTMLTableCellElement, TableLayoutHeaderCellProps>(
-  ({ className, columnId, style, ...props }, ref) => {
-    const { getColumn } = useTableLayoutContext();
+  ({ className, columnId, style, children, ...props }, ref) => {
+    const { getColumn, setColumnSize } = useTableLayoutContext();
     const resolved = columnId ? getColumn(columnId) : undefined;
+    const showResize = !!columnId && !!resolved?.resizable && !!setColumnSize;
     return (
       <th
         ref={ref}
         scope='col'
         data-column-id={columnId}
         className={cn(
+          'relative',
           tableLayoutHeaderCell,
           resolved?.pin && tableLayoutPinned,
           resolved?.lastPinnedLeft && tableLayoutLastPinnedLeft,
@@ -30,7 +33,10 @@ export const TableLayoutHeaderCell = forwardRef<HTMLTableCellElement, TableLayou
         )}
         style={{ ...resolved?.stickyStyle, ...style }}
         {...props}
-      />
+      >
+        {children}
+        {showResize ? <TableLayoutResizeHandle columnId={columnId as string} /> : null}
+      </th>
     );
   },
 );
