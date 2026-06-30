@@ -94,8 +94,10 @@ Generic over the value type `T` (`string` by default for the text wrappers).
 | `ref` / `className` | — | — | Forwarded / merged via `cn()` |
 
 **State management:** uses the existing `useControlled` hook for both `value` and `edit`
-(controlled when the prop is supplied, internal state otherwise). Reads
-`useAttributeOrientation()` for layout — no own orientation prop. Provides
+(controlled when the prop is supplied, internal state otherwise). Has no own
+`orientation` prop — layout follows the surrounding `Attribute` (its
+`AttributeValue` applies the horizontal/vertical styling) and the consumer's grid;
+the root does not itself read `useAttributeOrientation()`. Provides
 `AttributeEditContext`.
 
 ### `AttributeEditPreview`
