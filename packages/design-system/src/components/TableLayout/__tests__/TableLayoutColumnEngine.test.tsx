@@ -58,3 +58,39 @@ describe('TableLayout column engine — controller wiring', () => {
     expect(container.querySelectorAll('colgroup > col')).toHaveLength(3);
   });
 });
+
+describe('TableLayout column engine — pinning', () => {
+  const Pinned = () => {
+    const { columns, controller } = useTableLayoutColumns([
+      { columnId: 'a', width: 100, pin: 'left' },
+      { columnId: 'b', width: 60, pin: 'left' },
+      { columnId: 'c', width: 200 },
+    ]);
+    return (
+      <TableLayout aria-label='Pinned' controller={controller}>
+        <TableLayoutColumnGroup>
+          {columns.map(c => (
+            <TableLayoutColumn key={c.columnId} {...c} />
+          ))}
+        </TableLayoutColumnGroup>
+        <TableLayoutBody>
+          <TableLayoutRow rowId='r1'>
+            <TableLayoutCell columnId='a'>A</TableLayoutCell>
+            <TableLayoutCell columnId='b'>B</TableLayoutCell>
+            <TableLayoutCell columnId='c'>C</TableLayoutCell>
+          </TableLayoutRow>
+        </TableLayoutBody>
+      </TableLayout>
+    );
+  };
+
+  it('applies cumulative sticky offsets and the last-pinned-left boundary class', () => {
+    render(<Pinned />);
+    const a = screen.getByRole('cell', { name: 'A' });
+    const b = screen.getByRole('cell', { name: 'B' });
+    expect(a).toHaveStyle({ position: 'sticky', left: '0px' });
+    expect(b).toHaveStyle({ position: 'sticky', left: '100px' });
+    expect(b.className).toContain('shadow-');
+    expect(screen.getByRole('cell', { name: 'C' })).not.toHaveStyle({ position: 'sticky' });
+  });
+});

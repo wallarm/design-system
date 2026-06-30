@@ -25,3 +25,9 @@ export const cellAlignClass: Record<TableLayoutColumnAlign, string> = {
   center: 'text-center',
   right: 'text-right',
 };
+
+export const tableLayoutPinned = cn('z-20 bg-bg-light-primary');
+export const tableLayoutLastPinnedLeft = cn(
+  'shadow-[2px_0_4px_-2px_rgba(0,0,0,0.15)] [clip-path:inset(0_-8px_0_0)]',
+);
+export const tableLayoutFirstPinnedRight = cn('border-l border-border-primary-light');
