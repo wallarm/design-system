@@ -1,4 +1,3 @@
-// AttributeEdit.tsx
 import {
   type ReactElement,
   type ReactNode,
@@ -81,7 +80,6 @@ export function AttributeEdit<T = unknown>({
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useRef(true);
   useEffect(() => {
-    mounted.current = true;
     return () => {
       mounted.current = false;
       if (savedTimer.current) clearTimeout(savedTimer.current);
