@@ -13,7 +13,8 @@ const sliderStory = createStoryHelper('inputs-slider', [
 ] as const);
 
 // The inline value Input (the slider's own HiddenInput carries no data-slot="input").
-const VALUE_INPUT = '[data-slot="slider-input-row"] input[data-slot="input"]';
+// The root is the layout row now, so scope to it (the old slider-input-row wrapper is gone).
+const VALUE_INPUT = '[data-slot="slider"] input[data-slot="input"]';
 
 test.describe('Component: Slider', () => {
   test.describe('Visual', () => {
