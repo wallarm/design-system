@@ -113,7 +113,9 @@ export const AttributeEditPreview: FC<AttributeEditPreviewProps> = ({
       onKeyDown={handleKeyDown}
       onPointerMove={handlePointerMove}
       className={cn(
-        'group -my-4 flex w-full min-w-0 items-center gap-4 rounded-8 border border-transparent px-6 py-4 transition-colors',
+        'group -my-4 flex w-full min-w-0 gap-4 rounded-8 border border-transparent px-6 py-4 transition-colors',
+        // Multi-line values align the trigger icon to the top; single-line centers it.
+        lineClamp ? 'items-start' : 'items-center',
         // Editable, no error: neutral hover background + primary focus ring.
         activatable &&
           !invalid &&
