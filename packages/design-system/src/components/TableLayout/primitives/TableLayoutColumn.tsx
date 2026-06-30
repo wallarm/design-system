@@ -1,26 +1,47 @@
 import { useEffect } from 'react';
+import { computeColumnLayout } from '../lib/computeColumnLayout';
 import { useTableLayoutContext } from '../TableLayoutContext';
-import type { TableLayoutColumnAlign, TableLayoutColumnPin } from '../types';
+import type { TableLayoutColumnDef } from '../types';
 
-export interface TableLayoutColumnProps {
-  /** Column identity; cells bind to it via the same `columnId`. */
-  columnId: string;
-  /** Text alignment inherited by this column's cells. */
-  align?: TableLayoutColumnAlign;
-  /** Pin side (sticky offsets wired up by the column-engine plan). */
-  pin?: TableLayoutColumnPin;
-  /** Column width in px (applied to the underlying `<col>`). */
-  width?: number;
-}
+export type TableLayoutColumnProps = TableLayoutColumnDef;
 
-export const TableLayoutColumn = ({ columnId, align, pin, width }: TableLayoutColumnProps) => {
+export const TableLayoutColumn = ({
+  columnId,
+  align,
+  pin,
+  width,
+  minWidth,
+  maxWidth,
+  resizable,
+  hidden,
+}: TableLayoutColumnProps) => {
   const { registerColumn, unregisterColumn } = useTableLayoutContext();
 
+  // Effect deps are PRIMITIVE props only — never a freshly-built resolved object
+  // (which changes identity every render and would loop the registry). The resolved
+  // is rebuilt inside the effect from the same primitives.
   useEffect(() => {
-    registerColumn(columnId, { align, pin, width });
+    const { resolved } = computeColumnLayout([
+      { columnId, align, pin, width, minWidth, maxWidth, resizable, hidden },
+    ]);
+    // computeColumnLayout always produces an entry for every id in its input defs
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    registerColumn(columnId, resolved[columnId]!);
     return () => unregisterColumn(columnId);
-  }, [columnId, align, pin, width, registerColumn, unregisterColumn]);
+  }, [
+    columnId,
+    align,
+    pin,
+    width,
+    minWidth,
+    maxWidth,
+    resizable,
+    hidden,
+    registerColumn,
+    unregisterColumn,
+  ]);
 
+  if (hidden) return null;
   return <col data-column-id={columnId} style={width ? { width } : undefined} />;
 };
 TableLayoutColumn.displayName = 'TableLayoutColumn';

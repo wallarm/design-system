@@ -53,8 +53,7 @@ export const computeColumnLayout = (
 
   const rightOffset: Record<string, number> = {};
   let rightAcc = 0;
-  for (let i = rightPinned.length - 1; i >= 0; i--) {
-    const def = rightPinned[i];
+  for (const def of rightPinned.slice().reverse()) {
     rightOffset[def.columnId] = rightAcc;
     rightAcc += widthOf(def) ?? 0;
   }

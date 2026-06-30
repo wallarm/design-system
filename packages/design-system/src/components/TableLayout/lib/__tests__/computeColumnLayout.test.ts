@@ -41,5 +41,21 @@ describe('computeColumnLayout', () => {
     const { resolved } = computeColumnLayout(defs, { pinning: { left: ['c'] } });
     expect(resolved.c.pin).toBe('left');
     expect(resolved.c.stickyStyle.position).toBe('sticky');
+    // c is appended after a(100) and b(60) in left order → offset = 160px
+    expect(resolved.c.stickyStyle.left).toBe('160px');
+  });
+
+  it('computes offsets for multiple right-pinned columns', () => {
+    const rightDefs = [
+      { columnId: 'x', pin: 'right' as const, width: 40 },
+      { columnId: 'y', pin: 'right' as const, width: 40 },
+    ];
+    const { resolved } = computeColumnLayout(rightDefs);
+    // y is rightmost (last in declared order traversed right-to-left) → offset 0
+    expect(resolved.y.stickyStyle.right).toBe('0px');
+    // x is to the left of y → offset = y's width = 40
+    expect(resolved.x.stickyStyle.right).toBe('40px');
+    // x is the first (leftmost) right-pinned column
+    expect(resolved.x.firstPinnedRight).toBe(true);
   });
 });
