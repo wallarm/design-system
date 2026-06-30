@@ -10,6 +10,7 @@ import {
 import { useTableLayoutContext } from '../TableLayoutContext';
 
 export interface TableLayoutCellProps extends ComponentPropsWithRef<'td'> {
+  /** Binds this cell to a TableLayoutColumn of the same columnId to inherit presentation (align, pin, width, visibility). */
   columnId?: string;
 }
 

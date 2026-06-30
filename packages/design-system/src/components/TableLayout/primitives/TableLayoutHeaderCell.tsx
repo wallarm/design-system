@@ -10,6 +10,7 @@ import { useTableLayoutContext } from '../TableLayoutContext';
 import { TableLayoutResizeHandle } from './TableLayoutResizeHandle';
 
 export interface TableLayoutHeaderCellProps extends ComponentPropsWithRef<'th'> {
+  /** Binds this header cell to a TableLayoutColumn of the same columnId for pin styling and the resize handle. */
   columnId?: string;
 }
 

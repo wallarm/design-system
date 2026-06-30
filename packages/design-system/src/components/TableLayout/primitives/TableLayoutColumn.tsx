@@ -25,7 +25,6 @@ export const TableLayoutColumn = ({
       { columnId, align, pin, width, minWidth, maxWidth, resizable, hidden },
     ]);
     // computeColumnLayout always produces an entry for every id in its input defs
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     registerColumn(columnId, resolved[columnId]!);
     return () => unregisterColumn(columnId);
   }, [
