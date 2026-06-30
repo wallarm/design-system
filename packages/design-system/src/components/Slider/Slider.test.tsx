@@ -8,6 +8,7 @@ import { SliderControl } from './SliderControl';
 import { SliderInput } from './SliderInput';
 import { SliderMarks } from './SliderMarks';
 import { SliderThumb } from './SliderThumb';
+import { SliderValue } from './SliderValue';
 
 const MARKS = [
   { value: 0, label: 'Low' },
@@ -345,5 +346,46 @@ describe('Slider — inline SliderInput', () => {
       </Field>,
     );
     expect(getInputBoxes(container)[0]).toBeDisabled();
+  });
+});
+
+describe('Slider — SliderValue readout', () => {
+  it('shows a single value', () => {
+    render(
+      <Slider defaultValue={[42]}>
+        <SliderControl>
+          <SliderThumb aria-label='V' />
+        </SliderControl>
+        <SliderValue />
+      </Slider>,
+    );
+    expect(screen.getByText('42')).toBeInTheDocument();
+  });
+
+  it('shows both ends of a range joined by an en-dash', () => {
+    render(
+      <Slider defaultValue={[20, 80]}>
+        <SliderControl>
+          <SliderThumb index={0} />
+          <SliderThumb index={1} />
+        </SliderControl>
+        <SliderValue />
+      </Slider>,
+    );
+    expect(screen.getByText('20 – 80')).toBeInTheDocument();
+  });
+
+  it('shows the ordinal mark label for the current value', () => {
+    // The tick label is also "Medium", so scope to the readout slot to disambiguate.
+    const { container } = render(
+      <Slider defaultValue={[50]} min={0} max={100} step={50}>
+        <SliderControl>
+          <SliderThumb aria-label='Risk' />
+          <SliderMarks marks={MARKS} />
+        </SliderControl>
+        <SliderValue />
+      </Slider>,
+    );
+    expect(container.querySelector('[data-slot="slider-value"]')).toHaveTextContent('Medium');
   });
 });
