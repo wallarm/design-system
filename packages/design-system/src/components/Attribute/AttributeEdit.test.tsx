@@ -1,5 +1,4 @@
-// AttributeEdit.test.tsx
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { AttributeEdit } from './AttributeEdit';
@@ -76,7 +75,6 @@ describe('AttributeEdit', () => {
   });
 
   it('runs the async lifecycle: loading then saved then idle', async () => {
-    vi.useFakeTimers();
     let resolve!: () => void;
     const onCommit = vi.fn(
       () =>
@@ -84,22 +82,17 @@ describe('AttributeEdit', () => {
           resolve = r;
         }),
     );
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
     render(
-      <AttributeEdit defaultValue='hello' onValueCommit={onCommit} savedDuration={2000}>
+      <AttributeEdit defaultValue='hello' onValueCommit={onCommit} savedDuration={20}>
         <Harness />
       </AttributeEdit>,
     );
-    await user.click(screen.getByText('edit'));
-    await user.click(screen.getByText('submit'));
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('submit'));
     expect(screen.getByTestId('status')).toHaveTextContent('loading');
     resolve();
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('saved'));
-    await act(async () => {
-      vi.advanceTimersByTime(2000);
-    });
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('idle'));
-    vi.useRealTimers();
   });
 
   it('surfaces error and stays editing when the commit rejects', async () => {
