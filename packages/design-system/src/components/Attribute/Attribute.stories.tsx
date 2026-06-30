@@ -10,7 +10,6 @@ import {
   CalendarBody,
   CalendarContent,
   CalendarGrids,
-  CalendarInputHeader,
   Calendar as CalendarPicker,
   CalendarTrigger,
 } from '../Calendar';
@@ -1038,7 +1037,7 @@ function TimeEditor() {
   const timeValue = value instanceof Time ? value : null;
 
   return (
-    <DateFormatProvider order='day-first' hourCycle={24}>
+    <DateFormatProvider order='day-first' hourCycle={12}>
       <TimeInput
         value={timeValue}
         onChange={v => setValue(v instanceof Time ? v : null)}
@@ -1049,37 +1048,21 @@ function TimeEditor() {
   );
 }
 
+// Segmented date+time input. A calendar+time popover is intentionally not used
+// here: mixing the react-aria DateInput with the Ark calendar fights over the
+// value and drops commits. The segmented input edits both date and time and
+// commits on blur (submitMode='blur').
 function DateTimeEditor() {
-  const { value, setValue, submit } = useAttributeEdit<CalendarDateTime | null>();
+  const { value, setValue } = useAttributeEdit<CalendarDateTime | null>();
   const dateValue = value instanceof CalendarDateTime ? value : null;
 
   return (
-    <DateFormatProvider order='day-first' hourCycle={24}>
-      <CalendarPicker
-        type='single'
-        showTime
-        closeOnSelect={false}
-        defaultOpen
-        value={value ? [value] : []}
-        onChange={next => setValue((next[0] as CalendarDateTime | undefined) ?? null)}
-        onOpenChange={open => {
-          if (!open) submit();
-        }}
-      >
-        <CalendarTrigger>
-          <DateInput
-            value={dateValue}
-            onChange={v => setValue(v as CalendarDateTime | null)}
-            granularity='minute'
-          />
-        </CalendarTrigger>
-        <CalendarContent>
-          <CalendarBody>
-            <CalendarInputHeader />
-            <CalendarGrids />
-          </CalendarBody>
-        </CalendarContent>
-      </CalendarPicker>
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <DateInput
+        value={dateValue}
+        onChange={v => setValue(v as CalendarDateTime | null)}
+        granularity='minute'
+      />
     </DateFormatProvider>
   );
 }
