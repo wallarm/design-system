@@ -1060,12 +1060,12 @@ function TimeEditor() {
 // here: mixing the react-aria DateInput with the Ark calendar fights over the
 // value and drops commits. The segmented input edits both date and time and
 // commits on blur (submitMode='blur').
-// Segmented date+time input. A calendar+time popover is intentionally not used:
-// every Calendar composition tried here either failed to open or dropped grid
-// commits (the Ark calendar's showTime grid does not emit a committable value,
-// and a react-aria DateInput trigger fights it). The segmented input edits both
-// date and time by typing and commits on blur (submitMode='blur'), pre-filled
-// with the current value.
+// Segmented date+time input (pre-filled, commits on blur). A committing
+// calendar-grid dropdown is not feasible here: the minute-granularity react-aria
+// DateInput needed for time entry fights the Ark calendar over the value, so the
+// grid never commits (date-only/day granularity works — see DateEditor — but
+// minute does not). A true date+time picker with a working grid needs a
+// dedicated DS DatePicker component (follow-up).
 function DateTimeEditor() {
   const { value, setValue } = useAttributeEdit<CalendarDateTime | null>();
 
