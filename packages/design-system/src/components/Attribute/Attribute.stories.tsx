@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Copy, Filter } from '../../icons';
+import { Calendar, ChevronDown, Clock, Copy, Filter } from '../../icons';
 import type { DateValue } from '../../index';
 import { CalendarDate, CalendarDateTime, Time } from '../../index';
 import { Badge } from '../Badge';
@@ -1047,7 +1047,9 @@ function DateTimeEditor() {
  */
 function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineOrientation }) {
   const [text, setText] = useState('Checkout API');
-  const [about, setAbout] = useState('Displays a labeled value for a single object attribute.');
+  const [about, setAbout] = useState(
+    'Displays a labeled value for a single object attribute. Used in detail panels, drawers and forms to present structured information.',
+  );
   const [port, setPort] = useState('8443');
   const [role, setRole] = useState<string[]>(['editor']);
   const [roles, setRoles] = useState<string[]>(['editor', 'viewer']);
@@ -1105,7 +1107,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
         <AttributeLabel>About</AttributeLabel>
         <AttributeValue>
           <AttributeEdit value={about} onValueCommit={v => setAbout(v as string)}>
-            <AttributeEditPreview>{about}</AttributeEditPreview>
+            <AttributeEditPreview lineClamp={3}>{about}</AttributeEditPreview>
             <AttributeEditControl>
               <AttributeEditTextarea minRows={2} maxRows={6} />
             </AttributeEditControl>
@@ -1123,7 +1125,9 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
             submitMode='none'
             activationMode='click'
           >
-            <AttributeEditPreview>{roleLabel}</AttributeEditPreview>
+            <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
+              {roleLabel}
+            </AttributeEditPreview>
             <AttributeEditControl>
               <SelectEditor />
             </AttributeEditControl>
@@ -1140,7 +1144,9 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
             submitMode='none'
             activationMode='click'
           >
-            <AttributeEditPreview>{rolesLabel}</AttributeEditPreview>
+            <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
+              {rolesLabel}
+            </AttributeEditPreview>
             <AttributeEditControl>
               <MultiSelectEditor />
             </AttributeEditControl>
@@ -1157,7 +1163,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
             submitMode='none'
             activationMode='click'
           >
-            <AttributeEditPreview>
+            <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
               {tags.map(v => (
                 <Tag key={v}>{v}</Tag>
               ))}
@@ -1178,7 +1184,9 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
             submitMode='none'
             activationMode='click'
           >
-            <AttributeEditPreview>{dateLabel}</AttributeEditPreview>
+            <AttributeEditPreview triggerIcon={<Calendar size='md' />}>
+              {dateLabel}
+            </AttributeEditPreview>
             <AttributeEditControl>
               <DateEditor />
             </AttributeEditControl>
@@ -1195,7 +1203,9 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
             submitMode='blur'
             activationMode='click'
           >
-            <AttributeEditPreview>{timeLabel}</AttributeEditPreview>
+            <AttributeEditPreview triggerIcon={<Clock size='md' />}>
+              {timeLabel}
+            </AttributeEditPreview>
             <AttributeEditControl>
               <TimeEditor />
             </AttributeEditControl>
@@ -1212,7 +1222,9 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
             submitMode='blur'
             activationMode='click'
           >
-            <AttributeEditPreview>{dateTimeLabel}</AttributeEditPreview>
+            <AttributeEditPreview triggerIcon={<Calendar size='md' />}>
+              {dateTimeLabel}
+            </AttributeEditPreview>
             <AttributeEditControl>
               <DateTimeEditor />
             </AttributeEditControl>

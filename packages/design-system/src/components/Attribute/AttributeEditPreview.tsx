@@ -7,6 +7,16 @@ import { Loader } from '../Loader';
 import { Tooltip, TooltipContent, type TooltipProps, TooltipTrigger } from '../Tooltip';
 import { useAttributeEdit } from './AttributeEditContext';
 
+// Literal classes so Tailwind can statically detect them.
+const LINE_CLAMP_CLASS: Record<number, string> = {
+  1: 'line-clamp-1',
+  2: 'line-clamp-2',
+  3: 'line-clamp-3',
+  4: 'line-clamp-4',
+  5: 'line-clamp-5',
+  6: 'line-clamp-6',
+};
+
 export interface AttributeEditPreviewProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
   /** Trailing affordance icon shown on hover/focus in read mode. */
@@ -16,6 +26,11 @@ export interface AttributeEditPreviewProps extends HTMLAttributes<HTMLDivElement
    * `'Edit'`. Pass `null` to disable the tooltip.
    */
   tooltip?: ReactNode;
+  /**
+   * Clamp the read-mode value to this many lines (with an ellipsis) instead of
+   * the default single-line truncation. Use for multi-line values (textarea).
+   */
+  lineClamp?: 1 | 2 | 3 | 4 | 5 | 6;
   children?: ReactNode;
 }
 
@@ -23,6 +38,7 @@ export const AttributeEditPreview: FC<AttributeEditPreviewProps> = ({
   ref,
   triggerIcon = <Pencil size='md' />,
   tooltip = 'Edit',
+  lineClamp,
   children,
   className,
   onClick,
@@ -74,7 +90,8 @@ export const AttributeEditPreview: FC<AttributeEditPreviewProps> = ({
   // "Edit" hint appears under the pointer rather than centered on the row.
   const tooltipPositioning: TooltipProps['positioning'] = {
     placement: 'bottom-start',
-    offset: { mainAxis: 12, crossAxis: 8 },
+    // Clear the ~16-20px pointer-cursor graphic, leaving a small gap below it.
+    offset: { mainAxis: 24, crossAxis: 0 },
     getAnchorRect: () => ({
       x: pointerRef.current.x,
       y: pointerRef.current.y,
@@ -108,7 +125,15 @@ export const AttributeEditPreview: FC<AttributeEditPreviewProps> = ({
         className,
       )}
     >
-      <span className={cn('min-w-0 flex-1 truncate', isLoading && 'opacity-50')}>{children}</span>
+      <span
+        className={cn(
+          'min-w-0 flex-1',
+          lineClamp ? LINE_CLAMP_CLASS[lineClamp] : 'truncate',
+          isLoading && 'opacity-50',
+        )}
+      >
+        {children}
+      </span>
       {isLoading ? (
         <Loader type='circle' size='md' />
       ) : status === 'saved' ? (
