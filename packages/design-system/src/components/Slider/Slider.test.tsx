@@ -259,3 +259,18 @@ describe('Slider — marks / ordinal scale', () => {
     expect(() => fireEvent.click(high)).not.toThrow();
   });
 });
+
+describe('Slider — thumb tooltip', () => {
+  it('renders a thumb with the tooltip affordance (bubble is drag-driven, asserted in E2E)', () => {
+    // The tooltip opens only on api.dragging, which jsdom can't drive — so we only assert
+    // the thumb still renders as the real control when tooltip is enabled.
+    const { container } = render(
+      <Slider defaultValue={[50]}>
+        <SliderControl>
+          <SliderThumb aria-label='Value' tooltip />
+        </SliderControl>
+      </Slider>,
+    );
+    expect(getThumbs(container)[0]).toHaveAttribute('role', 'slider');
+  });
+});
