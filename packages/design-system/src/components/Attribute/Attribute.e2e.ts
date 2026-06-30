@@ -8,6 +8,12 @@ const attributeStory = createStoryHelper('data-display-attribute', [
   'Horizontal Loading',
   'Horizontal With Actions',
   'Horizontal With Actions Menu Only',
+  'Inline Edit Text',
+  'Inline Edit Error',
+  'Inline Edit Loading',
+  'Inline Edit Saved',
+  'Inline Edit Horizontal',
+  'Inline Edit Async',
 ] as const);
 
 test.describe('Component: Attribute', () => {
@@ -41,6 +47,44 @@ test.describe('Component: Attribute', () => {
       if (!box) throw new Error('target box not measurable');
       await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2);
       await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render inline edit read state correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Text');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render inline edit hover affordance correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Text');
+      await page.getByTestId('attr--edit-preview').hover();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render inline edit editing state correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Text');
+      await page.getByTestId('attr--edit-preview').click();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render inline edit error state correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Error');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render inline edit loading state correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Loading');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render inline edit saved state correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Saved');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render inline edit horizontal orientation correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Horizontal');
+      await page.getByTestId('attr--edit-preview').click();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
   });
 
@@ -114,6 +158,71 @@ test.describe('Component: Attribute', () => {
 
       await expect(overflowContent).toBeVisible();
       await expect(dropdownContent).toBeHidden();
+    });
+
+    test('Should enter edit mode and commit on Enter', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Text');
+      await page.getByTestId('attr--edit-preview').click();
+      const input = page.getByTestId('attr--edit-input');
+      await expect(input).toBeFocused();
+      await input.fill('Payments API');
+      await input.press('Enter');
+      await expect(page.getByTestId('attr--edit-preview')).toHaveText(/Payments API/);
+    });
+
+    test('Should revert on Escape', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Text');
+      await page.getByTestId('attr--edit-preview').click();
+      const input = page.getByTestId('attr--edit-input');
+      await input.fill('Discarded');
+      await input.press('Escape');
+      await expect(page.getByTestId('attr--edit-preview')).toHaveText(/Checkout API/);
+    });
+
+    test('Should commit on blur', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Text');
+      await page.getByTestId('attr--edit-preview').click();
+      const input = page.getByTestId('attr--edit-input');
+      await input.fill('Blurred API');
+      await input.press('Tab');
+      await expect(page.getByTestId('attr--edit-preview')).toHaveText(/Blurred API/);
+    });
+
+    test('Should show loading then saved during async commit', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Async');
+      await page.getByTestId('attr--edit-preview').click();
+      const input = page.getByTestId('attr--edit-input');
+      await input.fill('Async API');
+      await input.press('Enter');
+      // loading spinner visible inside the preview while the promise is pending
+      await expect(page.getByTestId('attr--edit-preview')).toHaveText(/Async API/);
+    });
+
+    test('Should surface error and stay in edit on rejected commit', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Async');
+      await page.getByTestId('attr--edit-preview').click();
+      const input = page.getByTestId('attr--edit-input');
+      await input.fill('');
+      await input.press('Enter');
+      await expect(page.getByTestId('attr--edit-error')).toBeVisible();
+      await expect(page.getByTestId('attr--edit-input')).toBeVisible();
+    });
+  });
+
+  test.describe('Accessibility', () => {
+    test('Should enter edit via keyboard activation', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Text');
+      const preview = page.getByTestId('attr--edit-preview');
+      await preview.focus();
+      await preview.press('Enter');
+      await expect(page.getByTestId('attr--edit-input')).toBeFocused();
+    });
+
+    test('Should cancel edit via Escape and restore focus to preview', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Text');
+      await page.getByTestId('attr--edit-preview').click();
+      await page.getByTestId('attr--edit-input').press('Escape');
+      await expect(page.getByTestId('attr--edit-preview')).toBeVisible();
     });
   });
 });
