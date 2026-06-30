@@ -1048,6 +1048,7 @@ function TimeEditor() {
         onChange={v => setValue(v instanceof Time ? v : null)}
         granularity='minute'
         showTimeDropdown
+        showIcon={false}
       />
     </DateFormatProvider>
   );
