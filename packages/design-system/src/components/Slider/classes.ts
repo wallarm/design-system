@@ -12,7 +12,13 @@ import { cn } from '../../utils/cn';
  */
 export const sliderVariants = cva(
   cn(
-    'relative flex w-full touch-none select-none items-center',
+    // The root IS the layout row: inline `SliderInput`(s) flank a flex-growing
+    // `SliderControl`, 8px gap (Figma `spacing-8`). With a single control child the
+    // gap is inert.
+    'relative flex w-full touch-none select-none items-center gap-8',
+    // Reserve room below the track for the tick-label band when <SliderMarks> renders
+    // (overlaid absolutely). Replaces the old JS-driven `pb-28`.
+    '[&:has([data-slot=slider-marker-group])]:pb-28',
     // Disabled — whole control dimmed + non-interactive (requirements §5)
     'data-disabled:opacity-50 data-disabled:cursor-not-allowed',
   ),
@@ -118,9 +124,6 @@ export const sliderThumbClassNames = cn(
   // Disabled — non-interactive; root handles the 50% opacity.
   'data-disabled:pointer-events-none data-disabled:cursor-not-allowed',
 );
-
-/** Row that lays the slider control out beside its inline Input(s). 8px gap (Figma `spacing-8`). */
-export const sliderInputRowClassNames = cn('flex w-full items-center gap-8');
 
 /**
  * Each inline value Input: a fixed 48px-wide box (Figma `_text-box`), centred

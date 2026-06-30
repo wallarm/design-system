@@ -1,2 +1,5 @@
 export { sliderVariants } from './classes';
-export { Slider, type SliderMark, type SliderProps } from './Slider';
+export { Slider, type SliderProps } from './Slider';
+export { SliderControl, type SliderControlProps } from './SliderControl';
+export { SliderThumb, type SliderThumbProps } from './SliderThumb';
+export type { SliderMark } from './types';
