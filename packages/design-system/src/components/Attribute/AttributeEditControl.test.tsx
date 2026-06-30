@@ -33,16 +33,10 @@ describe('AttributeEditControl', () => {
     expect(screen.getByTestId('editor')).toHaveFocus();
   });
 
-  it('submits on Enter and cancels on Escape', async () => {
+  it('submits on Enter', async () => {
     const onCommit = vi.fn();
-    const onRevert = vi.fn();
     render(
-      <AttributeEdit
-        defaultEdit
-        onValueCommit={onCommit}
-        onValueRevert={onRevert}
-        data-testid='attr'
-      >
+      <AttributeEdit defaultEdit onValueCommit={onCommit} data-testid='attr'>
         <AttributeEditControl>
           <ControlledInput />
         </AttributeEditControl>
@@ -50,9 +44,6 @@ describe('AttributeEditControl', () => {
     );
     await userEvent.keyboard('{Enter}');
     expect(onCommit).toHaveBeenCalledTimes(1);
-
-    // re-open and Escape
-    // (component exits edit on submit; render a fresh tree)
   });
 
   it('cancels on Escape', async () => {

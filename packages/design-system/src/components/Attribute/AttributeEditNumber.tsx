@@ -7,6 +7,14 @@ type NumberInputValueChangeDetails = Parameters<NonNullable<NumberInputProps['on
 
 export type AttributeEditNumberProps = Omit<NumberInputProps, 'value' | 'onValueChange' | 'error'>;
 
+/**
+ * Analytics closed-target gap: `NumberInput` spreads consumer props onto its
+ * Ark `Root` wrapper rather than the inner `<input>`, so `data-analytics-*`
+ * land on the wrapper (click analytics still resolve via `closest()`, but the
+ * attribute is not on the real focusable node). The durable fix is to forward
+ * those attributes to the input inside `NumberInput`. See ./ANALYTICS_GAPS.md.
+ */
+
 export const AttributeEditNumber: FC<AttributeEditNumberProps> = ({
   'data-testid': testIdProp,
   ...props
