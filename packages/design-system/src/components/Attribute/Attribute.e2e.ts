@@ -8,12 +8,11 @@ const attributeStory = createStoryHelper('data-display-attribute', [
   'Horizontal Loading',
   'Horizontal With Actions',
   'Horizontal With Actions Menu Only',
-  'Inline Edit Text',
-  'Inline Edit Error',
-  'Inline Edit Loading',
-  'Inline Edit Saved',
-  'Inline Edit Horizontal',
+  'Inline Edit',
+  'Inline Edit States',
   'Inline Edit Async',
+  'Inline Edit Horizontal',
+  'Inline Edit Horizontal States',
 ] as const);
 
 test.describe('Component: Attribute', () => {
@@ -49,41 +48,35 @@ test.describe('Component: Attribute', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render inline edit read state correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Text');
+    test('Should render inline edit gallery correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit');
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
     test('Should render inline edit hover affordance correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Text');
-      await page.getByTestId('attr--edit-preview').hover();
+      await attributeStory.goto(page, 'Inline Edit');
+      await page.getByTestId('text--edit-preview').hover();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
     test('Should render inline edit editing state correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Text');
-      await page.getByTestId('attr--edit-preview').click();
+      await attributeStory.goto(page, 'Inline Edit');
+      await page.getByTestId('text--edit-preview').click();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
-    test('Should render inline edit error state correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Error');
+    test('Should render inline edit states correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit States');
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
-    test('Should render inline edit loading state correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Loading');
-      await expect(page).toHaveScreenshot({ animations: 'disabled' });
-    });
-
-    test('Should render inline edit saved state correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Saved');
-      await expect(page).toHaveScreenshot({ animations: 'disabled' });
-    });
-
-    test('Should render inline edit horizontal orientation correctly', async ({ page }) => {
+    test('Should render inline edit horizontal gallery correctly', async ({ page }) => {
       await attributeStory.goto(page, 'Inline Edit Horizontal');
-      await page.getByTestId('attr--edit-preview').click();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render inline edit horizontal states correctly', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit Horizontal States');
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
   });
@@ -161,31 +154,31 @@ test.describe('Component: Attribute', () => {
     });
 
     test('Should enter edit mode and commit on Enter', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Text');
-      await page.getByTestId('attr--edit-preview').click();
-      const input = page.getByTestId('attr--edit-input');
+      await attributeStory.goto(page, 'Inline Edit');
+      await page.getByTestId('text--edit-preview').click();
+      const input = page.getByTestId('text--edit-input');
       await expect(input).toBeFocused();
       await input.fill('Payments API');
       await input.press('Enter');
-      await expect(page.getByTestId('attr--edit-preview')).toHaveText(/Payments API/);
+      await expect(page.getByTestId('text--edit-preview')).toHaveText(/Payments API/);
     });
 
     test('Should revert on Escape', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Text');
-      await page.getByTestId('attr--edit-preview').click();
-      const input = page.getByTestId('attr--edit-input');
+      await attributeStory.goto(page, 'Inline Edit');
+      await page.getByTestId('text--edit-preview').click();
+      const input = page.getByTestId('text--edit-input');
       await input.fill('Discarded');
       await input.press('Escape');
-      await expect(page.getByTestId('attr--edit-preview')).toHaveText(/Checkout API/);
+      await expect(page.getByTestId('text--edit-preview')).toHaveText(/Checkout API/);
     });
 
     test('Should commit on blur', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Text');
-      await page.getByTestId('attr--edit-preview').click();
-      const input = page.getByTestId('attr--edit-input');
+      await attributeStory.goto(page, 'Inline Edit');
+      await page.getByTestId('text--edit-preview').click();
+      const input = page.getByTestId('text--edit-input');
       await input.fill('Blurred API');
       await input.press('Tab');
-      await expect(page.getByTestId('attr--edit-preview')).toHaveText(/Blurred API/);
+      await expect(page.getByTestId('text--edit-preview')).toHaveText(/Blurred API/);
     });
 
     test('Should show loading then saved during async commit', async ({ page }) => {
@@ -211,18 +204,18 @@ test.describe('Component: Attribute', () => {
 
   test.describe('Accessibility', () => {
     test('Should enter edit via keyboard activation', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Text');
-      const preview = page.getByTestId('attr--edit-preview');
+      await attributeStory.goto(page, 'Inline Edit');
+      const preview = page.getByTestId('text--edit-preview');
       await preview.focus();
       await preview.press('Enter');
-      await expect(page.getByTestId('attr--edit-input')).toBeFocused();
+      await expect(page.getByTestId('text--edit-input')).toBeFocused();
     });
 
     test('Should cancel edit via Escape', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Text');
-      await page.getByTestId('attr--edit-preview').click();
-      await page.getByTestId('attr--edit-input').press('Escape');
-      await expect(page.getByTestId('attr--edit-preview')).toBeVisible();
+      await attributeStory.goto(page, 'Inline Edit');
+      await page.getByTestId('text--edit-preview').click();
+      await page.getByTestId('text--edit-input').press('Escape');
+      await expect(page.getByTestId('text--edit-preview')).toBeVisible();
     });
   });
 });
