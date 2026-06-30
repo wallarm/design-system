@@ -1,4 +1,4 @@
-import { type FC, useCallback, useState } from 'react';
+import { type FC, type MutableRefObject, useCallback, useReducer } from 'react';
 import { DatePicker, type UseDatePickerReturn } from '@ark-ui/react';
 import { CalendarDateTime } from '@internationalized/date';
 import type { DateValue as ReactAriaDateValue } from '@react-aria/datepicker';
@@ -34,19 +34,20 @@ const toArkDateValue = (date: ReactAriaDateValue | null | undefined): DateValue 
  * Uses controlled mode for reliable sync.
  */
 /**
- * Promote a date-only value to a `CalendarDateTime` carrying `time`.
+ * Build the `showTime` header value from a date and the tracked time.
  *
- * The calendar grid only ever produces date-only `CalendarDate`s, but a
- * `showTime` header renders a minute-granularity `DateInput` which rejects
- * date-only values (`Invalid granularity minute`). Merging the last-known
- * time keeps the picked time intact when the user jumps between days.
+ * Time is owned by `Calendar`'s `timeRef`, not by Ark — Ark's DatePicker keys
+ * its value by date and would carry a stale (or missing) time. Reconstructing
+ * `date + trackedTime` keeps the minute-granularity `DateInput` happy (it
+ * rejects date-only values: `Invalid granularity minute`) and reflects time
+ * edits immediately. Returns a fresh value each call, but with equal fields
+ * react-aria treats it as unchanged, so editing is not disrupted.
  */
 const withTime = (
   value: ReactAriaDateValue | null,
   time: { hour: number; minute: number },
 ): ReactAriaDateValue | null => {
   if (!value) return null;
-  if ('hour' in value) return value;
   return new CalendarDateTime(
     value.year,
     value.month,
@@ -56,13 +57,20 @@ const withTime = (
   ) as unknown as ReactAriaDateValue;
 };
 
+const sameDate = (a: DateValue | undefined, b: ReactAriaDateValue | null): boolean =>
+  !!a && !!b && a.year === b.year && a.month === b.month && a.day === b.day;
+
 const SingleDateInputInner: FC<{
   api: UseDatePickerReturn;
   readonly?: boolean;
   showTime?: boolean;
-}> = ({ api, readonly, showTime }) => {
-  // Last time the user picked — re-applied to grid-selected (date-only) days.
-  const [time, setTime] = useState({ hour: 0, minute: 0 });
+  timeRef?: MutableRefObject<{ hour: number; minute: number }>;
+  commitValue?: (value: DateValue[]) => void;
+}> = ({ api, readonly, showTime, timeRef, commitValue }) => {
+  // Time lives in `timeRef` (a ref, so `Calendar` can read it synchronously).
+  // A time-only edit may not trigger any other state change (uncontrolled, or
+  // a consumer that ignores `onChange`), so force a re-render to reflect it.
+  const [, bumpTime] = useReducer((n: number) => n + 1, 0);
 
   const handleChange = useCallback(
     (newValue: ReactAriaDateValue | null) => {
@@ -78,16 +86,28 @@ const SingleDateInputInner: FC<{
 
   const handleDateTimeChange = useCallback(
     (newValue: ReactAriaDateValue | null) => {
-      if (newValue && 'hour' in newValue) {
-        setTime({ hour: newValue.hour, minute: newValue.minute });
+      // Record the chosen time so a later grid pick (date-only) keeps it.
+      // `Calendar`'s `withTrackedTime` reads the same ref to promote grid picks.
+      if (newValue && 'hour' in newValue && timeRef) {
+        timeRef.current = { hour: newValue.hour, minute: newValue.minute };
       }
-      handleChange(newValue);
+      // A time-only edit keeps the date; Ark dedupes same-date values and would
+      // drop it, so commit straight to the consumer. A date change goes through
+      // Ark so the grid and view stay in sync.
+      if (newValue && sameDate(api.value[0], newValue)) {
+        const arkValue = toArkDateValue(newValue);
+        if (arkValue) commitValue?.([arkValue]);
+        bumpTime();
+      } else {
+        handleChange(newValue);
+      }
     },
-    [handleChange],
+    [api, handleChange, timeRef, commitValue],
   );
 
   // Use null for controlled mode when no value (not undefined)
   const inputValue = toReactAriaDateValue(api.value[0]);
+  const time = timeRef?.current ?? { hour: 0, minute: 0 };
 
   return (
     <div className='flex flex-1' onKeyDown={e => e.stopPropagation()}>
@@ -195,7 +215,7 @@ const RangeDateInputInner: FC<{
  * Automatically determines mode from CalendarContext.
  */
 export const CalendarInputHeader: FC<CalendarInputHeaderProps> = ({ className }) => {
-  const { isRange, readonly, showTime } = useCalendarContext();
+  const { isRange, readonly, showTime, timeRef, commitValue } = useCalendarContext();
 
   return (
     <div className={cn('flex flex-1 items-center', 'pt-20 pb-4 px-20', className)}>
@@ -204,7 +224,13 @@ export const CalendarInputHeader: FC<CalendarInputHeaderProps> = ({ className })
           isRange ? (
             <RangeDateInputInner api={api} readonly={readonly} />
           ) : (
-            <SingleDateInputInner api={api} readonly={readonly} showTime={showTime} />
+            <SingleDateInputInner
+              api={api}
+              readonly={readonly}
+              showTime={showTime}
+              timeRef={timeRef}
+              commitValue={commitValue}
+            />
           )
         }
       </DatePicker.Context>

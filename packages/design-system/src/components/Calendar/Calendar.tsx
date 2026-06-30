@@ -1,7 +1,8 @@
-import { type FC, type ReactNode, useCallback } from 'react';
+import { type FC, type ReactNode, useCallback, useRef } from 'react';
 import { DatePicker } from '@ark-ui/react';
 import {
   CalendarDate,
+  CalendarDateTime,
   endOfMonth,
   getLocalTimeZone,
   startOfMonth,
@@ -153,6 +154,49 @@ export const Calendar: FC<CalendarProps> = ({
   const isRange = type === 'range';
   const numOfMonths = isRange ? 2 : 1;
 
+  // Last-known time-of-day for `showTime` single mode. The grid emits date-only
+  // values; this lets `handleValueChange` promote them to a `CalendarDateTime`
+  // so the chosen time survives a day change and reaches `onChange`.
+  const timeRef = useRef({ hour: 0, minute: 0 });
+  // Keep the tracked time in sync with the current value (controlled or
+  // default) so the first grid pick after open re-applies the existing time
+  // rather than resetting it to midnight. Assigning a ref during render is
+  // idempotent and safe.
+  if (showTime && !isRange) {
+    const current = (value ?? defaultValue)?.[0];
+    if (current && 'hour' in current) {
+      timeRef.current = { hour: current.hour, minute: current.minute };
+    }
+  }
+
+  /** Promote a date-only value to a `CalendarDateTime` carrying the tracked time. */
+  const withTrackedTime = useCallback((date: DateValue): DateValue => {
+    if ('hour' in date) {
+      timeRef.current = { hour: date.hour, minute: date.minute };
+      return date;
+    }
+    return toDateValue(
+      new CalendarDateTime(
+        date.year,
+        date.month,
+        date.day,
+        timeRef.current.hour,
+        timeRef.current.minute,
+      ),
+    );
+  }, []);
+
+  // Emit to the consumer, promoting date-only values to `CalendarDateTime` in
+  // single `showTime` mode. Exposed via context so the `showTime` header can
+  // commit a time-only edit that Ark's date-keyed machine would otherwise drop.
+  const commitValue = useCallback(
+    (next: DateValue[]) => {
+      const emitted = showTime && !isRange ? next.map(withTrackedTime) : next;
+      onChange?.(emitted);
+    },
+    [showTime, isRange, withTrackedTime, onChange],
+  );
+
   /** Check if any date in the range is unavailable */
   const hasUnavailableDateInRange = useCallback(
     (start: DateValue, end: DateValue): boolean => {
@@ -197,9 +241,11 @@ export const Calendar: FC<CalendarProps> = ({
         }
       }
 
-      onChange?.(newValue);
+      // In single `showTime` mode the grid produces date-only values; promote
+      // them to `CalendarDateTime` so `onChange` always carries the chosen time.
+      commitValue(newValue);
     },
-    [onChange, disallowDisabledDatesInRange, isRange, hasUnavailableDateInRange],
+    [commitValue, disallowDisabledDatesInRange, isRange, hasUnavailableDateInRange],
   );
 
   const handleOpenChange = useCallback(
@@ -217,6 +263,8 @@ export const Calendar: FC<CalendarProps> = ({
     showKeyboardHints,
     showTime,
     readonly,
+    timeRef,
+    commitValue,
   };
 
   return (
