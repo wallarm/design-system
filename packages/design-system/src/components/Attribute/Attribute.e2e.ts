@@ -53,9 +53,10 @@ test.describe('Component: Attribute', () => {
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
-    test('Should render inline edit hover affordance correctly', async ({ page }) => {
+    test('Should render inline edit hover affordance with tooltip correctly', async ({ page }) => {
       await attributeStory.goto(page, 'Inline Edit');
       await page.getByTestId('text--edit-preview').hover();
+      await expect(page.getByTestId('text--content')).toHaveText('Edit');
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
