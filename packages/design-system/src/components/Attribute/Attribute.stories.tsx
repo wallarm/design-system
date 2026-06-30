@@ -1120,7 +1120,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
     >
       <Attribute orientation={orientation} data-testid='text'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit value={text} onValueCommit={v => setText(v as string)}>
             <AttributeEditPreview>{text}</AttributeEditPreview>
             <AttributeEditControl>
@@ -1133,7 +1133,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='number'>
         <AttributeLabel>Port</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit value={port} onValueCommit={v => setPort(v as string)}>
             <AttributeEditPreview>{port}</AttributeEditPreview>
             <AttributeEditControl>
@@ -1145,7 +1145,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='textarea'>
         <AttributeLabel>About</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit value={about} onValueCommit={v => setAbout(v as string)}>
             <AttributeEditPreview lineClamp={3}>{about}</AttributeEditPreview>
             <AttributeEditControl>
@@ -1158,7 +1158,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='select'>
         <AttributeLabel>Role</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit
             value={role}
             onValueCommit={v => setRole(v as string[])}
@@ -1177,7 +1177,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='multi-select'>
         <AttributeLabel>Roles</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit
             value={roles}
             onValueCommit={v => setRoles(v as string[])}
@@ -1196,7 +1196,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='tags'>
         <AttributeLabel>Tags</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit
             value={tags}
             onValueCommit={v => setTags(v as string[])}
@@ -1219,7 +1219,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='date'>
         <AttributeLabel>Date</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit
             value={date}
             onValueCommit={v => setDate(v as DateValue | null)}
@@ -1259,7 +1259,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='datetime'>
         <AttributeLabel>Date &amp; Time</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit
             value={dateTime}
             onValueCommit={v => setDateTime(v as CalendarDateTime | null)}
@@ -1289,7 +1289,7 @@ function InlineEditStatesList({ orientation = 'vertical' }: { orientation?: Inli
     <div className='flex w-[420px] flex-col gap-12'>
       <Attribute orientation={orientation} data-testid='loading'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit defaultValue='Checkout API and ABC' status='loading'>
             <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
             <AttributeEditControl>
@@ -1301,7 +1301,7 @@ function InlineEditStatesList({ orientation = 'vertical' }: { orientation?: Inli
 
       <Attribute orientation={orientation} data-testid='saved'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit defaultValue='Checkout API and ABC' status='saved'>
             <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
             <AttributeEditControl>
@@ -1313,7 +1313,7 @@ function InlineEditStatesList({ orientation = 'vertical' }: { orientation?: Inli
 
       <Attribute orientation={orientation} data-testid='error'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit
             defaultValue='Checkout API and ABC'
             defaultEdit
@@ -1354,7 +1354,7 @@ function InlineEditAsyncDemo({ orientation = 'vertical' }: { orientation?: Inlin
     <div className={orientation === 'horizontal' ? 'w-[420px]' : 'w-[320px]'}>
       <Attribute orientation={orientation} data-testid='attr'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue>
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit value={value} onValueCommit={save}>
             <AttributeEditPreview>{value}</AttributeEditPreview>
             <AttributeEditControl>
