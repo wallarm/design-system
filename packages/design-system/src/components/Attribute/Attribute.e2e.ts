@@ -194,7 +194,7 @@ test.describe('Component: Attribute', () => {
       const input = page.getByTestId('attr--edit-input');
       await input.fill('Async API');
       await input.press('Enter');
-      // loading spinner visible inside the preview while the promise is pending
+      // The async commit resolves and the preview shows the committed value.
       await expect(page.getByTestId('attr--edit-preview')).toHaveText(/Async API/);
     });
 
@@ -218,7 +218,7 @@ test.describe('Component: Attribute', () => {
       await expect(page.getByTestId('attr--edit-input')).toBeFocused();
     });
 
-    test('Should cancel edit via Escape and restore focus to preview', async ({ page }) => {
+    test('Should cancel edit via Escape', async ({ page }) => {
       await attributeStory.goto(page, 'Inline Edit Text');
       await page.getByTestId('attr--edit-preview').click();
       await page.getByTestId('attr--edit-input').press('Escape');

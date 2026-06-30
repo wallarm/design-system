@@ -127,6 +127,7 @@ export function AttributeEdit<T = unknown>({
   }, [committedValue, setEditingState, onValueRevert]);
 
   const submit = useCallback(() => {
+    if ((status ?? autoStatus) === 'loading') return;
     const current = draftRef.current;
     const result = onValueCommit?.(current);
     if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
@@ -153,7 +154,7 @@ export function AttributeEdit<T = unknown>({
     }
     setCommitted(current);
     setEditingState(false);
-  }, [onValueCommit, setCommitted, setEditingState, savedDuration]);
+  }, [onValueCommit, setCommitted, setEditingState, savedDuration, status, autoStatus]);
 
   const contextValue = useMemo<AttributeEditContextValue<T>>(
     () => ({
