@@ -193,3 +193,41 @@ describe('TableLayout column engine — resize', () => {
     expect(onSizing).toHaveBeenCalledWith({ a: 160 }); // 120 + (240-200) = 160
   });
 });
+
+describe('TableLayout column engine — metrics readiness', () => {
+  const ResizeProbe = () => {
+    const { columns, controller } = useTableLayoutColumns(
+      [{ columnId: 'a', width: 120, resizable: true }],
+      {
+        // biome-ignore lint/suspicious/noEmptyBlockStatements: no-op fixture
+        onColumnSizingChange: () => {},
+      },
+    );
+    return (
+      <TableLayout aria-label='Metrics' controller={controller}>
+        <TableLayoutColumnGroup>
+          {columns.map(c => (
+            <TableLayoutColumn key={c.columnId} {...c} />
+          ))}
+        </TableLayoutColumnGroup>
+        <TableLayoutHead>
+          <TableLayoutRow>
+            <TableLayoutHeaderCell columnId='a'>A</TableLayoutHeaderCell>
+          </TableLayoutRow>
+        </TableLayoutHead>
+        <TableLayoutBody>
+          <TableLayoutRow rowId='r1'>
+            <TableLayoutCell columnId='a'>x</TableLayoutCell>
+          </TableLayoutRow>
+        </TableLayoutBody>
+      </TableLayout>
+    );
+  };
+
+  it('renders the resize handle with a data-slot pass-through hook', () => {
+    const { container } = render(<ResizeProbe />);
+    const handle = container.querySelector('[data-slot="resize-handle"]');
+    expect(handle).not.toBeNull();
+    expect(handle).toHaveAttribute('data-slot', 'resize-handle');
+  });
+});
