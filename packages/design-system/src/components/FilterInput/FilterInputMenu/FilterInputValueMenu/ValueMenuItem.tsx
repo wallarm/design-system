@@ -40,6 +40,11 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
         <Text size='sm' truncate>
           {option.label}
         </Text>
+        {option.description && (
+          <Text size='xs' color='secondary' truncate>
+            {option.description}
+          </Text>
+        )}
       </div>
     )}
 

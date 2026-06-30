@@ -385,6 +385,58 @@ export const PairedFieldValueIsSet: Story = {
 };
 
 /**
+ * Paired field whose `Context Param` value list shows a muted secondary line
+ * (the backend path) beneath each bold key name. The bold name is **not
+ * unique** — two `request-id` rows appear under different paths, and the
+ * description line is what tells them apart. Selecting a row commits its unique
+ * path value, not the shared label.
+ */
+const describedParamFields: FieldMetadata[] = [
+  {
+    name: 'context_param',
+    label: 'Context Param',
+    type: 'enum',
+    operators: ['='],
+    values: [
+      {
+        value: 'requests->headers->request-id',
+        label: 'request-id',
+        description: 'requests->headers->request-id',
+      },
+      {
+        value: 'requests->headers->cookie->JSESSION-ID',
+        label: 'JSESSION-ID',
+        description: 'requests->headers->cookie->JSESSION-ID',
+      },
+      {
+        // Same bold label as the first row — distinguished only by its path.
+        value: 'requests->body->request-id',
+        label: 'request-id',
+        description: 'requests->body->request-id',
+      },
+    ],
+    pairedField: {
+      name: 'context_value',
+      label: 'Value',
+      type: 'string',
+      options: [],
+      operators: ['=', '!=', 'like', 'not_like', 'is_null', 'is_not_null'],
+    },
+  },
+  { name: 'method', label: 'Method', type: 'enum', options: ['GET', 'POST', 'PUT', 'DELETE'] },
+];
+
+export const PairedFieldValueDescriptions: Story = {
+  render: () => {
+    const ParentComponent = () => {
+      const [value, setValue] = useState<ExprNode | null>(null);
+      return <FilterInput fields={describedParamFields} value={value} onChange={setValue} />;
+    };
+    return <ParentComponent />;
+  },
+};
+
+/**
  * Paired field pre-populated with both values, rendered as one chip.
  */
 export const PairedFieldPreset: Story = {
