@@ -1,6 +1,7 @@
 import type { ComponentProps } from 'react';
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
+import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Field, FieldLabel } from '../Field';
 import { Slider } from './Slider';
 import { SliderControl } from './SliderControl';
@@ -17,6 +18,15 @@ const Single = (props: ComponentProps<typeof Slider>) => (
   <Slider {...props}>
     <SliderControl>
       <SliderThumb aria-label='Value' />
+    </SliderControl>
+  </Slider>
+);
+
+const Range = (props: ComponentProps<typeof Slider>) => (
+  <Slider defaultValue={[20, 80]} {...props}>
+    <SliderControl>
+      <SliderThumb index={0} />
+      <SliderThumb index={1} />
     </SliderControl>
   </Slider>
 );
@@ -97,5 +107,102 @@ describe('Slider — Field context', () => {
     const labelledBy = getThumbs(container)[0].getAttribute('aria-labelledby');
     expect(labelledBy).toBeTruthy();
     expect(document.getElementById(labelledBy as string)).toHaveTextContent('Risk threshold');
+  });
+});
+
+describe('Slider — range', () => {
+  it('renders two thumbs defaulting to Minimum / Maximum labels', () => {
+    const { container } = render(<Range />);
+    const thumbs = getThumbs(container);
+    expect(thumbs).toHaveLength(2);
+    expect(thumbs[0]).toHaveAttribute('aria-label', 'Minimum');
+    expect(thumbs[1]).toHaveAttribute('aria-label', 'Maximum');
+    expect(thumbs[0]).toHaveAttribute('aria-valuenow', '20');
+    expect(thumbs[1]).toHaveAttribute('aria-valuenow', '80');
+  });
+
+  it('clamps range thumbs so they cannot cross', () => {
+    const { container } = render(<Range />);
+    const [low, high] = getThumbs(container);
+    expect(low).toHaveAttribute('aria-valuemax', '80');
+    expect(high).toHaveAttribute('aria-valuemin', '20');
+  });
+
+  it('accepts per-thumb aria-labels', () => {
+    const { container } = render(
+      <Slider defaultValue={[10, 90]}>
+        <SliderControl>
+          <SliderThumb index={0} aria-label='Floor' />
+          <SliderThumb index={1} aria-label='Ceiling' />
+        </SliderControl>
+      </Slider>,
+    );
+    const thumbs = getThumbs(container);
+    expect(thumbs[0]).toHaveAttribute('aria-label', 'Floor');
+    expect(thumbs[1]).toHaveAttribute('aria-label', 'Ceiling');
+  });
+});
+
+describe('Slider — analytics pass-through (each thumb is the real node, CG-1 closed)', () => {
+  it('forwards a distinct data-analytics-id to each range thumb', () => {
+    const { container } = render(
+      <Slider defaultValue={[20, 80]} data-testid='s'>
+        <SliderControl>
+          <SliderThumb index={0} data-analytics-id='PRICE_MIN' />
+          <SliderThumb index={1} data-analytics-id='PRICE_MAX' />
+        </SliderControl>
+      </Slider>,
+    );
+    const thumbs = getThumbs(container);
+    expect(thumbs[0]).toHaveAttribute('role', 'slider');
+    expect(thumbs[0]).toHaveAttribute('data-analytics-id', 'PRICE_MIN');
+    expect(thumbs[1]).toHaveAttribute('data-analytics-id', 'PRICE_MAX');
+    // The Ark Root wrapper must NOT strand the id (the gap NumberInput has).
+    expect(screen.getByTestId('s')).not.toHaveAttribute('data-analytics-id');
+  });
+
+  it('forwards data-analytics-props byte-for-byte to the thumb', () => {
+    const payload = '{"feature":"risk","unit":"score"}';
+    const { container } = render(
+      <Slider defaultValue={[50]}>
+        <SliderControl>
+          <SliderThumb aria-label='Risk' data-analytics-id='RISK' data-analytics-props={payload} />
+        </SliderControl>
+      </Slider>,
+    );
+    expect(getThumbs(container)[0]).toHaveAttribute('data-analytics-props', payload);
+  });
+
+  it('resolves a thumb click to its analytics-id via closest()', () => {
+    const captured = captureAnalyticsClicks();
+    const { container } = render(
+      <Slider defaultValue={[50]}>
+        <SliderControl>
+          <SliderThumb aria-label='Risk' data-analytics-id='RISK_THRESHOLD' />
+        </SliderControl>
+      </Slider>,
+    );
+    // fireEvent (not userEvent) so the visibility:hidden thumb still dispatches.
+    fireEvent.click(getThumbs(container)[0]);
+    expect(captured).toHaveBeenCalledWith('RISK_THRESHOLD');
+  });
+});
+
+describe('Slider — data-testid cascade', () => {
+  it('derives the single thumb id as `{base}--thumb`', () => {
+    const { container } = render(<Single data-testid='risk' />);
+    expect(getThumbs(container)[0]).toHaveAttribute('data-testid', 'risk--thumb');
+  });
+
+  it('derives indexed thumb ids for a range (`{base}--thumb-0/1`)', () => {
+    const { container } = render(<Range data-testid='price' />);
+    const thumbs = getThumbs(container);
+    expect(thumbs[0]).toHaveAttribute('data-testid', 'price--thumb-0');
+    expect(thumbs[1]).toHaveAttribute('data-testid', 'price--thumb-1');
+  });
+
+  it('stays clean (no derived ids) when no data-testid is passed', () => {
+    const { container } = render(<Single />);
+    expect(getThumbs(container)[0]).not.toHaveAttribute('data-testid');
   });
 });
