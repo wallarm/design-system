@@ -35,9 +35,11 @@ export const AttributeEditControl: FC<AttributeEditControlProps> = ({
   const selectOnFocusRef = useRef(selectOnFocus);
   selectOnFocusRef.current = selectOnFocus;
 
-  // Focus the first focusable descendant once when the control mounts (edit start).
-  // Using useEffect with empty deps ensures this runs only on mount, not on re-renders.
+  // Focus the first focusable descendant each time editing begins.
+  // Depends on `editing` so it re-runs whenever the user clicks to edit,
+  // not just on the initial component mount (when editing may be false).
   useEffect(() => {
+    if (!editing) return;
     const node = divRef.current;
     if (!node) return;
     const focusable = node.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
@@ -49,7 +51,7 @@ export const AttributeEditControl: FC<AttributeEditControlProps> = ({
     ) {
       focusable.select();
     }
-  }, []);
+  }, [editing]);
 
   const combinedRef = useCallback(
     (node: HTMLDivElement | null) => {
