@@ -1,64 +1,16 @@
 import { type FC, type MutableRefObject, useCallback, useReducer } from 'react';
 import { DatePicker, type UseDatePickerReturn } from '@ark-ui/react';
-import { CalendarDateTime } from '@internationalized/date';
 import type { DateValue as ReactAriaDateValue } from '@react-aria/datepicker';
 import { cn } from '../../utils/cn';
 import { DateInput } from '../DateInput';
 import { useCalendarContext } from './CalendarContext';
+import { sameDate, toArkDateValue, toReactAriaDateValue, withTime } from './dateValue';
 import type { DateValue } from './types';
 
 export interface CalendarInputHeaderProps {
   /** Additional className for styling */
   className?: string;
 }
-
-/**
- * Converts Ark UI DateValue to React Aria DateValue.
- * Both use @internationalized/date internally, so we can cast directly.
- */
-const toReactAriaDateValue = (date: DateValue | undefined): ReactAriaDateValue | null => {
-  if (!date) return null;
-  return date as unknown as ReactAriaDateValue;
-};
-
-/**
- * Converts React Aria DateValue to Ark UI DateValue.
- */
-const toArkDateValue = (date: ReactAriaDateValue | null | undefined): DateValue | undefined => {
-  if (!date) return undefined;
-  return date as unknown as DateValue;
-};
-
-/**
- * Inner component for single date input that syncs with Ark UI DatePicker.
- * Uses controlled mode for reliable sync.
- */
-/**
- * Build the `showTime` header value from a date and the tracked time.
- *
- * Time is owned by `Calendar`'s `timeRef`, not by Ark — Ark's DatePicker keys
- * its value by date and would carry a stale (or missing) time. Reconstructing
- * `date + trackedTime` keeps the minute-granularity `DateInput` happy (it
- * rejects date-only values: `Invalid granularity minute`) and reflects time
- * edits immediately. Returns a fresh value each call, but with equal fields
- * react-aria treats it as unchanged, so editing is not disrupted.
- */
-const withTime = (
-  value: ReactAriaDateValue | null,
-  time: { hour: number; minute: number },
-): ReactAriaDateValue | null => {
-  if (!value) return null;
-  return new CalendarDateTime(
-    value.year,
-    value.month,
-    value.day,
-    time.hour,
-    time.minute,
-  ) as unknown as ReactAriaDateValue;
-};
-
-const sameDate = (a: DateValue | undefined, b: ReactAriaDateValue | null): boolean =>
-  !!a && !!b && a.year === b.year && a.month === b.month && a.day === b.day;
 
 const SingleDateInputInner: FC<{
   api: UseDatePickerReturn;
@@ -105,15 +57,18 @@ const SingleDateInputInner: FC<{
     [api, handleChange, timeRef, commitValue],
   );
 
-  // Use null for controlled mode when no value (not undefined)
+  // Null (not undefined) keeps the DateInput controlled when empty.
   const inputValue = toReactAriaDateValue(api.value[0]);
   const time = timeRef?.current ?? { hour: 0, minute: 0 };
+  // Rebuild date + tracked time: Ark owns only the date, so the time must come
+  // from timeRef; minute granularity also rejects a date-only value.
+  const dateTimeValue = inputValue ? toReactAriaDateValue(withTime(inputValue, time)) : null;
 
   return (
     <div className='flex flex-1' onKeyDown={e => e.stopPropagation()}>
       {showTime ? (
         <DateInput
-          value={withTime(inputValue, time)}
+          value={dateTimeValue}
           onChange={handleDateTimeChange}
           readOnly={readonly}
           granularity='minute'
