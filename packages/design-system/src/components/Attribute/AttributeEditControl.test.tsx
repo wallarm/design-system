@@ -80,4 +80,21 @@ describe('AttributeEditControl', () => {
     await userEvent.click(screen.getByTestId('attr--edit-preview'));
     expect(screen.getByTestId('editor')).toHaveFocus();
   });
+
+  it('does not cancel on blur when submitMode is "none"', async () => {
+    const onRevert = vi.fn();
+    render(
+      <AttributeEdit defaultEdit submitMode='none' onValueRevert={onRevert} data-testid='attr'>
+        <AttributeEditControl>
+          <ControlledInput />
+        </AttributeEditControl>
+        <button type='button'>outside</button>
+      </AttributeEdit>,
+    );
+    screen.getByTestId('editor').focus();
+    await userEvent.click(screen.getByText('outside'));
+    expect(onRevert).not.toHaveBeenCalled();
+    // still editing — the control stays mounted
+    expect(screen.getByTestId('attr--edit-control')).toBeInTheDocument();
+  });
 });
