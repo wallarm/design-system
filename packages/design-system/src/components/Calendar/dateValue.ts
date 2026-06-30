@@ -15,7 +15,7 @@ export const toArkDateValue = (
   date: ReactAriaDateValue | null | undefined,
 ): DateValue | undefined => (date ? (date as unknown as DateValue) : undefined);
 
-/** Combine a date with an explicit time into a `CalendarDateTime`. */
+/** Build a `CalendarDateTime` from `date`'s day and `time`; any time on `date` is ignored. */
 export const withTime = (date: DateParts, time: { hour: number; minute: number }): DateValue =>
   toDateValue(new CalendarDateTime(date.year, date.month, date.day, time.hour, time.minute));
 

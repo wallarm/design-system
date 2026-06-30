@@ -1,4 +1,4 @@
-import { type FC, type MutableRefObject, useCallback, useReducer } from 'react';
+import { type FC, type RefObject, useCallback, useReducer } from 'react';
 import { DatePicker, type UseDatePickerReturn } from '@ark-ui/react';
 import type { DateValue as ReactAriaDateValue } from '@react-aria/datepicker';
 import { cn } from '../../utils/cn';
@@ -16,7 +16,7 @@ const SingleDateInputInner: FC<{
   api: UseDatePickerReturn;
   readonly?: boolean;
   showTime?: boolean;
-  timeRef?: MutableRefObject<{ hour: number; minute: number }>;
+  timeRef?: RefObject<{ hour: number; minute: number }>;
   commitValue?: (value: DateValue[]) => void;
 }> = ({ api, readonly, showTime, timeRef, commitValue }) => {
   // Time lives in `timeRef` (a ref, so `Calendar` can read it synchronously).
@@ -38,8 +38,8 @@ const SingleDateInputInner: FC<{
 
   const handleDateTimeChange = useCallback(
     (newValue: ReactAriaDateValue | null) => {
-      // Record the chosen time so a later grid pick (date-only) keeps it.
-      // `Calendar`'s `withTrackedTime` reads the same ref to promote grid picks.
+      // Record the chosen time so a later grid pick (date-only) keeps it;
+      // `useCalendarTime` reads the same ref to promote grid picks.
       if (newValue && 'hour' in newValue && timeRef) {
         timeRef.current = { hour: newValue.hour, minute: newValue.minute };
       }
