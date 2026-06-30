@@ -8,11 +8,14 @@ import { useValueMenuDisplayValues } from './useValueMenuDisplayValues';
 import { useValueMenuState } from './useValueMenuState';
 import { ValueMenuFooter } from './ValueMenuFooter';
 import { ValueMenuItem } from './ValueMenuItem';
+import { valueOptionSearchText } from './valueOptionSearchText';
 
 export interface ValueOption {
   value: string | number | boolean;
   label: string;
   badge?: { color: BadgeColor; text: string };
+  /** Muted secondary line rendered beneath the bold `label`. Display-only. */
+  description?: string;
   hasSubmenu?: boolean;
 }
 
@@ -65,7 +68,7 @@ export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
   className,
 }) => {
   const filteredValues = useMemo(
-    () => filterAndSort(values, filterText, v => [v.label, String(v.value)]),
+    () => filterAndSort(values, filterText, valueOptionSearchText),
     [values, filterText],
   );
 
