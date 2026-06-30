@@ -201,6 +201,29 @@ test.describe('Component: Attribute', () => {
       await expect(page.getByTestId('attr--edit-error')).toBeVisible();
       await expect(page.getByTestId('attr--edit-input')).toBeVisible();
     });
+
+    test('Should commit a time edit when the date-time popover closes', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit');
+      const preview = page.getByTestId('datetime--edit-preview');
+      await expect(preview).toHaveText(/2:30 PM/);
+      await preview.click();
+      // The popover header carries the second hour segment (the first belongs to
+      // the trigger input). Editing time here exercises the showTime commit path.
+      await page.getByRole('spinbutton', { name: 'hour' }).last().click();
+      await page.keyboard.type('5');
+      // Closing the popover commits (submitMode='none').
+      await page.mouse.click(5, 5);
+      await expect(preview).toHaveText(/5:30 PM/);
+    });
+
+    test('Should keep the time when a day is picked from the date-time grid', async ({ page }) => {
+      await attributeStory.goto(page, 'Inline Edit');
+      const preview = page.getByTestId('datetime--edit-preview');
+      await preview.click();
+      await page.locator('[data-part="table-cell-trigger"]', { hasText: /^20$/ }).first().click();
+      await page.mouse.click(5, 5);
+      await expect(preview).toHaveText(/20 Jun, 2026 2:30 PM/);
+    });
   });
 
   test.describe('Accessibility', () => {
