@@ -54,7 +54,7 @@ export default meta;
 
 /** Default single-value control — drag the handle or use arrow / Home / End / Page keys. */
 export const Basic: StoryFn<SliderProps> = args => (
-  <Slider aria-label='Value' {...args}>
+  <Slider {...args}>
     <SliderControl>
       <SliderThumb aria-label='Value' />
     </SliderControl>
@@ -83,7 +83,7 @@ export const Range: StoryFn<SliderProps> = args => (
  * nearest thumb to it.
  */
 export const Ticks: StoryFn<SliderProps> = args => (
-  <Slider aria-label='Volume' {...args} step={25} defaultValue={[50]}>
+  <Slider {...args} step={25} defaultValue={[50]}>
     <SliderControl>
       <SliderThumb aria-label='Volume' />
       <SliderMarks
@@ -106,7 +106,7 @@ export const Ticks: StoryFn<SliderProps> = args => (
  * values. Clicking a tick still jumps to it.
  */
 export const TicksWithoutSnapping: StoryFn<SliderProps> = args => (
-  <Slider aria-label='Volume' {...args} step={1} defaultValue={[40]}>
+  <Slider {...args} step={1} defaultValue={[40]}>
     <SliderControl>
       <SliderThumb aria-label='Volume' />
       <SliderMarks
@@ -128,7 +128,7 @@ export const TicksWithoutSnapping: StoryFn<SliderProps> = args => (
  * step lands on a mark.
  */
 export const Labeled: StoryFn<SliderProps> = args => (
-  <Slider aria-label='Risk level' {...args} min={0} max={100} step={50} defaultValue={[50]}>
+  <Slider {...args} min={0} max={100} step={50} defaultValue={[50]}>
     <SliderControl>
       <SliderThumb aria-label='Risk level' />
       <SliderMarks
@@ -147,7 +147,7 @@ export const Labeled: StoryFn<SliderProps> = args => (
  * while dragging. Mutually exclusive with a persistent value readout.
  */
 export const WithTooltip: StoryFn<SliderProps> = args => (
-  <Slider aria-label='Value' {...args}>
+  <Slider {...args}>
     <SliderControl>
       <SliderThumb aria-label='Value' tooltip />
     </SliderControl>
@@ -160,7 +160,7 @@ export const WithTooltip: StoryFn<SliderProps> = args => (
  * `[min, max]`; dragging updates the input. The root lays the input out beside the control.
  */
 export const WithInput: StoryFn<SliderProps> = args => (
-  <Slider aria-label='Value' {...args}>
+  <Slider {...args}>
     <SliderControl>
       <SliderThumb aria-label='Value' />
     </SliderControl>
@@ -182,7 +182,7 @@ export const RangeWithInput: StoryFn<SliderProps> = args => (
 
 /** Disabled — the whole control renders at 50% opacity and is non-interactive. */
 export const Disabled: StoryFn<SliderProps> = args => (
-  <Slider aria-label='Value' {...args} disabled>
+  <Slider {...args} disabled>
     <SliderControl>
       <SliderThumb aria-label='Value' />
     </SliderControl>
@@ -272,16 +272,14 @@ export const RangeFieldWithValue: StoryFn<SliderProps> = args => {
 /**
  * `SliderValue` part — a live readout that reads the slider context (no controlled state
  * needed just to display). Single shows the number; a range shows `low – high`; ordinal
- * scales show the mark label. Here it sits in the label row of a `<Field>`.
+ * scales show the mark label. The root is a horizontal row, so `SliderValue` sits to the
+ * right of the track (like `SliderInput`, but read-only).
  */
 export const WithValueReadout: StoryFn<SliderProps> = args => (
-  <Slider aria-label='Volume' {...args} defaultValue={[60]}>
-    <div className='mb-8 flex w-full items-center justify-between'>
-      <span className='text-sm text-text-secondary'>Volume</span>
-      <SliderValue className='font-medium' />
-    </div>
+  <Slider {...args} defaultValue={[60]}>
     <SliderControl>
       <SliderThumb aria-label='Volume' />
     </SliderControl>
+    <SliderValue className='w-32 shrink-0 text-right font-medium' />
   </Slider>
 );

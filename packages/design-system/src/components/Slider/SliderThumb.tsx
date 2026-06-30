@@ -33,19 +33,29 @@ export const SliderThumb: FC<SliderThumbProps> = ({
   ref,
   'aria-label': ariaLabelProp,
   'aria-labelledby': ariaLabelledbyProp,
+  'aria-describedby': ariaDescribedbyProp,
   ...rest
 }) => {
   const { isRange, disabled, ariaDescribedby, fieldLabelId, marks } = useSliderRootContext();
   const api = useSliderContext();
   const testId = useTestId(isRange ? `thumb-${index}` : 'thumb');
 
-  // Accessible name: explicit on the thumb wins; else single-in-Field → the field label;
-  // else a range default (Minimum / Maximum) by index.
+  // Accessible name. Explicit consumer props always win. Otherwise:
+  //  - single in a Field → the FieldLabel names it (aria-labelledby), no aria-label.
+  //  - range → a default Minimum / Maximum per index.
+  //  - single, no Field, no label → a sensible default so the handle is never unnamed.
   const hasExplicit = ariaLabelProp !== undefined || ariaLabelledbyProp !== undefined;
-  const ariaLabel =
-    ariaLabelProp ?? (!hasExplicit && isRange ? (index === 0 ? 'Minimum' : 'Maximum') : undefined);
-  const ariaLabelledby =
-    ariaLabelledbyProp ?? (!hasExplicit && !isRange ? fieldLabelId : undefined);
+  let ariaLabel = ariaLabelProp;
+  let ariaLabelledby = ariaLabelledbyProp;
+  if (!hasExplicit) {
+    if (isRange) {
+      ariaLabel = index === 0 ? 'Minimum' : 'Maximum';
+    } else if (fieldLabelId) {
+      ariaLabelledby = fieldLabelId;
+    } else {
+      ariaLabel = 'Value';
+    }
+  }
 
   const thumb = (
     <ArkSlider.Thumb
@@ -53,8 +63,14 @@ export const SliderThumb: FC<SliderThumbProps> = ({
       ref={ref}
       index={index}
       aria-label={ariaLabel}
-      aria-labelledby={ariaLabelledby}
-      aria-describedby={ariaDescribedby}
+      // Force the attribute even when we have no id: Ark/zag injects a fallback
+      // `aria-labelledby` pointing at a Label element this DS never renders (it labels
+      // via Field instead) — passing '' overrides that dangling IDREF so `aria-label`
+      // names the node. A real id (explicit, or the Field label) takes precedence.
+      aria-labelledby={ariaLabelledby ?? ''}
+      // Consumer `aria-describedby` wins; else the Field's help/error id (DS-wide gap:
+      // the DS FieldError/Description don't register with Ark, so this is usually empty).
+      aria-describedby={ariaDescribedbyProp ?? ariaDescribedby}
       data-slot='slider-thumb'
       data-testid={testId}
       className={cn(sliderThumbClassNames, className)}

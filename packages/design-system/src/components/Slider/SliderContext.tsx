@@ -4,6 +4,8 @@ import type { SliderMark } from './types';
 export interface SliderRootContextValue {
   /** True when the value has 2+ entries (range) — drives slot-naming + label defaults. */
   isRange: boolean;
+  /** Expected thumb count (`value`/`defaultValue` length) — for the dev thumb-count guard. */
+  thumbCount: number;
   /** Resolved invalid state (own `error` || Field `invalid`) — for sub-part error styling. */
   invalid: boolean;
   /** Resolved disabled state (own `disabled` ?? Field `disabled`). */

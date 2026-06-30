@@ -1,6 +1,6 @@
 import type { ComponentProps } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Field, FieldLabel } from '../Field';
 import { Slider } from './Slider';
@@ -263,9 +263,10 @@ describe('Slider — marks / ordinal scale', () => {
 });
 
 describe('Slider — thumb tooltip', () => {
-  it('renders a thumb with the tooltip affordance (bubble is drag-driven, asserted in E2E)', () => {
-    // The tooltip opens only on api.dragging, which jsdom can't drive — so we only assert
-    // the thumb still renders as the real control when tooltip is enabled.
+  it('renders a thumb with the tooltip affordance enabled', () => {
+    // The bubble opens only on api.dragging, which jsdom can't drive (Ark's value/drag
+    // machine needs real layout); we assert the thumb still renders as the real control
+    // with tooltip enabled. Open-on-drag is verified visually via the WithTooltip story.
     const { container } = render(
       <Slider defaultValue={[50]}>
         <SliderControl>
@@ -387,5 +388,86 @@ describe('Slider — SliderValue readout', () => {
       </Slider>,
     );
     expect(container.querySelector('[data-slot="slider-value"]')).toHaveTextContent('Medium');
+  });
+});
+
+describe('Slider — accessible naming (no dangling aria-labelledby)', () => {
+  // Ark/zag injects a fallback aria-labelledby pointing at a Label element this DS never
+  // renders; the thumb must override it so the name resolves (or falls to aria-label).
+  const labelledbyIsSafe = (thumb: HTMLElement) => {
+    const lb = thumb.getAttribute('aria-labelledby');
+    // safe = absent, empty, or resolves to a real element — never a non-empty dangling ref.
+    return lb === null || lb === '' || document.getElementById(lb) !== null;
+  };
+
+  it('names a bare single thumb (no Field, no explicit label) without a dangling ref', () => {
+    const { container } = render(
+      <Slider defaultValue={[50]}>
+        <SliderControl>
+          <SliderThumb />
+        </SliderControl>
+      </Slider>,
+    );
+    const thumb = getThumbs(container)[0];
+    expect(thumb).toHaveAttribute('aria-label', 'Value');
+    expect(labelledbyIsSafe(thumb)).toBe(true);
+  });
+
+  it('keeps range Minimum/Maximum names with no dangling ref', () => {
+    const { container } = render(<Range />);
+    const thumbs = getThumbs(container);
+    expect(thumbs[0]).toHaveAttribute('aria-label', 'Minimum');
+    expect(thumbs[1]).toHaveAttribute('aria-label', 'Maximum');
+    for (const thumb of thumbs) expect(labelledbyIsSafe(thumb)).toBe(true);
+  });
+
+  it('resolves the single-in-Field aria-labelledby to the real FieldLabel', () => {
+    const { container } = render(
+      <Field>
+        <FieldLabel>Risk threshold</FieldLabel>
+        <Slider>
+          <SliderControl>
+            <SliderThumb />
+          </SliderControl>
+        </Slider>
+      </Field>,
+    );
+    const thumb = getThumbs(container)[0];
+    const lb = thumb.getAttribute('aria-labelledby');
+    expect(lb).toBeTruthy();
+    expect(document.getElementById(lb as string)).toHaveTextContent('Risk threshold');
+  });
+
+  it('forwards a consumer aria-describedby to the thumb (not clobbered by Field wiring)', () => {
+    const { container } = render(
+      <Slider defaultValue={[50]}>
+        <SliderControl>
+          <SliderThumb aria-label='V' aria-describedby='ext-hint' />
+        </SliderControl>
+      </Slider>,
+    );
+    expect(getThumbs(container)[0]).toHaveAttribute('aria-describedby', 'ext-hint');
+  });
+});
+
+describe('Slider — dev thumb-count guard', () => {
+  it('warns when the rendered thumb count does not match the value length', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <Slider defaultValue={[20, 80]}>
+        <SliderControl>
+          <SliderThumb index={0} />
+        </SliderControl>
+      </Slider>,
+    );
+    expect(warn).toHaveBeenCalledWith(expect.stringContaining('Rendered 1 <SliderThumb>'));
+    warn.mockRestore();
+  });
+
+  it('stays silent when thumb count matches', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(<Range />);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 });

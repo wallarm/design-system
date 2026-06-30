@@ -89,7 +89,7 @@ compound API. No flat-compat shim.
 | `Slider` (root) | `ArkSlider.Root` | Owns the machine config (props below), reads `Field` context, owns `error`, provides Ark context + DS `SliderContext` + `TestIdProvider`. Renders `children`. `data-slot="slider"`. |
 | `SliderControl` | `ArkSlider.Control` → `ArkSlider.Track` → `ArkSlider.Range` | The interactive track region. Renders track+range internally, then `children` (thumbs, marks). `data-slot="slider-control"`. |
 | `SliderThumb` | `ArkSlider.Thumb` (+ `ArkSlider.HiddenInput`) | **The real interactive node** (`role="slider"`). `index` (default `0`). Consumer `data-*` / `id` / `aria-*` / `ref` / events forward **here**. Optional `tooltip`. `data-slot="slider-thumb"`. |
-| `SliderMarks` | `ArkSlider.MarkerGroup` → `ArkSlider.Marker[]` | Ticks/labels from a `marks` array + click-to-jump. Publishes its marks to `SliderContext` so the root resolves ordinal `aria-valuetext`. `data-slot="slider-marks"`. |
+| `SliderMarks` | `ArkSlider.MarkerGroup` → `ArkSlider.Marker[]` | Ticks/labels from a `marks` array + click-to-jump. Publishes its marks to `SliderContext` so the root resolves ordinal `aria-valuetext`. `data-slot="slider-marker-group"` (group) + `data-slot="slider-marker"` (each tick) — Ark's part names. |
 | `SliderInput` | DS `Input` | Numbers-only box two-way bound to thumb `index`. `data-slot="slider-input"`. |
 | `SliderValue` | `<span>` | Live value readout (single → `"50"`; range → `"20 – 80"`; honors ordinal mark labels). Optional; for the value-beside-label pattern. `data-slot="slider-value"`. |
 
@@ -121,7 +121,7 @@ and the `aria-label` / `aria-labelledby` arrays.
 | Analytics target | `{...rest}` → primary thumb only (CG-1 gap) | `{...rest}` on each `<SliderThumb>` → its own node. **CG-1 resolved.** |
 | Accessible name | `aria-label` array on root | `aria-label` string per `<SliderThumb>`; Field-label fallback preserved. |
 | Ticks / labels | `marks` prop on root | `<SliderMarks marks={…}>` inside `SliderControl`. |
-| Ordinal `aria-valuetext` | root resolves from `marks` | `SliderMarks` registers its marks into `SliderContext`; root's `getAriaValueText` reads them at interaction time (lazy — no child→parent render coupling). Consumer `getAriaValueText` still wins. |
+| Ordinal `aria-valuetext` | root resolves from `marks` | `SliderMarks` publishes its marks to root **state** via a `useLayoutEffect` (identity-guarded `setMarks`); the root's `getAriaValueText` closes over that state. State (not a ref) is required because Ark computes `aria-valuetext` *during render*, before any child effect — the layout-effect `setMarks` re-renders the root synchronously pre-paint so the value text is right on the first commit. Consumer `getAriaValueText` still wins. |
 | On-drag tooltip | `tooltip` prop on root | `tooltip` prop on `<SliderThumb>`. |
 | Inline value input | `input` prop renders box(es) + row | `<SliderInput index={n}>` parts; the **root** lays its direct children in a row (inputs flank a flex-growing `SliderControl`). The marks `pb-28` band moves onto `SliderControl`. |
 | Persistent readout | plain composition in stories | optional `<SliderValue>` (or still hand-rolled). |

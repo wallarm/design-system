@@ -38,10 +38,16 @@ export const SliderMarks: FC<SliderMarksProps> = ({ marks, className }) => {
 
   // Publish marks to the root so its getAriaValueText (and SliderValue / the thumb
   // tooltip) can resolve ordinal labels. A post-commit effect — never a render-time
-  // ref write — and idempotent, so running each commit is harmless.
+  // ref write — and idempotent (the root's sameMarks guard), so running each commit
+  // is harmless.
   useLayoutEffect(() => {
     registerMarks(marks);
   });
+
+  // Clear root marks on unmount only, so a now-tickless slider doesn't keep announcing
+  // stale ordinal labels. Separate effect (stable dep) so the cleanup fires on unmount,
+  // not on every commit — which would flicker marks → [] → marks.
+  useLayoutEffect(() => () => registerMarks([]), [registerMarks]);
 
   if (marks.length === 0) return null;
 

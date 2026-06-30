@@ -86,7 +86,8 @@ export const Slider: FC<SliderProps> = ({
   const isReadOnly = readOnly ?? field?.readOnly;
 
   // Thumb COUNT is value-driven (Ark-native): controlled `value` wins, else `defaultValue`.
-  const isRange = (value ?? defaultValue).length > 1;
+  const thumbCount = (value ?? defaultValue).length;
+  const isRange = thumbCount > 1;
 
   // Marks published by <SliderMarks> (if any). Kept in state — not a ref — because Ark
   // computes the thumb's aria-valuetext from getAriaValueText DURING render, before any
@@ -115,6 +116,7 @@ export const Slider: FC<SliderProps> = ({
   const contextValue = useMemo(
     () => ({
       isRange,
+      thumbCount,
       invalid,
       disabled: isDisabled,
       ariaDescribedby: field?.ariaDescribedby,
@@ -122,7 +124,16 @@ export const Slider: FC<SliderProps> = ({
       marks,
       registerMarks,
     }),
-    [isRange, invalid, isDisabled, field?.ariaDescribedby, fieldLabelId, marks, registerMarks],
+    [
+      isRange,
+      thumbCount,
+      invalid,
+      isDisabled,
+      field?.ariaDescribedby,
+      fieldLabelId,
+      marks,
+      registerMarks,
+    ],
   );
 
   return (

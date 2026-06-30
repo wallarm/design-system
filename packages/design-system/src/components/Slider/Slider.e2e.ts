@@ -7,9 +7,11 @@ const sliderStory = createStoryHelper('inputs-slider', [
   'Ticks',
   'Labeled',
   'With Input',
+  'Range With Input',
   'Disabled',
   'In Field',
   'Field With Error',
+  'Field With Value',
 ] as const);
 
 // The inline value Input (the slider's own HiddenInput carries no data-slot="input").
@@ -94,6 +96,24 @@ test.describe('Component: Slider', () => {
       await input.fill('150');
       await input.blur();
       await expect(thumb).toHaveAttribute('aria-valuenow', '100');
+    });
+
+    test('Should clamp the min inline input so it cannot cross the max thumb', async ({ page }) => {
+      await sliderStory.goto(page, 'Range With Input');
+      const minInput = page.locator(VALUE_INPUT).first();
+      // Range starts at [20, 80]; typing 90 into the min box must not cross the max (80).
+      await minInput.fill('90');
+      await minInput.blur();
+      await expect(page.getByRole('slider').first()).toHaveAttribute('aria-valuenow', '80');
+    });
+
+    test('Should update the controlled readout (onValueChange) on arrow key', async ({ page }) => {
+      await sliderStory.goto(page, 'Field With Value');
+      const thumb = page.getByRole('slider');
+      await thumb.focus();
+      // Starts controlled at 40; ArrowRight fires onValueChange → the label-row readout re-renders.
+      await page.keyboard.press('ArrowRight');
+      await expect(page.getByText('41', { exact: true })).toBeVisible();
     });
   });
 
