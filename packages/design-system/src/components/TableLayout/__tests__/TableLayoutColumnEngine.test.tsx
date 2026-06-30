@@ -231,3 +231,50 @@ describe('TableLayout column engine — metrics readiness', () => {
     expect(handle).toHaveAttribute('data-slot', 'resize-handle');
   });
 });
+
+describe('TableLayout column engine — combined', () => {
+  const Combined = () => {
+    const { columns, controller } = useTableLayoutColumns(
+      [
+        { columnId: 'pin', width: 100, pin: 'left', resizable: true },
+        { columnId: 'mid', width: 100 },
+        { columnId: 'tail', width: 100 },
+      ],
+      { columnVisibility: { mid: false } },
+    );
+    return (
+      <TableLayout aria-label='Combined' controller={controller}>
+        <TableLayoutColumnGroup>
+          {columns.map(c => (
+            <TableLayoutColumn key={c.columnId} {...c} />
+          ))}
+        </TableLayoutColumnGroup>
+        <TableLayoutHead>
+          <TableLayoutRow>
+            <TableLayoutHeaderCell columnId='pin'>Pin</TableLayoutHeaderCell>
+            <TableLayoutHeaderCell columnId='mid'>Mid</TableLayoutHeaderCell>
+            <TableLayoutHeaderCell columnId='tail'>Tail</TableLayoutHeaderCell>
+          </TableLayoutRow>
+        </TableLayoutHead>
+        <TableLayoutBody>
+          <TableLayoutRow rowId='r1'>
+            <TableLayoutCell columnId='pin'>p</TableLayoutCell>
+            <TableLayoutCell columnId='mid'>m</TableLayoutCell>
+            <TableLayoutCell columnId='tail'>t</TableLayoutCell>
+          </TableLayoutRow>
+        </TableLayoutBody>
+      </TableLayout>
+    );
+  };
+
+  it('pins, hides, and shows a resize handle coherently together', () => {
+    const { container } = render(<Combined />);
+    expect(screen.getByRole('cell', { name: 'p' })).toHaveStyle({
+      position: 'sticky',
+      left: '0px',
+    });
+    expect(screen.queryByRole('cell', { name: 'm' })).toBeNull();
+    expect(container.querySelectorAll('colgroup > col')).toHaveLength(2);
+    expect(document.querySelector('[data-slot="resize-handle"]')).not.toBeNull();
+  });
+});
