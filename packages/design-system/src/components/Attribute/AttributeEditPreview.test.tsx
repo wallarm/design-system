@@ -53,4 +53,16 @@ describe('AttributeEditPreview', () => {
       'ATTR_EDIT',
     );
   });
+
+  it('is inert while loading (no button role, click does not enter edit)', async () => {
+    render(
+      <AttributeEdit defaultValue='hello' status='loading' data-testid='attr'>
+        <AttributeEditPreview>hello</AttributeEditPreview>
+      </AttributeEdit>,
+    );
+    const preview = screen.getByTestId('attr--edit-preview');
+    expect(preview).not.toHaveAttribute('role', 'button');
+    await userEvent.click(preview);
+    expect(screen.getByTestId('attr--edit-preview')).toBeInTheDocument();
+  });
 });

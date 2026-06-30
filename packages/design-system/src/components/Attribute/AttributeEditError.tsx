@@ -1,4 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import { OctagonAlert } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Text } from '../Text';
@@ -27,8 +28,9 @@ export const AttributeEditError: FC<AttributeEditErrorProps> = ({
       ref={ref}
       data-testid={testId}
       data-slot='attribute-edit-error'
-      className={cn('pt-4', className)}
+      className={cn('flex items-center gap-4 pt-4', className)}
     >
+      <OctagonAlert size='md' className='shrink-0 text-icon-danger' />
       <Text size='sm' color='danger'>
         {message}
       </Text>
