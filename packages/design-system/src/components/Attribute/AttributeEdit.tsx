@@ -11,7 +11,7 @@ import {
 import { useControlled } from '../../hooks/useControlled';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
-import { useTestId } from '../../utils/testId';
+import { TestIdProvider, useTestId } from '../../utils/testId';
 import {
   type AttributeEditActivationMode,
   type AttributeEditContextValue,
@@ -189,15 +189,17 @@ export function AttributeEdit<T = unknown>({
 
   return (
     <AttributeEditProvider value={contextValue as AttributeEditContextValue}>
-      <div
-        ref={ref}
-        data-testid={testId}
-        data-slot='attribute-edit'
-        data-editing={editing ? '' : undefined}
-        className={cn('flex w-full min-w-0 flex-col', className)}
-      >
-        {children}
-      </div>
+      <TestIdProvider value={testId}>
+        <div
+          ref={ref}
+          data-testid={testId}
+          data-slot='attribute-edit'
+          data-editing={editing ? '' : undefined}
+          className={cn('flex w-full min-w-0 flex-col', className)}
+        >
+          {children}
+        </div>
+      </TestIdProvider>
     </AttributeEditProvider>
   );
 }
