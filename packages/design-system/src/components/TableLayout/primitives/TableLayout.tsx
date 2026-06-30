@@ -8,15 +8,18 @@ import {
 import { cn } from '../../../utils/cn';
 import { tableLayoutContainer, tableLayoutTable } from '../classes';
 import { TableLayoutContext, type TableLayoutContextValue } from '../TableLayoutContext';
-import type { TableLayoutHandle } from '../types';
+import type { TableLayoutColumnController, TableLayoutHandle } from '../types';
 import { useColumnRegistry } from '../useColumnRegistry';
 
-export type TableLayoutProps = Omit<ComponentPropsWithRef<'table'>, 'ref'>;
+export interface TableLayoutProps extends Omit<ComponentPropsWithRef<'table'>, 'ref'> {
+  /** Column engine controller from `useTableLayoutColumns` — enables pin/resize/visibility. */
+  controller?: TableLayoutColumnController;
+}
 
 export const TableLayout = forwardRef<TableLayoutHandle, TableLayoutProps>(
-  ({ className, children, ...props }, ref) => {
+  ({ className, children, controller, ...props }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
-    const { registerColumn, unregisterColumn, getColumn } = useColumnRegistry();
+    const { registerColumn, unregisterColumn, getColumn: getRegistered } = useColumnRegistry();
 
     useImperativeHandle(
       ref,
@@ -37,8 +40,15 @@ export const TableLayout = forwardRef<TableLayoutHandle, TableLayoutProps>(
     );
 
     const value = useMemo<TableLayoutContextValue>(
-      () => ({ registerColumn, unregisterColumn, getColumn, containerRef }),
-      [registerColumn, unregisterColumn, getColumn],
+      () => ({
+        registerColumn,
+        unregisterColumn,
+        getColumn: (id: string) => controller?.resolved[id] ?? getRegistered(id),
+        containerRef,
+        resizeMode: controller?.resizeMode ?? 'onEnd',
+        setColumnSize: controller?.setColumnSize,
+      }),
+      [registerColumn, unregisterColumn, getRegistered, controller],
     );
 
     return (

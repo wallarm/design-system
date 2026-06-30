@@ -13,3 +13,4 @@ export type {
   TableLayoutHandle,
   TableLayoutScrollToRowOptions,
 } from './types';
+export { useTableLayoutColumns } from './useTableLayoutColumns';
