@@ -1,20 +1,46 @@
+import { useState } from 'react';
+import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Filter } from '../../icons';
+import type { DateValue } from '../../index';
+import { CalendarDate, Time } from '../../index';
 import { Badge } from '../Badge';
 import { Code } from '../Code';
 import { InlineCodeSnippet } from '../CodeSnippet';
+import { DateFormatProvider } from '../DateFormatProvider';
+import { DateInput } from '../DateInput';
 import { FormatDateTime } from '../FormatDateTime';
 import { Ip, IpAddress, IpCountry, IpList, IpProvider } from '../Ip';
 import { Link } from '../Link';
 import { OverflowList } from '../OverflowList';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
+import {
+  Select,
+  SelectButton,
+  SelectContent,
+  type SelectDataItem,
+  SelectInput,
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionText,
+  SelectPositioner,
+} from '../Select';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
+import { TimeInput } from '../TimeInput';
 import { Attribute, type AttributeProps } from './Attribute';
 import { AttributeActions } from './AttributeActions';
 import { AttributeActionsContent } from './AttributeActionsContent';
 import { AttributeActionsItem } from './AttributeActionsItem';
 import { AttributeActionsTarget } from './AttributeActionsTarget';
+import { AttributeEdit } from './AttributeEdit';
+import { useAttributeEdit } from './AttributeEditContext';
+import { AttributeEditControl } from './AttributeEditControl';
+import { AttributeEditError } from './AttributeEditError';
+import { AttributeEditInput } from './AttributeEditInput';
+import { AttributeEditNumber } from './AttributeEditNumber';
+import { AttributeEditPreview } from './AttributeEditPreview';
+import { AttributeEditTextarea } from './AttributeEditTextarea';
 import { AttributeEmptyDescription } from './AttributeEmptyDescription';
 import { AttributeLabel } from './AttributeLabel';
 import { AttributeLabelDescription } from './AttributeLabelDescription';
@@ -34,6 +60,13 @@ const meta = {
     AttributeActionsTarget,
     AttributeActionsContent,
     AttributeActionsItem,
+    AttributeEdit,
+    AttributeEditPreview,
+    AttributeEditControl,
+    AttributeEditInput,
+    AttributeEditTextarea,
+    AttributeEditNumber,
+    AttributeEditError,
   },
   parameters: {
     layout: 'centered',
@@ -848,3 +881,481 @@ export const HorizontalWithActionsMenuOnly: StoryFn<AttributeProps> = () => (
 );
 HorizontalWithActionsMenuOnly.storyName =
   'Horizontal With Actions (disableNestedInteractive — menu only)';
+
+// ─── Inline Edit Stories ──────────────────────────────────────────────────────
+
+export const InlineEditText: StoryFn = () => {
+  const [value, setValue] = useState('Checkout API');
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit value={value} onValueCommit={v => setValue(v as string)}>
+            <AttributeEditPreview>{value}</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditInput />
+            </AttributeEditControl>
+            <AttributeEditError />
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+export const InlineEditTextarea: StoryFn = () => {
+  const [value, setValue] = useState('Displays a labeled value for a single object attribute.');
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>About</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit value={value} onValueCommit={v => setValue(v as string)}>
+            <AttributeEditPreview>{value}</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditTextarea minRows={2} maxRows={6} />
+            </AttributeEditControl>
+            <AttributeEditError />
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+export const InlineEditNumber: StoryFn = () => {
+  const [value, setValue] = useState('8443');
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>Port</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit value={value} onValueCommit={v => setValue(v as string)}>
+            <AttributeEditPreview>{value}</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditNumber />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+export const InlineEditError: StoryFn = () => (
+  <div className='w-[320px]'>
+    <Attribute data-testid='attr'>
+      <AttributeLabel>Name</AttributeLabel>
+      <AttributeValue>
+        <AttributeEdit
+          defaultValue='Checkout API and ABC'
+          defaultEdit
+          status='error'
+          error='An error message.'
+        >
+          <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
+          <AttributeEditControl>
+            <AttributeEditInput />
+          </AttributeEditControl>
+          <AttributeEditError />
+        </AttributeEdit>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const InlineEditLoading: StoryFn = () => (
+  <div className='w-[320px]'>
+    <Attribute data-testid='attr'>
+      <AttributeLabel>Name</AttributeLabel>
+      <AttributeValue>
+        <AttributeEdit defaultValue='Checkout API and ABC' status='loading'>
+          <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
+          <AttributeEditControl>
+            <AttributeEditInput />
+          </AttributeEditControl>
+        </AttributeEdit>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const InlineEditSaved: StoryFn = () => (
+  <div className='w-[320px]'>
+    <Attribute data-testid='attr'>
+      <AttributeLabel>Name</AttributeLabel>
+      <AttributeValue>
+        <AttributeEdit defaultValue='Checkout API and ABC' status='saved'>
+          <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
+          <AttributeEditControl>
+            <AttributeEditInput />
+          </AttributeEditControl>
+        </AttributeEdit>
+      </AttributeValue>
+    </Attribute>
+  </div>
+);
+
+export const InlineEditHorizontal: StoryFn = () => {
+  const [value, setValue] = useState('Checkout API');
+  return (
+    <div className='w-[440px]'>
+      <Attribute orientation='horizontal' data-testid='attr'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit value={value} onValueCommit={v => setValue(v as string)}>
+            <AttributeEditPreview>{value}</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditInput />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+export const InlineEditAsync: StoryFn = () => {
+  const [value, setValue] = useState('Checkout API');
+  const save = (v: unknown) =>
+    new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        if ((v as string).trim().length === 0) reject(new Error('Name is required.'));
+        else {
+          setValue(v as string);
+          resolve();
+        }
+      }, 1200);
+    });
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit value={value} onValueCommit={save}>
+            <AttributeEditPreview>{value}</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditInput />
+            </AttributeEditControl>
+            <AttributeEditError />
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+// ─── Composed-editor stories ──────────────────────────────────────────────────
+
+const roleItems: SelectDataItem[] = [
+  { label: 'Admin', value: 'admin' },
+  { label: 'Editor', value: 'editor' },
+  { label: 'Viewer', value: 'viewer' },
+  { label: 'Auditor', value: 'auditor' },
+];
+
+function SelectEditor() {
+  const { value, setValue, submit } = useAttributeEdit<string[]>();
+  const collection = createListCollection({ items: roleItems });
+  const selected = Array.isArray(value) ? value : [];
+
+  return (
+    <Select
+      collection={collection}
+      value={selected}
+      onValueChange={details => setValue(details.value)}
+      onOpenChange={details => {
+        if (!details.open) submit();
+      }}
+    >
+      <SelectButton />
+      <SelectPositioner>
+        <SelectContent>
+          {collection.items.map(item => (
+            <SelectOption key={item.value} item={item}>
+              <SelectOptionText>{item.label}</SelectOptionText>
+              <SelectOptionIndicator />
+            </SelectOption>
+          ))}
+        </SelectContent>
+      </SelectPositioner>
+    </Select>
+  );
+}
+
+export const InlineEditSelect: StoryFn = () => {
+  const [value, setValue] = useState<string[]>(['editor']);
+  const committed = value[0] ?? '';
+  const label = roleItems.find(i => i.value === committed)?.label ?? committed;
+
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>Role</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit
+            value={value}
+            onValueCommit={v => setValue(v as string[])}
+            submitMode='none'
+            activationMode='click'
+          >
+            <AttributeEditPreview>{label}</AttributeEditPreview>
+            <AttributeEditControl>
+              <SelectEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+function MultiSelectEditor() {
+  const { value, setValue, submit } = useAttributeEdit<string[]>();
+  const collection = createListCollection({ items: roleItems });
+  const selected = Array.isArray(value) ? value : [];
+
+  return (
+    <Select
+      collection={collection}
+      multiple
+      value={selected}
+      onValueChange={details => setValue(details.value)}
+      onOpenChange={details => {
+        if (!details.open) submit();
+      }}
+    >
+      <SelectInput />
+      <SelectPositioner>
+        <SelectContent>
+          {collection.items.map(item => (
+            <SelectOption key={item.value} item={item}>
+              <SelectOptionText>{item.label}</SelectOptionText>
+              <SelectOptionIndicator />
+            </SelectOption>
+          ))}
+        </SelectContent>
+      </SelectPositioner>
+    </Select>
+  );
+}
+
+export const InlineEditMultiSelect: StoryFn = () => {
+  const [value, setValue] = useState<string[]>(['editor', 'viewer']);
+  const label = (Array.isArray(value) ? value : [])
+    .map(v => roleItems.find(i => i.value === v)?.label ?? v)
+    .join(', ');
+
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>Roles</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit
+            value={value}
+            onValueCommit={v => setValue(v as string[])}
+            submitMode='none'
+            activationMode='click'
+          >
+            <AttributeEditPreview>{label}</AttributeEditPreview>
+            <AttributeEditControl>
+              <MultiSelectEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+const tagItems: SelectDataItem[] = [
+  { label: 'production', value: 'production' },
+  { label: 'us-east-1', value: 'us-east-1' },
+  { label: 'critical', value: 'critical' },
+  { label: 'tier-1', value: 'tier-1' },
+  { label: 'public', value: 'public' },
+  { label: 'monitored', value: 'monitored' },
+];
+
+function TagsSelectEditor() {
+  const { value, setValue, submit } = useAttributeEdit<string[]>();
+  const collection = createListCollection({ items: tagItems });
+  const selected = Array.isArray(value) ? value : [];
+
+  return (
+    <Select
+      collection={collection}
+      multiple
+      value={selected}
+      onValueChange={details => setValue(details.value)}
+      onOpenChange={details => {
+        if (!details.open) submit();
+      }}
+    >
+      <SelectInput />
+      <SelectPositioner>
+        <SelectContent>
+          {collection.items.map(item => (
+            <SelectOption key={item.value} item={item}>
+              <Tag>{item.label}</Tag>
+            </SelectOption>
+          ))}
+        </SelectContent>
+      </SelectPositioner>
+    </Select>
+  );
+}
+
+export const InlineEditTags: StoryFn = () => {
+  const [value, setValue] = useState<string[]>(['production', 'critical']);
+
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>Tags</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit
+            value={value}
+            onValueCommit={v => setValue(v as string[])}
+            submitMode='none'
+            activationMode='click'
+          >
+            <AttributeEditPreview>
+              {(Array.isArray(value) ? value : []).map(v => (
+                <Tag key={v}>{v}</Tag>
+              ))}
+            </AttributeEditPreview>
+            <AttributeEditControl>
+              <TagsSelectEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+function DateEditor() {
+  const { value, setValue, submit } = useAttributeEdit<DateValue | null>();
+  const dateValue = value instanceof CalendarDate ? value : null;
+
+  return (
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <DateInput
+        value={dateValue}
+        onChange={v => {
+          setValue(v);
+          if (v !== null) submit();
+        }}
+        granularity='day'
+      />
+    </DateFormatProvider>
+  );
+}
+
+export const InlineEditDate: StoryFn = () => {
+  const [value, setValue] = useState<DateValue | null>(new CalendarDate(2026, 6, 15));
+  const label = value ? value.toString() : '—';
+
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>Date</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit
+            value={value}
+            onValueCommit={v => setValue(v as DateValue | null)}
+            submitMode='none'
+            activationMode='click'
+          >
+            <AttributeEditPreview>{label}</AttributeEditPreview>
+            <AttributeEditControl>
+              <DateEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+function TimeEditor() {
+  const { value, setValue } = useAttributeEdit<Time | null>();
+  const timeValue = value instanceof Time ? value : null;
+
+  return (
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <TimeInput
+        value={timeValue}
+        onChange={v => setValue(v instanceof Time ? v : null)}
+        granularity='minute'
+      />
+    </DateFormatProvider>
+  );
+}
+
+export const InlineEditTime: StoryFn = () => {
+  const [value, setValue] = useState<Time | null>(new Time(14, 30));
+  const label = value
+    ? `${String(value.hour).padStart(2, '0')}:${String(value.minute).padStart(2, '0')}`
+    : '—';
+
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>Time</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit
+            value={value}
+            onValueCommit={v => setValue(v as Time | null)}
+            submitMode='blur'
+            activationMode='click'
+          >
+            <AttributeEditPreview>{label}</AttributeEditPreview>
+            <AttributeEditControl>
+              <TimeEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+function DateTimeEditor() {
+  const { value, setValue } = useAttributeEdit<DateValue | null>();
+  const dateValue = value instanceof CalendarDate ? value : null;
+
+  return (
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <DateInput value={dateValue} onChange={v => setValue(v)} granularity='minute' />
+    </DateFormatProvider>
+  );
+}
+
+export const InlineEditDateTime: StoryFn = () => {
+  const [value, setValue] = useState<DateValue | null>(new CalendarDate(2026, 6, 15));
+  const label = value ? value.toString() : '—';
+
+  return (
+    <div className='w-[320px]'>
+      <Attribute data-testid='attr'>
+        <AttributeLabel>Date &amp; Time</AttributeLabel>
+        <AttributeValue>
+          <AttributeEdit
+            value={value}
+            onValueCommit={v => setValue(v as DateValue | null)}
+            submitMode='blur'
+            activationMode='click'
+          >
+            <AttributeEditPreview>{label}</AttributeEditPreview>
+            <AttributeEditControl>
+              <DateTimeEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
