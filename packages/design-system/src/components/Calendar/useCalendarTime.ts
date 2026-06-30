@@ -1,4 +1,4 @@
-import { type MutableRefObject, useCallback, useRef } from 'react';
+import { type RefObject, useCallback, useRef } from 'react';
 import { withTime } from './dateValue';
 import type { DateValue } from './types';
 
@@ -12,7 +12,7 @@ interface UseCalendarTimeParams {
 
 interface UseCalendarTime {
   /** Last-known time-of-day; read synchronously when promoting grid picks. */
-  timeRef: MutableRefObject<{ hour: number; minute: number }>;
+  timeRef: RefObject<{ hour: number; minute: number }>;
   /** Emit to the consumer, promoting date-only values to `CalendarDateTime`. */
   commitValue: (value: DateValue[]) => void;
 }
@@ -32,7 +32,8 @@ export const useCalendarTime = ({
   const timeRef = useRef({ hour: 0, minute: 0 });
 
   // Sync the tracked time from the current value so a grid pick re-applies it
-  // rather than resetting to midnight. Writing a ref during render is safe here.
+  // rather than resetting to midnight. Safe in render only because this write is
+  // idempotent — never derive timeRef from its own previous value here.
   if (showTime && !isRange) {
     const current = (value ?? defaultValue)?.[0];
     if (current && 'hour' in current) {

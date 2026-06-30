@@ -207,11 +207,12 @@ test.describe('Component: Attribute', () => {
       const preview = page.getByTestId('datetime--edit-preview');
       await expect(preview).toHaveText(/2:30 PM/);
       await preview.click();
-      // The popover header carries the second hour segment (the first belongs to
-      // the trigger input). Editing time here exercises the showTime commit path.
-      await page.getByRole('spinbutton', { name: 'hour' }).last().click();
+      // Scope to the popover so we edit the header input (the showTime commit
+      // path), not the trigger input — both carry an hour segment.
+      const popover = page.locator('[data-scope="date-picker"][data-part="content"]');
+      await popover.getByRole('spinbutton', { name: 'hour' }).click();
       await page.keyboard.type('5');
-      // Closing the popover commits (submitMode='none').
+      // Commit by closing the popover (submitMode='none'); Escape would cancel.
       await page.mouse.click(5, 5);
       await expect(preview).toHaveText(/5:30 PM/);
     });
