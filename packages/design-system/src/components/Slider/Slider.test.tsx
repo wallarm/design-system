@@ -5,6 +5,7 @@ import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Field, FieldLabel } from '../Field';
 import { Slider } from './Slider';
 import { SliderControl } from './SliderControl';
+import { SliderInput } from './SliderInput';
 import { SliderMarks } from './SliderMarks';
 import { SliderThumb } from './SliderThumb';
 
@@ -272,5 +273,77 @@ describe('Slider — thumb tooltip', () => {
       </Slider>,
     );
     expect(getThumbs(container)[0]).toHaveAttribute('role', 'slider');
+  });
+});
+
+describe('Slider — inline SliderInput', () => {
+  const getInputBoxes = (container: HTMLElement) =>
+    Array.from(container.querySelectorAll<HTMLInputElement>('input[data-slot="input"]'));
+
+  it('gives the two range inputs distinct, non-empty ids', () => {
+    const { container } = render(
+      <Field>
+        <FieldLabel>Price range</FieldLabel>
+        <Slider defaultValue={[20, 80]}>
+          <SliderInput index={0} />
+          <SliderControl>
+            <SliderThumb index={0} />
+            <SliderThumb index={1} />
+          </SliderControl>
+          <SliderInput index={1} />
+        </Slider>
+      </Field>,
+    );
+    const ids = getInputBoxes(container).map(input => input.id);
+    expect(ids).toHaveLength(2);
+    expect(ids[0]).toBeTruthy();
+    expect(ids[1]).toBeTruthy();
+    expect(ids[0]).not.toBe(ids[1]);
+  });
+
+  it('keeps the FieldLabel naming the thumb, not the input box', () => {
+    const { container } = render(
+      <Field>
+        <FieldLabel>Risk threshold</FieldLabel>
+        <Slider defaultValue={[50]}>
+          <SliderControl>
+            <SliderThumb />
+          </SliderControl>
+          <SliderInput />
+        </Slider>
+      </Field>,
+    );
+    const labelledBy = getThumbs(container)[0].getAttribute('aria-labelledby');
+    expect(document.getElementById(labelledBy as string)).toHaveTextContent('Risk threshold');
+    const [box] = getInputBoxes(container);
+    expect(box).toHaveAttribute('aria-label', 'Value');
+    expect(box.id).toBeTruthy();
+  });
+
+  it('reflects the current thumb value in the box', () => {
+    const { container } = render(
+      <Slider defaultValue={[42]}>
+        <SliderControl>
+          <SliderThumb aria-label='Value' />
+        </SliderControl>
+        <SliderInput />
+      </Slider>,
+    );
+    expect(getInputBoxes(container)[0]).toHaveValue('42');
+  });
+
+  it('inherits disabled from a wrapping <Field disabled>', () => {
+    const { container } = render(
+      <Field disabled>
+        <FieldLabel>Risk</FieldLabel>
+        <Slider defaultValue={[50]}>
+          <SliderControl>
+            <SliderThumb />
+          </SliderControl>
+          <SliderInput />
+        </Slider>
+      </Field>,
+    );
+    expect(getInputBoxes(container)[0]).toBeDisabled();
   });
 });
