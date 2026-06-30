@@ -3,7 +3,7 @@ import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Filter } from '../../icons';
 import type { DateValue } from '../../index';
-import { CalendarDate, Time } from '../../index';
+import { CalendarDate, CalendarDateTime, Time } from '../../index';
 import { Badge } from '../Badge';
 import { Code } from '../Code';
 import { InlineCodeSnippet } from '../CodeSnippet';
@@ -1280,6 +1280,7 @@ export const InlineEditDate: StoryFn = () => {
   );
 };
 
+// Commits on blur (submitMode='blur') — time pickers have no discrete 'selection complete' event.
 function TimeEditor() {
   const { value, setValue } = useAttributeEdit<Time | null>();
   const timeValue = value instanceof Time ? value : null;
@@ -1324,18 +1325,24 @@ export const InlineEditTime: StoryFn = () => {
 };
 
 function DateTimeEditor() {
-  const { value, setValue } = useAttributeEdit<DateValue | null>();
-  const dateValue = value instanceof CalendarDate ? value : null;
+  const { value, setValue } = useAttributeEdit<CalendarDateTime | null>();
+  const dateValue = value instanceof CalendarDateTime ? value : null;
 
   return (
     <DateFormatProvider order='day-first' hourCycle={24}>
-      <DateInput value={dateValue} onChange={v => setValue(v)} granularity='minute' />
+      <DateInput
+        value={dateValue}
+        onChange={v => setValue(v as CalendarDateTime | null)}
+        granularity='minute'
+      />
     </DateFormatProvider>
   );
 }
 
 export const InlineEditDateTime: StoryFn = () => {
-  const [value, setValue] = useState<DateValue | null>(new CalendarDate(2026, 6, 15));
+  const [value, setValue] = useState<CalendarDateTime | null>(
+    new CalendarDateTime(2026, 6, 15, 14, 30),
+  );
   const label = value ? value.toString() : '—';
 
   return (
@@ -1345,7 +1352,7 @@ export const InlineEditDateTime: StoryFn = () => {
         <AttributeValue>
           <AttributeEdit
             value={value}
-            onValueCommit={v => setValue(v as DateValue | null)}
+            onValueCommit={v => setValue(v as CalendarDateTime | null)}
             submitMode='blur'
             activationMode='click'
           >
