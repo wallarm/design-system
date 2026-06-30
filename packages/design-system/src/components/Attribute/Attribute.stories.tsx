@@ -10,6 +10,7 @@ import {
   CalendarBody,
   CalendarContent,
   CalendarGrids,
+  CalendarInputHeader,
   Calendar as CalendarPicker,
   CalendarTrigger,
 } from '../Calendar';
@@ -1056,27 +1057,47 @@ function TimeEditor() {
   );
 }
 
-// Segmented date+time input. A calendar+time popover is intentionally not used
-// here: mixing the react-aria DateInput with the Ark calendar fights over the
-// value and drops commits. The segmented input edits both date and time and
-// commits on blur (submitMode='blur').
-// Segmented date+time input (pre-filled, commits on blur). A committing
-// calendar-grid dropdown is not feasible here: the minute-granularity react-aria
-// DateInput needed for time entry fights the Ark calendar over the value, so the
-// grid never commits (date-only/day granularity works — see DateEditor — but
-// minute does not). A true date+time picker with a working grid needs a
-// dedicated DS DatePicker component (follow-up).
+// Date+time picker mirroring the `SingleWithDateTime` calendar: the trigger is
+// a segmented input pre-filled with the value, and the popover holds the
+// time-aware header (`CalendarInputHeader` + `showTime`) and the day grid. The
+// grid emits date-only values, but `Calendar showTime` promotes them to a
+// `CalendarDateTime` carrying the tracked time; a time-only edit in the header
+// is committed straight to `onChange` (Ark dedupes its value by date and would
+// otherwise drop it). Commits on popover close (submitMode='none').
 function DateTimeEditor() {
-  const { value, setValue } = useAttributeEdit<CalendarDateTime | null>();
+  const { value, setValue, submit } = useAttributeEdit<CalendarDateTime | null>();
 
   return (
     <DateFormatProvider order='day-first' hourCycle={12}>
-      <DateInput
-        value={value ?? null}
-        onChange={v => setValue(v as CalendarDateTime | null)}
-        granularity='minute'
-        showIcon={false}
-      />
+      <CalendarPicker
+        type='single'
+        showTime
+        defaultOpen
+        closeOnSelect={false}
+        value={value ? [value] : []}
+        onChange={next => setValue((next[0] as CalendarDateTime) ?? null)}
+        onOpenChange={open => {
+          if (!open) submit();
+        }}
+      >
+        <CalendarTrigger>
+          {/* Pass the value straight through — an `instanceof` gate drops
+              values produced by the Ark calendar (different
+              @internationalized/date copy), showing the placeholder instead. */}
+          <DateInput
+            value={value ?? null}
+            onChange={v => setValue(v as CalendarDateTime | null)}
+            granularity='minute'
+            showIcon={false}
+          />
+        </CalendarTrigger>
+        <CalendarContent>
+          <CalendarBody>
+            <CalendarInputHeader />
+            <CalendarGrids />
+          </CalendarBody>
+        </CalendarContent>
+      </CalendarPicker>
     </DateFormatProvider>
   );
 }
@@ -1270,7 +1291,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
           <AttributeEdit
             value={dateTime}
             onValueCommit={v => setDateTime(v as CalendarDateTime | null)}
-            submitMode='blur'
+            submitMode='none'
             activationMode='click'
           >
             <AttributeEditPreview triggerIcon={<Calendar size='md' />}>
