@@ -1248,7 +1248,9 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='time'>
         <AttributeLabel>Time</AttributeLabel>
-        <AttributeValue>
+        {/* overflow-visible so the (non-portaled, absolute) time dropdown is not
+            clipped by the horizontal value's truncate/overflow-hidden. */}
+        <AttributeValue className='overflow-visible'>
           <AttributeEdit
             value={time}
             onValueCommit={v => setTime(v as Time | null)}
