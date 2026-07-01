@@ -440,9 +440,10 @@ test.describe('Component: FilterInput — AS-1192 standalone chip', () => {
       await page.getByRole('menuitem', { name: /^Priority$/ }).click();
       await page.getByRole('menuitem', { name: /^is =$/ }).click();
 
-      // Force-commit the incomplete chip: click the input area just right of the
+      // Force-commit the incomplete chip: click the empty input area past the
       // building chip (leaves the value empty) instead of blurring, which would
-      // keep it a draft.
+      // keep it a draft. +24px clears the chip's margin and × button without
+      // reaching the next chip.
       const chip = getChip(page);
       const cbox = (await chip.boundingBox())!;
       await page.mouse.click(cbox.x + cbox.width + 24, cbox.y + cbox.height / 2);
@@ -450,7 +451,8 @@ test.describe('Component: FilterInput — AS-1192 standalone chip', () => {
       await expect(page.getByRole('alert')).toBeVisible();
 
       // The empty value renders a clickable placeholder; clicking it must resume
-      // value entry, not hit the × behind it → the chip survives with its input.
+      // value entry, not hit the × behind it → the chip survives and the value
+      // input opens.
       await chip.hover();
       const value = chip.locator('[data-slot="segment-value"]');
       const vbox = (await value.boundingBox())!;
@@ -458,7 +460,7 @@ test.describe('Component: FilterInput — AS-1192 standalone chip', () => {
       expect(vbox.height).toBeGreaterThanOrEqual(12);
       await page.mouse.click(vbox.x + vbox.width / 2, vbox.y + vbox.height / 2);
       await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
-      await expect(page.locator('[data-slot="filter-input"] input')).toHaveCount(1);
+      await expect(page.getByRole('combobox', { name: 'Filter value' })).toBeVisible();
     });
   });
 });
