@@ -1,20 +1,55 @@
+import { useState } from 'react';
+import { createListCollection } from '@ark-ui/react/collection';
+import { format } from 'date-fns';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Copy, Filter } from '../../icons';
+import { Calendar, ChevronDown, Clock, Copy, Filter } from '../../icons';
+import type { DateValue } from '../../index';
+import { CalendarDate, CalendarDateTime, Time } from '../../index';
 import { Badge } from '../Badge';
+import {
+  CalendarBody,
+  CalendarContent,
+  CalendarGrids,
+  CalendarInputHeader,
+  Calendar as CalendarPicker,
+  CalendarTrigger,
+} from '../Calendar';
 import { Code } from '../Code';
 import { InlineCodeSnippet } from '../CodeSnippet';
+import { DateFormatProvider } from '../DateFormatProvider';
+import { DateInput } from '../DateInput';
 import { FormatDateTime } from '../FormatDateTime';
 import { Ip, IpAddress, IpCountry, IpList, IpProvider } from '../Ip';
 import { Link } from '../Link';
 import { OverflowList } from '../OverflowList';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
+import {
+  Select,
+  SelectButton,
+  SelectContent,
+  type SelectDataItem,
+  SelectInput,
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionText,
+  SelectPositioner,
+} from '../Select';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
+import { TimeInput } from '../TimeInput';
 import { Attribute, type AttributeProps } from './Attribute';
 import { AttributeActions } from './AttributeActions';
 import { AttributeActionsContent } from './AttributeActionsContent';
 import { AttributeActionsItem } from './AttributeActionsItem';
 import { AttributeActionsTarget } from './AttributeActionsTarget';
+import { AttributeEdit } from './AttributeEdit';
+import { useAttributeEdit } from './AttributeEditContext';
+import { AttributeEditControl } from './AttributeEditControl';
+import { AttributeEditError } from './AttributeEditError';
+import { AttributeEditInput } from './AttributeEditInput';
+import { AttributeEditNumber } from './AttributeEditNumber';
+import { AttributeEditPreview } from './AttributeEditPreview';
+import { AttributeEditTextarea } from './AttributeEditTextarea';
 import { AttributeEmptyDescription } from './AttributeEmptyDescription';
 import { AttributeLabel } from './AttributeLabel';
 import { AttributeLabelDescription } from './AttributeLabelDescription';
@@ -34,6 +69,13 @@ const meta = {
     AttributeActionsTarget,
     AttributeActionsContent,
     AttributeActionsItem,
+    AttributeEdit,
+    AttributeEditPreview,
+    AttributeEditControl,
+    AttributeEditInput,
+    AttributeEditTextarea,
+    AttributeEditNumber,
+    AttributeEditError,
   },
   parameters: {
     layout: 'centered',
@@ -848,3 +890,514 @@ export const HorizontalWithActionsMenuOnly: StoryFn<AttributeProps> = () => (
 );
 HorizontalWithActionsMenuOnly.storyName =
   'Horizontal With Actions (disableNestedInteractive — menu only)';
+
+// ─── Inline Edit Stories ──────────────────────────────────────────────────────
+
+type InlineOrientation = 'horizontal' | 'vertical';
+
+const roleItems: SelectDataItem[] = [
+  { label: 'Admin', value: 'admin' },
+  { label: 'Editor', value: 'editor' },
+  { label: 'Viewer', value: 'viewer' },
+  { label: 'Auditor', value: 'auditor' },
+];
+
+const tagItems: SelectDataItem[] = [
+  { label: 'production', value: 'production' },
+  { label: 'us-east-1', value: 'us-east-1' },
+  { label: 'critical', value: 'critical' },
+  { label: 'tier-1', value: 'tier-1' },
+  { label: 'public', value: 'public' },
+  { label: 'monitored', value: 'monitored' },
+];
+
+function SelectEditor() {
+  const { value, setValue, submit } = useAttributeEdit<string[]>();
+  const collection = createListCollection({ items: roleItems });
+  const selected = Array.isArray(value) ? value : [];
+
+  return (
+    <Select
+      defaultOpen
+      collection={collection}
+      value={selected}
+      onValueChange={details => setValue(details.value)}
+      onOpenChange={details => {
+        if (!details.open) submit();
+      }}
+    >
+      <SelectButton />
+      <SelectPositioner>
+        <SelectContent>
+          {collection.items.map(item => (
+            <SelectOption key={item.value} item={item}>
+              <SelectOptionText>{item.label}</SelectOptionText>
+              <SelectOptionIndicator />
+            </SelectOption>
+          ))}
+        </SelectContent>
+      </SelectPositioner>
+    </Select>
+  );
+}
+
+function MultiSelectEditor() {
+  const { value, setValue, submit } = useAttributeEdit<string[]>();
+  const collection = createListCollection({ items: roleItems });
+  const selected = Array.isArray(value) ? value : [];
+
+  return (
+    <Select
+      defaultOpen
+      collection={collection}
+      multiple
+      value={selected}
+      onValueChange={details => setValue(details.value)}
+      onOpenChange={details => {
+        if (!details.open) submit();
+      }}
+    >
+      <SelectInput />
+      <SelectPositioner>
+        <SelectContent>
+          {collection.items.map(item => (
+            <SelectOption key={item.value} item={item}>
+              <SelectOptionText>{item.label}</SelectOptionText>
+              <SelectOptionIndicator />
+            </SelectOption>
+          ))}
+        </SelectContent>
+      </SelectPositioner>
+    </Select>
+  );
+}
+
+function TagsSelectEditor() {
+  const { value, setValue, submit } = useAttributeEdit<string[]>();
+  const collection = createListCollection({ items: tagItems });
+  const selected = Array.isArray(value) ? value : [];
+
+  return (
+    <Select
+      defaultOpen
+      collection={collection}
+      multiple
+      value={selected}
+      onValueChange={details => setValue(details.value)}
+      onOpenChange={details => {
+        if (!details.open) submit();
+      }}
+    >
+      <SelectInput />
+      <SelectPositioner>
+        <SelectContent>
+          {collection.items.map(item => (
+            <SelectOption key={item.value} item={item}>
+              <SelectOptionText>{item.label}</SelectOptionText>
+              <SelectOptionIndicator />
+            </SelectOption>
+          ))}
+        </SelectContent>
+      </SelectPositioner>
+    </Select>
+  );
+}
+
+function DateEditor() {
+  const { value, setValue, submit } = useAttributeEdit<DateValue | null>();
+
+  return (
+    <DateFormatProvider order='day-first' hourCycle={24}>
+      <CalendarPicker
+        type='single'
+        defaultOpen
+        closeOnSelect
+        value={value ? [value] : []}
+        onChange={next => setValue(next[0] ?? null)}
+        onOpenChange={open => {
+          if (!open) submit();
+        }}
+      >
+        <CalendarTrigger>
+          {/* Pass the value straight through — an `instanceof CalendarDate`
+              gate drops values produced by the Ark calendar (different
+              @internationalized/date copy), showing the placeholder instead. */}
+          <DateInput
+            value={value ?? null}
+            onChange={v => setValue(v)}
+            granularity='day'
+            showIcon={false}
+          />
+        </CalendarTrigger>
+        <CalendarContent>
+          <CalendarBody>
+            <CalendarGrids />
+          </CalendarBody>
+        </CalendarContent>
+      </CalendarPicker>
+    </DateFormatProvider>
+  );
+}
+
+// Commits on blur (submitMode='blur') — time pickers have no discrete 'selection complete' event.
+function TimeEditor() {
+  const { value, setValue } = useAttributeEdit<Time | null>();
+  const timeValue = value instanceof Time ? value : null;
+
+  return (
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <TimeInput
+        value={timeValue}
+        onChange={v => setValue(v instanceof Time ? v : null)}
+        granularity='minute'
+        showTimeDropdown
+        showIcon={false}
+      />
+    </DateFormatProvider>
+  );
+}
+
+// Date+time picker mirroring the `SingleWithDateTime` calendar: the trigger is
+// a segmented input pre-filled with the value, and the popover holds the
+// time-aware header (`CalendarInputHeader` + `showTime`) and the day grid. The
+// grid emits date-only values, but `Calendar showTime` promotes them to a
+// `CalendarDateTime` carrying the tracked time; a time-only edit in the header
+// is committed straight to `onChange` (Ark dedupes its value by date and would
+// otherwise drop it). Commits on popover close (submitMode='none').
+function DateTimeEditor() {
+  const { value, setValue, submit } = useAttributeEdit<CalendarDateTime | null>();
+
+  return (
+    <DateFormatProvider order='day-first' hourCycle={12}>
+      <CalendarPicker
+        type='single'
+        showTime
+        defaultOpen
+        closeOnSelect={false}
+        value={value ? [value] : []}
+        onChange={next => setValue((next[0] as CalendarDateTime) ?? null)}
+        onOpenChange={open => {
+          if (!open) submit();
+        }}
+      >
+        <CalendarTrigger>
+          {/* Pass the value straight through — an `instanceof` gate drops
+              values produced by the Ark calendar (different
+              @internationalized/date copy), showing the placeholder instead. */}
+          <DateInput
+            value={value ?? null}
+            onChange={v => setValue(v as CalendarDateTime | null)}
+            granularity='minute'
+            showIcon={false}
+          />
+        </CalendarTrigger>
+        <CalendarContent>
+          <CalendarBody>
+            <CalendarInputHeader />
+            <CalendarGrids />
+          </CalendarBody>
+        </CalendarContent>
+      </CalendarPicker>
+    </DateFormatProvider>
+  );
+}
+
+/**
+ * All inline-edit value types in a single gallery. Each attribute owns its own
+ * state and a unique `data-testid` (text, number, textarea, select,
+ * multi-select, tags, date, time, datetime) so it can be targeted individually
+ * in tests. Reused by both the vertical and horizontal stories.
+ */
+function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineOrientation }) {
+  const [text, setText] = useState('Checkout API');
+  const [about, setAbout] = useState(
+    'Displays a labeled value for a single object attribute. Used in detail panels, drawers and forms to present structured information.',
+  );
+  const [port, setPort] = useState('8443');
+  const [role, setRole] = useState<string[]>(['editor']);
+  const [roles, setRoles] = useState<string[]>(['editor', 'viewer']);
+  const [tags, setTags] = useState<string[]>(['production', 'critical']);
+  const [date, setDate] = useState<DateValue | null>(new CalendarDate(2026, 6, 15));
+  const [time, setTime] = useState<Time | null>(new Time(14, 30));
+  const [dateTime, setDateTime] = useState<CalendarDateTime | null>(
+    new CalendarDateTime(2026, 6, 15, 14, 30),
+  );
+
+  const roleLabel = roleItems.find(i => i.value === (role[0] ?? ''))?.label ?? '';
+  const rolesLabel = roles.map(v => roleItems.find(i => i.value === v)?.label ?? v).join(', ');
+  const dateLabel = date
+    ? format(new Date(date.year, date.month - 1, date.day), 'd MMM, yyyy')
+    : '—';
+  const timeLabel = time ? format(new Date(2000, 0, 1, time.hour, time.minute), 'h:mm a') : '—';
+  const dateTimeLabel = dateTime
+    ? format(
+        new Date(dateTime.year, dateTime.month - 1, dateTime.day, dateTime.hour, dateTime.minute),
+        'd MMM, yyyy h:mm a',
+      )
+    : '—';
+
+  const isHorizontal = orientation === 'horizontal';
+
+  return (
+    <div
+      className={
+        isHorizontal
+          ? 'flex w-[560px] flex-col gap-8'
+          : 'grid w-[700px] grid-cols-2 gap-x-16 gap-y-8'
+      }
+    >
+      <Attribute orientation={orientation} data-testid='text'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit value={text} onValueCommit={v => setText(v as string)}>
+            <AttributeEditPreview>{text}</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditInput />
+            </AttributeEditControl>
+            <AttributeEditError />
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='number'>
+        <AttributeLabel>Port</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit value={port} onValueCommit={v => setPort(v as string)}>
+            <AttributeEditPreview>{port}</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditNumber />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='textarea'>
+        <AttributeLabel>About</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit value={about} onValueCommit={v => setAbout(v as string)}>
+            <AttributeEditPreview lineClamp={3}>{about}</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditTextarea minRows={2} maxRows={6} />
+            </AttributeEditControl>
+            <AttributeEditError />
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='select'>
+        <AttributeLabel>Role</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit
+            value={role}
+            onValueCommit={v => setRole(v as string[])}
+            submitMode='none'
+            activationMode='click'
+          >
+            <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
+              {roleLabel}
+            </AttributeEditPreview>
+            <AttributeEditControl>
+              <SelectEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='multi-select'>
+        <AttributeLabel>Roles</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit
+            value={roles}
+            onValueCommit={v => setRoles(v as string[])}
+            submitMode='none'
+            activationMode='click'
+          >
+            <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
+              {rolesLabel}
+            </AttributeEditPreview>
+            <AttributeEditControl>
+              <MultiSelectEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='tags'>
+        <AttributeLabel>Tags</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit
+            value={tags}
+            onValueCommit={v => setTags(v as string[])}
+            submitMode='none'
+            activationMode='click'
+          >
+            <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
+              <span className='flex gap-4'>
+                {tags.map(v => (
+                  <Tag key={v}>{v}</Tag>
+                ))}
+              </span>
+            </AttributeEditPreview>
+            <AttributeEditControl>
+              <TagsSelectEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='date'>
+        <AttributeLabel>Date</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit
+            value={date}
+            onValueCommit={v => setDate(v as DateValue | null)}
+            submitMode='none'
+            activationMode='click'
+          >
+            <AttributeEditPreview triggerIcon={<Calendar size='md' />}>
+              {dateLabel}
+            </AttributeEditPreview>
+            <AttributeEditControl>
+              <DateEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='time'>
+        <AttributeLabel>Time</AttributeLabel>
+        {/* overflow-visible so the (non-portaled, absolute) time dropdown is not
+            clipped by the horizontal value's truncate/overflow-hidden. */}
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit
+            value={time}
+            onValueCommit={v => setTime(v as Time | null)}
+            submitMode='blur'
+            activationMode='click'
+          >
+            <AttributeEditPreview triggerIcon={<Clock size='md' />}>
+              {timeLabel}
+            </AttributeEditPreview>
+            <AttributeEditControl>
+              <TimeEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='datetime'>
+        <AttributeLabel>Date &amp; Time</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit
+            value={dateTime}
+            onValueCommit={v => setDateTime(v as CalendarDateTime | null)}
+            submitMode='none'
+            activationMode='click'
+          >
+            <AttributeEditPreview triggerIcon={<Calendar size='md' />}>
+              {dateTimeLabel}
+            </AttributeEditPreview>
+            <AttributeEditControl>
+              <DateTimeEditor />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+}
+
+export const InlineEdit: StoryFn = () => <InlineEditGallery />;
+
+export const InlineEditHorizontal: StoryFn = () => <InlineEditGallery orientation='horizontal' />;
+
+/** Async-feedback status snapshots: loading, saved, and error. */
+function InlineEditStatesList({ orientation = 'vertical' }: { orientation?: InlineOrientation }) {
+  return (
+    <div className='flex w-[420px] flex-col gap-12'>
+      <Attribute orientation={orientation} data-testid='loading'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit defaultValue='Checkout API and ABC' status='loading'>
+            <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditInput />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='saved'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit defaultValue='Checkout API and ABC' status='saved'>
+            <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditInput />
+            </AttributeEditControl>
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='error'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit
+            defaultValue='Checkout API and ABC'
+            defaultEdit
+            status='error'
+            error='An error message.'
+          >
+            <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditInput />
+            </AttributeEditControl>
+            <AttributeEditError />
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+}
+
+export const InlineEditStates: StoryFn = () => <InlineEditStatesList />;
+
+export const InlineEditHorizontalStates: StoryFn = () => (
+  <InlineEditStatesList orientation='horizontal' />
+);
+
+function InlineEditAsyncDemo({ orientation = 'vertical' }: { orientation?: InlineOrientation }) {
+  const [value, setValue] = useState('Checkout API');
+  const save = (v: unknown) =>
+    new Promise<void>((resolve, reject) => {
+      setTimeout(() => {
+        if ((v as string).trim().length === 0) reject(new Error('Name is required.'));
+        else {
+          setValue(v as string);
+          resolve();
+        }
+      }, 1200);
+    });
+  return (
+    <div className={orientation === 'horizontal' ? 'w-[420px]' : 'w-[320px]'}>
+      <Attribute orientation={orientation} data-testid='attr'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue className='overflow-visible'>
+          <AttributeEdit value={value} onValueCommit={save}>
+            <AttributeEditPreview>{value}</AttributeEditPreview>
+            <AttributeEditControl>
+              <AttributeEditInput />
+            </AttributeEditControl>
+            <AttributeEditError />
+          </AttributeEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+}
+
+export const InlineEditAsync: StoryFn = () => <InlineEditAsyncDemo />;
+
+export const InlineEditHorizontalAsync: StoryFn = () => (
+  <InlineEditAsyncDemo orientation='horizontal' />
+);
