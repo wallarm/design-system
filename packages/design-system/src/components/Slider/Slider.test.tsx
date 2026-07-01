@@ -1,4 +1,4 @@
-import type { ComponentProps } from 'react';
+import { type ComponentProps, createRef } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
@@ -534,5 +534,28 @@ describe('Slider — dev thumb-count guard', () => {
     render(<Range />);
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();
+  });
+});
+
+describe('Slider — ref forwarding (compound parts)', () => {
+  it('forwards a ref to each compound part real DOM node', () => {
+    const control = createRef<HTMLDivElement>();
+    const marks = createRef<HTMLDivElement>();
+    const value = createRef<HTMLSpanElement>();
+    const input = createRef<HTMLInputElement>();
+    render(
+      <Slider defaultValue={[50]} min={0} max={100} step={50}>
+        <SliderControl ref={control}>
+          <SliderThumb aria-label='V' />
+          <SliderMarks ref={marks} marks={MARKS} />
+        </SliderControl>
+        <SliderValue ref={value} />
+        <SliderInput ref={input} />
+      </Slider>,
+    );
+    expect(control.current).toHaveAttribute('data-slot', 'slider-control');
+    expect(marks.current).toHaveAttribute('data-slot', 'slider-marker-group');
+    expect(value.current).toHaveAttribute('data-slot', 'slider-value');
+    expect(input.current?.tagName).toBe('INPUT');
   });
 });

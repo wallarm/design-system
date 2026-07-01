@@ -1,4 +1,4 @@
-import { type FC, type MouseEventHandler, useCallback, useLayoutEffect } from 'react';
+import { type FC, type MouseEventHandler, type Ref, useCallback, useLayoutEffect } from 'react';
 import { Slider as ArkSlider, useSliderContext } from '@ark-ui/react/slider';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -28,10 +28,12 @@ export interface SliderMarksProps {
    */
   marks: SliderMark[];
   className?: string;
+  /** Ref to the Ark MarkerGroup element (the tick overlay). */
+  ref?: Ref<HTMLDivElement>;
 }
 
 /** Tick marks along the track + click-to-jump. Render inside `<SliderControl>`. */
-export const SliderMarks: FC<SliderMarksProps> = ({ marks, className }) => {
+export const SliderMarks: FC<SliderMarksProps> = ({ marks, className, ref }) => {
   const { registerMarks, readOnly } = useSliderRootContext();
   const api = useSliderContext();
   const testId = useTestId('marker-group');
@@ -72,6 +74,7 @@ export const SliderMarks: FC<SliderMarksProps> = ({ marks, className }) => {
 
   return (
     <ArkSlider.MarkerGroup
+      ref={ref}
       data-slot='slider-marker-group'
       data-testid={testId}
       className={cn(sliderMarkerGroupClassNames, className)}

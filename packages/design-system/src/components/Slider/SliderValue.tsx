@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, Ref } from 'react';
 import { useSliderContext } from '@ark-ui/react/slider';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -8,6 +8,8 @@ export interface SliderValueProps {
   /** Show one thumb's value (range). Omit to show all (single → "50", range → "20 – 80"). */
   index?: number;
   className?: string;
+  /** Ref to the readout `<span>`. */
+  ref?: Ref<HTMLSpanElement>;
 }
 
 /**
@@ -15,7 +17,7 @@ export interface SliderValueProps {
  * label instead of the number. Mutually exclusive with the on-drag `tooltip` — show the
  * value one way, never both.
  */
-export const SliderValue: FC<SliderValueProps> = ({ index, className }) => {
+export const SliderValue: FC<SliderValueProps> = ({ index, className, ref }) => {
   const { marks } = useSliderRootContext();
   const api = useSliderContext();
   const testId = useTestId('value');
@@ -26,6 +28,7 @@ export const SliderValue: FC<SliderValueProps> = ({ index, className }) => {
 
   return (
     <span
+      ref={ref}
       data-slot='slider-value'
       data-testid={testId}
       className={cn('text-sm text-text-primary tabular-nums', className)}

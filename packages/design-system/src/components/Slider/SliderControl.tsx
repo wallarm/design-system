@@ -1,4 +1,4 @@
-import { Children, type FC, isValidElement, type ReactNode } from 'react';
+import { Children, type FC, isValidElement, type ReactNode, type Ref } from 'react';
 import { Slider as ArkSlider } from '@ark-ui/react/slider';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -9,10 +9,12 @@ import { SliderThumb } from './SliderThumb';
 export interface SliderControlProps {
   children?: ReactNode;
   className?: string;
+  /** Ref to the Ark Control element (the track region). */
+  ref?: Ref<HTMLDivElement>;
 }
 
 /** The interactive track region — renders the track + range, then the thumb(s) / marks. */
-export const SliderControl: FC<SliderControlProps> = ({ children, className }) => {
+export const SliderControl: FC<SliderControlProps> = ({ children, className, ref }) => {
   const { thumbCount } = useSliderRootContext();
   const testId = useTestId('control');
 
@@ -34,6 +36,7 @@ export const SliderControl: FC<SliderControlProps> = ({ children, className }) =
 
   return (
     <ArkSlider.Control
+      ref={ref}
       data-slot='slider-control'
       data-testid={testId}
       className={cn(sliderControlClassNames, className)}
