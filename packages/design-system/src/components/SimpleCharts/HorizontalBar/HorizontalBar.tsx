@@ -1,8 +1,16 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
+import { useMemo } from 'react';
 import { cn } from '../../../utils/cn';
-import { type TestableProps, TestIdProvider } from '../../../utils/testId';
+import { type TestableProps, TestIdProvider, useTestId } from '../../../utils/testId';
+import { resolveChartColor } from '../lib/chartPalette';
 import type { ChartColor } from '../types';
-import { horizontalBarRootClasses } from './classes';
+import {
+  horizontalBarBarClasses,
+  horizontalBarBarWrapperClasses,
+  horizontalBarRootClasses,
+  horizontalBarSegmentClasses,
+} from './classes';
+import { resolveSegments } from './lib/resolveSegments';
 
 export interface HorizontalBarDatum {
   /** Legend label, React key, and `data-name` hook. */
@@ -40,6 +48,9 @@ export const HorizontalBar: FC<HorizontalBarProps> = ({
   'data-testid': testId,
   ...props
 }) => {
+  const segments = useMemo(() => resolveSegments(data, total), [data, total]);
+  const barTestId = useTestId('bar');
+
   return (
     <TestIdProvider value={testId}>
       <div
@@ -49,7 +60,35 @@ export const HorizontalBar: FC<HorizontalBarProps> = ({
         data-testid={testId}
         className={cn(horizontalBarRootClasses, className)}
       >
-        {/* header + bar + legend added in later tasks */}
+        {/* header added in a later task */}
+        <div data-slot='horizontal-bar-bar-wrapper' className={horizontalBarBarWrapperClasses}>
+          <div
+            data-slot='horizontal-bar-bar'
+            data-testid={barTestId}
+            aria-hidden='true'
+            className={horizontalBarBarClasses}
+          >
+            {segments.map(seg => (
+              <div
+                key={seg.key}
+                data-slot='horizontal-bar-segment'
+                data-name={seg.isRemainder ? undefined : seg.key}
+                data-remainder={seg.isRemainder ? 'true' : undefined}
+                className={cn(horizontalBarSegmentClasses, seg.className)}
+                style={{
+                  flexGrow: seg.value,
+                  flexBasis: 0,
+                  backgroundColor: seg.isRemainder
+                    ? 'var(--color-bg-strong-primary)'
+                    : seg.className
+                      ? undefined
+                      : resolveChartColor(seg.color),
+                }}
+              />
+            ))}
+          </div>
+        </div>
+        {/* legend added in a later task */}
       </div>
     </TestIdProvider>
   );
