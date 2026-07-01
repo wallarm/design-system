@@ -10,6 +10,10 @@ import {
   horizontalBarBarClasses,
   horizontalBarBarWrapperClasses,
   horizontalBarHeaderClasses,
+  horizontalBarLegendClasses,
+  horizontalBarLegendDotClasses,
+  horizontalBarLegendItemClasses,
+  horizontalBarLegendLabelClasses,
   horizontalBarRootClasses,
   horizontalBarSegmentClasses,
   horizontalBarValueClasses,
@@ -55,6 +59,13 @@ export const HorizontalBar: FC<HorizontalBarProps> = ({
   const segments = useMemo(() => resolveSegments(data, total), [data, total]);
   const barTestId = useTestId('bar');
   const valueTestId = useTestId('value');
+  const legendTestId = useTestId('legend');
+  const legendItemTestId = useTestId('legend-item');
+  const legendSegments = useMemo(() => segments.filter(s => !s.isRemainder), [segments]);
+  const barAriaLabel = useMemo(
+    () => (legend ? undefined : legendSegments.map(s => `${s.key} ${s.value}`).join(', ')),
+    [legend, legendSegments],
+  );
   const hasValue = typeof value === 'number';
   const hasDelta = !!delta;
   const deltaDirection = delta ? (delta.trend ?? (delta.value >= 0 ? 'up' : 'down')) : null;
@@ -97,7 +108,8 @@ export const HorizontalBar: FC<HorizontalBarProps> = ({
           <div
             data-slot='horizontal-bar-bar'
             data-testid={barTestId}
-            aria-hidden='true'
+            aria-hidden={legend ? 'true' : undefined}
+            aria-label={barAriaLabel}
             className={horizontalBarBarClasses}
           >
             {segments.map(seg => (
@@ -120,7 +132,33 @@ export const HorizontalBar: FC<HorizontalBarProps> = ({
             ))}
           </div>
         </div>
-        {/* legend added in a later task */}
+        {legend && legendSegments.length > 0 && (
+          <div
+            data-slot='horizontal-bar-legend'
+            data-testid={legendTestId}
+            className={horizontalBarLegendClasses}
+          >
+            {legendSegments.map(seg => (
+              <span
+                key={seg.key}
+                data-slot='horizontal-bar-legend-item'
+                data-testid={legendItemTestId}
+                data-name={seg.key}
+                className={horizontalBarLegendItemClasses}
+              >
+                <span
+                  data-slot='horizontal-bar-legend-dot'
+                  aria-hidden='true'
+                  className={cn(horizontalBarLegendDotClasses, seg.className)}
+                  style={{
+                    backgroundColor: seg.className ? undefined : resolveChartColor(seg.color),
+                  }}
+                />
+                <span className={horizontalBarLegendLabelClasses}>{seg.key}</span>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </TestIdProvider>
   );

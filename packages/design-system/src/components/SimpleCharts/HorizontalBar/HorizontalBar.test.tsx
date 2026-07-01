@@ -118,3 +118,26 @@ describe('HorizontalBar — bar rendering', () => {
     expect(seg.style.backgroundColor).toBe('');
   });
 });
+
+describe('HorizontalBar — legend', () => {
+  const data = [
+    { name: 'Critical', value: 5, color: 'red' as const },
+    { name: 'High', value: 3, color: 'amber' as const },
+  ];
+
+  it('renders one legend item per datum with a color-matched dot', () => {
+    render(<HorizontalBar data={data} total={10} />);
+    const items = document.querySelectorAll('[data-slot="horizontal-bar-legend-item"]');
+    expect(items).toHaveLength(2); // remainder excluded
+    expect(items[0]).toHaveTextContent('Critical');
+    const dot = items[0].querySelector('[data-slot="horizontal-bar-legend-dot"]') as HTMLElement;
+    expect(dot.style.backgroundColor).toBe('var(--color-red-500)');
+  });
+
+  it('hides the legend when legend={false} and summarizes the bar via aria-label', () => {
+    render(<HorizontalBar data={data} legend={false} />);
+    expect(document.querySelector('[data-slot="horizontal-bar-legend"]')).toBeNull();
+    const bar = document.querySelector('[data-slot="horizontal-bar-bar"]') as HTMLElement;
+    expect(bar).toHaveAttribute('aria-label', 'Critical 5, High 3');
+  });
+});
