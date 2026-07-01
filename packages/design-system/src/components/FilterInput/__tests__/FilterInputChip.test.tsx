@@ -266,7 +266,7 @@ describe('FilterInputChip building mode', () => {
       expect(baseValue?.className).toContain('shrink-0');
     });
 
-    it('makes the fixed "Value" label clickable to resume when the pair is incomplete (AS-1179)', async () => {
+    it('makes the fixed "Value" label clickable and resumes at the first missing pair segment (AS-1179/AS-1192)', async () => {
       const user = userEvent.setup();
       const onPairSegmentClick = vi.fn();
       const { container, rerender } = render(
@@ -283,8 +283,22 @@ describe('FilterInputChip building mode', () => {
       // user can resume the second part.
       const pairAttr = () => container.querySelectorAll('[data-slot="segment-attribute"]')[1]!;
       expect(pairAttr()).toHaveAttribute('role', 'button');
+      // No pair operator yet → resume at the operator, not the value (AS-1192).
       await user.click(pairAttr());
-      expect(onPairSegmentClick).toHaveBeenCalledWith('value', expect.anything());
+      expect(onPairSegmentClick).toHaveBeenLastCalledWith('operator', expect.anything());
+
+      // Operator chosen but value still missing → resume at the value (AS-1179).
+      rerender(
+        <FilterInputChip
+          attribute='Context Param'
+          operator='is'
+          value='header'
+          pair={{ attribute: 'Value', operator: 'is', value: '', error: 'value' }}
+          onPairSegmentClick={onPairSegmentClick}
+        />,
+      );
+      await user.click(pairAttr());
+      expect(onPairSegmentClick).toHaveBeenLastCalledWith('value', expect.anything());
 
       // A complete pair keeps the label non-interactive.
       rerender(

@@ -27,25 +27,27 @@ creates `condition.pair` even when it did not exist. Only the two entry points a
 
 ## Approach (A — mirror single-chip resume in the pair, with targeted re-select)
 
-1. **Helper `getFirstIncompletePairSegment(condition, field)`** — mirrors
-   `getFirstIncompleteSegment` for the pair:
-   - returns `operator` when the base is complete and the pair operator is missing
-     (`condition.pair == null` **or** `condition.pair.operator` undefined);
-   - else returns `value` when the pair value is empty;
-   - else `null`.
+1. **`FilterInputChip.tsx` incomplete-pair label** — replace the hardcoded
+   `SEGMENT_VARIANT.value` in the label `onClick` with a route based on the
+   displayed pair: `pair.operator ? 'value' : 'operator'`. The decision lives at
+   the display layer because that is where the routing happens and the chip only
+   holds display data — `chip.pair.operator` is populated exactly when
+   `condition.pair.operator` exists, so it is a faithful proxy for "the pair
+   operator is set". (This supersedes the originally-sketched condition-based
+   `getFirstIncompletePairSegment` helper, which would have needed the condition
+   the chip does not have.)
 
 2. **`handlePairChipClick` (`useChipEditing.ts`)** — relax the early-return: require
-   `pairedField && chip?.pair` but **not** `condition.pair`. When the pair has no
-   operator yet, seed the operator menu (`selectedField = pairedField`,
-   `selectedOperator = null`, `editingSegment = operator`, `editingSide = 1`,
-   `menuState = 'operator'`). Keep the handler **segment-direct** — clicking the
-   operator segment opens the operator menu, clicking value opens the value menu
-   (no redirect). This is the "targeted re-select" the user asked for.
-
-3. **`FilterInputChip.tsx` incomplete-pair label** — replace the hardcoded
-   `SEGMENT_VARIANT.value` in the label `onClick` with a route through
-   `getFirstIncompletePairSegment`: no operator → operator menu; operator set but
-   value empty → value menu.
+   `condition && pairedField && chip?.pair` but **not** `condition.pair` (and guard
+   the one `condition.pair.operator` read with `?.`). When the pair has no operator
+   yet, the handler already seeds the operator menu for `segment === 'operator'`
+   (`selectedField = pairedField`, `selectedOperator = null`, `editingSegment =
+   operator`, `editingSide = 1`, `menuState = 'operator'`). It stays
+   **segment-direct** — clicking the operator segment opens the operator menu,
+   clicking value opens the value menu (no redirect). This is the "targeted
+   re-select" the user asked for. The commit path (`useOperatorFlow` with
+   `editingSide === 1`, `upsertCondition(..., side: 1)`) already creates
+   `condition.pair` from scratch, so no change is needed there.
 
 ### Interaction contract after the change
 
@@ -66,17 +68,18 @@ creates `condition.pair` even when it did not exist. Only the two entry points a
 
 ## Testing
 
-- **Unit** — `getFirstIncompletePairSegment`: base-incomplete → `null`;
-  base-complete + no pair → `operator`; pair operator set + empty value → `value`;
-  complete pair → `null`.
-- **E2E** — build a `context_param` chip, commit it with the pair operator unset,
-  then click the chip and verify the pair **operator** menu opens, selecting an
-  operator advances to the value menu, and completing it clears the error (chip
-  no longer red). Also verify the operator-set/value-empty case: label → value,
-  operator segment → operator.
+- **Unit** (`FilterInputChip.test.tsx`) — the incomplete-pair label routes clicks:
+  no operator → `onPairSegmentClick('operator')`; operator set + empty value →
+  `onPairSegmentClick('value')`; complete pair → label not interactive.
+- **E2E** (`FilterInput.e2e.ts`, AS-1179 paired-chip block) — build a `context_param`
+  chip, blur before choosing the pair operator so it commits incomplete, then click
+  the "Value" label and verify the pair **operator** menu opens (operator menuitems
+  visible; the freeform value flow has none). Interaction-only, so it dodges the
+  AS-1193 value-commit race that quarantines the sibling resume→value test.
 
 ## Touched files
 
-- `hooks/useFilterInputAutocomplete/useChipEditing.ts` — helper + `handlePairChipClick`
-- `FilterInputField/FilterInputChip/FilterInputChip.tsx` — label routing
-- unit + e2e test files under `FilterInput/`
+- `FilterInputField/FilterInputChip/FilterInputChip.tsx` — incomplete-pair label routing
+- `hooks/useFilterInputAutocomplete/useChipEditing.ts` — `handlePairChipClick` guard
+- `__tests__/FilterInputChip.test.tsx` — updated label-routing unit test
+- `__tests__/FilterInput.e2e.ts` — new AS-1192 resume-at-operator e2e

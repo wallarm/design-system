@@ -197,13 +197,19 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           <PairSeparator />
           {/* The paired label ("Value") is normally non-interactive, but when the
               second triplet is incomplete its segments are zero-width — so make the
-              label clickable to resume entering it (AS-1179). */}
+              label clickable to resume entering it (AS-1179). Resume at the first
+              missing pair segment: the operator when it is not set yet, else the
+              value (AS-1192). */}
           <Segment
             variant={SEGMENT_VARIANT.attribute}
             className='shrink-0'
             onClick={
               interactive && pair.error
-                ? e => handlePairSegmentClick(SEGMENT_VARIANT.value, e)
+                ? e =>
+                    handlePairSegmentClick(
+                      pair.operator ? SEGMENT_VARIANT.value : SEGMENT_VARIANT.operator,
+                      e,
+                    )
                 : undefined
             }
           >

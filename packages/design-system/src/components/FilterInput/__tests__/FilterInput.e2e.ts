@@ -276,6 +276,33 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       },
     );
 
+    // AS-1192 — an incomplete paired chip whose pair operator was never chosen
+    // must resume at the OPERATOR, not the value. Clicking the fixed "Value"
+    // label opens the paired operator menu so the condition can be (re)picked.
+    // Before the fix the label hardcoded the value segment, leaving the operator
+    // unreachable while unset. Interaction-only (operator menu opening), so this
+    // avoids the AS-1193 value-commit race the resume test above is quarantined for.
+    test('Should resume at the pair operator when it was never chosen on an incomplete chip', async ({
+      page,
+    }) => {
+      // Leave the pair operator menu open (operator not yet chosen), then blur so
+      // the chip commits incomplete with no pair operator.
+      await buildBase(page, 'header');
+      await page.mouse.click(2, 2);
+
+      const chip = getChip(page);
+      await expect(chip).not.toHaveAttribute('data-building', '');
+      await expect(page.getByRole('alert')).toContainText('Value is required');
+
+      // Click the paired "Value" label: with no pair operator it must open the
+      // operator menu (operator choices render as menuitems; the value flow has
+      // no menuitems since the paired field is freeform). The "is =" and
+      // "is not !=" paired operators confirm it is the operator menu, not the value step.
+      await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
+      await expect(page.getByRole('menuitem', { name: /^is =$/ })).toBeVisible();
+      await expect(page.getByRole('menuitem', { name: /^is not !=$/ })).toBeVisible();
+    });
+
     // AS-1179 #4 — changing the parameter key of a complete paired chip keeps
     // the chip and its second value (regression: the chip used to vanish).
     test('Should keep the chip and its value when the parameter key is changed', async ({

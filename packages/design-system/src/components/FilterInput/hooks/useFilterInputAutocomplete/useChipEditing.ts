@@ -153,6 +153,11 @@ export const useChipEditing = ({
    * Edit an editable segment (operator/value) of a committed paired chip's
    * second triplet. Seeds the paired field and (for value edits) the pair's
    * current operator, then opens the matching menu anchored to the chip.
+   *
+   * The pair need not exist yet: when the base is complete but the pair operator
+   * was never chosen (`condition.pair` is null), the chip still renders a
+   * clickable label that routes here with `segment === 'operator'` so the user
+   * can pick the pair operator (AS-1192).
    */
   const handlePairChipClick = useCallback(
     (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => {
@@ -160,7 +165,7 @@ export const useChipEditing = ({
       const field = condition && fieldsRef.current.find(f => f.name === condition.field);
       const pairedField = field ? field.pairedField : undefined;
       const chip = chipsRef.current.find(c => c.id === chipId);
-      if (!condition?.pair || !pairedField || !chip?.pair) return;
+      if (!condition || !pairedField || !chip?.pair) return;
 
       setMenuAnchor(anchorEl);
       setEditingChipId(chipId);
@@ -169,7 +174,7 @@ export const useChipEditing = ({
 
       const rawOperator =
         getOperatorFromLabel(chip.pair.operator || '', pairedField.type) ??
-        condition.pair.operator ??
+        condition.pair?.operator ??
         null;
       setSelectedOperator(segment === SEGMENT_VARIANT.value ? rawOperator : null);
 
