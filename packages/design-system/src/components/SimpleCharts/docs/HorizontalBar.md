@@ -27,7 +27,7 @@
 | No delta | `delta` undefined | No chip. |
 | Remainder | `total > sum(data.value)` | Grey tail (`--color-bg-strong-primary`) fills the gap; not shown in the legend. |
 | Legend off | `legend={false}` | Bar + header only; the bar gains an `aria-label` summary. |
-| Empty | `data.length === 0` | Bar renders an empty rounded track; legend hidden. Prefer swapping in `<ChartEmpty />` for an explicit empty body. |
+| Empty / no data | `data.length === 0` | Header-only: value + delta render, but the bar wrapper and legend are not rendered at all (no empty track). Holds even when `total` is set. If `value` and `delta` are also absent, nothing renders — prefer `<ChartEmpty />` for an explicit empty body. |
 
 ## Interactions
 
@@ -36,7 +36,8 @@ None in v1 — the component is display-only. No hover-sync or click-to-filter (
 ## Edge cases & unclear states
 
 - **Negative / non-finite values** are coerced to `0` in `resolveSegments` so `flexGrow` geometry stays valid.
-- **Zero total** (all values 0, no positive `total`): the bar renders an empty track; no console warnings.
+- **No data** (`data.length === 0`): the bar wrapper is not rendered — only the header (value/delta) shows. A `total` with empty `data` still draws no bar (no labels → no bar).
+- **Zero total with data present** (all values 0, no positive `total`): the bar renders an empty track; no console warnings.
 - **`className` on a datum** wins over the palette color on both the segment and its legend dot (the inline `backgroundColor` is skipped).
 - **Remainder is never in the legend** — the legend renders only `data` items, not the synthetic tail.
 - **Duplicate `name`s** are used as the React key / `data-name`; keep them unique. A dev-only console warning (matching `PieChart`'s pattern) fires once when duplicates are detected; it is a no-op in production builds.

@@ -76,4 +76,4 @@ Palette.args = {
 };
 
 export const Empty: StoryFn<HorizontalBarProps> = Frame.bind({});
-Empty.args = { data: [] };
+Empty.args = { data: [], value: 91, delta: { value: 10, trend: 'up' } };
