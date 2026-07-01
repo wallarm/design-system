@@ -89,11 +89,13 @@ export const useResumeBuilding = ({
       // never removes the chip, so leave it to the normal path (AS-1179).
       if (baseOperatorMissing) return false;
 
-      // Base value missing: resume the cascade only for paired fields (picking
-      // the value must flow into the second triplet); a plain field reopens its
-      // value menu in place.
+      // Base value missing: resume value entry via the focusable main input
+      // (an empty inline value segment doesn't hold focus). Paired fields resume
+      // on any click so picking the value flows into the second triplet; a plain
+      // field resumes only on a value click, so attribute/operator clicks stay
+      // targeted inline editing (AS-1192).
       if (baseValueMissing) {
-        if (!field.pairedField) return false;
+        if (!field.pairedField && segment !== SEGMENT_VARIANT.value) return false;
         startBuilding({
           base: null,
           side: 0,

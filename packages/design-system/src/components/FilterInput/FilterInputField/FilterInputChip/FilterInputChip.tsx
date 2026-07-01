@@ -171,12 +171,23 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           {operator ?? ''}
         </Segment>
       )}
-      {(value || baseActiveSegment === SEGMENT_VARIANT.value) && (
+      {(value ||
+        baseActiveSegment === SEGMENT_VARIANT.value ||
+        (!pair && effectiveError === SEGMENT_VARIANT.value)) && (
         <Segment
           variant={SEGMENT_VARIANT.value}
           // Cap the paired base value ("key") so a long key can't push the paired
-          // value out; standalone chips truncate against the chip width.
-          className={pair ? 'max-w-[90px] shrink-0' : 'min-w-0'}
+          // value out; standalone chips truncate against the chip width. An empty
+          // required value (incomplete standalone chip) otherwise has no segment,
+          // so the trailing × sits where the user clicks to fill it — deleting the
+          // chip. Reserve a small full-height hit target instead (AS-1192).
+          className={
+            !value && !pair
+              ? 'min-w-[4px] self-stretch'
+              : pair
+                ? 'max-w-[90px] shrink-0'
+                : 'min-w-0'
+          }
           error={
             baseActiveSegment !== SEGMENT_VARIANT.value &&
             (effectiveError === true || effectiveError === SEGMENT_VARIANT.value)

@@ -141,6 +141,26 @@ the segment, so the click never reaches its `onClick` (it "isn't clickable"). Ad
 target. Confirmed in a real browser: click empty value → main input focused → type →
 Enter → chip completes.
 
+## Follow-up 5 (same for a standalone chip's empty value)
+
+The paired fixes above apply equally to a **standalone** (non-paired) incomplete chip:
+its empty required value renders no segment at all, so the chip reads `[attr][op][×]`
+with the × immediately after the operator — clicking where the value goes hits × and
+deletes the chip.
+
+**Fix (mirror of the paired case):**
+- `FilterInputChip.tsx` — render a clickable value placeholder for a standalone chip
+  when it is idle-errored on the value (`!pair && effectiveError === 'value'`), with the
+  same `min-w-[4px] self-stretch` hit target. `effectiveError` (not raw `error`) so the
+  placeholder never appears mid-cascade while another segment is being inline-edited.
+- `useResumeBuilding.ts` — a standalone base-value-missing chip resumes building on a
+  **value** click (typed via the focusable main input); attribute/operator clicks stay
+  targeted inline. Paired fields keep resuming on any click (value flows into the pair).
+
+Verified in a real browser: incomplete `Application ID is` chip → click the value
+placeholder → main input focused → type `123` → Enter → `Application ID is 123`, error
+clears, chip intact.
+
 ## Non-goals
 
 - No change to the base-triplet flow.

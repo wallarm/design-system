@@ -327,6 +327,28 @@ describe('FilterInputChip building mode', () => {
       expect(chip?.className).toContain('border-border-danger');
     });
 
+    it('renders a clickable value placeholder for an incomplete standalone chip (AS-1192)', async () => {
+      // An empty required value on a standalone chip otherwise has no segment, so
+      // the trailing × sits where the user clicks to fill it, deleting the chip.
+      // A placeholder value segment must render and be clickable to resume entry.
+      const user = userEvent.setup();
+      const onSegmentClick = vi.fn();
+      const { container } = render(
+        <FilterInputChip
+          attribute='Application ID'
+          operator='is'
+          value=''
+          error='value'
+          onSegmentClick={onSegmentClick}
+        />,
+      );
+      const valueSeg = container.querySelector('[data-slot="segment-value"]');
+      expect(valueSeg).not.toBeNull();
+      expect(valueSeg).toHaveAttribute('role', 'button');
+      await user.click(valueSeg!);
+      expect(onSegmentClick).toHaveBeenCalledWith('value', expect.anything());
+    });
+
     it('renders the separator as aria-hidden and non-interactive', () => {
       const { container } = render(
         <FilterInputChip
