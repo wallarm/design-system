@@ -15,6 +15,9 @@ const sampleData: HorizontalBarDatum[] = [
 
 figma.connect(HorizontalBar, figmaNodeUrl, {
   props: {
+    // `title` is intentionally rendered only via the external `ChartTitle` (the card frame
+    // shown in `example` below) — it is NOT a prop on `HorizontalBar` itself. Do not add a
+    // `title` prop to `HorizontalBarProps` to satisfy this mapping.
     title: figma.string('Title'),
   },
   example: ({ title }) => (

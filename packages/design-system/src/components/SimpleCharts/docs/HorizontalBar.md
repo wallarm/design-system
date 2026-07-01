@@ -39,7 +39,7 @@ None in v1 — the component is display-only. No hover-sync or click-to-filter (
 - **Zero total** (all values 0, no positive `total`): the bar renders an empty track; no console warnings.
 - **`className` on a datum** wins over the palette color on both the segment and its legend dot (the inline `backgroundColor` is skipped).
 - **Remainder is never in the legend** — the legend renders only `data` items, not the synthetic tail.
-- **Duplicate `name`s** are used as the React key / `data-name`; keep them unique.
+- **Duplicate `name`s** are used as the React key / `data-name`; keep them unique. A dev-only console warning (matching `PieChart`'s pattern) fires once when duplicates are detected; it is a no-op in production builds.
 
 ## Accessibility notes
 

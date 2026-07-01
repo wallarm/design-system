@@ -1,5 +1,5 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 import { ArrowDown, ArrowUp } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider, useTestId } from '../../../utils/testId';
@@ -63,9 +63,32 @@ export const HorizontalBar: FC<HorizontalBarProps> = ({
   const legendItemTestId = useTestId('legend-item');
   const legendSegments = useMemo(() => segments.filter(s => !s.isRemainder), [segments]);
   const barAriaLabel = useMemo(
-    () => (legend ? undefined : legendSegments.map(s => `${s.key} ${s.value}`).join(', ')),
+    () =>
+      legend
+        ? undefined
+        : legendSegments.length
+          ? legendSegments.map(s => `${s.key} ${s.value}`).join(', ')
+          : undefined,
     [legend, legendSegments],
   );
+  const hasDuplicateNames = useMemo(() => {
+    const seen = new Set<string>();
+    for (const d of data) {
+      if (seen.has(d.name)) return true;
+      seen.add(d.name);
+    }
+    return false;
+  }, [data]);
+
+  useEffect(() => {
+    if (hasDuplicateNames && process.env.NODE_ENV !== 'production') {
+      // eslint-disable-next-line no-console
+      console.warn(
+        '[HorizontalBar] `data` contains duplicate `name` values. Names are used as the React key ' +
+          'and the `data-name` hook — duplicates cause key collisions and ambiguous selectors. Provide unique names.',
+      );
+    }
+  }, [hasDuplicateNames]);
   const hasValue = typeof value === 'number';
   const hasDelta = !!delta;
   const deltaDirection = delta ? (delta.trend ?? (delta.value >= 0 ? 'up' : 'down')) : null;

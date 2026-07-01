@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { HorizontalBar } from './HorizontalBar';
 import { resolveSegments } from './lib/resolveSegments';
 
@@ -139,5 +139,55 @@ describe('HorizontalBar — legend', () => {
     expect(document.querySelector('[data-slot="horizontal-bar-legend"]')).toBeNull();
     const bar = document.querySelector('[data-slot="horizontal-bar-bar"]') as HTMLElement;
     expect(bar).toHaveAttribute('aria-label', 'Critical 5, High 3');
+  });
+
+  it('omits aria-label entirely (not empty string) when there are no non-remainder segments', () => {
+    render(<HorizontalBar data={[]} legend={false} />);
+    const bar = document.querySelector('[data-slot="horizontal-bar-bar"]') as HTMLElement;
+    expect(bar).not.toHaveAttribute('aria-label');
+  });
+
+  it('is aria-hidden with no aria-label when the legend is shown (default)', () => {
+    render(<HorizontalBar data={data} />);
+    const bar = document.querySelector('[data-slot="horizontal-bar-bar"]') as HTMLElement;
+    expect(bar).toHaveAttribute('aria-hidden', 'true');
+    expect(bar).not.toHaveAttribute('aria-label');
+  });
+});
+
+describe('HorizontalBar — duplicate name warning', () => {
+  it('warns once in dev when data contains duplicate names', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // Duplicate `name`s also produce duplicate React keys (by design — `name` is the key),
+    // which React additionally flags via console.error; that's expected noise from this
+    // exact scenario, not a bug, so it is silenced here to keep the assertion focused on
+    // the component's own duplicate-name warning.
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    render(
+      <HorizontalBar
+        data={[
+          { name: 'A', value: 1 },
+          { name: 'A', value: 2 },
+        ]}
+      />,
+    );
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('[HorizontalBar]'));
+    warnSpy.mockRestore();
+    errorSpy.mockRestore();
+  });
+
+  it('does not warn when names are unique', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <HorizontalBar
+        data={[
+          { name: 'A', value: 1 },
+          { name: 'B', value: 2 },
+        ]}
+      />,
+    );
+    expect(warnSpy).not.toHaveBeenCalled();
+    warnSpy.mockRestore();
   });
 });
