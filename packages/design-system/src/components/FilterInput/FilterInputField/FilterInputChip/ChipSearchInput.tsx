@@ -28,6 +28,8 @@ export const ChipSearchInput: FC = () => {
         ref={inputRef}
         type='text'
         role='combobox'
+        // Drops the input's default ~20ch min-width so it can shrink inside the chip.
+        size={1}
         aria-expanded={menuOpen}
         aria-invalid={error}
         aria-label='Filter value'
@@ -37,7 +39,7 @@ export const ChipSearchInput: FC = () => {
         onKeyDown={onInputKeyDown}
         onClick={onInputClick}
         style={{ width: `${inputWidth}px` }}
-        className='h-22 border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0'
+        className='h-22 min-w-0 border-none bg-transparent p-0 text-sm shadow-none outline-none ring-0'
       />
       <span
         ref={sizerRef}

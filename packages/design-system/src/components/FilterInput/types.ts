@@ -84,6 +84,14 @@ export interface FieldValueOption {
   value: string | number | boolean;
   label: string;
   badge?: { color: BadgeColor; text: string };
+  /**
+   * Optional secondary text rendered as a muted line beneath the bold `label`
+   * in the value dropdown (e.g. a backend path that explains or disambiguates
+   * the option). Display-only — never committed as a filter value. Because the
+   * bold `label` need not be unique, this line is what distinguishes rows that
+   * share a label (two `request-id` rows with different paths).
+   */
+  description?: string;
 }
 
 /**

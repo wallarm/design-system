@@ -238,6 +238,16 @@ export const useFilterInputExpression = ({
       }
 
       const condition = buildCondition(field, operator, val, error, dateOrigin);
+      // Editing the base side rebuilds the condition from scratch; carry the
+      // existing `pair` over when the field is unchanged so the second triplet
+      // survives. A field change is a fresh condition, so its pair is dropped (AS-1179).
+      if (editingChipId) {
+        const idx = chipIdToConditionIndex(editingChipId);
+        const prevCondition = idx !== null ? prev.conditions[idx] : undefined;
+        if (prevCondition?.pair && prevCondition.field === condition.field) {
+          condition.pair = prevCondition.pair;
+        }
+      }
       const newConditions = applyCondition(prev.conditions, condition, editingChipId, atIndex);
       const newConnectors = addConnectorIfNeeded(
         prev.connectors,

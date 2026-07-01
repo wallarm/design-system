@@ -48,6 +48,13 @@ export const chipVariants = cva(
 /** Segment container */
 export const segmentContainer = 'flex flex-col justify-center overflow-hidden leading-none';
 
+/** Hit target for an empty required value: a small full-height box so the value
+ *  is clickable and the trailing × can't sit on top of it (AS-1192). */
+export const emptyValueHitTarget = 'min-w-[4px] self-stretch';
+
+/** Min width for the value edit input so an empty freeform value stays clickable. */
+export const editingValueMinWidth = 'min-w-[3.5rem]';
+
 /** Segment text styles by variant */
 export const segmentTextVariants = cva('truncate text-sm', {
   variants: {
@@ -71,9 +78,11 @@ export const segmentTextVariants = cva('truncate text-sm', {
   },
 });
 
-/** Remove button styles — hidden by default, shown on chip hover or button focus */
+/** Remove button styles — hidden by default, shown on chip hover or button focus.
+ *  `pointer-events-none` while invisible stops it swallowing clicks meant for the
+ *  chip/input and silently deleting the chip (AS-1179). */
 export const removeButtonVariants = cva(
-  `absolute -right-[13px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 group-hover/chip:opacity-100 focus:opacity-100 transition-opacity ${hiddenWhenSelected}`,
+  `absolute -right-[13px] top-[-1px] bottom-[-1px] flex items-center justify-center p-0 cursor-pointer w-[18px] border border-solid border-l-0 rounded-r-8 opacity-0 pointer-events-none group-hover/chip:opacity-100 group-hover/chip:pointer-events-auto focus:opacity-100 focus:pointer-events-auto transition-opacity ${hiddenWhenSelected}`,
   {
     variants: {
       error: {

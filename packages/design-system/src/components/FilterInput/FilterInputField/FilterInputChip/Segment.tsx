@@ -2,7 +2,7 @@ import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import { FilterInputContext } from '../../FilterInputContext/FilterInputContext';
-import { segmentContainer, segmentTextVariants } from './classes';
+import { editingValueMinWidth, segmentContainer, segmentTextVariants } from './classes';
 import { CHAR_WIDTH_PX } from './constants';
 import { MultiValueSegment } from './MultiValueSegment';
 import { useSizerWidth } from './model/useSizerWidth';
@@ -135,6 +135,8 @@ export const Segment: FC<SegmentProps> = ({
             className={cn(
               segmentTextVariants({ variant, error }),
               'bg-transparent outline-none p-0 m-0',
+              // Keep an empty value input clickable — content width grows past it (AS-1192).
+              variant === SEGMENT_VARIANT.value && editingValueMinWidth,
             )}
             style={{ width: `${inputWidth}px` }}
           />
