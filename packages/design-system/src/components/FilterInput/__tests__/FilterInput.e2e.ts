@@ -346,12 +346,15 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       const chip = getChip(page);
       await expect(chip).not.toHaveAttribute('data-building', '');
 
-      // The idle empty value segment must be a real target, not zero-width.
+      // The idle empty value segment must be a real target: non-zero width AND
+      // height (an empty segment otherwise collapses to a 0×0 box and clicks fall
+      // through to the chip / × button).
       await chip.hover();
       const pairValue = chip.locator('[data-slot="segment-value"]').nth(1);
       const box = (await pairValue.boundingBox())!;
       expect(box).toBeTruthy();
-      expect(box.width).toBeGreaterThanOrEqual(28);
+      expect(box.width).toBeGreaterThanOrEqual(20);
+      expect(box.height).toBeGreaterThanOrEqual(12);
 
       // Click it (empty segments fail Playwright's visibility gate, so click by
       // coordinate as a user would). It must resume the chip for value entry, not

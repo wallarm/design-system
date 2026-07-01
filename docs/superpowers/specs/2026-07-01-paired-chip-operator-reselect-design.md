@@ -130,9 +130,16 @@ value` click with the pair operator set resumes; operator/base clicks stay targe
 inline (no hijack). Verified in a real browser: click empty value → main input focused →
 type `authorization` → Enter → chip completes, error clears.
 
-Also make the reserved idle value hit-target **smaller** (`min-w-[2rem]`, was
-`3.5rem`): since typing now happens in the main input, the idle segment only needs to be
-a click target that sits before the × button, not hold the text.
+Also make the reserved idle value hit-target **smaller** (`min-w-[24px]`): since typing
+now happens in the main input, the idle segment only needs to be a click target that
+sits before the × button, not hold the text.
+
+**Height, not just width.** An empty segment has no text, so it collapses to `height:
+0` — a 24×0 strip whose centre `elementFromPoint` resolves to the chip container, not
+the segment, so the click never reaches its `onClick` (it "isn't clickable"). Add
+`self-stretch` so the empty value fills the row height (24×~20), making it a real hit
+target. Confirmed in a real browser: click empty value → main input focused → type →
+Enter → chip completes.
 
 ## Non-goals
 
