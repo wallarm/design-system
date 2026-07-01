@@ -331,11 +331,14 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       await expect(page.getByRole('menuitem', { name: /^cookie$/ })).toBeVisible();
     });
 
-    // AS-1192 — the empty paired VALUE has a freeform field (no dropdown), so its
-    // inline-edit input must keep a clickable width instead of collapsing to a few
-    // px. A too-narrow target blurs shut on a near-miss ("click to fill → it just
-    // closes"). Opening the value edit must expose a usable (>= 40px) area.
-    test('Should give the empty paired value a clickable edit area', async ({ page }) => {
+    // AS-1192 — the empty paired VALUE reserves a clickable width even when idle.
+    // Otherwise it collapses to ~0px and the trailing remove (×) button lands
+    // exactly where the user clicks to fill the value — so "click to fill" deleted
+    // the whole chip. The value must be its own hit target (>= 40px), so clicking
+    // it opens the value edit and leaves the chip intact.
+    test('Should not delete the chip when clicking the empty paired value to fill it', async ({
+      page,
+    }) => {
       await buildBase(page, 'header');
       await page.getByRole('menuitem', { name: /^is =$/ }).click(); // pair operator
       await page.mouse.click(2, 2);
@@ -343,14 +346,20 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       const chip = getChip(page);
       await expect(chip).not.toHaveAttribute('data-building', '');
 
-      // The empty pair value segment collapses to ~0px when idle — the fixed
-      // "Value" label is its affordance. Clicking it opens the value edit, which
-      // must render a usable width.
-      await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
+      // The idle empty value segment must be a real target, not zero-width.
+      await chip.hover();
       const pairValue = chip.locator('[data-slot="segment-value"]').nth(1);
-      const box = await pairValue.boundingBox();
+      const box = (await pairValue.boundingBox())!;
       expect(box).toBeTruthy();
-      expect(box!.width).toBeGreaterThanOrEqual(40);
+      expect(box.width).toBeGreaterThanOrEqual(40);
+
+      // Click its centre (empty segments fail Playwright's visibility gate, so
+      // click by coordinate as a user would). It must open the value edit, not
+      // hit the × button behind it → the chip survives.
+      await page.mouse.click(box.x + 8, box.y + box.height / 2);
+      await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
+      // The value edit opened (its inline input is present) rather than the × button firing.
+      await expect(page.locator('[data-slot="filter-input"] input')).toHaveCount(1);
     });
 
     // AS-1179 #4 — changing the parameter key of a complete paired chip keeps

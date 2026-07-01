@@ -167,23 +167,31 @@ export const useChipEditing = ({
       const chip = chipsRef.current.find(c => c.id === chipId);
       if (!condition || !pairedField || !chip?.pair) return;
 
-      setMenuAnchor(anchorEl);
-      setEditingChipId(chipId);
-      setEditingSide(1);
-      setSelectedField(pairedField);
-
       const rawOperator =
         getOperatorFromLabel(chip.pair.operator || '', pairedField.type) ??
         condition.pair?.operator ??
         null;
-      setSelectedOperator(segment === SEGMENT_VARIANT.value ? rawOperator : null);
 
-      setEditingSegment(segment);
+      // Can't fill the value before its operator: a value click while the pair
+      // operator is unset redirects to the operator (mirrors the label routing
+      // and the single-chip first-incomplete-segment behaviour) (AS-1192).
+      const targetSegment =
+        segment === SEGMENT_VARIANT.value && !rawOperator ? SEGMENT_VARIANT.operator : segment;
+
+      setMenuAnchor(anchorEl);
+      setEditingChipId(chipId);
+      setEditingSide(1);
+      setSelectedField(pairedField);
+      setSelectedOperator(targetSegment === SEGMENT_VARIANT.value ? rawOperator : null);
+
+      setEditingSegment(targetSegment);
       setSegmentFilterText(
-        segment === SEGMENT_VARIANT.operator ? (chip.pair.operator ?? '') : (chip.pair.value ?? ''),
+        targetSegment === SEGMENT_VARIANT.operator
+          ? (chip.pair.operator ?? '')
+          : (chip.pair.value ?? ''),
       );
       setUserHasTyped(false);
-      setMenuState(SEGMENT_TO_MENU[segment]);
+      setMenuState(SEGMENT_TO_MENU[targetSegment]);
     },
     [setMenuAnchor, setSelectedField, setSelectedOperator, setMenuState],
   );

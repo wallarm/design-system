@@ -98,6 +98,23 @@ the ~5px input is somehow hit.
 unchanged; only the empty case gains a usable (~56px) click/type area. Scoped to the
 value variant — operator/attribute edits have menus and don't need it.
 
+## Follow-up 3 (clicking the empty value deletes the chip)
+
+Symptom: with the pair operator set and the value empty (red), clicking the value to
+fill it **deletes the chip**. Root cause (reproduced in Storybook): the idle empty value
+segment is zero-width and sits at the chip's right edge — exactly where the trailing
+remove (×) button renders (both at x≈401). So the click lands on × and removes the chip.
+(Follow-up 2's min-width only applied while *editing*; idle it was still 0px.)
+
+**Fix (two parts):**
+
+1. `FilterInputChip.tsx` — reserve a clickable width (`min-w-[3.5rem]`) for the pair
+   value segment while it is empty, even when idle. The value becomes its own hit target
+   and pushes × to its right (verified: value x=401 w=56, × x=457).
+2. `useChipEditing.ts` — a value click while the pair operator is unset redirects to the
+   operator (you can't fill a value before its operator), mirroring the label routing and
+   the single-chip first-incomplete-segment behaviour.
+
 ## Non-goals
 
 - No change to the base-triplet flow.
