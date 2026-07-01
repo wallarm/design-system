@@ -42,8 +42,7 @@ global.ResizeObserver = class ResizeObserver {
 // jsdom omits visualViewport; @zag-js/tour reads it during boundary tracking
 // and crashes after unmount in unrelated tests. Stub the minimum surface.
 if (typeof window !== 'undefined' && !window.visualViewport) {
-  // biome-ignore lint/suspicious/noExplicitAny: jsdom shim
-  (window as any).visualViewport = {
+  (window as { visualViewport?: unknown }).visualViewport = {
     width: window.innerWidth,
     height: window.innerHeight,
     offsetLeft: 0,
