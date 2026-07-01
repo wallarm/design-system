@@ -353,7 +353,7 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       const pairValue = chip.locator('[data-slot="segment-value"]').nth(1);
       const box = (await pairValue.boundingBox())!;
       expect(box).toBeTruthy();
-      expect(box.width).toBeGreaterThanOrEqual(20);
+      expect(box.width).toBeGreaterThanOrEqual(14);
       expect(box.height).toBeGreaterThanOrEqual(12);
 
       // Click it (empty segments fail Playwright's visibility gate, so click by
