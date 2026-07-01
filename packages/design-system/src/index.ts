@@ -522,6 +522,21 @@ export {
 } from './components/Selection';
 export { Separator, type SeparatorProps } from './components/Separator';
 export { Skeleton, type SkeletonProps } from './components/Skeleton';
+export {
+  Slider,
+  SliderControl,
+  type SliderControlProps,
+  SliderInput,
+  type SliderInputProps,
+  type SliderMark,
+  SliderMarks,
+  type SliderMarksProps,
+  type SliderProps,
+  SliderThumb,
+  type SliderThumbProps,
+  SliderValue,
+  type SliderValueProps,
+} from './components/Slider';
 export { SplashScreen, type SplashScreenProps } from './components/SplashScreen';
 export { SplitButton, type SplitButtonProps } from './components/SplitButton';
 export {

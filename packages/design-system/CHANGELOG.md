@@ -1,3 +1,7 @@
+## 0.69.0 (2026-07-01)
+
+* feat(design-system): add Slider component (#192) ([7978fb4](https://github.com/wallarm/design-system/commit/7978fb4)), closes [#192](https://github.com/wallarm/design-system/issues/192)
+
 ## <small>0.68.2 (2026-06-29)</small>
 
 * fix(filter-input): AS-1171 cross-field label borrowing (#191) ([0a06b8e](https://github.com/wallarm/design-system/commit/0a06b8e)), closes [#191](https://github.com/wallarm/design-system/issues/191)
