@@ -276,13 +276,13 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       },
     );
 
-    // AS-1192 — an incomplete paired chip whose pair operator was never chosen
-    // must resume at the OPERATOR, not the value. Clicking the fixed "Value"
-    // label opens the paired operator menu so the condition can be (re)picked.
-    // Before the fix the label hardcoded the value segment, leaving the operator
-    // unreachable while unset. Interaction-only (operator menu opening), so this
-    // avoids the AS-1193 value-commit race the resume test above is quarantined for.
-    test('Should resume at the pair operator when it was never chosen on an incomplete chip', async ({
+    // AS-1192 — an incomplete paired chip whose pair operator was never chosen:
+    // clicking the fixed "Value" label opens the pair OPERATOR menu (the operator
+    // segment is zero-width while unset, so the label is its affordance). Before
+    // the fix the label hardcoded the value segment, leaving the operator
+    // unreachable. Interaction-only (operator menu opening), so this avoids the
+    // AS-1193 value-commit race the resume test above is quarantined for.
+    test('Should open the pair operator menu from the label when the operator is unset', async ({
       page,
     }) => {
       // Leave the pair operator menu open (operator not yet chosen), then blur so
@@ -301,6 +301,34 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
       await expect(page.getByRole('menuitem', { name: /^is =$/ })).toBeVisible();
       await expect(page.getByRole('menuitem', { name: /^is not !=$/ })).toBeVisible();
+    });
+
+    // AS-1192 — every segment of an incomplete paired chip is individually
+    // editable via a targeted click, exactly like a single chip. Previously
+    // `tryResumeBuilding` hijacked every click to the first missing step
+    // (resume-building), so clicking the base operator jumped to the pair value.
+    // Now clicking a segment edits THAT segment.
+    test('Should edit the clicked segment (not resume) on an incomplete paired chip', async ({
+      page,
+    }) => {
+      // Base complete + pair operator "is =" chosen, pair value left empty → blur.
+      await buildBase(page, 'header');
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+      await page.mouse.click(2, 2);
+
+      const chip = getChip(page);
+      await expect(chip).not.toHaveAttribute('data-building', '');
+
+      // Click the PAIR operator segment → the pair operator menu ("like ~" is a
+      // paired-only operator the "=" base field lacks, proving it is the pair
+      // operator menu and not a resume into the value step).
+      await chip.locator('[data-slot="segment-operator"]').nth(1).click();
+      await expect(page.getByRole('menuitem', { name: /^like ~$/ })).toBeVisible();
+
+      // Click the BASE value segment → the key-options menu (targeted), not a resume.
+      await page.mouse.click(2, 2);
+      await chip.locator('[data-slot="segment-value"]').nth(0).click();
+      await expect(page.getByRole('menuitem', { name: /^cookie$/ })).toBeVisible();
     });
 
     // AS-1179 #4 — changing the parameter key of a complete paired chip keeps

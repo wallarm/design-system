@@ -58,6 +58,32 @@ creates `condition.pair` even when it did not exist. Only the two entry points a
 - Complete pair: unchanged — clicking the operator segment re-selects the operator.
 - Base triplet: unchanged (already mirrors the single-chip resume).
 
+## Follow-up (targeted per-segment editing — the real "like a single chip" fix)
+
+The label routing above made the operator *reachable*, but clicking the chip still
+did not behave like a single chip. Root cause: `useResumeBuilding.tryResumeBuilding`
+(called first in both `handleChipClick` and `handlePairChipClick`) intercepts **every**
+click on a committed-incomplete paired chip and *resumes building* at the first missing
+step — removing the chip and reopening the menu there — regardless of which segment was
+clicked. So clicking the base operator jumped to the pair value; no segment was
+individually editable. A single chip has no such hijack: clicks inline-edit the segment
+they land on.
+
+**Fix:** in `useResumeBuilding`, stop resuming for the *base-complete but pair-incomplete*
+case (return `false`), so those clicks fall through to the normal inline-edit handlers,
+which target the clicked segment. The one genuine cascade — base **value** missing on a
+paired field, where picking the value must flow into the second triplet — is kept.
+
+Resulting behaviour, matching a single chip:
+
+- Click the base operator → base operator menu; base value → key menu.
+- Click the (visible) pair operator → pair operator menu; pick → advances to value.
+- The zero-width missing pair segments keep the "Value" label as their affordance
+  (routes to operator when unset, else value).
+
+The commit paths were already correct (`useOperatorFlow` / `useValueFlow` with
+`editingSide === 1`, `upsertCondition(..., side: 1)`), so no change there.
+
 ## Non-goals
 
 - No change to the base-triplet flow.
@@ -81,5 +107,8 @@ creates `condition.pair` even when it did not exist. Only the two entry points a
 
 - `FilterInputField/FilterInputChip/FilterInputChip.tsx` — incomplete-pair label routing
 - `hooks/useFilterInputAutocomplete/useChipEditing.ts` — `handlePairChipClick` guard
+- `hooks/useFilterInputAutocomplete/useResumeBuilding.ts` — stop hijacking clicks on a
+  base-complete/pair-incomplete chip so segments stay individually editable
 - `__tests__/FilterInputChip.test.tsx` — updated label-routing unit test
-- `__tests__/FilterInput.e2e.ts` — new AS-1192 resume-at-operator e2e
+- `__tests__/FilterInput.test.tsx` — updated force-commit-mid-pair test to the targeted behaviour
+- `__tests__/FilterInput.e2e.ts` — label-opens-operator e2e + targeted-segment-edit e2e

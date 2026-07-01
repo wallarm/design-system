@@ -103,27 +103,12 @@ export const useResumeBuilding = ({
         return true;
       }
 
-      // Base complete. For a value-bearing paired field, resume the second
-      // triplet when its operator or value is still missing.
-      if (field.pairedField && !isNoValueOperator(condition.operator!)) {
-        const pairOperator = condition.pair?.operator;
-        const pairOperatorMissing = !pairOperator;
-        const pairOperatorTakesValue = pairOperator != null && !isNoValueOperator(pairOperator);
-        const pairValueMissing =
-          pairOperatorTakesValue && isEmptyFilterValue(condition.pair?.value);
-
-        if (pairOperatorMissing || pairValueMissing) {
-          startBuilding({
-            base: { field, operator: condition.operator, value: condition.value },
-            side: 1,
-            selectedField: field.pairedField,
-            selectedOperator: pairOperator ?? null,
-            menuState: pairOperatorMissing ? 'operator' : 'value',
-          });
-          return true;
-        }
-      }
-
+      // Base complete but the paired second triplet is incomplete: do NOT resume
+      // building. Each segment must stay individually editable via inline edit,
+      // exactly like a single chip — clicking the base operator edits the base
+      // operator, clicking the pair operator edits the pair operator, etc.
+      // (AS-1192). Resuming here would hijack every click to the first missing
+      // step and remove the chip, which is not the single-chip behaviour.
       return false;
     },
     [

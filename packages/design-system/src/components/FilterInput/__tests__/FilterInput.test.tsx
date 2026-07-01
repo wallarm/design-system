@@ -1410,10 +1410,14 @@ describe('FilterInput', () => {
       const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
       expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('xxx');
 
-      // Re-clicking the paired operator resumes the paired VALUE menu (yyy).
+      // Re-clicking the paired operator targets the OPERATOR (AS-1192): a
+      // targeted click edits the segment it lands on, exactly like a single
+      // chip, so the operator menu opens rather than resuming into the value
+      // step. (The paired "Value" label is the affordance for the zero-width
+      // empty value.)
       const operators = chip.querySelectorAll('[data-slot="segment-operator"]');
       await user.click(operators[operators.length - 1]!);
-      expect(await findMenuitem(/^yyy$/)).toBeInTheDocument();
+      expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
     });
   });
 });
