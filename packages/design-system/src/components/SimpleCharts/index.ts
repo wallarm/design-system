@@ -28,6 +28,11 @@ export {
 } from './Chart';
 export { type ChartTimeFormatters, useChartTimeFormatters } from './hooks';
 export {
+  HorizontalBar,
+  type HorizontalBarDatum,
+  type HorizontalBarProps,
+} from './HorizontalBar';
+export {
   LineChart,
   LineChartBody,
   type LineChartBodyProps,
