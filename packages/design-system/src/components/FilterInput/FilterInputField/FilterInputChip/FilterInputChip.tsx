@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import type { ChipErrorSegment, FilterInputChipData } from '../../types';
 import { ChipSearchInput } from './ChipSearchInput';
-import { chipVariants } from './classes';
+import { chipVariants, emptyValueHitTarget } from './classes';
 import { useEditingContext } from './context/EditingContext';
 import { FilterInputRemoveButton } from './FilterInputRemoveButton';
 import { PairSeparator } from './PairSeparator';
@@ -176,17 +176,9 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
         (!pair && effectiveError === SEGMENT_VARIANT.value)) && (
         <Segment
           variant={SEGMENT_VARIANT.value}
-          // Cap the paired base value ("key") so a long key can't push the paired
-          // value out; standalone chips truncate against the chip width. An empty
-          // required value (incomplete standalone chip) otherwise has no segment,
-          // so the trailing × sits where the user clicks to fill it — deleting the
-          // chip. Reserve a small full-height hit target instead (AS-1192).
+          // Empty required value → clickable placeholder; paired key → capped.
           className={
-            !value && !pair
-              ? 'min-w-[4px] self-stretch'
-              : pair
-                ? 'max-w-[90px] shrink-0'
-                : 'min-w-0'
+            !value && !pair ? emptyValueHitTarget : pair ? 'max-w-[90px] shrink-0' : 'min-w-0'
           }
           error={
             baseActiveSegment !== SEGMENT_VARIANT.value &&
@@ -206,11 +198,8 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       {pair && (
         <>
           <PairSeparator />
-          {/* The paired label ("Value") is normally non-interactive, but when the
-              second triplet is incomplete its segments are zero-width — so make the
-              label clickable to resume entering it (AS-1179). Resume at the first
-              missing pair segment: the operator when it is not set yet, else the
-              value (AS-1192). */}
+          {/* When the pair is incomplete its segments are zero-width, so the label
+              is the affordance — routing to the first missing segment (AS-1179/AS-1192). */}
           <Segment
             variant={SEGMENT_VARIANT.attribute}
             className='shrink-0'
@@ -239,12 +228,8 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           {(pair.value != null || pairActiveSegment === SEGMENT_VARIANT.value) && (
             <Segment
               variant={SEGMENT_VARIANT.value}
-              // An empty required value has no text, so it collapses to a 0×0 box —
-              // clicks fall through to the chip (or the trailing × button, deleting
-              // the chip). Reserve a real hit target: a small width plus full row
-              // height (`self-stretch`), so clicking it resumes building to type the
-              // value in the main input, and × stays pushed past it (AS-1192).
-              className={pair.value ? 'min-w-0' : 'min-w-[4px] self-stretch'}
+              // Empty required value → clickable placeholder (see emptyValueHitTarget).
+              className={pair.value ? 'min-w-0' : emptyValueHitTarget}
               error={
                 pairActiveSegment !== SEGMENT_VARIANT.value &&
                 (effectivePairError === true || effectivePairError === SEGMENT_VARIANT.value)

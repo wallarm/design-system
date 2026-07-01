@@ -48,6 +48,13 @@ export const chipVariants = cva(
 /** Segment container */
 export const segmentContainer = 'flex flex-col justify-center overflow-hidden leading-none';
 
+/** Hit target for an empty required value: a small full-height box so the value
+ *  is clickable and the trailing × can't sit on top of it (AS-1192). */
+export const emptyValueHitTarget = 'min-w-[4px] self-stretch';
+
+/** Min width for the value edit input so an empty freeform value stays clickable. */
+export const editingValueMinWidth = 'min-w-[3.5rem]';
+
 /** Segment text styles by variant */
 export const segmentTextVariants = cva('truncate text-sm', {
   variants: {
