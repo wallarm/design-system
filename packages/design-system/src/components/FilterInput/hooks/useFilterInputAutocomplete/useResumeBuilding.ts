@@ -1,5 +1,6 @@
 import type { RefObject } from 'react';
 import { useCallback } from 'react';
+import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
 import { chipIdToConditionIndex, isEmptyFilterValue, isNoValueOperator } from '../../lib';
 import type { Condition, FieldMetadata, FilterOperator, MenuState } from '../../types';
 import type { BuildingBase } from './useAutocompleteState';
@@ -48,7 +49,7 @@ export const useResumeBuilding = ({
   inputRef,
 }: UseResumeBuildingDeps) =>
   useCallback(
-    (chipId: string): boolean => {
+    (chipId: string, segment?: ChipSegment, side: 0 | 1 = 0): boolean => {
       const idx = chipIdToConditionIndex(chipId);
       if (idx === null) return false;
       const condition = conditions[idx];
@@ -103,12 +104,35 @@ export const useResumeBuilding = ({
         return true;
       }
 
-      // Base complete but the paired second triplet is incomplete: do NOT resume
-      // building. Each segment must stay individually editable via inline edit,
-      // exactly like a single chip — clicking the base operator edits the base
-      // operator, clicking the pair operator edits the pair operator, etc.
-      // (AS-1192). Resuming here would hijack every click to the first missing
-      // step and remove the chip, which is not the single-chip behaviour.
+      // Base complete, paired second triplet incomplete. Only the VALUE click
+      // resumes building: a freeform value must be typed, and the inline segment
+      // input does not hold focus (focus falls back to the container), whereas
+      // resume-building routes typing through the always-focusable main input.
+      // Operator (and base) clicks stay inline for targeted per-segment editing —
+      // resuming them would hijack the click to the first gap (AS-1192).
+      if (
+        side === 1 &&
+        segment === SEGMENT_VARIANT.value &&
+        field.pairedField &&
+        !isNoValueOperator(condition.operator!)
+      ) {
+        const pairOperator = condition.pair?.operator;
+        const pairValueMissing =
+          pairOperator != null &&
+          !isNoValueOperator(pairOperator) &&
+          isEmptyFilterValue(condition.pair?.value);
+        if (pairValueMissing) {
+          startBuilding({
+            base: { field, operator: condition.operator, value: condition.value },
+            side: 1,
+            selectedField: field.pairedField,
+            selectedOperator: pairOperator,
+            menuState: 'value',
+          });
+          return true;
+        }
+      }
+
       return false;
     },
     [

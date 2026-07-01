@@ -230,9 +230,11 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
               variant={SEGMENT_VARIANT.value}
               // An empty required value renders as zero-width text, so the trailing
               // remove (×) button lands exactly where the user clicks to fill it —
-              // deleting the chip instead. Reserve a clickable width so the value
-              // is its own hit target and × is pushed past it (AS-1192).
-              className={pair.value ? 'min-w-0' : 'min-w-[3.5rem]'}
+              // deleting the chip instead. Reserve a small clickable width so the
+              // value is its own hit target and × is pushed past it. Clicking it
+              // resumes building (typing goes to the main input), so this only
+              // needs to be a hit target, not hold the text (AS-1192).
+              className={pair.value ? 'min-w-0' : 'min-w-[2rem]'}
               error={
                 pairActiveSegment !== SEGMENT_VARIANT.value &&
                 (effectivePairError === true || effectivePairError === SEGMENT_VARIANT.value)

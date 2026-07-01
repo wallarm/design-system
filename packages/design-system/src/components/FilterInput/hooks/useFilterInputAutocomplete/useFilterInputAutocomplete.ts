@@ -286,7 +286,7 @@ export const useFilterInputAutocomplete = ({
 
   const handleChipClick = useCallback(
     (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => {
-      if (tryResumeBuilding(chipId)) return;
+      if (tryResumeBuilding(chipId, segment, 0)) return;
       editing.handleChipClick(chipId, segment, anchorEl);
     },
     [tryResumeBuilding, editing.handleChipClick],
@@ -294,7 +294,7 @@ export const useFilterInputAutocomplete = ({
 
   const handlePairChipClick = useCallback(
     (chipId: string, segment: ChipSegment, anchorEl: HTMLElement) => {
-      if (tryResumeBuilding(chipId)) return;
+      if (tryResumeBuilding(chipId, segment, 1)) return;
       editing.handlePairChipClick(chipId, segment, anchorEl);
     },
     [tryResumeBuilding, editing.handlePairChipClick],

@@ -331,11 +331,11 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       await expect(page.getByRole('menuitem', { name: /^cookie$/ })).toBeVisible();
     });
 
-    // AS-1192 — the empty paired VALUE reserves a clickable width even when idle.
-    // Otherwise it collapses to ~0px and the trailing remove (×) button lands
+    // AS-1192 — the empty paired VALUE reserves a small clickable width even when
+    // idle. Otherwise it collapses to ~0px and the trailing remove (×) button lands
     // exactly where the user clicks to fill the value — so "click to fill" deleted
-    // the whole chip. The value must be its own hit target (>= 40px), so clicking
-    // it opens the value edit and leaves the chip intact.
+    // the whole chip. The value must be its own hit target, so clicking it resumes
+    // building (to type the value in the main input) and leaves the chip intact.
     test('Should not delete the chip when clicking the empty paired value to fill it', async ({
       page,
     }) => {
@@ -351,14 +351,13 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       const pairValue = chip.locator('[data-slot="segment-value"]').nth(1);
       const box = (await pairValue.boundingBox())!;
       expect(box).toBeTruthy();
-      expect(box.width).toBeGreaterThanOrEqual(40);
+      expect(box.width).toBeGreaterThanOrEqual(28);
 
-      // Click its centre (empty segments fail Playwright's visibility gate, so
-      // click by coordinate as a user would). It must open the value edit, not
-      // hit the × button behind it → the chip survives.
+      // Click it (empty segments fail Playwright's visibility gate, so click by
+      // coordinate as a user would). It must resume the chip for value entry, not
+      // hit the × button behind it → the chip survives with its typing input.
       await page.mouse.click(box.x + 8, box.y + box.height / 2);
       await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
-      // The value edit opened (its inline input is present) rather than the × button firing.
       await expect(page.locator('[data-slot="filter-input"] input')).toHaveCount(1);
     });
 

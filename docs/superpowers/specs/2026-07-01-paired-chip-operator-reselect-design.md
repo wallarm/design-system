@@ -115,6 +115,25 @@ remove (×) button renders (both at x≈401). So the click lands on × and remov
    operator (you can't fill a value before its operator), mirroring the label routing and
    the single-chip first-incomplete-segment behaviour.
 
+## Follow-up 4 (clicking the empty value must open a typable input)
+
+Symptom: clicking the empty value to fill it "turns into an input but doesn't work" —
+you can't type. Root cause (confirmed via a real browser + headless): the inline value
+segment input never holds focus — focus falls back to the FilterInput container
+(`tabindex=-1`), so keystrokes go nowhere. This afflicts a **freeform** value (no menu
+to fall back on) and is the same fragility the quarantined AS-1193 documents.
+
+**Fix:** route the empty pair **value** click back through resume-building (the original
+AS-1179 mechanism), which types the value in the always-focusable **main input** instead
+of a fragile inline segment input. Scoped precisely: only a `side === 1`, `segment ===
+value` click with the pair operator set resumes; operator/base clicks stay targeted
+inline (no hijack). Verified in a real browser: click empty value → main input focused →
+type `authorization` → Enter → chip completes, error clears.
+
+Also make the reserved idle value hit-target **smaller** (`min-w-[2rem]`, was
+`3.5rem`): since typing now happens in the main input, the idle segment only needs to be
+a click target that sits before the × button, not hold the text.
+
 ## Non-goals
 
 - No change to the base-triplet flow.
@@ -139,7 +158,10 @@ remove (×) button renders (both at x≈401). So the click lands on × and remov
 - `FilterInputField/FilterInputChip/FilterInputChip.tsx` — incomplete-pair label routing
 - `hooks/useFilterInputAutocomplete/useChipEditing.ts` — `handlePairChipClick` guard
 - `hooks/useFilterInputAutocomplete/useResumeBuilding.ts` — stop hijacking clicks on a
-  base-complete/pair-incomplete chip so segments stay individually editable
+  base-complete/pair-incomplete chip so segments stay individually editable; resume
+  building only for the pair **value** click (typed via the focusable main input)
+- `hooks/useFilterInputAutocomplete/useFilterInputAutocomplete.ts` — pass the clicked
+  segment/side to `tryResumeBuilding`
 - `FilterInputField/FilterInputChip/Segment.tsx` — minimum edit width for the value
   variant so an empty freeform value is a usable click/type target
 - `__tests__/FilterInputChip.test.tsx` — updated label-routing unit test
