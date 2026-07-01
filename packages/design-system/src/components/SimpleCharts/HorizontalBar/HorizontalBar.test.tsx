@@ -59,6 +59,30 @@ describe('resolveSegments', () => {
   });
 });
 
+describe('HorizontalBar — header', () => {
+  it('renders the value with locale formatting', () => {
+    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} value={12345} />);
+    const value = document.querySelector('[data-slot="horizontal-bar-value"]');
+    expect(value).toHaveTextContent('12,345');
+  });
+
+  it('renders no header when both value and delta are absent', () => {
+    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} />);
+    expect(document.querySelector('[data-slot="horizontal-bar-header"]')).toBeNull();
+  });
+
+  it('renders a delta badge with an up label and absolute value', () => {
+    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} delta={{ value: 10 }} />);
+    const badge = screen.getByLabelText('up 10');
+    expect(badge).toHaveTextContent('10');
+  });
+
+  it('uses trend for direction over sign; shows the absolute number', () => {
+    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} delta={{ value: 5, trend: 'down' }} />);
+    expect(screen.getByLabelText('down 5')).toBeInTheDocument();
+  });
+});
+
 describe('HorizontalBar — bar rendering', () => {
   it('renders one segment per datum with matching data-name and resolved color', () => {
     render(
