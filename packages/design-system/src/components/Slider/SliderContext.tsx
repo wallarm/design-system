@@ -10,6 +10,12 @@ export interface SliderRootContextValue {
   invalid: boolean;
   /** Resolved disabled state (own `disabled` ?? Field `disabled`). */
   disabled: boolean;
+  /**
+   * Resolved read-only state (own `readOnly` ?? Field `readOnly`). Ark's thumb guards
+   * drag/keyboard on this, but its `setThumbValue` does NOT — so parts that write
+   * imperatively (`SliderInput`, `SliderMarks` click-to-jump) must honour it themselves.
+   */
+  readOnly: boolean;
   /** Field help/error id to announce on the thumb (`aria-describedby`). */
   ariaDescribedby?: string;
   /** Field label id — fallback accessible name for a single thumb with no explicit label. */

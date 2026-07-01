@@ -6,6 +6,7 @@ every interactive target a consumer **cannot yet** attach `data-analytics-id` / 
 (or arbitrary `data-*` / `aria-*` / `ref`) to, why, the workaround, the owner, and the next decision point.
 
 Audited: 2026-06-26 (pre-flight, `/metrics-audit`) · Updated: 2026-06-30 (compound rework — CG-1 resolved) ·
+Updated: 2026-07-01 (PR #192 review — `SliderInput` now forwards `{...rest}`/`ref`; markers documented as value gestures) ·
 Owner: Design System team — metrics rollout
 
 ## Already covered (not gaps)
@@ -26,13 +27,24 @@ independently addressable:
 </SliderControl>
 ```
 
+The inline **`SliderInput`** (`SliderThumb`'s numeric-entry sibling) is also a real interactive node — a
+DS `Input` (`<input>`) — and forwards the consumer's arbitrary `data-*` / `aria-*` / `id` / `ref` straight
+through via `{...rest}` (`SliderInputProps extends InputHTMLAttributes<HTMLInputElement>`). See
+`SliderInput.tsx`.
+
 | Target | Seam | Node |
 | --- | --- | --- |
 | Each thumb (single value, or any thumb of a range) | the `SliderThumb` sub-component's `{...rest}` | `<div role="slider">` |
+| The inline numeric box | the `SliderInput` sub-component's `{...rest}` / `ref` | `<input>` |
 
-Track click and pointer drag have **no discrete DOM click target** an SDK can resolve — they are value
-gestures, observable via the `onValueChange` / `onValueChangeEnd` callbacks. Not a gap (decision-tree
-"custom interaction with no DOM click → typed callback").
+Track click, pointer drag, and **tick click-to-jump** have **no meaningfully-attributable discrete click
+target** — they are value gestures (each moves the nearest thumb to a value), observable via the
+`onValueChange` / `onValueChangeEnd` callbacks. Individual `SliderMarks` ticks are therefore *not*
+per-tick addressable: marks are a `{ value, label }` data model (they also drive `aria-valuetext`), not
+exported per-mark sub-components. This is the decision-tree "custom interaction with no discrete DOM click →
+typed callback" case, not an accepted closed-target gap. If a product genuinely needs per-tick attribution,
+the escalation is a `renderMark` render-prop (keeps the data model, adds a visual/attribute seam) rather
+than full `<SliderMark>` compounding — file it then, not pre-emptively.
 
 ## Resolved gaps
 

@@ -182,6 +182,21 @@ describe('Slider — analytics pass-through (each thumb is the real node, CG-1 c
     expect(getThumbs(container)[0]).toHaveAttribute('data-analytics-props', payload);
   });
 
+  it('forwards analytics + arbitrary data-* to the real SliderInput <input>', () => {
+    const payload = '{"feature":"risk","unit":"score"}';
+    const { container } = render(
+      <Slider defaultValue={[50]}>
+        <SliderControl>
+          <SliderThumb aria-label='Risk' />
+        </SliderControl>
+        <SliderInput data-analytics-id='RISK_ENTRY' data-analytics-props={payload} />
+      </Slider>,
+    );
+    const box = container.querySelector<HTMLInputElement>('input[data-slot="input"]');
+    expect(box).toHaveAttribute('data-analytics-id', 'RISK_ENTRY');
+    expect(box).toHaveAttribute('data-analytics-props', payload);
+  });
+
   it('resolves a thumb click to its analytics-id via closest()', () => {
     const captured = captureAnalyticsClicks();
     const { container } = render(
@@ -347,6 +362,56 @@ describe('Slider — inline SliderInput', () => {
       </Field>,
     );
     expect(getInputBoxes(container)[0]).toBeDisabled();
+  });
+
+  it('keeps the raw draft while editing — an emptied box is not snapped back', () => {
+    const { container } = render(
+      <Slider defaultValue={[42]}>
+        <SliderControl>
+          <SliderThumb aria-label='Value' />
+        </SliderControl>
+        <SliderInput />
+      </Slider>,
+    );
+    const [box] = getInputBoxes(container);
+    expect(box).toHaveValue('42');
+    // Clearing the field must stick (draft), not immediately revert to the machine value.
+    fireEvent.change(box, { target: { value: '' } });
+    expect(box).toHaveValue('');
+    // A lone '-' (Number('-') === NaN) is preserved mid-entry rather than discarded.
+    fireEvent.change(box, { target: { value: '-' } });
+    expect(box).toHaveValue('-');
+  });
+
+  it('buffers until blur, then re-syncs a non-committable draft to the machine value', () => {
+    const { container } = render(
+      <Slider defaultValue={[42]}>
+        <SliderControl>
+          <SliderThumb aria-label='Value' />
+        </SliderControl>
+        <SliderInput />
+      </Slider>,
+    );
+    const [box] = getInputBoxes(container);
+    fireEvent.change(box, { target: { value: '-' } });
+    fireEvent.blur(box);
+    expect(box).toHaveValue('42');
+  });
+
+  it('is read-only (and drops edits) when the slider is readOnly', () => {
+    const { container } = render(
+      <Slider defaultValue={[50]} readOnly>
+        <SliderControl>
+          <SliderThumb aria-label='Value' />
+        </SliderControl>
+        <SliderInput />
+      </Slider>,
+    );
+    const [box] = getInputBoxes(container);
+    expect(box).toHaveAttribute('readonly');
+    // The readOnly guard drops the keystroke — the draft never takes over the box.
+    fireEvent.change(box, { target: { value: '9' } });
+    expect(box).toHaveValue('50');
   });
 });
 

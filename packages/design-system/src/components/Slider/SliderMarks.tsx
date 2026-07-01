@@ -1,4 +1,4 @@
-import { type FC, useLayoutEffect } from 'react';
+import { type FC, type MouseEventHandler, useCallback, useLayoutEffect } from 'react';
 import { Slider as ArkSlider, useSliderContext } from '@ark-ui/react/slider';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -32,7 +32,7 @@ export interface SliderMarksProps {
 
 /** Tick marks along the track + click-to-jump. Render inside `<SliderControl>`. */
 export const SliderMarks: FC<SliderMarksProps> = ({ marks, className }) => {
-  const { registerMarks } = useSliderRootContext();
+  const { registerMarks, readOnly } = useSliderRootContext();
   const api = useSliderContext();
   const testId = useTestId('marker-group');
 
@@ -49,6 +49,25 @@ export const SliderMarks: FC<SliderMarksProps> = ({ marks, className }) => {
   // not on every commit — which would flicker marks → [] → marks.
   useLayoutEffect(() => () => registerMarks([]), [registerMarks]);
 
+  // Click-to-jump, delegated: one stable handler on the group resolves the clicked tick
+  // via `closest` + its `data-value` and moves the nearest thumb onto it (requirements
+  // §6.3). Keyboard equivalent is arrow-stepping, so ticks are not separate tab stops.
+  // Guard readOnly ourselves — Ark's `setThumbValue` isn't gated by it (only drag/keyboard
+  // are), so an unguarded click would mutate a read-only slider.
+  const handleMarkerClick = useCallback<MouseEventHandler<HTMLDivElement>>(
+    event => {
+      if (readOnly) return;
+      const marker = (event.target as HTMLElement).closest<HTMLElement>(
+        '[data-slot="slider-marker"]',
+      );
+      if (!marker) return;
+      const markValue = Number(marker.dataset.value);
+      if (Number.isNaN(markValue)) return;
+      api.setThumbValue(nearestThumbIndex(api.value, markValue), markValue);
+    },
+    [api, readOnly],
+  );
+
   if (marks.length === 0) return null;
 
   return (
@@ -56,16 +75,15 @@ export const SliderMarks: FC<SliderMarksProps> = ({ marks, className }) => {
       data-slot='slider-marker-group'
       data-testid={testId}
       className={cn(sliderMarkerGroupClassNames, className)}
+      onClick={handleMarkerClick}
     >
       {marks.map(mark => (
         <ArkSlider.Marker
           key={mark.value}
           value={mark.value}
           data-slot='slider-marker'
+          data-value={mark.value}
           className={sliderMarkerClassNames}
-          // Click-to-jump: move the nearest thumb onto this tick (requirements §6.3).
-          // Keyboard equivalent is arrow-stepping, so ticks are not separate tab stops.
-          onClick={() => api.setThumbValue(nearestThumbIndex(api.value, mark.value), mark.value)}
         >
           {mark.label}
         </ArkSlider.Marker>

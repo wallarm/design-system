@@ -29,6 +29,9 @@ type SliderRootConfig = Pick<
   | 'thumbCollisionBehavior'
 >;
 
+/** The details object Ark passes to `onValueChange` / `onValueChangeEnd`. */
+type SliderValueDetails = Parameters<NonNullable<ArkSlider.RootProps['onValueChange']>>[0];
+
 export interface SliderProps extends SliderRootConfig, TestableProps {
   /** Error state → maps to Ark `invalid` (repaints the handle; the message is the Field's job). */
   error?: boolean;
@@ -83,7 +86,7 @@ export const Slider: FC<SliderProps> = ({
   const field = useFieldContext();
   const invalid = error || Boolean(field?.invalid);
   const isDisabled = disabled ?? field?.disabled ?? false;
-  const isReadOnly = readOnly ?? field?.readOnly;
+  const isReadOnly = readOnly ?? field?.readOnly ?? false;
 
   // Thumb COUNT is value-driven (Ark-native): controlled `value` wins, else `defaultValue`.
   const thumbCount = (value ?? defaultValue).length;
@@ -113,12 +116,24 @@ export const Slider: FC<SliderProps> = ({
   // Single value in a Field → the field label names the thumb (via aria-labelledby).
   const fieldLabelId = field && !isRange ? field.ids.label : undefined;
 
+  // Adapt Ark's `{ value }` details to the DS's bare `number[]` callbacks — as stable
+  // references so they don't churn the headless Root on every render.
+  const handleValueChange = useCallback(
+    (details: SliderValueDetails) => onValueChange?.(details.value),
+    [onValueChange],
+  );
+  const handleValueChangeEnd = useCallback(
+    (details: SliderValueDetails) => onValueChangeEnd?.(details.value),
+    [onValueChangeEnd],
+  );
+
   const contextValue = useMemo(
     () => ({
       isRange,
       thumbCount,
       invalid,
       disabled: isDisabled,
+      readOnly: isReadOnly,
       ariaDescribedby: field?.ariaDescribedby,
       fieldLabelId,
       marks,
@@ -129,6 +144,7 @@ export const Slider: FC<SliderProps> = ({
       thumbCount,
       invalid,
       isDisabled,
+      isReadOnly,
       field?.ariaDescribedby,
       fieldLabelId,
       marks,
@@ -152,8 +168,8 @@ export const Slider: FC<SliderProps> = ({
       form={form}
       minStepsBetweenThumbs={minStepsBetweenThumbs}
       thumbCollisionBehavior={thumbCollisionBehavior}
-      onValueChange={onValueChange ? details => onValueChange(details.value) : undefined}
-      onValueChangeEnd={onValueChangeEnd ? details => onValueChangeEnd(details.value) : undefined}
+      onValueChange={onValueChange ? handleValueChange : undefined}
+      onValueChangeEnd={onValueChangeEnd ? handleValueChangeEnd : undefined}
       data-slot='slider'
       data-testid={testId}
       className={cn(sliderVariants(), className)}

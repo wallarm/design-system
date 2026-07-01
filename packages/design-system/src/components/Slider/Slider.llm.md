@@ -40,7 +40,7 @@ The root `Slider` owns the machine (`value` / `min` / `max` / `step` / `disabled
 A slider should almost always show its value. Choose a single readout:
 - **Value beside the label** (the default for forms) — render the live value in the `FieldLabel` row (a controlled `value` + a `<span>`, or the `SliderValue` part).
 - **`tooltip` on a `SliderThumb`** — an on-drag bubble above the handle. Best when vertical space is tight and the value only matters mid-drag.
-- **`SliderInput`** — an inline numbers-only `Input` (a plain box, no stepper arrows; range → two boxes, min left / max right). The precision escape hatch that doubles as the readout.
+- **`SliderInput`** — an inline numbers-only `Input` (a plain box, no stepper arrows; range → two boxes, min left / max right). The precision escape hatch that doubles as the readout. Edits **commit on blur / Enter** (an in-progress draft is never fought by the machine's clamp/snap), and it reflects the slider's `disabled` / `readOnly` state. Arbitrary `data-*` / analytics / `ref` forward to the real `<input>`.
 
 ## Ordinal / labeled scales
 Put `<SliderMarks marks={[{ value, label }]}>` inside `SliderControl` (`Low` / `Medium` / `High`) and set `step` so each stop lands on a mark. The handle then **announces the label, not the number** (`aria-valuetext`) and the ticks carry the words. Use it for qualitative levels; keep it to a handful of stops.
