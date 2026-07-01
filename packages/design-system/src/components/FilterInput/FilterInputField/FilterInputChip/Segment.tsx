@@ -135,6 +135,11 @@ export const Segment: FC<SegmentProps> = ({
             className={cn(
               segmentTextVariants({ variant, error }),
               'bg-transparent outline-none p-0 m-0',
+              // A freeform value has no dropdown to fall back on, so an empty
+              // value input would collapse to a few px — an invisible, unhittable
+              // target that blurs shut on a near-miss. Guarantee a clickable width
+              // for value edits; content-driven width still grows past it (AS-1192).
+              variant === SEGMENT_VARIANT.value && 'min-w-[3.5rem]',
             )}
             style={{ width: `${inputWidth}px` }}
           />

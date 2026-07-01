@@ -84,6 +84,20 @@ Resulting behaviour, matching a single chip:
 The commit paths were already correct (`useOperatorFlow` / `useValueFlow` with
 `editingSide === 1`, `upsertCondition(..., side: 1)`), so no change there.
 
+## Follow-up 2 (empty paired value has no clickable edit area)
+
+Symptom: after the pair goes red (value required), clicking to fill the value "just
+closes". Root cause (reproduced in Storybook): the inline-edit `<input>` auto-sizes to
+its content (`useSizerWidth` on `editText || ' '`), so an **empty** value collapses to
+~5px. A freeform paired value (`options: []`) has no dropdown to fall back on, so there
+is no visible, hittable target — any near-miss blurs the edit shut. Typing works only if
+the ~5px input is somehow hit.
+
+**Fix:** give the value-variant edit input a minimum width (`min-w-[3.5rem]`) in
+`Segment.tsx`. Content-driven width still grows past it, so non-empty edits are
+unchanged; only the empty case gains a usable (~56px) click/type area. Scoped to the
+value variant — operator/attribute edits have menus and don't need it.
+
 ## Non-goals
 
 - No change to the base-triplet flow.
@@ -109,6 +123,8 @@ The commit paths were already correct (`useOperatorFlow` / `useValueFlow` with
 - `hooks/useFilterInputAutocomplete/useChipEditing.ts` — `handlePairChipClick` guard
 - `hooks/useFilterInputAutocomplete/useResumeBuilding.ts` — stop hijacking clicks on a
   base-complete/pair-incomplete chip so segments stay individually editable
+- `FilterInputField/FilterInputChip/Segment.tsx` — minimum edit width for the value
+  variant so an empty freeform value is a usable click/type target
 - `__tests__/FilterInputChip.test.tsx` — updated label-routing unit test
 - `__tests__/FilterInput.test.tsx` — updated force-commit-mid-pair test to the targeted behaviour
 - `__tests__/FilterInput.e2e.ts` — label-opens-operator e2e + targeted-segment-edit e2e

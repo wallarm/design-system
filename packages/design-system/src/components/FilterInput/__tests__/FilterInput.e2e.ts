@@ -331,6 +331,28 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       await expect(page.getByRole('menuitem', { name: /^cookie$/ })).toBeVisible();
     });
 
+    // AS-1192 — the empty paired VALUE has a freeform field (no dropdown), so its
+    // inline-edit input must keep a clickable width instead of collapsing to a few
+    // px. A too-narrow target blurs shut on a near-miss ("click to fill → it just
+    // closes"). Opening the value edit must expose a usable (>= 40px) area.
+    test('Should give the empty paired value a clickable edit area', async ({ page }) => {
+      await buildBase(page, 'header');
+      await page.getByRole('menuitem', { name: /^is =$/ }).click(); // pair operator
+      await page.mouse.click(2, 2);
+
+      const chip = getChip(page);
+      await expect(chip).not.toHaveAttribute('data-building', '');
+
+      // The empty pair value segment collapses to ~0px when idle — the fixed
+      // "Value" label is its affordance. Clicking it opens the value edit, which
+      // must render a usable width.
+      await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
+      const pairValue = chip.locator('[data-slot="segment-value"]').nth(1);
+      const box = await pairValue.boundingBox();
+      expect(box).toBeTruthy();
+      expect(box!.width).toBeGreaterThanOrEqual(40);
+    });
+
     // AS-1179 #4 — changing the parameter key of a complete paired chip keeps
     // the chip and its second value (regression: the chip used to vanish).
     test('Should keep the chip and its value when the parameter key is changed', async ({
