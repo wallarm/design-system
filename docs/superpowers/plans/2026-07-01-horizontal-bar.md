@@ -39,7 +39,7 @@ All paths under `packages/design-system/src/components/SimpleCharts/HorizontalBa
 - `HorizontalBar.e2e.ts` — Playwright screenshots + a11y.
 - `HorizontalBar.figma.tsx` — Code Connect binding.
 - `../docs/HorizontalBar.md` — living doc.
-- Modify `../index.ts` (SimpleCharts barrel) and `packages/design-system/src/index.ts` (top-level barrel) — add exports.
+- Modify `../index.ts` (SimpleCharts barrel) — add exports. **Note:** the SimpleCharts family is exposed only via the package.json `"./*"` subpath export (`components/SimpleCharts/index.ts`), NOT the top-level `packages/design-system/src/index.ts`. Registering in the SimpleCharts barrel is the only registration needed — do not touch the top-level barrel.
 
 ---
 
@@ -51,7 +51,6 @@ All paths under `packages/design-system/src/components/SimpleCharts/HorizontalBa
 - Create: `SimpleCharts/HorizontalBar/index.ts`
 - Create: `SimpleCharts/HorizontalBar/HorizontalBar.test.tsx`
 - Modify: `SimpleCharts/index.ts` (add barrel export)
-- Modify: `packages/design-system/src/index.ts` (add top-level export, alphabetical)
 
 **Interfaces:**
 - Produces:
@@ -187,19 +186,9 @@ export {
 } from './HorizontalBar';
 ```
 
-- [ ] **Step 7: Register in the top-level barrel**
+- [ ] **Step 7: (No top-level barrel change)**
 
-In `packages/design-system/src/index.ts`, add the exports alphabetically. The three symbols are already re-exported by `./components/SimpleCharts`; add:
-
-```ts
-export {
-  HorizontalBar,
-  type HorizontalBarDatum,
-  type HorizontalBarProps,
-} from './components/SimpleCharts';
-```
-
-(Place near the other `SimpleCharts` re-exports; if the file re-exports the whole family from one block, add the three symbols to that block instead of a new statement.)
+The SimpleCharts family is NOT re-exported from `packages/design-system/src/index.ts`; it is consumed via the package.json `"./*"` subpath export (`components/SimpleCharts/index.ts`). Step 6 is therefore the only registration needed. Do not modify the top-level barrel. Verify with `grep -n "SimpleCharts\|PieChart" packages/design-system/src/index.ts` (expect no matches).
 
 - [ ] **Step 8: Run test + typecheck**
 
@@ -211,7 +200,7 @@ Expected: no errors.
 - [ ] **Step 9: Commit**
 
 ```bash
-git add packages/design-system/src/components/SimpleCharts/HorizontalBar packages/design-system/src/components/SimpleCharts/index.ts packages/design-system/src/index.ts
+git add packages/design-system/src/components/SimpleCharts/HorizontalBar packages/design-system/src/components/SimpleCharts/index.ts
 git commit -m "feat(simple-charts): scaffold HorizontalBar root + exports
 
 Co-Authored-By: Claude Opus 4.8 (1M context) <noreply@anthropic.com>"
