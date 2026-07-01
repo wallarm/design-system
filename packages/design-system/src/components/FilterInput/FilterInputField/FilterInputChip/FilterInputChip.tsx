@@ -233,7 +233,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
               // the chip). Reserve a real hit target: a small width plus full row
               // height (`self-stretch`), so clicking it resumes building to type the
               // value in the main input, and × stays pushed past it (AS-1192).
-              className={pair.value ? 'min-w-0' : 'min-w-[16px] self-stretch'}
+              className={pair.value ? 'min-w-0' : 'min-w-[4px] self-stretch'}
               error={
                 pairActiveSegment !== SEGMENT_VARIANT.value &&
                 (effectivePairError === true || effectivePairError === SEGMENT_VARIANT.value)

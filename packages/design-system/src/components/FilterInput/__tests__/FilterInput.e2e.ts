@@ -353,13 +353,13 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       const pairValue = chip.locator('[data-slot="segment-value"]').nth(1);
       const box = (await pairValue.boundingBox())!;
       expect(box).toBeTruthy();
-      expect(box.width).toBeGreaterThanOrEqual(14);
+      expect(box.width).toBeGreaterThanOrEqual(3);
       expect(box.height).toBeGreaterThanOrEqual(12);
 
-      // Click it (empty segments fail Playwright's visibility gate, so click by
-      // coordinate as a user would). It must resume the chip for value entry, not
-      // hit the × button behind it → the chip survives with its typing input.
-      await page.mouse.click(box.x + 8, box.y + box.height / 2);
+      // Click its centre (empty segments fail Playwright's visibility gate, so
+      // click by coordinate as a user would). It must resume the chip for value
+      // entry, not hit the × button behind it → the chip survives with its input.
+      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
       await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
       await expect(page.locator('[data-slot="filter-input"] input')).toHaveCount(1);
     });
