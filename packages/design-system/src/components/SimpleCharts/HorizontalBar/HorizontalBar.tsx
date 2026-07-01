@@ -89,6 +89,7 @@ export const HorizontalBar: FC<HorizontalBarProps> = ({
       );
     }
   }, [hasDuplicateNames]);
+  const hasBar = data.length > 0;
   const hasValue = typeof value === 'number';
   const hasDelta = !!delta;
   const deltaDirection = delta ? (delta.trend ?? (delta.value >= 0 ? 'up' : 'down')) : null;
@@ -127,34 +128,36 @@ export const HorizontalBar: FC<HorizontalBarProps> = ({
             )}
           </div>
         )}
-        <div data-slot='horizontal-bar-bar-wrapper' className={horizontalBarBarWrapperClasses}>
-          <div
-            data-slot='horizontal-bar-bar'
-            data-testid={barTestId}
-            aria-hidden={legend ? 'true' : undefined}
-            aria-label={barAriaLabel}
-            className={horizontalBarBarClasses}
-          >
-            {segments.map(seg => (
-              <div
-                key={seg.key}
-                data-slot='horizontal-bar-segment'
-                data-name={seg.isRemainder ? undefined : seg.key}
-                data-remainder={seg.isRemainder ? 'true' : undefined}
-                className={cn(horizontalBarSegmentClasses, seg.className)}
-                style={{
-                  flexGrow: seg.value,
-                  flexBasis: 0,
-                  backgroundColor: seg.isRemainder
-                    ? 'var(--color-bg-strong-primary)'
-                    : seg.className
-                      ? undefined
-                      : resolveChartColor(seg.color),
-                }}
-              />
-            ))}
+        {hasBar && (
+          <div data-slot='horizontal-bar-bar-wrapper' className={horizontalBarBarWrapperClasses}>
+            <div
+              data-slot='horizontal-bar-bar'
+              data-testid={barTestId}
+              aria-hidden={legend ? 'true' : undefined}
+              aria-label={barAriaLabel}
+              className={horizontalBarBarClasses}
+            >
+              {segments.map(seg => (
+                <div
+                  key={seg.key}
+                  data-slot='horizontal-bar-segment'
+                  data-name={seg.isRemainder ? undefined : seg.key}
+                  data-remainder={seg.isRemainder ? 'true' : undefined}
+                  className={cn(horizontalBarSegmentClasses, seg.className)}
+                  style={{
+                    flexGrow: seg.value,
+                    flexBasis: 0,
+                    backgroundColor: seg.isRemainder
+                      ? 'var(--color-bg-strong-primary)'
+                      : seg.className
+                        ? undefined
+                        : resolveChartColor(seg.color),
+                  }}
+                />
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         {legend && legendSegments.length > 0 && (
           <div
             data-slot='horizontal-bar-legend'

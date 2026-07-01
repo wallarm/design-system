@@ -117,6 +117,14 @@ describe('HorizontalBar — bar rendering', () => {
     expect(seg).toHaveClass('bg-sky-500');
     expect(seg.style.backgroundColor).toBe('');
   });
+
+  it('renders header-only (no bar, no legend) when data is empty but value/delta are present', () => {
+    render(<HorizontalBar data={[]} value={91} delta={{ value: 10, trend: 'up' }} />);
+    expect(document.querySelector('[data-slot="horizontal-bar-bar-wrapper"]')).toBeNull();
+    expect(document.querySelector('[data-slot="horizontal-bar-legend"]')).toBeNull();
+    expect(document.querySelector('[data-slot="horizontal-bar-value"]')).toHaveTextContent('91');
+    expect(screen.getByLabelText('up 10')).toBeInTheDocument();
+  });
 });
 
 describe('HorizontalBar — legend', () => {
@@ -141,10 +149,10 @@ describe('HorizontalBar — legend', () => {
     expect(bar).toHaveAttribute('aria-label', 'Critical 5, High 3');
   });
 
-  it('omits aria-label entirely (not empty string) when there are no non-remainder segments', () => {
+  it('renders no bar at all when data is empty (even with legend={false})', () => {
     render(<HorizontalBar data={[]} legend={false} />);
-    const bar = document.querySelector('[data-slot="horizontal-bar-bar"]') as HTMLElement;
-    expect(bar).not.toHaveAttribute('aria-label');
+    expect(document.querySelector('[data-slot="horizontal-bar-bar-wrapper"]')).toBeNull();
+    expect(document.querySelector('[data-slot="horizontal-bar-bar"]')).toBeNull();
   });
 
   it('is aria-hidden with no aria-label when the legend is shown (default)', () => {
