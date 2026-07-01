@@ -125,6 +125,19 @@ describe('HorizontalBar — bar rendering', () => {
     expect(document.querySelector('[data-slot="horizontal-bar-value"]')).toHaveTextContent('91');
     expect(screen.getByLabelText('up 10')).toBeInTheDocument();
   });
+
+  it('renders no bar when data is empty even if total is set (no labels → no bar)', () => {
+    render(<HorizontalBar data={[]} value={91} total={120} />);
+    expect(document.querySelector('[data-slot="horizontal-bar-bar-wrapper"]')).toBeNull();
+    expect(document.querySelector('[data-slot="horizontal-bar-segment"]')).toBeNull();
+  });
+
+  it('renders only the root wrapper when data is empty and no value/delta', () => {
+    render(<HorizontalBar data={[]} />);
+    expect(document.querySelector('[data-slot="horizontal-bar-header"]')).toBeNull();
+    expect(document.querySelector('[data-slot="horizontal-bar-bar-wrapper"]')).toBeNull();
+    expect(document.querySelector('[data-slot="horizontal-bar-legend"]')).toBeNull();
+  });
 });
 
 describe('HorizontalBar — legend', () => {
