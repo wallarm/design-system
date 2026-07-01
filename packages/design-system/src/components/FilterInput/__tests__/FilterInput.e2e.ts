@@ -413,3 +413,45 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
     });
   });
 });
+
+// AS-1192 — a standalone (non-paired) incomplete chip is [attr][op] with no value
+// segment, so the trailing × sits where the value goes and clicking to fill it
+// deleted the chip. Mirrors the paired no-delete guard; interaction-only (chip
+// survival), so it dodges the AS-1193 value-commit race.
+test.describe('Component: FilterInput — AS-1192 standalone chip', () => {
+  test.describe('Interactions', () => {
+    type E2EPage = Parameters<Parameters<typeof test>[1]>[0]['page'];
+    const getField = (page: E2EPage) => page.locator('[data-slot="filter-input"]');
+    const getChip = (page: E2EPage) =>
+      page.locator('[data-slot="filter-input-condition-chip"]').first();
+
+    test('Should not delete the chip when clicking the empty value to fill it', async ({
+      page,
+    }) => {
+      await filterFieldStory.goto(page, 'Default');
+      await getField(page).click();
+      await page.getByRole('menuitem', { name: /^Priority$/ }).click();
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+
+      // Force-commit the incomplete chip: click the input area just right of the
+      // building chip (leaves the value empty) instead of blurring, which would
+      // keep it a draft.
+      const chip = getChip(page);
+      const cbox = (await chip.boundingBox())!;
+      await page.mouse.click(cbox.x + cbox.width + 24, cbox.y + cbox.height / 2);
+      await expect(chip).not.toHaveAttribute('data-building', '');
+      await expect(page.getByRole('alert')).toBeVisible();
+
+      // The empty value renders a clickable placeholder; clicking it must resume
+      // value entry, not hit the × behind it → the chip survives with its input.
+      await chip.hover();
+      const value = chip.locator('[data-slot="segment-value"]');
+      const vbox = (await value.boundingBox())!;
+      expect(vbox.width).toBeGreaterThanOrEqual(3);
+      expect(vbox.height).toBeGreaterThanOrEqual(12);
+      await page.mouse.click(vbox.x + vbox.width / 2, vbox.y + vbox.height / 2);
+      await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
+      await expect(page.locator('[data-slot="filter-input"] input')).toHaveCount(1);
+    });
+  });
+});

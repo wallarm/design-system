@@ -130,6 +130,9 @@ value` click with the pair operator set resumes; operator/base clicks stay targe
 inline (no hijack). Verified in a real browser: click empty value → main input focused →
 type `authorization` → Enter → chip completes, error clears.
 
+> Final width, after tuning: `min-w-[4px]` (shared by both cases via `emptyValueHitTarget`);
+> `self-stretch` supplies the clickable height. The 24px below was an intermediate value.
+
 Also make the reserved idle value hit-target **smaller** (`min-w-[24px]`): since typing
 now happens in the main input, the idle segment only needs to be a click target that
 sits before the × button, not hold the text.
