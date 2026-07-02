@@ -43,6 +43,7 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
     onStartReached,
     onStartReachedThreshold,
     initialScrollToRowId,
+    isLoadingPrevious,
   } = useTableContext();
   const testId = useTestId('container');
   const scrollRootRef = useRef<HTMLDivElement>(null);
@@ -59,6 +60,7 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
     onStartReached,
     onStartReachedThreshold,
     initialScrollToRowId,
+    isLoadingPrevious,
   });
 
   useEffect(() => {

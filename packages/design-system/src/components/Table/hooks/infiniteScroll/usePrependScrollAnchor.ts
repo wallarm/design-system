@@ -10,6 +10,14 @@ interface UsePrependScrollAnchorOptions {
   virtualizerRef?: RefObject<TableVirtualizerInstance | null>;
   /** Scopes the start-loader measurement to this table's body. */
   tbodyRef?: RefObject<HTMLTableSectionElement | null>;
+  /**
+   * True while the consumer fetches the previous page. Compensation only runs
+   * for prepends that land during (or right after) such a fetch: a dataset
+   * swap can be id-indistinguishable from a prepend — e.g. removing a filter
+   * whose subset was the tail of the superset — and compensating for it
+   * scrolls the viewport away (AS-1208).
+   */
+  isLoadingPrevious?: boolean;
 }
 
 /**
@@ -30,9 +38,11 @@ export const usePrependScrollAnchor = ({
   rows,
   virtualizerRef,
   tbodyRef,
+  isLoadingPrevious,
 }: UsePrependScrollAnchorOptions) => {
   const prevFirstRowIdRef = useRef<string | undefined>(undefined);
   const prevLastRowIdRef = useRef<string | undefined>(undefined);
+  const prevIsLoadingPreviousRef = useRef(false);
   const prevFirstRowStartRef = useRef<number | null>(null);
   const prevScrollHeightRef = useRef<number | null>(null);
   const prevLoaderRef = useRef({ count: 0, height: 0 });
@@ -80,13 +90,21 @@ export const usePrependScrollAnchor = ({
       prevFirstRowStartRef.current = getFirstRowStart();
       prevFirstRowIdRef.current = rows[0]?.id;
       prevLastRowIdRef.current = rows[rows.length - 1]?.id;
+      prevIsLoadingPreviousRef.current = !!isLoadingPrevious;
       getStartLoaderHeight();
       return;
     }
 
     const prevLoaderHeight = prevLoaderRef.current.height;
 
-    if (detectDataChange(prevFirstRowIdRef.current, rows, prevLastRowIdRef.current) === 'prepend') {
+    // The prepended page may land in the same commit that clears the loading
+    // flag, so the previous commit's flag counts as "during the fetch" too.
+    const prependExpected = !!isLoadingPrevious || prevIsLoadingPreviousRef.current;
+
+    if (
+      prependExpected &&
+      detectDataChange(prevFirstRowIdRef.current, rows, prevLastRowIdRef.current) === 'prepend'
+    ) {
       const prevId = prevFirstRowIdRef.current;
       const index = rows.findIndex(row => row.id === prevId);
       const newStart = virtualizerRef?.current?.measurementsCache[index]?.start;
@@ -115,6 +133,7 @@ export const usePrependScrollAnchor = ({
 
     prevFirstRowIdRef.current = rows[0]?.id;
     prevLastRowIdRef.current = rows[rows.length - 1]?.id;
+    prevIsLoadingPreviousRef.current = !!isLoadingPrevious;
     prevFirstRowStartRef.current = getFirstRowStart();
     prevScrollHeightRef.current = trackScrollHeight ? getScrollHeight() : null;
     getStartLoaderHeight();

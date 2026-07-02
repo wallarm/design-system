@@ -5,20 +5,42 @@ import { usePrependScrollAnchor } from '../usePrependScrollAnchor';
 const makeEl = (scrollHeight: number) => ({ scrollTop: 0, scrollHeight }) as HTMLElement;
 
 describe('usePrependScrollAnchor', () => {
-  it('compensates scrollTop by the height delta when rows are prepended', () => {
+  it('compensates scrollTop by the height delta when rows are prepended during a previous-page fetch', () => {
+    const el = makeEl(1000);
+    const scrollRef = { current: el };
+
+    const { rerender } = renderHook(
+      ({ rows, isLoadingPrevious }: { rows: { id: string }[]; isLoadingPrevious: boolean }) =>
+        usePrependScrollAnchor({ mode: 'container', scrollRef, rows, isLoadingPrevious }),
+      { initialProps: { rows: [{ id: 'b' }, { id: 'c' }], isLoadingPrevious: false } },
+    );
+
+    // the fetch starts (loading commit)…
+    rerender({ rows: [{ id: 'b' }, { id: 'c' }], isLoadingPrevious: true });
+
+    // …and the page lands in the commit that also clears the flag
+    el.scrollHeight = 1100;
+    rerender({ rows: [{ id: 'a' }, { id: 'b' }, { id: 'c' }], isLoadingPrevious: false });
+
+    expect(el.scrollTop).toBe(100);
+  });
+
+  it('does not compensate a prepend-shaped swap outside a previous-page fetch (filter reset)', () => {
     const el = makeEl(1000);
     const scrollRef = { current: el };
 
     const { rerender } = renderHook(
       ({ rows }: { rows: { id: string }[] }) =>
-        usePrependScrollAnchor({ mode: 'container', scrollRef, rows }),
+        usePrependScrollAnchor({ mode: 'container', scrollRef, rows, isLoadingPrevious: false }),
       { initialProps: { rows: [{ id: 'b' }, { id: 'c' }] } },
     );
 
+    // Removing a filter restores a superset where the old window is a suffix —
+    // id-wise identical to a prepend, but the viewport must stay put (AS-1208).
     el.scrollHeight = 1100;
     rerender({ rows: [{ id: 'a' }, { id: 'b' }, { id: 'c' }] });
 
-    expect(el.scrollTop).toBe(100);
+    expect(el.scrollTop).toBe(0);
   });
 
   it('does not touch scrollTop on a full replacement', () => {
@@ -27,7 +49,7 @@ describe('usePrependScrollAnchor', () => {
 
     const { rerender } = renderHook(
       ({ rows }: { rows: { id: string }[] }) =>
-        usePrependScrollAnchor({ mode: 'container', scrollRef, rows }),
+        usePrependScrollAnchor({ mode: 'container', scrollRef, rows, isLoadingPrevious: true }),
       { initialProps: { rows: [{ id: 'b' }, { id: 'c' }] } },
     );
 
@@ -42,7 +64,12 @@ describe('usePrependScrollAnchor', () => {
     const scrollRef = { current: el };
 
     renderHook(() =>
-      usePrependScrollAnchor({ mode: 'container', scrollRef, rows: [{ id: 'a' }, { id: 'b' }] }),
+      usePrependScrollAnchor({
+        mode: 'container',
+        scrollRef,
+        rows: [{ id: 'a' }, { id: 'b' }],
+        isLoadingPrevious: true,
+      }),
     );
 
     // First run only seeds the baseline — no scroll adjustment.
@@ -60,12 +87,13 @@ describe('usePrependScrollAnchor', () => {
 
     try {
       const { rerender } = renderHook(
-        ({ rows }: { rows: { id: string }[] }) => usePrependScrollAnchor({ mode: 'window', rows }),
-        { initialProps: { rows: [{ id: 'b' }, { id: 'c' }] } },
+        ({ rows, isLoadingPrevious }: { rows: { id: string }[]; isLoadingPrevious: boolean }) =>
+          usePrependScrollAnchor({ mode: 'window', rows, isLoadingPrevious }),
+        { initialProps: { rows: [{ id: 'b' }, { id: 'c' }], isLoadingPrevious: true } },
       );
 
       docScrollHeight = 1100;
-      rerender({ rows: [{ id: 'a' }, { id: 'b' }, { id: 'c' }] });
+      rerender({ rows: [{ id: 'a' }, { id: 'b' }, { id: 'c' }], isLoadingPrevious: false });
 
       expect(scrollBySpy).toHaveBeenCalledWith(0, 100);
     } finally {
