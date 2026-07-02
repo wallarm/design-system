@@ -54,8 +54,10 @@ export const NoMethod: StoryFn<typeof meta> = () => (
   <ParameterPath segments={['cookie', 'session_id']} attack />
 );
 
+// 600px keeps a wide margin below the path's natural width (~720px), so
+// truncation survives font-metric differences between environments.
 export const ExpandableTruncated: StoryFn<typeof meta> = () => (
-  <div style={{ width: 720 }}>
+  <div style={{ width: 600 }}>
     {/* The root is w-full (it must span the available space to measure it),
         so centering happens inside the component, not on the container. */}
     <ParameterPath
