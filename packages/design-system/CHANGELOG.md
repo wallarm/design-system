@@ -1,3 +1,7 @@
+## 0.71.0 (2026-07-02)
+
+* feat(filter-input): context_param value descriptions (AS-1192) + paired chip fixes (AS-1179) (#197) ([27de588](https://github.com/wallarm/design-system/commit/27de588)), closes [#197](https://github.com/wallarm/design-system/issues/197)
+
 ## 0.70.0 (2026-07-02)
 
 * feat(simple-charts): add HorizontalBar chart (#198) ([043a29b](https://github.com/wallarm/design-system/commit/043a29b)), closes [#198](https://github.com/wallarm/design-system/issues/198)
