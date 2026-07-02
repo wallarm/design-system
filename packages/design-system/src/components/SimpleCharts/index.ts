@@ -26,6 +26,11 @@ export {
   ChartTitle,
   type ChartTitleProps,
 } from './Chart';
+export {
+  HorizontalBar,
+  type HorizontalBarDatum,
+  type HorizontalBarProps,
+} from './HorizontalBar';
 export { type ChartTimeFormatters, useChartTimeFormatters } from './hooks';
 export {
   LineChart,

@@ -42,10 +42,11 @@ const makeEmptyChip = (i: number, error: boolean): FilterInputChipData =>
  * showing the label instead of the raw value. The fallback returns undefined
  * when no field defines the value, so genuinely freeform values stay raw.
  *
- * The cross-field fallback is gated by `canBorrowCrossFieldLabel`: a value that
- * is a valid entry of the current typed field (e.g. `1` in an integer field) is
- * never relabelled from an unrelated field that happens to define the same value
- * (AS-1171).
+ * The cross-field fallback is gated by `canBorrowCrossFieldLabel`: it only fires
+ * for a value that is *foreign* to the current field (fails its type/allowlist).
+ * A value that is valid for the current field — e.g. `1` typed into the freeform
+ * `total_requests` field — is a genuine entry and is never relabelled from an
+ * unrelated field that happens to define the same value (AS-1171).
  */
 const resolveValueLabel = (
   value: string | number | boolean | null,
