@@ -1,5 +1,6 @@
 import type { ClipboardEvent, FC, KeyboardEvent } from 'react';
 import { useCallback, useRef } from 'react';
+import { composeRefs } from '@radix-ui/react-compose-refs';
 import { useControlled } from '../../hooks';
 import { cn } from '../../utils/cn';
 import { hasTextSelection } from '../../utils/hasTextSelection';
@@ -97,7 +98,7 @@ export const ParameterPath: FC<ParameterPathProps> = ({
           data-slot='parameter-path'
           data-truncated={isTruncated || undefined}
           data-expanded={isExpanded || undefined}
-          ref={ref}
+          ref={composeRefs(ref, containerRef)}
           onCopy={handleCopy}
           role={interactive ? 'button' : undefined}
           tabIndex={interactive ? 0 : undefined}
@@ -105,14 +106,17 @@ export const ParameterPath: FC<ParameterPathProps> = ({
           onClick={interactive ? toggleExpanded : undefined}
           onKeyDown={interactive ? handleKeyDown : undefined}
           className={cn(
-            'relative flex items-center min-w-0',
+            // `w-full` keeps the root's width equal to the available space even
+            // when it is a flex item. Observing a shrink-to-fit box would feed
+            // the row's own content width back into the truncation decision and
+            // oscillate — the "shaking" path (AS-1205).
+            'relative flex w-full items-center min-w-0',
             interactive && 'cursor-pointer',
             className,
           )}
         >
           <TestIdProvider value={testId}>
             <ParameterPathRow
-              ref={containerRef}
               forMeasurement={false}
               isExpanded={isExpanded}
               indices={indices}
