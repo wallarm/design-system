@@ -37,16 +37,17 @@ test.describe('HorizontalBar', () => {
   test.describe('Accessibility', () => {
     test('legend mirrors the bar; bar is aria-hidden by default', async ({ page }) => {
       await story.goto(page, 'Default');
-      const bar = page.locator('[data-slot=horizontal-bar-bar]');
+      const bar = page.getByTestId('horizontal-bar--bar');
       await expect(bar).toHaveAttribute('aria-hidden', 'true');
-      await expect(page.locator('[data-slot=horizontal-bar-legend-item]')).toHaveCount(3);
+      await expect(page.getByTestId('horizontal-bar--legend-item')).toHaveCount(3);
     });
 
-    test('bar carries an aria-label summary when the legend is hidden', async ({ page }) => {
+    test('bar is a named image (role + aria-label) when the legend is hidden', async ({ page }) => {
       await story.goto(page, 'Legend Off');
-      const bar = page.locator('[data-slot=horizontal-bar-bar]');
+      const bar = page.getByTestId('horizontal-bar--bar');
+      await expect(bar).toHaveRole('img');
       await expect(bar).toHaveAttribute('aria-label', /Critical 42/);
-      await expect(page.locator('[data-slot=horizontal-bar-legend]')).toHaveCount(0);
+      await expect(page.getByTestId('horizontal-bar--legend')).toHaveCount(0);
     });
   });
 });

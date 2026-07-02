@@ -26,7 +26,7 @@
 | No value | `value` undefined | Headline number omitted; header row hidden if `delta` is also absent. |
 | No delta | `delta` undefined | No chip. |
 | Remainder | `total > sum(data.value)` | Grey tail (`--color-bg-strong-primary`) fills the gap; not shown in the legend. |
-| Legend off | `legend={false}` | Bar + header only; the bar gains an `aria-label` summary. |
+| Legend off | `legend={false}` | Bar + header only; the bar becomes a named image (`role='img'` + `aria-label` summary). |
 | Empty / no data | `data.length === 0` | Header-only: value + delta render, but the bar wrapper and legend are not rendered at all (no empty track). Holds even when `total` is set. If `value` and `delta` are also absent, nothing renders — prefer `<ChartEmpty />` for an explicit empty body. |
 
 ## Interactions
@@ -41,11 +41,12 @@ None in v1 — the component is display-only. No hover-sync or click-to-filter (
 - **`className` on a datum** wins over the palette color on both the segment and its legend dot (the inline `backgroundColor` is skipped).
 - **Remainder is never in the legend** — the legend renders only `data` items, not the synthetic tail.
 - **Duplicate `name`s** are used as the React key / `data-name`; keep them unique. A dev-only console warning (matching `PieChart`'s pattern) fires once when duplicates are detected; it is a no-op in production builds.
+- **Slot testids derive from the component's own `data-testid`** (`{base}--header`, `--value`, `--bar`, `--segment`, `--legend`, `--legend-item`, `--legend-dot`), computed locally — *not* via `useTestId`, because every slot renders inline in the root and the context hook would resolve a wrapping provider's base (e.g. `Chart`'s) instead of this component's. No `data-testid` → no slot testids (clean DOM).
 
 ## Accessibility notes
 
-- The bar is `aria-hidden` when the legend is shown (the legend is the readable representation). When `legend={false}`, the bar instead carries an `aria-label` summarizing the segments (`"Critical 42, High 31, …"`).
-- The delta badge exposes an `aria-label` like `"up 10"`; its arrow icon is `aria-hidden`.
+- The bar is `aria-hidden` when the legend is shown (the legend is the readable representation). When `legend={false}`, the bar instead becomes `role='img'` with an `aria-label` summarizing the segments (`"Critical 42, High 31, …"`) — the explicit role is required because `aria-label` is ignored on generic (role-less) elements.
+- The delta badge is likewise a named image (`role='img'` + `aria-label` like `"up 10"`) — `Badge` renders a generic `<div>`, so without the role the label would not be announced and the trend direction (carried only by the `aria-hidden` arrow icon) would be lost. All numbers in labels use the same `toLocaleString('en-US')` formatting as the visible text.
 - Non-interactive: no focusable elements.
 
 ## Open questions / known limitations

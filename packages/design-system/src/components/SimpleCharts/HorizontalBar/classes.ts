@@ -6,6 +6,8 @@ export const horizontalBarBarClasses = ['flex h-8 w-full overflow-hidden rounded
 
 export const horizontalBarSegmentClasses = ['h-full min-w-px'].join(' ');
 
+export const horizontalBarRemainderClasses = ['bg-bg-strong-primary'].join(' ');
+
 export const horizontalBarHeaderClasses = ['flex items-baseline gap-8 px-16 pt-8'].join(' ');
 
 export const horizontalBarValueClasses = [

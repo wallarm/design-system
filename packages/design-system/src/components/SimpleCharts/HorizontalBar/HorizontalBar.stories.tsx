@@ -27,6 +27,10 @@ const meta = {
       },
     },
   },
+  args: {
+    // Base for derived slot ids (`horizontal-bar--bar`, `--legend-item`, …) used by e2e tests.
+    'data-testid': 'horizontal-bar',
+  },
   argTypes: {
     data: { control: false },
     delta: { control: false },

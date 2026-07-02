@@ -1,5 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
+import { Chart } from '../Chart';
 import { HorizontalBar } from './HorizontalBar';
 import { resolveSegments } from './lib/resolveSegments';
 
@@ -22,6 +23,50 @@ describe('HorizontalBar — root', () => {
   it('keeps the DOM clean when no data-testid is passed', () => {
     const { container } = render(<HorizontalBar data={[{ name: 'A', value: 1 }]} />);
     expect(container.querySelector('[data-testid]')).toBeNull();
+  });
+});
+
+describe('HorizontalBar — testid cascade', () => {
+  it('derives slot testids ({base}--{slot}) from its own data-testid', () => {
+    render(
+      <HorizontalBar
+        data-testid='hb'
+        data={[
+          { name: 'A', value: 1 },
+          { name: 'B', value: 2 },
+        ]}
+        value={3}
+      />,
+    );
+    expect(screen.getByTestId('hb--header')).toBeInTheDocument();
+    expect(screen.getByTestId('hb--value')).toBeInTheDocument();
+    expect(screen.getByTestId('hb--bar')).toBeInTheDocument();
+    expect(screen.getAllByTestId('hb--segment')).toHaveLength(2);
+    expect(screen.getByTestId('hb--legend')).toBeInTheDocument();
+    expect(screen.getAllByTestId('hb--legend-item')).toHaveLength(2);
+    expect(screen.getAllByTestId('hb--legend-dot')).toHaveLength(2);
+  });
+
+  it('does not adopt a parent TestIdProvider base for its own slots', () => {
+    render(
+      <Chart data-testid='card'>
+        <HorizontalBar data-testid='hb' data={[{ name: 'A', value: 1 }]} value={5} />
+      </Chart>,
+    );
+    expect(screen.queryByTestId('card--bar')).toBeNull();
+    expect(screen.queryByTestId('card--value')).toBeNull();
+    expect(screen.getByTestId('hb--bar')).toBeInTheDocument();
+    expect(screen.getByTestId('hb--value')).toBeInTheDocument();
+  });
+
+  it('renders no slot testids inside a parent provider when it has no data-testid itself', () => {
+    render(
+      <Chart data-testid='card'>
+        <HorizontalBar data={[{ name: 'A', value: 1 }]} value={5} />
+      </Chart>,
+    );
+    expect(screen.queryByTestId('card--bar')).toBeNull();
+    expect(screen.queryByTestId('card--segment')).toBeNull();
   });
 });
 
@@ -61,25 +106,32 @@ describe('resolveSegments', () => {
 
 describe('HorizontalBar — header', () => {
   it('renders the value with locale formatting', () => {
-    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} value={12345} />);
-    const value = document.querySelector('[data-slot="horizontal-bar-value"]');
-    expect(value).toHaveTextContent('12,345');
+    render(<HorizontalBar data-testid='hb' data={[{ name: 'A', value: 1 }]} value={12345} />);
+    expect(screen.getByTestId('hb--value')).toHaveTextContent('12,345');
   });
 
   it('renders no header when both value and delta are absent', () => {
-    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} />);
-    expect(document.querySelector('[data-slot="horizontal-bar-header"]')).toBeNull();
+    render(<HorizontalBar data-testid='hb' data={[{ name: 'A', value: 1 }]} />);
+    expect(screen.queryByTestId('hb--header')).toBeNull();
   });
 
-  it('renders a delta badge with an up label and absolute value', () => {
+  it('renders the delta badge as a named image announcing direction and absolute value', () => {
     render(<HorizontalBar data={[{ name: 'A', value: 1 }]} delta={{ value: 10 }} />);
-    const badge = screen.getByLabelText('up 10');
+    // role='img' is required for the accessible name: aria-label alone is
+    // ignored on Badge's generic role-less <div>.
+    const badge = screen.getByRole('img', { name: 'up 10' });
     expect(badge).toHaveTextContent('10');
   });
 
   it('uses trend for direction over sign; shows the absolute number', () => {
     render(<HorizontalBar data={[{ name: 'A', value: 1 }]} delta={{ value: 5, trend: 'down' }} />);
-    expect(screen.getByLabelText('down 5')).toBeInTheDocument();
+    expect(screen.getByRole('img', { name: 'down 5' })).toBeInTheDocument();
+  });
+
+  it('locale-formats the delta accessible name to match the visible text', () => {
+    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} delta={{ value: 1234 }} />);
+    const badge = screen.getByRole('img', { name: 'up 1,234' });
+    expect(badge).toHaveTextContent('1,234');
   });
 });
 
@@ -94,49 +146,53 @@ describe('HorizontalBar — bar rendering', () => {
         ]}
       />,
     );
-    const segs = document.querySelectorAll('[data-slot="horizontal-bar-segment"]');
+    const segs = screen.getAllByTestId('hb--segment');
     expect(segs).toHaveLength(2);
     expect(segs[0]).toHaveAttribute('data-name', 'Critical');
-    expect((segs[0] as HTMLElement).style.backgroundColor).toBe('var(--color-red-500)');
-    expect((segs[0] as HTMLElement).style.flexGrow).toBe('5');
+    expect(segs[0].style.backgroundColor).toBe('var(--color-red-500)');
+    expect(segs[0].style.flexGrow).toBe('5');
   });
 
-  it('renders a remainder segment (no data-name) when total exceeds the sum', () => {
-    render(<HorizontalBar data={[{ name: 'A', value: 3 }]} total={10} />);
-    const remainder = document.querySelector(
-      '[data-slot="horizontal-bar-segment"][data-remainder="true"]',
-    );
-    expect(remainder).not.toBeNull();
-    expect((remainder as HTMLElement).style.backgroundColor).toBe('var(--color-bg-strong-primary)');
+  it('renders a remainder segment (no data-name) with the token class, not an inline color', () => {
+    render(<HorizontalBar data-testid='hb' data={[{ name: 'A', value: 3 }]} total={10} />);
+    const segs = screen.getAllByTestId('hb--segment');
+    const remainder = segs.find(s => s.dataset.remainder === 'true');
+    expect(remainder).toBeDefined();
+    expect(remainder).toHaveClass('bg-bg-strong-primary');
+    expect((remainder as HTMLElement).style.backgroundColor).toBe('');
     expect(remainder).not.toHaveAttribute('data-name');
   });
 
   it('lets a datum className win over the inline color', () => {
-    render(<HorizontalBar data={[{ name: 'A', value: 1, className: 'bg-sky-500' }]} />);
-    const seg = document.querySelector('[data-slot="horizontal-bar-segment"]') as HTMLElement;
+    render(
+      <HorizontalBar data-testid='hb' data={[{ name: 'A', value: 1, className: 'bg-sky-500' }]} />,
+    );
+    const seg = screen.getByTestId('hb--segment');
     expect(seg).toHaveClass('bg-sky-500');
     expect(seg.style.backgroundColor).toBe('');
   });
 
   it('renders header-only (no bar, no legend) when data is empty but value/delta are present', () => {
-    render(<HorizontalBar data={[]} value={91} delta={{ value: 10, trend: 'up' }} />);
-    expect(document.querySelector('[data-slot="horizontal-bar-bar-wrapper"]')).toBeNull();
-    expect(document.querySelector('[data-slot="horizontal-bar-legend"]')).toBeNull();
-    expect(document.querySelector('[data-slot="horizontal-bar-value"]')).toHaveTextContent('91');
-    expect(screen.getByLabelText('up 10')).toBeInTheDocument();
+    render(
+      <HorizontalBar data-testid='hb' data={[]} value={91} delta={{ value: 10, trend: 'up' }} />,
+    );
+    expect(screen.queryByTestId('hb--bar')).toBeNull();
+    expect(screen.queryByTestId('hb--legend')).toBeNull();
+    expect(screen.getByTestId('hb--value')).toHaveTextContent('91');
+    expect(screen.getByRole('img', { name: 'up 10' })).toBeInTheDocument();
   });
 
   it('renders no bar when data is empty even if total is set (no labels → no bar)', () => {
-    render(<HorizontalBar data={[]} value={91} total={120} />);
-    expect(document.querySelector('[data-slot="horizontal-bar-bar-wrapper"]')).toBeNull();
-    expect(document.querySelector('[data-slot="horizontal-bar-segment"]')).toBeNull();
+    render(<HorizontalBar data-testid='hb' data={[]} value={91} total={120} />);
+    expect(screen.queryByTestId('hb--bar')).toBeNull();
+    expect(screen.queryByTestId('hb--segment')).toBeNull();
   });
 
   it('renders only the root wrapper when data is empty and no value/delta', () => {
-    render(<HorizontalBar data={[]} />);
-    expect(document.querySelector('[data-slot="horizontal-bar-header"]')).toBeNull();
-    expect(document.querySelector('[data-slot="horizontal-bar-bar-wrapper"]')).toBeNull();
-    expect(document.querySelector('[data-slot="horizontal-bar-legend"]')).toBeNull();
+    render(<HorizontalBar data-testid='hb' data={[]} />);
+    expect(screen.queryByTestId('hb--header')).toBeNull();
+    expect(screen.queryByTestId('hb--bar')).toBeNull();
+    expect(screen.queryByTestId('hb--legend')).toBeNull();
   });
 });
 
@@ -147,43 +203,49 @@ describe('HorizontalBar — legend', () => {
   ];
 
   it('renders one legend item per datum with a color-matched dot', () => {
-    render(<HorizontalBar data={data} total={10} />);
-    const items = document.querySelectorAll('[data-slot="horizontal-bar-legend-item"]');
+    render(<HorizontalBar data-testid='hb' data={data} total={10} />);
+    const items = screen.getAllByTestId('hb--legend-item');
     expect(items).toHaveLength(2); // remainder excluded
     expect(items[0]).toHaveTextContent('Critical');
-    const dot = items[0].querySelector('[data-slot="horizontal-bar-legend-dot"]') as HTMLElement;
-    expect(dot.style.backgroundColor).toBe('var(--color-red-500)');
+    const dots = screen.getAllByTestId('hb--legend-dot');
+    expect(dots[0].style.backgroundColor).toBe('var(--color-red-500)');
   });
 
-  it('hides the legend when legend={false} and summarizes the bar via aria-label', () => {
-    render(<HorizontalBar data={data} legend={false} />);
-    expect(document.querySelector('[data-slot="horizontal-bar-legend"]')).toBeNull();
-    const bar = document.querySelector('[data-slot="horizontal-bar-bar"]') as HTMLElement;
-    expect(bar).toHaveAttribute('aria-label', 'Critical 5, High 3');
+  it('hides the legend when legend={false} and exposes the bar as a named image', () => {
+    render(<HorizontalBar data-testid='hb' data={data} legend={false} />);
+    expect(screen.queryByTestId('hb--legend')).toBeNull();
+    const bar = screen.getByRole('img', { name: 'Critical 5, High 3' });
+    expect(bar).toBe(screen.getByTestId('hb--bar'));
+  });
+
+  it('locale-formats segment values in the bar summary', () => {
+    render(<HorizontalBar data={[{ name: 'Requests', value: 12345 }]} legend={false} />);
+    expect(screen.getByRole('img', { name: 'Requests 12,345' })).toBeInTheDocument();
   });
 
   it('renders no bar at all when data is empty (even with legend={false})', () => {
-    render(<HorizontalBar data={[]} legend={false} />);
-    expect(document.querySelector('[data-slot="horizontal-bar-bar-wrapper"]')).toBeNull();
-    expect(document.querySelector('[data-slot="horizontal-bar-bar"]')).toBeNull();
+    render(<HorizontalBar data-testid='hb' data={[]} legend={false} />);
+    expect(screen.queryByTestId('hb--bar')).toBeNull();
+    expect(screen.queryByRole('img')).toBeNull();
   });
 
-  it('is aria-hidden with no aria-label when the legend is shown (default)', () => {
-    render(<HorizontalBar data={data} />);
-    const bar = document.querySelector('[data-slot="horizontal-bar-bar"]') as HTMLElement;
+  it('is aria-hidden with no role or aria-label when the legend is shown (default)', () => {
+    render(<HorizontalBar data-testid='hb' data={data} />);
+    const bar = screen.getByTestId('hb--bar');
     expect(bar).toHaveAttribute('aria-hidden', 'true');
     expect(bar).not.toHaveAttribute('aria-label');
+    expect(bar).not.toHaveAttribute('role');
   });
 });
 
 describe('HorizontalBar — duplicate name warning', () => {
   it('warns once in dev when data contains duplicate names', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     // Duplicate `name`s also produce duplicate React keys (by design — `name` is the key),
     // which React additionally flags via console.error; that's expected noise from this
     // exact scenario, not a bug, so it is silenced here to keep the assertion focused on
     // the component's own duplicate-name warning.
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     render(
       <HorizontalBar
         data={[
@@ -199,7 +261,7 @@ describe('HorizontalBar — duplicate name warning', () => {
   });
 
   it('does not warn when names are unique', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(
       <HorizontalBar
         data={[
