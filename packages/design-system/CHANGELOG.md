@@ -1,3 +1,7 @@
+## 0.70.0 (2026-07-02)
+
+* feat(simple-charts): add HorizontalBar chart (#198) ([043a29b](https://github.com/wallarm/design-system/commit/043a29b)), closes [#198](https://github.com/wallarm/design-system/issues/198)
+
 ## 0.69.0 (2026-07-01)
 
 * feat(design-system): add Slider component (#192) ([7978fb4](https://github.com/wallarm/design-system/commit/7978fb4)), closes [#192](https://github.com/wallarm/design-system/issues/192)
