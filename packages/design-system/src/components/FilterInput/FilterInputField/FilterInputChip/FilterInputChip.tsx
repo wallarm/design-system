@@ -3,7 +3,7 @@ import { useCallback, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import type { ChipErrorSegment, FilterInputChipData } from '../../types';
 import { ChipSearchInput } from './ChipSearchInput';
-import { chipVariants } from './classes';
+import { chipVariants, emptyValueHitTarget } from './classes';
 import { useEditingContext } from './context/EditingContext';
 import { FilterInputRemoveButton } from './FilterInputRemoveButton';
 import { PairSeparator } from './PairSeparator';
@@ -56,7 +56,6 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   ...props
 }) => {
   const interactive = !disabled;
-  const hasError = !!error;
   const internalRef = useRef<HTMLDivElement>(null);
 
   const editing = useEditingContext();
@@ -67,6 +66,12 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
     editing.editingSegment != null &&
     (building ? editing.editingChipId == null : chipId != null && editing.editingChipId === chipId);
   const activeSegment = isEditingThisChip ? editing.editingSegment : null;
+
+  // Suppress red while editing (the user is fixing it); a chip reads errored when
+  // either triplet has an error, so a paired chip stays red until both are valid (AS-1179).
+  const effectiveError = isEditingThisChip ? false : error;
+  const effectivePairError = isEditingThisChip ? undefined : pair?.error;
+  const hasError = !!effectiveError || !!effectivePairError;
 
   const handleSegmentClick = useCallback(
     (segment: ChipSegment, e: ReactMouseEvent) => {
@@ -136,7 +141,9 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       ref={setRefs}
       className={cn(
         chipVariants({ error: hasError, interactive, disabled, building }),
-        'max-w-[320px]',
+        // Paired chips get more room for their two values; each value is capped
+        // so a long base value can't hide the paired one (AS-1179).
+        pair ? 'max-w-[380px]' : 'max-w-[320px]',
         className,
       )}
       data-slot='filter-input-condition-chip'
@@ -146,7 +153,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       <Segment
         variant={SEGMENT_VARIANT.attribute}
         className='shrink-0'
-        error={error === true || error === SEGMENT_VARIANT.attribute}
+        error={effectiveError === true || effectiveError === SEGMENT_VARIANT.attribute}
         onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.attribute, e) : undefined}
         onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
         {...segmentEditProps(SEGMENT_VARIANT.attribute)}
@@ -164,13 +171,18 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           {operator ?? ''}
         </Segment>
       )}
-      {(value || baseActiveSegment === SEGMENT_VARIANT.value) && (
+      {(value ||
+        baseActiveSegment === SEGMENT_VARIANT.value ||
+        (!pair && effectiveError === SEGMENT_VARIANT.value)) && (
         <Segment
           variant={SEGMENT_VARIANT.value}
-          className='min-w-0'
+          // Empty required value → clickable placeholder; paired key → capped.
+          className={
+            !value && !pair ? emptyValueHitTarget : pair ? 'max-w-[90px] shrink-0' : 'min-w-0'
+          }
           error={
             baseActiveSegment !== SEGMENT_VARIANT.value &&
-            (error === true || error === SEGMENT_VARIANT.value)
+            (effectiveError === true || effectiveError === SEGMENT_VARIANT.value)
           }
           valueParts={valueParts}
           valueSeparator={valueSeparator}
@@ -186,8 +198,21 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       {pair && (
         <>
           <PairSeparator />
-          {/* Paired attribute is fixed by config — non-interactive. */}
-          <Segment variant={SEGMENT_VARIANT.attribute} className='shrink-0'>
+          {/* When the pair is incomplete its segments are zero-width, so the label
+              is the affordance — routing to the first missing segment (AS-1179/AS-1192). */}
+          <Segment
+            variant={SEGMENT_VARIANT.attribute}
+            className='shrink-0'
+            onClick={
+              interactive && pair.error
+                ? e =>
+                    handlePairSegmentClick(
+                      pair.operator ? SEGMENT_VARIANT.value : SEGMENT_VARIANT.operator,
+                      e,
+                    )
+                : undefined
+            }
+          >
             {pair.attribute}
           </Segment>
           {(pair.operator || pairActiveSegment === SEGMENT_VARIANT.operator) && (
@@ -203,10 +228,11 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           {(pair.value != null || pairActiveSegment === SEGMENT_VARIANT.value) && (
             <Segment
               variant={SEGMENT_VARIANT.value}
-              className='min-w-0'
+              // Empty required value → clickable placeholder (see emptyValueHitTarget).
+              className={pair.value ? 'min-w-0' : emptyValueHitTarget}
               error={
                 pairActiveSegment !== SEGMENT_VARIANT.value &&
-                (pair.error === true || pair.error === SEGMENT_VARIANT.value)
+                (effectivePairError === true || effectivePairError === SEGMENT_VARIANT.value)
               }
               onClick={interactive ? e => handlePairSegmentClick('value', e) : undefined}
               {...segmentEditProps(SEGMENT_VARIANT.value, 1)}

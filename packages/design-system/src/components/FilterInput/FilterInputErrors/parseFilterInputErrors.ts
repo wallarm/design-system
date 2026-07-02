@@ -1,5 +1,12 @@
 import { SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
-import { getFieldValues, hasStaticAllowlist, isNoValueOperator, isValidFieldValue } from '../lib';
+import {
+  getFieldValues,
+  hasStaticAllowlist,
+  incompleteTripletError,
+  isEmptyFilterValue,
+  isNoValueOperator,
+  isValidFieldValue,
+} from '../lib';
 import type { Condition, FieldMetadata } from '../types';
 
 /** True when a paired field's required second value is absent or empty. */
@@ -7,8 +14,7 @@ const isPairValueMissing = (condition: Condition): boolean => {
   const pair = condition.pair;
   if (!pair) return true;
   if (pair.operator && isNoValueOperator(pair.operator)) return false;
-  const value = pair.value;
-  return value == null || value === '' || (Array.isArray(value) && value.length === 0);
+  return isEmptyFilterValue(pair.value);
 };
 
 /**
@@ -32,9 +38,21 @@ export const parseFilterInputErrors = (
       errors.push(`${field.pairedField.label} is required`);
     }
 
-    if (!condition.error) continue;
-
     const label = field?.label || condition.field;
+
+    // A known non-paired field left incomplete reads red in the chip, so it must
+    // also surface a banner — red chip and error message always coexist (AS-1179).
+    if (
+      field &&
+      !field.pairedField &&
+      !condition.error &&
+      incompleteTripletError(condition.operator, condition.value)
+    ) {
+      errors.push(`${label} is incomplete`);
+      continue;
+    }
+
+    if (!condition.error) continue;
 
     switch (condition.error) {
       case SEGMENT_VARIANT.attribute:

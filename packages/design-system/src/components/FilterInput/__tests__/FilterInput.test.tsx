@@ -1343,5 +1343,81 @@ describe('FilterInput', () => {
         ],
       });
     });
+
+    it('reopens the operator menu in place for an attribute-only chip without removing it (AS-1179)', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<FilterInput fields={pairedFields} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Context Param'));
+      // Operator menu is open; force-commit before choosing one → attribute-only chip.
+      fireEvent.click(container.querySelector('[data-filter-input-inner]')!);
+      await waitFor(() => {
+        expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).not.toBeNull();
+      });
+
+      // Re-clicking "continues" the condition: the operator dropdown reopens and
+      // the chip is edited in place — it must NOT be deleted.
+      await user.click(container.querySelector('[data-slot="segment-attribute"]')!);
+      expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
+      expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).not.toBeNull();
+    });
+
+    it('resumes the value menu when an incomplete base chip is re-clicked (AS-1179)', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<FilterInput fields={pairedFields} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Context Param'));
+      await user.click(await findMenuitem(/^is =$/));
+
+      // Leave the base value empty, then force-commit with an area click.
+      fireEvent.click(container.querySelector('[data-filter-input-inner]')!);
+      await waitFor(() => {
+        expect(container.querySelector('[data-slot="filter-input-condition-chip"]')).not.toBeNull();
+      });
+
+      // Re-clicking the incomplete chip must reopen the base VALUE menu (xxx),
+      // not the operator/field menu.
+      await user.click(container.querySelector('[data-slot="segment-operator"]')!);
+      expect(await findMenuitem(/^xxx$/)).toBeInTheDocument();
+      expect(screen.queryByRole('menuitem', { name: 'Context Param' })).toBeNull();
+    });
+
+    it('keeps the base triplet when force-committed mid-pair and stays editable (AS-1179)', async () => {
+      const user = userEvent.setup();
+      const { container } = render(<FilterInput fields={pairedFields} />);
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Context Param'));
+      await user.click(await findMenuitem(/^is =$/));
+      await user.click(await findMenuitem(/^xxx$/));
+      // Paired operator menu is open — pick the operator, leaving its value empty.
+      await user.click(await findMenuitem(/^is =$/));
+
+      // Force-commit with an area click while building the paired second value.
+      fireEvent.click(container.querySelector('[data-filter-input-inner]')!);
+
+      // The base triplet must survive (not collapse to a broken `ctx_value`
+      // standalone chip): one chip carrying both attributes and the base value.
+      await waitFor(() => {
+        const chip = container.querySelector('[data-slot="filter-input-condition-chip"]');
+        expect(chip).not.toBeNull();
+        expect(
+          [...chip!.querySelectorAll('[data-slot="segment-attribute"]')].map(n => n.textContent),
+        ).toEqual(['Context Param', 'Value']);
+      });
+      const chip = container.querySelector('[data-slot="filter-input-condition-chip"]')!;
+      expect(chip.querySelector('[data-slot="segment-value"]')!.textContent).toBe('xxx');
+
+      // Re-clicking the paired operator targets the OPERATOR (AS-1192): a
+      // targeted click edits the segment it lands on, exactly like a single
+      // chip, so the operator menu opens rather than resuming into the value
+      // step. (The paired "Value" label is the affordance for the zero-width
+      // empty value.)
+      const operators = chip.querySelectorAll('[data-slot="segment-operator"]');
+      await user.click(operators[operators.length - 1]!);
+      expect(await findMenuitem(/^is =$/)).toBeInTheDocument();
+    });
   });
 });
