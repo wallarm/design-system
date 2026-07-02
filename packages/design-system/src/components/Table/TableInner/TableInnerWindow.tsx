@@ -33,6 +33,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
     onStartReached,
     onStartReachedThreshold,
     initialScrollToRowId,
+    isLoadingPrevious,
   } = useTableContext();
   const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
@@ -49,6 +50,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
     onStartReached,
     onStartReachedThreshold,
     initialScrollToRowId,
+    isLoadingPrevious,
   });
 
   useEffect(() => {

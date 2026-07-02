@@ -18,6 +18,8 @@ interface UseInfiniteScrollOptions<T> {
   onEndReached?: () => void;
   onEndReachedThreshold?: number;
   initialScrollToRowId?: string;
+  /** Gates the prepend scroll compensation to actual previous-page fetches. */
+  isLoadingPrevious?: boolean;
 }
 
 /** Single entry point for bidirectional infinite scroll behavior. */
@@ -32,12 +34,13 @@ export const useInfiniteScroll = <T>({
   onEndReached,
   onEndReachedThreshold,
   initialScrollToRowId,
+  isLoadingPrevious,
 }: UseInfiniteScrollOptions<T>) => {
   const rows = table.getRowModel().rows;
 
   const ready = useInitialAnchor({ initialScrollToRowId, rows, virtualizerRef });
 
-  usePrependScrollAnchor({ mode, scrollRef, rows, virtualizerRef, tbodyRef });
+  usePrependScrollAnchor({ mode, scrollRef, rows, virtualizerRef, tbodyRef, isLoadingPrevious });
 
   useScrollEdge({
     edge: 'start',
