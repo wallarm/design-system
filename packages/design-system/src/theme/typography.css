@@ -1,13 +1,15 @@
 @theme {
+    /* non.geist v2 registers 'Geist-Variable' / 'GeistMono-Variable' (hyphenated);
+       the space-separated names are kept for non.geist v1 consumers and local installs */
     --font-sans:
-        'Geist Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+        'Geist-Variable', 'Geist Variable', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --font-sans-display:
-        'Geist Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
-        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+        'Geist-Variable', 'Geist Variable', ui-sans-serif, system-ui, sans-serif,
+        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --font-mono:
-        'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
-        'Liberation Mono', 'Courier New', monospace;
+        'GeistMono-Variable', 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo,
+        Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
     --font-pixel: 'Geist Pixel', ui-sans-serif, system-ui, sans-serif;
     --font-serif: 'Inter', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 
