@@ -3,12 +3,19 @@ import { range } from '../../utils/range';
 import { useContainerWidth } from '../Table/lib/useContainerWidth';
 import { MEASURE } from './constants';
 
+// ResizeObserver's contentRect is device-pixel snapped while getBoundingClientRect
+// sums are not; without a tolerance a sub-pixel mismatch flips truncation back and
+// forth every frame — the "shaking" path (AS-1205).
+const EPSILON = 1;
+
 interface ComputeArgs {
   containerWidth: number;
   methodWidth: number;
   encodingWidth: number;
   segmentWidths: number[];
   jointsWidth: number;
+  jointWidth: number;
+  ellipsisWidth: number;
 }
 
 interface TruncationResult {
@@ -22,6 +29,8 @@ export const computeTruncation = ({
   encodingWidth,
   segmentWidths,
   jointsWidth,
+  jointWidth,
+  ellipsisWidth,
 }: ComputeArgs): TruncationResult => {
   const segCount = segmentWidths.length;
   const allIndices = range(segCount);
@@ -33,7 +42,19 @@ export const computeTruncation = ({
   const totalWidth =
     methodWidth + encodingWidth + segmentWidths.reduce((acc, w) => acc + w, 0) + jointsWidth;
 
-  if (totalWidth <= containerWidth) {
+  if (totalWidth <= containerWidth + EPSILON) {
+    return { isTruncated: false, visibleSegmentIndices: allIndices };
+  }
+
+  // Collapsing swaps the middle segments (and all but two of their joints) for
+  // the ellipsis pill. When the middle is narrower than the pill — e.g. a
+  // single-letter segment — collapsing makes the row WIDER, so it can never
+  // help; keep the full path (AS-1205).
+  const middleWidth =
+    segmentWidths.slice(1, -1).reduce((acc, w) => acc + w, 0) + (segCount - 3) * jointWidth;
+  const collapsedWidth = totalWidth - middleWidth + ellipsisWidth;
+
+  if (collapsedWidth + EPSILON >= totalWidth) {
     return { isTruncated: false, visibleSegmentIndices: allIndices };
   }
 
@@ -72,6 +93,7 @@ export const useParameterPathTruncation = ({
 
     const methodEl = root.querySelector<HTMLElement>(`[data-measure="${MEASURE.method}"]`);
     const encodingEl = root.querySelector<HTMLElement>(`[data-measure="${MEASURE.encoding}"]`);
+    const ellipsisEl = root.querySelector<HTMLElement>(`[data-measure="${MEASURE.ellipsis}"]`);
     const jointEls = Array.from(
       root.querySelectorAll<HTMLElement>(`[data-measure="${MEASURE.joint}"]`),
     );
@@ -82,7 +104,8 @@ export const useParameterPathTruncation = ({
     const segmentWidths = segmentEls.map(el => el.getBoundingClientRect().width);
     const methodWidth = hasMethod && methodEl ? methodEl.getBoundingClientRect().width : 0;
     const encodingWidth = hasEncoding && encodingEl ? encodingEl.getBoundingClientRect().width : 0;
-    const jointsWidth = jointEls.reduce((acc, el) => acc + el.getBoundingClientRect().width, 0);
+    const jointWidths = jointEls.map(el => el.getBoundingClientRect().width);
+    const jointsWidth = jointWidths.reduce((acc, w) => acc + w, 0);
 
     const next = computeTruncation({
       containerWidth,
@@ -90,6 +113,8 @@ export const useParameterPathTruncation = ({
       encodingWidth,
       segmentWidths,
       jointsWidth,
+      jointWidth: jointWidths[0] ?? 0,
+      ellipsisWidth: ellipsisEl?.getBoundingClientRect().width ?? 0,
     });
 
     setResult(prev =>

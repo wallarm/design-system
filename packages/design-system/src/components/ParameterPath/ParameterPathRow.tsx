@@ -93,6 +93,10 @@ export const ParameterPathRow: FC<ParameterPathRowProps> = ({
   }
 
   if (forMeasurement) {
+    // The collapsed layout swaps middle segments for the ellipsis pill, so the
+    // pill's width is part of the truncation math — measure it here alongside
+    // the segments (it is never rendered by the visible full row).
+    items.push(<ParameterPathEllipsis key='measure-ellipsis' data-measure={MEASURE.ellipsis} />);
     // Offscreen width-measuring copy; test-ids suppressed so queries hit the visible row only.
     return (
       <div

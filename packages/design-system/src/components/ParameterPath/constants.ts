@@ -5,6 +5,7 @@ export const MEASURE = {
   joint: 'joint',
   segment: 'segment',
   encoding: 'encoding',
+  ellipsis: 'ellipsis',
 } as const;
 
 export const ROW = {
