@@ -1,3 +1,7 @@
+## <small>0.71.3 (2026-07-02)</small>
+
+* fix(theme): reduce medium font weight from 500 to 450 (#201) ([0c6a5ac](https://github.com/wallarm/design-system/commit/0c6a5ac)), closes [#201](https://github.com/wallarm/design-system/issues/201)
+
 ## <small>0.71.2 (2026-07-02)</small>
 
 * fix(table): treat a tail-changing data swap as replace, not prepend (AS-1208) (#200) ([62fafe6](https://github.com/wallarm/design-system/commit/62fafe6)), closes [#200](https://github.com/wallarm/design-system/issues/200)
