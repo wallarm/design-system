@@ -15,14 +15,23 @@ export const useResetVirtualizerOnDataChange = (
     | Virtualizer<Window, Element>
     | Virtualizer<HTMLElement, Element>,
 ) => {
-  const firstRowId = table.getRowModel().rows[0]?.id;
+  const modelRows = table.getRowModel().rows;
+  const firstRowId = modelRows[0]?.id;
+  const lastRowId = modelRows[modelRows.length - 1]?.id;
   const prevFirstRowIdRef = useRef(firstRowId);
+  const prevLastRowIdRef = useRef(lastRowId);
 
   useEffect(() => {
-    if (prevFirstRowIdRef.current === firstRowId) return;
+    // An append moves only the tail — keep the baseline fresh so a later
+    // first-row change diffs against the actual previous commit.
+    if (prevFirstRowIdRef.current === firstRowId) {
+      prevLastRowIdRef.current = lastRowId;
+      return;
+    }
     const rows = table.getRowModel().rows;
-    const change = detectDataChange(prevFirstRowIdRef.current, rows);
+    const change = detectDataChange(prevFirstRowIdRef.current, rows, prevLastRowIdRef.current);
     prevFirstRowIdRef.current = firstRowId;
+    prevLastRowIdRef.current = lastRowId;
     if (change === 'replace') virtualizer.measure();
-  }, [firstRowId, table, virtualizer]);
+  }, [firstRowId, lastRowId, table, virtualizer]);
 };

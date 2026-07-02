@@ -23,4 +23,12 @@ describe('detectDataChange', () => {
   it('returns "replace" when rows became empty', () => {
     expect(detectDataChange('a', rows())).toBe('replace');
   });
+
+  it('returns "prepend" when the old first id moved down and the tail is intact', () => {
+    expect(detectDataChange('b', rows('a', 'b', 'c'), 'c')).toBe('prepend');
+  });
+
+  it('returns "replace" when the old first id survived but the tail changed (filter reset)', () => {
+    expect(detectDataChange('b', rows('a', 'b', 'c', 'd'), 'c')).toBe('replace');
+  });
 });

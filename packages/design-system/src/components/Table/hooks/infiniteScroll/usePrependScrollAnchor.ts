@@ -32,6 +32,7 @@ export const usePrependScrollAnchor = ({
   tbodyRef,
 }: UsePrependScrollAnchorOptions) => {
   const prevFirstRowIdRef = useRef<string | undefined>(undefined);
+  const prevLastRowIdRef = useRef<string | undefined>(undefined);
   const prevFirstRowStartRef = useRef<number | null>(null);
   const prevScrollHeightRef = useRef<number | null>(null);
   const prevLoaderRef = useRef({ count: 0, height: 0 });
@@ -78,13 +79,14 @@ export const usePrependScrollAnchor = ({
       prevScrollHeightRef.current = trackScrollHeight ? getScrollHeight() : null;
       prevFirstRowStartRef.current = getFirstRowStart();
       prevFirstRowIdRef.current = rows[0]?.id;
+      prevLastRowIdRef.current = rows[rows.length - 1]?.id;
       getStartLoaderHeight();
       return;
     }
 
     const prevLoaderHeight = prevLoaderRef.current.height;
 
-    if (detectDataChange(prevFirstRowIdRef.current, rows) === 'prepend') {
+    if (detectDataChange(prevFirstRowIdRef.current, rows, prevLastRowIdRef.current) === 'prepend') {
       const prevId = prevFirstRowIdRef.current;
       const index = rows.findIndex(row => row.id === prevId);
       const newStart = virtualizerRef?.current?.measurementsCache[index]?.start;
@@ -112,6 +114,7 @@ export const usePrependScrollAnchor = ({
     }
 
     prevFirstRowIdRef.current = rows[0]?.id;
+    prevLastRowIdRef.current = rows[rows.length - 1]?.id;
     prevFirstRowStartRef.current = getFirstRowStart();
     prevScrollHeightRef.current = trackScrollHeight ? getScrollHeight() : null;
     getStartLoaderHeight();
