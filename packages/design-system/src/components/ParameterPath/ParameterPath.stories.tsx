@@ -55,10 +55,20 @@ export const NoMethod: StoryFn<typeof meta> = () => (
 );
 
 export const ExpandableTruncated: StoryFn<typeof meta> = () => (
-  <div style={{ width: 360 }}>
+  <div style={{ width: 600 }}>
     <ParameterPath
       method='POST'
-      segments={['multipart', 'json_abc', 'json_doc', 'qwerty_doc', 'hash', 'formData', 'get']}
+      segments={[
+        'multipart',
+        'json_abc',
+        'json_doc',
+        'qwerty_doc',
+        'hash',
+        'formData',
+        'session_token',
+        'nested_payload',
+        'get',
+      ]}
       attack
       expandable
     />
