@@ -21,7 +21,7 @@ interface ParameterPathRowProps {
   forMeasurement: boolean;
   // Visible segment indices when collapsed; `null` shows every segment.
   indices: number[] | null;
-  // Visible row only: an expanded path scrolls horizontally instead of clipping.
+  // Visible row only: an expanded path wraps instead of clipping.
   isExpanded?: boolean;
 }
 

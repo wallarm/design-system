@@ -3,10 +3,8 @@ import { cva } from 'class-variance-authority';
 export const rowVariants = cva('flex items-center gap-0 min-w-0', {
   variants: {
     expanded: {
-      // Expanded stays on one line and scrolls horizontally (an expanded path
-      // never fits by definition — otherwise it would not have been collapsed);
-      // collapsed clips.
-      true: 'overflow-x-auto overflow-y-hidden [scrollbar-width:thin]',
+      // Expanded wraps (won't fit on one line); collapsed clips.
+      true: 'flex-wrap',
       false: 'overflow-hidden',
     },
   },
