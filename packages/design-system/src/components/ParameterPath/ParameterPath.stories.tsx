@@ -55,6 +55,19 @@ export const NoMethod: StoryFn<typeof meta> = () => (
 );
 
 export const ExpandableTruncated: StoryFn<typeof meta> = () => (
+  <div style={{ width: 360 }}>
+    <ParameterPath
+      method='POST'
+      segments={['multipart', 'json_abc', 'json_doc', 'qwerty_doc', 'hash', 'formData', 'get']}
+      attack
+      expandable
+    />
+  </div>
+);
+
+// The same expandable path in a container the full path fits into — the
+// expand affordance stays inert (no ellipsis, not clickable).
+export const ExpandableFitsInline: StoryFn<typeof meta> = () => (
   <div style={{ width: 720, display: 'flex', justifyContent: 'center' }}>
     <ParameterPath
       method='POST'
