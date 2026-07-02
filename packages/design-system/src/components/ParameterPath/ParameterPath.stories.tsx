@@ -55,8 +55,11 @@ export const NoMethod: StoryFn<typeof meta> = () => (
 );
 
 export const ExpandableTruncated: StoryFn<typeof meta> = () => (
-  <div style={{ width: 600 }}>
+  <div style={{ width: 720 }}>
+    {/* The root is w-full (it must span the available space to measure it),
+        so centering happens inside the component, not on the container. */}
     <ParameterPath
+      className='justify-center'
       method='POST'
       segments={[
         'multipart',
