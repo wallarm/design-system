@@ -8,7 +8,7 @@ A field accepts **only a number** and the user benefits from nudging or bounding
 ## Don't use it for
 - **A number that's really an identifier** — phone, port, ZIP, version, account/card number: anything where leading zeros matter or there's no arithmetic → `Input` (`inputMode="numeric"`). NumberInput coerces to a number — it strips leading zeros, applies grouping, and a +/– stepper is meaningless on an ID.
 - **Picking from a small fixed set of numbers** (page size 10/25/50, retries 1–5) → `Select` / `SegmentedControl` / `Radio`. Stepping through a short closed list is worse than picking from it.
-- **A draggable slider / range** — there's no Slider in the system; a bounded value is a NumberInput with `min`/`max`, not a hand-rolled slider.
+- **An approximate value the user *feels* for, or a min–max range** — risk score, threshold, opacity, a range filter → `Slider` (drag a handle; *seeing it move* helps them choose). Keep NumberInput when the **figure must be exact**; if both the feel *and* the figure matter, use a `Slider` with its inline `SliderInput`.
 - **Free or mixed text** → `Input`; multi-line prose → `Textarea`.
 
 ## Locked — don't override
