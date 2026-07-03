@@ -1,6 +1,15 @@
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import {
+  createListCollection,
+  SelectButton,
+  SelectContent,
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionText,
+  SelectPositioner,
+} from '../Select';
 import { InlineEdit } from './InlineEdit';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditSelect } from './InlineEditSelect';
@@ -88,6 +97,79 @@ describe('InlineEditSelect', () => {
     );
     expect(screen.getByTestId('custom-composition')).toBeInTheDocument();
     expect(screen.queryByText('Admin', ignoreHiddenSelectOption)).not.toBeInTheDocument();
+  });
+
+  it('children compose ordinary Select parts inside the prewired root and commit through it', async () => {
+    const onCommit = vi.fn();
+    render(
+      <InlineEdit defaultValue={['editor']} defaultEdit onValueCommit={onCommit} data-testid='ie'>
+        <InlineEditControl>
+          <InlineEditSelect items={items}>
+            <SelectButton data-testid='custom-trigger' />
+            <SelectPositioner>
+              <SelectContent>
+                {items.map(item => (
+                  <SelectOption key={item.value} item={item}>
+                    <SelectOptionText>{item.label}</SelectOptionText>
+                    <SelectOptionIndicator />
+                  </SelectOption>
+                ))}
+              </SelectContent>
+            </SelectPositioner>
+          </InlineEditSelect>
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('custom-trigger')).toBeInTheDocument();
+    const option = await screen.findByText('Admin', ignoreHiddenSelectOption);
+    await userEvent.click(option);
+    // Bound-root: commit-on-close wiring lives on the root regardless of
+    // which composition (default or custom children) rendered the option.
+    expect(onCommit).toHaveBeenCalledTimes(1);
+    expect(onCommit).toHaveBeenCalledWith(['admin']);
+  });
+
+  it('collection-only usage renders options from the resolved collection and commits on close', async () => {
+    const onCommit = vi.fn();
+    const collection = createListCollection({ items });
+    render(
+      <InlineEdit defaultValue={['editor']} defaultEdit onValueCommit={onCommit} data-testid='ie'>
+        <InlineEditControl>
+          <InlineEditSelect collection={collection} />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    const option = await screen.findByText('Admin', ignoreHiddenSelectOption);
+    await userEvent.click(option);
+    expect(onCommit).toHaveBeenCalledTimes(1);
+    expect(onCommit).toHaveBeenCalledWith(['admin']);
+  });
+
+  it('warns in dev when both items and collection are provided', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const collection = createListCollection({ items });
+    render(
+      <InlineEdit defaultValue={['editor']} defaultEdit data-testid='ie'>
+        <InlineEditControl>
+          <InlineEditSelect items={items} collection={collection} />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('InlineEditSelect'));
+    warnSpy.mockRestore();
+  });
+
+  it('warns in dev when neither items nor collection are provided', () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    render(
+      <InlineEdit defaultValue={[]} defaultEdit data-testid='ie'>
+        <InlineEditControl>
+          <InlineEditSelect />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('InlineEditSelect'));
+    warnSpy.mockRestore();
   });
 
   it('derives the shared input testId slot', () => {

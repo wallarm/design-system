@@ -1,6 +1,8 @@
 import { CalendarDate } from '@internationalized/date';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+import { CalendarBody, CalendarContent, CalendarGrids, CalendarTrigger } from '../Calendar';
+import { DateInput } from '../DateInput';
 import { InlineEdit } from './InlineEdit';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditDate } from './InlineEditDate';
@@ -62,5 +64,44 @@ describe('InlineEditDate', () => {
     expect(target?.querySelector('[data-segment]')).toBeTruthy();
     // The focusable segments themselves must not carry the attribute.
     expect(target?.querySelectorAll('[data-segment][data-analytics-id]')).toHaveLength(0);
+  });
+
+  it('children compose ordinary Calendar parts inside the prewired root (bound-root pattern)', () => {
+    const onCommit = vi.fn();
+    render(
+      <InlineEdit
+        defaultValue={new CalendarDate(2026, 6, 15)}
+        defaultEdit
+        onValueCommit={onCommit}
+        data-testid='ie'
+      >
+        <InlineEditControl>
+          <InlineEditDate>
+            <CalendarTrigger>
+              <DateInput
+                data-testid='custom-date-input'
+                value={null}
+                onChange={() => {}}
+                granularity='day'
+                showIcon={false}
+              />
+            </CalendarTrigger>
+            <CalendarContent>
+              <CalendarBody>
+                <CalendarGrids />
+              </CalendarBody>
+            </CalendarContent>
+          </InlineEditDate>
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    // defaultOpen wiring stays on the root regardless of composition — the
+    // portaled popover content renders through the children path too.
+    expect(document.querySelector('[data-scope="date-picker"][data-part="content"]')).toBeTruthy();
+    expect(screen.getByTestId('custom-date-input')).toBeInTheDocument();
+    // The children path replaces the default composition entirely — the
+    // default DateInput (which would carry the shared `input` testId slot)
+    // must not also render.
+    expect(screen.queryByTestId('ie--input')).not.toBeInTheDocument();
   });
 });

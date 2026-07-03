@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import { CalendarDateTime } from '@internationalized/date';
 import type { DateValue as ReactAriaDateValue } from '@react-aria/datepicker';
 import { useTestId } from '../../utils/testId';
@@ -36,6 +36,20 @@ export interface InlineEditDateProps
    * header, popover stays open on day picks (mirrors Calendar `showTime`).
    */
   showTime?: boolean;
+  /**
+   * Bound-root pattern: `InlineEditDate` IS the prewired `Calendar` root —
+   * the `DateValue[]` adapter, `defaultOpen`/`closeOnSelect`, and
+   * commit-on-close all stay on the root regardless of composition.
+   * `children` are ordinary `Calendar` compound parts (`CalendarTrigger`,
+   * `CalendarContent > CalendarBody > …`) rendered inside that root, not a
+   * replacement wrapper. Composing children means the consumer owns their
+   * own testids/attributes on their own parts — the shared `input` testId
+   * slot below only lands on the default `DateInput` trigger.
+   *
+   * No children → the default composition renders (segmented `DateInput`
+   * trigger + grids, plus `CalendarInputHeader` in `showTime` mode).
+   */
+  children?: ReactNode;
 }
 
 /**
@@ -71,6 +85,7 @@ export const InlineEditDate: FC<InlineEditDateProps> = ({
   showTime = false,
   'data-testid': testIdProp,
   showIcon = false,
+  children,
   ...rest
 }) => {
   const testId = useTestId('input', testIdProp);
@@ -92,36 +107,40 @@ export const InlineEditDate: FC<InlineEditDateProps> = ({
         if (!open) submit();
       }}
     >
-      <CalendarTrigger>
-        {/* Pass the value straight through — an `instanceof` gate drops values
-            produced by the Ark calendar (different @internationalized/date
-            copy), showing the placeholder instead. */}
-        {showTime ? (
-          <DateInput
-            {...rest}
-            data-testid={testId}
-            value={toReactAriaDateValue(withMinuteGranularity(value ?? null))}
-            onChange={v => setValue(toCalendarDateValue(v))}
-            granularity='minute'
-            showIcon={showIcon}
-          />
-        ) : (
-          <DateInput
-            {...rest}
-            data-testid={testId}
-            value={toReactAriaDateValue(value ?? null)}
-            onChange={v => setValue(toCalendarDateValue(v))}
-            granularity='day'
-            showIcon={showIcon}
-          />
-        )}
-      </CalendarTrigger>
-      <CalendarContent>
-        <CalendarBody>
-          {showTime ? <CalendarInputHeader /> : null}
-          <CalendarGrids />
-        </CalendarBody>
-      </CalendarContent>
+      {children ?? (
+        <>
+          <CalendarTrigger>
+            {/* Pass the value straight through — an `instanceof` gate drops values
+                produced by the Ark calendar (different @internationalized/date
+                copy), showing the placeholder instead. */}
+            {showTime ? (
+              <DateInput
+                {...rest}
+                data-testid={testId}
+                value={toReactAriaDateValue(withMinuteGranularity(value ?? null))}
+                onChange={v => setValue(toCalendarDateValue(v))}
+                granularity='minute'
+                showIcon={showIcon}
+              />
+            ) : (
+              <DateInput
+                {...rest}
+                data-testid={testId}
+                value={toReactAriaDateValue(value ?? null)}
+                onChange={v => setValue(toCalendarDateValue(v))}
+                granularity='day'
+                showIcon={showIcon}
+              />
+            )}
+          </CalendarTrigger>
+          <CalendarContent>
+            <CalendarBody>
+              {showTime ? <CalendarInputHeader /> : null}
+              <CalendarGrids />
+            </CalendarBody>
+          </CalendarContent>
+        </>
+      )}
     </CalendarRoot>
   );
 };
