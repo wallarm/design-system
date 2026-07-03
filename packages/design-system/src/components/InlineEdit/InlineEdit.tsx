@@ -31,6 +31,31 @@ export interface InlineEditProps<T = unknown> extends TestableProps {
   onValueChange?: (value: T) => void;
   onValueCommit?: (value: T) => void | Promise<unknown>;
   onValueRevert?: (value: T) => void;
+  /**
+   * Commit guard. Called on every submit (Enter, blur, popover close,
+   * confirm button) before `onValueCommit`, with the draft to be committed
+   * and the current committed value. Only an explicit `false` (or a promise
+   * resolving to `false`) blocks the commit: the field silently stays in
+   * edit mode with the draft. Any other result — `true`, `undefined`, no
+   * return — lets the commit proceed. A rejection or a synchronous throw is
+   * treated like a commit failure: status `error`, message from the error,
+   * field stays in edit mode.
+   *
+   * While the guard's promise is pending the edit session is held: duplicate
+   * submits are suppressed, blur neither submits nor cancels, and the field
+   * shows no status (`idle` — the consumer's confirmation UI is the
+   * feedback). Escape still cancels; a late resolution after cancel is
+   * dropped. The value committed on `true` is exactly the `value` argument
+   * the guard received; if the draft changed while the guard was pending,
+   * the resolution is dropped and the field stays in edit mode.
+   *
+   * Guards must settle via non-blocking UI (a promise resolved by dialog
+   * buttons). Synchronous blocking dialogs (`window.confirm`) are
+   * unsupported with submitMode 'blur'/'both' (the queued blur re-prompts).
+   * The guard's owner never gets its consumer UI closed by the DS — treat
+   * the dialog's own buttons as the source of truth for closing it.
+   */
+  onBeforeValueCommit?: (value: T, committedValue: T) => boolean | void | Promise<boolean | void>;
   edit?: boolean;
   defaultEdit?: boolean;
   onEditChange?: (editing: boolean) => void;
@@ -53,6 +78,7 @@ export function InlineEdit<T = unknown>({
   onValueChange,
   onValueCommit,
   onValueRevert,
+  onBeforeValueCommit,
   edit,
   defaultEdit = false,
   onEditChange,
@@ -111,6 +137,8 @@ export function InlineEdit<T = unknown>({
   // see the consumer's current bindings, not those captured at submit time.
   const onValueCommitRef = useRef(onValueCommit);
   onValueCommitRef.current = onValueCommit;
+  const onBeforeValueCommitRef = useRef(onBeforeValueCommit);
+  onBeforeValueCommitRef.current = onBeforeValueCommit;
   const savedDurationRef = useRef(savedDuration);
   savedDurationRef.current = savedDuration;
 
@@ -172,37 +200,90 @@ export function InlineEdit<T = unknown>({
     if ((status ?? autoStatus) === 'loading') return;
     const current = draftRef.current;
     const token = Symbol('inline-edit-commit');
+
+    const failCommit = (reason: unknown) => {
+      pendingCommitRef.current = null;
+      setAutoStatus('error');
+      setAutoError(reason instanceof Error ? reason.message : 'Failed to save');
+    };
+
+    // The pre-guard commit tail. Sync results settle in the same tick — the
+    // sync-commit contract must not gain a microtask window.
+    const runCommit = () => {
+      const result = onValueCommitRef.current?.(current);
+      if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
+        setAutoStatus('loading');
+        setAutoError(undefined);
+        Promise.resolve(result).then(
+          () => {
+            if (!mounted.current || pendingCommitRef.current !== token) return;
+            pendingCommitRef.current = null;
+            setCommitted(current);
+            setEditingState(false);
+            setAutoStatus('saved');
+            if (savedTimer.current) clearTimeout(savedTimer.current);
+            savedTimer.current = setTimeout(() => {
+              if (mounted.current) setAutoStatus('idle');
+            }, savedDurationRef.current);
+          },
+          (reason: unknown) => {
+            if (!mounted.current || pendingCommitRef.current !== token) return;
+            failCommit(reason);
+          },
+        );
+        return;
+      }
+      pendingCommitRef.current = null;
+      setCommitted(current);
+      setEditingState(false);
+    };
+
     pendingCommitRef.current = token;
 
-    const result = onValueCommitRef.current?.(current);
-    if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
-      setAutoStatus('loading');
-      setAutoError(undefined);
-      Promise.resolve(result).then(
-        () => {
+    const guard = onBeforeValueCommitRef.current;
+    if (!guard) {
+      runCommit();
+      return;
+    }
+
+    let verdict: boolean | void | Promise<boolean | void>;
+    try {
+      verdict = guard(current, committedValue as T);
+    } catch (reason) {
+      failCommit(reason);
+      return;
+    }
+
+    if (verdict && typeof (verdict as PromiseLike<unknown>).then === 'function') {
+      (verdict as Promise<boolean | void>).then(
+        resolved => {
           if (!mounted.current || pendingCommitRef.current !== token) return;
-          pendingCommitRef.current = null;
-          setCommitted(current);
-          setEditingState(false);
-          setAutoStatus('saved');
-          if (savedTimer.current) clearTimeout(savedTimer.current);
-          savedTimer.current = setTimeout(() => {
-            if (mounted.current) setAutoStatus('idle');
-          }, savedDurationRef.current);
+          if (resolved === false) {
+            pendingCommitRef.current = null;
+            return;
+          }
+          if (draftRef.current !== current) {
+            // The guard approved `current`, but the draft moved on — the
+            // approval no longer describes what would be committed. Decline.
+            pendingCommitRef.current = null;
+            return;
+          }
+          runCommit();
         },
         (reason: unknown) => {
           if (!mounted.current || pendingCommitRef.current !== token) return;
-          pendingCommitRef.current = null;
-          setAutoStatus('error');
-          setAutoError(reason instanceof Error ? reason.message : 'Failed to save');
+          failCommit(reason);
         },
       );
       return;
     }
-    pendingCommitRef.current = null;
-    setCommitted(current);
-    setEditingState(false);
-  }, [setCommitted, setEditingState, status, autoStatus]);
+
+    if (verdict === false) {
+      pendingCommitRef.current = null;
+      return;
+    }
+    runCommit();
+  }, [setCommitted, setEditingState, status, autoStatus, committedValue]);
 
   const contextValue = useMemo<InlineEditContextValue<T>>(
     () => ({

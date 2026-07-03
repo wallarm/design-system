@@ -22,6 +22,9 @@ function Harness() {
       <button type='button' onClick={() => setValue('draft')}>
         setDraft
       </button>
+      <button type='button' onClick={() => setValue('draft-2')}>
+        setDraft2
+      </button>
       <button type='button' onClick={() => submit()}>
         submit
       </button>
@@ -175,5 +178,297 @@ describe('InlineEdit', () => {
     expect(screen.getByTestId('committed')).toHaveTextContent('hello');
     expect(screen.getByTestId('status')).toHaveTextContent('idle');
     expect(screen.getByTestId('editing')).toHaveTextContent('false');
+  });
+});
+
+describe('InlineEdit onBeforeValueCommit', () => {
+  it('blocks the commit when the guard returns false', async () => {
+    const onCommit = vi.fn();
+    const guard = vi.fn(() => false);
+    render(
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    expect(guard).toHaveBeenCalledWith('draft', 'hello');
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('editing')).toHaveTextContent('true');
+    expect(screen.getByTestId('value')).toHaveTextContent('draft');
+    expect(screen.getByTestId('status')).toHaveTextContent('idle');
+  });
+
+  it('proceeds when the guard returns true', async () => {
+    const onCommit = vi.fn();
+    render(
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={() => true}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    expect(onCommit).toHaveBeenCalledWith('draft');
+    expect(screen.getByTestId('editing')).toHaveTextContent('false');
+    expect(screen.getByTestId('committed')).toHaveTextContent('draft');
+  });
+
+  it('proceeds when the guard returns nothing — only explicit false blocks', async () => {
+    const onCommit = vi.fn();
+    const guard = vi.fn(() => undefined);
+    render(
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    expect(onCommit).toHaveBeenCalledWith('draft');
+  });
+
+  it('maps a synchronous guard throw to the error status and stays editing', async () => {
+    const onCommit = vi.fn();
+    const guard = vi.fn(() => {
+      throw new Error('guard blew up');
+    });
+    render(
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('submit'));
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('status')).toHaveTextContent('error');
+    expect(screen.getByTestId('editing')).toHaveTextContent('true');
+  });
+
+  it('commits after the guard resolves true', async () => {
+    const onCommit = vi.fn();
+    let resolve!: (ok: boolean) => void;
+    const guard = vi.fn(
+      () =>
+        new Promise<boolean>(r => {
+          resolve = r;
+        }),
+    );
+    render(
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('status')).toHaveTextContent('idle'); // no loading during guard
+    await act(async () => {
+      resolve(true);
+      await Promise.resolve();
+    });
+    expect(onCommit).toHaveBeenCalledWith('draft');
+    expect(screen.getByTestId('editing')).toHaveTextContent('false');
+    expect(screen.getByTestId('committed')).toHaveTextContent('draft');
+  });
+
+  it('stays editing with the draft when the guard resolves false', async () => {
+    const onCommit = vi.fn();
+    let resolve!: (ok: boolean) => void;
+    const guard = vi.fn(
+      () =>
+        new Promise<boolean>(r => {
+          resolve = r;
+        }),
+    );
+    render(
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    await act(async () => {
+      resolve(false);
+      await Promise.resolve();
+    });
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('editing')).toHaveTextContent('true');
+    expect(screen.getByTestId('value')).toHaveTextContent('draft');
+    expect(screen.getByTestId('status')).toHaveTextContent('idle');
+  });
+
+  it('runs the async commit lifecycle after guard-true (loading then error, stays editing)', async () => {
+    const onCommit = vi.fn(() => Promise.reject(new Error('save failed')));
+    render(
+      <InlineEdit
+        defaultValue='hello'
+        onValueCommit={onCommit}
+        onBeforeValueCommit={() => Promise.resolve(true)}
+      >
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('submit'));
+    await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('error'));
+    expect(screen.getByTestId('editing')).toHaveTextContent('true');
+  });
+
+  it('suppresses duplicate submits while the guard is pending', async () => {
+    const guard = vi.fn(() => new Promise<boolean>(() => {})); // never settles
+    render(
+      <InlineEdit defaultValue='hello' onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('submit'));
+    await userEvent.click(screen.getByText('submit'));
+    expect(guard).toHaveBeenCalledTimes(1);
+  });
+
+  it('suppresses duplicate submits even when status is consumer-controlled idle', async () => {
+    const guard = vi.fn(() => new Promise<boolean>(() => {}));
+    render(
+      <InlineEdit defaultValue='hello' status='idle' onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('submit'));
+    await userEvent.click(screen.getByText('submit'));
+    expect(guard).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops a late guard resolution after cancel', async () => {
+    const onCommit = vi.fn();
+    const onRevert = vi.fn();
+    let resolve!: (ok: boolean) => void;
+    const guard = vi.fn(
+      () =>
+        new Promise<boolean>(r => {
+          resolve = r;
+        }),
+    );
+    render(
+      <InlineEdit
+        defaultValue='hello'
+        onValueCommit={onCommit}
+        onValueRevert={onRevert}
+        onBeforeValueCommit={guard}
+      >
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    await userEvent.click(screen.getByText('cancel'));
+    expect(onRevert).toHaveBeenCalledWith('hello');
+    await act(async () => {
+      resolve(true);
+      await Promise.resolve();
+    });
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('editing')).toHaveTextContent('false');
+    expect(screen.getByTestId('committed')).toHaveTextContent('hello');
+  });
+
+  it('drops the resolution when the draft changed while the guard was pending', async () => {
+    const onCommit = vi.fn();
+    let resolve!: (ok: boolean) => void;
+    const guard = vi.fn(
+      () =>
+        new Promise<boolean>(r => {
+          resolve = r;
+        }),
+    );
+    render(
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    await userEvent.click(screen.getByText('setDraft2')); // keeps typing while pending
+    await act(async () => {
+      resolve(true);
+      await Promise.resolve();
+    });
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('editing')).toHaveTextContent('true');
+    expect(screen.getByTestId('value')).toHaveTextContent('draft-2');
+  });
+
+  it('maps a guard rejection to the error status and stays editing', async () => {
+    const onCommit = vi.fn();
+    render(
+      <InlineEdit
+        defaultValue='hello'
+        onValueCommit={onCommit}
+        onBeforeValueCommit={() => Promise.reject(new Error('confirm failed'))}
+      >
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('submit'));
+    await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('error'));
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('editing')).toHaveTextContent('true');
+  });
+
+  it('does not commit when unmounted while the guard is pending', async () => {
+    const onCommit = vi.fn();
+    let resolve!: (ok: boolean) => void;
+    const guard = vi.fn(
+      () =>
+        new Promise<boolean>(r => {
+          resolve = r;
+        }),
+    );
+    const { unmount } = render(
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    unmount();
+    resolve(true);
+    await act(async () => {
+      await Promise.resolve();
+    });
+    expect(onCommit).not.toHaveBeenCalled();
+  });
+
+  it('fires onEditChange(false) only after the guard resolves true (controlled edit)', async () => {
+    const onEditChange = vi.fn();
+    let resolve!: (ok: boolean) => void;
+    const guard = vi.fn(
+      () =>
+        new Promise<boolean>(r => {
+          resolve = r;
+        }),
+    );
+    render(
+      <InlineEdit value='hello' edit onEditChange={onEditChange} onBeforeValueCommit={guard}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    expect(onEditChange).not.toHaveBeenCalled();
+    await act(async () => {
+      resolve(true);
+      await Promise.resolve();
+    });
+    expect(onEditChange).toHaveBeenCalledWith(false);
   });
 });
