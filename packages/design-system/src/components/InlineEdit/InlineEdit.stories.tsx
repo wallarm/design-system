@@ -1,11 +1,21 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import type { TimeValue } from '@react-aria/datepicker';
 import { format } from 'date-fns';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Calendar, ChevronDown, Clock } from '../../icons';
 import type { DateValue } from '../../index';
 import { CalendarDate, CalendarDateTime, Time } from '../../index';
+import { Button } from '../Button';
 import { DateFormatProvider } from '../DateFormatProvider';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogFooter,
+  DialogFooterControls,
+  DialogHeader,
+  DialogTitle,
+} from '../Dialog';
 import { Input } from '../Input';
 import type { SelectDataItem } from '../Select';
 import { Tag } from '../Tag';
@@ -45,7 +55,10 @@ const meta = {
           'built-in editor (`InlineEditInput`, `InlineEditNumber`, `InlineEditTextarea`, ' +
           '`InlineEditSelect`, `InlineEditDate`, `InlineEditTime`) or a custom one. ' +
           'The root manages the commit/cancel lifecycle, async commit with loading, saved, ' +
-          'and error status, and submit-mode handling (enter, blur, both, or none).',
+          'and error status, and submit-mode handling (enter, blur, both, or none).' +
+          ' An optional `onBeforeValueCommit` guard intercepts every commit — return `false` ' +
+          '(or a promise resolving to `false`) to keep the field in edit mode, e.g. after a ' +
+          'declined confirmation dialog.',
       },
     },
   },
@@ -330,13 +343,36 @@ export const CustomEditor: StoryFn = () => {
         <InlineEdit value={value} onValueCommit={v => setValue(v as string)} data-testid='custom'>
           <InlineEditPreview>{value}</InlineEditPreview>
           <InlineEditControl submitMode='both'>
-            {({ value: draft, setValue: setDraft }) => (
-              <Input
-                aria-label='Custom'
-                value={(draft as string) ?? ''}
-                onChange={e => setDraft(e.target.value.toUpperCase())}
-                className='h-28 px-8'
-              />
+            {({ value: draft, setValue: setDraft, submit, cancel }) => (
+              <span className='flex items-center gap-4'>
+                <Input
+                  aria-label='Custom'
+                  value={(draft as string) ?? ''}
+                  onChange={e => setDraft(e.target.value.toUpperCase())}
+                  className='h-28 px-8'
+                />
+                {/* preventDefault on mousedown keeps focus in the input, so
+                    Safari's click-after-blur ordering cannot fire a blur
+                    submit/cancel before the button's click lands. */}
+                <Button
+                  variant='primary'
+                  color='brand'
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => submit()}
+                  data-testid='custom-confirm'
+                >
+                  Save
+                </Button>
+                <Button
+                  variant='ghost'
+                  color='neutral'
+                  onMouseDown={e => e.preventDefault()}
+                  onClick={() => cancel()}
+                  data-testid='custom-cancel'
+                >
+                  Cancel
+                </Button>
+              </span>
             )}
           </InlineEditControl>
           <InlineEditError />
@@ -359,7 +395,131 @@ CustomEditor.parameters = {
         '`useInlineEditSubmitMode(mode)` to register its commit mode — the pattern used by the ' +
         'built-in editors (`InlineEditInput`, `InlineEditSelect`, etc.) and the better fit for ' +
         'popover-style editors (like a select or calendar) that commit on their own close event ' +
-        'rather than on blur or Enter.',
+        'rather than on blur or Enter.' +
+        ' Custom confirm/cancel buttons should call `e.preventDefault()` in `onMouseDown`: it ' +
+        'keeps focus in the input, so browsers that do not focus buttons on mousedown (Safari, ' +
+        'macOS Firefox) cannot fire a blur submit/cancel before the click lands.',
+    },
+  },
+};
+
+export const ConfirmCommit: StoryFn = () => {
+  const [email, setEmail] = useState('dev@wallarm.com');
+  const [role, setRole] = useState<string[]>(['editor']);
+  const [pending, setPending] = useState<string | null>(null);
+  const resolverRef = useRef<((ok: boolean) => void) | null>(null);
+
+  // Promise-based confirm: the guard returns this promise and the dialog
+  // buttons settle it. The DS never closes the dialog — `settle` does.
+  const confirmChange = (message: string) =>
+    new Promise<boolean>(resolve => {
+      resolverRef.current = resolve;
+      setPending(message);
+    });
+
+  const settle = (ok: boolean) => {
+    resolverRef.current?.(ok);
+    resolverRef.current = null;
+    setPending(null);
+  };
+
+  const roleLabel = roleItems.find(i => i.value === (role[0] ?? ''))?.label ?? '';
+
+  return (
+    <div className='flex w-[320px] flex-col gap-8'>
+      <Row label='Email'>
+        <InlineEdit
+          value={email}
+          onBeforeValueCommit={(next, prev) =>
+            next === prev || confirmChange(`Change email to ${next as string}?`)
+          }
+          onValueCommit={v => setEmail(v as string)}
+          data-testid='confirm-email'
+        >
+          <InlineEditPreview>{email}</InlineEditPreview>
+          <InlineEditControl>
+            <InlineEditInput type='email' aria-label='Email' />
+          </InlineEditControl>
+        </InlineEdit>
+      </Row>
+
+      <Row label='Role'>
+        <InlineEdit
+          value={role}
+          onBeforeValueCommit={(next, prev) => {
+            // The guard fires on every popover close, including no-op ones —
+            // short-circuit when nothing changed (for dates use `.compare()`).
+            const nextRole = (next as string[]).join();
+            if (nextRole === (prev as string[]).join()) return true;
+            const label = roleItems.find(i => i.value === (next as string[])[0])?.label ?? nextRole;
+            return confirmChange(`Change role to ${label}?`);
+          }}
+          onValueCommit={v => setRole(v as string[])}
+          data-testid='confirm-role'
+        >
+          <InlineEditPreview triggerIcon={<ChevronDown size='md' />}>{roleLabel}</InlineEditPreview>
+          <InlineEditControl>
+            <InlineEditSelect items={roleItems} />
+          </InlineEditControl>
+        </InlineEdit>
+      </Row>
+
+      <Dialog
+        open={pending !== null}
+        onOpenChange={open => {
+          if (!open) settle(false);
+        }}
+        data-testid='confirm-dialog'
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm change</DialogTitle>
+          </DialogHeader>
+          <DialogBody>
+            <Text>{pending}</Text>
+          </DialogBody>
+          <DialogFooter>
+            <DialogFooterControls>
+              <Button
+                variant='ghost'
+                color='neutral'
+                size='large'
+                onClick={() => settle(false)}
+                data-testid='confirm-decline'
+              >
+                Cancel
+              </Button>
+              <Button
+                variant='primary'
+                color='brand'
+                size='large'
+                onClick={() => settle(true)}
+                data-testid='confirm-accept'
+              >
+                Change
+              </Button>
+            </DialogFooterControls>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+ConfirmCommit.parameters = {
+  docs: {
+    description: {
+      story:
+        'The `onBeforeValueCommit` guard intercepts every commit before `onValueCommit` runs. ' +
+        'Return a promise resolved by your own confirmation UI: `false` silently keeps the field ' +
+        'in edit mode with the typed draft (no error state) and focus returns to the editor; any ' +
+        'other result lets the commit proceed; a rejection maps to the error status. The guard ' +
+        'fires for every commit path — Enter, blur, popover close — including no-op submits, so ' +
+        'short-circuit on unchanged values (`next === prev`; use `.compare()` for date values ' +
+        'and an item comparison for arrays). Declining a popover editor (the Role select here) ' +
+        'leaves it parked in edit mode with the popover closed: reopen and re-close to be asked ' +
+        'again, or press Escape inside the field to revert. The DS never closes your dialog — ' +
+        'its own buttons must settle the promise and close it.',
     },
   },
 };
