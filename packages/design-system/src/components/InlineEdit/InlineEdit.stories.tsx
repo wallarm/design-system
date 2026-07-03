@@ -35,6 +35,20 @@ const meta = {
     InlineEditDate,
     InlineEditTime,
   },
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component:
+          'InlineEdit is a compound inline-edit component: `InlineEditPreview` renders the ' +
+          'read-mode wrapper and `InlineEditControl` the edit-mode wrapper, hosting either a ' +
+          'built-in editor (`InlineEditInput`, `InlineEditNumber`, `InlineEditTextarea`, ' +
+          '`InlineEditSelect`, `InlineEditDate`, `InlineEditTime`) or a custom one. ' +
+          'The root manages the commit/cancel lifecycle, async commit with loading, saved, ' +
+          'and error status, and submit-mode handling (enter, blur, both, or none).',
+      },
+    },
+  },
 } satisfies Meta<typeof InlineEdit>;
 
 export default meta;
@@ -330,4 +344,22 @@ export const CustomEditor: StoryFn = () => {
       </Row>
     </div>
   );
+};
+
+CustomEditor.parameters = {
+  docs: {
+    description: {
+      story:
+        'There are two ways to plug a custom editor into `InlineEditControl`. This story uses ' +
+        'the render-prop path: pass a function as children to read `{ value, setValue }` (and ' +
+        '`submit`/`cancel`) straight from the inline-edit context, and set `submitMode` on ' +
+        '`InlineEditControl` itself since a plain render-prop cannot register its own mode. ' +
+        'The alternative is the component path: extract the editor into its own component that ' +
+        'calls `useInlineEdit()` for `{ value, setValue, submit }` and ' +
+        '`useInlineEditSubmitMode(mode)` to register its commit mode — the pattern used by the ' +
+        'built-in editors (`InlineEditInput`, `InlineEditSelect`, etc.) and the better fit for ' +
+        'popover-style editors (like a select or calendar) that commit on their own close event ' +
+        'rather than on blur or Enter.',
+    },
+  },
 };

@@ -1,6 +1,6 @@
 import { CalendarDate } from '@internationalized/date';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it } from 'vitest';
 import { InlineEdit } from './InlineEdit';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditDate } from './InlineEditDate';

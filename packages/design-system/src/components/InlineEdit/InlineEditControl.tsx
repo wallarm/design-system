@@ -83,6 +83,8 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
 
   const handleKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     onKeyDown?.(event);
+    // zag's dismissable layer preventDefaults Escape when closing a popover — this skip is
+    // what keeps Escape-close from also cancelling the edit. Load-bearing; do not remove.
     if (event.defaultPrevented) return;
     if (event.key === 'Escape') {
       event.preventDefault();
