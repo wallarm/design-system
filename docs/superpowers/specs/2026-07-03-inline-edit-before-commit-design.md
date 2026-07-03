@@ -200,14 +200,23 @@ must be visually silent; the sync-commit tail never resets `autoStatus`, so a
 borrowed `'loading'` would stick after a sync commit and render the preview
 permanently inert.
 
-### Decline UX
+### Decline UX and focus
 
-On resolve-`false` the DS re-runs the editor focus routine (the same
-first-focusable + `selectOnFocus` logic used on edit-mode entry). Without
-this, focus dies on `document.body` after the dialog closes: blur-based
-submit modes lose their "click outside to save" affordance and keyboard users
-are stranded. Consumer dialogs that restore focus on close typically agree
-(their restore target is the editor).
+On resolve-`false` the field silently stays in edit mode with the draft; the
+DS does **not** touch focus. An early revision restored focus to the editor
+on decline, but browser e2e proved it wedges the primary use case: forcing
+`.focus()` on the editor races the confirmation dialog's own
+focus-restore-on-close and leaves the modal stuck open. A modal `Dialog`
+(Ark-based) already records the element focused when it opened — the editor —
+and restores focus there on close, so the DS restore was both redundant and
+harmful. It was removed (`focusEpoch` deleted from the context).
+
+Consequence: consumers whose confirmation surface does **not** restore focus
+(a non-modal banner or toast that moved focus and won't return it) own focus
+management themselves. In practice the driving surface is a modal dialog,
+which handles it. Blur-suppression while the guard is pending
+(`isCommitPending`) is unchanged and remains the essential control-side
+behavior.
 
 ### Popover editors (Select / Date / Time)
 
