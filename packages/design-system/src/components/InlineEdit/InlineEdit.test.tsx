@@ -318,6 +318,38 @@ describe('InlineEdit onBeforeValueCommit', () => {
     expect(screen.getByTestId('editing')).toHaveTextContent('true');
   });
 
+  it('runs the async commit lifecycle after guard-true (loading then saved, exits edit)', async () => {
+    let resolve!: () => void;
+    const onCommit = vi.fn(
+      () =>
+        new Promise<void>(r => {
+          resolve = r;
+        }),
+    );
+    render(
+      <InlineEdit
+        defaultValue='hello'
+        onValueCommit={onCommit}
+        onBeforeValueCommit={() => Promise.resolve(true)}
+        savedDuration={20}
+      >
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit'));
+    await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('loading'));
+    await act(async () => {
+      resolve();
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('saved'));
+    expect(onCommit).toHaveBeenCalledWith('draft');
+    expect(screen.getByTestId('editing')).toHaveTextContent('false');
+    expect(screen.getByTestId('committed')).toHaveTextContent('draft');
+  });
+
   it('suppresses duplicate submits while the guard is pending', async () => {
     const guard = vi.fn(() => new Promise<boolean>(() => {})); // never settles
     render(

@@ -271,6 +271,10 @@ export function InlineEdit<T = unknown>({
           if (draftRef.current !== current) {
             // The guard approved `current`, but the draft moved on — the
             // approval no longer describes what would be committed. Decline.
+            // Reference equality is sufficient: setValue always assigns a new
+            // draft reference, and popover editors are parked (not re-editable)
+            // while the guard is pending, so `current` cannot be mutated in
+            // place.
             pendingCommitRef.current = null;
             return;
           }

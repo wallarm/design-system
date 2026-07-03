@@ -750,6 +750,12 @@ git commit -m "feat(inline-edit): onBeforeValueCommit commit guard (WDS-143)"
 
 ---
 
+> **Post-implementation note:** the `focusEpoch` decline focus-restore below
+> was removed after browser e2e showed it wedges a modal confirmation dialog
+> open (the DS `.focus()` races the dialog's own close-time restore). Only the
+> `isCommitPending` blur-suppression shipped; the modal dialog restores focus
+> itself. See the spec's "Decline UX and focus" section.
+
 ### Task 4: Control integration — blur suppression and decline focus-restore
 
 The root exposes two new context fields: ref-backed `isCommitPending()` (synchronous — blur can fire in the same tick the guard opens a dialog) and `focusEpoch` (bumped on decline so `InlineEditControl` re-runs its focus routine). The control's blur handler becomes a no-op while a commit is pending; Escape keeps working.

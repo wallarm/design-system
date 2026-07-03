@@ -239,7 +239,7 @@ test.describe('Component: InlineEdit', () => {
       await expect(page.getByRole('textbox', { name: 'Name' })).toBeFocused();
     });
 
-    test('Should return focus to the editor when the confirmation is declined', async ({
+    test('Should restore focus to the editor when the confirmation dialog closes on decline', async ({
       page,
     }) => {
       await inlineEditStory.goto(page, 'Confirm Commit');
@@ -250,6 +250,8 @@ test.describe('Component: InlineEdit', () => {
       // Focus moved into the dialog while it decides.
       await expect(page.getByTestId('confirm-decline')).toBeVisible();
       await expect(input).not.toBeFocused();
+      // The DS does not force focus; the modal's own close-time restore returns
+      // it to the editor (the element focused when the dialog opened).
       await page.getByTestId('confirm-decline').click();
       await expect(input).toBeFocused();
     });

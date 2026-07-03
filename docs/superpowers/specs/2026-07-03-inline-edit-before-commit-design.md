@@ -71,9 +71,12 @@ keeps edit mode) and AntD `beforeUpload` / Element Plus `before-leave`
   invalidation), spanning both the guard phase and the existing
   `onValueCommit` promise phase.
 - Blur suppression in `InlineEditControl` while a guard is pending.
-- Focus restoration to the editor on decline.
 - Two pre-existing bug fixes the mechanism subsumes (StrictMode `mounted`
   ref; cancel-during-async-commit stale resolution).
+
+> An earlier revision restored focus to the editor on decline; browser e2e
+> showed it wedges a modal confirmation dialog open, so it was removed — see
+> "Decline UX and focus". The modal dialog restores focus itself.
 - Storybook story (Dialog confirmation recipe), unit + integration + e2e
   tests per repo conventions.
 
@@ -293,13 +296,16 @@ Unit (`InlineEdit.test.tsx`):
   invocation despite blur re-submit.
 - Unmount during pending guard → no `onValueCommit`, no state updates.
 
-Integration (`InlineEdit.integration.test.tsx`): Dialog-driven guard —
-confirm commits, decline keeps draft and returns focus to the input.
+Integration (`InlineEdit.integration.test.tsx`): guard blur-suppression and
+decline — confirm commits; decline keeps the draft in edit mode; the DS does
+not force focus on decline (a non-restoring surface keeps focus where it
+left).
 
 E2E (`InlineEdit.e2e.ts`, per `docs/e2e-test-rules.md`): the confirmation
 story — decline keeps edit mode with draft; confirm commits; focus is inside
-the modal while open and returns to the editor subtree on decline; Select +
-guard decline story shows the parked state and its recovery.
+the modal while open and, on decline, the modal's own close-time focus-restore
+returns focus to the editor; Select + guard decline story shows the parked
+state and its recovery.
 
 ## Storybook
 
