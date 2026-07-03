@@ -1,11 +1,11 @@
 import type { FC } from 'react';
 import { useTestId } from '../../utils/testId';
 import { NumberInput, type NumberInputProps } from '../NumberInput';
-import { useAttributeEdit } from './AttributeEditContext';
+import { useInlineEdit } from './InlineEditContext';
 
 type NumberInputValueChangeDetails = Parameters<NonNullable<NumberInputProps['onValueChange']>>[0];
 
-export type AttributeEditNumberProps = Omit<NumberInputProps, 'value' | 'onValueChange' | 'error'>;
+export type InlineEditNumberProps = Omit<NumberInputProps, 'value' | 'onValueChange' | 'error'>;
 
 /**
  * Analytics closed-target gap: `NumberInput` spreads consumer props onto its
@@ -15,12 +15,12 @@ export type AttributeEditNumberProps = Omit<NumberInputProps, 'value' | 'onValue
  * those attributes to the input inside `NumberInput`. See ./ANALYTICS_GAPS.md.
  */
 
-export const AttributeEditNumber: FC<AttributeEditNumberProps> = ({
+export const InlineEditNumber: FC<InlineEditNumberProps> = ({
   'data-testid': testIdProp,
   ...props
 }) => {
-  const testId = useTestId('edit-input', testIdProp);
-  const { value, setValue, invalid } = useAttributeEdit<string>();
+  const testId = useTestId('input', testIdProp);
+  const { value, setValue, invalid } = useInlineEdit<string>();
   return (
     <NumberInput
       {...props}
@@ -32,4 +32,4 @@ export const AttributeEditNumber: FC<AttributeEditNumberProps> = ({
   );
 };
 
-AttributeEditNumber.displayName = 'AttributeEditNumber';
+InlineEditNumber.displayName = 'InlineEditNumber';

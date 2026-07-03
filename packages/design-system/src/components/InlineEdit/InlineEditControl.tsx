@@ -10,16 +10,16 @@ import type {
 import { useCallback, useEffect, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { useAttributeEdit } from './AttributeEditContext';
+import { useInlineEdit } from './InlineEditContext';
 
 const FOCUSABLE_SELECTOR = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
 
-export interface AttributeEditControlProps extends HTMLAttributes<HTMLDivElement> {
+export interface InlineEditControlProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
   children?: ReactNode;
 }
 
-export const AttributeEditControl: FC<AttributeEditControlProps> = ({
+export const InlineEditControl: FC<InlineEditControlProps> = ({
   ref,
   children,
   className,
@@ -27,8 +27,8 @@ export const AttributeEditControl: FC<AttributeEditControlProps> = ({
   onBlur,
   ...props
 }) => {
-  const testId = useTestId('edit-control');
-  const { editing, submitMode, selectOnFocus, submit, cancel } = useAttributeEdit();
+  const testId = useTestId('control');
+  const { editing, submitMode, selectOnFocus, submit, cancel } = useInlineEdit();
   const divRef = useRef<HTMLDivElement | null>(null);
   // Capture selectOnFocus in a ref so the mount-only effect reads the value at mount time
   // without needing it in the dependency array.
@@ -100,7 +100,7 @@ export const AttributeEditControl: FC<AttributeEditControlProps> = ({
       {...props}
       ref={combinedRef}
       data-testid={testId}
-      data-slot='attribute-edit-control'
+      data-slot='inline-edit-control'
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
       className={cn('w-full min-w-0', className)}
@@ -110,4 +110,4 @@ export const AttributeEditControl: FC<AttributeEditControlProps> = ({
   );
 };
 
-AttributeEditControl.displayName = 'AttributeEditControl';
+InlineEditControl.displayName = 'InlineEditControl';

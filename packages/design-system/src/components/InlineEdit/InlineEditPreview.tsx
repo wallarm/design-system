@@ -5,7 +5,7 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Loader } from '../Loader';
 import { Tooltip, TooltipContent, type TooltipProps, TooltipTrigger } from '../Tooltip';
-import { useAttributeEdit } from './AttributeEditContext';
+import { useInlineEdit } from './InlineEditContext';
 
 // Literal classes so Tailwind can statically detect them.
 const LINE_CLAMP_CLASS: Record<number, string> = {
@@ -17,7 +17,7 @@ const LINE_CLAMP_CLASS: Record<number, string> = {
   6: 'line-clamp-6',
 };
 
-export interface AttributeEditPreviewProps extends HTMLAttributes<HTMLDivElement> {
+export interface InlineEditPreviewProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
   /** Trailing affordance icon shown on hover/focus in read mode. */
   triggerIcon?: ReactNode;
@@ -34,7 +34,7 @@ export interface AttributeEditPreviewProps extends HTMLAttributes<HTMLDivElement
   children?: ReactNode;
 }
 
-export const AttributeEditPreview: FC<AttributeEditPreviewProps> = ({
+export const InlineEditPreview: FC<InlineEditPreviewProps> = ({
   ref,
   triggerIcon = <Pencil size='md' />,
   tooltip = 'Edit',
@@ -47,8 +47,8 @@ export const AttributeEditPreview: FC<AttributeEditPreviewProps> = ({
   onPointerMove,
   ...props
 }) => {
-  const testId = useTestId('edit-preview');
-  const { editing, status, invalid, disabled, readOnly, activationMode, edit } = useAttributeEdit();
+  const testId = useTestId('preview');
+  const { editing, status, invalid, disabled, readOnly, activationMode, edit } = useInlineEdit();
 
   // Last pointer position, used to anchor the tooltip under the cursor.
   const pointerRef = useRef({ x: 0, y: 0 });
@@ -105,7 +105,7 @@ export const AttributeEditPreview: FC<AttributeEditPreviewProps> = ({
       {...props}
       ref={ref}
       data-testid={testId}
-      data-slot='attribute-edit-preview'
+      data-slot='inline-edit-preview'
       role={activatable ? 'button' : undefined}
       tabIndex={activatable ? 0 : undefined}
       onClick={handleClick}
@@ -161,4 +161,4 @@ export const AttributeEditPreview: FC<AttributeEditPreviewProps> = ({
   return target;
 };
 
-AttributeEditPreview.displayName = 'AttributeEditPreview';
+InlineEditPreview.displayName = 'InlineEditPreview';

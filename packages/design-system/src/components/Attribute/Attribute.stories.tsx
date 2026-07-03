@@ -19,6 +19,16 @@ import { InlineCodeSnippet } from '../CodeSnippet';
 import { DateFormatProvider } from '../DateFormatProvider';
 import { DateInput } from '../DateInput';
 import { FormatDateTime } from '../FormatDateTime';
+import {
+  InlineEditControl,
+  InlineEditError,
+  InlineEditInput,
+  InlineEditNumber,
+  InlineEditPreview,
+  InlineEdit as InlineEditRoot,
+  InlineEditTextarea,
+  useInlineEdit,
+} from '../InlineEdit';
 import { Ip, IpAddress, IpCountry, IpList, IpProvider } from '../Ip';
 import { Link } from '../Link';
 import { OverflowList } from '../OverflowList';
@@ -42,14 +52,6 @@ import { AttributeActions } from './AttributeActions';
 import { AttributeActionsContent } from './AttributeActionsContent';
 import { AttributeActionsItem } from './AttributeActionsItem';
 import { AttributeActionsTarget } from './AttributeActionsTarget';
-import { AttributeEdit } from './AttributeEdit';
-import { useAttributeEdit } from './AttributeEditContext';
-import { AttributeEditControl } from './AttributeEditControl';
-import { AttributeEditError } from './AttributeEditError';
-import { AttributeEditInput } from './AttributeEditInput';
-import { AttributeEditNumber } from './AttributeEditNumber';
-import { AttributeEditPreview } from './AttributeEditPreview';
-import { AttributeEditTextarea } from './AttributeEditTextarea';
 import { AttributeEmptyDescription } from './AttributeEmptyDescription';
 import { AttributeLabel } from './AttributeLabel';
 import { AttributeLabelDescription } from './AttributeLabelDescription';
@@ -69,13 +71,12 @@ const meta = {
     AttributeActionsTarget,
     AttributeActionsContent,
     AttributeActionsItem,
-    AttributeEdit,
-    AttributeEditPreview,
-    AttributeEditControl,
-    AttributeEditInput,
-    AttributeEditTextarea,
-    AttributeEditNumber,
-    AttributeEditError,
+    InlineEditPreview,
+    InlineEditControl,
+    InlineEditInput,
+    InlineEditTextarea,
+    InlineEditNumber,
+    InlineEditError,
   },
   parameters: {
     layout: 'centered',
@@ -912,7 +913,7 @@ const tagItems: SelectDataItem[] = [
 ];
 
 function SelectEditor() {
-  const { value, setValue, submit } = useAttributeEdit<string[]>();
+  const { value, setValue, submit } = useInlineEdit<string[]>();
   const collection = createListCollection({ items: roleItems });
   const selected = Array.isArray(value) ? value : [];
 
@@ -942,7 +943,7 @@ function SelectEditor() {
 }
 
 function MultiSelectEditor() {
-  const { value, setValue, submit } = useAttributeEdit<string[]>();
+  const { value, setValue, submit } = useInlineEdit<string[]>();
   const collection = createListCollection({ items: roleItems });
   const selected = Array.isArray(value) ? value : [];
 
@@ -973,7 +974,7 @@ function MultiSelectEditor() {
 }
 
 function TagsSelectEditor() {
-  const { value, setValue, submit } = useAttributeEdit<string[]>();
+  const { value, setValue, submit } = useInlineEdit<string[]>();
   const collection = createListCollection({ items: tagItems });
   const selected = Array.isArray(value) ? value : [];
 
@@ -1004,7 +1005,7 @@ function TagsSelectEditor() {
 }
 
 function DateEditor() {
-  const { value, setValue, submit } = useAttributeEdit<DateValue | null>();
+  const { value, setValue, submit } = useInlineEdit<DateValue | null>();
 
   return (
     <DateFormatProvider order='day-first' hourCycle={24}>
@@ -1041,7 +1042,7 @@ function DateEditor() {
 
 // Commits on blur (submitMode='blur') — time pickers have no discrete 'selection complete' event.
 function TimeEditor() {
-  const { value, setValue } = useAttributeEdit<Time | null>();
+  const { value, setValue } = useInlineEdit<Time | null>();
   const timeValue = value instanceof Time ? value : null;
 
   return (
@@ -1065,7 +1066,7 @@ function TimeEditor() {
 // is committed straight to `onChange` (Ark dedupes its value by date and would
 // otherwise drop it). Commits on popover close (submitMode='none').
 function DateTimeEditor() {
-  const { value, setValue, submit } = useAttributeEdit<CalendarDateTime | null>();
+  const { value, setValue, submit } = useInlineEdit<CalendarDateTime | null>();
 
   return (
     <DateFormatProvider order='day-first' hourCycle={12}>
@@ -1149,118 +1150,116 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
       <Attribute orientation={orientation} data-testid='text'>
         <AttributeLabel>Name</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit value={text} onValueCommit={v => setText(v as string)}>
-            <AttributeEditPreview>{text}</AttributeEditPreview>
-            <AttributeEditControl>
-              <AttributeEditInput />
-            </AttributeEditControl>
-            <AttributeEditError />
-          </AttributeEdit>
+          <InlineEditRoot value={text} onValueCommit={v => setText(v as string)}>
+            <InlineEditPreview>{text}</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditInput />
+            </InlineEditControl>
+            <InlineEditError />
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
       <Attribute orientation={orientation} data-testid='number'>
         <AttributeLabel>Port</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit value={port} onValueCommit={v => setPort(v as string)}>
-            <AttributeEditPreview>{port}</AttributeEditPreview>
-            <AttributeEditControl>
-              <AttributeEditNumber />
-            </AttributeEditControl>
-          </AttributeEdit>
+          <InlineEditRoot value={port} onValueCommit={v => setPort(v as string)}>
+            <InlineEditPreview>{port}</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditNumber />
+            </InlineEditControl>
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
       <Attribute orientation={orientation} data-testid='textarea'>
         <AttributeLabel>About</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit value={about} onValueCommit={v => setAbout(v as string)}>
-            <AttributeEditPreview lineClamp={3}>{about}</AttributeEditPreview>
-            <AttributeEditControl>
-              <AttributeEditTextarea minRows={2} maxRows={6} />
-            </AttributeEditControl>
-            <AttributeEditError />
-          </AttributeEdit>
+          <InlineEditRoot value={about} onValueCommit={v => setAbout(v as string)}>
+            <InlineEditPreview lineClamp={3}>{about}</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditTextarea minRows={2} maxRows={6} />
+            </InlineEditControl>
+            <InlineEditError />
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
       <Attribute orientation={orientation} data-testid='select'>
         <AttributeLabel>Role</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit
+          <InlineEditRoot
             value={role}
             onValueCommit={v => setRole(v as string[])}
             submitMode='none'
             activationMode='click'
           >
-            <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
+            <InlineEditPreview triggerIcon={<ChevronDown size='md' />}>
               {roleLabel}
-            </AttributeEditPreview>
-            <AttributeEditControl>
+            </InlineEditPreview>
+            <InlineEditControl>
               <SelectEditor />
-            </AttributeEditControl>
-          </AttributeEdit>
+            </InlineEditControl>
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
       <Attribute orientation={orientation} data-testid='multi-select'>
         <AttributeLabel>Roles</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit
+          <InlineEditRoot
             value={roles}
             onValueCommit={v => setRoles(v as string[])}
             submitMode='none'
             activationMode='click'
           >
-            <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
+            <InlineEditPreview triggerIcon={<ChevronDown size='md' />}>
               {rolesLabel}
-            </AttributeEditPreview>
-            <AttributeEditControl>
+            </InlineEditPreview>
+            <InlineEditControl>
               <MultiSelectEditor />
-            </AttributeEditControl>
-          </AttributeEdit>
+            </InlineEditControl>
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
       <Attribute orientation={orientation} data-testid='tags'>
         <AttributeLabel>Tags</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit
+          <InlineEditRoot
             value={tags}
             onValueCommit={v => setTags(v as string[])}
             submitMode='none'
             activationMode='click'
           >
-            <AttributeEditPreview triggerIcon={<ChevronDown size='md' />}>
+            <InlineEditPreview triggerIcon={<ChevronDown size='md' />}>
               <span className='flex gap-4'>
                 {tags.map(v => (
                   <Tag key={v}>{v}</Tag>
                 ))}
               </span>
-            </AttributeEditPreview>
-            <AttributeEditControl>
+            </InlineEditPreview>
+            <InlineEditControl>
               <TagsSelectEditor />
-            </AttributeEditControl>
-          </AttributeEdit>
+            </InlineEditControl>
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
       <Attribute orientation={orientation} data-testid='date'>
         <AttributeLabel>Date</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit
+          <InlineEditRoot
             value={date}
             onValueCommit={v => setDate(v as DateValue | null)}
             submitMode='none'
             activationMode='click'
           >
-            <AttributeEditPreview triggerIcon={<Calendar size='md' />}>
-              {dateLabel}
-            </AttributeEditPreview>
-            <AttributeEditControl>
+            <InlineEditPreview triggerIcon={<Calendar size='md' />}>{dateLabel}</InlineEditPreview>
+            <InlineEditControl>
               <DateEditor />
-            </AttributeEditControl>
-          </AttributeEdit>
+            </InlineEditControl>
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
@@ -1269,38 +1268,36 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
         {/* overflow-visible so the (non-portaled, absolute) time dropdown is not
             clipped by the horizontal value's truncate/overflow-hidden. */}
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit
+          <InlineEditRoot
             value={time}
             onValueCommit={v => setTime(v as Time | null)}
             submitMode='blur'
             activationMode='click'
           >
-            <AttributeEditPreview triggerIcon={<Clock size='md' />}>
-              {timeLabel}
-            </AttributeEditPreview>
-            <AttributeEditControl>
+            <InlineEditPreview triggerIcon={<Clock size='md' />}>{timeLabel}</InlineEditPreview>
+            <InlineEditControl>
               <TimeEditor />
-            </AttributeEditControl>
-          </AttributeEdit>
+            </InlineEditControl>
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
       <Attribute orientation={orientation} data-testid='datetime'>
         <AttributeLabel>Date &amp; Time</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit
+          <InlineEditRoot
             value={dateTime}
             onValueCommit={v => setDateTime(v as CalendarDateTime | null)}
             submitMode='none'
             activationMode='click'
           >
-            <AttributeEditPreview triggerIcon={<Calendar size='md' />}>
+            <InlineEditPreview triggerIcon={<Calendar size='md' />}>
               {dateTimeLabel}
-            </AttributeEditPreview>
-            <AttributeEditControl>
+            </InlineEditPreview>
+            <InlineEditControl>
               <DateTimeEditor />
-            </AttributeEditControl>
-          </AttributeEdit>
+            </InlineEditControl>
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
     </div>
@@ -1318,42 +1315,42 @@ function InlineEditStatesList({ orientation = 'vertical' }: { orientation?: Inli
       <Attribute orientation={orientation} data-testid='loading'>
         <AttributeLabel>Name</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit defaultValue='Checkout API and ABC' status='loading'>
-            <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
-            <AttributeEditControl>
-              <AttributeEditInput />
-            </AttributeEditControl>
-          </AttributeEdit>
+          <InlineEditRoot defaultValue='Checkout API and ABC' status='loading'>
+            <InlineEditPreview>Checkout API and ABC</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditInput />
+            </InlineEditControl>
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
       <Attribute orientation={orientation} data-testid='saved'>
         <AttributeLabel>Name</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit defaultValue='Checkout API and ABC' status='saved'>
-            <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
-            <AttributeEditControl>
-              <AttributeEditInput />
-            </AttributeEditControl>
-          </AttributeEdit>
+          <InlineEditRoot defaultValue='Checkout API and ABC' status='saved'>
+            <InlineEditPreview>Checkout API and ABC</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditInput />
+            </InlineEditControl>
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
 
       <Attribute orientation={orientation} data-testid='error'>
         <AttributeLabel>Name</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit
+          <InlineEditRoot
             defaultValue='Checkout API and ABC'
             defaultEdit
             status='error'
             error='An error message.'
           >
-            <AttributeEditPreview>Checkout API and ABC</AttributeEditPreview>
-            <AttributeEditControl>
-              <AttributeEditInput />
-            </AttributeEditControl>
-            <AttributeEditError />
-          </AttributeEdit>
+            <InlineEditPreview>Checkout API and ABC</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditInput />
+            </InlineEditControl>
+            <InlineEditError />
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
     </div>
@@ -1383,13 +1380,13 @@ function InlineEditAsyncDemo({ orientation = 'vertical' }: { orientation?: Inlin
       <Attribute orientation={orientation} data-testid='attr'>
         <AttributeLabel>Name</AttributeLabel>
         <AttributeValue className='overflow-visible'>
-          <AttributeEdit value={value} onValueCommit={save}>
-            <AttributeEditPreview>{value}</AttributeEditPreview>
-            <AttributeEditControl>
-              <AttributeEditInput />
-            </AttributeEditControl>
-            <AttributeEditError />
-          </AttributeEdit>
+          <InlineEditRoot value={value} onValueCommit={save}>
+            <InlineEditPreview>{value}</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditInput />
+            </InlineEditControl>
+            <InlineEditError />
+          </InlineEditRoot>
         </AttributeValue>
       </Attribute>
     </div>

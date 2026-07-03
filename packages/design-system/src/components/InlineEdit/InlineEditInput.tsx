@@ -2,17 +2,17 @@ import type { FC } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Input, type InputProps } from '../Input';
-import { useAttributeEdit } from './AttributeEditContext';
+import { useInlineEdit } from './InlineEditContext';
 
-export type AttributeEditInputProps = Omit<InputProps, 'value' | 'onChange' | 'error'>;
+export type InlineEditInputProps = Omit<InputProps, 'value' | 'onChange' | 'error'>;
 
-export const AttributeEditInput: FC<AttributeEditInputProps> = ({
+export const InlineEditInput: FC<InlineEditInputProps> = ({
   className,
   'data-testid': testIdProp,
   ...props
 }) => {
-  const testId = useTestId('edit-input', testIdProp);
-  const { value, setValue, invalid } = useAttributeEdit<string>();
+  const testId = useTestId('input', testIdProp);
+  const { value, setValue, invalid } = useInlineEdit<string>();
   return (
     <Input
       {...props}
@@ -25,4 +25,4 @@ export const AttributeEditInput: FC<AttributeEditInputProps> = ({
   );
 };
 
-AttributeEditInput.displayName = 'AttributeEditInput';
+InlineEditInput.displayName = 'InlineEditInput';

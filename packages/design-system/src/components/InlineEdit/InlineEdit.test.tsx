@@ -1,13 +1,13 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
-import { AttributeEdit } from './AttributeEdit';
-import { useAttributeEdit } from './AttributeEditContext';
+import { InlineEdit } from './InlineEdit';
+import { useInlineEdit } from './InlineEditContext';
 
 // Harness exposes context actions as buttons + text.
 function Harness() {
   const { editing, value, committedValue, status, invalid, edit, submit, cancel, setValue } =
-    useAttributeEdit<string>();
+    useInlineEdit<string>();
   return (
     <div>
       <span data-testid='editing'>{String(editing)}</span>
@@ -31,12 +31,12 @@ function Harness() {
   );
 }
 
-describe('AttributeEdit', () => {
+describe('InlineEdit', () => {
   it('enters edit mode and seeds the draft from the committed value', async () => {
     render(
-      <AttributeEdit defaultValue='hello'>
+      <InlineEdit defaultValue='hello'>
         <Harness />
-      </AttributeEdit>,
+      </InlineEdit>,
     );
     expect(screen.getByTestId('editing')).toHaveTextContent('false');
     await userEvent.click(screen.getByText('edit'));
@@ -47,9 +47,9 @@ describe('AttributeEdit', () => {
   it('commits the draft synchronously and exits edit', async () => {
     const onCommit = vi.fn();
     render(
-      <AttributeEdit defaultValue='hello' onValueCommit={onCommit}>
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit}>
         <Harness />
-      </AttributeEdit>,
+      </InlineEdit>,
     );
     await userEvent.click(screen.getByText('edit'));
     await userEvent.click(screen.getByText('setDraft'));
@@ -62,9 +62,9 @@ describe('AttributeEdit', () => {
   it('reverts the draft on cancel', async () => {
     const onRevert = vi.fn();
     render(
-      <AttributeEdit defaultValue='hello' onValueRevert={onRevert}>
+      <InlineEdit defaultValue='hello' onValueRevert={onRevert}>
         <Harness />
-      </AttributeEdit>,
+      </InlineEdit>,
     );
     await userEvent.click(screen.getByText('edit'));
     await userEvent.click(screen.getByText('setDraft'));
@@ -83,9 +83,9 @@ describe('AttributeEdit', () => {
         }),
     );
     render(
-      <AttributeEdit defaultValue='hello' onValueCommit={onCommit} savedDuration={20}>
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} savedDuration={20}>
         <Harness />
-      </AttributeEdit>,
+      </InlineEdit>,
     );
     await userEvent.click(screen.getByText('edit'));
     await userEvent.click(screen.getByText('submit'));
@@ -98,9 +98,9 @@ describe('AttributeEdit', () => {
   it('surfaces error and stays editing when the commit rejects', async () => {
     const onCommit = vi.fn(() => Promise.reject(new Error('save failed')));
     render(
-      <AttributeEdit defaultValue='hello' onValueCommit={onCommit}>
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit}>
         <Harness />
-      </AttributeEdit>,
+      </InlineEdit>,
     );
     await userEvent.click(screen.getByText('edit'));
     await userEvent.click(screen.getByText('submit'));
@@ -111,9 +111,9 @@ describe('AttributeEdit', () => {
 
   it('lets explicit status/error props override the internal machine', () => {
     render(
-      <AttributeEdit defaultValue='hello' status='error' error='bad'>
+      <InlineEdit defaultValue='hello' status='error' error='bad'>
         <Harness />
-      </AttributeEdit>,
+      </InlineEdit>,
     );
     expect(screen.getByTestId('status')).toHaveTextContent('error');
     expect(screen.getByTestId('invalid')).toHaveTextContent('true');
@@ -122,9 +122,9 @@ describe('AttributeEdit', () => {
   it('ignores submit while a commit is already in flight', async () => {
     const onCommit = vi.fn(() => new Promise<void>(() => {})); // never resolves → stays loading
     render(
-      <AttributeEdit defaultValue='hello' onValueCommit={onCommit}>
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit}>
         <Harness />
-      </AttributeEdit>,
+      </InlineEdit>,
     );
     await userEvent.click(screen.getByText('edit'));
     await userEvent.click(screen.getByText('submit')); // → loading

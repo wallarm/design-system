@@ -3,21 +3,21 @@ import { OctagonAlert } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Text } from '../Text';
-import { useAttributeEdit } from './AttributeEditContext';
+import { useInlineEdit } from './InlineEditContext';
 
-export interface AttributeEditErrorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
+export interface InlineEditErrorProps extends Omit<HTMLAttributes<HTMLDivElement>, 'color'> {
   ref?: Ref<HTMLDivElement>;
   children?: ReactNode;
 }
 
-export const AttributeEditError: FC<AttributeEditErrorProps> = ({
+export const InlineEditError: FC<InlineEditErrorProps> = ({
   ref,
   children,
   className,
   ...props
 }) => {
-  const testId = useTestId('edit-error');
-  const { invalid, error } = useAttributeEdit();
+  const testId = useTestId('error');
+  const { invalid, error } = useInlineEdit();
   const message = children ?? error;
 
   if (!invalid || !message) return null;
@@ -27,7 +27,7 @@ export const AttributeEditError: FC<AttributeEditErrorProps> = ({
       {...props}
       ref={ref}
       data-testid={testId}
-      data-slot='attribute-edit-error'
+      data-slot='inline-edit-error'
       className={cn('flex items-center gap-4 pt-4', className)}
     >
       <OctagonAlert size='md' className='shrink-0 text-icon-danger' />
@@ -38,4 +38,4 @@ export const AttributeEditError: FC<AttributeEditErrorProps> = ({
   );
 };
 
-AttributeEditError.displayName = 'AttributeEditError';
+InlineEditError.displayName = 'InlineEditError';

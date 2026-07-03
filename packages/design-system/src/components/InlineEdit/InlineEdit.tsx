@@ -13,14 +13,14 @@ import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { TestIdProvider, useTestId } from '../../utils/testId';
 import {
-  type AttributeEditActivationMode,
-  type AttributeEditContextValue,
-  AttributeEditProvider,
-  type AttributeEditStatus,
-  type AttributeEditSubmitMode,
-} from './AttributeEditContext';
+  type InlineEditActivationMode,
+  type InlineEditContextValue,
+  InlineEditProvider,
+  type InlineEditStatus,
+  type InlineEditSubmitMode,
+} from './InlineEditContext';
 
-export interface AttributeEditProps<T = unknown> extends TestableProps {
+export interface InlineEditProps<T = unknown> extends TestableProps {
   value?: T;
   defaultValue?: T;
   onValueChange?: (value: T) => void;
@@ -29,10 +29,10 @@ export interface AttributeEditProps<T = unknown> extends TestableProps {
   edit?: boolean;
   defaultEdit?: boolean;
   onEditChange?: (editing: boolean) => void;
-  activationMode?: AttributeEditActivationMode;
-  submitMode?: AttributeEditSubmitMode;
+  activationMode?: InlineEditActivationMode;
+  submitMode?: InlineEditSubmitMode;
   selectOnFocus?: boolean;
-  status?: AttributeEditStatus;
+  status?: InlineEditStatus;
   error?: string;
   savedDuration?: number;
   disabled?: boolean;
@@ -42,7 +42,7 @@ export interface AttributeEditProps<T = unknown> extends TestableProps {
   ref?: Ref<HTMLDivElement>;
 }
 
-export function AttributeEdit<T = unknown>({
+export function InlineEdit<T = unknown>({
   value,
   defaultValue,
   onValueChange,
@@ -63,7 +63,7 @@ export function AttributeEdit<T = unknown>({
   children,
   ref,
   'data-testid': testIdProp,
-}: AttributeEditProps<T>): ReactElement {
+}: InlineEditProps<T>): ReactElement {
   const testId = useTestId(undefined, testIdProp);
   const [committedValue, setCommitted] = useControlled<T>({
     controlled: value,
@@ -75,7 +75,7 @@ export function AttributeEdit<T = unknown>({
   });
   const [draft, setDraft] = useState<T>(committedValue as T);
   const draftRef = useRef<T>(committedValue as T);
-  const [autoStatus, setAutoStatus] = useState<AttributeEditStatus>('idle');
+  const [autoStatus, setAutoStatus] = useState<InlineEditStatus>('idle');
   const [autoError, setAutoError] = useState<string | undefined>(undefined);
 
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -156,7 +156,7 @@ export function AttributeEdit<T = unknown>({
     setEditingState(false);
   }, [onValueCommit, setCommitted, setEditingState, savedDuration, status, autoStatus]);
 
-  const contextValue = useMemo<AttributeEditContextValue<T>>(
+  const contextValue = useMemo<InlineEditContextValue<T>>(
     () => ({
       editing: Boolean(editing),
       value: draft,
@@ -194,20 +194,20 @@ export function AttributeEdit<T = unknown>({
   );
 
   return (
-    <AttributeEditProvider value={contextValue as AttributeEditContextValue}>
+    <InlineEditProvider value={contextValue as InlineEditContextValue}>
       <TestIdProvider value={testId}>
         <div
           ref={ref}
           data-testid={testId}
-          data-slot='attribute-edit'
+          data-slot='inline-edit'
           data-editing={editing ? '' : undefined}
           className={cn('flex w-full min-w-0 flex-col', className)}
         >
           {children}
         </div>
       </TestIdProvider>
-    </AttributeEditProvider>
+    </InlineEditProvider>
   );
 }
 
-AttributeEdit.displayName = 'AttributeEdit';
+InlineEdit.displayName = 'InlineEdit';
