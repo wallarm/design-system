@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -130,5 +131,20 @@ describe('InlineEdit', () => {
     await userEvent.click(screen.getByText('submit')); // → loading
     await userEvent.click(screen.getByText('submit')); // ignored
     expect(onCommit).toHaveBeenCalledTimes(1);
+  });
+
+  it('completes an async commit under StrictMode', async () => {
+    const onCommit = vi.fn(() => Promise.resolve());
+    render(
+      <StrictMode>
+        <InlineEdit defaultValue='hello' onValueCommit={onCommit} savedDuration={20}>
+          <Harness />
+        </InlineEdit>
+      </StrictMode>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('submit'));
+    await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('saved'));
+    await waitFor(() => expect(screen.getByTestId('editing')).toHaveTextContent('false'));
   });
 });

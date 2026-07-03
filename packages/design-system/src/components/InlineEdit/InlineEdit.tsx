@@ -104,6 +104,9 @@ export function InlineEdit<T = unknown>({
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useRef(true);
   useEffect(() => {
+    // StrictMode remounts reuse the fiber (and this ref): reset on every
+    // effect run, or the cleanup's `false` outlives the simulated remount.
+    mounted.current = true;
     return () => {
       mounted.current = false;
       if (savedTimer.current) clearTimeout(savedTimer.current);
