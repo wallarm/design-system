@@ -1149,7 +1149,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
     >
       <Attribute orientation={orientation} data-testid='text'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot value={text} onValueCommit={v => setText(v as string)}>
             <InlineEditPreview>{text}</InlineEditPreview>
             <InlineEditControl>
@@ -1162,7 +1162,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='number'>
         <AttributeLabel>Port</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot value={port} onValueCommit={v => setPort(v as string)}>
             <InlineEditPreview>{port}</InlineEditPreview>
             <InlineEditControl>
@@ -1174,7 +1174,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='textarea'>
         <AttributeLabel>About</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot value={about} onValueCommit={v => setAbout(v as string)}>
             <InlineEditPreview lineClamp={3}>{about}</InlineEditPreview>
             <InlineEditControl>
@@ -1187,7 +1187,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='select'>
         <AttributeLabel>Role</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot
             value={role}
             onValueCommit={v => setRole(v as string[])}
@@ -1206,7 +1206,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='multi-select'>
         <AttributeLabel>Roles</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot
             value={roles}
             onValueCommit={v => setRoles(v as string[])}
@@ -1225,7 +1225,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='tags'>
         <AttributeLabel>Tags</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot
             value={tags}
             onValueCommit={v => setTags(v as string[])}
@@ -1248,7 +1248,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='date'>
         <AttributeLabel>Date</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot
             value={date}
             onValueCommit={v => setDate(v as DateValue | null)}
@@ -1265,9 +1265,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='time'>
         <AttributeLabel>Time</AttributeLabel>
-        {/* overflow-visible so the (non-portaled, absolute) time dropdown is not
-            clipped by the horizontal value's truncate/overflow-hidden. */}
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot
             value={time}
             onValueCommit={v => setTime(v as Time | null)}
@@ -1284,7 +1282,7 @@ function InlineEditGallery({ orientation = 'vertical' }: { orientation?: InlineO
 
       <Attribute orientation={orientation} data-testid='datetime'>
         <AttributeLabel>Date &amp; Time</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot
             value={dateTime}
             onValueCommit={v => setDateTime(v as CalendarDateTime | null)}
@@ -1314,7 +1312,7 @@ function InlineEditStatesList({ orientation = 'vertical' }: { orientation?: Inli
     <div className='flex w-[420px] flex-col gap-12'>
       <Attribute orientation={orientation} data-testid='loading'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot defaultValue='Checkout API and ABC' status='loading'>
             <InlineEditPreview>Checkout API and ABC</InlineEditPreview>
             <InlineEditControl>
@@ -1326,7 +1324,7 @@ function InlineEditStatesList({ orientation = 'vertical' }: { orientation?: Inli
 
       <Attribute orientation={orientation} data-testid='saved'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot defaultValue='Checkout API and ABC' status='saved'>
             <InlineEditPreview>Checkout API and ABC</InlineEditPreview>
             <InlineEditControl>
@@ -1338,7 +1336,7 @@ function InlineEditStatesList({ orientation = 'vertical' }: { orientation?: Inli
 
       <Attribute orientation={orientation} data-testid='error'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot
             defaultValue='Checkout API and ABC'
             defaultEdit
@@ -1379,7 +1377,7 @@ function InlineEditAsyncDemo({ orientation = 'vertical' }: { orientation?: Inlin
     <div className={orientation === 'horizontal' ? 'w-[420px]' : 'w-[320px]'}>
       <Attribute orientation={orientation} data-testid='attr'>
         <AttributeLabel>Name</AttributeLabel>
-        <AttributeValue className='overflow-visible'>
+        <AttributeValue>
           <InlineEditRoot value={value} onValueCommit={save}>
             <InlineEditPreview>{value}</InlineEditPreview>
             <InlineEditControl>

@@ -62,4 +62,13 @@ describe('InlineEditPreview', () => {
     await userEvent.click(preview);
     expect(screen.getByTestId('attr--preview')).toBeInTheDocument();
   });
+
+  it('is neutral standalone — no negative row margin', () => {
+    render(
+      <InlineEdit defaultValue='v' data-testid='ie'>
+        <InlineEditPreview>v</InlineEditPreview>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('ie--preview').className).not.toContain('-my-4');
+  });
 });

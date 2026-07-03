@@ -5,6 +5,7 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Loader } from '../Loader';
 import { Tooltip, TooltipContent, type TooltipProps, TooltipTrigger } from '../Tooltip';
+import { inlineEditPreviewVariants } from './classes';
 import { useInlineEdit } from './InlineEditContext';
 
 // Literal classes so Tailwind can statically detect them.
@@ -113,17 +114,11 @@ export const InlineEditPreview: FC<InlineEditPreviewProps> = ({
       onKeyDown={handleKeyDown}
       onPointerMove={handlePointerMove}
       className={cn(
-        'group -my-4 flex w-full min-w-0 gap-4 rounded-8 border border-transparent px-6 py-4 transition-colors',
-        // Multi-line values align the trigger icon to the top; single-line centers it.
-        lineClamp ? 'items-start' : 'items-center',
-        // Editable, no error: neutral hover background + primary focus ring.
-        activatable &&
-          !invalid &&
-          'cursor-pointer hover:bg-states-primary-hover active:bg-states-primary-pressed focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
-        // Editable with an error: hover/focus reveal the destructive text-box border + ring.
-        activatable &&
-          invalid &&
-          'cursor-pointer bg-component-input-bg hover:border-border-strong-danger hover:ring-3 hover:ring-focus-destructive focus-visible:border-border-strong-danger focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-destructive',
+        inlineEditPreviewVariants({
+          multiline: Boolean(lineClamp),
+          activatable,
+          invalid: activatable && invalid,
+        }),
         className,
       )}
     >

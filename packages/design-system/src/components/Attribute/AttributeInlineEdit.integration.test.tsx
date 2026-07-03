@@ -48,4 +48,11 @@ describe('InlineEdit integration', () => {
     expect(onCommit).not.toHaveBeenCalled();
     expect(screen.getByTestId('attr--preview')).toBeInTheDocument();
   });
+
+  it('AttributeValue carries the InlineEdit seam classes', () => {
+    render(<Example onCommit={() => {}} />);
+    const value = screen.getByTestId('attr--value');
+    expect(value.className).toContain('[&_[data-slot=inline-edit-preview]]:-my-4');
+    expect(value.className).toContain('has-[[data-slot=inline-edit]]:overflow-visible');
+  });
 });
