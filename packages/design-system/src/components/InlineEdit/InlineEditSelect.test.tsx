@@ -52,8 +52,12 @@ describe('InlineEditSelect', () => {
   it('picking an option (single) commits on close', async () => {
     const onCommit = vi.fn();
     render(<Harness onCommit={onCommit} />);
-    await userEvent.click(await screen.findByText('Admin', ignoreHiddenSelectOption));
+    const option = await screen.findByText('Admin', ignoreHiddenSelectOption);
+    // Opening on mount alone must not commit — only the close does.
+    expect(onCommit).not.toHaveBeenCalled();
+    await userEvent.click(option);
     // Single select closes on selection → onOpenChange(open:false) → submit()
+    expect(onCommit).toHaveBeenCalledTimes(1);
     expect(onCommit).toHaveBeenCalledWith(['admin']);
   });
 
@@ -89,5 +93,45 @@ describe('InlineEditSelect', () => {
   it('derives the shared input testId slot', () => {
     render(<Harness />);
     expect(screen.getByTestId('ie--input')).toBeInTheDocument();
+  });
+
+  describe('multiple', () => {
+    it('renders the SelectInput div trigger instead of SelectButton', async () => {
+      render(<Harness multiple />);
+      const trigger = await screen.findByTestId('ie--input');
+      expect(trigger.tagName).not.toBe('BUTTON');
+      expect(trigger.tagName).toBe('DIV');
+      // SelectInput-distinctive: Ark trigger part rendered as a div.
+      expect(trigger).toHaveAttribute('data-part', 'trigger');
+    });
+
+    it('stays open across picks and commits the multi-value array on close', async () => {
+      const onCommit = vi.fn();
+      render(<Harness onCommit={onCommit} value={[]} multiple />);
+      const listbox = await screen.findByRole('listbox');
+
+      await userEvent.click(within(listbox).getByText('Admin', ignoreHiddenSelectOption));
+      // Multi-select does NOT close on selection — no commit yet.
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+      expect(onCommit).not.toHaveBeenCalled();
+
+      await userEvent.click(within(listbox).getByText('Editor', ignoreHiddenSelectOption));
+      expect(screen.getByRole('listbox')).toBeInTheDocument();
+      expect(onCommit).not.toHaveBeenCalled();
+
+      // Toggle-close via the trigger (outside-click dismissal relies on
+      // document-level pointer tracking jsdom doesn't drive reliably)
+      // → onOpenChange(open:false) → submit()
+      await userEvent.click(screen.getByTestId('ie--input'));
+      expect(onCommit).toHaveBeenCalledTimes(1);
+      expect(onCommit).toHaveBeenCalledWith(['admin', 'editor']);
+    });
+
+    it('forwards data-analytics-id to the real div trigger', async () => {
+      render(<Harness multiple analyticsId='roles-edit' />);
+      const target = document.querySelector('[data-analytics-id="roles-edit"]');
+      expect(target?.tagName).toBe('DIV');
+      expect(target).toBe(screen.getByTestId('ie--input'));
+    });
   });
 });

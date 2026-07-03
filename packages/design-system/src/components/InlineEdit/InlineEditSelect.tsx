@@ -36,10 +36,15 @@ export interface InlineEditSelectSingleProps
   multiple?: false;
 }
 
-/** Multiple select: rest props forward to the trigger `<div>`. */
+/**
+ * Multiple select: rest props forward to the trigger `<div>`.
+ * `color` is omitted for symmetry with the single variant — `SelectInput`'s
+ * own props already exclude it, so accepting it here would only let a stray
+ * legacy attribute land on the div.
+ */
 export interface InlineEditSelectMultipleProps
   extends InlineEditSelectBaseProps,
-    Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+    Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'color'> {
   multiple: true;
 }
 
@@ -79,7 +84,10 @@ export const InlineEditSelect = ({
       {children ?? (
         <>
           {multiple ? (
-            <SelectInput data-testid={testId} {...(rest as HTMLAttributes<HTMLDivElement>)} />
+            <SelectInput
+              data-testid={testId}
+              {...(rest as Omit<HTMLAttributes<HTMLDivElement>, 'color'>)}
+            />
           ) : (
             <SelectButton
               data-testid={testId}
