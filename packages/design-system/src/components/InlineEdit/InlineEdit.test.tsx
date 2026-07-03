@@ -1,5 +1,5 @@
 import { StrictMode } from 'react';
-import { render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
@@ -146,5 +146,34 @@ describe('InlineEdit', () => {
     await userEvent.click(screen.getByText('submit'));
     await waitFor(() => expect(screen.getByTestId('status')).toHaveTextContent('saved'));
     await waitFor(() => expect(screen.getByTestId('editing')).toHaveTextContent('false'));
+  });
+
+  it('drops a late async commit resolution after cancel', async () => {
+    let resolve!: () => void;
+    const onCommit = vi.fn(
+      () =>
+        new Promise<void>(r => {
+          resolve = r;
+        }),
+    );
+    const onRevert = vi.fn();
+    render(
+      <InlineEdit defaultValue='hello' onValueCommit={onCommit} onValueRevert={onRevert}>
+        <Harness />
+      </InlineEdit>,
+    );
+    await userEvent.click(screen.getByText('edit'));
+    await userEvent.click(screen.getByText('setDraft'));
+    await userEvent.click(screen.getByText('submit')); // → loading
+    await userEvent.click(screen.getByText('cancel')); // user gives up mid-flight
+    expect(onRevert).toHaveBeenCalledWith('hello');
+    await act(async () => {
+      resolve();
+      await Promise.resolve();
+    });
+    // The late resolution must not resurrect the cancelled edit.
+    expect(screen.getByTestId('committed')).toHaveTextContent('hello');
+    expect(screen.getByTestId('status')).toHaveTextContent('idle');
+    expect(screen.getByTestId('editing')).toHaveTextContent('false');
   });
 });

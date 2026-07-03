@@ -101,6 +101,19 @@ export function InlineEdit<T = unknown>({
     };
   }, []);
 
+  // Owns the whole submit lifecycle (guard phase + commit phase). One symbol
+  // per submit; cancel()/edit_() null it, so a late async resolution can
+  // prove it still owns the session before touching state. A ref, not state:
+  // blur can re-enter submit() in the same tick, before any re-render.
+  const pendingCommitRef = useRef<symbol | null>(null);
+
+  // Latest-ref pattern (see draftRef/overrideRef): async continuations must
+  // see the consumer's current bindings, not those captured at submit time.
+  const onValueCommitRef = useRef(onValueCommit);
+  onValueCommitRef.current = onValueCommit;
+  const savedDurationRef = useRef(savedDuration);
+  savedDurationRef.current = savedDuration;
+
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useRef(true);
   useEffect(() => {
@@ -136,6 +149,7 @@ export function InlineEdit<T = unknown>({
 
   const edit_ = useCallback(() => {
     if (disabled || readOnly) return;
+    pendingCommitRef.current = null;
     draftRef.current = committedValue as T;
     setDraft(committedValue as T);
     setAutoStatus('idle');
@@ -144,6 +158,7 @@ export function InlineEdit<T = unknown>({
   }, [disabled, readOnly, committedValue, setEditingState]);
 
   const cancel = useCallback(() => {
+    pendingCommitRef.current = null;
     draftRef.current = committedValue as T;
     setDraft(committedValue as T);
     setAutoStatus('idle');
@@ -153,34 +168,41 @@ export function InlineEdit<T = unknown>({
   }, [committedValue, setEditingState, onValueRevert]);
 
   const submit = useCallback(() => {
+    if (pendingCommitRef.current) return;
     if ((status ?? autoStatus) === 'loading') return;
     const current = draftRef.current;
-    const result = onValueCommit?.(current);
+    const token = Symbol('inline-edit-commit');
+    pendingCommitRef.current = token;
+
+    const result = onValueCommitRef.current?.(current);
     if (result && typeof (result as PromiseLike<unknown>).then === 'function') {
       setAutoStatus('loading');
       setAutoError(undefined);
       Promise.resolve(result).then(
         () => {
-          if (!mounted.current) return;
+          if (!mounted.current || pendingCommitRef.current !== token) return;
+          pendingCommitRef.current = null;
           setCommitted(current);
           setEditingState(false);
           setAutoStatus('saved');
           if (savedTimer.current) clearTimeout(savedTimer.current);
           savedTimer.current = setTimeout(() => {
             if (mounted.current) setAutoStatus('idle');
-          }, savedDuration);
+          }, savedDurationRef.current);
         },
         (reason: unknown) => {
-          if (!mounted.current) return;
+          if (!mounted.current || pendingCommitRef.current !== token) return;
+          pendingCommitRef.current = null;
           setAutoStatus('error');
           setAutoError(reason instanceof Error ? reason.message : 'Failed to save');
         },
       );
       return;
     }
+    pendingCommitRef.current = null;
     setCommitted(current);
     setEditingState(false);
-  }, [onValueCommit, setCommitted, setEditingState, savedDuration, status, autoStatus]);
+  }, [setCommitted, setEditingState, status, autoStatus]);
 
   const contextValue = useMemo<InlineEditContextValue<T>>(
     () => ({
