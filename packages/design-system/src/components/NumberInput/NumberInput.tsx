@@ -14,8 +14,11 @@ interface NumberInputBaseProps {
 export type NumberInputProps = NumberInputNativeProps & NumberInputBaseProps & TestableProps;
 
 const numberInputTriggerClassNames = cn(
-  // Base
-  'w-16 h-14 px-2 py-1 rounded-2 transition-colors cursor-pointer',
+  // Base. Flex centering is load-bearing: the icon utility renders SVGs as
+  // inline-block with a baseline vertical-align, which drags the 12px glyph
+  // ~8px below center inside this fixed 16x14 button under inherited
+  // font-size/line-height.
+  'flex items-center justify-center w-16 h-14 px-2 py-1 rounded-2 transition-colors cursor-pointer',
   // State ---- hover
   'hover:bg-states-primary-hover',
   // State ---- disabled
