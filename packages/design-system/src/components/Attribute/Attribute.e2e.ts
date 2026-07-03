@@ -8,11 +8,8 @@ const attributeStory = createStoryHelper('data-display-attribute', [
   'Horizontal Loading',
   'Horizontal With Actions',
   'Horizontal With Actions Menu Only',
-  'Inline Edit',
-  'Inline Edit States',
-  'Inline Edit Async',
-  'Inline Edit Horizontal',
-  'Inline Edit Horizontal States',
+  'With Inline Edit',
+  'Horizontal With Inline Edit',
 ] as const);
 
 test.describe('Component: Attribute', () => {
@@ -48,36 +45,26 @@ test.describe('Component: Attribute', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render inline edit gallery correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
+    test('Should render hosted inline edit with correct row height', async ({ page }) => {
+      await attributeStory.goto(page, 'With Inline Edit');
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
-    test('Should render inline edit hover affordance with tooltip correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
-      await page.getByTestId('text--edit-preview').hover();
-      await expect(page.getByTestId('text--content')).toHaveText('Edit');
+    test('Should render horizontal hosted inline edit with correct truncation and row height', async ({
+      page,
+    }) => {
+      await attributeStory.goto(page, 'Horizontal With Inline Edit');
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
-    test('Should render inline edit editing state correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
-      await page.getByTestId('text--edit-preview').click();
-      await expect(page).toHaveScreenshot({ animations: 'disabled' });
-    });
-
-    test('Should render inline edit states correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit States');
-      await expect(page).toHaveScreenshot({ animations: 'disabled' });
-    });
-
-    test('Should render inline edit horizontal gallery correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Horizontal');
-      await expect(page).toHaveScreenshot({ animations: 'disabled' });
-    });
-
-    test('Should render inline edit horizontal states correctly', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Horizontal States');
+    test('Should not clip the open editor in a horizontal value (overflow seam)', async ({
+      page,
+    }) => {
+      // Regression for f16702b3: AttributeValue's :has() rule must un-clip the
+      // editor border/focus ring that horizontal `truncate` would hide.
+      await attributeStory.goto(page, 'Horizontal With Inline Edit');
+      await page.getByTestId('attr--preview').click();
+      await expect(page.getByTestId('attr--input')).toBeFocused();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
   });
@@ -152,95 +139,6 @@ test.describe('Component: Attribute', () => {
 
       await expect(overflowContent).toBeVisible();
       await expect(dropdownContent).toBeHidden();
-    });
-
-    test('Should enter edit mode and commit on Enter', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
-      await page.getByTestId('text--edit-preview').click();
-      const input = page.getByTestId('text--edit-input');
-      await expect(input).toBeFocused();
-      await input.fill('Payments API');
-      await input.press('Enter');
-      await expect(page.getByTestId('text--edit-preview')).toHaveText(/Payments API/);
-    });
-
-    test('Should revert on Escape', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
-      await page.getByTestId('text--edit-preview').click();
-      const input = page.getByTestId('text--edit-input');
-      await input.fill('Discarded');
-      await input.press('Escape');
-      await expect(page.getByTestId('text--edit-preview')).toHaveText(/Checkout API/);
-    });
-
-    test('Should commit on blur', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
-      await page.getByTestId('text--edit-preview').click();
-      const input = page.getByTestId('text--edit-input');
-      await input.fill('Blurred API');
-      await input.press('Tab');
-      await expect(page.getByTestId('text--edit-preview')).toHaveText(/Blurred API/);
-    });
-
-    test('Should show loading then saved during async commit', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Async');
-      await page.getByTestId('attr--edit-preview').click();
-      const input = page.getByTestId('attr--edit-input');
-      await input.fill('Async API');
-      await input.press('Enter');
-      // The async commit resolves and the preview shows the committed value.
-      await expect(page.getByTestId('attr--edit-preview')).toHaveText(/Async API/);
-    });
-
-    test('Should surface error and stay in edit on rejected commit', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit Async');
-      await page.getByTestId('attr--edit-preview').click();
-      const input = page.getByTestId('attr--edit-input');
-      await input.fill('');
-      await input.press('Enter');
-      await expect(page.getByTestId('attr--edit-error')).toBeVisible();
-      await expect(page.getByTestId('attr--edit-input')).toBeVisible();
-    });
-
-    test('Should commit a time edit when the date-time popover closes', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
-      const preview = page.getByTestId('datetime--edit-preview');
-      await expect(preview).toHaveText(/2:30 PM/);
-      await preview.click();
-      // Scope to the popover so we edit the header input (the showTime commit
-      // path), not the trigger input — both carry an hour segment.
-      const popover = page.locator('[data-scope="date-picker"][data-part="content"]');
-      await popover.getByRole('spinbutton', { name: 'hour' }).click();
-      await page.keyboard.type('5');
-      // Commit by closing the popover (submitMode='none'); Escape would cancel.
-      await page.mouse.click(5, 5);
-      await expect(preview).toHaveText(/5:30 PM/);
-    });
-
-    test('Should keep the time when a day is picked from the date-time grid', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
-      const preview = page.getByTestId('datetime--edit-preview');
-      await preview.click();
-      await page.locator('[data-part="table-cell-trigger"]', { hasText: /^20$/ }).first().click();
-      await page.mouse.click(5, 5);
-      await expect(preview).toHaveText(/20 Jun, 2026 2:30 PM/);
-    });
-  });
-
-  test.describe('Accessibility', () => {
-    test('Should enter edit via keyboard activation', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
-      const preview = page.getByTestId('text--edit-preview');
-      await preview.focus();
-      await preview.press('Enter');
-      await expect(page.getByTestId('text--edit-input')).toBeFocused();
-    });
-
-    test('Should cancel edit via Escape', async ({ page }) => {
-      await attributeStory.goto(page, 'Inline Edit');
-      await page.getByTestId('text--edit-preview').click();
-      await page.getByTestId('text--edit-input').press('Escape');
-      await expect(page.getByTestId('text--edit-preview')).toBeVisible();
     });
   });
 });
