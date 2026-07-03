@@ -7,6 +7,7 @@ const inlineEditStory = createStoryHelper('data-display-inlineedit', [
   'Async',
   'Non Editable',
   'Custom Editor',
+  'Confirm Commit',
 ] as const);
 
 test.describe('Component: InlineEdit', () => {
@@ -36,6 +37,16 @@ test.describe('Component: InlineEdit', () => {
 
     test('Should render non-editable states correctly', async ({ page }) => {
       await inlineEditStory.goto(page, 'Non Editable');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the commit confirmation dialog correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Confirm Commit');
+      await page.getByTestId('confirm-email--preview').click();
+      const input = page.getByTestId('confirm-email--input');
+      await input.fill('new@wallarm.com');
+      await input.press('Enter');
+      await expect(page.getByTestId('confirm-dialog--content')).toBeVisible();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
   });
@@ -154,6 +165,54 @@ test.describe('Component: InlineEdit', () => {
       await input.press('Enter');
       await expect(page.getByTestId('custom--preview')).toHaveText(/PAYMENTS API/);
     });
+
+    test('Should keep editing with the draft when the confirmation is declined', async ({
+      page,
+    }) => {
+      await inlineEditStory.goto(page, 'Confirm Commit');
+      await page.getByTestId('confirm-email--preview').click();
+      const input = page.getByTestId('confirm-email--input');
+      await input.fill('new@wallarm.com');
+      await input.press('Enter');
+      await page.getByTestId('confirm-decline').click();
+      await expect(input).toBeVisible();
+      await expect(input).toHaveValue('new@wallarm.com');
+    });
+
+    test('Should commit when the confirmation is accepted', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Confirm Commit');
+      await page.getByTestId('confirm-email--preview').click();
+      const input = page.getByTestId('confirm-email--input');
+      await input.fill('new@wallarm.com');
+      await input.press('Enter');
+      await page.getByTestId('confirm-accept').click();
+      await expect(page.getByTestId('confirm-email--preview')).toHaveText(/new@wallarm.com/);
+    });
+
+    test('Should not prompt when the submitted value is unchanged', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Confirm Commit');
+      await page.getByTestId('confirm-email--preview').click();
+      await page.getByTestId('confirm-email--input').press('Enter');
+      await expect(page.getByTestId('confirm-email--preview')).toBeVisible();
+      await expect(page.getByTestId('confirm-accept')).toBeHidden();
+    });
+
+    test('Should park a declined select in edit mode and ask again on reclose', async ({
+      page,
+    }) => {
+      await inlineEditStory.goto(page, 'Confirm Commit');
+      await page.getByTestId('confirm-role--preview').click();
+      await page.getByRole('option', { name: 'Admin' }).click(); // closes popover → guard
+      await page.getByTestId('confirm-decline').click();
+      // Parked: still in edit mode (collapsed trigger, no preview).
+      await expect(page.getByTestId('confirm-role--preview')).toBeHidden();
+      await expect(page.getByTestId('confirm-role--input')).toBeVisible();
+      // Recovery: reopen and re-close the popover — the guard fires again.
+      await page.getByTestId('confirm-role--input').click();
+      await page.getByRole('option', { name: 'Admin' }).click();
+      await page.getByTestId('confirm-accept').click();
+      await expect(page.getByTestId('confirm-role--preview')).toHaveText(/Admin/);
+    });
   });
 
   test.describe('Accessibility', () => {
@@ -178,6 +237,21 @@ test.describe('Component: InlineEdit', () => {
       await expect(page.getByTestId('text--preview')).toBeFocused();
       await page.keyboard.press('Enter');
       await expect(page.getByRole('textbox', { name: 'Name' })).toBeFocused();
+    });
+
+    test('Should return focus to the editor when the confirmation is declined', async ({
+      page,
+    }) => {
+      await inlineEditStory.goto(page, 'Confirm Commit');
+      await page.getByTestId('confirm-email--preview').click();
+      const input = page.getByTestId('confirm-email--input');
+      await input.fill('new@wallarm.com');
+      await input.press('Enter');
+      // Focus moved into the dialog while it decides.
+      await expect(page.getByTestId('confirm-decline')).toBeVisible();
+      await expect(input).not.toBeFocused();
+      await page.getByTestId('confirm-decline').click();
+      await expect(input).toBeFocused();
     });
   });
 });
