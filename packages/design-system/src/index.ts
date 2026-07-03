@@ -322,6 +322,8 @@ export {
   InlineEditPreview,
   type InlineEditPreviewProps,
   type InlineEditProps,
+  InlineEditSelect,
+  type InlineEditSelectProps,
   type InlineEditStatus,
   type InlineEditSubmitMode,
   InlineEditTextarea,
