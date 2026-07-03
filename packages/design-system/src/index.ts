@@ -313,6 +313,8 @@ export {
   type InlineEditContextValue,
   InlineEditControl,
   type InlineEditControlProps,
+  InlineEditDate,
+  type InlineEditDateProps,
   InlineEditError,
   type InlineEditErrorProps,
   InlineEditInput,

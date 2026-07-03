@@ -26,3 +26,14 @@ for every editor except one closed target, recorded here.
 
 `InlineEditInput` (text) and `InlineEditTextarea` forward to the real
 `<input>` / `<textarea>` and are contract-compliant (covered by tests).
+
+## `InlineEditDate` → DateInput wrapper, not the focusable segments
+
+- **What:** consumer `data-*` / `aria-*` spread lands on the `DateInput`
+  wrapper `<div>`, not the focusable date segments (mirror of the
+  `InlineEditNumber` entry above).
+- **Impact:** Low — document-level click analytics resolve via
+  `closest('[data-analytics-id]')`.
+- **Fix belongs in:** `components/DateInput` (forward consumer attributes to
+  the segment group), out of scope here.
+- **Tested:** `InlineEditDate.test.tsx` asserts the wrapper placement.
