@@ -266,6 +266,45 @@ with an invisible contract: all five popover rows set `submitMode='none'`
 - Consumer-set root `submitMode` keeps working unchanged for
   text/number/textarea (no override registered).
 
+### Wiring plain DS components: render-prop children on `InlineEditControl`
+
+Besides the adapters and the `useInlineEdit` hook, `InlineEditControl` accepts
+**function children** (render-prop) so consumers can wire a plain DS component
+in place, without defining a local editor component (a hook cannot be called
+inline in JSX; function children solve that boundary):
+
+```tsx
+<InlineEditControl submitMode='none'>
+  {({ value, setValue, submit }) => (
+    <Select
+      defaultOpen
+      collection={collection}
+      value={value as string[]}
+      onValueChange={d => setValue(d.value)}
+      onOpenChange={d => {
+        if (!d.open) submit();
+      }}
+    >
+      …
+    </Select>
+  )}
+</InlineEditControl>
+```
+
+- Type: `children?: ReactNode | ((ctx: InlineEditContextValue) => ReactNode)`;
+  the callback receives the same object `useInlineEdit()` returns and is
+  invoked only in edit mode (Control still unmounts otherwise).
+- A render-prop cannot register a submit-mode override (no component boundary
+  for the hook) — popover wiring pairs with the Control-level `submitMode`
+  prop, which exists exactly for this and has the highest precedence.
+- Rejected alternatives for "plain DS components inside Control", recorded for
+  posterity: `cloneElement` prop injection (DS inputs have heterogeneous
+  contracts — `onChange(event)` vs `onValueChange(details)` vs
+  `onChange(value)` — so injection needs a per-component mapping registry:
+  adapters in disguise, untyped and wrapper-fragile) and context-aware DS
+  inputs (every input would import inline-edit context — reverse coupling,
+  behavior varying by render location).
+
 **Escape semantics (deliberate).** zag's dismissable layer handles Escape at
 document level in the capture phase and calls `preventDefault()`;
 Control's Escape-cancel is skipped via its `defaultPrevented` guard — that
@@ -382,8 +421,10 @@ category, same as Attribute; derived e2e component id
   select/multi-select/tags/date/time/datetime rows switch to the built-ins,
   **preserving the existing row-level `data-testid` values** so e2e diffs are
   visual-only. Exactly **one** hand-rolled custom editor remains, demonstrating
-  the `useInlineEdit` + `useInlineEditSubmitMode` extension seam with its own
-  testid.
+  the extension seams with its own testid: the render-prop children +
+  Control-level `submitMode` (plain DS component path), with the
+  `useInlineEdit` + `useInlineEditSubmitMode` component path shown in the
+  story description.
 - `States` — `loading` / `saved` / `error + defaultEdit`.
 - `Async` — promise commit (1.2s, rejects on empty).
 - The Gallery's text editor is wired with `data-analytics-id` /
@@ -420,8 +461,9 @@ exercise Ark portals (`Select.test.tsx` opens the portaled dropdown;
 `DateInput.test.tsx`/`TimeInput.test.tsx` model the wrapper-level analytics
 assertions). Override-mechanism tests: effective mode after mount (including
 under StrictMode), token-safe cleanup, precedence (Control prop > registration
-> root prop), and a Control-level test pinning the Escape `defaultPrevented`
-guard. Implementation-time check: Control's focus-first-descendant effect must
+> root prop), a Control-level test pinning the Escape `defaultPrevented`
+guard, and a render-prop children test (callback receives the context object,
+invoked only while editing). Implementation-time check: Control's focus-first-descendant effect must
 not fight Ark's initial focus when `defaultOpen` is set.
 
 **E2E `InlineEdit.e2e.ts`** (per `docs/e2e-test-rules.md`, selectors via
