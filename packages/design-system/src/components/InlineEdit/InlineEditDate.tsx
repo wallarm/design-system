@@ -12,16 +12,30 @@ import {
   CalendarTrigger,
   type DateValue,
 } from '../Calendar';
-import { DateInput } from '../DateInput';
+import { DateInput, type DateInputProps } from '../DateInput';
 import { useInlineEdit, useInlineEditSubmitMode } from './InlineEditContext';
 
-export interface InlineEditDateProps {
+/**
+ * Rest props forward to the real `DateInput` wrapper (see
+ * `ANALYTICS_GAPS.md` — `InlineEditDate` entry — for why the wrapper, not the
+ * focusable segments, is the documented landing target).
+ *
+ * `value` / `onChange` are internally controlled via `useInlineEdit`.
+ * `granularity` / `showTimeDropdown` / `timeStep` are omitted because
+ * `DateInput`'s granularity is a discriminated union the two branches below
+ * (day vs. minute) already resolve from `showTime` — exposing them here
+ * would let a consumer prop fight the branch's own choice.
+ */
+export interface InlineEditDateProps
+  extends Omit<
+    DateInputProps,
+    'value' | 'onChange' | 'granularity' | 'showTimeDropdown' | 'timeStep'
+  > {
   /**
    * Date+time mode: minute-granularity segmented trigger, time-aware popover
    * header, popover stays open on day picks (mirrors Calendar `showTime`).
    */
   showTime?: boolean;
-  'data-testid'?: string;
 }
 
 /**
@@ -56,6 +70,8 @@ const withMinuteGranularity = (date: DateValue | null): DateValue | null => {
 export const InlineEditDate: FC<InlineEditDateProps> = ({
   showTime = false,
   'data-testid': testIdProp,
+  showIcon = false,
+  ...rest
 }) => {
   const testId = useTestId('input', testIdProp);
   const { value, setValue, submit } = useInlineEdit<DateValue | null>();
@@ -82,19 +98,21 @@ export const InlineEditDate: FC<InlineEditDateProps> = ({
             copy), showing the placeholder instead. */}
         {showTime ? (
           <DateInput
+            {...rest}
             data-testid={testId}
             value={toReactAriaDateValue(withMinuteGranularity(value ?? null))}
             onChange={v => setValue(toCalendarDateValue(v))}
             granularity='minute'
-            showIcon={false}
+            showIcon={showIcon}
           />
         ) : (
           <DateInput
+            {...rest}
             data-testid={testId}
             value={toReactAriaDateValue(value ?? null)}
             onChange={v => setValue(toCalendarDateValue(v))}
             granularity='day'
-            showIcon={false}
+            showIcon={showIcon}
           />
         )}
       </CalendarTrigger>

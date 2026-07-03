@@ -36,7 +36,10 @@ for every editor except one closed target, recorded here.
   `closest('[data-analytics-id]')`.
 - **Fix belongs in:** `components/DateInput` (forward consumer attributes to
   the segment group), out of scope here.
-- **Tested:** `InlineEditDate.test.tsx` asserts the wrapper placement.
+- **Tested:** `InlineEditDate.test.tsx` ("forwards data-analytics-id to the
+  DateInput wrapper, not the focusable segments") asserts same-node identity
+  with the wrapper carrying the derived testId, and that no focusable
+  segment carries the attribute.
 
 ## `InlineEditTime` → TimeInput wrapper + closed dropdown rows
 
@@ -46,4 +49,7 @@ for every editor except one closed target, recorded here.
 - **Impact:** Low — click analytics resolve via `closest()`; value-level
   analytics belong on `onValueCommit`.
 - **Fix belongs in:** `components/TimeInput` / `TemporalCore`, out of scope.
-- **Tested:** `InlineEditTime.test.tsx` asserts the wrapper placement.
+- **Tested:** `InlineEditTime.test.tsx` ("forwards data-analytics-id to the
+  TimeInput wrapper, not the focusable segments") asserts same-node identity
+  with the wrapper carrying the derived testId, and that no focusable
+  segment carries the attribute.

@@ -8,9 +8,11 @@ import { InlineEditDate } from './InlineEditDate';
 function Harness({
   onCommit,
   showTime = false,
+  analyticsId,
 }: {
   onCommit?: (v: unknown) => void;
   showTime?: boolean;
+  analyticsId?: string;
 }) {
   return (
     <InlineEdit
@@ -20,7 +22,7 @@ function Harness({
       data-testid='ie'
     >
       <InlineEditControl>
-        <InlineEditDate showTime={showTime} />
+        <InlineEditDate showTime={showTime} data-analytics-id={analyticsId} />
       </InlineEditControl>
     </InlineEdit>
   );
@@ -49,5 +51,16 @@ describe('InlineEditDate', () => {
   it('derives the shared input testId slot on the DateInput wrapper', () => {
     render(<Harness />);
     expect(screen.getByTestId('ie--input')).toBeInTheDocument();
+  });
+
+  it('forwards data-analytics-id to the DateInput wrapper, not the focusable segments', () => {
+    render(<Harness analyticsId='date-edit' />);
+    const target = document.querySelector('[data-analytics-id="date-edit"]');
+    // Same node as the wrapper carrying the derived testId (documented gap:
+    // ANALYTICS_GAPS.md — attributes land on the wrapper, not the segments).
+    expect(target).toBe(screen.getByTestId('ie--input'));
+    expect(target?.querySelector('[data-segment]')).toBeTruthy();
+    // The focusable segments themselves must not carry the attribute.
+    expect(target?.querySelectorAll('[data-segment][data-analytics-id]')).toHaveLength(0);
   });
 });

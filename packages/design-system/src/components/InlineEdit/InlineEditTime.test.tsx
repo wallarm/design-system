@@ -22,6 +22,23 @@ describe('InlineEditTime', () => {
     expect(screen.getByTestId('ie--input')).toBeInTheDocument();
   });
 
+  it('forwards data-analytics-id to the TimeInput wrapper, not the focusable segments', () => {
+    render(
+      <InlineEdit defaultValue={new Time(14, 30)} defaultEdit data-testid='ie'>
+        <InlineEditControl>
+          <InlineEditTime data-analytics-id='time-edit' />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    const target = document.querySelector('[data-analytics-id="time-edit"]');
+    // Same node as the wrapper carrying the derived testId (documented gap:
+    // ANALYTICS_GAPS.md — attributes land on the wrapper, not the segments).
+    expect(target).toBe(screen.getByTestId('ie--input'));
+    expect(target?.querySelector('[data-segment]')).toBeTruthy();
+    // The focusable segments themselves must not carry the attribute.
+    expect(target?.querySelectorAll('[data-segment][data-analytics-id]')).toHaveLength(0);
+  });
+
   it('registers the blur submit mode', () => {
     function ModeProbe() {
       const { submitMode } = useInlineEdit();
