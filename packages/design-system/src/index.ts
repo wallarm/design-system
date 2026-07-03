@@ -330,6 +330,8 @@ export {
   type InlineEditSubmitMode,
   InlineEditTextarea,
   type InlineEditTextareaProps,
+  InlineEditTime,
+  type InlineEditTimeProps,
   useInlineEdit,
   useInlineEditSubmitMode,
 } from './components/InlineEdit';

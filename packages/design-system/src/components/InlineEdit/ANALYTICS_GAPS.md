@@ -37,3 +37,13 @@ for every editor except one closed target, recorded here.
 - **Fix belongs in:** `components/DateInput` (forward consumer attributes to
   the segment group), out of scope here.
 - **Tested:** `InlineEditDate.test.tsx` asserts the wrapper placement.
+
+## `InlineEditTime` → TimeInput wrapper + closed dropdown rows
+
+- **What:** consumer attributes land on the `TimeInput` wrapper `<div>` (same
+  shape as the DateInput entry). Additionally the time-dropdown option rows
+  are a closed target — no consumer attribute can reach them.
+- **Impact:** Low — click analytics resolve via `closest()`; value-level
+  analytics belong on `onValueCommit`.
+- **Fix belongs in:** `components/TimeInput` / `TemporalCore`, out of scope.
+- **Tested:** `InlineEditTime.test.tsx` asserts the wrapper placement.

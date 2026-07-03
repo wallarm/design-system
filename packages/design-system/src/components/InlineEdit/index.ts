@@ -15,3 +15,4 @@ export { InlineEditNumber, type InlineEditNumberProps } from './InlineEditNumber
 export { InlineEditPreview, type InlineEditPreviewProps } from './InlineEditPreview';
 export { InlineEditSelect, type InlineEditSelectProps } from './InlineEditSelect';
 export { InlineEditTextarea, type InlineEditTextareaProps } from './InlineEditTextarea';
+export { InlineEditTime, type InlineEditTimeProps } from './InlineEditTime';
