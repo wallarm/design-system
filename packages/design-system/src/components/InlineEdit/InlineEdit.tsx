@@ -111,6 +111,7 @@ export function InlineEdit<T = unknown>({
   const [submitModeOverride, setSubmitModeOverride] = useState<SubmitModeOverride | null>(null);
   const overrideRef = useRef<SubmitModeOverride | null>(null);
   overrideRef.current = submitModeOverride;
+  const [focusEpoch, setFocusEpoch] = useState(0);
 
   const registerSubmitModeOverride = useCallback((mode: InlineEditSubmitMode) => {
     const prev = overrideRef.current;
@@ -132,6 +133,7 @@ export function InlineEdit<T = unknown>({
   // prove it still owns the session before touching state. A ref, not state:
   // blur can re-enter submit() in the same tick, before any re-render.
   const pendingCommitRef = useRef<symbol | null>(null);
+  const isCommitPending = useCallback(() => pendingCommitRef.current !== null, []);
 
   // Latest-ref pattern (see draftRef/overrideRef): async continuations must
   // see the consumer's current bindings, not those captured at submit time.
@@ -260,6 +262,9 @@ export function InlineEdit<T = unknown>({
           if (!mounted.current || pendingCommitRef.current !== token) return;
           if (resolved === false) {
             pendingCommitRef.current = null;
+            // Hand focus back to the editor: the consumer's dialog stole it,
+            // and no editing:false→true transition will re-run the routine.
+            setFocusEpoch(e => e + 1);
             return;
           }
           if (draftRef.current !== current) {
@@ -298,6 +303,8 @@ export function InlineEdit<T = unknown>({
       activationMode,
       submitMode: submitModeOverride?.mode ?? submitMode,
       selectOnFocus,
+      isCommitPending,
+      focusEpoch,
       setValue: handleSetValue,
       edit: edit_,
       submit,
@@ -317,6 +324,8 @@ export function InlineEdit<T = unknown>({
       submitMode,
       submitModeOverride,
       selectOnFocus,
+      isCommitPending,
+      focusEpoch,
       handleSetValue,
       edit_,
       submit,

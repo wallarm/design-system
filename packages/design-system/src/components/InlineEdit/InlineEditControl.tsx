@@ -41,7 +41,7 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
 }) => {
   const testId = useTestId('control');
   const ctx = useInlineEdit();
-  const { editing, selectOnFocus, submit, cancel } = ctx;
+  const { editing, selectOnFocus, submit, cancel, isCommitPending, focusEpoch } = ctx;
   const submitMode = submitModeProp ?? ctx.submitMode;
   const divRef = useRef<HTMLDivElement | null>(null);
   // Capture selectOnFocus in a ref so the mount-only effect reads the value at mount time
@@ -49,9 +49,9 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
   const selectOnFocusRef = useRef(selectOnFocus);
   selectOnFocusRef.current = selectOnFocus;
 
-  // Focus the first focusable descendant each time editing begins.
-  // Depends on `editing` so it re-runs whenever the user clicks to edit,
-  // not just on the initial component mount (when editing may be false).
+  // Focus the first focusable descendant each time editing begins, and again
+  // when a declined commit guard bumps focusEpoch (the consumer's dialog took
+  // focus; nothing else will hand it back).
   useEffect(() => {
     if (!editing) return;
     const node = divRef.current;
@@ -65,7 +65,7 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
     ) {
       focusable.select();
     }
-  }, [editing]);
+  }, [editing, focusEpoch]);
 
   const combinedRef = useCallback(
     (node: HTMLDivElement | null) => {
@@ -105,6 +105,9 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
     if (event.defaultPrevented) return;
     // Ignore focus moves that stay inside the control.
     if (event.currentTarget.contains(event.relatedTarget as Node | null)) return;
+    // A pending commit guard owns the session: focus moving to the consumer's
+    // confirmation dialog is incidental — it must neither submit nor cancel.
+    if (isCommitPending()) return;
     // `none`: the editor commits through its own events (e.g. a select/calendar
     // closing) — blur must NOT cancel, or it would revert that committed value.
     if (submitsOnBlur) submit();

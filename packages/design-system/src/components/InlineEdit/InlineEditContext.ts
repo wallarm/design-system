@@ -17,6 +17,18 @@ export interface InlineEditContextValue<T = unknown> {
   activationMode: InlineEditActivationMode;
   submitMode: InlineEditSubmitMode;
   selectOnFocus: boolean;
+  /**
+   * True while a submit is held by a pending `onBeforeValueCommit` guard or
+   * an in-flight `onValueCommit` promise. Ref-backed function so event
+   * handlers get a synchronous answer — blur can fire in the same tick the
+   * guard opens a dialog, before any re-render.
+   */
+  isCommitPending: () => boolean;
+  /**
+   * Increments when a declined guard hands focus back to the editor.
+   * `InlineEditControl` re-runs its focus routine when it changes.
+   */
+  focusEpoch: number;
   setValue: (value: T) => void;
   edit: () => void;
   submit: () => void;

@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
@@ -72,5 +72,143 @@ describe('InlineEdit standalone integration', () => {
     await userEvent.click(screen.getByTestId('rp--preview'));
     await userEvent.type(screen.getByRole('textbox', { name: 'raw' }), '2{Enter}');
     expect(onCommit).toHaveBeenCalledWith('v2');
+  });
+});
+
+function deferredBoolean() {
+  let resolve!: (ok: boolean) => void;
+  const promise = new Promise<boolean>(r => {
+    resolve = r;
+  });
+  return { promise, resolve };
+}
+
+describe('InlineEdit commit guard integration', () => {
+  function GuardedExample({
+    guard,
+    onCommit,
+    onRevert,
+    submitMode,
+  }: {
+    guard: (value: string, committed: string) => Promise<boolean>;
+    onCommit?: (v: string) => void;
+    onRevert?: (v: string) => void;
+    submitMode?: 'enter' | 'blur' | 'both' | 'none';
+  }) {
+    return (
+      <>
+        <InlineEdit
+          defaultValue='a@x.io'
+          submitMode={submitMode}
+          onBeforeValueCommit={guard}
+          onValueCommit={onCommit}
+          onValueRevert={onRevert}
+          data-testid='g'
+        >
+          <InlineEditPreview>a@x.io</InlineEditPreview>
+          <InlineEditControl>
+            <InlineEditInput />
+          </InlineEditControl>
+        </InlineEdit>
+        <button type='button'>outside</button>
+      </>
+    );
+  }
+
+  it('ignores focus loss while the guard is pending (submitMode enter would cancel)', async () => {
+    const d = deferredBoolean();
+    const guard = vi.fn(() => d.promise);
+    const onCommit = vi.fn();
+    const onRevert = vi.fn();
+    render(
+      <GuardedExample guard={guard} onCommit={onCommit} onRevert={onRevert} submitMode='enter' />,
+    );
+    await userEvent.click(screen.getByTestId('g--preview'));
+    const input = screen.getByTestId('g--input');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'b@x.io{Enter}');
+    expect(guard).toHaveBeenCalledWith('b@x.io', 'a@x.io');
+    await userEvent.click(screen.getByText('outside')); // the dialog stealing focus
+    expect(onRevert).not.toHaveBeenCalled();
+    expect(screen.getByTestId('g--input')).toHaveValue('b@x.io');
+    await act(async () => {
+      d.resolve(true);
+      await Promise.resolve();
+    });
+    expect(onCommit).toHaveBeenCalledWith('b@x.io');
+  });
+
+  it('does not re-submit on blur while the guard is pending (submitMode both)', async () => {
+    const d = deferredBoolean();
+    const guard = vi.fn(() => d.promise);
+    const onCommit = vi.fn();
+    render(<GuardedExample guard={guard} onCommit={onCommit} submitMode='both' />);
+    await userEvent.click(screen.getByTestId('g--preview'));
+    const input = screen.getByTestId('g--input');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'b@x.io{Enter}');
+    await userEvent.click(screen.getByText('outside'));
+    expect(guard).toHaveBeenCalledTimes(1);
+    await act(async () => {
+      d.resolve(false);
+      await Promise.resolve();
+    });
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('g--input')).toHaveValue('b@x.io');
+  });
+
+  it('returns focus to the editor when the guard declines', async () => {
+    const d = deferredBoolean();
+    const guard = vi.fn(() => d.promise);
+    render(<GuardedExample guard={guard} />);
+    await userEvent.click(screen.getByTestId('g--preview'));
+    const input = screen.getByTestId('g--input');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'b@x.io{Enter}');
+    await userEvent.click(screen.getByText('outside')); // focus leaves, like a dialog
+    await act(async () => {
+      d.resolve(false);
+      await Promise.resolve();
+    });
+    await waitFor(() => expect(screen.getByTestId('g--input')).toHaveFocus());
+    expect(screen.getByTestId('g--input')).toHaveValue('b@x.io');
+  });
+
+  it('invokes the guard once even when it synchronously steals focus', async () => {
+    // A guard that opens a dialog imperatively (showModal/.focus()) moves
+    // focus inside its own invocation — the resulting blur-submit fires in
+    // the same tick, before any re-render. The token is set before the guard
+    // runs, so the re-entrant submit must be a no-op.
+    const guard = vi.fn(() => {
+      screen.getByText('outside').focus();
+      return new Promise<boolean>(() => {}); // never settles
+    });
+    render(<GuardedExample guard={guard} submitMode='both' />);
+    await userEvent.click(screen.getByTestId('g--preview'));
+    const input = screen.getByTestId('g--input');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'b@x.io{Enter}');
+    expect(guard).toHaveBeenCalledTimes(1);
+    expect(screen.getByTestId('g--input')).toHaveValue('b@x.io');
+  });
+
+  it('Escape during a pending guard cancels and defuses the resolution', async () => {
+    const d = deferredBoolean();
+    const guard = vi.fn(() => d.promise);
+    const onCommit = vi.fn();
+    const onRevert = vi.fn();
+    render(<GuardedExample guard={guard} onCommit={onCommit} onRevert={onRevert} />);
+    await userEvent.click(screen.getByTestId('g--preview'));
+    const input = screen.getByTestId('g--input');
+    await userEvent.clear(input);
+    await userEvent.type(input, 'b@x.io{Enter}');
+    await userEvent.keyboard('{Escape}');
+    expect(onRevert).toHaveBeenCalledWith('a@x.io');
+    await act(async () => {
+      d.resolve(true);
+      await Promise.resolve();
+    });
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('g--preview')).toBeInTheDocument();
   });
 });
