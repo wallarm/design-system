@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
@@ -157,7 +157,12 @@ describe('InlineEdit commit guard integration', () => {
     expect(screen.getByTestId('g--input')).toHaveValue('b@x.io');
   });
 
-  it('returns focus to the editor when the guard declines', async () => {
+  it('leaves focus to the confirmation surface when the guard declines', async () => {
+    // The DS does not force focus back to the editor on decline: a modal
+    // dialog restores focus to the editor on close, and forcing it here would
+    // race that restore and wedge the dialog open. This example's plain button
+    // is a non-restoring surface, so focus stays where it left — the field
+    // simply remains in edit mode with the draft intact.
     const d = deferredBoolean();
     const guard = vi.fn(() => d.promise);
     render(<GuardedExample guard={guard} />);
@@ -165,13 +170,15 @@ describe('InlineEdit commit guard integration', () => {
     const input = screen.getByTestId('g--input');
     await userEvent.clear(input);
     await userEvent.type(input, 'b@x.io{Enter}');
-    await userEvent.click(screen.getByText('outside')); // focus leaves, like a dialog
+    const outside = screen.getByText('outside');
+    await userEvent.click(outside); // focus leaves, like a dialog opening
     await act(async () => {
       d.resolve(false);
       await Promise.resolve();
     });
-    await waitFor(() => expect(screen.getByTestId('g--input')).toHaveFocus());
-    expect(screen.getByTestId('g--input')).toHaveValue('b@x.io');
+    expect(input).toHaveValue('b@x.io'); // still editing, draft kept
+    expect(input).not.toHaveFocus(); // DS did not pull focus back
+    expect(outside).toHaveFocus();
   });
 
   it('invokes the guard once even when it synchronously steals focus', async () => {

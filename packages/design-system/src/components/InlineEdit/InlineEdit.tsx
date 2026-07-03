@@ -111,7 +111,6 @@ export function InlineEdit<T = unknown>({
   const [submitModeOverride, setSubmitModeOverride] = useState<SubmitModeOverride | null>(null);
   const overrideRef = useRef<SubmitModeOverride | null>(null);
   overrideRef.current = submitModeOverride;
-  const [focusEpoch, setFocusEpoch] = useState(0);
 
   const registerSubmitModeOverride = useCallback((mode: InlineEditSubmitMode) => {
     const prev = overrideRef.current;
@@ -261,10 +260,12 @@ export function InlineEdit<T = unknown>({
         resolved => {
           if (!mounted.current || pendingCommitRef.current !== token) return;
           if (resolved === false) {
+            // Silent decline: stay in edit mode with the draft. Focus is left
+            // to the confirmation surface — a modal dialog restores focus to
+            // the editor on close; forcing it here races that restore and
+            // wedges the dialog open (a non-restoring surface is the
+            // consumer's responsibility).
             pendingCommitRef.current = null;
-            // Hand focus back to the editor: the consumer's dialog stole it,
-            // and no editing:false→true transition will re-run the routine.
-            setFocusEpoch(e => e + 1);
             return;
           }
           if (draftRef.current !== current) {
@@ -304,7 +305,6 @@ export function InlineEdit<T = unknown>({
       submitMode: submitModeOverride?.mode ?? submitMode,
       selectOnFocus,
       isCommitPending,
-      focusEpoch,
       setValue: handleSetValue,
       edit: edit_,
       submit,
@@ -325,7 +325,6 @@ export function InlineEdit<T = unknown>({
       submitModeOverride,
       selectOnFocus,
       isCommitPending,
-      focusEpoch,
       handleSetValue,
       edit_,
       submit,

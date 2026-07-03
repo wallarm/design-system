@@ -41,7 +41,7 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
 }) => {
   const testId = useTestId('control');
   const ctx = useInlineEdit();
-  const { editing, selectOnFocus, submit, cancel, isCommitPending, focusEpoch } = ctx;
+  const { editing, selectOnFocus, submit, cancel, isCommitPending } = ctx;
   const submitMode = submitModeProp ?? ctx.submitMode;
   const divRef = useRef<HTMLDivElement | null>(null);
   // Capture selectOnFocus in a ref so the mount-only effect reads the value at mount time
@@ -49,9 +49,9 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
   const selectOnFocusRef = useRef(selectOnFocus);
   selectOnFocusRef.current = selectOnFocus;
 
-  // Focus the first focusable descendant each time editing begins, and again
-  // when a declined commit guard bumps focusEpoch (the consumer's dialog took
-  // focus; nothing else will hand it back).
+  // Focus the first focusable descendant each time editing begins.
+  // Depends on `editing` so it re-runs whenever the user clicks to edit,
+  // not just on the initial component mount (when editing may be false).
   useEffect(() => {
     if (!editing) return;
     const node = divRef.current;
@@ -65,7 +65,7 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
     ) {
       focusable.select();
     }
-  }, [editing, focusEpoch]);
+  }, [editing]);
 
   const combinedRef = useCallback(
     (node: HTMLDivElement | null) => {

@@ -512,7 +512,7 @@ ConfirmCommit.parameters = {
       story:
         'The `onBeforeValueCommit` guard intercepts every commit before `onValueCommit` runs. ' +
         'Return a promise resolved by your own confirmation UI: `false` silently keeps the field ' +
-        'in edit mode with the typed draft (no error state) and focus returns to the editor; any ' +
+        'in edit mode with the typed draft (no error state); any ' +
         'other result lets the commit proceed; a rejection maps to the error status. The guard ' +
         'fires for every commit path — Enter, blur, popover close — including no-op submits, so ' +
         'short-circuit on unchanged values (`next === prev`; use `.compare()` for date values ' +
