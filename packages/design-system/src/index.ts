@@ -327,6 +327,7 @@ export {
   InlineEditTextarea,
   type InlineEditTextareaProps,
   useInlineEdit,
+  useInlineEditSubmitMode,
 } from './components/InlineEdit';
 export { Input, type InputProps } from './components/Input';
 export {

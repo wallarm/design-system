@@ -10,13 +10,24 @@ import type {
 import { useCallback, useEffect, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { useInlineEdit } from './InlineEditContext';
+import {
+  type InlineEditContextValue,
+  type InlineEditSubmitMode,
+  useInlineEdit,
+} from './InlineEditContext';
 
 const FOCUSABLE_SELECTOR = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
 
-export interface InlineEditControlProps extends HTMLAttributes<HTMLDivElement> {
+export interface InlineEditControlProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   ref?: Ref<HTMLDivElement>;
-  children?: ReactNode;
+  /**
+   * Explicit render-time submit mode for this editor session. Highest
+   * precedence (beats editor registrations and the root prop) — the escape
+   * hatch for custom editors that cannot call useInlineEditSubmitMode.
+   */
+  submitMode?: InlineEditSubmitMode;
+  /** Function children receive the inline-edit context (render-prop). */
+  children?: ReactNode | ((ctx: InlineEditContextValue) => ReactNode);
 }
 
 export const InlineEditControl: FC<InlineEditControlProps> = ({
@@ -25,10 +36,13 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
   className,
   onKeyDown,
   onBlur,
+  submitMode: submitModeProp,
   ...props
 }) => {
   const testId = useTestId('control');
-  const { editing, submitMode, selectOnFocus, submit, cancel } = useInlineEdit();
+  const ctx = useInlineEdit();
+  const { editing, selectOnFocus, submit, cancel } = ctx;
+  const submitMode = submitModeProp ?? ctx.submitMode;
   const divRef = useRef<HTMLDivElement | null>(null);
   // Capture selectOnFocus in a ref so the mount-only effect reads the value at mount time
   // without needing it in the dependency array.
@@ -105,7 +119,7 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
       onBlur={handleBlur}
       className={cn('w-full min-w-0', className)}
     >
-      {children}
+      {typeof children === 'function' ? children(ctx) : children}
     </div>
   );
 };

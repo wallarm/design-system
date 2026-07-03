@@ -1,4 +1,4 @@
-import { createContext, useContext } from 'react';
+import { createContext, useContext, useLayoutEffect } from 'react';
 
 export type InlineEditStatus = 'idle' | 'loading' | 'saved' | 'error';
 
@@ -21,6 +21,13 @@ export interface InlineEditContextValue<T = unknown> {
   edit: () => void;
   submit: () => void;
   cancel: () => void;
+  /**
+   * Registers a submit-mode override while an editor is mounted (last
+   * registration wins; returns an unregister cleanup). Prefer the
+   * `useInlineEditSubmitMode` hook. Popover editors use this so consumers
+   * never have to pair `submitMode='none'` on the root by hand.
+   */
+  registerSubmitModeOverride: (mode: InlineEditSubmitMode) => () => void;
 }
 
 const InlineEditContext = createContext<InlineEditContextValue | null>(null);
@@ -33,4 +40,15 @@ export function useInlineEdit<T = unknown>(): InlineEditContextValue<T> {
     throw new Error('useInlineEdit must be used within <InlineEdit>');
   }
   return ctx as InlineEditContextValue<T>;
+}
+
+/**
+ * Declares the submit mode an editor needs while it is mounted (e.g. a
+ * popover editor commits on close, so blur/enter handling must be 'none').
+ * Registered via layout effect so the override is committed before paint and
+ * before any browser event can observe the consumer-provided mode.
+ */
+export function useInlineEditSubmitMode(mode: InlineEditSubmitMode): void {
+  const { registerSubmitModeOverride } = useInlineEdit();
+  useLayoutEffect(() => registerSubmitModeOverride(mode), [mode, registerSubmitModeOverride]);
 }

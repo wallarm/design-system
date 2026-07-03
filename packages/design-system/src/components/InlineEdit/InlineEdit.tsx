@@ -20,6 +20,11 @@ import {
   type InlineEditSubmitMode,
 } from './InlineEditContext';
 
+interface SubmitModeOverride {
+  token: symbol;
+  mode: InlineEditSubmitMode;
+}
+
 export interface InlineEditProps<T = unknown> extends TestableProps {
   value?: T;
   defaultValue?: T;
@@ -77,6 +82,24 @@ export function InlineEdit<T = unknown>({
   const draftRef = useRef<T>(committedValue as T);
   const [autoStatus, setAutoStatus] = useState<InlineEditStatus>('idle');
   const [autoError, setAutoError] = useState<string | undefined>(undefined);
+  const [submitModeOverride, setSubmitModeOverride] = useState<SubmitModeOverride | null>(null);
+  const overrideRef = useRef<SubmitModeOverride | null>(null);
+  overrideRef.current = submitModeOverride;
+
+  const registerSubmitModeOverride = useCallback((mode: InlineEditSubmitMode) => {
+    const prev = overrideRef.current;
+    if (process.env.NODE_ENV !== 'production' && prev && prev.mode !== mode) {
+      // biome-ignore lint/suspicious/noConsole: dev-only warning surface
+      console.warn(
+        `InlineEdit: an editor registered submitMode='${mode}' while another editor's '${prev.mode}' override is active. Last registration wins.`,
+      );
+    }
+    const entry: SubmitModeOverride = { token: Symbol('inline-edit-submit-mode'), mode };
+    setSubmitModeOverride(entry);
+    return () => {
+      setSubmitModeOverride(current => (current?.token === entry.token ? null : current));
+    };
+  }, []);
 
   const savedTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mounted = useRef(true);
@@ -167,12 +190,13 @@ export function InlineEdit<T = unknown>({
       disabled,
       readOnly,
       activationMode,
-      submitMode,
+      submitMode: submitModeOverride?.mode ?? submitMode,
       selectOnFocus,
       setValue: handleSetValue,
       edit: edit_,
       submit,
       cancel,
+      registerSubmitModeOverride,
     }),
     [
       editing,
@@ -185,11 +209,13 @@ export function InlineEdit<T = unknown>({
       readOnly,
       activationMode,
       submitMode,
+      submitModeOverride,
       selectOnFocus,
       handleSetValue,
       edit_,
       submit,
       cancel,
+      registerSubmitModeOverride,
     ],
   );
 

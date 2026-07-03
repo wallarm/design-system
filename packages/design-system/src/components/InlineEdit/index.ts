@@ -5,6 +5,7 @@ export {
   type InlineEditStatus,
   type InlineEditSubmitMode,
   useInlineEdit,
+  useInlineEditSubmitMode,
 } from './InlineEditContext';
 export { InlineEditControl, type InlineEditControlProps } from './InlineEditControl';
 export { InlineEditError, type InlineEditErrorProps } from './InlineEditError';
