@@ -333,10 +333,17 @@ choice).
   (note: `Select`'s `onOpenChange` receives a details object; `Calendar`'s
   receives a plain boolean — the two built-ins do not share a handler
   signature).
-- `items: SelectDataItem[]` — builds `createListCollection` internally
-  (precedent: `PaginationPageSize` builds a collection from a plain array).
-- `multiple?: boolean` — default `false`. Trigger: `SelectButton` (single) /
-  `SelectInput` (multiple), matching the stories.
+- **Bound-root pattern** (post-review refinement, user-approved): the
+  component IS the prewired `Select` root, not an opaque wrapper. It accepts
+  either `items: SelectDataItem[]` (shorthand — builds `createListCollection`
+  internally; precedent: `PaginationPageSize`) or a prebuilt
+  `collection` (exactly one of the two; dev-mode warn otherwise), and its
+  `children` are ordinary `Select` compound parts (`SelectButton`/`SelectInput`,
+  `SelectPositioner > SelectContent > SelectOption…`) rendered inside the
+  prewired root. No children → the default composition is rendered from the
+  resolved collection's items.
+- `multiple?: boolean` — default `false`. Default trigger: `SelectButton`
+  (single) / `SelectInput` (multiple), matching the stories.
 - **Props typing is a discriminated union on `multiple`** per the metrics
   contract's element-specific-typing rule: the single variant forwards
   button-appropriate attributes (trigger is a real `<button>` via
@@ -380,6 +387,13 @@ alias trick).
   interop hazard (Ark produces values from a different `@internationalized/date`
   copy; `instanceof` drops them). The comment moves into the component.
 - `onOpenChange(false)` → `submit()`; override `'none'`.
+- **Bound-root pattern** (post-review refinement, user-approved): `children`
+  are ordinary `Calendar` compound parts (`CalendarTrigger`,
+  `CalendarContent > CalendarBody > …`) rendered inside the prewired
+  `Calendar` root — the value adapter, `defaultOpen`/`closeOnSelect`, and
+  commit-on-close stay on the root regardless. No children → the current
+  default composition (segmented `DateInput` trigger + grids, plus
+  `CalendarInputHeader` in `showTime` mode).
 
 ### `InlineEditTime`
 
