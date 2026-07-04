@@ -48,6 +48,19 @@ Every existing call site is enumerated below with its exact replacement.
 - Any change to `InlineEditSelect`/`InlineEditTime` (unaffected by all three).
 - Any change to the commit-guard (`onBeforeValueCommit`) mechanism — these
   redesigns are orthogonal and land on top of it.
+- **Parked, needs a scope decision:** making the date/time *input field*
+  itself (`DateInput`/`TimeInput`) compound. `InlineEditDate`/
+  `InlineEditDateTime` already have full escape-hatch composability today via
+  their bound-root `children` override — a consumer can already swap in any
+  custom `DateInput` arrangement. What is *not* compound is `DateInput`'s own
+  icon: it's a fixed `Calendar` icon toggled by a `showIcon` boolean
+  (`DateInput.tsx:56,132`), not swappable content — but that's consistent
+  DS-wide (`TimeInput` does the same), not an InlineEdit-specific
+  `triggerIcon`-style anti-pattern. Making the icon genuinely compound (custom
+  content, not just on/off) means touching `DateInputInternal`, which is
+  shared by `DateInput`, `TimeInput`, and (transitively) `DateRangeInput` —
+  outside InlineEdit's/WDS-143's blast radius and better scoped as its own
+  spec if pursued.
 
 ## 1. `InlineEditError` — text only as children
 
