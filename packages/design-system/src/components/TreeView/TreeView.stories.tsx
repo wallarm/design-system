@@ -188,6 +188,44 @@ export const WithInlineBadge: StoryFn<TreeViewProps> = args => (
   </div>
 );
 
+/** `rightElement` holds anything — a count badge, or a custom tag like a label. */
+export const WithRightElement: StoryFn<TreeViewProps> = args => (
+  <div className='w-320'>
+    <TreeView {...args}>
+      <TreeViewItem defaultOpen rightElement={<CountBadge value={3} />}>
+        <Folder />
+        src
+        <TreeViewItem rightElement={<CountBadge value={12} />}>
+          <FileText />
+          index.ts
+        </TreeViewItem>
+        <TreeViewItem
+          rightElement={
+            <Badge color='blue' size='small'>
+              label
+            </Badge>
+          }
+        >
+          <FileText />
+          config.ts
+        </TreeViewItem>
+        <TreeViewItem>
+          <FileText />
+          types.ts
+        </TreeViewItem>
+      </TreeViewItem>
+      <TreeViewItem rightElement={<CountBadge value={1} />}>
+        <Folder />
+        public
+        <TreeViewItem>
+          <FileText />
+          favicon.ico
+        </TreeViewItem>
+      </TreeViewItem>
+    </TreeView>
+  </div>
+);
+
 export const Disabled: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView selectable {...args}>
