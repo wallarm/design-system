@@ -22,6 +22,12 @@ const meta = {
 
 export default meta;
 
+const CountBadge = ({ value }: { value: number }) => (
+  <Badge size='small' color='slate' type='secondary' textVariant='code'>
+    {value}
+  </Badge>
+);
+
 export const Basic: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
@@ -56,10 +62,10 @@ export const Basic: StoryFn<TreeViewProps> = args => (
 export const Nested: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
-      <TreeViewItem defaultOpen count={4}>
+      <TreeViewItem defaultOpen rightElement={<CountBadge value={4} />}>
         <Folder />
         src
-        <TreeViewItem defaultOpen count={2}>
+        <TreeViewItem defaultOpen rightElement={<CountBadge value={2} />}>
           <Folder />
           components
           <TreeViewItem defaultOpen>
@@ -80,7 +86,7 @@ export const Nested: StoryFn<TreeViewProps> = args => (
           index.ts
         </TreeViewItem>
       </TreeViewItem>
-      <TreeViewItem count={1}>
+      <TreeViewItem rightElement={<CountBadge value={1} />}>
         <Folder />
         public
         <TreeViewItem>
@@ -217,7 +223,7 @@ export const WithToolbar: StoryFn<TreeViewProps> = () => {
           onClose={() => undefined}
         />
         <TreeViewItem
-          count={2}
+          rightElement={<CountBadge value={2} />}
           open={open.src}
           onOpenChange={v => setOpen(s => ({ ...s, src: v }))}
         >
@@ -243,7 +249,7 @@ export const WithToolbar: StoryFn<TreeViewProps> = () => {
             index.ts
           </TreeViewItem>
         </TreeViewItem>
-        <TreeViewItem count={1}>
+        <TreeViewItem rightElement={<CountBadge value={1} />}>
           <FileText />
           package.json
         </TreeViewItem>

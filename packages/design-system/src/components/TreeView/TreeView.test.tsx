@@ -22,14 +22,16 @@ describe('Node rendering', () => {
     expect(screen.getByText('Sibling')).toBeInTheDocument();
   });
 
-  it('renders a count badge on the right slot', () => {
-    render(
+  it('renders rightElement content on the right slot', () => {
+    const { container } = render(
       <TreeView>
-        <TreeViewItem count={5}>Folder</TreeViewItem>
+        <TreeViewItem rightElement={<span data-testid='count'>5</span>}>Folder</TreeViewItem>
       </TreeView>,
     );
 
-    expect(screen.getByText('5')).toBeInTheDocument();
+    const right = container.querySelector('[data-slot="tree-view-right"]');
+    expect(right).toBeInTheDocument();
+    expect(screen.getByTestId('count')).toHaveTextContent('5');
   });
 
   it('renders composed children (icon, badge, text) as row content', () => {

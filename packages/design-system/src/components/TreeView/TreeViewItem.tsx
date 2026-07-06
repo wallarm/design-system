@@ -14,7 +14,6 @@ import { SquareMinus, SquarePlus } from '../../icons';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { TreeDepthProvider, useTreeDepth } from '../../utils/treeDepth';
-import { Badge } from '../Badge';
 import { Checkbox } from '../Checkbox';
 import { CheckboxIndicator } from '../Checkbox/CheckboxIndicator';
 import { treeViewRowVariants } from './classes';
@@ -41,10 +40,8 @@ export interface TreeViewItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   /** Uncontrolled initial open state. */
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** Numeric badge shown on the right side. */
-  count?: number;
-  /** Custom right-side content (rendered after `count`). */
-  actions?: ReactNode;
+  /** Custom content rendered on the right side (e.g. a count badge, actions). */
+  rightElement?: ReactNode;
   /** Show a checkbox for this row (overrides the tree-level `checkboxes` prop). */
   checkbox?: boolean;
   /** Controlled checkbox state. Leave undefined for an uncontrolled checkbox. */
@@ -66,8 +63,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   open: controlledOpen,
   defaultOpen = false,
   onOpenChange,
-  count,
-  actions,
+  rightElement,
   checkbox,
   checked,
   defaultChecked,
@@ -162,7 +158,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   );
 
   const paddingLeft = depth * TREE_VIEW_INDENT_STEP;
-  const hasRight = count !== undefined || actions != null;
+  const hasRight = rightElement != null;
 
   return (
     <div
@@ -240,12 +236,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
 
         {hasRight && (
           <div className='flex shrink-0 items-center gap-4' data-slot='tree-view-right'>
-            {count !== undefined && (
-              <Badge size='small' color='slate' type='secondary' textVariant='code'>
-                {count}
-              </Badge>
-            )}
-            {actions}
+            {rightElement}
           </div>
         )}
       </div>
