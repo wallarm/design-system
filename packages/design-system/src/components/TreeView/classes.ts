@@ -5,7 +5,7 @@ export const treeViewRowVariants = cva(
   {
     variants: {
       interactive: {
-        true: 'cursor-pointer',
+        true: 'cursor-pointer active:bg-states-primary-pressed',
         false: '',
       },
       selected: {
