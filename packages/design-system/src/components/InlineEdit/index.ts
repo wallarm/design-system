@@ -9,6 +9,7 @@ export {
 } from './InlineEditContext';
 export { InlineEditControl, type InlineEditControlProps } from './InlineEditControl';
 export { InlineEditDate, type InlineEditDateProps } from './InlineEditDate';
+export { InlineEditDateTime, type InlineEditDateTimeProps } from './InlineEditDateTime';
 export { InlineEditError, type InlineEditErrorProps } from './InlineEditError';
 export { InlineEditInput, type InlineEditInputProps } from './InlineEditInput';
 export { InlineEditNumber, type InlineEditNumberProps } from './InlineEditNumber';

@@ -1,9 +1,11 @@
 import type { FC, ReactNode } from 'react';
+import { CalendarDateTime } from '@internationalized/date';
 import { useTestId } from '../../utils/testId';
 import {
   CalendarBody,
   CalendarContent,
   CalendarGrids,
+  CalendarInputHeader,
   // Aliased: the DS also exports a `Calendar` icon; same trick as the stories.
   Calendar as CalendarRoot,
   CalendarTrigger,
@@ -19,14 +21,18 @@ import { useInlineEdit, useInlineEditSubmitMode } from './InlineEditContext';
  * focusable segments, is the documented landing target).
  *
  * `value` / `onChange` are internally controlled via `useInlineEdit`.
- * `granularity` is omitted — this component is always day-granularity; use
- * `InlineEditDateTime` for date+time.
+ * `granularity` / `showTimeDropdown` / `timeStep` are omitted — this
+ * component is always minute-granularity with the time-aware header; use
+ * `InlineEditDate` for day-only.
  */
-export interface InlineEditDateProps
-  extends Omit<DateInputProps, 'value' | 'onChange' | 'granularity'> {
+export interface InlineEditDateTimeProps
+  extends Omit<
+    DateInputProps,
+    'value' | 'onChange' | 'granularity' | 'showTimeDropdown' | 'timeStep'
+  > {
   /**
-   * Bound-root pattern: `InlineEditDate` IS the prewired `Calendar` root —
-   * the `DateValue[]` adapter, `defaultOpen`/`closeOnSelect`, and
+   * Bound-root pattern: `InlineEditDateTime` IS the prewired `Calendar`
+   * root — the `DateValue[]` adapter, `defaultOpen`, `showTime`, and
    * commit-on-close all stay on the root regardless of composition.
    * `children` are ordinary `Calendar` compound parts (`CalendarTrigger`,
    * `CalendarContent > CalendarBody > …`) rendered inside that root, not a
@@ -34,13 +40,28 @@ export interface InlineEditDateProps
    * own testids/attributes on their own parts — the shared `input` testId
    * slot below only lands on the default `DateInput` trigger.
    *
-   * No children → the default composition renders (segmented `DateInput`
-   * trigger + grids).
+   * No children → the default composition renders (minute-granularity
+   * segmented `DateInput` trigger + `CalendarInputHeader` + grids).
    */
   children?: ReactNode;
 }
 
-export const InlineEditDate: FC<InlineEditDateProps> = ({
+/**
+ * `DateInput` at `granularity='minute'` requires an hour/minute component —
+ * react-aria's `useDateFieldState` throws "Invalid granularity" otherwise. A
+ * committed value can be day-only (e.g. a consumer's initial `CalendarDate`,
+ * before any time has been picked), so promote it to midnight, mirroring
+ * Calendar's own date-only → `CalendarDateTime` promotion in `useCalendarTime`
+ * / `withTime` (Calendar/dateValue.ts). The cast crosses the same
+ * `@internationalized/date` package-instance boundary as `dateValueCast.ts`.
+ */
+const withMinuteGranularity = (date: DateValue | null): DateValue | null => {
+  if (!date) return null;
+  if ('hour' in date) return date;
+  return new CalendarDateTime(date.year, date.month, date.day, 0, 0) as unknown as DateValue;
+};
+
+export const InlineEditDateTime: FC<InlineEditDateTimeProps> = ({
   'data-testid': testIdProp,
   showIcon = false,
   children,
@@ -54,8 +75,11 @@ export const InlineEditDate: FC<InlineEditDateProps> = ({
     <CalendarRoot
       type='single'
       defaultOpen
-      closeOnSelect
+      showTime
+      closeOnSelect={false}
       value={value ? [value] : []}
+      // Calendar's contract is DateValue[]; `useCalendarTime` has already
+      // promoted a grid pick to a CalendarDateTime by the time this fires.
       onChange={next => setValue(next[0] ?? null)}
       onOpenChange={open => {
         if (!open) submit();
@@ -70,14 +94,15 @@ export const InlineEditDate: FC<InlineEditDateProps> = ({
             <DateInput
               {...rest}
               data-testid={testId}
-              value={toReactAriaDateValue(value ?? null)}
+              value={toReactAriaDateValue(withMinuteGranularity(value ?? null))}
               onChange={v => setValue(toCalendarDateValue(v))}
-              granularity='day'
+              granularity='minute'
               showIcon={showIcon}
             />
           </CalendarTrigger>
           <CalendarContent>
             <CalendarBody>
+              <CalendarInputHeader />
               <CalendarGrids />
             </CalendarBody>
           </CalendarContent>
@@ -87,4 +112,4 @@ export const InlineEditDate: FC<InlineEditDateProps> = ({
   );
 };
 
-InlineEditDate.displayName = 'InlineEditDate';
+InlineEditDateTime.displayName = 'InlineEditDateTime';

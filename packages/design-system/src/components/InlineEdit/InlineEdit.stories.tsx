@@ -23,6 +23,7 @@ import { Text } from '../Text';
 import { InlineEdit } from './InlineEdit';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditDate } from './InlineEditDate';
+import { InlineEditDateTime } from './InlineEditDateTime';
 import { InlineEditError } from './InlineEditError';
 import { InlineEditInput } from './InlineEditInput';
 import { InlineEditNumber } from './InlineEditNumber';
@@ -43,6 +44,7 @@ const meta = {
     InlineEditTextarea,
     InlineEditSelect,
     InlineEditDate,
+    InlineEditDateTime,
     InlineEditTime,
   },
   parameters: {
@@ -239,7 +241,7 @@ export const Gallery: StoryFn = () => {
               {dateTimeLabel}
             </InlineEditPreview>
             <InlineEditControl>
-              <InlineEditDate showTime />
+              <InlineEditDateTime />
             </InlineEditControl>
           </InlineEdit>
         </DateFormatProvider>

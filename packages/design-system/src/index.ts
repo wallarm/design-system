@@ -315,6 +315,8 @@ export {
   type InlineEditControlProps,
   InlineEditDate,
   type InlineEditDateProps,
+  InlineEditDateTime,
+  type InlineEditDateTimeProps,
   InlineEditError,
   type InlineEditErrorProps,
   InlineEditInput,

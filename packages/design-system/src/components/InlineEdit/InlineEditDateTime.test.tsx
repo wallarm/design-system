@@ -5,7 +5,7 @@ import { CalendarBody, CalendarContent, CalendarGrids, CalendarTrigger } from '.
 import { DateInput } from '../DateInput';
 import { InlineEdit } from './InlineEdit';
 import { InlineEditControl } from './InlineEditControl';
-import { InlineEditDate } from './InlineEditDate';
+import { InlineEditDateTime } from './InlineEditDateTime';
 
 function Harness({
   onCommit,
@@ -22,18 +22,22 @@ function Harness({
       data-testid='ie'
     >
       <InlineEditControl>
-        <InlineEditDate data-analytics-id={analyticsId} />
+        <InlineEditDateTime data-analytics-id={analyticsId} />
       </InlineEditControl>
     </InlineEdit>
   );
 }
 
-describe('InlineEditDate', () => {
-  it('renders the calendar open with the segmented trigger input pre-filled', async () => {
+describe('InlineEditDateTime', () => {
+  it('renders the calendar open with the time-aware header', () => {
     render(<Harness />);
-    // Portaled content is present (defaultOpen) — grid day cells exist.
-    expect(document.querySelector('[data-scope="date-picker"][data-part="content"]')).toBeTruthy();
-    expect(screen.getByTestId('ie--input')).toBeInTheDocument();
+    const content = document.querySelector('[data-scope="date-picker"][data-part="content"]');
+    expect(content).toBeTruthy();
+    // CalendarInputHeader renders a minute-granularity DateInput in the popover
+    // header — its segments carry `data-segment` (see TemporalSegment.tsx), so
+    // hour/minute segments prove the time-aware header rendered.
+    expect(content?.querySelector('[data-segment="hour"]')).toBeTruthy();
+    expect(content?.querySelector('[data-segment="minute"]')).toBeTruthy();
   });
 
   it('derives the shared input testId slot on the DateInput wrapper', () => {
@@ -44,11 +48,8 @@ describe('InlineEditDate', () => {
   it('forwards data-analytics-id to the DateInput wrapper, not the focusable segments', () => {
     render(<Harness analyticsId='date-edit' />);
     const target = document.querySelector('[data-analytics-id="date-edit"]');
-    // Same node as the wrapper carrying the derived testId (documented gap:
-    // ANALYTICS_GAPS.md — attributes land on the wrapper, not the segments).
     expect(target).toBe(screen.getByTestId('ie--input'));
     expect(target?.querySelector('[data-segment]')).toBeTruthy();
-    // The focusable segments themselves must not carry the attribute.
     expect(target?.querySelectorAll('[data-segment][data-analytics-id]')).toHaveLength(0);
   });
 
@@ -62,13 +63,13 @@ describe('InlineEditDate', () => {
         data-testid='ie'
       >
         <InlineEditControl>
-          <InlineEditDate>
+          <InlineEditDateTime>
             <CalendarTrigger>
               <DateInput
                 data-testid='custom-date-input'
                 value={null}
                 onChange={() => {}}
-                granularity='day'
+                granularity='minute'
                 showIcon={false}
               />
             </CalendarTrigger>
@@ -77,17 +78,12 @@ describe('InlineEditDate', () => {
                 <CalendarGrids />
               </CalendarBody>
             </CalendarContent>
-          </InlineEditDate>
+          </InlineEditDateTime>
         </InlineEditControl>
       </InlineEdit>,
     );
-    // defaultOpen wiring stays on the root regardless of composition — the
-    // portaled popover content renders through the children path too.
     expect(document.querySelector('[data-scope="date-picker"][data-part="content"]')).toBeTruthy();
     expect(screen.getByTestId('custom-date-input')).toBeInTheDocument();
-    // The children path replaces the default composition entirely — the
-    // default DateInput (which would carry the shared `input` testId slot)
-    // must not also render.
     expect(screen.queryByTestId('ie--input')).not.toBeInTheDocument();
   });
 });
