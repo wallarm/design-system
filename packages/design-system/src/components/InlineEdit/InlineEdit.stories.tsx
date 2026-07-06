@@ -80,6 +80,9 @@ const meta = {
           'read-mode wrapper and `InlineEditControl` the edit-mode wrapper, hosting either a ' +
           'built-in editor (`InlineEditInput`, `InlineEditNumber`, `InlineEditTextarea`, ' +
           '`InlineEditSelect`, `InlineEditDate`, `InlineEditTime`) or a custom one. ' +
+          '`InlineEditSelect`/`InlineEditDate`/`InlineEditDateTime` are pure root-wrappers — ' +
+          'they own only the draft/commit wiring, and `children` (required) are ordinary ' +
+          '`Select`/`Calendar` compound parts, composed exactly as you would standalone. ' +
           'The root manages the commit/cancel lifecycle, async commit with loading, saved, ' +
           'and error status, and submit-mode handling (enter, blur, both, or none).' +
           ' An optional `onBeforeValueCommit` guard intercepts every commit — return `false` ' +
@@ -134,6 +137,15 @@ function renderSelectOptions(items: SelectDataItem[]) {
 function SelectInputTrigger() {
   const testId = useTestId('input');
   return <SelectInput data-testid={testId} />;
+}
+
+// SelectButton naturally cascades to the `button` slot, but this specific
+// consumer (ConfirmCommit's Role row) needs to preserve the pre-existing
+// `input` slot name that InlineEdit.e2e.ts depends on — same reasoning as
+// SelectInputTrigger above, just for the single-select trigger.
+function SelectButtonTrigger() {
+  const testId = useTestId('input');
+  return <SelectButton data-testid={testId} />;
 }
 
 // `Calendar` never re-provides its own testid cascade, so this resolves
@@ -633,7 +645,7 @@ export const ConfirmCommit: StoryFn = () => {
           </InlineEditPreview>
           <InlineEditControl>
             <InlineEditSelect items={roleItems}>
-              <SelectButton />
+              <SelectButtonTrigger />
               <SelectPositioner>
                 <SelectContent>{renderSelectOptions(roleItems)}</SelectContent>
               </SelectPositioner>
