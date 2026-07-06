@@ -661,6 +661,15 @@ export {
   useTreeDepth,
   useTreeIndent,
 } from './components/Tree';
+export {
+  TREE_VIEW_INDENT_STEP,
+  TreeView,
+  TreeViewItem,
+  type TreeViewItemProps,
+  type TreeViewProps,
+  TreeViewToolbar,
+  type TreeViewToolbarProps,
+} from './components/TreeView';
 export { UtilityPage, type UtilityPageProps } from './components/UtilityPage';
 export {
   WallyIcon,
