@@ -338,8 +338,11 @@ export {
   type InlineEditTextareaProps,
   InlineEditTime,
   type InlineEditTimeProps,
+  toCalendarDateValue,
+  toReactAriaDateValue,
   useInlineEdit,
   useInlineEditSubmitMode,
+  withMinuteGranularity,
 } from './components/InlineEdit';
 export { Input, type InputProps } from './components/Input';
 export {

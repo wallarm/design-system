@@ -1,3 +1,4 @@
+export { toCalendarDateValue, toReactAriaDateValue, withMinuteGranularity } from './dateValueCast';
 export { InlineEdit, type InlineEditProps } from './InlineEdit';
 export {
   type InlineEditActivationMode,

@@ -1,11 +1,37 @@
 import { CalendarDate } from '@internationalized/date';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
-import { CalendarBody, CalendarContent, CalendarGrids, CalendarTrigger } from '../Calendar';
+import { describe, expect, it } from 'vitest';
+import { useTestId } from '../../utils/testId';
+import {
+  CalendarBody,
+  CalendarContent,
+  CalendarGrids,
+  CalendarTrigger,
+  type DateValue,
+} from '../Calendar';
 import { DateInput } from '../DateInput';
+import { toCalendarDateValue, toReactAriaDateValue } from './dateValueCast';
 import { InlineEdit } from './InlineEdit';
+import { useInlineEdit } from './InlineEditContext';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditDate } from './InlineEditDate';
+
+// `useTestId`/`useInlineEdit` only resolve correctly from a component
+// rendered as a descendant of <InlineEdit> — must be its own component, not
+// called at the top of the Harness (which renders <InlineEdit> itself).
+function DateInputTrigger({ analyticsId }: { analyticsId?: string }) {
+  const testId = useTestId('input');
+  const { value, setValue } = useInlineEdit<DateValue | null>();
+  return (
+    <DateInput
+      data-testid={testId}
+      data-analytics-id={analyticsId}
+      value={toReactAriaDateValue(value ?? null)}
+      onChange={v => setValue(toCalendarDateValue(v))}
+      granularity='day'
+    />
+  );
+}
 
 function Harness({
   onCommit,
@@ -22,7 +48,16 @@ function Harness({
       data-testid='ie'
     >
       <InlineEditControl>
-        <InlineEditDate data-analytics-id={analyticsId} />
+        <InlineEditDate>
+          <CalendarTrigger>
+            <DateInputTrigger analyticsId={analyticsId} />
+          </CalendarTrigger>
+          <CalendarContent>
+            <CalendarBody>
+              <CalendarGrids />
+            </CalendarBody>
+          </CalendarContent>
+        </InlineEditDate>
       </InlineEditControl>
     </InlineEdit>
   );
@@ -36,58 +71,14 @@ describe('InlineEditDate', () => {
     expect(screen.getByTestId('ie--input')).toBeInTheDocument();
   });
 
-  it('derives the shared input testId slot on the DateInput wrapper', () => {
+  it('derives the shared input testId slot from the ambient InlineEdit root, with no wiring in InlineEditDate itself', () => {
     render(<Harness />);
     expect(screen.getByTestId('ie--input')).toBeInTheDocument();
   });
 
-  it('forwards data-analytics-id to the DateInput wrapper, not the focusable segments', () => {
+  it('forwards data-analytics-id to whatever node the consumer places it on', () => {
     render(<Harness analyticsId='date-edit' />);
     const target = document.querySelector('[data-analytics-id="date-edit"]');
-    // Same node as the wrapper carrying the derived testId (documented gap:
-    // ANALYTICS_GAPS.md — attributes land on the wrapper, not the segments).
     expect(target).toBe(screen.getByTestId('ie--input'));
-    expect(target?.querySelector('[data-segment]')).toBeTruthy();
-    // The focusable segments themselves must not carry the attribute.
-    expect(target?.querySelectorAll('[data-segment][data-analytics-id]')).toHaveLength(0);
-  });
-
-  it('children compose ordinary Calendar parts inside the prewired root (bound-root pattern)', () => {
-    const onCommit = vi.fn();
-    render(
-      <InlineEdit
-        defaultValue={new CalendarDate(2026, 6, 15)}
-        defaultEdit
-        onValueCommit={onCommit}
-        data-testid='ie'
-      >
-        <InlineEditControl>
-          <InlineEditDate>
-            <CalendarTrigger>
-              <DateInput
-                data-testid='custom-date-input'
-                value={null}
-                onChange={() => {}}
-                granularity='day'
-                showIcon={false}
-              />
-            </CalendarTrigger>
-            <CalendarContent>
-              <CalendarBody>
-                <CalendarGrids />
-              </CalendarBody>
-            </CalendarContent>
-          </InlineEditDate>
-        </InlineEditControl>
-      </InlineEdit>,
-    );
-    // defaultOpen wiring stays on the root regardless of composition — the
-    // portaled popover content renders through the children path too.
-    expect(document.querySelector('[data-scope="date-picker"][data-part="content"]')).toBeTruthy();
-    expect(screen.getByTestId('custom-date-input')).toBeInTheDocument();
-    // The children path replaces the default composition entirely — the
-    // default DateInput (which would carry the shared `input` testId slot)
-    // must not also render.
-    expect(screen.queryByTestId('ie--input')).not.toBeInTheDocument();
   });
 });

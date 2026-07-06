@@ -7,7 +7,15 @@ import type { DateValue } from '../../index';
 import { CalendarDate, CalendarDateTime, Time } from '../../index';
 import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
+import {
+  CalendarBody,
+  CalendarContent,
+  CalendarGrids,
+  CalendarInputHeader,
+  CalendarTrigger,
+} from '../Calendar';
 import { DateFormatProvider } from '../DateFormatProvider';
+import { DateInput } from '../DateInput';
 import {
   Dialog,
   DialogBody,
@@ -30,7 +38,9 @@ import {
 } from '../Select';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
+import { toCalendarDateValue, toReactAriaDateValue, withMinuteGranularity } from './dateValueCast';
 import { InlineEdit } from './InlineEdit';
+import { useInlineEdit } from './InlineEditContext';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditDate } from './InlineEditDate';
 import { InlineEditDateTime } from './InlineEditDateTime';
@@ -124,6 +134,24 @@ function renderSelectOptions(items: SelectDataItem[]) {
 function SelectInputTrigger() {
   const testId = useTestId('input');
   return <SelectInput data-testid={testId} />;
+}
+
+// `Calendar` never re-provides its own testid cascade, so this resolves
+// straight from the ambient InlineEdit root — same reasoning as
+// SelectInputTrigger above, just without needing a bridge.
+function DateInputTrigger({ granularity }: { granularity: 'day' | 'minute' }) {
+  const testId = useTestId('input');
+  const { value, setValue } = useInlineEdit<DateValue | null>();
+  const resolvedValue =
+    granularity === 'minute' ? withMinuteGranularity(value ?? null) : (value ?? null);
+  return (
+    <DateInput
+      data-testid={testId}
+      value={toReactAriaDateValue(resolvedValue)}
+      onChange={v => setValue(toCalendarDateValue(v))}
+      granularity={granularity}
+    />
+  );
 }
 
 /** `InlineEditInput` in isolation — the default text editor. */
@@ -296,7 +324,16 @@ export const DateEditor: StoryFn = () => {
               </InlineEditPreviewIcon>
             </InlineEditPreview>
             <InlineEditControl>
-              <InlineEditDate />
+              <InlineEditDate>
+                <CalendarTrigger>
+                  <DateInputTrigger granularity='day' />
+                </CalendarTrigger>
+                <CalendarContent>
+                  <CalendarBody>
+                    <CalendarGrids />
+                  </CalendarBody>
+                </CalendarContent>
+              </InlineEditDate>
             </InlineEditControl>
           </InlineEdit>
         </Row>
@@ -361,7 +398,17 @@ export const DateTimeEditor: StoryFn = () => {
               </InlineEditPreviewIcon>
             </InlineEditPreview>
             <InlineEditControl>
-              <InlineEditDateTime />
+              <InlineEditDateTime>
+                <CalendarTrigger>
+                  <DateInputTrigger granularity='minute' />
+                </CalendarTrigger>
+                <CalendarContent>
+                  <CalendarBody>
+                    <CalendarInputHeader />
+                    <CalendarGrids />
+                  </CalendarBody>
+                </CalendarContent>
+              </InlineEditDateTime>
             </InlineEditControl>
           </InlineEdit>
         </Row>

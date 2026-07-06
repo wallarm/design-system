@@ -1,11 +1,35 @@
 import { CalendarDate } from '@internationalized/date';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
-import { CalendarBody, CalendarContent, CalendarGrids, CalendarTrigger } from '../Calendar';
+import { describe, expect, it } from 'vitest';
+import { useTestId } from '../../utils/testId';
+import {
+  CalendarBody,
+  CalendarContent,
+  CalendarGrids,
+  CalendarInputHeader,
+  CalendarTrigger,
+  type DateValue,
+} from '../Calendar';
 import { DateInput } from '../DateInput';
+import { toCalendarDateValue, toReactAriaDateValue, withMinuteGranularity } from './dateValueCast';
 import { InlineEdit } from './InlineEdit';
+import { useInlineEdit } from './InlineEditContext';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditDateTime } from './InlineEditDateTime';
+
+function DateInputTrigger({ analyticsId }: { analyticsId?: string }) {
+  const testId = useTestId('input');
+  const { value, setValue } = useInlineEdit<DateValue | null>();
+  return (
+    <DateInput
+      data-testid={testId}
+      data-analytics-id={analyticsId}
+      value={toReactAriaDateValue(withMinuteGranularity(value ?? null))}
+      onChange={v => setValue(toCalendarDateValue(v))}
+      granularity='minute'
+    />
+  );
+}
 
 function Harness({
   onCommit,
@@ -22,7 +46,17 @@ function Harness({
       data-testid='ie'
     >
       <InlineEditControl>
-        <InlineEditDateTime data-analytics-id={analyticsId} />
+        <InlineEditDateTime>
+          <CalendarTrigger>
+            <DateInputTrigger analyticsId={analyticsId} />
+          </CalendarTrigger>
+          <CalendarContent>
+            <CalendarBody>
+              <CalendarInputHeader />
+              <CalendarGrids />
+            </CalendarBody>
+          </CalendarContent>
+        </InlineEditDateTime>
       </InlineEditControl>
     </InlineEdit>
   );
@@ -40,50 +74,14 @@ describe('InlineEditDateTime', () => {
     expect(content?.querySelector('[data-segment="minute"]')).toBeTruthy();
   });
 
-  it('derives the shared input testId slot on the DateInput wrapper', () => {
+  it('derives the shared input testId slot from the ambient InlineEdit root, with no wiring in InlineEditDateTime itself', () => {
     render(<Harness />);
     expect(screen.getByTestId('ie--input')).toBeInTheDocument();
   });
 
-  it('forwards data-analytics-id to the DateInput wrapper, not the focusable segments', () => {
+  it('forwards data-analytics-id to whatever node the consumer places it on', () => {
     render(<Harness analyticsId='date-edit' />);
     const target = document.querySelector('[data-analytics-id="date-edit"]');
     expect(target).toBe(screen.getByTestId('ie--input'));
-    expect(target?.querySelector('[data-segment]')).toBeTruthy();
-    expect(target?.querySelectorAll('[data-segment][data-analytics-id]')).toHaveLength(0);
-  });
-
-  it('children compose ordinary Calendar parts inside the prewired root (bound-root pattern)', () => {
-    const onCommit = vi.fn();
-    render(
-      <InlineEdit
-        defaultValue={new CalendarDate(2026, 6, 15)}
-        defaultEdit
-        onValueCommit={onCommit}
-        data-testid='ie'
-      >
-        <InlineEditControl>
-          <InlineEditDateTime>
-            <CalendarTrigger>
-              <DateInput
-                data-testid='custom-date-input'
-                value={null}
-                onChange={() => {}}
-                granularity='minute'
-                showIcon={false}
-              />
-            </CalendarTrigger>
-            <CalendarContent>
-              <CalendarBody>
-                <CalendarGrids />
-              </CalendarBody>
-            </CalendarContent>
-          </InlineEditDateTime>
-        </InlineEditControl>
-      </InlineEdit>,
-    );
-    expect(document.querySelector('[data-scope="date-picker"][data-part="content"]')).toBeTruthy();
-    expect(screen.getByTestId('custom-date-input')).toBeInTheDocument();
-    expect(screen.queryByTestId('ie--input')).not.toBeInTheDocument();
   });
 });
