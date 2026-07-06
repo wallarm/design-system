@@ -5,6 +5,7 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Calendar, ChevronDown, Clock } from '../../icons';
 import type { DateValue } from '../../index';
 import { CalendarDate, CalendarDateTime, Time } from '../../index';
+import { useTestId } from '../../utils/testId';
 import { Button } from '../Button';
 import { DateFormatProvider } from '../DateFormatProvider';
 import {
@@ -17,7 +18,16 @@ import {
   DialogTitle,
 } from '../Dialog';
 import { Input } from '../Input';
-import type { SelectDataItem } from '../Select';
+import {
+  SelectButton,
+  SelectContent,
+  type SelectDataItem,
+  SelectInput,
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionText,
+  SelectPositioner,
+} from '../Select';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
 import { InlineEdit } from './InlineEdit';
@@ -99,6 +109,23 @@ const tagItems: SelectDataItem[] = [
   { label: 'monitored', value: 'monitored' },
 ];
 
+function renderSelectOptions(items: SelectDataItem[]) {
+  return items.map(item => (
+    <SelectOption key={item.value} item={item}>
+      <SelectOptionText>{item.label}</SelectOptionText>
+      <SelectOptionIndicator />
+    </SelectOption>
+  ));
+}
+
+// SelectInput does not self-cascade its testid (unlike SelectButton) — derive
+// it explicitly. Must be its own component: useTestId only resolves from a
+// descendant of <InlineEdit>, not from the story function that renders it.
+function SelectInputTrigger() {
+  const testId = useTestId('input');
+  return <SelectInput data-testid={testId} />;
+}
+
 /** `InlineEditInput` in isolation — the default text editor. */
 export const TextEditor: StoryFn = () => {
   const [text, setText] = useState('Checkout API');
@@ -169,7 +196,12 @@ export const SelectEditor: StoryFn = () => {
             </InlineEditPreviewIcon>
           </InlineEditPreview>
           <InlineEditControl>
-            <InlineEditSelect items={roleItems} />
+            <InlineEditSelect items={roleItems}>
+              <SelectButton />
+              <SelectPositioner>
+                <SelectContent>{renderSelectOptions(roleItems)}</SelectContent>
+              </SelectPositioner>
+            </InlineEditSelect>
           </InlineEditControl>
         </InlineEdit>
       </Row>
@@ -196,7 +228,12 @@ export const MultiSelectEditor: StoryFn = () => {
             </InlineEditPreviewIcon>
           </InlineEditPreview>
           <InlineEditControl>
-            <InlineEditSelect items={roleItems} multiple />
+            <InlineEditSelect items={roleItems} multiple>
+              <SelectInputTrigger />
+              <SelectPositioner>
+                <SelectContent>{renderSelectOptions(roleItems)}</SelectContent>
+              </SelectPositioner>
+            </InlineEditSelect>
           </InlineEditControl>
         </InlineEdit>
       </Row>
@@ -224,7 +261,12 @@ export const TagsEditor: StoryFn = () => {
             </InlineEditPreviewIcon>
           </InlineEditPreview>
           <InlineEditControl>
-            <InlineEditSelect items={tagItems} multiple />
+            <InlineEditSelect items={tagItems} multiple>
+              <SelectInputTrigger />
+              <SelectPositioner>
+                <SelectContent>{renderSelectOptions(tagItems)}</SelectContent>
+              </SelectPositioner>
+            </InlineEditSelect>
           </InlineEditControl>
         </InlineEdit>
       </Row>
@@ -543,7 +585,12 @@ export const ConfirmCommit: StoryFn = () => {
             </InlineEditPreviewIcon>
           </InlineEditPreview>
           <InlineEditControl>
-            <InlineEditSelect items={roleItems} />
+            <InlineEditSelect items={roleItems}>
+              <SelectButton />
+              <SelectPositioner>
+                <SelectContent>{renderSelectOptions(roleItems)}</SelectContent>
+              </SelectPositioner>
+            </InlineEditSelect>
           </InlineEditControl>
         </InlineEdit>
       </Row>

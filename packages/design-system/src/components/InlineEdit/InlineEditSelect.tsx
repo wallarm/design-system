@@ -1,22 +1,11 @@
-import type { ButtonHTMLAttributes, HTMLAttributes, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useEffect, useMemo } from 'react';
 import type { ListCollection } from '@ark-ui/react/collection';
 import { useTestId } from '../../utils/testId';
-import {
-  createListCollection,
-  Select,
-  SelectButton,
-  SelectContent,
-  type SelectDataItem,
-  SelectInput,
-  SelectOption,
-  SelectOptionIndicator,
-  SelectOptionText,
-  SelectPositioner,
-} from '../Select';
+import { createListCollection, Select, type SelectDataItem } from '../Select';
 import { useInlineEdit, useInlineEditSubmitMode } from './InlineEditContext';
 
-interface InlineEditSelectBaseProps {
+export interface InlineEditSelectProps {
   /**
    * Options; the collection is built internally (PaginationPageSize
    * precedent). Provide exactly one of `items` / `collection`.
@@ -28,60 +17,37 @@ interface InlineEditSelectBaseProps {
    * dev-only warning fires otherwise.
    */
   collection?: ListCollection<SelectDataItem>;
+  multiple?: boolean;
   /**
-   * Bound-root pattern: `InlineEditSelect` IS the prewired `Select` root —
-   * draft binding, `defaultOpen`, commit-on-close, and the submit-mode
-   * override all stay on the root regardless of composition. `children` are
+   * `InlineEditSelect` IS the prewired `Select` root — the draft binding,
+   * `defaultOpen`, and commit-on-close all live here. `children` are
    * ordinary `Select` compound parts (`SelectButton`/`SelectInput`,
-   * `SelectPositioner > SelectContent > SelectOption…`) rendered inside that
-   * root, not a replacement wrapper. Composing children means consumers
-   * place their own attributes (testids, analytics) on their own parts — the
-   * rest-prop forwarding documented below only applies to the default
-   * trigger.
-   *
-   * No children → the default trigger + positioner + options composition
-   * renders, built from the resolved collection's items.
+   * `SelectPositioner > SelectContent > SelectOption…`) — exactly as you'd
+   * compose a standalone `Select`. `SelectButton` already cascades its own
+   * testid slot from this root with zero extra wiring (`{base}--button`).
+   * `SelectOption` cascades too, but nested one level further: `SelectContent`
+   * re-provides the cascade scoped to its own `content` slot (a `ScrollArea`
+   * implementation detail — see its own testid comment), so bare options
+   * resolve under `{base}--content--option` rather than `{base}--option`.
+   * That cascaded id also has no per-item disambiguation (every option in a
+   * collection resolves to the same testid) — pass a per-item `data-testid`
+   * override if a test needs to address one option by id rather than by text.
+   * `SelectInput` (the multiple-select trigger) does not cascade on its own —
+   * pass it `data-testid` explicitly if you need one.
    */
-  children?: ReactNode;
-  'data-testid'?: string;
+  children: ReactNode;
 }
-
-/**
- * Single select: rest props forward to the real `<button>` trigger.
- * `color` is omitted: it's the legacy/deprecated global HTML attribute (not
- * meaningful on a `<button>`), and it would otherwise collide with
- * `SelectButton`'s own `color` prop, which is a narrower CVA variant
- * (`'brand' | 'neutral' | 'neutral-alt'`).
- */
-export interface InlineEditSelectSingleProps
-  extends InlineEditSelectBaseProps,
-    Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'value' | 'color'> {
-  multiple?: false;
-}
-
-/**
- * Multiple select: rest props forward to the trigger `<div>`.
- * `color` is omitted for symmetry with the single variant — `SelectInput`'s
- * own props already exclude it, so accepting it here would only let a stray
- * legacy attribute land on the div.
- */
-export interface InlineEditSelectMultipleProps
-  extends InlineEditSelectBaseProps,
-    Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'color'> {
-  multiple: true;
-}
-
-export type InlineEditSelectProps = InlineEditSelectSingleProps | InlineEditSelectMultipleProps;
 
 export const InlineEditSelect = ({
   items,
   collection,
   multiple = false,
   children,
-  'data-testid': testIdProp,
-  ...rest
 }: InlineEditSelectProps) => {
-  const testId = useTestId('input', testIdProp);
+  // Transparent pass-through (no slot segment): bridges the ambient
+  // InlineEdit-level cascade into Select's own re-provided TestIdProvider,
+  // so a consumer's bare SelectButton/SelectOption resolve automatically.
+  const testId = useTestId();
   const { value, setValue, submit } = useInlineEdit<string[] | string>();
   useInlineEditSubmitMode('none');
 
@@ -115,6 +81,7 @@ export const InlineEditSelect = ({
 
   return (
     <Select
+      data-testid={testId}
       defaultOpen
       collection={resolvedCollection}
       multiple={multiple}
@@ -124,31 +91,7 @@ export const InlineEditSelect = ({
         if (!details.open) submit();
       }}
     >
-      {children ?? (
-        <>
-          {multiple ? (
-            <SelectInput
-              data-testid={testId}
-              {...(rest as Omit<HTMLAttributes<HTMLDivElement>, 'color'>)}
-            />
-          ) : (
-            <SelectButton
-              data-testid={testId}
-              {...(rest as Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color'>)}
-            />
-          )}
-          <SelectPositioner>
-            <SelectContent>
-              {resolvedCollection.items.map(item => (
-                <SelectOption key={item.value} item={item}>
-                  <SelectOptionText>{item.label}</SelectOptionText>
-                  <SelectOptionIndicator />
-                </SelectOption>
-              ))}
-            </SelectContent>
-          </SelectPositioner>
-        </>
-      )}
+      {children}
     </Select>
   );
 };

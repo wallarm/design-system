@@ -1,10 +1,12 @@
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
+import { useTestId } from '../../utils/testId';
 import {
   createListCollection,
   SelectButton,
   SelectContent,
+  SelectInput,
   SelectOption,
   SelectOptionIndicator,
   SelectOptionText,
@@ -18,6 +20,43 @@ const items = [
   { label: 'Admin', value: 'admin' },
   { label: 'Editor', value: 'editor' },
 ];
+
+// SelectInput does not self-cascade its testid (unlike SelectButton/
+// SelectOption) — a consumer wanting a stable one derives it themselves via
+// useTestId, which only resolves correctly from a component rendered as a
+// descendant of <InlineEdit> (i.e. not from the top of a test's Harness).
+function SelectInputTrigger({ analyticsId }: { analyticsId?: string }) {
+  const testId = useTestId('input');
+  return <SelectInput data-testid={testId} data-analytics-id={analyticsId} />;
+}
+
+function SelectParts({
+  multiple = false,
+  analyticsId,
+}: {
+  multiple?: boolean;
+  analyticsId?: string;
+}) {
+  return (
+    <>
+      {multiple ? (
+        <SelectInputTrigger analyticsId={analyticsId} />
+      ) : (
+        <SelectButton data-analytics-id={analyticsId} />
+      )}
+      <SelectPositioner>
+        <SelectContent>
+          {items.map(item => (
+            <SelectOption key={item.value} item={item}>
+              <SelectOptionText>{item.label}</SelectOptionText>
+              <SelectOptionIndicator />
+            </SelectOption>
+          ))}
+        </SelectContent>
+      </SelectPositioner>
+    </>
+  );
+}
 
 function Harness({
   onCommit,
@@ -33,11 +72,9 @@ function Harness({
   return (
     <InlineEdit defaultValue={value} defaultEdit onValueCommit={onCommit} data-testid='ie'>
       <InlineEditControl>
-        {multiple ? (
-          <InlineEditSelect items={items} multiple data-analytics-id={analyticsId} />
-        ) : (
-          <InlineEditSelect items={items} data-analytics-id={analyticsId} />
-        )}
+        <InlineEditSelect items={items} multiple={multiple}>
+          <SelectParts multiple={multiple} analyticsId={analyticsId} />
+        </InlineEditSelect>
       </InlineEditControl>
     </InlineEdit>
   );
@@ -46,10 +83,10 @@ function Harness({
 // Ark's `Select` root always renders an aria-hidden native `<select>` mirror
 // (`ArkUiSelect.HiddenSelect`) with `<option>` elements duplicating every item
 // label, driven directly by the `collection` — independent of the visible
-// composition (default or custom children). This makes plain `getByText`
-// ambiguous (jsdom quirk `Select.test.tsx` never hits, since it queries
-// options via `data-testid` instead of text). `ignore: 'option'` excludes
-// that hidden mirror from the match pool without weakening any assertion.
+// composition. This makes plain `getByText` ambiguous (jsdom quirk
+// `Select.test.tsx` never hits, since it queries options via `data-testid`
+// instead of text). `ignore: 'option'` excludes that hidden mirror from the
+// match pool without weakening any assertion.
 const ignoreHiddenSelectOption = { ignore: 'option' };
 
 describe('InlineEditSelect', () => {
@@ -65,16 +102,12 @@ describe('InlineEditSelect', () => {
     // Opening on mount alone must not commit — only the close does.
     expect(onCommit).not.toHaveBeenCalled();
     await userEvent.click(option);
-    // Single select closes on selection → onOpenChange(open:false) → submit()
     expect(onCommit).toHaveBeenCalledTimes(1);
     expect(onCommit).toHaveBeenCalledWith(['admin']);
   });
 
   it('normalizes a plain string committed value into an array draft', async () => {
     render(<Harness value='editor' />);
-    // Draft is normalized to ['editor'] — Editor option is marked selected.
-    // Scoped to the listbox: the trigger button also renders the selected
-    // value's text ("Editor"), which would otherwise collide with the option.
     const listbox = await screen.findByRole('listbox');
     const option = within(listbox).getByText('Editor', ignoreHiddenSelectOption);
     expect(option.closest('[data-state]')).toHaveAttribute('data-state', 'checked');
@@ -85,7 +118,7 @@ describe('InlineEditSelect', () => {
     expect(document.querySelector('[data-analytics-id="role-edit"]')?.tagName).toBe('BUTTON');
   });
 
-  it('children replace the default composition (per-option analytics path)', async () => {
+  it('renders only the given children — no fallback composition exists to leak through', async () => {
     render(
       <InlineEdit defaultValue={['admin']} defaultEdit data-testid='ie'>
         <InlineEditControl>
@@ -99,43 +132,15 @@ describe('InlineEditSelect', () => {
     expect(screen.queryByText('Admin', ignoreHiddenSelectOption)).not.toBeInTheDocument();
   });
 
-  it('children compose ordinary Select parts inside the prewired root and commit through it', async () => {
-    const onCommit = vi.fn();
-    render(
-      <InlineEdit defaultValue={['editor']} defaultEdit onValueCommit={onCommit} data-testid='ie'>
-        <InlineEditControl>
-          <InlineEditSelect items={items}>
-            <SelectButton data-testid='custom-trigger' />
-            <SelectPositioner>
-              <SelectContent>
-                {items.map(item => (
-                  <SelectOption key={item.value} item={item}>
-                    <SelectOptionText>{item.label}</SelectOptionText>
-                    <SelectOptionIndicator />
-                  </SelectOption>
-                ))}
-              </SelectContent>
-            </SelectPositioner>
-          </InlineEditSelect>
-        </InlineEditControl>
-      </InlineEdit>,
-    );
-    expect(screen.getByTestId('custom-trigger')).toBeInTheDocument();
-    const option = await screen.findByText('Admin', ignoreHiddenSelectOption);
-    await userEvent.click(option);
-    // Bound-root: commit-on-close wiring lives on the root regardless of
-    // which composition (default or custom children) rendered the option.
-    expect(onCommit).toHaveBeenCalledTimes(1);
-    expect(onCommit).toHaveBeenCalledWith(['admin']);
-  });
-
   it('collection-only usage renders options from the resolved collection and commits on close', async () => {
     const onCommit = vi.fn();
     const collection = createListCollection({ items });
     render(
       <InlineEdit defaultValue={['editor']} defaultEdit onValueCommit={onCommit} data-testid='ie'>
         <InlineEditControl>
-          <InlineEditSelect collection={collection} />
+          <InlineEditSelect collection={collection}>
+            <SelectParts />
+          </InlineEditSelect>
         </InlineEditControl>
       </InlineEdit>,
     );
@@ -151,7 +156,9 @@ describe('InlineEditSelect', () => {
     render(
       <InlineEdit defaultValue={['editor']} defaultEdit data-testid='ie'>
         <InlineEditControl>
-          <InlineEditSelect items={items} collection={collection} />
+          <InlineEditSelect items={items} collection={collection}>
+            <SelectParts />
+          </InlineEditSelect>
         </InlineEditControl>
       </InlineEdit>,
     );
@@ -164,7 +171,9 @@ describe('InlineEditSelect', () => {
     render(
       <InlineEdit defaultValue={[]} defaultEdit data-testid='ie'>
         <InlineEditControl>
-          <InlineEditSelect />
+          <InlineEditSelect>
+            <SelectParts />
+          </InlineEditSelect>
         </InlineEditControl>
       </InlineEdit>,
     );
@@ -172,13 +181,28 @@ describe('InlineEditSelect', () => {
     warnSpy.mockRestore();
   });
 
-  it('derives the shared input testId slot', () => {
+  it('bridges the ambient InlineEdit testid into a bare SelectButton/SelectOption with zero extra wiring', async () => {
     render(<Harness />);
-    expect(screen.getByTestId('ie--input')).toBeInTheDocument();
+    // SelectButton calls useTestId('button', ...) itself and cascades directly
+    // off the root — InlineEditSelect only forwards a transparent useTestId()
+    // onto <Select>.
+    expect(screen.getByTestId('ie--button')).toBeInTheDocument();
+    // SelectOption cascades too, but with two twists verified against the real
+    // DOM (not asserted from the doc comment alone): (a) one level further —
+    // SelectContent's ScrollArea wrapper re-provides the cascade scoped to its
+    // own 'content' slot, so options resolve under `{base}--content--option`
+    // rather than `{base}--option`; and (b) with no per-item disambiguation —
+    // every SelectOption in the collection resolves to the identical derived
+    // testid (no index/value segment), so a 2-item collection always yields 2
+    // matches sharing one testid. Both are pre-existing `Select`-family cascade
+    // characteristics, orthogonal to this bridge — assert on the first match,
+    // in items order.
+    const options = await screen.findAllByTestId('ie--content--option');
+    expect(options[0]).toHaveTextContent('Admin');
   });
 
   describe('multiple', () => {
-    it('renders the SelectInput div trigger instead of SelectButton', async () => {
+    it('renders the SelectInput div trigger, testid supplied explicitly by the consumer', async () => {
       render(<Harness multiple />);
       const trigger = await screen.findByTestId('ie--input');
       expect(trigger.tagName).not.toBe('BUTTON');
