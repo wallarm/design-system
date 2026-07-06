@@ -219,80 +219,6 @@ export const Disabled: StoryFn<TreeViewProps> = args => (
   </div>
 );
 
-/**
- * The header is not a dedicated component — assemble it from Text + Button and
- * wire expand-all / collapse-all to the items' controlled `open` state.
- */
-export const WithHeader: StoryFn<TreeViewProps> = () => {
-  const BRANCHES = ['src', 'components'];
-  const [open, setOpen] = useState<Record<string, boolean>>({ src: true, components: true });
-  const setAll = (value: boolean) => setOpen(Object.fromEntries(BRANCHES.map(id => [id, value])));
-  const branch = (id: string) => ({
-    open: open[id],
-    onOpenChange: (v: boolean) => setOpen(s => ({ ...s, [id]: v })),
-  });
-
-  return (
-    <div className='w-320'>
-      <TreeView>
-        <div className='flex items-center gap-8 px-8 pt-8 pb-4'>
-          <Text size='xs' weight='medium' color='secondary' grow truncate>
-            Header
-          </Text>
-          <div className='flex shrink-0 items-center gap-8'>
-            <Button
-              variant='ghost'
-              color='neutral'
-              size='small'
-              aria-label='Collapse all'
-              onClick={() => setAll(false)}
-            >
-              <ChevronsDownUp size='sm' />
-            </Button>
-            <Button
-              variant='ghost'
-              color='neutral'
-              size='small'
-              aria-label='Expand all'
-              onClick={() => setAll(true)}
-            >
-              <ChevronsUpDown size='sm' />
-            </Button>
-            <Button variant='ghost' color='neutral' size='small' aria-label='Close panel'>
-              <PanelRightClose size='sm' />
-            </Button>
-          </div>
-        </div>
-
-        <TreeViewItem rightElement={<CountBadge value={2} />} {...branch('src')}>
-          <Folder />
-          src
-          <TreeViewItem {...branch('components')}>
-            <Folder />
-            components
-            <TreeViewItem>
-              <FileText />
-              Button.tsx
-            </TreeViewItem>
-            <TreeViewItem>
-              <FileText />
-              Input.tsx
-            </TreeViewItem>
-          </TreeViewItem>
-          <TreeViewItem>
-            <FileText />
-            index.ts
-          </TreeViewItem>
-        </TreeViewItem>
-        <TreeViewItem rightElement={<CountBadge value={1} />}>
-          <FileText />
-          package.json
-        </TreeViewItem>
-      </TreeView>
-    </div>
-  );
-};
-
 interface SearchNode {
   id: string;
   label: string;
@@ -300,7 +226,7 @@ interface SearchNode {
   children?: SearchNode[];
 }
 
-const SEARCH_DATA: SearchNode[] = [
+const TREE_DATA: SearchNode[] = [
   {
     id: 'src',
     label: 'src',
@@ -331,14 +257,19 @@ const SEARCH_DATA: SearchNode[] = [
   { id: 'readme', label: 'README.md', type: 'file' },
 ];
 
-/** Search filters the tree by label, keeps ancestors of matches, and auto-expands. */
-export const WithSearch: StoryFn<TreeViewProps> = () => {
+const BRANCH_IDS = ['src', 'components', 'utils'];
+
+/**
+ * The header and search are assembled from existing components (Text, Button,
+ * Input) — TreeView has no dedicated toolbar. Expand-all / collapse-all drive
+ * the items' controlled `open` state, and the search filters the tree by label
+ * (keeping ancestors of matches and auto-expanding them).
+ */
+export const WithHeaderAndSearch: StoryFn<TreeViewProps> = () => {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();
+  const [openIds, setOpenIds] = useState<Set<string>>(() => new Set(['src', 'components']));
 
-  const [openIds, setOpenIds] = useState<Set<string>>(
-    () => new Set(['src', 'components', 'utils']),
-  );
   const isOpen = (id: string) => (q ? true : openIds.has(id));
   const toggle = (id: string, v: boolean) =>
     setOpenIds(prev => {
@@ -350,6 +281,7 @@ export const WithSearch: StoryFn<TreeViewProps> = () => {
       }
       return next;
     });
+  const setAll = (open: boolean) => setOpenIds(open ? new Set(BRANCH_IDS) : new Set());
 
   const renderNode = (node: SearchNode): ReactNode => {
     const selfMatch = !q || node.label.toLowerCase().includes(q);
@@ -380,25 +312,59 @@ export const WithSearch: StoryFn<TreeViewProps> = () => {
     );
   };
 
-  const nodes = SEARCH_DATA.map(renderNode).filter(Boolean);
+  const nodes = TREE_DATA.map(renderNode).filter(Boolean);
 
   return (
     <div className='w-320'>
       <TreeView>
-        <div className='px-8 pt-8 pb-4'>
+        {/* Header — expand/collapse buttons grouped tightly, close set apart */}
+        <div className='flex items-center gap-8 px-8 pt-8 pb-4'>
+          <Text size='xs' weight='medium' color='secondary' grow truncate>
+            Header
+          </Text>
+          <div className='flex shrink-0 items-center gap-8'>
+            <div className='flex items-center gap-2'>
+              <Button
+                variant='ghost'
+                color='neutral'
+                size='small'
+                aria-label='Collapse all'
+                onClick={() => setAll(false)}
+              >
+                <ChevronsDownUp size='sm' />
+              </Button>
+              <Button
+                variant='ghost'
+                color='neutral'
+                size='small'
+                aria-label='Expand all'
+                onClick={() => setAll(true)}
+              >
+                <ChevronsUpDown size='sm' />
+              </Button>
+            </div>
+            <Button variant='ghost' color='neutral' size='small' aria-label='Close panel'>
+              <PanelRightClose size='sm' />
+            </Button>
+          </div>
+        </div>
+
+        {/* Search */}
+        <div className='px-8 pb-4'>
           <div className='relative'>
             <Search
-              size='sm'
+              size='md'
               className='pointer-events-none absolute top-1/2 left-12 -translate-y-1/2 text-text-secondary'
             />
             <Input
               placeholder='Search'
               value={query}
               onChange={e => setQuery(e.target.value)}
-              className='pl-36'
+              className='pl-40'
             />
           </div>
         </div>
+
         {nodes}
       </TreeView>
     </div>

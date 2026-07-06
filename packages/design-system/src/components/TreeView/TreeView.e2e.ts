@@ -8,8 +8,7 @@ const treeViewStory = createStoryHelper('navigation-treeview', [
   'Selectable',
   'With Inline Badge',
   'Disabled',
-  'With Header',
-  'With Search',
+  'With Header And Search',
 ] as const);
 
 const itemByText = (page: Page, text: string) =>
@@ -47,13 +46,8 @@ test.describe('Component: TreeView', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render tree with header correctly', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Header');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render tree with search correctly', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Search');
+    test('Should render tree with header and search correctly', async ({ page }) => {
+      await treeViewStory.goto(page, 'With Header And Search');
       await expect(page).toHaveScreenshot();
     });
   });
@@ -80,7 +74,7 @@ test.describe('Component: TreeView', () => {
     });
 
     test('Should collapse every branch when collapse-all is clicked', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Header');
+      await treeViewStory.goto(page, 'With Header And Search');
 
       const src = itemByText(page, 'src');
       const group = src.locator('[data-slot="tree-view-group"]').first();
@@ -91,7 +85,7 @@ test.describe('Component: TreeView', () => {
     });
 
     test('Should expand every branch when expand-all is clicked', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Header');
+      await treeViewStory.goto(page, 'With Header And Search');
 
       await page.getByRole('button', { name: 'Collapse all' }).click();
       const src = itemByText(page, 'src');
@@ -122,7 +116,7 @@ test.describe('Component: TreeView', () => {
     });
 
     test('Should filter items when typing in the search box', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Search');
+      await treeViewStory.goto(page, 'With Header And Search');
 
       const cn = page.getByRole('treeitem').filter({ hasText: 'cn.ts' });
       await expect(cn.first()).toBeVisible();
@@ -136,7 +130,7 @@ test.describe('Component: TreeView', () => {
     });
 
     test('Should show the empty state when search has no matches', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Search');
+      await treeViewStory.goto(page, 'With Header And Search');
 
       await page.getByPlaceholder('Search').fill('zzzzzz');
 
