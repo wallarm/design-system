@@ -95,14 +95,15 @@ export const Separator: FC<SeparatorProps> = ({
   orientation = 'horizontal',
   decorative = true,
   spacing,
+  className,
   ...props
 }) => (
   <div
+    {...props}
     role={decorative ? 'none' : 'separator'}
     aria-orientation={decorative ? undefined : orientation}
     data-orientation={orientation}
-    className={cn(separatorVariants({ orientation, spacing }))}
-    {...props}
+    className={cn(separatorVariants({ orientation, spacing }), className)}
   />
 );
 
