@@ -1,7 +1,10 @@
-import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { render, screen, waitFor } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
+import { InlineEditControl } from './InlineEditControl';
 import { InlineEditError } from './InlineEditError';
+import { InlineEditInput } from './InlineEditInput';
 
 describe('InlineEditError', () => {
   it('renders nothing when valid', () => {
@@ -13,21 +16,33 @@ describe('InlineEditError', () => {
     expect(screen.queryByTestId('attr--error')).toBeNull();
   });
 
-  it('renders the context error message when invalid', () => {
+  it('renders the auto-error message from a rejected commit when no children are given', async () => {
+    const onCommit = vi.fn(() => Promise.reject(new Error('An error message.')));
     render(
-      <InlineEdit defaultValue='x' status='error' error='An error message.' data-testid='attr'>
+      <InlineEdit defaultValue='x' onValueCommit={onCommit} defaultEdit data-testid='attr'>
+        <InlineEditControl>
+          <InlineEditInput />
+        </InlineEditControl>
         <InlineEditError />
       </InlineEdit>,
     );
-    expect(screen.getByTestId('attr--error')).toHaveTextContent('An error message.');
+    await userEvent.type(screen.getByTestId('attr--input'), '{Enter}');
+    await waitFor(() =>
+      expect(screen.getByTestId('attr--error')).toHaveTextContent('An error message.'),
+    );
   });
 
-  it('prefers explicit children over the context error', () => {
+  it('prefers explicit children over the auto-error message', async () => {
+    const onCommit = vi.fn(() => Promise.reject(new Error('ctx')));
     render(
-      <InlineEdit defaultValue='x' status='error' error='ctx' data-testid='attr'>
+      <InlineEdit defaultValue='x' onValueCommit={onCommit} defaultEdit data-testid='attr'>
+        <InlineEditControl>
+          <InlineEditInput />
+        </InlineEditControl>
         <InlineEditError>custom</InlineEditError>
       </InlineEdit>,
     );
-    expect(screen.getByTestId('attr--error')).toHaveTextContent('custom');
+    await userEvent.type(screen.getByTestId('attr--input'), '{Enter}');
+    await waitFor(() => expect(screen.getByTestId('attr--error')).toHaveTextContent('custom'));
   });
 });

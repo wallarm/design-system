@@ -63,7 +63,6 @@ export interface InlineEditProps<T = unknown> extends TestableProps {
   submitMode?: InlineEditSubmitMode;
   selectOnFocus?: boolean;
   status?: InlineEditStatus;
-  error?: string;
   savedDuration?: number;
   disabled?: boolean;
   readOnly?: boolean;
@@ -86,7 +85,6 @@ export function InlineEdit<T = unknown>({
   submitMode = 'both',
   selectOnFocus = true,
   status,
-  error,
   savedDuration = 2000,
   disabled = false,
   readOnly = false,
@@ -156,7 +154,7 @@ export function InlineEdit<T = unknown>({
   }, []);
 
   const resolvedStatus = status ?? autoStatus;
-  const resolvedError = error ?? autoError;
+  const resolvedError = autoError;
   const invalid = resolvedStatus === 'error' || Boolean(resolvedError);
 
   const setEditingState = useCallback(

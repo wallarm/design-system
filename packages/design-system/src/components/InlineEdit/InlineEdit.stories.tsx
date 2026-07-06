@@ -274,14 +274,13 @@ export const States: StoryFn = () => (
         defaultValue='Checkout API and ABC'
         defaultEdit
         status='error'
-        error='An error message.'
         data-testid='error'
       >
         <InlineEditPreview>Checkout API and ABC</InlineEditPreview>
         <InlineEditControl>
           <InlineEditInput />
         </InlineEditControl>
-        <InlineEditError />
+        <InlineEditError>An error message.</InlineEditError>
       </InlineEdit>
     </Row>
   </div>
