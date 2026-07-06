@@ -381,3 +381,31 @@ describe('Keyboard', () => {
     expect(onSelectionChange).toHaveBeenCalledWith(['a']);
   });
 });
+
+describe('Empty state', () => {
+  it('renders "No results" when there are no items', () => {
+    render(
+      <TreeView>
+        <div>chrome</div>
+      </TreeView>,
+    );
+
+    expect(screen.getByText('No results')).toBeInTheDocument();
+  });
+
+  it('renders "No results" when there are no children at all', () => {
+    render(<TreeView />);
+
+    expect(screen.getByText('No results')).toBeInTheDocument();
+  });
+
+  it('does not render the empty state when items exist', () => {
+    render(
+      <TreeView>
+        <TreeViewItem>Item</TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(screen.queryByText('No results')).not.toBeInTheDocument();
+  });
+});

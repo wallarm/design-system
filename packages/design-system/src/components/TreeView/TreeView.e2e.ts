@@ -134,6 +134,15 @@ test.describe('Component: TreeView', () => {
       ).toBeVisible();
       await expect(cn).toHaveCount(0);
     });
+
+    test('Should show the empty state when search has no matches', async ({ page }) => {
+      await treeViewStory.goto(page, 'With Search');
+
+      await page.getByPlaceholder('Search').fill('zzzzzz');
+
+      await expect(page.getByRole('treeitem')).toHaveCount(0);
+      await expect(page.getByText('No results')).toBeVisible();
+    });
   });
 
   test.describe('Accessibility', () => {

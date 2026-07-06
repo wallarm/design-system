@@ -399,13 +399,7 @@ export const WithSearch: StoryFn<TreeViewProps> = () => {
             />
           </div>
         </div>
-        {nodes.length > 0 ? (
-          nodes
-        ) : (
-          <Text size='xs' color='secondary' className='px-8 py-8'>
-            No results for “{query}”
-          </Text>
-        )}
+        {nodes}
       </TreeView>
     </div>
   );

@@ -1,6 +1,8 @@
 import {
+  Children,
   type FC,
   type HTMLAttributes,
+  isValidElement,
   type ReactNode,
   type Ref,
   useCallback,
@@ -10,6 +12,7 @@ import {
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { TreeDepthProvider } from '../../utils/treeDepth';
+import { Text } from '../Text';
 import { TreeViewProvider } from './TreeViewContext';
 
 /** Horizontal indentation added per nesting level, in pixels. */
@@ -75,6 +78,13 @@ export const TreeView: FC<TreeViewProps> = ({
     [selectable, multiSelect, selectedIds, toggleSelect, checkboxes],
   );
 
+  // Show the empty state whenever no items are rendered (e.g. an empty search).
+  const hasItems = Children.toArray(children).some(
+    child =>
+      isValidElement(child) &&
+      (child.type as { displayName?: string }).displayName === 'TreeViewItem',
+  );
+
   return (
     <TestIdProvider value={testId}>
       <TreeViewProvider value={contextValue}>
@@ -89,6 +99,16 @@ export const TreeView: FC<TreeViewProps> = ({
             {...props}
           >
             {children}
+            {!hasItems && (
+              <div
+                data-slot='tree-view-empty'
+                className='flex items-center justify-center px-8 py-24'
+              >
+                <Text size='sm' color='secondary'>
+                  No results
+                </Text>
+              </div>
+            )}
           </div>
         </TreeDepthProvider>
       </TreeViewProvider>
