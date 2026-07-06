@@ -100,10 +100,7 @@ export const TreeView: FC<TreeViewProps> = ({
           >
             {children}
             {!hasItems && (
-              <div
-                data-slot='tree-view-empty'
-                className='flex items-center justify-center px-8 py-24'
-              >
+              <div data-slot='tree-view-empty' className='flex h-32 items-center justify-center'>
                 <Text size='sm' color='secondary'>
                   No results
                 </Text>
