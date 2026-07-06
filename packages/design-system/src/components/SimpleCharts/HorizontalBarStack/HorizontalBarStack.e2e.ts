@@ -1,17 +1,16 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const story = createStoryHelper('data-display-simplecharts-horizontalbar', [
+const story = createStoryHelper('data-display-simplecharts-horizontalbarstack', [
   'Default',
   'No Delta',
   'No Value',
   'With Remainder',
   'Legend Off',
   'Palette',
-  'Empty',
 ] as const);
 
-test.describe('HorizontalBar', () => {
+test.describe('HorizontalBarStack', () => {
   test.describe('Screenshots', () => {
     test('Default', async ({ page }) => {
       await story.goto(page, 'Default');
@@ -27,27 +26,22 @@ test.describe('HorizontalBar', () => {
       await story.goto(page, 'Legend Off');
       await expect(page).toHaveScreenshot();
     });
-
-    test('Empty', async ({ page }) => {
-      await story.goto(page, 'Empty');
-      await expect(page).toHaveScreenshot();
-    });
   });
 
   test.describe('Accessibility', () => {
     test('legend mirrors the bar; bar is aria-hidden by default', async ({ page }) => {
       await story.goto(page, 'Default');
-      const bar = page.getByTestId('horizontal-bar--bar');
+      const bar = page.getByTestId('horizontal-bar-stack--bar');
       await expect(bar).toHaveAttribute('aria-hidden', 'true');
-      await expect(page.getByTestId('horizontal-bar--legend-item')).toHaveCount(3);
+      await expect(page.getByTestId('horizontal-bar-stack--legend-item')).toHaveCount(3);
     });
 
     test('bar is a named image (role + aria-label) when the legend is hidden', async ({ page }) => {
       await story.goto(page, 'Legend Off');
-      const bar = page.getByTestId('horizontal-bar--bar');
+      const bar = page.getByTestId('horizontal-bar-stack--bar');
       await expect(bar).toHaveRole('img');
       await expect(bar).toHaveAttribute('aria-label', /Critical 42/);
-      await expect(page.getByTestId('horizontal-bar--legend')).toHaveCount(0);
+      await expect(page.getByTestId('horizontal-bar-stack--legend')).toHaveCount(0);
     });
   });
 });

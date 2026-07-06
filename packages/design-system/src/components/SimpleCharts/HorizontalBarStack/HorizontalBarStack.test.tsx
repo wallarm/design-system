@@ -1,13 +1,13 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Chart } from '../Chart';
-import { HorizontalBar } from './HorizontalBar';
+import { HorizontalBarStack } from './HorizontalBarStack';
 import { resolveSegments } from './lib/resolveSegments';
 
-describe('HorizontalBar — root', () => {
+describe('HorizontalBarStack — root', () => {
   it('renders the root with data-slot and forwards data-testid + extra props', () => {
     render(
-      <HorizontalBar
+      <HorizontalBarStack
         data-testid='hb'
         data={[{ name: 'A', value: 1 }]}
         aria-label='distribution'
@@ -15,21 +15,21 @@ describe('HorizontalBar — root', () => {
       />,
     );
     const root = screen.getByTestId('hb');
-    expect(root).toHaveAttribute('data-slot', 'horizontal-bar');
+    expect(root).toHaveAttribute('data-slot', 'horizontal-bar-stack');
     expect(root).toHaveAttribute('aria-label', 'distribution');
     expect(root).toHaveClass('custom-class');
   });
 
   it('keeps the DOM clean when no data-testid is passed', () => {
-    const { container } = render(<HorizontalBar data={[{ name: 'A', value: 1 }]} />);
+    const { container } = render(<HorizontalBarStack data={[{ name: 'A', value: 1 }]} />);
     expect(container.querySelector('[data-testid]')).toBeNull();
   });
 });
 
-describe('HorizontalBar — testid cascade', () => {
+describe('HorizontalBarStack — testid cascade', () => {
   it('derives slot testids ({base}--{slot}) from its own data-testid', () => {
     render(
-      <HorizontalBar
+      <HorizontalBarStack
         data-testid='hb'
         data={[
           { name: 'A', value: 1 },
@@ -50,7 +50,7 @@ describe('HorizontalBar — testid cascade', () => {
   it('does not adopt a parent TestIdProvider base for its own slots', () => {
     render(
       <Chart data-testid='card'>
-        <HorizontalBar data-testid='hb' data={[{ name: 'A', value: 1 }]} value={5} />
+        <HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1 }]} value={5} />
       </Chart>,
     );
     expect(screen.queryByTestId('card--bar')).toBeNull();
@@ -62,7 +62,7 @@ describe('HorizontalBar — testid cascade', () => {
   it('renders no slot testids inside a parent provider when it has no data-testid itself', () => {
     render(
       <Chart data-testid='card'>
-        <HorizontalBar data={[{ name: 'A', value: 1 }]} value={5} />
+        <HorizontalBarStack data={[{ name: 'A', value: 1 }]} value={5} />
       </Chart>,
     );
     expect(screen.queryByTestId('card--bar')).toBeNull();
@@ -104,19 +104,19 @@ describe('resolveSegments', () => {
   });
 });
 
-describe('HorizontalBar — header', () => {
+describe('HorizontalBarStack — header', () => {
   it('renders the value with locale formatting', () => {
-    render(<HorizontalBar data-testid='hb' data={[{ name: 'A', value: 1 }]} value={12345} />);
+    render(<HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1 }]} value={12345} />);
     expect(screen.getByTestId('hb--value')).toHaveTextContent('12,345');
   });
 
   it('renders no header when both value and delta are absent', () => {
-    render(<HorizontalBar data-testid='hb' data={[{ name: 'A', value: 1 }]} />);
+    render(<HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1 }]} />);
     expect(screen.queryByTestId('hb--header')).toBeNull();
   });
 
   it('renders the delta badge as a named image announcing direction and absolute value', () => {
-    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} delta={{ value: 10 }} />);
+    render(<HorizontalBarStack data={[{ name: 'A', value: 1 }]} delta={{ value: 10 }} />);
     // role='img' is required for the accessible name: aria-label alone is
     // ignored on Badge's generic role-less <div>.
     const badge = screen.getByRole('img', { name: 'up 10' });
@@ -124,21 +124,21 @@ describe('HorizontalBar — header', () => {
   });
 
   it('uses trend for direction over sign; shows the absolute number', () => {
-    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} delta={{ value: 5, trend: 'down' }} />);
+    render(<HorizontalBarStack data={[{ name: 'A', value: 1 }]} delta={{ value: 5, trend: 'down' }} />);
     expect(screen.getByRole('img', { name: 'down 5' })).toBeInTheDocument();
   });
 
   it('locale-formats the delta accessible name to match the visible text', () => {
-    render(<HorizontalBar data={[{ name: 'A', value: 1 }]} delta={{ value: 1234 }} />);
+    render(<HorizontalBarStack data={[{ name: 'A', value: 1 }]} delta={{ value: 1234 }} />);
     const badge = screen.getByRole('img', { name: 'up 1,234' });
     expect(badge).toHaveTextContent('1,234');
   });
 });
 
-describe('HorizontalBar — bar rendering', () => {
+describe('HorizontalBarStack — bar rendering', () => {
   it('renders one segment per datum with matching data-name and resolved color', () => {
     render(
-      <HorizontalBar
+      <HorizontalBarStack
         data-testid='hb'
         data={[
           { name: 'Critical', value: 5, color: 'red' },
@@ -154,7 +154,7 @@ describe('HorizontalBar — bar rendering', () => {
   });
 
   it('renders a remainder segment (no data-name) with the token class, not an inline color', () => {
-    render(<HorizontalBar data-testid='hb' data={[{ name: 'A', value: 3 }]} total={10} />);
+    render(<HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 3 }]} total={10} />);
     const segs = screen.getAllByTestId('hb--segment');
     const remainder = segs.find(s => s.dataset.remainder === 'true');
     expect(remainder).toBeDefined();
@@ -165,7 +165,7 @@ describe('HorizontalBar — bar rendering', () => {
 
   it('lets a datum className win over the inline color', () => {
     render(
-      <HorizontalBar data-testid='hb' data={[{ name: 'A', value: 1, className: 'bg-sky-500' }]} />,
+      <HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1, className: 'bg-sky-500' }]} />,
     );
     const seg = screen.getByTestId('hb--segment');
     expect(seg).toHaveClass('bg-sky-500');
@@ -174,7 +174,7 @@ describe('HorizontalBar — bar rendering', () => {
 
   it('renders header-only (no bar, no legend) when data is empty but value/delta are present', () => {
     render(
-      <HorizontalBar data-testid='hb' data={[]} value={91} delta={{ value: 10, trend: 'up' }} />,
+      <HorizontalBarStack data-testid='hb' data={[]} value={91} delta={{ value: 10, trend: 'up' }} />,
     );
     expect(screen.queryByTestId('hb--bar')).toBeNull();
     expect(screen.queryByTestId('hb--legend')).toBeNull();
@@ -183,27 +183,27 @@ describe('HorizontalBar — bar rendering', () => {
   });
 
   it('renders no bar when data is empty even if total is set (no labels → no bar)', () => {
-    render(<HorizontalBar data-testid='hb' data={[]} value={91} total={120} />);
+    render(<HorizontalBarStack data-testid='hb' data={[]} value={91} total={120} />);
     expect(screen.queryByTestId('hb--bar')).toBeNull();
     expect(screen.queryByTestId('hb--segment')).toBeNull();
   });
 
   it('renders only the root wrapper when data is empty and no value/delta', () => {
-    render(<HorizontalBar data-testid='hb' data={[]} />);
+    render(<HorizontalBarStack data-testid='hb' data={[]} />);
     expect(screen.queryByTestId('hb--header')).toBeNull();
     expect(screen.queryByTestId('hb--bar')).toBeNull();
     expect(screen.queryByTestId('hb--legend')).toBeNull();
   });
 });
 
-describe('HorizontalBar — legend', () => {
+describe('HorizontalBarStack — legend', () => {
   const data = [
     { name: 'Critical', value: 5, color: 'red' as const },
     { name: 'High', value: 3, color: 'amber' as const },
   ];
 
   it('renders one legend item per datum with a color-matched dot', () => {
-    render(<HorizontalBar data-testid='hb' data={data} total={10} />);
+    render(<HorizontalBarStack data-testid='hb' data={data} total={10} />);
     const items = screen.getAllByTestId('hb--legend-item');
     expect(items).toHaveLength(2); // remainder excluded
     expect(items[0]).toHaveTextContent('Critical');
@@ -212,25 +212,25 @@ describe('HorizontalBar — legend', () => {
   });
 
   it('hides the legend when legend={false} and exposes the bar as a named image', () => {
-    render(<HorizontalBar data-testid='hb' data={data} legend={false} />);
+    render(<HorizontalBarStack data-testid='hb' data={data} legend={false} />);
     expect(screen.queryByTestId('hb--legend')).toBeNull();
     const bar = screen.getByRole('img', { name: 'Critical 5, High 3' });
     expect(bar).toBe(screen.getByTestId('hb--bar'));
   });
 
   it('locale-formats segment values in the bar summary', () => {
-    render(<HorizontalBar data={[{ name: 'Requests', value: 12345 }]} legend={false} />);
+    render(<HorizontalBarStack data={[{ name: 'Requests', value: 12345 }]} legend={false} />);
     expect(screen.getByRole('img', { name: 'Requests 12,345' })).toBeInTheDocument();
   });
 
   it('renders no bar at all when data is empty (even with legend={false})', () => {
-    render(<HorizontalBar data-testid='hb' data={[]} legend={false} />);
+    render(<HorizontalBarStack data-testid='hb' data={[]} legend={false} />);
     expect(screen.queryByTestId('hb--bar')).toBeNull();
     expect(screen.queryByRole('img')).toBeNull();
   });
 
   it('is aria-hidden with no role or aria-label when the legend is shown (default)', () => {
-    render(<HorizontalBar data-testid='hb' data={data} />);
+    render(<HorizontalBarStack data-testid='hb' data={data} />);
     const bar = screen.getByTestId('hb--bar');
     expect(bar).toHaveAttribute('aria-hidden', 'true');
     expect(bar).not.toHaveAttribute('aria-label');
@@ -238,7 +238,7 @@ describe('HorizontalBar — legend', () => {
   });
 });
 
-describe('HorizontalBar — duplicate name warning', () => {
+describe('HorizontalBarStack — duplicate name warning', () => {
   it('warns once in dev when data contains duplicate names', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     // Duplicate `name`s also produce duplicate React keys (by design — `name` is the key),
@@ -247,7 +247,7 @@ describe('HorizontalBar — duplicate name warning', () => {
     // the component's own duplicate-name warning.
     const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     render(
-      <HorizontalBar
+      <HorizontalBarStack
         data={[
           { name: 'A', value: 1 },
           { name: 'A', value: 2 },
@@ -255,7 +255,7 @@ describe('HorizontalBar — duplicate name warning', () => {
       />,
     );
     expect(warnSpy).toHaveBeenCalledTimes(1);
-    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('[HorizontalBar]'));
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('[HorizontalBarStack]'));
     warnSpy.mockRestore();
     errorSpy.mockRestore();
   });
@@ -263,7 +263,7 @@ describe('HorizontalBar — duplicate name warning', () => {
   it('does not warn when names are unique', () => {
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(
-      <HorizontalBar
+      <HorizontalBarStack
         data={[
           { name: 'A', value: 1 },
           { name: 'B', value: 2 },
