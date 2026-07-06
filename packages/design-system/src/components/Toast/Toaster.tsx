@@ -50,9 +50,11 @@ export const Toaster: FC = () => {
       <ArkToaster
         toaster={arkToasterInstance as CreateToasterReturn}
         className={cn(
-          'fixed bottom-0 right-0 !z-[50] flex flex-col gap-12 p-24',
-          // Group styles
-          '[&_[data-scope=toast][data-part=group]]:flex [&_[data-scope=toast][data-part=group]]:flex-col [&_[data-scope=toast][data-part=group]]:gap-12 [&_[data-scope=toast][data-part=group]]:max-w-[560px] [&_[data-scope=toast][data-part=group]]:mx-auto',
+          // The region IS the hover/pause zone. Clamp it to the max toast width and
+          // center it so pausing tracks the toast column, not the full viewport width.
+          // (These were previously on a `[data-part=group]` descendant selector that
+          // never matched — the region element itself carries data-part="group".)
+          'fixed bottom-0 right-0 !z-[50] flex flex-col gap-12 p-24 max-w-[560px] mx-auto',
           // Root styles with CSS variables for animations
           '[&_[data-scope=toast][data-part=root]]:[translate:var(--x)_var(--y)] [&_[data-scope=toast][data-part=root]]:scale-[var(--scale)] [&_[data-scope=toast][data-part=root]]:z-[var(--z-index)] [&_[data-scope=toast][data-part=root]]:h-[var(--height)] [&_[data-scope=toast][data-part=root]]:opacity-[var(--opacity)] [&_[data-scope=toast][data-part=root]]:[will-change:translate,opacity,scale]',
           // Match Drawer/Dialog timings: 300ms open, 150ms close
