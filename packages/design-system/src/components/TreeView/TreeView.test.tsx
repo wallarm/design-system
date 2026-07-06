@@ -146,6 +146,30 @@ describe('data-testid', () => {
   });
 });
 
+describe('Analytics-readiness', () => {
+  it('forwards arbitrary data-* attributes to the treeitem root', () => {
+    render(
+      <TreeView>
+        <TreeViewItem data-analytics-id='node-1'>Item</TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(screen.getByRole('treeitem')).toHaveAttribute('data-analytics-id', 'node-1');
+  });
+
+  it('calls the consumer onClick', async () => {
+    const onClick = vi.fn();
+    render(
+      <TreeView>
+        <TreeViewItem onClick={onClick}>Item</TreeViewItem>
+      </TreeView>,
+    );
+
+    await userEvent.click(screen.getByText('Item'));
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+});
+
 describe('Expand / collapse', () => {
   it('hides the group when closed', () => {
     const { container } = render(
@@ -261,6 +285,23 @@ describe('Selection', () => {
     await userEvent.click(screen.getByText('Beta'));
 
     expect(onSelectionChange).toHaveBeenLastCalledWith(['a', 'b']);
+  });
+
+  it('does not select the row when the toggle is clicked', async () => {
+    const onSelectionChange = vi.fn();
+    const { container } = render(
+      <TreeView selectable onSelectionChange={onSelectionChange}>
+        <TreeViewItem id='a'>
+          Branch
+          <TreeViewItem id='child'>Child</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLElement;
+    await userEvent.click(toggle);
+
+    expect(onSelectionChange).not.toHaveBeenCalled();
   });
 });
 

@@ -118,8 +118,18 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
     [isControlled, onOpenChange],
   );
 
+  // Primary row action: select when selectable, otherwise toggle a branch open.
+  const activate = useCallback(() => {
+    if (selectable && id !== undefined) {
+      toggleSelect(id);
+    } else if (isBranch) {
+      setOpen(!isOpen);
+    }
+  }, [selectable, id, toggleSelect, isBranch, isOpen, setOpen]);
+
   const handleToggle = useCallback(
     (event: MouseEvent) => {
+      // Keep the row's own click (select / toggle) from also firing.
       event.stopPropagation();
       setOpen(!isOpen);
     },
@@ -128,25 +138,17 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
 
   const handleRowClick = useCallback(
     (event: MouseEvent<HTMLDivElement>) => {
-      onClick?.(event as MouseEvent<HTMLDivElement>);
-      if (selectable && id !== undefined) {
-        toggleSelect(id);
-      } else if (isBranch) {
-        setOpen(!isOpen);
-      }
+      onClick?.(event);
+      activate();
     },
-    [onClick, selectable, id, toggleSelect, isBranch, isOpen, setOpen],
+    [onClick, activate],
   );
 
   const handleRowKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
-        if (selectable && id !== undefined) {
-          toggleSelect(id);
-        } else if (isBranch) {
-          setOpen(!isOpen);
-        }
+        activate();
       } else if (isBranch && event.key === 'ArrowRight' && !isOpen) {
         event.preventDefault();
         setOpen(true);
@@ -155,7 +157,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
         setOpen(false);
       }
     },
-    [selectable, id, toggleSelect, isBranch, isOpen, setOpen],
+    [activate, isBranch, isOpen, setOpen],
   );
 
   const paddingLeft = depth * TREE_VIEW_INDENT_STEP;
