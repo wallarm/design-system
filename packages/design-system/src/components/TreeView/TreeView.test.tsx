@@ -3,7 +3,6 @@ import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { TreeView } from './TreeView';
 import { TreeViewItem } from './TreeViewItem';
-import { TreeViewToolbar } from './TreeViewToolbar';
 
 describe('Node rendering', () => {
   it('renders leaf and branch items', () => {
@@ -380,33 +379,5 @@ describe('Keyboard', () => {
     await userEvent.keyboard('{Enter}');
 
     expect(onSelectionChange).toHaveBeenCalledWith(['a']);
-  });
-});
-
-describe('Toolbar', () => {
-  it('renders the title and action buttons', async () => {
-    const onExpandAll = vi.fn();
-    const onCollapseAll = vi.fn();
-    const onClose = vi.fn();
-    render(
-      <TreeView>
-        <TreeViewToolbar
-          title='Header'
-          onExpandAll={onExpandAll}
-          onCollapseAll={onCollapseAll}
-          onClose={onClose}
-        />
-        <TreeViewItem>Item</TreeViewItem>
-      </TreeView>,
-    );
-
-    expect(screen.getByText('Header')).toBeInTheDocument();
-    await userEvent.click(screen.getByRole('button', { name: 'Expand all' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Collapse all' }));
-    await userEvent.click(screen.getByRole('button', { name: 'Close' }));
-
-    expect(onExpandAll).toHaveBeenCalledOnce();
-    expect(onCollapseAll).toHaveBeenCalledOnce();
-    expect(onClose).toHaveBeenCalledOnce();
   });
 });

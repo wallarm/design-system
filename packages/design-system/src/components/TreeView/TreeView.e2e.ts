@@ -8,7 +8,8 @@ const treeViewStory = createStoryHelper('navigation-treeview', [
   'Selectable',
   'With Inline Badge',
   'Disabled',
-  'With Toolbar',
+  'With Header',
+  'With Search',
 ] as const);
 
 const itemByText = (page: Page, text: string) =>
@@ -46,8 +47,13 @@ test.describe('Component: TreeView', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render tree with toolbar correctly', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Toolbar');
+    test('Should render tree with header correctly', async ({ page }) => {
+      await treeViewStory.goto(page, 'With Header');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render tree with search correctly', async ({ page }) => {
+      await treeViewStory.goto(page, 'With Search');
       await expect(page).toHaveScreenshot();
     });
   });
@@ -74,7 +80,7 @@ test.describe('Component: TreeView', () => {
     });
 
     test('Should collapse every branch when collapse-all is clicked', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Toolbar');
+      await treeViewStory.goto(page, 'With Header');
 
       const src = itemByText(page, 'src');
       const group = src.locator('[data-slot="tree-view-group"]').first();
@@ -85,7 +91,7 @@ test.describe('Component: TreeView', () => {
     });
 
     test('Should expand every branch when expand-all is clicked', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Toolbar');
+      await treeViewStory.goto(page, 'With Header');
 
       await page.getByRole('button', { name: 'Collapse all' }).click();
       const src = itemByText(page, 'src');
@@ -113,6 +119,20 @@ test.describe('Component: TreeView', () => {
       await expect(checkbox).not.toBeChecked();
       await checkbox.click();
       await expect(checkbox).toBeChecked();
+    });
+
+    test('Should filter items when typing in the search box', async ({ page }) => {
+      await treeViewStory.goto(page, 'With Search');
+
+      const cn = page.getByRole('treeitem').filter({ hasText: 'cn.ts' });
+      await expect(cn.first()).toBeVisible();
+
+      await page.getByPlaceholder('Search').fill('Button');
+
+      await expect(
+        page.getByRole('treeitem').filter({ hasText: 'Button.tsx' }).first(),
+      ).toBeVisible();
+      await expect(cn).toHaveCount(0);
     });
   });
 

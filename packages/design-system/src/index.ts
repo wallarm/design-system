@@ -667,8 +667,6 @@ export {
   TreeViewItem,
   type TreeViewItemProps,
   type TreeViewProps,
-  TreeViewToolbar,
-  type TreeViewToolbarProps,
 } from './components/TreeView';
 export { UtilityPage, type UtilityPageProps } from './components/UtilityPage';
 export {
