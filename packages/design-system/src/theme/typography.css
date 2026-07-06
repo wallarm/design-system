@@ -1,15 +1,15 @@
 @theme {
-    /* non.geist v2 registers 'Geist-Variable' / 'GeistMono-Variable' (hyphenated);
-       the space-separated names are kept for non.geist v1 consumers and local installs */
+    /* Geist variable fonts are self-hosted — see fonts/geist.css.
+       'Geist-Variable' / 'GeistMono-Variable' are the @font-face family names. */
     --font-sans:
-        'Geist-Variable', 'Geist Variable', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+        'Geist-Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --font-sans-display:
-        'Geist-Variable', 'Geist Variable', ui-sans-serif, system-ui, sans-serif,
-        'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+        'Geist-Variable', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+        'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
     --font-mono:
-        'GeistMono-Variable', 'Geist Mono Variable', ui-monospace, SFMono-Regular, Menlo,
-        Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+        'GeistMono-Variable', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+        'Liberation Mono', 'Courier New', monospace;
     --font-pixel: 'Geist Pixel', ui-sans-serif, system-ui, sans-serif;
     --font-serif: 'Inter', ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 

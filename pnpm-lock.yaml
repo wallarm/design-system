@@ -42,9 +42,6 @@ catalogs:
     '@vitest/coverage-v8':
       specifier: 4.0.18
       version: 4.0.18
-    non.geist:
-      specifier: 2.0.1
-      version: 2.0.1
     react:
       specifier: 19.2.4
       version: 19.2.4
@@ -146,9 +143,6 @@ importers:
       '@wallarm-org/design-system':
         specifier: workspace:*
         version: link:../../packages/design-system
-      non.geist:
-        specifier: 'catalog:'
-        version: 2.0.1
       react:
         specifier: 'catalog:'
         version: 19.2.4
@@ -448,9 +442,6 @@ importers:
       lodash-es:
         specifier: 4.17.23
         version: 4.17.23
-      non.geist:
-        specifier: 'catalog:'
-        version: 2.0.1
       postcss:
         specifier: 8.5.6
         version: 8.5.6
@@ -4777,9 +4768,6 @@ packages:
 
   node-releases@2.0.27:
     resolution: {integrity: sha512-nmh3lCkYZ3grZvqcCH+fjmQ7X+H0OeZgP40OierEaAptX4XofMh5kwNbWh7lBduUzCcV/8kZ+NDLCwm2iorIlA==}
-
-  non.geist@2.0.1:
-    resolution: {integrity: sha512-hCl7GMAbrEcxTTxVA7tJfqRuFkvLmqQKoKxyOiIFjaoWG7ZZu5TrZN7GqNJ83QLPDZgwqINnJVhRKVwb/Sz1JA==}
 
   normalize-package-data@6.0.2:
     resolution: {integrity: sha512-V6gygoYb/5EmNI+MEGrWkC+e6+Rr7mTmfHrxDbLzxQogBkgzo76rkok0Am6thgSF7Mv2nLOajAJj5vDJZEFn7g==}
@@ -11372,8 +11360,6 @@ snapshots:
       skin-tone: 2.0.0
 
   node-releases@2.0.27: {}
-
-  non.geist@2.0.1: {}
 
   normalize-package-data@6.0.2:
     dependencies:

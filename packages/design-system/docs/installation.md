@@ -30,13 +30,13 @@ The library requires the following packages:
 
 ```bash
 # npm
-npm install react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0 non.geist@^2.0.0
+npm install react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0
 
 # yarn
-yarn add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0 non.geist@^2.0.0
+yarn add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0
 
 # pnpm
-pnpm add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0 non.geist@^2.0.0
+pnpm add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0
 ```
 
 ⚠️ **Important**: All peer dependencies are required for the library to work correctly:
@@ -44,7 +44,6 @@ pnpm add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.
 - `react` and `react-dom` - foundation for React components
 - `tailwindcss` - styling system
 - `tw-animate-css` - animations
-- `non.geist` - Geist font
 
 ## ⚙️ Project Setup
 
@@ -56,8 +55,6 @@ Create a CSS file for your application:
 /* App.css */
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'non.geist';
-@import 'non.geist/mono';
 @import '@wallarm-org/design-system/theme';
 ```
 
@@ -110,9 +107,8 @@ export const App = () => {
 
 **Solution**:
 
-1. Check that `non.geist` package is installed
-2. Font files `non.geist` and `non.geist/mono` are imported
-3. Check Network tab in DevTools
+1. Ensure `@wallarm-org/design-system/theme` is imported — the Geist fonts are bundled with it
+2. Check the Network tab in DevTools for the bundled Geist font requests
 
 ## 📚 Additional Configuration
 

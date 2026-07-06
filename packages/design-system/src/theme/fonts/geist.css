@@ -1,0 +1,21 @@
+/* Self-hosted Geist variable fonts (sans + mono).
+   Previously loaded via the `non.geist` npm package, which the design system
+   relied on consumers importing themselves — a v1→v2 family-name rename in that
+   package meant the webfont silently stopped matching for end users. Shipping the
+   variable woff2 files here (same pattern as geist-pixel.css) makes the design
+   system self-contained: the font travels with the tokens, no consumer setup. */
+@font-face {
+    font-family: 'Geist-Variable';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('./Geist-Variable.woff2') format('woff2');
+}
+
+@font-face {
+    font-family: 'GeistMono-Variable';
+    font-style: normal;
+    font-weight: 100 900;
+    font-display: swap;
+    src: url('./GeistMono-Variable.woff2') format('woff2');
+}

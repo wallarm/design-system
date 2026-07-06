@@ -1,7 +1,5 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'non.geist';
-@import 'non.geist/mono';
 @import '@wallarm-org/design-system/theme';
 
 body {
