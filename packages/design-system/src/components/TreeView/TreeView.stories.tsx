@@ -90,6 +90,42 @@ export const Selectable: StoryFn<TreeViewProps> = () => {
   );
 };
 
+export const WithInlineBadge: StoryFn<TreeViewProps> = args => (
+  <div className='w-320'>
+    <TreeView {...args}>
+      <TreeViewItem icon={<Folder />} label='Endpoints' defaultOpen>
+        <TreeViewItem
+          icon={<FileText />}
+          startContent={
+            <Badge color='slate' size='small'>
+              new
+            </Badge>
+          }
+          label='/users'
+        />
+        <TreeViewItem
+          icon={<FileText />}
+          startContent={
+            <Badge color='green' type='secondary' size='small' textVariant='code'>
+              GET
+            </Badge>
+          }
+          label='/orders'
+        />
+      </TreeViewItem>
+      <TreeViewItem
+        icon={<FileText />}
+        startContent={
+          <Badge color='amber' size='small'>
+            wip
+          </Badge>
+        }
+        label='/health'
+      />
+    </TreeView>
+  </div>
+);
+
 export const Disabled: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView selectable {...args}>

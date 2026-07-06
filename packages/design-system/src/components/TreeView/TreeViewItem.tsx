@@ -32,6 +32,8 @@ export interface TreeViewItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   label?: ReactNode;
   /** Leading type icon (e.g. `<Folder />`, `<FileText />`). */
   icon?: ReactNode;
+  /** Content rendered between the icon and the label (e.g. a status badge). */
+  startContent?: ReactNode;
   /** Force branch behaviour (show a toggle) even without rendered children. */
   expandable?: boolean;
   /** Controlled open state. */
@@ -59,6 +61,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   children,
   label,
   icon,
+  startContent,
   expandable,
   open: controlledOpen,
   defaultOpen = false,
@@ -213,6 +216,12 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
           {icon && (
             <span className='flex shrink-0 items-center text-text-secondary [&_svg]:icon-xs'>
               {icon}
+            </span>
+          )}
+
+          {startContent && (
+            <span className='flex shrink-0 items-center' data-slot='tree-view-start'>
+              {startContent}
             </span>
           )}
 

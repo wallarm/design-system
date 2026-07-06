@@ -31,6 +31,27 @@ describe('Node rendering', () => {
     expect(screen.getByText('5')).toBeInTheDocument();
   });
 
+  it('renders startContent between the icon and the label', () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem
+          icon={<span data-testid='icon' />}
+          startContent={<span data-testid='badge'>new</span>}
+          label='Endpoint'
+        />
+      </TreeView>,
+    );
+
+    const start = container.querySelector('[data-slot="tree-view-start"]');
+    expect(start).toBeInTheDocument();
+    expect(screen.getByTestId('badge')).toHaveTextContent('new');
+    // startContent sits before the label text in DOM order
+    expect(
+      start?.compareDocumentPosition(screen.getByText('Endpoint')) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+
   it('renders custom label content (left slot)', () => {
     render(
       <TreeView>
