@@ -2,7 +2,15 @@ import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const inlineEditStory = createStoryHelper('data-display-inlineedit', [
-  'Gallery',
+  'Text Editor',
+  'Number Editor',
+  'Textarea Editor',
+  'Select Editor',
+  'Multi Select Editor',
+  'Tags Editor',
+  'Date Editor',
+  'Time Editor',
+  'Date Time Editor',
   'States',
   'Async',
   'Non Editable',
@@ -12,20 +20,60 @@ const inlineEditStory = createStoryHelper('data-display-inlineedit', [
 
 test.describe('Component: InlineEdit', () => {
   test.describe('Visual', () => {
-    test('Should render the editor gallery correctly', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+    test('Should render the text editor correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Text Editor');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the number editor correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Number Editor');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the textarea editor correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Textarea Editor');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the select editor correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Select Editor');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the multi-select editor correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Multi Select Editor');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the tags editor correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Tags Editor');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the date editor correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Date Editor');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the time editor correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Time Editor');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render the date-time editor correctly', async ({ page }) => {
+      await inlineEditStory.goto(page, 'Date Time Editor');
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
     test('Should render hover affordance with tooltip correctly', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Text Editor');
       await page.getByTestId('text--preview').hover();
       await expect(page.getByTestId('text--content')).toHaveText('Edit');
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
     test('Should render the editing state correctly', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Text Editor');
       await page.getByTestId('text--preview').click();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
@@ -53,7 +101,7 @@ test.describe('Component: InlineEdit', () => {
 
   test.describe('Interactions', () => {
     test('Should enter edit mode and commit on Enter', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Text Editor');
       await page.getByTestId('text--preview').click();
       const input = page.getByTestId('text--input');
       await expect(input).toBeFocused();
@@ -63,7 +111,7 @@ test.describe('Component: InlineEdit', () => {
     });
 
     test('Should revert on Escape', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Text Editor');
       await page.getByTestId('text--preview').click();
       const input = page.getByTestId('text--input');
       await input.fill('Discarded');
@@ -72,7 +120,7 @@ test.describe('Component: InlineEdit', () => {
     });
 
     test('Should commit on blur', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Text Editor');
       await page.getByTestId('text--preview').click();
       const input = page.getByTestId('text--input');
       await input.fill('Blurred API');
@@ -100,14 +148,14 @@ test.describe('Component: InlineEdit', () => {
     });
 
     test('Should commit a select pick when the dropdown closes', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Select Editor');
       await page.getByTestId('select--preview').click();
       await page.getByRole('option', { name: 'Admin' }).click();
       await expect(page.getByTestId('select--preview')).toHaveText(/Admin/);
     });
 
     test('Should commit a date pick when the calendar closes', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Date Editor');
       await page.getByTestId('date--preview').click();
       await page.locator('[data-part="table-cell-trigger"]', { hasText: /^20$/ }).first().click();
       await page.mouse.click(5, 5);
@@ -115,7 +163,7 @@ test.describe('Component: InlineEdit', () => {
     });
 
     test('Should commit a time edit when the date-time popover closes', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Date Time Editor');
       const preview = page.getByTestId('datetime--preview');
       await expect(preview).toHaveText(/2:30 PM/);
       await preview.click();
@@ -127,7 +175,7 @@ test.describe('Component: InlineEdit', () => {
     });
 
     test('Should keep the time when a day is picked from the date-time grid', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Date Time Editor');
       const preview = page.getByTestId('datetime--preview');
       await preview.click();
       await page.locator('[data-part="table-cell-trigger"]', { hasText: /^20$/ }).first().click();
@@ -136,12 +184,12 @@ test.describe('Component: InlineEdit', () => {
     });
 
     test('Should commit a time edit on blur', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Time Editor');
       await page.getByTestId('time--preview').click();
       const hour = page.getByRole('spinbutton', { name: 'hour' }).first();
       await hour.click();
       await page.keyboard.type('9');
-      await page.getByTestId('text--preview').click(); // blur out
+      await page.mouse.click(5, 5); // blur out — no sibling editor on this isolated page
       await expect(page.getByTestId('time--preview')).toHaveText(/9:30/);
     });
 
@@ -217,7 +265,7 @@ test.describe('Component: InlineEdit', () => {
 
   test.describe('Accessibility', () => {
     test('Should enter edit via keyboard activation', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Text Editor');
       const preview = page.getByTestId('text--preview');
       await preview.focus();
       await preview.press('Enter');
@@ -225,14 +273,14 @@ test.describe('Component: InlineEdit', () => {
     });
 
     test('Should cancel edit via Escape', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Text Editor');
       await page.getByTestId('text--preview').click();
       await page.getByTestId('text--input').press('Escape');
       await expect(page.getByTestId('text--preview')).toBeVisible();
     });
 
     test('Should reach the preview in tab order and expose the editor name', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Gallery');
+      await inlineEditStory.goto(page, 'Text Editor');
       await page.keyboard.press('Tab');
       await expect(page.getByTestId('text--preview')).toBeFocused();
       await page.keyboard.press('Enter');
