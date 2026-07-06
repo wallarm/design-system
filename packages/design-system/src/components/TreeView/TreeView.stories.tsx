@@ -349,8 +349,8 @@ export const WithHeaderAndSearch: StoryFn<TreeViewProps> = () => {
           </div>
         </div>
 
-        {/* Search */}
-        <div className='px-8 pb-4'>
+        {/* Search — full width, aligned with the items' selection highlight */}
+        <div className='pb-4'>
           <div className='relative'>
             <Search
               size='md'
