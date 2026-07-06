@@ -71,10 +71,10 @@ export const Basic: StoryFn<TreeViewProps> = args => (
 export const Nested: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
-      <TreeViewItem defaultOpen rightElement={<CountBadge value={4} />}>
+      <TreeViewItem defaultOpen>
         <Folder />
         src
-        <TreeViewItem defaultOpen rightElement={<CountBadge value={2} />}>
+        <TreeViewItem defaultOpen>
           <Folder />
           components
           <TreeViewItem defaultOpen>
@@ -95,7 +95,7 @@ export const Nested: StoryFn<TreeViewProps> = args => (
           index.ts
         </TreeViewItem>
       </TreeViewItem>
-      <TreeViewItem rightElement={<CountBadge value={1} />}>
+      <TreeViewItem>
         <Folder />
         public
         <TreeViewItem>
