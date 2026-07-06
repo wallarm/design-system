@@ -1,6 +1,8 @@
 import {
+  Children,
   type FC,
   type HTMLAttributes,
+  isValidElement,
   type KeyboardEvent,
   type MouseEvent,
   type ReactNode,
@@ -26,15 +28,13 @@ export interface TreeViewItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   ref?: Ref<HTMLDivElement>;
   /** Stable id used for selection. Required for a row to be selectable. */
   id?: string;
-  /** Nested `<TreeViewItem>` elements. Presence marks this item as an expandable branch. */
+  /**
+   * Row content and nested items. Compose the row freely (icon, badge, text);
+   * any nested `<TreeViewItem>` children are rendered as the collapsible subtree,
+   * which also marks this item as an expandable branch.
+   */
   children?: ReactNode;
-  /** Row content — plain text, or a custom node (e.g. an http-method badge). */
-  label?: ReactNode;
-  /** Leading type icon (e.g. `<Folder />`, `<FileText />`). */
-  icon?: ReactNode;
-  /** Content rendered between the icon and the label (e.g. a status badge). */
-  startContent?: ReactNode;
-  /** Force branch behaviour (show a toggle) even without rendered children. */
+  /** Force branch behaviour (show a toggle) even without nested items. */
   expandable?: boolean;
   /** Controlled open state. */
   open?: boolean;
@@ -59,9 +59,6 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   ref,
   id,
   children,
-  label,
-  icon,
-  startContent,
   expandable,
   open: controlledOpen,
   defaultOpen = false,
@@ -85,7 +82,27 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   const isControlled = controlledOpen !== undefined;
   const isOpen = isControlled ? controlledOpen : internalOpen;
 
-  const isBranch = expandable || children != null;
+  // Split children: nested <TreeViewItem>s form the subtree, the rest is row content.
+  const nestedItems: ReactNode[] = [];
+  const content: ReactNode[] = [];
+  let labelIndex = 0;
+  for (const child of Children.toArray(children)) {
+    if (isValidElement(child) && child.type === TreeViewItem) {
+      nestedItems.push(child);
+    } else if (typeof child === 'string' || typeof child === 'number') {
+      // Wrap bare text so long titles truncate while inline slots keep their size.
+      labelIndex += 1;
+      content.push(
+        <span key={`label-${labelIndex}`} className='min-w-0 flex-1 truncate'>
+          {child}
+        </span>,
+      );
+    } else {
+      content.push(child);
+    }
+  }
+
+  const isBranch = expandable || nestedItems.length > 0;
   const isSelected = selectedProp ?? (id !== undefined ? selectedIds.has(id) : false);
   const showCheckbox = checkbox ?? checkboxes;
   const isInteractive = !disabled && (selectable ? id !== undefined : isBranch);
@@ -181,7 +198,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
         )}
 
         <div
-          className='flex h-24 min-w-0 flex-1 items-center gap-4'
+          className='flex h-24 min-w-0 flex-1 items-center gap-4 text-xs text-text-primary [&>svg]:icon-xs [&>svg]:shrink-0 [&>svg]:text-text-secondary'
           style={{ paddingLeft }}
           data-slot='tree-view-left'
         >
@@ -213,19 +230,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
             <span aria-hidden className='size-12 shrink-0' data-slot='tree-view-toggle-spacer' />
           )}
 
-          {icon && (
-            <span className='flex shrink-0 items-center text-text-secondary [&_svg]:icon-xs'>
-              {icon}
-            </span>
-          )}
-
-          {startContent && (
-            <span className='flex shrink-0 items-center' data-slot='tree-view-start'>
-              {startContent}
-            </span>
-          )}
-
-          <span className='min-w-0 flex-1 truncate text-xs text-text-primary'>{label}</span>
+          {content}
         </div>
 
         {hasRight && (
@@ -245,7 +250,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
           <TreeDepthProvider
             value={{ depth: depth + 1, indent: TREE_VIEW_INDENT_STEP, gap: undefined }}
           >
-            {children}
+            {nestedItems}
           </TreeDepthProvider>
         </div>
       )}

@@ -14,7 +14,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'TreeView is a hierarchical explorer built as a compound component (`<TreeView>`, `<TreeViewItem>`, `<TreeViewToolbar>`). Branches expand via an inline box toggle, rows support selection, checkboxes, counts, and custom left/right slots. Depth-based connector rails are drawn automatically.',
+          'TreeView is a hierarchical explorer built as a compound component (`<TreeView>`, `<TreeViewItem>`, `<TreeViewToolbar>`). Compose each row freely with children (icon, badge, text); nested `<TreeViewItem>` children become the collapsible subtree. Rows support selection, checkboxes, counts, disabled state, and custom right-side actions. Depth-based connector rails are drawn automatically.',
       },
     },
   },
@@ -25,14 +25,30 @@ export default meta;
 export const Basic: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
-      <TreeViewItem icon={<Folder />} label='Components' defaultOpen>
-        <TreeViewItem icon={<FileText />} label='Button.tsx' />
-        <TreeViewItem icon={<FileText />} label='Input.tsx' />
+      <TreeViewItem defaultOpen>
+        <Folder />
+        Components
+        <TreeViewItem>
+          <FileText />
+          Button.tsx
+        </TreeViewItem>
+        <TreeViewItem>
+          <FileText />
+          Input.tsx
+        </TreeViewItem>
       </TreeViewItem>
-      <TreeViewItem icon={<Folder />} label='Utils'>
-        <TreeViewItem icon={<FileText />} label='cn.ts' />
+      <TreeViewItem>
+        <Folder />
+        Utils
+        <TreeViewItem>
+          <FileText />
+          cn.ts
+        </TreeViewItem>
       </TreeViewItem>
-      <TreeViewItem icon={<FileText />} label='index.ts' />
+      <TreeViewItem>
+        <FileText />
+        index.ts
+      </TreeViewItem>
     </TreeView>
   </div>
 );
@@ -40,24 +56,37 @@ export const Basic: StoryFn<TreeViewProps> = args => (
 export const Nested: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
-      <TreeViewItem icon={<Folder />} label='src' defaultOpen count={4}>
-        <TreeViewItem icon={<Folder />} label='components' defaultOpen count={2}>
-          <TreeViewItem icon={<Folder />} label='TreeView' defaultOpen>
-            <TreeViewItem
-              label={
-                <Badge color='green' type='secondary' size='small' textVariant='code'>
-                  GET
-                </Badge>
-              }
-            />
-            <TreeViewItem icon={<FileText />} label='TreeView.tsx' />
+      <TreeViewItem defaultOpen count={4}>
+        <Folder />
+        src
+        <TreeViewItem defaultOpen count={2}>
+          <Folder />
+          components
+          <TreeViewItem defaultOpen>
+            <Folder />
+            TreeView
+            <TreeViewItem>
+              <FileText />
+              TreeView.tsx
+            </TreeViewItem>
           </TreeViewItem>
-          <TreeViewItem icon={<FileText />} label='Button.tsx' />
+          <TreeViewItem>
+            <FileText />
+            Button.tsx
+          </TreeViewItem>
         </TreeViewItem>
-        <TreeViewItem icon={<FileText />} label='index.ts' />
+        <TreeViewItem>
+          <FileText />
+          index.ts
+        </TreeViewItem>
       </TreeViewItem>
-      <TreeViewItem icon={<Folder />} label='public' count={1}>
-        <TreeViewItem icon={<FileText />} label='favicon.ico' />
+      <TreeViewItem count={1}>
+        <Folder />
+        public
+        <TreeViewItem>
+          <FileText />
+          favicon.ico
+        </TreeViewItem>
       </TreeViewItem>
     </TreeView>
   </div>
@@ -66,11 +95,22 @@ export const Nested: StoryFn<TreeViewProps> = args => (
 export const WithCheckboxes: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView checkboxes {...args}>
-      <TreeViewItem icon={<Folder />} label='Endpoints' defaultOpen>
-        <TreeViewItem icon={<FileText />} label='/users' />
-        <TreeViewItem icon={<FileText />} label='/orders' />
+      <TreeViewItem defaultOpen>
+        <Folder />
+        Endpoints
+        <TreeViewItem>
+          <FileText />
+          /users
+        </TreeViewItem>
+        <TreeViewItem>
+          <FileText />
+          /orders
+        </TreeViewItem>
       </TreeViewItem>
-      <TreeViewItem icon={<FileText />} label='/health' />
+      <TreeViewItem>
+        <FileText />
+        /health
+      </TreeViewItem>
     </TreeView>
   </div>
 );
@@ -80,11 +120,22 @@ export const Selectable: StoryFn<TreeViewProps> = () => {
   return (
     <div className='w-320'>
       <TreeView selectable selectedIds={selected} onSelectionChange={setSelected}>
-        <TreeViewItem id='components' icon={<Folder />} label='Components' defaultOpen>
-          <TreeViewItem id='button' icon={<FileText />} label='Button.tsx' />
-          <TreeViewItem id='input' icon={<FileText />} label='Input.tsx' />
+        <TreeViewItem id='components' defaultOpen>
+          <Folder />
+          Components
+          <TreeViewItem id='button'>
+            <FileText />
+            Button.tsx
+          </TreeViewItem>
+          <TreeViewItem id='input'>
+            <FileText />
+            Input.tsx
+          </TreeViewItem>
         </TreeViewItem>
-        <TreeViewItem id='index' icon={<FileText />} label='index.ts' />
+        <TreeViewItem id='index'>
+          <FileText />
+          index.ts
+        </TreeViewItem>
       </TreeView>
     </div>
   );
@@ -93,35 +144,31 @@ export const Selectable: StoryFn<TreeViewProps> = () => {
 export const WithInlineBadge: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
-      <TreeViewItem icon={<Folder />} label='Endpoints' defaultOpen>
-        <TreeViewItem
-          icon={<FileText />}
-          startContent={
-            <Badge color='slate' size='small'>
-              new
-            </Badge>
-          }
-          label='/users'
-        />
-        <TreeViewItem
-          icon={<FileText />}
-          startContent={
-            <Badge color='green' type='secondary' size='small' textVariant='code'>
-              GET
-            </Badge>
-          }
-          label='/orders'
-        />
-      </TreeViewItem>
-      <TreeViewItem
-        icon={<FileText />}
-        startContent={
-          <Badge color='amber' size='small'>
-            wip
+      <TreeViewItem defaultOpen>
+        <Folder />
+        Endpoints
+        <TreeViewItem>
+          <FileText />
+          <Badge color='slate' size='small'>
+            new
           </Badge>
-        }
-        label='/health'
-      />
+          /users
+        </TreeViewItem>
+        <TreeViewItem>
+          <FileText />
+          <Badge color='green' type='secondary' size='small' textVariant='code'>
+            GET
+          </Badge>
+          /orders
+        </TreeViewItem>
+      </TreeViewItem>
+      <TreeViewItem>
+        <FileText />
+        <Badge color='amber' size='small'>
+          wip
+        </Badge>
+        /health
+      </TreeViewItem>
     </TreeView>
   </div>
 );
@@ -129,14 +176,30 @@ export const WithInlineBadge: StoryFn<TreeViewProps> = args => (
 export const Disabled: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView selectable {...args}>
-      <TreeViewItem id='components' icon={<Folder />} label='Components' defaultOpen>
-        <TreeViewItem id='button' icon={<FileText />} label='Button.tsx' />
-        <TreeViewItem id='input' icon={<FileText />} label='Input.tsx (disabled)' disabled />
+      <TreeViewItem id='components' defaultOpen>
+        <Folder />
+        Components
+        <TreeViewItem id='button'>
+          <FileText />
+          Button.tsx
+        </TreeViewItem>
+        <TreeViewItem id='input' disabled>
+          <FileText />
+          Input.tsx (disabled)
+        </TreeViewItem>
       </TreeViewItem>
-      <TreeViewItem icon={<Folder />} label='Utils (disabled)' disabled>
-        <TreeViewItem icon={<FileText />} label='cn.ts' />
+      <TreeViewItem disabled>
+        <Folder />
+        Utils (disabled)
+        <TreeViewItem>
+          <FileText />
+          cn.ts
+        </TreeViewItem>
       </TreeViewItem>
-      <TreeViewItem id='index' icon={<FileText />} label='index.ts' />
+      <TreeViewItem id='index'>
+        <FileText />
+        index.ts
+      </TreeViewItem>
     </TreeView>
   </div>
 );
@@ -154,24 +217,36 @@ export const WithToolbar: StoryFn<TreeViewProps> = () => {
           onClose={() => undefined}
         />
         <TreeViewItem
-          icon={<Folder />}
-          label='src'
           count={2}
           open={open.src}
           onOpenChange={v => setOpen(s => ({ ...s, src: v }))}
         >
+          <Folder />
+          src
           <TreeViewItem
-            icon={<Folder />}
-            label='components'
             open={open.components}
             onOpenChange={v => setOpen(s => ({ ...s, components: v }))}
           >
-            <TreeViewItem icon={<FileText />} label='Button.tsx' />
-            <TreeViewItem icon={<FileText />} label='Input.tsx' />
+            <Folder />
+            components
+            <TreeViewItem>
+              <FileText />
+              Button.tsx
+            </TreeViewItem>
+            <TreeViewItem>
+              <FileText />
+              Input.tsx
+            </TreeViewItem>
           </TreeViewItem>
-          <TreeViewItem icon={<FileText />} label='index.ts' />
+          <TreeViewItem>
+            <FileText />
+            index.ts
+          </TreeViewItem>
         </TreeViewItem>
-        <TreeViewItem icon={<FileText />} label='package.json' count={1} />
+        <TreeViewItem count={1}>
+          <FileText />
+          package.json
+        </TreeViewItem>
       </TreeView>
     </div>
   );

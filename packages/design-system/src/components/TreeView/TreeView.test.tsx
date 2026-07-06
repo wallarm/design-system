@@ -9,10 +9,11 @@ describe('Node rendering', () => {
   it('renders leaf and branch items', () => {
     render(
       <TreeView>
-        <TreeViewItem label='Parent' defaultOpen>
-          <TreeViewItem label='Child' />
+        <TreeViewItem defaultOpen>
+          Parent
+          <TreeViewItem>Child</TreeViewItem>
         </TreeViewItem>
-        <TreeViewItem label='Sibling' />
+        <TreeViewItem>Sibling</TreeViewItem>
       </TreeView>,
     );
 
@@ -24,42 +25,32 @@ describe('Node rendering', () => {
   it('renders a count badge on the right slot', () => {
     render(
       <TreeView>
-        <TreeViewItem label='Folder' count={5} />
+        <TreeViewItem count={5}>Folder</TreeViewItem>
       </TreeView>,
     );
 
     expect(screen.getByText('5')).toBeInTheDocument();
   });
 
-  it('renders startContent between the icon and the label', () => {
-    const { container } = render(
-      <TreeView>
-        <TreeViewItem
-          icon={<span data-testid='icon' />}
-          startContent={<span data-testid='badge'>new</span>}
-          label='Endpoint'
-        />
-      </TreeView>,
-    );
-
-    const start = container.querySelector('[data-slot="tree-view-start"]');
-    expect(start).toBeInTheDocument();
-    expect(screen.getByTestId('badge')).toHaveTextContent('new');
-    // startContent sits before the label text in DOM order
-    expect(
-      start?.compareDocumentPosition(screen.getByText('Endpoint')) &
-        Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-  });
-
-  it('renders custom label content (left slot)', () => {
+  it('renders composed children (icon, badge, text) as row content', () => {
     render(
       <TreeView>
-        <TreeViewItem label={<span data-testid='custom'>GET</span>} />
+        <TreeViewItem>
+          <span data-testid='icon' />
+          <span data-testid='badge'>new</span>
+          Endpoint
+        </TreeViewItem>
       </TreeView>,
     );
 
-    expect(screen.getByTestId('custom')).toHaveTextContent('GET');
+    expect(screen.getByTestId('icon')).toBeInTheDocument();
+    expect(screen.getByTestId('badge')).toHaveTextContent('new');
+    expect(screen.getByText('Endpoint')).toBeInTheDocument();
+    // badge sits before the text label in DOM order
+    expect(
+      screen.getByTestId('badge').compareDocumentPosition(screen.getByText('Endpoint')) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
   });
 });
 
@@ -67,7 +58,7 @@ describe('data-slot attributes', () => {
   it('renders data-slot="tree-view" on the root', () => {
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='Item' />
+        <TreeViewItem>Item</TreeViewItem>
       </TreeView>,
     );
 
@@ -77,8 +68,8 @@ describe('data-slot attributes', () => {
   it('renders data-slot="tree-view-item" on items', () => {
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='A' />
-        <TreeViewItem label='B' />
+        <TreeViewItem>A</TreeViewItem>
+        <TreeViewItem>B</TreeViewItem>
       </TreeView>,
     );
 
@@ -88,8 +79,9 @@ describe('data-slot attributes', () => {
   it('renders a toggle on branches and a spacer on leaves', () => {
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='Branch'>
-          <TreeViewItem label='Leaf' />
+        <TreeViewItem>
+          Branch
+          <TreeViewItem>Leaf</TreeViewItem>
         </TreeViewItem>
       </TreeView>,
     );
@@ -103,8 +95,9 @@ describe('ARIA roles', () => {
   it('applies tree, treeitem and group roles', () => {
     render(
       <TreeView>
-        <TreeViewItem label='Parent' defaultOpen>
-          <TreeViewItem label='Child' />
+        <TreeViewItem defaultOpen>
+          Parent
+          <TreeViewItem>Child</TreeViewItem>
         </TreeViewItem>
       </TreeView>,
     );
@@ -117,8 +110,9 @@ describe('ARIA roles', () => {
   it('sets aria-expanded on branch items only', () => {
     render(
       <TreeView>
-        <TreeViewItem label='Branch' defaultOpen={false}>
-          <TreeViewItem label='Leaf' />
+        <TreeViewItem defaultOpen={false}>
+          Branch
+          <TreeViewItem>Leaf</TreeViewItem>
         </TreeViewItem>
       </TreeView>,
     );
@@ -132,7 +126,7 @@ describe('data-testid', () => {
   it('forwards and cascades data-testid', () => {
     const { container } = render(
       <TreeView data-testid='files'>
-        <TreeViewItem label='Item' />
+        <TreeViewItem>Item</TreeViewItem>
       </TreeView>,
     );
 
@@ -143,7 +137,7 @@ describe('data-testid', () => {
   it('does not render data-testid when none is provided', () => {
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='Item' />
+        <TreeViewItem>Item</TreeViewItem>
       </TreeView>,
     );
 
@@ -155,8 +149,9 @@ describe('Expand / collapse', () => {
   it('hides the group when closed', () => {
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='Branch' defaultOpen={false}>
-          <TreeViewItem label='Child' />
+        <TreeViewItem defaultOpen={false}>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
         </TreeViewItem>
       </TreeView>,
     );
@@ -167,8 +162,9 @@ describe('Expand / collapse', () => {
   it('toggles open state when the toggle is clicked', async () => {
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='Branch' defaultOpen={false}>
-          <TreeViewItem label='Child' />
+        <TreeViewItem defaultOpen={false}>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
         </TreeViewItem>
       </TreeView>,
     );
@@ -185,8 +181,9 @@ describe('Expand / collapse', () => {
     const onOpenChange = vi.fn();
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='Branch' defaultOpen={false} onOpenChange={onOpenChange}>
-          <TreeViewItem label='Child' />
+        <TreeViewItem defaultOpen={false} onOpenChange={onOpenChange}>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
         </TreeViewItem>
       </TreeView>,
     );
@@ -199,8 +196,9 @@ describe('Expand / collapse', () => {
   it('respects controlled open state', () => {
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='Branch' open>
-          <TreeViewItem label='Child' />
+        <TreeViewItem open>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
         </TreeViewItem>
       </TreeView>,
     );
@@ -214,8 +212,8 @@ describe('Selection', () => {
     const onSelectionChange = vi.fn();
     render(
       <TreeView selectable onSelectionChange={onSelectionChange}>
-        <TreeViewItem id='a' label='Alpha' />
-        <TreeViewItem id='b' label='Beta' />
+        <TreeViewItem id='a'>Alpha</TreeViewItem>
+        <TreeViewItem id='b'>Beta</TreeViewItem>
       </TreeView>,
     );
 
@@ -232,8 +230,8 @@ describe('Selection', () => {
     const onSelectionChange = vi.fn();
     render(
       <TreeView selectable onSelectionChange={onSelectionChange}>
-        <TreeViewItem id='a' label='Alpha' />
-        <TreeViewItem id='b' label='Beta' />
+        <TreeViewItem id='a'>Alpha</TreeViewItem>
+        <TreeViewItem id='b'>Beta</TreeViewItem>
       </TreeView>,
     );
 
@@ -247,8 +245,8 @@ describe('Selection', () => {
     const onSelectionChange = vi.fn();
     render(
       <TreeView selectable multiSelect onSelectionChange={onSelectionChange}>
-        <TreeViewItem id='a' label='Alpha' />
-        <TreeViewItem id='b' label='Beta' />
+        <TreeViewItem id='a'>Alpha</TreeViewItem>
+        <TreeViewItem id='b'>Beta</TreeViewItem>
       </TreeView>,
     );
 
@@ -263,7 +261,7 @@ describe('Checkbox', () => {
   it('renders a checkbox when tree-level checkboxes is set', () => {
     render(
       <TreeView checkboxes>
-        <TreeViewItem label='Item' />
+        <TreeViewItem>Item</TreeViewItem>
       </TreeView>,
     );
 
@@ -274,7 +272,9 @@ describe('Checkbox', () => {
     const onCheckedChange = vi.fn();
     render(
       <TreeView selectable>
-        <TreeViewItem id='a' label='Item' checkbox onCheckedChange={onCheckedChange} />
+        <TreeViewItem id='a' checkbox onCheckedChange={onCheckedChange}>
+          Item
+        </TreeViewItem>
       </TreeView>,
     );
 
@@ -293,7 +293,9 @@ describe('Disabled', () => {
     const onSelectionChange = vi.fn();
     render(
       <TreeView selectable onSelectionChange={onSelectionChange}>
-        <TreeViewItem id='a' label='Alpha' disabled />
+        <TreeViewItem id='a' disabled>
+          Alpha
+        </TreeViewItem>
       </TreeView>,
     );
 
@@ -307,8 +309,9 @@ describe('Disabled', () => {
   it('does not toggle a disabled branch and disables its toggle button', async () => {
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='Branch' defaultOpen={false} disabled>
-          <TreeViewItem label='Child' />
+        <TreeViewItem defaultOpen={false} disabled>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
         </TreeViewItem>
       </TreeView>,
     );
@@ -324,7 +327,9 @@ describe('Disabled', () => {
   it('disables the checkbox', () => {
     render(
       <TreeView>
-        <TreeViewItem label='Item' checkbox disabled />
+        <TreeViewItem checkbox disabled>
+          Item
+        </TreeViewItem>
       </TreeView>,
     );
 
@@ -336,8 +341,9 @@ describe('Keyboard', () => {
   it('toggles a branch with ArrowRight / ArrowLeft', async () => {
     const { container } = render(
       <TreeView>
-        <TreeViewItem label='Branch' defaultOpen={false}>
-          <TreeViewItem label='Child' />
+        <TreeViewItem defaultOpen={false}>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
         </TreeViewItem>
       </TreeView>,
     );
@@ -357,7 +363,7 @@ describe('Keyboard', () => {
     const onSelectionChange = vi.fn();
     render(
       <TreeView selectable onSelectionChange={onSelectionChange}>
-        <TreeViewItem id='a' label='Alpha' />
+        <TreeViewItem id='a'>Alpha</TreeViewItem>
       </TreeView>,
     );
 
@@ -382,7 +388,7 @@ describe('Toolbar', () => {
           onCollapseAll={onCollapseAll}
           onClose={onClose}
         />
-        <TreeViewItem label='Item' />
+        <TreeViewItem>Item</TreeViewItem>
       </TreeView>,
     );
 
