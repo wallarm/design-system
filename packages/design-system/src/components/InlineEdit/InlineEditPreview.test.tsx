@@ -3,6 +3,8 @@ import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { InlineEdit } from './InlineEdit';
 import { InlineEditPreview } from './InlineEditPreview';
+import { InlineEditPreviewIcon } from './InlineEditPreviewIcon';
+import { InlineEditPreviewValue } from './InlineEditPreviewValue';
 
 describe('InlineEditPreview', () => {
   it('renders the value and enters edit on click', async () => {
@@ -70,5 +72,30 @@ describe('InlineEditPreview', () => {
       </InlineEdit>,
     );
     expect(screen.getByTestId('ie--preview').className).not.toContain('-my-4');
+  });
+
+  it('auto-wraps plain children into Value + default Icon parts', () => {
+    render(
+      <InlineEdit defaultValue='hello' data-testid='attr'>
+        <InlineEditPreview>hello</InlineEditPreview>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('attr--preview-value')).toHaveTextContent('hello');
+    expect(screen.getByTestId('attr--preview-icon')).toBeInTheDocument();
+  });
+
+  it('renders explicit Value/Icon composition with a custom icon, no default pencil', () => {
+    render(
+      <InlineEdit defaultValue='hello' data-testid='attr'>
+        <InlineEditPreview>
+          <InlineEditPreviewValue>hello</InlineEditPreviewValue>
+          <InlineEditPreviewIcon>
+            <span data-testid='custom-icon'>*</span>
+          </InlineEditPreviewIcon>
+        </InlineEditPreview>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('attr--preview-value')).toHaveTextContent('hello');
+    expect(screen.getByTestId('custom-icon')).toBeInTheDocument();
   });
 });

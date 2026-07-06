@@ -1,27 +1,33 @@
-import type { FC, HTMLAttributes, KeyboardEvent, PointerEvent, ReactNode, Ref } from 'react';
-import { useRef } from 'react';
-import { Check, Pencil } from '../../icons';
+import type {
+  FC,
+  HTMLAttributes,
+  KeyboardEvent,
+  PointerEvent,
+  ReactElement,
+  ReactNode,
+  Ref,
+} from 'react';
+import { Children, isValidElement, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { Loader } from '../Loader';
 import { Tooltip, TooltipContent, type TooltipProps, TooltipTrigger } from '../Tooltip';
 import { inlineEditPreviewVariants } from './classes';
 import { useInlineEdit } from './InlineEditContext';
+import { InlineEditPreviewIcon } from './InlineEditPreviewIcon';
+import { InlineEditPreviewValue, type InlineEditPreviewValueProps } from './InlineEditPreviewValue';
 
-// Literal classes so Tailwind can statically detect them.
-const LINE_CLAMP_CLASS: Record<number, string> = {
-  1: 'line-clamp-1',
-  2: 'line-clamp-2',
-  3: 'line-clamp-3',
-  4: 'line-clamp-4',
-  5: 'line-clamp-5',
-  6: 'line-clamp-6',
-};
+const isInlineEditPreviewValue = (
+  child: ReactNode,
+): child is ReactElement<InlineEditPreviewValueProps> =>
+  isValidElement(child) &&
+  (child.type as { displayName?: string })?.displayName === InlineEditPreviewValue.displayName;
+
+const isInlineEditPreviewIcon = (child: ReactNode): boolean =>
+  isValidElement(child) &&
+  (child.type as { displayName?: string })?.displayName === InlineEditPreviewIcon.displayName;
 
 export interface InlineEditPreviewProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
-  /** Trailing affordance icon shown on hover/focus in read mode. */
-  triggerIcon?: ReactNode;
   /**
    * Tooltip shown on hover/focus while the value is editable. Defaults to
    * `'Edit'`. Pass `null` to disable the tooltip.
@@ -30,14 +36,20 @@ export interface InlineEditPreviewProps extends HTMLAttributes<HTMLDivElement> {
   /**
    * Clamp the read-mode value to this many lines (with an ellipsis) instead of
    * the default single-line truncation. Use for multi-line values (textarea).
+   * Applies to the default (no-parts) composition; when composing
+   * `InlineEditPreviewValue` explicitly, set `lineClamp` on it directly.
    */
   lineClamp?: 1 | 2 | 3 | 4 | 5 | 6;
+  /**
+   * Plain content auto-wraps into `InlineEditPreviewValue` + a default
+   * `InlineEditPreviewIcon` (pencil). Compose `InlineEditPreviewValue`/
+   * `InlineEditPreviewIcon` explicitly for a custom trailing icon.
+   */
   children?: ReactNode;
 }
 
 export const InlineEditPreview: FC<InlineEditPreviewProps> = ({
   ref,
-  triggerIcon = <Pencil size='md' />,
   tooltip = 'Edit',
   lineClamp,
   children,
@@ -60,6 +72,16 @@ export const InlineEditPreview: FC<InlineEditPreviewProps> = ({
   // tooltip, not clickable — just the dimmed value and a spinner.
   const isLoading = status === 'loading';
   const activatable = !disabled && !readOnly && !isLoading && activationMode !== 'none';
+
+  const childArray = Children.toArray(children);
+  const valueChild = childArray.find(isInlineEditPreviewValue);
+  const hasExplicitParts = childArray.some(
+    child => isInlineEditPreviewValue(child) || isInlineEditPreviewIcon(child),
+  );
+  // Alignment (multiline vs single-line) is a root-level CSS decision
+  // regardless of composition — read it off the composed Value's own prop
+  // when explicit, else fall back to this component's own `lineClamp`.
+  const effectiveLineClamp = hasExplicitParts ? valueChild?.props.lineClamp : lineClamp;
 
   const handleClick: HTMLAttributes<HTMLDivElement>['onClick'] = event => {
     onClick?.(event);
@@ -115,31 +137,21 @@ export const InlineEditPreview: FC<InlineEditPreviewProps> = ({
       onPointerMove={handlePointerMove}
       className={cn(
         inlineEditPreviewVariants({
-          multiline: Boolean(lineClamp),
+          multiline: Boolean(effectiveLineClamp),
           activatable,
           invalid: activatable && invalid,
         }),
         className,
       )}
     >
-      <span
-        className={cn(
-          'min-w-0 flex-1',
-          lineClamp ? LINE_CLAMP_CLASS[lineClamp] : 'truncate',
-          isLoading && 'opacity-50',
-        )}
-      >
-        {children}
-      </span>
-      {isLoading ? (
-        <Loader type='circle' size='md' />
-      ) : status === 'saved' ? (
-        <Check size='md' className='text-icon-success' />
-      ) : activatable ? (
-        <span className='text-icon-secondary opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'>
-          {triggerIcon}
-        </span>
-      ) : null}
+      {hasExplicitParts ? (
+        children
+      ) : (
+        <>
+          <InlineEditPreviewValue lineClamp={lineClamp}>{children}</InlineEditPreviewValue>
+          <InlineEditPreviewIcon />
+        </>
+      )}
     </div>
   );
 

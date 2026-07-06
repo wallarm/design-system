@@ -28,6 +28,8 @@ import { InlineEditError } from './InlineEditError';
 import { InlineEditInput } from './InlineEditInput';
 import { InlineEditNumber } from './InlineEditNumber';
 import { InlineEditPreview } from './InlineEditPreview';
+import { InlineEditPreviewIcon } from './InlineEditPreviewIcon';
+import { InlineEditPreviewValue } from './InlineEditPreviewValue';
 import { InlineEditSelect } from './InlineEditSelect';
 import { InlineEditTextarea } from './InlineEditTextarea';
 import { InlineEditTime } from './InlineEditTime';
@@ -37,6 +39,8 @@ const meta = {
   component: InlineEdit,
   subcomponents: {
     InlineEditPreview,
+    InlineEditPreviewValue,
+    InlineEditPreviewIcon,
     InlineEditControl,
     InlineEditError,
     InlineEditInput,
@@ -163,7 +167,12 @@ export const Gallery: StoryFn = () => {
 
       <Row label='Role'>
         <InlineEdit value={role} onValueCommit={v => setRole(v as string[])} data-testid='select'>
-          <InlineEditPreview triggerIcon={<ChevronDown size='md' />}>{roleLabel}</InlineEditPreview>
+          <InlineEditPreview>
+            <InlineEditPreviewValue>{roleLabel}</InlineEditPreviewValue>
+            <InlineEditPreviewIcon>
+              <ChevronDown size='md' />
+            </InlineEditPreviewIcon>
+          </InlineEditPreview>
           <InlineEditControl>
             <InlineEditSelect items={roleItems} />
           </InlineEditControl>
@@ -176,8 +185,11 @@ export const Gallery: StoryFn = () => {
           onValueCommit={v => setRoles(v as string[])}
           data-testid='multi-select'
         >
-          <InlineEditPreview triggerIcon={<ChevronDown size='md' />}>
-            {rolesLabel}
+          <InlineEditPreview>
+            <InlineEditPreviewValue>{rolesLabel}</InlineEditPreviewValue>
+            <InlineEditPreviewIcon>
+              <ChevronDown size='md' />
+            </InlineEditPreviewIcon>
           </InlineEditPreview>
           <InlineEditControl>
             <InlineEditSelect items={roleItems} multiple />
@@ -187,12 +199,17 @@ export const Gallery: StoryFn = () => {
 
       <Row label='Tags'>
         <InlineEdit value={tags} onValueCommit={v => setTags(v as string[])} data-testid='tags'>
-          <InlineEditPreview triggerIcon={<ChevronDown size='md' />}>
-            <span className='flex gap-4'>
-              {tags.map(v => (
-                <Tag key={v}>{v}</Tag>
-              ))}
-            </span>
+          <InlineEditPreview>
+            <InlineEditPreviewValue>
+              <span className='flex gap-4'>
+                {tags.map(v => (
+                  <Tag key={v}>{v}</Tag>
+                ))}
+              </span>
+            </InlineEditPreviewValue>
+            <InlineEditPreviewIcon>
+              <ChevronDown size='md' />
+            </InlineEditPreviewIcon>
           </InlineEditPreview>
           <InlineEditControl>
             <InlineEditSelect items={tagItems} multiple />
@@ -207,7 +224,12 @@ export const Gallery: StoryFn = () => {
             onValueCommit={v => setDate(v as DateValue | null)}
             data-testid='date'
           >
-            <InlineEditPreview triggerIcon={<Calendar size='md' />}>{dateLabel}</InlineEditPreview>
+            <InlineEditPreview>
+              <InlineEditPreviewValue>{dateLabel}</InlineEditPreviewValue>
+              <InlineEditPreviewIcon>
+                <Calendar size='md' />
+              </InlineEditPreviewIcon>
+            </InlineEditPreview>
             <InlineEditControl>
               <InlineEditDate />
             </InlineEditControl>
@@ -222,7 +244,12 @@ export const Gallery: StoryFn = () => {
             onValueCommit={v => setTime(v as TimeValue | null)}
             data-testid='time'
           >
-            <InlineEditPreview triggerIcon={<Clock size='md' />}>{timeLabel}</InlineEditPreview>
+            <InlineEditPreview>
+              <InlineEditPreviewValue>{timeLabel}</InlineEditPreviewValue>
+              <InlineEditPreviewIcon>
+                <Clock size='md' />
+              </InlineEditPreviewIcon>
+            </InlineEditPreview>
             <InlineEditControl>
               <InlineEditTime />
             </InlineEditControl>
@@ -237,8 +264,11 @@ export const Gallery: StoryFn = () => {
             onValueCommit={v => setDateTime(v as CalendarDateTime | null)}
             data-testid='datetime'
           >
-            <InlineEditPreview triggerIcon={<Calendar size='md' />}>
-              {dateTimeLabel}
+            <InlineEditPreview>
+              <InlineEditPreviewValue>{dateTimeLabel}</InlineEditPreviewValue>
+              <InlineEditPreviewIcon>
+                <Calendar size='md' />
+              </InlineEditPreviewIcon>
             </InlineEditPreview>
             <InlineEditControl>
               <InlineEditDateTime />
@@ -458,7 +488,12 @@ export const ConfirmCommit: StoryFn = () => {
           onValueCommit={v => setRole(v as string[])}
           data-testid='confirm-role'
         >
-          <InlineEditPreview triggerIcon={<ChevronDown size='md' />}>{roleLabel}</InlineEditPreview>
+          <InlineEditPreview>
+            <InlineEditPreviewValue>{roleLabel}</InlineEditPreviewValue>
+            <InlineEditPreviewIcon>
+              <ChevronDown size='md' />
+            </InlineEditPreviewIcon>
+          </InlineEditPreview>
           <InlineEditControl>
             <InlineEditSelect items={roleItems} />
           </InlineEditControl>
