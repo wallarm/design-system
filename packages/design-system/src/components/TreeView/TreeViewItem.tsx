@@ -11,6 +11,7 @@ import {
   useState,
 } from 'react';
 import { SquareMinus, SquarePlus } from '../../icons';
+import { Collapse } from '../../utils/Collapse';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { TreeDepthProvider, useTreeDepth } from '../../utils/treeDepth';
@@ -242,23 +243,13 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
       </div>
 
       {isBranch && (
-        <div
-          role='group'
-          data-slot='tree-view-group'
-          data-state={isOpen ? 'open' : 'closed'}
-          className={cn(
-            'grid transition-[grid-template-rows] duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
-            isOpen ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
-          )}
-        >
-          <div className='overflow-hidden' inert={!isOpen || undefined}>
-            <TreeDepthProvider
-              value={{ depth: depth + 1, indent: TREE_VIEW_INDENT_STEP, gap: undefined }}
-            >
-              {nestedItems}
-            </TreeDepthProvider>
-          </div>
-        </div>
+        <Collapse open={isOpen} inertWhenClosed role='group' data-slot='tree-view-group'>
+          <TreeDepthProvider
+            value={{ depth: depth + 1, indent: TREE_VIEW_INDENT_STEP, gap: undefined }}
+          >
+            {nestedItems}
+          </TreeDepthProvider>
+        </Collapse>
       )}
     </div>
   );
