@@ -156,7 +156,10 @@ describe('Expand / collapse', () => {
       </TreeView>,
     );
 
-    expect(container.querySelector('[data-slot="tree-view-group"]')).toHaveAttribute('hidden');
+    expect(container.querySelector('[data-slot="tree-view-group"]')).toHaveAttribute(
+      'data-state',
+      'closed',
+    );
   });
 
   it('toggles open state when the toggle is clicked', async () => {
@@ -172,9 +175,9 @@ describe('Expand / collapse', () => {
     const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLElement;
     const group = container.querySelector('[data-slot="tree-view-group"]') as HTMLElement;
 
-    expect(group).toHaveAttribute('hidden');
+    expect(group).toHaveAttribute('data-state', 'closed');
     await userEvent.click(toggle);
-    expect(group).not.toHaveAttribute('hidden');
+    expect(group).toHaveAttribute('data-state', 'open');
   });
 
   it('calls onOpenChange when toggled', async () => {
@@ -203,7 +206,10 @@ describe('Expand / collapse', () => {
       </TreeView>,
     );
 
-    expect(container.querySelector('[data-slot="tree-view-group"]')).not.toHaveAttribute('hidden');
+    expect(container.querySelector('[data-slot="tree-view-group"]')).toHaveAttribute(
+      'data-state',
+      'open',
+    );
   });
 });
 
@@ -321,7 +327,7 @@ describe('Disabled', () => {
 
     expect(toggle).toBeDisabled();
     await userEvent.click(toggle);
-    expect(group).toHaveAttribute('hidden');
+    expect(group).toHaveAttribute('data-state', 'closed');
   });
 
   it('disables the checkbox', () => {
@@ -353,10 +359,10 @@ describe('Keyboard', () => {
 
     branch.focus();
     await userEvent.keyboard('{ArrowRight}');
-    expect(group).not.toHaveAttribute('hidden');
+    expect(group).toHaveAttribute('data-state', 'open');
 
     await userEvent.keyboard('{ArrowLeft}');
-    expect(group).toHaveAttribute('hidden');
+    expect(group).toHaveAttribute('data-state', 'closed');
   });
 
   it('selects a row with Enter', async () => {
