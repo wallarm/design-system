@@ -17,7 +17,8 @@ export const treeViewRowVariants = cva(
       {
         interactive: true,
         selected: false,
-        className: 'hover:not-data-[selected=true]:bg-states-primary-hover',
+        // Exclude :active so pressed (:active) always wins over hover on every click.
+        className: '[&:hover:not(:active)]:bg-states-primary-hover',
       },
     ],
     defaultVariants: {
