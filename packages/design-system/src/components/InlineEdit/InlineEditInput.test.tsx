@@ -36,7 +36,7 @@ describe('InlineEditInput', () => {
 
   it('marks the input invalid when the edit is in error', () => {
     render(
-      <InlineEdit defaultEdit defaultValue='ab' status='error' error='bad' data-testid='attr'>
+      <InlineEdit defaultEdit defaultValue='ab' status='error' data-testid='attr'>
         <InlineEditControl>
           <InlineEditInput />
         </InlineEditControl>

@@ -113,9 +113,9 @@ describe('InlineEdit', () => {
     expect(screen.getByTestId('invalid')).toHaveTextContent('true');
   });
 
-  it('lets explicit status/error props override the internal machine', () => {
+  it('lets an explicit status prop override the internal machine', () => {
     render(
-      <InlineEdit defaultValue='hello' status='error' error='bad'>
+      <InlineEdit defaultValue='hello' status='error'>
         <Harness />
       </InlineEdit>,
     );
