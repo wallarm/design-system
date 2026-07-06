@@ -19,11 +19,14 @@ import { useInlineEdit, useInlineEditSubmitMode } from './InlineEditContext';
  * focusable segments, is the documented landing target).
  *
  * `value` / `onChange` are internally controlled via `useInlineEdit`.
- * `granularity` is omitted — this component is always day-granularity; use
- * `InlineEditDateTime` for date+time.
+ * `granularity` / `showTimeDropdown` / `timeStep` are omitted — this
+ * component is always day-granularity; use `InlineEditDateTime` for date+time.
  */
 export interface InlineEditDateProps
-  extends Omit<DateInputProps, 'value' | 'onChange' | 'granularity'> {
+  extends Omit<
+    DateInputProps,
+    'value' | 'onChange' | 'granularity' | 'showTimeDropdown' | 'timeStep'
+  > {
   /**
    * Bound-root pattern: `InlineEditDate` IS the prewired `Calendar` root —
    * the `DateValue[]` adapter, `defaultOpen`/`closeOnSelect`, and
