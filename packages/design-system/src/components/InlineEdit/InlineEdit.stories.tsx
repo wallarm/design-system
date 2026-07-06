@@ -99,43 +99,11 @@ const tagItems: SelectDataItem[] = [
   { label: 'monitored', value: 'monitored' },
 ];
 
-/**
- * All inline-edit value types in a single gallery, built with the standalone
- * component + its typed editors (no `Attribute` provider). Each row owns its
- * own state and a unique `data-testid` (text, number, textarea, select,
- * multi-select, tags, date, time, datetime) so it can be targeted
- * individually in tests.
- */
-export const Gallery: StoryFn = () => {
+/** `InlineEditInput` in isolation — the default text editor. */
+export const TextEditor: StoryFn = () => {
   const [text, setText] = useState('Checkout API');
-  const [about, setAbout] = useState(
-    'Displays a labeled value for a single object attribute. Used in detail panels, drawers and forms to present structured information.',
-  );
-  const [port, setPort] = useState('8443');
-  const [role, setRole] = useState<string[]>(['editor']);
-  const [roles, setRoles] = useState<string[]>(['editor', 'viewer']);
-  const [tags, setTags] = useState<string[]>(['production', 'critical']);
-  const [date, setDate] = useState<DateValue | null>(new CalendarDate(2026, 6, 15));
-  const [time, setTime] = useState<TimeValue | null>(new Time(14, 30));
-  const [dateTime, setDateTime] = useState<CalendarDateTime | null>(
-    new CalendarDateTime(2026, 6, 15, 14, 30),
-  );
-
-  const roleLabel = roleItems.find(i => i.value === (role[0] ?? ''))?.label ?? '';
-  const rolesLabel = roles.map(v => roleItems.find(i => i.value === v)?.label ?? v).join(', ');
-  const dateLabel = date
-    ? format(new Date(date.year, date.month - 1, date.day), 'd MMM, yyyy')
-    : '—';
-  const timeLabel = time ? format(new Date(2000, 0, 1, time.hour, time.minute), 'h:mm a') : '—';
-  const dateTimeLabel = dateTime
-    ? format(
-        new Date(dateTime.year, dateTime.month - 1, dateTime.day, dateTime.hour, dateTime.minute),
-        'd MMM, yyyy h:mm a',
-      )
-    : '—';
-
   return (
-    <div className='grid w-[700px] grid-cols-2 gap-x-16 gap-y-8'>
+    <div className='w-[320px]'>
       <Row label='Name'>
         <InlineEdit value={text} onValueCommit={v => setText(v as string)} data-testid='text'>
           <InlineEditPreview data-analytics-id='inline-edit-name'>{text}</InlineEditPreview>
@@ -145,7 +113,15 @@ export const Gallery: StoryFn = () => {
           <InlineEditError />
         </InlineEdit>
       </Row>
+    </div>
+  );
+};
 
+/** `InlineEditNumber` in isolation. */
+export const NumberEditor: StoryFn = () => {
+  const [port, setPort] = useState('8443');
+  return (
+    <div className='w-[320px]'>
       <Row label='Port'>
         <InlineEdit value={port} onValueCommit={v => setPort(v as string)} data-testid='number'>
           <InlineEditPreview>{port}</InlineEditPreview>
@@ -154,7 +130,17 @@ export const Gallery: StoryFn = () => {
           </InlineEditControl>
         </InlineEdit>
       </Row>
+    </div>
+  );
+};
 
+/** `InlineEditTextarea` in isolation, with `lineClamp` on the preview. */
+export const TextareaEditor: StoryFn = () => {
+  const [about, setAbout] = useState(
+    'Displays a labeled value for a single object attribute. Used in detail panels, drawers and forms to present structured information.',
+  );
+  return (
+    <div className='w-[320px]'>
       <Row label='About'>
         <InlineEdit value={about} onValueCommit={v => setAbout(v as string)} data-testid='textarea'>
           <InlineEditPreview lineClamp={3}>{about}</InlineEditPreview>
@@ -164,7 +150,16 @@ export const Gallery: StoryFn = () => {
           <InlineEditError />
         </InlineEdit>
       </Row>
+    </div>
+  );
+};
 
+/** `InlineEditSelect` (single) in isolation. */
+export const SelectEditor: StoryFn = () => {
+  const [role, setRole] = useState<string[]>(['editor']);
+  const roleLabel = roleItems.find(i => i.value === (role[0] ?? ''))?.label ?? '';
+  return (
+    <div className='w-[320px]'>
       <Row label='Role'>
         <InlineEdit value={role} onValueCommit={v => setRole(v as string[])} data-testid='select'>
           <InlineEditPreview>
@@ -178,7 +173,16 @@ export const Gallery: StoryFn = () => {
           </InlineEditControl>
         </InlineEdit>
       </Row>
+    </div>
+  );
+};
 
+/** `InlineEditSelect` (multiple) in isolation. */
+export const MultiSelectEditor: StoryFn = () => {
+  const [roles, setRoles] = useState<string[]>(['editor', 'viewer']);
+  const rolesLabel = roles.map(v => roleItems.find(i => i.value === v)?.label ?? v).join(', ');
+  return (
+    <div className='w-[320px]'>
       <Row label='Roles'>
         <InlineEdit
           value={roles}
@@ -196,7 +200,15 @@ export const Gallery: StoryFn = () => {
           </InlineEditControl>
         </InlineEdit>
       </Row>
+    </div>
+  );
+};
 
+/** `InlineEditSelect` (multiple) rendering its value as `Tag` chips. */
+export const TagsEditor: StoryFn = () => {
+  const [tags, setTags] = useState<string[]>(['production', 'critical']);
+  return (
+    <div className='w-[320px]'>
       <Row label='Tags'>
         <InlineEdit value={tags} onValueCommit={v => setTags(v as string[])} data-testid='tags'>
           <InlineEditPreview>
@@ -216,9 +228,20 @@ export const Gallery: StoryFn = () => {
           </InlineEditControl>
         </InlineEdit>
       </Row>
+    </div>
+  );
+};
 
-      <Row label='Date'>
-        <DateFormatProvider order='day-first' hourCycle={24}>
+/** `InlineEditDate` in isolation. */
+export const DateEditor: StoryFn = () => {
+  const [date, setDate] = useState<DateValue | null>(new CalendarDate(2026, 6, 15));
+  const dateLabel = date
+    ? format(new Date(date.year, date.month - 1, date.day), 'd MMM, yyyy')
+    : '—';
+  return (
+    <div className='w-[320px]'>
+      <DateFormatProvider order='day-first' hourCycle={24}>
+        <Row label='Date'>
           <InlineEdit
             value={date}
             onValueCommit={v => setDate(v as DateValue | null)}
@@ -234,11 +257,20 @@ export const Gallery: StoryFn = () => {
               <InlineEditDate />
             </InlineEditControl>
           </InlineEdit>
-        </DateFormatProvider>
-      </Row>
+        </Row>
+      </DateFormatProvider>
+    </div>
+  );
+};
 
-      <Row label='Time'>
-        <DateFormatProvider order='day-first' hourCycle={12}>
+/** `InlineEditTime` in isolation. */
+export const TimeEditor: StoryFn = () => {
+  const [time, setTime] = useState<TimeValue | null>(new Time(14, 30));
+  const timeLabel = time ? format(new Date(2000, 0, 1, time.hour, time.minute), 'h:mm a') : '—';
+  return (
+    <div className='w-[320px]'>
+      <DateFormatProvider order='day-first' hourCycle={12}>
+        <Row label='Time'>
           <InlineEdit
             value={time}
             onValueCommit={v => setTime(v as TimeValue | null)}
@@ -254,11 +286,27 @@ export const Gallery: StoryFn = () => {
               <InlineEditTime />
             </InlineEditControl>
           </InlineEdit>
-        </DateFormatProvider>
-      </Row>
+        </Row>
+      </DateFormatProvider>
+    </div>
+  );
+};
 
-      <Row label='Date & Time'>
-        <DateFormatProvider order='day-first' hourCycle={12}>
+/** `InlineEditDateTime` in isolation. */
+export const DateTimeEditor: StoryFn = () => {
+  const [dateTime, setDateTime] = useState<CalendarDateTime | null>(
+    new CalendarDateTime(2026, 6, 15, 14, 30),
+  );
+  const dateTimeLabel = dateTime
+    ? format(
+        new Date(dateTime.year, dateTime.month - 1, dateTime.day, dateTime.hour, dateTime.minute),
+        'd MMM, yyyy h:mm a',
+      )
+    : '—';
+  return (
+    <div className='w-[320px]'>
+      <DateFormatProvider order='day-first' hourCycle={12}>
+        <Row label='Date & Time'>
           <InlineEdit
             value={dateTime}
             onValueCommit={v => setDateTime(v as CalendarDateTime | null)}
@@ -274,8 +322,8 @@ export const Gallery: StoryFn = () => {
               <InlineEditDateTime />
             </InlineEditControl>
           </InlineEdit>
-        </DateFormatProvider>
-      </Row>
+        </Row>
+      </DateFormatProvider>
     </div>
   );
 };
