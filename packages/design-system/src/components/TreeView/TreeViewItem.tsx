@@ -202,18 +202,6 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
           style={{ paddingLeft }}
           data-slot='tree-view-left'
         >
-          {showCheckbox && (
-            <Checkbox
-              checked={checked}
-              disabled={disabled}
-              onCheckedChange={details => onCheckedChange?.(details.checked === true)}
-              onClick={event => event.stopPropagation()}
-              className='shrink-0'
-            >
-              <CheckboxIndicator />
-            </Checkbox>
-          )}
-
           {isBranch ? (
             <button
               type='button'
@@ -228,6 +216,18 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
             </button>
           ) : (
             <span aria-hidden className='size-12 shrink-0' data-slot='tree-view-toggle-spacer' />
+          )}
+
+          {showCheckbox && (
+            <Checkbox
+              checked={checked}
+              disabled={disabled}
+              onCheckedChange={details => onCheckedChange?.(details.checked === true)}
+              onClick={event => event.stopPropagation()}
+              className='shrink-0'
+            >
+              <CheckboxIndicator />
+            </Checkbox>
           )}
 
           {content}
