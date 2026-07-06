@@ -6,6 +6,7 @@ const treeViewStory = createStoryHelper('navigation-treeview', [
   'Nested',
   'With Checkboxes',
   'Selectable',
+  'Disabled',
   'With Toolbar',
 ] as const);
 
@@ -31,6 +32,11 @@ test.describe('Component: TreeView', () => {
 
     test('Should render selectable tree correctly', async ({ page }) => {
       await treeViewStory.goto(page, 'Selectable');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render disabled items correctly', async ({ page }) => {
+      await treeViewStory.goto(page, 'Disabled');
       await expect(page).toHaveScreenshot();
     });
 
@@ -82,6 +88,16 @@ test.describe('Component: TreeView', () => {
 
       await page.getByRole('button', { name: 'Expand all' }).click();
       await expect(group).toBeVisible();
+    });
+
+    test('Should not select a disabled row when it is clicked', async ({ page }) => {
+      await treeViewStory.goto(page, 'Disabled');
+
+      const disabled = itemByText(page, 'Input.tsx (disabled)');
+      await expect(disabled).toHaveAttribute('aria-disabled', 'true');
+
+      await disabled.click({ force: true });
+      await expect(disabled).not.toHaveAttribute('aria-selected', 'true');
     });
 
     test('Should toggle a checkbox when it is clicked', async ({ page }) => {

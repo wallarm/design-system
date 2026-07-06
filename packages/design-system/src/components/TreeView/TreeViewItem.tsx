@@ -49,6 +49,8 @@ export interface TreeViewItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   onCheckedChange?: (checked: boolean) => void;
   /** Visually mark the row as selected (defaults to the tree's selection state). */
   selected?: boolean;
+  /** Dim the row and disable all interaction (toggle, selection, checkbox). */
+  disabled?: boolean;
 }
 
 export const TreeViewItem: FC<TreeViewItemProps> = ({
@@ -67,6 +69,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   checked = false,
   onCheckedChange,
   selected: selectedProp,
+  disabled = false,
   className,
   onClick,
   ...props
@@ -82,7 +85,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   const isBranch = expandable || children != null;
   const isSelected = selectedProp ?? (id !== undefined ? selectedIds.has(id) : false);
   const showCheckbox = checkbox ?? checkboxes;
-  const isInteractive = selectable ? id !== undefined : isBranch;
+  const isInteractive = !disabled && (selectable ? id !== undefined : isBranch);
 
   const setOpen = useCallback(
     (next: boolean) => {
@@ -142,7 +145,8 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
       ref={ref}
       role='treeitem'
       aria-expanded={isBranch ? isOpen : undefined}
-      aria-selected={selectable && id !== undefined ? isSelected : undefined}
+      aria-selected={selectable && id !== undefined && !disabled ? isSelected : undefined}
+      aria-disabled={disabled || undefined}
       tabIndex={isInteractive ? 0 : -1}
       onKeyDown={isInteractive ? handleRowKeyDown : undefined}
       data-slot='tree-view-item'
@@ -152,9 +156,10 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
       <div
         data-slot='tree-view-row'
         data-selected={isSelected || undefined}
+        data-disabled={disabled || undefined}
         data-state={isBranch ? (isOpen ? 'open' : 'closed') : undefined}
         className={cn(
-          treeViewRowVariants({ interactive: isInteractive, selected: isSelected }),
+          treeViewRowVariants({ interactive: isInteractive, selected: isSelected, disabled }),
           className,
         )}
         onClick={isInteractive ? handleRowClick : onClick}
@@ -180,6 +185,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
           {showCheckbox && (
             <Checkbox
               checked={checked}
+              disabled={disabled}
               onCheckedChange={details => onCheckedChange?.(details.checked === true)}
               onClick={event => event.stopPropagation()}
               className='shrink-0'
@@ -193,7 +199,8 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
               type='button'
               data-slot='tree-view-toggle'
               aria-label={isOpen ? 'Collapse' : 'Expand'}
-              className='flex shrink-0 cursor-pointer items-center justify-center text-text-secondary'
+              disabled={disabled}
+              className='flex shrink-0 cursor-pointer items-center justify-center text-text-secondary disabled:cursor-not-allowed'
               onClick={handleToggle}
               tabIndex={-1}
             >

@@ -267,6 +267,50 @@ describe('Checkbox', () => {
   });
 });
 
+describe('Disabled', () => {
+  it('marks the row aria-disabled and does not select on click', async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <TreeView selectable onSelectionChange={onSelectionChange}>
+        <TreeViewItem id='a' label='Alpha' disabled />
+      </TreeView>,
+    );
+
+    const item = screen.getByText('Alpha').closest('[role="treeitem"]') as HTMLElement;
+    expect(item).toHaveAttribute('aria-disabled', 'true');
+
+    await userEvent.click(screen.getByText('Alpha'));
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+
+  it('does not toggle a disabled branch and disables its toggle button', async () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem label='Branch' defaultOpen={false} disabled>
+          <TreeViewItem label='Child' />
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLButtonElement;
+    const group = container.querySelector('[data-slot="tree-view-group"]') as HTMLElement;
+
+    expect(toggle).toBeDisabled();
+    await userEvent.click(toggle);
+    expect(group).toHaveAttribute('hidden');
+  });
+
+  it('disables the checkbox', () => {
+    render(
+      <TreeView>
+        <TreeViewItem label='Item' checkbox disabled />
+      </TreeView>,
+    );
+
+    expect(screen.getByRole('checkbox')).toBeDisabled();
+  });
+});
+
 describe('Keyboard', () => {
   it('toggles a branch with ArrowRight / ArrowLeft', async () => {
     const { container } = render(

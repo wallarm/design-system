@@ -90,6 +90,21 @@ export const Selectable: StoryFn<TreeViewProps> = () => {
   );
 };
 
+export const Disabled: StoryFn<TreeViewProps> = args => (
+  <div className='w-320'>
+    <TreeView selectable {...args}>
+      <TreeViewItem id='components' icon={<Folder />} label='Components' defaultOpen>
+        <TreeViewItem id='button' icon={<FileText />} label='Button.tsx' />
+        <TreeViewItem id='input' icon={<FileText />} label='Input.tsx (disabled)' disabled />
+      </TreeViewItem>
+      <TreeViewItem icon={<Folder />} label='Utils (disabled)' disabled>
+        <TreeViewItem icon={<FileText />} label='cn.ts' />
+      </TreeViewItem>
+      <TreeViewItem id='index' icon={<FileText />} label='index.ts' />
+    </TreeView>
+  </div>
+);
+
 export const WithToolbar: StoryFn<TreeViewProps> = () => {
   const [open, setOpen] = useState<Record<string, boolean>>({ src: true, components: true });
   const setAll = (value: boolean) => setOpen({ src: value, components: value });

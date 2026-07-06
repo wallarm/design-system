@@ -12,6 +12,10 @@ export const treeViewRowVariants = cva(
         true: 'bg-states-primary-default-alt',
         false: '',
       },
+      disabled: {
+        true: 'opacity-50 cursor-not-allowed',
+        false: '',
+      },
     },
     compoundVariants: [
       {
@@ -24,6 +28,7 @@ export const treeViewRowVariants = cva(
     defaultVariants: {
       interactive: false,
       selected: false,
+      disabled: false,
     },
   },
 );
