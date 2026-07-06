@@ -1,3 +1,8 @@
+## <small>0.71.4 (2026-07-06)</small>
+
+* fix(nav-panel): increase panel header bottom padding to 6px (#204) ([e5239c8](https://github.com/wallarm/design-system/commit/e5239c8)), closes [#204](https://github.com/wallarm/design-system/issues/204)
+* fix(separator): merge consumer className instead of clobbering computed classes (#203) ([050b46d](https://github.com/wallarm/design-system/commit/050b46d)), closes [#203](https://github.com/wallarm/design-system/issues/203)
+
 ## <small>0.71.3 (2026-07-02)</small>
 
 * fix(theme): reduce medium font weight from 500 to 450 (#201) ([0c6a5ac](https://github.com/wallarm/design-system/commit/0c6a5ac)), closes [#201](https://github.com/wallarm/design-system/issues/201)
