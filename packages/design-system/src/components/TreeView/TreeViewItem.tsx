@@ -47,7 +47,10 @@ export interface TreeViewItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   actions?: ReactNode;
   /** Show a checkbox for this row (overrides the tree-level `checkboxes` prop). */
   checkbox?: boolean;
+  /** Controlled checkbox state. Leave undefined for an uncontrolled checkbox. */
   checked?: boolean;
+  /** Uncontrolled initial checkbox state. */
+  defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
   /** Visually mark the row as selected (defaults to the tree's selection state). */
   selected?: boolean;
@@ -66,7 +69,8 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   count,
   actions,
   checkbox,
-  checked = false,
+  checked,
+  defaultChecked,
   onCheckedChange,
   selected: selectedProp,
   disabled = false,
@@ -221,6 +225,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
           {showCheckbox && (
             <Checkbox
               checked={checked}
+              defaultChecked={defaultChecked}
               disabled={disabled}
               onCheckedChange={details => onCheckedChange?.(details.checked === true)}
               onClick={event => event.stopPropagation()}
