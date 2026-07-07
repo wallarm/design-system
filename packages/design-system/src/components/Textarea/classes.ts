@@ -10,10 +10,10 @@ export const textareaPaddingVariants = cva('', {
   },
 });
 
-export const textareaHeightVariants = cva('min-h-[60px]', {
+export const textareaHeightVariants = cva('min-h-[64px]', {
   variants: {
     size: {
-      small: 'min-h-[60px]',
+      small: 'min-h-[64px]',
       medium: 'min-h-[72px]',
       default: 'min-h-[76px]',
     },

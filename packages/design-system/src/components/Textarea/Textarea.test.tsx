@@ -165,3 +165,20 @@ describe('Auto-resize mode', () => {
     expect(screen.getByTestId('textarea')).toHaveAttribute('rows', '1');
   });
 });
+
+describe('Size variants', () => {
+  it('renders the small size at 64px min-height (matches Figma spec)', () => {
+    render(<Textarea data-testid='textarea' size='small' />);
+    expect(screen.getByTestId('textarea').className).toContain('min-h-[64px]');
+  });
+
+  it('renders the medium size at 72px min-height', () => {
+    render(<Textarea data-testid='textarea' size='medium' />);
+    expect(screen.getByTestId('textarea').className).toContain('min-h-[72px]');
+  });
+
+  it('renders the default size at 76px min-height with no size prop', () => {
+    render(<Textarea data-testid='textarea' />);
+    expect(screen.getByTestId('textarea').className).toContain('min-h-[76px]');
+  });
+});
