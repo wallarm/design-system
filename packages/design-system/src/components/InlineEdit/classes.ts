@@ -1,13 +1,18 @@
 import { cva } from 'class-variance-authority';
 
 export const inlineEditPreviewVariants = cva(
-  'group flex w-full min-w-0 gap-4 rounded-8 border border-transparent px-6 py-4 transition-colors',
+  // Typography/padding match Input's `size='small'` (2px padding + 20px/
+  // text-sm line-height) so toggling into edit mode causes no visual jump.
+  'group flex w-full min-w-0 gap-4 rounded-8 border border-transparent px-6 py-2 font-sans text-sm text-text-primary transition-colors',
   {
     variants: {
-      // Multi-line values align the trigger icon to the top; single-line centers it.
+      // Multi-line values align the trigger icon to the top and grow with
+      // content (lineClamp); single-line centers it and fixes the row at
+      // Input's small 24px height (border-box: 2px padding + 1px border on
+      // each side + the 20px text-sm line-height above = 24px total).
       multiline: {
         true: 'items-start',
-        false: 'items-center',
+        false: 'items-center h-24',
       },
       activatable: {
         true: '',

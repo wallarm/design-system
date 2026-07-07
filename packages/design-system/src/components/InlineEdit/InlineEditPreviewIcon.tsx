@@ -30,14 +30,24 @@ export const InlineEditPreviewIcon: FC<InlineEditPreviewIconProps> = ({
 
   if (isLoading) {
     return (
-      <span ref={ref} data-testid={testId} data-slot='inline-edit-preview-icon'>
+      <span
+        ref={ref}
+        data-testid={testId}
+        data-slot='inline-edit-preview-icon'
+        className='inline-flex items-center'
+      >
         <Loader type='circle' size='md' />
       </span>
     );
   }
   if (status === 'saved') {
     return (
-      <span ref={ref} data-testid={testId} data-slot='inline-edit-preview-icon'>
+      <span
+        ref={ref}
+        data-testid={testId}
+        data-slot='inline-edit-preview-icon'
+        className='inline-flex items-center'
+      >
         <Check size='md' className='text-icon-success' />
       </span>
     );
@@ -49,7 +59,7 @@ export const InlineEditPreviewIcon: FC<InlineEditPreviewIconProps> = ({
       ref={ref}
       data-testid={testId}
       data-slot='inline-edit-preview-icon'
-      className='text-icon-secondary opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'
+      className='inline-flex items-center text-icon-secondary opacity-0 transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100'
     >
       {children}
     </span>
