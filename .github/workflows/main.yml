@@ -452,15 +452,21 @@ jobs:
           # (Playwright shards by spec file, so two shards can't touch the
           # same snapshot). Paths are staged relative to packages/design-system
           # so the artifact layout matches what commit-screenshots expects.
+          #
+          # Explicit -C/safe.directory: this job's container runs each step via a
+          # fresh `docker exec`, and git's repository auto-detection from cwd is
+          # not reliable there (seen failing with "Not a git repository" even
+          # though the checkout succeeded) - so point git at the workspace directly.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
           STAGING_DIR="$RUNNER_TEMP/changed-screenshots"
           mkdir -p "$STAGING_DIR"
           {
-            git diff --name-only -- packages/design-system
-            git ls-files --others --exclude-standard -- packages/design-system
+            git -C "$GITHUB_WORKSPACE" diff --name-only -- packages/design-system
+            git -C "$GITHUB_WORKSPACE" ls-files --others --exclude-standard -- packages/design-system
           } | grep '\.png$' | while IFS= read -r f; do
             rel="${f#packages/design-system/}"
             mkdir -p "$STAGING_DIR/$(dirname "$rel")"
-            cp "$f" "$STAGING_DIR/$rel"
+            cp "$GITHUB_WORKSPACE/$f" "$STAGING_DIR/$rel"
           done
           echo "dir=$STAGING_DIR" >> "$GITHUB_OUTPUT"
 
