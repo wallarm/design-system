@@ -44,6 +44,17 @@ describe('InlineEditInput', () => {
     );
     expect(screen.getByTestId('attr--input')).toHaveAttribute('aria-invalid', 'true');
   });
+
+  it('defaults to the small (24px) size, matching the rest of InlineEdit', () => {
+    render(
+      <InlineEdit defaultEdit defaultValue='ab' data-testid='attr'>
+        <InlineEditControl>
+          <InlineEditInput />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('attr--input')).toHaveClass('h-24');
+  });
 });
 
 describe('InlineEditTextarea', () => {
@@ -58,6 +69,17 @@ describe('InlineEditTextarea', () => {
     const node = screen.getByTestId('attr--input');
     expect(node.tagName).toBe('TEXTAREA');
     expect(node).toHaveAttribute('data-analytics-id', 'ATTR_TEXTAREA');
+  });
+
+  it('defaults to the small (64px) size, matching the rest of InlineEdit', () => {
+    render(
+      <InlineEdit defaultEdit defaultValue='ab' data-testid='attr'>
+        <InlineEditControl>
+          <InlineEditTextarea />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('attr--input')).toHaveClass('min-h-[64px]');
   });
 });
 
@@ -75,5 +97,16 @@ describe('InlineEditNumber', () => {
       </InlineEdit>,
     );
     expect(screen.getByTestId('attr--input')).toHaveAttribute('data-analytics-id', 'ATTR_NUMBER');
+  });
+
+  it('defaults to the small (24px) size, matching the rest of InlineEdit', () => {
+    render(
+      <InlineEdit defaultEdit defaultValue='8443' data-testid='attr'>
+        <InlineEditControl>
+          <InlineEditNumber />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('attr--input')).toHaveClass('h-24');
   });
 });

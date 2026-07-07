@@ -6,6 +6,7 @@ import { useInlineEdit } from './InlineEditContext';
 export type InlineEditTextareaProps = Omit<TextareaProps, 'value' | 'onChange' | 'error'>;
 
 export const InlineEditTextarea: FC<InlineEditTextareaProps> = ({
+  size = 'small',
   'data-testid': testIdProp,
   ...props
 }) => {
@@ -18,6 +19,7 @@ export const InlineEditTextarea: FC<InlineEditTextareaProps> = ({
       value={value ?? ''}
       onChange={event => setValue(event.target.value)}
       error={invalid}
+      size={size}
     />
   );
 };

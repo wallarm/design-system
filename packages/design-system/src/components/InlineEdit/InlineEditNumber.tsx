@@ -16,6 +16,7 @@ export type InlineEditNumberProps = Omit<NumberInputProps, 'value' | 'onValueCha
  */
 
 export const InlineEditNumber: FC<InlineEditNumberProps> = ({
+  size = 'small',
   'data-testid': testIdProp,
   ...props
 }) => {
@@ -28,6 +29,7 @@ export const InlineEditNumber: FC<InlineEditNumberProps> = ({
       value={value ?? ''}
       onValueChange={(details: NumberInputValueChangeDetails) => setValue(details.value)}
       error={invalid}
+      size={size}
     />
   );
 };

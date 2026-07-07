@@ -136,7 +136,7 @@ function renderSelectOptions(items: SelectDataItem[]) {
 // descendant of <InlineEdit>, not from the story function that renders it.
 function SelectInputTrigger() {
   const testId = useTestId('input');
-  return <SelectInput data-testid={testId} />;
+  return <SelectInput data-testid={testId} size='small' />;
 }
 
 // SelectButton naturally cascades to the `button` slot, but this specific
@@ -145,7 +145,7 @@ function SelectInputTrigger() {
 // SelectInputTrigger above, just for the single-select trigger.
 function SelectButtonTrigger() {
   const testId = useTestId('input');
-  return <SelectButton data-testid={testId} />;
+  return <SelectButton data-testid={testId} size='small' />;
 }
 
 // `Calendar` never re-provides its own testid cascade, so this resolves
@@ -162,6 +162,7 @@ function DateInputTrigger({ granularity }: { granularity: 'day' | 'minute' }) {
       value={toReactAriaDateValue(resolvedValue)}
       onChange={v => setValue(toCalendarDateValue(v))}
       granularity={granularity}
+      size='small'
     />
   );
 }
@@ -237,7 +238,7 @@ export const SelectEditor: StoryFn = () => {
           </InlineEditPreview>
           <InlineEditControl>
             <InlineEditSelect items={roleItems}>
-              <SelectButton />
+              <SelectButton size='small' />
               <SelectPositioner>
                 <SelectContent>{renderSelectOptions(roleItems)}</SelectContent>
               </SelectPositioner>
@@ -529,7 +530,7 @@ export const CustomEditor: StoryFn = () => {
                   aria-label='Custom'
                   value={(draft as string) ?? ''}
                   onChange={e => setDraft(e.target.value.toUpperCase())}
-                  className='h-28 px-8'
+                  size='small'
                 />
                 {/* preventDefault on mousedown keeps focus in the input, so
                     Safari's click-after-blur ordering cannot fire a blur

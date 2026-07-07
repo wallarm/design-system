@@ -54,4 +54,10 @@ describe('InlineEditTime', () => {
     );
     expect(screen.getByTestId('mode')).toHaveTextContent('blur');
   });
+
+  it('defaults to the small (24px) size, matching the rest of InlineEdit', () => {
+    render(<Harness />);
+    const group = screen.getByTestId('ie--input').querySelector('[data-slot="input-group"]');
+    expect(group).toHaveClass('h-24');
+  });
 });

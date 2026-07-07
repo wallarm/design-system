@@ -19,6 +19,7 @@ export const InlineEditTime: FC<InlineEditTimeProps> = ({
   granularity = 'minute',
   showTimeDropdown = true,
   showIcon = false,
+  size = 'small',
   ...props
 }) => {
   const testId = useTestId('input', testIdProp);
@@ -34,6 +35,7 @@ export const InlineEditTime: FC<InlineEditTimeProps> = ({
       granularity={granularity}
       showTimeDropdown={showTimeDropdown}
       showIcon={showIcon}
+      size={size}
       value={value ?? null}
       onChange={v => setValue(v)}
     />
