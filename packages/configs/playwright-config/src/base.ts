@@ -25,6 +25,11 @@ export const baseConfig = defineConfig({
             '--no-sandbox',
             '--disable-setuid-sandbox',
             '--disable-dev-shm-usage',
+            // Force software rendering. Headless-Chromium GPU rasterization in the
+            // CI (noble) container intermittently corrupts a random subset of
+            // screenshot captures — a torn band and a black void below the content.
+            // Software rendering is deterministic and eliminates the flake. See #207.
+            '--disable-gpu',
             '--disable-background-timer-throttling',
             '--disable-backgrounding-occluded-windows',
             '--disable-renderer-backgrounding',
