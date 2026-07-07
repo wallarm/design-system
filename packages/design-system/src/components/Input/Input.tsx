@@ -7,7 +7,7 @@ import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
 import { inputVariants } from './classes';
 
-type InputNativeProps = InputHTMLAttributes<HTMLInputElement>;
+type InputNativeProps = Omit<InputHTMLAttributes<HTMLInputElement>, 'size'>;
 
 type InputVariantsProps = VariantProps<typeof inputVariants>;
 
@@ -20,7 +20,7 @@ export type InputProps = InputNativeProps &
 export const Input: FC<InputProps> = ({
   className,
   error = false,
-  size = 'default' as const,
+  size = 'default',
   disabled = false,
   ref,
   ...props
