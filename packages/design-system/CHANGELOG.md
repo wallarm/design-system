@@ -1,3 +1,7 @@
+## <small>0.71.5 (2026-07-07)</small>
+
+* fix(toast): success icon, pause-hover zone, and semantic color tokens (#205) ([da00ece](https://github.com/wallarm/design-system/commit/da00ece)), closes [#205](https://github.com/wallarm/design-system/issues/205)
+
 ## <small>0.71.4 (2026-07-06)</small>
 
 * fix(nav-panel): increase panel header bottom padding to 6px (#204) ([e5239c8](https://github.com/wallarm/design-system/commit/e5239c8)), closes [#204](https://github.com/wallarm/design-system/issues/204)
