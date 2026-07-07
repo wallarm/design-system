@@ -111,3 +111,23 @@ describe('Persistence', () => {
     expect(screen.getByTestId('date-input')).toHaveAttribute('data-analytics-id', 'DATE_FROM');
   });
 });
+
+describe('Size variants (confirms InputGroup scaling, no DateInput code change)', () => {
+  it('defaults to the default (36px) InputGroup height with no size prop', () => {
+    render(<DateInput data-testid='date-input' />);
+    const group = screen.getByTestId('date-input').querySelector('[data-slot="input-group"]');
+    expect(group).toHaveClass('h-36');
+  });
+
+  it('renders the medium (32px) InputGroup height', () => {
+    render(<DateInput data-testid='date-input' size='medium' />);
+    const group = screen.getByTestId('date-input').querySelector('[data-slot="input-group"]');
+    expect(group).toHaveClass('h-32');
+  });
+
+  it('renders the small (24px) InputGroup height', () => {
+    render(<DateInput data-testid='date-input' size='small' />);
+    const group = screen.getByTestId('date-input').querySelector('[data-slot="input-group"]');
+    expect(group).toHaveClass('h-24');
+  });
+});
