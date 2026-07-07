@@ -42,8 +42,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "tailwindcss": "catalog:",
-    "tw-animate-css": "catalog:",
-    "non.geist": "catalog:"
+    "tw-animate-css": "catalog:"
   },
   "devDependencies": {
     "@rsbuild/core": "catalog:",
