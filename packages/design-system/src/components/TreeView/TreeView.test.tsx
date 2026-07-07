@@ -1,0 +1,397 @@
+import { render, screen } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
+import { describe, expect, it, vi } from 'vitest';
+import { TreeView } from './TreeView';
+import { TreeViewItem } from './TreeViewItem';
+
+describe('Node rendering', () => {
+  it('renders leaf and branch items', () => {
+    render(
+      <TreeView>
+        <TreeViewItem defaultOpen>
+          Parent
+          <TreeViewItem>Child</TreeViewItem>
+        </TreeViewItem>
+        <TreeViewItem>Sibling</TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(screen.getByText('Parent')).toBeInTheDocument();
+    expect(screen.getByText('Child')).toBeInTheDocument();
+    expect(screen.getByText('Sibling')).toBeInTheDocument();
+  });
+
+  it('renders composed children (icon, badge, text) as row content', () => {
+    render(
+      <TreeView>
+        <TreeViewItem>
+          <span data-testid='icon' />
+          <span data-testid='badge'>new</span>
+          Endpoint
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(screen.getByTestId('icon')).toBeInTheDocument();
+    expect(screen.getByTestId('badge')).toHaveTextContent('new');
+    expect(screen.getByText('Endpoint')).toBeInTheDocument();
+    // badge sits before the text label in DOM order
+    expect(
+      screen.getByTestId('badge').compareDocumentPosition(screen.getByText('Endpoint')) &
+        Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+  });
+});
+
+describe('data-slot attributes', () => {
+  it('renders data-slot="tree-view" on the root', () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem>Item</TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(container.querySelector('[data-slot="tree-view"]')).toBeInTheDocument();
+  });
+
+  it('renders data-slot="tree-view-item" on items', () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem>A</TreeViewItem>
+        <TreeViewItem>B</TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(container.querySelectorAll('[data-slot="tree-view-item"]')).toHaveLength(2);
+  });
+
+  it('renders a toggle on branches and a spacer on leaves', () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem>
+          Branch
+          <TreeViewItem>Leaf</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(container.querySelector('[data-slot="tree-view-toggle"]')).toBeInTheDocument();
+    expect(container.querySelector('[data-slot="tree-view-toggle-spacer"]')).toBeInTheDocument();
+  });
+});
+
+describe('ARIA roles', () => {
+  it('applies tree, treeitem and group roles', () => {
+    render(
+      <TreeView>
+        <TreeViewItem defaultOpen>
+          Parent
+          <TreeViewItem>Child</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(screen.getByRole('tree')).toBeInTheDocument();
+    expect(screen.getAllByRole('treeitem')).toHaveLength(2);
+    expect(screen.getByRole('group')).toBeInTheDocument();
+  });
+
+  it('sets aria-expanded on branch items only', () => {
+    render(
+      <TreeView>
+        <TreeViewItem defaultOpen={false}>
+          Branch
+          <TreeViewItem>Leaf</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    const branch = screen.getByText('Branch').closest('[role="treeitem"]');
+    expect(branch).toHaveAttribute('aria-expanded', 'false');
+  });
+});
+
+describe('data-testid', () => {
+  it('forwards and cascades data-testid', () => {
+    const { container } = render(
+      <TreeView data-testid='files'>
+        <TreeViewItem>Item</TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(screen.getByTestId('files')).toBeInTheDocument();
+    expect(container.querySelector('[data-testid="files--item"]')).toBeInTheDocument();
+  });
+
+  it('does not render data-testid when none is provided', () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem>Item</TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(container.querySelector('[data-slot="tree-view"]')).not.toHaveAttribute('data-testid');
+  });
+});
+
+describe('Analytics-readiness', () => {
+  it('forwards arbitrary data-* attributes to the treeitem root', () => {
+    render(
+      <TreeView>
+        <TreeViewItem data-analytics-id='node-1'>Item</TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(screen.getByRole('treeitem')).toHaveAttribute('data-analytics-id', 'node-1');
+  });
+
+  it('calls the consumer onClick', async () => {
+    const onClick = vi.fn();
+    render(
+      <TreeView>
+        <TreeViewItem onClick={onClick}>Item</TreeViewItem>
+      </TreeView>,
+    );
+
+    await userEvent.click(screen.getByText('Item'));
+    expect(onClick).toHaveBeenCalledOnce();
+  });
+});
+
+describe('Expand / collapse', () => {
+  it('hides the group when closed', () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem defaultOpen={false}>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(container.querySelector('[data-slot="tree-view-group"]')).toHaveAttribute(
+      'data-state',
+      'closed',
+    );
+  });
+
+  it('toggles open state when the toggle is clicked', async () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem defaultOpen={false}>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLElement;
+    const group = container.querySelector('[data-slot="tree-view-group"]') as HTMLElement;
+
+    expect(group).toHaveAttribute('data-state', 'closed');
+    await userEvent.click(toggle);
+    expect(group).toHaveAttribute('data-state', 'open');
+  });
+
+  it('calls onOpenChange when toggled', async () => {
+    const onOpenChange = vi.fn();
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem defaultOpen={false} onOpenChange={onOpenChange}>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLElement;
+    await userEvent.click(toggle);
+    expect(onOpenChange).toHaveBeenCalledWith(true);
+  });
+
+  it('respects controlled open state', () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem open>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(container.querySelector('[data-slot="tree-view-group"]')).toHaveAttribute(
+      'data-state',
+      'open',
+    );
+  });
+});
+
+describe('Selection', () => {
+  it('selects a row on click and marks aria-selected', async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <TreeView selectable onSelectionChange={onSelectionChange}>
+        <TreeViewItem id='a'>Alpha</TreeViewItem>
+        <TreeViewItem id='b'>Beta</TreeViewItem>
+      </TreeView>,
+    );
+
+    await userEvent.click(screen.getByText('Alpha'));
+
+    expect(onSelectionChange).toHaveBeenCalledWith(['a']);
+    expect(screen.getByText('Alpha').closest('[role="treeitem"]')).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
+  it('replaces selection in single-select mode', async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <TreeView selectable onSelectionChange={onSelectionChange}>
+        <TreeViewItem id='a'>Alpha</TreeViewItem>
+        <TreeViewItem id='b'>Beta</TreeViewItem>
+      </TreeView>,
+    );
+
+    await userEvent.click(screen.getByText('Alpha'));
+    await userEvent.click(screen.getByText('Beta'));
+
+    expect(onSelectionChange).toHaveBeenLastCalledWith(['b']);
+  });
+
+  it('accumulates selection in multi-select mode', async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <TreeView selectable multiSelect onSelectionChange={onSelectionChange}>
+        <TreeViewItem id='a'>Alpha</TreeViewItem>
+        <TreeViewItem id='b'>Beta</TreeViewItem>
+      </TreeView>,
+    );
+
+    await userEvent.click(screen.getByText('Alpha'));
+    await userEvent.click(screen.getByText('Beta'));
+
+    expect(onSelectionChange).toHaveBeenLastCalledWith(['a', 'b']);
+  });
+
+  it('does not select the row when the toggle is clicked', async () => {
+    const onSelectionChange = vi.fn();
+    const { container } = render(
+      <TreeView selectable onSelectionChange={onSelectionChange}>
+        <TreeViewItem id='a'>
+          Branch
+          <TreeViewItem id='child'>Child</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLElement;
+    await userEvent.click(toggle);
+
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+});
+
+describe('Disabled', () => {
+  it('marks the row aria-disabled and does not select on click', async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <TreeView selectable onSelectionChange={onSelectionChange}>
+        <TreeViewItem id='a' disabled>
+          Alpha
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    const item = screen.getByText('Alpha').closest('[role="treeitem"]') as HTMLElement;
+    expect(item).toHaveAttribute('aria-disabled', 'true');
+
+    await userEvent.click(screen.getByText('Alpha'));
+    expect(onSelectionChange).not.toHaveBeenCalled();
+  });
+
+  it('does not toggle a disabled branch and disables its toggle button', async () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem defaultOpen={false} disabled>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    const toggle = container.querySelector('[data-slot="tree-view-toggle"]') as HTMLButtonElement;
+    const group = container.querySelector('[data-slot="tree-view-group"]') as HTMLElement;
+
+    expect(toggle).toBeDisabled();
+    await userEvent.click(toggle);
+    expect(group).toHaveAttribute('data-state', 'closed');
+  });
+});
+
+describe('Keyboard', () => {
+  it('toggles a branch with ArrowRight / ArrowLeft', async () => {
+    const { container } = render(
+      <TreeView>
+        <TreeViewItem defaultOpen={false}>
+          Branch
+          <TreeViewItem>Child</TreeViewItem>
+        </TreeViewItem>
+      </TreeView>,
+    );
+
+    const branch = screen.getByText('Branch').closest('[role="treeitem"]') as HTMLElement;
+    const group = container.querySelector('[data-slot="tree-view-group"]') as HTMLElement;
+
+    branch.focus();
+    await userEvent.keyboard('{ArrowRight}');
+    expect(group).toHaveAttribute('data-state', 'open');
+
+    await userEvent.keyboard('{ArrowLeft}');
+    expect(group).toHaveAttribute('data-state', 'closed');
+  });
+
+  it('selects a row with Enter', async () => {
+    const onSelectionChange = vi.fn();
+    render(
+      <TreeView selectable onSelectionChange={onSelectionChange}>
+        <TreeViewItem id='a'>Alpha</TreeViewItem>
+      </TreeView>,
+    );
+
+    const item = screen.getByText('Alpha').closest('[role="treeitem"]') as HTMLElement;
+    item.focus();
+    await userEvent.keyboard('{Enter}');
+
+    expect(onSelectionChange).toHaveBeenCalledWith(['a']);
+  });
+});
+
+describe('Empty state', () => {
+  it('renders "No results" when there are no items', () => {
+    render(
+      <TreeView>
+        <div>chrome</div>
+      </TreeView>,
+    );
+
+    expect(screen.getByText('No results')).toBeInTheDocument();
+  });
+
+  it('renders "No results" when there are no children at all', () => {
+    render(<TreeView />);
+
+    expect(screen.getByText('No results')).toBeInTheDocument();
+  });
+
+  it('does not render the empty state when items exist', () => {
+    render(
+      <TreeView>
+        <TreeViewItem>Item</TreeViewItem>
+      </TreeView>,
+    );
+
+    expect(screen.queryByText('No results')).not.toBeInTheDocument();
+  });
+});
