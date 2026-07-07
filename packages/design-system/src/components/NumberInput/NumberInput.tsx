@@ -1,32 +1,36 @@
 import type { FC, Ref } from 'react';
 import { NumberInput as ArkUiNumberInput } from '@ark-ui/react/number-input';
+import type { VariantProps } from 'class-variance-authority';
 import { ChevronDown, ChevronUp } from '../../icons';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
+import {
+  numberInputControlVariants,
+  numberInputFieldVariants,
+  numberInputRootVariants,
+  numberInputTriggerVariants,
+} from './classes';
 
+// Ark UI's Root is a <div> (not a native <input>), so it carries no native
+// `size` HTML attribute to collide with — unlike Input, which needed an
+// explicit Omit (see Input.tsx) to avoid exactly that collision.
 type NumberInputNativeProps = Omit<ArkUiNumberInput.RootProps, 'className' | 'invalid'>;
+
+type NumberInputVariantsProps = VariantProps<typeof numberInputRootVariants>;
 
 interface NumberInputBaseProps {
   error?: boolean;
   ref?: Ref<HTMLDivElement>;
 }
 
-export type NumberInputProps = NumberInputNativeProps & NumberInputBaseProps & TestableProps;
-
-const numberInputTriggerClassNames = cn(
-  // Base. Flex centering is load-bearing: the icon utility renders SVGs as
-  // inline-block with a baseline vertical-align, which drags the 12px glyph
-  // ~8px below center inside this fixed 16x14 button under inherited
-  // font-size/line-height.
-  'flex items-center justify-center w-16 h-14 px-2 py-1 rounded-2 transition-colors cursor-pointer',
-  // State ---- hover
-  'hover:bg-states-primary-hover',
-  // State ---- disabled
-  '[&[data-disabled]]:cursor-not-allowed [&[data-disabled]]:pointer-events-none',
-);
+export type NumberInputProps = NumberInputNativeProps &
+  NumberInputVariantsProps &
+  NumberInputBaseProps &
+  TestableProps;
 
 export const NumberInput: FC<NumberInputProps> = ({
   error = false,
+  size = 'default',
   defaultValue = '0',
   ...props
 }) => (
@@ -34,59 +38,16 @@ export const NumberInput: FC<NumberInputProps> = ({
     {...props}
     invalid={error}
     defaultValue={defaultValue}
-    className={cn(
-      // Dimensions
-      'w-full h-36 has-[>textarea]:h-auto',
-
-      // Layout
-      'flex items-stretch border rounded-8 bg-component-input-bg relative',
-
-      // Static state
-      'border border-border-primary outline-none shadow-xs transition-[color,border,box-shadow]',
-      '[&:not([data-disabled]):not([data-focus])]:hover:border-component-border-input-hover ',
-
-      // Focus state.
-      '[&[data-focus]:not([data-disabled])]:ring-3',
-      '[&[data-focus]:not([data-disabled]):not([data-invalid])]:ring-focus-primary',
-      '[&[data-focus]:not([data-disabled]):not([data-invalid])]:border-border-strong-primary',
-
-      // Error state.
-      'data-invalid:border-border-strong-danger data-invalid:ring-focus-destructive',
-      '[&[data-invalid]:not([data-disabled])]:hover:border-border-strong-danger',
-      '[&[data-invalid]:not([data-disabled]):not([data-focus])]:hover:ring-3',
-      '[&[data-invalid]:not([data-disabled]):not([data-focus])]:hover:ring-focus-destructive-hover',
-      '[&[data-invalid]:not([data-disabled])]:[&>input]:hover:ring-0',
-
-      // Disabled state.
-      'data-disabled:opacity-50',
-      'data-disabled:cursor-not-allowed',
-      'data-disabled:*:cursor-not-allowed',
-    )}
+    className={numberInputRootVariants({ size })}
   >
-    <ArkUiNumberInput.Input
-      className={cn(
-        // Layout
-        'flex-1 h-full px-12 py-8',
-        // Visual
-        'rounded-none border-0 bg-transparent shadow-none outline-none',
-        // Text
-        'font-sans font-normal text-sm text-text-primary placeholder:text-text-secondary',
-      )}
-    />
+    <ArkUiNumberInput.Input className={numberInputFieldVariants({ size })} />
     <ArkUiNumberInput.Control
-      className={cn(
-        // Layout
-        'flex flex-col justify-center px-4 py-2',
-        // Visual
-        'bg-states-primary-default-alt border-l border-border-primary',
-        // Icons
-        '[&_svg]:icon-sm [&_svg]:text-icon-secondary [&_svg]:pointer-events-none',
-      )}
+      className={cn(numberInputControlVariants({ size }), '[&_svg]:text-icon-secondary')}
     >
-      <ArkUiNumberInput.IncrementTrigger className={numberInputTriggerClassNames}>
+      <ArkUiNumberInput.IncrementTrigger className={numberInputTriggerVariants({ size })}>
         <ChevronUp />
       </ArkUiNumberInput.IncrementTrigger>
-      <ArkUiNumberInput.DecrementTrigger className={numberInputTriggerClassNames}>
+      <ArkUiNumberInput.DecrementTrigger className={numberInputTriggerVariants({ size })}>
         <ChevronDown />
       </ArkUiNumberInput.DecrementTrigger>
     </ArkUiNumberInput.Control>

@@ -1,5 +1,6 @@
 import { fn } from 'storybook/test';
-import type { Meta, StoryObj } from 'storybook-react-rsbuild';
+import type { Meta, StoryFn, StoryObj } from 'storybook-react-rsbuild';
+import { HStack } from '../Stack';
 import { NumberInput } from './NumberInput';
 
 const meta = {
@@ -28,6 +29,14 @@ export const Basic: StoryObj<typeof meta> = {
     'data-testid': 'number-input',
   },
 };
+
+export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
+  <HStack gap={16} align='start'>
+    <NumberInput {...args} size='default' />
+    <NumberInput {...args} size='medium' />
+    <NumberInput {...args} size='small' />
+  </HStack>
+);
 
 export const Disabled: StoryObj<typeof meta> = {
   args: {
