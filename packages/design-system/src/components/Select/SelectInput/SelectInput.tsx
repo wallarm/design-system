@@ -12,7 +12,7 @@ import { SelectInputOverflowRenderer } from './SelectInputOverflowRenderer';
 const selectInputVariants = cva(
   [
     // Layout & container
-    'flex items-center gap-4 w-fit h-36 pr-12 rounded-8 border bg-component-input-bg shadow-xs transition-[colors,border,box-shadow]',
+    'flex items-center gap-4 w-fit pr-12 rounded-8 border bg-component-input-bg shadow-xs transition-[colors,border,box-shadow]',
 
     // Typography
     'font-sans text-sm text-text-primary placeholder:text-text-secondary',
@@ -72,6 +72,12 @@ const selectInputVariants = cva(
       empty: {
         true: 'text-text-secondary',
       },
+      // 24/32/36px scale, matching Input/InputGroup/Textarea/DateInput/TimeInput.
+      size: {
+        default: 'h-36',
+        medium: 'h-32',
+        small: 'h-24',
+      },
     },
     compoundVariants: [
       {
@@ -80,18 +86,23 @@ const selectInputVariants = cva(
         className: 'pl-12',
       },
     ],
+    defaultVariants: {
+      size: 'default',
+    },
   },
 );
 
 interface SelectInputBaseProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'color'> {
   'data-testid'?: string;
+  size?: 'small' | 'medium' | 'default';
 }
 
 type SelectInputProps = SelectInputBaseProps & Pick<SelectValueTextProps, 'placeholder'>;
 
 export const SelectInput: FC<SelectInputProps> = ({
   placeholder = 'Choose...',
+  size = 'default',
   className,
   ...rest
 }) => {
@@ -105,7 +116,7 @@ export const SelectInput: FC<SelectInputProps> = ({
         <div
           {...rest}
           className={cn(
-            selectInputVariants({ empty: isEmpty, multiple }),
+            selectInputVariants({ empty: isEmpty, multiple, size }),
             'w-full max-w-full gap-8',
             className,
           )}

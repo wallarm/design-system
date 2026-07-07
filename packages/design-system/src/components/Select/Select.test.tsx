@@ -7,6 +7,7 @@ import { Select } from './Select';
 import { SelectButton } from './SelectButton';
 import { SelectClearTrigger } from './SelectClearTrigger';
 import { SelectContent } from './SelectContent';
+import { SelectInput } from './SelectInput';
 import { SelectOption } from './SelectOption';
 import { SelectOptionText } from './SelectOptionText';
 import { SelectPositioner } from './SelectPositioner';
@@ -149,5 +150,63 @@ describe('State persistence', () => {
     await userEvent.click(screen.getByTestId('trigger'));
     const reactOptionAfter = await screen.findByTestId('option-react');
     expect(reactOptionAfter).toHaveAttribute('data-analytics-id', 'FRAMEWORK_REACT');
+  });
+});
+
+describe('Size variants', () => {
+  const collection = createListCollection({ items });
+
+  it('SelectButton defaults to the default (36px) height with no size prop', () => {
+    render(
+      <Select collection={collection} data-testid='select'>
+        <SelectButton data-testid='trigger' />
+      </Select>,
+    );
+    expect(screen.getByTestId('trigger').className).toContain('h-36');
+  });
+
+  it('SelectButton renders the medium (32px) height', () => {
+    render(
+      <Select collection={collection} data-testid='select'>
+        <SelectButton data-testid='trigger' size='medium' />
+      </Select>,
+    );
+    expect(screen.getByTestId('trigger').className).toContain('h-32');
+  });
+
+  it('SelectButton renders the small (24px) height', () => {
+    render(
+      <Select collection={collection} data-testid='select'>
+        <SelectButton data-testid='trigger' size='small' />
+      </Select>,
+    );
+    expect(screen.getByTestId('trigger').className).toContain('h-24');
+  });
+
+  it('SelectInput defaults to the default (36px) height with no size prop', () => {
+    render(
+      <Select collection={collection} multiple data-testid='select'>
+        <SelectInput data-testid='trigger' />
+      </Select>,
+    );
+    expect(screen.getByTestId('trigger').className).toContain('h-36');
+  });
+
+  it('SelectInput renders the medium (32px) height', () => {
+    render(
+      <Select collection={collection} multiple data-testid='select'>
+        <SelectInput data-testid='trigger' size='medium' />
+      </Select>,
+    );
+    expect(screen.getByTestId('trigger').className).toContain('h-32');
+  });
+
+  it('SelectInput renders the small (24px) height', () => {
+    render(
+      <Select collection={collection} multiple data-testid='select'>
+        <SelectInput data-testid='trigger' size='small' />
+      </Select>,
+    );
+    expect(screen.getByTestId('trigger').className).toContain('h-24');
   });
 });
