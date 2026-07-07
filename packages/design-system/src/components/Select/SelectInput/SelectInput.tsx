@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../../utils/cn';
@@ -7,12 +8,12 @@ import { SelectArrow } from '../SelectArrow';
 import { SelectValueText, type SelectValueTextProps } from '../SelectValueText';
 import { SelectInputClear } from './SelectInputClear';
 import { SelectInputItemRenderer } from './SelectInputItemRenderer';
-import { SelectInputOverflowRenderer } from './SelectInputOverflowRenderer';
+import { createSelectInputOverflowRenderer } from './SelectInputOverflowRenderer';
 
 const selectInputVariants = cva(
   [
     // Layout & container
-    'flex items-center gap-4 w-fit h-36 pr-12 rounded-8 border bg-component-input-bg shadow-xs transition-[colors,border,box-shadow]',
+    'flex items-center gap-4 w-fit pr-12 rounded-8 border bg-component-input-bg shadow-xs transition-[colors,border,box-shadow]',
 
     // Typography
     'font-sans text-sm text-text-primary placeholder:text-text-secondary',
@@ -72,6 +73,12 @@ const selectInputVariants = cva(
       empty: {
         true: 'text-text-secondary',
       },
+      // 24/32/36px scale, matching Input/InputGroup/Textarea/DateInput/TimeInput.
+      size: {
+        default: 'h-36',
+        medium: 'h-32',
+        small: 'h-24',
+      },
     },
     compoundVariants: [
       {
@@ -80,24 +87,30 @@ const selectInputVariants = cva(
         className: 'pl-12',
       },
     ],
+    defaultVariants: {
+      size: 'default',
+    },
   },
 );
 
 interface SelectInputBaseProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'color'> {
   'data-testid'?: string;
+  size?: 'small' | 'medium' | 'default';
 }
 
 type SelectInputProps = SelectInputBaseProps & Pick<SelectValueTextProps, 'placeholder'>;
 
 export const SelectInput: FC<SelectInputProps> = ({
   placeholder = 'Choose...',
+  size = 'default',
   className,
   ...rest
 }) => {
   const { selectedItems, disabled, multiple } = useSelectContext();
 
   const isEmpty = selectedItems.length <= 0;
+  const overflowRenderer = useMemo(() => createSelectInputOverflowRenderer(size), [size]);
 
   return (
     <ArkUiSelect.Control className='w-full max-w-full'>
@@ -105,7 +118,7 @@ export const SelectInput: FC<SelectInputProps> = ({
         <div
           {...rest}
           className={cn(
-            selectInputVariants({ empty: isEmpty, multiple }),
+            selectInputVariants({ empty: isEmpty, multiple, size }),
             'w-full max-w-full gap-8',
             className,
           )}
@@ -115,8 +128,10 @@ export const SelectInput: FC<SelectInputProps> = ({
             <OverflowList
               className='flex items-center gap-4 flex-1 h-full pl-6 overflow-hidden'
               items={selectedItems}
-              itemRenderer={item => <SelectInputItemRenderer key={item.value} item={item} />}
-              overflowRenderer={SelectInputOverflowRenderer}
+              itemRenderer={item => (
+                <SelectInputItemRenderer key={item.value} item={item} size={size} />
+              )}
+              overflowRenderer={overflowRenderer}
             />
           ) : (
             <SelectValueText placeholder={placeholder} />

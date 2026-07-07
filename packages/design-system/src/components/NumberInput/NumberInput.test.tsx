@@ -123,3 +123,20 @@ describe('Persistence', () => {
     );
   });
 });
+
+describe('Size variants', () => {
+  it('defaults to the default (36px) height with no size prop', () => {
+    render(<NumberInput data-testid='number-input' />);
+    expect(screen.getByTestId('number-input')).toHaveClass('h-36');
+  });
+
+  it('renders the medium (32px) height', () => {
+    render(<NumberInput data-testid='number-input' size='medium' />);
+    expect(screen.getByTestId('number-input')).toHaveClass('h-32');
+  });
+
+  it('renders the small (24px) height', () => {
+    render(<NumberInput data-testid='number-input' size='small' />);
+    expect(screen.getByTestId('number-input')).toHaveClass('h-24');
+  });
+});

@@ -12,7 +12,7 @@ import { Tooltip } from '../Tooltip';
 import { TooltipContent } from '../Tooltip/TooltipContent';
 import { TooltipTrigger } from '../Tooltip/TooltipTrigger';
 import { useCalendarContext } from './CalendarContext';
-import type { DateValue } from './types';
+import { toDateValue } from './dateValue';
 
 interface VisibleRangeText {
   start: string;
@@ -100,7 +100,7 @@ export const CalendarHeader: FC<CalendarHeaderProps> = ({
                             size='small'
                             aria-label='Jump to today'
                             onClick={() => {
-                              api.setFocusedValue(todayDate as unknown as DateValue);
+                              api.setFocusedValue(toDateValue(todayDate));
                             }}
                           >
                             <JumpToTodayIcon size='md' />
