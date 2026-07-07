@@ -32,6 +32,17 @@ export const inputVariants = cva(
           'focus-visible:ring-focus-primary',
         ),
       },
+      // 24/32/36px scale, matching InputGroup/Textarea/DateInput/TimeInput.
+      // Vertical padding is (height - 20) / 2 so the text-sm/20px-line-height
+      // value stays vertically centered at every size.
+      size: {
+        default: 'h-36 py-8',
+        medium: 'h-32 py-6',
+        small: 'h-24 py-2',
+      },
+    },
+    defaultVariants: {
+      size: 'default',
     },
   },
 );

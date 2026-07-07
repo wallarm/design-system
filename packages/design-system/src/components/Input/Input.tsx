@@ -20,6 +20,7 @@ export type InputProps = InputNativeProps &
 export const Input: FC<InputProps> = ({
   className,
   error = false,
+  size = 'default' as const,
   disabled = false,
   ref,
   ...props
@@ -31,7 +32,7 @@ export const Input: FC<InputProps> = ({
     <input
       {...mergedProps}
       {...props}
-      className={cn('h-36 py-8', inputVariants({ error }), className)}
+      className={cn(inputVariants({ error, size }), className)}
       disabled={disabled}
       aria-invalid={Boolean(error)}
       aria-disabled={disabled}
