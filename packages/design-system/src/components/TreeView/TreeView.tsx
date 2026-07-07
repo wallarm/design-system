@@ -31,8 +31,6 @@ export interface TreeViewProps extends HTMLAttributes<HTMLDivElement>, TestableP
   defaultSelectedIds?: string[];
   /** Called whenever the selection changes. */
   onSelectionChange?: (ids: string[]) => void;
-  /** Render a checkbox on every item. */
-  checkboxes?: boolean;
 }
 
 export const TreeView: FC<TreeViewProps> = ({
@@ -43,7 +41,6 @@ export const TreeView: FC<TreeViewProps> = ({
   selectedIds: controlledSelectedIds,
   defaultSelectedIds,
   onSelectionChange,
-  checkboxes = false,
   'data-testid': testId,
   className,
   ...props
@@ -74,8 +71,8 @@ export const TreeView: FC<TreeViewProps> = ({
   );
 
   const contextValue = useMemo(
-    () => ({ selectable, multiSelect, selectedIds, toggleSelect, checkboxes }),
-    [selectable, multiSelect, selectedIds, toggleSelect, checkboxes],
+    () => ({ selectable, multiSelect, selectedIds, toggleSelect }),
+    [selectable, multiSelect, selectedIds, toggleSelect],
   );
 
   // Show the empty state whenever no items are rendered (e.g. an empty search).

@@ -10,6 +10,8 @@ import {
 } from '../../icons';
 import { Badge } from '../Badge';
 import { Button } from '../Button';
+import { Checkbox } from '../Checkbox';
+import { CheckboxIndicator } from '../Checkbox/CheckboxIndicator';
 import { Input } from '../Input';
 import { Text } from '../Text';
 import { TreeView, type TreeViewProps } from './TreeView';
@@ -107,28 +109,61 @@ export const Nested: StoryFn<TreeViewProps> = args => (
   </div>
 );
 
-export const WithCheckboxes: StoryFn<TreeViewProps> = args => (
-  <div className='w-320'>
-    <TreeView checkboxes {...args}>
-      <TreeViewItem defaultOpen>
-        <Folder />
-        Endpoints
-        <TreeViewItem>
-          <FileText />
-          /users
+/**
+ * Checkboxes are just composed as children — the tree has no checkbox logic.
+ * The consumer owns the checked state (here a `Set` of ids) and stops the click
+ * from bubbling into row selection.
+ */
+export const WithCheckboxes: StoryFn<TreeViewProps> = () => {
+  const [checked, setChecked] = useState<Set<string>>(() => new Set(['users']));
+  const cb = (id: string) => (
+    <Checkbox
+      checked={checked.has(id)}
+      onClick={e => e.stopPropagation()}
+      onCheckedChange={details =>
+        setChecked(prev => {
+          const next = new Set(prev);
+          if (details.checked === true) {
+            next.add(id);
+          } else {
+            next.delete(id);
+          }
+          return next;
+        })
+      }
+      className='shrink-0'
+    >
+      <CheckboxIndicator />
+    </Checkbox>
+  );
+
+  return (
+    <div className='w-320'>
+      <TreeView>
+        <TreeViewItem defaultOpen>
+          {cb('endpoints')}
+          <Folder />
+          Endpoints
+          <TreeViewItem>
+            {cb('users')}
+            <FileText />
+            /users
+          </TreeViewItem>
+          <TreeViewItem>
+            {cb('orders')}
+            <FileText />
+            /orders
+          </TreeViewItem>
         </TreeViewItem>
         <TreeViewItem>
+          {cb('health')}
           <FileText />
-          /orders
+          /health
         </TreeViewItem>
-      </TreeViewItem>
-      <TreeViewItem>
-        <FileText />
-        /health
-      </TreeViewItem>
-    </TreeView>
-  </div>
-);
+      </TreeView>
+    </div>
+  );
+};
 
 export const Selectable: StoryFn<TreeViewProps> = () => {
   const [selected, setSelected] = useState<string[]>(['button']);
@@ -188,35 +223,38 @@ export const WithInlineBadge: StoryFn<TreeViewProps> = args => (
   </div>
 );
 
-/** `rightElement` holds anything — a count badge, or a custom tag like a label. */
-export const WithRightElement: StoryFn<TreeViewProps> = args => (
+/**
+ * Trailing content (count badge, custom tag) is just a child after the label —
+ * the label is `flex-1`, so anything after it is pushed to the right edge.
+ */
+export const WithTrailingContent: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
-      <TreeViewItem defaultOpen rightElement={<CountBadge value={3} />}>
+      <TreeViewItem defaultOpen>
         <Folder />
         src
-        <TreeViewItem rightElement={<CountBadge value={12} />}>
+        <CountBadge value={3} />
+        <TreeViewItem>
           <FileText />
           index.ts
+          <CountBadge value={12} />
         </TreeViewItem>
-        <TreeViewItem
-          rightElement={
-            <Badge color='blue' size='small'>
-              label
-            </Badge>
-          }
-        >
+        <TreeViewItem>
           <FileText />
           config.ts
+          <Badge color='blue' size='small'>
+            label
+          </Badge>
         </TreeViewItem>
         <TreeViewItem>
           <FileText />
           types.ts
         </TreeViewItem>
       </TreeViewItem>
-      <TreeViewItem rightElement={<CountBadge value={1} />}>
+      <TreeViewItem>
         <Folder />
         public
+        <CountBadge value={1} />
         <TreeViewItem>
           <FileText />
           favicon.ico

@@ -21,18 +21,6 @@ describe('Node rendering', () => {
     expect(screen.getByText('Sibling')).toBeInTheDocument();
   });
 
-  it('renders rightElement content on the right slot', () => {
-    const { container } = render(
-      <TreeView>
-        <TreeViewItem rightElement={<span data-testid='count'>5</span>}>Folder</TreeViewItem>
-      </TreeView>,
-    );
-
-    const right = container.querySelector('[data-slot="tree-view-right"]');
-    expect(right).toBeInTheDocument();
-    expect(screen.getByTestId('count')).toHaveTextContent('5');
-  });
-
   it('renders composed children (icon, badge, text) as row content', () => {
     render(
       <TreeView>
@@ -305,37 +293,6 @@ describe('Selection', () => {
   });
 });
 
-describe('Checkbox', () => {
-  it('renders a checkbox when tree-level checkboxes is set', () => {
-    render(
-      <TreeView checkboxes>
-        <TreeViewItem>Item</TreeViewItem>
-      </TreeView>,
-    );
-
-    expect(screen.getByRole('checkbox')).toBeInTheDocument();
-  });
-
-  it('calls onCheckedChange without selecting the row', async () => {
-    const onCheckedChange = vi.fn();
-    render(
-      <TreeView selectable>
-        <TreeViewItem id='a' checkbox onCheckedChange={onCheckedChange}>
-          Item
-        </TreeViewItem>
-      </TreeView>,
-    );
-
-    await userEvent.click(screen.getByRole('checkbox'));
-
-    expect(onCheckedChange).toHaveBeenCalledWith(true);
-    expect(screen.getByText('Item').closest('[role="treeitem"]')).toHaveAttribute(
-      'aria-selected',
-      'false',
-    );
-  });
-});
-
 describe('Disabled', () => {
   it('marks the row aria-disabled and does not select on click', async () => {
     const onSelectionChange = vi.fn();
@@ -370,18 +327,6 @@ describe('Disabled', () => {
     expect(toggle).toBeDisabled();
     await userEvent.click(toggle);
     expect(group).toHaveAttribute('data-state', 'closed');
-  });
-
-  it('disables the checkbox', () => {
-    render(
-      <TreeView>
-        <TreeViewItem checkbox disabled>
-          Item
-        </TreeViewItem>
-      </TreeView>,
-    );
-
-    expect(screen.getByRole('checkbox')).toBeDisabled();
   });
 });
 

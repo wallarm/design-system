@@ -9,8 +9,6 @@ export interface TreeViewContextValue {
   selectedIds: Set<string>;
   /** Toggle selection for a given item id. */
   toggleSelect: (id: string) => void;
-  /** Render a checkbox on every item (item-level `checkbox` still overrides). */
-  checkboxes: boolean;
 }
 
 const TreeViewContext = createContext<TreeViewContextValue | null>(null);

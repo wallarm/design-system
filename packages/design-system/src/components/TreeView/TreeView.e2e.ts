@@ -7,7 +7,7 @@ const treeViewStory = createStoryHelper('navigation-treeview', [
   'With Checkboxes',
   'Selectable',
   'With Inline Badge',
-  'With Right Element',
+  'With Trailing Content',
   'Disabled',
   'With Header And Search',
 ] as const);
@@ -42,8 +42,8 @@ test.describe('Component: TreeView', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render right-element content correctly', async ({ page }) => {
-      await treeViewStory.goto(page, 'With Right Element');
+    test('Should render trailing content correctly', async ({ page }) => {
+      await treeViewStory.goto(page, 'With Trailing Content');
       await expect(page).toHaveScreenshot();
     });
 

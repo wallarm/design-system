@@ -15,8 +15,6 @@ import { Collapse } from '../../utils/Collapse';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { TreeDepthProvider, useTreeDepth } from '../../utils/treeDepth';
-import { Checkbox } from '../Checkbox';
-import { CheckboxIndicator } from '../Checkbox/CheckboxIndicator';
 import { treeViewRowVariants } from './classes';
 import { TREE_VIEW_INDENT_STEP } from './TreeView';
 import { useTreeViewContext } from './TreeViewContext';
@@ -41,15 +39,6 @@ export interface TreeViewItemProps extends Omit<HTMLAttributes<HTMLDivElement>, 
   /** Uncontrolled initial open state. */
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** Custom content rendered on the right side (e.g. a count badge, actions). */
-  rightElement?: ReactNode;
-  /** Show a checkbox for this row (overrides the tree-level `checkboxes` prop). */
-  checkbox?: boolean;
-  /** Controlled checkbox state. Leave undefined for an uncontrolled checkbox. */
-  checked?: boolean;
-  /** Uncontrolled initial checkbox state. */
-  defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
   /** Visually mark the row as selected (defaults to the tree's selection state). */
   selected?: boolean;
   /** Dim the row and disable all interaction (toggle, selection, checkbox). */
@@ -64,11 +53,6 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   open: controlledOpen,
   defaultOpen = false,
   onOpenChange,
-  rightElement,
-  checkbox,
-  checked,
-  defaultChecked,
-  onCheckedChange,
   selected: selectedProp,
   disabled = false,
   className,
@@ -77,7 +61,7 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
 }) => {
   const depth = useTreeDepth();
   const testId = useTestId('item');
-  const { selectable, selectedIds, toggleSelect, checkboxes } = useTreeViewContext();
+  const { selectable, selectedIds, toggleSelect } = useTreeViewContext();
 
   const [internalOpen, setInternalOpen] = useState(defaultOpen);
   const isControlled = controlledOpen !== undefined;
@@ -105,7 +89,6 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
 
   const isBranch = expandable || nestedItems.length > 0;
   const isSelected = selectedProp ?? (id !== undefined ? selectedIds.has(id) : false);
-  const showCheckbox = checkbox ?? checkboxes;
   const isInteractive = !disabled && (selectable ? id !== undefined : isBranch);
 
   const setOpen = useCallback(
@@ -161,7 +144,6 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
   );
 
   const paddingLeft = depth * TREE_VIEW_INDENT_STEP;
-  const hasRight = rightElement != null;
 
   return (
     <div
@@ -221,27 +203,8 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
             <span aria-hidden className='size-12 shrink-0' data-slot='tree-view-toggle-spacer' />
           )}
 
-          {showCheckbox && (
-            <Checkbox
-              checked={checked}
-              defaultChecked={defaultChecked}
-              disabled={disabled}
-              onCheckedChange={details => onCheckedChange?.(details.checked === true)}
-              onClick={event => event.stopPropagation()}
-              className='shrink-0'
-            >
-              <CheckboxIndicator />
-            </Checkbox>
-          )}
-
           {content}
         </div>
-
-        {hasRight && (
-          <div className='flex shrink-0 items-center gap-4' data-slot='tree-view-right'>
-            {rightElement}
-          </div>
-        )}
       </div>
 
       {isBranch && (
