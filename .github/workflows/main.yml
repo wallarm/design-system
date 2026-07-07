@@ -439,13 +439,43 @@ jobs:
         env:
           STORYBOOK_URL: http://localhost:6006/design-system
 
+      - name: Stage changed screenshots
+        id: changed-screenshots
+        run: |
+          # Only this shard's own new/modified snapshots get uploaded.
+          # Uploading the full **/*.png glob (old behavior) makes every shard's
+          # artifact overlap on files it never touched; when commit-screenshots
+          # merges the 3 artifacts with merge-multiple, a differing-size
+          # duplicate can overwrite a file without truncating it, corrupting
+          # the PNG (trailing garbage after IEND). Staging only this shard's
+          # actual changes keeps the 3 artifacts disjoint by construction
+          # (Playwright shards by spec file, so two shards can't touch the
+          # same snapshot). Paths are staged relative to packages/design-system
+          # so the artifact layout matches what commit-screenshots expects.
+          #
+          # Explicit -C/safe.directory: this job's container runs each step via a
+          # fresh `docker exec`, and git's repository auto-detection from cwd is
+          # not reliable there (seen failing with "Not a git repository" even
+          # though the checkout succeeded) - so point git at the workspace directly.
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          STAGING_DIR="$RUNNER_TEMP/changed-screenshots"
+          mkdir -p "$STAGING_DIR"
+          {
+            git -C "$GITHUB_WORKSPACE" diff --name-only -- packages/design-system
+            git -C "$GITHUB_WORKSPACE" ls-files --others --exclude-standard -- packages/design-system
+          } | grep '\.png$' | while IFS= read -r f; do
+            rel="${f#packages/design-system/}"
+            mkdir -p "$STAGING_DIR/$(dirname "$rel")"
+            cp "$GITHUB_WORKSPACE/$f" "$STAGING_DIR/$rel"
+          done
+          echo "dir=$STAGING_DIR" >> "$GITHUB_OUTPUT"
+
       - name: Upload updated screenshots
         uses: actions/upload-artifact@v4
         with:
           name: screenshots-shard-${{ matrix.shard }}
-          path: |
-            packages/design-system/src/**/*.png
-            packages/design-system/tests/**/*.png
+          path: ${{ steps.changed-screenshots.outputs.dir }}
+          if-no-files-found: ignore
           retention-days: 1
 
   # ========================================
