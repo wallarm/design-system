@@ -209,4 +209,24 @@ describe('Size variants', () => {
     );
     expect(screen.getByTestId('trigger').className).toContain('h-24');
   });
+
+  it('SelectInput scales its item Tags to medium at small size (large would leave no vertical margin in a 24px row)', () => {
+    render(
+      <Select collection={collection} multiple defaultValue={['react']} data-testid='select'>
+        <SelectInput data-testid='trigger' size='small' />
+      </Select>,
+    );
+    const tag = document.querySelector('[data-slot="tag"]');
+    expect(tag?.className).toContain('h-20');
+  });
+
+  it('SelectInput keeps its item Tags at large for medium/default sizes', () => {
+    render(
+      <Select collection={collection} multiple defaultValue={['react']} data-testid='select'>
+        <SelectInput data-testid='trigger' size='medium' />
+      </Select>,
+    );
+    const tag = document.querySelector('[data-slot="tag"]');
+    expect(tag?.className).toContain('h-24');
+  });
 });

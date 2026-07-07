@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { useMemo } from 'react';
 import { Select as ArkUiSelect, useSelectContext } from '@ark-ui/react/select';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../../utils/cn';
@@ -7,7 +8,7 @@ import { SelectArrow } from '../SelectArrow';
 import { SelectValueText, type SelectValueTextProps } from '../SelectValueText';
 import { SelectInputClear } from './SelectInputClear';
 import { SelectInputItemRenderer } from './SelectInputItemRenderer';
-import { SelectInputOverflowRenderer } from './SelectInputOverflowRenderer';
+import { createSelectInputOverflowRenderer } from './SelectInputOverflowRenderer';
 
 const selectInputVariants = cva(
   [
@@ -109,6 +110,7 @@ export const SelectInput: FC<SelectInputProps> = ({
   const { selectedItems, disabled, multiple } = useSelectContext();
 
   const isEmpty = selectedItems.length <= 0;
+  const overflowRenderer = useMemo(() => createSelectInputOverflowRenderer(size), [size]);
 
   return (
     <ArkUiSelect.Control className='w-full max-w-full'>
@@ -126,8 +128,10 @@ export const SelectInput: FC<SelectInputProps> = ({
             <OverflowList
               className='flex items-center gap-4 flex-1 h-full pl-6 overflow-hidden'
               items={selectedItems}
-              itemRenderer={item => <SelectInputItemRenderer key={item.value} item={item} />}
-              overflowRenderer={SelectInputOverflowRenderer}
+              itemRenderer={item => (
+                <SelectInputItemRenderer key={item.value} item={item} size={size} />
+              )}
+              overflowRenderer={overflowRenderer}
             />
           ) : (
             <SelectValueText placeholder={placeholder} />
