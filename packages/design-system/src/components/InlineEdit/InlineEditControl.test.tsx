@@ -96,6 +96,27 @@ describe('InlineEditControl', () => {
     // still editing — the control stays mounted
     expect(screen.getByTestId('attr--control')).toBeInTheDocument();
   });
+
+  it('carries the descendant-selector rules that align composed controls with InlineEditPreview (jsdom cannot compute CSS specificity — see live verification in the component doc comment)', () => {
+    render(
+      <InlineEdit defaultEdit defaultValue='v' data-testid='attr'>
+        <InlineEditControl>
+          <ControlledInput />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    const control = screen.getByTestId('attr--control');
+    expect(control.className).toContain('-ml-7');
+    expect(control.className).toContain('[&_[data-slot=input]]:px-6');
+    expect(control.className).toContain('[&_textarea]:px-6');
+    expect(control.className).toContain('[&_[data-scope=number-input][data-part=input]]:px-6');
+    expect(control.className).toContain('[&_[data-scope=select][data-part=trigger]]:px-6');
+    expect(control.className).toContain(
+      '[&_div[data-scope=select][data-part=trigger]:has([data-slot=overflow-list])]:pl-0',
+    );
+    expect(control.className).toContain('[&_[data-slot=input-group-addon]]:px-6');
+    expect(control.className).toContain('[&_[data-slot=input-group]>div:not([data-slot])]:pl-0');
+  });
 });
 
 function ModeProbe() {

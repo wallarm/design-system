@@ -122,7 +122,47 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
       data-slot='inline-edit-control'
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
-      className={cn('w-full min-w-0', className)}
+      className={cn(
+        'w-full min-w-0',
+        // Matches InlineEditPreview's own -ml-7: the hover-row hit target
+        // (and, here, the composed controls' own padding, per the rules
+        // below) extends 7px further left than surrounding content, in both
+        // modes, so toggling preview <-> edit doesn't shift anything.
+        '-ml-7',
+        // Horizontal padding matches InlineEditPreview's 6px (px-6) on both
+        // sides so toggling between preview and edit mode causes no
+        // horizontal text jump. Descendant selectors, not a shared prop:
+        // Input is the only one of these that exposes a className merge
+        // point all the way down to the padded element — NumberInput/
+        // Textarea deliberately omit `className`, and SelectButton/
+        // DateInput's own overridable slot sits outside the padded element.
+        // Higher specificity than each target's own `px-*` utility wins
+        // regardless of class order — same technique InputGroup already
+        // uses to override Input's classes (InputGroup.tsx's
+        // `**:data-[slot=input]:...`).
+        '[&_[data-slot=input]]:px-6', // Input
+        '[&_textarea]:px-6', // Textarea
+        '[&_[data-scope=number-input][data-part=input]]:px-6', // NumberInput
+        // Matches any Select trigger style — Ark UI's `asChild` stamps
+        // `data-scope=select][data-part=trigger]` onto whichever element is
+        // composed as the trigger, so this also covers SelectButtonTag
+        // (Tag-rendered trigger), not just the default Button-rendered one.
+        '[&_[data-scope=select][data-part=trigger]]:px-6', // SelectButton / SelectButtonTag / SelectInput
+        // SelectInput's multi-select/tags case (`data-slot=overflow-list`)
+        // already gets 6px from OverflowList's own `pl-6` — the rule above
+        // would double it up, so this more specific selector wins for the
+        // left side only (higher specificity: extra `div` + `:has()`).
+        '[&_div[data-scope=select][data-part=trigger]:has([data-slot=overflow-list])]:pl-0',
+        '[&_[data-slot=input-group-addon]]:px-6', // DateInput/TimeInput icon addon (when shown)
+        // DateInput/TimeInput with `showIcon={false}` (InlineEdit's own
+        // usage): no addon renders, and DateInputInternal puts `pl-12`
+        // directly on the segment-group wrapper (no data-slot of its own —
+        // matched here as the input-group's first child with no data-slot
+        // at all, to avoid also matching the addon case above). Segments
+        // sit flush left instead of matching InlineEditPreview's 6px.
+        '[&_[data-slot=input-group]>div:not([data-slot])]:pl-0',
+        className,
+      )}
     >
       {typeof children === 'function' ? children(ctx) : children}
     </div>

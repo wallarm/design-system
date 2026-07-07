@@ -163,6 +163,7 @@ function DateInputTrigger({ granularity }: { granularity: 'day' | 'minute' }) {
       onChange={v => setValue(toCalendarDateValue(v))}
       granularity={granularity}
       size='small'
+      showIcon={false}
     />
   );
 }
@@ -270,7 +271,7 @@ export const MultiSelectEditor: StoryFn = () => {
           </InlineEditPreview>
           <InlineEditControl>
             <InlineEditSelect items={roleItems} multiple>
-              <SelectInputTrigger />
+              <SelectButton size='small' />
               <SelectPositioner>
                 <SelectContent>{renderSelectOptions(roleItems)}</SelectContent>
               </SelectPositioner>
