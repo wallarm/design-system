@@ -27,7 +27,7 @@ test.describe('Component: ResponseCode', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render wildcard groups (1XX–5XX) per category', async ({ page }) => {
+    test('Should render wildcard groups per category', async ({ page }) => {
       await responseCodeStory.goto(page, 'Wildcard Groups');
       await expect(page).toHaveScreenshot();
     });

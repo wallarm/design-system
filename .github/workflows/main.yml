@@ -242,6 +242,7 @@ jobs:
       needs.setup.outputs.should-update-screenshots != 'true' &&
       needs.setup.outputs.should-skip-e2e != 'true'
     strategy:
+      fail-fast: false
       matrix:
         shard: [1, 2, 3]
     steps:
@@ -376,6 +377,7 @@ jobs:
     needs: [setup, build]
     if: needs.setup.outputs.should-update-screenshots == 'true'
     strategy:
+      fail-fast: false
       matrix:
         shard: [1, 2, 3]
     steps:
@@ -458,17 +460,34 @@ jobs:
           # not reliable there (seen failing with "Not a git repository" even
           # though the checkout succeeded) - so point git at the workspace directly.
           git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          # core.quotePath=false: git's default quoting wraps non-ASCII filenames
+          # in double quotes with octal-escaped bytes (e.g. an en dash "–" in a
+          # test title becomes "...1XX\342\200\2235XX...png" in `git diff`/`ls-files`
+          # output). The read/cp loop below takes that output literally, so with
+          # the default quoting `cp` silently failed (no `set -e`) for every
+          # screenshot whose name carried a non-ASCII character, and the step
+          # still reported success - three baselines (ResponseCode, LineChart,
+          # PieChart "Hovered" variants) went missing this way.
+          git config --global core.quotePath false
           STAGING_DIR="$RUNNER_TEMP/changed-screenshots"
           mkdir -p "$STAGING_DIR"
-          {
-            git -C "$GITHUB_WORKSPACE" diff --name-only -- packages/design-system
-            git -C "$GITHUB_WORKSPACE" ls-files --others --exclude-standard -- packages/design-system
-          } | grep '\.png$' | while IFS= read -r f; do
+          echo "dir=$STAGING_DIR" >> "$GITHUB_OUTPUT"
+
+          failed=0
+          while IFS= read -r f; do
             rel="${f#packages/design-system/}"
             mkdir -p "$STAGING_DIR/$(dirname "$rel")"
-            cp "$GITHUB_WORKSPACE/$f" "$STAGING_DIR/$rel"
-          done
-          echo "dir=$STAGING_DIR" >> "$GITHUB_OUTPUT"
+            if ! cp "$GITHUB_WORKSPACE/$f" "$STAGING_DIR/$rel"; then
+              echo "::error::Failed to stage screenshot: $f"
+              failed=1
+            fi
+          done < <(
+            {
+              git -C "$GITHUB_WORKSPACE" diff --name-only -- packages/design-system
+              git -C "$GITHUB_WORKSPACE" ls-files --others --exclude-standard -- packages/design-system
+            } | grep '\.png$'
+          )
+          exit "$failed"
 
       - name: Upload updated screenshots
         uses: actions/upload-artifact@v4
