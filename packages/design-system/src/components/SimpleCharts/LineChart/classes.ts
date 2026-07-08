@@ -91,30 +91,9 @@ export const lineChartLegendItemVariants = cva(
   },
 );
 
-export const lineChartHoverPopoverClasses = [
-  'bg-bg-surface-2 border border-border-primary-light rounded-12 shadow-md',
-  'px-12 py-8 min-w-160',
-  'flex flex-col gap-4',
-  'pointer-events-none',
-].join(' ');
-
 export const lineChartHoverPopoverTimestampClasses = ['text-xs font-medium text-text-primary'].join(
   ' ',
 );
-
-export const lineChartHoverPopoverRowClasses = [
-  'relative h-16 w-full pl-12',
-  'flex items-center gap-8',
-  'text-xs font-mono text-text-primary',
-].join(' ');
-
-export const lineChartHoverPopoverRowDotClasses = ['absolute left-0 top-4'].join(' ');
-
-export const lineChartHoverPopoverRowLabelClasses = ['truncate min-w-0', 'font-normal'].join(' ');
-
-export const lineChartHoverPopoverRowValueClasses = ['ml-auto shrink-0', 'font-medium'].join(' ');
-
-export const lineChartHoverPopoverDotClasses = ['inline-block size-8 rounded-2'].join(' ');
 
 export const lineChartZoomPopoverClasses = [
   'bg-bg-surface-2 border border-border-primary-light rounded-12 shadow-md',

@@ -75,7 +75,7 @@ export const ChartHoverCardDot: FC<ChartHoverCardDotProps> = ({
 
 ChartHoverCardDot.displayName = 'ChartHoverCardDot';
 
-const formatValue = (value: number | string | null | undefined): ReactNode => {
+const defaultFormatValue = (value: number | string | null | undefined): ReactNode => {
   if (value == null) return '—';
   return typeof value === 'number' ? value.toLocaleString('en-US') : value;
 };
@@ -86,10 +86,12 @@ export interface ChartHoverCardRowProps extends HTMLAttributes<HTMLDivElement> {
   color?: ChartColor | (string & {});
   /** Extra dot class (e.g. a `bg-*` escape hatch that wins over `color`). */
   dotClassName?: string;
-  /** Series label. */
-  label: ReactNode;
+  /** Series label. Ignored when `children` is provided. */
+  label?: ReactNode;
   /** Value at the hovered point. A number is locale-formatted; `null`/`undefined` → em dash. */
   value?: number | string | null;
+  /** Override the default (locale) value formatting. */
+  formatValue?: (value: number | string | null | undefined) => ReactNode;
 }
 
 export const ChartHoverCardRow: FC<ChartHoverCardRowProps> = ({
@@ -97,7 +99,9 @@ export const ChartHoverCardRow: FC<ChartHoverCardRowProps> = ({
   dotClassName,
   label,
   value,
+  formatValue = defaultFormatValue,
   className,
+  children,
   ref,
   ...props
 }) => (
@@ -107,9 +111,16 @@ export const ChartHoverCardRow: FC<ChartHoverCardRowProps> = ({
     data-slot='chart-hover-card-row'
     className={cn(chartHoverCardRowClasses, className)}
   >
-    <ChartHoverCardDot color={color} className={cn(chartHoverCardRowDotClasses, dotClassName)} />
-    <span className={chartHoverCardRowLabelClasses}>{label}</span>
-    <span className={chartHoverCardRowValueClasses}>{formatValue(value)}</span>
+    {children ?? (
+      <>
+        <ChartHoverCardDot
+          color={color}
+          className={cn(chartHoverCardRowDotClasses, dotClassName)}
+        />
+        <span className={chartHoverCardRowLabelClasses}>{label}</span>
+        <span className={chartHoverCardRowValueClasses}>{formatValue(value)}</span>
+      </>
+    )}
   </div>
 );
 
