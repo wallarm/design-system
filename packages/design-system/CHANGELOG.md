@@ -1,3 +1,11 @@
+## 0.72.0 (2026-07-08)
+
+* test(e2e): regenerate all screenshot baselines (#211) ([46c7486](https://github.com/wallarm/design-system/commit/46c7486)), closes [#211](https://github.com/wallarm/design-system/issues/211)
+* feat(inline-edit): InlineEdit compound component + control size standardization (WDS-143) (#209) ([4e1469b](https://github.com/wallarm/design-system/commit/4e1469b)), closes [#209](https://github.com/wallarm/design-system/issues/209)
+* feat(tree-view): add TreeView compound component (WDS-111) (#208) ([9104030](https://github.com/wallarm/design-system/commit/9104030)), closes [#208](https://github.com/wallarm/design-system/issues/208)
+* fix(ci): prevent screenshot corruption from parallel shard artifact merge (#210) ([c9fd70d](https://github.com/wallarm/design-system/commit/c9fd70d)), closes [#210](https://github.com/wallarm/design-system/issues/210)
+* fix(theme): self-host Geist fonts, drop non.geist dependency (#202) ([63eb754](https://github.com/wallarm/design-system/commit/63eb754)), closes [#202](https://github.com/wallarm/design-system/issues/202)
+
 ## <small>0.71.5 (2026-07-07)</small>
 
 * fix(toast): success icon, pause-hover zone, and semantic color tokens (#205) ([da00ece](https://github.com/wallarm/design-system/commit/da00ece)), closes [#205](https://github.com/wallarm/design-system/issues/205)
