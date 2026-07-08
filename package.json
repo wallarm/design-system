@@ -65,7 +65,7 @@
     "cz-conventional-changelog": "3.3.0",
     "husky": "9.1.7",
     "semantic-release": "25.0.5",
-    "tsx": "^4.23.0",
+    "tsx": "4.23.0",
     "turbo": "2.10.4",
     "typescript": "catalog:",
     "vite": "7.3.6"

@@ -59,7 +59,7 @@ Separately: `check-pr-title` (PRs only, `pr-title.yml`) validates conventional-c
 ```yaml
 NODE_VERSION: "24"
 PNPM_VERSION: "10.33.2"
-PLAYWRIGHT_VERSION: "1.58.0"
+PLAYWRIGHT_VERSION: "1.61.1"
 ```
 
 ## Caching Strategy

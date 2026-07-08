@@ -90,7 +90,7 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 
 - **Node.js**: v24
 - **pnpm**: v10.33.2
-- **Playwright**: v1.58.0-noble
+- **Playwright**: v1.61.1-noble
 - **Runners**: Ubuntu latest
 
 ## 🎯 Best Practices

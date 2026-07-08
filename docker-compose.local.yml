@@ -3,7 +3,7 @@
 
 services:
   playwright-design-system:
-    image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.58.0}-noble
+    image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.61.1}-noble
     platform: linux/amd64
     working_dir: /app
     shm_size: '2gb'
@@ -45,7 +45,7 @@ services:
       - design-system
 
   playwright-design-system-update:
-    image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.58.0}-noble
+    image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.61.1}-noble
     platform: linux/amd64
     working_dir: /app
     shm_size: '2gb'
@@ -87,7 +87,7 @@ services:
       - design-system-update
 
   playwright-all:
-    image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.58.0}-noble
+    image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.61.1}-noble
     platform: linux/amd64
     working_dir: /app
     shm_size: '2gb'
