@@ -9,7 +9,7 @@ const tourStory = createStoryHelper('overlay-tour', [
   'Wait For Input',
 ] as const);
 
-const getTourContent = (page: Page) => page.locator('[data-part="content"]');
+const getTourContent = (page: Page) => page.locator('[data-scope="tour"][data-part="content"]');
 const getTourBackdrop = (page: Page) => page.locator('[data-part="backdrop"]');
 const getBeaconOverlay = (page: Page) => page.locator('.animate-pulse');
 const getCloseButton = (page: Page) => page.locator('[data-part="close-trigger"]');

@@ -10,15 +10,49 @@ import { Toast, type ToastData } from './Toast';
 
 export interface ToastCreateOptions extends Omit<ToastData, 'id'> {
   duration?: number;
+  priority?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 }
 
-export interface TypedToaster extends Omit<CreateToasterReturn, 'create'> {
+export interface TypedToaster extends Omit<CreateToasterReturn, 'create' | 'update'> {
   create: (options: ToastCreateOptions) => string;
+  update: (id: string, options: Partial<ToastCreateOptions>) => string;
   __arkToaster: CreateToasterReturn;
 }
 
 const SIMPLE_TOAST_DURATION_MS = 5000;
 const EXTENDED_TOAST_DURATION_MS = 10000;
+
+// @zag-js/toast >=1.41 (pulled in by @ark-ui/react 5.37) added a toast priority
+// queue: `createToaster().create()` now looks up `[actionable, nonActionable]`
+// priority pairs from a fixed internal map keyed by `type` and destructures the
+// result unconditionally — see `getPriorityForType` in
+// @zag-js/toast/dist/toast.store.mjs:
+//   var priorities = { error: [1, 2], warning: [3, 6], loading: [4, 5], success: [5, 7], info: [6, 8] };
+//   var getPriorityForType = (type, hasAction) => {
+//     const [actionable, nonActionable] = priorities[type ?? DEFAULT_TYPE];
+//     return hasAction ? actionable : nonActionable;
+//   };
+// Our own `type: 'default'` (rendered with no icon) isn't one of those keys, so
+// `priorities['default']` is `undefined` and the destructure throws
+// `TypeError: undefined is not iterable`, synchronously inside the onClick
+// handler — the toast is never created. Ark's public `priority` option (see
+// `Options.priority` in @zag-js/toast/dist/toast.types.d.ts) bypasses that
+// internal lookup entirely (`newToast.priority ?? getPriorityForType(...)`), so
+// we compute and pass it ourselves for every toast we create/update instead of
+// relying on Ark's type-keyed default.
+const TOAST_TYPE_PRIORITIES: Record<NonNullable<ToastData['type']>, [number, number]> = {
+  error: [1, 2],
+  warning: [3, 6],
+  loading: [4, 5],
+  success: [5, 7],
+  info: [6, 8],
+  default: [6, 8],
+};
+
+const getTypePriority = (type: ToastData['type'], hasAction: boolean) => {
+  const [actionable, nonActionable] = TOAST_TYPE_PRIORITIES[type ?? 'default'];
+  return hasAction ? actionable : nonActionable;
+};
 
 const arkToaster = createToaster({
   overlap: true,
@@ -38,6 +72,25 @@ export const toaster: TypedToaster = {
       duration:
         options.duration ??
         (options.variant === 'extended' ? EXTENDED_TOAST_DURATION_MS : SIMPLE_TOAST_DURATION_MS),
+      priority: options.priority ?? getTypePriority(options.type, Boolean(options.actions)),
+    });
+  },
+  update: (id: string, options: Partial<ToastCreateOptions>) => {
+    // Only (re)compute priority when this update changes `type` and doesn't
+    // already specify one explicitly — Ark preserves the existing toast's
+    // priority for in-place updates to an already-created toast, so we must
+    // not clobber it on every partial update (e.g. one that only changes
+    // `duration`). This still protects the update-creates-a-new-toast path
+    // (Ark's `update` calls `create` under the hood) for unknown types.
+    const priority =
+      options.priority ??
+      (options.type !== undefined
+        ? getTypePriority(options.type, Boolean(options.actions))
+        : undefined);
+
+    return arkToaster.update(id, {
+      ...options,
+      ...(priority !== undefined ? { priority } : {}),
     });
   },
 };
