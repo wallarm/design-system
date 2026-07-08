@@ -129,14 +129,23 @@ export const TreeViewItem: FC<TreeViewItemProps> = ({
 
   const handleRowKeyDown = useCallback(
     (event: KeyboardEvent<HTMLDivElement>) => {
+      // Outer treeitem divs nest (a branch's subtree renders inside its own
+      // treeitem element), so an unhandled keydown bubbles into every ancestor
+      // row's own onKeyDown - each would re-run activate()/setOpen() for itself
+      // too. Row clicks don't have this problem (onClick lives on the inner
+      // row div, which nested items never bubble through), but keydown does,
+      // so it needs the same explicit stop the toggle button's click already gets.
       if (event.key === 'Enter' || event.key === ' ') {
         event.preventDefault();
+        event.stopPropagation();
         activate();
       } else if (isBranch && event.key === 'ArrowRight' && !isOpen) {
         event.preventDefault();
+        event.stopPropagation();
         setOpen(true);
       } else if (isBranch && event.key === 'ArrowLeft' && isOpen) {
         event.preventDefault();
+        event.stopPropagation();
         setOpen(false);
       }
     },

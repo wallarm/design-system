@@ -13,7 +13,7 @@ const treeViewStory = createStoryHelper('navigation-treeview', [
 ] as const);
 
 const itemByText = (page: Page, text: string) =>
-  page.getByRole('treeitem').filter({ hasText: text }).first();
+  page.getByText(text, { exact: true }).locator('xpath=ancestor::*[@role="treeitem"][1]');
 
 test.describe('Component: TreeView', () => {
   test.describe('Visual', () => {
@@ -115,10 +115,13 @@ test.describe('Component: TreeView', () => {
     test('Should toggle a checkbox when it is clicked', async ({ page }) => {
       await treeViewStory.goto(page, 'With Checkboxes');
 
-      const checkbox = page.getByRole('checkbox').first();
-      await expect(checkbox).not.toBeChecked();
+      // The Ark UI checkbox's real <input> is visually hidden under the styled
+      // "control" div, so a direct click on the role=checkbox input never lands -
+      // click the visible control the way a real user would, same as Checkbox.e2e.ts.
+      const checkbox = page.locator('[data-scope="checkbox"][data-part="control"]').first();
+      await expect(checkbox).toHaveAttribute('data-state', 'unchecked');
       await checkbox.click();
-      await expect(checkbox).toBeChecked();
+      await expect(checkbox).toHaveAttribute('data-state', 'checked');
     });
 
     test('Should filter items when typing in the search box', async ({ page }) => {
