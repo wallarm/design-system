@@ -4,11 +4,19 @@ import { Menu, useMenuContext } from '@ark-ui/react/menu';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface DropdownMenuTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
     TestableProps {
   children: ReactNode;
   asChild?: boolean;
   ref?: Ref<HTMLButtonElement>;
+  /**
+   * A real `<button>`'s `value` DOM property is always a string at runtime.
+   * Narrowed from the native `ButtonHTMLAttributes['value']`
+   * (`string | number | readonly string[] | undefined`) to match Ark UI's
+   * `Menu.Trigger`, which also uses `value` to identify this trigger
+   * (see `onTriggerValueChange`). The prop still forwards to the real DOM node.
+   */
+  value?: string;
 }
 
 /**

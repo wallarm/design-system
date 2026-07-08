@@ -3,11 +3,13 @@ import { Popover as ArkUiPopover } from '@ark-ui/react/popover';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface PopoverTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
     TestableProps {
   children: ReactNode;
   asChild?: boolean;
   ref?: Ref<HTMLButtonElement>;
+  /** A real `<button>`'s `value` DOM attribute is always a string at runtime. */
+  value?: string;
 }
 
 export const PopoverTrigger: FC<PopoverTriggerProps> = ({

@@ -2,6 +2,7 @@
   "extends": "@wallarm-org/typescript-config/base.json",
   "compilerOptions": {
     "outDir": "./dist",
+    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
     "target": "ES2022",
