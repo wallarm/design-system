@@ -5,6 +5,7 @@ import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import type { ChartDeltaProps } from '../internal/ChartDelta';
+import { ChartHoverCard, ChartHoverCardRow } from '../internal/ChartHoverCard';
 import { resolveChartColor } from '../lib/chartPalette';
 import { makeIsHoverSyncTarget } from '../lib/hoverSync';
 import { MetricDelta, MetricHeader, MetricValue } from '../Metric';
@@ -272,17 +273,15 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
               return (
                 <Tooltip key={seg.key} openDelay={150} closeDelay={100}>
                   <TooltipTrigger asChild>{segment}</TooltipTrigger>
-                  <TooltipContent>
-                    <span className={horizontalBarStackTooltipClasses}>
-                      <span
-                        aria-hidden='true'
-                        className={cn(horizontalBarStackLegendDotClasses, seg.className)}
-                        style={{
-                          backgroundColor: seg.className ? undefined : resolveChartColor(seg.color),
-                        }}
+                  <TooltipContent className={horizontalBarStackTooltipClasses}>
+                    <ChartHoverCard>
+                      <ChartHoverCardRow
+                        color={seg.className ? undefined : seg.color}
+                        dotClassName={seg.className}
+                        label={seg.key}
+                        value={seg.value}
                       />
-                      {seg.key} · {formatNumber(seg.value)}
-                    </span>
+                    </ChartHoverCard>
                   </TooltipContent>
                 </Tooltip>
               );

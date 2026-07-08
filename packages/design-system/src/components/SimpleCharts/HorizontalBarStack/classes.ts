@@ -54,5 +54,8 @@ export const horizontalBarStackLegendItemVariants = cva(
   },
 );
 
-// Content of the segment hover tooltip: dot + `name · value` on one baseline.
-export const horizontalBarStackTooltipClasses = ['inline-flex items-center gap-4'].join(' ');
+// Neutralise the dark DS TooltipContent surface (bg / padding / radius / clip) so the shared
+// white `ChartHoverCard` rendered inside it is the only visible surface. twMerge lets these win.
+export const horizontalBarStackTooltipClasses = [
+  'bg-transparent p-0 shadow-none rounded-none overflow-visible',
+].join(' ');

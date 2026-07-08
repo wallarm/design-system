@@ -43,7 +43,7 @@ Same contract as `PieChart`, reused verbatim (the shared `makeIsHoverSyncTarget`
 - **Click-to-filter** — attach `onSelect`; legend items become buttons (`role='button'` + `tabIndex=0`, Enter/Space) and show a `Click to filter` tooltip on hover/focus — `Remove filter` when the item is the active/selected one. The caller filters (e.g. sets `selectedNames`, or filters `data`). Clicking the active item again to clear is a caller convention.
 - **Dimming** — `selectedNames` fades the non-selected series so emphasis lands on the chosen one(s). Hover (`activeName`) overrides selection while a series is hovered.
 - **Controlled hover** — set `activeName` + `onActiveNameChange` to drive/share hover from a parent (cross-chart sync). Stale names (not in current `data`) collapse the highlight to `null`.
-- **Segment tooltip** — each series segment is a DS `Tooltip` trigger; hovering shows a `dot · name · value` popover (the value is not shown elsewhere on the bar). The remainder tail has none. Baked in (not composed) because the segments are internal — the one spot the component diverges from the family's compose-a-`Tooltip`-in-stories convention.
+- **Segment tooltip** — each series segment is a DS `Tooltip` trigger; hovering shows the shared white `ChartHoverCard` (dot · name · value) — the same hover-detail surface the LineChart popover uses, so the family reads consistently (the DS `TooltipContent` surface is neutralised so only the card shows). The value is not shown elsewhere on the bar; the remainder tail has none. Baked in (not composed) because the segments are internal.
 
 ## Edge cases & unclear states
 
