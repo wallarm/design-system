@@ -8,6 +8,6 @@ type TreeViewComponent = typeof TreeViewRoot & {
 const TreeView = TreeViewRoot as TreeViewComponent;
 TreeView.Item = TreeViewItem;
 
-export { TreeView };
 export { TREE_VIEW_INDENT_STEP, type TreeViewProps } from './TreeView';
 export { TreeViewItem, type TreeViewItemProps } from './TreeViewItem';
+export { TreeView };
