@@ -489,6 +489,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
+      actions: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -525,6 +526,20 @@ jobs:
 
           git commit -m "${{ env.SCREENSHOT_COMMIT_MESSAGE }}"
           git push
+
+      - name: Trigger verification run against updated screenshots
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Pushes made with GITHUB_TOKEN don't trigger new workflow runs (GitHub's
+          # anti-recursion rule), so the screenshot commit above never gets a real
+          # e2e pass on its own. Dispatch a fresh run explicitly instead:
+          # workflow_dispatch has no head_commit, so should-update-screenshots
+          # resolves to false and the normal `e2e` job verifies against the
+          # baselines just committed, instead of the update job's --update-snapshots
+          # run whose exit code is deliberately ignored.
+          gh workflow run main.yml --ref "${{ github.head_ref || github.ref_name }}"
 
   # ========================================
   # Deploy Storybook to GitHub Pages
