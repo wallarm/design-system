@@ -15,7 +15,7 @@
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "catalog:",
-    "@vitest/ui": "4.0.18",
+    "@vitest/ui": "4.1.10",
     "jsdom": "27.4.0",
     "vitest": "catalog:"
   },
