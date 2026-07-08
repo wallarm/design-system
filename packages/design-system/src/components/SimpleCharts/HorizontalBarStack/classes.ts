@@ -8,12 +8,6 @@ export const horizontalBarStackBarClasses = ['flex h-8 w-full overflow-hidden ro
 
 export const horizontalBarStackRemainderClasses = ['bg-bg-strong-primary'].join(' ');
 
-export const horizontalBarStackHeaderClasses = ['flex items-baseline gap-8 px-16 pt-8'].join(' ');
-
-export const horizontalBarStackValueClasses = [
-  'text-3xl font-medium leading-3xl text-text-primary',
-].join(' ');
-
 export const horizontalBarStackLegendClasses = [
   'flex flex-row flex-wrap items-center gap-6 px-12 py-2',
 ].join(' ');

@@ -2,16 +2,16 @@ import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent, MouseEvent, Ref } f
 import { useCallback, useEffect, useMemo } from 'react';
 import { useControlled } from '../../../hooks';
 import { cn } from '../../../utils/cn';
-import type { TestableProps } from '../../../utils/testId';
+import { type TestableProps, TestIdProvider } from '../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
-import { ChartDelta, type ChartDeltaProps } from '../internal/ChartDelta';
+import type { ChartDeltaProps } from '../internal/ChartDelta';
 import { resolveChartColor } from '../lib/chartPalette';
 import { makeIsHoverSyncTarget } from '../lib/hoverSync';
+import { MetricDelta, MetricHeader, MetricValue } from '../Metric';
 import type { ChartColor } from '../types';
 import {
   horizontalBarStackBarClasses,
   horizontalBarStackBarWrapperClasses,
-  horizontalBarStackHeaderClasses,
   horizontalBarStackLegendClasses,
   horizontalBarStackLegendDotClasses,
   horizontalBarStackLegendItemVariants,
@@ -20,7 +20,6 @@ import {
   horizontalBarStackRootClasses,
   horizontalBarStackSegmentVariants,
   horizontalBarStackTooltipClasses,
-  horizontalBarStackValueClasses,
 } from './classes';
 import { resolveSegments } from './lib/resolveSegments';
 
@@ -52,9 +51,9 @@ export interface HorizontalBarStackProps extends HTMLAttributes<HTMLDivElement>,
   /** Headline number, rendered as `value.toLocaleString('en-US')`. Omitted → header hidden. */
   value?: number;
   /**
-   * Trend chip — the shared `ChartDelta`. `sentiment` sets the colour (positive → green,
-   * negative → w-orange, neutral → slate; default neutral), `trend` sets the arrow —
-   * independent axes. Omitted → no chip.
+   * Trend chip — the shared `ChartDelta` (rendered via `MetricDelta`). `sentiment` sets the
+   * colour (positive → green, negative → red, neutral → slate; default neutral), `trend` sets
+   * the arrow — independent axes. Omitted → no chip.
    */
   delta?: Pick<ChartDeltaProps, 'value' | 'trend' | 'sentiment'>;
   /** Bar denominator. `> sum(data.value)` → grey remainder tail. Default: `sum(data.value)`. */
@@ -185,11 +184,7 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
 
   // Only the active series stays bright; the rest fade. Hover wins over selection.
   const isDimmed = (key: string): boolean =>
-    activeName !== null
-      ? key !== activeName
-      : selectedSet.size > 0
-        ? !selectedSet.has(key)
-        : false;
+    activeName !== null ? key !== activeName : selectedSet.size > 0 ? !selectedSet.has(key) : false;
 
   const handleMouseLeave = useCallback(
     (event: MouseEvent<HTMLElement>) => {
@@ -224,22 +219,12 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
       className={cn(horizontalBarStackRootClasses, className)}
     >
       {(hasValue || hasDelta) && (
-        <div
-          data-slot='horizontal-bar-stack-header'
-          data-testid={slotTestId('header')}
-          className={horizontalBarStackHeaderClasses}
-        >
-          {hasValue && (
-            <span
-              data-slot='horizontal-bar-stack-value'
-              data-testid={slotTestId('value')}
-              className={horizontalBarStackValueClasses}
-            >
-              {formatNumber(value)}
-            </span>
-          )}
-          {delta && <ChartDelta {...delta} data-testid={slotTestId('delta')} />}
-        </div>
+        <TestIdProvider value={testId}>
+          <MetricHeader className='px-16 pt-8'>
+            {hasValue && <MetricValue>{value}</MetricValue>}
+            {delta && <MetricDelta {...delta} />}
+          </MetricHeader>
+        </TestIdProvider>
       )}
       {hasBar && (
         <div
@@ -293,9 +278,7 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
                         aria-hidden='true'
                         className={cn(horizontalBarStackLegendDotClasses, seg.className)}
                         style={{
-                          backgroundColor: seg.className
-                            ? undefined
-                            : resolveChartColor(seg.color),
+                          backgroundColor: seg.className ? undefined : resolveChartColor(seg.color),
                         }}
                       />
                       {seg.key} · {formatNumber(seg.value)}

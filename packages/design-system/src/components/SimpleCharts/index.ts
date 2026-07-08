@@ -31,7 +31,6 @@ export {
   type HorizontalBarStackDatum,
   type HorizontalBarStackProps,
 } from './HorizontalBarStack';
-export { Metric, type MetricProps } from './Metric';
 export { type ChartTimeFormatters, useChartTimeFormatters } from './hooks';
 export {
   LineChart,
@@ -86,6 +85,21 @@ export {
   formatChartTimezone,
   withTimezoneChip,
 } from './lib';
+export {
+  Metric,
+  MetricCaption,
+  type MetricCaptionProps,
+  MetricDelta,
+  type MetricDeltaProps,
+  MetricHeader,
+  type MetricHeaderProps,
+  type MetricProps,
+  MetricTotal,
+  type MetricTotalConnector,
+  type MetricTotalProps,
+  MetricValue,
+  type MetricValueProps,
+} from './Metric';
 export {
   LegendDot,
   type LegendDotProps,

@@ -13,8 +13,8 @@ export interface ChartDeltaProps {
   trend?: ChartDeltaTrend;
   /**
    * Colour = meaning, and it is independent of the arrow: `positive` → green,
-   * `negative` → w-orange, `neutral` → slate. Defaults to `neutral`. An increase
-   * can therefore read as negative (w-orange ↑) and a decrease as positive (green ↓).
+   * `negative` → red, `neutral` → slate. Defaults to `neutral`. An increase
+   * can therefore read as negative (red ↑) and a decrease as positive (green ↓).
    */
   sentiment?: ChartDeltaSentiment;
   'data-testid'?: string;
@@ -22,7 +22,7 @@ export interface ChartDeltaProps {
 
 const SENTIMENT_COLOR: Record<ChartDeltaSentiment, BadgeColor> = {
   positive: 'green',
-  negative: 'w-orange',
+  negative: 'red',
   neutral: 'slate',
 };
 

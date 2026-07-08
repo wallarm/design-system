@@ -62,7 +62,11 @@ const Frame: StoryFn<HorizontalBarStackProps> = args => (
 );
 
 export const Default: StoryFn<HorizontalBarStackProps> = Frame.bind({});
-Default.args = { data: severityData, value: 91, delta: { value: 10, trend: 'up', sentiment: 'negative' } };
+Default.args = {
+  data: severityData,
+  value: 91,
+  delta: { value: 10, trend: 'up', sentiment: 'negative' },
+};
 
 export const NoDelta: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 NoDelta.args = { data: severityData, value: 91 };

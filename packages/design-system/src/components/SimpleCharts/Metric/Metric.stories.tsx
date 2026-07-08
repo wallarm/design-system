@@ -1,8 +1,14 @@
+import type { FC, ReactNode } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Chart } from '../Chart/Chart';
 import { ChartHeader } from '../Chart/ChartHeader';
 import { ChartTitle } from '../Chart/ChartTitle';
-import { Metric, type MetricProps } from './Metric';
+import { Metric } from './Metric';
+import { MetricCaption } from './MetricCaption';
+import { MetricDelta } from './MetricDelta';
+import { MetricHeader } from './MetricHeader';
+import { MetricTotal } from './MetricTotal';
+import { MetricValue } from './MetricValue';
 
 const figmaUrl =
   'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11437-11939';
@@ -11,63 +17,121 @@ const meta = {
   title: 'Data display/SimpleCharts/Metric',
   component: Metric,
   parameters: {
-    layout: 'centered',
+    layout: 'padded',
     design: { type: 'figma', url: figmaUrl },
     docs: {
       description: {
         component:
-          'A headline value with an optional `/ total` denominator, an optional trend delta chip, and an optional caption — nothing else. The standalone stat sibling of `HorizontalBarStack` (same value/total/delta header, without the bar or legend). Composed inside a `Chart` card. The delta is the shared `ChartDelta`: `sentiment` sets the colour (positive → green, negative → w-orange, neutral → slate) independently of the `trend` arrow.',
+          'The family’s compact stat, composed as a brick set: `MetricHeader` (the shared value/total/delta row, also reused by `HorizontalBarStack`), `MetricValue`, `MetricTotal` (`/120` · `of 120` · `120 total`), `MetricDelta`, and `MetricCaption`. Body-only — composed inside a `Chart` card. The delta is the shared `ChartDelta`: `sentiment` sets the colour (positive → green, negative → red, neutral → slate) independently of the `trend` arrow.',
       },
     },
-  },
-  args: {
-    // Base for the derived slot ids (`metric--value`, `metric--delta`, …) used by e2e tests.
-    'data-testid': 'metric',
-  },
-  argTypes: {
-    delta: { control: false },
-    caption: { control: 'text' },
-    ref: { control: false },
-    className: { control: 'text' },
   },
 } satisfies Meta<typeof Metric>;
 
 export default meta;
 
-const Frame: StoryFn<MetricProps> = args => (
-  <div className='w-400'>
+/** A single Metric composed on the Chart card, as it ships in product. */
+const Card: FC<{ title: string; children: ReactNode }> = ({ title, children }) => (
+  <div className='w-320'>
     <Chart>
       <ChartHeader>
-        <ChartTitle>Findings</ChartTitle>
+        <ChartTitle>{title}</ChartTitle>
       </ChartHeader>
-      <Metric {...args} />
+      {children}
     </Chart>
   </div>
 );
 
-// Count rose — read as bad → negative (w-orange) with an up arrow.
-export const Default: StoryFn<MetricProps> = Frame.bind({});
-Default.args = { value: 91, delta: { value: 10, trend: 'up', sentiment: 'negative' } };
+/**
+ * One gallery of the brick combinations, each on a Chart card — mirrors the Figma
+ * "Metric Chart — options" board. Replaces the old one-story-per-config set.
+ */
+export const Gallery: StoryFn = () => (
+  <div className='flex flex-wrap gap-16'>
+    <Card title='Value only'>
+      <Metric data-testid='metric'>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+        </MetricHeader>
+      </Metric>
+    </Card>
 
-// Count fell — read as good → positive (green) with a down arrow.
-export const Positive: StoryFn<MetricProps> = Frame.bind({});
-Positive.args = { value: 74, delta: { value: 8, trend: 'down', sentiment: 'positive' } };
+    <Card title='Negative — count rose'>
+      <Metric>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricDelta value={10} trend='up' sentiment='negative' />
+        </MetricHeader>
+      </Metric>
+    </Card>
 
-// No judgement → neutral (slate). Sentiment defaults to neutral when omitted.
-export const Neutral: StoryFn<MetricProps> = Frame.bind({});
-Neutral.args = { value: 91, delta: { value: 10, trend: 'up' } };
+    <Card title='Positive — count fell'>
+      <Metric>
+        <MetricHeader>
+          <MetricValue>74</MetricValue>
+          <MetricDelta value={8} trend='down' sentiment='positive' />
+        </MetricHeader>
+      </Metric>
+    </Card>
 
-// Value out of a total → "91 /120 total".
-export const WithTotal: StoryFn<MetricProps> = Frame.bind({});
-WithTotal.args = { value: 91, total: 120, delta: { value: 10, trend: 'up', sentiment: 'negative' } };
+    <Card title='Neutral'>
+      <Metric>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricDelta value={10} trend='up' />
+        </MetricHeader>
+      </Metric>
+    </Card>
 
-// Secondary caption under the value.
-export const WithCaption: StoryFn<MetricProps> = Frame.bind({});
-WithCaption.args = {
-  value: 91,
-  caption: 'Last 24 hours',
-  delta: { value: 10, trend: 'up', sentiment: 'negative' },
-};
+    <Card title='Total — slash'>
+      <Metric>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricTotal connector='slash'>120</MetricTotal>
+          <MetricDelta value={10} trend='up' sentiment='negative' />
+        </MetricHeader>
+      </Metric>
+    </Card>
 
-export const NoDelta: StoryFn<MetricProps> = Frame.bind({});
-NoDelta.args = { value: 91 };
+    <Card title='Total — of'>
+      <Metric>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricTotal connector='of'>120</MetricTotal>
+          <MetricDelta value={10} trend='up' sentiment='negative' />
+        </MetricHeader>
+      </Metric>
+    </Card>
+
+    <Card title='Total — total'>
+      <Metric>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricTotal connector='total'>120</MetricTotal>
+          <MetricDelta value={10} trend='up' sentiment='negative' />
+        </MetricHeader>
+      </Metric>
+    </Card>
+
+    <Card title='With caption'>
+      <Metric>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricDelta value={10} trend='up' sentiment='negative' />
+        </MetricHeader>
+        <MetricCaption>blocked today</MetricCaption>
+      </Metric>
+    </Card>
+
+    <Card title='Everything'>
+      <Metric>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricTotal connector='of'>120</MetricTotal>
+          <MetricDelta value={10} trend='up' sentiment='negative' />
+        </MetricHeader>
+        <MetricCaption>blocked today</MetricCaption>
+      </Metric>
+    </Card>
+  </div>
+);

@@ -13,7 +13,7 @@
 
 - `data` (required, `HorizontalBarStackDatum[]`) — drives both the bar segments and the legend, so their colors always match. Order is preserved (the caller sorts). Non-finite / negative values are coerced to `0`. No aggregation or "Other" bucketing.
 - `value` (optional, `number`) — the headline number, rendered as `value.toLocaleString('en-US')`. Omitted → the header row is not rendered (unless a delta is present).
-- `delta` (optional, `{ value: number; trend?: 'up' | 'down' }`) — rendered as an internal `Badge` (`type='secondary'`, `color='w-orange'`) with an up/down arrow and the absolute value. Direction comes from `trend`, else the sign of `value`.
+- `delta` (optional, `{ value: number; trend?: 'up' | 'down'; sentiment?: 'positive' | 'negative' | 'neutral' }`) — the shared `ChartDelta`, rendered via `MetricDelta`. `sentiment` sets the colour (positive → green, negative → red, neutral → slate; default neutral); `trend` sets the arrow, else the sign of `value`. Independent axes.
 - `total` (optional, `number`) — the bar denominator. When `total > sum(data.value)`, a grey remainder tail fills `(total − sum)`. Defaults to the sum (no tail). `total <= sum` or non-finite is ignored.
 - `legend` (optional, `boolean`, default `true`) — show/hide the legend.
 - `activeName` / `onActiveNameChange` (optional, `string | null`) — controlled hover target, joined by `name`. Omitted → managed internally. Use the controlled pair to sync hover across charts. Mirrors `PieChart`.
@@ -66,5 +66,5 @@ Same contract as `PieChart`, reused verbatim (the shared `makeIsHoverSyncTarget`
 
 - **Skeleton** — no loading skeleton yet (pending the Figma node); add a `HorizontalBarStackSkeleton` matching `BarListSkeleton` / `PieChartSkeleton`.
 - **Per-item analytics** — because the legend is data-derived (not composed sub-components), consumer `data-analytics-*` can't land on individual legend items; the `onSelect(name)` callback carries the identity instead. Revisit (compound the legend) if per-item DOM analytics become a requirement.
-- **Delta** — still the local `w-orange` Badge; will move to the shared `ChartDelta` (sentiment × trend) to match `Metric`. Trend drives the arrow only, not color, until then.
+- **Header reuse** — the value + delta header is the shared `MetricHeader` / `MetricValue` / `MetricDelta` bricks from `Metric`, composed under HBS's own `TestIdProvider`, so the two never drift on header typography or delta colour.
 - No segment animation; no tooltips on long legend labels (wrap in `OverflowTooltip` if needed).

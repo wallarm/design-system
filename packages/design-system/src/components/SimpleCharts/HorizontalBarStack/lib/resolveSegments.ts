@@ -13,7 +13,10 @@ export interface ResolvedSegment {
 const sanitize = (n: number): number =>
   typeof n === 'number' && Number.isFinite(n) && n > 0 ? n : 0;
 
-export function resolveSegments(data: HorizontalBarStackDatum[], total?: number): ResolvedSegment[] {
+export function resolveSegments(
+  data: HorizontalBarStackDatum[],
+  total?: number,
+): ResolvedSegment[] {
   const segments: ResolvedSegment[] = data.map((d, i) => ({
     key: d.name,
     value: sanitize(d.value),

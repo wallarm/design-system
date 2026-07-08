@@ -124,7 +124,9 @@ describe('HorizontalBarStack — header', () => {
   });
 
   it('uses trend for direction over sign; shows the absolute number', () => {
-    render(<HorizontalBarStack data={[{ name: 'A', value: 1 }]} delta={{ value: 5, trend: 'down' }} />);
+    render(
+      <HorizontalBarStack data={[{ name: 'A', value: 1 }]} delta={{ value: 5, trend: 'down' }} />,
+    );
     expect(screen.getByRole('img', { name: 'down 5' })).toBeInTheDocument();
   });
 
@@ -165,7 +167,10 @@ describe('HorizontalBarStack — bar rendering', () => {
 
   it('lets a datum className win over the inline color', () => {
     render(
-      <HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1, className: 'bg-sky-500' }]} />,
+      <HorizontalBarStack
+        data-testid='hb'
+        data={[{ name: 'A', value: 1, className: 'bg-sky-500' }]}
+      />,
     );
     const seg = screen.getByTestId('hb--segment');
     expect(seg).toHaveClass('bg-sky-500');
@@ -174,7 +179,12 @@ describe('HorizontalBarStack — bar rendering', () => {
 
   it('renders header-only (no bar, no legend) when data is empty but value/delta are present', () => {
     render(
-      <HorizontalBarStack data-testid='hb' data={[]} value={91} delta={{ value: 10, trend: 'up' }} />,
+      <HorizontalBarStack
+        data-testid='hb'
+        data={[]}
+        value={91}
+        delta={{ value: 10, trend: 'up' }}
+      />,
     );
     expect(screen.queryByTestId('hb--bar')).toBeNull();
     expect(screen.queryByTestId('hb--legend')).toBeNull();

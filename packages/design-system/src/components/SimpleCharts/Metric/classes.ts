@@ -1,17 +1,17 @@
-export const metricRootClasses = ['flex flex-col items-start px-16 py-8 w-full'].join(' ');
+export const metricRootClasses = 'flex flex-col items-start px-16 py-8 w-full';
 
-export const metricHeaderClasses = ['flex items-baseline gap-8'].join(' ');
+// Baseline row: value + optional total + optional delta. Value↔total read as one unit
+// (MetricTotal tucks in via `-ml-2` → 6px), delta sits 8px off the group.
+export const metricHeaderClasses = 'flex items-baseline gap-8';
 
-export const metricValueGroupClasses = ['flex items-baseline gap-6'].join(' ');
+// The headline number: display font, 30px. Matches Figma `heading/3xl/medium` (Font/Sans-display).
+export const metricValueClasses =
+  'font-sans-display text-3xl font-medium leading-3xl text-text-primary';
 
-export const metricValueClasses = [
-  'text-3xl font-medium leading-3xl text-text-primary',
-].join(' ');
+// The denominator, one size down from the value; the connector words ("of" / "total") are muted.
+export const metricTotalClasses = '-ml-2 flex items-baseline gap-2';
+export const metricTotalValueClasses = 'font-sans-display text-lg font-medium text-text-primary';
+export const metricTotalWordClasses = 'text-xs font-normal text-text-secondary';
 
-// The `/N` denominator: smaller than the headline value, but still primary text.
-export const metricTotalClasses = ['text-lg font-medium text-text-primary'].join(' ');
-
-// The literal "total" word + the caption line: muted secondary text.
-export const metricTotalLabelClasses = ['text-xs text-text-secondary'].join(' ');
-
-export const metricCaptionClasses = ['text-xs text-text-secondary'].join(' ');
+// The subline under the header.
+export const metricCaptionClasses = 'text-xs text-text-secondary';
