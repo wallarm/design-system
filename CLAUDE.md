@@ -2,7 +2,7 @@
 
 ## 🎯 Project Overview
 
-You are an expert AI assistant for the Wallarm monorepo project. This is a modern TypeScript monorepo using Turborepo, pnpm workspaces, React, and Vite. The project consists of a UI component library and a web application with comprehensive testing and CI/CD pipelines.
+You are an expert AI assistant for the Wallarm monorepo project. This is a modern TypeScript monorepo using Turborepo, pnpm workspaces, and React, built with Rslib/Rsbuild (Rspack-based — not Vite; Vite only appears as a transitive test-tooling dependency of Vitest). The project consists of a UI component library and a web application with comprehensive testing and CI/CD pipelines.
 
 **For detailed information about the project structure and commands, see [README.md](./README.md)**.
 
@@ -16,8 +16,8 @@ You are an expert AI assistant for the Wallarm monorepo project. This is a moder
 - **Package Manager**: pnpm 10.33.2
 - **Monorepo Tool**: Turborepo
 - **CI/CD**: GitHub Actions with sharded testing
-- **Containerization**: Docker with multi-stage builds
-- **Registry**: GitHub Container Registry (ghcr.io) for Storybook, GitHub Pages for deployment
+- **Containerization**: Docker with multi-stage builds — for manual/local use only (`packages/design-system/Dockerfile`, `apps/playground/Dockerfile`, `docker-compose.local.yml`); CI never builds or pushes these images
+- **Deployment**: Storybook is built as a static site and deployed to GitHub Pages — there is no container registry in the pipeline
 
 ## 📋 Development Guidelines
 
@@ -92,7 +92,6 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 - **pnpm**: v10.33.2
 - **Playwright**: v1.58.0-noble
 - **Runners**: Ubuntu latest
-- **Container Registry**: ghcr.io/wallarm/
 
 ## 🎯 Best Practices
 
@@ -149,7 +148,7 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 4. ✅ Update documentation with code changes
 5. ✅ Review CI/CD status before merging (all checks must pass)
 6. ✅ Use TodoWrite for task tracking
-7. ✅ Wait for Docker health checks in CI/CD
+7. ✅ Wait for the E2E job's Storybook readiness check (an HTTP polling loop, not a Docker `services:` health check) before assuming the container is ready
 8. ✅ Run quality checks (lint, typecheck, test) in parallel
 
 ## 📈 Performance & Quality Goals
@@ -180,25 +179,31 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 
 ### Pipeline Jobs
 
-1. **check-pr-title** - Validates PR titles follow conventional commits
-2. **setup** - Manages dependencies, caching, and screenshot update detection
-3. **quality** - Parallel lint, typecheck, and unit test execution
-4. **build** - Docker image building for Storybook and pushing to ghcr.io
-5. **e2e** - Sharded testing (3 shards) for Storybook components
-6. **e2e-update-screenshots** - Auto-updates visual snapshots on main branch
-7. **deploy-storybook** - Production deployment to GitHub Pages
+`check-pr-title` lives in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). Everything else below is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch:
+
+1. **setup** - Manages dependencies, caching, and screenshot update detection
+2. **quality** - Parallel lint, typecheck, and unit test execution
+3. **build** - Builds all packages and the Storybook static site, uploaded as GitHub Actions artifacts — **no Docker image is built or pushed here**
+4. **e2e** - Sharded testing (3 shards) for Storybook components, run inside the public `mcr.microsoft.com/playwright` container
+5. **unit-test-report** / **e2e-report** - Publish JUnit test results
+6. **e2e-update-screenshots** - Auto-updates visual snapshots on main branch (sharded)
+7. **commit-screenshots** - Commits updated screenshots back to the branch
+8. **deploy-storybook** - Deploys the Storybook static artifact to GitHub Pages
+9. **release** - Runs `semantic-release` to publish `@wallarm-org/design-system`/`@wallarm-org/mcp` to npm (see [VERSIONING.md](./VERSIONING.md))
+
+Full detail: [CI_PLAN.md](./CI_PLAN.md).
 
 ### CI/CD Features
 
 - **Sharded Testing**: 3 parallel E2E test shards for faster execution
 - **Smart Caching**: Dependencies cached with `pnpm-lock.yaml` hash
-- **Docker Integration**: Storybook runs in container for consistent E2E tests
-- **Health Checks**: Proper service readiness verification
+- **Container-based E2E**: E2E tests run inside the public Playwright container image (not a project-built Storybook image) for consistent browser binaries
+- **Readiness Check**: An HTTP polling loop waits for the Storybook static server to respond — there is no Docker `services:` health check in this pipeline
 - **Artifact Upload**: Test results and reports preserved
 - **Concurrency Control**: Cancel in-progress runs on new pushes
 - **E2E Skip Optimization**: Skips E2E for bot screenshot commits
 - **E2E Skip Trigger**: Manual E2E skip with `[skip-e2e]` commit message trigger
-- **GitHub Pages Deployment**: Automatic Storybook deployment on main branch
+- **GitHub Pages Deployment**: Automatic Storybook deployment on main branch (static artifact, not a Docker image)
 
 ## 🎉 Success Criteria
 
@@ -210,4 +215,4 @@ You are successful when:
 4. CI/CD pipelines complete within 10 minutes
 5. User requirements are met accurately
 6. Best practices are followed consistently
-7. Docker image successfully built and Storybook deployed to GitHub Pages
+7. Storybook successfully built and deployed to GitHub Pages
