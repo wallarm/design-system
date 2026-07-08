@@ -300,7 +300,7 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
             const active = activeName === seg.key;
             const selected = selectedSet.has(seg.key);
             const dimmed = !selected && !active && selectedSet.size > 0;
-            return (
+            const item = (
               <div
                 key={seg.key}
                 data-slot='horizontal-bar-stack-legend-item'
@@ -335,6 +335,15 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
                 />
                 <span className={horizontalBarStackLegendLabelClasses}>{seg.key}</span>
               </div>
+            );
+            // Interactive legend items surface the click affordance on hover/focus, mirroring
+            // the Figma "Click to filter" / "Remove filter" states. Non-interactive → no tooltip.
+            if (!interactive) return item;
+            return (
+              <Tooltip key={seg.key} openDelay={150} closeDelay={100}>
+                <TooltipTrigger asChild>{item}</TooltipTrigger>
+                <TooltipContent>{selected ? 'Remove filter' : 'Click to filter'}</TooltipContent>
+              </Tooltip>
             );
           })}
         </div>

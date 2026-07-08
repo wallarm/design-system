@@ -8,6 +8,7 @@ const story = createStoryHelper('data-display-simplecharts-horizontalbarstack', 
   'With Remainder',
   'Legend Off',
   'Palette',
+  'Selectable',
 ] as const);
 
 test.describe('HorizontalBarStack', () => {
@@ -25,6 +26,19 @@ test.describe('HorizontalBarStack', () => {
     test('Legend Off', async ({ page }) => {
       await story.goto(page, 'Legend Off');
       await expect(page).toHaveScreenshot();
+    });
+  });
+
+  test.describe('Interactions', () => {
+    test('interactive legend items show the filter-affordance tooltip', async ({ page }) => {
+      await story.goto(page, 'Selectable');
+      const items = page.getByTestId('horizontal-bar-stack--legend-item');
+      // A non-selected item invites filtering...
+      await items.filter({ hasText: 'High' }).hover();
+      await expect(page.getByText('Click to filter')).toBeVisible();
+      // ...the active/selected one offers to clear it.
+      await items.filter({ hasText: 'Critical' }).hover();
+      await expect(page.getByText('Remove filter')).toBeVisible();
     });
   });
 
