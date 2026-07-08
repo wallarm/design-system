@@ -1,3 +1,7 @@
+## <small>0.72.1 (2026-07-08)</small>
+
+* fix(deps): patch 51 dependency vulnerabilities (1 critical, 17 high) (#212) ([6d3d244](https://github.com/wallarm/design-system/commit/6d3d244)), closes [#212](https://github.com/wallarm/design-system/issues/212)
+
 ## 0.72.0 (2026-07-08)
 
 * test(e2e): regenerate all screenshot baselines (#211) ([46c7486](https://github.com/wallarm/design-system/commit/46c7486)), closes [#211](https://github.com/wallarm/design-system/issues/211)
