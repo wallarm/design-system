@@ -40,17 +40,31 @@ const EXTENDED_TOAST_DURATION_MS = 10000;
 // internal lookup entirely (`newToast.priority ?? getPriorityForType(...)`), so
 // we compute and pass it ourselves for every toast we create/update instead of
 // relying on Ark's type-keyed default.
-const TOAST_TYPE_PRIORITIES: Record<NonNullable<ToastData['type']>, [number, number]> = {
+// `as const` keeps each pair as literal numbers (e.g. `readonly [1, 2]`)
+// instead of widening to `[number, number]`, so `getTypePriority` below
+// structurally matches zag-js's `ToastQueuePriority` (`1 | 2 | ... | 8`)
+// without importing that type by name (it isn't re-exported from
+// `@ark-ui/react/toast`).
+const TOAST_TYPE_PRIORITIES = {
   error: [1, 2],
   warning: [3, 6],
   loading: [4, 5],
   success: [5, 7],
   info: [6, 8],
   default: [6, 8],
-};
+} as const satisfies Record<NonNullable<ToastData['type']>, readonly [number, number]>;
 
-const getTypePriority = (type: ToastData['type'], hasAction: boolean) => {
-  const [actionable, nonActionable] = TOAST_TYPE_PRIORITIES[type ?? 'default'];
+// Accepts `unknown` rather than `ToastData['type']` deliberately: reading
+// `options.type` off a `ToastCreateOptions`/`ToastData` value resolves through
+// ToastData's `[key: string]: unknown` index signature (needed to allow
+// arbitrary extra Ark UI props through) rather than the named `type` property
+// in rslib's isolatedModules declaration-emit pass, so callers can never
+// reliably hand this function anything narrower than `unknown` anyway. Narrow
+// and validate here instead of trusting the caller's static type.
+const getTypePriority = (type: unknown, hasAction: boolean) => {
+  const key = typeof type === 'string' && type in TOAST_TYPE_PRIORITIES ? type : 'default';
+  const [actionable, nonActionable] =
+    TOAST_TYPE_PRIORITIES[key as keyof typeof TOAST_TYPE_PRIORITIES];
   return hasAction ? actionable : nonActionable;
 };
 
