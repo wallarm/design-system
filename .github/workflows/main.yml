@@ -443,6 +443,7 @@ jobs:
 
       - name: Stage changed screenshots
         id: changed-screenshots
+        shell: bash
         run: |
           # Only this shard's own new/modified snapshots get uploaded.
           # Uploading the full **/*.png glob (old behavior) makes every shard's
