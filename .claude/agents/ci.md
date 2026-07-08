@@ -12,12 +12,15 @@ You are an expert CI/CD engineer for the Wallarm Design System monorepo. You wor
 
 # Pipeline Architecture
 
-The CI/CD pipeline lives in `.github/workflows/main.yml` and consists of 7 jobs:
+`check-pr-title` lives in its own workflow, `.github/workflows/pr-title.yml`, triggered on `pull_request` — it is **not** part of `main.yml` and does not gate any job below it.
+
+The main CI/CD pipeline lives in `.github/workflows/main.yml`, triggered on `push` to any branch (`branches: ['**']`) plus `workflow_dispatch`, and consists of 9 jobs:
 
 ```
-setup → quality (lint | typecheck | test) → build → e2e (3 shards) → deploy-storybook
-                                                  → e2e-update-screenshots (on main)
-check-pr-title (on PR only)
+setup → quality (lint | typecheck | test) → build → e2e (3 shards) → unit-test-report / e2e-report
+                                                  → e2e-update-screenshots (3 shards) → commit-screenshots
+main only: → deploy-storybook
+main only: → release
 ```
 
 ## Jobs
@@ -25,12 +28,16 @@ check-pr-title (on PR only)
 | Job | Purpose | Runs On |
 |-----|---------|---------|
 | `setup` | Dependencies, caching, trigger detection | Always |
-| `check-pr-title` | Validates conventional commit format in PR titles | PRs only |
 | `quality` | Matrix: `lint`, `typecheck`, `test` (parallel) | Always |
-| `build` | Docker image for Storybook, push to ghcr.io | After quality |
-| `e2e` | Sharded Playwright tests (3 shards) against Docker Storybook | After build |
-| `e2e-update-screenshots` | Auto-update visual snapshots | main branch, when triggered |
-| `deploy-storybook` | Deploy to GitHub Pages | main branch |
+| `build` | Builds all packages + Storybook static site, uploaded as plain GitHub Actions artifacts — **no Docker image, no ghcr.io** | After quality |
+| `e2e` | Sharded Playwright tests (3 shards), run inside the public `mcr.microsoft.com/playwright` container against the Storybook static build served via `http-server` | After build |
+| `unit-test-report` / `e2e-report` | Publish JUnit results via `dorny/test-reporter` | After quality / e2e |
+| `e2e-update-screenshots` | Auto-update visual snapshots (3 shards) | main branch, when triggered |
+| `commit-screenshots` | Commits updated screenshots back to the branch | After e2e-update-screenshots |
+| `deploy-storybook` | Deploy the Storybook static artifact to GitHub Pages | main branch |
+| `release` | Runs `semantic-release` for design-system/mcp, publishes to npm | main branch |
+
+Separately: `check-pr-title` (PRs only, `pr-title.yml`) validates conventional-commit-format PR titles.
 
 ## Special Triggers
 
@@ -57,17 +64,15 @@ PLAYWRIGHT_VERSION: "1.58.0"
 
 ## Caching Strategy
 
-- pnpm store cached with `pnpm-lock.yaml` hash
-- Playwright browsers cached with version hash
-- Docker layer caching via `type=gha`
+- pnpm store cached with `pnpm-lock.yaml` hash (both via `actions/setup-node`'s built-in `cache: 'pnpm'` and a separate hand-rolled `node_modules` cache — these overlap, a known consolidation opportunity)
+- Playwright browsers pre-installed in the `mcr.microsoft.com/playwright` container image (no separate cache step needed)
 - Turborepo remote caching (if configured)
 
 ## Docker
 
-- Storybook image: `ghcr.io/wallarm/storybook-design-system`
-- Multi-stage build from `packages/design-system/Dockerfile`
-- Health check: curl to `http://localhost:6006`
-- Used by E2E tests as service container
+- **Not used by CI.** `packages/design-system/Dockerfile` and `apps/playground/Dockerfile` are multi-stage builds for manual/local use only (see root `README.md`) — no job in `main.yml` runs `docker build`, `docker push`, or references a container registry.
+- E2E tests run inside the public `mcr.microsoft.com/playwright` image (pre-installed browsers), not a project-built image.
+- Readiness check before running E2E: a `curl` retry loop polling `http://localhost:6006` until the `http-server`-served Storybook static build responds — this is an HTTP polling loop, not a GitHub Actions `services:`-based Docker health check.
 
 ## Artifacts
 
@@ -87,7 +92,7 @@ PLAYWRIGHT_VERSION: "1.58.0"
 2. Look at the specific job logs for error messages
 3. Common issues:
    - **Playwright version mismatch** — check `PLAYWRIGHT_VERSION` env var matches `package.json`
-   - **Docker health check timeout** — Storybook may need more time to build
+   - **Storybook readiness timeout** — the `curl` polling loop gave up before the static site finished serving; Storybook may need more time to build/start
    - **Screenshot diff** — visual regression detected, may need `[update-screenshots]`
    - **pnpm lock mismatch** — run `pnpm install` locally and commit lockfile
    - **Type errors** — `pnpm typecheck` locally to reproduce
