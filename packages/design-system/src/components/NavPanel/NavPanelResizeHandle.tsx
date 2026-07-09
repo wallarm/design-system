@@ -7,8 +7,8 @@ import {
   useState,
 } from 'react';
 import { cva } from 'class-variance-authority';
-import { throttle } from 'lodash-es';
 import { cn } from '../../utils/cn';
+import { throttle } from '../../utils/throttle';
 import { useNavPanelInternalContext } from './NavPanelContext';
 
 const resizeHandleVariants = cva(

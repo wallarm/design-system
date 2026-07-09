@@ -16,7 +16,7 @@
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "catalog:",
     "@vitest/ui": "4.1.10",
-    "jsdom": "27.4.0",
+    "jsdom": "29.1.1",
     "vitest": "catalog:"
   },
   "devDependencies": {

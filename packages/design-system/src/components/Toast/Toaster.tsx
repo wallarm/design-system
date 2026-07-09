@@ -10,15 +10,40 @@ import { Toast, type ToastData } from './Toast';
 
 export interface ToastCreateOptions extends Omit<ToastData, 'id'> {
   duration?: number;
+  priority?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 }
 
-export interface TypedToaster extends Omit<CreateToasterReturn, 'create'> {
+export interface TypedToaster extends Omit<CreateToasterReturn, 'create' | 'update'> {
   create: (options: ToastCreateOptions) => string;
+  update: (id: string, options: Partial<ToastCreateOptions>) => string;
   __arkToaster: CreateToasterReturn;
 }
 
 const SIMPLE_TOAST_DURATION_MS = 5000;
 const EXTENDED_TOAST_DURATION_MS = 10000;
+
+// @zag-js/toast >=1.41 (pulled in by @ark-ui/react 5.37) added a toast priority
+// queue: `createToaster().create()` now looks up `[actionable, nonActionable]`
+// priority pairs from a fixed internal map keyed by `type` and destructures the
+// result unconditionally — see `getPriorityForType` in
+// @zag-js/toast/dist/toast.store.mjs:
+//   var priorities = { error: [1, 2], warning: [3, 6], loading: [4, 5], success: [5, 7], info: [6, 8] };
+//   var getPriorityForType = (type, hasAction) => {
+//     const [actionable, nonActionable] = priorities[type ?? DEFAULT_TYPE];
+//     return hasAction ? actionable : nonActionable;
+//   };
+// Our own `type: 'default'` (rendered with no icon) isn't one of those keys, so
+// `priorities['default']` is `undefined` and the destructure throws
+// `TypeError: undefined is not iterable`, synchronously inside the onClick
+// handler — the toast is never created. Only THIS one type needs a workaround;
+// every other type (including an omitted `type`, which falls back to Ark's own
+// built-in 'info' default — a valid key) is already handled safely by Ark's
+// own lookup, so we let those flow through untouched (`priority: undefined`).
+// Ark's public `priority` option (see `Options.priority` in
+// @zag-js/toast/dist/toast.types.d.ts) is the documented bypass for that
+// internal lookup — reusing the 'info' pair here since our 'default' toast is
+// the same neutral, non-alerting variant.
+const DEFAULT_TOAST_PRIORITY = { actionable: 6, nonActionable: 8 } as const;
 
 const arkToaster = createToaster({
   overlap: true,
@@ -38,6 +63,31 @@ export const toaster: TypedToaster = {
       duration:
         options.duration ??
         (options.variant === 'extended' ? EXTENDED_TOAST_DURATION_MS : SIMPLE_TOAST_DURATION_MS),
+      priority:
+        options.priority ??
+        (options.type === 'default'
+          ? options.actions
+            ? DEFAULT_TOAST_PRIORITY.actionable
+            : DEFAULT_TOAST_PRIORITY.nonActionable
+          : undefined),
+    });
+  },
+  update: (id: string, options: Partial<ToastCreateOptions>) => {
+    // Only inject a priority override when this update sets `type` to our
+    // synthetic 'default' and doesn't already specify one explicitly — every
+    // other type (including an update that doesn't touch `type` at all) is
+    // left for Ark to handle exactly as it did before this fix.
+    const priority =
+      options.priority ??
+      (options.type === 'default'
+        ? options.actions
+          ? DEFAULT_TOAST_PRIORITY.actionable
+          : DEFAULT_TOAST_PRIORITY.nonActionable
+        : undefined);
+
+    return arkToaster.update(id, {
+      ...options,
+      ...(priority !== undefined ? { priority } : {}),
     });
   },
 };

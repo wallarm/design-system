@@ -47,6 +47,7 @@ export function useTour({
   closeOnInteractOutside,
 }: UseTourOptions = {}) {
   const prevStepIndexRef = useRef(-1);
+  const didAutoStartRef = useRef(false);
 
   const handleStatusChange = useCallback(
     (details: TourStatusChangeDetails) => {
@@ -82,9 +83,21 @@ export function useTour({
     onStepChange: handleStepChange,
   });
 
+  // `tour.start` is a new function reference on every render (zag-js's
+  // `connect()` rebuilds the returned API object each render), so it must
+  // not be a dependency here: including it re-runs this effect — and calls
+  // `tour.start()` again — on every re-render while `autoStart` is true.
+  // That includes the re-render triggered by a dismiss, which immediately
+  // reopens the tour before its exit transition/unmount can complete. Guard
+  // with a ref so this only ever fires once, matching the documented
+  // "start automatically on mount" behavior.
+  // biome-ignore lint/correctness/useExhaustiveDependencies: tour.start intentionally excluded, see comment above
   useEffect(() => {
-    if (autoStart) tour.start();
-  }, [autoStart, tour.start]);
+    if (autoStart && !didAutoStartRef.current) {
+      didAutoStartRef.current = true;
+      tour.start();
+    }
+  }, [autoStart]);
 
   // Reset tracking when tour closes
   useEffect(() => {

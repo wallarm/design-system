@@ -1,5 +1,4 @@
 import { Fragment } from 'react';
-import { capitalize } from 'lodash-es';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Check, CircleCheck, Info, PenTool, X } from '../../icons';
 import { HStack } from '../Stack';
@@ -10,6 +9,8 @@ import type { BadgeColor, BadgeType } from './types';
 
 const isMutedSupported = (type: BadgeType, color: BadgeColor): boolean =>
   type === 'solid' || (type === 'outline' && color === 'slate');
+
+const capitalize = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
 const meta = {
   title: 'Status Indication/Badge',

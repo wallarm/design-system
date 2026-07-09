@@ -3,12 +3,14 @@ import { Dialog } from '@ark-ui/react/dialog';
 import { type TestableProps, useTestId } from '../../utils/testId';
 
 export interface DrawerTriggerProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
     TestableProps {
   children: ReactNode;
   /** Render as child component */
   asChild?: boolean;
   ref?: Ref<HTMLButtonElement>;
+  /** Native button value attribute (string only, matching Ark UI's Dialog.Trigger) */
+  value?: string;
 }
 
 export const DrawerTrigger: FC<DrawerTriggerProps> = ({
