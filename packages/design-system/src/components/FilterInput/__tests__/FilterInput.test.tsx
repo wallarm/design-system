@@ -165,6 +165,23 @@ describe('FilterInput', () => {
     });
   });
 
+  describe('container sizing (WDS-143 regression)', () => {
+    // Input/classes.ts added a `size` CVA variant with `defaultVariants: { size: 'default' }`
+    // (WDS-143). FilterInputField borrows `inputVariants` from Input purely for the shared
+    // border/focus-ring look, not for sizing — its own height comes from
+    // filterInputContainerVariants's `min-h-40` so the field can grow across multiple chip
+    // rows. Because CVA now injects `h-36 py-8` into every `inputVariants({ error })` call by
+    // default, that fixed height/padding was silently leaking onto the outer wrapper (Textarea
+    // was updated in the same PR to explicitly override it; FilterInputField was not).
+    it('does not inherit the Input size variant fixed height/padding on the outer wrapper', () => {
+      const { container } = render(<FilterInput fields={sampleFields} />);
+      const field = container.querySelector('[data-slot="filter-input"]');
+      expect(field).toHaveClass('min-h-40');
+      expect(field).not.toHaveClass('h-36');
+      expect(field).not.toHaveClass('py-8');
+    });
+  });
+
   describe('onErrorsChange (AS-1134)', () => {
     it('reports validation messages and clears them when fixed', async () => {
       const onErrorsChange = vi.fn();

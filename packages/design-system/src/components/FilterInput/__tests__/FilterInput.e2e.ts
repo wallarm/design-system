@@ -14,124 +14,124 @@ const filterFieldStory = createStoryHelper('patterns-filterinput-filterinput', [
   'Paired Field Value Is Set',
 ] as const);
 
-// TODO: Enable after baseline screenshots are generated and menu flow is stabilized
-test.describe
-  .skip('Component: FilterInput', () => {
-    test.describe('Visual', () => {
-      test('Should render status code mask menu correctly', async ({ page }) => {
-        await filterFieldStory.goto(page, 'HTTP Status Code Suggestions');
-        const field = page.locator('[data-slot="filter-input"]');
+test.describe('Component: FilterInput', () => {
+  test.describe('Visual', () => {
+    test('Should render status code mask menu correctly', async ({ page }) => {
+      await filterFieldStory.goto(page, 'HTTP Status Code Suggestions');
+      const field = page.locator('[data-slot="filter-input"]');
 
-        await field.click();
-        // Pick the Status code field from the field menu, then the "is" operator,
-        // to surface the value menu with mask suggestions.
-        await page.getByRole('menuitem', { name: /status code/i }).click();
-        await page.getByRole('menuitem', { name: /^is$/i }).click();
+      await field.click();
+      // Pick the Status code field from the field menu, then the "is" operator,
+      // to surface the value menu with mask suggestions.
+      await page.getByRole('menuitem', { name: /status code/i }).click();
+      // Operators render as "<label> <symbol>", e.g. the `=` operator is "is =".
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
 
-        const menu = page.getByRole('menu').last();
-        await expect(menu).toHaveScreenshot('status-code-mask-menu.png');
-      });
-    });
-
-    test.describe('Interactions', () => {
-      test('Should focus field when clicked', async ({ page }) => {
-        await filterFieldStory.goto(page, 'With Preset Value');
-        const field = page.locator('[data-slot="filter-input"]');
-
-        await field.click();
-        await expect(field).toBeFocused();
-      });
-
-      test('Should display preset chips', async ({ page }) => {
-        await filterFieldStory.goto(page, 'With Preset Value');
-        const chips = page.locator('[data-slot="filter-input-chip"]');
-
-        await expect(chips).toHaveCount(1);
-      });
-
-      test('Should display multiple preset chips', async ({ page }) => {
-        await filterFieldStory.goto(page, 'With Multi Condition Preset');
-        const chips = page.locator('[data-slot="filter-input-chip"]');
-
-        const count = await chips.count();
-        expect(count).toBeGreaterThan(1);
-      });
-
-      test('Should propagate error state to field with value', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Error With Value');
-
-        const field = page.locator('[data-slot="filter-input"]');
-        await expect(field).toHaveAttribute('aria-invalid', 'true');
-
-        const chip = page.locator('[data-slot="filter-input-chip"]').first();
-        await expect(chip).toBeVisible();
-      });
-
-      // AS-1160 — two-step paired chip.
-      test('Should reveal the second value after the first when building a paired field', async ({
-        page,
-      }) => {
-        await filterFieldStory.goto(page, 'Paired Field');
-        const field = page.locator('[data-slot="filter-input"]');
-        await field.click();
-
-        await page.getByRole('menuitem', { name: /^Context Param$/ }).click();
-        await page.getByRole('menuitem', { name: /^is =$/ }).click();
-        await page.getByRole('menuitem', { name: /^header$/ }).click();
-
-        // The building chip now shows the paired attribute and the ; separator.
-        const buildingChip = page.locator(
-          '[data-slot="filter-input-condition-chip"][data-building]',
-        );
-        await expect(buildingChip.locator('[data-slot="segment-separator"]')).toBeVisible();
-        await expect(buildingChip).toContainText('Value');
-      });
-
-      test('Should render a preset paired condition as one chip', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Paired Field Preset');
-        const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-        await expect(chip.locator('[data-slot="segment-separator"]')).toBeVisible();
-        await expect(chip.locator('[data-slot="segment-attribute"]')).toHaveCount(2);
-        await expect(chip.locator('[data-slot="segment-value"]')).toHaveCount(2);
-      });
-    });
-
-    test.describe('Accessibility', () => {
-      test('Should be focusable via Tab key', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Default');
-        const field = page.locator('[data-slot="filter-input"]');
-
-        await page.keyboard.press('Tab');
-        await expect(field).toBeFocused();
-      });
-
-      test('Should have aria-invalid when error is true', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Error Empty');
-        const field = page.locator('[data-slot="filter-input"]');
-
-        await expect(field).toHaveAttribute('aria-invalid', 'true');
-      });
-
-      test('Should have proper role attribute', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Default');
-        const field = page.locator('[data-slot="filter-input"]');
-
-        await expect(field).toHaveAttribute('role', 'textbox');
-      });
-
-      test('Should have keyboard hint with proper aria labels', async ({ page }) => {
-        await filterFieldStory.goto(page, 'With Keyboard Hint');
-
-        const kbdElement = page.locator('kbd').first();
-        await expect(kbdElement).toBeVisible();
-      });
+      const menu = page.getByRole('menu').last();
+      await expect(menu).toHaveScreenshot('status-code-mask-menu.png');
     });
   });
 
+  test.describe('Interactions', () => {
+    test('Should focus the input when the field is clicked', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Preset Value');
+      const field = page.locator('[data-slot="filter-input"]');
+      // The [data-slot="filter-input"] wrapper delegates clicks to the inner
+      // combobox input — that is what receives focus, not the wrapper itself.
+      const input = field.locator('input');
+
+      await field.click();
+      await expect(input).toBeFocused();
+    });
+
+    test('Should display preset chips', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Preset Value');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
+
+      await expect(chips).toHaveCount(1);
+    });
+
+    test('Should display multiple preset chips', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Multi Condition Preset');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
+
+      const count = await chips.count();
+      expect(count).toBeGreaterThan(1);
+    });
+
+    test('Should propagate error state to the input with value', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Error With Value');
+
+      // aria-invalid lives on the inner combobox input, not the wrapper.
+      const input = page.locator('[data-slot="filter-input"] input');
+      await expect(input).toHaveAttribute('aria-invalid', 'true');
+
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      await expect(chip).toBeVisible();
+    });
+
+    // AS-1160 — two-step paired chip.
+    test('Should reveal the second value after the first when building a paired field', async ({
+      page,
+    }) => {
+      await filterFieldStory.goto(page, 'Paired Field');
+      const field = page.locator('[data-slot="filter-input"]');
+      await field.click();
+
+      await page.getByRole('menuitem', { name: /^Context Param$/ }).click();
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+      await page.getByRole('menuitem', { name: /^header$/ }).click();
+
+      // The building chip now shows the paired attribute and the ; separator.
+      const buildingChip = page.locator('[data-slot="filter-input-condition-chip"][data-building]');
+      await expect(buildingChip.locator('[data-slot="segment-separator"]')).toBeVisible();
+      await expect(buildingChip).toContainText('Value');
+    });
+
+    test('Should render a preset paired condition as one chip', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Paired Field Preset');
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      await expect(chip.locator('[data-slot="segment-separator"]')).toBeVisible();
+      await expect(chip.locator('[data-slot="segment-attribute"]')).toHaveCount(2);
+      await expect(chip.locator('[data-slot="segment-value"]')).toHaveCount(2);
+    });
+  });
+
+  test.describe('Accessibility', () => {
+    test('Should focus the input via Tab key', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Default');
+      const input = page.locator('[data-slot="filter-input"] input');
+
+      await page.keyboard.press('Tab');
+      await expect(input).toBeFocused();
+    });
+
+    test('Should have aria-invalid when error is true', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Error Empty');
+      const input = page.locator('[data-slot="filter-input"] input');
+
+      await expect(input).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    test('Should expose the combobox role on the input', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Default');
+      const input = page.locator('[data-slot="filter-input"] input');
+
+      await expect(input).toHaveAttribute('role', 'combobox');
+    });
+
+    test('Should have keyboard hint with proper aria labels', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Keyboard Hint');
+
+      const kbdElement = page.locator('kbd').first();
+      await expect(kbdElement).toBeVisible();
+    });
+  });
+});
+
 // AS-1022 — wrapper-click and blur-outside paths must commit an in-progress
-// multi-select building chip. The test lives outside the broader describe.skip
-// because the screenshot blocker doesn't apply to interaction assertions, and
-// the bug is a synchronous-event race subtle enough to need a CI guard.
+// multi-select building chip. The bug is a synchronous-event race subtle enough
+// to need a CI guard.
 test.describe('Component: FilterInput — AS-1022 wrapper-click commit', () => {
   test.describe('Interactions', () => {
     // Build an in-progress multi-select chip: Status code "in" with two values
@@ -196,11 +196,9 @@ test.describe('Component: FilterInput — AS-1022 wrapper-click commit', () => {
   });
 });
 
-// AS-1179 — context-parameter (paired) chip bugs. Interaction-only assertions
-// (no screenshots), so this block runs in CI despite the screenshot-gated
-// describe.skip above — same rationale as the AS-1022 block. A red chip and an
-// error banner always travel together, so the banner (role="alert") plus the
-// field's aria-invalid are the stable proxies for "the chip turned red".
+// AS-1179 — context-parameter (paired) chip bugs. A red chip and an error
+// banner always travel together, so the banner (role="alert") plus the field's
+// aria-invalid are the stable proxies for "the chip turned red".
 test.describe('Component: FilterInput — AS-1179 paired chip', () => {
   test.describe('Interactions', () => {
     type E2EPage = Parameters<Parameters<typeof test>[1]>[0]['page'];
@@ -436,7 +434,9 @@ test.describe('Component: FilterInput — AS-1192 standalone chip', () => {
     }) => {
       await filterFieldStory.goto(page, 'Default');
       await getField(page).click();
-      await page.getByRole('menuitem', { name: /^Priority$/ }).click();
+      // Application ID is a simple non-paired field that requires a value step,
+      // so an incomplete [attr][op] chip surfaces the empty-value placeholder.
+      await page.getByRole('menuitem', { name: /^Application ID$/ }).click();
       await page.getByRole('menuitem', { name: /^is =$/ }).click();
 
       // Force-commit the incomplete chip: click the empty input area past the
