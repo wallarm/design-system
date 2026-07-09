@@ -9,7 +9,9 @@ export const metricValueClasses =
   'font-sans-display text-3xl font-medium leading-3xl text-text-primary';
 
 // The denominator, one size down from the value; the connector words ("of" / "total") are muted.
-export const metricTotalClasses = '-ml-2 flex items-baseline gap-2';
+// gap-6 inside matches the effective 6px between value and total (header gap-8 minus -ml-2),
+// so the whole "91 of 120" run reads with one uniform rhythm (Figma item-spacing/6).
+export const metricTotalClasses = '-ml-2 flex items-baseline gap-6';
 export const metricTotalValueClasses = 'font-sans-display text-lg font-medium text-text-primary';
 export const metricTotalWordClasses = 'text-xs font-normal text-text-secondary';
 
