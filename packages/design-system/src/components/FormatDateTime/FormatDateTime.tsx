@@ -81,8 +81,7 @@ export const FormatDateTime: FC<FormatDateTimeProps> = ({
             <Text size='sm'>
               <span
                 className={cn(
-                  'whitespace-nowrap underline decoration-dashed underline-offset-4',
-                  'decoration-border-primary-light',
+                  'whitespace-nowrap border-b-1 border-dashed border-border-strong-primary',
                 )}
               >
                 {formatRelativeTime(date)}
