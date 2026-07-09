@@ -87,7 +87,7 @@ RealisticExample.args = {
  */
 export const AndOperator: StoryFn = () => (
   <MockFilterInputProvider>
-    <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
+    <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => undefined} />
   </MockFilterInputProvider>
 );
 
@@ -96,7 +96,7 @@ export const AndOperator: StoryFn = () => (
  */
 export const OrOperator: StoryFn = () => (
   <MockFilterInputProvider>
-    <FilterInputConnectorChip variant='or' chipId='c-1' onChange={() => {}} />
+    <FilterInputConnectorChip variant='or' chipId='c-1' onChange={() => undefined} />
   </MockFilterInputProvider>
 );
 
@@ -107,7 +107,7 @@ export const CombinedWithAnd: StoryFn = () => (
   <MockFilterInputProvider>
     <div className='flex items-center gap-4'>
       <FilterInputChip attribute='IP Address' operator='is' value='192.168.1.1' />
-      <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
+      <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => undefined} />
       <FilterInputChip attribute='Country' operator='is' value='US' />
     </div>
   </MockFilterInputProvider>
@@ -120,7 +120,7 @@ export const CombinedWithOr: StoryFn = () => (
   <MockFilterInputProvider>
     <div className='flex items-center gap-4'>
       <FilterInputChip attribute='Status' operator='is' value='Active' />
-      <FilterInputConnectorChip variant='or' chipId='c-1' onChange={() => {}} />
+      <FilterInputConnectorChip variant='or' chipId='c-1' onChange={() => undefined} />
       <FilterInputChip attribute='Status' operator='is' value='Pending' />
     </div>
   </MockFilterInputProvider>
@@ -169,7 +169,7 @@ export const InteractiveDeleteExample: StoryFn = () => {
               <FilterInputConnectorChip
                 variant='and'
                 chipId={`connector-${chip.id}`}
-                onChange={() => {}}
+                onChange={() => undefined}
               />
             )}
             <FilterInputChip
@@ -227,7 +227,7 @@ export const DisabledAndInteractiveMix: StoryFn = () => (
         disabled
         onRemove={() => undefined}
       />
-      <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
+      <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => undefined} />
       <FilterInputChip
         attribute='Country'
         operator='is'
@@ -287,14 +287,14 @@ export const AllStatesShowcase: StoryFn = () => (
             attribute='Attribute'
             operator='operator'
             value='Value'
-            onRemove={() => {}}
+            onRemove={() => undefined}
           />
           <FilterInputChip
             attribute='Attribute'
             operator='operator'
             value='Value'
             error
-            onRemove={() => {}}
+            onRemove={() => undefined}
           />
         </div>
       </div>
@@ -328,8 +328,8 @@ export const AllStatesShowcase: StoryFn = () => (
       <div>
         <h3 className='text-sm font-medium text-text-primary mb-2'>Connectors</h3>
         <div className='flex items-center gap-2 flex-wrap'>
-          <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
-          <FilterInputConnectorChip variant='or' chipId='c-2' onChange={() => {}} />
+          <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => undefined} />
+          <FilterInputConnectorChip variant='or' chipId='c-2' onChange={() => undefined} />
         </div>
       </div>
     </div>

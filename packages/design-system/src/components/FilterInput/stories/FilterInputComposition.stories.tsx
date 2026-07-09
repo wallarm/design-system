@@ -620,7 +620,8 @@ const attackFields: FieldMetadata[] = [
 /**
  * Mirrors the MY console **new Attacks** page: the full attack-vectors filter
  * schema served by sessions-api (`where_fields`), rendered straight from the
- * raw backend payload via `backendFieldsToMetadata` (see below). Every field is
+ * raw backend payload via `backendFieldsToMetadata` (from the shared
+ * `backendFieldsFixture` module). Every field is
  * `strictValues: false`, so backend option lists act as suggestions and any
  * typed value commits — exactly how the Attacks page treats the schema, letting
  * the backend reject truly invalid input.

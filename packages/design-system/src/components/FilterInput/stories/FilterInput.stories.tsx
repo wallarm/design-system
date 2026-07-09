@@ -99,7 +99,7 @@ export const WithPresetValue: Story = {
       type: 'condition',
       field: 'status',
       operator: '=',
-      value: 'active',
+      value: 'Blocked',
     });
 
     return (
@@ -129,7 +129,7 @@ export const WithMultiConditionPreset: Story = {
       type: 'group',
       operator: 'and',
       children: [
-        { type: 'condition', field: 'status', operator: '=', value: 'active' },
+        { type: 'condition', field: 'status', operator: '=', value: 'Blocked' },
         { type: 'condition', field: 'status_code', operator: '>', value: 400 },
       ],
     });
@@ -161,7 +161,7 @@ export const ErrorWithValue: Story = {
       type: 'condition',
       field: 'status',
       operator: '=',
-      value: 'active',
+      value: 'Blocked',
     });
 
     return (
@@ -188,7 +188,7 @@ export const WithDisabledChips: Story = {
       operator: 'and',
       children: [
         { type: 'condition', field: 'country', operator: '=', value: 'US', disabled: true },
-        { type: 'condition', field: 'status', operator: '=', value: 'blocked', disabled: true },
+        { type: 'condition', field: 'status', operator: '=', value: 'Blocked', disabled: true },
         { type: 'condition', field: 'status_code', operator: '>', value: 400 },
       ],
     });
@@ -220,7 +220,7 @@ export const AllChipsDisabled: Story = {
       type: 'group',
       operator: 'and',
       children: [
-        { type: 'condition', field: 'status', operator: '=', value: 'registered', disabled: true },
+        { type: 'condition', field: 'status', operator: '=', value: 'Monitoring', disabled: true },
         {
           type: 'condition',
           field: 'country',

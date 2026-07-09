@@ -2,7 +2,7 @@ import { createRef, type FC, type ReactNode } from 'react';
 import { FilterInputProvider } from '../FilterInputContext/FilterInputProvider';
 import type { FilterInputContextValue } from '../FilterInputContext/types';
 
-const noop = () => {};
+const noop = () => undefined;
 
 /**
  * A no-op FilterInput context, just enough to render standalone sub-components
