@@ -1,3 +1,10 @@
+## <small>0.72.2 (2026-07-09)</small>
+
+* fix(format-datetime): match relative-time underline to Figma (token color + width) (#216) ([18ee987](https://github.com/wallarm/design-system/commit/18ee987)), closes [#216](https://github.com/wallarm/design-system/issues/216)
+* ci: add missing build/perf/revert types to pr-title-checker config (#215) ([1032039](https://github.com/wallarm/design-system/commit/1032039)), closes [#215](https://github.com/wallarm/design-system/issues/215)
+* chore(deps): bump patch/minor dependencies workspace-wide (#214) ([818da37](https://github.com/wallarm/design-system/commit/818da37)), closes [#214](https://github.com/wallarm/design-system/issues/214)
+* docs: fix documentation drift against actual CI/CD, release, and versioning setup (#213) ([bf17830](https://github.com/wallarm/design-system/commit/bf17830)), closes [#213](https://github.com/wallarm/design-system/issues/213)
+
 ## <small>0.72.1 (2026-07-08)</small>
 
 * fix(deps): patch 51 dependency vulnerabilities (1 critical, 17 high) (#212) ([6d3d244](https://github.com/wallarm/design-system/commit/6d3d244)), closes [#212](https://github.com/wallarm/design-system/issues/212)
