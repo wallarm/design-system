@@ -10,6 +10,10 @@ import { BarListValue } from '../BarList/BarListValue';
 import { Chart } from '../Chart/Chart';
 import { ChartHeader } from '../Chart/ChartHeader';
 import { ChartTitle } from '../Chart/ChartTitle';
+import {
+  HorizontalBarStack,
+  type HorizontalBarStackDatum,
+} from '../HorizontalBarStack/HorizontalBarStack';
 import { useChartTimeFormatters } from '../hooks/useChartTimeFormatters';
 import { LineChart } from '../LineChart/LineChart';
 import { LineChartBody } from '../LineChart/LineChartBody';
@@ -19,6 +23,12 @@ import { LineChartTooltip } from '../LineChart/LineChartTooltip';
 import { LineChartXAxis } from '../LineChart/LineChartXAxis';
 import { LineChartYAxis } from '../LineChart/LineChartYAxis';
 import { hourlyData24, singleSeries } from '../LineChart/lib/sampleData';
+import { Metric } from '../Metric/Metric';
+import { MetricCaption } from '../Metric/MetricCaption';
+import { MetricDelta } from '../Metric/MetricDelta';
+import { MetricHeader } from '../Metric/MetricHeader';
+import { MetricTotal } from '../Metric/MetricTotal';
+import { MetricValue } from '../Metric/MetricValue';
 import { LegendDot } from '../PieChart/LegendDot';
 import { PieChart } from '../PieChart/PieChart';
 import {
@@ -53,6 +63,12 @@ const pieRows = [
   { name: '1XX', value: 1, color: 'slate' as const, badgeColor: 'slate' as const },
 ];
 const pieTotal = pieRows.reduce((sum, r) => sum + r.value, 0);
+
+const severityData: HorizontalBarStackDatum[] = [
+  { name: 'Critical', value: 42, color: 'red' },
+  { name: 'High', value: 31, color: 'brand' },
+  { name: 'Medium', value: 18, color: 'amber' },
+];
 
 const meta = {
   title: 'Data display/SimpleCharts/Overview',
@@ -152,6 +168,35 @@ const LineChartCard = () => {
   );
 };
 
+const HorizontalBarStackCard = () => (
+  <Chart>
+    <ChartHeader>
+      <ChartTitle>Findings by severity</ChartTitle>
+    </ChartHeader>
+    <HorizontalBarStack
+      data={severityData}
+      value={91}
+      delta={{ value: 10, trend: 'up', sentiment: 'negative' }}
+    />
+  </Chart>
+);
+
+const MetricCard = () => (
+  <Chart>
+    <ChartHeader>
+      <ChartTitle>Blocked attacks</ChartTitle>
+    </ChartHeader>
+    <Metric>
+      <MetricHeader>
+        <MetricValue>91</MetricValue>
+        <MetricTotal connector='of'>120</MetricTotal>
+        <MetricDelta value={10} trend='up' sentiment='negative' />
+      </MetricHeader>
+      <MetricCaption>Last 24 hours</MetricCaption>
+    </Metric>
+  </Chart>
+);
+
 export const Default: StoryFn<typeof meta> = () => (
   <div className='flex flex-col gap-16 w-832'>
     <div className='grid grid-cols-2 gap-16'>
@@ -159,6 +204,10 @@ export const Default: StoryFn<typeof meta> = () => (
       <PieChartCard />
     </div>
     <LineChartCard />
+    <div className='grid grid-cols-2 gap-16'>
+      <HorizontalBarStackCard />
+      <MetricCard />
+    </div>
   </div>
 );
 
@@ -166,7 +215,7 @@ Default.parameters = {
   docs: {
     description: {
       story:
-        'Default rendering of each chart in the SimpleCharts family. BarList (top-left) and PieChart (top-right) share the row; LineChart spans the row below.',
+        'Default rendering of each chart in the SimpleCharts family. BarList (top-left) and PieChart (top-right) share the row; LineChart spans the row below; HorizontalBarStack (bottom-left) and Metric (bottom-right) share the last row.',
     },
   },
 };
