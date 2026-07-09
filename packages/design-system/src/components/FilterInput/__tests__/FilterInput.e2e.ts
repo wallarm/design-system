@@ -434,7 +434,9 @@ test.describe('Component: FilterInput — AS-1192 standalone chip', () => {
     }) => {
       await filterFieldStory.goto(page, 'Default');
       await getField(page).click();
-      await page.getByRole('menuitem', { name: /^Priority$/ }).click();
+      // Application ID is a simple freeform field (requires a value step), so an
+      // incomplete [attr][op] chip surfaces the empty-value placeholder.
+      await page.getByRole('menuitem', { name: /^Application ID$/ }).click();
       await page.getByRole('menuitem', { name: /^is =$/ }).click();
 
       // Force-commit the incomplete chip: click the empty input area past the
