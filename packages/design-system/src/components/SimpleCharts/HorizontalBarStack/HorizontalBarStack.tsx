@@ -45,7 +45,11 @@ export interface HorizontalBarStackDatum {
   className?: string;
 }
 
-export interface HorizontalBarStackProps extends HTMLAttributes<HTMLDivElement>, TestableProps {
+// `onSelect` here is click-to-filter, not the DOM text-selection event — Omit the native
+// handler so the declaration build accepts the narrowed signature (TS2430).
+export interface HorizontalBarStackProps
+  extends Omit<HTMLAttributes<HTMLDivElement>, 'onSelect'>,
+    TestableProps {
   ref?: Ref<HTMLDivElement>;
   /** Segments + legend. One array drives both, so colors stay in sync. */
   data: HorizontalBarStackDatum[];
