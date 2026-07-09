@@ -9,9 +9,9 @@ import {
   useState,
 } from 'react';
 import { cva } from 'class-variance-authority';
-import { throttle } from 'lodash-es';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
+import { throttle } from '../../utils/throttle';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useDrawerContext } from './DrawerContext';
 
