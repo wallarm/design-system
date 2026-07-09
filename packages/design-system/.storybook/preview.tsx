@@ -48,7 +48,21 @@ const preview: Preview = {
           ['Patterns', { FilterInput: ['Composition', '*'] }],
           'Components',
           'Data display',
-          ['SimpleCharts', ['Overview', 'BarList', 'PieChart', 'LineChart', 'Chart']],
+          // Chart is pinned last: it's the foundational card frame the other charts compose,
+          // not a chart itself. `*` keeps any future chart above it automatically.
+          [
+            'SimpleCharts',
+            [
+              'Overview',
+              'BarList',
+              'PieChart',
+              'LineChart',
+              'HorizontalBarStack',
+              'Metric',
+              '*',
+              'Chart',
+            ],
+          ],
         ],
       },
     },
