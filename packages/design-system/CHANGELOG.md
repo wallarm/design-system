@@ -1,3 +1,5 @@
+## [0.72.3](https://github.com/wallarm/design-system/compare/v0.72.2...v0.72.3) (2026-07-09)
+
 ## <small>0.72.2 (2026-07-09)</small>
 
 * fix(format-datetime): match relative-time underline to Figma (token color + width) (#216) ([18ee987](https://github.com/wallarm/design-system/commit/18ee987)), closes [#216](https://github.com/wallarm/design-system/issues/216)
