@@ -11,6 +11,9 @@ import { ChartActions } from '../Chart/ChartActions';
 import { ChartHeader } from '../Chart/ChartHeader';
 import { ChartTitle } from '../Chart/ChartTitle';
 import { useChartTimeFormatters } from '../hooks/useChartTimeFormatters';
+import { MetricDelta } from '../Metric/MetricDelta';
+import { MetricHeader } from '../Metric/MetricHeader';
+import { MetricValue } from '../Metric/MetricValue';
 import { LineChart } from './LineChart';
 import { LineChartBody } from './LineChartBody';
 import type { LineChartDatum, LineChartSeries, LineChartZoomRange } from './LineChartContext';
@@ -159,6 +162,49 @@ const MultiLegend = ({ series = multiSeries }: { series?: LineChartSeries[] }) =
     ))}
   </LineChartLegend>
 );
+
+/**
+ * The anatomy's "metric + legend" variant: the shared Metric bricks (value + delta) sit to the
+ * left of the legend in one row between the card header and the grid. Pure composition — the
+ * chart itself is untouched; the card simply grows by the metric row's height.
+ */
+export const WithMetric: StoryFn<typeof meta> = () => {
+  const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
+  return (
+    <div className='w-800'>
+      <Chart>
+        <ChartHeader>
+          <ChartTitle>Requests per hour</ChartTitle>
+        </ChartHeader>
+        <LineChart data={hourlyData24} series={multiSeries} xKey='timestamp'>
+          <div className='flex items-center justify-between pr-8'>
+            <MetricHeader className='px-16'>
+              <MetricValue>{2903}</MetricValue>
+              <MetricDelta value={10} trend='up' sentiment='negative' />
+            </MetricHeader>
+            <MultiLegend />
+          </div>
+          <LineChartBody>
+            <LineChartGrid />
+            <LineChartXAxis tickFormatter={formatHour} minTickGap={32} />
+            <LineChartYAxis tickFormatter={formatYTick} />
+            {multiSeries.map(s => (
+              <LineChartLine key={s.key} seriesKey={s.key} />
+            ))}
+            <LineChartTooltip xTickFormatter={formatHourWithTimezone} />
+          </LineChartBody>
+        </LineChart>
+      </Chart>
+    </div>
+  );
+};
+
+WithMetric.parameters = {
+  design: {
+    type: 'figma',
+    url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11626-37312',
+  },
+};
 
 export const Curves: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();

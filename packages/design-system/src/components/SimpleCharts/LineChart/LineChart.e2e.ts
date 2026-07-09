@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const lineChartStory = createStoryHelper('data-display-simplecharts-linechart', [
   'Default',
   'Default Multi',
+  'With Metric',
   'Curves',
   'Line Styling',
   'Edge Cases',
@@ -33,6 +34,11 @@ test.describe('LineChart', () => {
 
     test('DefaultMulti', async ({ page }) => {
       await lineChartStory.goto(page, 'Default Multi');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('WithMetric', async ({ page }) => {
+      await lineChartStory.goto(page, 'With Metric');
       await expect(page).toHaveScreenshot();
     });
 
