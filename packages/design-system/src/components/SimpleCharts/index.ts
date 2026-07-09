@@ -30,6 +30,8 @@ export {
   HorizontalBarStack,
   type HorizontalBarStackDatum,
   type HorizontalBarStackProps,
+  HorizontalBarStackSkeleton,
+  type HorizontalBarStackSkeletonProps,
 } from './HorizontalBarStack';
 export { type ChartTimeFormatters, useChartTimeFormatters } from './hooks';
 export {
@@ -94,6 +96,8 @@ export {
   MetricHeader,
   type MetricHeaderProps,
   type MetricProps,
+  MetricSkeleton,
+  type MetricSkeletonProps,
   MetricTotal,
   type MetricTotalConnector,
   type MetricTotalProps,

@@ -8,6 +8,7 @@
 
 - Root: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=9667-10883
 - States (hover / filter / disabled): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11520-4054
+- Loading states board: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11580-9211
 
 ## Data model
 
@@ -34,6 +35,7 @@
 | Remainder | `total > sum(data.value)` | Grey tail (`--color-bg-strong-primary`) fills the gap; not shown in the legend. |
 | Legend off | `legend={false}` | Bar + header only; the bar becomes a named image (`role='img'` + `aria-label` summary). |
 | Empty / no data | `data.length === 0` | Header-only: value + delta render, but the bar wrapper and legend are not rendered at all (no empty track). Holds even when `total` is set. If `value` and `delta` are also absent, nothing renders — prefer `<ChartEmpty />` for an explicit empty body, or `Metric` for a bare stat. |
+| Loading | consumer swaps in `HorizontalBarStackSkeleton` | Value-sized block + 8px bar track + legend pills (`legendItems`, default 3) on the DS `Skeleton` shimmer, mirroring the loaded layout so the card doesn't jump; announces `aria-busy` / `aria-live`. |
 
 ## Interactions
 
@@ -64,7 +66,6 @@ Same contract as `PieChart`, reused verbatim (the shared `makeIsHoverSyncTarget`
 
 ## Open questions / known limitations
 
-- **Skeleton** — no loading skeleton yet (pending the Figma node); add a `HorizontalBarStackSkeleton` matching `BarListSkeleton` / `PieChartSkeleton`.
 - **Per-item analytics** — because the legend is data-derived (not composed sub-components), consumer `data-analytics-*` can't land on individual legend items; the `onSelect(name)` callback carries the identity instead. Revisit (compound the legend) if per-item DOM analytics become a requirement.
 - **Header reuse** — the value + delta header is the shared `MetricHeader` / `MetricValue` / `MetricDelta` bricks from `Metric`, composed under HBS's own `TestIdProvider`, so the two never drift on header typography or delta colour.
 - No segment animation; no tooltips on long legend labels (wrap in `OverflowTooltip` if needed).

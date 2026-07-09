@@ -7,6 +7,7 @@ import { Metric } from './Metric';
 import { MetricCaption } from './MetricCaption';
 import { MetricDelta } from './MetricDelta';
 import { MetricHeader } from './MetricHeader';
+import { MetricSkeleton } from './MetricSkeleton';
 import { MetricTotal } from './MetricTotal';
 import { MetricValue } from './MetricValue';
 
@@ -134,4 +135,11 @@ export const Gallery: StoryFn = () => (
       </Metric>
     </Card>
   </div>
+);
+
+/** Card-load shimmer — swap `Metric` for `MetricSkeleton` while data loads. */
+export const Loading: StoryFn = () => (
+  <Card title='Findings'>
+    <MetricSkeleton data-testid='metric-skeleton' />
+  </Card>
 );

@@ -15,6 +15,7 @@ as one band, use `HorizontalBarStack`; when each part needs its own row, use `Ba
 
 - Root: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11437-11939
 - Options (brick set): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11520-4054
+- Loading states board: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11580-9211
 
 ## Composition
 
@@ -55,6 +56,10 @@ Display-only; no interactive states. The visual variety comes from which bricks 
 (value only, + delta, + total in each connector form, + caption). The `Gallery` story covers the
 combinations.
 
+**Loading** — swap `Metric` for `MetricSkeleton` inside the `Chart` card (the `Loading` story).
+It renders a value-sized block (72×36) plus a thin caption line on the DS `Skeleton` shimmer,
+sized to the loaded layout so the card doesn't jump; announces `aria-busy` / `aria-live`.
+
 ## Interactions
 
 None — the component is display-only.
@@ -79,7 +84,5 @@ None — the component is display-only.
 
 ## Open questions / known limitations
 
-- No skeleton in v1 (the value is trivially cheap to render); add a `MetricSkeleton` if a card-load
-  shimmer is needed, matching `BarListSkeleton` / `PieChartSkeleton`.
 - Caption is the subline below the header. An inline-right caption placement (if the design ever
   needs one) is not implemented.

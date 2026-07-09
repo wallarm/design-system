@@ -2,6 +2,7 @@ import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Chart } from '../Chart';
 import { HorizontalBarStack } from './HorizontalBarStack';
+import { HorizontalBarStackSkeleton } from './HorizontalBarStackSkeleton';
 import { resolveSegments } from './lib/resolveSegments';
 
 describe('HorizontalBarStack — root', () => {
@@ -245,6 +246,27 @@ describe('HorizontalBarStack — legend', () => {
     expect(bar).toHaveAttribute('aria-hidden', 'true');
     expect(bar).not.toHaveAttribute('aria-label');
     expect(bar).not.toHaveAttribute('role');
+  });
+});
+
+describe('HorizontalBarStackSkeleton', () => {
+  it('announces loading and renders header, bar and legend placeholders', () => {
+    render(<HorizontalBarStackSkeleton data-testid='hbs' />);
+    const root = screen.getByTestId('hbs');
+    expect(root).toHaveAttribute('data-slot', 'horizontal-bar-stack-skeleton');
+    expect(root).toHaveAttribute('aria-busy', 'true');
+    expect(root).toHaveAttribute('aria-live', 'polite');
+    expect(screen.getAllByTestId('hbs--skeleton-legend-item')).toHaveLength(3);
+  });
+
+  it('renders a custom number of legend placeholder pills', () => {
+    render(<HorizontalBarStackSkeleton data-testid='hbs' legendItems={5} />);
+    expect(screen.getAllByTestId('hbs--skeleton-legend-item')).toHaveLength(5);
+  });
+
+  it('keeps the DOM clean when no data-testid is passed', () => {
+    const { container } = render(<HorizontalBarStackSkeleton />);
+    expect(container.querySelector('[data-testid]')).toBeNull();
   });
 });
 

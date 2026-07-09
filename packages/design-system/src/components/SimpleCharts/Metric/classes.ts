@@ -15,3 +15,6 @@ export const metricTotalWordClasses = 'text-xs font-normal text-text-secondary';
 
 // The subline under the header.
 export const metricCaptionClasses = 'text-xs text-text-secondary';
+
+// Skeleton: the thin caption-line placeholder under the value block.
+export const metricSkeletonLineClasses = 'w-full py-4';

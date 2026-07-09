@@ -9,6 +9,7 @@ import {
   type HorizontalBarStackDatum,
   type HorizontalBarStackProps,
 } from './HorizontalBarStack';
+import { HorizontalBarStackSkeleton } from './HorizontalBarStackSkeleton';
 
 const figmaUrl =
   'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=9667-10883';
@@ -91,6 +92,18 @@ Palette.args = {
   data: PALETTE.map((color, i) => ({ name: color, value: 10 + i, color })),
   value: 75,
 };
+
+/** Card-load shimmer — swap the chart for `HorizontalBarStackSkeleton` while data loads. */
+export const Loading: StoryFn = () => (
+  <div className='w-400'>
+    <Chart>
+      <ChartHeader>
+        <ChartTitle>Findings by severity</ChartTitle>
+      </ChartHeader>
+      <HorizontalBarStackSkeleton data-testid='horizontal-bar-stack-skeleton' />
+    </Chart>
+  </div>
+);
 
 /**
  * Click a legend item to filter to that series; click the active one again to clear

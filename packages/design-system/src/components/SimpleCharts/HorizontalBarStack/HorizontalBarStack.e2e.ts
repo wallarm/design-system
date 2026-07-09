@@ -9,6 +9,7 @@ const story = createStoryHelper('data-display-simplecharts-horizontalbarstack', 
   'Legend Off',
   'Palette',
   'Selectable',
+  'Loading',
 ] as const);
 
 test.describe('HorizontalBarStack', () => {
@@ -25,6 +26,11 @@ test.describe('HorizontalBarStack', () => {
 
     test('Legend Off', async ({ page }) => {
       await story.goto(page, 'Legend Off');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Loading', async ({ page }) => {
+      await story.goto(page, 'Loading');
       await expect(page).toHaveScreenshot();
     });
   });
@@ -56,6 +62,16 @@ test.describe('HorizontalBarStack', () => {
       await expect(bar).toHaveRole('img');
       await expect(bar).toHaveAttribute('aria-label', /Critical 42/);
       await expect(page.getByTestId('horizontal-bar-stack--legend')).toHaveCount(0);
+    });
+
+    test('Should announce the skeleton loading state', async ({ page }) => {
+      await story.goto(page, 'Loading');
+      const skeleton = page.locator('[data-slot=horizontal-bar-stack-skeleton]');
+      await expect(skeleton).toHaveAttribute('aria-busy', 'true');
+      await expect(skeleton).toHaveAttribute('aria-live', 'polite');
+      await expect(
+        page.locator('[data-slot=horizontal-bar-stack-skeleton-legend-item]'),
+      ).toHaveCount(3);
     });
   });
 });

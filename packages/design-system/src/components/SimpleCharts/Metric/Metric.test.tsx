@@ -5,6 +5,7 @@ import { Metric } from './Metric';
 import { MetricCaption } from './MetricCaption';
 import { MetricDelta } from './MetricDelta';
 import { MetricHeader } from './MetricHeader';
+import { MetricSkeleton } from './MetricSkeleton';
 import { MetricTotal } from './MetricTotal';
 import { MetricValue } from './MetricValue';
 
@@ -128,6 +129,22 @@ describe('Metric — total connectors', () => {
       </Metric>,
     );
     expect(screen.getByTestId('m--total')).toHaveTextContent('12,345');
+  });
+});
+
+describe('MetricSkeleton', () => {
+  it('announces loading and renders the value block + caption line placeholders', () => {
+    render(<MetricSkeleton data-testid='ms' />);
+    const root = screen.getByTestId('ms');
+    expect(root).toHaveAttribute('data-slot', 'metric-skeleton');
+    expect(root).toHaveAttribute('aria-busy', 'true');
+    expect(root).toHaveAttribute('aria-live', 'polite');
+    expect(root.querySelectorAll('[data-slot=skeleton]')).toHaveLength(2);
+  });
+
+  it('keeps the DOM clean when no data-testid is passed', () => {
+    const { container } = render(<MetricSkeleton />);
+    expect(container.querySelector('[data-testid]')).toBeNull();
   });
 });
 

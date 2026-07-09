@@ -8,6 +8,9 @@ export const horizontalBarStackBarClasses = ['flex h-8 w-full overflow-hidden ro
 
 export const horizontalBarStackRemainderClasses = ['bg-bg-strong-primary'].join(' ');
 
+// Skeleton: the value-block placeholder sits where the real header renders (px-16 pt-8).
+export const horizontalBarStackSkeletonHeaderClasses = ['px-16 pt-8'].join(' ');
+
 export const horizontalBarStackLegendClasses = [
   'flex flex-row flex-wrap items-center gap-6 px-12 py-2',
 ].join(' ');
