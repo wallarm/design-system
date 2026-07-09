@@ -10,9 +10,6 @@ const filterChipStory = createStoryHelper('patterns-filterinput-filterinputchip'
   'Or Operator',
   'Combined With And',
   'Combined With Or',
-  'Opening Parenthesis',
-  'Closing Parenthesis',
-  'Combined With Parentheses',
   'With Delete Button',
   'Error With Delete',
   'Interactive Delete Example',
@@ -61,24 +58,9 @@ test.describe('Component: FilterInputChip', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render opening parenthesis variant correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Opening Parenthesis');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render closing parenthesis variant correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Closing Parenthesis');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render combined with parentheses correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Combined With Parentheses');
-      await expect(page).toHaveScreenshot();
-    });
-
     test('Should render chip with delete button on hover correctly', async ({ page }) => {
       await filterChipStory.goto(page, 'With Delete Button');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
       await chip.hover();
       await expect(page).toHaveScreenshot();
     });
@@ -87,7 +69,7 @@ test.describe('Component: FilterInputChip', () => {
       page,
     }) => {
       await filterChipStory.goto(page, 'Error With Delete');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
       await chip.hover();
       await expect(page).toHaveScreenshot();
     });
@@ -101,20 +83,21 @@ test.describe('Component: FilterInputChip', () => {
   test.describe('Interactions', () => {
     test('Should show delete button when chip is hovered', async ({ page }) => {
       await filterChipStory.goto(page, 'With Delete Button');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
       const deleteButton = chip.getByRole('button', { name: 'Remove filter' });
 
-      // Delete button should not be visible initially
-      await expect(deleteButton).not.toBeVisible();
+      // The delete button is always in the DOM but hidden via opacity-0 until
+      // hover (Playwright's toBeVisible ignores opacity, so assert the CSS).
+      await expect(deleteButton).toHaveCSS('opacity', '0');
 
-      // Hover should show delete button
+      // Hover reveals it (group-hover/chip:opacity-100).
       await chip.hover();
-      await expect(deleteButton).toBeVisible();
+      await expect(deleteButton).toHaveCSS('opacity', '1');
     });
 
     test('Should remove chip when delete button is clicked', async ({ page }) => {
       await filterChipStory.goto(page, 'Interactive Delete Example');
-      const chips = page.locator('[data-slot="filter-input-chip"]');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
 
       // Should have 3 chips initially
       await expect(chips).toHaveCount(3);
@@ -131,7 +114,7 @@ test.describe('Component: FilterInputChip', () => {
 
     test('Should remove all chips in sequence when delete is clicked', async ({ page }) => {
       await filterChipStory.goto(page, 'Interactive Delete Example');
-      const chips = page.locator('[data-slot="filter-input-chip"]');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
 
       // Remove all chips one by one
       while ((await chips.count()) > 0) {
@@ -149,7 +132,7 @@ test.describe('Component: FilterInputChip', () => {
   test.describe('Accessibility', () => {
     test('Should be focusable via keyboard for chip delete button', async ({ page }) => {
       await filterChipStory.goto(page, 'With Delete Button');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
 
       // Hover to show delete button
       await chip.hover();
@@ -167,7 +150,7 @@ test.describe('Component: FilterInputChip', () => {
 
     test('Should have proper ARIA label for delete button', async ({ page }) => {
       await filterChipStory.goto(page, 'With Delete Button');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
 
       await chip.hover();
 

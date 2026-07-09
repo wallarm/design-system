@@ -24,7 +24,8 @@ test.describe('Component: FilterInput', () => {
       // Pick the Status code field from the field menu, then the "is" operator,
       // to surface the value menu with mask suggestions.
       await page.getByRole('menuitem', { name: /status code/i }).click();
-      await page.getByRole('menuitem', { name: /^is$/i }).click();
+      // Operators render as "<label> <symbol>", e.g. the `=` operator is "is =".
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
 
       const menu = page.getByRole('menu').last();
       await expect(menu).toHaveScreenshot('status-code-mask-menu.png');
@@ -32,36 +33,40 @@ test.describe('Component: FilterInput', () => {
   });
 
   test.describe('Interactions', () => {
-    test('Should focus field when clicked', async ({ page }) => {
+    test('Should focus the input when the field is clicked', async ({ page }) => {
       await filterFieldStory.goto(page, 'With Preset Value');
       const field = page.locator('[data-slot="filter-input"]');
+      // The [data-slot="filter-input"] wrapper delegates clicks to the inner
+      // combobox input — that is what receives focus, not the wrapper itself.
+      const input = field.locator('input');
 
       await field.click();
-      await expect(field).toBeFocused();
+      await expect(input).toBeFocused();
     });
 
     test('Should display preset chips', async ({ page }) => {
       await filterFieldStory.goto(page, 'With Preset Value');
-      const chips = page.locator('[data-slot="filter-input-chip"]');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
 
       await expect(chips).toHaveCount(1);
     });
 
     test('Should display multiple preset chips', async ({ page }) => {
       await filterFieldStory.goto(page, 'With Multi Condition Preset');
-      const chips = page.locator('[data-slot="filter-input-chip"]');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
 
       const count = await chips.count();
       expect(count).toBeGreaterThan(1);
     });
 
-    test('Should propagate error state to field with value', async ({ page }) => {
+    test('Should propagate error state to the input with value', async ({ page }) => {
       await filterFieldStory.goto(page, 'Error With Value');
 
-      const field = page.locator('[data-slot="filter-input"]');
-      await expect(field).toHaveAttribute('aria-invalid', 'true');
+      // aria-invalid lives on the inner combobox input, not the wrapper.
+      const input = page.locator('[data-slot="filter-input"] input');
+      await expect(input).toHaveAttribute('aria-invalid', 'true');
 
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
       await expect(chip).toBeVisible();
     });
 
@@ -93,26 +98,26 @@ test.describe('Component: FilterInput', () => {
   });
 
   test.describe('Accessibility', () => {
-    test('Should be focusable via Tab key', async ({ page }) => {
+    test('Should focus the input via Tab key', async ({ page }) => {
       await filterFieldStory.goto(page, 'Default');
-      const field = page.locator('[data-slot="filter-input"]');
+      const input = page.locator('[data-slot="filter-input"] input');
 
       await page.keyboard.press('Tab');
-      await expect(field).toBeFocused();
+      await expect(input).toBeFocused();
     });
 
     test('Should have aria-invalid when error is true', async ({ page }) => {
       await filterFieldStory.goto(page, 'Error Empty');
-      const field = page.locator('[data-slot="filter-input"]');
+      const input = page.locator('[data-slot="filter-input"] input');
 
-      await expect(field).toHaveAttribute('aria-invalid', 'true');
+      await expect(input).toHaveAttribute('aria-invalid', 'true');
     });
 
-    test('Should have proper role attribute', async ({ page }) => {
+    test('Should expose the combobox role on the input', async ({ page }) => {
       await filterFieldStory.goto(page, 'Default');
-      const field = page.locator('[data-slot="filter-input"]');
+      const input = page.locator('[data-slot="filter-input"] input');
 
-      await expect(field).toHaveAttribute('role', 'textbox');
+      await expect(input).toHaveAttribute('role', 'combobox');
     });
 
     test('Should have keyboard hint with proper aria labels', async ({ page }) => {

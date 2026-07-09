@@ -5,6 +5,7 @@ import {
   type FilterInputChipProps,
   FilterInputConnectorChip,
 } from '../FilterInputField';
+import { MockFilterInputProvider } from './mockFilterInputContext';
 
 const meta = {
   title: 'Patterns/FilterInput/FilterInputChip',
@@ -81,61 +82,48 @@ RealisticExample.args = {
 };
 
 /**
- * AND logical operator variant
+ * AND logical operator variant. Connector chips read FilterInput context, so
+ * standalone stories wrap them in a no-op provider.
  */
-export const AndOperator: StoryFn = () => <FilterInputConnectorChip variant='and' />;
+export const AndOperator: StoryFn = () => (
+  <MockFilterInputProvider>
+    <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
+  </MockFilterInputProvider>
+);
 
 /**
  * OR logical operator variant
  */
-export const OrOperator: StoryFn = () => <FilterInputConnectorChip variant='or' />;
+export const OrOperator: StoryFn = () => (
+  <MockFilterInputProvider>
+    <FilterInputConnectorChip variant='or' chipId='c-1' onChange={() => {}} />
+  </MockFilterInputProvider>
+);
 
 /**
  * Combined example showing chip + AND + chip
  */
 export const CombinedWithAnd: StoryFn = () => (
-  <div className='flex items-center gap-4'>
-    <FilterInputChip attribute='IP Address' operator='is' value='192.168.1.1' />
-    <FilterInputConnectorChip variant='and' />
-    <FilterInputChip attribute='Country' operator='is' value='US' />
-  </div>
+  <MockFilterInputProvider>
+    <div className='flex items-center gap-4'>
+      <FilterInputChip attribute='IP Address' operator='is' value='192.168.1.1' />
+      <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
+      <FilterInputChip attribute='Country' operator='is' value='US' />
+    </div>
+  </MockFilterInputProvider>
 );
 
 /**
  * Combined example showing chip + OR + chip
  */
 export const CombinedWithOr: StoryFn = () => (
-  <div className='flex items-center gap-4'>
-    <FilterInputChip attribute='Status' operator='is' value='Active' />
-    <FilterInputConnectorChip variant='or' />
-    <FilterInputChip attribute='Status' operator='is' value='Pending' />
-  </div>
-);
-
-/**
- * Opening parenthesis variant
- */
-export const OpeningParenthesis: StoryFn = () => <FilterInputConnectorChip variant='(' />;
-
-/**
- * Closing parenthesis variant
- */
-export const ClosingParenthesis: StoryFn = () => <FilterInputConnectorChip variant=')' />;
-
-/**
- * Combined example showing grouped conditions with parentheses
- * Example: (IP is 192.168.1.1 OR IP is 10.0.0.1) AND Country is US
- */
-export const CombinedWithParentheses: StoryFn = () => (
-  <div className='flex items-center gap-4'>
-    <FilterInputConnectorChip variant='(' />
-    <FilterInputChip attribute='IP Address' operator='is' value='192.168.1.1' />
-    <FilterInputConnectorChip variant='or' />
-    <FilterInputChip attribute='IP Address' operator='is' value='10.0.0.1' />
-    <FilterInputConnectorChip variant=')' />
-    <FilterInputConnectorChip variant='and' />
-    <FilterInputChip attribute='Country' operator='is' value='US' />
-  </div>
+  <MockFilterInputProvider>
+    <div className='flex items-center gap-4'>
+      <FilterInputChip attribute='Status' operator='is' value='Active' />
+      <FilterInputConnectorChip variant='or' chipId='c-1' onChange={() => {}} />
+      <FilterInputChip attribute='Status' operator='is' value='Pending' />
+    </div>
+  </MockFilterInputProvider>
 );
 
 /**
@@ -173,20 +161,28 @@ export const InteractiveDeleteExample: StoryFn = () => {
   ]);
 
   return (
-    <div className='flex items-center gap-4 flex-wrap'>
-      {chips.map((chip, index) => (
-        <React.Fragment key={chip.id}>
-          {index > 0 && <FilterInputConnectorChip variant='and' />}
-          <FilterInputChip
-            attribute={chip.attribute}
-            operator={chip.operator}
-            value={chip.value}
-            onRemove={() => setChips(chips.filter(c => c.id !== chip.id))}
-          />
-        </React.Fragment>
-      ))}
-      {chips.length === 0 && <p className='text-text-secondary text-sm'>All filters removed</p>}
-    </div>
+    <MockFilterInputProvider>
+      <div className='flex items-center gap-4 flex-wrap'>
+        {chips.map((chip, index) => (
+          <React.Fragment key={chip.id}>
+            {index > 0 && (
+              <FilterInputConnectorChip
+                variant='and'
+                chipId={`connector-${chip.id}`}
+                onChange={() => {}}
+              />
+            )}
+            <FilterInputChip
+              attribute={chip.attribute}
+              operator={chip.operator}
+              value={chip.value}
+              onRemove={() => setChips(chips.filter(c => c.id !== chip.id))}
+            />
+          </React.Fragment>
+        ))}
+        {chips.length === 0 && <p className='text-text-secondary text-sm'>All filters removed</p>}
+      </div>
+    </MockFilterInputProvider>
   );
 };
 
@@ -222,22 +218,24 @@ DisabledWithOnRemove.args = {
  * Mix of disabled and interactive chips.
  */
 export const DisabledAndInteractiveMix: StoryFn = () => (
-  <div className='flex items-center gap-4'>
-    <FilterInputChip
-      attribute='IP Address'
-      operator='is'
-      value='34.74.73.20'
-      disabled
-      onRemove={() => undefined}
-    />
-    <FilterInputConnectorChip variant='and' />
-    <FilterInputChip
-      attribute='Country'
-      operator='is'
-      value='US'
-      onRemove={() => alert('Removed Country filter')}
-    />
-  </div>
+  <MockFilterInputProvider>
+    <div className='flex items-center gap-4'>
+      <FilterInputChip
+        attribute='IP Address'
+        operator='is'
+        value='34.74.73.20'
+        disabled
+        onRemove={() => undefined}
+      />
+      <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
+      <FilterInputChip
+        attribute='Country'
+        operator='is'
+        value='US'
+        onRemove={() => alert('Removed Country filter')}
+      />
+    </div>
+  </MockFilterInputProvider>
 );
 
 // ============================================================================
@@ -277,63 +275,65 @@ export const BuildingComplete: StoryFn = () => (
  * Showcase of all FilterInputChip variants and states
  */
 export const AllStatesShowcase: StoryFn = () => (
-  <div className='flex flex-col gap-4'>
-    {/* Chip variants */}
-    <div>
-      <h3 className='text-sm font-medium text-text-primary mb-2'>FilterInput Chip</h3>
-      <div className='flex items-center gap-2 flex-wrap'>
-        <FilterInputChip attribute='Attribute' operator='operator' value='Value' />
-        <FilterInputChip attribute='Attribute' operator='operator' value='Value' error />
-        <FilterInputChip
-          attribute='Attribute'
-          operator='operator'
-          value='Value'
-          onRemove={() => {}}
-        />
-        <FilterInputChip
-          attribute='Attribute'
-          operator='operator'
-          value='Value'
-          error
-          onRemove={() => {}}
-        />
+  <MockFilterInputProvider>
+    <div className='flex flex-col gap-4'>
+      {/* Chip variants */}
+      <div>
+        <h3 className='text-sm font-medium text-text-primary mb-2'>FilterInput Chip</h3>
+        <div className='flex items-center gap-2 flex-wrap'>
+          <FilterInputChip attribute='Attribute' operator='operator' value='Value' />
+          <FilterInputChip attribute='Attribute' operator='operator' value='Value' error />
+          <FilterInputChip
+            attribute='Attribute'
+            operator='operator'
+            value='Value'
+            onRemove={() => {}}
+          />
+          <FilterInputChip
+            attribute='Attribute'
+            operator='operator'
+            value='Value'
+            error
+            onRemove={() => {}}
+          />
+        </div>
       </div>
-    </div>
 
-    {/* Disabled chip variants */}
-    <div>
-      <h3 className='text-sm font-medium text-text-primary mb-2'>Disabled Chip</h3>
-      <div className='flex items-center gap-2 flex-wrap'>
-        <FilterInputChip attribute='IP Address' operator='is' value='34.74.73.20' disabled />
-        <FilterInputChip
-          attribute='Host'
-          operator='is'
-          value='api.example.com'
-          disabled
-          onRemove={() => undefined}
-        />
+      {/* Disabled chip variants */}
+      <div>
+        <h3 className='text-sm font-medium text-text-primary mb-2'>Disabled Chip</h3>
+        <div className='flex items-center gap-2 flex-wrap'>
+          <FilterInputChip attribute='IP Address' operator='is' value='34.74.73.20' disabled />
+          <FilterInputChip
+            attribute='Host'
+            operator='is'
+            value='api.example.com'
+            disabled
+            onRemove={() => undefined}
+          />
+        </div>
       </div>
-    </div>
 
-    {/* Building chip variants */}
-    <div>
-      <h3 className='text-sm font-medium text-text-primary mb-2'>Building Chip</h3>
-      <div className='flex items-center gap-2 flex-wrap'>
-        <FilterInputChip building attribute='IP Address' />
-        <FilterInputChip building attribute='IP Address' operator='is' />
-        <FilterInputChip building attribute='IP Address' operator='is' value='192.168.1.1' />
+      {/* Building chip variants */}
+      <div>
+        <h3 className='text-sm font-medium text-text-primary mb-2'>Building Chip</h3>
+        <div className='flex items-center gap-2 flex-wrap'>
+          <FilterInputChip building attribute='IP Address' />
+          <FilterInputChip building attribute='IP Address' operator='is' />
+          <FilterInputChip building attribute='IP Address' operator='is' value='192.168.1.1' />
+        </div>
       </div>
-    </div>
 
-    {/* Connector variants */}
-    <div>
-      <h3 className='text-sm font-medium text-text-primary mb-2'>Connectors</h3>
-      <div className='flex items-center gap-2 flex-wrap'>
-        <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
-        <FilterInputConnectorChip variant='or' chipId='c-2' onChange={() => {}} />
+      {/* Connector variants */}
+      <div>
+        <h3 className='text-sm font-medium text-text-primary mb-2'>Connectors</h3>
+        <div className='flex items-center gap-2 flex-wrap'>
+          <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => {}} />
+          <FilterInputConnectorChip variant='or' chipId='c-2' onChange={() => {}} />
+        </div>
       </div>
     </div>
-  </div>
+  </MockFilterInputProvider>
 );
 
 /**
