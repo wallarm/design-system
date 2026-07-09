@@ -14,124 +14,119 @@ const filterFieldStory = createStoryHelper('patterns-filterinput-filterinput', [
   'Paired Field Value Is Set',
 ] as const);
 
-// TODO: Enable after baseline screenshots are generated and menu flow is stabilized
-test.describe
-  .skip('Component: FilterInput', () => {
-    test.describe('Visual', () => {
-      test('Should render status code mask menu correctly', async ({ page }) => {
-        await filterFieldStory.goto(page, 'HTTP Status Code Suggestions');
-        const field = page.locator('[data-slot="filter-input"]');
+test.describe('Component: FilterInput', () => {
+  test.describe('Visual', () => {
+    test('Should render status code mask menu correctly', async ({ page }) => {
+      await filterFieldStory.goto(page, 'HTTP Status Code Suggestions');
+      const field = page.locator('[data-slot="filter-input"]');
 
-        await field.click();
-        // Pick the Status code field from the field menu, then the "is" operator,
-        // to surface the value menu with mask suggestions.
-        await page.getByRole('menuitem', { name: /status code/i }).click();
-        await page.getByRole('menuitem', { name: /^is$/i }).click();
+      await field.click();
+      // Pick the Status code field from the field menu, then the "is" operator,
+      // to surface the value menu with mask suggestions.
+      await page.getByRole('menuitem', { name: /status code/i }).click();
+      await page.getByRole('menuitem', { name: /^is$/i }).click();
 
-        const menu = page.getByRole('menu').last();
-        await expect(menu).toHaveScreenshot('status-code-mask-menu.png');
-      });
-    });
-
-    test.describe('Interactions', () => {
-      test('Should focus field when clicked', async ({ page }) => {
-        await filterFieldStory.goto(page, 'With Preset Value');
-        const field = page.locator('[data-slot="filter-input"]');
-
-        await field.click();
-        await expect(field).toBeFocused();
-      });
-
-      test('Should display preset chips', async ({ page }) => {
-        await filterFieldStory.goto(page, 'With Preset Value');
-        const chips = page.locator('[data-slot="filter-input-chip"]');
-
-        await expect(chips).toHaveCount(1);
-      });
-
-      test('Should display multiple preset chips', async ({ page }) => {
-        await filterFieldStory.goto(page, 'With Multi Condition Preset');
-        const chips = page.locator('[data-slot="filter-input-chip"]');
-
-        const count = await chips.count();
-        expect(count).toBeGreaterThan(1);
-      });
-
-      test('Should propagate error state to field with value', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Error With Value');
-
-        const field = page.locator('[data-slot="filter-input"]');
-        await expect(field).toHaveAttribute('aria-invalid', 'true');
-
-        const chip = page.locator('[data-slot="filter-input-chip"]').first();
-        await expect(chip).toBeVisible();
-      });
-
-      // AS-1160 — two-step paired chip.
-      test('Should reveal the second value after the first when building a paired field', async ({
-        page,
-      }) => {
-        await filterFieldStory.goto(page, 'Paired Field');
-        const field = page.locator('[data-slot="filter-input"]');
-        await field.click();
-
-        await page.getByRole('menuitem', { name: /^Context Param$/ }).click();
-        await page.getByRole('menuitem', { name: /^is =$/ }).click();
-        await page.getByRole('menuitem', { name: /^header$/ }).click();
-
-        // The building chip now shows the paired attribute and the ; separator.
-        const buildingChip = page.locator(
-          '[data-slot="filter-input-condition-chip"][data-building]',
-        );
-        await expect(buildingChip.locator('[data-slot="segment-separator"]')).toBeVisible();
-        await expect(buildingChip).toContainText('Value');
-      });
-
-      test('Should render a preset paired condition as one chip', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Paired Field Preset');
-        const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-        await expect(chip.locator('[data-slot="segment-separator"]')).toBeVisible();
-        await expect(chip.locator('[data-slot="segment-attribute"]')).toHaveCount(2);
-        await expect(chip.locator('[data-slot="segment-value"]')).toHaveCount(2);
-      });
-    });
-
-    test.describe('Accessibility', () => {
-      test('Should be focusable via Tab key', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Default');
-        const field = page.locator('[data-slot="filter-input"]');
-
-        await page.keyboard.press('Tab');
-        await expect(field).toBeFocused();
-      });
-
-      test('Should have aria-invalid when error is true', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Error Empty');
-        const field = page.locator('[data-slot="filter-input"]');
-
-        await expect(field).toHaveAttribute('aria-invalid', 'true');
-      });
-
-      test('Should have proper role attribute', async ({ page }) => {
-        await filterFieldStory.goto(page, 'Default');
-        const field = page.locator('[data-slot="filter-input"]');
-
-        await expect(field).toHaveAttribute('role', 'textbox');
-      });
-
-      test('Should have keyboard hint with proper aria labels', async ({ page }) => {
-        await filterFieldStory.goto(page, 'With Keyboard Hint');
-
-        const kbdElement = page.locator('kbd').first();
-        await expect(kbdElement).toBeVisible();
-      });
+      const menu = page.getByRole('menu').last();
+      await expect(menu).toHaveScreenshot('status-code-mask-menu.png');
     });
   });
 
+  test.describe('Interactions', () => {
+    test('Should focus field when clicked', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Preset Value');
+      const field = page.locator('[data-slot="filter-input"]');
+
+      await field.click();
+      await expect(field).toBeFocused();
+    });
+
+    test('Should display preset chips', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Preset Value');
+      const chips = page.locator('[data-slot="filter-input-chip"]');
+
+      await expect(chips).toHaveCount(1);
+    });
+
+    test('Should display multiple preset chips', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Multi Condition Preset');
+      const chips = page.locator('[data-slot="filter-input-chip"]');
+
+      const count = await chips.count();
+      expect(count).toBeGreaterThan(1);
+    });
+
+    test('Should propagate error state to field with value', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Error With Value');
+
+      const field = page.locator('[data-slot="filter-input"]');
+      await expect(field).toHaveAttribute('aria-invalid', 'true');
+
+      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      await expect(chip).toBeVisible();
+    });
+
+    // AS-1160 — two-step paired chip.
+    test('Should reveal the second value after the first when building a paired field', async ({
+      page,
+    }) => {
+      await filterFieldStory.goto(page, 'Paired Field');
+      const field = page.locator('[data-slot="filter-input"]');
+      await field.click();
+
+      await page.getByRole('menuitem', { name: /^Context Param$/ }).click();
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+      await page.getByRole('menuitem', { name: /^header$/ }).click();
+
+      // The building chip now shows the paired attribute and the ; separator.
+      const buildingChip = page.locator('[data-slot="filter-input-condition-chip"][data-building]');
+      await expect(buildingChip.locator('[data-slot="segment-separator"]')).toBeVisible();
+      await expect(buildingChip).toContainText('Value');
+    });
+
+    test('Should render a preset paired condition as one chip', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Paired Field Preset');
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      await expect(chip.locator('[data-slot="segment-separator"]')).toBeVisible();
+      await expect(chip.locator('[data-slot="segment-attribute"]')).toHaveCount(2);
+      await expect(chip.locator('[data-slot="segment-value"]')).toHaveCount(2);
+    });
+  });
+
+  test.describe('Accessibility', () => {
+    test('Should be focusable via Tab key', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Default');
+      const field = page.locator('[data-slot="filter-input"]');
+
+      await page.keyboard.press('Tab');
+      await expect(field).toBeFocused();
+    });
+
+    test('Should have aria-invalid when error is true', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Error Empty');
+      const field = page.locator('[data-slot="filter-input"]');
+
+      await expect(field).toHaveAttribute('aria-invalid', 'true');
+    });
+
+    test('Should have proper role attribute', async ({ page }) => {
+      await filterFieldStory.goto(page, 'Default');
+      const field = page.locator('[data-slot="filter-input"]');
+
+      await expect(field).toHaveAttribute('role', 'textbox');
+    });
+
+    test('Should have keyboard hint with proper aria labels', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Keyboard Hint');
+
+      const kbdElement = page.locator('kbd').first();
+      await expect(kbdElement).toBeVisible();
+    });
+  });
+});
+
 // AS-1022 — wrapper-click and blur-outside paths must commit an in-progress
-// multi-select building chip. The test lives outside the broader describe.skip
-// because the screenshot blocker doesn't apply to interaction assertions, and
-// the bug is a synchronous-event race subtle enough to need a CI guard.
+// multi-select building chip. The bug is a synchronous-event race subtle enough
+// to need a CI guard.
 test.describe('Component: FilterInput — AS-1022 wrapper-click commit', () => {
   test.describe('Interactions', () => {
     // Build an in-progress multi-select chip: Status code "in" with two values
@@ -196,11 +191,9 @@ test.describe('Component: FilterInput — AS-1022 wrapper-click commit', () => {
   });
 });
 
-// AS-1179 — context-parameter (paired) chip bugs. Interaction-only assertions
-// (no screenshots), so this block runs in CI despite the screenshot-gated
-// describe.skip above — same rationale as the AS-1022 block. A red chip and an
-// error banner always travel together, so the banner (role="alert") plus the
-// field's aria-invalid are the stable proxies for "the chip turned red".
+// AS-1179 — context-parameter (paired) chip bugs. A red chip and an error
+// banner always travel together, so the banner (role="alert") plus the field's
+// aria-invalid are the stable proxies for "the chip turned red".
 test.describe('Component: FilterInput — AS-1179 paired chip', () => {
   test.describe('Interactions', () => {
     type E2EPage = Parameters<Parameters<typeof test>[1]>[0]['page'];
@@ -257,26 +250,27 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
     // `--repeat-each` against a production Storybook build; passes on dev and at
     // human speed). Pre-existing on the AS-1179 branch; re-enable once AS-1193
     // makes the commit deterministic.
-    test.fixme('Should resume an incomplete paired chip and clear the error when a value is entered', async ({
-      page,
-    }) => {
-      await buildBase(page, 'header');
-      await page.getByRole('menuitem', { name: /^is =$/ }).click();
-      await page.mouse.click(2, 2);
+    test.fixme(
+      'Should resume an incomplete paired chip and clear the error when a value is entered',
+      async ({ page }) => {
+        await buildBase(page, 'header');
+        await page.getByRole('menuitem', { name: /^is =$/ }).click();
+        await page.mouse.click(2, 2);
 
-      const chip = getChip(page);
-      await expect(page.getByRole('alert')).toContainText('Value is required');
+        const chip = getChip(page);
+        await expect(page.getByRole('alert')).toContainText('Value is required');
 
-      // The paired "Value" label (second attribute segment) is clickable while
-      // the pair is incomplete — it resumes editing at the missing value.
-      await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
-      await page.getByRole('combobox', { name: 'Filter value' }).fill('Mozilla');
-      await page.keyboard.press('Enter');
-      await page.mouse.click(2, 2);
+        // The paired "Value" label (second attribute segment) is clickable while
+        // the pair is incomplete — it resumes editing at the missing value.
+        await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
+        await page.getByRole('combobox', { name: 'Filter value' }).fill('Mozilla');
+        await page.keyboard.press('Enter');
+        await page.mouse.click(2, 2);
 
-      await expect(page.getByRole('alert')).toHaveCount(0);
-      await expect(chip).toContainText('Mozilla');
-    });
+        await expect(page.getByRole('alert')).toHaveCount(0);
+        await expect(chip).toContainText('Mozilla');
+      },
+    );
 
     // AS-1192 — an incomplete paired chip whose pair operator was never chosen:
     // clicking the fixed "Value" label opens the pair OPERATOR menu (the operator
@@ -285,26 +279,27 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
     // is still open is non-deterministic on the production Storybook build (the
     // chip stays `data-building`); passes on dev and verified manually. The
     // deterministic guard is the unit test in FilterInputChip.test.tsx.
-    test.fixme('Should open the pair operator menu from the label when the operator is unset', async ({
-      page,
-    }) => {
-      // Leave the pair operator menu open (operator not yet chosen), then blur so
-      // the chip commits incomplete with no pair operator.
-      await buildBase(page, 'header');
-      await page.mouse.click(2, 2);
+    test.fixme(
+      'Should open the pair operator menu from the label when the operator is unset',
+      async ({ page }) => {
+        // Leave the pair operator menu open (operator not yet chosen), then blur so
+        // the chip commits incomplete with no pair operator.
+        await buildBase(page, 'header');
+        await page.mouse.click(2, 2);
 
-      const chip = getChip(page);
-      await expect(chip).not.toHaveAttribute('data-building', '');
-      await expect(page.getByRole('alert')).toContainText('Value is required');
+        const chip = getChip(page);
+        await expect(chip).not.toHaveAttribute('data-building', '');
+        await expect(page.getByRole('alert')).toContainText('Value is required');
 
-      // Click the paired "Value" label: with no pair operator it must open the
-      // operator menu (operator choices render as menuitems; the value flow has
-      // no menuitems since the paired field is freeform). The "is =" and
-      // "is not !=" paired operators confirm it is the operator menu, not the value step.
-      await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
-      await expect(page.getByRole('menuitem', { name: /^is =$/ })).toBeVisible();
-      await expect(page.getByRole('menuitem', { name: /^is not !=$/ })).toBeVisible();
-    });
+        // Click the paired "Value" label: with no pair operator it must open the
+        // operator menu (operator choices render as menuitems; the value flow has
+        // no menuitems since the paired field is freeform). The "is =" and
+        // "is not !=" paired operators confirm it is the operator menu, not the value step.
+        await chip.locator('[data-slot="segment-attribute"]').nth(1).click();
+        await expect(page.getByRole('menuitem', { name: /^is =$/ })).toBeVisible();
+        await expect(page.getByRole('menuitem', { name: /^is not !=$/ })).toBeVisible();
+      },
+    );
 
     // AS-1192 — every segment of an incomplete paired chip is individually
     // editable via a targeted click, exactly like a single chip (previously
@@ -312,28 +307,29 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
     // QUARANTINED (AS-1193): clicking the committed pair's tiny operator segment is
     // non-deterministic on the production Storybook build; passes on dev and
     // verified manually. Unit tests cover the routing deterministically.
-    test.fixme('Should edit the clicked segment (not resume) on an incomplete paired chip', async ({
-      page,
-    }) => {
-      // Base complete + pair operator "is =" chosen, pair value left empty → blur.
-      await buildBase(page, 'header');
-      await page.getByRole('menuitem', { name: /^is =$/ }).click();
-      await page.mouse.click(2, 2);
+    test.fixme(
+      'Should edit the clicked segment (not resume) on an incomplete paired chip',
+      async ({ page }) => {
+        // Base complete + pair operator "is =" chosen, pair value left empty → blur.
+        await buildBase(page, 'header');
+        await page.getByRole('menuitem', { name: /^is =$/ }).click();
+        await page.mouse.click(2, 2);
 
-      const chip = getChip(page);
-      await expect(chip).not.toHaveAttribute('data-building', '');
+        const chip = getChip(page);
+        await expect(chip).not.toHaveAttribute('data-building', '');
 
-      // Click the PAIR operator segment → the pair operator menu ("like ~" is a
-      // paired-only operator the "=" base field lacks, proving it is the pair
-      // operator menu and not a resume into the value step).
-      await chip.locator('[data-slot="segment-operator"]').nth(1).click();
-      await expect(page.getByRole('menuitem', { name: /^like ~$/ })).toBeVisible();
+        // Click the PAIR operator segment → the pair operator menu ("like ~" is a
+        // paired-only operator the "=" base field lacks, proving it is the pair
+        // operator menu and not a resume into the value step).
+        await chip.locator('[data-slot="segment-operator"]').nth(1).click();
+        await expect(page.getByRole('menuitem', { name: /^like ~$/ })).toBeVisible();
 
-      // Click the BASE value segment → the key-options menu (targeted), not a resume.
-      await page.mouse.click(2, 2);
-      await chip.locator('[data-slot="segment-value"]').nth(0).click();
-      await expect(page.getByRole('menuitem', { name: /^cookie$/ })).toBeVisible();
-    });
+        // Click the BASE value segment → the key-options menu (targeted), not a resume.
+        await page.mouse.click(2, 2);
+        await chip.locator('[data-slot="segment-value"]').nth(0).click();
+        await expect(page.getByRole('menuitem', { name: /^cookie$/ })).toBeVisible();
+      },
+    );
 
     // AS-1192 — the empty paired VALUE reserves a small clickable width even when
     // idle, so the trailing × can't sit where the user clicks to fill it (which
@@ -342,33 +338,34 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
     // on the production Storybook build (the resumed input doesn't always render in
     // time); passes on dev and verified manually. The standalone equivalent below
     // is CI-stable, and the unit test guards the placeholder render.
-    test.fixme('Should not delete the chip when clicking the empty paired value to fill it', async ({
-      page,
-    }) => {
-      await buildBase(page, 'header');
-      await page.getByRole('menuitem', { name: /^is =$/ }).click(); // pair operator
-      await page.mouse.click(2, 2);
+    test.fixme(
+      'Should not delete the chip when clicking the empty paired value to fill it',
+      async ({ page }) => {
+        await buildBase(page, 'header');
+        await page.getByRole('menuitem', { name: /^is =$/ }).click(); // pair operator
+        await page.mouse.click(2, 2);
 
-      const chip = getChip(page);
-      await expect(chip).not.toHaveAttribute('data-building', '');
+        const chip = getChip(page);
+        await expect(chip).not.toHaveAttribute('data-building', '');
 
-      // The idle empty value segment must be a real target: non-zero width AND
-      // height (an empty segment otherwise collapses to a 0×0 box and clicks fall
-      // through to the chip / × button).
-      await chip.hover();
-      const pairValue = chip.locator('[data-slot="segment-value"]').nth(1);
-      const box = (await pairValue.boundingBox())!;
-      expect(box).toBeTruthy();
-      expect(box.width).toBeGreaterThanOrEqual(3);
-      expect(box.height).toBeGreaterThanOrEqual(12);
+        // The idle empty value segment must be a real target: non-zero width AND
+        // height (an empty segment otherwise collapses to a 0×0 box and clicks fall
+        // through to the chip / × button).
+        await chip.hover();
+        const pairValue = chip.locator('[data-slot="segment-value"]').nth(1);
+        const box = (await pairValue.boundingBox())!;
+        expect(box).toBeTruthy();
+        expect(box.width).toBeGreaterThanOrEqual(3);
+        expect(box.height).toBeGreaterThanOrEqual(12);
 
-      // Click its centre (empty segments fail Playwright's visibility gate, so
-      // click by coordinate as a user would). It must resume the chip for value
-      // entry, not hit the × button behind it → the chip survives with its input.
-      await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
-      await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
-      await expect(page.locator('[data-slot="filter-input"] input')).toHaveCount(1);
-    });
+        // Click its centre (empty segments fail Playwright's visibility gate, so
+        // click by coordinate as a user would). It must resume the chip for value
+        // entry, not hit the × button behind it → the chip survives with its input.
+        await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+        await expect(page.locator('[data-slot="filter-input-condition-chip"]')).toHaveCount(1);
+        await expect(page.locator('[data-slot="filter-input"] input')).toHaveCount(1);
+      },
+    );
 
     // AS-1179 #4 — changing the parameter key of a complete paired chip keeps
     // the chip and its second value (regression: the chip used to vanish).
