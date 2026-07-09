@@ -9,9 +9,9 @@ import {
   useState,
 } from 'react';
 import { cva } from 'class-variance-authority';
-import { throttle } from 'lodash-es';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
+import { throttle } from '../../utils/throttle';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useDrawerContext } from './DrawerContext';
 
@@ -48,9 +48,19 @@ interface DrawerResizeHandleCoordinates {
 }
 
 export interface DrawerResizeHandleProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color'>,
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'value'>,
     TestableProps {
   ref?: Ref<HTMLButtonElement>;
+  /**
+   * A real `<button>`'s `value` DOM property is always a string at runtime;
+   * the wider `string | number | readonly string[]` union on
+   * `ButtonHTMLAttributes` only exists because that interface is shared with
+   * `<input>`/`<select>`. Narrowed here to match Ark UI's `TooltipTrigger`
+   * (which types `value` as `string | undefined` for its trigger-identity
+   * feature) so this prop object can be spread onto it without widening or
+   * dropping the field.
+   */
+  value?: string;
   /** Fired when the user starts dragging the resize handle. */
   onResizeStart?: () => void;
   /** Fired when the user releases the resize handle, with the final pixel width. */

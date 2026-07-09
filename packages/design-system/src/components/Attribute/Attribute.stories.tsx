@@ -1,9 +1,17 @@
+import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Filter } from '../../icons';
 import { Badge } from '../Badge';
 import { Code } from '../Code';
 import { InlineCodeSnippet } from '../CodeSnippet';
 import { FormatDateTime } from '../FormatDateTime';
+import {
+  InlineEditControl,
+  InlineEditError,
+  InlineEditInput,
+  InlineEditPreview,
+  InlineEdit as InlineEditRoot,
+} from '../InlineEdit';
 import { Ip, IpAddress, IpCountry, IpList, IpProvider } from '../Ip';
 import { Link } from '../Link';
 import { OverflowList } from '../OverflowList';
@@ -34,6 +42,10 @@ const meta = {
     AttributeActionsTarget,
     AttributeActionsContent,
     AttributeActionsItem,
+    InlineEditPreview,
+    InlineEditControl,
+    InlineEditInput,
+    InlineEditError,
   },
   parameters: {
     layout: 'centered',
@@ -848,3 +860,37 @@ export const HorizontalWithActionsMenuOnly: StoryFn<AttributeProps> = () => (
 );
 HorizontalWithActionsMenuOnly.storyName =
   'Horizontal With Actions (disableNestedInteractive — menu only)';
+
+// ─── InlineEdit Integration ─────────────────────────────────────────────────
+// Canonical nesting: Attribute > AttributeValue > InlineEdit. No manual
+// overflow-visible — AttributeValue's :has() seam supplies it.
+
+function AttributeInlineEditExample({
+  orientation,
+}: {
+  orientation?: AttributeProps['orientation'];
+}) {
+  const [name, setName] = useState('Checkout API');
+  return (
+    <div className='w-[420px]'>
+      <Attribute orientation={orientation} data-testid='attr'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue>
+          <InlineEditRoot value={name} onValueCommit={v => setName(v as string)}>
+            <InlineEditPreview>{name}</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditInput />
+            </InlineEditControl>
+            <InlineEditError />
+          </InlineEditRoot>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+}
+
+export const WithInlineEdit: StoryFn = () => <AttributeInlineEditExample />;
+
+export const HorizontalWithInlineEdit: StoryFn = () => (
+  <AttributeInlineEditExample orientation='horizontal' />
+);

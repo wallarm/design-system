@@ -4,10 +4,10 @@
  * barrel gives consumers a single import surface and lets us swap the
  * underlying library later without breaking every caller.
  *
- * Note: `DateValue` is intentionally not re-exported here to avoid colliding
- * with `Calendar`'s own `DateValue` type. Consumers can type state with the
- * concrete classes (e.g. `useState<CalendarDate | null>`) — TypeScript
- * narrows the union automatically.
+ * Note: the `DateValue` union re-exported below comes from `Calendar`
+ * (`./components/Calendar`); the concrete classes (`CalendarDate`,
+ * `CalendarDateTime`, `ZonedDateTime`, `Time`) come from
+ * `@internationalized/date`.
  */
 
 export { usePagination, usePaginationContext } from '@ark-ui/react/pagination';
@@ -307,6 +307,43 @@ export {
   type HttpMethodName,
   type HttpMethodProps,
 } from './components/HttpMethod';
+export {
+  InlineEdit,
+  type InlineEditActivationMode,
+  type InlineEditContextValue,
+  InlineEditControl,
+  type InlineEditControlProps,
+  InlineEditDate,
+  type InlineEditDateProps,
+  InlineEditDateTime,
+  type InlineEditDateTimeProps,
+  InlineEditError,
+  type InlineEditErrorProps,
+  InlineEditInput,
+  type InlineEditInputProps,
+  InlineEditNumber,
+  type InlineEditNumberProps,
+  InlineEditPreview,
+  InlineEditPreviewIcon,
+  type InlineEditPreviewIconProps,
+  type InlineEditPreviewProps,
+  InlineEditPreviewValue,
+  type InlineEditPreviewValueProps,
+  type InlineEditProps,
+  InlineEditSelect,
+  type InlineEditSelectProps,
+  type InlineEditStatus,
+  type InlineEditSubmitMode,
+  InlineEditTextarea,
+  type InlineEditTextareaProps,
+  InlineEditTime,
+  type InlineEditTimeProps,
+  toCalendarDateValue,
+  toReactAriaDateValue,
+  useInlineEdit,
+  useInlineEditSubmitMode,
+  withMinuteGranularity,
+} from './components/InlineEdit';
 export { Input, type InputProps } from './components/Input';
 export {
   InputGroup,
@@ -490,10 +527,12 @@ export {
   SegmentedTabsTriggerButton,
 } from './components/SegmentedTabs';
 export {
+  createListCollection,
   Select,
   SelectButton,
   SelectClearTrigger,
   SelectContent,
+  type SelectDataItem,
   SelectFooter,
   SelectGroup,
   SelectGroupLabel,
@@ -661,6 +700,13 @@ export {
   useTreeDepth,
   useTreeIndent,
 } from './components/Tree';
+export {
+  TREE_VIEW_INDENT_STEP,
+  TreeView,
+  TreeViewItem,
+  type TreeViewItemProps,
+  type TreeViewProps,
+} from './components/TreeView';
 export { UtilityPage, type UtilityPageProps } from './components/UtilityPage';
 export {
   WallyIcon,

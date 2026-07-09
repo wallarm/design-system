@@ -92,7 +92,12 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
     >
       <div
         className={cn(
+          // inputVariants is borrowed for its border/focus-ring look only — its `size`
+          // variant now defaults to `h-36 py-8` (WDS-143), which must be neutralized here
+          // since this container's height/padding are owned by filterInputContainerVariants
+          // (min-h-40, auto-growing across chip rows) and filterInputInnerVariants.
           inputVariants({ error }),
+          'h-auto py-0',
           filterInputContainerVariants({ error, multiRow }),
           className,
         )}

@@ -123,9 +123,8 @@ wallarm-design-system/
 ### CI/CD
 
 - **GitHub Actions** - Automated CI/CD pipelines
-- **Docker** - Containerization with multi-stage builds
+- **Docker** - Multi-stage `Dockerfile`s for manual/local builds and Docker Compose dev setup (not built or published by CI)
 - **Docker Compose** - Local development environment
-- **GitHub Container Registry** - Docker image storage
 - **GitHub Pages** - Static hosting for Storybook documentation
 
 ## 🤖 AI Automation
@@ -195,11 +194,16 @@ pnpm typecheck        # TypeScript type checking
 ### Versioning & Release
 
 ```bash
-pnpm commit           # Create a conventional commit (interactive)
-pnpm changeset        # Create a changeset for version bump
-pnpm version          # Update package versions
-pnpm release          # Publish packages to NPM (CI only)
+pnpm commit                    # Create a conventional commit (interactive)
+pnpm semantic-release          # Publish packages to NPM (CI only)
+pnpm semantic-release:dry-run  # Preview the next release without publishing
 ```
+
+Versions are determined automatically from Conventional Commits by
+[semantic-release](https://semantic-release.gitbook.io/) — there is no manual
+version-bump or changeset step. See [RELEASE.md](./RELEASE.md) for the full
+branch strategy (RC versions on `feature/*`/`fix/*`, production releases on
+`main`).
 
 ## 🐳 Docker
 
@@ -230,33 +234,33 @@ Comprehensive GitHub Actions pipeline with multiple stages:
 
 ### Pipeline Jobs
 
-1. **PR Title Check** - Validates PR titles follow conventional commits
-2. **Setup & Dependencies** - Node.js setup, dependency caching, screenshot update detection
-3. **Quality Checks** - Parallel execution of lint, typecheck, and unit tests
-4. **Build** - Docker image building for Storybook
-5. **E2E Tests** - Cross-browser testing (Chromium) for Storybook components
-6. **Screenshot Updates** - Automated screenshot updates on main branch with `[update-screenshots]` commit flag
-7. **Deploy** - Production deployment:
-   - **deploy-storybook** - Deploys Storybook documentation to GitHub Pages
+`check-pr-title` runs in a separate workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml)), triggered on pull request open/edit. Everything else runs in [`main.yml`](./.github/workflows/main.yml), triggered on push to any branch:
+
+1. **setup** - Node.js/pnpm setup, dependency caching, screenshot update detection
+2. **quality** - Parallel lint, typecheck, and unit tests
+3. **build** - Builds all packages and Storybook static output, uploads as GitHub Actions artifacts (no Docker image is built or pushed)
+4. **e2e** - Cross-browser testing (Chromium), sharded 3-way, run inside the public `mcr.microsoft.com/playwright` container
+5. **unit-test-report** / **e2e-report** - Publish JUnit test results
+6. **e2e-update-screenshots** - Sharded visual baseline regeneration, triggered by `[update-screenshots]` or manual dispatch
+7. **commit-screenshots** - Commits updated screenshots back to the branch
+8. **deploy-storybook** - Deploys the Storybook static artifact to GitHub Pages
+9. **release** - Runs `semantic-release` for `@wallarm-org/design-system` and (conditionally) `@wallarm-org/mcp`, publishing to npm
 
 ### Features
 
 - **Parallel Execution** - Quality checks and E2E tests run in parallel
 - **Sharded Testing** - E2E tests split into 3 shards for faster execution
 - **Smart Caching** - Dependencies cached across all workflow runs
-- **Docker Integration** - Storybook runs in container for consistent E2E testing
 - **Auto Screenshot Updates** - Commit with `[update-screenshots]` to update visual snapshots
 - **E2E Skip Trigger** - Commit with `[skip-e2e]` to skip E2E tests when needed
 - **E2E Optimization** - Skips E2E tests for bot screenshot commits
-- **Container Registry**:
-  - Build stage: `ghcr.io/wallarm/design-system`
-  - Storybook Documentation: GitHub Pages at `https://wallarm.github.io/wallarm-design-system/`
+- **Deployment**: Storybook documentation published to GitHub Pages at `https://wallarm.github.io/wallarm-design-system/`. There is no Docker image build/push step in CI today — the `Dockerfile`s under `packages/design-system/` and `apps/playground/` are for manual/local use only (see [🐳 Docker](#-docker) below).
 
 ### Environment
 
 - **Node.js**: v24+
 - **pnpm**: v10.33.2
-- **Playwright**: v1.58.0
+- **Playwright**: v1.61.1
 
 ## 🤝 Contributing
 

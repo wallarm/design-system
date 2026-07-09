@@ -32,4 +32,3 @@ The library requires installation of:
 - `react` and `react-dom` (^19.0.0)
 - `tailwindcss` (^4.0.0) - styling system
 - `tw-animate-css` (^1.0.0) - animations
-- `non.geist` (^2.0.0) - Geist font

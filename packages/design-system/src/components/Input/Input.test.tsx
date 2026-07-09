@@ -34,3 +34,20 @@ describe('Attribute pass-through', () => {
     expect(input).toBeDisabled();
   });
 });
+
+describe('Size variants', () => {
+  it('defaults to the default (36px) height with no size prop', () => {
+    render(<Input data-testid='input' />);
+    expect(screen.getByTestId('input').className).toContain('h-36');
+  });
+
+  it('renders the medium (32px) height', () => {
+    render(<Input data-testid='input' size='medium' />);
+    expect(screen.getByTestId('input').className).toContain('h-32');
+  });
+
+  it('renders the small (24px) height', () => {
+    render(<Input data-testid='input' size='small' />);
+    expect(screen.getByTestId('input').className).toContain('h-24');
+  });
+});

@@ -113,3 +113,23 @@ describe('Persistence', () => {
     expect(screen.getByTestId('time-input')).toHaveAttribute('data-analytics-id', 'SCHEDULE_TIME');
   });
 });
+
+describe('Size variants (confirms InputGroup scaling, no TimeInput code change)', () => {
+  it('defaults to the default (36px) InputGroup height with no size prop', () => {
+    render(<TimeInput data-testid='time-input' />);
+    const group = screen.getByTestId('time-input').querySelector('[data-slot="input-group"]');
+    expect(group).toHaveClass('h-36');
+  });
+
+  it('renders the medium (32px) InputGroup height', () => {
+    render(<TimeInput data-testid='time-input' size='medium' />);
+    const group = screen.getByTestId('time-input').querySelector('[data-slot="input-group"]');
+    expect(group).toHaveClass('h-32');
+  });
+
+  it('renders the small (24px) InputGroup height', () => {
+    render(<TimeInput data-testid='time-input' size='small' />);
+    const group = screen.getByTestId('time-input').querySelector('[data-slot="input-group"]');
+    expect(group).toHaveClass('h-24');
+  });
+});

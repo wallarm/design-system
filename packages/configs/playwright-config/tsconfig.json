@@ -2,6 +2,7 @@
   "extends": "@wallarm-org/typescript-config/nodejs.json",
   "compilerOptions": {
     "outDir": "dist",
+    "rootDir": "src",
     "lib": ["ES2023", "DOM"]
   },
   "include": ["src/**/*"],

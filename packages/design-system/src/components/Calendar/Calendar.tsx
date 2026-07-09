@@ -8,10 +8,9 @@ import {
   today,
 } from '@internationalized/date';
 import { CalendarProvider } from './CalendarContext';
+import { toDateValue } from './dateValue';
 import type { CalendarType, DateValue, PresetConfig } from './types';
-
-// Type assertion helper (workaround for @internationalized/date version mismatch with @ark-ui/react)
-const toDateValue = <T,>(date: T): DateValue => date as unknown as DateValue;
+import { useCalendarTime } from './useCalendarTime';
 
 /** Get full month range (1st to last day) */
 const getThisMonthRange = (): DateValue[] => {
@@ -153,6 +152,15 @@ export const Calendar: FC<CalendarProps> = ({
   const isRange = type === 'range';
   const numOfMonths = isRange ? 2 : 1;
 
+  // Tracks time-of-day and promotes date-only grid picks for single showTime.
+  const { timeRef, commitValue } = useCalendarTime({
+    showTime,
+    isRange,
+    value,
+    defaultValue,
+    onChange,
+  });
+
   /** Check if any date in the range is unavailable */
   const hasUnavailableDateInRange = useCallback(
     (start: DateValue, end: DateValue): boolean => {
@@ -197,9 +205,9 @@ export const Calendar: FC<CalendarProps> = ({
         }
       }
 
-      onChange?.(newValue);
+      commitValue(newValue);
     },
-    [onChange, disallowDisabledDatesInRange, isRange, hasUnavailableDateInRange],
+    [commitValue, disallowDisabledDatesInRange, isRange, hasUnavailableDateInRange],
   );
 
   const handleOpenChange = useCallback(
@@ -217,6 +225,8 @@ export const Calendar: FC<CalendarProps> = ({
     showKeyboardHints,
     showTime,
     readonly,
+    timeRef,
+    commitValue,
   };
 
   return (

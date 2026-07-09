@@ -9,6 +9,7 @@ import {
   createStatusCodeValidator,
 } from '../lib/statusCode';
 import type { ExprNode, FieldMetadata } from '../types';
+import { backendFieldsToMetadata, realBackendFields } from './backendFieldsFixture';
 
 const meta = {
   title: 'Patterns/FilterInput/FilterInput',
@@ -51,49 +52,18 @@ const meta = {
 export default meta;
 type Story = StoryObj<typeof meta>;
 
-const sampleFields: FieldMetadata[] = [
-  {
-    name: 'last_seen',
-    label: 'Last seen',
-    type: 'date',
-  },
-  {
-    name: 'status',
-    label: 'Status',
-    type: 'enum',
-    values: [
-      { value: 'registered', label: 'Registered' },
-      { value: 'blocked', label: 'Blocked' },
-    ],
-  },
-  {
-    name: 'priority',
-    label: 'Priority',
-    type: 'integer',
-    values: [
-      { value: 1, label: 'Low' },
-      { value: 5, label: 'Medium' },
-      { value: 10, label: 'High' },
-    ],
-  },
-  {
-    name: 'country',
-    label: 'Country',
-    type: 'string',
-    values: [
-      { value: 'US', label: 'US' },
-      { value: 'DE', label: 'DE' },
-      { value: 'JP', label: 'JP' },
-    ],
-  },
-];
+// The full attack-vectors filter set (identical to the Composition "Default"
+// story), mapped from the shared raw backend schema. Every story below uses it
+// so the field dropdown is the same everywhere.
+const attackVectorFields: FieldMetadata[] = realBackendFields.map(backendFieldsToMetadata);
 
 /**
- * Default empty state with placeholder text.
+ * Default empty state with placeholder text. Uses the full attack-vectors
+ * filter set (identical to the Composition "Default" story).
  */
 export const Default: Story = {
   args: {
-    fields: sampleFields,
+    fields: attackVectorFields,
     placeholder: 'Type to filter...',
   },
 };
@@ -103,7 +73,7 @@ export const Default: Story = {
  */
 export const WithKeyboardHint: Story = {
   args: {
-    fields: sampleFields,
+    fields: attackVectorFields,
     placeholder: 'Type to filter...',
     showKeyboardHint: true,
   },
@@ -114,7 +84,7 @@ export const WithKeyboardHint: Story = {
  */
 export const ErrorEmpty: Story = {
   args: {
-    fields: sampleFields,
+    fields: attackVectorFields,
     placeholder: 'Type to filter...',
     error: true,
   },
@@ -129,13 +99,13 @@ export const WithPresetValue: Story = {
       type: 'condition',
       field: 'status',
       operator: '=',
-      value: 'active',
+      value: 'Blocked',
     });
 
     return (
       <>
         <FilterInput
-          fields={sampleFields}
+          fields={attackVectorFields}
           value={expression}
           onChange={setExpression}
           placeholder='Type to filter...'
@@ -159,15 +129,15 @@ export const WithMultiConditionPreset: Story = {
       type: 'group',
       operator: 'and',
       children: [
-        { type: 'condition', field: 'status', operator: '=', value: 'active' },
-        { type: 'condition', field: 'priority', operator: '>', value: 5 },
+        { type: 'condition', field: 'status', operator: '=', value: 'Blocked' },
+        { type: 'condition', field: 'status_code', operator: '>', value: 400 },
       ],
     });
 
     return (
       <>
         <FilterInput
-          fields={sampleFields}
+          fields={attackVectorFields}
           value={expression}
           onChange={setExpression}
           placeholder='Type to filter...'
@@ -191,12 +161,12 @@ export const ErrorWithValue: Story = {
       type: 'condition',
       field: 'status',
       operator: '=',
-      value: 'active',
+      value: 'Blocked',
     });
 
     return (
       <FilterInput
-        fields={sampleFields}
+        fields={attackVectorFields}
         value={expression}
         onChange={setExpression}
         placeholder='Type to filter...'
@@ -218,15 +188,15 @@ export const WithDisabledChips: Story = {
       operator: 'and',
       children: [
         { type: 'condition', field: 'country', operator: '=', value: 'US', disabled: true },
-        { type: 'condition', field: 'status', operator: '=', value: 'blocked', disabled: true },
-        { type: 'condition', field: 'priority', operator: '>', value: 5 },
+        { type: 'condition', field: 'status', operator: '=', value: 'Blocked', disabled: true },
+        { type: 'condition', field: 'status_code', operator: '>', value: 400 },
       ],
     });
 
     return (
       <>
         <FilterInput
-          fields={sampleFields}
+          fields={attackVectorFields}
           value={expression}
           onChange={setExpression}
           placeholder='Add more filters...'
@@ -250,7 +220,7 @@ export const AllChipsDisabled: Story = {
       type: 'group',
       operator: 'and',
       children: [
-        { type: 'condition', field: 'status', operator: '=', value: 'registered', disabled: true },
+        { type: 'condition', field: 'status', operator: '=', value: 'Monitoring', disabled: true },
         {
           type: 'condition',
           field: 'country',
@@ -263,7 +233,7 @@ export const AllChipsDisabled: Story = {
 
     return (
       <FilterInput
-        fields={sampleFields}
+        fields={attackVectorFields}
         value={expression}
         onChange={setExpression}
         placeholder='Add more filters...'

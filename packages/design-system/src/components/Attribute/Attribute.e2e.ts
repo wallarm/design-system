@@ -8,6 +8,8 @@ const attributeStory = createStoryHelper('data-display-attribute', [
   'Horizontal Loading',
   'Horizontal With Actions',
   'Horizontal With Actions Menu Only',
+  'With Inline Edit',
+  'Horizontal With Inline Edit',
 ] as const);
 
 test.describe('Component: Attribute', () => {
@@ -41,6 +43,29 @@ test.describe('Component: Attribute', () => {
       if (!box) throw new Error('target box not measurable');
       await page.mouse.move(box.x + box.width - 4, box.y + box.height / 2);
       await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render hosted inline edit with correct row height', async ({ page }) => {
+      await attributeStory.goto(page, 'With Inline Edit');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render horizontal hosted inline edit with correct truncation and row height', async ({
+      page,
+    }) => {
+      await attributeStory.goto(page, 'Horizontal With Inline Edit');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should not clip the open editor in a horizontal value (overflow seam)', async ({
+      page,
+    }) => {
+      // Regression for f16702b3: AttributeValue's :has() rule must un-clip the
+      // editor border/focus ring that horizontal `truncate` would hide.
+      await attributeStory.goto(page, 'Horizontal With Inline Edit');
+      await page.getByTestId('attr--preview').click();
+      await expect(page.getByTestId('attr--input')).toBeFocused();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
   });
 

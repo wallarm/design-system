@@ -1,5 +1,6 @@
 import { fn } from 'storybook/test';
-import type { Meta, StoryObj } from 'storybook-react-rsbuild';
+import type { Meta, StoryFn, StoryObj } from 'storybook-react-rsbuild';
+import { HStack } from '../Stack';
 import { Input } from './Input';
 
 const meta = {
@@ -29,6 +30,14 @@ export const Basic: StoryObj<typeof meta> = {
     'data-testid': 'input',
   },
 };
+
+export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
+  <HStack gap={16} align='start'>
+    <Input {...args} size='default' />
+    <Input {...args} size='medium' />
+    <Input {...args} size='small' />
+  </HStack>
+);
 
 export const Focused: StoryObj<typeof meta> = {
   parameters: { pseudo: { focusVisible: true } },

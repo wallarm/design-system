@@ -24,7 +24,13 @@ export const baseConfig = defineConfig({
           args: [
             '--no-sandbox',
             '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
+            // NOTE: intentionally NOT passing --disable-dev-shm-usage. That flag
+            // forces Chromium to use /tmp instead of /dev/shm, which under parallel
+            // screenshotting intermittently truncated capture buffers — visual
+            // baselines came out with a black void, and regeneration failed with
+            // "unrecognised content at end of stream". The CI container provides
+            // --shm-size=2gb, so Chromium can use /dev/shm directly, as Playwright's
+            // own Docker guidance recommends. See #207.
             '--disable-background-timer-throttling',
             '--disable-backgrounding-occluded-windows',
             '--disable-renderer-backgrounding',

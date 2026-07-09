@@ -1,3 +1,4 @@
+import { CalendarDateTime } from '@internationalized/date';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -10,10 +11,12 @@ import { CalendarContent } from './CalendarContent';
 import { CalendarFooter } from './CalendarFooter';
 import { CalendarFooterControls } from './CalendarFooterControls';
 import { CalendarGrids } from './CalendarGrids';
+import { CalendarInputHeader } from './CalendarInputHeader';
 import { CalendarPresetItem } from './CalendarPresetItem';
 import { CalendarPresets } from './CalendarPresets';
 import { CalendarResetButton } from './CalendarResetButton';
 import { CalendarTrigger } from './CalendarTrigger';
+import type { DateValue } from './types';
 
 // Calendar is a compound API; analytics seams live on the exported
 // sub-components. Day cells are rendered dynamically inside `CalendarGrid`
@@ -174,4 +177,57 @@ describe('Day-cell gap (documented)', () => {
       expect(cell).not.toHaveAttribute('data-analytics-id');
     }
   });
+});
+
+describe('showTime promotion', () => {
+  const renderWithTime = (onChange: (value: DateValue[]) => void) =>
+    render(
+      <Calendar
+        type='single'
+        showTime
+        defaultOpen
+        closeOnSelect={false}
+        value={[new CalendarDateTime(2026, 6, 15, 14, 30) as unknown as DateValue]}
+        onChange={onChange}
+      >
+        <CalendarTrigger>
+          <Button>Open</Button>
+        </CalendarTrigger>
+        <CalendarContent>
+          <CalendarBody>
+            <CalendarInputHeader />
+            <CalendarGrids />
+          </CalendarBody>
+        </CalendarContent>
+      </Calendar>,
+    );
+
+  const clickDay = async (label: string) => {
+    const cell = [...document.querySelectorAll('[data-part="table-cell-trigger"]')].find(
+      c => c.textContent?.trim() === label,
+    );
+    expect(cell).toBeTruthy();
+    await userEvent.click(cell as Element);
+  };
+
+  it('emits a CalendarDateTime carrying the tracked time when a grid day is picked', async () => {
+    const onChange = vi.fn();
+    renderWithTime(onChange);
+
+    // The grid produces a date-only value; Calendar promotes it to a
+    // CalendarDateTime using the time from the current value (14:30).
+    await clickDay('20');
+
+    expect(onChange).toHaveBeenCalled();
+    const emitted = onChange.mock.calls.at(-1)?.[0]?.[0];
+    expect(emitted).toBeTruthy();
+    expect('hour' in emitted).toBe(true);
+    expect(emitted.day).toBe(20);
+    expect(emitted.hour).toBe(14);
+    expect(emitted.minute).toBe(30);
+  });
+
+  // The header time-only commit path (editing the time segments) can't be
+  // driven in jsdom — react-aria date segments don't respond to synthetic key
+  // events. It's covered by the Attribute date-time e2e instead.
 });

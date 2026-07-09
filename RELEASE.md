@@ -8,7 +8,7 @@ This project uses **semantic-release** for fully automated versioning and packag
 graph LR
     feature1[feature/button] -->|auto RC| rc1[npm @rc-button]
     feature2[feature/modal] -->|auto RC| rc2[npm @rc-modal]
-    feature3[feature/form] -->|auto RC| rc3[npm @rc-form]
+    feature3[fix/tooltip-bug] -->|auto RC| rc3[npm @rc-tooltip-bug]
     feature1 -->|merge PR| main[main branch]
     feature2 -->|merge PR| main
     feature3 -->|merge PR| main
@@ -17,7 +17,7 @@ graph LR
 
 **Feature-to-Production Flow**:
 
-- `feature/*` branches automatically create RC versions for testing
+- `feature/*` and `fix/*` branches automatically create RC versions for testing
 - `main` branch creates production versions after PR merge
 
 ## Automatic Versioning
@@ -62,7 +62,7 @@ For local updates:
 pnpm e2e:docker:update:design-system
 
 # Without Docker
-pnpm --filter=@wallarm-org/design-system test:e2e --update-snapshots
+pnpm --filter=@wallarm-org/design-system e2e --update-snapshots
 ```
 
 ## Development Workflow
@@ -229,11 +229,13 @@ npm install modal-rc@npm:@wallarm-org/design-system@rc-modal
 ### Naming Conventions
 
 - Feature branches: `feature/descriptive-name`
+- Fix branches: `fix/descriptive-name` (also produce RC versions, same as `feature/*`)
 - Use lowercase and hyphens
 - Keep names short but descriptive
 - Examples:
   - ✅ `feature/dark-mode`
   - ✅ `feature/button-variants`
+  - ✅ `fix/tooltip-positioning`
   - ✅ `feature/issue-123`
   - ❌ `feature/my_awesome_feature`
   - ❌ `myfeature`

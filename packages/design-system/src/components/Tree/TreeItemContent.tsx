@@ -1,5 +1,5 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { cn } from '../../utils/cn';
+import { Collapse } from '../../utils/Collapse';
 import { useTreeItemContext } from './TreeItemContext';
 
 export interface TreeItemContentProps extends HTMLAttributes<HTMLDivElement> {
@@ -24,19 +24,9 @@ export const TreeItemContent: FC<TreeItemContentProps> = ({
   }
 
   return (
-    <div
-      ref={ref}
-      data-slot='tree-item-content'
-      data-state={open ? 'open' : 'closed'}
-      className={cn(
-        'grid transition-[grid-template-rows] duration-[220ms] ease-[cubic-bezier(0.4,0,0.2,1)] motion-reduce:transition-none',
-        open ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]',
-        className,
-      )}
-      {...props}
-    >
-      <div className='overflow-hidden'>{children}</div>
-    </div>
+    <Collapse ref={ref} open={open} data-slot='tree-item-content' className={className} {...props}>
+      {children}
+    </Collapse>
   );
 };
 

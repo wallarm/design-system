@@ -2,7 +2,7 @@ import type { ReactElement, ReactNode } from 'react';
 import { cloneElement, isValidElement } from 'react';
 import { Toast as ArkToast } from '@ark-ui/react/toast';
 import { cva } from 'class-variance-authority';
-import { CircleCheckBig, Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
+import { CircleCheck, Info, OctagonAlert, type SvgIconProps, TriangleAlert } from '../../icons';
 import { cn } from '../../utils/cn';
 import { TestIdProvider } from '../../utils/testId';
 import { Loader } from '../Loader';
@@ -33,20 +33,20 @@ const toastIconMap: Record<
   { component: React.ComponentType<SvgIconProps>; className: string }
 > = {
   success: {
-    component: CircleCheckBig,
-    className: 'text-green-500',
+    component: CircleCheck,
+    className: 'text-component-toast-ic-success',
   },
   error: {
     component: OctagonAlert,
-    className: 'text-red-500',
+    className: 'text-component-toast-ic-destructive',
   },
   warning: {
     component: TriangleAlert,
-    className: 'text-amber-500',
+    className: 'text-component-toast-ic-warning',
   },
   info: {
     component: Info,
-    className: 'text-blue-500',
+    className: 'text-component-toast-ic-info',
   },
 };
 

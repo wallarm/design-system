@@ -41,8 +41,6 @@ export const App = () => {
 /* App.css */
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import 'non.geist';
-@import 'non.geist/mono';
 @import '@wallarm-org/design-system/theme';
 
 body {
@@ -56,7 +54,7 @@ body {
 - **React 19** - Latest React version
 - **TypeScript** - Full type safety
 - **Tailwind CSS v4** - Modern styling system
-- **Geist font** - Modern typography (non.geist)
+- **Geist font** - Modern typography (bundled, self-hosted)
 - **Animations** - Built-in animations (tw-animate-css)
 - **Theming** - Light and dark themes
 - **Accessibility** - ARIA compliance

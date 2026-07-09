@@ -10,11 +10,14 @@
       "docs: ",
       "style: ",
       "refactor: ",
+      "perf: ",
       "test: ",
+      "build: ",
       "chore: ",
-      "ci: "
+      "ci: ",
+      "revert: "
     ],
-    "regexp": "^(#)?(feat|fix|docs|style|refactor|test|chore|ci)(\\(.*\\))?!?:?\\s.+",
+    "regexp": "^(#)?(feat|fix|docs|style|refactor|perf|test|build|chore|ci|revert)(\\(.*\\))?!?:?\\s.+",
     "ignoreLabels": ["skip-title-check"]
   },
   "MESSAGES": {

@@ -16,8 +16,8 @@
     "@playwright/test": "catalog:"
   },
   "devDependencies": {
-    "@wallarm-org/typescript-config": "workspace:*",
     "@types/node": "catalog:",
+    "@wallarm-org/typescript-config": "workspace:*",
     "typescript": "catalog:"
   }
 }

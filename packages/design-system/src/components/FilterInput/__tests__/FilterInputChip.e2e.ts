@@ -10,34 +10,13 @@ const filterChipStory = createStoryHelper('patterns-filterinput-filterinputchip'
   'Or Operator',
   'Combined With And',
   'Combined With Or',
-  'Opening Parenthesis',
-  'Closing Parenthesis',
-  'Combined With Parentheses',
   'With Delete Button',
   'Error With Delete',
   'Interactive Delete Example',
-  // AND operator variants
-  'And Operator Error',
-  'And Operator Hover',
-  'And Operator Error Hover',
-  // OR operator variants
-  'Or Operator Error',
-  'Or Operator Hover',
-  'Or Operator Error Hover',
-  // Opening parenthesis variants
-  'Opening Parenthesis Error',
-  'Opening Parenthesis Hover',
-  'Opening Parenthesis Error Hover',
-  // Closing parenthesis variants
-  'Closing Parenthesis Error',
-  'Closing Parenthesis Hover',
-  'Closing Parenthesis Error Hover',
-  // All states showcase
   'All States Showcase',
 ] as const);
 
-// TODO: Enable after baseline screenshots are generated and menu flow is stabilized
-test.describe.skip('Component: FilterInputChip', () => {
+test.describe('Component: FilterInputChip', () => {
   test.describe('Visual', () => {
     test('Should render default chip variant correctly', async ({ page }) => {
       await filterChipStory.goto(page, 'Default');
@@ -64,46 +43,8 @@ test.describe.skip('Component: FilterInputChip', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render AND operator with error correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'And Operator Error');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render AND operator hover state correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'And Operator Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      await chip.hover();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render AND operator error hover state correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'And Operator Error Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      await chip.hover();
-      await expect(page).toHaveScreenshot();
-    });
-
     test('Should render OR operator variant correctly', async ({ page }) => {
       await filterChipStory.goto(page, 'Or Operator');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render OR operator with error correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Or Operator Error');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render OR operator hover state correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Or Operator Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      await chip.hover();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render OR operator error hover state correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Or Operator Error Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      await chip.hover();
       await expect(page).toHaveScreenshot();
     });
 
@@ -117,62 +58,9 @@ test.describe.skip('Component: FilterInputChip', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render opening parenthesis variant correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Opening Parenthesis');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render opening parenthesis with error correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Opening Parenthesis Error');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render opening parenthesis hover state correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Opening Parenthesis Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      await chip.hover();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render opening parenthesis error hover state correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Opening Parenthesis Error Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      await chip.hover();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render closing parenthesis variant correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Closing Parenthesis');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render closing parenthesis with error correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Closing Parenthesis Error');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render closing parenthesis hover state correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Closing Parenthesis Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      await chip.hover();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render closing parenthesis error hover state correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Closing Parenthesis Error Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      await chip.hover();
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render combined with parentheses correctly', async ({ page }) => {
-      await filterChipStory.goto(page, 'Combined With Parentheses');
-      await expect(page).toHaveScreenshot();
-    });
-
     test('Should render chip with delete button on hover correctly', async ({ page }) => {
       await filterChipStory.goto(page, 'With Delete Button');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
       await chip.hover();
       await expect(page).toHaveScreenshot();
     });
@@ -181,7 +69,7 @@ test.describe.skip('Component: FilterInputChip', () => {
       page,
     }) => {
       await filterChipStory.goto(page, 'Error With Delete');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
       await chip.hover();
       await expect(page).toHaveScreenshot();
     });
@@ -195,50 +83,21 @@ test.describe.skip('Component: FilterInputChip', () => {
   test.describe('Interactions', () => {
     test('Should show delete button when chip is hovered', async ({ page }) => {
       await filterChipStory.goto(page, 'With Delete Button');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
       const deleteButton = chip.getByRole('button', { name: 'Remove filter' });
 
-      // Delete button should not be visible initially
-      await expect(deleteButton).not.toBeVisible();
+      // The delete button is always in the DOM but hidden via opacity-0 until
+      // hover (Playwright's toBeVisible ignores opacity, so assert the CSS).
+      await expect(deleteButton).toHaveCSS('opacity', '0');
 
-      // Hover should show delete button
+      // Hover reveals it (group-hover/chip:opacity-100).
       await chip.hover();
-      await expect(deleteButton).toBeVisible();
-    });
-
-    test('Should show delete button when AND operator is hovered', async ({ page }) => {
-      await filterChipStory.goto(page, 'And Operator Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      const deleteButton = chip.getByRole('button', { name: 'Remove filter' });
-
-      await expect(deleteButton).not.toBeVisible();
-      await chip.hover();
-      await expect(deleteButton).toBeVisible();
-    });
-
-    test('Should show delete button when OR operator is hovered', async ({ page }) => {
-      await filterChipStory.goto(page, 'Or Operator Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      const deleteButton = chip.getByRole('button', { name: 'Remove filter' });
-
-      await expect(deleteButton).not.toBeVisible();
-      await chip.hover();
-      await expect(deleteButton).toBeVisible();
-    });
-
-    test('Should show delete button when parenthesis is hovered', async ({ page }) => {
-      await filterChipStory.goto(page, 'Opening Parenthesis Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      const deleteButton = chip.getByRole('button', { name: 'Remove filter' });
-
-      await expect(deleteButton).not.toBeVisible();
-      await chip.hover();
-      await expect(deleteButton).toBeVisible();
+      await expect(deleteButton).toHaveCSS('opacity', '1');
     });
 
     test('Should remove chip when delete button is clicked', async ({ page }) => {
       await filterChipStory.goto(page, 'Interactive Delete Example');
-      const chips = page.locator('[data-slot="filter-input-chip"]');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
 
       // Should have 3 chips initially
       await expect(chips).toHaveCount(3);
@@ -255,7 +114,7 @@ test.describe.skip('Component: FilterInputChip', () => {
 
     test('Should remove all chips in sequence when delete is clicked', async ({ page }) => {
       await filterChipStory.goto(page, 'Interactive Delete Example');
-      const chips = page.locator('[data-slot="filter-input-chip"]');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
 
       // Remove all chips one by one
       while ((await chips.count()) > 0) {
@@ -273,7 +132,7 @@ test.describe.skip('Component: FilterInputChip', () => {
   test.describe('Accessibility', () => {
     test('Should be focusable via keyboard for chip delete button', async ({ page }) => {
       await filterChipStory.goto(page, 'With Delete Button');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
 
       // Hover to show delete button
       await chip.hover();
@@ -289,31 +148,9 @@ test.describe.skip('Component: FilterInputChip', () => {
       await page.keyboard.press('Enter');
     });
 
-    test('Should be focusable via keyboard for AND operator delete button', async ({ page }) => {
-      await filterChipStory.goto(page, 'And Operator Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-
-      await chip.hover();
-
-      const deleteButton = chip.getByRole('button', { name: 'Remove filter' });
-      await deleteButton.focus();
-      await expect(deleteButton).toBeFocused();
-    });
-
-    test('Should be focusable via keyboard for OR operator delete button', async ({ page }) => {
-      await filterChipStory.goto(page, 'Or Operator Hover');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-
-      await chip.hover();
-
-      const deleteButton = chip.getByRole('button', { name: 'Remove filter' });
-      await deleteButton.focus();
-      await expect(deleteButton).toBeFocused();
-    });
-
     test('Should have proper ARIA label for delete button', async ({ page }) => {
       await filterChipStory.goto(page, 'With Delete Button');
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
 
       await chip.hover();
 

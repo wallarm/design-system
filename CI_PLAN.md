@@ -15,14 +15,17 @@ This document describes the CI/CD pipeline architecture for the Wallarm Design S
 
 ### Pipeline Stages
 
+`check-pr-title` runs in a **separate** workflow ([`pr-title.yml`](../.github/workflows/pr-title.yml)), triggered on `pull_request`. Everything below runs in [`main.yml`](../.github/workflows/main.yml), triggered on `push` to any branch:
+
 ```mermaid
 flowchart LR
-    A[PR Created] --> B[PR Title Check]
-    B --> C[Setup & Dependencies]
+    A[Push to any branch] --> C[Setup & Dependencies]
     C --> D[Quality Checks]
-    D --> E[Build Docker Image]
+    D --> E[Build]
     E --> F[E2E Tests]
-    F --> G[Deploy]
+    F --> R{On main?}
+    R -->|yes| G[Deploy Storybook]
+    R -->|yes| S[Release: semantic-release]
 
     D --> D1[Lint]
     D --> D2[TypeCheck]
@@ -31,19 +34,20 @@ flowchart LR
     F --> F1[Shard 1]
     F --> F2[Shard 2]
     F --> F3[Shard 3]
+    F --> F4[unit-test-report / e2e-report]
 
-    G --> G1[Storybook to GitHub Pages]
+    G --> G1[Storybook static artifact to GitHub Pages]
 ```
 
 ## 📋 Pipeline Jobs
 
 ### 1. PR Title Check (`check-pr-title`)
 
-Validates that PR titles follow conventional commit format.
+Validates that PR titles follow conventional commit format. Lives in its own workflow file, [`pr-title.yml`](../.github/workflows/pr-title.yml) — it is **not** a job inside `main.yml` and does not gate or block the jobs below.
 
-**Triggers**: Pull request creation/update
+**Triggers**: Pull request creation/update (`opened`, `edited`, `synchronize`, `reopened`) targeting `main`
 **Requirements**: Conventional commit format
-**Tools**: `@amannn/action-semantic-pull-request`
+**Tools**: `thehanimo/pr-title-checker`
 
 ### 2. Setup (`setup`)
 
@@ -76,18 +80,15 @@ Parallel execution of code quality validations.
 
 ### 4. Build (`build`)
 
-Docker image building and registry push.
+Builds all workspace packages and the Storybook static site. **No Docker image is built or pushed here** — output is uploaded as plain GitHub Actions artifacts (`storybook-static`, `built-packages`) for downstream jobs to consume.
 
-**Image Built**:
+**Build Steps**:
 
-- `ghcr.io/wallarm/design-system`: Storybook documentation
+- `pnpm build` — builds all packages
+- `pnpm --filter=@wallarm-org/design-system build-storybook` — builds the static Storybook site
+- Uploads both as `actions/upload-artifact`
 
-**Build Features**:
-
-- Multi-stage Dockerfile optimization
-- Layer caching
-- Minimal production image with nginx
-- Static file serving configuration
+The `Dockerfile`s under `packages/design-system/` and `apps/playground/` exist for manual/local builds (see the root `README.md`'s Docker section) and are unrelated to this job.
 
 ### 5. E2E Tests (`e2e`)
 
@@ -104,14 +105,18 @@ browser: chromium
 
 **Features**:
 
-- Docker-based test execution
-- Health check validation
+- Runs inside the public `mcr.microsoft.com/playwright` container (not a project-built image) so Playwright's browser binaries are pre-installed
+- Readiness check: a plain `curl` retry loop polls the Storybook static server until it responds — not a GitHub Actions `services:`-based Docker health check
 - Artifact upload for test results
 - Screenshot comparison
 
-### 6. Screenshot Updates (`e2e-update-screenshots`)
+### 6. Test Reporting (`unit-test-report`, `e2e-report`)
 
-Automated visual regression baseline updates.
+Publishes JUnit test results from the `quality` and `e2e` jobs as GitHub Actions check annotations (via `dorny/test-reporter`).
+
+### 7. Screenshot Updates (`e2e-update-screenshots`, `commit-screenshots`)
+
+Automated visual regression baseline updates, split across two jobs.
 
 **Triggers**:
 
@@ -120,23 +125,24 @@ Automated visual regression baseline updates.
 
 **Process**:
 
-1. Run tests with `--update-snapshots` flag
-2. Commit updated screenshots
-3. Push back to repository
+1. `e2e-update-screenshots` (sharded 3-way) runs tests with `--update-snapshots`
+2. `commit-screenshots` merges the shard outputs, commits updated screenshots, and pushes back to the branch
 
-### 7. Deploy
+### 8. Deploy (`deploy-storybook`)
 
 Production deployment to GitHub Pages.
-
-#### Deploy Storybook (`deploy-storybook`)
 
 - **Target**: GitHub Pages
 - **URL**: https://wallarm.github.io/wallarm-design-system/
 - **Triggers**: Push to main branch
 - **Process**:
-  1. Extract static files from Docker image
+  1. Download the `storybook-static` artifact produced by the `build` job (no Docker image involved)
   2. Upload to GitHub Pages artifact
-  3. Deploy using actions/deploy-pages
+  3. Deploy using `actions/deploy-pages`
+
+### 9. Release (`release`)
+
+Runs `semantic-release` for `@wallarm-org/design-system` and, conditionally, `@wallarm-org/mcp` — analyzes commits since the last release, publishes to npm with `NPM_TOKEN`, creates a GitHub release, and (on `feature/*`/`fix/*` branches) publishes an RC-tagged prerelease. See [RELEASE.md](./RELEASE.md) for the full branch strategy.
 
 ## 🔧 Configuration Files
 
@@ -146,18 +152,20 @@ Production deployment to GitHub Pages.
 name: CI/CD Pipeline
 on:
   push:
-    branches: [main]
-  pull_request:
-    types: [opened, synchronize, reopened, edited]
+    branches: ['**']
+
+  workflow_dispatch:
 
 env:
   NODE_VERSION: '24'
   PNPM_VERSION: '10.33.2'
 ```
 
+`main.yml` has no `pull_request` trigger — that belongs to the separate `pr-title.yml` workflow (see job 1 above).
+
 ### Docker Configuration
 
-#### Design System Dockerfile (`packages/design-system/Dockerfile`)
+`packages/design-system/Dockerfile` and `apps/playground/Dockerfile` exist for **manual/local** builds and `docker-compose.local.yml` — CI does not build, run, or push either image. See the root `README.md`'s Docker section for local usage.
 
 ```dockerfile
 FROM node:24-alpine AS base
@@ -171,10 +179,9 @@ FROM node:24-alpine AS base
 
 ### 1. Caching Strategy
 
-- **pnpm Store**: Cached based on lockfile hash
+- **pnpm Store**: Cached based on lockfile hash, via both `actions/setup-node`'s built-in `cache: 'pnpm'` and a separate hand-rolled `node_modules` cache in each job that installs dependencies — these overlap and are a known consolidation opportunity
 - **Turbo Cache**: Incremental build caching
-- **Docker Layer Cache**: Reuse unchanged layers
-- **Browser Binary Cache**: Playwright browsers cached
+- **Browser Binary Cache**: Playwright browsers pre-installed in the `mcr.microsoft.com/playwright` container image used by `e2e`/`e2e-update-screenshots`
 
 ### 2. Parallelization
 
@@ -221,16 +228,14 @@ FROM node:24-alpine AS base
 
 Required GitHub Secrets:
 
-- `GITHUB_TOKEN`: Auto-provided by GitHub
-- `DOCKER_REGISTRY_TOKEN`: For container registry push
-- `DEPLOY_TOKEN`: For production deployments
+- `GITHUB_TOKEN`: Auto-provided by GitHub Actions
+- `NPM_TOKEN`: Required by the `release` job to publish `@wallarm-org/design-system` and `@wallarm-org/mcp` to npm
+
+There is no container registry push in this pipeline, so no registry credential is needed.
 
 ### Security Scanning
 
-- Dependency vulnerability scanning
-- Docker image scanning
-- Secret detection in commits
-- SAST/DAST integration ready
+No automated security scanning currently runs in CI — no dependency-vulnerability check (e.g. `pnpm audit`), no CodeQL/SAST, no Docker image scanning, and no secret-detection step are configured in `main.yml` or `pr-title.yml`. `pnpm audit --prod` can be run manually/locally in the meantime. This is a gap worth closing (e.g. a scheduled `pnpm audit` job or Dependabot), not a currently-implemented feature.
 
 ## 🐛 Debugging
 
@@ -304,6 +309,8 @@ gh run rerun <run-id> --failed
 2. **Incremental Builds**: Build only changed packages
 3. **Smart E2E Selection**: Run relevant tests based on changes
 4. **Progressive Deployment**: Canary releases for production
+5. **Consolidate caching**: Drop the redundant hand-rolled `node_modules` cache in favor of `actions/setup-node`'s built-in `pnpm` cache alone
+6. **Add `timeout-minutes`**: No job currently has an explicit timeout, so a hung step can run to GitHub's 360-minute default cap
 
 ## 📚 References
 
@@ -323,5 +330,5 @@ For CI/CD issues:
 
 ---
 
-_Last Updated: 2026-01_
-_Version: 1.0.0_
+_Last Updated: 2026-07_
+_Version: 1.1.0_

@@ -63,7 +63,7 @@ export const Textarea: FC<TextareaProps> = ({
         aria-disabled={disabled}
         rows={effectiveMinRows}
         {...(autoResize && {
-          onInput: (e: React.FormEvent<HTMLTextAreaElement>) => {
+          onInput: (e: React.InputEvent<HTMLTextAreaElement>) => {
             adjustHeight();
             props.onInput?.(e);
           },

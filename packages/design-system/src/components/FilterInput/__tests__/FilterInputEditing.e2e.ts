@@ -66,240 +66,241 @@ async function createMultiSelectChip(
 }
 
 // TODO: Enable after baseline screenshots are generated and menu flow is stabilized
-test.describe.skip('Component: FilterInput - Editing', () => {
-  test.describe('Interactions', () => {
-    test('Should change attribute when selecting from dropdown during edit', async ({ page }) => {
-      await compositionStory.goto(page, 'Simple');
+test.describe
+  .skip('Component: FilterInput - Editing', () => {
+    test.describe('Interactions', () => {
+      test('Should change attribute when selecting from dropdown during edit', async ({ page }) => {
+        await compositionStory.goto(page, 'Simple');
 
-      // Create a Status chip
-      await createChipWithSelection(page, 'Status', 'Active');
+        // Create a Status chip
+        await createChipWithSelection(page, 'Status', 'Active');
 
-      const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
-      await expect(chip).toBeVisible();
+        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        await expect(chip).toBeVisible();
 
-      // Click attribute segment to edit
-      const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
-      await attributeSegment.click();
+        // Click attribute segment to edit
+        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        await attributeSegment.click();
 
-      await page.waitForTimeout(300);
-      const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
-      await expect(fieldMenu).toBeVisible({ timeout: 2000 });
+        await page.waitForTimeout(300);
+        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        await expect(fieldMenu).toBeVisible({ timeout: 2000 });
 
-      // Select different field
-      await page.locator('[role="menuitem"]').filter({ hasText: 'Priority' }).click();
-      await page.waitForTimeout(300);
+        // Select different field
+        await page.locator('[role="menuitem"]').filter({ hasText: 'Priority' }).click();
+        await page.waitForTimeout(300);
 
-      // Chip should now show Priority, not Status
-      const updatedChip = page
-        .locator('[data-slot="filter-input-chip"]')
-        .filter({ hasText: 'Priority' });
-      await expect(updatedChip).toBeVisible();
+        // Chip should now show Priority, not Status
+        const updatedChip = page
+          .locator('[data-slot="filter-input-chip"]')
+          .filter({ hasText: 'Priority' });
+        await expect(updatedChip).toBeVisible();
 
-      // Should NOT have opened operator menu (stays on the chip as-is)
-      const menu = page.locator('[role="menu"]');
-      await expect(menu).not.toBeVisible({ timeout: 1000 });
+        // Should NOT have opened operator menu (stays on the chip as-is)
+        const menu = page.locator('[role="menu"]');
+        await expect(menu).not.toBeVisible({ timeout: 1000 });
+      });
+
+      test('Should mark chip as error when attribute changed to incompatible field', async ({
+        page,
+      }) => {
+        await compositionStory.goto(page, 'Simple');
+
+        // Create a Status chip with value "Active"
+        await createChipWithSelection(page, 'Status', 'Active');
+
+        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        await expect(chip).toBeVisible();
+
+        // Click attribute to edit it
+        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        await attributeSegment.click();
+
+        await page.waitForTimeout(300);
+        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        await expect(fieldMenu).toBeVisible({ timeout: 2000 });
+
+        // Change to Priority — "Active" is not a valid Priority value
+        await page.locator('[role="menuitem"]').filter({ hasText: 'Priority' }).click();
+        await page.waitForTimeout(300);
+
+        // Chip should be marked with error (data-error or error class)
+        const updatedChip = page.locator('[data-slot="filter-input-condition-chip"]');
+        // Error chips have the error styling
+        const debugOutput = page.locator('[data-testid="expression-debug"]');
+        const debugText = await debugOutput.textContent();
+        const expression = JSON.parse(debugText!);
+        expect(expression.error).toBe(true);
+      });
+
+      test('Should mark chip as error when custom unknown attribute is typed', async ({ page }) => {
+        await compositionStory.goto(page, 'Simple');
+
+        // Create a Status chip
+        await createChipWithSelection(page, 'Status', 'Active');
+
+        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        await attributeSegment.click();
+
+        await page.waitForTimeout(300);
+
+        // Type a custom attribute that doesn't exist
+        const segmentInput = page.locator('[data-slot^="segment-"] input');
+        await segmentInput.fill('UnknownField');
+        await page.keyboard.press('Enter');
+
+        await page.waitForTimeout(300);
+
+        // Should show the unknown attribute name
+        const updatedChip = page
+          .locator('[data-slot="filter-input-chip"]')
+          .filter({ hasText: 'UnknownField' });
+        await expect(updatedChip).toBeVisible();
+
+        // Expression should have error
+        const debugOutput = page.locator('[data-testid="expression-debug"]');
+        const debugText = await debugOutput.textContent();
+        const expression = JSON.parse(debugText!);
+        expect(expression.error).toBe(true);
+      });
+
+      test('Should open field dropdown when clicking attribute of error chip', async ({ page }) => {
+        await compositionStory.goto(page, 'Simple');
+
+        // Create a chip with Status, then change attribute to unknown
+        await createChipWithSelection(page, 'Status', 'Active');
+
+        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        await attributeSegment.click();
+
+        await page.waitForTimeout(300);
+
+        // Type unknown attribute
+        const segmentInput = page.locator('[data-slot^="segment-"] input');
+        await segmentInput.fill('BadField');
+        await page.keyboard.press('Enter');
+        await page.waitForTimeout(300);
+
+        // Now click attribute of the error chip
+        const errorChip = page
+          .locator('[data-slot="filter-input-chip"]')
+          .filter({ hasText: 'BadField' });
+        await expect(errorChip).toBeVisible();
+
+        const errorAttr = errorChip.locator('[data-slot="segment-attribute"]');
+        await errorAttr.click();
+        await page.waitForTimeout(300);
+
+        // Field dropdown should appear
+        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        await expect(fieldMenu).toBeVisible({ timeout: 2000 });
+
+        // Select a valid field to fix the error
+        await page.locator('[role="menuitem"]').filter({ hasText: 'Status' }).click();
+        await page.waitForTimeout(300);
+
+        // Chip should now show Status
+        const fixedChip = page
+          .locator('[data-slot="filter-input-chip"]')
+          .filter({ hasText: 'Status' });
+        await expect(fixedChip).toBeVisible();
+      });
+
+      test('Should not auto-highlight first dropdown item when focus is on input', async ({
+        page,
+      }) => {
+        await compositionStory.goto(page, 'Simple');
+
+        const input = page.locator('input[type="text"]');
+        await input.click();
+
+        const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
+        await expect(fieldMenu).toBeVisible({ timeout: 2000 });
+
+        // No item should be highlighted when focus is on input
+        const highlightedItem = page.locator('[role="menuitem"][data-highlighted]');
+        await expect(highlightedItem).toHaveCount(0);
+
+        // After pressing ArrowDown, first item should be highlighted
+        await page.keyboard.press('ArrowDown');
+        await page.waitForTimeout(100);
+        await expect(highlightedItem).toHaveCount(1);
+      });
+
+      test('Should show all multi-select options in original order during editing', async ({
+        page,
+      }) => {
+        await compositionStory.goto(page, 'Default');
+
+        // Create a multi-select chip: Status in [Registered, Blocked]
+        await createMultiSelectChip(page, 'Status', 'is one of', ['Registered', 'Blocked']);
+
+        await page.waitForTimeout(300);
+
+        // Click value segment to edit
+        const chip = page.locator('[data-slot="filter-input-chip"]').first();
+        const valueSegment = chip.locator('[data-slot="segment-value"]');
+        await valueSegment.click();
+
+        await page.waitForTimeout(300);
+        await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
+
+        // All options should be visible (not filtered)
+        const menuItems = page.locator('[role="menuitem"]');
+        const count = await menuItems.count();
+        // Status has 2 values: Registered, Blocked — both should show
+        expect(count).toBeGreaterThanOrEqual(2);
+      });
     });
 
-    test('Should mark chip as error when attribute changed to incompatible field', async ({
-      page,
-    }) => {
-      await compositionStory.goto(page, 'Simple');
+    test.describe('Accessibility', () => {
+      test('Should commit attribute edit via Enter key', async ({ page }) => {
+        await compositionStory.goto(page, 'Simple');
 
-      // Create a Status chip with value "Active"
-      await createChipWithSelection(page, 'Status', 'Active');
+        await createChipWithSelection(page, 'Status', 'Active');
 
-      const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
-      await expect(chip).toBeVisible();
+        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        await expect(chip).toBeVisible({ timeout: 5000 });
 
-      // Click attribute to edit it
-      const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
-      await attributeSegment.click();
+        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        await expect(attributeSegment).toBeVisible({ timeout: 5000 });
+        await attributeSegment.click();
 
-      await page.waitForTimeout(300);
-      const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
-      await expect(fieldMenu).toBeVisible({ timeout: 2000 });
+        // Type a valid field name and press Enter
+        const segmentInput = page.locator('[data-slot^="segment-"] input');
+        await expect(segmentInput).toBeVisible({ timeout: 5000 });
+        await segmentInput.fill('Priority');
+        await page.keyboard.press('Enter');
 
-      // Change to Priority — "Active" is not a valid Priority value
-      await page.locator('[role="menuitem"]').filter({ hasText: 'Priority' }).click();
-      await page.waitForTimeout(300);
+        // Chip should now show Priority
+        const updatedChip = page
+          .locator('[data-slot="filter-input-chip"]')
+          .filter({ hasText: 'Priority' });
+        await expect(updatedChip).toBeVisible({ timeout: 5000 });
+      });
 
-      // Chip should be marked with error (data-error or error class)
-      const updatedChip = page.locator('[data-slot="filter-input-condition-chip"]');
-      // Error chips have the error styling
-      const debugOutput = page.locator('[data-testid="expression-debug"]');
-      const debugText = await debugOutput.textContent();
-      const expression = JSON.parse(debugText!);
-      expect(expression.error).toBe(true);
-    });
+      test('Should cancel attribute edit via Escape key', async ({ page }) => {
+        await compositionStory.goto(page, 'Simple');
 
-    test('Should mark chip as error when custom unknown attribute is typed', async ({ page }) => {
-      await compositionStory.goto(page, 'Simple');
+        await createChipWithSelection(page, 'Status', 'Active');
 
-      // Create a Status chip
-      await createChipWithSelection(page, 'Status', 'Active');
+        const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
+        await expect(chip).toBeVisible({ timeout: 5000 });
 
-      const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
-      const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
-      await attributeSegment.click();
+        const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
+        await expect(attributeSegment).toBeVisible({ timeout: 5000 });
+        await attributeSegment.click();
 
-      await page.waitForTimeout(300);
+        // Type something then cancel
+        const segmentInput = page.locator('[data-slot^="segment-"] input');
+        await expect(segmentInput).toBeVisible({ timeout: 5000 });
+        await segmentInput.fill('Priority');
+        await page.keyboard.press('Escape');
 
-      // Type a custom attribute that doesn't exist
-      const segmentInput = page.locator('[data-slot^="segment-"] input');
-      await segmentInput.fill('UnknownField');
-      await page.keyboard.press('Enter');
-
-      await page.waitForTimeout(300);
-
-      // Should show the unknown attribute name
-      const updatedChip = page
-        .locator('[data-slot="filter-input-chip"]')
-        .filter({ hasText: 'UnknownField' });
-      await expect(updatedChip).toBeVisible();
-
-      // Expression should have error
-      const debugOutput = page.locator('[data-testid="expression-debug"]');
-      const debugText = await debugOutput.textContent();
-      const expression = JSON.parse(debugText!);
-      expect(expression.error).toBe(true);
-    });
-
-    test('Should open field dropdown when clicking attribute of error chip', async ({ page }) => {
-      await compositionStory.goto(page, 'Simple');
-
-      // Create a chip with Status, then change attribute to unknown
-      await createChipWithSelection(page, 'Status', 'Active');
-
-      const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
-      const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
-      await attributeSegment.click();
-
-      await page.waitForTimeout(300);
-
-      // Type unknown attribute
-      const segmentInput = page.locator('[data-slot^="segment-"] input');
-      await segmentInput.fill('BadField');
-      await page.keyboard.press('Enter');
-      await page.waitForTimeout(300);
-
-      // Now click attribute of the error chip
-      const errorChip = page
-        .locator('[data-slot="filter-input-chip"]')
-        .filter({ hasText: 'BadField' });
-      await expect(errorChip).toBeVisible();
-
-      const errorAttr = errorChip.locator('[data-slot="segment-attribute"]');
-      await errorAttr.click();
-      await page.waitForTimeout(300);
-
-      // Field dropdown should appear
-      const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
-      await expect(fieldMenu).toBeVisible({ timeout: 2000 });
-
-      // Select a valid field to fix the error
-      await page.locator('[role="menuitem"]').filter({ hasText: 'Status' }).click();
-      await page.waitForTimeout(300);
-
-      // Chip should now show Status
-      const fixedChip = page
-        .locator('[data-slot="filter-input-chip"]')
-        .filter({ hasText: 'Status' });
-      await expect(fixedChip).toBeVisible();
-    });
-
-    test('Should not auto-highlight first dropdown item when focus is on input', async ({
-      page,
-    }) => {
-      await compositionStory.goto(page, 'Simple');
-
-      const input = page.locator('input[type="text"]');
-      await input.click();
-
-      const fieldMenu = page.locator('[data-slot="filter-input-field-menu"]');
-      await expect(fieldMenu).toBeVisible({ timeout: 2000 });
-
-      // No item should be highlighted when focus is on input
-      const highlightedItem = page.locator('[role="menuitem"][data-highlighted]');
-      await expect(highlightedItem).toHaveCount(0);
-
-      // After pressing ArrowDown, first item should be highlighted
-      await page.keyboard.press('ArrowDown');
-      await page.waitForTimeout(100);
-      await expect(highlightedItem).toHaveCount(1);
-    });
-
-    test('Should show all multi-select options in original order during editing', async ({
-      page,
-    }) => {
-      await compositionStory.goto(page, 'Default');
-
-      // Create a multi-select chip: Status in [Registered, Blocked]
-      await createMultiSelectChip(page, 'Status', 'is one of', ['Registered', 'Blocked']);
-
-      await page.waitForTimeout(300);
-
-      // Click value segment to edit
-      const chip = page.locator('[data-slot="filter-input-chip"]').first();
-      const valueSegment = chip.locator('[data-slot="segment-value"]');
-      await valueSegment.click();
-
-      await page.waitForTimeout(300);
-      await page.waitForSelector('[role="menuitem"]', { state: 'visible', timeout: 5000 });
-
-      // All options should be visible (not filtered)
-      const menuItems = page.locator('[role="menuitem"]');
-      const count = await menuItems.count();
-      // Status has 2 values: Registered, Blocked — both should show
-      expect(count).toBeGreaterThanOrEqual(2);
+        // Chip should still show Status (not changed)
+        await expect(chip).toContainText('Status');
+      });
     });
   });
-
-  test.describe('Accessibility', () => {
-    test('Should commit attribute edit via Enter key', async ({ page }) => {
-      await compositionStory.goto(page, 'Simple');
-
-      await createChipWithSelection(page, 'Status', 'Active');
-
-      const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
-      await expect(chip).toBeVisible({ timeout: 5000 });
-
-      const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
-      await expect(attributeSegment).toBeVisible({ timeout: 5000 });
-      await attributeSegment.click();
-
-      // Type a valid field name and press Enter
-      const segmentInput = page.locator('[data-slot^="segment-"] input');
-      await expect(segmentInput).toBeVisible({ timeout: 5000 });
-      await segmentInput.fill('Priority');
-      await page.keyboard.press('Enter');
-
-      // Chip should now show Priority
-      const updatedChip = page
-        .locator('[data-slot="filter-input-chip"]')
-        .filter({ hasText: 'Priority' });
-      await expect(updatedChip).toBeVisible({ timeout: 5000 });
-    });
-
-    test('Should cancel attribute edit via Escape key', async ({ page }) => {
-      await compositionStory.goto(page, 'Simple');
-
-      await createChipWithSelection(page, 'Status', 'Active');
-
-      const chip = page.locator('[data-slot="filter-input-chip"]').filter({ hasText: 'Status' });
-      await expect(chip).toBeVisible({ timeout: 5000 });
-
-      const attributeSegment = chip.locator('[data-slot="segment-attribute"]');
-      await expect(attributeSegment).toBeVisible({ timeout: 5000 });
-      await attributeSegment.click();
-
-      // Type something then cancel
-      const segmentInput = page.locator('[data-slot^="segment-"] input');
-      await expect(segmentInput).toBeVisible({ timeout: 5000 });
-      await segmentInput.fill('Priority');
-      await page.keyboard.press('Escape');
-
-      // Chip should still show Status (not changed)
-      await expect(chip).toContainText('Status');
-    });
-  });
-});

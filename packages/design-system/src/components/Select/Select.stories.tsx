@@ -109,6 +109,104 @@ export const Basic: StoryFn<typeof Select> = () => {
   );
 };
 
+export const Sizes: StoryFn<typeof Select> = () => {
+  const collection = createListCollection({
+    items: skillsWithoutIcons,
+  });
+
+  return (
+    <VStack gap={16} align='stretch'>
+      <HStack gap={16} align='start'>
+        <Select collection={collection}>
+          <SelectButton size='default' />
+          <SelectPositioner>
+            <SelectContent>
+              {collection.items.map(skill => (
+                <SelectOption key={skill.value} item={skill}>
+                  <SelectOptionText>{skill.label}</SelectOptionText>
+                  <SelectOptionIndicator />
+                </SelectOption>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
+        </Select>
+
+        <Select collection={collection}>
+          <SelectButton size='medium' />
+          <SelectPositioner>
+            <SelectContent>
+              {collection.items.map(skill => (
+                <SelectOption key={skill.value} item={skill}>
+                  <SelectOptionText>{skill.label}</SelectOptionText>
+                  <SelectOptionIndicator />
+                </SelectOption>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
+        </Select>
+
+        <Select collection={collection}>
+          <SelectButton size='small' />
+          <SelectPositioner>
+            <SelectContent>
+              {collection.items.map(skill => (
+                <SelectOption key={skill.value} item={skill}>
+                  <SelectOptionText>{skill.label}</SelectOptionText>
+                  <SelectOptionIndicator />
+                </SelectOption>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
+        </Select>
+      </HStack>
+
+      <HStack gap={16} align='start'>
+        <Select collection={collection}>
+          <SelectInput size='default' />
+          <SelectPositioner>
+            <SelectContent>
+              {collection.items.map(skill => (
+                <SelectOption key={skill.value} item={skill}>
+                  <SelectOptionText>{skill.label}</SelectOptionText>
+                  <SelectOptionIndicator />
+                </SelectOption>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
+        </Select>
+
+        <Select collection={collection}>
+          <SelectInput size='medium' />
+          <SelectPositioner>
+            <SelectContent>
+              {collection.items.map(skill => (
+                <SelectOption key={skill.value} item={skill}>
+                  <SelectOptionText>{skill.label}</SelectOptionText>
+                  <SelectOptionIndicator />
+                </SelectOption>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
+        </Select>
+
+        <Select collection={collection}>
+          <SelectInput size='small' />
+          <SelectPositioner>
+            <SelectContent>
+              {collection.items.map(skill => (
+                <SelectOption key={skill.value} item={skill}>
+                  <SelectOptionText>{skill.label}</SelectOptionText>
+                  <SelectOptionIndicator />
+                </SelectOption>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
+        </Select>
+      </HStack>
+    </VStack>
+  );
+};
+
 export const DifferentButtons: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,

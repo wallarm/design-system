@@ -9,10 +9,21 @@ import { SelectValueText, type SelectValueTextProps } from './SelectValueText';
 
 type SelectButtonBaseProps = Omit<ButtonProps, 'variant' | 'color' | 'size' | 'disabled'>;
 
+export type SelectButtonSize = 'small' | 'medium' | 'default';
+
+// Select's own 24/32/36px scale ('small'|'medium'|'default') is independent
+// of Button's ('small'|'medium'|'large') — translate at the call site
+// rather than rename Button's own scale, which is used everywhere in the app.
+const SELECT_BUTTON_SIZE_MAP: Record<SelectButtonSize, ButtonProps['size']> = {
+  small: 'small',
+  medium: 'medium',
+  default: 'large',
+};
+
 export interface SelectButtonVariantProps {
   variant?: Exclude<ButtonProps['variant'], 'primary'>;
   color?: Exclude<ButtonProps['color'], 'destructive'>;
-  size?: ButtonProps['size'];
+  size?: SelectButtonSize;
 }
 
 type SelectButtonProps = SelectButtonBaseProps & SelectButtonVariantProps & SelectValueTextProps;
@@ -21,7 +32,7 @@ export const SelectButton: FC<SelectButtonProps> = ({
   placeholder = 'Choose...',
   variant = 'outline',
   color = 'neutral',
-  size = 'large',
+  size = 'default',
   'data-testid': testIdProp,
   ...props
 }) => {
@@ -37,7 +48,7 @@ export const SelectButton: FC<SelectButtonProps> = ({
           data-testid={testId}
           variant={variant}
           color={color}
-          size={size}
+          size={SELECT_BUTTON_SIZE_MAP[size]}
           loading={loading}
           disabled={disabled}
           fullWidth

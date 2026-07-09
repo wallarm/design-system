@@ -1,3 +1,33 @@
+## [0.72.3](https://github.com/wallarm/design-system/compare/v0.72.2...v0.72.3) (2026-07-09)
+
+## <small>0.72.2 (2026-07-09)</small>
+
+* fix(format-datetime): match relative-time underline to Figma (token color + width) (#216) ([18ee987](https://github.com/wallarm/design-system/commit/18ee987)), closes [#216](https://github.com/wallarm/design-system/issues/216)
+* ci: add missing build/perf/revert types to pr-title-checker config (#215) ([1032039](https://github.com/wallarm/design-system/commit/1032039)), closes [#215](https://github.com/wallarm/design-system/issues/215)
+* chore(deps): bump patch/minor dependencies workspace-wide (#214) ([818da37](https://github.com/wallarm/design-system/commit/818da37)), closes [#214](https://github.com/wallarm/design-system/issues/214)
+* docs: fix documentation drift against actual CI/CD, release, and versioning setup (#213) ([bf17830](https://github.com/wallarm/design-system/commit/bf17830)), closes [#213](https://github.com/wallarm/design-system/issues/213)
+
+## <small>0.72.1 (2026-07-08)</small>
+
+* fix(deps): patch 51 dependency vulnerabilities (1 critical, 17 high) (#212) ([6d3d244](https://github.com/wallarm/design-system/commit/6d3d244)), closes [#212](https://github.com/wallarm/design-system/issues/212)
+
+## 0.72.0 (2026-07-08)
+
+* test(e2e): regenerate all screenshot baselines (#211) ([46c7486](https://github.com/wallarm/design-system/commit/46c7486)), closes [#211](https://github.com/wallarm/design-system/issues/211)
+* feat(inline-edit): InlineEdit compound component + control size standardization (WDS-143) (#209) ([4e1469b](https://github.com/wallarm/design-system/commit/4e1469b)), closes [#209](https://github.com/wallarm/design-system/issues/209)
+* feat(tree-view): add TreeView compound component (WDS-111) (#208) ([9104030](https://github.com/wallarm/design-system/commit/9104030)), closes [#208](https://github.com/wallarm/design-system/issues/208)
+* fix(ci): prevent screenshot corruption from parallel shard artifact merge (#210) ([c9fd70d](https://github.com/wallarm/design-system/commit/c9fd70d)), closes [#210](https://github.com/wallarm/design-system/issues/210)
+* fix(theme): self-host Geist fonts, drop non.geist dependency (#202) ([63eb754](https://github.com/wallarm/design-system/commit/63eb754)), closes [#202](https://github.com/wallarm/design-system/issues/202)
+
+## <small>0.71.5 (2026-07-07)</small>
+
+* fix(toast): success icon, pause-hover zone, and semantic color tokens (#205) ([da00ece](https://github.com/wallarm/design-system/commit/da00ece)), closes [#205](https://github.com/wallarm/design-system/issues/205)
+
+## <small>0.71.4 (2026-07-06)</small>
+
+* fix(nav-panel): increase panel header bottom padding to 6px (#204) ([e5239c8](https://github.com/wallarm/design-system/commit/e5239c8)), closes [#204](https://github.com/wallarm/design-system/issues/204)
+* fix(separator): merge consumer className instead of clobbering computed classes (#203) ([050b46d](https://github.com/wallarm/design-system/commit/050b46d)), closes [#203](https://github.com/wallarm/design-system/issues/203)
+
 ## <small>0.71.3 (2026-07-02)</small>
 
 * fix(theme): reduce medium font weight from 500 to 450 (#201) ([0c6a5ac](https://github.com/wallarm/design-system/commit/0c6a5ac)), closes [#201](https://github.com/wallarm/design-system/issues/201)

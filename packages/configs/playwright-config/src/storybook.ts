@@ -45,7 +45,17 @@ export function createStoryHelper<const T extends readonly string[]>(
         { timeout: 30000 },
       );
 
-      await page.evaluate(() => document.fonts.ready);
+      // fonts.ready resolves immediately when no font request has started yet,
+      // so force-load every registered face before awaiting it — otherwise
+      // screenshots race the font-display:swap of lazily-loaded webfonts
+      await page.evaluate(async () => {
+        const loads: Promise<unknown>[] = [];
+        document.fonts.forEach(font => {
+          loads.push(font.load().catch(() => undefined));
+        });
+        await Promise.all(loads);
+        await document.fonts.ready;
+      });
       await page.waitForTimeout(300);
     },
 
