@@ -35,38 +35,15 @@ const EXTENDED_TOAST_DURATION_MS = 10000;
 // Our own `type: 'default'` (rendered with no icon) isn't one of those keys, so
 // `priorities['default']` is `undefined` and the destructure throws
 // `TypeError: undefined is not iterable`, synchronously inside the onClick
-// handler — the toast is never created. Ark's public `priority` option (see
-// `Options.priority` in @zag-js/toast/dist/toast.types.d.ts) bypasses that
-// internal lookup entirely (`newToast.priority ?? getPriorityForType(...)`), so
-// we compute and pass it ourselves for every toast we create/update instead of
-// relying on Ark's type-keyed default.
-// `as const` keeps each pair as literal numbers (e.g. `readonly [1, 2]`)
-// instead of widening to `[number, number]`, so `getTypePriority` below
-// structurally matches zag-js's `ToastQueuePriority` (`1 | 2 | ... | 8`)
-// without importing that type by name (it isn't re-exported from
-// `@ark-ui/react/toast`).
-const TOAST_TYPE_PRIORITIES = {
-  error: [1, 2],
-  warning: [3, 6],
-  loading: [4, 5],
-  success: [5, 7],
-  info: [6, 8],
-  default: [6, 8],
-} as const satisfies Record<NonNullable<ToastData['type']>, readonly [number, number]>;
-
-// Accepts `unknown` rather than `ToastData['type']` deliberately: reading
-// `options.type` off a `ToastCreateOptions`/`ToastData` value resolves through
-// ToastData's `[key: string]: unknown` index signature (needed to allow
-// arbitrary extra Ark UI props through) rather than the named `type` property
-// in rslib's isolatedModules declaration-emit pass, so callers can never
-// reliably hand this function anything narrower than `unknown` anyway. Narrow
-// and validate here instead of trusting the caller's static type.
-const getTypePriority = (type: unknown, hasAction: boolean) => {
-  const key = typeof type === 'string' && type in TOAST_TYPE_PRIORITIES ? type : 'default';
-  const [actionable, nonActionable] =
-    TOAST_TYPE_PRIORITIES[key as keyof typeof TOAST_TYPE_PRIORITIES];
-  return hasAction ? actionable : nonActionable;
-};
+// handler — the toast is never created. Only THIS one type needs a workaround;
+// every other type (including an omitted `type`, which falls back to Ark's own
+// built-in 'info' default — a valid key) is already handled safely by Ark's
+// own lookup, so we let those flow through untouched (`priority: undefined`).
+// Ark's public `priority` option (see `Options.priority` in
+// @zag-js/toast/dist/toast.types.d.ts) is the documented bypass for that
+// internal lookup — reusing the 'info' pair here since our 'default' toast is
+// the same neutral, non-alerting variant.
+const DEFAULT_TOAST_PRIORITY = { actionable: 6, nonActionable: 8 } as const;
 
 const arkToaster = createToaster({
   overlap: true,
@@ -86,20 +63,26 @@ export const toaster: TypedToaster = {
       duration:
         options.duration ??
         (options.variant === 'extended' ? EXTENDED_TOAST_DURATION_MS : SIMPLE_TOAST_DURATION_MS),
-      priority: options.priority ?? getTypePriority(options.type, Boolean(options.actions)),
+      priority:
+        options.priority ??
+        (options.type === 'default'
+          ? options.actions
+            ? DEFAULT_TOAST_PRIORITY.actionable
+            : DEFAULT_TOAST_PRIORITY.nonActionable
+          : undefined),
     });
   },
   update: (id: string, options: Partial<ToastCreateOptions>) => {
-    // Only (re)compute priority when this update changes `type` and doesn't
-    // already specify one explicitly — Ark preserves the existing toast's
-    // priority for in-place updates to an already-created toast, so we must
-    // not clobber it on every partial update (e.g. one that only changes
-    // `duration`). This still protects the update-creates-a-new-toast path
-    // (Ark's `update` calls `create` under the hood) for unknown types.
+    // Only inject a priority override when this update sets `type` to our
+    // synthetic 'default' and doesn't already specify one explicitly — every
+    // other type (including an update that doesn't touch `type` at all) is
+    // left for Ark to handle exactly as it did before this fix.
     const priority =
       options.priority ??
-      (options.type !== undefined
-        ? getTypePriority(options.type, Boolean(options.actions))
+      (options.type === 'default'
+        ? options.actions
+          ? DEFAULT_TOAST_PRIORITY.actionable
+          : DEFAULT_TOAST_PRIORITY.nonActionable
         : undefined);
 
     return arkToaster.update(id, {
