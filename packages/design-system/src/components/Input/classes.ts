@@ -5,6 +5,12 @@ export const inputVariants = cva(
   cn(
     'flex w-full px-12 rounded-8 border bg-component-input-bg',
     'font-sans text-sm text-text-primary placeholder:text-text-secondary',
+    // `line-height` isn't reliably inherited onto `::placeholder` across
+    // browsers (Chrome resolves it to the UA-default `normal`, not the
+    // element's own text-sm/20px) — reapply `text-sm` (font-size + line-
+    // height together) scoped to the placeholder so it centers identically
+    // to real typed text instead of sitting a couple pixels lower.
+    'placeholder:text-sm',
     'shadow-xs transition-[color,border,box-shadow]',
     'focus-visible:outline-none focus-visible:ring-3',
 
