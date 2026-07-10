@@ -58,7 +58,7 @@ export interface SliderProps extends SliderRootConfig, TestableProps {
  *
  * It reads `Field` context like `Input`/`Textarea`, so wrapping it in `<Field>` wires
  * label / invalid / disabled. When an exact figure matters, pair with `NumberInput`;
- * for 2–7 fixed options use `SegmentedControl`. See `docs/slider-design-spec.md`.
+ * for 2–7 fixed options use `SegmentedControl`.
  */
 export const Slider: FC<SliderProps> = ({
   value,
