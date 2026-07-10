@@ -6,6 +6,7 @@ export const textareaPaddingVariants = cva('', {
       small: 'py-0',
       medium: 'py-6',
       default: 'py-8',
+      'inline-edit': 'py-4',
     },
   },
 });
@@ -16,6 +17,7 @@ export const textareaHeightVariants = cva('min-h-[64px]', {
       small: 'min-h-[64px]',
       medium: 'min-h-[72px]',
       default: 'min-h-[76px]',
+      'inline-edit': 'min-h-[64px]',
     },
   },
 });
