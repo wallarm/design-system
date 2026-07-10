@@ -6,6 +6,7 @@ import { Calendar, ChevronDown, Clock } from '../../icons';
 import type { DateValue } from '../../index';
 import { CalendarDate, CalendarDateTime, Time } from '../../index';
 import { useTestId } from '../../utils/testId';
+import { Attribute, AttributeLabel } from '../Attribute';
 import { Button } from '../Button';
 import {
   CalendarBody,
@@ -86,24 +87,17 @@ const meta = {
           'and error status, and submit-mode handling (enter, blur, both, or none).' +
           ' An optional `onBeforeValueCommit` guard intercepts every commit — return `false` ' +
           '(or a promise resolving to `false`) to keep the field in edit mode, e.g. after a ' +
-          'declined confirmation dialog.',
+          'declined confirmation dialog.' +
+          ' Every story below composes `InlineEdit` directly as an `Attribute` child (no ' +
+          '`AttributeValue` wrapper) — `AttributeLabel` renders the label, and `InlineEditPreview`/' +
+          '`InlineEditControl` already carry their own row-height and hover/focus treatment, so ' +
+          'this is the same shape real consumers use.',
       },
     },
   },
 } satisfies Meta<typeof InlineEdit>;
 
 export default meta;
-
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className='flex flex-col gap-2'>
-      <Text size='sm' color='secondary'>
-        {label}
-      </Text>
-      {children}
-    </div>
-  );
-}
 
 const roleItems: SelectDataItem[] = [
   { label: 'Admin', value: 'admin' },
@@ -172,7 +166,8 @@ export const TextEditor: StoryFn = () => {
   const [text, setText] = useState('Checkout API');
   return (
     <div className='w-[320px]'>
-      <Row label='Name'>
+      <Attribute>
+        <AttributeLabel>Name</AttributeLabel>
         <InlineEdit value={text} onValueCommit={v => setText(v as string)} data-testid='text'>
           <InlineEditPreview data-analytics-id='inline-edit-name'>{text}</InlineEditPreview>
           <InlineEditControl>
@@ -180,7 +175,7 @@ export const TextEditor: StoryFn = () => {
           </InlineEditControl>
           <InlineEditError />
         </InlineEdit>
-      </Row>
+      </Attribute>
     </div>
   );
 };
@@ -190,14 +185,15 @@ export const NumberEditor: StoryFn = () => {
   const [port, setPort] = useState('8443');
   return (
     <div className='w-[320px]'>
-      <Row label='Port'>
+      <Attribute>
+        <AttributeLabel>Port</AttributeLabel>
         <InlineEdit value={port} onValueCommit={v => setPort(v as string)} data-testid='number'>
           <InlineEditPreview>{port}</InlineEditPreview>
           <InlineEditControl>
             <InlineEditNumber />
           </InlineEditControl>
         </InlineEdit>
-      </Row>
+      </Attribute>
     </div>
   );
 };
@@ -209,7 +205,8 @@ export const TextareaEditor: StoryFn = () => {
   );
   return (
     <div className='w-[320px]'>
-      <Row label='About'>
+      <Attribute>
+        <AttributeLabel>About</AttributeLabel>
         <InlineEdit value={about} onValueCommit={v => setAbout(v as string)} data-testid='textarea'>
           <InlineEditPreview lineClamp={3}>{about}</InlineEditPreview>
           <InlineEditControl>
@@ -217,7 +214,7 @@ export const TextareaEditor: StoryFn = () => {
           </InlineEditControl>
           <InlineEditError />
         </InlineEdit>
-      </Row>
+      </Attribute>
     </div>
   );
 };
@@ -228,7 +225,8 @@ export const SelectEditor: StoryFn = () => {
   const roleLabel = roleItems.find(i => i.value === (role[0] ?? ''))?.label ?? '';
   return (
     <div className='w-[320px]'>
-      <Row label='Role'>
+      <Attribute>
+        <AttributeLabel>Role</AttributeLabel>
         <InlineEdit value={role} onValueCommit={v => setRole(v as string[])} data-testid='select'>
           <InlineEditPreview>
             <InlineEditPreviewValue>{roleLabel}</InlineEditPreviewValue>
@@ -245,7 +243,7 @@ export const SelectEditor: StoryFn = () => {
             </InlineEditSelect>
           </InlineEditControl>
         </InlineEdit>
-      </Row>
+      </Attribute>
     </div>
   );
 };
@@ -256,7 +254,8 @@ export const MultiSelectEditor: StoryFn = () => {
   const rolesLabel = roles.map(v => roleItems.find(i => i.value === v)?.label ?? v).join(', ');
   return (
     <div className='w-[320px]'>
-      <Row label='Roles'>
+      <Attribute>
+        <AttributeLabel>Roles</AttributeLabel>
         <InlineEdit
           value={roles}
           onValueCommit={v => setRoles(v as string[])}
@@ -277,7 +276,7 @@ export const MultiSelectEditor: StoryFn = () => {
             </InlineEditSelect>
           </InlineEditControl>
         </InlineEdit>
-      </Row>
+      </Attribute>
     </div>
   );
 };
@@ -287,7 +286,8 @@ export const TagsEditor: StoryFn = () => {
   const [tags, setTags] = useState<string[]>(['production', 'critical']);
   return (
     <div className='w-[320px]'>
-      <Row label='Tags'>
+      <Attribute>
+        <AttributeLabel>Tags</AttributeLabel>
         <InlineEdit value={tags} onValueCommit={v => setTags(v as string[])} data-testid='tags'>
           <InlineEditPreview>
             <InlineEditPreviewValue>
@@ -310,7 +310,7 @@ export const TagsEditor: StoryFn = () => {
             </InlineEditSelect>
           </InlineEditControl>
         </InlineEdit>
-      </Row>
+      </Attribute>
     </div>
   );
 };
@@ -324,7 +324,8 @@ export const DateEditor: StoryFn = () => {
   return (
     <div className='w-[320px]'>
       <DateFormatProvider order='day-first' hourCycle={24}>
-        <Row label='Date'>
+        <Attribute>
+          <AttributeLabel>Date</AttributeLabel>
           <InlineEdit
             value={date}
             onValueCommit={v => setDate(v as DateValue | null)}
@@ -349,7 +350,7 @@ export const DateEditor: StoryFn = () => {
               </InlineEditDate>
             </InlineEditControl>
           </InlineEdit>
-        </Row>
+        </Attribute>
       </DateFormatProvider>
     </div>
   );
@@ -362,7 +363,8 @@ export const TimeEditor: StoryFn = () => {
   return (
     <div className='w-[320px]'>
       <DateFormatProvider order='day-first' hourCycle={12}>
-        <Row label='Time'>
+        <Attribute>
+          <AttributeLabel>Time</AttributeLabel>
           <InlineEdit
             value={time}
             onValueCommit={v => setTime(v as TimeValue | null)}
@@ -378,7 +380,7 @@ export const TimeEditor: StoryFn = () => {
               <InlineEditTime />
             </InlineEditControl>
           </InlineEdit>
-        </Row>
+        </Attribute>
       </DateFormatProvider>
     </div>
   );
@@ -398,7 +400,8 @@ export const DateTimeEditor: StoryFn = () => {
   return (
     <div className='w-[320px]'>
       <DateFormatProvider order='day-first' hourCycle={12}>
-        <Row label='Date & Time'>
+        <Attribute>
+          <AttributeLabel>Date &amp; Time</AttributeLabel>
           <InlineEdit
             value={dateTime}
             onValueCommit={v => setDateTime(v as CalendarDateTime | null)}
@@ -424,7 +427,7 @@ export const DateTimeEditor: StoryFn = () => {
               </InlineEditDateTime>
             </InlineEditControl>
           </InlineEdit>
-        </Row>
+        </Attribute>
       </DateFormatProvider>
     </div>
   );
@@ -433,25 +436,28 @@ export const DateTimeEditor: StoryFn = () => {
 /** Async-feedback status snapshots: loading, saved, and error. */
 export const States: StoryFn = () => (
   <div className='flex w-[420px] flex-col gap-12'>
-    <Row label='Name'>
+    <Attribute>
+      <AttributeLabel>Name</AttributeLabel>
       <InlineEdit defaultValue='Checkout API and ABC' status='loading' data-testid='loading'>
         <InlineEditPreview>Checkout API and ABC</InlineEditPreview>
         <InlineEditControl>
           <InlineEditInput />
         </InlineEditControl>
       </InlineEdit>
-    </Row>
+    </Attribute>
 
-    <Row label='Name'>
+    <Attribute>
+      <AttributeLabel>Name</AttributeLabel>
       <InlineEdit defaultValue='Checkout API and ABC' status='saved' data-testid='saved'>
         <InlineEditPreview>Checkout API and ABC</InlineEditPreview>
         <InlineEditControl>
           <InlineEditInput />
         </InlineEditControl>
       </InlineEdit>
-    </Row>
+    </Attribute>
 
-    <Row label='Name'>
+    <Attribute>
+      <AttributeLabel>Name</AttributeLabel>
       <InlineEdit
         defaultValue='Checkout API and ABC'
         defaultEdit
@@ -464,7 +470,7 @@ export const States: StoryFn = () => (
         </InlineEditControl>
         <InlineEditError>An error message.</InlineEditError>
       </InlineEdit>
-    </Row>
+    </Attribute>
   </div>
 );
 
@@ -482,7 +488,8 @@ export const Async: StoryFn = () => {
     });
   return (
     <div className='w-[320px]'>
-      <Row label='Name'>
+      <Attribute>
+        <AttributeLabel>Name</AttributeLabel>
         <InlineEdit value={value} onValueCommit={save} data-testid='attr'>
           <InlineEditPreview>{value}</InlineEditPreview>
           <InlineEditControl>
@@ -490,29 +497,31 @@ export const Async: StoryFn = () => {
           </InlineEditControl>
           <InlineEditError />
         </InlineEdit>
-      </Row>
+      </Attribute>
     </div>
   );
 };
 
 export const NonEditable: StoryFn = () => (
   <div className='flex w-[320px] flex-col gap-8'>
-    <Row label='Read only'>
+    <Attribute>
+      <AttributeLabel>Read only</AttributeLabel>
       <InlineEdit defaultValue='Locked value' readOnly data-testid='readonly'>
         <InlineEditPreview>Locked value</InlineEditPreview>
         <InlineEditControl>
           <InlineEditInput />
         </InlineEditControl>
       </InlineEdit>
-    </Row>
-    <Row label='Disabled'>
+    </Attribute>
+    <Attribute>
+      <AttributeLabel>Disabled</AttributeLabel>
       <InlineEdit defaultValue='Disabled value' disabled data-testid='disabled'>
         <InlineEditPreview>Disabled value</InlineEditPreview>
         <InlineEditControl>
           <InlineEditInput />
         </InlineEditControl>
       </InlineEdit>
-    </Row>
+    </Attribute>
   </div>
 );
 
@@ -540,7 +549,8 @@ export const ConfirmCommit: StoryFn = () => {
 
   return (
     <div className='flex w-[320px] flex-col gap-8'>
-      <Row label='Email'>
+      <Attribute>
+        <AttributeLabel>Email</AttributeLabel>
         <InlineEdit
           value={email}
           onBeforeValueCommit={(next, prev) =>
@@ -554,9 +564,10 @@ export const ConfirmCommit: StoryFn = () => {
             <InlineEditInput type='email' aria-label='Email' />
           </InlineEditControl>
         </InlineEdit>
-      </Row>
+      </Attribute>
 
-      <Row label='Role'>
+      <Attribute>
+        <AttributeLabel>Role</AttributeLabel>
         <InlineEdit
           value={role}
           onBeforeValueCommit={(next, prev) => {
@@ -585,7 +596,7 @@ export const ConfirmCommit: StoryFn = () => {
             </InlineEditSelect>
           </InlineEditControl>
         </InlineEdit>
-      </Row>
+      </Attribute>
 
       <Dialog
         open={pending !== null}
