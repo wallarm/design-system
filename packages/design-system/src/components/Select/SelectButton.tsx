@@ -9,15 +9,17 @@ import { SelectValueText, type SelectValueTextProps } from './SelectValueText';
 
 type SelectButtonBaseProps = Omit<ButtonProps, 'variant' | 'color' | 'size' | 'disabled'>;
 
-export type SelectButtonSize = 'small' | 'medium' | 'default';
+export type SelectButtonSize = 'small' | 'medium' | 'default' | 'inline-edit';
 
-// Select's own 24/32/36px scale ('small'|'medium'|'default') is independent
-// of Button's ('small'|'medium'|'large') — translate at the call site
-// rather than rename Button's own scale, which is used everywhere in the app.
+// Select's own 24/32/36/28px scale ('small'|'medium'|'default'|'inline-edit')
+// is independent of Button's ('small'|'medium'|'large'|'inline-edit') —
+// translate at the call site rather than rename Button's own scale, which is
+// used everywhere in the app.
 const SELECT_BUTTON_SIZE_MAP: Record<SelectButtonSize, ButtonProps['size']> = {
   small: 'small',
   medium: 'medium',
   default: 'large',
+  'inline-edit': 'inline-edit',
 };
 
 export interface SelectButtonVariantProps {
