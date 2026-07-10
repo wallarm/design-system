@@ -4,11 +4,10 @@ import { cn } from '../../utils/cn';
 /**
  * Root layout for the Slider control.
  *
- * Single fixed size for v1 — no `sm`/`md` axis (see
- * `docs/slider-handoff-requirements.md` §4). State styling
+ * Single fixed size for v1 — no `sm`/`md` axis. State styling
  * (hover / focus / dragging / invalid) is driven by Ark `data-*` attributes on
  * the individual parts and lands in Phase 2; only the root-level disabled
- * treatment (the whole control at 50% opacity, per requirements §5) lives here.
+ * treatment (the whole control at 50% opacity) lives here.
  */
 export const sliderVariants = cva(
   cn(
