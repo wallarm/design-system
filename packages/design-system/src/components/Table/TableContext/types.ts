@@ -80,6 +80,9 @@ export interface TableContextValue<T> {
   // Master cell click
   onMasterCellClick?: (rowId: string) => void;
   activeRowId: string | null;
+
+  // Fired when the built-in column-settings menu opens/closes
+  onSettingsOpenChange?: (open: boolean) => void;
 }
 
 export interface TableProviderProps<T> extends Omit<TableProps<T>, 'children' | 'aria-label'> {

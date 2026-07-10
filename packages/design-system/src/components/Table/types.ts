@@ -238,6 +238,14 @@ export interface TableProps<T> extends TestableProps {
   onColumnVisibilityChange?: TableOnChangeFn<TableVisibilityState>;
   defaultColumnVisibility?: TableVisibilityState;
   defaultColumnOrder?: string[];
+  /**
+   * Fired when the built-in column-settings menu opens (`true`) or closes
+   * (`false`). The menu's open state otherwise lives inside the DS and is not
+   * observable, so consumers that want to defer expensive work — e.g. refetch
+   * once with the final column selection instead of on every toggle — can hook
+   * the close edge here.
+   */
+  onSettingsOpenChange?: (open: boolean) => void;
 
   // --- Virtualization ---
   /** Enable row virtualization. `'container'` virtualizes within the scroll container; `'window'` virtualizes against the browser window. */
