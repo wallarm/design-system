@@ -130,4 +130,10 @@ describe('Size variants (confirms InputGroup scaling, no DateInput code change)'
     const group = screen.getByTestId('date-input').querySelector('[data-slot="input-group"]');
     expect(group).toHaveClass('h-24');
   });
+
+  it('renders the inline-edit (28px) InputGroup height', () => {
+    render(<DateInput data-testid='date-input' size='inline-edit' />);
+    const group = screen.getByTestId('date-input').querySelector('[data-slot="input-group"]');
+    expect(group).toHaveClass('h-28');
+  });
 });

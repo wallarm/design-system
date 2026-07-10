@@ -87,6 +87,7 @@ export const inputGroupVariants = cva(
         default: 'h-36',
         medium: 'h-32',
         small: 'h-24',
+        'inline-edit': 'h-28',
       },
     },
     defaultVariants: {
