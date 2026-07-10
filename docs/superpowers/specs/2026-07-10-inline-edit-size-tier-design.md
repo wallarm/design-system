@@ -210,11 +210,15 @@ Change `size='small'` → `size='inline-edit'`:
 - `:148` (`SelectButtonTrigger`)
 - `:165` (`DateInputTrigger`)
 - `:242`, `:274` (`SelectButton` in the Confirm/MultiSelect editor stories)
-- `:534` (`CustomEditor`'s `Input`)
 
-Add `size='inline-edit'` (currently unset, defaulting to `Button`'s own
-`'large'`):
-- `CustomEditor`'s Save/Cancel `Button`s (~`:539`, `:548`)
+**Delete the `CustomEditor` story** (~`:520`–`:586`, including its
+`docs.description` block) instead of migrating its sizes — grepped, nothing
+else references it: no e2e test navigates to it, no unit test asserts
+against its `custom`/`custom-confirm`/`custom-cancel` testids (the `custom`
+hits elsewhere in the test suite are unrelated). It was the only place
+demonstrating the render-prop `InlineEditControl` composition path with
+manually-sized `Save`/`Cancel` buttons; no replacement is needed since that
+composition pattern isn't part of this spec's scope.
 
 **Not touched:** `:678`/`:687` (`ConfirmCommit`'s confirmation-dialog
 Cancel/Change buttons, `size='large'`) — that's a modal confirmation, not an
