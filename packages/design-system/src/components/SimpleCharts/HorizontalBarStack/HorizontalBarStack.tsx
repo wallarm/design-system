@@ -1,18 +1,25 @@
-import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent, MouseEvent, Ref } from 'react';
+import type {
+  FC,
+  FocusEvent,
+  HTMLAttributes,
+  KeyboardEvent,
+  MouseEvent,
+  ReactNode,
+  Ref,
+} from 'react';
 import { useCallback, useEffect, useMemo } from 'react';
 import { useControlled } from '../../../hooks';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
-import type { ChartDeltaProps } from '../internal/ChartDelta';
 import { ChartHoverCard, ChartHoverCardRow } from '../internal/ChartHoverCard';
 import { resolveChartColor } from '../lib/chartPalette';
 import { makeIsHoverSyncTarget } from '../lib/hoverSync';
-import { MetricDelta, MetricHeader, MetricValue } from '../Metric';
 import type { ChartColor } from '../types';
 import {
   horizontalBarStackBarClasses,
   horizontalBarStackBarWrapperClasses,
+  horizontalBarStackHeaderClasses,
   horizontalBarStackLegendClasses,
   horizontalBarStackLegendDotClasses,
   horizontalBarStackLegendItemVariants,
@@ -53,14 +60,14 @@ export interface HorizontalBarStackProps
   ref?: Ref<HTMLDivElement>;
   /** Segments + legend. One array drives both, so colors stay in sync. */
   data: HorizontalBarStackDatum[];
-  /** Headline number, rendered as `value.toLocaleString('en-US')`. Omitted → header hidden. */
-  value?: number;
   /**
-   * Trend chip — the shared `ChartDelta` (rendered via `MetricDelta`). `sentiment` sets the
-   * colour (positive → green, negative → red, neutral → slate; default neutral), `trend` sets
-   * the arrow — independent axes. Omitted → no chip.
+   * Header slot. Compose the headline from the shared `Metric` bricks —
+   * `<MetricHeader>` wrapping `<MetricValue>` / `<MetricDelta>` (and optionally `<MetricTotal>` /
+   * `<MetricCaption>`) — exactly as `Metric` and `PieChart`'s centre do. Rendered above the bar
+   * under this component's own `TestIdProvider`. Omitted → no header. (Replaces the former
+   * `value` / `delta` config props: one way to build a delta across the whole chart family.)
    */
-  delta?: Pick<ChartDeltaProps, 'value' | 'trend' | 'sentiment'>;
+  children?: ReactNode;
   /** Bar denominator. `> sum(data.value)` → grey remainder tail. Default: `sum(data.value)`. */
   total?: number;
   /** Show/hide the legend. Default: true. */
@@ -90,8 +97,7 @@ const formatNumber = (n: number): string => n.toLocaleString('en-US');
 
 export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
   data,
-  value,
-  delta,
+  children,
   total,
   legend = true,
   activeName: controlledActiveName,
@@ -184,8 +190,6 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
   }, [hasDuplicateNames]);
 
   const hasBar = data.length > 0;
-  const hasValue = typeof value === 'number';
-  const hasDelta = !!delta;
 
   // Only the active series stays bright; the rest fade. Hover wins over selection.
   const isDimmed = (key: string): boolean =>
@@ -223,12 +227,11 @@ export const HorizontalBarStack: FC<HorizontalBarStackProps> = ({
       data-testid={testId}
       className={cn(horizontalBarStackRootClasses, className)}
     >
-      {(hasValue || hasDelta) && (
+      {children && (
         <TestIdProvider value={testId}>
-          <MetricHeader className='px-16 pt-8'>
-            {hasValue && <MetricValue>{value}</MetricValue>}
-            {delta && <MetricDelta {...delta} />}
-          </MetricHeader>
+          <div data-slot='horizontal-bar-stack-header' className={horizontalBarStackHeaderClasses}>
+            {children}
+          </div>
         </TestIdProvider>
       )}
       {hasBar && (

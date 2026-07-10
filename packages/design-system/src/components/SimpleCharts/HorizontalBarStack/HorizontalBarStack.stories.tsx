@@ -3,6 +3,7 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Chart } from '../Chart/Chart';
 import { ChartHeader } from '../Chart/ChartHeader';
 import { ChartTitle } from '../Chart/ChartTitle';
+import { MetricDelta, MetricHeader, MetricValue } from '../Metric';
 import type { ChartColor } from '../types';
 import {
   HorizontalBarStack,
@@ -29,7 +30,7 @@ const meta = {
     docs: {
       description: {
         component:
-          'A single proportional segmented bar with a headline value, an optional delta badge, and a horizontal legend. The legend is interactive: hovering an item or segment fades the rest (hover-sync), and passing `onSelect` makes items clickable filters — `selectedNames` marks the active one and dims the rest. Same interaction contract as `PieChart`. Composed inside a `Chart` card.',
+          'A single proportional segmented bar with an optional composed header (the shared `Metric` bricks — `MetricValue` + `MetricDelta`) and a horizontal legend. The legend is interactive: hovering an item or segment fades the rest (hover-sync), and passing `onSelect` makes items clickable filters — `selectedNames` marks the active one and dims the rest. Same interaction contract as `PieChart`. Composed inside a `Chart` card.',
       },
     },
   },
@@ -39,7 +40,7 @@ const meta = {
   },
   argTypes: {
     data: { control: false },
-    delta: { control: false },
+    children: { control: false },
     selectedNames: { control: false },
     onSelect: { control: false },
     activeName: { control: false },
@@ -65,12 +66,23 @@ const Frame: StoryFn<HorizontalBarStackProps> = args => (
 export const Default: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 Default.args = {
   data: severityData,
-  value: 91,
-  delta: { value: 10, trend: 'up', sentiment: 'negative' },
+  children: (
+    <MetricHeader>
+      <MetricValue>91</MetricValue>
+      <MetricDelta value={10} trend='up' sentiment='negative' />
+    </MetricHeader>
+  ),
 };
 
 export const NoDelta: StoryFn<HorizontalBarStackProps> = Frame.bind({});
-NoDelta.args = { data: severityData, value: 91 };
+NoDelta.args = {
+  data: severityData,
+  children: (
+    <MetricHeader>
+      <MetricValue>91</MetricValue>
+    </MetricHeader>
+  ),
+};
 
 export const NoValue: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 NoValue.args = { data: severityData };
@@ -78,19 +90,35 @@ NoValue.args = { data: severityData };
 export const WithRemainder: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 WithRemainder.args = {
   data: severityData,
-  value: 91,
   total: 120,
-  delta: { value: 4, trend: 'down', sentiment: 'positive' },
+  children: (
+    <MetricHeader>
+      <MetricValue>91</MetricValue>
+      <MetricDelta value={4} trend='down' sentiment='positive' />
+    </MetricHeader>
+  ),
 };
 
 export const LegendOff: StoryFn<HorizontalBarStackProps> = Frame.bind({});
-LegendOff.args = { data: severityData, value: 91, legend: false };
+LegendOff.args = {
+  data: severityData,
+  legend: false,
+  children: (
+    <MetricHeader>
+      <MetricValue>91</MetricValue>
+    </MetricHeader>
+  ),
+};
 
 const PALETTE: ChartColor[] = ['red', 'brand', 'amber', 'blue', 'green', 'purple'];
 export const Palette: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 Palette.args = {
   data: PALETTE.map((color, i) => ({ name: color, value: 10 + i, color })),
-  value: 75,
+  children: (
+    <MetricHeader>
+      <MetricValue>75</MetricValue>
+    </MetricHeader>
+  ),
 };
 
 /** Card-load shimmer — swap the chart for `HorizontalBarStackSkeleton` while data loads. */
@@ -120,10 +148,13 @@ export const Selectable: StoryFn<HorizontalBarStackProps> = () => {
         <HorizontalBarStack
           data-testid='horizontal-bar-stack'
           data={severityData}
-          value={91}
           selectedNames={selected ? [selected] : []}
           onSelect={name => setSelected(prev => (prev === name ? null : name))}
-        />
+        >
+          <MetricHeader>
+            <MetricValue>91</MetricValue>
+          </MetricHeader>
+        </HorizontalBarStack>
       </Chart>
     </div>
   );

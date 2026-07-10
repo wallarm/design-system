@@ -163,4 +163,15 @@ describe('Metric — delta', () => {
     render(<MetricDelta value={8} trend='down' sentiment='positive' />);
     expect(screen.getByRole('img', { name: 'down 8' }).className).toMatch(/green/);
   });
+
+  it('defaults the arrow direction to the sign of value when trend is omitted', () => {
+    render(<MetricDelta value={-5} />);
+    expect(screen.getByRole('img', { name: 'down 5' })).toBeInTheDocument();
+  });
+
+  it('locale-formats the accessible name and visible text to match', () => {
+    render(<MetricDelta value={1234} />);
+    const badge = screen.getByRole('img', { name: 'up 1,234' });
+    expect(badge).toHaveTextContent('1,234');
+  });
 });

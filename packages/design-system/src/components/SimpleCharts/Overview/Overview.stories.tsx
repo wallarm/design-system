@@ -173,11 +173,12 @@ const HorizontalBarStackCard = () => (
     <ChartHeader>
       <ChartTitle>Findings by severity</ChartTitle>
     </ChartHeader>
-    <HorizontalBarStack
-      data={severityData}
-      value={91}
-      delta={{ value: 10, trend: 'up', sentiment: 'negative' }}
-    />
+    <HorizontalBarStack data={severityData}>
+      <MetricHeader>
+        <MetricValue>91</MetricValue>
+        <MetricDelta value={10} trend='up' sentiment='negative' />
+      </MetricHeader>
+    </HorizontalBarStack>
   </Chart>
 );
 

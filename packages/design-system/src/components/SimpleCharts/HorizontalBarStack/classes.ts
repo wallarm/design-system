@@ -8,8 +8,10 @@ export const horizontalBarStackBarClasses = ['flex h-8 w-full overflow-hidden ro
 
 export const horizontalBarStackRemainderClasses = ['bg-bg-strong-primary'].join(' ');
 
-// Skeleton: the value-block placeholder sits where the real header renders (px-16 pt-8).
-export const horizontalBarStackSkeletonHeaderClasses = ['px-16 pt-8'].join(' ');
+// The composed header slot (the `Metric` value/delta bricks) and its skeleton placeholder
+// share one padding constant, so the shimmer sits exactly where the real header renders.
+export const horizontalBarStackHeaderClasses = ['px-16 pt-8'].join(' ');
+export const horizontalBarStackSkeletonHeaderClasses = horizontalBarStackHeaderClasses;
 
 export const horizontalBarStackLegendClasses = [
   'flex flex-row flex-wrap items-center gap-6 px-12 py-2',

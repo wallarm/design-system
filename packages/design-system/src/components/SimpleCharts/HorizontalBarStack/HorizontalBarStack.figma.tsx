@@ -2,6 +2,7 @@ import figma from '@figma/code-connect';
 import { Chart } from '../Chart/Chart';
 import { ChartHeader } from '../Chart/ChartHeader';
 import { ChartTitle } from '../Chart/ChartTitle';
+import { MetricDelta, MetricHeader, MetricValue } from '../Metric';
 import { HorizontalBarStack, type HorizontalBarStackDatum } from './HorizontalBarStack';
 
 const figmaNodeUrl =
@@ -25,11 +26,12 @@ figma.connect(HorizontalBarStack, figmaNodeUrl, {
       <ChartHeader>
         <ChartTitle>{title}</ChartTitle>
       </ChartHeader>
-      <HorizontalBarStack
-        data={sampleData}
-        value={91}
-        delta={{ value: 10, trend: 'up', sentiment: 'negative' }}
-      />
+      <HorizontalBarStack data={sampleData}>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricDelta value={10} trend='up' sentiment='negative' />
+        </MetricHeader>
+      </HorizontalBarStack>
     </Chart>
   ),
 });

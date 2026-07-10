@@ -1,6 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Chart } from '../Chart';
+import { MetricDelta, MetricHeader, MetricValue } from '../Metric';
 import { HorizontalBarStack } from './HorizontalBarStack';
 import { HorizontalBarStackSkeleton } from './HorizontalBarStackSkeleton';
 import { resolveSegments } from './lib/resolveSegments';
@@ -36,8 +37,11 @@ describe('HorizontalBarStack — testid cascade', () => {
           { name: 'A', value: 1 },
           { name: 'B', value: 2 },
         ]}
-        value={3}
-      />,
+      >
+        <MetricHeader>
+          <MetricValue>3</MetricValue>
+        </MetricHeader>
+      </HorizontalBarStack>,
     );
     expect(screen.getByTestId('hb--header')).toBeInTheDocument();
     expect(screen.getByTestId('hb--value')).toBeInTheDocument();
@@ -51,7 +55,11 @@ describe('HorizontalBarStack — testid cascade', () => {
   it('does not adopt a parent TestIdProvider base for its own slots', () => {
     render(
       <Chart data-testid='card'>
-        <HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1 }]} value={5} />
+        <HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1 }]}>
+          <MetricHeader>
+            <MetricValue>5</MetricValue>
+          </MetricHeader>
+        </HorizontalBarStack>
       </Chart>,
     );
     expect(screen.queryByTestId('card--bar')).toBeNull();
@@ -63,7 +71,11 @@ describe('HorizontalBarStack — testid cascade', () => {
   it('renders no slot testids inside a parent provider when it has no data-testid itself', () => {
     render(
       <Chart data-testid='card'>
-        <HorizontalBarStack data={[{ name: 'A', value: 1 }]} value={5} />
+        <HorizontalBarStack data={[{ name: 'A', value: 1 }]}>
+          <MetricHeader>
+            <MetricValue>5</MetricValue>
+          </MetricHeader>
+        </HorizontalBarStack>
       </Chart>,
     );
     expect(screen.queryByTestId('card--bar')).toBeNull();
@@ -105,36 +117,30 @@ describe('resolveSegments', () => {
   });
 });
 
-describe('HorizontalBarStack — header', () => {
-  it('renders the value with locale formatting', () => {
-    render(<HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1 }]} value={12345} />);
-    expect(screen.getByTestId('hb--value')).toHaveTextContent('12,345');
-  });
-
-  it('renders no header when both value and delta are absent', () => {
-    render(<HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1 }]} />);
-    expect(screen.queryByTestId('hb--header')).toBeNull();
-  });
-
-  it('renders the delta badge as a named image announcing direction and absolute value', () => {
-    render(<HorizontalBarStack data={[{ name: 'A', value: 1 }]} delta={{ value: 10 }} />);
-    // role='img' is required for the accessible name: aria-label alone is
-    // ignored on Badge's generic role-less <div>.
-    const badge = screen.getByRole('img', { name: 'up 10' });
-    expect(badge).toHaveTextContent('10');
-  });
-
-  it('uses trend for direction over sign; shows the absolute number', () => {
+describe('HorizontalBarStack — header slot', () => {
+  it('renders composed children in the header slot with resolved slot testids', () => {
     render(
-      <HorizontalBarStack data={[{ name: 'A', value: 1 }]} delta={{ value: 5, trend: 'down' }} />,
+      <HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1 }]}>
+        <MetricHeader>
+          <MetricValue>{12345}</MetricValue>
+          <MetricDelta value={10} trend='up' sentiment='negative' />
+        </MetricHeader>
+      </HorizontalBarStack>,
     );
-    expect(screen.getByRole('img', { name: 'down 5' })).toBeInTheDocument();
+    // The composed Metric bricks resolve their testids against HBS's own base (its
+    // TestIdProvider), and MetricValue applies the family's locale formatting. Delta
+    // direction/format behaviour is owned by MetricDelta and covered in the Metric suite.
+    expect(screen.getByTestId('hb--header')).toBeInTheDocument();
+    expect(screen.getByTestId('hb--value')).toHaveTextContent('12,345');
+    expect(screen.getByTestId('hb--delta')).toBeInTheDocument();
   });
 
-  it('locale-formats the delta accessible name to match the visible text', () => {
-    render(<HorizontalBarStack data={[{ name: 'A', value: 1 }]} delta={{ value: 1234 }} />);
-    const badge = screen.getByRole('img', { name: 'up 1,234' });
-    expect(badge).toHaveTextContent('1,234');
+  it('renders no header slot when no children are composed', () => {
+    const { container } = render(
+      <HorizontalBarStack data-testid='hb' data={[{ name: 'A', value: 1 }]} />,
+    );
+    expect(screen.queryByTestId('hb--header')).toBeNull();
+    expect(container.querySelector('[data-slot="horizontal-bar-stack-header"]')).toBeNull();
   });
 });
 
@@ -178,14 +184,14 @@ describe('HorizontalBarStack — bar rendering', () => {
     expect(seg.style.backgroundColor).toBe('');
   });
 
-  it('renders header-only (no bar, no legend) when data is empty but value/delta are present', () => {
+  it('renders header-only (no bar, no legend) when data is empty but a header is composed', () => {
     render(
-      <HorizontalBarStack
-        data-testid='hb'
-        data={[]}
-        value={91}
-        delta={{ value: 10, trend: 'up' }}
-      />,
+      <HorizontalBarStack data-testid='hb' data={[]}>
+        <MetricHeader>
+          <MetricValue>91</MetricValue>
+          <MetricDelta value={10} trend='up' />
+        </MetricHeader>
+      </HorizontalBarStack>,
     );
     expect(screen.queryByTestId('hb--bar')).toBeNull();
     expect(screen.queryByTestId('hb--legend')).toBeNull();
@@ -194,12 +200,12 @@ describe('HorizontalBarStack — bar rendering', () => {
   });
 
   it('renders no bar when data is empty even if total is set (no labels → no bar)', () => {
-    render(<HorizontalBarStack data-testid='hb' data={[]} value={91} total={120} />);
+    render(<HorizontalBarStack data-testid='hb' data={[]} total={120} />);
     expect(screen.queryByTestId('hb--bar')).toBeNull();
     expect(screen.queryByTestId('hb--segment')).toBeNull();
   });
 
-  it('renders only the root wrapper when data is empty and no value/delta', () => {
+  it('renders only the root wrapper when data is empty and no header is composed', () => {
     render(<HorizontalBarStack data-testid='hb' data={[]} />);
     expect(screen.queryByTestId('hb--header')).toBeNull();
     expect(screen.queryByTestId('hb--bar')).toBeNull();
