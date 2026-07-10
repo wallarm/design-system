@@ -13,7 +13,7 @@ const POPOVER_MAX_WIDTH: PopoverSizeDimension = '256px';
 // individual item tags (see TAG_SIZE_BY_SELECT_SIZE). The popover content's
 // own tags aren't squeezed into the 24/32/36px row, so they stay `large`.
 export const createSelectInputOverflowRenderer =
-  (size: 'small' | 'medium' | 'default') => (items: SelectDataItem[]) => (
+  (size: 'small' | 'medium' | 'default' | 'inline-edit') => (items: SelectDataItem[]) => (
     <Popover>
       <PopoverTrigger className={cn('**:data-[slot=tag]:cursor-help')} asChild>
         <Tag size={TAG_SIZE_BY_SELECT_SIZE[size]}>+{items.length}</Tag>
