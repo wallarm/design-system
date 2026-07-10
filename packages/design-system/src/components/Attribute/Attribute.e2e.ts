@@ -50,9 +50,7 @@ test.describe('Component: Attribute', () => {
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
-    test('Should keep the same row height when toggling from preview to edit', async ({
-      page,
-    }) => {
+    test('Should keep the same row height when toggling from preview to edit', async ({ page }) => {
       // Regression: AttributeValue's -my-4 row-height cancellation only
       // targeted the preview's data-slot, not the control's — the row grew
       // 28px -> 32px the instant editing started (pt-4 no longer absorbed).

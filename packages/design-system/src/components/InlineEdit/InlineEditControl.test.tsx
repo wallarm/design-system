@@ -106,7 +106,6 @@ describe('InlineEditControl', () => {
       </InlineEdit>,
     );
     const control = screen.getByTestId('attr--control');
-    expect(control.className).toContain('-ml-7');
     expect(control.className).toContain('[&_[data-slot=input]]:px-6');
     expect(control.className).toContain('[&_textarea]:px-6');
     expect(control.className).toContain('[&_[data-scope=number-input][data-part=input]]:px-6');

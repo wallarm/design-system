@@ -6,12 +6,10 @@ export const inlineEditPreviewVariants = cva(
   // since it must match whichever control's own `size='inline-edit'` tier
   // this row toggles into (Input's is py-4/h-28; Textarea's is py-4, no
   // fixed height).
-  // -ml-7 pulls the hover/pressed background and hit target further left
-  // than surrounding content, while the left px-6 keeps the text itself
-  // readably inset from that extended edge (the "padded hover row,
-  // compensated margin" pattern — the two values are deliberately
-  // asymmetric, not a cancel-out pair).
-  'group flex w-full min-w-0 gap-4 rounded-8 border border-transparent px-6 -ml-7 font-sans text-sm text-text-primary transition-colors',
+  // px-6 keeps the text readably inset from the extended hover hit target
+  // that AttributeValue applies via -ml-7 on this slot (see AttributeValue's
+  // InlineEdit hosting seam) — deliberately asymmetric, not a cancel-out pair.
+  'group flex w-full min-w-0 gap-4 rounded-8 border border-transparent px-6 font-sans text-sm text-text-primary transition-colors',
   {
     variants: {
       // Multi-line values (Textarea) align the icon to the top, use

@@ -8,11 +8,18 @@ import {
   InlineEditInput,
   InlineEditPreview,
 } from '../InlineEdit';
+import type { AttributeOrientation } from './AttributeOrientationContext';
 import { Attribute, AttributeLabel, AttributeValue } from './index';
 
-function Example({ onCommit }: { onCommit: (v: string) => void }) {
+function Example({
+  onCommit,
+  orientation,
+}: {
+  onCommit: (v: string) => void;
+  orientation?: AttributeOrientation;
+}) {
   return (
-    <Attribute data-testid='attr'>
+    <Attribute data-testid='attr' orientation={orientation}>
       <AttributeLabel>Name</AttributeLabel>
       <AttributeValue>
         <InlineEdit defaultValue='Checkout API' onValueCommit={onCommit}>
@@ -57,6 +64,26 @@ describe('InlineEdit integration', () => {
     // cancellation as the preview's, or the row grows by 4px (pt-4 no
     // longer absorbed) the moment editing starts.
     expect(value.className).toContain('[&_[data-slot=inline-edit-control]]:-my-4');
+    // Same seam, horizontal axis — AttributeValue is the sole owner of the
+    // -ml-7 hit-target offset; InlineEditPreview/InlineEditControl no
+    // longer carry it themselves (see AttributeValue.tsx). Gated on
+    // AttributeValue's own box via has-[], not a descendant selector, so the
+    // same rule also covers AttributeActionsTarget (see next test file).
+    expect(value.className).toContain('has-[[data-slot=inline-edit]]:-ml-7');
+    expect(value.className).toContain('has-[[data-slot=attribute-actions-target]]:-ml-7');
     expect(value.className).toContain('has-[[data-slot=inline-edit]]:overflow-visible');
+  });
+
+  it('omits the -ml-7 hit-target offset in horizontal orientation', () => {
+    // In horizontal orientation AttributeValue sits right next to
+    // AttributeLabel with only a 4px gap — a 7px pull would eat into the
+    // label's space, so the offset only applies when stacked vertically.
+    render(<Example onCommit={() => {}} orientation='horizontal' />);
+    const value = screen.getByTestId('attr--value');
+    expect(value.className).not.toContain('has-[[data-slot=inline-edit]]:-ml-7');
+    expect(value.className).not.toContain('has-[[data-slot=attribute-actions-target]]:-ml-7');
+    // The vertical-axis cancellation still applies regardless of orientation.
+    expect(value.className).toContain('[&_[data-slot=inline-edit-preview]]:-my-4');
+    expect(value.className).toContain('[&_[data-slot=inline-edit-control]]:-my-4');
   });
 });

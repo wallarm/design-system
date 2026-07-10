@@ -124,11 +124,10 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
       onBlur={handleBlur}
       className={cn(
         'w-full min-w-0',
-        // Matches InlineEditPreview's own -ml-7: the hover-row hit target
-        // (and, here, the composed controls' own padding, per the rules
-        // below) extends 7px further left than surrounding content, in both
-        // modes, so toggling preview <-> edit doesn't shift anything.
-        '-ml-7',
+        // The -7px left offset that matches InlineEditPreview's hit target
+        // comes from AttributeValue (InlineEdit is only ever hosted inside
+        // it — see AttributeValue's InlineEdit hosting seam), not from this
+        // component, so toggling preview <-> edit doesn't shift anything.
         // Horizontal padding matches InlineEditPreview's 6px (px-6) on both
         // sides so toggling between preview and edit mode causes no
         // horizontal text jump. Descendant selectors, not a shared prop:

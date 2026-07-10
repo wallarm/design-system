@@ -43,6 +43,17 @@ export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, classNa
         // outweighs plain utilities.
         '[&_[data-slot=inline-edit-preview]]:-my-4',
         '[&_[data-slot=inline-edit-control]]:-my-4',
+        // Same seam, horizontal axis: pulls the hover/pressed background and
+        // hit target 7px further left than surrounding content, on the
+        // AttributeValue box itself rather than duplicated per guest.
+        // Applies whenever AttributeValue hosts either an InlineEdit or an
+        // AttributeActionsTarget — both render their own wide hover row and
+        // want it pulled flush with the label above. Vertical orientation
+        // only — in horizontal orientation AttributeValue sits right next to
+        // AttributeLabel with only a 4px gap, so a 7px pull would eat into
+        // the label's space.
+        !isHorizontal && 'has-[[data-slot=inline-edit]]:-ml-7',
+        !isHorizontal && 'has-[[data-slot=attribute-actions-target]]:-ml-7',
         // Un-clip non-portaled editor dropdowns (horizontal `truncate` sets
         // overflow-hidden). :has() only matches while an InlineEdit is hosted.
         'has-[[data-slot=inline-edit]]:overflow-visible',
