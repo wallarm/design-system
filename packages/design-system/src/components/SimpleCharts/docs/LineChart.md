@@ -8,10 +8,13 @@ The root takes `data` and `series` as two flat arrays — `data` is one row per 
 
 Use it whenever a chart needs the same card frame as `BarList` / `PieChart` but the data is a trend (or any ordered X axis). Pick `BarList` for top-N comparisons and `PieChart` for share-of-total.
 
+Per the anatomy, a chart may also carry a **metric + legend** row between the card header and the grid: the shared `Metric` bricks (`MetricHeader` + `MetricValue` + `MetricDelta`) on the left, the legend on the right, in one `justify-between` row. This is pure consumer composition (the `WithMetric` story) — no chart props involved; the card grows by the row's height.
+
 ## Figma
 
 - Root anatomy: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7533-3334&m=dev
 - Single-line + multi-line: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7533-3335&m=dev
+- Anatomy incl. the metric + legend row: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11626-37312
 - Default states: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-123142&m=dev
 - Hover + zoom popovers: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7527-32438&m=dev
 - Filtered (legend toggling): https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7509-2354&m=dev

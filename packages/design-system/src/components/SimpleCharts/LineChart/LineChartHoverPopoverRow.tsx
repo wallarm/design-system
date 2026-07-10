@@ -1,13 +1,6 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import { cn } from '../../../utils/cn';
-import {
-  lineChartHoverPopoverRowClasses,
-  lineChartHoverPopoverRowDotClasses,
-  lineChartHoverPopoverRowLabelClasses,
-  lineChartHoverPopoverRowValueClasses,
-} from './classes';
+import { ChartHoverCardRow } from '../internal/ChartHoverCard';
 import type { LineChartSeries } from './LineChartContext';
-import { LineChartHoverPopoverDot } from './LineChartHoverPopoverDot';
 
 export interface LineChartHoverPopoverRowProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
@@ -15,44 +8,33 @@ export interface LineChartHoverPopoverRowProps extends HTMLAttributes<HTMLDivEle
   series: LineChartSeries;
   /** Raw datum value at the active index. `null`/`undefined` renders an em-dash. */
   value?: number | string | null;
-  /** Optional value formatter. Defaults to `Number.toLocaleString` / `String`. */
+  /** Optional value formatter. Defaults to the shared locale formatting. */
   formatValue?: (value: number | string | null | undefined) => ReactNode;
 }
 
-const defaultFormatValue = (value: number | string | null | undefined): ReactNode => {
-  if (value === null || value === undefined) return '—';
-  return typeof value === 'number' ? value.toLocaleString() : String(value);
-};
-
+/**
+ * A hover popover row for one series — the shared `ChartHoverCardRow`, fed from a
+ * `LineChartSeries` and keyed by `series.key`.
+ */
 export const LineChartHoverPopoverRow: FC<LineChartHoverPopoverRowProps> = ({
   series,
   value,
-  formatValue = defaultFormatValue,
-  ref,
-  className,
+  formatValue,
   children,
+  ref,
   ...props
-}) => {
-  return (
-    <div
-      {...props}
-      ref={ref}
-      data-slot='line-chart-hover-popover-row'
-      data-key={series.key}
-      className={cn(lineChartHoverPopoverRowClasses, className)}
-    >
-      {children ?? (
-        <>
-          <LineChartHoverPopoverDot
-            color={series.color ?? 'slate'}
-            className={lineChartHoverPopoverRowDotClasses}
-          />
-          <span className={lineChartHoverPopoverRowLabelClasses}>{series.label}</span>
-          <span className={lineChartHoverPopoverRowValueClasses}>{formatValue(value)}</span>
-        </>
-      )}
-    </div>
-  );
-};
+}) => (
+  <ChartHoverCardRow
+    ref={ref}
+    data-key={series.key}
+    color={series.color ?? 'slate'}
+    label={series.label}
+    value={value}
+    formatValue={formatValue}
+    {...props}
+  >
+    {children}
+  </ChartHoverCardRow>
+);
 
 LineChartHoverPopoverRow.displayName = 'LineChartHoverPopoverRow';

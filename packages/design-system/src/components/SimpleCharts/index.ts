@@ -27,10 +27,12 @@ export {
   type ChartTitleProps,
 } from './Chart';
 export {
-  HorizontalBar,
-  type HorizontalBarDatum,
-  type HorizontalBarProps,
-} from './HorizontalBar';
+  HorizontalBarStack,
+  type HorizontalBarStackDatum,
+  type HorizontalBarStackProps,
+  HorizontalBarStackSkeleton,
+  type HorizontalBarStackSkeletonProps,
+} from './HorizontalBarStack';
 export { type ChartTimeFormatters, useChartTimeFormatters } from './hooks';
 export {
   LineChart,
@@ -85,6 +87,23 @@ export {
   formatChartTimezone,
   withTimezoneChip,
 } from './lib';
+export {
+  Metric,
+  MetricCaption,
+  type MetricCaptionProps,
+  MetricDelta,
+  type MetricDeltaProps,
+  MetricHeader,
+  type MetricHeaderProps,
+  type MetricProps,
+  MetricSkeleton,
+  type MetricSkeletonProps,
+  MetricTotal,
+  type MetricTotalConnector,
+  type MetricTotalProps,
+  MetricValue,
+  type MetricValueProps,
+} from './Metric';
 export {
   LegendDot,
   type LegendDotProps,

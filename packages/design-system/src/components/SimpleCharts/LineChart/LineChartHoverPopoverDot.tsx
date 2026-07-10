@@ -1,40 +1,14 @@
-import type { FC, HTMLAttributes, Ref } from 'react';
-import { cn } from '../../../utils/cn';
-import type { ChartColor } from '../types';
-import { lineChartHoverPopoverDotClasses } from './classes';
-import { resolveSeriesColor } from './constants';
+import type { FC } from 'react';
+import { ChartHoverCardDot, type ChartHoverCardDotProps } from '../internal/ChartHoverCard';
 
-export interface LineChartHoverPopoverDotProps extends HTMLAttributes<HTMLSpanElement> {
-  ref?: Ref<HTMLSpanElement>;
-  /**
-   * Dot colour. Either a built-in palette token (`'brand'`, `'red'`, …) or any
-   * CSS colour string (`'var(--color-violet-500)'`, `'#8b5cf6'`, `'oklch(…)'`).
-   * Same shape as `LineChartSeries.color`, so passing `color={series.color}`
-   * keeps the dot in sync with its line. Consumer-supplied
-   * `style.backgroundColor` still wins when present.
-   */
-  color?: ChartColor | (string & {});
-}
+/**
+ * The hover popover's series dot — the shared `ChartHoverCardDot`. `color` accepts a palette
+ * token or any CSS colour, so `color={series.color}` keeps the dot in sync with its line.
+ */
+export type LineChartHoverPopoverDotProps = ChartHoverCardDotProps;
 
-export const LineChartHoverPopoverDot: FC<LineChartHoverPopoverDotProps> = ({
-  color,
-  className,
-  style,
-  ref,
-  ...props
-}) => {
-  const backgroundColor = style?.backgroundColor ?? resolveSeriesColor(color);
-
-  return (
-    <span
-      {...props}
-      ref={ref}
-      data-slot='line-chart-hover-popover-dot'
-      aria-hidden='true'
-      className={cn(lineChartHoverPopoverDotClasses, className)}
-      style={{ ...style, backgroundColor }}
-    />
-  );
-};
+export const LineChartHoverPopoverDot: FC<LineChartHoverPopoverDotProps> = props => (
+  <ChartHoverCardDot {...props} />
+);
 
 LineChartHoverPopoverDot.displayName = 'LineChartHoverPopoverDot';

@@ -1,29 +1,16 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
-import { cn } from '../../../utils/cn';
-import { lineChartHoverPopoverClasses } from './classes';
+import { ChartHoverCard } from '../internal/ChartHoverCard';
 
 export interface LineChartHoverPopoverProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
 }
 
-export const LineChartHoverPopover: FC<LineChartHoverPopoverProps> = ({
-  ref,
-  className,
-  children,
-  ...props
-}) => {
-  return (
-    <div
-      {...props}
-      ref={ref}
-      data-slot='line-chart-hover-popover'
-      role='tooltip'
-      aria-live='polite'
-      className={cn(lineChartHoverPopoverClasses, className)}
-    >
-      {children}
-    </div>
-  );
-};
+/**
+ * The line chart's hover popover — the shared `ChartHoverCard` surface with tooltip
+ * semantics (`role='tooltip'` + `aria-live`), positioned by the plotting-library tooltip.
+ */
+export const LineChartHoverPopover: FC<LineChartHoverPopoverProps> = ({ ref, ...props }) => (
+  <ChartHoverCard ref={ref} role='tooltip' aria-live='polite' {...props} />
+);
 
 LineChartHoverPopover.displayName = 'LineChartHoverPopover';

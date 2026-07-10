@@ -1,6 +1,6 @@
 import type { ChartColor } from '../../types';
-import { HORIZONTAL_BAR_PALETTE, REMAINDER_KEY } from '../constants';
-import type { HorizontalBarDatum } from '../HorizontalBar';
+import { HORIZONTAL_BAR_STACK_PALETTE, REMAINDER_KEY } from '../constants';
+import type { HorizontalBarStackDatum } from '../HorizontalBarStack';
 
 export interface ResolvedSegment {
   key: string;
@@ -13,11 +13,14 @@ export interface ResolvedSegment {
 const sanitize = (n: number): number =>
   typeof n === 'number' && Number.isFinite(n) && n > 0 ? n : 0;
 
-export function resolveSegments(data: HorizontalBarDatum[], total?: number): ResolvedSegment[] {
+export function resolveSegments(
+  data: HorizontalBarStackDatum[],
+  total?: number,
+): ResolvedSegment[] {
   const segments: ResolvedSegment[] = data.map((d, i) => ({
     key: d.name,
     value: sanitize(d.value),
-    color: d.color ?? HORIZONTAL_BAR_PALETTE[i % HORIZONTAL_BAR_PALETTE.length],
+    color: d.color ?? HORIZONTAL_BAR_STACK_PALETTE[i % HORIZONTAL_BAR_STACK_PALETTE.length],
     className: d.className,
     isRemainder: false,
   }));
