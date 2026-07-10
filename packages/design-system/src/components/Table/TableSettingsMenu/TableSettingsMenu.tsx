@@ -74,7 +74,7 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
   const testId = useTestId('settings-menu', testIdProp);
   const { anchorNode } = useTableSettingsMenuContext();
   const ctx = useTableContext();
-  const { table, alwaysPinnedLeft, masterColumnId } = ctx;
+  const { table, alwaysPinnedLeft, masterColumnId, onSettingsOpenChange } = ctx;
 
   const hasTextDescription = table
     .getAllLeafColumns()
@@ -82,6 +82,11 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
 
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleOpenChange = (open: boolean) => {
+    setMenuOpen(open);
+    onSettingsOpenChange?.(open);
+  };
 
   // Filter out utility columns (_selection, _expand) — they shouldn't appear in settings
   const allColumns = table
@@ -174,7 +179,7 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
         <Tooltip disabled={menuOpen}>
           <TooltipTrigger asChild>
             <span className='inline-flex'>
-              <DropdownMenu onOpenChange={setMenuOpen}>
+              <DropdownMenu onOpenChange={handleOpenChange}>
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant='outline'

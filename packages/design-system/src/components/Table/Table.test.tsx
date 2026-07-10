@@ -1143,3 +1143,26 @@ describe('TableActionBarSelection: bulk action-bar composition analytics', () =>
     expect(selectAll).not.toHaveAttribute('data-analytics-id');
   });
 });
+
+describe('TableSettingsMenu: onSettingsOpenChange', () => {
+  it('fires with true when the settings menu opens and false when it closes', async () => {
+    const onSettingsOpenChange = vi.fn();
+    render(
+      <Table
+        data={data}
+        columns={baseColumns}
+        onColumnVisibilityChange={vi.fn()}
+        onSettingsOpenChange={onSettingsOpenChange}
+        data-testid='table'
+      />,
+    );
+
+    const trigger = screen.getByRole('button', { name: 'Table settings' });
+
+    await userEvent.click(trigger);
+    expect(onSettingsOpenChange).toHaveBeenLastCalledWith(true);
+
+    await userEvent.keyboard('{Escape}');
+    expect(onSettingsOpenChange).toHaveBeenLastCalledWith(false);
+  });
+});

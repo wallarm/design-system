@@ -87,6 +87,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     initialScrollToRowId,
     onMasterCellClick,
     activeRowId: activeRowIdProp,
+    onSettingsOpenChange,
   } = props;
 
   const masterCellActiveRowId = activeRowIdProp ?? null;
@@ -330,6 +331,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       initialScrollToRowId,
       onMasterCellClick,
       activeRowId: masterCellActiveRowId,
+      onSettingsOpenChange,
     }),
     [
       table,
@@ -361,6 +363,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       initialScrollToRowId,
       masterCellActiveRowId,
       onMasterCellClick,
+      onSettingsOpenChange,
     ],
   );
 
