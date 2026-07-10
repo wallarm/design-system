@@ -73,11 +73,12 @@ const selectInputVariants = cva(
       empty: {
         true: 'text-text-secondary',
       },
-      // 24/32/36px scale, matching Input/InputGroup/Textarea/DateInput/TimeInput.
+      // 24/28/32/36px scale, matching Input/InputGroup/Textarea/DateInput/TimeInput.
       size: {
         default: 'h-36',
         medium: 'h-32',
         small: 'h-24',
+        'inline-edit': 'h-28',
       },
     },
     compoundVariants: [
@@ -96,7 +97,7 @@ const selectInputVariants = cva(
 interface SelectInputBaseProps
   extends Omit<React.HTMLAttributes<HTMLDivElement>, 'children' | 'color'> {
   'data-testid'?: string;
-  size?: 'small' | 'medium' | 'default';
+  size?: 'small' | 'medium' | 'default' | 'inline-edit';
 }
 
 type SelectInputProps = SelectInputBaseProps & Pick<SelectValueTextProps, 'placeholder'>;
