@@ -6,7 +6,7 @@ import { useInlineEdit } from './InlineEditContext';
 export type InlineEditInputProps = Omit<InputProps, 'value' | 'onChange' | 'error'>;
 
 export const InlineEditInput: FC<InlineEditInputProps> = ({
-  size = 'small',
+  size = 'inline-edit',
   'data-testid': testIdProp,
   ...props
 }) => {

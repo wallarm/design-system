@@ -45,7 +45,7 @@ describe('InlineEditInput', () => {
     expect(screen.getByTestId('attr--input')).toHaveAttribute('aria-invalid', 'true');
   });
 
-  it('defaults to the small (24px) size, matching the rest of InlineEdit', () => {
+  it('defaults to the inline-edit (28px) size, matching the rest of InlineEdit', () => {
     render(
       <InlineEdit defaultEdit defaultValue='ab' data-testid='attr'>
         <InlineEditControl>
@@ -53,7 +53,7 @@ describe('InlineEditInput', () => {
         </InlineEditControl>
       </InlineEdit>,
     );
-    expect(screen.getByTestId('attr--input')).toHaveClass('h-24');
+    expect(screen.getByTestId('attr--input')).toHaveClass('h-28');
   });
 });
 
@@ -71,7 +71,7 @@ describe('InlineEditTextarea', () => {
     expect(node).toHaveAttribute('data-analytics-id', 'ATTR_TEXTAREA');
   });
 
-  it('defaults to the small (64px) size, matching the rest of InlineEdit', () => {
+  it('defaults to the inline-edit (64px min-height, 4px padding) size, matching the rest of InlineEdit', () => {
     render(
       <InlineEdit defaultEdit defaultValue='ab' data-testid='attr'>
         <InlineEditControl>
@@ -80,6 +80,7 @@ describe('InlineEditTextarea', () => {
       </InlineEdit>,
     );
     expect(screen.getByTestId('attr--input')).toHaveClass('min-h-[64px]');
+    expect(screen.getByTestId('attr--input')).toHaveClass('py-4');
   });
 });
 
@@ -99,7 +100,7 @@ describe('InlineEditNumber', () => {
     expect(screen.getByTestId('attr--input')).toHaveAttribute('data-analytics-id', 'ATTR_NUMBER');
   });
 
-  it('defaults to the small (24px) size, matching the rest of InlineEdit', () => {
+  it('defaults to the inline-edit (28px) size, matching the rest of InlineEdit', () => {
     render(
       <InlineEdit defaultEdit defaultValue='8443' data-testid='attr'>
         <InlineEditControl>
@@ -107,6 +108,6 @@ describe('InlineEditNumber', () => {
         </InlineEditControl>
       </InlineEdit>,
     );
-    expect(screen.getByTestId('attr--input')).toHaveClass('h-24');
+    expect(screen.getByTestId('attr--input')).toHaveClass('h-28');
   });
 });

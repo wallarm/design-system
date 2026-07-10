@@ -6,7 +6,7 @@ import { useInlineEdit } from './InlineEditContext';
 export type InlineEditTextareaProps = Omit<TextareaProps, 'value' | 'onChange' | 'error'>;
 
 export const InlineEditTextarea: FC<InlineEditTextareaProps> = ({
-  size = 'small',
+  size = 'inline-edit',
   'data-testid': testIdProp,
   ...props
 }) => {
