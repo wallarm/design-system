@@ -50,4 +50,9 @@ describe('Size variants', () => {
     render(<Input data-testid='input' size='small' />);
     expect(screen.getByTestId('input').className).toContain('h-24');
   });
+
+  it('renders the inline-edit (28px) height', () => {
+    render(<Input data-testid='input' size='inline-edit' />);
+    expect(screen.getByTestId('input').className).toContain('h-28');
+  });
 });
