@@ -57,3 +57,14 @@ describe('Attribute pass-through', () => {
     expect(screen.getByRole('link')).toHaveAttribute('data-analytics-id', 'CHILD_NAV');
   });
 });
+
+describe('Size variants', () => {
+  it('renders the inline-edit (28px) height', () => {
+    render(
+      <Button data-testid='button' size='inline-edit'>
+        Save
+      </Button>,
+    );
+    expect(screen.getByTestId('button').className).toContain('h-28');
+  });
+});

@@ -17,6 +17,7 @@ export const buttonBaseVariants = cva(
         small: 'h-24 px-8 py-2 gap-4',
         medium: 'h-32 px-12 py-6 gap-6',
         large: 'h-36 px-16 py-8 gap-8',
+        'inline-edit': 'h-28 px-10 py-4 gap-5',
       },
       iconOnly: {
         true: '',
@@ -39,12 +40,14 @@ export const buttonBaseVariants = cva(
       { iconOnly: true, size: 'small', className: 'w-24 h-24 p-2' },
       { iconOnly: true, size: 'medium', className: 'w-32 h-32 p-6' },
       { iconOnly: true, size: 'large', className: 'w-36 h-36 p-8' },
+      { iconOnly: true, size: 'inline-edit', className: 'w-28 h-28 p-4' },
       // endregion
 
       // region --- Non-text end adjustment
       { hasNonTextEnd: true, size: 'small', className: 'pr-2' },
       { hasNonTextEnd: true, size: 'medium', className: 'pr-6' },
       { hasNonTextEnd: true, size: 'large', className: 'pr-10' },
+      { hasNonTextEnd: true, size: 'inline-edit', className: 'pr-4' },
       // endregion
     ],
   },
