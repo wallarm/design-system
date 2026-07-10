@@ -515,4 +515,13 @@ describe('InlineEditPreview sizing', () => {
     );
     expect(screen.getByTestId('attr--preview')).toHaveClass('h-28');
   });
+
+  it('matches the multiline preview row padding to the Textarea inline-edit tier (py-4)', () => {
+    render(
+      <InlineEdit defaultValue='ab' data-testid='attr'>
+        <InlineEditPreview lineClamp={2}>ab</InlineEditPreview>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('attr--preview')).toHaveClass('py-4');
+  });
 });

@@ -3,8 +3,9 @@ import { cva } from 'class-variance-authority';
 export const inlineEditPreviewVariants = cva(
   // Typography matches Input's `size='small'` (text-sm) so toggling into
   // edit mode causes no visual jump. Vertical padding is per-variant below,
-  // since it must match whichever control's own `size='small'` this row
-  // toggles into (Input's is 2px; Textarea's is 0).
+  // since it must match whichever control's own `size='inline-edit'` tier
+  // this row toggles into (Input's is py-4/h-28; Textarea's is py-4, no
+  // fixed height).
   // -ml-7 pulls the hover/pressed background and hit target further left
   // than surrounding content, while the left px-6 keeps the text itself
   // readably inset from that extended edge (the "padded hover row,
@@ -20,7 +21,7 @@ export const inlineEditPreviewVariants = cva(
       // inline-edit 28px height (border-box: 4px padding + 1px border on each
       // side + the 20px text-sm line-height above = 28px total).
       multiline: {
-        true: 'items-start py-0',
+        true: 'items-start py-4',
         false: 'items-center py-4 h-28',
       },
       activatable: {
