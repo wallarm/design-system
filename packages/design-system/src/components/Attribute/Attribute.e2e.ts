@@ -50,6 +50,25 @@ test.describe('Component: Attribute', () => {
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
 
+    test('Should keep the same row height when toggling from preview to edit', async ({
+      page,
+    }) => {
+      // Regression: AttributeValue's -my-4 row-height cancellation only
+      // targeted the preview's data-slot, not the control's — the row grew
+      // 28px -> 32px the instant editing started (pt-4 no longer absorbed).
+      await attributeStory.goto(page, 'With Inline Edit');
+      const value = page.getByTestId('attr--value');
+      const previewBox = await value.boundingBox();
+      if (!previewBox) throw new Error('attr--value box not measurable in preview mode');
+
+      await page.getByTestId('attr--preview').click();
+      await expect(page.getByTestId('attr--input')).toBeFocused();
+      const editBox = await value.boundingBox();
+      if (!editBox) throw new Error('attr--value box not measurable in edit mode');
+
+      expect(editBox.height).toBe(previewBox.height);
+    });
+
     test('Should render horizontal hosted inline edit with correct truncation and row height', async ({
       page,
     }) => {

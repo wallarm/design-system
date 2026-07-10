@@ -49,10 +49,14 @@ describe('InlineEdit integration', () => {
     expect(screen.getByTestId('attr--preview')).toBeInTheDocument();
   });
 
-  it('AttributeValue carries the InlineEdit seam classes', () => {
+  it('AttributeValue carries the InlineEdit seam classes for both preview and control', () => {
     render(<Example onCommit={() => {}} />);
     const value = screen.getByTestId('attr--value');
     expect(value.className).toContain('[&_[data-slot=inline-edit-preview]]:-my-4');
+    // Regression: the control's own box must get the same row-height
+    // cancellation as the preview's, or the row grows by 4px (pt-4 no
+    // longer absorbed) the moment editing starts.
+    expect(value.className).toContain('[&_[data-slot=inline-edit-control]]:-my-4');
     expect(value.className).toContain('has-[[data-slot=inline-edit]]:overflow-visible');
   });
 });

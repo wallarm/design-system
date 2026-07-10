@@ -33,13 +33,16 @@ export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, classNa
       className={cn(
         'flex items-center',
         // InlineEdit hosting seam, keyed on the guest's data-slot contract
-        // (see components/InlineEdit). The preview's own px-6/py-4 hover box
-        // is neutral; the host cancels its row padding so the box fills the
-        // row without changing row height. If the preview's padding changes,
-        // this constant must follow. Consumer overrides of the margin must
-        // target AttributeValue (or use `!` importance on the preview) —
-        // this rule is parent-scoped and outweighs plain utilities.
+        // (see components/InlineEdit). Both the preview's own box and the
+        // control's (edit-mode) box are neutral; the host cancels its own
+        // row padding against whichever one is currently rendered, so the
+        // box fills the row without changing row height on toggle. If either
+        // box's padding changes, this constant must follow. Consumer
+        // overrides of the margin must target AttributeValue (or use `!`
+        // importance on the guest) — this rule is parent-scoped and
+        // outweighs plain utilities.
         '[&_[data-slot=inline-edit-preview]]:-my-4',
+        '[&_[data-slot=inline-edit-control]]:-my-4',
         // Un-clip non-portaled editor dropdowns (horizontal `truncate` sets
         // overflow-hidden). :has() only matches while an InlineEdit is hosted.
         'has-[[data-slot=inline-edit]]:overflow-visible',
