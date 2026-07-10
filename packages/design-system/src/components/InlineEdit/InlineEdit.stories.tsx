@@ -25,7 +25,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '../Dialog';
-import { Input } from '../Input';
 import {
   SelectButton,
   SelectContent,
@@ -136,7 +135,7 @@ function renderSelectOptions(items: SelectDataItem[]) {
 // descendant of <InlineEdit>, not from the story function that renders it.
 function SelectInputTrigger() {
   const testId = useTestId('input');
-  return <SelectInput data-testid={testId} size='small' />;
+  return <SelectInput data-testid={testId} size='inline-edit' />;
 }
 
 // SelectButton naturally cascades to the `button` slot, but this specific
@@ -145,7 +144,7 @@ function SelectInputTrigger() {
 // SelectInputTrigger above, just for the single-select trigger.
 function SelectButtonTrigger() {
   const testId = useTestId('input');
-  return <SelectButton data-testid={testId} size='small' />;
+  return <SelectButton data-testid={testId} size='inline-edit' />;
 }
 
 // `Calendar` never re-provides its own testid cascade, so this resolves
@@ -162,7 +161,7 @@ function DateInputTrigger({ granularity }: { granularity: 'day' | 'minute' }) {
       value={toReactAriaDateValue(resolvedValue)}
       onChange={v => setValue(toCalendarDateValue(v))}
       granularity={granularity}
-      size='small'
+      size='inline-edit'
       showIcon={false}
     />
   );
@@ -239,7 +238,7 @@ export const SelectEditor: StoryFn = () => {
           </InlineEditPreview>
           <InlineEditControl>
             <InlineEditSelect items={roleItems}>
-              <SelectButton size='small' />
+              <SelectButton size='inline-edit' />
               <SelectPositioner>
                 <SelectContent>{renderSelectOptions(roleItems)}</SelectContent>
               </SelectPositioner>
@@ -271,7 +270,7 @@ export const MultiSelectEditor: StoryFn = () => {
           </InlineEditPreview>
           <InlineEditControl>
             <InlineEditSelect items={roleItems} multiple>
-              <SelectButton size='small' />
+              <SelectButton size='inline-edit' />
               <SelectPositioner>
                 <SelectContent>{renderSelectOptions(roleItems)}</SelectContent>
               </SelectPositioner>
@@ -516,74 +515,6 @@ export const NonEditable: StoryFn = () => (
     </Row>
   </div>
 );
-
-export const CustomEditor: StoryFn = () => {
-  const [value, setValue] = useState('CHECKOUT API');
-  return (
-    <div className='w-[320px]'>
-      <Row label='Custom editor (render-prop)'>
-        <InlineEdit value={value} onValueCommit={v => setValue(v as string)} data-testid='custom'>
-          <InlineEditPreview>{value}</InlineEditPreview>
-          <InlineEditControl submitMode='both'>
-            {({ value: draft, setValue: setDraft, submit, cancel }) => (
-              <span className='flex items-center gap-4'>
-                <Input
-                  aria-label='Custom'
-                  value={(draft as string) ?? ''}
-                  onChange={e => setDraft(e.target.value.toUpperCase())}
-                  size='small'
-                />
-                {/* preventDefault on mousedown keeps focus in the input, so
-                    Safari's click-after-blur ordering cannot fire a blur
-                    submit/cancel before the button's click lands. */}
-                <Button
-                  variant='primary'
-                  color='brand'
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => submit()}
-                  data-testid='custom-confirm'
-                >
-                  Save
-                </Button>
-                <Button
-                  variant='ghost'
-                  color='neutral'
-                  onMouseDown={e => e.preventDefault()}
-                  onClick={() => cancel()}
-                  data-testid='custom-cancel'
-                >
-                  Cancel
-                </Button>
-              </span>
-            )}
-          </InlineEditControl>
-          <InlineEditError />
-        </InlineEdit>
-      </Row>
-    </div>
-  );
-};
-
-CustomEditor.parameters = {
-  docs: {
-    description: {
-      story:
-        'There are two ways to plug a custom editor into `InlineEditControl`. This story uses ' +
-        'the render-prop path: pass a function as children to read `{ value, setValue }` (and ' +
-        '`submit`/`cancel`) straight from the inline-edit context, and set `submitMode` on ' +
-        '`InlineEditControl` itself since a plain render-prop cannot register its own mode. ' +
-        'The alternative is the component path: extract the editor into its own component that ' +
-        'calls `useInlineEdit()` for `{ value, setValue, submit }` and ' +
-        '`useInlineEditSubmitMode(mode)` to register its commit mode — the pattern used by the ' +
-        'built-in editors (`InlineEditInput`, `InlineEditSelect`, etc.) and the better fit for ' +
-        'popover-style editors (like a select or calendar) that commit on their own close event ' +
-        'rather than on blur or Enter.' +
-        ' Custom confirm/cancel buttons should call `e.preventDefault()` in `onMouseDown`: it ' +
-        'keeps focus in the input, so browsers that do not focus buttons on mousedown (Safari, ' +
-        'macOS Firefox) cannot fire a blur submit/cancel before the click lands.',
-    },
-  },
-};
 
 export const ConfirmCommit: StoryFn = () => {
   const [email, setEmail] = useState('dev@wallarm.com');
