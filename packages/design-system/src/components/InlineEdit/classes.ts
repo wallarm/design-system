@@ -14,14 +14,14 @@ export const inlineEditPreviewVariants = cva(
   {
     variants: {
       // Multi-line values (Textarea) align the icon to the top, use
-      // Textarea's `size='small'` py-0, and grow with content (lineClamp).
+      // Textarea's `size='inline-edit'` py-4, and grow with content (lineClamp).
       // Single-line values (Input/NumberInput/Select/Date/Time) center the
-      // icon, use Input's `size='small'` py-2, and fix the row at Input's
-      // small 24px height (border-box: 2px padding + 1px border on each
-      // side + the 20px text-sm line-height above = 24px total).
+      // icon, use Input's `size='inline-edit'` py-4, and fix the row at Input's
+      // inline-edit 28px height (border-box: 4px padding + 1px border on each
+      // side + the 20px text-sm line-height above = 28px total).
       multiline: {
         true: 'items-start py-0',
-        false: 'items-center py-2 h-24',
+        false: 'items-center py-4 h-28',
       },
       activatable: {
         true: '',
