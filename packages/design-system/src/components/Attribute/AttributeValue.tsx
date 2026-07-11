@@ -54,6 +54,11 @@ export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, classNa
         // the label's space.
         !isHorizontal && 'has-[[data-slot=inline-edit]]:-ml-7',
         !isHorizontal && 'has-[[data-slot=attribute-actions-target]]:-ml-7',
+        // The -ml-7 above pulls the whole box left, including InlineEditError
+        // — which isn't part of the wide hover row and has no reason to
+        // follow it. Cancel the pull for that one guest so the error message
+        // stays flush with the label instead of overhanging its left edge.
+        !isHorizontal && '[&_[data-slot=inline-edit-error]]:ml-7',
         // Un-clip non-portaled editor dropdowns (horizontal `truncate` sets
         // overflow-hidden). :has() only matches while an InlineEdit is hosted.
         'has-[[data-slot=inline-edit]]:overflow-visible',

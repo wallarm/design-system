@@ -71,6 +71,10 @@ describe('InlineEdit integration', () => {
     // same rule also covers AttributeActionsTarget (see next test file).
     expect(value.className).toContain('has-[[data-slot=inline-edit]]:-ml-7');
     expect(value.className).toContain('has-[[data-slot=attribute-actions-target]]:-ml-7');
+    // Regression: the -ml-7 above pulls the whole AttributeValue box left,
+    // including InlineEditError — cancel it there so the error message
+    // stays flush with the label instead of overhanging its left edge.
+    expect(value.className).toContain('[&_[data-slot=inline-edit-error]]:ml-7');
     expect(value.className).toContain('has-[[data-slot=inline-edit]]:overflow-visible');
   });
 
@@ -82,6 +86,8 @@ describe('InlineEdit integration', () => {
     const value = screen.getByTestId('attr--value');
     expect(value.className).not.toContain('has-[[data-slot=inline-edit]]:-ml-7');
     expect(value.className).not.toContain('has-[[data-slot=attribute-actions-target]]:-ml-7');
+    // Nothing to cancel when there's no ambient -ml-7 pull.
+    expect(value.className).not.toContain('[&_[data-slot=inline-edit-error]]:ml-7');
     // The vertical-axis cancellation still applies regardless of orientation.
     expect(value.className).toContain('[&_[data-slot=inline-edit-preview]]:-my-4');
     expect(value.className).toContain('[&_[data-slot=inline-edit-control]]:-my-4');
