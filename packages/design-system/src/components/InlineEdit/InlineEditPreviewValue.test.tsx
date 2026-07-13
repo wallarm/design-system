@@ -22,6 +22,19 @@ describe('InlineEditPreviewValue', () => {
     expect(screen.getByTestId('attr--preview-value')).toHaveClass('line-clamp-3');
   });
 
+  it('overrides inherited white-space so the clamp still wraps across lines', () => {
+    // Regression: in a horizontal-orientation Attribute, AttributeValue's
+    // own `truncate` sets `white-space: nowrap`, which is inherited and
+    // would otherwise collapse a clamped value to a single line regardless
+    // of `line-clamp-N`.
+    render(
+      <InlineEdit defaultValue='hello' data-testid='attr'>
+        <InlineEditPreviewValue lineClamp={3}>hello</InlineEditPreviewValue>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('attr--preview-value')).toHaveClass('whitespace-normal');
+  });
+
   it('dims while a commit is loading', () => {
     render(
       <InlineEdit defaultValue='hello' status='loading' data-testid='attr'>
