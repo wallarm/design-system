@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { FeedbackPulse } from './FeedbackPulse';
@@ -40,5 +40,28 @@ describe('FeedbackPulse', () => {
     await user.click(screen.getByRole('radio', { name: '2' }));
     expect(screen.queryByPlaceholderText('Tell us why? (optional)')).toBeNull();
     expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument();
+  });
+
+  it('moves the selection with arrow keys (roving radiogroup)', async () => {
+    const user = userEvent.setup();
+    render(<FeedbackPulse open onOpenChange={() => {}} onSubmit={() => {}} data-testid='fp' />);
+    await user.click(screen.getByRole('radio', { name: '3' }));
+
+    const group = screen.getByRole('radiogroup');
+    fireEvent.keyDown(group, { key: 'ArrowRight' });
+    expect(screen.getByRole('radio', { name: '4' })).toHaveAttribute('aria-checked', 'true');
+
+    fireEvent.keyDown(group, { key: 'ArrowLeft' });
+    expect(screen.getByRole('radio', { name: '3' })).toHaveAttribute('aria-checked', 'true');
+  });
+
+  it('sets roving tabindex — only the selected (or first) radio is tabbable', async () => {
+    const user = userEvent.setup();
+    render(<FeedbackPulse open onOpenChange={() => {}} onSubmit={() => {}} data-testid='fp' />);
+    // Before any pick, first radio is the tab stop.
+    expect(screen.getByRole('radio', { name: '1' })).toHaveAttribute('tabindex', '0');
+    await user.click(screen.getByRole('radio', { name: '5' }));
+    expect(screen.getByRole('radio', { name: '5' })).toHaveAttribute('tabindex', '0');
+    expect(screen.getByRole('radio', { name: '1' })).toHaveAttribute('tabindex', '-1');
   });
 });

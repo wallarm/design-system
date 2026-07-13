@@ -1,4 +1,4 @@
-import { type FC, type KeyboardEvent, type Ref, useEffect, useState } from 'react';
+import { type FC, type KeyboardEvent, type Ref, useEffect, useRef, useState } from 'react';
 import { Presence as ArkUiPresence } from '@ark-ui/react/presence';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { X } from '../../icons';
@@ -46,6 +46,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
   const [score, setScore] = useState<number | null>(null);
   const [comment, setComment] = useState('');
   const [paused, setPaused] = useState(false);
+  const scaleRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -61,6 +62,18 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
   const handleSelect = (value: number) => {
     setScore(value);
     setPhase('feedback');
+  };
+
+  const handleScaleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    const current = score ?? 1;
+    let next: number | null = null;
+    if (e.key === 'ArrowRight' || e.key === 'ArrowUp') next = Math.min(current + 1, 5);
+    else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') next = Math.max(current - 1, 1);
+    if (next != null) {
+      e.preventDefault();
+      handleSelect(next);
+      scaleRef.current?.querySelector<HTMLButtonElement>(`[data-score="${next}"]`)?.focus();
+    }
   };
 
   const handleSend = () => {
@@ -106,7 +119,14 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
           </div>
 
           <div className='flex flex-col gap-4'>
-            <div role='radiogroup' aria-label={question} data-testid={tid('scale')} className='flex gap-8'>
+            <div
+              ref={scaleRef}
+              role='radiogroup'
+              aria-label={question}
+              data-testid={tid('scale')}
+              className='flex gap-8'
+              onKeyDown={handleScaleKeyDown}
+            >
               {SCORES.map((n) => (
                 <ToggleButton
                   key={n}
@@ -120,6 +140,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
                   aria-label={String(n)}
                   data-score={n}
                   data-testid={tid(`score-${n}`)}
+                  tabIndex={score === n || (score == null && n === 1) ? 0 : -1}
                   onToggle={() => handleSelect(n)}
                 >
                   {n}
