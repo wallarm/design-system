@@ -20,8 +20,8 @@ describe('FeedbackPulse', () => {
     expect(screen.getAllByRole('radio')).toHaveLength(5);
     expect(screen.getByText('Very difficult')).toBeInTheDocument();
     expect(screen.getByText('Very easy')).toBeInTheDocument();
-    // Comment + Send are NOT shown until a score is picked
-    expect(screen.queryByRole('button', { name: 'Send' })).toBeNull();
+    // Comment + Send are present but collapsed & inert (progressive reveal) until a score is picked
+    expect(screen.getByRole('button', { name: 'Send' }).closest('[inert]')).not.toBeNull();
   });
 
   it('reveals the comment field and Send after a score is picked', async () => {
@@ -33,6 +33,8 @@ describe('FeedbackPulse', () => {
     expect(screen.getByRole('radio', { name: '4' })).toHaveAttribute('aria-checked', 'true');
     expect(screen.getByPlaceholderText('Tell us why? (optional)')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument();
+    // The comment + Send block is now revealed — no longer inert
+    expect(screen.getByRole('button', { name: 'Send' }).closest('[inert]')).toBeNull();
   });
 
   it('hides the comment field when showComment is false', async () => {

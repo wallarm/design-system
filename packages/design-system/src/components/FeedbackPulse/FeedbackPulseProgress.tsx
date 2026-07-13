@@ -51,7 +51,7 @@ export const FeedbackPulseProgress: FC<FeedbackPulseProgressProps> = ({
       className={cn('pointer-events-none absolute inset-0 overflow-hidden rounded-12')}
     >
       <div
-        className='h-full bg-component-input-bg transition-none'
+        className='h-full bg-states-primary-default-alt transition-none'
         style={{ width: `${progress * 100}%` }}
       />
     </div>
