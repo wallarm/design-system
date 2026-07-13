@@ -187,7 +187,7 @@ test.describe('LineChart', () => {
       const bodyBox = await body.boundingBox();
       if (!bodyBox) throw new Error('chart body has no bounding box');
 
-      const popover = page.locator('[data-slot=line-chart-hover-popover]');
+      const popover = page.locator('[data-slot=chart-hover-card]');
 
       // Sample three cursor positions across the plot — the popover Y must not
       // jump even though the cursor crosses peaks and valleys in the data.
@@ -341,7 +341,7 @@ test.describe('LineChart', () => {
       if (!bodyBox) throw new Error('chart body has no bounding box');
 
       await page.mouse.move(bodyBox.x + bodyBox.width / 2, bodyBox.y + bodyBox.height / 2);
-      const popover = page.locator('[data-slot=line-chart-hover-popover]');
+      const popover = page.locator('[data-slot=chart-hover-card]');
       await expect(popover).toBeVisible();
       await expect(popover).toHaveAttribute('role', 'tooltip');
     });
