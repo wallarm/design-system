@@ -4,6 +4,7 @@ import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { X } from '../../icons';
 import type { TestableProps } from '../../utils/testId';
 import { Button } from '../Button';
+import { Textarea } from '../Textarea';
 import { ToggleButton } from '../ToggleButton';
 import { feedbackPulseVariants } from './classes';
 
@@ -60,6 +61,13 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
   const handleSelect = (value: number) => {
     setScore(value);
     setPhase('feedback');
+  };
+
+  const handleSend = () => {
+    if (score == null) return;
+    const trimmed = comment.trim();
+    onSubmit({ score, comment: trimmed ? trimmed : undefined });
+    setPhase('submitted');
   };
 
   const handleRootKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
@@ -123,6 +131,30 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
               <span className='text-sm font-normal text-text-secondary'>{scaleLabels[1]}</span>
             </div>
           </div>
+
+          {phase === 'feedback' && (
+            <>
+              {showComment && (
+                <Textarea
+                  placeholder='Tell us why? (optional)'
+                  value={comment}
+                  onChange={(e) => setComment(e.target.value)}
+                  data-testid={tid('comment')}
+                />
+              )}
+              <div className='flex justify-end'>
+                <Button
+                  variant='primary'
+                  color='brand'
+                  size='medium'
+                  data-testid={tid('send')}
+                  onClick={handleSend}
+                >
+                  Send
+                </Button>
+              </div>
+            </>
+          )}
         </div>
       </ArkUiPresence>
     </ArkUiPortal>

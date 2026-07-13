@@ -1,4 +1,5 @@
 import { render, screen } from '@testing-library/react';
+import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { FeedbackPulse } from './FeedbackPulse';
 
@@ -20,5 +21,24 @@ describe('FeedbackPulse', () => {
     expect(screen.getByText('Very easy')).toBeInTheDocument();
     // Comment + Send are NOT shown until a score is picked
     expect(screen.queryByRole('button', { name: 'Send' })).toBeNull();
+  });
+
+  it('reveals the comment field and Send after a score is picked', async () => {
+    const user = userEvent.setup();
+    render(<FeedbackPulse open onOpenChange={() => {}} onSubmit={() => {}} data-testid='fp' />);
+
+    await user.click(screen.getByRole('radio', { name: '4' }));
+
+    expect(screen.getByRole('radio', { name: '4' })).toHaveAttribute('aria-checked', 'true');
+    expect(screen.getByPlaceholderText('Tell us why? (optional)')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument();
+  });
+
+  it('hides the comment field when showComment is false', async () => {
+    const user = userEvent.setup();
+    render(<FeedbackPulse open showComment={false} onOpenChange={() => {}} onSubmit={() => {}} data-testid='fp' />);
+    await user.click(screen.getByRole('radio', { name: '2' }));
+    expect(screen.queryByPlaceholderText('Tell us why? (optional)')).toBeNull();
+    expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument();
   });
 });
