@@ -1,3 +1,4 @@
+import { act } from 'react';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
@@ -111,5 +112,25 @@ describe('FeedbackPulse', () => {
     await user.click(screen.getByRole('button', { name: 'Send' }));
     await user.click(screen.getByRole('button', { name: 'Close' }));
     expect(onOpenChange).toHaveBeenCalledWith(false, 'submit');
+  });
+
+  it('auto-dismisses the Submitted phase with reason "submit" after dismissDuration', () => {
+    vi.useFakeTimers();
+    const onOpenChange = vi.fn();
+    render(
+      <FeedbackPulse
+        open
+        dismissDuration={4000}
+        onOpenChange={onOpenChange}
+        onSubmit={() => {}}
+        data-testid='fp'
+      />,
+    );
+    // Drive to Submitted with fireEvent (fake-timer friendly; avoids userEvent/timer clash).
+    fireEvent.click(screen.getByRole('radio', { name: '3' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Send' }));
+    act(() => vi.advanceTimersByTime(4200));
+    expect(onOpenChange).toHaveBeenCalledWith(false, 'submit');
+    vi.useRealTimers();
   });
 });

@@ -7,6 +7,7 @@ import { Button } from '../Button';
 import { Textarea } from '../Textarea';
 import { ToggleButton } from '../ToggleButton';
 import { feedbackPulseVariants } from './classes';
+import { FeedbackPulseProgress } from './FeedbackPulseProgress';
 
 const DEFAULT_QUESTION = 'How easy was it to use this feature?';
 const DEFAULT_LABELS: readonly [string, string] = ['Very difficult', 'Very easy'];
@@ -105,22 +106,30 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
           onMouseLeave={() => setPaused(false)}
         >
           {phase === 'submitted' ? (
-            <div className='relative z-10 flex items-center gap-8' aria-live='polite'>
-              <CircleCheck size='md' className='shrink-0 text-icon-success' />
-              <span className='flex-1 text-sm font-medium text-text-primary'>
-                {confirmationText}
-              </span>
-              <Button
-                variant='ghost'
-                color='neutral'
-                size='small'
-                aria-label='Close'
-                data-testid={tid('close')}
-                onClick={() => onOpenChange(false, 'submit')}
-              >
-                <X />
-              </Button>
-            </div>
+            <>
+              <FeedbackPulseProgress
+                duration={dismissDuration}
+                paused={paused}
+                onComplete={() => onOpenChange(false, 'submit')}
+                data-testid={tid('progress')}
+              />
+              <div className='relative z-10 flex items-center gap-8' aria-live='polite'>
+                <CircleCheck size='md' className='shrink-0 text-icon-success' />
+                <span className='flex-1 text-sm font-medium text-text-primary'>
+                  {confirmationText}
+                </span>
+                <Button
+                  variant='ghost'
+                  color='neutral'
+                  size='small'
+                  aria-label='Close'
+                  data-testid={tid('close')}
+                  onClick={() => onOpenChange(false, 'submit')}
+                >
+                  <X />
+                </Button>
+              </div>
+            </>
           ) : (
             <>
               <div className='flex items-start justify-between gap-8'>
