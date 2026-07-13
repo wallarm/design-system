@@ -1,1 +1,5 @@
-export { FeedbackPulse, type FeedbackPulseProps, type FeedbackPulseCloseReason } from './FeedbackPulse';
+export {
+  FeedbackPulse,
+  type FeedbackPulseCloseReason,
+  type FeedbackPulseProps,
+} from './FeedbackPulse';

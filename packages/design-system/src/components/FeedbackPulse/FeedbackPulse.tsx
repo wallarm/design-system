@@ -1,6 +1,6 @@
 import { type FC, type KeyboardEvent, type Ref, useEffect, useRef, useState } from 'react';
-import { Presence as ArkUiPresence } from '@ark-ui/react/presence';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
+import { Presence as ArkUiPresence } from '@ark-ui/react/presence';
 import { CircleCheck, X } from '../../icons';
 import type { TestableProps } from '../../utils/testId';
 import { Button } from '../Button';
@@ -155,7 +155,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
                   className='flex gap-8'
                   onKeyDown={handleScaleKeyDown}
                 >
-                  {SCORES.map((n) => (
+                  {SCORES.map(n => (
                     <ToggleButton
                       key={n}
                       variant='outline'
@@ -187,7 +187,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
                     <Textarea
                       placeholder='Tell us why? (optional)'
                       value={comment}
-                      onChange={(e) => setComment(e.target.value)}
+                      onChange={e => setComment(e.target.value)}
                       data-testid={tid('comment')}
                     />
                   )}

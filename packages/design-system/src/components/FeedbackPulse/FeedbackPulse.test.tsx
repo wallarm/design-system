@@ -37,7 +37,15 @@ describe('FeedbackPulse', () => {
 
   it('hides the comment field when showComment is false', async () => {
     const user = userEvent.setup();
-    render(<FeedbackPulse open showComment={false} onOpenChange={() => {}} onSubmit={() => {}} data-testid='fp' />);
+    render(
+      <FeedbackPulse
+        open
+        showComment={false}
+        onOpenChange={() => {}}
+        onSubmit={() => {}}
+        data-testid='fp'
+      />,
+    );
     await user.click(screen.getByRole('radio', { name: '2' }));
     expect(screen.queryByPlaceholderText('Tell us why? (optional)')).toBeNull();
     expect(screen.getByRole('button', { name: 'Send' })).toBeInTheDocument();
