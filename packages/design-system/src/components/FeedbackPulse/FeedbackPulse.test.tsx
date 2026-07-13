@@ -64,4 +64,27 @@ describe('FeedbackPulse', () => {
     expect(screen.getByRole('radio', { name: '5' })).toHaveAttribute('tabindex', '0');
     expect(screen.getByRole('radio', { name: '1' })).toHaveAttribute('tabindex', '-1');
   });
+
+  it('submits with score + comment and shows the confirmation', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<FeedbackPulse open onOpenChange={() => {}} onSubmit={onSubmit} data-testid='fp' />);
+
+    await user.click(screen.getByRole('radio', { name: '5' }));
+    await user.type(screen.getByPlaceholderText('Tell us why? (optional)'), 'Loved it');
+    await user.click(screen.getByRole('button', { name: 'Send' }));
+
+    expect(onSubmit).toHaveBeenCalledWith({ score: 5, comment: 'Loved it' });
+    expect(screen.getByText('Thanks a lot! — Wallarm Team')).toBeInTheDocument();
+    expect(screen.queryByRole('radiogroup')).toBeNull();
+  });
+
+  it('submits with an undefined comment when left blank', async () => {
+    const user = userEvent.setup();
+    const onSubmit = vi.fn();
+    render(<FeedbackPulse open onOpenChange={() => {}} onSubmit={onSubmit} data-testid='fp' />);
+    await user.click(screen.getByRole('radio', { name: '2' }));
+    await user.click(screen.getByRole('button', { name: 'Send' }));
+    expect(onSubmit).toHaveBeenCalledWith({ score: 2, comment: undefined });
+  });
 });

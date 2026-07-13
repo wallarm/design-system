@@ -1,7 +1,7 @@
 import { type FC, type KeyboardEvent, type Ref, useEffect, useRef, useState } from 'react';
 import { Presence as ArkUiPresence } from '@ark-ui/react/presence';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
-import { X } from '../../icons';
+import { CircleCheck, X } from '../../icons';
 import type { TestableProps } from '../../utils/testId';
 import { Button } from '../Button';
 import { Textarea } from '../Textarea';
@@ -104,76 +104,97 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
-          <div className='flex items-start justify-between gap-8'>
-            <span className='flex-1 text-sm font-medium text-text-primary'>{question}</span>
-            <Button
-              variant='ghost'
-              color='neutral'
-              size='small'
-              aria-label='Close'
-              data-testid={tid('close')}
-              onClick={() => onOpenChange(false, 'dismiss')}
-            >
-              <X />
-            </Button>
-          </div>
-
-          <div className='flex flex-col gap-4'>
-            <div
-              ref={scaleRef}
-              role='radiogroup'
-              aria-label={question}
-              data-testid={tid('scale')}
-              className='flex gap-8'
-              onKeyDown={handleScaleKeyDown}
-            >
-              {SCORES.map((n) => (
-                <ToggleButton
-                  key={n}
-                  variant='outline'
+          {phase === 'submitted' ? (
+            <div className='relative z-10 flex items-center gap-8' aria-live='polite'>
+              <CircleCheck size='md' className='shrink-0 text-icon-success' />
+              <span className='flex-1 text-sm font-medium text-text-primary'>
+                {confirmationText}
+              </span>
+              <Button
+                variant='ghost'
+                color='neutral'
+                size='small'
+                aria-label='Close'
+                data-testid={tid('close')}
+                onClick={() => onOpenChange(false, 'submit')}
+              >
+                <X />
+              </Button>
+            </div>
+          ) : (
+            <>
+              <div className='flex items-start justify-between gap-8'>
+                <span className='flex-1 text-sm font-medium text-text-primary'>{question}</span>
+                <Button
+                  variant='ghost'
                   color='neutral'
                   size='small'
-                  fullWidth
-                  active={score === n}
-                  role='radio'
-                  aria-checked={score === n}
-                  aria-label={String(n)}
-                  data-score={n}
-                  data-testid={tid(`score-${n}`)}
-                  tabIndex={score === n || (score == null && n === 1) ? 0 : -1}
-                  onToggle={() => handleSelect(n)}
+                  aria-label='Close'
+                  data-testid={tid('close')}
+                  onClick={() => onOpenChange(false, 'dismiss')}
                 >
-                  {n}
-                </ToggleButton>
-              ))}
-            </div>
-            <div className='flex justify-between'>
-              <span className='text-sm font-normal text-text-secondary'>{scaleLabels[0]}</span>
-              <span className='text-sm font-normal text-text-secondary'>{scaleLabels[1]}</span>
-            </div>
-          </div>
-
-          {phase === 'feedback' && (
-            <>
-              {showComment && (
-                <Textarea
-                  placeholder='Tell us why? (optional)'
-                  value={comment}
-                  onChange={(e) => setComment(e.target.value)}
-                  data-testid={tid('comment')}
-                />
-              )}
-              <div className='flex justify-end'>
-                <Button
-                  variant='primary'
-                  color='brand'
-                  size='medium'
-                  data-testid={tid('send')}
-                  onClick={handleSend}
-                >
-                  Send
+                  <X />
                 </Button>
               </div>
+
+              <div className='flex flex-col gap-4'>
+                <div
+                  ref={scaleRef}
+                  role='radiogroup'
+                  aria-label={question}
+                  data-testid={tid('scale')}
+                  className='flex gap-8'
+                  onKeyDown={handleScaleKeyDown}
+                >
+                  {SCORES.map((n) => (
+                    <ToggleButton
+                      key={n}
+                      variant='outline'
+                      color='neutral'
+                      size='small'
+                      fullWidth
+                      active={score === n}
+                      role='radio'
+                      aria-checked={score === n}
+                      aria-label={String(n)}
+                      data-score={n}
+                      data-testid={tid(`score-${n}`)}
+                      tabIndex={score === n || (score == null && n === 1) ? 0 : -1}
+                      onToggle={() => handleSelect(n)}
+                    >
+                      {n}
+                    </ToggleButton>
+                  ))}
+                </div>
+                <div className='flex justify-between'>
+                  <span className='text-sm font-normal text-text-secondary'>{scaleLabels[0]}</span>
+                  <span className='text-sm font-normal text-text-secondary'>{scaleLabels[1]}</span>
+                </div>
+              </div>
+
+              {phase === 'feedback' && (
+                <>
+                  {showComment && (
+                    <Textarea
+                      placeholder='Tell us why? (optional)'
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      data-testid={tid('comment')}
+                    />
+                  )}
+                  <div className='flex justify-end'>
+                    <Button
+                      variant='primary'
+                      color='brand'
+                      size='medium'
+                      data-testid={tid('send')}
+                      onClick={handleSend}
+                    >
+                      Send
+                    </Button>
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>
