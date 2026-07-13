@@ -14,7 +14,14 @@ export default meta;
 export const Playground: StoryFn<typeof meta> = args => {
   const [open, setOpen] = useState(true);
   return (
-    <div style={{ minHeight: '60vh' }}>
+    <div
+      style={{
+        display: 'flex',
+        minHeight: '100vh',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
       <Button variant='outline' color='neutral' onClick={() => setOpen(true)}>
         Show FeedbackPulse
       </Button>
@@ -29,7 +36,10 @@ export const Playground: StoryFn<typeof meta> = args => {
   );
 };
 
-// Static phase story for visual snapshots.
+// Static phase story for visual snapshots. The wrapper keeps a node in #storybook-root
+// (FeedbackPulse itself portals to document.body) so the e2e story-loader can detect render.
 export const Rating: StoryFn<typeof meta> = () => (
-  <FeedbackPulse open onOpenChange={() => {}} onSubmit={() => {}} data-testid='feedback-pulse' />
+  <div style={{ minHeight: '100vh' }}>
+    <FeedbackPulse open onOpenChange={() => {}} onSubmit={() => {}} data-testid='feedback-pulse' />
+  </div>
 );
