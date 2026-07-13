@@ -55,7 +55,7 @@ import { InlineEditTextarea } from './InlineEditTextarea';
 import { InlineEditTime } from './InlineEditTime';
 
 const meta = {
-  title: 'Data Display/InlineEdit',
+  title: 'Inputs/InlineEdit',
   component: InlineEdit,
   subcomponents: {
     InlineEditPreview,
