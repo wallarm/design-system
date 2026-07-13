@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const story = createStoryHelper('overlay-feedback-pulse', ['Playground', 'Rating'] as const);
+const story = createStoryHelper('overlay-feedbackpulse', ['Playground', 'Rating'] as const);
 
 const pickAndSend = async (page: Page) => {
   await page.getByRole('radio', { name: '4' }).click();
