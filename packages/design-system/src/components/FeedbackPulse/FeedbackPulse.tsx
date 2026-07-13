@@ -48,6 +48,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
   const [comment, setComment] = useState('');
   const [paused, setPaused] = useState(false);
   const scaleRef = useRef<HTMLDivElement>(null);
+  const submittedCloseRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (open) {
@@ -57,6 +58,12 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
       setPaused(false);
     }
   }, [open]);
+
+  useEffect(() => {
+    if (phase === 'submitted') {
+      submittedCloseRef.current?.focus();
+    }
+  }, [phase]);
 
   const tid = (slot: string) => (testId ? `${testId}--${slot}` : undefined);
 
@@ -119,6 +126,7 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
                   {confirmationText}
                 </span>
                 <Button
+                  ref={submittedCloseRef}
                   variant='ghost'
                   color='neutral'
                   size='small'

@@ -122,6 +122,16 @@ describe('FeedbackPulse', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false, 'submit');
   });
 
+  it('moves focus to the Submitted Close button on entering the Submitted phase', async () => {
+    const user = userEvent.setup();
+    render(<FeedbackPulse open onOpenChange={() => {}} onSubmit={() => {}} data-testid='fp' />);
+
+    await user.click(screen.getByRole('radio', { name: '4' }));
+    await user.click(screen.getByRole('button', { name: 'Send' }));
+
+    expect(screen.getByRole('button', { name: 'Close' })).toHaveFocus();
+  });
+
   it('auto-dismisses the Submitted phase with reason "submit" after dismissDuration', () => {
     vi.useFakeTimers();
     const onOpenChange = vi.fn();
