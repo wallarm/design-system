@@ -50,4 +50,19 @@ describe('Size variants', () => {
     render(<Input data-testid='input' size='small' />);
     expect(screen.getByTestId('input').className).toContain('h-24');
   });
+
+  it('renders the inline-edit (28px) height', () => {
+    render(<Input data-testid='input' size='inline-edit' />);
+    expect(screen.getByTestId('input').className).toContain('h-28');
+  });
+});
+
+describe('Placeholder typography', () => {
+  it('gives the placeholder an explicit line-height matching text-sm', () => {
+    // Regression: `line-height` isn't reliably inherited onto `::placeholder`
+    // (Chrome resolves it to the UA-default `normal`, not text-sm's 20px),
+    // rendering placeholder text a couple pixels lower than typed text.
+    render(<Input data-testid='input' placeholder='Enter name' />);
+    expect(screen.getByTestId('input').className).toContain('placeholder:text-sm');
+  });
 });

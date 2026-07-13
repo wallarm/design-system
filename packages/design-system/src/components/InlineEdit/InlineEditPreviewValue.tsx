@@ -38,7 +38,12 @@ export const InlineEditPreviewValue: FC<InlineEditPreviewValueProps> = ({
       data-slot='inline-edit-preview-value'
       className={cn(
         'min-w-0 flex-1',
-        lineClamp ? LINE_CLAMP_CLASS[lineClamp] : 'truncate',
+        // In a horizontal-orientation Attribute, AttributeValue's own
+        // `truncate` sets `white-space: nowrap`, which is inherited and
+        // would otherwise collapse a clamped value to one line regardless
+        // of `line-clamp-N` — override it back to wrapping here so the
+        // clamp actually spans multiple lines.
+        lineClamp ? cn(LINE_CLAMP_CLASS[lineClamp], 'whitespace-normal') : 'truncate',
         status === 'loading' && 'opacity-50',
       )}
     >

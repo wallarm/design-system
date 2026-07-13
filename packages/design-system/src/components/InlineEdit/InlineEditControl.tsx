@@ -16,7 +16,35 @@ import {
   useInlineEdit,
 } from './InlineEditContext';
 
-const FOCUSABLE_SELECTOR = 'input, textarea, select, button, [tabindex]:not([tabindex="-1"])';
+// `:not([tabindex="-1"])` must qualify every clause individually, not just
+// the generic `[tabindex]` catch-all — Ark UI's Select renders a hidden,
+// `aria-hidden`, `tabindex="-1"` native `<select>` mirror (for native form
+// submission) that sits earlier in DOM order than the real trigger button.
+// An unqualified bare `select` clause matches it first, silently focusing
+// an invisible element instead of the actual editor.
+const FOCUSABLE_SELECTOR =
+  'input:not([tabindex="-1"]), textarea:not([tabindex="-1"]), select:not([tabindex="-1"]), button:not([tabindex="-1"]), [tabindex]:not([tabindex="-1"])';
+
+// InlineEditSelect opens via `defaultOpen`, which initializes Ark's Select
+// machine directly in the `open` state rather than transitioning into it —
+// so `setInitialFocus` (a transition action, tied to events like
+// TRIGGER.CLICK) never runs, and nothing ever focuses the listbox on its
+// own. Left to FOCUSABLE_SELECTOR, focus lands on the trigger button
+// instead (earlier in DOM order) — which silently breaks Arrow-key
+// navigation, since the trigger's own key handler always sends
+// TRIGGER.ARROW_DOWN, and the machine's `open` state has no transition for
+// that event, only for CONTENT.ARROW_DOWN (dispatched by the listbox's own
+// handler). SelectContent renders through a portal (verified: not a DOM
+// descendant of this component at all, floating content typically mounts
+// under <body>), so it can't be found by scoping a querySelector to this
+// component's own subtree — resolve it via the trigger's `aria-controls`,
+// the same id/aria-controls pairing screen readers rely on.
+function findOpenListbox(focusable: HTMLElement): HTMLElement | null {
+  const controlsId = focusable.getAttribute('aria-controls');
+  if (!controlsId) return null;
+  const controlled = document.getElementById(controlsId);
+  return controlled?.getAttribute('role') === 'listbox' ? controlled : null;
+}
 
 export interface InlineEditControlProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   ref?: Ref<HTMLDivElement>;
@@ -49,15 +77,18 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
   const selectOnFocusRef = useRef(selectOnFocus);
   selectOnFocusRef.current = selectOnFocus;
 
-  // Focus the first focusable descendant each time editing begins.
+  // Focus the first focusable descendant each time editing begins — unless
+  // it controls an already-open listbox (see findOpenListbox above), which
+  // takes focus instead.
   // Depends on `editing` so it re-runs whenever the user clicks to edit,
   // not just on the initial component mount (when editing may be false).
   useEffect(() => {
     if (!editing) return;
     const node = divRef.current;
     if (!node) return;
-    const focusable = node.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
-    if (!focusable) return;
+    const firstFocusable = node.querySelector<HTMLElement>(FOCUSABLE_SELECTOR);
+    if (!firstFocusable) return;
+    const focusable = findOpenListbox(firstFocusable) ?? firstFocusable;
     focusable.focus();
     if (
       selectOnFocusRef.current &&
@@ -124,11 +155,10 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
       onBlur={handleBlur}
       className={cn(
         'w-full min-w-0',
-        // Matches InlineEditPreview's own -ml-7: the hover-row hit target
-        // (and, here, the composed controls' own padding, per the rules
-        // below) extends 7px further left than surrounding content, in both
-        // modes, so toggling preview <-> edit doesn't shift anything.
-        '-ml-7',
+        // The -7px left offset that matches InlineEditPreview's hit target
+        // comes from AttributeValue (InlineEdit is only ever hosted inside
+        // it — see AttributeValue's InlineEdit hosting seam), not from this
+        // component, so toggling preview <-> edit doesn't shift anything.
         // Horizontal padding matches InlineEditPreview's 6px (px-6) on both
         // sides so toggling between preview and edit mode causes no
         // horizontal text jump. Descendant selectors, not a shared prop:

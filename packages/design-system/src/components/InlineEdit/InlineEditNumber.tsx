@@ -16,7 +16,7 @@ export type InlineEditNumberProps = Omit<NumberInputProps, 'value' | 'onValueCha
  */
 
 export const InlineEditNumber: FC<InlineEditNumberProps> = ({
-  size = 'small',
+  size = 'inline-edit',
   'data-testid': testIdProp,
   ...props
 }) => {

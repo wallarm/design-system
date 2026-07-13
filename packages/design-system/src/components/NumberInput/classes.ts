@@ -28,12 +28,13 @@ export const numberInputRootVariants = cva(
     'data-disabled:*:cursor-not-allowed',
   ),
   {
-    // 24/32/36px scale, matching Input/Textarea/Select/DateInput/TimeInput.
+    // 24/28/32/36px scale, matching Input/Textarea/Select/DateInput/TimeInput.
     variants: {
       size: {
         default: 'h-36',
         medium: 'h-32',
         small: 'h-24',
+        'inline-edit': 'h-28',
       },
     },
     defaultVariants: {
@@ -55,6 +56,7 @@ export const numberInputFieldVariants = cva(
         default: 'px-12 py-8',
         medium: 'px-12 py-6',
         small: 'px-12 py-2',
+        'inline-edit': 'px-12 py-4',
       },
     },
     defaultVariants: {
@@ -75,6 +77,7 @@ export const numberInputControlVariants = cva(
         default: 'px-4 py-2 [&_svg]:icon-sm',
         medium: 'px-3 py-1 [&_svg]:icon-sm',
         small: 'px-2 py-0 [&_svg]:icon-xs',
+        'inline-edit': 'px-2 py-0 [&_svg]:icon-xs',
       },
     },
     defaultVariants: {
@@ -99,6 +102,7 @@ export const numberInputTriggerVariants = cva(
         default: 'w-16 h-14 px-2 py-1',
         medium: 'w-14 h-12 px-2 py-1',
         small: 'w-12 h-10 px-1 py-0',
+        'inline-edit': 'w-12 h-11 px-1 py-0',
       },
     },
     defaultVariants: {

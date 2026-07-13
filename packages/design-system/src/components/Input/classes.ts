@@ -5,6 +5,12 @@ export const inputVariants = cva(
   cn(
     'flex w-full px-12 rounded-8 border bg-component-input-bg',
     'font-sans text-sm text-text-primary placeholder:text-text-secondary',
+    // `line-height` isn't reliably inherited onto `::placeholder` across
+    // browsers (Chrome resolves it to the UA-default `normal`, not the
+    // element's own text-sm/20px) — reapply `text-sm` (font-size + line-
+    // height together) scoped to the placeholder so it centers identically
+    // to real typed text instead of sitting a couple pixels lower.
+    'placeholder:text-sm',
     'shadow-xs transition-[color,border,box-shadow]',
     'focus-visible:outline-none focus-visible:ring-3',
 
@@ -32,13 +38,14 @@ export const inputVariants = cva(
           'focus-visible:ring-focus-primary',
         ),
       },
-      // 24/32/36px scale, matching InputGroup/Textarea/DateInput/TimeInput.
+      // 24/28/32/36px scale, matching InputGroup/Textarea/DateInput/TimeInput.
       // Vertical padding is (height - 20) / 2 so the text-sm/20px-line-height
       // value stays vertically centered at every size.
       size: {
         default: 'h-36 py-8',
         medium: 'h-32 py-6',
         small: 'h-24 py-2',
+        'inline-edit': 'h-28 py-4',
       },
     },
     defaultVariants: {

@@ -132,4 +132,10 @@ describe('Size variants (confirms InputGroup scaling, no TimeInput code change)'
     const group = screen.getByTestId('time-input').querySelector('[data-slot="input-group"]');
     expect(group).toHaveClass('h-24');
   });
+
+  it('renders the inline-edit (28px) InputGroup height', () => {
+    render(<TimeInput data-testid='time-input' size='inline-edit' />);
+    const group = screen.getByTestId('time-input').querySelector('[data-slot="input-group"]');
+    expect(group).toHaveClass('h-28');
+  });
 });

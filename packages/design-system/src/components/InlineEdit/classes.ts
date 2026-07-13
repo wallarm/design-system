@@ -3,25 +3,24 @@ import { cva } from 'class-variance-authority';
 export const inlineEditPreviewVariants = cva(
   // Typography matches Input's `size='small'` (text-sm) so toggling into
   // edit mode causes no visual jump. Vertical padding is per-variant below,
-  // since it must match whichever control's own `size='small'` this row
-  // toggles into (Input's is 2px; Textarea's is 0).
-  // -ml-7 pulls the hover/pressed background and hit target further left
-  // than surrounding content, while the left px-6 keeps the text itself
-  // readably inset from that extended edge (the "padded hover row,
-  // compensated margin" pattern — the two values are deliberately
-  // asymmetric, not a cancel-out pair).
-  'group flex w-full min-w-0 gap-4 rounded-8 border border-transparent px-6 -ml-7 font-sans text-sm text-text-primary transition-colors',
+  // since it must match whichever control's own `size='inline-edit'` tier
+  // this row toggles into (Input's is py-4/h-28; Textarea's is py-4, no
+  // fixed height).
+  // px-6 keeps the text readably inset from the extended hover hit target
+  // that AttributeValue applies via -ml-7 on this slot (see AttributeValue's
+  // InlineEdit hosting seam) — deliberately asymmetric, not a cancel-out pair.
+  'group flex w-full min-w-0 gap-4 rounded-8 border border-transparent px-6 font-sans text-sm text-text-primary transition-colors',
   {
     variants: {
       // Multi-line values (Textarea) align the icon to the top, use
-      // Textarea's `size='small'` py-0, and grow with content (lineClamp).
+      // Textarea's `size='inline-edit'` py-4, and grow with content (lineClamp).
       // Single-line values (Input/NumberInput/Select/Date/Time) center the
-      // icon, use Input's `size='small'` py-2, and fix the row at Input's
-      // small 24px height (border-box: 2px padding + 1px border on each
-      // side + the 20px text-sm line-height above = 24px total).
+      // icon, use Input's `size='inline-edit'` py-4, and fix the row at Input's
+      // inline-edit 28px height (border-box: 4px padding + 1px border on each
+      // side + the 20px text-sm line-height above = 28px total).
       multiline: {
-        true: 'items-start py-0',
-        false: 'items-center py-2 h-24',
+        true: 'items-start py-4',
+        false: 'items-center py-4 h-28',
       },
       activatable: {
         true: '',

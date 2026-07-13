@@ -187,6 +187,15 @@ describe('Size variants', () => {
     expect(screen.getByTestId('trigger').className).toContain('h-24');
   });
 
+  it('SelectButton renders the inline-edit (28px) height', () => {
+    render(
+      <Select collection={collection} data-testid='select'>
+        <SelectButton data-testid='trigger' size='inline-edit' />
+      </Select>,
+    );
+    expect(screen.getByTestId('trigger').className).toContain('h-28');
+  });
+
   it('SelectInput defaults to the default (36px) height with no size prop', () => {
     render(
       <Select collection={collection} multiple data-testid='select'>
@@ -228,6 +237,25 @@ describe('Size variants', () => {
     render(
       <Select collection={collection} multiple defaultValue={['react']} data-testid='select'>
         <SelectInput data-testid='trigger' size='medium' />
+      </Select>,
+    );
+    const tag = document.querySelector('[data-slot="tag"]');
+    expect(tag?.className).toContain('h-24');
+  });
+
+  it('SelectInput renders the inline-edit (28px) height', () => {
+    render(
+      <Select collection={collection} multiple data-testid='select'>
+        <SelectInput data-testid='trigger' size='inline-edit' />
+      </Select>,
+    );
+    expect(screen.getByTestId('trigger').className).toContain('h-28');
+  });
+
+  it('SelectInput keeps its item Tags at large for inline-edit size', () => {
+    render(
+      <Select collection={collection} multiple defaultValue={['react']} data-testid='select'>
+        <SelectInput data-testid='trigger' size='inline-edit' />
       </Select>,
     );
     const tag = document.querySelector('[data-slot="tag"]');

@@ -19,7 +19,7 @@ export const InlineEditTime: FC<InlineEditTimeProps> = ({
   granularity = 'minute',
   showTimeDropdown = true,
   showIcon = false,
-  size = 'small',
+  size = 'inline-edit',
   ...props
 }) => {
   const testId = useTestId('input', testIdProp);

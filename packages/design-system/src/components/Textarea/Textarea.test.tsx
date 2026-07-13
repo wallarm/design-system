@@ -181,4 +181,10 @@ describe('Size variants', () => {
     render(<Textarea data-testid='textarea' />);
     expect(screen.getByTestId('textarea').className).toContain('min-h-[76px]');
   });
+
+  it('renders the inline-edit size at 4px padding, 64px min-height', () => {
+    render(<Textarea data-testid='textarea' size='inline-edit' />);
+    expect(screen.getByTestId('textarea').className).toContain('py-4');
+    expect(screen.getByTestId('textarea').className).toContain('min-h-[64px]');
+  });
 });

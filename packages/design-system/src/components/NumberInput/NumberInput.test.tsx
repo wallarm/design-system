@@ -139,4 +139,9 @@ describe('Size variants', () => {
     render(<NumberInput data-testid='number-input' size='small' />);
     expect(screen.getByTestId('number-input')).toHaveClass('h-24');
   });
+
+  it('renders the inline-edit (28px) height', () => {
+    render(<NumberInput data-testid='number-input' size='inline-edit' />);
+    expect(screen.getByTestId('number-input')).toHaveClass('h-28');
+  });
 });

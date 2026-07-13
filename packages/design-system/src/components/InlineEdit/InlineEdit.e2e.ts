@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const inlineEditStory = createStoryHelper('data-display-inlineedit', [
+const inlineEditStory = createStoryHelper('inputs-inlineedit', [
   'Text Editor',
   'Number Editor',
   'Textarea Editor',
@@ -14,7 +14,6 @@ const inlineEditStory = createStoryHelper('data-display-inlineedit', [
   'States',
   'Async',
   'Non Editable',
-  'Custom Editor',
   'Confirm Commit',
 ] as const);
 
@@ -203,15 +202,6 @@ test.describe('Component: InlineEdit', () => {
       await inlineEditStory.goto(page, 'Non Editable');
       await page.getByTestId('disabled--preview').click();
       await expect(page.getByTestId('disabled--input')).toHaveCount(0);
-    });
-
-    test('Should commit through a custom render-prop editor', async ({ page }) => {
-      await inlineEditStory.goto(page, 'Custom Editor');
-      await page.getByTestId('custom--preview').click();
-      const input = page.getByRole('textbox', { name: 'Custom' });
-      await input.fill('payments api');
-      await input.press('Enter');
-      await expect(page.getByTestId('custom--preview')).toHaveText(/PAYMENTS API/);
     });
 
     test('Should keep editing with the draft when the confirmation is declined', async ({

@@ -106,6 +106,19 @@ describe('InlineEditSelect', () => {
     expect(onCommit).toHaveBeenCalledWith(['admin']);
   });
 
+  it('seeds the highlighted item to the current selection so Arrow keys have somewhere to move from', async () => {
+    // Regression: `defaultOpen` initializes Ark's Select machine directly in
+    // the `open` state rather than transitioning into it, so
+    // `highlightFirstSelectedItem` (a transition action) never runs and no
+    // item is highlighted at all — Arrow keys had no valid starting index
+    // to move from (verified live: comparing against a standalone Select
+    // opened via click, which highlights the selected item immediately).
+    render(<Harness />);
+    const listbox = await screen.findByRole('listbox');
+    const editor = within(listbox).getByText('Editor', ignoreHiddenSelectOption);
+    expect(editor.closest('[data-highlighted]')).toBeInTheDocument();
+  });
+
   it('normalizes a plain string committed value into an array draft', async () => {
     render(<Harness value='editor' />);
     const listbox = await screen.findByRole('listbox');

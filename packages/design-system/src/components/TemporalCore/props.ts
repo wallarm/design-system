@@ -4,7 +4,7 @@ import type { TestableProps } from '../../utils/testId';
 /**
  * Visual size of a temporal input. Mirrors InputGroup sizes.
  */
-export type TemporalInputSize = 'default' | 'medium' | 'small';
+export type TemporalInputSize = 'default' | 'medium' | 'small' | 'inline-edit';
 
 /**
  * Props shared by every temporal input root wrapper — DateInput, TimeInput,

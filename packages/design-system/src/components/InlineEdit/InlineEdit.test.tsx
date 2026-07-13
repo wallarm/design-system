@@ -4,6 +4,7 @@ import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
 import { useInlineEdit } from './InlineEditContext';
+import { InlineEditPreview } from './InlineEditPreview';
 
 // Harness exposes context actions as buttons + text.
 function Harness() {
@@ -502,5 +503,25 @@ describe('InlineEdit onBeforeValueCommit', () => {
       await Promise.resolve();
     });
     expect(onEditChange).toHaveBeenCalledWith(false);
+  });
+});
+
+describe('InlineEditPreview sizing', () => {
+  it('sizes the single-line preview row to match the inline-edit control height (28px)', () => {
+    render(
+      <InlineEdit defaultValue='ab' data-testid='attr'>
+        <InlineEditPreview>ab</InlineEditPreview>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('attr--preview')).toHaveClass('h-28');
+  });
+
+  it('matches the multiline preview row padding to the Textarea inline-edit tier (py-4)', () => {
+    render(
+      <InlineEdit defaultValue='ab' data-testid='attr'>
+        <InlineEditPreview lineClamp={2}>ab</InlineEditPreview>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('attr--preview')).toHaveClass('py-4');
   });
 });

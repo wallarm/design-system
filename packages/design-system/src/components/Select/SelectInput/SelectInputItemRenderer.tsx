@@ -6,18 +6,24 @@ import type { SelectDataItem } from '../types';
 type SelectInputItemRendererProps = {
   item: SelectDataItem;
   /** `SelectInput`'s own size — chips scale down with it, see `TAG_SIZE_BY_SELECT_SIZE`. */
-  size?: 'small' | 'medium' | 'default';
+  size?: 'small' | 'medium' | 'default' | 'inline-edit';
 };
 
 // Tag's own scale (small=16px/medium=20px/large=24px) is unrelated to
-// Select's (small=24px/medium=32px/default=36px) — at Select's `small`
-// (24px container), a `large` (24px) tag leaves no margin, so it steps down
-// to `medium` (20px). Select's `medium`/`default` containers (32px/36px)
-// already fit a `large` tag with margin to spare, so those stay unchanged.
-export const TAG_SIZE_BY_SELECT_SIZE: Record<'small' | 'medium' | 'default', TagProps['size']> = {
+// Select's (small=24px/medium=32px/default=36px/inline-edit=28px) — at
+// Select's `small` (24px container), a `large` (24px) tag leaves no margin,
+// so it steps down to `medium` (20px). Select's `medium`/`default`
+// containers (32px/36px) already fit a `large` tag with margin to spare, so
+// those stay unchanged. `inline-edit` (28px) has 4px of margin budget for a
+// 24px tag, so it also stays at `large`.
+export const TAG_SIZE_BY_SELECT_SIZE: Record<
+  'small' | 'medium' | 'default' | 'inline-edit',
+  TagProps['size']
+> = {
   small: 'medium',
   medium: 'large',
   default: 'large',
+  'inline-edit': 'large',
 };
 
 export const SelectInputItemRenderer: FC<SelectInputItemRendererProps> = ({
