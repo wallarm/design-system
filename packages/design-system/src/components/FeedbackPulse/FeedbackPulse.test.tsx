@@ -87,4 +87,29 @@ describe('FeedbackPulse', () => {
     await user.click(screen.getByRole('button', { name: 'Send' }));
     expect(onSubmit).toHaveBeenCalledWith({ score: 2, comment: undefined });
   });
+
+  it('closes with reason "dismiss" from the Rating close button', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(<FeedbackPulse open onOpenChange={onOpenChange} onSubmit={() => {}} data-testid='fp' />);
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(onOpenChange).toHaveBeenCalledWith(false, 'dismiss');
+  });
+
+  it('closes with reason "dismiss" on Escape', () => {
+    const onOpenChange = vi.fn();
+    render(<FeedbackPulse open onOpenChange={onOpenChange} onSubmit={() => {}} data-testid='fp' />);
+    fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+    expect(onOpenChange).toHaveBeenCalledWith(false, 'dismiss');
+  });
+
+  it('closes with reason "submit" from the Submitted close button', async () => {
+    const user = userEvent.setup();
+    const onOpenChange = vi.fn();
+    render(<FeedbackPulse open onOpenChange={onOpenChange} onSubmit={() => {}} data-testid='fp' />);
+    await user.click(screen.getByRole('radio', { name: '3' }));
+    await user.click(screen.getByRole('button', { name: 'Send' }));
+    await user.click(screen.getByRole('button', { name: 'Close' }));
+    expect(onOpenChange).toHaveBeenCalledWith(false, 'submit');
+  });
 });
