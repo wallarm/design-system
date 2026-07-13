@@ -269,8 +269,8 @@ export {
 } from './components/EmptyState';
 export {
   FeedbackPulse,
-  type FeedbackPulseProps,
   type FeedbackPulseCloseReason,
+  type FeedbackPulseProps,
 } from './components/FeedbackPulse';
 export {
   Field,
