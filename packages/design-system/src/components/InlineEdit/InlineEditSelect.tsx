@@ -83,6 +83,15 @@ export const InlineEditSelect = ({
     <Select
       data-testid={testId}
       defaultOpen
+      // `defaultOpen` skips the normal open interaction (click/keydown) that
+      // is what seeds Zag's initial highlighted index — left unset, arrow
+      // keys have nothing to move from and the list never highlights
+      // anything (verified: standalone Select opened via click highlights
+      // the selected item and Arrow keys move it; InlineEditSelect's
+      // defaultOpen left every item's data-highlighted unset even after
+      // Arrow presses). Seed it explicitly to the current selection, or the
+      // collection's first item when nothing is selected yet.
+      defaultHighlightedValue={selected[0] ?? resolvedCollection.firstValue}
       collection={resolvedCollection}
       multiple={multiple}
       value={selected}

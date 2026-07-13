@@ -97,6 +97,43 @@ describe('InlineEditControl', () => {
     expect(screen.getByTestId('attr--control')).toBeInTheDocument();
   });
 
+  it('skips a hidden tabindex=-1 mirror element when choosing what to focus', () => {
+    // Regression: Ark UI's Select renders a hidden, aria-hidden,
+    // tabindex="-1" native <select> mirror (for native form submission)
+    // earlier in DOM order than the real trigger. FOCUSABLE_SELECTOR's bare
+    // `select` clause matched it first, silently focusing an invisible
+    // element instead of the actual editor.
+    render(
+      <InlineEdit defaultEdit data-testid='attr'>
+        <InlineEditControl>
+          <select aria-hidden='true' tabIndex={-1} data-testid='hidden-mirror' />
+          <input data-testid='editor' defaultValue='hello' />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('editor')).toHaveFocus();
+  });
+
+  it('focuses an already-open listbox instead of its trigger when one is present', () => {
+    // Regression: InlineEditSelect opens via `defaultOpen`, which skips the
+    // transition (TRIGGER.CLICK etc.) that would normally move focus onto
+    // the listbox itself. Left focused on the trigger, Arrow keys dispatch
+    // TRIGGER.ARROW_DOWN, which Select's `open` state doesn't handle (only
+    // CONTENT.ARROW_DOWN, sent by the listbox's own key handler) — so
+    // keyboard navigation silently did nothing once already open.
+    render(
+      <InlineEdit defaultEdit data-testid='attr'>
+        <InlineEditControl>
+          <button type='button' aria-controls='my-listbox' data-testid='trigger'>
+            Open
+          </button>
+          <div role='listbox' id='my-listbox' tabIndex={0} data-testid='listbox' />
+        </InlineEditControl>
+      </InlineEdit>,
+    );
+    expect(screen.getByTestId('listbox')).toHaveFocus();
+  });
+
   it('carries the descendant-selector rules that align composed controls with InlineEditPreview (jsdom cannot compute CSS specificity — see live verification in the component doc comment)', () => {
     render(
       <InlineEdit defaultEdit defaultValue='v' data-testid='attr'>
