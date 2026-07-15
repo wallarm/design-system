@@ -279,7 +279,7 @@ export const Scrollable: StoryFn<DialogProps> = () => {
         </DialogHeader>
 
         <DialogBody>
-          <div className='flex flex-col gap-16 py-12'>
+          <div className='flex flex-col gap-16'>
             {Array.from({ length: 20 }).map((_, i) => (
               <ContentPlaceholder key={i} height={100} />
             ))}
@@ -324,7 +324,7 @@ export const WithInputAtEdge: StoryFn<DialogProps> = () => {
               Cancel
             </Button>
           </DialogClose>
-          <Button variant='primary' color='danger' size='large'>
+          <Button variant='primary' color='destructive' size='large'>
             Delete
           </Button>
         </DialogFooter>
@@ -347,12 +347,13 @@ export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
         </DialogHeader>
 
         <DialogBody>
-          <div className='flex flex-col gap-16 py-12'>
+          <div className='flex flex-col gap-16'>
             {Array.from({ length: 10 }).map((_, i) => (
               <ContentPlaceholder key={i} height={100} />
             ))}
+
+            <Input placeholder='Type your email to confirm' data-testid='edge-input' />
           </div>
-          <Input placeholder='Type your email to confirm' data-testid='edge-input' />
         </DialogBody>
 
         <DialogFooter>
@@ -361,7 +362,7 @@ export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
               Cancel
             </Button>
           </DialogClose>
-          <Button variant='primary' color='danger' size='large'>
+          <Button variant='primary' color='destructive' size='large'>
             Delete
           </Button>
         </DialogFooter>
