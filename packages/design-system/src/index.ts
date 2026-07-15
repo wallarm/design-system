@@ -268,6 +268,11 @@ export {
   EmptyStateTitle,
 } from './components/EmptyState';
 export {
+  FeedbackPulse,
+  type FeedbackPulseCloseReason,
+  type FeedbackPulseProps,
+} from './components/FeedbackPulse';
+export {
   Field,
   FieldContent,
   FieldDescription,
