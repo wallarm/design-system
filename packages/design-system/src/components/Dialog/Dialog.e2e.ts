@@ -91,18 +91,6 @@ test.describe('Component: Dialog', () => {
       await focusViaKeyboard(page, input);
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
-
-    test('Should render focus ring fully around an input scrolled to the body edge', async ({
-      page,
-    }) => {
-      await dialogStory.goto(page, 'With Input At Edge Scrollable');
-      await page.getByRole('button', { name: 'Open Scrollable Dialog with Edge Input' }).click();
-      const input = page.getByTestId('edge-input');
-      await input.scrollIntoViewIfNeeded();
-
-      await focusViaKeyboard(page, input);
-      await expect(page).toHaveScreenshot({ animations: 'disabled' });
-    });
   });
 
   test.describe('Interactions', () => {

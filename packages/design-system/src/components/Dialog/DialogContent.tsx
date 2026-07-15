@@ -61,14 +61,6 @@ export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
             '[&:not(:has([data-part=viewport][data-overflow-y])):has([data-slot=drawer-footer])_[data-slot=drawer-scroll-area-content]]:pb-8',
             '[&:not(:has([data-part=viewport][data-overflow-y]))_[data-slot=drawer-footer]]:pt-8',
             '[&:has([data-part=viewport][data-overflow-y])_[data-slot=drawer-footer]]:pt-16',
-            //
-            // Remaining edge case: an input scrolled flush to the true bottom while
-            // overflowing has no padding buffer available (see above), so its ring
-            // would still clip there. `outline` isn't clipped by ancestor overflow
-            // at all, so swap the ring for one while overflowing - only there, since
-            // padding alone already fully covers the non-overflowing case.
-            '[&:has([data-part=viewport][data-overflow-y])_[data-slot=input]:focus-visible]:[--tw-ring-shadow:0_0_#0000]',
-            '[&:has([data-part=viewport][data-overflow-y])_[data-slot=input]:focus-visible]:[outline:3px_solid_var(--tw-ring-color)]',
           )}
           style={{ width }}
         >
