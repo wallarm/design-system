@@ -146,13 +146,12 @@ describe('State persistence', () => {
     const reactOption = await screen.findByTestId('option-react');
     await userEvent.click(reactOption);
 
-    // Re-open and verify the option still has its analytics-id. The default
-    // findByTestId timeout (1000ms) can lose the race against the
-    // close→reopen remount cycle (zag-js tears the option list down on
-    // close via its presence/exit-enter machine, then rebuilds it here)
-    // under CI-runner load, so give it more headroom than the first query.
-    await userEvent.click(screen.getByTestId('trigger'));
-    const reactOptionAfter = await screen.findByTestId('option-react', {}, { timeout: 5000 });
+    // Ark UI's Select machine defaults closeOnSelect to `!multiple`, so a
+    // multi-select list stays open after picking a value — no
+    // close/reopen cycle happens here. Query the still-open list directly;
+    // an extra trigger click would toggle it *closed* instead of
+    // "reopening" it, since it was never closed to begin with.
+    const reactOptionAfter = await screen.findByTestId('option-react');
     expect(reactOptionAfter).toHaveAttribute('data-analytics-id', 'FRAMEWORK_REACT');
   });
 });
