@@ -114,6 +114,19 @@ describe('FeedbackPulse', () => {
     expect(onOpenChange).toHaveBeenCalledWith(false, 'dismiss');
   });
 
+  it('closes with reason "dismiss" on Escape even when focus is outside the card', () => {
+    const onOpenChange = vi.fn();
+    render(
+      <>
+        <button type='button'>Elsewhere</button>
+        <FeedbackPulse open onOpenChange={onOpenChange} onSubmit={() => {}} data-testid='fp' />
+      </>,
+    );
+    screen.getByRole('button', { name: 'Elsewhere' }).focus();
+    fireEvent.keyDown(document, { key: 'Escape' });
+    expect(onOpenChange).toHaveBeenCalledWith(false, 'dismiss');
+  });
+
   it('closes with reason "submit" from the Submitted close button', async () => {
     const user = userEvent.setup();
     const onOpenChange = vi.fn();

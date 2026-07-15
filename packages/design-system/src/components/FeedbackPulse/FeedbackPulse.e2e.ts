@@ -49,5 +49,19 @@ test.describe('Component: FeedbackPulse', () => {
       await page.getByRole('radiogroup').press('ArrowRight');
       await expect(page.getByRole('radio', { name: '4' })).toHaveAttribute('aria-checked', 'true');
     });
+
+    test('Should be dismissible via the Escape key even when focus stays outside the card', async ({
+      page,
+    }) => {
+      await story.goto(page, 'Playground');
+      const trigger = page.getByRole('button', { name: 'Show FeedbackPulse' });
+      await trigger.click();
+      await expect(page.getByRole('dialog')).toBeVisible();
+      await expect(trigger).toBeFocused();
+
+      await page.keyboard.press('Escape');
+
+      await expect(page.getByRole('dialog')).toBeHidden();
+    });
   });
 });

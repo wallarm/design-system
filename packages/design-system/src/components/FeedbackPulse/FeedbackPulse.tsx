@@ -169,12 +169,17 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
     setPhase('submitted');
   };
 
-  const handleRootKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    if (e.key === 'Escape' && phase !== 'submitted') {
-      e.stopPropagation();
-      onOpenChange(false, 'dismiss');
-    }
-  };
+  // Document-level (not scoped to the card's onKeyDown) because the card never steals focus on
+  // open — a toast-like surface shouldn't yank focus from what the user was doing — so Escape
+  // must be caught regardless of where focus currently sits on the page.
+  useEffect(() => {
+    if (!open || phase === 'submitted') return;
+    const handleEscape = (e: globalThis.KeyboardEvent) => {
+      if (e.key === 'Escape') onOpenChange(false, 'dismiss');
+    };
+    document.addEventListener('keydown', handleEscape);
+    return () => document.removeEventListener('keydown', handleEscape);
+  }, [open, phase, onOpenChange]);
 
   return (
     <ArkUiPortal>
@@ -186,7 +191,6 @@ export const FeedbackPulse: FC<FeedbackPulseProps> = ({
           role='dialog'
           aria-label={question}
           className={feedbackPulseVariants()}
-          onKeyDown={handleRootKeyDown}
           onMouseEnter={() => setPaused(true)}
           onMouseLeave={() => setPaused(false)}
         >
