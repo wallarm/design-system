@@ -13,6 +13,8 @@ const dialogStory = createStoryHelper('overlay-dialog', [
   'No Overlay',
   'With Nested',
   'With Tabs',
+  'With Input At Edge',
+  'With Input At Edge Scrollable',
 ] as const);
 
 const getDialogContent = (page: Page) => page.getByTestId('dialog--content');
@@ -23,6 +25,16 @@ const getDialogCloseButton = (page: Page) =>
 const openDialog = async (page: Page) => {
   await getDialogTrigger(page).click();
   await expect(getDialogContent(page)).toBeVisible();
+};
+
+// `.focus()` doesn't trigger `:focus-visible` in Chromium - only keyboard-driven
+// focus changes do, which is what actually reveals a focus ring/outline visually.
+const focusViaKeyboard = async (page: Page, locator: ReturnType<Page['locator']>) => {
+  for (let i = 0; i < 10; i += 1) {
+    if (await locator.evaluate(el => el === document.activeElement)) return;
+    await page.keyboard.press('Tab');
+  }
+  await expect(locator).toBeFocused();
 };
 
 test.describe('Component: Dialog', () => {
@@ -65,6 +77,18 @@ test.describe('Component: Dialog', () => {
       await dialogStory.goto(page, 'With Tabs');
       await page.getByRole('button', { name: 'Open Dialog with Tabs' }).click();
       await expect(page.locator('[data-scope="dialog"][data-part="content"]')).toBeVisible();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render focus ring fully around an input flush with the body edge', async ({
+      page,
+    }) => {
+      await dialogStory.goto(page, 'With Input At Edge');
+      await page.getByRole('button', { name: 'Open Dialog with Edge Input' }).click();
+      const input = page.getByTestId('edge-input');
+      await expect(input).toBeVisible();
+
+      await focusViaKeyboard(page, input);
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
   });

@@ -36,7 +36,7 @@ export const DialogContent: FC<DialogContentProps> = ({ children, ref }) => {
             'data-[has-nested=dialog]:-translate-y-[calc((var(--dialog-pushed-back-offset)/(var(--dialog-pushed-back-scale)-(var(--nested-layer-count)*var(--dialog-pushed-back-ratio))))*var(--nested-layer-count))]',
 
             // Header
-            '[&_[data-slot=drawer-header]]:pt-20 [&_[data-slot=drawer-header]]:pb-16 [&_[data-slot=drawer-header]]:px-24',
+            '**:data-[slot=drawer-header]:pt-20 **:data-[slot=drawer-header]:pb-16 **:data-[slot=drawer-header]:px-24',
           )}
           style={{ width }}
         >

@@ -20,7 +20,7 @@ export const DrawerBody: FC<DrawerBodyProps> = ({ children, ref }) => {
     <ScrollArea className={cn('flex-1 min-h-0')} data-slot='drawer-body' data-testid={testId}>
       <ScrollAreaViewport ref={ref}>
         <ScrollAreaContent
-          className={cn('flex flex-col px-24')}
+          className={cn('flex flex-col px-24 min-h-full h-auto')}
           data-slot='drawer-scroll-area-content'
         >
           {children}

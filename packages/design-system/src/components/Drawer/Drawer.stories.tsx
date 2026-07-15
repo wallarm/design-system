@@ -370,7 +370,7 @@ const renderDrawerOverflow = (items: string[]) => (
 
 /** Resizable drawer with an OverflowList — drag the left edge to reflow tags. */
 export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(false);
 
   return (
     <Drawer width={480} open={open} onOpenChange={setOpen}>
