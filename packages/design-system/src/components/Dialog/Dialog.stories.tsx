@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { PanelRight } from '../../icons';
 import { Button } from '../Button';
+import { Input } from '../Input';
 import { HStack, VStack } from '../Stack';
 import { Switch, SwitchControl, SwitchLabel } from '../Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../Tabs';
@@ -293,6 +294,75 @@ export const Scrollable: StoryFn<DialogProps> = () => {
           </DialogClose>
           <Button variant='primary' color='brand' size='large'>
             Confirm
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+/** Input sits flush against the body's top/bottom edges - its focus ring must render fully, not clip against the scroll viewport */
+export const WithInputAtEdge: StoryFn<DialogProps> = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Dialog with Edge Input</Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete account</DialogTitle>
+        </DialogHeader>
+
+        <DialogBody>
+          <Input placeholder='Type your email to confirm' data-testid='edge-input' />
+        </DialogBody>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant='ghost' color='neutral' size='large'>
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button variant='primary' color='danger' size='large'>
+            Delete
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+/** Scrollable variant of WithInputAtEdge - the input sits at the very bottom of a long, scrolled body */
+export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Scrollable Dialog with Edge Input</Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete account</DialogTitle>
+        </DialogHeader>
+
+        <DialogBody>
+          <div className='flex flex-col gap-16 py-12'>
+            {Array.from({ length: 10 }).map((_, i) => (
+              <ContentPlaceholder key={i} height={100} />
+            ))}
+          </div>
+          <Input placeholder='Type your email to confirm' data-testid='edge-input' />
+        </DialogBody>
+
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant='ghost' color='neutral' size='large'>
+              Cancel
+            </Button>
+          </DialogClose>
+          <Button variant='primary' color='danger' size='large'>
+            Delete
           </Button>
         </DialogFooter>
       </DialogContent>
