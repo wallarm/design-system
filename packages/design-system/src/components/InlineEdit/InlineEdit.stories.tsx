@@ -552,6 +552,73 @@ export const DateTimeEditor: StoryFn<typeof meta> = args => {
   );
 };
 
+/** `InlineEdit` inside a horizontal `Attribute` — label on the left, value/editor on the right. */
+export const HorizontalLayout: StoryFn<typeof meta> = args => {
+  const [name, setName] = useState('Checkout API');
+  const [role, setRole] = useState<string[]>(['editor']);
+  const roleLabel = roleItems.find(i => i.value === (role[0] ?? ''))?.label ?? '';
+  return (
+    <div className='flex w-[420px] flex-col gap-8'>
+      <Attribute orientation='horizontal'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue>
+          <InlineEdit
+            {...args}
+            value={name}
+            onValueCommit={v => setName(v as string)}
+            data-testid='horizontal-text'
+          >
+            <InlineEditPreview>{name}</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditInput aria-label='Name' />
+            </InlineEditControl>
+            <InlineEditError />
+          </InlineEdit>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation='horizontal'>
+        <AttributeLabel>Role</AttributeLabel>
+        <AttributeValue>
+          <InlineEdit
+            {...args}
+            value={role}
+            onValueCommit={v => setRole(v as string[])}
+            data-testid='horizontal-select'
+          >
+            <InlineEditPreview>
+              <InlineEditPreviewValue>{roleLabel}</InlineEditPreviewValue>
+              <InlineEditPreviewIcon>
+                <ChevronDown size='md' />
+              </InlineEditPreviewIcon>
+            </InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditSelect items={roleItems}>
+                <SelectButton size='inline-edit' />
+                <SelectPositioner>
+                  <SelectContent>{renderSelectOptions(roleItems)}</SelectContent>
+                </SelectPositioner>
+              </InlineEditSelect>
+            </InlineEditControl>
+          </InlineEdit>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+};
+
+HorizontalLayout.parameters = {
+  docs: {
+    description: {
+      story:
+        'The label/value layout comes entirely from the hosting `Attribute`: set ' +
+        '`orientation="horizontal"` and the label renders in a fixed-width cell to the left while ' +
+        '`AttributeValue` fills the rest of the row. `InlineEdit` itself has no orientation prop — ' +
+        'the preview/control toggle and commit lifecycle are identical to the vertical stories above.',
+    },
+  },
+};
+
 /** Async-feedback status snapshots: loading, saved, and error. */
 export const States: StoryFn<typeof meta> = args => (
   <div className='flex w-[420px] flex-col gap-12'>
