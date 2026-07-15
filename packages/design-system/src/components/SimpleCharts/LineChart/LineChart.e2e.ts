@@ -304,6 +304,22 @@ test.describe('LineChart', () => {
 
         await page.evaluate(amount => window.scrollBy(0, amount), SCROLL_BY);
 
+        // The popover repositions via a `scroll` listener that bumps React
+        // state and re-renders (see the `scrollTick` effect in
+        // LineChartZoomBrush) — that's not synchronous with the scroll call
+        // itself, so poll for the settled offset instead of reading the
+        // bounding boxes immediately. Reading right away races the
+        // listener→setState→re-render→paint chain and flakes under slower
+        // CI runners even though it reliably wins locally.
+        await expect
+          .poll(async () => {
+            const box = await popover.boundingBox();
+            const surfaceBox = await surface.boundingBox();
+            if (!box || !surfaceBox) return null;
+            return Math.round(box.y - surfaceBox.y);
+          })
+          .toBe(Math.round(offsetBefore.y));
+
         const popoverAfter = await popover.boundingBox();
         const surfaceAfter = await surface.boundingBox();
         if (!popoverAfter || !surfaceAfter) throw new Error('missing bounding box after scroll');
