@@ -73,6 +73,7 @@ const SingleDateInputInner: FC<{
           readOnly={readonly}
           granularity='minute'
           showTimeDropdown
+          showIcon={false}
         />
       ) : (
         <DateInput
@@ -80,6 +81,7 @@ const SingleDateInputInner: FC<{
           onChange={handleChange}
           readOnly={readonly}
           granularity='day'
+          showIcon={false}
         />
       )}
     </div>
@@ -146,6 +148,7 @@ const RangeDateInputInner: FC<{
         onChange={handleStartChange}
         readOnly={readonly}
         granularity='day'
+        showIcon={false}
       />
       <span
         className='flex items-center justify-center shrink-0 basis-20 font-sans text-sm leading-sm text-text-secondary'
@@ -158,6 +161,7 @@ const RangeDateInputInner: FC<{
         onChange={handleEndChange}
         readOnly={readonly}
         granularity='day'
+        showIcon={false}
       />
     </div>
   );
