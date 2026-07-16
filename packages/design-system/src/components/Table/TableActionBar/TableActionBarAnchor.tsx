@@ -4,6 +4,7 @@ import { cva } from 'class-variance-authority';
 import { cn } from '../../../utils/cn';
 import type { TestableProps } from '../../../utils/testId';
 import { useTableContext } from '../TableContext';
+import { useTableActionBarAnchorRef } from './TableActionBarAnchorRefContext';
 
 const tableActionBarAnchorVariants = cva(cn('w-full relative outline-none'), {
   variants: {
@@ -25,9 +26,11 @@ export const TableActionBarAnchor: FC<TableActionBarAnchorProps> = ({
   children,
 }) => {
   const { virtualized } = useTableContext();
+  const anchorRef = useTableActionBarAnchorRef();
 
   return (
     <ArkUiPopover.Anchor
+      ref={anchorRef}
       data-testid={testId}
       className={cn(tableActionBarAnchorVariants({ virtualized }), className)}
     >
