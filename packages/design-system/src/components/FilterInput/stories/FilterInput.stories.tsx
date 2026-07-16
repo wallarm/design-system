@@ -79,6 +79,29 @@ export const WithKeyboardHint: Story = {
   },
 };
 
+const groupedDemoFields: FieldMetadata[] = [
+  { name: 'attack_type', label: 'Attack type', type: 'string' },
+  { name: 'status', label: 'Status', type: 'string' },
+  { name: 'host', label: 'Host', type: 'string' },
+  { name: 'path', label: 'Path', type: 'string' },
+  { name: 'country', label: 'Country', type: 'string' },
+];
+
+/**
+ * Field-selection menu with fields organized under labeled group headers.
+ */
+export const WithFieldGroups: Story = {
+  args: {
+    fields: groupedDemoFields,
+    fieldGroups: [
+      { label: 'Threat classification', fields: ['attack_type', 'status'] },
+      { label: 'Request features', fields: ['host', 'path'] },
+      { label: 'Source and identity', fields: ['country'] },
+    ],
+    placeholder: 'Filter…',
+  },
+};
+
 /**
  * Error state - empty field.
  */

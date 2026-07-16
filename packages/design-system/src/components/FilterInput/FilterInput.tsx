@@ -11,7 +11,7 @@ import {
   useFilterInputSelection,
 } from './hooks';
 import { applyKnownFieldHelpers } from './lib/applyKnownFieldHelpers';
-import type { ExprNode, FieldMetadata } from './types';
+import type { ExprNode, FieldGroup, FieldMetadata } from './types';
 
 export interface FilterInputProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'> {
@@ -29,6 +29,14 @@ export interface FilterInputProps
    * (`createStatusCodeSuggestions`, …) manually.
    */
   fields?: FieldMetadata[];
+  /**
+   * Optional grouping for the field-selection menu. When omitted, fields
+   * render as a flat list. When provided, fields render under labeled group
+   * headers (group order = array order; field order = listed order). Fields
+   * not referenced by any group fall into a trailing headerless section.
+   * Referenced by field `name`; unknown names are ignored.
+   */
+  fieldGroups?: FieldGroup[];
   value?: ExprNode | null;
   onChange?: (expression: ExprNode | null) => void;
   placeholder?: string;
@@ -53,6 +61,7 @@ export interface FilterInputProps
 
 export const FilterInput: FC<FilterInputProps> = ({
   fields: rawFields = [],
+  fieldGroups,
   value,
   onChange,
   placeholder = 'Type to filter...',
@@ -181,7 +190,7 @@ export const FilterInput: FC<FilterInputProps> = ({
         <FilterInputField {...props} />
       </FilterInputProvider>
 
-      <FilterInputMenu fields={fields} autocomplete={autocomplete} />
+      <FilterInputMenu fields={fields} fieldGroups={fieldGroups} autocomplete={autocomplete} />
 
       <FilterInputErrors errors={errors} />
     </div>

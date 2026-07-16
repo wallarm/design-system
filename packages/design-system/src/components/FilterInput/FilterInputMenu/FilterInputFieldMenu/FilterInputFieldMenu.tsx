@@ -1,5 +1,4 @@
-import type { RefObject } from 'react';
-import { type FC, useMemo } from 'react';
+import { type FC, Fragment, type RefObject, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
 import {
   DropdownMenu,
@@ -8,11 +7,13 @@ import {
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuItemText,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
 } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
-import { filterAndSort } from '../../lib';
-import type { Condition, FieldMetadata, FilterInputDropdownItem } from '../../types';
+import { buildFieldMenuSections } from '../../lib';
+import type { Condition, FieldGroup, FieldMetadata, FilterInputDropdownItem } from '../../types';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import { MenuEmptyState } from '../MenuEmptyState';
 import { OperatorsSection, RecentSection, SuggestionsSection } from './FieldMenuSections';
@@ -26,6 +27,8 @@ export interface FilterInputFieldMenuProps {
   onOpenChange?: (open: boolean) => void;
   recentConditions?: Condition[];
   suggestedFields?: FieldMetadata[];
+  /** Optional grouping for the field list. When omitted, fields render flat. */
+  fieldGroups?: FieldGroup[];
   onSelectAnd?: () => void;
   onSelectOr?: () => void;
   onEscape?: () => void;
@@ -45,6 +48,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   onOpenChange,
   recentConditions = [],
   suggestedFields = [],
+  fieldGroups,
   onSelectAnd,
   onSelectOr,
   onEscape,
@@ -57,9 +61,9 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   const showRecent = limitedRecentConditions.length > 0;
   const showSuggestions = suggestedFields.length > 0;
 
-  const filteredFields = useMemo(
-    () => filterAndSort(fields, filterText, f => [f.label, f.name]),
-    [fields, filterText],
+  const sections = useMemo(
+    () => buildFieldMenuSections(fields, fieldGroups, filterText),
+    [fields, fieldGroups, filterText],
   );
 
   const flatItems: FilterInputDropdownItem[] = useMemo(() => {
@@ -86,11 +90,13 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
       });
     }
 
-    filteredFields.forEach(field => {
-      items.push({
-        id: `field-${field.name}`,
-        label: field.label,
-        value: { type: 'field', field },
+    sections.forEach(section => {
+      section.fields.forEach(field => {
+        items.push({
+          id: `field-${field.name}`,
+          label: field.label,
+          value: { type: 'field', field },
+        });
       });
     });
 
@@ -99,7 +105,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
 
     return items;
   }, [
-    filteredFields,
+    sections,
     fields,
     limitedRecentConditions,
     suggestedFields,
@@ -133,7 +139,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   });
 
   // Hide menu when filter text matches nothing (e.g. pasted invalid text).
-  const hasResults = filteredFields.length > 0 || !filterText;
+  const hasResults = sections.length > 0 || !filterText;
 
   return (
     <DropdownMenu
@@ -167,19 +173,25 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
           />
         )}
 
-        {filteredFields.length > 0 ? (
-          <DropdownMenuGroup>
-            {filteredFields.map(field => (
-              <DropdownMenuItem
-                key={field.name}
-                value={`field-${field.name}`}
-                ref={registerItem(`field-${field.name}`)}
-                onSelect={() => onSelect(field)}
-              >
-                <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuGroup>
+        {sections.length > 0 ? (
+          sections.map((section, index) => (
+            <Fragment key={section.label ?? `ungrouped-${index}`}>
+              {index > 0 && <DropdownMenuSeparator />}
+              {section.label && <DropdownMenuLabel>{section.label}</DropdownMenuLabel>}
+              <DropdownMenuGroup>
+                {section.fields.map(field => (
+                  <DropdownMenuItem
+                    key={field.name}
+                    value={`field-${field.name}`}
+                    ref={registerItem(`field-${field.name}`)}
+                    onSelect={() => onSelect(field)}
+                  >
+                    <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuGroup>
+            </Fragment>
+          ))
         ) : (
           <MenuEmptyState />
         )}
