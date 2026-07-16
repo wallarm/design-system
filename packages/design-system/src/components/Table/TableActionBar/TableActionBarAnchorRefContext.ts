@@ -7,9 +7,8 @@ import { createContext, type RefObject, useContext } from 'react';
  * `getBoundingClientRect()` to horizontally align the action bar with the
  * table.
  */
-export const TableActionBarAnchorRefContext = createContext<RefObject<HTMLDivElement | null> | null>(
-  null,
-);
+export const TableActionBarAnchorRefContext =
+  createContext<RefObject<HTMLDivElement | null> | null>(null);
 
 export const useTableActionBarAnchorRef = (): RefObject<HTMLDivElement | null> => {
   const ref = useContext(TableActionBarAnchorRefContext);
