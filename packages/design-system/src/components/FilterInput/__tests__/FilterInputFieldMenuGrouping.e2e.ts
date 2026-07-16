@@ -93,7 +93,26 @@ test.describe('Component: FilterInput', () => {
       await expect(page.getByText('Source and identity')).toHaveCount(0);
     });
 
-    test('Should navigate across group boundaries with the keyboard', async ({ page }) => {
+    test('Should render an ungrouped field below all groups', async ({ page }) => {
+      await gotoFieldMenu(page, 'With Groups');
+
+      // "CWE" belongs to no group, so it must render in the trailing headerless
+      // section below every group — in particular below the last group header
+      // "Source and identity".
+      const cwe = page.getByRole('menuitem', { name: /^CWE$/ });
+      const source = page.getByText('Source and identity');
+      await expect(cwe).toBeVisible();
+      await expect(source).toBeVisible();
+
+      const [cweBox, sourceBox] = await Promise.all([cwe.boundingBox(), source.boundingBox()]);
+      expect(cweBox).not.toBeNull();
+      expect(sourceBox).not.toBeNull();
+      expect(cweBox!.y).toBeGreaterThan(sourceBox!.y);
+    });
+  });
+
+  test.describe('Accessibility', () => {
+    test('Should be navigable across group boundaries via the keyboard', async ({ page }) => {
       await filterInputStory.goto(page, 'With Field Groups');
       const field = page.locator('[data-slot="filter-input"]');
       const input = field.locator('input');
@@ -122,23 +141,6 @@ test.describe('Component: FilterInput', () => {
       // "Should select a field when grouped" assertion).
       await page.getByRole('menuitem', { name: /^is =$/ }).click();
       await expect(page.getByRole('combobox', { name: 'Filter value' })).toBeVisible();
-    });
-
-    test('Should render an ungrouped field below all groups', async ({ page }) => {
-      await gotoFieldMenu(page, 'With Groups');
-
-      // "CWE" belongs to no group, so it must render in the trailing headerless
-      // section below every group — in particular below the last group header
-      // "Source and identity".
-      const cwe = page.getByRole('menuitem', { name: /^CWE$/ });
-      const source = page.getByText('Source and identity');
-      await expect(cwe).toBeVisible();
-      await expect(source).toBeVisible();
-
-      const [cweBox, sourceBox] = await Promise.all([cwe.boundingBox(), source.boundingBox()]);
-      expect(cweBox).not.toBeNull();
-      expect(sourceBox).not.toBeNull();
-      expect(cweBox!.y).toBeGreaterThan(sourceBox!.y);
     });
   });
 });
