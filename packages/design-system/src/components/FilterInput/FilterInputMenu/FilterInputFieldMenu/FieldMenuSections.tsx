@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, Fragment } from 'react';
 import { CirclePlus } from '../../../../icons/CirclePlus';
 import { CircleSlash } from '../../../../icons/CircleSlash';
 import {
@@ -9,6 +9,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '../../../DropdownMenu';
+import type { FieldMenuSection } from '../../lib';
 import type { Condition, FieldMetadata } from '../../types';
 
 interface RecentSectionProps {
@@ -125,3 +126,34 @@ export const OperatorsSection: FC<OperatorsSectionProps> = ({
 );
 
 OperatorsSection.displayName = 'OperatorsSection';
+
+interface FieldSectionsProps {
+  sections: FieldMenuSection[];
+  onSelect: (field: FieldMetadata) => void;
+  registerItem: (id: string) => (el: HTMLElement | null) => void;
+}
+
+export const FieldSections: FC<FieldSectionsProps> = ({ sections, onSelect, registerItem }) => (
+  <>
+    {sections.map((section, index) => (
+      <Fragment key={`${section.label ?? 'ungrouped'}-${index}`}>
+        {index > 0 && <DropdownMenuSeparator />}
+        {section.label && <DropdownMenuLabel>{section.label}</DropdownMenuLabel>}
+        <DropdownMenuGroup>
+          {section.fields.map(field => (
+            <DropdownMenuItem
+              key={field.name}
+              value={`field-${field.name}`}
+              ref={registerItem(`field-${field.name}`)}
+              onSelect={() => onSelect(field)}
+            >
+              <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
+            </DropdownMenuItem>
+          ))}
+        </DropdownMenuGroup>
+      </Fragment>
+    ))}
+  </>
+);
+
+FieldSections.displayName = 'FieldSections';

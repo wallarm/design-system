@@ -1,21 +1,19 @@
-import type { RefObject } from 'react';
-import { type FC, useMemo } from 'react';
+import { type FC, type RefObject, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuFooter,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuItemText,
-} from '../../../DropdownMenu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
-import { filterAndSort } from '../../lib';
-import type { Condition, FieldMetadata, FilterInputDropdownItem } from '../../types';
+import { buildFieldMenuSections } from '../../lib';
+import type { Condition, FieldGroup, FieldMetadata, FilterInputDropdownItem } from '../../types';
+import { useFieldMenuNavItems } from '../hooks/useFieldMenuNavItems';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import { MenuEmptyState } from '../MenuEmptyState';
-import { OperatorsSection, RecentSection, SuggestionsSection } from './FieldMenuSections';
+import {
+  FieldSections,
+  OperatorsSection,
+  RecentSection,
+  SuggestionsSection,
+} from './FieldMenuSections';
 
 export interface FilterInputFieldMenuProps {
   fields: FieldMetadata[];
@@ -26,6 +24,8 @@ export interface FilterInputFieldMenuProps {
   onOpenChange?: (open: boolean) => void;
   recentConditions?: Condition[];
   suggestedFields?: FieldMetadata[];
+  /** Optional grouping for the field list. When omitted, fields render flat. */
+  fieldGroups?: FieldGroup[];
   onSelectAnd?: () => void;
   onSelectOr?: () => void;
   onEscape?: () => void;
@@ -45,6 +45,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   onOpenChange,
   recentConditions = [],
   suggestedFields = [],
+  fieldGroups,
   onSelectAnd,
   onSelectOr,
   onEscape,
@@ -57,58 +58,22 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   const showRecent = limitedRecentConditions.length > 0;
   const showSuggestions = suggestedFields.length > 0;
 
-  const filteredFields = useMemo(
-    () => filterAndSort(fields, filterText, f => [f.label, f.name]),
-    [fields, filterText],
+  const sections = useMemo(
+    () => buildFieldMenuSections(fields, fieldGroups, filterText),
+    [fields, fieldGroups, filterText],
   );
 
-  const flatItems: FilterInputDropdownItem[] = useMemo(() => {
-    const items: FilterInputDropdownItem[] = [];
-
-    if (!filterText && showRecent) {
-      limitedRecentConditions.forEach((condition, index) => {
-        const fieldMeta = fields.find(f => f.name === condition.field);
-        items.push({
-          id: `recent-${index}`,
-          label: fieldMeta?.label || condition.field,
-          value: { type: 'recent', field: fieldMeta },
-        });
-      });
-    }
-
-    if (!filterText && showSuggestions && !showRecent) {
-      suggestedFields.forEach((field, index) => {
-        items.push({
-          id: `suggested-${index}`,
-          label: field.label,
-          value: { type: 'field', field },
-        });
-      });
-    }
-
-    filteredFields.forEach(field => {
-      items.push({
-        id: `field-${field.name}`,
-        label: field.label,
-        value: { type: 'field', field },
-      });
-    });
-
-    if (!filterText && onSelectAnd) items.push({ id: 'and', label: 'AND', value: { type: 'and' } });
-    if (!filterText && onSelectOr) items.push({ id: 'or', label: 'OR', value: { type: 'or' } });
-
-    return items;
-  }, [
-    filteredFields,
+  const flatItems = useFieldMenuNavItems({
+    sections,
     fields,
+    filterText,
     limitedRecentConditions,
-    suggestedFields,
     showRecent,
+    suggestedFields,
     showSuggestions,
     onSelectAnd,
     onSelectOr,
-    filterText,
-  ]);
+  });
 
   const handleItemSelect = (item: FilterInputDropdownItem) => {
     const data = item.value as { type: string; field?: FieldMetadata };
@@ -133,7 +98,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   });
 
   // Hide menu when filter text matches nothing (e.g. pasted invalid text).
-  const hasResults = filteredFields.length > 0 || !filterText;
+  const hasResults = sections.length > 0 || !filterText;
 
   return (
     <DropdownMenu
@@ -167,19 +132,8 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
           />
         )}
 
-        {filteredFields.length > 0 ? (
-          <DropdownMenuGroup>
-            {filteredFields.map(field => (
-              <DropdownMenuItem
-                key={field.name}
-                value={`field-${field.name}`}
-                ref={registerItem(`field-${field.name}`)}
-                onSelect={() => onSelect(field)}
-              >
-                <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
-              </DropdownMenuItem>
-            ))}
-          </DropdownMenuGroup>
+        {sections.length > 0 ? (
+          <FieldSections sections={sections} onSelect={onSelect} registerItem={registerItem} />
         ) : (
           <MenuEmptyState />
         )}

@@ -294,6 +294,37 @@ export const WithSuggestions: Story = {
 };
 
 /**
+ * FilterInputFieldMenu with grouped fields. Fields render under labeled group
+ * headers; the `cwe` field is intentionally left out of every group to show
+ * the trailing headerless "ungrouped" section.
+ */
+export const WithGroups: Story = {
+  args: {
+    fields: sampleFields,
+    fieldGroups: [
+      { label: 'Threat classification', fields: ['status', 'severity', 'blocking_status'] },
+      {
+        label: 'Request features',
+        fields: ['http_status_code', 'endpoint', 'hostname', 'parameter'],
+      },
+      { label: 'Source and identity', fields: ['location', 'network', 'impact'] },
+    ],
+    open: true,
+    onSelect: () => {
+      // Field selection handler
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Fields grouped under section headers. Groups render in array order; the ungrouped "CWE" field appears in a trailing headerless section.',
+      },
+    },
+  },
+};
+
+/**
  * FilterInputFieldMenu with both recent and suggestions
  * Shows the full menu with all sections
  */

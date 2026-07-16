@@ -8,6 +8,7 @@ export {
 export { applyAcceptChar } from './applyAcceptChar';
 export { applyFieldValueTransforms } from './applyFieldValueTransforms';
 export { applyKnownFieldHelpers, getKnownFieldSerializer } from './applyKnownFieldHelpers';
+export { buildFieldMenuSections, type FieldMenuSection } from './buildFieldMenuSections';
 export {
   chipIdToConditionIndex,
   findChipSplitIndex,

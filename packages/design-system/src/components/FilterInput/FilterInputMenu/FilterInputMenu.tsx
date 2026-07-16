@@ -9,7 +9,7 @@ import {
   isBetweenOperator,
   isMultiSelectOperator,
 } from '../lib';
-import type { FieldMetadata, FilterOperator, MenuState } from '../types';
+import type { FieldGroup, FieldMetadata, FilterOperator, MenuState } from '../types';
 import { FilterInputDateValueMenu } from './FilterInputDateValueMenu';
 import { FilterInputFieldMenu } from './FilterInputFieldMenu';
 import { FilterInputOperatorMenu } from './FilterInputOperatorMenu';
@@ -46,10 +46,15 @@ export interface FilterInputAutocompleteState {
 
 export interface FilterInputMenuProps {
   fields: FieldMetadata[];
+  fieldGroups?: FieldGroup[];
   autocomplete: FilterInputAutocompleteState;
 }
 
-export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete }) => {
+export const FilterInputMenu: FC<FilterInputMenuProps> = ({
+  fields,
+  fieldGroups,
+  autocomplete,
+}) => {
   const {
     inputText,
     menuState,
@@ -147,6 +152,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({ fields, autocomplete
     <>
       <FilterInputFieldMenu
         fields={fields}
+        fieldGroups={fieldGroups}
         filterText={fieldFilterText}
         open={menuState === 'field'}
         onSelect={handleFieldSelect}
