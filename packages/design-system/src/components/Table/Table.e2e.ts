@@ -6,6 +6,7 @@ const tableStory = createStoryHelper('data-display-table', [
   'Column Resizing With Overflow List',
   'Bidirectional Infinite Scroll',
   'Bidirectional Infinite Scroll Window',
+  'Row Selection Window Scroll',
 ] as const);
 
 // The Bidirectional story header renders "Window of {N} rows around the anchor".
@@ -198,6 +199,39 @@ test.describe('Component: Table', () => {
       await expect(scrollContainer.locator('[data-row-id]').first()).toBeVisible();
       // Initial anchor scroll centers a mid-window row → viewport is no longer at the top.
       await expect.poll(() => scrollContainer.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the action bar pinned to the viewport bottom correctly', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Row Selection Window Scroll');
+      const anchor = page.getByTestId('row-selection-window-scroll-table');
+      const bar = page.getByTestId('row-selection-window-scroll-table--action-bar');
+
+      await anchor.locator('tbody tr').first().getByRole('checkbox').click();
+      await expect(bar).toBeVisible();
+
+      // Scroll partway down the table — the bar should stay at the viewport
+      // bottom instead of tracking the table's own document position.
+      await page.mouse.wheel(0, 2000);
+
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the action bar correctly after the table scrolls out of view', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Row Selection Window Scroll');
+      const anchor = page.getByTestId('row-selection-window-scroll-table');
+      const bar = page.getByTestId('row-selection-window-scroll-table--action-bar');
+
+      await anchor.locator('tbody tr').first().getByRole('checkbox').click();
+      await expect(bar).toBeVisible();
+
+      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+      await expect(anchor).not.toBeInViewport();
 
       await expect(page).toHaveScreenshot();
     });

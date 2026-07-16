@@ -763,6 +763,39 @@ export const RowSelection: StoryFn<typeof meta> = () => {
   );
 };
 
+export const RowSelectionWindowScroll: StoryFn<typeof meta> = () => {
+  const largeData = useMemo(() => createLargeSecurityEvents(100), []);
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+
+  return (
+    <>
+      <Table
+        data-testid='row-selection-window-scroll-table'
+        data={largeData}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='window'
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+      >
+        <TableActionBar>
+          <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
+            <Copy /> Duplicate
+          </Button>
+          <Button color='brand' onClick={() => alert('Delete clicked')}>
+            <Trash2 /> Delete
+          </Button>
+        </TableActionBar>
+      </Table>
+      {/* Filler so the e2e suite can scroll the table fully out of view while a
+          selection stays active — this story's only content otherwise fills
+          exactly to the table's own height, so max scroll would always leave
+          the table's tail in view. */}
+      <div style={{ height: 1200 }} />
+    </>
+  );
+};
+
 export const RowGrouping: StoryFn<typeof meta> = () => {
   const [expanded, setExpanded] = useState<TableExpandedState>({ 'group-cto': true });
   const [sorting, setSorting] = useState<TableSortingState>([{ id: 'lastEdited', desc: true }]);
