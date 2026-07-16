@@ -790,8 +790,10 @@ export const RowSelectionWindowScroll: StoryFn<typeof meta> = () => {
       {/* Filler so the e2e suite can scroll the table fully out of view while a
           selection stays active — this story's only content otherwise fills
           exactly to the table's own height, so max scroll would always leave
-          the table's tail in view. */}
-      <div style={{ height: 1200 }} />
+          the table's tail in view. Generous margin over the viewport height
+          (800px in the e2e config) so the anchor is unambiguously out of view
+          at max scroll, not just mostly. */}
+      <div style={{ height: 3000 }} />
     </>
   );
 };
