@@ -210,7 +210,7 @@ test.describe('Component: Table', () => {
       const anchor = page.getByTestId('row-selection-window-scroll-table');
       const bar = page.getByTestId('row-selection-window-scroll-table--action-bar');
 
-      await anchor.locator('tbody tr').first().locator('[data-part="control"]').click();
+      await anchor.locator('[data-row-id]').first().locator('[data-part="control"]').click();
       await expect(bar).toBeVisible();
 
       // The bar centers on the table's own width (read from the anchor), not the
@@ -236,7 +236,7 @@ test.describe('Component: Table', () => {
       const anchor = page.getByTestId('row-selection-window-scroll-table');
       const bar = page.getByTestId('row-selection-window-scroll-table--action-bar');
 
-      await anchor.locator('tbody tr').first().locator('[data-part="control"]').click();
+      await anchor.locator('[data-row-id]').first().locator('[data-part="control"]').click();
       await expect(bar).toBeVisible();
 
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
