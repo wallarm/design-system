@@ -98,7 +98,7 @@ export const WithFieldGroups: Story = {
       { label: 'Request features', fields: ['host', 'path'] },
       { label: 'Source and identity', fields: ['country'] },
     ],
-    placeholder: 'Filter…',
+    placeholder: 'Type to filter...',
   },
 };
 

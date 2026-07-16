@@ -175,7 +175,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
 
         {sections.length > 0 ? (
           sections.map((section, index) => (
-            <Fragment key={section.label ?? `ungrouped-${index}`}>
+            <Fragment key={`${section.label ?? 'ungrouped'}-${index}`}>
               {index > 0 && <DropdownMenuSeparator />}
               {section.label && <DropdownMenuLabel>{section.label}</DropdownMenuLabel>}
               <DropdownMenuGroup>

@@ -68,6 +68,18 @@ describe('buildFieldMenuSections', () => {
     expect(result.find(s => s.label === 'B')!.fields.map(x => x.name)).toEqual(['path']);
   });
 
+  it('keeps two groups that share a label as separate sections', () => {
+    const g: FieldGroup[] = [
+      { label: 'Dup', fields: ['host'] },
+      { label: 'Dup', fields: ['host', 'path'] },
+    ];
+    const result = buildFieldMenuSections(fields, g, '');
+    const dupSections = result.filter(s => s.label === 'Dup');
+    expect(dupSections).toHaveLength(2);
+    expect(dupSections[0]!.fields.map(x => x.name)).toEqual(['host']);
+    expect(dupSections[1]!.fields.map(x => x.name)).toEqual(['path']);
+  });
+
   it('floats startsWith matches to the top within a group during search', () => {
     const many: FieldMetadata[] = [f('a_host', 'Backhost'), f('host', 'Host')];
     const g: FieldGroup[] = [{ label: 'G', fields: ['a_host', 'host'] }];
