@@ -92,5 +92,53 @@ test.describe('Component: FilterInput', () => {
       await expect(page.getByText('Threat classification')).toHaveCount(0);
       await expect(page.getByText('Source and identity')).toHaveCount(0);
     });
+
+    test('Should navigate across group boundaries with the keyboard', async ({ page }) => {
+      await filterInputStory.goto(page, 'With Field Groups');
+      const field = page.locator('[data-slot="filter-input"]');
+      const input = field.locator('input');
+      await field.click();
+      await expect(page.getByRole('menuitem', { name: /^Host$/ })).toBeVisible();
+
+      // Flat keyboard-nav order follows `fieldGroups` array order across group
+      // boundaries: [1] Attack type, [2] Status (Threat classification) → [3]
+      // Host, [4] Path (Request features) → [5] Country (Source and identity).
+      // The first ArrowDown highlights item 1, so 3 presses land on "Host" —
+      // the first field of the SECOND group, proving nav crossed the boundary
+      // out of group 1 and did not stop at its first item.
+      await input.press('ArrowDown');
+      await input.press('ArrowDown');
+      await input.press('ArrowDown');
+      await input.press('Enter');
+
+      // Enter selected the highlighted later-group field → the building chip's
+      // attribute is "Host", not "Attack type". A nav regression that stopped
+      // inside group 1 would surface a different attribute here and fail.
+      const buildingChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      await expect(buildingChip.locator('[data-slot="segment-attribute"]')).toHaveText('Host');
+
+      // Drive the operator step; Host is a plain string field with no options,
+      // so committing "is =" opens the freeform value combobox (mirrors the
+      // "Should select a field when grouped" assertion).
+      await page.getByRole('menuitem', { name: /^is =$/ }).click();
+      await expect(page.getByRole('combobox', { name: 'Filter value' })).toBeVisible();
+    });
+
+    test('Should render an ungrouped field below all groups', async ({ page }) => {
+      await gotoFieldMenu(page, 'With Groups');
+
+      // "CWE" belongs to no group, so it must render in the trailing headerless
+      // section below every group — in particular below the last group header
+      // "Source and identity".
+      const cwe = page.getByRole('menuitem', { name: /^CWE$/ });
+      const source = page.getByText('Source and identity');
+      await expect(cwe).toBeVisible();
+      await expect(source).toBeVisible();
+
+      const [cweBox, sourceBox] = await Promise.all([cwe.boundingBox(), source.boundingBox()]);
+      expect(cweBox).not.toBeNull();
+      expect(sourceBox).not.toBeNull();
+      expect(cweBox!.y).toBeGreaterThan(sourceBox!.y);
+    });
   });
 });
