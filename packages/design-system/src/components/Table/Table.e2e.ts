@@ -210,12 +210,21 @@ test.describe('Component: Table', () => {
       const anchor = page.getByTestId('row-selection-window-scroll-table');
       const bar = page.getByTestId('row-selection-window-scroll-table--action-bar');
 
-      await anchor.locator('tbody tr').first().getByRole('checkbox').click();
+      await anchor.locator('tbody tr').first().locator('[data-part="control"]').click();
       await expect(bar).toBeVisible();
+
+      // The bar centers on the table's own width (read from the anchor), not the
+      // full browser window — assert this before scrolling changes its position.
+      const anchorBox = (await anchor.boundingBox())!;
+      const barBox = (await bar.boundingBox())!;
+      const anchorCenterX = anchorBox.x + anchorBox.width / 2;
+      const barCenterX = barBox.x + barBox.width / 2;
+      expect(Math.abs(barCenterX - anchorCenterX)).toBeLessThanOrEqual(2);
 
       // Scroll partway down the table — the bar should stay at the viewport
       // bottom instead of tracking the table's own document position.
       await page.mouse.wheel(0, 2000);
+      await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
 
       await expect(page).toHaveScreenshot();
     });
@@ -227,7 +236,7 @@ test.describe('Component: Table', () => {
       const anchor = page.getByTestId('row-selection-window-scroll-table');
       const bar = page.getByTestId('row-selection-window-scroll-table--action-bar');
 
-      await anchor.locator('tbody tr').first().getByRole('checkbox').click();
+      await anchor.locator('tbody tr').first().locator('[data-part="control"]').click();
       await expect(bar).toBeVisible();
 
       await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
