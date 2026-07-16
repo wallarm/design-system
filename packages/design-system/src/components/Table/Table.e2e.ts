@@ -251,8 +251,15 @@ test.describe('Component: Table', () => {
       await anchor.locator('[data-row-id]').first().locator('[data-part="control"]').click();
       await expect(bar).toBeVisible();
 
-      await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
-      await expect(anchor).not.toBeInViewport();
+      // Scrolling to document.body.scrollHeight is a moving target here:
+      // TanStack Virtual's estimateSize (40px) undershoots these rows' real
+      // measured height, so the first scroll reveals rows tall enough to grow
+      // the document further — confirmed live (scrollHeight grew ~3000px
+      // after the initial scroll, then held steady). Retry until it settles.
+      await expect(async () => {
+        await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+        await expect(anchor).not.toBeInViewport();
+      }).toPass({ timeout: 10000 });
 
       await expect(page).toHaveScreenshot();
     });
