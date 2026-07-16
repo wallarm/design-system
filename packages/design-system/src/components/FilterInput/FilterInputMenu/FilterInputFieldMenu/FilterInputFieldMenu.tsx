@@ -1,22 +1,19 @@
-import { type FC, Fragment, type RefObject, useMemo } from 'react';
+import { type FC, type RefObject, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuFooter,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuItemText,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-} from '../../../DropdownMenu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
 import { buildFieldMenuSections } from '../../lib';
 import type { Condition, FieldGroup, FieldMetadata, FilterInputDropdownItem } from '../../types';
+import { useFieldMenuNavItems } from '../hooks/useFieldMenuNavItems';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import { MenuEmptyState } from '../MenuEmptyState';
-import { OperatorsSection, RecentSection, SuggestionsSection } from './FieldMenuSections';
+import {
+  FieldSections,
+  OperatorsSection,
+  RecentSection,
+  SuggestionsSection,
+} from './FieldMenuSections';
 
 export interface FilterInputFieldMenuProps {
   fields: FieldMetadata[];
@@ -66,55 +63,17 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
     [fields, fieldGroups, filterText],
   );
 
-  const flatItems: FilterInputDropdownItem[] = useMemo(() => {
-    const items: FilterInputDropdownItem[] = [];
-
-    if (!filterText && showRecent) {
-      limitedRecentConditions.forEach((condition, index) => {
-        const fieldMeta = fields.find(f => f.name === condition.field);
-        items.push({
-          id: `recent-${index}`,
-          label: fieldMeta?.label || condition.field,
-          value: { type: 'recent', field: fieldMeta },
-        });
-      });
-    }
-
-    if (!filterText && showSuggestions && !showRecent) {
-      suggestedFields.forEach((field, index) => {
-        items.push({
-          id: `suggested-${index}`,
-          label: field.label,
-          value: { type: 'field', field },
-        });
-      });
-    }
-
-    sections.forEach(section => {
-      section.fields.forEach(field => {
-        items.push({
-          id: `field-${field.name}`,
-          label: field.label,
-          value: { type: 'field', field },
-        });
-      });
-    });
-
-    if (!filterText && onSelectAnd) items.push({ id: 'and', label: 'AND', value: { type: 'and' } });
-    if (!filterText && onSelectOr) items.push({ id: 'or', label: 'OR', value: { type: 'or' } });
-
-    return items;
-  }, [
+  const flatItems = useFieldMenuNavItems({
     sections,
     fields,
+    filterText,
     limitedRecentConditions,
-    suggestedFields,
     showRecent,
+    suggestedFields,
     showSuggestions,
     onSelectAnd,
     onSelectOr,
-    filterText,
-  ]);
+  });
 
   const handleItemSelect = (item: FilterInputDropdownItem) => {
     const data = item.value as { type: string; field?: FieldMetadata };
@@ -174,24 +133,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
         )}
 
         {sections.length > 0 ? (
-          sections.map((section, index) => (
-            <Fragment key={`${section.label ?? 'ungrouped'}-${index}`}>
-              {index > 0 && <DropdownMenuSeparator />}
-              {section.label && <DropdownMenuLabel>{section.label}</DropdownMenuLabel>}
-              <DropdownMenuGroup>
-                {section.fields.map(field => (
-                  <DropdownMenuItem
-                    key={field.name}
-                    value={`field-${field.name}`}
-                    ref={registerItem(`field-${field.name}`)}
-                    onSelect={() => onSelect(field)}
-                  >
-                    <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuGroup>
-            </Fragment>
-          ))
+          <FieldSections sections={sections} onSelect={onSelect} registerItem={registerItem} />
         ) : (
           <MenuEmptyState />
         )}
