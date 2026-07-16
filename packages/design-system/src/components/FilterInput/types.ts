@@ -175,6 +175,20 @@ export interface FieldMetadata {
 }
 
 /**
+ * A labeled group of filter fields for the field-selection menu, referenced by
+ * field `name`. Passed to `FilterInput` via the optional `fieldGroups` prop.
+ * Groups render in array order; fields within a group in listed order; fields
+ * not referenced by any group fall into a trailing headerless section. Unknown
+ * names are ignored; a field listed in multiple groups resolves to its first.
+ */
+export interface FieldGroup {
+  /** Section header text (e.g. "Threat classification"). */
+  label: string;
+  /** Field names in display order. */
+  fields: string[];
+}
+
+/**
  * Expression Tree Types
  */
 
