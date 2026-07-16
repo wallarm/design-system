@@ -208,7 +208,13 @@ test.describe('Component: Table', () => {
     }) => {
       await tableStory.goto(page, 'Row Selection Window Scroll');
       const anchor = page.getByTestId('row-selection-window-scroll-table');
-      const bar = page.getByTestId('row-selection-window-scroll-table--action-bar');
+      // Not getByTestId: TableActionBar renders inside TableInnerWindow's
+      // ScrollArea, which unconditionally re-scopes TestIdProvider to its own
+      // (here, unset) data-testid — a pre-existing ScrollArea cascade gap,
+      // same class as the previously-found SelectContent one — so the
+      // `--action-bar` cascade never reaches this element. role="dialog" is
+      // unique on this story regardless.
+      const bar = page.getByRole('dialog');
 
       await anchor.locator('[data-row-id]').first().locator('[data-part="control"]').click();
       await expect(bar).toBeVisible();
@@ -234,7 +240,13 @@ test.describe('Component: Table', () => {
     }) => {
       await tableStory.goto(page, 'Row Selection Window Scroll');
       const anchor = page.getByTestId('row-selection-window-scroll-table');
-      const bar = page.getByTestId('row-selection-window-scroll-table--action-bar');
+      // Not getByTestId: TableActionBar renders inside TableInnerWindow's
+      // ScrollArea, which unconditionally re-scopes TestIdProvider to its own
+      // (here, unset) data-testid — a pre-existing ScrollArea cascade gap,
+      // same class as the previously-found SelectContent one — so the
+      // `--action-bar` cascade never reaches this element. role="dialog" is
+      // unique on this story regardless.
+      const bar = page.getByRole('dialog');
 
       await anchor.locator('[data-row-id]').first().locator('[data-part="control"]').click();
       await expect(bar).toBeVisible();
