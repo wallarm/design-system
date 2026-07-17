@@ -5,6 +5,14 @@ import { PanelRight } from '../../icons';
 import { Attribute, AttributeLabel, AttributeValue } from '../Attribute';
 import { Button } from '../Button';
 import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../Dialog';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -632,6 +640,47 @@ export const WithNested: StoryFn<DrawerProps> = () => {
             Save
           </Button>
         </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
+/** A Dialog opened from a Drawer must NOT push the drawer back — only a nested Drawer does */
+export const WithNestedDialog: StoryFn<DrawerProps> = () => {
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button>Open drawer with dialog inside</Button>
+      </DrawerTrigger>
+
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Drawer stays in place</DrawerTitle>
+        </DrawerHeader>
+
+        <DrawerBody>
+          <VStack gap={12} align='start'>
+            <Text>Opening the dialog below must not scale or shift this drawer.</Text>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant='outline' color='neutral'>
+                  Open dialog
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>Dialog over a drawer</DialogTitle>
+                </DialogHeader>
+
+                <DialogBody>
+                  <ContentPlaceholder height={150} />
+                </DialogBody>
+              </DialogContent>
+            </Dialog>
+          </VStack>
+        </DrawerBody>
       </DrawerContent>
     </Drawer>
   );

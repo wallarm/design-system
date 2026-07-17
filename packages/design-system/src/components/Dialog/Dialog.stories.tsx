@@ -4,6 +4,14 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { PanelRight } from '../../icons';
 import { Button } from '../Button';
 import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '../Drawer';
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -382,6 +390,48 @@ export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
             Delete
           </Button>
         </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+/** A Drawer opened from a Dialog must NOT push the dialog back — only a nested Dialog does */
+export const WithNestedDrawer: StoryFn<DialogProps> = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open dialog with drawer inside</Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Dialog stays in place</DialogTitle>
+        </DialogHeader>
+
+        <DialogBody>
+          <VStack gap={12} align='start'>
+            <Text>Opening the drawer below must not scale or shift this dialog.</Text>
+
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button variant='outline' color='neutral'>
+                  <PanelRight />
+                  Open drawer
+                </Button>
+              </DrawerTrigger>
+
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Drawer over a dialog</DrawerTitle>
+                </DrawerHeader>
+
+                <DrawerBody>
+                  <ContentPlaceholder height={200} />
+                </DrawerBody>
+              </DrawerContent>
+            </Drawer>
+          </VStack>
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );
