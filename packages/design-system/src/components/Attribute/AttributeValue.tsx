@@ -48,8 +48,8 @@ export const AttributeValue: FC<AttributeValueProps> = ({ ref, children, classNa
         // AttributeValue box itself rather than duplicated per guest. Applies
         // whenever AttributeValue hosts either an InlineEdit or an
         // AttributeActionsTarget, in both orientations, so the guest's text
-        // lines up where a plain value would sit (in horizontal the hover row
-        // overhangs 3px into the 4px label gap — accepted).
+        // lines up where a plain value would sit (in horizontal the 7px pull
+        // fits inside the 12px label gap set by Attribute).
         'has-[[data-slot=inline-edit]]:-ml-7',
         'has-[[data-slot=attribute-actions-target]]:-ml-7',
         // The -ml-7 above pulls the whole box left, including InlineEditError
