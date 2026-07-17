@@ -52,7 +52,7 @@ export const Attribute: FC<AttributeProps> = ({
             data-orientation={orientation}
             data-empty={!loading && isEmpty ? '' : undefined}
             className={cn(
-              isHorizontal ? 'flex flex-row items-start gap-4' : 'flex flex-col',
+              isHorizontal ? 'flex flex-row items-start gap-12' : 'flex flex-col',
               className,
             )}
           >
