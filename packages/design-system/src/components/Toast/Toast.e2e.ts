@@ -3,6 +3,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const toastStory = createStoryHelper('messaging-toast', [
   'Basic',
+  'With Nested Overlays',
   'Update Loading To Success',
   'Simple With Actions',
   'Extended With Actions',
@@ -198,6 +199,49 @@ test.describe('Toast Component', () => {
       await expect(buttons).toHaveCount(0);
 
       await expect(page).toHaveScreenshot();
+    });
+  });
+
+  test.describe('Interactions', () => {
+    test('Should stack the toast above open drawer and nested dialog overlays', async ({
+      page,
+    }) => {
+      // Regression: the toaster region's forced !z-[50] sat at or below the
+      // drawer/dialog positioners (50 + layer * 20) and nested overlays
+      // (40 + layer * 20), hiding toasts behind them. The region now sits on
+      // the dedicated top-tier --toast-z-index.
+      const expectFrontToastOnTop = async () => {
+        const toast = getToasts(page).first();
+        await expect(toast).toBeVisible();
+
+        // The topmost element at the toast's location must belong to the
+        // toast itself — not to a drawer, dialog, or overlay covering it.
+        // Polled because the toast slides in: until the enter transition
+        // settles its center may still be outside the viewport.
+        await expect
+          .poll(() =>
+            toast.evaluate(el => {
+              const rect = el.getBoundingClientRect();
+              const top = document.elementFromPoint(
+                rect.left + rect.width / 2,
+                rect.top + rect.height / 2,
+              );
+              return !!top && el.contains(top);
+            }),
+          )
+          .toBe(true);
+      };
+
+      await toastStory.goto(page, 'With Nested Overlays');
+
+      await page.getByRole('button', { name: 'Open drawer' }).click();
+      await page.getByRole('button', { name: 'Show toast from drawer' }).click();
+      await expectFrontToastOnTop();
+
+      await page.getByRole('button', { name: 'Open nested dialog' }).click();
+      await page.getByRole('button', { name: 'Show toast from nested dialog' }).click();
+      await expect(getToasts(page)).toHaveCount(2);
+      await expectFrontToastOnTop();
     });
   });
 });
