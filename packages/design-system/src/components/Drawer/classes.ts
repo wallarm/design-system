@@ -14,9 +14,9 @@ export const drawerContentVariants = cva(
 
     // Scroll Area paddings
     '**:data-[slot=drawer-scroll-area-content]:pb-24',
-    'has-data-[slot=drawer-footer]:**:data-[slot=drawer-scroll-area-content]:pb-4',
+    'has-data-[slot=drawer-footer]:**:data-[slot=drawer-scroll-area-content]:pb-8',
     // Content top padding for prevent outline/borders cutting against the scroll viewport's edge
-    '**:data-[slot=drawer-scroll-area-content]:pt-4',
+    '**:data-[slot=drawer-scroll-area-content]:pt-8',
 
     // Scroll Area borders (applied to drawer-body based on scroll position)
     // Border shows when content is hidden in that direction
