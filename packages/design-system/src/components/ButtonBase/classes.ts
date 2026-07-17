@@ -3,8 +3,8 @@ import { cn } from '../../utils/cn';
 
 export const buttonBaseVariants = cva(
   cn(
-    'items-center justify-center min-w-0 rounded-8',
-    'text-sm font-medium font-sans',
+    'items-center justify-center min-w-0 shrink-0 rounded-8',
+    'text-sm font-medium font-sans whitespace-nowrap',
     'cursor-pointer overflow-hidden transition-[color,border,box-shadow,opacity]',
     'focus-visible:outline-none focus-visible:ring-3',
     'data-[focus=true]:outline-none data-[focus=true]:ring-3',
@@ -31,7 +31,9 @@ export const buttonBaseVariants = cva(
         false: '',
       },
       fullWidth: {
-        true: 'flex flex-1 basis-full w-full',
+        // shrink re-enables shrinking (overrides base shrink-0 via cn) so
+        // multiple fullWidth buttons can split a row without overflowing
+        true: 'flex flex-1 shrink basis-full w-full',
         false: 'inline-flex',
       },
     },

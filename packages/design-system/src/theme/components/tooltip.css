@@ -1,0 +1,8 @@
+:root {
+    /* Tooltips never join zag's dismissable layer stack (unlike menus,
+       selects, popovers, and dialogs), so they cannot derive a layer-aware
+       z-index from --layer-index. Instead they live on a dedicated top tier
+       above any realistic overlay stack — drawer/dialog positioners compute
+       50 + layer * 20, so 1000 clears dozens of nested levels. */
+    --tooltip-z-index: 1000;
+}

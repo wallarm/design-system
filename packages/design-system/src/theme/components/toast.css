@@ -1,0 +1,8 @@
+:root {
+    /* Toasts are viewport-level notifications that must stay visible above
+       any open drawer/dialog stack and its overlays (positioners compute
+       50 + layer * 20, overlays 40 + layer * 20), so they sit on a dedicated
+       top tier. Kept below --tooltip-z-index (1000) so tooltips triggered
+       from toast controls still render above the toast itself. */
+    --toast-z-index: 900;
+}

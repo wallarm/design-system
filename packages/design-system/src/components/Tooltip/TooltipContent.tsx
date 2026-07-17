@@ -10,8 +10,13 @@ const tooltipContentVariants = cva(
   [
     // Base
     'py-4 rounded-8 bg-component-tooltip-bg text-text-primary-alt text-xs font-medium',
-    // Behavior
-    'z-50 overflow-hidden',
+    // Behavior: tooltips sit on a dedicated top tier above nested
+    // drawer/dialog positioners (50 + layer * 20). They can't reuse the
+    // layer-aware formula from DropdownMenu/Popover because zag never
+    // registers tooltips in its dismissable layer stack, so --layer-index
+    // is never set on this node. Zag's popper mirrors the computed z-index
+    // into the portal positioner's --z-index, so the value lives here.
+    'z-(--tooltip-z-index) overflow-hidden',
     // Animation base
     'animate-in fade-in-0 zoom-in-95 origin-[--transform-origin]',
     // Animation closed

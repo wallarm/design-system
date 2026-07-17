@@ -2,6 +2,22 @@ import { useRef } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Activity } from '../../icons';
 import { Button } from '../Button';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../Dialog';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '../Drawer';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { ToastActions, Toaster, useToast } from './index';
@@ -117,6 +133,60 @@ const ToastDemo = () => {
 
 export const Basic: StoryFn = () => {
   return <ToastDemo />;
+};
+
+export const WithNestedOverlays: StoryFn = () => {
+  const toast = useToast();
+
+  const fireToast = () =>
+    toast.create({
+      title: 'Saved',
+      description: 'This toast must render above every open overlay.',
+      type: 'success',
+      duration: STATIC_DURATION,
+    });
+
+  return (
+    <Drawer data-testid='overlay-drawer'>
+      <DrawerTrigger asChild>
+        <Button>Open drawer</Button>
+      </DrawerTrigger>
+
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>[Level 1] Drawer</DrawerTitle>
+        </DrawerHeader>
+
+        <DrawerBody>
+          <VStack gap={12} align='start'>
+            <Button variant='outline' color='neutral' onClick={fireToast}>
+              Show toast from drawer
+            </Button>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant='ghost' color='neutral'>
+                  Open nested dialog
+                </Button>
+              </DialogTrigger>
+
+              <DialogContent>
+                <DialogHeader>
+                  <DialogTitle>[Level 2] Dialog</DialogTitle>
+                </DialogHeader>
+
+                <DialogBody>
+                  <Button variant='outline' color='neutral' onClick={fireToast}>
+                    Show toast from nested dialog
+                  </Button>
+                </DialogBody>
+              </DialogContent>
+            </Dialog>
+          </VStack>
+        </DrawerBody>
+      </DrawerContent>
+    </Drawer>
+  );
 };
 
 export const UpdateLoadingToSuccess: StoryFn = () => {

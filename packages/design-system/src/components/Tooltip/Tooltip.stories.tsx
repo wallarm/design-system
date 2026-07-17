@@ -1,6 +1,14 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { ChevronRight } from '../../icons';
 import { Button } from '../Button';
+import {
+  Dialog,
+  DialogBody,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '../Dialog';
 import { Kbd } from '../Kbd';
 import { Text } from '../Text';
 import { Tooltip } from './Tooltip';
@@ -43,6 +51,47 @@ export const WithDescription: StoryFn<typeof meta> = () => (
       <Text size='xs'>Description</Text>
     </TooltipContent>
   </Tooltip>
+);
+
+export const WithNestedDialog: StoryFn<typeof meta> = () => (
+  <Dialog>
+    <DialogTrigger asChild>
+      <Button>Open dialog with nested tooltip</Button>
+    </DialogTrigger>
+
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle>[Level 1] Main Dialog</DialogTitle>
+      </DialogHeader>
+
+      <DialogBody>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant='ghost' color='neutral' size='small'>
+              Open nested dialog
+            </Button>
+          </DialogTrigger>
+
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>[Level 2] With Tooltip</DialogTitle>
+            </DialogHeader>
+
+            <DialogBody>
+              <Tooltip data-testid='nested-tooltip' interactive>
+                <TooltipTrigger asChild>
+                  <Button variant='outline' color='neutral'>
+                    Hover me
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>Tooltip above the dialog</TooltipContent>
+              </Tooltip>
+            </DialogBody>
+          </DialogContent>
+        </Dialog>
+      </DialogBody>
+    </DialogContent>
+  </Dialog>
 );
 
 export const WithKbd: StoryFn<typeof meta> = () => (

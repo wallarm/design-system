@@ -20,6 +20,7 @@ const codeVariants = cva('font-mono', {
     },
     color: {
       primary: 'text-text-primary',
+      'primary-alt': 'text-text-primary-alt',
       secondary: 'text-text-secondary',
       destructive: 'text-text-danger',
     },

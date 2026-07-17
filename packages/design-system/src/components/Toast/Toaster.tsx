@@ -104,7 +104,12 @@ export const Toaster: FC = () => {
           // center it so pausing tracks the toast column, not the full viewport width.
           // (These were previously on a `[data-part=group]` descendant selector that
           // never matched — the region element itself carries data-part="group".)
-          'fixed bottom-0 right-0 !z-[50] flex flex-col gap-12 p-24 max-w-[560px] mx-auto',
+          // The `!` on z is required to beat zag's inline zIndex on the region;
+          // --toast-z-index keeps toasts above any drawer/dialog stack and its
+          // overlays (positioners compute 50 + layer * 20) while staying below
+          // tooltips. Safe to raise: zag sets pointer-events: none on the
+          // region while it holds no toasts.
+          'fixed bottom-0 right-0 !z-(--toast-z-index) flex flex-col gap-12 p-24 max-w-[560px] mx-auto',
           // Root styles with CSS variables for animations
           '[&_[data-scope=toast][data-part=root]]:[translate:var(--x)_var(--y)] [&_[data-scope=toast][data-part=root]]:scale-[var(--scale)] [&_[data-scope=toast][data-part=root]]:z-[var(--z-index)] [&_[data-scope=toast][data-part=root]]:h-[var(--height)] [&_[data-scope=toast][data-part=root]]:opacity-[var(--opacity)] [&_[data-scope=toast][data-part=root]]:[will-change:translate,opacity,scale]',
           // Match Drawer/Dialog timings: 300ms open, 150ms close
