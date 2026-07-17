@@ -78,16 +78,16 @@ describe('InlineEdit integration', () => {
     expect(value.className).toContain('has-[[data-slot=inline-edit]]:overflow-visible');
   });
 
-  it('omits the -ml-7 hit-target offset in horizontal orientation', () => {
-    // In horizontal orientation AttributeValue sits right next to
-    // AttributeLabel with only a 4px gap — a 7px pull would eat into the
-    // label's space, so the offset only applies when stacked vertically.
+  it('keeps the -ml-7 hit-target pulls in horizontal orientation', () => {
+    // Both pulls apply in both orientations so the guest's text lines up
+    // where a plain value would sit (see AttributeValue.tsx).
     render(<Example onCommit={() => {}} orientation='horizontal' />);
     const value = screen.getByTestId('attr--value');
-    expect(value.className).not.toContain('has-[[data-slot=inline-edit]]:-ml-7');
-    expect(value.className).not.toContain('has-[[data-slot=attribute-actions-target]]:-ml-7');
-    // Nothing to cancel when there's no ambient -ml-7 pull.
-    expect(value.className).not.toContain('[&_[data-slot=inline-edit-error]]:ml-7');
+    expect(value.className).toContain('has-[[data-slot=inline-edit]]:-ml-7');
+    expect(value.className).toContain('has-[[data-slot=attribute-actions-target]]:-ml-7');
+    // The pull is active for the hosted InlineEdit, so its error cancel
+    // must follow in horizontal too.
+    expect(value.className).toContain('[&_[data-slot=inline-edit-error]]:ml-7');
     // The vertical-axis cancellation still applies regardless of orientation.
     expect(value.className).toContain('[&_[data-slot=inline-edit-preview]]:-my-4');
     expect(value.className).toContain('[&_[data-slot=inline-edit-control]]:-my-4');

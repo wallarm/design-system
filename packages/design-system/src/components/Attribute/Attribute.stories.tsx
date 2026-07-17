@@ -894,3 +894,60 @@ export const WithInlineEdit: StoryFn = () => <AttributeInlineEditExample />;
 export const HorizontalWithInlineEdit: StoryFn = () => (
   <AttributeInlineEditExample orientation='horizontal' />
 );
+
+// ─── Mixed hosts ─────────────────────────────────────────────────────────────
+// Plain value, AttributeActions target, and InlineEdit host stacked in one
+// column — the value's left text edge must line up across all three rows in
+// both orientations (AttributeValue's -ml-7 seam pulls the hover boxes left,
+// not the text).
+
+function AttributeMixedExample({ orientation }: { orientation?: AttributeProps['orientation'] }) {
+  const [name, setName] = useState('Checkout API');
+  return (
+    <div
+      className={
+        orientation === 'horizontal'
+          ? 'w-[420px] flex flex-col gap-8'
+          : 'w-[420px] flex flex-col gap-16'
+      }
+    >
+      <Attribute orientation={orientation} data-testid='attr-plain'>
+        <AttributeLabel>Request ID</AttributeLabel>
+        <AttributeValue>
+          <Text size='sm'>abc-123-def-456</Text>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='attr-actions'>
+        <AttributeLabel>Source IP</AttributeLabel>
+        <AttributeValue>
+          <AttributeActions>
+            <AttributeActionsTarget>
+              <Text size='sm'>142.198.167.52</Text>
+            </AttributeActionsTarget>
+            {renderActionsItems()}
+          </AttributeActions>
+        </AttributeValue>
+      </Attribute>
+
+      <Attribute orientation={orientation} data-testid='attr-inline-edit'>
+        <AttributeLabel>Name</AttributeLabel>
+        <AttributeValue>
+          <InlineEditRoot value={name} onValueCommit={v => setName(v as string)}>
+            <InlineEditPreview>{name}</InlineEditPreview>
+            <InlineEditControl>
+              <InlineEditInput />
+            </InlineEditControl>
+            <InlineEditError />
+          </InlineEditRoot>
+        </AttributeValue>
+      </Attribute>
+    </div>
+  );
+}
+
+export const Mixed: StoryFn = () => <AttributeMixedExample />;
+Mixed.storyName = 'Mixed (plain + Actions + InlineEdit)';
+
+export const HorizontalMixed: StoryFn = () => <AttributeMixedExample orientation='horizontal' />;
+HorizontalMixed.storyName = 'Horizontal Mixed (plain + Actions + InlineEdit)';
