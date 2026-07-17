@@ -10,6 +10,8 @@ const attributeStory = createStoryHelper('data-display-attribute', [
   'Horizontal With Actions Menu Only',
   'With Inline Edit',
   'Horizontal With Inline Edit',
+  'Mixed',
+  'Horizontal Mixed',
 ] as const);
 
 test.describe('Component: Attribute', () => {
@@ -82,6 +84,20 @@ test.describe('Component: Attribute', () => {
       await attributeStory.goto(page, 'Horizontal With Inline Edit');
       await page.getByTestId('attr--preview').click();
       await expect(page.getByTestId('attr--input')).toBeFocused();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render mixed hosts with aligned values correctly', async ({ page }) => {
+      // Plain value, AttributeActions target, and InlineEdit host stacked in
+      // one column — the value's left text edge must line up across all rows.
+      await attributeStory.goto(page, 'Mixed');
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render horizontal mixed hosts with aligned values correctly', async ({ page }) => {
+      // Same alignment contract as the vertical Mixed story — the -ml-7 pull
+      // applies to InlineEdit and AttributeActionsTarget in both orientations.
+      await attributeStory.goto(page, 'Horizontal Mixed');
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
   });

@@ -68,7 +68,14 @@ export const PopoverContent: FC<PopoverContentProps> = ({
             'min-h-(--popover-min-height)',
             'max-h-[clamp(var(--popover-min-height),var(--available-height),var(--popover-max-height))]',
             // Visual
-            'p-12 bg-bg-surface-2 rounded-12 border border-border-primary-light shadow-md text-text-primary z-50',
+            'p-12 bg-bg-surface-2 rounded-12 border border-border-primary-light shadow-md text-text-primary',
+            // Leveling: layer-aware so a popover opened inside a nested
+            // drawer/dialog stacks above that dialog's positioner — zag sets
+            // --layer-index inline on this node when the popover opens, and
+            // popper mirrors the computed z-index into the positioner's
+            // --z-index (same mechanism as DropdownMenu/Select, see
+            // DropdownMenu/classes.ts).
+            'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index,0)*var(--drawer-level-ratio)))]',
             // Contain wheel chaining on the inner ScrollArea viewport so wheel
             // events past the scroll boundary don't propagate to whatever
             // scrollable lives below — popovers are portaled and frequently

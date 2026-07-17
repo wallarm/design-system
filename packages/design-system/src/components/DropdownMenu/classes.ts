@@ -4,8 +4,17 @@ import { cn } from '../../utils/cn';
 export const dropdownMenuClassNames = cn(
   // Dimensions
   'flex flex-col gap-1 min-w-128',
-  // Leveling and scrolling
-  'z-50 overflow-y-auto overflow-x-hidden outline-none',
+  // Leveling: the content's computed z-index is what zag's popper mirrors
+  // into the positioner's --z-index, so the layer-aware value must live
+  // here, not on the positioner. Zag's dismissable layer stack sets
+  // --layer-index inline on this node when the menu opens (menus, selects,
+  // and dialogs share one global stack), so a menu opened inside a nested
+  // drawer/dialog lands above that dialog's positioner
+  // (50 + layer-index * 20). The ,0 fallback keeps the calc valid while
+  // the node is closed / not yet registered in the stack.
+  'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index,0)*var(--drawer-level-ratio)))]',
+  // Scrolling
+  'overflow-y-auto overflow-x-hidden outline-none',
   // Visual
   'rounded-12 border border-border-primary-light bg-bg-surface-2 p-8 font-sans text-text-primary shadow-md outline-none',
   // Animation opened

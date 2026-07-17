@@ -1,11 +1,14 @@
 import { type FC, type ReactNode, useState } from 'react';
 import { useControlled } from '../../../hooks';
 import { DRAWER_SIZES, DRAWER_WIDTH_CONSTRAINTS } from '../constants';
+import { type DrawerKind, DrawerNestingProvider } from '../DrawerNestingContext';
 import { DrawerContext } from './DrawerContext';
 import type { DrawerContextValue } from './types';
 
 interface DrawerContextProviderProps {
   children: ReactNode;
+  /** Which overlay family this root belongs to — drives same-kind nesting */
+  kind: DrawerKind;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   /** Whether ESC key closes the drawer (default: true) */
@@ -24,6 +27,7 @@ interface DrawerContextProviderProps {
 
 export const DrawerProvider: FC<DrawerContextProviderProps> = ({
   children,
+  kind,
   open,
   onOpenChange,
   closeOnEscape,
@@ -64,5 +68,11 @@ export const DrawerProvider: FC<DrawerContextProviderProps> = ({
     maxWidth,
   };
 
-  return <DrawerContext.Provider value={contextValue}>{children}</DrawerContext.Provider>;
+  return (
+    <DrawerContext.Provider value={contextValue}>
+      <DrawerNestingProvider kind={kind} open={isOpen}>
+        {children}
+      </DrawerNestingProvider>
+    </DrawerContext.Provider>
+  );
 };

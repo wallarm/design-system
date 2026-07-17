@@ -11,6 +11,7 @@ export {
   type DrawerFooterControlsProps,
 } from './DrawerFooterControls';
 export { DrawerHeader, type DrawerHeaderProps } from './DrawerHeader';
+export { type DrawerKind, useNestedSameKindCount } from './DrawerNestingContext';
 export { DrawerOverlay } from './DrawerOverlay';
 export { DrawerPortal } from './DrawerPortal';
 export {

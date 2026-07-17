@@ -1,8 +1,32 @@
 import { useState } from 'react';
+import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { PanelRight } from '../../icons';
 import { Button } from '../Button';
+import {
+  Drawer,
+  DrawerBody,
+  DrawerContent,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from '../Drawer';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../DropdownMenu';
 import { Input } from '../Input';
+import {
+  Select,
+  SelectButton,
+  SelectContent,
+  SelectOption,
+  SelectOptionIndicator,
+  SelectOptionText,
+  SelectPositioner,
+} from '../Select';
 import { HStack, VStack } from '../Stack';
 import { Switch, SwitchControl, SwitchLabel } from '../Switch';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../Tabs';
@@ -366,6 +390,123 @@ export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
             Delete
           </Button>
         </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+/** A Drawer opened from a Dialog must NOT push the dialog back — only a nested Dialog does */
+export const WithNestedDrawer: StoryFn<DialogProps> = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open dialog with drawer inside</Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Dialog stays in place</DialogTitle>
+        </DialogHeader>
+
+        <DialogBody>
+          <VStack gap={12} align='start'>
+            <Text>Opening the drawer below must not scale or shift this dialog.</Text>
+
+            <Drawer>
+              <DrawerTrigger asChild>
+                <Button variant='outline' color='neutral'>
+                  <PanelRight />
+                  Open drawer
+                </Button>
+              </DrawerTrigger>
+
+              <DrawerContent>
+                <DrawerHeader>
+                  <DrawerTitle>Drawer over a dialog</DrawerTitle>
+                </DrawerHeader>
+
+                <DrawerBody>
+                  <ContentPlaceholder height={200} />
+                </DrawerBody>
+              </DrawerContent>
+            </Drawer>
+          </VStack>
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+/** Select and DropdownMenu opened inside a nested dialog must render above the nested dialog, not underneath it */
+export const WithNestedSelect: StoryFn<DialogProps> = () => {
+  const collection = createListCollection({
+    items: [
+      { label: 'React', value: 'react' },
+      { label: 'Vue', value: 'vue' },
+      { label: 'Angular', value: 'angular' },
+    ],
+  });
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open dialog with nested select</Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>[Level 1] Main Dialog</DialogTitle>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant='ghost' color='neutral' size='small'>
+                <PanelRight />
+                Open nested dialog
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>[Level 2] With Select</DialogTitle>
+              </DialogHeader>
+
+              <DialogBody>
+                <VStack gap={12} align='start'>
+                  <Select collection={collection} data-testid='nested-select'>
+                    <SelectButton />
+
+                    <SelectPositioner>
+                      <SelectContent>
+                        {collection.items.map(item => (
+                          <SelectOption key={item.value} item={item}>
+                            <SelectOptionText>{item.label}</SelectOptionText>
+                            <SelectOptionIndicator />
+                          </SelectOption>
+                        ))}
+                      </SelectContent>
+                    </SelectPositioner>
+                  </Select>
+
+                  <DropdownMenu data-testid='nested-dropdown'>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant='outline' color='neutral'>
+                        Open menu
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem>First action</DropdownMenuItem>
+                      <DropdownMenuItem>Second action</DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </VStack>
+              </DialogBody>
+            </DialogContent>
+          </Dialog>
+        </DialogHeader>
+
+        <DialogBody>
+          <ContentPlaceholder height={200} />
+        </DialogBody>
       </DialogContent>
     </Dialog>
   );

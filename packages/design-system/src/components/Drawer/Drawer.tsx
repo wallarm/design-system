@@ -2,10 +2,18 @@ import type { FC, ReactNode } from 'react';
 import type { DialogInteractOutsideEvent as DrawerInteractOutsideEvent } from '@ark-ui/react/dialog';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { DrawerProvider } from './DrawerContext';
+import type { DrawerKind } from './DrawerNestingContext';
 import { DrawerRoot } from './DrawerRoot';
 
 export interface DrawerProps extends TestableProps {
   children: ReactNode;
+  /**
+   * Which overlay family this root belongs to. Drives the same-kind nesting
+   * counter behind the pushed-back animation: a Drawer only pushes back for
+   * a nested Drawer, a Dialog only for a nested Dialog. Set to 'dialog' by
+   * the Dialog component — consumers should not need to touch this.
+   */
+  kind?: DrawerKind;
   /** Controlled open state */
   open?: boolean;
   /** Controlled open change handler */
@@ -32,6 +40,7 @@ export interface DrawerProps extends TestableProps {
 
 export const Drawer: FC<DrawerProps> = ({
   children,
+  kind = 'drawer',
   open,
   onOpenChange,
   closeOnEscape = true,
@@ -46,6 +55,7 @@ export const Drawer: FC<DrawerProps> = ({
   'data-testid': testId,
 }) => (
   <DrawerProvider
+    kind={kind}
     open={open}
     onOpenChange={onOpenChange}
     closeOnEscape={closeOnEscape}
