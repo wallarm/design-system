@@ -26,7 +26,7 @@ export const RemoteShellBreadcrumb: FC<RemoteShellBreadcrumbProps> = ({
       data-testid={testId}
       className={cn('[grid-area:breadcrumb] flex items-center gap-8 px-16 py-8', className)}
     >
-      <Breadcrumbs data-slot='nav-breadcrumbs'>
+      <Breadcrumbs data-slot='nav-breadcrumbs' className='-ml-4'>
         {breadcrumbSegments.map((segment, i) => {
           const isLast = i === breadcrumbSegments.length - 1;
 
