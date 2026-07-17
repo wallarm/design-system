@@ -104,7 +104,7 @@ export const createSelectionColumn = <T,>(): ColumnDef<T> => {
     enablePinning: false,
     meta: {
       headerClassName: 'px-8 py-4',
-      cellClassName: 'px-8 py-4',
+      cellClassName: 'px-8 py-8',
     },
     header: ({ table }) => {
       const checked = table.getIsAllPageRowsSelected();
