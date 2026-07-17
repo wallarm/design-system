@@ -15,6 +15,7 @@ const drawerStory = createStoryHelper('overlay-drawer', [
   'With Nested',
   'With Tabs',
   'Resizable With Overflow List',
+  'With Nested Select',
 ] as const);
 
 const getDrawerContent = (page: Page) => page.getByTestId('drawer--content');
@@ -74,9 +75,68 @@ test.describe('Component: Drawer', () => {
       await expect(page.locator('[data-scope="dialog"][data-part="content"]')).toBeVisible();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });
     });
+
+    test('Should render the select dropdown above a nested drawer correctly', async ({ page }) => {
+      await drawerStory.goto(page, 'With Nested Select');
+      await page.getByRole('button', { name: 'Open drawer with nested select' }).click();
+      await page.getByRole('button', { name: 'Open nested drawer' }).click();
+      await page.getByTestId('nested-select--button').click();
+      await expect(page.locator('[data-scope="select"][data-part="content"]')).toBeVisible();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
   });
 
   test.describe('Interactions', () => {
+    test('Should stack the select dropdown above a nested drawer when opened inside it', async ({
+      page,
+    }) => {
+      // Regression: the dropdown content's static z-50 mirrored into its
+      // positioner sat below the nested drawer positioner (50 + layer * 20),
+      // hiding the open menu. The content z-index is layer-aware now.
+      await drawerStory.goto(page, 'With Nested Select');
+      await page.getByRole('button', { name: 'Open drawer with nested select' }).click();
+      await page.getByRole('button', { name: 'Open nested drawer' }).click();
+      await page.getByTestId('nested-select--button').click();
+
+      const content = page.locator('[data-scope="select"][data-part="content"]');
+      await expect(content).toBeVisible();
+
+      // The topmost element at the dropdown's location must belong to the
+      // dropdown itself — not to the nested drawer covering it.
+      const isOnTop = await content.evaluate(el => {
+        const rect = el.getBoundingClientRect();
+        const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + 10);
+        return !!top && el.contains(top);
+      });
+      expect(isOnTop).toBe(true);
+
+      // The option is actually interactive: selecting closes the dropdown.
+      await page.getByRole('option', { name: 'Vue' }).click();
+      await expect(content).toBeHidden();
+    });
+
+    test('Should stack the dropdown menu above a nested drawer when opened inside it', async ({
+      page,
+    }) => {
+      await drawerStory.goto(page, 'With Nested Select');
+      await page.getByRole('button', { name: 'Open drawer with nested select' }).click();
+      await page.getByRole('button', { name: 'Open nested drawer' }).click();
+      await page.getByRole('button', { name: 'Open menu' }).click();
+
+      const content = page.locator('[data-scope="menu"][data-part="content"]');
+      await expect(content).toBeVisible();
+
+      const isOnTop = await content.evaluate(el => {
+        const rect = el.getBoundingClientRect();
+        const top = document.elementFromPoint(rect.left + rect.width / 2, rect.top + 10);
+        return !!top && el.contains(top);
+      });
+      expect(isOnTop).toBe(true);
+
+      await page.getByRole('menuitem', { name: 'First action' }).click();
+      await expect(content).toBeHidden();
+    });
+
     test('Should open drawer when trigger button is clicked', async ({ page }) => {
       await drawerStory.goto(page, 'Basic');
       await expect(getDrawerContent(page)).toBeHidden();
