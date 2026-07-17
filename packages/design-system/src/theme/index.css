@@ -19,6 +19,7 @@
 @import './utilities/code-snippet-bg.css';
 @import './components/drawer.css';
 @import './components/dialog.css';
+@import './components/tooltip.css';
 @import './components/tour.css';
 @import './components/skeleton.css';
 @import './components/accordion.css';
