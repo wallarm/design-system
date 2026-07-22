@@ -250,12 +250,13 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
 
     // The errored chip stays editable: clicking the fixed "Value" label reopens
     // the value input, and entering a value clears the error (AS-1179 #1/#2).
-    // QUARANTINED (AS-1193): the resume→value-commit path has a prod-only,
-    // load-dependent timing race that drops the typed value (~50-80% under
-    // `--repeat-each` against a production Storybook build; passes on dev and at
-    // human speed). Pre-existing on the AS-1179 branch; re-enable once AS-1193
-    // makes the commit deterministic.
-    test.fixme('Should resume an incomplete paired chip and clear the error when a value is entered', async ({
+    // Fixed by AS-1193: the prod-only, load-dependent flake here was the pair
+    // operator being dropped when the incomplete chip committed on blur (Ark's
+    // async menu-select had not flushed into `selectedOperator` before the blur
+    // commit read it), so the resumed chip had no pair operator and the "Value"
+    // label mis-routed to the operator step instead of reopening the value input.
+    // Committing the operator selection synchronously closes that window.
+    test('Should resume an incomplete paired chip and clear the error when a value is entered', async ({
       page,
     }) => {
       await buildBase(page, 'header');
@@ -279,17 +280,22 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
     // AS-1192 — an incomplete paired chip whose pair operator was never chosen:
     // clicking the fixed "Value" label opens the pair OPERATOR menu (the operator
     // segment is zero-width while unset, so the label is its affordance).
-    // QUARANTINED (AS-1193): committing the pair via a blur while its operator menu
-    // is still open is non-deterministic on the production Storybook build (the
-    // chip stays `data-building`); passes on dev and verified manually. The
-    // deterministic guard is the unit test in FilterInputChip.test.tsx.
-    test.fixme('Should open the pair operator menu from the label when the operator is unset', async ({
+    test('Should open the pair operator menu from the label when the operator is unset', async ({
       page,
     }) => {
-      // Leave the pair operator menu open (operator not yet chosen), then blur so
-      // the chip commits incomplete with no pair operator.
+      // Leave the pair operator menu open (operator not yet chosen), then commit
+      // the incomplete chip. Commit via an in-field area click (force-commit),
+      // NOT an outside click: while the pair-operator menu is open, focus churns
+      // between the input and the Ark menu, so an outside-blur commit is
+      // non-deterministic (the chip can stay `data-building`). The area click
+      // routes through commitBuildingForce, which reads the building refs and
+      // commits synchronously regardless of where focus sits (AS-1193).
       await buildBase(page, 'header');
-      await page.mouse.click(2, 2);
+      const buildingChip = getChip(page);
+      const box = (await buildingChip.boundingBox())!;
+      // Empty field area just to the right of the chip, on the same row (the
+      // operator dropdown opens below, so this point is outside the menu).
+      await page.mouse.click(box.x + box.width + 20, box.y + box.height / 2);
 
       const chip = getChip(page);
       await expect(chip).not.toHaveAttribute('data-building', '');
@@ -307,10 +313,10 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
     // AS-1192 — every segment of an incomplete paired chip is individually
     // editable via a targeted click, exactly like a single chip (previously
     // `tryResumeBuilding` hijacked every click to the first missing step).
-    // QUARANTINED (AS-1193): clicking the committed pair's tiny operator segment is
-    // non-deterministic on the production Storybook build; passes on dev and
-    // verified manually. Unit tests cover the routing deterministically.
-    test.fixme('Should edit the clicked segment (not resume) on an incomplete paired chip', async ({
+    // Re-enabled by AS-1193: the flake here was the pair operator being dropped
+    // on the incomplete-chip commit (Ark's async menu-select racing the blur),
+    // which mis-routed the segment click. The synchronous operator commit fixes it.
+    test('Should edit the clicked segment (not resume) on an incomplete paired chip', async ({
       page,
     }) => {
       // Base complete + pair operator "is =" chosen, pair value left empty → blur.
@@ -336,11 +342,11 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
     // AS-1192 — the empty paired VALUE reserves a small clickable width even when
     // idle, so the trailing × can't sit where the user clicks to fill it (which
     // deleted the chip). Clicking it resumes building to type the value.
-    // QUARANTINED (AS-1193): the paired resume-on-value-click is non-deterministic
-    // on the production Storybook build (the resumed input doesn't always render in
-    // time); passes on dev and verified manually. The standalone equivalent below
-    // is CI-stable, and the unit test guards the placeholder render.
-    test.fixme('Should not delete the chip when clicking the empty paired value to fill it', async ({
+    // Re-enabled by AS-1193: the flake was the pair operator dropped on the
+    // incomplete-chip commit (Ark's async menu-select racing the blur), which left
+    // the chip in a state where the value click could not resume. The synchronous
+    // operator commit fixes it.
+    test('Should not delete the chip when clicking the empty paired value to fill it', async ({
       page,
     }) => {
       await buildBase(page, 'header');
