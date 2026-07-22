@@ -135,7 +135,10 @@ export const Segment: FC<SegmentProps> = ({
             className={cn(
               segmentTextVariants({ variant, error }),
               'bg-transparent outline-none p-0 m-0',
-              // Keep an empty value input clickable — content width grows past it (AS-1192).
+              // Value input hugs its content (measured width + WIDTH_OFFSET); `min-w-0`
+              // drops the flex/intrinsic floor so a short value isn't boxed wide. An
+              // empty value falls back to the sizer's MIN_INPUT_WIDTH; the idle click
+              // affordance is `emptyValueHitTarget`, not this input (AS-1192).
               variant === SEGMENT_VARIANT.value && editingValueMinWidth,
             )}
             style={{ width: `${inputWidth}px` }}

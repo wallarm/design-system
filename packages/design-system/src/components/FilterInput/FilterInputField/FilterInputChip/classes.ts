@@ -52,8 +52,10 @@ export const segmentContainer = 'flex flex-col justify-center overflow-hidden le
  *  is clickable and the trailing × can't sit on top of it (AS-1192). */
 export const emptyValueHitTarget = 'min-w-[4px] self-stretch';
 
-/** Min width for the value edit input so an empty freeform value stays clickable. */
-export const editingValueMinWidth = 'min-w-[3.5rem]';
+/** The value edit input hugs its content (measured width + WIDTH_OFFSET). `min-w-0`
+ *  drops the flex/intrinsic min-width so a short value like "f" isn't forced into a
+ *  wide box; an empty value falls back to the sizer's MIN_INPUT_WIDTH floor. */
+export const editingValueMinWidth = 'min-w-0';
 
 /** Segment text styles by variant */
 export const segmentTextVariants = cva('truncate text-sm', {
