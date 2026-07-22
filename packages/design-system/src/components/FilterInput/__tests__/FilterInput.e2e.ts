@@ -280,20 +280,22 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
     // AS-1192 — an incomplete paired chip whose pair operator was never chosen:
     // clicking the fixed "Value" label opens the pair OPERATOR menu (the operator
     // segment is zero-width while unset, so the label is its affordance).
-    // STILL QUARANTINED: this is a DISTINCT race from AS-1193 (which fixed the
-    // dropped pair operator on the resume→value path). Here no operator is ever
-    // chosen — the blur must commit the chip straight from the open pair-operator
-    // menu, and whether DOM focus sits on the input or inside the Ark menu when
-    // the outside click lands is non-deterministic on the production build, so the
-    // chip intermittently stays `data-building`. Passes on dev and verified
-    // manually; the deterministic guard is the unit test in FilterInputChip.test.tsx.
-    test.fixme('Should open the pair operator menu from the label when the operator is unset', async ({
+    test('Should open the pair operator menu from the label when the operator is unset', async ({
       page,
     }) => {
-      // Leave the pair operator menu open (operator not yet chosen), then blur so
-      // the chip commits incomplete with no pair operator.
+      // Leave the pair operator menu open (operator not yet chosen), then commit
+      // the incomplete chip. Commit via an in-field area click (force-commit),
+      // NOT an outside click: while the pair-operator menu is open, focus churns
+      // between the input and the Ark menu, so an outside-blur commit is
+      // non-deterministic (the chip can stay `data-building`). The area click
+      // routes through commitBuildingForce, which reads the building refs and
+      // commits synchronously regardless of where focus sits (AS-1193).
       await buildBase(page, 'header');
-      await page.mouse.click(2, 2);
+      const buildingChip = getChip(page);
+      const box = (await buildingChip.boundingBox())!;
+      // Empty field area just to the right of the chip, on the same row (the
+      // operator dropdown opens below, so this point is outside the menu).
+      await page.mouse.click(box.x + box.width + 20, box.y + box.height / 2);
 
       const chip = getChip(page);
       await expect(chip).not.toHaveAttribute('data-building', '');
