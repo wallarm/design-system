@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { flushSync } from 'react-dom';
 import { SEGMENT_VARIANT } from '../../../FilterInputField/FilterInputChip';
 import {
   chipIdToConditionIndex,
@@ -138,6 +139,21 @@ export const useOperatorFlow = ({
           setEditingSegment(SEGMENT_VARIANT.value);
           setSegmentFilterText('');
         }
+      }
+
+      // Building a chip's operator (not editing a committed one): flush the
+      // operator into state synchronously. Ark closes the operator menu in the
+      // same click that fires onSelect, which drops DOM focus to <body> and can
+      // trigger commitBuildingOnBlur before React commits this update — a blur
+      // reading a still-null selectedOperator commits the pair WITHOUT its
+      // operator, so a later resume can't re-open the value step (AS-1193).
+      if (!editingChipId) {
+        flushSync(() => {
+          setSelectedOperator(operator);
+          setInputText('');
+        });
+        setMenuState('value');
+        return;
       }
 
       setSelectedOperator(operator);
