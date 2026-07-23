@@ -4,6 +4,13 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { PanelRight } from '../../icons';
 import { Button } from '../Button';
 import {
+  Calendar,
+  CalendarBody,
+  CalendarContent,
+  CalendarGrids,
+  CalendarTrigger,
+} from '../Calendar';
+import {
   Drawer,
   DrawerBody,
   DrawerContent,
@@ -499,6 +506,57 @@ export const WithNestedSelect: StoryFn<DialogProps> = () => {
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </VStack>
+              </DialogBody>
+            </DialogContent>
+          </Dialog>
+        </DialogHeader>
+
+        <DialogBody>
+          <ContentPlaceholder height={200} />
+        </DialogBody>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+/** Calendar opened inside a nested dialog must render above the nested dialog, not underneath it */
+export const WithNestedCalendar: StoryFn<DialogProps> = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open dialog with nested calendar</Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>[Level 1] Main Dialog</DialogTitle>
+
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button variant='ghost' color='neutral' size='small'>
+                <PanelRight />
+                Open nested dialog
+              </Button>
+            </DialogTrigger>
+
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>[Level 2] With Calendar</DialogTitle>
+              </DialogHeader>
+
+              <DialogBody>
+                <Calendar type='single'>
+                  <CalendarTrigger asChild>
+                    <Button variant='outline' color='neutral'>
+                      Open calendar
+                    </Button>
+                  </CalendarTrigger>
+                  <CalendarContent>
+                    <CalendarBody>
+                      <CalendarGrids />
+                    </CalendarBody>
+                  </CalendarContent>
+                </Calendar>
               </DialogBody>
             </DialogContent>
           </Dialog>
