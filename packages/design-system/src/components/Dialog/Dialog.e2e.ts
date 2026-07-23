@@ -16,6 +16,7 @@ const dialogStory = createStoryHelper('overlay-dialog', [
   'With Input At Edge',
   'With Input At Edge Scrollable',
   'With Nested Select',
+  'With Nested Calendar',
   'With Nested Drawer',
 ] as const);
 
@@ -187,6 +188,52 @@ test.describe('Component: Dialog', () => {
       expect(isOnTop).toBe(true);
 
       await page.getByRole('menuitem', { name: 'First action' }).click();
+      await expect(content).toBeHidden();
+    });
+
+    test('Should stack the calendar above a nested dialog when opened inside it', async ({
+      page,
+    }) => {
+      // Regression: the calendar content's static z-50 sat below the nested
+      // dialog positioner (50 + layer * 20), hiding the open popup. The
+      // content z-index is layer-aware now, same as Select/DropdownMenu.
+      await dialogStory.goto(page, 'With Nested Calendar');
+      await page.getByRole('button', { name: 'Open dialog with nested calendar' }).click();
+      await page.getByRole('button', { name: 'Open nested dialog' }).click();
+      await page.getByRole('button', { name: 'Open calendar' }).click();
+
+      const content = page.locator('[data-scope="date-picker"][data-part="content"]');
+      await expect(content).toBeVisible();
+
+      // Let the open animation (zoom-in/slide-in) finish before hit-testing —
+      // mid-animation the content box is still transforming and the probe
+      // point can land outside it.
+      await content.evaluate(el => Promise.all(el.getAnimations().map(a => a.finished)));
+      const isOnTop = await content.evaluate(el => {
+        // Unlike the Select/DropdownMenu panels (small enough to sit fully
+        // inside the nested dialog's card), the calendar grid is taller than
+        // the nested dialog here and mostly extends below it — probing the
+        // calendar's own center lands past the dialog's bottom edge, where
+        // nothing else competes for that pixel and the check trivially
+        // passes even when broken. Probe the actual overlap rectangle
+        // between the calendar and the nested dialog card instead.
+        const dialogContents = document.querySelectorAll(
+          '[data-scope="dialog"][data-part="content"]',
+        );
+        const nestedDialog = dialogContents[dialogContents.length - 1];
+        const calRect = el.getBoundingClientRect();
+        const dialogRect = nestedDialog.getBoundingClientRect();
+        const x =
+          (Math.max(calRect.left, dialogRect.left) + Math.min(calRect.right, dialogRect.right)) / 2;
+        const y =
+          (Math.max(calRect.top, dialogRect.top) + Math.min(calRect.bottom, dialogRect.bottom)) / 2;
+        const top = document.elementFromPoint(x, y);
+        return !!top && el.contains(top);
+      });
+      expect(isOnTop).toBe(true);
+
+      // The day cell is actually interactive: selecting today closes the calendar.
+      await content.locator('[data-part="table-cell-trigger"][data-today]').click();
       await expect(content).toBeHidden();
     });
 
