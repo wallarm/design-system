@@ -64,6 +64,7 @@ scripts/ralph/archive/
 
 # Superpowers workflow scratch (brainstorm specs + implementation plans) — never repo content
 docs/superpowers/
+.superpowers/
 
 # Dev notes
 QUERYBAR_NOTES.md

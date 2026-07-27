@@ -7,7 +7,7 @@ type BadgeVariantsColorMap = Partial<{
   [K in BadgeColor]: string;
 }>;
 
-export const badgeVariants = cva('inline-flex items-center gap-4', {
+export const badgeVariants = cva('inline-flex items-center gap-4 w-fit', {
   variants: {
     variant: {
       default: '',
