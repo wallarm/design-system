@@ -3,8 +3,8 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const timelineStory = createStoryHelper('data-display-timeline', [
   'Basic',
-  'WithContent',
-  'WithoutConnector',
+  'With Content',
+  'Without Connector',
 ] as const);
 
 test.describe('Component: Timeline', () => {
@@ -15,7 +15,7 @@ test.describe('Component: Timeline', () => {
     });
 
     test('Should render steps with title and description correctly', async ({ page }) => {
-      await timelineStory.goto(page, 'WithContent');
+      await timelineStory.goto(page, 'With Content');
       await expect(page).toHaveScreenshot();
     });
 
@@ -31,14 +31,14 @@ test.describe('Component: Timeline', () => {
     test('Should render content-only steps without a connector column correctly', async ({
       page,
     }) => {
-      await timelineStory.goto(page, 'WithoutConnector');
+      await timelineStory.goto(page, 'Without Connector');
       await expect(page).toHaveScreenshot();
     });
   });
 
   test.describe('Accessibility', () => {
     test('Should expose the step count via list semantics', async ({ page }) => {
-      await timelineStory.goto(page, 'WithContent');
+      await timelineStory.goto(page, 'With Content');
       await expect(page.getByRole('list')).toBeVisible();
       await expect(page.getByRole('listitem')).toHaveCount(3);
     });
