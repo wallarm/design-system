@@ -115,3 +115,43 @@ describe('Timeline data-slot', () => {
     );
   });
 });
+
+describe('Timeline with multiple items', () => {
+  const renderMultipleItems = () =>
+    render(
+      <Timeline data-testid='tl'>
+        <TimelineItem>
+          <TimelineConnector>
+            <TimelineIndicator>1</TimelineIndicator>
+            <TimelineSeparator />
+          </TimelineConnector>
+        </TimelineItem>
+        <TimelineItem>
+          <TimelineConnector>
+            <TimelineIndicator>2</TimelineIndicator>
+            <TimelineSeparator />
+          </TimelineConnector>
+        </TimelineItem>
+        <TimelineItem>
+          <TimelineConnector>
+            <TimelineIndicator>3</TimelineIndicator>
+            <TimelineSeparator />
+          </TimelineConnector>
+        </TimelineItem>
+      </Timeline>,
+    );
+
+  it('renders one <li> per item, all sharing the same flat testid', () => {
+    renderMultipleItems();
+    expect(screen.getAllByTestId('tl--item')).toHaveLength(3);
+  });
+
+  it('marks only the actual last item as :last-child', () => {
+    renderMultipleItems();
+    const items = screen.getAllByTestId('tl--item');
+    // last-child is a real DOM/CSS relationship, not something jsdom computes for us here;
+    // assert on the DOM structure instead: only the final <li> element is the last element child of its parent <ol>.
+    const list = screen.getByRole('list');
+    expect(list.lastElementChild).toBe(items[items.length - 1]);
+  });
+});

@@ -21,6 +21,8 @@ export const Timeline: FC<TimelineProps> = ({
       ref={ref}
       data-slot='timeline'
       data-testid={testId}
+      // biome-ignore lint/a11y/noRedundantRoles: Safari/VoiceOver drops list semantics from any list styled with `list-style: none` (applied via `list-none` below); role='list' restores it
+      role='list'
       className={cn(timelineVariants(), className)}
     >
       <TestIdProvider value={testId}>{children}</TestIdProvider>

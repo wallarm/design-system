@@ -64,20 +64,22 @@ const EVENTS = [
 ];
 
 export const WithContent: StoryFn<typeof meta> = () => (
-  <Timeline>
-    {EVENTS.map((event, index) => (
-      <TimelineItem key={event.title}>
-        <TimelineConnector>
-          <TimelineIndicator>{index + 1}</TimelineIndicator>
-          <TimelineSeparator />
-        </TimelineConnector>
-        <TimelineContent>
-          <TimelineTitle>{event.title}</TimelineTitle>
-          <TimelineDescription>{event.description}</TimelineDescription>
-        </TimelineContent>
-      </TimelineItem>
-    ))}
-  </Timeline>
+  <div className='max-w-[360px]'>
+    <Timeline>
+      {EVENTS.map((event, index) => (
+        <TimelineItem key={event.title}>
+          <TimelineConnector>
+            <TimelineIndicator>{index + 1}</TimelineIndicator>
+            <TimelineSeparator />
+          </TimelineConnector>
+          <TimelineContent>
+            <TimelineTitle>{event.title}</TimelineTitle>
+            <TimelineDescription>{event.description}</TimelineDescription>
+          </TimelineContent>
+        </TimelineItem>
+      ))}
+    </Timeline>
+  </div>
 );
 
 export const WithoutConnector: StoryFn<typeof meta> = () => (

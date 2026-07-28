@@ -21,6 +21,8 @@ test.describe('Component: Timeline', () => {
 
     test('Should not render a connecting line after the last step', async ({ page }) => {
       await timelineStory.goto(page, 'Basic');
+      const separators = page.locator('[data-slot="timeline-separator"]');
+      await expect(separators.first()).toBeVisible();
       const lastSeparator = page
         .getByRole('listitem')
         .last()
