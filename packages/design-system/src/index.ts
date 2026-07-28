@@ -671,11 +671,11 @@ export {
   type TimelineIndicatorProps,
   TimelineItem,
   type TimelineItemProps,
+  type TimelineProps,
   TimelineSeparator,
   type TimelineSeparatorProps,
   TimelineTitle,
   type TimelineTitleProps,
-  type TimelineProps,
 } from './components/Timeline';
 export { Toast, ToastActions, Toaster, toaster } from './components/Toast';
 export {
