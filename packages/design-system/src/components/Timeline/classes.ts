@@ -13,6 +13,6 @@ export const timelineItemVariants = cva(
 
 export const timelineConnectorVariants = cva('col-start-1 flex flex-col items-center h-full');
 
-export const timelineSeparatorVariants = cva('flex-1 min-h-16');
+export const timelineSeparatorVariants = cva('flex-1 min-h-16 self-center');
 
 export const timelineContentVariants = cva('col-start-2 flex flex-col gap-4 min-w-0 pb-16');

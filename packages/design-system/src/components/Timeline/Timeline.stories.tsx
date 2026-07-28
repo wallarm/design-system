@@ -36,61 +36,103 @@ const meta = {
 
 export default meta;
 
-const STEPS = [1, 2, 3, 4, 5];
-
 export const Basic: StoryFn<typeof meta> = () => (
   <Timeline>
-    {STEPS.map(step => (
-      <TimelineItem key={step}>
-        <TimelineConnector>
-          <TimelineIndicator>{step}</TimelineIndicator>
-          <TimelineSeparator />
-        </TimelineConnector>
-      </TimelineItem>
-    ))}
+    <TimelineItem>
+      <TimelineConnector>
+        <TimelineIndicator>1</TimelineIndicator>
+        <TimelineSeparator />
+      </TimelineConnector>
+    </TimelineItem>
+    <TimelineItem>
+      <TimelineConnector>
+        <TimelineIndicator>2</TimelineIndicator>
+        <TimelineSeparator />
+      </TimelineConnector>
+    </TimelineItem>
+    <TimelineItem>
+      <TimelineConnector>
+        <TimelineIndicator>3</TimelineIndicator>
+        <TimelineSeparator />
+      </TimelineConnector>
+    </TimelineItem>
+    <TimelineItem>
+      <TimelineConnector>
+        <TimelineIndicator>4</TimelineIndicator>
+        <TimelineSeparator />
+      </TimelineConnector>
+    </TimelineItem>
+    <TimelineItem>
+      <TimelineConnector>
+        <TimelineIndicator>5</TimelineIndicator>
+        <TimelineSeparator />
+      </TimelineConnector>
+    </TimelineItem>
   </Timeline>
 );
-
-const EVENTS = [
-  { title: 'Order placed', description: 'The order was placed by the customer.' },
-  { title: 'Order confirmed', description: 'Payment received, order confirmed.' },
-  {
-    title: 'Order shipped',
-    description:
-      'The package left the warehouse and is on its way. This step has the ' +
-      'longest description of the three, to show the connecting line ' +
-      'stretching to match a taller row.',
-  },
-];
 
 export const WithContent: StoryFn<typeof meta> = () => (
   <div className='max-w-[360px]'>
     <Timeline>
-      {EVENTS.map((event, index) => (
-        <TimelineItem key={event.title}>
-          <TimelineConnector>
-            <TimelineIndicator>{index + 1}</TimelineIndicator>
-            <TimelineSeparator />
-          </TimelineConnector>
-          <TimelineContent>
-            <TimelineTitle>{event.title}</TimelineTitle>
-            <TimelineDescription>{event.description}</TimelineDescription>
-          </TimelineContent>
-        </TimelineItem>
-      ))}
+      <TimelineItem>
+        <TimelineConnector>
+          <TimelineIndicator>1</TimelineIndicator>
+          <TimelineSeparator />
+        </TimelineConnector>
+        <TimelineContent>
+          <TimelineTitle>Order placed</TimelineTitle>
+          <TimelineDescription>The order was placed by the customer.</TimelineDescription>
+        </TimelineContent>
+      </TimelineItem>
+      <TimelineItem>
+        <TimelineConnector>
+          <TimelineIndicator>2</TimelineIndicator>
+          <TimelineSeparator />
+        </TimelineConnector>
+        <TimelineContent>
+          <TimelineTitle>Order confirmed</TimelineTitle>
+          <TimelineDescription>Payment received, order confirmed.</TimelineDescription>
+        </TimelineContent>
+      </TimelineItem>
+      <TimelineItem>
+        <TimelineConnector>
+          <TimelineIndicator>3</TimelineIndicator>
+          <TimelineSeparator />
+        </TimelineConnector>
+        <TimelineContent>
+          <TimelineTitle>Order shipped</TimelineTitle>
+          <TimelineDescription>
+            The package left the warehouse and is on its way. This step has the longest description
+            of the three, to show the connecting line stretching to match a taller row.
+          </TimelineDescription>
+        </TimelineContent>
+      </TimelineItem>
     </Timeline>
   </div>
 );
 
 export const WithoutConnector: StoryFn<typeof meta> = () => (
   <Timeline>
-    {EVENTS.map(event => (
-      <TimelineItem key={event.title}>
-        <TimelineContent>
-          <TimelineTitle>{event.title}</TimelineTitle>
-          <TimelineDescription>{event.description}</TimelineDescription>
-        </TimelineContent>
-      </TimelineItem>
-    ))}
+    <TimelineItem>
+      <TimelineContent>
+        <TimelineTitle>Order placed</TimelineTitle>
+        <TimelineDescription>The order was placed by the customer.</TimelineDescription>
+      </TimelineContent>
+    </TimelineItem>
+    <TimelineItem>
+      <TimelineContent>
+        <TimelineTitle>Order confirmed</TimelineTitle>
+        <TimelineDescription>Payment received, order confirmed.</TimelineDescription>
+      </TimelineContent>
+    </TimelineItem>
+    <TimelineItem>
+      <TimelineContent>
+        <TimelineTitle>Order shipped</TimelineTitle>
+        <TimelineDescription>
+          The package left the warehouse and is on its way. This step has the longest description of
+          the three, to show the connecting line stretching to match a taller row.
+        </TimelineDescription>
+      </TimelineContent>
+    </TimelineItem>
   </Timeline>
 );
