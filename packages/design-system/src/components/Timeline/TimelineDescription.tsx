@@ -10,7 +10,13 @@ export const TimelineDescription: FC<TimelineDescriptionProps> = ({ children, ..
   const testId = useTestId('description');
 
   return (
-    <Text {...props} data-slot='timeline-description' data-testid={testId} size='sm' color='secondary'>
+    <Text
+      {...props}
+      data-slot='timeline-description'
+      data-testid={testId}
+      size='sm'
+      color='secondary'
+    >
       {children}
     </Text>
   );

@@ -79,7 +79,10 @@ describe('Timeline fixed variants', () => {
         </TimelineItem>
       </Timeline>,
     );
-    expect(screen.getByTestId('tl--item--separator')).toHaveAttribute('aria-orientation', 'vertical');
+    expect(screen.getByTestId('tl--item--separator')).toHaveAttribute(
+      'aria-orientation',
+      'vertical',
+    );
   });
 });
 
@@ -101,7 +104,10 @@ describe('Timeline data-slot', () => {
       'data-slot',
       'timeline-separator',
     );
-    expect(screen.getByTestId('tl--item--content')).toHaveAttribute('data-slot', 'timeline-content');
+    expect(screen.getByTestId('tl--item--content')).toHaveAttribute(
+      'data-slot',
+      'timeline-content',
+    );
     expect(screen.getByTestId('tl--item--title')).toHaveAttribute('data-slot', 'timeline-title');
     expect(screen.getByTestId('tl--item--description')).toHaveAttribute(
       'data-slot',
