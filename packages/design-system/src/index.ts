@@ -659,6 +659,24 @@ export {
   useTheme,
 } from './components/ThemeProvider';
 export { TimeInput, type TimeInputProps } from './components/TimeInput';
+export {
+  Timeline,
+  TimelineConnector,
+  type TimelineConnectorProps,
+  TimelineContent,
+  type TimelineContentProps,
+  TimelineDescription,
+  type TimelineDescriptionProps,
+  TimelineIndicator,
+  type TimelineIndicatorProps,
+  TimelineItem,
+  type TimelineItemProps,
+  TimelineSeparator,
+  type TimelineSeparatorProps,
+  TimelineTitle,
+  type TimelineTitleProps,
+  type TimelineProps,
+} from './components/Timeline';
 export { Toast, ToastActions, Toaster, toaster } from './components/Toast';
 export {
   ToggleButton,
