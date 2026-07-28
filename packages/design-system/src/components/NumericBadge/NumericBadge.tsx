@@ -8,12 +8,17 @@ type NumericBadgeNativeProps = HTMLAttributes<HTMLDivElement>;
 
 type NumericBadgeVariantsProps = Omit<VariantProps<typeof numericBadgeVariants>, 'clickable'>;
 
-export type NumericBadgeProps = NumericBadgeNativeProps & NumericBadgeVariantsProps & TestableProps;
+export type NumericBadgeProps = NumericBadgeNativeProps &
+  NumericBadgeVariantsProps &
+  TestableProps & {
+    'data-slot'?: string;
+  };
 
 export const NumericBadge: FC<NumericBadgeProps> = ({
   type = 'primary',
   size = 'default',
   onClick,
+  'data-slot': dataSlot,
   ...props
 }) => {
   const isClickable = !!onClick;
@@ -22,7 +27,7 @@ export const NumericBadge: FC<NumericBadgeProps> = ({
     <div
       {...props}
       tabIndex={isClickable ? 0 : undefined}
-      data-slot='numeric-badge'
+      data-slot={dataSlot ?? 'numeric-badge'}
       data-type={type}
       onClick={onClick}
       className={cn(numericBadgeVariants({ type, size, clickable: isClickable }))}
