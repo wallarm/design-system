@@ -3,6 +3,7 @@ import { cn } from '../../../../utils/cn';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuFooter,
   DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
@@ -14,7 +15,7 @@ import { MenuEmptyState } from '../MenuEmptyState';
 import type { FilterInputValueMenuProps } from './FilterInputValueMenu';
 import { NestedValueMenuItem } from './NestedValueMenuItem';
 import { SELECT_ALL_ID, useNestedValueMenuState } from './useNestedValueMenuState';
-import { ValueMenuFooter } from './ValueMenuFooter';
+import { ValueMenuFooterHints } from './ValueMenuFooterHints';
 
 /**
  * Value menu with nesting: top-level options are grouped under section headers
@@ -135,7 +136,9 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
           ) : (
             <MenuEmptyState />
           )}
-          <ValueMenuFooter multiSelect={multiSelect} />
+          <DropdownMenuFooter>
+            <ValueMenuFooterHints multiSelect={multiSelect} />
+          </DropdownMenuFooter>
         </DropdownMenuContent>
       </DropdownMenu>
 

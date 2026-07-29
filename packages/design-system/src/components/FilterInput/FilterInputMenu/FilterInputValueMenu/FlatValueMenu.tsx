@@ -1,12 +1,17 @@
 import { type FC, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup } from '../../../DropdownMenu';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuFooter,
+  DropdownMenuGroup,
+} from '../../../DropdownMenu';
 import { filterAndSort } from '../../lib';
 import { MenuEmptyState } from '../MenuEmptyState';
 import type { FilterInputValueMenuProps } from './FilterInputValueMenu';
 import { useValueMenuDisplayValues } from './useValueMenuDisplayValues';
 import { useValueMenuState } from './useValueMenuState';
-import { ValueMenuFooter } from './ValueMenuFooter';
+import { ValueMenuFooterHints } from './ValueMenuFooterHints';
 import { ValueMenuItem } from './ValueMenuItem';
 import { valueOptionSearchText } from './valueOptionSearchText';
 
@@ -116,7 +121,9 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
         ) : (
           <MenuEmptyState />
         )}
-        <ValueMenuFooter multiSelect={multiSelect} />
+        <DropdownMenuFooter>
+          <ValueMenuFooterHints multiSelect={multiSelect} />
+        </DropdownMenuFooter>
       </DropdownMenuContent>
     </DropdownMenu>
   );
