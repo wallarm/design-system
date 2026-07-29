@@ -1,11 +1,14 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
+  collectLeaves,
+  findOptionByValue,
   findValueLabelInFields,
   getFieldValues,
   hasFieldValues,
   hasStaticAllowlist,
+  isValueGroup,
 } from '../lib/fields';
-import type { FieldMetadata } from '../types';
+import type { FieldMetadata, FieldValueOption } from '../types';
 
 const baseField = (overrides: Partial<FieldMetadata> = {}): FieldMetadata => ({
   name: 'status',
@@ -209,6 +212,78 @@ describe('fields.ts helpers', () => {
     it('returns undefined for null/undefined value', () => {
       expect(findValueLabelInFields(null, allFields)).toBeUndefined();
       expect(findValueLabelInFields(undefined, allFields)).toBeUndefined();
+    });
+
+    it('finds a label nested inside a group (recursive)', () => {
+      const nested: FieldMetadata[] = [
+        baseField({
+          values: [
+            {
+              label: 'SQL injection',
+              children: [{ value: 'sqli_union', label: 'Union-based SQLi' }],
+            },
+          ],
+        }),
+      ];
+      expect(findValueLabelInFields('sqli_union', nested)).toBe('Union-based SQLi');
+    });
+  });
+});
+
+describe('nested value helpers', () => {
+  const nestedValues: FieldValueOption[] = [
+    {
+      label: 'Input-based attacks',
+      children: [
+        { value: 'xss', label: 'XSS' },
+        {
+          label: 'SQL injection',
+          children: [
+            { value: 'sqli_union', label: 'Union-based SQLi' },
+            { value: 'sqli_time', label: 'Time-based blind SQLi' },
+          ],
+        },
+      ],
+    },
+    { value: 'rce', label: 'RCE' },
+  ];
+
+  describe('isValueGroup', () => {
+    it('is true for an option with children, false for a leaf', () => {
+      expect(isValueGroup({ label: 'g', children: [] })).toBe(true);
+      expect(isValueGroup({ value: 'x', label: 'X' })).toBe(false);
+      expect(isValueGroup(undefined)).toBe(false);
+    });
+  });
+
+  describe('collectLeaves', () => {
+    it('recursively flattens to committable leaves, dropping groups', () => {
+      expect(collectLeaves(nestedValues).map(l => l.value)).toEqual([
+        'xss',
+        'sqli_union',
+        'sqli_time',
+        'rce',
+      ]);
+    });
+
+    it('returns [] for undefined', () => {
+      expect(collectLeaves(undefined)).toEqual([]);
+    });
+  });
+
+  describe('findOptionByValue (recursive)', () => {
+    const field = baseField({ name: 'attack_type', label: 'Attack type', values: nestedValues });
+
+    it('finds a leaf nested inside a group', () => {
+      expect(findOptionByValue(field, 'sqli_time')?.label).toBe('Time-based blind SQLi');
+    });
+
+    it('finds a top-level leaf', () => {
+      expect(findOptionByValue(field, 'rce')?.label).toBe('RCE');
+    });
+
+    it('returns undefined for a group label (groups are not committable)', () => {
+      expect(findOptionByValue(field, 'SQL injection')).toBeUndefined();
     });
   });
 });

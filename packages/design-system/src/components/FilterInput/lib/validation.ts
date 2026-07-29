@@ -1,6 +1,6 @@
 import { isDatePreset } from '../FilterInputMenu/FilterInputDateValueMenu/constants';
 import type { Condition, FieldMetadata, FieldType, FieldValueOption } from '../types';
-import { getFieldValues, hasStaticAllowlist } from './fields';
+import { collectLeaves, getFieldValues, hasStaticAllowlist } from './fields';
 
 /**
  * Whether a value conforms to a field's data type. Catches a value left over
@@ -106,7 +106,9 @@ export const getInvalidValueIndices = (
   // not an allowlist — so nothing is flagged.
   if (field.getSuggestions) return [];
 
-  const allowlist = hasStaticAllowlist(field) ? getFieldValues(field) : null;
+  // Flatten to leaves — a nested field's allowlist is its committable leaves,
+  // not the presentational group/section nodes (which carry no `value`).
+  const allowlist = hasStaticAllowlist(field) ? collectLeaves(getFieldValues(field)) : null;
   return values.reduce<number[]>((acc, v, idx) => {
     if (v == null) return acc;
     // 1) Data type.

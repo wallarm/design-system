@@ -1,21 +1,27 @@
-import { type FC, type RefObject, useMemo } from 'react';
-import { cn } from '../../../../utils/cn';
+import type { FC, RefObject } from 'react';
 import type { BadgeColor } from '../../../Badge';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuGroup } from '../../../DropdownMenu';
-import { filterAndSort } from '../../lib';
-import { MenuEmptyState } from '../MenuEmptyState';
-import { useValueMenuDisplayValues } from './useValueMenuDisplayValues';
-import { useValueMenuState } from './useValueMenuState';
-import { ValueMenuFooter } from './ValueMenuFooter';
-import { ValueMenuItem } from './ValueMenuItem';
-import { valueOptionSearchText } from './valueOptionSearchText';
+import { isValueGroup } from '../../lib';
+import { FlatValueMenu } from './FlatValueMenu';
+import { NestedValueMenu } from './NestedValueMenu';
 
 export interface ValueOption {
-  value: string | number | boolean;
+  /**
+   * Committable value — present on **leaf** options only. Group options (those
+   * with `children`) omit it; they are presentational and never committed.
+   */
+  value?: string | number | boolean;
   label: string;
   badge?: { color: BadgeColor; text: string };
   /** Muted secondary line rendered beneath the bold `label`. Display-only. */
   description?: string;
+  /**
+   * Nested sub-values. When present this option is a group: a section header at
+   * the top level, or a submenu trigger when nested. Only leaves are committed.
+   */
+  children?: ValueOption[];
+  /** Optional section-header label to bucket top-level options under a heading. */
+  section?: string;
+  /** @deprecated superseded by `children`; kept for back-compat. */
   hasSubmenu?: boolean;
 }
 
@@ -23,7 +29,8 @@ type ConditionValue = string | number | boolean;
 
 export interface FilterInputValueMenuProps {
   values: ValueOption[];
-  onSelect: (value: ValueOption['value']) => void;
+  // Only committable leaf values fire onSelect — never a group (which has no value).
+  onSelect: (value: ConditionValue) => void;
   onCommit?: (values: ConditionValue[]) => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
@@ -47,111 +54,15 @@ export interface FilterInputValueMenuProps {
   className?: string;
 }
 
-export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = ({
-  values,
-  onSelect,
-  onCommit,
-  open = false,
-  onOpenChange,
-  onEscape,
-  multiSelect = false,
-  initialValues = [],
-  highlightValue,
-  width = 'standard',
-  positioning,
-  onBuildingValueChange,
-  onItemToggle,
-  inputRef,
-  filterText = '',
-  menuRef,
-  blurCommitRef,
-  className,
-}) => {
-  const filteredValues = useMemo(
-    () => filterAndSort(values, filterText, valueOptionSearchText),
-    [values, filterText],
-  );
-
-  const {
-    selectedValues,
-    checkedValues,
-    highlightedValue,
-    onHighlightChange,
-    pendingIds,
-    registerItem,
-    handleItemSelect,
-  } = useValueMenuState({
-    values: filteredValues,
-    open,
-    multiSelect,
-    initialValues,
-    highlightValue,
-    onSelect,
-    onCommit,
-    onEscape,
-    onOpenChange,
-    onBuildingValueChange,
-    onItemToggle,
-    inputRef,
-    menuRef,
-    blurCommitRef,
-  });
-
-  const displayValues = useValueMenuDisplayValues({
-    values,
-    filteredValues,
-    multiSelect,
-    checkedValues,
-    highlightValue,
-  });
-
-  const widthClass = width === 'compact' ? 'w-[172px]' : 'w-[300px]';
-  const widthStyle = typeof width === 'number' ? { width: `${width}px` } : undefined;
-
-  return (
-    <DropdownMenu
-      open={open}
-      onOpenChange={onOpenChange}
-      closeOnSelect={false}
-      positioning={positioning}
-      highlightedValue={highlightedValue}
-      onHighlightChange={onHighlightChange}
-    >
-      <DropdownMenuContent
-        ref={menuRef}
-        className={cn(widthClass, 'max-h-[430px]', className)}
-        style={widthStyle}
-        data-filter-input-menu='true'
-      >
-        {displayValues.length > 0 ? (
-          <DropdownMenuGroup>
-            {displayValues.map(option => (
-              <ValueMenuItem
-                key={String(option.value)}
-                option={option}
-                // Loose match — values may be stringified after parser round-trip
-                // (e.g. pasted "1" vs canonical 1); strict .includes would miss it.
-                isChecked={selectedValues.some(v => String(v) === String(option.value))}
-                isPending={pendingIds.has(String(option.value))}
-                multiSelect={multiSelect}
-                registerItem={registerItem}
-                onSelect={() =>
-                  handleItemSelect({
-                    id: String(option.value),
-                    label: option.label,
-                    value: option.value,
-                  })
-                }
-              />
-            ))}
-          </DropdownMenuGroup>
-        ) : (
-          <MenuEmptyState />
-        )}
-        <ValueMenuFooter multiSelect={multiSelect} />
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
+/**
+ * Value dropdown (third autocomplete step). Dispatches to the nested menu
+ * (sections + submenu) when the field's values contain groups or `section`
+ * tags, otherwise to the flat single-list menu. Owns no hooks itself so each
+ * variant's hooks mount/unmount cleanly.
+ */
+export const FilterInputValueMenu: FC<FilterInputValueMenuProps> = props => {
+  const isNested = props.values.some(v => isValueGroup(v) || v.section != null);
+  return isNested ? <NestedValueMenu {...props} /> : <FlatValueMenu {...props} />;
 };
 
 FilterInputValueMenu.displayName = 'FilterInputValueMenu';

@@ -78,10 +78,25 @@ export type FilterOperator =
   | 'between';
 
 /**
- * Value option for enum/select fields
+ * Value option for enum/select fields.
+ *
+ * A value option is one of two shapes:
+ * - a **leaf**: carries a committable `value` (the only thing that reaches the
+ *   expression tree / backend);
+ * - a **group**: carries `children` and **no** `value` — a purely presentational
+ *   node. Top-level groups render as section headers in the value menu; nested
+ *   groups render as a submenu trigger row (e.g. an "Attack type" like
+ *   `SQL injection` that opens a submenu of concrete leaf sub-types). Selecting
+ *   or toggling a group is a bulk shortcut for its descendant leaves; the group
+ *   itself is never committed. Nesting is recursive.
  */
 export interface FieldValueOption {
-  value: string | number | boolean;
+  /**
+   * The committable value. Present on **leaf** options only. Group options
+   * (those with `children`) omit it — they are presentational and never
+   * committed; only their descendant leaves reach the expression.
+   */
+  value?: string | number | boolean;
   label: string;
   badge?: { color: BadgeColor; text: string };
   /**
@@ -92,6 +107,20 @@ export interface FieldValueOption {
    * share a label (two `request-id` rows with different paths).
    */
   description?: string;
+  /**
+   * Nested sub-values. When present, this option is a **group** (no own
+   * `value`): a section header at the top level, or a submenu trigger when
+   * nested. Recursive — a group's children may themselves be groups. Only the
+   * leaves (options without `children`) are committable.
+   */
+  children?: FieldValueOption[];
+  /**
+   * Optional section-header label used to bucket top-level value options under
+   * a heading in the value menu (parallel to `FieldGroup` for the field menu).
+   * An alternative to wrapping options in a top-level group node; ignored for
+   * options nested inside a group.
+   */
+  section?: string;
 }
 
 /**

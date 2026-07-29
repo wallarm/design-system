@@ -10,6 +10,12 @@ export { applyFieldValueTransforms } from './applyFieldValueTransforms';
 export { applyKnownFieldHelpers, getKnownFieldSerializer } from './applyKnownFieldHelpers';
 export { buildFieldMenuSections, type FieldMenuSection } from './buildFieldMenuSections';
 export {
+  buildValueMenuSections,
+  type ValueMenuRow,
+  type ValueMenuSection,
+} from './buildValueMenuSections';
+export { type CollapseToken, collapseValues } from './collapseValuesToLabels';
+export {
   chipIdToConditionIndex,
   findChipSplitIndex,
   incompleteTripletError,
@@ -30,11 +36,13 @@ export {
 export { COUNTRY_OPTIONS } from './country';
 export { type AnchorBounds, buildAnchoredRect, isMenuRelated, toAnchorBounds } from './dom';
 export {
+  collectLeaves,
   findOptionByValue,
   findValueLabelInFields,
   getFieldValues,
   hasFieldValues,
   hasStaticAllowlist,
+  isValueGroup,
 } from './fields';
 export { filterAndSort } from './filterSort';
 export { getCurrentValueTokenText, getValueFilterText } from './menuFilterText';
