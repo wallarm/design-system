@@ -57,6 +57,26 @@ test.describe('Component: FilterInput', () => {
       const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
       await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('Union-based SQLi');
     });
+
+    test('a partially-selected category collapses to the parent label with a count', async ({
+      page,
+    }) => {
+      await story.goto(page, 'Nested Value Submenu');
+      await openValueMenu(page);
+
+      // Check two of the eight SQLi sub-types — a partial selection.
+      await page.getByRole('menuitem', { name: /^SQL injection$/ }).hover();
+      await page.getByRole('menuitem', { name: /^Code execution via SQLi$/ }).click();
+      await page.getByRole('menuitem', { name: /^Union-based SQLi$/ }).click();
+
+      // Blur to commit the multi-select.
+      await page.locator('body').click({ position: { x: 4, y: 4 } });
+
+      // The chip shows the parent label with the selected-leaf count, not the
+      // individual sub-type labels.
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('SQL injection (2)');
+    });
   });
 
   test.describe('Accessibility', () => {

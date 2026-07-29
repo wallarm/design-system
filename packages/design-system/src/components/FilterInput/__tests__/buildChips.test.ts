@@ -331,3 +331,74 @@ describe('buildChips — paired field (AS-1160)', () => {
     expect(findChip(buildChips(conditions, [], plainFields, false))?.pair).toBeUndefined();
   });
 });
+
+describe('buildChips — nested value group display (WDS-156)', () => {
+  const nestedFields: FieldMetadata[] = [
+    {
+      name: 'attack_type',
+      label: 'Attack type',
+      type: 'enum',
+      operators: ['in', 'not_in', '=', '!='],
+      values: [
+        {
+          label: 'Input-based attacks',
+          children: [
+            { value: 'xss', label: 'Cross-site scripting (XSS)' },
+            { value: 'rce', label: 'Remote code execution (RCE)' },
+            {
+              label: 'SQL injection',
+              children: [
+                { value: 'sqli_boolean', label: 'Boolean-based blind SQLi' },
+                { value: 'sqli_generic', label: 'Generic SQLi' },
+                { value: 'sqli_time', label: 'Time-based blind SQLi' },
+                { value: 'sqli_union', label: 'Union-based SQLi' },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+  ];
+
+  const inChip = (values: Array<string | number>) =>
+    findChip(
+      buildChips(
+        [{ type: 'condition', field: 'attack_type', operator: 'in', value: values }],
+        [],
+        nestedFields,
+        false,
+      ),
+    );
+
+  it('shows only the group name when every sub-value is selected', () => {
+    const chip = inChip(['sqli_boolean', 'sqli_generic', 'sqli_time', 'sqli_union']);
+    expect(chip?.value).toBe('SQL injection');
+    // A single collapsed token is one part — no multi-part rendering.
+    expect(chip?.valueParts).toBeUndefined();
+  });
+
+  it('shows the group name with a count when partially selected', () => {
+    const chip = inChip(['sqli_union', 'sqli_time']);
+    expect(chip?.value).toBe('SQL injection (2)');
+    expect(chip?.valueParts).toBeUndefined();
+  });
+
+  it('counts a single selected sub-value', () => {
+    expect(inChip(['sqli_union'])?.value).toBe('SQL injection (1)');
+  });
+
+  it('renders section leaves individually, not as the section group', () => {
+    const chip = inChip(['xss', 'rce']);
+    expect(chip?.valueParts).toEqual(['Cross-site scripting (XSS)', 'Remote code execution (RCE)']);
+  });
+
+  it('mixes a section leaf with a partially-selected submenu group', () => {
+    const chip = inChip(['xss', 'sqli_union']);
+    expect(chip?.valueParts).toEqual(['Cross-site scripting (XSS)', 'SQL injection (1)']);
+  });
+
+  it('mixes a section leaf with a fully-selected submenu group', () => {
+    const chip = inChip(['xss', 'sqli_boolean', 'sqli_generic', 'sqli_time', 'sqli_union']);
+    expect(chip?.valueParts).toEqual(['Cross-site scripting (XSS)', 'SQL injection']);
+  });
+});

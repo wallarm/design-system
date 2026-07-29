@@ -40,9 +40,31 @@ describe('collapseValues', () => {
     expect(tokens).toEqual([{ kind: 'group', label: 'SQL injection' }]);
   });
 
-  it('keeps partially-selected group children as leaf tokens', () => {
+  it('collapses a partially-selected submenu group to a label with a count', () => {
     const tokens = collapseValues(field, ['sqli_union']);
-    expect(tokens).toEqual([{ kind: 'leaf', value: 'sqli_union' }]);
+    expect(tokens).toEqual([{ kind: 'group', label: 'SQL injection', count: 1 }]);
+  });
+
+  it('counts every selected leaf of a partially-selected group', () => {
+    const tokens = collapseValues(field, ['sqli_time']);
+    expect(tokens).toEqual([{ kind: 'group', label: 'SQL injection', count: 1 }]);
+  });
+
+  it('does not collapse a top-level section group — its leaves show individually', () => {
+    // 'xss' and 'rce' are direct leaves of the "Input-based attacks" section.
+    const tokens = collapseValues(field, ['xss', 'rce']);
+    expect(tokens).toEqual([
+      { kind: 'leaf', value: 'xss' },
+      { kind: 'leaf', value: 'rce' },
+    ]);
+  });
+
+  it('mixes a section leaf with a partially-selected submenu group', () => {
+    const tokens = collapseValues(field, ['xss', 'sqli_union']);
+    expect(tokens).toEqual([
+      { kind: 'leaf', value: 'xss' },
+      { kind: 'group', label: 'SQL injection', count: 1 },
+    ]);
   });
 
   it('mixes a fully-selected group with sibling leaves', () => {

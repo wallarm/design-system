@@ -456,8 +456,9 @@ export const PairedFieldPreset: Story = {
  *
  * Sections and parent categories are purely presentational: only the **leaf**
  * sub-values are committable, so the expression always carries leaves (e.g.
- * `sqli_union`), never the group. When *every* child of a parent is selected
- * the chip collapses its display to the parent label ("SQL injection").
+ * `sqli_union`), never the group. A submenu category collapses in the chip:
+ * every child selected → the parent label ("SQL injection"); some children
+ * selected → the label with a count ("SQL injection (4)").
  *
  * Pick the `in` operator to multi-select. Toggle the parent (or "Select all")
  * to bulk-select every sub-type; the parent checkbox is tri-state.

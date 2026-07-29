@@ -133,15 +133,18 @@ const buildMultiValueChip = (
 ): FilterInputChipData => {
   const values = condition.value as Array<string | number | boolean>;
   const invalidIndices = field ? getInvalidValueIndices(field, values) : [];
-  // When every value is valid, collapse a fully-selected parent category into
-  // its label (e.g. all SQLi sub-types → "SQL injection"). Display-only — the
-  // stored value array still holds leaves. With invalid values present we skip
-  // the collapse so `errorValueIndices` stays aligned to the raw value array.
+  // When every value is valid, collapse a submenu parent category into its
+  // label — fully selected → "SQL injection", partially selected → "SQL
+  // injection (4)". Display-only — the stored value array still holds leaves.
+  // With invalid values present we skip the collapse so `errorValueIndices`
+  // stays aligned to the raw value array.
   const valueParts =
     field && invalidIndices.length === 0
       ? collapseValues(field, values).map(token =>
           token.kind === 'group'
-            ? token.label
+            ? token.count != null
+              ? `${token.label} (${token.count})`
+              : token.label
             : (resolveValueLabel(token.value, field, fields) ?? String(token.value)),
         )
       : values.map(v => resolveValueLabel(v, field, fields) ?? String(v));

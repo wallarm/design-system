@@ -3,22 +3,28 @@ import { collectLeaves, isValueGroup } from './fields';
 
 /**
  * A display token for a multi-value chip. A `group` token stands in for a
- * parent category whose *entire* leaf set is selected (e.g. all SQLi sub-types
- * → "SQL injection"); a `leaf` token is a single committed value.
+ * **submenu** parent category (e.g. "SQL injection"): `count` present means a
+ * partial selection ("SQL injection (4)"), `count` absent means every sub-value
+ * is selected ("SQL injection"). A `leaf` token is a single committed value.
  */
 export type CollapseToken =
-  | { kind: 'group'; label: string }
+  | { kind: 'group'; label: string; count?: number }
   | { kind: 'leaf'; value: string | number | boolean };
 
 /**
- * Collapse a committed leaf-value array into display tokens, folding a fully
- * selected parent category into a single group token. Display-only: the stored
+ * Collapse a committed leaf-value array into display tokens, folding a submenu
+ * parent category into a single group token. Display-only: the stored
  * `Condition.value` array is never mutated and always holds leaf values.
  *
  * For a field with no nested groups this returns one leaf token per value in
  * the original committed order (identical to the previous flat behavior). For a
- * nested field it walks the config in declaration order: a group whose every
- * descendant leaf is present collapses to a group token; otherwise it recurses.
+ * nested field it walks the config in declaration order:
+ * - **Top-level groups are section headers** (no checkbox) — never collapsed;
+ *   we recurse so their direct leaves render individually.
+ * - **Nested groups are submenu categories** — any selection collapses to a
+ *   single group token: fully selected → just the label; partially selected →
+ *   label + selected-leaf `count`.
+ *
  * Committed values absent from the config (freeform) trail in committed order.
  */
 export const collapseValues = (
@@ -35,17 +41,25 @@ export const collapseValues = (
   const consumed = new Set<string>();
   const tokens: CollapseToken[] = [];
 
-  const walk = (opts: FieldValueOption[]): void => {
+  const walk = (opts: FieldValueOption[], depth: number): void => {
     for (const option of opts) {
       if (isValueGroup(option)) {
-        const leafKeys = collectLeaves(option.children).map(leaf => String(leaf.value));
-        const allSelected = leafKeys.length > 0 && leafKeys.every(key => committed.has(key));
-        if (allSelected) {
-          tokens.push({ kind: 'group', label: option.label });
-          for (const key of leafKeys) consumed.add(key);
-        } else {
-          walk(option.children);
+        // Top-level groups render as section headers, not selectable submenu
+        // categories — recurse so their leaves show individually.
+        if (depth === 0) {
+          walk(option.children, depth + 1);
+          continue;
         }
+        const leafKeys = collectLeaves(option.children).map(leaf => String(leaf.value));
+        const selected = leafKeys.filter(key => committed.has(key));
+        if (selected.length === 0) continue;
+        const isFull = selected.length === leafKeys.length;
+        tokens.push(
+          isFull
+            ? { kind: 'group', label: option.label }
+            : { kind: 'group', label: option.label, count: selected.length },
+        );
+        for (const key of selected) consumed.add(key);
       } else if (option.value != null) {
         const key = String(option.value);
         if (committed.has(key) && !consumed.has(key)) {
@@ -55,7 +69,7 @@ export const collapseValues = (
       }
     }
   };
-  walk(options);
+  walk(options, 0);
 
   // Freeform values not present in the config, in original committed order.
   for (const value of values) {
