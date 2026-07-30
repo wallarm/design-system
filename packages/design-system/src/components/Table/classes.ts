@@ -5,7 +5,7 @@ import { cn } from '../../utils/cn';
 const tableCellBase = cn(
   'border-b border-r border-border-primary-light last:border-r-0',
   'overlay overflow-visible',
-  'select-none font-sans',
+  'font-sans',
 );
 
 /** Shared pinned shadow for the last pinned-left column */

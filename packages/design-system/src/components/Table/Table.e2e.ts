@@ -166,6 +166,18 @@ test.describe('Component: Table', () => {
         .toBeGreaterThan(0);
     });
 
+    test('Should allow selecting text in a table body cell', async ({ page }) => {
+      await tableStory.goto(page, 'Manual Sorting');
+
+      const table = page.getByTestId('manual-sort-table');
+      const cell = table.locator('tbody tr').first().locator('td').nth(1);
+
+      await cell.dblclick();
+
+      const selectedText = await page.evaluate(() => window.getSelection()?.toString() ?? '');
+      expect(selectedText.length).toBeGreaterThan(0);
+    });
+
     test('Should append newer rows when scrolled to the bottom', async ({ page }) => {
       await tableStory.goto(page, 'Bidirectional Infinite Scroll');
 
