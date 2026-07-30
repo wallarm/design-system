@@ -19,6 +19,27 @@ const freeTextField: FieldMetadata = {
   type: 'string',
 };
 
+const nestedField: FieldMetadata = {
+  name: 'attack_type',
+  label: 'Attack type',
+  type: 'enum',
+  values: [
+    {
+      label: 'Input-based attacks',
+      children: [
+        { value: 'xss', label: 'XSS' },
+        {
+          label: 'SQL injection',
+          children: [
+            { value: 'sqli_union', label: 'Union-based SQLi' },
+            { value: 'sqli_time', label: 'Time-based blind SQLi' },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 const makeConditions = (overrides: Partial<Condition> = {}): Condition[] => [
   {
     type: 'condition',
@@ -112,6 +133,30 @@ describe('deriveAutocompleteValues', () => {
       });
 
       expect(result.editingMultiValues).toEqual(['active']);
+    });
+
+    it('keeps valid nested leaf values when re-editing an errored nested condition (WDS-156)', () => {
+      const result = deriveAutocompleteValues({
+        editingChipId: 'chip-0',
+        selectedField: nestedField,
+        selectedOperator: 'in',
+        conditions: [
+          {
+            type: 'condition',
+            field: 'attack_type',
+            operator: 'in',
+            value: ['sqli_union', 'sqli_time', 'unknown'],
+            error: true,
+          },
+        ],
+        buildingMultiValue: undefined,
+        dateRangeFromValue: undefined,
+      });
+
+      // The two nested SQLi leaves are valid and must survive; only the truly
+      // unknown value is dropped. Before the leaf-flatten fix, the nested leaves
+      // were absent from the top-level option list and got dropped too.
+      expect(result.editingMultiValues).toEqual(['sqli_union', 'sqli_time']);
     });
 
     it('preserves all values for dynamic (getSuggestions) field even with error', () => {

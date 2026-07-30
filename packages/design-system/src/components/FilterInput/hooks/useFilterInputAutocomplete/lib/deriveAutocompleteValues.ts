@@ -1,6 +1,7 @@
 import type { BuildingChipData } from '../../../FilterInputContext/types';
 import {
   chipIdToConditionIndex,
+  collectLeaves,
   getDateDisplayLabel,
   getFieldValues,
   getOperatorLabel,
@@ -34,7 +35,8 @@ const displayBaseValue = (
   value: string | number | boolean | null | Array<string | number | boolean>,
   field: FieldMetadata,
 ): string => {
-  const options = getFieldValues(field);
+  // Flatten to leaves so a nested value resolves to its label, not the raw value.
+  const options = collectLeaves(getFieldValues(field));
   const resolve = (v: string | number | boolean | null): string =>
     options.find(opt => String(opt.value) === String(v))?.label ?? String(v ?? '');
   return Array.isArray(value) ? value.map(resolve).join(', ') : resolve(value);
@@ -97,7 +99,9 @@ export const deriveAutocompleteValues = ({
         ? [editingCondition.value]
         : [];
     if (editingCondition.error && selectedField && hasStaticAllowlist(selectedField)) {
-      const fieldValues = getFieldValues(selectedField);
+      // Flatten to leaves so re-editing an errored nested multi-value condition
+      // keeps its valid nested selections instead of dropping them (WDS-156).
+      const fieldValues = collectLeaves(getFieldValues(selectedField));
       if (fieldValues.length > 0) {
         return values.filter(v => fieldValues.some(opt => opt.value === v));
       }

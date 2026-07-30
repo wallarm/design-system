@@ -19,6 +19,27 @@ const dynamicField: FieldMetadata = {
   getSuggestions: () => [{ value: '200', label: '200 OK' }],
 };
 
+const nestedField: FieldMetadata = {
+  name: 'attack_type',
+  label: 'Attack type',
+  type: 'enum',
+  values: [
+    {
+      label: 'Input-based attacks',
+      children: [
+        { value: 'xss', label: 'XSS' },
+        {
+          label: 'SQL injection',
+          children: [
+            { value: 'sqli_union', label: 'Union-based SQLi' },
+            { value: 'sqli_time', label: 'Time-based blind SQLi' },
+          ],
+        },
+      ],
+    },
+  ],
+};
+
 describe('parseFilterInputErrors', () => {
   it('returns empty array when no conditions have errors', () => {
     const conditions: Condition[] = [
@@ -66,6 +87,23 @@ describe('parseFilterInputErrors', () => {
     ];
     expect(parseFilterInputErrors(conditions, [staticField])).toEqual([
       'Invalid value for Status: bogus',
+    ]);
+  });
+
+  it('treats nested leaf values as valid, flagging only the truly unknown one (WDS-156)', () => {
+    const conditions: Condition[] = [
+      {
+        type: 'condition',
+        field: 'attack_type',
+        operator: 'in',
+        value: ['sqli_union', 'sqli_time', 'bogus'],
+        error: 'value',
+      },
+    ];
+    // The nested SQLi leaves live under `children`; before the leaf-flatten fix
+    // they were absent from the top-level list and wrongly reported invalid.
+    expect(parseFilterInputErrors(conditions, [nestedField])).toEqual([
+      'Invalid value for Attack type: bogus',
     ]);
   });
 
