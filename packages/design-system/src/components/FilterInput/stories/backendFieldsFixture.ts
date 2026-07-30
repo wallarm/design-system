@@ -7,7 +7,7 @@
 // Shared fixture: consumed by the FilterInput and Composition "Default" stories
 // so both render the identical attack-vectors filter set.
 // ---------------------------------------------------------------------------
-import type { FieldMetadata, FieldType, FilterOperator } from '../types';
+import type { FieldMetadata, FieldType, FilterOperator, ValueGroup } from '../types';
 
 interface RawBackendOption {
   value: string;
@@ -65,6 +65,99 @@ const toOperators = (ops: string[]): FilterOperator[] =>
   ops
     .map(op => OPERATOR_ALIASES[op] ?? (op as FilterOperator))
     .filter(op => SUPPORTED_OPERATORS.has(op));
+
+/**
+ * Attack-type taxonomy for the grouped value menu, matching the WADS Figma
+ * design (`select-menu`, node 10330-85794).
+ *
+ * Deliberately a *story* fixture, not a design-system export: the backend's
+ * `attack_type` payload carries no category, and the DS ships the grouping
+ * mechanism rather than Wallarm's taxonomy — same division of labour as
+ * `fieldGroups`. Values absent from any group here (`rate_limit`, `ai_attack`,
+ * `mcp_parameter_violation`) intentionally demonstrate the trailing headerless
+ * section.
+ */
+export const ATTACK_TYPE_VALUE_GROUPS: ValueGroup[] = [
+  {
+    label: 'Input-based attacks',
+    values: [
+      'crlf',
+      'xss',
+      'mail_injection',
+      'ldapi',
+      'mass_assignment',
+      'nosqli',
+      'ptrav',
+      'rce',
+      'scanner',
+      'sqli',
+      'ssi',
+      'ssrf',
+      'ssti',
+    ],
+  },
+  {
+    label: 'GraphQL attacks',
+    values: [
+      'gql_aliases',
+      'gql_docs_per_batch',
+      'gql_debug',
+      'gql_introspection',
+      'gql_depth',
+      'gql_doc_size',
+      'gql_value_size',
+    ],
+  },
+  {
+    label: 'API specification enforcement',
+    values: [
+      'invalid_parameter_value',
+      'invalid_request',
+      'missing_auth',
+      'missing_parameter',
+      'undefined_endpoint',
+      'undefined_parameter',
+    ],
+  },
+  {
+    label: 'API abuse',
+    values: [
+      'account_takeover',
+      'scraping',
+      'security_crawlers',
+      'api_abuse',
+      'resource_consumption',
+    ],
+  },
+  {
+    label: 'Enumeration attacks',
+    values: ['bola', 'brute', 'dirbust', 'enum'],
+  },
+  {
+    label: 'Data handling',
+    values: [
+      'data_bomb',
+      'file_upload_violation',
+      'invalid_xml',
+      'processing_overlimit',
+      'overlimit_res',
+      'xxe',
+    ],
+  },
+  {
+    label: 'Other',
+    values: [
+      'blocked_source',
+      'credential_stuffing',
+      'query_anomaly',
+      'session_anomaly',
+      'redir',
+      'ai_prompt_injection',
+      'ai_prompt_retrieval',
+      'vpatch',
+    ],
+  },
+];
 
 /**
  * Normalize one raw backend field to `FieldMetadata`:

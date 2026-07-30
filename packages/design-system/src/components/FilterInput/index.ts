@@ -37,4 +37,5 @@ export type {
   FilterInputChipVariant,
   FilterOperator,
   Group,
+  ValueGroup,
 } from './types';

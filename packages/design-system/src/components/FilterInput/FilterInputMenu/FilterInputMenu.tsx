@@ -8,6 +8,7 @@ import {
   getValueFilterText,
   isBetweenOperator,
   isMultiSelectOperator,
+  isOperatorAllowedForField,
 } from '../lib';
 import type { FieldGroup, FieldMetadata, FilterOperator, MenuState } from '../types';
 import { FilterInputDateValueMenu } from './FilterInputDateValueMenu';
@@ -31,6 +32,10 @@ export interface FilterInputAutocompleteState {
   handleOperatorSelect: (operator: FilterOperator) => void;
   handleValueSelect: (val: string | number | boolean) => void;
   handleMultiCommit: (values: Array<string | number | boolean>) => void;
+  handleGroupSelect: (
+    values: Array<string | number | boolean>,
+    nextOperator: FilterOperator,
+  ) => void;
   handleRangeSelect: (from: string, to: string) => void;
   handleMenuClose: () => void;
   handleMenuDiscard: () => void;
@@ -70,6 +75,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
     handleOperatorSelect,
     handleValueSelect,
     handleMultiCommit,
+    handleGroupSelect,
     handleRangeSelect,
     handleMenuClose,
     handleMenuDiscard,
@@ -148,6 +154,27 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
   const isDateField = selectedField?.type === 'date';
   const hasValueOptions = selectedFieldValues.length > 0;
 
+  // Grouping is static membership, so it can't describe a dynamically-suggested
+  // list — `getSuggestions` fields fall back to the flat menu.
+  const valueGroups = selectedField?.getSuggestions ? undefined : selectedField?.valueGroups;
+
+  /**
+   * The multi-select operator a group selection should land on. Already
+   * multi-select → keep it (the header just toggles its members). Single-select →
+   * the same-polarity multi equivalent, but only if the field allows it: a field
+   * declaring `['=', '!=', 'in']` has no `not_in`, so under `!=` there is nothing
+   * to switch to and the header must stay inert rather than commit an operator
+   * the field forbids.
+   */
+  const groupOperator: FilterOperator | null = (() => {
+    if (!selectedField || !selectedOperator) return null;
+    if (isMultiSelectOperator(selectedOperator)) return selectedOperator;
+    const target: FilterOperator | null =
+      selectedOperator === '=' ? 'in' : selectedOperator === '!=' ? 'not_in' : null;
+    if (!target) return null;
+    return isOperatorAllowedForField(selectedField, target) ? target : null;
+  })();
+
   return (
     <>
       <FilterInputFieldMenu
@@ -204,6 +231,11 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
               onOpenChange={handleMenuClose}
               onEscape={handleMenuDiscard}
               multiSelect={isMultiSelectOperator(selectedOperator)}
+              valueGroups={valueGroups}
+              groupSelectable={groupOperator !== null}
+              onSelectGroup={
+                groupOperator ? values => handleGroupSelect(values, groupOperator) : undefined
+              }
               initialValues={editingMultiValues}
               highlightValue={editingSingleValue}
               positioning={menuPositioning}

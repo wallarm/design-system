@@ -301,6 +301,7 @@ export {
   type FilterInputProps,
   type FilterOperator,
   type Group,
+  type ValueGroup,
 } from './components/FilterInput';
 export { Flex, type FlexProps } from './components/Flex';
 export { FormatDateTime, type FormatDateTimeProps } from './components/FormatDateTime';

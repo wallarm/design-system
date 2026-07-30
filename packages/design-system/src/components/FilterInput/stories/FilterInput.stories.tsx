@@ -9,7 +9,11 @@ import {
   createStatusCodeValidator,
 } from '../lib/statusCode';
 import type { ExprNode, FieldMetadata } from '../types';
-import { backendFieldsToMetadata, realBackendFields } from './backendFieldsFixture';
+import {
+  ATTACK_TYPE_VALUE_GROUPS,
+  backendFieldsToMetadata,
+  realBackendFields,
+} from './backendFieldsFixture';
 
 const meta = {
   title: 'Patterns/FilterInput/FilterInput',
@@ -99,6 +103,29 @@ export const WithFieldGroups: Story = {
       { label: 'Source and identity', fields: ['country'] },
     ],
     placeholder: 'Type to filter...',
+  },
+};
+
+/**
+ * Value menu with a field's values organized under labeled group headers
+ * (`FieldMetadata.valueGroups`) — the value-level counterpart of `fieldGroups`.
+ *
+ * Try it: type `Attack type`, pick `in`, and the ~60 attack types render under
+ * their categories. Selecting a **group header** is a select-all shorthand over
+ * that group's visible members, with a tri-state checkbox reflecting partial
+ * selection. Under a single-select operator (`=`) a group header switches the
+ * operator to `in` and commits the members in one step.
+ *
+ * `rate_limit`, `ai_attack` and `mcp_parameter_violation` belong to no group, so
+ * they appear in the trailing headerless section.
+ */
+export const WithValueGroups: Story = {
+  args: {
+    fields: attackVectorFields.map(field =>
+      field.name === 'attack_type' ? { ...field, valueGroups: ATTACK_TYPE_VALUE_GROUPS } : field,
+    ),
+    placeholder: 'Type to filter...',
+    showKeyboardHint: true,
   },
 };
 

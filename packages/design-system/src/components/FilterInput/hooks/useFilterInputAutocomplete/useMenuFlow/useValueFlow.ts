@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { SEGMENT_VARIANT } from '../../../FilterInputField/FilterInputChip';
 import { isBetweenOperator, isMultiSelectOperator } from '../../../lib';
+import type { FilterOperator } from '../../../types';
 import {
   resolveDateRangeValue,
   resolveDateValue,
@@ -183,6 +184,35 @@ export const useValueFlow = ({
     [selectedField, selectedOperator, editingChipId, insertIndex, upsertCondition, resetState],
   );
 
+  /**
+   * A value group selected while the operator is single-select. Applies the
+   * operator switch and the members in **one** `upsertCondition` — composing the
+   * existing `handleOperatorSelect` + `handleMultiCommit` would not work, because
+   * `handleMultiCommit` reads `selectedOperator` from its closure and would still
+   * see the pre-switch operator in the same tick.
+   *
+   * `nextOperator` is chosen by the caller (`FilterInputMenu`), which knows both
+   * the current operator and the field's allowed list.
+   */
+  const handleGroupSelect = useCallback(
+    (values: Array<string | number | boolean>, nextOperator: FilterOperator) => {
+      if (!selectedField || values.length === 0) return;
+      const isEditing = !!editingChipId;
+      // Keep the visible operator segment aligned with what we committed; the
+      // reset below clears building state, but an edit session keeps rendering it.
+      setSelectedOperator(nextOperator);
+      upsertCondition(
+        selectedField,
+        nextOperator,
+        values,
+        editingChipId,
+        isEditing ? undefined : insertIndex,
+      );
+      resetState(!isEditing);
+    },
+    [selectedField, editingChipId, insertIndex, upsertCondition, resetState, setSelectedOperator],
+  );
+
   /** Building value preview from FilterInputValueMenu multi-select */
   const handleBuildingValueChange = useCallback(
     (preview: string | undefined) => {
@@ -288,6 +318,7 @@ export const useValueFlow = ({
   return {
     handleValueSelect,
     handleMultiCommit,
+    handleGroupSelect,
     handleBuildingValueChange,
     handleMultiSelectToggle,
     handleRangeSelect,

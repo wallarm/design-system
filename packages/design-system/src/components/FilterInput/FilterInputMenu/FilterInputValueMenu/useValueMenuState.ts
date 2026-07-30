@@ -1,19 +1,44 @@
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { ValueMenuSection } from '../../lib';
 import type { FilterInputDropdownItem } from '../../types';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import type { ValueOption } from './FilterInputValueMenu';
+import { toGroupItemId } from './ValueMenuGroupHeader';
 
 type ConditionValue = string | number | boolean;
 
+/**
+ * Payload marking a keyboard-nav entry as a group header rather than a value.
+ * Carries the members so select routing needs no lookup back into sections.
+ */
+interface GroupNavPayload {
+  kind: 'value-group';
+  label: string;
+  members: ConditionValue[];
+}
+
+const isGroupNavItem = (value: unknown): value is GroupNavPayload =>
+  typeof value === 'object' && value !== null && (value as GroupNavPayload).kind === 'value-group';
+
 interface UseValueMenuStateOptions {
   values: ValueOption[];
+  /** Rendered sections, in visual order — drives keyboard-nav ordering. */
+  sections: Array<ValueMenuSection<ValueOption>>;
+  /** Whether group headers participate in selection and keyboard nav. */
+  groupSelectable: boolean;
   open: boolean;
   multiSelect: boolean;
   initialValues: ConditionValue[];
   highlightValue?: ConditionValue;
   onSelect: (value: ConditionValue) => void;
   onCommit?: (values: ConditionValue[]) => void;
+  /**
+   * A group header selected while the operator is single-select. The parent
+   * switches to the matching multi-select operator and commits the members in
+   * one step — the menu can't change an operator itself.
+   */
+  onSelectGroup?: (values: ConditionValue[]) => void;
   onEscape?: () => void;
   onOpenChange?: (open: boolean) => void;
   onBuildingValueChange?: (preview: string | undefined) => void;
@@ -28,12 +53,15 @@ interface UseValueMenuStateOptions {
 
 export const useValueMenuState = ({
   values,
+  sections,
+  groupSelectable,
   open,
   multiSelect,
   initialValues,
   highlightValue,
   onSelect,
   onCommit,
+  onSelectGroup,
   onEscape,
   onOpenChange,
   onBuildingValueChange,
@@ -67,6 +95,21 @@ export const useValueMenuState = ({
       const key = String(val);
       const exists = prev.some(v => String(v) === key);
       return exists ? prev.filter(v => String(v) !== key) : [...prev, val];
+    });
+  };
+
+  /**
+   * Select-all / clear-all over a group's members. `members` is already narrowed
+   * to the *visible* rows by the caller, so selecting a searched-down group never
+   * silently checks values the user can't see.
+   */
+  const toggleGroup = (members: ConditionValue[]) => {
+    setCheckedValues(prev => {
+      const memberKeys = new Set(members.map(String));
+      const allChecked = members.every(m => prev.some(v => String(v) === String(m)));
+      if (allChecked) return prev.filter(v => !memberKeys.has(String(v)));
+      const missing = members.filter(m => !prev.some(v => String(v) === String(m)));
+      return [...prev, ...missing];
     });
   };
 
@@ -111,12 +154,43 @@ export const useValueMenuState = ({
     };
   }, [multiSelect, blurCommitRef, commitChecked]);
 
-  const flatItems: FilterInputDropdownItem[] = useMemo(
-    () => values.map(opt => ({ id: String(opt.value), label: opt.label, value: opt.value })),
-    [values],
-  );
+  // Keyboard-nav order follows the rendered sections top-to-bottom, so a
+  // selectable group header is navigated to just before its own members.
+  const flatItems: FilterInputDropdownItem[] = useMemo(() => {
+    const items: FilterInputDropdownItem[] = [];
+    for (const section of sections) {
+      if (section.label && groupSelectable) {
+        items.push({
+          id: toGroupItemId(section.label),
+          label: section.label,
+          value: {
+            kind: 'value-group',
+            label: section.label,
+            members: section.values.map(opt => opt.value),
+          } satisfies GroupNavPayload,
+        });
+      }
+      for (const opt of section.values) {
+        items.push({ id: String(opt.value), label: opt.label, value: opt.value });
+      }
+    }
+    return items;
+  }, [sections, groupSelectable]);
 
   const handleItemSelect = (item: FilterInputDropdownItem) => {
+    if (isGroupNavItem(item.value)) {
+      const { members } = item.value;
+      if (members.length === 0) return;
+      if (multiSelect) {
+        toggleGroup(members);
+        onItemToggle?.();
+      } else {
+        // Single-select can't hold a group: hand off so the parent switches to
+        // the matching multi-select operator and commits in one step.
+        onSelectGroup?.(members);
+      }
+      return;
+    }
     if (multiSelect) {
       toggleValue(item.value as ConditionValue);
       onItemToggle?.();

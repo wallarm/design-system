@@ -113,6 +113,13 @@ export interface FieldMetadata {
    */
   options?: string[];
   /**
+   * Optional labeled sections for the value dropdown. See [ValueGroup] for the
+   * bucketing semantics. Purely presentational plus a select-all affordance —
+   * the committed value is always the individual members, never the group label.
+   * Ignored when `getSuggestions` is set.
+   */
+  valueGroups?: ValueGroup[];
+  /**
    * When `false`, `values`/`options` are suggestions rather than an exhaustive
    * allowlist: the dropdown still offers them, but any typed value commits
    * without an allowlist error. Data-type validation (`isValueOfType`) still
@@ -186,6 +193,26 @@ export interface FieldGroup {
   label: string;
   /** Field names in display order. */
   fields: string[];
+}
+
+/**
+ * A labeled group of a field's *values* for the value-selection menu, declared
+ * on `FieldMetadata.valueGroups`. The value-menu counterpart of [FieldGroup] —
+ * same semantics: groups render in array order, values within a group in listed
+ * order, values not referenced by any group fall into a trailing headerless
+ * section, unknown values are ignored, and a value listed in multiple groups
+ * resolves to its first.
+ *
+ * Frontend-only: selecting a group is a select-all shorthand over its members,
+ * so the committed condition holds the individual values and the backend never
+ * sees the group. Ignored for fields that use `getSuggestions`, since dynamic
+ * suggestions can't be bucketed by static membership.
+ */
+export interface ValueGroup {
+  /** Section header text (e.g. "GraphQL attacks"). */
+  label: string;
+  /** Member values in display order, matching `values`/`options` entries. */
+  values: Array<string | number | boolean>;
 }
 
 /**
