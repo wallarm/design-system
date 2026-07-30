@@ -7,6 +7,8 @@ const tableStory = createStoryHelper('data-display-table', [
   'Bidirectional Infinite Scroll',
   'Bidirectional Infinite Scroll Window',
   'Row Selection Window Scroll',
+  'Context Menu',
+  'Column Drag And Drop',
 ] as const);
 
 // The Bidirectional story header renders "Window of {N} rows around the anchor".
@@ -173,6 +175,97 @@ test.describe('Component: Table', () => {
       const cell = table.locator('tbody tr').first().locator('td').nth(1);
 
       await cell.dblclick();
+
+      const selectedText = await page.evaluate(() => window.getSelection()?.toString() ?? '');
+      expect(selectedText.length).toBeGreaterThan(0);
+    });
+
+    test('Should allow selecting text in a non-draggable table header', async ({ page }) => {
+      await tableStory.goto(page, 'Manual Sorting');
+
+      const table = page.getByTestId('manual-sort-table');
+      const header = table.getByRole('columnheader', { name: 'Object name Sort column' });
+
+      // Dblclick near the start of the label — "Object name" is 2 words, and the
+      // header's bounding-box CENTER can fall on the space between them.
+      await header.dblclick({ position: { x: 8, y: 8 } });
+
+      const selectedText = await page.evaluate(() => window.getSelection()?.toString() ?? '');
+      expect(selectedText.length).toBeGreaterThan(0);
+    });
+
+    test('Should allow selecting text in a draggable table header when not dragging', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Column Drag And Drop');
+
+      // dnd-kit's `attributes` swap the draggable header's a11y role to "button"
+      // (for keyboard sortable support), so query by DOM text, not ARIA role.
+      const requestsHeader = page.locator('thead th').filter({ hasText: 'Requests' });
+
+      // The header's leading "More" menu button occupies the top-left corner
+      // (~4,4 to 28,28) — dblclick further right/down, inside the label text itself.
+      await requestsHeader.dblclick({ position: { x: 120, y: 12 } });
+
+      const selectedText = await page.evaluate(() => window.getSelection()?.toString() ?? '');
+      expect(selectedText.length).toBeGreaterThan(0);
+    });
+
+    test('Should suppress text selection on a table header while actively dragging it', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Column Drag And Drop');
+
+      const requestsHeader = page.locator('thead th').filter({ hasText: 'Requests' });
+      const box = await requestsHeader.boundingBox();
+      if (!box) throw new Error('Requests header not found');
+
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      await page.mouse.down();
+      // Cross dnd-kit's activation-distance threshold so `isDragging` flips true.
+      await page.mouse.move(box.x + box.width / 2 + 40, box.y + box.height / 2, { steps: 10 });
+
+      await expect(requestsHeader).toHaveCSS('user-select', 'none');
+
+      await page.mouse.up();
+    });
+
+    test('Should reorder columns via drag and drop', async ({ page }) => {
+      await tableStory.goto(page, 'Column Drag And Drop');
+
+      const getHeaderTexts = () => page.locator('thead th').allTextContents();
+      const before = await getHeaderTexts();
+
+      const requestsHeader = page.locator('thead th').filter({ hasText: 'Requests' });
+      const sourceHeader = page.locator('thead th').filter({ hasText: 'Source' });
+      const requestsBox = await requestsHeader.boundingBox();
+      const sourceBox = await sourceHeader.boundingBox();
+      if (!requestsBox || !sourceBox) throw new Error('Column headers not found');
+
+      await page.mouse.move(
+        requestsBox.x + requestsBox.width / 2,
+        requestsBox.y + requestsBox.height / 2,
+      );
+      await page.mouse.down();
+      await page.mouse.move(sourceBox.x + sourceBox.width / 2, sourceBox.y + sourceBox.height / 2, {
+        steps: 15,
+      });
+      await page.mouse.up();
+
+      const after = await getHeaderTexts();
+      expect(after).not.toEqual(before);
+    });
+
+    test('Should allow selecting text in a body cell with a context menu trigger', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Context Menu');
+
+      // The label wraps onto 2 lines at this column width — dblclick a point inside
+      // the first line specifically, since the element's bounding-box CENTER can
+      // fall in the inter-line gap (no glyph there) and select nothing.
+      const cell = page.getByText('Rate limiting abuse on the payment endpoint');
+      await cell.dblclick({ position: { x: 8, y: 8 } });
 
       const selectedText = await page.evaluate(() => window.getSelection()?.toString() ?? '');
       expect(selectedText.length).toBeGreaterThan(0);

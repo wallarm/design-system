@@ -7,12 +7,15 @@ type ThVariantProps = VariantProps<typeof tableHeadCellVariants>;
 type ThProps = Omit<ComponentPropsWithRef<'th'>, keyof ThVariantProps> & ThVariantProps;
 
 export const Th = forwardRef<HTMLTableCellElement, ThProps>(
-  ({ className, interactive, sorted, pinned, lastPinnedLeft, draggable, ...props }, ref) => (
+  (
+    { className, interactive, sorted, pinned, lastPinnedLeft, draggable, dragging, ...props },
+    ref,
+  ) => (
     <th
       ref={ref}
       scope='col'
       className={cn(
-        tableHeadCellVariants({ interactive, sorted, pinned, lastPinnedLeft, draggable }),
+        tableHeadCellVariants({ interactive, sorted, pinned, lastPinnedLeft, draggable, dragging }),
         className,
       )}
       {...props}

@@ -65,7 +65,7 @@ export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellP
   const pinningStyles = getPinningStyles(column);
   const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
 
-  const { canDnd, setNodeRef, dndStyle, attributes, listeners } = useColumnDnd(column);
+  const { canDnd, isDragging, setNodeRef, dndStyle, attributes, listeners } = useColumnDnd(column);
   const { hasOverflow } = useHorizontalScrollState(containerRef, isMasterColumn);
 
   // Call a functional header inline (instead of `flexRender`) so we can
@@ -123,6 +123,7 @@ export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellP
       pinned={isPinned === 'left'}
       lastPinnedLeft={lastLeft}
       draggable={canDnd}
+      dragging={isDragging}
       style={{
         ...pinningStyles,
         ...dndStyle,
@@ -132,12 +133,6 @@ export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellP
       aria-sort={ariaSort}
       {...(canDnd ? { ...listeners, ...attributes } : {})}
       tabIndex={-1}
-      onMouseDown={e => {
-        const target = e.target as HTMLElement;
-        if (!target.closest('button')) {
-          e.preventDefault();
-        }
-      }}
     >
       {isNotBasicColumn && content}
 
