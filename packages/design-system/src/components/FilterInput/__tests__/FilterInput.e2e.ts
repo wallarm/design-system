@@ -503,7 +503,14 @@ test.describe('Component: FilterInput — WDS-156 remove button beside a sibling
       const field = page.locator('[data-slot="filter-input"]');
       const leftChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
 
-      await leftChip.locator('[data-slot="filter-input-chip-delete"]').hover();
+      // Hover the chip body (not the × directly): the × is hidden until the chip
+      // is hovered, so a direct hover would fail the actionability check. This
+      // reveals the × above the connector gap for the snapshot.
+      await leftChip.hover();
+      await expect(leftChip.locator('[data-slot="filter-input-chip-delete"]')).toHaveCSS(
+        'opacity',
+        '1',
+      );
       await expect(field).toHaveScreenshot('multi-chip-left-remove-hover.png');
     });
   });
