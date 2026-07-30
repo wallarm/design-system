@@ -56,5 +56,14 @@ test.describe('Component: Tag', () => {
 
       await expect(tag).toBeHidden();
     });
+
+    test('Should allow selecting tag text with a mouse', async ({ page }) => {
+      await tagStory.goto(page, 'Basic');
+
+      await page.getByText('Tag').dblclick();
+
+      const selectedText = await page.evaluate(() => window.getSelection()?.toString() ?? '');
+      expect(selectedText.length).toBeGreaterThan(0);
+    });
   });
 });
