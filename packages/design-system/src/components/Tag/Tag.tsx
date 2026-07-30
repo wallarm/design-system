@@ -10,7 +10,7 @@ const tagVariants = cva(
     'inline-flex items-center',
     'rounded-8 border border-border-primary overlay',
     'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
-    'transition-colors cursor-pointer select-none',
+    'transition-colors cursor-pointer',
 
     // TagClose
     '[&_[data-slot=tag-close]]:cursor-pointer',

@@ -136,6 +136,18 @@ test.describe('Component: DropdownMenu', () => {
       await expect(page.locator('[data-scope="menu"][data-part="content"]').first()).toBeVisible();
     });
 
+    test('Should allow selecting text in the context-trigger area with a mouse', async ({
+      page,
+    }) => {
+      await dropdownMenuStory.goto(page, 'Context');
+      const contextArea = page.getByText('Right click here');
+
+      await contextArea.dblclick();
+
+      const selectedText = await page.evaluate(() => window.getSelection()?.toString() ?? '');
+      expect(selectedText.length).toBeGreaterThan(0);
+    });
+
     test('Should toggle checkbox item on click and keep menu open', async ({ page }) => {
       await dropdownMenuStory.goto(page, 'With Checkbox Items');
       await openMenu(page);

@@ -5,7 +5,7 @@ import { cn } from '../../utils/cn';
 const tableCellBase = cn(
   'border-b border-r border-border-primary-light last:border-r-0',
   'overlay overflow-visible',
-  'select-none font-sans',
+  'font-sans',
 );
 
 /** Shared pinned shadow for the last pinned-left column */
@@ -20,7 +20,7 @@ export const tableHeadCellVariants = cva(
     'pl-16 pr-4 py-4 text-xs font-medium text-text-secondary',
     'first:rounded-tl-12 last:rounded-tr-12',
     'bg-bg-light-primary',
-    'whitespace-nowrap select-none outline-none',
+    'whitespace-nowrap outline-none',
   ),
   {
     variants: {
@@ -44,6 +44,10 @@ export const tableHeadCellVariants = cva(
         true: 'cursor-grab active:cursor-grabbing',
         false: '',
       },
+      dragging: {
+        true: 'select-none',
+        false: '',
+      },
     },
     defaultVariants: {
       interactive: false,
@@ -51,6 +55,7 @@ export const tableHeadCellVariants = cva(
       pinned: false,
       lastPinnedLeft: false,
       draggable: false,
+      dragging: false,
     },
   },
 );
