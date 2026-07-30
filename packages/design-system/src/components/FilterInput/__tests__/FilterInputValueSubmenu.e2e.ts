@@ -46,7 +46,7 @@ test.describe('Component: FilterInput', () => {
       await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('SQL injection');
     });
 
-    test('selecting a single leaf shows that leaf label (no collapse)', async ({ page }) => {
+    test('selecting a single leaf collapses the category to "label (1)"', async ({ page }) => {
       await story.goto(page, 'Nested Value Submenu');
       await openValueMenu(page);
 
@@ -54,8 +54,10 @@ test.describe('Component: FilterInput', () => {
       await page.getByRole('menuitem', { name: /^Union-based SQLi$/ }).click();
       await page.locator('body').click({ position: { x: 4, y: 4 } });
 
+      // One of several sub-values selected is a partial selection, so the chip
+      // shows the parent label with a count of 1 — not the individual leaf.
       const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('Union-based SQLi');
+      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('SQL injection (1)');
     });
 
     test('a partially-selected category collapses to the parent label with a count', async ({
