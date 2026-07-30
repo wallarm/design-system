@@ -103,7 +103,10 @@ test.describe('Component: FilterInput', () => {
       await openValueMenu(page);
       await page.getByRole('menuitem', { name: /^SQL injection$/ }).hover();
       await expect(page.getByRole('menuitem', { name: /^Select all$/ })).toBeVisible();
-      await expect(page.locator('body')).toHaveScreenshot('nested-value-submenu.png');
+      // Capture the viewport (not the `body` element): the two panels render in
+      // fixed-positioned portals that overflow `body`'s small bounding box, so an
+      // element screenshot of `body` crops the menu. The viewport includes both.
+      await expect(page).toHaveScreenshot('nested-value-submenu.png');
     });
 
     test('renders a partially-selected group chip as "label (count)"', async ({ page }) => {
