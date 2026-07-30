@@ -103,5 +103,20 @@ test.describe('Component: FilterInput', () => {
       await expect(page.getByRole('menuitem', { name: /^Select all$/ })).toBeVisible();
       await expect(page.locator('body')).toHaveScreenshot('nested-value-submenu.png');
     });
+
+    test('renders a partially-selected group chip as "label (count)"', async ({ page }) => {
+      await story.goto(page, 'Nested Value Submenu');
+      await openValueMenu(page);
+
+      await page.getByRole('menuitem', { name: /^SQL injection$/ }).hover();
+      await page.getByRole('menuitem', { name: /^Code execution via SQLi$/ }).click();
+      await page.getByRole('menuitem', { name: /^Union-based SQLi$/ }).click();
+      await page.locator('body').click({ position: { x: 4, y: 4 } });
+
+      const field = page.locator('[data-slot="filter-input"]');
+      const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('SQL injection (2)');
+      await expect(field).toHaveScreenshot('nested-group-chip-partial-count.png');
+    });
   });
 });

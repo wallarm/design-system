@@ -123,9 +123,7 @@ test.describe.skip('Component: FilterInput - Editing', () => {
       await page.locator('[role="menuitem"]').filter({ hasText: 'Priority' }).click();
       await page.waitForTimeout(300);
 
-      // Chip should be marked with error (data-error or error class)
-      const updatedChip = page.locator('[data-slot="filter-input-condition-chip"]');
-      // Error chips have the error styling
+      // Chip should be marked with error — asserted via the debug expression.
       const debugOutput = page.locator('[data-testid="expression-debug"]');
       const debugText = await debugOutput.textContent();
       const expression = JSON.parse(debugText!);

@@ -469,3 +469,42 @@ test.describe('Component: FilterInput — AS-1192 standalone chip', () => {
     });
   });
 });
+
+// WDS-156: a chip's × button overflows past its right edge, over the
+// InsertionGap that precedes the next connector. The gap must not steal the
+// hover/click — the × of a chip that has a sibling to its right stays revealed
+// and removable, not only the last chip.
+test.describe('Component: FilterInput — WDS-156 remove button beside a sibling', () => {
+  test.describe('Interactions', () => {
+    test('reveals and removes the left chip via its × when a sibling follows', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Multi Condition Preset');
+      const chips = page.locator('[data-slot="filter-input-condition-chip"]');
+      await expect(chips).toHaveCount(2);
+
+      const leftChip = chips.first();
+      const remove = leftChip.locator('[data-slot="filter-input-chip-delete"]');
+
+      // Hovering the left chip reveals its × even though a gap + connector sit
+      // to its right; the button is really hoverable (opacity 1, clickable).
+      await leftChip.hover();
+      await expect(remove).toHaveCSS('opacity', '1');
+      await remove.hover();
+      await expect(remove).toHaveCSS('opacity', '1');
+
+      // Clicking it removes the left chip, leaving the right one.
+      await remove.click();
+      await expect(chips).toHaveCount(1);
+    });
+  });
+
+  test.describe('Visual', () => {
+    test('renders the left chip × on hover above the connector gap', async ({ page }) => {
+      await filterFieldStory.goto(page, 'With Multi Condition Preset');
+      const field = page.locator('[data-slot="filter-input"]');
+      const leftChip = page.locator('[data-slot="filter-input-condition-chip"]').first();
+
+      await leftChip.locator('[data-slot="filter-input-chip-delete"]').hover();
+      await expect(field).toHaveScreenshot('multi-chip-left-remove-hover.png');
+    });
+  });
+});
