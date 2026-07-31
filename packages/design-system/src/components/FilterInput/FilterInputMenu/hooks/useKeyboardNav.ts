@@ -8,6 +8,8 @@ interface UseKeyboardNavOptions {
   onSelect: (item: FilterInputDropdownItem) => void;
   onClose?: () => void;
   onArrowRight?: () => void;
+  /** ArrowLeft handler — used to exit a submenu level back to its parent. */
+  onArrowLeft?: () => void;
   /** Called after all pending items are selected via Cmd+Enter */
   onPendingCommit?: () => void;
   /** When true, ArrowRight selects the active item (like Enter) instead of calling onArrowRight */
@@ -33,6 +35,7 @@ export const useKeyboardNav = ({
   onSelect,
   onClose,
   onArrowRight,
+  onArrowLeft,
   onPendingCommit,
   arrowRightSelectsActive = false,
   inputRef,
@@ -63,6 +66,7 @@ export const useKeyboardNav = ({
     onSelect,
     onClose,
     onArrowRight,
+    onArrowLeft,
     onPendingCommit,
     arrowRightSelectsActive,
     inputRef,
@@ -73,6 +77,7 @@ export const useKeyboardNav = ({
     onSelect,
     onClose,
     onArrowRight,
+    onArrowLeft,
     onPendingCommit,
     arrowRightSelectsActive,
     inputRef,
@@ -212,6 +217,14 @@ export const useKeyboardNav = ({
           }
           return;
         }
+        if (e.key === 'ArrowLeft') {
+          const { onArrowLeft: arrowLeft } = stateRef.current;
+          if (!arrowLeft) return;
+          e.preventDefault();
+          e.stopPropagation();
+          arrowLeft();
+          return;
+        }
         // ArrowUp on first item returns focus to input.
         const { inputRef: iRef } = stateRef.current;
         if (e.key === 'ArrowUp' && iRef?.current && activeIndexRef.current === 0) {
@@ -295,6 +308,15 @@ export const useKeyboardNav = ({
           } else {
             arrowRight();
           }
+          break;
+        }
+
+        case 'ArrowLeft': {
+          const { onArrowLeft: arrowLeft } = stateRef.current;
+          if (!arrowLeft) break;
+          e.preventDefault();
+          e.stopPropagation();
+          arrowLeft();
           break;
         }
 

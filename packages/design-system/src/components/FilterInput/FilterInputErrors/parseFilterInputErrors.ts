@@ -1,5 +1,6 @@
 import { SEGMENT_VARIANT } from '../FilterInputField/FilterInputChip';
 import {
+  collectLeaves,
   getFieldValues,
   hasStaticAllowlist,
   incompleteTripletError,
@@ -72,7 +73,9 @@ export const parseFilterInputErrors = (
           }
         }
         if (field && hasStaticAllowlist(field) && Array.isArray(condition.value)) {
-          const fv = getFieldValues(field);
+          // Flatten to leaves so a legitimately-nested committed value (living
+          // under a group's `children`) isn't reported invalid (WDS-156).
+          const fv = collectLeaves(getFieldValues(field));
           if (fv.length > 0) {
             const invalidValues = condition.value.filter(v => !isValidFieldValue(fv, v));
             if (invalidValues.length > 0) {

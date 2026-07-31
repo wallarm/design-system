@@ -447,3 +447,90 @@ export const PairedFieldPreset: Story = {
     return <ParentComponent />;
   },
 };
+
+/**
+ * **Nested value submenu (WDS-156).** The `Attack type` field's values are
+ * organized under **section headers** ("Input-based attacks", "GraphQL
+ * attacks") and one row — `SQL injection` — is a **parent category** that opens
+ * a right-side **submenu** of concrete sub-types.
+ *
+ * Sections and parent categories are purely presentational: only the **leaf**
+ * sub-values are committable, so the expression always carries leaves (e.g.
+ * `sqli_union`), never the group. A submenu category collapses in the chip:
+ * every child selected → the parent label ("SQL injection"); some children
+ * selected → the label with a count ("SQL injection (4)").
+ *
+ * Pick the `in` operator to multi-select. Toggle the parent (or "Select all")
+ * to bulk-select every sub-type; the parent checkbox is tri-state.
+ */
+const attackTypeNestedFields: FieldMetadata[] = [
+  {
+    name: 'attack_type',
+    label: 'Attack type',
+    type: 'enum',
+    operators: ['in', 'not_in', '=', '!='],
+    values: [
+      {
+        label: 'Input-based attacks',
+        children: [
+          { value: 'crlf', label: 'CRLF injection' },
+          { value: 'xss', label: 'Cross-site scripting (XSS)' },
+          { value: 'email_injection', label: 'Email injection' },
+          { value: 'ldap', label: 'LDAP injection' },
+          { value: 'mass_assignment', label: 'Mass assignment' },
+          { value: 'nosqli', label: 'NoSQL injection' },
+          { value: 'path_traversal', label: 'Path traversal' },
+          { value: 'rce', label: 'Remote code execution (RCE)' },
+          { value: 'resource_scanning', label: 'Resource scanning' },
+          {
+            label: 'SQL injection',
+            children: [
+              { value: 'sqli_boolean', label: 'Boolean-based blind SQLi' },
+              { value: 'sqli_code_exec', label: 'Code execution via SQLi' },
+              { value: 'sqli_generic', label: 'Generic SQLi' },
+              { value: 'sqli_obfuscated', label: 'Obfuscated union-based SQLi' },
+              { value: 'sqli_recon', label: 'SQLi recon' },
+              { value: 'sqli_stacked', label: 'Stacked queries' },
+              { value: 'sqli_time', label: 'Time-based blind SQLi' },
+              { value: 'sqli_union', label: 'Union-based SQLi' },
+            ],
+          },
+          { value: 'ssi', label: 'SSI injection' },
+          { value: 'ssrf', label: 'Server-side request forgery (SSRF)' },
+          { value: 'ssti', label: 'Server-side template injection (SSTI)' },
+        ],
+      },
+      {
+        label: 'GraphQL attacks',
+        children: [
+          { value: 'graphql_aliases', label: 'GraphQL aliases' },
+          { value: 'graphql_batching', label: 'GraphQL batching' },
+        ],
+      },
+    ],
+  },
+];
+
+export const NestedValueSubmenu: Story = {
+  render: () => {
+    const ParentComponent = () => {
+      const [value, setValue] = useState<ExprNode | null>(null);
+      return (
+        <>
+          <FilterInput
+            fields={attackTypeNestedFields}
+            value={value}
+            onChange={setValue}
+            placeholder='Filter by attack type…'
+          />
+          {value && (
+            <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+              <pre>{JSON.stringify(value, null, 2)}</pre>
+            </div>
+          )}
+        </>
+      );
+    };
+    return <ParentComponent />;
+  },
+};

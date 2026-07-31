@@ -1,6 +1,7 @@
 import { MIN_DATE_STRING_LENGTH } from '../../../FilterInputMenu/FilterInputDateValueMenu/constants';
 import {
   chipIdToConditionIndex,
+  collectLeaves,
   findMatchingFieldValue,
   getFieldValues,
   getInvalidValueIndices,
@@ -14,8 +15,8 @@ export const resolveFieldValue = (
   field: FieldMetadata,
   text: string,
 ): string | number | boolean => {
-  const match = findMatchingFieldValue(getFieldValues(field), text);
-  return match ? match.value : text;
+  const match = findMatchingFieldValue(collectLeaves(getFieldValues(field)), text);
+  return match?.value ?? text;
 };
 
 /** Resolve and validate a single-select value from text */
@@ -23,9 +24,10 @@ export const resolveSingleValue = (
   field: FieldMetadata,
   trimmed: string,
 ): { resolved: string | number | boolean; error: boolean | undefined } => {
-  const fv = getFieldValues(field);
+  // Match against committable leaves (nested groups carry no value).
+  const fv = collectLeaves(getFieldValues(field));
   const match = findMatchingFieldValue(fv, trimmed);
-  const raw = match ? match.value : trimmed;
+  const raw = match?.value ?? trimmed;
   // Normalize before validation — normalized form is what ends up in the chip.
   const resolved = field.normalize ? field.normalize(raw) : raw;
   // Custom validator trumps static-allowlist check.

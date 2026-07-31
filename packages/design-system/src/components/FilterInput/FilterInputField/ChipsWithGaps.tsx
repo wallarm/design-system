@@ -46,7 +46,7 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
 
     if (isCondition) {
       elements.push(
-        <div key={chip.id} ref={chipRef(chip.id)} className='shrink-0 cursor-pointer hover:z-10'>
+        <div key={chip.id} ref={chipRef(chip.id)} className='shrink-0 cursor-pointer hover:z-30'>
           <FilterInputChip
             chipId={chip.id}
             attribute={chip.attribute ?? ''}
