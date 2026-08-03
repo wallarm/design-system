@@ -16,16 +16,69 @@ import { HStack, VStack } from '../../components/Stack';
 import { Text } from '../../components/Text';
 import { ToggleButton } from '../../components/ToggleButton';
 import * as iconExports from '../index';
+import { ProviderIcon } from '../ProviderIcon/ProviderIcon';
+import { providerIconPaths } from '../ProviderIcon/paths';
+import { socialIconPaths } from '../SocialIcon/paths';
+import { SocialIcon } from '../SocialIcon/SocialIcon';
 import type { SvgIconSize } from '../SvgIcon';
-import { categoryNames, iconCategories, iconToCategory } from './const';
+import { categoryNames, iconToCategory } from './const';
+
+// SocialIcon/ProviderIcon live in this barrel too, but take a required `name`
+// prop (one component, many brands) rather than being a standalone glyph —
+// each brand/provider is unpacked into its own gallery entry below instead.
+const NAME_PARAMETERIZED_COMPONENTS = new Set(['SocialIcon', 'ProviderIcon']);
+
+type GalleryEntry = {
+  name: string;
+  category: string;
+  copyText: string;
+  Component: React.FC<{
+    size?: SvgIconSize;
+    className?: string;
+    title?: string;
+    style?: React.CSSProperties;
+  }>;
+};
 
 // automatically collect all icon components from barrel exports
 const allIcons = Object.fromEntries(
-  Object.entries(iconExports).filter(([, value]) => typeof value === 'function'),
+  Object.entries(iconExports).filter(
+    ([name, value]) => typeof value === 'function' && !NAME_PARAMETERIZED_COMPONENTS.has(name),
+  ),
 ) as Record<
   string,
   React.FC<{ size?: SvgIconSize; className?: string; title?: string; style?: React.CSSProperties }>
 >;
+
+const monoEntries: GalleryEntry[] = Object.entries(allIcons).map(([name, Component]) => ({
+  name,
+  category: iconToCategory.get(name) ?? 'General',
+  copyText: `<${name} />`,
+  Component,
+}));
+
+const socialEntries: GalleryEntry[] = Object.keys(socialIconPaths).map(name => ({
+  name,
+  category: 'Social',
+  copyText: `<SocialIcon name='${name}' />`,
+  Component: props => <SocialIcon {...props} name={name as keyof typeof socialIconPaths} />,
+}));
+
+const providerEntries: GalleryEntry[] = Object.keys(providerIconPaths).map(name => ({
+  name,
+  category: 'Providers',
+  copyText: `<ProviderIcon name='${name}' />`,
+  Component: props => <ProviderIcon {...props} name={name as keyof typeof providerIconPaths} />,
+}));
+
+const allEntries: GalleryEntry[] = [...monoEntries, ...socialEntries, ...providerEntries];
+
+const galleryCategoryNames = [...categoryNames, 'Social', 'Providers'];
+
+const categoryCounts = allEntries.reduce<Record<string, number>>((acc, entry) => {
+  acc[entry.category] = (acc[entry.category] ?? 0) + 1;
+  return acc;
+}, {});
 
 const { Check, CircleCheck, Info, TriangleAlert } = iconExports;
 
@@ -58,9 +111,9 @@ export const AllIcons: Story = {
       })),
     });
 
-    const filteredIcons = Object.entries(allIcons).filter(([name]) => {
-      const matchesSearch = name.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesCategory = !selectedCategory || iconToCategory.get(name) === selectedCategory;
+    const filteredEntries = allEntries.filter(entry => {
+      const matchesSearch = entry.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesCategory = !selectedCategory || entry.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
 
@@ -76,7 +129,7 @@ export const AllIcons: Story = {
             paddingBlock: 12,
           }}
         >
-          <Heading>All Icons ({Object.keys(allIcons).length})</Heading>
+          <Heading>All Icons ({allEntries.length})</Heading>
 
           <HStack gap={8}>
             <Input
@@ -111,16 +164,16 @@ export const AllIcons: Story = {
               active={selectedCategory === null}
               onToggle={() => setSelectedCategory(null)}
             >
-              All ({Object.keys(allIcons).length})
+              All ({allEntries.length})
             </ToggleButton>
-            {categoryNames.map(category => (
+            {galleryCategoryNames.map(category => (
               <ToggleButton
                 key={category}
                 size='small'
                 active={selectedCategory === category}
                 onToggle={() => setSelectedCategory(category)}
               >
-                {category} ({iconCategories[category]?.length})
+                {category} ({categoryCounts[category] ?? 0})
               </ToggleButton>
             ))}
           </HStack>
@@ -133,14 +186,14 @@ export const AllIcons: Story = {
             gap: '16px',
           }}
         >
-          {filteredIcons.map(([name, IconComponent]) => (
+          {filteredEntries.map(({ name, category, copyText, Component }) => (
             <div
-              key={name}
+              key={`${category}-${name}`}
               className='flex flex-col items-center justify-center p-16 border border-border-primary rounded-8 bg-component-outline-button-bg transition-colors cursor-pointer'
-              onClick={() => navigator.clipboard?.writeText(`<${name} />`)}
-              title={`Click to copy: <${name} />`}
+              onClick={() => navigator.clipboard?.writeText(copyText)}
+              title={`Click to copy: ${copyText}`}
             >
-              <IconComponent size={selectedSize} style={{ marginBottom: '8px' }} />
+              <Component size={selectedSize} style={{ marginBottom: '8px' }} />
 
               <Text color='secondary' size='sm'>
                 {name}
@@ -149,7 +202,7 @@ export const AllIcons: Story = {
           ))}
         </div>
 
-        {filteredIcons.length === 0 && (
+        {filteredEntries.length === 0 && (
           <div
             style={{
               textAlign: 'center',
