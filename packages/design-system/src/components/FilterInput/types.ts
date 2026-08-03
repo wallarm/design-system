@@ -201,6 +201,14 @@ export interface FieldMetadata {
    * level only — a pairedField's own `pairedField` is ignored.
    */
   pairedField?: FieldMetadata;
+  /**
+   * When `true`, this field is omitted from the field-selection menu but stays
+   * fully functional everywhere else: an existing chip referencing it still
+   * resolves its label, operators, and value options. Use for fields that a
+   * consumer applies programmatically (e.g. a deep-link redirect) yet does not
+   * want users to pick manually.
+   */
+  hidden?: boolean;
 }
 
 /**

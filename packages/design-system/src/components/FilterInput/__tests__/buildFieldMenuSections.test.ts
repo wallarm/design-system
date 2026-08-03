@@ -87,4 +87,36 @@ describe('buildFieldMenuSections', () => {
     // 'Host' startsWith wins over 'Backhost' (includes only)
     expect(result[0]!.fields.map(x => x.name)).toEqual(['host', 'a_host']);
   });
+
+  it('excludes hidden fields from a group but keeps the rest of the group', () => {
+    const withHidden: FieldMetadata[] = [...fields, { ...f('secret'), hidden: true }];
+    const g: FieldGroup[] = [{ label: 'Source and identity', fields: ['country', 'secret'] }];
+    const result = buildFieldMenuSections(withHidden, g, '');
+    expect(result.find(s => s.label === 'Source and identity')!.fields.map(x => x.name)).toEqual([
+      'country',
+    ]);
+  });
+
+  it('excludes hidden fields from the trailing headerless section', () => {
+    const withHidden: FieldMetadata[] = [...fields, { ...f('secret'), hidden: true }];
+    const result = buildFieldMenuSections(withHidden, groups, '');
+    const tail = result[result.length - 1]!;
+    expect(tail.fields.map(x => x.name)).toEqual(['orphan']);
+  });
+
+  it('excludes hidden fields from the flat list when no groups', () => {
+    const withHidden: FieldMetadata[] = [f('host', 'Host'), { ...f('secret'), hidden: true }];
+    const result = buildFieldMenuSections(withHidden, undefined, '');
+    expect(result).toEqual([{ fields: [f('host', 'Host')] }]);
+  });
+
+  it('drops a group entirely when its only field is hidden', () => {
+    const withHidden: FieldMetadata[] = [f('host', 'Host'), { ...f('secret'), hidden: true }];
+    const g: FieldGroup[] = [
+      { label: 'Only hidden', fields: ['secret'] },
+      { label: 'Visible', fields: ['host'] },
+    ];
+    const result = buildFieldMenuSections(withHidden, g, '');
+    expect(result.map(s => s.label)).toEqual(['Visible']);
+  });
 });
