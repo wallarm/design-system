@@ -12,6 +12,9 @@ import {
   ArrowUp,
   ArrowUpLeft,
   ArrowUpRight,
+  AudioWaveform,
+  BellCog,
+  Brain,
   Check,
   CheckCheck,
   ChevronDown,
@@ -44,13 +47,19 @@ import {
   CircleEllipsis,
   CircleHelp,
   CirclePlus,
+  Collapse,
+  Duplicate,
   Earth,
   EarthLock,
   Ellipsis,
+  Expand,
+  FastForward,
+  FilePlus,
   Filter,
   FilterX,
   Folder,
   FunnelPlus,
+  GitBranch,
   GitCommitHorizontal,
   GitCommitVertical,
   GitCompare,
@@ -117,24 +126,33 @@ import {
   PenOff,
   PenTool,
   Pentagon,
+  Plug,
   Plus,
   Quote,
+  Radar,
   Redo,
   Redo2,
   RedoDot,
   RefreshCcw,
   RefreshCwOff,
+  Rss,
+  ScrollText,
   Search,
+  Signpost,
   Skull,
   SlidersHorizontal,
   SlidersVertical,
   SquareArrowOutUpRight,
+  SquareUserRound,
+  ThumbsDown,
+  ThumbsUp,
   Trash,
   Trash2,
   TriangleAlert,
   Undo,
   Undo2,
   UndoDot,
+  UsersRound,
   Wrench,
   X,
   ZoomIn,
@@ -146,6 +164,146 @@ figma.connect(
   'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6029-1125',
   {
     example: () => <Activity />,
+  },
+);
+
+figma.connect(
+  AudioWaveform,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6808-267',
+  {
+    example: () => <AudioWaveform />,
+  },
+);
+
+figma.connect(
+  BellCog,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6881-386',
+  {
+    example: () => <BellCog />,
+  },
+);
+
+figma.connect(
+  Brain,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6806-262',
+  {
+    example: () => <Brain />,
+  },
+);
+
+figma.connect(
+  Collapse,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6776-197',
+  {
+    example: () => <Collapse />,
+  },
+);
+
+figma.connect(
+  Duplicate,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6622-2209',
+  {
+    example: () => <Duplicate />,
+  },
+);
+
+figma.connect(
+  Expand,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6776-195',
+  {
+    example: () => <Expand />,
+  },
+);
+
+figma.connect(
+  FastForward,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6810-258',
+  {
+    example: () => <FastForward />,
+  },
+);
+
+figma.connect(
+  FilePlus,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6857-300',
+  {
+    example: () => <FilePlus />,
+  },
+);
+
+figma.connect(
+  GitBranch,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6857-297',
+  {
+    example: () => <GitBranch />,
+  },
+);
+
+figma.connect(
+  Plug,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6857-298',
+  {
+    example: () => <Plug />,
+  },
+);
+
+figma.connect(
+  Radar,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6857-299',
+  {
+    example: () => <Radar />,
+  },
+);
+
+figma.connect(Rss, 'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6883-395', {
+  example: () => <Rss />,
+});
+
+figma.connect(
+  ScrollText,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6873-228',
+  {
+    example: () => <ScrollText />,
+  },
+);
+
+figma.connect(
+  Signpost,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6883-403',
+  {
+    example: () => <Signpost />,
+  },
+);
+
+figma.connect(
+  SquareUserRound,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6873-227',
+  {
+    example: () => <SquareUserRound />,
+  },
+);
+
+figma.connect(
+  ThumbsDown,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6812-265',
+  {
+    example: () => <ThumbsDown />,
+  },
+);
+
+figma.connect(
+  ThumbsUp,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6812-266',
+  {
+    example: () => <ThumbsUp />,
+  },
+);
+
+figma.connect(
+  UsersRound,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6873-226',
+  {
+    example: () => <UsersRound />,
   },
 );
 
