@@ -15,18 +15,24 @@ const getText = (field: FieldMetadata): string[] => [field.label, field.name];
  * render under group headers in group/listed order, unclaimed fields fall into
  * a trailing headerless section, each section is filtered by `filterText`, and
  * sections with no surviving fields are dropped.
+ *
+ * Fields flagged `hidden` are excluded from every section — they stay usable in
+ * existing chips (resolved elsewhere by `name`) but are never offered for
+ * selection here.
  */
 export function buildFieldMenuSections(
   fields: FieldMetadata[],
   fieldGroups: FieldGroup[] | undefined,
   filterText: string,
 ): FieldMenuSection[] {
+  const selectableFields = fields.filter(field => !field.hidden);
+
   if (!fieldGroups || fieldGroups.length === 0) {
-    const flat = filterAndSort(fields, filterText, getText);
+    const flat = filterAndSort(selectableFields, filterText, getText);
     return flat.length > 0 ? [{ fields: flat }] : [];
   }
 
-  const byName = new Map(fields.map(field => [field.name, field]));
+  const byName = new Map(selectableFields.map(field => [field.name, field]));
   const claimed = new Set<string>();
   const sections: FieldMenuSection[] = [];
 
@@ -43,7 +49,7 @@ export function buildFieldMenuSections(
     if (filtered.length > 0) sections.push({ label: group.label, fields: filtered });
   }
 
-  const ungrouped = fields.filter(field => !claimed.has(field.name));
+  const ungrouped = selectableFields.filter(field => !claimed.has(field.name));
   const filteredUngrouped = filterAndSort(ungrouped, filterText, getText);
   if (filteredUngrouped.length > 0) sections.push({ fields: filteredUngrouped });
 
