@@ -306,11 +306,17 @@ export const useNestedValueMenuState = ({
   // ---- submenu keyboard nav -------------------------------------------------
   const submenuNavItems: FilterInputDropdownItem[] = useMemo(() => {
     if (!openParentRow) return [];
-    return [
-      { id: SELECT_ALL_ID, label: 'Select all', value: SELECT_ALL_ID },
-      ...submenuRows.map(row => ({ id: row.id, label: row.option.label, value: row.option.value })),
-    ];
-  }, [openParentRow, submenuRows]);
+    const leafItems = submenuRows.map(row => ({
+      id: row.id,
+      label: row.option.label,
+      value: row.option.value,
+    }));
+    // The "All {group}" row only exists in multi-select (see NestedValueMenu),
+    // so keyboard nav must not target it in single-select.
+    return multiSelect
+      ? [{ id: SELECT_ALL_ID, label: 'Select all', value: SELECT_ALL_ID }, ...leafItems]
+      : leafItems;
+  }, [openParentRow, submenuRows, multiSelect]);
 
   const handleSubmenuSelect = useCallback(
     (item: FilterInputDropdownItem) => {

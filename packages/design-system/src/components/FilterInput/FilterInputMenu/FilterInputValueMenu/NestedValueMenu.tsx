@@ -96,17 +96,20 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
 
   // The submenu's own "All {group}" bulk-select row — same visual language as
   // the section-level one, toggling every sub-value of the open parent category.
-  const submenuSelectAllRow: ValueMenuRow | null = openParentRow
-    ? {
-        id: SELECT_ALL_ID,
-        option: {
-          label: `All ${openParentRow.option.label}`,
-          children: openParentRow.option.children ?? [],
-        },
-        isGroup: true,
-        isSelectAll: true,
-      }
-    : null;
+  // Only in multi-select: bulk-selecting a whole group is meaningless when the
+  // operator commits a single value.
+  const submenuSelectAllRow: ValueMenuRow | null =
+    openParentRow && multiSelect
+      ? {
+          id: SELECT_ALL_ID,
+          option: {
+            label: `All ${openParentRow.option.label}`,
+            children: openParentRow.option.children ?? [],
+          },
+          isGroup: true,
+          isSelectAll: true,
+        }
+      : null;
 
   const hasRows = sections.some(section => section.rows.length > 0);
 
@@ -218,7 +221,7 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
                   selectAll
                 />
               )}
-              <DropdownMenuSeparator />
+              {submenuSelectAllRow && <DropdownMenuSeparator />}
               {state.submenuRows.map(row => (
                 <NestedValueMenuItem
                   key={row.id}
