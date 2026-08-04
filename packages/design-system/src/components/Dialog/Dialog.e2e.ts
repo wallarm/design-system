@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const dialogStory = createStoryHelper('overlay-dialog', [
   'Basic',
   'With Footer',
+  'With Description',
   'With Footer Left Actions',
   'Sizes',
   'Custom Sizes',
@@ -50,6 +51,13 @@ test.describe('Component: Dialog', () => {
 
     test('Should render dialog with footer correctly', async ({ page }) => {
       await dialogStory.goto(page, 'With Footer');
+      await page.getByRole('button', { name: 'Open Dialog' }).click();
+      await expect(page.locator('[data-scope="dialog"][data-part="content"]')).toBeVisible();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render dialog with description correctly', async ({ page }) => {
+      await dialogStory.goto(page, 'With Description');
       await page.getByRole('button', { name: 'Open Dialog' }).click();
       await expect(page.locator('[data-scope="dialog"][data-part="content"]')).toBeVisible();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });

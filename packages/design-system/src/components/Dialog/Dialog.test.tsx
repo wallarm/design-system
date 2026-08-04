@@ -6,6 +6,7 @@ import { Dialog } from './Dialog';
 import { DialogBody } from './DialogBody';
 import { DialogClose } from './DialogClose';
 import { DialogContent } from './DialogContent';
+import { DialogDescription } from './DialogDescription';
 import { DialogFooter } from './DialogFooter';
 import { DialogHeader } from './DialogHeader';
 import { DialogTitle } from './DialogTitle';
@@ -265,5 +266,90 @@ describe('Attribute pass-through', () => {
     await userEvent.click(close);
 
     expect(screen.getByTestId('trigger')).toHaveAttribute('data-analytics-id', 'OPEN_DIALOG');
+  });
+});
+
+describe('DialogHeader grouping of DialogTitle / DialogDescription', () => {
+  it('stacks DialogTitle and DialogDescription in a column, with DialogDescription cascading data-testid', () => {
+    render(
+      <Dialog data-testid='dialog' open>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Title</DialogTitle>
+            <DialogDescription>Supporting text</DialogDescription>
+          </DialogHeader>
+          <DialogBody>Body</DialogBody>
+        </DialogContent>
+      </Dialog>,
+    );
+
+    const description = screen.getByTestId('dialog--description');
+    expect(description).toHaveAttribute('data-slot', 'drawer-description');
+    expect(description).toHaveTextContent('Supporting text');
+
+    const title = screen.getByText('Title');
+    expect(title.parentElement).toBe(description.parentElement);
+    expect(title.parentElement?.className).toContain('flex-col');
+  });
+
+  it('keeps a trailing non-title/description child (e.g. a nested trigger) as a row sibling, not swallowed into the column', () => {
+    render(
+      <Dialog data-testid='dialog' open>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Title</DialogTitle>
+            <DialogDescription>Supporting text</DialogDescription>
+            <button type='button' data-testid='extra'>
+              Extra action
+            </button>
+          </DialogHeader>
+          <DialogBody>Body</DialogBody>
+        </DialogContent>
+      </Dialog>,
+    );
+
+    const description = screen.getByTestId('dialog--description');
+    const extra = screen.getByTestId('extra');
+    expect(extra.parentElement).not.toBe(description.parentElement);
+  });
+
+  it('wires aria-describedby from the dialog content to DialogDescription', () => {
+    render(
+      <Dialog open>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Title</DialogTitle>
+            <DialogDescription>Supporting text</DialogDescription>
+          </DialogHeader>
+          <DialogBody>Body</DialogBody>
+        </DialogContent>
+      </Dialog>,
+    );
+
+    const dialog = screen.getByRole('dialog');
+    const describedBy = dialog.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+
+    const descriptionEl = describedBy ? document.getElementById(describedBy) : null;
+    expect(descriptionEl).toHaveTextContent('Supporting text');
+  });
+
+  it('does not expose a description element when no DialogDescription is present', () => {
+    render(
+      <Dialog open>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Title</DialogTitle>
+          </DialogHeader>
+          <DialogBody>Body</DialogBody>
+        </DialogContent>
+      </Dialog>,
+    );
+
+    // Ark's dialog machine always reserves a description id on aria-describedby,
+    // whether or not a Dialog.Description is mounted — assert no element answers it.
+    const describedBy = screen.getByRole('dialog').getAttribute('aria-describedby');
+    const descriptionEl = describedBy ? document.getElementById(describedBy) : null;
+    expect(descriptionEl).toBeNull();
   });
 });

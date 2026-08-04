@@ -2,6 +2,7 @@ export { Dialog } from './Dialog';
 export { DialogBody } from './DialogBody';
 export { DialogClose } from './DialogClose';
 export { DialogContent } from './DialogContent';
+export { DialogDescription } from './DialogDescription';
 export { DialogFooter } from './DialogFooter';
 export { DialogFooterControls } from './DialogFooterControls';
 export { DialogHeader } from './DialogHeader';
