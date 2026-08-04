@@ -12,6 +12,13 @@ export interface ValueMenuRow {
   id: string;
   option: FieldValueOption;
   isGroup: boolean;
+  /**
+   * True for the synthetic **"All {group}"** bulk-select row rendered at the top
+   * of a labeled section. It is a group row for check-state/toggle purposes (its
+   * `option.children` are the section's full scope) but is NOT a submenu trigger:
+   * it never opens a right-side panel, it only toggles its descendant leaves.
+   */
+  isSelectAll?: boolean;
 }
 
 /** A render-ready value-menu section. `label` undefined = headerless. */
@@ -45,6 +52,86 @@ const toRows = (options: FieldValueOption[], filterText: string): ValueMenuRow[]
   }));
 
 /**
+ * The synthetic **"All {label}"** bulk-select row for a labeled section. Its
+ * `option` is a group over `scope` (the section's *full, unfiltered* options) so
+ * the shared tri-state / toggle-group logic treats it as selecting every
+ * descendant leaf — mirroring the submenu's own "All {group}" row.
+ */
+const selectAllRow = (label: string, scope: FieldValueOption[]): ValueMenuRow => ({
+  id: `select-all:${label}`,
+  option: { label: `All ${label}`, children: scope },
+  isGroup: true,
+  isSelectAll: true,
+});
+
+/** Joins ancestry labels for a flat-search row's muted second line. */
+export const PATH_SEPARATOR = ' › ';
+
+const matchesQuery = (value: string | number | boolean | undefined, query: string): boolean =>
+  value != null && String(value).toLowerCase().includes(query);
+
+/**
+ * Flatten a grouped value tree into a single flat list of matches for a search
+ * query (see §4 "flattened search"). Two row kinds, in tree order:
+ *
+ * - **Leaf matches** — every leaf whose own label/value/description contains the
+ *   query, carrying its ancestry as `description` (a muted second line) so deep
+ *   matches are disambiguated.
+ * - **"All {group}" shortcuts** (multi-select only) — for every group/type node
+ *   whose *own* label matches, a bulk-select row scoped to that node, so typing a
+ *   group name offers one-click selection of its whole subtree.
+ *
+ * Shortcuts lead, then leaves. Selection/tri-state persist across searching
+ * because rows still carry the real leaf `value` / group scope. Submenus never
+ * open here — the list is already flat.
+ */
+function buildFlatSearchSections(
+  values: FieldValueOption[],
+  query: string,
+  multiSelect: boolean,
+): ValueMenuSection[] {
+  const shortcuts: ValueMenuRow[] = [];
+  const leaves: ValueMenuRow[] = [];
+
+  const walk = (options: FieldValueOption[], path: string[]): void => {
+    for (const option of options) {
+      if (isValueGroup(option)) {
+        if (multiSelect && matchesQuery(option.label, query)) {
+          shortcuts.push({
+            id: `select-all:${[...path, option.label].join('/')}`,
+            option: {
+              ...option,
+              label: `All ${option.label}`,
+              description: path.join(PATH_SEPARATOR) || undefined,
+            },
+            isGroup: true,
+            isSelectAll: true,
+          });
+        }
+        walk(option.children ?? [], [...path, option.label]);
+      } else if (
+        matchesQuery(option.label, query) ||
+        matchesQuery(option.value, query) ||
+        matchesQuery(option.description, query)
+      ) {
+        // `section`-sugar leaves carry their bucket name instead of a tree path.
+        const ancestry = path.length > 0 ? path.join(PATH_SEPARATOR) : option.section;
+        leaves.push({
+          id: `leaf:${String(option.value)}`,
+          option: { ...option, description: ancestry || undefined },
+          isGroup: false,
+        });
+      }
+    }
+  };
+
+  walk(values, []);
+
+  const rows = [...shortcuts, ...leaves];
+  return rows.length > 0 ? [{ rows }] : [];
+}
+
+/**
  * Bucket value options into ordered, filtered menu sections.
  *
  * Three shapes, in priority order:
@@ -56,13 +143,38 @@ const toRows = (options: FieldValueOption[], filterText: string): ValueMenuRow[]
  * 3. **Flat** — no grouping: a single headerless section (today's behavior, so
  *    existing fields are visually unchanged).
  *
- * Each section is filtered by `filterText`; sections with no surviving rows are
- * dropped. A group row survives if its label OR any descendant leaf matches.
+ * A non-empty `filterText` **flattens** a grouped tree into a single flat list
+ * of matches at any depth (see {@link buildFlatSearchSections}) — hover submenus
+ * are unreachable while typing, so deep values are surfaced directly with their
+ * ancestry path. With an empty query the grouped structure below is returned.
+ *
+ * When `multiSelect` is set, every **labeled** section is prefixed with a
+ * synthetic "All {label}" bulk-select row (see {@link selectAllRow}) so the user
+ * can select/deselect the whole group's scope in one click; single-select menus
+ * omit it (bulk selection is meaningless there).
  */
 export function buildValueMenuSections(
   values: FieldValueOption[],
   filterText: string,
+  multiSelect = false,
 ): ValueMenuSection[] {
+  const query = filterText.trim().toLowerCase();
+  const hasHierarchy = values.some(v => isValueGroup(v) || v.section != null);
+
+  // Typing flattens a grouped tree into a flat match list at any depth.
+  if (query.length > 0 && hasHierarchy) {
+    return buildFlatSearchSections(values, query, multiSelect);
+  }
+
+  // Prefix a labeled section's rows with its "All {label}" row (multi-select
+  // only). `scope` is the full unfiltered option set so "All" spans the whole
+  // group even while a search narrows the visible rows.
+  const withSelectAll = (
+    label: string,
+    scope: FieldValueOption[],
+    rows: ValueMenuRow[],
+  ): ValueMenuRow[] => (multiSelect ? [selectAllRow(label, scope), ...rows] : rows);
+
   const topGroups = values.filter(isValueGroup);
 
   // 1. Top-level groups → sections.
@@ -72,8 +184,10 @@ export function buildValueMenuSections(
     const leafRows = toRows(topLeaves, filterText);
     if (leafRows.length > 0) sections.push({ rows: leafRows });
     for (const group of topGroups) {
-      const rows = toRows(group.children ?? [], filterText);
-      if (rows.length > 0) sections.push({ label: group.label, rows });
+      const children = group.children ?? [];
+      const rows = toRows(children, filterText);
+      if (rows.length > 0)
+        sections.push({ label: group.label, rows: withSelectAll(group.label, children, rows) });
     }
     return sections;
   }
@@ -98,8 +212,9 @@ export function buildValueMenuSections(
     const unsectionedRows = toRows(unsectioned, filterText);
     if (unsectionedRows.length > 0) sections.push({ rows: unsectionedRows });
     for (const label of order) {
-      const rows = toRows(buckets.get(label)!, filterText);
-      if (rows.length > 0) sections.push({ label, rows });
+      const bucket = buckets.get(label)!;
+      const rows = toRows(bucket, filterText);
+      if (rows.length > 0) sections.push({ label, rows: withSelectAll(label, bucket, rows) });
     }
     return sections;
   }

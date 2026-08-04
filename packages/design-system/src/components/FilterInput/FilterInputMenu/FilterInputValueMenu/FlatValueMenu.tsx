@@ -121,7 +121,7 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
         ) : (
           <MenuEmptyState />
         )}
-        <DropdownMenuFooter>
+        <DropdownMenuFooter className='justify-start'>
           <ValueMenuFooterHints multiSelect={multiSelect} />
         </DropdownMenuFooter>
       </DropdownMenuContent>

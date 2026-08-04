@@ -92,7 +92,7 @@ export const useNestedValueMenuState = ({
   topRowsRef.current = topRows;
 
   const openParentRow = useMemo(
-    () => topRows.find(row => row.id === openParentId && row.isGroup),
+    () => topRows.find(row => row.id === openParentId && row.isGroup && !row.isSelectAll),
     [topRows, openParentId],
   );
 
@@ -194,7 +194,7 @@ export const useNestedValueMenuState = ({
     closeTimerRef.current = setTimeout(() => {
       closeTimerRef.current = null;
       setOpenParentId(null);
-    }, 220);
+    }, 250);
   }, [cancelClose]);
   const openParent = useCallback(
     (id: string) => {
@@ -208,6 +208,30 @@ export const useNestedValueMenuState = ({
     setOpenParentId(null);
   }, [cancelClose]);
   useEffect(() => () => cancelClose(), [cancelClose]);
+
+  // ---- safe triangle --------------------------------------------------------
+  // While a submenu is open, a diagonal move from the parent row toward the
+  // panel briefly crosses sibling rows — whose leave/enter would otherwise close
+  // it. Track the pointer and, when it heads into the wedge between the last
+  // position and the submenu's two near corners, cancel the pending close so the
+  // panel survives the traversal (grace delay handles the rest).
+  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
+  const handleMainMouseMove = useCallback(
+    (event: { clientX: number; clientY: number }) => {
+      const prev = lastPointRef.current;
+      const point = { x: event.clientX, y: event.clientY };
+      lastPointRef.current = point;
+      if (openParentId == null || !prev) return;
+      const sub = submenuRef?.current?.getBoundingClientRect();
+      if (!sub) return;
+      // Submenu sits to the right: the wedge is bounded by its near (left) edge
+      // and its top/bottom corners, fanning out to the previous pointer spot.
+      const headingRight = point.x >= prev.x;
+      const insideBand = point.y >= sub.top - 12 && point.y <= sub.bottom + 12;
+      if (headingRight && insideBand && point.x <= sub.left) cancelClose();
+    },
+    [openParentId, submenuRef, cancelClose],
+  );
 
   // ---- selection handlers ---------------------------------------------------
 
@@ -223,7 +247,8 @@ export const useNestedValueMenuState = ({
   const selectRow = useCallback(
     (row: ValueMenuRow, fromSubmenu: boolean) => {
       if (row.isGroup) {
-        if (multiSelect) toggleGroup(row.option);
+        // The "All {group}" row is bulk-toggle only — never a submenu trigger.
+        if (multiSelect || row.isSelectAll) toggleGroup(row.option);
         else if (!fromSubmenu) openParent(row.id);
         return;
       }
@@ -261,7 +286,8 @@ export const useNestedValueMenuState = ({
 
   const handleTopArrowRight = useCallback(() => {
     const row = topRowsRef.current.find(r => r.id === topHighlightRef.current);
-    if (row?.isGroup) openParent(row.id);
+    // Only a real parent category opens a submenu; the "All {group}" row doesn't.
+    if (row?.isGroup && !row.isSelectAll) openParent(row.id);
     else if (multiSelect) commitChecked();
   }, [openParent, multiSelect, commitChecked]);
 
@@ -333,6 +359,7 @@ export const useNestedValueMenuState = ({
     closeParent,
     cancelClose,
     scheduleClose,
+    handleMainMouseMove,
     openParentRow,
     submenuRows,
     // selection

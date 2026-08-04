@@ -11,13 +11,18 @@ export type DropdownMenuLabelProps = HTMLAttributes<HTMLDivElement> &
     ref?: Ref<HTMLDivElement>;
   };
 
-export const DropdownMenuLabel: FC<DropdownMenuLabelProps> = ({ className, inset, ...props }) => {
+export const DropdownMenuLabel: FC<DropdownMenuLabelProps> = ({
+  className,
+  inset,
+  sticky,
+  ...props
+}) => {
   const testId = useTestId('label');
 
   return (
     <div
       data-testid={testId}
-      className={cn(dropdownMenuLabelVariants({ inset }), className)}
+      className={cn(dropdownMenuLabelVariants({ inset, sticky }), className)}
       {...props}
     />
   );

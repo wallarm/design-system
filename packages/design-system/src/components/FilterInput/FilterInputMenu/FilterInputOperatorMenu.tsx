@@ -179,7 +179,7 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
         ) : (
           <MenuEmptyState />
         )}
-        <DropdownMenuFooter>
+        <DropdownMenuFooter className='justify-start'>
           <span className='flex items-center gap-4'>
             <KbdGroup>
               <Kbd>↵</Kbd>

@@ -460,8 +460,19 @@ export const PairedFieldPreset: Story = {
  * every child selected → the parent label ("SQL injection"); some children
  * selected → the label with a count ("SQL injection (4)").
  *
- * Pick the `in` operator to multi-select. Toggle the parent (or "Select all")
- * to bulk-select every sub-type; the parent checkbox is tri-state.
+ * Pick the `in` operator to multi-select. Each labeled section is topped with a
+ * tri-state **"All {group}"** row (e.g. "All Input-based attacks") that
+ * selects/deselects the whole group's scope — including the nested SQL-injection
+ * sub-types — in one click; the SQL-injection submenu carries its own "All SQL
+ * injection" row. Toggling the parent category (or an "All {group}" row) is a
+ * bulk shortcut over its descendant leaves; every such checkbox is tri-state.
+ *
+ * **Typing flattens the tree**: the menu shows a flat list of matches at any
+ * depth, each deep match carrying its ancestry path as a muted second line and
+ * the matched substring highlighted; a query matching a group/type name adds an
+ * "All {name}" bulk-select shortcut. Group headers are **sticky** while
+ * scrolling, and the submenu tucks under the main panel with a safe-triangle
+ * grace delay so diagonal pointer moves don't dismiss it.
  */
 const attackTypeNestedFields: FieldMetadata[] = [
   {
