@@ -130,7 +130,7 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
           {hasRows ? (
             sections.map((section, index) => {
               const rows = (
-                <DropdownMenuGroup>
+                <DropdownMenuGroup className='flex flex-col gap-1'>
                   {section.rows.map(row => {
                     // A real parent category opens a submenu on hover; the
                     // synthetic "All {group}" row is a group for check-state but
@@ -204,7 +204,7 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
             onMouseEnter={state.cancelClose}
             onMouseLeave={state.scheduleClose}
           >
-            <DropdownMenuGroup>
+            <DropdownMenuGroup className='flex flex-col gap-1'>
               {submenuSelectAllRow && (
                 <NestedValueMenuItem
                   id={SELECT_ALL_ID}

@@ -97,7 +97,7 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
         data-filter-input-menu='true'
       >
         {displayValues.length > 0 ? (
-          <DropdownMenuGroup>
+          <DropdownMenuGroup className='flex flex-col gap-1'>
             {displayValues.map(option => (
               <ValueMenuItem
                 key={String(option.value)}

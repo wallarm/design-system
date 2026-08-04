@@ -50,11 +50,11 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
 
     {/* Checkbox for multi-select, checkmark for single-select */}
     {multiSelect ? (
-      <div className='flex shrink-0 items-start justify-end py-2 ml-auto'>
+      <div className='flex shrink-0 items-start justify-end ml-auto'>
         <Checkmark checkedState={isChecked} />
       </div>
     ) : isChecked ? (
-      <div className='flex shrink-0 items-start justify-end py-2 ml-auto'>
+      <div className='flex shrink-0 items-start justify-end ml-auto'>
         <Checkmark checkedState={true} />
       </div>
     ) : null}

@@ -125,8 +125,10 @@ export const NestedValueMenuItem: FC<NestedValueMenuItemProps> = ({
       )}
 
       {/* Right rail: a parent category's submenu chevron sits before the
-          (tri-state, for groups) checkbox / single-select checkmark. */}
-      <div className='flex shrink-0 items-center justify-end gap-8 py-2 ml-auto'>
+          (tri-state, for groups) checkbox / single-select checkmark. The
+          checkbox brings its own vertical rhythm (Checkmark's `my-2`), so the
+          rail adds none — keeping the row at the 32px spec height. */}
+      <div className='flex shrink-0 items-center justify-end gap-8 ml-auto'>
         {isGroup && (
           <span className='flex text-text-secondary'>
             <ChevronRight />
