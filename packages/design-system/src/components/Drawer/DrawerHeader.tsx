@@ -9,6 +9,8 @@ import {
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { DrawerClose } from './DrawerClose';
+import { DrawerDescription } from './DrawerDescription';
+import { DrawerTitle } from './DrawerTitle';
 
 export interface DrawerHeaderProps {
   children: ReactNode;
@@ -18,9 +20,20 @@ export interface DrawerHeaderProps {
 const isDrawerClose = (child: ReactNode): child is ReactElement =>
   isValidElement(child) && child.type === DrawerClose;
 
+const isDrawerTitle = (child: ReactNode): child is ReactElement =>
+  isValidElement(child) && child.type === DrawerTitle;
+
+const isDrawerDescription = (child: ReactNode): child is ReactElement =>
+  isValidElement(child) && child.type === DrawerDescription;
+
 export const DrawerHeader: FC<DrawerHeaderProps> = ({ children, ref }) => {
   const testId = useTestId('header');
-  const hasExplicitClose = Children.toArray(children).some(isDrawerClose);
+  const items = Children.toArray(children);
+
+  const hasExplicitClose = items.some(isDrawerClose);
+  const title = items.find(isDrawerTitle);
+  const description = items.find(isDrawerDescription);
+  const rest = items.filter(child => child !== title && child !== description);
 
   return (
     <div
@@ -36,7 +49,14 @@ export const DrawerHeader: FC<DrawerHeaderProps> = ({ children, ref }) => {
         'outline-none',
       )}
     >
-      {children}
+      {(title || description) && (
+        <div className='flex flex-1 flex-col gap-0 min-w-0'>
+          {title}
+          {description}
+        </div>
+      )}
+
+      {rest}
 
       {!hasExplicitClose && <DrawerClose />}
     </div>

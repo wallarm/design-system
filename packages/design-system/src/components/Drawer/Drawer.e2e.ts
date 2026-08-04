@@ -4,6 +4,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const drawerStory = createStoryHelper('overlay-drawer', [
   'Basic',
   'With Footer',
+  'With Description',
   'With Footer Left Actions',
   'Sizes',
   'Custom Sizes',
@@ -37,6 +38,13 @@ test.describe('Component: Drawer', () => {
 
     test('Should render drawer with footer correctly', async ({ page }) => {
       await drawerStory.goto(page, 'With Footer');
+      await page.getByRole('button', { name: 'Open Drawer' }).click();
+      await expect(page.locator('[data-scope="dialog"][data-part="content"]')).toBeVisible();
+      await expect(page).toHaveScreenshot({ animations: 'disabled' });
+    });
+
+    test('Should render drawer with description correctly', async ({ page }) => {
+      await drawerStory.goto(page, 'With Description');
       await page.getByRole('button', { name: 'Open Drawer' }).click();
       await expect(page.locator('[data-scope="dialog"][data-part="content"]')).toBeVisible();
       await expect(page).toHaveScreenshot({ animations: 'disabled' });

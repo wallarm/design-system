@@ -6,6 +6,7 @@ import { Drawer } from './Drawer';
 import { DrawerBody } from './DrawerBody';
 import { DrawerClose } from './DrawerClose';
 import { DrawerContent } from './DrawerContent';
+import { DrawerDescription } from './DrawerDescription';
 import { DrawerFooter } from './DrawerFooter';
 import { DrawerHeader } from './DrawerHeader';
 import { DrawerResizeHandle } from './DrawerResizeHandle';
@@ -260,5 +261,92 @@ describe('DrawerResizeHandle', () => {
 
     expect(onResizeEnd).toHaveBeenCalledTimes(1);
     expect(onResizeEnd).toHaveBeenCalledWith(300);
+  });
+});
+
+describe('DrawerHeader grouping of DrawerTitle / DrawerDescription', () => {
+  it('stacks DrawerTitle and DrawerDescription in a column, with DrawerDescription cascading data-testid', () => {
+    render(
+      <Drawer data-testid='drawer' open>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Supporting text</DrawerDescription>
+          </DrawerHeader>
+          <DrawerBody>Body</DrawerBody>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    const description = screen.getByTestId('drawer--description');
+    expect(description).toHaveAttribute('data-slot', 'drawer-description');
+    expect(description).toHaveTextContent('Supporting text');
+
+    const title = screen.getByText('Title');
+    // Title and description share the same generated column wrapper as parent.
+    expect(title.parentElement).toBe(description.parentElement);
+    expect(title.parentElement?.className).toContain('flex-col');
+  });
+
+  it('keeps a trailing non-title/description child (e.g. a nested trigger) as a row sibling, not swallowed into the column', () => {
+    render(
+      <Drawer data-testid='drawer' open>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Supporting text</DrawerDescription>
+            <button type='button' data-testid='extra'>
+              Extra action
+            </button>
+          </DrawerHeader>
+          <DrawerBody>Body</DrawerBody>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    const description = screen.getByTestId('drawer--description');
+    const extra = screen.getByTestId('extra');
+    // The extra trailing child must NOT be inside the title/description column.
+    expect(extra.parentElement).not.toBe(description.parentElement);
+  });
+
+  it('wires aria-describedby from the dialog content to DrawerDescription', () => {
+    render(
+      <Drawer open>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Title</DrawerTitle>
+            <DrawerDescription>Supporting text</DrawerDescription>
+          </DrawerHeader>
+          <DrawerBody>Body</DrawerBody>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    const dialog = screen.getByRole('dialog');
+    const describedBy = dialog.getAttribute('aria-describedby');
+    expect(describedBy).toBeTruthy();
+
+    const descriptionEl = describedBy ? document.getElementById(describedBy) : null;
+    expect(descriptionEl).toHaveTextContent('Supporting text');
+  });
+
+  it('does not expose a description element when no DrawerDescription is present', () => {
+    render(
+      <Drawer open>
+        <DrawerContent>
+          <DrawerHeader>
+            <DrawerTitle>Title</DrawerTitle>
+          </DrawerHeader>
+          <DrawerBody>Body</DrawerBody>
+        </DrawerContent>
+      </Drawer>,
+    );
+
+    // Ark's dialog machine always reserves a description id on aria-describedby,
+    // whether or not a Dialog.Description is mounted — assert no element answers it.
+    const describedBy = screen.getByRole('dialog').getAttribute('aria-describedby');
+    const descriptionEl = describedBy ? document.getElementById(describedBy) : null;
+    expect(descriptionEl).toBeNull();
   });
 });

@@ -43,6 +43,7 @@ import { Dialog, type DialogProps } from './Dialog';
 import { DialogBody } from './DialogBody';
 import { DialogClose } from './DialogClose';
 import { DialogContent } from './DialogContent';
+import { DialogDescription } from './DialogDescription';
 import { DialogFooter } from './DialogFooter';
 import { DialogFooterControls } from './DialogFooterControls';
 import { DialogHeader } from './DialogHeader';
@@ -57,6 +58,7 @@ const meta = {
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogDescription,
     DialogBody,
     DialogFooter,
     DialogFooterControls,
@@ -156,6 +158,48 @@ export const WithFooter: StoryFn<DialogProps> = () => {
       </DialogContent>
     </Dialog>
   );
+};
+
+/** Header title with a supporting description stacked underneath */
+export const WithDescription: StoryFn<DialogProps> = () => {
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button>Open Dialog</Button>
+      </DialogTrigger>
+
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Dialog's title</DialogTitle>
+          <DialogDescription>Description</DialogDescription>
+        </DialogHeader>
+
+        <DialogBody>
+          <ContentPlaceholder />
+        </DialogBody>
+
+        <DialogFooter>
+          <DialogFooterControls>
+            <Button variant='ghost' color='neutral' size='large'>
+              Button
+            </Button>
+            <Button variant='primary' color='brand' size='large'>
+              Button
+            </Button>
+          </DialogFooterControls>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+WithDescription.parameters = {
+  docs: {
+    description: {
+      story:
+        'DialogHeader detects DialogTitle and DialogDescription among its children and stacks them in a column so the close button stays right-aligned.',
+    },
+  },
 };
 
 /** With footer left actions */

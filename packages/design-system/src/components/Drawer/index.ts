@@ -5,6 +5,7 @@ export { DrawerBody, type DrawerBodyProps } from './DrawerBody';
 export { DrawerClose, type DrawerCloseProps } from './DrawerClose';
 export { DrawerContent, type DrawerContentProps } from './DrawerContent';
 export { useDrawerContext } from './DrawerContext';
+export { DrawerDescription, type DrawerDescriptionProps } from './DrawerDescription';
 export { DrawerFooter, type DrawerFooterProps } from './DrawerFooter';
 export {
   DrawerFooterControls,

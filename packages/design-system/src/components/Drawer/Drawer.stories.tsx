@@ -39,6 +39,7 @@ import { Drawer, type DrawerProps } from './Drawer';
 import { DrawerBody } from './DrawerBody';
 import { DrawerClose } from './DrawerClose';
 import { DrawerContent } from './DrawerContent';
+import { DrawerDescription } from './DrawerDescription';
 import { DrawerFooter } from './DrawerFooter';
 import { DrawerFooterControls } from './DrawerFooterControls';
 import { DrawerHeader } from './DrawerHeader';
@@ -53,6 +54,7 @@ const meta = {
     DrawerTrigger,
     DrawerContent,
     DrawerHeader,
+    DrawerDescription,
     DrawerBody,
     DrawerFooter,
     DrawerClose,
@@ -156,6 +158,46 @@ export const WithFooter: StoryFn<DrawerProps> = () => {
       </DrawerContent>
     </Drawer>
   );
+};
+
+/** Header title with a supporting description stacked underneath */
+export const WithDescription: StoryFn<DrawerProps> = () => {
+  return (
+    <Drawer>
+      <DrawerTrigger asChild>
+        <Button>Open Drawer</Button>
+      </DrawerTrigger>
+
+      <DrawerContent>
+        <DrawerHeader>
+          <DrawerTitle>Drawer's title</DrawerTitle>
+          <DrawerDescription>Description TBD</DrawerDescription>
+        </DrawerHeader>
+        <DrawerBody>
+          <ContentPlaceholder fillHeight />
+        </DrawerBody>
+        <DrawerFooter>
+          <DrawerFooterControls>
+            <Button variant='ghost' color='neutral' size='large'>
+              Button
+            </Button>
+            <Button variant='primary' color='brand' size='large'>
+              Button
+            </Button>
+          </DrawerFooterControls>
+        </DrawerFooter>
+      </DrawerContent>
+    </Drawer>
+  );
+};
+
+WithDescription.parameters = {
+  docs: {
+    description: {
+      story:
+        'DrawerHeader detects DrawerTitle and DrawerDescription among its children and stacks them in a column so the close button stays right-aligned.',
+    },
+  },
 };
 
 /** With footer left actions */
