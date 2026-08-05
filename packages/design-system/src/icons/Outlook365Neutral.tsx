@@ -6,7 +6,7 @@ export const Outlook365Neutral: FC<SvgIconProps> = props => (
     <>
       <defs>
         <mask
-          id='outlook365-neutral-glyph-mask'
+          id='provider-outlook365-neutral-glyph-mask'
           maskUnits='userSpaceOnUse'
           x='0'
           y='0'
@@ -21,7 +21,7 @@ export const Outlook365Neutral: FC<SvgIconProps> = props => (
           />
         </mask>
       </defs>
-      <g mask='url(#outlook365-neutral-glyph-mask)'>
+      <g mask='url(#provider-outlook365-neutral-glyph-mask)'>
         <g transform='translate(1.2648, 0.6408)'>
           <path
             d='M15.7453 2.09297L1.24687 11.2852L0 9.31641V7.61953C0 7.00078 0.314063 6.42891 0.829688 6.09141L9.25781 0.625781C10.5422 -0.208594 12.1969 -0.208594 13.4813 0.625781L15.7453 2.09297Z'
