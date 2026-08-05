@@ -1,0 +1,15 @@
+import type { FC } from 'react';
+import { SvgIcon, type SvgIconProps } from './SvgIcon';
+
+export const TiktokNeutral: FC<SvgIconProps> = props => (
+  <SvgIcon {...props} viewBox='0 0 24 24'>
+    <g transform='translate(1.75, 0)'>
+      <path
+        d='M15.0725 0H11.0278V16.3478C11.0278 18.2957 9.47219 19.8957 7.53626 19.8957C5.60034 19.8957 4.04469 18.2957 4.04469 16.3478C4.04469 14.4348 5.56577 12.8695 7.43257 12.8V8.69567C3.31872 8.7652 0 12.1391 0 16.3478C0 20.5913 3.38786 24 7.57085 24C11.7538 24 15.1416 20.5565 15.1416 16.3478V7.9652C16.6627 9.07827 18.5295 9.73913 20.5 9.77393V5.66957C17.4579 5.56522 15.0725 3.06087 15.0725 0Z'
+        fill='#0F172B'
+      />
+    </g>
+  </SvgIcon>
+);
+
+TiktokNeutral.displayName = 'TiktokNeutralIcon';
