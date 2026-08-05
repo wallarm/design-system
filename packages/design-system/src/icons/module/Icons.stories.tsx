@@ -16,17 +16,8 @@ import { HStack, VStack } from '../../components/Stack';
 import { Text } from '../../components/Text';
 import { ToggleButton } from '../../components/ToggleButton';
 import * as iconExports from '../index';
-import { ProviderIcon } from '../ProviderIcon/ProviderIcon';
-import { providerIconPaths } from '../ProviderIcon/paths';
-import { socialIconPaths } from '../SocialIcon/paths';
-import { SocialIcon } from '../SocialIcon/SocialIcon';
 import type { SvgIconSize } from '../SvgIcon';
 import { categoryNames, iconToCategory } from './const';
-
-// SocialIcon/ProviderIcon live in this barrel too, but take a required `name`
-// prop (one component, many brands) rather than being a standalone glyph —
-// each brand/provider is unpacked into its own gallery entry below instead.
-const NAME_PARAMETERIZED_COMPONENTS = new Set(['SocialIcon', 'ProviderIcon']);
 
 type GalleryEntry = {
   name: string;
@@ -42,38 +33,18 @@ type GalleryEntry = {
 
 // automatically collect all icon components from barrel exports
 const allIcons = Object.fromEntries(
-  Object.entries(iconExports).filter(
-    ([name, value]) => typeof value === 'function' && !NAME_PARAMETERIZED_COMPONENTS.has(name),
-  ),
+  Object.entries(iconExports).filter(([, value]) => typeof value === 'function'),
 ) as Record<
   string,
   React.FC<{ size?: SvgIconSize; className?: string; title?: string; style?: React.CSSProperties }>
 >;
 
-const monoEntries: GalleryEntry[] = Object.entries(allIcons).map(([name, Component]) => ({
+const allEntries: GalleryEntry[] = Object.entries(allIcons).map(([name, Component]) => ({
   name,
   category: iconToCategory.get(name) ?? 'General',
   copyText: `<${name} />`,
   Component,
 }));
-
-const socialEntries: GalleryEntry[] = Object.keys(socialIconPaths).map(name => ({
-  name,
-  category: 'Social',
-  copyText: `<SocialIcon name='${name}' />`,
-  Component: props => <SocialIcon {...props} name={name as keyof typeof socialIconPaths} />,
-}));
-
-const providerEntries: GalleryEntry[] = Object.keys(providerIconPaths).map(name => ({
-  name,
-  category: 'Providers',
-  copyText: `<ProviderIcon name='${name}' />`,
-  Component: props => <ProviderIcon {...props} name={name as keyof typeof providerIconPaths} />,
-}));
-
-const allEntries: GalleryEntry[] = [...monoEntries, ...socialEntries, ...providerEntries];
-
-const galleryCategoryNames = [...categoryNames, 'Social', 'Providers'];
 
 const categoryCounts = allEntries.reduce<Record<string, number>>((acc, entry) => {
   acc[entry.category] = (acc[entry.category] ?? 0) + 1;
@@ -166,7 +137,7 @@ export const AllIcons: Story = {
             >
               All ({allEntries.length})
             </ToggleButton>
-            {galleryCategoryNames.map(category => (
+            {categoryNames.map(category => (
               <ToggleButton
                 key={category}
                 size='small'
