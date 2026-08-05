@@ -43,6 +43,11 @@ for (const name of SIMPLE_NAMES) {
   children = children.replace(/fill='url\(#[^)]+\)'/g, "fill='currentColor'");
   children = children.replace(/fill='black'/g, "fill='currentColor'");
 
+  // Every discrete stroke (solid hex, keyword black, or gradient reference) becomes currentColor.
+  children = children.replace(/stroke='#[0-9A-Fa-f]{3,8}'/g, "stroke='currentColor'");
+  children = children.replace(/stroke='url\(#[^)]+\)'/g, "stroke='currentColor'");
+  children = children.replace(/stroke='black'/g, "stroke='currentColor'");
+
   const neutralName = `${name}Neutral`;
   const body = `import type { FC } from 'react';
 import { SvgIcon, type SvgIconProps } from './SvgIcon';

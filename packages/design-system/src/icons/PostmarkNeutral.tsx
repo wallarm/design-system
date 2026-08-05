@@ -8,7 +8,7 @@ export const PostmarkNeutral: FC<SvgIconProps> = props => (
         <path
           d='M20.25 0.15H3.75C1.76177 0.15 0.15 1.76177 0.15 3.75V20.25C0.15 22.2382 1.76177 23.85 3.75 23.85H20.25C22.2382 23.85 23.85 22.2382 23.85 20.25V3.75C23.85 1.76177 22.2382 0.15 20.25 0.15Z'
           fill='currentColor'
-          stroke='#D9B500'
+          stroke='currentColor'
           strokeWidth='0.3'
         />
       </g>
