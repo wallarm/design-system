@@ -5,12 +5,10 @@ import {
   DropdownMenuContent,
   DropdownMenuFooter,
   DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '../../../DropdownMenu';
-import { Text } from '../../../Text';
-import { buildValueMenuSections } from '../../lib/buildValueMenuSections';
+import { buildValueMenuSections, type ValueMenuRow } from '../../lib/buildValueMenuSections';
 import { MenuEmptyState } from '../MenuEmptyState';
 import type { FilterInputValueMenuProps } from './FilterInputValueMenu';
 import { NestedValueMenuItem } from './NestedValueMenuItem';
@@ -46,7 +44,10 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
   const submenuRef = useRef<HTMLDivElement | null>(null);
   const rowElsRef = useRef<Map<string, HTMLElement>>(new Map());
 
-  const sections = useMemo(() => buildValueMenuSections(values, filterText), [values, filterText]);
+  const sections = useMemo(
+    () => buildValueMenuSections(values, filterText, multiSelect),
+    [values, filterText, multiSelect],
+  );
 
   const state = useNestedValueMenuState({
     sections,
@@ -78,7 +79,11 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
   const submenuPositioning = useMemo(
     () => ({
       placement: 'right-start' as const,
-      gutter: 8,
+      // Small gutter tucks the submenu ~4px under the main menu's right edge
+      // (overlap past the checkbox column, not a gap): shortens the diagonal
+      // corridor and widens the aim target, so the hover-intent close delay
+      // rarely fires mid-traverse.
+      gutter: 4,
       getAnchorRect: () =>
         (state.openParentId &&
           rowElsRef.current.get(state.openParentId)?.getBoundingClientRect()) ||
@@ -88,7 +93,23 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
   );
 
   const openParentRow = state.openParentRow;
-  const allChecked = openParentRow ? state.allLeavesChecked(openParentRow.option) : false;
+
+  // The submenu's own "All {group}" bulk-select row — same visual language as
+  // the section-level one, toggling every sub-value of the open parent category.
+  // Only in multi-select: bulk-selecting a whole group is meaningless when the
+  // operator commits a single value.
+  const submenuSelectAllRow: ValueMenuRow | null =
+    openParentRow && multiSelect
+      ? {
+          id: SELECT_ALL_ID,
+          option: {
+            label: `All ${openParentRow.option.label}`,
+            children: openParentRow.option.children ?? [],
+          },
+          isGroup: true,
+          isSelectAll: true,
+        }
+      : null;
 
   const hasRows = sections.some(section => section.rows.length > 0);
 
@@ -107,36 +128,59 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
           className={cn(widthClass, 'max-h-[430px]', className)}
           style={widthStyle}
           data-filter-input-menu='true'
+          onMouseMove={state.handleMainMouseMove}
         >
           {hasRows ? (
-            sections.map((section, index) => (
-              <Fragment key={section.label ?? `section-${index}`}>
-                {index > 0 && <DropdownMenuSeparator />}
-                {section.label && <DropdownMenuLabel>{section.label}</DropdownMenuLabel>}
-                <DropdownMenuGroup>
-                  {section.rows.map(row => (
-                    <NestedValueMenuItem
-                      key={row.id}
-                      id={row.id}
-                      option={row.option}
-                      isGroup={row.isGroup}
-                      checkedState={state.getRowCheckState(row)}
-                      isPending={state.topPendingIds.has(row.id)}
-                      multiSelect={multiSelect}
-                      onSelect={() => state.selectRow(row, false)}
-                      onMouseEnter={row.isGroup ? () => state.openParent(row.id) : undefined}
-                      onMouseLeave={row.isGroup ? () => state.scheduleClose() : undefined}
-                      registerRef={setRowRef(row.id)}
-                      expanded={state.openParentId === row.id}
-                    />
-                  ))}
+            sections.map((section, index) => {
+              const rows = (
+                <DropdownMenuGroup className='flex flex-col gap-1'>
+                  {section.rows.map(row => {
+                    // A real parent category opens a submenu on hover; the
+                    // synthetic "All {group}" row is a group for check-state but
+                    // never a submenu trigger.
+                    const isParent = row.isGroup && !row.isSelectAll;
+                    return (
+                      <NestedValueMenuItem
+                        key={row.id}
+                        id={row.id}
+                        option={row.option}
+                        isGroup={isParent}
+                        checkedState={state.getRowCheckState(row)}
+                        isPending={state.topPendingIds.has(row.id)}
+                        multiSelect={multiSelect}
+                        onSelect={() => state.selectRow(row, false)}
+                        onMouseEnter={isParent ? () => state.openParent(row.id) : undefined}
+                        onMouseLeave={isParent ? () => state.scheduleClose() : undefined}
+                        registerRef={setRowRef(row.id)}
+                        expanded={state.openParentId === row.id}
+                        selectAll={row.isSelectAll}
+                        highlight={filterText}
+                      />
+                    );
+                  })}
                 </DropdownMenuGroup>
-              </Fragment>
-            ))
+              );
+              return (
+                <Fragment key={section.label ?? `section-${index}`}>
+                  {index > 0 && <DropdownMenuSeparator />}
+                  {section.label ? (
+                    // Per-section wrapper bounds the sticky header so it pins to
+                    // the top only while its own group is in view, then is pushed
+                    // out by the next group's header.
+                    <div className='flex flex-col gap-1'>
+                      <DropdownMenuLabel sticky>{section.label}</DropdownMenuLabel>
+                      {rows}
+                    </div>
+                  ) : (
+                    rows
+                  )}
+                </Fragment>
+              );
+            })
           ) : (
             <MenuEmptyState />
           )}
-          <DropdownMenuFooter>
+          <DropdownMenuFooter className='justify-start'>
             <ValueMenuFooterHints multiSelect={multiSelect} />
           </DropdownMenuFooter>
         </DropdownMenuContent>
@@ -163,20 +207,21 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
             onMouseEnter={state.cancelClose}
             onMouseLeave={state.scheduleClose}
           >
-            <DropdownMenuGroup>
-              <DropdownMenuItem
-                value={SELECT_ALL_ID}
-                ref={state.registerSubmenuItem(SELECT_ALL_ID)}
-                onSelect={() => state.toggleGroup(openParentRow.option)}
-                className={
-                  state.submenuPendingIds.has(SELECT_ALL_ID) ? 'bg-states-primary-hover' : undefined
-                }
-              >
-                <Text size='sm' color='secondary'>
-                  {allChecked ? 'Unselect all' : 'Select all'}
-                </Text>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
+            <DropdownMenuGroup className='flex flex-col gap-1'>
+              {submenuSelectAllRow && (
+                <NestedValueMenuItem
+                  id={SELECT_ALL_ID}
+                  option={submenuSelectAllRow.option}
+                  isGroup={false}
+                  checkedState={state.getRowCheckState(submenuSelectAllRow)}
+                  isPending={state.submenuPendingIds.has(SELECT_ALL_ID)}
+                  multiSelect={multiSelect}
+                  onSelect={() => state.toggleGroup(openParentRow.option)}
+                  registerRef={state.registerSubmenuItem(SELECT_ALL_ID)}
+                  selectAll
+                />
+              )}
+              {submenuSelectAllRow && <DropdownMenuSeparator />}
               {state.submenuRows.map(row => (
                 <NestedValueMenuItem
                   key={row.id}

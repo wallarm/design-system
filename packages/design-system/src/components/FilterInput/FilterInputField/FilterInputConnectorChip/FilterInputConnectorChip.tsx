@@ -91,7 +91,7 @@ export const FilterInputConnectorChip: FC<FilterInputConnectorChipProps> = ({
           </DropdownMenuItemIcon>
           <DropdownMenuItemText>OR</DropdownMenuItemText>
         </DropdownMenuItem>
-        <DropdownMenuFooter>
+        <DropdownMenuFooter className='justify-start'>
           <span className='flex items-center gap-4'>
             <KbdGroup>
               <Kbd>↑</Kbd>

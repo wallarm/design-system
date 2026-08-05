@@ -24,19 +24,19 @@ test.describe('Component: FilterInput', () => {
       await expect(parent).toBeVisible();
       await parent.hover();
 
-      // The submenu opens with a "Select all" toggle and the leaf sub-types.
-      await expect(page.getByRole('menuitem', { name: /^Select all$/ })).toBeVisible();
+      // The submenu opens with an "All SQL injection" toggle and the leaf sub-types.
+      await expect(page.getByRole('menuitem', { name: /^All SQL injection$/ })).toBeVisible();
       await expect(page.getByRole('menuitem', { name: /^Union-based SQLi$/ })).toBeVisible();
     });
 
-    test('"Select all" checks every child and the chip collapses to the parent label', async ({
+    test('"All SQL injection" checks every child and the chip collapses to the parent label', async ({
       page,
     }) => {
       await story.goto(page, 'Nested Value Submenu');
       await openValueMenu(page);
 
       await page.getByRole('menuitem', { name: /^SQL injection$/ }).hover();
-      await page.getByRole('menuitem', { name: /^Select all$/ }).click();
+      await page.getByRole('menuitem', { name: /^All SQL injection$/ }).click();
 
       // Blur to commit the multi-select.
       await page.locator('body').click({ position: { x: 4, y: 4 } });
@@ -89,11 +89,11 @@ test.describe('Component: FilterInput', () => {
 
       // Hovering the parent opens its submenu.
       await page.getByRole('menuitem', { name: /^SQL injection$/ }).hover();
-      await expect(page.getByRole('menuitem', { name: /^Select all$/ })).toBeVisible();
+      await expect(page.getByRole('menuitem', { name: /^All SQL injection$/ })).toBeVisible();
 
       // ArrowLeft returns to the parent level (submenu closes).
       await input.press('ArrowLeft');
-      await expect(page.getByRole('menuitem', { name: /^Select all$/ })).toHaveCount(0);
+      await expect(page.getByRole('menuitem', { name: /^All SQL injection$/ })).toHaveCount(0);
     });
   });
 
@@ -102,7 +102,7 @@ test.describe('Component: FilterInput', () => {
       await story.goto(page, 'Nested Value Submenu');
       await openValueMenu(page);
       await page.getByRole('menuitem', { name: /^SQL injection$/ }).hover();
-      await expect(page.getByRole('menuitem', { name: /^Select all$/ })).toBeVisible();
+      await expect(page.getByRole('menuitem', { name: /^All SQL injection$/ })).toBeVisible();
       // Capture the viewport (not the `body` element): the two panels render in
       // fixed-positioned portals that overflow `body`'s small bounding box, so an
       // element screenshot of `body` crops the menu. The viewport includes both.

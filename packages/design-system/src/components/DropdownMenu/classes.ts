@@ -87,6 +87,15 @@ export const dropdownMenuLabelVariants = cva(
       inset: {
         true: 'pl-32',
       },
+      /**
+       * Pin the header to the top of the scrolling menu so the current group's
+       * label stays visible; the incoming group's header pushes it out. Requires
+       * an opaque background (rows scroll underneath) and a per-section wrapper
+       * so each header sticks only within the bounds of its own group.
+       */
+      sticky: {
+        true: 'sticky top-0 z-10 bg-bg-surface-2',
+      },
     },
   },
 );

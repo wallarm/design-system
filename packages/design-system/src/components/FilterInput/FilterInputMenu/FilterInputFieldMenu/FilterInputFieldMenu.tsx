@@ -146,7 +146,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
           />
         )}
 
-        <DropdownMenuFooter>
+        <DropdownMenuFooter className='justify-start'>
           <span className='flex items-center gap-4'>
             <KbdGroup>
               <Kbd>↑</Kbd>

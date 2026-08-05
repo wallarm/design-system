@@ -26,32 +26,34 @@ export const RecentSection: FC<RecentSectionProps> = ({
   registerItem,
 }) => (
   <>
-    <DropdownMenuLabel>Recent</DropdownMenuLabel>
-    <DropdownMenuGroup>
-      {conditions.map((condition, index) => {
-        const fieldMeta = fields.find(f => f.name === condition.field);
-        const attribute = fieldMeta?.label || condition.field;
-        const operator = String(condition.operator);
-        const value = String(condition.value);
+    <div className='flex flex-col gap-1'>
+      <DropdownMenuLabel sticky>Recent</DropdownMenuLabel>
+      <DropdownMenuGroup>
+        {conditions.map((condition, index) => {
+          const fieldMeta = fields.find(f => f.name === condition.field);
+          const attribute = fieldMeta?.label || condition.field;
+          const operator = String(condition.operator);
+          const value = String(condition.value);
 
-        return (
-          <DropdownMenuItem
-            key={`recent-${index}`}
-            value={`recent-${index}`}
-            ref={registerItem(`recent-${index}`)}
-            onSelect={() => {
-              if (fieldMeta) onSelect(fieldMeta);
-            }}
-          >
-            <span className='flex gap-2 items-center text-sm'>
-              <span className='text-text-primary'>{attribute}</span>
-              <span className='text-text-secondary'>{operator}</span>
-              <span className='font-medium text-text-info'>{value}</span>
-            </span>
-          </DropdownMenuItem>
-        );
-      })}
-    </DropdownMenuGroup>
+          return (
+            <DropdownMenuItem
+              key={`recent-${index}`}
+              value={`recent-${index}`}
+              ref={registerItem(`recent-${index}`)}
+              onSelect={() => {
+                if (fieldMeta) onSelect(fieldMeta);
+              }}
+            >
+              <span className='flex gap-2 items-center text-sm'>
+                <span className='text-text-primary'>{attribute}</span>
+                <span className='text-text-secondary'>{operator}</span>
+                <span className='font-medium text-text-info'>{value}</span>
+              </span>
+            </DropdownMenuItem>
+          );
+        })}
+      </DropdownMenuGroup>
+    </div>
     <DropdownMenuSeparator />
   </>
 );
@@ -70,23 +72,25 @@ export const SuggestionsSection: FC<SuggestionsSectionProps> = ({
   registerItem,
 }) => (
   <>
-    <DropdownMenuLabel>Suggestions</DropdownMenuLabel>
-    <DropdownMenuGroup>
-      {fields.map((field, index) => (
-        <DropdownMenuItem
-          key={`suggested-${index}`}
-          value={`suggested-${index}`}
-          ref={registerItem(`suggested-${index}`)}
-          onSelect={() => onSelect(field)}
-        >
-          <span className='flex gap-2 items-center text-sm'>
-            <span className='text-text-primary'>{field.label}</span>
-            <span className='text-text-secondary'>operator</span>
-            <span className='font-medium text-text-info'>Value</span>
-          </span>
-        </DropdownMenuItem>
-      ))}
-    </DropdownMenuGroup>
+    <div className='flex flex-col gap-1'>
+      <DropdownMenuLabel sticky>Suggestions</DropdownMenuLabel>
+      <DropdownMenuGroup>
+        {fields.map((field, index) => (
+          <DropdownMenuItem
+            key={`suggested-${index}`}
+            value={`suggested-${index}`}
+            ref={registerItem(`suggested-${index}`)}
+            onSelect={() => onSelect(field)}
+          >
+            <span className='flex gap-2 items-center text-sm'>
+              <span className='text-text-primary'>{field.label}</span>
+              <span className='text-text-secondary'>operator</span>
+              <span className='font-medium text-text-info'>Value</span>
+            </span>
+          </DropdownMenuItem>
+        ))}
+      </DropdownMenuGroup>
+    </div>
     <DropdownMenuSeparator />
   </>
 );
@@ -135,10 +139,8 @@ interface FieldSectionsProps {
 
 export const FieldSections: FC<FieldSectionsProps> = ({ sections, onSelect, registerItem }) => (
   <>
-    {sections.map((section, index) => (
-      <Fragment key={`${section.label ?? 'ungrouped'}-${index}`}>
-        {index > 0 && <DropdownMenuSeparator />}
-        {section.label && <DropdownMenuLabel>{section.label}</DropdownMenuLabel>}
+    {sections.map((section, index) => {
+      const group = (
         <DropdownMenuGroup>
           {section.fields.map(field => (
             <DropdownMenuItem
@@ -146,13 +148,28 @@ export const FieldSections: FC<FieldSectionsProps> = ({ sections, onSelect, regi
               value={`field-${field.name}`}
               ref={registerItem(`field-${field.name}`)}
               onSelect={() => onSelect(field)}
+              className='scroll-mt-32'
             >
               <DropdownMenuItemText>{field.label}</DropdownMenuItemText>
             </DropdownMenuItem>
           ))}
         </DropdownMenuGroup>
-      </Fragment>
-    ))}
+      );
+      return (
+        <Fragment key={`${section.label ?? 'ungrouped'}-${index}`}>
+          {index > 0 && <DropdownMenuSeparator />}
+          {section.label ? (
+            // Per-section wrapper bounds the sticky group header while scrolling.
+            <div className='flex flex-col gap-1'>
+              <DropdownMenuLabel sticky>{section.label}</DropdownMenuLabel>
+              {group}
+            </div>
+          ) : (
+            group
+          )}
+        </Fragment>
+      );
+    })}
   </>
 );
 
