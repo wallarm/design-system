@@ -83,9 +83,7 @@ const renderOverflowPopoverInline = (items: string[]) => (
     <PopoverContent minWidth='auto' minHeight='auto' maxWidth='unset'>
       <div className='flex flex-row flex-nowrap gap-4'>
         {items.map(item => (
-          <Tag key={item} className='shrink-0 whitespace-nowrap'>
-            {item}
-          </Tag>
+          <Tag key={item}>{item}</Tag>
         ))}
       </div>
     </PopoverContent>
@@ -103,11 +101,7 @@ export const MinVisibleItems: StoryFn = () => (
       className='gap-4'
       minVisibleItems={1}
       items={TAGS}
-      itemRenderer={item => (
-        <Tag key={item} className='shrink-0 whitespace-nowrap'>
-          {item}
-        </Tag>
-      )}
+      itemRenderer={item => <Tag key={item}>{item}</Tag>}
       overflowRenderer={renderOverflowPopoverInline}
     />
   </div>
