@@ -3,7 +3,6 @@ import type { Row, RowData, TableFeatures } from '@tanstack/react-table';
 import type { TestableProps } from '../../utils/testId';
 
 declare module '@tanstack/react-table' {
-  // biome-ignore lint/correctness/noUnusedVariables: TanStack Table augmentation requires matching generic parameter names
   interface ColumnMeta<TFeatures extends TableFeatures, TData extends RowData, TValue> {
     headerClassName?: string;
     cellClassName?: string;

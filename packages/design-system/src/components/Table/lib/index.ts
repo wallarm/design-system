@@ -20,7 +20,7 @@ export { createExpandColumn } from './createExpandColumn';
 export { createSelectionColumn } from './createSelectionColumn';
 export { createTableColumnHelper } from './createTableColumnHelper';
 export { detectDataChange } from './detectDataChange';
-export { dsTableFeatures, type DSTableFeatures } from './dsTableFeatures';
+export { type DSTableFeatures, dsTableFeatures } from './dsTableFeatures';
 export { getDndStyles } from './getDndStyles';
 export { getPinningStyles } from './getPinningStyles';
 export { getRowKey } from './getRowKey';
