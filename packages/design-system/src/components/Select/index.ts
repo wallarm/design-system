@@ -4,6 +4,7 @@ export { SelectButton } from './SelectButton';
 export { SelectButtonTag, SelectButtonTagValue } from './SelectButtonTag';
 export { SelectClearTrigger } from './SelectClearTrigger';
 export { SelectContent } from './SelectContent';
+export { SelectEmptyState, type SelectEmptyStateProps } from './SelectEmptyState';
 export { SelectFooter } from './SelectFooter';
 export { SelectGroup } from './SelectGroup';
 export { SelectGroupLabel } from './SelectGroupLabel';
@@ -17,3 +18,8 @@ export { SelectPositioner } from './SelectPositioner';
 export { SelectSearchInput, type SelectSearchInputProps } from './SelectSearchInput';
 export { SelectSeparator, type SelectSeparatorProps } from './SelectSeparator';
 export type { SelectDataItem } from './types';
+export {
+  type UseSelectSearchOptions,
+  type UseSelectSearchResult,
+  useSelectSearch,
+} from './useSelectSearch';
