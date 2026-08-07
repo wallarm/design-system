@@ -37,28 +37,24 @@
 
 /**
  * Global native-scrollbar styling, matching the ScrollArea component's look
- * (thin slate thumb, transparent track, hidden until the scrollable element
- * is hovered) for every plain `overflow: auto/scroll` element that isn't
- * opting into ScrollArea's own JS-drawn thumb (excluded above via
- * higher-specificity attribute selector).
+ * (thin slate thumb, transparent track) for every plain `overflow:
+ * auto/scroll` element that isn't opting into ScrollArea's own JS-drawn
+ * thumb (excluded above via higher-specificity attribute selector). The
+ * thumb is permanently visible: `overflow: auto` already only renders a
+ * scrollbar when content overflows, so that's the only "show it when
+ * scrollable" gate this needs.
  *
  * Deliberately uses only the standard `scrollbar-width`/`scrollbar-color`
  * properties, not `::-webkit-scrollbar-*`. The legacy pseudo-elements would
- * allow a fully custom (rounded, inset) thumb, but their hover reveal only
- * repaints reliably when the pointer is over the scrollbar widget itself —
- * hovering the rest of the scrollable container (what we actually want)
- * doesn't consistently trigger a repaint in Chromium. `scrollbar-color`
- * has no such issue: changing it on the container's `:hover` recomputes and
- * repaints correctly every time, at the cost of not being able to customize
- * the thumb's shape/inset beyond color and `thin`/`auto`/`none` width.
+ * allow a fully custom (rounded, inset) thumb, but their hover-driven state
+ * changes only repaint reliably when the pointer is over the scrollbar
+ * widget itself, not the rest of the scrollable container — unreliable
+ * enough that a permanently-visible thumb sidesteps the issue entirely.
  */
 * {
     scrollbar-width: thin;
-    scrollbar-color: transparent transparent;
-
-    &:hover {
-        scrollbar-color: var(--color-badge-slate-dark-alt) transparent;
-    }
+    scrollbar-color: color-mix(in srgb, var(--color-badge-slate-dark-alt) 50%, transparent)
+        transparent;
 }
 
 /** Remove when old DS will be removed **/
