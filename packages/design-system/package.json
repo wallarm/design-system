@@ -97,7 +97,7 @@
     "@storybook/addon-themes": "10.5.7",
     "@storybook/mcp": "0.8.0",
     "@tailwindcss/postcss": "4.3.3",
-    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/jest-dom": "7.0.0",
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "catalog:",
     "@types/node": "catalog:",
