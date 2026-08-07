@@ -151,8 +151,8 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
     const { active, over } = event;
     if (!over || active.id === over.id) return;
 
-    const currentOrder = table.getState().columnOrder.length
-      ? table.getState().columnOrder
+    const currentOrder = table.store.state.columnOrder.length
+      ? table.store.state.columnOrder
       : allColumns.map(c => c.id);
 
     const oldIndex = currentOrder.indexOf(String(active.id));
