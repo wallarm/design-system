@@ -15,6 +15,10 @@ const meta = {
       control: 'select',
       options: ['relative', 'date', 'datetime'],
     },
+    layout: {
+      control: 'radio',
+      options: ['stacked', 'inline'],
+    },
     showSeconds: {
       control: 'boolean',
     },
@@ -22,6 +26,7 @@ const meta = {
   args: {
     value: new Date().toISOString(),
     format: 'relative',
+    layout: 'stacked',
     showSeconds: true,
   },
 } satisfies Meta<typeof FormatDateTime>;
@@ -103,6 +108,27 @@ export const DatetimeFormat: StoryFn<typeof meta> = () => (
     <FormatDateTime value='2026-02-11T14:32:07' format='datetime' />
     <FormatDateTime value='2025-12-25T23:59:59' format='datetime' />
   </VStack>
+);
+
+export const DatetimeLayout: StoryFn<typeof meta> = () => (
+  <HStack gap={64} align='start'>
+    <VStack gap={12} align='start'>
+      <Text size='sm' color='secondary'>
+        Stacked (default)
+      </Text>
+      <FormatDateTime value='2026-01-01T11:00:00' format='datetime' layout='stacked' />
+      <FormatDateTime value='2026-02-11T14:32:07' format='datetime' layout='stacked' />
+      <FormatDateTime value='2025-12-25T23:59:59' format='datetime' layout='stacked' />
+    </VStack>
+    <VStack gap={12} align='start'>
+      <Text size='sm' color='secondary'>
+        Inline
+      </Text>
+      <FormatDateTime value='2026-01-01T11:00:00' format='datetime' layout='inline' />
+      <FormatDateTime value='2026-02-11T14:32:07' format='datetime' layout='inline' />
+      <FormatDateTime value='2025-12-25T23:59:59' format='datetime' layout='inline' />
+    </VStack>
+  </HStack>
 );
 
 export const WithDescription: StoryFn<typeof meta> = () => (
