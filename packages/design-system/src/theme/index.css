@@ -35,6 +35,28 @@
     }
 }
 
+/**
+ * Global native-scrollbar styling, matching the ScrollArea component's look
+ * (thin slate thumb, transparent track) for every plain `overflow:
+ * auto/scroll` element that isn't opting into ScrollArea's own JS-drawn
+ * thumb (excluded above via higher-specificity attribute selector). The
+ * thumb is permanently visible: `overflow: auto` already only renders a
+ * scrollbar when content overflows, so that's the only "show it when
+ * scrollable" gate this needs.
+ *
+ * Deliberately uses only the standard `scrollbar-width`/`scrollbar-color`
+ * properties, not `::-webkit-scrollbar-*`. The legacy pseudo-elements would
+ * allow a fully custom (rounded, inset) thumb, but their hover-driven state
+ * changes only repaint reliably when the pointer is over the scrollbar
+ * widget itself, not the rest of the scrollable container — unreliable
+ * enough that a permanently-visible thumb sidesteps the issue entirely.
+ */
+* {
+    scrollbar-width: thin;
+    scrollbar-color: color-mix(in srgb, var(--color-badge-slate-dark-alt) 50%, transparent)
+        transparent;
+}
+
 /** Remove when old DS will be removed **/
 :where(:root) {
     cursor: default;
