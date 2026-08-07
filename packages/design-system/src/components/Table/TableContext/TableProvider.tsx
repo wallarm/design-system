@@ -128,9 +128,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     const prefix: ColumnDef<DSTableFeatures, T, any>[] = [];
 
     if (expandingEnabled && !subRowGroupingEnabled) {
-      // TODO(table-v9): drop this cast once createExpandColumn.tsx is migrated
-      // (Task 3) to return ColumnDef<DSTableFeatures, T, unknown> natively.
-      prefix.push(createExpandColumn<T>() as ColumnDef<DSTableFeatures, T, any>);
+      prefix.push(createExpandColumn<T>());
     }
 
     if (selectionEnabled) {

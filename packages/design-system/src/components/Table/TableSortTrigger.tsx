@@ -1,5 +1,5 @@
 import { type ButtonHTMLAttributes, type MouseEvent, type ReactNode, useCallback } from 'react';
-import type { Column } from '@tanstack/react-table';
+import type { Column, RowData } from '@tanstack/react-table';
 import { MoveDown, MoveUp, MoveVertical } from '../../icons';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
@@ -7,10 +7,10 @@ import { HStack } from '../Stack';
 import { Text } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { tableHeaderButtonClass } from './classes';
-import { getAlignClass, SORT_LABELS } from './lib';
+import { type DSTableFeatures, getAlignClass, SORT_LABELS } from './lib';
 import { useTableContext } from './TableContext';
 
-export interface TableSortTriggerProps<T = unknown>
+export interface TableSortTriggerProps<T extends RowData = Record<string, unknown>>
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'type' | 'children'>,
     TestableProps {
   /**
@@ -25,7 +25,7 @@ export interface TableSortTriggerProps<T = unknown>
    * )
    * ```
    */
-  column: Column<T, unknown>;
+  column: Column<DSTableFeatures, T, unknown>;
   /** Label rendered next to the sort icon. Visual styling matches the default header text. */
   children?: ReactNode;
 }
@@ -66,7 +66,7 @@ const renderSortIcon = (sortDirection: false | 'asc' | 'desc') => {
  * Consumer-passed `onClick` runs first; if it calls `event.preventDefault()`,
  * the internal `toggleSorting` is skipped.
  */
-export const TableSortTrigger = <T,>({
+export const TableSortTrigger = <T extends RowData = Record<string, unknown>>({
   column,
   children,
   'data-testid': testIdProp,

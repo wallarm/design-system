@@ -1,8 +1,16 @@
-import type { CellContext, ColumnDef, Row, RowSelectionState, Table } from '@tanstack/react-table';
+import type {
+  CellContext,
+  ColumnDef,
+  Row,
+  RowData,
+  RowSelectionState,
+  Table,
+} from '@tanstack/react-table';
 import { useIsKeyPressed } from '../../../hooks';
 import { Checkbox, CheckboxIndicator } from '../../Checkbox';
 import { useTableContext } from '../TableContext';
 import { TABLE_SELECT_COLUMN_ID, TABLE_SELECT_COLUMN_WIDTH } from './constants';
+import type { DSTableFeatures } from './dsTableFeatures';
 
 /**
  * Selects or deselects a range of rows between two indices.
@@ -10,18 +18,18 @@ import { TABLE_SELECT_COLUMN_ID, TABLE_SELECT_COLUMN_WIDTH } from './constants';
  * - Row was unselected → select the entire range
  * - Row was selected → deselect the entire range
  */
-const applyRangeSelection = <T,>(
-  rows: Row<T>[],
+const applyRangeSelection = <T extends RowData>(
+  rows: Row<DSTableFeatures, T>[],
   fromIndex: number,
   toIndex: number,
-  table: Table<T>,
-  clickedRow: Row<T>,
+  table: Table<DSTableFeatures, T>,
+  clickedRow: Row<DSTableFeatures, T>,
 ) => {
   const start = Math.min(fromIndex, toIndex);
   const end = Math.max(fromIndex, toIndex);
   const selecting = !clickedRow.getIsSelected();
 
-  const newSelection: RowSelectionState = { ...table.getState().rowSelection };
+  const newSelection: RowSelectionState = { ...table.store.state.rowSelection };
 
   for (let i = start; i <= end; i++) {
     const row = rows[i];
@@ -42,7 +50,10 @@ const applyRangeSelection = <T,>(
  * Cell component that handles shift-click range selection.
  * Uses useIsKeyPressed hook to detect Shift key state.
  */
-const SelectionCell = <T,>({ row, table }: CellContext<T, unknown>) => {
+const SelectionCell = <T extends RowData>({
+  row,
+  table,
+}: CellContext<DSTableFeatures, T, unknown>) => {
   const { lastSelectedRowIndexRef } = useTableContext<T>();
   const shiftRef = useIsKeyPressed('Shift');
   const hasSubRows = row.subRows.length > 0;
@@ -92,7 +103,7 @@ const SelectionCell = <T,>({ row, table }: CellContext<T, unknown>) => {
  * Automatically injected by Table when `onRowSelectionChange` is provided.
  * Supports shift-click range selection.
  */
-export const createSelectionColumn = <T,>(): ColumnDef<T> => {
+export const createSelectionColumn = <T extends RowData>(): ColumnDef<DSTableFeatures, T> => {
   return {
     id: TABLE_SELECT_COLUMN_ID,
     size: TABLE_SELECT_COLUMN_WIDTH,
@@ -109,7 +120,10 @@ export const createSelectionColumn = <T,>(): ColumnDef<T> => {
     header: ({ table }) => {
       const checked = table.getIsAllPageRowsSelected();
       const indeterminate = table.getIsSomePageRowsSelected();
-      const rowCount = table.getRowCount();
+      // getRowCount() belongs to the pagination feature, which dsTableFeatures
+      // deliberately doesn't register (this Table has no pagination). The row
+      // model's length is the equivalent "any rows to select?" measure.
+      const rowCount = table.getRowModel().rows.length;
 
       return (
         <Checkbox
