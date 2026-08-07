@@ -5,6 +5,7 @@ const popoverStory = createStoryHelper('overlay-popover', [
   'Basic',
   'Min Max Width',
   'Min Max Height',
+  'With Tooltip',
 ] as const);
 
 const getPopoverTrigger = (page: Page) => page.getByTestId('popover--trigger');
@@ -67,6 +68,30 @@ test.describe('Component: Popover', () => {
       // Click outside the popover
       await page.locator('body').click({ position: { x: 10, y: 10 } });
       await expect(getPopoverContent(page)).toBeHidden();
+    });
+
+    test('Should show tooltip when a combined tooltip+popover trigger is hovered', async ({
+      page,
+    }) => {
+      await popoverStory.goto(page, 'With Tooltip');
+      const trigger = page.getByTestId('popover-tooltip-trigger');
+      await trigger.hover();
+      await expect(page.getByTestId('with-tooltip-tooltip--content')).toBeVisible();
+    });
+
+    test('Should hide tooltip and open popover when a combined tooltip+popover trigger is clicked', async ({
+      page,
+    }) => {
+      await popoverStory.goto(page, 'With Tooltip');
+      const trigger = page.getByTestId('popover-tooltip-trigger');
+      // The same trigger element serves both roles — hover then click proves
+      // there's a single shared node, not a wrapper stacking two triggers.
+      await trigger.hover();
+      await expect(page.getByTestId('with-tooltip-tooltip--content')).toBeVisible();
+
+      await trigger.click();
+      await expect(page.getByTestId('with-tooltip-popover--content')).toBeVisible();
+      await expect(page.getByTestId('with-tooltip-tooltip--content')).toBeHidden();
     });
   });
 

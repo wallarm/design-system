@@ -6,6 +6,14 @@ export interface PopoverProps extends TestableProps {
   children: ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  /**
+   * Override the trigger element's id. Pass the same id to another
+   * compound component's `ids.trigger` (e.g. `Tooltip`, `DropdownMenu`) to
+   * compose their triggers on one element via nested `asChild` without an
+   * extra wrapper node — otherwise the outer trigger's id wins and the
+   * other component can't find its own anchor.
+   */
+  ids?: ArkUiPopover.RootProps['ids'];
 }
 
 const POPOVER_POSITIONING_DEFAULT: ArkUiPopover.RootProps['positioning'] = {
@@ -19,6 +27,7 @@ export const Popover: FC<PopoverProps> = ({
   children,
   open,
   onOpenChange,
+  ids,
   'data-testid': testIdProp,
 }) => {
   const inheritedTestId = useTestId();
@@ -34,6 +43,7 @@ export const Popover: FC<PopoverProps> = ({
         positioning={POPOVER_POSITIONING_DEFAULT}
         open={open}
         onOpenChange={handleOpenChange}
+        ids={ids}
         lazyMount
         unmountOnExit
       >

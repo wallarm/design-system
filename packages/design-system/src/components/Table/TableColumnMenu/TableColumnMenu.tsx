@@ -3,6 +3,7 @@ import {
   createContext,
   type ReactNode,
   useContext,
+  useId,
   useState,
 } from 'react';
 import type { Column } from '@tanstack/react-table';
@@ -79,6 +80,7 @@ export const TableColumnMenu = <T,>({
   const ctx = useTableContext<T>();
   const testId = useTestId('column-menu', testIdProp);
   const [menuOpen, setMenuOpen] = useState(false);
+  const triggerId = useId();
 
   const isAlwaysPinned = ctx.alwaysPinnedLeft.includes(column.id);
   const canSort = ctx.sortingEnabled && column.getCanSort();
@@ -91,8 +93,8 @@ export const TableColumnMenu = <T,>({
   return (
     <TableColumnMenuContext.Provider value={{ column: column as Column<unknown> }}>
       <span className='shrink-0 inline-flex opacity-0 group-hover:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
-        <Tooltip disabled={menuOpen}>
-          <DropdownMenu onOpenChange={setMenuOpen}>
+        <Tooltip disabled={menuOpen} ids={{ trigger: triggerId }}>
+          <DropdownMenu onOpenChange={setMenuOpen} ids={{ trigger: triggerId }}>
             <DropdownMenuTrigger asChild>
               <TooltipTrigger asChild>
                 <Button
