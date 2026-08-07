@@ -1,6 +1,7 @@
 import type {
   CellContext,
   ColumnDef,
+  HeaderContext,
   Row,
   RowData,
   RowSelectionState,
@@ -99,6 +100,68 @@ const SelectionCell = <T extends RowData>({
 };
 
 /**
+ * Header component for the "select all" checkbox.
+ *
+ * v9 dropped a guard that v8's Page-variant selection getters used to have.
+ * v8's `getIsSomePageRowsSelected()` short-circuited to `false` when
+ * `getIsAllPageRowsSelected()` was already `true`
+ * (`@tanstack/table-core@8.21.3/build/lib/features/RowSelection.js:214`).
+ * v9's equivalent (`@tanstack/table-core@9.0.0/dist/features/row-selection/
+ * rowSelectionFeature.utils.js:255-256`) has no such check — it just tests
+ * "is any selectable row in `getPaginatedRowModel().flatRows` selected?" — so
+ * it returns `true` even when *all* rows are selected. With
+ * `checked={indeterminate ? 'indeterminate' : checked}`, that meant the
+ * checkbox rendered `'indeterminate'` (never `true`) as soon as one row was
+ * selected, including at full selection, so the native `.checked` DOM
+ * property never became `true`.
+ *
+ * On top of that, `TableHeadCell` invokes function-shaped headers with a
+ * plain synchronous call (`headerDef(headerCtx)`), so the `table` inside
+ * `HeaderContext` is the framework-agnostic core `Table`, not the React
+ * adapter's `ReactTable` — it has no `.state` at all (confirmed: reading
+ * `table.state` there throws). That's real, but it isn't why the original
+ * bug happened (the original code never read `.state`); it does mean a
+ * one-line guard fix inside a bare closure would still be fragile long-term.
+ * Rendering this as a real named component instead — mirroring `SelectionCell`
+ * above — lets it call `useTableContext()` for the real, reactive `ReactTable`
+ * and compute checked/indeterminate locally instead of depending on
+ * `getIsSomePageRowsSelected()`/`getIsAllPageRowsSelected()` (or their
+ * non-Page counterparts) at all.
+ *
+ * Checked/indeterminate is computed from `table.state.rowSelection` and
+ * `getFilteredRowModel().flatRows` — the same row universe
+ * `toggleAllRowsSelected()` (the click handler below) actually acts on, and
+ * what `getIsAllRowsSelected()` itself iterates. `flatRows` (not the
+ * top-level `rows` used by `SelectionCell`/`applyRangeSelection` for
+ * index-based range selection) so grouped/nested sub-rows at any depth count
+ * toward "all selected". `getFilteredRowModel()` rather than `getRowModel()`
+ * matters once `grouping` is active: `getRowModel()` (post-grouping) includes
+ * synthetic group-header rows that `getCanSelect()` still allows but that
+ * `toggleAllRowsSelected()` never selects — using it here would leave the
+ * checkbox stuck on indeterminate forever.
+ */
+const SelectAllHeaderCell = <T extends RowData>(
+  _props: HeaderContext<DSTableFeatures, T, unknown>,
+) => {
+  const { table } = useTableContext<T>();
+
+  const selectableRows = table.getFilteredRowModel().flatRows.filter(row => row.getCanSelect());
+  const selectedCount = selectableRows.filter(row => table.state.rowSelection[row.id]).length;
+  const checked = selectableRows.length > 0 && selectedCount === selectableRows.length;
+  const indeterminate = selectedCount > 0 && !checked;
+
+  return (
+    <Checkbox
+      checked={indeterminate ? 'indeterminate' : checked}
+      onCheckedChange={() => table.toggleAllRowsSelected(!checked)}
+      disabled={selectableRows.length === 0}
+    >
+      <CheckboxIndicator />
+    </Checkbox>
+  );
+};
+
+/**
  * Creates a checkbox selection column for use in Table.
  * Automatically injected by Table when `onRowSelectionChange` is provided.
  * Supports shift-click range selection.
@@ -117,24 +180,7 @@ export const createSelectionColumn = <T extends RowData>(): ColumnDef<DSTableFea
       headerClassName: 'px-8 py-4',
       cellClassName: 'px-8 py-8',
     },
-    header: ({ table }) => {
-      const checked = table.getIsAllPageRowsSelected();
-      const indeterminate = table.getIsSomePageRowsSelected();
-      // getRowCount() belongs to the pagination feature, which dsTableFeatures
-      // deliberately doesn't register (this Table has no pagination). The row
-      // model's length is the equivalent "any rows to select?" measure.
-      const rowCount = table.getRowModel().rows.length;
-
-      return (
-        <Checkbox
-          checked={indeterminate ? 'indeterminate' : checked}
-          onCheckedChange={() => table.toggleAllPageRowsSelected(!checked)}
-          disabled={rowCount === 0}
-        >
-          <CheckboxIndicator />
-        </Checkbox>
-      );
-    },
+    header: props => <SelectAllHeaderCell {...props} />,
     cell: props => <SelectionCell {...props} />,
   };
 };
