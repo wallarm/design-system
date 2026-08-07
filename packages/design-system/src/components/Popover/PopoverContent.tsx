@@ -3,18 +3,7 @@ import { Popover as ArkUiPopover, usePopoverContext } from '@ark-ui/react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
-import {
-  ScrollArea,
-  ScrollAreaContent,
-  ScrollAreaScrollbar,
-  ScrollAreaViewport,
-} from '../ScrollArea';
-import {
-  POPOVER_MAX_HEIGHT,
-  POPOVER_MAX_WIDTH,
-  POPOVER_MIN_HEIGHT,
-  POPOVER_MIN_WIDTH,
-} from './constants';
+import { POPOVER_MAX_HEIGHT, POPOVER_MAX_WIDTH, POPOVER_MIN_WIDTH } from './constants';
 import type { PopoverSizeDimension } from './types';
 
 export interface PopoverContentProps
@@ -29,7 +18,7 @@ export interface PopoverContentProps
 
 export const PopoverContent: FC<PopoverContentProps> = ({
   children,
-  minHeight = POPOVER_MIN_HEIGHT,
+  minHeight,
   maxHeight = POPOVER_MAX_HEIGHT,
   minWidth = POPOVER_MIN_WIDTH,
   maxWidth = POPOVER_MAX_WIDTH,
@@ -62,11 +51,11 @@ export const PopoverContent: FC<PopoverContentProps> = ({
           style={style}
           className={cn(
             // Layout
-            'flex flex-col',
+            'flex flex-col overflow-auto',
             'min-w-(--popover-min-width)',
             'max-w-[clamp(var(--popover-min-width),var(--available-width),var(--popover-max-width))]',
             'min-h-(--popover-min-height)',
-            'max-h-[clamp(var(--popover-min-height),var(--available-height),var(--popover-max-height))]',
+            'max-h-[clamp(var(--popover-min-height,0px),var(--available-height),var(--popover-max-height))]',
             // Visual
             'p-12 bg-bg-surface-2 rounded-12 border border-border-primary-light shadow-md text-text-primary',
             // Leveling: layer-aware so a popover opened inside a nested
@@ -76,12 +65,12 @@ export const PopoverContent: FC<PopoverContentProps> = ({
             // --z-index (same mechanism as DropdownMenu/Select, see
             // DropdownMenu/classes.ts).
             'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index,0)*var(--drawer-level-ratio)))]',
-            // Contain wheel chaining on the inner ScrollArea viewport so wheel
-            // events past the scroll boundary don't propagate to whatever
-            // scrollable lives below — popovers are portaled and frequently
-            // open above a non-modal surface (e.g. a `modal={false}` Drawer),
-            // where chained scroll would otherwise move the page underneath.
-            '[&_[data-part=viewport]]:overscroll-contain',
+            // Contain wheel chaining on this scroll container so wheel events
+            // past the scroll boundary don't propagate to whatever scrollable
+            // lives below — popovers are portaled and frequently open above a
+            // non-modal surface (e.g. a `modal={false}` Drawer), where chained
+            // scroll would otherwise move the page underneath.
+            'overscroll-contain',
             // Animations
             'animate-in fade-in-0 zoom-in-95 origin-[--radix-tooltip-content-transform-origin]',
             // Animation closed
@@ -96,14 +85,8 @@ export const PopoverContent: FC<PopoverContentProps> = ({
             'data-[side=top]:slide-in-from-bottom-2',
             className,
           )}
-          asChild
         >
-          <ScrollArea ids={{ root: id }}>
-            <ScrollAreaViewport>
-              <ScrollAreaContent>{children}</ScrollAreaContent>
-            </ScrollAreaViewport>
-            <ScrollAreaScrollbar />
-          </ScrollArea>
+          {children}
         </ArkUiPopover.Content>
       </ArkUiPopover.Positioner>
     </ArkUiPortal>

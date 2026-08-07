@@ -35,6 +35,51 @@
     }
 }
 
+/**
+ * Global native-scrollbar styling, matching the ScrollArea component's look
+ * (transparent track, thin rounded slate thumb) for every plain
+ * `overflow: auto/scroll` element that isn't opting into ScrollArea's own
+ * JS-drawn thumb (excluded above via higher-specificity attribute selector).
+ * The thumb is permanently visible rather than hover-revealed: `overflow:
+ * auto` already only renders a scrollbar when content overflows, so that's
+ * the only "show it when scrollable" gate this needs.
+ *
+ * The two branches below are mutually exclusive by design, not layered
+ * fallbacks: once `scrollbar-color` is set on an element, Chromium/WebKit
+ * switch that element to their standardized scrollbar renderer and ignore
+ * `::-webkit-scrollbar-*` entirely, discarding the custom radius/inset thumb.
+ * So `::-webkit-scrollbar-*` only ever gets declared where the standard
+ * property is unsupported (Firefox), and `scrollbar-color` only where the
+ * legacy pseudo-elements are unsupported.
+ */
+@supports selector(::-webkit-scrollbar) {
+    *::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    *::-webkit-scrollbar-track {
+        background-color: transparent;
+    }
+
+    *::-webkit-scrollbar-thumb {
+        /* 8px track - 2px inset each side = 4px visible thumb, matching
+           ScrollAreaScrollbar's `w-4` thumb. */
+        background-color: color-mix(in srgb, var(--color-badge-slate-dark-alt) 50%, transparent);
+        background-clip: padding-box;
+        border: 2px solid transparent;
+        border-radius: var(--radius-8);
+    }
+}
+
+@supports not selector(::-webkit-scrollbar) {
+    * {
+        scrollbar-width: thin;
+        scrollbar-color: color-mix(in srgb, var(--color-badge-slate-dark-alt) 50%, transparent)
+            transparent;
+    }
+}
+
 /** Remove when old DS will be removed **/
 :where(:root) {
     cursor: default;
