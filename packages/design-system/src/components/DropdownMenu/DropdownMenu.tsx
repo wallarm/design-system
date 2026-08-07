@@ -19,6 +19,14 @@ interface DropdownMenuProps extends TestableProps {
   onHighlightChange?: (details: Menu.HighlightChangeDetails) => void;
   /** Whether selecting an item closes the menu (default true) */
   closeOnSelect?: boolean;
+  /**
+   * Override the trigger element's id. Pass the same id to another
+   * compound component's `ids.trigger` (e.g. `Tooltip`, `Popover`) to
+   * compose their triggers on one element via nested `asChild` without an
+   * extra wrapper node — otherwise the outer trigger's id wins and the
+   * other component can't find its own anchor.
+   */
+  ids?: Menu.RootProps['ids'];
 }
 
 const ROOT_POSITIONING: Menu.RootProps['positioning'] = {
@@ -43,6 +51,7 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
   highlightedValue,
   onHighlightChange,
   closeOnSelect,
+  ids,
   'data-testid': testIdProp,
   ...props
 }) => {
@@ -70,6 +79,7 @@ export const DropdownMenu: FC<DropdownMenuProps> = ({
       open={open}
       defaultOpen={defaultOpen}
       onOpenChange={handleOpenChange}
+      ids={ids}
       lazyMount
       unmountOnExit
     >

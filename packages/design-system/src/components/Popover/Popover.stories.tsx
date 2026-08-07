@@ -1,3 +1,4 @@
+import { useId, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import {
   Alert,
@@ -10,6 +11,7 @@ import {
 import { Button } from '../Button';
 import { VStack } from '../Stack';
 import { Text } from '../Text';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { Popover } from './Popover';
 import { PopoverContent } from './PopoverContent';
 import { PopoverTrigger } from './PopoverTrigger';
@@ -57,6 +59,36 @@ export const Basic: StoryFn<typeof meta> = () => (
     </PopoverContent>
   </Popover>
 );
+
+export const WithTooltip: StoryFn<typeof meta> = () => {
+  const triggerId = useId();
+  const [open, setOpen] = useState(false);
+
+  return (
+    <Popover
+      data-testid='with-tooltip-popover'
+      open={open}
+      onOpenChange={setOpen}
+      ids={{ trigger: triggerId }}
+    >
+      {/* Sharing `ids.trigger` lets both machines resolve the same DOM node as
+          their own anchor, so the tooltip positions correctly with no wrapper. */}
+      <Tooltip data-testid='with-tooltip-tooltip' disabled={open} ids={{ trigger: triggerId }}>
+        <PopoverTrigger asChild>
+          <TooltipTrigger asChild>
+            <Button data-testid='popover-tooltip-trigger' variant='outline' color='neutral'>
+              Actions
+            </Button>
+          </TooltipTrigger>
+        </PopoverTrigger>
+        <TooltipContent>More actions</TooltipContent>
+      </Tooltip>
+      <PopoverContent>
+        <Text size='sm'>Popover content</Text>
+      </PopoverContent>
+    </Popover>
+  );
+};
 
 export const MinMaxWidth: StoryFn<typeof meta> = () => (
   <VStack gap={32}>

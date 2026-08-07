@@ -15,6 +15,14 @@ export interface TooltipProps extends TestableProps {
   interactive?: boolean;
   disabled?: boolean;
   positioning?: ArkUiTooltip.RootProps['positioning'];
+  /**
+   * Override the trigger element's id. Pass the same id to another
+   * compound component's `ids.trigger` (e.g. `Popover`, `DropdownMenu`) to
+   * compose their triggers on one element via nested `asChild` without an
+   * extra wrapper node — otherwise the outer trigger's id wins and this
+   * tooltip can't find its anchor, mispositioning at the viewport origin.
+   */
+  ids?: ArkUiTooltip.RootProps['ids'];
 }
 
 const TOOLTIP_POSITIONING_DEFAULT: ArkUiTooltip.RootProps['positioning'] = {
@@ -37,6 +45,7 @@ export const Tooltip: FC<TooltipProps> = ({
   interactive,
   disabled,
   positioning,
+  ids,
   'data-testid': testIdProp,
 }) => {
   const inheritedTestId = useTestId();
@@ -60,6 +69,7 @@ export const Tooltip: FC<TooltipProps> = ({
         interactive={interactive}
         disabled={disabled}
         positioning={positioning ?? TOOLTIP_POSITIONING_DEFAULT}
+        ids={ids}
         lazyMount
         unmountOnExit
       >
