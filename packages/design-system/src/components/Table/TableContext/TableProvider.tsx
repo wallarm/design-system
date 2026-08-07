@@ -19,33 +19,50 @@ import {
   type ColumnOrderState,
   type ColumnPinningState,
   type ColumnSizingState,
+  type ColumnVisibilityState,
   type ExpandedState,
   type GroupingState,
-  getCoreRowModel,
-  getExpandedRowModel,
-  getGroupedRowModel,
-  getSortedRowModel,
+  type OnChangeFn,
   type Row,
+  type RowData,
   type RowSelectionState,
   type SortingState,
-  useReactTable,
-  type VisibilityState,
+  useTable,
 } from '@tanstack/react-table';
 import { useControlled } from '../../../hooks';
 import { useTableState } from '../hooks';
 import {
   createExpandColumn,
   createSelectionColumn,
+  type DSTableFeatures,
+  dsTableFeatures,
   TABLE_EXPAND_COLUMN_ID,
   TABLE_MIN_COLUMN_WIDTH,
   TABLE_SELECT_COLUMN_ID,
   TABLE_SKELETON_ROWS,
   TABLE_VIRTUALIZATION_OVERSCAN,
 } from '../lib';
+import type { TableColumnPinningState } from '../types';
 import { TableContext } from './TableContext';
 import type { TableContextValue, TableProviderProps, TableVirtualizerInstance } from './types';
 
-export const TableProvider = <T,>(props: TableProviderProps<T>) => {
+/**
+ * Snapshots the DS's public {left, right} pinning state into TanStack's real
+ * {start, end} shape, enforcing always-pinned columns at the front of `start`.
+ * Shared by `handleColumnPinningChange`'s `prevTanStackShape` and the
+ * `state.columnPinning` passed to `useTable()` — both must read the exact same
+ * "current pinning state" snapshot, or `prev` inside an updater function stops
+ * matching what was actually rendered and pinning silently desyncs.
+ */
+const toTanStackPinning = (
+  p: TableColumnPinningState | undefined,
+  pinnedLeft: string[],
+): ColumnPinningState => ({
+  start: [...pinnedLeft, ...(p?.left ?? []).filter(id => !pinnedLeft.includes(id))],
+  end: p?.right ?? [],
+});
+
+export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) => {
   const {
     data,
     columns,
@@ -106,12 +123,14 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
   // Auto-inject selection / expand columns based on enabled features
   // Also mark first user column as master column: non-pinnable, non-hideable
   // Auto-detect sortType from data when not explicitly set
-  const mergedColumns = useMemo<ColumnDef<T, any>[]>(() => {
-    const cols = columns as ColumnDef<T, any>[];
-    const prefix: ColumnDef<T, any>[] = [];
+  const mergedColumns = useMemo<ColumnDef<DSTableFeatures, T, any>[]>(() => {
+    const cols = columns as ColumnDef<DSTableFeatures, T, any>[];
+    const prefix: ColumnDef<DSTableFeatures, T, any>[] = [];
 
     if (expandingEnabled && !subRowGroupingEnabled) {
-      prefix.push(createExpandColumn<T>());
+      // TODO(table-v9): drop this cast once createExpandColumn.tsx is migrated
+      // (Task 3) to return ColumnDef<DSTableFeatures, T, unknown> natively.
+      prefix.push(createExpandColumn<T>() as ColumnDef<DSTableFeatures, T, any>);
     }
 
     if (selectionEnabled) {
@@ -135,6 +154,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       // Mark only the first user column as master
       if (withAutoMeta.length > 0) {
         return [{ ...withAutoMeta[0], ...masterOverrides }, ...withAutoMeta.slice(1)] as ColumnDef<
+          DSTableFeatures,
           T,
           any
         >[];
@@ -148,7 +168,7 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
         ? withAutoMeta.map((col, index) => (index === 0 ? { ...col, ...masterOverrides } : col))
         : withAutoMeta;
 
-    return [...prefix, ...userCols] as ColumnDef<T, any>[];
+    return [...prefix, ...userCols] as ColumnDef<DSTableFeatures, T, any>[];
   }, [columns, data, selectionEnabled, expandingEnabled, subRowGroupingEnabled]);
 
   // Master column ID — first data column (not _selection or _expand)
@@ -175,9 +195,13 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     onSortingChange,
   );
   const [rowSelection, handleRowSelectionChange] = useTableState<RowSelectionState>(
-    rowSelectionProp,
+    // v9's RowSelectionState is Record<string, true> (selection is tracked by key
+    // presence); the DS's public prop/callback stay the looser Record<string,
+    // boolean> shape for backwards compatibility. A stray `false` entry behaves
+    // identically to an absent one downstream, so this narrowing is safe.
+    rowSelectionProp as RowSelectionState | undefined,
     {},
-    onRowSelectionChange,
+    onRowSelectionChange as OnChangeFn<RowSelectionState> | undefined,
   );
   const [columnSizing, handleColumnSizingChange] = useTableState<ColumnSizingState>(
     columnSizingProp,
@@ -199,26 +223,30 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
     {},
     onExpandedChange,
   );
-  const [columnVisibility, handleColumnVisibilityChange] = useTableState<VisibilityState>(
+  const [columnVisibility, handleColumnVisibilityChange] = useTableState<ColumnVisibilityState>(
     columnVisibilityProp,
     defaultColumnVisibility ?? {},
     onColumnVisibilityChange,
   );
 
-  // Pinning needs useControlled separately — custom logic enforces always-pinned columns
-  const [columnPinning, setColumnPinningInternal] = useControlled<ColumnPinningState>({
+  // Pinning needs useControlled separately — custom logic enforces always-pinned columns.
+  // Internal storage stays in the DS's public {left, right} shape; only the
+  // value passed to useTable() and the updater TanStack calls back with use
+  // TanStack's real {start, end} shape (see handleColumnPinningChange below).
+  const [columnPinning, setColumnPinningInternal] = useControlled<TableColumnPinningState>({
     controlled: columnPinningProp,
     default: {},
   });
 
   const handleColumnPinningChange = useCallback(
     (updater: ColumnPinningState | ((prev: ColumnPinningState) => ColumnPinningState)) => {
-      const newValue = typeof updater === 'function' ? updater(columnPinning ?? {}) : updater;
-      const enforcedLeft = [
+      const prevTanStackShape = toTanStackPinning(columnPinning, alwaysPinnedLeft);
+      const newValue = typeof updater === 'function' ? updater(prevTanStackShape) : updater;
+      const enforcedStart = [
         ...alwaysPinnedLeft,
-        ...(newValue.left ?? []).filter(id => !alwaysPinnedLeft.includes(id)),
+        ...newValue.start.filter(id => !alwaysPinnedLeft.includes(id)),
       ];
-      const enforced = { ...newValue, left: enforcedLeft };
+      const enforced: TableColumnPinningState = { left: enforcedStart, right: newValue.end };
       setColumnPinningInternal(enforced);
       onColumnPinningChange?.(enforced);
     },
@@ -236,27 +264,18 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
   );
 
   // TanStack Table instance
-  const table = useReactTable<T>({
+  const table = useTable<DSTableFeatures, T>({
+    features: dsTableFeatures,
     data,
     columns: mergedColumns,
     getRowId,
     getSubRows,
-    getCoreRowModel: getCoreRowModel(),
-    ...(sortingEnabled && !manualSorting && { getSortedRowModel: getSortedRowModel() }),
     manualSorting,
-    ...(groupingEnabled && { getGroupedRowModel: getGroupedRowModel() }),
-    ...(groupingEnabled || expandingEnabled ? { getExpandedRowModel: getExpandedRowModel() } : {}),
     state: {
       sorting: sorting ?? [],
       rowSelection: rowSelection ?? {},
       columnSizing: columnSizing ?? {},
-      columnPinning: {
-        ...(columnPinning ?? {}),
-        left: [
-          ...alwaysPinnedLeft,
-          ...((columnPinning ?? {}).left ?? []).filter(id => !alwaysPinnedLeft.includes(id)),
-        ],
-      },
+      columnPinning: toTanStackPinning(columnPinning, alwaysPinnedLeft),
       columnOrder: columnOrder ?? [],
       grouping: grouping ?? [],
       expanded: expanded ?? {},
@@ -311,7 +330,9 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       expandingEnabled,
       visibilityEnabled,
       virtualized,
-      renderExpandedRow: renderExpandedRow as ((row: Row<T>) => ReactNode) | undefined,
+      renderExpandedRow: renderExpandedRow as
+        | ((row: Row<DSTableFeatures, T>) => ReactNode)
+        | undefined,
       estimateRowHeight,
       overscan,
       allLeafColumns,
@@ -394,8 +415,8 @@ export const TableProvider = <T,>(props: TableProviderProps<T>) => {
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
-      const currentOrder = table.getState().columnOrder.length
-        ? table.getState().columnOrder
+      const currentOrder = table.store.state.columnOrder.length
+        ? table.store.state.columnOrder
         : allLeafColumns.map(c => c.id);
 
       const oldIndex = currentOrder.indexOf(String(active.id));
