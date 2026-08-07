@@ -6,7 +6,7 @@ import {
   useId,
   useState,
 } from 'react';
-import type { Column } from '@tanstack/react-table';
+import type { Column, RowData } from '@tanstack/react-table';
 import { Check, ChevronsDown, Ellipsis } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, useTestId } from '../../../utils/testId';
@@ -20,7 +20,7 @@ import {
   DropdownMenuTriggerItem,
 } from '../../DropdownMenu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
-import { SORT_LABELS } from '../lib';
+import { type DSTableFeatures, SORT_LABELS } from '../lib';
 import { useTableContext } from '../TableContext';
 import { TableColumnMenuHideItem } from './TableColumnMenuHideItem';
 import { TableColumnMenuMoveLeftItem } from './TableColumnMenuMoveLeftItem';
@@ -29,7 +29,7 @@ import { TableColumnMenuPinItem } from './TableColumnMenuPinItem';
 import { TableColumnMenuSortItem } from './TableColumnMenuSortItem';
 
 interface TableColumnMenuContextValue {
-  column: Column<unknown>;
+  column: Column<DSTableFeatures, RowData>;
 }
 
 const TableColumnMenuContext = createContext<TableColumnMenuContextValue | null>(null);
@@ -42,11 +42,11 @@ export const useTableColumnMenuContext = (): TableColumnMenuContextValue => {
   return ctx;
 };
 
-export interface TableColumnMenuProps<T = unknown>
+export interface TableColumnMenuProps<T extends RowData = Record<string, unknown>>
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'color' | 'type' | 'children'>,
     TestableProps {
   /** Column from the header render context. */
-  column: Column<T>;
+  column: Column<DSTableFeatures, T>;
   /**
    * When omitted, the menu renders the default set of items (Move left / Move
    * right / Sort submenu / Pin / Hide) the same way the design system has
@@ -70,7 +70,7 @@ export interface TableColumnMenuProps<T = unknown>
  * (sorting disabled, pinning disabled, hiding disabled, and DnD disabled) —
  * matching the behavior of the legacy `TableHeadCellMenu` it replaces.
  */
-export const TableColumnMenu = <T,>({
+export const TableColumnMenu = <T extends RowData = Record<string, unknown>>({
   column,
   children,
   className,
@@ -91,7 +91,7 @@ export const TableColumnMenu = <T,>({
   if (!canSort && !canPin && !canHide && !canReorder) return null;
 
   return (
-    <TableColumnMenuContext.Provider value={{ column: column as Column<unknown> }}>
+    <TableColumnMenuContext.Provider value={{ column: column as Column<DSTableFeatures, RowData> }}>
       <span className='shrink-0 inline-flex opacity-0 group-hover:opacity-100 has-[>_[data-state=open]]:opacity-100 transition-opacity'>
         <Tooltip disabled={menuOpen} ids={{ trigger: triggerId }}>
           <DropdownMenu onOpenChange={setMenuOpen} ids={{ trigger: triggerId }}>
