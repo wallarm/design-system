@@ -90,7 +90,9 @@
       "picomatch@>=4.0.0 <4.0.4": ">=4.0.5",
       "ws": ">=8.21.0",
       "postcss": ">=8.5.16",
-      "@types/react": "19.2.18"
+      "@types/react": "19.2.18",
+      "@storybook/react": "10.4.6",
+      "@storybook/react-dom-shim": "10.4.6"
     }
   },
   "config": {

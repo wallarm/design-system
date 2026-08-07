@@ -7,13 +7,8 @@ const config: StorybookConfig = {
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)', '../src/**/*.mdx'],
   addons: [
     getAbsolutePath('@storybook/addon-docs'),
-    getAbsolutePath('@storybook/addon-mcp'),
     getAbsolutePath('@storybook/addon-themes'),
   ],
-  features: {
-    experimentalComponentsManifest: true,
-    experimentalCodeExamples: true,
-  },
   staticDirs: ['./assets'],
   rsbuildFinal: async (config, { configType }) => {
     if (configType === 'PRODUCTION' && config.output) {
