@@ -538,6 +538,8 @@ export {
   SelectClearTrigger,
   SelectContent,
   type SelectDataItem,
+  SelectEmptyState,
+  type SelectEmptyStateProps,
   SelectFooter,
   SelectGroup,
   SelectGroupLabel,
@@ -550,6 +552,9 @@ export {
   SelectPositioner,
   SelectSearchInput,
   SelectSeparator,
+  type UseSelectSearchOptions,
+  type UseSelectSearchResult,
+  useSelectSearch,
 } from './components/Select';
 export {
   Selection,

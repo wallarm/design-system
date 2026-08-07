@@ -1,10 +1,14 @@
-import type { FC } from 'react';
+import type { FC, ReactNode } from 'react';
 import { EmptyState, EmptyStateDescription, EmptyStateMessage } from '../EmptyState';
 
-export const SelectEmptyState: FC = () => (
+export interface SelectEmptyStateProps {
+  description?: ReactNode;
+}
+
+export const SelectEmptyState: FC<SelectEmptyStateProps> = ({ description = 'No results' }) => (
   <EmptyState type='no-results'>
     <EmptyStateMessage>
-      <EmptyStateDescription>No results</EmptyStateDescription>
+      <EmptyStateDescription>{description}</EmptyStateDescription>
     </EmptyStateMessage>
   </EmptyState>
 );

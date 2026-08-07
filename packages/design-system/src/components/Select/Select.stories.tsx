@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import { Fragment } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { LayoutGrid, LayoutTemplate, Pen, Search, SquareArrowOutUpRight } from '../../icons';
@@ -10,6 +10,7 @@ import { Select } from './Select';
 import { SelectButton } from './SelectButton';
 import { SelectClearTrigger } from './SelectClearTrigger';
 import { SelectContent } from './SelectContent';
+import { SelectEmptyState } from './SelectEmptyState';
 import { SelectFooter } from './SelectFooter';
 import { SelectGroup } from './SelectGroup';
 import { SelectGroupLabel } from './SelectGroupLabel';
@@ -23,6 +24,7 @@ import { SelectPositioner } from './SelectPositioner';
 import { SelectSearchInput } from './SelectSearchInput';
 import { SelectSeparator } from './SelectSeparator';
 import type { SelectDataItem } from './types';
+import { useSelectSearch } from './useSelectSearch';
 
 const meta = {
   title: 'Inputs/Select',
@@ -862,13 +864,13 @@ export const WithFooter: StoryFn<typeof Select> = () => {
 };
 
 export const WithSearch: StoryFn<typeof Select> = () => {
-  const [searchValue, setSearchValue] = useState<string>('');
-
   const collection = createListCollection({
     items: skillsWithoutIcons,
     groupBy: item => item.category ?? '',
     itemToString: item => item.label,
   });
+
+  const { searchValue, onSearchChange, filteredCollection } = useSelectSearch(collection);
 
   return (
     <div className='w-300'>
@@ -877,14 +879,14 @@ export const WithSearch: StoryFn<typeof Select> = () => {
 
         <SelectPositioner>
           <SelectHeader>
-            <SelectSearchInput value={searchValue} onChange={setSearchValue} />
+            <SelectSearchInput value={searchValue} onChange={onSearchChange} />
           </SelectHeader>
 
           <SelectContent>
-            {collection
-              .filter(skill => skill.toLowerCase().includes(searchValue.toLowerCase()))
-              .group()
-              .map(([category, group], index) => (
+            {filteredCollection.size === 0 ? (
+              <SelectEmptyState description={`No results for "${searchValue}"`} />
+            ) : (
+              filteredCollection.group().map(([category, group], index) => (
                 <SelectGroup key={category}>
                   <SelectGroupLabel>
                     {category}
@@ -900,7 +902,8 @@ export const WithSearch: StoryFn<typeof Select> = () => {
                     </SelectOption>
                   ))}
                 </SelectGroup>
-              ))}
+              ))
+            )}
           </SelectContent>
 
           <SelectFooter>
