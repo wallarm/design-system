@@ -260,7 +260,7 @@ Comprehensive GitHub Actions pipeline with multiple stages:
 
 - **Node.js**: v24+
 - **pnpm**: v10.33.2
-- **Playwright**: v1.61.1
+- **Playwright**: v1.62.1
 
 ## 🤝 Contributing
 

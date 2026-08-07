@@ -12,11 +12,11 @@
     "./react": "./dist/react.js"
   },
   "dependencies": {
-    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/jest-dom": "7.0.0",
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "catalog:",
     "@vitest/ui": "4.1.10",
-    "jsdom": "29.1.1",
+    "jsdom": "30.0.1",
     "vitest": "catalog:"
   },
   "devDependencies": {

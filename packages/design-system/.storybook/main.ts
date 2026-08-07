@@ -5,15 +5,7 @@ import { fileURLToPath } from 'node:url';
 const config: StorybookConfig = {
   framework: getAbsolutePath('storybook-react-rsbuild'),
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)', '../src/**/*.mdx'],
-  addons: [
-    getAbsolutePath('@storybook/addon-docs'),
-    getAbsolutePath('@storybook/addon-mcp'),
-    getAbsolutePath('@storybook/addon-themes'),
-  ],
-  features: {
-    experimentalComponentsManifest: true,
-    experimentalCodeExamples: true,
-  },
+  addons: [getAbsolutePath('@storybook/addon-docs'), getAbsolutePath('@storybook/addon-themes')],
   staticDirs: ['./assets'],
   rsbuildFinal: async (config, { configType }) => {
     if (configType === 'PRODUCTION' && config.output) {
