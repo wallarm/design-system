@@ -103,6 +103,13 @@ test.describe('Component: FilterInput', () => {
       await openValueMenu(page);
       await page.getByRole('menuitem', { name: /^SQL injection$/ }).hover();
       await expect(page.getByRole('menuitem', { name: /^All SQL injection$/ })).toBeVisible();
+      // "Visible" only means the submenu mounted — it races two async settles:
+      // the hover-highlight's scrollIntoView on the left list (useKeyboardNav's
+      // onHighlightChange), and floating-ui's autoUpdate repositioning the right
+      // panel in response to that same scroll (its anchor rect tracks the left
+      // row live). Give both one paint to land before capturing, same as the
+      // floating-ui settle wait in FilterInputMenuPositioning.e2e.ts.
+      await page.waitForTimeout(100);
       // Capture the viewport (not the `body` element): the two panels render in
       // fixed-positioned portals that overflow `body`'s small bounding box, so an
       // element screenshot of `body` crops the menu. The viewport includes both.
