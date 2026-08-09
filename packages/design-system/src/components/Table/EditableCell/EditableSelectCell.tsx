@@ -56,7 +56,11 @@ export const EditableSelectCell: FC<EditableSelectCellProps> = ({
   const hasValue = value != null && value !== '';
 
   return (
+    // `h-full` on the Ark Root + Control passes the row height down to the
+    // trigger so its own `h-full` fills the cell (the trigger is nested under
+    // these wrappers, unlike the text cell which is a direct td child).
     <Select
+      className='h-full'
       collection={collection}
       value={hasValue ? [value] : []}
       data-testid={testId}
@@ -65,7 +69,7 @@ export const EditableSelectCell: FC<EditableSelectCellProps> = ({
         if (next && next !== value) onCommit(next);
       }}
     >
-      <ArkUiSelect.Control>
+      <ArkUiSelect.Control className='h-full'>
         <ArkUiSelect.Trigger asChild>
           <div
             {...rest}
