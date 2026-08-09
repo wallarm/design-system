@@ -1,4 +1,4 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import type { CheckboxCheckedState } from '@ark-ui/react/checkbox';
 import { ChevronRight } from '../../../../icons/ChevronRight';
 import { cn } from '../../../../utils/cn';
@@ -7,35 +7,7 @@ import { Checkmark } from '../../../Checkmark';
 import { DropdownMenuItem } from '../../../DropdownMenu';
 import { Text } from '../../../Text';
 import type { ValueOption } from './FilterInputValueMenu';
-
-/**
- * Wrap every case-insensitive occurrence of `query` in `text` with a brand-tinted
- * emphasis, so a flat-search match reads at a glance. Returns the raw string when
- * there's no query (the common, non-search path) so nothing changes there.
- */
-const highlightMatch = (text: string, query?: string): ReactNode => {
-  const q = query?.trim().toLowerCase();
-  if (!q) return text;
-  const lower = text.toLowerCase();
-  const parts: ReactNode[] = [];
-  let cursor = 0;
-  let key = 0;
-  while (cursor < text.length) {
-    const at = lower.indexOf(q, cursor);
-    if (at === -1) {
-      parts.push(<span key={key++}>{text.slice(cursor)}</span>);
-      break;
-    }
-    if (at > cursor) parts.push(<span key={key++}>{text.slice(cursor, at)}</span>);
-    parts.push(
-      <mark key={key++} className='bg-transparent font-medium text-text-brand'>
-        {text.slice(at, at + q.length)}
-      </mark>,
-    );
-    cursor = at + q.length;
-  }
-  return parts;
-};
+import { highlightMatch } from './highlightMatch';
 
 interface NestedValueMenuItemProps {
   id: string;

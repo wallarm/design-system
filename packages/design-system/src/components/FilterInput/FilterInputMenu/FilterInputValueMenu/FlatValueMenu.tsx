@@ -108,6 +108,7 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
                 isPending={pendingIds.has(String(option.value))}
                 multiSelect={multiSelect}
                 registerItem={registerItem}
+                highlight={filterText}
                 onSelect={() =>
                   handleItemSelect({
                     id: String(option.value),

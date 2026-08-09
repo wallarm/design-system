@@ -19,9 +19,12 @@ export const QUERY_BAR_SELECTOR = '[data-slot="filter-input"]';
 export const MENU_BASE_GUTTER = 4;
 
 /** Extra vertical offset added to the anchor's bottom when the dropdown is
- *  anchored to a chip / input — total visual gap becomes
- *  MENU_BASE_GUTTER + MENU_CHIP_GUTTER_OFFSET (12). */
-export const MENU_CHIP_GUTTER_OFFSET = 8;
+ *  anchored to a chip / input. A building chip (h-22) sits 10px inset from the
+ *  field's bottom edge (measured: 8px py + 2px top-biased placement), so this
+ *  offset cancels that inset — the visual gap below the field border stays =
+ *  MENU_BASE_GUTTER in every state, matching the empty/field-anchored first
+ *  level. Value verified live in Storybook, not derived from nominal sizes. */
+export const MENU_CHIP_GUTTER_OFFSET = 10;
 
 /** Labels for non-chip filter chip variants (connectors, brackets). */
 export const VARIANT_LABELS: Partial<Record<FilterInputChipVariant, string>> = {
