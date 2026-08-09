@@ -1457,6 +1457,14 @@ const statusItems: SelectDataItem[] = [
   { label: 'Monitoring', value: 'Monitoring' },
 ];
 
+// Empty-by-default select — the placeholder text is supplied by the consumer.
+const categoryItems: SelectDataItem[] = [
+  { label: 'Category A', value: 'a' },
+  { label: 'Category B', value: 'b' },
+  { label: 'Category C', value: 'c' },
+  { label: 'Category D', value: 'd' },
+];
+
 const StatusBadge: FC<{ value: SecurityEvent['status'] }> = ({ value }) => (
   <Badge
     variant='dotted'
@@ -1470,6 +1478,8 @@ const StatusBadge: FC<{ value: SecurityEvent['status'] }> = ({ value }) => (
 
 export const InlineCellEditing: StoryFn<typeof meta> = () => {
   const [data, setData] = useState<SecurityEvent[]>(() => securityEvents.slice(0, 6));
+  // Category starts unselected for every row, so the select shows its placeholder.
+  const [categories, setCategories] = useState<Record<string, string>>({});
 
   const updateCell = useCallback(
     <K extends keyof SecurityEvent>(rowId: string, key: K, value: SecurityEvent[K]) => {
@@ -1514,6 +1524,27 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
           </EditableSelectCell>
         ),
       }),
+      // Empty-by-default select: consumer supplies the `placeholder` text.
+      securityColumnHelper.display({
+        id: 'category',
+        header: 'Category',
+        size: 200,
+        meta: EDITABLE_CELL_COLUMN_META,
+        cell: ({ row }) => {
+          const value = categories[row.id] ?? '';
+          return (
+            <EditableSelectCell
+              value={value}
+              items={categoryItems}
+              placeholder='Select…'
+              aria-label='Edit category'
+              onCommit={next => setCategories(prev => ({ ...prev, [row.id]: next }))}
+            >
+              {categoryItems.find(item => item.value === value)?.label}
+            </EditableSelectCell>
+          );
+        },
+      }),
       securityColumnHelper.accessor('parameter', {
         header: 'Parameters',
         size: 240,
@@ -1521,15 +1552,16 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
         cell: ({ getValue }) => <InlineCodeSnippet code={getValue()} size='sm' copyable={false} />,
       }),
     ],
-    [updateCell],
+    [updateCell, categories],
   );
 
   return (
     <VStack gap={12} align='stretch'>
       <Text size='sm' color='secondary'>
-        Hover an Object name (text) or Status (select) cell — the whole cell highlights. Click to
-        edit: the cell gets a brand-orange border and the content stays exactly in place (no shift).
-        Enter or blur commits, Escape reverts; the read-only columns stay static.
+        Hover an Object name (text) or Status / Category (select) cell — the whole cell highlights.
+        Click to edit: the cell gets a brand-orange border and the content stays exactly in place
+        (no shift). Category starts empty and shows a consumer-set “Select…” placeholder. Enter or
+        blur commits, Escape reverts; the read-only columns stay static.
       </Text>
       <Table data={data} columns={columns} getRowId={row => row.id} />
     </VStack>

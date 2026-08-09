@@ -607,6 +607,12 @@ export {
 } from './components/Switch';
 export {
   createTableColumnHelper,
+  EDITABLE_CELL_COLUMN_META,
+  EditableSelectCell,
+  type EditableSelectCellProps,
+  EditableTextCell,
+  type EditableTextCellProps,
+  editableCellVariants,
   Table,
   type TableAccessorColumnDef,
   TableActionBar,
