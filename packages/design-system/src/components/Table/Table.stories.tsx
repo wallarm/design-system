@@ -1473,13 +1473,29 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
 // Table has no dedicated "editable cell" API — a column's `cell` renderer may
 // return any React node, so inline editing reuses the design-system `InlineEdit`
 // primitive (the WDS-152 Attribute inline-edit work). `InlineEdit` is borderless
-// by default and keeps the preview and editor at the same 28px height with
-// matching `px-6`, so entering/leaving edit causes no layout shift. The `-mx-6`
-// on the root pulls that padding back so the editable text lines up with the
-// read-only columns while the hover highlight still bleeds into the cell.
+// by default and keeps the preview and editor at the same 28px height, so
+// entering/leaving edit causes no layout shift.
+//
+// InlineEdit's default hover target is an inset, rounded pill (sized for the
+// Attribute layout). Here we bleed both the preview and the editor out to the
+// full table-cell box — the body cell's `px-16 py-8` padding — so the *whole
+// cell* highlights on hover, edge-to-edge and square, matching the Figma
+// "cell-bg becomes interactive on hover" spec. `-mx-16 -my-8` cancels the cell
+// padding to reach its edges; `px-16 py-8` re-insets the content so the text
+// still lines up with the read-only columns; `h-44` (the 28px inline-edit
+// control + the 16px cell padding) keeps preview and editor the same height so
+// there is still no shift on focus.
 //
 // Activation is a single click (InlineEdit's default, matching WDS-152). Commit
 // happens on Enter / blur / option-pick, Escape reverts.
+
+const FILL_CELL_PREVIEW = '-mx-16 -my-8 h-44 rounded-none px-16 py-8';
+const FILL_CELL_CONTROL = [
+  '-mx-16 -my-8 flex h-44 items-center py-8',
+  '[&>*]:w-full', // stretch the editor (input / select wrapper) to the full cell width
+  '[&_[data-slot=input]]:!px-16', // text input aligns with the preview
+  '[&_[data-scope=select][data-part=trigger]]:!px-16', // select trigger aligns with the preview
+].join(' ');
 
 const statusItems: SelectDataItem[] = [
   { label: 'Blocked', value: 'Blocked' },
@@ -1491,9 +1507,11 @@ const InlineEditTextCell: FC<{ value: string; onCommit: (value: string) => void 
   value,
   onCommit,
 }) => (
-  <InlineEdit className='-mx-6' value={value} onValueCommit={next => onCommit(next as string)}>
-    <InlineEditPreview lineClamp={1}>{value}</InlineEditPreview>
-    <InlineEditControl>
+  <InlineEdit value={value} onValueCommit={next => onCommit(next as string)}>
+    <InlineEditPreview className={FILL_CELL_PREVIEW} lineClamp={1}>
+      {value}
+    </InlineEditPreview>
+    <InlineEditControl className={FILL_CELL_CONTROL}>
       <InlineEditInput aria-label='Edit object name' />
     </InlineEditControl>
     <InlineEditError />
@@ -1506,14 +1524,13 @@ const InlineEditStatusCell: FC<{
   onCommit: (value: SecurityEvent['status']) => void;
 }> = ({ value, onCommit }) => (
   <InlineEdit
-    className='-mx-6'
     value={[value]}
     onValueCommit={next => {
       const picked = (next as string[])[0] as SecurityEvent['status'] | undefined;
       if (picked) onCommit(picked);
     }}
   >
-    <InlineEditPreview>
+    <InlineEditPreview className={FILL_CELL_PREVIEW}>
       <InlineEditPreviewValue>
         <Badge
           variant='dotted'
@@ -1528,7 +1545,7 @@ const InlineEditStatusCell: FC<{
         <ChevronDown size='md' />
       </InlineEditPreviewIcon>
     </InlineEditPreview>
-    <InlineEditControl>
+    <InlineEditControl className={FILL_CELL_CONTROL}>
       <InlineEditSelect items={statusItems}>
         <SelectButton size='inline-edit' variant='ghost' />
         <SelectPositioner>
@@ -1597,9 +1614,9 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
   return (
     <VStack gap={12} align='stretch'>
       <Text size='sm' color='secondary'>
-        Click a cell in the Object name (text) or Status (select) column to edit — the borderless
-        editor keeps the text in place. Enter or blur commits, Escape reverts; the read-only columns
-        stay static.
+        Hover an Object name (text) or Status (select) cell — the whole cell highlights. Click to
+        edit; the borderless editor keeps the text in place. Enter or blur commits, Escape reverts;
+        the read-only columns stay static.
       </Text>
       <Table data={data} columns={columns} getRowId={row => row.id} />
     </VStack>
