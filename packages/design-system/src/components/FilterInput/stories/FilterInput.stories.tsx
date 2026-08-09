@@ -518,6 +518,68 @@ const attackTypeNestedFields: FieldMetadata[] = [
         children: [
           { value: 'graphql_aliases', label: 'GraphQL aliases' },
           { value: 'graphql_batching', label: 'GraphQL batching' },
+          { value: 'graphql_debug', label: 'GraphQL debug' },
+          { value: 'graphql_introspection', label: 'GraphQL introspection' },
+          { value: 'graphql_query_depth', label: 'GraphQL query depth' },
+          { value: 'graphql_query_size', label: 'GraphQL query size' },
+          { value: 'graphql_value_size', label: 'GraphQL value size' },
+        ],
+      },
+      {
+        label: 'API specification enforcement',
+        children: [
+          { value: 'invalid_parameter', label: 'Invalid parameter' },
+          { value: 'invalid_request', label: 'Invalid request' },
+          { value: 'missing_authentication', label: 'Missing authentication' },
+          { value: 'missing_parameter', label: 'Missing parameter' },
+          { value: 'undefined_endpoint', label: 'Undefined endpoint' },
+          { value: 'undefined_parameter', label: 'Undefined parameter' },
+        ],
+      },
+      {
+        label: 'API abuse',
+        children: [
+          { value: 'account_takeover', label: 'Account takeover' },
+          { value: 'scraping', label: 'Scraping' },
+          { value: 'security_crawlers', label: 'Security crawlers' },
+          { value: 'suspicious_api_activity', label: 'Suspicious API activity' },
+          {
+            value: 'unrestricted_resource_consumption',
+            label: 'Unrestricted resource consumption',
+          },
+        ],
+      },
+      {
+        label: 'Enumeration attacks',
+        children: [
+          { value: 'bola', label: 'Broken object level authorization (BOLA)' },
+          { value: 'brute_force', label: 'Brute force attack' },
+          { value: 'forced_browsing', label: 'Forced browsing' },
+          { value: 'generic_enumeration', label: 'Generic enumeration attack' },
+        ],
+      },
+      {
+        label: 'Data handling',
+        children: [
+          { value: 'data_bomb', label: 'Data bomb' },
+          { value: 'file_upload_violation', label: 'File upload violation' },
+          { value: 'invalid_xml', label: 'Invalid XML' },
+          { value: 'processing_overlimit', label: 'Processing overlimit' },
+          { value: 'resource_overlimit', label: 'Resource overlimit' },
+          { value: 'xxe', label: 'XML external entity (XXE)' },
+        ],
+      },
+      {
+        label: 'Other',
+        children: [
+          { value: 'blocked_source', label: 'Blocked source' },
+          { value: 'credential_stuffing', label: 'Credential stuffing' },
+          { value: 'custom_ai_payload_inspection', label: 'Custom AI payload inspection' },
+          { value: 'custom_logic_abuse', label: 'Custom logic abuse' },
+          { value: 'open_redirect', label: 'Open redirect' },
+          { value: 'prompt_injection', label: 'Prompt injection' },
+          { value: 'system_prompt_retrieval', label: 'System prompt retrieval' },
+          { value: 'virtual_patch', label: 'Virtual patch' },
         ],
       },
     ],
