@@ -378,14 +378,7 @@ describe('buildChips — nested value group display (WDS-156)', () => {
   });
 
   it('shows the whole top-level section name when every leaf is selected', () => {
-    const chip = inChip([
-      'xss',
-      'rce',
-      'sqli_boolean',
-      'sqli_generic',
-      'sqli_time',
-      'sqli_union',
-    ]);
+    const chip = inChip(['xss', 'rce', 'sqli_boolean', 'sqli_generic', 'sqli_time', 'sqli_union']);
     expect(chip?.value).toBe('Input-based attacks');
     expect(chip?.valueParts).toBeUndefined();
   });
