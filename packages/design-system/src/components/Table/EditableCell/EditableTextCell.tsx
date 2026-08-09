@@ -1,4 +1,4 @@
-import type { FC, InputHTMLAttributes, KeyboardEvent, Ref } from 'react';
+import type { FC, HTMLAttributes, KeyboardEvent, Ref } from 'react';
 import { useState } from 'react';
 import { Pencil } from '../../../icons';
 import { cn } from '../../../utils/cn';
@@ -10,11 +10,9 @@ import {
   editableCellVariants,
 } from './classes';
 
-// Everything a native input accepts EXCEPT the bits this component owns.
-type NativeProps = Omit<
-  InputHTMLAttributes<HTMLInputElement>,
-  'value' | 'defaultValue' | 'onChange' | 'children'
->;
+// The persistent root is a <div>, so consumer attrs (incl. data-analytics-*)
+// and composed handlers are typed against it — the internal <input> is owned.
+type NativeProps = Omit<HTMLAttributes<HTMLDivElement>, 'children'>;
 
 export interface EditableTextCellProps extends NativeProps, TestableProps {
   /** Current committed value. */
