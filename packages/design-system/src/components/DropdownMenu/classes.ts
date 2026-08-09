@@ -13,8 +13,11 @@ export const dropdownMenuClassNames = cn(
   // (50 + layer-index * 20). The ,0 fallback keeps the calc valid while
   // the node is closed / not yet registered in the stack.
   'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index,0)*var(--drawer-level-ratio)))]',
-  // Scrolling
-  'overflow-y-auto overflow-x-hidden outline-none',
+  // Scrolling. overscroll-none stops the macOS rubber-band bounce / scroll
+  // chaining when the menu is scrolled to its end — applied to the content and
+  // to the inner ScrollArea viewport (the actual scroller), since either can be
+  // the overflow container depending on content height.
+  'overflow-y-auto overflow-x-hidden outline-none overscroll-none [&_[data-part=viewport]]:overscroll-none',
   // Visual
   'rounded-12 border border-border-primary-light bg-bg-surface-2 p-8 font-sans text-text-primary shadow-md outline-none',
   // Animation opened
