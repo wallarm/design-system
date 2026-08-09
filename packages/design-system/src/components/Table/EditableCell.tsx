@@ -46,7 +46,8 @@ export const EDITABLE_CELL_COLUMN_META = { cellClassName: 'p-0' } as const;
 
 const editableCellShell = cn(
   'group/cell flex h-full w-full items-center gap-8 px-16 py-8',
-  'rounded-8 border border-transparent',
+  // Square, edge-to-edge (no rounding) — the border sits flush with the cell.
+  'border border-transparent',
   'text-left text-sm text-text-primary',
   'cursor-pointer outline-none transition-colors',
 );
