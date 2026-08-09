@@ -1,8 +1,16 @@
-import type { FC, ReactNode } from 'react';
+import type { FC } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Copy, Database, Ellipsis, Filter, FilterX, SearchX, Trash2 } from '../../icons';
-import { cn } from '../../utils/cn';
+import {
+  ChevronDown,
+  Copy,
+  Database,
+  Ellipsis,
+  Filter,
+  FilterX,
+  SearchX,
+  Trash2,
+} from '../../icons';
 import { Badge } from '../Badge';
 import {
   BulkBarSummaryClear,
@@ -34,7 +42,16 @@ import {
   EmptyStateTitle,
 } from '../EmptyState';
 import { HttpMethod } from '../HttpMethod';
-import { Input } from '../Input';
+import {
+  InlineEdit,
+  InlineEditControl,
+  InlineEditError,
+  InlineEditInput,
+  InlineEditPreview,
+  InlineEditPreviewIcon,
+  InlineEditPreviewValue,
+  InlineEditSelect,
+} from '../InlineEdit';
 import { OverflowList } from '../OverflowList';
 import {
   Pagination,
@@ -46,10 +63,9 @@ import {
 } from '../Pagination';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import {
-  createListCollection,
-  Select,
   SelectButton,
   SelectContent,
+  type SelectDataItem,
   SelectOption,
   SelectOptionIndicator,
   SelectOptionText,
@@ -58,7 +74,6 @@ import {
 import { HStack, VStack } from '../Stack';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import {
   createLargeGroupedData,
   createLargeSecurityEvents,
@@ -1455,118 +1470,70 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
 // ---------------------------------------------------------------------------
 // Inline cell editing (WDS-157)
 // ---------------------------------------------------------------------------
-// The Table has no dedicated "editable cell" API — a column's `cell` renderer
-// may return any React node, so inline editing is built in userland: a cell
-// component that swaps its read view for an editor on double click, then commits
-// the new value back to the row data the consumer owns. Below, one text editor
-// (Input) and one fixed-option editor (Select) demonstrate the pattern.
+// Table has no dedicated "editable cell" API — a column's `cell` renderer may
+// return any React node, so inline editing reuses the design-system `InlineEdit`
+// primitive (the WDS-152 Attribute inline-edit work). `InlineEdit` is borderless
+// by default and keeps the preview and editor at the same 28px height with
+// matching `px-6`, so entering/leaving edit causes no layout shift. The `-mx-6`
+// on the root pulls that padding back so the editable text lines up with the
+// read-only columns while the hover highlight still bleeds into the cell.
+//
+// Activation is a single click (InlineEdit's default, matching WDS-152). Commit
+// happens on Enter / blur / option-pick, Escape reverts.
 
-// Shared read view: fills the cell, highlights on hover, hints via a tooltip.
-const EditableReadCell: FC<{ onStartEdit: () => void; children: ReactNode }> = ({
-  onStartEdit,
-  children,
-}) => (
-  <Tooltip openDelay={400}>
-    <TooltipTrigger asChild>
-      <div
-        onDoubleClick={onStartEdit}
-        className={cn(
-          '-mx-16 -my-8 flex h-full cursor-pointer items-center px-16 py-8',
-          'hover:bg-bg-secondary-hover',
-        )}
-      >
-        {children}
-      </div>
-    </TooltipTrigger>
-    <TooltipContent>Double click to edit</TooltipContent>
-  </Tooltip>
-);
+const statusItems: SelectDataItem[] = [
+  { label: 'Blocked', value: 'Blocked' },
+  { label: 'Monitoring', value: 'Monitoring' },
+];
 
-// Free-text editor: Enter or blur commits, Escape cancels.
-const EditableTextCell: FC<{ value: string; onCommit: (value: string) => void }> = ({
+// Free-text editor.
+const InlineEditTextCell: FC<{ value: string; onCommit: (value: string) => void }> = ({
   value,
   onCommit,
-}) => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [draft, setDraft] = useState(value);
+}) => (
+  <InlineEdit className='-mx-6' value={value} onValueCommit={next => onCommit(next as string)}>
+    <InlineEditPreview lineClamp={1}>{value}</InlineEditPreview>
+    <InlineEditControl>
+      <InlineEditInput aria-label='Edit object name' />
+    </InlineEditControl>
+    <InlineEditError />
+  </InlineEdit>
+);
 
-  const start = () => {
-    setDraft(value);
-    setIsEditing(true);
-  };
-  const commit = () => {
-    setIsEditing(false);
-    if (draft !== value) onCommit(draft);
-  };
-  const cancel = () => {
-    setIsEditing(false);
-    setDraft(value);
-  };
-
-  if (isEditing) {
-    return (
-      <Input
-        autoFocus
-        size='small'
-        value={draft}
-        onChange={e => setDraft(e.currentTarget.value)}
-        onBlur={commit}
-        onKeyDown={e => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            commit();
-          } else if (e.key === 'Escape') {
-            e.preventDefault();
-            cancel();
-          }
-        }}
-      />
-    );
-  }
-
-  return (
-    <EditableReadCell onStartEdit={start}>
-      <Text size='sm' truncate>
-        {value}
-      </Text>
-    </EditableReadCell>
-  );
-};
-
-// Fixed-option editor: a Select that opens on entering edit mode and commits on
-// pick. Closing without a pick (click away / Escape) cancels.
-const statusCollection = createListCollection<{ label: string; value: SecurityEvent['status'] }>({
-  items: [
-    { label: 'Blocked', value: 'Blocked' },
-    { label: 'Monitoring', value: 'Monitoring' },
-  ],
-});
-
-const EditableStatusCell: FC<{
+// Fixed-option editor: borderless Select that opens on entering edit mode.
+const InlineEditStatusCell: FC<{
   value: SecurityEvent['status'];
   onCommit: (value: SecurityEvent['status']) => void;
-}> = ({ value, onCommit }) => {
-  const [isEditing, setIsEditing] = useState(false);
-
-  if (isEditing) {
-    return (
-      <Select
-        collection={statusCollection}
-        value={[value]}
-        defaultOpen
-        onValueChange={details => {
-          const next = details.value[0] as SecurityEvent['status'] | undefined;
-          if (next && next !== value) onCommit(next);
-          setIsEditing(false);
-        }}
-        onOpenChange={details => {
-          if (!details.open) setIsEditing(false);
-        }}
-      >
-        <SelectButton size='small' />
+}> = ({ value, onCommit }) => (
+  <InlineEdit
+    className='-mx-6'
+    value={[value]}
+    onValueCommit={next => {
+      const picked = (next as string[])[0] as SecurityEvent['status'] | undefined;
+      if (picked) onCommit(picked);
+    }}
+  >
+    <InlineEditPreview>
+      <InlineEditPreviewValue>
+        <Badge
+          variant='dotted'
+          color={value === 'Blocked' ? 'red' : 'yellow'}
+          type='secondary'
+          size='medium'
+        >
+          {value}
+        </Badge>
+      </InlineEditPreviewValue>
+      <InlineEditPreviewIcon>
+        <ChevronDown size='md' />
+      </InlineEditPreviewIcon>
+    </InlineEditPreview>
+    <InlineEditControl>
+      <InlineEditSelect items={statusItems}>
+        <SelectButton size='inline-edit' variant='ghost' />
         <SelectPositioner>
           <SelectContent>
-            {statusCollection.items.map(item => (
+            {statusItems.map(item => (
               <SelectOption key={item.value} item={item}>
                 <SelectOptionText>{item.label}</SelectOptionText>
                 <SelectOptionIndicator />
@@ -1574,23 +1541,10 @@ const EditableStatusCell: FC<{
             ))}
           </SelectContent>
         </SelectPositioner>
-      </Select>
-    );
-  }
-
-  return (
-    <EditableReadCell onStartEdit={() => setIsEditing(true)}>
-      <Badge
-        variant='dotted'
-        color={value === 'Blocked' ? 'red' : 'yellow'}
-        type='secondary'
-        size='medium'
-      >
-        {value}
-      </Badge>
-    </EditableReadCell>
-  );
-};
+      </InlineEditSelect>
+    </InlineEditControl>
+  </InlineEdit>
+);
 
 export const InlineCellEditing: StoryFn<typeof meta> = () => {
   const [data, setData] = useState<SecurityEvent[]>(() => securityEvents.slice(0, 6));
@@ -1609,7 +1563,7 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
         size: 400,
         meta: { resizeType: 'cut' as const },
         cell: ({ row, getValue }) => (
-          <EditableTextCell
+          <InlineEditTextCell
             value={getValue()}
             onCommit={value => updateCell(row.id, 'objectName', value)}
           />
@@ -1619,7 +1573,7 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
         header: 'Status',
         size: 200,
         cell: ({ row, getValue }) => (
-          <EditableStatusCell
+          <InlineEditStatusCell
             value={getValue()}
             onCommit={value => updateCell(row.id, 'status', value)}
           />
@@ -1643,8 +1597,9 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
   return (
     <VStack gap={12} align='stretch'>
       <Text size='sm' color='secondary'>
-        Double click a cell in the Object name (text) or Status (select) column to edit. Enter or
-        blur commits, Escape cancels — the read-only columns stay static.
+        Click a cell in the Object name (text) or Status (select) column to edit — the borderless
+        editor keeps the text in place. Enter or blur commits, Escape reverts; the read-only columns
+        stay static.
       </Text>
       <Table data={data} columns={columns} getRowId={row => row.id} />
     </VStack>
