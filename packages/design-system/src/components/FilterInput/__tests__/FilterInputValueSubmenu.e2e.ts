@@ -46,7 +46,7 @@ test.describe('Component: FilterInput', () => {
       await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('SQL injection');
     });
 
-    test('selecting a single leaf collapses the category to "label (1)"', async ({ page }) => {
+    test('selecting a single leaf shows that leaf label, not the category', async ({ page }) => {
       await story.goto(page, 'Nested Value Submenu');
       await openValueMenu(page);
 
@@ -54,15 +54,13 @@ test.describe('Component: FilterInput', () => {
       await page.getByRole('menuitem', { name: /^Union-based SQLi$/ }).click();
       await page.locator('body').click({ position: { x: 4, y: 4 } });
 
-      // One of several sub-values selected is a partial selection, so the chip
-      // shows the parent label with a count of 1 — not the individual leaf.
+      // A partial selection is never collapsed to the category: the single
+      // selected leaf renders as its own label.
       const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('SQL injection (1)');
+      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('Union-based SQLi');
     });
 
-    test('a partially-selected category collapses to the parent label with a count', async ({
-      page,
-    }) => {
+    test('a partially-selected category enumerates its leaves (no count)', async ({ page }) => {
       await story.goto(page, 'Nested Value Submenu');
       await openValueMenu(page);
 
@@ -74,10 +72,12 @@ test.describe('Component: FilterInput', () => {
       // Blur to commit the multi-select.
       await page.locator('body').click({ position: { x: 4, y: 4 } });
 
-      // The chip shows the parent label with the selected-leaf count, not the
-      // individual sub-type labels.
+      // The chip lists the selected sub-type labels, comma-separated, in config
+      // order — no "(2)" count.
       const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('SQL injection (2)');
+      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText(
+        'Code execution via SQLi, Union-based SQLi',
+      );
     });
   });
 
@@ -116,7 +116,9 @@ test.describe('Component: FilterInput', () => {
       await expect(page).toHaveScreenshot('nested-value-submenu.png');
     });
 
-    test('renders a partially-selected group chip as "label (count)"', async ({ page }) => {
+    test('renders a partially-selected group chip as a comma-separated leaf list', async ({
+      page,
+    }) => {
       await story.goto(page, 'Nested Value Submenu');
       await openValueMenu(page);
 
@@ -127,8 +129,10 @@ test.describe('Component: FilterInput', () => {
 
       const field = page.locator('[data-slot="filter-input"]');
       const chip = page.locator('[data-slot="filter-input-condition-chip"]').first();
-      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText('SQL injection (2)');
-      await expect(field).toHaveScreenshot('nested-group-chip-partial-count.png');
+      await expect(chip.locator('[data-slot="segment-value"]')).toHaveText(
+        'Code execution via SQLi, Union-based SQLi',
+      );
+      await expect(field).toHaveScreenshot('nested-group-chip-partial-list.png');
     });
   });
 });

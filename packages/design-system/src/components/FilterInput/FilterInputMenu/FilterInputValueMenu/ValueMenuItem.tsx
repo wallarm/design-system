@@ -5,6 +5,7 @@ import { Checkmark } from '../../../Checkmark';
 import { DropdownMenuItem } from '../../../DropdownMenu';
 import { Text } from '../../../Text';
 import type { ValueOption } from './FilterInputValueMenu';
+import { highlightMatch } from './highlightMatch';
 
 interface ValueMenuItemProps {
   option: ValueOption;
@@ -13,6 +14,8 @@ interface ValueMenuItemProps {
   multiSelect: boolean;
   onSelect: () => void;
   registerItem?: (id: string) => (el: HTMLElement | null) => void;
+  /** Active search query — matched substrings in label/description are emphasized. */
+  highlight?: string;
 }
 
 export const ValueMenuItem: FC<ValueMenuItemProps> = ({
@@ -22,6 +25,7 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
   multiSelect,
   onSelect,
   registerItem,
+  highlight,
 }) => (
   <DropdownMenuItem
     key={String(option.value)}
@@ -38,11 +42,11 @@ export const ValueMenuItem: FC<ValueMenuItemProps> = ({
     ) : (
       <div className='min-w-0'>
         <Text size='sm' truncate>
-          {option.label}
+          {highlightMatch(option.label, highlight)}
         </Text>
         {option.description && (
           <Text size='xs' color='secondary' truncate>
-            {option.description}
+            {highlightMatch(option.description, highlight)}
           </Text>
         )}
       </div>

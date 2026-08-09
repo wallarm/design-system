@@ -456,9 +456,11 @@ export const PairedFieldPreset: Story = {
  *
  * Sections and parent categories are purely presentational: only the **leaf**
  * sub-values are committable, so the expression always carries leaves (e.g.
- * `sqli_union`), never the group. A submenu category collapses in the chip:
- * every child selected → the parent label ("SQL injection"); some children
- * selected → the label with a count ("SQL injection (4)").
+ * `sqli_union`), never the group. A group collapses in the chip only when it is
+ * **fully** selected → the group label (a submenu category "SQL injection", or a
+ * whole section "Input-based attacks"); a **partial** selection lists the chosen
+ * leaves comma-separated. The same collapse applies live while selecting, not
+ * just once the filter is applied.
  *
  * Pick the `in` operator to multi-select. Each labeled section is topped with a
  * tri-state **"All {group}"** row (e.g. "All Input-based attacks") that

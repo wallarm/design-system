@@ -377,14 +377,27 @@ describe('buildChips — nested value group display (WDS-156)', () => {
     expect(chip?.valueParts).toBeUndefined();
   });
 
-  it('shows the group name with a count when partially selected', () => {
-    const chip = inChip(['sqli_union', 'sqli_time']);
-    expect(chip?.value).toBe('SQL injection (2)');
+  it('shows the whole top-level section name when every leaf is selected', () => {
+    const chip = inChip([
+      'xss',
+      'rce',
+      'sqli_boolean',
+      'sqli_generic',
+      'sqli_time',
+      'sqli_union',
+    ]);
+    expect(chip?.value).toBe('Input-based attacks');
     expect(chip?.valueParts).toBeUndefined();
   });
 
-  it('counts a single selected sub-value', () => {
-    expect(inChip(['sqli_union'])?.value).toBe('SQL injection (1)');
+  it('enumerates leaves (no count) when a group is partially selected', () => {
+    const chip = inChip(['sqli_union', 'sqli_time']);
+    expect(chip?.value).toBe('Time-based blind SQLi, Union-based SQLi');
+    expect(chip?.valueParts).toEqual(['Time-based blind SQLi', 'Union-based SQLi']);
+  });
+
+  it('shows a single selected sub-value as its own label', () => {
+    expect(inChip(['sqli_union'])?.value).toBe('Union-based SQLi');
   });
 
   it('renders section leaves individually, not as the section group', () => {
@@ -394,7 +407,7 @@ describe('buildChips — nested value group display (WDS-156)', () => {
 
   it('mixes a section leaf with a partially-selected submenu group', () => {
     const chip = inChip(['xss', 'sqli_union']);
-    expect(chip?.valueParts).toEqual(['Cross-site scripting (XSS)', 'SQL injection (1)']);
+    expect(chip?.valueParts).toEqual(['Cross-site scripting (XSS)', 'Union-based SQLi']);
   });
 
   it('mixes a section leaf with a fully-selected submenu group', () => {

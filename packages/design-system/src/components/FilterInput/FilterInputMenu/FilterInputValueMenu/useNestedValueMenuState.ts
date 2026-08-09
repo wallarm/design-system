@@ -1,7 +1,7 @@
 import type { RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CheckboxCheckedState } from '@ark-ui/react/checkbox';
-import { collectLeaves } from '../../lib';
+import { collapseValueOptions, collectLeaves } from '../../lib';
 import type { ValueMenuRow, ValueMenuSection } from '../../lib/buildValueMenuSections';
 import type { FieldValueOption, FilterInputDropdownItem } from '../../types';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
@@ -349,9 +349,18 @@ export const useNestedValueMenuState = ({
     return map;
   }, [allValues]);
 
+  // Mirror the committed-chip collapse (fully-selected group → its label,
+  // partial → its leaves) so the building preview reads identically while the
+  // user is still toggling values, not only once the filter is applied.
   const buildingMultiValue =
     multiSelect && checkedValues.length > 0
-      ? checkedValues.map(v => labelByValue.get(String(v)) ?? String(v)).join(', ')
+      ? collapseValueOptions(allValues, checkedValues)
+          .map(token =>
+            token.kind === 'group'
+              ? token.label
+              : (labelByValue.get(String(token.value)) ?? String(token.value)),
+          )
+          .join(', ')
       : undefined;
 
   useEffect(() => {
