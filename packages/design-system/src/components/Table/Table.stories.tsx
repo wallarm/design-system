@@ -1,3 +1,4 @@
+import type { FC } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Database, Ellipsis, Filter, FilterX, SearchX, Trash2 } from '../../icons';
@@ -42,9 +43,11 @@ import {
   useClientPagination,
 } from '../Pagination';
 import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
+import type { SelectDataItem } from '../Select';
 import { HStack, VStack } from '../Stack';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
+import { EDITABLE_CELL_COLUMN_META, EditableSelectCell, EditableTextCell } from './EditableCell';
 import {
   createLargeGroupedData,
   createLargeSecurityEvents,
@@ -1435,5 +1438,132 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
         </Button>
       </TableActionBar>
     </Table>
+  );
+};
+
+// ---------------------------------------------------------------------------
+// Inline cell editing (WDS-157)
+// ---------------------------------------------------------------------------
+// Table has no dedicated "editable cell" API — a column's `cell` renderer may
+// return any React node. Here that node is the purpose-built `EditableCell`
+// (see ./EditableCell), which owns the full body-cell box so nothing shifts
+// across idle / hover / editing: the whole cell highlights grey on hover and
+// draws a brand-orange border while editing (text) or open (select). The text
+// editor swaps in a borderless input in place; the select cell IS the trigger,
+// so its read view never gets replaced.
+
+const statusItems: SelectDataItem[] = [
+  { label: 'Blocked', value: 'Blocked' },
+  { label: 'Monitoring', value: 'Monitoring' },
+];
+
+// Empty-by-default select — the placeholder text is supplied by the consumer.
+const categoryItems: SelectDataItem[] = [
+  { label: 'Category A', value: 'a' },
+  { label: 'Category B', value: 'b' },
+  { label: 'Category C', value: 'c' },
+  { label: 'Category D', value: 'd' },
+];
+
+const StatusBadge: FC<{ value: SecurityEvent['status'] }> = ({ value }) => (
+  <Badge
+    variant='dotted'
+    color={value === 'Blocked' ? 'red' : 'yellow'}
+    type='secondary'
+    size='medium'
+  >
+    {value}
+  </Badge>
+);
+
+export const InlineCellEditing: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState<SecurityEvent[]>(() => securityEvents.slice(0, 6));
+  // Category starts unselected for every row, so the select shows its placeholder.
+  const [categories, setCategories] = useState<Record<string, string>>({});
+
+  const updateCell = useCallback(
+    <K extends keyof SecurityEvent>(rowId: string, key: K, value: SecurityEvent[K]) => {
+      setData(prev => prev.map(row => (row.id === rowId ? { ...row, [key]: value } : row)));
+    },
+    [],
+  );
+
+  const columns = useMemo<TableColumnDef<SecurityEvent>[]>(
+    () => [
+      // The first column is the Table's pinned "master" column — keep it
+      // read-only; editable cells live in the plain columns after it.
+      securityColumnHelper.accessor('sourceIp', {
+        header: 'Source',
+        size: 200,
+        meta: { resizeType: 'cut' as const },
+        cell: ({ getValue }) => <Text size='sm'>{getValue()}</Text>,
+      }),
+      securityColumnHelper.accessor('objectName', {
+        header: 'Object name',
+        size: 400,
+        meta: EDITABLE_CELL_COLUMN_META,
+        cell: ({ row, getValue }) => (
+          <EditableTextCell
+            value={getValue()}
+            aria-label='Edit object name'
+            onCommit={value => updateCell(row.id, 'objectName', value)}
+          />
+        ),
+      }),
+      securityColumnHelper.accessor('status', {
+        header: 'Status',
+        size: 200,
+        meta: EDITABLE_CELL_COLUMN_META,
+        cell: ({ row, getValue }) => (
+          <EditableSelectCell
+            value={getValue()}
+            items={statusItems}
+            onCommit={value => updateCell(row.id, 'status', value as SecurityEvent['status'])}
+          >
+            <StatusBadge value={getValue()} />
+          </EditableSelectCell>
+        ),
+      }),
+      // Empty-by-default select: consumer supplies the `placeholder` text.
+      securityColumnHelper.display({
+        id: 'category',
+        header: 'Category',
+        size: 200,
+        meta: EDITABLE_CELL_COLUMN_META,
+        cell: ({ row }) => {
+          const value = categories[row.id] ?? '';
+          return (
+            <EditableSelectCell
+              value={value}
+              items={categoryItems}
+              placeholder='Select…'
+              aria-label='Edit category'
+              onCommit={next => setCategories(prev => ({ ...prev, [row.id]: next }))}
+            >
+              {categoryItems.find(item => item.value === value)?.label}
+            </EditableSelectCell>
+          );
+        },
+      }),
+      securityColumnHelper.accessor('parameter', {
+        header: 'Parameters',
+        size: 240,
+        meta: { resizeType: 'cut' as const },
+        cell: ({ getValue }) => <InlineCodeSnippet code={getValue()} size='sm' copyable={false} />,
+      }),
+    ],
+    [updateCell, categories],
+  );
+
+  return (
+    <VStack gap={12} align='stretch'>
+      <Text size='sm' color='secondary'>
+        Hover an Object name (text) or Status / Category (select) cell — the whole cell highlights.
+        Click to edit: the cell gets a brand-orange border and the content stays exactly in place
+        (no shift). Category starts empty and shows a consumer-set “Select…” placeholder. Enter or
+        blur commits, Escape reverts; the read-only columns stay static.
+      </Text>
+      <Table data={data} columns={columns} getRowId={row => row.id} />
+    </VStack>
   );
 };

@@ -9,6 +9,14 @@ export {
   type BulkBarSummarySelectAllProps,
   BulkBarSummarySeparator,
 } from '../BulkBar';
+export {
+  EDITABLE_CELL_COLUMN_META,
+  EditableSelectCell,
+  type EditableSelectCellProps,
+  EditableTextCell,
+  type EditableTextCellProps,
+  editableCellVariants,
+} from './EditableCell';
 export { createTableColumnHelper } from './lib';
 export type { TableColumnHelper } from './lib/createTableColumnHelper';
 export { Table } from './Table';
