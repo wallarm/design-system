@@ -128,33 +128,55 @@ const SelectionCell = <T extends RowData>({
  * `getIsSomePageRowsSelected()`/`getIsAllPageRowsSelected()` (or their
  * non-Page counterparts) at all.
  *
- * Checked/indeterminate is computed from `table.state.rowSelection` and
- * `getFilteredRowModel().flatRows` — the same row universe
- * `toggleAllRowsSelected()` (the click handler below) actually acts on, and
- * what `getIsAllRowsSelected()` itself iterates. `flatRows` (not the
- * top-level `rows` used by `SelectionCell`/`applyRangeSelection` for
- * index-based range selection) so grouped/nested sub-rows at any depth count
- * toward "all selected". `getFilteredRowModel()` rather than `getRowModel()`
- * matters once `grouping` is active: `getRowModel()` (post-grouping) includes
- * synthetic group-header rows that `getCanSelect()` still allows but that
+ * `checked` is computed from TanStack's own memoized `getIsAllRowsSelected()`
+ * — the same row universe `toggleAllRowsSelected()` (the click handler below)
+ * actually acts on, since `getIsAllRowsSelected()` internally iterates
+ * `getFilteredRowModel().flatRows` (not the top-level `rows` used by
+ * `SelectionCell`/`applyRangeSelection` for index-based range selection, and
+ * not `getRowModel()`, whose post-grouping output includes synthetic
+ * group-header rows that `getCanSelect()` still allows but that
  * `toggleAllRowsSelected()` never selects — using it here would leave the
- * checkbox stuck on indeterminate forever.
+ * checkbox stuck on indeterminate forever). Unlike the Page-prefixed getter
+ * called out above, `getIsAllRowsSelected()` does not have the "returns true
+ * even at full selection" bug, and is already used successfully elsewhere in
+ * this codebase (`TableActionBarSelection.tsx`).
+ *
+ * `indeterminate` is deliberately *not* `getIsSomeRowsSelected()`: that
+ * method is `Object.keys(rowSelection).length > 0` — pure key presence,
+ * completely unscoped by any row model. This component supports a
+ * consumer-controlled `rowSelection` prop alongside infinite scroll and
+ * server-side data swaps, where a previously-selected id can end up outside
+ * the currently loaded `data` (scrolled out of the window, or the dataset
+ * was replaced). `toggleAllRowsSelected(false)` only deletes ids present in
+ * `getPreGroupedRowModel().flatRows`, so a stale id is never cleared —
+ * `getIsSomeRowsSelected()` would keep seeing a non-empty `rowSelection`
+ * object forever, permanently stuck on indeterminate even after "deselect
+ * all". Instead, `indeterminate` is derived from the same
+ * `getFilteredRowModel().flatRows` pass used for the `disabled` state below,
+ * counted together in one reduce to avoid a third full pass over `flatRows`.
  */
 const SelectAllHeaderCell = <T extends RowData>(
   _props: HeaderContext<DSTableFeatures, T, unknown>,
 ) => {
   const { table } = useTableContext<T>();
 
-  const selectableRows = table.getFilteredRowModel().flatRows.filter(row => row.getCanSelect());
-  const selectedCount = selectableRows.filter(row => table.state.rowSelection[row.id]).length;
-  const checked = selectableRows.length > 0 && selectedCount === selectableRows.length;
-  const indeterminate = selectedCount > 0 && !checked;
+  const checked = table.getIsAllRowsSelected();
+  const { selectableCount, selectedCount } = table.getFilteredRowModel().flatRows.reduce(
+    (acc, row) => {
+      if (!row.getCanSelect()) return acc;
+      acc.selectableCount++;
+      if (row.getIsSelected()) acc.selectedCount++;
+      return acc;
+    },
+    { selectableCount: 0, selectedCount: 0 },
+  );
+  const indeterminate = !checked && selectedCount > 0;
 
   return (
     <Checkbox
       checked={indeterminate ? 'indeterminate' : checked}
       onCheckedChange={() => table.toggleAllRowsSelected(!checked)}
-      disabled={selectableRows.length === 0}
+      disabled={selectableCount === 0}
     >
       <CheckboxIndicator />
     </Checkbox>

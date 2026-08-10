@@ -413,9 +413,8 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       const { active, over } = event;
       if (!over || active.id === over.id) return;
 
-      const currentOrder = table.store.state.columnOrder.length
-        ? table.store.state.columnOrder
-        : allLeafColumns.map(c => c.id);
+      const columnOrderAtom = table.atoms.columnOrder.get();
+      const currentOrder = columnOrderAtom.length ? columnOrderAtom : allLeafColumns.map(c => c.id);
 
       const oldIndex = currentOrder.indexOf(String(active.id));
       const newIndex = currentOrder.indexOf(String(over.id));

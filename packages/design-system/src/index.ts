@@ -607,6 +607,7 @@ export {
 } from './components/Switch';
 export {
   createTableColumnHelper,
+  type DSTableFeatures,
   EDITABLE_CELL_COLUMN_META,
   EditableSelectCell,
   type EditableSelectCellProps,
