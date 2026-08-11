@@ -54,6 +54,7 @@ describe('applyKnownFieldHelpers', () => {
       { name: 'status_code', label: 'Status', type: 'integer' },
     ]);
     expect(field.getSuggestions?.('').map(o => o.value)).toEqual([
+      '0XX',
       '1XX',
       '2XX',
       '3XX',
@@ -80,6 +81,7 @@ describe('applyKnownFieldHelpers', () => {
     expect(field.validate).not.toBe(customValidate);
     expect(field.getSuggestions).not.toBe(customSuggestions);
     expect(field.getSuggestions?.('').map(o => o.value)).toEqual([
+      '0XX',
       '1XX',
       '2XX',
       '3XX',
