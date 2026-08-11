@@ -289,4 +289,75 @@ describe('parseExpression', () => {
       value: 'any.host.com',
     });
   });
+
+  // ── AS-1377: paste must validate values the same way typing does ──
+  //
+  // Copy/paste re-parses the copied `where` string through validateValues.
+  // These fields mirror how consumers configure grouped and freeform fields;
+  // before the fix, pasting any of them threw "Invalid value ...".
+  describe('grouped and freeform values (AS-1377)', () => {
+    const groupedFields: FieldMetadata[] = [
+      {
+        // Strict allowlist expressed as grouped sections: the committable
+        // values live in `children`, the top-level entries are section headers
+        // with no `value` of their own.
+        name: 'attack_type',
+        label: 'Attack Type',
+        type: 'string',
+        values: [
+          { label: 'Injection', children: [{ value: 'sqli', label: 'SQLI' }] },
+          { label: 'Scripting', children: [{ value: 'xss', label: 'XSS' }] },
+        ],
+      },
+      {
+        // Same grouped options, but freeform — the list is a hint, not an
+        // allowlist.
+        name: 'tag',
+        label: 'Tag',
+        type: 'string',
+        strictValues: false,
+        values: [{ label: 'Common', children: [{ value: 'suggested', label: 'Suggested' }] }],
+      },
+    ];
+
+    it('accepts a grouped leaf value on paste', () => {
+      const expr = parseExpression('(attack_type = "sqli")', groupedFields);
+      expect(expr).toEqual({
+        type: 'condition',
+        field: 'attack_type',
+        operator: '=',
+        value: 'sqli',
+      });
+    });
+
+    it('accepts multiple grouped leaf values in an in-list on paste', () => {
+      const expr = parseExpression('(attack_type in ["sqli", "xss"])', groupedFields);
+      expect(expr).toEqual({
+        type: 'condition',
+        field: 'attack_type',
+        operator: 'in',
+        value: ['sqli', 'xss'],
+      });
+    });
+
+    it('still rejects a value absent from a grouped strict allowlist', () => {
+      try {
+        parseExpression('(attack_type = "nope")', groupedFields);
+        expect.unreachable('Expected to throw');
+      } catch (err) {
+        expect(isFilterParseError(err)).toBe(true);
+        expect((err as { message: string }).message).toContain('"nope"');
+      }
+    });
+
+    it('accepts a freeform value outside the suggestion list on paste', () => {
+      const expr = parseExpression('(tag = "anything-goes")', groupedFields);
+      expect(expr).toEqual({
+        type: 'condition',
+        field: 'tag',
+        operator: '=',
+        value: 'anything-goes',
+      });
+    });
+  });
 });
