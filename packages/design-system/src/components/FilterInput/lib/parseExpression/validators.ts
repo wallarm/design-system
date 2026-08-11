@@ -1,4 +1,5 @@
-import type { FieldMetadata, FilterOperator } from '../../types';
+import type { FilterOperator } from '../../types';
+import { getInvalidValueIndices } from '../validation';
 import { FilterParseError } from './error';
 import { OPERATORS } from './tokenizer';
 import type { ParserState } from './types';
@@ -20,17 +21,14 @@ export const validateOperator = (s: ParserState, op: string, fieldName: string):
   return op as FilterOperator;
 };
 
-/** Get allowed values for a field, or null if freeform */
-const getAllowedValues = (field: FieldMetadata): Set<string> | null => {
-  if (field.values && field.values.length > 0) {
-    return new Set(field.values.map(v => String(v.value)));
-  }
-  if (field.options && field.options.length > 0) {
-    return new Set(field.options);
-  }
-  return null;
-};
-
+/**
+ * Validate pasted values through the *same* rules as inline typing
+ * (`getInvalidValueIndices`): a custom `validate`, `getSuggestions` fields, and
+ * `strictValues: false` all mean "the value list is a hint, not an allowlist",
+ * and grouped value options are flattened to their committable leaves. Reusing
+ * that one path keeps paste and typing in agreement — a value accepted when
+ * typed must not be rejected when pasted (AS-1377).
+ */
 export const validateValues = (
   s: ParserState,
   fieldName: string,
@@ -39,10 +37,7 @@ export const validateValues = (
   const field = s.fields.find(f => f.name === fieldName);
   if (!field) return;
 
-  const allowed = getAllowedValues(field);
-  if (!allowed) return;
-
-  const invalid = values.filter(v => !allowed.has(String(v)));
+  const invalid = getInvalidValueIndices(field, values).map(i => values[i]);
   if (invalid.length > 0) {
     const formatted = invalid.map(v => `"${v}"`).join(', ');
     throw FilterParseError(`Invalid value ${formatted} for field '${fieldName}'`);
