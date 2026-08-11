@@ -134,6 +134,7 @@ describe('createStatusCodeValidator', () => {
     ['200', false],
     ['404', false],
     ['0XX', false],
+    ['001', false],
     ['1XX', false],
     ['5XX', false],
     ['40X', false],
