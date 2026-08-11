@@ -4,6 +4,7 @@
  *   - "2"  → "2XX"
  *   - "22" → "22X"
  *   - "2x" → "2XX"
+ *   - "0"  → "0XX"  (Wallarm's "no response" class)
  *   - "222", "4XX", "40X" → unchanged (already 3 chars)
  * Leaves anything unrecognised alone so `validate` can still flag it.
  */

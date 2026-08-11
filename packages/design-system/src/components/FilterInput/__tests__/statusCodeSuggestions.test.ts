@@ -9,11 +9,12 @@ import {
 describe('createStatusCodeSuggestions', () => {
   const suggest = createStatusCodeSuggestions();
 
-  it('returns all five HTTP class masks for empty input', () => {
-    expect(suggest('').map(o => o.value)).toEqual(['1XX', '2XX', '3XX', '4XX', '5XX']);
+  it('returns all six class masks for empty input', () => {
+    expect(suggest('').map(o => o.value)).toEqual(['0XX', '1XX', '2XX', '3XX', '4XX', '5XX']);
   });
 
   it.each([
+    ['0', '0XX'],
     ['1', '1XX'],
     ['2', '2XX'],
     ['5', '5XX'],
@@ -21,7 +22,7 @@ describe('createStatusCodeSuggestions', () => {
     expect(suggest(input).map(o => o.value)).toEqual([mask]);
   });
 
-  it.each([['0'], ['6'], ['9']])('returns empty for a single digit outside [1..5]: %s', input => {
+  it.each([['6'], ['9']])('returns empty for a single digit outside [0..5]: %s', input => {
     expect(suggest(input)).toEqual([]);
   });
 
@@ -58,7 +59,7 @@ describe('createStatusCodeSuggestions', () => {
 
   it('trims surrounding whitespace before matching', () => {
     expect(suggest('  4  ').map(o => o.value)).toEqual(['4XX']);
-    expect(suggest('  ').map(o => o.value)).toEqual(['1XX', '2XX', '3XX', '4XX', '5XX']);
+    expect(suggest('  ').map(o => o.value)).toEqual(['0XX', '1XX', '2XX', '3XX', '4XX', '5XX']);
   });
 
   describe('with X as placeholder in the typed input', () => {
@@ -83,6 +84,7 @@ describe('createStatusCodeSuggestions', () => {
   it('derives badge color from the leading digit', () => {
     const byValue = Object.fromEntries(suggest('').map(o => [o.value, o.badge?.color]));
     expect(byValue).toEqual({
+      '0XX': 'slate',
       '1XX': 'slate',
       '2XX': 'green',
       '3XX': 'blue',
@@ -94,7 +96,7 @@ describe('createStatusCodeSuggestions', () => {
   describe('selectedValues context', () => {
     it('prepends committed values as badged options ahead of masks', () => {
       const result = suggest('', { selectedValues: ['234'] });
-      expect(result.map(o => o.value)).toEqual(['234', '1XX', '2XX', '3XX', '4XX', '5XX']);
+      expect(result.map(o => o.value)).toEqual(['234', '0XX', '1XX', '2XX', '3XX', '4XX', '5XX']);
       expect(result[0].badge).toEqual({ color: 'green', text: '234' });
     });
 
@@ -103,9 +105,18 @@ describe('createStatusCodeSuggestions', () => {
       expect(result.map(o => o.value)).toEqual(['401']);
     });
 
-    it('filters out committed values whose class is outside [1..5]', () => {
+    it('filters out committed values whose class is outside [0..5]', () => {
       const result = suggest('', { selectedValues: ['601', '234'] });
-      expect(result.map(o => o.value)).toEqual(['234', '1XX', '2XX', '3XX', '4XX', '5XX']);
+      expect(result.map(o => o.value)).toEqual(['234', '0XX', '1XX', '2XX', '3XX', '4XX', '5XX']);
+    });
+
+    it('renders the committed 0XX "no response" class as a neutral slate pill', () => {
+      const result = suggest('', { selectedValues: ['0XX'] });
+      expect(result[0]).toEqual({
+        value: '0XX',
+        label: '0XX',
+        badge: { color: 'slate', text: '0XX' },
+      });
     });
 
     it('keeps committed values visible even when the input is invalid', () => {
@@ -122,6 +133,8 @@ describe('createStatusCodeValidator', () => {
     ['101', false],
     ['200', false],
     ['404', false],
+    ['0XX', false],
+    ['001', false],
     ['1XX', false],
     ['5XX', false],
     ['40X', false],
@@ -136,8 +149,7 @@ describe('createStatusCodeValidator', () => {
     ['', 'empty'],
     ['4a', 'non-digit chars'],
     ['XXX', 'no digit anchor'],
-    ['601', 'class 6 outside [1..5]'],
-    ['001', 'class 0 outside [1..5]'],
+    ['601', 'class 6 outside [0..5]'],
     ['4X0', 'mask with digit after X'],
   ])('rejects invalid input %s (%s)', value => {
     expect(isInvalid(value)).toBe(true);
@@ -160,6 +172,7 @@ describe('createStatusCodeNormalizer', () => {
   const normalize = createStatusCodeNormalizer();
 
   it.each([
+    ['0', '0XX'],
     ['2', '2XX'],
     ['22', '22X'],
     ['222', '222'],

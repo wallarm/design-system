@@ -4,15 +4,15 @@ import { canonicalizeStatusCodeInput, MASK_ROOTS, makeMask } from './utils';
 /**
  * Build the `getSuggestions` callback for an HTTP status code field. The
  * returned function:
- *   - on empty input, offers every HTTP class mask (`1XX..5XX`)
+ *   - on empty input, offers every class mask (`0XX..5XX`)
  *   - on partial input (`"3"`, `"3X"`, `"30"`, …), expands it via
  *     `canonicalizeStatusCodeInput` and offers the single matching mask
  *   - merges any `context.selectedValues` (values already committed to the
  *     chip) in front of the input-driven output so they always appear with
  *     their canonical badge styling
  *
- * No backend config is required — the status-code class range is fixed to
- * `[1..5]` per the HTTP spec.
+ * No backend config is required — the class range is fixed to `[0..5]`
+ * (HTTP `1`–`5` plus Wallarm's `0` "no response" class).
  */
 export const createStatusCodeSuggestions = (): ((
   inputText: string,

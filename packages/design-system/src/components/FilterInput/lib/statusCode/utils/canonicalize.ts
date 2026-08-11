@@ -7,6 +7,7 @@ import { MASK_PLACEHOLDER, MASK_ROOTS, STATUS_CODE_LENGTH } from './constants';
  *
  * Accepted inputs:
  *   "3"   → "3XX"    (single digit pads to full class mask)
+ *   "0"   → "0XX"    (Wallarm's "no response" class)
  *   "3X"  → "3XX"    (partial mask)
  *   "3XX" → "3XX"    (full mask)
  *   "30"  → "30X"    (two digits pad to narrowed mask)
@@ -16,7 +17,7 @@ import { MASK_PLACEHOLDER, MASK_ROOTS, STATUS_CODE_LENGTH } from './constants';
  * Rejected:
  *   "3X0"            (digit after placeholder)
  *   "X30"            (starts with placeholder)
- *   "6..."           (leading digit outside the `[1..5]` HTTP class range)
+ *   "6..."           (leading digit outside the `[0..5]` class range)
  *   "ab..."          (non-digit, non-X)
  */
 export const canonicalizeStatusCodeInput = (input: string): string | null => {

@@ -8,6 +8,7 @@
  *   "222" → "222"
  *   "4XX" → "4"
  *   "40X" → "40"
+ *   "0XX" → "0"   (Wallarm's "no response" class)
  *
  * Anything that isn't a status-code-shaped string (e.g. a number, boolean,
  * or freeform text) is returned unchanged so invalid committed values still

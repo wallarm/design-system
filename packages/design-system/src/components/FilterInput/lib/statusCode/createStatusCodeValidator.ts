@@ -2,8 +2,9 @@ import { MASK_ROOTS, STATUS_CODE_LENGTH } from './utils';
 
 /**
  * Build a validator for the HTTP status code field. Accepts only 3-character
- * values whose leading digit is a valid HTTP class (`[1..5]`) and whose
- * remaining two characters form one of:
+ * values whose leading digit is a valid class root (`[0..5]` — `1`–`5` are the
+ * HTTP classes, `0` is Wallarm's "no response" class) and whose remaining two
+ * characters form one of:
  *   - `XX` (mask like `4XX`)
  *   - `dX` (narrowed mask like `40X`)
  *   - `dd` (concrete code like `401`)
