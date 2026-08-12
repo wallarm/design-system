@@ -5,6 +5,7 @@ const formatDateTimeStory = createStoryHelper('data-display-formatdatetime', [
   'Relative',
   'Date Format',
   'Datetime Format',
+  'Datetime Layout',
   'With Description',
   'Null Value',
   'Future Date',
@@ -19,6 +20,11 @@ test.describe('Component: FormatDateTime', () => {
 
     test('Should render datetime format correctly', async ({ page }) => {
       await formatDateTimeStory.goto(page, 'Datetime Format');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render datetime layout variants correctly', async ({ page }) => {
+      await formatDateTimeStory.goto(page, 'Datetime Layout');
       await expect(page).toHaveScreenshot();
     });
 

@@ -13,12 +13,19 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
 type FormatDateTimeFormat = 'relative' | 'date' | 'datetime';
 
+type FormatDateTimeLayout = 'stacked' | 'inline';
+
 interface FormatDateTimeBaseProps {
   /** ISO string, Date object, or Unix timestamp (ms) */
   value: string | Date | number | null | undefined;
   /** Display format. Default: 'relative' */
   format?: FormatDateTimeFormat;
-  /** Show seconds in tooltip absolute time. Default: true */
+  /**
+   * Datetime layout. `stacked` puts date over time; `inline` puts them on one
+   * line. Only affects `format='datetime'`. Default: 'stacked'
+   */
+  layout?: FormatDateTimeLayout;
+  /** Show seconds in the relative-format tooltip. Default: true */
   showSeconds?: boolean;
   ref?: Ref<HTMLTimeElement>;
 }
@@ -37,6 +44,7 @@ const toDate = (value: string | Date | number): Date => {
 export const FormatDateTime: FC<FormatDateTimeProps> = ({
   value,
   format = 'relative',
+  layout = 'stacked',
   showSeconds = true,
   ref,
   ...props
@@ -94,45 +102,39 @@ export const FormatDateTime: FC<FormatDateTimeProps> = ({
     );
   }
 
-  // Datetime: date + time in two lines
+  // Datetime: date + time, stacked (two lines) or inline (one line).
+  // No tooltip — the value already shows date + time + timezone in full.
   if (format === 'datetime') {
     return (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <time
-            ref={ref}
-            dateTime={isoString}
-            className='inline-flex flex-col whitespace-nowrap'
-            data-slot='format-date-time'
-            {...props}
-          >
-            <Text size='sm'>{formatAbsoluteDate(date)}</Text>
-            <Text size='sm' color='secondary'>
-              {formatTimeOnly(date)}
-            </Text>
-          </time>
-        </TooltipTrigger>
-        <TooltipContent>{tooltipText}</TooltipContent>
-      </Tooltip>
+      <time
+        ref={ref}
+        dateTime={isoString}
+        className={cn(
+          'inline-flex whitespace-nowrap',
+          layout === 'inline' ? 'items-baseline gap-4' : 'flex-col',
+        )}
+        data-slot='format-date-time'
+        {...props}
+      >
+        <Text size='sm'>{formatAbsoluteDate(date)}</Text>
+        <Text size='sm' color='secondary'>
+          {formatTimeOnly(date)}
+        </Text>
+      </time>
     );
   }
 
-  // Date: absolute date
+  // Date: absolute date. No tooltip — the value is already self-explanatory.
   return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <time
-          ref={ref}
-          dateTime={isoString}
-          className='inline-flex flex-col whitespace-nowrap'
-          data-slot='format-date-time'
-          {...props}
-        >
-          <Text size='sm'>{formatAbsoluteDate(date)}</Text>
-        </time>
-      </TooltipTrigger>
-      <TooltipContent>{tooltipText}</TooltipContent>
-    </Tooltip>
+    <time
+      ref={ref}
+      dateTime={isoString}
+      className='inline-flex flex-col whitespace-nowrap'
+      data-slot='format-date-time'
+      {...props}
+    >
+      <Text size='sm'>{formatAbsoluteDate(date)}</Text>
+    </time>
   );
 };
 
