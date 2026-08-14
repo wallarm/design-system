@@ -1,6 +1,13 @@
 import type { ReactNode, RefObject } from 'react';
-import type { Column, Row, Table as TanStackTable, VisibilityState } from '@tanstack/react-table';
+import type {
+  Column,
+  ColumnVisibilityState,
+  ReactTable,
+  Row,
+  RowData,
+} from '@tanstack/react-table';
 import type { Virtualizer } from '@tanstack/react-virtual';
+import type { DSTableFeatures } from '../lib';
 import type { TableProps, TableVirtualized } from '../types';
 
 /**
@@ -13,8 +20,8 @@ export type TableVirtualizerInstance =
   | Virtualizer<HTMLElement, Element>
   | Virtualizer<Element, Element>;
 
-export interface TableContextValue<T> {
-  table: TanStackTable<T>;
+export interface TableContextValue<T extends RowData> {
+  table: ReactTable<DSTableFeatures, T>;
   isLoading: boolean;
   isLoadingPrevious: boolean;
   skeletonCount: number;
@@ -31,15 +38,15 @@ export interface TableContextValue<T> {
   virtualized: TableVirtualized | undefined;
 
   // Rendering helpers
-  renderExpandedRow?: (row: Row<T>) => ReactNode;
+  renderExpandedRow?: (row: Row<DSTableFeatures, T>) => ReactNode;
   estimateRowHeight?: (index: number) => number;
   overscan: number;
 
   // Pre-computed columns to avoid per-cell getAllLeafColumns() calls
-  allLeafColumns: Column<T, unknown>[];
+  allLeafColumns: Column<DSTableFeatures, T, unknown>[];
 
   // Settings menu support
-  defaultColumnVisibility?: VisibilityState;
+  defaultColumnVisibility?: ColumnVisibilityState;
   defaultColumnOrder?: string[];
 
   // Column order setter for DnD
@@ -85,6 +92,7 @@ export interface TableContextValue<T> {
   onSettingsOpenChange?: (open: boolean) => void;
 }
 
-export interface TableProviderProps<T> extends Omit<TableProps<T>, 'children' | 'aria-label'> {
+export interface TableProviderProps<T extends RowData>
+  extends Omit<TableProps<T>, 'children' | 'aria-label'> {
   children: ReactNode;
 }

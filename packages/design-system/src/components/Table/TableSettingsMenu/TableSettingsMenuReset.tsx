@@ -34,7 +34,7 @@ export const TableSettingsMenuReset: FC<TableSettingsMenuResetProps> = ({
     }
   };
 
-  const { columnVisibility: currentVisibility, columnOrder: currentOrder } = table.getState();
+  const { columnVisibility: currentVisibility, columnOrder: currentOrder } = table.state;
   const effectiveOrder = currentOrder.length === 0 ? defaultColumnOrder : currentOrder;
   const visibilityMatch =
     !defaultColumnVisibility || isEqual(currentVisibility, defaultColumnVisibility);

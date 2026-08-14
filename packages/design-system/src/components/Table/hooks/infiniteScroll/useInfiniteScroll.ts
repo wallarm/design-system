@@ -1,16 +1,20 @@
 import type { RefObject } from 'react';
-import type { Table } from '@tanstack/react-table';
-import { TABLE_END_REACHED_THRESHOLD, TABLE_START_REACHED_THRESHOLD } from '../../lib';
+import type { RowData, Table } from '@tanstack/react-table';
+import {
+  type DSTableFeatures,
+  TABLE_END_REACHED_THRESHOLD,
+  TABLE_START_REACHED_THRESHOLD,
+} from '../../lib';
 import type { TableVirtualizerInstance } from '../../TableContext/types';
 import { useInitialAnchor } from './useInitialAnchor';
 import { usePrependScrollAnchor } from './usePrependScrollAnchor';
 import { useScrollEdge } from './useScrollEdge';
 
-interface UseInfiniteScrollOptions<T> {
+interface UseInfiniteScrollOptions<T extends RowData> {
   mode: 'container' | 'window';
   /** Scroll element ref — required for `container` mode */
   scrollRef?: RefObject<HTMLElement | null>;
-  table: Table<T>;
+  table: Table<DSTableFeatures, T>;
   virtualizerRef: RefObject<TableVirtualizerInstance | null>;
   tbodyRef?: RefObject<HTMLTableSectionElement | null>;
   onStartReached?: () => void;
@@ -23,7 +27,7 @@ interface UseInfiniteScrollOptions<T> {
 }
 
 /** Single entry point for bidirectional infinite scroll behavior. */
-export const useInfiniteScroll = <T>({
+export const useInfiniteScroll = <T extends RowData>({
   mode,
   scrollRef,
   table,

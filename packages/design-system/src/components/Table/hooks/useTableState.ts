@@ -4,7 +4,7 @@ import { useControlled } from '../../../hooks';
 // ---------------------------------------------------------------------------
 // Combined controlled/uncontrolled state + TanStack updater handler.
 // Replaces separate useControlled + useStateHandler for each table feature.
-// Returns [currentState, tanstackHandler] — ready to plug into useReactTable.
+// Returns [currentState, tanstackHandler] — ready to plug into useTable.
 // ---------------------------------------------------------------------------
 export const useTableState = <S>(
   controlled: S | undefined,

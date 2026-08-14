@@ -1,14 +1,15 @@
-import type { ColumnDef } from '@tanstack/react-table';
+import type { ColumnDef, RowData } from '@tanstack/react-table';
 import { ChevronDown, ChevronRight } from '../../../icons';
 import { ToggleButton } from '../../ToggleButton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { TABLE_EXPAND_COLUMN_ID, TABLE_EXPAND_COLUMN_WIDTH } from './constants';
+import type { DSTableFeatures } from './dsTableFeatures';
 
 /**
  * Creates an expand/collapse column for use in Table.
  * Automatically injected by Table when `renderExpandedRow` is provided.
  */
-export const createExpandColumn = <T,>(): ColumnDef<T, unknown> => {
+export const createExpandColumn = <T extends RowData>(): ColumnDef<DSTableFeatures, T, unknown> => {
   return {
     id: TABLE_EXPAND_COLUMN_ID,
     size: TABLE_EXPAND_COLUMN_WIDTH,

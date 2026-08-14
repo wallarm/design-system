@@ -1,11 +1,12 @@
 import { useCallback } from 'react';
+import type { RowData } from '@tanstack/react-table';
 import { useTableContext } from '../TableContext';
 
 /**
  * Encapsulates master cell click logic for a body cell.
  * Returns flags and a click handler for the master column.
  */
-export const useMasterCell = <T>(columnId: string, rowId: string) => {
+export const useMasterCell = <T extends RowData>(columnId: string, rowId: string) => {
   const { masterColumnId, onMasterCellClick } = useTableContext<T>();
 
   const isMasterColumn = columnId === masterColumnId;

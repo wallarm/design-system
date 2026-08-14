@@ -1,8 +1,8 @@
 import { memo, type Ref } from 'react';
-import type { Row } from '@tanstack/react-table';
+import type { Row, RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
+import { type DSTableFeatures, TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
 import { Td, Tr } from './primitives';
 import { TableBodyCell } from './TableBody/TableBodyCell';
 import { useTableContext } from './TableContext';
@@ -10,13 +10,17 @@ import { TableRowExpanded } from './TableRowExpanded';
 
 const SYSTEM_COLUMN_IDS = new Set([TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID]);
 
-interface TableRowProps<T> {
-  row: Row<T>;
+interface TableRowProps<T extends RowData> {
+  row: Row<DSTableFeatures, T>;
   ref?: Ref<HTMLTableRowElement>;
   'data-index'?: number;
 }
 
-const TableRowInner = <T,>({ row, ref, 'data-index': dataIndex }: TableRowProps<T>) => {
+const TableRowInner = <T extends RowData>({
+  row,
+  ref,
+  'data-index': dataIndex,
+}: TableRowProps<T>) => {
   const { expandingEnabled, activeRowId } = useTableContext<T>();
   const testId = useTestId('row');
   const isGroupParent = row.subRows.length > 0;

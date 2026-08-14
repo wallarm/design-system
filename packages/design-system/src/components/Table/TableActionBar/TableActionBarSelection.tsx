@@ -49,7 +49,7 @@ const composeClick =
 export const TableActionBarSelection: FC<TableActionBarSelectionProps> = ({ children }) => {
   const { table } = useTableContext();
 
-  const count = Object.keys(table.getState().rowSelection).length;
+  const count = Object.keys(table.state.rowSelection).length;
   const isAllSelected = table.getIsAllRowsSelected();
 
   const selectAll = () => table.toggleAllRowsSelected(true);

@@ -1,7 +1,8 @@
 import type { CSSProperties } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
-import type { Column } from '@tanstack/react-table';
+import type { Column, RowData } from '@tanstack/react-table';
 import { useTableContext } from '../TableContext/useTableContext';
+import type { DSTableFeatures } from './dsTableFeatures';
 import { getDndStyles } from './getDndStyles';
 
 type UseSortableReturn = ReturnType<typeof useSortable>;
@@ -15,7 +16,9 @@ interface UseColumnDndResult {
   listeners: UseSortableReturn['listeners'];
 }
 
-export const useColumnDnd = <T>(column: Column<T, unknown>): UseColumnDndResult => {
+export const useColumnDnd = <T extends RowData>(
+  column: Column<DSTableFeatures, T, unknown>,
+): UseColumnDndResult => {
   const { columnDndEnabled, alwaysPinnedLeft } = useTableContext<T>();
   const isPinned = column.getIsPinned();
 

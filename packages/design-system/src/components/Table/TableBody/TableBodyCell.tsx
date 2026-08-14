@@ -1,9 +1,10 @@
-import { type Cell, flexRender } from '@tanstack/react-table';
+import { type Cell, flexRender, type RowData } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { useMasterCell } from '../hooks';
 import {
+  type DSTableFeatures,
   getAlignClass,
   getExpandBorderClass,
   getPinningStyles,
@@ -15,14 +16,14 @@ import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableMasterCellActions } from '../TableMasterCellActions';
 
-interface TableBodyCellProps<T> {
-  cell: Cell<T, unknown>;
+interface TableBodyCellProps<T extends RowData> {
+  cell: Cell<DSTableFeatures, T, unknown>;
   colSpan?: number;
   className?: string;
   disablePinnedShadow?: boolean;
 }
 
-export const TableBodyCell = <T,>({
+export const TableBodyCell = <T extends RowData>({
   cell,
   colSpan,
   className,
@@ -88,7 +89,7 @@ export const TableBodyCell = <T,>({
         meta?.cellClassName,
         className,
       )}
-      pinned={isPinned === 'left'}
+      pinned={isPinned === 'start'}
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}
       ref={canDnd ? setNodeRef : undefined}

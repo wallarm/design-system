@@ -32,9 +32,8 @@ export const TableColumnMenuMoveRightItem: FC<TableColumnMenuMoveRightItemProps>
   const handleSelect = () => {
     onSelect?.();
     const allColumns = ctx.table.getAllLeafColumns();
-    const currentOrder = ctx.table.getState().columnOrder.length
-      ? ctx.table.getState().columnOrder
-      : allColumns.map(c => c.id);
+    const columnOrderAtom = ctx.table.atoms.columnOrder.get();
+    const currentOrder = columnOrderAtom.length ? columnOrderAtom : allColumns.map(c => c.id);
     const fromIdx = currentOrder.indexOf(column.id);
     const toIdx = fromIdx + 1;
     if (toIdx >= currentOrder.length) return;
