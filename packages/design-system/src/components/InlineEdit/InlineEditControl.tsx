@@ -10,6 +10,7 @@ import type {
 import { useCallback, useEffect, useRef } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
+import { InlineEditActions } from './InlineEditActions';
 import {
   type InlineEditContextValue,
   type InlineEditSubmitMode,
@@ -54,11 +55,18 @@ export interface InlineEditControlProps extends Omit<HTMLAttributes<HTMLDivEleme
    * hatch for custom editors that cannot call useInlineEditSubmitMode.
    */
   submitMode?: InlineEditSubmitMode;
+  /**
+   * Show floating action buttons (submit/cancel) below the input.
+   * Provides a mouse-clickable alternative to Enter/Escape keyboard shortcuts.
+   * @default true
+   */
+  showActions?: boolean;
   /** Function children receive the inline-edit context (render-prop). */
   children?: ReactNode | ((ctx: InlineEditContextValue) => ReactNode);
 }
 
 export const InlineEditControl: FC<InlineEditControlProps> = ({
+  showActions = true,
   ref,
   children,
   className,
@@ -154,7 +162,7 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
       onKeyDown={handleKeyDown}
       onBlur={handleBlur}
       className={cn(
-        'w-full min-w-0',
+        'w-full min-w-0 relative',
         // The -7px left offset that matches InlineEditPreview's hit target
         // comes from AttributeValue (InlineEdit is only ever hosted inside
         // it — see AttributeValue's InlineEdit hosting seam), not from this
@@ -195,6 +203,8 @@ export const InlineEditControl: FC<InlineEditControlProps> = ({
       )}
     >
       {typeof children === 'function' ? children(ctx) : children}
+
+      {showActions && <InlineEditActions onSubmit={submit} onCancel={cancel} />}
     </div>
   );
 };
