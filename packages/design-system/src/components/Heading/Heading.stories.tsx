@@ -3,11 +3,23 @@ import { VStack } from '../Stack';
 import { Text } from '../Text';
 import { Heading } from './Heading';
 
+const DESCRIPTION = [
+  'Geist for titles and section headings.',
+  'Hierarchy comes from the size step. All four weights exist at every size, so weight is emphasis within a level rather than a way to create one.',
+  'Visual size and document level are independent. Pick `size` for how it looks and `as` for the outline, so a visually small heading can still be an `h2` where the structure needs one.',
+  'The bottom of the ramp deliberately duplicates metrics that also exist in the text ramp — `sm` is 14 on 20 and `md` is 16 on 24, the same as `Text`. The difference is semantic: reach for a heading when the text is a title, and for `Text` when it is copy.',
+].join('\n\n');
+
 const meta = {
   title: 'Typography/Heading',
   component: Heading,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 
   args: {},
@@ -36,38 +48,32 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
   <Heading {...args}>Default Heading</Heading>
 );
 
+/** Size / leading in px, measured from the rendered component. */
+const SIZES = [
+  { size: '7xl', metrics: '72 / 72' },
+  { size: '6xl', metrics: '60 / 60' },
+  { size: '5xl', metrics: '48 / 48' },
+  { size: '4xl', metrics: '36 / 40' },
+  { size: '3xl', metrics: '30 / 36' },
+  { size: '2xl', metrics: '24 / 32' },
+  { size: 'xl', metrics: '20 / 28' },
+  { size: 'lg', metrics: '18 / 24' },
+  { size: 'md', metrics: '16 / 24' },
+  { size: 'sm', metrics: '14 / 20' },
+] as const;
+
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <VStack align='start'>
-    <Heading {...args} size='sm'>
-      Small Heading
-    </Heading>
-    <Heading {...args} size='md'>
-      Medium Heading
-    </Heading>
-    <Heading {...args} size='lg'>
-      Large Heading
-    </Heading>
-    <Heading {...args} size='xl'>
-      Extra Large Heading
-    </Heading>
-    <Heading {...args} size='2xl'>
-      2XL Heading
-    </Heading>
-    <Heading {...args} size='3xl'>
-      3XL Heading
-    </Heading>
-    <Heading {...args} size='4xl'>
-      4XL Heading
-    </Heading>
-    <Heading {...args} size='5xl'>
-      5XL Heading
-    </Heading>
-    <Heading {...args} size='6xl'>
-      6XL Heading
-    </Heading>
-    <Heading {...args} size='7xl'>
-      7XL Heading
-    </Heading>
+  <VStack gap={24} align='start'>
+    {SIZES.map(({ size, metrics }) => (
+      <VStack key={size} gap={4} align='start'>
+        <Text size='xs' color='secondary'>
+          size=&apos;{size}&apos; · {metrics}
+        </Text>
+        <Heading {...args} size={size}>
+          The quick brown fox
+        </Heading>
+      </VStack>
+    ))}
   </VStack>
 );
 

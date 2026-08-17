@@ -2,11 +2,23 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { VStack } from '../Stack';
 import { Text } from './Text';
 
+const DESCRIPTION = [
+  'Geist for body copy, labels and UI text — the default choice for anything the user reads as prose.',
+  'All four weights exist at every size. Weight carries emphasis and colour carries de-emphasis, so neither is done by changing size. Step down for denser UI, not to build hierarchy.',
+  'Titles and links have their own ramps: reach for `Heading` when the text is a title and `Link` when it navigates.',
+  'Known gap: `size="md"` applies no font size of its own and inherits from its container, so it renders whatever surrounds it. The Sizes story below shows it beside `lg` — prefer an explicit step until that is fixed.',
+].join('\n\n');
+
 const meta = {
   title: 'Typography/Text',
   component: Text,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 
   args: {},
@@ -31,23 +43,27 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
   <Text {...args}>Default body text</Text>
 );
 
+/** Size / leading in px, measured from the rendered component. */
+const SIZES = [
+  { size: 'xl', metrics: '18 / 28' },
+  { size: 'lg', metrics: '16 / 24' },
+  { size: 'md', metrics: 'inherits from its container — see the note above' },
+  { size: 'sm', metrics: '14 / 20' },
+  { size: 'xs', metrics: '12 / 16' },
+] as const;
+
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <VStack align='start'>
-    <Text {...args} size='xs'>
-      Extra Small Body Text
-    </Text>
-    <Text {...args} size='sm'>
-      Small Body Text
-    </Text>
-    <Text {...args} size='md'>
-      Medium Body Text
-    </Text>
-    <Text {...args} size='lg'>
-      Large Body Text
-    </Text>
-    <Text {...args} size='xl'>
-      Extra Large Body Text
-    </Text>
+  <VStack gap={24} align='start'>
+    {SIZES.map(({ size, metrics }) => (
+      <VStack key={size} gap={4} align='start'>
+        <Text size='xs' color='secondary'>
+          size=&apos;{size}&apos; · {metrics}
+        </Text>
+        <Text {...args} size={size}>
+          The quick brown fox jumps over the lazy dog
+        </Text>
+      </VStack>
+    ))}
   </VStack>
 );
 
