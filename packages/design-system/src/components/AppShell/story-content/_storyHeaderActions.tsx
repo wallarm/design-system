@@ -5,11 +5,11 @@ import { Text } from '../../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
 import { TopHeaderSeparator } from '../../TopHeader';
 import { QuickHelpDropdown } from './_storyQuickHelpDropdown';
-import { SearchModal } from './_storySearchModal';
+import { StorySearchModal } from './_storySearchModal';
 
 export const HeaderActions = () => (
   <>
-    <SearchModal />
+    <StorySearchModal />
 
     <TopHeaderSeparator />
 
