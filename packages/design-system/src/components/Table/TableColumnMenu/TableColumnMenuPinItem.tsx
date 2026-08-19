@@ -28,7 +28,7 @@ export const TableColumnMenuPinItem: FC<TableColumnMenuPinItemProps> = ({
 
   const handleSelect = () => {
     onSelect?.();
-    column.pin(isPinned ? false : 'left');
+    column.pin(isPinned ? false : 'start');
   };
 
   return (

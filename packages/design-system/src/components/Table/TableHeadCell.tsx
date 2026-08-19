@@ -1,5 +1,5 @@
 import type { ComponentType, ReactNode } from 'react';
-import { flexRender, type Header } from '@tanstack/react-table';
+import { flexRender, type Header, type RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { HStack, VStack } from '../Stack';
@@ -8,6 +8,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useHorizontalScrollState } from './hooks';
 import {
   containsDirectChild,
+  type DSTableFeatures,
   getAlignClass,
   getPinningStyles,
   isLastPinnedLeft,
@@ -23,12 +24,15 @@ import { TableScrollHandlerSlot } from './TableScrollHandlerSlot';
 import { TableSortHandler } from './TableSortHandler';
 import { TableSortTrigger } from './TableSortTrigger';
 
-interface TableHeadCellProps<T> {
-  header: Header<T, unknown>;
+interface TableHeadCellProps<T extends RowData> {
+  header: Header<DSTableFeatures, T, unknown>;
   hasTextDescription?: boolean;
 }
 
-export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellProps<T>) => {
+export const TableHeadCell = <T extends RowData>({
+  header,
+  hasTextDescription,
+}: TableHeadCellProps<T>) => {
   const ctx = useTableContext<T>();
   const testId = useTestId('head-cell');
   const {
@@ -120,7 +124,7 @@ export const TableHeadCell = <T,>({ header, hasTextDescription }: TableHeadCellP
       )}
       interactive={canSort || hasMenu}
       sorted={!!sortDirection}
-      pinned={isPinned === 'left'}
+      pinned={isPinned === 'start'}
       lastPinnedLeft={lastLeft}
       draggable={canDnd}
       dragging={isDragging}

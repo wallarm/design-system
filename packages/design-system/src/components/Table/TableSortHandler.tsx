@@ -1,14 +1,14 @@
 import { type MouseEvent, useCallback } from 'react';
-import type { Header } from '@tanstack/react-table';
+import type { Header, RowData } from '@tanstack/react-table';
 import { MoveDown, MoveUp, MoveVertical } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { tableHeaderButtonClass } from './classes';
-import { SORT_LABELS } from './lib';
+import { type DSTableFeatures, SORT_LABELS } from './lib';
 import { useTableContext } from './TableContext';
 
-interface TableSortHandler<T> {
-  header: Header<T, unknown>;
+interface TableSortHandler<T extends RowData> {
+  header: Header<DSTableFeatures, T, unknown>;
 }
 
 const getSortTooltip = (
@@ -22,7 +22,7 @@ const getSortTooltip = (
   return ascLabel;
 };
 
-export const TableSortHandler = <T,>({ header }: TableSortHandler<T>) => {
+export const TableSortHandler = <T extends RowData>({ header }: TableSortHandler<T>) => {
   const { column } = header;
 
   const ctx = useTableContext<T>();

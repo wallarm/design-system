@@ -1,6 +1,6 @@
 {
   "name": "@wallarm-org/design-system",
-  "version": "0.88.2",
+  "version": "1.0.0",
   "description": "Core design system library with React components and Storybook documentation",
   "publishConfig": {
     "access": "public",
@@ -134,7 +134,7 @@
     "@react-stately/datepicker": "3.17.1",
     "@react-types/datepicker": "3.14.0",
     "@react-types/shared": "3.36.1",
-    "@tanstack/react-table": "8.21.3",
+    "@tanstack/react-table": "9.0.0",
     "@tanstack/react-virtual": "3.14.9",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",

@@ -79,4 +79,17 @@
     --leading-7xl: 72px;
     --leading-8xl: 96px;
     --leading-9xl: 128px;
+
+    /* Optical tracking for the heading ramp. Tightens as the size grows, because
+       large type sets too loose at the spacing Geist is drawn for.
+       Zero below 20px system-wide: at UI sizes the font's own spacing is already
+       right, and negative tracking there costs legibility. Steps sm/md/lg get no
+       token on purpose — they use tracking-normal. */
+    --tracking-xl: -0.005em;
+    --tracking-2xl: -0.01em;
+    --tracking-3xl: -0.01em;
+    --tracking-4xl: -0.015em;
+    --tracking-5xl: -0.015em;
+    --tracking-6xl: -0.02em;
+    --tracking-7xl: -0.02em;
 }

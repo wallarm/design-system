@@ -1,4 +1,5 @@
 import type { ComponentType } from 'react';
+import type { RowData } from '@tanstack/react-table';
 import { TestIdProvider } from '../../utils/testId';
 import { containsDirectChild } from './lib';
 import { TableProvider } from './TableContext';
@@ -8,7 +9,7 @@ import { TableScrollHandler } from './TableScrollHandler';
 import { TableSettingsMenu } from './TableSettingsMenu';
 import type { TableProps } from './types';
 
-export const Table = <T,>(props: TableProps<T>) => {
+export const Table = <T extends RowData>(props: TableProps<T>) => {
   const {
     data,
     isLoading = false,

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react';
-import type { Table } from '@tanstack/react-table';
+import type { RowData, Table } from '@tanstack/react-table';
 import type { Virtualizer } from '@tanstack/react-virtual';
+import type { DSTableFeatures } from '../lib';
 import { detectDataChange } from '../lib';
 
 /**
@@ -8,8 +9,8 @@ import { detectDataChange } from '../lib';
  * (infinite scroll up) measurements are kept — usePrependScrollAnchor handles
  * the position — so the virtualizer does not re-measure and jump.
  */
-export const useResetVirtualizerOnDataChange = (
-  table: Table<unknown>,
+export const useResetVirtualizerOnDataChange = <T extends RowData>(
+  table: Table<DSTableFeatures, T>,
   virtualizer:
     | Virtualizer<Element, Element>
     | Virtualizer<Window, Element>

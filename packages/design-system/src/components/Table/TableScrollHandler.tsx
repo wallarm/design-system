@@ -149,7 +149,7 @@ export const TableScrollHandler: FC<TableScrollHandlerProps> = ({ children }) =>
   // Visible non-pinned area width — computed at click time for accuracy.
   const getScrollPageSize = () => {
     const pinnedLeftWidth = allLeafColumns
-      .filter(c => c.getIsPinned() === 'left')
+      .filter(c => c.getIsPinned() === 'start')
       .reduce((sum, c) => sum + c.getSize(), 0);
     return Math.max((containerRef.current?.clientWidth ?? 0) - pinnedLeftWidth, 0);
   };

@@ -1144,6 +1144,82 @@ describe('TableActionBarSelection: bulk action-bar composition analytics', () =>
   });
 });
 
+describe('SelectAllHeaderCell: header checkbox states', () => {
+  // Regression coverage for the header select-all checkbox's own click
+  // handler and its three visual states — distinct from the bulk-action-bar
+  // tests above, which only exercise `toggleAllRowsSelected` via a different
+  // code path (the action bar's "Select all" button), never the header
+  // checkbox itself.
+  const SelectAllHarness: FC = () => {
+    const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+    return (
+      <Table<Row>
+        data={data}
+        columns={baseColumns}
+        data-testid='table'
+        rowSelection={rowSelection}
+        onRowSelectionChange={setRowSelection}
+      />
+    );
+  };
+
+  it('is unchecked when no rows are selected', () => {
+    render(<SelectAllHarness />);
+
+    // Note: `.indeterminate` isn't asserted here — Ark UI only syncs that DOM
+    // property on a post-mount re-render (confirmed empirically), so it
+    // reads `false` on first render regardless of the computed value and
+    // would pass even for a broken component. The other tests below all
+    // assert `.indeterminate` after a real interaction, which does force the
+    // sync.
+    const header = screen.getAllByRole('checkbox')[0] as HTMLInputElement;
+    expect(header.checked).toBe(false);
+  });
+
+  it('is indeterminate when some (but not all) rows are selected', async () => {
+    render(<SelectAllHarness />);
+
+    const [, firstRow] = screen.getAllByRole('checkbox');
+    await userEvent.click(firstRow as HTMLInputElement);
+
+    const header = screen.getAllByRole('checkbox')[0] as HTMLInputElement;
+    expect(header.checked).toBe(false);
+    expect(header.indeterminate).toBe(true);
+  });
+
+  it('is checked, not indeterminate, when all rows are selected', async () => {
+    render(<SelectAllHarness />);
+
+    const [header, ...rows] = screen.getAllByRole('checkbox') as HTMLInputElement[];
+    for (const row of rows) {
+      await userEvent.click(row);
+    }
+    expect(header.checked).toBe(true);
+    expect(header.indeterminate).toBe(false);
+  });
+
+  it('clicking the header toggles between all-selected and none-selected', async () => {
+    render(<SelectAllHarness />);
+
+    const header = screen.getAllByRole('checkbox')[0] as HTMLInputElement;
+
+    await userEvent.click(header);
+    expect(screen.getAllByRole('checkbox').every(cb => (cb as HTMLInputElement).checked)).toBe(
+      true,
+    );
+
+    await userEvent.click(header);
+    expect(screen.getAllByRole('checkbox').every(cb => !(cb as HTMLInputElement).checked)).toBe(
+      true,
+    );
+    // Deselect-all must clear indeterminate too, not just `checked` — this is
+    // the interaction path where a row-model-unscoped `indeterminate` (e.g.
+    // TanStack's `getIsSomeRowsSelected()`, which is pure `rowSelection`
+    // key-presence) would get stuck forever on a stale/ghost selection id.
+    expect(header.indeterminate).toBe(false);
+  });
+});
+
 describe('TableSettingsMenu: onSettingsOpenChange', () => {
   it('fires with true when the settings menu opens and false when it closes', async () => {
     const onSettingsOpenChange = vi.fn();

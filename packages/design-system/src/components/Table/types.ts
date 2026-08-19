@@ -1,10 +1,9 @@
 import type { ReactNode, Ref } from 'react';
-import type { Row, RowData } from '@tanstack/react-table';
+import type { Row, RowData, TableFeatures } from '@tanstack/react-table';
 import type { TestableProps } from '../../utils/testId';
 
 declare module '@tanstack/react-table' {
-  // biome-ignore lint/correctness/noUnusedVariables: TanStack Table augmentation requires matching generic parameter name
-  interface ColumnMeta<TData extends RowData, TValue> {
+  interface ColumnMeta<TFeatures extends TableFeatures, TData extends RowData, TValue> {
     headerClassName?: string;
     cellClassName?: string;
     /** Sort label type — controls the wording in the sort submenu */
@@ -25,7 +24,7 @@ declare module '@tanstack/react-table' {
     /** Resize behavior: 'resize' adapts content to fit (default), 'cut' truncates content */
     resizeType?: 'cut' | 'resize';
     /** Render the three-dots contextual menu shown on hover */
-    renderMenuAction?: (row: Row<TData>) => ReactNode;
+    renderMenuAction?: (row: Row<TFeatures, TData>) => ReactNode;
   }
 }
 

@@ -17,6 +17,7 @@ export {
   type EditableTextCellProps,
   editableCellVariants,
 } from './EditableCell';
+export type { DSTableFeatures } from './lib';
 export { createTableColumnHelper } from './lib';
 export type { TableColumnHelper } from './lib/createTableColumnHelper';
 export { Table } from './Table';

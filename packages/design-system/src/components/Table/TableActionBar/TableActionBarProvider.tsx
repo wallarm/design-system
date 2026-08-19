@@ -14,7 +14,7 @@ export const TableActionBarProvider: FC<TableActionBarProviderProps> = ({ childr
   const { table, selectionEnabled } = useTableContext();
   const anchorRef = useRef<HTMLDivElement>(null);
 
-  const selectedCount = selectionEnabled ? Object.keys(table.getState().rowSelection).length : 0;
+  const selectedCount = selectionEnabled ? Object.keys(table.state.rowSelection).length : 0;
 
   const positioning = useMemo<ArkUiPopover.RootProps['positioning']>(() => {
     // Pin the bar to the bottom of the viewport (not the bottom of the
