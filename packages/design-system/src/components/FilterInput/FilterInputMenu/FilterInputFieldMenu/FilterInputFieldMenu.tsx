@@ -1,4 +1,4 @@
-import { type FC, type RefObject, useCallback, useMemo, useRef } from 'react';
+import { type FC, type RefObject, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
@@ -7,9 +7,7 @@ import { buildFieldMenuSections } from '../../lib';
 import type { Condition, FieldGroup, FieldMetadata, FilterInputDropdownItem } from '../../types';
 import { useFieldMenuNavItems } from '../hooks/useFieldMenuNavItems';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
-import { useMenuScrollHighlightSync } from '../hooks/useMenuScrollHighlightSync';
 import { MenuEmptyState } from '../MenuEmptyState';
-import { FieldMenuPopover } from './FieldMenuPopover';
 import {
   FieldSections,
   OperatorsSection,
@@ -88,7 +86,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
     }
   };
 
-  const { highlightedValue, onHighlightChange, registerItem, getItemElement } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange, registerItem } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: handleItemSelect,
@@ -102,114 +100,69 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   // Hide menu when filter text matches nothing (e.g. pasted invalid text).
   const hasResults = sections.length > 0 || !filterText;
 
-  // The highlighted field row drives the description popover. Only true field
-  // rows (grouped sections + suggestions) qualify — recent/AND/OR items and the
-  // non-navigable group headers never surface it.
-  const highlightedField = useMemo(() => {
-    if (!highlightedValue) return undefined;
-    const data = flatItems.find(i => i.id === highlightedValue)?.value as
-      | { type?: string; field?: FieldMetadata }
-      | undefined;
-    return data?.type === 'field' ? data.field : undefined;
-  }, [flatItems, highlightedValue]);
-
-  // Read the highlighted id through a ref so `getAnchorRect` keeps a stable
-  // identity — zag captures it once at open, so closing over `highlightedValue`
-  // directly would freeze the popover on the open-time row (see FieldMenuPopover).
-  const highlightedValueRef = useRef(highlightedValue);
-  highlightedValueRef.current = highlightedValue;
-  // Anchor the popover vertically to the highlighted row but horizontally to the
-  // menu's edge, so the gutter is measured from the menu (a fixed 4px gap) rather
-  // than from the padding-inset row.
-  const getPopoverAnchorRect = useCallback(() => {
-    const el = getItemElement(highlightedValueRef.current);
-    if (!el) return null;
-    const item = el.getBoundingClientRect();
-    const menu = el.closest('[data-filter-input-menu="true"]')?.getBoundingClientRect();
-    return menu ? new DOMRect(menu.x, item.y, menu.width, item.height) : item;
-  }, [getItemElement]);
-
-  const popoverOpen = open && hasResults && !!highlightedField?.description;
-  const menuVisible = open && hasResults;
-
-  // Keep the highlight (and popover) on the row under the cursor when the list
-  // scrolls beneath a stationary pointer.
-  useMenuScrollHighlightSync(menuVisible, onHighlightChange);
-
   return (
-    <>
-      <DropdownMenu
-        open={open && hasResults}
-        onOpenChange={onOpenChange}
-        closeOnSelect={false}
-        positioning={positioning}
-        highlightedValue={highlightedValue}
-        onHighlightChange={onHighlightChange}
+    <DropdownMenu
+      open={open && hasResults}
+      onOpenChange={onOpenChange}
+      closeOnSelect={false}
+      positioning={positioning}
+      highlightedValue={highlightedValue}
+      onHighlightChange={onHighlightChange}
+    >
+      <DropdownMenuContent
+        ref={menuRef}
+        className={cn('w-[300px] max-h-[430px]', className)}
+        data-slot='filter-input-field-menu'
+        data-filter-input-menu='true'
       >
-        <DropdownMenuContent
-          ref={menuRef}
-          className={cn('w-[300px] max-h-[430px]', className)}
-          data-slot='filter-input-field-menu'
-          data-filter-input-menu='true'
-        >
-          {!filterText && showRecent && (
-            <RecentSection
-              conditions={limitedRecentConditions}
-              fields={fields}
-              onSelect={onSelect}
-              registerItem={registerItem}
-            />
-          )}
+        {!filterText && showRecent && (
+          <RecentSection
+            conditions={limitedRecentConditions}
+            fields={fields}
+            onSelect={onSelect}
+            registerItem={registerItem}
+          />
+        )}
 
-          {!filterText && showSuggestions && !showRecent && (
-            <SuggestionsSection
-              fields={suggestedFields}
-              onSelect={onSelect}
-              registerItem={registerItem}
-            />
-          )}
+        {!filterText && showSuggestions && !showRecent && (
+          <SuggestionsSection
+            fields={suggestedFields}
+            onSelect={onSelect}
+            registerItem={registerItem}
+          />
+        )}
 
-          {sections.length > 0 ? (
-            <FieldSections sections={sections} onSelect={onSelect} registerItem={registerItem} />
-          ) : (
-            <MenuEmptyState />
-          )}
+        {sections.length > 0 ? (
+          <FieldSections sections={sections} onSelect={onSelect} registerItem={registerItem} />
+        ) : (
+          <MenuEmptyState />
+        )}
 
-          {!filterText && (onSelectAnd || onSelectOr) && (
-            <OperatorsSection
-              onSelectAnd={onSelectAnd}
-              onSelectOr={onSelectOr}
-              registerItem={registerItem}
-            />
-          )}
+        {!filterText && (onSelectAnd || onSelectOr) && (
+          <OperatorsSection
+            onSelectAnd={onSelectAnd}
+            onSelectOr={onSelectOr}
+            registerItem={registerItem}
+          />
+        )}
 
-          <DropdownMenuFooter className='justify-start'>
-            <span className='flex items-center gap-4'>
-              <KbdGroup>
-                <Kbd>↑</Kbd>
-                <Kbd>↓</Kbd>
-              </KbdGroup>
-              to navigate
-            </span>
-            <span className='flex items-center gap-4'>
-              <KbdGroup>
-                <Kbd>↵</Kbd>
-              </KbdGroup>
-              to select
-            </span>
-          </DropdownMenuFooter>
-        </DropdownMenuContent>
-      </DropdownMenu>
-
-      <FieldMenuPopover
-        open={popoverOpen}
-        title={highlightedField?.label ?? ''}
-        description={highlightedField?.description ?? ''}
-        example={highlightedField?.example}
-        getAnchorRect={getPopoverAnchorRect}
-        repositionKey={highlightedValue}
-      />
-    </>
+        <DropdownMenuFooter className='justify-start'>
+          <span className='flex items-center gap-4'>
+            <KbdGroup>
+              <Kbd>↑</Kbd>
+              <Kbd>↓</Kbd>
+            </KbdGroup>
+            to navigate
+          </span>
+          <span className='flex items-center gap-4'>
+            <KbdGroup>
+              <Kbd>↵</Kbd>
+            </KbdGroup>
+            to select
+          </span>
+        </DropdownMenuFooter>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 };
 
