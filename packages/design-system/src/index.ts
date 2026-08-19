@@ -463,6 +463,13 @@ export {
   ParameterPath,
   type ParameterPathProps,
 } from './components/ParameterPath';
+export {
+  PasswordComplexity,
+  type PasswordComplexityItem,
+  type PasswordComplexityItemId,
+  type PasswordComplexityProps,
+  passwordValidators,
+} from './components/PasswordComplexity';
 export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
 export {
   Progress,
