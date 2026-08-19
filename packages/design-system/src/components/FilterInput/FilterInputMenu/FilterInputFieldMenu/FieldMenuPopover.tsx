@@ -1,4 +1,4 @@
-import type { FC } from 'react';
+import { type FC, useEffect } from 'react';
 import { Popover as ArkUiPopover } from '@ark-ui/react';
 import { PopoverContent } from '../../../Popover';
 import { Separator } from '../../../Separator';
@@ -48,6 +48,28 @@ export const FieldMenuPopover: FC<FieldMenuPopoverProps> = ({
   repositionKey,
 }) => {
   useFloatingRecomputeOn(repositionKey, open);
+
+  // floating-ui only tracks scroll through the anchor's DOM ancestors, but our
+  // anchor is a virtual rect (getAnchorRect), so scrolling the field menu's own
+  // list never reaches it and the popover drifts away from the row. Poke a
+  // reposition on any scroll — the capture phase catches the menu's inner,
+  // non-bubbling scroll — rAF-throttled to one recompute per frame.
+  useEffect(() => {
+    if (!open) return;
+    let raf = 0;
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        window.dispatchEvent(new Event('resize'));
+      });
+    };
+    window.addEventListener('scroll', onScroll, true);
+    return () => {
+      window.removeEventListener('scroll', onScroll, true);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [open]);
 
   return (
     <ArkUiPopover.Root
