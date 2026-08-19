@@ -20,10 +20,10 @@ export interface FieldMenuPopoverProps {
 }
 
 // Anchored to the right of the field menu, aligned to the highlighted row's top;
-// flips to the left when the menu opens too close to the right viewport edge.
+// flips left near the right viewport edge. 4px gap from the menu edge (AS-1060).
 const POPOVER_POSITIONING: ArkUiPopover.RootProps['positioning'] = {
   placement: 'right-start',
-  gutter: 8,
+  gutter: 4,
   flip: true,
   overflowPadding: 8,
 };

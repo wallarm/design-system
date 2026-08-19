@@ -118,10 +118,16 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   // directly would freeze the popover on the open-time row (see FieldMenuPopover).
   const highlightedValueRef = useRef(highlightedValue);
   highlightedValueRef.current = highlightedValue;
-  const getPopoverAnchorRect = useCallback(
-    () => getItemElement(highlightedValueRef.current)?.getBoundingClientRect() ?? null,
-    [getItemElement],
-  );
+  // Anchor the popover vertically to the highlighted row but horizontally to the
+  // menu's edge, so the gutter is measured from the menu (a fixed 4px gap) rather
+  // than from the padding-inset row.
+  const getPopoverAnchorRect = useCallback(() => {
+    const el = getItemElement(highlightedValueRef.current);
+    if (!el) return null;
+    const item = el.getBoundingClientRect();
+    const menu = el.closest('[data-filter-input-menu="true"]')?.getBoundingClientRect();
+    return menu ? new DOMRect(menu.x, item.y, menu.width, item.height) : item;
+  }, [getItemElement]);
 
   const popoverOpen = open && hasResults && !!highlightedField?.description;
   const menuVisible = open && hasResults;

@@ -51,12 +51,16 @@ test.describe('Component: FilterInput field-menu description popover (AS-1060)',
     const popover = page.getByTestId('field-menu-popover');
     await expect(popover).toBeVisible();
 
-    const [menuBox, popoverBox] = await Promise.all([menu.boundingBox(), popover.boundingBox()]);
-    expect(menuBox).not.toBeNull();
-    expect(popoverBox).not.toBeNull();
-    // Anchored to the right edge of the menu (default placement) — its left edge
-    // sits at or past the menu's right edge.
-    expect(popoverBox!.x).toBeGreaterThanOrEqual(menuBox!.x + menuBox!.width - 1);
+    // Sits a ~4px gutter to the right of the menu's edge (AS-1060), not the
+    // padding-inset row. Poll so the enter animation's transform has settled.
+    await expect
+      .poll(async () => {
+        const [m, p] = await Promise.all([menu.boundingBox(), popover.boundingBox()]);
+        if (!m || !p) return null;
+        const gap = p.x - (m.x + m.width);
+        return gap >= 2 && gap <= 6;
+      })
+      .toBe(true);
   });
 
   test('realigns to the newly highlighted row when moving between described fields', async ({
