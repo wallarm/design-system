@@ -1,4 +1,4 @@
-import { type FC, type RefObject, useCallback, useMemo, useRef } from 'react';
+import { type FC, type RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
@@ -127,6 +127,59 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   );
 
   const popoverOpen = open && hasResults && !!highlightedField?.description;
+
+  // Re-sync the hover highlight to the row under the cursor when the list scrolls
+  // beneath a stationary pointer (wheel/trackpad). Ark drives the highlight — and
+  // thus the description popover's content and anchor — off `pointermove`, which
+  // a scroll does not emit, so the highlight would otherwise stick to the row that
+  // was under the cursor before the scroll while the popover drifts to that row's
+  // new (often off-menu) position. On each scroll we re-hit-test at the last known
+  // pointer and replay a `pointermove` on the row now there, so Ark re-highlights
+  // it and the popover follows (AS-1060). rAF-throttled. Skipped while the user
+  // is keyboard-navigating so an arrow-key `scrollIntoView` can't be hijacked by
+  // a stationary pointer that happens to rest over the menu.
+  const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
+  const keyboardNavRef = useRef(false);
+  useEffect(() => {
+    if (!popoverOpen) return;
+    const trackPointer = (e: PointerEvent) => {
+      keyboardNavRef.current = false;
+      lastPointerRef.current = { x: e.clientX, y: e.clientY };
+    };
+    const trackKeyboard = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') keyboardNavRef.current = true;
+    };
+    let raf = 0;
+    const onScroll = () => {
+      if (raf || keyboardNavRef.current) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        const p = lastPointerRef.current;
+        const menuEl = menuRef?.current;
+        if (!p || !menuEl) return;
+        const el = document.elementFromPoint(p.x, p.y);
+        if (!el || !menuEl.contains(el)) return;
+        el.closest('[role="menuitem"]')?.dispatchEvent(
+          new PointerEvent('pointermove', {
+            bubbles: true,
+            clientX: p.x,
+            clientY: p.y,
+            pointerId: 1,
+            pointerType: 'mouse',
+          }),
+        );
+      });
+    };
+    window.addEventListener('pointermove', trackPointer, true);
+    window.addEventListener('keydown', trackKeyboard, true);
+    window.addEventListener('scroll', onScroll, true);
+    return () => {
+      window.removeEventListener('pointermove', trackPointer, true);
+      window.removeEventListener('keydown', trackKeyboard, true);
+      window.removeEventListener('scroll', onScroll, true);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [popoverOpen, menuRef]);
 
   return (
     <>
