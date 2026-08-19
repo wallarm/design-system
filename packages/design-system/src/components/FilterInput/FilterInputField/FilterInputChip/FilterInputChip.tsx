@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes, MouseEvent as ReactMouseEvent, Ref } from 'react';
 import { useCallback, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../../../Tooltip';
 import type { ChipErrorSegment, FilterInputChipData } from '../../types';
 import { ChipSearchInput } from './ChipSearchInput';
 import { chipVariants, emptyValueHitTarget } from './classes';
@@ -19,6 +20,9 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
   ref?: Ref<HTMLDivElement>;
   chipId?: string;
   attribute: string;
+  /** Description shown in a dark tooltip on hover of the attribute segment. When
+   *  absent, no tooltip renders. The operator/value segments are unaffected (AS-1060). */
+  attributeDescription?: string;
   operator?: string;
   value?: string;
   error?: ChipErrorSegment;
@@ -40,6 +44,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   ref,
   chipId,
   attribute,
+  attributeDescription,
   operator,
   value,
   error = false,
@@ -127,6 +132,19 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   const baseActiveSegment = editingSide === 0 ? activeSegment : null;
   const pairActiveSegment = editingSide === 1 ? activeSegment : null;
 
+  const attributeSegment = (
+    <Segment
+      variant={SEGMENT_VARIANT.attribute}
+      className='shrink-0'
+      error={effectiveError === true || effectiveError === SEGMENT_VARIANT.attribute}
+      onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.attribute, e) : undefined}
+      onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
+      {...segmentEditProps(SEGMENT_VARIANT.attribute)}
+    >
+      {attribute}
+    </Segment>
+  );
+
   const setRefs = useCallback(
     (node: HTMLDivElement | null) => {
       internalRef.current = node;
@@ -150,16 +168,17 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       {...(building && { 'data-building': '' })}
       {...props}
     >
-      <Segment
-        variant={SEGMENT_VARIANT.attribute}
-        className='shrink-0'
-        error={effectiveError === true || effectiveError === SEGMENT_VARIANT.attribute}
-        onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.attribute, e) : undefined}
-        onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
-        {...segmentEditProps(SEGMENT_VARIANT.attribute)}
-      >
-        {attribute}
-      </Segment>
+      {/* Dark tooltip on the attribute segment mirrors the field-menu popover's
+          description (recall). Disabled while that segment is inline-editing so
+          the input isn't obscured; absent when the field has no description. */}
+      {attributeDescription ? (
+        <Tooltip disabled={baseActiveSegment === SEGMENT_VARIANT.attribute}>
+          <TooltipTrigger asChild>{attributeSegment}</TooltipTrigger>
+          <TooltipContent>{attributeDescription}</TooltipContent>
+        </Tooltip>
+      ) : (
+        attributeSegment
+      )}
       {(operator || baseActiveSegment === SEGMENT_VARIANT.operator) && (
         <Segment
           variant={SEGMENT_VARIANT.operator}

@@ -55,6 +55,14 @@ export const useKeyboardNav = ({
     [],
   );
 
+  // Live element lookup for callers that anchor floating UI to an item (e.g. the
+  // field-menu description popover). Reads the registry so it always reflects the
+  // current DOM node, even after re-renders reorder items.
+  const getItemElement = useCallback(
+    (id: string): HTMLElement | null => itemRegistryRef.current.get(id) ?? null,
+    [],
+  );
+
   // Mutable ref to avoid stale closures in navigate.
   const activeIndexRef = useRef(-1);
 
@@ -358,5 +366,6 @@ export const useKeyboardNav = ({
     onHighlightChange,
     pendingIds,
     registerItem,
+    getItemElement,
   };
 };

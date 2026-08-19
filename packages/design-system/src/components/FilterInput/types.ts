@@ -34,6 +34,13 @@ export interface FilterInputChipData {
   id: string;
   variant: FilterInputChipVariant;
   attribute?: string;
+  /**
+   * Field description surfaced as a dark tooltip on the chip's first (attribute)
+   * segment. Sourced from `FieldMetadata.description`; absent when the field has
+   * none, so no tooltip renders. Recall counterpart of the field-menu popover
+   * that carries the same copy (AS-1060).
+   */
+  attributeDescription?: string;
   operator?: string;
   value?: string;
   error?: ChipErrorSegment;
@@ -132,6 +139,13 @@ export interface FieldMetadata {
   label: string;
   type: FieldType;
   description?: string;
+  /**
+   * Optional monospace example block shown beneath the description in the
+   * field-menu popover, for fields whose value format is non-obvious (wildcards,
+   * path patterns, ranges, structured IDs). Multi-line via `\n`. Omit for
+   * free-text fields and simple enums. Never rendered in the chip tooltip (AS-1060).
+   */
+  example?: string;
   operators?: FilterOperator[];
   default?: string | number | boolean;
   values?: FieldValueOption[];

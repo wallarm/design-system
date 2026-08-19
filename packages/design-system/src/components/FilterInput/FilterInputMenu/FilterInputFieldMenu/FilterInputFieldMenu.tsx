@@ -1,4 +1,4 @@
-import { type FC, type RefObject, useMemo } from 'react';
+import { type FC, type RefObject, useCallback, useMemo } from 'react';
 import { cn } from '../../../../utils/cn';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
@@ -8,6 +8,7 @@ import type { Condition, FieldGroup, FieldMetadata, FilterInputDropdownItem } fr
 import { useFieldMenuNavItems } from '../hooks/useFieldMenuNavItems';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
 import { MenuEmptyState } from '../MenuEmptyState';
+import { FieldMenuPopover } from './FieldMenuPopover';
 import {
   FieldSections,
   OperatorsSection,
@@ -86,7 +87,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
     }
   };
 
-  const { highlightedValue, onHighlightChange, registerItem } = useKeyboardNav({
+  const { highlightedValue, onHighlightChange, registerItem, getItemElement } = useKeyboardNav({
     items: flatItems,
     open,
     onSelect: handleItemSelect,
@@ -100,69 +101,98 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   // Hide menu when filter text matches nothing (e.g. pasted invalid text).
   const hasResults = sections.length > 0 || !filterText;
 
+  // The highlighted field row drives the description popover. Only true field
+  // rows (grouped sections + suggestions) qualify — recent/AND/OR items and the
+  // non-navigable group headers never surface it.
+  const highlightedField = useMemo(() => {
+    if (!highlightedValue) return undefined;
+    const data = flatItems.find(i => i.id === highlightedValue)?.value as
+      | { type?: string; field?: FieldMetadata }
+      | undefined;
+    return data?.type === 'field' ? data.field : undefined;
+  }, [flatItems, highlightedValue]);
+
+  const getPopoverAnchorRect = useCallback(
+    () => getItemElement(highlightedValue)?.getBoundingClientRect() ?? null,
+    [getItemElement, highlightedValue],
+  );
+
+  const popoverOpen = open && hasResults && !!highlightedField?.description;
+
   return (
-    <DropdownMenu
-      open={open && hasResults}
-      onOpenChange={onOpenChange}
-      closeOnSelect={false}
-      positioning={positioning}
-      highlightedValue={highlightedValue}
-      onHighlightChange={onHighlightChange}
-    >
-      <DropdownMenuContent
-        ref={menuRef}
-        className={cn('w-[300px] max-h-[430px]', className)}
-        data-slot='filter-input-field-menu'
-        data-filter-input-menu='true'
+    <>
+      <DropdownMenu
+        open={open && hasResults}
+        onOpenChange={onOpenChange}
+        closeOnSelect={false}
+        positioning={positioning}
+        highlightedValue={highlightedValue}
+        onHighlightChange={onHighlightChange}
       >
-        {!filterText && showRecent && (
-          <RecentSection
-            conditions={limitedRecentConditions}
-            fields={fields}
-            onSelect={onSelect}
-            registerItem={registerItem}
-          />
-        )}
+        <DropdownMenuContent
+          ref={menuRef}
+          className={cn('w-[300px] max-h-[430px]', className)}
+          data-slot='filter-input-field-menu'
+          data-filter-input-menu='true'
+        >
+          {!filterText && showRecent && (
+            <RecentSection
+              conditions={limitedRecentConditions}
+              fields={fields}
+              onSelect={onSelect}
+              registerItem={registerItem}
+            />
+          )}
 
-        {!filterText && showSuggestions && !showRecent && (
-          <SuggestionsSection
-            fields={suggestedFields}
-            onSelect={onSelect}
-            registerItem={registerItem}
-          />
-        )}
+          {!filterText && showSuggestions && !showRecent && (
+            <SuggestionsSection
+              fields={suggestedFields}
+              onSelect={onSelect}
+              registerItem={registerItem}
+            />
+          )}
 
-        {sections.length > 0 ? (
-          <FieldSections sections={sections} onSelect={onSelect} registerItem={registerItem} />
-        ) : (
-          <MenuEmptyState />
-        )}
+          {sections.length > 0 ? (
+            <FieldSections sections={sections} onSelect={onSelect} registerItem={registerItem} />
+          ) : (
+            <MenuEmptyState />
+          )}
 
-        {!filterText && (onSelectAnd || onSelectOr) && (
-          <OperatorsSection
-            onSelectAnd={onSelectAnd}
-            onSelectOr={onSelectOr}
-            registerItem={registerItem}
-          />
-        )}
+          {!filterText && (onSelectAnd || onSelectOr) && (
+            <OperatorsSection
+              onSelectAnd={onSelectAnd}
+              onSelectOr={onSelectOr}
+              registerItem={registerItem}
+            />
+          )}
 
-        <DropdownMenuFooter className='justify-start'>
-          <span className='flex items-center gap-4'>
-            <KbdGroup>
-              <Kbd>↑</Kbd>
-              <Kbd>↓</Kbd>
-            </KbdGroup>
-            to navigate
-          </span>
-          <span className='flex items-center gap-4'>
-            <KbdGroup>
-              <Kbd>↵</Kbd>
-            </KbdGroup>
-            to select
-          </span>
-        </DropdownMenuFooter>
-      </DropdownMenuContent>
-    </DropdownMenu>
+          <DropdownMenuFooter className='justify-start'>
+            <span className='flex items-center gap-4'>
+              <KbdGroup>
+                <Kbd>↑</Kbd>
+                <Kbd>↓</Kbd>
+              </KbdGroup>
+              to navigate
+            </span>
+            <span className='flex items-center gap-4'>
+              <KbdGroup>
+                <Kbd>↵</Kbd>
+              </KbdGroup>
+              to select
+            </span>
+          </DropdownMenuFooter>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      <FieldMenuPopover
+        open={popoverOpen}
+        title={highlightedField?.label ?? ''}
+        description={highlightedField?.description ?? ''}
+        example={highlightedField?.example}
+        getAnchorRect={getPopoverAnchorRect}
+        repositionKey={highlightedValue}
+      />
+    </>
   );
 };
 

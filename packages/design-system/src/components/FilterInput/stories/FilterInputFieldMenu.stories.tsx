@@ -325,6 +325,65 @@ export const WithGroups: Story = {
 };
 
 /**
+ * Hovering (or keyboard-focusing) a field row opens a description popover to the
+ * side of the menu: the filter title (monospace), its description, and — for
+ * fields whose value format is non-obvious — a monospace example block. Fields
+ * without a description (e.g. "No description field") open no popover, and group
+ * headers are non-interactive (AS-1060).
+ */
+const describedFields: FieldMetadata[] = [
+  {
+    name: 'attack_type',
+    label: 'Attack type',
+    type: 'enum',
+    description: 'Filter by the high-level category of the detected attack (e.g. SQLi, XSS, BOLA).',
+  },
+  {
+    name: 'parameter',
+    label: 'Parameter',
+    type: 'string',
+    description: 'Filter by the request parameter where the malicious payload was detected.',
+    example: 'header.user-agent\npost.user[*].name',
+  },
+  {
+    name: 'status_code',
+    label: 'Status code',
+    type: 'string',
+    description: 'Filter by the HTTP response status code returned to the attacker.',
+    example: '200, 4XX, 5XX',
+  },
+  {
+    name: 'no_desc',
+    label: 'No description field',
+    type: 'string',
+  },
+];
+
+export const WithDescriptions: Story = {
+  args: {
+    fields: describedFields,
+    fieldGroups: [
+      {
+        label: 'Threat classification',
+        fields: ['attack_type', 'parameter', 'status_code', 'no_desc'],
+      },
+    ],
+    open: true,
+    onSelect: () => {
+      // Field selection handler
+    },
+  },
+  parameters: {
+    docs: {
+      description: {
+        story:
+          'Hover or keyboard-focus a field to see its description popover; "Parameter" and "Status code" also show an example block.',
+      },
+    },
+  },
+};
+
+/**
  * FilterInputFieldMenu with both recent and suggestions
  * Shows the full menu with all sections
  */
