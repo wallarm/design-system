@@ -470,6 +470,7 @@ export {
   type PasswordComplexityProps,
   passwordValidators,
 } from './components/PasswordComplexity';
+export { PasswordInput, type PasswordInputProps } from './components/PasswordInput';
 export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
 export {
   Progress,

@@ -1,5 +1,5 @@
 export { Field } from './Field';
-export { FieldAction } from './FieldAction';
+export { FieldAction, type FieldActionType } from './FieldAction';
 export { FieldContent } from './FieldContent';
 export { FieldDescription } from './FieldDescription';
 export { FieldError } from './FieldError';
