@@ -189,15 +189,20 @@ test.describe('Component: FilterInput field-menu description popover (AS-1060)',
     await expect(popover).toBeVisible();
     for (let i = 0; i < 14; i++) await page.keyboard.press('ArrowDown');
 
-    const keyboardHighlighted = await page.evaluate(
-      () =>
-        document
-          .querySelector('[data-slot="filter-input-field-menu"] [data-highlighted]')
-          ?.textContent?.trim() ?? null,
-      undefined,
-    );
-    expect(keyboardHighlighted).not.toBeNull();
-    await expect(popover).toContainText(keyboardHighlighted!);
+    // The popover must settle on the keyboard-highlighted row (not the parked
+    // pointer's row). Poll until popover content and `data-highlighted` agree.
+    await expect
+      .poll(async () => {
+        const highlighted = await page.evaluate(
+          () =>
+            document
+              .querySelector('[data-slot="filter-input-field-menu"] [data-highlighted]')
+              ?.textContent?.trim() ?? null,
+        );
+        const text = (await popover.textContent())?.trim() ?? '';
+        return highlighted && text.includes(highlighted) ? highlighted : null;
+      })
+      .not.toBeNull();
   });
 });
 

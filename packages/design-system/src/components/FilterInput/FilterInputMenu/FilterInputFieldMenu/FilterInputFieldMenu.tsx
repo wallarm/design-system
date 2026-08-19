@@ -1,4 +1,4 @@
-import { type FC, type RefObject, useCallback, useEffect, useMemo, useRef } from 'react';
+import { type FC, type RefObject, useCallback, useMemo, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
@@ -7,6 +7,7 @@ import { buildFieldMenuSections } from '../../lib';
 import type { Condition, FieldGroup, FieldMetadata, FilterInputDropdownItem } from '../../types';
 import { useFieldMenuNavItems } from '../hooks/useFieldMenuNavItems';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
+import { useMenuScrollHighlightSync } from '../hooks/useMenuScrollHighlightSync';
 import { MenuEmptyState } from '../MenuEmptyState';
 import { FieldMenuPopover } from './FieldMenuPopover';
 import {
@@ -113,12 +114,8 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   }, [flatItems, highlightedValue]);
 
   // Read the highlighted id through a ref so `getAnchorRect` keeps a stable
-  // identity: zag captures the anchor-rect getter once when the popover opens and
-  // reuses it across repositions. A getter that closed over `highlightedValue`
-  // directly would freeze on the row that was highlighted at open time, leaving
-  // the popover behind when the highlight moves to another described row while it
-  // stays open. The ref always resolves the current row; the reposition itself is
-  // poked by `repositionKey` changing (see FieldMenuPopover).
+  // identity — zag captures it once at open, so closing over `highlightedValue`
+  // directly would freeze the popover on the open-time row (see FieldMenuPopover).
   const highlightedValueRef = useRef(highlightedValue);
   highlightedValueRef.current = highlightedValue;
   const getPopoverAnchorRect = useCallback(
@@ -129,59 +126,9 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   const popoverOpen = open && hasResults && !!highlightedField?.description;
   const menuVisible = open && hasResults;
 
-  // Re-sync the highlight to the row under the cursor when the list scrolls beneath
-  // a stationary pointer (wheel/trackpad). Ark moves the highlight — and thus the
-  // description popover's content and anchor — off `pointermove`, which a scroll
-  // does not emit, so the highlight would otherwise stick to the row that was under
-  // the cursor before the scroll while the popover drifts to that row's new (often
-  // off-menu) position. On scroll we re-hit-test at the last pointer and drive the
-  // highlight to the row now there via `onHighlightChange` — not a synthetic
-  // `pointermove`, which zag ignores when the position is unchanged (its own guard
-  // against the mouse stealing the keyboard highlight) (AS-1060). rAF-throttled.
-  // Gated on the menu being visible (not just the popover) so the pointer is
-  // tracked before the first scroll; skipped mid-keyboard-nav so an arrow-key
-  // `scrollIntoView` can't be hijacked by a pointer resting over the menu.
-  const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
-  const keyboardNavRef = useRef(false);
-  useEffect(() => {
-    if (!menuVisible) return;
-    const trackPointer = (e: PointerEvent) => {
-      keyboardNavRef.current = false;
-      lastPointerRef.current = { x: e.clientX, y: e.clientY };
-    };
-    const trackKeyboard = (e: KeyboardEvent) => {
-      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') keyboardNavRef.current = true;
-    };
-    let raf = 0;
-    const onScroll = () => {
-      if (raf || keyboardNavRef.current) return;
-      raf = requestAnimationFrame(() => {
-        raf = 0;
-        const p = lastPointerRef.current;
-        if (!p) return;
-        // Resolve the menu row under the pointer (no `menuRef` dependency — it's
-        // unset when the menu renders standalone). Scope by `data-filter-input-menu`
-        // so a pointer resting outside this menu is ignored. Drive the highlight
-        // directly via `onHighlightChange` rather than replaying a `pointermove`:
-        // zag ignores a pointer event whose position is unchanged (its own guard
-        // against the mouse stealing the keyboard highlight), which is exactly the
-        // same-coordinate replay a scroll would produce.
-        const item = document.elementFromPoint(p.x, p.y)?.closest('[role="menuitem"]');
-        if (!item?.closest('[data-filter-input-menu="true"]')) return;
-        const value = item.getAttribute('data-value');
-        if (value) onHighlightChange({ highlightedValue: value });
-      });
-    };
-    window.addEventListener('pointermove', trackPointer, true);
-    window.addEventListener('keydown', trackKeyboard, true);
-    window.addEventListener('scroll', onScroll, true);
-    return () => {
-      window.removeEventListener('pointermove', trackPointer, true);
-      window.removeEventListener('keydown', trackKeyboard, true);
-      window.removeEventListener('scroll', onScroll, true);
-      if (raf) cancelAnimationFrame(raf);
-    };
-  }, [menuVisible, onHighlightChange]);
+  // Keep the highlight (and popover) on the row under the cursor when the list
+  // scrolls beneath a stationary pointer.
+  useMenuScrollHighlightSync(menuVisible, onHighlightChange);
 
   return (
     <>

@@ -168,9 +168,8 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       {...(building && { 'data-building': '' })}
       {...props}
     >
-      {/* Dark tooltip on the attribute segment mirrors the field-menu popover's
-          description (recall). Disabled while that segment is inline-editing so
-          the input isn't obscured; absent when the field has no description. */}
+      {/* Dark tooltip mirrors the field-menu popover's description; disabled while
+          the attribute segment is inline-editing so the input isn't obscured. */}
       {attributeDescription ? (
         <Tooltip disabled={baseActiveSegment === SEGMENT_VARIANT.attribute}>
           <TooltipTrigger asChild>{attributeSegment}</TooltipTrigger>

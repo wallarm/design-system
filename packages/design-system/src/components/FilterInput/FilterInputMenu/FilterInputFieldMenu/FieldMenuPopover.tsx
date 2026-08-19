@@ -13,13 +13,9 @@ export interface FieldMenuPopoverProps {
   description: string;
   /** Optional monospace example block (wildcards, path patterns, ranges, IDs). */
   example?: string;
-  /** Live rect of the highlighted `_dd-item` the popover aligns to. */
+  /** Live rect of the highlighted row the popover aligns to. */
   getAnchorRect: () => DOMRect | null;
-  /**
-   * Highlighted item id. floating-ui's autoUpdate only listens for resize/scroll,
-   * not for a lateral anchor swap as the highlight moves between rows, so a change
-   * here pokes a reposition (mirrors the menu's own `useFloatingRecomputeOn`).
-   */
+  /** Highlighted id; a change pokes a reposition as the anchor swaps between rows. */
   repositionKey: string;
 }
 
@@ -34,10 +30,8 @@ const POPOVER_POSITIONING: ArkUiPopover.RootProps['positioning'] = {
 
 /**
  * Discovery popover for the field-selection menu: on hover or keyboard focus of a
- * filter attribute, it surfaces that attribute's title, description, and optional
- * example block (AS-1060). Fully controlled by `open` + `getAnchorRect` — it has no
- * trigger of its own and never takes focus, so keyboard navigation stays in the
- * menu. Group headers are not navigable items, so they never drive it open.
+ * filter attribute, surfaces its title, description, and optional example (AS-1060).
+ * Fully controlled by `open` + `getAnchorRect`; no trigger, never takes focus.
  */
 export const FieldMenuPopover: FC<FieldMenuPopoverProps> = ({
   open,
@@ -49,11 +43,9 @@ export const FieldMenuPopover: FC<FieldMenuPopoverProps> = ({
 }) => {
   useFloatingRecomputeOn(repositionKey, open);
 
-  // floating-ui only tracks scroll through the anchor's DOM ancestors, but our
-  // anchor is a virtual rect (getAnchorRect), so scrolling the field menu's own
-  // list never reaches it and the popover drifts away from the row. Poke a
-  // reposition on any scroll — the capture phase catches the menu's inner,
-  // non-bubbling scroll — rAF-throttled to one recompute per frame.
+  // A virtual anchor (getAnchorRect) isn't tracked by floating-ui's ancestor
+  // scroll, so poke a reposition on any scroll (capture catches the menu's inner,
+  // non-bubbling scroll), rAF-throttled.
   useEffect(() => {
     if (!open) return;
     let raf = 0;
@@ -75,8 +67,7 @@ export const FieldMenuPopover: FC<FieldMenuPopoverProps> = ({
     <ArkUiPopover.Root
       open={open}
       positioning={{ ...POPOVER_POSITIONING, getAnchorRect }}
-      // Passive panel: never grab or trap focus (keyboard nav lives in the menu),
-      // and never self-close — visibility is owned entirely by `open`.
+      // Passive panel: never take focus or self-close — visibility is owned by `open`.
       autoFocus={false}
       closeOnInteractOutside={false}
       closeOnEscape={false}
@@ -87,8 +78,7 @@ export const FieldMenuPopover: FC<FieldMenuPopoverProps> = ({
       <PopoverContent
         minWidth='240px'
         maxWidth='340px'
-        // Presentational only: pointer-events-none keeps a stray hover over the
-        // panel from re-triggering menu highlight logic or trapping the pointer.
+        // pointer-events-none: a stray hover over the panel must not affect the menu.
         className='gap-6 pointer-events-none'
         data-testid='field-menu-popover'
       >
