@@ -103,6 +103,41 @@ export const WithFieldGroups: Story = {
 };
 
 /**
+ * A committed chip whose field carries a description exposes that description in
+ * a dark tooltip when the attribute (first) segment is hovered. The operator and
+ * value segments keep their own click-to-edit behavior (AS-1060).
+ */
+const describedChipFields: FieldMetadata[] = [
+  {
+    name: 'status_code',
+    label: 'Status code',
+    type: 'string',
+    description: 'Filter by the HTTP response status code returned to the attacker.',
+    example: '200, 4XX, 5XX',
+  },
+];
+
+export const WithDescribedChip: Story = {
+  render: () => {
+    const [expression, setExpression] = useState<ExprNode | null>({
+      type: 'condition',
+      field: 'status_code',
+      operator: '=',
+      value: '200',
+    });
+
+    return (
+      <FilterInput
+        fields={describedChipFields}
+        value={expression}
+        onChange={setExpression}
+        placeholder='Type to filter...'
+      />
+    );
+  },
+};
+
+/**
  * Error state - empty field.
  */
 export const ErrorEmpty: Story = {
