@@ -1,4 +1,4 @@
-import { type FC, type RefObject, useCallback, useMemo } from 'react';
+import { type FC, type RefObject, useCallback, useMemo, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
@@ -112,9 +112,18 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
     return data?.type === 'field' ? data.field : undefined;
   }, [flatItems, highlightedValue]);
 
+  // Read the highlighted id through a ref so `getAnchorRect` keeps a stable
+  // identity: zag captures the anchor-rect getter once when the popover opens and
+  // reuses it across repositions. A getter that closed over `highlightedValue`
+  // directly would freeze on the row that was highlighted at open time, leaving
+  // the popover behind when the highlight moves to another described row while it
+  // stays open. The ref always resolves the current row; the reposition itself is
+  // poked by `repositionKey` changing (see FieldMenuPopover).
+  const highlightedValueRef = useRef(highlightedValue);
+  highlightedValueRef.current = highlightedValue;
   const getPopoverAnchorRect = useCallback(
-    () => getItemElement(highlightedValue)?.getBoundingClientRect() ?? null,
-    [getItemElement, highlightedValue],
+    () => getItemElement(highlightedValueRef.current)?.getBoundingClientRect() ?? null,
+    [getItemElement],
   );
 
   const popoverOpen = open && hasResults && !!highlightedField?.description;

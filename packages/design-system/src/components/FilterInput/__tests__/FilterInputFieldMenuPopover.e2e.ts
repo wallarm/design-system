@@ -58,6 +58,32 @@ test.describe('Component: FilterInput field-menu description popover (AS-1060)',
     expect(popoverBox!.x).toBeGreaterThanOrEqual(menuBox!.x + menuBox!.width - 1);
   });
 
+  test('realigns to the newly highlighted row when moving between described fields', async ({
+    page,
+  }) => {
+    await gotoFieldMenu(page, 'With Descriptions');
+    const popover = page.getByTestId('field-menu-popover');
+
+    // Open on the first described row, then move to another without leaving the
+    // menu — the popover stays mounted, so its anchor must follow the new row
+    // rather than freezing on the row it opened against.
+    await page.getByRole('menuitem', { name: /^Attack type$/ }).hover();
+    await expect(popover).toBeVisible();
+
+    const parameter = page.getByRole('menuitem', { name: /^Parameter$/ });
+    await parameter.hover();
+    await expect(popover).toContainText('Filter by the request parameter');
+
+    const [itemBox, popoverBox] = await Promise.all([
+      parameter.boundingBox(),
+      popover.boundingBox(),
+    ]);
+    expect(itemBox).not.toBeNull();
+    expect(popoverBox).not.toBeNull();
+    // right-start aligns the popover's top to the highlighted row's top.
+    expect(Math.abs(popoverBox!.y - itemBox!.y)).toBeLessThan(16);
+  });
+
   test('renders the monospace example block for a non-obvious value format', async ({ page }) => {
     await gotoFieldMenu(page, 'With Descriptions');
     await page.getByRole('menuitem', { name: /^Parameter$/ }).hover();
