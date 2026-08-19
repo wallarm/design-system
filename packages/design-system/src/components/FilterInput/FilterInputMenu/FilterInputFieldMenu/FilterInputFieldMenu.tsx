@@ -127,21 +127,24 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
   );
 
   const popoverOpen = open && hasResults && !!highlightedField?.description;
+  const menuVisible = open && hasResults;
 
-  // Re-sync the hover highlight to the row under the cursor when the list scrolls
-  // beneath a stationary pointer (wheel/trackpad). Ark drives the highlight — and
-  // thus the description popover's content and anchor — off `pointermove`, which
-  // a scroll does not emit, so the highlight would otherwise stick to the row that
-  // was under the cursor before the scroll while the popover drifts to that row's
-  // new (often off-menu) position. On each scroll we re-hit-test at the last known
-  // pointer and replay a `pointermove` on the row now there, so Ark re-highlights
-  // it and the popover follows (AS-1060). rAF-throttled. Skipped while the user
-  // is keyboard-navigating so an arrow-key `scrollIntoView` can't be hijacked by
-  // a stationary pointer that happens to rest over the menu.
+  // Re-sync the highlight to the row under the cursor when the list scrolls beneath
+  // a stationary pointer (wheel/trackpad). Ark moves the highlight — and thus the
+  // description popover's content and anchor — off `pointermove`, which a scroll
+  // does not emit, so the highlight would otherwise stick to the row that was under
+  // the cursor before the scroll while the popover drifts to that row's new (often
+  // off-menu) position. On scroll we re-hit-test at the last pointer and drive the
+  // highlight to the row now there via `onHighlightChange` — not a synthetic
+  // `pointermove`, which zag ignores when the position is unchanged (its own guard
+  // against the mouse stealing the keyboard highlight) (AS-1060). rAF-throttled.
+  // Gated on the menu being visible (not just the popover) so the pointer is
+  // tracked before the first scroll; skipped mid-keyboard-nav so an arrow-key
+  // `scrollIntoView` can't be hijacked by a pointer resting over the menu.
   const lastPointerRef = useRef<{ x: number; y: number } | null>(null);
   const keyboardNavRef = useRef(false);
   useEffect(() => {
-    if (!popoverOpen) return;
+    if (!menuVisible) return;
     const trackPointer = (e: PointerEvent) => {
       keyboardNavRef.current = false;
       lastPointerRef.current = { x: e.clientX, y: e.clientY };
@@ -155,19 +158,18 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
       raf = requestAnimationFrame(() => {
         raf = 0;
         const p = lastPointerRef.current;
-        const menuEl = menuRef?.current;
-        if (!p || !menuEl) return;
-        const el = document.elementFromPoint(p.x, p.y);
-        if (!el || !menuEl.contains(el)) return;
-        el.closest('[role="menuitem"]')?.dispatchEvent(
-          new PointerEvent('pointermove', {
-            bubbles: true,
-            clientX: p.x,
-            clientY: p.y,
-            pointerId: 1,
-            pointerType: 'mouse',
-          }),
-        );
+        if (!p) return;
+        // Resolve the menu row under the pointer (no `menuRef` dependency — it's
+        // unset when the menu renders standalone). Scope by `data-filter-input-menu`
+        // so a pointer resting outside this menu is ignored. Drive the highlight
+        // directly via `onHighlightChange` rather than replaying a `pointermove`:
+        // zag ignores a pointer event whose position is unchanged (its own guard
+        // against the mouse stealing the keyboard highlight), which is exactly the
+        // same-coordinate replay a scroll would produce.
+        const item = document.elementFromPoint(p.x, p.y)?.closest('[role="menuitem"]');
+        if (!item?.closest('[data-filter-input-menu="true"]')) return;
+        const value = item.getAttribute('data-value');
+        if (value) onHighlightChange({ highlightedValue: value });
       });
     };
     window.addEventListener('pointermove', trackPointer, true);
@@ -179,7 +181,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
       window.removeEventListener('scroll', onScroll, true);
       if (raf) cancelAnimationFrame(raf);
     };
-  }, [popoverOpen, menuRef]);
+  }, [menuVisible, onHighlightChange]);
 
   return (
     <>

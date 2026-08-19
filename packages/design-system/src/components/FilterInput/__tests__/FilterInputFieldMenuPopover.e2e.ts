@@ -3,6 +3,7 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const fieldMenuStory = createStoryHelper('patterns-filterinput-filterinputfieldmenu', [
   'With Descriptions',
+  'With Scrollable Descriptions',
 ] as const);
 
 const filterInputStory = createStoryHelper('patterns-filterinput-filterinput', [
@@ -107,6 +108,96 @@ test.describe('Component: FilterInput field-menu description popover (AS-1060)',
     await page.getByText('Threat classification').hover();
 
     await expect(page.getByTestId('field-menu-popover')).toBeHidden();
+  });
+
+  test('opens the popover on keyboard focus (arrow navigation)', async ({ page }) => {
+    await gotoFieldMenu(page, 'With Descriptions');
+    const popover = page.getByTestId('field-menu-popover');
+    // Nothing highlighted yet → no popover.
+    await expect(popover).toBeHidden();
+
+    // Arrow-key highlight (not hover) must trigger the popover, per the spec's
+    // "hover AND keyboard focus" requirement.
+    await page.keyboard.press('ArrowDown');
+    await expect(popover).toBeVisible();
+    await expect(popover).toContainText('Attack type');
+  });
+
+  test('follows the row under the cursor when the list scrolls beneath it', async ({ page }) => {
+    await gotoFieldMenu(page, 'With Scrollable Descriptions');
+    const menu = page.locator('[data-slot="filter-input-field-menu"]');
+    const popover = page.getByTestId('field-menu-popover');
+
+    const box = await menu.boundingBox();
+    expect(box).not.toBeNull();
+    const px = box!.x + 40;
+    const py = box!.y + box!.height / 2;
+
+    // Rest a real pointer on a row (records the last-pointer the re-hit-test uses).
+    await page.mouse.move(px, py);
+    await expect(popover).toBeVisible();
+    const before = (await popover.textContent())?.trim();
+
+    const labelUnderCursor = () =>
+      page.evaluate(
+        ({ x, y }) =>
+          document.elementFromPoint(x, y)?.closest('[role="menuitem"]')?.textContent?.trim() ??
+          null,
+        { x: px, y: py },
+      );
+    const rowBefore = await labelUnderCursor();
+
+    // Scroll the list beneath the stationary pointer. Driving the scroll container
+    // directly (a real `scroll` event — what the handler listens for) sidesteps
+    // headless wheel-target quirks while still exercising the re-hit-test path.
+    await page.evaluate(() => {
+      const menuEl = document.querySelector('[data-slot="filter-input-field-menu"]');
+      if (!menuEl) return;
+      const scroller =
+        menuEl.scrollHeight > menuEl.clientHeight
+          ? menuEl
+          : [...menuEl.querySelectorAll('*')].find(el => el.scrollHeight > el.clientHeight + 5);
+      if (!(scroller instanceof HTMLElement)) return;
+      for (let i = 0; i < 4; i++) {
+        scroller.scrollTop += 44;
+        scroller.dispatchEvent(new Event('scroll'));
+      }
+    });
+
+    // The row under the pointer changed → the popover must re-sync to it (content
+    // changes and matches the field now under the cursor).
+    await expect.poll(labelUnderCursor, { timeout: 4000 }).not.toBe(rowBefore);
+    const rowAfter = await labelUnderCursor();
+    expect(rowAfter).not.toBeNull();
+    await expect(popover).toContainText(rowAfter!);
+    expect((await popover.textContent())?.trim()).not.toBe(before);
+  });
+
+  test('keyboard navigation is not hijacked by a resting pointer during scroll', async ({
+    page,
+  }) => {
+    await gotoFieldMenu(page, 'With Scrollable Descriptions');
+    const menu = page.locator('[data-slot="filter-input-field-menu"]');
+    const popover = page.getByTestId('field-menu-popover');
+
+    const box = await menu.boundingBox();
+    expect(box).not.toBeNull();
+    // Park the pointer over an upper row, then drive the highlight down far
+    // enough that the list scrolls (scrollIntoView). The scroll must NOT re-sync
+    // the highlight to the parked pointer — keyboard wins.
+    await page.mouse.move(box!.x + 40, box!.y + 40);
+    await expect(popover).toBeVisible();
+    for (let i = 0; i < 14; i++) await page.keyboard.press('ArrowDown');
+
+    const keyboardHighlighted = await page.evaluate(
+      () =>
+        document
+          .querySelector('[data-slot="filter-input-field-menu"] [data-highlighted]')
+          ?.textContent?.trim() ?? null,
+      undefined,
+    );
+    expect(keyboardHighlighted).not.toBeNull();
+    await expect(popover).toContainText(keyboardHighlighted!);
   });
 });
 

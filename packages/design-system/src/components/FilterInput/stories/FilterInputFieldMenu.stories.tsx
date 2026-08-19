@@ -384,6 +384,27 @@ export const WithDescriptions: Story = {
 };
 
 /**
+ * A described field list long enough to scroll — used to exercise the popover's
+ * scroll-under-cursor re-highlight and the keyboard-nav guard (AS-1060).
+ */
+const manyDescribedFields: FieldMetadata[] = Array.from({ length: 20 }, (_, i) => ({
+  name: `field_${i}`,
+  label: `Field ${i}`,
+  type: 'string',
+  description: `Filter by field ${i}.`,
+}));
+
+export const WithScrollableDescriptions: Story = {
+  args: {
+    fields: manyDescribedFields,
+    open: true,
+    onSelect: () => {
+      // Field selection handler
+    },
+  },
+};
+
+/**
  * FilterInputFieldMenu with both recent and suggestions
  * Shows the full menu with all sections
  */
