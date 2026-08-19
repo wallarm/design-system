@@ -1,4 +1,4 @@
-import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent, Ref } from 'react';
+import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent } from 'react';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import { FilterInputContext } from '../../FilterInputContext/FilterInputContext';
@@ -9,9 +9,6 @@ import { useSizerWidth } from './model/useSizerWidth';
 import { SEGMENT_VARIANT, type SegmentVariant } from './segmentVariant';
 
 export type SegmentProps = HTMLAttributes<HTMLDivElement> & {
-  /** Forwarded to the segment container — lets a Tooltip/Popover trigger anchor
-   *  to it via `asChild` (attribute-segment chip tooltip, AS-1060). */
-  ref?: Ref<HTMLDivElement>;
   variant: SegmentVariant;
   children: string;
   error?: boolean;
@@ -29,7 +26,6 @@ export type SegmentProps = HTMLAttributes<HTMLDivElement> & {
 };
 
 export const Segment: FC<SegmentProps> = ({
-  ref,
   variant,
   children,
   className,
@@ -121,7 +117,6 @@ export const Segment: FC<SegmentProps> = ({
 
   return (
     <div
-      ref={ref}
       className={cn(segmentContainer, className)}
       data-slot={`segment-${variant}`}
       {...(isInteractive && { role: 'button', 'aria-label': `Edit filter ${variant}` })}
