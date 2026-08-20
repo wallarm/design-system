@@ -75,6 +75,51 @@ describe('InlineEdit standalone integration', () => {
   });
 });
 
+describe('InlineEdit action buttons', () => {
+  it('clicking Save commits the value', async () => {
+    const onCommit = vi.fn();
+    render(<Example onCommit={onCommit} />);
+    await userEvent.click(screen.getByTestId('ie--preview'));
+    const input = screen.getByTestId('ie--input') as HTMLInputElement;
+    await userEvent.clear(input);
+    await userEvent.type(input, 'Payments API');
+    await userEvent.click(screen.getByRole('button', { name: 'Save' }));
+    expect(onCommit).toHaveBeenCalledWith('Payments API');
+    expect(screen.getByTestId('ie--preview')).toBeInTheDocument();
+  });
+
+  it('clicking Cancel reverts without committing', async () => {
+    const onCommit = vi.fn();
+    const onRevert = vi.fn();
+    render(<Example onCommit={onCommit} onRevert={onRevert} />);
+    await userEvent.click(screen.getByTestId('ie--preview'));
+    await userEvent.type(screen.getByTestId('ie--input'), 'x');
+    await userEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(onCommit).not.toHaveBeenCalled();
+    expect(onRevert).toHaveBeenCalledWith('Checkout API');
+  });
+
+  it('action buttons are visible only in edit mode', async () => {
+    render(<Example />);
+    expect(screen.queryByRole('button', { name: 'Save' })).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Cancel' })).toBeNull();
+    await userEvent.click(screen.getByTestId('ie--preview'));
+    expect(screen.getByRole('button', { name: 'Save' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cancel' })).toBeInTheDocument();
+  });
+
+  it('Enter on a focused action button does not double-fire submit', async () => {
+    const onCommit = vi.fn();
+    render(<Example onCommit={onCommit} />);
+    await userEvent.click(screen.getByTestId('ie--preview'));
+    screen.getByRole('button', { name: 'Save' }).focus();
+    await userEvent.keyboard('{Enter}');
+    // The button click fires onCommit once; stopPropagation prevents the
+    // control's handleKeyDown from firing submit a second time.
+    expect(onCommit).toHaveBeenCalledTimes(1);
+  });
+});
+
 function deferredBoolean() {
   let resolve!: (ok: boolean) => void;
   const promise = new Promise<boolean>(r => {
