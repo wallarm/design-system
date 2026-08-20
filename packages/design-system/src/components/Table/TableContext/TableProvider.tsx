@@ -293,6 +293,12 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     enableColumnPinning: true, // Always true — auto-pinned columns require it
     enableGrouping: groupingEnabled,
     enableExpanding: expandingEnabled,
+    // Expanded state is consumer-controlled (external `expanded` + `onExpandedChange`),
+    // but we never pass `initialState.expanded`. TanStack's default auto-reset
+    // (`!manualExpanding`) fires on every data change and resets to that missing
+    // initial state — i.e. `{}` — which collapses all groups the moment a
+    // revalidation delivers fresh data. Keep the consumer's state authoritative.
+    ...(expandingEnabled ? { autoResetExpanded: false } : {}),
     ...(expandingEnabled && (renderExpandedRow || subRowGroupingEnabled)
       ? { getRowCanExpand: () => true }
       : {}),
