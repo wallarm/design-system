@@ -378,6 +378,14 @@ export {
 } from './components/Ip';
 export { Kbd, KbdGroup } from './components/Kbd';
 export { Link, type LinkProps } from './components/Link';
+export {
+  List,
+  ListIcon,
+  type ListIconProps,
+  ListItem,
+  type ListItemProps,
+  type ListProps,
+} from './components/List';
 export { Loader, type LoaderProps } from './components/Loader';
 export {
   Logo,
@@ -455,6 +463,14 @@ export {
   ParameterPath,
   type ParameterPathProps,
 } from './components/ParameterPath';
+export {
+  PasswordComplexity,
+  type PasswordComplexityItem,
+  type PasswordComplexityItemId,
+  type PasswordComplexityProps,
+  passwordValidators,
+} from './components/PasswordComplexity';
+export { PasswordInput, type PasswordInputProps } from './components/PasswordInput';
 export { Popover, PopoverContent, PopoverTrigger } from './components/Popover';
 export {
   Progress,
