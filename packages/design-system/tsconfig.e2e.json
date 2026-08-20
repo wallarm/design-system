@@ -11,6 +11,7 @@
     "**/*.e2e.*",
     "src/components/**/*.ts",
     "src/components/**/*.tsx",
+    "src/utils/**/*.ts",
     "playwright.config.ts",
     "playwright.config.docker.ts"
   ]
