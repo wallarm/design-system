@@ -7,14 +7,14 @@ import { linkVariants } from '../Link';
 
 type FieldActionNativeProps = Omit<
   ButtonHTMLAttributes<HTMLButtonElement>,
-  'className' | 'color' | 'disabled' | 'type'
+  'className' | 'color' | 'disabled' | 'style' | 'type'
 >;
 
 export type FieldActionType = NonNullable<VariantProps<typeof linkVariants>['type']>;
 
 export interface FieldActionBaseProps {
   asChild?: boolean;
-  type?: FieldActionType;
+  style?: FieldActionType;
   ref?: Ref<HTMLButtonElement>;
 }
 
@@ -22,7 +22,7 @@ type FieldActionProps = FieldActionNativeProps & FieldActionBaseProps;
 
 export const FieldAction: FC<FieldActionProps> = ({
   asChild = false,
-  type = 'default',
+  style = 'default',
   ...props
 }) => {
   const testId = useTestId('action');
@@ -33,7 +33,7 @@ export const FieldAction: FC<FieldActionProps> = ({
       {...props}
       data-testid={testId}
       className={cn(
-        linkVariants({ type, weight: 'medium', size: 'sm' }),
+        linkVariants({ type: style, weight: 'medium', size: 'sm' }),
         'ml-auto hover:decoration-transparent active:decoration-transparent',
       )}
     />

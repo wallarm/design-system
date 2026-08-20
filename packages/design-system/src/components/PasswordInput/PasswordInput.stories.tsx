@@ -42,7 +42,7 @@ export const WithField: StoryFn<typeof meta> = () => (
     <FieldLabel>
       Password
       <FieldIndicator />
-      <FieldAction type='muted'>Forgot password?</FieldAction>
+      <FieldAction style='muted'>Forgot password?</FieldAction>
     </FieldLabel>
     <PasswordInput placeholder='Enter' />
   </Field>
