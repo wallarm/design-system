@@ -312,6 +312,7 @@ export {
   type HttpMethodName,
   type HttpMethodProps,
 } from './components/HttpMethod';
+export { Indicator, type IndicatorProps } from './components/Indicator';
 export {
   InlineEdit,
   type InlineEditActivationMode,
