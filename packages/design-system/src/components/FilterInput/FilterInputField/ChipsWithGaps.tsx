@@ -50,6 +50,7 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
           <FilterInputChip
             chipId={chip.id}
             attribute={chip.attribute ?? ''}
+            attributeDescription={chip.attributeDescription}
             operator={chip.operator}
             value={chip.value}
             error={chip.error}

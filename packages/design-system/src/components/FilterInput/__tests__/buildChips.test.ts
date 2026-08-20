@@ -54,6 +54,36 @@ describe('buildChips — incomplete chips read as errored (AS-1179)', () => {
   });
 });
 
+describe('buildChips — attribute description for the chip tooltip (AS-1060)', () => {
+  const describedFields: FieldMetadata[] = [
+    {
+      name: 'status_code',
+      label: 'Status code',
+      type: 'string',
+      description: 'Filter by the HTTP response status code returned to the attacker.',
+    },
+    { name: 'host', label: 'Host', type: 'string' },
+  ];
+
+  it('carries the field description onto the chip as attributeDescription', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'status_code', operator: '=', value: '200' },
+    ];
+    expect(findChip(buildChips(conditions, [], describedFields, false))?.attributeDescription).toBe(
+      'Filter by the HTTP response status code returned to the attacker.',
+    );
+  });
+
+  it('omits attributeDescription when the field has no description', () => {
+    const conditions: Condition[] = [
+      { type: 'condition', field: 'host', operator: '=', value: 'api.example.com' },
+    ];
+    expect(
+      findChip(buildChips(conditions, [], describedFields, false))?.attributeDescription,
+    ).toBeUndefined();
+  });
+});
+
 describe('buildChips — loose-match label resolution (AS-882)', () => {
   describe('single-value condition', () => {
     it('resolves label when value is the canonical type (number)', () => {

@@ -34,6 +34,11 @@ export interface FilterInputChipData {
   id: string;
   variant: FilterInputChipVariant;
   attribute?: string;
+  /**
+   * Description shown as a dark tooltip on the chip's attribute segment; absent →
+   * no tooltip. Recall counterpart of the field-menu popover (AS-1060).
+   */
+  attributeDescription?: string;
   operator?: string;
   value?: string;
   error?: ChipErrorSegment;
@@ -132,6 +137,11 @@ export interface FieldMetadata {
   label: string;
   type: FieldType;
   description?: string;
+  /**
+   * Monospace example block shown under the description in the field-menu popover,
+   * for non-obvious value formats (wildcards, ranges, IDs). Multi-line via `\n` (AS-1060).
+   */
+  example?: string;
   operators?: FilterOperator[];
   default?: string | number | boolean;
   values?: FieldValueOption[];
