@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useOf } from '@storybook/addon-docs/blocks';
+import { DocsSection } from './DocsSection';
 import { ISSUE_URL, resolveStoryFileUrl } from './sourceUrl';
 
 const linkClassName = 'text-text-link no-underline hover:underline';
@@ -14,8 +15,7 @@ export const DocsFeedback: FC = () => {
   const storyFileUrl = resolveStoryFileUrl(fileName);
 
   return (
-    <section className='mt-12'>
-      <h2 className='mb-2 border-b border-border-primary pb-2 text-xl'>Feedback</h2>
+    <DocsSection title='Feedback'>
       <p className='text-sm'>
         Help us improve this component by{' '}
         <a className={linkClassName} href={ISSUE_URL} rel='noreferrer' target='_blank'>
@@ -31,7 +31,7 @@ export const DocsFeedback: FC = () => {
         ) : null}
         .
       </p>
-    </section>
+    </DocsSection>
   );
 };
 

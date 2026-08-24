@@ -31,7 +31,8 @@ const preview: Preview = {
     layout: 'centered',
     docs: {
       page: DocsPage,
-      toc: true,
+      // Sections and examples both belong in the table of contents.
+      toc: { headingSelector: 'h2, h3' },
     },
     controls: {
       matchers: {

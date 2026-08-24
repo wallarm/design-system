@@ -9,6 +9,11 @@ import { CheckboxGroup } from './CheckboxGroup';
 import { CheckboxIndicator } from './CheckboxIndicator';
 import { CheckboxLabel } from './CheckboxLabel';
 
+const DESCRIPTION = [
+  'Turns a single option on or off, or collects any number of choices from a set — reach for `Radio` when the choices are exclusive.',
+  'Compose each checkbox from `CheckboxIndicator` and `CheckboxLabel`, and wrap several in `CheckboxGroup` when they answer the same question.',
+].join(' ');
+
 const meta = {
   title: 'Inputs/Checkbox',
   component: Checkbox,
@@ -20,11 +25,17 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;
 
+/** The smallest useful composition — an indicator and a label, unchecked. */
 export const Basic: StoryFn<typeof meta> = () => (
   <Checkbox data-testid='checkbox'>
     <CheckboxIndicator />
@@ -32,6 +43,7 @@ export const Basic: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
+/** The checked state. Pass `checked` to drive it from your own state, or `defaultChecked` to let the checkbox keep track of it. */
 export const Checked: StoryFn<typeof meta> = () => (
   <Checkbox checked>
     <CheckboxIndicator />
@@ -39,6 +51,7 @@ export const Checked: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
+/** `checked='indeterminate'` covers a parent whose children are only partly selected. It is a state you set, never one a click produces — clicking moves it to checked. */
 export const Indeterminate: StoryFn<typeof meta> = () => (
   <Checkbox checked='indeterminate'>
     <CheckboxIndicator />
@@ -46,6 +59,7 @@ export const Indeterminate: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
+/** All three states while disabled, so you can see that the indicator stays readable when the option cannot be changed. */
 export const Disabled: StoryFn<typeof meta> = () => (
   <VStack>
     <Checkbox disabled>
@@ -65,6 +79,7 @@ export const Disabled: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/** `CheckboxDescription` adds a second line under the label, and switches the row to a grid so that text lines up with the label rather than the box. */
 export const WithDescription: StoryFn<typeof meta> = () => (
   <Checkbox>
     <CheckboxIndicator />
@@ -83,6 +98,7 @@ export const WithDescription: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
+/** `CheckboxGroup` ties several checkboxes to one `name` and one array of values, and owns the spacing between them. */
 export const Group: StoryFn<typeof meta> = () => (
   <CheckboxGroup name='framework' defaultValue={['vue']}>
     <Checkbox value='react'>
@@ -107,6 +123,7 @@ export const Group: StoryFn<typeof meta> = () => (
   </CheckboxGroup>
 );
 
+/** `variant='card'` gives every option its own bordered surface. Reach for it when options carry a description or need a larger target — plain rows read better for short, simple lists. */
 export const Card: StoryFn<typeof meta> = () => (
   <CheckboxGroup variant='card' name='framework' defaultValue={['vue', 'angular']}>
     <Checkbox value='react'>
@@ -159,6 +176,7 @@ export const Card: StoryFn<typeof meta> = () => (
   </CheckboxGroup>
 );
 
+/** Wrapped in `Field`, so the label and description above the options come from `FieldLabel` and `FieldDescription`. Shown as plain rows and as cards. */
 export const FormField: StoryFn<typeof meta> = () => (
   <HStack align='start' gap={40}>
     <Field>
