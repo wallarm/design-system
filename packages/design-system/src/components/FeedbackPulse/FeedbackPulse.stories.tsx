@@ -35,8 +35,10 @@ export const Playground: StoryFn<typeof meta> = args => {
   return (
     <div
       style={{
+        // The card is fixed to the viewport corner, not to this box, so the frame only has to
+        // hold the trigger — a full viewport height here leaves the docs page mostly empty.
         display: 'flex',
-        minHeight: '100vh',
+        minHeight: 120,
         alignItems: 'center',
         justifyContent: 'center',
       }}
