@@ -47,6 +47,11 @@ import { DrawerResizeHandle } from './DrawerResizeHandle';
 import { DrawerTitle } from './DrawerTitle';
 import { DrawerTrigger } from './DrawerTrigger';
 
+const DESCRIPTION = [
+  'A side panel for work the reader does alongside the page — its differentiator is that it can run non-modal, so with `modal={false}` they can keep using what is behind it.',
+  'Reach for `Dialog` when the panel is a decision to resolve now, since that is the same panel with the exit closed off.',
+].join(' ');
+
 const meta = {
   title: 'Overlay/Drawer',
   component: Drawer,
@@ -64,8 +69,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'An animated slide-out panel that appears from the right side of the screen. Follows the compound component pattern for flexible composition.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -109,7 +113,10 @@ const ContentPlaceholder = ({
   />
 );
 
-/** Basic uncontrolled drawer */
+/**
+ * Trigger, content, title. The title is what a screen reader announces, so it is never
+ * optional.
+ */
 export const Basic: StoryFn<DrawerProps> = () => {
   return (
     <Drawer data-testid='drawer'>
@@ -130,7 +137,9 @@ export const Basic: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** Minimal example */
+/**
+ * `DrawerFooter` for the actions that commit the work. It stays put while the body scrolls.
+ */
 export const WithFooter: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
@@ -160,7 +169,10 @@ export const WithFooter: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** Header title with a supporting description stacked underneath */
+/**
+ * `DrawerDescription` under the title, wired to `aria-describedby` so it is read with the panel
+ * rather than after it.
+ */
 export const WithDescription: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
@@ -200,7 +212,9 @@ WithDescription.parameters = {
   },
 };
 
-/** With footer left actions */
+/**
+ * A left-aligned secondary action, separated from the committing pair on the right.
+ */
 export const WithFooterLeftActions: StoryFn<DrawerProps> = () => (
   <Drawer>
     <DrawerTrigger asChild>
@@ -245,7 +259,10 @@ WithFooterLeftActions.parameters = {
   },
 };
 
-/** Drawer with different sizes - Small */
+/**
+ * The standard widths. A drawer earns more width than a dialog because the reader is working in
+ * it rather than answering it.
+ */
 export const Sizes: StoryFn<DrawerProps> = () => (
   <HStack gap={8} justify='center'>
     <Drawer width={DRAWER_SIZES.small}>
@@ -295,7 +312,9 @@ export const Sizes: StoryFn<DrawerProps> = () => (
   </HStack>
 );
 
-/** Custom width with percentage */
+/**
+ * Explicit width bounds for content the standard steps do not fit.
+ */
 export const CustomSizes: StoryFn<DrawerProps> = () => {
   return (
     <HStack gap={8} justify='center'>
@@ -338,7 +357,10 @@ export const CustomSizes: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** Resizable drawer */
+/**
+ * `DrawerResizeHandle` lets the reader set the width themselves — the part `Dialog`
+ * deliberately does not export, because a decision does not need resizing.
+ */
 export const Resizable: StoryFn<DrawerProps> = () => {
   return (
     <VStack gap={12}>
@@ -434,7 +456,10 @@ const renderDrawerOverflow = (items: string[]) => (
   </Popover>
 );
 
-/** Resizable drawer with an OverflowList — drag the left edge to reflow tags. */
+/**
+ * Resizing with content that reflows, which is the case worth testing: the panel is only useful
+ * at its new width if what is inside adapts.
+ */
 export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
   const [open, setOpen] = useState(false);
 
@@ -467,7 +492,10 @@ export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** Drawer with scrollable content */
+/**
+ * The body scrolls between a fixed header and footer, so the actions never scroll away from the
+ * work.
+ */
 export const Scrollable: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
@@ -503,7 +531,9 @@ export const Scrollable: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** Controlled drawer with external state */
+/**
+ * Owning `open`, for a panel something outside it opens or closes.
+ */
 export const Controlled: StoryFn<DrawerProps> = () => {
   const [open, setOpen] = useState(false);
 
@@ -540,7 +570,9 @@ export const Controlled: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** No closable on ESC */
+/**
+ * Escape disabled, for a panel holding unsaved work where a reflex keystroke would lose it.
+ */
 export const NoClosableOnEsc: StoryFn<DrawerProps> = () => {
   return (
     <Drawer closeOnEscape={false}>
@@ -561,7 +593,10 @@ export const NoClosableOnEsc: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** Without overlay */
+/**
+ * Without the backdrop, which is how a drawer reads as non-blocking. Pair it with
+ * `modal={false}` if the page behind should also stay usable.
+ */
 export const NoOverlay: StoryFn<DrawerProps> = () => {
   return (
     <Drawer overlay={false}>
@@ -584,7 +619,9 @@ export const NoOverlay: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** Nested drawers with push-back effect */
+/**
+ * A drawer from a drawer: same family, so the outer one steps back and the depth is legible.
+ */
 export const WithNested: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
@@ -687,7 +724,10 @@ export const WithNested: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** A Dialog opened from a Drawer must NOT push the drawer back — only a nested Drawer does */
+/**
+ * A dialog opened from a drawer — different family, so the drawer stays put rather than
+ * scaling. That separation is what `kind` exists for.
+ */
 export const WithNestedDialog: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
@@ -728,7 +768,9 @@ export const WithNestedDialog: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** Select and DropdownMenu opened inside a nested drawer must render above the nested drawer, not underneath it */
+/**
+ * A `Select` inside a drawer, checking its menu escapes the panel instead of being clipped.
+ */
 export const WithNestedSelect: StoryFn<DrawerProps> = () => {
   const collection = createListCollection({
     items: [
@@ -803,7 +845,9 @@ export const WithNestedSelect: StoryFn<DrawerProps> = () => {
   );
 };
 
-/** With tabs */
+/**
+ * Tabs inside a drawer, which suits a panel with several facets of one subject.
+ */
 export const WithTabs: StoryFn<DrawerProps> = () => {
   const [activeTab, setActiveTab] = useState('tab1');
 

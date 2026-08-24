@@ -50,6 +50,11 @@ import { DialogHeader } from './DialogHeader';
 import { DialogTitle } from './DialogTitle';
 import { DialogTrigger } from './DialogTrigger';
 
+const DESCRIPTION = [
+  'A panel the reader has to resolve before carrying on — reach for `Drawer` when they should be able to keep it open and keep working, and `Popover` when the content is a detail rather than a task.',
+  "It is `Drawer` with `kind='dialog'`, which shares the panel but keeps the two families' nesting separate: a dialog only steps back for another dialog.",
+].join(' ');
+
 const meta = {
   title: 'Overlay/Dialog',
   component: Dialog,
@@ -68,8 +73,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'An animated modal dialog that appears from the right side of the screen. Built on top of Drawer without resize functionality.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -107,7 +111,10 @@ const ContentPlaceholder = ({ height }: { fillHeight?: boolean; height?: number 
   />
 );
 
-/** Basic uncontrolled dialog */
+/**
+ * The minimum: trigger, content, and a title. Every dialog needs a title — it is what a screen
+ * reader announces on open.
+ */
 export const Basic: StoryFn<DialogProps> = () => {
   return (
     <Dialog data-testid='dialog'>
@@ -128,7 +135,10 @@ export const Basic: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Minimal example */
+/**
+ * `DialogFooter` holds the decision. Put the confirming action last, since that is where the
+ * eye finishes.
+ */
 export const WithFooter: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
@@ -160,7 +170,10 @@ export const WithFooter: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Header title with a supporting description stacked underneath */
+/**
+ * `DialogDescription` states the consequence, which is what turns a confirmation from a speed
+ * bump into a decision.
+ */
 export const WithDescription: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
@@ -202,7 +215,10 @@ WithDescription.parameters = {
   },
 };
 
-/** With footer left actions */
+/**
+ * A left-aligned action for the escape route — cancel, learn more — kept away from the
+ * confirming pair on the right.
+ */
 export const WithFooterLeftActions: StoryFn<DialogProps> = () => (
   <Dialog>
     <DialogTrigger asChild>
@@ -247,7 +263,10 @@ WithFooterLeftActions.parameters = {
   },
 };
 
-/** Dialog with different sizes - Small */
+/**
+ * The standard widths. Pick by the content, not the importance: a wide dialog for a short
+ * question reads as a mistake.
+ */
 export const Sizes: StoryFn<DialogProps> = () => (
   <HStack gap={8} justify='center'>
     <Dialog width={DIALOG_SIZES.small}>
@@ -297,7 +316,9 @@ export const Sizes: StoryFn<DialogProps> = () => (
   </HStack>
 );
 
-/** Custom width with percentage */
+/**
+ * Explicit `width`, `minWidth` and `maxWidth` for content the standard steps do not fit.
+ */
 export const CustomSizes: StoryFn<DialogProps> = () => {
   return (
     <HStack gap={8} justify='center'>
@@ -340,7 +361,10 @@ export const CustomSizes: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Dialog with scrollable content */
+/**
+ * The body scrolls while header and footer stay put, so the decision never scrolls out of
+ * reach.
+ */
 export const Scrollable: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
@@ -376,7 +400,10 @@ export const Scrollable: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Input sits flush against the body's top/bottom edges - its focus ring must render fully, not clip against the scroll viewport */
+/**
+ * A field against the panel edge, which is where focus rings and shadows get clipped if the
+ * padding is wrong.
+ */
 export const WithInputAtEdge: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
@@ -408,7 +435,10 @@ export const WithInputAtEdge: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Scrollable variant of WithInputAtEdge - the input sits at the very bottom of a long, scrolled body */
+/**
+ * The same, with scrolling — the case where a focus ring can be cut by the scroll container
+ * rather than the panel.
+ */
 export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
@@ -446,7 +476,10 @@ export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
   );
 };
 
-/** A Drawer opened from a Dialog must NOT push the dialog back — only a nested Dialog does */
+/**
+ * A drawer opened from a dialog. Different families, so neither pushes the other back; they
+ * stack.
+ */
 export const WithNestedDrawer: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
@@ -488,7 +521,10 @@ export const WithNestedDrawer: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Select and DropdownMenu opened inside a nested dialog must render above the nested dialog, not underneath it */
+/**
+ * A `Select` inside a dialog, checking that its menu escapes the panel rather than being
+ * clipped by it.
+ */
 export const WithNestedSelect: StoryFn<DialogProps> = () => {
   const collection = createListCollection({
     items: [
@@ -563,7 +599,9 @@ export const WithNestedSelect: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Calendar opened inside a nested dialog must render above the nested dialog, not underneath it */
+/**
+ * A `Calendar` inside a dialog, the same check for a popover that is taller than the panel.
+ */
 export const WithNestedCalendar: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
@@ -614,7 +652,10 @@ export const WithNestedCalendar: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Controlled dialog with external state */
+/**
+ * Owning `open`, which is what you need when something outside the dialog decides it should
+ * close.
+ */
 export const Controlled: StoryFn<DialogProps> = () => {
   const [open, setOpen] = useState(false);
 
@@ -651,7 +692,10 @@ export const Controlled: StoryFn<DialogProps> = () => {
   );
 };
 
-/** No closable on ESC */
+/**
+ * Escape disabled, for a decision that must not be dismissed by reflex. Use it sparingly — it
+ * takes away the exit readers expect.
+ */
 export const NoClosableOnEsc: StoryFn<DialogProps> = () => {
   return (
     <Dialog closeOnEscape={false}>
@@ -672,7 +716,10 @@ export const NoClosableOnEsc: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Without overlay */
+/**
+ * Without the backdrop. The panel stops reading as blocking, which is usually the wrong signal
+ * for a dialog.
+ */
 export const NoOverlay: StoryFn<DialogProps> = () => {
   return (
     <VStack gap={12}>
@@ -729,7 +776,10 @@ export const NoOverlay: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Nested dialogs with push-back effect */
+/**
+ * A dialog inside a dialog: the outer one steps back so the depth is visible. Two is the most a
+ * reader can follow.
+ */
 export const WithNested: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
@@ -830,7 +880,10 @@ export const WithNested: StoryFn<DialogProps> = () => {
   );
 };
 
-/** With tabs */
+/**
+ * Tabs inside a dialog, for a task with a couple of facets — not as a way to fit a whole form
+ * into one panel.
+ */
 export const WithTabs: StoryFn<DialogProps> = () => {
   const [activeTab, setActiveTab] = useState('tab1');
 

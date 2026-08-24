@@ -25,8 +25,8 @@
 
 ## Snapshot
 
-- **26 written to the standard · 43 with prose to level · 26 untouched**
-- **The Actions, Inputs, Inputs Date and Typography folders are complete** — 4, 14, 4 and 4 pages, every story carrying a sentence., across 95 story pages.
+- **33 written to the standard · 39 with prose to level · 23 untouched**
+- **The Actions, Inputs, Inputs Date, Typography and Overlay folders are complete** — 4, 14, 4, 4 and 7 pages, every story carrying a sentence., across 95 story pages.
 - Levelling a 🟡 is usually cutting, not filling. Slider reads as a dense developer paragraph about analytics attributes and ref forwarding; Heading runs four paragraphs of type theory. Both are good writing on the wrong page.
 - The drift runs upside-down. Niche components arrived documented while the ones everyone opens daily — `Button`, `Input`, `Select`, `Switch`, `Radio`, `Tag`, `Badge`, `Tabs`, `Tooltip` — arrived bare. Prioritise by daily traffic, not by how interesting the component is.
 - The **Stories** and **With a sentence** columns are the quickest way to spot a half-done page: equal numbers mean every example is covered.
@@ -103,13 +103,13 @@
 | ☐ | Navigation/Tabs | 11 | 0 | `src/components/Tabs/Tabs.stories.tsx` |
 | 🟡 | Navigation/Tree | 6 | 0 | `src/components/Tree/Tree.stories.tsx` |
 | 🟡 | Navigation/TreeView | 8 | 3 | `src/components/TreeView/TreeView.stories.tsx` |
-| 🟡 | Overlay/Dialog | 17 | 18 | `src/components/Dialog/Dialog.stories.tsx` |
-| 🟡 | Overlay/Drawer | 16 | 17 | `src/components/Drawer/Drawer.stories.tsx` |
-| ☐ | Overlay/FeedbackPulse | 2 | 0 | `src/components/FeedbackPulse/FeedbackPulse.stories.tsx` |
-| 🟡 | Overlay/OverflowTooltip | 7 | 0 | `src/components/OverflowTooltip/OverflowTooltip.stories.tsx` |
-| ☐ | Overlay/Popover | 4 | 0 | `src/components/Popover/Popover.stories.tsx` |
-| ☐ | Overlay/Tooltip | 4 | 0 | `src/components/Tooltip/Tooltip.stories.tsx` |
-| 🟡 | Overlay/Tour | 5 | 0 | `src/components/Tour/Tour.stories.tsx` |
+| ✅ | Overlay/Dialog | 17 | 17 | `src/components/Dialog/Dialog.stories.tsx` |
+| ✅ | Overlay/Drawer | 16 | 16 | `src/components/Drawer/Drawer.stories.tsx` |
+| ✅ | Overlay/FeedbackPulse | 2 | 2 | `src/components/FeedbackPulse/FeedbackPulse.stories.tsx` |
+| ✅ | Overlay/OverflowTooltip | 7 | 7 | `src/components/OverflowTooltip/OverflowTooltip.stories.tsx` |
+| ✅ | Overlay/Popover | 4 | 4 | `src/components/Popover/Popover.stories.tsx` |
+| ✅ | Overlay/Tooltip | 4 | 4 | `src/components/Tooltip/Tooltip.stories.tsx` |
+| ✅ | Overlay/Tour | 5 | 5 | `src/components/Tour/Tour.stories.tsx` |
 | 🟡 | Pages/EmptyState | 4 | 0 | `src/components/EmptyState/EmptyState.stories.tsx` |
 | 🟡 | Pages/UtilityPage | 4 | 0 | `src/components/UtilityPage/UtilityPage.stories.tsx` |
 | 🟡 | Patterns/FilterInput/Composition | 4 | 4 | `src/components/FilterInput/stories/FilterInputComposition.stories.tsx` |

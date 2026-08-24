@@ -251,6 +251,42 @@ One `###` heading per finding, newest last, with these lines:
   `Sizes` story, which should be removed once the gap is closed.
 - **Status** — Open.
 
+### Dialog's description claimed a position it does not have
+
+- **What** — Dialog's Storybook description said it "appears from the right side
+  of the screen" and is "Drawer without resize functionality". The position claim
+  is true of both, and the resize claim is the wrong difference: `kind` changes
+  nesting behaviour, not resizing.
+- **Evidence** — `Dialog.tsx` renders `<Drawer kind='dialog'>`; `DrawerPositioner`
+  is `fixed` on all four edges for both; and `kind` is consumed only by
+  `DrawerNestingContext` for the same-kind push-back. `DrawerResizeHandle` is a
+  separately exported part that Dialog simply does not re-export.
+- **Why it matters** — The two components are the same panel, and the real
+  difference is which one can run non-modal and be resized. A reader choosing
+  between them from the old description would have learned nothing useful.
+- **Suggested action** — None in the docs; already corrected. Worth deciding
+  whether `Dialog` should exist as a separate entry at all, or be documented as a
+  configuration of `Drawer`.
+- **Found while** — documenting the overlay family.
+- **Status** — Closed — the docs now describe the real difference.
+
+### Tour's stories carry documentation prose inside the canvas
+
+- **What** — Several Tour stories render a paragraph of explanatory copy and a
+  keyboard-shortcut legend inside the story frame, duplicating what the page
+  description now says.
+- **Evidence** — `Tour.stories.tsx` around the `Overview` story: a secondary
+  `Text` block restating the component's purpose, plus `Kbd` rows listing arrow,
+  Escape and Tab behaviour.
+- **Why it matters** — It is documentation rendered as though it were part of the
+  component, which is the confusion the annotation style exists to prevent. It
+  also now says the same thing twice on one page.
+- **Suggested action** — Move the keyboard legend into the story sentence or the
+  description and drop the paragraph. Left alone here because removing it changes
+  what the story renders.
+- **Found while** — documenting `Tour`.
+- **Status** — Open.
+
 ## Known limitations we chose to live with
 
 Not findings — decisions worth remembering so they are not rediscovered.

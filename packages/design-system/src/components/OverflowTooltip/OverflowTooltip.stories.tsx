@@ -7,6 +7,11 @@ import {
   OverflowTooltipTrigger,
 } from './index';
 
+const DESCRIPTION = [
+  'Shows the full value only when it is actually truncated, so a reader who can already see the text is not given a tooltip that repeats it.',
+  'It finds the truncating element itself, so wrap the content rather than pointing it at a node.',
+].join(' ');
+
 const meta = {
   title: 'Overlay/OverflowTooltip',
   component: OverflowTooltip,
@@ -15,9 +20,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Compound component that automatically detects overflow in elements with truncate or line-clamp classes. ' +
-          'No need to manually specify which element to monitor - it finds them automatically!',
+        component: DESCRIPTION,
       },
     },
   },
@@ -25,6 +28,10 @@ const meta = {
 
 export default meta;
 
+/**
+ * A single truncated line. The tooltip appears only when the text is cut — resize the frame and
+ * it stops offering one.
+ */
 export const AutoDetection: StoryFn<OverflowTooltipProps> = () => {
   return (
     <div className='font-sans flex flex-col gap-16 w-300'>
@@ -63,6 +70,9 @@ export const AutoDetection: StoryFn<OverflowTooltipProps> = () => {
   );
 };
 
+/**
+ * The same with `line-clamp`, where truncation happens at the block rather than the line.
+ */
 export const MultiLineAutoDetection: StoryFn<OverflowTooltipProps> = () => {
   const longText =
     'This is a very long text that demonstrates multi-line truncation. It keeps going and going to show how the component handles text that exceeds multiple lines. The tooltip will appear when you hover over the truncated content. And it continues even more to ensure we have enough content for demonstration purposes.';
@@ -102,6 +112,10 @@ export const MultiLineAutoDetection: StoryFn<OverflowTooltipProps> = () => {
   );
 };
 
+/**
+ * The truncating element is somewhere inside the children, which is the usual case — it is
+ * found rather than declared.
+ */
 export const NestedElements: StoryFn<OverflowTooltipProps> = () => {
   return (
     <div className='font-sans flex flex-col gap-16 w-300'>
@@ -154,6 +168,10 @@ export const NestedElements: StoryFn<OverflowTooltipProps> = () => {
   );
 };
 
+/**
+ * Overriding the content, for when the full value needs formatting the truncated one does not
+ * have.
+ */
 export const CustomTooltipContent: StoryFn<OverflowTooltipProps> = () => {
   return (
     <div className='font-sans flex flex-col gap-16 w-300'>
@@ -205,6 +223,10 @@ export const CustomTooltipContent: StoryFn<OverflowTooltipProps> = () => {
   );
 };
 
+/**
+ * Forcing it on regardless of truncation. Reach for a plain `Tooltip` instead if the answer is
+ * always yes — this prop exists for the case that switches.
+ */
 export const ForceTooltip: StoryFn<OverflowTooltipProps> = () => {
   return (
     <div className='font-sans flex flex-col gap-16 w-300'>
@@ -241,6 +263,9 @@ export const ForceTooltip: StoryFn<OverflowTooltipProps> = () => {
   );
 };
 
+/**
+ * Placement around the trigger. In a table, keep it off the side the reader is scanning.
+ */
 export const DifferentSides: StoryFn<OverflowTooltipProps> = () => {
   const text = 'This is a text that will be truncated and show tooltips on different sides';
 
@@ -289,6 +314,10 @@ export const DifferentSides: StoryFn<OverflowTooltipProps> = () => {
   );
 };
 
+/**
+ * Content that changes after mount, checking the measurement is re-taken rather than cached
+ * from first render.
+ */
 export const DynamicContent: StoryFn<OverflowTooltipProps> = () => {
   const [text, setText] = useState('Click the button to change this text');
 

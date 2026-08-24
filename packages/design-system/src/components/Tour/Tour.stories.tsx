@@ -14,6 +14,11 @@ import { Tour } from './Tour';
 import type { TourStepDetails } from './types';
 import { useTour } from './useTour';
 
+const DESCRIPTION = [
+  'A guided walk through the interface, for a feature the reader would not find on their own — configured with `useTour({ steps })` and one rendered `Tour`.',
+  "It owns how a step looks, not when the tour runs: deciding who sees it and how often is the application's job.",
+].join(' ');
+
 const meta = {
   title: 'Overlay/Tour',
   component: Tour,
@@ -21,8 +26,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Step-by-step guided experience that highlights interface elements with contextual popovers to help users discover new features or navigate unfamiliar workflows. Built on top of Ark UI Tour with custom styling.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -30,6 +34,9 @@ const meta = {
 
 export default meta;
 
+/**
+ * A full tour end to end. Keep it short — every step is one the reader did not choose to take.
+ */
 export const Overview: StoryFn<typeof meta> = () => {
   const firstRef = useRef<HTMLButtonElement>(null);
   const secondRef = useRef<HTMLButtonElement>(null);
@@ -190,6 +197,10 @@ const PLACEMENTS = [
   'bottom-end',
 ] as const;
 
+/**
+ * Where a step sits relative to its target. Choose the side that leaves the target visible,
+ * since the target is the point.
+ */
 export const Placement: StoryFn<typeof meta> = () => {
   const topStartRef = useRef<HTMLButtonElement>(null);
   const topRef = useRef<HTMLButtonElement>(null);
@@ -263,6 +274,10 @@ export const Placement: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * A beacon the reader opens themselves, which turns the tour from an interruption into an
+ * offer.
+ */
 export const BeaconTriggered: StoryFn<typeof meta> = () => {
   const targetRef = useRef<HTMLButtonElement>(null);
 
@@ -302,6 +317,10 @@ export const BeaconTriggered: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * A step that waits for the reader to act before advancing, for teaching by doing rather than
+ * by reading.
+ */
 export const WaitForInteraction: StoryFn<typeof meta> = () => {
   const firstRef = useRef<HTMLButtonElement>(null);
   const secondRef = useRef<HTMLButtonElement>(null);
@@ -378,6 +397,10 @@ export const WaitForInteraction: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The same, gated on input rather than a click — for a step where the reader has to type
+ * something real to continue.
+ */
 export const WaitForInput: StoryFn<typeof meta> = () => {
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
