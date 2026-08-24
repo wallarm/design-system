@@ -332,3 +332,22 @@ Not findings — decisions worth remembering so they are not rediscovered.
   colours in dark mode. Making the page itself dark would mean overriding
   Storybook's entire docs stylesheet, which is out of proportion to the benefit.
   Carbon's own documentation behaves the same way.
+
+### EmptyState: the flagship example demonstrates the wrong actions for its type
+
+- **What** — The `CollectionEmpty` story pairs the `collection-empty` type with
+  "Reset filters" and "Refresh" buttons, which are `no-results` actions, and its
+  copy is placeholder text ("Title text goes here").
+- **Evidence** — `packages/design-system/src/components/EmptyState/EmptyState.stories.tsx:64`.
+  Our own usage guide, plus Carbon, EUI and Geist, all split the types by *why*
+  the region is empty: a first-use or empty collection gets a create action, a
+  filtered-to-nothing view gets a clear-the-filter action.
+- **Why it matters** — It is the first example on the page and the one people
+  copy, so the canonical snippet teaches the one pairing the guidance forbids.
+  The placeholder title also means the page never shows the invitation-style
+  wording the copy rules ask for.
+- **Suggested action** — Give the story a real first-use scenario — a verb-led
+  title and a primary "Create…" button with an optional secondary — and leave
+  filter-clearing to `NoResults`.
+- **Found while** — documenting `EmptyState`.
+- **Status** — Open.

@@ -15,6 +15,11 @@ import { EmptyStateLink } from './EmptyStateLink';
 import { EmptyStateMessage } from './EmptyStateMessage';
 import { EmptyStateTitle } from './EmptyStateTitle';
 
+const DESCRIPTION = [
+  'Says what an empty region is missing and what to do next — reach for `Skeleton` or `Loader` while the data is still loading, and an `Alert` or an error page when the page failed rather than came back empty.',
+  '`type` follows why the region is empty: `collection-empty` for a first-use or genuinely empty collection, where a create button belongs; `no-results` for a search or filter that matched nothing, where the only useful action is clearing it.',
+].join(' ');
+
 const meta = {
   title: 'Pages/EmptyState',
   component: EmptyState,
@@ -30,11 +35,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'EmptyState communicates that a space has no content — whether because a collection is empty, ' +
-          'a search returned no matches, or a filter is too narrow. ' +
-          'Use compound components: EmptyStateIllustration, EmptyStateMessage, EmptyStateTitle, ' +
-          'EmptyStateDescription, EmptyStateActions, EmptyStateLink.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -54,6 +55,7 @@ const meta = {
 
 export default meta;
 
+/** The full form, 256–560px wide: illustration, title, description, actions, and a learn-more `EmptyStateLink`. Titles read as an invitation rather than an accusation — 'Explore your APIs', not 'You have no APIs'. */
 export const CollectionEmpty: StoryFn<EmptyStateProps> = args => (
   <EmptyState {...args}>
     <EmptyStateIllustration>
@@ -80,6 +82,7 @@ CollectionEmpty.args = {
   type: 'collection-empty',
 };
 
+/** The compact 240px form for a search or filter that matched nothing — its action clears or widens the query, and never offers to create something instead. */
 export const NoResults: StoryFn<EmptyStateProps> = args => (
   <EmptyState {...args}>
     <EmptyStateIllustration>
@@ -100,6 +103,7 @@ NoResults.args = {
   type: 'no-results',
 };
 
+/** Title and description alone. The illustration is decorative, so drop it wherever room is short: the message has to stand on its own anyway. */
 export const Minimal: StoryFn<EmptyStateProps> = args => (
   <EmptyState {...args}>
     <EmptyStateMessage>
@@ -111,6 +115,7 @@ export const Minimal: StoryFn<EmptyStateProps> = args => (
 
 const emptyCollection = createListCollection({ items: [] });
 
+/** The compact form in its real homes — a chart card with no data, and a `Select` whose option list came back empty. An empty inside a container stays action-light however it got that way. */
 export const NoResultsExamples: StoryFn<EmptyStateProps> = () => (
   <HStack gap={32} align='start'>
     {/* In a chart card */}

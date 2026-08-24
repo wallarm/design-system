@@ -108,7 +108,7 @@
 | ✅ | Overlay/Popover | 4 | 4 | `components/Popover/Popover.stories.tsx` |
 | ✅ | Overlay/Tooltip | 4 | 4 | `components/Tooltip/Tooltip.stories.tsx` |
 | ✅ | Overlay/Tour | 5 | 5 | `components/Tour/Tour.stories.tsx` |
-| 🟡 | Pages/EmptyState | 4 | 0 | `components/EmptyState/EmptyState.stories.tsx` |
+| ✅ | Pages/EmptyState | 4 | 4 | `components/EmptyState/EmptyState.stories.tsx` |
 | 🟡 | Pages/UtilityPage | 4 | 0 | `components/UtilityPage/UtilityPage.stories.tsx` |
 | 🟡 | Patterns/FilterInput/Composition | 4 | 4 | `components/FilterInput/stories/FilterInputComposition.stories.tsx` |
 | 🟡 | Patterns/FilterInput/FilterInput | 17 | 13 | `components/FilterInput/stories/FilterInput.stories.tsx` |
