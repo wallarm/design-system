@@ -2,7 +2,6 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CalendarDate, CalendarDateTime } from '../../index';
 import { DateFormatProvider } from '../DateFormatProvider';
 import { HStack, VStack } from '../Stack';
-import { Text } from '../Text';
 import { DateRangeInput } from './DateRangeInput';
 import type { DateRangeInputProps } from './types';
 
@@ -116,15 +115,11 @@ Basic.parameters = { layout: 'padded' };
 export const WithIcon: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Without icon
-      </Text>
+      <span className='sb-annotation'>Without icon</span>
       <DateRangeInput showIcon={false} defaultValue={defaultValue} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        With icon
-      </Text>
+      <span className='sb-annotation'>With icon</span>
       <DateRangeInput defaultValue={defaultValue} />
     </VStack>
   </HStack>
@@ -137,23 +132,17 @@ export const WithIcon: StoryFn<typeof meta> = () => (
 export const States: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Default
-      </Text>
+      <span className='sb-annotation'>Default</span>
       <DateRangeInput />
       <DateRangeInput defaultValue={sampleRange} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Disabled
-      </Text>
+      <span className='sb-annotation'>Disabled</span>
       <DateRangeInput disabled />
       <DateRangeInput disabled defaultValue={sampleRange} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Error
-      </Text>
+      <span className='sb-annotation'>Error</span>
       <DateRangeInput error />
       <DateRangeInput error defaultValue={sampleRange} />
     </VStack>
@@ -168,41 +157,29 @@ export const Sizes: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={16}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Default (36px)
-        </Text>
+        <span className='sb-annotation'>Default (36px)</span>
         <DateRangeInput size='default' />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Medium (32px)
-        </Text>
+        <span className='sb-annotation'>Medium (32px)</span>
         <DateRangeInput size='medium' />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Small (24px)
-        </Text>
+        <span className='sb-annotation'>Small (24px)</span>
         <DateRangeInput size='small' />
       </VStack>
     </VStack>
     <VStack gap={16}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Default filled
-        </Text>
+        <span className='sb-annotation'>Default filled</span>
         <DateRangeInput size='default' defaultValue={sampleRange} />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Medium filled
-        </Text>
+        <span className='sb-annotation'>Medium filled</span>
         <DateRangeInput size='medium' defaultValue={sampleRange} />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Small filled
-        </Text>
+        <span className='sb-annotation'>Small filled</span>
         <DateRangeInput size='small' defaultValue={sampleRange} />
       </VStack>
     </VStack>
@@ -216,23 +193,17 @@ export const Sizes: StoryFn<typeof meta> = () => (
 export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        Date range
-      </Text>
+      <span className='sb-annotation'>Date range</span>
       <DateRangeInput defaultValue={sampleRange} />
     </VStack>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Date + time range (24h)
-        </Text>
+        <span className='sb-annotation'>Date + time range (24h)</span>
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
       </VStack>
     </DateFormatProvider>
     <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        Without icon
-      </Text>
+      <span className='sb-annotation'>Without icon</span>
       <DateRangeInput showIcon={false} defaultValue={sampleRange} />
     </VStack>
   </VStack>
@@ -246,9 +217,7 @@ export const Granularity: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour format
-        </Text>
+        <span className='sb-annotation'>12-hour format</span>
         <DateRangeInput placeholder='day' granularity='day' />
         <DateRangeInput placeholder='hour' granularity='hour' />
         <DateRangeInput placeholder='minute' granularity='minute' />
@@ -257,9 +226,7 @@ export const Granularity: StoryFn<typeof meta> = () => (
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour format
-        </Text>
+        <span className='sb-annotation'>24-hour format</span>
         <DateRangeInput placeholder='day' granularity='day' />
         <DateRangeInput placeholder='hour' granularity='hour' />
         <DateRangeInput placeholder='minute' granularity='minute' />
@@ -277,9 +244,7 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
   <HStack gap={32}>
     <DateFormatProvider order='day-first'>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          Day first — DD MMM YYYY
-        </Text>
+        <span className='sb-annotation'>Day first — DD MMM YYYY</span>
         <DateRangeInput />
         <DateRangeInput defaultValue={sampleRange} />
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
@@ -287,9 +252,7 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
     </DateFormatProvider>
     <DateFormatProvider order='month-first'>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          Month first — MMM DD YYYY
-        </Text>
+        <span className='sb-annotation'>Month first — MMM DD YYYY</span>
         <DateRangeInput />
         <DateRangeInput defaultValue={sampleRange} />
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
@@ -306,17 +269,13 @@ export const HourCycleByContext: StoryFn<typeof meta> = () => (
   <HStack gap={32}>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour (AM/PM)
-        </Text>
+        <span className='sb-annotation'>12-hour (AM/PM)</span>
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
       </VStack>
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour
-        </Text>
+        <span className='sb-annotation'>24-hour</span>
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
       </VStack>
     </DateFormatProvider>
@@ -330,15 +289,11 @@ HourCycleByContext.parameters = { layout: 'padded' };
 export const ReadOnly: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Date range
-      </Text>
+      <span className='sb-annotation'>Date range</span>
       <DateRangeInput readOnly defaultValue={sampleRange} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Date + time range
-      </Text>
+      <span className='sb-annotation'>Date + time range</span>
       <DateRangeInput readOnly granularity='minute' defaultValue={sampleRangeDateTime} />
     </VStack>
   </HStack>

@@ -89,6 +89,31 @@ Hand; the size and leading are set for a documentation page rather than a canvas
 and the colour sits back at `--color-text-secondary` because Figma's annotation
 pink competes with the specimen it is meant to label.
 
+**Run this scan on every page, before you finish.** Missing a label is the easiest
+mistake to make, because the page looks fine until you compare it with a sibling
+— `TimeInput` and `DateRangeInput` shipped with forty-two old-style labels while
+`DateInput` beside them was converted:
+
+```bash
+grep -n "<Text \|<Heading" <story-file>
+```
+
+Every hit is one of two things, and you have to decide which:
+
+- **A label naming what you're looking at** — "Default", "Disabled", "Brand",
+  a size token beside a specimen. That's an annotation: convert it.
+- **Content inside the demo** — a menu item's description, a paragraph
+  demonstrating inline text, the copy in an empty-state example. Leave it.
+
+**Typography pages are the one exception: leave their labels alone.** On `Text`,
+`Heading`, `Code` and `Pixel` the whole point of the page is judging a typeface,
+and a second typeface sitting beside the specimen makes that impossible — the
+handwriting competes with the very thing the reader is there to look at. Those
+pages keep their own quiet `Text` labels.
+
+Elsewhere, both kinds of hit can appear in one file, so read each one rather than
+converting in bulk.
+
 **The rule that matters: restyle, never author.** Only convert a label a story
 already has. Never add an annotation to a story that doesn't have one — a page
 that looks annotated is not the goal, and inventing labels is how the
@@ -274,6 +299,7 @@ was still valid. Anchor edits on the `export const` line, and verify:
 ```bash
 git show HEAD:<path> | grep -c '^export const'   # must equal the file's count
 grep -c '^const DESCRIPTION' <path>              # must be 1 if the meta references it
+grep -c '<Text \|<Heading' <path>                # every hit judged: label or content?
 ```
 
 Both checks exist because **neither lint nor typecheck catches these.** A story
