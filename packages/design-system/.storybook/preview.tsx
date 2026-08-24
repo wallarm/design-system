@@ -4,6 +4,7 @@ import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Decorator, Preview } from 'storybook-react-rsbuild';
 import { DateFormatProvider, type DateOrder, ThemeProvider, Toaster } from '../src';
 import { DocsPage } from './docs/DocsPage';
+import { TOC_OPTIONS } from './docs/toc';
 import './preview.css';
 
 let toasterMountCount = 0;
@@ -32,7 +33,7 @@ const preview: Preview = {
     docs: {
       page: DocsPage,
       // Sections and examples both belong in the table of contents.
-      toc: { headingSelector: 'h2, h3' },
+      toc: TOC_OPTIONS,
     },
     controls: {
       matchers: {
