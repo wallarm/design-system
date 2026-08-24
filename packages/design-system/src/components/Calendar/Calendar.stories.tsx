@@ -20,11 +20,21 @@ import { CalendarTrigger } from './CalendarTrigger';
 
 type DateValue = DatePicker.DateValue;
 
+const DESCRIPTION = [
+  'The month grid for choosing a date the reader needs to see in context — a weekday, a distance from today — where `DateInput` is for a date they already know.',
+  'It is its own popover, so compose a trigger beside it rather than wrapping it in one, and take React Aria date objects rather than a JavaScript `Date`.',
+].join(' ');
+
 const meta = {
   title: 'Inputs Date/Calendar',
   component: Calendar,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
   tags: ['alpha'],
 } satisfies Meta<typeof Calendar>;
@@ -35,6 +45,10 @@ export default meta;
 const createDate = (year: number, month: number, day: number) =>
   today(getLocalTimeZone()).set({ year, month, day }) as unknown as DateValue;
 
+/**
+ * One date. The grid earns its space when the reader is choosing by weekday or by distance from
+ * today rather than typing a date they know.
+ */
 export const Single: StoryFn<typeof meta> = () => (
   <Calendar type='single' closeOnSelect={false}>
     <CalendarTrigger>
@@ -51,6 +65,10 @@ export const Single: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
+/**
+ * A start and an end in one grid, with the span drawn between them. Two months show at once so
+ * a range crossing a boundary can be chosen without paging.
+ */
 export const Range: StoryFn<typeof meta> = () => (
   <Calendar
     type='range'
@@ -71,6 +89,10 @@ export const Range: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
+/**
+ * `CalendarPresets` alongside the grid. The shipped defaults cover the ranges people actually
+ * ask for — last week, this month, last 90 days — so reach for them before writing your own.
+ */
 export const RangeWithPresets: StoryFn<typeof meta> = () => (
   <Calendar type='range' closeOnSelect={false}>
     <CalendarTrigger>
@@ -88,6 +110,10 @@ export const RangeWithPresets: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
+/**
+ * `CalendarInputHeader` puts a typed field above the grid, so the same popover serves both a
+ * reader who knows the dates and one who needs to look.
+ */
 export const RangeWithInput: StoryFn<typeof meta> = () => (
   <Calendar type='range' closeOnSelect={false}>
     <CalendarTrigger>
@@ -105,6 +131,10 @@ export const RangeWithInput: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
+/**
+ * `CalendarFooter` holds Reset and Apply, which turns the grid into a deliberate commit —
+ * nothing changes underneath the reader until they apply it.
+ */
 export const RangeWithFooter: StoryFn<typeof meta> = () => {
   const [value, setValue] = useState<DateValue[]>([]);
 
@@ -132,6 +162,10 @@ export const RangeWithFooter: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Presets, input header and footer together, which is the shape a filter bar wants. Everything
+ * else on this page is a subset of it.
+ */
 export const RangeFullFeatured: StoryFn<typeof meta> = () => {
   const [value, setValue] = useState<DateValue[]>([]);
 
@@ -161,6 +195,10 @@ export const RangeFullFeatured: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The typed header on a single calendar, for the same reason as the range: the reader chooses
+ * how to answer.
+ */
 export const SingleWithInput: StoryFn<typeof meta> = () => (
   <Calendar type='single' closeOnSelect={false}>
     <CalendarTrigger>
@@ -179,9 +217,8 @@ export const SingleWithInput: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Single calendar with a date **and time** input header. Pass `showTime` on
- * `Calendar` to upgrade the header `DateInput` to minute granularity with a
- * time dropdown — pick a day in the grid, then a time from the dropdown.
+ * `showTime` adds a time to the date, for a moment rather than a day. Ask for it only where the
+ * time genuinely changes the result.
  */
 export const SingleWithDateTime: StoryFn<typeof meta> = () => (
   <Calendar type='single' showTime closeOnSelect={false}>
@@ -200,6 +237,10 @@ export const SingleWithDateTime: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
+/**
+ * Single-date presets — today, yesterday, first of the month — which answer the questions a
+ * single date usually stands for.
+ */
 export const SingleWithPresets: StoryFn<typeof meta> = () => (
   <Calendar type='single' closeOnSelect={false}>
     <CalendarTrigger>
@@ -217,7 +258,10 @@ export const SingleWithPresets: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
-/** Range calendar with disabled weekends */
+/**
+ * `isDateUnavailable` greys out dates that cannot be chosen. Show them rather than hiding them,
+ * so the reader can see the shape of what is allowed.
+ */
 export const RangeWithDisabledDates: StoryFn<typeof meta> = () => (
   <Calendar
     type='range'
@@ -241,7 +285,10 @@ export const RangeWithDisabledDates: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
-/** Range selection cannot span disabled dates (controlled mode required) */
+/**
+ * A range refusing to span an unavailable date, which needs controlled mode. Use it where
+ * crossing the gap would produce a period the system cannot honour.
+ */
 export const RangeDisallowDisabled: StoryFn<typeof meta> = () => {
   const [value, setValue] = useState<DateValue[]>([]);
 
@@ -274,6 +321,10 @@ export const RangeDisallowDisabled: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Owning the value, which is what presets, Apply and disallowed spans all require — the
+ * uncontrolled form is only for the simplest case.
+ */
 export const RangeControlled: StoryFn<typeof meta> = () => {
   const [value, setValue] = useState<DateValue[]>([]);
   const [open, setOpen] = useState(false);
@@ -310,7 +361,10 @@ export const RangeControlled: StoryFn<typeof meta> = () => {
   );
 };
 
-/** Custom preset items */
+/**
+ * Your own preset list, for domain periods the defaults do not cover. Keep the labels as plain
+ * as the shipped ones.
+ */
 export const SingleCustomPresets: StoryFn<typeof meta> = () => {
   const now = today(getLocalTimeZone()) as unknown as DateValue;
 
@@ -367,7 +421,10 @@ export const SingleCustomPresets: StoryFn<typeof meta> = () => {
 // Readonly Examples
 // ============================================================================
 
-/** Readonly range calendar displaying a pre-selected range */
+/**
+ * A range shown but not editable, for a period the reader needs to read back rather than
+ * change.
+ */
 export const RangeReadonly: StoryFn<typeof meta> = () => (
   <Calendar
     type='range'
@@ -389,7 +446,10 @@ export const RangeReadonly: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
-/** Readonly range calendar with presets (presets are disabled) */
+/**
+ * The same, with presets rendered but inert — worth seeing, because a live-looking preset that
+ * does nothing is worse than none.
+ */
 export const RangeReadonlyWithPresets: StoryFn<typeof meta> = () => (
   <Calendar
     type='range'
@@ -412,7 +472,9 @@ export const RangeReadonlyWithPresets: StoryFn<typeof meta> = () => (
   </Calendar>
 );
 
-/** Readonly single calendar */
+/**
+ * A single date shown but not editable.
+ */
 export const SingleReadonly: StoryFn<typeof meta> = () => (
   <Calendar type='single' readonly defaultOpen defaultValue={[createDate(2025, 1, 15)]}>
     <CalendarTrigger>

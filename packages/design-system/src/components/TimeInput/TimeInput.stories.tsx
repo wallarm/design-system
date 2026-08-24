@@ -5,6 +5,11 @@ import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { TimeInput } from './TimeInput';
 
+const DESCRIPTION = [
+  'A time typed segment by segment, the companion to `DateInput` — `showTimeDropdown` adds a list of times for when the reader would rather pick than type.',
+  'It takes React Aria time objects, and hour cycle comes from `DateFormatProvider` app-wide rather than per input.',
+].join(' ');
+
 const meta: Meta<typeof TimeInput> = {
   title: 'Inputs Date/TimeInput',
   component: TimeInput,
@@ -12,8 +17,7 @@ const meta: Meta<typeof TimeInput> = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Segmented time-only input with keyboard navigation. Supports hour and minute granularity, 12/24-hour cycle, and an optional time dropdown for quick selection.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -77,12 +81,19 @@ const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
   ),
 ];
 
+/**
+ * The bare field, behaving exactly like `DateInput`: arrows step a segment, typing fills it and
+ * advances.
+ */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
   return <TimeInput {...args} />;
 };
 Basic.decorators = dropdownRoom;
 Basic.parameters = { layout: 'padded' };
 
+/**
+ * Default, disabled and error, matching `DateInput` so a form containing both stays consistent.
+ */
 export const States: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
@@ -110,9 +121,7 @@ export const States: StoryFn<typeof meta> = () => (
 );
 
 /**
- * `showIcon` toggles the leading clock icon. It defaults to `true`; pass
- * `showIcon={false}` for a bare segmented field (e.g. dense tables or when a
- * label already conveys the field's meaning).
+ * A clock icon as decoration. It opens nothing on its own — the dropdown is a separate opt-in.
  */
 export const Icon: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
@@ -133,6 +142,9 @@ export const Icon: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
+/**
+ * The shared height scale, so a time field lines up beside a date field.
+ */
 export const Sizes: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={16}>
@@ -178,6 +190,10 @@ export const Sizes: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
+/**
+ * A held value beside a placeholder, with the clear affordance appearing only once there is a
+ * value.
+ */
 export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <DateFormatProvider order='day-first' hourCycle={24}>
@@ -199,6 +215,10 @@ export const Filled: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * Hour, minute or second. Drop to `hour` where minutes would imply a precision the system does
+ * not honour.
+ */
 export const Granularity: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <DateFormatProvider order='day-first' hourCycle={12}>
@@ -224,6 +244,10 @@ export const Granularity: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
+/**
+ * `timeStep` sets the spacing of the offered times — fifteen, thirty or sixty minutes. Coarser
+ * steps make the list scannable; the reader can still type an exact time.
+ */
 export const TimeDropdownSteps: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <DateFormatProvider order='day-first' hourCycle={12}>
@@ -252,8 +276,7 @@ TimeDropdownSteps.decorators = dropdownRoom;
 TimeDropdownSteps.parameters = { layout: 'padded' };
 
 /**
- * `readOnly` shows a value but removes every edit affordance — typing is
- * ignored (react-aria), and the clear "×" is not rendered at all.
+ * Value legible, every edit affordance gone, as on `DateInput`.
  */
 export const ReadOnly: StoryFn<typeof meta> = () => (
   <HStack gap={24}>

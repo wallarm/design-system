@@ -6,6 +6,11 @@ import { Text } from '../Text';
 import { DateRangeInput } from './DateRangeInput';
 import type { DateRangeInputProps } from './types';
 
+const DESCRIPTION = [
+  'Two dates in one field, for a period the reader knows — pair it with `Calendar` in range mode when they need to see the months to choose.',
+  'Same rules as `DateInput`: React Aria date objects, and order and hour cycle from `DateFormatProvider` rather than per input.',
+].join(' ');
+
 const meta: Meta<typeof DateRangeInput> = {
   title: 'Inputs Date/DateRangeInput',
   component: DateRangeInput,
@@ -13,8 +18,7 @@ const meta: Meta<typeof DateRangeInput> = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Paired start/end date input for selecting date ranges. Supports date-only and date+time granularity, placeholder text, and an optional time dropdown. Can be used as a single compound component or composed from individual parts via `DateRangeProvider`.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -96,12 +100,19 @@ const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
   ),
 ];
 
+/**
+ * Start and end in one control, each segmented. The end cannot precede the start, so the field
+ * cannot produce a range the system would reject.
+ */
 export const Basic: StoryFn<typeof meta> = args => {
   return <DateRangeInput {...(args as DateRangeInputProps)} />;
 };
 Basic.decorators = dropdownRoom;
 Basic.parameters = { layout: 'padded' };
 
+/**
+ * Decoration again, not a trigger — reach for `Calendar` when the icon should open a picker.
+ */
 export const WithIcon: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
@@ -119,6 +130,10 @@ export const WithIcon: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
+/**
+ * Default, disabled and error. The error applies to the range as a whole, since a start without
+ * an end is not yet an answer.
+ */
 export const States: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
@@ -145,6 +160,10 @@ export const States: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
+/**
+ * The shared height scale. A range is wider than a single date, so check it against the column
+ * it lives in.
+ */
 export const Sizes: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={16}>
@@ -190,6 +209,10 @@ export const Sizes: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
+/**
+ * A complete range beside an empty one, which is the clearest way to see how much width the
+ * filled state needs.
+ */
 export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <VStack gap={4}>
@@ -215,6 +238,10 @@ export const Filled: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * Both ends share one granularity. Add time only when the period genuinely turns on it — a
+ * report covering part of a day rather than whole days.
+ */
 export const Granularity: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <DateFormatProvider order='day-first' hourCycle={12}>
@@ -243,10 +270,8 @@ export const Granularity: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Demonstrates both segment orders side by side. Each column wraps its
- * DateRangeInputs in a scoped `DateFormatProvider` — in real apps the
- * provider is mounted once near the root and the whole tree picks up a
- * single order.
+ * Day-first against month-first from the provider, doubly worth seeing here because an
+ * ambiguous range is twice as easy to misread.
  */
 export const DateOrderComparison: StoryFn<typeof meta> = () => (
   <HStack gap={32}>
@@ -275,8 +300,7 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
 DateOrderComparison.parameters = { layout: 'padded' };
 
 /**
- * Demonstrates `hourCycle` picked up from `DateFormatProvider`, not passed
- * per input. No `hourCycle` prop on the individual DateRangeInputs.
+ * 12-hour against 24-hour from the provider, with no per-input override.
  */
 export const HourCycleByContext: StoryFn<typeof meta> = () => (
   <HStack gap={32}>
@@ -301,8 +325,7 @@ export const HourCycleByContext: StoryFn<typeof meta> = () => (
 HourCycleByContext.parameters = { layout: 'padded' };
 
 /**
- * `readOnly` shows a value but removes every edit affordance — typing is
- * ignored (react-aria), and the trailing clear "×" is not rendered at all.
+ * Both ends legible, no edit affordances.
  */
 export const ReadOnly: StoryFn<typeof meta> = () => (
   <HStack gap={24}>

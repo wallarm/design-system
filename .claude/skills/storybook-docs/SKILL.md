@@ -273,7 +273,14 @@ was still valid. Anchor edits on the `export const` line, and verify:
 
 ```bash
 git show HEAD:<path> | grep -c '^export const'   # must equal the file's count
+grep -c '^const DESCRIPTION' <path>              # must be 1 if the meta references it
 ```
+
+Both checks exist because **neither lint nor typecheck catches these.** A story
+file can lose most of its content, or reference a constant that was never
+inserted, and still pass every check — the date family shipped
+"DESCRIPTION is not defined" straight to the rendered page. Opening the page is
+the only verification that works.
 
 ### 6 · Park what the run surfaced
 

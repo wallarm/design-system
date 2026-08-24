@@ -204,6 +204,37 @@ One `###` heading per finding, newest last, with these lines:
 - **Found while** — documenting `Input`.
 - **Status** — Open.
 
+### DateFormatProvider documents an hourCycle prop that no component accepts
+
+- **What** — `DateFormatProvider`'s own doc comment says the hour cycle "can be
+  overridden per-input via the `hourCycle` prop". No date or time component
+  accepts such a prop.
+- **Evidence** — `grep -n 'hourCycle?:'` across `DateInput`, `TimeInput`,
+  `DateRangeInput` and `Calendar` returns nothing, and `DateInput.tsx` states the
+  opposite in its own comment: hour cycle is "sourced exclusively from
+  `DateFormatProvider`".
+- **Why it matters** — Two comments in the same family contradict each other, and
+  the wrong one is the more discoverable. Someone will try the prop, find it
+  type-errors, and not know which behaviour was intended.
+- **Suggested action** — Decide which is true and correct the comment, or add the
+  prop. The exclusive-provider behaviour looks deliberate, in which case only the
+  comment is wrong.
+- **Found while** — documenting the date family.
+- **Status** — Open.
+
+### NumberInput starts at zero rather than empty
+
+- **What** — `NumberInput` defaults `defaultValue` to the string `'0'`, so an
+  untouched field reads as an answered one.
+- **Evidence** — `NumberInput.tsx`: `defaultValue = '0'`.
+- **Why it matters** — On a required numeric field a reader can submit zero
+  without ever deciding it, and nothing in the interface distinguishes a
+  deliberate zero from an untouched default.
+- **Suggested action** — Consider defaulting to empty and letting callers pass a
+  starting value, or confirm zero is intended for the fields this is used on.
+- **Found while** — documenting `NumberInput`.
+- **Status** — Open.
+
 ## Known limitations we chose to live with
 
 Not findings — decisions worth remembering so they are not rediscovered.

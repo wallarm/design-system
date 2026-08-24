@@ -25,8 +25,8 @@
 
 ## Snapshot
 
-- **18 written to the standard · 51 with prose to level · 26 untouched**
-- **The Actions and Inputs folders are complete** — 4 and 14 pages, every story carrying a sentence., across 95 story pages.
+- **22 written to the standard · 47 with prose to level · 26 untouched**
+- **The Actions, Inputs and Inputs Date folders are complete** — 4, 14 and 4 pages, every story carrying a sentence., across 95 story pages.
 - Levelling a 🟡 is usually cutting, not filling. Slider reads as a dense developer paragraph about analytics attributes and ref forwarding; Heading runs four paragraphs of type theory. Both are good writing on the wrong page.
 - The drift runs upside-down. Niche components arrived documented while the ones everyone opens daily — `Button`, `Input`, `Select`, `Switch`, `Radio`, `Tag`, `Badge`, `Tabs`, `Tooltip` — arrived bare. Prioritise by daily traffic, not by how interesting the component is.
 - The **Stories** and **With a sentence** columns are the quickest way to spot a half-done page: equal numbers mean every example is covered.
@@ -65,10 +65,10 @@
 | 🟡 | Data display/SimpleCharts/Metric | 2 | 3 | `src/components/SimpleCharts/Metric/Metric.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/Overview | 1 | 0 | `src/components/SimpleCharts/Overview/Overview.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/PieChart | 12 | 0 | `src/components/SimpleCharts/PieChart/PieChart.stories.tsx` |
-| 🟡 | Inputs Date/Calendar | 16 | 7 | `src/components/Calendar/Calendar.stories.tsx` |
-| 🟡 | Inputs Date/DateInput | 10 | 3 | `src/components/DateInput/DateInput.stories.tsx` |
-| 🟡 | Inputs Date/DateRangeInput | 9 | 3 | `src/components/DateRangeInput/DateRangeInput.stories.tsx` |
-| 🟡 | Inputs Date/TimeInput | 8 | 2 | `src/components/TimeInput/TimeInput.stories.tsx` |
+| ✅ | Inputs Date/Calendar | 16 | 16 | `src/components/Calendar/Calendar.stories.tsx` |
+| ✅ | Inputs Date/DateInput | 10 | 10 | `src/components/DateInput/DateInput.stories.tsx` |
+| ✅ | Inputs Date/DateRangeInput | 9 | 9 | `src/components/DateRangeInput/DateRangeInput.stories.tsx` |
+| ✅ | Inputs Date/TimeInput | 8 | 8 | `src/components/TimeInput/TimeInput.stories.tsx` |
 | ✅ | Inputs/Checkbox | 8 | 8 | `src/components/Checkbox/Checkbox.stories.tsx` |
 | ✅ | Inputs/Field | 9 | 9 | `src/components/Field/Field.stories.tsx` |
 | ✅ | Inputs/InlineEdit | 14 | 14 | `src/components/InlineEdit/InlineEdit.stories.tsx` |
