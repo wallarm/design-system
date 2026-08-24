@@ -24,6 +24,8 @@ allowed to write:
 - `parameters.docs.description.component` in a story file's `meta`
 - JSDoc comments (`/** … */`) above exported stories
 - story names and ordering, when they actively mislead
+- the **text style** of annotation labels a story already has (see below) — the
+  style only, never the labels themselves
 
 Documenting a component *will* surface real problems in it — that is one of the
 most valuable things about doing this work carefully. When it happens, park the
@@ -61,6 +63,41 @@ So your entire output for a component is prose: one description, and one line pe
 story. If the *frame* needs changing rather than the prose, that is a different
 job — [`references/frame.md`](references/frame.md) explains how it works and the
 Storybook traps around it.
+
+## Annotation labels inside a story
+
+Some stories carry small labels inside the canvas naming what a group of examples
+shows — `brand` / `neutral` above rows of buttons, `default` / `disabled` /
+`error` above input states. These are **scaffolding around the specimen**, not
+component surface, and they need to look like it.
+
+They didn't. Button used `Heading`, so bold black type announced "Brand" as
+though it were part of the design; DateInput used muted body text, which read as
+a real field label. Same job, two looks, both easy to mistake for the component.
+
+They now take one style, which borrows Figma's annotation convention:
+**handwritten, lowercase, quiet.** Add `className='sb-annotation'` to the label
+and delete whatever component it was wrapped in:
+
+```tsx
+<span className='sb-annotation'>Neutral Alt</span>
+```
+
+The class lives in `.storybook/preview.css`, so this is Storybook-only styling —
+nothing in `src/` and no product token is involved. Caveat stands in for Figma
+Hand; the size and leading are set for a documentation page rather than a canvas,
+and the colour sits back at `--color-text-secondary` because Figma's annotation
+pink competes with the specimen it is meant to label.
+
+**The rule that matters: restyle, never author.** Only convert a label a story
+already has. Never add an annotation to a story that doesn't have one — a page
+that looks annotated is not the goal, and inventing labels is how the
+inconsistency started. If a story genuinely needs one, that's a finding to park,
+not a licence to write it.
+
+And keep the distinction: a label that **names what you're looking at** is an
+annotation. A heading that **separates two genuinely different examples** is
+structure — leave it alone.
 
 ## Usage
 

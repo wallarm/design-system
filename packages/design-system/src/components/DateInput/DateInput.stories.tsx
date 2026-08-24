@@ -4,7 +4,6 @@ import { CalendarDate, CalendarDateTime, getLocalTimeZone, today } from '../../i
 import { DateFormatProvider } from '../DateFormatProvider';
 import { Field, FieldAction, FieldDescription, FieldError, FieldLabel } from '../Field';
 import { HStack, VStack } from '../Stack';
-import { Text } from '../Text';
 import { DateInput } from './DateInput';
 
 const sampleDate = new CalendarDate(2026, 1, 1);
@@ -93,15 +92,11 @@ Basic.parameters = { layout: 'padded' };
 export const WithIcon: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Without icon
-      </Text>
+      <span className='sb-annotation'>Without icon</span>
       <DateInput showIcon={false} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        With icon
-      </Text>
+      <span className='sb-annotation'>With icon</span>
       <DateInput />
     </VStack>
   </HStack>
@@ -110,23 +105,17 @@ export const WithIcon: StoryFn<typeof meta> = () => (
 export const States: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Default
-      </Text>
+      <span className='sb-annotation'>Default</span>
       <DateInput />
       <DateInput defaultValue={sampleDate} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Disabled
-      </Text>
+      <span className='sb-annotation'>Disabled</span>
       <DateInput disabled />
       <DateInput disabled defaultValue={sampleDate} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Error
-      </Text>
+      <span className='sb-annotation'>Error</span>
       <DateInput error />
       <DateInput error defaultValue={sampleDate} />
     </VStack>
@@ -137,41 +126,29 @@ export const Sizes: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={16}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Default (36px)
-        </Text>
+        <span className='sb-annotation'>Default (36px)</span>
         <DateInput size='default' />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Medium (32px)
-        </Text>
+        <span className='sb-annotation'>Medium (32px)</span>
         <DateInput size='medium' />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Small (24px)
-        </Text>
+        <span className='sb-annotation'>Small (24px)</span>
         <DateInput size='small' />
       </VStack>
     </VStack>
     <VStack gap={16}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Default filled
-        </Text>
+        <span className='sb-annotation'>Default filled</span>
         <DateInput size='default' defaultValue={sampleDate} />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Medium filled
-        </Text>
+        <span className='sb-annotation'>Medium filled</span>
         <DateInput size='medium' defaultValue={sampleDate} />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Small filled
-        </Text>
+        <span className='sb-annotation'>Small filled</span>
         <DateInput size='small' defaultValue={sampleDate} />
       </VStack>
     </VStack>
@@ -181,31 +158,23 @@ export const Sizes: StoryFn<typeof meta> = () => (
 export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        Date
-      </Text>
+      <span className='sb-annotation'>Date</span>
       <DateInput defaultValue={sampleDate} />
     </VStack>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Date + time (24h)
-        </Text>
+        <span className='sb-annotation'>Date + time (24h)</span>
         <DateInput granularity='minute' defaultValue={sampleDateTime} />
       </VStack>
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Date + time (12h)
-        </Text>
+        <span className='sb-annotation'>Date + time (12h)</span>
         <DateInput granularity='minute' defaultValue={sampleDateTime} />
       </VStack>
     </DateFormatProvider>
     <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        Without icon
-      </Text>
+      <span className='sb-annotation'>Without icon</span>
       <DateInput showIcon={false} defaultValue={sampleDate} />
     </VStack>
   </VStack>
@@ -215,9 +184,7 @@ export const Granularity: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour format
-        </Text>
+        <span className='sb-annotation'>12-hour format</span>
         <DateInput placeholder='day' granularity='day' />
         <DateInput placeholder='hour' granularity='hour' />
         <DateInput placeholder='minute' granularity='minute' />
@@ -226,9 +193,7 @@ export const Granularity: StoryFn<typeof meta> = () => (
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour format
-        </Text>
+        <span className='sb-annotation'>24-hour format</span>
         <DateInput placeholder='day' granularity='day' />
         <DateInput placeholder='hour' granularity='hour' />
         <DateInput placeholder='minute' granularity='minute' />
@@ -285,9 +250,7 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
   <HStack gap={32}>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          Day first — DD MMM YYYY
-        </Text>
+        <span className='sb-annotation'>Day first — DD MMM YYYY</span>
         <DateInput />
         <DateInput defaultValue={sampleDate} />
         <DateInput granularity='minute' defaultValue={sampleDateTime} />
@@ -295,9 +258,7 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
     </DateFormatProvider>
     <DateFormatProvider order='month-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          Month first — MMM DD YYYY
-        </Text>
+        <span className='sb-annotation'>Month first — MMM DD YYYY</span>
         <DateInput />
         <DateInput defaultValue={sampleDate} />
         <DateInput granularity='minute' defaultValue={sampleDateTime} />
@@ -316,18 +277,14 @@ export const HourCycleByContext: StoryFn<typeof meta> = () => (
   <HStack gap={32}>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour (AM/PM)
-        </Text>
+        <span className='sb-annotation'>12-hour (AM/PM)</span>
         <DateInput granularity='minute' defaultValue={sampleDateTime} />
         <DateInput granularity='second' defaultValue={sampleDateTime} />
       </VStack>
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour
-        </Text>
+        <span className='sb-annotation'>24-hour</span>
         <DateInput granularity='minute' defaultValue={sampleDateTime} />
         <DateInput granularity='second' defaultValue={sampleDateTime} />
       </VStack>
@@ -344,15 +301,11 @@ HourCycleByContext.parameters = { layout: 'padded' };
 export const ReadOnly: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Date
-      </Text>
+      <span className='sb-annotation'>Date</span>
       <DateInput readOnly defaultValue={sampleDate} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Date + time
-      </Text>
+      <span className='sb-annotation'>Date + time</span>
       <DateInput readOnly granularity='minute' defaultValue={sampleDateTime} />
     </VStack>
   </HStack>

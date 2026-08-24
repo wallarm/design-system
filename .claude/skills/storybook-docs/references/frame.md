@@ -85,6 +85,21 @@ Add the static server as a temporary `.claude/launch.json` entry and restore the
 file afterwards. `runtimeExecutable` needs an **absolute** binary path or the
 server silently never binds.
 
+## The annotation label style
+
+`.sb-annotation` in `preview.css` styles the labels inside a story canvas. Two
+things to know if you touch it:
+
+- **Caveat is loaded from Google Fonts** via an `@import` at the top of
+  `preview.css`. Everything else in the repo self-hosts (see `theme/fonts/`), so
+  if offline dev or CDN independence ever matters, self-hosting it in
+  `.storybook/assets/` is the consistent move — `staticDirs` already serves that
+  folder.
+- **The lowercasing is CSS, not source.** The story still reads `Neutral Alt` and
+  renders `neutral alt`, which keeps the source legible and makes the style
+  removable — but it does mean the rendered label and the "Show code" snippet
+  differ in case.
+
 ## MDX pages are untouched
 
 `src/docs/*.mdx` (Getting Started, Installation, Release, Adding Components)
