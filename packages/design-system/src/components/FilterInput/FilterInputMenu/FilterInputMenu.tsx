@@ -106,8 +106,15 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
     }),
     [editingMultiValues, editingSingleValue],
   );
-  const selectedFieldValues = selectedField
-    ? getFieldValues(selectedField, currentTokenText, selectedContext)
+  // `selectedField` is a snapshot captured when the field was picked. Re-resolve
+  // it against the current `fields` so asynchronous field updates — e.g. a lazy
+  // `getSuggestions` whose options land after selection — reach the value menu
+  // instead of being frozen at the (empty) state they had at selection time.
+  const liveSelectedField = selectedField
+    ? (fields.find(f => f.name === selectedField.name) ?? selectedField)
+    : null;
+  const selectedFieldValues = liveSelectedField
+    ? getFieldValues(liveSelectedField, currentTokenText, selectedContext)
     : [];
 
   // A selected value that the current field doesn't define (e.g. left over after
@@ -213,6 +220,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
               menuRef={menuRef}
               filterText={valueFilterText}
               blurCommitRef={blurCommitRef}
+              loading={liveSelectedField?.loadingOptions ?? false}
             />
           )
         ))}

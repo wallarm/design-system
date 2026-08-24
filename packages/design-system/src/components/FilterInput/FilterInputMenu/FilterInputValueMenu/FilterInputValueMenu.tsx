@@ -47,6 +47,8 @@ export interface FilterInputValueMenuProps {
   inputRef?: RefObject<HTMLInputElement | null>;
   /** Filter values by label. */
   filterText?: string;
+  /** Options are still loading — show a loading indicator instead of the list. */
+  loading?: boolean;
   /** Menu content ref (shared across menus for focus management). */
   menuRef?: RefObject<HTMLDivElement | null>;
   /** Set here so blur handler can commit multi-select values. */
