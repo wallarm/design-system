@@ -80,6 +80,31 @@ describe('applyKnownFieldHelpers', () => {
       expect(out.filter(o => o.value === 'US')).toHaveLength(1);
       expect(out.length).toBeGreaterThan(200);
     });
+
+    it('falls back to the bundled list when the wrapped getSuggestions yields nothing', () => {
+      // A lazy consumer returns undefined before its fetch lands.
+      const consumerSuggest = vi.fn(() => undefined as never);
+      const [field] = applyKnownFieldHelpers([
+        { name: 'country', label: 'Country', type: 'string', getSuggestions: consumerSuggest },
+      ]);
+      const out = field.getSuggestions!('');
+      expect(out.length).toBeGreaterThan(200);
+      expect(out).toContainEqual({ value: 'US', label: 'United States' });
+    });
+
+    it('preserves a free-text lead value absent from the bundled list', () => {
+      const [field] = applyKnownFieldHelpers([
+        {
+          name: 'country',
+          label: 'Country',
+          type: 'string',
+          values: [{ value: 'ZZ', label: 'Unknown' }],
+        },
+      ]);
+      const values = field.values!;
+      expect(values[0]).toEqual({ value: 'ZZ', label: 'Unknown' });
+      expect(values.length).toBeGreaterThan(200);
+    });
   });
 
   it('wires all five helpers for a field named status_code', () => {

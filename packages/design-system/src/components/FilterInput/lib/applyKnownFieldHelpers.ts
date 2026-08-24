@@ -46,6 +46,15 @@ const KNOWN_FIELD_HELPERS: Record<string, (field: FieldMetadata) => FieldHelpers
   // would otherwise outrank `values` and disable allowlist validation).
   country: field => {
     if (field.getSuggestions) {
+      // Keeping a `getSuggestions` on the field means the DS allowlist
+      // validation no longer runs for it (getSuggestions is treated as a
+      // hint, not an allowlist): a code outside the list commits without a
+      // red chip. That is intentional here — a consumer opting into a dynamic
+      // list owns its own validity (the AS-1419 attacks filter is
+      // backend-validated, strictValues:false). `values` stays the bundled
+      // list, not the merged one, so committed-chip labels resolve from it;
+      // fine as long as the lead relabels bundled codes with their canonical
+      // ISO names (setting the merged list would force the lazy fetch eagerly).
       const consumerSuggest = field.getSuggestions;
       return {
         getSuggestions: (input, context) =>
