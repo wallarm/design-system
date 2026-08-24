@@ -84,6 +84,20 @@ What was gathered and deliberately dropped: Primer's group-level validation rule
 budget), Carbon's form spacing values (a foundations rule, not a checkbox rule),
 and the wrapped-label alignment rule (we don't follow it — parked as a finding).
 
+## One mechanical trap
+
+**Never let a code span wrap across two JSDoc lines.** Markdown reads the
+continuation as an indented code block, so the sentence renders in three pieces
+with a grey box in the middle — invisible in the diff, obvious on the page.
+
+Either keep the backticked phrase on one line, or use plain quotes when the thing
+you're quoting is prose rather than an identifier. This scan finds every case:
+
+```bash
+grep -rn '^ \*' --include='*.stories.tsx' packages/design-system/src \
+  | awk -F: '{ n = gsub(/`/, "`", $0); if (n % 2) print }'
+```
+
 ## Failure modes
 
 **Padding a primitive.** `Stack` does not need a boundaries-first paragraph. If

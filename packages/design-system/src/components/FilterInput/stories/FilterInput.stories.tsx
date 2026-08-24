@@ -348,8 +348,7 @@ export const HTTPStatusCodeByName: Story = {
 /**
  * Two-step "paired" field (AS-1160). `Context Param` takes a single `is`
  * operator plus a key, after which the second part (`Value`) **always** appears
- * with its own operator and value — captured in one chip (`Context Param is
- * header ; Value is yyy`).
+ * with its own operator and value — captured in one chip ("Context Param is header; Value is yyy").
  *
  * The `Value` part adds `like` / `not like` (substring match) plus `is set` /
  * `is not set` operators. The last two take no value:
