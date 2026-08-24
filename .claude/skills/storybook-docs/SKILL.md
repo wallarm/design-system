@@ -265,6 +265,16 @@ description doesn't restate the story name; nothing contradicts the props table
 just below; no sentence spills past the budget. `pnpm lint:fix` and `pnpm typecheck`
 before you finish — story files are typechecked like any other source.
 
+**When levelling a page that already has prose, count the stories before and
+after.** Rewriting existing JSDoc with a multiline regex will happily match
+across story boundaries and delete code; it once removed thirteen of Slider's
+fourteen stories, and neither lint nor typecheck complained because what remained
+was still valid. Anchor edits on the `export const` line, and verify:
+
+```bash
+git show HEAD:<path> | grep -c '^export const'   # must equal the file's count
+```
+
 ### 6 · Park what the run surfaced
 
 Three destinations, so nothing is lost and nothing lands in the wrong place:

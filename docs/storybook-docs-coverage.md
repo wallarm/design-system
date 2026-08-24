@@ -25,7 +25,8 @@
 
 ## Snapshot
 
-- **13 written to the standard · 53 with prose to level · 29 untouched**, across 95 story pages.
+- **18 written to the standard · 51 with prose to level · 26 untouched**
+- **The Actions and Inputs folders are complete** — 4 and 14 pages, every story carrying a sentence., across 95 story pages.
 - Levelling a 🟡 is usually cutting, not filling. Slider reads as a dense developer paragraph about analytics attributes and ref forwarding; Heading runs four paragraphs of type theory. Both are good writing on the wrong page.
 - The drift runs upside-down. Niche components arrived documented while the ones everyone opens daily — `Button`, `Input`, `Select`, `Switch`, `Radio`, `Tag`, `Badge`, `Tabs`, `Tooltip` — arrived bare. Prioritise by daily traffic, not by how interesting the component is.
 - The **Stories** and **With a sentence** columns are the quickest way to spot a half-done page: equal numbers mean every example is covered.
@@ -70,16 +71,16 @@
 | 🟡 | Inputs Date/TimeInput | 8 | 2 | `src/components/TimeInput/TimeInput.stories.tsx` |
 | ✅ | Inputs/Checkbox | 8 | 8 | `src/components/Checkbox/Checkbox.stories.tsx` |
 | ✅ | Inputs/Field | 9 | 9 | `src/components/Field/Field.stories.tsx` |
-| 🟡 | Inputs/InlineEdit | 14 | 11 | `src/components/InlineEdit/InlineEdit.stories.tsx` |
+| ✅ | Inputs/InlineEdit | 14 | 14 | `src/components/InlineEdit/InlineEdit.stories.tsx` |
 | ✅ | Inputs/Input | 6 | 6 | `src/components/Input/Input.stories.tsx` |
 | ✅ | Inputs/InputGroup | 8 | 8 | `src/components/InputGroup/InputGroup.stories.tsx` |
-| ☐ | Inputs/NumberInput | 5 | 0 | `src/components/NumberInput/NumberInput.stories.tsx` |
-| ☐ | Inputs/OTPInput | 6 | 0 | `src/components/InputOTP/OTPInput.stories.tsx` |
-| ☐ | Inputs/PasswordInput | 6 | 0 | `src/components/PasswordInput/PasswordInput.stories.tsx` |
+| ✅ | Inputs/NumberInput | 5 | 5 | `src/components/NumberInput/NumberInput.stories.tsx` |
+| ✅ | Inputs/OTPInput | 6 | 6 | `src/components/InputOTP/OTPInput.stories.tsx` |
+| ✅ | Inputs/PasswordInput | 6 | 6 | `src/components/PasswordInput/PasswordInput.stories.tsx` |
 | ✅ | Inputs/Radio | 3 | 3 | `src/components/Radio/Radio.stories.tsx` |
 | ✅ | Inputs/SegmentedControl | 10 | 10 | `src/components/SegmentedControl/SegmentedControl.stories.tsx` |
 | ✅ | Inputs/Select | 15 | 15 | `src/components/Select/Select.stories.tsx` |
-| 🟡 | Inputs/Slider | 14 | 14 | `src/components/Slider/Slider.stories.tsx` |
+| ✅ | Inputs/Slider | 14 | 14 | `src/components/Slider/Slider.stories.tsx` |
 | ✅ | Inputs/Switch | 6 | 6 | `src/components/Switch/Switch.stories.tsx` |
 | ✅ | Inputs/Textarea | 8 | 8 | `src/components/Textarea/Textarea.stories.tsx` |
 | 🟡 | Layout/AnimatedBackground | 4 | 0 | `src/components/AnimatedBackground/AnimatedBackground.stories.tsx` |

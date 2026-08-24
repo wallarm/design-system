@@ -4,11 +4,21 @@ import { Field } from '../Field';
 import { FieldLabel } from '../Field/FieldLabel';
 import { OTPInput } from './OTPInput';
 
+const DESCRIPTION = [
+  'A short code split into one cell per character, for codes that arrive by mail or from an authenticator — reach for `Input` for anything the reader knows by heart.',
+  'Six cells by default, and `groupSize` inserts separators so the reader can check what they typed against what they were sent.',
+].join(' ');
+
 const meta = {
   title: 'Inputs/OTPInput',
   component: OTPInput,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
   args: {
     type: 'alphanumeric',
@@ -57,20 +67,36 @@ const meta = {
 
 export default meta;
 
+/**
+ * Six cells, with focus advancing as the reader types and a paste filling the whole code at
+ * once — pasting is how most codes actually arrive.
+ */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => <OTPInput {...args} />;
 
+/**
+ * All cells out together. The code is a single value, so cells are never disabled
+ * individually.
+ */
 export const Disabled: StoryObj<typeof meta> = {
   args: {
     disabled: true,
   },
 };
 
+/**
+ * The invalid state across every cell, since a wrong code is wrong as a whole rather than in
+ * one position.
+ */
 export const WithError: StoryObj<typeof meta> = {
   args: {
     error: true,
   },
 };
 
+/**
+ * Numeric entry brings up the number keypad, and the `otp` flag lets a password manager or
+ * the OS offer the code it has just received.
+ */
 export const Numeric: StoryObj<typeof meta> = {
   args: {
     type: 'numeric',
@@ -78,6 +104,10 @@ export const Numeric: StoryObj<typeof meta> = {
   },
 };
 
+/**
+ * `mask` hides the characters as they are entered. Reserve it for codes worth hiding —
+ * masking a six-digit code the reader is copying off a screen only makes it harder.
+ */
 export const Masked: StoryObj<typeof meta> = {
   args: {
     mask: true,
@@ -86,6 +116,10 @@ export const Masked: StoryObj<typeof meta> = {
   },
 };
 
+/**
+ * Inside `Field`, so the instruction above the cells comes from `FieldLabel` and
+ * `FieldDescription` — which is where to say where the code came from.
+ */
 export const WithField: StoryObj<typeof meta> = {
   decorators: [
     Story => (

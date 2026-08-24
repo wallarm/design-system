@@ -8,6 +8,11 @@ import { SliderMarks } from './SliderMarks';
 import { SliderThumb } from './SliderThumb';
 import { SliderValue } from './SliderValue';
 
+const DESCRIPTION = [
+  'Sets an approximate, bounded value by dragging along a track — reach for `NumberInput` when the exact figure matters, since a slider is faster to move than it is to land.',
+  'A slider should always show its value: pair it with `SliderInput` for entry, or `SliderValue` for a readout.',
+].join(' ');
+
 const meta = {
   title: 'Inputs/Slider',
   component: Slider,
@@ -15,8 +20,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Pick an approximate, bounded value — or a range — by dragging a handle along a track. Built on `@ark-ui/react/slider`. A lean compound: the root owns the machine, and you compose `SliderControl` (renders the track + range) with one `SliderThumb` per thumb (the real interactive node — consumer `data-*` / analytics / `ref` land there). Add `SliderMarks` for ticks, `tooltip` on a `SliderThumb` for an on-drag bubble, `SliderInput` for inline numeric entry, and `SliderValue` for a live readout. Single vs range is driven by the value length (`[n]` vs `[low, high]`); render one thumb per entry. Reads `Field` context, so wrapping it in `<Field>` is the "Slider input" form field (no bundled wrapper).',
+        component: DESCRIPTION,
       },
     },
   },
@@ -52,7 +56,10 @@ const meta = {
 
 export default meta;
 
-/** Default single-value control — drag the handle or use arrow / Home / End / Page keys. */
+/**
+ * One handle on a track. Arrow keys move by `step`, Page keys jump further, and Home and End go
+ * to the bounds — worth knowing before reaching for a paired input.
+ */
 export const Basic: StoryFn<SliderProps> = args => (
   <Slider {...args}>
     <SliderControl>
@@ -62,11 +69,8 @@ export const Basic: StoryFn<SliderProps> = args => (
 );
 
 /**
- * Range — a 2-element value renders two thumbs (Figma `Double`). Render one
- * `SliderThumb` per thumb; they never cross (`thumbCollisionBehavior='none'`) and default
- * to `Minimum` / `Maximum` for screen readers. Pass `minStepsBetweenThumbs` to enforce a
- * gap. Each thumb carries its own `data-*` / analytics, so a range attributes its low and
- * high handles independently.
+ * Two entries in the value make two thumbs; render one `SliderThumb` per entry. The thumbs
+ * cannot cross, so the pair always reads as a valid range.
  */
 export const Range: StoryFn<SliderProps> = args => (
   <Slider {...args} defaultValue={[20, 80]}>
@@ -78,9 +82,8 @@ export const Range: StoryFn<SliderProps> = args => (
 );
 
 /**
- * Discrete with ticks — `SliderMarks` places ticks along the scale. Align `step` to the
- * mark spacing so drag and arrow-keys snap onto the ticks; click a tick to jump the
- * nearest thumb to it.
+ * `SliderMarks` draws ticks along the scale. Keep `step` aligned to the marks, or the handle
+ * lands between them and the ticks stop meaning anything.
  */
 export const Ticks: StoryFn<SliderProps> = args => (
   <Slider {...args} step={25} defaultValue={[50]}>
@@ -100,10 +103,8 @@ export const Ticks: StoryFn<SliderProps> = args => (
 );
 
 /**
- * Ticks as reference marks, without snapping — the same marks render for orientation, but
- * `step={1}` lets the thumb stop anywhere in between (here it starts at `40`, between the
- * 25 and 50 ticks). Use when the ticks are a visual guide rather than the only allowed
- * values. Clicking a tick still jumps to it.
+ * The same marks used purely for orientation, with `step` finer than their spacing. Choose this
+ * when the marks are a guide rather than the only valid answers.
  */
 export const TicksWithoutSnapping: StoryFn<SliderProps> = args => (
   <Slider {...args} step={1} defaultValue={[40]}>
@@ -123,9 +124,8 @@ export const TicksWithoutSnapping: StoryFn<SliderProps> = args => (
 );
 
 /**
- * Labeled / ordinal scale — marks carry text labels. The thumb snaps to mark positions
- * and announces the label (`aria-valuetext`) instead of the raw number. Set `step` so each
- * step lands on a mark.
+ * Marks carrying text, for a scale whose steps are named rather than numeric. The handle snaps
+ * to the labelled positions, so this is a choice among rungs rather than a magnitude.
  */
 export const Labeled: StoryFn<SliderProps> = args => (
   <Slider {...args} min={0} max={100} step={50} defaultValue={[50]}>
@@ -143,8 +143,8 @@ export const Labeled: StoryFn<SliderProps> = args => (
 );
 
 /**
- * On-drag tooltip — `tooltip` on a `SliderThumb` shows a value bubble above the handle
- * while dragging. Mutually exclusive with a persistent value readout.
+ * `tooltip` on a `SliderThumb` shows the value while dragging, then hides it. It suits a value
+ * only checked mid-gesture; anything needed afterwards wants a persistent readout.
  */
 export const WithTooltip: StoryFn<SliderProps> = args => (
   <Slider {...args}>
@@ -155,9 +155,9 @@ export const WithTooltip: StoryFn<SliderProps> = args => (
 );
 
 /**
- * Paired input — the precision escape hatch. `SliderInput` is an inline numbers-only
- * `Input` (a plain box, no stepper); typing updates the slider live and clamps to
- * `[min, max]`; dragging updates the input. The root lays the input out beside the control.
+ * `SliderInput` is the precision escape hatch: the track for approximate moves, the field for
+ * an exact figure. Typing commits on blur or Enter rather than live, so clamping never fights a
+ * half-typed number.
  */
 export const WithInput: StoryFn<SliderProps> = args => (
   <Slider {...args}>
@@ -168,7 +168,10 @@ export const WithInput: StoryFn<SliderProps> = args => (
   </Slider>
 );
 
-/** Range with two inputs — min on the left, max on the right; neither crosses. */
+/**
+ * A field at each end, low on the left and high on the right. Neither crosses the other, so the
+ * fields cannot produce a range the track could not.
+ */
 export const RangeWithInput: StoryFn<SliderProps> = args => (
   <Slider {...args} defaultValue={[20, 80]}>
     <SliderInput index={0} />
@@ -180,7 +183,10 @@ export const RangeWithInput: StoryFn<SliderProps> = args => (
   </Slider>
 );
 
-/** Disabled — the whole control renders at 50% opacity and is non-interactive. */
+/**
+ * The whole control dims and stops responding, handle included. The value stays legible,
+ * because a locked setting is usually one the reader still needs to read.
+ */
 export const Disabled: StoryFn<SliderProps> = args => (
   <Slider {...args} disabled>
     <SliderControl>
@@ -190,10 +196,8 @@ export const Disabled: StoryFn<SliderProps> = args => (
 );
 
 /**
- * In a `<Field>` — the "Slider input". Same composition order as every other DS input:
- * label on top → control → description below. The Slider reads Field context, so
- * `FieldLabel` names the thumb (`aria-labelledby`) and `invalid` / `disabled` cascade. No
- * bundled wrapper — pure composition.
+ * Wrapped in `Field`, which is the form-field shape. The slider reads that context, so the
+ * label and error attach without being passed anything.
  */
 export const InField: StoryFn<SliderProps> = args => (
   <Field>
@@ -208,9 +212,8 @@ export const InField: StoryFn<SliderProps> = args => (
 );
 
 /**
- * Field error — `invalid` on the `<Field>` cascades to the Slider (danger handle border)
- * and the `FieldError` message renders below the control (same field order as the rest of
- * the forms family).
+ * `invalid` on the `Field` cascades to the handle. The message is `FieldError`'s job, and it
+ * matters here because a slider cannot show a wrong value the way a text field can.
  */
 export const FieldWithError: StoryFn<SliderProps> = args => (
   <Field invalid>
@@ -225,8 +228,8 @@ export const FieldWithError: StoryFn<SliderProps> = args => (
 );
 
 /**
- * Value beside the label (Figma `Label value`) — the persistent value readout. Controlled,
- * rendered in the label row. Mutually exclusive with the on-drag `tooltip` — never both.
+ * The value beside the label, which is the readout Figma draws for a slider in a form — value
+ * beside label is the drawn default, not one option among several.
  */
 export const FieldWithValue: StoryFn<SliderProps> = args => {
   const [value, setValue] = useState([40]);
@@ -246,8 +249,8 @@ export const FieldWithValue: StoryFn<SliderProps> = args => {
 };
 
 /**
- * Range value beside the label — both ends shown, comma-separated (`{low}, {high}`),
- * updating live as either thumb moves (Figma `Label value` for `double`). Controlled.
+ * Both ends beside the label, comma-separated. For a range this is the only way to read the
+ * value without hovering each thumb.
  */
 export const RangeFieldWithValue: StoryFn<SliderProps> = args => {
   const [value, setValue] = useState([20, 80]);
@@ -270,10 +273,8 @@ export const RangeFieldWithValue: StoryFn<SliderProps> = args => {
 };
 
 /**
- * `SliderValue` part — a live readout that reads the slider context (no controlled state
- * needed just to display). Single shows the number; a range shows `low – high`; ordinal
- * scales show the mark label. The root is a horizontal row, so `SliderValue` sits to the
- * right of the track (like `SliderInput`, but read-only).
+ * `SliderValue` reads the slider's own context, so a live readout needs no controlled state of
+ * its own.
  */
 export const WithValueReadout: StoryFn<SliderProps> = args => (
   <Slider {...args} defaultValue={[60]}>
