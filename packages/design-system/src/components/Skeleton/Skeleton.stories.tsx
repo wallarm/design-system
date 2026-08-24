@@ -9,6 +9,12 @@ import { Tag, TagClose } from '../Tag';
 import { Text } from '../Text';
 import { Skeleton, type SkeletonProps } from './Skeleton';
 
+const DESCRIPTION = [
+  'A content-shaped placeholder for a region whose layout you know but whose data has not landed — it shortens the perceived wait and stops the page jumping when the content arrives.',
+  'Reach for it on the first or full load of a page, list, card or table; a single inline wait is a `Loader`, a measurable one is `Progress`, and a wait under a second wants nothing at all. Never put a skeleton and a spinner in the same region.',
+  'The root is `aria-hidden`, so the loading announcement has to come from a live region of your own.',
+].join(' ');
+
 const meta = {
   title: 'Loading/Skeleton',
   component: Skeleton,
@@ -16,13 +22,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Skeleton placeholder for loading states. ' +
-          'Uses pulse animation (opacity fade in/out). ' +
-          'Default size: width 100%, height 20px. Use width/height props (px, %, vw/vh). ' +
-          'Default radius: 6px (rounded-6), adjustable via rounded prop to match component shape. ' +
-          'Transparent mode: slate-600 gradient (6% → 16% → 6% → 16%). ' +
-          'Non-transparent mode: surface-1 background + slate-600 gradient (6% → 16% → 6% → 16%).',
+        component: DESCRIPTION,
       },
     },
   },
@@ -47,8 +47,10 @@ const meta = {
 
 export default meta;
 
+/** One sized box. `width` and `height` take any CSS length, and `rounded` should match the shape of whatever is coming. */
 export const Basic: StoryFn<typeof meta> = () => <Skeleton width='200px' height='20px' />;
 
+/** Standalone boxes built to match the real components beside them. The point of the comparison is the measurements: a placeholder that is not the content’s size is what makes the page jump on swap-in. */
 export const Shapes: StoryFn<SkeletonProps> = () => (
   <HStack gap={24} align='start'>
     <div className='flex flex-col items-end gap-24 w-[400px]'>
@@ -143,6 +145,7 @@ export const Shapes: StoryFn<SkeletonProps> = () => (
   </HStack>
 );
 
+/** The cleaner way — wrap the real content and toggle `loading`. The skeleton takes the content’s exact box, so there is nothing to keep in sync by hand. */
 export const Wrap: StoryFn<SkeletonProps> = () => (
   <HStack gap={24} align='start'>
     <div className='flex flex-col items-end gap-24 w-[400px]'>
@@ -283,13 +286,16 @@ export const Wrap: StoryFn<SkeletonProps> = () => (
   </HStack>
 );
 
+/** `transparent`, the default, animates over invisible content so the surface behind shows through; `transparent={false}` fills the box with `surface-1`. */
 export const Transparent: StoryFn<SkeletonProps> = () => (
   <div className='flex flex-col gap-8 p-8 rounded-8 bg-orange-100'>
-    <div className='flex gap-24 justify-end'>
-      Transparent: <Skeleton width='200px' height='20px' />
+    <div className='flex items-center justify-end gap-24'>
+      <span className='sb-annotation'>transparent</span>
+      <Skeleton width='200px' height='20px' />
     </div>
-    <div className='flex gap-24 justify-end'>
-      Not transparent: <Skeleton width='200px' height='20px' transparent={false} />
+    <div className='flex items-center justify-end gap-24'>
+      <span className='sb-annotation'>filled</span>
+      <Skeleton width='200px' height='20px' transparent={false} />
     </div>
   </div>
 );

@@ -486,3 +486,67 @@ Not findings — decisions worth remembering so they are not rediscovered.
   Story-file only.
 - **Found while** — documenting `Primitives/Icons`.
 - **Status** — Open.
+
+### Loader: no way to give the spinner an accessible name
+
+- **What** — `Loader` destructures only its own props and spreads nothing, so a
+  consumer cannot pass `aria-label`, `role`, `className` or any other attribute.
+  The only escape is wrapping it in an element of your own.
+- **Evidence** — `packages/design-system/src/components/Loader/Loader.tsx:38-45`.
+  Nord ships a `label` prop and hides the spinner from assistive tech without
+  one; Primer ships `srText` defaulting to "Loading"; EUI requires a title or
+  the icon goes `aria-hidden`. Three systems converge and we ship neither.
+- **Why it matters** — Every consumer has to reinvent the live region, so most
+  will not, and a spinner is exactly the moment a non-sighted user needs telling.
+  It also blocks analytics attributes on a loading state.
+- **Suggested action** — Either forward rest props, or add an optional `label`
+  that renders the `role="status"` wrapper. Coordinate with the loading-a11y
+  foundations gap already parked in the design-judgment backlog.
+- **Found while** — documenting `Loader`.
+- **Status** — Open.
+
+### Loader: the usage guide names a default colour the code does not have
+
+- **What** — The component's usage guide says `color` defaults to `primary`.
+  `loaderVariants` declares no `defaultVariants`, so with no `color` the spinner
+  simply inherits the current text colour.
+- **Evidence** — `Loader.tsx:8-26` against `Loader.llm.md` ("`primary` default").
+- **Why it matters** — Inheriting is arguably the better behaviour, but the two
+  documents disagree, and the Storybook page now describes the code.
+- **Suggested action** — Decide which is intended: add `defaultVariants` or
+  correct the usage guide.
+- **Found while** — documenting `Loader`.
+- **Status** — Open.
+
+### Progress: the colour prop exposes the whole palette
+
+- **What** — `color` offers every palette hue (brand, slate, red, worange, amber,
+  yellow, lime, green, emerald, teal, cyan, sky, blue, indigo and more) on a
+  component whose guidance is "stay on `brand` unless a status genuinely
+  applies".
+- **Evidence** — `packages/design-system/src/components/Progress/constants.ts`,
+  rendered in the `Colors` story.
+- **Why it matters** — A fourteen-colour menu reads as an invitation to pick a
+  colour, and a progress bar's colour is one of the few places where hue carries
+  meaning (failing, blocked, complete). The wide surface makes the meaningful
+  choice indistinguishable from a decorative one.
+- **Suggested action** — Consider narrowing to the status-bearing set, or keep
+  the palette and mark the status subset in the type.
+- **Found while** — documenting `Progress`.
+- **Status** — Open.
+
+### Skeleton: the comparison stories never say which column is which
+
+- **What** — `Shapes` and `Wrap` put placeholders in the left column and the real
+  components in the right with nothing labelling either, so the reader has to
+  infer the comparison.
+- **Evidence** — `Skeleton.stories.tsx`, both stories. The code carries
+  `{/* Title */}`-style comments that never render.
+- **Why it matters** — It is the one page where the whole point is that the
+  placeholder matches the content's measurements, and the pairing is left
+  implicit.
+- **Suggested action** — Add a two-word annotation over each column
+  ("placeholder" / "real"). Flagged rather than done, because the docs pass only
+  restyles annotations a story already has.
+- **Found while** — documenting `Skeleton`.
+- **Status** — Open.

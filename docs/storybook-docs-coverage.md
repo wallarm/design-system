@@ -86,10 +86,10 @@
 | 🟡 | Layout/Page | 2 | 0 | `components/Page/Page.stories.tsx` |
 | ☐ | Layout/ScrollArea | 2 | 0 | `components/ScrollArea/ScrollArea.stories.tsx` |
 | ☐ | Layout/Stack | 6 | 0 | `components/Stack/Stack.stories.tsx` |
-| ☐ | Loading/Loader | 5 | 0 | `components/Loader/Loader.stories.tsx` |
-| ☐ | Loading/Progress | 5 | 0 | `components/Progress/Progress.stories.tsx` |
-| 🟡 | Loading/Skeleton | 4 | 0 | `components/Skeleton/Skeleton.stories.tsx` |
-| ☐ | Loading/SplashScreen | 3 | 0 | `components/SplashScreen/SplashScreen.stories.tsx` |
+| ✅ | Loading/Loader | 5 | 5 | `components/Loader/Loader.stories.tsx` |
+| ✅ | Loading/Progress | 5 | 5 | `components/Progress/Progress.stories.tsx` |
+| ✅ | Loading/Skeleton | 4 | 4 | `components/Skeleton/Skeleton.stories.tsx` |
+| ✅ | Loading/SplashScreen | 3 | 3 | `components/SplashScreen/SplashScreen.stories.tsx` |
 | 🟡 | Messaging/Alert | 8 | 0 | `components/Alert/Alert.stories.tsx` |
 | 🟡 | Messaging/Banner | 8 | 4 | `components/Banner/Banner.stories.tsx` |
 | 🟡 | Messaging/Toast | 8 | 0 | `components/Toast/Toast.stories.tsx` |
