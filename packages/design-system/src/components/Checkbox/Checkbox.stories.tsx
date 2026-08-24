@@ -10,8 +10,8 @@ import { CheckboxIndicator } from './CheckboxIndicator';
 import { CheckboxLabel } from './CheckboxLabel';
 
 const DESCRIPTION = [
-  'Turns a single option on or off, or collects any number of choices from a set — reach for `Radio` when the choices are exclusive.',
-  'Compose each checkbox from `CheckboxIndicator` and `CheckboxLabel`, and wrap several in `CheckboxGroup` when they answer the same question.',
+  'Collects any number of choices from a limited set, or turns a single option on or off — reach for `Radio` when only one choice is allowed, and `Switch` when the change takes effect immediately instead of on submit.',
+  'Past roughly ten options, a `Select` reads better than a long column of boxes.',
 ].join(' ');
 
 const meta = {
@@ -35,7 +35,7 @@ const meta = {
 
 export default meta;
 
-/** The smallest useful composition — an indicator and a label, unchecked. */
+/** The smallest useful composition — `CheckboxIndicator` plus `CheckboxLabel`, with the label in sentence case. */
 export const Basic: StoryFn<typeof meta> = () => (
   <Checkbox data-testid='checkbox'>
     <CheckboxIndicator />
@@ -98,7 +98,10 @@ export const WithDescription: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
-/** `CheckboxGroup` ties several checkboxes to one `name` and one array of values, and owns the spacing between them. */
+/**
+ * `CheckboxGroup` ties several checkboxes to one `name` and one array of values, and owns the spacing
+ * between them. Group whatever answers a single question, and leave the rest ungrouped.
+ */
 export const Group: StoryFn<typeof meta> = () => (
   <CheckboxGroup name='framework' defaultValue={['vue']}>
     <Checkbox value='react'>
@@ -123,7 +126,11 @@ export const Group: StoryFn<typeof meta> = () => (
   </CheckboxGroup>
 );
 
-/** `variant='card'` gives every option its own bordered surface. Reach for it when options carry a description or need a larger target — plain rows read better for short, simple lists. */
+/**
+ * `variant='card'` gives every option its own bordered surface. Cards exist to carry a description —
+ * that is what the extra room is for, and a card holding a bare label wastes it. Plain rows read
+ * better for short lists of short labels.
+ */
 export const Card: StoryFn<typeof meta> = () => (
   <CheckboxGroup variant='card' name='framework' defaultValue={['vue', 'angular']}>
     <Checkbox value='react'>
