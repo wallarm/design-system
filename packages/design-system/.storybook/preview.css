@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Kalam:wght@300&family=Caveat:wght@400&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '../src/theme/index.css';
@@ -42,9 +42,11 @@ html,
    is how the inconsistency started. */
 .sb-annotation {
     color: var(--color-text-secondary);
-    font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+    /* Kalam at 300 rather than Caveat: Caveat's variable axis bottoms out at 400, and at 22px its
+       stroke read as too heavy next to the controls it labels. Caveat stays as the fallback. */
+    font-family: 'Kalam', 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
     font-size: 22px;
-    font-weight: 400;
+    font-weight: 300;
     /* Loose on purpose: the annotation sits directly above its examples, and at Figma's tight
        line height the label crowded the controls underneath it. */
     line-height: 1.6;
