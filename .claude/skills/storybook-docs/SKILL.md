@@ -142,6 +142,15 @@ Once a label is earning its place, cut it to the part that differs. `top` beats
 "Tooltip on top", `line-clamp-2` beats "Auto-detect line-clamp-2" — the story name
 carries the rest, and repeating it costs the reader a line every time.
 
+**Check the layout after converting, not just the wording.** The style is 22px
+handwriting on loose leading, which is taller and wider than the muted body text
+it usually replaces. Two failure modes follow. A story that lays labels out in one
+column and specimens in another, relying on the two columns having matching row
+heights, drifts out of alignment — `NumericBadge` went visibly crooked this way,
+and the fix is to give each row its own label so the pairing is structural rather
+than coincidental. And a label in a fixed-width column may now wrap where it did
+not before, so widen the column rather than shortening the label past sense.
+
 **A long annotation is a description in the wrong place.** Tour rendered five
 paragraphs inside its story canvases, each restating what the story sentence
 above the frame now said. Cut an annotation to the fewest words that still name

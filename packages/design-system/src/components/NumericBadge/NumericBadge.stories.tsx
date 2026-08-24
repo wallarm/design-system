@@ -32,16 +32,16 @@ export const Basic: StoryFn<typeof meta> = () => <NumericBadge>1</NumericBadge>;
  * Two heights, chosen to sit inside the control they are attached to rather than beside it.
  */
 export const Sizes: StoryFn<typeof meta> = () => (
-  <HStack gap={12}>
-    <VStack align='end'>
-      <span className='sb-annotation'>Small</span>
-      <span className='sb-annotation'>Default</span>
-    </VStack>
-    <VStack>
-      <NumericBadge size='small'>1</NumericBadge>
-      <NumericBadge size='default'>1</NumericBadge>
-    </VStack>
-  </HStack>
+  // One row per size, each holding its own label: parallel columns drift apart as soon as the
+  // label and the specimen have different heights.
+  <VStack gap={8} align='start'>
+    {(['small', 'default'] as const).map(size => (
+      <HStack key={size} gap={12} align='center'>
+        <span className='sb-annotation w-96 text-right'>{size}</span>
+        <NumericBadge size={size}>1</NumericBadge>
+      </HStack>
+    ))}
+  </VStack>
 );
 
 /**
@@ -49,60 +49,30 @@ export const Sizes: StoryFn<typeof meta> = () => (
  * itself is the thing demanding attention.
  */
 export const Types: StoryFn<typeof meta> = () => (
-  <HStack gap={12} align='stretch'>
-    <VStack align='end'>
-      <span className='sb-annotation'>Primary</span>
-      <span className='sb-annotation'>Brand</span>
-      <span className='sb-annotation'>Destructive</span>
-      <span className='sb-annotation'>Outline</span>
-      <span className='sb-annotation'>Info</span>
-      <span className='sb-annotation'>Primary-alt</span>
-    </VStack>
-
-    <VStack justify='between'>
-      <NumericBadge type='primary' size='default' onClick={() => console.log('meow')}>
-        1
-      </NumericBadge>
-      <NumericBadge type='brand' size='default' onClick={() => console.log('meow')}>
-        1
-      </NumericBadge>
-      <NumericBadge type='destructive' size='default' onClick={() => console.log('meow')}>
-        1
-      </NumericBadge>
-      <NumericBadge type='outline' size='default' onClick={() => console.log('meow')}>
-        1
-      </NumericBadge>
-      <NumericBadge type='info' size='default' onClick={() => console.log('meow')}>
-        1
-      </NumericBadge>
-      <div className='inline-flex bg-component-tooltip-bg'>
-        <NumericBadge type='primary-alt' size='default' onClick={() => console.log('meow')}>
+  // One row per type, so the label always sits beside the badges it names.
+  <VStack gap={8} align='start'>
+    {(['primary', 'brand', 'destructive', 'outline', 'info'] as const).map(type => (
+      <HStack key={type} gap={12} align='center'>
+        <span className='sb-annotation w-144 text-right'>{type}</span>
+        <NumericBadge type={type} size='default'>
           1
         </NumericBadge>
-      </div>
-    </VStack>
+        <NumericBadge type={type} size='small'>
+          1
+        </NumericBadge>
+      </HStack>
+    ))}
 
-    <VStack justify='around'>
-      <NumericBadge type='primary' size='small'>
-        1
-      </NumericBadge>
-      <NumericBadge type='brand' size='small'>
-        1
-      </NumericBadge>
-      <NumericBadge type='destructive' size='small'>
-        1
-      </NumericBadge>
-      <NumericBadge type='outline' size='small'>
-        1
-      </NumericBadge>
-      <NumericBadge type='info' size='small'>
-        1
-      </NumericBadge>
-      <div className='inline-flex bg-component-tooltip-bg'>
+    <HStack gap={12} align='center'>
+      <span className='sb-annotation w-144 text-right'>primary-alt</span>
+      <div className='inline-flex items-center gap-12 bg-component-tooltip-bg p-8'>
+        <NumericBadge type='primary-alt' size='default'>
+          1
+        </NumericBadge>
         <NumericBadge type='primary-alt' size='small'>
           1
         </NumericBadge>
       </div>
-    </VStack>
-  </HStack>
+    </HStack>
+  </VStack>
 );
