@@ -95,7 +95,17 @@ mistake to make, because the page looks fine until you compare it with a sibling
 `DateInput` beside them was converted:
 
 ```bash
-grep -n "<Text \|<Heading" <story-file>
+grep -nE "<Text |<Heading|text-text-(secondary|tertiary)" <story-file>
+```
+
+**A label is not always a `Text`.** `OverflowTooltip` shipped sixteen of them as
+`<p className='text-sm text-text-secondary mb-8'>`, and a scan for design-system
+components alone found none of them. Any muted small text sitting beside a
+specimen is a candidate, whatever element it uses. Convert by swapping the text
+classes for `sb-annotation` and keeping the spacing:
+
+```tsx
+<p className='sb-annotation mb-8'>Auto-detect line-clamp-2</p>
 ```
 
 Every hit is one of two things, and you have to decide which:
@@ -299,7 +309,7 @@ was still valid. Anchor edits on the `export const` line, and verify:
 ```bash
 git show HEAD:<path> | grep -c '^export const'   # must equal the file's count
 grep -c '^const DESCRIPTION' <path>              # must be 1 if the meta references it
-grep -c '<Text \|<Heading' <path>                # every hit judged: label or content?
+grep -cE '<Text |<Heading|text-text-(secondary|tertiary)' <path>  # each hit: label or content?
 ```
 
 Both checks exist because **neither lint nor typecheck catches these.** A story
