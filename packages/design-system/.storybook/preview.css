@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap');
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '../src/theme/index.css';
@@ -26,4 +27,23 @@ html,
     .docs-frame-rule {
         border-color: var(--color-slate-300);
     }
+}
+
+/* Story annotations — the labels inside a story canvas that name what a group of examples shows
+   ("Brand" / "Neutral", "Default" / "Disabled" / "Error"). They are scaffolding around the
+   specimen, not component surface, so they should never be mistaken for part of the design: they
+   take Figma's own annotation style, handwritten and pink, where Caveat stands in for Figma Hand.
+
+   Values come straight from Figma's `annotation/md` text style and `figma-utility/annotation-pink`,
+   which is already `--color-pink-500` in the palette.
+
+   Only ever restyle a label a story already has. Adding annotations to make a story look annotated
+   is how the inconsistency started. */
+.sb-annotation {
+    color: var(--color-pink-500);
+    font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
+    font-size: 18px;
+    font-weight: 400;
+    line-height: 1;
+    text-transform: lowercase;
 }

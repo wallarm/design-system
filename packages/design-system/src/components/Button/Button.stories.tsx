@@ -1,7 +1,6 @@
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { ChevronLeft, ChevronRight } from '../../icons';
-import { Heading } from '../Heading';
 import { NumericBadge } from '../NumericBadge';
 import { HStack, VStack } from '../Stack';
 import { Button } from './Button';
@@ -55,7 +54,7 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
  */
 export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
-    <Heading>Brand</Heading>
+    <span className='sb-annotation'>Brand</span>
 
     <HStack>
       <Button {...args} variant='primary' color='brand'>
@@ -71,7 +70,7 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral</Heading>
+    <span className='sb-annotation'>Neutral</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral'>
@@ -87,7 +86,7 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral Alt</Heading>
+    <span className='sb-annotation'>Neutral Alt</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral-alt'>
@@ -103,7 +102,7 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Destructive</Heading>
+    <span className='sb-annotation'>Destructive</span>
 
     <HStack>
       <Button {...args} variant='primary' color='destructive'>
@@ -150,7 +149,7 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
  */
 export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
-    <Heading>Brand</Heading>
+    <span className='sb-annotation'>Brand</span>
 
     <HStack>
       <Button {...args} variant='primary' color='brand' disabled>
@@ -166,7 +165,7 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral</Heading>
+    <span className='sb-annotation'>Neutral</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral' disabled>
@@ -182,7 +181,7 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral Alt</Heading>
+    <span className='sb-annotation'>Neutral Alt</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral-alt' disabled>
@@ -198,7 +197,7 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Destructive</Heading>
+    <span className='sb-annotation'>Destructive</span>
 
     <HStack>
       <Button {...args} variant='primary' color='destructive' disabled>
@@ -227,7 +226,7 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
  */
 export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
-    <Heading>Brand</Heading>
+    <span className='sb-annotation'>Brand</span>
 
     <HStack>
       <Button {...args} variant='primary' color='brand' loading>
@@ -243,7 +242,7 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral</Heading>
+    <span className='sb-annotation'>Neutral</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral' loading>
@@ -259,7 +258,7 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral Alt</Heading>
+    <span className='sb-annotation'>Neutral Alt</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral-alt' loading>
@@ -275,7 +274,7 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Destructive</Heading>
+    <span className='sb-annotation'>Destructive</span>
 
     <HStack>
       <Button {...args} variant='primary' color='destructive' loading>
