@@ -3,11 +3,9 @@ import { HStack, VStack } from '../components/Stack';
 import { Text } from '../components/Text';
 
 const DESCRIPTION = [
-  'Geist Pixel is the decorative typeface. Use it for empty states, and for moments that want personality rather than information.',
-  'There is no `Pixel` component. Pixel type is composed from the `font-pixel` utility plus the shared `text-*` size utilities, so the steps below are conventions rather than a component API. The only place it ships today is `EmptyStateTitle`, at 16/24.',
-  'One cut only: Square at regular weight. There is no light or bold, so `font-bold` on pixel type renders as a browser-synthesized fake — emphasis has to come from size or colour, never from weight.',
-  'Not for UI copy, labels, or anything read at length; that is the text ramp. Keep it to short strings, where the blocky letterforms stay legible.',
-].join('\n\n');
+  'The decorative face, for empty states and moments that want personality rather than information — never for UI copy, labels, or anything read at length.',
+  'There is no `Pixel` component: compose `font-pixel` with the shared `text-*` sizes, so the steps below are a convention rather than an API.',
+].join(' ');
 
 const meta = {
   title: 'Typography/Pixel',
@@ -39,6 +37,10 @@ const STEPS: PixelStep[] = [
   { token: 'pixel-lg', utilities: 'font-pixel text-base', metrics: '16 / 24' },
 ];
 
+/**
+ * The four sanctioned steps, with the Figma token beside each. Only one ships today —
+ * `EmptyStateTitle` at 16 on 24 — so treat the rest as available rather than established.
+ */
 export const Scale: StoryFn<typeof meta> = () => (
   <VStack gap={32} align='start'>
     {STEPS.map(({ token, utilities, metrics }) => (
@@ -57,6 +59,10 @@ export const Scale: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * One cut only, Square at regular weight. `font-bold` on pixel type renders as a
+ * browser-synthesised fake, so emphasis has to come from size or colour and never from weight.
+ */
 export const Decorative: StoryFn<typeof meta> = () => (
   <VStack gap={40} align='start'>
     <VStack gap={12} align='start'>

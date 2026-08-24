@@ -4,11 +4,9 @@ import { Text } from '../Text';
 import { Heading } from './Heading';
 
 const DESCRIPTION = [
-  'Geist for titles and section headings.',
-  'Hierarchy comes from the size step. All four weights exist at every size, so weight is emphasis within a level rather than a way to create one.',
-  'Visual size and document level are independent. Pick `size` for how it looks and `as` for the outline, so a visually small heading can still be an `h2` where the structure needs one.',
-  'The bottom of the ramp deliberately duplicates metrics that also exist in the text ramp — `sm` is 14 on 20 and `md` is 16 on 24, the same as `Text`. The difference is semantic: reach for a heading when the text is a title, and for `Text` when it is copy.',
-].join('\n\n');
+  'Geist for titles and section headings, where hierarchy comes from the size step — reach for `Text` when the words are copy rather than a title.',
+  'Visual size and document level are independent: pick `size` for how it looks and `as` for the outline, so a visually small heading can still be the `h2` the structure needs.',
+].join(' ');
 
 const meta = {
   title: 'Typography/Heading',
@@ -44,6 +42,10 @@ const meta = {
 
 export default meta;
 
+/**
+ * The default step. A heading is a title first and a size second, which is why the two are
+ * separate props.
+ */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
   <Heading {...args}>Default Heading</Heading>
 );
@@ -62,6 +64,10 @@ const SIZES = [
   { size: 'sm', metrics: '14 / 20' },
 ] as const;
 
+/**
+ * The full ramp with its metrics. The bottom steps deliberately duplicate the text ramp — `sm`
+ * is 14 on 20 exactly as in `Text` — because what separates them is semantic, not visual.
+ */
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack gap={24} align='start'>
     {SIZES.map(({ size, metrics }) => (
@@ -77,6 +83,9 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * All four weights at every size, so weight emphasises within a level rather than creating one.
+ */
 export const Weights: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack align='start'>
     <Heading {...args} size='3xl' weight='light'>
@@ -94,12 +103,20 @@ export const Weights: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * `asChild` moves the styling onto your own element, keeping whatever tag the surrounding
+ * markup needs.
+ */
 export const AsChild: StoryFn<typeof meta> = ({ ...args }) => (
   <Heading {...args} size='4xl' weight='bold' asChild>
     <h2>Custom H2 Element with AsChild</h2>
   </Heading>
 );
 
+/**
+ * `as` across the heading levels, which is the outline both a screen reader and a table of
+ * contents read. Choose it from the document structure, not from the size you wanted.
+ */
 export const PolymorphicElements: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack align='start'>
     <Heading {...args} as='h1' size='4xl'>
@@ -123,6 +140,10 @@ export const PolymorphicElements: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * A heading rendered inline, for a title inside a row of other content where a block element
+ * would break the line.
+ */
 export const AsSpan: StoryFn<typeof meta> = ({ ...args }) => (
   <Text>
     This is a paragraph with{' '}
@@ -133,6 +154,10 @@ export const AsSpan: StoryFn<typeof meta> = ({ ...args }) => (
   </Text>
 );
 
+/**
+ * A heading with no document level at all, for text that looks like a title but should not
+ * appear in the outline.
+ */
 export const AsDiv: StoryFn<typeof meta> = ({ ...args }) => (
   <Heading {...args} as='div' size='2xl' weight='medium'>
     This heading is rendered as a div element

@@ -235,6 +235,22 @@ One `###` heading per finding, newest last, with these lines:
 - **Found while** — documenting `NumberInput`.
 - **Status** — Open.
 
+### Text size='md' sets no font size and inherits from its container
+
+- **What** — The `md` step in the text ramp applies no font size of its own, so
+  a `Text` at `md` renders at whatever size surrounds it rather than at a known
+  step.
+- **Evidence** — Documented as a known gap in `Text.stories.tsx`'s own
+  description before this pass, and visible in the `Sizes` story where `md` does
+  not sit between `sm` and `lg` as the ramp implies.
+- **Why it matters** — A size step that silently means "inherit" is worse than a
+  missing step: the same code renders differently depending on where it is
+  dropped, and the ramp stops being a ramp.
+- **Suggested action** — Give `md` its own size, or remove it from the scale.
+- **Found while** — documenting `Text`. The page now warns about it on the
+  `Sizes` story, which should be removed once the gap is closed.
+- **Status** — Open.
+
 ## Known limitations we chose to live with
 
 Not findings — decisions worth remembering so they are not rediscovered.

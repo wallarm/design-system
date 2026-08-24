@@ -3,11 +3,9 @@ import { VStack } from '../Stack';
 import { Text } from './Text';
 
 const DESCRIPTION = [
-  'Geist for body copy, labels and UI text — the default choice for anything the user reads as prose.',
-  'All four weights exist at every size. Weight carries emphasis and colour carries de-emphasis, so neither is done by changing size. Step down for denser UI, not to build hierarchy.',
-  'Titles and links have their own ramps: reach for `Heading` when the text is a title and `Link` when it navigates.',
-  'Known gap: `size="md"` applies no font size of its own and inherits from its container, so it renders whatever surrounds it. The Sizes story below shows it beside `lg` — prefer an explicit step until that is fixed.',
-].join('\n\n');
+  'Geist for body copy, labels and anything read as prose — reach for `Heading` when the text is a title and `Link` when it navigates.',
+  'Weight carries emphasis and colour carries de-emphasis, so build hierarchy from those rather than by changing size.',
+].join(' ');
 
 const meta = {
   title: 'Typography/Text',
@@ -39,6 +37,10 @@ const meta = {
 
 export default meta;
 
+/**
+ * The default step. Text inherits its colour from the surroundings, which is why de-emphasis is
+ * a deliberate choice rather than the absence of one.
+ */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
   <Text {...args}>Default body text</Text>
 );
@@ -52,6 +54,11 @@ const SIZES = [
   { size: 'xs', metrics: '12 / 16' },
 ] as const;
 
+/**
+ * The ramp, for density rather than hierarchy — step down in a dense table, not to signal that
+ * something matters less. Note that `md` sets no size of its own and inherits from its
+ * container, so prefer an explicit step until that is fixed.
+ */
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack gap={24} align='start'>
     {SIZES.map(({ size, metrics }) => (
@@ -67,6 +74,9 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * All four weights at one size. Weight is emphasis within a level, never a way to create one.
+ */
 export const Weights: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack align='start'>
     <Text {...args} size='lg' weight='light'>
@@ -84,6 +94,10 @@ export const Weights: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * The de-emphasis ladder. Colour is how text recedes; a smaller size only makes it harder to
+ * read.
+ */
 export const Colors: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack align='start'>
     <Text {...args} color='primary'>
@@ -104,6 +118,10 @@ export const Colors: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * `asChild` puts the typography on your own element, for when the tag matters to the document
+ * but the styling should still come from here.
+ */
 export const AsChild: StoryFn<typeof meta> = ({ ...args }) => (
   <Text {...args} size='lg' weight='medium' asChild>
     <span>Custom Span Element with AsChild</span>

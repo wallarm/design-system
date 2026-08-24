@@ -4,11 +4,9 @@ import { Text } from '../Text';
 import { Code } from './Code';
 
 const DESCRIPTION = [
-  'Geist Mono for code, identifiers and machine-readable values — anything the user is meant to read as literal.',
-  'Italic is a modifier rather than a step in the scale: the `italic` prop pairs with any size and any weight.',
-  'Never add letter-spacing to this ramp. Monospace depends on a fixed character cell, so tracking breaks alignment in diffs, terminal output and anything measured in `ch`.',
-  'Multi-line blocks are `CodeSnippet`, not `Code`. It runs 12px on 20px leading so stacked lines breathe, where `size="s"` here is 12 on 16.',
-].join('\n\n');
+  'Geist Mono for code, identifiers and machine-readable values — anything read as literal rather than as prose.',
+  'This ramp is for inline fragments; multi-line blocks are `CodeSnippet`, drawn with looser leading so stacked lines breathe.',
+].join(' ');
 
 const meta = {
   title: 'Typography/Code',
@@ -40,6 +38,10 @@ const meta = {
 
 export default meta;
 
+/**
+ * An inline fragment in running text. It keeps the surrounding line height, so a paragraph
+ * containing code does not open up.
+ */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
   <Code {...args}>const example = 'code'</Code>
 );
@@ -52,6 +54,10 @@ const SIZES = [
   { size: 'l', metrics: '16 / 20' },
 ] as const;
 
+/**
+ * The ramp. Never add letter-spacing to it — monospace depends on a fixed character cell, and
+ * tracking breaks alignment in diffs, terminal output and anything measured in `ch`.
+ */
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack gap={24} align='start'>
     {SIZES.map(({ size, metrics }) => (
@@ -67,6 +73,10 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * Weight for emphasis within code, which buys less here than elsewhere: in a monospace run,
+ * bold is harder to spot than colour.
+ */
 export const Weights: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack align='start'>
     <Code {...args} size='m' weight='light'>
@@ -84,6 +94,10 @@ export const Weights: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * The same de-emphasis ladder as `Text`, for dimming part of an identifier rather than all of
+ * it.
+ */
 export const Colors: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack align='start'>
     <Code {...args} color='primary'>
@@ -95,6 +109,10 @@ export const Colors: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * What happens when code wraps in this ramp — tight leading, because it is drawn for one line.
+ * Past a couple of lines, reach for `CodeSnippet`.
+ */
 export const Multiline: StoryFn<typeof meta> = ({ ...args }) => (
   <Code {...args} size='m'>
     {`function example() {
@@ -105,6 +123,10 @@ export const Multiline: StoryFn<typeof meta> = ({ ...args }) => (
   </Code>
 );
 
+/**
+ * `italic` is a modifier rather than a step, pairing with any size and weight. Conventionally
+ * it marks a placeholder the reader is meant to replace.
+ */
 export const Italic: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack align='start'>
     <Code {...args} size='s' italic>
@@ -128,6 +150,10 @@ export const Italic: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * `asChild` puts the monospace styling on your own element, for when the tag carries meaning
+ * the styling should not override.
+ */
 export const AsChild: StoryFn<typeof meta> = ({ ...args }) => (
   <Code {...args} size='m' weight='medium' asChild>
     <code>{'<CustomCodeElement />'}</code>

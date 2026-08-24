@@ -25,8 +25,8 @@
 
 ## Snapshot
 
-- **22 written to the standard · 47 with prose to level · 26 untouched**
-- **The Actions, Inputs and Inputs Date folders are complete** — 4, 14 and 4 pages, every story carrying a sentence., across 95 story pages.
+- **26 written to the standard · 43 with prose to level · 26 untouched**
+- **The Actions, Inputs, Inputs Date and Typography folders are complete** — 4, 14, 4 and 4 pages, every story carrying a sentence., across 95 story pages.
 - Levelling a 🟡 is usually cutting, not filling. Slider reads as a dense developer paragraph about analytics attributes and ref forwarding; Heading runs four paragraphs of type theory. Both are good writing on the wrong page.
 - The drift runs upside-down. Niche components arrived documented while the ones everyone opens daily — `Button`, `Input`, `Select`, `Switch`, `Radio`, `Tag`, `Badge`, `Tabs`, `Tooltip` — arrived bare. Prioritise by daily traffic, not by how interesting the component is.
 - The **Stories** and **With a sentence** columns are the quickest way to spot a half-done page: equal numbers mean every example is covered.
@@ -126,7 +126,7 @@
 | ☐ | Status Indication/Indicator | 2 | 0 | `src/components/Indicator/Indicator.stories.tsx` |
 | ☐ | Status Indication/NumericBadge | 3 | 0 | `src/components/NumericBadge/NumericBadge.stories.tsx` |
 | ☐ | Status Indication/Tag | 7 | 0 | `src/components/Tag/Tag.stories.tsx` |
-| 🟡 | Typography/Code | 7 | 1 | `src/components/Code/Code.stories.tsx` |
-| 🟡 | Typography/Heading | 7 | 1 | `src/components/Heading/Heading.stories.tsx` |
-| 🟡 | Typography/Pixel | 2 | 0 | `src/theme/Pixel.stories.tsx` |
-| 🟡 | Typography/Text | 5 | 1 | `src/components/Text/Text.stories.tsx` |
+| ✅ | Typography/Code | 7 | 7 | `src/components/Code/Code.stories.tsx` |
+| ✅ | Typography/Heading | 7 | 7 | `src/components/Heading/Heading.stories.tsx` |
+| ✅ | Typography/Pixel | 2 | 2 | `src/theme/Pixel.stories.tsx` |
+| ✅ | Typography/Text | 5 | 5 | `src/components/Text/Text.stories.tsx` |
