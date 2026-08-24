@@ -34,16 +34,19 @@ html,
    specimen, not component surface, so they should never be mistaken for part of the design: they
    take Figma's own annotation style, handwritten and pink, where Caveat stands in for Figma Hand.
 
-   Values come straight from Figma's `annotation/md` text style and `figma-utility/annotation-pink`,
-   which is already `--color-pink-500` in the palette.
+   The handwritten face comes from Figma's `annotation/md` style. The colour deliberately does not:
+   Figma's annotation pink earns its loudness on a canvas full of other people's notes, but on a
+   documentation page it competes with the specimen, so these sit back at `--color-text-secondary`.
 
    Only ever restyle a label a story already has. Adding annotations to make a story look annotated
    is how the inconsistency started. */
 .sb-annotation {
-    color: var(--color-pink-500);
+    color: var(--color-text-secondary);
     font-family: 'Caveat', 'Segoe Script', 'Bradley Hand', cursive;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: 400;
-    line-height: 1;
+    /* Loose on purpose: the annotation sits directly above its examples, and at Figma's tight
+       line height the label crowded the controls underneath it. */
+    line-height: 1.6;
     text-transform: lowercase;
 }
