@@ -76,8 +76,9 @@ export const Basic: StoryFn<CardProps> = ({ ...args }) => (
       </Badge>
     </CardHeader>
 
+    <CardContent>Card description</CardContent>
+
     <CardFooter>
-      Card description
       <Button
         variant='secondary'
         color='neutral'
