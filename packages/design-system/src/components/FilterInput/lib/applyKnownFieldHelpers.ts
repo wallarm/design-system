@@ -18,13 +18,26 @@ type FieldHelpers = Pick<
  * Keyed by `FieldMetadata.name`; the factories produce the DS-supplied
  * implementation for every slot declared by `FieldHelpers` above.
  */
-// Append the bundled ISO list after the consumer-supplied lead, deduped by
-// value, so priority countries stay in front and everything else is still
-// selectable. An empty lead ⇒ the bundled list unchanged.
-const withBundledCountryTail = (lead: FieldValueOption[]): FieldValueOption[] => {
+// Section headers for the merged country menu: the consumer lead groups under
+// the first, the remaining bundled countries under the second.
+const FREQUENT_COUNTRY_SECTION = 'Most frequent';
+const OTHER_COUNTRY_SECTION = 'Other countries';
+
+// Merge the consumer-supplied lead with the bundled ISO list, split into two
+// labeled sections (`section` sugar → headers in the value menu): the lead
+// under "Most frequent", the remaining bundled countries (deduped against the
+// lead by value) under "Other countries". An empty lead ⇒ the flat bundled
+// list unchanged (no headers — there is nothing to distinguish).
+const withBundledCountrySections = (lead: FieldValueOption[]): FieldValueOption[] => {
   if (lead.length === 0) return COUNTRY_OPTIONS;
   const seen = new Set(lead.map(option => option.value));
-  return [...lead, ...COUNTRY_OPTIONS.filter(option => !seen.has(option.value))];
+  return [
+    ...lead.map(option => ({ ...option, section: FREQUENT_COUNTRY_SECTION })),
+    ...COUNTRY_OPTIONS.filter(option => !seen.has(option.value)).map(option => ({
+      ...option,
+      section: OTHER_COUNTRY_SECTION,
+    })),
+  ];
 };
 
 const KNOWN_FIELD_HELPERS: Record<string, (field: FieldMetadata) => FieldHelpers> = {
@@ -39,11 +52,12 @@ const KNOWN_FIELD_HELPERS: Record<string, (field: FieldMetadata) => FieldHelpers
   // The bundled list gives label resolution (chip + menu) and validation.
   //
   // Consumers may surface priority countries (e.g. a per-client "most seen"
-  // list) via `getSuggestions` or `values`; those lead and the bundled list
-  // fills the tail (see withBundledCountryTail), so anything not surfaced stays
-  // selectable. A plain consumer (no getSuggestions/values) gets the bundled
-  // list unchanged, with `getSuggestions` cleared so the allowlist wins (it
-  // would otherwise outrank `values` and disable allowlist validation).
+  // list) via `getSuggestions` or `values`; those group under a "Most frequent"
+  // header and the remaining bundled countries under "Other countries" (see
+  // withBundledCountrySections), so anything not surfaced stays selectable. A
+  // plain consumer (no getSuggestions/values) gets the flat bundled list
+  // unchanged, with `getSuggestions` cleared so the allowlist wins (it would
+  // otherwise outrank `values` and disable allowlist validation).
   country: field => {
     if (field.getSuggestions) {
       // Keeping a `getSuggestions` on the field means the DS allowlist
@@ -58,12 +72,12 @@ const KNOWN_FIELD_HELPERS: Record<string, (field: FieldMetadata) => FieldHelpers
       const consumerSuggest = field.getSuggestions;
       return {
         getSuggestions: (input, context) =>
-          withBundledCountryTail(consumerSuggest(input, context) ?? []),
+          withBundledCountrySections(consumerSuggest(input, context) ?? []),
         values: COUNTRY_OPTIONS,
       };
     }
     return {
-      values: withBundledCountryTail(field.values ?? []),
+      values: withBundledCountrySections(field.values ?? []),
       getSuggestions: undefined,
     };
   },
@@ -78,7 +92,7 @@ const KNOWN_FIELD_HELPERS: Record<string, (field: FieldMetadata) => FieldHelpers
  * | `name`        | DS owns                                                  |
  * | ------------- | -------------------------------------------------------- |
  * | `status_code` | acceptChar, normalize, getSuggestions, validate, serializeValue |
- * | `country`     | values/getSuggestions (bundled ISO list; consumer lead kept in front) |
+ * | `country`     | values/getSuggestions (consumer lead → "Most frequent" section, bundled ISO list → "Other countries") |
  *
  * Backend with a different name (e.g. `http_status_code`) must either rename or
  * wire the pieces manually (`createStatusCode*`, `COUNTRY_OPTIONS`). Only the

@@ -37,7 +37,7 @@ describe('applyKnownFieldHelpers', () => {
       expect(getInvalidValueIndices(field, ['US', 'ZZ'])).toEqual([1]);
     });
 
-    it('keeps a consumer `values` lead in front of the bundled tail, deduped', () => {
+    it('groups a consumer `values` lead under "Most frequent" and the rest under "Other countries", deduped', () => {
       const [field] = applyKnownFieldHelpers([
         {
           name: 'country',
@@ -51,17 +51,24 @@ describe('applyKnownFieldHelpers', () => {
         },
       ]);
       const values = field.values!;
-      // Lead preserved in the given order at the front...
+      // Lead preserved in order, tagged into the frequent section...
       expect(values.slice(0, 2)).toEqual([
-        { value: 'JP', label: 'Japan' },
-        { value: 'US', label: 'United States' },
+        { value: 'JP', label: 'Japan', section: 'Most frequent' },
+        { value: 'US', label: 'United States', section: 'Most frequent' },
       ]);
-      // ...and the bundled tail fills the rest without duplicating the lead.
+      // ...the rest bucket under "Other countries", deduped against the lead.
       expect(values.filter(o => o.value === 'US')).toHaveLength(1);
-      expect(values.length).toBeGreaterThan(200);
+      const other = values.filter(o => o.section === 'Other countries');
+      expect(other.length).toBeGreaterThan(200);
+      expect(other.every(o => o.value !== 'JP' && o.value !== 'US')).toBe(true);
+      // Exactly two section labels, frequent first.
+      expect([...new Set(values.map(o => o.section))]).toEqual([
+        'Most frequent',
+        'Other countries',
+      ]);
     });
 
-    it('wraps a consumer `getSuggestions` so its lead precedes the bundled tail', () => {
+    it('wraps a consumer `getSuggestions` so its lead leads under "Most frequent"', () => {
       const consumerSuggest = vi.fn(() => [{ value: 'US', label: 'United States' }]);
       const [field] = applyKnownFieldHelpers([
         {
@@ -76,12 +83,12 @@ describe('applyKnownFieldHelpers', () => {
       expect(typeof field.getSuggestions).toBe('function');
       const out = field.getSuggestions!('');
       expect(consumerSuggest).toHaveBeenCalled();
-      expect(out[0]).toEqual({ value: 'US', label: 'United States' });
+      expect(out[0]).toEqual({ value: 'US', label: 'United States', section: 'Most frequent' });
       expect(out.filter(o => o.value === 'US')).toHaveLength(1);
       expect(out.length).toBeGreaterThan(200);
     });
 
-    it('falls back to the bundled list when the wrapped getSuggestions yields nothing', () => {
+    it('falls back to the flat, unsectioned bundled list when the lead is empty', () => {
       // A lazy consumer returns undefined before its fetch lands.
       const consumerSuggest = vi.fn(() => undefined as never);
       const [field] = applyKnownFieldHelpers([
@@ -89,6 +96,8 @@ describe('applyKnownFieldHelpers', () => {
       ]);
       const out = field.getSuggestions!('');
       expect(out.length).toBeGreaterThan(200);
+      // No lead ⇒ no section headers.
+      expect(out.every(o => o.section === undefined)).toBe(true);
       expect(out).toContainEqual({ value: 'US', label: 'United States' });
     });
 
@@ -102,7 +111,7 @@ describe('applyKnownFieldHelpers', () => {
         },
       ]);
       const values = field.values!;
-      expect(values[0]).toEqual({ value: 'ZZ', label: 'Unknown' });
+      expect(values[0]).toEqual({ value: 'ZZ', label: 'Unknown', section: 'Most frequent' });
       expect(values.length).toBeGreaterThan(200);
     });
   });

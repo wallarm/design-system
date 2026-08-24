@@ -219,6 +219,13 @@ export interface FieldMetadata {
    * want users to pick manually.
    */
   hidden?: boolean;
+  /**
+   * When `true`, this field's value options are still loading (e.g. fetched
+   * on demand). The value dropdown shows a loading indicator instead of the
+   * option list until it flips back to `false`. Consumer-owned and reactive —
+   * set it while an async options fetch is in flight.
+   */
+  loadingOptions?: boolean;
 }
 
 /**
