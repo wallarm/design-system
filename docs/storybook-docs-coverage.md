@@ -8,7 +8,9 @@
 
 ## How to use this
 
-1. Pick a row, ideally a page people actually open every day.
+1. Pick a row — 🟡 counts. **Every page goes through the skill**, including the
+   ones that already have prose: existing wording gets read against the standard
+   and rewritten where it doesn't hold. A 🟡 is not a page you can skip.
 2. Start a fresh chat and run `/storybook-docs <Name>`.
 3. When the prose is on the page, set **Status** to ✅.
 4. Found a real problem in the component? Park it in [findings](./storybook-docs-findings.md) — never fix it here.
@@ -16,6 +18,8 @@
 **Status:** ✅ Written to the standard · 🟡 Has prose, not yet levelled · ☐ Nothing yet
 
 > ✅ means a person ran the skill on it and judged the result against the budget.
+> Nothing else counts — inherited prose has turned out to be over budget, at the
+> wrong altitude, and in at least one case simply wrong about what the component does.
 > The 🟡 and ☐ split below was derived mechanically from what is in the files, so it
 > measures whether prose *exists* — not whether it is any good.
 

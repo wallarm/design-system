@@ -85,10 +85,26 @@ grep -c '^/\*\*' <path>          # existing story descriptions
 grep -n 'description' <path>      # existing component description
 ```
 
-If prose already exists, you are **levelling, not filling** — most of the 49
-pages that have a description don't match the budget. Slider's is a dense
-developer paragraph; Heading's is four paragraphs of type theory. Both are good
-writing that needs cutting, not replacing.
+**Every page goes through this skill, including the ones that already have prose.**
+A 🟡 row in the coverage tracker is not "done" — it means prose exists, nothing
+more. Only a run that judged the wording against the standard earns ✅, so treat
+a 🟡 exactly like a ☐: read what's there, keep the lines that hold up, rewrite
+the ones that don't.
+
+When prose already exists you are **levelling, not filling**, which is the harder
+half of the job and where most of the ninety-five pages sit. Expect three kinds
+of problem:
+
+- **Over budget.** Slider's description was a hundred words of build detail;
+  Heading's is four paragraphs of type theory. Good writing, wrong page — cut it.
+- **Wrong altitude.** Contract detail (analytics attributes, ref forwarding)
+  belongs in the code, near whoever needs it, not on the page a designer opens.
+- **Factually wrong.** This is the one to watch for, because it reads as
+  finished. Slider's `WithInput` sentence claimed typing updates the slider live
+  and clamps; `SliderInput.tsx` actually holds an uncommitted draft and commits on
+  blur or Enter, deliberately, so clamping doesn't fight a half-typed number.
+  **Verify existing sentences against the source as carefully as your own** — an
+  inherited claim is not evidence.
 
 If the target isn't a real exported component, say so and stop rather than
 documenting something that can't be imported.
@@ -102,6 +118,7 @@ Read the component directory. Ground-truth rules, learned the hard way:
 | `{Name}.tsx` | what it is, what it's built on, structural behaviour |
 | `classes.ts` | variants and compound rules — what's locked |
 | `{Name}.stories.tsx` | **what each story actually renders** |
+| `{Name}.figma.tsx` | sanctioned compositions, and the Figma node ids for step 2 |
 | `index.ts` | sub-components worth naming in prose |
 | sibling components | the alternatives your boundaries will point at |
 
@@ -116,13 +133,26 @@ Read the component directory. Ground-truth rules, learned the hard way:
 ### 2 · Read our Figma file
 
 Figma carries *intent* the code cannot state, and it is the only source that will
-tell you what a variant is **for**. Ask the designer for the component's node URL
-if you don't have one.
+tell you what a variant is **for**.
 
-The WADS Components file is `VKb5gW46uSGw0rqrhZsbXT`. Read a node like this,
-because the obvious approaches fail:
+**Start with `{Name}.figma.tsx`** — the Code Connect file, if the component has
+one. It hard-codes the node URLs, and its `example()` blocks map each variant to
+sanctioned JSX, so it answers two questions at once: which node to read, and
+which compositions are blessed. On `Button` it also settled the variant matrix
+outright.
 
-1. `get_metadata` on the component's page node to get the frame tree.
+Only ask the designer for a node URL when there's no Code Connect file. The
+WADS Components file key is `VKb5gW46uSGw0rqrhZsbXT`.
+
+Then read the node, keeping in mind that **you cannot walk upward from a
+component node to the page that holds it**. `get_metadata` with no `nodeId`
+returns only the file's cover page, and there is no parent traversal — so without
+a node id from Code Connect or the designer, the `Documentation` and `Notes`
+frames are simply unreachable. Say so and move on rather than burning the run.
+
+With a node id in hand:
+
+1. `get_metadata` on it to get the frame tree.
 2. Find the `Documentation` and `Notes` frames in it.
 3. `get_screenshot` each child section, at `maxDimension` ≈ **the frame's width**
    (usually 960). A tall frame requested whole scales its text below readability.
