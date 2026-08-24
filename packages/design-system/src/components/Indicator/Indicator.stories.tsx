@@ -45,15 +45,22 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => <Indicator {...args}
  * system, so pick from meaning rather than from contrast.
  */
 export const AllVariants: StoryFn<typeof meta> = () => (
-  <VStack gap={12}>
-    <HStack align='center' gap={8}>
-      <span className='sb-annotation'>sm</span>
-      <span className='sb-annotation'>md</span>
+  // Fixed-width cells so each size heading sits over its own column: the dots are 6 and 8px, far
+  // narrower than the words above them, so without a shared width nothing lines up.
+  <VStack gap={16} align='start'>
+    <HStack gap={24} align='center'>
+      <span className='sb-annotation w-32 text-center'>sm</span>
+      <span className='sb-annotation w-32 text-center'>md</span>
     </HStack>
+
     {colors.map(color => (
-      <HStack key={color} align='center' gap={24}>
-        <Indicator size='sm' color={color} />
-        <Indicator size='md' color={color} />
+      <HStack key={color} gap={24} align='center'>
+        <div className='flex w-32 justify-center'>
+          <Indicator size='sm' color={color} />
+        </div>
+        <div className='flex w-32 justify-center'>
+          <Indicator size='md' color={color} />
+        </div>
         <span className='sb-annotation'>{color}</span>
       </HStack>
     ))}
