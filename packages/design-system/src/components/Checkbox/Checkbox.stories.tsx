@@ -35,7 +35,10 @@ const meta = {
 
 export default meta;
 
-/** The smallest useful composition — `CheckboxIndicator` plus `CheckboxLabel`, with the label in sentence case. */
+/**
+ * The smallest useful composition — `CheckboxIndicator` plus `CheckboxLabel`. Keep labels to a few
+ * words in sentence case, and reword rather than truncate.
+ */
 export const Basic: StoryFn<typeof meta> = () => (
   <Checkbox data-testid='checkbox'>
     <CheckboxIndicator />
@@ -51,7 +54,10 @@ export const Checked: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
-/** `checked='indeterminate'` covers a parent whose children are only partly selected. It is a state you set, never one a click produces — clicking moves it to checked. */
+/**
+ * `checked='indeterminate'` is for a parent whose children are only partly selected. Set it
+ * deliberately — a click never produces it — and clear it once every child is checked or unchecked.
+ */
 export const Indeterminate: StoryFn<typeof meta> = () => (
   <Checkbox checked='indeterminate'>
     <CheckboxIndicator />
@@ -100,7 +106,8 @@ export const WithDescription: StoryFn<typeof meta> = () => (
 
 /**
  * `CheckboxGroup` ties several checkboxes to one `name` and one array of values, and owns the spacing
- * between them. Group whatever answers a single question, and leave the rest ungrouped.
+ * between them. Every box stays independent: ticking one must never move another, unless it is a
+ * parent selecting all of its children.
  */
 export const Group: StoryFn<typeof meta> = () => (
   <CheckboxGroup name='framework' defaultValue={['vue']}>
