@@ -124,6 +124,17 @@ pages keep their own quiet `Text` labels.
 Elsewhere, both kinds of hit can appear in one file, so read each one rather than
 converting in bulk.
 
+**An annotation earns its place only when it tells two specimens apart.** That is
+the whole test. A frame showing a short string beside a long one needs "short — no
+tooltip" and "long — tooltip", because nothing else distinguishes them. A frame
+showing one specimen does not need a label at all: the story heading above it
+already says what it is, so the label just says it twice. When you delete a lone
+label, check its meaning survives in the story sentence.
+
+Once a label is earning its place, cut it to the part that differs. `top` beats
+"Tooltip on top", `line-clamp-2` beats "Auto-detect line-clamp-2" — the story name
+carries the rest, and repeating it costs the reader a line every time.
+
 **A long annotation is a description in the wrong place.** Tour rendered five
 paragraphs inside its story canvases, each restating what the story sentence
 above the frame now said. Cut an annotation to the fewest words that still name
