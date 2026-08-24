@@ -550,3 +550,38 @@ Not findings — decisions worth remembering so they are not rediscovered.
   restyles annotations a story already has.
 - **Found while** — documenting `Skeleton`.
 - **Status** — Open.
+
+### Logo: the Styles story never says which colour value each row is
+
+- **What** — `Styles` stacks three rows (`default`, `white`, `full-white`) with
+  only the background telling them apart, and no label naming the prop value.
+  `Sizes` has the same gap across its three columns.
+- **Evidence** — `packages/design-system/src/components/Logo/Logo.stories.tsx`.
+- **Why it matters** — `white` and `full-white` sit on identical dark surfaces
+  and differ only in the icon's colour, so a reader cannot map row to value
+  without opening the code.
+- **Suggested action** — Add a two-word annotation per row and per column.
+  Flagged rather than done, because this pass only restyles labels a story
+  already has.
+- **Found while** — documenting `Logo`.
+- **Status** — Open.
+
+### Brand: there is no logo-usage page, and the reference systems cannot supply one
+
+- **What** — Storybook documents the `Logo` component's props but nothing about
+  using the brand: clear space, minimum legible size, what not to do (recolour,
+  stretch, add effects, place on a busy photo), and when the mascot may appear
+  next to the logo.
+- **Evidence** — Consulting all seven reference systems returned almost nothing
+  usable: Atlassian's Logo page is a one-line definition, Primer keeps brand
+  rules in a separate brand toolkit outside the design system, Carbon's are
+  IBM-internal, and Nord ships no logo component at all. The guidance has to
+  come from us.
+- **Why it matters** — `Logo` and `WallyIcon` are the two components where misuse
+  is a brand problem rather than a UI problem, and the pages that would prevent
+  it do not exist.
+- **Suggested action** — A short `Brand/Usage` docs page (clear space, minimum
+  sizes, the misuse set, mascot-versus-logo), sourced from Figma rather than
+  written here.
+- **Found while** — documenting `Brand/Logo` and `Brand/WallyIcon`.
+- **Status** — Open.

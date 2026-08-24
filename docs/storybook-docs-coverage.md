@@ -37,8 +37,8 @@
 | ✅ | Actions/DropdownMenu | 9 | 9 | `components/DropdownMenu/DropdownMenu.stories.tsx` |
 | ✅ | Actions/SplitButton | 5 | 5 | `components/SplitButton/SplitButton.stories.tsx` |
 | ✅ | Actions/ToggleButton | 8 | 8 | `components/ToggleButton/ToggleButton.stories.tsx` |
-| 🟡 | Brand/Logo | 4 | 0 | `components/Logo/Logo.stories.tsx` |
-| 🟡 | Brand/WallyIcon | 3 | 0 | `components/WallyIcon/WallyIcon.stories.tsx` |
+| ✅ | Brand/Logo | 4 | 4 | `components/Logo/Logo.stories.tsx` |
+| ✅ | Brand/WallyIcon | 3 | 3 | `components/WallyIcon/WallyIcon.stories.tsx` |
 | 🟡 | Data Display/Accordion | 8 | 0 | `components/Accordion/Accordion.stories.tsx` |
 | 🟡 | Data Display/Attribute | 19 | 2 | `components/Attribute/Attribute.stories.tsx` |
 | 🟡 | Data Display/Card | 3 | 0 | `components/Card/Card.stories.tsx` |
