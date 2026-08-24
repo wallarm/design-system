@@ -115,3 +115,30 @@ describe('FormatNumber byte', () => {
     expect(screen.getByTestId('num')).toHaveTextContent('12,700,000 bytes');
   });
 });
+
+describe('FormatNumber tooltip={false}', () => {
+  it('renders no tooltip for abbreviated decimal values', () => {
+    render(<FormatNumber value={12_042} tooltip={false} data-testid='num' />);
+    expect(screen.getByTestId('num')).not.toHaveAttribute('data-part');
+  });
+
+  it('still displays abbreviated text', () => {
+    render(<FormatNumber value={12_042} tooltip={false} data-testid='num' />);
+    expect(screen.getByTestId('num')).toHaveTextContent('12k');
+  });
+
+  it('preserves aria-label for accessibility', () => {
+    render(<FormatNumber value={12_042} tooltip={false} data-testid='num' />);
+    expect(screen.getByTestId('num')).toHaveAttribute('aria-label', '12,042');
+  });
+
+  it('renders no tooltip for abbreviated byte values', () => {
+    render(<FormatNumber value={12_700_000} type='byte' tooltip={false} data-testid='num' />);
+    expect(screen.getByTestId('num')).not.toHaveAttribute('data-part');
+  });
+
+  it('displays abbreviated byte text without tooltip', () => {
+    render(<FormatNumber value={12_700_000} type='byte' tooltip={false} data-testid='num' />);
+    expect(screen.getByTestId('num')).toHaveTextContent('12.7 MB');
+  });
+});

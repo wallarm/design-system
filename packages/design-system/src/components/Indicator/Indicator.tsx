@@ -20,7 +20,7 @@ export type IndicatorProps = IndicatorNativeProps &
 export const Indicator: FC<IndicatorProps> = ({
   ref,
   className,
-  size = 'md',
+  size = 'sm',
   color = 'info',
   ...props
 }) => {

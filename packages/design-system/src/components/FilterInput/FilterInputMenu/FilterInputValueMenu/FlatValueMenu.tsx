@@ -6,6 +6,7 @@ import {
   DropdownMenuFooter,
   DropdownMenuGroup,
 } from '../../../DropdownMenu';
+import { Loader } from '../../../Loader';
 import { filterAndSort } from '../../lib';
 import { MenuEmptyState } from '../MenuEmptyState';
 import type { FilterInputValueMenuProps } from './FilterInputValueMenu';
@@ -39,6 +40,7 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
   menuRef,
   blurCommitRef,
   className,
+  loading = false,
 }) => {
   const filteredValues = useMemo(
     () => filterAndSort(values, filterText, valueOptionSearchText),
@@ -96,7 +98,15 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
         style={widthStyle}
         data-filter-input-menu='true'
       >
-        {displayValues.length > 0 ? (
+        {loading ? (
+          <div
+            className='flex items-center justify-center pt-2 pb-4 text-text-secondary'
+            role='status'
+            aria-live='polite'
+          >
+            <Loader size='sm' />
+          </div>
+        ) : displayValues.length > 0 ? (
           <DropdownMenuGroup className='flex flex-col gap-1'>
             {displayValues.map(option => (
               <ValueMenuItem
