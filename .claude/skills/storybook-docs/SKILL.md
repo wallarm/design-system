@@ -95,17 +95,24 @@ mistake to make, because the page looks fine until you compare it with a sibling
 `DateInput` beside them was converted:
 
 ```bash
-grep -nE "<Text |<Heading|text-text-(secondary|tertiary)" <story-file>
+grep -nE "<Text |<Heading|text-text-(secondary|tertiary)|<(div|span|p|th|td|b|strong)>[A-Z]" <story-file>
 ```
 
-**A label is not always a `Text`.** `OverflowTooltip` shipped sixteen of them as
-`<p className='text-sm text-text-secondary mb-8'>`, and a scan for design-system
-components alone found none of them. Any muted small text sitting beside a
-specimen is a candidate, whatever element it uses. Convert by swapping the text
-classes for `sb-annotation` and keeping the spacing:
+**No grep finds all of them, so the grep is the first pass and the rendered page
+is the check.** Open the story and read every piece of text in the frame: anything
+that is not the component or its own content is a label. Three shapes have turned
+up so far and each defeated the scan written for the last one —
+`<Text size='sm' color='secondary'>` on the date inputs, `<p className='text-sm
+text-text-secondary'>` on `OverflowTooltip`, and on `Badge` and `NumericBadge` a
+`<th>` and a bare `<div>Small</div>` carrying **no classes at all**. Expect a
+fourth shape.
+
+Convert by swapping the text classes for `sb-annotation`, keeping layout classes:
 
 ```tsx
-<p className='sb-annotation mb-8'>Auto-detect line-clamp-2</p>
+<p className='sb-annotation mb-8'>line-clamp-2</p>
+<th className='sb-annotation p-8 text-left'>{type}</th>
+<span className='sb-annotation'>Small</span>
 ```
 
 Every hit is one of two things, and you have to decide which:

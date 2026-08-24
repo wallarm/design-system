@@ -214,7 +214,7 @@ export const MutedVariants: StoryFn<typeof meta> = () => (
     <thead>
       <tr>
         {Object.keys(BadgeTypeEnum).map(type => (
-          <th key={type} className='p-8 text-left'>
+          <th key={type} className='sb-annotation p-8 text-left'>
             {type}
           </th>
         ))}
@@ -247,7 +247,7 @@ export const ColorVariants: StoryFn<typeof meta> = () => (
     <thead>
       <tr>
         {Object.keys(BadgeTypeEnum).map(type => (
-          <th key={type} className='p-8 text-left'>
+          <th key={type} className='sb-annotation p-8 text-left'>
             {type}
           </th>
         ))}
@@ -278,7 +278,7 @@ export const ContentVariants: StoryFn<typeof meta> = () => (
     <thead>
       <tr>
         {Object.keys(BadgeTypeEnum).map(type => (
-          <th key={type} className='p-8 text-left'>
+          <th key={type} className='sb-annotation p-8 text-left'>
             {type}
           </th>
         ))}

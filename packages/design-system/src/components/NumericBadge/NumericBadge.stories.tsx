@@ -34,8 +34,8 @@ export const Basic: StoryFn<typeof meta> = () => <NumericBadge>1</NumericBadge>;
 export const Sizes: StoryFn<typeof meta> = () => (
   <HStack gap={12}>
     <VStack align='end'>
-      <div>Small</div>
-      <div>Default</div>
+      <span className='sb-annotation'>Small</span>
+      <span className='sb-annotation'>Default</span>
     </VStack>
     <VStack>
       <NumericBadge size='small'>1</NumericBadge>
@@ -51,12 +51,12 @@ export const Sizes: StoryFn<typeof meta> = () => (
 export const Types: StoryFn<typeof meta> = () => (
   <HStack gap={12} align='stretch'>
     <VStack align='end'>
-      <div>Primary</div>
-      <div>Brand</div>
-      <div>Destructive</div>
-      <div>Outline</div>
-      <div>Info</div>
-      <div>Primary-alt</div>
+      <span className='sb-annotation'>Primary</span>
+      <span className='sb-annotation'>Brand</span>
+      <span className='sb-annotation'>Destructive</span>
+      <span className='sb-annotation'>Outline</span>
+      <span className='sb-annotation'>Info</span>
+      <span className='sb-annotation'>Primary-alt</span>
     </VStack>
 
     <VStack justify='between'>
