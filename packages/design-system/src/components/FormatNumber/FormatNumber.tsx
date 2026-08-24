@@ -40,6 +40,13 @@ interface FormatNumberBaseProps {
   /** Decimal places for percent. Default: 0. */
   decimals?: number;
 
+  /**
+   * Whether to show a tooltip with the full value on abbreviated numbers.
+   * When false, abbreviated values display without tooltip or dashed underline.
+   * Default: true.
+   */
+  tooltip?: boolean;
+
   ref?: Ref<HTMLSpanElement>;
 }
 
@@ -49,21 +56,24 @@ export type FormatNumberProps = FormatNumberNativeProps & FormatNumberBaseProps 
 
 const DASHED_UNDERLINE = 'border-b-1 border-dashed border-border-strong-primary';
 
+const TOOLTIP_POSITIONING = { placement: 'top' as const };
+
 export const FormatNumber: FC<FormatNumberProps> = ({
   value,
   type = 'decimal',
   notation = 'compact',
   unit,
   decimals = 0,
+  tooltip: showTooltip = true,
   ref,
   ...props
 }) => {
   // Null / undefined → em dash with "No data" tooltip
   if (value == null) {
     return (
-      <Tooltip>
+      <Tooltip positioning={TOOLTIP_POSITIONING}>
         <TooltipTrigger asChild>
-          <span ref={ref} data-slot='format-number' {...props}>
+          <span ref={ref} className='w-fit' data-slot='format-number' {...props}>
             <Text size='sm' color='secondary'>
               —
             </Text>
@@ -99,11 +109,17 @@ export const FormatNumber: FC<FormatNumberProps> = ({
     const { display, full } = formatBytes(value);
     const isAbbreviated = notation === 'compact' && value >= 1_000;
 
-    if (isAbbreviated) {
+    if (isAbbreviated && showTooltip) {
       return (
-        <Tooltip>
+        <Tooltip positioning={TOOLTIP_POSITIONING}>
           <TooltipTrigger asChild>
-            <span ref={ref} data-slot='format-number' aria-label={full} {...props}>
+            <span
+              ref={ref}
+              className='w-fit'
+              data-slot='format-number'
+              aria-label={full}
+              {...props}
+            >
               <Text size='sm'>
                 <span className={cn('whitespace-nowrap tabular-nums', DASHED_UNDERLINE)}>
                   {display}
@@ -113,6 +129,16 @@ export const FormatNumber: FC<FormatNumberProps> = ({
           </TooltipTrigger>
           <TooltipContent>{full}</TooltipContent>
         </Tooltip>
+      );
+    }
+
+    if (isAbbreviated) {
+      return (
+        <span ref={ref} data-slot='format-number' aria-label={full} {...props}>
+          <Text size='sm'>
+            <span className='whitespace-nowrap tabular-nums'>{display}</span>
+          </Text>
+        </span>
       );
     }
 
@@ -130,11 +156,17 @@ export const FormatNumber: FC<FormatNumberProps> = ({
   const isAbbreviated = notation === 'compact' && Math.abs(value) >= 1_000;
   const fullWithUnit = unit ? `${fullValue}\u00A0${unit}` : fullValue;
 
-  if (isAbbreviated) {
+  if (isAbbreviated && showTooltip) {
     return (
-      <Tooltip>
+      <Tooltip positioning={TOOLTIP_POSITIONING}>
         <TooltipTrigger asChild>
-          <span ref={ref} data-slot='format-number' aria-label={fullWithUnit} {...props}>
+          <span
+            ref={ref}
+            className='w-fit'
+            data-slot='format-number'
+            aria-label={fullWithUnit}
+            {...props}
+          >
             <Text size='sm'>
               <span className={cn('whitespace-nowrap tabular-nums', DASHED_UNDERLINE)}>
                 {abbreviated}
@@ -144,6 +176,18 @@ export const FormatNumber: FC<FormatNumberProps> = ({
         </TooltipTrigger>
         <TooltipContent>{fullWithUnit}</TooltipContent>
       </Tooltip>
+    );
+  }
+
+  if (isAbbreviated) {
+    const displayValue = unit ? `${abbreviated}\u00A0${unit}` : abbreviated;
+
+    return (
+      <span ref={ref} data-slot='format-number' aria-label={fullWithUnit} {...props}>
+        <Text size='sm'>
+          <span className='whitespace-nowrap tabular-nums'>{displayValue}</span>
+        </Text>
+      </span>
     );
   }
 

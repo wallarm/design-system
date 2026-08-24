@@ -16,7 +16,7 @@ export const indicatorVariants = cva('inline-block shrink-0 rounded-2', {
     },
   },
   defaultVariants: {
-    size: 'md',
+    size: 'sm',
     color: 'info',
   },
 });

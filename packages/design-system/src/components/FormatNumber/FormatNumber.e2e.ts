@@ -7,6 +7,7 @@ const formatNumberStory = createStoryHelper('data-display-formatnumber', [
   'With Unit',
   'Percent',
   'Bytes',
+  'No Tooltip',
   'Negative Values',
   'Null Value',
   'Special Values',
@@ -36,6 +37,11 @@ test.describe('Component: FormatNumber', () => {
 
     test('Should render byte values correctly', async ({ page }) => {
       await formatNumberStory.goto(page, 'Bytes');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render no tooltip variant correctly', async ({ page }) => {
+      await formatNumberStory.goto(page, 'No Tooltip');
       await expect(page).toHaveScreenshot();
     });
 

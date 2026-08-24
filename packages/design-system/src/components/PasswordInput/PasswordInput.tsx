@@ -41,9 +41,13 @@ export const PasswordInput: FC<PasswordInputProps> = ({
               disabled={disabled}
               aria-label={visible ? 'Hide password' : 'Show password'}
               onClick={toggle}
-              className='cursor-pointer disabled:cursor-not-allowed disabled:opacity-50'
+              className='cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 flex'
             >
-              {visible ? <EyeOff /> : <Eye />}
+              {visible ? (
+                <EyeOff size='md' className='text-slate-500' />
+              ) : (
+                <Eye size='md' className='text-slate-500' />
+              )}
             </button>
           </TooltipTrigger>
           <TooltipContent>{visible ? 'Hide password' : 'Show password'}</TooltipContent>
