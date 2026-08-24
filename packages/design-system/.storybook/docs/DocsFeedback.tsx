@@ -2,8 +2,7 @@ import type { FC } from 'react';
 import { useOf } from '@storybook/addon-docs/blocks';
 import { DocsSection } from './DocsSection';
 import { ISSUE_URL, resolveStoryFileUrl } from './sourceUrl';
-
-const linkClassName = 'text-text-link no-underline hover:underline';
+import { DOCS_LINK_CLASS_NAME } from './styles';
 
 /**
  * The same closing section on every component page: one obvious way to tell us the docs are wrong,
@@ -18,13 +17,18 @@ export const DocsFeedback: FC = () => {
     <DocsSection title='Feedback'>
       <p className='text-sm'>
         Help us improve this component by{' '}
-        <a className={linkClassName} href={ISSUE_URL} rel='noreferrer' target='_blank'>
+        <a className={DOCS_LINK_CLASS_NAME} href={ISSUE_URL} rel='noreferrer' target='_blank'>
           opening an issue
         </a>
         {storyFileUrl ? (
           <>
             {' or '}
-            <a className={linkClassName} href={storyFileUrl} rel='noreferrer' target='_blank'>
+            <a
+              className={DOCS_LINK_CLASS_NAME}
+              href={storyFileUrl}
+              rel='noreferrer'
+              target='_blank'
+            >
               updating this page on GitHub
             </a>
           </>

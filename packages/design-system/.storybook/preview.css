@@ -7,3 +7,23 @@ html,
     background: var(--color-bg-page-bg);
     color: var(--color-text-primary);
 }
+
+/* Storybook renders docs pages on its own light surface in both themes, so the Overview frame keeps
+   its light-theme colours rather than following data-theme into pale-on-white. */
+[data-theme='dark'] {
+    .docs-frame-link {
+        color: var(--color-blue-600);
+    }
+
+    .docs-frame-link:hover {
+        color: var(--color-blue-800);
+    }
+
+    .docs-frame-muted {
+        color: var(--color-slate-300);
+    }
+
+    .docs-frame-rule {
+        border-color: var(--color-slate-300);
+    }
+}
