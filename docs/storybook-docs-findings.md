@@ -351,3 +351,37 @@ Not findings — decisions worth remembering so they are not rediscovered.
   filter-clearing to `NoResults`.
 - **Found while** — documenting `EmptyState`.
 - **Status** — Open.
+
+### UtilityPage: the Offline story carries the 500 story's subtitle
+
+- **What** — `Offline` states "Something broke." above a description that says the
+  connection dropped and will reconnect on its own, so the headline contradicts
+  the copy below it and duplicates the `500` story word for word.
+- **Evidence** — `packages/design-system/src/components/UtilityPage/UtilityPage.stories.tsx`,
+  `Offline.args.subtitle`. Carbon and Atlassian both ask an error message to name
+  the actual problem; our own usage guide asks the subtitle to be the one-line
+  statement of what happened.
+- **Why it matters** — Offline is the one state where nothing is broken, and
+  saying it is undercuts the reassurance the description then tries to give.
+  It is also the sanctioned copy people will lift.
+- **Suggested action** — Reword to the state, e.g. "You're offline." or
+  "Connection lost."
+- **Found while** — documenting `UtilityPage`.
+- **Status** — Open.
+
+### UtilityPage: hand-rolled typography instead of the type components
+
+- **What** — The template styles its own heading and body text
+  (`font-mono text-6xl` on an `h1`, raw `p` elements) rather than composing
+  `Heading` / `Text`, and its three copy slots are plain `string` props, so a
+  consumer cannot pass a formatted node.
+- **Evidence** — `packages/design-system/src/components/UtilityPage/UtilityPage.tsx:31-40`.
+  `EmptyState` next to it composes `Text` for its description.
+- **Why it matters** — A typography change in the foundations will not reach this
+  page, and the sibling pair drifts. The string-only props also block a link
+  inside the description, which several of the states plausibly want.
+- **Suggested action** — Compose `Heading` / `Text` where the ramp allows it, and
+  widen the copy props to `ReactNode`. Both are behaviour-visible, so pair with a
+  screenshot check.
+- **Found while** — documenting `UtilityPage`.
+- **Status** — Open.
