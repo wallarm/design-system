@@ -160,6 +160,30 @@ export const Bytes: StoryFn<typeof meta> = () => (
   </div>
 );
 
+export const NoTooltip: StoryFn<typeof meta> = () => (
+  <div className='grid grid-cols-[1fr_1fr] items-center gap-x-16 gap-y-12'>
+    <Text size='sm' color='secondary' align='right'>
+      12,042 (decimal)
+    </Text>
+    <FormatNumber value={12_042} tooltip={false} />
+
+    <Text size='sm' color='secondary' align='right'>
+      59,614,283 (decimal)
+    </Text>
+    <FormatNumber value={59_614_283} tooltip={false} />
+
+    <Text size='sm' color='secondary' align='right'>
+      12,042 with unit
+    </Text>
+    <FormatNumber value={12_042} unit='requests' tooltip={false} />
+
+    <Text size='sm' color='secondary' align='right'>
+      12,700,000 (byte)
+    </Text>
+    <FormatNumber value={12_700_000} type='byte' tooltip={false} />
+  </div>
+);
+
 export const NegativeValues: StoryFn<typeof meta> = () => (
   <div className='grid grid-cols-[1fr_1fr] items-center gap-x-16 gap-y-12'>
     <Text size='sm' color='secondary' align='right'>

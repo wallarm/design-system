@@ -10,7 +10,7 @@ import {
   type PasswordComplexityItem,
 } from '../PasswordComplexity/PasswordComplexity';
 import { passwordValidators } from '../PasswordComplexity/validators';
-import { HStack } from '../Stack';
+import { HStack, VStack } from '../Stack';
 import { PasswordInput } from './PasswordInput';
 
 const meta = {
@@ -93,7 +93,7 @@ export const WithRequirements: StoryFn<typeof meta> = () => {
   ];
 
   return (
-    <div className='flex flex-col gap-16 w-[320px]'>
+    <VStack gap={16} className='w-[320px]'>
       <Field>
         <FieldLabel>New password</FieldLabel>
         <PasswordInput
@@ -102,16 +102,19 @@ export const WithRequirements: StoryFn<typeof meta> = () => {
           onChange={e => setPassword(e.target.value)}
         />
       </Field>
-      <Field>
-        <FieldLabel>Confirm password</FieldLabel>
-        <PasswordInput
-          placeholder='Confirm password...'
-          value={confirmPassword}
-          onChange={e => setConfirmPassword(e.target.value)}
-        />
-      </Field>
-      <PasswordComplexity items={items} />
-    </div>
+
+      <VStack gap={6}>
+        <Field>
+          <FieldLabel>Confirm password</FieldLabel>
+          <PasswordInput
+            placeholder='Confirm password...'
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+          />
+        </Field>
+        <PasswordComplexity items={items} />
+      </VStack>
+    </VStack>
   );
 };
 

@@ -32,7 +32,7 @@ export const InlineEditActions: FC<InlineEditActionsProps> = ({ onSubmit, onCanc
           // internal focus move and never submits.
           tabIndex={-1}
         >
-          <Check />
+          <Check className='text-slate-500' />
         </Button>
       </TooltipTrigger>
       <TooltipContent>
@@ -52,7 +52,7 @@ export const InlineEditActions: FC<InlineEditActionsProps> = ({ onSubmit, onCanc
           // tab order for the same reason as Save above.
           tabIndex={-1}
         >
-          <X />
+          <X className='text-slate-500' />
         </Button>
       </TooltipTrigger>
       <TooltipContent>
