@@ -3,6 +3,7 @@ import './react-aria-polyfill';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Decorator, Preview } from 'storybook-react-rsbuild';
 import { DateFormatProvider, type DateOrder, ThemeProvider, Toaster } from '../src';
+import { DocsPage } from './docs/DocsPage';
 import './preview.css';
 
 let toasterMountCount = 0;
@@ -28,6 +29,10 @@ const isDev = process.env.NODE_ENV === 'development';
 const preview: Preview = {
   parameters: {
     layout: 'centered',
+    docs: {
+      page: DocsPage,
+      toc: true,
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
