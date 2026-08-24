@@ -8,7 +8,6 @@ import { Field, FieldLabel, FieldSet } from '../Field';
 import { Input } from '../Input';
 import { Kbd, KbdGroup } from '../Kbd';
 import { HStack, VStack } from '../Stack';
-import { Text } from '../Text';
 import { beaconStepEffect, waitForStepEvent } from './lib';
 import { Tour } from './Tour';
 import type { TourStepDetails } from './types';
@@ -111,38 +110,22 @@ export const Overview: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          Step-by-step guided experience that highlights interface elements with contextual popovers
-          to help users discover new features or navigate unfamiliar workflows.
-          <br />
-          Supports full keyboard navigation: arrow keys to move between steps, Escape to dismiss,
-          Tab to focus the close button.
-        </Text>
-
         <VStack gap={4} align='stretch'>
-          <Text size='xs' weight='medium' color='secondary'>
-            Keyboard navigation
-          </Text>
+          <span className='sb-annotation'>keyboard</span>
           <HStack gap={8}>
             <KbdGroup>
               <Kbd>&larr;</Kbd>
               <Kbd>&rarr;</Kbd>
             </KbdGroup>
-            <Text size='xs' color='secondary'>
-              Navigate between steps
-            </Text>
+            <span className='sb-annotation'>move</span>
           </HStack>
           <HStack gap={8}>
             <Kbd>Esc</Kbd>
-            <Text size='xs' color='secondary'>
-              Dismiss tour
-            </Text>
+            <span className='sb-annotation'>dismiss</span>
           </HStack>
           <HStack gap={8}>
             <Kbd>Tab</Kbd>
-            <Text size='xs' color='secondary'>
-              Focus buttons
-            </Text>
+            <span className='sb-annotation'>focus</span>
           </HStack>
         </VStack>
 
@@ -244,12 +227,6 @@ export const Placement: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          The tour popover supports placement in any direction relative to the target element.
-          Placement is set per step and auto-flips when the popover would overflow the viewport,
-          ensuring content stays visible regardless of the target's position on screen.
-        </Text>
-
         <div className='grid grid-cols-3 gap-8 max-w-[50vw] mx-auto'>
           {PLACEMENTS.map(p => (
             <Button key={p} ref={refs[p]} variant='outline' color='neutral' size='medium'>
@@ -299,12 +276,6 @@ export const BeaconTriggered: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          A passive discovery pattern where a pulsing beacon highlights a new feature without
-          blocking the UI. No popover is shown initially — the tour step appears only after the user
-          clicks the highlighted element.
-        </Text>
-
         <HStack gap={8}>
           <Button ref={targetRef} variant='outline' color='neutral' size='large'>
             Quick tip
@@ -363,15 +334,6 @@ export const WaitForInteraction: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          A tour step that pauses and waits for the user to interact with a highlighted element
-          before proceeding to the next step.
-          <br />
-          The wait step uses <code>type: "tooltip"</code> with an effect callback{' '}
-          <code>waitForStepEvent</code> that attaches an event listener to the target element and
-          calls <code>next()</code> method when the user interacts with it.
-        </Text>
-
         <HStack gap={8}>
           <Button ref={firstRef} variant='outline' color='neutral' size='large'>
             Add Item
@@ -472,11 +434,6 @@ export const WaitForInput: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          To continue a step, user has to complete the highlighted action. Once the action is
-          performed, the tour will automatically move forward.
-        </Text>
-
         <FieldSet>
           <Field>
             <FieldLabel>Name</FieldLabel>

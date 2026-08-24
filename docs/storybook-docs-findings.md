@@ -281,11 +281,11 @@ One `###` heading per finding, newest last, with these lines:
 - **Why it matters** — It is documentation rendered as though it were part of the
   component, which is the confusion the annotation style exists to prevent. It
   also now says the same thing twice on one page.
-- **Suggested action** — Move the keyboard legend into the story sentence or the
-  description and drop the paragraph. Left alone here because removing it changes
-  what the story renders.
+- **Suggested action** — Done. The five duplicated paragraphs are gone, since the
+  story sentences above each frame now say the same thing, and the keyboard legend
+  is annotation-styled and cut to one word per row.
 - **Found while** — documenting `Tour`.
-- **Status** — Open.
+- **Status** — Closed — removed rather than parked, on Artem's call.
 
 ## Known limitations we chose to live with
 

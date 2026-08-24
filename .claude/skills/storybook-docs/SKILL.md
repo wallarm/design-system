@@ -124,6 +124,14 @@ pages keep their own quiet `Text` labels.
 Elsewhere, both kinds of hit can appear in one file, so read each one rather than
 converting in bulk.
 
+**A long annotation is a description in the wrong place.** Tour rendered five
+paragraphs inside its story canvases, each restating what the story sentence
+above the frame now said. Cut an annotation to the fewest words that still name
+what you are looking at — a legend row reads better as "dismiss" than as
+"Dismiss tour", and a paragraph inside a canvas almost always belongs in the
+description instead. Removing duplicated prose changes what the story renders, so
+it is a judgement call, but leaving two copies on one page is not neutral either.
+
 **The rule that matters: restyle, never author.** Only convert a label a story
 already has. Never add an annotation to a story that doesn't have one — a page
 that looks annotated is not the goal, and inventing labels is how the
