@@ -11,7 +11,7 @@ export const SwitchDescription: FC<SwitchDescriptionProps> = props => {
     <Text
       {...props}
       data-testid={testId}
-      size='md'
+      size='sm'
       weight='regular'
       color='secondary'
       data-scope='switch'
