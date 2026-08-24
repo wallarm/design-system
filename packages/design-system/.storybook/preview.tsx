@@ -47,7 +47,9 @@ const preview: Preview = {
         isFullscreen: true,
         showNav: isDev,
         showPanel: isDev,
-        showToolbar: isDev,
+        // Always on: the theme, date-order and locale switchers live here, and a reader of the
+        // deployed Storybook should never have to discover how to reveal them.
+        showToolbar: true,
       },
       storySort: {
         order: [
