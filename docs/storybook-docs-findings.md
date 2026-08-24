@@ -287,6 +287,25 @@ One `###` heading per finding, newest last, with these lines:
 - **Found while** — documenting `Tour`.
 - **Status** — Closed — removed rather than parked, on Artem's call.
 
+### FeedbackPulse's Playground story opens itself on page load
+
+- **What** — The story starts with `open` set to `true`, and `FeedbackPulse`
+  portals to `document.body`, so opening the Overview page makes a feedback card
+  appear pinned to the corner of the whole page rather than inside the story
+  frame.
+- **Evidence** — `FeedbackPulse.stories.tsx`, `Playground`: `useState(true)`.
+  Closed-on-load would be the honest demo, and the Escape test already clicks the
+  trigger to open it — but `Should show the confirmation when feedback is sent`
+  goes straight to this story and clicks a score, so it depends on the card being
+  up already.
+- **Why it matters** — A reader landing on the docs page is interrupted by a
+  survey they did not open, from a component they were only reading about.
+- **Suggested action** — Default the story closed and add a trigger click to the
+  one e2e test that assumes otherwise. Small, but it touches a test, so it wants
+  its own change rather than riding along with a documentation pass.
+- **Found while** — documenting `FeedbackPulse`; reported by Artem from the page.
+- **Status** — Open.
+
 ## Known limitations we chose to live with
 
 Not findings — decisions worth remembering so they are not rediscovered.
