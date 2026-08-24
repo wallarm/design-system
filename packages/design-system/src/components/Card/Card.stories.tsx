@@ -75,11 +75,11 @@ export const Basic: StoryFn<CardProps> = ({ ...args }) => (
         Badge
       </Badge>
     </CardHeader>
-    <CardContent>Card description</CardContent>
+
     <CardFooter>
+      Card description
       <Button
         variant='secondary'
-        size='small'
         color='neutral'
         onClick={() => console.log('Card`s button clicked')}
       >
