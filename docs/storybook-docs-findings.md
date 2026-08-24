@@ -156,6 +156,54 @@ One `###` heading per finding, newest last, with these lines:
 - **Found while** — documenting `ToggleButton`.
 - **Status** — Open.
 
+### Field context is read by only three of the controls it wraps
+
+- **What** — `Field` looks like it labels any control placed inside it, but only
+  `Input`, `Textarea` and `Slider` read Ark's field context. For `Switch`,
+  `Radio`, `Checkbox`, `NumberInput`, `Select`, `InputOTP` and the date/time
+  inputs, `Field` supplies layout only — the id, `aria-describedby` and
+  `aria-invalid` wiring does not happen.
+- **Evidence** — `useFieldContext` appears in exactly four files:
+  `Field/FieldIndicator.tsx`, `Input/Input.tsx`, `Textarea/Textarea.tsx` and
+  `Slider/Slider.tsx`. Field's own stories nevertheless demonstrate `Switches`,
+  `Radios`, `Checkboxes`, `NumberInputs` and `Selects`.
+- **Why it matters** — The gap is invisible: the page looks correct, and a
+  screen reader gets nothing. Because the stories show these combinations, they
+  read as sanctioned and wired.
+- **Suggested action** — Either have the remaining controls read the context, or
+  make the labelling requirement explicit at the point of composition. This is
+  the same gap the AI usage docs recorded as spanning seven inputs, so it is
+  known and worth doing properly rather than per component.
+- **Found while** — documenting `Field`.
+- **Status** — Open.
+
+### Input spreads its props twice, discarding the merge with field context
+
+- **What** — `Input` merges field props with its own (`mergeProps(field?.getInputProps(), props)`)
+  and then spreads `props` again after the merged object, so for any key present
+  in both, the merge is thrown away and the consumer's value wins outright.
+- **Evidence** — `Input/Input.tsx`: `<input {...mergedProps} {...props} …>`.
+- **Why it matters** — The merge exists to combine the field's handlers and
+  attributes with the consumer's. Where both supply one, the field's is silently
+  dropped, which is precisely the case the merge was written for.
+- **Suggested action** — Drop the second spread, or spread `props` first and the
+  merged object second, whichever matches the intent.
+- **Found while** — documenting `Input`.
+- **Status** — Open.
+
+### size='inline-edit' is public on Input as well as Button
+
+- **What** — The same undeclared fourth size appears on `Input`
+  (`h-28`), reachable by consumers but absent from every story and from Figma.
+- **Evidence** — `Input/classes.ts` size variants; matches the `Button` finding
+  above.
+- **Why it matters** — Two components now leak an internal size for `InlineEdit`,
+  which suggests the pattern will spread rather than a one-off slip.
+- **Suggested action** — Decide once, for the family, whether `inline-edit` is a
+  public size or internal plumbing.
+- **Found while** — documenting `Input`.
+- **Status** — Open.
+
 ## Known limitations we chose to live with
 
 Not findings — decisions worth remembering so they are not rediscovered.

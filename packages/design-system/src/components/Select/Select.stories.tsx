@@ -26,6 +26,11 @@ import { SelectSeparator } from './SelectSeparator';
 import type { SelectDataItem } from './types';
 import { useSelectSearch } from './useSelectSearch';
 
+const DESCRIPTION = [
+  'Holds one answer, or several, chosen from a list — below about six options expose them instead with `Radio` or `SegmentedControl`, and reach for `DropdownMenu` when the items run commands rather than set a value.',
+  'The trigger is composed rather than configured: `SelectButton` for a button-shaped trigger, `SelectInput` for one that looks like a field.',
+].join(' ');
+
 const meta = {
   title: 'Inputs/Select',
   component: Select,
@@ -48,6 +53,11 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 } satisfies Meta<typeof Select>;
 
@@ -85,6 +95,10 @@ const skills: SelectDataItem[] = [
 
 const skillsWithoutIcons: SelectDataItem[] = skills.map(({ icon, ...skill }) => skill);
 
+/**
+ * The minimum composition: a trigger, a `SelectPositioner`, and `SelectContent` holding the
+ * options. Every part is explicit, which is what lets the trigger change without the menu changing.
+ */
 export const Basic: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
@@ -111,6 +125,10 @@ export const Basic: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * The same height scale as the other fields, so a select sits in a row of inputs without
+ * breaking the line.
+ */
 export const Sizes: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
@@ -209,6 +227,10 @@ export const Sizes: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * The trigger is yours to shape — labelled, icon-led, or value-only. Whatever it looks like,
+ * it must still read as something that opens.
+ */
 export const DifferentButtons: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
@@ -452,6 +474,10 @@ export const DifferentButtons: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * `multiple` collects several answers, and the trigger summarises them. Once past a couple of
+ * selections a summary beats a list, which is what `WithTags` is for.
+ */
 export const Multiple: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
@@ -527,6 +553,10 @@ export const Multiple: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * Icons carry the option's identity into the closed trigger, which matters more in a
+ * multi-select where the text is compressed into a summary.
+ */
 export const MultipleWithIcons: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skills,
@@ -617,6 +647,10 @@ export const MultipleWithIcons: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * `SelectGroup` with `SelectGroupLabel` splits a long list into named sections. Group when
+ * the reader would otherwise scan, not merely because the options have categories.
+ */
 export const Grouped: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
@@ -649,6 +683,10 @@ export const Grouped: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * The whole control is out, trigger included. Disabling individual options instead keeps the
+ * list honest about what exists.
+ */
 export const Disabled: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skills,
@@ -672,6 +710,10 @@ export const Disabled: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * `loading` on the root, for a list still being fetched. It holds the trigger's shape so the
+ * layout doesn't jump when the options land.
+ */
 export const Loading: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skills,
@@ -695,6 +737,10 @@ export const Loading: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * `SelectInput` makes the trigger look like a text field, which suits a select sitting in a
+ * form beside real inputs rather than in a toolbar.
+ */
 export const WithSelectInput: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skills,
@@ -752,6 +798,10 @@ export const WithSelectInput: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * `SelectSeparator` divides kinds of option — a destructive or clear-all entry from the real
+ * choices — where a group label would be overkill.
+ */
 export const WithSeparator: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skills,
@@ -781,6 +831,10 @@ export const WithSeparator: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * `SelectValueIcon` in the option and the trigger, so the chosen option keeps its icon once
+ * the menu closes.
+ */
 export const WithIcons: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skills,
@@ -807,6 +861,10 @@ export const WithIcons: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * `SelectFooter` pins content below the scrolling list, for a persistent escape like managing
+ * the options themselves.
+ */
 export const WithFooter: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
@@ -863,6 +921,10 @@ export const WithFooter: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * `SelectSearchInput` with the `useSelectSearch` hook, plus `SelectEmptyState` for when
+ * nothing matches. Add search once the list outgrows a glance — roughly ten options.
+ */
 export const WithSearch: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
@@ -930,6 +992,10 @@ export const WithSearch: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * Inside `Field`, so the label and description come from `FieldLabel` and `FieldDescription`
+ * rather than from the select.
+ */
 export const WithFormField: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
@@ -1022,6 +1088,10 @@ export const WithFormField: StoryFn<typeof Select> = () => {
   );
 };
 
+/**
+ * Selections render as removable tags inside the field, which is the honest shape for
+ * multi-select when the reader needs to see and undo each choice individually.
+ */
 export const WithTags: StoryFn<typeof Select> = () => {
   const collection = createListCollection({
     items: skillsWithoutIcons,
