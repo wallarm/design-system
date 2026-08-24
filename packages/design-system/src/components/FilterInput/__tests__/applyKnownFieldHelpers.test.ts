@@ -36,6 +36,50 @@ describe('applyKnownFieldHelpers', () => {
       expect(getInvalidValueIndices(field, ['US', 'DE'])).toEqual([]);
       expect(getInvalidValueIndices(field, ['US', 'ZZ'])).toEqual([1]);
     });
+
+    it('keeps a consumer `values` lead in front of the bundled tail, deduped', () => {
+      const [field] = applyKnownFieldHelpers([
+        {
+          name: 'country',
+          label: 'Country',
+          type: 'string',
+          // Per-client "most seen" priority list, backend order.
+          values: [
+            { value: 'JP', label: 'Japan' },
+            { value: 'US', label: 'United States' },
+          ],
+        },
+      ]);
+      const values = field.values!;
+      // Lead preserved in the given order at the front...
+      expect(values.slice(0, 2)).toEqual([
+        { value: 'JP', label: 'Japan' },
+        { value: 'US', label: 'United States' },
+      ]);
+      // ...and the bundled tail fills the rest without duplicating the lead.
+      expect(values.filter(o => o.value === 'US')).toHaveLength(1);
+      expect(values.length).toBeGreaterThan(200);
+    });
+
+    it('wraps a consumer `getSuggestions` so its lead precedes the bundled tail', () => {
+      const consumerSuggest = vi.fn(() => [{ value: 'US', label: 'United States' }]);
+      const [field] = applyKnownFieldHelpers([
+        {
+          name: 'country',
+          label: 'Country',
+          type: 'string',
+          getSuggestions: consumerSuggest,
+        },
+      ]);
+      // getSuggestions survives (wrapped, not cleared) so the consumer's lazy
+      // fetch still fires and its list leads.
+      expect(typeof field.getSuggestions).toBe('function');
+      const out = field.getSuggestions!('');
+      expect(consumerSuggest).toHaveBeenCalled();
+      expect(out[0]).toEqual({ value: 'US', label: 'United States' });
+      expect(out.filter(o => o.value === 'US')).toHaveLength(1);
+      expect(out.length).toBeGreaterThan(200);
+    });
   });
 
   it('wires all five helpers for a field named status_code', () => {

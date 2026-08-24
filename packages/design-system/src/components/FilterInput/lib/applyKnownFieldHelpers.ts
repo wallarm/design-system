@@ -1,4 +1,4 @@
-import type { FieldMetadata } from '../types';
+import type { FieldMetadata, FieldValueOption } from '../types';
 import { COUNTRY_OPTIONS } from './country';
 import {
   createStatusCodeInputFilter,
@@ -18,7 +18,16 @@ type FieldHelpers = Pick<
  * Keyed by `FieldMetadata.name`; the factories produce the DS-supplied
  * implementation for every slot declared by `FieldHelpers` above.
  */
-const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
+// Append the bundled ISO list after the consumer-supplied lead, deduped by
+// value, so priority countries stay in front and everything else is still
+// selectable. An empty lead ⇒ the bundled list unchanged.
+const withBundledCountryTail = (lead: FieldValueOption[]): FieldValueOption[] => {
+  if (lead.length === 0) return COUNTRY_OPTIONS;
+  const seen = new Set(lead.map(option => option.value));
+  return [...lead, ...COUNTRY_OPTIONS.filter(option => !seen.has(option.value))];
+};
+
+const KNOWN_FIELD_HELPERS: Record<string, (field: FieldMetadata) => FieldHelpers> = {
   status_code: () => ({
     acceptChar: createStatusCodeInputFilter(),
     normalize: createStatusCodeNormalizer(),
@@ -27,13 +36,28 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
     serializeValue: createStatusCodeSerializer(),
   }),
   // Country options are bundled in DS so the backend doesn't ship the full list.
-  // A static allowlist gives label resolution (chip + menu) and validation.
-  // `getSuggestions` is cleared so the allowlist always wins (it would otherwise
-  // outrank `values` in getFieldValues and disable allowlist validation).
-  country: () => ({
-    values: COUNTRY_OPTIONS,
-    getSuggestions: undefined,
-  }),
+  // The bundled list gives label resolution (chip + menu) and validation.
+  //
+  // Consumers may surface priority countries (e.g. a per-client "most seen"
+  // list) via `getSuggestions` or `values`; those lead and the bundled list
+  // fills the tail (see withBundledCountryTail), so anything not surfaced stays
+  // selectable. A plain consumer (no getSuggestions/values) gets the bundled
+  // list unchanged, with `getSuggestions` cleared so the allowlist wins (it
+  // would otherwise outrank `values` and disable allowlist validation).
+  country: field => {
+    if (field.getSuggestions) {
+      const consumerSuggest = field.getSuggestions;
+      return {
+        getSuggestions: (input, context) =>
+          withBundledCountryTail(consumerSuggest(input, context) ?? []),
+        values: COUNTRY_OPTIONS,
+      };
+    }
+    return {
+      values: withBundledCountryTail(field.values ?? []),
+      getSuggestions: undefined,
+    };
+  },
 };
 
 /**
@@ -45,7 +69,7 @@ const KNOWN_FIELD_HELPERS: Record<string, () => FieldHelpers> = {
  * | `name`        | DS owns                                                  |
  * | ------------- | -------------------------------------------------------- |
  * | `status_code` | acceptChar, normalize, getSuggestions, validate, serializeValue |
- * | `country`     | values (bundled ISO country allowlist)                   |
+ * | `country`     | values/getSuggestions (bundled ISO list; consumer lead kept in front) |
  *
  * Backend with a different name (e.g. `http_status_code`) must either rename or
  * wire the pieces manually (`createStatusCode*`, `COUNTRY_OPTIONS`). Only the
@@ -59,7 +83,7 @@ export const applyKnownFieldHelpers = (fields: FieldMetadata[]): FieldMetadata[]
     const factory = KNOWN_FIELD_HELPERS[field.name];
     if (!factory) return field;
     changed = true;
-    return { ...field, ...factory() };
+    return { ...field, ...factory(field) };
   });
   return changed ? out : fields;
 };
@@ -72,4 +96,4 @@ export const applyKnownFieldHelpers = (fields: FieldMetadata[]): FieldMetadata[]
 export const getKnownFieldSerializer = (
   fieldName: string,
 ): NonNullable<FieldMetadata['serializeValue']> | undefined =>
-  KNOWN_FIELD_HELPERS[fieldName]?.().serializeValue;
+  KNOWN_FIELD_HELPERS[fieldName]?.({ name: fieldName } as FieldMetadata).serializeValue;
