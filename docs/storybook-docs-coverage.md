@@ -115,10 +115,10 @@
 | ✅ | Patterns/FilterInput/FilterInputChip | 21 | 21 | `components/FilterInput/stories/FilterInputChip.stories.tsx` |
 | ✅ | Patterns/FilterInput/FilterInputFieldMenu | 11 | 11 | `components/FilterInput/stories/FilterInputFieldMenu.stories.tsx` |
 | ✅ | Patterns/FilterInput/FilterInputOperatorMenu | 8 | 8 | `components/FilterInput/stories/FilterInputOperatorMenu.stories.tsx` |
-| 🟡 | Primitives/Icons | 3 | 1 | `icons/module/Icons.stories.tsx` |
-| ☐ | Primitives/Kbd | 4 | 0 | `components/Kbd/Kbd.stories.tsx` |
-| ☐ | Primitives/Overlay | 1 | 0 | `components/Overlay/Overlay.stories.tsx` |
-| ☐ | Primitives/Separator | 1 | 0 | `components/Separator/Separator.stories.tsx` |
+| ✅ | Primitives/Icons | 3 | 3 | `icons/module/Icons.stories.tsx` |
+| ✅ | Primitives/Kbd | 4 | 4 | `components/Kbd/Kbd.stories.tsx` |
+| ✅ | Primitives/Overlay | 1 | 1 | `components/Overlay/Overlay.stories.tsx` |
+| ✅ | Primitives/Separator | 1 | 1 | `components/Separator/Separator.stories.tsx` |
 | 🟡 | Production cluster | 10 | 0 | `components/Selection/Selection.stories.tsx` |
 | ✅ | Status Indication/Badge | 11 | 11 | `components/Badge/Badge.stories.tsx` |
 | ✅ | Status Indication/Indicator | 2 | 2 | `components/Indicator/Indicator.stories.tsx` |

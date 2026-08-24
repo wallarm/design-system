@@ -53,11 +53,19 @@ const categoryCounts = allEntries.reduce<Record<string, number>>((acc, entry) =>
 
 const { Check, CircleCheck, Info, TriangleAlert } = iconExports;
 
+const DESCRIPTION = [
+  'The whole icon set, one component per glyph. `size` defaults to `inherit`, so an icon set in text follows the size and colour of the type around it; pass an explicit size only where it has to stay put whatever the text does.',
+  'An icon with no `title` is decorative and hidden from screen readers — give it one wherever the icon is the only thing carrying the meaning, an icon-only button above all.',
+].join(' ');
+
 const meta: Meta = {
   title: 'Primitives/Icons',
   parameters: {
     layout: 'padded',
     docs: {
+      description: {
+        component: DESCRIPTION,
+      },
       canvas: {
         sourceState: 'none',
       },
@@ -69,6 +77,7 @@ export default meta;
 
 type Story = StoryObj;
 
+/** The searchable gallery: filter by name or category, switch the preview size, and click a tile to copy its JSX. */
 export const AllIcons: Story = {
   render: () => {
     const [searchTerm, setSearchTerm] = useState('');
@@ -188,34 +197,34 @@ export const AllIcons: Story = {
   },
 };
 
+/** The fixed steps from `xs` to `2xl`. A fixed size holds whatever the surrounding text does, which is what a button or a table cell wants. */
 export const IconSizes: Story = {
   render: () => (
     <div style={{ padding: '20px' }}>
-      <h3 style={{ marginBottom: '20px' }}>Icon Sizes</h3>
       <div style={{ display: 'flex', gap: '20px', alignItems: 'center' }}>
         <div style={{ textAlign: 'center' }}>
           <Check size='xs' title='Check icon XS' />
-          <div style={{ fontSize: '12px', marginTop: '4px' }}>XS</div>
+          <div className='sb-annotation'>xs</div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <Check size='sm' title='Check icon SM' />
-          <div style={{ fontSize: '12px', marginTop: '4px' }}>SM</div>
+          <div className='sb-annotation'>sm</div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <Check size='md' title='Check icon MD' />
-          <div style={{ fontSize: '12px', marginTop: '4px' }}>MD</div>
+          <div className='sb-annotation'>md</div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <Check size='lg' title='Check icon LG' />
-          <div style={{ fontSize: '12px', marginTop: '4px' }}>LG</div>
+          <div className='sb-annotation'>lg</div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <Check size='xl' title='Check icon XL' />
-          <div style={{ fontSize: '12px', marginTop: '4px' }}>XL</div>
+          <div className='sb-annotation'>xl</div>
         </div>
         <div style={{ textAlign: 'center' }}>
           <Check size='2xl' title='Check icon 2XL' />
-          <div style={{ fontSize: '12px', marginTop: '4px' }}>2XL</div>
+          <div className='sb-annotation'>2xl</div>
         </div>
       </div>
     </div>
@@ -231,21 +240,13 @@ const textSizes = [
 
 const iconSizes: SvgIconSize[] = ['xs', 'sm', 'md', 'lg', 'xl'];
 
-/**
- * Demonstrates how icons behave inside text at different text and icon sizes.
- *
- * - **Inherit (1em)**: icon scales with font size via `size="current"`
- * - **Fixed sizes**: icon stays at its fixed pixel size regardless of text size
- * - **Color inheritance**: icon inherits text color, can be overridden
- */
+/** Icons inside running text — `size='inherit'` scales and takes its colour from the type, fixed sizes ignore it, and an explicit `className` still overrides the inherited colour. */
 export const IconsInText: Story = {
   render: () => (
     <VStack gap={20} align='stretch'>
       {/* Inherit size */}
       <VStack gap={8} align='stretch'>
-        <Text weight='bold' size='sm' color='secondary'>
-          Inherit size — icon scales with text via size=&quot;inherit&quot;
-        </Text>
+        <p className='sb-annotation'>inherit — scales with the text</p>
         <VStack gap={4} align='start'>
           {textSizes.map(({ label, className }) => (
             <p key={label} className={`${className} text-text-primary`}>
@@ -257,33 +258,29 @@ export const IconsInText: Story = {
 
       {/* Fixed icon sizes across text sizes */}
       <VStack gap={8} align='stretch'>
-        <Text weight='bold' size='sm' color='secondary'>
-          Fixed icon sizes in different text sizes
-        </Text>
+        <p className='sb-annotation'>fixed sizes</p>
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: `100px repeat(${iconSizes.length}, 1fr)`,
+            gridTemplateColumns: `160px repeat(${iconSizes.length}, 1fr)`,
             gap: '8px 16px',
             alignItems: 'start',
           }}
         >
           {/* Header row */}
-          <Text size='xs' color='secondary' weight='medium'>
-            text \ icon
-          </Text>
+          <span className='sb-annotation'>text \ icon</span>
           {iconSizes.map(size => (
-            <Text key={size} size='xs' color='secondary' weight='medium'>
+            <span key={size} className='sb-annotation'>
               {size}
-            </Text>
+            </span>
           ))}
 
           {/* Data rows */}
           {textSizes.map(({ label, className }) => (
             <>
-              <Text key={`${label}-label`} size='xs' color='secondary'>
+              <span key={`${label}-label`} className='sb-annotation'>
                 {label}
-              </Text>
+              </span>
               {iconSizes.map(size => (
                 <p key={`${label}-${size}`} className={`${className} text-text-primary`}>
                   <TriangleAlert size={size} /> Alert
@@ -296,9 +293,7 @@ export const IconsInText: Story = {
 
       {/* Color inheritance */}
       <VStack gap={8} align='stretch'>
-        <Text weight='bold' size='sm' color='secondary'>
-          Color inheritance — icon inherits text color
-        </Text>
+        <p className='sb-annotation'>colour follows the text</p>
         <VStack gap={4} align='start'>
           <p className='text-sm text-text-primary'>
             Default <TriangleAlert size='inherit' /> inherits text-primary
@@ -324,9 +319,7 @@ export const IconsInText: Story = {
 
       {/* Multiline paragraph */}
       <VStack gap={8} align='stretch'>
-        <Text weight='bold' size='sm' color='secondary'>
-          Icon in flowing text (baseline alignment)
-        </Text>
+        <p className='sb-annotation'>in flowing text</p>
         <p className='text-sm text-text-primary' style={{ maxWidth: '400px' }}>
           Click the <TriangleAlert size='inherit' /> icon to see warnings. You can also check{' '}
           <Info size='inherit' /> for more details about the issue.

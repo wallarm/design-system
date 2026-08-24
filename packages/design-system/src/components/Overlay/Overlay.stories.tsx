@@ -2,11 +2,22 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Text } from '../Text';
 import { Overlay } from './Overlay';
 
+const DESCRIPTION = [
+  'The house scrim — a fixed, dimmed, lightly blurred layer that mutes the page behind an elevated surface.',
+  '`Dialog`, `Drawer` and `Tour` render it for you, so reach for those; a popover, tooltip or dropdown is non-modal and takes no scrim at all.',
+  'It is presentation only: no focus trap, no click-to-dismiss, no scroll lock, and no `className`.',
+].join(' ');
+
 const meta = {
   title: 'Primitives/Overlay',
   component: Overlay,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 
   decorators: [
@@ -48,4 +59,5 @@ const meta = {
 
 export default meta;
 
+/** The scrim over a page of text, which is the whole of what it does. Its fade keys off a `data-state` the parent sets, so on its own it just sits there — the behaviour comes from the headless backdrop you wrap it in. */
 export const Basic: StoryFn<typeof meta> = () => <Overlay />;

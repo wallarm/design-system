@@ -439,3 +439,50 @@ Not findings — decisions worth remembering so they are not rediscovered.
   the entry point is unambiguous.
 - **Found while** — documenting the `FilterInput` family.
 - **Status** — Open.
+
+### Kbd: the props types are never exported
+
+- **What** — `KbdProps` and `KbdGroupProps` are declared with `type` but not
+  exported, and `index.ts` re-exports only the components.
+- **Evidence** — `packages/design-system/src/components/Kbd/Kbd.tsx:24`,
+  `KbdGroup.tsx:4`, `Kbd/index.ts`. The component rules require exporting both
+  the component and its props type from `index.ts`.
+- **Why it matters** — A consumer cannot type a wrapper around `Kbd`, and the
+  Overview page's API table comes out nearly empty: `size` shows no options and
+  `children` is missing, so the page cannot tell anyone that `xsmall` exists.
+- **Suggested action** — Export both prop types and add them to `index.ts`.
+- **Found while** — documenting `Kbd`.
+- **Status** — Open.
+
+### Separator: the props table omits `spacing`, its main knob
+
+- **What** — The API table lists `orientation` and `decorative` but not
+  `spacing`, the 22-step scale that sets the margin around the rule.
+- **Evidence** — `Separator.tsx` takes `spacing` through
+  `VariantProps<typeof separatorVariants>`; the rendered Overview table shows
+  only the explicitly declared props. `EmptyState`'s `type` (also a variant prop,
+  but declared on the interface) does appear.
+- **Why it matters** — The one thing a reader has to decide about a separator is
+  how much air it carries, and the API section does not admit the prop exists.
+- **Suggested action** — Declare `spacing` on the exported props type, or add an
+  `argTypes` entry so docgen picks it up. Worth checking which other components
+  hide variant-only props the same way.
+- **Found while** — documenting `Separator`.
+- **Status** — Open.
+
+### Icons: the gallery tiles are click-only
+
+- **What** — Each tile in `AllIcons` is a `div` with an `onClick` that copies the
+  JSX, so copying an icon name cannot be done from the keyboard, and the copy
+  affordance is a `title` tooltip.
+- **Evidence** — `packages/design-system/src/icons/module/Icons.stories.tsx`,
+  the gallery grid. The story file also builds its layout from inline `style`
+  objects and returns a keyless fragment from a `map`, which logs a React warning
+  on the page.
+- **Why it matters** — This is the most-visited page in Storybook and the one
+  designers and engineers use as a picker; a mouse-only copy is a real barrier,
+  and it reads oddly on a design system that audits its own components for this.
+- **Suggested action** — Make each tile a `button`, and add the missing key.
+  Story-file only.
+- **Found while** — documenting `Primitives/Icons`.
+- **Status** — Open.
