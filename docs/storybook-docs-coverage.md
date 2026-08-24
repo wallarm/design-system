@@ -25,8 +25,8 @@
 
 ## Snapshot
 
-- **37 written to the standard · 39 with prose to level · 19 untouched**, across 95 story pages.
-- **Complete folders:** Actions, Inputs, Inputs Date, Typography, Overlay, Status Indication.
+- **54 written to the standard · 28 with prose to level · 13 untouched**, across 95 story pages.
+- **Complete folders:** Actions, Brand, Inputs, Inputs Date, Loading, Overlay, Pages, Patterns, Primitives, Status Indication, Typography.
 - Levelling a 🟡 is usually cutting, not filling — and sometimes correcting: `Slider` claimed behaviour its own code contradicted, and `Dialog` claimed a position it does not have.
 - On a ✅ row the two count columns match. Where they do not, the page is not finished.
 
