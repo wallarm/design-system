@@ -385,3 +385,57 @@ Not findings — decisions worth remembering so they are not rediscovered.
   screenshot check.
 - **Found while** — documenting `UtilityPage`.
 - **Status** — Open.
+
+### FilterInput stories: non-token chrome on public docs pages
+
+- **What** — The scaffolding around the specimens is raw Tailwind rather than
+  design-system surface: `bg-blue-500` trigger buttons, a `bg-blue-50` info
+  panel, `text-gray-600` labels, `bg-gray-100` JSON debug boxes, and hand-styled
+  `<kbd>` spans where the DS ships a `Kbd` component.
+- **Evidence** — `FilterInputOperatorMenu.stories.tsx` (the `Open Menu` button and
+  the keyboard panel), `FilterInput.stories.tsx` and
+  `FilterInputComposition.stories.tsx` (the `bg-gray-100` expression dumps).
+- **Why it matters** — These are the pages a reader opens to judge the pattern,
+  and the loudest thing on several of them is a stock-blue button that exists in
+  no product screen. The `<kbd>` spans also mean the docs contradict `Kbd`.
+- **Suggested action** — Swap the triggers for `Button`, the panel for the
+  annotation style, the `<kbd>` spans for `Kbd`, and give the expression dumps a
+  neutral token surface. Story-file only, so it is safe from the component's
+  point of view.
+- **Found while** — documenting the `FilterInput` family.
+- **Status** — Open.
+
+### FilterInput: the BackendIntegration example demonstrates a pattern we forbid
+
+- **What** — The story fakes a fetch with `useState(() => { setTimeout(...) })`,
+  using a state initialiser as an effect, and `Simple` still carries a
+  `console.log` (the one lint warning in the folder).
+- **Evidence** — `FilterInputComposition.stories.tsx`, `BackendIntegration.render`
+  and `Simple.render`. Our coding standards rule out `useEffect` for derived
+  state and `console` in shipped code; a state initialiser with a timer inside is
+  worse than either.
+- **Why it matters** — It is the sanctioned answer to "how do I wire this to the
+  backend", so it is the snippet people copy into product code.
+- **Suggested action** — Rewrite with a plain `useEffect` and a documented mock
+  delay, and drop the `console.log`.
+- **Found while** — documenting the `FilterInput` family.
+- **Status** — Open.
+
+### FilterInput: three of the five pages document internals nobody should compose
+
+- **What** — `FilterInputChip` (21 stories), `FilterInputFieldMenu` (11) and
+  `FilterInputOperatorMenu` (8) each get a full Overview page, while the usage
+  guidance is that the pattern owns all three and consumers must not hand-wire
+  them. Forty of the family's sixty-one stories are therefore internal-only.
+- **Evidence** — The five story files under
+  `packages/design-system/src/components/FilterInput/stories/`, against the
+  "self-contained UI / exported only for rare custom builds" rule in the
+  component's usage guide.
+- **Why it matters** — A reader browsing `Patterns/` cannot tell which of the
+  five pages they are meant to use, and the sub-pages carry the most
+  implementation-flavoured stories in the library.
+- **Suggested action** — Decide whether the three internal pages belong in the
+  public sidebar at all; if they stay, group them under an `Internals` node so
+  the entry point is unambiguous.
+- **Found while** — documenting the `FilterInput` family.
+- **Status** — Open.

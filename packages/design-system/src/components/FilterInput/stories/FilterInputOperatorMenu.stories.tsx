@@ -4,9 +4,21 @@ import type { FilterInputOperatorMenuProps } from '../FilterInputMenu';
 import { FilterInputOperatorMenu } from '../FilterInputMenu';
 import type { FilterOperator } from '../types';
 
+const DESCRIPTION = [
+  'The operator menu, shown on its own — `FilterInput` opens it once a field is chosen, and that field’s `type` decides the list.',
+  'The wording is house-fixed: you pass tokens like `is_null` and the menu renders the words, so operator labels stay the same everywhere.',
+].join(' ');
+
 const meta = {
   title: 'Patterns/FilterInput/FilterInputOperatorMenu',
   component: FilterInputOperatorMenu,
+  parameters: {
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
+  },
   tags: ['autodocs'],
   argTypes: {
     fieldType: {
@@ -57,11 +69,7 @@ const Template: StoryFn<typeof meta> = (args: FilterInputOperatorMenuProps) => {
       >
         {open ? 'Close Menu' : 'Open Menu'}
       </button>
-      {selectedOperator && (
-        <div className='mb-2 text-sm text-gray-600'>
-          Selected: <strong>{selectedOperator}</strong>
-        </div>
-      )}
+      {selectedOperator && <p className='sb-annotation mb-2'>selected: {selectedOperator}</p>}
       <FilterInputOperatorMenu
         {...args}
         selectedOperator={selectedOperator}
@@ -73,73 +81,56 @@ const Template: StoryFn<typeof meta> = (args: FilterInputOperatorMenuProps) => {
   );
 };
 
-/**
- * String field type operators: is, is not, contains, does not contain, is one of, is not one of, is empty, is not empty
- */
+/** A string field: equality, substring matching, set membership, and the two presence checks. */
 export const StringType = Template.bind({});
 StringType.args = {
   fieldType: 'string',
   open: true,
 };
 
-/**
- * Integer field type operators: is, is not, greater than, less than, greater than or equal to, less than or equal to, is between, is one of, is not one of, is empty, is not empty
- */
+/** Numbers add the comparisons and `between` — the operators a row of dropdowns cannot express, and the usual reason to reach for this pattern at all. */
 export const IntegerType = Template.bind({});
 IntegerType.args = {
   fieldType: 'integer',
   open: true,
 };
 
-/**
- * Float field type operators: is, is not, greater than, less than, greater than or equal to, less than or equal to, is between, is empty, is not empty
- */
+/** Same as integer, minus set membership: picking an exact float out of a list is not a real query. */
 export const FloatType = Template.bind({});
 FloatType.args = {
   fieldType: 'float',
   open: true,
 };
 
-/**
- * Date field type operators: is, is not, greater than, less than, greater than or equal to, less than or equal to, is between, is empty, is not empty
- */
+/** Dates behave like numbers — before, after, between — so a time window is one condition rather than two. */
 export const DateType = Template.bind({});
 DateType.args = {
   fieldType: 'date',
   open: true,
 };
 
-/**
- * Boolean field type operators: is, is not, is empty, is not empty
- */
+/** A boolean offers is / is not and the presence checks, and nothing else is worth asking. */
 export const BooleanType = Template.bind({});
 BooleanType.args = {
   fieldType: 'boolean',
   open: true,
 };
 
-/**
- * Enum field type operators: is, is not, is one of, is not one of, is empty, is not empty
- */
+/** An enum trades comparison for set membership: is one of / is not one of is the operator that earns its place here. */
 export const EnumType = Template.bind({});
 EnumType.args = {
   fieldType: 'enum',
   open: true,
 };
 
-/**
- * Interactive example showing operator selection
- */
+/** Selection wired up, with the chosen operator echoed above the menu. */
 export const Interactive = Template.bind({});
 Interactive.args = {
   fieldType: 'string',
   open: true,
 };
 
-/**
- * Keyboard navigation example - demonstrates arrow keys, Enter, and Esc
- * Use Arrow Up/Down to navigate, Enter to select, Esc to close
- */
+/** Arrow keys move, Enter selects, Escape closes — the menu is fully operable without a pointer. */
 export const KeyboardNavigation: StoryFn<typeof meta> = (args: FilterInputOperatorMenuProps) => {
   const [selectedOperator, setSelectedOperator] = React.useState<FilterOperator | undefined>(
     undefined,
@@ -148,23 +139,7 @@ export const KeyboardNavigation: StoryFn<typeof meta> = (args: FilterInputOperat
 
   return (
     <div className='p-4'>
-      <div className='mb-4 p-4 bg-blue-50 border border-blue-200 rounded-md'>
-        <h3 className='font-semibold mb-2'>Keyboard Navigation Instructions:</h3>
-        <ul className='list-disc list-inside text-sm space-y-1'>
-          <li>
-            <kbd className='px-2 py-1 bg-white border rounded text-xs'>↑</kbd> /{' '}
-            <kbd className='px-2 py-1 bg-white border rounded text-xs'>↓</kbd> - Navigate between
-            items
-          </li>
-          <li>
-            <kbd className='px-2 py-1 bg-white border rounded text-xs'>Enter</kbd> - Select
-            highlighted item
-          </li>
-          <li>
-            <kbd className='px-2 py-1 bg-white border rounded text-xs'>Esc</kbd> - Close menu
-          </li>
-        </ul>
-      </div>
+      <p className='sb-annotation mb-4'>↑ ↓ navigate · Enter selects · Esc closes</p>
       <button
         type='button'
         onClick={() => setOpen(!open)}
@@ -172,11 +147,7 @@ export const KeyboardNavigation: StoryFn<typeof meta> = (args: FilterInputOperat
       >
         {open ? 'Close Menu' : 'Open Menu'}
       </button>
-      {selectedOperator && (
-        <div className='mb-2 text-sm text-gray-600'>
-          Selected: <strong>{selectedOperator}</strong>
-        </div>
-      )}
+      {selectedOperator && <p className='sb-annotation mb-2'>selected: {selectedOperator}</p>}
       <FilterInputOperatorMenu
         {...args}
         fieldType='string'

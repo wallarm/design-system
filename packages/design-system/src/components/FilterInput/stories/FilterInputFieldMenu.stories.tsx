@@ -8,11 +8,21 @@ import {
 } from '../lib/statusCode';
 import type { FieldMetadata } from '../types';
 
+const DESCRIPTION = [
+  'The field-picking menu `FilterInput` opens on focus, shown here on its own.',
+  'It is internal — the pattern opens, filters and closes it for you — so these stories are for checking the menu’s sections, search and popovers, not for composing it yourself.',
+].join(' ');
+
 const meta = {
   title: 'Patterns/FilterInput/FilterInputFieldMenu',
   component: FilterInputFieldMenu,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
   tags: ['autodocs'],
   argTypes: {
@@ -106,9 +116,7 @@ const sampleFields: FieldMetadata[] = [
   },
 ];
 
-/**
- * Default FilterInputFieldMenu with field list
- */
+/** The plain list — every field in the config, label first, whatever its type. */
 export const Default: Story = {
   args: {
     fields: sampleFields,
@@ -119,9 +127,7 @@ export const Default: Story = {
   },
 };
 
-/**
- * FilterInputFieldMenu with fewer fields
- */
+/** A short config, to check the menu does not pad itself out. */
 export const FewFields: Story = {
   args: {
     fields: sampleFields.slice(0, 5),
@@ -132,9 +138,7 @@ export const FewFields: Story = {
   },
 };
 
-/**
- * Closed FilterInputFieldMenu (should not render)
- */
+/** `open={false}` renders nothing: the menu has no closed appearance of its own. */
 export const Closed: Story = {
   args: {
     fields: sampleFields,
@@ -145,9 +149,7 @@ export const Closed: Story = {
   },
 };
 
-/**
- * Interactive example with state management
- */
+/** Selection wired up, so you can watch which field the menu hands back. */
 export const Interactive: Story = {
   render: () => {
     const [open, setOpen] = React.useState(true);
@@ -186,10 +188,7 @@ export const Interactive: Story = {
   },
 };
 
-/**
- * Example demonstrating search functionality
- * Try typing "status", "HTTP", or "CWE" in the search field
- */
+/** Typing filters the list by label — try “status” or “CWE”. */
 export const WithSearch: Story = {
   args: {
     fields: sampleFields,
@@ -208,10 +207,7 @@ export const WithSearch: Story = {
   },
 };
 
-/**
- * FilterInputFieldMenu with recent fields section
- * Shows up to 3 recently used fields at the top
- */
+/** Up to three recently used fields sit at the top, which is what keeps a fifty-field menu usable day to day. */
 export const WithRecentFields: Story = {
   args: {
     fields: sampleFields,
@@ -252,10 +248,7 @@ export const WithRecentFields: Story = {
   },
 };
 
-/**
- * FilterInputFieldMenu with suggestions section
- * Shows commonly used fields
- */
+/** A curated suggestions section, for the handful of fields most people reach for first. */
 export const WithSuggestions: Story = {
   args: {
     fields: sampleFields,
@@ -293,11 +286,7 @@ export const WithSuggestions: Story = {
   },
 };
 
-/**
- * FilterInputFieldMenu with grouped fields. Fields render under labeled group
- * headers; the `cwe` field is intentionally left out of every group to show
- * the trailing headerless "ungrouped" section.
- */
+/** Fields under labelled group headers, with anything left out of every group falling into a trailing headerless section. */
 export const WithGroups: Story = {
   args: {
     fields: sampleFields,
@@ -324,13 +313,6 @@ export const WithGroups: Story = {
   },
 };
 
-/**
- * Hovering (or keyboard-focusing) a field row opens a description popover to the
- * side of the menu: the filter title (monospace), its description, and — for
- * fields whose value format is non-obvious — a monospace example block. Fields
- * without a description (e.g. "No description field") open no popover, and group
- * headers are non-interactive (AS-1060).
- */
 const describedFields: FieldMetadata[] = [
   {
     name: 'attack_type',
@@ -359,6 +341,7 @@ const describedFields: FieldMetadata[] = [
   },
 ];
 
+/** Hovering or keyboard-focusing a row opens a popover beside the menu with the description and, where the value format is not obvious, an example. A row with no description opens nothing, and group headers are inert. */
 export const WithDescriptions: Story = {
   args: {
     fields: describedFields,
@@ -383,10 +366,6 @@ export const WithDescriptions: Story = {
   },
 };
 
-/**
- * A described field list long enough to scroll — used to exercise the popover's
- * scroll-under-cursor re-highlight and the keyboard-nav guard (AS-1060).
- */
 const manyDescribedFields: FieldMetadata[] = Array.from({ length: 20 }, (_, i) => ({
   name: `field_${i}`,
   label: `Field ${i}`,
@@ -394,6 +373,7 @@ const manyDescribedFields: FieldMetadata[] = Array.from({ length: 20 }, (_, i) =
   description: `Filter by field ${i}.`,
 }));
 
+/** A described list long enough to scroll, for checking the popover keeps up with the cursor and the keyboard. */
 export const WithScrollableDescriptions: Story = {
   args: {
     fields: manyDescribedFields,
@@ -404,10 +384,7 @@ export const WithScrollableDescriptions: Story = {
   },
 };
 
-/**
- * FilterInputFieldMenu with both recent and suggestions
- * Shows the full menu with all sections
- */
+/** Both sections at once — the full menu, and the order it puts them in. */
 export const WithRecentAndSuggestions: Story = {
   args: {
     fields: sampleFields,

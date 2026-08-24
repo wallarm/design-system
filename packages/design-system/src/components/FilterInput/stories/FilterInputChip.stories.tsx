@@ -7,9 +7,21 @@ import {
 } from '../FilterInputField';
 import { MockFilterInputProvider } from './mockFilterInputContext';
 
+const DESCRIPTION = [
+  'The chip `FilterInput` renders for each committed condition — attribute, operator, value — exported for rare custom builds.',
+  'The pattern creates, edits and removes these itself, so reach for `FilterInput` rather than assembling chips by hand; these stories exist to check the chip states.',
+].join(' ');
+
 const meta = {
   title: 'Patterns/FilterInput/FilterInputChip',
   component: FilterInputChip,
+  parameters: {
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
+  },
   tags: ['autodocs'],
   argTypes: {
     attribute: {
@@ -37,9 +49,7 @@ const Template: StoryFn<typeof meta> = (args: FilterInputChipProps) => (
   <FilterInputChip {...args} />
 );
 
-/**
- * Default chip variant showing attribute-operator-value
- */
+/** The three segments a chip is made of; inside `FilterInput` each one is separately clickable, which is how a committed filter gets edited. */
 export const Default = Template.bind({});
 Default.args = {
   attribute: 'Attribute',
@@ -48,9 +58,7 @@ Default.args = {
   error: false,
 };
 
-/**
- * Chip with error state
- */
+/** `error` reddens the chip for a value that was rejected. It is presentational only — the expression underneath is unchanged. */
 export const WithError = Template.bind({});
 WithError.args = {
   attribute: 'Attribute',
@@ -59,9 +67,7 @@ WithError.args = {
   error: true,
 };
 
-/**
- * Chip with long text to demonstrate truncation
- */
+/** A long value truncates rather than wrapping, so a row of chips keeps one height. */
 export const WithLongText = Template.bind({});
 WithLongText.args = {
   attribute: 'Very Long Attribute Name That Should Truncate',
@@ -70,9 +76,7 @@ WithLongText.args = {
   error: false,
 };
 
-/**
- * Example chip showing realistic filter condition
- */
+/** The same chip carrying real content, which is where the segment widths actually get tested. */
 export const RealisticExample = Template.bind({});
 RealisticExample.args = {
   attribute: 'IP Address',
@@ -81,28 +85,21 @@ RealisticExample.args = {
   error: false,
 };
 
-/**
- * AND logical operator variant. Connector chips read FilterInput context, so
- * standalone stories wrap them in a no-op provider.
- */
+/** The AND connector is itself a chip, clickable to change the join. Standalone it reads `FilterInput` context, so the story wraps it in a no-op provider. */
 export const AndOperator: StoryFn = () => (
   <MockFilterInputProvider>
     <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => undefined} />
   </MockFilterInputProvider>
 );
 
-/**
- * OR logical operator variant
- */
+/** The OR connector, same shape — which is why AND/OR needs no separate control. */
 export const OrOperator: StoryFn = () => (
   <MockFilterInputProvider>
     <FilterInputConnectorChip variant='or' chipId='c-1' onChange={() => undefined} />
   </MockFilterInputProvider>
 );
 
-/**
- * Combined example showing chip + AND + chip
- */
+/** Two conditions and the connector between them: what the input assembles as each chip commits. */
 export const CombinedWithAnd: StoryFn = () => (
   <MockFilterInputProvider>
     <div className='flex items-center gap-4'>
@@ -113,9 +110,7 @@ export const CombinedWithAnd: StoryFn = () => (
   </MockFilterInputProvider>
 );
 
-/**
- * Combined example showing chip + OR + chip
- */
+/** The same pair joined by OR, where the connector is the only difference between two very different queries. */
 export const CombinedWithOr: StoryFn = () => (
   <MockFilterInputProvider>
     <div className='flex items-center gap-4'>
@@ -126,9 +121,7 @@ export const CombinedWithOr: StoryFn = () => (
   </MockFilterInputProvider>
 );
 
-/**
- * Chip with delete button (hover to see delete button)
- */
+/** `onRemove` reveals the remove button on hover, so a resting filter row stays quiet. */
 export const WithDeleteButton = Template.bind({});
 WithDeleteButton.args = {
   attribute: 'IP Address',
@@ -138,9 +131,7 @@ WithDeleteButton.args = {
   onRemove: () => alert('Filter removed'),
 };
 
-/**
- * Error state with delete button (hover to see delete button)
- */
+/** Error plus remove — a rejected chip has to stay removable, since dropping it is usually the fastest fix. */
 export const ErrorWithDelete = Template.bind({});
 ErrorWithDelete.args = {
   attribute: 'Invalid Field',
@@ -150,9 +141,7 @@ ErrorWithDelete.args = {
   onRemove: () => alert('Filter removed'),
 };
 
-/**
- * Interactive example showing multiple chips with delete functionality
- */
+/** Removing chips one at a time, with the connectors closing up behind them. */
 export const InteractiveDeleteExample: StoryFn = () => {
   const [chips, setChips] = React.useState([
     { id: 1, attribute: 'IP Address', operator: 'is', value: '192.168.1.1' },
@@ -190,10 +179,7 @@ export const InteractiveDeleteExample: StoryFn = () => {
 // Disabled Chip Variants
 // ============================================================================
 
-/**
- * Disabled chip — dimmed, not clickable, no remove button.
- * Used for locked filter conditions (e.g. drill-down context).
- */
+/** `disabled` locks a chip: dimmed, no click, no remove, for a condition the surrounding page owns. */
 export const Disabled = Template.bind({});
 Disabled.args = {
   attribute: 'IP Address',
@@ -202,9 +188,7 @@ Disabled.args = {
   disabled: true,
 };
 
-/**
- * Disabled chip with onRemove — remove button is still hidden.
- */
+/** `disabled` wins over `onRemove` — no remove button appears, so a locked chip cannot be dropped by accident. */
 export const DisabledWithOnRemove = Template.bind({});
 DisabledWithOnRemove.args = {
   attribute: 'Host',
@@ -214,9 +198,7 @@ DisabledWithOnRemove.args = {
   onRemove: () => alert('This should never fire'),
 };
 
-/**
- * Mix of disabled and interactive chips.
- */
+/** Locked and editable chips in one row, which is what a drill-down actually looks like. */
 export const DisabledAndInteractiveMix: StoryFn = () => (
   <MockFilterInputProvider>
     <div className='flex items-center gap-4'>
@@ -246,23 +228,17 @@ export const DisabledAndInteractiveMix: StoryFn = () => (
 // Building Chip Variants
 // ============================================================================
 
-/**
- * Building chip — only attribute selected
- */
+/** `building` is the half-made chip shown while a condition is being composed — attribute chosen, operator next. */
 export const BuildingAttributeOnly: StoryFn = () => (
   <FilterInputChip building attribute='IP Address' />
 );
 
-/**
- * Building chip — attribute + operator selected
- */
+/** One step on, waiting for a value. */
 export const BuildingWithOperator: StoryFn = () => (
   <FilterInputChip building attribute='IP Address' operator='is' />
 );
 
-/**
- * Building chip — attribute + operator + value (about to commit)
- */
+/** All three segments filled, at the point where the chip commits and stops building. */
 export const BuildingComplete: StoryFn = () => (
   <FilterInputChip building attribute='IP Address' operator='is' value='192.168.1.1' />
 );
@@ -271,15 +247,13 @@ export const BuildingComplete: StoryFn = () => (
 // All States Showcase
 // ============================================================================
 
-/**
- * Showcase of all FilterInputChip variants and states
- */
+/** Every chip state in one frame — the quickest way to check a visual change has not shifted one of them. */
 export const AllStatesShowcase: StoryFn = () => (
   <MockFilterInputProvider>
     <div className='flex flex-col gap-4'>
       {/* Chip variants */}
       <div>
-        <h3 className='text-sm font-medium text-text-primary mb-2'>FilterInput Chip</h3>
+        <p className='sb-annotation mb-2'>default</p>
         <div className='flex items-center gap-2 flex-wrap'>
           <FilterInputChip attribute='Attribute' operator='operator' value='Value' />
           <FilterInputChip attribute='Attribute' operator='operator' value='Value' error />
@@ -301,7 +275,7 @@ export const AllStatesShowcase: StoryFn = () => (
 
       {/* Disabled chip variants */}
       <div>
-        <h3 className='text-sm font-medium text-text-primary mb-2'>Disabled Chip</h3>
+        <p className='sb-annotation mb-2'>disabled</p>
         <div className='flex items-center gap-2 flex-wrap'>
           <FilterInputChip attribute='IP Address' operator='is' value='34.74.73.20' disabled />
           <FilterInputChip
@@ -316,7 +290,7 @@ export const AllStatesShowcase: StoryFn = () => (
 
       {/* Building chip variants */}
       <div>
-        <h3 className='text-sm font-medium text-text-primary mb-2'>Building Chip</h3>
+        <p className='sb-annotation mb-2'>building</p>
         <div className='flex items-center gap-2 flex-wrap'>
           <FilterInputChip building attribute='IP Address' />
           <FilterInputChip building attribute='IP Address' operator='is' />
@@ -326,7 +300,7 @@ export const AllStatesShowcase: StoryFn = () => (
 
       {/* Connector variants */}
       <div>
-        <h3 className='text-sm font-medium text-text-primary mb-2'>Connectors</h3>
+        <p className='sb-annotation mb-2'>connectors</p>
         <div className='flex items-center gap-2 flex-wrap'>
           <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => undefined} />
           <FilterInputConnectorChip variant='or' chipId='c-2' onChange={() => undefined} />
@@ -336,10 +310,7 @@ export const AllStatesShowcase: StoryFn = () => (
   </MockFilterInputProvider>
 );
 
-/**
- * Paired (two-value) chip — two attribute/operator/value triplets joined by `;`.
- * The second attribute is fixed by field config; both operators and values render.
- */
+/** A paired chip carries two triplets separated by a semicolon, for a field whose value means nothing without its key. */
 export const Paired: StoryFn<typeof meta> = () => (
   <FilterInputChip
     attribute='Context Param'
@@ -350,9 +321,7 @@ export const Paired: StoryFn<typeof meta> = () => (
   />
 );
 
-/**
- * Paired chip with an error on the required second value.
- */
+/** The error lands on the half that is wrong — here the required second value — rather than reddening the whole chip. */
 export const PairedWithError: StoryFn<typeof meta> = () => (
   <FilterInputChip
     attribute='Context Param'
@@ -363,9 +332,7 @@ export const PairedWithError: StoryFn<typeof meta> = () => (
   />
 );
 
-/**
- * Paired chip with long text to demonstrate truncation across both triplets.
- */
+/** Both halves truncate independently, so one long value cannot squeeze the other out. */
 export const PairedWithLongText: StoryFn<typeof meta> = () => (
   <FilterInputChip
     attribute='Context Param With A Long Name'

@@ -110,11 +110,11 @@
 | ✅ | Overlay/Tour | 5 | 5 | `components/Tour/Tour.stories.tsx` |
 | ✅ | Pages/EmptyState | 4 | 4 | `components/EmptyState/EmptyState.stories.tsx` |
 | ✅ | Pages/UtilityPage | 4 | 4 | `components/UtilityPage/UtilityPage.stories.tsx` |
-| 🟡 | Patterns/FilterInput/Composition | 4 | 4 | `components/FilterInput/stories/FilterInputComposition.stories.tsx` |
-| 🟡 | Patterns/FilterInput/FilterInput | 17 | 13 | `components/FilterInput/stories/FilterInput.stories.tsx` |
-| 🟡 | Patterns/FilterInput/FilterInputChip | 21 | 21 | `components/FilterInput/stories/FilterInputChip.stories.tsx` |
-| 🟡 | Patterns/FilterInput/FilterInputFieldMenu | 11 | 9 | `components/FilterInput/stories/FilterInputFieldMenu.stories.tsx` |
-| 🟡 | Patterns/FilterInput/FilterInputOperatorMenu | 8 | 8 | `components/FilterInput/stories/FilterInputOperatorMenu.stories.tsx` |
+| ✅ | Patterns/FilterInput/Composition | 4 | 4 | `components/FilterInput/stories/FilterInputComposition.stories.tsx` |
+| ✅ | Patterns/FilterInput/FilterInput | 17 | 17 | `components/FilterInput/stories/FilterInput.stories.tsx` |
+| ✅ | Patterns/FilterInput/FilterInputChip | 21 | 21 | `components/FilterInput/stories/FilterInputChip.stories.tsx` |
+| ✅ | Patterns/FilterInput/FilterInputFieldMenu | 11 | 11 | `components/FilterInput/stories/FilterInputFieldMenu.stories.tsx` |
+| ✅ | Patterns/FilterInput/FilterInputOperatorMenu | 8 | 8 | `components/FilterInput/stories/FilterInputOperatorMenu.stories.tsx` |
 | 🟡 | Primitives/Icons | 3 | 1 | `icons/module/Icons.stories.tsx` |
 | ☐ | Primitives/Kbd | 4 | 0 | `components/Kbd/Kbd.stories.tsx` |
 | ☐ | Primitives/Overlay | 1 | 0 | `components/Overlay/Overlay.stories.tsx` |
