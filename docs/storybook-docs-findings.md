@@ -53,6 +53,64 @@ One `###` heading per finding, newest last, with these lines:
 - **Found while** — documenting `Checkbox`.
 - **Status** — Open.
 
+### Button: the type system allows variant/colour pairings that aren't designed
+
+- **What** — `variant` × `color` type-checks to 16 combinations, but only 13 are
+  drawn. `variant='primary' color='neutral'` compiles and renders **with no
+  background at all**.
+- **Evidence** — `Button.tsx` `compoundVariants` covers brand (primary, ghost,
+  secondary), neutral and neutral-alt (outline, ghost, secondary) and destructive
+  (all four). `Button.figma.tsx` draws the same set. The `Variants` story shows
+  exactly the supported pairings, so the gap is invisible until someone reaches
+  for an unsupported one.
+- **Why it matters** — Nothing stops a consumer picking a pairing that renders
+  invisibly, and the props table advertises all 16.
+- **Suggested action** — Narrow the type so only designed pairings are
+  expressible, or add the missing compounds.
+- **Found while** — documenting `Button`.
+- **Status** — Open.
+
+### Button: the IconOnly story has no accessible name
+
+- **What** — The `IconOnly` story renders three icon-only buttons with no
+  `aria-label` and no `Tooltip`, so nothing on screen or in the accessibility
+  tree says what they do.
+- **Evidence** — `Button.stories.tsx`, `IconOnly` story: zero occurrences of
+  `aria-label`.
+- **Why it matters** — This is the sanctioned example people copy into product
+  code, so the omission propagates. The docs now tell readers to add both, which
+  makes the story contradict its own description.
+- **Suggested action** — Add `aria-label` and a `Tooltip` to the story.
+- **Found while** — documenting `Button`.
+- **Status** — Open.
+
+### Button: neutral-alt hover states apply while disabled
+
+- **What** — The `neutral-alt` compound variants use `hover:` and `active:`
+  without the `not-disabled:` guard its siblings carry, so a disabled
+  `neutral-alt` button still lights up on hover.
+- **Evidence** — `Button.tsx`: brand, neutral and destructive compounds use
+  `hover:not-disabled:…`; all three `neutral-alt` compounds use plain `hover:`.
+- **Why it matters** — A disabled control that reacts to the pointer reads as
+  available.
+- **Suggested action** — Add the `not-disabled:` guard to the three `neutral-alt`
+  compounds.
+- **Found while** — documenting `Button`.
+- **Status** — Open.
+
+### Button: size='inline-edit' is public but belongs to InlineEdit
+
+- **What** — `ButtonBase` ships a fourth size, `inline-edit`, which is reachable
+  on `Button` but appears in no story and no Figma variant.
+- **Evidence** — `ButtonBase/classes.ts` size variants and the `iconOnly`
+  compounds include `inline-edit`.
+- **Why it matters** — It reads as internal plumbing for `InlineEdit` while being
+  offered to every consumer through the props table.
+- **Suggested action** — Decide whether it's public. If not, keep it internal to
+  `ButtonBase`.
+- **Found while** — documenting `Button`.
+- **Status** — Open.
+
 ## Known limitations we chose to live with
 
 Not findings — decisions worth remembering so they are not rediscovered.

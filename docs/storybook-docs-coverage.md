@@ -21,7 +21,7 @@
 
 ## Snapshot
 
-- **1 written to the standard · 54 with prose to level · 40 untouched**, across 95 story pages.
+- **2 written to the standard · 54 with prose to level · 39 untouched**, across 95 story pages.
 - Levelling a 🟡 is usually cutting, not filling. Slider reads as a dense developer paragraph about analytics attributes and ref forwarding; Heading runs four paragraphs of type theory. Both are good writing on the wrong page.
 - The drift runs upside-down. Niche components arrived documented while the ones everyone opens daily — `Button`, `Input`, `Select`, `Switch`, `Radio`, `Tag`, `Badge`, `Tabs`, `Tooltip` — arrived bare. Prioritise by daily traffic, not by how interesting the component is.
 - The **Stories** and **With a sentence** columns are the quickest way to spot a half-done page: equal numbers mean every example is covered.
@@ -30,7 +30,7 @@
 
 | Status | Page | Stories | With a sentence | Story file |
 |---|---|---|---|---|
-| ☐ | Actions/Button | 10 | 0 | `src/components/Button/Button.stories.tsx` |
+| ✅ | Actions/Button | 10 | 10 | `src/components/Button/Button.stories.tsx` |
 | ☐ | Actions/DropdownMenu | 9 | 0 | `src/components/DropdownMenu/DropdownMenu.stories.tsx` |
 | ☐ | Actions/SplitButton | 5 | 0 | `src/components/SplitButton/SplitButton.stories.tsx` |
 | ☐ | Actions/ToggleButton | 8 | 0 | `src/components/ToggleButton/ToggleButton.stories.tsx` |
