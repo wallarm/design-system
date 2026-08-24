@@ -306,6 +306,22 @@ One `###` heading per finding, newest last, with these lines:
 - **Found while** — documenting `FeedbackPulse`; reported by Artem from the page.
 - **Status** — Open.
 
+### NumericBadge turns clickable from onClick, while hiding the prop
+
+- **What** — `NumericBadge` omits `clickable` from its public props, then derives
+  it from whether an `onClick` was passed. So a consumer cannot ask for the
+  clickable styling, but gets it as a side effect of attaching a handler.
+- **Evidence** — `NumericBadge.tsx`: `Omit<VariantProps<typeof numericBadgeVariants>, 'clickable'>`
+  alongside `const isClickable = !!onClick`.
+- **Why it matters** — A count is not a control, and nothing in the design says a
+  count should look pressable. Hiding the prop suggests the affordance was not
+  meant to be reachable, yet the most ordinary thing a consumer might do turns it
+  on.
+- **Suggested action** — Decide whether a clickable count is sanctioned. If it is,
+  expose the prop; if not, stop deriving it.
+- **Found while** — documenting `NumericBadge`.
+- **Status** — Open.
+
 ## Known limitations we chose to live with
 
 Not findings — decisions worth remembering so they are not rediscovered.

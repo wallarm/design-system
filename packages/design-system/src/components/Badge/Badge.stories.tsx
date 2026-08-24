@@ -12,11 +12,21 @@ const isMutedSupported = (type: BadgeType, color: BadgeColor): boolean =>
 
 const capitalize = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
 
+const DESCRIPTION = [
+  'The status chip the rest of the family is built from — reach for the dedicated component when one exists (`HttpMethod`, `ResponseCode`, `Ip`, `Country`) rather than rebuilding it here, and for `Tag` when the chip is interactive.',
+  'Colour carries the meaning, so choose it from what the value is rather than from what looks right on the page.',
+].join(' ');
+
 const meta = {
   title: 'Status Indication/Badge',
   component: Badge,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
   argTypes: {
     size: {
@@ -43,14 +53,25 @@ const meta = {
 
 export default meta;
 
+/**
+ * The default chip. Keep the text to a word or two — a badge is read at a glance, in a table
+ * cell, alongside dozens of others.
+ */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => <Badge {...args}>Badge</Badge>;
 
+/**
+ * A leading dot in the current colour, for a status that reads faster as a mark than as a fill.
+ */
 export const Dotted: StoryFn<typeof meta> = ({ ...args }) => (
   <Badge {...args} variant='dotted'>
     Badge
   </Badge>
 );
 
+/**
+ * Two heights. `medium` exists for dense rows; anything smaller stops being legible at a
+ * glance, which is the only thing a badge is for.
+ */
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack align='center' gap={8}>
     <Badge {...args} size='small'>
@@ -65,6 +86,10 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * The emphasis ladder from `solid` down to `text`. Drop the emphasis when badges are everywhere
+ * — a table of solid chips is a table nobody can scan.
+ */
 export const Types: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack gap={8}>
     <Badge {...args} type='solid'>
@@ -85,6 +110,10 @@ export const Types: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * `text` and `text-color`, the two flattest types. They suit a value that must be read but
+ * should not compete with the row it sits in.
+ */
 export const TextVariants: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack gap={8}>
     <Badge {...args} textVariant='default'>
@@ -96,6 +125,9 @@ export const TextVariants: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * An icon before the label, which is how a status reads without relying on colour alone.
+ */
 export const WithIconsLeft: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack gap={8}>
     <Badge {...args}>
@@ -121,6 +153,9 @@ export const WithIconsLeft: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * An icon after the label, for a mark about the value rather than the value's own state.
+ */
 export const WithIconsRight: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack gap={8}>
     <Badge {...args}>
@@ -146,6 +181,10 @@ export const WithIconsRight: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * No label at all. Only safe where the icon's meaning is already established elsewhere on the
+ * page, since nothing here names it.
+ */
 export const IconsOnly: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack gap={8}>
     <Badge {...args}>
@@ -166,6 +205,10 @@ export const IconsOnly: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * `muted` drops the saturation for a status that is true but not worth attention — the case for
+ * everything that is merely fine.
+ */
 export const MutedVariants: StoryFn<typeof meta> = () => (
   <table className='w-full'>
     <thead>
@@ -195,6 +238,10 @@ export const MutedVariants: StoryFn<typeof meta> = () => (
   </table>
 );
 
+/**
+ * The full palette. Every colour already means something in the system, so borrowing one for
+ * decoration teaches the reader the wrong thing.
+ */
 export const ColorVariants: StoryFn<typeof meta> = () => (
   <table className='w-full'>
     <thead>
@@ -222,6 +269,10 @@ export const ColorVariants: StoryFn<typeof meta> = () => (
   </table>
 );
 
+/**
+ * What happens as the content grows. A badge does not truncate, so long text widens the row
+ * rather than being cut.
+ */
 export const ContentVariants: StoryFn<typeof meta> = () => (
   <table className='w-full'>
     <thead>

@@ -25,8 +25,8 @@
 
 ## Snapshot
 
-- **33 written to the standard · 39 with prose to level · 23 untouched**
-- **The Actions, Inputs, Inputs Date, Typography and Overlay folders are complete** — 4, 14, 4, 4 and 7 pages, every story carrying a sentence., across 95 story pages.
+- **37 written to the standard · 39 with prose to level · 19 untouched**
+- **The Actions, Inputs, Inputs Date, Typography Overlay and Status Indication folders are complete** — 4, 14, 4, 4, 7 and 4 pages, every story carrying a sentence., across 95 story pages.
 - Levelling a 🟡 is usually cutting, not filling. Slider reads as a dense developer paragraph about analytics attributes and ref forwarding; Heading runs four paragraphs of type theory. Both are good writing on the wrong page.
 - The drift runs upside-down. Niche components arrived documented while the ones everyone opens daily — `Button`, `Input`, `Select`, `Switch`, `Radio`, `Tag`, `Badge`, `Tabs`, `Tooltip` — arrived bare. Prioritise by daily traffic, not by how interesting the component is.
 - The **Stories** and **With a sentence** columns are the quickest way to spot a half-done page: equal numbers mean every example is covered.
@@ -122,10 +122,10 @@
 | ☐ | Primitives/Overlay | 1 | 0 | `src/components/Overlay/Overlay.stories.tsx` |
 | ☐ | Primitives/Separator | 1 | 0 | `src/components/Separator/Separator.stories.tsx` |
 | 🟡 | Production cluster | 10 | 0 | `src/components/Selection/Selection.stories.tsx` |
-| ☐ | Status Indication/Badge | 11 | 0 | `src/components/Badge/Badge.stories.tsx` |
-| ☐ | Status Indication/Indicator | 2 | 0 | `src/components/Indicator/Indicator.stories.tsx` |
-| ☐ | Status Indication/NumericBadge | 3 | 0 | `src/components/NumericBadge/NumericBadge.stories.tsx` |
-| ☐ | Status Indication/Tag | 7 | 0 | `src/components/Tag/Tag.stories.tsx` |
+| ✅ | Status Indication/Badge | 11 | 11 | `src/components/Badge/Badge.stories.tsx` |
+| ✅ | Status Indication/Indicator | 2 | 2 | `src/components/Indicator/Indicator.stories.tsx` |
+| ✅ | Status Indication/NumericBadge | 3 | 3 | `src/components/NumericBadge/NumericBadge.stories.tsx` |
+| ✅ | Status Indication/Tag | 7 | 7 | `src/components/Tag/Tag.stories.tsx` |
 | ✅ | Typography/Code | 7 | 7 | `src/components/Code/Code.stories.tsx` |
 | ✅ | Typography/Heading | 7 | 7 | `src/components/Heading/Heading.stories.tsx` |
 | ✅ | Typography/Pixel | 2 | 2 | `src/theme/Pixel.stories.tsx` |
