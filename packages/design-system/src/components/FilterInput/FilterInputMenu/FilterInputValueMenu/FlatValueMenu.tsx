@@ -6,9 +6,9 @@ import {
   DropdownMenuFooter,
   DropdownMenuGroup,
 } from '../../../DropdownMenu';
+import { Loader } from '../../../Loader';
 import { filterAndSort } from '../../lib';
 import { MenuEmptyState } from '../MenuEmptyState';
-import { MenuLoadingState } from '../MenuLoadingState';
 import type { FilterInputValueMenuProps } from './FilterInputValueMenu';
 import { useValueMenuDisplayValues } from './useValueMenuDisplayValues';
 import { useValueMenuState } from './useValueMenuState';
@@ -99,7 +99,13 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
         data-filter-input-menu='true'
       >
         {loading ? (
-          <MenuLoadingState />
+          <div
+            className='flex items-center justify-center pt-2 pb-4 text-text-secondary'
+            role='status'
+            aria-live='polite'
+          >
+            <Loader size='sm' />
+          </div>
         ) : displayValues.length > 0 ? (
           <DropdownMenuGroup className='flex flex-col gap-1'>
             {displayValues.map(option => (
