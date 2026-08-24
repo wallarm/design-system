@@ -22,6 +22,11 @@ import { DropdownMenuShortcut } from './DropdownMenuShortcut';
 import { DropdownMenuTrigger } from './DropdownMenuTrigger';
 import { DropdownMenuTriggerItem } from './DropdownMenuTriggerItem';
 
+const DESCRIPTION = [
+  'A menu of actions hanging off a trigger — reach for `Select` when the reader is choosing a value for a form, since a menu runs commands rather than holding an answer.',
+  'Leave the primary action visible as a `Button` and put only the secondary ones in here; past roughly ten items, group them or move them somewhere with room.',
+].join(' ');
+
 const meta = {
   title: 'Actions/DropdownMenu',
   component: DropdownMenu,
@@ -46,11 +51,20 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 } satisfies Meta<typeof DropdownMenu>;
 
 export default meta;
 
+/**
+ * The smallest composition — `DropdownMenuTrigger` with `asChild`, so your own `Button`
+ * becomes the trigger rather than being wrapped in one.
+ */
 export const Basic: StoryFn<typeof meta> = () => (
   <DropdownMenu data-testid='dropdown-menu'>
     <DropdownMenuTrigger asChild>
@@ -142,6 +156,11 @@ export const Basic: StoryFn<typeof meta> = () => (
   </DropdownMenu>
 );
 
+/**
+ * `DropdownMenuContextTrigger` opens the same menu on right-click, and
+ * `DropdownMenuTriggerItem` nests a submenu inside it. Always leave a left-click route to the same
+ * actions — a right-click-only affordance is undiscoverable.
+ */
 export const Context: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuContextTrigger asChild>
@@ -233,6 +252,11 @@ export const Context: StoryFn<typeof meta> = () => (
   </DropdownMenu>
 );
 
+/**
+ * `DropdownMenuItemContent` pairs `DropdownMenuItemText` with
+ * `DropdownMenuItemDescription` for a second line. Descriptions make a menu tall quickly, which is
+ * when separators start doing real work.
+ */
 export const WithDescriptions: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -276,6 +300,10 @@ export const WithDescriptions: StoryFn<typeof meta> = () => (
   </DropdownMenu>
 );
 
+/**
+ * `DropdownMenuItemIcon` sits before the label. Icon every item in a group or none of
+ * them — a half-iconned list reads as though some items are missing theirs.
+ */
 export const WithIcons: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -323,6 +351,10 @@ export const WithIcons: StoryFn<typeof meta> = () => (
   </DropdownMenu>
 );
 
+/**
+ * `DropdownMenuFooter` bleeds to the panel edge under a divider and renders at secondary
+ * emphasis, so it suits a persistent link or count rather than an action competing with the items.
+ */
 export const WithFooter: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -362,6 +394,10 @@ export const WithFooter: StoryFn<typeof meta> = () => (
   </DropdownMenu>
 );
 
+/**
+ * Icons and descriptions together, which is the widest an item gets. Past this the
+ * menu is doing a panel's job — reach for a `Popover`.
+ */
 export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
@@ -414,6 +450,10 @@ export const WithDescriptionAndIcons: StoryFn<typeof meta> = () => (
   </DropdownMenu>
 );
 
+/**
+ * `DropdownMenuCheckboxItem` for options that aren't mutually exclusive. Selecting one
+ * leaves the menu open, so several can be toggled in a single visit.
+ */
 export const WithCheckboxItems: StoryFn<typeof meta> = () => {
   const [bold, setBold] = useState(true);
   const [italic, setItalic] = useState(false);
@@ -445,6 +485,10 @@ export const WithCheckboxItems: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `DropdownMenuRadioGroup` for one-of-many. It also stays open on select, so the reader
+ * sees the indicator move before dismissing it themselves.
+ */
 export const WithRadioGroup: StoryFn<typeof meta> = () => {
   const [view, setView] = useState('list');
 
@@ -473,6 +517,10 @@ export const WithRadioGroup: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Commands, checkboxes and a radio group in one menu. `DropdownMenuLabel` and
+ * `DropdownMenuSeparator` are what keep the three kinds from reading as one flat list.
+ */
 export const WithMixedSelectionItems: StoryFn<typeof meta> = () => {
   const [bold, setBold] = useState(true);
   const [italic, setItalic] = useState(false);

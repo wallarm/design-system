@@ -52,3 +52,9 @@ html,
     line-height: 1.6;
     text-transform: lowercase;
 }
+
+/* Same label, on a dark surface — the two neutral-alt rows in SplitButton's stories sit on a dark
+   panel, where secondary text is invisible. */
+.sb-annotation-alt {
+    color: var(--color-text-secondary-alt);
+}

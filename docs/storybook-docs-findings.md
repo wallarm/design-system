@@ -111,6 +111,51 @@ One `###` heading per finding, newest last, with these lines:
 - **Found while** — documenting `Button`.
 - **Status** — Open.
 
+### SplitButton relies on a class name to detect outline buttons
+
+- **What** — The group collapses its gap and overlaps the inner borders by
+  matching a Tailwind class on its children: `has-[>.bg-component-outline-button-bg]`.
+  So the layout depends on `Button` continuing to emit that exact utility.
+- **Evidence** — `SplitButton/classes.ts`, with the comment "Outline buttons
+  (detected via unique bg class)".
+- **Why it matters** — A refactor of `Button`'s outline styling silently breaks
+  every split button's seam, and nothing in either component's tests would say
+  why. It also means a consumer can't get the collapsed look on a variant we
+  haven't anticipated.
+- **Suggested action** — Detect it from a prop or `data-` attribute rather than a
+  style class, or note the coupling in both files.
+- **Found while** — documenting `SplitButton`.
+- **Status** — Open.
+
+### SplitButton does not constrain its two halves to match
+
+- **What** — Both halves are free-standing `Button`s, so nothing stops a consumer
+  giving them different variants, colours or sizes — which breaks the joined-corner
+  illusion the component exists to create.
+- **Evidence** — `SplitButton.tsx` renders `children` inside a `role='group'`
+  wrapper with no validation; the docs now have to carry the rule in prose.
+- **Why it matters** — A rule that lives only in documentation gets broken.
+- **Suggested action** — Decide whether this is worth constraining, or accept
+  that the pairing stays a documented convention.
+- **Found while** — documenting `SplitButton`.
+- **Status** — Open.
+
+### ToggleButton's brand/outline unpressed state is identical to neutral
+
+- **What** — With `variant='outline'`, the unpressed `brand` and `neutral`
+  compounds resolve to the same border, background and text colour; they only
+  diverge once pressed.
+- **Evidence** — `ToggleButton.tsx` compound variants: `color: 'brand', variant:
+  'outline', active: false` and the `neutral` equivalent differ only in the focus
+  ring token.
+- **Why it matters** — The `VariantsAndColors` story shows two columns that look
+  identical until clicked, which reads as a rendering bug rather than a design
+  decision.
+- **Suggested action** — Confirm this is intended. If it is, the story could show
+  the pressed state alongside so the difference is visible.
+- **Found while** — documenting `ToggleButton`.
+- **Status** — Open.
+
 ## Known limitations we chose to live with
 
 Not findings — decisions worth remembering so they are not rediscovered.
