@@ -1017,3 +1017,22 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Found while** — classifying e2e failures before opening the PR, after CI
   flagged shard failures.
 - **Status** — Closed.
+
+### Toast's e2e located its buttons by label text the docs pass rewrote
+
+- **What** — `Toast.e2e.ts` found its no-timer section with
+  `getByText('Static (for screenshots)')` and clicked triggers by names like
+  `Success Toast`. The annotation conversion renamed the section to
+  `static — no timer`, and the scaffolding pass shortened the triggers to an icon
+  plus one word (`Success`). Every one of the sixteen specs timed out.
+- **Why it matters** — Introduced by this branch, and invisible in review: the
+  story files and the spec were edited in different sessions, and nothing links a
+  label rewrite to a spec that depends on it. The same trap as the `Tour` naming
+  collision, from the other direction.
+- **Suggested action** — Fixed. The section is now located by
+  `.sb-annotation` + `hasText: 'static'` rather than by its prose, so rewording the
+  label cannot break the file again, and the six trigger names match what the
+  buttons say. Locating scaffolding by class rather than by copy is the general
+  lesson for any spec that drives a story harness.
+- **Found while** — running the full e2e suite locally before opening the PR.
+- **Status** — Closed.
