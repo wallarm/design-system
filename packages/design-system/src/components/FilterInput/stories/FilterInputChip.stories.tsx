@@ -67,7 +67,7 @@ WithError.args = {
   error: true,
 };
 
-/** A long value truncates rather than wrapping, so a row of chips keeps one height. */
+/** Long text in both segments against the chip's 320px cap. Only the value segment can shrink, so a long field label fills the chip and the value collapses to nothing — one reason to keep field labels short. */
 export const WithLongText = Template.bind({});
 WithLongText.args = {
   attribute: 'Very Long Attribute Name That Should Truncate',
@@ -332,7 +332,7 @@ export const PairedWithError: StoryFn<typeof meta> = () => (
   />
 );
 
-/** Both halves truncate independently, so one long value cannot squeeze the other out. */
+/** The same cap, 380px across two triplets. The base value is held to 90px so it cannot hide its partner, but every other segment keeps its full width, so the second value is the one that gives way. */
 export const PairedWithLongText: StoryFn<typeof meta> = () => (
   <FilterInputChip
     attribute='Context Param With A Long Name'

@@ -585,3 +585,31 @@ Not findings — decisions worth remembering so they are not rediscovered.
   written here.
 - **Found while** — documenting `Brand/Logo` and `Brand/WallyIcon`.
 - **Status** — Open.
+
+### FilterInputChip: a long attribute label wipes out the value
+
+- **What** — Every chip segment except the last value carries `flex-shrink: 0`,
+  so when the content exceeds the chip's cap the last value absorbs the entire
+  deficit and collapses to **zero width** — no ellipsis, no sign it is there.
+  The value is the only part of the chip that disappears, and it is the part the
+  filter actually matches on.
+- **Evidence** — Measured in the running Storybook.
+  `FilterInputChip → WithLongText`: chip 320px (its `max-w-[320px]` holds),
+  attribute segment 308.9px at `shrink-0`, operator 10.5px, **value 0px**.
+  `PairedWithLongText`: chip 380px, first attribute 219px, base value capped at
+  90px as intended, **second value 0px** and the remove button squeezed.
+  `FilterInputChip.tsx:137` (`className='shrink-0'` on the attribute segment),
+  `:164` (the 320/380 cap), `:199` (the 90px paired-value cap).
+- **Why it matters** — Field labels come from a backend schema, so their length
+  is not ours to control, and several in the shipped attack-vectors set are long.
+  A user then sees a chip naming the field and the operator with nothing after
+  it, which reads as an empty or broken filter. The `max-w-[90px]` patch on the
+  paired base value (commented `AS-1179`) is the same bug fixed for one segment
+  only.
+- **Suggested action** — Give the attribute segment `min-w-0` and a share of the
+  budget (a percentage max-width, or a flex basis) so it truncates with an
+  ellipsis before the value loses its last pixel, and guarantee the value a
+  minimum width. Worth deciding the priority explicitly: if the chip has to drop
+  something, the field label is the safer thing to abbreviate.
+- **Found while** — reviewing the `FilterInput` docs pages with Artem.
+- **Status** — Open.
