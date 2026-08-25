@@ -36,7 +36,7 @@ export default meta;
 /**
  * A full tour end to end. Keep it short — every step is one the reader did not choose to take.
  */
-export const Overview: StoryFn<typeof meta> = () => {
+export const Basic: StoryFn<typeof meta> = () => {
   const firstRef = useRef<HTMLButtonElement>(null);
   const secondRef = useRef<HTMLButtonElement>(null);
   const thirdRef = useRef<HTMLButtonElement>(null);

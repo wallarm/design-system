@@ -993,3 +993,27 @@ Not findings — decisions worth remembering so they are not rediscovered.
   Worth folding into whatever regenerates the tracker counts.
 - **Found while** — running that audit across all 95 files before opening the PR.
 - **Status** — Closed for `Progress`; the count script's blind spot is open.
+
+### The docs page's "Overview" name silently swallowed Tour's Overview story
+
+- **What** — `.storybook/main.ts` sets `docs.defaultName: 'Overview'`, so every
+  component's autodocs page owns the `--overview` story id. `Tour` shipped a story
+  export literally named `Overview`, and the docs page took the id: the story
+  vanished from `index.json` (`overlay-tour--overview` is `type: docs`), and its
+  URL renders documentation instead of the story.
+- **Evidence** — Fourteen `Tour.e2e.ts` specs timed out at thirty seconds each,
+  because `tourStory.goto(page, 'Overview')` was landing on the docs page and
+  `getByTestId('tour-start')` never appeared. Nothing in the failure said so; they
+  read as flaky timeouts.
+- **Why it matters** — Introduced by this branch, since the shared docs frame and
+  the `Overview` naming convention are new here. It is the worst kind of
+  regression: a naming collision that produces a timeout rather than an error,
+  in a spec file nobody edited.
+- **Suggested action** — Fixed: the story is now `Basic` (matching the house
+  convention for a first story) and its spec follows. Guarded against recurrence
+  by `scripts/metadata/__tests__/story-names.test.ts`, which fails if any story
+  export takes a name the docs page reserves. `Tour` was the only collision in the
+  library.
+- **Found while** — classifying e2e failures before opening the PR, after CI
+  flagged shard failures.
+- **Status** — Closed.
