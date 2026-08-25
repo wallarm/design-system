@@ -32,6 +32,9 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
   building?: boolean;
   /** When true, the chip cannot be edited or removed (dimmed appearance) */
   disabled?: boolean;
+  /** Caps the applied value segment at this width (px), truncating with an
+   *  ellipsis; lifts the chip's default max-width so it grows to fit (AS-1064). */
+  valueMaxWidth?: number;
   /** Second paired triplet (two-step fields). The paired attribute is fixed. */
   pair?: FilterInputChipData['pair'];
   onRemove?: () => void;
@@ -53,6 +56,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   errorValueIndices,
   building = false,
   disabled = false,
+  valueMaxWidth,
   pair,
   onRemove,
   onSegmentClick,
@@ -160,8 +164,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       className={cn(
         chipVariants({ error: hasError, interactive, disabled, building }),
         // Paired chips get more room for their two values; each value is capped
-        // so a long base value can't hide the paired one (AS-1179).
-        pair ? 'max-w-[380px]' : 'max-w-[320px]',
+        // so a long base value can't hide the paired one (AS-1179). A field with
+        // its own valueMaxWidth (AS-1064) owns the cap on the value segment, so
+        // the chip's blanket cap is lifted to let it grow to that width.
+        valueMaxWidth && !pair ? 'max-w-none' : pair ? 'max-w-[380px]' : 'max-w-[320px]',
         className,
       )}
       data-slot='filter-input-condition-chip'
@@ -198,6 +204,9 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           className={
             !value && !pair ? emptyValueHitTarget : pair ? 'max-w-[90px] shrink-0' : 'min-w-0'
           }
+          // Field-owned cap on the applied value: the inner truncate ellipsizes
+          // at this width; ignored for the empty hit target and paired chips (AS-1064).
+          {...(valueMaxWidth && value && !pair && { style: { maxWidth: valueMaxWidth } })}
           error={
             baseActiveSegment !== SEGMENT_VARIANT.value &&
             (effectiveError === true || effectiveError === SEGMENT_VARIANT.value)

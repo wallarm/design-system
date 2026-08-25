@@ -80,6 +80,16 @@ WithLongText.args = {
   error: false,
 };
 
+/** A field with its own `valueMaxWidth` (here 500px) lifts the chip's blanket cap and lets the value segment run wide, truncating with an ellipsis only past that width — for long freeform values like parameter-path expressions (AS-1064). The full value is preserved for matching. */
+export const WithValueMaxWidth = Template.bind({});
+WithValueMaxWidth.args = {
+  attribute: 'Parameter',
+  operator: 'is',
+  value: 'post.user[*].profile.settings.notification.preferences.email.frequency',
+  valueMaxWidth: 500,
+  error: false,
+};
+
 /** The same chip carrying real content, which is where the segment widths actually get tested. */
 export const RealisticExample = Template.bind({});
 RealisticExample.args = {
