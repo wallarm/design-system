@@ -37,7 +37,7 @@ test.describe('Component: EmptyState', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render medallion on every surface and theme correctly', async ({ page }) => {
+    test('Should render medallion on both surfaces correctly', async ({ page }) => {
       await emptyStateStory.goto(page, 'Medallion');
       await expect(page).toHaveScreenshot();
     });

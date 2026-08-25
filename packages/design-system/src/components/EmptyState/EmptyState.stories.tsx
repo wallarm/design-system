@@ -1,6 +1,6 @@
 import { createListCollection } from '@ark-ui/react/collection';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Circle, ScanLine, Zap } from '../../icons';
+import { ScanLine, Shapes, Zap } from '../../icons';
 import { cn } from '../../utils/cn';
 import { Button } from '../Button';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
@@ -65,7 +65,7 @@ export default meta;
 export const CollectionEmpty: StoryFn<EmptyStateProps> = args => (
   <EmptyState {...args}>
     <EmptyStateIllustration>
-      <Circle />
+      <Shapes />
     </EmptyStateIllustration>
     <EmptyStateMessage>
       <EmptyStateTitle>Title text goes here</EmptyStateTitle>
@@ -115,8 +115,8 @@ NoFilterResults.args = {
 };
 
 /**
- * The compact inline state, for a card body, dropdown or select menu. The icon
- * is optional here and renders bare — no medallion at this scale.
+ * The same compact state with the optional icon turned on. It renders bare — no
+ * medallion at this scale, since a framed tile would out-weigh two lines of text.
  */
 export const NoResults: StoryFn<EmptyStateProps> = args => (
   <EmptyState {...args}>
@@ -133,14 +133,21 @@ NoResults.args = {
   type: 'no-results',
 };
 
+/**
+ * The compact state at its spec default: no icon, no actions — just the title
+ * and subtitle. This is the shape most in-app empty states take.
+ */
 export const Minimal: StoryFn<EmptyStateProps> = args => (
   <EmptyState {...args}>
     <EmptyStateMessage>
-      <EmptyStateTitle>Nothing here</EmptyStateTitle>
-      <EmptyStateDescription>This collection is empty.</EmptyStateDescription>
+      <EmptyStateTitle>No results</EmptyStateTitle>
+      <EmptyStateDescription>Short description</EmptyStateDescription>
     </EmptyStateMessage>
   </EmptyState>
 );
+Minimal.args = {
+  type: 'no-results',
+};
 
 const emptyCollection = createListCollection({ items: [] });
 
@@ -179,21 +186,18 @@ export const NoResultsExamples: StoryFn<EmptyStateProps> = () => (
  * The medallion reads as a lit surface: a top-down gradient, a hairline border,
  * a soft drop shadow and an inner top highlight. Every layer resolves through
  * `--color-component-empty-state-medallion-*` and
- * `--shadow-empty-state-medallion`, so it holds up on both the card and the
- * page surface, in both themes — shown here side by side.
+ * `--shadow-empty-state-medallion`, so it holds up on both the card surface and
+ * the slightly darker page surface it sits on — shown here side by side. Use the
+ * toolbar theme switcher to check it in dark.
  */
 export const Medallion: StoryFn<EmptyStateProps> = () => (
-  <VStack gap={0} className='w-[330px] overflow-hidden rounded-16 border border-border-primary'>
-    {(['light', 'dark'] as const).map(theme => (
-      <HStack key={theme} gap={0} data-theme={theme}>
-        {(['bg-bg-surface-1', 'bg-bg-light-primary'] as const).map(surface => (
-          <div key={surface} className={cn('flex flex-1 justify-center py-28', surface)}>
-            <EmptyStateIllustration>
-              <ScanLine />
-            </EmptyStateIllustration>
-          </div>
-        ))}
-      </HStack>
+  <HStack gap={0} className='w-[330px] overflow-hidden rounded-16 border border-border-primary'>
+    {(['bg-bg-surface-1', 'bg-bg-light-primary'] as const).map(surface => (
+      <div key={surface} className={cn('flex flex-1 justify-center py-28', surface)}>
+        <EmptyStateIllustration>
+          <ScanLine />
+        </EmptyStateIllustration>
+      </div>
     ))}
-  </VStack>
+  </HStack>
 );
