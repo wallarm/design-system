@@ -60,7 +60,7 @@
 | ✅ | Data Display/FormatNumber | 9 | 9 | `components/FormatNumber/FormatNumber.stories.tsx` |
 | ✅ | Data Display/HttpMethod | 4 | 4 | `components/HttpMethod/HttpMethod.stories.tsx` |
 | ✅ | Data Display/Ip | 3 | 3 | `components/Ip/Ip.stories.tsx` |
-| 🟡 | Data Display/List | 5 | 0 | `components/List/List.stories.tsx` |
+| ✅ | Data Display/List | 5 | 5 | `components/List/List.stories.tsx` |
 | 🟡 | Data Display/OverflowList | 5 | 5 | `components/OverflowList/OverflowList.stories.tsx` |
 | ☐ | Data Display/ParameterPath | 11 | 0 | `components/ParameterPath/ParameterPath.stories.tsx` |
 | 🟡 | Data Display/PasswordComplexity | 4 | 0 | `components/PasswordComplexity/PasswordComplexity.stories.tsx` |
