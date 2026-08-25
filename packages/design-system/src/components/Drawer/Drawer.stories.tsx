@@ -108,7 +108,7 @@ const ContentPlaceholder = ({
   height?: number;
 }) => (
   <div
-    className={`w-full rounded-12 bg-[#f1f5f9] ${fillHeight ? 'flex-1 min-h-0' : ''}`}
+    className={`w-full rounded-12 bg-bg-surface-5 ${fillHeight ? 'flex-1 min-h-0' : ''}`}
     style={height ? { height: `${height}px` } : fillHeight ? undefined : { height: '200px' }}
   />
 );
@@ -121,7 +121,9 @@ export const Basic: StoryFn<DrawerProps> = () => {
   return (
     <Drawer data-testid='drawer'>
       <DrawerTrigger asChild>
-        <Button>Open Drawer</Button>
+        <Button variant='outline' color='neutral'>
+          Open Drawer
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -144,7 +146,9 @@ export const WithFooter: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button>Open Drawer</Button>
+        <Button variant='outline' color='neutral'>
+          Open Drawer
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -177,7 +181,9 @@ export const WithDescription: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button>Open Drawer</Button>
+        <Button variant='outline' color='neutral'>
+          Open Drawer
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -209,7 +215,9 @@ export const WithDescription: StoryFn<DrawerProps> = () => {
 export const WithFooterLeftActions: StoryFn<DrawerProps> = () => (
   <Drawer>
     <DrawerTrigger asChild>
-      <Button>Open with Footer Actions</Button>
+      <Button variant='outline' color='neutral'>
+        Open with Footer Actions
+      </Button>
     </DrawerTrigger>
     <DrawerContent>
       <DrawerHeader>
@@ -249,7 +257,9 @@ export const Sizes: StoryFn<DrawerProps> = () => (
   <HStack gap={8} justify='center'>
     <Drawer width={DRAWER_SIZES.small}>
       <DrawerTrigger asChild>
-        <Button>Open Small ({DRAWER_SIZES.small}px)</Button>
+        <Button variant='outline' color='neutral'>
+          Open Small ({DRAWER_SIZES.small}px)
+        </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
@@ -264,7 +274,9 @@ export const Sizes: StoryFn<DrawerProps> = () => (
 
     <Drawer width={DRAWER_SIZES.medium}>
       <DrawerTrigger asChild>
-        <Button>Open Medium ({DRAWER_SIZES.medium}px)</Button>
+        <Button variant='outline' color='neutral'>
+          Open Medium ({DRAWER_SIZES.medium}px)
+        </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
@@ -279,7 +291,9 @@ export const Sizes: StoryFn<DrawerProps> = () => (
 
     <Drawer width={DRAWER_SIZES.large}>
       <DrawerTrigger asChild>
-        <Button>Open Large ({DRAWER_SIZES.large}px)</Button>
+        <Button variant='outline' color='neutral'>
+          Open Large ({DRAWER_SIZES.large}px)
+        </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerHeader>
@@ -302,7 +316,9 @@ export const CustomSizes: StoryFn<DrawerProps> = () => {
     <HStack gap={8} justify='center'>
       <Drawer width='50%'>
         <DrawerTrigger asChild>
-          <Button>50% Width</Button>
+          <Button variant='outline' color='neutral'>
+            50% Width
+          </Button>
         </DrawerTrigger>
 
         <DrawerContent>
@@ -320,7 +336,9 @@ export const CustomSizes: StoryFn<DrawerProps> = () => {
 
       <Drawer width={1000}>
         <DrawerTrigger asChild>
-          <Button>1000px Width</Button>
+          <Button variant='outline' color='neutral'>
+            1000px Width
+          </Button>
         </DrawerTrigger>
 
         <DrawerContent>
@@ -348,7 +366,9 @@ export const Resizable: StoryFn<DrawerProps> = () => {
     <VStack gap={12}>
       <Drawer width={800}>
         <DrawerTrigger asChild>
-          <Button>Open Resizable Drawer (as number)</Button>
+          <Button variant='outline' color='neutral'>
+            Open Resizable Drawer (as number)
+          </Button>
         </DrawerTrigger>
 
         <DrawerContent>
@@ -368,7 +388,9 @@ export const Resizable: StoryFn<DrawerProps> = () => {
 
       <Drawer width='900px'>
         <DrawerTrigger asChild>
-          <Button>Open Resizable Drawer (900px)</Button>
+          <Button variant='outline' color='neutral'>
+            Open Resizable Drawer (900px)
+          </Button>
         </DrawerTrigger>
 
         <DrawerContent>
@@ -388,7 +410,9 @@ export const Resizable: StoryFn<DrawerProps> = () => {
 
       <Drawer width='50%'>
         <DrawerTrigger asChild>
-          <Button>Open Resizable Drawer (50%)</Button>
+          <Button variant='outline' color='neutral'>
+            Open Resizable Drawer (50%)
+          </Button>
         </DrawerTrigger>
 
         <DrawerContent>
@@ -448,7 +472,9 @@ export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
   return (
     <Drawer width={480} open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <Button>Open Resizable Drawer with OverflowList</Button>
+        <Button variant='outline' color='neutral'>
+          Open Resizable Drawer with OverflowList
+        </Button>
       </DrawerTrigger>
       <DrawerContent>
         <DrawerResizeHandle />
@@ -482,7 +508,9 @@ export const Scrollable: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button>Open Drawer with Scroll</Button>
+        <Button variant='outline' color='neutral'>
+          Open Drawer with Scroll
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -521,7 +549,9 @@ export const Controlled: StoryFn<DrawerProps> = () => {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Open Controlled Drawer</Button>
+      <Button variant='outline' color='neutral' onClick={() => setOpen(true)}>
+        Open Controlled Drawer
+      </Button>
 
       <Drawer open={open} onOpenChange={setOpen}>
         <DrawerContent>
@@ -559,7 +589,9 @@ export const NoClosableOnEsc: StoryFn<DrawerProps> = () => {
   return (
     <Drawer closeOnEscape={false}>
       <DrawerTrigger asChild>
-        <Button>Open Drawer</Button>
+        <Button variant='outline' color='neutral'>
+          Open Drawer
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -583,7 +615,9 @@ export const NoOverlay: StoryFn<DrawerProps> = () => {
   return (
     <Drawer overlay={false}>
       <DrawerTrigger asChild>
-        <Button>Open without Overlay</Button>
+        <Button variant='outline' color='neutral'>
+          Open without Overlay
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -608,7 +642,9 @@ export const WithNested: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button>1st level drawer</Button>
+        <Button variant='outline' color='neutral'>
+          1st level drawer
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -714,7 +750,9 @@ export const WithNestedDialog: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button>Open drawer with dialog inside</Button>
+        <Button variant='outline' color='neutral'>
+          Open drawer with dialog inside
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -765,7 +803,9 @@ export const WithNestedSelect: StoryFn<DrawerProps> = () => {
   return (
     <Drawer>
       <DrawerTrigger asChild>
-        <Button>Open drawer with nested select</Button>
+        <Button variant='outline' color='neutral'>
+          Open drawer with nested select
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>
@@ -836,7 +876,9 @@ export const WithTabs: StoryFn<DrawerProps> = () => {
   return (
     <Drawer width={960}>
       <DrawerTrigger asChild>
-        <Button>Open Drawer with Tabs</Button>
+        <Button variant='outline' color='neutral'>
+          Open Drawer with Tabs
+        </Button>
       </DrawerTrigger>
 
       <DrawerContent>

@@ -405,8 +405,11 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Found while** — documenting the `FilterInput` family.
 - **Status** — Partly done. The operator-menu and field-menu pages now use a DS
   `Button` trigger and the annotation style, and the hand-styled `<kbd>` panel is
-  gone. Still open: the `bg-gray-100` expression dumps on the `FilterInput` and
-  `Composition` pages.
+  gone. `Toast`, `Dialog` and `Drawer` have since had the same treatment, and the
+  rule is now a section of the skill rather than a per-page judgement. Still open:
+  the `bg-gray-100` expression dumps on the `FilterInput` and `Composition`
+  pages, and the remaining loud pages (`Selection`, `Table`, `Tour`,
+  `OverflowTooltip`, `InlineEdit`, `Card`, `AppShell`, `Tooltip`, `TreeView`).
 
 ### FilterInput: the BackendIntegration example demonstrates a pattern we forbid
 

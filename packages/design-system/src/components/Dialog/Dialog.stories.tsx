@@ -106,7 +106,7 @@ export default meta;
 /** Content placeholder styled like Figma designs - fills available space */
 const ContentPlaceholder = ({ height }: { fillHeight?: boolean; height?: number }) => (
   <div
-    className='w-full rounded-12 bg-[#f1f5f9]'
+    className='w-full rounded-12 bg-bg-surface-5'
     style={height ? { height: `${height}px` } : { height: '200px' }}
   />
 );
@@ -119,7 +119,9 @@ export const Basic: StoryFn<DialogProps> = () => {
   return (
     <Dialog data-testid='dialog'>
       <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -143,7 +145,9 @@ export const WithFooter: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -179,7 +183,9 @@ export const WithDescription: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -214,7 +220,9 @@ export const WithDescription: StoryFn<DialogProps> = () => {
 export const WithFooterLeftActions: StoryFn<DialogProps> = () => (
   <Dialog>
     <DialogTrigger asChild>
-      <Button>Open with Footer Actions</Button>
+      <Button variant='outline' color='neutral'>
+        Open with Footer Actions
+      </Button>
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
@@ -254,7 +262,9 @@ export const Sizes: StoryFn<DialogProps> = () => (
   <HStack gap={8} justify='center'>
     <Dialog width={DIALOG_SIZES.small}>
       <DialogTrigger asChild>
-        <Button>Open Small ({DIALOG_SIZES.small}px)</Button>
+        <Button variant='outline' color='neutral'>
+          Open Small ({DIALOG_SIZES.small}px)
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -269,7 +279,9 @@ export const Sizes: StoryFn<DialogProps> = () => (
 
     <Dialog width={DIALOG_SIZES.medium}>
       <DialogTrigger asChild>
-        <Button>Open Medium ({DIALOG_SIZES.medium}px)</Button>
+        <Button variant='outline' color='neutral'>
+          Open Medium ({DIALOG_SIZES.medium}px)
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -284,7 +296,9 @@ export const Sizes: StoryFn<DialogProps> = () => (
 
     <Dialog width={DIALOG_SIZES.large}>
       <DialogTrigger asChild>
-        <Button>Open Large ({DIALOG_SIZES.large}px)</Button>
+        <Button variant='outline' color='neutral'>
+          Open Large ({DIALOG_SIZES.large}px)
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -307,7 +321,9 @@ export const CustomSizes: StoryFn<DialogProps> = () => {
     <HStack gap={8} justify='center'>
       <Dialog width='50%'>
         <DialogTrigger asChild>
-          <Button>50% Width</Button>
+          <Button variant='outline' color='neutral'>
+            50% Width
+          </Button>
         </DialogTrigger>
 
         <DialogContent>
@@ -325,7 +341,9 @@ export const CustomSizes: StoryFn<DialogProps> = () => {
 
       <Dialog width={1000}>
         <DialogTrigger asChild>
-          <Button>1000px Width</Button>
+          <Button variant='outline' color='neutral'>
+            1000px Width
+          </Button>
         </DialogTrigger>
 
         <DialogContent>
@@ -352,7 +370,9 @@ export const Scrollable: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Dialog with Scroll</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog with Scroll
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -391,7 +411,9 @@ export const WithInputAtEdge: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Dialog with Edge Input</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog with Edge Input
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -426,7 +448,9 @@ export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Scrollable Dialog with Edge Input</Button>
+        <Button variant='outline' color='neutral'>
+          Open Scrollable Dialog with Edge Input
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -467,7 +491,9 @@ export const WithNestedDrawer: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open dialog with drawer inside</Button>
+        <Button variant='outline' color='neutral'>
+          Open dialog with drawer inside
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -520,7 +546,9 @@ export const WithNestedSelect: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open dialog with nested select</Button>
+        <Button variant='outline' color='neutral'>
+          Open dialog with nested select
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -589,7 +617,9 @@ export const WithNestedCalendar: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open dialog with nested calendar</Button>
+        <Button variant='outline' color='neutral'>
+          Open dialog with nested calendar
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -644,7 +674,9 @@ export const Controlled: StoryFn<DialogProps> = () => {
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Open Controlled Dialog</Button>
+      <Button variant='outline' color='neutral' onClick={() => setOpen(true)}>
+        Open Controlled Dialog
+      </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
@@ -683,7 +715,9 @@ export const NoClosableOnEsc: StoryFn<DialogProps> = () => {
   return (
     <Dialog closeOnEscape={false}>
       <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -725,7 +759,9 @@ export const NoOverlay: StoryFn<DialogProps> = () => {
 
       <Dialog overlay={false}>
         <DialogTrigger asChild>
-          <Button>Open without Overlay</Button>
+          <Button variant='outline' color='neutral'>
+            Open without Overlay
+          </Button>
         </DialogTrigger>
 
         <DialogContent>
@@ -767,7 +803,9 @@ export const WithNested: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>1st level dialog</Button>
+        <Button variant='outline' color='neutral'>
+          1st level dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -873,7 +911,9 @@ export const WithTabs: StoryFn<DialogProps> = () => {
   return (
     <Dialog width={960}>
       <DialogTrigger asChild>
-        <Button>Open Dialog with Tabs</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog with Tabs
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
