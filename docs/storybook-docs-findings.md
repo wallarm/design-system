@@ -403,7 +403,10 @@ Not findings — decisions worth remembering so they are not rediscovered.
   neutral token surface. Story-file only, so it is safe from the component's
   point of view.
 - **Found while** — documenting the `FilterInput` family.
-- **Status** — Open.
+- **Status** — Partly done. The operator-menu and field-menu pages now use a DS
+  `Button` trigger and the annotation style, and the hand-styled `<kbd>` panel is
+  gone. Still open: the `bg-gray-100` expression dumps on the `FilterInput` and
+  `Composition` pages.
 
 ### FilterInput: the BackendIntegration example demonstrates a pattern we forbid
 
@@ -648,4 +651,23 @@ Not findings — decisions worth remembering so they are not rediscovered.
   development when `open` is true and no `positioning` was given. The stories are
   fixed regardless.
 - **Found while** — fixing the `FilterInputFieldMenu` page with Artem.
+- **Status** — Open.
+
+### FilterInput: only half the field types offer the presence operators
+
+- **What** — `is_null` / `is_not_null` are offered for `string`, `boolean` and
+  `enum` fields but not for `integer`, `float` or `date`, so a query cannot ask
+  whether a numeric or date field is set.
+- **Evidence** — `FilterInput/lib/constants.ts:123-136` (`OPERATORS_BY_TYPE`).
+  `integer` also carries `in` while `float` does not, and `between` exists only
+  for `date`.
+- **Why it matters** — A missing numeric value is as real as a missing string —
+  "no response time recorded" is a normal thing to filter for — and the asymmetry
+  reads as an oversight rather than a decision. It also made the old story prose
+  wrong: it listed `between` and the presence checks for integer, and the menu
+  shows neither.
+- **Suggested action** — Decide per type whether the presence pair belongs, and
+  document the answer. Cheap to add if the backend already supports null checks
+  on those columns.
+- **Found while** — fixing the `FilterInputOperatorMenu` page with Artem.
 - **Status** — Open.
