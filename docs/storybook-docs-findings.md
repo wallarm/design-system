@@ -403,28 +403,23 @@ Not findings — decisions worth remembering so they are not rediscovered.
   neutral token surface. Story-file only, so it is safe from the component's
   point of view.
 - **Found while** — documenting the `FilterInput` family.
-- **Status** — Partly done, and re-audited before the PR. Cleaned: the
-  operator-menu and field-menu pages (DS `Button` trigger, annotation style, the
-  hand-styled `<kbd>` panel gone), `Toast`, `Dialog`, `Drawer`, `Selection` (the
-  drawer trigger), `Table` (the four `scrollToRow` controls) and `Card`. The rule
-  is now a section of the skill rather than a per-page judgement.
+- **Status** — Closed. Everything on the list is now on system: the operator-menu
+  and field-menu pages, `Toast`, `Dialog`, `Drawer`, `Selection`, `Table`, `Card`,
+  and finally the `bg-gray-100` expression dumps on `FilterInput` /
+  `FilterInputComposition` (now a bordered token panel in mono),
+  `OverflowTooltip`'s two raw `bg-blue-500` buttons and its in-tooltip code chip
+  (now the token a `Kbd` uses inside a tooltip), `Tooltip`'s solid dialog trigger,
+  and one hand-rolled `animate-pulse` div that is now the shipped `Skeleton`.
 
-  **Still open, deliberately deferred out of this PR** because these pages were
-  already reviewed and signed off, and none of it blocks a reviewer:
+  `Tour`'s four start buttons took **`secondary`**, not `outline`: the tour targets
+  around them are already outline, so outline would have made the control that
+  reveals the specimen identical to the things it points at. The rule is relative
+  loudness, not a fixed variant — worth remembering next time.
 
-  | Page | What | Sites |
-  |---|---|---|
-  | `FilterInput`, `FilterInputComposition` | `bg-gray-100` expression dumps | 7 |
-  | `OverflowTooltip` | two raw `bg-blue-500` `<button>` triggers, one `bg-gray-100` code chip inside tooltip content | 3 |
-  | `Tour` | `variant='primary'` brand start buttons — the harness that reveals the specimen | 4 |
-  | `Tooltip` | default solid `<Button>` as a `DialogTrigger` | 1 |
-  | `InlineEdit` | one `variant='primary'` control | 1 |
-
-  `AppShell`'s primary is **not** in scope — it sits inside a mocked sign-in form,
-  where a primary is correct. `TreeView` is clean.
-
-  Each is the same one-line restyle already applied elsewhere; worth one follow-up
-  commit once someone confirms they want those five pages touched.
+  Ruled out of scope on inspection: `InlineEdit`'s `variant='primary'` is the
+  confirm action in a dialog footer, and `AppShell`'s is inside a mocked sign-in
+  form — a primary is correct in both. `Logo` and `Loader` keep their `bg-slate-900`
+  / `bg-slate-950` backdrops, which exist to show a light-on-dark variant.
 
 ### FilterInput: the BackendIntegration example demonstrates a pattern we forbid
 
