@@ -54,7 +54,7 @@
 | ✅ | Data Display/Accordion | 8 | 8 | `components/Accordion/Accordion.stories.tsx` |
 | ✅ | Data Display/Attribute | 19 | 19 | `components/Attribute/Attribute.stories.tsx` |
 | ✅ | Data Display/Card | 3 | 3 | `components/Card/Card.stories.tsx` |
-| 🟡 | Data Display/CodeSnippet/InlineCodeSnippet | 4 | 3 | `components/CodeSnippet/InlineCodeSnippet.stories.tsx` |
+| ✅ | Data Display/CodeSnippet/InlineCodeSnippet | 4 | 4 | `components/CodeSnippet/InlineCodeSnippet.stories.tsx` |
 | ☐ | Data Display/Country | 5 | 0 | `components/Country/Country.stories.tsx` |
 | ☐ | Data Display/FormatDateTime | 7 | 0 | `components/FormatDateTime/FormatDateTime.stories.tsx` |
 | ☐ | Data Display/FormatNumber | 9 | 0 | `components/FormatNumber/FormatNumber.stories.tsx` |
