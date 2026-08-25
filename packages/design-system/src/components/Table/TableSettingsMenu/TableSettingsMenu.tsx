@@ -4,7 +4,9 @@ import {
   type FC,
   type ReactNode,
   type Ref,
+  useLayoutEffect,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { createPortal } from 'react-dom';
@@ -83,10 +85,31 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
 
+  // Lock the menu to its unfiltered width on open so typing in the search field
+  // (which drops rows and changes the widest visible one) never resizes it —
+  // the width the user first sees is kept for the whole session (AS-1431).
+  const contentRef = useRef<HTMLDivElement>(null);
+  const [lockedWidth, setLockedWidth] = useState<number>();
+
   const handleOpenChange = (open: boolean) => {
     setMenuOpen(open);
+    // Fresh search each open, so the lock below always measures the full list.
+    if (open) setSearch('');
+    else setLockedWidth(undefined);
     onSettingsOpenChange?.(open);
   };
+
+  // Measure the natural (full-list) width once the portaled content has mounted,
+  // then pin it. rAF-retries until the Ark portal is in the DOM.
+  useLayoutEffect(() => {
+    if (!menuOpen) return;
+    let raf = requestAnimationFrame(function measure() {
+      const el = contentRef.current;
+      if (el) setLockedWidth(el.offsetWidth);
+      else raf = requestAnimationFrame(measure);
+    });
+    return () => cancelAnimationFrame(raf);
+  }, [menuOpen]);
 
   // Filter out utility columns (_selection, _expand) — they shouldn't appear in settings
   const allColumns = table
@@ -192,7 +215,11 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
                   </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className={cn('w-256 max-h-[430px]')}>
+                <DropdownMenuContent
+                  ref={contentRef}
+                  className={cn('min-w-256 max-h-[430px]')}
+                  style={lockedWidth ? { width: lockedWidth } : undefined}
+                >
                   {searchOverride ?? <TableSettingsMenuSearch />}
                   <VStack gap={1}>
                     <DndContext
