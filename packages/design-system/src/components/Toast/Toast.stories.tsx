@@ -123,7 +123,7 @@ const ToastDemo = () => {
           {types.map(({ label, icon, type, title, description }) => (
             <Button
               key={label}
-              variant='ghost'
+              variant='secondary'
               color='neutral'
               onClick={() =>
                 toast.create({
@@ -253,10 +253,10 @@ export const UpdateLoadingToSuccess: StoryFn = () => {
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
-          <Button variant='ghost' color='neutral' onClick={() => createToast(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => createToast(STATIC_DURATION)}>
             Create loading toast
           </Button>
-          <Button variant='ghost' color='neutral' onClick={() => updateToast(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => updateToast(STATIC_DURATION)}>
             Update to success
           </Button>
         </HStack>
@@ -318,10 +318,10 @@ export const SimpleWithActions: StoryFn = () => {
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
-          <Button variant='ghost' color='neutral' onClick={() => single(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => single(STATIC_DURATION)}>
             Simple Toast with Action
           </Button>
-          <Button variant='ghost' color='neutral' onClick={() => double(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => double(STATIC_DURATION)}>
             Simple Toast with Two Actions
           </Button>
         </HStack>
@@ -385,10 +385,10 @@ export const ExtendedWithActions: StoryFn = () => {
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
-          <Button variant='ghost' color='neutral' onClick={() => single(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => single(STATIC_DURATION)}>
             Extended Toast with Action
           </Button>
-          <Button variant='ghost' color='neutral' onClick={() => double(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => double(STATIC_DURATION)}>
             Extended Toast with Two Actions
           </Button>
         </HStack>
@@ -439,10 +439,10 @@ export const LongText: StoryFn = () => {
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
-          <Button variant='ghost' color='neutral' onClick={() => simpleLong(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => simpleLong(STATIC_DURATION)}>
             Simple with long title
           </Button>
-          <Button variant='ghost' color='neutral' onClick={() => extendedLong(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => extendedLong(STATIC_DURATION)}>
             Extended with long text
           </Button>
         </HStack>
@@ -478,7 +478,7 @@ export const WithoutCloseButton: StoryFn = () => {
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
-          <Button variant='ghost' color='neutral' onClick={() => create(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => create(STATIC_DURATION)}>
             Non-closable Toast
           </Button>
         </HStack>
@@ -527,10 +527,10 @@ export const CustomIcon: StoryFn = () => {
       <VStack gap={4} align='start'>
         <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
-          <Button variant='ghost' color='neutral' onClick={() => withColor(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => withColor(STATIC_DURATION)}>
             Custom Icon with own color
           </Button>
-          <Button variant='ghost' color='neutral' onClick={() => withoutColor(STATIC_DURATION)}>
+          <Button variant='secondary' color='neutral' onClick={() => withoutColor(STATIC_DURATION)}>
             Custom Icon without color
           </Button>
         </HStack>

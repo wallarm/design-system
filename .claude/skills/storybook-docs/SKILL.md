@@ -186,8 +186,10 @@ trigger was a stock-blue `bg-blue-500` box.
 Three rules, in order of how often they bite:
 
 - **Quietest treatment that still works.** `variant='outline'` with
-  `color='neutral'`, or `ghost` for a second rank of controls. Never a solid
-  brand button for something whose only job is to reveal the component.
+  `color='neutral'`, and `secondary` + `neutral` for a second rank of controls —
+  a soft low-opacity fill with no border, which sits a step back from outline
+  without disappearing the way `ghost` does. Never a solid brand button for
+  something whose only job is to reveal the component.
 - **DS components, not raw markup.** A trigger built from a `<button>` and a
   Tailwind hue is both louder and off-system; it also contradicts whatever the
   page is teaching. The same goes for debug output — a `bg-gray-100` JSON dump is
