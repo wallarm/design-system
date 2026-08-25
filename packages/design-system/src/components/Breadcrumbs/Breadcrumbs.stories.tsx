@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { ChevronDown, CircleDashed, Home } from '../../icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
@@ -8,6 +9,9 @@ const DESCRIPTION = [
   'The location trail for a page that sits deep in a hierarchy — each ancestor links up, and the last item is the page you are on.',
   'Skip it in a flat app of one or two levels, and never use it to move between peers at the same level: that is `Tabs`. It shows vertical hierarchy only, and complements the sidebar rather than replacing it.',
 ].join(' ');
+
+const onCurrentPageClick = fn().mockName('onCurrentPageClick');
+const onCategoryClick = fn().mockName('onCategoryClick');
 
 const meta: Meta<typeof Breadcrumbs> = {
   title: 'Navigation/Breadcrumbs',
@@ -78,7 +82,7 @@ export const WithIcons: StoryFn<typeof Breadcrumbs> = args => {
           Subcategory
           <CircleDashed size='md' />
         </BreadcrumbsItem>
-        <BreadcrumbsItem onClick={() => alert('Current page clicked')}>
+        <BreadcrumbsItem onClick={onCurrentPageClick}>
           <CircleDashed size='md' />
           Current Page
           <CircleDashed size='md' />
@@ -96,7 +100,7 @@ export const WithInteractiveItems: StoryFn<typeof Breadcrumbs> = args => {
     <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
       <Breadcrumbs {...args}>
         <BreadcrumbsItem href='#home'>Home</BreadcrumbsItem>
-        <BreadcrumbsItem onClick={() => alert('Category dropdown clicked')}>
+        <BreadcrumbsItem onClick={onCategoryClick}>
           <CircleDashed size='md' />
           Category
           <ChevronDown size='md' />
@@ -129,7 +133,7 @@ export const IconsOnly: StoryFn<typeof Breadcrumbs> = args => {
         <BreadcrumbsItem href='#security' aria-label='Security'>
           <CircleDashed size='md' />
         </BreadcrumbsItem>
-        <BreadcrumbsItem aria-label='Current page' onClick={() => alert('Current page clicked')}>
+        <BreadcrumbsItem aria-label='Current page' onClick={onCurrentPageClick}>
           <CircleDashed size='md' />
         </BreadcrumbsItem>
       </Breadcrumbs>
@@ -184,7 +188,7 @@ export const LongBreadcrumbs: StoryFn<typeof Breadcrumbs> = args => {
         <BreadcrumbsItem href='#category'>Technology Category</BreadcrumbsItem>
         <BreadcrumbsItem href='#subcategory'>Software Development</BreadcrumbsItem>
         <BreadcrumbsItem href='#area'>Web Development Tools</BreadcrumbsItem>
-        <BreadcrumbsItem onClick={() => alert('Current page clicked')}>
+        <BreadcrumbsItem onClick={onCurrentPageClick}>
           Frontend Frameworks and Libraries
         </BreadcrumbsItem>
       </Breadcrumbs>

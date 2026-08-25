@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Earth, Info } from '../../icons';
 import {
@@ -21,6 +22,8 @@ const DESCRIPTION = [
   'An interactive chip for a keyword or attribute the reader can select or remove — a chip that only states a value is a `Badge`.',
   'Give it one job: Carbon warns against tags carrying several functions at once, and a chip that both filters and deletes is one people trigger by accident.',
 ].join(' ');
+
+const onTagClick = fn().mockName('onTagClick');
 
 const meta = {
   title: 'Status Indication/Tag',
@@ -235,7 +238,7 @@ export const WithIcons: StoryFn<typeof meta> = ({ ...args }) => (
  * link, which Carbon rules out for tags.
  */
 export const WithOnClick: StoryFn<typeof meta> = ({ ...args }) => (
-  <Tag {...args} onClick={() => alert('Tag clicked!')}>
+  <Tag {...args} onClick={onTagClick}>
     Click me
   </Tag>
 );

@@ -1,4 +1,5 @@
 import { useRef } from 'react';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import {
   Activity,
@@ -27,6 +28,8 @@ import {
 } from '../Drawer';
 import { HStack, VStack } from '../Stack';
 import { ToastActions, Toaster, useToast } from './index';
+
+const onToastAction = fn().mockName('onToastAction');
 
 const DESCRIPTION = [
   'A transient notification fired from `useToast()` — you never place one in the tree, and a single `Toaster` at the app root owns placement, stacking and the timer.',
@@ -277,7 +280,7 @@ export const SimpleWithActions: StoryFn = () => {
       duration,
       actions: (
         <ToastActions>
-          <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
+          <Button variant='secondary' size='small' color='neutral-alt' onClick={onToastAction}>
             Undo
           </Button>
         </ToastActions>
@@ -292,10 +295,10 @@ export const SimpleWithActions: StoryFn = () => {
       duration,
       actions: (
         <ToastActions>
-          <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
+          <Button variant='secondary' size='small' color='neutral-alt' onClick={onToastAction}>
             View
           </Button>
-          <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
+          <Button variant='secondary' size='small' color='neutral-alt' onClick={onToastAction}>
             Dismiss
           </Button>
         </ToastActions>
@@ -343,7 +346,7 @@ export const ExtendedWithActions: StoryFn = () => {
       duration,
       actions: (
         <ToastActions>
-          <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
+          <Button variant='secondary' size='small' color='neutral-alt' onClick={onToastAction}>
             Action
           </Button>
         </ToastActions>
@@ -359,10 +362,10 @@ export const ExtendedWithActions: StoryFn = () => {
       duration,
       actions: (
         <ToastActions>
-          <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
+          <Button variant='secondary' size='small' color='neutral-alt' onClick={onToastAction}>
             View
           </Button>
-          <Button variant='secondary' size='small' color='neutral-alt' onClick={() => {}}>
+          <Button variant='secondary' size='small' color='neutral-alt' onClick={onToastAction}>
             Download
           </Button>
         </ToastActions>

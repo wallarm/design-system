@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Database, Ellipsis, Filter, FilterX, SearchX, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
@@ -94,6 +95,13 @@ import type {
   TableSortingState,
   TableVisibilityState,
 } from './types';
+
+const onDuplicate = fn().mockName('onDuplicate');
+const onDelete = fn().mockName('onDelete');
+const onCopyValue = fn().mockName('onCopyValue');
+const onShowOnly = fn().mockName('onShowOnly');
+const onExclude = fn().mockName('onExclude');
+const onExecute = fn().mockName('onExecute');
 
 const DESCRIPTION = [
   'The grid for many records of one shape — reach for a `Card` grid when a row reads better as an object than as a set of columns, and for `Attribute` when you are showing one record rather than many.',
@@ -813,10 +821,10 @@ export const RowSelection: StoryFn<typeof meta> = () => {
       onRowSelectionChange={setRowSelection}
     >
       <TableActionBar>
-        <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
+        <Button variant='ghost' color='neutral-alt' onClick={onDuplicate}>
           <Copy /> Duplicate
         </Button>
-        <Button color='brand' onClick={() => alert('Delete clicked')}>
+        <Button color='brand' onClick={onDelete}>
           <Trash2 /> Delete
         </Button>
       </TableActionBar>
@@ -844,10 +852,10 @@ export const RowSelectionWindowScroll: StoryFn<typeof meta> = () => {
         onRowSelectionChange={setRowSelection}
       >
         <TableActionBar>
-          <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
+          <Button variant='ghost' color='neutral-alt' onClick={onDuplicate}>
             <Copy /> Duplicate
           </Button>
-          <Button color='brand' onClick={() => alert('Delete clicked')}>
+          <Button color='brand' onClick={onDelete}>
             <Trash2 /> Delete
           </Button>
         </TableActionBar>
@@ -950,7 +958,7 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
             <Text size='sm'>{getValue()}</Text>
           </DropdownMenuContextTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onSelect={() => alert('Copy')}>
+            <DropdownMenuItem onSelect={onCopyValue}>
               <DropdownMenuItemIcon>
                 <Copy />
               </DropdownMenuItemIcon>
@@ -959,7 +967,7 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem onSelect={() => alert('Show Only')}>
+            <DropdownMenuItem onSelect={onShowOnly}>
               <DropdownMenuItemIcon>
                 <Filter />
               </DropdownMenuItemIcon>
@@ -969,7 +977,7 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
               </DropdownMenuItemContent>
             </DropdownMenuItem>
 
-            <DropdownMenuItem onSelect={() => alert('Exclude')}>
+            <DropdownMenuItem onSelect={onExclude}>
               <DropdownMenuItemIcon>
                 <FilterX />
               </DropdownMenuItemIcon>
@@ -990,7 +998,7 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
             <InlineCodeSnippet code={getValue()} size='sm' copyable={false} />
           </DropdownMenuContextTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onSelect={() => alert('Execute')}>
+            <DropdownMenuItem onSelect={onExecute}>
               <DropdownMenuItemIcon>
                 <Copy />
               </DropdownMenuItemIcon>
@@ -1385,17 +1393,13 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
                         <DropdownMenuItemText>Copy name</DropdownMenuItemText>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onSelect={() => alert(`Filter: ${row.original.objectName}`)}
-                      >
+                      <DropdownMenuItem onSelect={() => onShowOnly(row.original.objectName)}>
                         <DropdownMenuItemIcon>
                           <Filter />
                         </DropdownMenuItemIcon>
                         <DropdownMenuItemText>Show only</DropdownMenuItemText>
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => alert(`Exclude: ${row.original.objectName}`)}
-                      >
+                      <DropdownMenuItem onSelect={() => onExclude(row.original.objectName)}>
                         <DropdownMenuItemIcon>
                           <FilterX />
                         </DropdownMenuItemIcon>
@@ -1559,10 +1563,10 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
       virtualized='container'
     >
       <TableActionBar>
-        <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
+        <Button variant='ghost' color='neutral-alt' onClick={onDuplicate}>
           <Copy /> Duplicate
         </Button>
-        <Button color='brand' onClick={() => alert('Delete clicked')}>
+        <Button color='brand' onClick={onDelete}>
           <Trash2 /> Delete
         </Button>
       </TableActionBar>

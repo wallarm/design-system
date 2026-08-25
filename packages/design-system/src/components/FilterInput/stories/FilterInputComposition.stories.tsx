@@ -1,6 +1,7 @@
 import type React from 'react';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from 'storybook/test';
 import { FilterInput } from '../FilterInput';
 import {
   createStatusCodeInputFilter,
@@ -10,6 +11,8 @@ import {
 } from '../lib/statusCode';
 import type { ExprNode, FieldMetadata } from '../types';
 import { backendFieldsToMetadata, realBackendFields } from './backendFieldsFixture';
+
+const onFilterChange = fn().mockName('onFilterChange');
 
 const DESCRIPTION = [
   'The same `FilterInput` at production scale — the attack-vectors schema as the backend actually serves it, mapped through `backendFieldsToMetadata`.',
@@ -719,7 +722,7 @@ export const Simple: Story = {
           fields={simpleFields}
           value={expression}
           onChange={expr => {
-            console.log('Filter:', expr);
+            onFilterChange(expr);
             setExpression(expr);
           }}
           placeholder='Filter items...'

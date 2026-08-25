@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Button } from '../Button';
 import { FeedbackPulse } from './FeedbackPulse';
@@ -7,6 +8,8 @@ const DESCRIPTION = [
   'Asks one question in place, for measuring how a change landed without sending the reader to a survey.',
   'It is deliberately small and skippable: one question, an optional comment, and a timeout that dismisses it if the reader ignores it.',
 ].join(' ');
+
+const onSubmit = fn().mockName('onSubmit');
 
 const meta = {
   title: 'Overlay/FeedbackPulse',
@@ -50,7 +53,7 @@ export const Playground: StoryFn<typeof meta> = args => {
         {...args}
         open={open}
         onOpenChange={next => setOpen(next)}
-        onSubmit={r => console.log('submitted', r)}
+        onSubmit={onSubmit}
         data-testid='feedback-pulse'
       />
     </div>

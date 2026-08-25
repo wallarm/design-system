@@ -1,3 +1,4 @@
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CircleDashed } from '../../icons';
 import { Badge } from '../Badge';
@@ -17,6 +18,9 @@ import { CardContent } from './CardContent';
 import { CardFooter } from './CardFooter';
 import { CardHeader } from './CardHeader';
 import { CardTitle } from './CardTitle';
+
+const onCardClick = fn().mockName('onCardClick');
+const onButtonClick = fn().mockName('onButtonClick');
 
 const DESCRIPTION = [
   'Holds one self-contained thing — a metric, an integration, a saved view — in a block you can compare against its neighbours in a grid; reach for `Table` when the same fields repeat down a list, and for a `Heading` when you only mean to section a page.',
@@ -71,7 +75,7 @@ export default meta;
  * separate targets.
  */
 export const Basic: StoryFn<CardProps> = ({ ...args }) => (
-  <Card onClick={() => console.log('Card clicked')} {...args}>
+  <Card onClick={onCardClick} {...args}>
     <CardHeader>
       <CardTitle>Card title</CardTitle>
       <Badge size='medium' type='solid' color='slate'>
@@ -80,12 +84,7 @@ export const Basic: StoryFn<CardProps> = ({ ...args }) => (
     </CardHeader>
     <CardContent>Card description</CardContent>
     <CardFooter>
-      <Button
-        variant='secondary'
-        size='small'
-        color='neutral'
-        onClick={() => console.log('Card`s button clicked')}
-      >
+      <Button variant='secondary' size='small' color='neutral' onClick={onButtonClick}>
         Button
       </Button>
     </CardFooter>
@@ -132,7 +131,7 @@ export const Variants: StoryFn<CardProps> = () => (
     </HStack>
 
     <HStack gap={16} align='center'>
-      <Card color='primary' onClick={() => console.log('Primary card clicked')}>
+      <Card color='primary' onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Primary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>
@@ -147,7 +146,7 @@ export const Variants: StoryFn<CardProps> = () => (
         </CardFooter>
       </Card>
 
-      <Card color='secondary' onClick={() => console.log('Secondary card clicked')}>
+      <Card color='secondary' onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Secondary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>
@@ -164,7 +163,7 @@ export const Variants: StoryFn<CardProps> = () => (
     </HStack>
 
     <HStack gap={16} align='center'>
-      <Card color='primary' disabled onClick={() => console.log('Primary card clicked')}>
+      <Card color='primary' disabled onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Primary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>
@@ -179,7 +178,7 @@ export const Variants: StoryFn<CardProps> = () => (
         </CardFooter>
       </Card>
 
-      <Card color='secondary' disabled onClick={() => console.log('Secondary card clicked')}>
+      <Card color='secondary' disabled onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Secondary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>

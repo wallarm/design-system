@@ -1,11 +1,15 @@
 import * as React from 'react';
 import type { Meta, StoryFn } from '@storybook/react';
+import { fn } from 'storybook/test';
 import {
   FilterInputChip,
   type FilterInputChipProps,
   FilterInputConnectorChip,
 } from '../FilterInputField';
 import { MockFilterInputProvider } from './mockFilterInputContext';
+
+const onRemove = fn().mockName('onRemove');
+const onRemoveShouldNotFire = fn().mockName('onRemoveShouldNotFire');
 
 const DESCRIPTION = [
   'The chip `FilterInput` renders for each committed condition — attribute, operator, value — exported for rare custom builds.',
@@ -128,7 +132,7 @@ WithDeleteButton.args = {
   operator: 'is',
   value: '192.168.1.1',
   error: false,
-  onRemove: () => alert('Filter removed'),
+  onRemove,
 };
 
 /** Error plus remove — a rejected chip has to stay removable, since dropping it is usually the fastest fix. */
@@ -138,7 +142,7 @@ ErrorWithDelete.args = {
   operator: 'is',
   value: 'Invalid Value',
   error: true,
-  onRemove: () => alert('Filter removed'),
+  onRemove,
 };
 
 /** Removing chips one at a time, with the connectors closing up behind them. */
@@ -195,7 +199,7 @@ DisabledWithOnRemove.args = {
   operator: 'is',
   value: 'api.example.com',
   disabled: true,
-  onRemove: () => alert('This should never fire'),
+  onRemove: onRemoveShouldNotFire,
 };
 
 /** Locked and editable chips in one row, which is what a drill-down actually looks like. */
@@ -210,12 +214,7 @@ export const DisabledAndInteractiveMix: StoryFn = () => (
         onRemove={() => undefined}
       />
       <FilterInputConnectorChip variant='and' chipId='c-1' onChange={() => undefined} />
-      <FilterInputChip
-        attribute='Country'
-        operator='is'
-        value='US'
-        onRemove={() => alert('Removed Country filter')}
-      />
+      <FilterInputChip attribute='Country' operator='is' value='US' onRemove={onRemove} />
     </div>
   </MockFilterInputProvider>
 );

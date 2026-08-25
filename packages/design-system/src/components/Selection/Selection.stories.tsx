@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Folder, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
@@ -43,6 +44,12 @@ const clusters: Cluster[] = [
   { id: '4', title: 'Legacy cluster', region: 'ap-south-1', status: 'Error' },
   { id: '5', title: 'Read replica', region: 'us-east-1', status: 'Active', locked: true },
 ];
+
+const onDuplicate = fn().mockName('onDuplicate');
+const onDelete = fn().mockName('onDelete');
+const onMove = fn().mockName('onMove');
+const onInspect = fn().mockName('onInspect');
+const onConfirm = fn().mockName('onConfirm');
 
 const DESCRIPTION = [
   'Turns a set of anything — cards, rows, list items — into a selectable collection: a checkbox on each one, shift-click for a range, and a bulk-action bar that arrives once something is ticked.',
@@ -99,14 +106,10 @@ export const Default: StoryFn<typeof meta> = () => {
       </VStack>
 
       <SelectionBulkBar>
-        <Button
-          variant='ghost'
-          color='neutral-alt'
-          onClick={() => alert(`Duplicate ${selected.length}`)}
-        >
+        <Button variant='ghost' color='neutral-alt' onClick={() => onDuplicate(selected)}>
           <Copy /> Duplicate
         </Button>
-        <Button color='brand' onClick={() => alert(`Delete ${selected.length}`)}>
+        <Button color='brand' onClick={() => onDelete(selected)}>
           <Trash2 /> Delete
         </Button>
       </SelectionBulkBar>
@@ -141,7 +144,7 @@ export const WithSelectAll: StoryFn<typeof meta> = () => {
       </VStack>
 
       <SelectionBulkBar>
-        <Button color='brand' onClick={() => alert(`Delete ${selected.length}`)}>
+        <Button color='brand' onClick={() => onDelete(selected)}>
           <Trash2 /> Delete
         </Button>
       </SelectionBulkBar>
@@ -167,7 +170,7 @@ export const Grid: StoryFn<typeof meta> = () => {
       </div>
 
       <SelectionBulkBar>
-        <Button onClick={() => alert(selected.join(', '))}>Inspect</Button>
+        <Button onClick={() => onInspect(selected)}>Inspect</Button>
       </SelectionBulkBar>
     </Selection>
   );
@@ -200,7 +203,7 @@ export const WithDisabled: StoryFn<typeof meta> = () => {
       </VStack>
 
       <SelectionBulkBar>
-        <Button color='brand' onClick={() => alert(`Delete ${selected.length}`)}>
+        <Button color='brand' onClick={() => onDelete(selected)}>
           <Trash2 /> Delete
         </Button>
       </SelectionBulkBar>
@@ -227,7 +230,7 @@ export const RangeSelection: StoryFn<typeof meta> = () => {
       </VStack>
 
       <SelectionBulkBar>
-        <Button color='brand' onClick={() => alert(`Selected: ${selected.join(', ')}`)}>
+        <Button color='brand' onClick={() => onConfirm(selected)}>
           Confirm
         </Button>
       </SelectionBulkBar>
@@ -253,21 +256,13 @@ export const BulkActions: StoryFn<typeof meta> = () => {
       </VStack>
 
       <SelectionBulkBar>
-        <Button
-          variant='ghost'
-          color='neutral-alt'
-          onClick={() => alert(`Move ${selected.length}`)}
-        >
+        <Button variant='ghost' color='neutral-alt' onClick={() => onMove(selected)}>
           <Folder /> Move
         </Button>
-        <Button
-          variant='ghost'
-          color='neutral-alt'
-          onClick={() => alert(`Duplicate ${selected.length}`)}
-        >
+        <Button variant='ghost' color='neutral-alt' onClick={() => onDuplicate(selected)}>
           <Copy /> Duplicate
         </Button>
-        <Button color='brand' onClick={() => alert(`Delete ${selected.length}`)}>
+        <Button color='brand' onClick={() => onDelete(selected)}>
           <Trash2 /> Delete
         </Button>
       </SelectionBulkBar>
@@ -315,7 +310,7 @@ export const EmptyAndPartial: StoryFn<typeof meta> = () => {
         </VStack>
 
         <SelectionBulkBar>
-          <Button color='brand' onClick={() => alert(`Delete ${selected.length}`)}>
+          <Button color='brand' onClick={() => onDelete(selected)}>
             <Trash2 /> Delete
           </Button>
         </SelectionBulkBar>
@@ -380,7 +375,7 @@ const CompoundToolbar = () => {
         data-testid='bulk-delete'
         data-analytics-id='BULK_DELETE'
         color='brand'
-        onClick={() => alert(`Delete ${selectedIds.size}`)}
+        onClick={() => onDelete([...selectedIds])}
       >
         <Trash2 /> Delete
       </Button>
@@ -460,7 +455,7 @@ export const InsideDrawer: StoryFn<typeof meta> = () => {
               variant='secondary'
               color='neutral-alt'
               size='large'
-              onClick={() => alert(`Duplicate ${selected.length}`)}
+              onClick={() => onDuplicate(selected)}
             >
               <Copy /> Duplicate
             </Button>
@@ -468,7 +463,7 @@ export const InsideDrawer: StoryFn<typeof meta> = () => {
               variant='secondary'
               color='neutral-alt'
               size='large'
-              onClick={() => alert(`Move ${selected.length}`)}
+              onClick={() => onMove(selected)}
             >
               <Folder /> Move
             </Button>
@@ -476,7 +471,7 @@ export const InsideDrawer: StoryFn<typeof meta> = () => {
               variant='secondary'
               color='destructive'
               size='large'
-              onClick={() => alert(`Delete ${selected.length}`)}
+              onClick={() => onDelete(selected)}
             >
               <Trash2 /> Delete
             </Button>

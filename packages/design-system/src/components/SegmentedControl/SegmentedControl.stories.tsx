@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import {
   ChevronLeft,
@@ -22,6 +23,8 @@ const DESCRIPTION = [
   'Switches between renditions of the same content, with every option visible — reach for `Tabs` when the sections are distinct places rather than views of one thing, and `Radio` when the choice is an answer a form submits.',
   'It owns no panel: it reports the chosen value and you re-render the content yourself.',
 ].join(' ');
+
+const onShowMore = fn().mockName('onShowMore');
 
 const meta = {
   title: 'Inputs/SegmentedControl',
@@ -146,7 +149,7 @@ export const MoreButton: StoryFn<SegmentedControlProps> = () => (
     </SegmentedControlItem>
     <SegmentedControlItem value='3'>Schema</SegmentedControlItem>
     <SegmentedControlSeparator />
-    <SegmentedControlButton onClick={() => alert('Show more items')}>
+    <SegmentedControlButton onClick={onShowMore}>
       <Ellipsis />
       More
     </SegmentedControlButton>
@@ -171,7 +174,7 @@ export const Many: StoryFn<SegmentedControlProps> = () => {
         </SegmentedControlItem>
       ))}
       <SegmentedControlSeparator />
-      <SegmentedControlButton onClick={() => alert('Show more items')}>
+      <SegmentedControlButton onClick={onShowMore}>
         <Ellipsis />
         More
       </SegmentedControlButton>
