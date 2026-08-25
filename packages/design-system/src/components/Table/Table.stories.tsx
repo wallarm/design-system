@@ -599,7 +599,7 @@ export const EmptyCollection: StoryFn<typeof meta> = () => (
     <TableEmptyState>
       <EmptyState type='collection-empty'>
         <EmptyStateIllustration>
-          <Database size='lg' />
+          <Database />
         </EmptyStateIllustration>
         <EmptyStateMessage>
           <EmptyStateTitle>No events yet</EmptyStateTitle>
@@ -616,15 +616,17 @@ export const EmptyCollection: StoryFn<typeof meta> = () => (
 );
 
 /**
- * The other kind of empty — data exists and the filters matched none of it, so the action
- * clears the filters and is never a create.
+ * When data exists but the current filters or search matched nothing, stay at
+ * the `collection-empty` scale — a table body is a page-level surface, and
+ * `no-results` is the compact treatment for a card or menu. What changes is the
+ * action: a neutral one that clears the filters, never a primary "create".
  */
 export const NoResults: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} getRowId={row => row.id}>
     <TableEmptyState>
-      <EmptyState type='no-results'>
+      <EmptyState type='collection-empty'>
         <EmptyStateIllustration>
-          <SearchX size='lg' />
+          <SearchX />
         </EmptyStateIllustration>
         <EmptyStateMessage>
           <EmptyStateTitle>No results found</EmptyStateTitle>

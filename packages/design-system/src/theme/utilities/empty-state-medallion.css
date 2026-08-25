@@ -1,0 +1,18 @@
+/**
+ * The raised tile behind an EmptyState icon.
+ *
+ * Composed here rather than in the component so the three layers Figma draws
+ * as stacked overlays (gradient fill, outer drop shadow, inner top highlight)
+ * collapse into one element: the gradient is a background-image, and the drop
+ * shadow, the inset highlight and the hairline ring all ride in a single
+ * box-shadow list. All of it resolves through tokens that flip in
+ * `[data-theme='dark']`.
+ */
+@utility empty-state-medallion {
+    background-image: linear-gradient(
+        to bottom,
+        var(--color-component-empty-state-medallion-bg-from),
+        var(--color-component-empty-state-medallion-bg-to)
+    );
+    box-shadow: var(--shadow-empty-state-medallion);
+}

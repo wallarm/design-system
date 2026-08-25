@@ -4,7 +4,10 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-08-25, against main at v1.5.0. **All 95 pages are written.**
+> **Last updated:** 2026-08-25, against main at v1.7.0. **All 95 pages are written.**
+>
+> `SearchModal` landed in v1.7.0 with no stories file, so it is not a page yet — it becomes an
+> unticked row the moment one is added.
 
 ## How to use this
 
@@ -126,7 +129,7 @@ check**, not a queue:
 | ✅ | Overlay/Popover | 4 | 4 | `components/Popover/Popover.stories.tsx` |
 | ✅ | Overlay/Tooltip | 4 | 4 | `components/Tooltip/Tooltip.stories.tsx` |
 | ✅ | Overlay/Tour | 5 | 5 | `components/Tour/Tour.stories.tsx` |
-| ✅ | Pages/EmptyState | 4 | 4 | `components/EmptyState/EmptyState.stories.tsx` |
+| ✅ | Pages/EmptyState | 5 | 5 | `components/EmptyState/EmptyState.stories.tsx` |
 | ✅ | Pages/UtilityPage | 4 | 4 | `components/UtilityPage/UtilityPage.stories.tsx` |
 | ✅ | Patterns/FilterInput/Composition | 4 | 4 | `components/FilterInput/stories/FilterInputComposition.stories.tsx` |
 | ✅ | Patterns/FilterInput/FilterInput | 17 | 17 | `components/FilterInput/stories/FilterInput.stories.tsx` |
