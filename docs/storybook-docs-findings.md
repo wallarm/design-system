@@ -792,3 +792,47 @@ Not findings — decisions worth remembering so they are not rediscovered.
   story already has.
 - **Found while** — documenting `Link`.
 - **Status** — Open.
+
+### Alert: the MinMaxWidth story cannot demonstrate either bound
+
+- **What** — `Alert` is a block-level flex container with `min-width: 256px` and
+  `max-width: 980px` and no width of its own, so it simply takes the container's
+  width, clamped. Both bounds are therefore invisible in a canvas that sits
+  between them, which is every canvas the story renders in.
+- **Evidence** — Measured on the Overview page. At a 1600px window (938px
+  canvas): the "short content" alert is **938px**, the "long content" alert is
+  **938px**, and only the `maxWidth={500}` one differs at **500px**. At an 800px
+  window the canvas collapses to 256px and **all three** sit at the minimum, so
+  the same story shows completely different widths depending on window size —
+  a consequence of `layout: 'centered'` shrink-to-fitting the story root.
+  `Alert.tsx:66` applies both bounds as inline style.
+- **Why it matters** — The labels named the two bounds, so the page asserted a
+  256px alert next to a 938px one. Corrected to describe what is actually
+  visible, but the story still cannot show either limit.
+- **Suggested action** — To demonstrate them, each example needs a container that
+  crosses its bound: a ~200px wrapper for the minimum (which also shows the alert
+  overflowing it — measured: 256px inside a 200px parent), and a >980px wrapper
+  for the ceiling. Worth deciding whether the ceiling is worth a wide example at
+  all, or whether stating it in prose is enough.
+- **Found while** — Artem spotted the min-width label on the rendered page.
+- **Status** — Open.
+
+### Visual e2e baselines are stale on this branch
+
+- **What** — Around thirty story files have changed rendered output during this
+  documentation pass — every annotation-label conversion, plus the two menu story
+  harnesses — while no screenshot baseline has been regenerated.
+- **Evidence** — `git diff --name-only main...HEAD`: 72 story files changed, zero
+  files under any `*.e2e.ts-snapshots/`. `Alert`, `Badge`, `Button`, `DateInput`,
+  `DateRangeInput`, `Icons`, `Indicator`, `NumericBadge`, `OverflowTooltip`,
+  `Progress`, `Skeleton`, `SplitButton`, `Stack`, `Flex`, `TimeInput`, `Toast`,
+  `Tour`, `WallyIcon` and the two FilterInput menu pages are the substantive ones.
+- **Why it matters** — The visual e2e jobs will fail on this branch until the
+  baselines are regenerated. This is expected for a pass whose whole point is
+  restyling in-canvas labels, but it must not come as a surprise at PR time.
+- **Suggested action** — Regenerate with the `[update-screenshots]` commit
+  trigger once the branch merges to main, per the repo's CI convention. Worth
+  confirming with engineering before opening the PR.
+- **Found while** — checking whether the Alert story change would break a
+  snapshot.
+- **Status** — Open.

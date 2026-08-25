@@ -239,12 +239,17 @@ export const WithBottomActions: StoryFn<AlertProps> = () => {
   );
 };
 
-/** The alert fills its container between 256 and 980px. `maxWidth` brings the ceiling down where the layout needs it; pinning a width by hand loses the fill. */
+/**
+ * Width comes from the container, clamped between 256 and 980px — so the short and
+ * the long alert here are exactly as wide as each other, and content length never
+ * changes it. `maxWidth` is the only thing that visibly narrows one. Below a 256px
+ * container the alert holds its minimum and overflows instead of shrinking.
+ */
 export const MinMaxWidth: StoryFn<AlertProps> = () => {
   return (
     <div className='flex flex-col gap-16'>
       <div>
-        <p className='sb-annotation mb-8'>min 256px</p>
+        <p className='sb-annotation mb-8'>short content</p>
         <Alert color='info'>
           <AlertIcon />
           <AlertContent>
@@ -254,7 +259,7 @@ export const MinMaxWidth: StoryFn<AlertProps> = () => {
       </div>
 
       <div>
-        <p className='sb-annotation mb-8'>max 980px</p>
+        <p className='sb-annotation mb-8'>long content</p>
         <Alert color='warning'>
           <AlertIcon />
           <AlertContent>
