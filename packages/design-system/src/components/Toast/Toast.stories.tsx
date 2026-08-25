@@ -19,8 +19,12 @@ import {
   DrawerTrigger,
 } from '../Drawer';
 import { HStack, VStack } from '../Stack';
-import { Text } from '../Text';
 import { ToastActions, Toaster, useToast } from './index';
+
+const DESCRIPTION = [
+  'A transient notification fired from `useToast()` — you never place one in the tree, and a single `Toaster` at the app root owns placement, stacking and the timer.',
+  'Because it disappears, nothing may live only here: reach for a `Dialog` when the reader has to decide, `Banner` for standing account state, and `Alert` for a message that belongs to a region. Actions on a toast stay optional for the same reason.',
+].join(' ');
 
 const meta = {
   title: 'Messaging/Toast',
@@ -29,10 +33,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Toast component for displaying notifications. ' +
-          'Built on top of Ark UI Toast with custom styling and features. ' +
-          'Supports extended and simple layouts, icons, actions, and customizable descriptions.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -40,7 +41,6 @@ const meta = {
 
 export default meta;
 
-/** Duration used for screenshot-friendly toasts (no progress bar animation) */
 const STATIC_DURATION = Number.MAX_SAFE_INTEGER;
 
 // Helper component to demonstrate toast usage
@@ -89,9 +89,7 @@ const ToastDemo = () => {
   return (
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          With timeout animation
-        </Text>
+        <p className='sb-annotation'>timed</p>
         <HStack gap={8} wrap>
           {types.map(({ label, type, title, description }) => (
             <Button
@@ -104,9 +102,7 @@ const ToastDemo = () => {
         </HStack>
       </VStack>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          Static (for screenshots)
-        </Text>
+        <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
           {types.map(({ label, type, title, description }) => (
             <Button
@@ -131,10 +127,12 @@ const ToastDemo = () => {
   );
 };
 
+/** Every `type` from one place: the icon and colour come from it, and `default` has none. The second row fires the same toasts with the timer stopped, which is what the screenshot tests use. */
 export const Basic: StoryFn = () => {
   return <ToastDemo />;
 };
 
+/** A toast fired from inside a `Drawer`, and again from a `Dialog` on top of it, to prove it renders above every open overlay rather than behind them. */
 export const WithNestedOverlays: StoryFn = () => {
   const toast = useToast();
 
@@ -189,6 +187,7 @@ export const WithNestedOverlays: StoryFn = () => {
   );
 };
 
+/** A loading toast has no timer and no progress bar, so it will not clear itself: `update()` the same id to resolve it to success or error. */
 export const UpdateLoadingToSuccess: StoryFn = () => {
   const toast = useToast();
   const id = useRef<string | undefined>(undefined);
@@ -221,18 +220,14 @@ export const UpdateLoadingToSuccess: StoryFn = () => {
   return (
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          With timeout animation
-        </Text>
+        <p className='sb-annotation'>timed</p>
         <HStack gap={8} wrap>
           <Button onClick={() => createToast()}>Create loading toast</Button>
           <Button onClick={() => updateToast()}>Update to success</Button>
         </HStack>
       </VStack>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          Static (for screenshots)
-        </Text>
+        <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
           <Button variant='secondary' onClick={() => createToast(STATIC_DURATION)}>
             Create loading toast
@@ -246,6 +241,7 @@ export const UpdateLoadingToSuccess: StoryFn = () => {
   );
 };
 
+/** `simple` is a one-line title for about five seconds. One action is the norm and two is the ceiling — they have to be optional, since the toast leaves on its own. */
 export const SimpleWithActions: StoryFn = () => {
   const toast = useToast();
 
@@ -285,18 +281,14 @@ export const SimpleWithActions: StoryFn = () => {
   return (
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          With timeout animation
-        </Text>
+        <p className='sb-annotation'>timed</p>
         <HStack gap={8} wrap>
           <Button onClick={() => single()}>Simple Toast with Action</Button>
           <Button onClick={() => double()}>Simple Toast with Two Actions</Button>
         </HStack>
       </VStack>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          Static (for screenshots)
-        </Text>
+        <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
           <Button variant='secondary' onClick={() => single(STATIC_DURATION)}>
             Simple Toast with Action
@@ -310,6 +302,7 @@ export const SimpleWithActions: StoryFn = () => {
   );
 };
 
+/** `extended` adds a description and about ten seconds, for the cases where one sentence of context genuinely helps. */
 export const ExtendedWithActions: StoryFn = () => {
   const toast = useToast();
 
@@ -351,18 +344,14 @@ export const ExtendedWithActions: StoryFn = () => {
   return (
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          With timeout animation
-        </Text>
+        <p className='sb-annotation'>timed</p>
         <HStack gap={8} wrap>
           <Button onClick={() => single()}>Extended Toast with Action</Button>
           <Button onClick={() => double()}>Extended Toast with Two Actions</Button>
         </HStack>
       </VStack>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          Static (for screenshots)
-        </Text>
+        <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
           <Button variant='secondary' onClick={() => single(STATIC_DURATION)}>
             Extended Toast with Action
@@ -376,6 +365,7 @@ export const ExtendedWithActions: StoryFn = () => {
   );
 };
 
+/** The title clamps to one line simple, two extended, and the description to four, with the full text in a tooltip. Pre-truncating your own copy fights it. */
 export const LongText: StoryFn = () => {
   const toast = useToast();
 
@@ -404,18 +394,14 @@ export const LongText: StoryFn = () => {
   return (
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          With timeout animation
-        </Text>
+        <p className='sb-annotation'>timed</p>
         <HStack gap={8} wrap>
           <Button onClick={() => simpleLong()}>Simple with long title</Button>
           <Button onClick={() => extendedLong()}>Extended with long text</Button>
         </HStack>
       </VStack>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          Static (for screenshots)
-        </Text>
+        <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
           <Button variant='secondary' onClick={() => simpleLong(STATIC_DURATION)}>
             Simple with long title
@@ -429,6 +415,7 @@ export const LongText: StoryFn = () => {
   );
 };
 
+/** `closable: false` takes the X away, which is only right for an in-flight loading toast the reader must not lose. */
 export const WithoutCloseButton: StoryFn = () => {
   const toast = useToast();
 
@@ -445,17 +432,13 @@ export const WithoutCloseButton: StoryFn = () => {
   return (
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          With timeout animation
-        </Text>
+        <p className='sb-annotation'>timed</p>
         <HStack gap={8} wrap>
           <Button onClick={() => create()}>Non-closable Toast</Button>
         </HStack>
       </VStack>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          Static (for screenshots)
-        </Text>
+        <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
           <Button variant='secondary' onClick={() => create(STATIC_DURATION)}>
             Non-closable Toast
@@ -466,6 +449,7 @@ export const WithoutCloseButton: StoryFn = () => {
   );
 };
 
+/** A custom `icon` replaces the type’s own. It inherits the type colour unless it sets one, so the first here is deliberately purple and the second is not. */
 export const CustomIcon: StoryFn = () => {
   const toast = useToast();
 
@@ -492,18 +476,14 @@ export const CustomIcon: StoryFn = () => {
   return (
     <VStack gap={16} align='start'>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          With timeout animation
-        </Text>
+        <p className='sb-annotation'>timed</p>
         <HStack gap={8} wrap>
           <Button onClick={() => withColor()}>Custom Icon with own color</Button>
           <Button onClick={() => withoutColor()}>Custom Icon without color</Button>
         </HStack>
       </VStack>
       <VStack gap={4} align='start'>
-        <Text size='sm' color='secondary' weight='medium'>
-          Static (for screenshots)
-        </Text>
+        <p className='sb-annotation'>static — no timer</p>
         <HStack gap={8} wrap>
           <Button variant='secondary' onClick={() => withColor(STATIC_DURATION)}>
             Custom Icon with own color

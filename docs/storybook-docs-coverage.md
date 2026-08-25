@@ -102,9 +102,9 @@
 | ✅ | Loading/Progress | 5 | 5 | `components/Progress/Progress.stories.tsx` |
 | ✅ | Loading/Skeleton | 4 | 4 | `components/Skeleton/Skeleton.stories.tsx` |
 | ✅ | Loading/SplashScreen | 3 | 3 | `components/SplashScreen/SplashScreen.stories.tsx` |
-| 🟡 | Messaging/Alert | 8 | 0 | `components/Alert/Alert.stories.tsx` |
-| 🟡 | Messaging/Banner | 8 | 4 | `components/Banner/Banner.stories.tsx` |
-| 🟡 | Messaging/Toast | 8 | 0 | `components/Toast/Toast.stories.tsx` |
+| ✅ | Messaging/Alert | 8 | 8 | `components/Alert/Alert.stories.tsx` |
+| ✅ | Messaging/Banner | 8 | 8 | `components/Banner/Banner.stories.tsx` |
+| ✅ | Messaging/Toast | 8 | 8 | `components/Toast/Toast.stories.tsx` |
 | 🟡 | Navigation/AppShell | 3 | 0 | `components/AppShell/AppShell.stories.tsx` |
 | 🟡 | Navigation/Breadcrumbs | 7 | 0 | `components/Breadcrumbs/Breadcrumbs.stories.tsx` |
 | ☐ | Navigation/Link | 5 | 0 | `components/Link/Link.stories.tsx` |

@@ -10,6 +10,11 @@ import { AlertDescription } from './AlertDescription';
 import { AlertIcon } from './AlertIcon';
 import { AlertTitle } from './AlertTitle';
 
+const DESCRIPTION = [
+  'An inline message bound to one part of the screen, which stays until the state changes or the reader dismisses it — reach for `Banner` when the message would still matter on another page, `Toast` for a transient confirmation, and the field’s own error for a single invalid input.',
+  '`color` carries the meaning and `AlertIcon` takes its icon from it, so the pair is not yours to mix; `primary` is the neutral default for a notice with no status to encode.',
+].join(' ');
+
 const meta = {
   title: 'Messaging/Alert',
   component: Alert,
@@ -25,10 +30,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Alert component for displaying important messages. ' +
-          'Supports 5 color variants: primary (neutral), destructive, info, warning, and success. ' +
-          'Use compound components: AlertIcon, AlertContent, AlertClose, AlertControls, AlertActions.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -43,6 +45,7 @@ const meta = {
 
 export default meta;
 
+/** The five colours with the icon each implies: neutral `primary` for a general notice, then destructive, info, warning and success for real status. */
 export const AllColors: StoryFn<AlertProps> = () => (
   <div className='flex flex-col gap-16 w-[600px]'>
     <Alert color='primary'>
@@ -87,6 +90,7 @@ export const AllColors: StoryFn<AlertProps> = () => (
   </div>
 );
 
+/** A title on its own is a complete alert. Add a description only when it says something the title does not. */
 export const TitleOnly: StoryFn<AlertProps> = () => {
   return (
     <div className='flex flex-col gap-16 w-[600px]'>
@@ -107,6 +111,7 @@ export const TitleOnly: StoryFn<AlertProps> = () => {
   );
 };
 
+/** `AlertClose` gives the reader a way out — add it where dismissing is reasonable, and leave it off while the condition still holds. */
 export const WithCloseButton: StoryFn<AlertProps> = () => {
   const [showInfo, setShowInfo] = useState(true);
   const [showWarning, setShowWarning] = useState(true);
@@ -137,6 +142,7 @@ export const WithCloseButton: StoryFn<AlertProps> = () => {
   );
 };
 
+/** `AlertControls` as a direct child of `Alert` puts the actions top-right, which is what a wide alert wants. The buttons are always `secondary` and `small`, neutral or destructive to match the alert, never a solid primary. */
 export const WithControls: StoryFn<AlertProps> = () => {
   return (
     <div className='flex flex-col gap-16 w-[600px]'>
@@ -189,6 +195,7 @@ export const WithControls: StoryFn<AlertProps> = () => {
   );
 };
 
+/** The same controls nested inside `AlertContent` drop below the text instead, which is what a narrow alert wants. Placement follows the width rather than a rule. */
 export const WithBottomActions: StoryFn<AlertProps> = () => {
   return (
     <div className='flex flex-col gap-16 w-[600px]'>
@@ -232,13 +239,12 @@ export const WithBottomActions: StoryFn<AlertProps> = () => {
   );
 };
 
+/** The alert fills its container between 256 and 980px. `maxWidth` brings the ceiling down where the layout needs it; pinning a width by hand loses the fill. */
 export const MinMaxWidth: StoryFn<AlertProps> = () => {
   return (
     <div className='flex flex-col gap-16'>
       <div>
-        <p className='text-sm text-text-secondary mb-8'>
-          Default min width (256px) - Short content
-        </p>
+        <p className='sb-annotation mb-8'>min 256px</p>
         <Alert color='info'>
           <AlertIcon />
           <AlertContent>
@@ -248,7 +254,7 @@ export const MinMaxWidth: StoryFn<AlertProps> = () => {
       </div>
 
       <div>
-        <p className='text-sm text-text-secondary mb-8'>Default max width (980px) - Long content</p>
+        <p className='sb-annotation mb-8'>max 980px</p>
         <Alert color='warning'>
           <AlertIcon />
           <AlertContent>
@@ -267,7 +273,7 @@ export const MinMaxWidth: StoryFn<AlertProps> = () => {
       </div>
 
       <div>
-        <p className='text-sm text-text-secondary mb-8'>Custom maxWidth={500}</p>
+        <p className='sb-annotation mb-8'>maxWidth 500</p>
         <Alert color='success' maxWidth={500}>
           <AlertIcon />
           <AlertContent>
@@ -285,6 +291,7 @@ export const MinMaxWidth: StoryFn<AlertProps> = () => {
   );
 };
 
+/** `lineClamp` is opt-in: without it long text wraps freely, and with it the text truncates and the full string moves into a tooltip. Four lines is the usual cap. */
 export const MaxLines: StoryFn<AlertProps> = () => {
   const longTitle =
     'This is a very long title that should be truncated after a certain number of lines. It keeps going and going to demonstrate the line clamp functionality. We need even more text to ensure it exceeds the maximum number of lines allowed.';
@@ -294,7 +301,7 @@ export const MaxLines: StoryFn<AlertProps> = () => {
   return (
     <div className='flex flex-col gap-16 w-600'>
       <div>
-        <p className='text-sm text-text-secondary mb-8'>Default (4 lines max)</p>
+        <p className='sb-annotation mb-8'>lineClamp 4</p>
         <Alert color='info'>
           <AlertIcon />
           <AlertContent>
@@ -305,7 +312,7 @@ export const MaxLines: StoryFn<AlertProps> = () => {
       </div>
 
       <div>
-        <p className='text-sm text-text-secondary mb-8'>Custom (2 lines max)</p>
+        <p className='sb-annotation mb-8'>lineClamp 2</p>
         <Alert color='warning'>
           <AlertIcon />
           <AlertContent>
@@ -316,7 +323,7 @@ export const MaxLines: StoryFn<AlertProps> = () => {
       </div>
 
       <div>
-        <p className='text-sm text-text-secondary mb-8'>No truncation</p>
+        <p className='sb-annotation mb-8'>no clamp</p>
         <Alert color='success'>
           <AlertIcon />
           <AlertContent>
@@ -329,6 +336,7 @@ export const MaxLines: StoryFn<AlertProps> = () => {
   );
 };
 
+/** An inline `Code` line inside the content, for the error code or the command that failed — the one piece of rich content an alert is built to carry. */
 export const WithCode: StoryFn<AlertProps> = () => (
   <div className='flex flex-col gap-16 w-700'>
     <Alert color='destructive'>

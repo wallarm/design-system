@@ -671,3 +671,41 @@ Not findings — decisions worth remembering so they are not rediscovered.
   on those columns.
 - **Found while** — fixing the `FilterInputOperatorMenu` page with Artem.
 - **Status** — Open.
+
+### Alert and Toast: the sanctioned examples break the house microcopy rules
+
+- **What** — Alert's stories title their examples in Title Case ("Primary Alert",
+  "Critical Error", "Alert with Two Action Buttons") and Toast's fire titles like
+  "Success!", "Loading...", "Error occurred" with terminal punctuation. Both
+  contradict the messaging microcopy rules the components' own usage guides carry:
+  sentence case, no trailing punctuation, no "successfully", aim for three words.
+- **Evidence** — `Alert.stories.tsx` (every story), `Toast.stories.tsx`
+  (`ToastDemo`'s six types). `Alert.llm.md` and `Toast.llm.md` both state the
+  rules; Carbon and Atlassian independently ask an error title to name what
+  stopped rather than shout.
+- **Why it matters** — These are the strings people copy. A page that teaches the
+  right component with the wrong words spreads the wrong words, and the messaging
+  family is exactly where the copy is the work.
+- **Suggested action** — Rewrite the example strings to the house rules once the
+  technical writers settle them ("Event created", "Uploading file…"). Story copy
+  only, no component change.
+- **Found while** — documenting `Alert` and `Toast`.
+- **Status** — Open.
+
+### Messaging: two reference systems ship a success banner and we deliberately do not
+
+- **What** — Our `Banner` has no success variant: "it worked" is a `Toast`. Nord's
+  banner and Primer's Banner both ship success tones, and Nord's banner is
+  section-scoped, which is our `Alert`'s job rather than our `Banner`'s.
+- **Evidence** — `Banner/classes.ts` variants (primary, secondary, destructive,
+  info, warning); nordhealth.design/components/banner (`'info' | 'danger' |
+  'success' | 'warning'`, "place at the top of the section it applies to");
+  primer.style Banner (critical, info, success, warning, upsell).
+- **Why it matters** — Nothing to change today, but the naming collision is a real
+  trap for anyone reading another system's docs: their "banner" is our "alert".
+  Worth stating in our own guidance rather than leaving people to discover it.
+- **Suggested action** — Keep what we ship. Consider one line in the Banner usage
+  guide naming the collision, so a designer arriving from Nord or Primer does not
+  reach for a success banner.
+- **Found while** — documenting the messaging family.
+- **Status** — Open.
