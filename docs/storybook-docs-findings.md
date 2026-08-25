@@ -613,3 +613,39 @@ Not findings — decisions worth remembering so they are not rediscovered.
   something, the field label is the safer thing to abbreviate.
 - **Found while** — reviewing the `FilterInput` docs pages with Artem.
 - **Status** — Filed (WDS-174).
+
+### FilterInputFieldMenu: Recent and Suggestions can never appear together
+
+- **What** — The menu renders its Suggestions section only when there are no
+  recent conditions (`!filterText && showSuggestions && !showRecent`), so passing
+  both props shows Recent alone.
+- **Evidence** —
+  `FilterInputMenu/FilterInputFieldMenu/FilterInputFieldMenu.tsx:155-170`.
+  Verified in the browser: with both props set, only the Recent section renders.
+  The `WithRecentAndSuggestions` story existed to show both and never could.
+- **Why it matters** — It reads as intentional (suggestions are the cold-start
+  fallback, and two shortcut sections at once would be noise) but it is written
+  nowhere, so the next person to add a suggestions list will file it as a bug.
+- **Suggested action** — Confirm the rule is intended, then either state it in
+  the component's usage guide or let the two stack. The story now documents the
+  current behaviour either way.
+- **Found while** — fixing the `FilterInputFieldMenu` page with Artem.
+- **Status** — Open.
+
+### FilterInputFieldMenu: no `positioning` means the menu lands in the page corner
+
+- **What** — The menu is anchored entirely by the `positioning` object its parent
+  supplies. Rendered without one, the Ark portal has nothing to measure and the
+  panel pins itself to the top-left of the viewport.
+- **Evidence** — Measured on the old Overview page: ten positioners portaled to
+  `<body>`, every one at `top: 0, left: 0`, stacked, which is also why the shadow
+  looked far heavier than the `shadow-md` it actually carries. The e2e suite
+  carried a bespoke `gotoFieldMenu` helper in two files purely to work around it.
+- **Why it matters** — Only `FilterInput` composes this today, so no product
+  surface is affected, but the failure is silent and the fix is not discoverable
+  from the props table.
+- **Suggested action** — Optional: fall back to a sane anchor, or warn in
+  development when `open` is true and no `positioning` was given. The stories are
+  fixed regardless.
+- **Found while** — fixing the `FilterInputFieldMenu` page with Artem.
+- **Status** — Open.

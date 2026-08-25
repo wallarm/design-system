@@ -1,23 +1,27 @@
+import { type FC, useMemo, useRef, useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
-import { FilterInputFieldMenu } from '../FilterInputMenu';
+import { ChevronDown } from '../../../icons';
+import { Button } from '../../Button';
+import { FilterInputFieldMenu, type FilterInputFieldMenuProps } from '../FilterInputMenu';
 import {
   createStatusCodeInputFilter,
   createStatusCodeNormalizer,
   createStatusCodeSuggestions,
   createStatusCodeValidator,
 } from '../lib/statusCode';
-import type { FieldMetadata } from '../types';
+import type { Condition, FieldMetadata } from '../types';
 
 const DESCRIPTION = [
   'The field-picking menu `FilterInput` opens on focus, shown here on its own.',
-  'It is internal — the pattern opens, filters and closes it for you — so these stories are for checking the menu’s sections, search and popovers, not for composing it yourself.',
+  'It is internal — the pattern owns its open state and anchors it to the input or the chip being edited — so these stories stand it up behind a `Button` to give it something to hang off. Reach for `FilterInput`, not this.',
+  'Click the trigger to open, click it again or press Escape to close.',
 ].join(' ');
 
 const meta = {
   title: 'Patterns/FilterInput/FilterInputFieldMenu',
   component: FilterInputFieldMenu,
   parameters: {
-    layout: 'centered',
+    layout: 'padded',
     docs: {
       description: {
         component: DESCRIPTION,
@@ -41,6 +45,67 @@ const meta = {
 
 export default meta;
 type Story = StoryObj<typeof meta>;
+
+/**
+ * The menu takes no trigger of its own: `FilterInput` owns `open` and hands it a
+ * `positioning` object that anchors it to whatever is being edited. Without one
+ * the Ark portal has nothing to measure against and lands in the page corner, so
+ * every story below anchors it to a `Button` and drives `open` from local state.
+ */
+const FieldMenuHarness: FC<
+  Omit<FilterInputFieldMenuProps, 'open' | 'onOpenChange' | 'positioning'> & {
+    showSelection?: boolean;
+  }
+> = ({ showSelection = false, onSelect, ...menuProps }) => {
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState<FieldMetadata | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+
+  const positioning = useMemo(
+    () => ({
+      placement: 'bottom-start' as const,
+      gutter: 4,
+      getAnchorRect: () => triggerRef.current?.getBoundingClientRect() ?? null,
+    }),
+    [],
+  );
+
+  return (
+    <div className='flex items-center gap-16'>
+      <Button
+        ref={triggerRef}
+        variant='outline'
+        color='neutral'
+        data-testid='field-menu-trigger'
+        onClick={() => setOpen(isOpen => !isOpen)}
+      >
+        Add filter
+        <ChevronDown />
+      </Button>
+
+      {showSelection && selected && (
+        <span className='sb-annotation'>selected: {selected.label}</span>
+      )}
+
+      <FilterInputFieldMenu
+        {...menuProps}
+        open={open}
+        onOpenChange={setOpen}
+        onEscape={() => setOpen(false)}
+        positioning={positioning}
+        onSelect={field => {
+          setSelected(field);
+          setOpen(false);
+          onSelect(field);
+        }}
+      />
+    </div>
+  );
+};
+
+const noop = () => {
+  // Stories only need the menu to close; FilterInput does the real work.
+};
 
 // Sample field metadata for stories
 const sampleFields: FieldMetadata[] = [
@@ -118,199 +183,83 @@ const sampleFields: FieldMetadata[] = [
 
 /** The plain list — every field in the config, label first, whatever its type. */
 export const Default: Story = {
-  args: {
-    fields: sampleFields,
-    open: true,
-    onSelect: () => {
-      // Field selection handler
-    },
-  },
+  render: () => <FieldMenuHarness fields={sampleFields} onSelect={noop} />,
 };
 
 /** A short config, to check the menu does not pad itself out. */
 export const FewFields: Story = {
-  args: {
-    fields: sampleFields.slice(0, 5),
-    open: true,
-    onSelect: () => {
-      // Field selection handler
-    },
-  },
+  render: () => <FieldMenuHarness fields={sampleFields.slice(0, 5)} onSelect={noop} />,
 };
 
-/** `open={false}` renders nothing: the menu has no closed appearance of its own. */
+/**
+ * `open={false}` renders nothing at all — no collapsed shell, no placeholder — so
+ * this frame is deliberately empty. It is the one story with no trigger.
+ */
 export const Closed: Story = {
   args: {
     fields: sampleFields,
     open: false,
-    onSelect: () => {
-      // Field selection handler
-    },
+    onSelect: noop,
   },
 };
 
 /** Selection wired up, so you can watch which field the menu hands back. */
 export const Interactive: Story = {
-  render: () => {
-    const [open, setOpen] = React.useState(true);
-    const [selectedField, setSelectedField] = React.useState<FieldMetadata | null>(null);
-
-    return (
-      <div className='flex flex-col gap-4'>
-        <div className='flex gap-2'>
-          <button
-            type='button'
-            onClick={() => setOpen(!open)}
-            className='px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600'
-          >
-            {open ? 'Close' : 'Open'} Menu
-          </button>
-          {selectedField && (
-            <div className='px-4 py-2 bg-gray-100 rounded'>
-              Selected: {selectedField.label} ({selectedField.type})
-            </div>
-          )}
-        </div>
-        {/* Absolute positioned wrapper prevents layout shift */}
-        <div className='relative'>
-          <FilterInputFieldMenu
-            fields={sampleFields}
-            open={open}
-            onOpenChange={setOpen}
-            onSelect={field => {
-              setSelectedField(field);
-              setOpen(false);
-            }}
-          />
-        </div>
-      </div>
-    );
-  },
+  render: () => <FieldMenuHarness fields={sampleFields} onSelect={noop} showSelection />,
 };
 
-/** Typing filters the list by label — try “status” or “CWE”. */
+/** Typing filters the list by label and name, case-insensitively — try “status” or “CWE”. */
 export const WithSearch: Story = {
-  args: {
-    fields: sampleFields,
-    open: true,
-    onSelect: () => {
-      // Field selection handler
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'The search input filters fields by label and name (case-insensitive). Try searching for "status" to see fields with "status" in their name or label.',
-      },
-    },
-  },
+  render: () => <FieldMenuHarness fields={sampleFields} onSelect={noop} />,
 };
 
-/** Up to three recently used fields sit at the top, which is what keeps a fifty-field menu usable day to day. */
+const recentConditions: Condition[] = [
+  { type: 'condition', field: 'status', operator: '=', value: 'Blocked' },
+  { type: 'condition', field: 'http_status_code', operator: '>', value: 400 },
+  { type: 'condition', field: 'location', operator: '=', value: 'US' },
+];
+
+/**
+ * `recentConditions` puts the last few filters back at the top, capped at three —
+ * what keeps a fifty-field menu usable day to day. Each row replays the whole
+ * condition, not just the field.
+ */
 export const WithRecentFields: Story = {
-  args: {
-    fields: sampleFields,
-    recentFields: [
-      {
-        name: 'status',
-        label: 'Status',
-        type: 'enum',
-        description: 'Request status',
-      },
-      {
-        name: 'http_status_code',
-        label: 'HTTP status code',
-        type: 'integer',
-        description: 'HTTP response status code',
-        getSuggestions: createStatusCodeSuggestions(),
-        validate: createStatusCodeValidator(),
-      },
-      {
-        name: 'location',
-        label: 'Location',
-        type: 'string',
-        description: 'Geographic location',
-      },
-    ],
-    open: true,
-    onSelect: () => {
-      // Field selection handler
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Recent fields are displayed at the top of the menu (max 3) with a "Recent" section header.',
-      },
-    },
-  },
+  render: () => (
+    <FieldMenuHarness fields={sampleFields} recentConditions={recentConditions} onSelect={noop} />
+  ),
 };
 
 /** A curated suggestions section, for the handful of fields most people reach for first. */
 export const WithSuggestions: Story = {
-  args: {
-    fields: sampleFields,
-    suggestedFields: [
-      {
-        name: 'status',
-        label: 'Status',
-        type: 'enum',
-        description: 'Request status',
-      },
-      {
-        name: 'severity',
-        label: 'Severity',
-        type: 'enum',
-        description: 'Attack severity level',
-      },
-      {
-        name: 'location',
-        label: 'Location',
-        type: 'string',
-        description: 'Geographic location',
-      },
-    ],
-    open: true,
-    onSelect: () => {
-      // Field selection handler
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story: 'Suggested fields are displayed with a "Suggestions" section header.',
-      },
-    },
-  },
+  render: () => (
+    <FieldMenuHarness
+      fields={sampleFields}
+      suggestedFields={sampleFields.slice(0, 3)}
+      onSelect={noop}
+    />
+  ),
 };
 
-/** Fields under labelled group headers, with anything left out of every group falling into a trailing headerless section. */
+/**
+ * Fields under labelled group headers, in array order, with anything left out of
+ * every group falling into a trailing headerless section — here, `CWE`.
+ */
 export const WithGroups: Story = {
-  args: {
-    fields: sampleFields,
-    fieldGroups: [
-      { label: 'Threat classification', fields: ['status', 'severity', 'blocking_status'] },
-      {
-        label: 'Request features',
-        fields: ['http_status_code', 'endpoint', 'hostname', 'parameter'],
-      },
-      { label: 'Source and identity', fields: ['location', 'network', 'impact'] },
-    ],
-    open: true,
-    onSelect: () => {
-      // Field selection handler
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Fields grouped under section headers. Groups render in array order; the ungrouped "CWE" field appears in a trailing headerless section.',
-      },
-    },
-  },
+  render: () => (
+    <FieldMenuHarness
+      fields={sampleFields}
+      fieldGroups={[
+        { label: 'Threat classification', fields: ['status', 'severity', 'blocking_status'] },
+        {
+          label: 'Request features',
+          fields: ['http_status_code', 'endpoint', 'hostname', 'parameter'],
+        },
+        { label: 'Source and identity', fields: ['location', 'network', 'impact'] },
+      ]}
+      onSelect={noop}
+    />
+  ),
 };
 
 const describedFields: FieldMetadata[] = [
@@ -343,27 +292,18 @@ const describedFields: FieldMetadata[] = [
 
 /** Hovering or keyboard-focusing a row opens a popover beside the menu with the description and, where the value format is not obvious, an example. A row with no description opens nothing, and group headers are inert. */
 export const WithDescriptions: Story = {
-  args: {
-    fields: describedFields,
-    fieldGroups: [
-      {
-        label: 'Threat classification',
-        fields: ['attack_type', 'parameter', 'status_code', 'no_desc'],
-      },
-    ],
-    open: true,
-    onSelect: () => {
-      // Field selection handler
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Hover or keyboard-focus a field to see its description popover; "Parameter" and "Status code" also show an example block.',
-      },
-    },
-  },
+  render: () => (
+    <FieldMenuHarness
+      fields={describedFields}
+      fieldGroups={[
+        {
+          label: 'Threat classification',
+          fields: ['attack_type', 'parameter', 'status_code', 'no_desc'],
+        },
+      ]}
+      onSelect={noop}
+    />
+  ),
 };
 
 const manyDescribedFields: FieldMetadata[] = Array.from({ length: 20 }, (_, i) => ({
@@ -375,63 +315,21 @@ const manyDescribedFields: FieldMetadata[] = Array.from({ length: 20 }, (_, i) =
 
 /** A described list long enough to scroll, for checking the popover keeps up with the cursor and the keyboard. */
 export const WithScrollableDescriptions: Story = {
-  args: {
-    fields: manyDescribedFields,
-    open: true,
-    onSelect: () => {
-      // Field selection handler
-    },
-  },
+  render: () => <FieldMenuHarness fields={manyDescribedFields} onSelect={noop} />,
 };
 
-/** Both sections at once — the full menu, and the order it puts them in. */
+/**
+ * Both props set, and only Recent renders — the two shortcut sections are
+ * mutually exclusive, so suggestions are the fallback for someone with no
+ * history rather than a second row of shortcuts.
+ */
 export const WithRecentAndSuggestions: Story = {
-  args: {
-    fields: sampleFields,
-    recentFields: [
-      {
-        name: 'http_status_code',
-        label: 'HTTP status code',
-        type: 'integer',
-        description: 'HTTP response status code',
-        getSuggestions: createStatusCodeSuggestions(),
-        validate: createStatusCodeValidator(),
-      },
-      {
-        name: 'endpoint',
-        label: 'Endpoint',
-        type: 'string',
-        description: 'API endpoint path',
-      },
-    ],
-    suggestedFields: [
-      {
-        name: 'status',
-        label: 'Status',
-        type: 'enum',
-        description: 'Request status',
-      },
-      {
-        name: 'severity',
-        label: 'Severity',
-        type: 'enum',
-        description: 'Attack severity level',
-      },
-    ],
-    open: true,
-    onSelect: () => {
-      // Field selection handler
-    },
-  },
-  parameters: {
-    docs: {
-      description: {
-        story:
-          'Full menu with Recent section at top, Suggestions section in the middle, and all fields below. Each section is visually separated. Keyboard hints are shown at the bottom.',
-      },
-    },
-  },
+  render: () => (
+    <FieldMenuHarness
+      fields={sampleFields}
+      recentConditions={recentConditions.slice(0, 2)}
+      suggestedFields={sampleFields.slice(0, 2)}
+      onSelect={noop}
+    />
+  ),
 };
-
-// Import React for the Interactive story
-import React from 'react';

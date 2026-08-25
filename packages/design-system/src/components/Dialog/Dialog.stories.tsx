@@ -172,7 +172,8 @@ export const WithFooter: StoryFn<DialogProps> = () => {
 
 /**
  * `DialogDescription` states the consequence, which is what turns a confirmation from a speed
- * bump into a decision.
+ * bump into a decision. `DialogHeader` finds the title and description among its children and
+ * stacks them, so the close button stays right-aligned however many it gets.
  */
 export const WithDescription: StoryFn<DialogProps> = () => {
   return (
@@ -204,15 +205,6 @@ export const WithDescription: StoryFn<DialogProps> = () => {
       </DialogContent>
     </Dialog>
   );
-};
-
-WithDescription.parameters = {
-  docs: {
-    description: {
-      story:
-        'DialogHeader detects DialogTitle and DialogDescription among its children and stacks them in a column so the close button stays right-aligned.',
-    },
-  },
 };
 
 /**
@@ -253,15 +245,6 @@ export const WithFooterLeftActions: StoryFn<DialogProps> = () => (
     </DialogContent>
   </Dialog>
 );
-
-WithFooterLeftActions.parameters = {
-  docs: {
-    description: {
-      story:
-        'Footer can have actions on both left and right sides. Use flexbox utilities to position elements.',
-    },
-  },
-};
 
 /**
  * The standard widths. Pick by the content, not the importance: a wide dialog for a short

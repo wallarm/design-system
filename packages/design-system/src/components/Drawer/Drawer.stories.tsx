@@ -171,7 +171,7 @@ export const WithFooter: StoryFn<DrawerProps> = () => {
 
 /**
  * `DrawerDescription` under the title, wired to `aria-describedby` so it is read with the panel
- * rather than after it.
+ * rather than after it. `DrawerHeader` stacks the two, keeping the close button right-aligned.
  */
 export const WithDescription: StoryFn<DrawerProps> = () => {
   return (
@@ -201,15 +201,6 @@ export const WithDescription: StoryFn<DrawerProps> = () => {
       </DrawerContent>
     </Drawer>
   );
-};
-
-WithDescription.parameters = {
-  docs: {
-    description: {
-      story:
-        'DrawerHeader detects DrawerTitle and DrawerDescription among its children and stacks them in a column so the close button stays right-aligned.',
-    },
-  },
 };
 
 /**
@@ -249,15 +240,6 @@ export const WithFooterLeftActions: StoryFn<DrawerProps> = () => (
     </DrawerContent>
   </Drawer>
 );
-
-WithFooterLeftActions.parameters = {
-  docs: {
-    description: {
-      story:
-        'Footer can have actions on both left and right sides. Use flexbox utilities to position elements.',
-    },
-  },
-};
 
 /**
  * The standard widths. A drawer earns more width than a dialog because the reader is working in
