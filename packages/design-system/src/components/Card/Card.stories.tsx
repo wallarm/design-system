@@ -18,6 +18,11 @@ import { CardFooter } from './CardFooter';
 import { CardHeader } from './CardHeader';
 import { CardTitle } from './CardTitle';
 
+const DESCRIPTION = [
+  'Holds one self-contained thing — a metric, an integration, a saved view — in a block you can compare against its neighbours in a grid; reach for `Table` when the same fields repeat down a list, and for a `Heading` when you only mean to section a page.',
+  'Passing any handler turns the whole card into the target: it becomes focusable and picks up hover and pressed overlays, while clicks on a link or button inside it stay with that control.',
+].join(' ');
+
 const meta = {
   title: 'Data Display/Card',
   component: Card,
@@ -29,14 +34,7 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
-    docs: {
-      description: {
-        component:
-          'Card component for displaying titled content blocks. ' +
-          'Supports primary and secondary color variants. ' +
-          'Use compound components: CardHeader, CardTitle, CardContent, CardFooter.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
   argTypes: {
     color: {
@@ -67,6 +65,11 @@ const meta = {
 
 export default meta;
 
+/**
+ * The full stack — `CardHeader` with a `CardTitle`, `CardContent`, and a `CardFooter`
+ * for actions — carrying a handler, so the footer button and the card are two
+ * separate targets.
+ */
 export const Basic: StoryFn<CardProps> = ({ ...args }) => (
   <Card onClick={() => console.log('Card clicked')} {...args}>
     <CardHeader>
@@ -89,6 +92,11 @@ export const Basic: StoryFn<CardProps> = ({ ...args }) => (
   </Card>
 );
 
+/**
+ * `primary` sits on the page surface and `secondary` on a tinted fill, each shown
+ * plain, with a handler, and disabled — where the card fades and stops answering
+ * the pointer.
+ */
 export const Variants: StoryFn<CardProps> = () => (
   <VStack gap={24} align='center'>
     <HStack gap={16} align='center'>
@@ -189,6 +197,10 @@ export const Variants: StoryFn<CardProps> = () => (
   </VStack>
 );
 
+/**
+ * What the block tolerates: body copy that wraps, a `CodeSnippet`, a whole `Field`,
+ * a `CardTitle` with an `icon`, and a header standing on its own with nothing under it.
+ */
 export const VariousContent: StoryFn<CardProps> = () => (
   <HStack gap={16}>
     <VStack gap={16} align='stretch'>

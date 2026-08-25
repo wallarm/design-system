@@ -840,3 +840,17 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Found while** — checking whether the Alert story change would break a
   snapshot.
 - **Status** — Open.
+
+### Card stories log to the console instead of using `fn()`
+
+- **What** — `Card.stories.tsx` wires four `onClick` handlers to `console.log`,
+  where the rest of the library uses `fn()` from `storybook/test` (see
+  `Accordion.stories.tsx`). Biome reports six `noConsole` warnings on the file.
+- **Why it matters** — The handlers exist to make the card interactive, and
+  `fn()` does that while also showing the call in the Actions panel. As written
+  the demo's feedback is hidden in the browser console.
+- **Suggested action** — Swap the four `console.log` calls for `args`-level
+  `fn()`, as `Accordion` does.
+- **Found while** — linting after writing Card's prose; the warnings predate this
+  branch.
+- **Status** — Open.
