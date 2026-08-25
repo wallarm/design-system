@@ -10,6 +10,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const onSubmit = fn().mockName('onSubmit');
+const onOpenChange = fn().mockName('onOpenChange');
 
 const meta = {
   title: 'Overlay/FeedbackPulse',
@@ -68,7 +69,12 @@ export const Playground: StoryFn<typeof meta> = args => {
  */
 export const Rating: StoryFn<typeof meta> = () => (
   <div style={{ minHeight: '100vh' }}>
-    <FeedbackPulse open onOpenChange={() => {}} onSubmit={() => {}} data-testid='feedback-pulse' />
+    <FeedbackPulse
+      open
+      onOpenChange={onOpenChange}
+      onSubmit={onSubmit}
+      data-testid='feedback-pulse'
+    />
   </div>
 );
 
