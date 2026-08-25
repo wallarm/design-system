@@ -542,7 +542,11 @@ export const DateTimeEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEdit` inside a horizontal `Attribute` — label on the left, value/editor on the right. */
+/**
+ * `InlineEdit` inside a horizontal `Attribute` — label on the left, value/editor on the right.
+ * The orientation belongs to `Attribute`, not here: `InlineEdit` has no orientation prop and
+ * behaves identically either way.
+ */
 export const HorizontalLayout: StoryFn<typeof meta> = args => {
   const [name, setName] = useState('Checkout API');
   const [role, setRole] = useState<string[]>(['editor']);
@@ -595,18 +599,6 @@ export const HorizontalLayout: StoryFn<typeof meta> = args => {
       </Attribute>
     </div>
   );
-};
-
-HorizontalLayout.parameters = {
-  docs: {
-    description: {
-      story:
-        'The label/value layout comes entirely from the hosting `Attribute`: set ' +
-        '`orientation="horizontal"` and the label renders in a fixed-width cell to the left while ' +
-        '`AttributeValue` fills the rest of the row. `InlineEdit` itself has no orientation prop — ' +
-        'the preview/control toggle and commit lifecycle are identical to the vertical stories above.',
-    },
-  },
 };
 
 /** The three async states side by side. `saved` is transient and clears itself after
@@ -735,7 +727,8 @@ export const NonEditable: StoryFn<typeof meta> = args => (
 
 /**
  * `onBeforeValueCommit` intercepts the commit — return `false`, or a promise of it, to hold
- * the field open. Use it where the change is consequential enough to confirm, not for validation.
+ * the field open. Use it where the change is consequential enough to confirm, not for validation,
+ * and short-circuit unchanged values: the guard fires on every commit path, no-op submits included.
  */
 export const ConfirmCommit: StoryFn<typeof meta> = args => {
   const [email, setEmail] = useState('dev@wallarm.com');
@@ -857,22 +850,4 @@ export const ConfirmCommit: StoryFn<typeof meta> = args => {
       </Dialog>
     </div>
   );
-};
-
-ConfirmCommit.parameters = {
-  docs: {
-    description: {
-      story:
-        'The `onBeforeValueCommit` guard intercepts every commit before `onValueCommit` runs. ' +
-        'Return a promise resolved by your own confirmation UI: `false` silently keeps the field ' +
-        'in edit mode with the typed draft (no error state); any ' +
-        'other result lets the commit proceed; a rejection maps to the error status. The guard ' +
-        'fires for every commit path — Enter, blur, popover close — including no-op submits, so ' +
-        'short-circuit on unchanged values (`next === prev`; use `.compare()` for date values ' +
-        'and an item comparison for arrays). Declining a popover editor (the Role select here) ' +
-        'leaves it parked in edit mode with the popover closed: reopen and re-close to be asked ' +
-        'again, or press Escape inside the field to revert. The DS never closes your dialog — ' +
-        'its own buttons must settle the promise and close it.',
-    },
-  },
 };

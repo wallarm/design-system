@@ -17,6 +17,16 @@
 
 **Status:** ✅ Written to the standard · 🟡 Has prose, not yet levelled · ☐ Nothing yet
 
+> **Story-description shadow — swept 2026-08-24.** A story-level
+> `parameters.docs.description.story` silently overrides the JSDoc sentence above
+> the story, and the counts below cannot see it. The sweep found twelve shadowed
+> sentences (`FilterInputFieldMenu` 6, `Dialog` 2, `Drawer` 2, `InlineEdit` 2);
+> all are fixed. Five `story:` params remain, on the SimpleCharts pages, where
+> they are the only description — nothing is hidden, but fold them into JSDoc when
+> those rows get levelled. One story is hidden from its own page on purpose:
+> `FeedbackPulse`'s `Rating` carries `tags: ['!autodocs']`, so its sentence is
+> written but never rendered on the Overview.
+
 > ✅ means a person ran the skill on it and judged the result against the budget.
 > Nothing else counts — inherited prose has turned out to be over budget, at the
 > wrong altitude, and in at least one case simply wrong about what the component does.
