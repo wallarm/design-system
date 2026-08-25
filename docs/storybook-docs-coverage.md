@@ -70,7 +70,7 @@
 | ✅ | Data Display/Timeline | 3 | 3 | `components/Timeline/Timeline.stories.tsx` |
 | ✅ | Data display/CodeSnippet/CodeSnippet | 25 | 25 | `components/CodeSnippet/CodeSnippet.stories.tsx` |
 | ✅ | Data display/SimpleCharts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
-| 🟡 | Data display/SimpleCharts/Chart | 6 | 0 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
+| ✅ | Data display/SimpleCharts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/HorizontalBarStack | 8 | 2 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/LineChart | 15 | 1 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/Metric | 2 | 2 | `components/SimpleCharts/Metric/Metric.stories.tsx` |

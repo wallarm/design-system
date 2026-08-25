@@ -7,6 +7,11 @@ import { ChartEmpty } from './ChartEmpty';
 import { ChartHeader } from './ChartHeader';
 import { ChartTitle } from './ChartTitle';
 
+const DESCRIPTION = [
+  'The card every chart in the family sits in: the surface, the 32px title bar, and actions that appear on hover — it draws no data itself, so reach for `BarList`, `PieChart`, `LineChart`, `HorizontalBarStack` or `Metric` for the chart inside it.',
+  'Worth knowing before composing one: `ChartActions` takes no layout space while hidden, so the title has the full header width until you hover.',
+].join(' ');
+
 const meta = {
   title: 'Data display/SimpleCharts/Chart',
   component: Chart,
@@ -22,21 +27,17 @@ const meta = {
       type: 'figma',
       url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-118206&m=dev',
     },
-    docs: {
-      description: {
-        component:
-          'Chart is a generic card container for simple charts. ' +
-          'It provides the surface, border, default min-height (196px) and full-width block layout. ' +
-          'Compose with `ChartHeader`, `ChartTitle` and `ChartActions` for the top bar, ' +
-          'and place any chart content below. Use `ChartEmpty` as the body when there is no data.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],
 } satisfies Meta<typeof Chart>;
 
 export default meta;
 
+/**
+ * The frame with everything it owns — title, hover-revealed actions, and a body slot standing
+ * in for the chart.
+ */
 export const Default: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -56,6 +57,10 @@ export const Default: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * `alwaysVisible` pins the actions open, which is what a card does while a filter is applied:
+ * the control that clears it must not need hovering to be found.
+ */
 export const WithAlwaysVisibleActions: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -75,6 +80,10 @@ export const WithAlwaysVisibleActions: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * The card is a full-width block with a minimum height; give it a width and height directly
+ * when a dashboard slot demands a particular size.
+ */
 export const CustomSize: StoryFn<typeof meta> = () => (
   <Chart className='w-640 h-320'>
     <ChartHeader>
@@ -84,6 +93,10 @@ export const CustomSize: StoryFn<typeof meta> = () => (
   </Chart>
 );
 
+/**
+ * `ChartTitle` stays on one line and truncates, so the actions keep their place however long
+ * the title runs.
+ */
 export const LongTitle: StoryFn<typeof meta> = () => (
   <div className='w-300'>
     <Chart>
@@ -105,6 +118,10 @@ export const LongTitle: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * `ChartEmpty` centres a default 'No data' in the body — the frame and the title stay, so the
+ * card does not vanish from the grid when its data does.
+ */
 export const Empty: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -116,6 +133,10 @@ export const Empty: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * Pass children to say why it is empty. A card emptied by a filter should say so, since the
+ * fix is different from having no data at all.
+ */
 export const EmptyWithCustomMessage: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
