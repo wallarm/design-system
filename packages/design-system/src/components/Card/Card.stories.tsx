@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CircleDashed } from '../../icons';
@@ -74,22 +75,44 @@ export default meta;
  * for actions — carrying a handler, so the footer button and the card are two
  * separate targets.
  */
-export const Basic: StoryFn<CardProps> = ({ ...args }) => (
-  <Card onClick={onCardClick} {...args}>
-    <CardHeader>
-      <CardTitle>Card title</CardTitle>
-      <Badge size='medium' type='solid' color='slate'>
-        Badge
-      </Badge>
-    </CardHeader>
-    <CardContent>Card description</CardContent>
-    <CardFooter>
-      <Button variant='secondary' size='small' color='neutral' onClick={onButtonClick}>
-        Button
-      </Button>
-    </CardFooter>
-  </Card>
-);
+export const Basic: StoryFn<CardProps> = ({ ...args }) => {
+  // `data-last-click` records which target handled the click. It renders nothing,
+  // and it is what the click-isolation e2e asserts on — the story used to prove
+  // the same thing by writing to the console.
+  const [lastClick, setLastClick] = useState<'card' | 'button' | 'none'>('none');
+
+  return (
+    <Card
+      onClick={e => {
+        onCardClick(e);
+        setLastClick('card');
+      }}
+      data-last-click={lastClick}
+      {...args}
+    >
+      <CardHeader>
+        <CardTitle>Card title</CardTitle>
+        <Badge size='medium' type='solid' color='slate'>
+          Badge
+        </Badge>
+      </CardHeader>
+      <CardContent>Card description</CardContent>
+      <CardFooter>
+        <Button
+          variant='secondary'
+          size='small'
+          color='neutral'
+          onClick={e => {
+            onButtonClick(e);
+            setLastClick('button');
+          }}
+        >
+          Button
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+};
 
 /**
  * `primary` sits on the page surface and `secondary` on a tinted fill, each shown

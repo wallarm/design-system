@@ -61,34 +61,24 @@ test.describe('Card Component', () => {
       await cardStory.goto(page, 'Basic');
     });
 
+    // The story records the handling target in `data-last-click` rather than
+    // logging it, so these assert the DOM instead of console output.
     test('Button click - does not trigger card click', async ({ page }) => {
-      const consoleLogs: string[] = [];
-      page.on('console', msg => {
-        if (msg.type() === 'log') {
-          consoleLogs.push(msg.text());
-        }
-      });
+      const card = getCards(page).first();
+      await expect(card).toHaveAttribute('data-last-click', 'none');
 
-      const button = getCards(page).first().getByRole('button', { name: 'Button' });
-      await button.click();
+      await card.getByRole('button', { name: 'Button' }).click();
 
-      expect(consoleLogs).toContain('Card`s button clicked');
-      expect(consoleLogs).not.toContain('Card clicked');
+      await expect(card).toHaveAttribute('data-last-click', 'button');
     });
 
     test('Card area click - triggers card click', async ({ page }) => {
-      const consoleLogs: string[] = [];
-      page.on('console', msg => {
-        if (msg.type() === 'log') {
-          consoleLogs.push(msg.text());
-        }
-      });
-
       const card = getCards(page).first();
-      const cardContent = card.locator('[data-slot="card-content"]');
-      await cardContent.click();
+      await expect(card).toHaveAttribute('data-last-click', 'none');
 
-      expect(consoleLogs).toContain('Card clicked');
+      await card.locator('[data-slot="card-content"]').click();
+
+      await expect(card).toHaveAttribute('data-last-click', 'card');
     });
   });
 

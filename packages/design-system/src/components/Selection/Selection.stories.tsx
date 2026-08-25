@@ -349,7 +349,7 @@ export const WithoutBulkBar: StoryFn<typeof meta> = () => {
 // React element type, so the summary must be a direct JSX child of
 // SelectionBulkBar — wrapper components are opaque and would force the
 // default Selection-wired summary to render alongside.
-const CompoundToolbar = () => {
+const CompoundToolbar = ({ onDeleteSelected }: { onDeleteSelected: (ids: string[]) => void }) => {
   const { selectedIds, isAllSelected, selectAll, clear } = useSelectionContext();
 
   return (
@@ -375,7 +375,11 @@ const CompoundToolbar = () => {
         data-testid='bulk-delete'
         data-analytics-id='BULK_DELETE'
         color='brand'
-        onClick={() => onDelete([...selectedIds])}
+        onClick={() => {
+          const ids = [...selectedIds];
+          onDelete(ids);
+          onDeleteSelected(ids);
+        }}
       >
         <Trash2 /> Delete
       </Button>
@@ -388,19 +392,27 @@ const CompoundToolbar = () => {
  * to be a direct child of the bar; a wrapper component hides it and the default appears too.
  */
 export const CompoundBulkBar: StoryFn<typeof meta> = () => {
+  const [items, setItems] = useState<Cluster[]>(clusters);
   const [selected, setSelected] = useState<string[]>([]);
 
+  // Delete actually deletes here: a bulk action that only logged left nothing to
+  // observe, and the row leaving is the honest demonstration of one.
+  const deleteSelected = (ids: string[]) => {
+    setItems(prev => prev.filter(c => !ids.includes(c.id)));
+    setSelected([]);
+  };
+
   return (
-    <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
+    <Selection items={items} getItemId={c => c.id} value={selected} onChange={setSelected}>
       <VStack gap={12}>
-        {clusters.map(c => (
+        {items.map(c => (
           <SelectionItem key={c.id} itemId={c.id}>
             <ClusterCard cluster={c} />
           </SelectionItem>
         ))}
       </VStack>
 
-      <CompoundToolbar />
+      <CompoundToolbar onDeleteSelected={deleteSelected} />
     </Selection>
   );
 };
