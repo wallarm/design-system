@@ -37,8 +37,8 @@
 
 ## Snapshot
 
-- **54 written to the standard · 28 with prose to level · 13 untouched**, across 95 story pages.
-- **Complete folders:** Actions, Brand, Inputs, Inputs Date, Loading, Overlay, Pages, Patterns, Primitives, Status Indication, Typography.
+- **70 written to the standard · 18 with prose to level · 7 untouched**, across 95 story pages.
+- **Complete folders:** Actions, Brand, Inputs, Inputs Date, Layout, Loading, Messaging, Navigation, Overlay, Pages, Patterns, Primitives, Status Indication, Typography.
 - Levelling a 🟡 is usually cutting, not filling — and sometimes correcting: `Slider` claimed behaviour its own code contradicted, and `Dialog` claimed a position it does not have.
 - On a ✅ row the two count columns match. Where they do not, the page is not finished.
 
@@ -105,14 +105,14 @@
 | ✅ | Messaging/Alert | 8 | 8 | `components/Alert/Alert.stories.tsx` |
 | ✅ | Messaging/Banner | 8 | 8 | `components/Banner/Banner.stories.tsx` |
 | ✅ | Messaging/Toast | 8 | 8 | `components/Toast/Toast.stories.tsx` |
-| 🟡 | Navigation/AppShell | 3 | 0 | `components/AppShell/AppShell.stories.tsx` |
-| 🟡 | Navigation/Breadcrumbs | 7 | 0 | `components/Breadcrumbs/Breadcrumbs.stories.tsx` |
-| ☐ | Navigation/Link | 5 | 0 | `components/Link/Link.stories.tsx` |
-| ☐ | Navigation/Pagination | 9 | 0 | `components/Pagination/Pagination.stories.tsx` |
-| 🟡 | Navigation/SegmentedTabs | 9 | 0 | `components/SegmentedTabs/SegmentedTabs.stories.tsx` |
-| ☐ | Navigation/Tabs | 11 | 0 | `components/Tabs/Tabs.stories.tsx` |
-| 🟡 | Navigation/Tree | 6 | 0 | `components/Tree/Tree.stories.tsx` |
-| 🟡 | Navigation/TreeView | 8 | 3 | `components/TreeView/TreeView.stories.tsx` |
+| ✅ | Navigation/AppShell | 3 | 3 | `components/AppShell/AppShell.stories.tsx` |
+| ✅ | Navigation/Breadcrumbs | 7 | 7 | `components/Breadcrumbs/Breadcrumbs.stories.tsx` |
+| ✅ | Navigation/Link | 5 | 5 | `components/Link/Link.stories.tsx` |
+| ✅ | Navigation/Pagination | 9 | 9 | `components/Pagination/Pagination.stories.tsx` |
+| ✅ | Navigation/SegmentedTabs | 9 | 9 | `components/SegmentedTabs/SegmentedTabs.stories.tsx` |
+| ✅ | Navigation/Tabs | 11 | 11 | `components/Tabs/Tabs.stories.tsx` |
+| ✅ | Navigation/Tree | 6 | 6 | `components/Tree/Tree.stories.tsx` |
+| ✅ | Navigation/TreeView | 8 | 8 | `components/TreeView/TreeView.stories.tsx` |
 | ✅ | Overlay/Dialog | 17 | 17 | `components/Dialog/Dialog.stories.tsx` |
 | ✅ | Overlay/Drawer | 16 | 16 | `components/Drawer/Drawer.stories.tsx` |
 | ✅ | Overlay/FeedbackPulse | 2 | 2 | `components/FeedbackPulse/FeedbackPulse.stories.tsx` |

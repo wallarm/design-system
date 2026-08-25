@@ -760,3 +760,35 @@ Not findings — decisions worth remembering so they are not rediscovered.
   that should be hidden from the API, and say which in the component's own docs.
 - **Found while** — documenting `AnimatedBackground`.
 - **Status** — Open.
+
+### Breadcrumbs: a "WIP" tooltip ships on the docs page
+
+- **What** — `WithTruncation` wraps the ellipsis in a `Tooltip` whose entire
+  content is the string "WIP", so hovering the collapse control on a public page
+  shows a work-in-progress marker.
+- **Evidence** — `Breadcrumbs.stories.tsx`, the `WithTruncation` story. The
+  component's usage guide also records that per-item truncation with a tooltip is
+  drawn in Figma but not shipped, which is presumably what the marker refers to.
+- **Why it matters** — It reads as an unfinished component to anyone browsing, and
+  it hides the one thing the story is meant to teach: that the ellipsis expands
+  the middle of the trail.
+- **Suggested action** — Replace it with the real tooltip copy, or drop the
+  tooltip and let the ellipsis speak for itself.
+- **Found while** — documenting `Breadcrumbs`.
+- **Status** — Open.
+
+### Link: the variant stories cannot be read without opening the code
+
+- **What** — `Types`, `Weight` and `Sizes` each render several links whose text is
+  the identical word "Link", with nothing naming which variant is which. `Types`
+  also demonstrates `alt` — the inverted family meant for dark surfaces — on the
+  light canvas, where it is pale blue on white and close to illegible.
+- **Evidence** — `Link.stories.tsx`, all three stories; verified in the browser.
+- **Why it matters** — The reader cannot map row to prop, and the one variant that
+  needs a dark surface is shown failing on a light one, which invites the
+  conclusion that `alt` is simply low-contrast.
+- **Suggested action** — Label the rows, and put the `alt` example on a dark
+  surface. Flagged rather than done, because this pass only restyles labels a
+  story already has.
+- **Found while** — documenting `Link`.
+- **Status** — Open.

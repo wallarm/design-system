@@ -29,6 +29,11 @@ import {
   WallarmLogo,
 } from './story-content';
 
+const DESCRIPTION = [
+  'The platform’s outermost frame — global top bar, product rail, and the content surface products mount into. There is exactly one, at the app root, and it persists while the content swaps.',
+  'Do not wrap a page in it: a single product screen renders `RemoteShell` and its own content, blind to the shell. In-product navigation is `NavPanel`, and laying out a page’s insides is `Stack` and `Flex`.',
+].join(' ');
+
 const meta = {
   title: 'Navigation/AppShell',
   component: AppShell,
@@ -41,10 +46,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Application shell layout using CSS Grid. ' +
-          'Provides header, rail (sidebar), and remote (main content) areas. ' +
-          'Use compound components: AppShellHeader, AppShellRail, AppShellRemote.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -56,6 +58,7 @@ const meta = {
 
 export default meta;
 
+/** The three regions composed once — `AppShellHeader`, `AppShellRail`, `AppShellRemote` — with the content surface being the only part that scrolls. */
 export const Basic: StoryFn<AppShellProps> = () => {
   const pathname = useLocationPathname();
   const activeProduct = deriveProduct(pathname);
@@ -143,6 +146,7 @@ export const Basic: StoryFn<AppShellProps> = () => {
   );
 };
 
+/** `reveal` animates the chrome in on the first application load only. Leave it unset for an ordinary screen; this exists for prototyping the boot moment itself. */
 export const RevealFlow: StoryFn<AppShellProps> = () => {
   const pathname = useLocationPathname();
   const activeProduct = deriveProduct(pathname);
@@ -228,6 +232,7 @@ export const RevealFlow: StoryFn<AppShellProps> = () => {
 
 const CARD_DIMENSIONS = { width: 480, height: 600, borderRadius: 12 };
 
+/** The whole entrance: the splash hands off, the content surface expands from the sign-in card into the full shell. `onRevealed` fires when it has settled. */
 export const LoginFlow: StoryFn<AppShellProps> = () => {
   const pathname = useLocationPathname();
   const activeProduct = deriveProduct(pathname);

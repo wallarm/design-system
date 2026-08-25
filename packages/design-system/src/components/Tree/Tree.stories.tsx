@@ -7,6 +7,11 @@ import { TreeItem } from './TreeItem';
 import { TreeItemContent } from './TreeItemContent';
 import { TreeItemHeader } from './TreeItemHeader';
 
+const DESCRIPTION = [
+  'Draws structure: a vertical rail and depth indentation around nested content, with optional per-item collapse.',
+  'It shows a hierarchy rather than letting you work in one — reach for `TreeView` when rows need selecting, keyboard navigation or disabled states, and for `Accordion` when the levels are sections rather than a tree.',
+].join(' ');
+
 const meta = {
   title: 'Navigation/Tree',
   component: Tree,
@@ -14,8 +19,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Tree renders a vertical line indicator with depth-based indentation for nested item groups. Uses a compound component pattern with `<Tree>`, `<TreeItem>`, `<TreeItemHeader>`, and `<TreeItemContent>`.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -26,6 +30,7 @@ const meta = {
 
 export default meta;
 
+/** One level: the rail and the indentation, with the items composed from `TreeItemHeader` and `TreeItemContent`. */
 export const Basic: StoryFn<TreeProps> = args => (
   <div className='w-240'>
     <Tree {...args}>
@@ -42,6 +47,7 @@ export const Basic: StoryFn<TreeProps> = args => (
   </div>
 );
 
+/** Nesting a `Tree` inside an item adds a depth, and each depth draws its own rail so the ancestry stays readable. */
 export const Nested: StoryFn<TreeProps> = args => (
   <div className='w-320'>
     <Tree {...args}>
@@ -74,6 +80,7 @@ export const Nested: StoryFn<TreeProps> = args => (
   </div>
 );
 
+/** `TreeItemHeader`’s `icon` prop sits before the label at every depth, which is how a status or a type reads down a branch. */
 export const WithIcons: StoryFn<TreeProps> = args => (
   <div className='w-320'>
     <Tree gap={12} {...args}>
@@ -109,6 +116,7 @@ export const WithIcons: StoryFn<TreeProps> = args => (
   </div>
 );
 
+/** The same icons four levels deep — the case that shows whether the indentation is still legible at depth. */
 export const WithIconsNested: StoryFn<TreeProps> = args => (
   <div className='w-320'>
     <Tree gap={12} {...args}>
@@ -197,6 +205,7 @@ export const WithIconsNested: StoryFn<TreeProps> = args => (
   </div>
 );
 
+/** `collapsible` on an item turns its header into a toggle, open by default. It is per item, not a tree-wide setting. */
 export const Collapsible: StoryFn<TreeProps> = args => (
   <div className='w-320'>
     <Tree gap={8} {...args}>
@@ -253,6 +262,7 @@ export const Collapsible: StoryFn<TreeProps> = args => (
   </div>
 );
 
+/** `TreeItemHeader`’s `action` slot holds a control on the right of the row, which is where a per-branch action belongs. */
 export const CollapsibleWithActions: StoryFn<TreeProps> = args => (
   <div className='w-320'>
     <Tree gap={8} {...args}>

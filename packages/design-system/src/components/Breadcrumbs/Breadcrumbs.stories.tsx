@@ -4,6 +4,11 @@ import { ChevronDown, CircleDashed, Home } from '../../icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { Breadcrumbs, BreadcrumbsEllipsis, BreadcrumbsItem } from './index';
 
+const DESCRIPTION = [
+  'The location trail for a page that sits deep in a hierarchy — each ancestor links up, and the last item is the page you are on.',
+  'Skip it in a flat app of one or two levels, and never use it to move between peers at the same level: that is `Tabs`. It shows vertical hierarchy only, and complements the sidebar rather than replacing it.',
+].join(' ');
+
 const meta: Meta<typeof Breadcrumbs> = {
   title: 'Navigation/Breadcrumbs',
   component: Breadcrumbs,
@@ -12,8 +17,7 @@ const meta: Meta<typeof Breadcrumbs> = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Navigation breadcrumbs component that shows the current page location within a navigational hierarchy.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -29,6 +33,7 @@ const meta: Meta<typeof Breadcrumbs> = {
 
 export default meta;
 
+/** The plain trail. The root inserts the chevrons and marks the last item as the current page, so you list only your own items. */
 export const Basic: StoryFn<typeof Breadcrumbs> = args => {
   return (
     <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
@@ -43,6 +48,7 @@ export const Basic: StoryFn<typeof Breadcrumbs> = args => {
 
 Basic.args = {};
 
+/** One item is the current page and nothing more — which is the case where a breadcrumb has stopped earning its space. */
 export const SingleItem: StoryFn<typeof Breadcrumbs> = args => {
   return (
     <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
@@ -55,6 +61,7 @@ export const SingleItem: StoryFn<typeof Breadcrumbs> = args => {
 
 SingleItem.args = {};
 
+/** An icon inside an item, for a level whose type is worth showing as well as naming. */
 export const WithIcons: StoryFn<typeof Breadcrumbs> = args => {
   return (
     <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
@@ -83,6 +90,7 @@ export const WithIcons: StoryFn<typeof Breadcrumbs> = args => {
 
 WithIcons.args = {};
 
+/** Items that call a handler instead of following an `href`, for a trail wired to a router rather than to URLs. */
 export const WithInteractiveItems: StoryFn<typeof Breadcrumbs> = args => {
   return (
     <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
@@ -101,6 +109,7 @@ export const WithInteractiveItems: StoryFn<typeof Breadcrumbs> = args => {
 
 WithInteractiveItems.args = {};
 
+/** Icons with no text. Each item needs its own `aria-label`, since the icon is then the only thing naming the level. */
 export const IconsOnly: StoryFn<typeof Breadcrumbs> = args => {
   return (
     <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
@@ -130,6 +139,7 @@ export const IconsOnly: StoryFn<typeof Breadcrumbs> = args => {
 
 IconsOnly.args = {};
 
+/** A long trail folded behind a `BreadcrumbsEllipsis`, which expands the middle on click. The first and current items always stay. */
 export const WithTruncation: StoryFn<typeof Breadcrumbs> = args => {
   const [showAll, setShowAll] = useState(false);
 
@@ -164,6 +174,7 @@ export const WithTruncation: StoryFn<typeof Breadcrumbs> = args => {
 
 WithTruncation.args = {};
 
+/** What a trail of long labels actually does today: it runs on. Per-item truncation is drawn in Figma but not shipped, so keep labels short. */
 export const LongBreadcrumbs: StoryFn<typeof Breadcrumbs> = args => {
   return (
     <div className='flex items-center justify-center w-full p-8 min-h-[400px]'>
