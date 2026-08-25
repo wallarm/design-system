@@ -169,6 +169,39 @@ And keep the distinction: a label that **names what you're looking at** is an
 annotation. A heading that **separates two genuinely different examples** is
 structure — leave it alone.
 
+## The scaffolding around the specimen
+
+Annotation labels are not the only thing on a page that isn't the component.
+Interactive components need **controls to expose them** — a button that fires a
+toast, a trigger that opens a menu, a toggle that flips a state — and those
+controls are scaffolding in exactly the same sense. **The specimen is what the
+reader came for; the scaffolding must never out-shout it.**
+
+It reliably does, because a story author reaches for the default `Button`, which
+is solid brand. `Toast`'s page opened with twelve solid-orange buttons in two
+rows, above a toast that only appears once you click one: the loudest thing on the
+page was the furniture. The same read applied to `FilterInputOperatorMenu`, whose
+trigger was a stock-blue `bg-blue-500` box.
+
+Three rules, in order of how often they bite:
+
+- **Quietest treatment that still works.** `variant='outline'` with
+  `color='neutral'`, or `ghost` for a second rank of controls. Never a solid
+  brand button for something whose only job is to reveal the component.
+- **DS components, not raw markup.** A trigger built from a `<button>` and a
+  Tailwind hue is both louder and off-system; it also contradicts whatever the
+  page is teaching. The same goes for debug output — a `bg-gray-100` JSON dump is
+  scaffolding too.
+- **Let an icon carry the meaning, then shrink the label.** Where a control fires
+  one of several semantic variants, give it **the icon that variant will actually
+  render** — the toast triggers now carry the same `CircleCheck` / `OctagonAlert` /
+  `TriangleAlert` / `Info` the toasts do — so the button predicts its result and
+  the label can drop to one word ("Success Toast" → an icon plus "Success").
+
+This is a **restyle, like the annotation work** — you are changing how the
+scaffolding looks, not what the story demonstrates. Adding controls a story does
+not have, or changing which variants it fires, is a different job: park it.
+
 ## Usage
 
 ```
@@ -334,6 +367,23 @@ Then check the things that actually go wrong: every story has a description; the
 description doesn't restate the story name; nothing contradicts the props table
 just below; no sentence spills past the budget. `pnpm lint:fix` and `pnpm typecheck`
 before you finish — story files are typechecked like any other source.
+
+**Two things to look at rather than read**, both covered above: are the annotation
+labels in the house style, and **is the scaffolding quieter than the specimen?**
+Squint at the page — whatever your eye lands on first should be the component. A
+row of solid brand buttons will win that contest every time.
+
+```bash
+grep -n "variant='primary'\|<Button>\|bg-blue-\|bg-gray-" <story-file>
+```
+
+Also check that a story-level `parameters.docs.description.story` is not
+**shadowing** your JSDoc — it wins silently, and the coverage tracker cannot see
+it. There should be none left in the library:
+
+```bash
+grep -n 'story:' <story-file>
+```
 
 **When levelling a page that already has prose, count the stories before and
 after.** Rewriting existing JSDoc with a multiline regex will happily match
