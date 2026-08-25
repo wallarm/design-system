@@ -73,7 +73,7 @@
 | ✅ | Data display/SimpleCharts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
 | ✅ | Data display/SimpleCharts/HorizontalBarStack | 8 | 8 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/LineChart | 15 | 1 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
-| 🟡 | Data display/SimpleCharts/Metric | 2 | 2 | `components/SimpleCharts/Metric/Metric.stories.tsx` |
+| ✅ | Data display/SimpleCharts/Metric | 2 | 2 | `components/SimpleCharts/Metric/Metric.stories.tsx` |
 | ✅ | Data display/SimpleCharts/Overview | 1 | 1 | `components/SimpleCharts/Overview/Overview.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/PieChart | 12 | 0 | `components/SimpleCharts/PieChart/PieChart.stories.tsx` |
 | ✅ | Inputs Date/Calendar | 16 | 16 | `components/Calendar/Calendar.stories.tsx` |
