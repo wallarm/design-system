@@ -27,12 +27,14 @@ export const emptyStateVariants = cva('flex flex-col items-center text-center m-
  * There is deliberately no unframed variant — the spec never shows a bare glyph,
  * at either scale, so an illustration always carries the tile.
  *
- * The corner radius is set by the `empty-state-medallion` utility, not a
- * `rounded-*` class here — see that file for why the spec's 16px needs
- * `corner-shape` to reproduce, and what the fallback does.
+ * `rounded-[15px]` is off the radius scale on purpose: it's the value Figma
+ * reports for this node, and fitting a superellipse to the rendered outline
+ * agrees — a plain circular corner at r=14.5 matches to 0.29px, and r=15 to
+ * 0.35px, while the nearest token (16) is off by 0.73px. There is no corner
+ * smoothing on this shape, so no `corner-shape` is needed.
  */
 export const emptyStateIllustrationVariants = cva(
-  'empty-state-medallion flex items-center justify-center shrink-0 size-36 border p-8 text-xl text-icon-secondary',
+  'empty-state-medallion flex items-center justify-center shrink-0 size-36 rounded-[15px] border p-8 text-xl text-icon-secondary',
 );
 
 export const emptyStateMessageVariants = cva('flex flex-col items-center', {

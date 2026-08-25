@@ -6,22 +6,8 @@
  * collapse into one element: the gradient is a background-image, and both the
  * drop shadow and the inset highlight ride in a single box-shadow list. All of
  * it resolves through tokens that flip in `[data-theme='dark']`.
- *
- * The corner is the one place the spec can't be taken literally. Figma draws
- * the tile at radius 16 *with corner smoothing* — an iOS-style squircle, whose
- * sides stay flat far longer than a circular arc of the same radius. Plain
- * `border-radius: 16px` on a 36px box leaves only 4px of flat edge per side and
- * reads as a circle, so the fallback approximates the drawn silhouette with a
- * smaller 12px radius. Where `corner-shape` is supported the real construction
- * is available, and we use the spec's own numbers instead of the approximation.
- *
- * The radius lives here rather than as a `rounded-*` class on the component so
- * both branches stay in one place; overriding it from a call site means
- * overriding this utility.
  */
 @utility empty-state-medallion {
-    border-radius: var(--radius-12);
-
     background-image: linear-gradient(
         to bottom,
         var(--color-component-empty-state-medallion-bg-from),
@@ -29,9 +15,4 @@
     );
     border-color: var(--color-component-empty-state-medallion-border);
     box-shadow: var(--shadow-empty-state-medallion);
-
-    @supports (corner-shape: squircle) {
-        border-radius: var(--radius-16);
-        corner-shape: squircle;
-    }
 }
