@@ -1,6 +1,8 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
+import { emptyStateTitleVariants } from './classes';
+import { useEmptyStateType } from './EmptyStateContext';
 
 export interface EmptyStateTitleProps extends HTMLAttributes<HTMLParagraphElement> {
   ref?: Ref<HTMLParagraphElement>;
@@ -14,6 +16,7 @@ export const EmptyStateTitle: FC<EmptyStateTitleProps> = ({
   ...props
 }) => {
   const testId = useTestId('title');
+  const type = useEmptyStateType();
 
   return (
     <p
@@ -21,10 +24,7 @@ export const EmptyStateTitle: FC<EmptyStateTitleProps> = ({
       ref={ref}
       data-testid={testId}
       data-slot='empty-state-title'
-      className={cn(
-        'font-pixel text-base leading-base text-text-primary text-center break-words',
-        className,
-      )}
+      className={cn(emptyStateTitleVariants({ type }), className)}
     >
       {children}
     </p>

@@ -3,9 +3,10 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const emptyStateStory = createStoryHelper('pages-emptystate', [
   'Collection Empty',
-  'No Results',
+  'No Filter Results',
   'Minimal',
   'No Results Examples',
+  'Medallion',
 ] as const);
 
 test.describe('Component: EmptyState', () => {
@@ -15,8 +16,8 @@ test.describe('Component: EmptyState', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render no results variant correctly', async ({ page }) => {
-      await emptyStateStory.goto(page, 'No Results');
+    test('Should render no filter results variant correctly', async ({ page }) => {
+      await emptyStateStory.goto(page, 'No Filter Results');
       await expect(page).toHaveScreenshot();
     });
 
@@ -27,6 +28,11 @@ test.describe('Component: EmptyState', () => {
 
     test('Should render no results examples correctly', async ({ page }) => {
       await emptyStateStory.goto(page, 'No Results Examples');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render medallion on both surfaces correctly', async ({ page }) => {
+      await emptyStateStory.goto(page, 'Medallion');
       await expect(page).toHaveScreenshot();
     });
   });

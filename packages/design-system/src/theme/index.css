@@ -17,6 +17,7 @@
 @import './icon.css';
 @import './utilities/hover-overlay.css';
 @import './utilities/code-snippet-bg.css';
+@import './utilities/empty-state-medallion.css';
 @import './components/drawer.css';
 @import './components/dialog.css';
 @import './components/tooltip.css';

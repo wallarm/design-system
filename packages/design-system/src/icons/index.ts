@@ -438,6 +438,7 @@ export { Ses } from './Ses';
 export { SesNeutral } from './SesNeutral';
 export { Settings } from './Settings';
 export { Settings2 } from './Settings2';
+export { Shapes } from './Shapes';
 export { Share } from './Share';
 export { Sheet } from './Sheet';
 export { Shield } from './Shield';
