@@ -931,5 +931,8 @@ Not findings — decisions worth remembering so they are not rediscovered.
   convention.
 - **Suggested action** — Replace all eleven with `fn()`, and consider making it a
   lint rule so it stops recurring.
+- **Also in** — `Table.stories.tsx` has ten more `alert()` calls, across
+  `RowSelection`, `RowSelectionWindowScroll`, `ContextMenu`, `MasterCellWithActions`
+  and `InlineCellEditing`. Same fix.
 - **Found while** — reading the bulk-bar stories for their sentences.
 - **Status** — Open.
