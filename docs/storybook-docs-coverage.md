@@ -69,12 +69,12 @@
 | ✅ | Data Display/Table | 33 | 33 | `components/Table/Table.stories.tsx` |
 | ✅ | Data Display/Timeline | 3 | 3 | `components/Timeline/Timeline.stories.tsx` |
 | ✅ | Data display/CodeSnippet/CodeSnippet | 25 | 25 | `components/CodeSnippet/CodeSnippet.stories.tsx` |
-| 🟡 | Data display/SimpleCharts/BarList | 13 | 0 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
+| ✅ | Data display/SimpleCharts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/Chart | 6 | 0 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/HorizontalBarStack | 8 | 2 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/LineChart | 15 | 1 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/Metric | 2 | 2 | `components/SimpleCharts/Metric/Metric.stories.tsx` |
-| 🟡 | Data display/SimpleCharts/Overview | 1 | 0 | `components/SimpleCharts/Overview/Overview.stories.tsx` |
+| ✅ | Data display/SimpleCharts/Overview | 1 | 1 | `components/SimpleCharts/Overview/Overview.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/PieChart | 12 | 0 | `components/SimpleCharts/PieChart/PieChart.stories.tsx` |
 | ✅ | Inputs Date/Calendar | 16 | 16 | `components/Calendar/Calendar.stories.tsx` |
 | ✅ | Inputs Date/DateInput | 10 | 10 | `components/DateInput/DateInput.stories.tsx` |

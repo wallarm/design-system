@@ -67,6 +67,11 @@ const percentageRows: Row[] = [
 const formatValue = (n: number) => n.toLocaleString('en-US');
 const formatPercent = (n: number) => `${n}%`;
 
+const DESCRIPTION = [
+  'A compact top-N breakdown for a dashboard card — endpoints, status codes, regions — where the rows are read as a ranking rather than plotted against an axis.',
+  'You render a `BarListItem` per data point and choose which slots go in it; the root supplies `max`, the value at which a bar is full, and nothing is sorted, sliced or aggregated for you. `BarListSkeleton` covers the loading state.',
+].join(' ');
+
 const meta = {
   title: 'Data display/SimpleCharts/BarList',
   component: BarList,
@@ -84,15 +89,7 @@ const meta = {
       type: 'figma',
       url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-121720&m=dev',
     },
-    docs: {
-      description: {
-        component:
-          'BarList is a composable, JSX-driven horizontal bar list. Callers render one `BarListItem` per data point ' +
-          'and pick which slots to compose inside it (bar, label, value, percent). The parent supplies `max` — the ' +
-          'value at which a bar fills 100%. Use `selected` on an item to force its bar to 100% while keeping the ' +
-          'real `value / max` in the percent label. For the loading state use `BarListSkeleton`.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],
 } satisfies Meta<typeof BarList>;
@@ -102,6 +99,11 @@ export default meta;
 const chartSum = (rows: Row[]) => rows.reduce((sum, r) => sum + r.value, 0);
 const chartMax = (rows: Row[]) => Math.max(...rows.map(r => r.value));
 
+/**
+ * The interactive shape: click a row to filter down to it, and the header's clear button
+ * appears while that filter holds. Filtering recomputes `max` from what is left, which is why
+ * a lone row reads 100%.
+ */
 export const Default: StoryFn<typeof meta> = () => {
   const [filtered, setFiltered] = useState<string | null>(null);
   const rows = filtered ? baseRows.filter(r => r.name === filtered) : baseRows;
@@ -164,6 +166,10 @@ export const Default: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `color` tints the bar with a palette hue at 16% — enough to distinguish the rows while still
+ * letting the row's own hover state show through it.
+ */
 export const Colored: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -194,6 +200,10 @@ const customColorClassNames = [
   'bg-fuchsia-500/16',
 ];
 
+/**
+ * For a hue the palette does not carry, pass a `bg-*` utility on the bar instead — the
+ * explicit class wins the merge against the variant's own fill.
+ */
 export const CustomColors: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -216,6 +226,10 @@ export const CustomColors: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * Values that are already percentages: `max={100}`, and the value slot prints the number
+ * itself rather than a share derived from it.
+ */
 export const Percentage: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -235,6 +249,10 @@ export const Percentage: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * `selected` marks the active row — the hover tint and `aria-current` — and never touches the
+ * bar, whose width stays `value / max` whatever is selected.
+ */
 export const Selectable: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string | null>(null);
 
@@ -283,6 +301,10 @@ export const Selectable: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Long labels truncate at the row width. A tooltip on the label needs `pointer-events-auto`,
+ * since the row's slots are transparent to the pointer by default.
+ */
 export const TruncatedLabels: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -310,6 +332,10 @@ export const TruncatedLabels: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * The same labels under `OverflowTooltip`, which shows the full text only when it is actually
+ * cut off — the right choice when most labels fit.
+ */
 export const TruncatedLabelsWithTooltip: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -372,6 +398,10 @@ const datasets: Record<DatasetKey, Dataset> = {
   },
 };
 
+/**
+ * One card, three datasets behind a settings menu: raw counts, percentages and fractions each
+ * need their own `max`, so switching the source switches that too.
+ */
 export const DataVariants: StoryFn<typeof meta> = () => {
   const [key, setKey] = useState<DatasetKey>('values');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -426,6 +456,10 @@ export const DataVariants: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `BarListSkeleton` stands in for the list while data loads, taking a row count so the card
+ * holds the height it will end up at.
+ */
 export const Loading: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -443,6 +477,10 @@ const overflowRows: Row[] = [
   { name: 'Zero', value: 0 },
 ];
 
+/**
+ * A value above `max` caps the bar at full width and the label at 100%, rather than
+ * overrunning the row.
+ */
 export const Overflow: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -465,6 +503,10 @@ export const Overflow: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * `max={0}` is not a division the component will guess at: every row renders empty at 0%, with
+ * a single warning in development.
+ */
 export const InvalidMax: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -487,6 +529,10 @@ export const InvalidMax: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * `digits` adds decimal places, for a set of shares too close together to tell apart as whole
+ * numbers.
+ */
 export const PercentDigits: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -509,6 +555,10 @@ export const PercentDigits: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * The three percent treatments — `split` colours the number and the `%` differently and is the
+ * Figma default, `muted` sets both back, `inherit` leaves them to the row.
+ */
 export const PercentVariants: StoryFn<typeof meta> = () => (
   <div className='flex flex-col gap-16 w-400'>
     <Chart>

@@ -936,3 +936,20 @@ Not findings — decisions worth remembering so they are not rediscovered.
   and `InlineCellEditing`. Same fix.
 - **Found while** — reading the bulk-bar stories for their sentences.
 - **Status** — Open.
+
+### BarList's description claimed `selected` fills the bar to 100%
+
+- **What** — The old component description read: "Use `selected` on an item to
+  force its bar to 100% while keeping the real `value / max` in the percent
+  label." `BarListItem.tsx` says the opposite in its own JSDoc — `selected`
+  applies the hover background and `aria-current` and "never changes the fill" —
+  and `BarListBar` computes width from `ratio` alone.
+- **Why it matters** — Anyone designing a filtered state from that sentence would
+  expect the chosen row to fill. What actually makes a lone row read 100% in the
+  `Default` story is the story itself recomputing `max` from the filtered rows.
+- **Suggested action** — Corrected in the prose: `Selectable` now says `selected`
+  never touches the bar, and `Default` says the filter recomputes `max`. No code
+  change needed; the code was right and the docs were wrong.
+- **Found while** — cross-reading the description against
+  `SimpleCharts/docs/BarList.md`, which already had it right.
+- **Status** — Closed — prose corrected.
