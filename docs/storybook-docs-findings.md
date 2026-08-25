@@ -403,13 +403,28 @@ Not findings — decisions worth remembering so they are not rediscovered.
   neutral token surface. Story-file only, so it is safe from the component's
   point of view.
 - **Found while** — documenting the `FilterInput` family.
-- **Status** — Partly done. The operator-menu and field-menu pages now use a DS
-  `Button` trigger and the annotation style, and the hand-styled `<kbd>` panel is
-  gone. `Toast`, `Dialog` and `Drawer` have since had the same treatment, and the
-  rule is now a section of the skill rather than a per-page judgement. Still open:
-  the `bg-gray-100` expression dumps on the `FilterInput` and `Composition`
-  pages, and the remaining loud pages (`Selection`, `Table`, `Tour`,
-  `OverflowTooltip`, `InlineEdit`, `Card`, `AppShell`, `Tooltip`, `TreeView`).
+- **Status** — Partly done, and re-audited before the PR. Cleaned: the
+  operator-menu and field-menu pages (DS `Button` trigger, annotation style, the
+  hand-styled `<kbd>` panel gone), `Toast`, `Dialog`, `Drawer`, `Selection` (the
+  drawer trigger), `Table` (the four `scrollToRow` controls) and `Card`. The rule
+  is now a section of the skill rather than a per-page judgement.
+
+  **Still open, deliberately deferred out of this PR** because these pages were
+  already reviewed and signed off, and none of it blocks a reviewer:
+
+  | Page | What | Sites |
+  |---|---|---|
+  | `FilterInput`, `FilterInputComposition` | `bg-gray-100` expression dumps | 7 |
+  | `OverflowTooltip` | two raw `bg-blue-500` `<button>` triggers, one `bg-gray-100` code chip inside tooltip content | 3 |
+  | `Tour` | `variant='primary'` brand start buttons — the harness that reveals the specimen | 4 |
+  | `Tooltip` | default solid `<Button>` as a `DialogTrigger` | 1 |
+  | `InlineEdit` | one `variant='primary'` control | 1 |
+
+  `AppShell`'s primary is **not** in scope — it sits inside a mocked sign-in form,
+  where a primary is correct. `TreeView` is clean.
+
+  Each is the same one-line restyle already applied elsewhere; worth one follow-up
+  commit once someone confirms they want those five pages touched.
 
 ### FilterInput: the BackendIntegration example demonstrates a pattern we forbid
 
