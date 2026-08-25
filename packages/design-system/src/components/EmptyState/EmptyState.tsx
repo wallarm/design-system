@@ -3,6 +3,7 @@ import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { emptyStateVariants } from './classes';
+import { EmptyStateProvider } from './EmptyStateContext';
 
 export interface EmptyStateProps
   extends Omit<VariantProps<typeof emptyStateVariants>, 'type'>,
@@ -23,16 +24,18 @@ export const EmptyState: FC<EmptyStateProps> = ({
 }) => {
   return (
     <TestIdProvider value={testId}>
-      <div
-        {...props}
-        ref={ref}
-        role='status'
-        data-slot='empty-state'
-        data-testid={testId}
-        className={cn(emptyStateVariants({ type }), className)}
-      >
-        {children}
-      </div>
+      <EmptyStateProvider value={type}>
+        <div
+          {...props}
+          ref={ref}
+          role='status'
+          data-slot='empty-state'
+          data-testid={testId}
+          className={cn(emptyStateVariants({ type }), className)}
+        >
+          {children}
+        </div>
+      </EmptyStateProvider>
     </TestIdProvider>
   );
 };

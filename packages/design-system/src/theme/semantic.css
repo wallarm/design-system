@@ -216,6 +216,17 @@
     --color-component-toast-ic-info: var(--color-blue-400);
     --color-component-app-shell-bg: var(--color-slate-100);
 
+    /* EmptyState medallion — the small raised tile behind the empty-state icon.
+     * Reads as a lit surface: a top-down gradient, a hairline border, a soft
+     * drop shadow and an inner top highlight. Kept as tokens (not utilities)
+     * because every layer flips between light and dark. */
+    --color-component-empty-state-medallion-bg-from: var(--color-white);
+    --color-component-empty-state-medallion-bg-to: --alpha(var(--color-slate-100) / 80%);
+    --color-component-empty-state-medallion-border: --alpha(var(--color-slate-300) / 70%);
+    --shadow-empty-state-medallion:
+        0 2px 2.5px 0 rgba(15, 23, 43, 0.03), 0 1px 1px 0 rgba(15, 23, 43, 0.05),
+        inset 0 -1px 1px 0 rgba(15, 23, 43, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
+
     /* ========================================
    * SYNTAX COLORS
    * ⚠️  CODE-MANAGED — DO NOT SYNC FROM FIGMA
@@ -611,6 +622,15 @@
     --color-component-toast-ic-success: var(--color-green-600);
     --color-component-toast-ic-info: var(--color-blue-600);
     --color-component-app-shell-bg: var(--color-slate-975);
+
+    /* EmptyState medallion (dark) — same recipe inverted: the gradient and the
+     * top highlight become low-alpha white, the shadows deepen to near-black. */
+    --color-component-empty-state-medallion-bg-from: --alpha(var(--color-white) / 7%);
+    --color-component-empty-state-medallion-bg-to: --alpha(var(--color-white) / 2%);
+    --color-component-empty-state-medallion-border: --alpha(var(--color-white) / 13%);
+    --shadow-empty-state-medallion:
+        0 2px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 2px 0 rgba(0, 0, 0, 0.24),
+        inset 0 -1px 2px 0 rgba(0, 0, 0, 0.16), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
 
     /* ========================================
      * SYNTAX COLORS
