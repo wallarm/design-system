@@ -397,6 +397,11 @@ export const CustomTooltip: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Legend placement is structural, not configured: JSX child order picks top or
+ * bottom, and wrapping the body and the legend together in an `HStack` picks left
+ * or right. The side layouts pair it with `orientation='vertical'` so its rows stack.
+ */
 export const LegendPlacements: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
@@ -510,11 +515,6 @@ export const LegendPlacements: StoryFn<typeof meta> = () => {
 
 LegendPlacements.parameters = {
   layout: 'padded',
-  docs: {
-    description: {
-      story: `Legend placement is structural, not configured. JSX child order picks top vs bottom; wrapping the body and the legend together in an \`<HStack>\` (or any row flex container) picks left vs right. The legend pairs \`orientation="vertical"\` with the side layout so its rows stack vertically.`,
-    },
-  },
 };
 
 export const Filterable: StoryFn<typeof meta> = () => {
@@ -713,19 +713,17 @@ const ZoomControlledChart = () => {
   );
 };
 
+/**
+ * Drag across the plot to select a range, then confirm in the popover — the button
+ * or `Enter` fires `onZoomChange`, while Escape, a click outside or a new drag
+ * dismisses it without emitting. Slicing the data to the range is the consumer's
+ * job, as is the zoom-out control in `ChartActions`.
+ */
 export const Zoom: StoryFn<typeof meta> = () => (
   <div className='w-560'>
     <ZoomControlledChart />
   </div>
 );
-
-Zoom.parameters = {
-  docs: {
-    description: {
-      story: `Drag on the chart plot to select a range — the gray selection rectangle follows the cursor. On release the selection stays put and a "Zoom in" popover appears for confirmation. Clicking "Zoom in" or pressing \`Enter\` fires \`onZoomChange\` with the selected range; pressing \`Escape\`, clicking outside the popover, or starting a new drag dismisses without emitting. The consumer slices its own data based on the range, and a "Zoom out" button in \`<ChartActions>\` clears it.`,
-    },
-  },
-};
 
 const LoadingLegend = ({ orientation }: { orientation?: 'horizontal' | 'vertical' }) => (
   <LineChartLegend orientation={orientation}>
@@ -737,6 +735,12 @@ const LoadingLegend = ({ orientation }: { orientation?: 'horizontal' | 'vertical
   </LineChartLegend>
 );
 
+/**
+ * The loading state is composed from the same primitives as a populated chart —
+ * `Skeleton` chips inside `LineChartLegend`, and a bare `LineChartEmpty` for the
+ * dashed plot frame. There is no `loading` prop: setting `aria-busy` on `Chart` is
+ * the consumer's job, as this story does.
+ */
 export const Loading: StoryFn<typeof meta> = () => (
   <div className='grid grid-cols-2 gap-16 w-1120'>
     <Chart aria-busy='true' aria-live='polite'>
@@ -788,11 +792,6 @@ Loading.parameters = {
   design: {
     type: 'figma',
     url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7519-2617&m=dev',
-  },
-  docs: {
-    description: {
-      story: `Loading state is built by composing the same primitives as a populated chart — \`<LineChartLegend>\` with \`<Skeleton>\` chips for the legend, bare \`<LineChartEmpty />\` for the dashed-grid plot frame (no \`children\` means no message overlay). Mirrors the four placement variants from \`LegendPlacements\` plus a no-legend variant. \`aria-busy\` on \`<Chart>\` announces the loading state.`,
-    },
   },
 };
 
@@ -910,6 +909,11 @@ const RefreshingChart = ({
   );
 };
 
+/**
+ * Each panel loads for two seconds before swapping to data, and the refresh button
+ * replays it per chart. The skeleton and the populated chart share the same outer
+ * layout, so nothing but the content moves on swap.
+ */
 export const Refreshing: StoryFn<typeof meta> = () => (
   <div className='grid grid-cols-2 gap-16 w-1120'>
     <RefreshingChart placement='none' title='No legend' />
@@ -919,14 +923,6 @@ export const Refreshing: StoryFn<typeof meta> = () => (
     <RefreshingChart placement='right' title='Right — wrapped in HStack' />
   </div>
 );
-
-Refreshing.parameters = {
-  docs: {
-    description: {
-      story: `Each panel mounts in the loading state for 2 seconds before swapping to data; the refresh button replays the cycle independently per chart. Mirrors the four placement variants from \`LegendPlacements\` plus a no-legend variant — the skeleton (legend + plot frame) and the populated chart share the same outer layout, so the swap is invisible apart from the content.`,
-    },
-  },
-};
 
 export const Empty: StoryFn<typeof meta> = () => (
   <div className='w-560'>

@@ -198,6 +198,10 @@ const MetricCard = () => (
   </Chart>
 );
 
+/**
+ * Every chart in the family at its default, side by side — the quickest way to
+ * check they still read as one system after a change to any one of them.
+ */
 export const Default: StoryFn<typeof meta> = () => (
   <div className='flex flex-col gap-16 w-832'>
     <div className='grid grid-cols-2 gap-16'>
@@ -211,12 +215,3 @@ export const Default: StoryFn<typeof meta> = () => (
     </div>
   </div>
 );
-
-Default.parameters = {
-  docs: {
-    description: {
-      story:
-        'Default rendering of each chart in the SimpleCharts family. BarList (top-left) and PieChart (top-right) share the row; LineChart spans the row below; HorizontalBarStack (bottom-left) and Metric (bottom-right) share the last row.',
-    },
-  },
-};

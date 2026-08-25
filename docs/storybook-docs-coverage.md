@@ -21,9 +21,11 @@
 > `parameters.docs.description.story` silently overrides the JSDoc sentence above
 > the story, and the counts below cannot see it. The sweep found twelve shadowed
 > sentences (`FilterInputFieldMenu` 6, `Dialog` 2, `Drawer` 2, `InlineEdit` 2);
-> all are fixed. Five `story:` params remain, on the SimpleCharts pages, where
-> they are the only description — nothing is hidden, but fold them into JSDoc when
-> those rows get levelled. One story is hidden from its own page on purpose:
+> all are fixed. The five remaining `story:` params, on the SimpleCharts pages,
+> were the only description there rather than a shadow — they are now JSDoc too, so
+> **no story file uses the param form any more** and the trap cannot reappear
+> silently. Those rows stay 🟡: the form is fixed, the pages are not levelled.
+> One story is hidden from its own page on purpose:
 > `FeedbackPulse`'s `Rating` carries `tags: ['!autodocs']`, so its sentence is
 > written but never rendered on the Overview.
 
