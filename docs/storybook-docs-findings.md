@@ -809,13 +809,14 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Why it matters** — The labels named the two bounds, so the page asserted a
   256px alert next to a 938px one. Corrected to describe what is actually
   visible, but the story still cannot show either limit.
-- **Suggested action** — To demonstrate them, each example needs a container that
-  crosses its bound: a ~200px wrapper for the minimum (which also shows the alert
-  overflowing it — measured: 256px inside a 200px parent), and a >980px wrapper
-  for the ceiling. Worth deciding whether the ceiling is worth a wide example at
-  all, or whether stating it in prose is enough.
+- **Suggested action** — Each example needs a container that crosses its bound.
 - **Found while** — Artem spotted the min-width label on the rendered page.
-- **Status** — Open.
+- **Status** — Closed — rebuilt on Artem's go. Four rows, each measured: a 200px
+  container (alert holds 256 and overflows it), a 600px container (fills at
+  598), an 1100px container inside an `overflow-x-auto` wrapper (stops at 980,
+  leaving the container visibly empty), and `maxWidth={500}` in a 600px container.
+  Dashed container edges make the bound visible, and the story takes
+  `layout: 'padded'` so the canvas no longer shrink-wraps it.
 
 ### Visual e2e baselines are stale on this branch
 
