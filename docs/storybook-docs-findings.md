@@ -612,4 +612,4 @@ Not findings — decisions worth remembering so they are not rediscovered.
   minimum width. Worth deciding the priority explicitly: if the chip has to drop
   something, the field label is the safer thing to abbreviate.
 - **Found while** — reviewing the `FilterInput` docs pages with Artem.
-- **Status** — Open.
+- **Status** — Filed (WDS-174).
