@@ -15,13 +15,12 @@ export const emptyStateVariants = cva('flex flex-col items-center text-center m-
 });
 
 /**
- * `text-base` on both variants sets the 16px em box, so an icon left at its
- * default `size='inherit'` lands on spec without every call site restating a
- * size.
+ * The medallion: a 36px raised tile holding a 16px glyph. `text-base` sets the
+ * 16px em box, so an icon left at its default `size='inherit'` lands on spec
+ * without every call site restating a size.
  *
- * Only the page-level state earns the medallion — a 36px raised tile. The
- * compact inline state carries the bare glyph instead: at 240px wide, a framed
- * tile would out-weigh the two lines of text it sits above.
+ * There is deliberately no unframed variant — the spec never shows a bare glyph,
+ * at either scale, so an illustration always carries the tile.
  *
  * The tile is `rounded-12`, not the 16px Figma reports. Figma draws it with
  * corner smoothing (an iOS-style squircle), which reads as flatter sides than
@@ -29,18 +28,7 @@ export const emptyStateVariants = cva('flex flex-col items-center text-center m-
  * circle. 12px matches the drawn silhouette.
  */
 export const emptyStateIllustrationVariants = cva(
-  'flex items-center justify-center shrink-0 text-base text-icon-secondary',
-  {
-    variants: {
-      type: {
-        'collection-empty': 'empty-state-medallion size-36 rounded-12 border p-8',
-        'no-results': 'size-16',
-      },
-    },
-    defaultVariants: {
-      type: 'collection-empty',
-    },
-  },
+  'empty-state-medallion flex items-center justify-center shrink-0 size-36 rounded-12 border p-8 text-base text-icon-secondary',
 );
 
 export const emptyStateMessageVariants = cva('flex flex-col items-center', {

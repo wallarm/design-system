@@ -39,8 +39,8 @@ const meta = {
           '`type` picks the scale, and every slot follows it from context — no need to restate it on ' +
           'children. `collection-empty` is the page-level treatment: a medallion (a 36px raised tile ' +
           'holding a 16px icon), a pixel title, and room for actions plus a link. `no-results` is the ' +
-          'compact inline treatment for a card, dropdown or select menu: 240px wide, a bare 16px icon, ' +
-          'and a 14px secondary title.\n\n' +
+          'compact inline treatment for a card, dropdown or select menu: 240px wide, with a 14px ' +
+          'secondary title. An illustration always carries the medallion — there is no bare glyph.\n\n' +
           'Scale is not the same question as cause. A page-level "no filter matches" state still uses ' +
           '`collection-empty` — it just drops the create CTA and offers a neutral one instead.',
       },
@@ -112,25 +112,6 @@ export const NoFilterResults: StoryFn<EmptyStateProps> = args => (
 );
 NoFilterResults.args = {
   type: 'collection-empty',
-};
-
-/**
- * The same compact state with the optional icon turned on. It renders bare — no
- * medallion at this scale, since a framed tile would out-weigh two lines of text.
- */
-export const NoResults: StoryFn<EmptyStateProps> = args => (
-  <EmptyState {...args}>
-    <EmptyStateIllustration>
-      <Zap />
-    </EmptyStateIllustration>
-    <EmptyStateMessage>
-      <EmptyStateTitle>No results</EmptyStateTitle>
-      <EmptyStateDescription>Short description</EmptyStateDescription>
-    </EmptyStateMessage>
-  </EmptyState>
-);
-NoResults.args = {
-  type: 'no-results',
 };
 
 /**

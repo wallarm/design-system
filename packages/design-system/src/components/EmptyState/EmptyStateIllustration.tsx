@@ -2,7 +2,6 @@ import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { emptyStateIllustrationVariants } from './classes';
-import { useEmptyStateType } from './EmptyStateContext';
 
 export interface EmptyStateIllustrationProps extends HTMLAttributes<HTMLDivElement> {
   ref?: Ref<HTMLDivElement>;
@@ -16,7 +15,6 @@ export const EmptyStateIllustration: FC<EmptyStateIllustrationProps> = ({
   ...props
 }) => {
   const testId = useTestId('illustration');
-  const type = useEmptyStateType();
 
   return (
     <div
@@ -24,7 +22,7 @@ export const EmptyStateIllustration: FC<EmptyStateIllustrationProps> = ({
       ref={ref}
       data-slot='empty-state-illustration'
       data-testid={testId}
-      className={cn(emptyStateIllustrationVariants({ type }), className)}
+      className={cn(emptyStateIllustrationVariants(), className)}
     >
       {children}
     </div>

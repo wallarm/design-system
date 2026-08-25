@@ -4,7 +4,6 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 const emptyStateStory = createStoryHelper('pages-emptystate', [
   'Collection Empty',
   'No Filter Results',
-  'No Results',
   'Minimal',
   'No Results Examples',
   'Medallion',
@@ -19,11 +18,6 @@ test.describe('Component: EmptyState', () => {
 
     test('Should render no filter results variant correctly', async ({ page }) => {
       await emptyStateStory.goto(page, 'No Filter Results');
-      await expect(page).toHaveScreenshot();
-    });
-
-    test('Should render no results variant correctly', async ({ page }) => {
-      await emptyStateStory.goto(page, 'No Results');
       await expect(page).toHaveScreenshot();
     });
 
