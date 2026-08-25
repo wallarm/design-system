@@ -57,3 +57,8 @@ Keep the three parking lots distinct, because mixing them loses things:
   `CodeSnippetShowMoreButton` → one lowercase run). Reword the label in plain
   words instead — identifiers belong in the story sentence, where the prose keeps
   its case. Found converting `CodeSnippet`'s three `ShowMore` labels.
+- Run `typecheck` after **every** file, not per batch. Normalising a curly
+  apostrophe to a straight one inside a single-quoted TS string breaks the file,
+  and the failure surfaces only as `Unable to index …` in Storybook's own output —
+  the rendered page 404s with no error on it. Biome's `check` did not catch it
+  either. Found on `SimpleCharts/Overview`.

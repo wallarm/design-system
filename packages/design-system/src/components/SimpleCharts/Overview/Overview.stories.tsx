@@ -72,7 +72,7 @@ const severityData: HorizontalBarStackDatum[] = [
 
 const DESCRIPTION = [
   'The family of self-contained charts for a dashboard card: each owns its own data and they all share one frame — `Chart`, with `ChartHeader`, `ChartTitle` and `ChartActions`.',
-  'This page is the family portrait, for checking they still read as one system after any one of them changes; the API and the interaction stories live on each chart's own page, and `Chart` by itself is the frame rather than a chart to reach for.',
+  "This page is the family portrait, for checking they still read as one system after any one of them changes; the API and the interaction stories live on each chart's own page, and `Chart` by itself is the frame rather than a chart to reach for.",
 ].join(' ');
 
 const meta = {
