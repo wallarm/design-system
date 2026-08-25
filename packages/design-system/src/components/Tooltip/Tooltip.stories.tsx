@@ -78,7 +78,9 @@ export const WithDescription: StoryFn<typeof meta> = () => (
 export const WithNestedDialog: StoryFn<typeof meta> = () => (
   <Dialog>
     <DialogTrigger asChild>
-      <Button>Open dialog with nested tooltip</Button>
+      <Button variant='outline' color='neutral'>
+        Open dialog with nested tooltip
+      </Button>
     </DialogTrigger>
 
     <DialogContent>

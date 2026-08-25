@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { Button } from '../Button';
 import {
   OverflowTooltip,
   OverflowTooltipContent,
@@ -180,7 +181,7 @@ export const CustomTooltipContent: StoryFn<OverflowTooltipProps> = () => {
           <OverflowTooltipContent>
             <div className='flex flex-col gap-2'>
               <div className='font-medium text-sm'>API Endpoint</div>
-              <code className='text-xs bg-gray-100 px-2 py-1 rounded'>
+              <code className='rounded-6 bg-component-kbi-tooltip-bg px-4 py-2 font-mono text-text-primary-alt text-xs'>
                 /api/v1/users/1234567890/sessions/abc-def-ghi-jkl-mno/tokens/refresh
               </code>
               <div className='text-xs text-text-secondary'>
@@ -240,7 +241,9 @@ export const ForceTooltip: StoryFn<OverflowTooltipProps> = () => {
         <p className='sb-annotation mb-8'>forced, with extra detail</p>
         <OverflowTooltip forceTooltip>
           <OverflowTooltipTrigger>
-            <button className='px-4 py-2 bg-blue-500 text-white rounded'>Click for info</button>
+            <Button variant='outline' color='neutral'>
+              Click for info
+            </Button>
           </OverflowTooltipTrigger>
           <OverflowTooltipContent>
             <div className='flex flex-col gap-2'>
@@ -326,8 +329,9 @@ export const DynamicContent: StoryFn<OverflowTooltipProps> = () => {
         </OverflowTooltip>
       </div>
 
-      <button
-        className='px-4 py-2 bg-blue-500 text-white rounded'
+      <Button
+        variant='outline'
+        color='neutral'
         onClick={() => {
           const texts = [
             'Short text',
@@ -340,7 +344,7 @@ export const DynamicContent: StoryFn<OverflowTooltipProps> = () => {
         }}
       >
         Change Text
-      </button>
+      </Button>
     </div>
   );
 };

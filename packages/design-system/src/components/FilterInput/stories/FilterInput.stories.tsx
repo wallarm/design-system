@@ -159,7 +159,7 @@ export const WithPresetValue: Story = {
           placeholder='Type to filter...'
         />
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -189,7 +189,7 @@ export const WithMultiConditionPreset: Story = {
           placeholder='Type to filter...'
         />
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -242,7 +242,7 @@ export const WithDisabledChips: Story = {
           placeholder='Add more filters...'
         />
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -554,7 +554,7 @@ export const NestedValueSubmenu: Story = {
             placeholder='Filter by attack type…'
           />
           {value && (
-            <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+            <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
               <pre>{JSON.stringify(value, null, 2)}</pre>
             </div>
           )}

@@ -151,8 +151,8 @@ export const Overview: StoryFn<typeof meta> = () => {
 
         <Button
           data-testid='tour-start'
-          variant='primary'
-          color='brand'
+          variant='secondary'
+          color='neutral'
           size='large'
           onClick={() => tour.start()}
         >
@@ -237,8 +237,8 @@ export const Placement: StoryFn<typeof meta> = () => {
 
         <Button
           data-testid='tour-start'
-          variant='primary'
-          color='brand'
+          variant='secondary'
+          color='neutral'
           size='large'
           onClick={() => tour.start()}
         >
@@ -345,8 +345,8 @@ export const WaitForInteraction: StoryFn<typeof meta> = () => {
 
         <Button
           data-testid='tour-start'
-          variant='primary'
-          color='brand'
+          variant='secondary'
+          color='neutral'
           size='large'
           onClick={() => tour.start()}
         >
@@ -452,8 +452,8 @@ export const WaitForInput: StoryFn<typeof meta> = () => {
 
         <Button
           data-testid='tour-start'
-          variant='primary'
-          color='brand'
+          variant='secondary'
+          color='neutral'
           size='large'
           onClick={() => tour.start()}
         >

@@ -2,6 +2,7 @@ import type React from 'react';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
 import { fn } from 'storybook/test';
+import { Skeleton } from '../../Skeleton';
 import { FilterInput } from '../FilterInput';
 import {
   createStatusCodeInputFilter,
@@ -649,7 +650,7 @@ export const Default: Story = {
 
         {/* Debug output */}
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -679,7 +680,7 @@ export const SuggestionsOnly: Story = {
         />
 
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -729,7 +730,7 @@ export const Simple: Story = {
         />
 
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre data-testid='expression-debug'>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -753,7 +754,7 @@ export const BackendIntegration: Story = {
     });
 
     if (!metadata) {
-      return <div className='h-40 bg-gray-100 rounded-8 animate-pulse' />;
+      return <Skeleton width='100%' height='40px' />;
     }
 
     return (
