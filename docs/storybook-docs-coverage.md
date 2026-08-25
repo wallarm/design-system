@@ -93,11 +93,11 @@
 | ✅ | Inputs/Slider | 14 | 14 | `components/Slider/Slider.stories.tsx` |
 | ✅ | Inputs/Switch | 6 | 6 | `components/Switch/Switch.stories.tsx` |
 | ✅ | Inputs/Textarea | 8 | 8 | `components/Textarea/Textarea.stories.tsx` |
-| 🟡 | Layout/AnimatedBackground | 4 | 0 | `components/AnimatedBackground/AnimatedBackground.stories.tsx` |
-| ☐ | Layout/Flex | 5 | 0 | `components/Flex/Flex.stories.tsx` |
-| 🟡 | Layout/Page | 2 | 0 | `components/Page/Page.stories.tsx` |
-| ☐ | Layout/ScrollArea | 2 | 0 | `components/ScrollArea/ScrollArea.stories.tsx` |
-| ☐ | Layout/Stack | 6 | 0 | `components/Stack/Stack.stories.tsx` |
+| ✅ | Layout/AnimatedBackground | 4 | 4 | `components/AnimatedBackground/AnimatedBackground.stories.tsx` |
+| ✅ | Layout/Flex | 5 | 5 | `components/Flex/Flex.stories.tsx` |
+| ✅ | Layout/Page | 2 | 2 | `components/Page/Page.stories.tsx` |
+| ✅ | Layout/ScrollArea | 2 | 2 | `components/ScrollArea/ScrollArea.stories.tsx` |
+| ✅ | Layout/Stack | 6 | 6 | `components/Stack/Stack.stories.tsx` |
 | ✅ | Loading/Loader | 5 | 5 | `components/Loader/Loader.stories.tsx` |
 | ✅ | Loading/Progress | 5 | 5 | `components/Progress/Progress.stories.tsx` |
 | ✅ | Loading/Skeleton | 4 | 4 | `components/Skeleton/Skeleton.stories.tsx` |

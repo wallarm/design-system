@@ -709,3 +709,54 @@ Not findings — decisions worth remembering so they are not rediscovered.
   reach for a success banner.
 - **Found while** — documenting the messaging family.
 - **Status** — Open.
+
+### Stack: children that are not elements are silently dropped
+
+- **What** — `Stack` maps its children through `getValidChildren`, which filters on
+  `isValidElement`, so a bare string or number child renders nothing at all:
+  `<VStack>Saving…</VStack>` is empty.
+- **Evidence** — `Stack/Stack.tsx` (the `clones` memo) and `Stack/utils.ts`
+  (`Children.toArray(children).filter(isValidElement)`). `Flex` next to it has no
+  such filter and renders text fine.
+- **Why it matters** — It is the most-used layout primitive in the library and the
+  failure is silent: no warning, no fallback, just missing content. The two
+  siblings also behave differently on the same input, which nobody would predict.
+- **Suggested action** — Either render non-element children as-is, or warn in
+  development. The Storybook page now states the rule, but a component that
+  swallows content deserves better than a documented workaround.
+- **Found while** — documenting `Stack`.
+- **Status** — Open.
+
+### Layout stories: stock-blue demo boxes, and one example that cannot show its own point
+
+- **What** — `Flex`, `Stack` and `ScrollArea` all build their specimens from a
+  local `Box` helper coloured `bg-blue-500`, a raw Tailwind hue rather than a
+  token. In `Stack`'s `FlexBehavior`, the `fullWidth` row is visually identical to
+  the `default` row, because the boxes are a fixed width and stretching the
+  container changes nothing you can see.
+- **Evidence** — the `Box` helpers in `Flex.stories.tsx`, `Stack.stories.tsx` and
+  `ScrollArea.stories.tsx`; the second group of `FlexBehavior`.
+- **Why it matters** — These are the pages people open to learn the spacing
+  system, and the colour in them exists in no product screen. An example that
+  cannot demonstrate the prop it is named after teaches nothing.
+- **Suggested action** — Move the `Box` helpers onto a neutral token surface, and
+  give the `fullWidth` example a child that actually fills (or a visible container
+  edge) so the difference shows.
+- **Found while** — documenting the layout folder.
+- **Status** — Open.
+
+### AnimatedBackground: the description promised it never takes pointer events
+
+- **What** — The old page description said the background "never intercepts
+  pointer events". The pixel variant's `game` prop switches on `pointer-events-auto`
+  while the game runs, and the `PixelWithCard` story turns it on without saying so.
+- **Evidence** — `AnimatedBackground/pixel/PixelBackground.tsx` (`gameActive &&
+  'pointer-events-auto'`, twice) against the previous `docs.description.component`.
+  Corrected on the page in this pass.
+- **Why it matters** — Anyone laying interactive content over the background would
+  have trusted the old sentence. It is also the only place `game` is documented at
+  all, and it is a genuine feature rather than dead code.
+- **Suggested action** — Decide whether `game` is a supported prop or an easter egg
+  that should be hidden from the API, and say which in the component's own docs.
+- **Found while** — documenting `AnimatedBackground`.
+- **Status** — Open.
