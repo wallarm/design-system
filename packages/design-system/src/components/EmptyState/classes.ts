@@ -15,20 +15,24 @@ export const emptyStateVariants = cva('flex flex-col items-center text-center m-
 });
 
 /**
- * The medallion: a 36px raised tile holding a 16px glyph. `text-base` sets the
- * 16px em box, so an icon left at its default `size='inherit'` lands on spec
- * without every call site restating a size.
+ * The medallion: a 36px raised tile holding a 20px glyph, which with `p-8` fills
+ * the content box exactly. `text-xl` sets the 20px em box, so an icon left at
+ * its default `size='inherit'` lands on spec without every call site restating
+ * a size.
+ *
+ * The Figma master's placeholder is 16px at 10px padding, but every applied
+ * instance and the medallion spec sheet itself use 20px at 8px — the file is
+ * inconsistent here, and the 20/8 pairing is the one that fills the tile.
  *
  * There is deliberately no unframed variant — the spec never shows a bare glyph,
  * at either scale, so an illustration always carries the tile.
  *
- * The tile is `rounded-12`, not the 16px Figma reports. Figma draws it with
- * corner smoothing (an iOS-style squircle), which reads as flatter sides than
- * the same radius in CSS — a plain 16px radius on a 36px box collapses into a
- * circle. 12px matches the drawn silhouette.
+ * The corner radius is set by the `empty-state-medallion` utility, not a
+ * `rounded-*` class here — see that file for why the spec's 16px needs
+ * `corner-shape` to reproduce, and what the fallback does.
  */
 export const emptyStateIllustrationVariants = cva(
-  'empty-state-medallion flex items-center justify-center shrink-0 size-36 rounded-12 border p-8 text-base text-icon-secondary',
+  'empty-state-medallion flex items-center justify-center shrink-0 size-36 border p-8 text-xl text-icon-secondary',
 );
 
 export const emptyStateMessageVariants = cva('flex flex-col items-center', {

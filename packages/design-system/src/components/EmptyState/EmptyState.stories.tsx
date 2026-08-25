@@ -38,7 +38,7 @@ const meta = {
           'EmptyStateDescription, EmptyStateActions, EmptyStateLink.\n\n' +
           '`type` picks the scale, and every slot follows it from context — no need to restate it on ' +
           'children. `collection-empty` is the page-level treatment: a medallion (a 36px raised tile ' +
-          'holding a 16px icon), a pixel title, and room for actions plus a link. `no-results` is the ' +
+          'holding a 20px icon), a pixel title, and room for actions plus a link. `no-results` is the ' +
           'compact inline treatment for a card, dropdown or select menu: 240px wide, with a 14px ' +
           'secondary title. An illustration always carries the medallion — there is no bare glyph.\n\n' +
           'Scale is not the same question as cause. A page-level "no filter matches" state still uses ' +
