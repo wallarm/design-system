@@ -878,6 +878,25 @@ Not findings — decisions worth remembering so they are not rediscovered.
   can't read it" — and in the second case hovering says nothing.
 - **Suggested action** — Either give the invalid branch its own tooltip, or decide
   deliberately that both read as "No data" and share the branch. Not documented on
-  the page, since no story renders an invalid value.
+  the page, since no story renders an invalid value. `FormatNumber` treats
+  `NaN`/`Infinity` exactly the same way, so this is a house pattern rather than a
+  one-off slip — which makes it worth settling once, for both.
 - **Found while** — writing the `NullValue` sentence.
+- **Status** — Open.
+
+### FormatNumber drops the unit from the cell as soon as the number abbreviates
+
+- **What** — In the `WithUnit` story, `42` renders "42 requests" and `500`
+  (standard) renders "500 requests", but `12,042` renders a bare "12k" and
+  `59,614,283` a bare "59.6M". The unit survives in the tooltip and the accessible
+  name only. The three branches in `FormatNumber.tsx` differ: abbreviated **with**
+  a tooltip appends no unit, abbreviated **without** one does, unabbreviated does.
+- **Why it matters** — In a column of mixed magnitudes the unit appears and
+  disappears row by row, which reads as a bug rather than a rule, and the reader
+  who most needs the unit — the one looking at the abbreviated figure — is the one
+  who does not get it.
+- **Suggested action** — Decide one rule: either the unit always shows beside the
+  value, or never does and the label carries it. Documented as-shipped for now.
+- **Found while** — checking the `WithUnit` story on the page against the three
+  return branches.
 - **Status** — Open.
