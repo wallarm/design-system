@@ -63,7 +63,7 @@
 | ✅ | Data Display/List | 5 | 5 | `components/List/List.stories.tsx` |
 | ✅ | Data Display/OverflowList | 5 | 5 | `components/OverflowList/OverflowList.stories.tsx` |
 | ✅ | Data Display/ParameterPath | 11 | 11 | `components/ParameterPath/ParameterPath.stories.tsx` |
-| 🟡 | Data Display/PasswordComplexity | 4 | 0 | `components/PasswordComplexity/PasswordComplexity.stories.tsx` |
+| ✅ | Data Display/PasswordComplexity | 4 | 4 | `components/PasswordComplexity/PasswordComplexity.stories.tsx` |
 | ☐ | Data Display/ResponseCode | 6 | 0 | `components/ResponseCode/ResponseCode.stories.tsx` |
 | 🟡 | Data Display/Table | 33 | 3 | `components/Table/Table.stories.tsx` |
 | 🟡 | Data Display/Timeline | 3 | 0 | `components/Timeline/Timeline.stories.tsx` |
