@@ -66,19 +66,80 @@ describe('parseExamples', () => {
       expect(controlled.code).toContain('useState');
     });
 
-    it('Basic has description from JSDoc', () => {
+    it('Basic takes its description from the JSDoc above the export', () => {
       const basic = examples.find(e => e.name === 'Basic')!;
-      expect(basic.description).toBe('Basic uncontrolled dialog');
+      // Deliberately not asserting the sentence itself — see the fixture block
+      // below. This only proves the JSDoc reaches `description` for a real
+      // component, which is what the parser is responsible for.
+      expect(typeof basic.description).toBe('string');
+      expect(basic.description).not.toBe('');
+      expect(basic.description).not.toBe(basic.name);
     });
 
     it('Scrollable is included', () => {
       const scrollable = examples.find(e => e.name === 'Scrollable');
       expect(scrollable).toBeDefined();
     });
+  });
 
-    it('WithFooterLeftActions has description from JSDoc (priority over .parameters)', () => {
-      const story = examples.find(e => e.name === 'WithFooterLeftActions')!;
-      expect(story.description).toBe('With footer left actions');
+  /**
+   * Description resolution is tested against a fixture, not a shipped story file.
+   *
+   * These cases used to assert the exact prose of two `Dialog` stories, which
+   * coupled a parser test to editorial copy: every documentation edit broke the
+   * suite, and one of the two assertions was pinned to a JSDoc line that merely
+   * restated its own story name. The fixture also keeps the precedence case
+   * meaningful — no story file in the library uses the `.parameters` form any
+   * more, so nothing real can exercise "JSDoc wins" any longer.
+   */
+  describe('description sources (fixture)', () => {
+    const FIXTURE = `
+import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+
+const meta = {} satisfies Meta<unknown>;
+export default meta;
+
+/** Documented with JSDoc. */
+export const FromJsDoc: StoryFn = () => null;
+
+export const FromParameters: StoryFn = () => null;
+FromParameters.parameters = { docs: { description: { story: 'Documented with parameters.' } } };
+
+/** JSDoc wins. */
+export const HasBoth: StoryFn = () => null;
+HasBoth.parameters = { docs: { description: { story: 'Parameters lose.' } } };
+
+export const HasNeither: StoryFn = () => null;
+`;
+
+    const fixtureProject = new Project({ useInMemoryFileSystem: true });
+    fixtureProject.createSourceFile('/fixture/Fixture.stories.tsx', FIXTURE);
+    const examples = parseExamples(fixtureProject, '/fixture', 'Fixture');
+    const byName = (name: string) => examples.find(e => e.name === name)!;
+
+    it('extracts every exported story', () => {
+      expect(examples.map(e => e.name)).toEqual([
+        'FromJsDoc',
+        'FromParameters',
+        'HasBoth',
+        'HasNeither',
+      ]);
+    });
+
+    it('reads a description from JSDoc', () => {
+      expect(byName('FromJsDoc').description).toBe('Documented with JSDoc.');
+    });
+
+    it('reads a description from a .parameters assignment', () => {
+      expect(byName('FromParameters').description).toBe('Documented with parameters.');
+    });
+
+    it('prefers JSDoc when a story carries both', () => {
+      expect(byName('HasBoth').description).toBe('JSDoc wins.');
+    });
+
+    it('leaves description unset when a story carries neither', () => {
+      expect(byName('HasNeither').description).toBeUndefined();
     });
   });
 
