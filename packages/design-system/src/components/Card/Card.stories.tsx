@@ -96,11 +96,12 @@ export const Basic: StoryFn<CardProps> = ({ ...args }) => {
           Badge
         </Badge>
       </CardHeader>
+
       <CardContent>Card description</CardContent>
+
       <CardFooter>
         <Button
           variant='secondary'
-          size='small'
           color='neutral'
           onClick={e => {
             onButtonClick(e);
