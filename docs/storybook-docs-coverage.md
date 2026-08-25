@@ -67,7 +67,7 @@
 | ☐ | Data Display/ResponseCode | 6 | 0 | `components/ResponseCode/ResponseCode.stories.tsx` |
 | 🟡 | Data Display/Table | 33 | 3 | `components/Table/Table.stories.tsx` |
 | 🟡 | Data Display/Timeline | 3 | 0 | `components/Timeline/Timeline.stories.tsx` |
-| 🟡 | Data display/CodeSnippet/CodeSnippet | 25 | 25 | `components/CodeSnippet/CodeSnippet.stories.tsx` |
+| ✅ | Data display/CodeSnippet/CodeSnippet | 25 | 25 | `components/CodeSnippet/CodeSnippet.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/BarList | 13 | 0 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/Chart | 6 | 0 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
 | 🟡 | Data display/SimpleCharts/HorizontalBarStack | 8 | 2 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |

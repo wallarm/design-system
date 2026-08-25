@@ -20,17 +20,17 @@ import { CodeSnippetTitle } from './CodeSnippetTitle';
 import { CodeSnippetWrapButton } from './CodeSnippetWrapButton';
 import { getHttpFolds } from './lib/httpFolds';
 
+const DESCRIPTION = [
+  'A block of code to be read and copied, never edited — reach for `InlineCodeSnippet` when the code belongs inside a sentence, and a real editor when the value is meant to change.',
+  'Everything beyond the code is composed: a `CodeSnippetHeader` carrying a title or tabs, `CodeSnippetActions` for copy, wrap and fullscreen, `CodeSnippetLineNumbers`, and per-line colour, prefixes and folds — and highlighting happens only inside a `CodeSnippetAdapterProvider`.',
+].join(' ');
+
 const meta = {
   title: 'Data display/CodeSnippet/CodeSnippet',
   component: CodeSnippetRoot,
   parameters: {
     layout: 'padded',
-    docs: {
-      description: {
-        component:
-          'CodeSnippet renders code with optional syntax highlighting, actions, line numbers, annotations, folding, fullscreen mode, wrapping, and maxLines-based show-more collapse. For ordinary collapsed snippets, set maxLines on CodeSnippetRoot and use the default auto-rendered show-more button. Add CodeSnippetShowMoreButton as a direct child only when the real show-more <button> needs consumer props such as data-analytics-id, data-testid, aria-* attributes, ref, event handlers, or Button props; CodeSnippetRoot then suppresses the auto-rendered default.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
     design: {
       type: 'figma',
       url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=3087-29516&m=dev',
@@ -64,7 +64,8 @@ const jsonCode = `{
 }`;
 
 /**
- * Basic code snippet with plain text rendering.
+ * The block with no adapter in scope — mono type on a tinted surface, and the plain
+ * fallback rather than an absence of highlighting to fix.
  */
 export const Default: StoryFn<typeof meta> = () => (
   <CodeSnippetRoot code={bashCode} language='text'>
@@ -75,7 +76,8 @@ export const Default: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Code snippet with line numbers displayed.
+ * `CodeSnippetLineNumbers` is a sibling of the code inside `CodeSnippetContent`, so the
+ * gutter is something you compose in rather than a prop you switch on.
  */
 export const WithLineNumbers: StoryFn<typeof meta> = () => (
   <CodeSnippetRoot code={sampleCode} language='text'>
@@ -87,12 +89,13 @@ export const WithLineNumbers: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Different size variants: sm, md (default), lg.
+ * The three sizes. `sm` is the default at 12px; `md` and `lg` step the code to 14 and
+ * 16px for a block meant to be read from further away.
  */
 export const Sizes: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <VStack align='start' gap={4}>
-      <span className='text-xs text-text-secondary font-medium'>sm</span>
+      <span className='sb-annotation'>sm (default)</span>
       <CodeSnippetRoot code={bashCode} language='text' size='sm'>
         <CodeSnippetContent>
           <CodeSnippetCode />
@@ -101,7 +104,7 @@ export const Sizes: StoryFn<typeof meta> = () => (
     </VStack>
 
     <VStack align='start' gap={4}>
-      <span className='text-xs text-text-secondary font-medium'>md (default)</span>
+      <span className='sb-annotation'>md</span>
       <CodeSnippetRoot code={bashCode} language='text' size='md'>
         <CodeSnippetContent>
           <CodeSnippetCode />
@@ -110,7 +113,7 @@ export const Sizes: StoryFn<typeof meta> = () => (
     </VStack>
 
     <VStack align='start' gap={4}>
-      <span className='text-xs text-text-secondary font-medium'>lg</span>
+      <span className='sb-annotation'>lg</span>
       <CodeSnippetRoot code={bashCode} language='text' size='lg'>
         <CodeSnippetContent>
           <CodeSnippetCode />
@@ -121,9 +124,8 @@ export const Sizes: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Line annotations with different colors.
- * Each line can have a color (danger, warning, info, success, brand, ai, neutral)
- * and an optional prefix (text, icon, etc.).
+ * `lines`, keyed by line number, tints a line and hangs a prefix off it — here a
+ * tooltipped icon on each of the three headers worth calling out.
  */
 export const LineAnnotations: StoryFn<typeof meta> = () => {
   const httpCode = `Host: inventory.example.com
@@ -183,7 +185,8 @@ Cache-Control: no-cache`;
 };
 
 /**
- * All available line colors.
+ * The seven line colours are semantic, so choose by what the line means — `danger` for
+ * the attack, `info` for the aside — not by which tint reads best.
  */
 export const LineColors: StoryFn<typeof meta> = () => {
   const colorsCode = `Line 1: Default (no color)
@@ -218,11 +221,9 @@ Line 8: Neutral color`;
 };
 
 /**
- * Highlight specific character ranges within lines with colored bold text.
- * Ranges define start (inclusive) and end (exclusive) character indices.
- * When ranges are present, the whole-line text color is suppressed;
- * only the specified ranges get colored + bold text.
- * The line background/border from `color` still applies.
+ * `ranges` narrows the emphasis to character offsets inside the line — start inclusive,
+ * end exclusive — and once a line has them only the range is coloured, though the
+ * line's own background stays.
  */
 export const LineRanges: StoryFn<typeof meta> = () => {
   const httpCode = `GET /api/v2/users HTTP/1.1
@@ -258,8 +259,8 @@ Cache-Control: no-cache`;
 };
 
 /**
- * Text styles for lines: regular, medium, italic.
- * Each color has a default text style, but it can be overridden.
+ * `textStyle` overrides the weight or slant a colour would have chosen, with `className`
+ * and `style` left for the cases the three named styles do not cover.
  */
 export const TextStyles: StoryFn<typeof meta> = () => {
   const stylesCode = `Line 1: Default (regular)
@@ -292,7 +293,8 @@ Line 7: Custom inline style`;
 };
 
 /**
- * Lines with prefix content (text, symbols).
+ * A `+` and `-` prefix over `success` and `danger` lines gives you a diff without a diff
+ * component.
  */
 export const LineWithPrefix: StoryFn<typeof meta> = () => {
   const diffCode = `const greeting = "Hello";
@@ -321,8 +323,8 @@ export default greeting;`;
 };
 
 /**
- * Line wrapping enabled for long lines.
- * Includes examples with annotations and folds in wrap mode.
+ * `wrapLines` against the same code unwrapped, in three pairs — what to check is that
+ * prefixes, colour sticks and fold toggles stay on the first visual row of a wrapped line.
  */
 export const LineWrapping: StoryFn<typeof meta> = () => {
   const longCode = `const veryLongVariableName = "This is a very long string that will demonstrate line wrapping behavior when the content exceeds the container width";
@@ -341,7 +343,7 @@ Accept: application/json
   return (
     <VStack gap={16}>
       <VStack align='start' gap={4}>
-        <span className='text-xs text-text-secondary font-medium'>Without wrapping</span>
+        <span className='sb-annotation'>Without wrapping</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot code={longCode} language='text'>
             <CodeSnippetContent>
@@ -353,7 +355,7 @@ Accept: application/json
       </VStack>
 
       <VStack align='start' gap={4}>
-        <span className='text-xs text-text-secondary font-medium'>With wrapping</span>
+        <span className='sb-annotation'>With wrapping</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot code={longCode} language='text' wrapLines>
             <CodeSnippetContent>
@@ -364,9 +366,7 @@ Accept: application/json
         </div>
       </VStack>
       <VStack align='start' gap={4}>
-        <span className='text-xs text-text-secondary font-medium'>
-          Without wrapping with annotations
-        </span>
+        <span className='sb-annotation'>Without wrapping, with annotations</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot
             code={longCode}
@@ -384,7 +384,7 @@ Accept: application/json
         </div>
       </VStack>
       <VStack align='start' gap={4}>
-        <span className='text-xs text-text-secondary font-medium'>Wrapping with annotations</span>
+        <span className='sb-annotation'>Wrapping with annotations</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot
             code={longCode}
@@ -403,7 +403,7 @@ Accept: application/json
         </div>
       </VStack>
       <VStack align='start' gap={4}>
-        <span className='text-xs text-text-secondary font-medium'>Folds without wrapping</span>
+        <span className='sb-annotation'>Folds without wrapping</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot
             code={httpCode}
@@ -418,7 +418,7 @@ Accept: application/json
         </div>
       </VStack>
       <VStack align='start' gap={4}>
-        <span className='text-xs text-text-secondary font-medium'>Folds with wrapping</span>
+        <span className='sb-annotation'>Folds with wrapping</span>
         <div style={{ maxWidth: '600px' }}>
           <CodeSnippetRoot
             code={httpCode}
@@ -471,8 +471,8 @@ const processor = new DataProcessor(config);
 export { processData, fetchUserData, DataProcessor };`;
 
 /**
- * Code snippet with both vertical and horizontal scrolling.
- * The container is constrained to show scrollbars.
+ * Given a fixed height inside a narrow column, the block scrolls in both directions
+ * rather than pushing its container around.
  */
 export const WithBothScrolls: StoryFn<typeof meta> = () => (
   <div style={{ maxWidth: '500px', maxHeight: '300px', background: 'white' }}>
@@ -496,7 +496,7 @@ export const WithBothScrolls: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Custom starting line number.
+ * `startingLineNumber` renumbers the gutter, for a fragment lifted out of a longer file.
  */
 export const CustomStartingLine: StoryFn<typeof meta> = () => (
   <CodeSnippetRoot code={sampleCode} language='text' startingLineNumber={97}>
@@ -508,8 +508,8 @@ export const CustomStartingLine: StoryFn<typeof meta> = () => (
 );
 
 /**
- * JSON code with Shiki syntax highlighting.
- * Shiki provides VS Code-quality highlighting (~200KB+ with WASM).
+ * Shiki, supplied through `CodeSnippetAdapterProvider` — VS Code's own grammars, and the
+ * heaviest of the three adapters at roughly 200KB plus WASM.
  */
 export const JSONWithShiki: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
@@ -547,8 +547,8 @@ const users: User[] = [];
 export { fetchUser, users };`;
 
 /**
- * Typescript code with Prism syntax highlighting.
- * Prism is lightweight (~15KB) and good for most use cases.
+ * Prism, at roughly 15KB, is the one to reach for unless something forces otherwise;
+ * this is TypeScript under it.
  */
 export const TypescriptWithPrism: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
@@ -571,8 +571,8 @@ const curlCode = `curl -X POST "https://api.wallarm.com/v2/node" \\
   }'`;
 
 /**
- * Bash code with Prism syntax highlighting.
- * Prism is lightweight (~15KB) and good for most use cases.
+ * A multi-line `curl` under Prism, where the continuation backslashes and the quoted JSON
+ * body are the parts a highlighter usually gets wrong.
  */
 export const BashWithPrism: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
@@ -611,8 +611,8 @@ const htmlCode = `<!DOCTYPE html>
 </html>`;
 
 /**
- * HTML code with highlight.js syntax highlighting.
- * highlight.js is well-established (~30KB) with good language support.
+ * highlight.js sits between the other two at roughly 30KB, with the longest language list
+ * of the three.
  */
 export const HTMLWithHighlightJs: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadHighlightJsAdapter}>
@@ -634,8 +634,8 @@ User-Agent: WallarmSDK/2.0
 Cache-Control: no-cache`;
 
 /**
- * HTTP request with Prism syntax highlighting.
- * Highlights HTTP method, URL, version, header names and values.
+ * `language='http'` is a grammar in its own right — method, path and version on the first
+ * line, then header names told apart from their values.
  */
 export const HTTPRequestWithPrism: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
@@ -662,8 +662,8 @@ Cache-Control: no-store
 }`;
 
 /**
- * HTTP response with Shiki syntax highlighting.
- * Highlights status line, headers, and embedded JSON body.
+ * The response side, where the JSON body after the headers is highlighted as JSON rather
+ * than as more header text.
  */
 export const HTTPResponseWithShiki: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
@@ -677,7 +677,8 @@ export const HTTPResponseWithShiki: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Header with a simple title.
+ * `CodeSnippetHeader` with a `CodeSnippetTitle` names the file the code came from, as a
+ * bar above the block rather than a caption on it.
  */
 export const WithHeader: StoryFn<typeof meta> = () => (
   <CodeSnippetRoot code={bashCode} language='text'>
@@ -698,11 +699,8 @@ const packageManagerCodes: Record<string, string> = {
 };
 
 /**
- * Header with tabs for switching between package managers and a copy action.
- * Matches Figma node 3099:5956.
- *
- * The tab indicator sits directly on the header's bottom border —
- * the tab list itself has **no** border of its own.
+ * Tabs in the header swap the `code` the block is given, which is how one command per
+ * package manager is built; the actions sit at the far end of the same bar.
  */
 export const WithTabsAndActions: StoryFn<typeof meta> = () => {
   const [tab, setTab] = useState('npm');
@@ -733,9 +731,8 @@ export const WithTabsAndActions: StoryFn<typeof meta> = () => {
 };
 
 /**
- * Floating actions without a header.
- * Actions are positioned absolute at the top-right corner of the code snippet.
- * Matches Figma node 3092:13248.
+ * With no header to hold them, `CodeSnippetActions` floats over the top-right of the code
+ * — the shape for a block whose only affordance is copy.
  */
 export const WithFloatingActions: StoryFn<typeof meta> = () => (
   <div style={{ width: '320px' }}>
@@ -785,19 +782,14 @@ Authorization: Bearer token123
 X-Request-ID: abc-def-ghi`;
 
 /**
- * Show more / show less with threshold behavior.
- * First snippet (12 lines, maxLines=7) shows the button (5 hidden).
- * Second snippet (9 lines, maxLines=7) hides only 2 lines — below
- * the threshold of 3, so all lines are shown without the button.
- * Third snippet provides an explicit CodeSnippetShowMoreButton for
- * per-button analytics; root does not auto-render a second button.
+ * `maxLines` clips the block and adds the control itself — but only when it would hide at
+ * least three lines, so the middle snippet stays open; the third passes props to the real
+ * button by rendering `CodeSnippetShowMoreButton` in place of the automatic one.
  */
 export const ShowMore: StoryFn<typeof meta> = () => (
   <div style={{ display: 'flex', flexDirection: 'column', gap: '24px', width: '500px' }}>
     <div>
-      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>
-        12 lines, maxLines=7 — 5 hidden, button shown
-      </p>
+      <p className='sb-annotation mb-8'>12 lines, clipped at 7 — 5 hidden</p>
       <CodeSnippetRoot code={showMoreCode} language='text' maxLines={7}>
         <CodeSnippetContent>
           <CodeSnippetCode />
@@ -805,9 +797,7 @@ export const ShowMore: StoryFn<typeof meta> = () => (
       </CodeSnippetRoot>
     </div>
     <div>
-      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>
-        9 lines, maxLines=7 — 2 hidden, below threshold, no button
-      </p>
+      <p className='sb-annotation mb-8'>9 lines, clipped at 7 — 2 hidden, no button</p>
       <CodeSnippetRoot code={showMoreThresholdCode} language='text' maxLines={7}>
         <CodeSnippetContent>
           <CodeSnippetCode />
@@ -815,9 +805,7 @@ export const ShowMore: StoryFn<typeof meta> = () => (
       </CodeSnippetRoot>
     </div>
     <div>
-      <p style={{ margin: '0 0 8px', fontSize: '14px', color: '#64748b' }}>
-        Explicit CodeSnippetShowMoreButton for per-button analytics
-      </p>
+      <p className='sb-annotation mb-8'>the button rendered by hand</p>
       <CodeSnippetRoot code={showMoreCode} language='text' maxLines={7}>
         <CodeSnippetContent>
           <CodeSnippetCode />
@@ -878,7 +866,8 @@ Cache-Control: private, max-age=0
 }`;
 
 /**
- * HTTP Request with foldable headers and body using `getHttpFolds`.
+ * `getHttpFolds` reads an HTTP message and returns its fold regions, so the reader opens
+ * the headers or the body rather than scrolling past both.
  */
 export const HTTPRequestWithFolding: StoryFn<typeof meta> = () => (
   <CodeSnippetRoot
@@ -894,7 +883,7 @@ export const HTTPRequestWithFolding: StoryFn<typeof meta> = () => (
 );
 
 /**
- * HTTP Response with foldable headers and body using `getHttpFolds`.
+ * The same helper on a response, where the body is usually the half worth folding away.
  */
 export const HTTPResponseWithFolding: StoryFn<typeof meta> = () => (
   <CodeSnippetRoot
@@ -910,8 +899,8 @@ export const HTTPResponseWithFolding: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Folds combined with line highlights — colors and decorations
- * on folded lines are hidden when collapsed, visible when expanded.
+ * Folds over coloured lines: a collapsed fold takes its colours and prefixes with it, and
+ * hands them back on expand.
  */
 export const WithFoldingExpanded: StoryFn<typeof meta> = () => (
   <CodeSnippetRoot
@@ -933,9 +922,8 @@ export const WithFoldingExpanded: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Folds combined with maxLines (ShowMore) and a custom startingLineNumber.
- * Fold line numbers are absolute — `getHttpFolds` accepts `startingLineNumber`
- * to offset them automatically.
+ * Folds, `maxLines` and `startingLineNumber` together — fold line numbers are absolute, so
+ * `getHttpFolds` has to be given the same offset the gutter uses.
  */
 export const WithFoldingAndShowMore: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>

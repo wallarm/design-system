@@ -854,3 +854,16 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Found while** — linting after writing Card's prose; the warnings predate this
   branch.
 - **Status** — Open.
+
+### CodeSnippet's `Sizes` story labelled the wrong default
+
+- **What** — The annotation above the middle specimen read `md (default)`.
+  `CodeSnippetRoot` defaults to `size = 'sm'` (`CodeSnippetRoot.tsx:94`), and the
+  rendered `Default` story measures 12px against `md`'s 14px.
+- **Why it matters** — It is the only place on the page that states a default, and
+  it stated the wrong one; a reader sizing a block by it would land one step large.
+- **Suggested action** — Corrected in this pass: the label now sits on `sm`. Kept
+  as a record because it is the third inherited-claim error found this way.
+- **Found while** — measuring the rendered font sizes before writing the `Sizes`
+  sentence.
+- **Status** — Closed — label moved to `sm`.
