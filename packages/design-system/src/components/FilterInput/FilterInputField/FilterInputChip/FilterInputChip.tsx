@@ -35,6 +35,9 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
   /** Caps the applied value segment at this width (px), truncating with an
    *  ellipsis; lifts the chip's default max-width so it grows to fit (AS-1064). */
   valueMaxWidth?: number;
+  /** Caret placement when the value segment enters inline-edit (AS-1064).
+   *  `'end'` places the caret at the end; default selects the whole value. */
+  caretMode?: 'select' | 'end';
   /** Second paired triplet (two-step fields). The paired attribute is fixed. */
   pair?: FilterInputChipData['pair'];
   onRemove?: () => void;
@@ -57,6 +60,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   building = false,
   disabled = false,
   valueMaxWidth,
+  caretMode,
   pair,
   onRemove,
   onSegmentClick,
@@ -214,6 +218,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           valueParts={valueParts}
           valueSeparator={valueSeparator}
           errorValueIndices={errorValueIndices}
+          caretMode={caretMode}
           onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.value, e) : undefined}
           onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
           {...segmentEditProps(SEGMENT_VARIANT.value)}

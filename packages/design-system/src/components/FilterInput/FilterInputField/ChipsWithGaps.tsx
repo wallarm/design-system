@@ -59,6 +59,7 @@ export const ChipsWithGaps: FC<ChipsWithGapsProps> = ({
             errorValueIndices={chip.errorValueIndices}
             disabled={chip.disabled}
             valueMaxWidth={chip.valueMaxWidth}
+            caretMode={chip.caretMode}
             pair={chip.pair}
             onRemove={chip.disabled ? undefined : () => onChipRemove(chip.id)}
             onSegmentClick={

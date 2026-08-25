@@ -1,3 +1,4 @@
+export { applyEditCaret } from './applyEditCaret';
 export {
   type ConnectorVariant,
   FilterInputConnectorChip,
