@@ -37,7 +37,7 @@ export default meta;
 const Box: FC<PropsWithChildren<{ className?: string }>> = ({ children, className }) => (
   <div
     className={cn(
-      'flex py-4 px-8 items-center justify-center bg-blue-500 text-white rounded',
+      'flex py-4 px-8 items-center justify-center rounded-6 border border-border-info bg-bg-light-info font-mono text-xs text-text-info',
       className,
     )}
   >

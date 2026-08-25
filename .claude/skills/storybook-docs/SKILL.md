@@ -194,6 +194,15 @@ Three rules, in order of how often they bite:
   Tailwind hue is both louder and off-system; it also contradicts whatever the
   page is teaching. The same goes for debug output — a `bg-gray-100` JSON dump is
   scaffolding too.
+- **Filler blocks are placeholders, so let them look like it.** A layout page
+  demonstrates *arrangement*, and the boxes being arranged carry no meaning: a
+  saturated `bg-blue-500` block makes the filler the loudest thing in a story
+  about spacing. The house treatment, shared by `Flex` / `Stack` / `ScrollArea`,
+  is a soft tinted surface with a legible edge and a mono label —
+  `border border-border-info bg-bg-light-info font-mono text-xs text-text-info`.
+  The border matters: with a fill that pale, it is what still tells you where each
+  box ends, which is the whole point of a layout demo. Mono also gives the
+  numbered fillers tabular digits.
 - **Let an icon carry the meaning, then shrink the label.** Where a control fires
   one of several semantic variants, give it **the icon that variant will actually
   render** — the toast triggers now carry the same `CircleCheck` / `OctagonAlert` /

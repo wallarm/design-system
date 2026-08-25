@@ -6,7 +6,7 @@ import { Stack } from './Stack';
 import { VStack } from './VStack';
 
 const Box = ({ children }: { children: ReactNode }) => (
-  <div className='flex h-24 w-24 items-center justify-center bg-blue-500 text-white rounded text-sm'>
+  <div className='flex h-24 w-24 items-center justify-center rounded-6 border border-border-info bg-bg-light-info font-mono text-xs text-text-info'>
     {children}
   </div>
 );
