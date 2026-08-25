@@ -867,3 +867,17 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Found while** — measuring the rendered font sizes before writing the `Sizes`
   sentence.
 - **Status** — Closed — label moved to `sm`.
+
+### FormatDateTime: an invalid date gets no tooltip, a null one does
+
+- **What** — `value == null` renders the em dash inside a `Tooltip` reading "No
+  data"; an unparseable value renders the same em dash with no tooltip at all
+  (`FormatDateTime.tsx`, the two early returns).
+- **Why it matters** — Both cases look identical on the page, so hovering is the
+  only way to tell "nothing was recorded" from "something was recorded and we
+  can't read it" — and in the second case hovering says nothing.
+- **Suggested action** — Either give the invalid branch its own tooltip, or decide
+  deliberately that both read as "No data" and share the branch. Not documented on
+  the page, since no story renders an invalid value.
+- **Found while** — writing the `NullValue` sentence.
+- **Status** — Open.
