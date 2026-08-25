@@ -953,3 +953,33 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Found while** — cross-reading the description against
   `SimpleCharts/docs/BarList.md`, which already had it right.
 - **Status** — Closed — prose corrected.
+
+### The coverage counts cannot see a sentence attached to the wrong node
+
+- **What** — `Progress`'s `Sizes` sentence sat above the `sizeRows` const rather
+  than above `export const Sizes`, so it never reached the page. The tracker
+  counted the row 5 / 5 regardless, because the count is per file rather than per
+  export.
+- **Why it matters** — It is the same blind spot as the story-description shadow,
+  in the other direction: the tracker reports a page finished while a story on it
+  renders bare. `CodeSnippet` has a related case that is harmless — a leftover
+  JSDoc on a `const` that documents nothing.
+- **Suggested action** — Fixed for `Progress`, and the whole branch is now audited
+  per export rather than per file:
+
+  ```bash
+  # every exported story must be immediately preceded by a JSDoc block
+  python3 - <<'PY'
+  import re, subprocess
+  files = subprocess.run(['git','ls-files','*.stories.tsx'], capture_output=True, text=True).stdout.split()
+  for f in files:
+      src = open(f).read()
+      for m in re.finditer(r'^export const (\w+)', src, re.M):
+          if not src[:m.start()].rstrip().endswith('*/'):
+              print(f, m.group(1))
+  PY
+  ```
+
+  Worth folding into whatever regenerates the tracker counts.
+- **Found while** — running that audit across all 95 files before opening the PR.
+- **Status** — Closed for `Progress`; the count script's blind spot is open.

@@ -63,7 +63,6 @@ Basic.args = {
   showLabel: false,
 };
 
-/** `xs` through `lg`. A thin bar belongs in an inline row; the heavier ones are for an operation the screen is actually about. */
 const sizeRows = [
   { size: 'xs', label: 'xs (default)', value: 20 },
   { size: 'sm', label: 'sm', value: 40 },
@@ -71,6 +70,7 @@ const sizeRows = [
   { size: 'lg', label: 'lg', value: 80 },
 ] as const;
 
+/** `xs` through `lg`. A thin bar belongs in an inline row; the heavier ones are for an operation the screen is actually about. */
 export const Sizes: StoryFn<typeof meta> = () => (
   <div className='flex w-[360px] flex-col gap-16'>
     {sizeRows.map(({ size, label, value }) => (
