@@ -3,18 +3,17 @@ import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Tag } from '../Tag';
 import { OverflowList } from './OverflowList';
 
+const DESCRIPTION = [
+  'Lays a set of items out in one row and folds whatever will not fit into an overflow control — reach for `OverflowTooltip` instead when the thing overrunning is a single run of text rather than a set.',
+  'It renders nothing of its own: both the item and the `+N` are your renderers, so the popover behind the count is your composition, and it re-measures whenever the container changes width.',
+].join(' ');
+
 const meta = {
   title: 'Data Display/OverflowList',
   component: OverflowList,
   parameters: {
     layout: 'padded',
-    docs: {
-      description: {
-        component:
-          'Renders a horizontal list of items and collapses the ones that do not fit into a ' +
-          '"+N" overflow indicator. Reflows efficiently when its container is resized.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
 } satisfies Meta<typeof OverflowList<string>>;
 
@@ -37,7 +36,7 @@ const renderOverflowPopover = (items: string[]) => (
   </Popover>
 );
 
-/** Basic list — all items fit in a wide container. */
+/** All nine tags fit in 640px, so the overflow renderer is never called at all. */
 export const Basic: StoryFn = () => (
   <div className='w-640'>
     <OverflowList
@@ -49,7 +48,7 @@ export const Basic: StoryFn = () => (
   </div>
 );
 
-/** Narrow container — most items collapse into "+N". */
+/** The same nine in 200px: two survive and the `+N` takes the rest, which is the whole job. */
 export const Collapsed: StoryFn = () => (
   <div className='w-200'>
     <OverflowList
@@ -61,7 +60,10 @@ export const Collapsed: StoryFn = () => (
   </div>
 );
 
-/** Collapse from the start of the list. */
+/**
+ * `collapseFrom='start'` hides the beginning and keeps the end in view — for a path or a
+ * history where the most recent items are the ones that matter.
+ */
 export const CollapseFromStart: StoryFn = () => (
   <div className='w-240'>
     <OverflowList
@@ -91,9 +93,8 @@ const renderOverflowPopoverInline = (items: string[]) => (
 );
 
 /**
- * Guaranteed minimum number of visible items. The container is deliberately
- * narrow: `minVisibleItems={1}` keeps at least one tag visible (the rest
- * collapse into "+N") even when the space is tight.
+ * `minVisibleItems` puts a floor under the measurement: however tight the column gets,
+ * that many items stay and the rest go to the `+N` rather than the row emptying out.
  */
 export const MinVisibleItems: StoryFn = () => (
   <div className='w-160 overflow-hidden rounded-2 border border-border-primary p-12'>
@@ -108,8 +109,8 @@ export const MinVisibleItems: StoryFn = () => (
 );
 
 /**
- * Resizable container: drag the bottom-right corner of the box to see the list
- * reflow live. The data-testid is used by E2E to resize programmatically.
+ * Drag the box's right edge: the split is re-measured as the width changes rather than at
+ * breakpoints, which is what makes it safe inside a resizable panel.
  */
 export const ResizableContainer: StoryFn = () => (
   <div

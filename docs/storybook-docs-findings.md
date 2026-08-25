@@ -900,3 +900,20 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Found while** — checking the `WithUnit` story on the page against the three
   return branches.
 - **Status** — Open.
+
+### OverflowList's `MinVisibleItems` story does not exercise the floor
+
+- **What** — The story sets `minVisibleItems={1}` in a 160px box and its own
+  description says the floor is what keeps a tag visible. Measured on the page,
+  the row needs 134px of the 136px available and shows **two** tags plus `+7`, so
+  the engine's own measurement is doing the work and the floor never engages
+  (`resolveVisibleItems` only applies when `visibleItems.length < minVisibleItems`).
+- **Why it matters** — The story reads as a demonstration of a prop it does not
+  demonstrate; anyone checking whether the floor works would conclude it does from
+  a frame that never called it.
+- **Suggested action** — Narrow the container until nothing fits (roughly 60–80px
+  of content width), or use a longer item so a single tag cannot fit. Then the
+  floor is visibly the reason one item survives.
+- **Found while** — measuring the frame before writing its sentence; the prose now
+  describes the prop without claiming this frame proves it.
+- **Status** — Open.
