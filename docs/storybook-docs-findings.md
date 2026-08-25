@@ -917,3 +917,19 @@ Not findings — decisions worth remembering so they are not rediscovered.
 - **Found while** — measuring the frame before writing its sentence; the prose now
   describes the prop without claiming this frame proves it.
 - **Status** — Open.
+
+### Selection's stories fire `alert()` — eleven of them
+
+- **What** — Every bulk action in `Selection.stories.tsx` is wired to
+  `window.alert` (`alert(\`Delete ${selected.length}\`)` and friends), so clicking
+  Delete on the Overview page throws a blocking browser dialog.
+- **Why it matters** — On a documentation page the reader is expected to click the
+  bar; a modal dialog interrupts the page and has to be dismissed before anything
+  else works. The house pattern elsewhere is `fn()` from `storybook/test`, which
+  logs to the Actions panel instead. Same root cause as the `Card`
+  `console.log` finding: story handlers were written ad hoc rather than to a
+  convention.
+- **Suggested action** — Replace all eleven with `fn()`, and consider making it a
+  lint rule so it stops recurring.
+- **Found while** — reading the bulk-bar stories for their sentences.
+- **Status** — Open.

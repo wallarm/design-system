@@ -131,7 +131,7 @@
 | ✅ | Primitives/Kbd | 4 | 4 | `components/Kbd/Kbd.stories.tsx` |
 | ✅ | Primitives/Overlay | 1 | 1 | `components/Overlay/Overlay.stories.tsx` |
 | ✅ | Primitives/Separator | 1 | 1 | `components/Separator/Separator.stories.tsx` |
-| 🟡 | Production cluster | 10 | 0 | `components/Selection/Selection.stories.tsx` |
+| ✅ | Data Display/Selection | 10 | 10 | `components/Selection/Selection.stories.tsx` |
 | ✅ | Status Indication/Badge | 11 | 11 | `components/Badge/Badge.stories.tsx` |
 | ✅ | Status Indication/Indicator | 2 | 2 | `components/Indicator/Indicator.stories.tsx` |
 | ✅ | Status Indication/NumericBadge | 3 | 3 | `components/NumericBadge/NumericBadge.stories.tsx` |

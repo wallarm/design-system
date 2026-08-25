@@ -44,6 +44,11 @@ const clusters: Cluster[] = [
   { id: '5', title: 'Read replica', region: 'us-east-1', status: 'Active', locked: true },
 ];
 
+const DESCRIPTION = [
+  'Turns a set of anything — cards, rows, list items — into a selectable collection: a checkbox on each one, shift-click for a range, and a bulk-action bar that arrives once something is ticked.',
+  "The selection is controlled and ordered by `items`, so what comes back follows the list rather than the order of clicks, and ids no longer present in `items` are kept rather than dropped — a selection can outlive a page change, and clearing it is the caller's decision.",
+].join(' ');
+
 const meta = {
   title: 'Data Display/Selection',
   component: Selection,
@@ -54,15 +59,7 @@ const meta = {
   },
   parameters: {
     layout: 'padded',
-    docs: {
-      description: {
-        component:
-          'Selection is a compound component family that wraps arbitrary items, ' +
-          'gives each one a checkbox, and reveals an animated bulk-action bar when items are selected. ' +
-          'Use SelectionItem to wrap each item, SelectionAll for a select-all checkbox, ' +
-          'and SelectionBulkBar for the action bar.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
 } satisfies Meta<typeof Selection>;
 
@@ -84,6 +81,10 @@ const ClusterCard = ({ cluster }: { cluster: Cluster }) => (
   </Card>
 );
 
+/**
+ * The shape at its smallest: `Selection` around the collection, a `SelectionItem` per card,
+ * and a `SelectionBulkBar` that stays out of the way until something is selected.
+ */
 export const Default: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -113,6 +114,10 @@ export const Default: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `SelectionAll` is the header checkbox — indeterminate while the selection is partial, and
+ * a press while everything is selected clears it rather than reselecting.
+ */
 export const WithSelectAll: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -144,6 +149,10 @@ export const WithSelectAll: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The same machinery over a three-column grid: `Selection` lays nothing out, so the
+ * arrangement stays entirely yours.
+ */
 export const Grid: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -164,6 +173,10 @@ export const Grid: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * A `disabled` item leaves both select-all and any shift range, so "all" means all the ones
+ * this user is allowed to touch — and the header checkbox counts only those.
+ */
 export const WithDisabled: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -195,15 +208,17 @@ export const WithDisabled: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Shift-click selects everything between the last checkbox you touched and this one,
+ * following the order of `items` rather than the order you clicked in.
+ */
 export const RangeSelection: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
     <Selection items={clusters} getItemId={c => c.id} value={selected} onChange={setSelected}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          Tip: hold <kbd>Shift</kbd> and click another checkbox to select a range.
-        </Text>
+        <span className='sb-annotation'>hold shift and click another checkbox</span>
         {clusters.map(c => (
           <SelectionItem key={c.id} itemId={c.id}>
             <ClusterCard cluster={c} />
@@ -220,6 +235,10 @@ export const RangeSelection: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Three actions in one bar. Only the destructive one is solid, so a bar with several verbs
+ * still has a single obvious primary.
+ */
 export const BulkActions: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -256,6 +275,10 @@ export const BulkActions: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Emptying the list strands the ids that were selected, because the component keeps them on
+ * purpose — the effect here is the cleanup pattern, dropping any id the list no longer has.
+ */
 export const EmptyAndPartial: StoryFn<typeof meta> = () => {
   const [items, setItems] = useState<Cluster[]>(clusters);
   const [selected, setSelected] = useState<string[]>(['1', 'ghost']);
@@ -301,6 +324,10 @@ export const EmptyAndPartial: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * No bar at all: the selection still works and the count is rendered from state, for a page
+ * that acts on the selection somewhere else entirely.
+ */
 export const WithoutBulkBar: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -361,6 +388,10 @@ const CompoundToolbar = () => {
   );
 };
 
+/**
+ * Composing the summary — count, select-all, clear — instead of taking the default. It has
+ * to be a direct child of the bar; a wrapper component hides it and the default appears too.
+ */
 export const CompoundBulkBar: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
@@ -379,13 +410,19 @@ export const CompoundBulkBar: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Inside a `Drawer`, `placement='absolute'` pins the bar to the bottom of the panel instead
+ * of the viewport, and the actions step up to `large` to match the surface.
+ */
 export const InsideDrawer: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<string[]>([]);
 
   return (
     <Drawer width={720}>
       <DrawerTrigger asChild>
-        <Button>Open drawer with selection</Button>
+        <Button variant='outline' color='neutral'>
+          Open drawer with selection
+        </Button>
       </DrawerTrigger>
       <DrawerContent>
         <Selection
