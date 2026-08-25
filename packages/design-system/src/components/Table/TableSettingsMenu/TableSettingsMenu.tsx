@@ -192,7 +192,7 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
                   </Button>
                 </DropdownMenuTrigger>
 
-                <DropdownMenuContent className={cn('min-w-256 max-h-[430px]')}>
+                <DropdownMenuContent className={cn('w-256 max-h-[430px]')}>
                   {searchOverride ?? <TableSettingsMenuSearch />}
                   <VStack gap={1}>
                     <DndContext
