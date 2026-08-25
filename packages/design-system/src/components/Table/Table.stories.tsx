@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Database, Ellipsis, Filter, FilterX, SearchX, Trash2 } from '../../icons';
 import { Badge } from '../Badge';
@@ -95,17 +96,35 @@ import type {
   TableVisibilityState,
 } from './types';
 
+const onDuplicate = fn().mockName('onDuplicate');
+const onDelete = fn().mockName('onDelete');
+const onCopyValue = fn().mockName('onCopyValue');
+const onShowOnly = fn().mockName('onShowOnly');
+const onExclude = fn().mockName('onExclude');
+const onExecute = fn().mockName('onExecute');
+
+const DESCRIPTION = [
+  'The grid for many records of one shape — reach for a `Card` grid when a row reads better as an object than as a set of columns, and for `Attribute` when you are showing one record rather than many.',
+  'Everything interactive is controlled: sorting, selection, expansion, column order, pinning, sizing and visibility are each a state prop with a callback, so nothing moves unless you move it, and `manualSorting` hands the sort to the server.',
+  'Filtering belongs above the grid in a `FilterInput`, and a long collection scrolls rather than paginates — `Pagination` is the deliberate exception, for when a page number is part of the task.',
+].join(' ');
+
 const meta = {
   title: 'Data Display/Table',
   component: Table,
   parameters: {
     layout: 'padded',
+    docs: { description: { component: DESCRIPTION } },
   },
   tags: ['beta'],
 } satisfies Meta<typeof Table>;
 
 export default meta;
 
+/**
+ * The minimum — `data`, `columns`, `getRowId` and a column to open sorted on. The header stays
+ * put as the body scrolls.
+ */
 export const Basic: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([{ id: 'firstDetected', desc: true }]);
 
@@ -121,6 +140,10 @@ export const Basic: StoryFn<typeof meta> = () => {
 };
 
 // "Rows per page" + page navigation share a right-aligned footer below the table.
+/**
+ * `useClientPagination` slices the rows and the pager sits right-aligned below the table,
+ * sharing its footer with the rows-per-page control.
+ */
 export const WithPagination: StoryFn<typeof meta> = () => {
   const allData = useMemo(() => createLargeSecurityEvents(47), []);
   const { pageData, ...pagination } = useClientPagination(allData, 10);
@@ -138,6 +161,10 @@ export const WithPagination: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Sorting held in state, so the arrow and the row order are the same fact — click a header to
+ * cycle through the directions.
+ */
 export const Sorting: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
 
@@ -169,6 +196,10 @@ const sortSecurityEvents = (sorting: TableSortingState): SecurityEvent[] => {
   });
 };
 
+/**
+ * `manualSorting` stops the table sorting anything itself: it only reports the change, and the
+ * story re-derives `data` the way a refetch would.
+ */
 export const ManualSorting: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const data = useMemo(() => sortSecurityEvents(sorting), [sorting]);
@@ -226,6 +257,11 @@ export const ManualSorting: StoryFn<typeof meta> = () => {
 //
 // Pending DS work (no DOM seam yet — callback-only): selection checkbox,
 // expand toggle, master-cell click, resize handle.
+/**
+ * Every analytics seam at once — `TableSortTrigger`, `TableColumnMenu` and each of its items,
+ * the action bar, the scroll handlers — plus the state callbacks, which carry the resulting
+ * sort, selection and column layout rather than just a click.
+ */
 export const WithAnalytics: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
@@ -532,10 +568,18 @@ export const WithAnalytics: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `isLoading` with nothing to show yet: skeleton rows under a real header, so the columns do
+ * not jump when the data lands.
+ */
 export const LoadingState: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} isLoading />
 );
 
+/**
+ * The same flag with rows already present appends the skeletons below them — this is the shape
+ * for fetching the next batch, not for replacing what is on screen.
+ */
 export const LoadingWithData: StoryFn<typeof meta> = () => (
   <Table
     className='h-500'
@@ -547,12 +591,8 @@ export const LoadingWithData: StoryFn<typeof meta> = () => (
 );
 
 /**
- * When `data` is empty and the table is not loading, the `TableEmptyState` slot
- * renders its children. Compose the `EmptyState` component inside it to get the
- * standard illustration / message / actions layout.
- *
- * Use `type='collection-empty'` when there is genuinely no data yet (nothing has
- * been created), and offer a primary action that creates the first item.
+ * `TableEmptyState` holding an `EmptyState` of `type='collection-empty'`: nothing exists yet,
+ * so the action creates the first thing.
  */
 export const EmptyCollection: StoryFn<typeof meta> = () => (
   <Table data={[]} columns={securityColumns} getRowId={row => row.id}>
@@ -605,6 +645,10 @@ export const NoResults: StoryFn<typeof meta> = () => (
   </Table>
 );
 
+/**
+ * Drag a header edge to resize. `columnSizing` is state like everything else, so a width can
+ * be remembered between visits.
+ */
 export const ColumnResizing: StoryFn<typeof meta> = () => {
   const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
 
@@ -634,7 +678,10 @@ const renderTableTagsOverflow = (items: string[]) => (
   </Popover>
 );
 
-/** Resizable column whose cell hosts an OverflowList — resize it to reflow tags. */
+/**
+ * A resizable column whose cell holds an `OverflowList`: the tags re-measure as the column
+ * narrows instead of being clipped by it.
+ */
 export const ColumnResizingWithOverflowList: StoryFn<typeof meta> = () => {
   const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
 
@@ -670,6 +717,10 @@ export const ColumnResizingWithOverflowList: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Resizing alongside a pinned column — the pinned one holds its position while the rest of the
+ * row moves underneath it.
+ */
 export const ColumnResizingWithPinning: StoryFn<typeof meta> = () => {
   const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
   const [columnPinning, setColumnPinning] = useState<TableColumnPinningState>({
@@ -690,6 +741,10 @@ export const ColumnResizingWithPinning: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `columnPinning` freezes a column to the left, so the name of the thing stays readable
+ * however far sideways the table scrolls.
+ */
 export const ColumnPinning: StoryFn<typeof meta> = () => {
   const [columnPinning, setColumnPinning] = useState<TableColumnPinningState>({
     left: ['objectName'],
@@ -707,6 +762,10 @@ export const ColumnPinning: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Drag a header to reorder the columns. `columnOrder` is the same state the settings menu
+ * writes, so the two never disagree.
+ */
 export const ColumnDragAndDrop: StoryFn<typeof meta> = () => {
   const [columnOrder, setColumnOrder] = useState<string[]>([]);
 
@@ -721,6 +780,10 @@ export const ColumnDragAndDrop: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The per-column menu that appears on hover — sort, pin, hide, move — which is where the
+ * column controls live once a header is too narrow to show them.
+ */
 export const ColumnHeaderMenu: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [columnVisibility, setColumnVisibility] = useState<TableVisibilityState>({});
@@ -744,6 +807,10 @@ export const ColumnHeaderMenu: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Checkboxes plus `TableActionBar`, which rises from the bottom once a row is ticked and
+ * carries the verbs that apply to the whole selection.
+ */
 export const RowSelection: StoryFn<typeof meta> = () => {
   const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
 
@@ -756,10 +823,10 @@ export const RowSelection: StoryFn<typeof meta> = () => {
       onRowSelectionChange={setRowSelection}
     >
       <TableActionBar>
-        <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
+        <Button variant='ghost' color='neutral-alt' onClick={onDuplicate}>
           <Copy /> Duplicate
         </Button>
-        <Button color='brand' onClick={() => alert('Delete clicked')}>
+        <Button color='brand' onClick={onDelete}>
           <Trash2 /> Delete
         </Button>
       </TableActionBar>
@@ -767,6 +834,10 @@ export const RowSelection: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * A selection that outlives the table scrolling away: under `virtualized='window'` the bar is
+ * pinned to the viewport rather than to the table.
+ */
 export const RowSelectionWindowScroll: StoryFn<typeof meta> = () => {
   const largeData = useMemo(() => createLargeSecurityEvents(100), []);
   const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
@@ -783,10 +854,10 @@ export const RowSelectionWindowScroll: StoryFn<typeof meta> = () => {
         onRowSelectionChange={setRowSelection}
       >
         <TableActionBar>
-          <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
+          <Button variant='ghost' color='neutral-alt' onClick={onDuplicate}>
             <Copy /> Duplicate
           </Button>
-          <Button color='brand' onClick={() => alert('Delete clicked')}>
+          <Button color='brand' onClick={onDelete}>
             <Trash2 /> Delete
           </Button>
         </TableActionBar>
@@ -802,6 +873,10 @@ export const RowSelectionWindowScroll: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `getSubRows` turns flat data into groups — each group row counts its children and collapses
+ * them, keyed in the same `expanded` state a row detail uses.
+ */
 export const RowGrouping: StoryFn<typeof meta> = () => {
   const [expanded, setExpanded] = useState<TableExpandedState>({ 'group-cto': true });
   const [sorting, setSorting] = useState<TableSortingState>([{ id: 'lastEdited', desc: true }]);
@@ -823,6 +898,10 @@ export const RowGrouping: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `renderExpandedRow` draws a panel beneath the row, for the two or three fields that do not
+ * deserve columns of their own.
+ */
 export const RowExpanding: StoryFn<typeof meta> = () => {
   const [expanded, setExpanded] = useState<TableExpandedState>({});
 
@@ -867,6 +946,10 @@ export const RowExpanding: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Right-click inside a cell: `DropdownMenuContextTrigger` puts that column's verbs where the
+ * pointer already is, so each column can offer its own.
+ */
 export const ContextMenu: StoryFn<typeof meta> = () => {
   const contextMenuColumns: TableColumnDef<(typeof securityEvents)[number]>[] = [
     securityColumnHelper.accessor('objectName', {
@@ -877,7 +960,7 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
             <Text size='sm'>{getValue()}</Text>
           </DropdownMenuContextTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onSelect={() => alert('Copy')}>
+            <DropdownMenuItem onSelect={onCopyValue}>
               <DropdownMenuItemIcon>
                 <Copy />
               </DropdownMenuItemIcon>
@@ -886,7 +969,7 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
 
             <DropdownMenuSeparator />
 
-            <DropdownMenuItem onSelect={() => alert('Show Only')}>
+            <DropdownMenuItem onSelect={onShowOnly}>
               <DropdownMenuItemIcon>
                 <Filter />
               </DropdownMenuItemIcon>
@@ -896,7 +979,7 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
               </DropdownMenuItemContent>
             </DropdownMenuItem>
 
-            <DropdownMenuItem onSelect={() => alert('Exclude')}>
+            <DropdownMenuItem onSelect={onExclude}>
               <DropdownMenuItemIcon>
                 <FilterX />
               </DropdownMenuItemIcon>
@@ -917,7 +1000,7 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
             <InlineCodeSnippet code={getValue()} size='sm' copyable={false} />
           </DropdownMenuContextTrigger>
           <DropdownMenuContent>
-            <DropdownMenuItem onSelect={() => alert('Execute')}>
+            <DropdownMenuItem onSelect={onExecute}>
               <DropdownMenuItemIcon>
                 <Copy />
               </DropdownMenuItemIcon>
@@ -956,6 +1039,10 @@ export const ContextMenu: StoryFn<typeof meta> = () => {
   return <Table data={securityEvents} columns={contextMenuColumns} getRowId={row => row.id} />;
 };
 
+/**
+ * The gear at the end of the header — search the columns, show and hide them, reorder them,
+ * reset — writing the same visibility and order state as the header menu.
+ */
 export const SettingsMenu: StoryFn<typeof meta> = () => {
   const [columnVisibility, setColumnVisibility] = useState<TableVisibilityState>({});
   const [columnOrder, setColumnOrder] = useState<string[]>([]);
@@ -975,6 +1062,10 @@ export const SettingsMenu: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `virtualized='container'` inside a fixed height renders only the rows in view, which is what
+ * lets a thousand rows behave like ten.
+ */
 export const Virtualization: StoryFn<typeof meta> = () => {
   const largeData = useMemo(() => createLargeSecurityEvents(1000), []);
 
@@ -989,6 +1080,10 @@ export const Virtualization: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `virtualized='window'` measures against the page's own scroll instead, for a table that is
+ * the page rather than a panel inside one.
+ */
 export const WindowVirtualization: StoryFn<typeof meta> = () => {
   const largeData = useMemo(() => createLargeSecurityEvents(1000), []);
   const [columnOrder, setColumnOrder] = useState<string[]>([]);
@@ -1008,6 +1103,10 @@ export const WindowVirtualization: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The imperative escape hatch: `scrollToRow(id, { align })` off the ref, returning false for
+ * an id the table does not have so a deep link can fall back.
+ */
 export const ScrollToRow: StoryFn<typeof meta> = () => {
   const largeData = useMemo(() => createLargeSecurityEvents(1000), []);
   const tableRef = useRef<TableHandle>(null);
@@ -1023,11 +1122,18 @@ export const ScrollToRow: StoryFn<typeof meta> = () => {
   return (
     <VStack gap={8}>
       <HStack gap={8}>
-        <Button onClick={() => scroll(0, 'start')}>Top</Button>
-        <Button onClick={() => scroll(499, 'center')}>Middle</Button>
-        <Button onClick={() => scroll(999, 'end')}>Bottom</Button>
+        <Button variant='outline' color='neutral' onClick={() => scroll(0, 'start')}>
+          Top
+        </Button>
+        <Button variant='outline' color='neutral' onClick={() => scroll(499, 'center')}>
+          Middle
+        </Button>
+        <Button variant='outline' color='neutral' onClick={() => scroll(999, 'end')}>
+          Bottom
+        </Button>
         <Button
-          variant='ghost'
+          variant='secondary'
+          color='neutral'
           onClick={() => {
             const ok = tableRef.current?.scrollToRow('does-not-exist') ?? false;
             setLastResult(`scrollToRow("does-not-exist") → ${ok}`);
@@ -1053,6 +1159,10 @@ export const ScrollToRow: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `onEndReached` with `isLoading` — the house default for a long collection, where rows arrive
+ * as you reach them and there is no page number to lose.
+ */
 export const InfiniteScroll: StoryFn<typeof meta> = () => {
   const { data, isFetching, hasMore, totalItems, fetchNextPage } = useInfiniteData();
 
@@ -1076,6 +1186,10 @@ export const InfiniteScroll: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The same fetch-on-approach against the page's scroll, where the trigger has to account for
+ * everything else on the page as well as the table.
+ */
 export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
   const { data, isFetching, hasMore, totalItems, fetchNextPage } = useInfiniteData();
 
@@ -1098,6 +1212,10 @@ export const InfiniteScrollWindow: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Both ends at once: `onStartReached` prepends, and the scroll position is compensated so the
+ * row you were reading does not slide out from under you.
+ */
 export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
   const {
     data,
@@ -1139,6 +1257,10 @@ export const BidirectionalInfiniteScroll: StoryFn<typeof meta> = () => {
 // Same dataset/anchor as BidirectionalInfiniteScroll, but the document itself
 // scrolls — the regression mode for prepend compensation, where unrelated page
 // content shares the scrollHeight the old delta diffed against.
+/**
+ * The prepend case against the document scroll, where unrelated page content shares the height
+ * being measured — the regression this story exists to catch.
+ */
 export const BidirectionalInfiniteScrollWindow: StoryFn<typeof meta> = () => {
   const {
     data,
@@ -1176,6 +1298,10 @@ export const BidirectionalInfiniteScrollWindow: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * A column can explain itself: `description` renders as a second line under the title, or as a
+ * tooltip behind a dashed underline when the header has no room for one.
+ */
 export const HeaderColumnDescription: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
 
@@ -1232,6 +1358,10 @@ export const HeaderColumnDescription: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The first column is the master cell — pinned, and the place per-row actions appear on hover,
+ * so every row keeps its verbs in one predictable spot.
+ */
 export const MasterCellWithActions: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [columnSizing, setColumnSizing] = useState<TableColumnSizingState>({});
@@ -1265,17 +1395,13 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
                         <DropdownMenuItemText>Copy name</DropdownMenuItemText>
                       </DropdownMenuItem>
                       <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        onSelect={() => alert(`Filter: ${row.original.objectName}`)}
-                      >
+                      <DropdownMenuItem onSelect={() => onShowOnly(row.original.objectName)}>
                         <DropdownMenuItemIcon>
                           <Filter />
                         </DropdownMenuItemIcon>
                         <DropdownMenuItemText>Show only</DropdownMenuItemText>
                       </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onSelect={() => alert(`Exclude: ${row.original.objectName}`)}
-                      >
+                      <DropdownMenuItem onSelect={() => onExclude(row.original.objectName)}>
                         <DropdownMenuItemIcon>
                           <FilterX />
                         </DropdownMenuItemIcon>
@@ -1305,6 +1431,10 @@ export const MasterCellWithActions: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `onMasterCellClick` with `activeRowId`: the master cell opens a `Drawer` and the row it
+ * belongs to stays marked while the panel is open.
+ */
 export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
   const [sorting, setSorting] = useState<TableSortingState>([]);
   const [activeRowId, setActiveRowId] = useState<string | null>(null);
@@ -1381,6 +1511,10 @@ export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Grouping, expansion, selection, pinning, virtualization and the action bar in one table —
+ * the honest test of whether the features cooperate rather than merely exist.
+ */
 export const FullFeatured: StoryFn<typeof meta> = () => {
   const data = useMemo(() => createLargeGroupedData(12, 50), []);
 
@@ -1431,10 +1565,10 @@ export const FullFeatured: StoryFn<typeof meta> = () => {
       virtualized='container'
     >
       <TableActionBar>
-        <Button variant='ghost' color='neutral-alt' onClick={() => alert('Copy clicked')}>
+        <Button variant='ghost' color='neutral-alt' onClick={onDuplicate}>
           <Copy /> Duplicate
         </Button>
-        <Button color='brand' onClick={() => alert('Delete clicked')}>
+        <Button color='brand' onClick={onDelete}>
           <Trash2 /> Delete
         </Button>
       </TableActionBar>
@@ -1477,6 +1611,12 @@ const StatusBadge: FC<{ value: SecurityEvent['status'] }> = ({ value }) => (
   </Badge>
 );
 
+/**
+ * `EditableTextCell` and `EditableSelectCell` in the plain columns, with the master column
+ * deliberately read-only — editing in place suits a value the user owns, not one the system
+ * reports. Hovering highlights the whole cell, clicking opens it without the content shifting,
+ * and Enter or blur commits while Escape reverts.
+ */
 export const InlineCellEditing: StoryFn<typeof meta> = () => {
   const [data, setData] = useState<SecurityEvent[]>(() => securityEvents.slice(0, 6));
   // Category starts unselected for every row, so the select shows its placeholder.
@@ -1558,12 +1698,7 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
 
   return (
     <VStack gap={12} align='stretch'>
-      <Text size='sm' color='secondary'>
-        Hover an Object name (text) or Status / Category (select) cell — the whole cell highlights.
-        Click to edit: the cell gets a brand-orange border and the content stays exactly in place
-        (no shift). Category starts empty and shows a consumer-set “Select…” placeholder. Enter or
-        blur commits, Escape reverts; the read-only columns stay static.
-      </Text>
+      <span className='sb-annotation'>click a cell to edit it</span>
       <Table data={data} columns={columns} getRowId={row => row.id} />
     </VStack>
   );

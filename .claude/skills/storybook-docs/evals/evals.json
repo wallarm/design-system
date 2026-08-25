@@ -1,0 +1,46 @@
+{
+  "skill_name": "storybook-docs",
+  "evals": [
+    {
+      "id": 0,
+      "name": "button-bare-page",
+      "prompt": "Our Button page in Storybook has no description at all, it's just a wall of story frames with headings. Can you document it properly?",
+      "expected_output": "A 1-2 sentence component description leading with boundaries against SplitButton / ToggleButton / Link, plus one sentence per story.",
+      "files": [],
+      "assertions": [
+        "Component description is at most 2 sentences",
+        "Component description names at least one alternative component to reach for instead (e.g. SplitButton, ToggleButton, Link)",
+        "All 10 stories have a description sentence",
+        "No story sentence merely restates its story name",
+        "No claim about a prop, variant or size that Button does not ship"
+      ]
+    },
+    {
+      "id": 1,
+      "name": "slider-over-budget",
+      "prompt": "Slider's Storybook description is this huge paragraph about analytics attributes and ref forwarding. Can you sort that page out so it reads like the way we document components now?",
+      "expected_output": "The long description cut to 1-2 sentences of user-facing guidance; developer contract detail removed; existing story descriptions kept or tightened.",
+      "files": [],
+      "assertions": [
+        "Rewritten component description is at most 2 sentences",
+        "Developer-contract detail is gone: no mention of analytics, data-* attributes, or ref forwarding",
+        "Description still says what Slider is for and names at least one boundary or alternative",
+        "All 14 stories still have a description sentence",
+        "Compound part names used are real exports (SliderControl, SliderThumb, SliderMarks, SliderInput, SliderValue)"
+      ]
+    },
+    {
+      "id": 2,
+      "name": "stack-primitive-restraint",
+      "prompt": "Add docs to the Stack component's Storybook page.",
+      "expected_output": "A short description, one or two sentences at most, with no padded boundaries section. Restraint is the point.",
+      "files": [],
+      "assertions": [
+        "Component description is at most 2 sentences",
+        "Total prose across description and all stories is under 120 words (restraint on a layout primitive)",
+        "Does not invent a boundary against a component that does not exist",
+        "All 6 stories have a description sentence"
+      ]
+    }
+  ]
+}

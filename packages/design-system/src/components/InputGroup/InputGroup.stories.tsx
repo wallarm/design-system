@@ -21,6 +21,11 @@ import { InputGroup } from './InputGroup';
 import { InputGroupAddon } from './InputGroupAddon';
 import { InputGroupText } from './InputGroupText';
 
+const DESCRIPTION = [
+  'Joins a field to whatever sits against it — an icon, a unit, a shortcut hint, a button — inside one bordered box that focuses as a single control.',
+  'Reach for `Field` instead when what you need is a label and a description rather than something attached to the field itself.',
+].join(' ');
+
 const meta = {
   title: 'Inputs/InputGroup',
   component: InputGroup,
@@ -30,11 +35,20 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 } satisfies Meta<typeof InputGroup>;
 
 export default meta;
 
+/**
+ * `InputGroupAddon` on either side of the control. The group draws the border, so the input
+ * inside it draws none — which is why an `Input` used here looks different from one used alone.
+ */
 export const Basic: StoryFn<typeof meta> = () => (
   <VStack gap={12}>
     <InputGroup data-testid='input-group'>
@@ -59,6 +73,10 @@ export const Basic: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * Disabling the control dims the whole group, addons included, so the box reads as one
+ * unavailable thing rather than a live button next to a dead field.
+ */
 export const Disabled: StoryFn<typeof meta> = () => (
   <VStack gap={12}>
     <InputGroup>
@@ -83,6 +101,10 @@ export const Disabled: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * The error border is drawn by the group for the same reason, keeping the red outline around
+ * everything the reader thinks of as the field.
+ */
 export const WithError: StoryFn<typeof meta> = () => (
   <VStack gap={12}>
     <InputGroup>
@@ -107,6 +129,10 @@ export const WithError: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * A `Loader` as a trailing addon, for a field that validates or searches as you type. It
+ * replaces nothing, so the text doesn't shift when it appears.
+ */
 export const WithLoader: StoryFn<typeof meta> = () => (
   <InputGroup>
     <Input placeholder='Searching...' disabled />
@@ -116,6 +142,10 @@ export const WithLoader: StoryFn<typeof meta> = () => (
   </InputGroup>
 );
 
+/**
+ * A `Kbd` addon showing the shortcut that focuses the field — the search-box convention.
+ * Only worth it where the shortcut actually exists.
+ */
 export const WithKbd: StoryFn<typeof meta> = () => (
   <InputGroup>
     <InputGroupAddon>
@@ -129,6 +159,10 @@ export const WithKbd: StoryFn<typeof meta> = () => (
   </InputGroup>
 );
 
+/**
+ * An addon that explains the field, for when the reason is longer than a description line but
+ * shorter than help text.
+ */
 export const WithTooltip: StoryFn<typeof meta> = () => (
   <InputGroup>
     <InputGroupAddon>
@@ -146,6 +180,10 @@ export const WithTooltip: StoryFn<typeof meta> = () => (
   </InputGroup>
 );
 
+/**
+ * The group also wraps a `Textarea`, with `align='block-end'` putting the addon under the
+ * text rather than beside it — this is the composer shape.
+ */
 export const WithTextarea: StoryFn<typeof meta> = () => (
   <div style={{ width: 480 }}>
     <VStack gap={12}>
@@ -181,6 +219,10 @@ export const WithTextarea: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * A `Select` as an addon, for a unit or scope that changes what the value means. Keep it on
+ * the side the reader reads last.
+ */
 export const WithSelect: StoryFn<typeof meta> = () => {
   const collection = createListCollection({
     items: [

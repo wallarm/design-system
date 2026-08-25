@@ -2,6 +2,11 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { HStack, VStack } from '../Stack';
 import { WallyIcon, type WallyIconProps } from './WallyIcon';
 
+const DESCRIPTION = [
+  'Wally, the mascot for Wallarm’s AI assistant — the mark that signals an AI surface rather than a general-purpose icon, so keep it for the assistant and reach for the icon set for everything else.',
+  '`simple` is the bare mark and `circle` wraps it in its own badge so it can sit on a coloured surface; both are sized by height from 16px to 64px, with the width following.',
+].join(' ');
+
 const meta = {
   title: 'Brand/WallyIcon',
   component: WallyIcon,
@@ -9,8 +14,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'The Wallarm`s AI assistant mascot icon (Wally). Supports simple and circle variants with multiple sizes.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -30,6 +34,7 @@ const meta = {
 
 export default meta;
 
+/** Wally at the defaults — `simple` at `md`, which is 24px tall. */
 export const Basic: StoryFn<WallyIconProps> = args => <WallyIcon {...args} />;
 
 Basic.args = {
@@ -37,23 +42,25 @@ Basic.args = {
   size: 'md',
 };
 
+/** The two variants side by side. The badge is what lets the mark keep its edge on a coloured or busy surface; on a plain panel the bare mark is enough. */
 export const Styles: StoryFn<WallyIconProps> = args => (
-  <VStack gap={12}>
-    <HStack gap={32} justify='around'>
-      <div>Simple</div>
-      <div>Circle</div>
-    </HStack>
-    <HStack gap={32} justify='around'>
+  <HStack gap={32} justify='around' align='start'>
+    <VStack gap={8} align='center'>
+      <span className='sb-annotation'>simple</span>
       <WallyIcon {...args} variant='simple' />
+    </VStack>
+    <VStack gap={8} align='center'>
+      <span className='sb-annotation'>circle</span>
       <WallyIcon {...args} variant='circle' />
-    </HStack>
-  </VStack>
+    </VStack>
+  </HStack>
 );
 
 Styles.args = {
   size: 'xl',
 };
 
+/** `xs` to `xl` in both variants. Worth reading down the columns to see where the detail in the bare mark gives out and the badge stops helping. */
 export const Sizes: StoryFn<WallyIconProps> = args => (
   <HStack gap={48} justify='center' align='stretch'>
     <VStack gap={16} align='center'>

@@ -39,6 +39,10 @@ const STEPS: PixelStep[] = [
   { token: 'pixel-lg', utilities: 'font-pixel text-base', metrics: '16 / 24' },
 ];
 
+/**
+ * The four sanctioned steps, with the Figma token beside each. Only one ships today —
+ * `EmptyStateTitle` at 16 on 24 — so treat the rest as available rather than established.
+ */
 export const Scale: StoryFn<typeof meta> = () => (
   <VStack gap={32} align='start'>
     {STEPS.map(({ token, utilities, metrics }) => (
@@ -57,6 +61,10 @@ export const Scale: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * One cut only, Square at regular weight. `font-bold` on pixel type renders as a
+ * browser-synthesised fake, so emphasis has to come from size or colour and never from weight.
+ */
 export const Decorative: StoryFn<typeof meta> = () => (
   <VStack gap={40} align='start'>
     <VStack gap={12} align='start'>

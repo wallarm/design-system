@@ -16,17 +16,30 @@ import { Popover } from './Popover';
 import { PopoverContent } from './PopoverContent';
 import { PopoverTrigger } from './PopoverTrigger';
 
+const DESCRIPTION = [
+  'A small panel anchored to what opened it, for content the reader can act on — a form, a set of controls, a detail with a link in it.',
+  'Reach for `Tooltip` when the content is only a label, and `Drawer` when it is a task rather than a detail.',
+].join(' ');
+
 const meta = {
   title: 'Overlay/Popover',
   component: Popover,
   subcomponents: { PopoverContent, PopoverTrigger },
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 } satisfies Meta<typeof Popover>;
 
 export default meta;
 
+/**
+ * Trigger and content. It takes focus, which is the whole difference from a tooltip.
+ */
 export const Basic: StoryFn<typeof meta> = () => (
   <Popover data-testid='popover'>
     <PopoverTrigger asChild>
@@ -60,6 +73,10 @@ export const Basic: StoryFn<typeof meta> = () => (
   </Popover>
 );
 
+/**
+ * A tooltip on the popover's own trigger — the label explains what opens, the popover holds
+ * what you do.
+ */
 export const WithTooltip: StoryFn<typeof meta> = () => {
   const triggerId = useId();
   const [open, setOpen] = useState(false);
@@ -90,6 +107,10 @@ export const WithTooltip: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Width bounds, for content that varies. Let it size to the content rather than pinning it, or
+ * short content sits in an empty box.
+ */
 export const MinMaxWidth: StoryFn<typeof meta> = () => (
   <VStack gap={32}>
     <Popover>
@@ -128,6 +149,10 @@ export const MinMaxWidth: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * Height bounds with scrolling past the cap. If it scrolls often, the content has outgrown a
+ * popover.
+ */
 export const MinMaxHeight: StoryFn<typeof meta> = () => (
   <VStack gap={32}>
     <Popover>

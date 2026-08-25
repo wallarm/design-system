@@ -29,6 +29,11 @@ import { AttributeLabelDescription } from './AttributeLabelDescription';
 import { AttributeLabelInfo } from './AttributeLabelInfo';
 import { AttributeValue } from './AttributeValue';
 
+const DESCRIPTION = [
+  "Pairs one field's label with its value on a detail page — reach for `Table` when the same fields repeat across many objects, and `Field` when the value is being collected rather than read.",
+  'The value slot takes whichever display component fits the data and hosts `InlineEdit` when the field is editable in place, while `AttributeActions` hangs a per-value menu off it.',
+].join(' ');
+
 const meta = {
   title: 'Data Display/Attribute',
   component: Attribute,
@@ -49,14 +54,7 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
-    docs: {
-      description: {
-        component:
-          'Displays a labeled read-only value for a single object attribute. ' +
-          'Used in detail panels, drawers, and forms to present structured information. ' +
-          'The value slot accepts text, badges, tags, code snippets, links, and other display components.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
 } satisfies Meta<typeof Attribute>;
 
@@ -100,6 +98,10 @@ const renderActionsItems = () => (
   </AttributeActionsContent>
 );
 
+/**
+ * The smallest pair — `AttributeLabel` over `AttributeValue` — with the label in
+ * sentence case and the value left to whichever component formats that data.
+ */
 export const Default: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute>
@@ -111,6 +113,10 @@ export const Default: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * `AttributeLabelDescription` adds a line that stays under the label, for a field
+ * whose name does not explain itself.
+ */
 export const WithDescription: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute>
@@ -127,6 +133,10 @@ export const WithDescription: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * `AttributeLabelInfo` puts the same explanation behind a hover tooltip instead,
+ * and reads correctly on either side of the label text.
+ */
 export const WithInfo: StoryFn<AttributeProps> = () => (
   <div className='w-[400px] flex flex-col gap-16'>
     <Attribute>
@@ -151,6 +161,10 @@ export const WithInfo: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * The label row takes inline content of its own, here a `Link` out to whatever
+ * explains the field — the value slot stays reserved for the data.
+ */
 export const WithLink: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute>
@@ -168,15 +182,10 @@ export const WithLink: StoryFn<AttributeProps> = () => (
 );
 
 /**
- * All empty-state variants in vertical orientation:
- *   1. Manual composition — `AttributeLabelDescription` always visible, value
- *      composed by the consumer (no `isEmpty` flag).
- *   2. `isEmpty` alone — value becomes em-dash, `AttributeValue` children are
- *      ignored, label stays bare.
- *   3. `isEmpty` + `<AttributeEmptyDescription>` — description renders only
- *      while `isEmpty` is true; outside that state it returns null.
- *   4. Same as (3), with `ReactNode` content (text + link) inside the
- *      description.
+ * Four ways a missing value can read: composed by hand, `isEmpty` on its own —
+ * which swaps the value for an em dash and ignores whatever children it had — and
+ * `isEmpty` alongside an `AttributeEmptyDescription`, which appears only in that
+ * state and can carry the link out to the fix.
  */
 export const Empty: StoryFn<AttributeProps> = () => (
   <div className='w-[400px] flex flex-col gap-16'>
@@ -218,6 +227,10 @@ export const Empty: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * `loading` skeletons both slots and ignores the children, so a panel can be laid
+ * out before its data lands; it wins over `isEmpty`.
+ */
 export const Loading: StoryFn<AttributeProps> = () => (
   <div className='w-[400px] flex flex-col gap-16'>
     <Attribute loading>
@@ -231,6 +244,11 @@ export const Loading: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * The display components sanctioned inside a value — `Badge`, `FormatDateTime`,
+ * `OverflowList` of `Tag`s, `Ip` and `IpList`, `Link`, `InlineCodeSnippet`, `Code` —
+ * each formatting the data itself rather than receiving a pre-built string.
+ */
 export const Composition: StoryFn<AttributeProps> = () => (
   <div className='grid grid-cols-2 gap-x-8 gap-y-16 w-[874px]'>
     <Attribute>
@@ -360,6 +378,10 @@ export const Composition: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * `AttributeActions` turns the value into a `DropdownMenu` trigger: the row picks up
+ * a hover surface and the menu carries the actions that belong to that one value.
+ */
 export const WithActions: StoryFn<AttributeProps> = () => (
   <div className='grid grid-cols-2 gap-x-8 gap-y-16 w-[874px]'>
     <Attribute>
@@ -554,6 +576,10 @@ export const WithActions: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * `orientation='horizontal'` sets the label beside the value in a cell clamped
+ * between 100 and 256px, so values line up down a panel.
+ */
 export const Horizontal: StoryFn<AttributeProps> = () => (
   <div className='w-[400px]'>
     <Attribute orientation='horizontal'>
@@ -567,6 +593,10 @@ export const Horizontal: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * Horizontal cells clip with an ellipsis rather than wrapping — the label at its set
+ * width, 100px unless you widen it, and the value once its own content overruns.
+ */
 export const HorizontalTruncation: StoryFn<AttributeProps> = () => (
   <div className='w-[500px] flex flex-col gap-8'>
     <Attribute orientation='horizontal'>
@@ -594,6 +624,10 @@ export const HorizontalTruncation: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * The same value components in the horizontal layout, where a wide one such as
+ * `IpList type='horizontal'` needs its row to span both columns.
+ */
 export const HorizontalComposition: StoryFn<AttributeProps> = () => (
   <div className='grid grid-cols-2 gap-x-8 gap-y-6 w-[874px]'>
     <Attribute orientation='horizontal'>
@@ -683,6 +717,10 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
   </div>
 );
 
+/**
+ * The horizontal skeleton is a 16px line against the vertical 24px, matching the
+ * single-line row it stands in for.
+ */
 export const HorizontalLoading: StoryFn<AttributeProps> = () => (
   <div className='w-[400px] flex flex-col gap-8'>
     <Attribute orientation='horizontal' loading>
@@ -697,9 +735,8 @@ export const HorizontalLoading: StoryFn<AttributeProps> = () => (
 );
 
 /**
- * All empty-state variants in horizontal orientation. Same four cases as
- * `Empty`, just with `orientation='horizontal'` and `AttributeLabel width=160`
- * to leave room for descriptions (DS clamp: 100..256px).
+ * The same four cases side by side, with `width={160}` on the label so the
+ * descriptions have somewhere to sit.
  */
 export const HorizontalEmpty: StoryFn<AttributeProps> = () => (
   <div className='w-[400px] flex flex-col gap-8'>
@@ -850,11 +887,19 @@ const renderActionsAttributes = (disableNestedInteractive: boolean) => (
   </>
 );
 
+/**
+ * By default the value keeps its own interactivity: a link, or a snippet's copy
+ * button, still does its own job, and the menu opens from the space around it.
+ */
 export const HorizontalWithActions: StoryFn<AttributeProps> = () => (
   <div className='w-[400px] flex flex-col gap-8'>{renderActionsAttributes(false)}</div>
 );
 HorizontalWithActions.storyName = 'Horizontal With Actions (default — copy on text, menu outside)';
 
+/**
+ * `disableNestedInteractive` renders the value inert, so a click anywhere on the row
+ * opens the menu — for values with nothing worth clicking of their own.
+ */
 export const HorizontalWithActionsMenuOnly: StoryFn<AttributeProps> = () => (
   <div className='w-[400px] flex flex-col gap-8'>{renderActionsAttributes(true)}</div>
 );
@@ -889,8 +934,17 @@ function AttributeInlineEditExample({
   );
 }
 
+/**
+ * `Attribute` > `AttributeValue` > `InlineEdit` is the sanctioned nesting for an
+ * editable field — the value slot supplies the overflow room the editor needs, so
+ * never add your own.
+ */
 export const WithInlineEdit: StoryFn = () => <AttributeInlineEditExample />;
 
+/**
+ * The same editor in a horizontal row, where it takes the width of the value cell
+ * rather than the panel.
+ */
 export const HorizontalWithInlineEdit: StoryFn = () => (
   <AttributeInlineEditExample orientation='horizontal' />
 );
@@ -946,8 +1000,17 @@ function AttributeMixedExample({ orientation }: { orientation?: AttributeProps['
   );
 }
 
+/**
+ * A plain value, an actions target and an inline editor stacked in one column: the
+ * text has to start at the same place in all three, which is what the value slot's
+ * 7px pull is for — it moves the hover box left, not the text.
+ */
 export const Mixed: StoryFn = () => <AttributeMixedExample />;
 Mixed.storyName = 'Mixed (plain + Actions + InlineEdit)';
 
+/**
+ * The same three hosts horizontally, where the label cell fixes the start of every
+ * value and the pull has to fit inside the 12px gap between the two cells.
+ */
 export const HorizontalMixed: StoryFn = () => <AttributeMixedExample orientation='horizontal' />;
 HorizontalMixed.storyName = 'Horizontal Mixed (plain + Actions + InlineEdit)';

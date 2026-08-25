@@ -48,6 +48,11 @@ import {
 
 const formatYTick = (value: unknown) => formatFullNumber(Number(value));
 
+const DESCRIPTION = [
+  "A time series in the family's card — request volume, error rate, latency, anything where the X axis reads left to right; reach for `BarList` for a top-N comparison and `PieChart` for a share of a total.",
+  'Every part is an opt-in child, so a bare sparkline and a fully instrumented panel are the same component with different children, and hover, filtering and zoom all travel through one context.',
+].join(' ');
+
 const meta = {
   title: 'Data display/SimpleCharts/LineChart',
   component: LineChart,
@@ -73,17 +78,17 @@ const meta = {
       type: 'figma',
       url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-123142&m=dev',
     },
-    docs: {
-      description: {
-        component: `LineChart renders one or more time-series lines inside the shared chart frame. The root owns \`data\` and \`series\` and supplies a context that the body, lines, axes, grid, tooltip, brush, and legend compose against. Hover sync, click-to-filter, and zoom-to-emit all flow through the same context. Legend placement is structural — JSX child order picks top vs bottom; wrapping body+legend in an \`<HStack>\` picks left vs right.`,
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],
 } satisfies Meta<typeof LineChart>;
 
 export default meta;
 
+/**
+ * One series with the full chrome — grid, both axes, and a tooltip that follows the pointer
+ * along the line.
+ */
 export const Default: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
@@ -113,6 +118,10 @@ Default.parameters = {
   },
 };
 
+/**
+ * Three series with a legend composed from `LineChartLegendItem` rows. The dot in each row is
+ * the same one the tooltip uses, so the colours cannot drift apart.
+ */
 export const DefaultMulti: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
@@ -164,9 +173,9 @@ const MultiLegend = ({ series = multiSeries }: { series?: LineChartSeries[] }) =
 );
 
 /**
- * The anatomy's "metric + legend" variant: the shared Metric bricks (value + delta) sit to the
- * left of the legend in one row between the card header and the grid. Pure composition — the
- * chart itself is untouched; the card simply grows by the metric row's height.
+ * The metric variant: the shared `Metric` bricks sit to the left of the legend in a row of
+ * their own between the header and the plot. Pure composition — the chart is untouched and the
+ * card simply grows by that row.
  */
 export const WithMetric: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
@@ -206,6 +215,11 @@ WithMetric.parameters = {
   },
 };
 
+/**
+ * Straight joins tell the truth about where the samples are; `monotone` smooths between them
+ * and reads better for a rate. Mix the two only when the series mean genuinely different
+ * things.
+ */
 export const Curves: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
@@ -249,6 +263,10 @@ export const Curves: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * A dashed series against a solid one — the way to separate a threshold or a projection from
+ * measured data — and a CSS colour string for a series whose colour is decided elsewhere.
+ */
 export const LineStyling: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
@@ -292,6 +310,10 @@ export const LineStyling: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The three shapes that break naive charts: a sparkline with no chrome at all, a single data
+ * point, and a series with null gaps, which has to break the line rather than bridge it.
+ */
 export const EdgeCases: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
@@ -343,6 +365,10 @@ export const EdgeCases: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Composing the hover popover yourself, a `LineChartHoverPopoverRow` per series, for when a
+ * value needs its unit rather than the default name-and-number.
+ */
 export const CustomTooltip: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
@@ -397,6 +423,11 @@ export const CustomTooltip: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Legend placement is structural rather than a prop: JSX order picks top or bottom, and
+ * wrapping the body and the legend in an `HStack` picks left or right, where a vertical
+ * orientation stacks its rows.
+ */
 export const LegendPlacements: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   return (
@@ -510,13 +541,12 @@ export const LegendPlacements: StoryFn<typeof meta> = () => {
 
 LegendPlacements.parameters = {
   layout: 'padded',
-  docs: {
-    description: {
-      story: `Legend placement is structural, not configured. JSX child order picks top vs bottom; wrapping the body and the legend together in an \`<HStack>\` (or any row flex container) picks left vs right. The legend pairs \`orientation="vertical"\` with the side layout so its rows stack vertically.`,
-    },
-  },
 };
 
+/**
+ * Clicking a legend row isolates that series and clicking another adds it back, with the
+ * header's clear control appearing while anything is hidden.
+ */
 export const Filterable: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   const [hidden, setHidden] = useState<string[]>([]);
@@ -586,6 +616,11 @@ export const Filterable: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Two cards sharing a pointer, and it takes two mechanisms: `syncId` lines up the cursor and
+ * tooltip through recharts, while `activeKey` shares the series highlight through our own
+ * context.
+ */
 export const CrossChartHoverSync: StoryFn<typeof meta> = () => {
   const { formatHour, formatHourWithTimezone } = useChartTimeFormatters();
   // `syncId` syncs the *cursor X* (tooltip + brush) via recharts' own redux
@@ -713,19 +748,16 @@ const ZoomControlledChart = () => {
   );
 };
 
+/**
+ * Drag across the plot to choose a range, then confirm in the popover — Enter or the button
+ * emits `onZoomChange`, while Escape, an outside click or a new drag dismisses it. Slicing the
+ * data to that range is yours, and so is the way back out.
+ */
 export const Zoom: StoryFn<typeof meta> = () => (
   <div className='w-560'>
     <ZoomControlledChart />
   </div>
 );
-
-Zoom.parameters = {
-  docs: {
-    description: {
-      story: `Drag on the chart plot to select a range — the gray selection rectangle follows the cursor. On release the selection stays put and a "Zoom in" popover appears for confirmation. Clicking "Zoom in" or pressing \`Enter\` fires \`onZoomChange\` with the selected range; pressing \`Escape\`, clicking outside the popover, or starting a new drag dismisses without emitting. The consumer slices its own data based on the range, and a "Zoom out" button in \`<ChartActions>\` clears it.`,
-    },
-  },
-};
 
 const LoadingLegend = ({ orientation }: { orientation?: 'horizontal' | 'vertical' }) => (
   <LineChartLegend orientation={orientation}>
@@ -737,6 +769,11 @@ const LoadingLegend = ({ orientation }: { orientation?: 'horizontal' | 'vertical
   </LineChartLegend>
 );
 
+/**
+ * There is no `loading` prop: the state is composed from the same primitives as a populated
+ * chart — `Skeleton` chips inside the legend and a bare `LineChartEmpty` for the dashed plot —
+ * with `aria-busy` on the `Chart` left to the caller.
+ */
 export const Loading: StoryFn<typeof meta> = () => (
   <div className='grid grid-cols-2 gap-16 w-1120'>
     <Chart aria-busy='true' aria-live='polite'>
@@ -788,11 +825,6 @@ Loading.parameters = {
   design: {
     type: 'figma',
     url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7519-2617&m=dev',
-  },
-  docs: {
-    description: {
-      story: `Loading state is built by composing the same primitives as a populated chart — \`<LineChartLegend>\` with \`<Skeleton>\` chips for the legend, bare \`<LineChartEmpty />\` for the dashed-grid plot frame (no \`children\` means no message overlay). Mirrors the four placement variants from \`LegendPlacements\` plus a no-legend variant. \`aria-busy\` on \`<Chart>\` announces the loading state.`,
-    },
   },
 };
 
@@ -910,6 +942,11 @@ const RefreshingChart = ({
   );
 };
 
+/**
+ * Each panel loads for two seconds before swapping to data, and the refresh button replays it.
+ * The skeleton and the real chart share an outer layout, so nothing but the content moves on
+ * the swap.
+ */
 export const Refreshing: StoryFn<typeof meta> = () => (
   <div className='grid grid-cols-2 gap-16 w-1120'>
     <RefreshingChart placement='none' title='No legend' />
@@ -920,14 +957,10 @@ export const Refreshing: StoryFn<typeof meta> = () => (
   </div>
 );
 
-Refreshing.parameters = {
-  docs: {
-    description: {
-      story: `Each panel mounts in the loading state for 2 seconds before swapping to data; the refresh button replays the cycle independently per chart. Mirrors the four placement variants from \`LegendPlacements\` plus a no-legend variant — the skeleton (legend + plot frame) and the populated chart share the same outer layout, so the swap is invisible apart from the content.`,
-    },
-  },
-};
-
+/**
+ * `LineChartEmpty` keeps the dashed plot frame and puts the message inside it, so a card with
+ * no data still reads as a chart rather than as something broken.
+ */
 export const Empty: StoryFn<typeof meta> = () => (
   <div className='w-560'>
     <Chart>
@@ -1002,6 +1035,10 @@ const LongTimeRangeChart = () => {
   );
 };
 
+/**
+ * A thousand hourly samples in one card: drag to zoom and the header's control restores the
+ * full range. The story slices the data itself, exactly as a consumer has to.
+ */
 export const LongTimeRange: StoryFn<typeof meta> = () => (
   <div className='w-720'>
     <LongTimeRangeChart />

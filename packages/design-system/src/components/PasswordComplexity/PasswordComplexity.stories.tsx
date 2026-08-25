@@ -4,19 +4,17 @@ import { Input } from '../Input';
 import { PasswordComplexity, type PasswordComplexityItem } from './PasswordComplexity';
 import { passwordValidators } from './validators';
 
+const DESCRIPTION = [
+  'The rules a password has to meet, ticked off as it meets them — show them from the moment the field appears rather than after a failed submit, and keep the same set everywhere a password is created.',
+  "The component only paints: you compute each rule's `met` and pass it in, with `passwordValidators` shipped alongside for that. A satisfied rule is struck through and steps back, so what is left to do is what stands out.",
+].join(' ');
+
 const meta = {
   title: 'Data Display/PasswordComplexity',
   component: PasswordComplexity,
   parameters: {
     layout: 'centered',
-    docs: {
-      description: {
-        component:
-          'Presentation-only password-rule checklist built on List/ListItem/ListIcon. ' +
-          'The consumer passes pre-computed items with `met` booleans; the component ' +
-          'handles only the visual states (checked vs unchecked).',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
 } satisfies Meta<typeof PasswordComplexity>;
 
@@ -30,12 +28,24 @@ const defaultItems: PasswordComplexityItem[] = [
   { id: 'symbol', label: 'Contains a special character', met: false },
 ];
 
+/**
+ * The opening state — every rule still outstanding, marked with a muted dot and left in
+ * full-strength type.
+ */
 export const AllUnmet: StoryFn<typeof meta> = () => <PasswordComplexity items={defaultItems} />;
 
+/**
+ * Everything satisfied: green checks with the labels struck through, which reads as done
+ * without needing a success message on top.
+ */
 export const AllMet: StoryFn<typeof meta> = () => (
   <PasswordComplexity items={defaultItems.map(item => ({ ...item, met: true }))} />
 );
 
+/**
+ * The state actually seen most of the time. Three rules are struck through and two are not,
+ * and the two are what the eye goes to.
+ */
 export const PartiallyMet: StoryFn<typeof meta> = () => (
   <PasswordComplexity
     items={[
@@ -48,6 +58,10 @@ export const PartiallyMet: StoryFn<typeof meta> = () => (
   />
 );
 
+/**
+ * Two fields wired to `passwordValidators`, `passwordsMatch` included, recomputed on every
+ * keystroke — the real-time checking the rules are meant to be shown with.
+ */
 export const Interactive: StoryFn<typeof meta> = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');

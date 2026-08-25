@@ -21,18 +21,18 @@ const severityData: HorizontalBarStackDatum[] = [
   { name: 'Medium', value: 18, color: 'amber' },
 ];
 
+const DESCRIPTION = [
+  'One total read as a few named parts in a single band — reach for `BarList` when each part deserves a row of its own, and `Metric` when there is no breakdown to show at all.',
+  'The header is composed from the shared `Metric` bricks rather than configured, so a value and its delta read the same here as anywhere else in the family; hovering a segment or a legend item fades the rest.',
+].join(' ');
+
 const meta = {
   title: 'Data display/SimpleCharts/HorizontalBarStack',
   component: HorizontalBarStack,
   parameters: {
     layout: 'centered',
     design: { type: 'figma', url: figmaUrl },
-    docs: {
-      description: {
-        component:
-          'A single proportional segmented bar with an optional composed header (the shared `Metric` bricks — `MetricValue` + `MetricDelta`) and a horizontal legend. The legend is interactive: hovering an item or segment fades the rest (hover-sync), and passing `onSelect` makes items clickable filters — `selectedNames` marks the active one and dims the rest. Same interaction contract as `PieChart`. Composed inside a `Chart` card.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
   args: {
     // Base for derived slot ids (`horizontal-bar-stack--bar`, `--legend-item`, …) used by e2e tests.
@@ -63,6 +63,10 @@ const Frame: StoryFn<HorizontalBarStackProps> = args => (
   </div>
 );
 
+/**
+ * The full shape: a headline value with its delta, a three-part band, and the legend that
+ * names the parts.
+ */
 export const Default: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 Default.args = {
   data: severityData,
@@ -74,6 +78,9 @@ Default.args = {
   ),
 };
 
+/**
+ * The same without the delta — a value with no comparison to make yet.
+ */
 export const NoDelta: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 NoDelta.args = {
   data: severityData,
@@ -84,9 +91,17 @@ NoDelta.args = {
   ),
 };
 
+/**
+ * No header at all: the band and its legend alone, for a card whose total is already stated
+ * somewhere else.
+ */
 export const NoValue: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 NoValue.args = { data: severityData };
 
+/**
+ * A `total` above the sum of the parts fills the difference with a grey tail — 91 of 120,
+ * where the 29 nobody has accounted for is part of what the card says.
+ */
 export const WithRemainder: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 WithRemainder.args = {
   data: severityData,
@@ -99,6 +114,10 @@ WithRemainder.args = {
   ),
 };
 
+/**
+ * `legend={false}` leaves the band on its own, for a card too small to carry names or one
+ * whose legend is already nearby.
+ */
 export const LegendOff: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 LegendOff.args = {
   data: severityData,
@@ -111,6 +130,10 @@ LegendOff.args = {
 };
 
 const PALETTE: ChartColor[] = ['red', 'brand', 'amber', 'blue', 'green', 'purple'];
+/**
+ * All six chart colours in one band, which is the check that they stay tellable apart at the
+ * widths a real breakdown gives them.
+ */
 export const Palette: StoryFn<HorizontalBarStackProps> = Frame.bind({});
 Palette.args = {
   data: PALETTE.map((color, i) => ({ name: color, value: 10 + i, color })),
@@ -121,7 +144,10 @@ Palette.args = {
   ),
 };
 
-/** Card-load shimmer — swap the chart for `HorizontalBarStackSkeleton` while data loads. */
+/**
+ * `HorizontalBarStackSkeleton` stands in while the card loads, holding the header and band
+ * heights so nothing shifts when data arrives.
+ */
 export const Loading: StoryFn = () => (
   <div className='w-400'>
     <Chart>
@@ -134,8 +160,9 @@ export const Loading: StoryFn = () => (
 );
 
 /**
- * Click a legend item to filter to that series; click the active one again to clear
- * ("remove filter"). Hovering any item or segment fades the rest (hover-sync).
+ * `onSelect` turns the legend into a filter — the chosen series stays bright, the rest fade,
+ * and clicking it again clears. Hover always wins, so pointing at any series brings it forward
+ * regardless of what is selected.
  */
 export const Selectable: StoryFn<HorizontalBarStackProps> = () => {
   const [selected, setSelected] = useState<string | null>('Critical');

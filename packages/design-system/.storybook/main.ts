@@ -6,6 +6,10 @@ const config: StorybookConfig = {
   framework: getAbsolutePath('storybook-react-rsbuild'),
   stories: ['../src/**/*.stories.@(js|jsx|mjs|ts|tsx)', '../src/**/*.mdx'],
   addons: [getAbsolutePath('@storybook/addon-docs'), getAbsolutePath('@storybook/addon-themes')],
+  docs: {
+    // The sidebar entry reads "Overview" instead of Storybook's default "Docs".
+    defaultName: 'Overview',
+  },
   staticDirs: ['./assets'],
   rsbuildFinal: async (config, { configType }) => {
     if (configType === 'PRODUCTION' && config.output) {

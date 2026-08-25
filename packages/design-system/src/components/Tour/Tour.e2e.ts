@@ -2,7 +2,7 @@ import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const tourStory = createStoryHelper('overlay-tour', [
-  'Overview',
+  'Basic',
   'Placement',
   'Beacon Triggered',
   'Wait For Interaction',
@@ -37,7 +37,7 @@ const checkProgress = async (page: Page, text: string) => {
 test.describe('Component: Tour', () => {
   test.describe('Visual', () => {
     test('Should render dialog step correctly', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
 
       await expect(getTourBackdrop(page)).toBeVisible();
@@ -46,7 +46,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should render tooltip step correctly', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await goFirstStep(page);
 
@@ -56,7 +56,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should render tooltip step with media correctly', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await goFirstStep(page);
       await goNextStep(page);
@@ -70,7 +70,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should render tooltip step without backdrop correctly', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await goFirstStep(page);
       await goNextStep(page);
@@ -82,7 +82,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should render circle spotlight correctly', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await goFirstStep(page);
       await goNextStep(page);
@@ -95,7 +95,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should render finish dialog with media correctly', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await goFirstStep(page);
       await goNextStep(page);
@@ -114,7 +114,7 @@ test.describe('Component: Tour', () => {
 
   test.describe('Interactions', () => {
     test('Should navigate to previous step when Back button is clicked', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await goFirstStep(page);
       await goNextStep(page);
@@ -124,7 +124,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should dismiss tour when Skip button is clicked', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await getActionButton(page, 'Skip').click();
 
@@ -132,7 +132,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should dismiss tour when Finish button is clicked', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await goFirstStep(page);
       await goNextStep(page);
@@ -145,7 +145,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should close tour when close button is clicked', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await getCloseButton(page).click();
 
@@ -205,7 +205,7 @@ test.describe('Component: Tour', () => {
 
   test.describe('Accessibility', () => {
     test('Should navigate to next step via ArrowRight key', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await getActionButton(page, 'Start').click();
       await expect(getTourContent(page)).toContainText('Common use case');
@@ -215,7 +215,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should navigate to previous step via ArrowLeft key', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
       await getActionButton(page, 'Start').click();
       await getActionButton(page, 'Next').click();
@@ -226,7 +226,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should dismiss tour via Escape key', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
 
       await page.keyboard.press('Escape');
@@ -234,7 +234,7 @@ test.describe('Component: Tour', () => {
     });
 
     test('Should trap focus within content via Tab key', async ({ page }) => {
-      await tourStory.goto(page, 'Overview');
+      await tourStory.goto(page, 'Basic');
       await startTour(page);
 
       // Press Tab multiple times to cycle through interactive elements

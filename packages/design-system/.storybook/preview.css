@@ -1,3 +1,4 @@
+@import './fonts/kalam.css';
 @import 'tailwindcss';
 @import 'tw-animate-css';
 @import '../src/theme/index.css';
@@ -6,4 +7,54 @@ html,
 .docs-story {
     background: var(--color-bg-page-bg);
     color: var(--color-text-primary);
+}
+
+/* Storybook renders docs pages on its own light surface in both themes, so the Overview frame keeps
+   its light-theme colours rather than following data-theme into pale-on-white. */
+[data-theme='dark'] {
+    .docs-frame-link {
+        color: var(--color-blue-600);
+    }
+
+    .docs-frame-link:hover {
+        color: var(--color-blue-800);
+    }
+
+    .docs-frame-muted {
+        color: var(--color-slate-300);
+    }
+
+    .docs-frame-rule {
+        border-color: var(--color-slate-300);
+    }
+}
+
+/* Story annotations — the labels inside a story canvas that name what a group of examples shows
+   ("Brand" / "Neutral", "Default" / "Disabled" / "Error"). They are scaffolding around the
+   specimen, not component surface, so they should never be mistaken for part of the design: they
+   take Figma's own annotation style, handwritten and pink, where Caveat stands in for Figma Hand.
+
+   The handwritten face comes from Figma's `annotation/md` style. The colour deliberately does not:
+   Figma's annotation pink earns its loudness on a canvas full of other people's notes, but on a
+   documentation page it competes with the specimen, so these sit back at `--color-text-secondary`.
+
+   Only ever restyle a label a story already has. Adding annotations to make a story look annotated
+   is how the inconsistency started. */
+.sb-annotation {
+    color: var(--color-text-secondary);
+    /* Kalam at 300 rather than Caveat, the other candidate: Caveat's variable axis bottoms out at
+       400, and at 22px its stroke read as too heavy next to the controls it labels. */
+    font-family: 'Kalam', 'Segoe Script', 'Bradley Hand', cursive;
+    font-size: 22px;
+    font-weight: 300;
+    /* Loose on purpose: the annotation sits directly above its examples, and at Figma's tight
+       line height the label crowded the controls underneath it. */
+    line-height: 1.6;
+    text-transform: lowercase;
+}
+
+/* Same label, on a dark surface — the two neutral-alt rows in SplitButton's stories sit on a dark
+   panel, where secondary text is invisible. */
+.sb-annotation-alt {
+    color: var(--color-text-secondary-alt);
 }

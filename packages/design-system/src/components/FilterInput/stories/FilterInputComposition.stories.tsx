@@ -1,6 +1,8 @@
 import type React from 'react';
 import { useState } from 'react';
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from 'storybook/test';
+import { Skeleton } from '../../Skeleton';
 import { FilterInput } from '../FilterInput';
 import {
   createStatusCodeInputFilter,
@@ -11,11 +13,23 @@ import {
 import type { ExprNode, FieldMetadata } from '../types';
 import { backendFieldsToMetadata, realBackendFields } from './backendFieldsFixture';
 
+const onFilterChange = fn().mockName('onFilterChange');
+
+const DESCRIPTION = [
+  'The same `FilterInput` at production scale — the attack-vectors schema as the backend actually serves it, mapped through `backendFieldsToMetadata`.',
+  'Come here to see the pattern hold up against fifty fields and hundred-entry option lists; the `FilterInput` page beside it shows the individual behaviours one at a time.',
+].join(' ');
+
 const meta = {
   title: 'Patterns/FilterInput/Composition',
   component: FilterInput,
   parameters: {
     layout: 'fullscreen',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
   decorators: [
     (Story: React.ComponentType) => (
@@ -617,21 +631,7 @@ const attackFields: FieldMetadata[] = [
   },
 ];
 
-/**
- * Mirrors the MY console **new Attacks** page: the full attack-vectors filter
- * schema served by sessions-api (`where_fields`), rendered straight from the
- * raw backend payload via `backendFieldsToMetadata` (from the shared
- * `backendFieldsFixture` module). Every field is
- * `strictValues: false`, so backend option lists act as suggestions and any
- * typed value commits — exactly how the Attacks page treats the schema, letting
- * the backend reject truly invalid input.
- *
- * Exercises the real-world breadth the component must handle: ~50 fields, a
- * ~115-entry `application_id` option list, large `attack_type` /
- * `attack_subtype` / `cwe_id` / `capec_id` enumerations, freeform
- * integer/date/float fields, and the `context_param` key/value field (rendered
- * as a paired Parameter → Value chip).
- */
+/** The raw backend payload rendered as-is: around fifty fields, a hundred-plus application list, and the paired context-parameter field — the breadth the pattern has to survive. */
 export const Default: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>(null);
@@ -650,7 +650,7 @@ export const Default: Story = {
 
         {/* Debug output */}
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -659,17 +659,7 @@ export const Default: Story = {
   },
 };
 
-/**
- * Same fields as `Default`, but every field sets `strictValues: false`, so its
- * `values`/`options` act as *suggestions* rather than a strict allowlist: the
- * dropdown still offers them, but any typed value commits without an
- * "Invalid value" error and changing a chip's field never reddens the carried
- * value. Data-type checks (a non-date in a `date` field) and explicit `validate`
- * callbacks (e.g. `status_code` format) still apply.
- *
- * This mirrors the Attacks page, which treats backend schema options as samples
- * and lets the backend reject truly invalid values.
- */
+/** With `strictValues: false` everywhere, option lists become suggestions and any typed value commits, which is how the Attacks page treats the schema. Type checks and explicit `validate` callbacks still apply. */
 export const SuggestionsOnly: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>(null);
@@ -690,7 +680,7 @@ export const SuggestionsOnly: Story = {
         />
 
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -699,10 +689,7 @@ export const SuggestionsOnly: Story = {
   },
 };
 
-/**
- * Minimal example with fewer fields.
- * Supports multiple conditions with AND/OR — create several filters in a row.
- */
+/** Two fields, to show the same component scales down — though at this size a pair of `Select`s is usually the better answer. */
 export const Simple: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>(null);
@@ -736,14 +723,14 @@ export const Simple: Story = {
           fields={simpleFields}
           value={expression}
           onChange={expr => {
-            console.log('Filter:', expr);
+            onFilterChange(expr);
             setExpression(expr);
           }}
           placeholder='Filter items...'
         />
 
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre data-testid='expression-debug'>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -752,10 +739,7 @@ export const Simple: Story = {
   },
 };
 
-/**
- * Backend integration example
- * Shows how to use with API config (like from sessions-api metadata.go)
- */
+/** The schema arriving from a fetch: until `fields` exists there is nothing to filter by, so the input waits behind a placeholder block. */
 export const BackendIntegration: Story = {
   render: () => {
     const [metadata, setMetadata] = useState<FieldMetadata[] | null>(null);
@@ -770,7 +754,7 @@ export const BackendIntegration: Story = {
     });
 
     if (!metadata) {
-      return <div className='h-40 bg-gray-100 rounded-8 animate-pulse' />;
+      return <Skeleton width='100%' height='40px' />;
     }
 
     return (

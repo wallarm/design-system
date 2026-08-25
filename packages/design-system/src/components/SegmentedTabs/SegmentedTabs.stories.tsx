@@ -16,6 +16,11 @@ import { SegmentedTabsSeparator } from './SegmentedTabsSeparator';
 import { SegmentedTabsTrigger } from './SegmentedTabsTrigger';
 import { SegmentedTabsTriggerButton } from './SegmentedTabsTriggerButton';
 
+const DESCRIPTION = [
+  'The pill-skinned tab set: it owns its panels like `Tabs` but wears `SegmentedControl`’s look. Reach for it for scoped views of a single collection — All / Active / Blocked — or as a second level under primary `Tabs`, never as a page’s main tabs.',
+  'The line against `SegmentedControl` is whether selecting changes *which* content shows (here) or only *how the same content looks* (there). Keep the set short: overflow goes to a “More” menu, since these pills do not scroll.',
+].join(' ');
+
 const meta = {
   title: 'Navigation/SegmentedTabs',
   component: SegmentedTabs,
@@ -31,9 +36,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'An enhanced segmented control with actionable hover buttons. ' +
-          'Each item can show a three-dot action button on hover that can trigger dropdown menus.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -58,6 +61,7 @@ export default meta;
 
 type Story = StoryFn<typeof meta>;
 
+/** The smallest set — pills and their panels, with the selected pill sliding under the label. */
 export const Basic: Story = () => (
   <SegmentedTabs defaultValue='react' data-testid='segmented-tabs'>
     <SegmentedTabsList>
@@ -73,6 +77,7 @@ export const Basic: Story = () => (
   </SegmentedTabs>
 );
 
+/** A disabled pill stays visible but unselectable, for a scope that exists and currently has nothing to show. */
 export const Disabled: Story = () => (
   <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
@@ -90,6 +95,7 @@ export const Disabled: Story = () => (
   </SegmentedTabs>
 );
 
+/** A `NumericBadge` in the pill turns a scope into a count, which is most of the value of this pattern over plain tabs. */
 export const WithNumericBadge: Story = () => (
   <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
@@ -108,6 +114,7 @@ export const WithNumericBadge: Story = () => (
   </SegmentedTabs>
 );
 
+/** An icon beside the label, for scopes that read faster as symbols. */
 export const WithIcons: Story = () => (
   <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
@@ -135,6 +142,7 @@ export const WithIcons: Story = () => (
   </SegmentedTabs>
 );
 
+/** A pill can carry its own action button — the three-dot menu appears on hover, which is how a saved view gets rename and delete without leaving the row. */
 export const WithContextAction: Story = () => (
   <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
@@ -198,6 +206,7 @@ export const WithContextAction: Story = () => (
   </SegmentedTabs>
 );
 
+/** `SegmentedTabsSeparator` splits the fixed presets from what follows, which is the seam the overflow menu sits behind. */
 export const WithSeparator: Story = () => (
   <SegmentedTabs defaultValue='react'>
     <SegmentedTabsList>
@@ -232,6 +241,7 @@ export const WithSeparator: Story = () => (
   </SegmentedTabs>
 );
 
+/** The `indicator` dot marks a saved or custom view, so a user-made scope is distinguishable from the built-in ones. */
 export const WithIndicator: Story = () => (
   <SegmentedTabs defaultValue='all'>
     <SegmentedTabsList>
@@ -251,6 +261,7 @@ export const WithIndicator: Story = () => (
   </SegmentedTabs>
 );
 
+/** `fullWidth` stretches the row to its container, for a toolbar where the pills should span rather than huddle left. */
 export const FullWidth: Story = () => (
   <div className='min-w-800'>
     <SegmentedTabs defaultValue='react' fullWidth>
@@ -268,6 +279,7 @@ export const FullWidth: Story = () => (
   </div>
 );
 
+/** `value` and `onChange` when the scope lives outside the component — in the URL, or shared with a filter. */
 export const Controlled: Story = () => {
   const [value, setValue] = useState<string>('vue');
 

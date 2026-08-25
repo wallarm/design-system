@@ -10,26 +10,15 @@ const filterInputStory = createStoryHelper('patterns-filterinput-filterinput', [
   'With Described Chip',
 ] as const);
 
-// The FilterInputFieldMenu story renders `open: true` with no trigger — the menu
-// lives in an Ark UI portal on <body>, so the shared readiness check never
-// resolves. Navigate directly and wait on the portaled menu (mirrors
-// FilterInputFieldMenuGrouping.e2e.ts).
+// FilterInputFieldMenu's own stories stand the menu up behind a `Button` (the
+// component takes no trigger of its own), so open it before asserting. The
+// shared `goto()` covers the readiness and font-settle waits.
 const gotoFieldMenu = async (page: Page, storyName: Parameters<typeof fieldMenuStory.goto>[1]) => {
-  await page.goto(fieldMenuStory.url(storyName), { waitUntil: 'domcontentloaded' });
-  // Generous timeout: with parallel workers hitting a cold Storybook, the first
-  // portal render of this story can lag past the default 5s expect budget.
+  await fieldMenuStory.goto(page, storyName);
+  await page.getByTestId('field-menu-trigger').click();
   await expect(page.locator('[data-slot="filter-input-field-menu"]')).toBeVisible({
     timeout: 15000,
   });
-  await page.evaluate(async () => {
-    const loads: Promise<unknown>[] = [];
-    document.fonts.forEach(font => {
-      loads.push(font.load().catch(() => undefined));
-    });
-    await Promise.all(loads);
-    await document.fonts.ready;
-  });
-  await page.waitForTimeout(300);
 };
 
 test.describe('Component: FilterInput field-menu description popover (AS-1060)', () => {

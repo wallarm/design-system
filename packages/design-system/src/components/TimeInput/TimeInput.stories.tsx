@@ -2,8 +2,12 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Time } from '../../index';
 import { DateFormatProvider } from '../DateFormatProvider';
 import { HStack, VStack } from '../Stack';
-import { Text } from '../Text';
 import { TimeInput } from './TimeInput';
+
+const DESCRIPTION = [
+  'A time typed segment by segment, the companion to `DateInput` — `showTimeDropdown` adds a list of times for when the reader would rather pick than type.',
+  'It takes React Aria time objects, and hour cycle comes from `DateFormatProvider` app-wide rather than per input.',
+].join(' ');
 
 const meta: Meta<typeof TimeInput> = {
   title: 'Inputs Date/TimeInput',
@@ -12,8 +16,7 @@ const meta: Meta<typeof TimeInput> = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Segmented time-only input with keyboard navigation. Supports hour and minute granularity, 12/24-hour cycle, and an optional time dropdown for quick selection.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -77,32 +80,33 @@ const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
   ),
 ];
 
+/**
+ * The bare field, behaving exactly like `DateInput`: arrows step a segment, typing fills it and
+ * advances.
+ */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
   return <TimeInput {...args} />;
 };
 Basic.decorators = dropdownRoom;
 Basic.parameters = { layout: 'padded' };
 
+/**
+ * Default, disabled and error, matching `DateInput` so a form containing both stays consistent.
+ */
 export const States: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Default
-      </Text>
+      <span className='sb-annotation'>Default</span>
       <TimeInput />
       <TimeInput defaultValue={new Time(22, 0)} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Disabled
-      </Text>
+      <span className='sb-annotation'>Disabled</span>
       <TimeInput disabled />
       <TimeInput disabled defaultValue={new Time(14, 30)} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Error
-      </Text>
+      <span className='sb-annotation'>Error</span>
       <TimeInput error />
       <TimeInput error defaultValue={new Time(14, 30)} />
     </VStack>
@@ -110,102 +114,89 @@ export const States: StoryFn<typeof meta> = () => (
 );
 
 /**
- * `showIcon` toggles the leading clock icon. It defaults to `true`; pass
- * `showIcon={false}` for a bare segmented field (e.g. dense tables or when a
- * label already conveys the field's meaning).
+ * A clock icon as decoration. It opens nothing on its own — the dropdown is a separate opt-in.
  */
 export const Icon: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        With icon
-      </Text>
+      <span className='sb-annotation'>With icon</span>
       <TimeInput showIcon />
       <TimeInput showIcon defaultValue={new Time(22, 0)} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Without icon
-      </Text>
+      <span className='sb-annotation'>Without icon</span>
       <TimeInput showIcon={false} />
       <TimeInput showIcon={false} defaultValue={new Time(22, 0)} />
     </VStack>
   </HStack>
 );
 
+/**
+ * The shared height scale, so a time field lines up beside a date field.
+ */
 export const Sizes: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={16}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Default (36px)
-        </Text>
+        <span className='sb-annotation'>Default (36px)</span>
         <TimeInput size='default' />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Medium (32px)
-        </Text>
+        <span className='sb-annotation'>Medium (32px)</span>
         <TimeInput size='medium' />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Small (24px)
-        </Text>
+        <span className='sb-annotation'>Small (24px)</span>
         <TimeInput size='small' />
       </VStack>
     </VStack>
     <VStack gap={16}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Default filled
-        </Text>
+        <span className='sb-annotation'>Default filled</span>
         <TimeInput size='default' defaultValue={new Time(22, 0)} />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Medium filled
-        </Text>
+        <span className='sb-annotation'>Medium filled</span>
         <TimeInput size='medium' defaultValue={new Time(22, 0)} />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Small filled
-        </Text>
+        <span className='sb-annotation'>Small filled</span>
         <TimeInput size='small' defaultValue={new Time(22, 0)} />
       </VStack>
     </VStack>
   </HStack>
 );
 
+/**
+ * A held value beside a placeholder, with the clear affordance appearing only once there is a
+ * value.
+ */
 export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          24-hour
-        </Text>
+        <span className='sb-annotation'>24-hour</span>
         <TimeInput defaultValue={new Time(22, 0)} />
       </VStack>
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          12-hour
-        </Text>
+        <span className='sb-annotation'>12-hour</span>
         <TimeInput defaultValue={new Time(22, 0)} />
       </VStack>
     </DateFormatProvider>
   </VStack>
 );
 
+/**
+ * Hour, minute or second. Drop to `hour` where minutes would imply a precision the system does
+ * not honour.
+ */
 export const Granularity: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour format
-        </Text>
+        <span className='sb-annotation'>12-hour format</span>
         <TimeInput placeholder='hour' granularity='hour' />
         <TimeInput placeholder='hour:min' granularity='minute' />
         <TimeInput placeholder='hour:min:sec' granularity='second' />
@@ -213,9 +204,7 @@ export const Granularity: StoryFn<typeof meta> = () => (
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour format
-        </Text>
+        <span className='sb-annotation'>24-hour format</span>
         <TimeInput placeholder='hour' granularity='hour' />
         <TimeInput placeholder='hour:min' granularity='minute' />
         <TimeInput placeholder='hour:min:sec' granularity='second' />
@@ -224,13 +213,15 @@ export const Granularity: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
+/**
+ * `timeStep` sets the spacing of the offered times — fifteen, thirty or sixty minutes. Coarser
+ * steps make the list scannable; the reader can still type an exact time.
+ */
 export const TimeDropdownSteps: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour format
-        </Text>
+        <span className='sb-annotation'>12-hour format</span>
         <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} />
         <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} />
         <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} />
@@ -238,9 +229,7 @@ export const TimeDropdownSteps: StoryFn<typeof meta> = () => (
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour format
-        </Text>
+        <span className='sb-annotation'>24-hour format</span>
         <TimeInput placeholder='Every 15 min' showTimeDropdown timeStep={15} />
         <TimeInput placeholder='Every 30 min' showTimeDropdown timeStep={30} />
         <TimeInput placeholder='Every 60 min' showTimeDropdown timeStep={60} />
@@ -252,30 +241,23 @@ TimeDropdownSteps.decorators = dropdownRoom;
 TimeDropdownSteps.parameters = { layout: 'padded' };
 
 /**
- * `readOnly` shows a value but removes every edit affordance — typing is
- * ignored (react-aria), and the clear "×" is not rendered at all.
+ * Value legible, every edit affordance gone, as on `DateInput`.
  */
 export const ReadOnly: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Locale
-      </Text>
+      <span className='sb-annotation'>Locale</span>
       <TimeInput readOnly defaultValue={new Time(22, 0)} />
     </VStack>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour
-        </Text>
+        <span className='sb-annotation'>12-hour</span>
         <TimeInput readOnly defaultValue={new Time(22, 0)} />
       </VStack>
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour
-        </Text>
+        <span className='sb-annotation'>24-hour</span>
         <TimeInput readOnly defaultValue={new Time(22, 0)} />
       </VStack>
     </DateFormatProvider>

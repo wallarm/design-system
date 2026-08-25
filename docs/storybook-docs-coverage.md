@@ -1,0 +1,150 @@
+# Storybook docs — coverage tracker
+
+> Which component Overview pages have been written to the standard. The how-to is the
+> [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
+> the way go in [findings](./storybook-docs-findings.md).
+
+> **Last updated:** 2026-08-25, against main at v1.7.0. **All 95 pages are written.**
+>
+> `SearchModal` landed in v1.7.0 with no stories file, so it is not a page yet — it becomes an
+> unticked row the moment one is added.
+
+## How to use this
+
+The pass is complete — every row is ✅. From here the table is a **regression
+check**, not a queue:
+
+1. A new component arrives with a ☐ row. Run `/storybook-docs <Name>` on it in a
+   fresh chat, then set it to ✅.
+2. A page whose stories change may need its prose re-read; the two count columns
+   drifting apart is the signal.
+3. Found a real problem in a component? Park it in [findings](./storybook-docs-findings.md) — never fix it here.
+
+**Status:** ✅ Written to the standard · 🟡 Has prose, not yet levelled · ☐ Nothing yet
+
+> **Story-description shadow — swept 2026-08-24.** A story-level
+> `parameters.docs.description.story` silently overrides the JSDoc sentence above
+> the story, and the counts below cannot see it. The sweep found twelve shadowed
+> sentences (`FilterInputFieldMenu` 6, `Dialog` 2, `Drawer` 2, `InlineEdit` 2);
+> all are fixed. The five remaining `story:` params, on the SimpleCharts pages,
+> were the only description there rather than a shadow — they are now JSDoc too, so
+> **no story file uses the param form any more** and the trap cannot reappear
+> silently. Those rows stay 🟡: the form is fixed, the pages are not levelled.
+> One story is hidden from its own page on purpose:
+> `FeedbackPulse`'s `Rating` carries `tags: ['!autodocs']`, so its sentence is
+> written but never rendered on the Overview.
+
+> ✅ means a person ran the skill on it and judged the result against the budget.
+> Nothing else counts — inherited prose has turned out to be over budget, at the
+> wrong altitude, and in at least one case simply wrong about what the component does.
+> The counts are regenerated from the files, so they follow main rather than drifting, and
+> they count only a sentence sitting directly above a story.
+
+## Snapshot
+
+- **95 written to the standard · 0 left**, across 95 story pages. Every folder is complete.
+- Levelling was usually cutting, not filling — and often correcting. Five pages
+  claimed behaviour their own code contradicted: `Slider`, `Dialog`,
+  `CodeSnippet` (its `Sizes` story labelled the wrong default), `BarList`
+  (`selected` does not fill the bar) and `Table`'s `LoadingWithData` (it appends
+  skeletons, it does not overlay).
+- On a ✅ row the two count columns match. Where they do not, the page is not finished.
+
+## Pages
+| Status | Page | Stories | With a sentence | Story file |
+|---|---|---|---|---|
+| ✅ | Actions/Button | 10 | 10 | `components/Button/Button.stories.tsx` |
+| ✅ | Actions/DropdownMenu | 9 | 9 | `components/DropdownMenu/DropdownMenu.stories.tsx` |
+| ✅ | Actions/SplitButton | 5 | 5 | `components/SplitButton/SplitButton.stories.tsx` |
+| ✅ | Actions/ToggleButton | 8 | 8 | `components/ToggleButton/ToggleButton.stories.tsx` |
+| ✅ | Brand/Logo | 4 | 4 | `components/Logo/Logo.stories.tsx` |
+| ✅ | Brand/WallyIcon | 3 | 3 | `components/WallyIcon/WallyIcon.stories.tsx` |
+| ✅ | Data Display/Accordion | 8 | 8 | `components/Accordion/Accordion.stories.tsx` |
+| ✅ | Data Display/Attribute | 19 | 19 | `components/Attribute/Attribute.stories.tsx` |
+| ✅ | Data Display/Card | 3 | 3 | `components/Card/Card.stories.tsx` |
+| ✅ | Data Display/CodeSnippet/InlineCodeSnippet | 4 | 4 | `components/CodeSnippet/InlineCodeSnippet.stories.tsx` |
+| ✅ | Data Display/Country | 5 | 5 | `components/Country/Country.stories.tsx` |
+| ✅ | Data Display/FormatDateTime | 7 | 7 | `components/FormatDateTime/FormatDateTime.stories.tsx` |
+| ✅ | Data Display/FormatNumber | 9 | 9 | `components/FormatNumber/FormatNumber.stories.tsx` |
+| ✅ | Data Display/HttpMethod | 4 | 4 | `components/HttpMethod/HttpMethod.stories.tsx` |
+| ✅ | Data Display/Ip | 3 | 3 | `components/Ip/Ip.stories.tsx` |
+| ✅ | Data Display/List | 5 | 5 | `components/List/List.stories.tsx` |
+| ✅ | Data Display/OverflowList | 5 | 5 | `components/OverflowList/OverflowList.stories.tsx` |
+| ✅ | Data Display/ParameterPath | 11 | 11 | `components/ParameterPath/ParameterPath.stories.tsx` |
+| ✅ | Data Display/PasswordComplexity | 4 | 4 | `components/PasswordComplexity/PasswordComplexity.stories.tsx` |
+| ✅ | Data Display/ResponseCode | 6 | 6 | `components/ResponseCode/ResponseCode.stories.tsx` |
+| ✅ | Data Display/Selection | 10 | 10 | `components/Selection/Selection.stories.tsx` |
+| ✅ | Data Display/Table | 33 | 33 | `components/Table/Table.stories.tsx` |
+| ✅ | Data Display/Timeline | 3 | 3 | `components/Timeline/Timeline.stories.tsx` |
+| ✅ | Data display/CodeSnippet/CodeSnippet | 25 | 25 | `components/CodeSnippet/CodeSnippet.stories.tsx` |
+| ✅ | Data display/SimpleCharts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
+| ✅ | Data display/SimpleCharts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
+| ✅ | Data display/SimpleCharts/HorizontalBarStack | 8 | 8 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
+| ✅ | Data display/SimpleCharts/LineChart | 15 | 15 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
+| ✅ | Data display/SimpleCharts/Metric | 2 | 2 | `components/SimpleCharts/Metric/Metric.stories.tsx` |
+| ✅ | Data display/SimpleCharts/Overview | 1 | 1 | `components/SimpleCharts/Overview/Overview.stories.tsx` |
+| ✅ | Data display/SimpleCharts/PieChart | 12 | 12 | `components/SimpleCharts/PieChart/PieChart.stories.tsx` |
+| ✅ | Inputs Date/Calendar | 16 | 16 | `components/Calendar/Calendar.stories.tsx` |
+| ✅ | Inputs Date/DateInput | 10 | 10 | `components/DateInput/DateInput.stories.tsx` |
+| ✅ | Inputs Date/DateRangeInput | 9 | 9 | `components/DateRangeInput/DateRangeInput.stories.tsx` |
+| ✅ | Inputs Date/TimeInput | 8 | 8 | `components/TimeInput/TimeInput.stories.tsx` |
+| ✅ | Inputs/Checkbox | 8 | 8 | `components/Checkbox/Checkbox.stories.tsx` |
+| ✅ | Inputs/Field | 9 | 9 | `components/Field/Field.stories.tsx` |
+| ✅ | Inputs/InlineEdit | 14 | 14 | `components/InlineEdit/InlineEdit.stories.tsx` |
+| ✅ | Inputs/Input | 6 | 6 | `components/Input/Input.stories.tsx` |
+| ✅ | Inputs/InputGroup | 8 | 8 | `components/InputGroup/InputGroup.stories.tsx` |
+| ✅ | Inputs/NumberInput | 5 | 5 | `components/NumberInput/NumberInput.stories.tsx` |
+| ✅ | Inputs/OTPInput | 6 | 6 | `components/InputOTP/OTPInput.stories.tsx` |
+| ✅ | Inputs/PasswordInput | 6 | 6 | `components/PasswordInput/PasswordInput.stories.tsx` |
+| ✅ | Inputs/Radio | 3 | 3 | `components/Radio/Radio.stories.tsx` |
+| ✅ | Inputs/SegmentedControl | 10 | 10 | `components/SegmentedControl/SegmentedControl.stories.tsx` |
+| ✅ | Inputs/Select | 15 | 15 | `components/Select/Select.stories.tsx` |
+| ✅ | Inputs/Slider | 14 | 14 | `components/Slider/Slider.stories.tsx` |
+| ✅ | Inputs/Switch | 6 | 6 | `components/Switch/Switch.stories.tsx` |
+| ✅ | Inputs/Textarea | 8 | 8 | `components/Textarea/Textarea.stories.tsx` |
+| ✅ | Layout/AnimatedBackground | 4 | 4 | `components/AnimatedBackground/AnimatedBackground.stories.tsx` |
+| ✅ | Layout/Flex | 5 | 5 | `components/Flex/Flex.stories.tsx` |
+| ✅ | Layout/Page | 2 | 2 | `components/Page/Page.stories.tsx` |
+| ✅ | Layout/ScrollArea | 2 | 2 | `components/ScrollArea/ScrollArea.stories.tsx` |
+| ✅ | Layout/Stack | 6 | 6 | `components/Stack/Stack.stories.tsx` |
+| ✅ | Loading/Loader | 5 | 5 | `components/Loader/Loader.stories.tsx` |
+| ✅ | Loading/Progress | 5 | 5 | `components/Progress/Progress.stories.tsx` |
+| ✅ | Loading/Skeleton | 4 | 4 | `components/Skeleton/Skeleton.stories.tsx` |
+| ✅ | Loading/SplashScreen | 3 | 3 | `components/SplashScreen/SplashScreen.stories.tsx` |
+| ✅ | Messaging/Alert | 8 | 8 | `components/Alert/Alert.stories.tsx` |
+| ✅ | Messaging/Banner | 8 | 8 | `components/Banner/Banner.stories.tsx` |
+| ✅ | Messaging/Toast | 8 | 8 | `components/Toast/Toast.stories.tsx` |
+| ✅ | Navigation/AppShell | 3 | 3 | `components/AppShell/AppShell.stories.tsx` |
+| ✅ | Navigation/Breadcrumbs | 7 | 7 | `components/Breadcrumbs/Breadcrumbs.stories.tsx` |
+| ✅ | Navigation/Link | 5 | 5 | `components/Link/Link.stories.tsx` |
+| ✅ | Navigation/Pagination | 9 | 9 | `components/Pagination/Pagination.stories.tsx` |
+| ✅ | Navigation/SegmentedTabs | 9 | 9 | `components/SegmentedTabs/SegmentedTabs.stories.tsx` |
+| ✅ | Navigation/Tabs | 11 | 11 | `components/Tabs/Tabs.stories.tsx` |
+| ✅ | Navigation/Tree | 6 | 6 | `components/Tree/Tree.stories.tsx` |
+| ✅ | Navigation/TreeView | 8 | 8 | `components/TreeView/TreeView.stories.tsx` |
+| ✅ | Overlay/Dialog | 17 | 17 | `components/Dialog/Dialog.stories.tsx` |
+| ✅ | Overlay/Drawer | 16 | 16 | `components/Drawer/Drawer.stories.tsx` |
+| ✅ | Overlay/FeedbackPulse | 2 | 2 | `components/FeedbackPulse/FeedbackPulse.stories.tsx` |
+| ✅ | Overlay/OverflowTooltip | 7 | 7 | `components/OverflowTooltip/OverflowTooltip.stories.tsx` |
+| ✅ | Overlay/Popover | 4 | 4 | `components/Popover/Popover.stories.tsx` |
+| ✅ | Overlay/Tooltip | 4 | 4 | `components/Tooltip/Tooltip.stories.tsx` |
+| ✅ | Overlay/Tour | 5 | 5 | `components/Tour/Tour.stories.tsx` |
+| ✅ | Pages/EmptyState | 5 | 5 | `components/EmptyState/EmptyState.stories.tsx` |
+| ✅ | Pages/UtilityPage | 4 | 4 | `components/UtilityPage/UtilityPage.stories.tsx` |
+| ✅ | Patterns/FilterInput/Composition | 4 | 4 | `components/FilterInput/stories/FilterInputComposition.stories.tsx` |
+| ✅ | Patterns/FilterInput/FilterInput | 17 | 17 | `components/FilterInput/stories/FilterInput.stories.tsx` |
+| ✅ | Patterns/FilterInput/FilterInputChip | 21 | 21 | `components/FilterInput/stories/FilterInputChip.stories.tsx` |
+| ✅ | Patterns/FilterInput/FilterInputFieldMenu | 11 | 11 | `components/FilterInput/stories/FilterInputFieldMenu.stories.tsx` |
+| ✅ | Patterns/FilterInput/FilterInputOperatorMenu | 8 | 8 | `components/FilterInput/stories/FilterInputOperatorMenu.stories.tsx` |
+| ✅ | Primitives/Icons | 3 | 3 | `icons/module/Icons.stories.tsx` |
+| ✅ | Primitives/Kbd | 4 | 4 | `components/Kbd/Kbd.stories.tsx` |
+| ✅ | Primitives/Overlay | 1 | 1 | `components/Overlay/Overlay.stories.tsx` |
+| ✅ | Primitives/Separator | 1 | 1 | `components/Separator/Separator.stories.tsx` |
+| ✅ | Status Indication/Badge | 11 | 11 | `components/Badge/Badge.stories.tsx` |
+| ✅ | Status Indication/Indicator | 2 | 2 | `components/Indicator/Indicator.stories.tsx` |
+| ✅ | Status Indication/NumericBadge | 3 | 3 | `components/NumericBadge/NumericBadge.stories.tsx` |
+| ✅ | Status Indication/Tag | 7 | 7 | `components/Tag/Tag.stories.tsx` |
+| ✅ | Typography/Code | 7 | 7 | `components/Code/Code.stories.tsx` |
+| ✅ | Typography/Heading | 7 | 7 | `components/Heading/Heading.stories.tsx` |
+| ✅ | Typography/Pixel | 2 | 2 | `theme/Pixel.stories.tsx` |
+| ✅ | Typography/Text | 5 | 5 | `components/Text/Text.stories.tsx` |

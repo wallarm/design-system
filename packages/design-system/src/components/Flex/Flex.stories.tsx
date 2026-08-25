@@ -1,14 +1,13 @@
 import type { FC, PropsWithChildren } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { cn } from '../../utils/cn';
-import { Heading } from '../Heading';
 import { VStack } from '../Stack';
 import { Flex } from './Flex';
 
 const Box: FC<PropsWithChildren<{ className?: string }>> = ({ children, className }) => (
   <div
     className={cn(
-      'flex h-40 py-4 px-8 items-center justify-center bg-blue-500 text-white rounded',
+      'flex h-40 py-4 px-8 items-center justify-center rounded-6 border border-border-info bg-bg-light-info font-mono text-xs text-text-info',
       className,
     )}
   >
@@ -16,17 +15,28 @@ const Box: FC<PropsWithChildren<{ className?: string }>> = ({ children, classNam
   </div>
 );
 
+const DESCRIPTION = [
+  'A flex container with the properties as props — `direction`, `justify`, `align`, `wrap`, plus `basis` fractions and `grow` / `shrink` for how the children size themselves.',
+  'Reach for `Stack`, or `HStack` / `VStack`, when all you want is a spaced list in one direction: `Stack` carries a default gap where `Flex` has none. `Flex` takes no `className`, so everything goes through props.',
+].join(' ');
+
 const meta = {
   title: 'Layout/Flex',
   component: Flex,
   args: {},
   parameters: {
     layout: 'padded',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 } satisfies Meta<typeof Flex>;
 
 export default meta;
 
+/** A row of three, which is the default direction. There is no gap until you ask for one. */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
   <Flex {...args} gap={4}>
     <Box>A</Box>
@@ -35,10 +45,11 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
   </Flex>
 );
 
+/** `row`, `column` and `row-reverse`. Reverse changes the paint order without touching the DOM order, so it moves the visual sequence away from the tab order — use it sparingly. */
 export const Direction: StoryFn<typeof meta> = ({ ...args }) => (
   <Flex direction='column' gap={8}>
     <VStack>
-      <Heading>Row (default)</Heading>
+      <p className='sb-annotation'>row — default</p>
       <Flex {...args} direction='row' gap={2}>
         <Box className='h-32 py-2 px-4 text-sm'>1</Box>
         <Box className='h-32 py-2 px-4 text-sm'>2</Box>
@@ -47,7 +58,7 @@ export const Direction: StoryFn<typeof meta> = ({ ...args }) => (
     </VStack>
 
     <VStack>
-      <Heading>Column</Heading>
+      <p className='sb-annotation'>column</p>
       <Flex {...args} direction='column' gap={2}>
         <Box className='h-32 py-2 px-4 text-sm'>1</Box>
         <Box className='h-32 py-2 px-4 text-sm'>2</Box>
@@ -56,7 +67,7 @@ export const Direction: StoryFn<typeof meta> = ({ ...args }) => (
     </VStack>
 
     <VStack>
-      <Heading>Row Reverse</Heading>
+      <p className='sb-annotation'>row-reverse</p>
       <Flex {...args} direction='row-reverse' gap={2}>
         <Box className='h-32 py-2 px-4 text-sm'>1</Box>
         <Box className='h-32 py-2 px-4 text-sm'>2</Box>
@@ -66,10 +77,11 @@ export const Direction: StoryFn<typeof meta> = ({ ...args }) => (
   </Flex>
 );
 
+/** `justify` distributes along the main axis, and needs `fullWidth` (or a sized parent) to have any room to distribute in. */
 export const Alignment: StoryFn<typeof meta> = ({ ...args }) => (
   <Flex direction='column' gap={8}>
     <VStack>
-      <Heading>Justify Start (default)</Heading>
+      <p className='sb-annotation'>justify start — default</p>
       <Flex {...args} justify='start' fullWidth>
         <Box className='h-16 w-16 text-xs'>A</Box>
         <Box className='h-16 w-16 text-xs'>B</Box>
@@ -77,7 +89,7 @@ export const Alignment: StoryFn<typeof meta> = ({ ...args }) => (
     </VStack>
 
     <VStack>
-      <Heading>Justify Center</Heading>
+      <p className='sb-annotation'>justify center</p>
       <Flex {...args} justify='center' fullWidth>
         <Box className='h-16 w-16 text-xs'>A</Box>
         <Box className='h-16 w-16 text-xs'>B</Box>
@@ -85,7 +97,7 @@ export const Alignment: StoryFn<typeof meta> = ({ ...args }) => (
     </VStack>
 
     <VStack>
-      <Heading>Justify Between</Heading>
+      <p className='sb-annotation'>justify between</p>
       <Flex {...args} justify='between' fullWidth>
         <Box className='h-16 w-16 text-xs'>A</Box>
         <Box className='h-16 w-16 text-xs'>B</Box>
@@ -94,9 +106,10 @@ export const Alignment: StoryFn<typeof meta> = ({ ...args }) => (
   </Flex>
 );
 
+/** `wrap` lets the row break onto more lines once it runs out of width, which is what keeps a long row of chips or tags from overflowing. */
 export const Wrap: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
-    <Heading>Wrap enabled (container: 24rem)</Heading>
+    <p className='sb-annotation'>wrap</p>
     <Flex {...args} wrap='wrap' gap={2} fullWidth>
       {new Array(40).fill(null).map((_, index) => {
         const key = `${index + 1}`;
@@ -111,10 +124,11 @@ export const Wrap: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/** How the children behave when the space does not fit: growing to fill it, or shrinking to survive it. `basis` is the third lever, for a child that should start at a fraction of the row. */
 export const GrowShrink: StoryFn<typeof meta> = ({ ...args }) => (
   <Flex direction='column' gap={8}>
     <VStack>
-      <Heading>Grow: items expand to fill space</Heading>
+      <p className='sb-annotation'>grow</p>
       <Flex {...args} fullWidth>
         <Box className='h-16 flex-1 text-xs'>Flex-1</Box>
         <Box className='h-16 flex-1 text-xs'>Flex-1</Box>
@@ -123,7 +137,7 @@ export const GrowShrink: StoryFn<typeof meta> = ({ ...args }) => (
     </VStack>
 
     <VStack>
-      <Heading>Shrink: items shrink when needed</Heading>
+      <p className='sb-annotation'>shrink</p>
       <Flex {...args} fullWidth>
         <Box className='h-16 flex-shrink text-xs'>Shrinkable long content</Box>
         <Box className='h-16 flex-shrink-0 text-xs'>No shrink</Box>

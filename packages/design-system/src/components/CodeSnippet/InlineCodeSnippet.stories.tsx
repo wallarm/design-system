@@ -2,6 +2,11 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { VStack } from '../Stack';
 import { InlineCodeSnippet } from './InlineCodeSnippet';
 
+const DESCRIPTION = [
+  'A fragment of code inside a sentence, copied by clicking it — reach for `Code` when the text only needs the mono treatment, and `CodeSnippet` when it needs syntax highlighting, a header or line numbers.',
+  'It takes its size from the text around it, so a snippet in a caption stays the size of the caption; keep it to a single line so the sentence still reads.',
+].join(' ');
+
 const meta = {
   title: 'Data Display/CodeSnippet/InlineCodeSnippet',
   component: InlineCodeSnippet,
@@ -11,16 +16,7 @@ const meta = {
       type: 'figma',
       url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=3087-29516&m=dev',
     },
-    docs: {
-      description: {
-        component: `
-Inline code with **copy-to-clipboard** on click. Wraps [\`Code\`](?path=/docs/typography-code--docs) component.
-
-- Need **just text styling**? Use [\`Code\`](?path=/docs/typography-code--docs)
-- Need **syntax highlighting**? Use [\`CodeSnippet\`](?path=/docs/data-display-codesnippet--docs)
-                `,
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],
 } satisfies Meta<typeof InlineCodeSnippet>;
@@ -28,8 +24,8 @@ Inline code with **copy-to-clipboard** on click. Wraps [\`Code\`](?path=/docs/ty
 export default meta;
 
 /**
- * Default behavior: The code snippet inherits the font size from the surrounding text
- * and is copyable by default. Hover to see "Click to copy" tooltip, click to copy.
+ * One snippet in three sentence sizes: `size='inherit'`, the default, scales the type
+ * and the padding with whatever it sits in, and hovering offers the copy.
  */
 export const Default: StoryFn<typeof meta> = () => (
   <VStack align='start'>
@@ -46,26 +42,27 @@ export const Default: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Explicit sizes: sm, md, lg - use these when you need a specific size.
+ * The three fixed sizes, each beside the text size it pairs with — set one when the
+ * snippet must hold its size regardless of its surroundings.
  */
 export const Sizes: StoryFn<typeof meta> = () => (
   <VStack align='start' gap={16}>
     <VStack align='start' gap={4}>
-      <span className='text-xs text-text-secondary font-medium'>sm</span>
+      <span className='sb-annotation'>sm</span>
       <div className='text-xs text-text-primary'>
         To start creating an interface, run{' '}
         <InlineCodeSnippet code='npm install @wads/ui' size='sm' /> and then apply the following...
       </div>
     </VStack>
     <VStack align='start' gap={4}>
-      <span className='text-xs text-text-secondary font-medium'>md</span>
+      <span className='sb-annotation'>md</span>
       <div className='text-sm text-text-primary'>
         To start creating an interface, run{' '}
         <InlineCodeSnippet code='npm install @wads/ui' size='md' /> and then apply the following...
       </div>
     </VStack>
     <VStack align='start' gap={4}>
-      <span className='text-xs text-text-secondary font-medium'>lg</span>
+      <span className='sb-annotation'>lg</span>
       <div className='text-base text-text-primary'>
         To start creating an interface, run{' '}
         <InlineCodeSnippet code='npm install @wads/ui' size='lg' /> and then apply the following...
@@ -75,8 +72,8 @@ export const Sizes: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Non-copyable: Set `copyable={false}` to disable copy functionality.
- * No tooltip will be shown and the cursor will be default.
+ * `copyable={false}` takes the tooltip and the pointer cursor away with the copy, for a
+ * snippet that is only being named rather than reused.
  */
 export const NonCopyable: StoryFn<typeof meta> = () => (
   <p className='text-sm text-text-primary'>
@@ -84,6 +81,10 @@ export const NonCopyable: StoryFn<typeof meta> = () => (
   </p>
 );
 
+/**
+ * Commands, JSON, SQL and a quoted message all render in one colour — inline code gets
+ * the mono treatment and nothing else.
+ */
 export const VariousContent: StoryFn<typeof meta> = () => (
   <VStack align='start'>
     <InlineCodeSnippet code='npm install' />

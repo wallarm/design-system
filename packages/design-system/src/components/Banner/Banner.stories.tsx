@@ -11,6 +11,11 @@ import { BannerIcon } from './BannerIcon';
 import { BannerLink } from './BannerLink';
 import { BannerTitle } from './BannerTitle';
 
+const DESCRIPTION = [
+  'A full-width message pinned above the header, for something account- or system-wide. The test is whether it would still matter on another page: yes and it is a `Banner`, no and it is an `Alert`.',
+  'There is no success variant — “it worked” is a `Toast` — and no `icon` prop either: the icon appears only when a `BannerIcon` is composed in.',
+].join(' ');
+
 const meta = {
   title: 'Messaging/Banner',
   component: Banner,
@@ -27,16 +32,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Banner displays a prominent, full-width message at the top of the page ' +
-          '(above the header) to communicate system-wide status, announcements, warnings, ' +
-          'errors, or promotional messages. Banners persist until dismissed by the user or ' +
-          'until the state that caused them is resolved. Supports 5 variants: primary ' +
-          '(dark/neutral), secondary, destructive, info, and warning. Compose BannerIcon to ' +
-          'show a leading icon — destructive, info, and warning render a default icon, while ' +
-          'primary and secondary render none unless you pass a custom `icon`. Compose with: ' +
-          'BannerIcon, BannerContent, BannerTitle, BannerDescription, BannerLink, ' +
-          'BannerControls, BannerClose.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -61,11 +57,7 @@ interface BannerControlArgs extends BannerProps {
   text: string;
 }
 
-/**
- * Interactive preview — toggle the controls below to compose the banner.
- * BannerIcon shows the default icon on destructive, info, and warning; enable
- * "customIcon" to override it (and to add an icon to primary/secondary).
- */
+/** The playground — toggle the controls to compose a banner and see which parts are optional. */
 export const Default: StoryFn<BannerControlArgs> = ({
   variant,
   customIcon,
@@ -126,10 +118,7 @@ Default.argTypes = {
   text: { control: 'text', description: 'Description text' },
 };
 
-/**
- * primary and secondary have no icon by default; destructive, info, and warning
- * each render their own default icon.
- */
+/** `primary` (dark) and `secondary` (light) are the neutral bars and carry no icon of their own; destructive, info and warning each bring one. */
 export const AllColors: StoryFn<BannerProps> = () => (
   <div className='flex flex-col gap-16'>
     <Banner variant='primary'>
@@ -167,6 +156,7 @@ export const AllColors: StoryFn<BannerProps> = () => (
   </div>
 );
 
+/** A description earns its place by adding the consequence — here the node version the feature needs — never by restating the title. */
 export const WithDescription: StoryFn<BannerProps> = () => (
   <Banner variant='info'>
     <BannerIcon />
@@ -179,6 +169,7 @@ export const WithDescription: StoryFn<BannerProps> = () => (
   </Banner>
 );
 
+/** A `BannerLink` inside the title, for when the action belongs in the sentence. Use the inline link or the trailing buttons, never both. */
 export const WithInlineLink: StoryFn<BannerProps> = () => (
   <Banner variant='warning'>
     <BannerIcon />
@@ -190,10 +181,7 @@ export const WithInlineLink: StoryFn<BannerProps> = () => (
   </Banner>
 );
 
-/**
- * Long messages wrap and clamp to a maximum of two lines, then truncate with an
- * ellipsis. A tooltip reveals the full text on hover. One line is preferred.
- */
+/** Two lines is the ceiling, after which the text truncates into a tooltip. One line is what to aim for. */
 export const LongText: StoryFn<BannerProps> = () => (
   <Banner variant='primary'>
     <BannerContent>
@@ -210,10 +198,7 @@ export const LongText: StoryFn<BannerProps> = () => (
   </Banner>
 );
 
-/**
- * Override the default variant icon (or add one to primary/secondary) by
- * passing the `icon` prop to BannerIcon.
- */
+/** `BannerIcon`’s `icon` prop overrides the variant default, or gives `primary` and `secondary` the icon they otherwise lack — which is how an announcement gets its megaphone. */
 export const CustomIcon: StoryFn<BannerProps> = () => (
   <Banner variant='secondary'>
     <BannerIcon icon={<Megaphone size='lg' className='text-icon-brand' />} />
@@ -228,6 +213,7 @@ export const CustomIcon: StoryFn<BannerProps> = () => (
   </Banner>
 );
 
+/** Trailing buttons in `BannerControls`, small and never solid, labelled with the verb that follows: “Renew”, not “Learn more”. */
 export const WithActions: StoryFn<BannerProps> = () => (
   <Banner variant='destructive'>
     <BannerIcon />
@@ -245,6 +231,7 @@ export const WithActions: StoryFn<BannerProps> = () => (
   </Banner>
 );
 
+/** `BannerClose` where the reader may dismiss it. Leave it off while the condition still holds, since a banner is meant to outlast a page view. */
 export const Closable: StoryFn<BannerProps> = () => {
   const [open, setOpen] = useState(true);
 

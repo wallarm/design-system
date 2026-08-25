@@ -12,6 +12,12 @@ import { PaginationNext } from './PaginationNext';
 import { PaginationPageSize } from './PaginationPageSize';
 import { PaginationPrevious } from './PaginationPrevious';
 
+const DESCRIPTION = [
+  'Page-through navigation for a bounded set — previous and next, numbered pages with automatic ellipsis, and an optional rows-per-page selector.',
+  'Infinite scroll is the house default for long data, so this is the deliberate alternative: reach for it when knowing and controlling your position genuinely helps — jumping to a page, coming back to page two, choosing a page size. “Lots of rows” on its own is not the cue.',
+  'It is compound, so render only the parts you want, in the order you want.',
+].join(' ');
+
 const meta = {
   title: 'Navigation/Pagination',
   component: Pagination,
@@ -23,11 +29,19 @@ const meta = {
     PaginationEllipsis,
     PaginationNext,
   },
-  parameters: { layout: 'centered' },
+  parameters: {
+    layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
+  },
 } satisfies Meta<typeof Pagination>;
 
 export default meta;
 
+/** The complete set — previous, the numbered list, next — which is what most collections want. */
 export const Full: StoryFn<typeof Pagination> = () => (
   <Pagination count={120} pageSize={10} defaultPage={2} align='center' aria-label='Search results'>
     <PaginationPrevious />
@@ -37,6 +51,7 @@ export const Full: StoryFn<typeof Pagination> = () => (
 );
 
 // Simple = page numbers only (no prev/next links)
+/** Numbers only. Fine where the reader is scanning to a known page rather than stepping through. */
 export const Simple: StoryFn<typeof Pagination> = () => (
   <Pagination count={120} pageSize={10} defaultPage={2} align='center'>
     <PaginationList />
@@ -44,6 +59,7 @@ export const Simple: StoryFn<typeof Pagination> = () => (
 );
 
 // Links only = Previous/Next links only (no page numbers)
+/** Previous and next with no numbers, for a set whose page count means nothing to the reader. */
 export const LinksOnly: StoryFn<typeof Pagination> = () => (
   <Pagination count={120} pageSize={10} defaultPage={2} align='center'>
     <PaginationPrevious />
@@ -51,6 +67,7 @@ export const LinksOnly: StoryFn<typeof Pagination> = () => (
   </Pagination>
 );
 
+/** `PaginationPageSize` puts rows-per-page in the same row. Offering it is the strongest reason to choose pagination over infinite scroll. */
 export const WithPageSize: StoryFn<typeof Pagination> = () => (
   <Pagination count={120} defaultPageSize={25} defaultPage={2} align='right'>
     <PaginationPageSize options={[10, 25, 50]} />
@@ -60,6 +77,7 @@ export const WithPageSize: StoryFn<typeof Pagination> = () => (
   </Pagination>
 );
 
+/** `medium` and `small`. Small is the one to use in a `Table` footer, where the pager should not outweigh the data. */
 export const Sizes: StoryFn<typeof Pagination> = () => (
   <VStack gap={24}>
     <Pagination count={120} pageSize={10} defaultPage={2} size='medium' align='center'>
@@ -75,6 +93,7 @@ export const Sizes: StoryFn<typeof Pagination> = () => (
   </VStack>
 );
 
+/** `align` places the row left, centre or right — right for a table footer, centre for a standalone list. */
 export const Alignment: StoryFn<typeof Pagination> = () => (
   <VStack gap={24} className='w-600'>
     {(['left', 'center', 'right'] as const).map(align => (
@@ -85,6 +104,7 @@ export const Alignment: StoryFn<typeof Pagination> = () => (
   </VStack>
 );
 
+/** `siblingCount` and `boundaryCount` decide how much of a 50-page set stays visible; the ellipsis is inserted for you. */
 export const ManyPages: StoryFn<typeof Pagination> = () => (
   <Pagination
     count={500}
@@ -100,6 +120,7 @@ export const ManyPages: StoryFn<typeof Pagination> = () => (
   </Pagination>
 );
 
+/** Controlled mode with both `page` and `pageSize` held outside, which is how it behaves against a real query. */
 export const Playground: StoryFn<typeof Pagination> = () => {
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
@@ -166,6 +187,7 @@ const endpointColumns: TableColumnDef<ApiEndpoint>[] = [
 ];
 
 // "Rows per page" + page navigation share a right-aligned footer below the table.
+/** The pager below a `Table`, sharing its state through `useClientPagination` — the composition to copy for a paged grid. */
 export const InTable: StoryFn<typeof Pagination> = () => {
   const { pageData, ...pagination } = useClientPagination(apiEndpoints, 10);
 

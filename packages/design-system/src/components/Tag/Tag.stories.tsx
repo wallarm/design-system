@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Earth, Info } from '../../icons';
-import { Heading } from '../Heading';
 import {
   Select,
   SelectButtonTag,
@@ -18,12 +18,24 @@ import { HStack, VStack } from '../Stack';
 import { Tag } from './Tag';
 import { TagClose } from './TagClose';
 
+const DESCRIPTION = [
+  'An interactive chip for a keyword or attribute the reader can select or remove — a chip that only states a value is a `Badge`.',
+  'Give it one job: Carbon warns against tags carrying several functions at once, and a chip that both filters and deletes is one people trigger by accident.',
+].join(' ');
+
+const onTagClick = fn().mockName('onTagClick');
+
 const meta = {
   title: 'Status Indication/Tag',
   component: Tag,
   subcomponents: { TagClose },
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 
   argTypes: {
@@ -39,8 +51,15 @@ const meta = {
 
 export default meta;
 
+/**
+ * The default. It is focusable and clickable, which is what separates it from a badge even when
+ * it looks the same.
+ */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => <Tag {...args}>Tag</Tag>;
 
+/**
+ * The same two heights as `Badge`, so a row mixing them stays level.
+ */
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack align='center' gap={8}>
     <Tag {...args} size='medium'>
@@ -52,6 +71,10 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * Out of the tab order and unclickable, but still readable — a filter that cannot currently
+ * apply is still information.
+ */
 export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack gap={8}>
     <Tag {...args} size='medium' disabled>
@@ -63,6 +86,10 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * A dismiss control for a value the reader added, such as an applied filter. Removal is the
+ * only thing the control should do.
+ */
 export const Closable: StoryFn<typeof meta> = ({ ...args }) => {
   const [isVisible, setIsVisible] = useState<boolean>(true);
 
@@ -78,6 +105,10 @@ export const Closable: StoryFn<typeof meta> = ({ ...args }) => {
   );
 };
 
+/**
+ * A toggle, for filtering by tapping the values themselves. Selected state has to be visible
+ * without colour alone.
+ */
 export const Selectable: StoryFn<typeof meta> = () => {
   const collection = createListCollection<SelectDataItem>({
     items: [
@@ -158,10 +189,13 @@ export const Selectable: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * An icon beside the label, carrying the kind of thing rather than its state.
+ */
 export const WithIcons: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack gap={12} align='stretch'>
     <VStack gap={8}>
-      <Heading size='sm'>Medium Size</Heading>
+      <span className='sb-annotation'>medium</span>
       <HStack gap={8}>
         <Tag {...args} size='medium'>
           <Earth />
@@ -179,7 +213,7 @@ export const WithIcons: StoryFn<typeof meta> = ({ ...args }) => (
       </HStack>
     </VStack>
     <VStack gap={8}>
-      <Heading size='sm'>Large Size</Heading>
+      <span className='sb-annotation'>large</span>
       <HStack gap={8}>
         <Tag {...args} size='large'>
           <Earth />
@@ -199,8 +233,12 @@ export const WithIcons: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * A plain click handler, for a chip that navigates or opens rather than toggling — but not as a
+ * link, which Carbon rules out for tags.
+ */
 export const WithOnClick: StoryFn<typeof meta> = ({ ...args }) => (
-  <Tag {...args} onClick={() => alert('Tag clicked!')}>
+  <Tag {...args} onClick={onTagClick}>
     Click me
   </Tag>
 );

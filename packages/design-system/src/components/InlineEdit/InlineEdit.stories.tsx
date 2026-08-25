@@ -56,6 +56,11 @@ import { InlineEditSelect } from './InlineEditSelect';
 import { InlineEditTextarea } from './InlineEditTextarea';
 import { InlineEditTime } from './InlineEditTime';
 
+const DESCRIPTION = [
+  'Turns a displayed value into its own editor, so a reader can correct one field without opening a form — reach for a form when several values change together.',
+  'Every story composes it inside an `Attribute`, because that is what keeps the read and edit states the same height and stops the row jumping on toggle.',
+].join(' ');
+
 const meta = {
   title: 'Inputs/InlineEdit',
   component: InlineEdit,
@@ -77,28 +82,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'InlineEdit is a compound inline-edit component: `InlineEditPreview` renders the ' +
-          'read-mode wrapper and `InlineEditControl` the edit-mode wrapper, hosting either a ' +
-          'built-in editor (`InlineEditInput`, `InlineEditNumber`, `InlineEditTextarea`, ' +
-          '`InlineEditSelect`, `InlineEditDate`, `InlineEditTime`) or a custom one. ' +
-          '`InlineEditSelect`/`InlineEditDate`/`InlineEditDateTime` are pure root-wrappers — ' +
-          'they own only the draft/commit wiring, and `children` (required) are ordinary ' +
-          '`Select`/`Calendar` compound parts, composed exactly as you would standalone. ' +
-          'The root manages the commit/cancel lifecycle, async commit with loading, saved, ' +
-          'and error status, and submit-mode handling (enter, blur, both, or none).' +
-          ' An optional `onBeforeValueCommit` guard intercepts every commit — return `false` ' +
-          '(or a promise resolving to `false`) to keep the field in edit mode, e.g. after a ' +
-          'declined confirmation dialog.' +
-          ' Every story below composes `InlineEdit` inside `AttributeValue` — `AttributeLabel` ' +
-          'renders the label, and `AttributeValue` owns the row-height and hit-target seam that ' +
-          'keeps `InlineEditPreview`/`InlineEditControl` visually identical on toggle, so this ' +
-          'is the same shape real consumers use.' +
-          ' The Controls panel drives the shared behavioral props (`activationMode`, ' +
-          '`submitMode`, `disabled`, `readOnly`, `selectOnFocus`, `savedDuration`) live on every ' +
-          'instance below; each story still hardcodes its own `value`/`status`/`readOnly`/' +
-          '`disabled` where that is the point of the demo (e.g. States, Non Editable), so those ' +
-          'specific controls have no visible effect there.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -232,7 +216,8 @@ function DateInputTrigger({ granularity }: { granularity: 'day' | 'minute' }) {
   );
 }
 
-/** `InlineEditInput` in isolation — the default text editor. */
+/** The default editor. Clicking the value swaps in an input of the same size, which is why the
+ * row does not move. */
 export const TextEditor: StoryFn<typeof meta> = args => {
   const [text, setText] = useState('Checkout API');
   return (
@@ -258,7 +243,8 @@ export const TextEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEditNumber` in isolation. */
+/** `InlineEditNumber` for a numeric field, with the steppers available while editing and gone
+ * again once committed. */
 export const NumberEditor: StoryFn<typeof meta> = args => {
   const [port, setPort] = useState('8443');
   return (
@@ -283,7 +269,8 @@ export const NumberEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEditTextarea` in isolation, with `lineClamp` on the preview. */
+/** For a value long enough to wrap. `lineClamp` on the preview keeps the row short in read mode
+ * and lets the editor grow past it. */
 export const TextareaEditor: StoryFn<typeof meta> = args => {
   const [about, setAbout] = useState(
     'Displays a labeled value for a single object attribute. Used in detail panels, drawers and forms to present structured information.',
@@ -311,7 +298,8 @@ export const TextareaEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEditSelect` (single) in isolation. */
+/** `InlineEditSelect` for a value from a known set. Its children are ordinary `Select` parts, so
+ * the menu behaves exactly as it would standalone. */
 export const SelectEditor: StoryFn<typeof meta> = args => {
   const [role, setRole] = useState<string[]>(['editor']);
   const roleLabel = roleItems.find(i => i.value === (role[0] ?? ''))?.label ?? '';
@@ -347,7 +335,7 @@ export const SelectEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEditSelect` (multiple) in isolation. */
+/** The same editor with `multiple`, for a value that is genuinely a list rather than one choice. */
 export const MultiSelectEditor: StoryFn<typeof meta> = args => {
   const [roles, setRoles] = useState<string[]>(['editor', 'viewer']);
   const rolesLabel = roles.map(v => roleItems.find(i => i.value === v)?.label ?? v).join(', ');
@@ -383,7 +371,8 @@ export const MultiSelectEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEditSelect` (multiple) rendering its value as `Tag` chips. */
+/** A multi-select whose committed value reads as `Tag` chips, which suits a list the reader
+ * scans rather than one they read as a sentence. */
 export const TagsEditor: StoryFn<typeof meta> = args => {
   const [tags, setTags] = useState<string[]>(['production', 'critical']);
   return (
@@ -425,7 +414,8 @@ export const TagsEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEditDate` in isolation. */
+/** `InlineEditDate` hosts a `Calendar`, so the editor is a popover rather than a field — the row
+ * stays the same height while it is open. */
 export const DateEditor: StoryFn<typeof meta> = args => {
   const [date, setDate] = useState<DateValue | null>(new CalendarDate(2026, 6, 15));
   const dateLabel = date
@@ -469,7 +459,7 @@ export const DateEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEditTime` in isolation. */
+/** `InlineEditTime` for a time of day, taking the same value objects as `TimeInput`. */
 export const TimeEditor: StoryFn<typeof meta> = args => {
   const [time, setTime] = useState<TimeValue | null>(new Time(14, 30));
   const timeLabel = time ? format(new Date(2000, 0, 1, time.hour, time.minute), 'h:mm a') : '—';
@@ -502,7 +492,7 @@ export const TimeEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEditDateTime` in isolation. */
+/** Date and time in one editor, for a value where the pair only makes sense together. */
 export const DateTimeEditor: StoryFn<typeof meta> = args => {
   const [dateTime, setDateTime] = useState<CalendarDateTime | null>(
     new CalendarDateTime(2026, 6, 15, 14, 30),
@@ -552,7 +542,11 @@ export const DateTimeEditor: StoryFn<typeof meta> = args => {
   );
 };
 
-/** `InlineEdit` inside a horizontal `Attribute` — label on the left, value/editor on the right. */
+/**
+ * `InlineEdit` inside a horizontal `Attribute` — label on the left, value/editor on the right.
+ * The orientation belongs to `Attribute`, not here: `InlineEdit` has no orientation prop and
+ * behaves identically either way.
+ */
 export const HorizontalLayout: StoryFn<typeof meta> = args => {
   const [name, setName] = useState('Checkout API');
   const [role, setRole] = useState<string[]>(['editor']);
@@ -607,19 +601,8 @@ export const HorizontalLayout: StoryFn<typeof meta> = args => {
   );
 };
 
-HorizontalLayout.parameters = {
-  docs: {
-    description: {
-      story:
-        'The label/value layout comes entirely from the hosting `Attribute`: set ' +
-        '`orientation="horizontal"` and the label renders in a fixed-width cell to the left while ' +
-        '`AttributeValue` fills the rest of the row. `InlineEdit` itself has no orientation prop — ' +
-        'the preview/control toggle and commit lifecycle are identical to the vertical stories above.',
-    },
-  },
-};
-
-/** Async-feedback status snapshots: loading, saved, and error. */
+/** The three async states side by side. `saved` is transient and clears itself after
+ * `savedDuration`, so it is pinned here to be looked at. */
 export const States: StoryFn<typeof meta> = args => (
   <div className='flex w-[420px] flex-col gap-12'>
     <Attribute>
@@ -677,6 +660,10 @@ export const States: StoryFn<typeof meta> = args => (
   </div>
 );
 
+/**
+ * A commit that returns a promise. The field stays in edit mode until it resolves, and a
+ * rejection keeps the reader's text rather than discarding it.
+ */
 export const Async: StoryFn<typeof meta> = args => {
   const [value, setValue] = useState('Checkout API');
   const save = (v: unknown) =>
@@ -707,6 +694,10 @@ export const Async: StoryFn<typeof meta> = args => {
   );
 };
 
+/**
+ * `readOnly` and `disabled` are different answers: read-only shows the value plainly with no
+ * affordance, disabled says there is a control here that you cannot use.
+ */
 export const NonEditable: StoryFn<typeof meta> = args => (
   <div className='flex w-[320px] flex-col gap-8'>
     <Attribute>
@@ -734,6 +725,11 @@ export const NonEditable: StoryFn<typeof meta> = args => (
   </div>
 );
 
+/**
+ * `onBeforeValueCommit` intercepts the commit — return `false`, or a promise of it, to hold
+ * the field open. Use it where the change is consequential enough to confirm, not for validation,
+ * and short-circuit unchanged values: the guard fires on every commit path, no-op submits included.
+ */
 export const ConfirmCommit: StoryFn<typeof meta> = args => {
   const [email, setEmail] = useState('dev@wallarm.com');
   const [role, setRole] = useState<string[]>(['editor']);
@@ -854,22 +850,4 @@ export const ConfirmCommit: StoryFn<typeof meta> = args => {
       </Dialog>
     </div>
   );
-};
-
-ConfirmCommit.parameters = {
-  docs: {
-    description: {
-      story:
-        'The `onBeforeValueCommit` guard intercepts every commit before `onValueCommit` runs. ' +
-        'Return a promise resolved by your own confirmation UI: `false` silently keeps the field ' +
-        'in edit mode with the typed draft (no error state); any ' +
-        'other result lets the commit proceed; a rejection maps to the error status. The guard ' +
-        'fires for every commit path — Enter, blur, popover close — including no-op submits, so ' +
-        'short-circuit on unchanged values (`next === prev`; use `.compare()` for date values ' +
-        'and an item comparison for arrays). Declining a popover editor (the Role select here) ' +
-        'leaves it parked in edit mode with the popover closed: reopen and re-close to be asked ' +
-        'again, or press Escape inside the field to revert. The DS never closes your dialog — ' +
-        'its own buttons must settle the promise and close it.',
-    },
-  },
 };

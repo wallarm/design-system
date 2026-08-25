@@ -62,6 +62,7 @@ const meta = {
 
 export default meta;
 
+/** The full form, 256–560px wide: illustration, title, description, actions, and a learn-more `EmptyStateLink`. Titles read as an invitation rather than an accusation — 'Explore your APIs', not 'You have no APIs'. */
 export const CollectionEmpty: StoryFn<EmptyStateProps> = args => (
   <EmptyState {...args}>
     <EmptyStateIllustration>
@@ -132,6 +133,7 @@ Minimal.args = {
 
 const emptyCollection = createListCollection({ items: [] });
 
+/** The compact form in its real homes — a chart card with no data, and a `Select` whose option list came back empty. An empty inside a container stays action-light however it got that way. */
 export const NoResultsExamples: StoryFn<EmptyStateProps> = () => (
   <HStack gap={32} align='start'>
     {/* In a chart card */}

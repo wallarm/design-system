@@ -1,16 +1,25 @@
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { ChevronLeft, ChevronRight } from '../../icons';
-import { Heading } from '../Heading';
 import { NumericBadge } from '../NumericBadge';
 import { HStack, VStack } from '../Stack';
 import { Button } from './Button';
+
+const DESCRIPTION = [
+  'Triggers an action — reach for `Link` when the control navigates somewhere instead, `ToggleButton` when it stays switched on, and `SplitButton` or `DropdownMenu` when several related actions compete for one slot.',
+  "Keep one `variant='primary'` per view, and reserve `color='destructive'` for actions that are hard to undo.",
+].join(' ');
 
 const meta = {
   title: 'Actions/Button',
   component: Button,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 
   args: { onClick: fn() },
@@ -26,6 +35,10 @@ const meta = {
 
 export default meta;
 
+/**
+ * A button with nothing set: you get the brand primary at the large size. Label it with a
+ * verb and its object — `Delete rule` rather than `Delete` — so the action still reads on its own.
+ */
 export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
   return (
     <Button {...args} data-testid='button'>
@@ -34,9 +47,14 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => {
   );
 };
 
+/**
+ * `variant` sets emphasis and `color` sets meaning, and only the pairings drawn here are
+ * designed: `primary` exists for `brand` and `destructive` only, and the neutral colors start at
+ * `outline`. `neutral-alt` is the same ladder for a dark or coloured surface.
+ */
 export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
-    <Heading>Brand</Heading>
+    <span className='sb-annotation'>Brand</span>
 
     <HStack>
       <Button {...args} variant='primary' color='brand'>
@@ -52,7 +70,7 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral</Heading>
+    <span className='sb-annotation'>Neutral</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral'>
@@ -68,7 +86,7 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral Alt</Heading>
+    <span className='sb-annotation'>Neutral Alt</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral-alt'>
@@ -84,7 +102,7 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Destructive</Heading>
+    <span className='sb-annotation'>Destructive</span>
 
     <HStack>
       <Button {...args} variant='primary' color='destructive'>
@@ -106,6 +124,10 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * Three heights at identical emphasis; `large` is the default, and the smaller two are for
+ * dense contexts like table rows and toolbars where a full-height button would dominate.
+ */
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack align='end' justify='center'>
     <Button {...args} size='small'>
@@ -120,9 +142,14 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * Every sanctioned pairing with the action unavailable. `disabled` also takes the button out
+ * of the tab order, so say somewhere on screen what would re-enable it rather than leaving the
+ * reader to guess.
+ */
 export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
-    <Heading>Brand</Heading>
+    <span className='sb-annotation'>Brand</span>
 
     <HStack>
       <Button {...args} variant='primary' color='brand' disabled>
@@ -138,7 +165,7 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral</Heading>
+    <span className='sb-annotation'>Neutral</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral' disabled>
@@ -154,7 +181,7 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral Alt</Heading>
+    <span className='sb-annotation'>Neutral Alt</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral-alt' disabled>
@@ -170,7 +197,7 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Destructive</Heading>
+    <span className='sb-annotation'>Destructive</span>
 
     <HStack>
       <Button {...args} variant='primary' color='destructive' disabled>
@@ -192,9 +219,14 @@ export const Disabled: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * `loading` covers the content with a spinner but keeps the label's footprint, so the button
+ * doesn't resize mid-request. It disables the button on its own — passing `disabled` as well is
+ * redundant.
+ */
 export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
   <VStack>
-    <Heading>Brand</Heading>
+    <span className='sb-annotation'>Brand</span>
 
     <HStack>
       <Button {...args} variant='primary' color='brand' loading>
@@ -210,7 +242,7 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral</Heading>
+    <span className='sb-annotation'>Neutral</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral' loading>
@@ -226,7 +258,7 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Neutral Alt</Heading>
+    <span className='sb-annotation'>Neutral Alt</span>
 
     <HStack>
       <Button {...args} variant='outline' color='neutral-alt' loading>
@@ -242,7 +274,7 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
       </Button>
     </HStack>
 
-    <Heading>Destructive</Heading>
+    <span className='sb-annotation'>Destructive</span>
 
     <HStack>
       <Button {...args} variant='primary' color='destructive' loading>
@@ -264,6 +296,10 @@ export const Loading: StoryFn<typeof meta> = ({ ...args }) => (
   </VStack>
 );
 
+/**
+ * An icon before the label, after it, or both. The button sizes and spaces icons itself, so
+ * pass the icon bare; and if one button in a row carries an icon, they all should.
+ */
 export const Icons: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack>
     <Button {...args}>
@@ -283,6 +319,11 @@ export const Icons: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * A `NumericBadge` after the label, for a count the action applies to. The button tightens
+ * its right padding whenever the last child isn't text, so a trailing badge or icon doesn't sit
+ * stranded.
+ */
 export const Badge: StoryFn<typeof meta> = ({ ...args }) => (
   <Button {...args}>
     With badge
@@ -290,6 +331,10 @@ export const Badge: StoryFn<typeof meta> = ({ ...args }) => (
   </Button>
 );
 
+/**
+ * There is no `iconOnly` prop: a button whose only child is an icon squares itself off. Give
+ * it an `aria-label` naming the action and a `Tooltip`, since nothing on screen says what it does.
+ */
 export const IconOnly: StoryFn<typeof meta> = ({ ...args }) => (
   <HStack>
     <Button {...args}>
@@ -306,6 +351,11 @@ export const IconOnly: StoryFn<typeof meta> = ({ ...args }) => (
   </HStack>
 );
 
+/**
+ * `asChild` puts the button's styling on your own `<a>`, so the element stays a real link and
+ * middle-click and “open in new tab” keep working. Use it only when a navigation has to carry a
+ * button's weight; ordinary navigation is a `Link`.
+ */
 export const LinkAsButton: StoryFn<typeof meta> = ({ ...args }) => (
   <Button {...args} asChild>
     <a href='https://google.com' target='_blank' rel='noopener noreferrer'>
@@ -314,6 +364,11 @@ export const LinkAsButton: StoryFn<typeof meta> = ({ ...args }) => (
   </Button>
 );
 
+/**
+ * `fullWidth` fills the container, for narrow surfaces like a `Drawer` or a dialog footer
+ * rather than a wide desktop form. Two full-width buttons side by side split the row evenly
+ * instead of overflowing it.
+ */
 export const FullWidth: StoryFn<typeof meta> = ({ ...args }) => (
   <div className='w-400'>
     <Button {...args} fullWidth>

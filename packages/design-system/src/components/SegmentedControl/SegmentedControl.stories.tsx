@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import {
   ChevronLeft,
@@ -18,6 +19,13 @@ import { SegmentedControlButton } from './SegmentedControlButton';
 import { SegmentedControlItem } from './SegmentedControlItem';
 import { SegmentedControlSeparator } from './SegmentedControlSeparator';
 
+const DESCRIPTION = [
+  'Switches between renditions of the same content, with every option visible — reach for `Tabs` when the sections are distinct places rather than views of one thing, and `Radio` when the choice is an answer a form submits.',
+  'It owns no panel: it reports the chosen value and you re-render the content yourself.',
+].join(' ');
+
+const onShowMore = fn().mockName('onShowMore');
+
 const meta = {
   title: 'Inputs/SegmentedControl',
   component: SegmentedControl,
@@ -30,7 +38,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component: 'A segmented control for switching between different views or options.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -53,6 +61,10 @@ const meta = {
 
 export default meta;
 
+/**
+ * Two to five options, all visible at once. Past that the control gets cramped and the
+ * comparison it exists to offer stops working.
+ */
 export const Basic: StoryFn<SegmentedControlProps> = () => (
   <SegmentedControl defaultValue='1' data-testid='segmented-control'>
     <SegmentedControlItem value='1'>
@@ -67,6 +79,10 @@ export const Basic: StoryFn<SegmentedControlProps> = () => (
   </SegmentedControl>
 );
 
+/**
+ * A disabled option stays visible rather than disappearing, so the set of choices doesn't
+ * change shape between visits.
+ */
 export const Disabled: StoryFn<SegmentedControlProps> = () => (
   <SegmentedControl defaultValue='1'>
     <SegmentedControlItem value='1'>Active</SegmentedControlItem>
@@ -77,6 +93,10 @@ export const Disabled: StoryFn<SegmentedControlProps> = () => (
   </SegmentedControl>
 );
 
+/**
+ * Icons beside the labels, which helps when the options are renditions — a list against a
+ * grid — rather than categories.
+ */
 export const Icons: StoryFn<SegmentedControlProps> = () => (
   <SegmentedControl defaultValue='1'>
     <SegmentedControlItem value='1'>
@@ -94,6 +114,10 @@ export const Icons: StoryFn<SegmentedControlProps> = () => (
   </SegmentedControl>
 );
 
+/**
+ * Icon-only segments for a toolbar. Each still needs an accessible name; the icon is the
+ * label only visually.
+ */
 export const IconOnly: StoryFn<SegmentedControlProps> = () => (
   <SegmentedControl defaultValue='user'>
     <SegmentedControlItem value='user'>
@@ -109,6 +133,10 @@ export const IconOnly: StoryFn<SegmentedControlProps> = () => (
   </SegmentedControl>
 );
 
+/**
+ * An overflow trigger for the options that didn't fit. If you need this often, the choice
+ * probably wants a `Select`.
+ */
 export const MoreButton: StoryFn<SegmentedControlProps> = () => (
   <SegmentedControl defaultValue='1'>
     <SegmentedControlItem value='1'>
@@ -121,13 +149,17 @@ export const MoreButton: StoryFn<SegmentedControlProps> = () => (
     </SegmentedControlItem>
     <SegmentedControlItem value='3'>Schema</SegmentedControlItem>
     <SegmentedControlSeparator />
-    <SegmentedControlButton onClick={() => alert('Show more items')}>
+    <SegmentedControlButton onClick={onShowMore}>
       <Ellipsis />
       More
     </SegmentedControlButton>
   </SegmentedControl>
 );
 
+/**
+ * What too many options looks like — worth seeing so the limit is a judgement rather than a
+ * rule you took on trust.
+ */
 export const Many: StoryFn<SegmentedControlProps> = () => {
   const items = Array.from({ length: 10 }, (_, i) => ({
     id: String(i + 1),
@@ -142,7 +174,7 @@ export const Many: StoryFn<SegmentedControlProps> = () => {
         </SegmentedControlItem>
       ))}
       <SegmentedControlSeparator />
-      <SegmentedControlButton onClick={() => alert('Show more items')}>
+      <SegmentedControlButton onClick={onShowMore}>
         <Ellipsis />
         More
       </SegmentedControlButton>
@@ -150,6 +182,10 @@ export const Many: StoryFn<SegmentedControlProps> = () => {
   );
 };
 
+/**
+ * A count on a segment, for when each view holds a different number of things and the reader
+ * would otherwise have to switch to find out.
+ */
 export const Badge: StoryFn<SegmentedControlProps> = () => (
   <SegmentedControl defaultValue='icon-badge'>
     <SegmentedControlItem value='icon-only'>
@@ -166,6 +202,10 @@ export const Badge: StoryFn<SegmentedControlProps> = () => (
   </SegmentedControl>
 );
 
+/**
+ * Stretches to its container, dividing the width evenly. Suits a narrow panel; in a wide one
+ * it leaves the segments floating far apart.
+ */
 export const FullWidth: StoryFn<SegmentedControlProps> = () => (
   <div className='min-w-800'>
     <SegmentedControl defaultValue='1' fullWidth>
@@ -183,6 +223,10 @@ export const FullWidth: StoryFn<SegmentedControlProps> = () => (
   </div>
 );
 
+/**
+ * Own the value when something else has to move with it, which is the usual case, since the
+ * control renders no panel of its own.
+ */
 export const Controlled: StoryFn<SegmentedControlProps> = () => {
   const [value, setValue] = useState<string>('1');
 
@@ -201,6 +245,10 @@ export const Controlled: StoryFn<SegmentedControlProps> = () => {
   );
 };
 
+/**
+ * Inside `Field`, for when the choice really is a form answer — the case where `Radio` is
+ * often the better call.
+ */
 export const FormField: StoryFn<typeof meta> = () => (
   <Field>
     <FieldLabel>

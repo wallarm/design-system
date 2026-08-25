@@ -17,6 +17,11 @@ import { Text } from '../Text';
 import { TreeView, type TreeViewProps } from './TreeView';
 import { TreeViewItem } from './TreeViewItem';
 
+const DESCRIPTION = [
+  'The interactive hierarchy: rows that expand, select and disable, with the connector rails drawn for you.',
+  'Reach for `Tree` when you only need to *show* nesting — this one is for working in it. Rows are composed freely, so an icon, a badge or a checkbox is just a child, and nested `TreeViewItem`s become the subtree.',
+].join(' ');
+
 const meta = {
   title: 'Navigation/TreeView',
   component: TreeView,
@@ -24,8 +29,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'TreeView is a hierarchical explorer built as a compound component (`<TreeView>`, `<TreeViewItem>`). Compose each row freely with children (icon, badge, text); nested `<TreeViewItem>` children become the collapsible subtree. Rows support selection, checkboxes, disabled state, and a custom `rightElement`. A header or search box is assembled from existing components (see the WithHeader and WithSearch stories). Depth-based connector rails are drawn automatically.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -39,6 +43,7 @@ const CountBadge = ({ value }: { value: number }) => (
   </Badge>
 );
 
+/** One level of rows. Each `TreeViewItem` is composed like any row — the component supplies the rail, the indentation and the toggle. */
 export const Basic: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
@@ -70,6 +75,7 @@ export const Basic: StoryFn<TreeViewProps> = args => (
   </div>
 );
 
+/** Nested items become the collapsible subtree, which is also what marks the parent as a branch. Branches start closed. */
 export const Nested: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
@@ -109,11 +115,7 @@ export const Nested: StoryFn<TreeViewProps> = args => (
   </div>
 );
 
-/**
- * Checkboxes are just composed as children — the tree has no checkbox logic.
- * The consumer owns the checked state (here a `Set` of ids) and stops the click
- * from bubbling into row selection.
- */
+/** The tree has no checkbox logic: the checkbox is a child, the checked set is yours, and the click has to be stopped from reaching row selection. */
 export const WithCheckboxes: StoryFn<TreeViewProps> = () => {
   const [checked, setChecked] = useState<Set<string>>(() => new Set(['users']));
   const cb = (id: string) => (
@@ -165,6 +167,7 @@ export const WithCheckboxes: StoryFn<TreeViewProps> = () => {
   );
 };
 
+/** `selectable` (with `multiSelect` for more than one) turns rows into a selection, controlled through `selectedIds` or left to the component. */
 export const Selectable: StoryFn<TreeViewProps> = () => {
   const [selected, setSelected] = useState<string[]>(['button']);
   return (
@@ -191,6 +194,7 @@ export const Selectable: StoryFn<TreeViewProps> = () => {
   );
 };
 
+/** A badge beside the label, for a count that belongs to the row rather than to its children. */
 export const WithInlineBadge: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
@@ -223,10 +227,7 @@ export const WithInlineBadge: StoryFn<TreeViewProps> = args => (
   </div>
 );
 
-/**
- * Trailing content (count badge, custom tag) is just a child after the label —
- * the label is `flex-1`, so anything after it is pushed to the right edge.
- */
+/** The label is `flex-1`, so anything after it lands against the right edge — which is how a count or a tag ends up trailing without any prop for it. */
 export const WithTrailingContent: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView {...args}>
@@ -264,6 +265,7 @@ export const WithTrailingContent: StoryFn<TreeViewProps> = args => (
   </div>
 );
 
+/** A disabled row dims and stops responding to everything: toggle, selection and checkbox alike. */
 export const Disabled: StoryFn<TreeViewProps> = args => (
   <div className='w-320'>
     <TreeView selectable {...args}>
@@ -335,12 +337,7 @@ const TREE_DATA: SearchNode[] = [
 
 const BRANCH_IDS = ['src', 'components', 'utils'];
 
-/**
- * The header and search are assembled from existing components (Text, Button,
- * Input) — TreeView has no dedicated toolbar. Expand-all / collapse-all drive
- * the items' controlled `open` state, and the search filters the tree by label
- * (keeping ancestors of matches and auto-expanding them).
- */
+/** The toolbar is assembled from `Text`, `Button` and `Input` — there is no TreeView toolbar. Expand-all drives the items’ controlled `open` state, and the search keeps ancestors of matches and opens them. */
 export const WithHeaderAndSearch: StoryFn<TreeViewProps> = () => {
   const [query, setQuery] = useState('');
   const q = query.trim().toLowerCase();

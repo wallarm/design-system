@@ -1,3 +1,5 @@
+import { useState } from 'react';
+import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CircleDashed } from '../../icons';
 import { Badge } from '../Badge';
@@ -18,6 +20,14 @@ import { CardFooter } from './CardFooter';
 import { CardHeader } from './CardHeader';
 import { CardTitle } from './CardTitle';
 
+const onCardClick = fn().mockName('onCardClick');
+const onButtonClick = fn().mockName('onButtonClick');
+
+const DESCRIPTION = [
+  'Holds one self-contained thing — a metric, an integration, a saved view — in a block you can compare against its neighbours in a grid; reach for `Table` when the same fields repeat down a list, and for a `Heading` when you only mean to section a page.',
+  'Passing any handler turns the whole card into the target: it becomes focusable and picks up hover and pressed overlays, while clicks on a link or button inside it stay with that control.',
+].join(' ');
+
 const meta = {
   title: 'Data Display/Card',
   component: Card,
@@ -29,14 +39,7 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
-    docs: {
-      description: {
-        component:
-          'Card component for displaying titled content blocks. ' +
-          'Supports primary and secondary color variants. ' +
-          'Use compound components: CardHeader, CardTitle, CardContent, CardFooter.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
   argTypes: {
     color: {
@@ -67,29 +70,56 @@ const meta = {
 
 export default meta;
 
-export const Basic: StoryFn<CardProps> = ({ ...args }) => (
-  <Card onClick={() => console.log('Card clicked')} {...args}>
-    <CardHeader>
-      <CardTitle>Card title</CardTitle>
-      <Badge size='medium' type='solid' color='slate'>
-        Badge
-      </Badge>
-    </CardHeader>
+/**
+ * The full stack — `CardHeader` with a `CardTitle`, `CardContent`, and a `CardFooter`
+ * for actions — carrying a handler, so the footer button and the card are two
+ * separate targets.
+ */
+export const Basic: StoryFn<CardProps> = ({ ...args }) => {
+  // `data-last-click` records which target handled the click. It renders nothing,
+  // and it is what the click-isolation e2e asserts on — the story used to prove
+  // the same thing by writing to the console.
+  const [lastClick, setLastClick] = useState<'card' | 'button' | 'none'>('none');
 
-    <CardContent>Card description</CardContent>
+  return (
+    <Card
+      onClick={e => {
+        onCardClick(e);
+        setLastClick('card');
+      }}
+      data-last-click={lastClick}
+      {...args}
+    >
+      <CardHeader>
+        <CardTitle>Card title</CardTitle>
+        <Badge size='medium' type='solid' color='slate'>
+          Badge
+        </Badge>
+      </CardHeader>
 
-    <CardFooter>
-      <Button
-        variant='secondary'
-        color='neutral'
-        onClick={() => console.log('Card`s button clicked')}
-      >
-        Button
-      </Button>
-    </CardFooter>
-  </Card>
-);
+      <CardContent>Card description</CardContent>
 
+      <CardFooter>
+        <Button
+          variant='secondary'
+          color='neutral'
+          onClick={e => {
+            onButtonClick(e);
+            setLastClick('button');
+          }}
+        >
+          Button
+        </Button>
+      </CardFooter>
+    </Card>
+  );
+};
+
+/**
+ * `primary` sits on the page surface and `secondary` on a tinted fill, each shown
+ * plain, with a handler, and disabled — where the card fades and stops answering
+ * the pointer.
+ */
 export const Variants: StoryFn<CardProps> = () => (
   <VStack gap={24} align='center'>
     <HStack gap={16} align='center'>
@@ -125,7 +155,7 @@ export const Variants: StoryFn<CardProps> = () => (
     </HStack>
 
     <HStack gap={16} align='center'>
-      <Card color='primary' onClick={() => console.log('Primary card clicked')}>
+      <Card color='primary' onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Primary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>
@@ -140,7 +170,7 @@ export const Variants: StoryFn<CardProps> = () => (
         </CardFooter>
       </Card>
 
-      <Card color='secondary' onClick={() => console.log('Secondary card clicked')}>
+      <Card color='secondary' onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Secondary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>
@@ -157,7 +187,7 @@ export const Variants: StoryFn<CardProps> = () => (
     </HStack>
 
     <HStack gap={16} align='center'>
-      <Card color='primary' disabled onClick={() => console.log('Primary card clicked')}>
+      <Card color='primary' disabled onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Primary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>
@@ -172,7 +202,7 @@ export const Variants: StoryFn<CardProps> = () => (
         </CardFooter>
       </Card>
 
-      <Card color='secondary' disabled onClick={() => console.log('Secondary card clicked')}>
+      <Card color='secondary' disabled onClick={onCardClick}>
         <CardHeader>
           <CardTitle>Secondary card</CardTitle>
           <Badge size='medium' type='solid' color='slate'>
@@ -190,6 +220,10 @@ export const Variants: StoryFn<CardProps> = () => (
   </VStack>
 );
 
+/**
+ * What the block tolerates: body copy that wraps, a `CodeSnippet`, a whole `Field`,
+ * a `CardTitle` with an `icon`, and a header standing on its own with nothing under it.
+ */
 export const VariousContent: StoryFn<CardProps> = () => (
   <HStack gap={16}>
     <VStack gap={16} align='stretch'>

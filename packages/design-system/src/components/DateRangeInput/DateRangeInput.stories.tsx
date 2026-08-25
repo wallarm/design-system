@@ -2,9 +2,13 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { CalendarDate, CalendarDateTime } from '../../index';
 import { DateFormatProvider } from '../DateFormatProvider';
 import { HStack, VStack } from '../Stack';
-import { Text } from '../Text';
 import { DateRangeInput } from './DateRangeInput';
 import type { DateRangeInputProps } from './types';
+
+const DESCRIPTION = [
+  'Two dates in one field, for a period the reader knows — pair it with `Calendar` in range mode when they need to see the months to choose.',
+  'Same rules as `DateInput`: React Aria date objects, and order and hour cycle from `DateFormatProvider` rather than per input.',
+].join(' ');
 
 const meta: Meta<typeof DateRangeInput> = {
   title: 'Inputs Date/DateRangeInput',
@@ -13,8 +17,7 @@ const meta: Meta<typeof DateRangeInput> = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Paired start/end date input for selecting date ranges. Supports date-only and date+time granularity, placeholder text, and an optional time dropdown. Can be used as a single compound component or composed from individual parts via `DateRangeProvider`.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -96,132 +99,125 @@ const dropdownRoom: StoryFn<typeof meta>['decorators'] = [
   ),
 ];
 
+/**
+ * Start and end in one control, each segmented. The end cannot precede the start, so the field
+ * cannot produce a range the system would reject.
+ */
 export const Basic: StoryFn<typeof meta> = args => {
   return <DateRangeInput {...(args as DateRangeInputProps)} />;
 };
 Basic.decorators = dropdownRoom;
 Basic.parameters = { layout: 'padded' };
 
+/**
+ * Decoration again, not a trigger — reach for `Calendar` when the icon should open a picker.
+ */
 export const WithIcon: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Without icon
-      </Text>
+      <span className='sb-annotation'>Without icon</span>
       <DateRangeInput showIcon={false} defaultValue={defaultValue} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        With icon
-      </Text>
+      <span className='sb-annotation'>With icon</span>
       <DateRangeInput defaultValue={defaultValue} />
     </VStack>
   </HStack>
 );
 
+/**
+ * Default, disabled and error. The error applies to the range as a whole, since a start without
+ * an end is not yet an answer.
+ */
 export const States: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Default
-      </Text>
+      <span className='sb-annotation'>Default</span>
       <DateRangeInput />
       <DateRangeInput defaultValue={sampleRange} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Disabled
-      </Text>
+      <span className='sb-annotation'>Disabled</span>
       <DateRangeInput disabled />
       <DateRangeInput disabled defaultValue={sampleRange} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Error
-      </Text>
+      <span className='sb-annotation'>Error</span>
       <DateRangeInput error />
       <DateRangeInput error defaultValue={sampleRange} />
     </VStack>
   </HStack>
 );
 
+/**
+ * The shared height scale. A range is wider than a single date, so check it against the column
+ * it lives in.
+ */
 export const Sizes: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={16}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Default (36px)
-        </Text>
+        <span className='sb-annotation'>Default (36px)</span>
         <DateRangeInput size='default' />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Medium (32px)
-        </Text>
+        <span className='sb-annotation'>Medium (32px)</span>
         <DateRangeInput size='medium' />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Small (24px)
-        </Text>
+        <span className='sb-annotation'>Small (24px)</span>
         <DateRangeInput size='small' />
       </VStack>
     </VStack>
     <VStack gap={16}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Default filled
-        </Text>
+        <span className='sb-annotation'>Default filled</span>
         <DateRangeInput size='default' defaultValue={sampleRange} />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Medium filled
-        </Text>
+        <span className='sb-annotation'>Medium filled</span>
         <DateRangeInput size='medium' defaultValue={sampleRange} />
       </VStack>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Small filled
-        </Text>
+        <span className='sb-annotation'>Small filled</span>
         <DateRangeInput size='small' defaultValue={sampleRange} />
       </VStack>
     </VStack>
   </HStack>
 );
 
+/**
+ * A complete range beside an empty one, which is the clearest way to see how much width the
+ * filled state needs.
+ */
 export const Filled: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        Date range
-      </Text>
+      <span className='sb-annotation'>Date range</span>
       <DateRangeInput defaultValue={sampleRange} />
     </VStack>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={4}>
-        <Text size='sm' color='secondary'>
-          Date + time range (24h)
-        </Text>
+        <span className='sb-annotation'>Date + time range (24h)</span>
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
       </VStack>
     </DateFormatProvider>
     <VStack gap={4}>
-      <Text size='sm' color='secondary'>
-        Without icon
-      </Text>
+      <span className='sb-annotation'>Without icon</span>
       <DateRangeInput showIcon={false} defaultValue={sampleRange} />
     </VStack>
   </VStack>
 );
 
+/**
+ * Both ends share one granularity. Add time only when the period genuinely turns on it — a
+ * report covering part of a day rather than whole days.
+ */
 export const Granularity: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour format
-        </Text>
+        <span className='sb-annotation'>12-hour format</span>
         <DateRangeInput placeholder='day' granularity='day' />
         <DateRangeInput placeholder='hour' granularity='hour' />
         <DateRangeInput placeholder='minute' granularity='minute' />
@@ -230,9 +226,7 @@ export const Granularity: StoryFn<typeof meta> = () => (
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour format
-        </Text>
+        <span className='sb-annotation'>24-hour format</span>
         <DateRangeInput placeholder='day' granularity='day' />
         <DateRangeInput placeholder='hour' granularity='hour' />
         <DateRangeInput placeholder='minute' granularity='minute' />
@@ -243,18 +237,14 @@ export const Granularity: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Demonstrates both segment orders side by side. Each column wraps its
- * DateRangeInputs in a scoped `DateFormatProvider` — in real apps the
- * provider is mounted once near the root and the whole tree picks up a
- * single order.
+ * Day-first against month-first from the provider, doubly worth seeing here because an
+ * ambiguous range is twice as easy to misread.
  */
 export const DateOrderComparison: StoryFn<typeof meta> = () => (
   <HStack gap={32}>
     <DateFormatProvider order='day-first'>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          Day first — DD MMM YYYY
-        </Text>
+        <span className='sb-annotation'>Day first — DD MMM YYYY</span>
         <DateRangeInput />
         <DateRangeInput defaultValue={sampleRange} />
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
@@ -262,9 +252,7 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
     </DateFormatProvider>
     <DateFormatProvider order='month-first'>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          Month first — MMM DD YYYY
-        </Text>
+        <span className='sb-annotation'>Month first — MMM DD YYYY</span>
         <DateRangeInput />
         <DateRangeInput defaultValue={sampleRange} />
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
@@ -275,24 +263,19 @@ export const DateOrderComparison: StoryFn<typeof meta> = () => (
 DateOrderComparison.parameters = { layout: 'padded' };
 
 /**
- * Demonstrates `hourCycle` picked up from `DateFormatProvider`, not passed
- * per input. No `hourCycle` prop on the individual DateRangeInputs.
+ * 12-hour against 24-hour from the provider, with no per-input override.
  */
 export const HourCycleByContext: StoryFn<typeof meta> = () => (
   <HStack gap={32}>
     <DateFormatProvider order='day-first' hourCycle={12}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          12-hour (AM/PM)
-        </Text>
+        <span className='sb-annotation'>12-hour (AM/PM)</span>
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
       </VStack>
     </DateFormatProvider>
     <DateFormatProvider order='day-first' hourCycle={24}>
       <VStack gap={12}>
-        <Text size='sm' color='secondary'>
-          24-hour
-        </Text>
+        <span className='sb-annotation'>24-hour</span>
         <DateRangeInput granularity='minute' defaultValue={sampleRangeDateTime} />
       </VStack>
     </DateFormatProvider>
@@ -301,21 +284,16 @@ export const HourCycleByContext: StoryFn<typeof meta> = () => (
 HourCycleByContext.parameters = { layout: 'padded' };
 
 /**
- * `readOnly` shows a value but removes every edit affordance — typing is
- * ignored (react-aria), and the trailing clear "×" is not rendered at all.
+ * Both ends legible, no edit affordances.
  */
 export const ReadOnly: StoryFn<typeof meta> = () => (
   <HStack gap={24}>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Date range
-      </Text>
+      <span className='sb-annotation'>Date range</span>
       <DateRangeInput readOnly defaultValue={sampleRange} />
     </VStack>
     <VStack gap={12}>
-      <Text size='sm' color='secondary'>
-        Date + time range
-      </Text>
+      <span className='sb-annotation'>Date + time range</span>
       <DateRangeInput readOnly granularity='minute' defaultValue={sampleRangeDateTime} />
     </VStack>
   </HStack>

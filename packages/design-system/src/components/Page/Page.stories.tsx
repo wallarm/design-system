@@ -7,6 +7,11 @@ import { PageContent } from './PageContent';
 import { PageHeader } from './PageHeader';
 import { PageTitle } from './PageTitle';
 
+const DESCRIPTION = [
+  'The frame a microfrontend page renders into — a header carrying the title and its actions, then the content below.',
+  'It tells the host shell how it wants to be laid out (`fullSize`, `fixedHeight`) through context and falls back to sensible behaviour when there is no host, so the same page works inside the console and on its own.',
+].join(' ');
+
 const meta = {
   title: 'Layout/Page',
   component: Page,
@@ -20,10 +25,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Page compound component for defining microfrontend page layout. ' +
-          'Communicates layout preferences (fullSize, fixedHeight) to the host shell ' +
-          'via PageHostProvider context. Works standalone when no host provider is present.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -45,6 +47,7 @@ const meta = {
 
 export default meta;
 
+/** The whole frame: `PageTitle` with a count beside it, `PageActions` on the right, `PageContent` below, asking the shell for the full width and a fixed height. */
 export const Basic: StoryFn<PageProps> = () => {
   return (
     <Page name='full-featured' fullSize fixedHeight>
@@ -68,6 +71,7 @@ export const Basic: StoryFn<PageProps> = () => {
   );
 };
 
+/** `contained` gives the page its own scroll container, which is what lets `PageHeader sticky` stick. Without it the shell does the scrolling and the header leaves with the content. */
 export const StickyHeader: StoryFn<PageProps> = () => {
   return (
     <Page name='sticky-header' contained>

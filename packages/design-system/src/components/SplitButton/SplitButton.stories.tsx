@@ -7,21 +7,34 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '../DropdownMenu';
-import { Heading } from '../Heading';
 import { NumericBadge } from '../NumericBadge';
 import { HStack, VStack } from '../Stack';
 import { SplitButton } from './SplitButton';
+
+const DESCRIPTION = [
+  'Pairs one action with a menu of related ones, for when a second action matters enough that burying it in a `DropdownMenu` would hide it.',
+  'Both halves are ordinary `Button`s, so they must share a variant, colour and size — the group only joins their facing corners.',
+].join(' ');
 
 const meta = {
   title: 'Actions/SplitButton',
   component: SplitButton,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 } satisfies Meta<typeof SplitButton>;
 
 export default meta;
 
+/**
+ * The two halves are plain `Button` children. `SplitButton` strips their facing corners and
+ * gives the pair a `role='group'` so it reads as one control.
+ */
 export const Default: StoryFn<typeof meta> = () => (
   <SplitButton data-testid='split-button'>
     <Button variant='primary' color='brand'>
@@ -33,9 +46,14 @@ export const Default: StoryFn<typeof meta> = () => (
   </SplitButton>
 );
 
+/**
+ * Every sanctioned pairing, and the reason the pair must match: outline buttons drop the
+ * gap and overlap their borders into a single hairline, which only looks right when both halves
+ * carry the same variant.
+ */
 export const Variants: StoryFn<typeof meta> = () => (
   <VStack>
-    <Heading>Primary / Brand</Heading>
+    <span className='sb-annotation'>Primary / Brand</span>
     <HStack>
       <SplitButton>
         <Button variant='primary' color='brand'>
@@ -47,7 +65,7 @@ export const Variants: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
 
-    <Heading>Outline / Neutral</Heading>
+    <span className='sb-annotation'>Outline / Neutral</span>
     <HStack>
       <SplitButton>
         <Button variant='outline' color='neutral'>
@@ -59,7 +77,7 @@ export const Variants: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
 
-    <Heading>Secondary / Neutral</Heading>
+    <span className='sb-annotation'>Secondary / Neutral</span>
     <HStack>
       <SplitButton>
         <Button variant='secondary' color='neutral'>
@@ -71,7 +89,7 @@ export const Variants: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
 
-    <Heading>Ghost / Neutral</Heading>
+    <span className='sb-annotation'>Ghost / Neutral</span>
     <HStack>
       <SplitButton>
         <Button variant='ghost' color='neutral'>
@@ -83,7 +101,7 @@ export const Variants: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
 
-    <Heading>Secondary / Brand</Heading>
+    <span className='sb-annotation'>Secondary / Brand</span>
     <HStack>
       <SplitButton>
         <Button variant='secondary' color='brand'>
@@ -95,7 +113,7 @@ export const Variants: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
 
-    <Heading>Ghost / Brand</Heading>
+    <span className='sb-annotation'>Ghost / Brand</span>
     <HStack>
       <SplitButton>
         <Button variant='ghost' color='brand'>
@@ -107,7 +125,7 @@ export const Variants: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
 
-    <Heading className='text-text-primary-alt'>Ghost / Neutral Alt</Heading>
+    <span className='sb-annotation sb-annotation-alt'>Ghost / Neutral Alt</span>
     <div className='flex flex-col gap-16 rounded-lg bg-component-tooltip-bg p-8'>
       <HStack>
         <SplitButton>
@@ -121,7 +139,7 @@ export const Variants: StoryFn<typeof meta> = () => (
       </HStack>
     </div>
 
-    <Heading className='text-text-primary-alt'>Secondary / Neutral Alt</Heading>
+    <span className='sb-annotation sb-annotation-alt'>Secondary / Neutral Alt</span>
     <div className='flex flex-col gap-16 rounded-lg bg-component-tooltip-bg p-8'>
       <HStack>
         <SplitButton>
@@ -137,6 +155,9 @@ export const Variants: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * Both halves take the same `size`, since the group aligns them rather than sizing them.
+ */
 export const Sizes: StoryFn<typeof meta> = () => (
   <HStack align='end' justify='center'>
     <SplitButton>
@@ -166,9 +187,13 @@ export const Sizes: StoryFn<typeof meta> = () => (
   </HStack>
 );
 
+/**
+ * Text, icon-and-text, and icon-only leading halves. The trailing half stays a bare
+ * chevron — giving it a label doubles the width and makes the menu look like a second action.
+ */
 export const Content: StoryFn<typeof meta> = () => (
   <VStack>
-    <Heading>Text only</Heading>
+    <span className='sb-annotation'>Text only</span>
     <HStack align='end'>
       <SplitButton>
         <Button variant='primary' color='brand' size='large'>
@@ -196,7 +221,7 @@ export const Content: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
 
-    <Heading>Icon + Text</Heading>
+    <span className='sb-annotation'>Icon + Text</span>
     <HStack align='end'>
       <SplitButton>
         <Button variant='primary' color='brand' size='large'>
@@ -227,7 +252,7 @@ export const Content: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
 
-    <Heading>Icon + Text + Badge</Heading>
+    <span className='sb-annotation'>Icon + Text + Badge</span>
     <HStack align='end'>
       <SplitButton>
         <Button variant='primary' color='brand' size='large'>
@@ -261,7 +286,7 @@ export const Content: StoryFn<typeof meta> = () => (
       </SplitButton>
     </HStack>
 
-    <Heading>Icon only</Heading>
+    <span className='sb-annotation'>Icon only</span>
     <HStack align='end'>
       <SplitButton>
         <Button variant='primary' color='brand' size='large'>
@@ -291,6 +316,10 @@ export const Content: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * The real shape: the leading half performs the default action, and only the chevron opens
+ * the menu. Repeat the default inside the menu only if its wording differs there.
+ */
 export const WithDropdownMenu: StoryFn<typeof meta> = () => (
   <DropdownMenu>
     <SplitButton data-testid='split-button-dropdown'>

@@ -19,6 +19,11 @@ import { TabsList } from './TabsList';
 import { TabsSeparator } from './TabsSeparator';
 import { TabsTrigger } from './TabsTrigger';
 
+const DESCRIPTION = [
+  'Switches between a few peer sections of one page without going anywhere — `Tabs` owns the panels, which is what separates it from `SegmentedControl`.',
+  'Underline tabs are the default for a page’s primary division; reach for `SegmentedTabs` for scoped views of one collection or a second level below these, `SegmentedControl` for a toggle that owns no panel, and `Accordion` when the sections should be open at once.',
+].join(' ');
+
 const meta = {
   title: 'Navigation/Tabs',
   component: Tabs,
@@ -32,6 +37,11 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 
   args: { onChange: fn() },
@@ -41,6 +51,7 @@ export default meta;
 
 type Story = StoryFn<typeof meta>;
 
+/** The smallest complete set: every `TabsTrigger` value pairs with a `TabsContent` of the same value, and the panel mounts the first time it opens. */
 export const Basic: Story = () => (
   <div className='w-600'>
     <Tabs defaultValue='1' data-testid='tabs'>
@@ -56,6 +67,7 @@ export const Basic: Story = () => (
   </div>
 );
 
+/** `grayscale` mutes the active underline and label for a bar that should sit quieter than the content it introduces. */
 export const Variants: Story = () => (
   <div className='w-600'>
     <VStack gap={32}>
@@ -84,6 +96,7 @@ export const Variants: Story = () => (
   </div>
 );
 
+/** An icon before the label, for a set where the words alone are slow to scan. */
 export const Icons: Story = () => (
   <div className='w-600'>
     <Tabs defaultValue='1'>
@@ -109,6 +122,7 @@ export const Icons: Story = () => (
   </div>
 );
 
+/** Icons with no labels — only for a set the reader already knows, and each trigger still needs an accessible name. */
 export const IconsOnly: Story = () => (
   <div className='w-600'>
     <Tabs defaultValue='1'>
@@ -130,6 +144,7 @@ export const IconsOnly: Story = () => (
   </div>
 );
 
+/** A count in the trigger, which is what turns a tab into a status: how much is waiting behind it. */
 export const Badge: Story = () => (
   <div className='w-600'>
     <Tabs defaultValue='1'>
@@ -155,6 +170,7 @@ export const Badge: Story = () => (
   </div>
 );
 
+/** `medium` and `small`. `Tabs` is the one in the switcher family with a size — the segmented pills are fixed height. */
 export const Sizes: Story = () => (
   <div className='w-600'>
     <VStack gap={32}>
@@ -183,6 +199,7 @@ export const Sizes: Story = () => (
   </div>
 );
 
+/** Past the available width the list scrolls sideways with arrow buttons rather than wrapping, so the bar stays one line however many tabs there are. */
 export const Scrollable: Story = () => (
   <div className='w-400'>
     <Tabs defaultValue='1'>
@@ -209,6 +226,7 @@ export const Scrollable: Story = () => (
   </div>
 );
 
+/** `value` plus `onChange` when something outside the tabs decides which one is open — a route, or a step in a flow. */
 export const Controlled: Story = () => {
   const [value, setValue] = useState('1');
 
@@ -226,6 +244,7 @@ export const Controlled: Story = () => {
   );
 };
 
+/** A disabled trigger keeps its place but drops out of the keyboard order. Prefer hiding a tab that has nothing behind it. */
 export const Disabled: Story = () => (
   <Tabs defaultValue='1'>
     <TabsList>
@@ -243,6 +262,7 @@ export const Disabled: Story = () => (
   </Tabs>
 );
 
+/** `TabsSeparator` groups the triggers inside one bar, for when two of them belong together more than the rest. */
 export const WithSeparator: Story = () => (
   <div className='w-600'>
     <Tabs defaultValue='1'>
@@ -271,6 +291,7 @@ export const WithSeparator: Story = () => (
   </div>
 );
 
+/** `TabsLineActions` puts controls on the right of the bar itself, which is where an action about the whole section belongs rather than inside a panel. */
 export const WithLineActions: Story = () => (
   <div className='w-600'>
     <Tabs defaultValue='1'>

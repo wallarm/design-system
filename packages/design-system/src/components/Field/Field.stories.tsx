@@ -29,6 +29,11 @@ import { FieldLegend } from './FieldLegend';
 import { FieldSeparator } from './FieldSeparator';
 import { FieldSet } from './FieldSet';
 
+const DESCRIPTION = [
+  'The scaffolding around a control — label, description, error and the required marker — so the control itself only has to be the control.',
+  'Only `Input`, `Textarea` and `Slider` read this context automatically; wrap anything else and you get the layout, but the labelling still has to be wired by hand.',
+].join(' ');
+
 const meta = {
   title: 'Inputs/Field',
   component: Field,
@@ -45,11 +50,21 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 } satisfies Meta<typeof Field>;
 
 export default meta;
 
+/**
+ * The parts in order: `FieldLabel`, `FieldDescription`, the control, then `FieldError`.
+ * `FieldIndicator` reads `required` from the field and renders either an asterisk or `(Optional)`,
+ * so the two cases share one component and one wording.
+ */
 export const Basic: StoryFn<typeof meta> = () => {
   const monthsCollection = createListCollection({
     items: ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'],
@@ -212,6 +227,10 @@ export const Basic: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `Input` inside a `Field` is the case that works end to end — it reads the context, so the
+ * label points at it and the error sets `aria-invalid` without being passed anything.
+ */
 export const Inputs: StoryFn<typeof meta> = () => (
   <div className='min-w-320'>
     <FieldSet>
@@ -231,6 +250,10 @@ export const Inputs: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * Same wiring as `Input`, since `Textarea` reads the context too. The description sits above
+ * the box rather than below, so it is read before the reader starts typing.
+ */
 export const Textareas: StoryFn<typeof meta> = () => (
   <div className='min-w-320'>
     <FieldSet>
@@ -245,6 +268,10 @@ export const Textareas: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * `FieldSet` with `FieldLegend` for a question with several controls under it. This is the
+ * grouping that assistive technology announces, so use it rather than a heading.
+ */
 export const Fieldset: StoryFn<typeof meta> = () => (
   <div className='min-w-320'>
     <FieldSet>
@@ -286,6 +313,10 @@ export const Fieldset: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * A field around switches. Note that the layout is all you get here — `Switch` doesn't read
+ * field context, so the label and description are visual, not wired.
+ */
 export const Switches: StoryFn<typeof meta> = () => (
   <div className='min-w-320'>
     <FieldSet>
@@ -321,6 +352,10 @@ export const Switches: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * A field around a radio group, where the group's own `name` does the binding and the field
+ * supplies the question above it.
+ */
 export const Radios: StoryFn<typeof meta> = () => (
   <div className='min-w-320'>
     <FieldSet>
@@ -353,6 +388,10 @@ export const Radios: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * A field around checkboxes. `FieldLegend` is the right home for the question, since each
+ * checkbox already carries its own label.
+ */
 export const Checkboxes: StoryFn<typeof meta> = () => (
   <div className='min-w-320'>
     <FieldSet>
@@ -386,6 +425,10 @@ export const Checkboxes: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * A field around `NumberInput`, which composes its own label rather than reading the field's
+ * — check the labelling in the rendered markup rather than assuming.
+ */
 export const NumberInputs: StoryFn<typeof meta> = () => (
   <div className='min-w-320'>
     <FieldSet>
@@ -417,6 +460,10 @@ export const NumberInputs: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * A field around `Select`. The trigger is a button, so the label needs to point at it
+ * explicitly for the pairing to survive a screen reader.
+ */
 export const Selects: StoryFn<typeof meta> = () => {
   const countriesCollection = createListCollection({
     items: [

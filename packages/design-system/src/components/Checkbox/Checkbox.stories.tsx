@@ -9,6 +9,11 @@ import { CheckboxGroup } from './CheckboxGroup';
 import { CheckboxIndicator } from './CheckboxIndicator';
 import { CheckboxLabel } from './CheckboxLabel';
 
+const DESCRIPTION = [
+  'Collects any number of choices from a limited set, or turns a single option on or off — reach for `Radio` when only one choice is allowed, and `Switch` when the change takes effect immediately instead of on submit.',
+  'Past roughly ten options, a `Select` reads better than a long column of boxes.',
+].join(' ');
+
 const meta = {
   title: 'Inputs/Checkbox',
   component: Checkbox,
@@ -20,11 +25,20 @@ const meta = {
   },
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
 } satisfies Meta<typeof Checkbox>;
 
 export default meta;
 
+/**
+ * The smallest useful composition — `CheckboxIndicator` plus `CheckboxLabel`. Keep labels to a few
+ * words in sentence case, and reword rather than truncate.
+ */
 export const Basic: StoryFn<typeof meta> = () => (
   <Checkbox data-testid='checkbox'>
     <CheckboxIndicator />
@@ -32,6 +46,7 @@ export const Basic: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
+/** The checked state. Pass `checked` to drive it from your own state, or `defaultChecked` to let the checkbox keep track of it. */
 export const Checked: StoryFn<typeof meta> = () => (
   <Checkbox checked>
     <CheckboxIndicator />
@@ -39,6 +54,10 @@ export const Checked: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
+/**
+ * `checked='indeterminate'` is for a parent whose children are only partly selected. Set it
+ * deliberately — a click never produces it — and clear it once every child is checked or unchecked.
+ */
 export const Indeterminate: StoryFn<typeof meta> = () => (
   <Checkbox checked='indeterminate'>
     <CheckboxIndicator />
@@ -46,6 +65,7 @@ export const Indeterminate: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
+/** All three states while disabled, so you can see that the indicator stays readable when the option cannot be changed. */
 export const Disabled: StoryFn<typeof meta> = () => (
   <VStack>
     <Checkbox disabled>
@@ -65,6 +85,7 @@ export const Disabled: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/** `CheckboxDescription` adds a second line under the label, and switches the row to a grid so that text lines up with the label rather than the box. */
 export const WithDescription: StoryFn<typeof meta> = () => (
   <Checkbox>
     <CheckboxIndicator />
@@ -83,6 +104,11 @@ export const WithDescription: StoryFn<typeof meta> = () => (
   </Checkbox>
 );
 
+/**
+ * `CheckboxGroup` ties several checkboxes to one `name` and one array of values, and owns the spacing
+ * between them. Every box stays independent: ticking one must never move another, unless it is a
+ * parent selecting all of its children.
+ */
 export const Group: StoryFn<typeof meta> = () => (
   <CheckboxGroup name='framework' defaultValue={['vue']}>
     <Checkbox value='react'>
@@ -107,6 +133,11 @@ export const Group: StoryFn<typeof meta> = () => (
   </CheckboxGroup>
 );
 
+/**
+ * `variant='card'` gives every option its own bordered surface. Cards exist to carry a description —
+ * that is what the extra room is for, and a card holding a bare label wastes it. Plain rows read
+ * better for short lists of short labels.
+ */
 export const Card: StoryFn<typeof meta> = () => (
   <CheckboxGroup variant='card' name='framework' defaultValue={['vue', 'angular']}>
     <Checkbox value='react'>
@@ -159,6 +190,7 @@ export const Card: StoryFn<typeof meta> = () => (
   </CheckboxGroup>
 );
 
+/** Wrapped in `Field`, so the label and description above the options come from `FieldLabel` and `FieldDescription`. Shown as plain rows and as cards. */
 export const FormField: StoryFn<typeof meta> = () => (
   <HStack align='start' gap={40}>
     <Field>

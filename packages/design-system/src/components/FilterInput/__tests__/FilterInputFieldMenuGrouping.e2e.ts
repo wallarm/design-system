@@ -9,27 +9,15 @@ const filterInputStory = createStoryHelper('patterns-filterinput-filterinput', [
   'With Field Groups',
 ] as const);
 
-// FilterInputFieldMenu's own stories render with `open: true` and no trigger
-// element in `#storybook-root` — the menu content lives entirely in an Ark UI
-// portal appended to `<body>`. `fieldMenuStory.goto()`'s generic readiness
-// check (`#storybook-root` has children) therefore never resolves for this
-// story. Navigate directly and wait on the portaled menu instead. The
-// font-ready/settle wait mirrors the shared `createStoryHelper.goto()` so the
-// Visual screenshot baseline can't be captured mid font-display:swap.
+// FilterInputFieldMenu's own stories stand the menu up behind a `Button`, since
+// the component takes no trigger of its own and is anchored by FilterInput in
+// real use. Open it before asserting: the shared `goto()` already waits on
+// `#storybook-root` (the trigger) plus the font settle, so the menu's own
+// portal is all that is left to wait for.
 const gotoFieldMenu = async (page: Page, storyName: Parameters<typeof fieldMenuStory.goto>[1]) => {
-  await page.goto(fieldMenuStory.url(storyName), { waitUntil: 'domcontentloaded' });
+  await fieldMenuStory.goto(page, storyName);
+  await page.getByTestId('field-menu-trigger').click();
   await expect(page.locator('[data-slot="filter-input-field-menu"]')).toBeVisible();
-  // fonts.ready resolves immediately when no font request has started yet, so
-  // force-load every registered face before awaiting it.
-  await page.evaluate(async () => {
-    const loads: Promise<unknown>[] = [];
-    document.fonts.forEach(font => {
-      loads.push(font.load().catch(() => undefined));
-    });
-    await Promise.all(loads);
-    await document.fonts.ready;
-  });
-  await page.waitForTimeout(300);
 };
 
 test.describe('Component: FilterInput', () => {

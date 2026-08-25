@@ -115,19 +115,19 @@ test.describe('Component: SelectionBulkBar', () => {
       }
     });
 
+    // The story's Delete removes the selected rows rather than announcing them in a
+    // dialog, so this asserts the effect: the row leaves and the bar stands down.
     test('Should fire the consumer action button when clicked', async ({ page }) => {
+      const before = await getCheckboxes(page).count();
+
       await getCheckboxes(page).first().click();
       // Wait for the bar's enter animation to settle before clicking the action.
       await expect(getBulkBar(page)).toHaveAttribute('data-state', 'open');
 
-      const messages: string[] = [];
-      page.on('dialog', async d => {
-        messages.push(d.message());
-        await d.accept();
-      });
-
       await getDelete(page).click();
-      await expect.poll(() => messages).toEqual(['Delete 1']);
+
+      await expect(getCheckboxes(page)).toHaveCount(before - 1);
+      await expect(getBulkBar(page)).toBeHidden();
     });
 
     test('Should hoist the consumer summary into the summary slot, not the actions row', async ({

@@ -2,10 +2,18 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { HStack, VStack } from '../Stack';
 import { ResponseCode } from './ResponseCode';
 
+const DESCRIPTION = [
+  'Renders an HTTP status code as a code `Badge` coloured by its class — green for success, blue for a redirect, amber for a client error, red for a server error, slate for informational.',
+  'A mask counts as well as a number, so `2XX` or `40X` from a filter suggestion takes the colour of its leading digit, and anything outside 100–599 falls back to slate rather than guessing. Pairs with `HttpMethod`.',
+].join(' ');
+
 const meta = {
   title: 'Data Display/ResponseCode',
   component: ResponseCode,
-  parameters: { layout: 'centered' },
+  parameters: {
+    layout: 'centered',
+    docs: { description: { component: DESCRIPTION } },
+  },
   args: {
     code: 200,
     size: 'medium',
@@ -23,8 +31,15 @@ const meta = {
 
 export default meta;
 
+/**
+ * One badge on the controls, for checking which class a particular code lands in.
+ */
 export const Playground: StoryFn<typeof meta> = args => <ResponseCode {...args} />;
 
+/**
+ * The five classes at their round numbers. This is the colour vocabulary, and like
+ * `HttpMethod` it is fixed rather than chosen per screen.
+ */
 export const AllCategories: StoryFn<typeof meta> = () => (
   <VStack align='start' gap={8}>
     <ResponseCode code={100} />
@@ -35,6 +50,10 @@ export const AllCategories: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * The codes that actually turn up in logs, a row per class — every code in a row shares its
+ * colour, so the eye sorts by severity before it reads the number.
+ */
 export const RealWorldCodes: StoryFn<typeof meta> = () => (
   <VStack align='start' gap={8}>
     <HStack gap={8}>
@@ -67,6 +86,10 @@ export const RealWorldCodes: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * `medium` is the default; `large` adds vertical padding and leaves the code type where it
+ * is, exactly as on `HttpMethod`.
+ */
 export const Sizes: StoryFn<typeof meta> = () => (
   <VStack gap={16}>
     <HStack align='center' gap={8}>
@@ -86,6 +109,10 @@ export const Sizes: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * The wildcard forms, which is what a filter chip shows when the query matches a whole
+ * class rather than one code.
+ */
 export const WildcardGroups: StoryFn<typeof meta> = () => (
   <VStack align='start' gap={8}>
     <ResponseCode code='1XX' />
@@ -96,6 +123,10 @@ export const WildcardGroups: StoryFn<typeof meta> = () => (
   </VStack>
 );
 
+/**
+ * `0`, `42`, `999` and `???` all fall outside 100–599, so each is printed verbatim in slate
+ * — an unrecognised code is shown, never swallowed.
+ */
 export const UnknownCodeFallsBackToSlate: StoryFn<typeof meta> = () => (
   <HStack align='center' gap={8}>
     <ResponseCode code={0} />

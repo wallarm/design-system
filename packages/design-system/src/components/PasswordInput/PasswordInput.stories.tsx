@@ -13,11 +13,21 @@ import { passwordValidators } from '../PasswordComplexity/validators';
 import { HStack, VStack } from '../Stack';
 import { PasswordInput } from './PasswordInput';
 
+const DESCRIPTION = [
+  'A password field with a reveal toggle, which is the whole point of reaching for it over an `Input` of type password.',
+  'Where rules are enforced, pair it with `PasswordComplexity` so the reader watches them being met rather than discovering them on submit.',
+].join(' ');
+
 const meta = {
   title: 'Inputs/PasswordInput',
   component: PasswordInput,
   parameters: {
     layout: 'centered',
+    docs: {
+      description: {
+        component: DESCRIPTION,
+      },
+    },
   },
   argTypes: {
     error: {
@@ -31,12 +41,19 @@ const meta = {
 
 export default meta;
 
+/**
+ * Masked by default, with the eye toggling to plain text. The toggle is a real button, so it
+ * is reachable by keyboard rather than being a mouse-only affordance.
+ */
 export const Basic: StoryObj<typeof meta> = {
   args: {
     placeholder: 'Enter',
   },
 };
 
+/**
+ * Inside `Field`, which supplies the label and description above it.
+ */
 export const WithField: StoryFn<typeof meta> = () => (
   <Field required>
     <FieldLabel>
@@ -48,6 +65,10 @@ export const WithField: StoryFn<typeof meta> = () => (
   </Field>
 );
 
+/**
+ * `error` on the field. Say what is wrong in `FieldError` — a red border on a masked field
+ * leaves the reader guessing at something they cannot see.
+ */
 export const WithError: StoryFn<typeof meta> = () => (
   <Field required>
     <FieldLabel>
@@ -59,6 +80,10 @@ export const WithError: StoryFn<typeof meta> = () => (
   </Field>
 );
 
+/**
+ * `PasswordComplexity` fed by the exported `passwordValidators`, ticking off each rule as it
+ * is met. Show the rules from the start rather than revealing them after a failure.
+ */
 export const WithRequirements: StoryFn<typeof meta> = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -118,6 +143,10 @@ export const WithRequirements: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Dimmed, with the reveal toggle out as well — there is nothing to reveal that the reader can
+ * act on.
+ */
 export const Disabled: StoryObj<typeof meta> = {
   args: {
     placeholder: 'Enter',
@@ -125,6 +154,9 @@ export const Disabled: StoryObj<typeof meta> = {
   },
 };
 
+/**
+ * The same height scale as `Input`, so a password field lines up with the fields around it.
+ */
 export const Sizes: StoryFn<typeof meta> = () => (
   <HStack gap={16} align='start'>
     <PasswordInput placeholder='Default' size='default' />

@@ -14,18 +14,18 @@ import { MetricValue } from './MetricValue';
 const figmaUrl =
   'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=11437-11939';
 
+const DESCRIPTION = [
+  "The family's compact stat — one number, optionally against a total and a change — for a card with no breakdown to draw; reach for `HorizontalBarStack` once that number splits into named parts.",
+  'It is a brick set rather than a set of props: `MetricHeader` holds `MetricValue`, `MetricTotal` and `MetricDelta`, with `MetricCaption` beneath. On the delta, `sentiment` picks the colour and `trend` picks the arrow, on purpose independently — a number going up is not always good news.',
+].join(' ');
+
 const meta = {
   title: 'Data display/SimpleCharts/Metric',
   component: Metric,
   parameters: {
     layout: 'padded',
     design: { type: 'figma', url: figmaUrl },
-    docs: {
-      description: {
-        component:
-          'The family’s compact stat, composed as a brick set: `MetricHeader` (the shared value/total/delta row, also reused by `HorizontalBarStack`), `MetricValue`, `MetricTotal` (`/120` · `of 120` · `120 total`), `MetricDelta`, and `MetricCaption`. Body-only — composed inside a `Chart` card. The delta is the shared `ChartDelta`: `sentiment` sets the colour (positive → green, negative → red, neutral → slate) independently of the `trend` arrow.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
 } satisfies Meta<typeof Metric>;
 
@@ -44,8 +44,9 @@ const Card: FC<{ title: string; children: ReactNode }> = ({ title, children }) =
 );
 
 /**
- * One gallery of the brick combinations, each on a Chart card — mirrors the Figma
- * "Metric Chart — options" board. Replaces the old one-story-per-config set.
+ * Every brick combination on its own card, mirroring the Figma options board: value alone,
+ * value with a delta in each sentiment, and the three `MetricTotal` connectors: a slash, the
+ * word "of", and the word "total" after the number.
  */
 export const Gallery: StoryFn = () => (
   <div className='flex flex-wrap gap-16'>
@@ -137,7 +138,10 @@ export const Gallery: StoryFn = () => (
   </div>
 );
 
-/** Card-load shimmer — swap `Metric` for `MetricSkeleton` while data loads. */
+/**
+ * `MetricSkeleton` in place of the stat while the card loads, so the number arriving does not
+ * resize the card.
+ */
 export const Loading: StoryFn = () => (
   <Card title='Findings'>
     <MetricSkeleton data-testid='metric-skeleton' />

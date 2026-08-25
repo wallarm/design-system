@@ -3,6 +3,8 @@ import './react-aria-polyfill';
 import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import type { Decorator, Preview } from 'storybook-react-rsbuild';
 import { DateFormatProvider, type DateOrder, ThemeProvider, Toaster } from '../src';
+import { DocsPage } from './docs/DocsPage';
+import { TOC_OPTIONS } from './docs/toc';
 import './preview.css';
 
 let toasterMountCount = 0;
@@ -28,6 +30,11 @@ const isDev = process.env.NODE_ENV === 'development';
 const preview: Preview = {
   parameters: {
     layout: 'centered',
+    docs: {
+      page: DocsPage,
+      // Sections and examples both belong in the table of contents.
+      toc: TOC_OPTIONS,
+    },
     controls: {
       matchers: {
         color: /(background|color)$/i,
@@ -40,7 +47,9 @@ const preview: Preview = {
         isFullscreen: true,
         showNav: isDev,
         showPanel: isDev,
-        showToolbar: isDev,
+        // Always on: the theme, date-order and locale switchers live here, and a reader of the
+        // deployed Storybook should never have to discover how to reveal them.
+        showToolbar: true,
       },
       storySort: {
         order: [

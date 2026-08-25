@@ -50,6 +50,11 @@ import { DialogHeader } from './DialogHeader';
 import { DialogTitle } from './DialogTitle';
 import { DialogTrigger } from './DialogTrigger';
 
+const DESCRIPTION = [
+  'A panel the reader has to resolve before carrying on — reach for `Drawer` when they should be able to keep it open and keep working, and `Popover` when the content is a detail rather than a task.',
+  "It is `Drawer` with `kind='dialog'`, which shares the panel but keeps the two families' nesting separate: a dialog only steps back for another dialog.",
+].join(' ');
+
 const meta = {
   title: 'Overlay/Dialog',
   component: Dialog,
@@ -68,8 +73,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'An animated modal dialog that appears from the right side of the screen. Built on top of Drawer without resize functionality.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -102,17 +106,22 @@ export default meta;
 /** Content placeholder styled like Figma designs - fills available space */
 const ContentPlaceholder = ({ height }: { fillHeight?: boolean; height?: number }) => (
   <div
-    className='w-full rounded-12 bg-[#f1f5f9]'
+    className='w-full rounded-12 bg-bg-surface-5'
     style={height ? { height: `${height}px` } : { height: '200px' }}
   />
 );
 
-/** Basic uncontrolled dialog */
+/**
+ * The minimum: trigger, content, and a title. Every dialog needs a title — it is what a screen
+ * reader announces on open.
+ */
 export const Basic: StoryFn<DialogProps> = () => {
   return (
     <Dialog data-testid='dialog'>
       <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -128,12 +137,17 @@ export const Basic: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Minimal example */
+/**
+ * `DialogFooter` holds the decision. Put the confirming action last, since that is where the
+ * eye finishes.
+ */
 export const WithFooter: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -160,12 +174,18 @@ export const WithFooter: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Header title with a supporting description stacked underneath */
+/**
+ * `DialogDescription` states the consequence, which is what turns a confirmation from a speed
+ * bump into a decision. `DialogHeader` finds the title and description among its children and
+ * stacks them, so the close button stays right-aligned however many it gets.
+ */
 export const WithDescription: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -193,20 +213,16 @@ export const WithDescription: StoryFn<DialogProps> = () => {
   );
 };
 
-WithDescription.parameters = {
-  docs: {
-    description: {
-      story:
-        'DialogHeader detects DialogTitle and DialogDescription among its children and stacks them in a column so the close button stays right-aligned.',
-    },
-  },
-};
-
-/** With footer left actions */
+/**
+ * A left-aligned action for the escape route — cancel, learn more — kept away from the
+ * confirming pair on the right.
+ */
 export const WithFooterLeftActions: StoryFn<DialogProps> = () => (
   <Dialog>
     <DialogTrigger asChild>
-      <Button>Open with Footer Actions</Button>
+      <Button variant='outline' color='neutral'>
+        Open with Footer Actions
+      </Button>
     </DialogTrigger>
     <DialogContent>
       <DialogHeader>
@@ -238,21 +254,17 @@ export const WithFooterLeftActions: StoryFn<DialogProps> = () => (
   </Dialog>
 );
 
-WithFooterLeftActions.parameters = {
-  docs: {
-    description: {
-      story:
-        'Footer can have actions on both left and right sides. Use flexbox utilities to position elements.',
-    },
-  },
-};
-
-/** Dialog with different sizes - Small */
+/**
+ * The standard widths. Pick by the content, not the importance: a wide dialog for a short
+ * question reads as a mistake.
+ */
 export const Sizes: StoryFn<DialogProps> = () => (
   <HStack gap={8} justify='center'>
     <Dialog width={DIALOG_SIZES.small}>
       <DialogTrigger asChild>
-        <Button>Open Small ({DIALOG_SIZES.small}px)</Button>
+        <Button variant='outline' color='neutral'>
+          Open Small ({DIALOG_SIZES.small}px)
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -267,7 +279,9 @@ export const Sizes: StoryFn<DialogProps> = () => (
 
     <Dialog width={DIALOG_SIZES.medium}>
       <DialogTrigger asChild>
-        <Button>Open Medium ({DIALOG_SIZES.medium}px)</Button>
+        <Button variant='outline' color='neutral'>
+          Open Medium ({DIALOG_SIZES.medium}px)
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -282,7 +296,9 @@ export const Sizes: StoryFn<DialogProps> = () => (
 
     <Dialog width={DIALOG_SIZES.large}>
       <DialogTrigger asChild>
-        <Button>Open Large ({DIALOG_SIZES.large}px)</Button>
+        <Button variant='outline' color='neutral'>
+          Open Large ({DIALOG_SIZES.large}px)
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -297,13 +313,17 @@ export const Sizes: StoryFn<DialogProps> = () => (
   </HStack>
 );
 
-/** Custom width with percentage */
+/**
+ * Explicit `width`, `minWidth` and `maxWidth` for content the standard steps do not fit.
+ */
 export const CustomSizes: StoryFn<DialogProps> = () => {
   return (
     <HStack gap={8} justify='center'>
       <Dialog width='50%'>
         <DialogTrigger asChild>
-          <Button>50% Width</Button>
+          <Button variant='outline' color='neutral'>
+            50% Width
+          </Button>
         </DialogTrigger>
 
         <DialogContent>
@@ -321,7 +341,9 @@ export const CustomSizes: StoryFn<DialogProps> = () => {
 
       <Dialog width={1000}>
         <DialogTrigger asChild>
-          <Button>1000px Width</Button>
+          <Button variant='outline' color='neutral'>
+            1000px Width
+          </Button>
         </DialogTrigger>
 
         <DialogContent>
@@ -340,12 +362,17 @@ export const CustomSizes: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Dialog with scrollable content */
+/**
+ * The body scrolls while header and footer stay put, so the decision never scrolls out of
+ * reach.
+ */
 export const Scrollable: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Dialog with Scroll</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog with Scroll
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -376,12 +403,17 @@ export const Scrollable: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Input sits flush against the body's top/bottom edges - its focus ring must render fully, not clip against the scroll viewport */
+/**
+ * A field against the panel edge, which is where focus rings and shadows get clipped if the
+ * padding is wrong.
+ */
 export const WithInputAtEdge: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Dialog with Edge Input</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog with Edge Input
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -408,12 +440,17 @@ export const WithInputAtEdge: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Scrollable variant of WithInputAtEdge - the input sits at the very bottom of a long, scrolled body */
+/**
+ * The same, with scrolling — the case where a focus ring can be cut by the scroll container
+ * rather than the panel.
+ */
 export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open Scrollable Dialog with Edge Input</Button>
+        <Button variant='outline' color='neutral'>
+          Open Scrollable Dialog with Edge Input
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -446,12 +483,17 @@ export const WithInputAtEdgeScrollable: StoryFn<DialogProps> = () => {
   );
 };
 
-/** A Drawer opened from a Dialog must NOT push the dialog back — only a nested Dialog does */
+/**
+ * A drawer opened from a dialog. Different families, so neither pushes the other back; they
+ * stack.
+ */
 export const WithNestedDrawer: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open dialog with drawer inside</Button>
+        <Button variant='outline' color='neutral'>
+          Open dialog with drawer inside
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -488,7 +530,10 @@ export const WithNestedDrawer: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Select and DropdownMenu opened inside a nested dialog must render above the nested dialog, not underneath it */
+/**
+ * A `Select` inside a dialog, checking that its menu escapes the panel rather than being
+ * clipped by it.
+ */
 export const WithNestedSelect: StoryFn<DialogProps> = () => {
   const collection = createListCollection({
     items: [
@@ -501,7 +546,9 @@ export const WithNestedSelect: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open dialog with nested select</Button>
+        <Button variant='outline' color='neutral'>
+          Open dialog with nested select
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -563,12 +610,16 @@ export const WithNestedSelect: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Calendar opened inside a nested dialog must render above the nested dialog, not underneath it */
+/**
+ * A `Calendar` inside a dialog, the same check for a popover that is taller than the panel.
+ */
 export const WithNestedCalendar: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>Open dialog with nested calendar</Button>
+        <Button variant='outline' color='neutral'>
+          Open dialog with nested calendar
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -614,13 +665,18 @@ export const WithNestedCalendar: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Controlled dialog with external state */
+/**
+ * Owning `open`, which is what you need when something outside the dialog decides it should
+ * close.
+ */
 export const Controlled: StoryFn<DialogProps> = () => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <Button onClick={() => setOpen(true)}>Open Controlled Dialog</Button>
+      <Button variant='outline' color='neutral' onClick={() => setOpen(true)}>
+        Open Controlled Dialog
+      </Button>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
@@ -651,12 +707,17 @@ export const Controlled: StoryFn<DialogProps> = () => {
   );
 };
 
-/** No closable on ESC */
+/**
+ * Escape disabled, for a decision that must not be dismissed by reflex. Use it sparingly — it
+ * takes away the exit readers expect.
+ */
 export const NoClosableOnEsc: StoryFn<DialogProps> = () => {
   return (
     <Dialog closeOnEscape={false}>
       <DialogTrigger asChild>
-        <Button>Open Dialog</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -672,7 +733,10 @@ export const NoClosableOnEsc: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Without overlay */
+/**
+ * Without the backdrop. The panel stops reading as blocking, which is usually the wrong signal
+ * for a dialog.
+ */
 export const NoOverlay: StoryFn<DialogProps> = () => {
   return (
     <VStack gap={12}>
@@ -695,7 +759,9 @@ export const NoOverlay: StoryFn<DialogProps> = () => {
 
       <Dialog overlay={false}>
         <DialogTrigger asChild>
-          <Button>Open without Overlay</Button>
+          <Button variant='outline' color='neutral'>
+            Open without Overlay
+          </Button>
         </DialogTrigger>
 
         <DialogContent>
@@ -729,12 +795,17 @@ export const NoOverlay: StoryFn<DialogProps> = () => {
   );
 };
 
-/** Nested dialogs with push-back effect */
+/**
+ * A dialog inside a dialog: the outer one steps back so the depth is visible. Two is the most a
+ * reader can follow.
+ */
 export const WithNested: StoryFn<DialogProps> = () => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>1st level dialog</Button>
+        <Button variant='outline' color='neutral'>
+          1st level dialog
+        </Button>
       </DialogTrigger>
 
       <DialogContent>
@@ -830,14 +901,19 @@ export const WithNested: StoryFn<DialogProps> = () => {
   );
 };
 
-/** With tabs */
+/**
+ * Tabs inside a dialog, for a task with a couple of facets — not as a way to fit a whole form
+ * into one panel.
+ */
 export const WithTabs: StoryFn<DialogProps> = () => {
   const [activeTab, setActiveTab] = useState('tab1');
 
   return (
     <Dialog width={960}>
       <DialogTrigger asChild>
-        <Button>Open Dialog with Tabs</Button>
+        <Button variant='outline' color='neutral'>
+          Open Dialog with Tabs
+        </Button>
       </DialogTrigger>
 
       <DialogContent>

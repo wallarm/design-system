@@ -82,6 +82,11 @@ const longLabelRows: Row[] = [
 
 const formatValue = (n: number) => n.toLocaleString('en-US');
 
+const DESCRIPTION = [
+  'A donut and its legend for a share-of-total breakdown — response codes, traffic origins, error classes — where the parts add up to something meaningful; reach for `BarList` when the reader needs to compare magnitudes rather than shares.',
+  'The two halves are synced through context, so hovering a slice highlights its legend row and hovering a row dims the other slices. The legend is yours to compose: rows join to the data by `name`, which is what keeps the badge, value and percent layout free.',
+].join(' ');
+
 const meta = {
   title: 'Data display/SimpleCharts/PieChart',
   component: PieChart,
@@ -103,21 +108,17 @@ const meta = {
       type: 'figma',
       url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-122167&m=dev',
     },
-    docs: {
-      description: {
-        component:
-          'PieChart is a composable donut + legend pair. The root accepts `data` (the single source of truth) and provides ' +
-          'context to a recharts-driven `PieChartDonut` and a JSX-composed `PieChartLegend`. Hovering a slice highlights ' +
-          'its legend row and vice versa. Click-to-filter and selection are caller-owned — pass `selected` on a legend ' +
-          'item and re-render with the filtered data set. For loading, use `PieChartSkeleton`.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],
 } satisfies Meta<typeof PieChart>;
 
 export default meta;
 
+/**
+ * The interactive shape: click a legend row to filter to that slice, with the header's clear
+ * control appearing while the filter holds.
+ */
 export const Default: StoryFn<typeof meta> = () => {
   const [filtered, setFiltered] = useState<string | null>(null);
   const visibleRows = useMemo(
@@ -202,6 +203,10 @@ export const Default: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Selection kept in state rather than by filtering the data — the chosen row stays lit and the
+ * other slices fade, so the whole remains visible while one part is emphasised.
+ */
 export const Selectable: StoryFn<typeof meta> = () => {
   const [selected, setSelected] = useState<Set<string>>(() => new Set(['4XX']));
   const total = baseRows.reduce((sum, r) => sum + r.value, 0);
@@ -274,6 +279,10 @@ export const Selectable: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Legend labels truncate at the row width, since the legend takes whatever horizontal space
+ * the donut leaves.
+ */
 export const TruncatedLabels: StoryFn<typeof meta> = () => {
   const total = longLabelRows.reduce((sum, r) => sum + r.value, 0);
 
@@ -315,6 +324,10 @@ export const TruncatedLabels: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The same rows under `OverflowTooltip`, which reveals the full label only when it is actually
+ * cut off.
+ */
 export const TruncatedLabelsWithTooltip: StoryFn<typeof meta> = () => {
   const total = longLabelRows.reduce((sum, r) => sum + r.value, 0);
 
@@ -356,6 +369,10 @@ export const TruncatedLabelsWithTooltip: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `PieChartSkeleton` takes a row count so the placeholder legend is as long as the real one,
+ * and the card does not resize when data lands.
+ */
 export const Loading: StoryFn<typeof meta> = () => (
   <div className='w-400'>
     <Chart>
@@ -367,6 +384,10 @@ export const Loading: StoryFn<typeof meta> = () => (
   </div>
 );
 
+/**
+ * One slice is a full ring at 100% — legible, but ask whether a `Metric` says it better, since
+ * there is no share left to compare against.
+ */
 export const SingleSlice: StoryFn<typeof meta> = () => {
   const data: Row[] = [{ name: '5XX', value: 23, color: 'red', badgeColor: 'red' }];
   return (
@@ -402,6 +423,10 @@ export const SingleSlice: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Two slices is where a donut earns its place: the split is readable at a glance without
+ * reading either number.
+ */
 export const TwoSlices: StoryFn<typeof meta> = () => {
   const data: Row[] = [
     { name: 'Success', value: 78, color: 'green', badgeColor: 'green' },
@@ -451,6 +476,10 @@ const customRows: CustomRow[] = [
   { name: '1XX', value: 8, fillClass: 'fill-fuchsia-500', badgeColor: 'fuchsia' },
 ];
 
+/**
+ * Colours passed per datum rather than taken from the palette, for a breakdown whose
+ * categories already have colours elsewhere in the product.
+ */
 export const CustomColors: StoryFn<typeof meta> = () => {
   const data: PieChartDatum[] = customRows.map(r => ({
     name: r.name,
@@ -492,6 +521,10 @@ export const CustomColors: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * Every value zero: the ring renders empty and the percents read 0% rather than the chart
+ * dividing by nothing or disappearing.
+ */
 export const ZeroTotal: StoryFn<typeof meta> = () => {
   const data: Row[] = baseRows.map(r => ({ ...r, value: 0 }));
   return (
@@ -535,6 +568,10 @@ const widthOptions: Record<WidthKey, { title: string; className: string }> = {
   wide: { title: 'Wide — 560px', className: 'w-560' },
 };
 
+/**
+ * The same chart at 280, 400 and 560px. The donut holds its size and the legend takes the
+ * rest, which is what sets the practical minimum width.
+ */
 export const WidthVariants: StoryFn<typeof meta> = () => {
   const [key, setKey] = useState<WidthKey>('wide');
   const [menuOpen, setMenuOpen] = useState(false);
@@ -603,6 +640,10 @@ export const WidthVariants: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The three percent treatments, matching `BarList` — `split` colours number and symbol
+ * differently, `muted` sets both back, `inherit` leaves them to the row.
+ */
 export const PercentVariants: StoryFn<typeof meta> = () => {
   const total = baseRows.reduce((sum, r) => sum + r.value, 0);
 
@@ -660,6 +701,10 @@ const PALETTE: ChartColor[] = [
   'rose',
 ];
 
+/**
+ * The six chart colours around one ring, for checking adjacent slices stay tellable apart at
+ * small sizes.
+ */
 export const Palette: StoryFn<typeof meta> = () => {
   const data: PieChartDatum[] = PALETTE.slice(0, 6).map((color, i) => ({
     name: color,

@@ -11,6 +11,12 @@ import {
 import type { ExprNode, FieldMetadata } from '../types';
 import { backendFieldsToMetadata, realBackendFields } from './backendFieldsFixture';
 
+const DESCRIPTION = [
+  'A config-driven query builder — `fields` metadata in, an `ExprNode` tree out of `onChange` — for filtering a data-dense resource.',
+  'Reach for a row of `Select`s instead when three or four facets picked by equality would do; reach for this when the attribute count is high, or the query needs AND/OR, grouping, or operators like `between` and `like`.',
+  'The menus, chips and connectors are internal, so what you own is the field config.',
+].join(' ');
+
 const meta = {
   title: 'Patterns/FilterInput/FilterInput',
   component: FilterInput,
@@ -18,8 +24,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'FilterInput is the main entry point for filter UI. Pass `fields` config and it handles autocomplete, chip creation, and expression management automatically.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -57,10 +62,7 @@ type Story = StoryObj<typeof meta>;
 // so the field dropdown is the same everywhere.
 const attackVectorFields: FieldMetadata[] = realBackendFields.map(backendFieldsToMetadata);
 
-/**
- * Default empty state with placeholder text. Uses the full attack-vectors
- * filter set (identical to the Composition "Default" story).
- */
+/** The pattern at rest against the real attack-vectors schema: click in and it walks you field, then operator, then value. */
 export const Default: Story = {
   args: {
     fields: attackVectorFields,
@@ -68,9 +70,7 @@ export const Default: Story = {
   },
 };
 
-/**
- * Empty state with keyboard hint.
- */
+/** `showKeyboardHint` prints the shortcut hint beside the input — worth turning on where filtering is new to the reader, and off where it is routine. */
 export const WithKeyboardHint: Story = {
   args: {
     fields: attackVectorFields,
@@ -87,9 +87,7 @@ const groupedDemoFields: FieldMetadata[] = [
   { name: 'country', label: 'Country', type: 'string' },
 ];
 
-/**
- * Field-selection menu with fields organized under labeled group headers.
- */
+/** `fieldGroups` sorts the field menu under labelled headers, which is what keeps a fifty-field schema navigable. */
 export const WithFieldGroups: Story = {
   args: {
     fields: groupedDemoFields,
@@ -102,11 +100,6 @@ export const WithFieldGroups: Story = {
   },
 };
 
-/**
- * A committed chip whose field carries a description exposes that description in
- * a dark tooltip when the attribute (first) segment is hovered. The operator and
- * value segments keep their own click-to-edit behavior (AS-1060).
- */
 const describedChipFields: FieldMetadata[] = [
   {
     name: 'status_code',
@@ -117,6 +110,7 @@ const describedChipFields: FieldMetadata[] = [
   },
 ];
 
+/** A field with a `description` carries it into a tooltip on the chip's first segment, so a committed filter can still explain itself; the operator and value segments keep click-to-edit. */
 export const WithDescribedChip: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>({
@@ -137,9 +131,7 @@ export const WithDescribedChip: Story = {
   },
 };
 
-/**
- * Error state - empty field.
- */
+/** `error` reddens the input as a whole — pair it with an `Alert` that says what was rejected, since the input itself cannot. */
 export const ErrorEmpty: Story = {
   args: {
     fields: attackVectorFields,
@@ -148,9 +140,7 @@ export const ErrorEmpty: Story = {
   },
 };
 
-/**
- * Controlled mode with pre-set single condition value.
- */
+/** Controlled mode: `value` takes an `ExprNode` and `onChange` hands the tree back. The JSON below the input is the story printing that tree, not part of the component. */
 export const WithPresetValue: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>({
@@ -169,7 +159,7 @@ export const WithPresetValue: Story = {
           placeholder='Type to filter...'
         />
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -178,9 +168,7 @@ export const WithPresetValue: Story = {
   },
 };
 
-/**
- * Controlled mode with pre-set multi-condition Group value.
- */
+/** Two conditions joined by AND — what a `group` node looks like once rendered, connectors included. */
 export const WithMultiConditionPreset: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>({
@@ -201,7 +189,7 @@ export const WithMultiConditionPreset: Story = {
           placeholder='Type to filter...'
         />
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -210,9 +198,7 @@ export const WithMultiConditionPreset: Story = {
   },
 };
 
-/**
- * Error state with a pre-set condition.
- */
+/** The error state with a condition already committed: the chip stays editable, so the query can be fixed in place rather than cleared. */
 export const ErrorWithValue: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>({
@@ -234,11 +220,7 @@ export const ErrorWithValue: Story = {
   },
 };
 
-/**
- * Disabled chips cannot be edited or removed.
- * They appear dimmed and do not react to clicks.
- * Useful for locked filter conditions (e.g. drill-down context in investigation flows).
- */
+/** A condition marked `disabled` is locked — dimmed, no edit, no remove — which is how a drill-down carries its context into the filter without letting the reader drop it. */
 export const WithDisabledChips: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>({
@@ -260,7 +242,7 @@ export const WithDisabledChips: Story = {
           placeholder='Add more filters...'
         />
         {expression && (
-          <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+          <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
             <pre>{JSON.stringify(expression, null, 2)}</pre>
           </div>
         )}
@@ -269,9 +251,7 @@ export const WithDisabledChips: Story = {
   },
 };
 
-/**
- * All chips disabled — clear button removes nothing, input still allows adding new chips.
- */
+/** With every chip locked, clear-all has nothing to remove, and the input still accepts new conditions on top. */
 export const AllChipsDisabled: Story = {
   render: () => {
     const [expression, setExpression] = useState<ExprNode | null>({
@@ -300,11 +280,7 @@ export const AllChipsDisabled: Story = {
   },
 };
 
-/**
- * HTTP status code field using createStatusCodeSuggestions for mask-only
- * suggestions. Empty input shows all masks available in the data; typing a
- * digit narrows the suggestion (e.g. "4" → 4XX, "40" → 40X). See AS-877.
- */
+/** A status-code field wired by hand with the `createStatusCode*` helpers: typing narrows the mask suggestions, 4 to 4XX and 40 to 40X. */
 export const HTTPStatusCodeSuggestions: Story = {
   args: {
     fields: [
@@ -325,12 +301,7 @@ export const HTTPStatusCodeSuggestions: Story = {
   },
 };
 
-/**
- * Same HTTP status code field, but relying on FilterInput's built-in
- * name-based auto-wiring: a field named `status_code` automatically gets
- * `acceptChar` / `normalize` / `getSuggestions` / `validate` filled in by
- * the DS. Any explicit callback on the field still wins. See AS-877.
- */
+/** `status_code` is a reserved field name — the DS fills in the same suggestions, input filter, normaliser and validator on its own, and an explicit callback still wins. */
 export const HTTPStatusCodeByName: Story = {
   args: {
     fields: [
@@ -345,20 +316,6 @@ export const HTTPStatusCodeByName: Story = {
   },
 };
 
-/**
- * Two-step "paired" field (AS-1160). `Context Param` takes a single `is`
- * operator plus a key, after which the second part (`Value`) **always** appears
- * with its own operator and value — captured in one chip (`Context Param is
- * header ; Value is yyy`).
- *
- * The `Value` part adds `like` / `not like` (substring match) plus `is set` /
- * `is not set` operators. The last two take no value:
- *
- * - **Value is set** — the key's value is present (`!= null`).
- * - **Value is not set** — the key's value is absent (`== null`).
- *
- * In those two cases the second value is not required; otherwise it is.
- */
 const pairedFields: FieldMetadata[] = [
   {
     name: 'context_param',
@@ -381,6 +338,7 @@ const pairedFields: FieldMetadata[] = [
   { name: 'method', label: 'Method', type: 'enum', options: ['GET', 'POST', 'PUT', 'DELETE'] },
 ];
 
+/** `pairedField` captures two steps in one chip — a parameter name, then its value with its own operator — for an attribute that means nothing on its own. */
 export const PairedField: Story = {
   render: () => {
     const ParentComponent = () => {
@@ -391,10 +349,7 @@ export const PairedField: Story = {
   },
 };
 
-/**
- * Paired field whose `Value` uses the no-value `is set` operator — the chip
- * reads `Context Param is header ; Value is set` with no second value.
- */
+/** `is set` and `is not set` on the paired half finish the chip with no second value, which is how you ask whether a key is present at all. */
 export const PairedFieldValueIsSet: Story = {
   render: () => {
     const ParentComponent = () => {
@@ -412,13 +367,6 @@ export const PairedFieldValueIsSet: Story = {
   },
 };
 
-/**
- * Paired field whose `Context Param` value list shows a muted secondary line
- * (the backend path) beneath each bold key name. The bold name is **not
- * unique** — two `request-id` rows appear under different paths, and the
- * description line is what tells them apart. Selecting a row commits its unique
- * path value, not the shared label.
- */
 const describedParamFields: FieldMetadata[] = [
   {
     name: 'context_param',
@@ -454,6 +402,7 @@ const describedParamFields: FieldMetadata[] = [
   { name: 'method', label: 'Method', type: 'enum', options: ['GET', 'POST', 'PUT', 'DELETE'] },
 ];
 
+/** The value rows carry a muted second line because the bold name is not unique: two `request-id` rows differ only by their path, and selecting one commits the path. */
 export const PairedFieldValueDescriptions: Story = {
   render: () => {
     const ParentComponent = () => {
@@ -464,9 +413,7 @@ export const PairedFieldValueDescriptions: Story = {
   },
 };
 
-/**
- * Paired field pre-populated with both values, rendered as one chip.
- */
+/** The same paired field arriving pre-filled from a controlled value, rendered as the single chip it becomes. */
 export const PairedFieldPreset: Story = {
   render: () => {
     const ParentComponent = () => {
@@ -483,34 +430,6 @@ export const PairedFieldPreset: Story = {
   },
 };
 
-/**
- * **Nested value submenu (WDS-156).** The `Attack type` field's values are
- * organized under **section headers** ("Input-based attacks", "GraphQL
- * attacks") and one row — `SQL injection` — is a **parent category** that opens
- * a right-side **submenu** of concrete sub-types.
- *
- * Sections and parent categories are purely presentational: only the **leaf**
- * sub-values are committable, so the expression always carries leaves (e.g.
- * `sqli_union`), never the group. A group collapses in the chip only when it is
- * **fully** selected → the group label (a submenu category "SQL injection", or a
- * whole section "Input-based attacks"); a **partial** selection lists the chosen
- * leaves comma-separated. The same collapse applies live while selecting, not
- * just once the filter is applied.
- *
- * Pick the `in` operator to multi-select. Each labeled section is topped with a
- * tri-state **"All {group}"** row (e.g. "All Input-based attacks") that
- * selects/deselects the whole group's scope — including the nested SQL-injection
- * sub-types — in one click; the SQL-injection submenu carries its own "All SQL
- * injection" row. Toggling the parent category (or an "All {group}" row) is a
- * bulk shortcut over its descendant leaves; every such checkbox is tri-state.
- *
- * **Typing flattens the tree**: the menu shows a flat list of matches at any
- * depth, each deep match carrying its ancestry path as a muted second line and
- * the matched substring highlighted; a query matching a group/type name adds an
- * "All {name}" bulk-select shortcut. Group headers are **sticky** while
- * scrolling, and the submenu tucks under the main panel with a safe-triangle
- * grace delay so diagonal pointer moves don't dismiss it.
- */
 const attackTypeNestedFields: FieldMetadata[] = [
   {
     name: 'attack_type',
@@ -621,6 +540,7 @@ const attackTypeNestedFields: FieldMetadata[] = [
   },
 ];
 
+/** Values grouped under section headers, with one row opening a submenu of sub-types: only leaves commit, so the expression never carries a group. A fully selected group collapses to its own label in the chip while a partial one lists the chosen leaves, and typing flattens the tree to matches at any depth. */
 export const NestedValueSubmenu: Story = {
   render: () => {
     const ParentComponent = () => {
@@ -634,7 +554,7 @@ export const NestedValueSubmenu: Story = {
             placeholder='Filter by attack type…'
           />
           {value && (
-            <div className='mt-16 p-4 bg-gray-100 rounded text-xs'>
+            <div className='mt-16 rounded-8 border border-border-primary bg-bg-light-primary p-8 font-mono text-xs text-text-secondary'>
               <pre>{JSON.stringify(value, null, 2)}</pre>
             </div>
           )}

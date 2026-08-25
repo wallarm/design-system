@@ -2,6 +2,11 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Card, CardContent, CardHeader, CardTitle } from '../Card';
 import { AnimatedBackground, type AnimatedBackgroundProps } from './AnimatedBackground';
 
+const DESCRIPTION = [
+  'The decorative backdrop behind the surfaces that have no chrome of their own — sign-in, the splash screen, the assistant. `pixel`, the default, sweeps a canvas dot grid; `blur` drifts a mesh gradient. Children sit centred above it.',
+  'It is `aria-hidden` and lets the pointer through, with one exception: the pixel variant’s `game`, which takes pointer events for as long as it is running.',
+].join(' ');
+
 const meta = {
   title: 'Layout/AnimatedBackground',
   component: AnimatedBackground,
@@ -9,12 +14,7 @@ const meta = {
     layout: 'fullscreen',
     docs: {
       description: {
-        component:
-          'Decorative animated background with two variants. ' +
-          '`pixel` (default): canvas-based dot grid with sweep animation. ' +
-          '`blur`: liquid mesh gradient with six drifting color blobs. ' +
-          'Purely decorative (`aria-hidden`), never intercepts pointer events. ' +
-          'Content passed as `children` is centered above the background.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -22,10 +22,12 @@ const meta = {
 
 export default meta;
 
+/** The default sweep across the dot grid, full-bleed with nothing on top of it. */
 export const Pixel: StoryFn<AnimatedBackgroundProps> = () => (
   <AnimatedBackground className='h-screen w-screen' />
 );
 
+/** A card above the grid, with `excludeCardSize` keeping the dots clear behind it. This story also switches on `game` — the easter egg, and the one case where the backdrop accepts clicks. */
 export const PixelWithCard: StoryFn<AnimatedBackgroundProps> = () => (
   <AnimatedBackground
     className='h-screen w-screen'
@@ -45,10 +47,12 @@ export const PixelWithCard: StoryFn<AnimatedBackgroundProps> = () => (
   </AnimatedBackground>
 );
 
+/** `variant='blur'`: colour blobs drifting behind a frosted layer, which is the assistant’s backdrop rather than the console’s. */
 export const Blur: StoryFn<AnimatedBackgroundProps> = () => (
   <AnimatedBackground variant='blur' className='h-screen w-screen' />
 );
 
+/** The same gradient with content over it. There is no exclusion to set here, since the blur has no grid for a card to interrupt. */
 export const BlurWithCard: StoryFn<AnimatedBackgroundProps> = () => (
   <AnimatedBackground variant='blur' className='h-screen w-screen'>
     <Card className='w-[300px] h-[200px]'>

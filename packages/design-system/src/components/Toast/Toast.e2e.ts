@@ -16,10 +16,14 @@ const getToasts = (page: Page) => page.locator('[data-scope="toast"][data-part="
 const getToastCloseButton = (page: Page) =>
   getToasts(page).first().getByRole('button', { name: 'Close' });
 
-/** Click a static (secondary variant) button to create a toast without progress animation */
+/**
+ * Click a static (secondary variant) button to create a toast without progress
+ * animation. The section is found by its annotation label rather than by prose,
+ * so rewording the label does not silently break every test in this file.
+ */
 const initStaticToast = async (page: Page, name: string) => {
-  const staticSection = page.getByText('Static (for screenshots)').locator('..');
-  await staticSection.getByRole('button', { name }).click();
+  const staticSection = page.locator('.sb-annotation', { hasText: 'static' }).locator('..');
+  await staticSection.getByRole('button', { name, exact: true }).click();
 };
 
 const verifyAndClose = async (page: Page) => {
@@ -33,37 +37,37 @@ test.describe('Toast Component', () => {
   test.describe('View - All Types', () => {
     test('Success toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initStaticToast(page, 'Success Toast');
+      await initStaticToast(page, 'Success');
       await verifyAndClose(page);
     });
 
     test('Error toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initStaticToast(page, 'Error Toast');
+      await initStaticToast(page, 'Error');
       await verifyAndClose(page);
     });
 
     test('Warning toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initStaticToast(page, 'Warning Toast');
+      await initStaticToast(page, 'Warning');
       await verifyAndClose(page);
     });
 
     test('Info toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initStaticToast(page, 'Info Toast');
+      await initStaticToast(page, 'Info');
       await verifyAndClose(page);
     });
 
     test('Loading toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initStaticToast(page, 'Loading Toast');
+      await initStaticToast(page, 'Loading');
       await verifyAndClose(page);
     });
 
     test('Default toast', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initStaticToast(page, 'Default Toast');
+      await initStaticToast(page, 'Default');
       await verifyAndClose(page);
     });
   });
@@ -175,7 +179,7 @@ test.describe('Toast Component', () => {
   test.describe('Close Button', () => {
     test('Close button - keyboard accessible', async ({ page }) => {
       await toastStory.goto(page, 'Basic');
-      await initStaticToast(page, 'Success Toast');
+      await initStaticToast(page, 'Success');
       const toast = getToasts(page).first();
       await expect(toast).toBeVisible();
 

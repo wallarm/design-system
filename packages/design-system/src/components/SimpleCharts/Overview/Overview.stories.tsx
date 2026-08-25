@@ -70,6 +70,11 @@ const severityData: HorizontalBarStackDatum[] = [
   { name: 'Medium', value: 18, color: 'amber' },
 ];
 
+const DESCRIPTION = [
+  'The family of self-contained charts for a dashboard card: each owns its own data and they all share one frame — `Chart`, with `ChartHeader`, `ChartTitle` and `ChartActions`.',
+  "This page is the family portrait, for checking they still read as one system after any one of them changes; the API and the interaction stories live on each chart's own page, and `Chart` by itself is the frame rather than a chart to reach for.",
+].join(' ');
+
 const meta = {
   title: 'Data display/SimpleCharts/Overview',
   parameters: {
@@ -78,15 +83,7 @@ const meta = {
       type: 'figma',
       url: 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-121203&m=dev',
     },
-    docs: {
-      description: {
-        component:
-          'SimpleCharts is the design-system family of self-contained, composable charts for dashboard cards. ' +
-          'Each chart owns its own data context and shares the chart frame (`<Chart>`, `<ChartHeader>`, `<ChartTitle>`, `<ChartActions>`). ' +
-          'This page shows a default rendering of each one — open the individual chart pages for the full API and interaction stories. ' +
-          '`Chart` itself is the low-level primitive used to build the others; treat it as developer reference.',
-      },
-    },
+    docs: { description: { component: DESCRIPTION } },
   },
   tags: ['autodocs'],
 } satisfies Meta;
@@ -198,6 +195,10 @@ const MetricCard = () => (
   </Chart>
 );
 
+/**
+ * One card per chart, at its default: a `BarList` top-five, a `PieChart` share-of-total, a
+ * `LineChart` over time, a `HorizontalBarStack` composition and a bare `Metric`.
+ */
 export const Default: StoryFn<typeof meta> = () => (
   <div className='flex flex-col gap-16 w-832'>
     <div className='grid grid-cols-2 gap-16'>
@@ -211,12 +212,3 @@ export const Default: StoryFn<typeof meta> = () => (
     </div>
   </div>
 );
-
-Default.parameters = {
-  docs: {
-    description: {
-      story:
-        'Default rendering of each chart in the SimpleCharts family. BarList (top-left) and PieChart (top-right) share the row; LineChart spans the row below; HorizontalBarStack (bottom-left) and Metric (bottom-right) share the last row.',
-    },
-  },
-};

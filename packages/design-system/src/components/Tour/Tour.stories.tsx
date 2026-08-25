@@ -8,11 +8,15 @@ import { Field, FieldLabel, FieldSet } from '../Field';
 import { Input } from '../Input';
 import { Kbd, KbdGroup } from '../Kbd';
 import { HStack, VStack } from '../Stack';
-import { Text } from '../Text';
 import { beaconStepEffect, waitForStepEvent } from './lib';
 import { Tour } from './Tour';
 import type { TourStepDetails } from './types';
 import { useTour } from './useTour';
+
+const DESCRIPTION = [
+  'A guided walk through the interface, for a feature the reader would not find on their own — configured with `useTour({ steps })` and one rendered `Tour`.',
+  "It owns how a step looks, not when the tour runs: deciding who sees it and how often is the application's job.",
+].join(' ');
 
 const meta = {
   title: 'Overlay/Tour',
@@ -21,8 +25,7 @@ const meta = {
     layout: 'centered',
     docs: {
       description: {
-        component:
-          'Step-by-step guided experience that highlights interface elements with contextual popovers to help users discover new features or navigate unfamiliar workflows. Built on top of Ark UI Tour with custom styling.',
+        component: DESCRIPTION,
       },
     },
   },
@@ -30,7 +33,10 @@ const meta = {
 
 export default meta;
 
-export const Overview: StoryFn<typeof meta> = () => {
+/**
+ * A full tour end to end. Keep it short — every step is one the reader did not choose to take.
+ */
+export const Basic: StoryFn<typeof meta> = () => {
   const firstRef = useRef<HTMLButtonElement>(null);
   const secondRef = useRef<HTMLButtonElement>(null);
   const thirdRef = useRef<HTMLButtonElement>(null);
@@ -104,38 +110,22 @@ export const Overview: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          Step-by-step guided experience that highlights interface elements with contextual popovers
-          to help users discover new features or navigate unfamiliar workflows.
-          <br />
-          Supports full keyboard navigation: arrow keys to move between steps, Escape to dismiss,
-          Tab to focus the close button.
-        </Text>
-
         <VStack gap={4} align='stretch'>
-          <Text size='xs' weight='medium' color='secondary'>
-            Keyboard navigation
-          </Text>
+          <span className='sb-annotation'>keyboard</span>
           <HStack gap={8}>
             <KbdGroup>
               <Kbd>&larr;</Kbd>
               <Kbd>&rarr;</Kbd>
             </KbdGroup>
-            <Text size='xs' color='secondary'>
-              Navigate between steps
-            </Text>
+            <span className='sb-annotation'>move</span>
           </HStack>
           <HStack gap={8}>
             <Kbd>Esc</Kbd>
-            <Text size='xs' color='secondary'>
-              Dismiss tour
-            </Text>
+            <span className='sb-annotation'>dismiss</span>
           </HStack>
           <HStack gap={8}>
             <Kbd>Tab</Kbd>
-            <Text size='xs' color='secondary'>
-              Focus buttons
-            </Text>
+            <span className='sb-annotation'>focus</span>
           </HStack>
         </VStack>
 
@@ -161,8 +151,8 @@ export const Overview: StoryFn<typeof meta> = () => {
 
         <Button
           data-testid='tour-start'
-          variant='primary'
-          color='brand'
+          variant='secondary'
+          color='neutral'
           size='large'
           onClick={() => tour.start()}
         >
@@ -190,6 +180,10 @@ const PLACEMENTS = [
   'bottom-end',
 ] as const;
 
+/**
+ * Where a step sits relative to its target. Choose the side that leaves the target visible,
+ * since the target is the point.
+ */
 export const Placement: StoryFn<typeof meta> = () => {
   const topStartRef = useRef<HTMLButtonElement>(null);
   const topRef = useRef<HTMLButtonElement>(null);
@@ -233,12 +227,6 @@ export const Placement: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          The tour popover supports placement in any direction relative to the target element.
-          Placement is set per step and auto-flips when the popover would overflow the viewport,
-          ensuring content stays visible regardless of the target's position on screen.
-        </Text>
-
         <div className='grid grid-cols-3 gap-8 max-w-[50vw] mx-auto'>
           {PLACEMENTS.map(p => (
             <Button key={p} ref={refs[p]} variant='outline' color='neutral' size='medium'>
@@ -249,8 +237,8 @@ export const Placement: StoryFn<typeof meta> = () => {
 
         <Button
           data-testid='tour-start'
-          variant='primary'
-          color='brand'
+          variant='secondary'
+          color='neutral'
           size='large'
           onClick={() => tour.start()}
         >
@@ -263,6 +251,10 @@ export const Placement: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * A beacon the reader opens themselves, which turns the tour from an interruption into an
+ * offer.
+ */
 export const BeaconTriggered: StoryFn<typeof meta> = () => {
   const targetRef = useRef<HTMLButtonElement>(null);
 
@@ -284,12 +276,6 @@ export const BeaconTriggered: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          A passive discovery pattern where a pulsing beacon highlights a new feature without
-          blocking the UI. No popover is shown initially — the tour step appears only after the user
-          clicks the highlighted element.
-        </Text>
-
         <HStack gap={8}>
           <Button ref={targetRef} variant='outline' color='neutral' size='large'>
             Quick tip
@@ -302,6 +288,10 @@ export const BeaconTriggered: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * A step that waits for the reader to act before advancing, for teaching by doing rather than
+ * by reading.
+ */
 export const WaitForInteraction: StoryFn<typeof meta> = () => {
   const firstRef = useRef<HTMLButtonElement>(null);
   const secondRef = useRef<HTMLButtonElement>(null);
@@ -344,15 +334,6 @@ export const WaitForInteraction: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          A tour step that pauses and waits for the user to interact with a highlighted element
-          before proceeding to the next step.
-          <br />
-          The wait step uses <code>type: "tooltip"</code> with an effect callback{' '}
-          <code>waitForStepEvent</code> that attaches an event listener to the target element and
-          calls <code>next()</code> method when the user interacts with it.
-        </Text>
-
         <HStack gap={8}>
           <Button ref={firstRef} variant='outline' color='neutral' size='large'>
             Add Item
@@ -364,8 +345,8 @@ export const WaitForInteraction: StoryFn<typeof meta> = () => {
 
         <Button
           data-testid='tour-start'
-          variant='primary'
-          color='brand'
+          variant='secondary'
+          color='neutral'
           size='large'
           onClick={() => tour.start()}
         >
@@ -378,6 +359,10 @@ export const WaitForInteraction: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * The same, gated on input rather than a click — for a step where the reader has to type
+ * something real to continue.
+ */
 export const WaitForInput: StoryFn<typeof meta> = () => {
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
@@ -449,11 +434,6 @@ export const WaitForInput: StoryFn<typeof meta> = () => {
   return (
     <div className='w-600 p-32'>
       <VStack gap={24} align='stretch'>
-        <Text size='sm' color='secondary'>
-          To continue a step, user has to complete the highlighted action. Once the action is
-          performed, the tour will automatically move forward.
-        </Text>
-
         <FieldSet>
           <Field>
             <FieldLabel>Name</FieldLabel>
@@ -472,8 +452,8 @@ export const WaitForInput: StoryFn<typeof meta> = () => {
 
         <Button
           data-testid='tour-start'
-          variant='primary'
-          color='brand'
+          variant='secondary'
+          color='neutral'
           size='large'
           onClick={() => tour.start()}
         >
