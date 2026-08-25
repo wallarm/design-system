@@ -1608,7 +1608,8 @@ const StatusBadge: FC<{ value: SecurityEvent['status'] }> = ({ value }) => (
 /**
  * `EditableTextCell` and `EditableSelectCell` in the plain columns, with the master column
  * deliberately read-only — editing in place suits a value the user owns, not one the system
- * reports.
+ * reports. Hovering highlights the whole cell, clicking opens it without the content shifting,
+ * and Enter or blur commits while Escape reverts.
  */
 export const InlineCellEditing: StoryFn<typeof meta> = () => {
   const [data, setData] = useState<SecurityEvent[]>(() => securityEvents.slice(0, 6));
@@ -1691,12 +1692,7 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
 
   return (
     <VStack gap={12} align='stretch'>
-      <Text size='sm' color='secondary'>
-        Hover an Object name (text) or Status / Category (select) cell — the whole cell highlights.
-        Click to edit: the cell gets a brand-orange border and the content stays exactly in place
-        (no shift). Category starts empty and shows a consumer-set “Select…” placeholder. Enter or
-        blur commits, Escape reverts; the read-only columns stay static.
-      </Text>
+      <span className='sb-annotation'>click a cell to edit it</span>
       <Table data={data} columns={columns} getRowId={row => row.id} />
     </VStack>
   );

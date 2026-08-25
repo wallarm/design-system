@@ -4,16 +4,18 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-08-24, against main at v1.5.0.
+> **Last updated:** 2026-08-25, against main at v1.5.0. **All 95 pages are written.**
 
 ## How to use this
 
-1. Pick a row — 🟡 counts. **Every page goes through the skill**, including the
-   ones that already have prose: existing wording gets read against the standard
-   and rewritten where it doesn't hold. A 🟡 is not a page you can skip.
-2. Start a fresh chat and run `/storybook-docs <Name>`.
-3. When the prose is on the page, set **Status** to ✅.
-4. Found a real problem in the component? Park it in [findings](./storybook-docs-findings.md) — never fix it here.
+The pass is complete — every row is ✅. From here the table is a **regression
+check**, not a queue:
+
+1. A new component arrives with a ☐ row. Run `/storybook-docs <Name>` on it in a
+   fresh chat, then set it to ✅.
+2. A page whose stories change may need its prose re-read; the two count columns
+   drifting apart is the signal.
+3. Found a real problem in a component? Park it in [findings](./storybook-docs-findings.md) — never fix it here.
 
 **Status:** ✅ Written to the standard · 🟡 Has prose, not yet levelled · ☐ Nothing yet
 
@@ -37,9 +39,12 @@
 
 ## Snapshot
 
-- **70 written to the standard · 18 with prose to level · 7 untouched**, across 95 story pages.
-- **Complete folders:** Actions, Brand, Inputs, Inputs Date, Layout, Loading, Messaging, Navigation, Overlay, Pages, Patterns, Primitives, Status Indication, Typography.
-- Levelling a 🟡 is usually cutting, not filling — and sometimes correcting: `Slider` claimed behaviour its own code contradicted, and `Dialog` claimed a position it does not have.
+- **95 written to the standard · 0 left**, across 95 story pages. Every folder is complete.
+- Levelling was usually cutting, not filling — and often correcting. Five pages
+  claimed behaviour their own code contradicted: `Slider`, `Dialog`,
+  `CodeSnippet` (its `Sizes` story labelled the wrong default), `BarList`
+  (`selected` does not fill the bar) and `Table`'s `LoadingWithData` (it appends
+  skeletons, it does not overlay).
 - On a ✅ row the two count columns match. Where they do not, the page is not finished.
 
 ## Pages
