@@ -16,9 +16,10 @@ export const emptyStateVariants = cva('flex flex-col items-center text-center m-
 
 /**
  * The medallion: a 36px raised tile holding a 20px glyph, which with `p-8` fills
- * the content box exactly. `text-xl` sets the 20px em box, so an icon left at
- * its default `size='inherit'` lands on spec without every call site restating
- * a size.
+ * the content box exactly — the hairline is an inset ring in the shadow list,
+ * not a real border, so it doesn't eat into the padding. `text-xl` sets the
+ * 20px em box, so an icon left at its default `size='inherit'` lands on spec
+ * without every call site restating a size.
  *
  * The Figma master's placeholder is 16px at 10px padding, but every applied
  * instance and the medallion spec sheet itself use 20px at 8px — the file is
@@ -34,7 +35,7 @@ export const emptyStateVariants = cva('flex flex-col items-center text-center m-
  * smoothing on this shape, so no `corner-shape` is needed.
  */
 export const emptyStateIllustrationVariants = cva(
-  'empty-state-medallion flex items-center justify-center shrink-0 size-36 rounded-[15px] border p-8 text-xl text-icon-secondary',
+  'empty-state-medallion flex items-center justify-center shrink-0 size-36 rounded-[15px] p-8 text-xl text-icon-secondary',
 );
 
 export const emptyStateMessageVariants = cva('flex flex-col items-center', {

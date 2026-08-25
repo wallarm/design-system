@@ -223,9 +223,16 @@
     --color-component-empty-state-medallion-bg-from: var(--color-white);
     --color-component-empty-state-medallion-bg-to: --alpha(var(--color-slate-100) / 80%);
     --color-component-empty-state-medallion-border: --alpha(var(--color-slate-300) / 70%);
+    /* The hairline rides in the shadow list as an inset ring rather than a real
+     * border: Figma composites the top highlight *over* the stroke, and a CSS
+     * inset shadow is clipped to the padding box, so it can never reach a real
+     * border. Ordering matters — earlier shadows paint on top, so the highlight
+     * and the inner shade both land over the ring, as in Figma. It also keeps
+     * the glyph at 8px from the edge instead of 9px. */
     --shadow-empty-state-medallion:
-        0 2px 2.5px 0 rgba(15, 23, 43, 0.03), 0 1px 1px 0 rgba(15, 23, 43, 0.05),
-        inset 0 -1px 1px 0 rgba(15, 23, 43, 0.04), inset 0 1px 0 0 rgba(255, 255, 255, 0.45);
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.45), inset 0 -1px 1px 0 rgba(15, 23, 43, 0.04),
+        inset 0 0 0 1px var(--color-component-empty-state-medallion-border),
+        0 2px 2.5px 0 rgba(15, 23, 43, 0.03), 0 1px 1px 0 rgba(15, 23, 43, 0.05);
 
     /* ========================================
    * SYNTAX COLORS
@@ -629,8 +636,9 @@
     --color-component-empty-state-medallion-bg-to: --alpha(var(--color-white) / 2%);
     --color-component-empty-state-medallion-border: --alpha(var(--color-white) / 13%);
     --shadow-empty-state-medallion:
-        0 2px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 2px 0 rgba(0, 0, 0, 0.24),
-        inset 0 -1px 2px 0 rgba(0, 0, 0, 0.16), inset 0 1px 0 0 rgba(255, 255, 255, 0.05);
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.05), inset 0 -1px 2px 0 rgba(0, 0, 0, 0.16),
+        inset 0 0 0 1px var(--color-component-empty-state-medallion-border),
+        0 2px 5px 0 rgba(0, 0, 0, 0.14), 0 1px 2px 0 rgba(0, 0, 0, 0.24);
 
     /* ========================================
      * SYNTAX COLORS
