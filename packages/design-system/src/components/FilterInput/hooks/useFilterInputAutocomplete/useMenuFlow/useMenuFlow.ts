@@ -36,7 +36,6 @@ export const useMenuFlow = (deps: MenuFlowDeps) => {
   const {
     handleValueSelect,
     handleMultiCommit,
-    handleMultiLiveChange,
     handleBuildingValueChange,
     handleMultiSelectToggle,
     handleRangeSelect,
@@ -71,7 +70,6 @@ export const useMenuFlow = (deps: MenuFlowDeps) => {
     handleOperatorSelect,
     handleValueSelect,
     handleMultiCommit,
-    handleMultiLiveChange,
     handleBuildingValueChange,
     handleMultiSelectToggle,
     handleRangeSelect,

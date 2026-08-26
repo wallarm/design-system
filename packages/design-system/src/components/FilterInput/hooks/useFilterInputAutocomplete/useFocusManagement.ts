@@ -75,16 +75,28 @@ export const useFocusManagement = ({
     (e: FocusEvent) => {
       if (handlingBlurRef.current) return;
       const related = e.relatedTarget as HTMLElement | null;
-      if (containerRef.current?.contains(related)) return;
+      // Selecting inside the value menu keeps the edit alive.
       if (isMenuRelated(related)) return;
       handlingBlurRef.current = true;
       try {
+        // Commit an in-progress multi-select edit first — valid even when focus
+        // stays inside the container (clicking the input / another chip),
+        // because Ark unmounts the value menu only on the follow-up click.
+        // Committing closes the menu (resetState via onCommit) and re-queries
+        // once, so the chip's toggles aren't dropped on the way out (AS-1064).
+        if (blurCommitRef.current?.()) {
+          setIsFocused(false);
+          related?.focus();
+          return;
+        }
+        // No multi-select to commit and focus stayed inside (e.g. a building
+        // segment-to-segment move): leave in-progress work untouched.
+        if (containerRef.current?.contains(related)) return;
         setIsFocused(false);
-        // Try multi-select commit, then freeform building commit. If neither
-        // fires and a building chip is incomplete, preserve it (blur shouldn't
-        // destroy in-progress work) but force-close the menu in case Ark UI's
-        // outside-click handler bailed out.
-        const committed = blurCommitRef.current?.() || commitBuildingOnBlur();
+        // Freeform building commit. If it doesn't fire and a building chip is
+        // incomplete, preserve it (blur shouldn't destroy in-progress work) but
+        // force-close the menu in case Ark UI's outside-click handler bailed out.
+        const committed = commitBuildingOnBlur();
         if (!committed) {
           if (hasIncompleteBuilding()) {
             setMenuState('closed');

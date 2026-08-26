@@ -21,9 +21,6 @@ interface UseNestedValueMenuStateOptions {
   initialValues: ConditionValue[];
   onSelect: (value: ConditionValue) => void;
   onCommit?: (values: ConditionValue[]) => void;
-  /** Fires the live checked set on each user toggle (not on reseed) so an
-   *  editing chip commits in place, not only on menu close (AS-1064). */
-  onCheckedValuesChange?: (values: ConditionValue[]) => void;
   onEscape?: () => void;
   onOpenChange?: (open: boolean) => void;
   onBuildingValueChange?: (preview: string | undefined) => void;
@@ -55,7 +52,6 @@ export const useNestedValueMenuState = ({
   initialValues,
   onSelect,
   onCommit,
-  onCheckedValuesChange,
   onEscape,
   onOpenChange,
   onBuildingValueChange,
@@ -77,27 +73,12 @@ export const useNestedValueMenuState = ({
   // flat useValueMenuState discipline — see its comment for the Ark
   // outside-click rationale).
   const prevSerializedRef = useRef<string | null>(null);
-  // Snapshot of the last set surfaced via onCheckedValuesChange — keeps the
-  // live-propagation effect below from re-firing on the reseed our own upsert
-  // triggers (would otherwise loop). Reseeds update it in lockstep.
-  const lastEmittedRef = useRef<string | null>(null);
   useEffect(() => {
     const serialized = initialValues.map(String).sort().join('\0');
     if (serialized === prevSerializedRef.current) return;
     prevSerializedRef.current = serialized;
-    lastEmittedRef.current = serialized;
     setCheckedValues(initialValues);
   }, [initialValues]);
-
-  // Live-propagate genuine user toggles (the reseed sets lastEmittedRef first,
-  // so this only fires for real changes) so an edited committed chip commits in
-  // place instead of only on menu close (AS-1064).
-  useEffect(() => {
-    const serialized = checkedValues.map(String).sort().join('\0');
-    if (serialized === lastEmittedRef.current) return;
-    lastEmittedRef.current = serialized;
-    onCheckedValuesChange?.(checkedValues);
-  }, [checkedValues, onCheckedValuesChange]);
 
   // Close any open submenu when the whole menu closes.
   const prevOpenRef = useRef(open);

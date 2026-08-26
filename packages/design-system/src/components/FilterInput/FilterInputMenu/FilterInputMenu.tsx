@@ -31,7 +31,6 @@ export interface FilterInputAutocompleteState {
   handleOperatorSelect: (operator: FilterOperator) => void;
   handleValueSelect: (val: string | number | boolean) => void;
   handleMultiCommit: (values: Array<string | number | boolean>) => void;
-  handleMultiLiveChange: (values: Array<string | number | boolean>) => void;
   handleRangeSelect: (from: string, to: string) => void;
   handleMenuClose: () => void;
   handleMenuDiscard: () => void;
@@ -71,7 +70,6 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
     handleOperatorSelect,
     handleValueSelect,
     handleMultiCommit,
-    handleMultiLiveChange,
     handleRangeSelect,
     handleMenuClose,
     handleMenuDiscard,
@@ -210,7 +208,6 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
               open={menuState === 'value'}
               onSelect={handleValueSelect}
               onCommit={handleMultiCommit}
-              onCheckedValuesChange={handleMultiLiveChange}
               onOpenChange={handleMenuClose}
               onEscape={handleMenuDiscard}
               multiSelect={isMultiSelectOperator(selectedOperator)}

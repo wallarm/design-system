@@ -32,9 +32,6 @@ export interface FilterInputValueMenuProps {
   // Only committable leaf values fire onSelect — never a group (which has no value).
   onSelect: (value: ConditionValue) => void;
   onCommit?: (values: ConditionValue[]) => void;
-  /** Live checked set on each user toggle (multi-select) — lets an editing chip
-   *  commit in place instead of only on menu close (AS-1064). */
-  onCheckedValuesChange?: (values: ConditionValue[]) => void;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   multiSelect?: boolean;

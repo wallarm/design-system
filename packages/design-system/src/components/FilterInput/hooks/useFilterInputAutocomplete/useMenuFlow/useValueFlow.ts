@@ -183,20 +183,6 @@ export const useValueFlow = ({
     [selectedField, selectedOperator, editingChipId, insertIndex, upsertCondition, resetState],
   );
 
-  /**
-   * Live multi-select update while EDITING a committed chip: upsert in place on
-   * each toggle (no resetState, so the menu stays open) so the chip is always
-   * committed — nothing to lose whichever way the edit ends. Building has its own
-   * live preview (handleBuildingValueChange), so this is a no-op there. (AS-1064)
-   */
-  const handleMultiLiveChange = useCallback(
-    (values: Array<string | number | boolean>) => {
-      if (!editingChipId || !selectedField || !selectedOperator || values.length === 0) return;
-      upsertCondition(selectedField, selectedOperator, values, editingChipId, undefined);
-    },
-    [editingChipId, selectedField, selectedOperator, upsertCondition],
-  );
-
   /** Building value preview from FilterInputValueMenu multi-select */
   const handleBuildingValueChange = useCallback(
     (preview: string | undefined) => {
@@ -302,7 +288,6 @@ export const useValueFlow = ({
   return {
     handleValueSelect,
     handleMultiCommit,
-    handleMultiLiveChange,
     handleBuildingValueChange,
     handleMultiSelectToggle,
     handleRangeSelect,
