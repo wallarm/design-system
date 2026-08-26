@@ -222,6 +222,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           valueSeparator={valueSeparator}
           errorValueIndices={errorValueIndices}
           caretMode={caretMode}
+          valueMaxWidth={valueMaxWidth}
           onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.value, e) : undefined}
           onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
           {...segmentEditProps(SEGMENT_VARIANT.value)}

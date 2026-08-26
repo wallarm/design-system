@@ -29,6 +29,10 @@ export type SegmentProps = HTMLAttributes<HTMLDivElement> & {
   errorValueIndices?: number[];
   /** Caret placement on entering edit: `'end'` vs default select-all (AS-1064). */
   caretMode?: 'select' | 'end';
+  /** Caps the edit input's width (px) to match the applied value cap, so the
+   *  segment keeps the same width entering/leaving edit instead of snapping to
+   *  the default MAX_INPUT_WIDTH. Value variant only (AS-1064). */
+  valueMaxWidth?: number;
 };
 
 export const Segment: FC<SegmentProps> = ({
@@ -46,6 +50,7 @@ export const Segment: FC<SegmentProps> = ({
   valueSeparator = ', ',
   errorValueIndices,
   caretMode,
+  valueMaxWidth,
   ...props
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
@@ -95,6 +100,9 @@ export const Segment: FC<SegmentProps> = ({
   const inputWidth = useSizerWidth({
     sizerRef,
     text: editText ?? '',
+    // Match the applied value cap so the segment doesn't jump width on edit;
+    // falls back to the default ceiling when the field sets no cap (AS-1064).
+    ...(variant === SEGMENT_VARIANT.value && valueMaxWidth && { maxWidth: valueMaxWidth }),
   });
 
   const setInputRef = useCallback(
