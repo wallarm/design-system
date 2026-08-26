@@ -66,6 +66,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   onSegmentClick,
   onPairSegmentClick,
   className,
+  style,
   ...props
 }) => {
   const interactive = !disabled;
@@ -168,12 +169,14 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       className={cn(
         chipVariants({ error: hasError, interactive, disabled, building }),
         // Paired chips get more room for their two values; each value is capped
-        // so a long base value can't hide the paired one (AS-1179). A field with
-        // its own valueMaxWidth (AS-1064) owns the cap on the value segment, so
-        // the chip's blanket cap is lifted to let it grow to that width.
-        valueMaxWidth && !pair ? 'max-w-none' : pair ? 'max-w-[380px]' : 'max-w-[320px]',
+        // so a long base value can't hide the paired one (AS-1179).
+        pair ? 'max-w-[380px]' : 'max-w-[320px]',
         className,
       )}
+      // A field with its own valueMaxWidth (AS-1064) owns the cap on the value
+      // segment, so the chip's blanket cap is lifted (inline, to beat the class)
+      // to let it grow to that width.
+      style={valueMaxWidth && !pair ? { maxWidth: 'none', ...style } : style}
       data-slot='filter-input-condition-chip'
       {...(building && { 'data-building': '' })}
       {...props}
