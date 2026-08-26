@@ -169,15 +169,12 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       ref={setRefs}
       className={cn(
         chipVariants({ error: hasError, interactive, disabled, building }),
-        // Paired chips cap their whole width at valueMaxWidth (the two values
-        // share it, each truncating); non-paired lift the cap so the single
-        // value grows to valueMaxWidth on its own (AS-1064/AS-1179).
+        // Paired chip caps the whole box at valueMaxWidth (values share it); a
+        // non-paired chip lifts the cap (inline beats the class) so its single
+        // value can grow to valueMaxWidth (AS-1064/AS-1179).
         pair ? undefined : 'max-w-[320px]',
         className,
       )}
-      // valueMaxWidth owns the width: a paired chip caps its whole box there;
-      // a non-paired chip lifts the blanket cap (inline, to beat the class) so
-      // its value segment can grow to that width.
       style={pair ? { maxWidth: valueMaxWidth, ...style } : { maxWidth: 'none', ...style }}
       data-slot='filter-input-condition-chip'
       {...(building && { 'data-building': '' })}
