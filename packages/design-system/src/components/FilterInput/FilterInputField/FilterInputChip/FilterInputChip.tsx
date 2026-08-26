@@ -33,9 +33,11 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
   /** When true, the chip cannot be edited or removed (dimmed appearance) */
   disabled?: boolean;
   /** Caps the applied value segment at this width (px), truncating with an
-   *  ellipsis; lifts the chip's default max-width so it grows to fit (AS-1064). */
+   *  ellipsis; lifts the chip's default max-width so it grows to fit. Defaults
+   *  to 500; a paired chip caps its whole width there instead (AS-1064). */
   valueMaxWidth?: number;
-  /** `'end'` places the caret at the end on value inline-edit; omit to select all (AS-1064). */
+  /** Caret placement on value inline-edit: `'end'` (default) puts it at the
+   *  tail — better for long values; pass explicitly to keep the API visible (AS-1064). */
   caretMode?: 'end';
   /** Second paired triplet (two-step fields). The paired attribute is fixed. */
   pair?: FilterInputChipData['pair'];
@@ -58,8 +60,8 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   errorValueIndices,
   building = false,
   disabled = false,
-  valueMaxWidth,
-  caretMode,
+  valueMaxWidth = 500,
+  caretMode = 'end',
   pair,
   onRemove,
   onSegmentClick,
@@ -167,15 +169,16 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
       ref={setRefs}
       className={cn(
         chipVariants({ error: hasError, interactive, disabled, building }),
-        // Paired chips get more room for their two values; each value is capped
-        // so a long base value can't hide the paired one (AS-1179).
-        pair ? 'max-w-[380px]' : 'max-w-[320px]',
+        // Paired chips cap their whole width at valueMaxWidth (the two values
+        // share it, each truncating); non-paired lift the cap so the single
+        // value grows to valueMaxWidth on its own (AS-1064/AS-1179).
+        pair ? undefined : 'max-w-[320px]',
         className,
       )}
-      // A field with its own valueMaxWidth (AS-1064) owns the cap on the value
-      // segment, so the chip's blanket cap is lifted (inline, to beat the class)
-      // to let it grow to that width.
-      style={valueMaxWidth && !pair ? { maxWidth: 'none', ...style } : style}
+      // valueMaxWidth owns the width: a paired chip caps its whole box there;
+      // a non-paired chip lifts the blanket cap (inline, to beat the class) so
+      // its value segment can grow to that width.
+      style={pair ? { maxWidth: valueMaxWidth, ...style } : { maxWidth: 'none', ...style }}
       data-slot='filter-input-condition-chip'
       {...(building && { 'data-building': '' })}
       {...props}
@@ -269,6 +272,8 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
                 pairActiveSegment !== SEGMENT_VARIANT.value &&
                 (effectivePairError === true || effectivePairError === SEGMENT_VARIANT.value)
               }
+              caretMode={caretMode}
+              valueMaxWidth={valueMaxWidth}
               onClick={interactive ? e => handlePairSegmentClick('value', e) : undefined}
               {...segmentEditProps(SEGMENT_VARIANT.value, 1)}
             >

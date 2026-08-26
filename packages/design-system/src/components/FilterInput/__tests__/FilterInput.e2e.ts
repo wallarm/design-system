@@ -411,15 +411,15 @@ test.describe('Component: FilterInput — AS-1179 paired chip', () => {
       await expect(page.getByRole('alert')).toContainText('Value is required');
     });
 
-    // AS-1179 #3 — a long paired value can't grow the chip past its 380px cap.
+    // AS-1179 #3 / AS-1064 — a long paired value can't grow the chip past its 500px cap.
     test('Should cap the paired chip width when the value is very long', async ({ page }) => {
       await buildFullPair(page, 'header', `Mozilla-5.0-${'x'.repeat(200)}`);
       await page.mouse.click(2, 2);
 
       const box = await getChip(page).boundingBox();
       expect(box).toBeTruthy();
-      // 380px cap + border/padding tolerance.
-      expect(box!.width).toBeLessThanOrEqual(390);
+      // 500px cap + border/padding tolerance.
+      expect(box!.width).toBeLessThanOrEqual(510);
     });
   });
 });
