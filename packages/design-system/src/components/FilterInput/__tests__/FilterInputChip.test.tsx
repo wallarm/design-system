@@ -232,12 +232,14 @@ describe('FilterInputChip building mode', () => {
       expect(screen.getByText(';')).toBeInTheDocument();
     });
 
-    it('caps a paired chip at 380px and a standalone chip at 320px (AS-1179)', () => {
+    it('lifts the cap on a standalone chip and caps a paired chip at 500px (AS-1064)', () => {
       const { container, rerender } = render(
         <FilterInputChip attribute='Context Param' operator='is' value='header' />,
       );
-      const chip = () => container.querySelector('[data-slot="filter-input-condition-chip"]');
-      expect(chip()?.className).toContain('max-w-[320px]');
+      const chip = () =>
+        container.querySelector('[data-slot="filter-input-condition-chip"]') as HTMLElement | null;
+      // Standalone: the chip grows (the value segment carries the 500px cap).
+      expect(chip()?.style.maxWidth).toBe('none');
 
       rerender(
         <FilterInputChip
@@ -247,7 +249,8 @@ describe('FilterInputChip building mode', () => {
           pair={{ attribute: 'Value', operator: 'is', value: 'x' }}
         />,
       );
-      expect(chip()?.className).toContain('max-w-[380px]');
+      // Paired: the whole chip is capped, its two values share the width.
+      expect(chip()?.style.maxWidth).toBe('500px');
     });
 
     it('caps the base value in a paired chip so a long key cannot hog the row (AS-1179)', () => {

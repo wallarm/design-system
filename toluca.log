@@ -1,0 +1,24 @@
+yarn run v1.22.19
+$ API=https://audit.api.wallarm.com yarn dev
+$ NODE_ENV=development rsbuild dev
+Rsbuild v1.7.3
+
+  ➜  Network:  http://toluca:8080/
+
+start   build started...
+ready   built in 12.7 s
+error   [browser] Uncaught (in promise) Error: [ Federation Runtime ]: Failed to get manifest. #RUNTIME-003
+args: {"manifestUrl":"http://localhost:8082/mf-manifest.json","moduleName":"agenticCopilot","hostName":"host"}
+View the docs to see how to solve: https://module-federation.io/guide/troubleshooting/runtime#runtime-003
+Original Error Message:
+ TypeError: Failed to fetch (node_modules/@module-federation/runtime-core/src/utils/logger.ts:55:0)
+error   [browser] Uncaught (in promise) Error: [ Federation Runtime ]: Failed to get manifest. #RUNTIME-003
+args: {"manifestUrl":"http://localhost:5014/mf-manifest.json","moduleName":"platformUi","hostName":"host"}
+View the docs to see how to solve: https://module-federation.io/guide/troubleshooting/runtime#runtime-003
+Original Error Message:
+ TypeError: Failed to fetch (node_modules/@module-federation/runtime-core/src/utils/logger.ts:55:0)
+error   [browser] Uncaught (in promise) Error: [ Federation Runtime ]: Failed to get manifest. #RUNTIME-003
+args: {"manifestUrl":"http://localhost:8081/mf-manifest.json","moduleName":"discoveryAgent","hostName":"host"}
+View the docs to see how to solve: https://module-federation.io/guide/troubleshooting/runtime#runtime-003
+Original Error Message:
+ TypeError: Failed to fetch (node_modules/@module-federation/runtime-core/src/utils/logger.ts:55:0)
