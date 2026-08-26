@@ -12,16 +12,19 @@ const config: StorybookConfig = {
   },
   staticDirs: ['./assets'],
   // Storybook hard-caps the sidebar brand image at 150px wide, which renders our
-  // lockup too small to read. 226px is the SVG's native width, so it renders 1:1
-  // with no upscaling. The brand slot is only ~207px, hence the +19px allowance —
-  // it borrows the empty gutter before the settings button and still tracks the
-  // slot (keeping a 9px gap) if the sidebar is dragged narrower.
+  // lockup too small to read. Size it by height instead: 24px, with the width
+  // left to follow the lockup's 226:28 ratio, so it lands at ~194px and sits
+  // inside the brand slot rather than overflowing it the way a width-driven rule
+  // had to. `max-width` keeps that true if the sidebar is dragged narrow —
+  // `contain` scales the lockup down whole instead of letting it spill or squash.
   managerHead: head => `${head}
     <style>
       #storybook-sidebar-region img {
-        width: 226px !important;
-        max-width: calc(100% + 19px) !important;
-        height: auto !important;
+        height: 24px !important;
+        width: auto !important;
+        max-width: 100% !important;
+        object-fit: contain;
+        object-position: left center;
       }
     </style>
   `,
