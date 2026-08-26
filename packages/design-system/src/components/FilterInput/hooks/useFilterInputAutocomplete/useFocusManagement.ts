@@ -77,10 +77,8 @@ export const useFocusManagement = ({
       const related = e.relatedTarget as HTMLElement | null;
       // Selecting inside the value menu keeps the edit alive.
       if (isMenuRelated(related)) return;
-      // Focus moving INTO a segment's own edit input (opening/continuing an
-      // inline edit) is not a "leave" — committing here would close the menu the
-      // click just opened. Only a leave to a non-segment target (the query input,
-      // another chip) or outside should commit. (AS-1064)
+      // Focus moving into the chip's own segment input is opening/continuing an
+      // edit, not leaving — skip the commit (it would close the just-opened menu). (AS-1064)
       if (
         related != null &&
         (related === segmentAttributeInputRef.current ||
@@ -91,11 +89,9 @@ export const useFocusManagement = ({
       }
       handlingBlurRef.current = true;
       try {
-        // Commit an in-progress multi-select edit first — valid even when focus
-        // stays inside the container (clicking the input / another chip),
-        // because Ark unmounts the value menu only on the follow-up click.
-        // Committing closes the menu (resetState via onCommit) and re-queries
-        // once, so the chip's toggles aren't dropped on the way out (AS-1064).
+        // Commit an in-progress multi-select edit even when focus stays inside the
+        // container: blurCommitRef is still valid here (Ark unmounts the menu only
+        // on the follow-up click); committing closes it and re-queries once. (AS-1064)
         if (blurCommitRef.current?.()) {
           setIsFocused(false);
           related?.focus();

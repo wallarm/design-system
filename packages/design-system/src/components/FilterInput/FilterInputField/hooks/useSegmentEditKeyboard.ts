@@ -136,10 +136,8 @@ export const useSegmentEditKeyboard = ({
     (e: FocusEvent<HTMLInputElement>) => {
       // Menu interaction (selecting a value) keeps the edit alive.
       if (isMenuRelated(e.relatedTarget as HTMLElement | null)) return;
-      // Blur to a non-menu target (e.g. clicking into the input) commits a
-      // single-value typed edit instead of discarding it (AS-1064). Multi-select
-      // commits its toggles live, so it falls through to cancel cleanly; a value
-      // segment with empty text also cancels (nothing to commit).
+      // Blur to a non-menu target (e.g. clicking the input) commits a single-value
+      // typed edit rather than discarding it; multi-select commits its own way. (AS-1064)
       if (
         editingSegment === SEGMENT_VARIANT.value &&
         !isMultiSelectValueEdit &&

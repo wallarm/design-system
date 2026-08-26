@@ -318,12 +318,8 @@ export const useFilterInputAutocomplete = ({
       editingSide: editing.editingSide,
     });
 
-  // While editing a committed multi-select chip's value, mirror the live checked
-  // set (buildingMultiValue, recomputed on every toggle) into the chip's shown
-  // value so it updates on each toggle instead of only on menu close. Display
-  // only: the menu filter text and the commit path are untouched, and once the
-  // user types to filter the options (segmentMenuFilterText set) the typed text
-  // takes over again. (AS-1064 multi-select live edit)
+  // Mirror the live checked set into the edited chip's shown value so it updates
+  // per toggle, not only on close; the typed filter text takes over once set. (AS-1064)
   const isMultiValueValueEdit =
     editing.editingChipId != null &&
     editing.editingSegment === SEGMENT_VARIANT.value &&
