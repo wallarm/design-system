@@ -2,7 +2,7 @@
 
 Welcome to **Wallarm Design System** — a modern React component library for building user interfaces.
 
-## 🎯 About
+## About
 
 Wallarm Design System is a collection of ready-to-use, accessible, and customizable React components built with modern technologies:
 
@@ -13,7 +13,7 @@ Wallarm Design System is a collection of ready-to-use, accessible, and customiza
 - **TanStack Table** for table layouts
 - **TanStack Virtual** for virtualization
 
-## 📚 Documentation Structure
+## Documentation Structure
 
 ### Installation
 
@@ -23,9 +23,9 @@ Detailed [installation](/docs/documentation-installation--docs) and setup instru
 
 Guide for [creating new components](/docs/documentation-adding-components--docs) — file structure, patterns, and best practices.
 
-## 💾 Important Information
+## Important Information
 
-⚠️ **Peer Dependencies are required!**
+**Peer Dependencies are required!**
 
 The library requires installation of:
 
