@@ -77,6 +77,18 @@ export const useFocusManagement = ({
       const related = e.relatedTarget as HTMLElement | null;
       // Selecting inside the value menu keeps the edit alive.
       if (isMenuRelated(related)) return;
+      // Focus moving INTO a segment's own edit input (opening/continuing an
+      // inline edit) is not a "leave" — committing here would close the menu the
+      // click just opened. Only a leave to a non-segment target (the query input,
+      // another chip) or outside should commit. (AS-1064)
+      if (
+        related != null &&
+        (related === segmentAttributeInputRef.current ||
+          related === segmentOperatorInputRef.current ||
+          related === segmentValueInputRef.current)
+      ) {
+        return;
+      }
       handlingBlurRef.current = true;
       try {
         // Commit an in-progress multi-select edit first — valid even when focus

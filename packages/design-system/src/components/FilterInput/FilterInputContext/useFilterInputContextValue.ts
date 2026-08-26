@@ -28,6 +28,7 @@ interface AutocompleteForContext {
   editingSegment: ChipSegment | null;
   editingSide: 0 | 1;
   segmentFilterText: string;
+  isMultiSelectValueEdit: boolean;
   handleSegmentFilterChange: (text: string) => void;
   cancelSegmentEdit: () => void;
   handleCustomValueCommit: (customText: string) => void;

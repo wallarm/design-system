@@ -39,6 +39,7 @@ const mockContextValue: FilterInputContextValue = {
   editingSegment: null,
   editingSide: 0,
   segmentFilterText: '',
+  isMultiSelectValueEdit: false,
   onSegmentFilterChange: noop,
   onCancelSegmentEdit: noop,
   onCustomValueCommit: noop,
