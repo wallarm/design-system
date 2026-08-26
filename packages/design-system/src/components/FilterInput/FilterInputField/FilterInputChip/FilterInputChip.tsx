@@ -35,9 +35,8 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
   /** Caps the applied value segment at this width (px), truncating with an
    *  ellipsis; lifts the chip's default max-width so it grows to fit (AS-1064). */
   valueMaxWidth?: number;
-  /** Caret placement when the value segment enters inline-edit (AS-1064).
-   *  `'end'` places the caret at the end; default selects the whole value. */
-  caretMode?: 'select' | 'end';
+  /** `'end'` places the caret at the end on value inline-edit; omit to select all (AS-1064). */
+  caretMode?: 'end';
   /** Second paired triplet (two-step fields). The paired attribute is fixed. */
   pair?: FilterInputChipData['pair'];
   onRemove?: () => void;

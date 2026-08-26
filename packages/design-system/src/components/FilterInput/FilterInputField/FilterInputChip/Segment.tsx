@@ -27,8 +27,8 @@ export type SegmentProps = HTMLAttributes<HTMLDivElement> & {
   valueSeparator?: string;
   /** Indices of invalid values in valueParts */
   errorValueIndices?: number[];
-  /** Caret placement on entering edit: `'end'` vs default select-all (AS-1064). */
-  caretMode?: 'select' | 'end';
+  /** `'end'` places the caret at the end on edit; omit for default select-all (AS-1064). */
+  caretMode?: 'end';
   /** Caps the edit input's width (px) to match the applied value cap, so the
    *  segment keeps the same width entering/leaving edit instead of snapping to
    *  the default MAX_INPUT_WIDTH. Value variant only (AS-1064). */

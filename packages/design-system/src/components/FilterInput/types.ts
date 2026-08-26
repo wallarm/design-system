@@ -53,7 +53,7 @@ export interface FilterInputChipData {
   /** Applied value-segment width cap in px (see FieldMetadata.valueMaxWidth). */
   valueMaxWidth?: number;
   /** Caret placement on value inline-edit (see FieldMetadata.caretMode). */
-  caretMode?: 'select' | 'end';
+  caretMode?: 'end';
   /** Second paired triplet (display) for two-step fields. */
   pair?: {
     attribute: string;
@@ -238,13 +238,10 @@ export interface FieldMetadata {
    */
   valueMaxWidth?: number;
   /**
-   * Caret placement when the value segment enters inline-edit. `'end'` puts the
-   * caret at the end of the value (natural for long values — click in and keep
-   * typing from the tail; a further click while editing repositions natively).
-   * Defaults to `'select'` (the whole value is selected so typing replaces it).
-   * (AS-1064.)
+   * `'end'` places the caret at the end of the value on inline-edit (natural for
+   * long values); omit to select the whole value so typing replaces it. (AS-1064)
    */
-  caretMode?: 'select' | 'end';
+  caretMode?: 'end';
 }
 
 /**
