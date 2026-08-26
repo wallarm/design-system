@@ -2,14 +2,14 @@
 
 Complete guide for installing and setting up Wallarm Design System in your project.
 
-## 📋 Requirements
+## Requirements
 
 Before you begin, make sure you have:
 
 - **Node.js** version 18 or higher
 - One of the package managers: **npm**, **pnpm** (recommended), or **yarn**
 
-## 📦 Installation
+## Installation
 
 ### Step 1: Install the main library
 
@@ -39,13 +39,13 @@ yarn add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.
 pnpm add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0
 ```
 
-⚠️ **Important**: All peer dependencies are required for the library to work correctly:
+**Important**: All peer dependencies are required for the library to work correctly:
 
 - `react` and `react-dom` - foundation for React components
 - `tailwindcss` - styling system
 - `tw-animate-css` - animations
 
-## ⚙️ Project Setup
+## Project Setup
 
 ### Step 3: Import styles
 
@@ -77,7 +77,7 @@ export const App = () => {
 };
 ```
 
-## 🚨 Troubleshooting
+## Troubleshooting
 
 ### Problem: Styles are not applied
 
@@ -110,20 +110,20 @@ export const App = () => {
 1. Ensure `@wallarm-org/design-system/theme` is imported — the Geist fonts are bundled with it
 2. Check the Network tab in DevTools for the bundled Geist font requests
 
-## 📚 Additional Configuration
+## Additional Configuration
 
 ### Bundle Optimization
 
 The library supports tree-shaking. Import only the components you need:
 
 ```tsx
-// ✅ Good - imports only Button
+// Good - imports only Button
 import { Button } from '@wallarm-org/design-system/Button';
 
-// ❌ Bad - imports entire library
+// Bad - imports entire library
 import { Button } from '@wallarm-org/design-system';
 ```
 
-## 🎉 Done!
+## Done!
 
 You can now use the design system components in your project.
