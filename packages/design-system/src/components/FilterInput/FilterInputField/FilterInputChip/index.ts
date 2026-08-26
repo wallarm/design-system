@@ -1,9 +1,9 @@
-export { applyEditCaret } from './applyEditCaret';
 export {
   type ConnectorVariant,
   FilterInputConnectorChip,
   type FilterInputConnectorChipProps,
 } from '../FilterInputConnectorChip';
+export { applyEditCaret } from './applyEditCaret';
 export {
   type EditingContextValue,
   EditingProvider,
