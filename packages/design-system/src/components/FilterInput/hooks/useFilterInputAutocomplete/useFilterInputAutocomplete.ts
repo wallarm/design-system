@@ -1,6 +1,7 @@
 import type { RefObject } from 'react';
 import { useCallback } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
+import { isMultiSelectOperator } from '../../lib';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
 import type { Condition, FieldMetadata, FilterInputChipData, UpsertCondition } from '../../types';
 import { deriveAutocompleteValues } from './lib';
@@ -317,6 +318,22 @@ export const useFilterInputAutocomplete = ({
       editingSide: editing.editingSide,
     });
 
+  // While editing a committed multi-select chip's value, mirror the live checked
+  // set (buildingMultiValue, recomputed on every toggle) into the chip's shown
+  // value so it updates on each toggle instead of only on menu close. Display
+  // only: the menu filter text and the commit path are untouched, and once the
+  // user types to filter the options (segmentMenuFilterText set) the typed text
+  // takes over again. (AS-1064 multi-select live edit)
+  const isMultiValueValueEdit =
+    editing.editingChipId != null &&
+    editing.editingSegment === SEGMENT_VARIANT.value &&
+    selectedOperator != null &&
+    isMultiSelectOperator(selectedOperator);
+  const liveSegmentFilterText =
+    isMultiValueValueEdit && buildingMultiValue != null && editing.segmentMenuFilterText === ''
+      ? buildingMultiValue
+      : editing.segmentFilterText;
+
   return {
     inputText,
     menuState,
@@ -361,7 +378,7 @@ export const useFilterInputAutocomplete = ({
     editingChipId: editing.editingChipId,
     editingSegment: editing.editingSegment,
     editingSide: editing.editingSide,
-    segmentFilterText: editing.segmentFilterText,
+    segmentFilterText: liveSegmentFilterText,
     segmentMenuFilterText: editing.segmentMenuFilterText,
     handleSegmentFilterChange,
     cancelSegmentEdit,
