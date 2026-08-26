@@ -132,6 +132,9 @@ export const useFocusManagement = ({
       setIsFocused,
       setMenuState,
       inputRef,
+      segmentAttributeInputRef,
+      segmentOperatorInputRef,
+      segmentValueInputRef,
     ],
   );
 

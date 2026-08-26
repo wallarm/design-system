@@ -1,8 +1,8 @@
 import type { RefObject } from 'react';
 import { useCallback } from 'react';
 import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
-import { isMultiSelectOperator } from '../../lib';
 import { useDateRange } from '../../FilterInputMenu/FilterInputDateValueMenu/hooks';
+import { isMultiSelectOperator } from '../../lib';
 import type { Condition, FieldMetadata, FilterInputChipData, UpsertCondition } from '../../types';
 import { deriveAutocompleteValues } from './lib';
 import { useAutocompleteState } from './useAutocompleteState';

@@ -148,7 +148,13 @@ export const useSegmentEditKeyboard = ({
       }
       onCancelSegmentEdit();
     },
-    [editingSegment, isMultiSelectValueEdit, segmentFilterText, onCustomValueCommit, onCancelSegmentEdit],
+    [
+      editingSegment,
+      isMultiSelectValueEdit,
+      segmentFilterText,
+      onCustomValueCommit,
+      onCancelSegmentEdit,
+    ],
   );
 
   return { handleSegmentEditKeyDown, handleSegmentEditBlur };
