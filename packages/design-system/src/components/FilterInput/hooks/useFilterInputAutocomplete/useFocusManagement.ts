@@ -1,6 +1,10 @@
 import type { FocusEvent, RefObject } from 'react';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { type ChipSegment, SEGMENT_VARIANT } from '../../FilterInputField/FilterInputChip';
+import {
+  applyEditCaret,
+  type ChipSegment,
+  SEGMENT_VARIANT,
+} from '../../FilterInputField/FilterInputChip';
 import { isMenuRelated, nextBuildingMenu } from '../../lib';
 import type { FieldMetadata, FilterOperator, MenuState } from '../../types';
 
@@ -71,16 +75,39 @@ export const useFocusManagement = ({
     (e: FocusEvent) => {
       if (handlingBlurRef.current) return;
       const related = e.relatedTarget as HTMLElement | null;
-      if (containerRef.current?.contains(related)) return;
+      // Selecting inside the value menu keeps the edit alive.
       if (isMenuRelated(related)) return;
+      // Focus moving into the chip's own segment input is opening/continuing an
+      // edit, not leaving — skip the commit (it would close the just-opened menu). (AS-1064)
+      if (
+        related != null &&
+        (related === segmentAttributeInputRef.current ||
+          related === segmentOperatorInputRef.current ||
+          related === segmentValueInputRef.current)
+      ) {
+        return;
+      }
       handlingBlurRef.current = true;
       try {
+        const focusStaysInside = !!containerRef.current?.contains(related);
+        // Editing a committed multi-select chip commits its toggles on blur even
+        // when focus stays inside (e.g. clicking the input): blurCommitRef is
+        // still valid here (Ark unmounts the menu only on the follow-up click).
+        // Building must NOT commit while focus stays inside — the container guard
+        // below protects the multi-select toggle flow (AS-1022/AS-1064).
+        if ((editingSegment != null || !focusStaysInside) && blurCommitRef.current?.()) {
+          setIsFocused(false);
+          related?.focus();
+          return;
+        }
+        // Focus stayed inside with nothing to commit (e.g. a building
+        // segment-to-segment move): leave in-progress work untouched.
+        if (focusStaysInside) return;
         setIsFocused(false);
-        // Try multi-select commit, then freeform building commit. If neither
-        // fires and a building chip is incomplete, preserve it (blur shouldn't
-        // destroy in-progress work) but force-close the menu in case Ark UI's
-        // outside-click handler bailed out.
-        const committed = blurCommitRef.current?.() || commitBuildingOnBlur();
+        // Freeform building commit. If it doesn't fire and a building chip is
+        // incomplete, preserve it (blur shouldn't destroy in-progress work) but
+        // force-close the menu in case Ark UI's outside-click handler bailed out.
+        const committed = commitBuildingOnBlur();
         if (!committed) {
           if (hasIncompleteBuilding()) {
             setMenuState('closed');
@@ -108,6 +135,10 @@ export const useFocusManagement = ({
       setIsFocused,
       setMenuState,
       inputRef,
+      editingSegment,
+      segmentAttributeInputRef,
+      segmentOperatorInputRef,
+      segmentValueInputRef,
     ],
   );
 
@@ -193,7 +224,9 @@ export const useFocusManagement = ({
         if (!dest) return;
         if (document.activeElement === dest) return;
         dest.focus();
-        if (editingSegment) dest.select();
+        // Same caret rule as the Segment effect, read off the input's data attr
+        // so a field opting into caret-at-end wins here too (AS-1064).
+        if (editingSegment) applyEditCaret(dest);
       });
     });
     return () => {

@@ -9,6 +9,10 @@ interface UseSegmentEditKeyboardOptions {
   editingChipId: string | null;
   editingSegment: ChipSegment | null;
   segmentFilterText: string;
+  /** True while a committed multi-select chip's value is being edited — its
+   *  toggles already commit live, so blur cancels cleanly instead of committing
+   *  the display string as a custom value (AS-1064). */
+  isMultiSelectValueEdit: boolean;
   chips: FilterInputChipData[];
   buildingChipData: BuildingChipData | null;
   menuRef: RefObject<HTMLDivElement | null>;
@@ -38,6 +42,7 @@ export const useSegmentEditKeyboard = ({
   editingChipId,
   editingSegment,
   segmentFilterText,
+  isMultiSelectValueEdit,
   chips,
   buildingChipData,
   menuRef,
@@ -129,13 +134,31 @@ export const useSegmentEditKeyboard = ({
 
   const handleSegmentEditBlur = useCallback(
     (e: FocusEvent<HTMLInputElement>) => {
-      // Menu interaction (selecting a value) keeps the edit alive; any other blur
-      // ends it. A value edit commits through the menu (single-select) or its live
-      // toggles (multi-select) — not through this blur — so a menu-select's focus
-      // bounce back to the main input must not re-commit stale text (AS-1064).
-      if (!isMenuRelated(e.relatedTarget as HTMLElement | null)) onCancelSegmentEdit();
+      const related = e.relatedTarget as HTMLElement | null;
+      // Menu interaction (selecting a value) keeps the edit alive.
+      if (isMenuRelated(related)) return;
+      // Commit a single-value typed edit only when focus moves to a real non-menu
+      // element (e.g. the main input) instead of discarding it; a null relatedTarget
+      // means a menu selection is in flight (menuitem click drops it) — let the menu
+      // apply it. Multi-select commits its own way. (AS-1064)
+      if (
+        related != null &&
+        editingSegment === SEGMENT_VARIANT.value &&
+        !isMultiSelectValueEdit &&
+        segmentFilterText.trim()
+      ) {
+        onCustomValueCommit(segmentFilterText);
+        return;
+      }
+      onCancelSegmentEdit();
     },
-    [onCancelSegmentEdit],
+    [
+      editingSegment,
+      isMultiSelectValueEdit,
+      segmentFilterText,
+      onCustomValueCommit,
+      onCancelSegmentEdit,
+    ],
   );
 
   return { handleSegmentEditKeyDown, handleSegmentEditBlur };
