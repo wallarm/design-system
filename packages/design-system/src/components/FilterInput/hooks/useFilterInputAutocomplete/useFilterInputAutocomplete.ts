@@ -382,6 +382,10 @@ export const useFilterInputAutocomplete = ({
     editingSide: editing.editingSide,
     segmentFilterText: liveSegmentFilterText,
     segmentMenuFilterText: editing.segmentMenuFilterText,
+    // True while a committed multi-select chip's value is being edited — lets the
+    // segment blur handler commit single-value typed text but leave the
+    // multi-select alone (its toggles already upsert live). (AS-1064)
+    isMultiSelectValueEdit: isMultiValueValueEdit,
     handleSegmentFilterChange,
     cancelSegmentEdit,
     handleCustomValueCommit,

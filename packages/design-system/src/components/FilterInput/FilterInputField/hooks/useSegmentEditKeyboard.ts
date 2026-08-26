@@ -9,6 +9,10 @@ interface UseSegmentEditKeyboardOptions {
   editingChipId: string | null;
   editingSegment: ChipSegment | null;
   segmentFilterText: string;
+  /** True while a committed multi-select chip's value is being edited — its
+   *  toggles already commit live, so blur cancels cleanly instead of committing
+   *  the display string as a custom value (AS-1064). */
+  isMultiSelectValueEdit: boolean;
   chips: FilterInputChipData[];
   buildingChipData: BuildingChipData | null;
   menuRef: RefObject<HTMLDivElement | null>;
@@ -38,6 +42,7 @@ export const useSegmentEditKeyboard = ({
   editingChipId,
   editingSegment,
   segmentFilterText,
+  isMultiSelectValueEdit,
   chips,
   buildingChipData,
   menuRef,
@@ -129,9 +134,23 @@ export const useSegmentEditKeyboard = ({
 
   const handleSegmentEditBlur = useCallback(
     (e: FocusEvent<HTMLInputElement>) => {
-      if (!isMenuRelated(e.relatedTarget as HTMLElement | null)) onCancelSegmentEdit();
+      // Menu interaction (selecting a value) keeps the edit alive.
+      if (isMenuRelated(e.relatedTarget as HTMLElement | null)) return;
+      // Blur to a non-menu target (e.g. clicking into the input) commits a
+      // single-value typed edit instead of discarding it (AS-1064). Multi-select
+      // commits its toggles live, so it falls through to cancel cleanly; a value
+      // segment with empty text also cancels (nothing to commit).
+      if (
+        editingSegment === SEGMENT_VARIANT.value &&
+        !isMultiSelectValueEdit &&
+        segmentFilterText.trim()
+      ) {
+        onCustomValueCommit(segmentFilterText);
+        return;
+      }
+      onCancelSegmentEdit();
     },
-    [onCancelSegmentEdit],
+    [editingSegment, isMultiSelectValueEdit, segmentFilterText, onCustomValueCommit, onCancelSegmentEdit],
   );
 
   return { handleSegmentEditKeyDown, handleSegmentEditBlur };
