@@ -51,8 +51,6 @@ export interface FilterInputContextValue {
   /** Which triplet is being edited: 0 = base, 1 = paired second. */
   editingSide: 0 | 1;
   segmentFilterText: string;
-  /** True while a committed multi-select chip's value is being edited (AS-1064). */
-  isMultiSelectValueEdit: boolean;
   onSegmentFilterChange: (text: string) => void;
   onCancelSegmentEdit: () => void;
   onCustomValueCommit: (customText: string) => void;

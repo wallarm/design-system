@@ -89,17 +89,20 @@ export const useFocusManagement = ({
       }
       handlingBlurRef.current = true;
       try {
-        // Commit an in-progress multi-select edit even when focus stays inside the
-        // container: blurCommitRef is still valid here (Ark unmounts the menu only
-        // on the follow-up click); committing closes it and re-queries once. (AS-1064)
-        if (blurCommitRef.current?.()) {
+        const focusStaysInside = !!containerRef.current?.contains(related);
+        // Editing a committed multi-select chip commits its toggles on blur even
+        // when focus stays inside (e.g. clicking the input): blurCommitRef is
+        // still valid here (Ark unmounts the menu only on the follow-up click).
+        // Building must NOT commit while focus stays inside — the container guard
+        // below protects the multi-select toggle flow (AS-1022/AS-1064).
+        if ((editingSegment != null || !focusStaysInside) && blurCommitRef.current?.()) {
           setIsFocused(false);
           related?.focus();
           return;
         }
-        // No multi-select to commit and focus stayed inside (e.g. a building
+        // Focus stayed inside with nothing to commit (e.g. a building
         // segment-to-segment move): leave in-progress work untouched.
-        if (containerRef.current?.contains(related)) return;
+        if (focusStaysInside) return;
         setIsFocused(false);
         // Freeform building commit. If it doesn't fire and a building chip is
         // incomplete, preserve it (blur shouldn't destroy in-progress work) but
@@ -132,6 +135,7 @@ export const useFocusManagement = ({
       setIsFocused,
       setMenuState,
       inputRef,
+      editingSegment,
       segmentAttributeInputRef,
       segmentOperatorInputRef,
       segmentValueInputRef,

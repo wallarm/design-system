@@ -1,0 +1,187 @@
+
+> @wallarm-org/design-system@1.7.0 storybook /private/tmp/ds-as1064/packages/design-system
+> storybook dev --no-open -p 6006
+
+
+┌  storybook v10.4.6
+│
+●  Starting...
+│
+●  Storybook collects completely anonymous usage telemetry. We use it to
+│  shape Storybook's roadmap and prioritize features. You can learn more,
+│  including how to opt out, at ]8;;https://storybook.js.org/telemetryhttps://storybook.js.org/telemetry]8;;
+│
+▲  unable to find package.json for @wallarm-org/rsbuild-config
+│
+●  Addon-docs: using MDX3
+start   build started...
+│
+●  Using tsconfig paths for react-docgen
+ready   built in 1.29s
+│
+▲  Change detection unavailable: builder does not support change
+│  detection
+│ [38;2;255;71;133m╭[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m╮[39m
+│ [38;2;255;71;133m│[39m   Storybook ready!                                                         [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m                                                                            [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m   - Local:                http://localhost:6006/                           [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m   - On your network:      http://192.168.1.137:6006/                       [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m                                                                            [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m                                                                            [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m   [38;2;243;173;56mA new version (10.5.10) is available![39m                                    [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m                                                                            [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m   Upgrade now: [38;2;162;224;94mnpx storybook@latest upgrade[39m                                [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m                                                                            [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m   Read full changelog:                                                     [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m│[39m   https://github.com/storybookjs/storybook/blob/main/CHANGELOG.md          [38;2;255;71;133m│[39m
+│ [38;2;255;71;133m╰[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m─[39m[38;2;255;71;133m╯[39m
+│
+●  873 ms for manager and 1.97 s for preview
+start   building removed storybook-stories.js and 1 more
+ready   built in 0.09s
+start   building tmp/ds-as1064/packages
+ready   built in 0.34s
+start   building packages/configs/playwright-config
+ready   built in 0.25s
+start   building tmp/ds-as1064/packages
+ready   built in 0.52s
+start   building FilterInput/stories/FilterInput.stories.tsx
+ready   built in 2.26s
+start   build started...
+ready   built in 0.10s
+start   building tmp/ds-as1064/packages
+ready   built in 0.31s
+start   building tmp/ds-as1064/packages
+ready   built in 0.21s
+start   building hooks/useFilterInputAutocomplete/useFocusManagement.ts
+ready   built in 0.53s
+start   building hooks/useFilterInputAutocomplete/useFocusManagement.ts
+ready   built in 0.30s
+start   building tmp/ds-as1064/packages
+ready   built in 0.50s
+start   building ds-as1064/packages/design-system
+ready   built in 0.48s
+start   building tmp/ds-as1064/packages
+ready   built in 0.26s
+start   building tmp/ds-as1064/packages
+ready   built in 0.21s
+start   building FilterInputField/hooks/useSegmentEditKeyboard.ts
+ready   built in 0.44s
+start   building tmp/ds-as1064/packages
+ready   built in 0.34s
+start   building ds-as1064/packages/design-system
+ready   built in 0.27s
+start   building tmp/ds-as1064/packages
+ready   built in 0.28s
+start   building tmp/ds-as1064/packages
+ready   built in 0.23s
+start   building FilterInputField/hooks/useSegmentEditKeyboard.ts
+ready   built in 0.48s
+start   building tmp/ds-as1064/packages
+ready   built in 0.29s
+start   building ds-as1064/packages/design-system
+ready   built in 0.26s
+start   building tmp/ds-as1064/packages
+ready   built in 0.22s
+start   building FilterInputField/hooks/useSegmentEditKeyboard.ts
+ready   built in 0.38s
+start   building FilterInputField/hooks/useSegmentEditKeyboard.ts
+ready   built in 0.40s
+start   building tmp/ds-as1064/packages
+ready   built in 0.45s
+start   building tmp/ds-as1064/packages
+ready   built in 0.23s
+start   building ds-as1064/packages/design-system
+ready   built in 0.22s
+start   building tmp/ds-as1064/packages
+ready   built in 0.29s
+start   building tmp/ds-as1064/packages
+ready   built in 0.39s
+start   building FilterInputField/hooks/useSegmentEditKeyboard.ts
+ready   built in 0.45s
+start   building tmp/ds-as1064/packages
+ready   built in 0.73s
+start   building ds-as1064/packages/design-system
+ready   built in 0.76s
+start   building tmp/ds-as1064/packages
+ready   built in 0.43s
+start   building tmp/ds-as1064/packages
+ready   built in 0.24s
+start   building tmp/ds-as1064/packages
+ready   built in 0.33s
+start   building tmp/ds-as1064/packages
+ready   built in 0.24s
+start   building tmp/ds-as1064/packages
+ready   built in 0.31s
+start   building tmp/ds-as1064/packages
+ready   built in 0.24s
+start   building tmp/ds-as1064/packages
+ready   built in 0.20s
+start   building tmp/ds-as1064/packages
+ready   built in 0.31s
+start   building tmp/ds-as1064/packages
+ready   built in 0.29s
+start   building tmp/ds-as1064/packages
+ready   built in 0.27s
+start   building tmp/ds-as1064/packages
+ready   built in 0.33s
+start   building tmp/ds-as1064/packages
+ready   built in 0.29s
+start   building tmp/ds-as1064/packages
+ready   built in 0.50s
+start   building tmp/ds-as1064/packages
+ready   built in 0.23s
+start   building tmp/ds-as1064/packages
+ready   built in 0.23s
+start   building FilterInputField/hooks/useSegmentEditKeyboard.ts
+ready   built in 0.40s
+start   building FilterInputField/hooks/useSegmentEditKeyboard.ts
+ready   built in 0.31s
+start   building FilterInput/FilterInputField/FilterInputField.tsx
+ready   built in 0.32s
+start   building FilterInput/FilterInputField/FilterInputField.tsx
+ready   built in 0.28s
+start   building FilterInput/FilterInputContext/useFilterInputContextValue.ts
+ready   built in 0.33s
+start   building FilterInput/FilterInputContext/useFilterInputContextValue.ts
+ready   built in 0.30s
+start   building FilterInput/FilterInputContext/useFilterInputContextValue.ts
+ready   built in 0.39s
+start   building FilterInput/FilterInputContext/types.ts
+ready   built in 0.38s
+start   building hooks/useFilterInputAutocomplete/useFilterInputAutocomplete.ts
+ready   built in 0.30s
+start   building FilterInput/stories/mockFilterInputContext.tsx
+ready   built in 0.30s
+start   building tmp/ds-as1064/packages
+ready   built in 0.52s
+start   building ds-as1064/packages/design-system
+ready   built in 0.45s
+start   building tmp/ds-as1064/packages
+ready   built in 0.24s
+start   building tmp/ds-as1064/packages
+ready   built in 0.19s
+start   building tmp/ds-as1064/packages
+ready   built in 0.44s
+start   building ds-as1064/packages/design-system
+ready   built in 0.38s
+start   building tmp/ds-as1064/packages
+ready   built in 1.75s
+start   building tmp/ds-as1064/packages
+ready   built in 0.30s
+start   building tmp/ds-as1064/packages
+ready   built in 0.21s
+start   building tmp/ds-as1064/packages
+ready   built in 0.34s
+start   building ds-as1064/packages/design-system
+ready   built in 0.38s
+start   building tmp/ds-as1064/packages
+ready   built in 0.39s
+start   building tmp/ds-as1064/packages
+ready   built in 0.43s
+start   building tmp/ds-as1064/packages
+ready   built in 0.22s
+start   building ds-as1064/packages/design-system
+ready   built in 0.24s
+start   building tmp/ds-as1064/packages
+ready   built in 0.37s

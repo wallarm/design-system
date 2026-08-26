@@ -28,7 +28,6 @@ interface AutocompleteForContext {
   editingSegment: ChipSegment | null;
   editingSide: 0 | 1;
   segmentFilterText: string;
-  isMultiSelectValueEdit: boolean;
   handleSegmentFilterChange: (text: string) => void;
   cancelSegmentEdit: () => void;
   handleCustomValueCommit: (customText: string) => void;
@@ -92,7 +91,6 @@ export const useFilterInputContextValue = ({
       editingSegment: autocomplete.editingSegment,
       editingSide: autocomplete.editingSide,
       segmentFilterText: autocomplete.segmentFilterText,
-      isMultiSelectValueEdit: autocomplete.isMultiSelectValueEdit,
       onSegmentFilterChange: autocomplete.handleSegmentFilterChange,
       onCancelSegmentEdit: autocomplete.cancelSegmentEdit,
       onCustomValueCommit: autocomplete.handleCustomValueCommit,
@@ -129,7 +127,6 @@ export const useFilterInputContextValue = ({
       autocomplete.editingSegment,
       autocomplete.editingSide,
       autocomplete.segmentFilterText,
-      autocomplete.isMultiSelectValueEdit,
       autocomplete.handleSegmentFilterChange,
       autocomplete.cancelSegmentEdit,
       autocomplete.handleCustomValueCommit,
