@@ -2,6 +2,7 @@ import type { FC, FocusEvent, HTMLAttributes, KeyboardEvent, Ref } from 'react';
 import { useCallback, useContext, useEffect, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import { FilterInputContext } from '../../FilterInputContext/FilterInputContext';
+import { applyEditCaret } from './applyEditCaret';
 import { editingValueMinWidth, segmentContainer, segmentTextVariants } from './classes';
 import { CHAR_WIDTH_PX } from './constants';
 import { MultiValueSegment } from './MultiValueSegment';
@@ -26,6 +27,12 @@ export type SegmentProps = HTMLAttributes<HTMLDivElement> & {
   valueSeparator?: string;
   /** Indices of invalid values in valueParts */
   errorValueIndices?: number[];
+  /** Caret placement on entering edit: `'end'` vs default select-all (AS-1064). */
+  caretMode?: 'select' | 'end';
+  /** Caps the edit input's width (px) to match the applied value cap, so the
+   *  segment keeps the same width entering/leaving edit instead of snapping to
+   *  the default MAX_INPUT_WIDTH. Value variant only (AS-1064). */
+  valueMaxWidth?: number;
 };
 
 export const Segment: FC<SegmentProps> = ({
@@ -42,6 +49,8 @@ export const Segment: FC<SegmentProps> = ({
   valueParts,
   valueSeparator = ', ',
   errorValueIndices,
+  caretMode,
+  valueMaxWidth,
   ...props
 }) => {
   const textRef = useRef<HTMLParagraphElement>(null);
@@ -77,7 +86,9 @@ export const Segment: FC<SegmentProps> = ({
     const outerFrame = requestAnimationFrame(() => {
       innerFrame = requestAnimationFrame(() => {
         inputRef.current?.focus();
-        inputRef.current?.select();
+        // Caret rule is read off the input's own data attr so useFocusManagement's
+        // focus-retention rAF applies the same rule (see applyEditCaret).
+        applyEditCaret(inputRef.current);
       });
     });
     return () => {
@@ -89,6 +100,9 @@ export const Segment: FC<SegmentProps> = ({
   const inputWidth = useSizerWidth({
     sizerRef,
     text: editText ?? '',
+    // Match the applied value cap so the segment doesn't jump width on edit;
+    // falls back to the default ceiling when the field sets no cap (AS-1064).
+    ...(variant === SEGMENT_VARIANT.value && valueMaxWidth && { maxWidth: valueMaxWidth }),
   });
 
   const setInputRef = useCallback(
@@ -137,6 +151,7 @@ export const Segment: FC<SegmentProps> = ({
             onKeyDown={onEditKeyDown}
             onBlur={onEditBlur}
             aria-label={`Filter ${variant}`}
+            {...(caretMode === 'end' && { 'data-caret-mode': 'end' })}
             className={cn(
               segmentTextVariants({ variant, error }),
               'bg-transparent outline-none p-0 m-0',

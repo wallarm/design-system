@@ -32,6 +32,12 @@ export interface FilterInputChipProps extends Omit<HTMLAttributes<HTMLDivElement
   building?: boolean;
   /** When true, the chip cannot be edited or removed (dimmed appearance) */
   disabled?: boolean;
+  /** Caps the applied value segment at this width (px), truncating with an
+   *  ellipsis; lifts the chip's default max-width so it grows to fit (AS-1064). */
+  valueMaxWidth?: number;
+  /** Caret placement when the value segment enters inline-edit (AS-1064).
+   *  `'end'` places the caret at the end; default selects the whole value. */
+  caretMode?: 'select' | 'end';
   /** Second paired triplet (two-step fields). The paired attribute is fixed. */
   pair?: FilterInputChipData['pair'];
   onRemove?: () => void;
@@ -53,11 +59,14 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   errorValueIndices,
   building = false,
   disabled = false,
+  valueMaxWidth,
+  caretMode,
   pair,
   onRemove,
   onSegmentClick,
   onPairSegmentClick,
   className,
+  style,
   ...props
 }) => {
   const interactive = !disabled;
@@ -164,6 +173,10 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
         pair ? 'max-w-[380px]' : 'max-w-[320px]',
         className,
       )}
+      // A field with its own valueMaxWidth (AS-1064) owns the cap on the value
+      // segment, so the chip's blanket cap is lifted (inline, to beat the class)
+      // to let it grow to that width.
+      style={valueMaxWidth && !pair ? { maxWidth: 'none', ...style } : style}
       data-slot='filter-input-condition-chip'
       {...(building && { 'data-building': '' })}
       {...props}
@@ -198,6 +211,9 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           className={
             !value && !pair ? emptyValueHitTarget : pair ? 'max-w-[90px] shrink-0' : 'min-w-0'
           }
+          // Field-owned cap on the applied value: the inner truncate ellipsizes
+          // at this width; ignored for the empty hit target and paired chips (AS-1064).
+          {...(valueMaxWidth && value && !pair && { style: { maxWidth: valueMaxWidth } })}
           error={
             baseActiveSegment !== SEGMENT_VARIANT.value &&
             (effectiveError === true || effectiveError === SEGMENT_VARIANT.value)
@@ -205,6 +221,8 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           valueParts={valueParts}
           valueSeparator={valueSeparator}
           errorValueIndices={errorValueIndices}
+          caretMode={caretMode}
+          valueMaxWidth={valueMaxWidth}
           onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.value, e) : undefined}
           onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
           {...segmentEditProps(SEGMENT_VARIANT.value)}

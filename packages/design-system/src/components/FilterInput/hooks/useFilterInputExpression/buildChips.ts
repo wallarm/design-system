@@ -80,6 +80,8 @@ const buildBaseChip = (i: number, condition: Condition, field: FieldMetadata | u
   variant: 'chip' as const,
   attribute: field?.label || condition.field,
   ...(field?.description && { attributeDescription: field.description }),
+  ...(field?.valueMaxWidth && { valueMaxWidth: field.valueMaxWidth }),
+  ...(field?.caretMode && { caretMode: field.caretMode }),
   operator: condition.operator
     ? getOperatorLabel(condition.operator, field?.type || DEFAULT_FIELD_TYPE)
     : undefined,

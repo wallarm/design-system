@@ -50,6 +50,10 @@ export interface FilterInputChipData {
   errorValueIndices?: number[];
   /** When true, the chip cannot be edited or removed */
   disabled?: boolean;
+  /** Applied value-segment width cap in px (see FieldMetadata.valueMaxWidth). */
+  valueMaxWidth?: number;
+  /** Caret placement on value inline-edit (see FieldMetadata.caretMode). */
+  caretMode?: 'select' | 'end';
   /** Second paired triplet (display) for two-step fields. */
   pair?: {
     attribute: string;
@@ -226,6 +230,21 @@ export interface FieldMetadata {
    * set it while an async options fetch is in flight.
    */
   loadingOptions?: boolean;
+  /**
+   * Caps the applied value segment at this width in px: a longer value truncates
+   * with a trailing ellipsis while the full value is preserved for matching. When
+   * set, the chip's default max-width is lifted so it grows to fit the wider value.
+   * Omit to keep the chip's default cap. (AS-1064: long parameter-path expressions.)
+   */
+  valueMaxWidth?: number;
+  /**
+   * Caret placement when the value segment enters inline-edit. `'end'` puts the
+   * caret at the end of the value (natural for long values — click in and keep
+   * typing from the tail; a further click while editing repositions natively).
+   * Defaults to `'select'` (the whole value is selected so typing replaces it).
+   * (AS-1064.)
+   */
+  caretMode?: 'select' | 'end';
 }
 
 /**
