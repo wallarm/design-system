@@ -238,8 +238,17 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
 
                 <DropdownMenuContent
                   ref={contentRef}
-                  className={cn('min-w-256 max-h-[430px]')}
-                  style={lockedWidth ? { width: lockedWidth } : undefined}
+                  className={cn('min-w-256')}
+                  // Cap at 430px but never exceed the room Ark left on the
+                  // chosen side (--available-height). A bare `max-h-[430px]`
+                  // overrides that var, so a menu flipped up (trigger low on a
+                  // long page) kept its full height and ran off the top of the
+                  // viewport; clamping to the min lets it flip either way and
+                  // scroll within the space it actually has.
+                  style={{
+                    maxHeight: 'min(430px, var(--available-height))',
+                    ...(lockedWidth ? { width: lockedWidth } : {}),
+                  }}
                 >
                   {searchOverride ?? <TableSettingsMenuSearch />}
                   <VStack gap={1}>
