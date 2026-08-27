@@ -246,8 +246,11 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
                     {labeledSections ? (
                       <>
                         {labeledSections.sections.map(section => (
-                          <div key={section.label}>
-                            <DropdownMenuLabel>{section.label}</DropdownMenuLabel>
+                          // Per-section wrapper bounds the sticky header: the
+                          // group's label pins to the top while its rows scroll,
+                          // then the next group's header pushes it out.
+                          <div key={section.label} className='flex flex-col gap-1'>
+                            <DropdownMenuLabel sticky>{section.label}</DropdownMenuLabel>
                             {section.cols.map(renderColumnItem)}
                           </div>
                         ))}
