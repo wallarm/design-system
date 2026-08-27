@@ -76,7 +76,7 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
   const testId = useTestId('settings-menu', testIdProp);
   const { anchorNode } = useTableSettingsMenuContext();
   const ctx = useTableContext();
-  const { table, alwaysPinnedLeft, masterColumnId, onSettingsOpenChange } = ctx;
+  const { table, alwaysPinnedLeft, masterColumnId, columnGroups, onSettingsOpenChange } = ctx;
 
   const hasTextDescription = table
     .getAllLeafColumns()
@@ -124,6 +124,27 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
       return header.toLowerCase().includes(lower);
     });
   }, [allColumns, search]);
+
+  // Labeled sections (opt-in via `columnGroups`): flat, non-reorderable list
+  // grouped under headers — the FilterInput field-menu pattern. Columns absent
+  // from every group fall into a trailing headerless section; groups left empty
+  // by the search filter render nothing.
+  const labeledSections = useMemo(() => {
+    if (!columnGroups) return null;
+    const byId = new Map(filteredColumns.map(col => [col.id, col]));
+    const claimed = new Set<string>();
+    const sections = columnGroups
+      .map(group => {
+        const cols = group.columns
+          .map(id => byId.get(id))
+          .filter((col): col is (typeof filteredColumns)[number] => col != null);
+        for (const col of cols) claimed.add(col.id);
+        return { label: group.label, cols };
+      })
+      .filter(section => section.cols.length > 0);
+    const ungrouped = filteredColumns.filter(col => !claimed.has(col.id));
+    return { sections, ungrouped };
+  }, [columnGroups, filteredColumns]);
 
   // Split into pinned (including master) and unpinned groups
   const { pinnedColumns, unpinnedColumns } = useMemo(() => {
@@ -222,26 +243,38 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
                 >
                   {searchOverride ?? <TableSettingsMenuSearch />}
                   <VStack gap={1}>
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <SortableContext
-                        items={filteredColumns
-                          .filter(c => !alwaysPinnedLeft.includes(c.id))
-                          .map(c => c.id)}
-                        strategy={verticalListSortingStrategy}
+                    {labeledSections ? (
+                      <>
+                        {labeledSections.sections.map(section => (
+                          <div key={section.label}>
+                            <DropdownMenuLabel>{section.label}</DropdownMenuLabel>
+                            {section.cols.map(renderColumnItem)}
+                          </div>
+                        ))}
+                        {labeledSections.ungrouped.map(renderColumnItem)}
+                      </>
+                    ) : (
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
                       >
-                        {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
+                        <SortableContext
+                          items={filteredColumns
+                            .filter(c => !alwaysPinnedLeft.includes(c.id))
+                            .map(c => c.id)}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
 
-                        {pinnedColumns.map(renderColumnItem)}
+                          {pinnedColumns.map(renderColumnItem)}
 
-                        {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
+                          {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
 
-                        {unpinnedColumns.map(renderColumnItem)}
-                      </SortableContext>
-                    </DndContext>
+                          {unpinnedColumns.map(renderColumnItem)}
+                        </SortableContext>
+                      </DndContext>
+                    )}
                   </VStack>
                   <DropdownMenuFooter>
                     {resetOverride ?? <TableSettingsMenuReset />}

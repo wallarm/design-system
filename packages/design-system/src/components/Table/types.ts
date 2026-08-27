@@ -56,6 +56,20 @@ export type TableGroupingState = string[];
 /** Column visibility state: `{ [columnId]: boolean }` */
 export type TableVisibilityState = Record<string, boolean>;
 
+/**
+ * Labeled grouping for the column-settings menu. When `columnGroups` is passed
+ * to the Table, the settings menu renders these labeled sections (in the given
+ * order) instead of the default pinned/unpinned + drag-reorder list — the same
+ * flat, non-reorderable pattern the FilterInput field menu uses. `columns` are
+ * column ids; ids absent from every group fall into a trailing headerless
+ * section, and empty groups (or groups whose columns are all filtered out by
+ * search) render nothing.
+ */
+export interface TableColumnGroup {
+  label: string;
+  columns: string[];
+}
+
 /** State updater — value or functional update */
 export type TableUpdater<T> = T | ((prev: T) => T);
 
@@ -237,6 +251,13 @@ export interface TableProps<T> extends TestableProps {
   onColumnVisibilityChange?: TableOnChangeFn<TableVisibilityState>;
   defaultColumnVisibility?: TableVisibilityState;
   defaultColumnOrder?: string[];
+  /**
+   * Labeled sections for the column-settings menu. When set, the menu renders
+   * these groups (flat, non-reorderable — like the FilterInput field menu)
+   * instead of the default pinned/unpinned drag-reorder list. See
+   * {@link TableColumnGroup}.
+   */
+  columnGroups?: TableColumnGroup[];
   /**
    * Fired when the built-in column-settings menu opens (`true`) or closes
    * (`false`). The menu's open state otherwise lives inside the DS and is not
