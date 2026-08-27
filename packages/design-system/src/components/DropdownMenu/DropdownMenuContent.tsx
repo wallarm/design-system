@@ -38,18 +38,24 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
   // from reaching menu items. Re-establish the cascade explicitly for the children.
   const cascadeBase = useTestId();
   const childArray = Children.toArray(children);
-  const inputChildren = childArray.filter(
-    child => isValidElement(child) && child.type === DropdownMenuInput,
-  );
+  // The search input renders ABOVE the ScrollArea (pinned, unclipped). Match it
+  // by identity OR by a `dropdownMenuSlot: 'input'` tag, so a wrapper that
+  // re-exports the input (e.g. TableSettingsMenuSearch) is lifted out too —
+  // otherwise it lands inside the scroll viewport and its border is clipped.
+  const isInputChild = (child: ReactNode): boolean => {
+    if (!isValidElement(child)) return false;
+    if (child.type === DropdownMenuInput) return true;
+    return (
+      typeof child.type === 'function' &&
+      (child.type as { dropdownMenuSlot?: string }).dropdownMenuSlot === 'input'
+    );
+  };
+  const inputChildren = childArray.filter(isInputChild);
   const footerChildren = childArray.filter(
     child => isValidElement(child) && child.type === DropdownMenuFooter,
   );
   const menuChildren = childArray.filter(
-    child =>
-      !(
-        isValidElement(child) &&
-        (child.type === DropdownMenuFooter || child.type === DropdownMenuInput)
-      ),
+    child => !isInputChild(child) && !(isValidElement(child) && child.type === DropdownMenuFooter),
   );
 
   return (
