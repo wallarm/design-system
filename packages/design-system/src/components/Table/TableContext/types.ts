@@ -8,7 +8,7 @@ import type {
 } from '@tanstack/react-table';
 import type { Virtualizer } from '@tanstack/react-virtual';
 import type { DSTableFeatures } from '../lib';
-import type { TableProps, TableVirtualized } from '../types';
+import type { TableColumnGroup, TableProps, TableVirtualized } from '../types';
 
 /**
  * Union covers both virtualizer flavors used by the Table (`useVirtualizer`
@@ -48,6 +48,10 @@ export interface TableContextValue<T extends RowData> {
   // Settings menu support
   defaultColumnVisibility?: ColumnVisibilityState;
   defaultColumnOrder?: string[];
+
+  // Labeled sections for the settings menu. When set, the menu renders these
+  // groups (flat, non-reorderable) instead of the pinned/unpinned DnD list.
+  columnGroups?: TableColumnGroup[];
 
   // Column order setter for DnD
   setColumnOrder: (order: string[]) => void;

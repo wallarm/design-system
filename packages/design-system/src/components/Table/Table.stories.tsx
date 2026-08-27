@@ -87,6 +87,7 @@ import {
 import { TableSortTrigger } from './TableSortTrigger';
 import type {
   TableColumnDef,
+  TableColumnGroup,
   TableColumnPinningState,
   TableColumnSizingState,
   TableExpandedState,
@@ -1058,6 +1059,35 @@ export const SettingsMenu: StoryFn<typeof meta> = () => {
       onColumnOrderChange={setColumnOrder}
       defaultColumnVisibility={{}}
       defaultColumnOrder={securityColumnIds}
+    />
+  );
+};
+
+/**
+ * `columnGroups` turns the settings menu into labeled, non-reorderable sections
+ * (the FilterInput field-menu pattern): no drag handle, columns rendered under
+ * their group header in the given order. Column ids absent from every group
+ * (`cweId` here) fall into a trailing headerless section.
+ */
+export const SettingsMenuGrouped: StoryFn<typeof meta> = () => {
+  const [columnVisibility, setColumnVisibility] = useState<TableVisibilityState>({});
+
+  const columnGroups: TableColumnGroup[] = [
+    {
+      label: 'Threat classification',
+      columns: ['objectName', 'status', 'firstDetected', 'lastSeen'],
+    },
+    { label: 'Request features', columns: ['sourceIp', 'parameter', 'endpoint', 'requests'] },
+  ];
+
+  return (
+    <Table
+      data={securityEvents}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      columnVisibility={columnVisibility}
+      onColumnVisibilityChange={setColumnVisibility}
+      columnGroups={columnGroups}
     />
   );
 };

@@ -65,6 +65,7 @@ export type {
   TableCellContext,
   TableColumnBase,
   TableColumnDef,
+  TableColumnGroup,
   TableColumnMeta,
   TableColumnPinningState,
   TableColumnSizingState,

@@ -18,7 +18,10 @@ export const TableSettingsMenuItem = ({
   'data-testid': testIdProp,
   ...rest
 }: TableSettingsMenuItemProps) => {
-  const { masterColumnId, columnDndEnabled, table } = useTableContext();
+  const { masterColumnId, columnDndEnabled, columnGroups, table } = useTableContext();
+  // Labeled-group mode is a flat, non-reorderable list (FilterInput pattern):
+  // no drag handle, so the row loses the grip's left gutter.
+  const grouped = !!columnGroups;
   const slotTestId = useTestId('settings-menu-item');
   const switchTestId = useTestId(`settings-menu-item-${columnId}`, testIdProp);
 
@@ -49,22 +52,25 @@ export const TableSettingsMenuItem = ({
       style={style}
       data-testid={slotTestId}
       className={cn(
-        'relative flex items-center w-full rounded-6 pl-20 pr-8 py-6',
+        'relative flex items-center w-full rounded-6 pr-8 py-6',
+        grouped ? 'pl-8' : 'pl-20',
         'hover:bg-states-primary-hover transition-colors',
         'data-disabled:opacity-50 data-disabled:pointer-events-none',
       )}
       data-disabled={isMasterColumn || undefined}
     >
-      <span
-        className={cn(
-          'absolute left-4 top-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing text-icon-secondary hover:text-icon-primary data-disabled:opacity-50 data-disabled:pointer-events-none',
-        )}
-        {...attributes}
-        {...listeners}
-        data-disabled={isMasterColumn || !columnDndEnabled || undefined}
-      >
-        <GripVertical size='sm' />
-      </span>
+      {!grouped && (
+        <span
+          className={cn(
+            'absolute left-4 top-1/2 -translate-y-1/2 cursor-grab active:cursor-grabbing text-icon-secondary hover:text-icon-primary data-disabled:opacity-50 data-disabled:pointer-events-none',
+          )}
+          {...attributes}
+          {...listeners}
+          data-disabled={isMasterColumn || !columnDndEnabled || undefined}
+        >
+          <GripVertical size='sm' />
+        </span>
+      )}
 
       <Switch
         {...rest}

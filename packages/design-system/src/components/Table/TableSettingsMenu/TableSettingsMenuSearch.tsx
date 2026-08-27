@@ -27,3 +27,8 @@ export const TableSettingsMenuSearch: FC<TableSettingsMenuSearchProps> = ({
 };
 
 TableSettingsMenuSearch.displayName = 'TableSettingsMenuSearch';
+
+// Tag as the DropdownMenu input slot so DropdownMenuContent pins it above the
+// scroll area. Without this the wrapper isn't matched by identity, renders
+// inside the scroll viewport, and its border is clipped by the overflow edge.
+Object.assign(TableSettingsMenuSearch, { dropdownMenuSlot: 'input' as const });

@@ -76,7 +76,7 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
   const testId = useTestId('settings-menu', testIdProp);
   const { anchorNode } = useTableSettingsMenuContext();
   const ctx = useTableContext();
-  const { table, alwaysPinnedLeft, masterColumnId, onSettingsOpenChange } = ctx;
+  const { table, alwaysPinnedLeft, masterColumnId, columnGroups, onSettingsOpenChange } = ctx;
 
   const hasTextDescription = table
     .getAllLeafColumns()
@@ -124,6 +124,27 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
       return header.toLowerCase().includes(lower);
     });
   }, [allColumns, search]);
+
+  // Labeled sections (opt-in via `columnGroups`): flat, non-reorderable list
+  // grouped under headers — the FilterInput field-menu pattern. Columns absent
+  // from every group fall into a trailing headerless section; groups left empty
+  // by the search filter render nothing.
+  const labeledSections = useMemo(() => {
+    if (!columnGroups) return null;
+    const byId = new Map(filteredColumns.map(col => [col.id, col]));
+    const claimed = new Set<string>();
+    const sections = columnGroups
+      .map(group => {
+        const cols = group.columns
+          .map(id => byId.get(id))
+          .filter((col): col is (typeof filteredColumns)[number] => col != null);
+        for (const col of cols) claimed.add(col.id);
+        return { label: group.label, cols };
+      })
+      .filter(section => section.cols.length > 0);
+    const ungrouped = filteredColumns.filter(col => !claimed.has(col.id));
+    return { sections, ungrouped };
+  }, [columnGroups, filteredColumns]);
 
   // Split into pinned (including master) and unpinned groups
   const { pinnedColumns, unpinnedColumns } = useMemo(() => {
@@ -217,31 +238,52 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
 
                 <DropdownMenuContent
                   ref={contentRef}
-                  className={cn('min-w-256 max-h-[430px]')}
-                  style={lockedWidth ? { width: lockedWidth } : undefined}
+                  className={cn('min-w-256')}
+                  // Cap at 430px but never exceed the room Ark left on the
+                  // chosen side (--available-height). A bare `max-h-[430px]`
+                  // overrides that var, so a menu flipped up (trigger low on a
+                  // long page) kept its full height and ran off the top of the
+                  // viewport; clamping to the min lets it flip either way and
+                  // scroll within the space it actually has.
+                  style={{ maxHeight: 'min(430px, var(--available-height))', width: lockedWidth }}
                 >
                   {searchOverride ?? <TableSettingsMenuSearch />}
                   <VStack gap={1}>
-                    <DndContext
-                      sensors={sensors}
-                      collisionDetection={closestCenter}
-                      onDragEnd={handleDragEnd}
-                    >
-                      <SortableContext
-                        items={filteredColumns
-                          .filter(c => !alwaysPinnedLeft.includes(c.id))
-                          .map(c => c.id)}
-                        strategy={verticalListSortingStrategy}
+                    {labeledSections ? (
+                      <>
+                        {labeledSections.sections.map(section => (
+                          // Per-section wrapper bounds the sticky header: the
+                          // group's label pins to the top while its rows scroll,
+                          // then the next group's header pushes it out.
+                          <div key={section.label} className='flex flex-col gap-1'>
+                            <DropdownMenuLabel sticky>{section.label}</DropdownMenuLabel>
+                            {section.cols.map(renderColumnItem)}
+                          </div>
+                        ))}
+                        {labeledSections.ungrouped.map(renderColumnItem)}
+                      </>
+                    ) : (
+                      <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
                       >
-                        {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
+                        <SortableContext
+                          items={filteredColumns
+                            .filter(c => !alwaysPinnedLeft.includes(c.id))
+                            .map(c => c.id)}
+                          strategy={verticalListSortingStrategy}
+                        >
+                          {hasUserPinned && <DropdownMenuLabel>Pinned</DropdownMenuLabel>}
 
-                        {pinnedColumns.map(renderColumnItem)}
+                          {pinnedColumns.map(renderColumnItem)}
 
-                        {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
+                          {hasUserPinned && unpinnedColumns.length > 0 && <Separator spacing={4} />}
 
-                        {unpinnedColumns.map(renderColumnItem)}
-                      </SortableContext>
-                    </DndContext>
+                          {unpinnedColumns.map(renderColumnItem)}
+                        </SortableContext>
+                      </DndContext>
+                    )}
                   </VStack>
                   <DropdownMenuFooter>
                     {resetOverride ?? <TableSettingsMenuReset />}

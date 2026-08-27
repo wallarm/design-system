@@ -939,6 +939,56 @@ describe('TableSettingsMenu items: partial-override analytics', () => {
   });
 });
 
+describe('TableSettingsMenu: columnGroups (labeled sections)', () => {
+  interface GroupRow {
+    id: string;
+    name: string;
+    status: string;
+    category: string;
+  }
+
+  const groupData: GroupRow[] = [{ id: '1', name: 'Alpha', status: 'active', category: 'x' }];
+  const helper = createTableColumnHelper<GroupRow>();
+  const groupColumns = [
+    helper.accessor('name', { header: 'Name' }),
+    helper.accessor('status', { header: 'Status' }),
+    helper.accessor('category', { header: 'Category' }),
+  ];
+
+  const renderGrouped = (columnGroups: { label: string; columns: string[] }[]) =>
+    render(
+      <Table<GroupRow>
+        data={groupData}
+        columns={groupColumns}
+        onColumnVisibilityChange={vi.fn()}
+        columnGroups={columnGroups}
+        data-testid='table'
+      />,
+    );
+
+  const openMenu = async () =>
+    userEvent.click(screen.getByRole('button', { name: 'Table settings' }));
+
+  it('renders a header per non-empty group and puts ungrouped columns in a trailing section', async () => {
+    renderGrouped([
+      { label: 'Threat', columns: ['name', 'status'] },
+      { label: 'Empty', columns: ['does-not-exist'] },
+    ]);
+    await openMenu();
+
+    // Group with real columns gets a header; group whose ids are all absent renders nothing.
+    expect(screen.getByText('Threat')).toBeInTheDocument();
+    expect(screen.queryByText('Empty')).not.toBeInTheDocument();
+    // The default pinned/unpinned split is replaced — no "Pinned" label.
+    expect(screen.queryByText('Pinned')).not.toBeInTheDocument();
+
+    // Grouped columns and the ungrouped one (category → trailing) all render.
+    expect(screen.getByTestId('table--settings-menu-item-name')).toBeInTheDocument();
+    expect(screen.getByTestId('table--settings-menu-item-status')).toBeInTheDocument();
+    expect(screen.getByTestId('table--settings-menu-item-category')).toBeInTheDocument();
+  });
+});
+
 describe('TableScrollHandler: table-level composition analytics', () => {
   interface ScrollRow {
     id: string;
