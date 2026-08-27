@@ -245,10 +245,7 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
                   // long page) kept its full height and ran off the top of the
                   // viewport; clamping to the min lets it flip either way and
                   // scroll within the space it actually has.
-                  style={{
-                    maxHeight: 'min(430px, var(--available-height))',
-                    ...(lockedWidth ? { width: lockedWidth } : {}),
-                  }}
+                  style={{ maxHeight: 'min(430px, var(--available-height))', width: lockedWidth }}
                 >
                   {searchOverride ?? <TableSettingsMenuSearch />}
                   <VStack gap={1}>
