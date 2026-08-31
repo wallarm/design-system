@@ -189,6 +189,7 @@ export {
   type CheckboxProps,
 } from './components/Checkbox';
 export { Code, type CodeProps } from './components/Code';
+export { CopyButton, type CopyButtonProps } from './components/CopyButton';
 export {
   Country,
   CountryFlag,
