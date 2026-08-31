@@ -74,6 +74,7 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
     '=': 'is',
     '!=': 'is not',
     in: 'in',
+    not_in: 'not in',
     like: 'like',
     not_like: 'not like',
     is_null: 'is not set',
@@ -87,6 +88,7 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
     '>=': 'greater or equal',
     '<=': 'less or equal',
     in: 'in',
+    not_in: 'not in',
   },
   float: {
     '=': 'is',

@@ -18,15 +18,22 @@ import { useKeyboardNav } from './hooks/useKeyboardNav';
 import { MenuEmptyState } from './MenuEmptyState';
 
 /**
- * Build operator groups filtered by a custom operators list.
- * Preserves grouping from OPERATORS_BY_TYPE but only keeps operators present in the list.
+ * Build operator groups for a custom operators list. The list is authoritative
+ * (per the `operators` prop contract): OPERATORS_BY_TYPE only provides grouping
+ * and order for the operators it knows; operators outside the type's default
+ * groups are appended as a trailing group instead of being dropped.
  */
 const filterOperatorGroups = (
   groups: FilterOperator[][],
   operators: FilterOperator[],
 ): FilterOperator[][] => {
   const allowed = new Set(operators);
-  return groups.map(group => group.filter(op => allowed.has(op))).filter(group => group.length > 0);
+  const filtered = groups
+    .map(group => group.filter(op => allowed.has(op)))
+    .filter(group => group.length > 0);
+  const known = new Set(groups.flat());
+  const extras = operators.filter(op => !known.has(op));
+  return extras.length > 0 ? [...filtered, extras] : filtered;
 };
 
 /** Field types where operator symbols are hidden (per Figma spec) */
