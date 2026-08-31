@@ -124,10 +124,13 @@ export const OPERATOR_LABELS_BY_TYPE: Record<FieldType, Partial<Record<FilterOpe
 /** Operators per field type, grouped for menu separators. */
 export const OPERATORS_BY_TYPE: Record<FieldType, FilterOperator[][]> = {
   string: [
-    ['=', '!=', 'in', 'like', 'not_like'],
+    ['=', '!=', 'in', 'not_in', 'like', 'not_like'],
     ['is_null', 'is_not_null'],
   ],
-  integer: [['=', '!=', '>', '<', '>=', '<='], ['in']],
+  integer: [
+    ['=', '!=', '>', '<', '>=', '<='],
+    ['in', 'not_in'],
+  ],
   float: [['=', '!=', '>', '<', '>=', '<=']],
   date: [['>', '>=', '<', '<=', '=', '!=', 'between']],
   boolean: [['=', '!=', 'is_null', 'is_not_null']],
