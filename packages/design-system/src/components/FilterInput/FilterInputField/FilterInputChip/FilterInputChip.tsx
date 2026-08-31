@@ -145,7 +145,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
   const attributeSegment = (
     <Segment
       variant={SEGMENT_VARIANT.attribute}
-      className='shrink-0'
+      className='min-w-0'
       error={effectiveError === true || effectiveError === SEGMENT_VARIANT.attribute}
       onClick={interactive ? e => handleSegmentClick(SEGMENT_VARIANT.attribute, e) : undefined}
       onMouseDown={interactive && building ? handleSegmentMouseDown : undefined}
@@ -208,7 +208,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
           variant={SEGMENT_VARIANT.value}
           // Empty required value → clickable placeholder; paired key → capped.
           className={
-            !value && !pair ? emptyValueHitTarget : pair ? 'max-w-[90px] shrink-0' : 'min-w-0'
+            !value && !pair ? emptyValueHitTarget : pair ? 'max-w-[90px] shrink-0' : 'min-w-[40px]'
           }
           // Field-owned cap on the applied value: the inner truncate ellipsizes
           // at this width; ignored for the empty hit target and paired chips (AS-1064).
@@ -237,7 +237,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
               is the affordance — routing to the first missing segment (AS-1179/AS-1192). */}
           <Segment
             variant={SEGMENT_VARIANT.attribute}
-            className='shrink-0'
+            className='min-w-0'
             onClick={
               interactive && pair.error
                 ? e =>
@@ -264,7 +264,7 @@ export const FilterInputChip: FC<FilterInputChipProps> = ({
             <Segment
               variant={SEGMENT_VARIANT.value}
               // Empty required value → clickable placeholder (see emptyValueHitTarget).
-              className={pair.value ? 'min-w-0' : emptyValueHitTarget}
+              className={pair.value ? 'min-w-[40px]' : emptyValueHitTarget}
               error={
                 pairActiveSegment !== SEGMENT_VARIANT.value &&
                 (effectivePairError === true || effectivePairError === SEGMENT_VARIANT.value)
