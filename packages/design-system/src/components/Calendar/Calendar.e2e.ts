@@ -28,6 +28,12 @@ async function openCalendar(page: Page): Promise<void> {
 
 test.describe('Component: Calendar', () => {
   test.describe('Visual', () => {
+    // Freeze the clock so calendar always renders the same month regardless of
+    // when the test runs — prevents baselines from going stale every month.
+    test.beforeEach(async ({ page }) => {
+      await page.clock.setFixedTime(new Date('2026-07-08T12:00:00'));
+    });
+
     test('Should render single readonly calendar correctly', async ({ page }) => {
       await calendarStory.goto(page, 'Single Readonly');
       await expect(page).toHaveScreenshot();
