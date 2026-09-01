@@ -209,30 +209,6 @@ export const useNestedValueMenuState = ({
   }, [cancelClose]);
   useEffect(() => () => cancelClose(), [cancelClose]);
 
-  // ---- safe triangle --------------------------------------------------------
-  // While a submenu is open, a diagonal move from the parent row toward the
-  // panel briefly crosses sibling rows — whose leave/enter would otherwise close
-  // it. Track the pointer and, when it heads into the wedge between the last
-  // position and the submenu's two near corners, cancel the pending close so the
-  // panel survives the traversal (grace delay handles the rest).
-  const lastPointRef = useRef<{ x: number; y: number } | null>(null);
-  const handleMainMouseMove = useCallback(
-    (event: { clientX: number; clientY: number }) => {
-      const prev = lastPointRef.current;
-      const point = { x: event.clientX, y: event.clientY };
-      lastPointRef.current = point;
-      if (openParentId == null || !prev) return;
-      const sub = submenuRef?.current?.getBoundingClientRect();
-      if (!sub) return;
-      // Submenu sits to the right: the wedge is bounded by its near (left) edge
-      // and its top/bottom corners, fanning out to the previous pointer spot.
-      const headingRight = point.x >= prev.x;
-      const insideBand = point.y >= sub.top - 12 && point.y <= sub.bottom + 12;
-      if (headingRight && insideBand && point.x <= sub.left) cancelClose();
-    },
-    [openParentId, submenuRef, cancelClose],
-  );
-
   // ---- selection handlers ---------------------------------------------------
 
   const toggleGroup = useCallback(
@@ -374,7 +350,6 @@ export const useNestedValueMenuState = ({
     closeParent,
     cancelClose,
     scheduleClose,
-    handleMainMouseMove,
     openParentRow,
     submenuRows,
     // selection
