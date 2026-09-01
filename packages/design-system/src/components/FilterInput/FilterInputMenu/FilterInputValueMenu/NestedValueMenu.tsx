@@ -1,4 +1,4 @@
-import { type FC, Fragment, useCallback, useMemo, useRef } from 'react';
+import { type FC, Fragment, useMemo, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import {
   DropdownMenu,
@@ -84,11 +84,6 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
   const openParentIdRef = useRef(state.openParentId);
   openParentIdRef.current = state.openParentId;
 
-  const getSubmenuAnchorRect = useCallback(() => {
-    const id = openParentIdRef.current;
-    return (id && rowElsRef.current.get(id)?.getBoundingClientRect()) || null;
-  }, []);
-
   const submenuPositioning = useMemo(
     () => ({
       placement: 'right-start' as const,
@@ -97,9 +92,12 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
       // corridor and widens the aim target, so the hover-intent close delay
       // rarely fires mid-traverse.
       gutter: 4,
-      getAnchorRect: getSubmenuAnchorRect,
+      getAnchorRect: () => {
+        const id = openParentIdRef.current;
+        return (id && rowElsRef.current.get(id)?.getBoundingClientRect()) || null;
+      },
     }),
-    [getSubmenuAnchorRect],
+    [],
   );
 
   // The anchor is virtual, so floating-ui has nothing to observe when the open

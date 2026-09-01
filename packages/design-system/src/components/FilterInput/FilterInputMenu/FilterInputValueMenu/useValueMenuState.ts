@@ -111,6 +111,13 @@ export const useValueMenuState = ({
     };
   }, [multiSelect, blurCommitRef, commitChecked]);
 
+  // Memoized: `flatItems` depends on it, and a fresh array each render would
+  // defeat that memo.
+  const selectedValues = useMemo(
+    () => (multiSelect ? checkedValues : highlightValue != null ? [highlightValue] : []),
+    [multiSelect, checkedValues, highlightValue],
+  );
+
   const flatItems: FilterInputDropdownItem[] = useMemo(() => {
     const items = values.map(opt => ({
       id: String(opt.value),
@@ -124,12 +131,11 @@ export const useValueMenuState = ({
     // never highlight is inert on click, so an undeclared value could be checked
     // but never unchecked.
     const known = new Set(items.map(item => item.id));
-    const selected = multiSelect ? checkedValues : highlightValue != null ? [highlightValue] : [];
-    const orphans = selected
+    const orphans = selectedValues
       .filter(value => !known.has(String(value)))
       .map(value => ({ id: String(value), label: String(value), value }));
-    return orphans.length > 0 ? [...orphans, ...items] : items;
-  }, [values, multiSelect, checkedValues, highlightValue]);
+    return [...orphans, ...items];
+  }, [values, selectedValues]);
 
   const handleItemSelect = (item: FilterInputDropdownItem) => {
     if (multiSelect) {
@@ -155,12 +161,6 @@ export const useValueMenuState = ({
     inputRef,
     menuRef,
   });
-
-  const selectedValues = multiSelect
-    ? checkedValues
-    : highlightValue != null
-      ? [highlightValue]
-      : [];
 
   const buildingMultiValue =
     multiSelect && checkedValues.length > 0
