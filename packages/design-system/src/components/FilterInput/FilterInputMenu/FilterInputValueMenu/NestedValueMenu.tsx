@@ -1,4 +1,4 @@
-import { type FC, Fragment, useMemo, useRef } from 'react';
+import { type FC, Fragment, useCallback, useMemo, useRef } from 'react';
 import { cn } from '../../../../utils/cn';
 import {
   DropdownMenu,
@@ -8,6 +8,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
 } from '../../../DropdownMenu';
+import { useFloatingRecomputeOn } from '../../hooks/useFloatingRecomputeOn';
 import { buildValueMenuSections, type ValueMenuRow } from '../../lib/buildValueMenuSections';
 import { MenuEmptyState } from '../MenuEmptyState';
 import type { FilterInputValueMenuProps } from './FilterInputValueMenu';
@@ -76,6 +77,18 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
     else rowElsRef.current.delete(id);
   };
 
+  // Read the open parent through a ref so `getAnchorRect` keeps a stable
+  // identity — zag captures it once at open, so closing over `openParentId`
+  // directly would freeze the submenu on the row that opened it and every later
+  // parent would render its own rows at the first one's position.
+  const openParentIdRef = useRef(state.openParentId);
+  openParentIdRef.current = state.openParentId;
+
+  const getSubmenuAnchorRect = useCallback(() => {
+    const id = openParentIdRef.current;
+    return (id && rowElsRef.current.get(id)?.getBoundingClientRect()) || null;
+  }, []);
+
   const submenuPositioning = useMemo(
     () => ({
       placement: 'right-start' as const,
@@ -84,13 +97,14 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
       // corridor and widens the aim target, so the hover-intent close delay
       // rarely fires mid-traverse.
       gutter: 4,
-      getAnchorRect: () =>
-        (state.openParentId &&
-          rowElsRef.current.get(state.openParentId)?.getBoundingClientRect()) ||
-        null,
+      getAnchorRect: getSubmenuAnchorRect,
     }),
-    [state.openParentId],
+    [getSubmenuAnchorRect],
   );
+
+  // The anchor is virtual, so floating-ui has nothing to observe when the open
+  // parent changes — poke it to recompute against the new row.
+  useFloatingRecomputeOn(state.openParentId, state.openParentId != null);
 
   const openParentRow = state.openParentRow;
 
