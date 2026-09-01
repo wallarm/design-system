@@ -111,10 +111,25 @@ export const useValueMenuState = ({
     };
   }, [multiSelect, blurCommitRef, commitChecked]);
 
-  const flatItems: FilterInputDropdownItem[] = useMemo(
-    () => values.map(opt => ({ id: String(opt.value), label: opt.label, value: opt.value })),
-    [values],
-  );
+  const flatItems: FilterInputDropdownItem[] = useMemo(() => {
+    const items = values.map(opt => ({
+      id: String(opt.value),
+      label: opt.label,
+      value: opt.value,
+    }));
+    // Selected values the field doesn't declare (freeform entry on a
+    // strictValues:false field) are still rendered — useValueMenuDisplayValues
+    // prepends them so they stay visible. They must be in this list too, in the
+    // same order: it feeds the controlled `highlightedValue`, and a row Ark can
+    // never highlight is inert on click, so an undeclared value could be checked
+    // but never unchecked.
+    const known = new Set(items.map(item => item.id));
+    const selected = multiSelect ? checkedValues : highlightValue != null ? [highlightValue] : [];
+    const orphans = selected
+      .filter(value => !known.has(String(value)))
+      .map(value => ({ id: String(value), label: String(value), value }));
+    return orphans.length > 0 ? [...orphans, ...items] : items;
+  }, [values, multiSelect, checkedValues, highlightValue]);
 
   const handleItemSelect = (item: FilterInputDropdownItem) => {
     if (multiSelect) {

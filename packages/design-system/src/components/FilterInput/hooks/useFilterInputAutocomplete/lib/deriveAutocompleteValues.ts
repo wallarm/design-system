@@ -12,6 +12,7 @@ import {
 } from '../../../lib';
 import type { Condition, FieldMetadata, FilterOperator } from '../../../types';
 import type { BuildingBase } from '../useAutocompleteState';
+import { resolveMultiValues } from './valueResolution';
 
 interface DeriveOptions {
   editingChipId: string | null;
@@ -20,7 +21,7 @@ interface DeriveOptions {
   conditions: Condition[];
   buildingMultiValue: string | undefined;
   dateRangeFromValue: string | null | undefined;
-  /** Segment text when inline-editing a value. */
+  /** Segment text when inline-editing a value — set only once the user typed. */
   segmentFilterText?: string;
   /** Which triplet is being built: 0 = base, 1 = paired second. */
   buildingSide?: 0 | 1;
@@ -90,9 +91,16 @@ export const deriveAutocompleteValues = ({
     if (!editingCondition || !selectedOperator || !isMultiSelectOperator(selectedOperator))
       return [];
 
-    // Derive from committed condition values only — using segmentFilterText
-    // would create a loop: segmentFilterText → editingMultiValues →
-    // initialValues → checkedValues → buildingMultiValue → setSegmentFilterText.
+    // Once the user has typed in the value segment the text owns the selection:
+    // the menu's checked set follows it, so a value erased from the text is
+    // erased from what gets committed. Only the typed case reads the text — the
+    // reverse mirror (checked set → segment text) is suppressed while typing, so
+    // the two never feed each other.
+    if (segmentFilterText !== undefined && selectedField) {
+      return resolveMultiValues(selectedField, segmentFilterText.trim()).resolved;
+    }
+
+    // Otherwise derive from the committed condition values.
     const values = Array.isArray(editingCondition.value)
       ? editingCondition.value
       : editingCondition.value != null

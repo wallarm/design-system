@@ -65,7 +65,7 @@ describe('deriveAutocompleteValues', () => {
       expect(result.editingMultiValues).toEqual(['active', 'pending']);
     });
 
-    it('ignores segmentFilterText (derives from condition values only)', () => {
+    it('lets a typed segmentFilterText replace the committed values', () => {
       const result = deriveAutocompleteValues({
         editingChipId: 'chip-0',
         selectedField: statusField,
@@ -76,8 +76,10 @@ describe('deriveAutocompleteValues', () => {
         segmentFilterText: 'Active',
       });
 
-      // segmentFilterText is intentionally NOT used to avoid circular dependency
-      expect(result.editingMultiValues).toEqual(['active', 'pending']);
+      // Typed text owns the selection: the label resolves to its value and the
+      // value the user erased is gone. Set only once the user typed, so it never
+      // loops back through the checked-set → segment-text mirror.
+      expect(result.editingMultiValues).toEqual(['active']);
     });
 
     it('returns empty array when condition has no value', () => {
@@ -114,10 +116,23 @@ describe('deriveAutocompleteValues', () => {
         conditions: makeConditions({ field: 'ip', value: ['1.1.1.1'] }),
         buildingMultiValue: undefined,
         dateRangeFromValue: undefined,
-        segmentFilterText: 'something',
       });
 
       expect(result.editingMultiValues).toEqual(['1.1.1.1']);
+    });
+
+    it('takes typed text verbatim on a free-text field', () => {
+      const result = deriveAutocompleteValues({
+        editingChipId: 'chip-0',
+        selectedField: freeTextField,
+        selectedOperator: 'in',
+        conditions: makeConditions({ field: 'ip', value: ['1.1.1.1'] }),
+        buildingMultiValue: undefined,
+        dateRangeFromValue: undefined,
+        segmentFilterText: '2.2.2.2, 3.3.3.3',
+      });
+
+      expect(result.editingMultiValues).toEqual(['2.2.2.2', '3.3.3.3']);
     });
   });
 

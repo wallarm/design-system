@@ -309,9 +309,11 @@ export const useFilterInputAutocomplete = ({
       conditions,
       buildingMultiValue,
       dateRangeFromValue: dateRange.fromValue,
+      // Raw text, not the menu-filter text: it must stay defined once the user
+      // typed even after they cleared the segment back to empty.
       segmentFilterText:
-        editing.editingSegment === SEGMENT_VARIANT.value
-          ? editing.segmentMenuFilterText
+        editing.editingSegment === SEGMENT_VARIANT.value && editing.userHasTyped
+          ? editing.segmentFilterText
           : undefined,
       buildingSide,
       buildingBase,
@@ -325,8 +327,11 @@ export const useFilterInputAutocomplete = ({
     editing.editingSegment === SEGMENT_VARIANT.value &&
     selectedOperator != null &&
     isMultiSelectOperator(selectedOperator);
+  // Gate on the typing flag, not on the derived filter text: once the user has
+  // edited the segment the text owns the value, and clearing it back to empty
+  // must stay empty instead of snapping back to the checked set.
   const liveSegmentFilterText =
-    isMultiValueValueEdit && buildingMultiValue != null && editing.segmentMenuFilterText === ''
+    isMultiValueValueEdit && buildingMultiValue != null && !editing.userHasTyped
       ? buildingMultiValue
       : editing.segmentFilterText;
 
