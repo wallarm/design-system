@@ -89,8 +89,9 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
       placement: 'right-start' as const,
       // Small gutter tucks the submenu ~4px under the main menu's right edge
       // (overlap past the checkbox column, not a gap): shortens the diagonal
-      // corridor and widens the aim target, so the hover-intent close delay
-      // rarely fires mid-traverse.
+      // corridor and widens the aim target, so the hover-intent close delay —
+      // the only thing protecting the traverse — has time to be cancelled by
+      // the panel's own mouseenter.
       gutter: 4,
       getAnchorRect: () => {
         const id = openParentIdRef.current;
@@ -140,7 +141,6 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
           className={cn(widthClass, 'max-h-[430px]', className)}
           style={widthStyle}
           data-filter-input-menu='true'
-          onMouseMove={state.handleMainMouseMove}
         >
           {hasRows ? (
             sections.map((section, index) => {
