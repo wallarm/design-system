@@ -9,6 +9,7 @@ const tableStory = createStoryHelper('data-display-table', [
   'Row Selection Window Scroll',
   'Context Menu',
   'Column Drag And Drop',
+  'Row Reordering',
 ] as const);
 
 // The Bidirectional story header renders "Window of {N} rows around the anchor".
@@ -269,6 +270,58 @@ test.describe('Component: Table', () => {
 
       const selectedText = await page.evaluate(() => window.getSelection()?.toString() ?? '');
       expect(selectedText.length).toBeGreaterThan(0);
+    });
+
+    test('Should render drag handle column when onRowReorder is provided', async ({ page }) => {
+      await tableStory.goto(page, 'Row Reordering');
+
+      const table = page.getByTestId('row-reorder-table');
+      await expect(table).toBeVisible();
+
+      // The drag handle column renders a GripVertical icon in each row
+      const gripIcons = table
+        .locator('tbody td')
+        .filter({ has: page.locator('svg') })
+        .first();
+      await expect(gripIcons).toBeVisible();
+    });
+
+    test('Should reorder rows via drag and drop', async ({ page }) => {
+      await tableStory.goto(page, 'Row Reordering');
+
+      const table = page.getByTestId('row-reorder-table');
+      await expect(table).toBeVisible();
+
+      // Get row IDs before drag
+      const getRowIds = () =>
+        table
+          .locator('tbody tr[data-row-id]')
+          .evaluateAll(els => els.map(el => el.getAttribute('data-row-id')).filter(Boolean));
+      const before = await getRowIds();
+      expect(before.length).toBeGreaterThan(1);
+
+      // Locate drag handles (first column cells with the grip icon)
+      const firstRow = table.locator(`tbody tr[data-row-id="${before[0]}"]`);
+      const thirdRow = table.locator(`tbody tr[data-row-id="${before[2]}"]`);
+
+      const firstHandle = firstRow.locator('td').first();
+      const thirdHandle = thirdRow.locator('td').first();
+
+      const firstBox = await firstHandle.boundingBox();
+      const thirdBox = await thirdHandle.boundingBox();
+      if (!firstBox || !thirdBox) throw new Error('Drag handle bounding boxes not found');
+
+      // Drag first row to third row's position
+      await page.mouse.move(firstBox.x + firstBox.width / 2, firstBox.y + firstBox.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(thirdBox.x + thirdBox.width / 2, thirdBox.y + thirdBox.height / 2, {
+        steps: 15,
+      });
+      await page.mouse.up();
+
+      const after = await getRowIds();
+      expect(after).not.toEqual(before);
+      expect(after).toHaveLength(before.length);
     });
 
     test('Should append newer rows when scrolled to the bottom', async ({ page }) => {

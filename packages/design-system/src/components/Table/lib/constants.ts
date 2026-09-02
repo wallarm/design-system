@@ -10,6 +10,9 @@ export const TABLE_SELECT_COLUMN_WIDTH = 33;
 export const TABLE_EXPAND_COLUMN_ID = '_expand';
 export const TABLE_EXPAND_COLUMN_WIDTH = 33;
 
+export const TABLE_DRAG_HANDLE_COLUMN_ID = '_dragHandle';
+export const TABLE_DRAG_HANDLE_COLUMN_WIDTH = 33;
+
 export const TABLE_END_REACHED_THRESHOLD = 200;
 export const TABLE_START_REACHED_THRESHOLD = 200;
 

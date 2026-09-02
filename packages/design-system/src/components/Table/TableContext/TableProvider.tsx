@@ -32,10 +32,12 @@ import {
 import { useControlled } from '../../../hooks';
 import { useTableState } from '../hooks';
 import {
+  createDragHandleColumn,
   createExpandColumn,
   createSelectionColumn,
   type DSTableFeatures,
   dsTableFeatures,
+  TABLE_DRAG_HANDLE_COLUMN_ID,
   TABLE_EXPAND_COLUMN_ID,
   TABLE_MIN_COLUMN_WIDTH,
   TABLE_SELECT_COLUMN_ID,
@@ -103,6 +105,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     onStartReached,
     onStartReachedThreshold,
     initialScrollToRowId,
+    onRowReorder,
     onMasterCellClick,
     activeRowId: activeRowIdProp,
     onSettingsOpenChange,
@@ -118,6 +121,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
   const columnDndEnabled = !!onColumnOrderChange;
   const groupingEnabled = !!groupingProp || !!onGroupingChange;
   const subRowGroupingEnabled = !!renderGroupRow && !!getSubRows;
+  const rowDndEnabled = !!onRowReorder && !subRowGroupingEnabled;
   const expandingEnabled = !!renderExpandedRow || !!onExpandedChange || subRowGroupingEnabled;
   const visibilityEnabled = !!onColumnVisibilityChange;
 
@@ -134,6 +138,10 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
 
     if (selectionEnabled) {
       prefix.push(createSelectionColumn<T>());
+    }
+
+    if (rowDndEnabled) {
+      prefix.push(createDragHandleColumn<T>());
     }
 
     // Auto-detect sortType from data values for accessor columns
@@ -168,7 +176,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
         : withAutoMeta;
 
     return [...prefix, ...userCols] as ColumnDef<DSTableFeatures, T, any>[];
-  }, [columns, data, selectionEnabled, expandingEnabled, subRowGroupingEnabled]);
+  }, [columns, data, selectionEnabled, expandingEnabled, subRowGroupingEnabled, rowDndEnabled]);
 
   // Master column ID — first data column (not _selection or _expand)
   const masterColumnId = useMemo<string | null>(() => {
@@ -183,9 +191,10 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     const ids: string[] = [];
     if (expandingEnabled && !subRowGroupingEnabled) ids.push(TABLE_EXPAND_COLUMN_ID);
     if (selectionEnabled) ids.push(TABLE_SELECT_COLUMN_ID);
+    if (rowDndEnabled) ids.push(TABLE_DRAG_HANDLE_COLUMN_ID);
     if (masterColumnId) ids.push(masterColumnId);
     return ids;
-  }, [masterColumnId, expandingEnabled, selectionEnabled, subRowGroupingEnabled]);
+  }, [masterColumnId, expandingEnabled, selectionEnabled, subRowGroupingEnabled, rowDndEnabled]);
 
   // Combined controlled/uncontrolled state + TanStack updater handlers
   const [sorting, handleSortingChange] = useTableState<SortingState>(
@@ -331,6 +340,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       resizingEnabled,
       pinningEnabled,
       columnDndEnabled,
+      rowDndEnabled,
       groupingEnabled,
       expandingEnabled,
       visibilityEnabled,
@@ -356,6 +366,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       onStartReached,
       onStartReachedThreshold,
       initialScrollToRowId,
+      onRowReorder,
       onMasterCellClick,
       activeRowId: masterCellActiveRowId,
       onSettingsOpenChange,
@@ -370,6 +381,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       resizingEnabled,
       pinningEnabled,
       columnDndEnabled,
+      rowDndEnabled,
       groupingEnabled,
       expandingEnabled,
       visibilityEnabled,
@@ -389,6 +401,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       onStartReached,
       onStartReachedThreshold,
       initialScrollToRowId,
+      onRowReorder,
       masterCellActiveRowId,
       onMasterCellClick,
       onSettingsOpenChange,

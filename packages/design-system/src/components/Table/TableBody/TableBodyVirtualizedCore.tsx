@@ -6,6 +6,7 @@ import { TBody, Td, Tr } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableLoadingState } from '../TableLoadingState';
 import { TableRow } from '../TableRow';
+import { TableBodyRowDndContext } from './TableBodyRowDndContext';
 
 export interface TableBodyVirtualizedCoreProps {
   tbodyRef: RefObject<HTMLTableSectionElement | null>;
@@ -29,48 +30,50 @@ export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
   const scrollMargin = virtualizer.options.scrollMargin;
 
   return (
-    <TBody ref={tbodyRef} data-testid={testId}>
-      {/* Above the top spacer — only on screen when scrolled to the very start. */}
-      {isLoadingPrevious && (
-        <TableLoadingState position='start' count={TABLE_PREPEND_SKELETON_ROWS} />
-      )}
-      {virtualRows.length > 0 && (
-        <Tr key='spacer-top'>
-          <Td
-            style={{
-              height: `${(virtualRows[0]?.start ?? 0) - scrollMargin}px`,
-              padding: 0,
-              border: 'none',
-            }}
-            colSpan={colSpan}
-          />
-        </Tr>
-      )}
-      {virtualRows.map(virtualRow => {
-        const row = rows.at(virtualRow.index);
+    <TableBodyRowDndContext>
+      <TBody ref={tbodyRef} data-testid={testId}>
+        {/* Above the top spacer — only on screen when scrolled to the very start. */}
+        {isLoadingPrevious && (
+          <TableLoadingState position='start' count={TABLE_PREPEND_SKELETON_ROWS} />
+        )}
+        {virtualRows.length > 0 && (
+          <Tr key='spacer-top'>
+            <Td
+              style={{
+                height: `${(virtualRows[0]?.start ?? 0) - scrollMargin}px`,
+                padding: 0,
+                border: 'none',
+              }}
+              colSpan={colSpan}
+            />
+          </Tr>
+        )}
+        {virtualRows.map(virtualRow => {
+          const row = rows.at(virtualRow.index);
 
-        if (row) {
-          return (
-            <TableRow key={row.id} row={row} data-index={virtualRow.index} ref={measureElement} />
-          );
-        }
+          if (row) {
+            return (
+              <TableRow key={row.id} row={row} data-index={virtualRow.index} ref={measureElement} />
+            );
+          }
 
-        return null;
-      })}
-      {isLoading && <TableLoadingState />}
-      {virtualRows.length > 0 && (
-        <Tr key='spacer-bottom'>
-          <Td
-            style={{
-              height: `${totalSize - (virtualRows[virtualRows.length - 1]?.end ?? 0)}px`,
-              padding: 0,
-              border: 'none',
-            }}
-            colSpan={colSpan}
-          />
-        </Tr>
-      )}
-    </TBody>
+          return null;
+        })}
+        {isLoading && <TableLoadingState />}
+        {virtualRows.length > 0 && (
+          <Tr key='spacer-bottom'>
+            <Td
+              style={{
+                height: `${totalSize - (virtualRows[virtualRows.length - 1]?.end ?? 0)}px`,
+                padding: 0,
+                border: 'none',
+              }}
+              colSpan={colSpan}
+            />
+          </Tr>
+        )}
+      </TBody>
+    </TableBodyRowDndContext>
   );
 };
 
