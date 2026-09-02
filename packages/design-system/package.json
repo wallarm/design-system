@@ -142,6 +142,7 @@
     "highlight.js": "11.11.1",
     "prism-react-renderer": "2.4.1",
     "prismjs": "1.30.0",
+    "react-resizable-panels": "4.12.3",
     "recharts": "3.10.1",
     "shiki": "4.4.2",
     "tailwind-merge": "3.6.0"
