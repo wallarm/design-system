@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { Row, RowData } from '@tanstack/react-table';
 import { useTestId } from '../../utils/testId';
 import { type DSTableFeatures, TABLE_EXPAND_COLUMN_ID } from './lib';
@@ -6,9 +7,14 @@ import { useTableContext } from './TableContext';
 
 interface TableRowExpandedProps<T extends RowData> {
   row: Row<DSTableFeatures, T>;
+  /** When row DnD is active, pass the same transform style so expanded content moves with its parent row. */
+  dndStyle?: CSSProperties;
 }
 
-export const TableRowExpanded = <T extends RowData>({ row }: TableRowExpandedProps<T>) => {
+export const TableRowExpanded = <T extends RowData>({
+  row,
+  dndStyle,
+}: TableRowExpandedProps<T>) => {
   const { table, renderExpandedRow } = useTableContext<T>();
   const testId = useTestId('row-expanded');
 
@@ -21,7 +27,7 @@ export const TableRowExpanded = <T extends RowData>({ row }: TableRowExpandedPro
   const contentColSpan = hasExpandColumn ? visibleColumns.length - 1 : visibleColumns.length;
 
   return (
-    <Tr data-testid={testId}>
+    <Tr data-testid={testId} style={dndStyle}>
       {hasExpandColumn && (
         <Td className='border-b-0 border-r border-border-primary-light bg-bg-surface-2 sticky left-0' />
       )}

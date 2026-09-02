@@ -1,3 +1,4 @@
+import type { useSortable } from '@dnd-kit/sortable';
 import { type Cell, flexRender, type RowData } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
@@ -21,6 +22,8 @@ interface TableBodyCellProps<T extends RowData> {
   colSpan?: number;
   className?: string;
   disablePinnedShadow?: boolean;
+  dragListeners?: ReturnType<typeof useSortable>['listeners'];
+  dragAttributes?: ReturnType<typeof useSortable>['attributes'];
 }
 
 export const TableBodyCell = <T extends RowData>({
@@ -28,6 +31,8 @@ export const TableBodyCell = <T extends RowData>({
   colSpan,
   className,
   disablePinnedShadow,
+  dragListeners,
+  dragAttributes,
 }: TableBodyCellProps<T>) => {
   const { allLeafColumns, masterColumnId } = useTableContext<T>();
   const testId = useTestId('body-cell');
@@ -86,6 +91,7 @@ export const TableBodyCell = <T extends RowData>({
         getExpandBorderClass(isExpandColumn, cell.row.depth),
         isCut && 'pr-0',
         (isMasterTrigger || tooltipText) && 'cursor-pointer',
+        dragListeners && 'cursor-grab active:cursor-grabbing',
         meta?.cellClassName,
         className,
       )}
@@ -101,6 +107,8 @@ export const TableBodyCell = <T extends RowData>({
         ...(isCut && { overflow: 'hidden' }),
       }}
       colSpan={colSpan}
+      {...dragListeners}
+      {...dragAttributes}
     >
       {renderContent()}
     </Td>

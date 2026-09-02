@@ -1,14 +1,24 @@
-import { memo, type Ref } from 'react';
+import { memo, type Ref, useCallback } from 'react';
 import type { Row, RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { type DSTableFeatures, TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
+import {
+  type DSTableFeatures,
+  TABLE_DRAG_HANDLE_COLUMN_ID,
+  TABLE_EXPAND_COLUMN_ID,
+  TABLE_SELECT_COLUMN_ID,
+  useRowDnd,
+} from './lib';
 import { Td, Tr } from './primitives';
 import { TableBodyCell } from './TableBody/TableBodyCell';
 import { useTableContext } from './TableContext';
 import { TableRowExpanded } from './TableRowExpanded';
 
-const SYSTEM_COLUMN_IDS = new Set([TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID]);
+const SYSTEM_COLUMN_IDS = new Set([
+  TABLE_EXPAND_COLUMN_ID,
+  TABLE_SELECT_COLUMN_ID,
+  TABLE_DRAG_HANDLE_COLUMN_ID,
+]);
 
 interface TableRowProps<T extends RowData> {
   row: Row<DSTableFeatures, T>;
@@ -23,9 +33,20 @@ const TableRowInner = <T extends RowData>({
 }: TableRowProps<T>) => {
   const { expandingEnabled, activeRowId } = useTableContext<T>();
   const testId = useTestId('row');
+  const { canDnd, isDragging, setNodeRef, style: dndStyle, attributes, listeners } = useRowDnd(row);
   const isGroupParent = row.subRows.length > 0;
   const isSelected = isGroupParent ? row.getIsAllSubRowsSelected() : row.getIsSelected();
   const isPreviewActive = activeRowId === row.id;
+
+  // Compose the external ref (virtualizer's measureElement or consumer ref) with dnd-kit's setNodeRef
+  const composedRef = useCallback(
+    (node: HTMLTableRowElement | null) => {
+      if (canDnd) setNodeRef(node);
+      if (typeof ref === 'function') ref(node);
+      else if (ref) (ref as { current: HTMLTableRowElement | null }).current = node;
+    },
+    [canDnd, setNodeRef, ref],
+  );
 
   if (isGroupParent) {
     const cells = row.getVisibleCells();
@@ -36,7 +57,7 @@ const TableRowInner = <T extends RowData>({
     return (
       <>
         <Tr
-          ref={ref}
+          ref={composedRef}
           data-index={dataIndex}
           data-row-id={row.id}
           data-testid={testId}
@@ -71,21 +92,31 @@ const TableRowInner = <T extends RowData>({
   return (
     <>
       <Tr
-        ref={ref}
+        ref={composedRef}
         data-index={dataIndex}
         data-row-id={row.id}
         data-testid={testId}
         className='group/row'
         data-selected={isSelected || undefined}
         data-preview-active={isPreviewActive || undefined}
+        data-dragging={isDragging || undefined}
         aria-selected={isSelected || undefined}
         data-depth={row.depth > 0 ? row.depth : undefined}
+        style={dndStyle}
       >
-        {row.getVisibleCells().map(cell => (
-          <TableBodyCell key={cell.id} cell={cell} />
-        ))}
+        {row.getVisibleCells().map(cell => {
+          const isDragHandle = cell.column.id === TABLE_DRAG_HANDLE_COLUMN_ID;
+          return (
+            <TableBodyCell
+              key={cell.id}
+              cell={cell}
+              dragListeners={isDragHandle ? listeners : undefined}
+              dragAttributes={isDragHandle ? attributes : undefined}
+            />
+          );
+        })}
       </Tr>
-      {expandingEnabled && <TableRowExpanded row={row} />}
+      {expandingEnabled && <TableRowExpanded row={row} dndStyle={dndStyle} />}
     </>
   );
 };

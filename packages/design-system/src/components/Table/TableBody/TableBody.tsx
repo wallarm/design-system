@@ -5,6 +5,7 @@ import { TBody } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableLoadingState } from '../TableLoadingState';
 import { TableRow } from '../TableRow';
+import { TableBodyRowDndContext } from './TableBodyRowDndContext';
 import { TableBodyVirtualizedContainer } from './TableBodyVirtualizedContainer';
 import { TableBodyVirtualizedWindow } from './TableBodyVirtualizedWindow';
 
@@ -29,15 +30,17 @@ export const TableBody: FC = () => {
   virtualizerRef.current = null;
 
   return (
-    <TBody ref={tbodyRef} data-testid={testId}>
-      {isLoadingPrevious && (
-        <TableLoadingState position='start' count={TABLE_PREPEND_SKELETON_ROWS} />
-      )}
-      {rows.map(row => {
-        return <TableRow key={row.id} row={row} />;
-      })}
-      {isLoading && <TableLoadingState />}
-    </TBody>
+    <TableBodyRowDndContext>
+      <TBody ref={tbodyRef} data-testid={testId}>
+        {isLoadingPrevious && (
+          <TableLoadingState position='start' count={TABLE_PREPEND_SKELETON_ROWS} />
+        )}
+        {rows.map(row => {
+          return <TableRow key={row.id} row={row} />;
+        })}
+        {isLoading && <TableLoadingState />}
+      </TBody>
+    </TableBodyRowDndContext>
   );
 };
 

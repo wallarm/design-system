@@ -1,8 +1,12 @@
 import type { FC } from 'react';
-import { TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
+import { TABLE_DRAG_HANDLE_COLUMN_ID, TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
 import { useTableContext } from './TableContext';
 
-const SYSTEM_COLUMN_IDS = new Set([TABLE_SELECT_COLUMN_ID, TABLE_EXPAND_COLUMN_ID]);
+const SYSTEM_COLUMN_IDS = new Set([
+  TABLE_SELECT_COLUMN_ID,
+  TABLE_EXPAND_COLUMN_ID,
+  TABLE_DRAG_HANDLE_COLUMN_ID,
+]);
 
 interface TableColGroupProps {
   tableWidth: number;

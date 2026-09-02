@@ -8,7 +8,12 @@ import type {
 } from '@tanstack/react-table';
 import type { Virtualizer } from '@tanstack/react-virtual';
 import type { DSTableFeatures } from '../lib';
-import type { TableColumnGroup, TableProps, TableVirtualized } from '../types';
+import type {
+  TableColumnGroup,
+  TableProps,
+  TableRowReorderEvent,
+  TableVirtualized,
+} from '../types';
 
 /**
  * Union covers both virtualizer flavors used by the Table (`useVirtualizer`
@@ -32,6 +37,7 @@ export interface TableContextValue<T extends RowData> {
   resizingEnabled: boolean;
   pinningEnabled: boolean;
   columnDndEnabled: boolean;
+  rowDndEnabled: boolean;
   groupingEnabled: boolean;
   expandingEnabled: boolean;
   visibilityEnabled: boolean;
@@ -87,6 +93,9 @@ export interface TableContextValue<T extends RowData> {
   onStartReached?: () => void;
   onStartReachedThreshold?: number;
   initialScrollToRowId?: string;
+
+  // Row reorder callback
+  onRowReorder?: (event: TableRowReorderEvent) => void;
 
   // Master cell click
   onMasterCellClick?: (rowId: string) => void;

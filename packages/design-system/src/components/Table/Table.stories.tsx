@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { arrayMove } from '@dnd-kit/sortable';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Database, Ellipsis, Filter, FilterX, SearchX, Trash2 } from '../../icons';
@@ -92,6 +93,7 @@ import type {
   TableColumnSizingState,
   TableExpandedState,
   TableHandle,
+  TableRowReorderEvent,
   TableRowSelectionState,
   TableSortingState,
   TableVisibilityState,
@@ -1647,6 +1649,90 @@ const StatusBadge: FC<{ value: SecurityEvent['status'] }> = ({ value }) => (
  * reports. Hovering highlights the whole cell, clicking opens it without the content shifting,
  * and Enter or blur commits while Escape reverts.
  */
+/**
+ * Drag-handle column appears when `onRowReorder` is provided. The consumer uses `arrayMove`
+ * (or equivalent) in the callback to reorder its data array.
+ */
+export const RowReordering: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState(() => securityEvents.slice(0, 6));
+
+  const handleRowReorder = useCallback((event: TableRowReorderEvent) => {
+    setData(prev => {
+      const oldIndex = prev.findIndex(row => row.id === event.activeRowId);
+      const newIndex = prev.findIndex(row => row.id === event.overRowId);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  }, []);
+
+  return (
+    <Table
+      data={data}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      onRowReorder={handleRowReorder}
+      data-testid='row-reorder-table'
+    />
+  );
+};
+
+/**
+ * Row reordering coexists with row selection — each feature has its own column and they
+ * don't interfere with each other.
+ */
+export const RowReorderingWithSelection: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState(() => securityEvents.slice(0, 6));
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+
+  const handleRowReorder = useCallback((event: TableRowReorderEvent) => {
+    setData(prev => {
+      const oldIndex = prev.findIndex(row => row.id === event.activeRowId);
+      const newIndex = prev.findIndex(row => row.id === event.overRowId);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  }, []);
+
+  return (
+    <Table
+      data={data}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      onRowReorder={handleRowReorder}
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+    />
+  );
+};
+
+/**
+ * Row drag-and-drop with container virtualization — the `DragOverlay` renders the dragged row
+ * outside the virtualizer so it stays visible even when scrolled out of the virtual window.
+ */
+export const RowReorderingVirtualized: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState(() => createLargeSecurityEvents(100));
+
+  const handleRowReorder = useCallback((event: TableRowReorderEvent) => {
+    setData(prev => {
+      const oldIndex = prev.findIndex(row => row.id === event.activeRowId);
+      const newIndex = prev.findIndex(row => row.id === event.overRowId);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  }, []);
+
+  return (
+    <Table
+      data={data}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      onRowReorder={handleRowReorder}
+      virtualized='container'
+      estimateRowHeight={() => 40}
+    />
+  );
+};
+
 export const InlineCellEditing: StoryFn<typeof meta> = () => {
   const [data, setData] = useState<SecurityEvent[]>(() => securityEvents.slice(0, 6));
   // Category starts unselected for every row, so the select shows its placeholder.
