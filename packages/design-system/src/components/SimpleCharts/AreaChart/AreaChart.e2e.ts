@@ -64,13 +64,18 @@ test.describe('Component: AreaChart', () => {
     test('Should isolate the matching area when a legend row is clicked', async ({ page }) => {
       await areaChartStory.goto(page, 'Filterable');
       const row = page.locator('[data-slot=line-chart-legend-item][data-key="errors"]');
-      await expect(page.locator('[data-slot=area-chart-area]')).toHaveCount(3);
+      // Recharts renders two <path> elements per Area (fill + stroke); use
+      // .recharts-area-area to match only the fill path and avoid double-counting.
+      const areas = page.locator('.recharts-area-area[data-slot=area-chart-area]');
+      await expect(areas).toHaveCount(3);
 
       await row.click();
 
       // Only the clicked series remains visible.
-      await expect(page.locator('[data-slot=area-chart-area]')).toHaveCount(1);
-      await expect(page.locator('[data-slot=area-chart-area][data-key="errors"]')).toHaveCount(1);
+      await expect(areas).toHaveCount(1);
+      await expect(
+        page.locator('.recharts-area-area[data-slot=area-chart-area][data-key="errors"]'),
+      ).toHaveCount(1);
     });
 
     test('Should show hover tooltip when mousing over the plot', async ({ page }) => {
@@ -94,12 +99,16 @@ test.describe('Component: AreaChart', () => {
       const row = page.locator(`[data-slot=line-chart-legend-item][data-key="${targetKey}"]`);
       await row.hover();
 
+      // Use .recharts-area-area to match only the fill path (Recharts renders
+      // two <path> elements per Area — fill + stroke — both receiving data-*).
       const activeArea = page.locator(
-        `[data-slot=area-chart-area][data-key="${targetKey}"][data-active="true"]`,
+        `.recharts-area-area[data-slot=area-chart-area][data-key="${targetKey}"][data-active="true"]`,
       );
       await expect(activeArea).toHaveCount(1);
 
-      const inactiveAreas = page.locator('[data-slot=area-chart-area]:not([data-active="true"])');
+      const inactiveAreas = page.locator(
+        '.recharts-area-area[data-slot=area-chart-area]:not([data-active="true"])',
+      );
       await expect(inactiveAreas).toHaveCount(2);
     });
   });
