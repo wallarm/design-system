@@ -1,4 +1,4 @@
-import { type ReactNode, useEffect, useMemo, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { FilterX, RefreshCcw, ZoomOut } from '../../../icons';
 import { formatFullNumber } from '../../../utils/abbreviateNumber';
@@ -16,7 +16,7 @@ import { MetricHeader } from '../Metric/MetricHeader';
 import { MetricValue } from '../Metric/MetricValue';
 import { LineChart } from './LineChart';
 import { LineChartBody } from './LineChartBody';
-import type { LineChartDatum, LineChartSeries, LineChartZoomRange } from './LineChartContext';
+import type { LineChartSeries, LineChartZoomRange } from './LineChartContext';
 import { LineChartEmpty } from './LineChartEmpty';
 import { LineChartGrid } from './LineChartGrid';
 import { LineChartHoverPopover } from './LineChartHoverPopover';
@@ -700,20 +700,45 @@ export const CrossChartHoverSync: StoryFn<typeof meta> = () => {
 
 const ZoomControlledChart = () => {
   const { formatDate, formatDateWithTimezone } = useChartTimeFormatters();
-  const [range, setRange] = useState<LineChartZoomRange | null>(null);
-  const visibleData = useMemo(() => {
-    if (!range) return dailyData60;
-    return dailyData60.slice(range.fromIndex, range.toIndex + 1);
-  }, [range]);
+  const [visibleData, setVisibleData] = useState(dailyData60);
+  const handleZoom = useCallback((range: LineChartZoomRange | null) => {
+    if (!range) {
+      setVisibleData(dailyData60);
+      return;
+    }
+    setVisibleData(prev => prev.slice(range.fromIndex, range.toIndex + 1));
+  }, []);
+  const isZoomed = visibleData !== dailyData60;
   // Daily data — time is always 00:00 so the zoom popover renders date-only.
   const formatDateOnlyRange = useMemo(() => formatRange(formatDate), [formatDate]);
 
+  const chartRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!isZoomed) return;
+
+    const handleKey = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      const target = event.target;
+      const isAmbient =
+        target === null || target === document.body || target === document.documentElement;
+      const isInChart = target instanceof Node && chartRef.current?.contains(target);
+      if (!isAmbient && !isInChart) return;
+      event.preventDefault();
+      handleZoom(null);
+    };
+
+    window.addEventListener('keydown', handleKey);
+
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [isZoomed, handleZoom]);
+
   return (
-    <Chart>
+    <Chart ref={chartRef}>
       <ChartHeader>
         <ChartTitle>Drag on the plot, then click "Zoom in" — Esc to cancel</ChartTitle>
-        <ChartActions alwaysVisible={range !== null}>
-          {range !== null && (
+        <ChartActions alwaysVisible={isZoomed}>
+          {isZoomed && (
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -721,7 +746,7 @@ const ZoomControlledChart = () => {
                   color='neutral'
                   size='small'
                   aria-label='Reset time selection'
-                  onClick={() => setRange(null)}
+                  onClick={() => handleZoom(null)}
                 >
                   <ZoomOut />
                 </Button>
@@ -731,7 +756,7 @@ const ZoomControlledChart = () => {
           )}
         </ChartActions>
       </ChartHeader>
-      <LineChart data={visibleData} series={multiSeries} xKey='timestamp' onZoomChange={setRange}>
+      <LineChart data={visibleData} series={multiSeries} xKey='timestamp' onZoomChange={handleZoom}>
         <MultiLegend />
         <LineChartBody height={220}>
           <LineChartGrid />

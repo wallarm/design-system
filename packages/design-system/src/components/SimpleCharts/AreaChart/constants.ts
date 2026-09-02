@@ -1,0 +1,16 @@
+export {
+  LINE_ANIMATION_BEGIN as AREA_ANIMATION_BEGIN,
+  LINE_ANIMATION_DURATION as AREA_ANIMATION_DURATION,
+  LINE_CARD_HEIGHT as AREA_CARD_HEIGHT,
+  LINE_DEFAULT_BODY_MARGIN as AREA_DEFAULT_BODY_MARGIN,
+  LINE_HEADER_HEIGHT as AREA_HEADER_HEIGHT,
+  LINE_INACTIVE_OPACITY as AREA_INACTIVE_OPACITY,
+  LINE_STROKE_WIDTH as AREA_STROKE_WIDTH,
+} from '../LineChart/constants';
+export {
+  CHART_PALETTE_FILL as AREA_STROKE_FILL,
+  resolveChartColor as resolveSeriesColor,
+} from '../lib/chartPalette';
+
+/** 20% fill opacity per Figma spec — semi-transparent bands. */
+export const AREA_FILL_OPACITY = 0.2;

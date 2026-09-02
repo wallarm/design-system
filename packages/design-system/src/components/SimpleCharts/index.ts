@@ -1,4 +1,13 @@
 export {
+  AreaChart,
+  AreaChartArea,
+  type AreaChartAreaProps,
+  AreaChartBody,
+  type AreaChartBodyProps,
+  type AreaChartProps,
+  type AreaChartVariant,
+} from './AreaChart';
+export {
   BarList,
   BarListBar,
   type BarListBarProps,
