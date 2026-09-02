@@ -344,6 +344,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       groupingEnabled,
       expandingEnabled,
       visibilityEnabled,
+      hasSubRowGrouping: !!getSubRows,
       virtualized,
       renderExpandedRow: renderExpandedRow as
         | ((row: Row<DSTableFeatures, T>) => ReactNode)
@@ -385,6 +386,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       groupingEnabled,
       expandingEnabled,
       visibilityEnabled,
+      getSubRows,
       virtualized,
       renderExpandedRow,
       estimateRowHeight,

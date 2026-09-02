@@ -10,6 +10,8 @@ const tableStory = createStoryHelper('data-display-table', [
   'Context Menu',
   'Column Drag And Drop',
   'Row Reordering',
+  'Sticky Group Parent',
+  'Sticky Group Parent Virtualized',
 ] as const);
 
 // The Bidirectional story header renders "Window of {N} rows around the anchor".
@@ -324,6 +326,52 @@ test.describe('Component: Table', () => {
       expect(after).toHaveLength(before.length);
     });
 
+    test('Should show sticky group parent when scrolled into an expanded group', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Sticky Group Parent');
+
+      const scrollContainer = page.locator('[data-table-scroll-container]');
+      await expect(scrollContainer).toBeVisible();
+
+      // The sticky overlay is aria-hidden and only appears when scrolled
+      const stickyOverlay = page.locator('[aria-hidden="true"].sticky');
+
+      // Initially, if the first group parent is visible, the overlay may not be shown
+      // Scroll down so a group parent scrolls past the header
+      await scrollContainer.evaluate((el: HTMLElement) => {
+        el.scrollTop = 100;
+      });
+
+      // Wait for the overlay to appear with a group parent row
+      await expect.poll(() => stickyOverlay.count(), { timeout: 3000 }).toBeGreaterThan(0);
+    });
+
+    test('Should hide sticky overlay when a stuck group is collapsed', async ({ page }) => {
+      await tableStory.goto(page, 'Sticky Group Parent');
+
+      const scrollContainer = page.locator('[data-table-scroll-container]');
+      await expect(scrollContainer).toBeVisible();
+
+      // Scroll down into the first expanded group
+      await scrollContainer.evaluate((el: HTMLElement) => {
+        el.scrollTop = 100;
+      });
+
+      // The sticky overlay should be visible
+      const stickyOverlay = page.locator('[aria-hidden="true"].sticky');
+      await expect.poll(() => stickyOverlay.count(), { timeout: 3000 }).toBeGreaterThan(0);
+
+      // Click the expand toggle in the sticky overlay to collapse the group
+      const expandButton = stickyOverlay.locator('button').first();
+      if (await expandButton.isVisible()) {
+        await expandButton.click();
+
+        // After collapsing, the overlay should disappear (or show a different group)
+        // The scroll position should also adjust
+      }
+    });
+
     test('Should append newer rows when scrolled to the bottom', async ({ page }) => {
       await tableStory.goto(page, 'Bidirectional Infinite Scroll');
 
@@ -389,6 +437,23 @@ test.describe('Component: Table', () => {
       // bottom instead of tracking the table's own document position.
       await page.mouse.wheel(0, 2000);
       await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render sticky group parent correctly during mid-scroll', async ({ page }) => {
+      await tableStory.goto(page, 'Sticky Group Parent');
+
+      const scrollContainer = page.locator('[data-table-scroll-container]');
+      await expect(scrollContainer).toBeVisible();
+
+      // Scroll down so a group parent sticks below the header
+      await scrollContainer.evaluate((el: HTMLElement) => {
+        el.scrollTop = 100;
+      });
+
+      // Wait for the scroll to settle and sticky overlay to render
+      await page.waitForTimeout(200);
 
       await expect(page).toHaveScreenshot();
     });

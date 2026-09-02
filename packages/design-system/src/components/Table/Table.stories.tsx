@@ -1819,3 +1819,70 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
     </VStack>
   );
 };
+
+/**
+ * The group parent row sticks below the header while its children scroll — scroll through
+ * a group to see the parent pin in place, then release when the group boundary passes.
+ */
+export const StickyGroupParentStory: StoryFn<typeof meta> = () => {
+  const data = useMemo(() => createLargeGroupedData(4, 20), []);
+  const [expanded, setExpanded] = useState<TableExpandedState>({
+    'group-0': true,
+    'group-1': true,
+    'group-2': true,
+    'group-3': true,
+  });
+  const [sorting, setSorting] = useState<TableSortingState>([{ id: 'lastEdited', desc: true }]);
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+
+  return (
+    <Table<SecurityHeaderEntry>
+      className='h-300'
+      data={data}
+      columns={headerColumns}
+      getRowId={row => row.id}
+      getSubRows={row => row.children}
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+      data-testid='sticky-group-parent-table'
+    />
+  );
+};
+StickyGroupParentStory.storyName = 'Sticky Group Parent';
+
+/**
+ * The same sticky-parent behavior under container virtualization with large grouped data —
+ * the overlay stays in the DOM even when the real parent row is unmounted by the virtualizer.
+ */
+export const StickyGroupParentVirtualized: StoryFn<typeof meta> = () => {
+  const data = useMemo(() => createLargeGroupedData(12, 50), []);
+  const [expanded, setExpanded] = useState<TableExpandedState>({
+    'group-0': true,
+    'group-1': true,
+    'group-2': true,
+  });
+  const [sorting, setSorting] = useState<TableSortingState>([{ id: 'lastEdited', desc: true }]);
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+
+  return (
+    <Table<SecurityHeaderEntry>
+      className='h-500'
+      data={data}
+      columns={headerColumns}
+      getRowId={row => row.id}
+      getSubRows={row => row.children}
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+      virtualized='container'
+      data-testid='sticky-group-parent-virt-table'
+    />
+  );
+};
