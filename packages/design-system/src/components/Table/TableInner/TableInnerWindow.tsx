@@ -3,6 +3,7 @@ import { useTestId } from '../../../utils/testId';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
 import { useInfiniteScroll } from '../hooks';
 import { useContainerWidth } from '../lib';
+import { StickyGroupParent } from '../StickyGroupParent';
 import { TableBody } from '../TableBody';
 import { TableColGroup } from '../TableColGroup';
 import { useTableContext } from '../TableContext';
@@ -28,6 +29,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
     table,
     virtualizerRef,
     tbodyRef,
+    hasSubRowGrouping,
     onEndReached,
     onEndReachedThreshold,
     onStartReached,
@@ -68,6 +70,11 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);
 
+  const hasTextDescription = table
+    .getAllLeafColumns()
+    .some(col => col.columnDef.meta?.description?.type === 'text');
+  const headerHeight = hasTextDescription ? 48 : 32;
+
   const tableStyles = 'table-fixed border-separate border-spacing-0';
 
   return (
@@ -85,6 +92,9 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
               <TableHead />
             </table>
           </div>
+          {hasSubRowGrouping && (
+            <StickyGroupParent tableWidth={tableWidth} headerHeight={headerHeight} />
+          )}
 
           {/* Body */}
           <table className={tableStyles} style={{ width: tableWidth }} aria-label={ariaLabel}>
