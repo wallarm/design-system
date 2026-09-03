@@ -28,6 +28,12 @@ export const SplashScreen: FC<SplashScreenProps> = ({
   const containerPhase = phase as Exclude<PhaseType, 'exited'>;
   const contentPhase = phase as ContentPhase;
 
+  // Keep content mounted during 'shrinking' so the DOM child removal doesn't
+  // interfere with the clip-path CSS transition on the container.
+  const showContent = SPLASH_PHASES[contentPhase] || phase === 'shrinking';
+  const effectiveContentPhase: ContentPhase =
+    phase === 'shrinking' ? 'content-fading' : contentPhase;
+
   return (
     <div
       {...props}
@@ -37,13 +43,16 @@ export const SplashScreen: FC<SplashScreenProps> = ({
       style={getContainerStyle(phase, shrinkTarget)}
       onTransitionEnd={handleContainerTransitionEnd}
     >
-      {SPLASH_PHASES[contentPhase] && (
+      {showContent && (
         <div
-          className={splashContentVariants({ phase: contentPhase })}
+          className={splashContentVariants({ phase: effectiveContentPhase })}
           onTransitionEnd={handleContentTransitionEnd}
         >
-          <Logo className={splashLogoVariants({ phase: contentPhase })} />
-          <Progress value={null} className={splashProgressVariants({ phase: contentPhase })} />
+          <Logo className={splashLogoVariants({ phase: effectiveContentPhase })} />
+          <Progress
+            value={null}
+            className={splashProgressVariants({ phase: effectiveContentPhase })}
+          />
         </div>
       )}
 

@@ -17,9 +17,14 @@ export function getContainerStyle(
   const { width, height, borderRadius = 0 } = shrinkTarget;
 
   switch (phase) {
+    case 'enter-start':
+    case 'entered':
+      return {
+        clipPath: `inset(0 0 round ${borderRadius}px)`,
+      };
     case 'content-fading':
       return {
-        clipPath: 'inset(0 0 round 0px)',
+        clipPath: `inset(0 0 round ${borderRadius}px)`,
         transition: 'clip-path 500ms ease-in-out',
       };
     case 'shrinking':
