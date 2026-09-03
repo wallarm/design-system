@@ -34,6 +34,13 @@ export interface NavConfigDrill {
   type: 'drill';
   id: string;
   label: string;
+  /**
+   * URL segment for this drill (`{path}/:param/...`). Pass `''` for a **pathless drill**:
+   * it consumes no segment of its own, so the dynamic param sits where the path would have
+   * been (`/:param/...`). At most one pathless drill is supported per nav level (including
+   * across transparent groups); a literal sibling path always matches before a pathless
+   * drill claims the segment.
+   */
   path: string;
   /** URL parameter name for the dynamic segment */
   param: string;
@@ -66,6 +73,13 @@ export interface NavStackEntry {
   parentLabel: string | null;
   items: NavConfigNode[];
   activeItemId: string | null;
+  /**
+   * Number of pathname segments consumed to reach this stack level (0 for the root).
+   * A normal drill consumes 2 segments (its path, then the param); a pathless drill
+   * consumes 1 (just the param). Used to rebuild the URL prefix for the current level
+   * without assuming a fixed 2-segments-per-level ratio.
+   */
+  segmentCount: number;
 }
 
 export interface BreadcrumbSegment {

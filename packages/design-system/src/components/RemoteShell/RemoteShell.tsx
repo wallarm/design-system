@@ -74,6 +74,12 @@ export const RemoteShell: FC<RemoteShellProps> = ({
       ? (navStack[effectiveDrillLevel]?.activeItemId ?? activeItemId)
       : activeItemId;
 
+  // Number of pathname segments consumed to reach the effective drill level. Each
+  // traversed drill consumes 2 segments (path + param), except a pathless drill
+  // (`path: ''`), which consumes 1 — so this can't be derived as `effectiveDrillLevel * 2`
+  // once a pathless drill is in the stack; `matchNav` tracks the real count per level.
+  const prefixSegmentCount = navStack[effectiveDrillLevel]?.segmentCount ?? effectiveDrillLevel * 2;
+
   // handlers
   const navigate = useCallback(
     (path: string) => {
@@ -82,10 +88,10 @@ export const RemoteShell: FC<RemoteShellProps> = ({
         .replace(/^\/+|\/+$/g, '')
         .split('/')
         .filter(Boolean);
-      const prefixSegments = segments.slice(0, effectiveDrillLevel * 2);
+      const prefixSegments = segments.slice(0, prefixSegmentCount);
       setPathname(`/${[...prefixSegments, path].join('/')}`);
     },
-    [effectiveDrillLevel, pathname, setPathname],
+    [prefixSegmentCount, pathname, setPathname],
   );
 
   const drillInto = useCallback(
@@ -95,12 +101,18 @@ export const RemoteShell: FC<RemoteShellProps> = ({
         .replace(/^\/+|\/+$/g, '')
         .split('/')
         .filter(Boolean);
-      const prefixSegments = segments.slice(0, effectiveDrillLevel * 2);
+      const prefixSegments = segments.slice(0, prefixSegmentCount);
       const defaultEntity = drill.entities?.[0]?.id ?? 'default';
       const firstChildPath = findFirstLinkPath(drill.children) ?? '';
-      setPathname(`/${[...prefixSegments, drill.path, defaultEntity, firstChildPath].join('/')}`);
+      // A pathless drill (`path: ''`) contributes no segment of its own — skip it so no
+      // empty segment leaks into the URL (which would otherwise render as `//`).
+      const parts =
+        drill.path === ''
+          ? [...prefixSegments, defaultEntity, firstChildPath]
+          : [...prefixSegments, drill.path, defaultEntity, firstChildPath];
+      setPathname(`/${parts.join('/')}`);
     },
-    [effectiveDrillLevel, pathname, setPathname],
+    [prefixSegmentCount, pathname, setPathname],
   );
 
   const goBack = useCallback(() => {
