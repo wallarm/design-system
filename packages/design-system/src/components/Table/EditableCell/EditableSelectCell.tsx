@@ -1,6 +1,7 @@
 import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
 import { useMemo } from 'react';
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
+import { ChevronDown } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { type TestableProps, useTestId } from '../../../utils/testId';
 import {
@@ -13,7 +14,12 @@ import {
   SelectOptionText,
   SelectPositioner,
 } from '../../Select';
-import { editableCellPlaceholder, editableCellValue, editableCellVariants } from './classes';
+import {
+  editableCellIcon,
+  editableCellPlaceholder,
+  editableCellValue,
+  editableCellVariants,
+} from './classes';
 
 type NativeProps = Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange'>;
 
@@ -87,6 +93,12 @@ export const EditableSelectCell: FC<EditableSelectCellProps> = ({
             ) : (
               <span className={editableCellPlaceholder}>{placeholder}</span>
             )}
+            <ChevronDown
+              className={cn(
+                editableCellIcon,
+                'transition-transform group-data-[state=open]/cell:rotate-180',
+              )}
+            />
           </div>
         </ArkUiSelect.Trigger>
       </ArkUiSelect.Control>
