@@ -231,6 +231,15 @@ export interface FieldMetadata {
    */
   loadingOptions?: boolean;
   /**
+   * Replaces the value dropdown's default "No results" text when this field has
+   * no options to show. For a field whose options are fetched per some scope,
+   * an empty list means something more specific than "nothing matched" — e.g.
+   * "No values recorded in this period" for a time-scoped list. Consumer-owned:
+   * set it only while the emptiness is the meaningful kind (a failed fetch
+   * should keep the default).
+   */
+  emptyOptionsLabel?: string;
+  /**
    * Caps the applied value segment at this width in px: a longer value truncates
    * with a trailing ellipsis while the full value is preserved for matching. When
    * set, the chip's default max-width is lifted so it grows to fit the wider value.

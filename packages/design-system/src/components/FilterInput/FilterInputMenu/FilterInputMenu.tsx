@@ -221,6 +221,7 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
               filterText={valueFilterText}
               blurCommitRef={blurCommitRef}
               loading={liveSelectedField?.loadingOptions ?? false}
+              emptyLabel={liveSelectedField?.emptyOptionsLabel}
             />
           )
         ))}

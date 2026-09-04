@@ -41,6 +41,7 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
   blurCommitRef,
   className,
   loading = false,
+  emptyLabel,
 }) => {
   const filteredValues = useMemo(
     () => filterAndSort(values, filterText, valueOptionSearchText),
@@ -130,7 +131,7 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
             ))}
           </DropdownMenuGroup>
         ) : (
-          <MenuEmptyState />
+          <MenuEmptyState label={emptyLabel} />
         )}
         <DropdownMenuFooter className='justify-start'>
           <ValueMenuFooterHints multiSelect={multiSelect} />

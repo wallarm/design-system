@@ -49,6 +49,8 @@ export interface FilterInputValueMenuProps {
   filterText?: string;
   /** Options are still loading — show a loading indicator instead of the list. */
   loading?: boolean;
+  /** Replaces the empty-state's default "No results" text. */
+  emptyLabel?: string;
   /** Menu content ref (shared across menus for focus management). */
   menuRef?: RefObject<HTMLDivElement | null>;
   /** Set here so blur handler can commit multi-select values. */

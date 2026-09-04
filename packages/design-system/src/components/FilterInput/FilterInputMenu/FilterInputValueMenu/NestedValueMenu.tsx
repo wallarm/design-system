@@ -41,6 +41,7 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
   menuRef,
   blurCommitRef,
   className,
+  emptyLabel,
 }) => {
   const submenuRef = useRef<HTMLDivElement | null>(null);
   const rowElsRef = useRef<Map<string, HTMLElement>>(new Map());
@@ -190,7 +191,7 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
               );
             })
           ) : (
-            <MenuEmptyState />
+            <MenuEmptyState label={emptyLabel} />
           )}
           <DropdownMenuFooter className='justify-start'>
             <ValueMenuFooterHints multiSelect={multiSelect} />
