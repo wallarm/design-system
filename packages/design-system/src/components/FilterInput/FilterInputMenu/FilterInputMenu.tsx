@@ -153,7 +153,14 @@ export const FilterInputMenu: FC<FilterInputMenuProps> = ({
   const showOperatorMenu = !!selectedField;
   const showValueMenu = !!selectedField && !!selectedOperator;
   const isDateField = selectedField?.type === 'date';
-  const hasValueOptions = selectedFieldValues.length > 0;
+  // An options-less field is freeform and skips the dropdown entirely — except
+  // when the field has something to say about the emptiness: a fetch still in
+  // flight (the loading indicator) or an `emptyOptionsLabel` explaining why the
+  // list came back empty. Without this the two states render as no menu at all.
+  const hasValueOptions =
+    selectedFieldValues.length > 0 ||
+    !!liveSelectedField?.loadingOptions ||
+    !!liveSelectedField?.emptyOptionsLabel;
 
   return (
     <>
