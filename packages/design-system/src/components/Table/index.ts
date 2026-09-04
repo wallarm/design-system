@@ -76,6 +76,7 @@ export type {
   TableOnChangeFn,
   TableProps,
   TableRow,
+  TableRowReorderEvent,
   TableRowSelectionState,
   TableScrollToRowOptions,
   TableSortingState,

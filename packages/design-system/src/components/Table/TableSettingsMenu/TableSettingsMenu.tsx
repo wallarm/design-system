@@ -39,7 +39,12 @@ import {
 import { Separator } from '../../Separator';
 import { VStack } from '../../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
-import { collectDirectChildren, TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from '../lib';
+import {
+  collectDirectChildren,
+  TABLE_DRAG_HANDLE_COLUMN_ID,
+  TABLE_EXPAND_COLUMN_ID,
+  TABLE_SELECT_COLUMN_ID,
+} from '../lib';
 import { useTableContext } from '../TableContext';
 import { TableSettingsMenuContentProvider } from './TableSettingsMenuContentContext';
 import { useTableSettingsMenuContext } from './TableSettingsMenuContext';
@@ -111,10 +116,15 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
     return () => cancelAnimationFrame(raf);
   }, [menuOpen]);
 
-  // Filter out utility columns (_selection, _expand) — they shouldn't appear in settings
+  // Filter out utility columns (_selection, _expand, _dragHandle) — they shouldn't appear in settings
   const allColumns = table
     .getAllLeafColumns()
-    .filter(col => col.id !== TABLE_SELECT_COLUMN_ID && col.id !== TABLE_EXPAND_COLUMN_ID);
+    .filter(
+      col =>
+        col.id !== TABLE_SELECT_COLUMN_ID &&
+        col.id !== TABLE_EXPAND_COLUMN_ID &&
+        col.id !== TABLE_DRAG_HANDLE_COLUMN_ID,
+    );
 
   const filteredColumns = useMemo(() => {
     if (!search) return allColumns;

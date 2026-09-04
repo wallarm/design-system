@@ -1,5 +1,6 @@
 import type { FC } from 'react';
 import { useCallback, useMemo, useRef, useState } from 'react';
+import { arrayMove } from '@dnd-kit/sortable';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Copy, Database, Ellipsis, Filter, FilterX, SearchX, Trash2 } from '../../icons';
@@ -92,6 +93,7 @@ import type {
   TableColumnSizingState,
   TableExpandedState,
   TableHandle,
+  TableRowReorderEvent,
   TableRowSelectionState,
   TableSortingState,
   TableVisibilityState,
@@ -1647,6 +1649,90 @@ const StatusBadge: FC<{ value: SecurityEvent['status'] }> = ({ value }) => (
  * reports. Hovering highlights the whole cell, clicking opens it without the content shifting,
  * and Enter or blur commits while Escape reverts.
  */
+/**
+ * Drag-handle column appears when `onRowReorder` is provided. The consumer uses `arrayMove`
+ * (or equivalent) in the callback to reorder its data array.
+ */
+export const RowReordering: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState(() => securityEvents.slice(0, 6));
+
+  const handleRowReorder = useCallback((event: TableRowReorderEvent) => {
+    setData(prev => {
+      const oldIndex = prev.findIndex(row => row.id === event.activeRowId);
+      const newIndex = prev.findIndex(row => row.id === event.overRowId);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  }, []);
+
+  return (
+    <Table
+      data={data}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      onRowReorder={handleRowReorder}
+      data-testid='row-reorder-table'
+    />
+  );
+};
+
+/**
+ * Row reordering coexists with row selection — each feature has its own column and they
+ * don't interfere with each other.
+ */
+export const RowReorderingWithSelection: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState(() => securityEvents.slice(0, 6));
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+
+  const handleRowReorder = useCallback((event: TableRowReorderEvent) => {
+    setData(prev => {
+      const oldIndex = prev.findIndex(row => row.id === event.activeRowId);
+      const newIndex = prev.findIndex(row => row.id === event.overRowId);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  }, []);
+
+  return (
+    <Table
+      data={data}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      onRowReorder={handleRowReorder}
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+    />
+  );
+};
+
+/**
+ * Row drag-and-drop with container virtualization — the `DragOverlay` renders the dragged row
+ * outside the virtualizer so it stays visible even when scrolled out of the virtual window.
+ */
+export const RowReorderingVirtualized: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState(() => createLargeSecurityEvents(100));
+
+  const handleRowReorder = useCallback((event: TableRowReorderEvent) => {
+    setData(prev => {
+      const oldIndex = prev.findIndex(row => row.id === event.activeRowId);
+      const newIndex = prev.findIndex(row => row.id === event.overRowId);
+      if (oldIndex === -1 || newIndex === -1) return prev;
+      return arrayMove(prev, oldIndex, newIndex);
+    });
+  }, []);
+
+  return (
+    <Table
+      data={data}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      onRowReorder={handleRowReorder}
+      virtualized='container'
+      estimateRowHeight={() => 40}
+    />
+  );
+};
+
 export const InlineCellEditing: StoryFn<typeof meta> = () => {
   const [data, setData] = useState<SecurityEvent[]>(() => securityEvents.slice(0, 6));
   // Category starts unselected for every row, so the select shows its placeholder.
@@ -1731,5 +1817,72 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
       <span className='sb-annotation'>click a cell to edit it</span>
       <Table data={data} columns={columns} getRowId={row => row.id} />
     </VStack>
+  );
+};
+
+/**
+ * The group parent row sticks below the header while its children scroll — scroll through
+ * a group to see the parent pin in place, then release when the group boundary passes.
+ */
+export const StickyGroupParentStory: StoryFn<typeof meta> = () => {
+  const data = useMemo(() => createLargeGroupedData(4, 20), []);
+  const [expanded, setExpanded] = useState<TableExpandedState>({
+    'group-0': true,
+    'group-1': true,
+    'group-2': true,
+    'group-3': true,
+  });
+  const [sorting, setSorting] = useState<TableSortingState>([{ id: 'lastEdited', desc: true }]);
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+
+  return (
+    <Table<SecurityHeaderEntry>
+      className='h-300'
+      data={data}
+      columns={headerColumns}
+      getRowId={row => row.id}
+      getSubRows={row => row.children}
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+      data-testid='sticky-group-parent-table'
+    />
+  );
+};
+StickyGroupParentStory.storyName = 'Sticky Group Parent';
+
+/**
+ * The same sticky-parent behavior under container virtualization with large grouped data —
+ * the overlay stays in the DOM even when the real parent row is unmounted by the virtualizer.
+ */
+export const StickyGroupParentVirtualized: StoryFn<typeof meta> = () => {
+  const data = useMemo(() => createLargeGroupedData(12, 50), []);
+  const [expanded, setExpanded] = useState<TableExpandedState>({
+    'group-0': true,
+    'group-1': true,
+    'group-2': true,
+  });
+  const [sorting, setSorting] = useState<TableSortingState>([{ id: 'lastEdited', desc: true }]);
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+
+  return (
+    <Table<SecurityHeaderEntry>
+      className='h-500'
+      data={data}
+      columns={headerColumns}
+      getRowId={row => row.id}
+      getSubRows={row => row.children}
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      sorting={sorting}
+      onSortingChange={setSorting}
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+      virtualized='container'
+      data-testid='sticky-group-parent-virt-table'
+    />
   );
 };

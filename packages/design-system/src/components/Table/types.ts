@@ -70,6 +70,12 @@ export interface TableColumnGroup {
   columns: string[];
 }
 
+/** Event fired when a row is dragged to a new position */
+export interface TableRowReorderEvent {
+  activeRowId: string;
+  overRowId: string;
+}
+
 /** State updater — value or functional update */
 export type TableUpdater<T> = T | ((prev: T) => T);
 
@@ -288,6 +294,14 @@ export interface TableProps<T> extends TestableProps {
    * scroll settles. Use for deep-linking into the middle of a dataset.
    */
   initialScrollToRowId?: string;
+
+  // --- Row Reordering (DnD) ---
+  /**
+   * Callback fired when a row is dragged to a new position. When provided,
+   * a drag-handle column is auto-injected and row DnD is enabled.
+   * Disabled when `getSubRows` grouping is active.
+   */
+  onRowReorder?: (event: TableRowReorderEvent) => void;
 
   // --- Master cell click ---
   /** Callback fired when the master cell is clicked. Receives the row ID. */

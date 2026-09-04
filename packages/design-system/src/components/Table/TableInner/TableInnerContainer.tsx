@@ -10,6 +10,7 @@ import {
 import { tableContainerVariants } from '../classes';
 import { useInfiniteScroll } from '../hooks';
 import { useContainerWidth } from '../lib';
+import { StickyGroupParent } from '../StickyGroupParent';
 import { TableBody } from '../TableBody';
 import { TableColGroup } from '../TableColGroup';
 import { useTableContext } from '../TableContext';
@@ -38,6 +39,7 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
     table,
     virtualizerRef,
     tbodyRef,
+    hasSubRowGrouping,
     onEndReached,
     onEndReachedThreshold,
     onStartReached,
@@ -80,6 +82,11 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);
 
+  const hasTextDescription = table
+    .getAllLeafColumns()
+    .some(col => col.columnDef.meta?.description?.type === 'text');
+  const headerHeight = hasTextDescription ? 48 : 32;
+
   return (
     <>
       <ScrollArea
@@ -88,6 +95,9 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
         className={cn('group/scroll', tableContainerVariants({ virtualized }))}
       >
         <ScrollAreaViewport ref={containerRef} data-table-scroll-container tabIndex={-1}>
+          {hasSubRowGrouping && (
+            <StickyGroupParent tableWidth={tableWidth} headerHeight={headerHeight} />
+          )}
           <table
             className='table-fixed border-separate border-spacing-0 overflow-clip'
             style={{ width: tableWidth }}
