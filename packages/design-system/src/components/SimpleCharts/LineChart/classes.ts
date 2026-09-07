@@ -7,9 +7,19 @@ export const lineChartRootClasses = ['relative w-full flex flex-col min-h-0'].jo
 // `[&_*]:outline-none` suppresses the browser focus outline that recharts'
 // SVG path/active-dot pick up on click; the body is `aria-hidden` and never
 // in the tab order.
-export const lineChartBodyClasses = ['relative flex-1 min-h-0 min-w-0', '[&_*]:outline-none'].join(
-  ' ',
-);
+// The `[&_.recharts-*]` rules apply a CSS fade-in so charts appear from zero
+// opacity instead of recharts' default left-to-right draw. The keyframe
+// `ds-chart-fade-in` is defined in `theme/components/chart.css`.
+// `motion-reduce:` overrides suppress the animation when the user prefers
+// reduced motion.
+export const lineChartBodyClasses = [
+  'relative flex-1 min-h-0 min-w-0',
+  '[&_*]:outline-none',
+  '[&_.recharts-line]:animate-[ds-chart-fade-in_400ms_ease-out]',
+  '[&_.recharts-area]:animate-[ds-chart-fade-in_400ms_ease-out]',
+  'motion-reduce:[&_.recharts-line]:animate-none',
+  'motion-reduce:[&_.recharts-area]:animate-none',
+].join(' ');
 
 // `recharts-wrapper` carries an inline `cursor: default`; Tailwind's `!`
 // modifier wins the inline-style cascade so the crosshair reaches the wrapper
@@ -81,12 +91,18 @@ export const lineChartLegendItemVariants = cva(
         true: 'opacity-60',
         false: '',
       },
+      filtering: {
+        true: '',
+        false: '',
+      },
     },
+    compoundVariants: [{ filtering: true, selected: true, class: 'bg-states-primary-active' }],
     defaultVariants: {
       interactive: false,
       active: false,
       selected: true,
       dimmed: false,
+      filtering: false,
     },
   },
 );

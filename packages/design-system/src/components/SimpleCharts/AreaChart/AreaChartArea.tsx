@@ -4,8 +4,6 @@ import { LineChartActiveContext, LineChartDataContext } from '../LineChart/LineC
 import { warnLineChartLine } from '../LineChart/lib/warn';
 import { AreaChartVariantContext } from './AreaChartContext';
 import {
-  AREA_ANIMATION_BEGIN,
-  AREA_ANIMATION_DURATION,
   AREA_FILL_OPACITY,
   AREA_INACTIVE_OPACITY,
   AREA_STROKE_FILL,
@@ -74,10 +72,7 @@ export const AreaChartArea: FC<AreaChartAreaProps> = ({
       opacity={opacity}
       connectNulls={connectNulls}
       stackId={variant === 'stacked' ? 'area-stack' : undefined}
-      isAnimationActive={disableAnimation ? false : 'auto'}
-      animationBegin={AREA_ANIMATION_BEGIN}
-      animationDuration={AREA_ANIMATION_DURATION}
-      animationEasing='ease-out'
+      isAnimationActive={false}
       data-slot='area-chart-area'
       data-key={seriesKey}
       data-active={isActive ? 'true' : undefined}
