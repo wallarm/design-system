@@ -58,6 +58,7 @@ export const LineChartLegendItem: FC<LineChartLegendItemProps> = ({
   const active = activeKey === seriesKey;
   const selected = selectedProp ?? !hiddenSet.has(seriesKey);
   const dimmed = !selected && !active && hiddenSet.size > 0;
+  const filtering = hiddenSet.size > 0;
 
   const color = series?.color;
   const label = series?.label;
@@ -139,7 +140,7 @@ export const LineChartLegendItem: FC<LineChartLegendItemProps> = ({
         onFocus={handleFocus}
         onBlur={handleBlur}
         className={cn(
-          lineChartLegendItemVariants({ interactive, active, selected, dimmed }),
+          lineChartLegendItemVariants({ interactive, active, selected, dimmed, filtering }),
           className,
         )}
       >
