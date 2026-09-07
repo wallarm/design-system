@@ -35,7 +35,7 @@ const DESCRIPTION =
   'Content is consumer-assembled: the component is a composable shell, not a hard-wired feature.';
 
 const meta = {
-  title: 'Overlay/SearchModal',
+  title: 'Navigation/SearchModal',
   component: SearchModal,
   subcomponents: {
     SearchModalTrigger,
@@ -77,71 +77,71 @@ const RECENT_ITEMS: (NavItem & { date: string })[] = [
   {
     id: 'recent-1',
     label: 'Attack Rechecker \u2014 Scanner',
-    icon: <History className='text-text-tertiary !icon-md' />,
+    icon: <History className='text-text-primary !icon-md' />,
     date: '2m ago',
   },
   {
     id: 'recent-2',
     label: 'API Discovery \u2014 API Security',
-    icon: <History className='text-text-tertiary !icon-md' />,
+    icon: <History className='text-text-primary !icon-md' />,
     date: '15m ago',
   },
   {
     id: 'recent-3',
     label: 'Rules \u2014 Cloud WAF',
-    icon: <History className='text-text-tertiary !icon-md' />,
+    icon: <History className='text-text-primary !icon-md' />,
     date: '1h ago',
   },
   {
     id: 'recent-4',
     label: 'Dashboards \u2014 Platform',
-    icon: <History className='text-text-tertiary !icon-md' />,
+    icon: <History className='text-text-primary !icon-md' />,
     date: '3h ago',
   },
   {
     id: 'recent-5',
     label: 'Integrations \u2014 Settings',
-    icon: <History className='text-text-tertiary !icon-md' />,
+    icon: <History className='text-text-primary !icon-md' />,
     date: 'Yesterday',
   },
 ];
 
 const JUMP_TO_ITEMS: NavItem[] = [
-  { id: 'nav-scanner', label: 'Scanner', icon: <Search className='text-text-tertiary !icon-md' /> },
+  { id: 'nav-scanner', label: 'Scanner', icon: <Search className='text-text-primary !icon-md' /> },
   {
     id: 'nav-api-security',
     label: 'API Security',
-    icon: <Shield className='text-text-tertiary !icon-md' />,
+    icon: <Shield className='text-text-primary !icon-md' />,
   },
   {
     id: 'nav-cloud-waf',
     label: 'Cloud WAF',
-    icon: <Globe className='text-text-tertiary !icon-md' />,
+    icon: <Globe className='text-text-primary !icon-md' />,
   },
   {
     id: 'nav-dashboards',
     label: 'Dashboards',
-    icon: <Layers className='text-text-tertiary !icon-md' />,
+    icon: <Layers className='text-text-primary !icon-md' />,
   },
   {
     id: 'nav-settings',
     label: 'Settings',
-    icon: <Settings className='text-text-tertiary !icon-md' />,
+    icon: <Settings className='text-text-primary !icon-md' />,
   },
   {
     id: 'nav-connectors',
     label: 'Connectors',
-    icon: <Zap className='text-text-tertiary !icon-md' />,
+    icon: <Zap className='text-text-primary !icon-md' />,
   },
   {
     id: 'nav-audit-log',
     label: 'Audit Log',
-    icon: <Clock className='text-text-tertiary !icon-md' />,
+    icon: <Clock className='text-text-primary !icon-md' />,
   },
   {
     id: 'nav-users',
     label: 'Users & Roles',
-    icon: <Users className='text-text-tertiary !icon-md' />,
+    icon: <Users className='text-text-primary !icon-md' />,
   },
 ];
 
@@ -149,31 +149,31 @@ const CREATE_ITEMS: NavItem[] = [
   {
     id: 'create-rule',
     label: 'Rule',
-    icon: <Shield className='text-text-tertiary !icon-md' />,
+    icon: <Shield className='text-text-primary !icon-md' />,
     section: 'Cloud WAF',
   },
   {
     id: 'create-trigger',
     label: 'Trigger',
-    icon: <Zap className='text-text-tertiary !icon-md' />,
+    icon: <Zap className='text-text-primary !icon-md' />,
     section: 'Cloud WAF',
   },
   {
     id: 'create-app',
     label: 'Application',
-    icon: <Globe className='text-text-tertiary !icon-md' />,
+    icon: <Globe className='text-text-primary !icon-md' />,
     section: 'Scanner',
   },
   {
     id: 'create-scope',
     label: 'Scan scope',
-    icon: <Compass className='text-text-tertiary !icon-md' />,
+    icon: <Compass className='text-text-primary !icon-md' />,
     section: 'Scanner',
   },
   {
     id: 'create-connector',
     label: 'Connector',
-    icon: <Zap className='text-text-tertiary !icon-md' />,
+    icon: <Zap className='text-text-primary !icon-md' />,
     section: 'Integrations',
   },
 ];
@@ -230,7 +230,7 @@ export const Basic: StoryFn<SearchModalProps> = () => {
               </Text>
             </SearchModalGroupLabel>
             <SearchModalItem onSelect={noop}>
-              <WallyIcon size='sm' />
+              <WallyIcon variant='circle' size='sm' />
               <Text size='sm'>{query ? `Ask Wally "${query}"` : 'Ask Wally'}</Text>
             </SearchModalItem>
             {!query && (
@@ -287,7 +287,7 @@ export const Basic: StoryFn<SearchModalProps> = () => {
 
           {query && !hasResults && (
             <SearchModalGroup>
-              <SearchModalEmpty className='px-16 py-8'>
+              <SearchModalEmpty>
                 <Text size='sm' color='secondary'>
                   No results
                 </Text>
@@ -324,7 +324,7 @@ export const EmptyRecents: StoryFn<SearchModalProps> = () => {
               </Text>
             </SearchModalGroupLabel>
             <SearchModalItem onSelect={noop}>
-              <WallyIcon size='sm' />
+              <WallyIcon variant='circle' size='sm' />
               <Text size='sm'>{query ? `Ask Wally "${query}"` : 'Ask Wally'}</Text>
             </SearchModalItem>
             {!query && (
@@ -348,7 +348,7 @@ export const EmptyRecents: StoryFn<SearchModalProps> = () => {
                   Recent
                 </Text>
               </SearchModalGroupLabel>
-              <SearchModalEmpty className='px-16 py-8'>
+              <SearchModalEmpty>
                 <Text size='sm' color='secondary'>
                   Nothing recent yet
                 </Text>
@@ -375,7 +375,7 @@ export const EmptyRecents: StoryFn<SearchModalProps> = () => {
 
           {query && filteredJumpTo.length === 0 && (
             <SearchModalGroup>
-              <SearchModalEmpty className='px-16 py-8'>
+              <SearchModalEmpty>
                 <Text size='sm' color='secondary'>
                   No results
                 </Text>
@@ -434,7 +434,7 @@ export const SubList: StoryFn<SearchModalProps> = () => {
             ))
           ) : (
             <SearchModalGroup>
-              <SearchModalEmpty className='px-16 py-8'>
+              <SearchModalEmpty>
                 <Text size='sm' color='secondary'>
                   No results
                 </Text>
@@ -495,7 +495,7 @@ export const ItemsAsLinks: StoryFn<SearchModalProps> = () => {
             </SearchModalGroup>
           ) : (
             <SearchModalGroup>
-              <SearchModalEmpty className='px-16 py-8'>
+              <SearchModalEmpty>
                 <Text size='sm' color='secondary'>
                   No results
                 </Text>
@@ -520,7 +520,7 @@ export const DisabledItems: StoryFn<SearchModalProps> = () => {
     () =>
       filterItems(
         [
-          { id: 'ask-wally', label: 'Ask Wally', icon: <WallyIcon size='sm' /> },
+          { id: 'ask-wally', label: 'Ask Wally', icon: <WallyIcon variant='circle' size='sm' /> },
           { id: 'switch-tenant', label: 'Switch tenant', icon: <Users className='!icon-md' /> },
           { id: 'create', label: 'Create\u2026', icon: <Plus className='!icon-md' /> },
         ],
@@ -562,7 +562,7 @@ export const DisabledItems: StoryFn<SearchModalProps> = () => {
             </SearchModalGroup>
           ) : (
             <SearchModalGroup>
-              <SearchModalEmpty className='px-16 py-8'>
+              <SearchModalEmpty>
                 <Text size='sm' color='secondary'>
                   No results
                 </Text>
@@ -626,7 +626,7 @@ export const CloseOnSelectFalse: StoryFn<SearchModalProps> = () => {
             </SearchModalGroup>
           ) : (
             <SearchModalGroup>
-              <SearchModalEmpty className='px-16 py-8'>
+              <SearchModalEmpty>
                 <Text size='sm' color='secondary'>
                   No results
                 </Text>
@@ -675,7 +675,7 @@ export const Controlled: StoryFn<SearchModalProps> = () => {
               </SearchModalGroup>
             ) : (
               <SearchModalGroup>
-                <SearchModalEmpty className='px-16 py-8'>
+                <SearchModalEmpty>
                   <Text size='sm' color='secondary'>
                     No results
                   </Text>
@@ -703,7 +703,7 @@ export const Scrollable: StoryFn<SearchModalProps> = () => {
       Array.from({ length: 30 }, (_, i) => ({
         id: `item-${i}`,
         label: `Feature ${i + 1}`,
-        icon: <Compass className='text-text-tertiary !icon-md' />,
+        icon: <Compass className='text-text-primary !icon-md' />,
       })),
     [],
   );
@@ -732,7 +732,7 @@ export const Scrollable: StoryFn<SearchModalProps> = () => {
             </SearchModalGroup>
           ) : (
             <SearchModalGroup>
-              <SearchModalEmpty className='px-16 py-8'>
+              <SearchModalEmpty>
                 <Text size='sm' color='secondary'>
                   No results
                 </Text>
