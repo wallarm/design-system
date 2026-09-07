@@ -8,6 +8,7 @@ import {
 } from 'react';
 import { useCopyTooltip } from '../../hooks';
 import { Check, Copy } from '../../icons';
+import { cn } from '../../utils/cn';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { Button, type ButtonProps } from '../Button';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
@@ -37,6 +38,7 @@ export const CopyButton: FC<CopyButtonProps> = ({
   color = 'neutral',
   size,
   style,
+  className,
   ref,
   ...props
 }) => {
@@ -69,6 +71,7 @@ export const CopyButton: FC<CopyButtonProps> = ({
           color={color}
           size={resolvedSize}
           aria-label={label ?? 'Copy'}
+          className={cn(label ? 'justify-start px-12' : 'px-3', className)}
           data-slot='copy-button'
           {...props}
           onClick={handleClick}

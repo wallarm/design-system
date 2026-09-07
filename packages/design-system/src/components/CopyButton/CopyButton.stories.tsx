@@ -15,7 +15,7 @@ import { Toaster, useToast } from '../Toast';
 import { CopyButton } from './CopyButton';
 
 const DESCRIPTION =
-  'A button that copies text to the clipboard and shows inline visual feedback — the icon swaps from Copy to Check and the tooltip confirms the action. Use it anywhere a user needs a one-click copy affordance.';
+  'An animated button component that allows users to copy text to their clipboard with visual feedback. Provides instant feedback with state change animation.';
 
 const SAMPLE_TEXT = 'Hello, clipboard!';
 const SAMPLE_CODE = 'npx wasd-new@latest add code-snippet';
@@ -134,7 +134,7 @@ export const WithToast: StoryFn<typeof meta> = () => {
   const toast = useToast();
 
   const handleCopy = () => {
-    toast.create({ title: 'Copied', type: 'success', variant: 'simple' });
+    toast.create({ title: 'Copied', type: 'default', variant: 'simple' });
   };
 
   return (
