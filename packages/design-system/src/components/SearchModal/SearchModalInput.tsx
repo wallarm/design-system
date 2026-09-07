@@ -22,7 +22,7 @@ export const SearchModalInput: FC<SearchModalInputProps> = ({
   ...props
 }) => {
   const testId = useTestId('input');
-  const { query, setQuery, inputRef } = useSearchModalContext();
+  const { query, setQuery, inputRef, close } = useSearchModalContext();
 
   return (
     <div data-slot='search-modal-input' data-testid={testId} className={searchModalInputVariants()}>
@@ -31,7 +31,7 @@ export const SearchModalInput: FC<SearchModalInputProps> = ({
           <Loader size='sm' />
         </span>
       ) : (
-        <Search className='text-text-tertiary shrink-0 !icon-md' />
+        <Search className='text-text-secondary shrink-0 !icon-md' />
       )}
       <input
         {...props}
@@ -40,12 +40,20 @@ export const SearchModalInput: FC<SearchModalInputProps> = ({
         onChange={e => setQuery(e.target.value)}
         className={cn(
           'flex-1 h-48 bg-transparent text-text-primary text-base',
-          'placeholder:text-text-tertiary outline-none',
+          'placeholder:text-text-hint outline-none',
           className,
         )}
         autoComplete='off'
       />
-      <Kbd size='xsmall'>ESC</Kbd>
+      <button
+        type='button'
+        tabIndex={-1}
+        onClick={close}
+        className='shrink-0 cursor-pointer'
+        aria-label='Close'
+      >
+        <Kbd size='xsmall'>ESC</Kbd>
+      </button>
     </div>
   );
 };

@@ -17,6 +17,7 @@ import {
   SearchModalTrigger,
 } from '../../SearchModal';
 import { Text } from '../../Text';
+import { WallyIcon } from '../../WallyIcon';
 
 const recentItems = [
   { page: 'Attacks', product: 'Cloud WAF', date: '2 hours ago', href: '/attacks' },
@@ -105,7 +106,7 @@ export const StorySearchModal = () => {
               </Text>
             </SearchModalGroupLabel>
             <SearchModalItem onSelect={() => {}}>
-              <span className='text-lg'>🐶</span>
+              <WallyIcon variant='circle' size='sm' />
               <Text size='sm'>Ask Wally</Text>
             </SearchModalItem>
 
@@ -133,7 +134,7 @@ export const StorySearchModal = () => {
               </SearchModalGroupLabel>
               {filteredRecent.map(item => (
                 <SearchModalItem key={`${item.page}-${item.product}`} onSelect={() => {}}>
-                  <LoaderCircle className='text-text-tertiary shrink-0 !icon-md' />
+                  <LoaderCircle className='text-text-primary shrink-0 !icon-md' />
                   <Text size='sm' grow truncate>
                     {item.page}
                     <Text size='sm' color='secondary' inline>
@@ -160,7 +161,7 @@ export const StorySearchModal = () => {
               </SearchModalGroupLabel>
               {filteredJumpTo.map(item => (
                 <SearchModalItem key={item.href} onSelect={() => {}}>
-                  <LoaderCircle className='text-text-tertiary shrink-0 !icon-md' />
+                  <LoaderCircle className='text-text-primary shrink-0 !icon-md' />
                   <Text size='sm'>{item.name}</Text>
                 </SearchModalItem>
               ))}
