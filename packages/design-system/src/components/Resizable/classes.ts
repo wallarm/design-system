@@ -37,14 +37,12 @@ export const resizableHandleVariants = cva(
           'cursor-col-resize',
           'before:w-3 before:inset-y-0',
           'after:inset-y-0 after:-inset-x-6',
-          '[&>[data-slot=resizable-handle-grip]]:rotate-0',
         ),
         vertical: cn(
           'h-px',
           'cursor-row-resize',
           'before:h-3 before:inset-x-0',
           'after:inset-x-0 after:-inset-y-6',
-          '[&>[data-slot=resizable-handle-grip]]:rotate-90',
         ),
       },
     },
@@ -52,16 +50,4 @@ export const resizableHandleVariants = cva(
       orientation: 'horizontal',
     },
   },
-);
-
-export const resizableHandleGripVariants = cva(
-  cn(
-    'z-20',
-    'flex items-center justify-center',
-    'size-12',
-    'rounded-4',
-    'border border-border-primary',
-    'bg-bg-surface-2',
-    'text-text-secondary',
-  ),
 );
