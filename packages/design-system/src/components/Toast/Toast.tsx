@@ -22,7 +22,7 @@ const toastVariants = cva(
       },
     },
     defaultVariants: {
-      variant: 'extended',
+      variant: 'simple',
     },
   },
 );
@@ -70,8 +70,31 @@ export interface ToastProps {
   toast: ToastData;
 }
 
+/**
+ * Which layout a toast ends up in.
+ *
+ * `simple` is a single row and renders the title ALONE, so a `description`
+ * handed to it would be dropped without a trace — and the description is
+ * usually the actionable half (an error's reason, what happens next). Losing
+ * the caller's text is never the better reading of the pair, so a description
+ * decides the layout whenever there is one; `variant` decides it otherwise.
+ *
+ * Shared with the toaster, which sizes the auto-dismiss timer off the same
+ * answer: text nobody has time to read is the other way to lose it.
+ */
+// The arguments are `unknown` on purpose: `ToastData` carries an index
+// signature for Ark's own extra properties, and `Omit<ToastData, 'id'>` widens
+// every field back to it under the declaration-file compiler — so a caller
+// passing `options.variant` cannot promise the literal type. Normalising here
+// costs one comparison and keeps both call sites free of casts.
+export const resolveToastVariant = (
+  variant: unknown,
+  description: unknown,
+): NonNullable<ToastData['variant']> =>
+  description || variant === 'extended' ? 'extended' : 'simple';
+
 export const Toast = ({ toast }: ToastProps) => {
-  const toastVariant = toast.variant || 'simple';
+  const toastVariant = resolveToastVariant(toast.variant, toast.description);
   const isSimple = toastVariant === 'simple';
   const closable = toast.closable !== false;
 

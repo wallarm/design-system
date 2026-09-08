@@ -6,7 +6,7 @@ import {
   createToaster,
 } from '@ark-ui/react/toast';
 import { cn } from '../../utils/cn';
-import { Toast, type ToastData } from './Toast';
+import { resolveToastVariant, Toast, type ToastData } from './Toast';
 
 export interface ToastCreateOptions extends Omit<ToastData, 'id'> {
   duration?: number;
@@ -62,7 +62,9 @@ export const toaster: TypedToaster = {
       ...options,
       duration:
         options.duration ??
-        (options.variant === 'extended' ? EXTENDED_TOAST_DURATION_MS : SIMPLE_TOAST_DURATION_MS),
+        (resolveToastVariant(options.variant, options.description) === 'extended'
+          ? EXTENDED_TOAST_DURATION_MS
+          : SIMPLE_TOAST_DURATION_MS),
       priority:
         options.priority ??
         (options.type === 'default'
