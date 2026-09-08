@@ -19,8 +19,7 @@ export const useToast = (): UseToastReturn => {
   return useMemo(
     () => ({
       create: (options: CreateToastOptions) => toaster.create(options),
-      update: ({ id, ...options }: UpdateToastOptions) =>
-        toaster.update(id, options as unknown as Parameters<typeof toaster.update>[1]),
+      update: ({ id, ...options }: UpdateToastOptions) => toaster.update(id, options),
       dismiss: (options: DismissToastOptions = {}) => toaster.dismiss(options.id),
     }),
     [],

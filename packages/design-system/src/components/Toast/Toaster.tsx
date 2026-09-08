@@ -12,10 +12,13 @@ import {
   SIMPLE_TOAST_DURATION_MS,
   Toast,
   type ToastData,
+  type ToastFields,
 } from './Toast';
 
-export interface ToastCreateOptions extends Omit<ToastData, 'id'> {
-  duration?: number;
+// Built from `ToastFields`, not `ToastData`: over the latter's index signature
+// an `Omit` keeps nothing, so this interface checked no option name and gave
+// every field back as `unknown`.
+export interface ToastCreateOptions extends Omit<ToastFields, 'id'> {
   priority?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 }
 

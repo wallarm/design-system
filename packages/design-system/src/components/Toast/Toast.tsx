@@ -53,7 +53,16 @@ const toastIconMap: Record<
 export const SIMPLE_TOAST_DURATION_MS = 5000;
 export const EXTENDED_TOAST_DURATION_MS = 10000;
 
-export interface ToastData {
+/**
+ * The fields a toast is actually made of.
+ *
+ * Kept apart from `ToastData` so they survive an `Omit`: an index signature
+ * swallows every named field it is declared beside, which left
+ * `ToastCreateOptions` — `Omit<ToastData, 'id'>` — checking nothing at all
+ * (`toaster.create({ titl: 'x' })` compiled) and widening each field back to
+ * `unknown` under the declaration compiler, invisibly to `tsc --noEmit`.
+ */
+export interface ToastFields {
   id: string;
   title?: string;
   description?: string;
@@ -64,7 +73,13 @@ export interface ToastData {
   variant?: 'extended' | 'simple';
   closable?: boolean;
   duration?: number;
-  [key: string]: unknown; // Allow additional properties from Ark UI
+}
+
+// What the renderer receives: the fields above plus whatever Ark UI hands
+// along with them. The escape hatch belongs on this side only — the toaster's
+// own options are a closed set.
+export interface ToastData extends ToastFields {
+  [key: string]: unknown;
 }
 
 export interface ToastProps {
@@ -195,16 +210,10 @@ Toast.displayName = 'Toast';
 // Shared with the toaster, which sizes the auto-dismiss timer off the same
 // answer: text nobody has time to read is the other way to lose it.
 //
-// The arguments are `unknown` on purpose: `ToastData` carries an index
-// signature for Ark's own extra properties, and `Omit<ToastData, 'id'>` widens
-// every field back to it under the declaration-file compiler — so a caller
-// passing `options.variant` cannot promise the literal type. Normalising here
-// costs one comparison and keeps both call sites free of casts.
-//
 // Kept as line comments deliberately: scripts/metadata publishes the first
 // JSDoc block in the file as the COMPONENT's description.
 export const resolveToastVariant = (
-  variant: unknown,
-  description: unknown,
-): NonNullable<ToastData['variant']> =>
+  variant: ToastFields['variant'],
+  description: ToastFields['description'],
+): NonNullable<ToastFields['variant']> =>
   description || variant === 'extended' ? 'extended' : 'simple';
