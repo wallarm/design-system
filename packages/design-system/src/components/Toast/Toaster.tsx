@@ -12,19 +12,26 @@ import {
   SIMPLE_TOAST_DURATION_MS,
   Toast,
   type ToastData,
-  type ToastFields,
+  type ToastOptions,
 } from './Toast';
 
-// Built from `ToastFields`, not `ToastData`: over the latter's index signature
-// an `Omit` keeps nothing, so this interface checked no option name and gave
-// every field back as `unknown`.
-export interface ToastCreateOptions extends Omit<ToastFields, 'id'> {
+export interface ToastCreateOptions extends ToastOptions {
+  /**
+   * Stable id for this toast. Creating with an id that is already showing
+   * updates that toast instead of stacking a duplicate, which is how a caller
+   * keeps a repeated action (copy to clipboard, say) to one visible toast.
+   * Omit it and the toaster assigns one.
+   */
+  id?: string;
   priority?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 }
 
 export interface TypedToaster extends Omit<CreateToasterReturn, 'create' | 'update'> {
   create: (options: ToastCreateOptions) => string;
-  update: (id: string, options: Partial<ToastCreateOptions>) => string;
+  // `id` is omitted from the payload deliberately: zag's update is
+  // `create({ id, ...data })`, so an `id` inside the options would override the
+  // positional one — retargeting the update, or spawning a stray toast.
+  update: (id: string, options: Omit<Partial<ToastCreateOptions>, 'id'>) => string;
   __arkToaster: CreateToasterReturn;
 }
 
