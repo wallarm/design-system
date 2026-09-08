@@ -158,7 +158,7 @@ const SelectionCell = <T extends RowData>({
 const SelectAllHeaderCell = <T extends RowData>(
   _props: HeaderContext<DSTableFeatures, T, unknown>,
 ) => {
-  const { table } = useTableContext<T>();
+  const { table, selectAllRowsEnabled, onSelectAllRows } = useTableContext<T>();
 
   const checked = table.getIsAllRowsSelected();
   const { selectableCount, selectedCount } = table.getFilteredRowModel().flatRows.reduce(
@@ -172,10 +172,21 @@ const SelectAllHeaderCell = <T extends RowData>(
   );
   const indeterminate = !checked && selectedCount > 0;
 
+  // The column keeps its width so the header does not shift against the rows,
+  // which still carry their own checkboxes.
+  if (!selectAllRowsEnabled) return null;
+
+  const handleCheckedChange = () => {
+    table.toggleAllRowsSelected(!checked);
+    // After the toggle, so a consumer reading selection state in the callback
+    // sees the state the gesture produced rather than the one it replaced.
+    onSelectAllRows?.(!checked);
+  };
+
   return (
     <Checkbox
       checked={indeterminate ? 'indeterminate' : checked}
-      onCheckedChange={() => table.toggleAllRowsSelected(!checked)}
+      onCheckedChange={handleCheckedChange}
       disabled={selectableCount === 0}
     >
       <CheckboxIndicator />

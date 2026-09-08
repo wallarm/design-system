@@ -79,6 +79,8 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     manualSorting = false,
     rowSelection: rowSelectionProp,
     onRowSelectionChange,
+    enableSelectAllRows = true,
+    onSelectAllRows,
     columnSizing: columnSizingProp,
     onColumnSizingChange,
     columnPinning: columnPinningProp,
@@ -359,6 +361,8 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       alwaysPinnedLeft,
       masterColumnId,
       lastSelectedRowIndexRef,
+      selectAllRowsEnabled: enableSelectAllRows,
+      onSelectAllRows,
       containerRef,
       tbodyRef,
       virtualizerRef,
@@ -407,6 +411,8 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       masterCellActiveRowId,
       onMasterCellClick,
       onSettingsOpenChange,
+      enableSelectAllRows,
+      onSelectAllRows,
     ],
   );
 

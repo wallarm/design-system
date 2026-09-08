@@ -227,6 +227,28 @@ export interface TableProps<T> extends TestableProps {
   // --- Row Selection ---
   rowSelection?: TableRowSelectionState;
   onRowSelectionChange?: TableOnChangeFn<TableRowSelectionState>;
+  /**
+   * Renders the master checkbox in the selection column header.
+   *
+   * Set `false` when "all rows" is not a selection the consumer can act on —
+   * a listing whose scope the consumer cannot express, for instance — leaving
+   * per-row checkboxes (shift-click range selection included) as the only way
+   * to select. The column itself stays, so the layout does not shift.
+   *
+   * Default: `true`.
+   */
+  enableSelectAllRows?: boolean;
+  /**
+   * Called when the master checkbox is toggled, with its new state, in
+   * addition to the `onRowSelectionChange` the toggle produces.
+   *
+   * The state change alone cannot identify the gesture: "every loaded row is
+   * selected" is also what checking the last row by hand produces. A consumer
+   * that treats the master checkbox as meaning more than the loaded rows —
+   * everything matching a server-side filter, say — needs to know the
+   * difference, which is what this reports.
+   */
+  onSelectAllRows?: (selected: boolean) => void;
 
   // --- Column Resizing ---
   columnSizing?: TableColumnSizingState;
