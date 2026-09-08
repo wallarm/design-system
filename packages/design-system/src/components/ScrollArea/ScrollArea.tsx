@@ -1,30 +1,37 @@
-import { forwardRef } from 'react';
+import type { FC, Ref } from 'react';
 import { ScrollArea as ArkUiScrollArea } from '@ark-ui/react/scroll-area';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 
-export type ScrollAreaProps = ArkUiScrollArea.RootProps & TestableProps;
+export type ScrollAreaProps = ArkUiScrollArea.RootProps &
+  TestableProps & {
+    ref?: Ref<HTMLDivElement>;
+  };
 
-export const ScrollArea = forwardRef<HTMLDivElement, ScrollAreaProps>(
-  ({ className, 'data-testid': testId, children, ...props }, ref) => (
-    <ArkUiScrollArea.Root
-      {...props}
-      ref={ref}
-      data-testid={testId}
-      className={cn(
-        'h-full outline-none',
-        // Show thumbs only when content overflows in that direction
-        '[&:has([data-overflow-x])_[data-orientation=horizontal]_[data-part=thumb][data-hover]]:opacity-50',
-        '[&:has([data-overflow-y])_[data-orientation=vertical]_[data-part=thumb][data-hover]]:opacity-50',
-        // Hide scrollbar tracks entirely when no overflow in their direction
-        '[&:not(:has([data-overflow-x]))_[data-part=scrollbar][data-orientation=horizontal]]:opacity-0',
-        '[&:not(:has([data-overflow-y]))_[data-part=scrollbar][data-orientation=vertical]]:opacity-0',
-        className,
-      )}
-    >
-      <TestIdProvider value={testId}>{children}</TestIdProvider>
-    </ArkUiScrollArea.Root>
-  ),
+export const ScrollArea: FC<ScrollAreaProps> = ({
+  className,
+  ref,
+  'data-testid': testId,
+  children,
+  ...props
+}) => (
+  <ArkUiScrollArea.Root
+    {...props}
+    ref={ref}
+    data-testid={testId}
+    className={cn(
+      'h-full outline-none',
+      // Show thumbs only when content overflows in that direction
+      '[&:has([data-overflow-x])_[data-orientation=horizontal]_[data-part=thumb][data-hover]]:opacity-50',
+      '[&:has([data-overflow-y])_[data-orientation=vertical]_[data-part=thumb][data-hover]]:opacity-50',
+      // Hide scrollbar tracks entirely when no overflow in their direction
+      '[&:not(:has([data-overflow-x]))_[data-part=scrollbar][data-orientation=horizontal]]:opacity-0',
+      '[&:not(:has([data-overflow-y]))_[data-part=scrollbar][data-orientation=vertical]]:opacity-0',
+      className,
+    )}
+  >
+    <TestIdProvider value={testId}>{children}</TestIdProvider>
+  </ArkUiScrollArea.Root>
 );
 
 ScrollArea.displayName = 'ScrollArea';

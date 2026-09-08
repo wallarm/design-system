@@ -1,4 +1,5 @@
-import type { FC, PropsWithChildren } from 'react';
+import { type FC, type PropsWithChildren, useRef } from 'react';
+import { useVirtualizer } from '@tanstack/react-virtual';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { cn } from '../../utils/cn';
 import { HStack, VStack } from '../Stack';
@@ -98,3 +99,57 @@ export const Horizontal: StoryFn<typeof meta> = () => (
     </ScrollArea>
   </div>
 );
+
+/**
+ * `ScrollAreaViewport` forwards its `ref` to the scrolling element itself, so a row
+ * virtualiser such as `@tanstack/react-virtual` can track scroll position inside the
+ * house scrollbar instead of falling back to a bare `overflow-y: auto` div. Ten thousand
+ * rows here, a few dozen in the DOM.
+ *
+ * Two things this story is deliberately showing:
+ *
+ * - `useVirtualizer` is called in the same component that declares the ref. Called from a
+ *   component rendered *inside* the viewport, `getScrollElement()` runs once — before React
+ *   has attached the host element's ref — returns `null`, and nothing ever re-runs it, so the
+ *   list stays permanently empty.
+ * - `ScrollAreaContent` gets `h-auto min-h-full` so it grows with the virtual sizer. The
+ *   scrollbar is only rendered while the viewport reports `data-overflow-y`, and that flag is
+ *   recomputed from a `ResizeObserver` watching the content box — which at its default `h-full`
+ *   stays the height of the viewport. A list that grows *after* mount therefore keeps its
+ *   scrollbar hidden until something else forces a remeasure.
+ */
+export const Virtualized: StoryFn<typeof meta> = () => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const virtualizer = useVirtualizer({
+    count: 10_000,
+    getScrollElement: () => scrollRef.current,
+    estimateSize: () => 44,
+    overscan: 8,
+  });
+
+  return (
+    <div className='w-320 h-320 overflow-hidden'>
+      <ScrollArea>
+        <ScrollAreaViewport ref={scrollRef}>
+          <ScrollAreaContent className='h-auto min-h-full'>
+            <div className='relative w-full' style={{ height: virtualizer.getTotalSize() }}>
+              {virtualizer.getVirtualItems().map(item => (
+                <div
+                  key={item.key}
+                  className='absolute top-0 left-0 w-full pb-4'
+                  style={{ height: item.size, transform: `translateY(${item.start}px)` }}
+                >
+                  <Box className='h-full w-full'>{item.index + 1}</Box>
+                </div>
+              ))}
+            </div>
+          </ScrollAreaContent>
+        </ScrollAreaViewport>
+
+        <ScrollAreaScrollbar />
+
+        <ScrollAreaCorner />
+      </ScrollArea>
+    </div>
+  );
+};
