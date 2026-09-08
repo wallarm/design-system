@@ -268,7 +268,59 @@ export const UpdateLoadingToSuccess: StoryFn = () => {
   );
 };
 
-/** `simple` is a one-line title for about five seconds. One action is the norm and two is the ceiling — they have to be optional, since the toast leaves on its own. */
+/** A `description` is never dropped: ask for `simple` alongside one and the toast still reflows to `extended`, timer included. Passing no description keeps the one-line layout. */
+export const DescriptionKeepsExtended: StoryFn = () => {
+  const toast = useToast();
+
+  const withDescription = (duration?: number) =>
+    toast.create({
+      title: 'Failed to mark as True Positive',
+      description: 'resolved vector count must not exceed 500000',
+      type: 'error',
+      variant: 'simple',
+      duration,
+    });
+
+  const withoutDescription = (duration?: number) =>
+    toast.create({ title: 'Marked 2 attacks', type: 'success', variant: 'simple', duration });
+
+  return (
+    <VStack gap={16} align='start'>
+      <VStack gap={4} align='start'>
+        <p className='sb-annotation'>timed</p>
+        <HStack gap={8} wrap>
+          <Button variant='outline' color='neutral' onClick={() => withDescription()}>
+            Simple with description
+          </Button>
+          <Button variant='outline' color='neutral' onClick={() => withoutDescription()}>
+            Simple without description
+          </Button>
+        </HStack>
+      </VStack>
+      <VStack gap={4} align='start'>
+        <p className='sb-annotation'>static — no timer</p>
+        <HStack gap={8} wrap>
+          <Button
+            variant='secondary'
+            color='neutral'
+            onClick={() => withDescription(STATIC_DURATION)}
+          >
+            Simple with description
+          </Button>
+          <Button
+            variant='secondary'
+            color='neutral'
+            onClick={() => withoutDescription(STATIC_DURATION)}
+          >
+            Simple without description
+          </Button>
+        </HStack>
+      </VStack>
+    </VStack>
+  );
+};
+
+/** `simple` is a one-line title for about five seconds — as long as no `description` is passed with it. One action is the norm and two is the ceiling — they have to be optional, since the toast leaves on its own. */
 export const SimpleWithActions: StoryFn = () => {
   const toast = useToast();
 
