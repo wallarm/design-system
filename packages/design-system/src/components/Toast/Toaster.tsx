@@ -6,10 +6,19 @@ import {
   createToaster,
 } from '@ark-ui/react/toast';
 import { cn } from '../../utils/cn';
-import { Toast, type ToastData } from './Toast';
+import {
+  EXTENDED_TOAST_DURATION_MS,
+  resolveToastVariant,
+  SIMPLE_TOAST_DURATION_MS,
+  Toast,
+  type ToastData,
+  type ToastFields,
+} from './Toast';
 
-export interface ToastCreateOptions extends Omit<ToastData, 'id'> {
-  duration?: number;
+// Built from `ToastFields`, not `ToastData`: over the latter's index signature
+// an `Omit` keeps nothing, so this interface checked no option name and gave
+// every field back as `unknown`.
+export interface ToastCreateOptions extends Omit<ToastFields, 'id'> {
   priority?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8;
 }
 
@@ -18,9 +27,6 @@ export interface TypedToaster extends Omit<CreateToasterReturn, 'create' | 'upda
   update: (id: string, options: Partial<ToastCreateOptions>) => string;
   __arkToaster: CreateToasterReturn;
 }
-
-const SIMPLE_TOAST_DURATION_MS = 5000;
-const EXTENDED_TOAST_DURATION_MS = 10000;
 
 // @zag-js/toast >=1.41 (pulled in by @ark-ui/react 5.37) added a toast priority
 // queue: `createToaster().create()` now looks up `[actionable, nonActionable]`
@@ -62,7 +68,9 @@ export const toaster: TypedToaster = {
       ...options,
       duration:
         options.duration ??
-        (options.variant === 'extended' ? EXTENDED_TOAST_DURATION_MS : SIMPLE_TOAST_DURATION_MS),
+        (resolveToastVariant(options.variant, options.description) === 'extended'
+          ? EXTENDED_TOAST_DURATION_MS
+          : SIMPLE_TOAST_DURATION_MS),
       priority:
         options.priority ??
         (options.type === 'default'
@@ -72,6 +80,11 @@ export const toaster: TypedToaster = {
           : undefined),
     });
   },
+  // The duration is settled by the `create` call: zag only re-derives the
+  // remaining time when `type` or `duration` changes, and a partial update
+  // cannot tell a caller's deliberate duration from the one injected above. So
+  // an update that ADDS a description reflows to the extended layout while
+  // keeping the short timer — pass `duration` explicitly in that case.
   update: (id: string, options: Partial<ToastCreateOptions>) => {
     // Only inject a priority override when this update sets `type` to our
     // synthetic 'default' and doesn't already specify one explicitly — every

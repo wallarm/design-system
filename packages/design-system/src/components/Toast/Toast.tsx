@@ -22,7 +22,7 @@ const toastVariants = cva(
       },
     },
     defaultVariants: {
-      variant: 'extended',
+      variant: 'simple',
     },
   },
 );
@@ -50,28 +50,51 @@ const toastIconMap: Record<
   },
 };
 
-const SIMPLE_TOAST_DURATION_MS = 5000;
-const EXTENDED_TOAST_DURATION_MS = 10000;
+export const SIMPLE_TOAST_DURATION_MS = 5000;
+export const EXTENDED_TOAST_DURATION_MS = 10000;
 
-export interface ToastData {
+/**
+ * The fields a toast is actually made of.
+ *
+ * Kept apart from `ToastData` so they survive an `Omit`: an index signature
+ * swallows every named field it is declared beside, which left
+ * `ToastCreateOptions` — `Omit<ToastData, 'id'>` — checking nothing at all
+ * (`toaster.create({ titl: 'x' })` compiled) and widening each field back to
+ * `unknown` under the declaration compiler, invisibly to `tsc --noEmit`.
+ */
+export interface ToastFields {
   id: string;
   title?: string;
   description?: string;
   type?: 'success' | 'error' | 'warning' | 'info' | 'loading' | 'default';
   actions?: ReactNode;
   icon?: ReactNode;
+  /** Layout. A `description` forces `extended` and its longer timer. */
   variant?: 'extended' | 'simple';
   closable?: boolean;
   duration?: number;
-  [key: string]: unknown; // Allow additional properties from Ark UI
+}
+
+// What the renderer receives: the fields above plus whatever Ark UI hands
+// along with them. The escape hatch belongs on this side only — the toaster's
+// own options are a closed set.
+export interface ToastData extends ToastFields {
+  [key: string]: unknown;
 }
 
 export interface ToastProps {
   toast: ToastData;
 }
 
+/**
+ * Floating notification rendered by `Toaster`.
+ *
+ * Two layouts: `simple` is a one-line title, `extended` adds a description and
+ * a longer timer. Passing a `description` selects `extended` on its own — see
+ * `resolveToastVariant`.
+ */
 export const Toast = ({ toast }: ToastProps) => {
-  const toastVariant = toast.variant || 'simple';
+  const toastVariant = resolveToastVariant(toast.variant, toast.description);
   const isSimple = toastVariant === 'simple';
   const closable = toast.closable !== false;
 
@@ -175,3 +198,22 @@ export const Toast = ({ toast }: ToastProps) => {
 };
 
 Toast.displayName = 'Toast';
+
+// Which layout a toast ends up in.
+//
+// `simple` is a single row and renders the title ALONE, so a `description`
+// handed to it would be dropped without a trace — and the description is
+// usually the actionable half (an error's reason, what happens next). Losing
+// the caller's text is never the better reading of the pair, so a description
+// decides the layout whenever there is one; `variant` decides it otherwise.
+//
+// Shared with the toaster, which sizes the auto-dismiss timer off the same
+// answer: text nobody has time to read is the other way to lose it.
+//
+// Kept as line comments deliberately: scripts/metadata publishes the first
+// JSDoc block in the file as the COMPONENT's description.
+export const resolveToastVariant = (
+  variant: ToastFields['variant'],
+  description: ToastFields['description'],
+): NonNullable<ToastFields['variant']> =>
+  description || variant === 'extended' ? 'extended' : 'simple';

@@ -6,6 +6,7 @@ const toastStory = createStoryHelper('messaging-toast', [
   'With Nested Overlays',
   'Update Loading To Success',
   'Simple With Actions',
+  'Description Keeps Extended',
   'Extended With Actions',
   'Long Text',
   'Without Close Button',
@@ -80,6 +81,32 @@ test.describe('Toast Component', () => {
       await expect(getToasts(page)).toBeVisible();
 
       await initStaticToast(page, 'Update to success');
+      await verifyAndClose(page);
+    });
+  });
+
+  test.describe('Description Keeps Extended', () => {
+    test('A description reflows a simple toast to two lines', async ({ page }) => {
+      await toastStory.goto(page, 'Description Keeps Extended');
+      await initStaticToast(page, 'Simple with description');
+
+      const toast = getToasts(page);
+      await toast.waitFor();
+      // The point of the fix: the caller asked for `simple`, and the
+      // description still reaches the DOM rather than being dropped.
+      await expect(toast.getByTestId(/description$/)).toBeVisible();
+
+      await verifyAndClose(page);
+    });
+
+    test('No description keeps the one-line layout', async ({ page }) => {
+      await toastStory.goto(page, 'Description Keeps Extended');
+      await initStaticToast(page, 'Simple without description');
+
+      const toast = getToasts(page);
+      await toast.waitFor();
+      await expect(toast.getByTestId(/description$/)).toHaveCount(0);
+
       await verifyAndClose(page);
     });
   });
