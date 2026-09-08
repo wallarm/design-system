@@ -53,17 +53,10 @@ const toastIconMap: Record<
 export const SIMPLE_TOAST_DURATION_MS = 5000;
 export const EXTENDED_TOAST_DURATION_MS = 10000;
 
-/**
- * The fields a toast is actually made of.
- *
- * Kept apart from `ToastData` so they survive an `Omit`: an index signature
- * swallows every named field it is declared beside, which left
- * `ToastCreateOptions` — `Omit<ToastData, 'id'>` — checking nothing at all
- * (`toaster.create({ titl: 'x' })` compiled) and widening each field back to
- * `unknown` under the declaration compiler, invisibly to `tsc --noEmit`.
- */
-export interface ToastFields {
-  id: string;
+// Everything a caller decides about a toast. The id is not here: the toaster
+// assigns one, and a caller may supply it only to address a toast that is
+// already showing (see `ToastCreateOptions`).
+export interface ToastOptions {
   title?: string;
   description?: string;
   type?: 'success' | 'error' | 'warning' | 'info' | 'loading' | 'default';
@@ -75,11 +68,14 @@ export interface ToastFields {
   duration?: number;
 }
 
-// What the renderer receives: the fields above plus whatever Ark UI hands
-// along with them. The escape hatch belongs on this side only — the toaster's
-// own options are a closed set.
-export interface ToastData extends ToastFields {
-  [key: string]: unknown;
+// What the renderer receives. No index signature: one declared beside these
+// fields swallows all of them under `Omit` / `Pick` / `keyof`, which is how
+// `ToastCreateOptions` came to check no option name at all and to hand every
+// field back as `unknown` under the declaration compiler — invisibly to
+// `tsc --noEmit`. Ark's own extra properties reach this type through the single
+// acknowledged cast in `Toaster.tsx`, which is a boundary worth seeing.
+export interface ToastData extends ToastOptions {
+  id: string;
 }
 
 export interface ToastProps {
@@ -210,10 +206,11 @@ Toast.displayName = 'Toast';
 // Shared with the toaster, which sizes the auto-dismiss timer off the same
 // answer: text nobody has time to read is the other way to lose it.
 //
-// Kept as line comments deliberately: scripts/metadata publishes the first
-// JSDoc block in the file as the COMPONENT's description.
+// Kept as line comments deliberately: scripts/metadata publishes the JSDoc of
+// the first JSDoc'd `const` in the file as the COMPONENT's description, and
+// this resolver is declared right after it.
 export const resolveToastVariant = (
-  variant: ToastFields['variant'],
-  description: ToastFields['description'],
-): NonNullable<ToastFields['variant']> =>
+  variant: ToastOptions['variant'],
+  description: ToastOptions['description'],
+): NonNullable<ToastOptions['variant']> =>
   description || variant === 'extended' ? 'extended' : 'simple';
