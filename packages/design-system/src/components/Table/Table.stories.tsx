@@ -838,6 +838,68 @@ export const RowSelection: StoryFn<typeof meta> = () => {
 };
 
 /**
+ * `onSelectAllRows` separates the master checkbox from a hand-made full selection, which the
+ * row state alone cannot tell apart. Here the gesture means "every row matching the filter",
+ * including the ones the server has not sent — so the bar jumps to the filter's total, and any
+ * manual change drops back to the rows actually loaded.
+ */
+export const SelectAllRowsGesture: StoryFn<typeof meta> = () => {
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+  const [filterWide, setFilterWide] = useState(false);
+  const MATCHING_THE_FILTER = 1474;
+
+  const selectedCount = filterWide ? MATCHING_THE_FILTER : Object.keys(rowSelection).length;
+
+  return (
+    <Table
+      data={securityEvents}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      rowSelection={rowSelection}
+      onRowSelectionChange={updater => {
+        setRowSelection(updater);
+        // "Everything matching the filter, minus this one row" is not a filter,
+        // so any hand-made change falls back to the explicit list.
+        setFilterWide(false);
+      }}
+      onSelectAllRows={setFilterWide}
+    >
+      <TableActionBar>
+        <TableActionBarSelection>
+          <BulkBarSummaryCount>
+            {selectedCount} {selectedCount === 1 ? 'event' : 'events'} selected
+          </BulkBarSummaryCount>
+          <BulkBarSummaryClear />
+        </TableActionBarSelection>
+        <Button color='brand' onClick={onDelete}>
+          <Trash2 /> Delete
+        </Button>
+      </TableActionBar>
+    </Table>
+  );
+};
+
+/**
+ * `enableSelectAllRows={false}` drops the master checkbox while keeping the column, for a
+ * listing where "all rows" is not a scope the consumer can act on. Per-row checkboxes stay,
+ * shift-click range selection included.
+ */
+export const SelectAllRowsDisabled: StoryFn<typeof meta> = () => {
+  const [rowSelection, setRowSelection] = useState<TableRowSelectionState>({});
+
+  return (
+    <Table
+      data={securityEvents}
+      columns={securityColumns}
+      getRowId={row => row.id}
+      rowSelection={rowSelection}
+      onRowSelectionChange={setRowSelection}
+      enableSelectAllRows={false}
+    />
+  );
+};
+
+/**
  * A selection that outlives the table scrolling away: under `virtualized='window'` the bar is
  * pinned to the viewport rather than to the table.
  */

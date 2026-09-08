@@ -66,6 +66,10 @@ export interface TableContextValue<T extends RowData> {
   // Shift-click range selection (ref to avoid unnecessary re-renders)
   lastSelectedRowIndexRef: RefObject<number | null>;
 
+  // Master checkbox in the selection column header
+  selectAllRowsEnabled: boolean;
+  onSelectAllRows?: (selected: boolean) => void;
+
   // IDs of columns that are always pinned left and cannot be unpinned/moved
   alwaysPinnedLeft: string[];
 
