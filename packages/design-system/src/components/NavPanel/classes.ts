@@ -7,7 +7,7 @@ export const navPanelItemVariants = cva(
       active: {
         true: 'overlay-states-primary-active font-semibold',
         false:
-          'opacity-64 hover:opacity-100 hover:overlay-states-primary-hover focus-visible:opacity-100 focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
+          'opacity-85 hover:opacity-100 hover:overlay-states-primary-hover focus-visible:opacity-100 focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
       },
     },
     defaultVariants: { active: false },
@@ -21,7 +21,7 @@ export const navPanelGroupItemVariants = cva(
       active: {
         true: 'overlay-states-primary-active font-semibold',
         false:
-          'opacity-64 hover:opacity-100 hover:overlay-states-primary-hover focus-visible:opacity-100 focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
+          'opacity-85 hover:opacity-100 hover:overlay-states-primary-hover focus-visible:opacity-100 focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
       },
     },
     defaultVariants: { active: false },
