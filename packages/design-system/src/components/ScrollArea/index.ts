@@ -3,7 +3,7 @@ export {
   ScrollAreaContent,
   type ScrollAreaContentProps,
 } from './ScrollAreaContent';
-export { ScrollAreaCorner } from './ScrollAreaCorner';
+export { ScrollAreaCorner, type ScrollAreaCornerProps } from './ScrollAreaCorner';
 export {
   ScrollAreaScrollbar,
   type ScrollAreaScrollbarProps,

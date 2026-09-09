@@ -31,6 +31,10 @@
       "type": "stdio",
       "command": "npx",
       "args": ["@playwright/mcp@latest", "--extension"]
+    },
+    "atlassian": {
+      "type": "http",
+      "url": "https://mcp.atlassian.com/v1/mcp"
     }
   }
 }

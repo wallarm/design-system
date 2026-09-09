@@ -537,6 +537,7 @@ export {
   ScrollAreaContent,
   type ScrollAreaContentProps,
   ScrollAreaCorner,
+  type ScrollAreaCornerProps,
   type ScrollAreaProps,
   ScrollAreaScrollbar,
   type ScrollAreaScrollbarProps,
