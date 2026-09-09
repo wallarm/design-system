@@ -14,13 +14,13 @@ export const navRailVariants = cva(
 );
 
 export const navRailItemVariants = cva(
-  'overlay flex h-32 w-full cursor-pointer items-center rounded-6 p-8 text-sm transition-colors outline-none data-[state=open]:overlay-states-primary-active data-[state=open]:text-text-primary',
+  'overlay flex h-32 w-full cursor-pointer items-center rounded-6 p-8 text-sm text-text-primary transition-colors outline-none data-[state=open]:overlay-states-primary-active data-[state=open]:opacity-100',
   {
     variants: {
       active: {
-        true: 'overlay-states-primary-active text-text-primary',
+        true: 'overlay-states-primary-active',
         false:
-          'text-text-secondary hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
+          'opacity-85 hover:opacity-100 hover:overlay-states-primary-hover focus-visible:opacity-100 focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
       },
     },
     defaultVariants: { active: false },
