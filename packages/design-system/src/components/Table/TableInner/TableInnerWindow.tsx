@@ -1,7 +1,7 @@
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
 import { useTestId } from '../../../utils/testId';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
-import { useInfiniteScroll } from '../hooks';
+import { useInfiniteScroll, useShiftWheelHorizontalScroll } from '../hooks';
 import { useContainerWidth } from '../lib';
 import { StickyGroupParent } from '../StickyGroupParent';
 import { TableBody } from '../TableBody';
@@ -26,6 +26,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   children,
 }) => {
   const {
+    containerRef,
     table,
     virtualizerRef,
     tbodyRef,
@@ -39,7 +40,6 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   } = useTableContext();
   const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const headScrollRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(rootRef);
 
@@ -57,7 +57,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   });
 
   useEffect(() => {
-    const scrollEl = scrollRef.current;
+    const scrollEl = containerRef.current;
     if (!scrollEl) return;
 
     const onScroll = () => {
@@ -69,7 +69,9 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
 
     scrollEl.addEventListener('scroll', onScroll, { passive: true });
     return () => scrollEl.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [containerRef]);
+
+  useShiftWheelHorizontalScroll(containerRef);
 
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);
@@ -101,7 +103,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
           {showSettings && <TableSettingsMenuSlot hasConsumerMenu={hasConsumerSettingsMenu} />}
         </div>
         <ScrollAreaViewport
-          ref={scrollRef}
+          ref={containerRef}
           data-table-scroll-container
           style={{ overflowX: 'auto', overflowY: 'hidden' }}
         >
