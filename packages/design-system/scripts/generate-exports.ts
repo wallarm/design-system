@@ -56,6 +56,16 @@ const exports: PackageExports = {
     require: './dist/metadata/components.json',
     default: './dist/metadata/components.json',
   },
+  // Standalone helpers (`@wallarm-org/design-system/utils/abbreviateNumber`)
+  // for non-JSX call sites — chart tick formatters, plain-string labels — where
+  // the component wrappers (`FormatNumber`, `FormatDateTime`) cannot be used.
+  './utils/*': {
+    development: './src/utils/*.ts',
+    types: './dist/utils/*.d.ts',
+    import: './dist/utils/*.js',
+    require: './dist/utils/*.js',
+    default: './dist/utils/*.js',
+  },
   './*': {
     development: './src/components/*/index.ts',
     types: './dist/components/*/index.d.ts',
@@ -70,4 +80,4 @@ packageJson.exports = exports;
 // biome-ignore lint/style/useTemplate: just new line
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
 
-console.log('Generated package exports (root + icons + theme + metadata + ./* wildcard)');
+console.log('Generated package exports (root + icons + theme + metadata + ./utils/* + ./* wildcard)');
