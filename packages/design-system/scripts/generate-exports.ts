@@ -80,4 +80,4 @@ packageJson.exports = exports;
 // biome-ignore lint/style/useTemplate: just new line
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2) + '\n');
 
-console.log('Generated package exports (root + icons + theme + metadata + ./utils/* + ./* wildcard)');
+console.log('Generated package exports (root + icons + theme + metadata + utils/* + ./*)');
