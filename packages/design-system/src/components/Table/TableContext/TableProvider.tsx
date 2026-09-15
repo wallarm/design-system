@@ -327,6 +327,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
   // Refs (stable across renders)
   const lastSelectedRowIndexRef = useRef<number | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const headerScrollRef = useRef<HTMLDivElement | null>(null);
   const tbodyRef = useRef<HTMLTableSectionElement | null>(null);
   const virtualizerRef = useRef<TableVirtualizerInstance | null>(null);
 
@@ -364,6 +365,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       selectAllRowsEnabled: enableSelectAllRows,
       onSelectAllRows,
       containerRef,
+      headerScrollRef,
       tbodyRef,
       virtualizerRef,
       onEndReached,

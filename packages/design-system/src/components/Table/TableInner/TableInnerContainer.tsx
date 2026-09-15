@@ -8,7 +8,7 @@ import {
   ScrollAreaViewport,
 } from '../../ScrollArea';
 import { tableContainerVariants } from '../classes';
-import { useInfiniteScroll } from '../hooks';
+import { useInfiniteScroll, useWheelHorizontalScroll } from '../hooks';
 import { useContainerWidth } from '../lib';
 import { StickyGroupParent } from '../StickyGroupParent';
 import { TableBody } from '../TableBody';
@@ -78,6 +78,8 @@ export const TableInnerContainer: FC<TableInnerContainerProps> = ({
     viewport.addEventListener('scroll', handleScroll, { passive: true });
     return () => viewport.removeEventListener('scroll', handleScroll);
   }, [containerRef]);
+
+  useWheelHorizontalScroll(containerRef);
 
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);

@@ -1,7 +1,7 @@
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
 import { useTestId } from '../../../utils/testId';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
-import { useInfiniteScroll } from '../hooks';
+import { useInfiniteScroll, useWheelHorizontalScroll } from '../hooks';
 import { useContainerWidth } from '../lib';
 import { StickyGroupParent } from '../StickyGroupParent';
 import { TableBody } from '../TableBody';
@@ -26,6 +26,8 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   children,
 }) => {
   const {
+    containerRef,
+    headerScrollRef,
     table,
     virtualizerRef,
     tbodyRef,
@@ -39,7 +41,6 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   } = useTableContext();
   const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(rootRef);
 
   useInfiniteScroll({
@@ -56,16 +57,21 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   });
 
   useEffect(() => {
-    const scrollEl = scrollRef.current;
+    const scrollEl = containerRef.current;
     if (!scrollEl) return;
 
     const onScroll = () => {
       rootRef.current?.toggleAttribute('data-scrolled', scrollEl.scrollLeft > 0);
+      // The header lives outside the horizontal scroller (see below), so it
+      // follows the body by mirroring its scrollLeft.
+      if (headerScrollRef.current) headerScrollRef.current.scrollLeft = scrollEl.scrollLeft;
     };
 
     scrollEl.addEventListener('scroll', onScroll, { passive: true });
     return () => scrollEl.removeEventListener('scroll', onScroll);
-  }, []);
+  }, [containerRef, headerScrollRef]);
+
+  useWheelHorizontalScroll(containerRef, headerScrollRef);
 
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);
@@ -80,18 +86,27 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   return (
     <div ref={rootRef} data-testid={testId} className='group/scroll relative outline-none'>
       <ScrollArea className='group/scroll rounded-12 border border-border-primary-light'>
-        <ScrollAreaViewport
-          ref={scrollRef}
-          data-table-scroll-container
-          style={{ overflowX: 'auto', overflowY: 'hidden' }}
-        >
-          {/* Sticky header */}
-          <div className='sticky top-0 z-30'>
+        {/*
+          Sticky header. It must sit outside the horizontal scroll viewport:
+          any overflow other than `visible` makes that viewport the sticky
+          containing block, and the viewport itself scrolls away with the
+          window, so a header inside it never snaps. The settings slot is
+          absolutely positioned, so it rides along with the sticky shell.
+        */}
+        <div className='sticky top-0 z-30'>
+          <div ref={headerScrollRef} className='overflow-hidden'>
             <table className={tableStyles} style={{ width: tableWidth }} aria-hidden>
               <TableColGroup tableWidth={tableWidth} />
               <TableHead />
             </table>
           </div>
+          {showSettings && <TableSettingsMenuSlot hasConsumerMenu={hasConsumerSettingsMenu} />}
+        </div>
+        <ScrollAreaViewport
+          ref={containerRef}
+          data-table-scroll-container
+          style={{ overflowX: 'auto', overflowY: 'hidden' }}
+        >
           {hasSubRowGrouping && (
             <StickyGroupParent tableWidth={tableWidth} headerHeight={headerHeight} />
           )}
@@ -105,7 +120,6 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
         </ScrollAreaViewport>
         <ScrollAreaScrollbar orientation='horizontal' />
       </ScrollArea>
-      {showSettings && <TableSettingsMenuSlot hasConsumerMenu={hasConsumerSettingsMenu} />}
     </div>
   );
 };
