@@ -14,7 +14,9 @@ export const TableScrollHandlerSlot: FC = () => {
 
   return (
     <>
-      <div ref={setAnchorNode} className={cn('shrink-0 ml-auto flex items-center gap-4')} />
+      {/* h-16 keeps the 24px controls from growing the 32px header row: they
+          overflow into the cell padding instead. */}
+      <div ref={setAnchorNode} className={cn('shrink-0 ml-auto flex items-center gap-4 h-16')} />
       {!hasConsumerScrollHandler && <TableScrollHandler />}
     </>
   );

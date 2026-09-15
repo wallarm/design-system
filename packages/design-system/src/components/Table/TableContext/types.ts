@@ -80,6 +80,11 @@ export interface TableContextValue<T extends RowData> {
   // Container ref for scoping keyboard handlers
   containerRef: RefObject<HTMLDivElement | null>;
 
+  // Window mode keeps the header in its own clipped scroller outside the
+  // viewport (see TableInnerWindow); programmatic horizontal scrolls move it
+  // in the same frame as the body. Unused in container mode.
+  headerScrollRef: RefObject<HTMLDivElement | null>;
+
   // Ref to the <tbody> element — populated by whichever body component
   // mounts (virtualized window, virtualized container, or non-virt).
   // Used by `TableHandle.scrollToRow` to resolve a row element by

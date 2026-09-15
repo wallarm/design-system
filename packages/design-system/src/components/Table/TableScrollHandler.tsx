@@ -23,6 +23,8 @@ interface TableScrollStateContextValue {
 
 const TableScrollStateContext = createContext<TableScrollStateContextValue | null>(null);
 
+const SCROLL_ANIMATION_MS = 300;
+
 const useTableScrollStateContext = (): TableScrollStateContextValue => {
   const ctx = useContext(TableScrollStateContext);
   if (!ctx) {
@@ -142,7 +144,7 @@ export interface TableScrollHandlerProps {
 
 export const TableScrollHandler: FC<TableScrollHandlerProps> = ({ children }) => {
   const { anchorNode } = useTableScrollHandlerContext();
-  const { allLeafColumns, containerRef } = useTableContext();
+  const { allLeafColumns, containerRef, headerScrollRef } = useTableContext();
   // Self-sufficient scroll state; works for both the default and consumer paths.
   const { atStart, atEnd } = useHorizontalScrollState(containerRef, true);
 
@@ -154,10 +156,27 @@ export const TableScrollHandler: FC<TableScrollHandlerProps> = ({ children }) =>
     return Math.max((containerRef.current?.clientWidth ?? 0) - pinnedLeftWidth, 0);
   };
 
-  const scrollLeft = () =>
-    containerRef.current?.scrollBy({ left: -getScrollPageSize(), behavior: 'smooth' });
-  const scrollRight = () =>
-    containerRef.current?.scrollBy({ left: getScrollPageSize(), behavior: 'smooth' });
+  // Not `scrollBy({ behavior: 'smooth' })`: the browser runs that animation
+  // off the main thread, and a header mirrored from `scroll` events trails it
+  // by a frame (visibly, in window mode). Animating here and writing both
+  // scrollers in the same frame keeps them locked together.
+  const scrollBy = (delta: number) => {
+    const el = containerRef.current;
+    if (!el) return;
+    const from = el.scrollLeft;
+    const to = Math.max(0, Math.min(from + delta, el.scrollWidth - el.clientWidth));
+    const start = performance.now();
+    const step = (now: number) => {
+      const t = Math.min((now - start) / SCROLL_ANIMATION_MS, 1);
+      const x = from + (to - from) * (1 - (1 - t) ** 3);
+      el.scrollLeft = x;
+      if (headerScrollRef.current) headerScrollRef.current.scrollLeft = x;
+      if (t < 1) requestAnimationFrame(step);
+    };
+    requestAnimationFrame(step);
+  };
+  const scrollLeft = () => scrollBy(-getScrollPageSize());
+  const scrollRight = () => scrollBy(getScrollPageSize());
 
   // No anchor yet (master column not overflowing / not mounted) → render nothing.
   if (!anchorNode) return null;

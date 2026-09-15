@@ -27,6 +27,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
 }) => {
   const {
     containerRef,
+    headerScrollRef,
     table,
     virtualizerRef,
     tbodyRef,
@@ -40,7 +41,6 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   } = useTableContext();
   const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
-  const headScrollRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(rootRef);
 
   useInfiniteScroll({
@@ -64,12 +64,12 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
       rootRef.current?.toggleAttribute('data-scrolled', scrollEl.scrollLeft > 0);
       // The header lives outside the horizontal scroller (see below), so it
       // follows the body by mirroring its scrollLeft.
-      if (headScrollRef.current) headScrollRef.current.scrollLeft = scrollEl.scrollLeft;
+      if (headerScrollRef.current) headerScrollRef.current.scrollLeft = scrollEl.scrollLeft;
     };
 
     scrollEl.addEventListener('scroll', onScroll, { passive: true });
     return () => scrollEl.removeEventListener('scroll', onScroll);
-  }, [containerRef]);
+  }, [containerRef, headerScrollRef]);
 
   useShiftWheelHorizontalScroll(containerRef);
 
@@ -94,7 +94,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
           absolutely positioned, so it rides along with the sticky shell.
         */}
         <div className='sticky top-0 z-30'>
-          <div ref={headScrollRef} className='overflow-hidden'>
+          <div ref={headerScrollRef} className='overflow-hidden'>
             <table className={tableStyles} style={{ width: tableWidth }} aria-hidden>
               <TableColGroup tableWidth={tableWidth} />
               <TableHead />
