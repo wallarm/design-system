@@ -43,6 +43,13 @@
       "require": "./dist/metadata/components.json",
       "default": "./dist/metadata/components.json"
     },
+    "./utils/*": {
+      "development": "./src/utils/*.ts",
+      "types": "./dist/utils/*.d.ts",
+      "import": "./dist/utils/*.js",
+      "require": "./dist/utils/*.js",
+      "default": "./dist/utils/*.js"
+    },
     "./*": {
       "development": "./src/components/*/index.ts",
       "types": "./dist/components/*/index.d.ts",
