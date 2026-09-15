@@ -1,7 +1,7 @@
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
 import { useTestId } from '../../../utils/testId';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
-import { useInfiniteScroll, useShiftWheelHorizontalScroll } from '../hooks';
+import { useInfiniteScroll, useWheelHorizontalScroll } from '../hooks';
 import { useContainerWidth } from '../lib';
 import { StickyGroupParent } from '../StickyGroupParent';
 import { TableBody } from '../TableBody';
@@ -71,7 +71,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
     return () => scrollEl.removeEventListener('scroll', onScroll);
   }, [containerRef, headerScrollRef]);
 
-  useShiftWheelHorizontalScroll(containerRef);
+  useWheelHorizontalScroll(containerRef, headerScrollRef);
 
   const totalSize = table.getTotalSize();
   const tableWidth = Math.max(containerWidth, totalSize);
