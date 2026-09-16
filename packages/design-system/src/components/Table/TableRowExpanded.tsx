@@ -19,16 +19,18 @@ export const TableRowExpanded = <T extends RowData>({
   dndStyle,
   lastRow,
 }: TableRowExpandedProps<T>) => {
-  const { table, renderExpandedRow } = useTableContext<T>();
+  const { table, stretch, renderExpandedRow } = useTableContext<T>();
   const testId = useTestId('row-expanded');
 
   if (!row.getIsExpanded() || !renderExpandedRow) return null;
 
   const visibleColumns = table.getVisibleLeafColumns();
   const hasExpandColumn = visibleColumns.some(col => col.id === TABLE_EXPAND_COLUMN_ID);
+  const fillerOffset = stretch ? 0 : 1;
 
   // Expand column stays empty, content spans the remaining columns
-  const contentColSpan = hasExpandColumn ? visibleColumns.length - 1 : visibleColumns.length;
+  const contentColSpan =
+    (hasExpandColumn ? visibleColumns.length - 1 : visibleColumns.length) + fillerOffset;
 
   return (
     <Tr data-testid={testId} style={dndStyle}>

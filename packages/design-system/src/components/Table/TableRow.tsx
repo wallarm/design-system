@@ -31,7 +31,7 @@ const TableRowInner = <T extends RowData>({
   ref,
   'data-index': dataIndex,
 }: TableRowProps<T>) => {
-  const { table, expandingEnabled, activeRowId, isLoading, renderExpandedRow } =
+  const { table, expandingEnabled, activeRowId, isLoading, renderExpandedRow, stretch } =
     useTableContext<T>();
   const testId = useTestId('row');
   const { canDnd, isDragging, setNodeRef, style: dndStyle, attributes, listeners } = useRowDnd(row);
@@ -100,6 +100,7 @@ const TableRowInner = <T extends RowData>({
               aria-hidden='true'
             />
           ))}
+          {!stretch && <Td pinned={false} aria-hidden />}
         </Tr>
         {expandingEnabled && <TableRowExpanded row={row} lastRow={isLastRowExpanded} />}
       </>
@@ -133,6 +134,7 @@ const TableRowInner = <T extends RowData>({
             />
           );
         })}
+        {!stretch && <Td pinned={false} aria-hidden />}
       </Tr>
       {expandingEnabled && (
         <TableRowExpanded row={row} dndStyle={dndStyle} lastRow={isLastRowExpanded} />

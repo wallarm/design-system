@@ -142,6 +142,31 @@ export const Basic: StoryFn<typeof meta> = () => {
   );
 };
 
+/**
+ * `stretch={false}` — columns keep their defined widths and do not expand to fill the container.
+ * Empty space appears on the right when the total column width is less than the container width.
+ */
+export const NoStretch: StoryFn<typeof meta> = () => {
+  const narrowColumns: TableColumnDef<SecurityEvent>[] = [
+    securityColumnHelper.accessor('objectName', {
+      header: 'Object name',
+      size: 200,
+    }),
+    securityColumnHelper.accessor('status', {
+      header: 'Status',
+      size: 120,
+    }),
+    securityColumnHelper.accessor('requests', {
+      header: 'Requests',
+      size: 100,
+    }),
+  ];
+
+  return (
+    <Table data={securityEvents} columns={narrowColumns} getRowId={row => row.id} stretch={false} />
+  );
+};
+
 // "Rows per page" + page navigation share a right-aligned footer below the table.
 /**
  * `useClientPagination` slices the rows and the pager sits right-aligned below the table,

@@ -43,6 +43,7 @@ export interface TableContextValue<T extends RowData> {
   visibilityEnabled: boolean;
   hasSubRowGrouping: boolean;
   virtualized: TableVirtualized | undefined;
+  stretch: boolean;
 
   // Rendering helpers
   renderExpandedRow?: (row: Row<DSTableFeatures, T>) => ReactNode;

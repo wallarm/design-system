@@ -17,7 +17,7 @@ interface TableLoadingStateProps {
 }
 
 export const TableLoadingState: FC<TableLoadingStateProps> = ({ position = 'end', count }) => {
-  const { table, skeletonCount } = useTableContext();
+  const { table, skeletonCount, stretch } = useTableContext();
   const testId = useTestId(position === 'start' ? 'loading-start' : 'loading');
   const columns = table.getVisibleLeafColumns();
   const lastRowIdx = (count ?? skeletonCount) - 1;
@@ -45,6 +45,7 @@ export const TableLoadingState: FC<TableLoadingStateProps> = ({ position = 'end'
                 <Skeleton width='100%' height='20px' />
               </Td>
             ))}
+            {!stretch && <Td pinned={false} aria-hidden />}
           </Tr>
         );
       })}

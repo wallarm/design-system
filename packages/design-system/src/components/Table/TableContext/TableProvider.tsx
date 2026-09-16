@@ -100,6 +100,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     defaultColumnOrder,
     columnGroups,
     virtualized,
+    stretch = true,
     estimateRowHeight,
     overscan = TABLE_VIRTUALIZATION_OVERSCAN,
     onEndReached,
@@ -349,6 +350,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       visibilityEnabled,
       hasSubRowGrouping: !!getSubRows,
       virtualized,
+      stretch,
       renderExpandedRow: renderExpandedRow as
         | ((row: Row<DSTableFeatures, T>) => ReactNode)
         | undefined,
@@ -394,6 +396,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       visibilityEnabled,
       getSubRows,
       virtualized,
+      stretch,
       renderExpandedRow,
       estimateRowHeight,
       overscan,
