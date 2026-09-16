@@ -32,10 +32,15 @@ export const getAlignClass = (meta?: { align?: string; sortType?: string }): str
   return 'text-left';
 };
 
-/** Border-bottom override for the last expanded row in a depth group */
-export const getExpandBorderClass = (isExpandColumn: boolean, depth: number): string | false =>
+/** Border-bottom override for the last expanded row in a depth group (never on the table's last row) */
+export const getExpandBorderClass = (
+  isExpandColumn: boolean,
+  depth: number,
+  isLastRow = false,
+): string | false =>
   isExpandColumn &&
   depth > 0 &&
+  !isLastRow &&
   '[tr[data-depth]:has(+_tr:not([data-depth]))_&]:!border-b [tr[data-depth]:last-child_&]:!border-b';
 
 /** Sort labels by sortType: [ascLabel, descLabel] */

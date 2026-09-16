@@ -22,6 +22,8 @@ interface TableBodyCellProps<T extends RowData> {
   colSpan?: number;
   className?: string;
   disablePinnedShadow?: boolean;
+  /** Cell belongs to the table's last row — drop the bottom border, the frame draws it */
+  lastRow?: boolean;
   dragListeners?: ReturnType<typeof useSortable>['listeners'];
   dragAttributes?: ReturnType<typeof useSortable>['attributes'];
 }
@@ -31,6 +33,7 @@ export const TableBodyCell = <T extends RowData>({
   colSpan,
   className,
   disablePinnedShadow,
+  lastRow,
   dragListeners,
   dragAttributes,
 }: TableBodyCellProps<T>) => {
@@ -88,7 +91,7 @@ export const TableBodyCell = <T extends RowData>({
       data-testid={testId}
       className={cn(
         getAlignClass(meta),
-        getExpandBorderClass(isExpandColumn, cell.row.depth),
+        getExpandBorderClass(isExpandColumn, cell.row.depth, lastRow),
         isCut && 'pr-0',
         (isMasterTrigger || tooltipText) && 'cursor-pointer',
         dragListeners && 'cursor-grab active:cursor-grabbing',
@@ -98,6 +101,7 @@ export const TableBodyCell = <T extends RowData>({
       pinned={isPinned === 'start'}
       lastPinnedLeft={disablePinnedShadow ? false : lastLeft}
       expanded={isExpandedToggle}
+      lastRow={lastRow}
       ref={canDnd ? setNodeRef : undefined}
       onClick={isMasterTrigger ? handleClick : undefined}
       style={{
