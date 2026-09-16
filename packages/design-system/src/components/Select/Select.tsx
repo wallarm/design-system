@@ -14,6 +14,8 @@ type SelectNativeProps<T extends CollectionItem> = Omit<
 
 export interface SelectBaseProps {
   loading?: boolean;
+  /** Override default floating positioning (merged with DS defaults). */
+  positioning?: SelectRootProps<CollectionItem>['positioning'];
 }
 
 type SelectProps<T extends CollectionItem> = SelectNativeProps<T> & SelectBaseProps & TestableProps;
@@ -22,6 +24,7 @@ export const Select = <T extends CollectionItem>({
   children,
   loading = false,
   disabled = false,
+  positioning: positioningOverride,
   'data-testid': testId,
   ...props
 }: SelectProps<T>) => {
@@ -30,8 +33,9 @@ export const Select = <T extends CollectionItem>({
       offset: { mainAxis: 4 },
       gutter: 4,
       overflowPadding: 4,
+      ...positioningOverride,
     }),
-    [],
+    [positioningOverride],
   );
 
   return (
