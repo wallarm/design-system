@@ -1,6 +1,5 @@
 import type { CSSProperties } from 'react';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
 import type { Row, RowData } from '@tanstack/react-table';
 import { useTableContext } from '../TableContext/useTableContext';
 import type { DSTableFeatures } from './dsTableFeatures';
@@ -20,21 +19,15 @@ export const useRowDnd = <T extends RowData>(row: Row<DSTableFeatures, T>): UseR
   const { rowDndEnabled } = useTableContext<T>();
   const canDnd = rowDndEnabled && row.subRows.length === 0;
 
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({
     id: row.id,
     disabled: !canDnd,
   });
 
-  // Zero out horizontal transform — rows only move vertically.
-  // Non-dragging rows receive the "make room" transform from verticalListSortingStrategy
-  // which serves as the visual drop-position indicator.
-  const style: CSSProperties = canDnd
-    ? {
-        transform: CSS.Translate.toString(transform ? { ...transform, x: 0 } : null),
-        transition,
-        ...(isDragging && { opacity: 0.5, position: 'relative' as const, zIndex: 100 }),
-      }
-    : {};
+  // Rows stay in place during drag — no transforms or transitions.
+  // The DragOverlay provides the floating ghost, and an orange drop indicator
+  // line shows the target position.
+  const style: CSSProperties = canDnd && isDragging ? { opacity: 0.4 } : {};
 
   return { canDnd, isDragging, setNodeRef, style, attributes, listeners };
 };

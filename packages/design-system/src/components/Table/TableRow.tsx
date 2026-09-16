@@ -11,6 +11,7 @@ import {
 } from './lib';
 import { Td, Tr } from './primitives';
 import { TableBodyCell } from './TableBody/TableBodyCell';
+import { useRowDndIndicator } from './TableBody/TableBodyRowDndContext';
 import { useTableContext } from './TableContext';
 import { TableRowExpanded } from './TableRowExpanded';
 
@@ -31,10 +32,19 @@ const TableRowInner = <T extends RowData>({
   ref,
   'data-index': dataIndex,
 }: TableRowProps<T>) => {
-  const { table, expandingEnabled, activeRowId, isLoading, renderExpandedRow, stretch } =
-    useTableContext<T>();
+  const {
+    table,
+    expandingEnabled,
+    activeRowId,
+    isLoading,
+    renderExpandedRow,
+    stretch,
+    hasSubRowGrouping,
+    allLeafColumns,
+  } = useTableContext<T>();
   const testId = useTestId('row');
   const { canDnd, isDragging, setNodeRef, style: dndStyle, attributes, listeners } = useRowDnd(row);
+  const { activeId, overId } = useRowDndIndicator();
   const isGroupParent = row.subRows.length > 0;
   const isSelected = isGroupParent ? row.getIsAllSubRowsSelected() : row.getIsSelected();
   const isPreviewActive = activeRowId === row.id;
@@ -65,6 +75,18 @@ const TableRowInner = <T extends RowData>({
     const dataCells = cells.filter(c => !SYSTEM_COLUMN_IDS.has(c.column.id));
     const firstDataCell = dataCells[0];
 
+    // Make expanded group parent rows CSS-sticky so they pin instantly (no
+    // frame delay). The JS overlay (StickyGroupParent, z-[21]) layers on top
+    // for the push-up animation and virtualization fallback.
+    const stickyStyle =
+      hasSubRowGrouping && row.getIsExpanded()
+        ? {
+            position: 'sticky' as const,
+            top: allLeafColumns.some(c => c.columnDef.meta?.description?.type === 'text') ? 48 : 32,
+            zIndex: 20,
+          }
+        : undefined;
+
     return (
       <>
         <Tr
@@ -76,6 +98,7 @@ const TableRowInner = <T extends RowData>({
           data-selected={isSelected || undefined}
           data-preview-active={isPreviewActive || undefined}
           aria-selected={isSelected || undefined}
+          style={stickyStyle}
         >
           {systemCells.map(cell => (
             <TableBodyCell key={cell.id} cell={cell} disablePinnedShadow lastRow={isLastRow} />
@@ -107,6 +130,19 @@ const TableRowInner = <T extends RowData>({
     );
   }
 
+  // Compute orange drop indicator position for this row.
+  // When hovering over a row while dragging, the indicator shows where the
+  // dragged row will be inserted: above if dragging downward-to-here,
+  // below if dragging upward-to-here.
+  let dropIndicator: 'above' | 'below' | undefined;
+  if (overId === row.id && activeId != null && activeId !== row.id) {
+    const activeIndex = flatRows.findIndex(r => r.id === activeId);
+    const overIndex = flatRows.findIndex(r => r.id === row.id);
+    if (activeIndex !== -1 && overIndex !== -1) {
+      dropIndicator = activeIndex < overIndex ? 'below' : 'above';
+    }
+  }
+
   return (
     <>
       <Tr
@@ -131,6 +167,7 @@ const TableRowInner = <T extends RowData>({
               dragListeners={isDragHandle ? listeners : undefined}
               dragAttributes={isDragHandle ? attributes : undefined}
               lastRow={isLastRow}
+              dropIndicator={dropIndicator}
             />
           );
         })}

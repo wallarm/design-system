@@ -14,7 +14,10 @@ const TableRowOverlayInner = <T extends RowData>({ row }: TableRowOverlayProps<T
   const visibleColumns = table.getVisibleLeafColumns();
 
   return (
-    <table className='w-full table-fixed border-collapse' style={{ tableLayout: 'fixed' }}>
+    <table
+      className='w-full table-fixed border-collapse'
+      style={{ tableLayout: 'fixed', cursor: 'grabbing' }}
+    >
       <tbody>
         <Tr className='pointer-events-none shadow-lg opacity-90 bg-bg-primary'>
           {row.getVisibleCells().map(cell => {
