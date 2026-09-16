@@ -93,11 +93,17 @@ export const tableBodyCellVariants = cva(
         true: 'border-b-0 before:hidden',
         false: '',
       },
+      /** Last row of the table: the container frame already draws the bottom edge */
+      lastRow: {
+        true: 'border-b-0',
+        false: '',
+      },
     },
     defaultVariants: {
       pinned: false,
       lastPinnedLeft: false,
       expanded: false,
+      lastRow: false,
     },
   },
 );

@@ -1,4 +1,5 @@
 import type { FC } from 'react';
+import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Skeleton } from '../Skeleton';
 import { Td, Tr } from './primitives';
@@ -19,6 +20,7 @@ export const TableLoadingState: FC<TableLoadingStateProps> = ({ position = 'end'
   const { table, skeletonCount } = useTableContext();
   const testId = useTestId(position === 'start' ? 'loading-start' : 'loading');
   const columns = table.getVisibleLeafColumns();
+  const lastRowIdx = (count ?? skeletonCount) - 1;
 
   return (
     <>
@@ -34,7 +36,10 @@ export const TableLoadingState: FC<TableLoadingStateProps> = ({ position = 'end'
             {columns.map(column => (
               <Td
                 key={column.id}
-                className='px-16 py-8 border-b border-r border-border-primary-light'
+                className={cn(
+                  'px-16 py-8 border-b border-r border-border-primary-light',
+                  position === 'end' && rowIdx === lastRowIdx && 'border-b-0',
+                )}
                 style={{ width: column.getSize() }}
               >
                 <Skeleton width='100%' height='20px' />

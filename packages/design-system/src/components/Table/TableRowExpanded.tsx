@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Row, RowData } from '@tanstack/react-table';
+import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { type DSTableFeatures, TABLE_EXPAND_COLUMN_ID } from './lib';
 import { Td, Tr } from './primitives';
@@ -9,11 +10,14 @@ interface TableRowExpandedProps<T extends RowData> {
   row: Row<DSTableFeatures, T>;
   /** When row DnD is active, pass the same transform style so expanded content moves with its parent row. */
   dndStyle?: CSSProperties;
+  /** Expanded content is the table's bottom edge — drop its bottom border, the frame draws it */
+  lastRow?: boolean;
 }
 
 export const TableRowExpanded = <T extends RowData>({
   row,
   dndStyle,
+  lastRow,
 }: TableRowExpandedProps<T>) => {
   const { table, renderExpandedRow } = useTableContext<T>();
   const testId = useTestId('row-expanded');
@@ -33,7 +37,10 @@ export const TableRowExpanded = <T extends RowData>({
       )}
       <Td
         colSpan={contentColSpan}
-        className='border-b border-border-primary-light bg-bg-primary p-0'
+        className={cn(
+          'border-b border-border-primary-light bg-bg-primary p-0',
+          lastRow && 'border-b-0',
+        )}
       >
         <div className='px-16 py-12'>{renderExpandedRow(row)}</div>
       </Td>

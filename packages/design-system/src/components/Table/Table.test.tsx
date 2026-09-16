@@ -1292,3 +1292,86 @@ describe('TableSettingsMenu: onSettingsOpenChange', () => {
     expect(onSettingsOpenChange).toHaveBeenLastCalledWith(false);
   });
 });
+
+describe('Last row bottom border (container frame owns the bottom edge)', () => {
+  const getRows = () => screen.getAllByTestId('tbl--container--row');
+
+  it('drops the bottom border on the last data row only', () => {
+    render(<Table data={data} columns={baseColumns} getRowId={row => row.id} data-testid='tbl' />);
+
+    const rows = getRows();
+    const [firstRow, lastRow] = [rows[0], rows[rows.length - 1]];
+
+    for (const cell of within(lastRow).getAllByRole('cell')) {
+      expect(cell.className).toMatch(/\bborder-b-0\b/);
+    }
+    for (const cell of within(firstRow).getAllByRole('cell')) {
+      expect(cell.className).not.toMatch(/\bborder-b-0\b/);
+    }
+  });
+
+  it('keeps the bottom border on the last data row while more rows are loading', () => {
+    render(
+      <Table
+        data={data}
+        columns={baseColumns}
+        getRowId={row => row.id}
+        isLoading
+        data-testid='tbl'
+      />,
+    );
+
+    const rows = getRows();
+    const lastRow = rows[rows.length - 1];
+
+    for (const cell of within(lastRow).getAllByRole('cell')) {
+      expect(cell.className).not.toMatch(/\bborder-b-0\b/);
+    }
+  });
+
+  it('moves the dropped border to the expanded content when the last row is expanded', async () => {
+    const user = userEvent.setup();
+    render(
+      <Table
+        data={data}
+        columns={baseColumns}
+        getRowId={row => row.id}
+        renderExpandedRow={row => <div>Details {row.original.name}</div>}
+        data-testid='tbl'
+      />,
+    );
+
+    const rows = getRows();
+    const lastRow = rows[rows.length - 1];
+    await user.click(within(lastRow).getByRole('button', { name: 'Expand row' }));
+
+    const expanded = screen.getByTestId('tbl--container--row-expanded');
+    const contentCell = within(expanded).getByText('Details Bravo').closest('td');
+    expect(contentCell?.className).toMatch(/\bborder-b-0\b/);
+
+    // The parent row now sits above its own content, so it keeps its separator
+    const parentDataCells = within(lastRow)
+      .getAllByRole('cell')
+      .filter(cell => !cell.querySelector('[aria-label="Collapse row"]'));
+    for (const cell of parentDataCells) {
+      expect(cell.className).not.toMatch(/\bborder-b-0\b/);
+    }
+  });
+});
+
+describe('Loading skeleton bottom border', () => {
+  it('drops the bottom border on the last skeleton row', () => {
+    render(<Table data={[]} columns={baseColumns} isLoading data-testid='tbl' />);
+
+    const skeletonRows = screen
+      .getByTestId('tbl--container--body')
+      .querySelectorAll('tr[data-loading-position]');
+    const lastRow = skeletonRows[skeletonRows.length - 1];
+    const cells = lastRow?.querySelectorAll('td') ?? [];
+    expect(cells.length).toBeGreaterThan(0);
+
+    for (const cell of cells) {
+      expect(cell.className).toMatch(/\bborder-b-0\b/);
+    }
+  });
+});
