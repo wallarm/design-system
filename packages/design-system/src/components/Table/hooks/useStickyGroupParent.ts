@@ -134,6 +134,7 @@ export const useStickyGroupParent = <T extends RowData>(
   const [pushUpOffset, setPushUpOffset] = useState(0);
   const rafRef = useRef(0);
   const prevStickyRowIdRef = useRef<string | null>(null);
+  const prevOffsetRef = useRef(0);
 
   const compute = useCallback(() => {
     if (!enabled) {
@@ -222,8 +223,9 @@ export const useStickyGroupParent = <T extends RowData>(
     }
 
     const newId = foundRow?.id ?? null;
-    if (newId !== prevStickyRowIdRef.current || offset !== 0) {
+    if (newId !== prevStickyRowIdRef.current || offset !== prevOffsetRef.current) {
       prevStickyRowIdRef.current = newId;
+      prevOffsetRef.current = offset;
       setStickyRow(foundRow as Row<DSTableFeatures, T> | null);
       setPushUpOffset(offset);
     }

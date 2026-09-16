@@ -1880,7 +1880,7 @@ export const InlineCellEditing: StoryFn<typeof meta> = () => {
             <EditableSelectCell
               value={value}
               items={categoryItems}
-              placeholder='Select…'
+              placeholder='Select'
               aria-label='Edit category'
               onCommit={next => setCategories(prev => ({ ...prev, [row.id]: next }))}
             >

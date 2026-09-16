@@ -32,7 +32,7 @@ export interface EditableSelectCellProps extends NativeProps, TestableProps {
   items: SelectDataItem[];
   /** Read-mode rendering of the selected value (e.g. a `Badge`). */
   children?: ReactNode;
-  /** Shown when nothing is selected. Defaults to `'Select…'`. */
+  /** Shown when nothing is selected. Defaults to `'Select'`. */
   placeholder?: ReactNode;
   ref?: Ref<HTMLDivElement>;
 }
@@ -51,7 +51,7 @@ export const EditableSelectCell: FC<EditableSelectCellProps> = ({
   onCommit,
   items,
   children,
-  placeholder = 'Select…',
+  placeholder = 'Select',
   className,
   ref,
   'data-testid': testIdProp,
