@@ -70,6 +70,7 @@ export const EditableSelectCell: FC<EditableSelectCellProps> = ({
       collection={collection}
       value={hasValue ? [value] : []}
       data-testid={testId}
+      positioning={{ placement: 'bottom-start' }}
       onValueChange={details => {
         const next = details.value[0];
         if (next && next !== value) onCommit(next);
