@@ -17,6 +17,12 @@ import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableMasterCellActions } from '../TableMasterCellActions';
 
+/** Box-shadow styles for the orange drop indicator line */
+const DROP_INDICATOR_SHADOW = {
+  above: 'inset 0 2px 0 0 var(--color-border-strong-warning)',
+  below: 'inset 0 -2px 0 0 var(--color-border-strong-warning)',
+} as const;
+
 interface TableBodyCellProps<T extends RowData> {
   cell: Cell<DSTableFeatures, T, unknown>;
   colSpan?: number;
@@ -26,6 +32,8 @@ interface TableBodyCellProps<T extends RowData> {
   lastRow?: boolean;
   dragListeners?: ReturnType<typeof useSortable>['listeners'];
   dragAttributes?: ReturnType<typeof useSortable>['attributes'];
+  /** Orange line indicator for row drag-and-drop placement */
+  dropIndicator?: 'above' | 'below';
 }
 
 export const TableBodyCell = <T extends RowData>({
@@ -36,6 +44,7 @@ export const TableBodyCell = <T extends RowData>({
   lastRow,
   dragListeners,
   dragAttributes,
+  dropIndicator,
 }: TableBodyCellProps<T>) => {
   const { allLeafColumns, masterColumnId } = useTableContext<T>();
   const testId = useTestId('body-cell');
@@ -109,6 +118,7 @@ export const TableBodyCell = <T extends RowData>({
         width: cell.column.getSize(),
         ...dndStyle,
         ...(isCut && { overflow: 'hidden' }),
+        ...(dropIndicator && { boxShadow: DROP_INDICATOR_SHADOW[dropIndicator] }),
       }}
       colSpan={colSpan}
       {...dragListeners}

@@ -23,10 +23,10 @@ export const createDragHandleColumn = <T extends RowData>(): ColumnDef<
     enableHiding: false,
     enablePinning: false,
     meta: {
-      headerClassName: 'px-8 py-4',
-      cellClassName: 'px-8 py-8',
+      headerClassName: 'px-4 py-4',
+      cellClassName: 'px-4 py-8',
     },
     header: () => null,
-    cell: () => <GripVertical size='sm' className='text-text-tertiary' />,
+    cell: () => <GripVertical size='sm' className='text-text-secondary' />,
   };
 };
