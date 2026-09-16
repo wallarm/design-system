@@ -51,7 +51,7 @@ test.describe('Component: EditableCell', () => {
       await story.goto(page, 'Inline Cell Editing');
 
       // The Category column starts empty → placeholder text.
-      await expect(page.getByRole('combobox').filter({ hasText: 'Select…' }).first()).toBeVisible();
+      await expect(page.getByRole('combobox').filter({ hasText: 'Select' }).first()).toBeVisible();
     });
   });
 

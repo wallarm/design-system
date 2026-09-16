@@ -76,51 +76,57 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
     prevStickyIdRef.current = stickyRow.id;
   }, [stickyRow, containerRef, tbodyRef, useWindowScroll, headerHeight]);
 
-  if (!stickyRow) return null;
+  const cells = stickyRow?.getVisibleCells();
+  const systemCells = cells?.filter(c => SYSTEM_COLUMN_IDS.has(c.column.id));
+  const dataCells = cells?.filter(c => !SYSTEM_COLUMN_IDS.has(c.column.id));
+  const firstDataCell = dataCells?.[0];
+  const isSelected = stickyRow?.getIsAllSubRowsSelected();
 
-  const cells = stickyRow.getVisibleCells();
-  const systemCells = cells.filter(c => SYSTEM_COLUMN_IDS.has(c.column.id));
-  const dataCells = cells.filter(c => !SYSTEM_COLUMN_IDS.has(c.column.id));
-  const firstDataCell = dataCells[0];
-  const isSelected = stickyRow.getIsAllSubRowsSelected();
-
+  // Always render the sticky anchor to avoid DOM insertion/removal during
+  // scroll which causes a brief layout reflow (the "jump" glitch).
   return (
     <div
-      className='sticky z-20 h-0 overflow-visible pointer-events-none'
+      className='sticky z-[21] h-0 overflow-visible pointer-events-none'
       style={{ top: headerHeight }}
       aria-hidden='true'
     >
-      <div className='overflow-hidden' style={{ height: rowRef.current?.offsetHeight ?? 40 }}>
-        <div style={{ transform: pushUpOffset ? `translateY(${pushUpOffset}px)` : undefined }}>
-          <table
-            className='table-fixed border-separate border-spacing-0 pointer-events-auto'
-            style={{ width: tableWidth }}
-          >
-            <TableColGroup tableWidth={tableWidth} />
-            <tbody>
-              <Tr ref={rowRef} className='group/row' data-selected={isSelected || undefined}>
-                {systemCells.map(cell => (
-                  <TableBodyCell key={cell.id} cell={cell} disablePinnedShadow />
-                ))}
-                {firstDataCell && (
-                  <TableBodyCell cell={firstDataCell} className='border-r-0' disablePinnedShadow />
-                )}
-                {dataCells.slice(1).map(cell => (
-                  <Td
-                    key={cell.id}
-                    className={cn(
-                      'border-b border-border-primary-light bg-bg-surface-2 overlay',
-                      'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
-                    )}
-                    style={{ width: cell.column.getSize() }}
-                    aria-hidden='true'
-                  />
-                ))}
-              </Tr>
-            </tbody>
-          </table>
+      {stickyRow && (
+        <div className='overflow-hidden' style={{ height: rowRef.current?.offsetHeight ?? 40 }}>
+          <div style={{ transform: pushUpOffset ? `translateY(${pushUpOffset}px)` : undefined }}>
+            <table
+              className='table-fixed border-separate border-spacing-0 pointer-events-auto'
+              style={{ width: tableWidth }}
+            >
+              <TableColGroup tableWidth={tableWidth} />
+              <tbody>
+                <Tr ref={rowRef} className='group/row' data-selected={isSelected || undefined}>
+                  {systemCells!.map(cell => (
+                    <TableBodyCell key={cell.id} cell={cell} disablePinnedShadow />
+                  ))}
+                  {firstDataCell && (
+                    <TableBodyCell
+                      cell={firstDataCell}
+                      className='border-r-0'
+                      disablePinnedShadow
+                    />
+                  )}
+                  {dataCells!.slice(1).map(cell => (
+                    <Td
+                      key={cell.id}
+                      className={cn(
+                        'border-b border-border-primary-light bg-bg-surface-2 overlay',
+                        'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
+                      )}
+                      style={{ width: cell.column.getSize() }}
+                      aria-hidden='true'
+                    />
+                  ))}
+                </Tr>
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };

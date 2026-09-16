@@ -137,7 +137,7 @@ describe('EditableSelectCell', () => {
         </EditableSelectCell>,
       );
 
-      expect(screen.getByRole('combobox')).toHaveTextContent('Select…');
+      expect(screen.getByRole('combobox')).toHaveTextContent('Select');
     });
 
     it('renders a custom placeholder set from outside', () => {
@@ -159,7 +159,7 @@ describe('EditableSelectCell', () => {
 
       const trigger = screen.getByRole('combobox');
       expect(trigger).toHaveTextContent('Blocked badge');
-      expect(trigger).not.toHaveTextContent('Select…');
+      expect(trigger).not.toHaveTextContent('Select');
     });
   });
 
