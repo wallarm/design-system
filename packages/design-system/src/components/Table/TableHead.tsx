@@ -1,12 +1,12 @@
 import type { FC } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { THead, Tr } from './primitives';
+import { THead, Th, Tr } from './primitives';
 import { useTableContext } from './TableContext';
 import { TableHeadCell } from './TableHeadCell';
 
 export const TableHead: FC = () => {
-  const { table } = useTableContext();
+  const { table, stretch } = useTableContext();
   const testId = useTestId('head');
 
   const hasTextDescription = table
@@ -27,6 +27,7 @@ export const TableHead: FC = () => {
               hasTextDescription={hasTextDescription}
             />
           ))}
+          {!stretch && <Th aria-hidden />}
         </Tr>
       ))}
     </THead>

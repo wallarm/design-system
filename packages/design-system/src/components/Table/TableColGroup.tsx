@@ -23,7 +23,7 @@ interface TableColGroupProps {
  * so table-fixed has zero leftover space to redistribute.
  */
 export const TableColGroup: FC<TableColGroupProps> = ({ tableWidth }) => {
-  const { table } = useTableContext();
+  const { table, stretch } = useTableContext();
   const columns = table.getVisibleLeafColumns();
 
   const isFixed = (col: (typeof columns)[number]) =>
@@ -40,7 +40,7 @@ export const TableColGroup: FC<TableColGroupProps> = ({ tableWidth }) => {
   return (
     <colgroup>
       {columns.map(col => {
-        if (isFixed(col)) {
+        if (isFixed(col) || !stretch) {
           return <col key={col.id} style={{ width: col.getSize() }} />;
         }
 
@@ -49,6 +49,7 @@ export const TableColGroup: FC<TableColGroupProps> = ({ tableWidth }) => {
         const pixelWidth = (col.getSize() / totalFlexSize) * availableForFlex;
         return <col key={col.id} style={{ width: pixelWidth }} />;
       })}
+      {!stretch && <col key='_filler' />}
     </colgroup>
   );
 };

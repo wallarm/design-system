@@ -298,6 +298,14 @@ export interface TableProps<T> extends TestableProps {
   // --- Virtualization ---
   /** Enable row virtualization. `'container'` virtualizes within the scroll container; `'window'` virtualizes against the browser window. */
   virtualized?: TableVirtualized;
+  /**
+   * Whether columns stretch proportionally to fill the container width.
+   * When `false`, columns use their defined sizes and the table may be
+   * narrower than its container.
+   *
+   * Default: `true`.
+   */
+  stretch?: boolean;
   estimateRowHeight?: (index: number) => number;
   overscan?: number;
 
