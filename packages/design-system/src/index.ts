@@ -552,6 +552,7 @@ export {
   ScrollAreaViewport,
   type ScrollAreaViewportProps,
 } from './components/ScrollArea';
+export { SearchInput, type SearchInputProps } from './components/SearchInput';
 export {
   SearchModal,
   SearchModalBody,
