@@ -101,12 +101,13 @@ describe('Attribute pass-through (compound seams)', () => {
     expect(clear).toHaveAttribute('data-analytics-id', 'FRAMEWORK_CLEAR');
   });
 
-  it('forwards data-analytics-id to the SelectSearchInput container', async () => {
+  it('forwards data-analytics-id to the SelectSearchInput input', async () => {
     renderSelect();
     await userEvent.click(screen.getByTestId('trigger'));
 
-    const search = await screen.findByTestId('search');
-    expect(search).toHaveAttribute('data-analytics-id', 'FRAMEWORK_SEARCH');
+    const searchContainer = await screen.findByTestId('search');
+    const input = searchContainer.querySelector('input');
+    expect(input).toHaveAttribute('data-analytics-id', 'FRAMEWORK_SEARCH');
   });
 });
 

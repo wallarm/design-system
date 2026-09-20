@@ -1,8 +1,6 @@
-import type { ChangeEvent, FC, HTMLAttributes } from 'react';
-import { Search } from '../../icons';
+import type { FC, HTMLAttributes } from 'react';
 import { type TestableProps, useTestId } from '../../utils/testId';
-import { Input } from '../Input';
-import { InputGroup, InputGroupAddon } from '../InputGroup';
+import { SearchInput } from '../SearchInput';
 
 export interface SelectSearchInputProps
   extends Omit<HTMLAttributes<HTMLDivElement>, 'children' | 'onChange' | 'color'>,
@@ -19,18 +17,7 @@ export const SelectSearchInput: FC<SelectSearchInputProps> = ({
 }) => {
   const testId = useTestId('search-input', testIdProp);
 
-  const handleChange = (event: ChangeEvent<HTMLInputElement>) => {
-    onChange(event.target.value);
-  };
-
-  return (
-    <InputGroup {...rest} data-testid={testId}>
-      <InputGroupAddon>
-        <Search />
-      </InputGroupAddon>
-      <Input placeholder='Search' value={value} onChange={handleChange} />
-    </InputGroup>
-  );
+  return <SearchInput {...rest} value={value} onChange={onChange} data-testid={testId} />;
 };
 
 SelectSearchInput.displayName = 'SelectSearchInput';
