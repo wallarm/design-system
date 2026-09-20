@@ -70,7 +70,11 @@ export const EditableSelectCell: FC<EditableSelectCellProps> = ({
       collection={collection}
       value={hasValue ? [value] : []}
       data-testid={testId}
-      positioning={{ placement: 'bottom-start' }}
+      positioning={{
+        placement: 'bottom-start',
+        sameWidth: true,
+        offset: { crossAxis: -8 },
+      }}
       onValueChange={details => {
         const next = details.value[0];
         if (next && next !== value) onCommit(next);
@@ -103,7 +107,10 @@ export const EditableSelectCell: FC<EditableSelectCellProps> = ({
           </div>
         </ArkUiSelect.Trigger>
       </ArkUiSelect.Control>
-      <SelectPositioner>
+      <SelectPositioner
+        className='min-w-full max-w-full'
+        style={{ width: 'calc(var(--reference-width) + 16px)' }}
+      >
         <SelectContent>
           {items.map(item => (
             <SelectOption key={item.value} item={item}>
