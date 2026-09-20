@@ -1,59 +1,39 @@
 import { useCallback, useRef, useState } from 'react';
-
-const isClipboardSupported =
-  typeof navigator !== 'undefined' &&
-  typeof navigator.clipboard !== 'undefined' &&
-  typeof navigator.clipboard.writeText === 'function';
+import { copyText } from '../utils/copyText';
 
 /**
  * Hook for copying text to clipboard with status tracking.
  *
+ * Uses the Clipboard API with an `execCommand` fallback for older browsers.
+ * The `copied` flag auto-resets after `resetDelay` ms.
+ *
  * @param resetDelay - Time in ms before `copied` resets to false (default: 2000)
- * @returns Object with `copied` state, `copy` function, `reset` function, and `isSupported` flag
+ * @returns `{ copied, copy }` — `copied` is `true` while the feedback window is active
  *
  * @example
  * ```tsx
- * const { copied, copy, reset, isSupported } = useCopyToClipboard();
+ * const { copied, copy } = useCopyToClipboard();
  *
- * {isSupported && (
- *   <button onClick={() => copy('text to copy')}>
- *     {copied ? 'Copied!' : 'Copy'}
- *   </button>
- * )}
+ * <button onClick={() => copy('text to copy')}>
+ *   {copied ? 'Copied!' : 'Copy'}
+ * </button>
  * ```
  */
 export function useCopyToClipboard(resetDelay = 2000) {
   const [copied, setCopied] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined);
 
-  const reset = useCallback(() => {
-    if (timeoutRef.current) {
-      clearTimeout(timeoutRef.current);
-    }
-    setCopied(false);
-  }, []);
-
   const copy = useCallback(
-    async (text: string): Promise<boolean> => {
-      if (!isClipboardSupported) {
-        return false;
+    (text: string) => {
+      copyText(text);
+      setCopied(true);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
-
-      try {
-        await navigator.clipboard.writeText(text);
-        setCopied(true);
-        if (timeoutRef.current) {
-          clearTimeout(timeoutRef.current);
-        }
-        timeoutRef.current = setTimeout(() => setCopied(false), resetDelay);
-        return true;
-      } catch {
-        // Clipboard access denied or other error
-        return false;
-      }
+      timeoutRef.current = setTimeout(() => setCopied(false), resetDelay);
     },
     [resetDelay],
   );
 
-  return { copied, copy, reset, isSupported: isClipboardSupported };
+  return { copied, copy };
 }

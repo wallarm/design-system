@@ -193,7 +193,15 @@ export {
   type CheckboxProps,
 } from './components/Checkbox';
 export { Code, type CodeProps } from './components/Code';
-export { CopyButton, type CopyButtonProps } from './components/CopyButton';
+export {
+  Copyable,
+  CopyableIcon,
+  type CopyableIconProps,
+  CopyableLabel,
+  type CopyableLabelProps,
+  type CopyableProps,
+  useCopyable,
+} from './components/Copyable';
 export {
   Country,
   CountryFlag,

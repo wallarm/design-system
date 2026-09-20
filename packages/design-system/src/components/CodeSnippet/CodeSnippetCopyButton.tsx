@@ -1,7 +1,7 @@
 import type { FC, Ref } from 'react';
 import { useTestId } from '../../utils/testId';
-import type { ButtonProps } from '../Button';
-import { CopyButton } from '../CopyButton';
+import { Button, type ButtonProps } from '../Button';
+import { Copyable, CopyableIcon } from '../Copyable';
 import { useCodeSnippet } from './hooks';
 
 export type CodeSnippetCopyButtonProps = Omit<ButtonProps, 'children'> & {
@@ -13,14 +13,19 @@ export const CodeSnippetCopyButton: FC<CodeSnippetCopyButtonProps> = ({ ref, ...
   const { code } = useCodeSnippet();
 
   return (
-    <CopyButton
-      ref={ref}
-      text={code}
-      size='small'
-      aria-label='Copy code'
-      data-testid={testId}
-      {...props}
-    />
+    <Copyable text={code} tooltip>
+      <Button
+        ref={ref}
+        variant='ghost'
+        color='neutral'
+        size='small'
+        aria-label='Copy code'
+        data-testid={testId}
+        {...props}
+      >
+        <CopyableIcon />
+      </Button>
+    </Copyable>
   );
 };
 
