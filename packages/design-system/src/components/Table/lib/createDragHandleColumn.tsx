@@ -24,7 +24,7 @@ export const createDragHandleColumn = <T extends RowData>(): ColumnDef<
     enablePinning: false,
     meta: {
       headerClassName: 'px-4 py-4',
-      cellClassName: 'px-4 py-8',
+      cellClassName: 'px-4 py-8 align-middle text-center',
     },
     header: () => null,
     cell: () => <GripVertical size='sm' className='text-text-secondary' />,

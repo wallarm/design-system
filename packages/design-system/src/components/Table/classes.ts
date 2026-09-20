@@ -122,6 +122,13 @@ export const tableContainerVariants = cva(
 
 export const tableRowVariants = cva('transition-colors');
 
+/**
+ * Drop-indicator ::after pseudo-element (shared by TableBodyCell & filler Td).
+ * Positioned above borders so the line is uninterrupted across columns.
+ */
+export const DROP_INDICATOR_BASE =
+  "after:content-[''] after:absolute after:left-0 after:-right-px after:h-[2px] after:bg-[var(--color-border-strong-brand)] after:pointer-events-none after:z-[1]";
+
 /** Small icon button used in table header (sort, scroll, menu triggers) */
 export const tableHeaderButtonClass = cn(
   'w-16 h-16 shrink-0 hover:text-text-primary',
