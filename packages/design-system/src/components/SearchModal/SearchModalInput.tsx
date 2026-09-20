@@ -1,5 +1,5 @@
 import type { FC, InputHTMLAttributes, Ref } from 'react';
-import { Search } from '../../icons';
+import { Search, X } from '../../icons';
 import { cn } from '../../utils/cn';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { useTestId } from '../../utils/testId';
@@ -45,14 +45,28 @@ export const SearchModalInput: FC<SearchModalInputProps> = ({
         )}
         autoComplete='off'
       />
+      {query && (
+        <button
+          type='button'
+          tabIndex={-1}
+          onClick={() => {
+            setQuery('');
+            inputRef.current?.focus();
+          }}
+          className='shrink-0 cursor-pointer text-text-secondary hover:text-text-primary transition-colors'
+          aria-label='Clear search'
+        >
+          <X className='!icon-md' />
+        </button>
+      )}
       <button
         type='button'
         tabIndex={-1}
         onClick={close}
-        className='shrink-0 cursor-pointer'
+        className='flex shrink-0 cursor-pointer'
         aria-label='Close'
       >
-        <Kbd size='xsmall'>ESC</Kbd>
+        <Kbd size='small'>ESC</Kbd>
       </button>
     </div>
   );
