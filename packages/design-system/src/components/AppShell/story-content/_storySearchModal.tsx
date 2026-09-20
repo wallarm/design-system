@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Building, LoaderCircle, Plus } from '../../../icons';
+import { Building, CircleDashed, Plus } from '../../../icons';
 import { Button } from '../../Button';
 import { Code } from '../../Code';
 import { EmptyState, EmptyStateDescription, EmptyStateMessage } from '../../EmptyState';
@@ -134,7 +134,7 @@ export const StorySearchModal = () => {
               </SearchModalGroupLabel>
               {filteredRecent.map(item => (
                 <SearchModalItem key={`${item.page}-${item.product}`} onSelect={() => {}}>
-                  <LoaderCircle className='text-text-primary shrink-0 !icon-md' />
+                  <CircleDashed className='text-text-primary shrink-0 !icon-md' />
                   <Text size='sm' grow truncate>
                     {item.page}
                     <Text size='sm' color='secondary' inline>
@@ -161,7 +161,7 @@ export const StorySearchModal = () => {
               </SearchModalGroupLabel>
               {filteredJumpTo.map(item => (
                 <SearchModalItem key={item.href} onSelect={() => {}}>
-                  <LoaderCircle className='text-text-primary shrink-0 !icon-md' />
+                  <CircleDashed className='text-text-primary shrink-0 !icon-md' />
                   <Text size='sm'>{item.name}</Text>
                 </SearchModalItem>
               ))}
