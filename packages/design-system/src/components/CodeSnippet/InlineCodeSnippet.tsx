@@ -1,10 +1,9 @@
-import type { ComponentPropsWithRef, FC, MouseEventHandler, ReactElement } from 'react';
+import type { ComponentPropsWithRef, FC, ReactElement } from 'react';
 import { cloneElement, isValidElement } from 'react';
 import { Slot } from '@radix-ui/react-slot';
 import { cva } from 'class-variance-authority';
-import { useCopyTooltip } from '../../hooks';
 import { cn } from '../../utils/cn';
-import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
+import { Copyable } from '../Copyable';
 
 export interface InlineCodeSnippetProps extends Omit<ComponentPropsWithRef<'code'>, 'children'> {
   /** The code content to display */
@@ -70,15 +69,6 @@ export const InlineCodeSnippet: FC<InlineCodeSnippetProps> = props => {
     children,
     ...otherProps
   } = props;
-  const { copied, tooltipOpen, onTooltipOpenChange, handleCopy } = useCopyTooltip({
-    text: code,
-    enabled: copyable,
-  });
-
-  const handleClick: MouseEventHandler<HTMLElement> = event => {
-    handleCopy();
-    onClick?.(event);
-  };
 
   const sharedProps = {
     ref,
@@ -90,7 +80,7 @@ export const InlineCodeSnippet: FC<InlineCodeSnippetProps> = props => {
     'data-ds-suppress-parent-click': copyable ? '' : undefined,
     className: cn(inlineCodeSnippetVariants({ size, copyable }), className),
     ...otherProps,
-    onClick: handleClick,
+    onClick,
   };
 
   const codeElement =
@@ -105,10 +95,9 @@ export const InlineCodeSnippet: FC<InlineCodeSnippetProps> = props => {
   }
 
   return (
-    <Tooltip open={tooltipOpen} onOpenChange={onTooltipOpenChange} closeOnPointerDown={false}>
-      <TooltipTrigger asChild>{codeElement}</TooltipTrigger>
-      <TooltipContent>{copied ? 'Copied' : 'Click to copy'}</TooltipContent>
-    </Tooltip>
+    <Copyable text={code} tooltip>
+      {codeElement}
+    </Copyable>
   );
 };
 
