@@ -2,6 +2,7 @@ import { memo, type Ref, useCallback } from 'react';
 import type { Row, RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
+import { DROP_INDICATOR_BASE } from './classes';
 import {
   type DSTableFeatures,
   TABLE_DRAG_HANDLE_COLUMN_ID,
@@ -171,7 +172,18 @@ const TableRowInner = <T extends RowData>({
             />
           );
         })}
-        {!stretch && <Td pinned={false} aria-hidden />}
+        {!stretch && (
+          <Td
+            pinned={false}
+            aria-hidden
+            className={cn(
+              dropIndicator && DROP_INDICATOR_BASE,
+              dropIndicator === 'above' && 'after:top-0',
+              dropIndicator === 'below' && 'after:-bottom-px',
+            )}
+            style={dropIndicator ? { overflow: 'visible' } : undefined}
+          />
+        )}
       </Tr>
       {expandingEnabled && (
         <TableRowExpanded row={row} dndStyle={dndStyle} lastRow={isLastRowExpanded} />

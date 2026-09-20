@@ -3,6 +3,7 @@ import { type Cell, flexRender, type RowData } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
+import { DROP_INDICATOR_BASE } from '../classes';
 import { useMasterCell } from '../hooks';
 import {
   type DSTableFeatures,
@@ -16,12 +17,6 @@ import {
 import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableMasterCellActions } from '../TableMasterCellActions';
-
-/** Box-shadow styles for the orange drop indicator line */
-const DROP_INDICATOR_SHADOW = {
-  above: 'inset 0 2px 0 0 var(--color-border-strong-warning)',
-  below: 'inset 0 -2px 0 0 var(--color-border-strong-warning)',
-} as const;
 
 interface TableBodyCellProps<T extends RowData> {
   cell: Cell<DSTableFeatures, T, unknown>;
@@ -104,6 +99,9 @@ export const TableBodyCell = <T extends RowData>({
         isCut && 'pr-0',
         (isMasterTrigger || tooltipText) && 'cursor-pointer',
         dragListeners && 'cursor-grab active:cursor-grabbing',
+        dropIndicator && DROP_INDICATOR_BASE,
+        dropIndicator === 'above' && 'after:top-0',
+        dropIndicator === 'below' && 'after:-bottom-px',
         meta?.cellClassName,
         className,
       )}
@@ -118,7 +116,10 @@ export const TableBodyCell = <T extends RowData>({
         width: cell.column.getSize(),
         ...dndStyle,
         ...(isCut && { overflow: 'hidden' }),
-        ...(dropIndicator && { boxShadow: DROP_INDICATOR_SHADOW[dropIndicator] }),
+        // Force overflow:visible so the ::after indicator line extends past
+        // the padding box into the border zone (overrides both the overlay
+        // utility and the isCut overflow:hidden above).
+        ...(dropIndicator && { overflow: 'visible' }),
       }}
       colSpan={colSpan}
       {...dragListeners}
