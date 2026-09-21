@@ -116,6 +116,7 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
                       className={cn(
                         'border-b border-border-primary-light bg-bg-surface-2 overlay',
                         'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
+                        'group-data-[preview-active]/row:overlay-states-primary-hover group-has-[[data-state=open]]/row:overlay-states-primary-hover',
                       )}
                       style={{ width: cell.column.getSize() }}
                       aria-hidden='true'

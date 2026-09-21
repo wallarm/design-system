@@ -175,7 +175,9 @@ test.describe('Component: Table', () => {
       await tableStory.goto(page, 'Manual Sorting');
 
       const table = page.getByTestId('manual-sort-table');
-      const cell = table.locator('tbody tr').first().locator('td').nth(1);
+      // nth(2) skips the new Switch "State" column at index 1 to reach a
+      // text-bearing cell whose content can be selected with a double-click.
+      const cell = table.locator('tbody tr').first().locator('td').nth(2);
 
       await cell.dblclick();
 
@@ -422,7 +424,11 @@ test.describe('Component: Table', () => {
       // unique on this story regardless.
       const bar = page.getByRole('dialog');
 
-      await anchor.locator('[data-row-id]').first().locator('[data-part="control"]').click();
+      await anchor
+        .locator('[data-row-id]')
+        .first()
+        .locator('[data-scope="checkbox"][data-part="control"]')
+        .click();
       await expect(bar).toBeVisible();
 
       // The bar centers on the table's own width (read from the anchor), not the
@@ -471,7 +477,11 @@ test.describe('Component: Table', () => {
       // unique on this story regardless.
       const bar = page.getByRole('dialog');
 
-      await anchor.locator('[data-row-id]').first().locator('[data-part="control"]').click();
+      await anchor
+        .locator('[data-row-id]')
+        .first()
+        .locator('[data-scope="checkbox"][data-part="control"]')
+        .click();
       await expect(bar).toBeVisible();
 
       // Scrolling to document.body.scrollHeight is a moving target here:

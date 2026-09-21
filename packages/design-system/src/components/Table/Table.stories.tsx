@@ -1631,6 +1631,113 @@ export const MasterCellWithDrawer: StoryFn<typeof meta> = () => {
 };
 
 /**
+ * Master cell with both an action menu and a drawer:
+ * clicking the cell body opens the drawer, clicking the action button opens the menu
+ * without triggering the drawer.
+ */
+export const MasterCellWithActionsAndDrawer: StoryFn<typeof meta> = () => {
+  const [sorting, setSorting] = useState<TableSortingState>([]);
+  const [activeRowId, setActiveRowId] = useState<string | null>(null);
+
+  const data = useMemo(() => multiplySecurityEvents(), []);
+
+  const columns = useMemo<TableColumnDef<SecurityEvent>[]>(
+    () =>
+      securityColumns.map((col, i) =>
+        i === 0
+          ? {
+              ...col,
+              cell: ({ row }: { row: { original: SecurityEvent } }) => (
+                <Text size='xs'>{row.original.objectName}</Text>
+              ),
+              meta: {
+                ...col.meta,
+                resizeType: 'resize',
+                renderMenuAction: (row: { original: SecurityEvent }) => (
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button variant='ghost' color='neutral' size='small' aria-label='More'>
+                        <Ellipsis />
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent>
+                      <DropdownMenuItem
+                        onSelect={() => navigator.clipboard.writeText(row.original.objectName)}
+                      >
+                        <DropdownMenuItemIcon>
+                          <Copy />
+                        </DropdownMenuItemIcon>
+                        <DropdownMenuItemText>Copy name</DropdownMenuItemText>
+                      </DropdownMenuItem>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem onSelect={() => onShowOnly(row.original.objectName)}>
+                        <DropdownMenuItemIcon>
+                          <Filter />
+                        </DropdownMenuItemIcon>
+                        <DropdownMenuItemText>Show only</DropdownMenuItemText>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem onSelect={() => onExclude(row.original.objectName)}>
+                        <DropdownMenuItemIcon>
+                          <FilterX />
+                        </DropdownMenuItemIcon>
+                        <DropdownMenuItemText>Exclude</DropdownMenuItemText>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                ),
+              },
+            }
+          : col,
+      ),
+    [],
+  );
+
+  const handleMasterCellClick = useCallback((rowId: string) => {
+    setActiveRowId(prev => (prev === rowId ? null : rowId));
+  }, []);
+
+  const activeRow = useMemo(() => data.find(d => d.id === activeRowId), [data, activeRowId]);
+
+  return (
+    <>
+      <Table
+        className='max-w-920'
+        data={data}
+        columns={columns}
+        getRowId={row => row.id}
+        sorting={sorting}
+        onSortingChange={setSorting}
+        onMasterCellClick={handleMasterCellClick}
+        activeRowId={activeRowId}
+      />
+      <Drawer
+        open={!!activeRow}
+        onOpenChange={open => {
+          if (!open) setActiveRowId(null);
+        }}
+        modal={false}
+        overlay={false}
+        closeOnOutsideClick={false}
+        width={960}
+      >
+        <DrawerContent>
+          {activeRow ? (
+            renderSecurityPreviewHeader({ original: activeRow })
+          ) : (
+            <DrawerHeader>
+              <span />
+            </DrawerHeader>
+          )}
+          <DrawerBody>
+            {activeRow && renderSecurityPreviewContent({ original: activeRow })}
+          </DrawerBody>
+        </DrawerContent>
+      </Drawer>
+    </>
+  );
+};
+
+/**
  * Grouping, expansion, selection, pinning, virtualization and the action bar in one table —
  * the honest test of whether the features cooperate rather than merely exist.
  */
