@@ -1,3 +1,4 @@
+import type { MouseEvent } from 'react';
 import { useCallback } from 'react';
 import type { RowData } from '@tanstack/react-table';
 import { useTableContext } from '../TableContext';
@@ -12,9 +13,15 @@ export const useMasterCell = <T extends RowData>(columnId: string, rowId: string
   const isMasterColumn = columnId === masterColumnId;
   const hasMasterClick = isMasterColumn && !!onMasterCellClick;
 
-  const handleClick = useCallback(() => {
-    onMasterCellClick?.(rowId);
-  }, [onMasterCellClick, rowId]);
+  const handleClick = useCallback(
+    (e: MouseEvent) => {
+      // Skip when the click originates from the action area so the drawer
+      // doesn't open while still letting the event propagate for analytics.
+      if ((e.target as HTMLElement).closest('[data-master-cell-action]')) return;
+      onMasterCellClick?.(rowId);
+    },
+    [onMasterCellClick, rowId],
+  );
 
   return {
     /** Master cell click is enabled */
