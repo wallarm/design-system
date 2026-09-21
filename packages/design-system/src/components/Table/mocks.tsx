@@ -26,6 +26,7 @@ import {
   OverflowTooltipTrigger,
 } from '../OverflowTooltip';
 import { HStack, VStack } from '../Stack';
+import { Switch, SwitchControl } from '../Switch';
 import { Text } from '../Text';
 import { createTableColumnHelper } from './lib';
 import type { TableColumnDef } from './types';
@@ -50,6 +51,7 @@ export interface SecurityEvent {
   lastSeen: string;
   endpointMethod: HttpMethodName;
   endpointPath: string;
+  state: boolean;
 }
 
 export interface SecurityHeaderEntry {
@@ -91,6 +93,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '5 days ago',
     endpointMethod: 'POST',
     endpointPath: '/api/v1/payments',
+    state: true,
   },
   {
     id: '2',
@@ -108,6 +111,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '6 days ago',
     endpointMethod: 'PUT',
     endpointPath: '/api/v1/users/profile',
+    state: false,
   },
   {
     id: '3',
@@ -125,6 +129,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '7 days ago',
     endpointMethod: 'GET',
     endpointPath: '/api/v1/users/:id',
+    state: true,
   },
   {
     id: '4',
@@ -142,6 +147,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '1 week ago',
     endpointMethod: 'GET',
     endpointPath: '/api/v1/errors/debug',
+    state: true,
   },
   {
     id: '5',
@@ -159,6 +165,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '4 days ago',
     endpointMethod: 'POST',
     endpointPath: '/api/v1/auth/login',
+    state: false,
   },
   {
     id: '6',
@@ -176,6 +183,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '2 days ago',
     endpointMethod: 'POST',
     endpointPath: '/api/v1/files/upload',
+    state: true,
   },
   {
     id: '7',
@@ -193,6 +201,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '3 days ago',
     endpointMethod: 'GET',
     endpointPath: '/api/v1/images/proxy',
+    state: false,
   },
   {
     id: '8',
@@ -210,6 +219,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '4 days ago',
     endpointMethod: 'GET',
     endpointPath: '/api/v1/auth/redirect',
+    state: true,
   },
   {
     id: '9',
@@ -227,6 +237,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '1 day ago',
     endpointMethod: 'DELETE',
     endpointPath: '/api/v1/users/:id',
+    state: false,
   },
   {
     id: '10',
@@ -244,6 +255,7 @@ export const securityEvents: SecurityEvent[] = [
     lastSeen: '3 days ago',
     endpointMethod: 'PATCH',
     endpointPath: '/api/v1/content',
+    state: true,
   },
 ];
 
@@ -268,6 +280,15 @@ export const securityColumns: TableColumnDef<SecurityEvent>[] = [
         </OverflowTooltipTrigger>
         <OverflowTooltipContent>{row.original.objectName}</OverflowTooltipContent>
       </OverflowTooltip>
+    ),
+  }),
+  securityColumnHelper.accessor('state', {
+    header: 'State',
+    size: 100,
+    cell: ({ getValue }) => (
+      <Switch checked={getValue()}>
+        <SwitchControl />
+      </Switch>
     ),
   }),
   securityColumnHelper.accessor('requests', {
@@ -619,6 +640,9 @@ const SecurityPreviewContent = ({ row }: { row: { original: SecurityEvent } }) =
       >
         {row.original.status}
       </Badge>
+      <Switch checked={row.original.state}>
+        <SwitchControl />
+      </Switch>
       <InlineCodeSnippet code={row.original.parameter} size='sm' copyable={false} />
     </HStack>
     <VStack gap={4}>
