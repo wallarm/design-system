@@ -22,7 +22,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Layout/SettingsHeader',
+  title: 'Layout/Headers/SettingsHeader',
   component: SettingsHeader,
   subcomponents: {
     SettingsHeaderActions,
@@ -66,7 +66,7 @@ export const Full: StoryFn<SettingsHeaderProps> = () => {
           </SettingsHeaderDescription>
         </div>
         <SettingsHeaderActions>
-          <Button variant='primary' color='brand'>
+          <Button size='medium' variant='primary' color='brand'>
             Create service account
           </Button>
         </SettingsHeaderActions>
@@ -129,10 +129,7 @@ export const WithBreadcrumbsAndActions: StoryFn<SettingsHeaderProps> = () => (
         </SettingsHeaderDescription>
       </div>
       <SettingsHeaderActions>
-        <Button variant='secondary' color='neutral'>
-          Export
-        </Button>
-        <Button variant='primary' color='brand'>
+        <Button size='medium' variant='primary' color='brand'>
           Add integration
         </Button>
       </SettingsHeaderActions>
