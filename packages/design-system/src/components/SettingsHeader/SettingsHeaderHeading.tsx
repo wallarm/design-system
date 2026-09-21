@@ -21,7 +21,7 @@ export const SettingsHeaderHeading: FC<SettingsHeaderHeadingProps> = ({
       ref={ref}
       data-testid={testId}
       data-slot='settings-header-heading'
-      className={cn('flex items-start justify-between gap-16 w-full', className)}
+      className={cn('flex items-center justify-between gap-16 w-full', className)}
     >
       {children}
     </div>

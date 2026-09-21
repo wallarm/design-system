@@ -21,7 +21,7 @@ export const SettingsHeaderBreadcrumbs: FC<SettingsHeaderBreadcrumbsProps> = ({
       ref={ref}
       data-testid={testId}
       data-slot='settings-header-breadcrumbs'
-      className={cn(className)}
+      className={cn('ml-[-4px]', className)}
     >
       {children}
     </div>
