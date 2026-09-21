@@ -38,7 +38,7 @@ export const SwitchControl: FC = () => {
       <ArkUiSwitch.Thumb
         className={cn(
           'w-16 h-12',
-          'bg-icon-primary-alt rounded-4 shadow-sm transition-all relative z-10',
+          'bg-icon-primary-alt rounded-4 shadow-sm transition-all relative z-[9]',
           'translate-x-4',
           'data-[state=checked]:translate-x-14',
         )}
