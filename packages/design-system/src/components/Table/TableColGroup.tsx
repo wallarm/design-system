@@ -24,13 +24,12 @@ interface TableColGroupProps {
  */
 export const TableColGroup: FC<TableColGroupProps> = ({ tableWidth }) => {
   const { table, stretch } = useTableContext();
-  // Pinned first, exactly as the header row and the body cells are built
-  // (`table_getHeaderGroups` / `row_getVisibleCells` both hoist the pinned
-  // regions). `getVisibleLeafColumns` does NOT: it returns the column order
-  // alone. The two agree until a `columnOrder` omits a pinned id — the
-  // auto-injected `_selection` column is never in a caller's order — and then
-  // TanStack appends that column at the end of the order while the header
-  // still draws it first, so every <col> lands on the wrong header.
+  // `getVisibleLeafColumns` applies `columnOrder` and nothing else, while the
+  // header row (`table_getHeaderGroups`) and the body cells
+  // (`row_getVisibleCells`) hoist the pinned regions. The two disagree
+  // whenever a pinned column does not already sit in its pinned position —
+  // pinning a middle column, or a caller order that omits the auto-injected
+  // `_selection` — and then every <col> lands on the wrong header.
   const columns = [
     ...table.getStartVisibleLeafColumns(),
     ...table.getCenterVisibleLeafColumns(),
