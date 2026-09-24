@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { Activity } from '../../icons';
@@ -139,6 +139,48 @@ describe('Avatar plate', () => {
       .getByTestId('item-user')
       .querySelector('[data-slot="nav-rail-item-avatar"]');
     expect(plate).not.toBeNull();
+    expect(plate?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('fills the plate with the photo when avatarSrc is set', () => {
+    render(
+      <NavRail>
+        <NavRailItem
+          icon={Activity}
+          label='Meow Meow'
+          avatarSrc='/me.png'
+          data-testid='item-user'
+        />
+      </NavRail>,
+    );
+
+    const img = screen
+      .getByTestId('item-user')
+      .querySelector('[data-slot="nav-rail-item-avatar"] img');
+    expect(img).toHaveAttribute('src', '/me.png');
+    expect(img).toHaveAttribute('alt', '');
+  });
+
+  it('falls back to the icon when the photo fails to load', () => {
+    render(
+      <NavRail>
+        <NavRailItem
+          icon={Activity}
+          label='Meow Meow'
+          avatarSrc='/broken.png'
+          data-testid='item-user'
+        />
+      </NavRail>,
+    );
+
+    const plate = screen
+      .getByTestId('item-user')
+      .querySelector('[data-slot="nav-rail-item-avatar"]');
+    const img = plate?.querySelector('img');
+    if (!img) throw new Error('expected the photo to render first');
+    fireEvent.error(img);
+
+    expect(plate?.querySelector('img')).toBeNull();
     expect(plate?.querySelector('svg')).not.toBeNull();
   });
 

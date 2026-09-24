@@ -6,6 +6,7 @@ import {
   type ReactNode,
   type Ref,
   useRef,
+  useState,
 } from 'react';
 import { composeRefs } from '@radix-ui/react-compose-refs';
 import { Slot, Slottable } from '@radix-ui/react-slot';
@@ -29,6 +30,8 @@ export interface NavRailItemProps extends AnchorHTMLAttributes<HTMLAnchorElement
   active?: boolean;
   /** Seats the icon on a soft plate, for the signed-in user's item at the foot of the rail. */
   avatar?: boolean;
+  /** User photo for the plate (implies `avatar`). The icon stays underneath and returns if the photo fails to load. */
+  avatarSrc?: string;
 }
 
 export const NavRailItem: FC<NavRailItemProps> = ({
@@ -39,6 +42,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
   shortcut,
   active = false,
   avatar = false,
+  avatarSrc,
   className,
   children,
   'data-testid': testIdProp,
@@ -48,6 +52,9 @@ export const NavRailItem: FC<NavRailItemProps> = ({
   const testId = useTestId('item', testIdProp);
   const Comp = asChild ? Slot : 'a';
   const internalRef = useRef<HTMLAnchorElement>(null);
+  const [failedSrc, setFailedSrc] = useState<string>();
+  const photo = avatarSrc && avatarSrc !== failedSrc ? avatarSrc : undefined;
+  const hasPlate = avatar || avatarSrc !== undefined;
 
   useShortcut(shortcut, internalRef);
 
@@ -61,13 +68,26 @@ export const NavRailItem: FC<NavRailItemProps> = ({
       className={cn(navRailItemVariants({ active }), className)}
     >
       <span className='flex shrink-0 items-center justify-center'>
-        {avatar ? (
+        {hasPlate ? (
           // The plate overhangs the 16px icon slot by 4px on every side, so labels stay aligned.
+          // Icon and photo share one grid cell rather than using absolute positioning, so the
+          // item's hover/active overlay still tints the plate.
           <span
             data-slot='nav-rail-item-avatar'
-            className='-m-4 flex size-24 items-center justify-center rounded-8 border border-border-primary bg-states-primary-hover'
+            className={cn(
+              '-m-4 grid size-24 place-items-center overflow-hidden rounded-8 bg-states-primary-hover *:col-start-1 *:row-start-1',
+              !photo && 'border border-border-primary',
+            )}
           >
             <Icon size='md' />
+            {photo && (
+              <img
+                src={photo}
+                alt=''
+                className='size-full object-cover'
+                onError={() => setFailedSrc(photo)}
+              />
+            )}
           </span>
         ) : (
           <Icon size='md' />
