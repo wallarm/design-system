@@ -1,5 +1,6 @@
 import { subDays, subHours, subMinutes, subMonths, subSeconds, subYears } from 'date-fns';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { DateFormatProvider } from '../DateFormatProvider';
 import { HStack, VStack } from '../Stack';
 import { Text } from '../Text';
 import { FormatDateTime } from './FormatDateTime';
@@ -170,4 +171,57 @@ export const NullValue: StoryFn<typeof meta> = () => (
  */
 export const FutureDate: StoryFn<typeof meta> = () => (
   <FormatDateTime value={new Date(Date.now() + 5 * 60 * 1000)} format='relative' />
+);
+
+/**
+ * The component respects the app's date order from `DateFormatProvider`. Day-first (the
+ * default) prints "11 Feb, 2026"; month-first prints "Feb 11, 2026". Both hour cycles
+ * are shown: 24-hour and 12-hour with AM/PM.
+ */
+export const DateOrderAndHourCycle: StoryFn<typeof meta> = () => (
+  <VStack gap={24} align='start'>
+    <VStack gap={12} align='start'>
+      <span className='sb-annotation'>Day-first, 24-hour (default)</span>
+      <DateFormatProvider order='day-first' hourCycle={24}>
+        <VStack gap={8} align='start'>
+          <FormatDateTime value='2026-02-11T14:32:07' format='date' />
+          <FormatDateTime value='2026-02-11T14:32:07' format='datetime' />
+          <FormatDateTime value={subDays(now, 200)} format='relative' />
+        </VStack>
+      </DateFormatProvider>
+    </VStack>
+
+    <VStack gap={12} align='start'>
+      <span className='sb-annotation'>Month-first, 12-hour</span>
+      <DateFormatProvider order='month-first' hourCycle={12}>
+        <VStack gap={8} align='start'>
+          <FormatDateTime value='2026-02-11T14:32:07' format='date' />
+          <FormatDateTime value='2026-02-11T14:32:07' format='datetime' />
+          <FormatDateTime value={subDays(now, 200)} format='relative' />
+        </VStack>
+      </DateFormatProvider>
+    </VStack>
+
+    <VStack gap={12} align='start'>
+      <span className='sb-annotation'>Day-first, 12-hour</span>
+      <DateFormatProvider order='day-first' hourCycle={12}>
+        <VStack gap={8} align='start'>
+          <FormatDateTime value='2026-02-11T14:32:07' format='date' />
+          <FormatDateTime value='2026-02-11T14:32:07' format='datetime' />
+          <FormatDateTime value={subDays(now, 200)} format='relative' />
+        </VStack>
+      </DateFormatProvider>
+    </VStack>
+
+    <VStack gap={12} align='start'>
+      <span className='sb-annotation'>Month-first, 24-hour</span>
+      <DateFormatProvider order='month-first' hourCycle={24}>
+        <VStack gap={8} align='start'>
+          <FormatDateTime value='2026-02-11T14:32:07' format='date' />
+          <FormatDateTime value='2026-02-11T14:32:07' format='datetime' />
+          <FormatDateTime value={subDays(now, 200)} format='relative' />
+        </VStack>
+      </DateFormatProvider>
+    </VStack>
+  </VStack>
 );
