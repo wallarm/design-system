@@ -32,6 +32,7 @@ import {
 const DESCRIPTION = [
   'The platform’s outermost frame — global top bar, product rail, and the content surface products mount into. There is exactly one, at the app root, and it persists while the content swaps.',
   'Do not wrap a page in it: a single product screen renders `RemoteShell` and its own content, blind to the shell. In-product navigation is `NavPanel`, and laying out a page’s insides is `Stack` and `Flex`.',
+  'The gray surround — header bar plus rail, everything that is not the canvas — is the **Frame**. It carries **Ambient**, a faint living layer of slow-drifting blooms, grain and a dot cluster pooled bottom-left, painted under everything and stilled under reduced motion. Ambient is on by default; `ambient={false}` leaves the flat Frame fill.',
 ].join(' ');
 
 const meta = {
@@ -50,16 +51,23 @@ const meta = {
       },
     },
   },
+  args: {
+    ambient: true,
+  },
   argTypes: {
     children: { control: false },
     ref: { control: false },
+    ambient: {
+      control: 'boolean',
+      description: 'The Frame’s ambient layer. Turn off to see the flat Frame token fill.',
+    },
   },
 } satisfies Meta<typeof AppShell>;
 
 export default meta;
 
 /** The three regions composed once — `AppShellHeader`, `AppShellRail`, `AppShellRemote` — with the content surface being the only part that scrolls. */
-export const Basic: StoryFn<AppShellProps> = () => {
+export const Basic: StoryFn<AppShellProps> = ({ ambient }) => {
   const pathname = useLocationPathname();
   const activeProduct = deriveProduct(pathname);
 
@@ -69,7 +77,7 @@ export const Basic: StoryFn<AppShellProps> = () => {
   const collapsed = sidebarMode === 'adaptive' && activeProduct !== 'home';
 
   return (
-    <AppShell>
+    <AppShell ambient={ambient}>
       <AppShellHeader>
         <TopHeader>
           <TopHeaderLogo href='/'>

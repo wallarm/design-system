@@ -2,6 +2,7 @@ import { type FC, type HTMLAttributes, type ReactNode, type Ref, useMemo, useRef
 import { composeRefs } from '@radix-ui/react-compose-refs';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
+import { AppShellAmbient } from './AppShellAmbient';
 import { AppShellContext } from './AppShellContext';
 import { ExpandOverlay } from './ExpandOverlay';
 import { RevealOverlay } from './RevealOverlay';
@@ -20,6 +21,11 @@ export interface AppShellProps extends HTMLAttributes<HTMLDivElement>, TestableP
   expandFrom?: AppShellExpandFrom;
   onRevealed?: () => void;
   appeared?: boolean;
+  /**
+   * The Frame's ambient layer — drifting blooms, grain and a dot cluster behind the header and
+   * rail. On by default; `false` leaves the flat Frame token fill.
+   */
+  ambient?: boolean;
 }
 
 export const AppShell: FC<AppShellProps> = ({
@@ -30,6 +36,7 @@ export const AppShell: FC<AppShellProps> = ({
   expandFrom,
   onRevealed,
   appeared: appearedProp,
+  ambient = true,
   'data-testid': testId,
   ...props
 }) => {
@@ -55,12 +62,13 @@ export const AppShell: FC<AppShellProps> = ({
           data-slot='app-shell'
           data-testid={testId}
           className={cn(
-            'relative grid h-screen overscroll-none [grid-template-areas:"header_header""rail_remote"] [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr] bg-component-app-shell-bg',
+            'relative isolate grid h-screen overscroll-none [grid-template-areas:"header_header""rail_remote"] [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr] bg-component-app-shell-bg',
             className,
           )}
           style={expandStyle}
           onTransitionEnd={expandFrom ? handleExpandTransitionEnd : undefined}
         >
+          {ambient && <AppShellAmbient />}
           {children}
 
           {expandFrom && (
