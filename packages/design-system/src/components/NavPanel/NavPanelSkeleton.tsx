@@ -25,7 +25,7 @@ export const NavPanelSkeleton: FC<NavPanelSkeletonProps> = ({
       className={cn('flex flex-col gap-6', className)}
     >
       {Array.from({ length: count }, (_, i) => (
-        <Skeleton key={i} width='100%' height='28px' rounded={6} />
+        <Skeleton key={i} width='100%' height='28px' rounded={10} />
       ))}
     </div>
   );

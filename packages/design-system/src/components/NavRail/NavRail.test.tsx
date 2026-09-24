@@ -126,3 +126,31 @@ describe('Attribute pass-through', () => {
     expect(captured).toHaveBeenCalledWith('NAV_REPORTS');
   });
 });
+
+describe('Avatar plate', () => {
+  it('seats the icon on a plate when avatar is set', () => {
+    render(
+      <NavRail>
+        <NavRailItem icon={Activity} label='Meow Meow' avatar data-testid='item-user' />
+      </NavRail>,
+    );
+
+    const plate = screen
+      .getByTestId('item-user')
+      .querySelector('[data-slot="nav-rail-item-avatar"]');
+    expect(plate).not.toBeNull();
+    expect(plate?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('renders no plate by default', () => {
+    render(
+      <NavRail>
+        <NavRailItem icon={Activity} label='Activity' data-testid='item-activity' />
+      </NavRail>,
+    );
+
+    expect(
+      screen.getByTestId('item-activity').querySelector('[data-slot="nav-rail-item-avatar"]'),
+    ).toBeNull();
+  });
+});
