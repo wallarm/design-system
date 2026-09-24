@@ -9,6 +9,33 @@ import {
   format,
   isValid,
 } from 'date-fns';
+import type { DateOrder } from '../components/DateFormatProvider/context';
+
+/**
+ * App-level date preferences, as `DateFormatProvider` models them.
+ *
+ * The formatters below take them as an argument rather than reading the
+ * context, so they stay pure and usable outside React; `FormatDateTime` is
+ * what feeds them the active values. Omitted, each falls back to the shape
+ * these functions have always produced — day-first, 24-hour.
+ */
+export interface DateTimeFormatOptions {
+  order?: DateOrder;
+  hourCycle?: 12 | 24;
+}
+
+/** `d MMM` / `MMM d`, per the app's segment order. */
+const dayMonth = (order: DateOrder | undefined): string =>
+  order === 'month-first' ? 'MMM d' : 'd MMM';
+
+/** `d MMM, yyyy` / `MMM d, yyyy`. The year stays last in both orders. */
+const dayMonthYear = (order: DateOrder | undefined): string => `${dayMonth(order)}, yyyy`;
+
+/** 24-hour `HH:mm[:ss]`, or 12-hour `hh:mm[:ss] a`. */
+const timePattern = (hourCycle: 12 | 24 | undefined, showSeconds: boolean): string => {
+  const seconds = showSeconds ? ':ss' : '';
+  return hourCycle === 12 ? `hh:mm${seconds} a` : `HH:mm${seconds}`;
+};
 
 /**
  * Format a date as relative time for table cells.
@@ -27,7 +54,11 @@ import {
  *
  * Future dates are treated as "Just now" (clock skew tolerance).
  */
-export const formatRelativeTime = (date: Date, now: Date = new Date()): string => {
+export const formatRelativeTime = (
+  date: Date,
+  now: Date = new Date(),
+  options: DateTimeFormatOptions = {},
+): string => {
   if (!isValid(date)) return '—';
 
   const seconds = differenceInSeconds(now, date);
@@ -43,7 +74,7 @@ export const formatRelativeTime = (date: Date, now: Date = new Date()): string =
   if (hours < 24) return hours === 1 ? '1 hour ago' : `${hours} hours ago`;
 
   const days = differenceInDays(now, date);
-  if (days < 2) return `Yesterday, ${format(date, 'HH:mm')}`;
+  if (days < 2) return `Yesterday, ${format(date, timePattern(options.hourCycle, false))}`;
   if (days < 7) return `${days} days ago`;
 
   const weeks = differenceInWeeks(now, date);
@@ -53,9 +84,9 @@ export const formatRelativeTime = (date: Date, now: Date = new Date()): string =
   const months = differenceInMonths(now, date);
   if (days < 150) return months === 1 ? '1 month ago' : `${months} months ago`;
 
-  if (differenceInYears(now, date) < 1) return format(date, 'd MMM');
+  if (differenceInYears(now, date) < 1) return format(date, dayMonth(options.order));
 
-  return format(date, 'd MMM, yyyy');
+  return format(date, dayMonthYear(options.order));
 };
 
 /**
@@ -63,11 +94,16 @@ export const formatRelativeTime = (date: Date, now: Date = new Date()): string =
  *
  * Output: "11 Feb, 2026 14:32:07 GMT+2"
  */
-export const formatAbsoluteTime = (date: Date, options: { showSeconds?: boolean } = {}): string => {
+export const formatAbsoluteTime = (
+  date: Date,
+  options: DateTimeFormatOptions & { showSeconds?: boolean } = {},
+): string => {
   if (!isValid(date)) return '—';
   const { showSeconds = true } = options;
-  const timePattern = showSeconds ? 'HH:mm:ss' : 'HH:mm';
-  const formatted = format(date, `d MMM, yyyy ${timePattern}`);
+  const formatted = format(
+    date,
+    `${dayMonthYear(options.order)} ${timePattern(options.hourCycle, showSeconds)}`,
+  );
   const tz = formatTimezone(date);
   return `${formatted} ${tz}`;
 };
@@ -77,10 +113,14 @@ export const formatAbsoluteTime = (date: Date, options: { showSeconds?: boolean 
  *
  * Output: "11 Feb, 2026"
  */
-export const formatAbsoluteDate = (date: Date, now: Date = new Date()): string => {
+export const formatAbsoluteDate = (
+  date: Date,
+  now: Date = new Date(),
+  options: DateTimeFormatOptions = {},
+): string => {
   if (!isValid(date)) return '—';
-  if (date.getFullYear() === now.getFullYear()) return format(date, 'd MMM');
-  return format(date, 'd MMM, yyyy');
+  if (date.getFullYear() === now.getFullYear()) return format(date, dayMonth(options.order));
+  return format(date, dayMonthYear(options.order));
 };
 
 /**
@@ -88,9 +128,9 @@ export const formatAbsoluteDate = (date: Date, now: Date = new Date()): string =
  *
  * Output: "14:32 GMT+2"
  */
-export const formatTimeOnly = (date: Date): string => {
+export const formatTimeOnly = (date: Date, options: DateTimeFormatOptions = {}): string => {
   if (!isValid(date)) return '—';
-  return `${format(date, 'HH:mm')} ${formatTimezone(date)}`;
+  return `${format(date, timePattern(options.hourCycle, false))} ${formatTimezone(date)}`;
 };
 
 /**

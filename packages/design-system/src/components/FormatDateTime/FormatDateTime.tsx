@@ -8,6 +8,7 @@ import {
   formatTimeOnly,
 } from '../../utils/formatDateTime';
 import type { TestableProps } from '../../utils/testId';
+import { useDateFormat } from '../DateFormatProvider/useDateFormat';
 import { Text } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 
@@ -49,6 +50,12 @@ export const FormatDateTime: FC<FormatDateTimeProps> = ({
   ref,
   ...props
 }) => {
+  // The app's segment order and hour cycle, from DateFormatProvider. Read here
+  // rather than inside the formatters so those stay pure — and read at all,
+  // which this component did not do: it rendered day-first 24-hour regardless
+  // of what the app had configured.
+  const dateFormat = useDateFormat();
+
   // Null / undefined / invalid → em dash
   if (value == null) {
     return (
@@ -78,7 +85,7 @@ export const FormatDateTime: FC<FormatDateTimeProps> = ({
   }
 
   const isoString = date.toISOString();
-  const tooltipText = formatAbsoluteTime(date, { showSeconds });
+  const tooltipText = formatAbsoluteTime(date, { showSeconds, ...dateFormat });
 
   // Relative: "3 hours ago" with dashed underline
   if (format === 'relative') {
@@ -92,7 +99,7 @@ export const FormatDateTime: FC<FormatDateTimeProps> = ({
                   'whitespace-nowrap border-b-1 border-dashed border-border-strong-primary',
                 )}
               >
-                {formatRelativeTime(date)}
+                {formatRelativeTime(date, undefined, dateFormat)}
               </span>
             </Text>
           </time>
@@ -116,9 +123,9 @@ export const FormatDateTime: FC<FormatDateTimeProps> = ({
         data-slot='format-date-time'
         {...props}
       >
-        <Text size='sm'>{formatAbsoluteDate(date)}</Text>
+        <Text size='sm'>{formatAbsoluteDate(date, undefined, dateFormat)}</Text>
         <Text size='sm' color='secondary'>
-          {formatTimeOnly(date)}
+          {formatTimeOnly(date, dateFormat)}
         </Text>
       </time>
     );
@@ -133,7 +140,7 @@ export const FormatDateTime: FC<FormatDateTimeProps> = ({
       data-slot='format-date-time'
       {...props}
     >
-      <Text size='sm'>{formatAbsoluteDate(date)}</Text>
+      <Text size='sm'>{formatAbsoluteDate(date, undefined, dateFormat)}</Text>
     </time>
   );
 };
