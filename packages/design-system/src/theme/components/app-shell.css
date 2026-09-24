@@ -1,0 +1,336 @@
+/**
+ * AppShell Frame ambient (WDS-181).
+ *
+ * Vocabulary: the **Frame** is the shell's gray surround — the header bar plus
+ * the rail, everything that is not the canvas. **Ambient** is the barely-there
+ * life painted into it.
+ *
+ * Three stacked layers, all decorative, all under the regions:
+ *   1. blooms  — seven large soft gray spots: four in the rail (two lifts, two
+ *                shades) and three flat ellipses crossing
+ *                the top edge so the header carries the same light. They wander
+ *                on 60–90 s loops, stretching as they move. This is the "mesh gradient" of the 21st.dev
+ *                builder, in the shell's own tones.
+ *   2. grain   — desaturated fractal noise tiled as a background image, so it
+ *                rasterises once and never repaints with the blooms.
+ *   3. dots    — a 12px halftone raster (the auth-page scanner's grid) pooled
+ *                in the bottom-left of the rail, fading upward to nothing;
+ *                patches of it surface and dissolve under two drifting noise
+ *                masks, so the grid is never fully there.
+ *
+ * Softness is baked into the gradient stops rather than `filter: blur()`:
+ * a blur on a transform-animated layer is re-run by the GPU every frame, a
+ * gradient is rasterised once and then only composited.
+ *
+ * The canvas (`AppShellRemote`) sits on top, so none of this shows under page
+ * content. Colours are theme tokens in semantic.css (light and dark), derived
+ * from the Frame token; only grain opacity/blend live in this file.
+ */
+
+/* Colours are theme tokens (`--color-component-app-shell-ambient-*` in
+   semantic.css, beside the Frame token they derive from). Only the non-colour
+   knobs live here. */
+:root {
+    --app-shell-ambient-grain-opacity: 0.36;
+    --app-shell-ambient-grain-blend: multiply;
+}
+
+[data-theme='dark'] {
+    --app-shell-ambient-grain-opacity: 0.28;
+    --app-shell-ambient-grain-blend: screen;
+}
+
+@utility app-shell-ambient {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: hidden;
+    pointer-events: none;
+    contain: layout paint;
+}
+
+/* One soft spot. Each `app-shell-ambient-bloom-N` only sets its colour (`--c`), shape,
+   size, position and drift path; the falloff below approximates a Gaussian so no
+   `filter: blur()` is needed. */
+@utility app-shell-ambient-bloom {
+    --c: transparent;
+    --shape: circle;
+    position: absolute;
+    border-radius: 50%;
+    will-change: transform;
+    background: radial-gradient(
+        var(--shape),
+        var(--c) 0%,
+        color-mix(in srgb, var(--c) 78%, transparent) 22%,
+        color-mix(in srgb, var(--c) 40%, transparent) 46%,
+        color-mix(in srgb, var(--c) 12%, transparent) 64%,
+        transparent 78%
+    );
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
+}
+
+@utility app-shell-ambient-bloom-1 {
+    --c: var(--color-component-app-shell-ambient-lift);
+    width: 760px;
+    height: 760px;
+    left: -280px;
+    bottom: -240px;
+    animation: app-shell-ambient-drift-1 60s ease-in-out infinite;
+}
+
+@utility app-shell-ambient-bloom-2 {
+    --c: var(--color-component-app-shell-ambient-shade);
+    width: 680px;
+    height: 680px;
+    left: -140px;
+    top: 8%;
+    animation: app-shell-ambient-drift-2 74s ease-in-out infinite;
+}
+
+@utility app-shell-ambient-bloom-3 {
+    --c: var(--color-component-app-shell-ambient-lift-soft);
+    width: 540px;
+    height: 540px;
+    left: -170px;
+    top: 46%;
+    animation: app-shell-ambient-drift-3 66s ease-in-out infinite;
+}
+
+@utility app-shell-ambient-bloom-4 {
+    --c: var(--color-component-app-shell-ambient-shade-soft);
+    width: 620px;
+    height: 620px;
+    left: 30px;
+    bottom: -190px;
+    animation: app-shell-ambient-drift-4 82s ease-in-out infinite;
+}
+
+/* Header strip: three wide, flat ellipses crossing the top edge so the bar
+   catches an echo of the rail's light — a shade over the centre, a lift toward
+   the actions on the right, and a shade bridging the corner past the logo so
+   the bar and the rail read as one fluid, not two zones. */
+@utility app-shell-ambient-bloom-5 {
+    --c: var(--color-component-app-shell-ambient-header);
+    --shape: ellipse;
+    width: clamp(1000px, 55vw, 1400px);
+    height: 540px;
+    left: 22%;
+    top: -360px;
+    animation: app-shell-ambient-drift-5 90s ease-in-out infinite;
+}
+
+@utility app-shell-ambient-bloom-6 {
+    --c: var(--color-component-app-shell-ambient-lift);
+    --shape: ellipse;
+    width: clamp(1100px, 60vw, 1500px);
+    height: 580px;
+    right: -300px;
+    top: -390px;
+    animation: app-shell-ambient-drift-6 78s ease-in-out infinite;
+}
+
+@utility app-shell-ambient-bloom-7 {
+    --c: var(--color-component-app-shell-ambient-header);
+    --shape: ellipse;
+    width: clamp(780px, 50vw, 1100px);
+    height: 500px;
+    left: 20px;
+    top: -350px;
+    animation: app-shell-ambient-drift-7 70s ease-in-out infinite;
+}
+
+/* Drift paths. Each spot wanders through four waypoints instead of a straight
+   back-and-forth, stretching along the direction it moves (a liquid smearing
+   on a surface) and breathing a little in opacity. Transform + opacity only,
+   so the rasterised gradient is never repainted, just composited. */
+@keyframes app-shell-ambient-drift-1 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1, 1);
+        opacity: 1;
+    }
+    33% {
+        transform: translate(70px, -90px) rotate(6deg) scale(1.16, 0.92);
+        opacity: 0.9;
+    }
+    66% {
+        transform: translate(30px, -160px) rotate(-4deg) scale(0.94, 1.14);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0) rotate(0deg) scale(1, 1);
+        opacity: 1;
+    }
+}
+@keyframes app-shell-ambient-drift-2 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1, 1);
+        opacity: 0.95;
+    }
+    33% {
+        transform: translate(-50px, 110px) rotate(-8deg) scale(0.9, 1.18);
+        opacity: 1;
+    }
+    66% {
+        transform: translate(40px, 170px) rotate(5deg) scale(1.2, 0.9);
+        opacity: 0.88;
+    }
+    100% {
+        transform: translate(0, 0) rotate(0deg) scale(1, 1);
+        opacity: 0.95;
+    }
+}
+@keyframes app-shell-ambient-drift-3 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1, 1);
+        opacity: 1;
+    }
+    33% {
+        transform: translate(60px, -120px) rotate(10deg) scale(1.22, 0.88);
+        opacity: 0.85;
+    }
+    66% {
+        transform: translate(-30px, -200px) rotate(-6deg) scale(0.92, 1.16);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0) rotate(0deg) scale(1, 1);
+        opacity: 1;
+    }
+}
+@keyframes app-shell-ambient-drift-4 {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(1, 1);
+        opacity: 0.9;
+    }
+    33% {
+        transform: translate(-80px, -60px) rotate(-7deg) scale(1.18, 0.9);
+        opacity: 1;
+    }
+    66% {
+        transform: translate(-40px, -140px) rotate(4deg) scale(0.9, 1.2);
+        opacity: 0.86;
+    }
+    100% {
+        transform: translate(0, 0) rotate(0deg) scale(1, 1);
+        opacity: 0.9;
+    }
+}
+@keyframes app-shell-ambient-drift-5 {
+    0% {
+        transform: translate(0, 0) scale(1, 1);
+        opacity: 1;
+    }
+    33% {
+        transform: translate(160px, 40px) scale(1.14, 0.94);
+        opacity: 0.85;
+    }
+    66% {
+        transform: translate(260px, 10px) scale(0.96, 1.1);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0) scale(1, 1);
+        opacity: 1;
+    }
+}
+@keyframes app-shell-ambient-drift-6 {
+    0% {
+        transform: translate(0, 0) scale(1, 1);
+        opacity: 0.95;
+    }
+    33% {
+        transform: translate(-200px, 30px) scale(1.12, 0.92);
+        opacity: 1;
+    }
+    66% {
+        transform: translate(-320px, 60px) scale(0.94, 1.12);
+        opacity: 0.85;
+    }
+    100% {
+        transform: translate(0, 0) scale(1, 1);
+        opacity: 0.95;
+    }
+}
+@keyframes app-shell-ambient-drift-7 {
+    0% {
+        transform: translate(0, 0) scale(1, 1);
+        opacity: 1;
+    }
+    33% {
+        transform: translate(120px, 50px) scale(1.16, 0.9);
+        opacity: 0.88;
+    }
+    66% {
+        transform: translate(200px, 20px) scale(0.92, 1.12);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(0, 0) scale(1, 1);
+        opacity: 1;
+    }
+}
+
+@utility app-shell-ambient-grain {
+    position: absolute;
+    inset: 0;
+    opacity: var(--app-shell-ambient-grain-opacity);
+    mix-blend-mode: var(--app-shell-ambient-grain-blend);
+    background-size: 256px 256px;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncA type='linear' slope='0.24'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Dot cluster. Confined to the bottom-left of the Frame (the only place it is
+   ever visible) so the animated masks repaint a small box, not the viewport.
+   Three masks intersect: the vertical fade, and two tiles of low-frequency
+   noise drifting in opposite directions. Dots show only where both noise
+   tiles are open, so patches of dots surface and dissolve in place over a
+   couple of minutes instead of sliding across. */
+@utility app-shell-ambient-dots {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: min(100%, 480px);
+    height: min(560px, 64vh);
+    background-image: radial-gradient(circle at center, var(--color-component-app-shell-ambient-dot) 0.9px, transparent 1.1px);
+    background-size: 12px 12px;
+    background-position: 6px 6px;
+    mask-image:
+        linear-gradient(
+            to top,
+            #000 0,
+            rgb(0 0 0 / 0.75) 22%,
+            rgb(0 0 0 / 0.4) 48%,
+            rgb(0 0 0 / 0.12) 74%,
+            transparent 94%
+        ),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 5 5 5 0 -6.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.014' numOctaves='2' seed='11' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 5 5 5 0 -6.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    mask-size:
+        100% 100%,
+        400px 400px,
+        400px 400px;
+    mask-repeat: no-repeat, repeat, repeat;
+    mask-composite: intersect;
+    mask-position:
+        0 0,
+        0 0,
+        0 0;
+    animation: app-shell-ambient-dots-shift 150s linear infinite;
+
+    @media (prefers-reduced-motion: reduce) {
+        animation: none;
+    }
+}
+
+/* Whole-tile offsets (multiples of 400px) so the loop is seamless. */
+@keyframes app-shell-ambient-dots-shift {
+    to {
+        mask-position:
+            0 0,
+            400px -400px,
+            -800px 400px;
+    }
+}

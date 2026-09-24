@@ -216,6 +216,38 @@
     --color-component-toast-ic-info: var(--color-blue-400);
     --color-component-app-shell-bg: var(--color-slate-100);
 
+    /* AppShell Frame ambient — the soft spots and dot raster painted into the
+     * Frame (header + rail). Every tone derives from the Frame token above, so
+     * a branded Frame (any hue) lights and shades itself: "lift" mixes the base
+     * toward white, "shade" toward black, in oklch to keep the hue honest.
+     * Achromatic by design: no accent tint. */
+    --color-component-app-shell-ambient-lift: color-mix(
+        in oklch,
+        var(--color-component-app-shell-bg),
+        white 70%
+    );
+    --color-component-app-shell-ambient-lift-soft: color-mix(
+        in srgb,
+        color-mix(in oklch, var(--color-component-app-shell-bg), white 45%) 70%,
+        transparent
+    );
+    --color-component-app-shell-ambient-shade: color-mix(
+        in srgb,
+        color-mix(in oklch, var(--color-component-app-shell-bg), black 10%) 70%,
+        transparent
+    );
+    --color-component-app-shell-ambient-shade-soft: color-mix(
+        in srgb,
+        color-mix(in oklch, var(--color-component-app-shell-bg), black 5%) 65%,
+        transparent
+    );
+    --color-component-app-shell-ambient-header: color-mix(
+        in srgb,
+        color-mix(in oklch, var(--color-component-app-shell-bg), black 7%) 22%,
+        transparent
+    );
+    --color-component-app-shell-ambient-dot: --alpha(var(--color-slate-500) / 28%);
+
     /* EmptyState medallion — the small raised tile behind the empty-state icon.
      * Reads as a lit surface: a top-down gradient, a hairline border, a soft
      * drop shadow and an inner top highlight. Kept as tokens (not utilities)
@@ -629,6 +661,35 @@
     --color-component-toast-ic-success: var(--color-green-600);
     --color-component-toast-ic-info: var(--color-blue-600);
     --color-component-app-shell-bg: var(--color-slate-975);
+
+    /* AppShell Frame ambient (dark) — on a near-black base only lifts read, so
+     * every spot mixes toward white. */
+    --color-component-app-shell-ambient-lift: color-mix(
+        in srgb,
+        color-mix(in oklch, var(--color-component-app-shell-bg), white 11%) 95%,
+        transparent
+    );
+    --color-component-app-shell-ambient-lift-soft: color-mix(
+        in srgb,
+        color-mix(in oklch, var(--color-component-app-shell-bg), white 14%) 70%,
+        transparent
+    );
+    --color-component-app-shell-ambient-shade: color-mix(
+        in srgb,
+        color-mix(in oklch, var(--color-component-app-shell-bg), white 18%) 60%,
+        transparent
+    );
+    --color-component-app-shell-ambient-shade-soft: color-mix(
+        in srgb,
+        color-mix(in oklch, var(--color-component-app-shell-bg), white 6%) 95%,
+        transparent
+    );
+    --color-component-app-shell-ambient-header: color-mix(
+        in srgb,
+        color-mix(in oklch, var(--color-component-app-shell-bg), white 10%) 30%,
+        transparent
+    );
+    --color-component-app-shell-ambient-dot: --alpha(var(--color-slate-50) / 15%);
 
     /* EmptyState medallion (dark) — same recipe inverted: the gradient and the
      * top highlight become low-alpha white, the shadows deepen to near-black. */
