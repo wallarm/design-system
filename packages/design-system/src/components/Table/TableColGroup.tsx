@@ -24,7 +24,17 @@ interface TableColGroupProps {
  */
 export const TableColGroup: FC<TableColGroupProps> = ({ tableWidth }) => {
   const { table, stretch } = useTableContext();
-  const columns = table.getVisibleLeafColumns();
+  // `getVisibleLeafColumns` applies `columnOrder` and nothing else, while the
+  // header row (`table_getHeaderGroups`) and the body cells
+  // (`row_getVisibleCells`) hoist the pinned regions. The two disagree
+  // whenever a pinned column does not already sit in its pinned position —
+  // pinning a middle column, or a caller order that omits the auto-injected
+  // `_selection` — and then every <col> lands on the wrong header.
+  const columns = [
+    ...table.getStartVisibleLeafColumns(),
+    ...table.getCenterVisibleLeafColumns(),
+    ...table.getEndVisibleLeafColumns(),
+  ];
 
   const isFixed = (col: (typeof columns)[number]) =>
     SYSTEM_COLUMN_IDS.has(col.id) ||

@@ -1375,3 +1375,39 @@ describe('Loading skeleton bottom border', () => {
     }
   });
 });
+
+describe('Column widths follow the rendered order', () => {
+  const widthColumns = [
+    columnHelper.accessor('name', { header: 'Name', size: 100 }),
+    columnHelper.accessor('status', { header: 'Status', size: 200 }),
+    columnHelper.accessor('id', { header: 'Id', size: 300 }),
+  ];
+
+  const readTable = () => {
+    const table = screen.getByTestId('tbl').querySelector('table') as HTMLTableElement;
+    return {
+      headers: [...table.querySelectorAll('thead th')].map(th => (th.textContent ?? '').trim()),
+      widths: [...table.querySelectorAll('colgroup col')].map(col => col.style.width),
+    };
+  };
+
+  // The header row and the body cells hoist the pinned regions to the front;
+  // the column order on its own does not. Pinning a column that is not already
+  // sitting in its pinned position used to leave every <col> one place off.
+  it('keeps each width with its own header when a later column is pinned', () => {
+    render(
+      <Table
+        data={data}
+        columns={widthColumns}
+        getRowId={row => row.id}
+        columnPinning={{ left: ['id'] }}
+        data-testid='tbl'
+      />,
+    );
+
+    expect(readTable()).toEqual({
+      headers: ['Name', 'Id', 'Status'],
+      widths: ['100px', '300px', '200px'],
+    });
+  });
+});
