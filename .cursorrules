@@ -1,0 +1,53 @@
+## Project Context
+
+You are working on the Wallarm Design System (WASD) — a production React component library with 56 components, MCP server integration, and comprehensive tooling.
+
+## Current Initiative: LLM Excellence
+
+We are making this design system LLM-friendly so that designers, PMs, frontend and backend developers can vibe-code consistent, on-brand interfaces using AI tools.
+
+**Read `docs/WASD-LLM-Excellence-Framework.md` for the full strategic plan.** This is the master document that describes:
+- Current state assessment and gap analysis
+- Three-tier framework (Components → Guidelines → Platform)
+- The `/describe-component` skill design (Section 4.5) — the cornerstone tool for creating .llm.md files
+- Enhanced MCP schema proposals
+- Skills and agents roadmap (10 new skills)
+- Implementation phases and PR sequence
+
+**Read `docs/WASD-Workflow-Guide.md` for the Git workflow** — branch naming, PR sequence, task ownership.
+
+## Key Architecture Facts
+
+- **56 components** in `packages/design-system/src/components/`
+- **CVA** (class-variance-authority) for all variants, defined in `classes.ts`
+- **Ark UI** headless primitives for accessible foundations
+- **Compound component pattern** with Context + TestIdProvider
+- **MCP server** in `packages/mcp/` — serves component metadata to AI tools
+- **Metadata generation** via ts-morph AST parsing at build time → `dist/metadata/components.json`
+- **Figma Code Connect** in `.figma.tsx` files per component
+- **Storybook 10** with MCP addon at `localhost:6006/mcp`
+
+## What We're Building
+
+### .llm.md Files
+Per-component knowledge files placed next to the component source. These are the **authoring format** — they get parsed by the metadata generator and served through MCP to end users. They contain: when to use, when NOT to use, composition patterns, accessibility notes, do's/don'ts, related components, platform context.
+
+Standard template is in Section 4.5 of the Framework doc → Phase 3: Draft Generation.
+
+### Guidelines (in `guidelines/` directory)
+Above-component knowledge: UX copywriting, data display patterns, form patterns, page layouts, states, navigation, accessibility, iconography, Wallarm platform context.
+
+### Skills (in `.claude/skills/`)
+- `/describe-component` — generates .llm.md files via Figma + Storybook + human interview
+- `/ux-copy`, `/data-format`, `/form-pattern`, `/page-layout`, `/a11y-check`, `/states`, etc.
+
+### MCP Enhancements
+New tools: `suggest_component`, `get_pattern`, `get_guideline`. Extended schema with `whenToUse`, `composition`, `accessibility`, `tags`, `category`.
+
+## Rules
+
+- Import components from `@wallarm-org/design-system` or `@wallarm-org/design-system/{Component}`
+- Never use raw HTML when a DS component exists
+- Use semantic design tokens, never raw colors or spacing
+- Follow conventional commits: `feat:`, `docs:`, `chore:`
+- All component files follow the patterns in `.claude/rules/`
