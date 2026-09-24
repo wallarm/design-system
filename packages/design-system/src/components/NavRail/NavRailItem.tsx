@@ -27,6 +27,8 @@ export interface NavRailItemProps extends AnchorHTMLAttributes<HTMLAnchorElement
   label: ReactNode;
   shortcut?: string[];
   active?: boolean;
+  /** Seats the icon on a soft plate, for the signed-in user's item at the foot of the rail. */
+  avatar?: boolean;
 }
 
 export const NavRailItem: FC<NavRailItemProps> = ({
@@ -36,6 +38,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
   label,
   shortcut,
   active = false,
+  avatar = false,
   className,
   children,
   'data-testid': testIdProp,
@@ -58,7 +61,17 @@ export const NavRailItem: FC<NavRailItemProps> = ({
       className={cn(navRailItemVariants({ active }), className)}
     >
       <span className='flex shrink-0 items-center justify-center'>
-        <Icon size='md' />
+        {avatar ? (
+          // The plate overhangs the 16px icon slot by 4px on every side, so labels stay aligned.
+          <span
+            data-slot='nav-rail-item-avatar'
+            className='-m-4 flex size-24 items-center justify-center rounded-8 border border-border-primary bg-states-primary-hover'
+          >
+            <Icon size='md' />
+          </span>
+        ) : (
+          <Icon size='md' />
+        )}
       </span>
       {!collapsed && (
         <span

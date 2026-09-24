@@ -1,4 +1,4 @@
-import { Check, LogOut, PanelLeftDashed, PencilRuler, Settings, User } from '../../../icons';
+import { LogOut, PanelLeftDashed, PencilRuler, Settings, User, UserRound } from '../../../icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,8 +6,9 @@ import {
   DropdownMenuItemContent,
   DropdownMenuItemIcon,
   DropdownMenuItemText,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
   DropdownMenuTriggerItem,
 } from '../../DropdownMenu';
@@ -20,6 +21,9 @@ export type SidebarMode = 'adaptive' | 'expanded';
 
 const USER_NAME = 'Meow Meow';
 const USER_EMAIL = 'meow@meow.com';
+
+const THEMES: Theme[] = ['light', 'dark'];
+const SIDEBAR_MODES: SidebarMode[] = ['adaptive', 'expanded'];
 
 const THEME_LABELS: Record<Theme, string> = {
   light: 'Light',
@@ -44,7 +48,7 @@ export const AccountDropdown = ({
 }) => (
   <DropdownMenu positioning={{ placement: 'right-end', gutter: 6, offset: { crossAxis: 12 } }}>
     <DropdownMenuTrigger>
-      <NavRailItem icon={User} label={USER_NAME} />
+      <NavRailItem icon={UserRound} label={USER_NAME} avatar />
     </DropdownMenuTrigger>
     <DropdownMenuContent className='w-256'>
       <div className='rounded-6 border border-border-primary-light bg-states-primary-hover px-8 py-8 mb-4'>
@@ -74,29 +78,26 @@ export const AccountDropdown = ({
             <PencilRuler />
           </DropdownMenuItemIcon>
           <DropdownMenuItemContent>
-            <DropdownMenuItemText>Theme</DropdownMenuItemText>
+            <DropdownMenuItemText>Appearance</DropdownMenuItemText>
             <Text size='xs' color='secondary'>
               {THEME_LABELS[theme]}
             </Text>
           </DropdownMenuItemContent>
         </DropdownMenuTriggerItem>
         <DropdownMenuContent className='w-132'>
-          <DropdownMenuItem onSelect={() => onThemeChange('light')}>
-            <DropdownMenuItemText>Light</DropdownMenuItemText>
-            {theme === 'light' && (
-              <DropdownMenuShortcut>
-                <Check />
-              </DropdownMenuShortcut>
-            )}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => onThemeChange('dark')}>
-            <DropdownMenuItemText>Dark</DropdownMenuItemText>
-            {theme === 'dark' && (
-              <DropdownMenuShortcut>
-                <Check />
-              </DropdownMenuShortcut>
-            )}
-          </DropdownMenuItem>
+          <DropdownMenuRadioGroup
+            value={theme}
+            onValueChange={({ value }) => {
+              const next = THEMES.find(t => t === value);
+              if (next) onThemeChange(next);
+            }}
+          >
+            {THEMES.map(t => (
+              <DropdownMenuRadioItem key={t} value={t}>
+                <DropdownMenuItemText>{THEME_LABELS[t]}</DropdownMenuItemText>
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu>
@@ -112,22 +113,19 @@ export const AccountDropdown = ({
           </DropdownMenuItemContent>
         </DropdownMenuTriggerItem>
         <DropdownMenuContent className='w-200'>
-          <DropdownMenuItem onSelect={() => onSidebarModeChange('adaptive')}>
-            <DropdownMenuItemText>Adaptive</DropdownMenuItemText>
-            {sidebarMode === 'adaptive' && (
-              <DropdownMenuShortcut>
-                <Check />
-              </DropdownMenuShortcut>
-            )}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => onSidebarModeChange('expanded')}>
-            <DropdownMenuItemText>Always expanded</DropdownMenuItemText>
-            {sidebarMode === 'expanded' && (
-              <DropdownMenuShortcut>
-                <Check />
-              </DropdownMenuShortcut>
-            )}
-          </DropdownMenuItem>
+          <DropdownMenuRadioGroup
+            value={sidebarMode}
+            onValueChange={({ value }) => {
+              const next = SIDEBAR_MODES.find(m => m === value);
+              if (next) onSidebarModeChange(next);
+            }}
+          >
+            {SIDEBAR_MODES.map(m => (
+              <DropdownMenuRadioItem key={m} value={m}>
+                <DropdownMenuItemText>{SIDEBAR_MODE_LABELS[m]}</DropdownMenuItemText>
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenuSeparator />
