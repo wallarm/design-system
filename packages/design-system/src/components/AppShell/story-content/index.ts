@@ -1,4 +1,4 @@
-export { AccountDropdown, type SidebarMode } from './_storyAccountDropdown';
+export { AccountDropdown, railModeFor, type SidebarMode } from './_storyAccountDropdown';
 export { RemoteForProduct } from './_storyConfigRenderer';
 export { HeaderActions } from './_storyHeaderActions';
 export { HomeContent } from './_storyHomeContent';

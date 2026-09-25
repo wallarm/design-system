@@ -17,7 +17,7 @@ import { Kbd } from '../Kbd';
 import { Tooltip } from '../Tooltip';
 import { TooltipContent } from '../Tooltip/TooltipContent';
 import { TooltipTrigger } from '../Tooltip/TooltipTrigger';
-import { navRailItemVariants } from './classes';
+import { navRailItemCompactLabelClassName, navRailItemVariants } from './classes';
 import { useNavRailContext } from './NavRailContext';
 import { useShortcut } from './useShortcut';
 
@@ -48,13 +48,16 @@ export const NavRailItem: FC<NavRailItemProps> = ({
   'data-testid': testIdProp,
   ...props
 }) => {
-  const { collapsed } = useNavRailContext();
+  const { mode } = useNavRailContext();
   const testId = useTestId('item', testIdProp);
   const Comp = asChild ? Slot : 'a';
   const internalRef = useRef<HTMLAnchorElement>(null);
   const [failedSrc, setFailedSrc] = useState<string>();
   const photo = avatarSrc && avatarSrc !== failedSrc ? avatarSrc : undefined;
   const hasPlate = avatar || avatarSrc !== undefined;
+  const showsLabel = mode === 'expanded' || (mode === 'compact' && !hasPlate);
+  // Without a visible label the link would have no name, so hand the label to assistive tech.
+  const fallbackName = !showsLabel && typeof label === 'string' ? label : undefined;
 
   useShortcut(shortcut, internalRef);
 
@@ -62,10 +65,11 @@ export const NavRailItem: FC<NavRailItemProps> = ({
     <Comp
       {...props}
       ref={composeRefs(internalRef, ref)}
+      aria-label={props['aria-label'] ?? fallbackName}
       aria-current={active ? ('page' as const) : undefined}
       data-slot='nav-rail-item'
       data-testid={testId}
-      className={cn(navRailItemVariants({ active }), className)}
+      className={cn(navRailItemVariants({ mode, active }), className)}
     >
       <span className='flex shrink-0 items-center justify-center'>
         {hasPlate ? (
@@ -93,12 +97,16 @@ export const NavRailItem: FC<NavRailItemProps> = ({
           <Icon size='md' />
         )}
       </span>
-      {!collapsed && (
+      {mode === 'expanded' && (
         <span
           className={cn('truncate whitespace-nowrap transition-[opacity,width] duration-200 pl-8')}
         >
           {label}
         </span>
+      )}
+      {/* In compact the avatar item shows the plate alone; the tooltip still names the user. */}
+      {showsLabel && mode === 'compact' && (
+        <span className={navRailItemCompactLabelClassName}>{label}</span>
       )}
       <Slottable>{children}</Slottable>
     </Comp>

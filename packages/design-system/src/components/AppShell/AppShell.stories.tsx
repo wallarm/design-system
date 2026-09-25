@@ -25,6 +25,7 @@ import {
   QuickHelpDropdown,
   RecentDropdown,
   RemoteForProduct,
+  railModeFor,
   type SidebarMode,
   WallarmLogo,
 } from './story-content';
@@ -74,7 +75,7 @@ export const Basic: StoryFn<AppShellProps> = ({ ambient }) => {
   const [loading, setLoading] = useState(true);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
   const { theme, setTheme } = useTheme();
-  const collapsed = sidebarMode === 'adaptive' && activeProduct !== 'home';
+  const railMode = railModeFor(sidebarMode, activeProduct === 'home');
 
   return (
     <AppShell ambient={ambient}>
@@ -115,7 +116,7 @@ export const Basic: StoryFn<AppShellProps> = ({ ambient }) => {
       </AppShellHeader>
 
       <AppShellRail>
-        <NavRail collapsed={collapsed}>
+        <NavRail mode={railMode}>
           <NavRailBody>
             <NavRailItem
               icon={Home}
@@ -163,7 +164,7 @@ export const RevealFlow: StoryFn<AppShellProps> = () => {
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
   const [revealKey, setRevealKey] = useState(0);
   const { theme, setTheme } = useTheme();
-  const collapsed = sidebarMode === 'adaptive' && activeProduct !== 'home';
+  const railMode = railModeFor(sidebarMode, activeProduct === 'home');
 
   useEffect(() => {
     if (splashDone) return;
@@ -199,7 +200,7 @@ export const RevealFlow: StoryFn<AppShellProps> = () => {
       </AppShellHeader>
 
       <AppShellRail>
-        <NavRail collapsed={collapsed}>
+        <NavRail mode={railMode}>
           <NavRailBody>
             <NavRailItem
               icon={Home}
@@ -251,7 +252,7 @@ export const LoginFlow: StoryFn<AppShellProps> = () => {
   const [flowKey, setFlowKey] = useState(0);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
   const { theme, setTheme } = useTheme();
-  const collapsed = sidebarMode === 'adaptive' && activeProduct !== 'home';
+  const railMode = railModeFor(sidebarMode, activeProduct === 'home');
 
   useEffect(() => {
     if (!splashVisible) return;
@@ -322,7 +323,7 @@ export const LoginFlow: StoryFn<AppShellProps> = () => {
             </AppShellHeader>
 
             <AppShellRail>
-              <NavRail collapsed={collapsed}>
+              <NavRail mode={railMode}>
                 <NavRailBody>
                   <NavRailItem
                     icon={Home}

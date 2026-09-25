@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import { LogOut, PanelLeftDashed, PencilRuler, Settings, User, UserRound } from '../../../icons';
 import {
   DropdownMenu,
@@ -12,18 +13,26 @@ import {
   DropdownMenuTrigger,
   DropdownMenuTriggerItem,
 } from '../../DropdownMenu';
-import { NavRailItem } from '../../NavRail';
+import { NavRailItem, type NavRailMode } from '../../NavRail';
 import { HStack, VStack } from '../../Stack';
 import { Text } from '../../Text';
 import type { Theme } from '../../ThemeProvider';
 
-export type SidebarMode = 'adaptive' | 'expanded';
+export type SidebarMode = 'adaptive' | 'expanded' | 'collapsed' | 'compact';
+
+/** Adaptive collapses the rail inside a product and expands it on Home; the other modes pin it. */
+export const railModeFor = (mode: SidebarMode, onHome: boolean): NavRailMode => {
+  if (mode === 'adaptive') return onHome ? 'expanded' : 'collapsed';
+  return mode;
+};
 
 const USER_NAME = 'Meow Meow';
 const USER_EMAIL = 'meow@meow.com';
 
 const THEMES: Theme[] = ['light', 'dark'];
-const SIDEBAR_MODES: SidebarMode[] = ['adaptive', 'expanded'];
+// Adaptive on its own, then the two pinned widths, then compact.
+const SIDEBAR_MODE_GROUPS: SidebarMode[][] = [['adaptive'], ['expanded', 'collapsed'], ['compact']];
+const SIDEBAR_MODES = SIDEBAR_MODE_GROUPS.flat();
 
 const THEME_LABELS: Record<Theme, string> = {
   light: 'Light',
@@ -33,6 +42,8 @@ const THEME_LABELS: Record<Theme, string> = {
 const SIDEBAR_MODE_LABELS: Record<SidebarMode, string> = {
   adaptive: 'Adaptive',
   expanded: 'Always expanded',
+  collapsed: 'Always collapsed',
+  compact: 'Compact',
 };
 
 export const AccountDropdown = ({
@@ -120,10 +131,15 @@ export const AccountDropdown = ({
               if (next) onSidebarModeChange(next);
             }}
           >
-            {SIDEBAR_MODES.map(m => (
-              <DropdownMenuRadioItem key={m} value={m}>
-                <DropdownMenuItemText>{SIDEBAR_MODE_LABELS[m]}</DropdownMenuItemText>
-              </DropdownMenuRadioItem>
+            {SIDEBAR_MODE_GROUPS.map((group, index) => (
+              <Fragment key={group.join('-')}>
+                {index > 0 && <DropdownMenuSeparator />}
+                {group.map(m => (
+                  <DropdownMenuRadioItem key={m} value={m}>
+                    <DropdownMenuItemText>{SIDEBAR_MODE_LABELS[m]}</DropdownMenuItemText>
+                  </DropdownMenuRadioItem>
+                ))}
+              </Fragment>
             ))}
           </DropdownMenuRadioGroup>
         </DropdownMenuContent>
