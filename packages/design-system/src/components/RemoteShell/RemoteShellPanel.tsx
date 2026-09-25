@@ -26,8 +26,12 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
   ...props
 }) => {
   const testId = useTestId('panel');
-  const { config, drillLevel } = useRemoteShellContext();
-  const { transition, clearTransition } = useDrillTransition(drillLevel);
+  const { config, drillLevel, navStack, effectiveActiveItemId } = useRemoteShellContext();
+  const { transition, clearTransition } = useDrillTransition(
+    drillLevel,
+    navStack,
+    effectiveActiveItemId,
+  );
 
   if (isLoading)
     return (
@@ -71,7 +75,17 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
                   animation: `${isForward ? 'ds-nav-blur-out' : 'ds-nav-blur-in'} ${timing}`,
                 }}
               >
-                <NavPanelContent level={isForward ? transition.fromLevel : drillLevel} />
+                <NavPanelContent
+                  level={isForward ? transition.fromLevel : drillLevel}
+                  navigationSnapshot={
+                    isForward
+                      ? {
+                          navStack: transition.fromNavStack,
+                          activeItemId: transition.fromActiveItemId,
+                        }
+                      : undefined
+                  }
+                />
               </div>
               <div
                 className='flex w-full shrink-0 flex-col gap-2 motion-reduce:animate-none'
@@ -79,7 +93,17 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
                   animation: `${isForward ? 'ds-nav-blur-in' : 'ds-nav-blur-out'} ${timing}`,
                 }}
               >
-                <NavPanelContent level={isForward ? drillLevel : transition.fromLevel} />
+                <NavPanelContent
+                  level={isForward ? drillLevel : transition.fromLevel}
+                  navigationSnapshot={
+                    isForward
+                      ? undefined
+                      : {
+                          navStack: transition.fromNavStack,
+                          activeItemId: transition.fromActiveItemId,
+                        }
+                  }
+                />
               </div>
             </div>
           </div>
