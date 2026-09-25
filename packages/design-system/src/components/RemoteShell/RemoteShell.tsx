@@ -174,6 +174,8 @@ export const RemoteShell: FC<RemoteShellProps> = ({
           data-testid={testId}
           className={cn(
             'grid h-full overflow-hidden overscroll-none [grid-template-areas:"panel_breadcrumb""panel_content"] [grid-template-columns:auto_1fr] [grid-template-rows:auto_1fr]',
+            '[&:has([data-slot=page-header])_[data-slot=remote-shell-breadcrumb]]:pb-4',
+            '[&:has([data-slot=remote-shell-breadcrumb])_[data-slot=page-header]]:pt-4',
             className,
           )}
         >
