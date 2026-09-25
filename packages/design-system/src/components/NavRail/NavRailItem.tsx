@@ -69,7 +69,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
       aria-current={active ? ('page' as const) : undefined}
       data-slot='nav-rail-item'
       data-testid={testId}
-      className={cn(navRailItemVariants({ mode, active }), className)}
+      className={cn(navRailItemVariants({ mode, active, avatar: hasPlate }), className)}
     >
       <span className='flex shrink-0 items-center justify-center'>
         {hasPlate ? (
@@ -79,8 +79,8 @@ export const NavRailItem: FC<NavRailItemProps> = ({
           <span
             data-slot='nav-rail-item-avatar'
             className={cn(
-              '-m-4 grid size-24 place-items-center overflow-hidden rounded-8 bg-states-primary-hover *:col-start-1 *:row-start-1',
-              !photo && 'border border-border-primary',
+              '-m-4 grid size-24 place-items-center overflow-hidden rounded-8 bg-states-primary-hover branded:bg-states-brand-hover *:col-start-1 *:row-start-1',
+              !photo && 'border border-border-primary branded:border-border-brand',
             )}
           >
             <Icon size='md' />
