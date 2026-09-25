@@ -886,14 +886,71 @@
  * FRAME STYLE: BRANDED (WDS-182)
  * ThemeProvider writes `data-frame-style` on <html>. Branded is not a value swap like
  * dark: components switch to the existing brand tokens through the `branded:` variant
- * (index.css). Only the Frame base and the Ambient dot change here. `:root` doubles the
- * specificity, so this beats both the light theme and `[data-theme='dark']`.
+ * (index.css). Only the Frame base and the Ambient tones change here. These rules are
+ * unlayered, so they beat the light theme values in `@layer theme`; the doubled
+ * specificity of `:root[...]` beats `[data-theme='dark']`.
+ *
+ * The neutral Ambient recipe mixes the base toward white/black in oklch. The achromatic
+ * end has no hue, so on a pale orange base the tones lose theirs and read gray. Branded
+ * tints the spots toward the brand oranges in oklab instead, which keeps the hue, and
+ * lifts only part-way to white so they stay warm. The grain's blend lives in app-shell.css.
  * ======================================== */
 :root[data-frame-style='branded'] {
     --color-component-app-shell-bg: var(--color-component-app-shell-bg-branded);
+    --color-component-app-shell-ambient-lift: color-mix(
+        in oklab,
+        var(--color-component-app-shell-bg),
+        white 40%
+    );
+    --color-component-app-shell-ambient-lift-soft: color-mix(
+        in srgb,
+        color-mix(in oklab, var(--color-component-app-shell-bg), white 25%) 70%,
+        transparent
+    );
+    --color-component-app-shell-ambient-shade: color-mix(
+        in srgb,
+        color-mix(in oklab, var(--color-component-app-shell-bg), var(--color-w-orange-300) 30%) 70%,
+        transparent
+    );
+    --color-component-app-shell-ambient-shade-soft: color-mix(
+        in srgb,
+        color-mix(in oklab, var(--color-component-app-shell-bg), var(--color-w-orange-200) 30%) 65%,
+        transparent
+    );
+    --color-component-app-shell-ambient-header: color-mix(
+        in srgb,
+        color-mix(in oklab, var(--color-component-app-shell-bg), var(--color-w-orange-300) 25%) 22%,
+        transparent
+    );
     --color-component-app-shell-ambient-dot: --alpha(var(--color-w-orange-500) / 28%);
 }
 
+/* Dark: only a faint warm glow toward the deepest brand oranges, as quiet as the neutral lifts. */
 :root[data-theme='dark'][data-frame-style='branded'] {
+    --color-component-app-shell-ambient-lift: color-mix(
+        in srgb,
+        color-mix(in oklab, var(--color-component-app-shell-bg), var(--color-w-orange-900) 10%) 95%,
+        transparent
+    );
+    --color-component-app-shell-ambient-lift-soft: color-mix(
+        in srgb,
+        color-mix(in oklab, var(--color-component-app-shell-bg), var(--color-w-orange-900) 14%) 70%,
+        transparent
+    );
+    --color-component-app-shell-ambient-shade: color-mix(
+        in srgb,
+        color-mix(in oklab, var(--color-component-app-shell-bg), var(--color-w-orange-900) 12%) 60%,
+        transparent
+    );
+    --color-component-app-shell-ambient-shade-soft: color-mix(
+        in srgb,
+        color-mix(in oklab, var(--color-component-app-shell-bg), var(--color-w-orange-950) 18%) 95%,
+        transparent
+    );
+    --color-component-app-shell-ambient-header: color-mix(
+        in srgb,
+        color-mix(in oklab, var(--color-component-app-shell-bg), var(--color-w-orange-900) 10%) 30%,
+        transparent
+    );
     --color-component-app-shell-ambient-dot: --alpha(var(--color-w-orange-300) / 15%);
 }
