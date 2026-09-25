@@ -217,7 +217,8 @@
     --color-component-app-shell-bg: var(--color-slate-100);
     /* Branded Frame (WDS-182): the Frame fill when the user picks the Branded Frame style.
      * Swapped in for the token above under `[data-frame-style='branded']` (end of file), so
-     * AppShell and every Ambient tone below follow with no component change. */
+     * AppShell follows with no component change; the Ambient tones below get their own
+     * Branded recipe at the end of the file. */
     --color-component-app-shell-bg-branded: var(--color-w-orange-50);
 
     /* AppShell Frame ambient — the soft spots and dot raster painted into the
