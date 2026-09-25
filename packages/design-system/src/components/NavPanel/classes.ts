@@ -5,7 +5,7 @@ export const navPanelItemVariants = cva(
   {
     variants: {
       active: {
-        true: 'overlay-states-primary-active font-semibold',
+        true: 'overlay-states-primary-active font-semibold branded:overlay-states-brand-active branded:text-text-brand',
         false:
           'hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
       },
@@ -19,7 +19,7 @@ export const navPanelGroupItemVariants = cva(
   {
     variants: {
       active: {
-        true: 'overlay-states-primary-active font-semibold',
+        true: 'overlay-states-primary-active font-semibold branded:overlay-states-brand-active branded:text-text-brand',
         false:
           'hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
       },
