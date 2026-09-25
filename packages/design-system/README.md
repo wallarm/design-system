@@ -37,6 +37,8 @@ export const App = () => {
 };
 ```
 
+`ThemeProvider` also controls the Frame style (`useTheme().setFrameStyle`, `'neutral' | 'branded'`) - see [Installation Guide](docs/installation.md) for details.
+
 ```css
 /* App.css */
 @import 'tailwindcss';

@@ -108,7 +108,7 @@ export const AccountDropdown = ({
             <DropdownMenuItemContent>
               <DropdownMenuItemText>Appearance</DropdownMenuItemText>
               <Text size='xs' color='secondary'>
-                {THEME_LABELS[theme]} and {frameStyle}
+                {THEME_LABELS[theme]} and {FRAME_STYLE_LABELS[frameStyle].toLowerCase()}
               </Text>
             </DropdownMenuItemContent>
           </DropdownMenuTriggerItem>

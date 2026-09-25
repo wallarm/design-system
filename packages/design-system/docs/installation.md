@@ -77,6 +77,17 @@ export const App = () => {
 };
 ```
 
+`ThemeProvider` also carries the **Frame style**: `neutral` (default) or `branded`, the user's AppShell look next to light/dark. Read it and set it with `const { frameStyle, setFrameStyle } = useTheme()`.
+
+Optional props:
+
+- `defaultFrameStyle` - Frame style until the user picks one (default `'neutral'`)
+- `frameStyleStorageKey` - localStorage key for the persisted choice (default `'wasd-frame-style'`)
+
+The choice is written as `data-frame-style` on `<html>` and remembered, so micro-frontends follow it without wiring.
+
+**Important**: Keep `defaultFrameStyle` (and `defaultTheme`) identical in the host and every micro-frontend. Each `ThemeProvider` writes `<html>` when it mounts, so a different default would flip the whole console when that product opens.
+
 ## Troubleshooting
 
 ### Problem: Styles are not applied
