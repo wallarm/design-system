@@ -2,19 +2,36 @@ import type { FC } from 'react';
 import { NavPanelBack, NavPanelDivider, NavPanelHeader } from '../NavPanel';
 import { Text } from '../Text';
 import { HeaderActions } from './HeaderActions';
+import type { NavStackEntry } from './model';
 import { findDrillNode, useRemoteShellContext } from './model';
 import { NavItemsList } from './NavItemsList';
 
-interface NavPanelContentProps {
-  level: number;
+interface NavigationSnapshot {
+  navStack: NavStackEntry[];
 }
 
-export const NavPanelContent: FC<NavPanelContentProps> = ({ level: rawLevel }) => {
-  const { config, navStack, effectiveActiveItemId, navigate, drillInto, goBack } =
-    useRemoteShellContext();
+interface NavPanelContentProps {
+  level: number;
+  navigationSnapshot?: NavigationSnapshot;
+}
+
+export const NavPanelContent: FC<NavPanelContentProps> = ({
+  level: rawLevel,
+  navigationSnapshot,
+}) => {
+  const {
+    config,
+    navStack: currentNavStack,
+    navigate,
+    drillInto,
+    goBack,
+  } = useRemoteShellContext();
+
+  const navStack = navigationSnapshot?.navStack ?? currentNavStack;
 
   const level = Math.min(rawLevel, navStack.length - 1);
   const entry = navStack[level]!;
+  const activeItemId = entry.activeItemId;
   const hasHeaderActions = !!config.headerActions?.length;
 
   if (level === 0)
@@ -33,7 +50,7 @@ export const NavPanelContent: FC<NavPanelContentProps> = ({ level: rawLevel }) =
 
         <NavItemsList
           items={config.items}
-          activeItemId={effectiveActiveItemId}
+          activeItemId={activeItemId}
           onNavigate={navigate}
           onDrillClick={drillInto}
         />
@@ -54,7 +71,7 @@ export const NavPanelContent: FC<NavPanelContentProps> = ({ level: rawLevel }) =
 
       <NavItemsList
         items={entry.items}
-        activeItemId={effectiveActiveItemId}
+        activeItemId={activeItemId}
         onNavigate={navigate}
         onDrillClick={drillInto}
       />

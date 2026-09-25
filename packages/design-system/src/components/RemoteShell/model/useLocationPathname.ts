@@ -20,6 +20,11 @@ function getSnapshot(): string {
 /** Push a new pathname to the browser history and notify subscribers. */
 export function pushPathname(path: string): void {
   window.history.pushState(null, '', path);
+  notifyPathnameChanged();
+}
+
+/** Notify pathname subscribers after navigation handled by an external router. */
+export function notifyPathnameChanged(): void {
   for (const listener of listeners) {
     listener();
   }
