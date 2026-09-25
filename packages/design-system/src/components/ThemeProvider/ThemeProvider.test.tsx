@@ -4,14 +4,16 @@ import { ThemeProvider } from './ThemeProvider';
 import { useTheme } from './useTheme';
 
 /**
- * Node ships a built-in global `localStorage` that is active by default
+ * Node 25+ ships a built-in global `localStorage` that is active by default
  * without a `--localstorage-file`, and it shadows jsdom's own working
  * implementation in this environment. That global exists (`typeof
  * localStorage === 'object'`) but every method throws
  * `TypeError: ... is not a function`, so a real Storage stub is needed for
- * the ThemeProvider persistence assertions below. Scoped here via
- * `vi.stubGlobal` rather than in the shared `vitest.setup.ts`, since this
- * suite is the only one that reads/writes `localStorage`.
+ * the ThemeProvider persistence assertions below. The repo pins Node 24 and
+ * CI runs Node 24, where this does not happen, but this in-file stub keeps
+ * the suite working on both. Scoped here via `vi.stubGlobal` rather than in
+ * the shared `vitest.setup.ts`, since this suite is the only one that
+ * reads/writes `localStorage`.
  */
 const createMemoryStorage = (): Storage => {
   const store = new Map<string, string>();
@@ -87,6 +89,19 @@ describe('ThemeProvider frame style', () => {
     );
 
     expect(document.documentElement).toHaveAttribute('data-frame-style', 'branded');
+  });
+
+  it('ignores an unknown stored value and uses the default', () => {
+    localStorage.setItem('wasd-frame-style', 'Branded');
+
+    render(
+      <ThemeProvider>
+        <FrameStyleProbe />
+      </ThemeProvider>,
+    );
+
+    expect(screen.getByRole('button')).toHaveTextContent('neutral');
+    expect(document.documentElement).toHaveAttribute('data-frame-style', 'neutral');
   });
 
   it('uses defaultFrameStyle until the user picks one', () => {

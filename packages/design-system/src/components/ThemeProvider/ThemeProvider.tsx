@@ -22,9 +22,10 @@ export const ThemeProvider: FC<ThemeProviderProps> = ({
   const [theme, setTheme] = useState<Theme>(
     () => (localStorage.getItem(storageKey) as Theme) || defaultTheme,
   );
-  const [frameStyle, setFrameStyle] = useState<FrameStyle>(
-    () => (localStorage.getItem(frameStyleStorageKey) as FrameStyle) || defaultFrameStyle,
-  );
+  const [frameStyle, setFrameStyle] = useState<FrameStyle>(() => {
+    const stored = localStorage.getItem(frameStyleStorageKey);
+    return stored === 'neutral' || stored === 'branded' ? stored : defaultFrameStyle;
+  });
 
   useEffect(() => {
     const root = window.document.documentElement;
