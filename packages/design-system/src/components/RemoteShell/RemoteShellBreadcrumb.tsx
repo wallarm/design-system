@@ -24,7 +24,7 @@ export const RemoteShellBreadcrumb: FC<RemoteShellBreadcrumbProps> = ({
       ref={ref}
       data-slot='remote-shell-breadcrumb'
       data-testid={testId}
-      className={cn('[grid-area:breadcrumb] flex items-center gap-8 px-16 py-8', className)}
+      className={cn('[grid-area:breadcrumb] flex items-center gap-8 px-24 py-8', className)}
     >
       <Breadcrumbs data-slot='nav-breadcrumbs' className='-ml-4'>
         {breadcrumbSegments.map((segment, i) => {
