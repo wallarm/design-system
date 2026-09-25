@@ -5,16 +5,23 @@ import { useArrowNav } from '../../hooks/useArrowNav';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { navRailVariants } from './classes';
-import { NavRailContextProvider } from './NavRailContext';
+import { NavRailContextProvider, type NavRailMode } from './NavRailContext';
 
 export interface NavRailProps extends HTMLAttributes<HTMLElement>, TestableProps {
   ref?: Ref<HTMLElement>;
   children?: ReactNode;
+  /**
+   * How the rail lays out its items: `expanded` (icon beside label), `collapsed` (icon only) or
+   * `compact` (icon over a short label). Wins over `collapsed` when both are set.
+   */
+  mode?: NavRailMode;
+  /** Shorthand for `mode='collapsed'`, kept so existing hosts keep working. Prefer `mode`. */
   collapsed?: boolean;
 }
 
 export const NavRail: FC<NavRailProps> = ({
   ref,
+  mode: modeProp,
   collapsed = false,
   className,
   children,
@@ -22,6 +29,7 @@ export const NavRail: FC<NavRailProps> = ({
   ...props
 }) => {
   const internalRef = useRef<HTMLElement>(null);
+  const mode: NavRailMode = modeProp ?? (collapsed ? 'collapsed' : 'expanded');
 
   const focusPanel = useCallback(() => {
     const panel = document.querySelector<HTMLElement>('[data-slot="nav-panel"]');
@@ -52,14 +60,15 @@ export const NavRail: FC<NavRailProps> = ({
 
   return (
     <TestIdProvider value={testId}>
-      <NavRailContextProvider value={{ collapsed }}>
+      <NavRailContextProvider value={{ mode }}>
         <nav
           {...props}
           ref={composeRefs(internalRef, ref)}
           aria-label='Global navigation'
           data-slot='nav-rail'
+          data-mode={mode}
           data-testid={testId}
-          className={cn(navRailVariants({ collapsed }), className)}
+          className={cn(navRailVariants({ mode }), className)}
         >
           {children}
         </nav>
