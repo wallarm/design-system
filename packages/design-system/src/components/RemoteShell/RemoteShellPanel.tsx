@@ -26,12 +26,8 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
   ...props
 }) => {
   const testId = useTestId('panel');
-  const { config, drillLevel, navStack, effectiveActiveItemId } = useRemoteShellContext();
-  const { transition, clearTransition } = useDrillTransition(
-    drillLevel,
-    navStack,
-    effectiveActiveItemId,
-  );
+  const { config, drillLevel, navStack } = useRemoteShellContext();
+  const { transition, clearTransition } = useDrillTransition(drillLevel, navStack);
 
   if (isLoading)
     return (
@@ -81,7 +77,6 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
                     isForward
                       ? {
                           navStack: transition.fromNavStack,
-                          activeItemId: transition.fromActiveItemId,
                         }
                       : undefined
                   }
@@ -100,7 +95,6 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
                       ? undefined
                       : {
                           navStack: transition.fromNavStack,
-                          activeItemId: transition.fromActiveItemId,
                         }
                   }
                 />
