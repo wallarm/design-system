@@ -47,7 +47,9 @@ export const SearchModal: FC<SearchModalProps> = ({
 
   return (
     <TestIdProvider value={testId}>
-      <div data-slot='search-modal' data-testid={testId}>
+      {/* `contents` keeps this wrapper out of layout: as a block it opened a line box around the
+          inline trigger and added descender space (a 24px trigger measured 26px). */}
+      <div data-slot='search-modal' data-testid={testId} className='contents'>
         <Dialog.Root
           open={open}
           onOpenChange={handleOpenChange}

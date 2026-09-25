@@ -16,6 +16,7 @@ const skeletonVariants = cva(cn('overflow-hidden', 'animate-skeleton'), {
       4: 'rounded-4',
       6: 'rounded-6',
       8: 'rounded-8',
+      10: 'rounded-10',
       12: 'rounded-12',
       16: 'rounded-16',
       24: 'rounded-24',
