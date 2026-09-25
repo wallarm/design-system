@@ -31,6 +31,10 @@
 @import './components/app-shell.css';
 @import './components/chart.css';
 
+/* Frame style (WDS-182): styles that apply only while the user has picked the Branded Frame.
+   ThemeProvider writes `data-frame-style` on <html>, so this reaches every micro-frontend. */
+@custom-variant branded (&:where([data-frame-style='branded'] *));
+
 [data-scope='scroll-area'][data-part='viewport'] {
     scrollbar-width: none;
     &::-webkit-scrollbar {

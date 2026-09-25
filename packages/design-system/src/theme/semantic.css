@@ -215,6 +215,10 @@
     --color-component-toast-ic-success: var(--color-green-400);
     --color-component-toast-ic-info: var(--color-blue-400);
     --color-component-app-shell-bg: var(--color-slate-100);
+    /* Branded Frame (WDS-182): the Frame fill when the user picks the Branded Frame style.
+     * Swapped in for the token above under `[data-frame-style='branded']` (end of file), so
+     * AppShell and every Ambient tone below follow with no component change. */
+    --color-component-app-shell-bg-branded: var(--color-w-orange-50);
 
     /* AppShell Frame ambient — the soft spots and dot raster painted into the
      * Frame (header + rail). Every tone derives from the Frame token above, so
@@ -661,6 +665,7 @@
     --color-component-toast-ic-success: var(--color-green-600);
     --color-component-toast-ic-info: var(--color-blue-600);
     --color-component-app-shell-bg: var(--color-slate-975);
+    --color-component-app-shell-bg-branded: #160e1a;
 
     /* AppShell Frame ambient (dark) — on a near-black base only lifts read, so
      * every spot mixes toward white. */
@@ -875,4 +880,20 @@
      * ======================================== */
     --color-data-viz-1: #ffffff;
     --temp-token: #ffffff;
+}
+
+/* ========================================
+ * FRAME STYLE: BRANDED (WDS-182)
+ * ThemeProvider writes `data-frame-style` on <html>. Branded is not a value swap like
+ * dark: components switch to the existing brand tokens through the `branded:` variant
+ * (index.css). Only the Frame base and the Ambient dot change here. `:root` doubles the
+ * specificity, so this beats both the light theme and `[data-theme='dark']`.
+ * ======================================== */
+:root[data-frame-style='branded'] {
+    --color-component-app-shell-bg: var(--color-component-app-shell-bg-branded);
+    --color-component-app-shell-ambient-dot: --alpha(var(--color-w-orange-500) / 28%);
+}
+
+:root[data-theme='dark'][data-frame-style='branded'] {
+    --color-component-app-shell-ambient-dot: --alpha(var(--color-w-orange-300) / 15%);
 }
