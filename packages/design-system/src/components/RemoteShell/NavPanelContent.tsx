@@ -2,16 +2,37 @@ import type { FC } from 'react';
 import { NavPanelBack, NavPanelDivider, NavPanelHeader } from '../NavPanel';
 import { Text } from '../Text';
 import { HeaderActions } from './HeaderActions';
+import type { NavStackEntry } from './model';
 import { findDrillNode, useRemoteShellContext } from './model';
 import { NavItemsList } from './NavItemsList';
 
-interface NavPanelContentProps {
-  level: number;
+interface NavigationSnapshot {
+  navStack: NavStackEntry[];
+  activeItemId: string | null;
 }
 
-export const NavPanelContent: FC<NavPanelContentProps> = ({ level: rawLevel }) => {
-  const { config, navStack, effectiveActiveItemId, navigate, drillInto, goBack } =
-    useRemoteShellContext();
+interface NavPanelContentProps {
+  level: number;
+  navigationSnapshot?: NavigationSnapshot;
+}
+
+export const NavPanelContent: FC<NavPanelContentProps> = ({
+  level: rawLevel,
+  navigationSnapshot,
+}) => {
+  const {
+    config,
+    navStack: currentNavStack,
+    effectiveActiveItemId: currentActiveItemId,
+    navigate,
+    drillInto,
+    goBack,
+  } = useRemoteShellContext();
+
+  const navStack = navigationSnapshot?.navStack ?? currentNavStack;
+  const effectiveActiveItemId = navigationSnapshot
+    ? navigationSnapshot.activeItemId
+    : currentActiveItemId;
 
   const level = Math.min(rawLevel, navStack.length - 1);
   const entry = navStack[level]!;
