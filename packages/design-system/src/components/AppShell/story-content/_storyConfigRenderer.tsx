@@ -14,6 +14,8 @@ import { PRODUCT_CONFIGS, type Product } from './_storyLib';
 export interface ConfigRemoteProps {
   config: NavConfig;
   basePath?: string;
+  /** Fake a 2s load whenever the product changes, to show the panel and content skeletons. */
+  simulateLoading?: boolean;
 }
 
 const RemotePageContent: FC = () => {
@@ -35,10 +37,11 @@ const RemotePageContent: FC = () => {
   );
 };
 
-const ConfigRemote: FC<ConfigRemoteProps> = ({ config, basePath }) => {
-  const [loading, setLoading] = useState(true);
+const ConfigRemote: FC<ConfigRemoteProps> = ({ config, basePath, simulateLoading = true }) => {
+  const [loading, setLoading] = useState(simulateLoading);
 
   useEffect(() => {
+    if (!simulateLoading) return;
     setLoading(true);
 
     const timer = setTimeout(() => {
@@ -46,7 +49,7 @@ const ConfigRemote: FC<ConfigRemoteProps> = ({ config, basePath }) => {
     }, 2000);
 
     return () => clearTimeout(timer);
-  }, [config.productLabel]);
+  }, [config.productLabel, simulateLoading]);
 
   return (
     <RemoteShell config={config} basePath={basePath}>
@@ -68,8 +71,16 @@ const ConfigRemote: FC<ConfigRemoteProps> = ({ config, basePath }) => {
   );
 };
 
-export const RemoteForProduct = ({ product }: { product: Product }) => {
+export const RemoteForProduct = ({
+  product,
+  simulateLoading = true,
+}: {
+  product: Product;
+  simulateLoading?: boolean;
+}) => {
   if (product === 'home') return <HomeContent />;
   const { config } = PRODUCT_CONFIGS[product];
-  return <ConfigRemote config={config} basePath={`/${product}`} />;
+  return (
+    <ConfigRemote config={config} basePath={`/${product}`} simulateLoading={simulateLoading} />
+  );
 };

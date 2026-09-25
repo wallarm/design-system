@@ -67,12 +67,18 @@ const meta = {
 
 export default meta;
 
-/** The three regions composed once — `AppShellHeader`, `AppShellRail`, `AppShellRemote` — with the content surface being the only part that scrolls. */
-export const Basic: StoryFn<AppShellProps> = ({ ambient }) => {
+interface ShellProps {
+  ambient?: boolean;
+  /** Header actions and product rail show skeletons in place of their items. */
+  loading?: boolean;
+  /** Each product fakes a 2s load when opened, showing its panel and content skeletons. */
+  simulateProductLoading?: boolean;
+}
+
+const Shell = ({ ambient, loading = false, simulateProductLoading = false }: ShellProps) => {
   const pathname = useLocationPathname();
   const activeProduct = deriveProduct(pathname);
 
-  const [loading, setLoading] = useState(true);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
   const { theme, setTheme } = useTheme();
   const railMode = railModeFor(sidebarMode, activeProduct === 'home');
@@ -143,16 +149,25 @@ export const Basic: StoryFn<AppShellProps> = ({ ambient }) => {
       </AppShellRail>
 
       <AppShellRemote>
-        <div className='flex gap-8 absolute top-4 right-4 z-10'>
-          <Button variant='ghost' size='small' color='neutral' onClick={() => setLoading(v => !v)}>
-            {loading ? 'Finish loading' : 'Start loading'}
-          </Button>
-        </div>
-
-        <RemoteForProduct product={activeProduct} />
+        <RemoteForProduct product={activeProduct} simulateLoading={simulateProductLoading} />
       </AppShellRemote>
     </AppShell>
   );
+};
+
+/** The three regions composed once — `AppShellHeader`, `AppShellRail`, `AppShellRemote` — with the content surface being the only part that scrolls. Pick a product in the rail to drill into it, and the account item at the bottom for appearance and sidebar mode. */
+export const Basic: StoryFn<AppShellProps> = ({ ambient }) => <Shell ambient={ambient} />;
+
+/** How the shell looks while the platform loads. The header actions and the product rail hold skeletons that sit exactly where the real items land, so nothing jumps when they arrive. Turn `loading` off in Controls to watch the swap. Opening a product also shows its own panel and content loading. */
+export const Loading: StoryFn<AppShellProps & { loading: boolean }> = ({ ambient, loading }) => (
+  <Shell ambient={ambient} loading={loading} simulateProductLoading />
+);
+Loading.args = { loading: true };
+Loading.argTypes = {
+  loading: {
+    control: 'boolean',
+    description: 'Show the header and rail skeletons instead of their items.',
+  },
 };
 
 /** `reveal` animates the chrome in on the first application load only. Leave it unset for an ordinary screen; this exists for prototyping the boot moment itself. */
