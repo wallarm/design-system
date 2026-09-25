@@ -747,6 +747,7 @@ export { Tag, TagClose, type TagProps } from './components/Tag';
 export { Text, type TextProps } from './components/Text';
 export { Textarea, type TextareaProps } from './components/Textarea';
 export {
+  type FrameStyle,
   type Theme,
   ThemeProvider,
   useTheme,
