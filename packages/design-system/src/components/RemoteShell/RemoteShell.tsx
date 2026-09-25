@@ -6,6 +6,7 @@ import type { NavConfig, NavConfigDrill } from './model';
 import {
   findFirstLinkPath,
   matchNav,
+  notifyPathnameChanged,
   pushPathname,
   RemoteShellContextProvider,
   useLocationPathname,
@@ -44,6 +45,7 @@ export const RemoteShell: FC<RemoteShellProps> = ({
       const fullPath = basePath ? `${basePath}${next}` : next;
       if (onNavigate) {
         onNavigate(fullPath);
+        notifyPathnameChanged();
       } else {
         pushPathname(fullPath);
       }
