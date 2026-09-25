@@ -8,15 +8,10 @@ export interface DrillTransition {
   fromLevel: number;
   direction: 'forward' | 'backward';
   fromNavStack: NavStackEntry[];
-  fromActiveItemId: string | null;
 }
 
-export const useDrillTransition = (
-  drillLevel: number,
-  navStack: NavStackEntry[],
-  activeItemId: string | null,
-) => {
-  const previousRef = useRef({ drillLevel, navStack, activeItemId });
+export const useDrillTransition = (drillLevel: number, navStack: NavStackEntry[]) => {
+  const previousRef = useRef({ drillLevel, navStack });
   const [transition, setTransition] = useState<DrillTransition | null>(null);
 
   useLayoutEffect(() => {
@@ -26,11 +21,10 @@ export const useDrillTransition = (
         fromLevel: previous.drillLevel,
         direction: drillLevel > previous.drillLevel ? 'forward' : 'backward',
         fromNavStack: previous.navStack,
-        fromActiveItemId: previous.activeItemId,
       });
     }
-    previousRef.current = { drillLevel, navStack, activeItemId };
-  }, [activeItemId, drillLevel, navStack]);
+    previousRef.current = { drillLevel, navStack };
+  }, [drillLevel, navStack]);
 
   const clearTransition = () => setTransition(null);
 
