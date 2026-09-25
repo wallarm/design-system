@@ -21,7 +21,10 @@ export const SettingsHeader: FC<SettingsHeaderProps> = ({
         ref={ref}
         data-testid={testId}
         data-slot='settings-header'
-        className={cn('flex flex-col gap-6 pb-12 pt-8 px-24', className)}
+        className={cn(
+          'flex flex-col gap-6 pb-12 pt-8 px-24 has-[+[data-slot=page-content]]:pb-6',
+          className,
+        )}
       >
         {children}
       </div>
