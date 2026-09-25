@@ -45,12 +45,18 @@ export const navRailItemVariants = cva(
         compact: 'min-h-42 flex-col justify-center gap-2 px-8 py-6',
       },
       active: {
-        true: 'overlay-states-primary-active',
+        // Branded: only the active item turns brand; inactive items stay neutral in every state.
+        true: 'overlay-states-primary-active branded:overlay-states-brand-active branded:text-text-brand',
         false:
           'hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
       },
+      // The signed-in user's item. In Branded it reads as brand in every state, not only when active.
+      avatar: {
+        true: 'branded:text-text-brand branded:hover:overlay-states-brand-hover branded:focus-visible:overlay-states-brand-hover branded:active:overlay-states-brand-pressed branded:data-[state=open]:overlay-states-brand-active',
+        false: '',
+      },
     },
-    defaultVariants: { mode: 'expanded', active: false },
+    defaultVariants: { mode: 'expanded', active: false, avatar: false },
   },
 );
 
