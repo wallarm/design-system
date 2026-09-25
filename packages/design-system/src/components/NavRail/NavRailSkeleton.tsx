@@ -11,11 +11,12 @@ export interface NavRailSkeletonProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 // Bar sizes per mode, 2px inside the 32px items and 4px/2px inside the 62×42px compact ones.
-const SKELETON_BARS: Record<NavRailMode, { width: string; height: string }> = {
+// `as const` keeps the literal sizes, which is what Skeleton's px/% dimension type needs.
+const SKELETON_BARS = {
   expanded: { width: '100%', height: '28px' },
   collapsed: { width: '28px', height: '28px' },
   compact: { width: '54px', height: '38px' },
-};
+} as const satisfies Record<NavRailMode, { width: string; height: string }>;
 
 export const NavRailSkeleton: FC<NavRailSkeletonProps> = ({
   ref,
