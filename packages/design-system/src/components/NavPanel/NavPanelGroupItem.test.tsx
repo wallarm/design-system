@@ -22,6 +22,7 @@ describe('NavPanelGroupItem tree line', () => {
     expect(segment).not.toBeNull();
     // Same x as NavPanelGroupContent's line: 24 * 1 - 8.
     expect(segment).toHaveStyle({ left: '16px' });
+    expect(segment).toHaveClass('hidden', 'branded:block', 'bg-border-brand');
   });
 
   it('follows the depth for deeper items', () => {
