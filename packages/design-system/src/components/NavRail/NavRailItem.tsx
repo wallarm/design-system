@@ -79,7 +79,7 @@ export const NavRailItem: FC<NavRailItemProps> = ({
           <span
             data-slot='nav-rail-item-avatar'
             className={cn(
-              '-m-4 grid size-24 place-items-center overflow-hidden rounded-8 bg-states-primary-hover branded:bg-states-brand-hover *:col-start-1 *:row-start-1',
+              '-m-4 grid size-24 place-items-center overflow-hidden rounded-8 bg-states-primary-hover branded:bg-states-brand-hover branded:text-icon-brand *:col-start-1 *:row-start-1',
               !photo && 'border border-border-primary branded:border-border-brand',
             )}
           >
