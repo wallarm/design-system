@@ -16,4 +16,4 @@ export type {
   NavConfigSectionHeader,
   NavStackEntry,
 } from './types';
-export { pushPathname, useLocationPathname } from './useLocationPathname';
+export { notifyPathnameChanged, pushPathname, useLocationPathname } from './useLocationPathname';
