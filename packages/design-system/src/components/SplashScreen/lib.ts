@@ -11,10 +11,13 @@ export const SPLASH_PHASES: Record<ContentPhase, boolean> = {
 export function getContainerStyle(
   phase: PhaseType,
   shrinkTarget?: SplashScreenShrinkTarget,
+  measuredHeight?: number,
 ): CSSProperties | undefined {
   if (!shrinkTarget) return undefined;
 
-  const { width, height, borderRadius = 0 } = shrinkTarget;
+  const { width, height: targetHeight, borderRadius = 0 } = shrinkTarget;
+  // Priority: measuredHeight > shrinkTarget.height > undefined
+  const height = measuredHeight ?? targetHeight;
 
   switch (phase) {
     case 'enter-start':
@@ -28,6 +31,13 @@ export function getContainerStyle(
         transition: 'clip-path 500ms ease-in-out',
       };
     case 'shrinking':
+      // If no height available yet, return early state (will update when measured)
+      if (height === undefined) {
+        return {
+          clipPath: `inset(0 0 round ${borderRadius}px)`,
+          transition: 'clip-path 500ms ease-in-out',
+        };
+      }
       return {
         clipPath: `inset(calc(50% - ${height / 2}px) calc(50% - ${width / 2}px) round ${borderRadius}px)`,
         transition: 'clip-path 500ms ease-in-out',

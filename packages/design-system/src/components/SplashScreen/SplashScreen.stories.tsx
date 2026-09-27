@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { AnimatedBackground } from '../AnimatedBackground';
 import { Button } from '../Button';
+import { Input } from '../Input';
 import { VStack } from '../Stack';
+import { Text } from '../Text';
 import { SplashScreen } from './SplashScreen';
 
 const DESCRIPTION = [
@@ -86,5 +88,53 @@ export const ShrinkToCard: StoryFn = () => {
 };
 
 ShrinkToCard.parameters = {
+  layout: 'fullscreen',
+};
+
+/** The splash can measure its own content height when `shrinkTarget.height` is omitted — the animation shrinks to fit whatever you put inside, no hardcoded constant needed. */
+export const MeasuredHeight: StoryFn = () => {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    if (!visible) return;
+
+    const timer = window.setTimeout(() => {
+      setVisible(false);
+    }, 2000);
+
+    return () => window.clearTimeout(timer);
+  }, [visible]);
+
+  const handleSignIn = () => {
+    setVisible(true);
+  };
+
+  return (
+    <div className='relative h-screen w-screen'>
+      <AnimatedBackground />
+
+      <div className='absolute inset-0 flex items-center justify-center'>
+        <SplashScreen
+          visible={visible}
+          shrinkTarget={{ width: 480, borderRadius: 12 }}
+          className='bg-bg-page-bg shadow-lg'
+        >
+          <div className='flex h-full w-full flex-col items-center justify-center gap-16 p-24'>
+            <Text size='xl'>Sign In</Text>
+            <div className='flex w-full flex-col gap-12'>
+              <Input placeholder='Email' />
+              <Input placeholder='Password' type='password' />
+            </div>
+            <Button variant='primary' color='brand' className='w-full' onClick={handleSignIn}>
+              Sign In
+            </Button>
+          </div>
+        </SplashScreen>
+      </div>
+    </div>
+  );
+};
+
+MeasuredHeight.parameters = {
   layout: 'fullscreen',
 };

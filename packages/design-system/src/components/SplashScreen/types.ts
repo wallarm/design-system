@@ -6,7 +6,7 @@ export type PhaseType = ContentPhase | 'shrinking' | 'settled' | 'exited';
 
 export interface SplashScreenShrinkTarget {
   width: number;
-  height: number;
+  height?: number;
   borderRadius?: number;
 }
 
@@ -15,4 +15,5 @@ export interface SplashScreenProps extends HTMLAttributes<HTMLDivElement> {
   visible?: boolean;
   shrinkTarget?: SplashScreenShrinkTarget;
   children?: ReactNode;
+  onPhaseChange?: (phase: PhaseType) => void;
 }

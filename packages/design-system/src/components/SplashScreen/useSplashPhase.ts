@@ -13,7 +13,11 @@ const doubleRaf = (callback: () => void): (() => void) => {
   };
 };
 
-export const useSplashPhase = (visible: boolean, shrinkTarget?: SplashScreenShrinkTarget) => {
+export const useSplashPhase = (
+  visible: boolean,
+  shrinkTarget?: SplashScreenShrinkTarget,
+  onPhaseChange?: (phase: PhaseType) => void,
+) => {
   const shrinkTargetRef = useRef(shrinkTarget);
   shrinkTargetRef.current = shrinkTarget;
 
@@ -53,7 +57,9 @@ export const useSplashPhase = (visible: boolean, shrinkTarget?: SplashScreenShri
       // clip-path: inset(0 0 round 0px) set by 'content-fading'.
       return doubleRaf(() => setPhase('shrinking'));
     }
-    if (phase === 'settled') {
+    // Start content fade during shrinking (not after settled)
+    // This eliminates the blank card flicker
+    if (phase === 'shrinking') {
       return doubleRaf(() => setChildrenRevealed(true));
     }
   }, [phase]);
@@ -73,6 +79,11 @@ export const useSplashPhase = (visible: boolean, shrinkTarget?: SplashScreenShri
       setPhase('shrinking');
     }
   };
+
+  // Notify consumer of phase changes
+  useEffect(() => {
+    onPhaseChange?.(phase);
+  }, [phase, onPhaseChange]);
 
   return {
     phase,
