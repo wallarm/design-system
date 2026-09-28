@@ -81,6 +81,7 @@ import {
   Keyboard,
   KeyRound,
   KeySquare,
+  Laptop,
   Layers,
   Layers2,
   Layers3,
@@ -105,11 +106,13 @@ import {
   MessageSquareX,
   MessagesSquare,
   Minus,
+  Moon,
   Mouse,
   Move3D,
   NotebookPen,
   NotepadText,
   OctagonAlert,
+  Paintbrush,
   PanelBottom,
   PanelBottomOpen,
   PanelRight,
@@ -144,6 +147,7 @@ import {
   SlidersVertical,
   SquareArrowOutUpRight,
   SquareUserRound,
+  Sun,
   ThumbsDown,
   ThumbsUp,
   Trash,
@@ -240,6 +244,30 @@ figma.connect(
 );
 
 figma.connect(
+  Laptop,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6990-1368',
+  {
+    example: () => <Laptop />,
+  },
+);
+
+figma.connect(
+  Moon,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6990-1370',
+  {
+    example: () => <Moon />,
+  },
+);
+
+figma.connect(
+  Paintbrush,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6987-267',
+  {
+    example: () => <Paintbrush />,
+  },
+);
+
+figma.connect(
   Plug,
   'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6857-298',
   {
@@ -280,6 +308,14 @@ figma.connect(
   'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6873-227',
   {
     example: () => <SquareUserRound />,
+  },
+);
+
+figma.connect(
+  Sun,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6990-1369',
+  {
+    example: () => <Sun />,
   },
 );
 
