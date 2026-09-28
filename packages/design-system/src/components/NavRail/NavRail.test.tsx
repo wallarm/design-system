@@ -198,6 +198,39 @@ describe('Avatar plate', () => {
   });
 });
 
+describe('Branded frame style', () => {
+  // jsdom applies no CSS, so these pin the branded: classes that make the look.
+  it('keeps the active item brand while its tooltip marks it open', () => {
+    render(
+      <NavRail>
+        <NavRailItem icon={Activity} label='Activity' active data-testid='item-activity' />
+      </NavRail>,
+    );
+
+    expect(screen.getByTestId('item-activity')).toHaveClass(
+      'branded:overlay-states-brand-active',
+      'branded:data-[state=open]:overlay-states-brand-active',
+      'branded:text-text-brand',
+    );
+  });
+
+  it('brands only the plate of the user item, not its name', () => {
+    render(
+      <NavRail>
+        <NavRailItem icon={Activity} label='Meow Meow' avatar data-testid='item-user' />
+      </NavRail>,
+    );
+
+    const item = screen.getByTestId('item-user');
+    expect(item).not.toHaveClass('branded:text-text-brand');
+    expect(item).toHaveClass('branded:hover:overlay-states-brand-hover');
+    expect(item.querySelector('[data-slot="nav-rail-item-avatar"]')).toHaveClass(
+      'branded:text-icon-brand',
+      'branded:border-border-brand',
+    );
+  });
+});
+
 describe('Rail modes', () => {
   const renderRail = (props: {
     mode?: 'expanded' | 'collapsed' | 'compact';

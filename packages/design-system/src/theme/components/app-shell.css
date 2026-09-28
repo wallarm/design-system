@@ -40,6 +40,17 @@
     --app-shell-ambient-grain-blend: screen;
 }
 
+/* Branded Frame (WDS-182): multiplying or screening gray noise over the warm base dulls it
+   toward gray. Soft-light adds the same texture and keeps the orange. */
+:root[data-frame-style='branded'] {
+    --app-shell-ambient-grain-opacity: 0.6;
+    --app-shell-ambient-grain-blend: soft-light;
+}
+
+:root[data-theme='dark'][data-frame-style='branded'] {
+    --app-shell-ambient-grain-opacity: 0.35;
+}
+
 @utility app-shell-ambient {
     position: absolute;
     inset: 0;

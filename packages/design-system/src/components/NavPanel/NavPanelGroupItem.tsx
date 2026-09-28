@@ -5,7 +5,7 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Text } from '../Text';
 import { navPanelGroupItemVariants } from './classes';
-import { useNavPanelDepth, useNavPanelIndent } from './NavPanelContext';
+import { NAV_PANEL_BASE_PADDING, useNavPanelDepth, useNavPanelIndent } from './NavPanelContext';
 
 export interface NavPanelGroupItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   ref?: Ref<HTMLAnchorElement>;
@@ -47,6 +47,15 @@ export const NavPanelGroupItem: FC<NavPanelGroupItemProps> = ({
       <Text size='sm' truncate>
         {children}
       </Text>
+      {active && depth > 0 && (
+        // Branded: the active item draws its own brand segment over the group's tree line
+        // (NavPanelGroupContent), at the same x. Neutral keeps the plain gray line.
+        <span
+          aria-hidden
+          className='absolute top-0 bottom-0 hidden w-px bg-border-brand branded:block'
+          style={{ left: depth * indent - NAV_PANEL_BASE_PADDING }}
+        />
+      )}
     </Comp>
   );
 };

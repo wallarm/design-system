@@ -45,12 +45,21 @@ export const navRailItemVariants = cva(
         compact: 'min-h-42 flex-col justify-center gap-2 px-8 py-6',
       },
       active: {
-        true: 'overlay-states-primary-active',
+        // Branded: only the active item turns brand; inactive items stay neutral in every state.
+        // The tooltip marks its trigger data-state=open on hover, so the open state is branded
+        // too, or the neutral open fill above would turn the active item gray.
+        true: 'overlay-states-primary-active branded:overlay-states-brand-active branded:data-[state=open]:overlay-states-brand-active branded:text-text-brand',
         false:
           'hover:overlay-states-primary-hover focus-visible:overlay-states-primary-hover active:overlay-states-primary-pressed',
       },
+      // The signed-in user's item. In Branded its hover, pressed and open fills are brand; the name
+      // stays text-primary and only the plate turns brand (NavRailItem).
+      avatar: {
+        true: 'branded:hover:overlay-states-brand-hover branded:focus-visible:overlay-states-brand-hover branded:active:overlay-states-brand-pressed branded:data-[state=open]:overlay-states-brand-active',
+        false: '',
+      },
     },
-    defaultVariants: { mode: 'expanded', active: false },
+    defaultVariants: { mode: 'expanded', active: false, avatar: false },
   },
 );
 
