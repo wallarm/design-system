@@ -417,6 +417,7 @@ export {
   type NavRailFooterProps,
   NavRailItem,
   type NavRailItemProps,
+  type NavRailMode,
   type NavRailProps,
   NavRailSeparator,
   type NavRailSeparatorProps,

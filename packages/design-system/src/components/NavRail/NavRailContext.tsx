@@ -1,10 +1,12 @@
 import { createContext, useContext } from 'react';
 
+export type NavRailMode = 'expanded' | 'collapsed' | 'compact';
+
 interface NavRailContextValue {
-  collapsed: boolean;
+  mode: NavRailMode;
 }
 
-const NavRailCtx = createContext<NavRailContextValue>({ collapsed: false });
+const NavRailCtx = createContext<NavRailContextValue>({ mode: 'expanded' });
 
 export const NavRailContextProvider = NavRailCtx.Provider;
 
