@@ -1,4 +1,5 @@
-import { Check, LogOut, PanelLeftDashed, PencilRuler, Settings, User } from '../../../icons';
+import { Fragment } from 'react';
+import { LogOut, PanelLeftDashed, PencilRuler, Settings, User, UserRound } from '../../../icons';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,20 +7,32 @@ import {
   DropdownMenuItemContent,
   DropdownMenuItemIcon,
   DropdownMenuItemText,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
   DropdownMenuTriggerItem,
 } from '../../DropdownMenu';
-import { NavRailItem } from '../../NavRail';
+import { NavRailItem, type NavRailMode } from '../../NavRail';
 import { HStack, VStack } from '../../Stack';
 import { Text } from '../../Text';
 import type { Theme } from '../../ThemeProvider';
 
-export type SidebarMode = 'adaptive' | 'expanded';
+export type SidebarMode = 'adaptive' | 'expanded' | 'collapsed' | 'compact';
+
+/** Adaptive collapses the rail inside a product and expands it on Home; the other modes pin it. */
+export const railModeFor = (mode: SidebarMode, onHome: boolean): NavRailMode => {
+  if (mode === 'adaptive') return onHome ? 'expanded' : 'collapsed';
+  return mode;
+};
 
 const USER_NAME = 'Meow Meow';
 const USER_EMAIL = 'meow@meow.com';
+
+const THEMES: Theme[] = ['light', 'dark'];
+// Adaptive on its own, then the two pinned widths, then compact.
+const SIDEBAR_MODE_GROUPS: SidebarMode[][] = [['adaptive'], ['expanded', 'collapsed'], ['compact']];
+const SIDEBAR_MODES = SIDEBAR_MODE_GROUPS.flat();
 
 const THEME_LABELS: Record<Theme, string> = {
   light: 'Light',
@@ -29,6 +42,8 @@ const THEME_LABELS: Record<Theme, string> = {
 const SIDEBAR_MODE_LABELS: Record<SidebarMode, string> = {
   adaptive: 'Adaptive',
   expanded: 'Always expanded',
+  collapsed: 'Always collapsed',
+  compact: 'Compact',
 };
 
 export const AccountDropdown = ({
@@ -44,7 +59,7 @@ export const AccountDropdown = ({
 }) => (
   <DropdownMenu positioning={{ placement: 'right-end', gutter: 6, offset: { crossAxis: 12 } }}>
     <DropdownMenuTrigger>
-      <NavRailItem icon={User} label={USER_NAME} />
+      <NavRailItem icon={UserRound} label={USER_NAME} avatar />
     </DropdownMenuTrigger>
     <DropdownMenuContent className='w-256'>
       <div className='rounded-6 border border-border-primary-light bg-states-primary-hover px-8 py-8 mb-4'>
@@ -74,29 +89,26 @@ export const AccountDropdown = ({
             <PencilRuler />
           </DropdownMenuItemIcon>
           <DropdownMenuItemContent>
-            <DropdownMenuItemText>Theme</DropdownMenuItemText>
+            <DropdownMenuItemText>Appearance</DropdownMenuItemText>
             <Text size='xs' color='secondary'>
               {THEME_LABELS[theme]}
             </Text>
           </DropdownMenuItemContent>
         </DropdownMenuTriggerItem>
         <DropdownMenuContent className='w-132'>
-          <DropdownMenuItem onSelect={() => onThemeChange('light')}>
-            <DropdownMenuItemText>Light</DropdownMenuItemText>
-            {theme === 'light' && (
-              <DropdownMenuShortcut>
-                <Check />
-              </DropdownMenuShortcut>
-            )}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => onThemeChange('dark')}>
-            <DropdownMenuItemText>Dark</DropdownMenuItemText>
-            {theme === 'dark' && (
-              <DropdownMenuShortcut>
-                <Check />
-              </DropdownMenuShortcut>
-            )}
-          </DropdownMenuItem>
+          <DropdownMenuRadioGroup
+            value={theme}
+            onValueChange={({ value }) => {
+              const next = THEMES.find(t => t === value);
+              if (next) onThemeChange(next);
+            }}
+          >
+            {THEMES.map(t => (
+              <DropdownMenuRadioItem key={t} value={t}>
+                <DropdownMenuItemText>{THEME_LABELS[t]}</DropdownMenuItemText>
+              </DropdownMenuRadioItem>
+            ))}
+          </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenu>
@@ -112,22 +124,24 @@ export const AccountDropdown = ({
           </DropdownMenuItemContent>
         </DropdownMenuTriggerItem>
         <DropdownMenuContent className='w-200'>
-          <DropdownMenuItem onSelect={() => onSidebarModeChange('adaptive')}>
-            <DropdownMenuItemText>Adaptive</DropdownMenuItemText>
-            {sidebarMode === 'adaptive' && (
-              <DropdownMenuShortcut>
-                <Check />
-              </DropdownMenuShortcut>
-            )}
-          </DropdownMenuItem>
-          <DropdownMenuItem onSelect={() => onSidebarModeChange('expanded')}>
-            <DropdownMenuItemText>Always expanded</DropdownMenuItemText>
-            {sidebarMode === 'expanded' && (
-              <DropdownMenuShortcut>
-                <Check />
-              </DropdownMenuShortcut>
-            )}
-          </DropdownMenuItem>
+          <DropdownMenuRadioGroup
+            value={sidebarMode}
+            onValueChange={({ value }) => {
+              const next = SIDEBAR_MODES.find(m => m === value);
+              if (next) onSidebarModeChange(next);
+            }}
+          >
+            {SIDEBAR_MODE_GROUPS.map((group, index) => (
+              <Fragment key={group.join('-')}>
+                {index > 0 && <DropdownMenuSeparator />}
+                {group.map(m => (
+                  <DropdownMenuRadioItem key={m} value={m}>
+                    <DropdownMenuItemText>{SIDEBAR_MODE_LABELS[m]}</DropdownMenuItemText>
+                  </DropdownMenuRadioItem>
+                ))}
+              </Fragment>
+            ))}
+          </DropdownMenuRadioGroup>
         </DropdownMenuContent>
       </DropdownMenu>
       <DropdownMenuSeparator />

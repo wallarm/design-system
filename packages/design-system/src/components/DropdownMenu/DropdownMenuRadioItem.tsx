@@ -39,7 +39,12 @@ export const DropdownMenuRadioItem: FC<DropdownMenuRadioItemProps> = ({
       disabled={disabled}
       closeOnSelect={closeOnSelect ?? false}
       data-testid={testId}
-      className={cn(dropdownMenuItemVariants({ variant }), className)}
+      className={cn(
+        dropdownMenuItemVariants({ variant }),
+        // Same selected fill as SelectOption, so a picked value reads alike in both menus.
+        'data-[state=checked]:bg-states-primary-active',
+        className,
+      )}
     >
       {children}
       <DropdownMenuItemIndicator>
