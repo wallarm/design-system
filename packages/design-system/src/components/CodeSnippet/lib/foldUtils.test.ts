@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   buildDisplayItems,
   type DisplayItem,
+  type FoldButtonProps,
   type FoldRegion,
   getFoldSummaryLabel,
   validateFolds,
@@ -232,5 +233,17 @@ describe('getFoldSummaryLabel', () => {
   it('returns "1 lines" for single line fold', () => {
     const fold: FoldRegion = { id: 'a', startLine: 3, endLine: 3 };
     expect(getFoldSummaryLabel(fold, 1)).toBe('1 lines');
+  });
+});
+
+describe('FoldButtonProps', () => {
+  it('accepts number and boolean data-* values, as React does', () => {
+    const props = {
+      'data-analytics-id': 'fold',
+      'data-index': 1,
+      'data-open': true,
+      'data-empty': undefined,
+    } satisfies FoldButtonProps;
+    expect(props['data-index']).toBe(1);
   });
 });

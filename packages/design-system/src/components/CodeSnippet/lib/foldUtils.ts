@@ -2,7 +2,7 @@ import type { ButtonHTMLAttributes } from 'react';
 
 export type FoldButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
   /** Hyphenated `data-*` attributes (e.g. `data-analytics-id`) are not part of the DOM typings. */
-  [dataAttribute: `data-${string}`]: string | undefined;
+  [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
 };
 
 export type FoldRegion = {
@@ -30,14 +30,15 @@ export function getFoldSummaryLabel(fold: FoldRegion, lineCount: number): string
   return fold.label ?? `${lineCount} lines`;
 }
 
-/**
- * Validates fold regions and returns a clean, sorted list.
- * Dev: logs warnings for invalid folds. Prod: silently filters them out.
- */
 export type ValidateFoldsOptions = {
   /** Log dev warnings for skipped folds. Default: true */
   warn?: boolean;
 };
+
+/**
+ * Validates fold regions and returns a clean, sorted list.
+ * Dev: logs warnings for invalid folds. Prod: silently filters them out.
+ */
 
 export function validateFolds(
   folds: readonly FoldRegion[],
