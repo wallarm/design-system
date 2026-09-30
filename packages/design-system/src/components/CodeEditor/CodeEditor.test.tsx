@@ -23,6 +23,9 @@ vi.mock('../../utils/copyText', () => ({
 const makeValue = (lineCount: number) =>
   Array.from({ length: lineCount }, (_, index) => `line ${index + 1}`).join('\n');
 
+const FALLBACK_LINES = { 1: { color: 'success' as const, prefix: '+' } };
+const FALLBACK_FOLDS = [{ id: 'rest', startLine: 2, endLine: 3 }];
+
 const FOLDS_FOR_ROLE_TEST = [{ id: 'middle', startLine: 2, endLine: 3, label: 'Middle' }];
 
 const WrapProbe = () => {
@@ -63,6 +66,52 @@ describe('CodeEditor', () => {
 
       expect(screen.getByTestId('ed--fallback')).toHaveTextContent('41');
       expect(screen.getByTestId('ed--fallback')).toHaveTextContent('42');
+      await screen.findByTestId('ed--editor');
+    });
+
+    it('reserves every gutter the engine will render (stick, numbers, folds, prefixes)', async () => {
+      render(
+        <CodeEditorRoot
+          data-testid='ed'
+          defaultValue={'a\nb\nc'}
+          lines={FALLBACK_LINES}
+          folds={FALLBACK_FOLDS}
+        >
+          <CodeEditorContent aria-label='Code' lineNumbers />
+        </CodeEditorRoot>,
+      );
+
+      const gutters = screen.getByTestId('ed--fallback-gutters');
+      const columns = Array.from(gutters.children);
+      expect(columns).toHaveLength(4);
+      expect(columns[0]).toHaveClass('border-l-2', 'border-transparent', 'pl-12');
+      expect(columns[1]).toHaveTextContent('123');
+      expect(columns[2]).toHaveClass('w-24');
+      expect(columns[3]).toHaveClass('px-8');
+      expect(columns[3]).toHaveTextContent('+');
+      await screen.findByTestId('ed--editor');
+    });
+
+    it('reserves only the gutters that are configured', async () => {
+      render(
+        <CodeEditorRoot data-testid='ed' defaultValue={'a\nb'}>
+          <CodeEditorContent aria-label='Code' />
+        </CodeEditorRoot>,
+      );
+      expect(screen.queryByTestId('ed--fallback-gutters')).not.toBeInTheDocument();
+      await screen.findByTestId('ed--editor');
+    });
+
+    it('reserves the diff stick and prefix columns in diff mode', async () => {
+      render(
+        <CodeEditorRoot data-testid='ed' defaultValue={'a\nb'} original='a'>
+          <CodeEditorContent aria-label='Code' />
+        </CodeEditorRoot>,
+      );
+      const columns = Array.from(screen.getByTestId('ed--fallback-gutters').children);
+      expect(columns).toHaveLength(2);
+      expect(columns[0]).toHaveClass('border-l-2');
+      expect(columns[1]).toHaveClass('px-8');
       await screen.findByTestId('ed--editor');
     });
 

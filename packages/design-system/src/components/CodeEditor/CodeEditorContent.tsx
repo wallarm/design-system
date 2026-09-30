@@ -1,5 +1,6 @@
 import type { FC, HTMLAttributes, Ref } from 'react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { useCodeSnippetChrome } from '../CodeSnippet/hooks';
@@ -7,6 +8,7 @@ import { useCodeEditorContext } from './CodeEditorContext';
 import {
   codeEditorContentVariants,
   codeEditorFallbackCodeVariants,
+  codeEditorFallbackGuttersVariants,
   codeEditorFallbackGutterVariants,
   codeEditorFallbackLineVariants,
   codeEditorFallbackVariants,
@@ -38,6 +40,24 @@ interface FallbackRow {
   text: string;
 }
 
+interface FallbackGutters {
+  stick: boolean;
+  folds: boolean;
+  prefix: boolean;
+}
+
+/** Which engine gutters will render besides line numbers (mirrors `guttersExtension`). */
+const fallbackGuttersFor = (options: EngineOptions): FallbackGutters => {
+  const configs = Object.values(options.lines);
+  const diff = options.original !== undefined;
+  const { folds } = options;
+  return {
+    stick: diff || configs.some(line => line.color != null),
+    folds: folds !== undefined && !(Array.isArray(folds) && folds.length === 0),
+    prefix: diff || configs.some(line => line.prefix != null),
+  };
+};
+
 const buildFallbackRows = (
   value: string,
   startingLineNumber: number,
@@ -66,6 +86,7 @@ export const CodeEditorContent: FC<CodeEditorContentProps> = ({
 }) => {
   const testId = useTestId('content', testIdProp);
   const fallbackTestId = useTestId('fallback');
+  const fallbackGuttersTestId = useTestId('fallback-gutters');
   const { options, callbacks, setHandle } = useCodeEditorContext();
   const { isFullscreen } = useCodeSnippetChrome();
   const [registry] = useState(createPortalRegistry);
@@ -104,8 +125,13 @@ export const CodeEditorContent: FC<CodeEditorContentProps> = ({
           ...callbacks,
           portals: registry,
         });
-        setHandle(created);
-        setLocalHandle(created);
+        // Commit synchronously: the view is already in the DOM, so a deferred render would paint
+        // the fallback and the editor together for a frame (double height).
+        const mounted = created;
+        flushSync(() => {
+          setHandle(mounted);
+          setLocalHandle(mounted);
+        });
       },
       (error: unknown) => {
         if (cancelled) return;
@@ -157,6 +183,10 @@ export const CodeEditorContent: FC<CodeEditorContentProps> = ({
     handle === null
       ? buildFallbackRows(options.value, options.startingLineNumber, options.maxHeight)
       : null;
+  const fallbackGutters = fallbackGuttersFor(options);
+  const hasGutter =
+    lineNumbers || fallbackGutters.stick || fallbackGutters.folds || fallbackGutters.prefix;
+  const isDiff = options.original !== undefined;
 
   return (
     <div
@@ -173,16 +203,41 @@ export const CodeEditorContent: FC<CodeEditorContentProps> = ({
           aria-busy={loadFailed ? 'false' : 'true'}
           className={codeEditorFallbackVariants()}
         >
-          {lineNumbers && (
-            <span aria-hidden='true' className={codeEditorFallbackGutterVariants()}>
-              {fallbackRows.map(row => (
-                <span key={row.number} className={codeEditorFallbackLineVariants()}>
-                  {row.number}
+          {hasGutter && (
+            <span
+              aria-hidden='true'
+              data-testid={fallbackGuttersTestId}
+              className={codeEditorFallbackGuttersVariants()}
+            >
+              {fallbackGutters.stick && (
+                <span className={codeEditorFallbackGutterVariants({ column: 'stick' })} />
+              )}
+              {lineNumbers && (
+                <span className={codeEditorFallbackGutterVariants({ column: 'lineNumbers' })}>
+                  {fallbackRows.map(row => (
+                    <span key={row.number} className={codeEditorFallbackLineVariants()}>
+                      {row.number}
+                    </span>
+                  ))}
                 </span>
-              ))}
+              )}
+              {fallbackGutters.folds && (
+                <span className={codeEditorFallbackGutterVariants({ column: 'folds' })} />
+              )}
+              {fallbackGutters.prefix && (
+                <span className={codeEditorFallbackGutterVariants({ column: 'prefix' })}>
+                  {fallbackRows.map(row => (
+                    <span key={row.number} className={codeEditorFallbackLineVariants()}>
+                      {isDiff ? null : options.lines[row.number]?.prefix}
+                    </span>
+                  ))}
+                  {/* Diff prefixes (`+` / `-`) come from the engine: reserve one character. */}
+                  {isDiff && <span className='invisible h-0 overflow-hidden'>+</span>}
+                </span>
+              )}
             </span>
           )}
-          <code className={codeEditorFallbackCodeVariants({ hasGutter: lineNumbers })}>
+          <code className={codeEditorFallbackCodeVariants({ hasGutter })}>
             {fallbackRows.map(row => (
               <span
                 key={row.number}
