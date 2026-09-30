@@ -4,8 +4,11 @@ import { cn } from '../../utils/cn';
 /**
  * Root: vertical stack — picker, error, then the item list, 8px apart (Figma:
  * "8px before the first file and between files"; the 4px under the label is Field's gap).
+ * The "Select file" Trigger hugs its content (Figma), so it opts out of the column stretch.
  */
-export const fileUploadVariants = cva('flex w-full min-w-0 flex-col gap-8');
+export const fileUploadVariants = cva(
+  'flex w-full min-w-0 flex-col gap-8 [&>[data-slot=file-upload-trigger]]:self-start',
+);
 
 /**
  * Dashed drop Area (Figma `file-upload-area`): fixed 96px tall, fills its container,

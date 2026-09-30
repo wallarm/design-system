@@ -235,13 +235,18 @@ export const FormSubmission: StoryFn<FileUploadProps> = args => {
     );
   };
   return (
-    <form onSubmit={onSubmit} className='flex flex-col gap-12'>
-      <Field required>
+    <form onSubmit={onSubmit} noValidate className='flex flex-col gap-12'>
+      <Field required invalid={submitted === 'nothing'}>
         <FieldLabel>
           Artifact
           <FieldIndicator />
         </FieldLabel>
-        <FileUpload data-testid='file-upload' name='artifact' {...args}>
+        <FileUpload
+          data-testid='file-upload'
+          name='artifact'
+          {...args}
+          onValueChange={() => setSubmitted('')}
+        >
           <FileUploadTrigger />
           <Rows />
         </FileUpload>
