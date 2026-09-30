@@ -246,6 +246,11 @@ const rangeLines: Record<number, LineConfig> = {
   7: { color: 'info', ranges: [{ start: 17, end: 30 }] },
 };
 
+const wrapDiffLines: Record<number, LineConfig> = {
+  1: { color: 'danger', prefix: '-' },
+  2: { color: 'success', prefix: '+' },
+};
+
 const parityColorLines: Record<number, LineConfig> = {
   ...colorLines,
   1: { prefix: tooltipPrefix(<Info />, 'Untouched line') },
@@ -594,7 +599,7 @@ export const Wrap: StoryFn<typeof meta> = () => {
           <CodeEditorRoot
             defaultValue={longCode}
             language='text'
-            lines={{ 1: { color: 'danger', prefix: '-' }, 2: { color: 'success', prefix: '+' } }}
+            lines={wrapDiffLines}
             data-testid='code-editor-wrap-off'
           >
             <CodeEditorContent lineNumbers aria-label='Long lines' />
@@ -608,7 +613,7 @@ export const Wrap: StoryFn<typeof meta> = () => {
             defaultValue={longCode}
             language='text'
             defaultWrapLines
-            lines={{ 1: { color: 'danger', prefix: '-' }, 2: { color: 'success', prefix: '+' } }}
+            lines={wrapDiffLines}
             data-testid='code-editor-wrap-uncontrolled'
           >
             <CodeSnippetActions>
