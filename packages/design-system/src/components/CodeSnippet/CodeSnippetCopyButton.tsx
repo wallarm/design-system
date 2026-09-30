@@ -2,7 +2,7 @@ import type { FC, Ref } from 'react';
 import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
 import { Copyable, CopyableIcon } from '../Copyable';
-import { useCodeSnippet } from './hooks';
+import { useCodeSnippetChrome } from './hooks';
 
 export type CodeSnippetCopyButtonProps = Omit<ButtonProps, 'children'> & {
   ref?: Ref<HTMLButtonElement>;
@@ -10,10 +10,10 @@ export type CodeSnippetCopyButtonProps = Omit<ButtonProps, 'children'> & {
 
 export const CodeSnippetCopyButton: FC<CodeSnippetCopyButtonProps> = ({ ref, ...props }) => {
   const testId = useTestId('copy-button');
-  const { code } = useCodeSnippet();
+  const { getCode, notifyCopied } = useCodeSnippetChrome();
 
   return (
-    <Copyable text={code} tooltip>
+    <Copyable text={getCode} onCopied={notifyCopied} tooltip>
       <Button
         ref={ref}
         variant='ghost'

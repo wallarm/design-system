@@ -1,9 +1,10 @@
 import type { FC, MouseEventHandler, Ref } from 'react';
 import { ChevronDown } from '../../icons/ChevronDown';
 import { ChevronUp } from '../../icons/ChevronUp';
+import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
 import { MIN_HIDDEN_LINES_THRESHOLD } from './CodeSnippetContext';
-import { useCodeSnippet } from './hooks';
+import { useCodeSnippetChrome } from './hooks';
 
 export type CodeSnippetShowMoreButtonProps = Omit<ButtonProps, 'children'> & {
   ref?: Ref<HTMLButtonElement>;
@@ -20,11 +21,10 @@ export const CodeSnippetShowMoreButton: FC<CodeSnippetShowMoreButtonProps> = ({
   ref,
   ...props
 }) => {
-  const { displayItems, maxLines, isExpanded, setIsExpanded } = useCodeSnippet();
+  const testId = useTestId('show-more-button');
+  const { maxLines, isExpanded, setIsExpanded, hiddenLineCount } = useCodeSnippetChrome();
 
-  const hiddenLines = displayItems.length - maxLines;
-
-  if (maxLines <= 0 || hiddenLines < MIN_HIDDEN_LINES_THRESHOLD) return null;
+  if (maxLines <= 0 || hiddenLineCount < MIN_HIDDEN_LINES_THRESHOLD) return null;
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
     setIsExpanded(!isExpanded);
@@ -39,6 +39,7 @@ export const CodeSnippetShowMoreButton: FC<CodeSnippetShowMoreButtonProps> = ({
         color='neutral'
         size='small'
         fullWidth
+        data-testid={testId}
         {...props}
         onClick={handleClick}
       >
@@ -49,7 +50,7 @@ export const CodeSnippetShowMoreButton: FC<CodeSnippetShowMoreButtonProps> = ({
           </>
         ) : (
           <>
-            Show more ({hiddenLines} lines)
+            Show more ({hiddenLineCount} lines)
             <ChevronDown />
           </>
         )}
