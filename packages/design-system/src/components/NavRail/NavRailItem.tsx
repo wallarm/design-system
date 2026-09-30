@@ -6,13 +6,13 @@ import {
   type ReactNode,
   type Ref,
   useRef,
-  useState,
 } from 'react';
 import { composeRefs } from '@radix-ui/react-compose-refs';
 import { Slot, Slottable } from '@radix-ui/react-slot';
 import type { SvgIconProps } from '../../icons/SvgIcon';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
+import { Avatar, AvatarFallback, AvatarImage } from '../Avatar';
 import { Kbd } from '../Kbd';
 import { Tooltip } from '../Tooltip';
 import { TooltipContent } from '../Tooltip/TooltipContent';
@@ -30,7 +30,7 @@ export interface NavRailItemProps extends AnchorHTMLAttributes<HTMLAnchorElement
   active?: boolean;
   /** Seats the icon on a soft plate, for the signed-in user's item at the foot of the rail. */
   avatar?: boolean;
-  /** User photo for the plate (implies `avatar`). The icon stays underneath and returns if the photo fails to load. */
+  /** User photo for the plate (implies `avatar`). The icon shows while it loads and if it fails. */
   avatarSrc?: string;
 }
 
@@ -52,8 +52,6 @@ export const NavRailItem: FC<NavRailItemProps> = ({
   const testId = useTestId('item', testIdProp);
   const Comp = asChild ? Slot : 'a';
   const internalRef = useRef<HTMLAnchorElement>(null);
-  const [failedSrc, setFailedSrc] = useState<string>();
-  const photo = avatarSrc && avatarSrc !== failedSrc ? avatarSrc : undefined;
   const hasPlate = avatar || avatarSrc !== undefined;
   const showsLabel = mode === 'expanded' || (mode === 'compact' && !hasPlate);
   // Without a visible label the link would have no name, so hand the label to assistive tech.
@@ -74,25 +72,10 @@ export const NavRailItem: FC<NavRailItemProps> = ({
       <span className='flex shrink-0 items-center justify-center'>
         {hasPlate ? (
           // The plate overhangs the 16px icon slot by 4px on every side, so labels stay aligned.
-          // Icon and photo share one grid cell rather than using absolute positioning, so the
-          // item's hover/active overlay still tints the plate.
-          <span
-            data-slot='nav-rail-item-avatar'
-            className={cn(
-              '-m-4 grid size-24 place-items-center overflow-hidden rounded-8 bg-states-primary-hover branded:bg-states-brand-hover branded:text-icon-brand *:col-start-1 *:row-start-1',
-              !photo && 'border border-border-primary branded:border-border-brand',
-            )}
-          >
-            <Icon size='md' />
-            {photo && (
-              <img
-                src={photo}
-                alt=''
-                className='size-full object-cover'
-                onError={() => setFailedSrc(photo)}
-              />
-            )}
-          </span>
+          <Avatar size='xs' data-slot='nav-rail-item-avatar' className='-m-4'>
+            <AvatarImage src={avatarSrc} />
+            <AvatarFallback icon={Icon} />
+          </Avatar>
         ) : (
           <Icon size='md' />
         )}

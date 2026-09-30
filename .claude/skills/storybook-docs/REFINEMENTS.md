@@ -67,3 +67,7 @@ Keep the three parking lots distinct, because mixing them loses things:
   `iframe.html?id=inputs-fileupload--overview&viewMode=docs`. Also, `pnpm typecheck`
   is a no-op in design-system; use `npx tsc -p tsconfig.storybook.json --noEmit`.
   Found on `FileUpload`.
+- `references/reference-systems.md` is stale on two systems: Pajamas' avatar page
+  fetched fine with plain `WebFetch` on 2026-09-30 (no auth wall), and Carbon ships no
+  avatar at all (`components/user-profile/usage.mdx` 404s) — worth a "Carbon has no
+  <X>" line so a run doesn't hunt for it. Found on `Avatar`.

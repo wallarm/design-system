@@ -1,6 +1,8 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import type { FC } from 'react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
+import type { SvgIconProps } from '../../icons';
 import { Activity } from '../../icons';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { NavRail } from './NavRail';
@@ -162,7 +164,7 @@ describe('Avatar plate', () => {
     expect(img).toHaveAttribute('alt', '');
   });
 
-  it('falls back to the icon when the photo fails to load', () => {
+  it('falls back to the icon when the photo fails to load', async () => {
     render(
       <NavRail>
         <NavRailItem
@@ -178,11 +180,50 @@ describe('Avatar plate', () => {
       .getByTestId('item-user')
       .querySelector('[data-slot="nav-rail-item-avatar"]');
     const img = plate?.querySelector('img');
-    if (!img) throw new Error('expected the photo to render first');
+    if (!img) throw new Error('expected the photo element');
+    // Load first: while loading, the fallback is already visible, which would make the test vacuous.
+    fireEvent.load(img);
+    await waitFor(() => expect(img).toHaveAttribute('data-state', 'visible'));
     fireEvent.error(img);
 
-    expect(plate?.querySelector('img')).toBeNull();
-    expect(plate?.querySelector('svg')).not.toBeNull();
+    // Ark keeps the <img> mounted and hides it; the icon fallback shows instead.
+    await waitFor(() => expect(img).toHaveAttribute('data-state', 'hidden'));
+    const fallback = plate?.querySelector('[data-slot="avatar-fallback"]');
+    expect(fallback).toHaveAttribute('data-state', 'visible');
+    expect(fallback?.querySelector('svg')).not.toBeNull();
+  });
+
+  it('forwards the item icon to the plate fallback', () => {
+    const Custom: FC<SvgIconProps> = () => <svg data-testid='item-icon' />;
+    render(
+      <NavRail>
+        <NavRailItem icon={Custom} label='Meow Meow' avatar data-testid='item-user' />
+      </NavRail>,
+    );
+    const fallback = screen
+      .getByTestId('item-user')
+      .querySelector('[data-slot="nav-rail-item-avatar"] [data-slot="avatar-fallback"]');
+    expect(fallback).toContainElement(screen.getByTestId('item-icon'));
+  });
+
+  it('adds no test ids of its own inside the rail cascade', () => {
+    const { container } = render(
+      <NavRail data-testid='rail'>
+        <NavRailItem
+          icon={Activity}
+          label='Meow Meow'
+          avatarSrc='/me.png'
+          data-testid='item-user'
+        />
+      </NavRail>,
+    );
+    const ids = [...container.querySelectorAll('[data-testid]')].map(el =>
+      el.getAttribute('data-testid'),
+    );
+    expect(new Set(ids).size).toBe(ids.length);
+    expect(
+      screen.getByTestId('item-user').querySelector('[data-slot="nav-rail-item-avatar"]'),
+    ).not.toHaveAttribute('data-testid');
   });
 
   it('renders no plate by default', () => {

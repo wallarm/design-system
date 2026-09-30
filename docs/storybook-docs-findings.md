@@ -1065,3 +1065,19 @@ Not findings — decisions worth remembering so they are not rediscovered.
   consumer pattern (upload in `onValueChange`, mark the row `loading`).
 - **Found while** — documenting `FileUpload`.
 - **Status** — Closed — deliberate divergence
+
+### Avatar: one rounded-square shape for people and things
+
+- **What** — Our `Avatar` draws every entity on the same rounded-square plate, while
+  most reference systems reserve a circle for people and a square for organisations,
+  projects, bots or groups.
+- **Evidence** — `packages/design-system/src/components/Avatar/classes.ts` (`rounded-8` /
+  `rounded-12`, matching Figma `user-avatar` 12336:5504). Nord, Primer, Pajamas and
+  Atlassian all tie shape to entity type; EUI's `type='space'` does the same.
+- **Why it matters** — Nothing to fix today: the only shipped use is the signed-in user.
+  If a product later needs avatars for organisations, bots or integrations, the page has
+  no way to tell them apart from a person.
+- **Suggested action** — None now. Revisit with design if a non-person avatar is needed;
+  the reference answer is a shape variant, not a new component.
+- **Found while** — documenting `Avatar`.
+- **Status** — Open

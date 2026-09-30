@@ -19,3 +19,4 @@ export {
 } from './FileUploadItemReplaceTrigger';
 export { FileUploadTrigger, type FileUploadTriggerProps } from './FileUploadTrigger';
 export type { FileUploadErrorCode, FileUploadItemFile, FileUploadRejection } from './types';
+export { useFilePreviewUrl } from './useFilePreviewUrl';

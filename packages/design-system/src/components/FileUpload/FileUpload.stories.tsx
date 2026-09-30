@@ -16,7 +16,7 @@ import { formatFileSize } from './lib';
 
 const DESCRIPTION = [
   'Attaches files to a form and checks their type, size and count before accepting them — the drop Area when attaching is the main task on the screen, the "Select file" button when space is tight.',
-  'Picking never uploads: files travel with the form when it is saved, and the product marks a row `loading` while it sends one.',
+  'Picking never uploads: files travel with the form when it is saved, and the product marks a row `loading` while it sends one. To pick a photo by clicking an avatar, see Data Display/Avatar → Click To Upload.',
 ].join(' ');
 
 const MB = 1024 ** 2;
