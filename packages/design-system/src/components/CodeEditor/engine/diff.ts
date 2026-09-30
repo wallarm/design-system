@@ -154,6 +154,8 @@ const deletedGutterClass = gutterWidgetClass.of((view, _widget, block) =>
  * rules also make diff styling win over `lines` colours on the same line (spec §7.15).
  */
 const diffTheme = EditorView.theme({
+  // These backgrounds duplicate the `LINE_COLOR_STYLES` classes on purpose: the theme's scoped
+  // selectors outrank a `lines` colour class on the same line/cell, so diff styling always wins.
   [`.cm-line.${DIFF_INSERTED_CLASS}`]: {
     backgroundColor: 'var(--color-syntax-highlight-success-highlight)',
   },
@@ -166,11 +168,12 @@ const diffTheme = EditorView.theme({
   [`.cm-gutterElement.${DIFF_DELETED_CLASS}`]: {
     backgroundColor: 'var(--color-syntax-highlight-error-highlight)',
   },
-  // Deleted rows = `danger` line: background + code colour + font-medium, no syntax colours.
+  // Deleted rows = `danger` line: background + code colour + font-medium (the same token as the
+  // `font-medium` utility in `LINE_COLOR_STYLES`), no syntax colours.
   '& .cm-deletedChunk': {
     backgroundColor: 'var(--color-syntax-highlight-error-highlight)',
     color: 'var(--color-syntax-highlight-error-code)',
-    fontWeight: '500',
+    fontWeight: 'var(--font-weight-medium, 450)',
     paddingLeft: '0',
   },
   // `.cm-deletedLine` is not a `.cm-line`: mirror the editor theme's line paddings (12px right
@@ -187,13 +190,14 @@ const diffTheme = EditorView.theme({
       background: 'none',
     },
   // Intra-line changes read like a `ranges` entry: bold + the line colour. Only in chunks
-  // that replace lines — a wholly added / removed block has nothing to single out.
-  [`.${DIFF_CHANGED_CLASS} .cm-changedText`]: {
-    fontWeight: '700',
+  // that replace lines — a wholly added / removed block has nothing to single out. `*` reaches
+  // the innermost success text mark, whose `font-medium` would otherwise win over the bold.
+  [`.${DIFF_CHANGED_CLASS} .cm-changedText, .${DIFF_CHANGED_CLASS} .cm-changedText *`]: {
+    fontWeight: 'var(--font-weight-bold, 700)',
     color: 'var(--color-syntax-highlight-success-code)',
   },
   [`.cm-deletedChunk:has(+ .${DIFF_CHANGED_CLASS}) .cm-deletedText`]: {
-    fontWeight: '700',
+    fontWeight: 'var(--font-weight-bold, 700)',
     color: 'var(--color-syntax-highlight-error-code)',
   },
 });

@@ -3,6 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { SyntaxAdapter } from '../../CodeSnippet/adapters/types';
 import { createPortalRegistry } from '../lib/portalRegistry';
 import { DIFF_INSERTED_CLASS } from './diff';
+import { getCollapsedFoldIds } from './folds';
 import { PREFIX_GUTTER_CLASS } from './gutters';
 import { createEditor } from './index';
 import type { EditorHandle, EngineOptions } from './types';
@@ -126,6 +127,37 @@ describe('createEditor — diff compartment', () => {
     expect(insertedLineTexts(handle)).toEqual([]);
     expect(prefixTexts(handle)).toEqual([]);
     expect(handle.view.dom.classList.contains('cm-merge-b')).toBe(false);
+  });
+
+  it('hides the `-` marker of a deleted chunk inside a collapsed fold', () => {
+    const { handle } = mount({
+      value: 'a\nb\nc\nd\ne',
+      original: 'a\nb\nold\nc\nd\ne',
+      folds: [{ id: 'middle', startLine: 2, endLine: 4, defaultCollapsed: true }],
+    });
+    expect(getCollapsedFoldIds(handle.view.state).has('middle')).toBe(true);
+    expect(handle.view.contentDOM.querySelector('.cm-deletedChunk')).toBeNull();
+    expect(prefixTexts(handle).filter(text => text !== '')).toEqual([]);
+
+    handle.api.unfoldAll();
+    expect(handle.view.contentDOM.querySelector('.cm-deletedChunk')).not.toBeNull();
+    expect(prefixTexts(handle)).toEqual(['-']);
+  });
+
+  it('keeps the gutters compartment when only the `original` text changes', () => {
+    const { handle, rerender } = mount({ value: 'a\nb\nc', original: 'a\nc' });
+    const gutters = handle.view.dom.querySelector('.cm-gutters');
+    const numbers = handle.view.dom.querySelector('.cm-lineNumbers');
+    const spy = vi.spyOn(handle.view, 'dispatch');
+    rerender({ original: 'b\nc' });
+    const effects = spy.mock.calls.flatMap(([spec]) =>
+      'effects' in spec && spec.effects ? [spec.effects].flat() : [],
+    );
+    // Only the diff compartment is reconfigured, not `lines` (gutters).
+    expect(effects).toHaveLength(1);
+    expect(handle.view.dom.querySelector('.cm-gutters')).toBe(gutters);
+    expect(handle.view.dom.querySelector('.cm-lineNumbers')).toBe(numbers);
+    expect(prefixTexts(handle)).toEqual(['+']);
   });
 
   it('re-diffs user edits in diff mode', () => {

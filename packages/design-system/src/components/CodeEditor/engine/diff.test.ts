@@ -1,6 +1,6 @@
 import { EditorState, type Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished } from 'vitest';
 import type { LineConfig } from '../../CodeSnippet/CodeSnippetContext';
 import { LINE_COLOR_STYLES } from '../../CodeSnippet/lib/lineStyles';
 import { createPortalRegistry } from '../lib/portalRegistry';
@@ -207,5 +207,39 @@ describe('diffExtension — theme', () => {
     expect(css).toMatch(
       /:has\(\.cm-gutters\) \.cm-deletedChunk \.cm-deletedLine \{padding-left: 8px;?\}/,
     );
+  });
+});
+
+describe('diffExtension — font weights', () => {
+  it('bolds the innermost text of an inserted-side intra-line change', () => {
+    // Stand-in for Tailwind's `font-medium` utility (not loaded in jsdom).
+    const utility = document.head.appendChild(document.createElement('style'));
+    utility.textContent = '.font-medium { font-weight: 450; }';
+    onTestFinished(() => utility.remove());
+    const view = setup({ original: ORIGINAL, value: MODIFIED });
+    const changedText = contentLines(view)[1]?.querySelector('.cm-changedText');
+    expect(changedText).not.toBeNull();
+    // Innermost element: the success text mark (`font-medium`) must not win over the bold.
+    let innermost = changedText as Element;
+    while (innermost.firstElementChild) innermost = innermost.firstElementChild;
+    expect(innermost).not.toBe(changedText);
+    expect(getComputedStyle(innermost).fontWeight).toBe('var(--font-weight-bold, 700)');
+  });
+
+  it('bolds deleted-side intra-line changes', () => {
+    const view = setup({ original: ORIGINAL, value: MODIFIED });
+    const deletedText = view.contentDOM.querySelector('.cm-deletedChunk .cm-deletedText');
+    expect(deletedText).not.toBeNull();
+    expect(getComputedStyle(deletedText as Element).fontWeight).toBe(
+      'var(--font-weight-bold, 700)',
+    );
+  });
+
+  it('uses the `font-medium` token for deleted rows, like LINE_COLOR_STYLES text', () => {
+    const view = setup({ original: 'a\nold\nc', value: 'a\nc' });
+    const chunk = view.contentDOM.querySelector('.cm-deletedChunk');
+    expect(chunk).not.toBeNull();
+    expect(getComputedStyle(chunk as Element).fontWeight).toBe('var(--font-weight-medium, 450)');
+    expect(LINE_COLOR_STYLES.danger.text).toContain('font-medium');
   });
 });

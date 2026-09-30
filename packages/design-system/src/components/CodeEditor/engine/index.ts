@@ -97,8 +97,16 @@ type SlotKey = (typeof CORE_KEYS)[number] | FeatureKey | (typeof TAIL_KEYS)[numb
 
 const SLOT_KEYS: readonly SlotKey[] = [...CORE_KEYS, ...FEATURE_KEYS, ...TAIL_KEYS];
 
+/** Values computed from options, so a slot can depend on a fact rather than on the raw option. */
+const DERIVED_DEPS = {
+  /** The gutters only need to know whether diff mode is on, not the `original` text. */
+  diffEnabled: (o: EngineOptions): boolean => o.original !== undefined,
+} as const;
+
+type DepKey = keyof EngineOptions | keyof typeof DERIVED_DEPS;
+
 /** Options each compartment depends on; a compartment is reconfigured only when one of them changes. */
-const SLOT_DEPS: Record<SlotKey, readonly (keyof EngineOptions)[]> = {
+const SLOT_DEPS: Record<SlotKey, readonly DepKey[]> = {
   language: ['language'],
   readOnly: ['readOnly'],
   wrap: ['wrapLines'],
@@ -106,7 +114,7 @@ const SLOT_DEPS: Record<SlotKey, readonly (keyof EngineOptions)[]> = {
   contentAttributes: ['contentAttributes', 'testId'],
   cspNonce: ['cspNonce'],
   painter: ['adapter', 'language'],
-  lines: ['lines', 'startingLineNumber', 'lineNumbers', 'testId', 'folds', 'original'],
+  lines: ['lines', 'startingLineNumber', 'lineNumbers', 'testId', 'folds', 'diffEnabled'],
   folds: ['folds', 'startingLineNumber', 'testId'],
   search: ['readOnly', 'testId'],
   diagnostics: ['language', 'schema', 'diagnostics', 'startingLineNumber'],
@@ -146,7 +154,7 @@ const featureExtensions = (
       foldGutter: buildFolds(options, callbacks.portals).gutter,
       portals: callbacks.portals,
       testId: options.testId,
-      diff: options.original !== undefined,
+      diff: DERIVED_DEPS.diffEnabled(options),
     }),
   ],
   folds: () => buildFolds(options, callbacks.portals).extension,
@@ -239,8 +247,11 @@ const shallowEqualRecord = (a: Record<string, string>, b: Record<string, string>
   return aKeys.every(key => Object.hasOwn(b, key) && a[key] === b[key]);
 };
 
-const changedOptionKeys = (prev: EngineOptions, next: EngineOptions): Set<keyof EngineOptions> => {
-  const changed = new Set<keyof EngineOptions>();
+const changedOptionKeys = (prev: EngineOptions, next: EngineOptions): Set<DepKey> => {
+  const changed = new Set<DepKey>();
+  for (const key of Object.keys(DERIVED_DEPS) as (keyof typeof DERIVED_DEPS)[]) {
+    if (DERIVED_DEPS[key](prev) !== DERIVED_DEPS[key](next)) changed.add(key);
+  }
   for (const key of Object.keys(next) as (keyof EngineOptions)[]) {
     if (key === 'contentAttributes') {
       if (!shallowEqualRecord(prev.contentAttributes, next.contentAttributes)) changed.add(key);
