@@ -435,7 +435,7 @@ Consumer `CodeEditorCompletionSource`s receive `CodeEditorCompletionContext` (bu
 - **Tab indents.** Escape followed by Tab moves focus out (CM built-in `tabFocusMode`), `Ctrl-M` / `Alt-Shift-M` toggles Tab focus mode. Documented on the Storybook page and in the `aria-describedby`-able hint text exported as `CODE_EDITOR_KEYBOARD_HINT`.
 - `.cm-content` keeps `role="textbox"`, `aria-multiline`, `aria-readonly` (set by CM); consumers must pass `aria-label` or `aria-labelledby` (dev warning if missing).
 - Fold toggles/summaries are the DS buttons with CodeSnippet's aria-labels (`Expand/Collapse {label}`).
-- `EditorView.announce` is used for "N matches", "Folded {label}", "Replaced N occurrences".
+- `EditorView.announce` is used for "N matches", "Folded {label}", "Occurrences replaced: N".
 
 ## 8. Visual contract
 

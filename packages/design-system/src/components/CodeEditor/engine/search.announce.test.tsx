@@ -36,7 +36,7 @@ afterEach(() => {
 });
 
 describe('search panel — replace all announcement (spec §7.16)', () => {
-  it('announces "Replaced N occurrences" once when Replace all is clicked', () => {
+  it('announces "Occurrences replaced: N" once when Replace all is clicked', () => {
     const handle = mount('foo bar foo baz foo');
     act(() => handle.api.openSearch());
     act(() => {
@@ -49,7 +49,7 @@ describe('search panel — replace all announcement (spec §7.16)', () => {
     fireEvent.click(screen.getByTestId('editor--replace-all'));
 
     expect(handle.view.state.doc.toString()).toBe('x bar x baz x');
-    expect(announcements(handle.view)).toEqual(['Replaced 3 occurrences.']);
+    expect(announcements(handle.view)).toEqual(['Occurrences replaced: 3.']);
   });
 
   it('announces nothing when there is nothing to replace', () => {
@@ -66,6 +66,6 @@ describe('search panel — replace all announcement (spec §7.16)', () => {
 
     expect(handle.view.state.doc.toString()).toBe('foo bar');
     expect(announcements(handle.view)).toEqual(before);
-    expect(announcements(handle.view)).not.toContain('Replaced 0 occurrences.');
+    expect(announcements(handle.view)).not.toContain('Occurrences replaced: 0.');
   });
 });

@@ -1,7 +1,7 @@
 import { closeSearchPanel, openSearchPanel, searchPanelOpen } from '@codemirror/search';
 import { Compartment, EditorState } from '@codemirror/state';
-import { EditorView } from '@codemirror/view';
-import { act, render, screen } from '@testing-library/react';
+import { EditorView, runScopeHandlers } from '@codemirror/view';
+import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it } from 'vitest';
 import { PortalOutlet } from '../lib/PortalOutlet';
@@ -226,6 +226,54 @@ describe('searchExtension — panel', () => {
     await user.type(screen.getByTestId('editor--search-input'), 'foo');
 
     expect(view.dom.querySelector('.cm-announced')).toHaveTextContent('3 matches');
+  });
+
+  it('announces "Invalid regular expression" instead of "No matches" for a bad regexp', async () => {
+    const user = userEvent.setup();
+    const { view, open } = setup();
+    open();
+
+    await user.click(screen.getByTestId('editor--search-regexp'));
+    await user.type(screen.getByTestId('editor--search-input'), '[[');
+
+    expect(view.dom.querySelector('.cm-announced')).toHaveTextContent('Invalid regular expression');
+    expect(view.dom.querySelector('.cm-announced')).not.toHaveTextContent('No matches');
+  });
+
+  it('ignores Enter while an IME composition is in progress', () => {
+    const { view, open } = setup();
+    open();
+    const input = screen.getByTestId('editor--search-input');
+    act(() => {
+      fireEvent.change(input, { target: { value: 'foo' } });
+    });
+    const before = view.state.selection.main;
+
+    act(() => {
+      fireEvent.keyDown(input, { key: 'Enter', isComposing: true });
+      fireEvent.keyDown(input, { key: 'Enter', keyCode: 229 });
+    });
+    expect(view.state.selection.main).toEqual(before);
+
+    act(() => {
+      fireEvent.keyDown(input, { key: 'Enter' });
+    });
+    expect(view.state.selection.main).toMatchObject({ from: 0, to: 3 });
+  });
+
+  it("does not bind Mod-Alt-g to CodeMirror's unthemed go-to-line dialog", () => {
+    const { view } = setup();
+    act(() => view.focus());
+
+    const handled = runScopeHandlers(
+      view,
+      new KeyboardEvent('keydown', { key: 'g', ctrlKey: true, altKey: true }),
+      'editor',
+    );
+
+    expect(handled).toBe(false);
+    expect(view.dom.querySelector('.cm-panel:not(.cm-search)')).toBeNull();
+    expect(view.dom.querySelector('.cm-goto-line, [name="line"]')).toBeNull();
   });
 
   it('keeps the DOM free of test ids when no testId is given', () => {

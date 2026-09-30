@@ -1,5 +1,5 @@
 import { createElement, type ReactNode } from 'react';
-import { getSearchQuery, search, searchKeymap } from '@codemirror/search';
+import { getSearchQuery, gotoLine, search, searchKeymap } from '@codemirror/search';
 import { EditorState, type Extension, Facet } from '@codemirror/state';
 import { EditorView, keymap, type Panel, type ViewUpdate } from '@codemirror/view';
 import type { PortalRegistry } from '../lib/portalRegistry';
@@ -83,8 +83,12 @@ const createSearchPanel = (view: EditorView): Panel => {
  * here. A second announce from the panel would stack a second line in `.cm-announced`.
  */
 const SEARCH_PHRASES: Record<string, string> = {
-  'replaced $ matches': 'Replaced $ occurrences',
+  // Count-independent wording: the phrase has no plural form ("Replaced 1 occurrences").
+  'replaced $ matches': 'Occurrences replaced: $',
 };
+
+/** `Mod-Alt-g` (gotoLine) opens CodeMirror's own unthemed dialog; the DS editor has no go-to-line. */
+const dsSearchKeymap = searchKeymap.filter(binding => binding.run !== gotoLine);
 
 /** Neutralises CodeMirror's default panel chrome; the React panel draws its own. */
 const searchTheme = EditorView.theme({
@@ -116,7 +120,7 @@ export const searchExtension = (config: {
     testId: config.testId,
   }),
   searchConfigured.of(true),
-  keymap.of(searchKeymap),
+  keymap.of(dsSearchKeymap),
   EditorState.phrases.of(SEARCH_PHRASES),
   searchTheme,
 ];

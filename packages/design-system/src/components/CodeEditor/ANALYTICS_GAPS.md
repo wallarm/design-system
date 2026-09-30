@@ -93,7 +93,7 @@ never to the id on `CodeEditorContent`. Read a root-level id as "somewhere in th
 - **Why a gap:** no DOM click by definition.
 - **Workaround:** outcomes are observable through `onChange` (edits, undo / redo, replace)
   and the fold summary / toggle state. The `EditorView.announce` messages for screen readers
-  (matches, `Folded {label}` / `Unfolded {label}`, `Replaced N occurrences.`) are not an
+  (matches, `Folded {label}` / `Unfolded {label}`, `Occurrences replaced: N.`) are not an
   analytics channel.
 - **Owner:** Design System team.
 - **Next decision point:** revisit only if product needs per-shortcut attribution.

@@ -64,11 +64,19 @@ export const SearchPanel: FC<SearchPanelProps> = ({
     const announce =
       next.search === ''
         ? []
-        : [EditorView.announce.of(matchCountMessage(countMatches(view.state, next)))];
+        : [
+            EditorView.announce.of(
+              next.valid
+                ? matchCountMessage(countMatches(view.state, next))
+                : 'Invalid regular expression',
+            ),
+          ];
     view.dispatch({ effects: [...effects, ...announce] });
   };
 
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>, onEnter: (shift: boolean) => void) => {
+    // Enter / Escape while an IME composes text confirm the composition, not a search command.
+    if (event.nativeEvent.isComposing || event.keyCode === 229) return;
     // Escape / Mod-F / F3 / Mod-G from `searchKeymap` (scope `search-panel`).
     // preventDefault marks Escape as handled, so an enclosing fullscreen stays open.
     if (runScopeHandlers(view, event.nativeEvent, 'search-panel')) {
