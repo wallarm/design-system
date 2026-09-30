@@ -47,7 +47,9 @@ interface FallbackGutters {
 }
 
 /** Which engine gutters will render besides line numbers (mirrors `guttersExtension`). */
-const fallbackGuttersFor = (options: EngineOptions): FallbackGutters => {
+const fallbackGuttersFor = (
+  options: Pick<EngineOptions, 'lines' | 'original' | 'folds'>,
+): FallbackGutters => {
   const configs = Object.values(options.lines);
   const diff = options.original !== undefined;
   const { folds } = options;
