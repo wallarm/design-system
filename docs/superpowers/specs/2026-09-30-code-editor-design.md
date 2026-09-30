@@ -384,7 +384,7 @@ Order and widths match `CodeSnippetContent`: colour stick (`border-l-2 pl-12`) â
 | selection (`.cm-selectionBackground`, focused and unfocused) | `--color-syntax-highlight-selected-highlight` |
 | active line / active line gutter | none (CodeSnippet has no active line) |
 | matching bracket (`.cm-matchingBracket`) | `--color-syntax-highlight-neutral-highlight` background |
-| search match / current match | `--color-syntax-highlight-warning-highlight` / `--color-syntax-highlight-selected-highlight` |
+| search match / current match | background `color-mix(in oklab, var(--color-syntax-highlight-warning-indicator) 24%, transparent)` / 48% mix plus `outline: 1px solid var(--color-syntax-highlight-warning-indicator)` (no text-colour change; the `-warning-highlight` / `-selected-highlight` tokens are too faint in light and too solid in dark) |
 | diagnostic underline error / warning / info | wavy underline in `--color-syntax-highlight-error-indicator` / `-warning-indicator` / `-info-indicator` |
 | tooltips (lint, hover, autocomplete) | DS popover surface tokens (`bg-bg-*`, `border-border-*`, `shadow-*`) â€” same classes as `Tooltip`/`DropdownMenu` content |
 | autocomplete selected option | DS menu item selected classes |
