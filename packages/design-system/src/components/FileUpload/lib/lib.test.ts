@@ -85,6 +85,16 @@ describe('checkFile', () => {
     expect(checkFile(file('a.png', 20, 'image/png'), { acceptList: ['image/png'] })).toEqual([]);
     expect(checkFile(file('a.webp', 20, 'image/webp'), { acceptList: ['image/*'] })).toEqual([]);
   });
+  it('guesses the MIME type from the extension when the OS reports none (like Ark)', () => {
+    expect(checkFile(file('a.wasm'), { acceptList: ['application/wasm'] })).toEqual([]);
+    expect(checkFile(file('a.png'), { acceptList: ['image/*'] })).toEqual([]);
+    expect(checkFile(file('a.txt'), { acceptList: ['image/*'] })).toEqual(['FILE_INVALID_TYPE']);
+  });
+  it('accepts application/x-moz-file like Ark', () => {
+    expect(checkFile(file('a.bin', 20, 'application/x-moz-file'), { acceptList: ['.so'] })).toEqual(
+      [],
+    );
+  });
   it('rejects the wrong type', () => {
     expect(checkFile(file('a.txt'), { acceptList: ['.so'] })).toEqual(['FILE_INVALID_TYPE']);
   });
