@@ -12,6 +12,21 @@ import {
   useLocationPathname,
 } from './model';
 
+/** Strips `basePath` only on a segment boundary: `/edge-nodes` is not under `/edge`. */
+const stripBasePath = (fullPathname: string, basePath: string | undefined): string => {
+  if (!basePath) return fullPathname;
+  if (fullPathname === basePath) return '/';
+  return fullPathname.startsWith(`${basePath}/`)
+    ? fullPathname.slice(basePath.length)
+    : fullPathname;
+};
+
+interface DrillOverride {
+  level: number;
+  /** Pathname (basePath stripped) the override was set for. */
+  pathname: string;
+}
+
 export interface RemoteShellProps extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
   children?: ReactNode;
@@ -19,7 +34,36 @@ export interface RemoteShellProps extends HTMLAttributes<HTMLDivElement>, Testab
   config: NavConfig;
   /** URL prefix stripped before matching and prepended when navigating (e.g. `"/edge"`). */
   basePath?: string;
-  /** Custom navigation handler for router integration (React Router, Next.js, etc.). */
+  /**
+   * Current pathname. When set, it is the single source of truth for the active nav
+   * item, drill level and breadcrumbs, and `window.location` is ignored.
+   *
+   * Pass it — **together with `onNavigate`** — whenever a router owns the URL: router
+   * navigations (links in page content, `router.navigate`, memory history, the host's
+   * rail) do not fire `popstate`, so without it the shell can go stale. Without
+   * `onNavigate` the shell's own navigations would only reach `window.history`, which
+   * a controlled shell ignores (a dev warning flags this).
+   *
+   * Either form is accepted: with the `basePath` prefix (what `onNavigate` receives) or
+   * without it — the prefix is stripped only when the pathname starts with a whole
+   * `basePath` segment. With TanStack Router, `useRouterState({ select: s =>
+   * s.location.pathname })` is router-relative: it excludes the router's own
+   * `basepath`. So when the router has `basepath`:
+   * - omit `basePath` here — `pathname` and `onNavigate` are then both router-relative
+   *   and `onNavigate={to => navigate({ to })}` is correct; or
+   * - keep `basePath` and strip it in `onNavigate`
+   *   (`to => navigate({ to: to.slice(basePath.length) || '/' })`), otherwise the
+   *   router prefixes it a second time.
+   *
+   * Omit it to read `window.location.pathname` (updated on `popstate` and on the
+   * shell's own navigations).
+   */
+  pathname?: string;
+  /**
+   * Navigation handler for router integration (TanStack Router, React Router,
+   * Next.js, …). Receives the target pathname, prefixed with `basePath` when one is
+   * set. Without it the shell pushes to `window.history` itself.
+   */
   onNavigate?: (pathname: string) => void;
 }
 
@@ -30,21 +74,35 @@ export const RemoteShell: FC<RemoteShellProps> = ({
   config,
   basePath,
   onNavigate,
+  pathname: controlledPathname,
   'data-testid': testId,
   ...props
 }) => {
-  const fullPathname = useLocationPathname();
+  // Always subscribed (hooks can't be conditional); ignored when controlled.
+  const locationPathname = useLocationPathname();
+  const fullPathname = controlledPathname ?? locationPathname;
 
-  const pathname =
-    basePath && fullPathname.startsWith(basePath)
-      ? fullPathname.slice(basePath.length) || '/'
-      : fullPathname;
+  const pathname = stripBasePath(fullPathname, basePath);
+
+  const isControlled = controlledPathname !== undefined;
+  const hasOnNavigate = onNavigate !== undefined;
+  useEffect(() => {
+    if (isControlled && !hasOnNavigate && process.env.NODE_ENV !== 'production') {
+      // biome-ignore lint/suspicious/noConsole: dev-only misuse warning
+      console.warn(
+        '[RemoteShell] `pathname` is controlled but `onNavigate` is missing: shell navigations will update `window.history` only, and the shell will keep showing the old route. Pass `onNavigate` to route them through your router.',
+      );
+    }
+  }, [isControlled, hasOnNavigate]);
 
   const setPathname = useCallback(
     (next: string) => {
       const fullPath = basePath ? `${basePath}${next}` : next;
       if (onNavigate) {
         onNavigate(fullPath);
+        // Uncontrolled + external router: the router may have updated
+        // `window.location` without a `popstate`, so re-read it. A no-op when the
+        // pathname is controlled — the parent passes the new value instead.
         notifyPathnameChanged();
       } else {
         pushPathname(fullPath);
@@ -60,14 +118,20 @@ export const RemoteShell: FC<RemoteShellProps> = ({
 
   const urlDrillLevel = navStack.length - 1;
 
-  // Visual drill level override — allows the menu to display a different
-  // level than what the URL implies (e.g. after clicking "back").
-  const [visualDrillLevel, setVisualDrillLevel] = useState<number | null>(null);
+  // Visual drill level override — lets the menu show a different level than the URL
+  // implies (after clicking "back"). It is bound to the pathname it was set for and
+  // only honoured while that pathname is current, so a URL change drops it in the very
+  // same render (no effect, no one-render lag that would make `useDrillTransition` see
+  // a spurious level change).
+  const [drillOverride, setDrillOverride] = useState<DrillOverride | null>(null);
+  const visualDrillLevel = drillOverride?.pathname === pathname ? drillOverride.level : null;
 
-  // Reset visual override whenever the URL actually changes
-  useEffect(() => {
-    setVisualDrillLevel(null);
-  }, [pathname]);
+  // Forget an override once its pathname is no longer current, so returning to that
+  // pathname later doesn't resurrect it. Adjusting state during render (React's
+  // "storing information from previous renders" pattern) — not derived-state-in-effect.
+  if (drillOverride && drillOverride.pathname !== pathname) {
+    setDrillOverride(null);
+  }
 
   // Effective values accounting for visual override
   const effectiveDrillLevel = visualDrillLevel ?? urlDrillLevel;
@@ -85,7 +149,7 @@ export const RemoteShell: FC<RemoteShellProps> = ({
   // handlers
   const navigate = useCallback(
     (path: string) => {
-      setVisualDrillLevel(null);
+      setDrillOverride(null);
       const segments = pathname
         .replace(/^\/+|\/+$/g, '')
         .split('/')
@@ -98,7 +162,7 @@ export const RemoteShell: FC<RemoteShellProps> = ({
 
   const drillInto = useCallback(
     (drill: NavConfigDrill) => {
-      setVisualDrillLevel(null);
+      setDrillOverride(null);
       const segments = pathname
         .replace(/^\/+|\/+$/g, '')
         .split('/')
@@ -118,15 +182,15 @@ export const RemoteShell: FC<RemoteShellProps> = ({
   );
 
   const goBack = useCallback(() => {
-    setVisualDrillLevel(prev => {
-      const current = prev ?? urlDrillLevel;
-      return Math.max(current - 1, 0);
+    setDrillOverride(prev => {
+      const current = prev?.pathname === pathname ? prev.level : urlDrillLevel;
+      return { level: Math.max(current - 1, 0), pathname };
     });
-  }, [urlDrillLevel]);
+  }, [pathname, urlDrillLevel]);
 
   const navigateTo = useCallback(
     (href: string) => {
-      setVisualDrillLevel(null);
+      setDrillOverride(null);
       if (href === config.productPath) {
         setPathname('/');
       } else {

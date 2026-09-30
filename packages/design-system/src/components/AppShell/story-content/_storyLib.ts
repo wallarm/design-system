@@ -1,4 +1,4 @@
-import { findFirstLinkPath, pushPathname } from '../../RemoteShell';
+import { findFirstLinkPath } from '../../RemoteShell';
 import {
   aiHypervisorNavConfig,
   edgeNavConfig,
@@ -34,12 +34,10 @@ export function deriveProduct(pathname: string): Product {
   return 'home';
 }
 
-export function navigateToProduct(product: Product) {
-  if (product === 'home') {
-    pushPathname('/home');
-    return;
-  }
+/** Landing URL of a product: its first link, or `/home`. */
+export function productLandingPath(product: Product): string {
+  if (product === 'home') return '/home';
   const { config } = PRODUCT_CONFIGS[product];
   const firstPath = findFirstLinkPath(config.items) ?? '';
-  pushPathname(`/${product}/${firstPath}`);
+  return `/${product}/${firstPath}`;
 }

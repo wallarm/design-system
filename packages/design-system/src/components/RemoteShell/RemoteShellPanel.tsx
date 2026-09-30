@@ -27,7 +27,11 @@ export const RemoteShellPanel: FC<RemoteShellPanelProps> = ({
 }) => {
   const testId = useTestId('panel');
   const { config, drillLevel, navStack } = useRemoteShellContext();
-  const { transition, clearTransition } = useDrillTransition(drillLevel, navStack);
+  const { transition, clearTransition } = useDrillTransition(
+    drillLevel,
+    navStack,
+    config.productPath,
+  );
 
   if (isLoading)
     return (

@@ -102,6 +102,7 @@
     "@storybook/addon-docs": "10.4.6",
     "@storybook/addon-themes": "10.4.6",
     "@tailwindcss/postcss": "4.3.3",
+    "@tanstack/react-router": "1.170.21",
     "@testing-library/jest-dom": "7.0.0",
     "@testing-library/react": "catalog:",
     "@testing-library/user-event": "catalog:",

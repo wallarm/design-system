@@ -1,4 +1,5 @@
-import { type FC, useEffect, useState } from 'react';
+import { type FC, type ReactNode, useEffect, useState } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 import { Page, PageContent, PageHeader, PageTitle } from '../../Page';
 import {
   type NavConfig,
@@ -10,12 +11,15 @@ import {
 } from '../../RemoteShell';
 import { HomeContent } from './_storyHomeContent';
 import { PRODUCT_CONFIGS, type Product } from './_storyLib';
+import { useStoryPathname } from './_storyRouter';
 
 export interface ConfigRemoteProps {
   config: NavConfig;
   basePath?: string;
-  /** Fake a 2s load whenever the product changes, to show the panel and content skeletons. */
+  /** Fake a 2s load when the product opens, to show the panel and content skeletons. */
   simulateLoading?: boolean;
+  /** Page content; defaults to a placeholder page titled after the breadcrumbs. */
+  children?: ReactNode;
 }
 
 const RemotePageContent: FC = () => {
@@ -37,22 +41,35 @@ const RemotePageContent: FC = () => {
   );
 };
 
-const ConfigRemote: FC<ConfigRemoteProps> = ({ config, basePath, simulateLoading = true }) => {
+/**
+ * A product remote wired to TanStack Router the recommended way: the router owns the
+ * URL, `RemoteShell` gets the router's pathname (`pathname`) and hands navigations
+ * back to it (`onNavigate`). Must render inside a router (`StoryRouter`).
+ */
+export const ConfigRemote: FC<ConfigRemoteProps> = ({
+  config,
+  basePath,
+  simulateLoading = true,
+  children,
+}) => {
+  const navigate = useNavigate();
+  const pathname = useStoryPathname();
   const [loading, setLoading] = useState(simulateLoading);
 
+  // Remounted per product (see `RemoteForProduct`), so this runs once per product.
   useEffect(() => {
     if (!simulateLoading) return;
-    setLoading(true);
-
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 2000);
-
+    const timer = setTimeout(() => setLoading(false), 2000);
     return () => clearTimeout(timer);
-  }, [config.productLabel, simulateLoading]);
+  }, [simulateLoading]);
 
   return (
-    <RemoteShell config={config} basePath={basePath}>
+    <RemoteShell
+      config={config}
+      basePath={basePath}
+      pathname={pathname}
+      onNavigate={to => navigate({ to })}
+    >
       {loading ? (
         <>
           <RemoteShellPanel isLoading />
@@ -62,9 +79,7 @@ const ConfigRemote: FC<ConfigRemoteProps> = ({ config, basePath, simulateLoading
         <>
           <RemoteShellPanel resizable />
           <RemoteShellBreadcrumb />
-          <RemoteShellContent>
-            <RemotePageContent />
-          </RemoteShellContent>
+          <RemoteShellContent>{children ?? <RemotePageContent />}</RemoteShellContent>
         </>
       )}
     </RemoteShell>
@@ -80,7 +95,14 @@ export const RemoteForProduct = ({
 }) => {
   if (product === 'home') return <HomeContent />;
   const { config } = PRODUCT_CONFIGS[product];
+  // Keyed by product: each product is its own remote, so its drill-transition and
+  // loading state never carry over to the next one.
   return (
-    <ConfigRemote config={config} basePath={`/${product}`} simulateLoading={simulateLoading} />
+    <ConfigRemote
+      key={product}
+      config={config}
+      basePath={`/${product}`}
+      simulateLoading={simulateLoading}
+    />
   );
 };

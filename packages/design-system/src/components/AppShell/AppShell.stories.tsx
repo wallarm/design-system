@@ -1,11 +1,31 @@
-import { useEffect, useState } from 'react';
+import { type FC, useEffect, useState } from 'react';
+import {
+  createMemoryHistory,
+  createRootRoute,
+  createRoute,
+  createRouter,
+  Outlet,
+  Link as RouterLink,
+  RouterProvider,
+  useNavigate,
+  useParams,
+  useRouterState,
+} from '@tanstack/react-router';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Bell, Home } from '../../icons';
 import { AnimatedBackground } from '../AnimatedBackground';
 import { Button } from '../Button';
 import { Input } from '../Input';
+import { Link } from '../Link';
 import { NavRail, NavRailBody, NavRailItem, NavRailSeparator, NavRailSkeleton } from '../NavRail';
-import { useLocationPathname } from '../RemoteShell';
+import { Page, PageContent, PageHeader, PageTitle } from '../Page';
+import {
+  RemoteShell,
+  RemoteShellBreadcrumb,
+  RemoteShellContent,
+  RemoteShellPanel,
+  useRemoteShellContext,
+} from '../RemoteShell';
 import { Skeleton } from '../Skeleton';
 import { SplashScreen } from '../SplashScreen';
 import { Text } from '../Text';
@@ -19,14 +39,19 @@ import { AppShellRemote } from './AppShellRemote';
 import {
   deriveProduct,
   HeaderActions,
+  HomeContent,
   NavRailFooterContent,
-  navigateToProduct,
+  PRODUCT_CONFIGS,
+  type Product,
   ProductNavItems,
+  productLandingPath,
   QuickHelpDropdown,
   RecentDropdown,
   RemoteForProduct,
   railModeFor,
   type SidebarMode,
+  StoryRouter,
+  useStoryProductNavigation,
   WallarmLogo,
 } from './story-content';
 
@@ -77,8 +102,7 @@ interface ShellProps {
 }
 
 const Shell = ({ ambient, loading = false, simulateProductLoading = false }: ShellProps) => {
-  const pathname = useLocationPathname();
-  const activeProduct = deriveProduct(pathname);
+  const { activeProduct, goToProduct } = useStoryProductNavigation();
 
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
   const { theme, setTheme } = useTheme();
@@ -130,16 +154,21 @@ const Shell = ({ ambient, loading = false, simulateProductLoading = false }: She
               label='Home'
               shortcut={['G', 'H']}
               active={activeProduct === 'home'}
-              onClick={() => navigateToProduct('home')}
+              onClick={() => goToProduct('home')}
             />
             <RecentDropdown />
 
             <NavRailSeparator />
 
-            {loading ? <NavRailSkeleton /> : <ProductNavItems activeProduct={activeProduct} />}
+            {loading ? (
+              <NavRailSkeleton />
+            ) : (
+              <ProductNavItems activeProduct={activeProduct} onSelectProduct={goToProduct} />
+            )}
           </NavRailBody>
 
           <NavRailFooterContent
+            onSelectProduct={goToProduct}
             activeProduct={activeProduct}
             sidebarMode={sidebarMode}
             onSidebarModeChange={setSidebarMode}
@@ -157,11 +186,17 @@ const Shell = ({ ambient, loading = false, simulateProductLoading = false }: She
 };
 
 /** The three regions composed once — `AppShellHeader`, `AppShellRail`, `AppShellRemote` — with the content surface being the only part that scrolls. Pick a product in the rail to drill into it, and the account item at the bottom for appearance and sidebar mode. */
-export const Basic: StoryFn<AppShellProps> = ({ ambient }) => <Shell ambient={ambient} />;
+export const Basic: StoryFn<AppShellProps> = ({ ambient }) => (
+  <StoryRouter>
+    <Shell ambient={ambient} />
+  </StoryRouter>
+);
 
 /** How the shell looks while the platform loads. The header actions and the product rail hold skeletons that sit exactly where the real items land, so nothing jumps when they arrive. Turn `loading` off in Controls to watch the swap. Opening a product also shows its own panel and content loading. */
 export const Loading: StoryFn<AppShellProps & { loading: boolean }> = ({ ambient, loading }) => (
-  <Shell ambient={ambient} loading={loading} simulateProductLoading />
+  <StoryRouter>
+    <Shell ambient={ambient} loading={loading} simulateProductLoading />
+  </StoryRouter>
 );
 Loading.args = { loading: true };
 Loading.argTypes = {
@@ -171,10 +206,8 @@ Loading.argTypes = {
   },
 };
 
-/** `reveal` animates the chrome in on the first application load only. Leave it unset for an ordinary screen; this exists for prototyping the boot moment itself. */
-export const RevealFlow: StoryFn<AppShellProps> = () => {
-  const pathname = useLocationPathname();
-  const activeProduct = deriveProduct(pathname);
+const RevealFlowShell = () => {
+  const { activeProduct, goToProduct } = useStoryProductNavigation();
 
   const [splashDone, setSplashDone] = useState(false);
   const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
@@ -223,16 +256,17 @@ export const RevealFlow: StoryFn<AppShellProps> = () => {
               label='Home'
               shortcut={['G', 'H']}
               active={activeProduct === 'home'}
-              onClick={() => navigateToProduct('home')}
+              onClick={() => goToProduct('home')}
             />
             <RecentDropdown />
 
             <NavRailSeparator />
 
-            <ProductNavItems activeProduct={activeProduct} />
+            <ProductNavItems activeProduct={activeProduct} onSelectProduct={goToProduct} />
           </NavRailBody>
 
           <NavRailFooterContent
+            onSelectProduct={goToProduct}
             activeProduct={activeProduct}
             sidebarMode={sidebarMode}
             onSidebarModeChange={setSidebarMode}
@@ -255,12 +289,17 @@ export const RevealFlow: StoryFn<AppShellProps> = () => {
   );
 };
 
+/** `reveal` animates the chrome in on the first application load only. Leave it unset for an ordinary screen; this exists for prototyping the boot moment itself. */
+export const RevealFlow: StoryFn<AppShellProps> = () => (
+  <StoryRouter>
+    <RevealFlowShell />
+  </StoryRouter>
+);
+
 const CARD_DIMENSIONS = { width: 480, height: 600, borderRadius: 12 };
 
-/** The whole entrance: the splash hands off, the content surface expands from the sign-in card into the full shell. `onRevealed` fires when it has settled. */
-export const LoginFlow: StoryFn<AppShellProps> = () => {
-  const pathname = useLocationPathname();
-  const activeProduct = deriveProduct(pathname);
+const LoginFlowShell = () => {
+  const { activeProduct, goToProduct } = useStoryProductNavigation();
 
   const [splashVisible, setSplashVisible] = useState(true);
   const [showShell, setShowShell] = useState(false);
@@ -345,14 +384,15 @@ export const LoginFlow: StoryFn<AppShellProps> = () => {
                     icon={Home}
                     label='Home'
                     active={activeProduct === 'home'}
-                    onClick={() => navigateToProduct('home')}
+                    onClick={() => goToProduct('home')}
                   />
 
                   <NavRailSeparator />
 
-                  <ProductNavItems activeProduct={activeProduct} />
+                  <ProductNavItems activeProduct={activeProduct} onSelectProduct={goToProduct} />
                 </NavRailBody>
                 <NavRailFooterContent
+                  onSelectProduct={goToProduct}
                   activeProduct={activeProduct}
                   sidebarMode={sidebarMode}
                   onSidebarModeChange={setSidebarMode}
@@ -375,4 +415,184 @@ export const LoginFlow: StoryFn<AppShellProps> = () => {
       )}
     </div>
   );
+};
+
+/** The whole entrance: the splash hands off, the content surface expands from the sign-in card into the full shell. `onRevealed` fires when it has settled. */
+export const LoginFlow: StoryFn<AppShellProps> = () => (
+  <StoryRouter>
+    <LoginFlowShell />
+  </StoryRouter>
+);
+
+// --- TanStack Router ---------------------------------------------------------------
+
+/** Rail → router: the host shell owns product switching. */
+const RouterRootLayout: FC = () => {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: state => state.location.pathname });
+  const activeProduct = deriveProduct(pathname);
+  const goToProduct = (product: Product) => navigate({ to: productLandingPath(product) });
+
+  const [sidebarMode, setSidebarMode] = useState<SidebarMode>('adaptive');
+  const { theme, setTheme } = useTheme();
+  const railMode = railModeFor(sidebarMode, activeProduct === 'home');
+
+  return (
+    <AppShell>
+      <AppShellHeader>
+        <TopHeader>
+          <TopHeaderLogo href='/'>
+            <WallarmLogo />
+          </TopHeaderLogo>
+          <TopHeaderActions>
+            <HeaderActions />
+          </TopHeaderActions>
+        </TopHeader>
+      </AppShellHeader>
+
+      <AppShellRail>
+        <NavRail mode={railMode}>
+          <NavRailBody>
+            <NavRailItem
+              icon={Home}
+              label='Home'
+              shortcut={['G', 'H']}
+              active={activeProduct === 'home'}
+              onClick={() => goToProduct('home')}
+            />
+            <NavRailSeparator />
+            <ProductNavItems activeProduct={activeProduct} onSelectProduct={goToProduct} />
+          </NavRailBody>
+          <NavRailFooterContent
+            activeProduct={activeProduct}
+            onSelectProduct={goToProduct}
+            sidebarMode={sidebarMode}
+            onSidebarModeChange={setSidebarMode}
+            theme={theme}
+            onThemeChange={setTheme}
+          />
+        </NavRail>
+      </AppShellRail>
+
+      <AppShellRemote>
+        <Outlet />
+      </AppShellRemote>
+    </AppShell>
+  );
+};
+
+/**
+ * One product remote. The router owns the URL: `RemoteShell` gets the router's pathname
+ * through `pathname` and hands its own navigations back through `onNavigate`. The router
+ * has no `basepath`, so both sides use the full pathname (`/edge/...`).
+ */
+const RouterProductRemote: FC = () => {
+  const navigate = useNavigate();
+  const pathname = useRouterState({ select: state => state.location.pathname });
+  const { product } = useParams({ strict: false });
+  const entry = PRODUCT_CONFIGS[product as Exclude<Product, 'home'>];
+
+  if (!entry) return <HomeContent />;
+
+  return (
+    <RemoteShell
+      // A product is its own remote: remount so no drill state carries over.
+      key={product}
+      config={entry.config}
+      basePath={`/${product}`}
+      pathname={pathname}
+      onNavigate={to => navigate({ to })}
+    >
+      <RemoteShellPanel resizable />
+      <RemoteShellBreadcrumb />
+      <RemoteShellContent>
+        <Outlet />
+      </RemoteShellContent>
+    </RemoteShell>
+  );
+};
+
+const ROUTER_PAGE_LINKS = [
+  { to: '/edge/data-planes/production/services', label: 'Edge → Production → Services' },
+  {
+    to: '/edge/data-planes/staging/nodes/node-2/metrics',
+    label: 'Edge → Staging → Node 2 → Metrics',
+  },
+  { to: '/settings', label: 'Settings (another product)' },
+];
+
+/** A routed page. Its router links bypass the shell — the panel and breadcrumbs still follow. */
+const RouterProductPage: FC = () => {
+  const { breadcrumbSegments } = useRemoteShellContext();
+  const pathname = useRouterState({ select: state => state.location.pathname });
+  const title = breadcrumbSegments[breadcrumbSegments.length - 1]?.label ?? '';
+
+  return (
+    <Page title={title} fixedHeight>
+      <PageHeader>
+        <PageTitle>{title}</PageTitle>
+      </PageHeader>
+      <PageContent>
+        <div className='flex flex-col gap-12'>
+          <Text size='sm' color='secondary'>
+            Router pathname: <code>{pathname}</code>
+          </Text>
+          <ul className='flex flex-col gap-4'>
+            {ROUTER_PAGE_LINKS.map(link => (
+              <li key={link.to}>
+                <Link asChild>
+                  <RouterLink to={link.to}>{link.label}</RouterLink>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </PageContent>
+    </Page>
+  );
+};
+
+const createShellRouter = () => {
+  const rootRoute = createRootRoute({ component: RouterRootLayout });
+  const homeRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: 'home',
+    component: HomeContent,
+  });
+  const productRoute = createRoute({
+    getParentRoute: () => rootRoute,
+    path: '$product',
+    component: RouterProductRemote,
+  });
+  const productIndexRoute = createRoute({
+    getParentRoute: () => productRoute,
+    path: '/',
+    component: RouterProductPage,
+  });
+  const productPageRoute = createRoute({
+    getParentRoute: () => productRoute,
+    path: '$',
+    component: RouterProductPage,
+  });
+
+  return createRouter({
+    routeTree: rootRoute.addChildren([
+      homeRoute,
+      productRoute.addChildren([productIndexRoute, productPageRoute]),
+    ]),
+    history: createMemoryHistory({ initialEntries: ['/edge/overview'] }),
+  });
+};
+
+/**
+ * `AppShell` and a `RemoteShell` per product on one TanStack Router: the root route is
+ * the shell (rail → `navigate`, `AppShellRemote` → `<Outlet />`), `/$product` is the
+ * remote (`RemoteShell` with `pathname` + `onNavigate`, content → `<Outlet />`), and
+ * `/$product/$` is the page. Every way of moving — the rail, the nav panel, the
+ * breadcrumbs, links in the page — goes through the router, and the active items follow.
+ */
+export const WithTanStackRouter: StoryFn<AppShellProps> = () => {
+  const [router] = useState(createShellRouter);
+
+  return <RouterProvider router={router} />;
 };
