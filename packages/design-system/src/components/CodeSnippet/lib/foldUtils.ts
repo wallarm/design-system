@@ -1,6 +1,9 @@
 import type { ButtonHTMLAttributes } from 'react';
 
-export type FoldButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>;
+export type FoldButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
+  /** Hyphenated `data-*` attributes (e.g. `data-analytics-id`) are not part of the DOM typings. */
+  [dataAttribute: `data-${string}`]: string | undefined;
+};
 
 export type FoldRegion = {
   /** Unique identifier for this fold region */
