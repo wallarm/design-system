@@ -28,12 +28,13 @@ Replace the one-off avatar plate in `NavRailItem` with a reusable **Avatar** tha
 | D6 | Add a `useFilePreviewUrl(file)` hook to FileUpload, so consumers don't each hand-roll `createObjectURL`/`revokeObjectURL`. |
 | D7 | The crop dialog ("Upload avatar": pan, zoom slider, rule-of-thirds grid) is **out of scope**. It needs a crop dependency decision and an output-format decision, so it gets its own ticket. |
 | D8 | `NavRailItem` migrates to `Avatar` in the same PR. NavRail and AppShell screenshots must not change. |
+| D10 | The interactive avatar is `<Avatar as='button'>` — no hand-written `<button>` inside `Avatar asChild` (user decision 2026-09-30). The DOM keeps a real `<button>` for focus, keyboard, `disabled` and the metrics contract; only the JSX layer goes. `asChild` stays for custom roots. |
 | D9 | New semantic token `--color-component-avatar-overlay` for the hover wash. Figma's raw `rgba(255,255,255,.8)` would be wrong in dark mode. |
 
 ## 3. Anatomy
 
 ```
-Avatar (root, Ark Avatar.Root, <span>; asChild → e.g. <button>)
+Avatar (root, Ark Avatar.Root, <span>; as='button' → <button type='button'>; asChild → consumer element)
 ├── AvatarImage      Ark Avatar.Image  <img>   visible once loaded
 ├── AvatarFallback   Ark Avatar.Fallback <span> visible while loading / on error / without src
 │                    content: children → initials(name) → icon (default UserRound)
@@ -61,12 +62,10 @@ const preview = useFilePreviewUrl(file);
   onValueChange={files => setFile(files[0])}
 >
   <FileUploadTrigger asChild>
-    <Avatar asChild>
-      <button type='button' aria-label='Change avatar'>
-        <AvatarImage src={preview ?? user.photoUrl} />
-        <AvatarFallback name={user.name} />
-        <AvatarOverlay />
-      </button>
+    <Avatar as='button' aria-label='Change avatar'>
+      <AvatarImage src={preview ?? user.photoUrl} />
+      <AvatarFallback name={user.name} />
+      <AvatarOverlay />
     </Avatar>
   </FileUploadTrigger>
   <FileUploadError />
@@ -82,7 +81,8 @@ Every part follows the DS rules: native attributes for its element, `{...rest}` 
 | Prop | Type | Default | Notes |
 |---|---|---|---|
 | `size` | `'xs' \| 'sm'` | `'sm'` | See §6. |
-| `asChild` | `boolean` | `false` | Ark `asChild`. Used to make the root a `<button>` (for example inside `FileUploadTrigger asChild`). |
+| `as` | `'span' \| 'button'` | `'span'` | The root tag. `'button'` renders `<button type='button'>` (consumer `type` wins) — the interactive avatar, e.g. inside `FileUploadTrigger asChild`. Decision D10. |
+| `asChild` | `boolean` | `false` | Ark `asChild`: the single child element becomes the root (e.g. a router link). Takes precedence over `as`. |
 | `onStatusChange` | `(details: { status: 'loading' \| 'loaded' \| 'error' }) => void` | — | Passed through from Ark. |
 | `className`, `children`, `ref`, `data-testid` | | | Renders a `<span>` (Ark's default `div` is invalid inside a `<button>`). `data-slot='avatar'` is set **before** `{...rest}`, so an incoming `data-slot` wins (`file-upload-trigger` from the trigger, `nav-rail-item-avatar` from NavRail). Avatar's own CSS therefore keys off the `group/avatar` class, never `[data-slot=avatar]`. `disabled`, `type` and `onClick` flow through `rest`. The whole root is wrapped in `TestIdProvider`, so parts get `{testId}--image` etc. even under `asChild`. |
 
@@ -226,7 +226,7 @@ src/index.ts                                         (export Avatar)
   - `readOnly` → `null`.
   - The existing tests stay green.
 - **testid:** `{id}--image`, `{id}--fallback`, `{id}--overlay`.
-- **a11y:** testing-library ARIA assertions (no axe in the repo). `role='img'` only with an `aria-label` and without `asChild`; the fallback is `aria-hidden`; the interactive trigger is named and linked to the error.
+- **a11y:** testing-library ARIA assertions (no axe in the repo). `role='img'` only with an `aria-label`, without `asChild`, and not `as='button'`; the fallback is `aria-hidden`; the interactive trigger is named and linked to the error.
 - **analytics:** `data-analytics-*` and `onClick` land on the consumer's `<button>` through both Slot layers. No `stopPropagation`.
 - **E2E (CI, `[update-screenshots]`):**
   - screenshots: sizes × fallback kinds × branded, and hover and focus overlay over photo and over fallback;
