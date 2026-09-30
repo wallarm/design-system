@@ -194,7 +194,7 @@ describe('completionExtension', () => {
   });
 
   it('keeps built-in results when a consumer source throws synchronously', async () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const throwing: CodeEditorCompletionSource = () => {
       throw new Error('boom');
     };
@@ -204,7 +204,7 @@ describe('completionExtension', () => {
   });
 
   it('keeps built-in results when a consumer source rejects', async () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
     const rejecting: CodeEditorCompletionSource = () => Promise.reject(new Error('nope'));
     const view = mount('PO|', { language: 'http', sources: [rejecting] });
     expect(await openCompletions(view)).toContain('POST');
