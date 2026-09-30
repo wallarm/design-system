@@ -496,3 +496,14 @@ Phases 1 and 2 may ship as one PR or two; phase 0 always ships first.
 | Static `lines`/`folds` surprise consumers during edits | D6 documented with a recipe for anchored decorations. |
 | CM injects `<style>` tags | `cspNonce` prop; documented. |
 | Fullscreen host move breaks CodeSnippet | Phase 0 tests + unchanged baselines before any editor code lands. |
+
+## 14. Amendment 2026-10-01 — more languages, syntax errors for every parsed language
+
+Requested after the first stories landed.
+
+| # | Decision |
+|---|---|
+| A1 | `CodeEditorLanguage` gains `'javascript' \| 'typescript' \| 'python'`. Colours still come from the adapter (Prism, Shiki and highlight.js already support all three). |
+| A2 | Structure parsers: `@codemirror/lang-javascript` 6.2.5 (`javascript()` / `javascript({ typescript: true })`) and `@codemirror/lang-python` 6.2.1, both exact-pinned dependencies. They are **lazy per language**: `languageExtension` returns `[]` for them synchronously, the engine then `import()`s the package and reconfigures the language compartment. A result for a language that is no longer current is dropped. The engine chunk does not grow; pages that never use JS/TS/Python never download them. |
+| A3 | Syntax errors are shown for every language with a Lezer parser: `json`, `yaml`, `javascript`, `typescript`, `python`, and the JSON body of `http`. Source: Lezer error nodes (`node.type.isError`) of the fully parsed tree → `error` diagnostics, `source: 'syntax'`, message `Unexpected "<char>"` or `Unexpected end of input`. In JSON regions the precise `JSON.parse` message is used instead and error nodes inside that region are dropped (no duplicates). `bash` and `text` have no syntax diagnostics. Rendering is unchanged (§7.12: underline + tooltip). |
+| A4 | Stories: `Languages` (Python, JSON, JavaScript, TypeScript, YAML, each editable, Shiki adapter) and `SyntaxErrors` (one intentionally broken sample per parsed language). |

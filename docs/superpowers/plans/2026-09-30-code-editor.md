@@ -334,6 +334,9 @@ Do not add a second `lastRowCount`, `reportRowCount` or updateListener.
 - **E-RF4 [T4]** — add to the http language tests: `EditorState.create({ doc: 'POST /x HTTP/1.1\r\nContent-Type: application/json\r\n\r\n{"a":1}', extensions: [http()] })`; expect `state.doc.lines === 4`, `findJsonBodyRange(state)` to equal the offsets of `{"a":1}` in `state.doc.toString()`, and `getHttpFolds(state.doc.toString())` to return both `http-headers` and `http-body` folds.
 - **E-RF5 [T9]** — add to `CodeEditor.test.tsx`: render `<StrictMode><CodeEditorRoot defaultValue='x'><CodeEditorContent aria-label='e' data-testid='se' /></CodeEditorRoot></StrictMode>` (root data-testid='s'); await `findByTestId('s--editor')`; expect `document.querySelectorAll('.cm-editor').length === 1` (engine unit-level DOM check is acceptable here) and no `console.error` calls (spy); then unmount and expect 0 `.cm-editor`.
 
+- **E16 [T12] (major — spec §14 A3)** — Syntax errors must be reported for every language with a Lezer parser, not only JSON.
+  - **Fix:** In `engine/diagnostics.ts` add `syntaxErrorDiagnostics(state, region?)`: `const tree = ensureSyntaxTree(state, state.doc.length, 200) ?? syntaxTree(state)`; iterate the tree (or only `region` when given); for each node with `node.type.isError` push `{ from: node.from, to: Math.min(Math.max(node.to, node.from + 1), state.doc.length), severity: 'error', source: 'syntax', message: node.from < state.doc.length ? `Unexpected "${state.doc.sliceString(node.from, node.from + 1)}"` : 'Unexpected end of input' }` (collapse consecutive error nodes that touch into one diagnostic). Use it for `yaml`, `javascript`, `typescript`, `python` (whole document). For `json` and the `http` JSON body keep the `JSON.parse`-based diagnostic and drop error-node diagnostics inside that region (no duplicates); if `JSON.parse` succeeds there, emit none. `bash`/`text`: none. `SLOT_DEPS.diagnostics` already includes `language`. Because the JS/TS/Python parsers load lazily (Task 19), the linter must re-run when the language compartment is reconfigured: pass `needsRefresh: update => update.transactions.some(tr => tr.reconfigured)` to `linter(...)`. Tests: one broken sample per language (`{"a": 1 "b": 2}`, `a: [1, 2`, `function f( {`, `let a: = 1;`, `def f(:\n  pass`) each yields ≥1 `source: 'syntax'` diagnostic at a plausible offset; valid samples yield 0; JSON yields exactly one (the JSON.parse one). Add a `SyntaxErrors` story (one editor per parsed language with the broken sample, `data-testid` `syntax-<lang>`, Shiki adapter, `onDiagnosticsChange` rendering the count under each editor) and its `STORY_ROOTS` entry `SyntaxErrors: { editors: ['syntax-json','syntax-yaml','syntax-javascript','syntax-typescript','syntax-python'] },` in `CodeEditor.stories.test.tsx`.
+
 ---
 
 ### Task 1: CodeSnippet chrome context, button migration, onCopy fix, Copyable lazy text, show-more helpers
@@ -20423,3 +20426,267 @@ git status --short
 pnpm vitest run src/components/CodeEditor/boundary.test.ts
 ```
 Expected: `git status --short` prints nothing (`dist/` is ignored) and the boundary test passes, 11 tests. Do not run E2E locally. The Task 17 CI run with `[update-screenshots]` owns baselines, and this task adds no E2E.
+
+---
+
+### Task 19: More languages (JavaScript, TypeScript, Python) with lazy parsers + Languages story
+
+> **Execution order:** runs right after Task 10 (before Task 11). Spec §14 A1, A2, A4 (Languages story).
+
+**Files:**
+- Modify: `package.json` (dependencies `@codemirror/lang-javascript@6.2.5`, `@codemirror/lang-python@6.2.1`, exact pins) + `pnpm-lock.yaml` (run `pnpm install` from the repo root)
+- Modify: `src/components/CodeEditor/types.ts` — `CodeEditorLanguage`
+- Modify: `src/components/CodeEditor/engine/languages/index.ts`
+- Modify: `src/components/CodeEditor/engine/index.ts` — lazy language reconfigure
+- Modify: `src/components/CodeEditor/CodeEditor.stories.tsx`, `CodeEditor.stories.test.tsx` (`STORY_ROOTS`)
+- Test: `src/components/CodeEditor/engine/languages/lazyLanguages.test.ts`, `src/components/CodeEditor/engine/index.languages.test.ts`
+
+**Interfaces:**
+- Consumes: `languageExtension(language)` (Task 4), `createEditor` + language compartment + `SLOT_DEPS.language` (Task 5), `adapterPainter` (Task 6, passes `options.language` verbatim to the adapter — adapters already accept `javascript`/`typescript`/`python`).
+- Produces:
+  ```ts
+  // types.ts
+  export type CodeEditorLanguage = 'http' | 'json' | 'yaml' | 'bash' | 'text' | 'javascript' | 'typescript' | 'python';
+  // engine/languages/index.ts
+  export const isLazyLanguage: (language: CodeEditorLanguage) => boolean;
+  export const loadLanguageExtension: (language: CodeEditorLanguage) => Promise<Extension>; // cached per language; resolves [] for non-lazy
+  // languageExtension(language) keeps returning [] synchronously for lazy languages
+  ```
+
+- [ ] **Step 1: Add dependencies** — add `"@codemirror/lang-javascript": "6.2.5"` and `"@codemirror/lang-python": "6.2.1"` to `dependencies` (alphabetical, exact pins), run `pnpm install` from the repo root, confirm `node -p "require('./node_modules/@codemirror/lang-javascript/package.json').version"` prints `6.2.5` (and python `6.2.1`).
+
+- [ ] **Step 2: Write the failing lazy-language tests** — `engine/languages/lazyLanguages.test.ts`:
+
+```ts
+import { language as languageFacet, syntaxTree, ensureSyntaxTree } from '@codemirror/language';
+import { EditorState } from '@codemirror/state';
+import { describe, expect, it } from 'vitest';
+import { isLazyLanguage, languageExtension, loadLanguageExtension } from './index';
+
+describe('lazy languages', () => {
+  it('marks javascript, typescript and python as lazy', () => {
+    expect(isLazyLanguage('javascript')).toBe(true);
+    expect(isLazyLanguage('typescript')).toBe(true);
+    expect(isLazyLanguage('python')).toBe(true);
+    expect(isLazyLanguage('json')).toBe(false);
+    expect(isLazyLanguage('text')).toBe(false);
+  });
+
+  it('returns no synchronous extension for lazy languages', () => {
+    const state = EditorState.create({ doc: 'const a = 1', extensions: languageExtension('javascript') });
+    expect(state.facet(languageFacet)).toBeNull();
+  });
+
+  it.each([
+    ['javascript', 'const a = 1;', 'javascript'],
+    ['typescript', 'let a: number = 1;', 'typescript'],
+    ['python', 'def f():\n    return 1\n', 'python'],
+  ] as const)('loads %s', async (lang, doc, name) => {
+    const ext = await loadLanguageExtension(lang);
+    const state = EditorState.create({ doc, extensions: ext });
+    expect(state.facet(languageFacet)?.name).toBe(name);
+    const tree = ensureSyntaxTree(state, state.doc.length, 1000) ?? syntaxTree(state);
+    expect(tree.length).toBe(state.doc.length);
+  });
+
+  it('caches the load per language', () => {
+    expect(loadLanguageExtension('python')).toBe(loadLanguageExtension('python'));
+  });
+
+  it('resolves [] for non-lazy languages', async () => {
+    await expect(loadLanguageExtension('json')).resolves.toEqual([]);
+  });
+});
+```
+
+Run: `pnpm vitest run src/components/CodeEditor/engine/languages/lazyLanguages.test.ts` — Expected: FAIL (`isLazyLanguage` / `loadLanguageExtension` not exported; `'javascript'` not assignable to `CodeEditorLanguage` in tsc).
+
+- [ ] **Step 3: Implement** — `types.ts`: extend the union exactly as in Interfaces. `engine/languages/index.ts`:
+
+```ts
+import type { Extension } from '@codemirror/state';
+import type { CodeEditorLanguage } from '../../types';
+import { http } from './http';
+import { json } from './json';
+import { yaml } from './yaml';
+
+export { findJsonBodyRange, http, httpContextAt, httpLanguage } from './http';
+
+const noLanguage = (): Extension => [];
+
+const LANGUAGE_EXTENSIONS: Record<CodeEditorLanguage, () => Extension> = {
+  http,
+  json,
+  yaml,
+  bash: noLanguage,
+  text: noLanguage,
+  // Lazy: loaded by loadLanguageExtension and reconfigured by the engine.
+  javascript: noLanguage,
+  typescript: noLanguage,
+  python: noLanguage,
+};
+
+const LAZY_LANGUAGES: Partial<Record<CodeEditorLanguage, () => Promise<Extension>>> = {
+  javascript: () => import('@codemirror/lang-javascript').then(m => m.javascript()),
+  typescript: () => import('@codemirror/lang-javascript').then(m => m.javascript({ typescript: true })),
+  python: () => import('@codemirror/lang-python').then(m => m.python()),
+};
+
+const lazyCache = new Map<CodeEditorLanguage, Promise<Extension>>();
+
+/** CodeMirror language support for a CodeEditor `language`. `bash` and `text` have no structure parser; lazy languages return [] until loaded. */
+export const languageExtension = (language: CodeEditorLanguage): Extension =>
+  LANGUAGE_EXTENSIONS[language]();
+
+export const isLazyLanguage = (language: CodeEditorLanguage): boolean => language in LAZY_LANGUAGES;
+
+/** Loads the parser for a lazy language (cached). Resolves [] for languages that are available synchronously. */
+export const loadLanguageExtension = (language: CodeEditorLanguage): Promise<Extension> => {
+  const load = LAZY_LANGUAGES[language];
+  if (!load) return Promise.resolve([]);
+  let pending = lazyCache.get(language);
+  if (!pending) {
+    pending = load().catch(error => {
+      lazyCache.delete(language);
+      throw error;
+    });
+    lazyCache.set(language, pending);
+  }
+  return pending;
+};
+```
+
+(Note `Promise.resolve([])` is a new promise each call — the caching test only uses a lazy language.)
+
+Run the Step 2 tests — Expected: PASS.
+
+- [ ] **Step 4: Write the failing engine test** — `engine/index.languages.test.ts` using the existing `src/testUtils/codeEditorEngine.ts` helper (read it for the mount function name and option defaults):
+
+```ts
+// Pseudocode-free: adapt only the helper import name to the real one in src/testUtils/codeEditorEngine.ts
+import { language as languageFacet } from '@codemirror/language';
+import { describe, expect, it, vi } from 'vitest';
+import { mountEngine } from '../../../testUtils/codeEditorEngine';
+
+describe('lazy language reconfigure', () => {
+  it('reconfigures the language compartment once the parser loads', async () => {
+    const { handle } = mountEngine({ value: 'const a = 1;', language: 'javascript' });
+    await vi.waitFor(() => expect(handle.view.state.facet(languageFacet)?.name).toBe('javascript'));
+  });
+
+  it('switches from json to python via update()', async () => {
+    const { handle, options } = mountEngine({ value: '{}', language: 'json' });
+    expect(handle.view.state.facet(languageFacet)?.name).toBe('json');
+    handle.update({ ...options, language: 'python', value: 'x = 1' });
+    await vi.waitFor(() => expect(handle.view.state.facet(languageFacet)?.name).toBe('python'));
+  });
+
+  it('drops a lazy load when the language changed before it resolved', async () => {
+    const { handle, options } = mountEngine({ value: 'x', language: 'python' });
+    handle.update({ ...options, language: 'json' });
+    await new Promise(r => setTimeout(r, 50));
+    expect(handle.view.state.facet(languageFacet)?.name).toBe('json');
+  });
+
+  it('does not dispatch into a destroyed view', async () => {
+    const { handle } = mountEngine({ value: 'x', language: 'typescript' });
+    const dispatch = vi.spyOn(handle.view, 'dispatch');
+    handle.destroy();
+    await new Promise(r => setTimeout(r, 50));
+    expect(dispatch).not.toHaveBeenCalled();
+  });
+});
+```
+
+Run: `pnpm vitest run src/components/CodeEditor/engine/index.languages.test.ts` — Expected: FAIL (facet stays null for javascript/python).
+
+- [ ] **Step 5: Implement in `engine/index.ts`** — add `import { isLazyLanguage, loadLanguageExtension } from './languages';` next to the existing `languageExtension` import. Add a function inside `createEditor` (after the view is created and next to the other closure state; reuse the existing "current options" variable and the existing `destroyed`/compartment objects — read the file for their exact names):
+
+```ts
+const ensureLazyLanguage = (lang: CodeEditorLanguage) => {
+  if (!isLazyLanguage(lang)) return;
+  loadLanguageExtension(lang).then(
+    extension => {
+      if (destroyed || currentOptions.language !== lang) return;
+      view.dispatch({ effects: compartments.language.reconfigure(extension) });
+    },
+    error => {
+      // biome-ignore lint/suspicious/noConsole: surfaced once per failed load; editor keeps working without structure
+      console.error(`[CodeEditor] failed to load the ${lang} parser`, error);
+    },
+  );
+};
+```
+
+Call `ensureLazyLanguage(options.language)` once after creating the view, and in `update()` whenever `next.language !== prev.language` (after the language compartment reconfigure). The dispatch happens in a promise callback, never inside an update. If `createEditor` has no `destroyed` flag yet, add `let destroyed = false;` and set it in `destroy()`.
+
+Run Step 4 tests — Expected: PASS. Then `pnpm vitest run src/components/CodeEditor src/components/CodeSnippet` — all green.
+
+- [ ] **Step 6: Languages story** — in `CodeEditor.stories.tsx` add a `Languages` story (module-level sample constants; each editor controlled with its own `useState`; wrapped in the Shiki adapter provider the same way the existing `HttpResponseWithShiki` story loads Shiki; annotation label per language like the other stories use):
+
+```tsx
+const PYTHON_SAMPLE = `from dataclasses import dataclass
+
+
+@dataclass
+class Rule:
+    action: str
+    point: list[str]
+    enabled: bool = True
+
+
+def active(rules: list[Rule]) -> list[Rule]:
+    return [r for r in rules if r.enabled]
+`;
+const JSON_SAMPLE = `{
+  "action": "block",
+  "point": ["header", "X-Forwarded-For"],
+  "enabled": true,
+  "threshold": 42
+}
+`;
+const JAVASCRIPT_SAMPLE = `export async function fetchRules(client, { limit = 50 } = {}) {
+  const res = await client.get('/api/v2/rules', { params: { limit } });
+  return res.data.filter(rule => rule.enabled);
+}
+`;
+const TYPESCRIPT_SAMPLE = `interface Rule {
+  action: 'block' | 'monitor';
+  point: string[];
+  enabled: boolean;
+}
+
+export const activeRules = (rules: readonly Rule[]): Rule[] =>
+  rules.filter((rule): rule is Rule => rule.enabled);
+`;
+const YAML_SAMPLE = `rules:
+  - action: block
+    point: [header, X-Forwarded-For]
+    enabled: true
+  - action: monitor
+    point: [query, id]
+    enabled: false
+`;
+
+const LANGUAGE_SAMPLES = [
+  { id: 'python', label: 'Python', language: 'python', value: PYTHON_SAMPLE },
+  { id: 'json', label: 'JSON', language: 'json', value: JSON_SAMPLE },
+  { id: 'javascript', label: 'JavaScript', language: 'javascript', value: JAVASCRIPT_SAMPLE },
+  { id: 'typescript', label: 'TypeScript', language: 'typescript', value: TYPESCRIPT_SAMPLE },
+  { id: 'yaml', label: 'YAML', language: 'yaml', value: YAML_SAMPLE },
+] as const satisfies readonly { id: string; label: string; language: CodeEditorLanguage; value: string }[];
+```
+
+Render one `CodeEditorRoot` per sample (`data-testid={`lang-${id}`}`, `language`, header with `CodeSnippetTitle` = label + Copy button, `CodeEditorContent lineNumbers aria-label={`${label} example`}`), each with its own controlled state (a small `LanguageExample` component taking a sample). JSDoc: "Colours come from the adapter (Shiki here); JavaScript, TypeScript and Python parsers load on first use." Add to `STORY_ROOTS` in `CodeEditor.stories.test.tsx`: `Languages: { editors: ['lang-python', 'lang-json', 'lang-javascript', 'lang-typescript', 'lang-yaml'] },` (match the existing entry shape exactly).
+
+- [ ] **Step 7: Verify** — `pnpm vitest run src/components/CodeEditor src/components/CodeSnippet`, `pnpm exec tsc --build tsconfig.app.json --noEmit`, `pnpm exec biome check src/components/CodeEditor package.json`. The Storybook dev server already running on :6006 must list `data-display-codeeditor-codeeditor--languages` (`curl -s http://localhost:6006/index.json | grep -c codeeditor--languages` → 1).
+
+- [ ] **Step 8: Commit**
+
+```bash
+git add package.json ../../pnpm-lock.yaml src/components/CodeEditor
+git commit -m "feat(code-editor): add JavaScript, TypeScript and Python with lazy parsers
+
+Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>"
+```
+
