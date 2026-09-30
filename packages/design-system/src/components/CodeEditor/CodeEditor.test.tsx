@@ -1,6 +1,6 @@
 import { act, createRef, StrictMode } from 'react';
 import { EditorView } from '@codemirror/view';
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { copyText } from '../../utils/copyText';
@@ -22,6 +22,8 @@ vi.mock('../../utils/copyText', () => ({
 
 const makeValue = (lineCount: number) =>
   Array.from({ length: lineCount }, (_, index) => `line ${index + 1}`).join('\n');
+
+const FOLDS_FOR_ROLE_TEST = [{ id: 'middle', startLine: 2, endLine: 3, label: 'Middle' }];
 
 const WrapProbe = () => {
   const { wrapLines } = useCodeSnippetChrome();
@@ -412,6 +414,21 @@ describe('CodeEditor', () => {
       expect(screen.getByTestId('ed--content')).toHaveClass('custom-wrapper');
       expect(onKeyDown).toHaveBeenCalledTimes(1);
       expect(onKeyDown.mock.calls[0]?.[0].target).toBe(editor);
+    });
+
+    it('exposes fold toggles as buttons by role (not inside an aria-hidden gutter)', async () => {
+      render(
+        <CodeEditorRoot data-testid='ed' defaultValue={'a\nb\nc\nd'} folds={FOLDS_FOR_ROLE_TEST}>
+          <CodeEditorContent aria-label='Code' lineNumbers />
+        </CodeEditorRoot>,
+      );
+      await screen.findByTestId('ed--editor');
+
+      const toggle = await within(screen.getByTestId('ed')).findByRole('button', {
+        name: /Collapse Middle/,
+      });
+      expect(toggle).toBe(screen.getByTestId('ed--fold-toggle'));
+      expect(toggle).toHaveAttribute('aria-expanded', 'true');
     });
 
     it('marks the editor aria-readonly when readOnly', async () => {

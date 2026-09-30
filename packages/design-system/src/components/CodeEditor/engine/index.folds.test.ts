@@ -64,6 +64,37 @@ describe('createEditor — folds wiring', () => {
     expect(create(undefined).handle.view.dom.querySelector('.cm-ds-fold-gutter')).toBeNull();
   });
 
+  it('exposes the fold gutter to assistive tech and hides the other gutters', () => {
+    const { handle } = create(MIDDLE);
+    const gutters = handle.view.scrollDOM.querySelector(':scope > .cm-gutters');
+    expect(gutters).not.toBeNull();
+    expect(gutters).not.toHaveAttribute('aria-hidden');
+    const columns = Array.from(gutters?.querySelectorAll(':scope > .cm-gutter') ?? []);
+    expect(columns.length).toBeGreaterThan(1);
+    for (const column of columns) {
+      if (column.classList.contains('cm-ds-fold-gutter')) {
+        expect(column).not.toHaveAttribute('aria-hidden');
+      } else {
+        expect(column).toHaveAttribute('aria-hidden', 'true');
+      }
+    }
+    expect(gutters?.querySelector('.cm-lineNumbers')).toHaveAttribute('aria-hidden', 'true');
+  });
+
+  it('keeps gutter aria-hidden in sync when folds are added or removed by update()', () => {
+    const { handle } = create(undefined);
+    const gutters = () => handle.view.scrollDOM.querySelector(':scope > .cm-gutters');
+    expect(gutters()).toHaveAttribute('aria-hidden', 'true');
+
+    handle.update(options(MIDDLE));
+    expect(gutters()).not.toHaveAttribute('aria-hidden');
+    expect(gutters()?.querySelector('.cm-lineNumbers')).toHaveAttribute('aria-hidden', 'true');
+
+    handle.update(options(undefined));
+    expect(handle.view.dom.querySelector('.cm-ds-fold-gutter')).toBeNull();
+    expect(gutters()).toHaveAttribute('aria-hidden', 'true');
+  });
+
   it('api.foldAll / api.unfoldAll drive the fold field and the visible row count', () => {
     const { handle, callbacks } = create(MIDDLE);
 

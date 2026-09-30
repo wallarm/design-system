@@ -89,8 +89,8 @@ const FEATURE_KEYS = [
   'diff',
 ] as const;
 
-/** Must stay last: its ViewPlugin has to be created after the gutter plugins. */
-const TAIL_KEYS = ['gutterTestId'] as const;
+/** Must stay last: their ViewPlugins have to be created after the gutter plugins. */
+const TAIL_KEYS = ['gutterTestId', 'gutterAria'] as const;
 
 type FeatureKey = (typeof FEATURE_KEYS)[number];
 type SlotKey = (typeof CORE_KEYS)[number] | FeatureKey | (typeof TAIL_KEYS)[number];
@@ -121,6 +121,7 @@ const SLOT_DEPS: Record<SlotKey, readonly DepKey[]> = {
   completion: ['language', 'schema', 'completions', 'startingLineNumber'],
   diff: ['original'],
   gutterTestId: ['testId'],
+  gutterAria: [],
 };
 
 type SlotBuilders<K extends string> = Record<K, () => Extension>;
@@ -227,6 +228,41 @@ const gutterTestId = (testId: string | undefined): Extension => {
   ];
 };
 
+/**
+ * CodeMirror marks every `.cm-gutters` container `aria-hidden="true"`, which would hide the
+ * focusable fold-toggle buttons from screen readers (§7.16). While a container holds the fold
+ * gutter, the container is exposed and every other gutter column (line numbers, colour stick,
+ * prefixes) is hidden instead; without folds the container is hidden again.
+ */
+const syncGutterAria = (view: EditorView): void => {
+  for (const container of view.scrollDOM.querySelectorAll(':scope > .cm-gutters')) {
+    const columns = Array.from(container.querySelectorAll(':scope > .cm-gutter'));
+    const hasFolds = columns.some(column => column.classList.contains('cm-ds-fold-gutter'));
+    if (!hasFolds) {
+      if (container.getAttribute('aria-hidden') !== 'true') {
+        container.setAttribute('aria-hidden', 'true');
+      }
+      continue;
+    }
+    if (container.hasAttribute('aria-hidden')) container.removeAttribute('aria-hidden');
+    for (const column of columns) {
+      if (column.classList.contains('cm-ds-fold-gutter')) {
+        if (column.hasAttribute('aria-hidden')) column.removeAttribute('aria-hidden');
+      } else if (column.getAttribute('aria-hidden') !== 'true') {
+        column.setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+};
+
+const gutterAria: Extension = [
+  ViewPlugin.define(view => {
+    syncGutterAria(view);
+    return {};
+  }),
+  EditorView.updateListener.of(update => syncGutterAria(update.view)),
+];
+
 const slotExtensions = (
   options: EngineOptions,
   callbacks: EngineCallbacks,
@@ -239,6 +275,7 @@ const slotExtensions = (
   cspNonce: () => (options.cspNonce ? EditorView.cspNonce.of(options.cspNonce) : []),
   ...featureExtensions(options, callbacks),
   gutterTestId: () => gutterTestId(options.testId),
+  gutterAria: () => gutterAria,
 });
 
 const shallowEqualRecord = (a: Record<string, string>, b: Record<string, string>): boolean => {
