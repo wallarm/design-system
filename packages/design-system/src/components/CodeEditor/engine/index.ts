@@ -25,6 +25,7 @@ import type { PortalRegistry } from '../lib/portalRegistry';
 import type { CodeEditorApi, CodeEditorLanguage } from '../types';
 import { adapterPainter } from './adapterPainter';
 import { sanitizeContentAttributes } from './contentAttributes';
+import { diagnosticsExtension } from './diagnostics';
 import { foldAllRegions, foldsExtension, getVisibleRowCount, unfoldAllRegions } from './folds';
 import { guttersExtension } from './gutters';
 import { isLazyLanguage, languageExtension, loadLanguageExtension } from './languages';
@@ -150,7 +151,14 @@ const featureExtensions = (
       readOnly: options.readOnly,
       testId: options.testId,
     }),
-  diagnostics: () => [],
+  diagnostics: () =>
+    diagnosticsExtension({
+      language: options.language,
+      schema: options.schema,
+      external: options.diagnostics,
+      startingLineNumber: options.startingLineNumber,
+      onChange: callbacks.onDiagnosticsChange,
+    }),
   completion: () => [],
   diff: () => [],
 });

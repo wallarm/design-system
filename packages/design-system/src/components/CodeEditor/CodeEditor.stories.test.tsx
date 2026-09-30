@@ -1,5 +1,5 @@
 import '@testing-library/jest-dom/vitest';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { composeStories } from 'storybook-react-rsbuild';
 import { describe, expect, it, vi } from 'vitest';
@@ -60,6 +60,15 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
   Languages: {
     editors: ['lang-python', 'lang-json', 'lang-javascript', 'lang-typescript', 'lang-yaml'],
   },
+  SyntaxErrors: {
+    editors: [
+      'syntax-json',
+      'syntax-yaml',
+      'syntax-javascript',
+      'syntax-typescript',
+      'syntax-python',
+    ],
+  },
   ParityDefault: { editors: ['parity-default-editor'], snippets: ['parity-default-snippet'] },
   ParityLineColors: {
     editors: ['parity-line-colors-editor'],
@@ -77,6 +86,8 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
 
 /** The engine chunk is a dynamic import; the first load in a worker can take a few seconds. */
 const ENGINE = { timeout: 5000 };
+/** Engine load + lazy parser load + the 300 ms lint delay. */
+const LINT = { timeout: 8000 };
 
 describe('CodeEditor stories', () => {
   it('lists every exported story in STORY_ROOTS', () => {
@@ -189,5 +200,16 @@ describe('CodeEditor stories', () => {
     expect(snippet).toHaveTextContent('const greeting = "Hello, World!";');
     expect(editor).toHaveTextContent('const greeting = "Hello, World!";');
     expect(editor).toHaveAttribute('aria-readonly', 'true');
+  });
+
+  it('SyntaxErrors reports syntax diagnostics under every editor', async () => {
+    const { SyntaxErrors } = composed;
+    render(<SyntaxErrors />);
+
+    for (const language of ['json', 'yaml', 'javascript', 'typescript', 'python']) {
+      const count = screen.getByTestId(`syntax-${language}--count`);
+      await waitFor(() => expect(count).not.toHaveTextContent(/^0 diagnostics$/), LINT);
+    }
+    expect(screen.getByTestId('syntax-json--count')).toHaveTextContent('1 diagnostic');
   });
 });

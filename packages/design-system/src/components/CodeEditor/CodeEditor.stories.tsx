@@ -26,7 +26,7 @@ import { VStack } from '../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { CodeEditorContent } from './CodeEditorContent';
 import { CodeEditorRoot } from './CodeEditorRoot';
-import type { CodeEditorLanguage } from './types';
+import type { CodeEditorDiagnostic, CodeEditorLanguage } from './types';
 
 const DESCRIPTION = [
   'An editable code surface that looks exactly like `CodeSnippet` and reuses its chrome — header, title, tabs, copy, wrap, fullscreen and show more — with undo, find, folds and line colours on CodeMirror 6, loaded lazily on first mount.',
@@ -943,6 +943,69 @@ export const Languages: StoryFn<typeof meta> = () => (
     <VStack gap={16}>
       {LANGUAGE_SAMPLES.map(sample => (
         <LanguageExample key={sample.id} sample={sample} />
+      ))}
+    </VStack>
+  </CodeSnippetAdapterProvider>
+);
+
+// --- Syntax errors ---
+
+interface SyntaxErrorSample {
+  language: CodeEditorLanguage;
+  label: string;
+  value: string;
+}
+
+/** One intentionally broken sample per language with a structure parser. */
+const SYNTAX_ERROR_SAMPLES = [
+  { language: 'json', label: 'JSON', value: '{\n  "action": "block"\n  "enabled": true\n}\n' },
+  { language: 'yaml', label: 'YAML', value: 'rules:\n  - action: block\n    point: [header, id\n' },
+  {
+    language: 'javascript',
+    label: 'JavaScript',
+    value: 'function fetchRules( {\n  return client.get("/api/v2/rules");\n}\n',
+  },
+  { language: 'typescript', label: 'TypeScript', value: 'let limit: = 50;\n' },
+  { language: 'python', label: 'Python', value: 'def active(:\n    pass\n' },
+] as const satisfies readonly SyntaxErrorSample[];
+
+const SyntaxErrorExample = ({ sample }: { sample: SyntaxErrorSample }) => {
+  const [value, setValue] = useState(sample.value);
+  const [diagnostics, setDiagnostics] = useState<CodeEditorDiagnostic[]>([]);
+  const testId = `syntax-${sample.language}`;
+
+  return (
+    <VStack align='start' gap={4}>
+      <span className='sb-annotation'>{sample.label}</span>
+      <div style={{ width: '600px' }}>
+        <CodeEditorRoot
+          value={value}
+          onChange={setValue}
+          language={sample.language}
+          onDiagnosticsChange={setDiagnostics}
+          data-testid={testId}
+        >
+          <CodeEditorContent lineNumbers aria-label={`Broken ${sample.label} example`} />
+        </CodeEditorRoot>
+      </div>
+      <span className='sb-annotation' data-testid={`${testId}--count`}>
+        {diagnostics.length === 1 ? '1 diagnostic' : `${diagnostics.length} diagnostics`}
+      </span>
+    </VStack>
+  );
+};
+
+/**
+ * Syntax errors for every language with a structure parser: JSON (and an HTTP JSON body) use the
+ * precise `JSON.parse` message, YAML, JavaScript, TypeScript and Python report the parser's error
+ * nodes. Hover an underline to read the message; the count below each editor comes from
+ * `onDiagnosticsChange`. Bash and plain text have no syntax diagnostics.
+ */
+export const SyntaxErrors: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <VStack gap={16}>
+      {SYNTAX_ERROR_SAMPLES.map(sample => (
+        <SyntaxErrorExample key={sample.language} sample={sample} />
       ))}
     </VStack>
   </CodeSnippetAdapterProvider>
