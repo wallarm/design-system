@@ -186,6 +186,9 @@ test.describe('Component: CodeEditor', () => {
   test.describe('Visual', () => {
     for (const storyName of STORY_NAMES) {
       test(`Should render ${storyName.toLowerCase()} correctly`, async ({ page }) => {
+        // Multi-editor stories wait up to 15s per editor for colours / underlines: allow 3x the
+        // per-test timeout so the waits cannot add up past it.
+        if (COLOURED_STORIES.has(storyName) || DIAGNOSTIC_STORIES.has(storyName)) test.slow();
         await everyStory.goto(page, storyName);
         await waitForEngine(page);
         await waitForLazyWork(page, storyName);
@@ -502,7 +505,14 @@ test.describe('Component: CodeEditor', () => {
       await expect(editor).toBeFocused();
       const before = await editorText(editor);
       await page.keyboard.type('x');
-      expect(await editorText(editor)).toBe(before);
+      // Let CodeMirror flush its DOM observer (two frames), then require the text to stay put.
+      await page.evaluate(
+        () =>
+          new Promise<void>(resolve =>
+            requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+          ),
+      );
+      await expect.poll(() => editorText(editor), { intervals: [100, 200, 300] }).toBe(before);
     });
 
     test('Should keep focus in the editor via Tab key', async ({ page }) => {
