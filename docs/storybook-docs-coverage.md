@@ -4,7 +4,7 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-08-25, against main at v1.7.0. **All 95 pages are written.**
+> **Last updated:** 2026-08-25, against main at v1.7.0. **All 96 pages are written.**
 >
 > `SearchModal` landed in v1.7.0 with no stories file, so it is not a page yet — it becomes an
 > unticked row the moment one is added.
@@ -42,7 +42,7 @@ check**, not a queue:
 
 ## Snapshot
 
-- **95 written to the standard · 0 left**, across 95 story pages. Every folder is complete.
+- **96 written to the standard · 0 left**, across 96 story pages. Every folder is complete.
 - Levelling was usually cutting, not filling — and often correcting. Five pages
   claimed behaviour their own code contradicted: `Slider`, `Dialog`,
   `CodeSnippet` (its `Sizes` story labelled the wrong default), `BarList`
@@ -90,6 +90,7 @@ check**, not a queue:
 | ✅ | Inputs Date/TimeInput | 8 | 8 | `components/TimeInput/TimeInput.stories.tsx` |
 | ✅ | Inputs/Checkbox | 8 | 8 | `components/Checkbox/Checkbox.stories.tsx` |
 | ✅ | Inputs/Field | 9 | 9 | `components/Field/Field.stories.tsx` |
+| ✅ | Inputs/FileUpload | 13 | 13 | `components/FileUpload/FileUpload.stories.tsx` |
 | ✅ | Inputs/InlineEdit | 14 | 14 | `components/InlineEdit/InlineEdit.stories.tsx` |
 | ✅ | Inputs/Input | 6 | 6 | `components/Input/Input.stories.tsx` |
 | ✅ | Inputs/InputGroup | 8 | 8 | `components/InputGroup/InputGroup.stories.tsx` |
