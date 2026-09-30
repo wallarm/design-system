@@ -1041,15 +1041,17 @@ Not findings — decisions worth remembering so they are not rediscovered.
 
 - **What** — Figma's Item section draws "Replace", "Delete" and "Download" tooltips
   beside the row actions, but the shipped icon buttons carry only an `aria-label`.
-- **Evidence** — `packages/design-system/src/components/FileUpload/FileUploadItemReplaceTrigger.tsx`,
-  `FileUploadItemDeleteTrigger.tsx` and `FileUploadItemAction.tsx` render a bare ghost
+- **Evidence** — Before 0ef0b39c, `packages/design-system/src/components/FileUpload/FileUploadItemReplaceTrigger.tsx`,
+  `FileUploadItemDeleteTrigger.tsx` and `FileUploadItemAction.tsx` rendered a bare ghost
   `Button`; the Figma documentation frame for `file-upload-item` shows the three tooltips.
+  Now each wraps its button in `Tooltip` ("Replace", "Delete" / "Cancel upload", and the
+  Action's string `aria-label`), disabled together with the button.
 - **Why it matters** — Two unlabelled icons sit side by side on every row, so a mouse
   user has to guess that the circular arrows mean Replace.
 - **Suggested action** — Confirm with design whether the tooltips are intended; if so,
   wrap each default action in `Tooltip` with the same text as its `aria-label`.
 - **Found while** — documenting `FileUpload`.
-- **Status** — Open
+- **Status** — Closed — tooltips added (0ef0b39c) per the Figma ruling; disabled with their button since the residual-review pass.
 
 ### FileUpload: we hold files until save, Carbon uploads on pick
 

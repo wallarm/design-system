@@ -110,8 +110,12 @@ Root-level DS context is memoized and holds:
 - the resolved `disabled`, `readOnly`, and `invalid` flags
 - `single` (`maxFiles === 1`)
 - `locked`, meaning some item is loading, tracked with a registered counter
-- `hasRejections`
+- `pickerHidden` (read-only) and `pickerBlocked` (disabled, locked, or multiple mode at `maxFiles`)
+- `rejections` (the visible list: Ark's, minus single-mode `FILE_EXISTS`, plus multi-mode Replace ones), with `reportRejections` / `clearRejections`
+- `commitFiles`, Ark's `setFiles` plus the report and hidden-input write zag skips when the new list "equals" the old one (§5.3)
 - the error element id, used for `aria-describedby`
+
+The context value is memoized, but Ark's `api` is a new object on every render, so in practice it is rebuilt each render. That is harmless (the callbacks it carries are stable).
 
 ### Parts
 
@@ -124,13 +128,13 @@ Every part follows the same rules:
 
 | Part | Element / base | Props (beyond native) | Behaviour |
 |---|---|---|---|
-| `FileUploadDropzone` | `div` (Ark `Dropzone`) | `children?` (default: `Share` icon + "Drag and drop files or click to select") | Click, Enter/Space, or drop opens or accepts files. Stays visible once a file is chosen; hidden only when `readOnly`. It looks disabled when `disabled`, `locked`, or when the maximum number of files is reached. In that case click and drop are disabled: `disableClick` plus DS guards and root `allowDrop` go false. Slot `dropzone`. |
+| `FileUploadDropzone` | `div` (Ark `Dropzone`) | `children?` (default: `Share` icon + "Drag and drop files or click to select"), `icon?` | Click, Enter/Space, or drop opens or accepts files. Stays visible once a file is chosen; hidden only when `readOnly`. It looks disabled when `disabled`, `locked`, or when the maximum number of files is reached. In that case click and drop are disabled: `disableClick` plus DS guards and root `allowDrop` go false. Slot `dropzone`. |
 | `FileUploadTrigger` | DS `Button` via Ark `Trigger asChild` | All `ButtonProps`. Default `variant='primary' color='brand' size='large'`. Default children: `<Share />Select file` | Stays visible once a file is chosen; hidden only when `readOnly`. Disabled when `disabled`, `locked`, or the maximum is reached. Slot `trigger`. |
-| `FileUploadError` | `div role='alert'` | `children?: (rejection: FileUploadRejection, error: FileUploadErrorCode) => ReactNode` | Renders nothing when there are no rejections. Otherwise it renders one line per (file, error) pair in `FieldError` style. Slot `error`. |
-| `FileUploadItemGroup` | `ul` | `children: ReactNode \| ((file: File, index: number) => ReactNode)` | With a function child, it maps over the accepted files. Renders nothing when the list is empty. Layout: `flex flex-col gap-8`. Slot `item-group`. |
-| `FileUploadItem` | `li` | `file: File \| { name: string; size?: number }` (required), `description?: ReactNode`, `loading?: boolean`, `icon?: ReactNode` (default `File`), `children` = actions | Provides the item context (`file`, `loading`). While `loading`, it registers the lock with the root. Slot `item`; the name, description, and actions parts get `item-name`, `item-description`, `item-actions`. |
-| `FileUploadItemDeleteTrigger` | DS `Button` ghost/neutral/small, icon `X` | `ButtonProps`, `children?` (default `<X />`) | If the item's `file` is a `File` inside a root, it calls Ark `deleteFile(file)`. Otherwise it only runs the consumer's `onClick`. Default `aria-label`: `Delete {name}`, or `Cancel upload` while loading. Hidden when `readOnly`. Slot `item-delete-trigger`. |
-| `FileUploadItemReplaceTrigger` | DS `Button` ghost/neutral/small, icon `RefreshCcw` | `ButtonProps`, `children?` | In `single` mode it calls `openFilePicker()`, and the new file replaces the old one. With multiple files it opens a DS-owned per-item hidden `<input type=file accept=…>` (see below). Default `aria-label`: `Replace {name}`. Hidden when `readOnly` or the item is loading. Slot `item-replace-trigger`. Multiple mode pre-validates the replacement with `lib/checkFile` (type, size, custom) before `setFiles`, because `setFiles` re-validates the whole list and would drop the original on failure; its rejections are held in DS state and cleared on the next accept or delete. |
+| `FileUploadError` | `div role='alert'` | `children?: (rejection: FileUploadRejection, error: FileUploadErrorCode) => ReactNode` | Renders nothing when there are no rejections. Otherwise it renders one line per (file, error) pair in `FieldError` style. Slot `rejections` (`{base}--rejections`) — not `error`, which under an inherited `Field` cascade is `FieldError`'s `{field}--error`. |
+| `FileUploadItemGroup` | `ul` | `children: ReactNode \| ((file: File, index: number) => ReactNode)` | With a function child, it maps over the accepted files. Renders nothing when the list is empty. Layout: `flex flex-col gap-8`. Slot `item-group`. An own `data-testid` becomes the base for its rows (`{id}--item`, `{id}--item-name`, …), so a standalone stored-file list gets test ids. |
+| `FileUploadItem` | `li` | `file: File \| { name: string; size?: number }` (required), `description?: ReactNode`, `loading?: boolean`, `icon?: ReactNode` (default `File`), `children` = actions | Provides the item context (`file`, `loading`). While `loading`, it registers the lock with the root. Slot `item`; the name and description get `item-name`, `item-description` (the actions wrapper has no test id). An own `data-testid` becomes the base for this row's parts (`{id}--item-name`, `{id}--item-delete-trigger`, …). |
+| `FileUploadItemDeleteTrigger` | DS `Button` ghost/neutral/small, icon `X` | `ButtonProps`, `children?` (default `<X />`) | If the item's `file` is a `File` inside a root, it calls Ark `deleteFile(file)`. Otherwise it only runs the consumer's `onClick`. Default `aria-label`: `Delete {name}`, or `Cancel upload` while loading. Hidden when `readOnly`. Slot `item-delete-trigger`. After a removal, focus moves to the row now at the same position (else the previous one) — its Delete — or back to the picker, never to `<body>`. |
+| `FileUploadItemReplaceTrigger` | DS `Button` ghost/neutral/small, icon `RefreshCcw` | `ButtonProps`, `children?` | In `single` mode it calls `openFilePicker()`, and the new file replaces the old one. With multiple files it opens a DS-owned per-item hidden `<input type=file accept=…>` (see below). Default `aria-label`: `Replace {name}`. Hidden when `readOnly` or the item is loading. Slot `item-replace-trigger`. Multiple mode pre-validates the replacement with `lib/checkFile` (type, size, custom) before `setFiles`, because `setFiles` re-validates the whole list and would drop the original on failure; its rejections are held in DS state and cleared on the next accept or delete. A replacement equal (name, size, type) to **another** listed file is rejected as `FILE_EXISTS` before `setFiles`, which would otherwise keep one of the two and drop the original. Needs a root: it renders nothing outside `FileUpload`, and in multiple mode nothing on a stored `{ name }` row (it is not in the accepted list, so a pick there would be discarded). The type check is zag's own `isValidFileType` (`@zag-js/file-utils`): an empty `file.type` falls back to the MIME type guessed from the extension. |
 | `FileUploadItemAction` | DS `Button` ghost/neutral/small | `ButtonProps` | Generic icon action such as Download. It has no built-in behaviour. It is disabled when the root is `disabled`, and stays enabled when the root is `readOnly`. Slot `item-action`. |
 
 Delete, Replace, and Action each show a tooltip with the short action label (Figma): `Delete` (`Cancel upload` while loading), `Replace`, and the Action's string `aria-label` (no tooltip when it has none). A disabled action shows none.
@@ -150,12 +154,13 @@ Exported types:
 
 ## 5. Behaviour
 
-1. **Nothing uploads.** Ark's `syncInputElement` writes the accepted files into the hidden input's `files` (via `DataTransfer`) and dispatches a bubbling `change`. A native `<form>` or `FormData` carries them under `name`.
+1. **Nothing uploads.** Ark's `syncInputElement` writes the accepted files into the hidden input's `files` (via `DataTransfer`) and dispatches a bubbling `change`. A native `<form>` or `FormData` carries them under `name`. zag runs that sync only when the list changes (its tracker skips the first run), so the DS writes files held from mount (`defaultValue` / `value`) to the hidden input once after mount.
 2. **Validation** runs the same way for pick, drop, and replace: `accept`, then size, then `validate`. That is Ark's `getEventFiles`.
 3. **Single mode:**
    - A valid new file replaces the old one. The picker stays visible after a pick, with the chosen file shown below it.
    - An invalid file keeps the old one and sets the rejections.
    - Re-picking an identical file (same name, size, and type) is silently ignored: the DS filters out `FILE_EXISTS` when `single`.
+   - zag compares files by name, size, and type only. A re-pick (or multi-mode Replace) that matches by those three but has a different `lastModified` — the file was edited without changing its byte count — is taken as a replacement: the DS calls `setFiles`, reports it through `onValueChange`, and writes it to the hidden input, since zag sees "no change" and would do neither. The very same file (same `lastModified`) stays a no-op. An edit that also keeps `lastModified` cannot be detected without reading content; that is a known limit.
 4. **Multiple mode:**
    - New files are appended.
    - Duplicates produce `Already added`.
@@ -198,26 +203,26 @@ Sizes use binary units (B, KB, MB, GB with 1024 steps), with at most one decimal
 |---|---|
 | default | `bg-states-primary-default-alt border-border-primary text-text-primary` |
 | hover / drag-over (`data-dragging`) — same look | `bg-states-brand-hover border-border-brand text-text-brand` |
-| disabled / locked | `text-text-disable-primary cursor-not-allowed`, no hover |
+| disabled / locked / at `maxFiles` | `text-text-disable-primary cursor-not-allowed`, no hover |
 | invalid | `border-border-strong-danger` (**pending designer confirmation**) |
 | focus-visible | `outline-none ring-3 ring-focus-primary` |
 
-**Item.** Layout `bg-bg-primary rounded-12 pl-10 pr-6 py-6` (height 36, or 52 with a description), then:
+**Item.** Layout `bg-bg-primary rounded-12 pl-10 pr-6 py-8` (height 36, or 52 with a description; the actions take `-my-2` to sit on Figma's top-6 line), then:
 
 - icon `File`, `size='md'`, `text-icon-secondary`, with a `gap-8` to the text;
 - the name, `text-sm text-text-primary`, truncated inside `OverflowTooltip`;
 - the description, `text-xs text-text-secondary`, aligned under the name;
 - the actions, `gap-4`, as ghost neutral small icon Buttons (24px).
 
-When loading, the name and icon switch to `text-text-disable-primary` and a `Loader type='sonner' size='md'` appears after the actions.
+When loading, the name switches to `text-text-disable-primary` and the icon to `text-icon-primary-disable`, and a `Loader type='sonner' size='md'` appears after the actions.
 
 **Layout.** `Field` already puts 4px under the label. The root puts 8px between the picker, the error, and the item group, and the item group puts 8px between items. That matches Figma: "4px under the label · 8px before the first file and between files".
 
 ## 8. Accessibility
 
-- **Dropzone:** `role=button`, `tabIndex=0`, and Enter/Space open the picker (Ark). Its accessible name comes from `aria-labelledby` = [Field label id, own text id], which replaces Ark's default `"dropzone"`. It gets `aria-disabled` when disabled or locked, and `aria-describedby` points to the error when there are rejections.
-- **Trigger:** a native button with visible text. It gets `aria-describedby` to the error when there are rejections.
-- **Icon actions:** have default `aria-label`s (§4), which the consumer can override. Row actions show a tooltip with the short verb; the accessible name stays the full `aria-label`.
+- **Dropzone:** `role=button`, `tabIndex=0`, and Enter/Space open the picker (Ark). Its accessible name comes from `aria-labelledby` = [Field label id, own text id], which replaces Ark's default `"dropzone"`; a consumer `aria-label` or `aria-labelledby` replaces that default. It gets `aria-disabled` when disabled, locked, or at `maxFiles`, and `aria-describedby` points to the error when there are rejections — merged with a consumer `aria-describedby`, never replacing it.
+- **Trigger:** a native button with visible text. It gets `aria-describedby` to the error when there are rejections, merged with a consumer `aria-describedby`.
+- **Icon actions:** have default `aria-label`s (§4), which the consumer can override. Row actions show a tooltip with the short verb; the accessible name stays the full `aria-label`. A disabled action's tooltip is disabled too. Delete keeps focus in the component (§4).
 - **Truncated names:** the full name appears in a tooltip, and the `li` stays readable in full by screen readers.
 - **FileUploadError:** `role=alert`, so new rejections are announced.
 
@@ -234,13 +239,13 @@ Under `packages/design-system/src/components/FileUpload/`:
 - `FileUpload.tsx`, `FileUploadDropzone.tsx`, `FileUploadTrigger.tsx`, `FileUploadError.tsx`
 - `FileUploadItemGroup.tsx`, `FileUploadItem.tsx`, `FileUploadItemDeleteTrigger.tsx`, `FileUploadItemReplaceTrigger.tsx`, `FileUploadItemAction.tsx`
 - `FileUploadContext.tsx` (root DS context), `FileUploadItemContext.tsx`
-- `classes.ts` (CVA), `types.ts`, `lib/{normalizeAccept,formatFileSize,formatRejection}.ts` (+ `*.test.ts`)
+- `classes.ts` (CVA), `types.ts`, `lib/{accept,checkFile,formatFileSize,formatRejection,setInputFiles}.ts` (+ `lib.test.ts`)
 - `index.ts`, `FileUpload.stories.tsx`, `FileUpload.test.tsx`, `FileUpload.e2e.ts`
 - `FileUpload.figma.tsx` (Code Connect), `ANALYTICS_GAPS.md`
 
 Also update:
 
-- `packages/design-system/src/index.ts` — export block, alphabetical, between FeedbackPulse and Field
+- `packages/design-system/src/index.ts` — export block, alphabetical, after Field and before FilterInput
 - `docs/storybook-docs-coverage.md` — add a row
 
 ## 11. Testing

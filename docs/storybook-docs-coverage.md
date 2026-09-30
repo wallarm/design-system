@@ -4,7 +4,7 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-08-25, against main at v1.7.0. **All 96 pages are written.**
+> **Last updated:** 2026-09-30, against main at v1.27.0 (plus `FileUpload` on `feat/WDS-185`). **All 96 pages are written.**
 >
 > `SearchModal` landed in v1.7.0 with no stories file, so it is not a page yet — it becomes an
 > unticked row the moment one is added.

@@ -1,5 +1,7 @@
 # FileUpload Implementation Plan
 
+> **Superseded in part.** Where this plan hides the picker once a file is chosen (single mode), it is superseded by the 2026-09-30 user decision (spec D4 / §5.3): the pickers stay visible. Later review passes also renamed the `FileUploadError` test-id slot to `rejections` (`{base}--rejections`). The spec is the authority; this plan is the historical record.
+
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Ship the `FileUpload` compound component: a drop Area or Button picker, an inline rejection error, and file rows with Replace, Delete, Download and Loading. It is built on Ark UI and covers WDS-185 and WDS-186.
