@@ -163,7 +163,8 @@ export function parseComponentProps(
   // Iterate over exported types from index.ts
   for (const exportDecl of indexFile.getExportDeclarations()) {
     for (const namedExport of exportDecl.getNamedExports()) {
-      const name = namedExport.getName();
+      // `export { X as Y }` is published as `Y`, so classify by the exported name.
+      const name = namedExport.getAliasNode()?.getText() ?? namedExport.getName();
       if (!name.endsWith('Props')) continue;
 
       // Resolve the type
