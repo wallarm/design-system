@@ -27,6 +27,10 @@ const Uploader = ({ children, ...props }: UploaderProps) => (
   </FileUpload>
 );
 
+afterEach(() => {
+  vi.restoreAllMocks();
+});
+
 describe('FileUpload — rows', () => {
   it('lists accepted files as rows with name, testids and slots', async () => {
     const { container } = render(<Uploader maxFiles={3} />);
@@ -173,7 +177,6 @@ describe('FileUpload — row actions', () => {
     await waitFor(() => expect(click).toHaveBeenCalled());
     pick(container, makeFile('new.wasm'));
     await waitFor(() => expect(names()).toEqual(['new.wasm']));
-    click.mockRestore();
   });
 
   it('Replace in multiple mode swaps only that file, in place', async () => {
@@ -258,8 +261,6 @@ describe('FileUpload — row actions', () => {
 });
 
 describe('FileUpload — row action tooltips', () => {
-  afterEach(() => vi.restoreAllMocks());
-
   it('shows "Replace" and "Delete" tooltips on hover, keeping the button test ids', async () => {
     const { container } = render(<Uploader />);
     pick(container, makeFile('a.wasm'));

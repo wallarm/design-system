@@ -1,8 +1,10 @@
-import { render, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import { Field } from '../Field';
 import { FileUpload } from './FileUpload';
 import { byTestId, hiddenInput, makeFile, pick } from './FileUpload.test.helpers';
+import { FileUploadItem } from './FileUploadItem';
+import { FileUploadItemGroup } from './FileUploadItemGroup';
 
 describe('FileUpload — root', () => {
   it('renders a div root with slot + testid and a named hidden file input', () => {
@@ -33,12 +35,20 @@ describe('FileUpload — root', () => {
     expect(hiddenInput(container).files?.[0]?.name).toBe('policy.wasm');
   });
 
-  it('works controlled, and a re-render with an equal new array does not re-fire onValueChange', () => {
+  it('works controlled: rows follow `value`, and a re-render with an equal new array does not re-fire onValueChange', async () => {
     const onValueChange = vi.fn();
-    const file = makeFile();
-    const { rerender } = render(<FileUpload value={[file]} onValueChange={onValueChange} />);
-    rerender(<FileUpload value={[makeFile()]} onValueChange={onValueChange} />);
+    const Controlled = ({ value }: { value: File[] }) => (
+      <FileUpload data-testid='fu' value={value} onValueChange={onValueChange}>
+        <FileUploadItemGroup>{file => <FileUploadItem file={file} />}</FileUploadItemGroup>
+      </FileUpload>
+    );
+    const { rerender } = render(<Controlled value={[makeFile('first.wasm')]} />);
+    expect(byTestId('fu--item')).toHaveTextContent('first.wasm');
+    rerender(<Controlled value={[makeFile('first.wasm')]} />);
     expect(onValueChange).not.toHaveBeenCalled();
+    rerender(<Controlled value={[makeFile('second.wasm')]} />);
+    await waitFor(() => expect(byTestId('fu--item')).toHaveTextContent('second.wasm'));
+    expect(screen.getAllByTestId('fu--item')).toHaveLength(1);
   });
 
   it('forwards consumer attributes and ref to the root div', () => {

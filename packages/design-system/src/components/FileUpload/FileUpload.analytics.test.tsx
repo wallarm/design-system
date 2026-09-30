@@ -1,9 +1,16 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { FileUpload } from './FileUpload';
-import { byTestId, hiddenInput, makeFile, pick, Uploader } from './FileUpload.test.helpers';
+import {
+  byTestId,
+  hiddenInput,
+  makeFile,
+  nextFrame,
+  pick,
+  Uploader,
+} from './FileUpload.test.helpers';
 import { FileUploadDropzone } from './FileUploadDropzone';
 import { FileUploadItem } from './FileUploadItem';
 import { FileUploadItemAction } from './FileUploadItemAction';
@@ -100,7 +107,22 @@ describe('FileUpload — analytics & test ids (docs/metrics/contract.md)', () =>
     );
     await userEvent.click(byTestId('fu--dropzone'));
     expect(onClick).toHaveBeenCalledTimes(1);
+    // The picker would open a frame later — wait it out before asserting it didn't.
+    await nextFrame();
     expect(click).not.toHaveBeenCalled();
+  });
+
+  it('composes a consumer handler that does not preventDefault, and the picker still opens (control)', async () => {
+    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const onClick = vi.fn();
+    render(
+      <FileUpload data-testid='fu'>
+        <FileUploadDropzone onClick={onClick} />
+      </FileUpload>,
+    );
+    await userEvent.click(byTestId('fu--dropzone'));
+    expect(onClick).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(click).toHaveBeenCalledTimes(1));
   });
 
   it('a consumer data-testid on a part wins over the cascade', () => {
