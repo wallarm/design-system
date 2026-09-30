@@ -100,10 +100,13 @@ const searchTheme = EditorView.theme({
     borderBottom: 'none',
   },
   '.cm-searchMatch': {
-    backgroundColor: 'var(--color-syntax-highlight-warning-highlight)',
+    backgroundColor:
+      'color-mix(in oklab, var(--color-syntax-highlight-warning-indicator) 24%, transparent)',
   },
   '.cm-searchMatch.cm-searchMatch-selected': {
-    backgroundColor: 'var(--color-syntax-highlight-selected-highlight)',
+    backgroundColor:
+      'color-mix(in oklab, var(--color-syntax-highlight-warning-indicator) 48%, transparent)',
+    outline: '1px solid var(--color-syntax-highlight-warning-indicator)',
   },
 });
 
