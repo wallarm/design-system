@@ -383,6 +383,16 @@ export const getVisibleRowCount = (state: EditorState): number => {
   return state.doc.lines - hidden;
 };
 
+/** Document ranges of the collapsed regions (what the fold replace decorations hide). */
+export const getCollapsedRanges = (state: EditorState): { from: number; to: number }[] => {
+  const value = readField(state);
+  if (!value || value.collapsed.size === 0) return [];
+  const start = startingLine(state);
+  return value.regions
+    .filter(region => value.collapsed.has(region.id))
+    .map(region => regionRange(state, region, start));
+};
+
 export const toggleFoldRegion = (view: EditorView, id: string): boolean => {
   const value = readField(view.state);
   const region = value?.regions.find(r => r.id === id);

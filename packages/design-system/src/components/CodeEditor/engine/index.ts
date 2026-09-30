@@ -27,8 +27,14 @@ import { adapterPainter } from './adapterPainter';
 import { completionExtension } from './completion';
 import { sanitizeContentAttributes } from './contentAttributes';
 import { diagnosticsExtension, jsonRegion } from './diagnostics';
-import { diffExtension } from './diff';
-import { foldAllRegions, foldsExtension, getVisibleRowCount, unfoldAllRegions } from './folds';
+import { diffDeletedRowCount, diffExtension } from './diff';
+import {
+  foldAllRegions,
+  foldsExtension,
+  getCollapsedRanges,
+  getVisibleRowCount,
+  unfoldAllRegions,
+} from './folds';
 import { guttersExtension } from './gutters';
 import { isLazyLanguage, languageExtension, loadLanguageExtension } from './languages';
 import { linesExtension } from './lines';
@@ -299,8 +305,12 @@ const changedOptionKeys = (prev: EngineOptions, next: EngineOptions): Set<DepKey
   return changed;
 };
 
-/** Rows the editor shows: document lines minus the lines hidden by collapsed folds. */
-const visibleRowCount = (state: EditorState): number => getVisibleRowCount(state);
+/**
+ * Rows the editor shows: document lines minus the lines hidden by collapsed folds, plus the
+ * deleted rows diff mode draws outside collapsed folds (spec §7.8 counts visible rows).
+ */
+const visibleRowCount = (state: EditorState): number =>
+  getVisibleRowCount(state) + diffDeletedRowCount(state, getCollapsedRanges(state));
 
 interface CachedDocument {
   state: EditorState;

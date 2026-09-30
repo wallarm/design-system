@@ -144,6 +144,51 @@ describe('createEditor — diff compartment', () => {
     expect(prefixTexts(handle)).toEqual(['-']);
   });
 
+  it('counts deleted rows in the visible row count', () => {
+    const onVisibleRowCountChange = vi.fn();
+    const parent = document.body.appendChild(document.createElement('div'));
+    const handle = createEditor(
+      parent,
+      baseOptions({ value: 'a\nb', original: 'a\n1\n2\n3\n4\n5\n6\nb' }),
+      {
+        onChange: vi.fn(),
+        onDiagnosticsChange: vi.fn(),
+        onVisibleRowCountChange,
+        portals: createPortalRegistry(),
+      },
+    );
+    handles.push(handle);
+    // 2 document lines + 6 deleted original lines.
+    expect(onVisibleRowCountChange).toHaveBeenLastCalledWith(8);
+
+    handle.update(baseOptions({ value: 'a\nb', original: undefined }));
+    expect(onVisibleRowCountChange).toHaveBeenLastCalledWith(2);
+  });
+
+  it('does not count deleted rows hidden inside a collapsed fold', () => {
+    const onVisibleRowCountChange = vi.fn();
+    const parent = document.body.appendChild(document.createElement('div'));
+    const handle = createEditor(
+      parent,
+      baseOptions({
+        value: 'a\nb\nc\nd\ne',
+        original: 'a\nb\nold\nc\nd\ne',
+        folds: [{ id: 'middle', startLine: 2, endLine: 4, defaultCollapsed: true }],
+      }),
+      {
+        onChange: vi.fn(),
+        onDiagnosticsChange: vi.fn(),
+        onVisibleRowCountChange,
+        portals: createPortalRegistry(),
+      },
+    );
+    handles.push(handle);
+    expect(onVisibleRowCountChange).toHaveBeenLastCalledWith(3);
+
+    handle.api.unfoldAll();
+    expect(onVisibleRowCountChange).toHaveBeenLastCalledWith(6);
+  });
+
   it('keeps the gutters compartment when only the `original` text changes', () => {
     const { handle, rerender } = mount({ value: 'a\nb\nc', original: 'a\nc' });
     const gutters = handle.view.dom.querySelector('.cm-gutters');
@@ -151,7 +196,7 @@ describe('createEditor — diff compartment', () => {
     const spy = vi.spyOn(handle.view, 'dispatch');
     rerender({ original: 'b\nc' });
     const effects = spy.mock.calls.flatMap(([spec]) =>
-      'effects' in spec && spec.effects ? [spec.effects].flat() : [],
+      spec && 'effects' in spec && spec.effects ? [spec.effects].flat() : [],
     );
     // Only the diff compartment is reconfigured, not `lines` (gutters).
     expect(effects).toHaveLength(1);

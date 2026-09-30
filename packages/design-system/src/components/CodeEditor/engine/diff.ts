@@ -139,6 +139,27 @@ export const deletedRowCount = (state: EditorState, block: BlockInfo): number =>
   return original.lineAt(chunk.endA).number - original.lineAt(chunk.fromA).number + 1;
 };
 
+/**
+ * Rows the merge view's deleted-chunk widgets add in diff mode (one per deleted original line),
+ * skipping chunks whose widget sits strictly inside a `hidden` (collapsed fold) range — the fold's
+ * replace decoration hides those widgets. 0 outside diff mode.
+ */
+export const diffDeletedRowCount = (
+  state: EditorState,
+  hidden: readonly { from: number; to: number }[],
+): number => {
+  const chunks = getChunks(state)?.chunks;
+  if (!chunks) return 0;
+  const original = getOriginalDoc(state);
+  let rows = 0;
+  for (const chunk of chunks) {
+    if (chunk.fromA >= chunk.toA) continue;
+    if (hidden.some(({ from, to }) => from < chunk.fromB && chunk.fromB <= to)) continue;
+    rows += original.lineAt(chunk.endA).number - original.lineAt(chunk.fromA).number + 1;
+  }
+  return rows;
+};
+
 /** For gutter `lineMarkerChange`: the diff changed although the document may not have. */
 export const diffChunksChanged = (update: ViewUpdate): boolean =>
   getChunks(update.startState)?.chunks !== getChunks(update.state)?.chunks;
