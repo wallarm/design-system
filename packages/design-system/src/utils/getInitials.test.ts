@@ -9,7 +9,12 @@ describe('getInitials', () => {
     ['Jean-Luc Picard', 'JP'],
     ['Grace Brewster Murray Hopper', 'GH'],
     ['ada lovelace', 'AL'],
-    ['👩‍💻 Dev', '👩‍💻D'],
+    ['👩‍💻 Dev', 'D'],
+    ['42', ''],
+    ['"Ada" Lovelace', 'AL'],
+    ['Ada 42', 'A'],
+    ['(Ada) (Lovelace)', 'AL'],
+    ['e\u0301mile Zola', 'E\u0301Z'],
     ['', ''],
     ['   ', ''],
   ])('%j → %j', (name, expected) => {

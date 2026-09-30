@@ -3,18 +3,25 @@ const segmenter =
     ? new Intl.Segmenter(undefined, { granularity: 'grapheme' })
     : undefined;
 
-// Grapheme-safe: an emoji or a letter with a combining mark stays whole.
-const firstGrapheme = (word: string): string => {
-  if (!segmenter) return Array.from(word)[0] ?? '';
-  const first = segmenter.segment(word)[Symbol.iterator]().next();
-  return first.done ? '' : first.value.segment;
-};
+const LETTER = /^\p{L}/u;
 
-/** Avatar initials: the first grapheme of the first and of the last word, upper-cased. */
+const graphemes = (word: string): string[] =>
+  segmenter ? Array.from(segmenter.segment(word), s => s.segment) : Array.from(word);
+
+// Grapheme-safe: a letter with a combining mark stays whole. Leading punctuation is skipped.
+const firstLetter = (word: string): string => graphemes(word).find(g => LETTER.test(g)) ?? '';
+
+/**
+ * Avatar initials: the first letter of the first and of the last word that has a letter,
+ * upper-cased. '' when the name has no letter, so the fallback shows its icon.
+ */
 export const getInitials = (name: string): string => {
-  const words = name.trim().split(/\s+/).filter(Boolean);
-  const first = words.at(0);
-  if (!first) return '';
-  const last = words.length > 1 ? (words.at(-1) ?? '') : '';
-  return (firstGrapheme(first) + firstGrapheme(last)).toLocaleUpperCase();
+  const letters = name
+    .trim()
+    .split(/\s+/)
+    .map(firstLetter)
+    .filter(letter => letter !== '');
+  const first = letters.at(0) ?? '';
+  const last = letters.length > 1 ? (letters.at(-1) ?? '') : '';
+  return (first + last).toLocaleUpperCase();
 };
