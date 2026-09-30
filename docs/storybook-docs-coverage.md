@@ -42,7 +42,7 @@ check**, not a queue:
 
 ## Snapshot
 
-- **96 written to the standard · 0 left**, across 96 story pages. Every folder is complete.
+- **96 written to the standard · 1 left** (`FilterDropdown`, new on `feat/WDS-180`), across 97 story pages.
 - Levelling was usually cutting, not filling — and often correcting. Five pages
   claimed behaviour their own code contradicted: `Slider`, `Dialog`,
   `CodeSnippet` (its `Sizes` story labelled the wrong default), `BarList`
@@ -132,6 +132,7 @@ check**, not a queue:
 | ✅ | Overlay/Tour | 5 | 5 | `components/Tour/Tour.stories.tsx` |
 | ✅ | Pages/EmptyState | 5 | 5 | `components/EmptyState/EmptyState.stories.tsx` |
 | ✅ | Pages/UtilityPage | 4 | 4 | `components/UtilityPage/UtilityPage.stories.tsx` |
+| ☐ | Patterns/FilterDropdown | 10 | 10 | `components/FilterDropdown/FilterDropdown.stories.tsx` |
 | ✅ | Patterns/FilterInput/Composition | 4 | 4 | `components/FilterInput/stories/FilterInputComposition.stories.tsx` |
 | ✅ | Patterns/FilterInput/FilterInput | 17 | 17 | `components/FilterInput/stories/FilterInput.stories.tsx` |
 | ✅ | Patterns/FilterInput/FilterInputChip | 21 | 21 | `components/FilterInput/stories/FilterInputChip.stories.tsx` |

@@ -1,14 +1,20 @@
+import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Select } from './Select';
 import { SelectButton } from './SelectButton';
 import { SelectClearTrigger } from './SelectClearTrigger';
 import { SelectContent } from './SelectContent';
+import { SelectFooter } from './SelectFooter';
+import { SelectGroup } from './SelectGroup';
+import { SelectGroupLabel } from './SelectGroupLabel';
+import { SelectHeader } from './SelectHeader';
 import { SelectInput } from './SelectInput';
 import { SelectOption } from './SelectOption';
+import { SelectOptionHint } from './SelectOptionHint';
 import { SelectOptionText } from './SelectOptionText';
 import { SelectPositioner } from './SelectPositioner';
 import { SelectSearchInput } from './SelectSearchInput';
@@ -260,5 +266,287 @@ describe('Size variants', () => {
     );
     const tag = document.querySelector('[data-slot="tag"]');
     expect(tag?.className).toContain('h-24');
+  });
+});
+
+describe('SelectSearchInput keyboard', () => {
+  const SearchableSelect = ({ onKeyDown }: { onKeyDown?: () => void }) => {
+    const [query, setQuery] = useState('');
+    const collection = createListCollection({ items });
+    return (
+      <Select collection={collection} data-testid='select'>
+        <SelectButton data-testid='trigger' />
+        <SelectPositioner>
+          <SelectHeader>
+            <SelectSearchInput
+              value={query}
+              onChange={setQuery}
+              onKeyDown={onKeyDown}
+              data-testid='search'
+            />
+          </SelectHeader>
+          <SelectContent>
+            {items.map(item => (
+              <SelectOption key={item.value} item={item} data-testid={`option-${item.value}`}>
+                <SelectOptionText>{item.label}</SelectOptionText>
+              </SelectOption>
+            ))}
+          </SelectContent>
+        </SelectPositioner>
+      </Select>
+    );
+  };
+
+  it('types a space instead of picking the highlighted option, and composes onKeyDown', async () => {
+    const onKeyDown = vi.fn();
+    render(<SearchableSelect onKeyDown={onKeyDown} />);
+    await userEvent.click(screen.getByTestId('trigger'));
+    const input = within(await screen.findByTestId('search')).getByRole('textbox');
+    input.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await userEvent.type(input, 'a b');
+
+    expect(input).toHaveValue('a b');
+    expect(screen.getByTestId('option-react')).toHaveAttribute('aria-selected', 'false');
+    expect(onKeyDown).toHaveBeenCalled();
+  });
+
+  it('regression: a space typed while an option is highlighted is inserted and picks nothing', async () => {
+    const onValueChange = vi.fn();
+    const Wrapped = () => {
+      const [query, setQuery] = useState('');
+      const collection = createListCollection({ items });
+      return (
+        <Select collection={collection} onValueChange={onValueChange} data-testid='select'>
+          <SelectButton data-testid='trigger' />
+          <SelectPositioner>
+            <SelectHeader>
+              <SelectSearchInput value={query} onChange={setQuery} data-testid='search' />
+            </SelectHeader>
+            <SelectContent>
+              {items.map(item => (
+                <SelectOption key={item.value} item={item} data-testid={`option-${item.value}`}>
+                  <SelectOptionText>{item.label}</SelectOptionText>
+                </SelectOption>
+              ))}
+            </SelectContent>
+          </SelectPositioner>
+        </Select>
+      );
+    };
+    render(<Wrapped />);
+    await userEvent.click(screen.getByTestId('trigger'));
+    const input = within(await screen.findByTestId('search')).getByRole('textbox');
+    input.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() =>
+      expect(screen.getByTestId('option-react')).toHaveAttribute('data-highlighted', ''),
+    );
+
+    await userEvent.keyboard(' ');
+    expect(input).toHaveValue(' ');
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(screen.getByTestId('option-react')).toHaveAttribute('aria-selected', 'false');
+    expect(screen.getByTestId('trigger')).toHaveAttribute('aria-expanded', 'true');
+  });
+
+  it('Home and End stay in the input and do not move the highlight', async () => {
+    render(<SearchableSelect />);
+    await userEvent.click(screen.getByTestId('trigger'));
+    const input = within(await screen.findByTestId('search')).getByRole('textbox');
+    input.focus();
+    await userEvent.keyboard('{ArrowDown}');
+    await waitFor(() =>
+      expect(screen.getByTestId('option-react')).toHaveAttribute('data-highlighted', ''),
+    );
+
+    await userEvent.keyboard('{End}');
+    expect(screen.getByTestId('option-angular')).not.toHaveAttribute('data-highlighted');
+    await userEvent.keyboard('{Home}');
+    expect(screen.getByTestId('option-react')).toHaveAttribute('data-highlighted', '');
+  });
+
+  it('still lets arrows and Enter reach the list from the input', async () => {
+    const onValueChange = vi.fn();
+    const collection = createListCollection({ items });
+    render(
+      <Select collection={collection} onValueChange={onValueChange} data-testid='select'>
+        <SelectButton data-testid='trigger' />
+        <SelectPositioner>
+          <SelectHeader>
+            <SelectSearchInput value='' onChange={vi.fn()} data-testid='search' />
+          </SelectHeader>
+          <SelectContent>
+            {items.map(item => (
+              <SelectOption key={item.value} item={item} data-testid={`option-${item.value}`}>
+                <SelectOptionText>{item.label}</SelectOptionText>
+              </SelectOption>
+            ))}
+          </SelectContent>
+        </SelectPositioner>
+      </Select>,
+    );
+    await userEvent.click(screen.getByTestId('trigger'));
+    const input = within(await screen.findByTestId('search')).getByRole('textbox');
+    input.focus();
+    await userEvent.keyboard('{ArrowDown}{ArrowDown}');
+    await waitFor(() =>
+      expect(screen.getByTestId('option-vue')).toHaveAttribute('data-highlighted', ''),
+    );
+    await userEvent.keyboard('{Enter}');
+    expect(onValueChange).toHaveBeenCalledWith(expect.objectContaining({ value: ['vue'] }));
+  });
+});
+
+describe('SelectPositioner contentProps and size override', () => {
+  const renderPositioner = (props: Parameters<typeof SelectPositioner>[0]) => {
+    const collection = createListCollection({ items });
+    return render(
+      <Select collection={collection} data-testid='select'>
+        <SelectButton data-testid='trigger' />
+        <SelectPositioner {...props}>
+          <SelectContent>
+            {items.map(item => (
+              <SelectOption key={item.value} item={item}>
+                <SelectOptionText>{item.label}</SelectOptionText>
+              </SelectOption>
+            ))}
+          </SelectContent>
+        </SelectPositioner>
+      </Select>,
+    );
+  };
+
+  it('forwards ref, style and data-* to the listbox content element', async () => {
+    const ref = { current: null as HTMLDivElement | null };
+    renderPositioner({
+      contentProps: {
+        ref,
+        style: { width: 200 },
+        'data-testid': 'panel',
+        'data-analytics-id': 'PANEL',
+      },
+    });
+    await userEvent.click(screen.getByTestId('trigger'));
+    const panel = await screen.findByTestId('panel');
+    expect(panel).toHaveAttribute('role', 'listbox');
+    expect(panel).toHaveAttribute('data-analytics-id', 'PANEL');
+    expect(panel.style.width).toBe('200px');
+    expect(ref.current).toBe(panel);
+  });
+
+  it('lets className replace the default min/max width via tailwind-merge', async () => {
+    renderPositioner({
+      className: 'min-w-128 max-w-360',
+      contentProps: { 'data-testid': 'panel' },
+    });
+    await userEvent.click(screen.getByTestId('trigger'));
+    const panel = await screen.findByTestId('panel');
+    expect(panel.className).toContain('min-w-128');
+    expect(panel.className).toContain('max-w-360');
+    expect(panel.className).not.toContain('min-w-240');
+    expect(panel.className).not.toContain('max-w-320');
+  });
+
+  it('keeps the default sizes without a className', async () => {
+    renderPositioner({ contentProps: { 'data-testid': 'panel' } });
+    await userEvent.click(screen.getByTestId('trigger'));
+    const panel = await screen.findByTestId('panel');
+    expect(panel.className).toContain('min-w-240');
+    expect(panel.className).toContain('max-w-320');
+  });
+});
+
+describe('SelectFooter variants', () => {
+  it('default variant keeps the original classes', () => {
+    render(<SelectFooter data-testid='footer'>x</SelectFooter>);
+    const footer = screen.getByTestId('footer');
+    for (const cls of ['bg-component-outline-button-bg', 'py-8', 'px-16', 'border-t']) {
+      expect(footer.className).toContain(cls);
+    }
+    expect(footer.className).not.toContain('justify-end');
+  });
+
+  it('actions variant right-aligns inside the 8px inset', () => {
+    render(
+      <SelectFooter variant='actions' data-testid='footer'>
+        x
+      </SelectFooter>,
+    );
+    const footer = screen.getByTestId('footer');
+    for (const cls of ['justify-end', 'p-8', 'border-t', 'border-border-primary-light']) {
+      expect(footer.className).toContain(cls);
+    }
+    expect(footer.className).not.toContain('px-16');
+  });
+});
+
+describe('Consumer data-testid on Select parts', () => {
+  it('accepts a consumer data-testid on content, group, group label and footer', async () => {
+    const collection = createListCollection({ items });
+    render(
+      <Select collection={collection} data-testid='select'>
+        <SelectButton data-testid='trigger' />
+        <SelectPositioner>
+          <SelectContent data-testid='my-list'>
+            <SelectGroup data-testid='my-group' data-slot='custom-group'>
+              <SelectGroupLabel data-testid='my-label'>Frameworks</SelectGroupLabel>
+              <SelectOption item={items[0]}>
+                <SelectOptionText>React</SelectOptionText>
+              </SelectOption>
+            </SelectGroup>
+          </SelectContent>
+          <SelectFooter data-testid='my-footer'>footer</SelectFooter>
+        </SelectPositioner>
+      </Select>,
+    );
+    await userEvent.click(screen.getByTestId('trigger'));
+    expect(await screen.findByTestId('my-list')).toBeInTheDocument();
+    expect(screen.getByTestId('my-group')).toHaveAttribute('data-slot', 'custom-group');
+    expect(screen.getByTestId('my-label')).toHaveTextContent('Frameworks');
+    expect(screen.getByTestId('my-footer')).toHaveTextContent('footer');
+  });
+
+  it('falls back to the cascaded ids without a consumer data-testid', async () => {
+    const collection = createListCollection({ items });
+    render(
+      <Select collection={collection} data-testid='select'>
+        <SelectButton />
+        <SelectPositioner>
+          <SelectContent>
+            <SelectGroup>
+              <SelectGroupLabel>Frameworks</SelectGroupLabel>
+            </SelectGroup>
+          </SelectContent>
+        </SelectPositioner>
+      </Select>,
+    );
+    await userEvent.click(screen.getByRole('combobox'));
+    expect(await screen.findByTestId('select--content')).toBeInTheDocument();
+  });
+});
+
+describe('SelectOptionHint', () => {
+  it('renders right-side text and keeps the option row on one line', async () => {
+    const collection = createListCollection({ items });
+    render(
+      <Select collection={collection} data-testid='select'>
+        <SelectButton data-testid='trigger' />
+        <SelectPositioner>
+          <SelectContent>
+            <SelectOption item={items[0]} data-testid='option'>
+              <SelectOptionText>React</SelectOptionText>
+              <SelectOptionHint data-testid='hint'>12</SelectOptionHint>
+            </SelectOption>
+          </SelectContent>
+        </SelectPositioner>
+      </Select>,
+    );
+    await userEvent.click(screen.getByTestId('trigger'));
+    expect(await screen.findByTestId('hint')).toHaveTextContent('12');
+    expect(screen.getByTestId('hint')).toHaveAttribute('data-slot', 'select-option-hint');
+    expect(screen.getByTestId('option').className).toContain(
+      'has-[>[data-slot=select-option-hint]]:flex-nowrap',
+    );
   });
 });

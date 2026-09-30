@@ -33,6 +33,8 @@ export const SelectOption: FC<SelectOptionProps> = ({
       className={cn(
         dropdownMenuItemVariants({ variant, inset: false }),
         'flex-wrap relative gap-y-0 gap-x-8 pr-32',
+        // A right-side hint keeps the row on one line so it never lands under the indicator.
+        'has-[>[data-slot=select-option-hint]]:flex-nowrap',
         'data-[state=checked]:bg-states-primary-active',
         'data-highlighted:bg-states-primary-hover',
       )}
