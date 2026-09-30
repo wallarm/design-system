@@ -131,6 +131,11 @@ interface LatestProps {
  * Editable code surface (CodeMirror 6, lazy-loaded) that looks like CodeSnippet and reuses
  * its chrome: syntax-adapter colours, gutters, lines, folds, copy/wrap/fullscreen/show-more,
  * plus find/replace, diagnostics, JSON Schema, autocomplete and diff against an original.
+ *
+ * Layout: like CodeSnippetRoot, the root renders inside a `display: contents` wrapper
+ * (`data-slot='code-snippet-frame'`, the persistent fullscreen portal host), so a parent's
+ * `space-*` / `divide-*` utilities and child selectors (`first:`, `last:`, `[&>*]:`) do not reach
+ * the editor. Put spacing on the editor's own `className` (e.g. `mt-16`) or use `gap` on the parent.
  */
 export const CodeEditorRoot = ({
   ref,

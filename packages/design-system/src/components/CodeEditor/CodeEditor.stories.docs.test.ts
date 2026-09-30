@@ -50,6 +50,12 @@ describe('CodeEditor Storybook docs', () => {
     }
   });
 
+  it('explains how to space editors around the display:contents wrapper', () => {
+    expect(description).toContain('`display: contents`');
+    expect(description).toContain('`gap`');
+    expect(description).toContain('`space-*`');
+  });
+
   it('includes the stories the E2E suite drives', () => {
     expect(storyExports.map(story => story.name)).toEqual(
       expect.arrayContaining(['EditingWorkflow', 'TabsKeepHistory', 'LongDocument']),
