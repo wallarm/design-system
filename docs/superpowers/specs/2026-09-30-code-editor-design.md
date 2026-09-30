@@ -169,7 +169,7 @@ export interface CodeEditorPosition {
 
 export interface CodeEditorDiagnostic {
   from: CodeEditorPosition;
-  /** Defaults to end of `from.line` */
+  /** Defaults to one character after `from` (a point at end of line); clamped to the document */
   to?: CodeEditorPosition;
   severity: 'error' | 'warning' | 'info';
   message: string;
