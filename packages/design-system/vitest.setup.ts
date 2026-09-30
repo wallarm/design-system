@@ -57,3 +57,41 @@ if (typeof window !== 'undefined' && !window.visualViewport) {
     dispatchEvent: () => true,
   };
 }
+
+// jsdom does not implement layout on Range. CodeMirror measures text through
+// Range#getClientRects / getBoundingClientRect (coordsAtPos, cursor drawing,
+// tooltips) and throws "getClientRects is not a function" without them.
+// Stub zero-size rects; layout-dependent behaviour is covered by Playwright E2E.
+if (typeof document !== 'undefined' && typeof document.createRange === 'function') {
+  const emptyRect = (): DOMRect =>
+    typeof DOMRect === 'function'
+      ? new DOMRect(0, 0, 0, 0)
+      : ({
+          x: 0,
+          y: 0,
+          width: 0,
+          height: 0,
+          top: 0,
+          right: 0,
+          bottom: 0,
+          left: 0,
+          toJSON: () => ({}),
+        } as DOMRect);
+
+  const emptyRectList = (): DOMRectList =>
+    ({
+      length: 0,
+      item: () => null,
+      [Symbol.iterator]: function* () {
+        yield* [] as DOMRect[];
+      },
+    }) as unknown as DOMRectList;
+
+  const rangePrototype = Object.getPrototypeOf(document.createRange()) as Range;
+  if (typeof rangePrototype.getClientRects !== 'function') {
+    rangePrototype.getClientRects = emptyRectList;
+  }
+  if (typeof rangePrototype.getBoundingClientRect !== 'function') {
+    rangePrototype.getBoundingClientRect = emptyRect;
+  }
+}
