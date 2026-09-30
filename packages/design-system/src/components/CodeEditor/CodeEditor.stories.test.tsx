@@ -68,6 +68,7 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
       'syntax-javascript',
       'syntax-typescript',
       'syntax-python',
+      'syntax-http',
     ],
   },
   ParityDefault: { editors: ['parity-default-editor'], snippets: ['parity-default-snippet'] },
@@ -82,6 +83,20 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
   ParityHttpPrism: {
     editors: ['parity-http-prism-editor'],
     snippets: ['parity-http-prism-snippet'],
+  },
+  ParityRanges: { editors: ['parity-ranges-editor'], snippets: ['parity-ranges-snippet'] },
+  ParityWrap: { editors: ['parity-wrap-editor'], snippets: ['parity-wrap-snippet'] },
+  ParitySizes: {
+    editors: ['parity-size-sm-editor', 'parity-size-md-editor', 'parity-size-lg-editor'],
+    snippets: ['parity-size-sm-snippet', 'parity-size-md-snippet', 'parity-size-lg-snippet'],
+  },
+  ParityChrome: {
+    editors: ['parity-chrome-header-editor', 'parity-chrome-floating-editor'],
+    snippets: ['parity-chrome-header-snippet', 'parity-chrome-floating-snippet'],
+  },
+  ParityShowMore: {
+    editors: ['parity-show-more-editor'],
+    snippets: ['parity-show-more-snippet'],
   },
   Diff: { editors: ['code-editor-diff'] },
   DiffWrapLines: { editors: ['code-editor-diff-wrap'] },
@@ -208,14 +223,37 @@ describe('CodeEditor stories', () => {
     expect(editor).toHaveAttribute('aria-readonly', 'true');
   });
 
+  it('ParityShowMore clamps both roots and shows the same Show more count', async () => {
+    const { ParityShowMore } = composed;
+    render(<ParityShowMore />);
+    await screen.findByTestId('parity-show-more-editor--editor', {}, ENGINE);
+
+    const snippetButton = screen.getByTestId('parity-show-more-snippet--show-more-button');
+    const editorButton = screen.getByTestId('parity-show-more-editor--show-more-button');
+    expect(snippetButton).toHaveTextContent('5');
+    expect(editorButton.textContent).toBe(snippetButton.textContent);
+  });
+
+  it('ParityChrome renders the same header tabs and actions in both roots', async () => {
+    const { ParityChrome } = composed;
+    render(<ParityChrome />);
+    await screen.findByTestId('parity-chrome-header-editor--editor', {}, ENGINE);
+
+    for (const id of ['parity-chrome-header-snippet', 'parity-chrome-header-editor']) {
+      expect(screen.getByTestId(`${id}--header`)).toHaveTextContent('Request');
+      expect(screen.getByTestId(`${id}--copy-button`)).toBeInTheDocument();
+    }
+  });
+
   it('SyntaxErrors reports syntax diagnostics under every editor', async () => {
     const { SyntaxErrors } = composed;
     render(<SyntaxErrors />);
 
-    for (const language of ['json', 'yaml', 'javascript', 'typescript', 'python']) {
+    for (const language of ['json', 'yaml', 'javascript', 'typescript', 'python', 'http']) {
       const count = screen.getByTestId(`syntax-${language}--count`);
       await waitFor(() => expect(count).not.toHaveTextContent(/^0 diagnostics$/), LINT);
     }
     expect(screen.getByTestId('syntax-json--count')).toHaveTextContent('1 diagnostic');
+    expect(screen.getByTestId('syntax-http--count')).toHaveTextContent('1 diagnostic');
   });
 });

@@ -69,8 +69,9 @@ function CodeEditorPage() {
       <VStack gap={16}>
         <Heading color='primary'>CodeEditor</Heading>
         <Text color='secondary'>
-          Bundle-measurement route: the editor engine is one lazy chunk loaded on first mount;
-          json-schema-library is a second chunk loaded only when a schema is attached.
+          Bundle-measurement route: the editor engine loads lazily on first mount (split into a
+          few chunks); json-schema-library is loaded only when a schema is attached, and
+          JS/TS/Python parsers only for those languages.
         </Text>
 
         <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>

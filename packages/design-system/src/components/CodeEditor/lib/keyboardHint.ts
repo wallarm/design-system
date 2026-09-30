@@ -3,4 +3,4 @@
  * `aria-describedby` on `CodeEditorContent` at that element's id.
  */
 export const CODE_EDITOR_KEYBOARD_HINT =
-  'Tab inserts indentation. Press Escape, then Tab, to move focus out of the editor.';
+  'Tab inserts indentation. Press Escape, then Tab, to move focus out of the editor, or press Ctrl+M (Alt+Shift+M on macOS) to switch Tab between indenting and moving focus.';

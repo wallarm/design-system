@@ -12,6 +12,7 @@ import {
   CodeSnippetLineNumbers,
   CodeSnippetRoot,
   CodeSnippetShowMoreButton,
+  type CodeSnippetSize,
   CodeSnippetTab,
   CodeSnippetTabs,
   CodeSnippetTitle,
@@ -38,7 +39,9 @@ const DESCRIPTION = [
   'Like the snippet, the editor sits inside a `display: contents` wrapper that keeps it mounted across fullscreen, so space editors with their own `className` (for example `mt-16`) or a `gap` on the parent — not `space-*`, `divide-*` or child selectors on the parent.',
   '`lines`, `folds`, `completions` and `schema` are compared by identity, so memoise them or hoist them to module constants — a new value on every render reconfigures the editor.',
   'Syntax errors are best-effort: JSON reports the `JSON.parse` message, JavaScript and TypeScript use Babel, YAML and Python use their Lezer parsers, which still flag a few valid Python forms such as `lambda a, /, b` and parenthesised `with` items.',
-  'Tab indents, so keyboard users leave with Escape, then Tab — point `aria-describedby` at text holding `CODE_EDITOR_KEYBOARD_HINT` to tell screen-reader users.',
+  '`lines` and `folds` stay on their line numbers while typing; to keep a decoration on a piece of text, recompute it from `value` (for example `useMemo(() => linesFor(value), [value])`, or a `folds` function such as `getHttpFolds`).',
+  'The editor injects `<style>` tags, so under a strict Content Security Policy pass `cspNonce`.',
+  'Tab indents, so keyboard users leave with Escape, then Tab, or press Ctrl+M (Alt+Shift+M on macOS) to switch Tab between indenting and moving focus — point `aria-describedby` at text holding `CODE_EDITOR_KEYBOARD_HINT` to tell screen-reader users.',
 ].join(' ');
 
 const meta = {
@@ -772,9 +775,25 @@ interface ParityPairProps {
   language: CodeEditorLanguage;
   lines?: Record<number, LineConfig>;
   folds?: FoldRegion[];
+  /** Initial wrapping for both (the wrap button toggles each one) */
+  wrapLines?: boolean;
+  size?: CodeSnippetSize;
+  maxLines?: number;
+  /** Shared chrome (header, tabs, actions), rendered before the content in both roots */
+  children?: ReactNode;
 }
 
-const ParityPair = ({ testId, code, language, lines, folds }: ParityPairProps) => (
+const ParityPair = ({
+  testId,
+  code,
+  language,
+  lines,
+  folds,
+  wrapLines,
+  size,
+  maxLines,
+  children,
+}: ParityPairProps) => (
   <VStack gap={16}>
     <VStack align='start' gap={4}>
       <span className='sb-annotation'>CodeSnippet</span>
@@ -784,8 +803,12 @@ const ParityPair = ({ testId, code, language, lines, folds }: ParityPairProps) =
           language={language}
           lines={lines}
           folds={folds}
+          wrapLines={wrapLines}
+          size={size}
+          maxLines={maxLines}
           data-testid={`${testId}-snippet`}
         >
+          {children}
           <CodeSnippetContent>
             <CodeSnippetLineNumbers />
             <CodeSnippetCode />
@@ -801,14 +824,41 @@ const ParityPair = ({ testId, code, language, lines, folds }: ParityPairProps) =
           language={language}
           lines={lines}
           folds={folds}
+          defaultWrapLines={wrapLines}
+          size={size}
+          maxLines={maxLines}
           readOnly
           data-testid={`${testId}-editor`}
         >
+          {children}
           <CodeEditorContent lineNumbers aria-label='Parity editor' />
         </CodeEditorRoot>
       </div>
     </VStack>
   </VStack>
+);
+
+/** Header with tabs, a title-less tab strip and header actions — the same element in both roots. */
+const PARITY_HEADER_CHROME = (
+  <CodeSnippetHeader>
+    <CodeSnippetTabs defaultValue='request'>
+      <CodeSnippetTab value='request'>Request</CodeSnippetTab>
+      <CodeSnippetTab value='response'>Response</CodeSnippetTab>
+    </CodeSnippetTabs>
+    <CodeSnippetActions>
+      <CodeSnippetWrapButton />
+      <CodeSnippetCopyButton />
+      <CodeSnippetFullscreenButton />
+    </CodeSnippetActions>
+  </CodeSnippetHeader>
+);
+
+/** Floating actions (no header) — the same element in both roots. */
+const PARITY_FLOATING_CHROME = (
+  <CodeSnippetActions>
+    <CodeSnippetWrapButton />
+    <CodeSnippetCopyButton />
+  </CodeSnippetActions>
 );
 
 /**
@@ -854,6 +904,54 @@ export const ParityHttpPrism: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadPrismAdapter}>
     <ParityPair testId='parity-http-prism' code={httpRequestCode} language='http' />
   </CodeSnippetAdapterProvider>
+);
+
+/**
+ * Parity check for `ranges`: the same bold, coloured spans inside the same tinted lines.
+ */
+export const ParityRanges: StoryFn<typeof meta> = () => (
+  <ParityPair testId='parity-ranges' code={rangesCode} language='text' lines={rangeLines} />
+);
+
+/**
+ * Parity check for wrapped lines: long lines break at the same points and line numbers stay on
+ * the first row of each wrapped line.
+ */
+export const ParityWrap: StoryFn<typeof meta> = () => (
+  <ParityPair testId='parity-wrap' code={longCode} language='text' wrapLines />
+);
+
+/**
+ * Parity check for the three sizes: the same font size, line height and gutter padding per size.
+ */
+export const ParitySizes: StoryFn<typeof meta> = () => (
+  <VStack gap={24}>
+    <ParityPair testId='parity-size-sm' code={bashCode} language='bash' size='sm' />
+    <ParityPair testId='parity-size-md' code={bashCode} language='bash' size='md' />
+    <ParityPair testId='parity-size-lg' code={bashCode} language='bash' size='lg' />
+  </VStack>
+);
+
+/**
+ * Parity check for the shared chrome: a header with tabs and actions, and floating actions
+ * without a header, sit in the same place with the same spacing.
+ */
+export const ParityChrome: StoryFn<typeof meta> = () => (
+  <VStack gap={24}>
+    <ParityPair testId='parity-chrome-header' code={sampleCode} language='text'>
+      {PARITY_HEADER_CHROME}
+    </ParityPair>
+    <ParityPair testId='parity-chrome-floating' code={sampleCode} language='text'>
+      {PARITY_FLOATING_CHROME}
+    </ParityPair>
+  </VStack>
+);
+
+/**
+ * Parity check for `maxLines`: the same clamped height and the same "Show N more lines" button.
+ */
+export const ParityShowMore: StoryFn<typeof meta> = () => (
+  <ParityPair testId='parity-show-more' code={showMoreCode} language='text' maxLines={7} />
 );
 
 // --- Languages ---
@@ -975,6 +1073,11 @@ const SYNTAX_ERROR_SAMPLES = [
   },
   { language: 'typescript', label: 'TypeScript', value: 'let limit: = 50;\n' },
   { language: 'python', label: 'Python', value: 'def active(:\n    pass\n' },
+  {
+    language: 'http',
+    label: 'HTTP',
+    value: 'POST /rules HTTP/1.1\nContent-Type: application/json\n\n{\n  "action": "block",\n}\n',
+  },
 ] as const satisfies readonly SyntaxErrorSample[];
 
 const SyntaxErrorExample = ({ sample }: { sample: SyntaxErrorSample }) => {
@@ -1004,9 +1107,9 @@ const SyntaxErrorExample = ({ sample }: { sample: SyntaxErrorSample }) => {
 };
 
 /**
- * Syntax errors for every language with a structure parser: JSON (and an HTTP JSON body) use the
- * precise `JSON.parse` message, YAML, JavaScript, TypeScript and Python report the parser's error
- * nodes. Hover an underline to read the message; the count below each editor comes from
+ * Syntax errors for every language with a structure parser: JSON and an HTTP JSON body use the
+ * precise `JSON.parse` message, JavaScript and TypeScript use Babel, YAML and Python report Lezer
+ * error nodes. Hover an underline to read the message; the count below each editor comes from
  * `onDiagnosticsChange`. Bash and plain text have no syntax diagnostics.
  */
 export const SyntaxErrors: StoryFn<typeof meta> = () => (

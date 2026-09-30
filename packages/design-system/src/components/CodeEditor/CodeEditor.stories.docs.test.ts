@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { CODE_EDITOR_KEYBOARD_HINT } from './lib/keyboardHint';
 
 const source = readFileSync(
   join(dirname(fileURLToPath(import.meta.url)), 'CodeEditor.stories.tsx'),
@@ -48,6 +49,24 @@ describe('CodeEditor Storybook docs', () => {
     for (const prop of ['`lines`', '`folds`', '`completions`', '`schema`']) {
       expect(description).toContain(prop);
     }
+  });
+
+  it('names the Tab focus toggle, the anchored-decorations recipe and the CSP nonce', () => {
+    expect(description).toContain('Ctrl+M');
+    expect(description).toContain('Alt+Shift+M');
+    expect(description).toContain('recompute it from `value`');
+    expect(description).toContain('`getHttpFolds`');
+    expect(description).toContain('`cspNonce`');
+    expect(CODE_EDITOR_KEYBOARD_HINT).toContain('Ctrl+M (Alt+Shift+M on macOS)');
+  });
+
+  it('documents SyntaxErrors per amendment A5 and includes an HTTP JSON body sample', () => {
+    const index = storyExports.find(story => story.name === 'SyntaxErrors')?.index ?? -1;
+    const jsdoc = lines.slice(Math.max(0, index - 8), index).join(' ');
+    expect(jsdoc).toContain('`JSON.parse`');
+    expect(jsdoc).toContain('Babel');
+    expect(jsdoc).toMatch(/YAML and Python .*Lezer/);
+    expect(source).toMatch(/language: 'http',\s*label: 'HTTP'/);
   });
 
   it('explains how to space editors around the display:contents wrapper', () => {
