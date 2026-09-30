@@ -59,6 +59,21 @@ describe('parseComponentProps', () => {
     expect(subNames).toContain('AlertTitle');
   });
 
+  it('classifies an aliased Props export (CodeEditorRootProps as CodeEditorProps) as the main props', () => {
+    const { mainProps, subComponents } = parseComponentProps(
+      project,
+      path.join(COMPONENTS_DIR, 'CodeEditor'),
+      'CodeEditor',
+    );
+
+    const mainNames = mainProps.map(p => p.name);
+    expect(mainNames).toEqual(expect.arrayContaining(['value', 'language', 'readOnly']));
+
+    const subNames = subComponents.map(s => s.name);
+    expect(subNames).toContain('CodeEditorContent');
+    expect(subNames.filter(name => name === 'CodeEditorRoot').length).toBeLessThanOrEqual(1);
+  });
+
   it('returns empty for non-existent component', () => {
     const { mainProps, subComponents } = parseComponentProps(
       project,
