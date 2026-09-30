@@ -195,3 +195,17 @@ describe('diffExtension — live updates', () => {
     expect(sticks[1]?.classList.contains(LINE_COLOR_STYLES.warning.border)).toBe(false);
   });
 });
+
+describe('diffExtension — theme', () => {
+  it('pads deleted rows like `.cm-line`, so their text lines up with the code', () => {
+    setup({ original: 'a\nold\nc', value: 'a\nc' });
+    const css = Array.from(document.querySelectorAll('style'))
+      .map(style => style.textContent ?? '')
+      .join('\n');
+    // `.cm-deletedLine` is not a `.cm-line`: it needs the same 12px right edge and 8px gutter gap.
+    expect(css).toMatch(/\.cm-deletedChunk \.cm-deletedLine \{padding: 0 12px;?\}/);
+    expect(css).toMatch(
+      /:has\(\.cm-gutters\) \.cm-deletedChunk \.cm-deletedLine \{padding-left: 8px;?\}/,
+    );
+  });
+});

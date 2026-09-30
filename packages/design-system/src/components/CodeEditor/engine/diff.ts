@@ -173,8 +173,13 @@ const diffTheme = EditorView.theme({
     fontWeight: '500',
     paddingLeft: '0',
   },
+  // `.cm-deletedLine` is not a `.cm-line`: mirror the editor theme's line paddings (12px right
+  // edge, 8px gap after the gutters) so deleted text lines up and the background fills the row.
   '& .cm-deletedChunk .cm-deletedLine': {
-    padding: '0',
+    padding: '0 12px',
+  },
+  '&:has(.cm-gutters) .cm-deletedChunk .cm-deletedLine': {
+    paddingLeft: '8px',
   },
   // Merge's own markers (tinted line backgrounds, underline gradients) are replaced.
   '&.cm-merge-b .cm-changedText, & .cm-deletedChunk .cm-deletedText, &.cm-merge-b .cm-deletedText':
