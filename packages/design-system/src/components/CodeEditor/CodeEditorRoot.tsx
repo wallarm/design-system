@@ -80,7 +80,11 @@ export interface CodeEditorRootProps
   original?: string;
   /** JSON Schema for the document (`json`) or the JSON body (`http`) */
   schema?: JsonSchema;
-  /** Consumer completion sources, added after the built-in ones */
+  /**
+   * Consumer completion sources, added after the built-in ones. Compared by identity: a new
+   * array reconfigures autocomplete and closes an open list, so keep it stable (module constant
+   * or `useMemo`).
+   */
   completions?: CodeEditorCompletionSource[];
   /** External diagnostics, merged with syntax and schema ones */
   diagnostics?: CodeEditorDiagnostic[];

@@ -24,6 +24,7 @@ import {
 import type { PortalRegistry } from '../lib/portalRegistry';
 import type { CodeEditorApi, CodeEditorLanguage } from '../types';
 import { adapterPainter } from './adapterPainter';
+import { completionExtension } from './completion';
 import { sanitizeContentAttributes } from './contentAttributes';
 import { diagnosticsExtension, jsonRegion } from './diagnostics';
 import { foldAllRegions, foldsExtension, getVisibleRowCount, unfoldAllRegions } from './folds';
@@ -175,7 +176,13 @@ const featureExtensions = (
           ),
     ];
   },
-  completion: () => [],
+  completion: () =>
+    completionExtension({
+      language: options.language,
+      schema: options.schema,
+      sources: options.completions,
+      startingLineNumber: options.startingLineNumber,
+    }),
   diff: () => [],
 });
 
