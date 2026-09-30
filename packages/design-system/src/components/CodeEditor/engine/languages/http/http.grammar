@@ -1,0 +1,40 @@
+// HTTP/1.x message grammar for CodeEditor (spec §7.4).
+// Structure only: colours come from the SyntaxAdapter painter, not from this grammar.
+// Line rules mirror CodeSnippet's getHttpFolds (lib/httpFolds.ts):
+//   - line 1 is always the start line, whatever it contains;
+//   - the first line after line 1 that is empty or only spaces/tabs separates headers from body;
+//   - Body is the rest of the document, blank lines included.
+// Regenerate with `pnpm generate:grammars` after editing; parser.ts and parser.terms.ts are committed.
+
+@top Message {
+  StartLine (nl Header)* (nl BlankLine? (nl Body?)?)?
+}
+
+// Tolerant: an empty or unrecognised first line still produces a StartLine node.
+StartLine { (RequestLine | StatusLine | StartLineText)? }
+
+RequestLine { Method sp Target (sp Version)? sp? }
+
+StatusLine { Version sp StatusCode (sp ReasonPhrase?)? }
+
+BlankLine { hws }
+
+// Leading whitespace (obs-fold continuation) and missing colons stay inside Header.
+Header { hws? (HeaderName (":" HeaderValue?)? | ":" HeaderValue?) }
+
+@tokens {
+  nl { "\n" }
+  sp { $[ \t]+ }
+  hws { $[ \t]+ }
+  Method { $[A-Z] $[A-Z_\-]* }
+  Target { ![ \t\n]+ }
+  Version { "HTTP/" ![ \t\n]* }
+  StatusCode { ![ \t\n]+ }
+  ReasonPhrase { ![\n]+ }
+  StartLineText { ![\n]+ }
+  HeaderName { ![:\n]+ }
+  HeaderValue { ![\n]+ }
+  Body { ![]+ }
+  @precedence { Version, Method, StartLineText }
+  @precedence { hws, HeaderName }
+}

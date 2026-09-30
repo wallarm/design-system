@@ -71,6 +71,7 @@
     "prepublishOnly": "prepare-publish",
     "postpublish": "restore-package",
     "generate-exports": "tsx scripts/generate-exports.ts",
+    "generate:grammars": "lezer-generator src/components/CodeEditor/engine/languages/http/http.grammar -o src/components/CodeEditor/engine/languages/http/parser.ts --typeScript",
     "publish:local": "pnpm build && yalc publish --push",
     "lint": "biome check",
     "lint:fix": "biome check --fix",
