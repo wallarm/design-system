@@ -29,7 +29,9 @@ export const SelectContent: FC<SelectContentProps> = ({
       asChild
     >
       <ScrollArea>
-        <ScrollAreaViewport>
+        {/* The viewport is tabbable only until it measures no overflow; as the initial focus it
+            would drop focus to <body> once its tabindex goes away. */}
+        <ScrollAreaViewport data-no-autofocus=''>
           <ScrollAreaContent className='flex flex-col gap-1'>
             {isEmpty ? <SelectEmptyState /> : children}
           </ScrollAreaContent>

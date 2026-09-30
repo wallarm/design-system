@@ -1033,6 +1033,16 @@ describe('Initial focus candidates', () => {
     expect(screen.getByTestId('type-filter--footer-clear')).toHaveAttribute('data-no-autofocus');
     await waitFor(() => expect(screen.getByTestId('type-filter--content')).toHaveFocus());
   });
+
+  // In a browser the ScrollArea viewport is tabbable until it measures no overflow and drops its
+  // tabindex; if Zag picks it as the initial focus, focus falls to <body> and the keyboard dies.
+  it('keeps the scroll viewport out of the initial focus', async () => {
+    render(<Harness />);
+    await userEvent.click(trigger());
+    expect(await screen.findByTestId('type-filter--list--viewport')).toHaveAttribute(
+      'data-no-autofocus',
+    );
+  });
 });
 
 describe('Refs on the group parts', () => {
