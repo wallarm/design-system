@@ -130,14 +130,16 @@ Every part follows the same rules:
 | `FileUploadItemGroup` | `ul` | `children: ReactNode \| ((file: File, index: number) => ReactNode)` | With a function child, it maps over the accepted files. Renders nothing when the list is empty. Layout: `flex flex-col gap-8`. Slot `item-group`. |
 | `FileUploadItem` | `li` | `file: File \| { name: string; size?: number }` (required), `description?: ReactNode`, `loading?: boolean`, `icon?: ReactNode` (default `File`), `children` = actions | Provides the item context (`file`, `loading`). While `loading`, it registers the lock with the root. Slot `item`; the name, description, and actions parts get `item-name`, `item-description`, `item-actions`. |
 | `FileUploadItemDeleteTrigger` | DS `Button` ghost/neutral/small, icon `X` | `ButtonProps`, `children?` (default `<X />`) | If the item's `file` is a `File` inside a root, it calls Ark `deleteFile(file)`. Otherwise it only runs the consumer's `onClick`. Default `aria-label`: `Delete {name}`, or `Cancel upload` while loading. Hidden when `readOnly`. Slot `item-delete-trigger`. |
-| `FileUploadItemReplaceTrigger` | DS `Button` ghost/neutral/small, icon `RefreshCcw` | `ButtonProps`, `children?` | In `single` mode it calls `openFilePicker()`, and the new file replaces the old one. With multiple files it opens a DS-owned per-item hidden `<input type=file accept=…>` (see below). Default `aria-label`: `Replace {name}`. Hidden when `readOnly` or the item is loading. Slot `item-replace-trigger`. |
+| `FileUploadItemReplaceTrigger` | DS `Button` ghost/neutral/small, icon `RefreshCcw` | `ButtonProps`, `children?` | In `single` mode it calls `openFilePicker()`, and the new file replaces the old one. With multiple files it opens a DS-owned per-item hidden `<input type=file accept=…>` (see below). Default `aria-label`: `Replace {name}`. Hidden when `readOnly` or the item is loading. Slot `item-replace-trigger`. Multiple mode pre-validates the replacement with `lib/checkFile` (type, size, custom) before `setFiles`, because `setFiles` re-validates the whole list and would drop the original on failure; its rejections are held in DS state and cleared on the next accept or delete. |
 | `FileUploadItemAction` | DS `Button` ghost/neutral/small | `ButtonProps` | Generic icon action such as Download. It has no built-in behaviour. It is disabled when the root is `disabled`, and stays enabled when the root is `readOnly`. Slot `item-action`. |
+
+Delete, Replace, and Action each show a tooltip with the short action label (Figma): `Delete` (`Cancel upload` while loading), `Replace`, and the Action's string `aria-label` (no tooltip when it has none). A disabled action shows none.
 
 How the multi-file per-item replace input behaves:
 
-- On `change`, it calls `setFiles(accepted.map(f => f === target ? picked : f))`.
-- Ark re-validates the whole list.
-- An invalid replacement ends up in the rejections, and the original file stays in the list.
+- On `change`, it first validates the picked file with `lib/checkFile` (type, size, custom).
+- If valid, it calls `setFiles(accepted.map(f => f === target ? picked : f))`.
+- If invalid, it reports the rejection to DS state and never calls `setFiles`, so the original file stays in the list. `setFiles` re-validates the whole list and would drop the original on failure.
 
 Exported types:
 
@@ -212,7 +214,7 @@ When loading, the name and icon switch to `text-text-disable-primary` and a `Loa
 
 - **Dropzone:** `role=button`, `tabIndex=0`, and Enter/Space open the picker (Ark). Its accessible name comes from `aria-labelledby` = [Field label id, own text id], which replaces Ark's default `"dropzone"`. It gets `aria-disabled` when disabled or locked, and `aria-describedby` points to the error when there are rejections.
 - **Trigger:** a native button with visible text. It gets `aria-describedby` to the error when there are rejections.
-- **Icon actions:** have default `aria-label`s (§4), which the consumer can override.
+- **Icon actions:** have default `aria-label`s (§4), which the consumer can override. Row actions show a tooltip with the short verb; the accessible name stays the full `aria-label`.
 - **Truncated names:** the full name appears in a tooltip, and the `li` stays readable in full by screen readers.
 - **FileUploadError:** `role=alert`, so new rejections are announced.
 
