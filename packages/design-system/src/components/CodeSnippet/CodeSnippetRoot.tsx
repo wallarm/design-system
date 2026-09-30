@@ -60,10 +60,11 @@ const EMPTY_LINES: Record<number, LineConfig> = {};
 /**
  * Code block with syntax highlighting, actions, line numbers, folding, and maxLines collapse.
  *
- * Layout: the root renders inside a `display: contents` wrapper (`data-slot='code-snippet-frame'`,
- * the persistent fullscreen portal host), so a parent's `space-*` / `divide-*` utilities and child
- * selectors (`first:`, `last:`, `[&>*]:`) reach the wrapper, not the snippet. Put spacing on the
- * snippet's own `className` (e.g. `mt-16`) or use `gap` on the parent.
+ * @remarks Layout: the root renders inside a `display: contents` wrapper
+ * (`data-slot='code-snippet-frame'`, the persistent fullscreen portal host), so a parent's
+ * `space-*` / `divide-*` utilities and child selectors (`first:`, `last:`, `[&>*]:`) reach the
+ * wrapper, not the snippet. Put spacing on the snippet's own `className` (e.g. `mt-16`) or use
+ * `gap` on the parent.
  */
 export const CodeSnippetRoot = <TLanguage extends string = string>({
   code,
