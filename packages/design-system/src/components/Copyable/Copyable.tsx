@@ -14,8 +14,11 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { CopyableProvider } from './CopyableContext';
 
 export interface CopyableProps {
-  /** The text to copy to the clipboard. */
-  text: string;
+  /**
+   * The text to copy to the clipboard. Pass a function to read the text
+   * lazily at click time (e.g. the live document of an editor).
+   */
+  text: string | (() => string);
   /**
    * Show a tooltip with copy feedback.
    *
@@ -65,7 +68,7 @@ export const Copyable: FC<CopyableProps> = ({
 
   const handleClick = useCallback(
     (_event: MouseEvent) => {
-      copy(text);
+      copy(typeof text === 'function' ? text() : text);
       onCopied?.();
 
       if (tooltip) {
