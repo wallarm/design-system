@@ -1,7 +1,6 @@
 import type { HTMLAttributes, ReactNode, Ref } from 'react';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { cva, type VariantProps } from 'class-variance-authority';
+import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { copyText } from '../../utils/copyText';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
@@ -18,38 +17,11 @@ import {
   type LineConfig,
 } from './CodeSnippetContext';
 import { CodeSnippetShowMoreButton } from './CodeSnippetShowMoreButton';
+import { codeSnippetRootVariants } from './classes';
 import { useAdapter } from './hooks';
+import { ChromeFrame } from './internal/ChromeFrame';
 import { buildDisplayItems, type FoldRegion, validateFolds } from './lib/foldUtils';
 import { getHiddenLineCount, hasExplicitShowMoreButton, isClamped } from './lib/showMore';
-
-const codeSnippetRootVariants = cva(
-  [
-    'relative',
-    'code-snippet-bg',
-    'rounded-6',
-    'font-mono',
-    'text-syntax-no-syntax',
-    'overflow-hidden',
-    'flex flex-col',
-    '[&::selection]:bg-[var(--color-syntax-highlight-selected-highlight)]',
-    '[&::selection]:text-[var(--color-syntax-highlight-selected-code)]',
-    '[&_*::selection]:bg-[var(--color-syntax-highlight-selected-highlight)]',
-    '[&_*::selection]:text-[var(--color-syntax-highlight-selected-code)]',
-    '[&>[data-slot=code-snippet-actions]]:absolute [&>[data-slot=code-snippet-actions]]:right-0 [&>[data-slot=code-snippet-actions]]:top-0 [&>[data-slot=code-snippet-actions]]:z-30 [&>[data-slot=code-snippet-actions]]:p-6 [&>[data-slot=code-snippet-actions]]:rounded-br-6 [&>[data-slot=code-snippet-actions]]:rounded-tl-6',
-  ].join(' '),
-  {
-    variants: {
-      size: {
-        sm: 'text-xs leading-sm',
-        md: 'text-sm',
-        lg: 'text-base leading-sm',
-      },
-    },
-    defaultVariants: {
-      size: 'sm',
-    },
-  },
-);
 
 type CodeSnippetRootVariantProps = VariantProps<typeof codeSnippetRootVariants>;
 
@@ -100,6 +72,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   onCopy,
   className,
   children,
+  ref,
   'data-testid': testId,
   ...props
 }: CodeSnippetRootProps<TLanguage>) => {
@@ -148,16 +121,6 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       cancelled = true;
     };
   }, [normalizedCode, language, adapter]);
-
-  // Close fullscreen on Escape
-  useEffect(() => {
-    if (!isFullscreen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsFullscreen(false);
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen]);
 
   const copyToClipboard = useCallback(async () => {
     await copyText(code);
@@ -290,36 +253,25 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   );
 
   const snippet = (
-    <div
+    <ChromeFrame
       data-slot='code-snippet'
       data-testid={testId}
-      className={cn(
-        codeSnippetRootVariants({ size }),
-        isFullscreen ? 'fixed inset-16 z-50' : className,
-      )}
-      {...(!isFullscreen ? props : {})}
+      {...props}
+      ref={ref}
+      className={cn(codeSnippetRootVariants({ size }), className)}
+      isFullscreen={isFullscreen}
+      setIsFullscreen={setIsFullscreen}
     >
       {children}
       {maxLines > 0 && !hasExplicitShowMore && <CodeSnippetShowMoreButton />}
-    </div>
+    </ChromeFrame>
   );
 
   return (
     <TestIdProvider value={testId}>
       <CodeSnippetChromeContext.Provider value={chromeValue}>
         <CodeSnippetContext.Provider value={contextValue as unknown as CodeSnippetContextValue}>
-          {isFullscreen
-            ? createPortal(
-                <>
-                  <div
-                    className='fixed inset-0 z-40 backdrop-blur-xs bg-component-dialog-overlay'
-                    onClick={() => setIsFullscreen(false)}
-                  />
-                  {snippet}
-                </>,
-                document.body,
-              )
-            : snippet}
+          {snippet}
         </CodeSnippetContext.Provider>
       </CodeSnippetChromeContext.Provider>
     </TestIdProvider>
