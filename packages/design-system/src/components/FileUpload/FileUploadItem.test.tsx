@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FileUpload } from './FileUpload';
 import { byTestId, makeFile, pick, queryByTestId } from './FileUpload.test.helpers';
 import { FileUploadItem } from './FileUploadItem';
@@ -254,5 +254,69 @@ describe('FileUpload — row actions', () => {
     expect(byTestId('fu--item-delete-trigger')).toBeDisabled();
     expect(byTestId('fu--item-replace-trigger')).toBeDisabled();
     expect(byTestId('fu--item-action')).toBeDisabled();
+  });
+});
+
+describe('FileUpload — row action tooltips', () => {
+  afterEach(() => vi.restoreAllMocks());
+
+  it('shows "Replace" and "Delete" tooltips on hover, keeping the button test ids', async () => {
+    const { container } = render(<Uploader />);
+    pick(container, makeFile('a.wasm'));
+    await waitForRows(1);
+
+    const replace = byTestId('fu--item-replace-trigger');
+    expect(replace.tagName).toBe('BUTTON');
+    expect(replace).toHaveAccessibleName('Replace a.wasm');
+    await userEvent.hover(replace);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Replace');
+    await userEvent.unhover(replace);
+    await waitFor(() => expect(screen.queryByRole('tooltip')).toBeNull());
+
+    const remove = byTestId('fu--item-delete-trigger');
+    expect(remove.tagName).toBe('BUTTON');
+    expect(remove).toHaveAccessibleName('Delete a.wasm');
+    await userEvent.hover(remove);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(/^Delete$/);
+  });
+
+  it('a loading row Delete tooltip reads "Cancel upload"', async () => {
+    render(
+      <FileUpload data-testid='fu'>
+        <FileUploadItemGroup>
+          <FileUploadItem file={{ name: 'up.wasm' }} loading>
+            <FileUploadItemDeleteTrigger />
+          </FileUploadItem>
+        </FileUploadItemGroup>
+      </FileUpload>,
+    );
+    await userEvent.hover(byTestId('fu--item-delete-trigger'));
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Cancel upload');
+  });
+
+  it('Action shows its string aria-label as a tooltip', async () => {
+    render(
+      <FileUploadItem file={{ name: 'p.wasm' }}>
+        <FileUploadItemAction aria-label='Download p.wasm'>
+          <span />
+        </FileUploadItemAction>
+      </FileUploadItem>,
+    );
+    const action = screen.getByRole('button', { name: 'Download p.wasm' });
+    await userEvent.hover(action);
+    expect(await screen.findByRole('tooltip')).toHaveTextContent('Download p.wasm');
+  });
+
+  it('Action without a string aria-label renders no tooltip', async () => {
+    render(
+      <FileUploadItem file={{ name: 'p.wasm' }}>
+        <FileUploadItemAction data-testid='bare'>
+          <span />
+        </FileUploadItemAction>
+      </FileUploadItem>,
+    );
+    await userEvent.hover(byTestId('bare'));
+    await new Promise(resolve => setTimeout(resolve, 600));
+    expect(screen.queryByRole('tooltip')).toBeNull();
   });
 });

@@ -2,6 +2,7 @@ import { type ChangeEvent, type FC, type MouseEvent, useRef } from 'react';
 import { RefreshCcw } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useRequiredFileUploadRootContext } from './FileUploadContext';
 import { useRequiredFileUploadItemContext } from './FileUploadItemContext';
 import { checkFile } from './lib';
@@ -57,19 +58,26 @@ export const FileUploadItemReplaceTrigger: FC<FileUploadItemReplaceTriggerProps>
 
   return (
     <>
-      <Button
-        variant='ghost'
-        color='neutral'
-        size='small'
-        aria-label={ariaLabel ?? `Replace ${item.file.name}`}
-        {...props}
-        data-slot='file-upload-item-replace-trigger'
-        data-testid={testId}
-        disabled={disabled || root.disabled}
-        onClick={handleClick}
-      >
-        {children ?? <RefreshCcw />}
-      </Button>
+      <Tooltip positioning={{ placement: 'top' }}>
+        <TooltipTrigger asChild data-testid={testId}>
+          <Button
+            variant='ghost'
+            color='neutral'
+            size='small'
+            aria-label={ariaLabel ?? `Replace ${item.file.name}`}
+            {...props}
+            data-slot='file-upload-item-replace-trigger'
+            data-testid={testId}
+            disabled={disabled || root.disabled}
+            onClick={handleClick}
+          >
+            {children ?? <RefreshCcw />}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent data-testid={testId ? `${testId}--tooltip` : undefined}>
+          Replace
+        </TooltipContent>
+      </Tooltip>
       {root.single ? null : (
         <input
           ref={inputRef}

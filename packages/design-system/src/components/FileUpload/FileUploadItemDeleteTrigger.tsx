@@ -2,6 +2,7 @@ import type { FC, MouseEvent } from 'react';
 import { X } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { useFileUploadRootContext } from './FileUploadContext';
 import { useRequiredFileUploadItemContext } from './FileUploadItemContext';
 
@@ -36,19 +37,26 @@ export const FileUploadItemDeleteTrigger: FC<FileUploadItemDeleteTriggerProps> =
   };
 
   return (
-    <Button
-      variant='ghost'
-      color='neutral'
-      size='small'
-      aria-label={ariaLabel ?? (item.loading ? 'Cancel upload' : `Delete ${item.file.name}`)}
-      {...props}
-      data-slot='file-upload-item-delete-trigger'
-      data-testid={testId}
-      disabled={disabled || root?.disabled}
-      onClick={handleClick}
-    >
-      {children ?? <X />}
-    </Button>
+    <Tooltip positioning={{ placement: 'top' }}>
+      <TooltipTrigger asChild data-testid={testId}>
+        <Button
+          variant='ghost'
+          color='neutral'
+          size='small'
+          aria-label={ariaLabel ?? (item.loading ? 'Cancel upload' : `Delete ${item.file.name}`)}
+          {...props}
+          data-slot='file-upload-item-delete-trigger'
+          data-testid={testId}
+          disabled={disabled || root?.disabled}
+          onClick={handleClick}
+        >
+          {children ?? <X />}
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent data-testid={testId ? `${testId}--tooltip` : undefined}>
+        {item.loading ? 'Cancel upload' : 'Delete'}
+      </TooltipContent>
+    </Tooltip>
   );
 };
 
