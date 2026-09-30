@@ -1,5 +1,5 @@
-import type { HTMLAttributes, ReactElement, ReactNode, Ref } from 'react';
-import { Children, isValidElement, useCallback, useEffect, useMemo, useState } from 'react';
+import type { HTMLAttributes, ReactNode, Ref } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { cva, type VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
@@ -8,15 +8,19 @@ import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { plainAdapter } from './adapters/plain';
 import type { SyntaxAdapter, Token } from './adapters/types';
 import {
+  CodeSnippetChromeContext,
+  type CodeSnippetChromeContextValue,
+} from './CodeSnippetChromeContext';
+import {
   CodeSnippetContext,
   type CodeSnippetContextValue,
   type CodeSnippetSize,
   type LineConfig,
-  MIN_HIDDEN_LINES_THRESHOLD,
 } from './CodeSnippetContext';
 import { CodeSnippetShowMoreButton } from './CodeSnippetShowMoreButton';
 import { useAdapter } from './hooks';
 import { buildDisplayItems, type FoldRegion, validateFolds } from './lib/foldUtils';
+import { getHiddenLineCount, hasExplicitShowMoreButton, isClamped } from './lib/showMore';
 
 const codeSnippetRootVariants = cva(
   [
@@ -80,10 +84,6 @@ export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippe
   };
 
 const EMPTY_LINES: Record<number, LineConfig> = {};
-
-const isCodeSnippetShowMoreButton = (child: ReactNode): child is ReactElement =>
-  isValidElement(child) &&
-  (child.type as { displayName?: string })?.displayName === CodeSnippetShowMoreButton.displayName;
 
 /**
  * Code block with syntax highlighting, actions, line numbers, folding, and maxLines collapse.
@@ -164,6 +164,12 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     onCopy?.(code);
   }, [code, onCopy]);
 
+  const getCode = useCallback(() => code, [code]);
+
+  const notifyCopied = useCallback(() => {
+    onCopy?.(code);
+  }, [code, onCopy]);
+
   const totalLines = tokens?.length ?? code.split('\n').length;
 
   const validatedFolds = useMemo(
@@ -205,13 +211,14 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     [totalLines, validatedFolds, collapsedFolds, startingLineNumber],
   );
 
-  const hasExplicitShowMoreButton = Children.toArray(children).some(isCodeSnippetShowMoreButton);
+  const hasExplicitShowMore = hasExplicitShowMoreButton(children);
 
-  const visibleDisplayItems = useMemo(() => {
-    const hiddenRows = displayItems.length - maxLines;
-    const shouldClip = maxLines > 0 && !isExpanded && hiddenRows >= MIN_HIDDEN_LINES_THRESHOLD;
-    return shouldClip ? displayItems.slice(0, maxLines) : displayItems;
-  }, [displayItems, maxLines, isExpanded]);
+  const hiddenLineCount = getHiddenLineCount(displayItems.length, maxLines);
+
+  const visibleDisplayItems = useMemo(
+    () => (isClamped(hiddenLineCount, isExpanded) ? displayItems.slice(0, maxLines) : displayItems),
+    [displayItems, hiddenLineCount, maxLines, isExpanded],
+  );
 
   const contextValue = useMemo<CodeSnippetContextValue<TLanguage>>(
     () => ({
@@ -265,6 +272,23 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     ],
   );
 
+  const chromeValue = useMemo<CodeSnippetChromeContextValue>(
+    () => ({
+      size: (size ?? 'sm') as CodeSnippetSize,
+      getCode,
+      notifyCopied,
+      wrapLines,
+      setWrapLines,
+      isFullscreen,
+      setIsFullscreen,
+      maxLines,
+      isExpanded,
+      setIsExpanded,
+      hiddenLineCount,
+    }),
+    [size, getCode, notifyCopied, wrapLines, isFullscreen, maxLines, isExpanded, hiddenLineCount],
+  );
+
   const snippet = (
     <div
       data-slot='code-snippet'
@@ -276,26 +300,28 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
       {...(!isFullscreen ? props : {})}
     >
       {children}
-      {maxLines > 0 && !hasExplicitShowMoreButton && <CodeSnippetShowMoreButton />}
+      {maxLines > 0 && !hasExplicitShowMore && <CodeSnippetShowMoreButton />}
     </div>
   );
 
   return (
     <TestIdProvider value={testId}>
-      <CodeSnippetContext.Provider value={contextValue as unknown as CodeSnippetContextValue}>
-        {isFullscreen
-          ? createPortal(
-              <>
-                <div
-                  className='fixed inset-0 z-40 backdrop-blur-xs bg-component-dialog-overlay'
-                  onClick={() => setIsFullscreen(false)}
-                />
-                {snippet}
-              </>,
-              document.body,
-            )
-          : snippet}
-      </CodeSnippetContext.Provider>
+      <CodeSnippetChromeContext.Provider value={chromeValue}>
+        <CodeSnippetContext.Provider value={contextValue as unknown as CodeSnippetContextValue}>
+          {isFullscreen
+            ? createPortal(
+                <>
+                  <div
+                    className='fixed inset-0 z-40 backdrop-blur-xs bg-component-dialog-overlay'
+                    onClick={() => setIsFullscreen(false)}
+                  />
+                  {snippet}
+                </>,
+                document.body,
+              )
+            : snippet}
+        </CodeSnippetContext.Provider>
+      </CodeSnippetChromeContext.Provider>
     </TestIdProvider>
   );
 };
