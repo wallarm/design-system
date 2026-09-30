@@ -333,6 +333,7 @@ export {
   fileUploadDropzoneVariants,
   fileUploadItemVariants,
   fileUploadVariants,
+  useFilePreviewUrl,
 } from './components/FileUpload';
 export {
   FilterDropdown,
