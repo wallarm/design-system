@@ -122,6 +122,16 @@ const toCompletion = (item: CodeEditorCompletion): Completion => ({
   type: item.kind === undefined ? undefined : KIND_TO_TYPE[item.kind],
 });
 
+let reported = false;
+const reportSourceError = (error: unknown): null => {
+  if (!reported) {
+    reported = true;
+    // biome-ignore lint/suspicious/noConsole: surfaced once; a failing consumer source is ignored
+    console.error('[CodeEditor] a completion source failed', error);
+  }
+  return null;
+};
+
 /** Adapts a public `CodeEditorCompletionSource` to a CodeMirror `CompletionSource`. */
 const adaptSource = (
   source: CodeEditorCompletionSource,
@@ -132,8 +142,13 @@ const adaptSource = (
     const from = completionWord(ctx).from;
     const finish = (items: CodeEditorCompletion[] | null): CompletionResult | null =>
       items && items.length > 0 ? { from, options: items.map(toCompletion) } : null;
-    const result = source(buildCompletionContext(ctx, language, startingLineNumber));
-    return result instanceof Promise ? result.then(finish) : finish(result);
+    // A failing consumer source must not take down the plugin or close the list for others.
+    try {
+      const result = source(buildCompletionContext(ctx, language, startingLineNumber));
+      return Promise.resolve(result).then(finish, reportSourceError);
+    } catch (error) {
+      return reportSourceError(error);
+    }
   };
 };
 

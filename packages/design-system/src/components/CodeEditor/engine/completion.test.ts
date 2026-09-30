@@ -192,4 +192,31 @@ describe('completionExtension', () => {
       'aria-selected:bg-states-primary-hover!',
     );
   });
+
+  it('keeps built-in results when a consumer source throws synchronously', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const throwing: CodeEditorCompletionSource = () => {
+      throw new Error('boom');
+    };
+    const view = mount('PO|', { language: 'http', sources: [throwing] });
+    expect(await openCompletions(view)).toContain('POST');
+    spy.mockRestore();
+  });
+
+  it('keeps built-in results when a consumer source rejects', async () => {
+    const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const rejecting: CodeEditorCompletionSource = () => Promise.reject(new Error('nope'));
+    const view = mount('PO|', { language: 'http', sources: [rejecting] });
+    expect(await openCompletions(view)).toContain('POST');
+    spy.mockRestore();
+  });
+
+  it('closes the open list on Escape and prevents the default', async () => {
+    const view = mount('PO|', { language: 'http' });
+    await openCompletions(view);
+    const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
+    view.contentDOM.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(true);
+    await vi.waitFor(() => expect(completionStatus(view.state)).toBeNull());
+  });
 });

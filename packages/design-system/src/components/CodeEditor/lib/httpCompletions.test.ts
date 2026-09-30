@@ -194,6 +194,12 @@ describe('httpCompletions', () => {
       ).toEqual(['charset=utf-8']);
     });
 
+    it('does not re-offer charset after `charset=` or when already present', () => {
+      const ct = (doc: string) => valueContext(doc, 'Content-Type', true);
+      expect(run(ct('POST / HTTP/1.1\nContent-Type: text/plain; charset=|'))).toBeNull();
+      expect(run(ct('POST / HTTP/1.1\nContent-Type: text/plain; charset=utf-8; |'))).toBeNull();
+    });
+
     it('offers Authorization schemes with a trailing space', () => {
       const items = run(valueContext('GET / HTTP/1.1\nAuthorization: Be|', 'Authorization')) ?? [];
       expect(items).toContainEqual(

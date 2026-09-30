@@ -124,7 +124,10 @@ const headerValueCompletions = (
   const valueSoFar = before.slice(before.indexOf(':') + 1);
   const typedBeforeWord = valueSoFar.slice(0, valueSoFar.length - ctx.word.text.length);
 
+  // After `key=` the user is typing a parameter value; never re-offer one.
+  if (before.slice(0, before.length - ctx.word.text.length).endsWith('=')) return null;
   if (MEDIA_TYPE_HEADERS.has(name) && typedBeforeWord.includes(';')) {
+    if (/;\s*charset\s*=/i.test(typedBeforeWord)) return null;
     return valueCompletions(HTTP_MEDIA_TYPE_PARAMETERS);
   }
   if (typedBeforeWord.trim() !== '') {
