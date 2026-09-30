@@ -41,6 +41,20 @@ describe('FileUpload — consumer aria on the pickers', () => {
     expect(byTestId('fu--trigger')).toHaveAttribute('aria-describedby', `wasm-hint ${error.id}`);
   });
 
+  it('asChild Trigger merges a consumer aria-describedby with the error link', async () => {
+    const { container } = render(
+      <FileUpload data-testid='fu' accept='.wasm'>
+        <FileUploadTrigger asChild aria-describedby='avatar-hint'>
+          <button type='button' aria-label='Change avatar' />
+        </FileUploadTrigger>
+        <FileUploadError />
+      </FileUpload>,
+    );
+    expect(byTestId('fu--trigger')).toHaveAttribute('aria-describedby', 'avatar-hint');
+    const error = await reject(container);
+    expect(byTestId('fu--trigger')).toHaveAttribute('aria-describedby', `avatar-hint ${error.id}`);
+  });
+
   it('a consumer aria-label names the Dropzone (the default aria-labelledby steps aside)', () => {
     render(
       <FileUpload data-testid='fu'>

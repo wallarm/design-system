@@ -269,3 +269,76 @@ describe('FileUpload — drag and drop', () => {
     expect(screen.getAllByTestId('fu--item')).toHaveLength(2);
   });
 });
+
+describe('FileUploadTrigger asChild', () => {
+  it('makes the child the trigger: no Button, attributes merged, picker opens', async () => {
+    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const onClick = vi.fn();
+    render(
+      <FileUpload data-testid='fu'>
+        <FileUploadTrigger asChild data-analytics-id='AVATAR_PICK' variant='secondary' size='small'>
+          <button type='button' aria-label='Change avatar' onClick={onClick} />
+        </FileUploadTrigger>
+      </FileUpload>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Change avatar' });
+    expect(trigger).toHaveAttribute('data-testid', 'fu--trigger');
+    expect(trigger).toHaveAttribute('data-slot', 'file-upload-trigger');
+    expect(trigger).toHaveAttribute('data-analytics-id', 'AVATAR_PICK');
+    expect(trigger).not.toHaveAttribute('variant');
+    expect(trigger).not.toHaveAttribute('size');
+    expect(trigger.className).not.toMatch(/bg-/);
+    await userEvent.click(trigger);
+    expect(onClick).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(click).toHaveBeenCalled());
+  });
+
+  it('is blocked while a row is loading and when disabled', async () => {
+    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const { unmount } = render(
+      <FileUpload data-testid='fu' maxFiles={3}>
+        <FileUploadTrigger asChild>
+          <button type='button' aria-label='Change avatar' />
+        </FileUploadTrigger>
+        <FileUploadItemGroup>
+          <FileUploadItem file={{ name: 'up.png' }} loading />
+        </FileUploadItemGroup>
+      </FileUpload>,
+    );
+    expect(byTestId('fu--trigger')).toBeDisabled();
+    unmount();
+    render(
+      <FileUpload data-testid='fu'>
+        <FileUploadTrigger asChild disabled>
+          <button type='button' aria-label='Change avatar' />
+        </FileUploadTrigger>
+      </FileUpload>,
+    );
+    expect(byTestId('fu--trigger')).toBeDisabled();
+    await userEvent.click(byTestId('fu--trigger'));
+    await nextFrame();
+    expect(click).not.toHaveBeenCalled();
+  });
+
+  it('renders nothing when read-only', () => {
+    render(
+      <FileUpload data-testid='fu' readOnly>
+        <FileUploadTrigger asChild>
+          <button type='button' aria-label='Change avatar' />
+        </FileUploadTrigger>
+      </FileUpload>,
+    );
+    expect(queryByTestId('fu--trigger')).toBeNull();
+  });
+
+  it('renders exactly as before without asChild', () => {
+    render(
+      <FileUpload data-testid='fu'>
+        <FileUploadTrigger />
+      </FileUpload>,
+    );
+    const trigger = screen.getByRole('button', { name: 'Select file' });
+    expect(trigger).toHaveAttribute('data-slot', 'file-upload-trigger');
+    expect(trigger.querySelector('svg')).not.toBeNull();
+  });
+});
