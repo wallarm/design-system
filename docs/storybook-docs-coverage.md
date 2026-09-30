@@ -42,7 +42,7 @@ check**, not a queue:
 
 ## Snapshot
 
-- **96 written to the standard · 0 left**, across 96 story pages. Every folder is complete.
+- **96 written to the standard · 1 left** (`FilterDropdown`, new on `feat/WDS-180`), across 97 story pages.
 - Levelling was usually cutting, not filling — and often correcting. Five pages
   claimed behaviour their own code contradicted: `Slider`, `Dialog`,
   `CodeSnippet` (its `Sizes` story labelled the wrong default), `BarList`
@@ -91,6 +91,7 @@ check**, not a queue:
 | ✅ | Inputs/Checkbox | 8 | 8 | `components/Checkbox/Checkbox.stories.tsx` |
 | ✅ | Inputs/Field | 9 | 9 | `components/Field/Field.stories.tsx` |
 | ✅ | Inputs/FileUpload | 13 | 13 | `components/FileUpload/FileUpload.stories.tsx` |
+| ☐ | Inputs/FilterDropdown | 10 | 10 | `components/FilterDropdown/FilterDropdown.stories.tsx` |
 | ✅ | Inputs/InlineEdit | 14 | 14 | `components/InlineEdit/InlineEdit.stories.tsx` |
 | ✅ | Inputs/Input | 6 | 6 | `components/Input/Input.stories.tsx` |
 | ✅ | Inputs/InputGroup | 8 | 8 | `components/InputGroup/InputGroup.stories.tsx` |
