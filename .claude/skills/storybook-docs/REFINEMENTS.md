@@ -62,3 +62,8 @@ Keep the three parking lots distinct, because mixing them loses things:
   and the failure surfaces only as `Unable to index …` in Storybook's own output —
   the rendered page 404s with no error on it. Biome's `check` did not catch it
   either. Found on `SimpleCharts/Overview`.
+- Step 5 should give the headless URL for the page: the Overview entry's id is
+  `<title-kebab>--overview` (not `--docs`), e.g.
+  `iframe.html?id=inputs-fileupload--overview&viewMode=docs`. Also, `pnpm typecheck`
+  is a no-op in design-system; use `npx tsc -p tsconfig.storybook.json --noEmit`.
+  Found on `FileUpload`.

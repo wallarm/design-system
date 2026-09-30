@@ -15,8 +15,8 @@ import { FileUploadTrigger } from './FileUploadTrigger';
 import { formatFileSize } from './lib';
 
 const DESCRIPTION = [
-  'Attaches files to a form: drop them on an Area or pick them with a button, and the type and size are checked before anything is sent.',
-  'Picking never uploads — files are held until the form is saved, and the product marks a row `loading` while it sends it. Reach for `Input` instead when the value is a path or URL, not a file.',
+  'Attaches files to a form and checks their type, size and count before accepting them — the drop Area when attaching is the main task on the screen, the "Select file" button when space is tight.',
+  'Picking never uploads: files travel with the form when it is saved, and the product marks a row `loading` while it sends one.',
 ].join(' ');
 
 const MB = 1024 ** 2;
@@ -63,7 +63,7 @@ const meta = {
 
 export default meta;
 
-/** The drop Area — the picker to use when attaching a file is the main task. Click anywhere or drop. */
+/** The drop Area: click anywhere on it or drop files onto it, and from the keyboard Tab reaches it and Enter opens the file dialog. */
 export const Basic: StoryFn<FileUploadProps> = args => (
   <FileUpload data-testid='file-upload' {...args}>
     <FileUploadDropzone data-analytics-id='FILE_UPLOAD_DROPZONE' />
@@ -72,7 +72,7 @@ export const Basic: StoryFn<FileUploadProps> = args => (
   </FileUpload>
 );
 
-/** The compact picker for tight spaces — the same behaviour behind a "Select file" button. */
+/** The same picking and checks behind a "Select file" button that hugs its label, for when a 96px Area would crowd the form. */
 export const ButtonTrigger: StoryFn<FileUploadProps> = args => (
   <FileUpload data-testid='file-upload' {...args}>
     <FileUploadTrigger />
@@ -99,7 +99,7 @@ export const InField: StoryFn<FileUploadProps> = args => (
   </Field>
 );
 
-/** With `maxFiles` above one the picker stays, and each file stacks below it. */
+/** With `maxFiles` above one the picker stays and disables once the limit is reached, while each file stacks below it as its own row. */
 export const Multiple: StoryFn<FileUploadProps> = args => (
   <FileUpload
     data-testid='file-upload'
@@ -122,7 +122,7 @@ export const SingleFileChosen: StoryFn<FileUploadProps> = args => (
   </FileUpload>
 );
 
-/** A second line on the row for size and status — here, that the file goes with the form. */
+/** `description` adds a second line to the row for size or status — here, that the file goes with the form. */
 export const WithDescription: StoryFn<FileUploadProps> = args => (
   <FileUpload data-testid='file-upload' {...args} defaultValue={[sample('policy.wasm')]}>
     <FileUploadDropzone />
@@ -140,7 +140,7 @@ export const WithDescription: StoryFn<FileUploadProps> = args => (
   </FileUpload>
 );
 
-/** A row marked `loading` dims and spins, and the picker locks until it finishes; X cancels. */
+/** A row marked `loading` dims and shows a spinner, and the picker locks until no row is loading; its X becomes "Cancel upload", and stopping the request is up to the product. */
 export const Uploading: StoryFn<FileUploadProps> = args => (
   <FileUpload data-testid='file-upload' {...args} maxFiles={5} defaultValue={[sample('rules.lua')]}>
     <FileUploadDropzone />
@@ -181,7 +181,7 @@ export const Disabled: StoryFn<FileUploadProps> = args => (
   </div>
 );
 
-/** Read-only: the picker, Replace and Delete go away; a Download action stays. */
+/** Read-only removes the picker, Replace and Delete, while a custom `FileUploadItemAction` such as Download stays. */
 export const ReadOnly: StoryFn<FileUploadProps> = args => (
   <FileUpload data-testid='file-upload' {...args} readOnly defaultValue={[sample('policy.wasm')]}>
     <FileUploadDropzone />
@@ -199,7 +199,7 @@ export const ReadOnly: StoryFn<FileUploadProps> = args => (
   </FileUpload>
 );
 
-/** A file already on the server is a row too — described by name and size, with Download and Detach. */
+/** A file already on the server is a row too: `FileUploadItem` works outside `FileUpload` from a name and size, and its actions only run your `onClick`. */
 export const StoredFile: StoryFn<FileUploadProps> = () => (
   <FileUploadItemGroup data-testid='stored'>
     <FileUploadItem file={{ name: 'policy.wasm', size: 48 * 1024 }} description='48 KB · attached'>
@@ -224,7 +224,7 @@ export const LongFileName: StoryFn<FileUploadProps> = args => (
   </FileUpload>
 );
 
-/** Nothing uploads on pick: the file travels with the form's `FormData` under `name` when it is submitted. */
+/** Nothing uploads on pick: the file travels in the form's `FormData` under `name`, and an empty submit of a required Field shows its error. */
 export const FormSubmission: StoryFn<FileUploadProps> = args => {
   const [submitted, setSubmitted] = useState<string>('');
   const onSubmit = (event: FormEvent<HTMLFormElement>) => {
