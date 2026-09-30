@@ -176,6 +176,48 @@ describe('foldsExtension — function folds', () => {
     expect(visibleLineTexts(view).slice(-1)).toEqual(['']);
   });
 
+  it('keeps a collapsed body that ends at the last line when a line above it is deleted', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const folds: CodeEditorFolds = (value, { startingLineNumber }) =>
+      getHttpFolds(value, { startingLineNumber, body: { defaultCollapsed: true } });
+    const view = mount(REQUEST, folds);
+    expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.body]);
+
+    // Ctrl-Shift-K on the Host header: the document loses one line.
+    view.dispatch({
+      changes: { from: view.state.doc.line(2).from, to: view.state.doc.line(3).from },
+      userEvent: 'delete.line',
+    });
+
+    // Inside the debounce window the body is mapped to its new lines — no stale range.
+    expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.body]);
+    // 6 lines: start line, 1 header, blank, 3 body lines collapsed into 1 row
+    expect(getVisibleRowCount(view.state)).toBe(4);
+    expect(visibleLineTexts(view)).toEqual([
+      'POST /api HTTP/1.1',
+      'Content-Type: application/json',
+      '',
+      '',
+    ]);
+    expect(view.contentDOM.querySelectorAll('.cm-ds-fold-summary')).toHaveLength(1);
+
+    vi.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
+
+    expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.body]);
+    expect(getVisibleRowCount(view.state)).toBe(4);
+  });
+
+  it('keeps a collapsed body when an external change shortens the document', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const view = mount(REQUEST, httpFolds);
+    toggleFoldRegion(view, HTTP_FOLD_ID.body);
+
+    view.dispatch({ changes: { from: 0, to: view.state.doc.line(2).from } });
+    expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.body]);
+    vi.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
+    expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.body]);
+  });
+
   it('drops a region whose id disappears', () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     const view = mount(REQUEST, httpFolds);
@@ -236,6 +278,26 @@ describe('foldsExtension — selection and editing', () => {
     const line4 = view.state.doc.line(4);
 
     view.dispatch({ selection: { anchor: line4.from, head: line4.to } });
+    expect(getCollapsedFoldIds(view.state).has('middle')).toBe(false);
+  });
+
+  it('keeps regions collapsed on Select All and on a selection merely overlapping them', () => {
+    const view = mount(FIVE_LINES, MIDDLE);
+
+    view.dispatch({ selection: { anchor: 0, head: view.state.doc.length } });
+    expect(getCollapsedFoldIds(view.state).has('middle')).toBe(true);
+
+    // From line 1 into the region start, and from before to after the region.
+    view.dispatch({ selection: { anchor: 0, head: view.state.doc.line(5).to } });
+    expect(getCollapsedFoldIds(view.state).has('middle')).toBe(true);
+    view.dispatch({ selection: { anchor: view.state.doc.line(5).to, head: 0 } });
+    expect(getCollapsedFoldIds(view.state).has('middle')).toBe(true);
+  });
+
+  it('unfolds when a range selection head moves inside the region', () => {
+    const view = mount(FIVE_LINES, MIDDLE);
+
+    view.dispatch({ selection: { anchor: 0, head: view.state.doc.line(3).from + 1 } });
     expect(getCollapsedFoldIds(view.state).has('middle')).toBe(false);
   });
 

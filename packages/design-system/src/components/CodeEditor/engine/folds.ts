@@ -160,8 +160,38 @@ const buildDecorations = (
   return Decoration.set(ranges, true);
 };
 
+/**
+ * Whether a selection range goes into a region: a cursor or a range head strictly inside it, or a
+ * range lying entirely within it (a search match). Select All or a range merely overlapping the
+ * region does not count, so it stays collapsed.
+ */
 const selectionEntersRange = (range: SelectionRange, from: number, to: number): boolean =>
-  range.empty ? range.head > from && range.head < to : range.from < to && range.to > from;
+  (range.head > from && range.head < to) || (!range.empty && range.from >= from && range.to <= to);
+
+/**
+ * Maps function-form regions through a document change until the debounced re-run delivers a
+ * fresh set (no stale line ranges in the meantime). A region outside the old document is kept.
+ */
+const mapRegions = (
+  raw: readonly FoldRegion[],
+  tr: Transaction,
+  startingLineNumber: number,
+): readonly FoldRegion[] => {
+  const oldDoc = tr.startState.doc;
+  const newDoc = tr.state.doc;
+  const offset = startingLineNumber - 1;
+  return raw.map(region => {
+    const startLine = region.startLine - offset;
+    const endLine = region.endLine - offset;
+    if (startLine < 1 || endLine > oldDoc.lines || startLine > endLine) return region;
+    const from = tr.changes.mapPos(oldDoc.line(startLine).from, 1);
+    const to = tr.changes.mapPos(oldDoc.line(endLine).to, -1);
+    const nextStart = newDoc.lineAt(Math.min(from, to)).number + offset;
+    const nextEnd = newDoc.lineAt(to).number + offset;
+    if (nextStart === region.startLine && nextEnd === region.endLine) return region;
+    return { ...region, startLine: nextStart, endLine: nextEnd };
+  });
+};
 
 const sameSet = (a: ReadonlySet<string>, b: ReadonlySet<string>): boolean =>
   a.size === b.size && [...a].every(id => b.has(id));
@@ -196,8 +226,11 @@ const updateState = (value: FoldsState, tr: Transaction): FoldsState => {
       validated = true;
     }
   }
+  const isFunction = typeof state.facet(foldsConfig)?.folds === 'function';
   if (!validated && tr.docChanged) {
-    // D6: regions are absolute line numbers — re-apply to the new document silently.
+    // Function folds: follow the edit until the debounced re-run arrives. Static folds (D6):
+    // regions are absolute line numbers — re-apply them to the new document.
+    if (isFunction) raw = mapRegions(raw, tr, startingLine(state));
     regions = resolve(raw, state, false);
   }
 
@@ -218,9 +251,13 @@ const updateState = (value: FoldsState, tr: Transaction): FoldsState => {
     else collapsed.delete(effect.value.id);
   }
 
-  const ids = new Set(regions.map(r => r.id));
-  for (const id of [...collapsed]) {
-    if (!ids.has(id)) collapsed.delete(id);
+  // Function folds forget a collapsed id only when a fresh fold set lacks it — never on a silent
+  // re-resolve after an edit, which could drop a region the next run brings back.
+  if (validated || !isFunction) {
+    const ids = new Set(regions.map(r => r.id));
+    for (const id of [...collapsed]) {
+      if (!ids.has(id)) collapsed.delete(id);
+    }
   }
 
   const userEdit = tr.docChanged && (tr.isUserEvent('input') || tr.isUserEvent('delete'));
