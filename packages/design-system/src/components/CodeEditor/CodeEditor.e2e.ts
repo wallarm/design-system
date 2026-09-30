@@ -94,6 +94,9 @@ const waitForLazyWork = async (page: Page, storyName: string) => {
  * screenshot never catches a half-painted frame.
  */
 const waitForStableDom = async (page: Page) => {
+  await page.evaluate(() => {
+    delete (window as DomProbeWindow).__codeEditorDomProbe;
+  });
   await page.waitForFunction(
     () => {
       const probeWindow = window as DomProbeWindow;
@@ -354,10 +357,10 @@ test.describe('Component: CodeEditor', () => {
 
       await showMore.click();
       await expect(showMore).toContainText('Show less');
-      const expanded = await content.boundingBox();
       expect(clamped).not.toBeNull();
-      expect(expanded).not.toBeNull();
-      expect(expanded?.height ?? 0).toBeGreaterThan((clamped?.height ?? 0) * 10);
+      await expect
+        .poll(async () => (await content.boundingBox())?.height ?? 0)
+        .toBeGreaterThan((clamped?.height ?? 0) * 10);
 
       await showMore.click();
       await expect(showMore).toContainText('Show more (1988 lines)');
