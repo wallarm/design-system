@@ -1,5 +1,5 @@
 import { act, renderHook } from '@testing-library/react';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useWindowScrollRoot } from '../useWindowScrollRoot';
 
 const setHeights = (el: HTMLElement, client: number, scroll: number) =>
@@ -17,23 +17,62 @@ const mountInPane = () => {
   return { pane, container };
 };
 
+const scrollBy = (el: HTMLElement, top: number) =>
+  act(() => {
+    el.scrollTop = top;
+    el.dispatchEvent(new Event('scroll'));
+  });
+
+let resizeCallbacks: (() => void)[] = [];
+
 describe('useWindowScrollRoot', () => {
+  beforeEach(() => {
+    resizeCallbacks = [];
+    vi.stubGlobal(
+      'ResizeObserver',
+      class {
+        constructor(cb: () => void) {
+          resizeCallbacks.push(cb);
+        }
+        observe = vi.fn();
+        disconnect = vi.fn();
+      },
+    );
+  });
   afterEach(() => {
+    vi.unstubAllGlobals();
     document.body.innerHTML = '';
   });
 
-  it('starts on the window while the pane does not overflow, then adopts it once it scrolls', () => {
+  it('starts on the window while the pane does not overflow, then adopts it once the table grows', () => {
     const { pane, container } = mountInPane();
     setHeights(pane, 600, 600);
     const { result } = renderHook(() => useWindowScrollRoot({ current: container }));
-    expect(result.current).toBe(window);
+    expect(result.current.scrollRoot).toBe(window);
 
-    // Rows arrived and the user scrolls the pane.
+    // Rows rendered: the table grew, nobody scrolled yet.
     setHeights(pane, 600, 3000);
-    act(() => {
-      pane.dispatchEvent(new Event('scroll'));
-    });
-    expect(result.current).toBe(pane);
+    act(() => resizeCallbacks.forEach(cb => cb()));
+    expect(result.current.scrollRoot).toBe(pane);
+  });
+
+  it('settles on the first resize notification, not at mount', () => {
+    const { container } = mountInPane();
+    const { result } = renderHook(() => useWindowScrollRoot({ current: container }));
+    expect(result.current.isSettled).toBe(false);
+
+    act(() => resizeCallbacks.forEach(cb => cb()));
+    expect(result.current.isSettled).toBe(true);
+  });
+
+  it('adopts the pane when it scrolls vertically', () => {
+    const { pane, container } = mountInPane();
+    setHeights(pane, 600, 600);
+    const { result } = renderHook(() => useWindowScrollRoot({ current: container }));
+
+    setHeights(pane, 600, 3000);
+    scrollBy(pane, 200);
+    expect(result.current.scrollRoot).toBe(pane);
   });
 
   it("ignores the table's own horizontal scroller", () => {
@@ -42,21 +81,17 @@ describe('useWindowScrollRoot', () => {
     const { result } = renderHook(() => useWindowScrollRoot({ current: container }));
 
     setHeights(pane, 600, 3000);
-    act(() => {
-      container.dispatchEvent(new Event('scroll'));
-    });
-    expect(result.current).toBe(window);
+    scrollBy(container, 200);
+    expect(result.current.scrollRoot).toBe(window);
   });
 
-  it('keeps the window when a scrolling ancestor never scrolls vertically', () => {
-    // An `overflow-x` wrapper scrolled sideways: `overflow-y` computes to
-    // `auto`, yet the box grows with its content.
+  it('keeps the window for an ancestor that grows with its content', () => {
+    // An `overflow-x` wrapper: `overflow-y` computes to `auto`, yet the box
+    // never scrolls vertically — the document around it does.
     const { pane, container } = mountInPane();
     setHeights(pane, 3000, 3000);
     const { result } = renderHook(() => useWindowScrollRoot({ current: container }));
-    act(() => {
-      pane.dispatchEvent(new Event('scroll'));
-    });
-    expect(result.current).toBe(window);
+    act(() => resizeCallbacks.forEach(cb => cb()));
+    expect(result.current.scrollRoot).toBe(window);
   });
 });

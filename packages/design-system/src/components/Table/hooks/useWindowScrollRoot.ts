@@ -10,8 +10,12 @@ export const WindowScrollRootContext = createContext<ScrollRoot | null>(null);
  *
  * Starts on the window. At mount the body has no rows yet, so a pane that will
  * scroll does not overflow and stays on the window. While the root is the
- * window, a scroll of any ancestor of the table re-resolves it: a pane the user
- * scrolls overflows by then. An element root is final.
+ * window, it re-resolves whenever the table grows (rows, spacers) or an
+ * ancestor scrolls vertically — a pane overflows by then, before the user has
+ * to touch it. An element root is final.
+ *
+ * `scrollRoot` is for the virtualizer, from the first render; edge detection
+ * and prepend compensation wait for `isSettled`.
  */
 export const useWindowScrollRoot = (containerRef: RefObject<HTMLElement | null>) => {
   // The window from the first render, as before scroll roots existed: the
@@ -21,33 +25,59 @@ export const useWindowScrollRoot = (containerRef: RefObject<HTMLElement | null>)
     typeof window === 'undefined' ? null : window,
   );
   const scrollRootRef = useRef<ScrollRoot | null>(scrollRoot);
+  // False until the table has laid out its rows once (the first resize
+  // notification). Before that a pane host still reads as the window, whose
+  // edges both look reached — firing them would load a page at each end in
+  // one commit, which the prepend compensation cannot tell from a data swap.
+  const [isSettled, setIsSettled] = useState(false);
 
   useLayoutEffect(() => {
     const container = containerRef.current;
-    if (!container) return;
+    if (!container || (scrollRootRef.current && !isWindowScrollRoot(scrollRootRef.current))) {
+      return;
+    }
 
-    const resolve = () => {
+    // Scroll events do not bubble, so ancestors are only heard in the capture
+    // phase. The table's own horizontal scroller is the container, and a
+    // sideways scroll of an ancestor leaves its `scrollTop` at 0 — both skipped.
+    const onScroll = (event: Event) => {
+      const { target } = event;
+      if (
+        target instanceof Element &&
+        target !== container &&
+        target.scrollTop > 0 &&
+        target.contains(container)
+      ) {
+        resolve();
+      }
+    };
+    const resizeObserver = new ResizeObserver(() => {
+      resolve();
+      setIsSettled(true);
+    });
+
+    const detach = () => {
+      document.removeEventListener('scroll', onScroll, { capture: true });
+      resizeObserver.disconnect();
+    };
+
+    function resolve() {
       const next = getScrollRoot(container);
       if (next === scrollRootRef.current) return;
       scrollRootRef.current = next;
       setScrollRoot(next);
-    };
-    resolve();
-
-    // Scroll events do not bubble, so ancestors are only heard in the capture
-    // phase. The table's own horizontal scroller is the container — skipped.
-    const onScroll = (event: Event) => {
-      const { target } = event;
-      if (scrollRootRef.current && !isWindowScrollRoot(scrollRootRef.current)) return;
-      if (!(target instanceof Element) || target === container || !target.contains(container)) {
-        return;
+      if (!isWindowScrollRoot(next)) {
+        detach();
+        setIsSettled(true);
       }
-      resolve();
-    };
+    }
 
     document.addEventListener('scroll', onScroll, { capture: true, passive: true });
-    return () => document.removeEventListener('scroll', onScroll, { capture: true });
+    resizeObserver.observe(container);
+    resolve();
+
+    return detach;
   }, [containerRef]);
 
-  return scrollRoot;
+  return { scrollRoot, isSettled };
 };

@@ -203,6 +203,34 @@ test.describe('Component: Table', () => {
         .toBeGreaterThan(initialWindowSize);
     });
 
+    test('Should compensate a prepend in a pane before the user scrolls it', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Pane');
+
+      const pane = page.getByTestId('scroll-pane');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+
+      // The story opens at the top of its window, so `onStartReached` prepends
+      // a page right away. The rows the user sees must stay put: the pane moves
+      // down by the prepended block, the document does not.
+      await expect.poll(() => pane.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    });
+
+    test('Should keep the position of an already scrolled pane when the table mounts', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Scrolled Pane');
+
+      const pane = page.getByTestId('scroll-pane');
+      await pane.evaluate(el => {
+        el.scrollTop = 300;
+      });
+      await page.getByTestId('show-table').click();
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+
+      expect(await pane.evaluate(el => el.scrollTop)).toBe(300);
+    });
+
     test('Should allow selecting text in a table body cell', async ({ page }) => {
       await tableStory.goto(page, 'Manual Sorting');
 

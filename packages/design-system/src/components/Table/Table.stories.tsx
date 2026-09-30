@@ -1455,6 +1455,41 @@ export const InfiniteScrollWindowInPane: StoryFn<typeof meta> = () => {
 };
 
 /**
+ * A window-mode table mounting into a pane the user already scrolled (content above it): the pane
+ * keeps its position — adopting the root must not reset it.
+ */
+export const InfiniteScrollWindowInScrolledPane: StoryFn<typeof meta> = () => {
+  const [isShown, setIsShown] = useState(false);
+  const { data, isFetchingNext, fetchNextPage } = useBidirectionalData();
+
+  return (
+    <VStack gap={8}>
+      <Button data-testid='show-table' onClick={() => setIsShown(true)}>
+        Show table
+      </Button>
+      <div data-testid='scroll-pane' style={{ height: 480, overflowY: 'auto' }}>
+        <div style={{ height: 800 }}>
+          <Text size='sm' color='secondary'>
+            Content above the table
+          </Text>
+        </div>
+        {isShown && (
+          <Table
+            data={data}
+            columns={securityColumns}
+            getRowId={row => row.id}
+            virtualized='window'
+            isLoading={isFetchingNext}
+            onEndReached={fetchNextPage}
+            onEndReachedThreshold={200}
+          />
+        )}
+      </div>
+    </VStack>
+  );
+};
+
+/**
  * A column can explain itself: `description` renders as a second line under the title, or as a
  * tooltip behind a dashed underline when the header has no room for one.
  */

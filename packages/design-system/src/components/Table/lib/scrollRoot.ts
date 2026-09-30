@@ -17,13 +17,20 @@ export const isWindowScrollRoot = (root: ScrollRoot): root is Window => root ===
  * `overflow-x-hidden` layout wrapper) computes `overflow-y: visible` to `auto`
  * on a box that grows with its content and never scrolls. Only a box whose
  * content overflows it counts — so a pane that does not overflow yet resolves
- * to the window (`useWindowScrollRoot` re-resolves once an ancestor scrolls).
+ * to the window (`useWindowScrollRoot` re-resolves as the table grows).
  */
 export const getScrollRoot = (el: Element | null): ScrollRoot => {
-  for (let node = el?.parentElement; node && node !== document.body; node = node.parentElement) {
+  // `body` is walked too: a shell with `html { overflow: hidden }` scrolls it.
+  // The 1px slack keeps sub-pixel or stray overflow from making a
+  // grow-with-content box the root.
+  for (
+    let node = el?.parentElement;
+    node && node !== document.documentElement;
+    node = node.parentElement
+  ) {
     if (
       SCROLLABLE_OVERFLOW.test(getComputedStyle(node).overflowY) &&
-      node.scrollHeight > node.clientHeight
+      node.scrollHeight - node.clientHeight > 1
     ) {
       return node;
     }

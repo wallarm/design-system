@@ -48,6 +48,9 @@ export const useScrollEdge = ({
   useEffect(() => {
     const target = mode === 'window' ? scrollRoot : scrollRef?.current;
     if (!target) return;
+    // A new target starts armed: the edge state of the previous one (e.g. the
+    // window a pane host starts on, always "at the end") does not carry over.
+    firedRef.current = false;
 
     const check = () => {
       const callback = onReachedRef.current;
