@@ -91,7 +91,6 @@ check**, not a queue:
 | ✅ | Inputs/Checkbox | 8 | 8 | `components/Checkbox/Checkbox.stories.tsx` |
 | ✅ | Inputs/Field | 9 | 9 | `components/Field/Field.stories.tsx` |
 | ✅ | Inputs/FileUpload | 13 | 13 | `components/FileUpload/FileUpload.stories.tsx` |
-| ☐ | Inputs/FilterDropdown | 10 | 10 | `components/FilterDropdown/FilterDropdown.stories.tsx` |
 | ✅ | Inputs/InlineEdit | 14 | 14 | `components/InlineEdit/InlineEdit.stories.tsx` |
 | ✅ | Inputs/Input | 6 | 6 | `components/Input/Input.stories.tsx` |
 | ✅ | Inputs/InputGroup | 8 | 8 | `components/InputGroup/InputGroup.stories.tsx` |
@@ -133,6 +132,7 @@ check**, not a queue:
 | ✅ | Overlay/Tour | 5 | 5 | `components/Tour/Tour.stories.tsx` |
 | ✅ | Pages/EmptyState | 5 | 5 | `components/EmptyState/EmptyState.stories.tsx` |
 | ✅ | Pages/UtilityPage | 4 | 4 | `components/UtilityPage/UtilityPage.stories.tsx` |
+| ☐ | Patterns/FilterDropdown | 10 | 10 | `components/FilterDropdown/FilterDropdown.stories.tsx` |
 | ✅ | Patterns/FilterInput/Composition | 4 | 4 | `components/FilterInput/stories/FilterInputComposition.stories.tsx` |
 | ✅ | Patterns/FilterInput/FilterInput | 17 | 17 | `components/FilterInput/stories/FilterInput.stories.tsx` |
 | ✅ | Patterns/FilterInput/FilterInputChip | 21 | 21 | `components/FilterInput/stories/FilterInputChip.stories.tsx` |
