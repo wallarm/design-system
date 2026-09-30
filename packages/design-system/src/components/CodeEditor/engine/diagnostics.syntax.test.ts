@@ -162,8 +162,7 @@ const BROKEN: readonly { language: CodeEditorLanguage; doc: string; near: number
 const VALID: readonly { language: CodeEditorLanguage; doc: string }[] = [
   { language: 'json', doc: '{"a": 1, "b": [true, null]}' },
   { language: 'yaml', doc: 'a: [1, 2]\nb:\n  - c\n' },
-  // Not `{ b = 1 }`: @lezer/javascript 1.5.5 flags shorthand defaults in object patterns.
-  { language: 'javascript', doc: 'function f(a, { b } = {}) {\n  return a + b ?? 1;\n}\n' },
+  { language: 'javascript', doc: 'function f(a, { b = 1 } = {}) {\n  return a + b;\n}\n' },
   { language: 'typescript', doc: 'let a: number = 1;\nconst f = (x: string): string => x;\n' },
   { language: 'python', doc: 'def f(x):\n    return x\n' },
 ];
@@ -269,5 +268,37 @@ describe('diagnosticsExtension — syntax errors for every parsed language', () 
     await vi.waitFor(() => expect(activeDiagnostics(view.state).length).toBeGreaterThan(0), {
       timeout: LINT_DELAY * 5,
     });
+  });
+});
+
+describe('diagnosticsExtension — @lezer/javascript 1.5.5 shorthand-default workaround', () => {
+  const syntaxCount = async (language: CodeEditorLanguage, doc: string) => {
+    const { view } = mountLinted(doc, { language }, await loadLanguageExtension(language));
+    await flushLint(view);
+    return activeDiagnostics(view.state).filter(d => d.source === 'syntax').length;
+  };
+
+  const VALID_DEFAULTS = [
+    'function f({ a = 1 }) {}',
+    'const {a = 1} = o;',
+    // The Languages story's JavaScript sample.
+    "export async function fetchRules(client, { limit = 50 } = {}) {\n  const res = await client.get('/api/v2/rules', { params: { limit } });\n  return res.data.filter(rule => rule.enabled);\n}\n",
+  ];
+  const INVALID_DEFAULTS = ['function f({ a = }) {}', 'f({ a = 1 })'];
+
+  for (const language of ['javascript', 'typescript'] as const) {
+    it.each(VALID_DEFAULTS)(`${language}: no syntax errors for %j`, async doc => {
+      expect(await syntaxCount(language, doc)).toBe(0);
+    });
+
+    it.each(INVALID_DEFAULTS)(`${language}: still reports %j`, async doc => {
+      expect(await syntaxCount(language, doc)).toBeGreaterThanOrEqual(1);
+    });
+  }
+
+  it('typescript: no syntax errors for a typed shorthand-default pattern', async () => {
+    expect(
+      await syntaxCount('typescript', 'const f = ({ a = 1 }: { a?: number }): number => a;'),
+    ).toBe(0);
   });
 });

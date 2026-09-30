@@ -31,7 +31,10 @@ export interface CodeEditorPosition {
 
 export interface CodeEditorDiagnostic {
   from: CodeEditorPosition;
-  /** Defaults to end of `from.line` */
+  /**
+   * Defaults to one character after `from` (a point when `from` is at the end of its line).
+   * A line past the document end is clamped to the document end; never before `from`.
+   */
   to?: CodeEditorPosition;
   severity: 'error' | 'warning' | 'info';
   message: string;

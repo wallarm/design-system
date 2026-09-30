@@ -2,6 +2,7 @@ import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 import { type Diagnostic, linter, setDiagnosticsEffect } from '@codemirror/lint';
 import type { EditorState, Extension, Text } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
+import type { SyntaxNode } from '@lezer/common';
 import type { CodeEditorDiagnostic, CodeEditorLanguage, JsonSchema } from '../types';
 import { findJsonBodyRange } from './languages';
 import { offsetToPosition, positionToOffset } from './positions';
@@ -132,12 +133,48 @@ const firstErrorNode = (state: EditorState, region: JsonRegion): JsonRegion | nu
   return found;
 };
 
+/** Error nodes a language's parser produces for valid code; skipped by `syntaxErrorDiagnostics`. */
+export type IgnoreErrorNode = (node: SyntaxNode) => boolean;
+
+/** E1 of the shorthand-default misparse: ⚠ holding `Equals`, directly in `PatternProperty > VariableDefinition`. */
+const isShorthandDefaultEquals = (node: SyntaxNode | null): boolean =>
+  node !== null &&
+  node.type.isError &&
+  node.parent?.name === 'VariableDefinition' &&
+  node.parent.parent?.name === 'PatternProperty' &&
+  node.getChild('Equals') !== null;
+
+const isNonEmptyError = (node: SyntaxNode | null): node is SyntaxNode =>
+  node !== null && node.type.isError && node.to > node.from;
+
+/**
+ * Works around @lezer/javascript 1.5.5 misparsing shorthand defaults in object patterns
+ * (`function f({ a = 1 }) {}`, `const { a = 1 } = o`) as
+ * `PatternProperty(VariableDefinition(⚠(Equals), ⚠(<value>)))`. Drops exactly that pair — E1 (⚠ with
+ * `Equals`) and its non-empty ⚠ next sibling E2. A missing value (`{ a = }`, no E2) and
+ * `{ a = 1 }` outside a pattern (`PropertyDefinition` parent) are still reported.
+ */
+export const isJavaScriptShorthandDefaultMisparse: IgnoreErrorNode = node => {
+  if (isShorthandDefaultEquals(node)) return isNonEmptyError(node.nextSibling);
+  return isNonEmptyError(node) && isShorthandDefaultEquals(node.prevSibling);
+};
+
+/** Per-language error-node filters for parser misparses of valid code. */
+const IGNORED_ERROR_NODES: Partial<Record<CodeEditorLanguage, IgnoreErrorNode>> = {
+  javascript: isJavaScriptShorthandDefaultMisparse,
+  typescript: isJavaScriptShorthandDefaultMisparse,
+};
+
 /**
  * Syntax errors from the Lezer tree (spec §14 A3): every error (⚠) node of the fully parsed
  * tree — or only those inside `region` — becomes an `error` diagnostic; error nodes that touch
- * are collapsed into one. Empty for a state without a parser.
+ * are collapsed into one. Nodes matched by `ignore` are skipped. Empty for a state without a parser.
  */
-export const syntaxErrorDiagnostics = (state: EditorState, region?: JsonRegion): Diagnostic[] => {
+export const syntaxErrorDiagnostics = (
+  state: EditorState,
+  region?: JsonRegion,
+  ignore?: IgnoreErrorNode,
+): Diagnostic[] => {
   const length = state.doc.length;
   const tree = ensureSyntaxTree(state, length, ENSURE_TREE_TIMEOUT) ?? syntaxTree(state);
   const out: Diagnostic[] = [];
@@ -147,6 +184,7 @@ export const syntaxErrorDiagnostics = (state: EditorState, region?: JsonRegion):
     enter: node => {
       if (!node.type.isError) return true;
       if (region && (node.from < region.from || node.from > region.to)) return false;
+      if (ignore?.(node.node)) return false;
       const from = node.from;
       const to = Math.min(Math.max(node.to, from + 1), length);
       const last = out.at(-1);
@@ -269,7 +307,7 @@ const lintSource =
     const syntax = region
       ? jsonSyntaxDiagnostics(state, region)
       : ERROR_NODE_LANGUAGES.has(config.language)
-        ? syntaxErrorDiagnostics(state)
+        ? syntaxErrorDiagnostics(state, undefined, IGNORED_ERROR_NODES[config.language])
         : [];
     const external = externalDiagnostics(state.doc, config.external, config.startingLineNumber);
     const { schemaSource, schema } = config;
