@@ -36,6 +36,7 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
   LineColorsAndPrefixes: {
     editors: ['code-editor-line-colors', 'code-editor-line-diff', 'code-editor-line-icons'],
   },
+  AnalyticsAttributes: { editors: ['analytics-editor'] },
   Ranges: { editors: ['code-editor-ranges'] },
   HttpRequestWithPrism: { editors: ['code-editor-http-request'] },
   HttpResponseWithShiki: { editors: ['code-editor-http-response'] },

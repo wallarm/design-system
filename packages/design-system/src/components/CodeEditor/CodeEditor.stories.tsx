@@ -1051,3 +1051,54 @@ export const Diff: StoryFn<typeof meta> = () => {
     </CodeEditorRoot>
   );
 };
+
+const analyticsRequest = `POST /api/v1/rules HTTP/1.1
+Host: api.example.com
+Content-Type: application/json
+Authorization: Bearer token123
+
+{
+  "action": "block"
+}`;
+
+const analyticsFolds: FoldRegion[] = [
+  {
+    id: 'headers',
+    startLine: 2,
+    endLine: 4,
+    label: 'Headers',
+    toggleProps: { 'data-analytics-id': 'CODE_EDITOR_FOLD_HEADERS' },
+    summaryProps: { 'data-analytics-id': 'CODE_EDITOR_EXPAND_HEADERS' },
+  },
+];
+
+/**
+ * Where analytics attributes land. `data-*` / `aria-*` / `id` on `CodeEditorContent`
+ * reach the typing surface (`role="textbox"`), chrome buttons take them directly, and
+ * fold buttons take them through `toggleProps` / `summaryProps`. Popups drawn by the
+ * editor (autocomplete, tooltips, search panel) are not attributable — see
+ * `CodeEditor/ANALYTICS_GAPS.md`.
+ */
+export const AnalyticsAttributes: StoryFn<typeof meta> = () => (
+  <CodeEditorRoot
+    data-testid='analytics-editor'
+    language='http'
+    defaultValue={analyticsRequest}
+    folds={analyticsFolds}
+  >
+    <CodeSnippetHeader>
+      <CodeSnippetTitle>Request</CodeSnippetTitle>
+      <CodeSnippetActions>
+        <CodeSnippetCopyButton data-analytics-id='CODE_EDITOR_COPY' />
+        <CodeSnippetWrapButton data-analytics-id='CODE_EDITOR_WRAP' />
+        <CodeSnippetFullscreenButton data-analytics-id='CODE_EDITOR_FULLSCREEN' />
+      </CodeSnippetActions>
+    </CodeSnippetHeader>
+    <CodeEditorContent
+      aria-label='HTTP request'
+      lineNumbers
+      data-analytics-id='CODE_EDITOR_REQUEST'
+      data-analytics-props='{"surface":"rule-editor"}'
+    />
+  </CodeEditorRoot>
+);
