@@ -1,9 +1,11 @@
 import {
   type ComponentPropsWithoutRef,
+  type DragEvent,
   type FC,
   type ReactNode,
   type Ref,
   useCallback,
+  useEffect,
   useId,
   useMemo,
   useState,
@@ -89,6 +91,8 @@ export const FileUpload: FC<FileUploadProps> = ({
   className,
   children,
   ref,
+  onDragOver,
+  onDrop,
   'data-testid': testIdProp,
   ...rest
 }) => {
@@ -111,6 +115,11 @@ export const FileUpload: FC<FileUploadProps> = ({
   }, []);
   const locked = loadingCount > 0;
 
+  // Held-file count for turning drop off at `maxFiles` — needed BEFORE `useFileUpload` runs,
+  // so it can't come from `api`. Kept from Ark's accept callback; `value` wins when controlled.
+  const [heldCount, setHeldCount] = useState(defaultValue?.length ?? 0);
+  const atLimit = !single && (value?.length ?? heldCount) >= maxFiles;
+
   // Rejections from the multi-mode Replace, which validates outside Ark.
   const [replaceRejections, setReplaceRejections] = useState<FileUploadRejection[]>([]);
 
@@ -132,6 +141,7 @@ export const FileUpload: FC<FileUploadProps> = ({
   const handleAccept = useCallback(
     (details: FileUploadFileAcceptDetails) => {
       setReplaceRejections([]);
+      setHeldCount(details.files.length);
       onValueChange?.(details.files);
     },
     [onValueChange],
@@ -156,7 +166,11 @@ export const FileUpload: FC<FileUploadProps> = ({
     disabled: isDisabled,
     readOnly: isReadOnly,
     invalid,
-    allowDrop: allowDrop && !locked,
+    // Off while locked or full, so zag never enters `dragging` or accepts the drop.
+    allowDrop: allowDrop && !locked && !atLimit,
+    // zag reads this once at start (and skips it if `allowDrop` is false then) — the DS guard
+    // below re-evaluates instead.
+    preventDocumentDrop: false,
     acceptedFiles: value,
     defaultAcceptedFiles: defaultValue,
     onFileAccept: handleAccept,
@@ -176,8 +190,40 @@ export const FileUpload: FC<FileUploadProps> = ({
     setReplaceRejections([]);
   }, [api]);
 
+  // A missed drop must not make the browser open the file and leave the form (zag's
+  // `preventDocumentDrop`, but kept in sync with `allowDrop` / `disabled`).
+  const guardPage = allowDrop && !isDisabled;
+  useEffect(() => {
+    if (!guardPage) return;
+    const guard = (event: globalThis.DragEvent) => event.preventDefault();
+    document.addEventListener('dragover', guard);
+    document.addEventListener('drop', guard);
+    return () => {
+      document.removeEventListener('dragover', guard);
+      document.removeEventListener('drop', guard);
+    };
+  }, [guardPage]);
+
+  // Anything dragged inside the component that the Area didn't take (the Area is off, or the
+  // drop is on a row) is swallowed: "no drop" cursor, and the browser never opens the file.
+  // The accepting Area stops propagation itself, so it never gets here.
+  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+    onDragOver?.(event);
+    if (event.defaultPrevented) return;
+    event.preventDefault();
+    try {
+      event.dataTransfer.dropEffect = 'none';
+    } catch {
+      // Some browsers make dropEffect read-only outside dragover/dragenter.
+    }
+  };
+  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+    onDrop?.(event);
+    event.preventDefault();
+  };
+
+  const pickerBlocked = isDisabled || locked || (!single && api.maxFilesReached);
   const errorId = useId();
-  const hasFiles = api.acceptedFiles.length > 0;
   const rejections = useMemo(
     () => [...visible(api.rejectedFiles), ...replaceRejections],
     [visible, api.rejectedFiles, replaceRejections],
@@ -192,7 +238,7 @@ export const FileUpload: FC<FileUploadProps> = ({
       invalid,
       locked,
       pickerHidden: isReadOnly,
-      pickerBlocked: isDisabled || locked || (!single && api.maxFilesReached),
+      pickerBlocked,
       accept: acceptString,
       limits: { acceptList, maxFiles, maxFileSize, minFileSize },
       validate,
@@ -209,7 +255,7 @@ export const FileUpload: FC<FileUploadProps> = ({
       isReadOnly,
       invalid,
       locked,
-      hasFiles,
+      pickerBlocked,
       acceptString,
       acceptList,
       maxFiles,
@@ -229,6 +275,8 @@ export const FileUpload: FC<FileUploadProps> = ({
       {...rest}
       value={api}
       ref={ref}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
       data-slot='file-upload'
       // Only an OWN test id goes on the root — an inherited (Field) one would duplicate the Field's.
       data-testid={testIdProp}
@@ -239,6 +287,11 @@ export const FileUpload: FC<FileUploadProps> = ({
       </FileUploadRootContextProvider>
       {/* Always mounted: Replace and form submission need it even while the picker is hidden. */}
       <ArkFileUpload.HiddenInput
+        // A Field label (`htmlFor` = this input) and single-mode Replace reach the input
+        // directly; cancel the click so no dialog opens while the picker is blocked.
+        onClick={event => {
+          if (pickerBlocked) event.preventDefault();
+        }}
         data-slot='file-upload-hidden-input'
         data-testid={testId ? `${testId}--hidden-input` : undefined}
       />

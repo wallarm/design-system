@@ -1,13 +1,27 @@
+import type { ComponentProps } from 'react';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Field, FieldLabel } from '../Field';
 import { FileUpload } from './FileUpload';
-import { byTestId, hiddenInput, makeFile, pick, queryByTestId } from './FileUpload.test.helpers';
+import {
+  byTestId,
+  dragOver,
+  drop,
+  hiddenInput,
+  makeFile,
+  nextFrame,
+  pick,
+  queryByTestId,
+} from './FileUpload.test.helpers';
 import { FileUploadDropzone } from './FileUploadDropzone';
 import { FileUploadItem } from './FileUploadItem';
 import { FileUploadItemGroup } from './FileUploadItemGroup';
 import { FileUploadTrigger } from './FileUploadTrigger';
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('FileUpload — pickers', () => {
   it('renders the default Area with a role=button named by its text', () => {
@@ -62,7 +76,6 @@ describe('FileUpload — pickers', () => {
     byTestId('fu--dropzone').focus();
     await userEvent.keyboard('{Enter}');
     await waitFor(() => expect(click).toHaveBeenCalledTimes(2));
-    click.mockRestore();
   });
 
   it('renders the Button trigger with default content and opens the picker', async () => {
@@ -76,7 +89,6 @@ describe('FileUpload — pickers', () => {
     expect(trigger).toHaveAttribute('data-testid', 'fu--trigger');
     await userEvent.click(trigger);
     await waitFor(() => expect(click).toHaveBeenCalled());
-    click.mockRestore();
   });
 
   it('keeps the pickers in single mode once a file is chosen, and a new pick replaces the file', async () => {
@@ -125,6 +137,7 @@ describe('FileUpload — pickers', () => {
     expect(byTestId('fu--dropzone')).toHaveAttribute('data-disabled');
     expect(byTestId('fu--trigger')).toBeDisabled();
     await userEvent.click(byTestId('fu--dropzone'));
+    await nextFrame();
     expect(click).not.toHaveBeenCalled();
     unmount();
     render(
@@ -137,7 +150,6 @@ describe('FileUpload — pickers', () => {
     );
     expect(queryByTestId('fu--dropzone')).toBeNull();
     expect(queryByTestId('fu--trigger')).toBeNull();
-    click.mockRestore();
   });
 
   it('marks the Area invalid from Field', () => {
@@ -163,5 +175,97 @@ describe('FileUpload — pickers', () => {
       screen.getByRole('button', { name: 'Choose a .wasm module or drop it here' }),
     ).toBeInTheDocument();
     expect(byTestId('icon')).toBeInTheDocument();
+  });
+});
+
+describe('FileUpload — drag and drop', () => {
+  // zag reads the drop through a promise chain; give it a few ticks before asserting absence.
+  const settle = () => new Promise(resolve => setTimeout(resolve, 50));
+
+  const DnD = (props: Partial<ComponentProps<typeof FileUpload>> & { loading?: boolean }) => {
+    const { loading, ...rest } = props;
+    return (
+      <FileUpload data-testid='fu' {...rest}>
+        <FileUploadDropzone />
+        <FileUploadItemGroup>{file => <FileUploadItem file={file} />}</FileUploadItemGroup>
+        {loading !== undefined ? (
+          <FileUploadItemGroup>
+            <FileUploadItem file={{ name: 'up.wasm' }} loading={loading} />
+          </FileUploadItemGroup>
+        ) : null}
+      </FileUpload>
+    );
+  };
+
+  it('marks the Area while dragging over it and lists the dropped file', async () => {
+    const onValueChange = vi.fn();
+    render(<DnD onValueChange={onValueChange} />);
+    const dz = byTestId('fu--dropzone');
+    expect(dragOver(dz, makeFile('dropped.wasm'))).toBe(false);
+    await waitFor(() => expect(dz).toHaveAttribute('data-dragging'));
+    expect(drop(dz, makeFile('dropped.wasm'))).toBe(false);
+    await waitFor(() => expect(byTestId('fu--item')).toHaveTextContent('dropped.wasm'));
+    expect(onValueChange).toHaveBeenLastCalledWith([
+      expect.objectContaining({ name: 'dropped.wasm' }),
+    ]);
+    expect(dz).not.toHaveAttribute('data-dragging');
+  });
+
+  it('while a row is uploading, a drop on the Area is swallowed: the browser does not open it and no file is added', async () => {
+    const onValueChange = vi.fn();
+    render(<DnD maxFiles={3} loading onValueChange={onValueChange} />);
+    const dz = byTestId('fu--dropzone');
+    expect(dragOver(dz, makeFile('late.wasm'))).toBe(false);
+    expect(dz).not.toHaveAttribute('data-dragging');
+    expect(drop(dz, makeFile('late.wasm'))).toBe(false);
+    await settle();
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('a drop on a row inside the component never reaches the browser', () => {
+    render(<DnD loading={false} />);
+    expect(drop(byTestId('fu--item'), makeFile('late.wasm'))).toBe(false);
+  });
+
+  it('after an upload that was running at mount ends, a drop that misses the Area does not navigate away', () => {
+    const { rerender } = render(<DnD loading />);
+    rerender(<DnD loading={false} />);
+    expect(dragOver(document.body, makeFile('late.wasm'))).toBe(false);
+    expect(drop(document.body, makeFile('late.wasm'))).toBe(false);
+  });
+
+  it('when disabled, a drop on the Area is swallowed and adds nothing', async () => {
+    const onValueChange = vi.fn();
+    render(<DnD disabled onValueChange={onValueChange} />);
+    const dz = byTestId('fu--dropzone');
+    expect(dragOver(dz, makeFile('x.wasm'))).toBe(false);
+    expect(drop(dz, makeFile('x.wasm'))).toBe(false);
+    await settle();
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('with allowDrop={false}, the Area accepts no drop and the browser does not open the file', async () => {
+    const onValueChange = vi.fn();
+    render(<DnD allowDrop={false} onValueChange={onValueChange} />);
+    const dz = byTestId('fu--dropzone');
+    expect(dragOver(dz, makeFile('x.wasm'))).toBe(false);
+    expect(dz).not.toHaveAttribute('data-dragging');
+    expect(drop(dz, makeFile('x.wasm'))).toBe(false);
+    await settle();
+    expect(onValueChange).not.toHaveBeenCalled();
+  });
+
+  it('in multiple mode at maxFiles, drop is off: no TOO_MANY_FILES rejection', async () => {
+    const onFileReject = vi.fn();
+    const { container } = render(<DnD maxFiles={1 + 1} onFileReject={onFileReject} />);
+    pick(container, makeFile('a.wasm'), makeFile('b.wasm'));
+    await waitFor(() => expect(byTestId('fu--dropzone')).toHaveAttribute('data-disabled'));
+    const dz = byTestId('fu--dropzone');
+    expect(dragOver(dz, makeFile('c.wasm'))).toBe(false);
+    expect(dz).not.toHaveAttribute('data-dragging');
+    expect(drop(dz, makeFile('c.wasm'))).toBe(false);
+    await settle();
+    expect(onFileReject).not.toHaveBeenCalled();
+    expect(screen.getAllByTestId('fu--item')).toHaveLength(2);
   });
 });

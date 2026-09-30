@@ -1,8 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { Field, FieldLabel } from '../Field';
 import { FileUpload } from './FileUpload';
-import { byTestId } from './FileUpload.test.helpers';
+import { byTestId, hiddenInput, makeFile, pick } from './FileUpload.test.helpers';
 import { FileUploadDropzone } from './FileUploadDropzone';
 import { FileUploadItem } from './FileUploadItem';
 import { FileUploadItemDeleteTrigger } from './FileUploadItemDeleteTrigger';
@@ -90,5 +91,45 @@ describe('FileUpload — loading row locks the pickers (integration)', () => {
     const { rerender } = render(<Two second />);
     rerender(<Two second={false} />);
     expectLocked();
+  });
+
+  it('a click on the Field label does not open the picker while a row is uploading (single mode)', async () => {
+    const onValueChange = vi.fn();
+    const { container } = render(
+      <Field>
+        <FieldLabel>WASM module</FieldLabel>
+        <FileUpload data-testid='fu' onValueChange={onValueChange}>
+          <FileUploadDropzone />
+          <FileUploadItemGroup>
+            {file => <FileUploadItem file={file} loading />}
+          </FileUploadItemGroup>
+        </FileUpload>
+      </Field>,
+    );
+    pick(container, makeFile('a.wasm'));
+    await waitFor(() => expect(byTestId('fu--dropzone')).toHaveAttribute('aria-disabled', 'true'));
+    const clicks: Event[] = [];
+    hiddenInput(container).addEventListener('click', event => clicks.push(event));
+    await userEvent.click(screen.getByText('WASM module'));
+    // The label does reach the input; the DS cancels the click, so no file dialog opens.
+    expect(clicks).toHaveLength(1);
+    expect(clicks[0]?.defaultPrevented).toBe(true);
+    expect(byTestId('fu--item')).toHaveTextContent('a.wasm');
+  });
+
+  it('a click on the Field label opens the picker when nothing is uploading (control)', async () => {
+    const { container } = render(
+      <Field>
+        <FieldLabel>WASM module</FieldLabel>
+        <FileUpload data-testid='fu'>
+          <FileUploadDropzone />
+        </FileUpload>
+      </Field>,
+    );
+    const clicks: Event[] = [];
+    hiddenInput(container).addEventListener('click', event => clicks.push(event));
+    await userEvent.click(screen.getByText('WASM module'));
+    expect(clicks).toHaveLength(1);
+    expect(clicks[0]?.defaultPrevented).toBe(false);
   });
 });
