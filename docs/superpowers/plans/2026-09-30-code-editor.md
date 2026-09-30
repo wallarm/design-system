@@ -327,7 +327,7 @@ Do not add a second `lastRowCount`, `reportRowCount` or updateListener.
 - **E13 [T2/T9] (minor)** — The unit tests assert on `data-slot` (`toHaveAttribute('data-slot', 'code-snippet' | 'code-editor')`, and `getAttribute('data-slot')` in the SSR test). The test-id rule says `data-slot` is never used for testing.
   - **Fix:** Remove the `data-slot` assertions in `CodeSnippet.fullscreen.test.tsx` and `CodeEditor.test.tsx`. In `ChromeFrame.ssr.test.tsx`, replace the `data-slot` check with `expect(container.querySelector('[data-testid="frame"]')?.parentElement?.parentElement?.parentElement).toBe(container);`.
 
-- **E14 [spec §13] (minor)** — The risk mitigation calls for a unit test that mounts and unmounts 1000 portal markers. No task implements it.
+- **E14 [T7, spec §13] (minor)** — The risk mitigation calls for a unit test that mounts and unmounts 1000 portal markers. No task implements it.
   - **Fix:** Add to T7 `gutters.test.ts`: mount a 1000-line doc with `lines` whose ReactNode prefix is on every line, call `editor.destroy()`, and expect `portals.getSnapshot()` to have length 0.
 
 - **E-RF1 [T5]** — add to `engine/index.test.ts`: mount with a controlled harness whose onChange stores `v.toUpperCase()` and calls `handle.update({...options, value: stored})`; dispatch a user input of `'a'` at offset 0 of doc `''`; expect `handle.view.state.doc.toString()` to be `'A'`, onChange called exactly once, and `state.selection.main.head === 1`.
