@@ -49,7 +49,7 @@ export const Sizes: StoryFn<AvatarProps> = () => (
   <VStack gap={16} align='start' data-testid='avatar'>
     {(['xs', 'sm'] as const).map(size => (
       <HStack key={size} gap={12} align='center'>
-        <Avatar size={size}>
+        <Avatar size={size} data-testid={`avatar-${size}-photo`}>
           <AvatarImage src={PHOTO} />
           <AvatarFallback name='Ada Lovelace' />
         </Avatar>
@@ -74,11 +74,11 @@ export const Fallback: StoryFn<AvatarProps> = () => (
     <Avatar>
       <AvatarFallback />
     </Avatar>
-    <Avatar>
+    <Avatar data-testid='avatar-broken-initials'>
       <AvatarImage src='/does-not-exist.png' />
       <AvatarFallback name='Alan Turing' />
     </Avatar>
-    <Avatar>
+    <Avatar data-testid='avatar-broken-icon'>
       <AvatarImage src='/does-not-exist.png' />
       <AvatarFallback />
     </Avatar>
@@ -101,7 +101,7 @@ export const Branded: StoryFn<AvatarProps> = () => (
     <Avatar>
       <AvatarFallback name='Ada Lovelace' />
     </Avatar>
-    <Avatar>
+    <Avatar data-testid='avatar-branded-photo'>
       <AvatarImage src={PHOTO} />
       <AvatarFallback />
     </Avatar>

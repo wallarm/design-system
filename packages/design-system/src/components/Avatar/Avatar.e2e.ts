@@ -1,7 +1,7 @@
 import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
-const avatarStory = createStoryHelper('data-display-avatar', [
+const STORIES = [
   'Basic',
   'Sizes',
   'Fallback',
@@ -10,37 +10,52 @@ const avatarStory = createStoryHelper('data-display-avatar', [
   'Click To Upload',
   'With Actions',
   'Uploading',
-] as const);
+] as const;
 
-// 1×1 transparent PNG — a real image the browser can decode.
+const avatarStory = createStoryHelper('data-display-avatar', STORIES);
+
+// 1×1 opaque PNG (8-bit RGB, no alpha, #4b6cb7) — a real image the browser can decode.
 const PNG = Buffer.from(
-  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
+  'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAADElEQVR4nGPwztkOAAJ0AW9BSzkTAAAAAElFTkSuQmCC',
   'base64',
 );
+
+type VisualStory = Exclude<(typeof STORIES)[number], 'Click To Upload'>;
+
+// Avatar test ids per story: `photo` images must reach data-state=visible; `broken` ones settle on
+// the fallback (image hidden, fallback visible). Loading and error render the same pixels.
+const SETTLED: Record<VisualStory, { photo?: string[]; broken?: string[] }> = {
+  Basic: { photo: ['avatar'] },
+  Sizes: { photo: ['avatar-xs-photo', 'avatar-sm-photo'] },
+  Fallback: { broken: ['avatar-broken-initials', 'avatar-broken-icon'] },
+  'Custom Icon': {},
+  Branded: { photo: ['avatar-branded-photo'] },
+  'With Actions': { photo: ['avatar'] },
+  Uploading: { photo: ['avatar-upload--trigger'] },
+};
+
+const waitForSettledImages = async (page: Page, story: VisualStory) => {
+  const { photo = [], broken = [] } = SETTLED[story];
+  for (const id of photo) {
+    await expect(page.getByTestId(`${id}--image`)).toHaveAttribute('data-state', 'visible');
+  }
+  for (const id of broken) {
+    await expect(page.getByTestId(`${id}--image`)).toHaveAttribute('data-state', 'hidden');
+    await expect(page.getByTestId(`${id}--fallback`)).toHaveAttribute('data-state', 'visible');
+  }
+};
 
 const pick = (page: Page, file: { name: string; mimeType: string; buffer: Buffer }) =>
   page.getByTestId('avatar-upload--hidden-input').setInputFiles(file);
 
 test.describe('Component: Avatar', () => {
   test.describe('Visual', () => {
-    for (const story of [
-      'Basic',
-      'Sizes',
-      'Fallback',
-      'Custom Icon',
-      'Branded',
-      'With Actions',
-      'Uploading',
-    ] as const) {
+    for (const story of Object.keys(SETTLED) as VisualStory[]) {
       test(`Should render ${story.toLowerCase()} correctly`, async ({ page }) => {
         await avatarStory.goto(page, story);
-        // The data-URI photo decodes asynchronously; wait until Ark has settled every image
-        // (loaded → visible, broken/absent → error), so no screenshot catches a loading frame.
-        await page.waitForFunction(() =>
-          [...document.querySelectorAll('[data-slot="avatar-image"]')].every(
-            img => (img as HTMLImageElement).complete,
-          ),
-        );
+        // The data-URI photo decodes asynchronously; wait for Ark's data-state, not img.complete,
+        // so no screenshot catches a loading frame.
+        await waitForSettledImages(page, story);
         await expect(page).toHaveScreenshot();
       });
     }
