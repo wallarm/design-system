@@ -50,6 +50,12 @@ type DomProbeWindow = Window & { __codeEditorDomProbe?: { html: string; since: n
 
 const editorOf = (page: Page, testId: string): Locator => page.getByTestId(`${testId}--editor`);
 
+/**
+ * Editor content is as wide as its longest line, so a centred click would scroll `.cm-scroller`
+ * sideways. Always click near the left edge of the element instead.
+ */
+const EDITOR_CLICK_POSITION = { x: 4, y: 10 };
+
 const ENGINE_SELECTOR = '[data-testid$="--editor"]';
 
 /** The engine chunk has loaded: every editor surface exists and no static fallback is left. */
@@ -126,14 +132,25 @@ const blurUnlessCompleting = async (page: Page) => {
   });
 };
 
+const expectEditorsNotScrolled = async (page: Page) => {
+  await expect
+    .poll(() =>
+      page.evaluate(() =>
+        [...document.querySelectorAll('.cm-scroller')].every(s => s.scrollLeft === 0),
+      ),
+    )
+    .toBe(true);
+};
+
 const settleForScreenshot = async (page: Page) => {
   await blurUnlessCompleting(page);
   await waitForStableDom(page);
+  await expectEditorsNotScrolled(page);
 };
 
 /** Puts the caret at the end of a (1-based) document line using the keyboard only. */
 const caretToLineEnd = async (page: Page, editor: Locator, line: number) => {
-  await editor.click();
+  await editor.click({ position: EDITOR_CLICK_POSITION });
   await page.keyboard.press(`${MOD}+Home`);
   for (let current = 1; current < line; current++) {
     await page.keyboard.press('ArrowDown');
@@ -215,6 +232,7 @@ test.describe('Component: CodeEditor', () => {
       await page.getByTestId('editing--search-input').fill('staging');
       await expect(page.getByTestId('editing--search')).toBeVisible();
       await waitForStableDom(page);
+      await expectEditorsNotScrolled(page);
       await expect(page).toHaveScreenshot();
     });
 
@@ -245,6 +263,7 @@ test.describe('Component: CodeEditor', () => {
         await expect(page.getByText(/at maximum/).first()).toBeVisible({ timeout: 1_000 });
       }).toPass({ timeout: 10_000 });
       await waitForStableDom(page);
+      await expectEditorsNotScrolled(page);
       await expect(page).toHaveScreenshot();
     });
 
@@ -396,7 +415,7 @@ test.describe('Component: CodeEditor', () => {
       await fullscreenButton.click();
       await expect(fullscreenButton).toHaveAccessibleName('Exit full screen');
 
-      await editor.click();
+      await editor.click({ position: EDITOR_CLICK_POSITION });
       await page.keyboard.press(`${MOD}+z`);
       await expect(editor).not.toContainText('api.wallarm.example.test');
       await expect(fullscreenButton).toHaveAccessibleName('Exit full screen');
@@ -470,13 +489,13 @@ test.describe('Component: CodeEditor', () => {
 
       await page.getByTestId('tabs-editor--tab-request').click();
       await expect(editor).toContainText('"/login-e2e"');
-      await editor.click();
+      await editor.click({ position: EDITOR_CLICK_POSITION });
       await page.keyboard.press(`${MOD}+z`);
       await expect(editor).toContainText('"path": "/login"');
 
       await page.getByTestId('tabs-editor--tab-response').click();
       await expect(editor).toContainText('"blocked-e2e"');
-      await editor.click();
+      await editor.click({ position: EDITOR_CLICK_POSITION });
       await page.keyboard.press(`${MOD}+z`);
       await expect(editor).toContainText('"reason": "blocked"');
     });
@@ -501,7 +520,7 @@ test.describe('Component: CodeEditor', () => {
       const editor = editorOf(page, 'long-document');
       await expect(editor).toHaveAttribute('aria-readonly', 'true');
 
-      await editor.click();
+      await editor.click({ position: EDITOR_CLICK_POSITION });
       await expect(editor).toBeFocused();
       const before = await editorText(editor);
       await page.keyboard.type('x');
