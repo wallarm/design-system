@@ -1,5 +1,6 @@
+import { syntaxTree } from '@codemirror/language';
 import { Compartment, EditorState, type Extension } from '@codemirror/state';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   activeDiagnostics,
   destroyLintedViews,
@@ -7,6 +8,7 @@ import {
   mountLinted,
 } from '../../../testUtils/codeEditorDiagnostics';
 import type { CodeEditorLanguage } from '../types';
+import { loadBabelParser } from './babelSyntax';
 import {
   jsonRegion,
   jsonSyntaxDiagnostics,
@@ -20,6 +22,11 @@ const HTTP_TEXT = 'POST /users HTTP/1.1\nContent-Type: text/plain\n\n{"a": 1,}';
 
 const stateOf = (doc: string, language: 'json' | 'http' | 'yaml' | 'text') =>
   EditorState.create({ doc, extensions: languageExtension(language) });
+
+// JS/TS lint results wait on the Babel chunk; load it once so `flushLint`'s single tick suffices.
+beforeAll(async () => {
+  await loadBabelParser();
+});
 
 afterEach(() => {
   destroyLintedViews();
@@ -151,6 +158,50 @@ const supportFor = async (language: CodeEditorLanguage): Promise<Extension> => [
   await loadLanguageExtension(language),
 ];
 
+// Exact copies of the `Languages` story samples (CodeEditor.stories.tsx) — they must lint clean.
+const STORY_PYTHON = `from dataclasses import dataclass
+
+
+@dataclass
+class Rule:
+    action: str
+    point: list[str]
+    enabled: bool = True
+
+
+def active(rules: list[Rule]) -> list[Rule]:
+    return [r for r in rules if r.enabled]
+`;
+const STORY_JSON = `{
+  "action": "block",
+  "point": ["header", "X-Forwarded-For"],
+  "enabled": true,
+  "threshold": 42
+}
+`;
+const STORY_JAVASCRIPT = `export async function fetchRules(client, { limit = 50 } = {}) {
+  const res = await client.get('/api/v2/rules', { params: { limit } });
+  return res.data.filter(rule => rule.enabled);
+}
+`;
+const STORY_TYPESCRIPT = `interface Rule {
+  action: 'block' | 'monitor';
+  point: string[];
+  enabled: boolean;
+}
+
+export const activeRules = (rules: readonly Rule[]): Rule[] =>
+  rules.filter((rule): rule is Rule => rule.enabled);
+`;
+const STORY_YAML = `rules:
+  - action: block
+    point: [header, X-Forwarded-For]
+    enabled: true
+  - action: monitor
+    point: [query, id]
+    enabled: false
+`;
+
 const BROKEN: readonly { language: CodeEditorLanguage; doc: string; near: number }[] = [
   { language: 'json', doc: '{"a": 1 "b": 2}', near: 8 },
   { language: 'yaml', doc: 'a: [1, 2', near: 3 },
@@ -159,12 +210,61 @@ const BROKEN: readonly { language: CodeEditorLanguage; doc: string; near: number
   { language: 'python', doc: 'def f(:\n  pass', near: 6 },
 ];
 
-const VALID: readonly { language: CodeEditorLanguage; doc: string }[] = [
-  { language: 'json', doc: '{"a": 1, "b": [true, null]}' },
-  { language: 'yaml', doc: 'a: [1, 2]\nb:\n  - c\n' },
-  { language: 'javascript', doc: 'function f(a, { b = 1 } = {}) {\n  return a + b;\n}\n' },
-  { language: 'typescript', doc: 'let a: number = 1;\nconst f = (x: string): string => x;\n' },
-  { language: 'python', doc: 'def f(x):\n    return x\n' },
+const VALID: readonly { name: string; language: CodeEditorLanguage; doc: string }[] = [
+  { name: 'json', language: 'json', doc: '{"a": 1, "b": [true, null]}' },
+  { name: 'yaml', language: 'yaml', doc: 'a: [1, 2]\nb:\n  - c\n' },
+  {
+    name: 'javascript',
+    language: 'javascript',
+    doc: 'function f(a, { b = 1 } = {}) {\n  return a + b;\n}\n',
+  },
+  {
+    name: 'typescript',
+    language: 'typescript',
+    doc: 'let a: number = 1;\nconst f = (x: string): string => x;\n',
+  },
+  { name: 'python', language: 'python', doc: 'def f(x):\n    return x\n' },
+  { name: 'Languages story python', language: 'python', doc: STORY_PYTHON },
+  { name: 'Languages story json', language: 'json', doc: STORY_JSON },
+  { name: 'Languages story javascript', language: 'javascript', doc: STORY_JAVASCRIPT },
+  { name: 'Languages story typescript', language: 'typescript', doc: STORY_TYPESCRIPT },
+  { name: 'Languages story yaml', language: 'yaml', doc: STORY_YAML },
+  {
+    name: 'ts arrow type predicate',
+    language: 'typescript',
+    doc: 'const isRule = (x: unknown): x is Rule => true;\n',
+  },
+  {
+    name: 'ts declare module',
+    language: 'typescript',
+    doc: 'declare module "m" {\n  export const x: number;\n}\n',
+  },
+  {
+    name: 'nested / non-literal pattern defaults',
+    language: 'javascript',
+    doc: 'const { a = f(1, 2), b: { c = 2 } = {}, ...rest } = o;\n',
+  },
+  {
+    name: 'ts nested / non-literal pattern defaults',
+    language: 'typescript',
+    doc: 'const { a = f(1, 2), b: { c = 2 } = {} }: Options = o;\n',
+  },
+  {
+    name: 'jsx in javascript',
+    language: 'javascript',
+    doc: 'const el = <div className="x">{a}</div>;\n',
+  },
+  {
+    name: 'optional chaining + nullish',
+    language: 'javascript',
+    doc: 'const n = user?.profile?.name ?? "anon";\nconst m = obj?.[key]?.(1);\n',
+  },
+  {
+    name: 'ts satisfies',
+    language: 'typescript',
+    doc: 'const config = { retries: 3 } satisfies Partial<Options>;\n',
+  },
+  { name: 'explicit resource management', language: 'typescript', doc: 'using r = g();\n' },
 ];
 
 describe('syntaxErrorDiagnostics', () => {
@@ -183,23 +283,56 @@ describe('syntaxErrorDiagnostics', () => {
   });
 
   it('collapses touching error nodes and only looks inside the region when given', async () => {
-    const doc = 'let a: = 1;\nlet b: = 2;';
-    const state = EditorState.create({ doc, extensions: await supportFor('typescript') });
+    const doc = 'def f(:\n  pass\ndef g(:\n  pass\n';
+    const state = EditorState.create({ doc, extensions: await supportFor('python') });
     const all = syntaxErrorDiagnostics(state);
     expect(all.length).toBeGreaterThanOrEqual(2);
     for (let i = 1; i < all.length; i++) {
       expect(all[i]?.from).toBeGreaterThan(all[i - 1]?.to ?? Number.POSITIVE_INFINITY);
     }
 
-    const secondLine = doc.indexOf('\n') + 1;
-    const inRegion = syntaxErrorDiagnostics(state, { from: secondLine, to: doc.length });
+    const secondDef = doc.indexOf('def g');
+    const inRegion = syntaxErrorDiagnostics(state, { from: secondDef, to: doc.length });
     expect(inRegion.length).toBeGreaterThanOrEqual(1);
-    for (const d of inRegion) expect(d.from).toBeGreaterThanOrEqual(secondLine);
+    for (const d of inRegion) expect(d.from).toBeGreaterThanOrEqual(secondDef);
   });
 
   it('returns nothing without a parser', () => {
     const state = EditorState.create({ doc: '{', extensions: languageExtension('text') });
     expect(syntaxErrorDiagnostics(state)).toEqual([]);
+  });
+});
+
+describe('syntax diagnostics on a partially parsed tree (parse timeout)', () => {
+  // Large enough that a 0 ms budget cannot parse it to the end.
+  const LARGE_YAML = Array.from({ length: 20000 }, (_, i) => `key${i}: [${i}, ${i + 1}]`).join(
+    '\n',
+  );
+
+  it('ignores error nodes at or past the parsed extent, including "end of input"', () => {
+    const state = EditorState.create({ doc: LARGE_YAML, extensions: languageExtension('yaml') });
+    expect(syntaxErrorDiagnostics(state, undefined, 0)).toEqual([]);
+  });
+
+  it('still reports real errors inside the parsed extent', () => {
+    const doc = `a: [1, 2\n${LARGE_YAML}`;
+    const state = EditorState.create({ doc, extensions: languageExtension('yaml') });
+    const diagnostics = syntaxErrorDiagnostics(state, undefined, 0);
+    expect(diagnostics.length).toBeGreaterThanOrEqual(1);
+    expect(diagnostics.every(d => d.from < doc.length)).toBe(true);
+  });
+
+  it('keeps the JSON fallback away from cut-off error nodes', () => {
+    // No position in the message → the Lezer fallback; an incomplete tree must not
+    // point at its artificial end.
+    const doc = `[${Array.from({ length: 20000 }, (_, i) => i).join(', ')}, tru]`;
+    const state = EditorState.create({ doc, extensions: languageExtension('json') });
+    const [diagnostic] = jsonSyntaxDiagnostics(state, { from: 0, to: doc.length }, 0);
+    const parsedTo = syntaxTree(state).length;
+    expect(parsedTo).toBeLessThan(doc.length);
+    // The real error ("tru") lies past the parsed extent → the fallback is the content start,
+    // never the cut-off artefact at `parsedTo`.
+    expect(diagnostic).toMatchObject({ from: 0, to: 1, message: "Unexpected token ']'" });
   });
 });
 
@@ -219,7 +352,7 @@ describe('diagnosticsExtension — syntax errors for every parsed language', () 
     },
   );
 
-  it.each(VALID)('reports nothing for valid $language', async ({ language, doc }) => {
+  it.each(VALID)('reports nothing for valid $name', async ({ language, doc }) => {
     const { view, onChange } = mountLinted(
       doc,
       { language },
@@ -257,48 +390,31 @@ describe('diagnosticsExtension — syntax errors for every parsed language', () 
     expect(diagnostics[0]).toMatchObject({ source: 'syntax', from: doc.indexOf('"b"') });
   });
 
-  it('re-lints when a lazily loaded parser is reconfigured in', async () => {
+  it('re-lints when the lazily loaded Python parser is reconfigured in', async () => {
     const language = new Compartment();
-    const { view } = mountLinted('function f( {', { language: 'javascript' }, language.of([]));
+    const { view } = mountLinted('def f(:\n  pass', { language: 'python' }, language.of([]));
     await flushLint(view);
     expect(activeDiagnostics(view.state)).toEqual([]);
 
     // No forceLinting: the reconfigure alone must schedule a lint run (needsRefresh).
-    view.dispatch({ effects: language.reconfigure(await loadLanguageExtension('javascript')) });
+    view.dispatch({ effects: language.reconfigure(await loadLanguageExtension('python')) });
     await vi.waitFor(() => expect(activeDiagnostics(view.state).length).toBeGreaterThan(0), {
       timeout: LINT_DELAY * 5,
     });
   });
 });
 
-describe('diagnosticsExtension — @lezer/javascript 1.5.5 shorthand-default workaround', () => {
-  const syntaxCount = async (language: CodeEditorLanguage, doc: string) => {
-    const { view } = mountLinted(doc, { language }, await loadLanguageExtension(language));
-    await flushLint(view);
-    return activeDiagnostics(view.state).filter(d => d.source === 'syntax').length;
+describe('known limitation — @lezer/python 1.1.19 misreports valid code (not filtered)', () => {
+  const pythonSyntaxCount = async (doc: string) => {
+    const state = EditorState.create({ doc, extensions: await supportFor('python') });
+    return syntaxErrorDiagnostics(state).length;
   };
 
-  const VALID_DEFAULTS = [
-    'function f({ a = 1 }) {}',
-    'const {a = 1} = o;',
-    // The Languages story's JavaScript sample.
-    "export async function fetchRules(client, { limit = 50 } = {}) {\n  const res = await client.get('/api/v2/rules', { params: { limit } });\n  return res.data.filter(rule => rule.enabled);\n}\n",
-  ];
-  const INVALID_DEFAULTS = ['function f({ a = }) {}', 'f({ a = 1 })'];
+  it.fails('positional-only lambda parameters', async () => {
+    expect(await pythonSyntaxCount('f = lambda a, /, b=1: a + b\n')).toBe(0);
+  });
 
-  for (const language of ['javascript', 'typescript'] as const) {
-    it.each(VALID_DEFAULTS)(`${language}: no syntax errors for %j`, async doc => {
-      expect(await syntaxCount(language, doc)).toBe(0);
-    });
-
-    it.each(INVALID_DEFAULTS)(`${language}: still reports %j`, async doc => {
-      expect(await syntaxCount(language, doc)).toBeGreaterThanOrEqual(1);
-    });
-  }
-
-  it('typescript: no syntax errors for a typed shorthand-default pattern', async () => {
-    expect(
-      await syntaxCount('typescript', 'const f = ({ a = 1 }: { a?: number }): number => a;'),
-    ).toBe(0);
+  it.fails('parenthesised context managers', async () => {
+    expect(await pythonSyntaxCount('with (open(a) as f, open(b) as g):\n    pass\n')).toBe(0);
   });
 });

@@ -2,8 +2,9 @@ import { ensureSyntaxTree, syntaxTree } from '@codemirror/language';
 import { type Diagnostic, linter, setDiagnosticsEffect } from '@codemirror/lint';
 import type { EditorState, Extension, Text } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import type { SyntaxNode } from '@lezer/common';
+import type { Tree } from '@lezer/common';
 import type { CodeEditorDiagnostic, CodeEditorLanguage, JsonSchema } from '../types';
+import { type BabelLanguage, babelSyntaxDiagnostics } from './babelSyntax';
 import { findJsonBodyRange } from './languages';
 import { offsetToPosition, positionToOffset } from './positions';
 
@@ -75,9 +76,14 @@ const cleanMessage = (message: string): string => {
   const cleaned = message
     .replace(/^JSON\.parse: /, '')
     .replace(/^JSON Parse error: /, '')
-    .replace(/ in JSON at position \d+(?: \(line \d+ column \d+\))?$/, '')
+    // V8: `... in JSON at position N (line L column C)` (dropped) and
+    // `... after JSON at position N (line L column C)` (keeps `after JSON`).
+    .replace(/ (in|after) JSON at position \d+(?: \(line \d+ column \d+\))?$/, (_, word: string) =>
+      word === 'after' ? ' after JSON' : '',
+    )
     .replace(/ at line \d+ column \d+ of the JSON data$/, '')
-    .replace(/, ".*" is not valid JSON$/s, '')
+    // V8 quotes the input, truncated with `...` on either side for long texts.
+    .replace(/, (?:\.\.\.)?".*"(?:\.\.\.)? is not valid JSON$/s, '')
     .trim();
   if (cleaned === '') return 'Invalid JSON';
   return cleaned.charAt(0).toUpperCase() + cleaned.slice(1);
@@ -116,9 +122,30 @@ const rangeAt = (text: string, relative: number, base: number): JsonRegion => {
     : { from: base + from, to: base + from + 1 };
 };
 
+interface ParsedTree {
+  tree: Tree;
+  /**
+   * End of the parsed extent. When the parse timed out, the tree is partial and its error nodes at
+   * or after this point are artefacts of the cut-off (not real errors), so they are ignored.
+   */
+  parsedTo: number;
+}
+
+/** Tree parsed up to `upto` (bounded by `timeout` ms), with how far it really got. */
+const parsedTree = (state: EditorState, upto: number, timeout: number): ParsedTree => {
+  const ensured = ensureSyntaxTree(state, upto, timeout);
+  if (ensured) return { tree: ensured, parsedTo: Number.POSITIVE_INFINITY };
+  const tree = syntaxTree(state);
+  return { tree, parsedTo: tree.length };
+};
+
 /** First Lezer error (⚠) node inside the region — used when the message has no position. */
-const firstErrorNode = (state: EditorState, region: JsonRegion): JsonRegion | null => {
-  const tree = ensureSyntaxTree(state, region.to, ENSURE_TREE_TIMEOUT) ?? syntaxTree(state);
+const firstErrorNode = (
+  state: EditorState,
+  region: JsonRegion,
+  timeout: number,
+): JsonRegion | null => {
+  const { tree, parsedTo } = parsedTree(state, region.to, timeout);
   let found: JsonRegion | null = null;
   tree.iterate({
     from: region.from,
@@ -126,6 +153,7 @@ const firstErrorNode = (state: EditorState, region: JsonRegion): JsonRegion | nu
     enter: node => {
       if (found) return false;
       if (!node.type.isError || node.from < region.from) return true;
+      if (node.from >= parsedTo) return false;
       found = { from: node.from, to: node.to };
       return false;
     },
@@ -133,50 +161,19 @@ const firstErrorNode = (state: EditorState, region: JsonRegion): JsonRegion | nu
   return found;
 };
 
-/** Error nodes a language's parser produces for valid code; skipped by `syntaxErrorDiagnostics`. */
-export type IgnoreErrorNode = (node: SyntaxNode) => boolean;
-
-/** E1 of the shorthand-default misparse: ⚠ holding `Equals`, directly in `PatternProperty > VariableDefinition`. */
-const isShorthandDefaultEquals = (node: SyntaxNode | null): boolean =>
-  node !== null &&
-  node.type.isError &&
-  node.parent?.name === 'VariableDefinition' &&
-  node.parent.parent?.name === 'PatternProperty' &&
-  node.getChild('Equals') !== null;
-
-const isNonEmptyError = (node: SyntaxNode | null): node is SyntaxNode =>
-  node !== null && node.type.isError && node.to > node.from;
-
 /**
- * Works around @lezer/javascript 1.5.5 misparsing shorthand defaults in object patterns
- * (`function f({ a = 1 }) {}`, `const { a = 1 } = o`) as
- * `PatternProperty(VariableDefinition(⚠(Equals), ⚠(<value>)))`. Drops exactly that pair — E1 (⚠ with
- * `Equals`) and its non-empty ⚠ next sibling E2. A missing value (`{ a = }`, no E2) and
- * `{ a = 1 }` outside a pattern (`PropertyDefinition` parent) are still reported.
- */
-export const isJavaScriptShorthandDefaultMisparse: IgnoreErrorNode = node => {
-  if (isShorthandDefaultEquals(node)) return isNonEmptyError(node.nextSibling);
-  return isNonEmptyError(node) && isShorthandDefaultEquals(node.prevSibling);
-};
-
-/** Per-language error-node filters for parser misparses of valid code. */
-const IGNORED_ERROR_NODES: Partial<Record<CodeEditorLanguage, IgnoreErrorNode>> = {
-  javascript: isJavaScriptShorthandDefaultMisparse,
-  typescript: isJavaScriptShorthandDefaultMisparse,
-};
-
-/**
- * Syntax errors from the Lezer tree (spec §14 A3): every error (⚠) node of the fully parsed
- * tree — or only those inside `region` — becomes an `error` diagnostic; error nodes that touch
- * are collapsed into one. Nodes matched by `ignore` are skipped. Empty for a state without a parser.
+ * Syntax errors from the Lezer tree (spec §14 A3): every error (⚠) node of the parsed tree — or
+ * only those inside `region` — becomes an `error` diagnostic; error nodes that touch are
+ * collapsed into one. If the parse times out, errors at or past the parsed extent (including
+ * "Unexpected end of input") are not reported. Empty for a state without a parser.
  */
 export const syntaxErrorDiagnostics = (
   state: EditorState,
   region?: JsonRegion,
-  ignore?: IgnoreErrorNode,
+  timeout = ENSURE_TREE_TIMEOUT,
 ): Diagnostic[] => {
   const length = state.doc.length;
-  const tree = ensureSyntaxTree(state, length, ENSURE_TREE_TIMEOUT) ?? syntaxTree(state);
+  const { tree, parsedTo } = parsedTree(state, length, timeout);
   const out: Diagnostic[] = [];
   tree.iterate({
     from: region?.from ?? 0,
@@ -184,7 +181,7 @@ export const syntaxErrorDiagnostics = (
     enter: node => {
       if (!node.type.isError) return true;
       if (region && (node.from < region.from || node.from > region.to)) return false;
-      if (ignore?.(node.node)) return false;
+      if (node.from >= parsedTo) return false;
       const from = node.from;
       const to = Math.min(Math.max(node.to, from + 1), length);
       const last = out.at(-1);
@@ -208,16 +205,24 @@ export const syntaxErrorDiagnostics = (
   return out;
 };
 
-/** Languages whose syntax errors come from Lezer error nodes (JSON regions use `JSON.parse`). */
-const ERROR_NODE_LANGUAGES: ReadonlySet<CodeEditorLanguage> = new Set([
-  'yaml',
-  'javascript',
-  'typescript',
-  'python',
-]);
+/**
+ * Languages whose syntax errors come from Lezer error nodes. JSON regions use `JSON.parse`;
+ * javascript/typescript use `@babel/parser` (spec §14 A5).
+ *
+ * Known limitation (@lezer/python 1.1.19, not filtered): valid `lambda a, /, b=1: ...` and
+ * parenthesised context managers `with (open(a) as f, open(b) as g):` are misreported.
+ */
+const ERROR_NODE_LANGUAGES: ReadonlySet<CodeEditorLanguage> = new Set(['yaml', 'python']);
+
+const isBabelLanguage = (language: CodeEditorLanguage): language is BabelLanguage =>
+  language === 'javascript' || language === 'typescript';
 
 /** JSON syntax error of the region (at most one — `JSON.parse` stops at the first). */
-export const jsonSyntaxDiagnostics = (state: EditorState, region: JsonRegion): Diagnostic[] => {
+export const jsonSyntaxDiagnostics = (
+  state: EditorState,
+  region: JsonRegion,
+  timeout = ENSURE_TREE_TIMEOUT,
+): Diagnostic[] => {
   const text = state.sliceDoc(region.from, region.to);
   if (text.trim() === '') return [];
   try {
@@ -230,7 +235,7 @@ export const jsonSyntaxDiagnostics = (state: EditorState, region: JsonRegion): D
     if (located.offset !== null) {
       range = rangeAt(text, located.offset, region.from);
     } else {
-      const node = firstErrorNode(state, region);
+      const node = firstErrorNode(state, region, timeout);
       if (node && node.to > node.from) range = node;
       else if (node) range = rangeAt(text, node.from - region.from, region.from);
       else range = rangeAt(text, text.length - text.trimStart().length, region.from);
@@ -302,14 +307,24 @@ const lintSource =
   (view: EditorView): readonly Diagnostic[] | Promise<readonly Diagnostic[]> => {
     const { state } = view;
     const region = jsonRegion(state, config.language);
+    const external = externalDiagnostics(state.doc, config.external, config.startingLineNumber);
+    if (isBabelLanguage(config.language)) {
+      return babelSyntaxDiagnostics(state.doc.toString(), config.language).then(
+        syntax => [...syntax, ...external],
+        (error: unknown) => {
+          // biome-ignore lint/suspicious/noConsole: a parser that fails to load must not hide consumer diagnostics
+          console.error('[CodeEditor] failed to load the JavaScript syntax checker', error);
+          return external;
+        },
+      );
+    }
     // JSON regions (json, http body): the precise JSON.parse message only — error nodes inside
-    // the region would duplicate it. Other parsed languages: Lezer error nodes. bash/text: none.
+    // the region would duplicate it. yaml/python: Lezer error nodes. bash/text: none.
     const syntax = region
       ? jsonSyntaxDiagnostics(state, region)
       : ERROR_NODE_LANGUAGES.has(config.language)
-        ? syntaxErrorDiagnostics(state, undefined, IGNORED_ERROR_NODES[config.language])
+        ? syntaxErrorDiagnostics(state)
         : [];
-    const external = externalDiagnostics(state.doc, config.external, config.startingLineNumber);
     const { schemaSource, schema } = config;
     if (
       !region ||
@@ -408,15 +423,16 @@ export const diagnosticsTheme: Extension = EditorView.theme({
 });
 
 /**
- * Diagnostics (spec §7.12, §14 A3): one debounced linter merging syntax errors (JSON.parse for
- * json / the http JSON body, Lezer error nodes for yaml / javascript / typescript / python), schema errors (via `schemaSource`, T13) and the consumer `diagnostics` prop.
+ * Diagnostics (spec §7.12, §14 A3 + A5): one debounced linter merging syntax errors (JSON.parse for
+ * json / the http JSON body, `@babel/parser` for javascript / typescript, Lezer error nodes for
+ * yaml / python), schema errors (via `schemaSource`, T13) and the consumer `diagnostics` prop.
  * Underlines + hover tooltip only — no lint gutter, panel or lint keymap.
  */
 export const diagnosticsExtension = (config: DiagnosticsConfig): Extension => [
   linter(lintSource(config), {
     delay: LINT_DELAY,
     autoPanel: false,
-    // Lazy parsers (JS/TS/Python) arrive through a language-compartment reconfigure.
+    // The lazy Python parser arrives through a language-compartment reconfigure.
     needsRefresh: update => update.transactions.some(tr => tr.reconfigured),
   }),
   reportChanges(config),

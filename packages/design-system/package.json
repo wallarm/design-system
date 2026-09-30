@@ -134,6 +134,7 @@
   },
   "dependencies": {
     "@ark-ui/react": "5.38.0",
+    "@babel/parser": "7.29.9",
     "@codemirror/autocomplete": "6.20.3",
     "@codemirror/commands": "6.11.1",
     "@codemirror/lang-javascript": "6.2.5",

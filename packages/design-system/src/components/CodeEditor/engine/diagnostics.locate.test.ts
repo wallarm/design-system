@@ -40,4 +40,25 @@ describe('locateJsonSyntaxError', () => {
   it('falls back to a generic message when nothing is left after cleaning', () => {
     expect(locateJsonSyntaxError('', '{')).toEqual({ offset: null, message: 'Invalid JSON' });
   });
+
+  it('keeps the "after JSON" wording of the V8 trailing-content message', () => {
+    expect(
+      locateJsonSyntaxError(
+        'Unexpected non-whitespace character after JSON at position 4 (line 1 column 5)',
+        '[1] x',
+      ),
+    ).toEqual({ offset: 4, message: 'Unexpected non-whitespace character after JSON' });
+  });
+
+  it('drops the quoted input of V8 messages, also when it is truncated', () => {
+    expect(
+      locateJsonSyntaxError(`Unexpected token ']', ..."19999, tru]" is not valid JSON`, '[tru]'),
+    ).toEqual({ offset: null, message: "Unexpected token ']'" });
+    expect(
+      locateJsonSyntaxError(
+        `Unexpected token 't', ..."1, 2, tru, 0, 1"... is not valid JSON`,
+        '[tru]',
+      ),
+    ).toEqual({ offset: null, message: "Unexpected token 't'" });
+  });
 });
