@@ -45,6 +45,7 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
 
   useInfiniteScroll({
     mode: 'window',
+    scrollRef: containerRef,
     table,
     virtualizerRef,
     tbodyRef,

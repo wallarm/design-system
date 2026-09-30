@@ -28,6 +28,14 @@ export { getDndStyles } from './getDndStyles';
 export { getPinningStyles } from './getPinningStyles';
 export { getRowKey } from './getRowKey';
 export { isLastPinnedLeft } from './isLastPinnedLeft';
+export {
+  getOffsetTopInScrollRoot,
+  getScrollMetrics,
+  getScrollRoot,
+  isWindowScrollRoot,
+  type ScrollRoot,
+  scrollRootBy,
+} from './scrollRoot';
 export { useColumnDnd } from './useColumnDnd';
 export { useContainerWidth } from './useContainerWidth';
 export { useRowDnd } from './useRowDnd';

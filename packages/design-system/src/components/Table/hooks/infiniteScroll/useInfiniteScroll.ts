@@ -12,7 +12,7 @@ import { useScrollEdge } from './useScrollEdge';
 
 interface UseInfiniteScrollOptions<T extends RowData> {
   mode: 'container' | 'window';
-  /** Scroll element ref — required for `container` mode */
+  /** `container`: the scroll element. `window`: an element to resolve the scroll root from. */
   scrollRef?: RefObject<HTMLElement | null>;
   table: Table<DSTableFeatures, T>;
   virtualizerRef: RefObject<TableVirtualizerInstance | null>;

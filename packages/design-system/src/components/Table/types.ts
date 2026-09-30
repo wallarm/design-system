@@ -296,7 +296,10 @@ export interface TableProps<T> extends TestableProps {
   onSettingsOpenChange?: (open: boolean) => void;
 
   // --- Virtualization ---
-  /** Enable row virtualization. `'container'` virtualizes within the scroll container; `'window'` virtualizes against the browser window. */
+  /**
+   * Enable row virtualization. `'container'` virtualizes within the table's own scroll container;
+   * `'window'` follows the page scroll — the nearest scrollable ancestor, or the browser window.
+   */
   virtualized?: TableVirtualized;
   /**
    * Whether columns stretch proportionally to fill the container width.

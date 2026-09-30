@@ -1,5 +1,5 @@
 import { type RefObject, useEffect, useRef } from 'react';
-import { SCROLL_EDGE_COOLDOWN_MS } from '../../lib';
+import { getScrollMetrics, getScrollRoot, SCROLL_EDGE_COOLDOWN_MS } from '../../lib';
 
 type ScrollMode = 'container' | 'window';
 type ScrollEdge = 'start' | 'end';
@@ -7,7 +7,10 @@ type ScrollEdge = 'start' | 'end';
 interface UseScrollEdgeOptions {
   edge: ScrollEdge;
   mode: ScrollMode;
-  /** Scroll element ref — required for `container` mode */
+  /**
+   * `container`: the scroll element. `window`: any element inside the table —
+   * the scroll root is resolved from it (see `getScrollRoot`).
+   */
   scrollRef?: RefObject<HTMLElement | null>;
   onReached?: () => void;
   threshold: number;
@@ -43,26 +46,15 @@ export const useScrollEdge = ({
   });
 
   useEffect(() => {
+    const target =
+      mode === 'window' ? getScrollRoot(scrollRef?.current ?? null) : scrollRef?.current;
+    if (!target) return;
+
     const check = () => {
       const callback = onReachedRef.current;
       if (!callback || !enabledRef.current) return;
 
-      let scrollTop: number;
-      let clientHeight: number;
-      let scrollHeight: number;
-
-      if (mode === 'window') {
-        scrollTop = window.scrollY;
-        clientHeight = window.innerHeight;
-        scrollHeight = document.documentElement.scrollHeight;
-      } else {
-        const el = scrollRef?.current;
-        if (!el) return;
-        scrollTop = el.scrollTop;
-        clientHeight = el.clientHeight;
-        scrollHeight = el.scrollHeight;
-      }
-
+      const { scrollTop, clientHeight, scrollHeight } = getScrollMetrics(target);
       const distance = edge === 'start' ? scrollTop : scrollHeight - scrollTop - clientHeight;
 
       if (distance <= threshold) {
@@ -76,9 +68,6 @@ export const useScrollEdge = ({
         firedRef.current = false;
       }
     };
-
-    const target = mode === 'window' ? window : scrollRef?.current;
-    if (!target) return;
 
     // `enabled` is read via ref, so flipping it does not re-run this effect —
     // re-arming after the initial-anchor gate opens relies on the next scroll event.

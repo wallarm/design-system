@@ -129,4 +129,32 @@ describe('useScrollEdge', () => {
     el.fire();
     expect(onReached).toHaveBeenCalledTimes(1);
   });
+  it('in window mode follows a scrollable ancestor instead of the window', () => {
+    // A micro-frontend host scrolls its content pane; the window never moves.
+    const pane = document.createElement('div');
+    pane.style.overflowY = 'auto';
+    const inner = document.createElement('div');
+    pane.appendChild(inner);
+    document.body.appendChild(pane);
+    Object.defineProperties(pane, {
+      clientHeight: { value: 100 },
+      scrollHeight: { value: 1000 },
+    });
+    const onReached = vi.fn();
+    renderHook(() =>
+      useScrollEdge({
+        edge: 'end',
+        mode: 'window',
+        scrollRef: { current: inner },
+        onReached,
+        threshold: 200,
+      }),
+    );
+    expect(onReached).not.toHaveBeenCalled();
+
+    pane.scrollTop = 850;
+    pane.dispatchEvent(new Event('scroll'));
+    expect(onReached).toHaveBeenCalledTimes(1);
+    pane.remove();
+  });
 });
