@@ -164,7 +164,10 @@ Exported types:
 6. **Auto-lock.** Each `FileUploadItem loading` increments a counter in root context: register on mount or when `loading` turns on, unregister on cleanup. That is a real side effect, not derived state, so the effect is appropriate. When `locked`:
    - the Dropzone and Trigger are disabled;
    - Delete (Cancel) stays active;
-   - Replace is hidden on the loading row.
+   - Replace is hidden on the loading row;
+   - the hidden input's `click` is cancelled, so a `Field` label (its `htmlFor` points to the hidden input) and single-mode Replace cannot open the picker either. The same holds for `disabled` and multiple mode at `maxFiles`.
+
+   **Drop guards.** Ark `allowDrop` is passed as `allowDrop && !locked && !atMaxFiles`, so zag never enters `dragging` or accepts a drop while the Area is off. Because zag's `preventDocumentDrop` reads `allowDrop` only once at start, the DS sets it to `false` and runs its own document guard, which re-evaluates while `allowDrop && !disabled`. The root also cancels any `dragover`/`drop` inside the component that the Area did not take, such as a drop on the dimmed Area or on a row. It shows a "no drop" cursor, and the browser never opens the file and navigates away from the form.
 
    Root `disabled` is **not** used for this. It would disable Delete and remove the hidden input from `FormData`.
 7. **`readOnly`:**
