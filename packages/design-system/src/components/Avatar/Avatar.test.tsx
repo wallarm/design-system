@@ -1,7 +1,9 @@
 import type { FC } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { describe, expect, it, vi } from 'vitest';
 import type { SvgIconProps } from '../../icons';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { Avatar, AvatarFallback, AvatarImage, AvatarOverlay } from '.';
 
 const renderAvatar = (props: { src?: string; name?: string; onStatusChange?: () => void } = {}) =>
@@ -251,6 +253,33 @@ describe('as="button"', () => {
     expect(root).toBeDisabled();
   });
 
+  it('a span root drops button-only attributes', () => {
+    render(
+      // @ts-expect-error button attributes need as='button' or asChild
+      <Avatar data-testid='av' disabled name='photo' value='1' form='f'>
+        <AvatarFallback />
+      </Avatar>,
+    );
+    const root = screen.getByTestId('av');
+    for (const attr of ['disabled', 'name', 'value', 'form', 'type']) {
+      expect(root).not.toHaveAttribute(attr);
+    }
+  });
+
+  it('asChild passes button attributes to its child', () => {
+    render(
+      <Avatar asChild type='submit' disabled name='photo'>
+        <button aria-label='Save'>
+          <AvatarFallback />
+        </button>
+      </Avatar>,
+    );
+    const button = screen.getByRole('button', { name: 'Save' });
+    expect(button).toHaveAttribute('type', 'submit');
+    expect(button).toHaveAttribute('name', 'photo');
+    expect(button).toBeDisabled();
+  });
+
   it('asChild still wins over as', () => {
     render(
       <Avatar as='button' asChild data-testid='av'>
@@ -261,5 +290,45 @@ describe('as="button"', () => {
     );
     expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute('data-testid', 'av');
     expect(screen.queryByRole('button')).toBeNull();
+  });
+});
+
+describe('Avatar id', () => {
+  it('puts a consumer id on the root unchanged', () => {
+    render(
+      <Avatar id='me' data-testid='av'>
+        <AvatarFallback />
+      </Avatar>,
+    );
+    expect(screen.getByTestId('av')).toHaveAttribute('id', 'me');
+  });
+
+  it('puts a consumer id on a button root unchanged', () => {
+    render(
+      <Avatar as='button' id='me' aria-label='Profile'>
+        <AvatarFallback />
+      </Avatar>,
+    );
+    expect(screen.getByRole('button', { name: 'Profile' })).toHaveAttribute('id', 'me');
+  });
+
+  it('keeps the tooltip trigger id on the button, so the tooltip links to it', async () => {
+    render(
+      <Tooltip openDelay={0}>
+        <TooltipTrigger asChild>
+          <Avatar as='button' aria-label='Profile'>
+            <AvatarFallback />
+          </Avatar>
+        </TooltipTrigger>
+        <TooltipContent data-testid='tip'>Ada Lovelace</TooltipContent>
+      </Tooltip>,
+    );
+    const button = screen.getByRole('button', { name: 'Profile' });
+    expect(button.id).toMatch(/^tooltip:.+:trigger$/);
+    // Keyboard focus: zag opens a tooltip on focus only when focus is visible.
+    await userEvent.tab();
+    expect(button).toHaveFocus();
+    const tip = await screen.findByTestId('tip');
+    await waitFor(() => expect(button).toHaveAttribute('aria-describedby', tip.id));
   });
 });

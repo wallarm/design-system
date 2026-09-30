@@ -53,6 +53,27 @@ describe('Avatar as a FileUpload trigger', () => {
     expect(byTestId('fu--trigger--fallback')).toHaveTextContent('AL');
   });
 
+  it('keeps the FileUpload trigger id on the button', () => {
+    render(<ClickToUpload />);
+    expect(screen.getByRole('button', { name: 'Change avatar' }).id).toMatch(/^file:.+:trigger$/);
+  });
+
+  it('a consumer id on FileUploadTrigger lands on the button unchanged', () => {
+    render(
+      <FileUpload>
+        <FileUploadTrigger asChild id='avatar-trigger'>
+          <Avatar as='button' aria-label='Change avatar'>
+            <AvatarFallback />
+          </Avatar>
+        </FileUploadTrigger>
+      </FileUpload>,
+    );
+    expect(screen.getByRole('button', { name: 'Change avatar' })).toHaveAttribute(
+      'id',
+      'avatar-trigger',
+    );
+  });
+
   it('opens the picker on click', async () => {
     const click = vi.spyOn(HTMLInputElement.prototype, 'click');
     render(<ClickToUpload />);

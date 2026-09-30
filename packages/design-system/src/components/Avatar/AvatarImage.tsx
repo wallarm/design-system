@@ -4,7 +4,9 @@ import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { avatarImageClassNames } from './classes';
 
-export interface AvatarImageProps extends ImgHTMLAttributes<HTMLImageElement> {
+// No `id`: Ark finds the image by its own id to track `src` changes and load state; an id here would
+// override it (zag getImageEl looks up `ids.image ?? avatar:${id}:image`). Put an id on `Avatar`.
+export interface AvatarImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, 'id'> {
   ref?: Ref<HTMLImageElement>;
 }
 
