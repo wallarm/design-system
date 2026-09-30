@@ -11,7 +11,7 @@ export type FileUploadTriggerProps = ButtonProps;
  * "Select file" button — the compact picker for when space is tight. Takes every
  * `Button` prop (defaults: primary / brand / large). Hidden (read-only) and blocked like the Area.
  *
- * `asChild`: no Button is rendered. The single child element (e.g. `<Avatar asChild><button/></Avatar>`)
+ * `asChild`: no Button is rendered. The single child element (e.g. `<Avatar as='button'>`)
  * becomes the trigger and receives `data-slot`, `data-testid`, `aria-describedby`, `disabled` and the
  * Ark trigger props. Button-only props (`variant`, `color`, `size`, `loading`, `fullWidth`, `as`) are
  * ignored. Pass `disabled` / `aria-describedby` here, not on the child — a child value wins the merge.
