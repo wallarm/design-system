@@ -42,6 +42,8 @@ export const useInfiniteScroll = <T extends RowData>({
 }: UseInfiniteScrollOptions<T>) => {
   const rows = table.getRowModel().rows;
 
+  const resolveKey = mode === 'window' ? rows.length : undefined;
+
   const ready = useInitialAnchor({ initialScrollToRowId, rows, virtualizerRef });
 
   usePrependScrollAnchor({ mode, scrollRef, rows, virtualizerRef, tbodyRef, isLoadingPrevious });
@@ -53,6 +55,7 @@ export const useInfiniteScroll = <T extends RowData>({
     onReached: onStartReached,
     threshold: onStartReachedThreshold ?? TABLE_START_REACHED_THRESHOLD,
     enabled: ready,
+    resolveKey,
   });
 
   useScrollEdge({
@@ -62,5 +65,6 @@ export const useInfiniteScroll = <T extends RowData>({
     onReached: onEndReached,
     threshold: onEndReachedThreshold ?? TABLE_END_REACHED_THRESHOLD,
     enabled: ready,
+    resolveKey,
   });
 };

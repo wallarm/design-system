@@ -16,6 +16,12 @@ interface UseScrollEdgeOptions {
   threshold: number;
   /** When false, suppresses firing (e.g. while the initial anchor scroll settles) */
   enabled?: boolean;
+  /**
+   * `window` mode: re-resolves the scroll root when this changes (pass the row
+   * count) — a pane with too little content to scroll resolves to the window
+   * until rows fill it.
+   */
+  resolveKey?: unknown;
 }
 
 /**
@@ -30,6 +36,7 @@ export const useScrollEdge = ({
   onReached,
   threshold,
   enabled = true,
+  resolveKey,
 }: UseScrollEdgeOptions) => {
   const firedRef = useRef(false);
   const lastFiredAtRef = useRef(0);
@@ -45,6 +52,7 @@ export const useScrollEdge = ({
     enabledRef.current = enabled;
   });
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `resolveKey` only re-runs the root resolution
   useEffect(() => {
     const target =
       mode === 'window' ? getScrollRoot(scrollRef?.current ?? null) : scrollRef?.current;
@@ -77,5 +85,5 @@ export const useScrollEdge = ({
     return () => {
       target.removeEventListener('scroll', check);
     };
-  }, [edge, mode, scrollRef, threshold]);
+  }, [edge, mode, scrollRef, threshold, resolveKey]);
 };

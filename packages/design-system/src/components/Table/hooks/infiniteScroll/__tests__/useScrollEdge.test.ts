@@ -141,20 +141,23 @@ describe('useScrollEdge', () => {
       scrollHeight: { value: 1000 },
     });
     const onReached = vi.fn();
-    renderHook(() =>
-      useScrollEdge({
-        edge: 'end',
-        mode: 'window',
-        scrollRef: { current: inner },
-        onReached,
-        threshold: 200,
-      }),
-    );
-    expect(onReached).not.toHaveBeenCalled();
+    try {
+      renderHook(() =>
+        useScrollEdge({
+          edge: 'end',
+          mode: 'window',
+          scrollRef: { current: inner },
+          onReached,
+          threshold: 200,
+        }),
+      );
+      expect(onReached).not.toHaveBeenCalled();
 
-    pane.scrollTop = 850;
-    pane.dispatchEvent(new Event('scroll'));
-    expect(onReached).toHaveBeenCalledTimes(1);
-    pane.remove();
+      pane.scrollTop = 850;
+      pane.dispatchEvent(new Event('scroll'));
+      expect(onReached).toHaveBeenCalledTimes(1);
+    } finally {
+      pane.remove();
+    }
   });
 });

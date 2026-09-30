@@ -171,6 +171,38 @@ test.describe('Component: Table', () => {
         .toBeGreaterThan(0);
     });
 
+    test('Should follow a scrolling pane in window mode', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Pane');
+
+      const pane = page.getByTestId('scroll-pane');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+      const initialWindowSize = await readWindowSize(page);
+      expect(initialWindowSize).toBeGreaterThan(0);
+
+      // Scroll the pane step by step, as a wheel does: the document never
+      // moves, so rows under the pane viewport and the end edge are only
+      // reached if the table tracks the pane.
+      const paneHasRowInView = () =>
+        pane.evaluate(el => {
+          const { top, bottom } = el.getBoundingClientRect();
+          return [...el.querySelectorAll('[data-row-id]')].some(row => {
+            const rect = row.getBoundingClientRect();
+            return rect.bottom > top && rect.top < bottom;
+          });
+        });
+      for (let step = 0; step < 40; step++) {
+        await pane.evaluate(el => {
+          el.scrollTop += 300;
+        });
+        await expect.poll(paneHasRowInView).toBe(true);
+      }
+
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+      await expect
+        .poll(() => readWindowSize(page), { timeout: 3000 })
+        .toBeGreaterThan(initialWindowSize);
+    });
+
     test('Should allow selecting text in a table body cell', async ({ page }) => {
       await tableStory.goto(page, 'Manual Sorting');
 

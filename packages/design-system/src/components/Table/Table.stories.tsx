@@ -1418,6 +1418,43 @@ export const BidirectionalInfiniteScrollWindow: StoryFn<typeof meta> = () => {
 };
 
 /**
+ * `virtualized='window'` in an app shell that scrolls a content pane instead of the document: the
+ * table follows the pane. The `overflow-x: hidden` wrapper in between never scrolls (its
+ * `overflow-y` only computes to `auto`), so it must not be taken for the scroll root.
+ */
+export const InfiniteScrollWindowInPane: StoryFn<typeof meta> = () => {
+  const { data, isFetchingPrev, isFetchingNext, hasPrev, hasNext, fetchPrevPage, fetchNextPage } =
+    useBidirectionalData();
+
+  return (
+    <div data-testid='scroll-pane' style={{ height: 480, overflowY: 'auto' }}>
+      <div style={{ overflowX: 'hidden' }}>
+        <VStack gap={8}>
+          <Text size='sm' color='secondary'>
+            Window of {data.length} rows around the anchor
+            {(isFetchingPrev || isFetchingNext) && ' — loading...'}
+            {!hasPrev && ' — top reached'}
+            {!hasNext && ' — bottom reached'}
+          </Text>
+          <Table
+            data={data}
+            columns={securityColumns}
+            getRowId={row => row.id}
+            virtualized='window'
+            isLoading={isFetchingNext}
+            isLoadingPrevious={isFetchingPrev}
+            onStartReached={fetchPrevPage}
+            onStartReachedThreshold={200}
+            onEndReached={fetchNextPage}
+            onEndReachedThreshold={200}
+          />
+        </VStack>
+      </div>
+    </div>
+  );
+};
+
+/**
  * A column can explain itself: `description` renders as a second line under the title, or as a
  * tooltip behind a dashed underline when the header has no room for one.
  */
