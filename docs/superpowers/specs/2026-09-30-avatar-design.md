@@ -177,7 +177,7 @@ It lives in `src/utils/getInitials.ts`. It is internal and not exported from the
 This replaces the hand-rolled plate, its `failedSrc` state, and the `onError` handler.
 
 - Nothing else about the item changes: the `-m-4` overhang, the item's hover and active tint, and `data-slot='nav-rail-item-avatar'`, which is kept for any CSS hooks by passing it to the root.
-- Its existing tests and e2e screenshots are the regression guard.
+- Its unit tests and the AppShell screenshots guard the icon-plate path (AppShell stories have no `avatarSrc`). The photo path is the same `Avatar` code, covered by the Avatar `xs` screenshots.
 - NavRail used to show the icon *under* the photo while loading, and Ark hides the fallback once the photo loads. The result looks the same because the photo is opaque and fills the box.
 
 ## 9. Stories (`Data Display/Avatar`)
