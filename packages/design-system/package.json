@@ -143,6 +143,7 @@
     "@react-types/shared": "3.36.1",
     "@tanstack/react-table": "9.0.0",
     "@tanstack/react-virtual": "3.14.9",
+    "@zag-js/file-utils": "1.43.0",
     "class-variance-authority": "0.7.1",
     "clsx": "2.1.1",
     "date-fns": "4.4.0",

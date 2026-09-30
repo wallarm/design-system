@@ -1036,3 +1036,32 @@ Not findings — decisions worth remembering so they are not rediscovered.
   lesson for any spec that drives a story harness.
 - **Found while** — running the full e2e suite locally before opening the PR.
 - **Status** — Closed.
+
+### FileUpload: row actions have no hover tooltip
+
+- **What** — Figma's Item section draws "Replace", "Delete" and "Download" tooltips
+  beside the row actions, but the shipped icon buttons carry only an `aria-label`.
+- **Evidence** — Before 0ef0b39c, `packages/design-system/src/components/FileUpload/FileUploadItemReplaceTrigger.tsx`,
+  `FileUploadItemDeleteTrigger.tsx` and `FileUploadItemAction.tsx` rendered a bare ghost
+  `Button`; the Figma documentation frame for `file-upload-item` shows the three tooltips.
+  Now each wraps its button in `Tooltip` ("Replace", "Delete" / "Cancel upload", and the
+  Action's string `aria-label`), disabled together with the button.
+- **Why it matters** — Two unlabelled icons sit side by side on every row, so a mouse
+  user has to guess that the circular arrows mean Replace.
+- **Suggested action** — Confirm with design whether the tooltips are intended; if so,
+  wrap each default action in `Tooltip` with the same text as its `aria-label`.
+- **Found while** — documenting `FileUpload`.
+- **Status** — Closed — tooltips added (0ef0b39c) per the Figma ruling; disabled with their button since the residual-review pass.
+
+### FileUpload: we hold files until save, Carbon uploads on pick
+
+- **What** — Carbon's file uploader starts uploading as soon as a file is chosen;
+  ours never uploads on pick and sends files with the form.
+- **Evidence** — Carbon `file-uploader/usage.mdx` ("files begin uploading after
+  selection"); our spec `docs/superpowers/specs/2026-09-30-file-upload-design.md`.
+- **Why it matters** — Nothing to fix: the page documents what we ship. Parked so a
+  later reader comparing with Carbon knows the difference is deliberate.
+- **Suggested action** — None unless a product needs upload-on-pick; that is a
+  consumer pattern (upload in `onValueChange`, mark the row `loading`).
+- **Found while** — documenting `FileUpload`.
+- **Status** — Closed — deliberate divergence

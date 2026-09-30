@@ -1,0 +1,74 @@
+import { type ComponentPropsWithoutRef, type FC, type ReactNode, type Ref, useId } from 'react';
+import { useFieldContext } from '@ark-ui/react/field';
+import { FileUpload as ArkFileUpload } from '@ark-ui/react/file-upload';
+import { Share } from '../../icons';
+import { cn } from '../../utils/cn';
+import { type TestableProps, useTestId } from '../../utils/testId';
+import { fileUploadDropzoneVariants } from './classes';
+import { useRequiredFileUploadRootContext } from './FileUploadContext';
+
+export interface FileUploadDropzoneProps extends ComponentPropsWithoutRef<'div'>, TestableProps {
+  /** Replaces the default upload icon. */
+  icon?: ReactNode;
+  /** Replaces the default text ("Drag and drop files or click to select"). */
+  children?: ReactNode;
+  ref?: Ref<HTMLDivElement>;
+}
+
+const DEFAULT_TEXT = 'Drag and drop files or click to select';
+
+/**
+ * Dashed drop Area — drop files on it, or click / Enter / Space to open the picker.
+ * Stays visible once a file is chosen; hidden only when read-only; inert while disabled,
+ * while a row is uploading, and at `maxFiles`.
+ */
+export const FileUploadDropzone: FC<FileUploadDropzoneProps> = ({
+  icon,
+  children,
+  className,
+  ref,
+  'data-testid': testIdProp,
+  'aria-describedby': describedByProp,
+  ...props
+}) => {
+  const ctx = useRequiredFileUploadRootContext('FileUploadDropzone');
+  const field = useFieldContext();
+  const testId = useTestId('dropzone', testIdProp);
+  const textId = useId();
+
+  if (ctx.pickerHidden) return null;
+
+  const blocked = ctx.pickerBlocked;
+  const hasRejections = ctx.rejections.length > 0;
+  // Ark names the zone "dropzone"; name it by the Field label + the visible text instead —
+  // unless the consumer names it (`aria-label` / `aria-labelledby`).
+  const ownName = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined;
+  const labelledBy = ownName ? undefined : [field?.ids.label, textId].filter(Boolean).join(' ');
+  // A consumer hint is kept; the error link is added to it, never replaced.
+  const describedBy =
+    [describedByProp, hasRejections ? ctx.errorId : undefined].filter(Boolean).join(' ') ||
+    undefined;
+
+  return (
+    <ArkFileUpload.Dropzone
+      aria-labelledby={labelledBy}
+      {...props}
+      aria-describedby={describedBy}
+      ref={ref}
+      disableClick={blocked}
+      // Keep the button role while blocked (Ark switches to "application" with disableClick).
+      role='button'
+      aria-disabled={blocked || undefined}
+      data-disabled={blocked ? '' : undefined}
+      data-invalid={ctx.invalid || hasRejections ? '' : undefined}
+      data-slot='file-upload-dropzone'
+      data-testid={testId}
+      className={cn(fileUploadDropzoneVariants(), className)}
+    >
+      {icon ?? <Share size='md' />}
+      <span id={textId}>{children ?? DEFAULT_TEXT}</span>
+    </ArkFileUpload.Dropzone>
+  );
+};
+
+FileUploadDropzone.displayName = 'FileUploadDropzone';
