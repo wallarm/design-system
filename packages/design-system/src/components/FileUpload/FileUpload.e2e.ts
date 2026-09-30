@@ -114,8 +114,24 @@ test.describe('Component: FileUpload', () => {
       page,
     }) => {
       await fileUploadStory.goto(page, 'Long File Name');
-      await page.getByTestId('file-upload--item-name').hover();
+      const name = page.getByTestId('file-upload--item-name');
+      await name.hover();
+      // OverflowTooltipTrigger only starts measuring on the first pointer-enter,
+      // so nudge the pointer once more inside the element.
+      const box = await name.boundingBox();
+      if (!box) throw new Error('item name has no bounding box');
+      await page.mouse.move(box.x + 5, box.y + 5);
+      await page.mouse.move(box.x + 6, box.y + 5);
       await expect(page.getByRole('tooltip')).toBeVisible();
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render the row action tooltip correctly', async ({ page }) => {
+      await fileUploadStory.goto(page, 'Multiple');
+      await page.getByTestId('file-upload--item-replace-trigger').first().hover();
+      const tooltip = page.getByRole('tooltip');
+      await expect(tooltip).toBeVisible();
+      await expect(tooltip).toHaveText('Replace');
       await expect(page).toHaveScreenshot();
     });
   });
