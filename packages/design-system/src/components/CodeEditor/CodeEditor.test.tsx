@@ -431,6 +431,40 @@ describe('CodeEditor', () => {
       expect(toggle).toHaveAttribute('aria-expanded', 'true');
     });
 
+    it('warns once when documentId is used without a controlled value', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const { rerender } = render(
+        <CodeEditorRoot data-testid='ed' defaultValue='a' documentId='one'>
+          <CodeEditorContent aria-label='Code' />
+        </CodeEditorRoot>,
+      );
+      await screen.findByTestId('ed--editor');
+      rerender(
+        <CodeEditorRoot data-testid='ed' defaultValue='a' documentId='two'>
+          <CodeEditorContent aria-label='Code' />
+        </CodeEditorRoot>,
+      );
+
+      const documentIdWarnings = warn.mock.calls.filter(([message]) =>
+        String(message).includes('documentId'),
+      );
+      expect(documentIdWarnings).toHaveLength(1);
+      expect(String(documentIdWarnings[0]?.[0])).toContain('controlled `value`');
+    });
+
+    it('does not warn about documentId with a controlled value', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      render(
+        <CodeEditorRoot data-testid='ed' value='a' documentId='one'>
+          <CodeEditorContent aria-label='Code' />
+        </CodeEditorRoot>,
+      );
+      await screen.findByTestId('ed--editor');
+      expect(warn.mock.calls.filter(([message]) => String(message).includes('documentId'))).toEqual(
+        [],
+      );
+    });
+
     it('marks the editor aria-readonly when readOnly', async () => {
       render(
         <CodeEditorRoot data-testid='ed' defaultValue='x' readOnly>

@@ -50,7 +50,12 @@ export interface CodeEditorRootProps
   onChange?: (value: string) => void;
   /** Passed verbatim to the syntax adapter; selects the structural parser */
   language?: CodeEditorLanguage;
-  /** Document identity: changing it swaps to that document's cached state (undo history, selection, folds) */
+  /**
+   * Document identity: changing it swaps to that document's cached state (undo history,
+   * selection, folds). Requires a controlled `value`: when the id changes, `value` must already
+   * hold that document's text (an uncached id starts from `value`). In uncontrolled mode the new
+   * document would be seeded with the previous document's text.
+   */
   documentId?: string;
   /** Focusable, selectable, searchable, copyable — but not editable by the user */
   readOnly?: boolean;
@@ -186,6 +191,18 @@ export const CodeEditorRoot = ({
   useEffect(() => {
     latest.current = { value, onChange, onDiagnosticsChange, onWrapLinesChange, onCopy };
   });
+
+  const documentIdWithoutValue = documentId !== undefined && valueProp === undefined;
+  const warnedDocumentId = useRef(false);
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') return;
+    if (!documentIdWithoutValue || warnedDocumentId.current) return;
+    warnedDocumentId.current = true;
+    // biome-ignore lint/suspicious/noConsole: dev-only authoring guard.
+    console.warn(
+      "[CodeEditor] `documentId` requires a controlled `value`: in uncontrolled mode a new document starts from the previous document's text.",
+    );
+  }, [documentIdWithoutValue]);
 
   const handleRef = useRef<EditorHandle | null>(null);
 
