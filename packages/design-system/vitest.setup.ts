@@ -1,17 +1,20 @@
 import '@testing-library/jest-dom/vitest';
 
-// Mock scrollIntoView which is not implemented in jsdom
-// biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
-Element.prototype.scrollIntoView = () => {};
+// Element is absent under `@vitest-environment node` (SSR tests).
+if (typeof Element !== 'undefined') {
+  // Mock scrollIntoView which is not implemented in jsdom
+  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  Element.prototype.scrollIntoView = () => {};
 
-// Mock scrollTo which jsdom omits; Zag UI's select uses it to reset the
-// content scroll position when value changes.
-// biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
-Element.prototype.scrollTo = (() => {}) as Element['scrollTo'];
+  // Mock scrollTo which jsdom omits; Zag UI's select uses it to reset the
+  // content scroll position when value changes.
+  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  Element.prototype.scrollTo = (() => {}) as Element['scrollTo'];
 
-// Mock scrollBy which jsdom omits; the Table horizontal scroll controls call it.
-// biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
-Element.prototype.scrollBy = (() => {}) as Element['scrollBy'];
+  // Mock scrollBy which jsdom omits; the Table horizontal scroll controls call it.
+  // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
+  Element.prototype.scrollBy = (() => {}) as Element['scrollBy'];
+}
 
 // Mock IntersectionObserver which is not implemented in jsdom
 global.IntersectionObserver = class IntersectionObserver {
