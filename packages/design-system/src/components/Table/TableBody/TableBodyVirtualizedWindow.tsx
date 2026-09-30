@@ -13,6 +13,7 @@ import {
   getOffsetTopInScrollRoot,
   getRowKey,
   getScrollMetrics,
+  isWindowScrollRoot,
   type ScrollRoot,
   TABLE_VIRTUALIZATION_OVERSCAN,
 } from '../lib';
@@ -71,6 +72,12 @@ export const TableBodyVirtualizedWindow: FC = () => {
     observeElementRect: observeRootRect,
     observeElementOffset: observeRootOffset,
     scrollToFn: elementScroll,
+    // `useWindowVirtualizer`'s starting size: rows render in the very first
+    // commit, so the shell sees a laid-out table when it settles the root.
+    initialRect:
+      scrollRoot && isWindowScrollRoot(scrollRoot)
+        ? { width: scrollRoot.innerWidth, height: scrollRoot.innerHeight }
+        : undefined,
     initialOffset: () => {
       const root = getScrollElement() ?? (typeof window === 'undefined' ? null : window);
       return root ? getScrollMetrics(root).scrollTop : 0;

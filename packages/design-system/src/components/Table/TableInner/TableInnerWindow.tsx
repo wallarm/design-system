@@ -47,7 +47,10 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(rootRef);
-  const { scrollRoot, isSettled } = useWindowScrollRoot(containerRef);
+  const { scrollRoot, isSettled } = useWindowScrollRoot(
+    containerRef,
+    !isEmpty && table.getRowModel().rows.length > 0,
+  );
 
   useInfiniteScroll({
     mode: 'window',

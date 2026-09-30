@@ -237,6 +237,44 @@ test.describe('Component: Table', () => {
       expect(await page.evaluate(() => window.scrollY)).toBe(0);
     });
 
+    test('Should fire only the reached edge in a pane when rows arrive late', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Pane Late Rows');
+
+      const pane = page.getByTestId('scroll-pane');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+
+      // Scroll the pane to its end as a wheel does. Settling against the window
+      // before the rows arrived would have fired both edges there at once.
+      for (let step = 0; step < 30; step++) {
+        await pane.evaluate(el => {
+          el.scrollTop += 300;
+        });
+      }
+      await expect(page.getByText(/Edge calls: start \d+, end [1-9]/)).toBeVisible();
+      await expect(page.getByText(/Edge calls: start 0,/)).toBeVisible();
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    });
+
+    test('Should land on the anchor row once a hidden pane is shown', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Hidden Pane Anchored');
+
+      await page.getByTestId('show-table').click();
+      const pane = page.getByTestId('scroll-pane');
+      // Row id 251 is the story's anchor (index 250).
+      const anchorRow = pane.locator('[data-row-id="251"]');
+      await expect(anchorRow).toBeVisible();
+      await expect
+        .poll(() =>
+          anchorRow.evaluate(row => {
+            const paneRect = row.closest('[data-testid="scroll-pane"]')?.getBoundingClientRect();
+            const rect = row.getBoundingClientRect();
+            return !!paneRect && rect.top >= paneRect.top && rect.bottom <= paneRect.bottom;
+          }),
+        )
+        .toBe(true);
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    });
+
     test('Should keep the position of an already scrolled pane when the table mounts', async ({
       page,
     }) => {

@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
@@ -1478,6 +1478,92 @@ export const InfiniteScrollWindowInPaneAnchored: StoryFn<typeof meta> = () => {
         onEndReachedThreshold={200}
       />
     </div>
+  );
+};
+
+/**
+ * A pane host that mounts the table before its data: rows arrive after a delay. Neither edge may
+ * fire against the window meanwhile — only the edge the user scrolls to.
+ */
+export const InfiniteScrollWindowInPaneLateRows: StoryFn<typeof meta> = () => {
+  const { data, isFetchingPrev, isFetchingNext, fetchPrevPage, fetchNextPage } =
+    useBidirectionalData();
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [calls, setCalls] = useState({ start: 0, end: 0 });
+  useEffect(() => {
+    const timer = setTimeout(() => setHasLoaded(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div data-testid='scroll-pane' style={{ height: 480, overflowY: 'auto' }}>
+      <Text size='sm' color='secondary'>
+        Edge calls: start {calls.start}, end {calls.end}
+      </Text>
+      <Table
+        data={hasLoaded ? data : []}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='window'
+        isLoading={!hasLoaded || isFetchingNext}
+        isLoadingPrevious={isFetchingPrev}
+        // Nothing to page from before the first page — as with a real cursor.
+        onStartReached={
+          hasLoaded
+            ? () => {
+                setCalls(prev => ({ ...prev, start: prev.start + 1 }));
+                fetchPrevPage();
+              }
+            : undefined
+        }
+        onStartReachedThreshold={200}
+        onEndReached={
+          hasLoaded
+            ? () => {
+                setCalls(prev => ({ ...prev, end: prev.end + 1 }));
+                fetchNextPage();
+              }
+            : undefined
+        }
+        onEndReachedThreshold={200}
+      />
+    </div>
+  );
+};
+
+/**
+ * A share-link landing in a pane that starts hidden (a closed tab or drawer): the anchor waits
+ * until the table is shown and laid out, then lands inside the pane.
+ */
+export const InfiniteScrollWindowInHiddenPaneAnchored: StoryFn<typeof meta> = () => {
+  const [isShown, setIsShown] = useState(false);
+  const { data, anchorId, isFetchingPrev, isFetchingNext, fetchPrevPage, fetchNextPage } =
+    useBidirectionalData();
+
+  return (
+    <VStack gap={8}>
+      <Button data-testid='show-table' onClick={() => setIsShown(true)}>
+        Show table
+      </Button>
+      <div
+        data-testid='scroll-pane'
+        style={{ height: 480, overflowY: 'auto', display: isShown ? 'block' : 'none' }}
+      >
+        <Table
+          data={data}
+          columns={securityColumns}
+          getRowId={row => row.id}
+          virtualized='window'
+          isLoading={isFetchingNext}
+          isLoadingPrevious={isFetchingPrev}
+          initialScrollToRowId={anchorId}
+          onStartReached={fetchPrevPage}
+          onStartReachedThreshold={200}
+          onEndReached={fetchNextPage}
+          onEndReachedThreshold={200}
+        />
+      </div>
+    </VStack>
   );
 };
 
