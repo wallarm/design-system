@@ -302,16 +302,30 @@ const externalDiagnostics = (
     return converted ? [converted] : [];
   });
 
+/**
+ * State each view was last linted from. An async result (Babel, schema) whose run has been
+ * superseded — e.g. a language/schema reconfigure with the same document — must not overwrite
+ * the newer diagnostics: CodeMirror only checks that the document is unchanged. Keyed by state
+ * (not a per-call token) so several sources of one run all stay current.
+ */
+const latestLintState = new WeakMap<EditorView, EditorState>();
+
+/** A promise that never settles: CodeMirror's lint batch then never dispatches the stale run. */
+const superseded = (): Promise<readonly Diagnostic[]> => new Promise(() => undefined);
+
 const lintSource =
   (config: DiagnosticsConfig) =>
   (view: EditorView): readonly Diagnostic[] | Promise<readonly Diagnostic[]> => {
     const { state } = view;
+    latestLintState.set(view, state);
+    const isCurrent = () => latestLintState.get(view) === state;
     const region = jsonRegion(state, config.language);
     const external = externalDiagnostics(state.doc, config.external, config.startingLineNumber);
     if (isBabelLanguage(config.language)) {
       return babelSyntaxDiagnostics(state.doc.toString(), config.language).then(
-        syntax => [...syntax, ...external],
+        syntax => (isCurrent() ? [...syntax, ...external] : superseded()),
         (error: unknown) => {
+          if (!isCurrent()) return superseded();
           // biome-ignore lint/suspicious/noConsole: a parser that fails to load must not hide consumer diagnostics
           console.error('[CodeEditor] failed to load the JavaScript syntax checker', error);
           return external;
@@ -336,11 +350,15 @@ const lintSource =
       return [...syntax, ...external];
     }
     return schemaSource(state, region).then(
-      schemaDiagnostics => [
-        ...schemaDiagnostics.map(d => ({ ...d, source: d.source ?? SCHEMA_SOURCE })),
-        ...external,
-      ],
+      schemaDiagnostics =>
+        isCurrent()
+          ? [
+              ...schemaDiagnostics.map(d => ({ ...d, source: d.source ?? SCHEMA_SOURCE })),
+              ...external,
+            ]
+          : superseded(),
       (error: unknown) => {
+        if (!isCurrent()) return superseded();
         // biome-ignore lint/suspicious/noConsole: a failing schema must not hide syntax/consumer diagnostics
         console.error('[CodeEditor] JSON Schema validation failed', error);
         return external;

@@ -1,5 +1,5 @@
 import type { Diagnostic } from '@codemirror/lint';
-import { Text } from '@codemirror/state';
+import { Compartment, Text } from '@codemirror/state';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   activeDiagnostics,
@@ -8,7 +8,13 @@ import {
   mountLinted,
 } from '../../../testUtils/codeEditorDiagnostics';
 import type { CodeEditorDiagnostic } from '../types';
-import { type SchemaDiagnosticsSource, toCmDiagnostic, toPublicDiagnostic } from './diagnostics';
+import {
+  type DiagnosticsConfig,
+  diagnosticsExtension,
+  type SchemaDiagnosticsSource,
+  toCmDiagnostic,
+  toPublicDiagnostic,
+} from './diagnostics';
 
 const DOC = 'first line\nsecond line';
 const doc = Text.of(DOC.split('\n'));
@@ -241,5 +247,47 @@ describe('diagnosticsExtension — schema hook', () => {
       '[CodeEditor] JSON Schema validation failed',
       expect.any(Error),
     );
+  });
+
+  it('drops a superseded async result that settles after a newer lint run', async () => {
+    let resolveStale: (diagnostics: Diagnostic[]) => void = () => undefined;
+    const slowSource: SchemaDiagnosticsSource = () =>
+      new Promise(resolve => {
+        resolveStale = resolve;
+      });
+    const compartment = new Compartment();
+    const onChange = vi.fn();
+    const configFor = (overrides: Partial<DiagnosticsConfig>): DiagnosticsConfig => ({
+      language: 'json',
+      schema: undefined,
+      external: [],
+      startingLineNumber: 1,
+      onChange,
+      ...overrides,
+    });
+    const { view } = mountLinted(
+      '{"a": 1}',
+      { language: 'json' },
+      compartment.of(diagnosticsExtension(configFor({ schema: {}, schemaSource: slowSource }))),
+    );
+    await flushLint(view);
+
+    // Same document, new config (schema removed): the newer run reports only `fresh`.
+    view.dispatch({
+      effects: compartment.reconfigure(
+        diagnosticsExtension(
+          configFor({
+            external: [{ from: { line: 1, column: 1 }, severity: 'info', message: 'fresh' }],
+          }),
+        ),
+      ),
+    });
+    await flushLint(view);
+    expect(activeDiagnostics(view.state).map(d => d.message)).toContain('fresh');
+
+    resolveStale([{ from: 6, to: 7, severity: 'warning', message: 'stale' }]);
+    await new Promise(resolve => setTimeout(resolve, 0));
+
+    expect(activeDiagnostics(view.state).map(d => d.message)).not.toContain('stale');
   });
 });

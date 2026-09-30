@@ -66,6 +66,11 @@ describe('maxHeightTheme', () => {
     expect(maxHeightTheme(null)).toEqual([]);
   });
 
+  it('returns the same extension for the same height, so toggling the clamp adds no new rules', () => {
+    expect(maxHeightTheme(216)).toBe(maxHeightTheme(216));
+    expect(maxHeightTheme(216)).not.toBe(maxHeightTheme(236));
+  });
+
   it('clamps and scrolls .cm-scroller', () => {
     mountView('a', { extensions: maxHeightTheme(216) });
     const css = mountedCss();

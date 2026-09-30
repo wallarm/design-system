@@ -155,7 +155,18 @@ export const readPartialJson = (state: EditorState, value: SyntaxNode): unknown 
     for (const property of value.getChildren('Property')) {
       const name = property.getChild('PropertyName');
       const member = firstValueChild(property);
-      if (name && member) out[readJsonKey(state, name)] = readPartialJson(state, member);
+      if (!name || !member) continue;
+      const data = readPartialJson(state, member);
+      // An unparsable scalar is an unfinished member: drop it like one without a value.
+      if (data === undefined) continue;
+      // defineProperty, not assignment: a "__proto__" key must stay an own member instead of
+      // going through the prototype setter (as JSON.parse keeps it).
+      Object.defineProperty(out, readJsonKey(state, name), {
+        value: data,
+        enumerable: true,
+        writable: true,
+        configurable: true,
+      });
     }
     return out;
   }

@@ -16,7 +16,15 @@ describe('sanitizeContentAttributes', () => {
       'autocorrect',
       'autocapitalize',
       'translate',
+      'writingsuggestions',
     ]);
+  });
+
+  it('drops writingsuggestions, which CodeMirror sets to "false" on .cm-content', () => {
+    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    expect(sanitizeContentAttributes({ writingsuggestions: 'true', 'aria-label': 'Code' })).toEqual(
+      { 'aria-label': 'Code' },
+    );
   });
 
   it('keeps consumer attributes verbatim, including data-analytics-props and class', () => {

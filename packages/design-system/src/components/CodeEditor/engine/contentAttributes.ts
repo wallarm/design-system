@@ -12,6 +12,7 @@ export const RESERVED_CONTENT_ATTRIBUTES: readonly string[] = [
   'autocorrect',
   'autocapitalize',
   'translate',
+  'writingsuggestions',
 ];
 
 const RESERVED = new Set(RESERVED_CONTENT_ATTRIBUTES);

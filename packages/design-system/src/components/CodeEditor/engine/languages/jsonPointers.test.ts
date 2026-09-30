@@ -93,6 +93,23 @@ describe('readRegionData', () => {
     expect(readRegionData(state, whole(state))).toEqual({ k: 'y', n: { x: 1 }, l: [true] });
   });
 
+  it('keeps a "__proto__" key as an own member without touching the prototype', () => {
+    const state = jsonState('{"__proto__": {"polluted": true}, "a": 1, "b": }');
+    const data = readRegionData(state, whole(state)) as Record<string, unknown>;
+    expect(Object.getPrototypeOf(data)).toBe(Object.prototype);
+    expect(Object.hasOwn(data, '__proto__')).toBe(true);
+    expect(Object.getOwnPropertyDescriptor(data, '__proto__')?.value).toEqual({ polluted: true });
+    expect((data as { polluted?: unknown }).polluted).toBeUndefined();
+    expect(data.a).toBe(1);
+  });
+
+  it('skips members whose value is an unterminated scalar', () => {
+    const state = jsonState('{"a": 1, "s": "unterminated\n}');
+    const data = readRegionData(state, whole(state)) as Record<string, unknown>;
+    expect(data).toEqual({ a: 1 });
+    expect(Object.keys(data)).toEqual(['a']);
+  });
+
   it('is undefined for an empty region', () => {
     const state = jsonState('');
     expect(readRegionData(state, whole(state))).toBeUndefined();

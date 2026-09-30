@@ -111,13 +111,24 @@ const selectedTextColor = ViewPlugin.fromClass(
 
 export const editorTheme: Extension = [snippetTheme, selectedTextColor];
 
-/** Height clamp for maxLines / Show more (spec §7.8); `null` = no clamp. */
-export const maxHeightTheme = (maxHeight: number | null): Extension =>
-  maxHeight === null
-    ? []
-    : EditorView.theme({
-        '.cm-scroller': {
-          maxHeight: `${maxHeight}px`,
-          overflowY: 'auto',
-        },
-      });
+const maxHeightThemes = new Map<number, Extension>();
+
+/**
+ * Height clamp for maxLines / Show more (spec §7.8); `null` = no clamp. Memoised by height:
+ * every `EditorView.theme` call mounts a new style module, so toggling the clamp would
+ * otherwise pile up CSS rules.
+ */
+export const maxHeightTheme = (maxHeight: number | null): Extension => {
+  if (maxHeight === null) return [];
+  let theme = maxHeightThemes.get(maxHeight);
+  if (!theme) {
+    theme = EditorView.theme({
+      '.cm-scroller': {
+        maxHeight: `${maxHeight}px`,
+        overflowY: 'auto',
+      },
+    });
+    maxHeightThemes.set(maxHeight, theme);
+  }
+  return theme;
+};
