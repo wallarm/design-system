@@ -1,4 +1,5 @@
 import { undo } from '@codemirror/commands';
+import { searchPanelOpen } from '@codemirror/search';
 import { afterEach, describe, expect, it } from 'vitest';
 import { mountEngine, typeAt, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 
@@ -53,13 +54,13 @@ describe('createEditor — api', () => {
     expect(document.activeElement).toBe(handle.view.contentDOM);
   });
 
-  it('openSearch does not open the built-in CodeMirror panel when no search feature is configured', () => {
+  it('openSearch opens the DS panel, not the built-in CodeMirror one', () => {
     const { handle } = mountEngine({ value: 'abc' });
 
     handle.api.openSearch();
 
+    expect(searchPanelOpen(handle.view.state)).toBe(true);
     expect(handle.view.dom.querySelector('.cm-search')).toBeNull();
-    expect(handle.view.dom.querySelector('.cm-panels')).toBeNull();
   });
 
   it('foldAll / unfoldAll are safe with no foldable ranges', () => {

@@ -9,7 +9,6 @@ import {
   Compartment,
   EditorState,
   type Extension,
-  Facet,
   Transaction,
 } from '@codemirror/state';
 import {
@@ -30,6 +29,7 @@ import { foldAllRegions, foldsExtension, getVisibleRowCount, unfoldAllRegions } 
 import { guttersExtension } from './gutters';
 import { isLazyLanguage, languageExtension, loadLanguageExtension } from './languages';
 import { linesExtension } from './lines';
+import { searchConfigured, searchExtension } from './search';
 import { editorTheme, maxHeightTheme } from './theme';
 import type { EditorHandle, EngineCallbacks, EngineOptions } from './types';
 
@@ -61,14 +61,7 @@ export const minimalChange = (from: string, to: string): ChangeSpec | null => {
   return { from: prefix, to: from.length - suffix, insert: to.slice(prefix, to.length - suffix) };
 };
 
-/**
- * `true` once a search extension is configured (T11 adds `searchConfigured.of(true)`
- * next to its search extension). Without it `openSearch` is a no-op, so
- * `openSearchPanel` never falls back to CodeMirror's own un-themed panel.
- */
-export const searchConfigured = Facet.define<boolean, boolean>({
-  combine: values => values.some(Boolean),
-});
+export { searchConfigured } from './search';
 
 /** Core compartments owned by this module. */
 const CORE_KEYS = [
@@ -151,7 +144,12 @@ const featureExtensions = (
     }),
   ],
   folds: () => buildFolds(options, callbacks.portals).extension,
-  search: () => [],
+  search: () =>
+    searchExtension({
+      portals: callbacks.portals,
+      readOnly: options.readOnly,
+      testId: options.testId,
+    }),
   diagnostics: () => [],
   completion: () => [],
   diff: () => [],
