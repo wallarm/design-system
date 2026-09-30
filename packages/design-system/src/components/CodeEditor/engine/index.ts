@@ -23,12 +23,12 @@ import {
   type ViewUpdate,
 } from '@codemirror/view';
 import type { PortalRegistry } from '../lib/portalRegistry';
-import type { CodeEditorApi } from '../types';
+import type { CodeEditorApi, CodeEditorLanguage } from '../types';
 import { adapterPainter } from './adapterPainter';
 import { sanitizeContentAttributes } from './contentAttributes';
 import { foldAllRegions, foldsExtension, getVisibleRowCount, unfoldAllRegions } from './folds';
 import { guttersExtension } from './gutters';
-import { languageExtension } from './languages';
+import { isLazyLanguage, languageExtension, loadLanguageExtension } from './languages';
 import { linesExtension } from './lines';
 import { editorTheme, maxHeightTheme } from './theme';
 import type { EditorHandle, EngineCallbacks, EngineOptions } from './types';
@@ -237,6 +237,7 @@ export const createEditor = (
   const cache = new Map<string, CachedDocument>();
   let options = initialOptions;
   let lastRowCount = -1;
+  let destroyed = false;
 
   const reportRowCount = (state: EditorState) => {
     const rows = visibleRowCount(state);
@@ -289,6 +290,23 @@ export const createEditor = (
 
   const view = new EditorView({ state: createState(initialOptions.value, initialOptions), parent });
 
+  /** Loads a lazy parser and reconfigures the language compartment from the promise callback (never inside a CM update). */
+  const ensureLazyLanguage = (lang: CodeEditorLanguage) => {
+    if (!isLazyLanguage(lang)) return;
+    loadLanguageExtension(lang).then(
+      extension => {
+        if (destroyed || options.language !== lang) return;
+        view.dispatch({ effects: compartments.language.reconfigure(extension) });
+      },
+      error => {
+        // biome-ignore lint/suspicious/noConsole: surfaced once per failed load; editor keeps working without structure
+        console.error(`[CodeEditor] failed to load the ${lang} parser`, error);
+      },
+    );
+  };
+
+  ensureLazyLanguage(initialOptions.language);
+
   const reconfigure = (prev: EngineOptions, next: EngineOptions) => {
     const changed = changedOptionKeys(prev, next);
     const builders = slotExtensions(next, callbacks);
@@ -321,6 +339,7 @@ export const createEditor = (
       view.setState(createState(next.value, next));
     }
     reportRowCount(view.state);
+    ensureLazyLanguage(next.language);
   };
 
   const update = (next: EngineOptions) => {
@@ -331,6 +350,7 @@ export const createEditor = (
       return;
     }
     reconfigure(prev, next);
+    if (next.language !== prev.language) ensureLazyLanguage(next.language);
     syncValue(next.value);
   };
 
@@ -363,6 +383,7 @@ export const createEditor = (
     api,
     view,
     destroy: () => {
+      destroyed = true;
       cache.clear();
       view.destroy();
     },

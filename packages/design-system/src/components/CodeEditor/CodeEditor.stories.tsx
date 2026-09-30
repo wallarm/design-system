@@ -847,3 +847,103 @@ export const ParityHttpPrism: StoryFn<typeof meta> = () => (
     <ParityPair testId='parity-http-prism' code={httpRequestCode} language='http' />
   </CodeSnippetAdapterProvider>
 );
+
+// --- Languages ---
+
+const PYTHON_SAMPLE = `from dataclasses import dataclass
+
+
+@dataclass
+class Rule:
+    action: str
+    point: list[str]
+    enabled: bool = True
+
+
+def active(rules: list[Rule]) -> list[Rule]:
+    return [r for r in rules if r.enabled]
+`;
+const JSON_SAMPLE = `{
+  "action": "block",
+  "point": ["header", "X-Forwarded-For"],
+  "enabled": true,
+  "threshold": 42
+}
+`;
+const JAVASCRIPT_SAMPLE = `export async function fetchRules(client, { limit = 50 } = {}) {
+  const res = await client.get('/api/v2/rules', { params: { limit } });
+  return res.data.filter(rule => rule.enabled);
+}
+`;
+const TYPESCRIPT_SAMPLE = `interface Rule {
+  action: 'block' | 'monitor';
+  point: string[];
+  enabled: boolean;
+}
+
+export const activeRules = (rules: readonly Rule[]): Rule[] =>
+  rules.filter((rule): rule is Rule => rule.enabled);
+`;
+const YAML_SAMPLE = `rules:
+  - action: block
+    point: [header, X-Forwarded-For]
+    enabled: true
+  - action: monitor
+    point: [query, id]
+    enabled: false
+`;
+
+interface LanguageSample {
+  id: string;
+  label: string;
+  language: CodeEditorLanguage;
+  value: string;
+}
+
+const LANGUAGE_SAMPLES = [
+  { id: 'python', label: 'Python', language: 'python', value: PYTHON_SAMPLE },
+  { id: 'json', label: 'JSON', language: 'json', value: JSON_SAMPLE },
+  { id: 'javascript', label: 'JavaScript', language: 'javascript', value: JAVASCRIPT_SAMPLE },
+  { id: 'typescript', label: 'TypeScript', language: 'typescript', value: TYPESCRIPT_SAMPLE },
+  { id: 'yaml', label: 'YAML', language: 'yaml', value: YAML_SAMPLE },
+] as const satisfies readonly LanguageSample[];
+
+const LanguageExample = ({ sample }: { sample: LanguageSample }) => {
+  const [value, setValue] = useState(sample.value);
+
+  return (
+    <VStack align='start' gap={4}>
+      <span className='sb-annotation'>{sample.label}</span>
+      <div style={{ width: '600px' }}>
+        <CodeEditorRoot
+          value={value}
+          onChange={setValue}
+          language={sample.language}
+          data-testid={`lang-${sample.id}`}
+        >
+          <CodeSnippetHeader>
+            <CodeSnippetTitle>{sample.label}</CodeSnippetTitle>
+            <CodeSnippetActions>
+              <CodeSnippetCopyButton />
+            </CodeSnippetActions>
+          </CodeSnippetHeader>
+          <CodeEditorContent lineNumbers aria-label={`${sample.label} example`} />
+        </CodeEditorRoot>
+      </div>
+    </VStack>
+  );
+};
+
+/**
+ * Colours come from the adapter (Shiki here); JavaScript, TypeScript and Python parsers load on
+ * first use.
+ */
+export const Languages: StoryFn<typeof meta> = () => (
+  <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
+    <VStack gap={16}>
+      {LANGUAGE_SAMPLES.map(sample => (
+        <LanguageExample key={sample.id} sample={sample} />
+      ))}
+    </VStack>
+  </CodeSnippetAdapterProvider>
+);

@@ -1,7 +1,15 @@
 import type { FoldRegion } from '../CodeSnippet/lib/foldUtils';
 
 /** Language of the document. Passed verbatim to the syntax adapter and selects the structural parser. */
-export type CodeEditorLanguage = 'http' | 'json' | 'yaml' | 'bash' | 'text';
+export type CodeEditorLanguage =
+  | 'http'
+  | 'json'
+  | 'yaml'
+  | 'bash'
+  | 'text'
+  | 'javascript'
+  | 'typescript'
+  | 'python';
 
 /** Imperative handle exposed through `apiRef` and `useCodeEditor()`. */
 export interface CodeEditorApi {

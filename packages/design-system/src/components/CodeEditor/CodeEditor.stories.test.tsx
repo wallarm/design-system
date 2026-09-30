@@ -57,6 +57,9 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
   Sizes: { editors: ['code-editor-size-sm', 'code-editor-size-md', 'code-editor-size-lg'] },
   ReadOnly: { editors: ['code-editor-read-only'] },
   Tabs: { editors: ['code-editor-tabs'] },
+  Languages: {
+    editors: ['lang-python', 'lang-json', 'lang-javascript', 'lang-typescript', 'lang-yaml'],
+  },
   ParityDefault: { editors: ['parity-default-editor'], snippets: ['parity-default-snippet'] },
   ParityLineColors: {
     editors: ['parity-line-colors-editor'],
