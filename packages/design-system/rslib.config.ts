@@ -20,6 +20,8 @@ export default defineConfig({
         '!./src/**/*.test.{ts,tsx}',
         '!./src/**/*.stories.{ts,tsx}',
         '!./src/**/*.e2e.{ts,tsx}',
+        // Story-only helpers (fixtures, the TanStack Router harness) — never published.
+        '!./src/**/story-content/**',
         '!./src/testUtils/**',
       ],
     },

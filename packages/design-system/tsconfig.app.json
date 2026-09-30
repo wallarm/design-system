@@ -17,6 +17,7 @@
     "**/*.spec.*",
     "**/*.stories.*",
     "**/*.e2e.*",
+    "**/story-content/**",
     "src/testUtils",
     "node_modules",
     "dist",

@@ -2,8 +2,9 @@
  * Creates a semantic-release configuration with conditional changelog/git
  * plugins that only run on the main branch.
  *
- * RC (prerelease) builds on feature branches skip CHANGELOG updates and
- * `chore(release)` commits — they only publish to npm and create a GitHub release.
+ * RC (prerelease) builds on feature branches skip CHANGELOG updates,
+ * `chore(release)` commits and PR labels — they only publish to npm and create a
+ * GitHub release.
  *
  * @param {object} params
  * @param {string} params.tagFormat - Git tag format, e.g. `"v${version}"` or `"mcp-v${version}"`
@@ -82,7 +83,13 @@ export function defineConfig({
         : []),
       [
         '@semantic-release/github',
-        { successComment, failComment: false },
+        {
+          successComment,
+          failComment: false,
+          // The default `released on @<channel>` label embeds the branch name on RC
+          // builds and exceeds GitHub's 50-char label limit for long branches (422).
+          ...(isMainBranch ? {} : { releasedLabels: false }),
+        },
       ],
     ],
   };

@@ -552,11 +552,68 @@ interface NavPanelGroupItemProps {
 interface RemoteShellProps {
   children: ReactNode
   className?: string
+  /** Navigation config: active item, drill level and breadcrumbs are matched from the pathname. */
+  config: NavConfig
+  /** URL prefix stripped before matching and prepended when navigating (e.g. "/edge"). */
+  basePath?: string
+  /**
+   * Current pathname, with or without the basePath prefix (stripped only on a whole
+   * segment). When set, it is the single source of truth. Pass together with onNavigate.
+   */
+  pathname?: string
+  /** Receives the target pathname (prefixed with basePath when set) for every shell navigation. */
+  onNavigate?: (pathname: string) => void
 }
 
 // Sub-components: RemoteShellPanel, RemoteShellBreadcrumb, RemoteShellContent
 // Each accepts children: ReactNode and optional className
 ```
+
+**Router integration.** When the product's router owns the URL, pass both `pathname` and
+`onNavigate`. Router navigations — `router.navigate`, `<Link>`s in page content, the host's
+rail, memory history — do not fire `popstate`, so a shell reading `window.location` alone
+can keep highlighting the previous item. A controlled `pathname` without `onNavigate` is a
+misuse (the shell's own clicks would only reach `window.history`, which it then ignores) and
+logs a dev warning.
+
+TanStack Router's `location.pathname` is **router-relative**: when the router is created
+with `basepath`, the prefix is not part of it, and `navigate({ to })` adds it again. So the
+wiring depends on who owns the prefix.
+
+Router with `basepath` (the usual remote setup, `createRouter({ basepath })`) — omit
+`basePath` on the shell, so both directions are router-relative:
+
+```tsx
+const navigate = useNavigate()
+const pathname = useRouterState({ select: s => s.location.pathname }) // '/uid/overview'
+
+<RemoteShell config={navConfig} pathname={pathname} onNavigate={to => navigate({ to })}>
+  …
+</RemoteShell>
+```
+
+If you keep `basePath` on the shell as well, strip it in `onNavigate` — otherwise the
+router prefixes it twice (`/deployments/deployments/…`):
+
+```tsx
+<RemoteShell
+  config={navConfig}
+  basePath={basePath}
+  pathname={pathname}
+  onNavigate={to => navigate({ to: to.slice(basePath.length) || '/' })}
+>
+```
+
+Router without `basepath` (routes include the product prefix, as in the Storybook harness)
+— `location.pathname` is the full path, so `basePath={basePath}` plus
+`onNavigate={to => navigate({ to })}` is correct.
+
+`pathname` is accepted with or without the `basePath` prefix: the prefix is stripped only
+when the pathname equals `basePath` or continues it with `/` (`/edge-nodes` is not under
+`/edge`). Without `pathname` the shell falls back to `window.location` (updated on
+`popstate` and on its own navigations). The "back" override set by `goBack` is bound to the
+pathname it was set for, so any URL change drops it in the same render. The Storybook
+`Navigation/RemoteShell` story shows the router setup end to end.
 
 CSS Grid layout (inside Remote area):
 ```
