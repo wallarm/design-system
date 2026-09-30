@@ -16,11 +16,9 @@ describe('Avatar — analytics (docs/metrics/contract.md)', () => {
     render(
       <FileUpload data-testid='fu'>
         <FileUploadTrigger asChild data-analytics-id='AVATAR_CHANGE' data-analytics-props={PROPS}>
-          <Avatar asChild onClick={onClick}>
-            <button type='button' aria-label='Change avatar'>
-              <AvatarImage />
-              <AvatarFallback />
-            </button>
+          <Avatar as='button' aria-label='Change avatar' onClick={onClick}>
+            <AvatarImage />
+            <AvatarFallback />
           </Avatar>
         </FileUploadTrigger>
       </FileUpload>,

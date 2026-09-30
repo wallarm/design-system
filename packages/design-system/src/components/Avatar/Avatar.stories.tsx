@@ -19,7 +19,7 @@ const MAX_SIZE = 512 * 1024;
 const DESCRIPTION = [
   "A person's photo on a rounded plate, falling back to initials or an icon while it loads, when it fails, or when there is none.",
   'It is decorative beside a visible name; standing alone, give it `aria-label` so it reads as an image.',
-  'To let people change it, make the avatar the `FileUploadTrigger` (`asChild`) — picking only previews, and your form uploads.',
+  "To let people change it, make the avatar the `FileUploadTrigger` (`asChild`) and give it `as='button'` — picking only previews, and your form uploads.",
 ].join(' ');
 
 const meta = {
@@ -134,12 +134,10 @@ export const ClickToUpload: StoryFn = () => {
       onValueChange={setFiles}
     >
       <FileUploadTrigger asChild data-analytics-id='AVATAR_CHANGE'>
-        <Avatar asChild>
-          <button type='button' aria-label='Change avatar'>
-            <AvatarImage src={src} />
-            <AvatarFallback />
-            <AvatarOverlay />
-          </button>
+        <Avatar as='button' aria-label='Change avatar'>
+          <AvatarImage src={src} />
+          <AvatarFallback />
+          <AvatarOverlay />
         </Avatar>
       </FileUploadTrigger>
       <FileUploadError />
@@ -199,14 +197,12 @@ export const WithActions: StoryFn = () => {
 export const Uploading: StoryFn = () => (
   <FileUpload data-testid='avatar-upload' accept={ACCEPT}>
     <FileUploadTrigger asChild disabled>
-      <Avatar asChild>
-        <button type='button' aria-label='Change avatar' aria-busy>
-          <AvatarImage src={PHOTO} />
-          <AvatarFallback />
-          <AvatarOverlay visible>
-            <Loader size='md' />
-          </AvatarOverlay>
-        </button>
+      <Avatar as='button' aria-label='Change avatar' aria-busy>
+        <AvatarImage src={PHOTO} />
+        <AvatarFallback />
+        <AvatarOverlay visible>
+          <Loader size='md' />
+        </AvatarOverlay>
       </Avatar>
     </FileUploadTrigger>
   </FileUpload>

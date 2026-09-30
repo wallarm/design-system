@@ -223,3 +223,43 @@ describe('AvatarOverlay', () => {
     );
   });
 });
+
+describe('as="button"', () => {
+  it('renders a native button root with type=button', () => {
+    render(
+      <Avatar as='button' data-testid='av' aria-label='Change avatar'>
+        <AvatarImage />
+        <AvatarFallback />
+      </Avatar>,
+    );
+    const root = screen.getByRole('button', { name: 'Change avatar' });
+    expect(root).toHaveAttribute('data-testid', 'av');
+    expect(root).toHaveAttribute('type', 'button');
+    expect(root).toHaveAttribute('data-slot', 'avatar');
+    expect(root).toHaveClass('group/avatar', 'size-32');
+    expect(screen.getByTestId('av--image')).toBeInTheDocument();
+  });
+
+  it('keeps a consumer type and supports disabled', () => {
+    render(
+      <Avatar as='button' type='submit' disabled aria-label='Change avatar'>
+        <AvatarFallback />
+      </Avatar>,
+    );
+    const root = screen.getByRole('button', { name: 'Change avatar' });
+    expect(root).toHaveAttribute('type', 'submit');
+    expect(root).toBeDisabled();
+  });
+
+  it('asChild still wins over as', () => {
+    render(
+      <Avatar as='button' asChild data-testid='av'>
+        <a href='/me' aria-label='Profile'>
+          <AvatarFallback />
+        </a>
+      </Avatar>,
+    );
+    expect(screen.getByRole('link', { name: 'Profile' })).toHaveAttribute('data-testid', 'av');
+    expect(screen.queryByRole('button')).toBeNull();
+  });
+});

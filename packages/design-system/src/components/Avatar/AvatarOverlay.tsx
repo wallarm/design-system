@@ -12,7 +12,7 @@ export interface AvatarOverlayProps extends HTMLAttributes<HTMLSpanElement> {
 
 /**
  * The "change photo" affordance, shown on hover and keyboard focus of an interactive
- * (`asChild` button) avatar. Over a photo it adds a wash; over the fallback it swaps the icon.
+ * (`as='button'`) avatar. Over a photo it adds a wash; over the fallback it swaps the icon.
  */
 export const AvatarOverlay: FC<AvatarOverlayProps> = ({
   ref,

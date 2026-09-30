@@ -57,3 +57,13 @@ describe('Avatar — accessibility', () => {
     expect(screen.getByTestId('av--image')).toHaveAttribute('alt', 'Ada Lovelace');
   });
 });
+
+it('does not force role=img on an as="button" root', () => {
+  render(
+    <Avatar as='button' aria-label='Change avatar'>
+      <AvatarFallback />
+    </Avatar>,
+  );
+  expect(screen.getByRole('button', { name: 'Change avatar' })).toBeInTheDocument();
+  expect(screen.queryByRole('img')).toBeNull();
+});

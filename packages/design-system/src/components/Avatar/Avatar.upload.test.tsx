@@ -17,12 +17,10 @@ const ClickToUpload = ({ disabled = false, stored }: { disabled?: boolean; store
       onValueChange={files => setFile(files[0])}
     >
       <FileUploadTrigger asChild disabled={disabled}>
-        <Avatar asChild>
-          <button type='button' aria-label='Change avatar'>
-            <AvatarImage src={preview ?? stored} />
-            <AvatarFallback name='Ada Lovelace' />
-            <AvatarOverlay />
-          </button>
+        <Avatar as='button' aria-label='Change avatar'>
+          <AvatarImage src={preview ?? stored} />
+          <AvatarFallback name='Ada Lovelace' />
+          <AvatarOverlay />
         </Avatar>
       </FileUploadTrigger>
       <FileUploadError />
