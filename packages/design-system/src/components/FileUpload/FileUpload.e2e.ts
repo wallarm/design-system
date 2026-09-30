@@ -144,13 +144,35 @@ test.describe('Component: FileUpload', () => {
 
     test('Should list a file when it is dropped', async ({ page }) => {
       await fileUploadStory.goto(page, 'Basic');
+      // zag keeps an item only if webkitGetAsEntry() returns an entry, and Chromium returns null
+      // for a script-built DataTransfer (no dragged filesystem). Report a file entry so zag
+      // takes the getAsFile() path, as it does for a real OS drag.
+      await page.evaluate(() => {
+        const native = DataTransferItem.prototype.webkitGetAsEntry;
+        DataTransferItem.prototype.webkitGetAsEntry = function webkitGetAsEntry() {
+          return (
+            native.call(this) ??
+            ({
+              isFile: true,
+              isDirectory: false,
+              name: this.getAsFile()?.name ?? '',
+            } as FileSystemEntry)
+          );
+        };
+      });
       const dataTransfer = await page.evaluateHandle(() => {
         const dt = new DataTransfer();
         dt.items.add(new File(['x'], 'dropped.wasm'));
         return dt;
       });
-      await page.getByTestId('file-upload--dropzone').dispatchEvent('drop', { dataTransfer });
+      const dropzone = page.getByTestId('file-upload--dropzone');
+      // A real drag fires dragenter/dragover first; zag accepts DROP only in its `dragging` state.
+      await dropzone.dispatchEvent('dragenter', { dataTransfer });
+      await dropzone.dispatchEvent('dragover', { dataTransfer });
+      await expect(dropzone).toHaveAttribute('data-dragging', '');
+      await dropzone.dispatchEvent('drop', { dataTransfer });
       await expect(page.getByTestId('file-upload--item-name')).toHaveText('dropped.wasm');
+      await expect(dropzone).not.toHaveAttribute('data-dragging');
     });
 
     test('Should reject a file when its type is not accepted', async ({ page }) => {
