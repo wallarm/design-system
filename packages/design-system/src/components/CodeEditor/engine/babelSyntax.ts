@@ -25,8 +25,8 @@ const optionsFor = (language: BabelLanguage): ParserOptions => ({
   allowReturnOutsideFunction: true,
   plugins:
     language === 'typescript'
-      ? ['typescript', 'explicitResourceManagement']
-      : ['jsx', 'explicitResourceManagement'],
+      ? ['typescript', 'explicitResourceManagement', 'decorators-legacy', 'decoratorAutoAccessors']
+      : ['jsx', 'explicitResourceManagement', 'decorators', 'decoratorAutoAccessors'],
 });
 
 interface PositionedError {

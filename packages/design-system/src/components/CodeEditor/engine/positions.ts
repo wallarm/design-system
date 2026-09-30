@@ -40,7 +40,8 @@ export const lineNumberToDocLine = (
 /**
  * Converts an absolute line + 1-based column into a document offset.
  * Returns `null` when the line is outside the document; the column is clamped to
- * `[1, line.length + 1]` (column `line.length + 1` is the end of the line).
+ * `[1, line.length + 1]` (column `line.length + 1` is the end of the line). A non-finite
+ * column (`NaN`, `±Infinity`) is treated as column 1 so a bad value can never yield `NaN`.
  */
 export const positionToOffset = (
   doc: Text,
@@ -49,6 +50,7 @@ export const positionToOffset = (
 ): number | null => {
   const line = lineNumberToDocLine(doc, position.line, startingLineNumber);
   if (!line) return null;
-  const column = clamp(Math.floor(position.column), 1, line.length + 1);
+  const raw = Number.isFinite(position.column) ? Math.floor(position.column) : 1;
+  const column = clamp(raw, 1, line.length + 1);
   return line.from + column - 1;
 };

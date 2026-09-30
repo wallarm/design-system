@@ -20,6 +20,30 @@ describe('babelSyntaxDiagnostics', () => {
     }
   });
 
+  it('accepts decorators and auto-accessors (Angular/NestJS-style TS, Stage-3 JS)', async () => {
+    const angular = [
+      "@Component({ selector: 'app-root' })",
+      'export class AppComponent {',
+      "  @Input() name = '';",
+      '  @Output() changed = new EventEmitter<string>();',
+      '  accessor count = 0;',
+      '  constructor(@Inject(TOKEN) private readonly service: Service) {}',
+      '}',
+    ].join('\n');
+    expect(await babelSyntaxDiagnostics(angular, 'typescript')).toEqual([]);
+    expect(
+      await babelSyntaxDiagnostics(
+        '@Controller("rules")\nexport class RulesController {\n  @Get(":id") find(@Param("id") id: string) { return id; }\n}',
+        'typescript',
+      ),
+    ).toEqual([]);
+    expect(await babelSyntaxDiagnostics('@dec export class A {}', 'javascript')).toEqual([]);
+    expect(await babelSyntaxDiagnostics('export @dec class B {}', 'javascript')).toEqual([]);
+    expect(
+      await babelSyntaxDiagnostics('class C { @dec accessor x = 1; @dec m() {} }', 'javascript'),
+    ).toEqual([]);
+  });
+
   it('reports recovered errors at error.pos without the "(line:col)" suffix', async () => {
     expect(await babelSyntaxDiagnostics('let a: = 1;', 'typescript')).toEqual([
       { from: 7, to: 8, severity: 'error', source: 'syntax', message: 'Unexpected token' },

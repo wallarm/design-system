@@ -59,6 +59,14 @@ describe('positionToOffset', () => {
     expect(positionToOffset(doc, { line: 3, column: 5 }, 1)).toBe(23);
   });
 
+  it('treats a non-finite column as column 1 and a non-finite line as outside the document', () => {
+    expect(positionToOffset(doc, { line: 2, column: Number.NaN }, 1)).toBe(15);
+    expect(positionToOffset(doc, { line: 2, column: Number.POSITIVE_INFINITY }, 1)).toBe(15);
+    expect(positionToOffset(doc, { line: 2, column: Number.NEGATIVE_INFINITY }, 1)).toBe(15);
+    expect(positionToOffset(doc, { line: Number.NaN, column: 1 }, 1)).toBeNull();
+    expect(positionToOffset(doc, { line: Number.POSITIVE_INFINITY, column: 1 }, 1)).toBeNull();
+  });
+
   it('round-trips with offsetToPosition', () => {
     for (let offset = 0; offset <= doc.length; offset++) {
       const position = offsetToPosition(doc, offset, 10);
