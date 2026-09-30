@@ -14,7 +14,8 @@ import { Body, Header, HeaderName, HeaderValue } from './parser.terms';
 
 /** Same blank-line rule as CodeSnippet's getHttpFolds: empty or spaces/tabs only. */
 const BLANK_LINE = /^[ \t]*$/;
-const JSON_MEDIA_TYPE = /json/i;
+/** Exact `type/json` or `type/<suffix>+json` (spec §7.4) — not x-ndjson, jsonl, json-seq, jsonp. */
+const JSON_MEDIA_TYPE = /^[\w.+-]+\/(?:[\w.!#$&^-]+\+)?json$/i;
 const JSON_START = /^\s*[[{]/;
 const RESPONSE_START_LINE = /^HTTP\//;
 /** Upper bound for the parse work findJsonBodyRange may force, in ms. */
@@ -25,8 +26,9 @@ const readNode = (node: SyntaxNode | null, input: Input): string =>
 
 /**
  * Decides whether a Body node holds JSON:
- * - the first `Content-Type` header wins; its media type (before `;`) must contain `json`
- *   (`application/json`, `application/problem+json`, `...; charset=utf-8`);
+ * - the first `Content-Type` header wins; its media type (before `;`, trimmed) must have the
+ *   subtype `json` or a `+json` suffix (`application/json`, `application/problem+json`,
+ *   `...; charset=utf-8`); `application/x-ndjson`, `jsonl`, `json-seq` are not JSON documents;
  * - with no `Content-Type` header, the body is sniffed: first non-whitespace char `{` or `[`.
  */
 const isJsonBody = (body: SyntaxNode, input: Input): boolean => {
@@ -36,7 +38,7 @@ const isJsonBody = (body: SyntaxNode, input: Input): boolean => {
       const name = readNode(header.getChild(HeaderName), input).trim().toLowerCase();
       if (name !== 'content-type') continue;
       const mediaType = readNode(header.getChild(HeaderValue), input).split(';')[0] ?? '';
-      return JSON_MEDIA_TYPE.test(mediaType);
+      return JSON_MEDIA_TYPE.test(mediaType.trim());
     }
   }
   return JSON_START.test(input.read(body.from, body.to));

@@ -59,6 +59,32 @@ describe('http language', () => {
     });
   });
 
+  it('mounts JSON only for an exact json / +json subtype', () => {
+    const body = '{"a":1}\n{"b":2}';
+    const docFor = (type: string): string =>
+      `POST /bulk HTTP/1.1\nContent-Type: ${type}\n\n${body}`;
+    for (const type of [
+      'application/x-ndjson',
+      'application/jsonl',
+      'application/json-seq',
+      'application/x-json-stream',
+      'application/jsonp',
+    ]) {
+      const state = createState(docFor(type));
+      expect(shape(state), type).not.toContain('JsonText');
+      expect(findJsonBodyRange(state), type).toBeNull();
+    }
+    for (const type of [
+      'application/json',
+      'APPLICATION/JSON',
+      'application/problem+json; charset=utf-8',
+      'application/vnd.api+json',
+      '  application/json  ; charset=utf-8',
+    ]) {
+      expect(shape(createState(docFor(type))), type).toContain('JsonText');
+    }
+  });
+
   it('sniffs a JSON body when there is no Content-Type header', () => {
     const doc = 'POST /x HTTP/1.1\nHost: a\n\n\n  [1, 2]';
     expect(findJsonBodyRange(createState(doc))).toEqual({
