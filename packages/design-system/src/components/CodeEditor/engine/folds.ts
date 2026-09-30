@@ -412,10 +412,45 @@ const regionsFoldService = foldService.of((state, lineStart) => {
   return region ? regionRange(state, region, start) : null;
 });
 
+interface ToggleHost {
+  view: EditorView;
+  regionId: string;
+  portalId: number;
+  portals: PortalRegistry;
+  testId: string | undefined;
+}
+
+/** Live fold-toggle hosts per view, re-rendered in place when the fold field changes. */
+const toggleHosts = new WeakMap<EditorView, Set<ToggleHost>>();
+const toggleHostByDom = new WeakMap<Node, ToggleHost>();
+
+/** The FoldToggle for `regionId` from the current field value (`null` if the region is gone). */
+const renderToggle = (
+  view: EditorView,
+  regionId: string,
+  testId: string | undefined,
+): ReturnType<typeof createElement> | null => {
+  const value = readField(view.state);
+  const region = value?.regions.find(r => r.id === regionId);
+  if (!value || !region) return null;
+  return createElement(FoldToggle, {
+    fold: region,
+    isCollapsed: value.collapsed.has(regionId),
+    onToggle: () => {
+      toggleFoldRegion(view, regionId);
+    },
+    testId: testId === undefined ? undefined : `${testId}--fold-toggle`,
+  });
+};
+
+/**
+ * Identity is the region id + start line + stable config — NOT the collapsed state or
+ * the region's props. Toggling therefore keeps the same host and <button> (keyboard
+ * focus survives); `foldToggleUpdater` re-renders the portal node in place instead.
+ */
 class FoldToggleMarker extends GutterMarker {
   constructor(
     readonly region: FoldRegion,
-    readonly collapsed: boolean,
     readonly portals: PortalRegistry,
     readonly testId: string | undefined,
   ) {
@@ -425,8 +460,8 @@ class FoldToggleMarker extends GutterMarker {
   eq(other: GutterMarker): boolean {
     return (
       other instanceof FoldToggleMarker &&
-      sameRegion(this.region, other.region) &&
-      this.collapsed === other.collapsed &&
+      this.region.id === other.region.id &&
+      this.region.startLine === other.region.startLine &&
       this.portals === other.portals &&
       this.testId === other.testId
     );
@@ -436,25 +471,45 @@ class FoldToggleMarker extends GutterMarker {
     const host = document.createElement('span');
     host.className = 'cm-ds-fold-toggle';
     const { id } = this.region;
-    const portalId = this.portals.register(
-      host,
-      createElement(FoldToggle, {
-        fold: this.region,
-        isCollapsed: this.collapsed,
-        onToggle: () => {
-          toggleFoldRegion(view, id);
-        },
-        testId: this.testId === undefined ? undefined : `${this.testId}--fold-toggle`,
-      }),
-    );
+    const portalId = this.portals.register(host, renderToggle(view, id, this.testId));
     portalIds.set(host, portalId);
+    const entry: ToggleHost = {
+      view,
+      regionId: id,
+      portalId,
+      portals: this.portals,
+      testId: this.testId,
+    };
+    toggleHostByDom.set(host, entry);
+    let hosts = toggleHosts.get(view);
+    if (!hosts) {
+      hosts = new Set();
+      toggleHosts.set(view, hosts);
+    }
+    hosts.add(entry);
     return host;
   }
 
   destroy(dom: Node): void {
+    const entry = toggleHostByDom.get(dom);
+    if (entry) {
+      toggleHostByDom.delete(dom);
+      toggleHosts.get(entry.view)?.delete(entry);
+    }
     releasePortal(this.portals, dom);
   }
 }
+
+/** Re-renders live fold toggles in place (collapsed state, label, toggleProps) on field changes. */
+const foldToggleUpdater = ViewPlugin.define(view => ({
+  update(update: ViewUpdate) {
+    if (readField(update.startState) === readField(update.state)) return;
+    for (const entry of toggleHosts.get(view) ?? []) {
+      const node = renderToggle(view, entry.regionId, entry.testId);
+      if (node) entry.portals.update(entry.portalId, node);
+    }
+  },
+}));
 
 class FoldSpacerMarker extends GutterMarker {
   eq(other: GutterMarker): boolean {
@@ -496,16 +551,12 @@ const foldGutter: Extension = [
       const lineNumber = state.doc.lineAt(line.from).number + config.startingLineNumber - 1;
       const region = value.regions.find(r => r.startLine === lineNumber);
       if (!region) return null;
-      return new FoldToggleMarker(
-        region,
-        value.collapsed.has(region.id),
-        config.portals,
-        config.testId,
-      );
+      return new FoldToggleMarker(region, config.portals, config.testId);
     },
     lineMarkerChange: update => readField(update.startState) !== readField(update.state),
     initialSpacer: () => foldSpacer,
   }),
+  foldToggleUpdater,
   foldGutterTheme,
 ];
 
