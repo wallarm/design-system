@@ -19,9 +19,9 @@ const PICKER = '[data-slot="file-upload-dropzone"], [data-slot="file-upload-trig
 const keepFocusInside = (button: HTMLButtonElement) => {
   const row = button.closest(ROW);
   const root = button.closest('[data-slot="file-upload"]');
-  if (!row || !root) return () => {};
-  const index = [...root.querySelectorAll(ROW)].indexOf(row);
-  return () =>
+  const index = row && root ? [...root.querySelectorAll(ROW)].indexOf(row) : -1;
+  return () => {
+    if (!root || index < 0) return;
     requestAnimationFrame(() => {
       const active = button.ownerDocument.activeElement;
       // Focus moved on its own (or the consumer moved it): leave it.
@@ -34,6 +34,7 @@ const keepFocusInside = (button: HTMLButtonElement) => {
         root.querySelector<HTMLElement>(PICKER);
       target?.focus();
     });
+  };
 };
 
 /**
