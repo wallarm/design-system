@@ -89,7 +89,7 @@ test.describe('Component: FileUpload', () => {
     test('Should render the rejected state correctly', async ({ page }) => {
       await fileUploadStory.goto(page, 'Validation');
       await pick(page, file('policy.txt'));
-      await expect(page.getByTestId('file-upload--error')).toBeVisible();
+      await expect(page.getByTestId('file-upload--rejections')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
@@ -178,7 +178,7 @@ test.describe('Component: FileUpload', () => {
     test('Should reject a file when its type is not accepted', async ({ page }) => {
       await fileUploadStory.goto(page, 'Validation');
       await pick(page, file('policy.txt'));
-      await expect(page.getByTestId('file-upload--error')).toHaveText(
+      await expect(page.getByTestId('file-upload--rejections')).toHaveText(
         'policy.txt — Not a .so / .dylib file',
       );
       await expect(page.getByTestId('file-upload--item')).toHaveCount(0);
@@ -187,7 +187,7 @@ test.describe('Component: FileUpload', () => {
     test('Should reject a file when it is over the size limit', async ({ page }) => {
       await fileUploadStory.goto(page, 'Validation');
       await pick(page, file('big.so', 40 * 1024));
-      await expect(page.getByTestId('file-upload--error')).toHaveText(
+      await expect(page.getByTestId('file-upload--rejections')).toHaveText(
         'big.so — Too large: 40 KB; the limit is 32 KB',
       );
     });

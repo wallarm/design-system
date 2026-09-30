@@ -1,14 +1,16 @@
 import type { ComponentPropsWithoutRef, FC, ReactNode, Ref } from 'react';
 import { OctagonAlert } from '../../icons';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { Text } from '../Text';
 import { fileUploadErrorClassNames } from './classes';
 import { useRequiredFileUploadRootContext } from './FileUploadContext';
 import { formatRejection } from './lib';
 import type { FileUploadErrorCode, FileUploadRejection } from './types';
 
-export interface FileUploadErrorProps extends Omit<ComponentPropsWithoutRef<'div'>, 'children'> {
+export interface FileUploadErrorProps
+  extends Omit<ComponentPropsWithoutRef<'div'>, 'children'>,
+    TestableProps {
   /** Override a message: called once per (file, error) pair. */
   children?: (rejection: FileUploadRejection, code: FileUploadErrorCode) => ReactNode;
   ref?: Ref<HTMLDivElement>;
@@ -18,16 +20,18 @@ export interface FileUploadErrorProps extends Omit<ComponentPropsWithoutRef<'div
  * Inline rejection message — names the file and the rule it broke ("policy.txt — Not a
  * .wasm file"). Renders nothing until a pick, drop or replace is rejected; clears on the
  * next accepted file or on delete. Styled like `FieldError`; use `FieldError` itself for
- * form-level errors (e.g. "required").
+ * form-level errors (e.g. "required"). Test id slot: `{base}--rejections`.
  */
 export const FileUploadError: FC<FileUploadErrorProps> = ({
   children,
   className,
   ref,
+  'data-testid': testIdProp,
   ...props
 }) => {
   const ctx = useRequiredFileUploadRootContext('FileUploadError');
-  const testId = useTestId('error');
+  // `rejections`, not `error`: under an inherited Field cascade `{field}--error` is FieldError's.
+  const testId = useTestId('rejections', testIdProp);
 
   if (ctx.rejections.length === 0) return null;
 

@@ -3,11 +3,11 @@ import { useFieldContext } from '@ark-ui/react/field';
 import { FileUpload as ArkFileUpload } from '@ark-ui/react/file-upload';
 import { Share } from '../../icons';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 import { fileUploadDropzoneVariants } from './classes';
 import { useRequiredFileUploadRootContext } from './FileUploadContext';
 
-export interface FileUploadDropzoneProps extends ComponentPropsWithoutRef<'div'> {
+export interface FileUploadDropzoneProps extends ComponentPropsWithoutRef<'div'>, TestableProps {
   /** Replaces the default upload icon. */
   icon?: ReactNode;
   /** Replaces the default text ("Drag and drop files or click to select"). */
@@ -27,11 +27,12 @@ export const FileUploadDropzone: FC<FileUploadDropzoneProps> = ({
   children,
   className,
   ref,
+  'data-testid': testIdProp,
   ...props
 }) => {
   const ctx = useRequiredFileUploadRootContext('FileUploadDropzone');
   const field = useFieldContext();
-  const testId = useTestId('dropzone');
+  const testId = useTestId('dropzone', testIdProp);
   const textId = useId();
 
   if (ctx.pickerHidden) return null;

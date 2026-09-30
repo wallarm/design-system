@@ -14,14 +14,14 @@ describe('FileUpload — rejections', () => {
 
   it('renders nothing until a file is rejected', () => {
     render(<Rejecting />);
-    expect(queryByTestId('fu--error')).toBeNull();
+    expect(queryByTestId('fu--rejections')).toBeNull();
   });
 
   it('names the file and the type rule, marks the Area invalid, and describes it', async () => {
     const onFileReject = vi.fn();
     const { container } = render(<Rejecting onFileReject={onFileReject} />);
     pick(container, makeFile('policy.txt', 3, 'text/plain'));
-    const error = await screen.findByTestId('fu--error');
+    const error = await screen.findByTestId('fu--rejections');
     expect(error).toHaveAttribute('role', 'alert');
     expect(error).toHaveTextContent('policy.txt — Not a .so / .dylib file');
     expect(byTestId('fu--dropzone')).toHaveAttribute('data-invalid');
@@ -34,7 +34,7 @@ describe('FileUpload — rejections', () => {
   it('states size and limit for an oversized file', async () => {
     const { container } = render(<Rejecting maxFileSize={10} />);
     pick(container, makeFile('big.so', 20));
-    expect(await screen.findByTestId('fu--error')).toHaveTextContent(
+    expect(await screen.findByTestId('fu--rejections')).toHaveTextContent(
       'big.so — Too large: 20 B; the limit is 10 B',
     );
   });
@@ -44,11 +44,11 @@ describe('FileUpload — rejections', () => {
     pick(container, makeFile('good.so'));
     await screen.findByTestId('fu--item');
     pick(container, makeFile('bad.txt'));
-    await screen.findByTestId('fu--error');
+    await screen.findByTestId('fu--rejections');
     expect(byTestId('fu--item')).toHaveTextContent('good.so');
     // single mode: the picker stays, and a re-pick goes through the hidden input
     pick(container, makeFile('better.so'));
-    await waitFor(() => expect(queryByTestId('fu--error')).toBeNull());
+    await waitFor(() => expect(queryByTestId('fu--rejections')).toBeNull());
     await waitFor(() => expect(byTestId('fu--item')).toHaveTextContent('better.so'));
   });
 
@@ -61,7 +61,7 @@ describe('FileUpload — rejections', () => {
     pick(container, file);
     // let any async Ark reporting flush before asserting absence
     await new Promise(resolve => setTimeout(resolve, 50));
-    expect(queryByTestId('fu--error')).toBeNull();
+    expect(queryByTestId('fu--rejections')).toBeNull();
     expect(onFileReject).not.toHaveBeenCalled();
   });
 
@@ -71,10 +71,12 @@ describe('FileUpload — rejections', () => {
     pick(container, file);
     await screen.findByTestId('fu--item');
     pick(container, file);
-    await waitFor(() => expect(byTestId('fu--error')).toHaveTextContent('a.so — Already added'));
+    await waitFor(() =>
+      expect(byTestId('fu--rejections')).toHaveTextContent('a.so — Already added'),
+    );
     pick(container, makeFile('b.so'), makeFile('c.so'));
     await waitFor(() =>
-      expect(byTestId('fu--error')).toHaveTextContent('Too many files; the limit is 2'),
+      expect(byTestId('fu--rejections')).toHaveTextContent('Too many files; the limit is 2'),
     );
   });
 
@@ -86,7 +88,7 @@ describe('FileUpload — rejections', () => {
       </Uploader>,
     );
     pick(container, makeFile('x.wasm'));
-    expect(await screen.findByTestId('fu--error')).toHaveTextContent(
+    expect(await screen.findByTestId('fu--rejections')).toHaveTextContent(
       'Missing spe_init export: x.wasm',
     );
   });
@@ -96,9 +98,9 @@ describe('FileUpload — rejections', () => {
     pick(container, makeFile('a.wasm'));
     await screen.findByTestId('fu--item');
     pick(container, makeFile('bad.txt'));
-    await screen.findByTestId('fu--error');
+    await screen.findByTestId('fu--rejections');
     await userEvent.click(screen.getByRole('button', { name: 'Delete a.wasm' }));
-    await waitFor(() => expect(queryByTestId('fu--error')).toBeNull());
+    await waitFor(() => expect(queryByTestId('fu--rejections')).toBeNull());
   });
 
   it('an invalid multi-mode replacement names the new file inline (review focus #2)', async () => {
@@ -111,7 +113,9 @@ describe('FileUpload — rejections', () => {
     fireEvent.change(replaceInputs[0] as HTMLInputElement, {
       target: { files: [makeFile('evil.txt')] },
     });
-    expect(await screen.findByTestId('fu--error')).toHaveTextContent('evil.txt — Not a .wasm file');
+    expect(await screen.findByTestId('fu--rejections')).toHaveTextContent(
+      'evil.txt — Not a .wasm file',
+    );
     expect(screen.getAllByTestId('fu--item-name').map(n => n.textContent)).toEqual([
       'a.wasm',
       'b.wasm',

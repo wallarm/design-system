@@ -1,6 +1,6 @@
 import { type ComponentPropsWithoutRef, type FC, Fragment, type ReactNode, type Ref } from 'react';
 import { cn } from '../../utils/cn';
-import { type TestableProps, useTestId } from '../../utils/testId';
+import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { useFileUploadRootContext } from './FileUploadContext';
 
 export interface FileUploadItemGroupProps
@@ -11,7 +11,11 @@ export interface FileUploadItemGroupProps
   ref?: Ref<HTMLUListElement>;
 }
 
-/** The list of chosen files (Figma slot "Items"), 8px apart. Renders nothing when empty. */
+/**
+ * The list of chosen files (Figma slot "Items"), 8px apart. Renders nothing when empty.
+ * An own `data-testid` becomes the base for its rows (`{id}--item`, `{id}--item-name`, …) —
+ * how a standalone stored-file list gets test ids.
+ */
 export const FileUploadItemGroup: FC<FileUploadItemGroupProps> = ({
   children,
   className,
@@ -44,7 +48,11 @@ export const FileUploadItemGroup: FC<FileUploadItemGroupProps> = ({
       data-testid={testId}
       className={cn('flex w-full min-w-0 flex-col gap-8', className)}
     >
-      {content}
+      {testIdProp === undefined ? (
+        content
+      ) : (
+        <TestIdProvider value={testIdProp}>{content}</TestIdProvider>
+      )}
     </ul>
   );
 };

@@ -8,7 +8,7 @@ import {
 } from 'react';
 import { File as FileIcon } from '../../icons';
 import { cn } from '../../utils/cn';
-import { type TestableProps, useTestId } from '../../utils/testId';
+import { type TestableProps, TestIdProvider, useTestId } from '../../utils/testId';
 import { Loader } from '../Loader';
 import {
   OverflowTooltip,
@@ -43,6 +43,8 @@ export interface FileUploadItemProps extends ComponentPropsWithoutRef<'li'>, Tes
 /**
  * One file: icon, name (truncates — full name in a tooltip), optional description and a
  * slot of small ghost icon actions. Works inside `FileUpload` or on its own (stored files).
+ * An own `data-testid` becomes the base for this row's parts (`{id}--item-name`,
+ * `{id}--item-delete-trigger`, …), so one row can be targeted without an id on every action.
  */
 export const FileUploadItem: FC<FileUploadItemProps> = ({
   file,
@@ -57,8 +59,12 @@ export const FileUploadItem: FC<FileUploadItemProps> = ({
 }) => {
   const root = useFileUploadRootContext();
   const testId = useTestId('item', testIdProp);
-  const nameTestId = useTestId('item-name');
-  const descriptionTestId = useTestId('item-description');
+  // An own test id becomes the base for this row's parts: `{id}--item-name`, `{id}--item-delete-trigger`, …
+  const own = (slot: string) => (testIdProp === undefined ? undefined : `${testIdProp}--${slot}`);
+  const cascadeNameTestId = useTestId('item-name');
+  const cascadeDescriptionTestId = useTestId('item-description');
+  const nameTestId = own('item-name') ?? cascadeNameTestId;
+  const descriptionTestId = own('item-description') ?? cascadeDescriptionTestId;
   const registerLoading = root?.registerLoading;
 
   // A real side effect (not derived state): hold the root's upload lock while mounted + loading.
@@ -107,7 +113,11 @@ export const FileUploadItem: FC<FileUploadItemProps> = ({
       {hasActions ? (
         <div data-slot='file-upload-item-actions' className={fileUploadItemActionsClassNames}>
           <FileUploadItemContextProvider value={itemContext}>
-            {children}
+            {testIdProp === undefined ? (
+              children
+            ) : (
+              <TestIdProvider value={testIdProp}>{children}</TestIdProvider>
+            )}
           </FileUploadItemContextProvider>
           {loading ? <Loader type='sonner' size='md' color='primary' /> : null}
         </div>

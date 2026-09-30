@@ -69,7 +69,7 @@ describe('FileUpload — re-picking an edited file with the same name, size and 
     pick(container, edited);
     await waitFor(() => expect(lastFiles(onValueChange)?.[0]).toBe(edited));
     expect(lastFiles(onValueChange)).toHaveLength(1);
-    expect(queryByTestId('fu--error')).toBeNull();
+    expect(queryByTestId('fu--rejections')).toBeNull();
   });
 
   it('single mode still ignores the very same file (same lastModified)', async () => {
@@ -81,7 +81,7 @@ describe('FileUpload — re-picking an edited file with the same name, size and 
     pick(container, makeFile('rules.lua', 5, 'text/x-lua', 1_000));
     await new Promise(resolve => setTimeout(resolve, 50));
     expect(onValueChange).toHaveBeenCalledTimes(1);
-    expect(queryByTestId('fu--error')).toBeNull();
+    expect(queryByTestId('fu--rejections')).toBeNull();
   });
 
   it('multi-mode Replace with an edited copy of the same row takes it and reports it', async () => {
@@ -109,7 +109,7 @@ describe('FileUpload — multi-mode Replace with a copy of another listed file',
     await waitFor(() => expect(names()).toEqual(['a.wasm', 'b.wasm']));
     const copyOfB = makeFile('b.wasm');
     replaceWith(container, 0, copyOfB);
-    expect(await screen.findByTestId('fu--error')).toHaveTextContent('b.wasm — Already added');
+    expect(await screen.findByTestId('fu--rejections')).toHaveTextContent('b.wasm — Already added');
     expect(names()).toEqual(['a.wasm', 'b.wasm']);
     expect(onFileReject).toHaveBeenLastCalledWith([{ file: copyOfB, errors: ['FILE_EXISTS'] }]);
   });
