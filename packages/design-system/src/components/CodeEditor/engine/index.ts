@@ -1,6 +1,6 @@
 import { closeBrackets, closeBracketsKeymap } from '@codemirror/autocomplete';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
-import { bracketMatching, foldAll, indentOnInput, unfoldAll } from '@codemirror/language';
+import { bracketMatching, indentOnInput } from '@codemirror/language';
 import { openSearchPanel } from '@codemirror/search';
 import {
   Annotation,
@@ -22,9 +22,11 @@ import {
   ViewPlugin,
   type ViewUpdate,
 } from '@codemirror/view';
+import type { PortalRegistry } from '../lib/portalRegistry';
 import type { CodeEditorApi } from '../types';
 import { adapterPainter } from './adapterPainter';
 import { sanitizeContentAttributes } from './contentAttributes';
+import { foldAllRegions, foldsExtension, getVisibleRowCount, unfoldAllRegions } from './folds';
 import { guttersExtension } from './gutters';
 import { languageExtension } from './languages';
 import { linesExtension } from './lines';
@@ -106,7 +108,7 @@ const SLOT_DEPS: Record<SlotKey, readonly (keyof EngineOptions)[]> = {
   contentAttributes: ['contentAttributes', 'testId'],
   cspNonce: ['cspNonce'],
   painter: ['adapter', 'language'],
-  lines: ['lines', 'startingLineNumber', 'lineNumbers', 'testId'],
+  lines: ['lines', 'startingLineNumber', 'lineNumbers', 'testId', 'folds'],
   folds: ['folds', 'startingLineNumber', 'testId'],
   search: ['readOnly', 'testId'],
   diagnostics: ['language', 'schema', 'diagnostics', 'startingLineNumber'],
@@ -116,6 +118,15 @@ const SLOT_DEPS: Record<SlotKey, readonly (keyof EngineOptions)[]> = {
 };
 
 type SlotBuilders<K extends string> = Record<K, () => Extension>;
+
+/** Fold field/keymap/service (`folds` slot) and the fold gutter (inside the `lines` slot). */
+const buildFolds = (o: EngineOptions, portals: PortalRegistry) =>
+  foldsExtension({
+    folds: o.folds,
+    startingLineNumber: o.startingLineNumber,
+    portals,
+    testId: o.testId,
+  });
 
 /**
  * Extension point for feature tasks (painter, lines + gutters, folds, search,
@@ -134,13 +145,12 @@ const featureExtensions = (
       lines: options.lines,
       startingLineNumber: options.startingLineNumber,
       lineNumbers: options.lineNumbers,
-      // T8 replaces `null` with `foldsExtension(...).gutter`
-      foldGutter: null,
+      foldGutter: buildFolds(options, callbacks.portals).gutter,
       portals: callbacks.portals,
       testId: options.testId,
     }),
   ],
-  folds: () => [],
+  folds: () => buildFolds(options, callbacks.portals).extension,
   search: () => [],
   diagnostics: () => [],
   completion: () => [],
@@ -207,8 +217,8 @@ const changedOptionKeys = (prev: EngineOptions, next: EngineOptions): Set<keyof 
   return changed;
 };
 
-/** Rows the editor shows; T8 switches this to `getVisibleRowCount(state)` (folds). */
-const visibleRowCount = (state: EditorState): number => state.doc.lines;
+/** Rows the editor shows: document lines minus the lines hidden by collapsed folds. */
+const visibleRowCount = (state: EditorState): number => getVisibleRowCount(state);
 
 interface CachedDocument {
   state: EditorState;
@@ -242,7 +252,12 @@ export const createEditor = (
     ) {
       callbacks.onChange(update.state.doc.toString());
     }
-    if (update.docChanged || update.transactions.some(tr => tr.effects.length > 0)) {
+    // selectionSet: moving the cursor into a collapsed region unfolds it (no effects).
+    if (
+      update.docChanged ||
+      update.selectionSet ||
+      update.transactions.some(tr => tr.effects.length > 0)
+    ) {
       reportRowCount(update.state);
     }
   });
@@ -257,7 +272,8 @@ export const createEditor = (
     indentOnInput(),
     bracketMatching(),
     closeBrackets(),
-    // searchKeymap / completionKeymap / foldKeymap come with their feature extensions.
+    // searchKeymap / completionKeymap come with their feature extensions; fold keys are
+    // bound by foldsExtension (CM's foldKeymap is never used — it owns a second fold state).
     keymap.of([...closeBracketsKeymap, ...defaultKeymap, ...historyKeymap, indentWithTab]),
     editorTheme,
     listener,
@@ -332,12 +348,11 @@ export const createEditor = (
     openSearch: () => {
       if (view.state.facet(searchConfigured)) openSearchPanel(view);
     },
-    // T8 switches these to foldAllRegions / unfoldAllRegions.
     foldAll: () => {
-      foldAll(view);
+      foldAllRegions(view);
     },
     unfoldAll: () => {
-      unfoldAll(view);
+      unfoldAllRegions(view);
     },
   };
 
