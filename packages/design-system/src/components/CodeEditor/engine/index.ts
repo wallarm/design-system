@@ -25,11 +25,13 @@ import type { PortalRegistry } from '../lib/portalRegistry';
 import type { CodeEditorApi, CodeEditorLanguage } from '../types';
 import { adapterPainter } from './adapterPainter';
 import { sanitizeContentAttributes } from './contentAttributes';
-import { diagnosticsExtension } from './diagnostics';
+import { diagnosticsExtension, jsonRegion } from './diagnostics';
 import { foldAllRegions, foldsExtension, getVisibleRowCount, unfoldAllRegions } from './folds';
 import { guttersExtension } from './gutters';
 import { isLazyLanguage, languageExtension, loadLanguageExtension } from './languages';
 import { linesExtension } from './lines';
+import { schemaHover } from './schema/hover';
+import { validateAgainstSchema } from './schema/validate';
 import { searchConfigured, searchExtension } from './search';
 import { editorTheme, maxHeightTheme } from './theme';
 import type { EditorHandle, EngineCallbacks, EngineOptions } from './types';
@@ -151,14 +153,28 @@ const featureExtensions = (
       readOnly: options.readOnly,
       testId: options.testId,
     }),
-  diagnostics: () =>
-    diagnosticsExtension({
-      language: options.language,
-      schema: options.schema,
-      external: options.diagnostics,
-      startingLineNumber: options.startingLineNumber,
-      onChange: callbacks.onDiagnosticsChange,
-    }),
+  diagnostics: () => {
+    const { schema } = options;
+    return [
+      diagnosticsExtension({
+        language: options.language,
+        schema,
+        external: options.diagnostics,
+        startingLineNumber: options.startingLineNumber,
+        onChange: callbacks.onDiagnosticsChange,
+        schemaSource:
+          schema === undefined
+            ? undefined
+            : (state, region) => validateAgainstSchema(state, region, schema),
+      }),
+      schema === undefined
+        ? []
+        : schemaHover(
+            () => schema,
+            state => jsonRegion(state, options.language),
+          ),
+    ];
+  },
   completion: () => [],
   diff: () => [],
 });
