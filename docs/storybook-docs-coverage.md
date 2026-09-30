@@ -4,7 +4,7 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-09-30, against main at v1.27.0 (plus `FileUpload` on `feat/WDS-185`). **All 96 pages are written.**
+> **Last updated:** 2026-09-30, against main at v1.27.0 (plus `FileUpload` on `feat/WDS-185` and `Avatar` on `feat-avatar-component`). **97 of 98 pages are written** (`FilterDropdown` left).
 >
 > `SearchModal` landed in v1.7.0 with no stories file, so it is not a page yet — it becomes an
 > unticked row the moment one is added.
@@ -42,7 +42,7 @@ check**, not a queue:
 
 ## Snapshot
 
-- **96 written to the standard · 1 left** (`FilterDropdown`, new on `feat/WDS-180`), across 97 story pages.
+- **97 written to the standard · 1 left** (`FilterDropdown`, new on `feat/WDS-180`), across 98 story pages.
 - Levelling was usually cutting, not filling — and often correcting. Five pages
   claimed behaviour their own code contradicted: `Slider`, `Dialog`,
   `CodeSnippet` (its `Sizes` story labelled the wrong default), `BarList`
@@ -61,6 +61,7 @@ check**, not a queue:
 | ✅ | Brand/WallyIcon | 3 | 3 | `components/WallyIcon/WallyIcon.stories.tsx` |
 | ✅ | Data Display/Accordion | 8 | 8 | `components/Accordion/Accordion.stories.tsx` |
 | ✅ | Data Display/Attribute | 19 | 19 | `components/Attribute/Attribute.stories.tsx` |
+| ✅ | Data Display/Avatar | 8 | 8 | `components/Avatar/Avatar.stories.tsx` |
 | ✅ | Data Display/Card | 3 | 3 | `components/Card/Card.stories.tsx` |
 | ✅ | Data Display/CodeSnippet/InlineCodeSnippet | 4 | 4 | `components/CodeSnippet/InlineCodeSnippet.stories.tsx` |
 | ✅ | Data Display/Country | 5 | 5 | `components/Country/Country.stories.tsx` |
