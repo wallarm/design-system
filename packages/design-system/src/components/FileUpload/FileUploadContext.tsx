@@ -5,7 +5,7 @@ import type { FileUploadLimits, FileUploadRejection } from './types';
 export interface FileUploadRootContextValue {
   /** The Ark/zag API (accepted files, deleteFile, setFiles, openFilePicker, …). */
   api: UseFileUploadReturn;
-  /** `maxFiles === 1`: a new pick replaces the file and the picker hides while one is chosen. */
+  /** `maxFiles === 1`: a new pick replaces the file; the picker stays visible. */
   single: boolean;
   disabled: boolean;
   readOnly: boolean;
@@ -13,7 +13,7 @@ export interface FileUploadRootContextValue {
   invalid: boolean;
   /** Some `FileUploadItem loading` is mounted — the picker is locked until it finishes. */
   locked: boolean;
-  /** Pickers render nothing: read-only, or single mode with a file chosen. */
+  /** Pickers render nothing while read-only (a chosen file never hides them). */
   pickerHidden: boolean;
   /** Pickers render but are inert: disabled, locked, or multiple mode at `maxFiles`. */
   pickerBlocked: boolean;

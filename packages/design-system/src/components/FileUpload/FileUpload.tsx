@@ -38,7 +38,7 @@ export interface FileUploadProps
   onFileReject?: (rejections: FileUploadRejection[]) => void;
   /** Extensions and/or MIME types: `'.so,.dylib'`, `'image/png'`, `['.lua']`. */
   accept?: string | string[];
-  /** Default `1`: a new pick replaces the file, and the picker hides while one is chosen. */
+  /** Default `1`: a new pick replaces the file, and the picker stays visible, with the chosen file shown below it. */
   maxFiles?: number;
   /** Bytes. Checked on pick, drop and replace. */
   maxFileSize?: number;
@@ -191,7 +191,7 @@ export const FileUpload: FC<FileUploadProps> = ({
       readOnly: isReadOnly,
       invalid,
       locked,
-      pickerHidden: isReadOnly || (single && hasFiles),
+      pickerHidden: isReadOnly,
       pickerBlocked: isDisabled || locked || (!single && api.maxFilesReached),
       accept: acceptString,
       limits: { acceptList, maxFiles, maxFileSize, minFileSize },

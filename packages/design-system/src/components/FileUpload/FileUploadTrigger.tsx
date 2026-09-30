@@ -9,7 +9,7 @@ export type FileUploadTriggerProps = ButtonProps;
 
 /**
  * "Select file" button — the compact picker for when space is tight. Takes every
- * `Button` prop (defaults: primary / brand / large). Hidden and blocked like the Area.
+ * `Button` prop (defaults: primary / brand / large). Hidden (read-only) and blocked like the Area.
  */
 export const FileUploadTrigger: FC<FileUploadTriggerProps> = ({
   children,

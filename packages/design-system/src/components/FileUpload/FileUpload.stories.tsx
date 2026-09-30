@@ -113,7 +113,7 @@ export const Multiple: StoryFn<FileUploadProps> = args => (
   </FileUpload>
 );
 
-/** One file allowed and chosen: the picker hides, and Replace in the row swaps the file. */
+/** One file allowed and chosen: the file shows below the picker, and a new pick, or Replace in the row, swaps it. */
 export const SingleFileChosen: StoryFn<FileUploadProps> = args => (
   <FileUpload data-testid='file-upload' {...args} defaultValue={[sample('policy.wasm')]}>
     <FileUploadDropzone />

@@ -19,7 +19,7 @@ const DEFAULT_TEXT = 'Drag and drop files or click to select';
 
 /**
  * Dashed drop Area — drop files on it, or click / Enter / Space to open the picker.
- * Hidden in single mode once a file is chosen and when read-only; inert while disabled,
+ * Stays visible once a file is chosen; hidden only when read-only; inert while disabled,
  * while a row is uploading, and at `maxFiles`.
  */
 export const FileUploadDropzone: FC<FileUploadDropzoneProps> = ({

@@ -22,7 +22,7 @@ The consumer owns the network: upload, download, and detaching a stored file. Th
 | D1 | Build a compound component on top of Ark UI (approach A). No monolithic props component and no preset for now. |
 | D2 | Item rows (WDS-186) ship in the same PR. |
 | D3 | Rejections show inline via `FileUploadError`, not as a toast. `onFileReject` is still exposed for consumers that also want a toast. |
-| D4 | Multiple files are supported through `maxFiles`. The default is `1`, and in that mode the picker hides once a file is chosen. |
+| D4 | Multiple files are supported through `maxFiles`. The default is `1`, and in that mode the picker stays visible once a file is chosen. A new pick replaces the file, and the chosen file appears below the picker. |
 | D5 | Auto-lock: any `FileUploadItem loading` locks the picker (Dropzone and Trigger) through root context. Delete stays enabled because it acts as Cancel. |
 | D6 | `FileUploadItem` is a DS-owned presentational row. It accepts `File` **or** `{ name, size? }`, so stored server files use the same row. It works inside and outside `FileUpload`. |
 | D7 | Out of scope (YAGNI): a DS upload helper or progress percentage; whole-window drop overlay; image previews; re-exporting Ark's raw `useFileUploadContext`. |
@@ -124,8 +124,8 @@ Every part follows the same rules:
 
 | Part | Element / base | Props (beyond native) | Behaviour |
 |---|---|---|---|
-| `FileUploadDropzone` | `div` (Ark `Dropzone`) | `children?` (default: `Share` icon + "Drag and drop files or click to select") | Click, Enter/Space, or drop opens or accepts files. Hidden when `single` and a file is chosen, and when `readOnly`. It looks disabled when `disabled`, `locked`, or when the maximum number of files is reached. In that case click and drop are disabled: `disableClick` plus DS guards and root `allowDrop` go false. Slot `dropzone`. |
-| `FileUploadTrigger` | DS `Button` via Ark `Trigger asChild` | All `ButtonProps`. Default `variant='primary' color='brand' size='large'`. Default children: `<Share />Select file` | Hidden when `single` and a file is chosen, and when `readOnly`. Disabled when `disabled`, `locked`, or the maximum is reached. Slot `trigger`. |
+| `FileUploadDropzone` | `div` (Ark `Dropzone`) | `children?` (default: `Share` icon + "Drag and drop files or click to select") | Click, Enter/Space, or drop opens or accepts files. Stays visible once a file is chosen; hidden only when `readOnly`. It looks disabled when `disabled`, `locked`, or when the maximum number of files is reached. In that case click and drop are disabled: `disableClick` plus DS guards and root `allowDrop` go false. Slot `dropzone`. |
+| `FileUploadTrigger` | DS `Button` via Ark `Trigger asChild` | All `ButtonProps`. Default `variant='primary' color='brand' size='large'`. Default children: `<Share />Select file` | Stays visible once a file is chosen; hidden only when `readOnly`. Disabled when `disabled`, `locked`, or the maximum is reached. Slot `trigger`. |
 | `FileUploadError` | `div role='alert'` | `children?: (rejection: FileUploadRejection, error: FileUploadErrorCode) => ReactNode` | Renders nothing when there are no rejections. Otherwise it renders one line per (file, error) pair in `FieldError` style. Slot `error`. |
 | `FileUploadItemGroup` | `ul` | `children: ReactNode \| ((file: File, index: number) => ReactNode)` | With a function child, it maps over the accepted files. Renders nothing when the list is empty. Layout: `flex flex-col gap-8`. Slot `item-group`. |
 | `FileUploadItem` | `li` | `file: File \| { name: string; size?: number }` (required), `description?: ReactNode`, `loading?: boolean`, `icon?: ReactNode` (default `File`), `children` = actions | Provides the item context (`file`, `loading`). While `loading`, it registers the lock with the root. Slot `item`; the name, description, and actions parts get `item-name`, `item-description`, `item-actions`. |
@@ -153,7 +153,7 @@ Exported types:
 1. **Nothing uploads.** Ark's `syncInputElement` writes the accepted files into the hidden input's `files` (via `DataTransfer`) and dispatches a bubbling `change`. A native `<form>` or `FormData` carries them under `name`.
 2. **Validation** runs the same way for pick, drop, and replace: `accept`, then size, then `validate`. That is Ark's `getEventFiles`.
 3. **Single mode:**
-   - A valid new file replaces the old one.
+   - A valid new file replaces the old one. The picker stays visible after a pick, with the chosen file shown below it.
    - An invalid file keeps the old one and sets the rejections.
    - Re-picking an identical file (same name, size, and type) is silently ignored: the DS filters out `FILE_EXISTS` when `single`.
 4. **Multiple mode:**
@@ -221,6 +221,7 @@ When loading, the name and icon switch to `text-text-disable-primary` and a `Loa
 ## 9. Open items to confirm with design
 
 - The invalid Dropzone look (danger dashed border). It is not in Figma.
+- Deviation from Figma: pickers stay visible after a pick (product decision 2026-09-30). Figma still shows the picker hiding for a single file; ask design to update.
 - `Loader` size (`sonner`, `md` 16px vs Figma's `sm` 12px). The spec uses `md` to match the 16px file icon.
 
 ## 10. Files
@@ -272,7 +273,7 @@ Also update:
   - item with a description;
   - loading (locked);
   - rejected;
-  - single mode filled (picker hidden);
+  - single mode filled (picker stays above the file);
   - read-only with Download;
   - long name with its tooltip.
 - *Interactions:* pick via `setInputFiles`, reject by type and by size, delete, replace, cancel while loading.

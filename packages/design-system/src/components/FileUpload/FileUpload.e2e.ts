@@ -66,11 +66,9 @@ test.describe('Component: FileUpload', () => {
       await expect(page).toHaveScreenshot();
     });
 
-    test('Should render a chosen single file with the picker hidden correctly', async ({
-      page,
-    }) => {
+    test('Should render a chosen single file below the picker correctly', async ({ page }) => {
       await fileUploadStory.goto(page, 'Single File Chosen');
-      await expect(page.getByTestId('file-upload--dropzone')).toHaveCount(0);
+      await expect(page.getByTestId('file-upload--dropzone')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
 
@@ -141,7 +139,7 @@ test.describe('Component: FileUpload', () => {
       await fileUploadStory.goto(page, 'Basic');
       await pick(page, file('policy.wasm'));
       await expect(page.getByTestId('file-upload--item-name')).toHaveText('policy.wasm');
-      await expect(page.getByTestId('file-upload--dropzone')).toHaveCount(0);
+      await expect(page.getByTestId('file-upload--dropzone')).toBeVisible();
     });
 
     test('Should list a file when it is dropped', async ({ page }) => {
@@ -187,6 +185,13 @@ test.describe('Component: FileUpload', () => {
       await expect(page.getByTestId('file-upload--item-name')).toHaveText('replacement.wasm');
     });
 
+    test('Should replace the file when another is picked in single mode', async ({ page }) => {
+      await fileUploadStory.goto(page, 'Single File Chosen');
+      await pick(page, file('another.wasm'));
+      await expect(page.getByTestId('file-upload--item')).toHaveCount(1);
+      await expect(page.getByTestId('file-upload--item-name')).toHaveText('another.wasm');
+    });
+
     test('Should submit the held file with the form when saved', async ({ page }) => {
       await fileUploadStory.goto(page, 'Form Submission');
       await pick(page, file('artifact.so', 2048));
@@ -214,6 +219,8 @@ test.describe('Component: FileUpload', () => {
 
     test('Should be reachable via keyboard for row actions', async ({ page }) => {
       await fileUploadStory.goto(page, 'Single File Chosen');
+      await page.keyboard.press('Tab');
+      await expect(page.getByTestId('file-upload--dropzone')).toBeFocused();
       await page.keyboard.press('Tab');
       await expect(page.getByTestId('file-upload--item-replace-trigger')).toBeFocused();
       await page.keyboard.press('Tab');

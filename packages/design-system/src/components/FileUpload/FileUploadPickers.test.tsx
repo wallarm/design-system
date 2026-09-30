@@ -5,6 +5,8 @@ import { Field, FieldLabel } from '../Field';
 import { FileUpload } from './FileUpload';
 import { byTestId, hiddenInput, makeFile, pick, queryByTestId } from './FileUpload.test.helpers';
 import { FileUploadDropzone } from './FileUploadDropzone';
+import { FileUploadItem } from './FileUploadItem';
+import { FileUploadItemGroup } from './FileUploadItemGroup';
 import { FileUploadTrigger } from './FileUploadTrigger';
 
 describe('FileUpload — pickers', () => {
@@ -77,16 +79,23 @@ describe('FileUpload — pickers', () => {
     click.mockRestore();
   });
 
-  it('hides the pickers in single mode once a file is chosen', async () => {
+  it('keeps the pickers in single mode once a file is chosen, and a new pick replaces the file', async () => {
     const { container } = render(
       <FileUpload data-testid='fu'>
         <FileUploadDropzone />
         <FileUploadTrigger />
+        <FileUploadItemGroup>{file => <FileUploadItem file={file} />}</FileUploadItemGroup>
       </FileUpload>,
     );
-    pick(container, makeFile());
-    await waitFor(() => expect(queryByTestId('fu--dropzone')).toBeNull());
-    expect(queryByTestId('fu--trigger')).toBeNull();
+    pick(container, makeFile('first.wasm'));
+    await waitFor(() => expect(screen.getAllByTestId('fu--item')).toHaveLength(1));
+    expect(byTestId('fu--dropzone')).toBeInTheDocument();
+    expect(byTestId('fu--dropzone')).not.toHaveAttribute('data-disabled');
+    expect(byTestId('fu--trigger')).toBeEnabled();
+    expect(byTestId('fu--item')).toHaveTextContent('first.wasm');
+    pick(container, makeFile('second.wasm'));
+    await waitFor(() => expect(byTestId('fu--item')).toHaveTextContent('second.wasm'));
+    expect(screen.getAllByTestId('fu--item')).toHaveLength(1);
     expect(hiddenInput(container)).toBeInTheDocument();
   });
 

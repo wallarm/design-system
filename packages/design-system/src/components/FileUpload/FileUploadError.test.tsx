@@ -46,7 +46,7 @@ describe('FileUpload — rejections', () => {
     pick(container, makeFile('bad.txt'));
     await screen.findByTestId('fu--error');
     expect(byTestId('fu--item')).toHaveTextContent('good.so');
-    // single mode: the picker is hidden, but a re-pick still goes through the hidden input
+    // single mode: the picker stays, and a re-pick goes through the hidden input
     pick(container, makeFile('better.so'));
     await waitFor(() => expect(queryByTestId('fu--error')).toBeNull());
     await waitFor(() => expect(byTestId('fu--item')).toHaveTextContent('better.so'));
