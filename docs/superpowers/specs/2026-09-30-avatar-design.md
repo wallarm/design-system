@@ -84,7 +84,7 @@ Every part follows the DS rules: native attributes for its element, `{...rest}` 
 | `as` | `'span' \| 'button'` | `'span'` | The root tag. `'button'` renders `<button type='button'>` (consumer `type` wins) — the interactive avatar, e.g. inside `FileUploadTrigger asChild`. Decision D10. |
 | `asChild` | `boolean` | `false` | Ark `asChild`: the single child element becomes the root (e.g. a router link). Takes precedence over `as`. |
 | `onStatusChange` | `(details: { status: 'loading' \| 'loaded' \| 'error' }) => void` | — | Passed through from Ark. |
-| `className`, `children`, `ref`, `data-testid` | | | Renders a `<span>` (Ark's default `div` is invalid inside a `<button>`). `data-slot='avatar'` is set **before** `{...rest}`, so an incoming `data-slot` wins (`file-upload-trigger` from the trigger, `nav-rail-item-avatar` from NavRail). Avatar's own CSS therefore keys off the `group/avatar` class, never `[data-slot=avatar]`. `disabled`, `type` and `onClick` flow through `rest`. The whole root is wrapped in `TestIdProvider`, so parts get `{testId}--image` etc. even under `asChild`. |
+| `className`, `children`, `ref`, `data-testid` | | | Renders a `<span>` (Ark's default `div` is invalid inside a `<button>`). `data-slot='avatar'` is set **before** `{...rest}`, so an incoming `data-slot` wins (`file-upload-trigger` from the trigger, `nav-rail-item-avatar` from NavRail). Avatar's own CSS therefore keys off the `group/avatar` class, never `[data-slot=avatar]`. `onClick` flows through `rest`; the button attributes (`disabled`, `type`, `name`, `value`, `form`) are typed only for `as='button'` or `asChild` and dropped on a span root. A consumer `id` becomes Ark's `ids.root`, so it lands on the DOM node verbatim (Ark would otherwise render `avatar:${id}`). `AvatarImage` takes no `id` — Ark finds the image by its own id. The whole root is wrapped in `TestIdProvider`, so parts get `{testId}--image` etc. even under `asChild`. |
 
 The root also carries `group/avatar`, so the other parts can react to hover, focus and image state.
 
@@ -100,10 +100,10 @@ The root also carries `group/avatar`, so the other parts can react to hover, foc
 
 It lives in `src/utils/getInitials.ts`. It is internal and not exported from the package.
 
-- It trims the name, splits on `/\s+/`, and takes the first grapheme of the first word and of the last word. With a single word it takes one grapheme.
-- Graphemes are split with `Intl.Segmenter`, so emoji and combined characters stay whole.
-- The result is uppercased with `toLocaleUpperCase()`. It returns `''` for an empty or whitespace-only name, and the fallback then shows the icon.
-- Examples: `'Ada Lovelace' → 'AL'`, `'  ada  ' → 'A'`, `'Иван Петров' → 'ИП'`, `'Jean-Luc Picard' → 'JP'`, `'' → ''`.
+- It trims the name, splits on `/\s+/`, and takes the first letter grapheme (`\p{L}`) of the first and of the last word that has a letter. Leading non-letters are skipped and words without a letter are ignored. With a single such word it takes one letter.
+- Graphemes are split with `Intl.Segmenter`, so a letter with a combining mark stays whole. Emoji are not letters and never become initials.
+- The result is uppercased with `toLocaleUpperCase()`. It returns `''` for a name with no letter (empty, whitespace-only, `'42'`), and the fallback then shows the icon.
+- Examples: `'Ada Lovelace' → 'AL'`, `'  ada  ' → 'A'`, `'Иван Петров' → 'ИП'`, `'Jean-Luc Picard' → 'JP'`, `'"Ada" Lovelace' → 'AL'`, `'42' → ''`, `'' → ''`.
 
 ### FileUpload changes
 
@@ -191,7 +191,7 @@ This replaces the hand-rolled plate, its `failedSrc` state, and the `onError` ha
   - `ClickToUpload`: empty → pick → preview. Hover overlay on both states. PNG/JPEG/WebP, 512 KB, `FileUploadError` under the row.
   - `WithActions`: an "Avatar" label row with a "PNG, JPEG, or WebP · up to 512 KB" description, Trash2 and RefreshCcw `ghost/neutral/small` buttons, and the avatar (Figma 2188:26617).
   - `Uploading`: `AvatarOverlay visible` with `Loader`, and the trigger disabled.
-- An `analytics` story shows where `data-analytics-id` goes (on the `<button>`).
+- No separate `analytics` story (repo convention): `ClickToUpload` shows the placement — `data-analytics-id='AVATAR_CHANGE'` on its `FileUploadTrigger asChild`, which lands on the `<button>`.
 - The Overview docs follow the `storybook-docs` skill.
 
 ## 10. Files
