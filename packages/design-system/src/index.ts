@@ -92,6 +92,15 @@ export {
   AttributeValue,
   type AttributeValueProps,
 } from './components/Attribute';
+export {
+  Avatar,
+  AvatarFallback,
+  type AvatarFallbackProps,
+  AvatarImage,
+  type AvatarImageProps,
+  type AvatarProps,
+  type AvatarStatusChangeDetails,
+} from './components/Avatar';
 export { Badge, type BadgeProps } from './components/Badge';
 export {
   Banner,
