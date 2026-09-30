@@ -1455,6 +1455,33 @@ export const InfiniteScrollWindowInPane: StoryFn<typeof meta> = () => {
 };
 
 /**
+ * A share-link landing in a pane host: the window-mode table opens scrolled to its anchor row,
+ * inside the pane — the document stays put.
+ */
+export const InfiniteScrollWindowInPaneAnchored: StoryFn<typeof meta> = () => {
+  const { data, anchorId, isFetchingPrev, isFetchingNext, fetchPrevPage, fetchNextPage } =
+    useBidirectionalData();
+
+  return (
+    <div data-testid='scroll-pane' style={{ height: 480, overflowY: 'auto' }}>
+      <Table
+        data={data}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='window'
+        isLoading={isFetchingNext}
+        isLoadingPrevious={isFetchingPrev}
+        initialScrollToRowId={anchorId}
+        onStartReached={fetchPrevPage}
+        onStartReachedThreshold={200}
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={200}
+      />
+    </div>
+  );
+};
+
+/**
  * A window-mode table mounting into a pane the user already scrolled (content above it): the pane
  * keeps its position — adopting the root must not reset it.
  */

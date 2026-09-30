@@ -29,4 +29,25 @@ describe('useInitialAnchor', () => {
     );
     expect(result.current).toBe(true);
   });
+
+  it('holds the scroll while disabled and scrolls once enabled', async () => {
+    const scrollToIndex = vi.fn();
+    const virtualizerRef = { current: { scrollToIndex } as never };
+    const { result, rerender } = renderHook(
+      ({ enabled }: { enabled: boolean }) =>
+        useInitialAnchor({
+          initialScrollToRowId: 'b',
+          rows: rows('a', 'b', 'c'),
+          virtualizerRef,
+          enabled,
+        }),
+      { initialProps: { enabled: false } },
+    );
+    expect(scrollToIndex).not.toHaveBeenCalled();
+    expect(result.current).toBe(false);
+
+    rerender({ enabled: true });
+    expect(scrollToIndex).toHaveBeenCalledWith(1, { align: 'center' });
+    await waitFor(() => expect(result.current).toBe(true));
+  });
 });

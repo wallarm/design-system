@@ -46,7 +46,12 @@ export const useInfiniteScroll = <T extends RowData>({
 }: UseInfiniteScrollOptions<T>) => {
   const rows = table.getRowModel().rows;
 
-  const ready = useInitialAnchor({ initialScrollToRowId, rows, virtualizerRef });
+  const ready = useInitialAnchor({
+    initialScrollToRowId,
+    rows,
+    virtualizerRef,
+    enabled: mode !== 'window' || scrollRoot != null,
+  });
 
   usePrependScrollAnchor({
     mode,

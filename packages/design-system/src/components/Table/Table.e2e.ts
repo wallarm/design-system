@@ -216,6 +216,27 @@ test.describe('Component: Table', () => {
       expect(await page.evaluate(() => window.scrollY)).toBe(0);
     });
 
+    test('Should land on the anchor row inside a pane in window mode', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Pane Anchored');
+
+      const pane = page.getByTestId('scroll-pane');
+      // Row id 251 is the story's anchor (index 250).
+      const anchorRow = pane.locator('[data-row-id="251"]');
+      await expect(anchorRow).toBeVisible();
+
+      await expect
+        .poll(() =>
+          anchorRow.evaluate(row => {
+            const paneRect = row.closest('[data-testid="scroll-pane"]')?.getBoundingClientRect();
+            const rect = row.getBoundingClientRect();
+            return !!paneRect && rect.top >= paneRect.top && rect.bottom <= paneRect.bottom;
+          }),
+        )
+        .toBe(true);
+      expect(await pane.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    });
+
     test('Should keep the position of an already scrolled pane when the table mounts', async ({
       page,
     }) => {
