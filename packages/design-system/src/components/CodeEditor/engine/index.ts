@@ -27,6 +27,7 @@ import { adapterPainter } from './adapterPainter';
 import { completionExtension } from './completion';
 import { sanitizeContentAttributes } from './contentAttributes';
 import { diagnosticsExtension, jsonRegion } from './diagnostics';
+import { diffExtension } from './diff';
 import { foldAllRegions, foldsExtension, getVisibleRowCount, unfoldAllRegions } from './folds';
 import { guttersExtension } from './gutters';
 import { isLazyLanguage, languageExtension, loadLanguageExtension } from './languages';
@@ -105,7 +106,7 @@ const SLOT_DEPS: Record<SlotKey, readonly (keyof EngineOptions)[]> = {
   contentAttributes: ['contentAttributes', 'testId'],
   cspNonce: ['cspNonce'],
   painter: ['adapter', 'language'],
-  lines: ['lines', 'startingLineNumber', 'lineNumbers', 'testId', 'folds'],
+  lines: ['lines', 'startingLineNumber', 'lineNumbers', 'testId', 'folds', 'original'],
   folds: ['folds', 'startingLineNumber', 'testId'],
   search: ['readOnly', 'testId'],
   diagnostics: ['language', 'schema', 'diagnostics', 'startingLineNumber'],
@@ -145,6 +146,7 @@ const featureExtensions = (
       foldGutter: buildFolds(options, callbacks.portals).gutter,
       portals: callbacks.portals,
       testId: options.testId,
+      diff: options.original !== undefined,
     }),
   ],
   folds: () => buildFolds(options, callbacks.portals).extension,
@@ -183,7 +185,10 @@ const featureExtensions = (
       sources: options.completions,
       startingLineNumber: options.startingLineNumber,
     }),
-  diff: () => [],
+  diff: () =>
+    options.original === undefined
+      ? []
+      : diffExtension({ original: options.original, portals: callbacks.portals }),
 });
 
 const contentAttributesFor = (options: EngineOptions): Record<string, string> => {

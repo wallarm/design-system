@@ -19,6 +19,7 @@ import { cn } from '../../../utils/cn';
 import type { LineColor, LineConfig } from '../../CodeSnippet/CodeSnippetContext';
 import { LINE_COLOR_STYLES } from '../../CodeSnippet/lib/lineStyles';
 import type { PortalRegistry } from '../lib/portalRegistry';
+import { deletedRowCount, diffChunksChanged, isDiffInsertedLine } from './diff';
 import { lineNumberToDocLine } from './positions';
 
 export interface GuttersConfig {
@@ -28,6 +29,8 @@ export interface GuttersConfig {
   foldGutter: Extension | null;
   portals: PortalRegistry;
   testId: string | undefined;
+  /** Diff mode (`original` set): `+` / `-` prefixes and colour sticks from the merge chunks. */
+  diff?: boolean;
 }
 
 /** Gutter wrapper classes (`.cm-gutter`), used by tests and the theme below. */
@@ -109,6 +112,30 @@ class PrefixMarker extends GutterMarker {
   }
 }
 
+/** Prefix cell of a deleted chunk: one `-` per deleted row (the widget is a single gutter block). */
+class DeletedRowsMarker extends GutterMarker {
+  readonly elementClass = cn('px-8 text-center', LINE_COLOR_STYLES.danger.text);
+
+  constructor(readonly rows: number) {
+    super();
+  }
+
+  override eq(other: GutterMarker): boolean {
+    return other instanceof DeletedRowsMarker && other.rows === this.rows;
+  }
+
+  override toDOM(view: EditorView): Node {
+    const doc = view.dom.ownerDocument;
+    const host = doc.createElement('span');
+    for (let row = 0; row < this.rows; row++) {
+      const cell = doc.createElement('div');
+      cell.textContent = '-';
+      host.append(cell);
+    }
+    return host;
+  }
+}
+
 const absoluteLineAt = (state: EditorState, block: BlockInfo, startingLineNumber: number): number =>
   state.doc.lineAt(block.from).number + startingLineNumber - 1;
 
@@ -159,22 +186,24 @@ const buildGutterClassSets = (
 };
 
 /**
- * Gutters in CodeSnippet order: colour stick (only if any line has `color`) → line numbers
- * (if `lineNumbers`) → fold gutter (if given) → prefix (only if any line has `prefix`).
+ * Gutters in CodeSnippet order: colour stick (only if any line has `color`, or diff mode) →
+ * line numbers (if `lineNumbers`) → fold gutter (if given) → prefix (only if any line has
+ * `prefix`, or diff mode). In diff mode the diff marker wins over the line's own stick/prefix.
  */
 export const guttersExtension = (config: GuttersConfig): Extension => {
   const { lines, startingLineNumber, portals } = config;
+  const diff = config.diff === true;
   const configs = Object.values(lines);
   const hasColors = configs.some(line => line.color != null);
   const hasPrefixes = configs.some(line => line.prefix != null);
 
-  if (!hasColors && !hasPrefixes && !config.lineNumbers && !config.foldGutter) {
+  if (!hasColors && !hasPrefixes && !diff && !config.lineNumbers && !config.foldGutter) {
     return [];
   }
 
   const extensions: Extension[] = [gutterTheme];
 
-  if (hasColors) {
+  if (hasColors || diff) {
     const classSets = StateField.define<GutterClassSets>({
       create: state => buildGutterClassSets(state, lines, startingLineNumber),
       update: (value, tr) =>
@@ -189,7 +218,14 @@ export const guttersExtension = (config: GuttersConfig): Extension => {
       gutter({
         class: STICK_GUTTER_CLASS,
         lineMarker: (view, block) =>
-          getStickMarker(lines[absoluteLineAt(view.state, block, startingLineNumber)]?.color),
+          getStickMarker(
+            diff && isDiffInsertedLine(view.state, block.from)
+              ? 'success'
+              : lines[absoluteLineAt(view.state, block, startingLineNumber)]?.color,
+          ),
+        widgetMarker: (view, _widget, block) =>
+          diff && deletedRowCount(view.state, block) > 0 ? getStickMarker('danger') : null,
+        lineMarkerChange: diff ? diffChunksChanged : null,
         initialSpacer: () => transparentStick,
       }),
     );
@@ -205,16 +241,25 @@ export const guttersExtension = (config: GuttersConfig): Extension => {
     extensions.push(config.foldGutter);
   }
 
-  if (hasPrefixes) {
+  if (hasPrefixes || diff) {
     extensions.push(
       gutter({
         class: PREFIX_GUTTER_CLASS,
         lineMarker: (view, block) => {
           const absolute = absoluteLineAt(view.state, block, startingLineNumber);
+          if (diff && isDiffInsertedLine(view.state, block.from)) {
+            return new PrefixMarker(absolute, '+', 'success', portals);
+          }
           const line = lines[absolute];
           if (line?.prefix == null) return null;
           return new PrefixMarker(absolute, line.prefix, line.color, portals);
         },
+        widgetMarker: (view, _widget, block) => {
+          if (!diff) return null;
+          const rows = deletedRowCount(view.state, block);
+          return rows > 0 ? new DeletedRowsMarker(rows) : null;
+        },
+        lineMarkerChange: diff ? diffChunksChanged : null,
       }),
     );
   }

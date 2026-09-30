@@ -1010,3 +1010,44 @@ export const SyntaxErrors: StoryFn<typeof meta> = () => (
     </VStack>
   </CodeSnippetAdapterProvider>
 );
+
+const DIFF_ORIGINAL = `POST /api/v2/users HTTP/1.1
+Host: api.wallarm.com
+Content-Type: application/json
+X-Request-Id: 42
+
+{
+  "name": "Ann",
+  "role": "viewer"
+}`;
+
+const DIFF_MODIFIED = `POST /api/v2/users HTTP/1.1
+Host: api.wallarm.com
+Content-Type: application/json
+Authorization: Bearer <token>
+
+{
+  "name": "Ann",
+  "role": "admin"
+}`;
+
+/**
+ * `original` turns on diff mode: added and changed lines read as `success` lines with a `+`,
+ * removed lines as `danger` rows with a `-` and no line number. The rows stay editable, and the
+ * diff updates as you type.
+ */
+export const Diff: StoryFn<typeof meta> = () => {
+  const [value, setValue] = useState(DIFF_MODIFIED);
+
+  return (
+    <CodeEditorRoot
+      data-testid='code-editor-diff'
+      language='http'
+      original={DIFF_ORIGINAL}
+      value={value}
+      onChange={setValue}
+    >
+      <CodeEditorContent aria-label='Request draft compared with the stored request' lineNumbers />
+    </CodeEditorRoot>
+  );
+};

@@ -82,6 +82,7 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
     editors: ['parity-http-prism-editor'],
     snippets: ['parity-http-prism-snippet'],
   },
+  Diff: { editors: ['code-editor-diff'] },
 };
 
 /** The engine chunk is a dynamic import; the first load in a worker can take a few seconds. */
