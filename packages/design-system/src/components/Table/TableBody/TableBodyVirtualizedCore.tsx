@@ -64,7 +64,10 @@ export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
           <Tr key='spacer-bottom'>
             <Td
               style={{
-                height: `${totalSize - (virtualRows[virtualRows.length - 1]?.end ?? 0)}px`,
+                // `end` includes `scrollMargin`, `getTotalSize()` does not. Unbalanced,
+                // the height goes negative near the end, the browser drops the invalid
+                // value and keeps the previous one — a stale blank tail under the rows.
+                height: `${totalSize + scrollMargin - (virtualRows[virtualRows.length - 1]?.end ?? 0)}px`,
                 padding: 0,
                 border: 'none',
               }}
