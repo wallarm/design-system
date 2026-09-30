@@ -4,3 +4,4 @@ export { useMasterCell } from './useMasterCell';
 export { useStickyGroupParent } from './useStickyGroupParent';
 export { useTableState } from './useTableState';
 export { useWheelHorizontalScroll } from './useWheelHorizontalScroll';
+export { useWindowScrollRoot, WindowScrollRootContext } from './useWindowScrollRoot';

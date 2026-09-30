@@ -1,5 +1,5 @@
 import { type RefObject, useEffect, useRef } from 'react';
-import { getScrollMetrics, getScrollRoot, SCROLL_EDGE_COOLDOWN_MS } from '../../lib';
+import { getScrollMetrics, SCROLL_EDGE_COOLDOWN_MS, type ScrollRoot } from '../../lib';
 
 type ScrollMode = 'container' | 'window';
 type ScrollEdge = 'start' | 'end';
@@ -7,21 +7,14 @@ type ScrollEdge = 'start' | 'end';
 interface UseScrollEdgeOptions {
   edge: ScrollEdge;
   mode: ScrollMode;
-  /**
-   * `container`: the scroll element. `window`: any element inside the table —
-   * the scroll root is resolved from it (see `getScrollRoot`).
-   */
+  /** Scroll element ref — required for `container` mode */
   scrollRef?: RefObject<HTMLElement | null>;
   onReached?: () => void;
   threshold: number;
   /** When false, suppresses firing (e.g. while the initial anchor scroll settles) */
   enabled?: boolean;
-  /**
-   * `window` mode: re-resolves the scroll root when this changes (pass the row
-   * count) — a pane with too little content to scroll resolves to the window
-   * until rows fill it.
-   */
-  resolveKey?: unknown;
+  /** `window` mode: the resolved scroll root (see `useWindowScrollRoot`) */
+  scrollRoot?: ScrollRoot | null;
 }
 
 /**
@@ -36,7 +29,7 @@ export const useScrollEdge = ({
   onReached,
   threshold,
   enabled = true,
-  resolveKey,
+  scrollRoot,
 }: UseScrollEdgeOptions) => {
   const firedRef = useRef(false);
   const lastFiredAtRef = useRef(0);
@@ -52,10 +45,8 @@ export const useScrollEdge = ({
     enabledRef.current = enabled;
   });
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: `resolveKey` only re-runs the root resolution
   useEffect(() => {
-    const target =
-      mode === 'window' ? getScrollRoot(scrollRef?.current ?? null) : scrollRef?.current;
+    const target = mode === 'window' ? scrollRoot : scrollRef?.current;
     if (!target) return;
 
     const check = () => {
@@ -85,5 +76,5 @@ export const useScrollEdge = ({
     return () => {
       target.removeEventListener('scroll', check);
     };
-  }, [edge, mode, scrollRef, threshold, resolveKey]);
+  }, [edge, mode, scrollRef, scrollRoot, threshold]);
 };

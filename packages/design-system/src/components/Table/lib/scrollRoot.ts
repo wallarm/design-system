@@ -17,7 +17,7 @@ export const isWindowScrollRoot = (root: ScrollRoot): root is Window => root ===
  * `overflow-x-hidden` layout wrapper) computes `overflow-y: visible` to `auto`
  * on a box that grows with its content and never scrolls. Only a box whose
  * content overflows it counts — so a pane that does not overflow yet resolves
- * to the window, and callers re-resolve once the content grows.
+ * to the window (`useWindowScrollRoot` re-resolves once an ancestor scrolls).
  */
 export const getScrollRoot = (el: Element | null): ScrollRoot => {
   for (let node = el?.parentElement; node && node !== document.body; node = node.parentElement) {

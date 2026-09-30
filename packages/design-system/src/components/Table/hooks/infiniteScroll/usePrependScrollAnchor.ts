@@ -1,11 +1,12 @@
 import { type RefObject, useLayoutEffect, useRef } from 'react';
-import { detectDataChange, getScrollMetrics, getScrollRoot, scrollRootBy } from '../../lib';
+import { detectDataChange, getScrollMetrics, type ScrollRoot, scrollRootBy } from '../../lib';
 import type { TableVirtualizerInstance } from '../../TableContext/types';
 
 interface UsePrependScrollAnchorOptions {
   mode: 'container' | 'window';
-  /** `container`: the scroll element. `window`: an element to resolve the scroll root from. */
   scrollRef?: RefObject<HTMLElement | null>;
+  /** `window` mode: the resolved scroll root (see `useWindowScrollRoot`) */
+  scrollRoot?: ScrollRoot | null;
   rows: { id: string }[];
   /** Preferred delta source: virtual-list offsets are immune to unrelated layout growth. */
   virtualizerRef?: RefObject<TableVirtualizerInstance | null>;
@@ -36,6 +37,7 @@ interface UsePrependScrollAnchorOptions {
 export const usePrependScrollAnchor = ({
   mode,
   scrollRef,
+  scrollRoot,
   rows,
   virtualizerRef,
   tbodyRef,
@@ -52,8 +54,7 @@ export const usePrependScrollAnchor = ({
   // No dependency array on purpose: the loader baseline must track every
   // commit, not just rows changes.
   useLayoutEffect(() => {
-    const getRoot = () =>
-      mode === 'window' ? getScrollRoot(scrollRef?.current ?? null) : scrollRef?.current;
+    const getRoot = () => (mode === 'window' ? scrollRoot : scrollRef?.current);
     const getScrollHeight = () => {
       const root = getRoot();
       return root ? getScrollMetrics(root).scrollHeight : 0;
