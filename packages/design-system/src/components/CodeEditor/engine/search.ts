@@ -1,6 +1,6 @@
 import { createElement, type ReactNode } from 'react';
 import { getSearchQuery, search, searchKeymap } from '@codemirror/search';
-import { type EditorState, type Extension, Facet } from '@codemirror/state';
+import { EditorState, type Extension, Facet } from '@codemirror/state';
 import { EditorView, keymap, type Panel, type ViewUpdate } from '@codemirror/view';
 import type { PortalRegistry } from '../lib/portalRegistry';
 import { SearchPanel } from './SearchPanel';
@@ -77,6 +77,15 @@ const createSearchPanel = (view: EditorView): Panel => {
   };
 };
 
+/**
+ * Screen-reader wording (spec §7.16). `replaceAll` from `@codemirror/search` already
+ * announces `state.phrase('replaced $ matches', n) + '.'`, so the wording is changed
+ * here. A second announce from the panel would stack a second line in `.cm-announced`.
+ */
+const SEARCH_PHRASES: Record<string, string> = {
+  'replaced $ matches': 'Replaced $ occurrences',
+};
+
 /** Neutralises CodeMirror's default panel chrome; the React panel draws its own. */
 const searchTheme = EditorView.theme({
   '.cm-panels': {
@@ -108,5 +117,6 @@ export const searchExtension = (config: {
   }),
   searchConfigured.of(true),
   keymap.of(searchKeymap),
+  EditorState.phrases.of(SEARCH_PHRASES),
   searchTheme,
 ];
