@@ -10,33 +10,43 @@
 
 import { Route as rootRouteImport } from './routes/__root';
 import { Route as IndexRouteImport } from './routes/index';
+import { Route as CodeEditorRouteImport } from './routes/code-editor';
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any);
+const CodeEditorRoute = CodeEditorRouteImport.update({
+  id: '/code-editor',
+  path: '/code-editor',
+  getParentRoute: () => rootRouteImport,
+} as any);
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute;
+  '/code-editor': typeof CodeEditorRoute;
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute;
+  '/code-editor': typeof CodeEditorRoute;
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport;
   '/': typeof IndexRoute;
+  '/code-editor': typeof CodeEditorRoute;
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath;
-  fullPaths: '/';
+  fullPaths: '/' | '/code-editor';
   fileRoutesByTo: FileRoutesByTo;
-  to: '/';
-  id: '__root__' | '/';
+  to: '/' | '/code-editor';
+  id: '__root__' | '/' | '/code-editor';
   fileRoutesById: FileRoutesById;
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute;
+  CodeEditorRoute: typeof CodeEditorRoute;
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +58,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport;
       parentRoute: typeof rootRouteImport;
     };
+    '/code-editor': {
+      id: '/code-editor';
+      path: '/code-editor';
+      fullPath: '/code-editor';
+      preLoaderRoute: typeof CodeEditorRouteImport;
+      parentRoute: typeof rootRouteImport;
+    };
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CodeEditorRoute: CodeEditorRoute,
 };
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
