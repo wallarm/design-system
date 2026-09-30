@@ -18,21 +18,33 @@ const AREA_URL =
 const ITEM_URL =
   'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=12403-10197';
 
+// Properties verified on the Figma components (12403:10372 and 12400:8762):
+// `Label` / `File items` (BOOLEAN) on file-upload, `State: Default | Hover | Disable` on the Area.
+const rows = (
+  <FileUploadItemGroup>
+    {(file: File) => (
+      <FileUploadItem file={file}>
+        <FileUploadItemReplaceTrigger />
+        <FileUploadItemDeleteTrigger />
+      </FileUploadItem>
+    )}
+  </FileUploadItemGroup>
+);
+
+const sharedProps = {
+  label: figma.boolean('Label', { true: <FieldLabel>Label</FieldLabel>, false: undefined }),
+  items: figma.boolean('File items', { true: rows, false: undefined }),
+};
+
 figma.connect(FileUpload, FILE_UPLOAD_URL, {
   variant: { Type: 'Area' },
-  example: () => (
+  props: sharedProps,
+  example: ({ label, items }) => (
     <Field>
-      <FieldLabel>Label</FieldLabel>
+      {label}
       <FileUpload>
         <FileUploadDropzone />
-        <FileUploadItemGroup>
-          {file => (
-            <FileUploadItem file={file}>
-              <FileUploadItemReplaceTrigger />
-              <FileUploadItemDeleteTrigger />
-            </FileUploadItem>
-          )}
-        </FileUploadItemGroup>
+        {items}
       </FileUpload>
     </Field>
   ),
@@ -40,13 +52,25 @@ figma.connect(FileUpload, FILE_UPLOAD_URL, {
 
 figma.connect(FileUpload, FILE_UPLOAD_URL, {
   variant: { Type: 'Button' },
-  example: () => (
+  props: sharedProps,
+  example: ({ label, items }) => (
     <Field>
-      <FieldLabel>Label</FieldLabel>
+      {label}
       <FileUpload>
         <FileUploadTrigger />
+        {items}
       </FileUpload>
     </Field>
+  ),
+});
+
+// Hover is a CSS state. Disable is set on the root: `<FileUpload disabled>`.
+figma.connect(FileUploadDropzone, AREA_URL, {
+  variant: { State: 'Disable' },
+  example: () => (
+    <FileUpload disabled>
+      <FileUploadDropzone />
+    </FileUpload>
   ),
 });
 
