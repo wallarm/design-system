@@ -2,7 +2,7 @@ import { EditorState } from '@codemirror/state';
 import { describe, expect, it } from 'vitest';
 import { findJsonBodyRange, http } from './http';
 import { json } from './json';
-import { getJsonPointers, pointerAt } from './jsonPointers';
+import { getJsonPointers, pointerAt, readRegionData } from './jsonPointers';
 
 const jsonState = (doc: string) => EditorState.create({ doc, extensions: [json()] });
 const httpState = (doc: string) => EditorState.create({ doc, extensions: [http()] });
@@ -79,5 +79,22 @@ describe('pointerAt', () => {
   it('is undefined outside the JSON value', () => {
     const padded = jsonState('  {"a": 1}');
     expect(pointerAt(padded, 0, whole(padded))).toBeUndefined();
+  });
+});
+
+describe('readRegionData', () => {
+  it('parses valid JSON as is', () => {
+    const state = jsonState('{"a": [1, {"b": null}]}');
+    expect(readRegionData(state, whole(state))).toEqual({ a: [1, { b: null }] });
+  });
+
+  it('keeps complete members of an unfinished document and drops the rest', () => {
+    const state = jsonState('{"k": "y", "n": {"x": 1, "y": }, "l": [true, ], ""}');
+    expect(readRegionData(state, whole(state))).toEqual({ k: 'y', n: { x: 1 }, l: [true] });
+  });
+
+  it('is undefined for an empty region', () => {
+    const state = jsonState('');
+    expect(readRegionData(state, whole(state))).toBeUndefined();
   });
 });

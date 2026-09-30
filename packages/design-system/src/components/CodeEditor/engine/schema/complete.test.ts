@@ -149,3 +149,60 @@ describe('schemaCompletionSource — scope', () => {
     expect(await noSchema(new CompletionContext(jsonDoc, pos, true))).toBeNull();
   });
 });
+
+describe('schemaCompletionSource — combinators', () => {
+  const run = async (s: JsonSchema, docWithCursor: string, explicit = false) => {
+    const { state, pos } = setup(docWithCursor);
+    return schemaCompletionSource(() => s, wholeDoc)(new CompletionContext(state, pos, explicit));
+  };
+
+  it('offers properties from every allOf branch', async () => {
+    const s: JsonSchema = {
+      type: 'object',
+      allOf: [
+        { properties: { a: { type: 'string' } } },
+        { required: ['b'], properties: { b: { type: 'number' } } },
+      ],
+    };
+    const result = await run(s, '{"|"}');
+    expect(labels(result)).toEqual(['a', 'b']);
+    expect(result?.options.find(o => o.label === 'b')?.detail).toBe('number (required)');
+  });
+
+  it('offers the keys of the oneOf branch the typed data selects', async () => {
+    const s: JsonSchema = {
+      type: 'object',
+      oneOf: [
+        { required: ['k'], properties: { k: { const: 'x' }, a: { type: 'string' } } },
+        { required: ['k'], properties: { k: { const: 'y' }, b: { type: 'string' } } },
+      ],
+    };
+    expect(labels(await run(s, '{"k": "y", "|"}'))).toEqual(['b']);
+    expect(labels(await run(s, '{"k": "x", "|"}'))).toEqual(['a']);
+  });
+
+  it('reduces nested objects against the partially typed document', async () => {
+    const s: JsonSchema = {
+      type: 'object',
+      properties: {
+        meta: {
+          allOf: [{ properties: { owner: { type: 'string' } } }, { properties: { team: {} } }],
+        },
+      },
+    };
+    expect(labels(await run(s, '{"meta": {"owner": "me", "|"}, "x": '))).toEqual(['team']);
+  });
+
+  it('still resolves $ref', async () => {
+    const s: JsonSchema = {
+      $defs: { rule: { type: 'object', properties: { r: { type: 'string' } } } },
+      $ref: '#/$defs/rule',
+    };
+    expect(labels(await run(s, '{"|"}'))).toEqual(['r']);
+  });
+
+  it('resolves to null instead of rejecting for a broken schema', async () => {
+    const s: JsonSchema = { type: 'object', properties: { a: { $ref: '#/nope' } } };
+    await expect(run(s, '{"a": |}', true)).resolves.toBeNull();
+  });
+});

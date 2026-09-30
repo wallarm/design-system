@@ -6,13 +6,8 @@ import {
   type Tooltip,
 } from '@codemirror/view';
 import type { JsonSchema } from '../../types';
-import { getJsonPointers } from '../languages/jsonPointers';
-import { getCompiledSchema, parseJson } from './loadSchema';
-
-interface JsonRegion {
-  from: number;
-  to: number;
-}
+import { getJsonPointers, type JsonRegion, readRegionData } from '../languages/jsonPointers';
+import { getCompiledSchema } from './loadSchema';
 
 interface HoverTarget {
   pointer: string;
@@ -67,35 +62,44 @@ const renderHover = (title: string | undefined, description: string | undefined)
   return dom;
 };
 
+const hoverFor = async (
+  state: EditorState,
+  pos: number,
+  getRegion: (state: EditorState) => JsonRegion | null,
+  schema: JsonSchema,
+): Promise<Tooltip | null> => {
+  const region = getRegion(state);
+  if (!region || pos < region.from || pos > region.to) return null;
+  const target = hoverTargetAt(state, pos, region);
+  if (!target) return null;
+
+  const root = await getCompiledSchema(schema);
+  // `getNode` reduces every parent (allOf / oneOf / if) against the data on the way down.
+  const { node } = root.getNode(target.pointer, readRegionData(state, region));
+  if (!node) return null;
+  const title = textOf(node.schema.title);
+  const description = textOf(node.schema.description);
+  if (!title && !description) return null;
+
+  return {
+    pos: target.from,
+    end: target.to,
+    above: true,
+    create: () => ({ dom: renderHover(title, description) }),
+  };
+};
+
 /** Hover source: `title` / `description` of the schema for the property under the pointer. */
 export const schemaHoverSource =
   (
     getSchema: () => JsonSchema | undefined,
     getRegion: (state: EditorState) => { from: number; to: number } | null,
   ): HoverTooltipSource =>
-  async (view: EditorView, pos: number): Promise<Tooltip | null> => {
+  (view: EditorView, pos: number): Promise<Tooltip | null> => {
     const schema = getSchema();
-    if (schema === undefined) return null;
-    const { state } = view;
-    const region = getRegion(state);
-    if (!region || pos < region.from || pos > region.to) return null;
-    const target = hoverTargetAt(state, pos, region);
-    if (!target) return null;
-
-    const parsed = parseJson(state.sliceDoc(region.from, region.to));
-    const root = await getCompiledSchema(schema);
-    const { node } = root.getNode(target.pointer, parsed.ok ? parsed.value : undefined);
-    if (!node) return null;
-    const title = textOf(node.schema.title);
-    const description = textOf(node.schema.description);
-    if (!title && !description) return null;
-
-    return {
-      pos: target.from,
-      end: target.to,
-      above: true,
-      create: () => ({ dom: renderHover(title, description) }),
-    };
+    if (schema === undefined) return Promise.resolve(null);
+    // A broken schema or a failed chunk load must not reject on every hover.
+    return hoverFor(view.state, pos, getRegion, schema).catch(() => null);
   };
 
 export const schemaHover = (

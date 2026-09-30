@@ -11,18 +11,17 @@ import type { EditorState } from '@codemirror/state';
 import type { EditorView } from '@codemirror/view';
 import type { SyntaxNode } from '@lezer/common';
 import type { JsonSchema } from '../../types';
-import { escapePointerSegment, getJsonPointers, readJsonKey } from '../languages/jsonPointers';
 import {
-  getCompiledSchema,
-  type LibraryJsonSchema,
-  parseJson,
-  type SchemaNode,
-} from './loadSchema';
-
-interface JsonRegion {
-  from: number;
-  to: number;
-}
+  ENSURE_TREE_TIMEOUT,
+  escapePointerSegment,
+  getJsonPointers,
+  isValueNode,
+  type JsonRegion,
+  readJsonKey,
+  readPartialJson,
+  readRegionData,
+} from '../languages/jsonPointers';
+import { getCompiledSchema, type LibraryJsonSchema, type SchemaNode } from './loadSchema';
 
 /** The text the cursor is in: an (possibly unterminated) string literal, or a bare word. */
 interface CursorToken {
@@ -39,7 +38,6 @@ type CompletionTarget =
 const WORD_BEFORE = /[\w$.+-]*$/;
 const WORD_AFTER = /^[\w$.+-]*/;
 const WHITESPACE = /\s/;
-const ENSURE_TREE_TIMEOUT = 200;
 
 /** JSON strings cannot span lines, so a scan from the line start tells whether `pos` is inside one. */
 const tokenAt = (state: EditorState, pos: number, region: JsonRegion): CursorToken => {
@@ -97,16 +95,6 @@ const ancestor = (node: SyntaxNode | null, names: readonly string[]): SyntaxNode
   return null;
 };
 
-const VALUE_NODE_NAMES: readonly string[] = [
-  'Object',
-  'Array',
-  'String',
-  'Number',
-  'True',
-  'False',
-  'Null',
-];
-
 /** Decides key vs value position from the punctuation before the token and the syntax tree. */
 const targetAt = (
   state: EditorState,
@@ -132,7 +120,7 @@ const targetAt = (
   if (previous.ch === '{') return null;
   let index = 0;
   for (let child = container.firstChild; child; child = child.nextSibling) {
-    if (VALUE_NODE_NAMES.includes(child.name) && child.to <= token.from) index++;
+    if (isValueNode(child) && child.to <= token.from) index++;
   }
   return { role: 'value', container, key: index };
 };
@@ -224,53 +212,69 @@ const valueOptions = (node: SchemaNode, tail: number): Completion[] => {
  * JSON Schema completions for the JSON region (spec §7.13): missing property names in key
  * position, `enum` / `const` / boolean values in value position. Registered by Task 14.
  */
+const completeAt = async (
+  context: CompletionContext,
+  getRegion: (state: EditorState) => JsonRegion | null,
+  schema: JsonSchema,
+): Promise<CompletionResult | null> => {
+  const { state, pos } = context;
+  const region = getRegion(state);
+  if (!region || pos < region.from || pos > region.to) return null;
+
+  const token = tokenAt(state, pos, region);
+  if (token.kind === 'word' && token.from === pos && token.to === pos && !context.explicit) {
+    return null;
+  }
+  const target = targetAt(state, token, region);
+  if (!target) return null;
+
+  const containerEntry = [...getJsonPointers(state, region).values()].find(
+    entry => entry.valueFrom === target.container.from,
+  );
+  if (!containerEntry) return null;
+  const pointer =
+    target.role === 'key'
+      ? containerEntry.pointer
+      : `${containerEntry.pointer}/${escapePointerSegment(String(target.key))}`;
+
+  // Partial data while typing, so `oneOf` / `if` branches can be selected by what is already there.
+  const root = await getCompiledSchema(schema);
+  const { node } = root.getNode(pointer, readRegionData(state, region));
+  if (!node) return null;
+
+  const tail = token.kind === 'string' && !token.closed ? 0 : token.to - pos;
+  if (target.role === 'value') {
+    const options = valueOptions(node, tail);
+    return options.length > 0 ? { from: token.from, options } : null;
+  }
+
+  // `getNode` does not reduce the node it returns: merge allOf / the matching oneOf / if-then
+  // against the object's current members before reading `properties` / `required`.
+  const reduced = node.reduceNode(readPartialJson(state, target.container)).node ?? node;
+  const next = significantChar(state, token.to, region, 1);
+  const suffix = next?.ch === ':' ? '' : ': ';
+  const inString = token.kind === 'string';
+  const options = propertyOptions(reduced, presentKeys(state, target.container, token), name => {
+    const quoted = JSON.stringify(name);
+    return applyText(inString ? `${quoted.slice(1)}${suffix}` : `${quoted}${suffix}`, tail);
+  });
+  if (options.length === 0) return null;
+  // Inside a string the filter text starts after the opening quote.
+  return { from: inString ? token.from + 1 : token.from, options };
+};
+
+/**
+ * JSON Schema completions for the JSON region (spec §7.13): missing property names in key
+ * position, `enum` / `const` / boolean values in value position. Registered by Task 14.
+ * Never rejects: a broken schema or a failed chunk load yields `null`.
+ */
 export const schemaCompletionSource =
   (
     getSchema: () => JsonSchema | undefined,
     getRegion: (state: EditorState) => { from: number; to: number } | null,
   ): CompletionSource =>
-  async (context: CompletionContext): Promise<CompletionResult | null> => {
+  (context: CompletionContext): Promise<CompletionResult | null> => {
     const schema = getSchema();
-    if (schema === undefined) return null;
-    const { state, pos } = context;
-    const region = getRegion(state);
-    if (!region || pos < region.from || pos > region.to) return null;
-
-    const token = tokenAt(state, pos, region);
-    if (token.kind === 'word' && token.from === pos && token.to === pos && !context.explicit) {
-      return null;
-    }
-    const target = targetAt(state, token, region);
-    if (!target) return null;
-
-    const containerEntry = [...getJsonPointers(state, region).values()].find(
-      entry => entry.valueFrom === target.container.from,
-    );
-    if (!containerEntry) return null;
-    const pointer =
-      target.role === 'key'
-        ? containerEntry.pointer
-        : `${containerEntry.pointer}/${escapePointerSegment(String(target.key))}`;
-
-    const parsed = parseJson(state.sliceDoc(region.from, region.to));
-    const root = await getCompiledSchema(schema);
-    const { node } = root.getNode(pointer, parsed.ok ? parsed.value : undefined);
-    if (!node) return null;
-
-    const tail = token.kind === 'string' && !token.closed ? 0 : token.to - pos;
-    if (target.role === 'value') {
-      const options = valueOptions(node, tail);
-      return options.length > 0 ? { from: token.from, options } : null;
-    }
-
-    const next = significantChar(state, token.to, region, 1);
-    const suffix = next?.ch === ':' ? '' : ': ';
-    const inString = token.kind === 'string';
-    const options = propertyOptions(node, presentKeys(state, target.container, token), name => {
-      const quoted = JSON.stringify(name);
-      return applyText(inString ? `${quoted.slice(1)}${suffix}` : `${quoted}${suffix}`, tail);
-    });
-    if (options.length === 0) return null;
-    // Inside a string the filter text starts after the opening quote.
-    return { from: inString ? token.from + 1 : token.from, options };
+    if (schema === undefined) return Promise.resolve(null);
+    return completeAt(context, getRegion, schema).catch(() => null);
   };

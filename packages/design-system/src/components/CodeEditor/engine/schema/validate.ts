@@ -1,13 +1,8 @@
 import type { Diagnostic } from '@codemirror/lint';
 import type { EditorState } from '@codemirror/state';
 import type { JsonSchema } from '../../types';
-import { getJsonPointers, type JsonPointerEntry } from '../languages/jsonPointers';
+import { getJsonPointers, type JsonPointerEntry, type JsonRegion } from '../languages/jsonPointers';
 import { getCompiledSchema, type JsonError, parseJson } from './loadSchema';
-
-interface JsonRegion {
-  from: number;
-  to: number;
-}
 
 const REQUIRED_ERROR = 'required-property-error';
 const ADDITIONAL_PROPERTY_ERROR = 'no-additional-properties-error';

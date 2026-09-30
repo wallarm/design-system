@@ -94,3 +94,23 @@ describe('schemaHover', () => {
     ).not.toThrow();
   });
 });
+
+describe('schemaHoverSource — combinators and failures', () => {
+  const hoverWith = async (s: JsonSchema, doc: string, pos: number) => {
+    const view = viewFor(doc);
+    return (await schemaHoverSource(() => s, wholeDoc)(view, pos, 1)) as Tooltip | null;
+  };
+
+  it('describes a property declared in an allOf branch', async () => {
+    const s: JsonSchema = { allOf: [{ properties: { a: { description: 'From allOf' } } }] };
+    const doc = '{"a": 1}';
+    const view = viewFor(doc);
+    const tooltip = await schemaHoverSource(() => s, wholeDoc)(view, 2, 1);
+    expect((tooltip as Tooltip | null)?.create(view).dom.textContent).toBe('From allOf');
+  });
+
+  it('resolves to null instead of rejecting for a broken schema', async () => {
+    const s: JsonSchema = { type: 'object', properties: { a: { $ref: '#/nope' } } };
+    await expect(hoverWith(s, '{"a": 1}', 2)).resolves.toBeNull();
+  });
+});

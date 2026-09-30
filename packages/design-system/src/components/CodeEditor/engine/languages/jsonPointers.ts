@@ -11,13 +11,14 @@ export interface JsonPointerEntry {
   valueTo: number;
 }
 
-interface JsonRegion {
+/** A range of the document that holds one JSON text (the whole doc, or an http body). */
+export interface JsonRegion {
   from: number;
   to: number;
 }
 
 /** Lezer JSON node names that are complete values (error nodes `⚠` are not). */
-const VALUE_NODE_NAMES: ReadonlySet<string> = new Set([
+export const VALUE_NODE_NAMES: ReadonlySet<string> = new Set([
   'Object',
   'Array',
   'String',
@@ -28,13 +29,13 @@ const VALUE_NODE_NAMES: ReadonlySet<string> = new Set([
 ]);
 
 /** Upper bound for the parse work a pointer lookup may force, in ms. */
-const ENSURE_TREE_TIMEOUT = 200;
+export const ENSURE_TREE_TIMEOUT = 200;
 
 /** RFC 6901 reference-token escaping: `~` → `~0`, `/` → `~1`. */
 export const escapePointerSegment = (segment: string): string =>
   segment.replaceAll('~', '~0').replaceAll('/', '~1');
 
-const isValueNode = (node: SyntaxNode): boolean => VALUE_NODE_NAMES.has(node.name);
+export const isValueNode = (node: SyntaxNode): boolean => VALUE_NODE_NAMES.has(node.name);
 
 /** Decoded text of a `PropertyName` / `String` node; the raw inner text when it is not valid JSON. */
 export const readJsonKey = (state: EditorState, node: SyntaxNode): string => {
@@ -141,4 +142,44 @@ export const pointerAt = (
     }
   }
   return best;
+};
+
+/**
+ * Best-effort data for a value node of a possibly unfinished document: complete members
+ * and items are kept, unfinished ones (no value yet, error nodes) are dropped. Used to
+ * reduce `oneOf` / `if` schemas while the text is not valid JSON yet.
+ */
+export const readPartialJson = (state: EditorState, value: SyntaxNode): unknown => {
+  if (value.name === 'Object') {
+    const out: Record<string, unknown> = {};
+    for (const property of value.getChildren('Property')) {
+      const name = property.getChild('PropertyName');
+      const member = firstValueChild(property);
+      if (name && member) out[readJsonKey(state, name)] = readPartialJson(state, member);
+    }
+    return out;
+  }
+  if (value.name === 'Array') {
+    const items: unknown[] = [];
+    for (let child = value.firstChild; child; child = child.nextSibling) {
+      if (isValueNode(child)) items.push(readPartialJson(state, child));
+    }
+    return items;
+  }
+  try {
+    return JSON.parse(state.sliceDoc(value.from, value.to));
+  } catch {
+    return undefined;
+  }
+};
+
+/** `JSON.parse` of the region when valid, otherwise {@link readPartialJson} of its root value. */
+export const readRegionData = (state: EditorState, region: JsonRegion): unknown => {
+  try {
+    return JSON.parse(state.sliceDoc(region.from, region.to));
+  } catch {
+    const jsonText = findJsonText(state, region);
+    const root = jsonText ? firstValueChild(jsonText) : null;
+    return root ? readPartialJson(state, root) : undefined;
+  }
 };
