@@ -1,13 +1,20 @@
-import type { FC, PropsWithChildren } from 'react';
+import type { FC, Ref } from 'react';
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
 import { cn } from '../../utils/cn';
-import { useTestId } from '../../utils/testId';
+import { type TestableProps, useTestId } from '../../utils/testId';
 
-export const SelectGroup: FC<PropsWithChildren> = ({ children }) => {
-  const testId = useTestId('group');
+type SelectGroupProps = Omit<ArkUiSelect.ItemGroupProps, 'className'> &
+  TestableProps & { ref?: Ref<HTMLDivElement> };
+
+export const SelectGroup: FC<SelectGroupProps> = ({
+  children,
+  'data-testid': testIdProp,
+  ...props
+}) => {
+  const testId = useTestId('group', testIdProp);
 
   return (
-    <ArkUiSelect.ItemGroup data-testid={testId} className={cn('flex flex-col gap-1')}>
+    <ArkUiSelect.ItemGroup {...props} data-testid={testId} className={cn('flex flex-col gap-1')}>
       {children}
     </ArkUiSelect.ItemGroup>
   );

@@ -18,7 +18,9 @@ export interface SelectBaseProps {
   positioning?: SelectRootProps<CollectionItem>['positioning'];
 }
 
-type SelectProps<T extends CollectionItem> = SelectNativeProps<T> & SelectBaseProps & TestableProps;
+export type SelectProps<T extends CollectionItem> = SelectNativeProps<T> &
+  SelectBaseProps &
+  TestableProps;
 
 export const Select = <T extends CollectionItem>({
   children,

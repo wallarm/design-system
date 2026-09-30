@@ -3,10 +3,14 @@ import { EmptyState, EmptyStateDescription, EmptyStateMessage } from '../EmptySt
 
 export interface SelectEmptyStateProps {
   description?: ReactNode;
+  className?: string;
 }
 
-export const SelectEmptyState: FC<SelectEmptyStateProps> = ({ description = 'No results' }) => (
-  <EmptyState type='no-results'>
+export const SelectEmptyState: FC<SelectEmptyStateProps> = ({
+  description = 'No results',
+  className,
+}) => (
+  <EmptyState type='no-results' className={className}>
     <EmptyStateMessage>
       <EmptyStateDescription>{description}</EmptyStateDescription>
     </EmptyStateMessage>
