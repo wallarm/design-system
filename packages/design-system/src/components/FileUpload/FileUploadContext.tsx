@@ -27,6 +27,11 @@ export interface FileUploadRootContextValue {
   reportRejections: (rejections: FileUploadRejection[]) => void;
   /** Clears Ark's and the DS's rejections (on delete). */
   clearRejections: () => void;
+  /**
+   * `api.setFiles` that also reports and writes the hidden input when zag sees no change
+   * (an edited file with the same name, size and type).
+   */
+  commitFiles: (files: File[]) => void;
   /** Registers one loading row; returns the unregister cleanup. */
   registerLoading: () => () => void;
   /** Id of `FileUploadError`, for `aria-describedby` on the pickers. */

@@ -8,6 +8,7 @@ import {
   useEffect,
   useId,
   useMemo,
+  useRef,
   useState,
 } from 'react';
 import { useFieldContext } from '@ark-ui/react/field';
@@ -15,6 +16,7 @@ import {
   FileUpload as ArkFileUpload,
   type FileUploadFileAcceptDetails,
   type FileUploadFileRejectDetails,
+  type UseFileUploadReturn,
   useFileUpload,
 } from '@ark-ui/react/file-upload';
 import { cn } from '../../utils/cn';
@@ -24,7 +26,7 @@ import {
   FileUploadRootContextProvider,
   type FileUploadRootContextValue,
 } from './FileUploadContext';
-import { toAcceptList, toAcceptString } from './lib';
+import { isSameFile, setInputFiles, toAcceptList, toAcceptString } from './lib';
 import type { FileUploadRejection } from './types';
 
 export interface FileUploadProps
@@ -147,12 +149,58 @@ export const FileUpload: FC<FileUploadProps> = ({
     [onValueChange],
   );
 
+  const hiddenInputRef = useRef<HTMLInputElement>(null);
+  // The latest Ark api, for callbacks Ark itself calls (they are defined before `api` exists).
+  const apiRef = useRef<UseFileUploadReturn | null>(null);
+
+  const writeHiddenInput = useCallback((files: File[]) => {
+    if (hiddenInputRef.current) setInputFiles(hiddenInputRef.current, files);
+  }, []);
+
+  /**
+   * `api.setFiles`, plus what zag skips when the new list "equals" the old one: it compares
+   * name + size + type only, so an edited file with the same three would never be reported or
+   * written to the hidden input (the stale file would be saved).
+   */
+  const commitFiles = useCallback(
+    (files: File[]) => {
+      const current = apiRef.current;
+      if (!current) return;
+      const held = current.acceptedFiles;
+      const looksUnchanged =
+        held.length === files.length && held.every((file, i) => isSameFile(file, files[i] as File));
+      current.setFiles(files);
+      if (!looksUnchanged) return;
+      writeHiddenInput(files);
+      handleAccept({ files });
+    },
+    [writeHiddenInput, handleAccept],
+  );
+
   const handleReject = useCallback(
     (details: FileUploadFileRejectDetails) => {
+      // Single mode: zag rejects a re-pick that matches the held file by name, size and type as
+      // FILE_EXISTS. When it is a newer version (edited, same byte count) take it; the very same
+      // file (same `lastModified`) stays a silent no-op.
+      const [only] = details.files;
+      const held = apiRef.current?.acceptedFiles[0];
+      if (
+        single &&
+        details.files.length === 1 &&
+        only &&
+        held &&
+        only.errors.length === 1 &&
+        only.errors[0] === 'FILE_EXISTS' &&
+        only.file.lastModified !== held.lastModified
+      ) {
+        // Ark calls this from inside its own update — start the replacement after it.
+        queueMicrotask(() => commitFiles([only.file]));
+        return;
+      }
       const shown = visible(details.files);
       if (shown.length) onFileReject?.(shown);
     },
-    [visible, onFileReject],
+    [single, visible, onFileReject, commitFiles],
   );
 
   const api = useFileUpload({
@@ -176,6 +224,14 @@ export const FileUpload: FC<FileUploadProps> = ({
     onFileAccept: handleAccept,
     onFileReject: handleReject,
   });
+  apiRef.current = api;
+
+  // zag writes the hidden input only when the list changes (its tracker skips the first run),
+  // so files held from mount (`defaultValue` / `value`) would never be submitted with the form.
+  const initialFiles = useRef(api.acceptedFiles);
+  useEffect(() => {
+    if (initialFiles.current.length) writeHiddenInput(initialFiles.current);
+  }, [writeHiddenInput]);
 
   const reportRejections = useCallback(
     (rejections: FileUploadRejection[]) => {
@@ -245,6 +301,7 @@ export const FileUpload: FC<FileUploadProps> = ({
       rejections,
       reportRejections,
       clearRejections,
+      commitFiles,
       registerLoading,
       errorId,
     }),
@@ -265,6 +322,7 @@ export const FileUpload: FC<FileUploadProps> = ({
       rejections,
       reportRejections,
       clearRejections,
+      commitFiles,
       registerLoading,
       errorId,
     ],
@@ -287,6 +345,7 @@ export const FileUpload: FC<FileUploadProps> = ({
       </FileUploadRootContextProvider>
       {/* Always mounted: Replace and form submission need it even while the picker is hidden. */}
       <ArkFileUpload.HiddenInput
+        ref={hiddenInputRef}
         // A Field label (`htmlFor` = this input) and single-mode Replace reach the input
         // directly; cancel the click so no dialog opens while the picker is blocked.
         onClick={event => {

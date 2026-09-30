@@ -8,8 +8,50 @@ import { FileUploadItemDeleteTrigger } from './FileUploadItemDeleteTrigger';
 import { FileUploadItemGroup } from './FileUploadItemGroup';
 import { FileUploadItemReplaceTrigger } from './FileUploadItemReplaceTrigger';
 
-export const makeFile = (name = 'policy.wasm', size = 3, type = 'application/wasm') =>
-  new File(['x'.repeat(size)], name, { type });
+export const makeFile = (
+  name = 'policy.wasm',
+  size = 3,
+  type = 'application/wasm',
+  lastModified?: number,
+) => new File(['x'.repeat(size)], name, { type, lastModified });
+
+/** jsdom keeps each wrapper's implementation under an own `Symbol(impl)`. */
+const implOf = (wrapper: object): unknown => {
+  const symbol = Object.getOwnPropertySymbols(wrapper).find(s => s.description === 'impl');
+  return symbol ? (wrapper as Record<symbol, unknown>)[symbol] : undefined;
+};
+
+/**
+ * jsdom has no `DataTransfer`, so nothing can write `input.files` the way a browser (and zag's
+ * `setInputFiles`) does. This stand-in builds a REAL jsdom `FileList` — `input.files` and
+ * `new FormData(form)` then see the files. Returns the cleanup.
+ */
+export const installDataTransfer = () => {
+  class TestDataTransfer {
+    private readonly list: File[] = [];
+    readonly items = {
+      add: (file: File) => {
+        this.list.push(file);
+      },
+    };
+    get files(): FileList {
+      const input = document.createElement('input');
+      input.type = 'file';
+      const files = input.files as FileList;
+      (implOf(files) as unknown[]).push(...this.list.map(implOf));
+      return files;
+    }
+  }
+  const win = document.defaultView as unknown as Record<string, unknown>;
+  const targets = [win, globalThis as unknown as Record<string, unknown>];
+  const previous = targets.map(target => target.DataTransfer);
+  for (const target of targets) target.DataTransfer = TestDataTransfer;
+  return () =>
+    targets.forEach((target, i) => {
+      if (previous[i] === undefined) delete target.DataTransfer;
+      else target.DataTransfer = previous[i];
+    });
+};
 
 export const hiddenInput = (container: HTMLElement) =>
   container.querySelector<HTMLInputElement>(
