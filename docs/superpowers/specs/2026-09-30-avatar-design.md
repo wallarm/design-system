@@ -84,7 +84,7 @@ Every part follows the DS rules: native attributes for its element, `{...rest}` 
 | `size` | `'xs' \| 'sm'` | `'sm'` | See §6. |
 | `asChild` | `boolean` | `false` | Ark `asChild`. Used to make the root a `<button>` (for example inside `FileUploadTrigger asChild`). |
 | `onStatusChange` | `(details: { status: 'loading' \| 'loaded' \| 'error' }) => void` | — | Passed through from Ark. |
-| `className`, `children`, `ref`, `data-testid` | | | `data-slot='avatar'`. Wraps `children` in `TestIdProvider`. |
+| `className`, `children`, `ref`, `data-testid` | | | Renders a `<span>` (Ark's default `div` is invalid inside a `<button>`). `data-slot='avatar'` is set **before** `{...rest}`, so an incoming `data-slot` wins (`file-upload-trigger` from the trigger, `nav-rail-item-avatar` from NavRail). Avatar's own CSS therefore keys off the `group/avatar` class, never `[data-slot=avatar]`. `disabled`, `type` and `onClick` flow through `rest`. The whole root is wrapped in `TestIdProvider`, so parts get `{testId}--image` etc. even under `asChild`. |
 
 The root also carries `group/avatar`, so the other parts can react to hover, focus and image state.
 
@@ -126,7 +126,7 @@ It lives in `src/utils/getInitials.ts`. It is internal and not exported from the
 ## 5. Behaviour
 
 1. **Loading and error.** Ark runs the image load state machine. The fallback shows while loading, on error, and without `src`. The image shows only once loaded. There is no `useState`/`onError` in DS code. Ark toggles visibility with the HTML `hidden` attribute, and any Tailwind display utility (`flex`, `grid`, `inline-flex`) overrides it. So `AvatarImage` and `AvatarFallback` both carry `data-[state=hidden]:hidden`.
-2. **Border.** The 1px `border-border-primary` shows only while no photo is visible. The root uses `has-[[data-slot=avatar-image][data-state=visible]]:border-transparent`, so the border is CSS-only with no JS status. The border space stays reserved, so the size doesn't jump.
+2. **Border.** The 1px `border-border-primary` shows only while no photo is visible. The root uses `has-[>img[data-state=visible]]:border-0`, so the border is CSS-only with no JS status. The box is fixed-size and `border-box`, so nothing moves, and the photo then fills the full 24/32px like Figma `Photo=On`. A transparent border would leave a 1px ring of the plate tint around the photo.
 3. **Changing `src`** (for example stored URL → blob preview → new server URL) re-runs loading. The fallback shows between images only if the new one is still loading.
 4. **Interactive root.** When the root is a `button`:
    - `cursor-pointer`;
@@ -161,7 +161,7 @@ It lives in `src/utils/getInitials.ts`. It is internal and not exported from the
 - **Decorative by default.** `AvatarImage alt=''`. Fallback initials and the icon are `aria-hidden`, so a screen reader doesn't read "A L".
 - **Meaningful avatar** (standalone, no adjacent name): pass `aria-label` to `Avatar`. The root then gets `role='img'`.
 - **Interactive avatar:** the consumer's `<button>` needs an `aria-label` (stories use `Change avatar` / `Upload avatar`). `FileUploadError` is linked through `aria-describedby` by the trigger (§4).
-- The axe test covers every story state.
+- `Avatar.a11y.test.tsx` asserts these rules with testing-library ARIA queries (the repo has no axe).
 
 ## 8. NavRail migration
 
@@ -211,7 +211,7 @@ theme/semantic.css                                   (overlay token, light + dar
 src/index.ts                                         (export Avatar)
 ```
 
-`Avatar.figma.tsx` binds the WADS Components `user-avatar` set, mapping `Photo=On` → `AvatarImage`. The node id in `VKb5gW46uSGw0rqrhZsbXT` is looked up by component key during implementation.
+`Avatar.figma.tsx` binds the WADS Components `user-avatar` set, node `12336:5504` in `VKb5gW46uSGw0rqrhZsbXT`: `Photo=On` → `AvatarImage` + `AvatarFallback`, `Photo=Off` → `AvatarFallback`. Figma has no size prop, so `size` is not mapped.
 
 ## 11. Testing
 
@@ -226,7 +226,7 @@ src/index.ts                                         (export Avatar)
   - `readOnly` → `null`.
   - The existing tests stay green.
 - **testid:** `{id}--image`, `{id}--fallback`, `{id}--overlay`.
-- **a11y:** axe on every state. `role='img'` only with an `aria-label`.
+- **a11y:** testing-library ARIA assertions (no axe in the repo). `role='img'` only with an `aria-label` and without `asChild`; the fallback is `aria-hidden`; the interactive trigger is named and linked to the error.
 - **analytics:** `data-analytics-*` and `onClick` land on the consumer's `<button>` through both Slot layers. No `stopPropagation`.
 - **E2E (CI, `[update-screenshots]`):**
   - screenshots: sizes × fallback kinds × branded, and hover and focus overlay over photo and over fallback;
