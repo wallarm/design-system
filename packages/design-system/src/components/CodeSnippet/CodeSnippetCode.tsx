@@ -1,10 +1,8 @@
-import type { FC, HTMLAttributes, MouseEventHandler, Ref } from 'react';
-import { cn } from '../../utils/cn';
+import type { FC, HTMLAttributes, Ref } from 'react';
 import { useTestId } from '../../utils/testId';
 import { useCodeSnippet } from './hooks';
-import { CodeContent, CodeLine, TokenizedCodeLine } from './internal';
+import { CodeContent, CodeLine, FoldSummary, TokenizedCodeLine } from './internal';
 import type { DisplayItem } from './lib/foldUtils';
-import { getFoldSummaryLabel } from './lib/foldUtils';
 import { SIZE_LINE_HEIGHT_CLASSES } from './lib/lineStyles';
 import { splitTextByRanges } from './lib/lineUtils';
 
@@ -44,46 +42,25 @@ export const CodeSnippetCode: FC<CodeSnippetCodeProps> = ({ className, ...props 
     };
   };
 
-  const renderFoldSummary = (item: Extract<DisplayItem, { type: 'fold-summary' }>) => {
-    const label = getFoldSummaryLabel(item.fold, item.lineCount);
-    const {
-      className: summaryClassName,
-      onClick: consumerOnClick,
-      ...summaryProps
-    } = item.fold.summaryProps ?? {};
-
-    const handleSummaryClick: MouseEventHandler<HTMLButtonElement> = event => {
-      toggleFold(item.fold.id);
-      consumerOnClick?.(event);
-    };
-
-    return (
-      <CodeLine
-        key={`fold-${item.fold.id}`}
-        lineConfig={undefined}
-        lineHeightClass={lineHeightClass}
-        showInlineGutter={inlineGutter}
-        lineNumber={showLineNumbers ? item.fold.startLine : undefined}
-        fold={inlineGutter ? item.fold : undefined}
-        isFoldCollapsed={inlineGutter || undefined}
-        onFoldToggle={inlineGutter ? () => toggleFold(item.fold.id) : undefined}
-        hasFolds={inlineGutter && hasFolds}
-      >
-        <button
-          type='button'
-          className={cn('inline-flex items-center cursor-pointer select-none', summaryClassName)}
-          aria-expanded={false}
-          aria-label={`Collapsed region: ${label}, ${item.lineCount} lines`}
-          {...summaryProps}
-          onClick={handleSummaryClick}
-        >
-          <span className='inline-flex items-center italic text-text-secondary hover:text-text-primary transition-colors'>
-            {label}
-          </span>
-        </button>
-      </CodeLine>
-    );
-  };
+  const renderFoldSummary = (item: Extract<DisplayItem, { type: 'fold-summary' }>) => (
+    <CodeLine
+      key={`fold-${item.fold.id}`}
+      lineConfig={undefined}
+      lineHeightClass={lineHeightClass}
+      showInlineGutter={inlineGutter}
+      lineNumber={showLineNumbers ? item.fold.startLine : undefined}
+      fold={inlineGutter ? item.fold : undefined}
+      isFoldCollapsed={inlineGutter || undefined}
+      onFoldToggle={inlineGutter ? () => toggleFold(item.fold.id) : undefined}
+      hasFolds={inlineGutter && hasFolds}
+    >
+      <FoldSummary
+        fold={item.fold}
+        lineCount={item.lineCount}
+        onToggle={() => toggleFold(item.fold.id)}
+      />
+    </CodeLine>
+  );
 
   // Show loading state or plain code if tokens not ready
   if (isLoading || !tokens) {

@@ -106,6 +106,21 @@ describe('validateFolds', () => {
 
     expect(result).toHaveLength(2);
   });
+
+  it('skips invalid folds without warning when warn is false', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const folds: readonly FoldRegion[] = [
+      { id: 'reversed', startLine: 3, endLine: 2 },
+      { id: 'outside', startLine: 8, endLine: 20 },
+      { id: 'ok', startLine: 1, endLine: 2 },
+    ];
+
+    const result = validateFolds(folds, 10, 1, { warn: false });
+
+    expect(result.map(fold => fold.id)).toEqual(['ok']);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
+  });
 });
 
 describe('buildDisplayItems', () => {

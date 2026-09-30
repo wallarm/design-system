@@ -9,7 +9,9 @@ export const FoldToggle: FC<{
   fold: FoldRegion;
   isCollapsed: boolean;
   onToggle: () => void;
-}> = ({ fold, isCollapsed, onToggle }) => {
+  /** Default `data-testid`; `fold.toggleProps['data-testid']` still wins. */
+  testId?: string;
+}> = ({ fold, isCollapsed, onToggle, testId }) => {
   const lineCount = fold.endLine - fold.startLine + 1;
   const label = getFoldSummaryLabel(fold, lineCount);
   const ariaLabel = isCollapsed ? `Expand ${label}` : `Collapse ${label}`;
@@ -29,6 +31,7 @@ export const FoldToggle: FC<{
       )}
       aria-expanded={!isCollapsed}
       aria-label={ariaLabel}
+      data-testid={testId}
       {...toggleProps}
       onClick={handleClick}
     >
