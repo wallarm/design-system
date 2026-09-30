@@ -33,15 +33,17 @@ describe('editorTheme', () => {
 
     expect(css).toContain('font-family: inherit');
     expect(css).toContain('line-height: 20px');
-    expect(css).toContain('padding: 8px 12px 8px 0');
-    expect(css).toMatch(/:not\(:has\(\.cm-gutters\)\) \.cm-content \{padding-left: 12px;?\}/);
+    expect(css).toMatch(/\.cm-content \{[^}]*padding: 8px 0;/);
+    expect(css).toMatch(/\.cm-line \{padding: 0 12px;?\}/);
+    expect(css).toMatch(/:has\(\.cm-gutters\) \.cm-line \{padding-left: 8px;?\}/);
+    expect(css).not.toContain(':not(:has(.cm-gutters))');
     expect(css).toContain('caret-color: var(--color-syntax-no-syntax)');
     expect(css).toContain('border-left-color: var(--color-syntax-no-syntax)');
     expect(css).toContain('background: var(--color-syntax-highlight-selected-highlight)');
     expect(css).toContain('background-color: var(--color-syntax-highlight-neutral-highlight)');
     expect(css).toContain('word-break: break-all');
     expect(css).toContain('var(--color-component-code-snippet-bg)');
-    expect(css).toContain('margin-right: 8px');
+    expect(css).not.toMatch(/\.cm-gutters \{[^}]*margin-right/);
     expect(css).toMatch(/\.cm-focused \{outline: none;?\}/);
   });
 

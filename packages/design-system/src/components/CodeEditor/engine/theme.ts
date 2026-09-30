@@ -29,15 +29,17 @@ const snippetTheme = EditorView.theme({
     lineHeight: '20px',
   },
   '.cm-content': {
-    padding: '8px 12px 8px 0',
+    padding: '8px 0',
     caretColor: 'var(--color-syntax-no-syntax)',
   },
-  // No gutter → the text column gets CodeSnippet's `pl-12`.
-  '&:not(:has(.cm-gutters)) .cm-content': {
-    paddingLeft: '12px',
-  },
+  // The 12px right edge and the 8px gutter gap live on `.cm-line` (not on `.cm-content` /
+  // `.cm-gutters`) so a coloured line background covers them, like CodeSnippet's full-row highlight.
   '.cm-line': {
-    padding: '0',
+    padding: '0 12px',
+  },
+  // With a gutter the text column starts 8px after it (CodeSnippet `mr-8`).
+  '&:has(.cm-gutters) .cm-line': {
+    paddingLeft: '8px',
   },
   // CodeSnippet wraps with `whitespace-pre-wrap break-all`.
   '.cm-lineWrapping': {
@@ -47,7 +49,6 @@ const snippetTheme = EditorView.theme({
     background: CODE_SNIPPET_BG,
     color: 'inherit',
     border: 'none',
-    marginRight: '8px',
   },
   '.cm-gutters.cm-gutters-before': {
     borderRightWidth: '0',
