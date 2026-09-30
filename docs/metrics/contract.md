@@ -84,7 +84,7 @@ This keeps the analytics path (document-level `closest('[data-analytics-id]')`) 
 
 Wrapper-level placement is acceptable only when all of these are true:
 
-- the component flags the wrapper-level decision in its **own folder** — in the component's test comments or in an `ANALYTICS_GAPS.md` colocated with it (the `CodeSnippet/ANALYTICS_GAPS.md` precedent)
+- the component flags the wrapper-level decision in its **own folder** — in the component's test comments or in an `ANALYTICS_GAPS.md` colocated with it (precedents: [`Table/ANALYTICS_GAPS.md`](../../packages/design-system/src/components/Table/ANALYTICS_GAPS.md), [`FilterDropdown/ANALYTICS_GAPS.md`](../../packages/design-system/src/components/FilterDropdown/ANALYTICS_GAPS.md), [`CodeEditor/ANALYTICS_GAPS.md`](../../packages/design-system/src/components/CodeEditor/ANALYTICS_GAPS.md))
 - that record explains why the actual target is not currently reachable, plus the workaround, the owner, and the next decision point
 - tests name the wrapper-level contract directly and assert wrapper placement deliberately
 
