@@ -26,11 +26,18 @@ import { VStack } from '../Stack';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { CodeEditorContent } from './CodeEditorContent';
 import { CodeEditorRoot } from './CodeEditorRoot';
+import { EditingWorkflowDemo } from './story-content/_storyEditingWorkflow';
+import { LongDocumentDemo } from './story-content/_storyLongDocument';
+import { TabsKeepHistoryDemo } from './story-content/_storyTabsKeepHistory';
 import type { CodeEditorDiagnostic, CodeEditorLanguage } from './types';
 
 const DESCRIPTION = [
-  'An editable code surface that looks exactly like `CodeSnippet` and reuses its chrome — header, title, tabs, copy, wrap, fullscreen and show more — with undo, find, folds and line colours on CodeMirror 6, loaded lazily on first mount.',
-  'Reach for `CodeSnippet` when the code is only read; reach for `CodeEditor` when the value changes. Colours come from the same `CodeSnippetAdapterProvider`, so an editor under Prism looks like a snippet under Prism.',
+  'An editable code surface that is visually the same component as `CodeSnippet` and reuses its header, tabs, actions and show-more — reach for `CodeSnippet` whenever the code is only read, since a page that never renders `CodeEditorContent` never loads the editor engine.',
+  'Colours come from the same `CodeSnippetAdapterProvider` (plain text without one), so a read-only editor matches the snippet except for a native thin scrollbar, a caret and selection drawn by the editor, and an HTTP JSON body that stays coloured when `Content-Type` has parameters or the body has blank lines.',
+  'The adapter re-tokenizes the whole document after each pause in typing, which stays within a frame up to about 2 000 lines with Prism; longer documents still edit smoothly, their colours just settle a moment later.',
+  '`lines`, `folds`, `completions` and `schema` are compared by identity, so memoise them or hoist them to module constants — a new value on every render reconfigures the editor.',
+  'Syntax errors are best-effort: JSON reports the `JSON.parse` message, JavaScript and TypeScript use Babel, YAML and Python use their Lezer parsers, which still flag a few valid Python forms such as `lambda a, /, b` and parenthesised `with` items.',
+  'Tab indents, so keyboard users leave with Escape, then Tab — point `aria-describedby` at text holding `CODE_EDITOR_KEYBOARD_HINT` to tell screen-reader users.',
 ].join(' ');
 
 const meta = {
@@ -1052,6 +1059,38 @@ export const Diff: StoryFn<typeof meta> = () => {
   );
 };
 
+const DIFF_WRAP_ORIGINAL = `GET /api/v2/rules HTTP/1.1
+Host: api.wallarm.com
+X-Debug-Trace: gateway=eu-central-1;route=/api/v2/rules;upstream=rules-service;sampled=true;span=9f86d081884c7d659a2feaa0c55ad015a3bf4f1b2b0b822cd15d6c15b0f00a08
+Accept: application/json`;
+
+const DIFF_WRAP_MODIFIED = `GET /api/v2/rules HTTP/1.1
+Host: api.wallarm.com
+Accept: application/json`;
+
+/**
+ * With wrapping on, a removed line longer than the frame wraps inside its `danger` row and its
+ * `-` marker stays on the first visual row, beside where the line starts.
+ */
+export const DiffWrapLines: StoryFn<typeof meta> = () => {
+  const [value, setValue] = useState(DIFF_WRAP_MODIFIED);
+
+  return (
+    <div className='w-480'>
+      <CodeEditorRoot
+        data-testid='code-editor-diff-wrap'
+        language='http'
+        original={DIFF_WRAP_ORIGINAL}
+        value={value}
+        onChange={setValue}
+        defaultWrapLines
+      >
+        <CodeEditorContent aria-label='Request without the debug header' lineNumbers />
+      </CodeEditorRoot>
+    </div>
+  );
+};
+
 const analyticsRequest = `POST /api/v1/rules HTTP/1.1
 Host: api.example.com
 Content-Type: application/json
@@ -1102,3 +1141,22 @@ export const AnalyticsAttributes: StoryFn<typeof meta> = () => (
     />
   </CodeEditorRoot>
 );
+
+/**
+ * A controlled HTTP request with header and body folds and a JSON Schema on the body —
+ * `retries` breaks the schema's maximum on purpose, so the underline and its hover message
+ * are part of the example. The editor's description points at `CODE_EDITOR_KEYBOARD_HINT`.
+ */
+export const EditingWorkflow: StoryFn<typeof meta> = () => <EditingWorkflowDemo />;
+
+/**
+ * Each tab passes its own `documentId`, so switching swaps in that document's undo history,
+ * selection and collapsed folds instead of replacing the text of one shared document.
+ */
+export const TabsKeepHistory: StoryFn<typeof meta> = () => <TabsKeepHistoryDemo />;
+
+/**
+ * 2 000 read-only lines clamped by `maxLines` — the top of the envelope the colour painter is
+ * built for, where `readOnly` still lets the text be focused, searched and copied.
+ */
+export const LongDocument: StoryFn<typeof meta> = () => <LongDocumentDemo />;
