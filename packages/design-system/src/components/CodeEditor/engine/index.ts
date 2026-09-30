@@ -23,6 +23,7 @@ import {
   type ViewUpdate,
 } from '@codemirror/view';
 import type { CodeEditorApi } from '../types';
+import { adapterPainter } from './adapterPainter';
 import { sanitizeContentAttributes } from './contentAttributes';
 import { languageExtension } from './languages';
 import { editorTheme, maxHeightTheme } from './theme';
@@ -121,10 +122,10 @@ type SlotBuilders<K extends string> = Record<K, () => Extension>;
  * Later tasks replace the corresponding `[]` (and update `SLOT_DEPS`).
  */
 const featureExtensions = (
-  _options: EngineOptions,
-  _callbacks: EngineCallbacks,
+  options: EngineOptions,
+  callbacks: EngineCallbacks,
 ): SlotBuilders<FeatureKey> => ({
-  painter: () => [],
+  painter: () => adapterPainter({ adapter: options.adapter, language: options.language }),
   lines: () => [],
   folds: () => [],
   search: () => [],
