@@ -98,6 +98,8 @@ export {
   type AvatarFallbackProps,
   AvatarImage,
   type AvatarImageProps,
+  AvatarOverlay,
+  type AvatarOverlayProps,
   type AvatarProps,
   type AvatarStatusChangeDetails,
 } from './components/Avatar';

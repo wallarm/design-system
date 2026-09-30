@@ -2,7 +2,7 @@ import type { FC } from 'react';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { describe, expect, it, vi } from 'vitest';
 import type { SvgIconProps } from '../../icons';
-import { Avatar, AvatarFallback, AvatarImage } from '.';
+import { Avatar, AvatarFallback, AvatarImage, AvatarOverlay } from '.';
 
 const renderAvatar = (props: { src?: string; name?: string; onStatusChange?: () => void } = {}) =>
   render(
@@ -170,5 +170,56 @@ describe('Avatar', () => {
     expect(ref.current).toBe(root);
     expect(root).toHaveClass('-m-4');
     expect(root).toHaveAttribute('title', 'Ada');
+  });
+});
+
+describe('AvatarOverlay', () => {
+  it('renders the default edit icon, hidden from assistive tech', () => {
+    render(
+      <Avatar asChild data-testid='av'>
+        <button type='button' aria-label='Change avatar'>
+          <AvatarFallback />
+          <AvatarOverlay />
+        </button>
+      </Avatar>,
+    );
+    const overlay = screen.getByTestId('av--overlay');
+    expect(overlay).toHaveAttribute('data-slot', 'avatar-overlay');
+    expect(overlay).toHaveAttribute('aria-hidden', 'true');
+    expect(overlay).not.toHaveAttribute('data-visible');
+    expect(overlay.querySelector('svg')).not.toBeNull();
+  });
+
+  it('is forced visible with `visible`, with custom content', () => {
+    render(
+      <Avatar data-testid='av'>
+        <AvatarOverlay visible>…</AvatarOverlay>
+      </Avatar>,
+    );
+    const overlay = screen.getByTestId('av--overlay');
+    expect(overlay).toHaveAttribute('data-visible');
+    expect(overlay).toHaveTextContent('…');
+  });
+
+  it('a disabled root hides only the non-forced overlay (class contract)', () => {
+    render(
+      <Avatar data-testid='av'>
+        <AvatarOverlay />
+      </Avatar>,
+    );
+    expect(screen.getByTestId('av--overlay')).toHaveClass(
+      'group-disabled/avatar:not-data-[visible]:hidden',
+    );
+  });
+
+  it('paints the wash only over a visible photo (class contract)', () => {
+    render(
+      <Avatar data-testid='av'>
+        <AvatarOverlay />
+      </Avatar>,
+    );
+    expect(screen.getByTestId('av--overlay')).toHaveClass(
+      'group-has-[>img[data-state=visible]]/avatar:bg-component-avatar-overlay',
+    );
   });
 });

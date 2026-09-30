@@ -10,6 +10,13 @@ export const avatarVariants = cva(
     // A visible photo drops the stroke (Figma Photo=On). The box is fixed-size and border-box, so
     // nothing moves — a transparent border would leave a 1px ring of plate tint around the photo.
     'has-[>img[data-state=visible]]:border-0',
+    // With the edit overlay showing over the fallback, the icon swaps rather than stacking
+    // (Figma 2159:1698) — the fallback steps aside on hover/focus of an enabled root, or when forced.
+    // Gated through `hover:` / `focus-visible:` so they sit in the same `@media (hover: hover)` as the
+    // overlay's `group-hover` — a raw `:hover` would leave an empty plate after a tap on touch devices.
+    'hover:not-disabled:[&:has(>[data-slot=avatar-overlay])>[data-slot=avatar-fallback]]:invisible',
+    'focus-visible:[&:has(>[data-slot=avatar-overlay])>[data-slot=avatar-fallback]]:invisible',
+    '[&:has(>[data-slot=avatar-overlay][data-visible])>[data-slot=avatar-fallback]]:invisible',
     // Interactive root (asChild → <button>).
     'enabled:cursor-pointer disabled:cursor-not-allowed',
     'focus-visible:outline-none focus-visible:ring-3 focus-visible:ring-focus-primary',
@@ -30,4 +37,13 @@ export const avatarImageClassNames = cn('size-full object-cover data-[state=hidd
 
 export const avatarFallbackClassNames = cn(
   'inline-flex items-center justify-center select-none data-[state=hidden]:hidden',
+);
+
+export const avatarOverlayClassNames = cn(
+  'hidden size-full place-items-center text-icon-primary',
+  // `group-disabled` is emitted after `group-hover`, so a disabled root shows no hover overlay —
+  // unless it is forced (`visible`, e.g. the upload loader on a disabled trigger).
+  'group-hover/avatar:grid group-focus-visible/avatar:grid group-disabled/avatar:not-data-[visible]:hidden',
+  'data-[visible]:grid',
+  'group-has-[>img[data-state=visible]]/avatar:bg-component-avatar-overlay',
 );

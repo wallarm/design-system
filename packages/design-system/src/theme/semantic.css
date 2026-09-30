@@ -208,6 +208,7 @@
     --color-component-logo-wordmark-alt: var(--color-white);
     --color-component-kbi-tooltip-bg: --alpha(var(--color-white) / 20%);
     --color-component-dialog-overlay: --alpha(var(--color-white) / 60%);
+    --color-component-avatar-overlay: --alpha(var(--color-white) / 80%);
     --color-component-code-snippet-bg: --alpha(var(--color-slate-500) / 6%);
     --color-component-toast-bg: var(--color-slate-800);
     --color-component-toast-ic-destructive: var(--color-red-400);
@@ -659,6 +660,7 @@
     --color-component-logo-wordmark-alt: var(--color-slate-950);
     --color-component-kbi-tooltip-bg: --alpha(var(--color-slate-950) / 20%);
     --color-component-dialog-overlay: --alpha(var(--color-slate-950) / 60%);
+    --color-component-avatar-overlay: --alpha(var(--color-slate-950) / 80%);
     --color-component-code-snippet-bg: --alpha(var(--color-slate-300) / 12%);
     --color-component-toast-bg: var(--color-slate-100);
     --color-component-toast-ic-destructive: var(--color-red-600);

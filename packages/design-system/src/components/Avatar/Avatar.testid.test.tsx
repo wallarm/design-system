@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import { TestIdProvider } from '../../utils/testId';
-import { Avatar, AvatarFallback, AvatarImage } from '.';
+import { Avatar, AvatarFallback, AvatarImage, AvatarOverlay } from '.';
 
 describe('Avatar — test ids', () => {
   it('cascades {id}--image and {id}--fallback', () => {
@@ -13,6 +13,15 @@ describe('Avatar — test ids', () => {
     );
     expect(screen.getByTestId('me--image')).toHaveAttribute('data-slot', 'avatar-image');
     expect(screen.getByTestId('me--fallback')).toHaveAttribute('data-slot', 'avatar-fallback');
+  });
+
+  it('cascades {id}--overlay', () => {
+    render(
+      <Avatar data-testid='me'>
+        <AvatarOverlay />
+      </Avatar>,
+    );
+    expect(screen.getByTestId('me--overlay')).toHaveAttribute('data-slot', 'avatar-overlay');
   });
 
   it('keeps the DOM clean without a data-testid', () => {
