@@ -25,7 +25,9 @@ import {
 import type { CodeEditorApi } from '../types';
 import { adapterPainter } from './adapterPainter';
 import { sanitizeContentAttributes } from './contentAttributes';
+import { guttersExtension } from './gutters';
 import { languageExtension } from './languages';
+import { linesExtension } from './lines';
 import { editorTheme, maxHeightTheme } from './theme';
 import type { EditorHandle, EngineCallbacks, EngineOptions } from './types';
 
@@ -126,7 +128,18 @@ const featureExtensions = (
   callbacks: EngineCallbacks,
 ): SlotBuilders<FeatureKey> => ({
   painter: () => adapterPainter({ adapter: options.adapter, language: options.language }),
-  lines: () => [],
+  lines: () => [
+    linesExtension({ lines: options.lines, startingLineNumber: options.startingLineNumber }),
+    guttersExtension({
+      lines: options.lines,
+      startingLineNumber: options.startingLineNumber,
+      lineNumbers: options.lineNumbers,
+      // T8 replaces `null` with `foldsExtension(...).gutter`
+      foldGutter: null,
+      portals: callbacks.portals,
+      testId: options.testId,
+    }),
+  ],
   folds: () => [],
   search: () => [],
   diagnostics: () => [],
