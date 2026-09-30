@@ -15,6 +15,7 @@ export const FileUploadTrigger: FC<FileUploadTriggerProps> = ({
   children,
   disabled,
   'data-testid': testIdProp,
+  'aria-describedby': describedByProp,
   ...props
 }) => {
   const ctx = useRequiredFileUploadRootContext('FileUploadTrigger');
@@ -22,14 +23,19 @@ export const FileUploadTrigger: FC<FileUploadTriggerProps> = ({
 
   if (ctx.pickerHidden) return null;
 
+  // A consumer hint is kept; the error link is added to it, never replaced.
+  const describedBy =
+    [describedByProp, ctx.rejections.length ? ctx.errorId : undefined].filter(Boolean).join(' ') ||
+    undefined;
+
   return (
     <ArkFileUpload.Trigger asChild>
       <Button
         variant='primary'
         color='brand'
         size='large'
-        aria-describedby={ctx.rejections.length ? ctx.errorId : undefined}
         {...props}
+        aria-describedby={describedBy}
         data-slot='file-upload-trigger'
         data-testid={testId}
         disabled={disabled || ctx.pickerBlocked}

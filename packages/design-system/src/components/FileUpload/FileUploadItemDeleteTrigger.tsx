@@ -8,10 +8,39 @@ import { useRequiredFileUploadItemContext } from './FileUploadItemContext';
 
 export type FileUploadItemDeleteTriggerProps = ButtonProps;
 
+const ROW = '[data-slot="file-upload-item"]';
+const PICKER = '[data-slot="file-upload-dropzone"], [data-slot="file-upload-trigger"]';
+
+/**
+ * Removing a row unmounts the focused button, and focus would fall to `<body>`. Returns a
+ * callback that, once the row is gone, moves focus to the row now at the same position
+ * (else the previous one) — its Delete, else its first action — or else back to the picker.
+ */
+const keepFocusInside = (button: HTMLButtonElement) => {
+  const row = button.closest(ROW);
+  const root = button.closest('[data-slot="file-upload"]');
+  if (!row || !root) return () => {};
+  const index = [...root.querySelectorAll(ROW)].indexOf(row);
+  return () =>
+    requestAnimationFrame(() => {
+      const active = button.ownerDocument.activeElement;
+      // Focus moved on its own (or the consumer moved it): leave it.
+      if (active && active !== button.ownerDocument.body && active.isConnected) return;
+      const rows = root.querySelectorAll(ROW);
+      const next = rows[index] ?? rows[index - 1];
+      const target =
+        next?.querySelector<HTMLElement>('[data-slot="file-upload-item-delete-trigger"]') ??
+        next?.querySelector<HTMLElement>('button:not(:disabled)') ??
+        root.querySelector<HTMLElement>(PICKER);
+      target?.focus();
+    });
+};
+
 /**
  * X — removes a picked file (and clears any showing rejection). While the row is loading
  * it is the Cancel: your `onClick` aborts the request. For a stored `{ name }` file only
  * your `onClick` runs (e.g. detach). Call `event.preventDefault()` to skip the removal.
+ * After a removal, focus moves to the next row (else the previous one), or back to the picker.
  */
 export const FileUploadItemDeleteTrigger: FC<FileUploadItemDeleteTriggerProps> = ({
   children,
@@ -26,18 +55,21 @@ export const FileUploadItemDeleteTrigger: FC<FileUploadItemDeleteTriggerProps> =
   const testId = useTestId('item-delete-trigger', testIdProp);
 
   if (root?.readOnly) return null;
+  const isDisabled = Boolean(disabled || root?.disabled);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     if (event.defaultPrevented) return;
     if (root && item.file instanceof File) {
+      const restoreFocus = keepFocusInside(event.currentTarget);
       root.api.deleteFile(item.file);
       root.clearRejections();
+      restoreFocus();
     }
   };
 
   return (
-    <Tooltip positioning={{ placement: 'top' }}>
+    <Tooltip positioning={{ placement: 'top' }} disabled={isDisabled}>
       <TooltipTrigger asChild data-testid={testId}>
         <Button
           variant='ghost'
@@ -47,7 +79,7 @@ export const FileUploadItemDeleteTrigger: FC<FileUploadItemDeleteTriggerProps> =
           {...props}
           data-slot='file-upload-item-delete-trigger'
           data-testid={testId}
-          disabled={disabled || root?.disabled}
+          disabled={isDisabled}
           onClick={handleClick}
         >
           {children ?? <X />}

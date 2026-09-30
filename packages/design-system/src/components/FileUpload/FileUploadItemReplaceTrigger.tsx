@@ -35,6 +35,7 @@ export const FileUploadItemReplaceTrigger: FC<FileUploadItemReplaceTriggerProps>
   if (!root || root.readOnly || item.loading) return null;
   const current = item.file;
   if (!root.single && !(current instanceof File)) return null;
+  const isDisabled = Boolean(disabled || root.disabled);
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
@@ -69,7 +70,7 @@ export const FileUploadItemReplaceTrigger: FC<FileUploadItemReplaceTriggerProps>
 
   return (
     <>
-      <Tooltip positioning={{ placement: 'top' }}>
+      <Tooltip positioning={{ placement: 'top' }} disabled={isDisabled}>
         <TooltipTrigger asChild data-testid={testId}>
           <Button
             variant='ghost'
@@ -79,7 +80,7 @@ export const FileUploadItemReplaceTrigger: FC<FileUploadItemReplaceTriggerProps>
             {...props}
             data-slot='file-upload-item-replace-trigger'
             data-testid={testId}
-            disabled={disabled || root.disabled}
+            disabled={isDisabled}
             onClick={handleClick}
           >
             {children ?? <RefreshCcw />}

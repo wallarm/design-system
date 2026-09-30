@@ -28,6 +28,7 @@ export const FileUploadDropzone: FC<FileUploadDropzoneProps> = ({
   className,
   ref,
   'data-testid': testIdProp,
+  'aria-describedby': describedByProp,
   ...props
 }) => {
   const ctx = useRequiredFileUploadRootContext('FileUploadDropzone');
@@ -39,14 +40,20 @@ export const FileUploadDropzone: FC<FileUploadDropzoneProps> = ({
 
   const blocked = ctx.pickerBlocked;
   const hasRejections = ctx.rejections.length > 0;
-  // Ark names the zone "dropzone"; name it by the Field label + the visible text instead.
-  const labelledBy = [field?.ids.label, textId].filter(Boolean).join(' ');
+  // Ark names the zone "dropzone"; name it by the Field label + the visible text instead —
+  // unless the consumer names it (`aria-label` / `aria-labelledby`).
+  const ownName = props['aria-label'] !== undefined || props['aria-labelledby'] !== undefined;
+  const labelledBy = ownName ? undefined : [field?.ids.label, textId].filter(Boolean).join(' ');
+  // A consumer hint is kept; the error link is added to it, never replaced.
+  const describedBy =
+    [describedByProp, hasRejections ? ctx.errorId : undefined].filter(Boolean).join(' ') ||
+    undefined;
 
   return (
     <ArkFileUpload.Dropzone
       aria-labelledby={labelledBy}
-      aria-describedby={hasRejections ? ctx.errorId : undefined}
       {...props}
+      aria-describedby={describedBy}
       ref={ref}
       disableClick={blocked}
       // Keep the button role while blocked (Ark switches to "application" with disableClick).

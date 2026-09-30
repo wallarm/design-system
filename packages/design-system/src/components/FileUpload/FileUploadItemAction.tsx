@@ -20,6 +20,7 @@ export const FileUploadItemAction: FC<FileUploadItemActionProps> = ({
   const root = useFileUploadRootContext();
   const testId = useTestId('item-action', testIdProp);
   const label = props['aria-label'];
+  const isDisabled = Boolean(disabled || root?.disabled);
 
   const button = (
     <Button
@@ -29,14 +30,14 @@ export const FileUploadItemAction: FC<FileUploadItemActionProps> = ({
       {...props}
       data-slot='file-upload-item-action'
       data-testid={testId}
-      disabled={disabled || root?.disabled}
+      disabled={isDisabled}
     />
   );
 
   if (typeof label !== 'string') return button;
 
   return (
-    <Tooltip positioning={{ placement: 'top' }}>
+    <Tooltip positioning={{ placement: 'top' }} disabled={isDisabled}>
       <TooltipTrigger asChild data-testid={testId}>
         {button}
       </TooltipTrigger>
