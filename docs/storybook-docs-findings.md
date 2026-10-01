@@ -1081,3 +1081,162 @@ Not findings — decisions worth remembering so they are not rediscovered.
   the reference answer is a shape variant, not a new component.
 - **Found while** — documenting `Avatar`.
 - **Status** — Open
+
+### Stepper: Ark's tab ARIA is replaced by list semantics
+
+- **What** — Ark UI Steps renders a `tablist` of `tab`s (`role`, `aria-selected`,
+  `aria-controls`, `aria-owns`, `aria-orientation`, `aria-current` on the item) and each
+  `Steps.Content` as a `tabpanel` with `tabIndex=0`. The Stepper removes all of it and
+  renders an `<ol>` of `<li>`s holding plain buttons with `aria-current="step"`;
+  `StepperContent` is a `role="group"` named by Ark's `aria-labelledby` (its step
+  trigger's id), with no `tabindex`.
+- **Evidence** — `packages/design-system/src/components/Stepper/constants.ts`
+  (`ARK_*_ARIA_RESET`, which rely on Zag `mergeProps` letting `null` win),
+  `StepperContent.tsx`; `Stepper.a11y.test.tsx` pins the rule so an Ark/Zag upgrade that
+  changes it fails loudly.
+- **Why it matters** — A step is not a tab: tab semantics would promise arrow-key
+  navigation the Stepper does not have, and the panel's `tabIndex=0` would add a stray Tab
+  stop between the steps and the first field. Tab visits every step instead. The trigger's
+  `aria-controls` stays removed: Ark always computes the content id, so it would dangle when
+  a page renders no `StepperContent`. Content's `aria-labelledby` needs the matching
+  `StepperTrigger` rendered in the same `Stepper` (it is, in the standard anatomy), and a
+  consumer `id` on `StepperTrigger` breaks the link — use the root `ids` prop instead
+  (`StepperTrigger` warns in development when it gets an `id`).
+- **Suggested action** — None now. Re-check the resets on every Ark upgrade.
+- **Found while** — building `Stepper` (WDS-148).
+- **Status** — Open
+
+### Stepper: the overflow tooltip does not open on keyboard focus
+
+- **What** — A truncated step label shows its full text in a tooltip on hover only. Focus
+  lands on the step's button, not on the label span that owns the tooltip, so keyboard
+  users never see it.
+- **Evidence** — `packages/design-system/src/components/Stepper/StepperTitle.tsx`,
+  `StepperDescription.tsx` (`OverflowTooltip` on the inner span, the `FileUploadItem`
+  pattern).
+- **Why it matters** — The full label still reaches screen readers through the button's
+  accessible name, but a sighted keyboard user sees only the ellipsis.
+- **Suggested action** — Consider letting `OverflowTooltip` take an external focus
+  target, or open it from the button's focus when the label overflows.
+- **Found while** — building `Stepper` (WDS-148).
+- **Status** — Open
+
+### Stepper: its own step badge, pending the NumericBadge rework
+
+- **What** — The Stepper draws its step badge with its own CVA instead of `NumericBadge`,
+  because NumericBadge has no active (brand tint), danger (danger tint) or completed
+  (check icon) type at the 20px height the stepper needs.
+- **Evidence** — `packages/design-system/src/components/Stepper/classes.ts`
+  (`stepperIndicatorVariants`, `// TODO(WDS-188)`); the upcoming state mirrors
+  NumericBadge `outline` colour tokens, but uses `px-3` (not NumericBadge's `px-4`) so the
+  badge stays 16px wide — a straight swap would widen it by about 1px.
+- **Why it matters** — Two badge implementations can drift apart in padding, font or
+  colour.
+- **Suggested action** — Switch to the reworked `NumericBadge` once WDS-188 lands.
+- **Found while** — building `Stepper` (WDS-148).
+- **Status** — Open (WDS-188)
+
+### Stepper: the focus-ring radius is borrowed, not specified
+
+- **What** — Figma gives the step trigger no focus-ring radius. The Stepper uses
+  `rounded-6` with `focus-visible:ring-3 focus-visible:ring-focus-primary`, copied from
+  `BreadcrumbsItem`, the closest text-like navigation trigger.
+- **Evidence** — `packages/design-system/src/components/Stepper/classes.ts`
+  (`stepperTriggerVariants`); `components/Breadcrumbs/BreadcrumbsItem.tsx:15`.
+- **Why it matters** — If design intends a different radius, the ring will look off
+  against the badge and label.
+- **Suggested action** — Confirm the radius with design, then update the one class.
+- **Found while** — building `Stepper` (WDS-148).
+- **Status** — Open
+
+### Stepper: the active step label misses WCAG AA contrast in light mode
+
+- **What** — The current step's label uses `text-text-brand`, which in light mode is
+  `--color-w-orange-600` (#ff441c): about 3.44:1 on white. The label is 14px regular, so
+  WCAG 1.4.3 AA needs 4.5:1. The active badge digit (`text-text-brand` on
+  `bg-states-brand-active`, 12px) is lower still, about 3.1:1, though it is `aria-hidden`
+  and sits next to the label. Dark mode (w-orange-300 on #0d1123, about 10:1) passes, as do
+  danger (#e7000b, about 4.77:1) and secondary (#62748e, about 4.76:1).
+- **Evidence** — `packages/design-system/src/components/Stepper/classes.ts`
+  (`stepperTitleVariants` `active`, `stepperIndicatorVariants` `active`);
+  `theme/semantic.css` (`--color-text-brand`), `theme/colors/primary.css`
+  (`--color-w-orange-600`). The same token is used for text in `DropdownMenu` and `NavRail`.
+- **Why it matters** — The current step is the most important label in the component and
+  the only one that fails. `font-medium` does not help: 14px text needs to be 18.66px bold
+  to count as large.
+- **Suggested action** — Raise with design: map the active label (and badge digit) to a
+  darker, design-approved brand text token that reaches 4.5:1 on white (a w-orange-700
+  level value), ideally fixing `text-brand` for all text uses. Do not change the token in
+  the Stepper alone.
+- **Found while** — reviewing `Stepper` (WDS-148).
+- **Status** — Open (needs design)
+
+### Stepper: the step position is carried by list semantics, not the button name
+
+- **What** — The visible step number sits in the indicator, which Ark marks
+  `aria-hidden="true"`. A step button's accessible name is its title, description and
+  status suffix only, with no "step N of M".
+- **Evidence** — `packages/design-system/src/components/Stepper/StepperIndicator.tsx`,
+  `StepperTrigger.tsx`; `Stepper.a11y.test.tsx` pins names without a position.
+- **Why it matters** — Screen readers announce "list, N items" when focus enters the
+  `<ol>`, but most do not announce an item's position when focus lands on a button inside
+  an `<li>`, so a keyboard screen-reader user hears "Scope, button, current step" while a
+  sighted user sees "3". Hiding the badge itself is correct: "3" next to the title is noise.
+- **Suggested action** — Decision for now: rely on the `<ol>` semantics and keep the name
+  short. If research with screen-reader users shows the position is missed, add an
+  i18n-able sr-only prefix (e.g. a `statusLabels.position(index, count)` formatter giving
+  "Step 3 of 4, ") and update the a11y name assertions.
+- **Found while** — reviewing `Stepper` (WDS-148).
+- **Status** — Open (decision recorded)
+
+### Stepper: Ark's Next trigger moves past the last step
+
+- **What** — In `@zag-js/steps` 1.43, `hasNextStep` is `step < count`, so
+  `Steps.NextTrigger` stays enabled on the last step and a click moves to `step = count`,
+  Ark's "completed" state, where no step is current and every `Steps.Content` is hidden.
+  `goToNextStep()` and `setStep(count)` reach it too. Zag also keeps an out-of-range step
+  when an uncontrolled `count` shrinks, and Ark's Prev steps back from that raw value.
+- **Evidence** — `node_modules/@zag-js/steps/dist/steps.machine.mjs` (`hasNextStep`,
+  `goToNextStep`); `StepperNextTrigger.tsx` disables Next on the last step and prevents the
+  click; `StepperPrevTrigger.tsx` steps back from the shown (clamped) step;
+  `StepperContext.tsx` (`useStepperContext`), `useStepper.ts` (clamped `setStep`, guarded
+  `goToNextStep` / `goToPrevStep`, `isCompleted` always `false`, root `onStepChange` drops
+  `step = count`); `Stepper.test.tsx` ("never
+  moves the step to count", "drops an onStepChange at count reached through the raw Ark
+  API").
+- **Why it matters** — The Stepper always shows one current step. The footer recipe renders
+  the page's own submit button instead of Next on the last step; a submit button wrapped in
+  `StepperNextTrigger` would be disabled there.
+- **Suggested action** — None now. Re-check on every Ark/Zag upgrade.
+- **Found while** — rewriting `Stepper` as a compound component (WDS-148).
+- **Status** — Open (guarded in the DS)
+
+### Stepper: Ark's Progress and CompletedContent are not exposed
+
+- **What** — The compound Stepper mirrors Ark Steps part for part except `Steps.Progress`
+  and `Steps.CompletedContent`.
+- **Evidence** — `packages/design-system/src/components/Stepper/index.ts`.
+- **Why it matters** — Figma has no progress bar for the Stepper, and the Stepper never
+  reaches Ark's "completed" state (see above), so `CompletedContent` would never show.
+- **Suggested action** — Add a `StepperProgress` only if design draws one.
+- **Found while** — rewriting `Stepper` as a compound component (WDS-148).
+- **Status** — Open (out of scope)
+
+### Stepper: Drawer parts inside the Stepper root take the Stepper's test ids
+
+- **What** — In the drawer recipe (`InDrawer`, `WithFooter`) `DrawerBody`, `DrawerFooter` and
+  `DrawerFooterControls` sit inside `<Stepper data-testid="stepper">`, because the footer's
+  Back / Next triggers need the Stepper context. Those Drawer parts read the nearest
+  `TestIdProvider`, so they render as `stepper--body`, `stepper--footer` and
+  `stepper--footer-controls`, not `drawer--*`.
+- **Evidence** — `packages/design-system/src/utils/testId.ts` (nearest provider wins);
+  `Stepper.tsx` (`TestIdProvider`); `Stepper.stories.tsx` (`InDrawer`, `WithFooter`).
+- **Why it matters** — Tests written against a plain Drawer (`drawer--body`) would not find
+  those parts once a Stepper wraps them. Two `DrawerFooterControls` in one footer also share
+  one id; that is a Drawer limitation (it takes no `data-testid`), not a Stepper one.
+- **Suggested action** — None in the Stepper: the cascade works as designed. Target those
+  parts as `{stepper}--body` / `--footer`, or give the footer buttons their own
+  `data-testid` (as `WithFooter` does). Consider letting `DrawerFooterControls` take a
+  `data-testid`.
+- **Found while** — reviewing `Stepper` (WDS-148).
+- **Status** — Open (documented)
