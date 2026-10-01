@@ -1,5 +1,5 @@
 import type { FC } from 'react';
-import { useCallback, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
@@ -1413,6 +1413,191 @@ export const BidirectionalInfiniteScrollWindow: StoryFn<typeof meta> = () => {
         onEndReached={fetchNextPage}
         onEndReachedThreshold={200}
       />
+    </VStack>
+  );
+};
+
+/**
+ * `virtualized='window'` in an app shell that scrolls a content pane instead of the document: the
+ * table follows the pane. The `overflow-x: hidden` wrapper in between never scrolls (its
+ * `overflow-y` only computes to `auto`), so it must not be taken for the scroll root.
+ */
+export const InfiniteScrollWindowInPane: StoryFn<typeof meta> = () => {
+  const { data, isFetchingPrev, isFetchingNext, hasPrev, hasNext, fetchPrevPage, fetchNextPage } =
+    useBidirectionalData();
+
+  return (
+    <div data-testid='scroll-pane' style={{ height: 480, overflowY: 'auto' }}>
+      <div style={{ overflowX: 'hidden' }}>
+        <VStack gap={8}>
+          <Text size='sm' color='secondary'>
+            Window of {data.length} rows around the anchor
+            {(isFetchingPrev || isFetchingNext) && ' — loading...'}
+            {!hasPrev && ' — top reached'}
+            {!hasNext && ' — bottom reached'}
+          </Text>
+          <Table
+            data={data}
+            columns={securityColumns}
+            getRowId={row => row.id}
+            virtualized='window'
+            isLoading={isFetchingNext}
+            isLoadingPrevious={isFetchingPrev}
+            onStartReached={fetchPrevPage}
+            onStartReachedThreshold={200}
+            onEndReached={fetchNextPage}
+            onEndReachedThreshold={200}
+          />
+        </VStack>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * A share-link landing in a pane host: the window-mode table opens scrolled to its anchor row,
+ * inside the pane — the document stays put.
+ */
+export const InfiniteScrollWindowInPaneAnchored: StoryFn<typeof meta> = () => {
+  const { data, anchorId, isFetchingPrev, isFetchingNext, fetchPrevPage, fetchNextPage } =
+    useBidirectionalData();
+
+  return (
+    <div data-testid='scroll-pane' style={{ height: 480, overflowY: 'auto' }}>
+      <Table
+        data={data}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='window'
+        isLoading={isFetchingNext}
+        isLoadingPrevious={isFetchingPrev}
+        initialScrollToRowId={anchorId}
+        onStartReached={fetchPrevPage}
+        onStartReachedThreshold={200}
+        onEndReached={fetchNextPage}
+        onEndReachedThreshold={200}
+      />
+    </div>
+  );
+};
+
+/**
+ * A pane host that mounts the table before its data: rows arrive after a delay. Neither edge may
+ * fire against the window meanwhile — only the edge the user scrolls to.
+ */
+export const InfiniteScrollWindowInPaneLateRows: StoryFn<typeof meta> = () => {
+  const { data, isFetchingPrev, isFetchingNext, fetchPrevPage, fetchNextPage } =
+    useBidirectionalData();
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [calls, setCalls] = useState({ start: 0, end: 0 });
+  useEffect(() => {
+    const timer = setTimeout(() => setHasLoaded(true), 500);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <div data-testid='scroll-pane' style={{ height: 480, overflowY: 'auto' }}>
+      <Text size='sm' color='secondary'>
+        Edge calls: start {calls.start}, end {calls.end}
+      </Text>
+      <Table
+        data={hasLoaded ? data : []}
+        columns={securityColumns}
+        getRowId={row => row.id}
+        virtualized='window'
+        isLoading={!hasLoaded || isFetchingNext}
+        isLoadingPrevious={isFetchingPrev}
+        // Nothing to page from before the first page — as with a real cursor.
+        onStartReached={
+          hasLoaded
+            ? () => {
+                setCalls(prev => ({ ...prev, start: prev.start + 1 }));
+                fetchPrevPage();
+              }
+            : undefined
+        }
+        onStartReachedThreshold={200}
+        onEndReached={
+          hasLoaded
+            ? () => {
+                setCalls(prev => ({ ...prev, end: prev.end + 1 }));
+                fetchNextPage();
+              }
+            : undefined
+        }
+        onEndReachedThreshold={200}
+      />
+    </div>
+  );
+};
+
+/**
+ * A share-link landing in a pane that starts hidden (a closed tab or drawer): the anchor waits
+ * until the table is shown and laid out, then lands inside the pane.
+ */
+export const InfiniteScrollWindowInHiddenPaneAnchored: StoryFn<typeof meta> = () => {
+  const [isShown, setIsShown] = useState(false);
+  const { data, anchorId, isFetchingPrev, isFetchingNext, fetchPrevPage, fetchNextPage } =
+    useBidirectionalData();
+
+  return (
+    <VStack gap={8}>
+      <Button data-testid='show-table' onClick={() => setIsShown(true)}>
+        Show table
+      </Button>
+      <div
+        data-testid='scroll-pane'
+        style={{ height: 480, overflowY: 'auto', display: isShown ? 'block' : 'none' }}
+      >
+        <Table
+          data={data}
+          columns={securityColumns}
+          getRowId={row => row.id}
+          virtualized='window'
+          isLoading={isFetchingNext}
+          isLoadingPrevious={isFetchingPrev}
+          initialScrollToRowId={anchorId}
+          onStartReached={fetchPrevPage}
+          onStartReachedThreshold={200}
+          onEndReached={fetchNextPage}
+          onEndReachedThreshold={200}
+        />
+      </div>
+    </VStack>
+  );
+};
+
+/**
+ * A window-mode table mounting into a pane the user already scrolled (content above it): the pane
+ * keeps its position — adopting the root must not reset it.
+ */
+export const InfiniteScrollWindowInScrolledPane: StoryFn<typeof meta> = () => {
+  const [isShown, setIsShown] = useState(false);
+  const { data, isFetchingNext, fetchNextPage } = useBidirectionalData();
+
+  return (
+    <VStack gap={8}>
+      <Button data-testid='show-table' onClick={() => setIsShown(true)}>
+        Show table
+      </Button>
+      <div data-testid='scroll-pane' style={{ height: 480, overflowY: 'auto' }}>
+        <div style={{ height: 800 }}>
+          <Text size='sm' color='secondary'>
+            Content above the table
+          </Text>
+        </div>
+        {isShown && (
+          <Table
+            data={data}
+            columns={securityColumns}
+            getRowId={row => row.id}
+            virtualized='window'
+            isLoading={isFetchingNext}
+            onEndReached={fetchNextPage}
+            onEndReachedThreshold={200}
+          />
+        )}
+      </div>
     </VStack>
   );
 };

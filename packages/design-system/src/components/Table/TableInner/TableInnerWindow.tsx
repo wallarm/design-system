@@ -1,7 +1,12 @@
 import { type FC, type ReactNode, useEffect, useRef } from 'react';
 import { useTestId } from '../../../utils/testId';
 import { ScrollArea, ScrollAreaScrollbar, ScrollAreaViewport } from '../../ScrollArea';
-import { useInfiniteScroll, useWheelHorizontalScroll } from '../hooks';
+import {
+  useInfiniteScroll,
+  useWheelHorizontalScroll,
+  useWindowScrollRoot,
+  WindowScrollRootContext,
+} from '../hooks';
 import { useContainerWidth } from '../lib';
 import { StickyGroupParent } from '../StickyGroupParent';
 import { TableBody } from '../TableBody';
@@ -42,9 +47,14 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
   const testId = useTestId('window');
   const rootRef = useRef<HTMLDivElement>(null);
   const containerWidth = useContainerWidth(rootRef);
+  const { scrollRoot, isSettled } = useWindowScrollRoot(
+    containerRef,
+    !isEmpty && table.getRowModel().rows.length > 0,
+  );
 
   useInfiniteScroll({
     mode: 'window',
+    scrollRoot: isSettled ? scrollRoot : null,
     table,
     virtualizerRef,
     tbodyRef,
@@ -114,7 +124,11 @@ export const TableInnerWindow: FC<TableInnerWindowProps> = ({
           {/* Body */}
           <table className={tableStyles} style={{ width: tableWidth }} aria-label={ariaLabel}>
             <TableColGroup tableWidth={tableWidth} />
-            {!isEmpty && <TableBody />}
+            {!isEmpty && (
+              <WindowScrollRootContext value={scrollRoot}>
+                <TableBody />
+              </WindowScrollRootContext>
+            )}
           </table>
           {children}
         </ScrollAreaViewport>

@@ -88,7 +88,7 @@ describe('usePrependScrollAnchor', () => {
     try {
       const { rerender } = renderHook(
         ({ rows, isLoadingPrevious }: { rows: { id: string }[]; isLoadingPrevious: boolean }) =>
-          usePrependScrollAnchor({ mode: 'window', rows, isLoadingPrevious }),
+          usePrependScrollAnchor({ mode: 'window', scrollRoot: window, rows, isLoadingPrevious }),
         { initialProps: { rows: [{ id: 'b' }, { id: 'c' }], isLoadingPrevious: true } },
       );
 

@@ -1,5 +1,5 @@
 import { type RefObject, useEffect, useRef } from 'react';
-import { SCROLL_EDGE_COOLDOWN_MS } from '../../lib';
+import { getScrollMetrics, SCROLL_EDGE_COOLDOWN_MS, type ScrollRoot } from '../../lib';
 
 type ScrollMode = 'container' | 'window';
 type ScrollEdge = 'start' | 'end';
@@ -13,6 +13,8 @@ interface UseScrollEdgeOptions {
   threshold: number;
   /** When false, suppresses firing (e.g. while the initial anchor scroll settles) */
   enabled?: boolean;
+  /** `window` mode: the resolved scroll root (see `useWindowScrollRoot`) */
+  scrollRoot?: ScrollRoot | null;
 }
 
 /**
@@ -27,6 +29,7 @@ export const useScrollEdge = ({
   onReached,
   threshold,
   enabled = true,
+  scrollRoot,
 }: UseScrollEdgeOptions) => {
   const firedRef = useRef(false);
   const lastFiredAtRef = useRef(0);
@@ -43,26 +46,17 @@ export const useScrollEdge = ({
   });
 
   useEffect(() => {
+    const target = mode === 'window' ? scrollRoot : scrollRef?.current;
+    if (!target) return;
+    // A new target starts armed: the edge state of the previous one (e.g. the
+    // window a pane host starts on, always "at the end") does not carry over.
+    firedRef.current = false;
+
     const check = () => {
       const callback = onReachedRef.current;
       if (!callback || !enabledRef.current) return;
 
-      let scrollTop: number;
-      let clientHeight: number;
-      let scrollHeight: number;
-
-      if (mode === 'window') {
-        scrollTop = window.scrollY;
-        clientHeight = window.innerHeight;
-        scrollHeight = document.documentElement.scrollHeight;
-      } else {
-        const el = scrollRef?.current;
-        if (!el) return;
-        scrollTop = el.scrollTop;
-        clientHeight = el.clientHeight;
-        scrollHeight = el.scrollHeight;
-      }
-
+      const { scrollTop, clientHeight, scrollHeight } = getScrollMetrics(target);
       const distance = edge === 'start' ? scrollTop : scrollHeight - scrollTop - clientHeight;
 
       if (distance <= threshold) {
@@ -77,9 +71,6 @@ export const useScrollEdge = ({
       }
     };
 
-    const target = mode === 'window' ? window : scrollRef?.current;
-    if (!target) return;
-
     // `enabled` is read via ref, so flipping it does not re-run this effect —
     // re-arming after the initial-anchor gate opens relies on the next scroll event.
     target.addEventListener('scroll', check, { passive: true });
@@ -88,5 +79,5 @@ export const useScrollEdge = ({
     return () => {
       target.removeEventListener('scroll', check);
     };
-  }, [edge, mode, scrollRef, threshold]);
+  }, [edge, mode, scrollRef, scrollRoot, threshold]);
 };

@@ -129,4 +129,23 @@ describe('useScrollEdge', () => {
     el.fire();
     expect(onReached).toHaveBeenCalledTimes(1);
   });
+  it('in window mode listens to the resolved scroll root, not the window', () => {
+    // A micro-frontend host scrolls its content pane; the window never moves.
+    const pane = makeEl({ scrollTop: 0 });
+    const onReached = vi.fn();
+    renderHook(() =>
+      useScrollEdge({
+        edge: 'end',
+        mode: 'window',
+        scrollRoot: pane as unknown as HTMLElement,
+        onReached,
+        threshold: 200,
+      }),
+    );
+    expect(onReached).not.toHaveBeenCalled();
+
+    pane.scrollTop = 850;
+    pane.fire();
+    expect(onReached).toHaveBeenCalledTimes(1);
+  });
 });

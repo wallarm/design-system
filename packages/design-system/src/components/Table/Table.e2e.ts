@@ -171,6 +171,125 @@ test.describe('Component: Table', () => {
         .toBeGreaterThan(0);
     });
 
+    test('Should follow a scrolling pane in window mode', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Pane');
+
+      const pane = page.getByTestId('scroll-pane');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+      const initialWindowSize = await readWindowSize(page);
+      expect(initialWindowSize).toBeGreaterThan(0);
+
+      // Scroll the pane step by step, as a wheel does: the document never
+      // moves, so rows under the pane viewport and the end edge are only
+      // reached if the table tracks the pane.
+      const paneHasRowInView = () =>
+        pane.evaluate(el => {
+          const { top, bottom } = el.getBoundingClientRect();
+          return [...el.querySelectorAll('[data-row-id]')].some(row => {
+            const rect = row.getBoundingClientRect();
+            return rect.bottom > top && rect.top < bottom;
+          });
+        });
+      for (let step = 0; step < 40; step++) {
+        await pane.evaluate(el => {
+          el.scrollTop += 300;
+        });
+        await expect.poll(paneHasRowInView).toBe(true);
+      }
+
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+      await expect
+        .poll(() => readWindowSize(page), { timeout: 3000 })
+        .toBeGreaterThan(initialWindowSize);
+    });
+
+    test('Should compensate a prepend in a pane before the user scrolls it', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Pane');
+
+      const pane = page.getByTestId('scroll-pane');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+
+      // The story opens at the top of its window, so `onStartReached` prepends
+      // a page right away. The rows the user sees must stay put: the pane moves
+      // down by the prepended block, the document does not.
+      await expect.poll(() => pane.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    });
+
+    test('Should land on the anchor row inside a pane in window mode', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Pane Anchored');
+
+      const pane = page.getByTestId('scroll-pane');
+      // Row id 251 is the story's anchor (index 250).
+      const anchorRow = pane.locator('[data-row-id="251"]');
+      await expect(anchorRow).toBeVisible();
+
+      await expect
+        .poll(() =>
+          anchorRow.evaluate(row => {
+            const paneRect = row.closest('[data-testid="scroll-pane"]')?.getBoundingClientRect();
+            const rect = row.getBoundingClientRect();
+            return !!paneRect && rect.top >= paneRect.top && rect.bottom <= paneRect.bottom;
+          }),
+        )
+        .toBe(true);
+      expect(await pane.evaluate(el => el.scrollTop)).toBeGreaterThan(0);
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    });
+
+    test('Should fire only the reached edge in a pane when rows arrive late', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Pane Late Rows');
+
+      const pane = page.getByTestId('scroll-pane');
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+
+      // Scroll the pane to its end as a wheel does. Settling against the window
+      // before the rows arrived would have fired both edges there at once.
+      for (let step = 0; step < 30; step++) {
+        await pane.evaluate(el => {
+          el.scrollTop += 300;
+        });
+      }
+      await expect(page.getByText(/Edge calls: start \d+, end [1-9]/)).toBeVisible();
+      await expect(page.getByText(/Edge calls: start 0,/)).toBeVisible();
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    });
+
+    test('Should land on the anchor row once a hidden pane is shown', async ({ page }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Hidden Pane Anchored');
+
+      await page.getByTestId('show-table').click();
+      const pane = page.getByTestId('scroll-pane');
+      // Row id 251 is the story's anchor (index 250).
+      const anchorRow = pane.locator('[data-row-id="251"]');
+      await expect(anchorRow).toBeVisible();
+      await expect
+        .poll(() =>
+          anchorRow.evaluate(row => {
+            const paneRect = row.closest('[data-testid="scroll-pane"]')?.getBoundingClientRect();
+            const rect = row.getBoundingClientRect();
+            return !!paneRect && rect.top >= paneRect.top && rect.bottom <= paneRect.bottom;
+          }),
+        )
+        .toBe(true);
+      expect(await page.evaluate(() => window.scrollY)).toBe(0);
+    });
+
+    test('Should keep the position of an already scrolled pane when the table mounts', async ({
+      page,
+    }) => {
+      await tableStory.goto(page, 'Infinite Scroll Window In Scrolled Pane');
+
+      const pane = page.getByTestId('scroll-pane');
+      await pane.evaluate(el => {
+        el.scrollTop = 300;
+      });
+      await page.getByTestId('show-table').click();
+      await expect(pane.locator('[data-row-id]').first()).toBeVisible();
+
+      expect(await pane.evaluate(el => el.scrollTop)).toBe(300);
+    });
+
     test('Should allow selecting text in a table body cell', async ({ page }) => {
       await tableStory.goto(page, 'Manual Sorting');
 

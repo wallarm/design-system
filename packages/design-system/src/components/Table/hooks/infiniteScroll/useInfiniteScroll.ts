@@ -2,6 +2,7 @@ import type { RefObject } from 'react';
 import type { RowData, Table } from '@tanstack/react-table';
 import {
   type DSTableFeatures,
+  type ScrollRoot,
   TABLE_END_REACHED_THRESHOLD,
   TABLE_START_REACHED_THRESHOLD,
 } from '../../lib';
@@ -14,6 +15,8 @@ interface UseInfiniteScrollOptions<T extends RowData> {
   mode: 'container' | 'window';
   /** Scroll element ref — required for `container` mode */
   scrollRef?: RefObject<HTMLElement | null>;
+  /** `window` mode: the resolved scroll root (see `useWindowScrollRoot`) */
+  scrollRoot?: ScrollRoot | null;
   table: Table<DSTableFeatures, T>;
   virtualizerRef: RefObject<TableVirtualizerInstance | null>;
   tbodyRef?: RefObject<HTMLTableSectionElement | null>;
@@ -30,6 +33,7 @@ interface UseInfiniteScrollOptions<T extends RowData> {
 export const useInfiniteScroll = <T extends RowData>({
   mode,
   scrollRef,
+  scrollRoot,
   table,
   virtualizerRef,
   tbodyRef,
@@ -42,14 +46,28 @@ export const useInfiniteScroll = <T extends RowData>({
 }: UseInfiniteScrollOptions<T>) => {
   const rows = table.getRowModel().rows;
 
-  const ready = useInitialAnchor({ initialScrollToRowId, rows, virtualizerRef });
+  const ready = useInitialAnchor({
+    initialScrollToRowId,
+    rows,
+    virtualizerRef,
+    enabled: mode !== 'window' || scrollRoot != null,
+  });
 
-  usePrependScrollAnchor({ mode, scrollRef, rows, virtualizerRef, tbodyRef, isLoadingPrevious });
+  usePrependScrollAnchor({
+    mode,
+    scrollRef,
+    scrollRoot,
+    rows,
+    virtualizerRef,
+    tbodyRef,
+    isLoadingPrevious,
+  });
 
   useScrollEdge({
     edge: 'start',
     mode,
     scrollRef,
+    scrollRoot,
     onReached: onStartReached,
     threshold: onStartReachedThreshold ?? TABLE_START_REACHED_THRESHOLD,
     enabled: ready,
@@ -59,6 +77,7 @@ export const useInfiniteScroll = <T extends RowData>({
     edge: 'end',
     mode,
     scrollRef,
+    scrollRoot,
     onReached: onEndReached,
     threshold: onEndReachedThreshold ?? TABLE_END_REACHED_THRESHOLD,
     enabled: ready,

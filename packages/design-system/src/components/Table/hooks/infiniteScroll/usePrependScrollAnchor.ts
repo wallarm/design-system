@@ -1,10 +1,12 @@
 import { type RefObject, useLayoutEffect, useRef } from 'react';
-import { detectDataChange } from '../../lib';
+import { detectDataChange, getScrollMetrics, type ScrollRoot, scrollRootBy } from '../../lib';
 import type { TableVirtualizerInstance } from '../../TableContext/types';
 
 interface UsePrependScrollAnchorOptions {
   mode: 'container' | 'window';
   scrollRef?: RefObject<HTMLElement | null>;
+  /** `window` mode: the resolved scroll root (see `useWindowScrollRoot`) */
+  scrollRoot?: ScrollRoot | null;
   rows: { id: string }[];
   /** Preferred delta source: virtual-list offsets are immune to unrelated layout growth. */
   virtualizerRef?: RefObject<TableVirtualizerInstance | null>;
@@ -35,6 +37,7 @@ interface UsePrependScrollAnchorOptions {
 export const usePrependScrollAnchor = ({
   mode,
   scrollRef,
+  scrollRoot,
   rows,
   virtualizerRef,
   tbodyRef,
@@ -51,10 +54,15 @@ export const usePrependScrollAnchor = ({
   // No dependency array on purpose: the loader baseline must track every
   // commit, not just rows changes.
   useLayoutEffect(() => {
-    const getScrollHeight = () =>
-      mode === 'window'
-        ? document.documentElement.scrollHeight
-        : (scrollRef?.current?.scrollHeight ?? 0);
+    const getRoot = () => (mode === 'window' ? scrollRoot : scrollRef?.current);
+    const getScrollHeight = () => {
+      const root = getRoot();
+      return root ? getScrollMetrics(root).scrollHeight : 0;
+    };
+    const scrollBy = (delta: number) => {
+      const root = getRoot();
+      if (root) scrollRootBy(root, delta);
+    };
 
     // Re-measure only when the row count changes (mount/unmount) so steady
     // renders don't pay geometry reads.
@@ -116,18 +124,12 @@ export const usePrependScrollAnchor = ({
         // the offset path adds it (the scrollHeight fallback nets it already).
         const loaderDelta = getStartLoaderHeight() - prevLoaderHeight;
         const delta = rowDelta + loaderDelta;
-        if (delta !== 0) {
-          if (mode === 'window') window.scrollBy(0, delta);
-          else if (scrollRef?.current) scrollRef.current.scrollTop += delta;
-        }
+        if (delta !== 0) scrollBy(delta);
       } else if (prevScrollHeightRef.current !== null) {
         const delta = getScrollHeight() - prevScrollHeightRef.current;
         // `> 0`: a non-positive net (page shorter than the skeletons) is left
         // uncorrected — a tiny static gap beats a jump the wrong way.
-        if (delta > 0) {
-          if (mode === 'window') window.scrollBy(0, delta);
-          else if (scrollRef?.current) scrollRef.current.scrollTop += delta;
-        }
+        if (delta > 0) scrollBy(delta);
       }
     }
 
