@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { parseExpression } from '../../FilterInput/lib/parseExpression';
 import type { FieldMetadata } from '../../FilterInput/types';
 import { formatAsFilter } from '../formatAsFilter';

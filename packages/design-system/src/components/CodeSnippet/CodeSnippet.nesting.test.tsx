@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Card } from '../Card';
 import { Popover } from '../Popover/Popover';
@@ -24,7 +24,7 @@ import { InlineCodeSnippet } from './InlineCodeSnippet';
  */
 describe('CodeSnippet toolbar inside a clickable Card', () => {
   it('toolbar button clicks resolve analytics without firing the Card onClick', async () => {
-    const cardClick = vi.fn();
+    const cardClick = rs.fn();
     const captured = captureAnalyticsClicks();
 
     render(
@@ -57,7 +57,7 @@ describe('CodeSnippet toolbar inside an open Popover', () => {
     // Controlled `open` keeps the content mounted; the `onOpenChange` spy
     // detects any dismissal Ark UI would attempt. The DS Popover only exposes
     // controlled `open`, so this is the faithful way to assert "stays open".
-    const onOpenChange = vi.fn();
+    const onOpenChange = rs.fn();
 
     render(
       <Popover open onOpenChange={onOpenChange}>
@@ -87,7 +87,7 @@ describe('CodeSnippet toolbar inside an open Popover', () => {
 
 describe('InlineCodeSnippet inside a clickable Card', () => {
   it('copy click resolves analytics without firing the Card onClick', async () => {
-    const cardClick = vi.fn();
+    const cardClick = rs.fn();
     const captured = captureAnalyticsClicks();
 
     render(

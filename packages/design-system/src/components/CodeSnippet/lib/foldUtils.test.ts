@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import {
   buildDisplayItems,
   type DisplayItem,
@@ -23,7 +23,7 @@ describe('validateFolds', () => {
   });
 
   it('filters out inverted ranges (startLine > endLine)', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => {});
     const folds: FoldRegion[] = [{ id: 'bad', startLine: 5, endLine: 2 }];
     const result = validateFolds(folds, 10);
 
@@ -40,7 +40,7 @@ describe('validateFolds', () => {
   });
 
   it('filters out out-of-bounds folds', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => {});
     const folds: FoldRegion[] = [
       { id: 'before', startLine: 0, endLine: 2 },
       { id: 'after', startLine: 8, endLine: 12 },
@@ -54,7 +54,7 @@ describe('validateFolds', () => {
   });
 
   it('filters out overlapping folds (keeps first)', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => {});
     const folds: FoldRegion[] = [
       { id: 'a', startLine: 1, endLine: 5 },
       { id: 'b', startLine: 3, endLine: 7 },
@@ -67,7 +67,7 @@ describe('validateFolds', () => {
   });
 
   it('filters out duplicate ids (keeps first)', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => {});
     const folds: FoldRegion[] = [
       { id: 'dup', startLine: 1, endLine: 3 },
       { id: 'dup', startLine: 5, endLine: 7 },
@@ -91,7 +91,7 @@ describe('validateFolds', () => {
   });
 
   it('rejects out-of-bounds folds with startingLineNumber offset', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => {});
     const folds: FoldRegion[] = [{ id: 'a', startLine: 101, endLine: 115 }];
     const result = validateFolds(folds, 10, 100);
     expect(result).toEqual([]);
@@ -109,7 +109,7 @@ describe('validateFolds', () => {
   });
 
   it('skips invalid folds without warning when warn is false', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     const folds: readonly FoldRegion[] = [
       { id: 'reversed', startLine: 3, endLine: 2 },
       { id: 'outside', startLine: 8, endLine: 20 },

@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import { createPortalRegistry } from './portalRegistry';
 
 const makeHost = () => document.createElement('span');
@@ -49,7 +49,7 @@ describe('createPortalRegistry', () => {
   it('ignores updates with the same node or an unknown id', () => {
     const registry = createPortalRegistry();
     const id = registry.register(makeHost(), 'same');
-    const listener = vi.fn();
+    const listener = rs.fn();
     registry.subscribe(listener);
     const before = registry.getSnapshot();
 
@@ -65,7 +65,7 @@ describe('createPortalRegistry', () => {
     const a = registry.register(makeHost(), 'A');
     const hostB = makeHost();
     const b = registry.register(hostB, 'B');
-    const listener = vi.fn();
+    const listener = rs.fn();
     registry.subscribe(listener);
 
     registry.unregister(a);
@@ -78,7 +78,7 @@ describe('createPortalRegistry', () => {
 
   it('notifies subscribers on every change and stops after unsubscribe', () => {
     const registry = createPortalRegistry();
-    const listener = vi.fn();
+    const listener = rs.fn();
     const unsubscribe = registry.subscribe(listener);
 
     const id = registry.register(makeHost(), 'A');

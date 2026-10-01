@@ -1,12 +1,12 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { useResetVirtualizerOnDataChange } from '../useResetVirtualizerOnDataChange';
 
 const makeTable = (ids: string[]) =>
   ({ getRowModel: () => ({ rows: ids.map(id => ({ id })) }) }) as never;
 
 const setup = (initialIds: string[]) => {
-  const measure = vi.fn();
+  const measure = rs.fn();
   const virtualizer = { measure } as never;
   const { rerender } = renderHook(
     ({ ids }: { ids: string[] }) => useResetVirtualizerOnDataChange(makeTable(ids), virtualizer),

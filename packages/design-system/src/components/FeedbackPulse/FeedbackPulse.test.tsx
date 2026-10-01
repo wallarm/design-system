@@ -1,7 +1,7 @@
 import { act } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { FeedbackPulse } from './FeedbackPulse';
 
 const noop = () => {};
@@ -78,7 +78,7 @@ describe('FeedbackPulse', () => {
 
   it('submits with score + comment and shows the confirmation', async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn();
+    const onSubmit = rs.fn();
     render(<FeedbackPulse open onOpenChange={() => {}} onSubmit={onSubmit} data-testid='fp' />);
 
     await user.click(screen.getByRole('radio', { name: '5' }));
@@ -92,7 +92,7 @@ describe('FeedbackPulse', () => {
 
   it('submits with an undefined comment when left blank', async () => {
     const user = userEvent.setup();
-    const onSubmit = vi.fn();
+    const onSubmit = rs.fn();
     render(<FeedbackPulse open onOpenChange={() => {}} onSubmit={onSubmit} data-testid='fp' />);
     await user.click(screen.getByRole('radio', { name: '2' }));
     await user.click(screen.getByRole('button', { name: 'Send' }));
@@ -101,21 +101,21 @@ describe('FeedbackPulse', () => {
 
   it('closes with reason "dismiss" from the Rating close button', async () => {
     const user = userEvent.setup();
-    const onOpenChange = vi.fn();
+    const onOpenChange = rs.fn();
     render(<FeedbackPulse open onOpenChange={onOpenChange} onSubmit={() => {}} data-testid='fp' />);
     await user.click(screen.getByRole('button', { name: 'Close' }));
     expect(onOpenChange).toHaveBeenCalledWith(false, 'dismiss');
   });
 
   it('closes with reason "dismiss" on Escape', () => {
-    const onOpenChange = vi.fn();
+    const onOpenChange = rs.fn();
     render(<FeedbackPulse open onOpenChange={onOpenChange} onSubmit={() => {}} data-testid='fp' />);
     fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
     expect(onOpenChange).toHaveBeenCalledWith(false, 'dismiss');
   });
 
   it('closes with reason "dismiss" on Escape even when focus is outside the card', () => {
-    const onOpenChange = vi.fn();
+    const onOpenChange = rs.fn();
     render(
       <>
         <button type='button'>Elsewhere</button>
@@ -129,7 +129,7 @@ describe('FeedbackPulse', () => {
 
   it('closes with reason "submit" from the Submitted close button', async () => {
     const user = userEvent.setup();
-    const onOpenChange = vi.fn();
+    const onOpenChange = rs.fn();
     render(<FeedbackPulse open onOpenChange={onOpenChange} onSubmit={() => {}} data-testid='fp' />);
     await user.click(screen.getByRole('radio', { name: '3' }));
     await user.click(screen.getByRole('button', { name: 'Send' }));
@@ -148,8 +148,8 @@ describe('FeedbackPulse', () => {
   });
 
   it('auto-dismisses the Submitted phase with reason "submit" after dismissDuration', () => {
-    vi.useFakeTimers();
-    const onOpenChange = vi.fn();
+    rs.useFakeTimers();
+    const onOpenChange = rs.fn();
     render(
       <FeedbackPulse
         open
@@ -162,8 +162,8 @@ describe('FeedbackPulse', () => {
     // Drive to Submitted with fireEvent (fake-timer friendly; avoids userEvent/timer clash).
     fireEvent.click(screen.getByRole('radio', { name: '3' }));
     fireEvent.click(screen.getByRole('button', { name: 'Send' }));
-    act(() => vi.advanceTimersByTime(4200));
+    act(() => rs.advanceTimersByTime(4200));
     expect(onOpenChange).toHaveBeenCalledWith(false, 'submit');
-    vi.useRealTimers();
+    rs.useRealTimers();
   });
 });

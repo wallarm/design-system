@@ -1,5 +1,5 @@
 import { createElement, Fragment } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { CodeSnippetContent } from '../CodeSnippetContent';
 import { CodeSnippetShowMoreButton } from '../CodeSnippetShowMoreButton';
 import { getHiddenLineCount, hasExplicitShowMoreButton, isClamped } from './showMore';

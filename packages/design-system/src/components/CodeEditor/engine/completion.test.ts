@@ -6,7 +6,7 @@ import {
 } from '@codemirror/autocomplete';
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import type {
   CodeEditorCompletionContext,
   CodeEditorCompletionSource,
@@ -61,7 +61,7 @@ const mount = (docWithCursor: string, config: MountConfig = {}): EditorView => {
 
 /** `acceptCompletion` is ignored during CodeMirror's 75 ms interaction delay, so retry it. */
 const accept = async (view: EditorView, line: number, expected: string): Promise<void> => {
-  await vi.waitFor(() => {
+  await rs.waitFor(() => {
     acceptCompletion(view);
     expect(view.state.doc.line(line).text).toBe(expected);
   });
@@ -69,7 +69,7 @@ const accept = async (view: EditorView, line: number, expected: string): Promise
 
 const openCompletions = async (view: EditorView, timeout = 1000): Promise<string[]> => {
   startCompletion(view);
-  await vi.waitFor(() => expect(completionStatus(view.state)).toBe('active'), { timeout });
+  await rs.waitFor(() => expect(completionStatus(view.state)).toBe('active'), { timeout });
   return currentCompletions(view.state).map(completion => completion.label);
 };
 
@@ -100,7 +100,7 @@ describe('completionExtension', () => {
     const view = mount('GET / HTTP/1.1\nConnecti|', { language: 'http' });
     await openCompletions(view);
     await accept(view, 2, 'Connection: ');
-    await vi.waitFor(() =>
+    await rs.waitFor(() =>
       expect(currentCompletions(view.state).map(item => item.label)).toEqual([
         'close',
         'keep-alive',
@@ -117,13 +117,13 @@ describe('completionExtension', () => {
   });
 
   it('does not add the HTTP source for other languages', async () => {
-    const source = vi.fn<CodeEditorCompletionSource>(() => [{ label: 'POLICY' }]);
+    const source = rs.fn<CodeEditorCompletionSource>(() => [{ label: 'POLICY' }]);
     const view = mount('PO|', { language: 'text', sources: [source] });
     expect(await openCompletions(view)).toEqual(['POLICY']);
   });
 
   it('passes the public context to consumer sources and shows their results', async () => {
-    const source = vi.fn<CodeEditorCompletionSource>(() => [
+    const source = rs.fn<CodeEditorCompletionSource>(() => [
       {
         label: 'X-Tenant-Id',
         apply: 'X-Tenant-Id: ',
@@ -182,7 +182,7 @@ describe('completionExtension', () => {
   it('puts DS menu classes on the list and its options', async () => {
     const view = mount('PO|', { language: 'http' });
     await openCompletions(view);
-    await vi.waitFor(() =>
+    await rs.waitFor(() =>
       expect(view.dom.querySelector('.cm-tooltip-autocomplete')).not.toBeNull(),
     );
     const tooltip = view.dom.querySelector('.cm-tooltip-autocomplete');
@@ -194,7 +194,7 @@ describe('completionExtension', () => {
   });
 
   it('keeps built-in results when a consumer source throws synchronously', async () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const spy = rs.spyOn(console, 'error').mockImplementation(() => undefined);
     const throwing: CodeEditorCompletionSource = () => {
       throw new Error('boom');
     };
@@ -204,7 +204,7 @@ describe('completionExtension', () => {
   });
 
   it('keeps built-in results when a consumer source rejects', async () => {
-    const spy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const spy = rs.spyOn(console, 'error').mockImplementation(() => undefined);
     const rejecting: CodeEditorCompletionSource = () => Promise.reject(new Error('nope'));
     const view = mount('PO|', { language: 'http', sources: [rejecting] });
     expect(await openCompletions(view)).toContain('POST');
@@ -217,6 +217,6 @@ describe('completionExtension', () => {
     const event = new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
     view.contentDOM.dispatchEvent(event);
     expect(event.defaultPrevented).toBe(true);
-    await vi.waitFor(() => expect(completionStatus(view.state)).toBeNull());
+    await rs.waitFor(() => expect(completionStatus(view.state)).toBeNull());
   });
 });

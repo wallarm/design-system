@@ -1,6 +1,6 @@
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { FileUpload } from './FileUpload';
 import {
@@ -20,7 +20,7 @@ import { FileUploadItemReplaceTrigger } from './FileUploadItemReplaceTrigger';
 import { FileUploadTrigger } from './FileUploadTrigger';
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  rs.restoreAllMocks();
 });
 
 describe('FileUpload — analytics & test ids (docs/metrics/contract.md)', () => {
@@ -98,8 +98,8 @@ describe('FileUpload — analytics & test ids (docs/metrics/contract.md)', () =>
   });
 
   it('composes consumer handlers on the Dropzone and respects preventDefault', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
-    const onClick = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
+    const onClick = rs.fn((e: { preventDefault: () => void }) => e.preventDefault());
     render(
       <FileUpload data-testid='fu'>
         <FileUploadDropzone onClick={onClick} />
@@ -113,8 +113,8 @@ describe('FileUpload — analytics & test ids (docs/metrics/contract.md)', () =>
   });
 
   it('composes a consumer handler that does not preventDefault, and the picker still opens (control)', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
-    const onClick = vi.fn();
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
+    const onClick = rs.fn();
     render(
       <FileUpload data-testid='fu'>
         <FileUploadDropzone onClick={onClick} />

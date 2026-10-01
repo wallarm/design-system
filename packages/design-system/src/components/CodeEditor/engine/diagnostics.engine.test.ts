@@ -1,5 +1,5 @@
 import { forceLinting } from '@codemirror/lint';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { mountEngine, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 
 const flush = async (view: Parameters<typeof forceLinting>[0]) => {
@@ -74,7 +74,7 @@ describe('createEditor — diagnostics compartment', () => {
     const { callbacks } = mountEngine({ language: 'python', value: 'def f(:\n  pass' });
 
     // No forceLinting: loading the parser reconfigures the language compartment, which re-lints.
-    await vi.waitFor(() => expect(callbacks.onDiagnosticsChange).toHaveBeenCalled(), {
+    await rs.waitFor(() => expect(callbacks.onDiagnosticsChange).toHaveBeenCalled(), {
       timeout: 3000,
     });
     const [reported] = callbacks.onDiagnosticsChange.mock.lastCall ?? [[]];

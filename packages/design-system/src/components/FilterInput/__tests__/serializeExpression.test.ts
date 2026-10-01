@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { serializeExpression } from '../lib/serializeExpression';
 import { createStatusCodeSerializer } from '../lib/statusCode';
 import type { Condition, ExprNode, FieldMetadata, Group } from '../types';

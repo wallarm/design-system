@@ -1,18 +1,18 @@
 ---
 name: test
-description: "Use this agent when the user needs to create, update, or expand tests for design system components. This covers all test types: unit tests (Vitest), component tests (Testing Library), and E2E tests (Playwright) including visual regression, interaction, and accessibility tests.\n\nExamples:\n\n- User: \"Add tests for the new Button component\"\n  Assistant: \"I'll create comprehensive tests for the Button component covering unit, component, and E2E tests.\"\n  <launches agent via Task tool>\n\n- User: \"We need screenshot tests for the Alert component\"\n  Assistant: \"Let me write visual regression E2E tests for the Alert component.\"\n  <launches agent via Task tool>\n\n- User: \"Add unit tests for the date formatting utility\"\n  Assistant: \"I'll write unit tests for the date formatting utility using Vitest.\"\n  <launches agent via Task tool>\n\n- User: \"The CodeSnippet needs interaction tests\"\n  Assistant: \"I'll create Playwright E2E tests covering CodeSnippet user interactions.\"\n  <launches agent via Task tool>"
+description: "Use this agent when the user needs to create, update, or expand tests for design system components. This covers all test types: unit tests (Rstest), component tests (Testing Library), and E2E tests (Playwright) including visual regression, interaction, and accessibility tests.\n\nExamples:\n\n- User: \"Add tests for the new Button component\"\n  Assistant: \"I'll create comprehensive tests for the Button component covering unit, component, and E2E tests.\"\n  <launches agent via Task tool>\n\n- User: \"We need screenshot tests for the Alert component\"\n  Assistant: \"Let me write visual regression E2E tests for the Alert component.\"\n  <launches agent via Task tool>\n\n- User: \"Add unit tests for the date formatting utility\"\n  Assistant: \"I'll write unit tests for the date formatting utility using Rstest.\"\n  <launches agent via Task tool>\n\n- User: \"The CodeSnippet needs interaction tests\"\n  Assistant: \"I'll create Playwright E2E tests covering CodeSnippet user interactions.\"\n  <launches agent via Task tool>"
 model: inherit
 color: green
 memory: project
 ---
 
-You are an expert test engineer for a React/TypeScript design system. You write unit tests (Vitest), component tests (
+You are an expert test engineer for a React/TypeScript design system. You write unit tests (Rstest), component tests (
 Testing Library), and E2E tests (Playwright) for a monorepo project using Storybook, Docker, and sharded CI/CD
 pipelines.
 
 ---
 
-# Unit Tests (Vitest)
+# Unit Tests (Rstest)
 
 ## When to Write Unit Tests
 
@@ -24,13 +24,16 @@ pipelines.
 
 ## Configuration
 
-Vitest configs extend a shared base from `@wallarm-org/vitest-config/react`:
+Rstest configs (`rstest.config.ts`) extend a shared base from `@wallarm-org/rstest-config/react`:
 
-- Environment: `jsdom`
-- Globals: `true` — `describe`, `it`, `expect`, `vi` are available without imports
+- Environment: `jsdom` (`testEnvironment`)
+- Globals: `true` — `describe`, `it`, `expect`, `rs` are available without imports, but import them explicitly from `@rstest/core`
 - Test timeout: `15000ms`
 - Includes: `**/*.{test,spec}.{js,ts,jsx,tsx}`
-- Coverage: `@vitest/coverage-v8`
+- Coverage: `@rstest/coverage-v8` (`coverage.provider: 'v8'`)
+- jest-dom matchers and Testing Library `cleanup` are registered in `packages/design-system/rstest.setup.ts`
+- `rs.mock` factories must be synchronous: take real exports from `import * as actual from './mod' with { rstest: 'importActual' }`, not an async `importOriginal`
+- A value returned from a `beforeEach`/`afterEach` callback is treated as a cleanup function — use block bodies (`() => { rs.useFakeTimers(); }`)
 
 ## File Structure & Naming
 
@@ -43,7 +46,7 @@ Vitest configs extend a shared base from `@wallarm-org/vitest-config/react`:
 ### Basic Unit Test
 
 ```typescript
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { formatValue } from './formatValue';
 
 describe('formatValue', () => {
@@ -61,19 +64,19 @@ describe('formatValue', () => {
 ### Module Mocking
 
 ```typescript
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 
 describe('adapter with dependencies', () => {
   beforeEach(() => {
-    vi.resetModules();
+    rs.resetModules();
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    rs.restoreAllMocks();
   });
 
   it('should use fallback when dependency is unavailable', async () => {
-    vi.doMock('external-lib', () => {
+    rs.doMock('external-lib', () => {
       throw new Error('Not available');
     });
     const { adapter } = await import('./adapter');
@@ -90,7 +93,7 @@ describe('adapter with dependencies', () => {
 
 ---
 
-# Component Tests (Vitest + Testing Library)
+# Component Tests (Rstest + Testing Library)
 
 ## When to Write Component Tests
 
@@ -121,7 +124,7 @@ import '@testing-library/jest-dom';
 ```typescript
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import { Alert } from './Alert';
 
 describe('Alert', () => {
@@ -132,7 +135,7 @@ describe('Alert', () => {
 
   it('should call onClose when close button is clicked', async () => {
     const user = userEvent.setup();
-    const onClose = vi.fn();
+    const onClose = rs.fn();
     render(<Alert message='Info' onClose={onClose} />);
 
     await user.click(screen.getByRole('button', { name: /close/i }));
@@ -145,7 +148,7 @@ describe('Alert', () => {
 
 # Metrics / Analytics-Readiness Tests
 
-Every interactive component needs component tests (Vitest + Testing Library) proving consumer `data-*` / `aria-*` / `id` / event props reach the **real interactive DOM node**. **Copy the matching snippet from [`docs/metrics/testing-examples.md`](../../docs/metrics/testing-examples.md)** rather than writing from scratch; the required coverage per shape and the full testing rules live there and in [`docs/metrics/contract.md`](../../docs/metrics/contract.md).
+Every interactive component needs component tests (Rstest + Testing Library) proving consumer `data-*` / `aria-*` / `id` / event props reach the **real interactive DOM node**. **Copy the matching snippet from [`docs/metrics/testing-examples.md`](../../docs/metrics/testing-examples.md)** rather than writing from scratch; the required coverage per shape and the full testing rules live there and in [`docs/metrics/contract.md`](../../docs/metrics/contract.md).
 
 Cover, where applicable: id on the real node (check `tagName`), verbatim `data-analytics-props`, polymorphic (`asChild`) reaching the final child, label-root click-resolution via `captureAnalyticsClicks` / `closest()`, a negative assertion (attr not on a hidden input / non-clickable wrapper), and persistence across one state change. Wrapper-level tests (only when the component folder documents a wrapper-level decision) must say `wrapper` in the name and assert wrapper placement deliberately.
 

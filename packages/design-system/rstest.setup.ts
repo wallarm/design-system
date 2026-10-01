@@ -1,6 +1,19 @@
-import '@testing-library/jest-dom/vitest';
+import { afterEach, expect } from '@rstest/core';
+import * as matchers from '@testing-library/jest-dom/matchers';
+import { cleanup } from '@testing-library/react';
 
-// Element is absent under `@vitest-environment node` (SSR tests).
+// jest-dom ships a Vitest-only entry (`@testing-library/jest-dom/vitest`), so
+// register its matchers on Rstest's `expect` directly. Their types come from
+// `src/testUtils/rstest-env.d.ts`.
+expect.extend(matchers);
+
+// Testing Library only auto-registers cleanup when it finds a global `afterEach`
+// at import time; unmount explicitly so the DOM never leaks between tests.
+afterEach(() => {
+  cleanup();
+});
+
+// Element is absent under `@rstest-environment node` (SSR tests).
 if (typeof Element !== 'undefined') {
   // Mock scrollIntoView which is not implemented in jsdom
   // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock

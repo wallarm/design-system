@@ -1,5 +1,5 @@
+import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 import { DateFormatProvider } from '../DateFormatProvider';
 import { FormatDateTime } from './FormatDateTime';
 

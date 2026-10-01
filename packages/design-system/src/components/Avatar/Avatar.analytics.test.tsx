@@ -1,18 +1,20 @@
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { FileUpload, FileUploadTrigger } from '../FileUpload';
 import { Avatar, AvatarFallback, AvatarImage } from '.';
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  rs.restoreAllMocks();
+});
 
 describe('Avatar — analytics (docs/metrics/contract.md)', () => {
   const PROPS = '{"surface":"profile"}';
 
   it('lands data-analytics-* and onClick on the real button through both Slot layers', async () => {
     const spy = captureAnalyticsClicks();
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     render(
       <FileUpload data-testid='fu'>
         <FileUploadTrigger asChild data-analytics-id='AVATAR_CHANGE' data-analytics-props={PROPS}>

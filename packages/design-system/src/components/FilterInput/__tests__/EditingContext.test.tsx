@@ -1,5 +1,5 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import {
   EditingProvider,
   useEditingContext,
@@ -66,7 +66,7 @@ describe('FilterInputChip with EditingContext', () => {
   });
 
   it('shows input when editing context targets this chip', () => {
-    const onChange = vi.fn();
+    const onChange = rs.fn();
     render(
       <EditingProvider
         editingChipId='chip-0'
@@ -85,7 +85,7 @@ describe('FilterInputChip with EditingContext', () => {
   });
 
   it('calls onSegmentFilterChange when input value changes', () => {
-    const onChange = vi.fn();
+    const onChange = rs.fn();
     render(
       <EditingProvider
         editingChipId='chip-0'

@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { Button } from '../Button';
 import { Drawer } from './Drawer';
 import { DrawerBody } from './DrawerBody';
@@ -79,7 +79,7 @@ describe('Attribute pass-through', () => {
 
 describe('Handler composition', () => {
   it('consumer onClick on DrawerTrigger fires alongside Ark open behavior', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
 
     render(
       <Drawer>
@@ -102,7 +102,7 @@ describe('Handler composition', () => {
   });
 
   it('consumer onMouseDown on DrawerResizeHandle composes with internal drag start', () => {
-    const onMouseDown = vi.fn();
+    const onMouseDown = rs.fn();
 
     render(
       <Drawer open minWidth={100}>
@@ -124,7 +124,7 @@ describe('Handler composition', () => {
   });
 
   it('consumer onClick on a DrawerClose asChild Button fires alongside Ark close behavior', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
 
     render(
       <Drawer>
@@ -159,7 +159,7 @@ describe('Handler composition', () => {
 
 describe('Dismissable callbacks', () => {
   it('fires onEscapeKeyDown when the user presses Escape', async () => {
-    const onEscapeKeyDown = vi.fn();
+    const onEscapeKeyDown = rs.fn();
 
     render(
       <Drawer open onEscapeKeyDown={onEscapeKeyDown}>
@@ -185,7 +185,7 @@ describe('Dismissable callbacks', () => {
   });
 
   it('fires onInteractOutside when the user clicks outside the drawer content', async () => {
-    const onInteractOutside = vi.fn();
+    const onInteractOutside = rs.fn();
 
     render(
       <Drawer open onInteractOutside={onInteractOutside}>
@@ -229,8 +229,8 @@ describe('DrawerResizeHandle', () => {
   });
 
   it('fires onResizeStart on mousedown and onResizeEnd with final width on mouseup', () => {
-    const onResizeStart = vi.fn();
-    const onResizeEnd = vi.fn<(width: number) => void>();
+    const onResizeStart = rs.fn();
+    const onResizeEnd = rs.fn<(width: number) => void>();
 
     render(
       <Drawer open minWidth={100} maxWidth={1000}>

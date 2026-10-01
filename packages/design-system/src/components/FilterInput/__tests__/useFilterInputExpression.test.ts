@@ -1,5 +1,5 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { useFilterInputExpression } from '../hooks/useFilterInputExpression';
 import type { Condition, ExprNode, FieldMetadata, Group } from '../types';
 
@@ -75,7 +75,7 @@ describe('useFilterInputExpression', () => {
 
   describe('upsertCondition', () => {
     it('adds a new condition and calls onChange', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, onChange, error: false }),
       );
@@ -98,7 +98,7 @@ describe('useFilterInputExpression', () => {
     });
 
     it('adds connector when inserting second condition', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, onChange, error: false }),
       );
@@ -130,7 +130,7 @@ describe('useFilterInputExpression', () => {
       const pairedFields = [ctxField];
 
       it('writes the paired triplet when side=1 targeting an existing chip', () => {
-        const onChange = vi.fn();
+        const onChange = rs.fn();
         const { result } = renderHook(() =>
           useFilterInputExpression({ fields: pairedFields, onChange, error: false }),
         );
@@ -154,7 +154,7 @@ describe('useFilterInputExpression', () => {
       });
 
       it('writes the paired triplet onto the last condition when building (no chipId)', () => {
-        const onChange = vi.fn();
+        const onChange = rs.fn();
         const { result } = renderHook(() =>
           useFilterInputExpression({ fields: pairedFields, onChange, error: false }),
         );
@@ -178,7 +178,7 @@ describe('useFilterInputExpression', () => {
       });
 
       it('preserves the pair when editing the base side of a paired chip (AS-1179)', () => {
-        const onChange = vi.fn();
+        const onChange = rs.fn();
         const { result } = renderHook(() =>
           useFilterInputExpression({ fields: pairedFields, onChange, error: false }),
         );
@@ -208,7 +208,7 @@ describe('useFilterInputExpression', () => {
       });
 
       it('drops the pair when the base field is changed to a different field', () => {
-        const onChange = vi.fn();
+        const onChange = rs.fn();
         const otherField: FieldMetadata = { name: 'method', label: 'Method', type: 'string' };
         const { result } = renderHook(() =>
           useFilterInputExpression({ fields: [ctxField, otherField], onChange, error: false }),
@@ -239,7 +239,7 @@ describe('useFilterInputExpression', () => {
     });
 
     it('edits an existing condition by chipId', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, onChange, error: false }),
       );
@@ -257,7 +257,7 @@ describe('useFilterInputExpression', () => {
     });
 
     it('inserts at specific index', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, onChange, error: false }),
       );
@@ -279,7 +279,7 @@ describe('useFilterInputExpression', () => {
     });
 
     it('onChange receives correct expression after rapid sequential upserts (no stale closure)', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, onChange, error: false }),
       );
@@ -305,7 +305,7 @@ describe('useFilterInputExpression', () => {
 
   describe('removeCondition', () => {
     it('removes a condition by chipId and calls onChange', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const group: Group = {
         type: 'group',
         operator: 'and',
@@ -330,7 +330,7 @@ describe('useFilterInputExpression', () => {
     });
 
     it('removes connector when removing middle condition', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, onChange, error: false }),
       );
@@ -359,7 +359,7 @@ describe('useFilterInputExpression', () => {
 
   describe('removeConditionAtIndex', () => {
     it('removes condition at given index', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const group: Group = {
         type: 'group',
         operator: 'and',
@@ -382,7 +382,7 @@ describe('useFilterInputExpression', () => {
     });
 
     it('does nothing for out-of-bounds index', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, onChange, error: false }),
       );
@@ -404,7 +404,7 @@ describe('useFilterInputExpression', () => {
 
   describe('clearAll', () => {
     it('clears all conditions and calls onChange with null', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, onChange, error: false }),
       );
@@ -430,7 +430,7 @@ describe('useFilterInputExpression', () => {
 
   describe('setConnectorValue', () => {
     it('changes connector from AND to OR', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const group: Group = {
         type: 'group',
         operator: 'and',
@@ -456,7 +456,7 @@ describe('useFilterInputExpression', () => {
     });
 
     it('onChange receives fresh connectors (no stale closure)', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, onChange, error: false }),
       );
@@ -630,7 +630,7 @@ describe('useFilterInputExpression', () => {
     });
 
     it('also fires onChange in controlled mode', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useFilterInputExpression({ fields, value: null, onChange, error: false }),
       );

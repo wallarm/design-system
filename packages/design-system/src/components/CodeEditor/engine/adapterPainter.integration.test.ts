@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import type { HighlightResult, SyntaxAdapter } from '../../CodeSnippet/adapters/types';
 import { createPortalRegistry } from '../lib/portalRegistry';
 import { getPaintedDecorations } from './adapterPainter';
@@ -6,7 +6,7 @@ import { createEditor } from './index';
 import type { EditorHandle, EngineCallbacks, EngineOptions } from './types';
 
 const lineAdapter = (name: string, type: 'keyword' | 'string') => {
-  const highlight = vi.fn<SyntaxAdapter<string>['highlight']>(
+  const highlight = rs.fn<SyntaxAdapter<string>['highlight']>(
     async (code): Promise<HighlightResult> => ({
       tokens: code.split('\n').map(line => [{ content: line, type }]),
     }),
@@ -41,9 +41,9 @@ const baseOptions = (adapter: SyntaxAdapter<string>): EngineOptions => ({
 });
 
 const makeCallbacks = (): EngineCallbacks => ({
-  onChange: vi.fn(),
-  onDiagnosticsChange: vi.fn(),
-  onVisibleRowCountChange: vi.fn(),
+  onChange: rs.fn(),
+  onDiagnosticsChange: rs.fn(),
+  onVisibleRowCountChange: rs.fn(),
   portals: createPortalRegistry(),
 });
 
@@ -51,13 +51,13 @@ describe('createEditor — adapter painter wiring', () => {
   let handle: EditorHandle | null = null;
 
   beforeEach(() => {
-    vi.useFakeTimers();
+    rs.useFakeTimers();
   });
 
   afterEach(() => {
     handle?.destroy();
     handle = null;
-    vi.useRealTimers();
+    rs.useRealTimers();
     document.body.innerHTML = '';
   });
 
@@ -71,7 +71,7 @@ describe('createEditor — adapter painter wiring', () => {
   it('paints adapter tokens on create', async () => {
     const { adapter, highlight } = lineAdapter('lines', 'keyword');
     const editor = mount(baseOptions(adapter));
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
 
     expect(highlight).toHaveBeenCalledWith('{"a": 1}', 'json');
     expect(getPaintedDecorations(editor.view).size).toBe(1);
@@ -81,11 +81,11 @@ describe('createEditor — adapter painter wiring', () => {
     const { adapter, highlight } = lineAdapter('lines', 'keyword');
     const options = baseOptions(adapter);
     const editor = mount(options);
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
     const painted = getPaintedDecorations(editor.view);
 
     editor.update({ ...options, readOnly: true, wrapLines: true });
-    await vi.advanceTimersByTimeAsync(200);
+    await rs.advanceTimersByTimeAsync(200);
 
     expect(highlight).toHaveBeenCalledTimes(1);
     expect(getPaintedDecorations(editor.view)).toBe(painted);
@@ -96,14 +96,14 @@ describe('createEditor — adapter painter wiring', () => {
     const second = lineAdapter('second', 'string');
     const options = baseOptions(first.adapter);
     const editor = mount(options);
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
 
     editor.update({ ...options, language: 'yaml' });
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
     expect(first.highlight).toHaveBeenLastCalledWith('{"a": 1}', 'yaml');
 
     editor.update({ ...options, language: 'yaml', adapter: second.adapter });
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
     expect(second.highlight).toHaveBeenCalledWith('{"a": 1}', 'yaml');
     expect(first.highlight).toHaveBeenCalledTimes(2);
   });

@@ -1,5 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useScrollEdge } from '../useScrollEdge';
 
 interface FakeEl {
@@ -30,15 +30,15 @@ const makeEl = (init: Partial<FakeEl> = {}): FakeEl => {
 
 describe('useScrollEdge', () => {
   beforeEach(() => {
-    vi.spyOn(Date, 'now').mockReturnValue(10_000);
+    rs.spyOn(Date, 'now').mockReturnValue(10_000);
   });
   afterEach(() => {
-    vi.restoreAllMocks();
+    rs.restoreAllMocks();
   });
 
   it('fires onReached for the end edge when near the bottom', () => {
     const el = makeEl({ scrollTop: 850 });
-    const onReached = vi.fn();
+    const onReached = rs.fn();
     renderHook(() =>
       useScrollEdge({
         edge: 'end',
@@ -53,7 +53,7 @@ describe('useScrollEdge', () => {
 
   it('fires onReached for the start edge when near the top', () => {
     const el = makeEl({ scrollTop: 50 });
-    const onReached = vi.fn();
+    const onReached = rs.fn();
     renderHook(() =>
       useScrollEdge({
         edge: 'start',
@@ -68,7 +68,7 @@ describe('useScrollEdge', () => {
 
   it('re-arms only after scrolling past the threshold', () => {
     const el = makeEl({ scrollTop: 0 });
-    const onReached = vi.fn();
+    const onReached = rs.fn();
     renderHook(() =>
       useScrollEdge({
         edge: 'start',
@@ -87,14 +87,14 @@ describe('useScrollEdge', () => {
     el.scrollTop = 500;
     el.fire();
     el.scrollTop = 0;
-    vi.spyOn(Date, 'now').mockReturnValue(10_500);
+    rs.spyOn(Date, 'now').mockReturnValue(10_500);
     el.fire();
     expect(onReached).toHaveBeenCalledTimes(2);
   });
 
   it('does not fire while disabled', () => {
     const el = makeEl({ scrollTop: 0 });
-    const onReached = vi.fn();
+    const onReached = rs.fn();
     renderHook(() =>
       useScrollEdge({
         edge: 'start',
@@ -111,7 +111,7 @@ describe('useScrollEdge', () => {
 
   it('respects the cooldown between fires', () => {
     const el = makeEl({ scrollTop: 0 });
-    const onReached = vi.fn();
+    const onReached = rs.fn();
     renderHook(() =>
       useScrollEdge({
         edge: 'start',
@@ -132,7 +132,7 @@ describe('useScrollEdge', () => {
   it('in window mode listens to the resolved scroll root, not the window', () => {
     // A micro-frontend host scrolls its content pane; the window never moves.
     const pane = makeEl({ scrollTop: 0 });
-    const onReached = vi.fn();
+    const onReached = rs.fn();
     renderHook(() =>
       useScrollEdge({
         edge: 'end',

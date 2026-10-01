@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditError } from './InlineEditError';
@@ -17,7 +17,7 @@ describe('InlineEditError', () => {
   });
 
   it('renders the auto-error message from a rejected commit when no children are given', async () => {
-    const onCommit = vi.fn(() => Promise.reject(new Error('An error message.')));
+    const onCommit = rs.fn(() => Promise.reject(new Error('An error message.')));
     render(
       <InlineEdit defaultValue='x' onValueCommit={onCommit} defaultEdit data-testid='attr'>
         <InlineEditControl>
@@ -33,7 +33,7 @@ describe('InlineEditError', () => {
   });
 
   it('prefers explicit children over the auto-error message', async () => {
-    const onCommit = vi.fn(() => Promise.reject(new Error('ctx')));
+    const onCommit = rs.fn(() => Promise.reject(new Error('ctx')));
     render(
       <InlineEdit defaultValue='x' onValueCommit={onCommit} defaultEdit data-testid='attr'>
         <InlineEditControl>

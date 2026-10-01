@@ -1,5 +1,5 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { Chart } from '../Chart';
 import { MetricDelta, MetricHeader, MetricValue } from '../Metric';
 import { HorizontalBarStack } from './HorizontalBarStack';
@@ -278,12 +278,12 @@ describe('HorizontalBarStackSkeleton', () => {
 
 describe('HorizontalBarStack — duplicate name warning', () => {
   it('warns once in dev when data contains duplicate names', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warnSpy = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     // Duplicate `name`s also produce duplicate React keys (by design — `name` is the key),
     // which React additionally flags via console.error; that's expected noise from this
     // exact scenario, not a bug, so it is silenced here to keep the assertion focused on
     // the component's own duplicate-name warning.
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const errorSpy = rs.spyOn(console, 'error').mockImplementation(() => undefined);
     render(
       <HorizontalBarStack
         data={[
@@ -299,7 +299,7 @@ describe('HorizontalBarStack — duplicate name warning', () => {
   });
 
   it('does not warn when names are unique', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warnSpy = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(
       <HorizontalBarStack
         data={[

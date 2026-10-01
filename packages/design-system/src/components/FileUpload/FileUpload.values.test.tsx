@@ -1,5 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FileUpload } from './FileUpload';
 import {
   byTestId,
@@ -20,11 +20,11 @@ beforeEach(() => {
 });
 afterEach(() => {
   uninstall();
-  vi.restoreAllMocks();
+  rs.restoreAllMocks();
 });
 
 /** `toHaveBeenCalledWith` compares Files structurally (equal name/size/type pass) — check identity. */
-const lastFiles = (spy: ReturnType<typeof vi.fn>) => spy.mock.lastCall?.[0] as File[] | undefined;
+const lastFiles = (spy: ReturnType<typeof rs.fn>) => spy.mock.lastCall?.[0] as File[] | undefined;
 
 const names = () => screen.getAllByTestId('fu--item-name').map(n => n.textContent);
 const replaceInput = (container: HTMLElement, index: number) =>
@@ -60,7 +60,7 @@ describe('FileUpload — initial files go with the form', () => {
 
 describe('FileUpload — re-picking an edited file with the same name, size and type', () => {
   it('single mode takes the edited file (newer lastModified) instead of ignoring it', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     const { container } = render(<Uploader onValueChange={onValueChange} />);
     const original = makeFile('rules.lua', 5, 'text/x-lua', 1_000);
     const edited = makeFile('rules.lua', 5, 'text/x-lua', 2_000);
@@ -73,7 +73,7 @@ describe('FileUpload — re-picking an edited file with the same name, size and 
   });
 
   it('single mode still ignores the very same file (same lastModified)', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     const { container } = render(<Uploader onValueChange={onValueChange} />);
     const file = makeFile('rules.lua', 5, 'text/x-lua', 1_000);
     pick(container, file);
@@ -85,7 +85,7 @@ describe('FileUpload — re-picking an edited file with the same name, size and 
   });
 
   it('multi-mode Replace with an edited copy of the same row takes it and reports it', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     const { container } = render(<Uploader maxFiles={3} onValueChange={onValueChange} />);
     const a = makeFile('a.wasm', 3, 'application/wasm', 1_000);
     const b = makeFile('b.wasm', 3, 'application/wasm', 1_000);
@@ -101,7 +101,7 @@ describe('FileUpload — re-picking an edited file with the same name, size and 
 
 describe('FileUpload — multi-mode Replace with a copy of another listed file', () => {
   it('keeps every original and reports "Already added"', async () => {
-    const onFileReject = vi.fn();
+    const onFileReject = rs.fn();
     const { container } = render(<Uploader maxFiles={3} onFileReject={onFileReject} />);
     const a = makeFile('a.wasm');
     const b = makeFile('b.wasm');

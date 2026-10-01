@@ -1,7 +1,7 @@
 import { Steps as ArkSteps } from '@ark-ui/react/steps';
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { StepperFixture, type StepperFixtureProps } from '../../testUtils/StepperFixture';
 import { Stepper, StepperContent, StepperItem, StepperList, StepperTitle, StepperTrigger } from '.';
 import { ARK_CONTENT_ARIA_RESET, ARK_TAB_ARIA_RESET } from './constants';
@@ -206,7 +206,7 @@ describe('Stepper — content accessibility', () => {
   });
 
   it('warns when StepperTrigger gets its own id, which would leave the body unnamed', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(
       <Stepper count={1} data-testid='ps'>
         <StepperList>

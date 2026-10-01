@@ -1,10 +1,10 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { CodeEditorContent, CodeEditorRoot } from './index';
 
 describe('CodeEditor — diff mode (original)', () => {
   it('shows deleted rows and +/- prefixes against `original`, and drops them without it', async () => {
-    const onChange = vi.fn();
+    const onChange = rs.fn();
     const { rerender } = render(
       <CodeEditorRoot data-testid='ed' value={'a\nb\nc'} onChange={onChange} original={'a\nold\nc'}>
         <CodeEditorContent aria-label='Diff' lineNumbers />

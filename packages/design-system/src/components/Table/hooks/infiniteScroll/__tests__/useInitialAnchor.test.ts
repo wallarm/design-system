@@ -1,5 +1,5 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { renderHook, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { useInitialAnchor } from '../useInitialAnchor';
 
 const rows = (...ids: string[]) => ids.map(id => ({ id }));
@@ -12,7 +12,7 @@ describe('useInitialAnchor', () => {
   });
 
   it('scrolls to the anchor index and becomes ready after the frame', async () => {
-    const scrollToIndex = vi.fn();
+    const scrollToIndex = rs.fn();
     const virtualizerRef = { current: { scrollToIndex } as never };
     const { result } = renderHook(() =>
       useInitialAnchor({ initialScrollToRowId: 'b', rows: rows('a', 'b', 'c'), virtualizerRef }),
@@ -31,7 +31,7 @@ describe('useInitialAnchor', () => {
   });
 
   it('holds the scroll while disabled and scrolls once enabled', async () => {
-    const scrollToIndex = vi.fn();
+    const scrollToIndex = rs.fn();
     const virtualizerRef = { current: { scrollToIndex } as never };
     const { result, rerender } = renderHook(
       ({ enabled }: { enabled: boolean }) =>

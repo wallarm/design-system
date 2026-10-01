@@ -1,6 +1,6 @@
 import { Compartment, EditorState, type Extension } from '@codemirror/state';
 import { Decoration, EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from '@rstest/core';
 import type { LineConfig } from '../../CodeSnippet/CodeSnippetContext';
 import { getLineDecorations, linesExtension } from './lines';
 

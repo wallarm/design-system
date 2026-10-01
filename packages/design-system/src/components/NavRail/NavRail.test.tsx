@@ -1,7 +1,7 @@
 import type { FC } from 'react';
+import { describe, expect, it } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
 import type { SvgIconProps } from '../../icons';
 import { Activity } from '../../icons';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';

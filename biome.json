@@ -21,7 +21,8 @@
       "!**/*.gen.ts",
       "!**/CodeEditor/engine/languages/http/parser.ts",
       "!**/CodeEditor/engine/languages/http/parser.terms.ts",
-      "!**/playwright-report"
+      "!**/playwright-report",
+      "!**/coverage"
     ]
   }
 }

@@ -1,5 +1,5 @@
+import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 import { Field, FieldError, FieldLabel } from '../Field';
 import { FileUpload } from './FileUpload';
 import { byTestId, makeFile, pick, queryByTestId } from './FileUpload.test.helpers';

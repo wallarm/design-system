@@ -1,8 +1,8 @@
 import { createRef, type FC, type ReactNode, useState } from 'react';
 import { useStepsContext } from '@ark-ui/react/steps';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, renderHook, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { POLICY, StepperFixture, type StepperFixtureProps } from '../../testUtils/StepperFixture';
 import { Button } from '../Button';
 import {
@@ -25,7 +25,9 @@ import {
   useStepperItemContext,
 } from '.';
 
-afterEach(() => vi.restoreAllMocks());
+afterEach(() => {
+  rs.restoreAllMocks();
+});
 
 const FigmaExample: FC<StepperFixtureProps> = props => <StepperFixture {...props} />;
 
@@ -43,7 +45,7 @@ describe('Stepper', () => {
   });
 
   it('calls onStepChange forward and back', async () => {
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     render(<FigmaExample defaultStep={1} onStepChange={onStepChange} />);
     await userEvent.click(trigger(3));
     expect(onStepChange).toHaveBeenLastCalledWith({ step: 3 });
@@ -62,7 +64,7 @@ describe('Stepper', () => {
   });
 
   it('does not move when controlled until the parent updates step', async () => {
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     const { rerender } = render(<FigmaExample step={0} onStepChange={onStepChange} />);
     await userEvent.click(trigger(2));
     expect(onStepChange).toHaveBeenCalledWith({ step: 2 });
@@ -212,7 +214,7 @@ describe('Stepper', () => {
   });
 
   it('renders type="button" and never submits a surrounding form', async () => {
-    const onSubmit = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    const onSubmit = rs.fn((e: { preventDefault: () => void }) => e.preventDefault());
     render(
       <form onSubmit={onSubmit}>
         <FigmaExample withNav />
@@ -229,9 +231,9 @@ describe('Stepper', () => {
   });
 
   it('runs a consumer onClick, and preventDefault in it cancels navigation', async () => {
-    const onClick = vi.fn();
-    const onBlocked = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
-    const onStepChange = vi.fn();
+    const onClick = rs.fn();
+    const onBlocked = rs.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    const onStepChange = rs.fn();
     render(
       <FigmaExample
         onStepChange={onStepChange}
@@ -256,7 +258,7 @@ describe('Stepper', () => {
     ['step', { step: -1 }, 0],
     ['defaultStep', { defaultStep: 99 }, 3],
   ] as const)('clamps an out-of-range %s and warns', (_, props, expected) => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(<FigmaExample {...props} />);
     expect(trigger(expected)).toHaveAttribute('aria-current', 'step');
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('out of range'));
@@ -270,7 +272,7 @@ describe('Stepper', () => {
     await userEvent.click(trigger(3));
     expect(trigger(3)).toHaveAttribute('aria-current', 'step');
 
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     rerender(<Items count={2} />);
     expect(currentSteps()).toHaveLength(1);
     expect(trigger(1)).toHaveAttribute('aria-current', 'step');
@@ -284,20 +286,20 @@ describe('Stepper', () => {
   });
 
   it('does not fire onStepChange for a click on the current step', async () => {
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     render(<FigmaExample defaultStep={1} onStepChange={onStepChange} />);
     await userEvent.click(trigger(1));
     expect(onStepChange).not.toHaveBeenCalled();
   });
 
   it('does not warn for an in-range step', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(<FigmaExample step={3} />);
     expect(warn).not.toHaveBeenCalled();
   });
 
   it('warns for more than six steps', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(<FigmaExample steps={['A', 'B', 'C', 'D', 'E', 'F', 'G'].map(title => ({ title }))} />);
     expect(screen.getAllByRole('button')).toHaveLength(7);
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('7 steps'));
@@ -463,7 +465,7 @@ describe('Stepper — content', () => {
 
 describe('Stepper — Prev / Next triggers', () => {
   it('moves back and forward and fires onStepChange', async () => {
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     render(<FigmaExample withNav withContent onStepChange={onStepChange} />);
     await userEvent.click(next());
     expect(onStepChange).toHaveBeenLastCalledWith({ step: 1 });
@@ -486,7 +488,7 @@ describe('Stepper — Prev / Next triggers', () => {
   });
 
   it('never moves the step to count (Ark "completed"): there is always a current step', async () => {
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     render(<FigmaExample withNav withContent onStepChange={onStepChange} />);
     for (let i = 0; i < 6; i++) await userEvent.click(next());
     expect(onStepChange.mock.calls.map(([d]) => d.step)).toEqual([1, 2, 3]);
@@ -496,7 +498,7 @@ describe('Stepper — Prev / Next triggers', () => {
   });
 
   it('blocks a last-step Next even when an asChild child ignores disabled', async () => {
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     render(
       <Stepper data-testid='ps' count={2} defaultStep={1} onStepChange={onStepChange}>
         <StepperList>
@@ -551,7 +553,7 @@ describe('Stepper — Prev / Next triggers', () => {
   ] as const)(
     'keeps %s disabled when an asChild child sets disabled={false}',
     async (_, defaultStep, which) => {
-      const onStepChange = vi.fn();
+      const onStepChange = rs.fn();
       render(
         <Stepper data-testid='ps' count={2} defaultStep={defaultStep} onStepChange={onStepChange}>
           {which === 'next' ? (
@@ -593,9 +595,9 @@ describe('Stepper — Prev / Next triggers', () => {
   ] as const)(
     'runs a consumer onClick on %s, plain and on an asChild Button',
     async (_, defaultStep, Trigger, testId, expected) => {
-      const onClick = vi.fn();
-      const childClick = vi.fn();
-      const onStepChange = vi.fn();
+      const onClick = rs.fn();
+      const childClick = rs.fn();
+      const onStepChange = rs.fn();
       const { unmount } = render(
         <Stepper data-testid='ps' count={3} defaultStep={defaultStep} onStepChange={onStepChange}>
           <Trigger onClick={onClick}>Go</Trigger>
@@ -627,8 +629,8 @@ describe('Stepper — Prev / Next triggers', () => {
   ] as const)(
     'lets preventDefault in a consumer onClick on %s cancel navigation',
     async (_, defaultStep, Trigger, testId) => {
-      const onStepChange = vi.fn();
-      const childClick = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+      const onStepChange = rs.fn();
+      const childClick = rs.fn((e: { preventDefault: () => void }) => e.preventDefault());
       render(
         <Stepper data-testid='ps' count={3} defaultStep={defaultStep} onStepChange={onStepChange}>
           <Trigger asChild>
@@ -648,7 +650,7 @@ describe('Stepper — Prev / Next triggers', () => {
     );
     const { rerender } = render(<Items count={4} />);
     await userEvent.click(trigger(3));
-    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     rerender(<Items count={2} />);
     expect(trigger(1)).toHaveAttribute('aria-current', 'step');
     expect(prev()).toBeEnabled();
@@ -658,7 +660,7 @@ describe('Stepper — Prev / Next triggers', () => {
   });
 
   it('never submits the form when Next swaps for the submit button on the last step', async () => {
-    const onSubmit = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    const onSubmit = rs.fn((e: { preventDefault: () => void }) => e.preventDefault());
     const Recipe = () => {
       const [step, setStep] = useState(0);
       return (
@@ -728,7 +730,7 @@ describe('Stepper — hooks', () => {
   });
 
   it('useStepperItemContext throws outside a StepperItem', () => {
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    rs.spyOn(console, 'error').mockImplementation(() => undefined);
     const Probe = () => {
       useStepperItemContext();
       return null;
@@ -750,7 +752,7 @@ describe('Stepper — hooks', () => {
       ark = useStepsContext();
       return null;
     };
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     render(<FigmaExampleWithProbe probe={<Probe />} defaultStep={3} onStepChange={onStepChange} />);
     expect(api?.value).toBe(3);
     expect(api?.hasNextStep).toBe(false);
@@ -773,7 +775,7 @@ describe('Stepper — hooks', () => {
       ark = useStepsContext();
       return null;
     };
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     render(<FigmaExampleWithProbe probe={<Probe />} defaultStep={3} onStepChange={onStepChange} />);
     await act(async () => ark?.goToNextStep());
     expect(ark?.value).toBe(4);
@@ -784,7 +786,7 @@ describe('Stepper — hooks', () => {
   });
 
   it('useStepper + StepperRootProvider drive the same parts with the same guards', async () => {
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     const External = () => {
       const stepper = useStepper({ count: 3, defaultStep: 7, onStepChange });
       return (
@@ -811,7 +813,7 @@ describe('Stepper — hooks', () => {
         </>
       );
     };
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(<External />);
     expect(warn).toHaveBeenCalledWith(expect.stringContaining('out of range'));
     expect(screen.getByTestId('ps')).toHaveAttribute('data-slot', 'stepper');
@@ -827,7 +829,7 @@ describe('Stepper — hooks', () => {
   });
 
   it('useStepper().setStep clamps, so the machine never reaches Ark "completed"', async () => {
-    const onStepChange = vi.fn();
+    const onStepChange = rs.fn();
     const { result } = renderHook(() => useStepper({ count: 3, onStepChange }));
     await act(async () => result.current.setStep(3));
     expect(result.current.value).toBe(2);
@@ -870,14 +872,14 @@ describe('Stepper — hooks', () => {
       },
     ],
   ] as const)('throws a [Stepper] error for %s outside a Stepper', (part, Part) => {
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    rs.spyOn(console, 'error').mockImplementation(() => undefined);
     expect(() => render(<Part />)).toThrow(
       `[Stepper] ${part} must be used inside a Stepper or StepperRootProvider.`,
     );
   });
 
   it('warns for a StepperItem outside a StepperList', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     render(
       <Stepper count={1}>
         <StepperItem index={0}>

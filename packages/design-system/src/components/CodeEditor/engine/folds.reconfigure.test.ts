@@ -1,6 +1,6 @@
 import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from '@rstest/core';
 import type { FoldRegion } from '../../CodeSnippet/lib/foldUtils';
 import { createPortalRegistry } from '../lib/portalRegistry';
 import type { CodeEditorFolds } from '../types';

@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import type { FileUpload } from './FileUpload';
 import { byTestId, makeFile, pick, queryByTestId, Uploader } from './FileUpload.test.helpers';
 import { FileUploadDropzone } from './FileUploadDropzone';
@@ -18,7 +18,7 @@ describe('FileUpload — rejections', () => {
   });
 
   it('names the file and the type rule, marks the Area invalid, and describes it', async () => {
-    const onFileReject = vi.fn();
+    const onFileReject = rs.fn();
     const { container } = render(<Rejecting onFileReject={onFileReject} />);
     pick(container, makeFile('policy.txt', 3, 'text/plain'));
     const error = await screen.findByTestId('fu--rejections');
@@ -53,7 +53,7 @@ describe('FileUpload — rejections', () => {
   });
 
   it('ignores re-picking the identical file in single mode', async () => {
-    const onFileReject = vi.fn();
+    const onFileReject = rs.fn();
     const { container } = render(<Rejecting onFileReject={onFileReject} />);
     const file = makeFile('same.so');
     pick(container, file);

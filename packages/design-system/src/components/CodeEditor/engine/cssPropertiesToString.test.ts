@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { cssPropertiesToString } from './lines';
 
 /** Consumer styles may carry custom properties and loose values that `CSSProperties` does not model. */

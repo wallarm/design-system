@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Field, FieldLabel } from '../Field';
 import { FileUpload } from './FileUpload';
 import {
@@ -20,7 +20,7 @@ import { FileUploadItemGroup } from './FileUploadItemGroup';
 import { FileUploadTrigger } from './FileUploadTrigger';
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  rs.restoreAllMocks();
 });
 
 describe('FileUpload — pickers', () => {
@@ -65,7 +65,7 @@ describe('FileUpload — pickers', () => {
   });
 
   it('opens the native picker on click and on Enter', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
     render(
       <FileUpload data-testid='fu'>
         <FileUploadDropzone />
@@ -79,7 +79,7 @@ describe('FileUpload — pickers', () => {
   });
 
   it('renders the Button trigger with default content and opens the picker', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
     render(
       <FileUpload data-testid='fu'>
         <FileUploadTrigger />
@@ -125,7 +125,7 @@ describe('FileUpload — pickers', () => {
   });
 
   it('is inert when disabled and hidden when read-only (also via Field)', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
     const { unmount } = render(
       <Field disabled>
         <FileUpload data-testid='fu'>
@@ -198,7 +198,7 @@ describe('FileUpload — drag and drop', () => {
   };
 
   it('marks the Area while dragging over it and lists the dropped file', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     render(<DnD onValueChange={onValueChange} />);
     const dz = byTestId('fu--dropzone');
     expect(dragOver(dz, makeFile('dropped.wasm'))).toBe(false);
@@ -212,7 +212,7 @@ describe('FileUpload — drag and drop', () => {
   });
 
   it('while a row is uploading, a drop on the Area is swallowed: the browser does not open it and no file is added', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     render(<DnD maxFiles={3} loading onValueChange={onValueChange} />);
     const dz = byTestId('fu--dropzone');
     expect(dragOver(dz, makeFile('late.wasm'))).toBe(false);
@@ -235,7 +235,7 @@ describe('FileUpload — drag and drop', () => {
   });
 
   it('when disabled, a drop on the Area is swallowed and adds nothing', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     render(<DnD disabled onValueChange={onValueChange} />);
     const dz = byTestId('fu--dropzone');
     expect(dragOver(dz, makeFile('x.wasm'))).toBe(false);
@@ -245,7 +245,7 @@ describe('FileUpload — drag and drop', () => {
   });
 
   it('with allowDrop={false}, the Area accepts no drop and the browser does not open the file', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     render(<DnD allowDrop={false} onValueChange={onValueChange} />);
     const dz = byTestId('fu--dropzone');
     expect(dragOver(dz, makeFile('x.wasm'))).toBe(false);
@@ -256,7 +256,7 @@ describe('FileUpload — drag and drop', () => {
   });
 
   it('in multiple mode at maxFiles, drop is off: no TOO_MANY_FILES rejection', async () => {
-    const onFileReject = vi.fn();
+    const onFileReject = rs.fn();
     const { container } = render(<DnD maxFiles={1 + 1} onFileReject={onFileReject} />);
     pick(container, makeFile('a.wasm'), makeFile('b.wasm'));
     await waitFor(() => expect(byTestId('fu--dropzone')).toHaveAttribute('data-disabled'));
@@ -272,8 +272,8 @@ describe('FileUpload — drag and drop', () => {
 
 describe('FileUploadTrigger asChild', () => {
   it('makes the child the trigger: no Button, attributes merged, picker opens', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
-    const onClick = vi.fn();
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
+    const onClick = rs.fn();
     render(
       <FileUpload data-testid='fu'>
         <FileUploadTrigger asChild data-analytics-id='AVATAR_PICK' variant='secondary' size='small'>
@@ -294,7 +294,7 @@ describe('FileUploadTrigger asChild', () => {
   });
 
   it('is blocked while a row is loading and when disabled', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
     const { unmount } = render(
       <FileUpload data-testid='fu' maxFiles={3}>
         <FileUploadTrigger asChild>

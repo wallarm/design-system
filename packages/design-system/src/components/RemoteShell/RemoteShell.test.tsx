@@ -1,3 +1,4 @@
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import {
   createMemoryHistory,
   createRootRoute,
@@ -7,7 +8,6 @@ import {
   useRouterState,
 } from '@tanstack/react-router';
 import { act, fireEvent, render, screen, within } from '@testing-library/react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { NavConfig } from './model';
 import { useRemoteShellContext } from './model';
 import { RemoteShell } from './RemoteShell';
@@ -206,7 +206,7 @@ describe('RemoteShell', () => {
     });
 
     it('warns in development when pathname is controlled without onNavigate', () => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
 
       try {
         const { rerender } = render(
@@ -230,7 +230,7 @@ describe('RemoteShell', () => {
     });
 
     it('does not warn when uncontrolled or when onNavigate is given', () => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
 
       try {
         render(

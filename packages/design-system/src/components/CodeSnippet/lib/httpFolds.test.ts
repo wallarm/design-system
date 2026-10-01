@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { getHttpFolds, HTTP_FOLD_ID } from './httpFolds';
 
 const httpRequest = `GET /api/v2/users HTTP/1.1

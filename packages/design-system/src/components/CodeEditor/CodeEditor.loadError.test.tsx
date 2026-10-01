@@ -1,14 +1,14 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { CodeEditorContent, CodeEditorRoot } from './index';
 
-vi.mock('./lib/loadEngine', () => ({
+rs.mock('./lib/loadEngine', () => ({
   loadEngine: () => Promise.reject(new Error('chunk failed')),
 }));
 
 describe('CodeEditor engine load failure', () => {
   it('keeps the fallback text and logs the error', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const consoleError = rs.spyOn(console, 'error').mockImplementation(() => undefined);
     render(
       <CodeEditorRoot data-testid='ed' defaultValue={'a\nb'}>
         <CodeEditorContent aria-label='Code' />
