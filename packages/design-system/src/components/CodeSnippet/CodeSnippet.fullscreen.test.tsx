@@ -61,6 +61,40 @@ describe('CodeSnippet fullscreen', () => {
     expect(screen.getByTestId('counter')).toHaveTextContent('1');
   });
 
+  it('replaces consumer sizing classes in fullscreen so the frame fills the viewport', async () => {
+    const user = userEvent.setup();
+    render(
+      <CodeSnippetRoot
+        code='const a = 1;'
+        data-testid='snippet'
+        className='consumer-class h-[240px] max-w-[600px] w-320 mx-auto'
+      >
+        <CodeSnippetActions>
+          <CodeSnippetFullscreenButton />
+        </CodeSnippetActions>
+        <CodeSnippetContent>
+          <CodeSnippetCode />
+        </CodeSnippetContent>
+      </CodeSnippetRoot>,
+    );
+    const root = screen.getByTestId('snippet');
+    expect(root).toHaveClass('h-[240px]', 'max-w-[600px]', 'w-320', 'mx-auto');
+
+    await enterFullscreen(user);
+
+    expect(root).toHaveClass('consumer-class', 'fixed', 'inset-16', 'z-50', 'h-auto', 'w-auto');
+    expect(root).toHaveClass('max-w-[none]', 'max-h-[none]', 'min-w-0', 'min-h-0', 'm-0');
+    expect(root).not.toHaveClass('h-[240px]');
+    expect(root).not.toHaveClass('max-w-[600px]');
+    expect(root).not.toHaveClass('max-w-none');
+    expect(root).not.toHaveClass('max-h-none');
+    expect(root).not.toHaveClass('w-320');
+    expect(root).not.toHaveClass('mx-auto');
+
+    await user.click(screen.getByTestId('snippet--fullscreen-button'));
+    expect(root).toHaveClass('h-[240px]', 'max-w-[600px]', 'w-320', 'mx-auto');
+  });
+
   it('keeps consumer id, data-* attributes, className and ref in fullscreen', async () => {
     const user = userEvent.setup();
     const ref = createRef<HTMLDivElement>();

@@ -1,8 +1,8 @@
 import type { FC } from 'react';
 import type { Token, TokenType } from '../adapters/types';
 
-// Token type to Tailwind class mapping
-const TOKEN_CLASSES: Record<TokenType, string> = {
+// Token type to Tailwind class mapping (also used by CodeEditor's adapter painter)
+export const TOKEN_CLASSES: Record<TokenType, string> = {
   plain: 'text-syntax-no-syntax',
   keyword: 'text-syntax-keyword',
   string: 'text-syntax-string',

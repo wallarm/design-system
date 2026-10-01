@@ -2,6 +2,7 @@ import { describe, expect, it, vi } from 'vitest';
 import {
   buildDisplayItems,
   type DisplayItem,
+  type FoldButtonProps,
   type FoldRegion,
   getFoldSummaryLabel,
   validateFolds,
@@ -105,6 +106,21 @@ describe('validateFolds', () => {
     const result = validateFolds(folds, 10);
 
     expect(result).toHaveLength(2);
+  });
+
+  it('skips invalid folds without warning when warn is false', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const folds: readonly FoldRegion[] = [
+      { id: 'reversed', startLine: 3, endLine: 2 },
+      { id: 'outside', startLine: 8, endLine: 20 },
+      { id: 'ok', startLine: 1, endLine: 2 },
+    ];
+
+    const result = validateFolds(folds, 10, 1, { warn: false });
+
+    expect(result.map(fold => fold.id)).toEqual(['ok']);
+    expect(warn).not.toHaveBeenCalled();
+    warn.mockRestore();
   });
 });
 
@@ -217,5 +233,17 @@ describe('getFoldSummaryLabel', () => {
   it('returns "1 lines" for single line fold', () => {
     const fold: FoldRegion = { id: 'a', startLine: 3, endLine: 3 };
     expect(getFoldSummaryLabel(fold, 1)).toBe('1 lines');
+  });
+});
+
+describe('FoldButtonProps', () => {
+  it('accepts number and boolean data-* values, as React does', () => {
+    const props = {
+      'data-analytics-id': 'fold',
+      'data-index': 1,
+      'data-open': true,
+      'data-empty': undefined,
+    } satisfies FoldButtonProps;
+    expect(props['data-index']).toBe(1);
   });
 });

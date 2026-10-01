@@ -1,6 +1,9 @@
 import type { ButtonHTMLAttributes } from 'react';
 
-export type FoldButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>;
+export type FoldButtonProps = Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'> & {
+  /** Hyphenated `data-*` attributes (e.g. `data-analytics-id`) are not part of the DOM typings. */
+  [dataAttribute: `data-${string}`]: string | number | boolean | undefined;
+};
 
 export type FoldRegion = {
   /** Unique identifier for this fold region */
@@ -27,16 +30,23 @@ export function getFoldSummaryLabel(fold: FoldRegion, lineCount: number): string
   return fold.label ?? `${lineCount} lines`;
 }
 
+export type ValidateFoldsOptions = {
+  /** Log dev warnings for skipped folds. Default: true */
+  warn?: boolean;
+};
+
 /**
  * Validates fold regions and returns a clean, sorted list.
  * Dev: logs warnings for invalid folds. Prod: silently filters them out.
  */
+
 export function validateFolds(
-  folds: FoldRegion[],
+  folds: readonly FoldRegion[],
   totalLines: number,
   startingLineNumber = 1,
+  options?: ValidateFoldsOptions,
 ): FoldRegion[] {
-  const isDev = process.env.NODE_ENV !== 'production';
+  const isDev = options?.warn !== false && process.env.NODE_ENV !== 'production';
   const valid: FoldRegion[] = [];
   const seenIds = new Set<string>();
   const lastLine = startingLineNumber + totalLines - 1;

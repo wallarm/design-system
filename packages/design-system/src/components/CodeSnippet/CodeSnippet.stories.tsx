@@ -23,6 +23,7 @@ import { getHttpFolds } from './lib/httpFolds';
 const DESCRIPTION = [
   'A block of code to be read and copied, never edited — reach for `InlineCodeSnippet` when the code belongs inside a sentence, and a real editor when the value is meant to change.',
   'Everything beyond the code is composed: a `CodeSnippetHeader` carrying a title or tabs, `CodeSnippetActions` for copy, wrap and fullscreen, `CodeSnippetLineNumbers`, and per-line colour, prefixes and folds — and highlighting happens only inside a `CodeSnippetAdapterProvider`.',
+  'The snippet sits inside a `display: contents` wrapper that keeps it mounted across fullscreen, so space snippets with their own `className` (for example `mt-16`) or a `gap` on the parent — not `space-*`, `divide-*` or child selectors on the parent.',
 ].join(' ');
 
 const meta = {

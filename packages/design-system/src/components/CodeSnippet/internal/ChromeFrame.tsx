@@ -11,7 +11,12 @@ export interface ChromeFrameProps extends Omit<HTMLAttributes<HTMLDivElement>, '
   children: ReactNode;
 }
 
-const FULLSCREEN_CLASSES = 'fixed inset-16 z-50';
+/**
+ * Fullscreen fills the viewport inset: the sizing/margin resets make `cn` drop conflicting
+ * consumer utilities (e.g. `h-[240px]`, `max-w-[600px]`, `mx-auto`) while fullscreen is on.
+ */
+const FULLSCREEN_CLASSES =
+  'fixed inset-16 z-50 m-0 w-auto h-auto min-w-0 min-h-0 max-w-[none] max-h-[none]';
 const BACKDROP_CLASSES = 'fixed inset-0 z-40 backdrop-blur-xs bg-component-dialog-overlay';
 const HOST_CLASSES = 'contents';
 
