@@ -1,8 +1,8 @@
 import { createRef, useState } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { FilterDropdown, type FilterDropdownProps } from './FilterDropdown';
 import { FilterDropdownAllOption } from './FilterDropdownAllOption';
@@ -161,7 +161,7 @@ describe('Trigger label forms and aria-label', () => {
 
 describe('Single mode «All» sentinel', () => {
   it('shows «All» picked while unset and never reports the sentinel', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled allLabel='All types' initial={['lua']} spy={spy} />);
     await userEvent.click(trigger());
     const all = await screen.findByTestId('type-filter--all-option');
@@ -191,7 +191,7 @@ describe('Single mode «All» sentinel', () => {
 
 describe('Clearing a multi filter', () => {
   it('✕ clears and returns focus to the trigger', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled multiple initial={['lua', 'wasm']} spy={spy} />);
     await userEvent.click(screen.getByTestId('type-filter--clear'));
     expect(spy).toHaveBeenLastCalledWith([]);
@@ -200,7 +200,7 @@ describe('Clearing a multi filter', () => {
   });
 
   it('Backspace and Delete on the focused trigger clear', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled multiple initial={['lua']} spy={spy} />);
     trigger().focus();
     await userEvent.keyboard('{Backspace}');
@@ -215,7 +215,7 @@ describe('Clearing a multi filter', () => {
   });
 
   it('Backspace does nothing in single mode', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled initial={['lua']} spy={spy} />);
     trigger().focus();
     await userEvent.keyboard('{Backspace}');
@@ -223,7 +223,7 @@ describe('Clearing a multi filter', () => {
   });
 
   it('footer Clear shows only while something is picked, clears and keeps the menu open', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled multiple initial={[]} spy={spy} />);
     await userEvent.click(trigger());
     await screen.findByTestId('option-lua');
@@ -277,7 +277,7 @@ describe('Search', () => {
   });
 
   it('filters, types a space instead of picking, and shows the empty state', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled items={many} spy={spy} />);
     await userEvent.click(trigger());
     const input = within(await screen.findByTestId('type-filter--search')).getByRole('combobox');
@@ -296,7 +296,7 @@ describe('Search', () => {
   });
 
   it('highlights the first match after a query change so Enter picks it', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled items={many} spy={spy} />);
     await userEvent.click(trigger());
     const input = within(await screen.findByTestId('type-filter--search')).getByRole('combobox');
@@ -332,7 +332,7 @@ describe('Multi "Selected" section', () => {
   });
 
   it('snapshots on open: ticking does not add rows, unticking a copy unticks the original', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled items={many} multiple initial={['f', 'c']} spy={spy} />);
     await userEvent.click(trigger());
     const selected = await screen.findByTestId('type-filter--selected');
@@ -447,8 +447,8 @@ describe('Attribute pass-through (compound seams)', () => {
   });
 
   it('consumer handlers still run on the trigger and ✕', async () => {
-    const onKeyDown = vi.fn();
-    const onClick = vi.fn();
+    const onKeyDown = rs.fn();
+    const onClick = rs.fn();
     const collection = createListCollection({ items: few });
     render(
       <FilterDropdown
@@ -472,7 +472,7 @@ describe('Attribute pass-through (compound seams)', () => {
   });
 
   it('a consumer preventDefault on the ✕ keeps the value', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     const collection = createListCollection({ items: few });
     render(
       <FilterDropdown
@@ -572,7 +572,7 @@ describe('Keyboard and focus', () => {
   });
 
   it('keeps the menu open on pick in multi mode', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled multiple spy={spy} />);
     await userEvent.click(trigger());
     await userEvent.click(await screen.findByTestId('option-lua'));
@@ -620,14 +620,14 @@ describe('Disabled', () => {
 
 describe('Callbacks only see consumer values', () => {
   it('onOpenChange reports [] for an unset single filter', async () => {
-    const onOpenChange = vi.fn();
+    const onOpenChange = rs.fn();
     render(<Harness onOpenChange={onOpenChange} />);
     await userEvent.click(trigger());
     expect(onOpenChange).toHaveBeenLastCalledWith({ open: true, value: [] });
   });
 
   it('onValueChange passes the picked items alongside the values', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     render(<Harness multiple onValueChange={onValueChange} />);
     await userEvent.click(trigger());
     await userEvent.click(await screen.findByTestId('option-wasm'));
@@ -684,7 +684,7 @@ describe('Groups, hint and width', () => {
   });
 
   it('pins the menu width while a query is active and releases it when cleared', async () => {
-    const offsetWidth = vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(214);
+    const offsetWidth = rs.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(214);
     try {
       render(<Harness items={many} />);
       await userEvent.click(trigger());
@@ -970,7 +970,7 @@ describe('Footer Clear from the keyboard', () => {
     ['Enter', '{Enter}'],
     ['Space', ' '],
   ])('%s clears instead of toggling the highlighted option', async (_name, key) => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(<Controlled multiple initial={['lua', 'wasm']} spy={spy} />);
     await userEvent.click(trigger());
     await waitFor(() =>
@@ -1004,7 +1004,7 @@ describe('Search combobox wiring', () => {
   });
 
   it('reports a click on the built-in clear button through onClear', async () => {
-    const onClear = vi.fn();
+    const onClear = rs.fn();
     const collection = createListCollection({ items: many });
     render(
       <FilterDropdown collection={collection} label='Type' data-testid='type-filter'>
@@ -1082,7 +1082,7 @@ describe('Refs on the group parts', () => {
 
 describe('Disabled root and a replacement ✕', () => {
   it('keeps the ✕ disabled even when it passes disabled={false}', async () => {
-    const spy = vi.fn();
+    const spy = rs.fn();
     render(
       <FilterDropdown
         collection={createListCollection({ items: few })}

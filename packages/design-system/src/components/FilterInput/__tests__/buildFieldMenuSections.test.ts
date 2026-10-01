@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { buildFieldMenuSections } from '../lib/buildFieldMenuSections';
 import type { FieldGroup, FieldMetadata } from '../types';
 

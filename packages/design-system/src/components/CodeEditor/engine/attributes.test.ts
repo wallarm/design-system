@@ -1,11 +1,11 @@
 import { StateEffect } from '@codemirror/state';
 import { lineNumbers } from '@codemirror/view';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { mountEngine, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 
 afterEach(() => {
   unmountAllEngines();
-  vi.restoreAllMocks();
+  rs.restoreAllMocks();
 });
 
 describe('createEditor — content attributes (D10)', () => {
@@ -44,7 +44,7 @@ describe('createEditor — content attributes (D10)', () => {
   });
 
   it('ignores reserved attributes with a warning', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     const { handle } = mountEngine({
       contentAttributes: { role: 'presentation', spellcheck: 'true', 'aria-label': 'Body' },
     });
@@ -59,7 +59,7 @@ describe('createEditor — content attributes (D10)', () => {
 
   it('updates attributes on change and skips reconfigure for shallow-equal records', () => {
     const { handle, rerender } = mountEngine({ contentAttributes: { 'aria-label': 'One' } });
-    const dispatch = vi.spyOn(handle.view, 'dispatch');
+    const dispatch = rs.spyOn(handle.view, 'dispatch');
 
     rerender({ contentAttributes: { 'aria-label': 'One' } });
     expect(dispatch).not.toHaveBeenCalled();

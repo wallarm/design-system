@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import { matchNav } from '../matchNav';
 import type { NavConfig, NavConfigDrill, NavConfigLink } from '../types';
 
@@ -274,7 +274,7 @@ describe('matchNav — pathless drill', () => {
   });
 
   it('warns and uses the first pathless drill when a config declares more than one at the same level', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => {});
     const secondPathlessDrill: NavConfigDrill = {
       ...applicationDrill,
       id: 'second-pathless',
@@ -293,7 +293,7 @@ describe('matchNav — pathless drill', () => {
   });
 
   it('warns when the two pathless drills sit inside different groups at the same level', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => {});
     const secondPathlessDrill: NavConfigDrill = {
       ...applicationDrill,
       id: 'second-pathless',

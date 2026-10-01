@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { createListCollection } from '@ark-ui/react/collection';
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Select } from './Select';
 import { SelectButton } from './SelectButton';
@@ -298,7 +298,7 @@ describe('SelectSearchInput keyboard', () => {
   };
 
   it('types a space instead of picking the highlighted option, and composes onKeyDown', async () => {
-    const onKeyDown = vi.fn();
+    const onKeyDown = rs.fn();
     render(<SearchableSelect onKeyDown={onKeyDown} />);
     await userEvent.click(screen.getByTestId('trigger'));
     const input = within(await screen.findByTestId('search')).getByRole('textbox');
@@ -312,7 +312,7 @@ describe('SelectSearchInput keyboard', () => {
   });
 
   it('regression: a space typed while an option is highlighted is inserted and picks nothing', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     const Wrapped = () => {
       const [query, setQuery] = useState('');
       const collection = createListCollection({ items });
@@ -367,14 +367,14 @@ describe('SelectSearchInput keyboard', () => {
   });
 
   it('still lets arrows and Enter reach the list from the input', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     const collection = createListCollection({ items });
     render(
       <Select collection={collection} onValueChange={onValueChange} data-testid='select'>
         <SelectButton data-testid='trigger' />
         <SelectPositioner>
           <SelectHeader>
-            <SelectSearchInput value='' onChange={vi.fn()} data-testid='search' />
+            <SelectSearchInput value='' onChange={rs.fn()} data-testid='search' />
           </SelectHeader>
           <SelectContent>
             {items.map(item => (

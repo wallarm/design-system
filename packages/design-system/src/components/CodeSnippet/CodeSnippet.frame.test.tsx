@@ -1,6 +1,6 @@
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { copyText } from '../../utils/copyText';
 import { CodeSnippetActions } from './CodeSnippetActions';
 import { CodeSnippetCode } from './CodeSnippetCode';
@@ -10,8 +10,8 @@ import { CodeSnippetRoot } from './CodeSnippetRoot';
 import { CodeSnippetShowMoreButton } from './CodeSnippetShowMoreButton';
 import { useCodeSnippetFrame } from './hooks';
 
-vi.mock('../../utils/copyText', () => ({
-  copyText: vi.fn(() => Promise.resolve()),
+rs.mock('../../utils/copyText', () => ({
+  copyText: rs.fn(() => Promise.resolve()),
 }));
 
 const makeCode = (lineCount: number) =>
@@ -35,12 +35,12 @@ const FrameProbe = () => {
 };
 
 afterEach(() => {
-  vi.mocked(copyText).mockClear();
+  rs.mocked(copyText).mockClear();
 });
 
 describe('CodeSnippet frame context', () => {
   it('useCodeSnippetFrame throws outside a provider', () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const consoleError = rs.spyOn(console, 'error').mockImplementation(() => undefined);
 
     expect(() => render(<FrameProbe />)).toThrow(
       'useCodeSnippetFrame must be used within CodeSnippetRoot or CodeEditorRoot',
@@ -95,7 +95,7 @@ describe('CodeSnippet frame context', () => {
 
 describe('CodeSnippetCopyButton onCopy', () => {
   it('fires onCopy with the code after the copy button is clicked', async () => {
-    const onCopy = vi.fn();
+    const onCopy = rs.fn();
 
     render(
       <CodeSnippetRoot code='const a = 1;' onCopy={onCopy}>
@@ -113,7 +113,7 @@ describe('CodeSnippetCopyButton onCopy', () => {
   });
 
   it('copies the latest code after the code prop changes', async () => {
-    const onCopy = vi.fn();
+    const onCopy = rs.fn();
     const { rerender } = render(
       <CodeSnippetRoot code='first' onCopy={onCopy}>
         <CodeSnippetActions>
@@ -137,8 +137,8 @@ describe('CodeSnippetCopyButton onCopy', () => {
   });
 
   it('still composes a consumer onClick on the copy button', async () => {
-    const onClick = vi.fn();
-    const onCopy = vi.fn();
+    const onClick = rs.fn();
+    const onCopy = rs.fn();
 
     render(
       <CodeSnippetRoot code='x' onCopy={onCopy}>

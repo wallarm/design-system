@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { useTestId } from '../../utils/testId';
 import {
   createListCollection,
@@ -96,7 +96,7 @@ describe('InlineEditSelect', () => {
   });
 
   it('picking an option (single) commits on close', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(<Harness onCommit={onCommit} />);
     const option = await screen.findByText('Admin', ignoreHiddenSelectOption);
     // Opening on mount alone must not commit — only the close does.
@@ -146,7 +146,7 @@ describe('InlineEditSelect', () => {
   });
 
   it('collection-only usage renders options from the resolved collection and commits on close', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     const collection = createListCollection({ items });
     render(
       <InlineEdit defaultValue={['editor']} defaultEdit onValueCommit={onCommit} data-testid='ie'>
@@ -164,7 +164,7 @@ describe('InlineEditSelect', () => {
   });
 
   it('warns in dev when both items and collection are provided', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = rs.spyOn(console, 'warn').mockImplementation(() => {});
     const collection = createListCollection({ items });
     render(
       <InlineEdit defaultValue={['editor']} defaultEdit data-testid='ie'>
@@ -180,7 +180,7 @@ describe('InlineEditSelect', () => {
   });
 
   it('warns in dev when neither items nor collection are provided', () => {
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warnSpy = rs.spyOn(console, 'warn').mockImplementation(() => {});
     render(
       <InlineEdit defaultValue={[]} defaultEdit data-testid='ie'>
         <InlineEditControl>
@@ -225,7 +225,7 @@ describe('InlineEditSelect', () => {
     });
 
     it('stays open across picks and commits the multi-value array on close', async () => {
-      const onCommit = vi.fn();
+      const onCommit = rs.fn();
       render(<Harness onCommit={onCommit} value={[]} multiple />);
       const listbox = await screen.findByRole('listbox');
 

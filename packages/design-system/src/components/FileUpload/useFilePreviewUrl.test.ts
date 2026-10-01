@@ -1,12 +1,12 @@
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { makeFile } from './FileUpload.test.helpers';
 import { useFilePreviewUrl } from './useFilePreviewUrl';
 
 describe('useFilePreviewUrl', () => {
   let n = 0;
-  const create = vi.fn(() => `blob:preview-${++n}`);
-  const revoke = vi.fn();
+  const create = rs.fn(() => `blob:preview-${++n}`);
+  const revoke = rs.fn();
 
   beforeEach(() => {
     n = 0;
@@ -18,7 +18,7 @@ describe('useFilePreviewUrl', () => {
   });
 
   afterEach(() => {
-    vi.restoreAllMocks();
+    rs.restoreAllMocks();
   });
 
   it('returns undefined without a file', () => {

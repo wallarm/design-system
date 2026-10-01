@@ -1,6 +1,6 @@
 # Metrics Test Examples
 
-Copy-ready component tests (Vitest + Testing Library) that prove the [analytics-readiness contract](./contract.md). Pick the snippet matching your component's shape. These are the canonical templates the `test` agent and `/review-pr` expect.
+Copy-ready component tests (Rstest + Testing Library) that prove the [analytics-readiness contract](./contract.md). Pick the snippet matching your component's shape. These are the canonical templates the `test` agent and `/review-pr` expect.
 
 **Locator hygiene (applies to every snippet):** never query by the same `data-*` attribute you are asserting. Locate the element with `data-testid`, `getByRole`, or `data-slot`, then assert the analytics attribute on it.
 
@@ -18,7 +18,7 @@ For a component whose root is the interactive element (`Button`, `Link`, `Input`
 
 ```tsx
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { Button } from './Button';
 
 describe('Button — analytics pass-through', () => {
@@ -51,7 +51,7 @@ Assert the attribute lands on the consumer-rendered element, not the wrapper.
 
 ```tsx
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { Button } from './Button';
 
 describe('Button — asChild', () => {
@@ -78,7 +78,7 @@ For `Checkbox` / `Radio` / `Switch` / `SegmentedControl`, where the clickable ro
 ```tsx
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Checkbox } from './Checkbox';
 
@@ -110,7 +110,7 @@ describe('Checkbox — analytics', () => {
 ```tsx
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { NumberInput } from './NumberInput';
 
@@ -152,7 +152,7 @@ For stateful components, verify the analytics attribute survives at least one me
 ```tsx
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { Accordion, AccordionItem, AccordionTrigger } from './Accordion';
 
 describe('AccordionTrigger — analytics persistence', () => {
@@ -184,12 +184,12 @@ When an internal handler exists, prove the consumer's handler runs too (and, whe
 ```tsx
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import { DialogTrigger } from './Dialog';
 
 describe('DialogTrigger — handler composition', () => {
   it('fires the consumer onClick alongside the internal open behavior', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     render(<DialogTrigger data-testid='trigger' onClick={onClick}>Open</DialogTrigger>);
 
     await userEvent.click(screen.getByTestId('trigger'));

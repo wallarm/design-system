@@ -23,9 +23,10 @@ interface JsdomIdlUtils {
 /**
  * Since jsdom 30.1 each wrapper's implementation sits in a private field that only jsdom's own
  * idl utils can read. Resolve them through the test runner so it is the very jsdom instance the
- * test environment runs on (jsdom is the runner's peer, not a direct dependency of this package).
+ * test environment runs on (jsdom is the runner's peer). This needs the environment loaded
+ * natively (`testEnvironment.prebundle: false` in rstest.config.ts), not Rstest's prebundled copy.
  */
-const requireFromRunner = createRequire(createRequire(import.meta.url).resolve('vitest'));
+const requireFromRunner = createRequire(createRequire(import.meta.url).resolve('@rstest/core'));
 const jsdomIdlUtils = requireFromRunner('jsdom/lib/generated/idl/utils.js') as JsdomIdlUtils;
 
 const implOf = (wrapper: object): unknown => jsdomIdlUtils.implForWrapper(wrapper);

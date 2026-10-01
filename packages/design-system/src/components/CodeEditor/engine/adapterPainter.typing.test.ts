@@ -1,6 +1,6 @@
 import { EditorState } from '@codemirror/state';
 import { type DecorationSet, EditorView } from '@codemirror/view';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import type { HighlightResult, SyntaxAdapter, Token } from '../../CodeSnippet/adapters/types';
 import { adapterPainter, getPaintedDecorations } from './adapterPainter';
 
@@ -35,7 +35,7 @@ type Deferred = {
 /** Adapter whose every highlight() call stays pending until the test settles it. */
 const deferredAdapter = () => {
   const calls: Deferred[] = [];
-  const highlight = vi.fn<SyntaxAdapter<string>['highlight']>(
+  const highlight = rs.fn<SyntaxAdapter<string>['highlight']>(
     code =>
       new Promise<HighlightResult>((resolve, reject) => {
         calls.push({ code, resolve, reject });
@@ -63,11 +63,11 @@ const mount = (doc: string, adapter: SyntaxAdapter<string>): EditorView => {
 
 describe('adapterPainter — typing', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
+    rs.useFakeTimers();
   });
 
   afterEach(() => {
-    vi.useRealTimers();
+    rs.useRealTimers();
     document.body.innerHTML = '';
   });
 
@@ -75,7 +75,7 @@ describe('adapterPainter — typing', () => {
     const { adapter, highlight, calls } = deferredAdapter();
     const view = mount('foo bar', adapter);
     calls[0]?.resolve(wordTokens('foo bar'));
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
     expect(collect(getPaintedDecorations(view))).toEqual([
       { from: 0, to: 3, className: 'text-syntax-keyword' },
       { from: 4, to: 7, className: 'text-syntax-keyword' },
@@ -88,15 +88,15 @@ describe('adapterPainter — typing', () => {
       { from: 3, to: 6, className: 'text-syntax-keyword' },
       { from: 7, to: 10, className: 'text-syntax-keyword' },
     ]);
-    await vi.advanceTimersByTimeAsync(99);
+    await rs.advanceTimersByTimeAsync(99);
     expect(highlight).toHaveBeenCalledTimes(1);
 
-    await vi.advanceTimersByTimeAsync(1);
+    await rs.advanceTimersByTimeAsync(1);
     expect(highlight).toHaveBeenCalledTimes(2);
     expect(calls[1]?.code).toBe('xx foo bar');
 
     calls[1]?.resolve(wordTokens('xx foo bar'));
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
     expect(collect(getPaintedDecorations(view))).toEqual([
       { from: 0, to: 2, className: 'text-syntax-keyword' },
       { from: 3, to: 6, className: 'text-syntax-keyword' },
@@ -109,15 +109,15 @@ describe('adapterPainter — typing', () => {
     const { adapter, highlight, calls } = deferredAdapter();
     const view = mount('a', adapter);
     calls[0]?.resolve(wordTokens('a'));
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
 
     view.dispatch({ changes: { from: 1, insert: 'b' } });
-    await vi.advanceTimersByTimeAsync(60);
+    await rs.advanceTimersByTimeAsync(60);
     view.dispatch({ changes: { from: 2, insert: 'c' } });
-    await vi.advanceTimersByTimeAsync(60);
+    await rs.advanceTimersByTimeAsync(60);
     expect(highlight).toHaveBeenCalledTimes(1);
 
-    await vi.advanceTimersByTimeAsync(40);
+    await rs.advanceTimersByTimeAsync(40);
     expect(highlight).toHaveBeenCalledTimes(2);
     expect(calls[1]?.code).toBe('abc');
     view.destroy();
@@ -130,13 +130,13 @@ describe('adapterPainter — typing', () => {
     view.dispatch({ changes: { from: 0, to: 3, insert: 'two words' } });
     // The stale result describes 'one' — applying it would paint the wrong ranges.
     calls[0]?.resolve({ tokens: [[{ content: 'one', type: 'string' }]] });
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
     expect(getPaintedDecorations(view).size).toBe(0);
 
-    await vi.advanceTimersByTimeAsync(100);
+    await rs.advanceTimersByTimeAsync(100);
     expect(calls[1]?.code).toBe('two words');
     calls[1]?.resolve(wordTokens('two words'));
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
     expect(collect(getPaintedDecorations(view))).toEqual([
       { from: 0, to: 3, className: 'text-syntax-keyword' },
       { from: 4, to: 9, className: 'text-syntax-keyword' },
@@ -148,10 +148,10 @@ describe('adapterPainter — typing', () => {
     const { adapter, highlight, calls } = deferredAdapter();
     const view = mount('abc', adapter);
     calls[0]?.resolve(wordTokens('abc'));
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
 
     view.dispatch({ selection: { anchor: 2 } });
-    await vi.advanceTimersByTimeAsync(200);
+    await rs.advanceTimersByTimeAsync(200);
 
     expect(highlight).toHaveBeenCalledTimes(1);
     expect(getPaintedDecorations(view).size).toBe(1);

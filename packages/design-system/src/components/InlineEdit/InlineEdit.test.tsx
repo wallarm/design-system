@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
 import { useInlineEdit } from './InlineEditContext';
 import { InlineEditPreview } from './InlineEditPreview';
@@ -50,7 +50,7 @@ describe('InlineEdit', () => {
   });
 
   it('commits the draft synchronously and exits edit', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(
       <InlineEdit defaultValue='hello' onValueCommit={onCommit}>
         <Harness />
@@ -65,7 +65,7 @@ describe('InlineEdit', () => {
   });
 
   it('reverts the draft on cancel', async () => {
-    const onRevert = vi.fn();
+    const onRevert = rs.fn();
     render(
       <InlineEdit defaultValue='hello' onValueRevert={onRevert}>
         <Harness />
@@ -81,7 +81,7 @@ describe('InlineEdit', () => {
 
   it('runs the async lifecycle: loading then saved then idle', async () => {
     let resolve!: () => void;
-    const onCommit = vi.fn(
+    const onCommit = rs.fn(
       () =>
         new Promise<void>(r => {
           resolve = r;
@@ -101,7 +101,7 @@ describe('InlineEdit', () => {
   });
 
   it('surfaces error and stays editing when the commit rejects', async () => {
-    const onCommit = vi.fn(() => Promise.reject(new Error('save failed')));
+    const onCommit = rs.fn(() => Promise.reject(new Error('save failed')));
     render(
       <InlineEdit defaultValue='hello' onValueCommit={onCommit}>
         <Harness />
@@ -125,7 +125,7 @@ describe('InlineEdit', () => {
   });
 
   it('ignores submit while a commit is already in flight', async () => {
-    const onCommit = vi.fn(() => new Promise<void>(() => {})); // never resolves → stays loading
+    const onCommit = rs.fn(() => new Promise<void>(() => {})); // never resolves → stays loading
     render(
       <InlineEdit defaultValue='hello' onValueCommit={onCommit}>
         <Harness />
@@ -138,7 +138,7 @@ describe('InlineEdit', () => {
   });
 
   it('completes an async commit under StrictMode', async () => {
-    const onCommit = vi.fn(() => Promise.resolve());
+    const onCommit = rs.fn(() => Promise.resolve());
     render(
       <StrictMode>
         <InlineEdit defaultValue='hello' onValueCommit={onCommit} savedDuration={20}>
@@ -154,13 +154,13 @@ describe('InlineEdit', () => {
 
   it('drops a late async commit resolution after cancel', async () => {
     let resolve!: () => void;
-    const onCommit = vi.fn(
+    const onCommit = rs.fn(
       () =>
         new Promise<void>(r => {
           resolve = r;
         }),
     );
-    const onRevert = vi.fn();
+    const onRevert = rs.fn();
     render(
       <InlineEdit defaultValue='hello' onValueCommit={onCommit} onValueRevert={onRevert}>
         <Harness />
@@ -184,8 +184,8 @@ describe('InlineEdit', () => {
 
 describe('InlineEdit onBeforeValueCommit', () => {
   it('blocks the commit when the guard returns false', async () => {
-    const onCommit = vi.fn();
-    const guard = vi.fn(() => false);
+    const onCommit = rs.fn();
+    const guard = rs.fn(() => false);
     render(
       <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={guard}>
         <Harness />
@@ -202,7 +202,7 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('proceeds when the guard returns true', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(
       <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={() => true}>
         <Harness />
@@ -217,8 +217,8 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('proceeds when the guard returns nothing — only explicit false blocks', async () => {
-    const onCommit = vi.fn();
-    const guard = vi.fn(() => undefined);
+    const onCommit = rs.fn();
+    const guard = rs.fn(() => undefined);
     render(
       <InlineEdit defaultValue='hello' onValueCommit={onCommit} onBeforeValueCommit={guard}>
         <Harness />
@@ -231,8 +231,8 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('maps a synchronous guard throw to the error status and stays editing', async () => {
-    const onCommit = vi.fn();
-    const guard = vi.fn(() => {
+    const onCommit = rs.fn();
+    const guard = rs.fn(() => {
       throw new Error('guard blew up');
     });
     render(
@@ -248,9 +248,9 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('commits after the guard resolves true', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     let resolve!: (ok: boolean) => void;
-    const guard = vi.fn(
+    const guard = rs.fn(
       () =>
         new Promise<boolean>(r => {
           resolve = r;
@@ -276,9 +276,9 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('stays editing with the draft when the guard resolves false', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     let resolve!: (ok: boolean) => void;
-    const guard = vi.fn(
+    const guard = rs.fn(
       () =>
         new Promise<boolean>(r => {
           resolve = r;
@@ -303,7 +303,7 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('runs the async commit lifecycle after guard-true (loading then error, stays editing)', async () => {
-    const onCommit = vi.fn(() => Promise.reject(new Error('save failed')));
+    const onCommit = rs.fn(() => Promise.reject(new Error('save failed')));
     render(
       <InlineEdit
         defaultValue='hello'
@@ -321,7 +321,7 @@ describe('InlineEdit onBeforeValueCommit', () => {
 
   it('runs the async commit lifecycle after guard-true (loading then saved, exits edit)', async () => {
     let resolve!: () => void;
-    const onCommit = vi.fn(
+    const onCommit = rs.fn(
       () =>
         new Promise<void>(r => {
           resolve = r;
@@ -352,7 +352,7 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('suppresses duplicate submits while the guard is pending', async () => {
-    const guard = vi.fn(() => new Promise<boolean>(() => {})); // never settles
+    const guard = rs.fn(() => new Promise<boolean>(() => {})); // never settles
     render(
       <InlineEdit defaultValue='hello' onBeforeValueCommit={guard}>
         <Harness />
@@ -365,7 +365,7 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('suppresses duplicate submits even when status is consumer-controlled idle', async () => {
-    const guard = vi.fn(() => new Promise<boolean>(() => {}));
+    const guard = rs.fn(() => new Promise<boolean>(() => {}));
     render(
       <InlineEdit defaultValue='hello' status='idle' onBeforeValueCommit={guard}>
         <Harness />
@@ -378,10 +378,10 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('drops a late guard resolution after cancel', async () => {
-    const onCommit = vi.fn();
-    const onRevert = vi.fn();
+    const onCommit = rs.fn();
+    const onRevert = rs.fn();
     let resolve!: (ok: boolean) => void;
-    const guard = vi.fn(
+    const guard = rs.fn(
       () =>
         new Promise<boolean>(r => {
           resolve = r;
@@ -412,9 +412,9 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('drops the resolution when the draft changed while the guard was pending', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     let resolve!: (ok: boolean) => void;
-    const guard = vi.fn(
+    const guard = rs.fn(
       () =>
         new Promise<boolean>(r => {
           resolve = r;
@@ -439,7 +439,7 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('maps a guard rejection to the error status and stays editing', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(
       <InlineEdit
         defaultValue='hello'
@@ -457,9 +457,9 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('does not commit when unmounted while the guard is pending', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     let resolve!: (ok: boolean) => void;
-    const guard = vi.fn(
+    const guard = rs.fn(
       () =>
         new Promise<boolean>(r => {
           resolve = r;
@@ -482,9 +482,9 @@ describe('InlineEdit onBeforeValueCommit', () => {
   });
 
   it('fires onEditChange(false) only after the guard resolves true (controlled edit)', async () => {
-    const onEditChange = vi.fn();
+    const onEditChange = rs.fn();
     let resolve!: (ok: boolean) => void;
-    const guard = vi.fn(
+    const guard = rs.fn(
       () =>
         new Promise<boolean>(r => {
           resolve = r;

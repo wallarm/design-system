@@ -1,7 +1,7 @@
 import { createRef } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { Pagination } from './Pagination';
 import { PaginationEllipsis } from './PaginationEllipsis';
 import { PaginationItem } from './PaginationItem';
@@ -148,7 +148,7 @@ describe('PaginationItem', () => {
   });
 
   it('navigates to the clicked page', async () => {
-    const onPageChange = vi.fn();
+    const onPageChange = rs.fn();
     render(
       <Pagination count={50} pageSize={10} defaultPage={1} onPageChange={onPageChange}>
         <ul>
@@ -311,7 +311,7 @@ describe('Pagination prev/next', () => {
   });
 
   it('calls onPageChange when Next is clicked', async () => {
-    const onPageChange = vi.fn();
+    const onPageChange = rs.fn();
     render(
       <Pagination count={30} pageSize={10} defaultPage={1} onPageChange={onPageChange}>
         <PaginationPrevious />
@@ -323,7 +323,7 @@ describe('Pagination prev/next', () => {
   });
 
   it('calls onPageChange with the previous page when Previous is clicked', async () => {
-    const onPageChange = vi.fn();
+    const onPageChange = rs.fn();
     render(
       <Pagination count={30} pageSize={10} defaultPage={2} onPageChange={onPageChange}>
         <PaginationPrevious />
@@ -369,7 +369,7 @@ describe('Pagination uncontrolled navigation', () => {
 
 describe('Pagination full composition', () => {
   it('renders prev + list + next together and navigates on page click', async () => {
-    const onPageChange = vi.fn();
+    const onPageChange = rs.fn();
     render(
       <Pagination count={120} pageSize={10} defaultPage={2} onPageChange={onPageChange}>
         <PaginationPrevious />
@@ -388,7 +388,7 @@ describe('Pagination full composition', () => {
 
 describe('PaginationPageSize', () => {
   it('renders the label and the current page size, and changes it', async () => {
-    const onPageSizeChange = vi.fn();
+    const onPageSizeChange = rs.fn();
     render(
       <Pagination count={200} defaultPageSize={25} onPageSizeChange={onPageSizeChange}>
         <PaginationPageSize options={[10, 25, 50]} data-testid='pg-page-size' />

@@ -1,7 +1,7 @@
 import { forceLinting, forEachDiagnostic } from '@codemirror/lint';
 import { EditorState, type Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { type Mock, vi } from 'vitest';
+import { type Mock, rs } from '@rstest/core';
 import {
   type DiagnosticsConfig,
   diagnosticsExtension,
@@ -22,7 +22,7 @@ export const mountLinted = (
   overrides: Partial<Omit<DiagnosticsConfig, 'onChange'>> = {},
   extra: Extension = [],
 ): LintedView => {
-  const onChange = vi.fn<DiagnosticsConfig['onChange']>();
+  const onChange = rs.fn<DiagnosticsConfig['onChange']>();
   const config: DiagnosticsConfig = {
     language: 'json',
     schema: undefined,

@@ -1,7 +1,7 @@
 import type { FC } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import type { SvgIconProps } from '../../icons';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { Avatar, AvatarFallback, AvatarImage, AvatarOverlay } from '.';
@@ -33,7 +33,7 @@ describe('Avatar', () => {
   });
 
   it('shows the fallback while loading and the photo once loaded', async () => {
-    const onStatusChange = vi.fn();
+    const onStatusChange = rs.fn();
     renderAvatar({ src: '/me.png', name: 'Ada Lovelace', onStatusChange });
     const img = screen.getByTestId('av--image');
     const fallback = screen.getByTestId('av--fallback');
@@ -49,7 +49,7 @@ describe('Avatar', () => {
 
   it('falls back when the photo fails', async () => {
     // Loading already shows the fallback, so assert the error status itself, not only the DOM.
-    const onStatusChange = vi.fn();
+    const onStatusChange = rs.fn();
     renderAvatar({ src: '/broken.png', name: 'Ada Lovelace', onStatusChange });
     const img = screen.getByTestId('av--image');
     fireEvent.error(img);

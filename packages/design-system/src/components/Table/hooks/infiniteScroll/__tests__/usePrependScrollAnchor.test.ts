@@ -1,5 +1,5 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { usePrependScrollAnchor } from '../usePrependScrollAnchor';
 
 const makeEl = (scrollHeight: number) => ({ scrollTop: 0, scrollHeight }) as HTMLElement;
@@ -77,7 +77,7 @@ describe('usePrependScrollAnchor', () => {
   });
 
   it('compensates the window scroll position on prepend in window mode', () => {
-    const scrollBySpy = vi.spyOn(window, 'scrollBy').mockImplementation(() => undefined);
+    const scrollBySpy = rs.spyOn(window, 'scrollBy').mockImplementation(() => undefined);
     let docScrollHeight = 1000;
     const original = Object.getOwnPropertyDescriptor(document.documentElement, 'scrollHeight');
     Object.defineProperty(document.documentElement, 'scrollHeight', {

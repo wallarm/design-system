@@ -1,5 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { ThemeProvider } from './ThemeProvider';
 import { useTheme } from './useTheme';
 
@@ -11,8 +11,8 @@ import { useTheme } from './useTheme';
  * `TypeError: ... is not a function`, so a real Storage stub is needed for
  * the ThemeProvider persistence assertions below. The repo pins Node 24 and
  * CI runs Node 24, where this does not happen, but this in-file stub keeps
- * the suite working on both. Scoped here via `vi.stubGlobal` rather than in
- * the shared `vitest.setup.ts`, since this suite is the only one that
+ * the suite working on both. Scoped here via `rs.stubGlobal` rather than in
+ * the shared `rstest.setup.ts`, since this suite is the only one that
  * reads/writes `localStorage`.
  */
 const createMemoryStorage = (): Storage => {
@@ -46,12 +46,12 @@ const FrameStyleProbe = () => {
 
 describe('ThemeProvider frame style', () => {
   beforeEach(() => {
-    vi.stubGlobal('localStorage', createMemoryStorage());
+    rs.stubGlobal('localStorage', createMemoryStorage());
     document.documentElement.removeAttribute('data-frame-style');
   });
 
   afterEach(() => {
-    vi.unstubAllGlobals();
+    rs.unstubAllGlobals();
   });
 
   it('defaults to neutral and writes it on <html>', () => {

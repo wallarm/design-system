@@ -1,7 +1,7 @@
 import { createRef } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { NumericBadge } from './NumericBadge';
 
@@ -121,8 +121,8 @@ describe('NumericBadge', () => {
 describe('NumericBadge interactions', () => {
   it('activates a clickable badge with pointer, Enter and Space', async () => {
     const user = userEvent.setup();
-    const onClick = vi.fn();
-    const onKeyDown = vi.fn();
+    const onClick = rs.fn();
+    const onKeyDown = rs.fn();
     render(
       <NumericBadge onClick={onClick} onKeyDown={onKeyDown}>
         5
@@ -143,7 +143,7 @@ describe('NumericBadge interactions', () => {
 
   it.each(['{Enter}', ' '])('lets the caller cancel keyboard activation for %s', async key => {
     const user = userEvent.setup();
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     render(
       <NumericBadge onClick={onClick} onKeyDown={event => event.preventDefault()}>
         5
@@ -157,7 +157,7 @@ describe('NumericBadge interactions', () => {
 
   it('preserves caller tab order on a clickable badge', () => {
     render(
-      <NumericBadge onClick={vi.fn()} tabIndex={-1}>
+      <NumericBadge onClick={rs.fn()} tabIndex={-1}>
         5
       </NumericBadge>,
     );
@@ -167,7 +167,7 @@ describe('NumericBadge interactions', () => {
 
   it('lets the caller cancel Space activation on keyup', async () => {
     const user = userEvent.setup();
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     render(
       <NumericBadge onClick={onClick} onKeyUp={event => event.preventDefault()}>
         5
@@ -181,7 +181,7 @@ describe('NumericBadge interactions', () => {
 
   it('makes an asChild span keyboard accessible when its child owns onClick', async () => {
     const user = userEvent.setup();
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     render(
       <NumericBadge asChild>
         <span onClick={onClick}>5</span>
@@ -225,8 +225,8 @@ describe('NumericBadge interactions', () => {
 
   it('activates an asChild button once per key and composes child handlers', async () => {
     const user = userEvent.setup();
-    const onClick = vi.fn();
-    const onChildClick = vi.fn();
+    const onClick = rs.fn();
+    const onChildClick = rs.fn();
     render(
       <NumericBadge asChild onClick={onClick}>
         <button type='button' onClick={onChildClick}>
@@ -248,7 +248,7 @@ describe('NumericBadge interactions', () => {
 
   it('lets an asChild button cancel the badge click handler', async () => {
     const user = userEvent.setup();
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     render(
       <NumericBadge asChild onClick={onClick}>
         <button type='button' onClick={event => event.preventDefault()}>
@@ -265,7 +265,7 @@ describe('NumericBadge interactions', () => {
 describe('NumericBadge analytics pass-through', () => {
   it('forwards analytics and accessibility attributes to the clickable div', async () => {
     const user = userEvent.setup();
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     const captured = captureAnalyticsClicks();
     const payload = '{ "feature": "hosts", "count": 3 }';
     const { rerender } = render(
@@ -318,7 +318,7 @@ describe('NumericBadge analytics pass-through', () => {
         aria-label='Hosts'
         data-analytics-id='HOST_COUNT'
         data-analytics-props='{"count":3}'
-        onClick={vi.fn()}
+        onClick={rs.fn()}
       >
         <button type='button'>
           <span>3</span>

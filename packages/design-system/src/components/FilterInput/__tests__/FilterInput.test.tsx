@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { FilterInput } from '../FilterInput';
 import type { Condition, ExprNode, FieldMetadata, Group } from '../types';
 
@@ -79,7 +79,7 @@ describe('FilterInput', () => {
 
     it('calls onChange with null when chip is cleared', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const condition: Condition = {
         type: 'condition',
         field: 'status',
@@ -184,7 +184,7 @@ describe('FilterInput', () => {
 
   describe('onErrorsChange (AS-1134)', () => {
     it('reports validation messages and clears them when fixed', async () => {
-      const onErrorsChange = vi.fn();
+      const onErrorsChange = rs.fn();
       const invalid: Condition = {
         type: 'condition',
         field: 'priority',
@@ -494,7 +494,7 @@ describe('FilterInput', () => {
     });
 
     it('does not call getSuggestions during initial render of a committed chip', () => {
-      const spy = vi.fn(() => [{ value: 'only', label: 'Only' }]);
+      const spy = rs.fn(() => [{ value: 'only', label: 'Only' }]);
       const field: FieldMetadata = {
         name: 'code',
         label: 'Status code',
@@ -575,7 +575,7 @@ describe('FilterInput', () => {
 
     it('lets the user reopen the field menu by clicking the building chip attribute', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       render(<FilterInput fields={fields} onChange={onChange} />);
 
       await startBuildingThroughOperator(user);
@@ -627,7 +627,7 @@ describe('FilterInput', () => {
 
     it('escape from inline-edit on a building chip keeps the building state intact', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { container } = render(<FilterInput fields={fields} onChange={onChange} />);
 
       await startBuildingThroughOperator(user);
@@ -662,7 +662,7 @@ describe('FilterInput', () => {
 
     it('does not commit an incomplete building chip on blur', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { container } = render(
         <div>
           <FilterInput fields={fields} onChange={onChange} />
@@ -695,7 +695,7 @@ describe('FilterInput', () => {
 
     it('auto-commits when the third (value) segment is chosen', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       render(<FilterInput fields={fields} onChange={onChange} />);
 
       const input = screen.getByRole('combobox');
@@ -882,7 +882,7 @@ describe('FilterInput', () => {
       // attribute-only — it should transition to operator selection so the
       // user can finish building.
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       render(
         <FilterInput
           fields={fields}
@@ -1191,7 +1191,7 @@ describe('FilterInput', () => {
 
     it('commits a typed value missing from options when strictValues is false', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       render(<FilterInput fields={suggestionFields} onChange={onChange} />);
 
       await user.click(screen.getByRole('combobox'));
@@ -1213,7 +1213,7 @@ describe('FilterInput', () => {
 
     it('does not commit free text on a strict-allowlist field', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       render(<FilterInput fields={sampleFields} onChange={onChange} />);
 
       await user.click(screen.getByRole('combobox'));
@@ -1314,7 +1314,7 @@ describe('FilterInput', () => {
 
     it('completes a paired chip when the Value operator is "is set" (no second value)', async () => {
       const user = userEvent.setup();
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const setValueFields: FieldMetadata[] = [
         {
           name: 'ctx_param',

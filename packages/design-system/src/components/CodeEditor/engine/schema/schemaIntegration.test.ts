@@ -1,5 +1,5 @@
 import { forceLinting } from '@codemirror/lint';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { mountEngine, unmountAllEngines } from '../../../../testUtils/codeEditorEngine';
 
 const schema = {
@@ -15,7 +15,7 @@ describe('schema diagnostics in the engine', () => {
     const { handle, callbacks } = mountEngine({ language: 'json', value: '{"name": 5}', schema });
     forceLinting(handle.view);
 
-    await vi.waitFor(() =>
+    await rs.waitFor(() =>
       expect(callbacks.onDiagnosticsChange).toHaveBeenLastCalledWith([
         expect.objectContaining({
           source: 'schema',
@@ -31,7 +31,7 @@ describe('schema diagnostics in the engine', () => {
     const { handle, callbacks } = mountEngine({ language: 'http', value, schema });
     forceLinting(handle.view);
 
-    await vi.waitFor(() =>
+    await rs.waitFor(() =>
       expect(callbacks.onDiagnosticsChange).toHaveBeenLastCalledWith([
         expect.objectContaining({ source: 'schema', from: { line: 4, column: 1 } }),
       ]),
@@ -41,11 +41,11 @@ describe('schema diagnostics in the engine', () => {
   it('drops schema diagnostics when the schema prop is removed', async () => {
     const engine = mountEngine({ language: 'json', value: '{"name": 5}', schema });
     forceLinting(engine.handle.view);
-    await vi.waitFor(() => expect(engine.callbacks.onDiagnosticsChange).toHaveBeenCalled());
+    await rs.waitFor(() => expect(engine.callbacks.onDiagnosticsChange).toHaveBeenCalled());
 
     engine.rerender({ schema: undefined });
     forceLinting(engine.handle.view);
-    await vi.waitFor(() =>
+    await rs.waitFor(() =>
       expect(engine.callbacks.onDiagnosticsChange).toHaveBeenLastCalledWith([]),
     );
   });

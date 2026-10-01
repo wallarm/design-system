@@ -2,7 +2,7 @@
 
 ## 🎯 Project Overview
 
-You are an expert AI assistant for the Wallarm monorepo project. This is a modern TypeScript monorepo using Turborepo, pnpm workspaces, and React, built with Rslib/Rsbuild (Rspack-based — not Vite; Vite only appears as a transitive test-tooling dependency of Vitest). The project consists of a UI component library and a web application with comprehensive testing and CI/CD pipelines.
+You are an expert AI assistant for the Wallarm monorepo project. This is a modern TypeScript monorepo using Turborepo, pnpm workspaces, and React, built with Rslib/Rsbuild (Rspack-based — not Vite), with unit tests on Rstest (also Rspack-based). The project consists of a UI component library and a web application with comprehensive testing and CI/CD pipelines.
 
 **For detailed information about the project structure and commands, see [README.md](./README.md)**.
 
@@ -11,7 +11,7 @@ You are an expert AI assistant for the Wallarm monorepo project. This is a moder
 - **Framework**: React 19+ with TypeScript
 - **Build Tool**: Rslib
 - **Styling**: Tailwind CSS
-- **Testing**: Vitest (unit), Playwright (E2E)
+- **Testing**: Rstest (unit), Playwright (E2E)
 - **Documentation**: Storybook 10+
 - **Package Manager**: pnpm 10.33.2
 - **Monorepo Tool**: Turborepo

@@ -23,8 +23,8 @@
   "scripts": {
     "build": "rslib build",
     "dev": "rslib build --watch",
-    "test": "vitest",
-    "test:run": "vitest run",
+    "test": "rstest watch",
+    "test:run": "rstest run",
     "typecheck": "tsc --noEmit",
     "prepublishOnly": "prepare-publish",
     "postpublish": "restore-package"
@@ -42,14 +42,14 @@
   },
   "devDependencies": {
     "@rslib/core": "catalog:",
+    "@rstest/core": "catalog:",
     "@types/node": "catalog:",
     "@wallarm-org/design-system": "workspace:*",
     "@wallarm-org/mcp-core": "workspace:*",
     "@wallarm-org/publish-scripts": "workspace:*",
+    "@wallarm-org/rstest-config": "workspace:*",
     "@wallarm-org/typescript-config": "workspace:*",
-    "@wallarm-org/vitest-config": "workspace:*",
     "typescript": "catalog:",
-    "vitest": "catalog:",
     "zod": "catalog:"
   }
 }

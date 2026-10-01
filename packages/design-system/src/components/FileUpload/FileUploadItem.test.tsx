@@ -1,7 +1,7 @@
 import type { ComponentProps } from 'react';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { FileUpload } from './FileUpload';
 import { byTestId, makeFile, pick, queryByTestId } from './FileUpload.test.helpers';
 import { FileUploadItem } from './FileUploadItem';
@@ -28,7 +28,7 @@ const Uploader = ({ children, ...props }: UploaderProps) => (
 );
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  rs.restoreAllMocks();
 });
 
 describe('FileUpload — rows', () => {
@@ -89,7 +89,7 @@ describe('FileUpload — rows', () => {
   });
 
   it('forwards consumer attributes and ref to the row li', () => {
-    const ref = vi.fn();
+    const ref = rs.fn();
     render(
       <FileUploadItem
         file={{ name: 'a' }}
@@ -109,7 +109,7 @@ const waitForRows = (count: number) =>
 
 describe('FileUpload — row actions', () => {
   it('Delete removes a picked file, with a default aria-label', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     const { container } = render(<Uploader maxFiles={3} onValueChange={onValueChange} />);
     pick(container, makeFile('a.wasm'), makeFile('b.wasm'));
     await waitForRows(2);
@@ -119,7 +119,7 @@ describe('FileUpload — row actions', () => {
   });
 
   it('Delete composes the consumer onClick and honours preventDefault', async () => {
-    const onClick = vi.fn((e: { preventDefault: () => void }) => e.preventDefault());
+    const onClick = rs.fn((e: { preventDefault: () => void }) => e.preventDefault());
     const { container } = render(
       <Uploader>
         <FileUploadItemGroup>
@@ -139,7 +139,7 @@ describe('FileUpload — row actions', () => {
   });
 
   it('Delete on a loading row is "Cancel upload" and stays enabled', async () => {
-    const onCancel = vi.fn();
+    const onCancel = rs.fn();
     render(
       <FileUpload data-testid='fu'>
         <FileUploadItemGroup>
@@ -158,7 +158,7 @@ describe('FileUpload — row actions', () => {
   });
 
   it('Delete for a stored file only runs the consumer handler', async () => {
-    const onDetach = vi.fn();
+    const onDetach = rs.fn();
     render(
       <FileUploadItem file={{ name: 'stored.so' }}>
         <FileUploadItemDeleteTrigger aria-label='Detach artifact' onClick={onDetach} />
@@ -169,7 +169,7 @@ describe('FileUpload — row actions', () => {
   });
 
   it('Replace in single mode opens the picker and the new file replaces the old one', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
     const { container } = render(<Uploader />);
     pick(container, makeFile('old.wasm'));
     await waitForRows(1);
@@ -193,7 +193,7 @@ describe('FileUpload — row actions', () => {
   });
 
   it('an invalid multi-mode replacement keeps the original', async () => {
-    const onFileReject = vi.fn();
+    const onFileReject = rs.fn();
     const { container } = render(
       <Uploader maxFiles={3} accept='.wasm' onFileReject={onFileReject} />,
     );
@@ -214,7 +214,7 @@ describe('FileUpload — row actions', () => {
   });
 
   it('read-only hides Delete and Replace but keeps FileUploadItemAction (Download)', async () => {
-    const onDownload = vi.fn();
+    const onDownload = rs.fn();
     render(
       <FileUpload data-testid='fu' readOnly defaultValue={[makeFile('a.wasm')]}>
         <FileUploadItemGroup>

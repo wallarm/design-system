@@ -1,6 +1,6 @@
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { Field, FieldLabel } from '../Field';
 import { FileUpload } from './FileUpload';
 import { byTestId, hiddenInput, makeFile, pick } from './FileUpload.test.helpers';
@@ -11,7 +11,7 @@ import { FileUploadItemGroup } from './FileUploadItemGroup';
 import { FileUploadTrigger } from './FileUploadTrigger';
 
 afterEach(() => {
-  vi.restoreAllMocks();
+  rs.restoreAllMocks();
 });
 
 const Tree = ({ loading, withRow = true }: { loading?: boolean; withRow?: boolean }) => (
@@ -48,7 +48,7 @@ describe('FileUpload — loading row locks the pickers (integration)', () => {
   });
 
   it('a locked Dropzone click does not open the picker', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
     render(<Tree loading />);
     await userEvent.click(byTestId('fu--dropzone'));
     // Ark opens the picker asynchronously: give it the same window the control test needs.
@@ -57,7 +57,7 @@ describe('FileUpload — loading row locks the pickers (integration)', () => {
   });
 
   it('an unlocked Dropzone click opens the picker (control for the lock test)', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
     render(<Tree loading={false} />);
     await userEvent.click(byTestId('fu--dropzone'));
     await waitFor(() => expect(click).toHaveBeenCalledTimes(1));
@@ -94,7 +94,7 @@ describe('FileUpload — loading row locks the pickers (integration)', () => {
   });
 
   it('a click on the Field label does not open the picker while a row is uploading (single mode)', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     const { container } = render(
       <Field>
         <FieldLabel>WASM module</FieldLabel>

@@ -1,20 +1,20 @@
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { copyText } from '../../utils/copyText';
 import { Copyable } from './Copyable';
 
-vi.mock('../../utils/copyText', () => ({
-  copyText: vi.fn(() => Promise.resolve()),
+rs.mock('../../utils/copyText', () => ({
+  copyText: rs.fn(() => Promise.resolve()),
 }));
 
 afterEach(() => {
-  vi.mocked(copyText).mockClear();
+  rs.mocked(copyText).mockClear();
 });
 
 describe('Copyable', () => {
   it('copies a string text', async () => {
-    const onCopied = vi.fn();
+    const onCopied = rs.fn();
 
     render(
       <Copyable text='static value' onCopied={onCopied}>
@@ -32,7 +32,7 @@ describe('Copyable', () => {
 
   it('calls a function text lazily at click time and copies its result', async () => {
     let current = 'initial';
-    const getText = vi.fn(() => current);
+    const getText = rs.fn(() => current);
 
     render(
       <Copyable text={getText}>

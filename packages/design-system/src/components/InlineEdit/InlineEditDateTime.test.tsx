@@ -1,6 +1,6 @@
 import { CalendarDate } from '@internationalized/date';
+import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 import { useTestId } from '../../utils/testId';
 import {
   CalendarBody,

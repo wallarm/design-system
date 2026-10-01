@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { ToggleButton } from './ToggleButton';
 
 describe('Attribute pass-through', () => {
@@ -26,7 +26,7 @@ describe('Attribute pass-through', () => {
   });
 
   it('onToggle still fires when consumer attrs are present', async () => {
-    const onToggle = vi.fn();
+    const onToggle = rs.fn();
 
     render(
       <ToggleButton data-analytics-id='TOGGLE_WRAP' onToggle={onToggle}>

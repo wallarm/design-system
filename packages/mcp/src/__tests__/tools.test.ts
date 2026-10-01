@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { formatComponentDetails, getComponent } from '../tools/get-component';
 import { formatTokenCategory, getTokenCategory } from '../tools/get-token-category';

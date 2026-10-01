@@ -1,6 +1,6 @@
 import type { Diagnostic } from '@codemirror/lint';
 import { Compartment, Text } from '@codemirror/state';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import {
   activeDiagnostics,
   destroyLintedViews,
@@ -21,7 +21,7 @@ const doc = Text.of(DOC.split('\n'));
 
 afterEach(() => {
   destroyLintedViews();
-  vi.restoreAllMocks();
+  rs.restoreAllMocks();
 });
 
 describe('toCmDiagnostic', () => {
@@ -207,7 +207,7 @@ describe('diagnosticsExtension — schema hook', () => {
   };
 
   it('runs schemaSource only when schema is set and the JSON parses, defaulting source to "schema"', async () => {
-    const schemaSource = vi.fn<SchemaDiagnosticsSource>(async () => [schemaDiagnostic]);
+    const schemaSource = rs.fn<SchemaDiagnosticsSource>(async () => [schemaDiagnostic]);
 
     const withoutSchema = mountLinted('{"a": 1}', { language: 'json', schemaSource });
     await flushLint(withoutSchema.view);
@@ -229,7 +229,7 @@ describe('diagnosticsExtension — schema hook', () => {
   });
 
   it('keeps external diagnostics when schemaSource rejects', async () => {
-    const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    const consoleError = rs.spyOn(console, 'error').mockImplementation(() => undefined);
     const { view } = mountLinted('{"a": 1}', {
       language: 'json',
       schema: {},
@@ -256,7 +256,7 @@ describe('diagnosticsExtension — schema hook', () => {
         resolveStale = resolve;
       });
     const compartment = new Compartment();
-    const onChange = vi.fn();
+    const onChange = rs.fn();
     const configFor = (overrides: Partial<DiagnosticsConfig>): DiagnosticsConfig => ({
       language: 'json',
       schema: undefined,

@@ -1,7 +1,7 @@
 import { searchPanelOpen } from '@codemirror/search';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { engineOptions } from '../../../testUtils/codeEditorEngine';
 import { PortalOutlet } from '../lib/PortalOutlet';
 import { createPortalRegistry } from '../lib/portalRegistry';
@@ -17,9 +17,9 @@ const mountWithPortals = (overrides: Partial<EngineOptions> = {}) => {
   let handle: EditorHandle | undefined;
   act(() => {
     handle = createEditor(container, options, {
-      onChange: vi.fn(),
-      onDiagnosticsChange: vi.fn(),
-      onVisibleRowCountChange: vi.fn(),
+      onChange: rs.fn(),
+      onDiagnosticsChange: rs.fn(),
+      onVisibleRowCountChange: rs.fn(),
       portals,
     });
   });

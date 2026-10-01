@@ -1,6 +1,6 @@
 import { undo } from '@codemirror/commands';
 import { searchPanelOpen } from '@codemirror/search';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from '@rstest/core';
 import { mountEngine, typeAt, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 
 afterEach(() => {

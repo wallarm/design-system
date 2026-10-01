@@ -1,6 +1,6 @@
 import { completionStatus, currentCompletions, startCompletion } from '@codemirror/autocomplete';
 import { EditorSelection } from '@codemirror/state';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { mountEngine, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 import type { CodeEditorCompletionSource } from '../types';
 
@@ -9,7 +9,7 @@ afterEach(unmountAllEngines);
 const labelsAfterStart = async (view: Parameters<typeof startCompletion>[0]): Promise<string[]> => {
   view.focus();
   startCompletion(view);
-  await vi.waitFor(() => expect(completionStatus(view.state)).toBe('active'));
+  await rs.waitFor(() => expect(completionStatus(view.state)).toBe('active'));
   return currentCompletions(view.state).map(completion => completion.label);
 };
 

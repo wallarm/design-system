@@ -1,6 +1,6 @@
 import { insertNewlineAndIndent, undo } from '@codemirror/commands';
 import { EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import {
   engineOptions,
   mountEngine,
@@ -105,14 +105,14 @@ describe('createEditor — controlled transform in onChange (E-RF1)', () => {
     let handle: EditorHandle | null = null;
     // Like a React parent: store the transformed value, re-render (update) later —
     // CodeMirror forbids dispatching while an update is in progress.
-    const onChange = vi.fn<EngineCallbacks['onChange']>(value => {
+    const onChange = rs.fn<EngineCallbacks['onChange']>(value => {
       stored = value.toUpperCase();
       queueMicrotask(() => handle?.update({ ...options, value: stored }));
     });
     handle = createEditor(parent, options, {
       onChange,
-      onDiagnosticsChange: vi.fn(),
-      onVisibleRowCountChange: vi.fn(),
+      onDiagnosticsChange: rs.fn(),
+      onVisibleRowCountChange: rs.fn(),
       portals: createPortalRegistry(),
     });
 

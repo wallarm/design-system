@@ -156,7 +156,8 @@ jobs:
       - name: Run ${{ matrix.check }}
         run: |
           if [ "${{ matrix.check }}" = "test" ]; then
-            pnpm test:run -- --reporter=default --reporter=junit --outputFile=./test-results/junit.xml
+            # JUnit (packages/*/test-results/junit.xml) comes from @wallarm-org/rstest-config when CI is set
+            pnpm test:run
           else
             pnpm ${{ matrix.check }}
           fi

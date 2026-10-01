@@ -1,7 +1,7 @@
 import { createRef, type FC, type Ref, StrictMode, useState } from 'react';
+import { describe, expect, it } from '@rstest/core';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
 import { TestIdProvider } from '../../../utils/testId';
 import { CodeSnippetFrame } from './CodeSnippetFrame';
 

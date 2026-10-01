@@ -27,38 +27,40 @@
       "dependsOn": ["^build", "^typecheck"]
     },
     "test": {
-      "dependsOn": ["@wallarm-org/vitest-config#build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx}",
+        "scripts/**/*.{ts,tsx,js,jsx}",
         "**/*.{test,spec}.{ts,tsx,js,jsx}",
-        "vitest.config.{ts,js}",
-        "vitest.setup.{ts,js}"
+        "rstest.config.{ts,js}",
+        "rstest.setup.{ts,js}",
+        "$TURBO_ROOT$/packages/configs/rstest-config/src/**"
       ],
-      "outputs": ["coverage/**"]
+      "env": ["CI"],
+      "outputs": ["coverage/**", "test-results/junit.xml"]
     },
     "test:run": {
-      "dependsOn": ["@wallarm-org/vitest-config#build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx}",
+        "scripts/**/*.{ts,tsx,js,jsx}",
         "**/*.{test,spec}.{ts,tsx,js,jsx}",
-        "vitest.config.{ts,js}",
-        "vitest.setup.{ts,js}"
+        "rstest.config.{ts,js}",
+        "rstest.setup.{ts,js}",
+        "$TURBO_ROOT$/packages/configs/rstest-config/src/**"
       ],
-      "outputs": ["coverage/**"]
+      "env": ["CI"],
+      "outputs": ["coverage/**", "test-results/junit.xml"]
     },
     "test:coverage": {
-      "dependsOn": ["@wallarm-org/vitest-config#build"],
       "inputs": [
         "src/**/*.{ts,tsx,js,jsx}",
+        "scripts/**/*.{ts,tsx,js,jsx}",
         "**/*.{test,spec}.{ts,tsx,js,jsx}",
-        "vitest.config.{ts,js}",
-        "vitest.setup.{ts,js}"
+        "rstest.config.{ts,js}",
+        "rstest.setup.{ts,js}",
+        "$TURBO_ROOT$/packages/configs/rstest-config/src/**"
       ],
-      "outputs": ["coverage/**"]
-    },
-    "test:ui": {
-      "cache": false,
-      "persistent": true
+      "env": ["CI"],
+      "outputs": ["coverage/**", "test-results/junit.xml"]
     },
     "e2e": {
       "dependsOn": ["^build"],

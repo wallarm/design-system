@@ -1,5 +1,5 @@
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { useWindowScrollRoot } from '../useWindowScrollRoot';
 
 const setHeights = (el: HTMLElement, client: number, scroll: number) =>
@@ -30,19 +30,19 @@ let resizeCallbacks: (() => void)[] = [];
 describe('useWindowScrollRoot', () => {
   beforeEach(() => {
     resizeCallbacks = [];
-    vi.stubGlobal(
+    rs.stubGlobal(
       'ResizeObserver',
       class {
         constructor(cb: () => void) {
           resizeCallbacks.push(cb);
         }
-        observe = vi.fn();
-        disconnect = vi.fn();
+        observe = rs.fn();
+        disconnect = rs.fn();
       },
     );
   });
   afterEach(() => {
-    vi.unstubAllGlobals();
+    rs.unstubAllGlobals();
     document.body.innerHTML = '';
   });
 

@@ -1,8 +1,8 @@
 import { EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from '@rstest/core';
 
-describe('jsdom layout stubs (vitest.setup.ts)', () => {
+describe('jsdom layout stubs (rstest.setup.ts)', () => {
   let parent: HTMLElement | null = null;
   let view: EditorView | null = null;
 
