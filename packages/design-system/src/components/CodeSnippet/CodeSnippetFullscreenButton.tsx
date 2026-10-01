@@ -5,7 +5,7 @@ import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
 import { Kbd } from '../Kbd';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-import { useCodeSnippetChrome } from './hooks';
+import { useCodeSnippetFrame } from './hooks';
 
 export type CodeSnippetFullscreenButtonProps = Omit<ButtonProps, 'children'> & {
   ref?: Ref<HTMLButtonElement>;
@@ -17,7 +17,7 @@ export const CodeSnippetFullscreenButton: FC<CodeSnippetFullscreenButtonProps> =
   ...props
 }) => {
   const testId = useTestId('fullscreen-button');
-  const { isFullscreen, setIsFullscreen } = useCodeSnippetChrome();
+  const { isFullscreen, setIsFullscreen } = useCodeSnippetFrame();
 
   const handleClick: MouseEventHandler<HTMLButtonElement> = event => {
     setIsFullscreen(!isFullscreen);

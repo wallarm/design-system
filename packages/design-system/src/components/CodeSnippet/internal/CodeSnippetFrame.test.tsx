@@ -3,7 +3,7 @@ import { act, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { describe, expect, it } from 'vitest';
 import { TestIdProvider } from '../../../utils/testId';
-import { ChromeFrame } from './ChromeFrame';
+import { CodeSnippetFrame } from './CodeSnippetFrame';
 
 const Counter: FC = () => {
   const [count, setCount] = useState(0);
@@ -27,7 +27,7 @@ const Harness: FC<HarnessProps> = ({ initialFullscreen = false, frameRef }) => {
         toggle
       </button>
       <TestIdProvider value='frame'>
-        <ChromeFrame
+        <CodeSnippetFrame
           ref={frameRef}
           id='consumer-id'
           data-testid='frame'
@@ -38,13 +38,13 @@ const Harness: FC<HarnessProps> = ({ initialFullscreen = false, frameRef }) => {
           setIsFullscreen={setIsFullscreen}
         >
           <Counter />
-        </ChromeFrame>
+        </CodeSnippetFrame>
       </TestIdProvider>
     </div>
   );
 };
 
-describe('ChromeFrame', () => {
+describe('CodeSnippetFrame', () => {
   it('renders the root inline inside the parent when not fullscreen', () => {
     render(<Harness />);
 

@@ -2,19 +2,19 @@ import { act } from '@testing-library/react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
 import { describe, expect, it, vi } from 'vitest';
-import { ChromeFrame } from './ChromeFrame';
+import { CodeSnippetFrame } from './CodeSnippetFrame';
 
 const noop = () => {
   // fullscreen toggling is not exercised here
 };
 
 const Frame = () => (
-  <ChromeFrame data-testid='frame' id='ssr-root' isFullscreen={false} setIsFullscreen={noop}>
+  <CodeSnippetFrame data-testid='frame' id='ssr-root' isFullscreen={false} setIsFullscreen={noop}>
     <span data-testid='child'>code</span>
-  </ChromeFrame>
+  </CodeSnippetFrame>
 );
 
-describe('ChromeFrame SSR', () => {
+describe('CodeSnippetFrame SSR', () => {
   it('renders the root inline on the server', () => {
     const html = renderToString(<Frame />);
 

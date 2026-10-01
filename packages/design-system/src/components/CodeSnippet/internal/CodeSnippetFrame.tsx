@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 
-export interface ChromeFrameProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
+export interface CodeSnippetFrameProps extends Omit<HTMLAttributes<HTMLDivElement>, 'children'> {
   ref?: Ref<HTMLDivElement>;
   isFullscreen: boolean;
   setIsFullscreen: (fullscreen: boolean) => void;
@@ -35,7 +35,7 @@ const createHost = (): HTMLDivElement | null => {
 };
 
 /**
- * Chrome shell shared by CodeSnippetRoot and CodeEditorRoot.
+ * Frame shell shared by CodeSnippetRoot and CodeEditorRoot.
  *
  * The root `<div>` (with every consumer prop, `className` and `ref`) is always
  * rendered through `createPortal` into one persistent host element. Entering or
@@ -48,7 +48,7 @@ const createHost = (): HTMLDivElement | null => {
  * inside the placeholder; the client switches to the portal right after
  * hydration (a one-time remount at mount, never on fullscreen toggle).
  */
-export const ChromeFrame: FC<ChromeFrameProps> = ({
+export const CodeSnippetFrame: FC<CodeSnippetFrameProps> = ({
   ref,
   isFullscreen,
   setIsFullscreen,
@@ -115,4 +115,4 @@ export const ChromeFrame: FC<ChromeFrameProps> = ({
   );
 };
 
-ChromeFrame.displayName = 'ChromeFrame';
+CodeSnippetFrame.displayName = 'CodeSnippetFrame';
