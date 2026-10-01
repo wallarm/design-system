@@ -228,7 +228,7 @@ describe('CodeEditor import boundary', () => {
         "import type { EditorHandle, EngineOptions } from './engine/types';",
         "export type { EditorHandle } from './engine/types';",
         "import { cn } from '../../utils/cn';",
-        "import { ChromeFrame } from '../CodeSnippet/internal/ChromeFrame';",
+        "import { CodeSnippetFrame } from '../CodeSnippet/internal/CodeSnippetFrame';",
         "import { enginePlaceholder } from './engineless';",
       ].join('\n');
       expect(findMainChunkViolations(root, source)).toEqual([]);

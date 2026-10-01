@@ -11,7 +11,7 @@ import {
   CodeSnippetHeader,
   CodeSnippetTitle,
   CodeSnippetWrapButton,
-  useCodeSnippetChrome,
+  useCodeSnippetFrame,
 } from '../CodeSnippet';
 import { type CodeEditorApi, CodeEditorContent, CodeEditorRoot, useCodeEditor } from './index';
 import { loadEngine } from './lib/loadEngine';
@@ -29,7 +29,7 @@ const FALLBACK_FOLDS = [{ id: 'rest', startLine: 2, endLine: 3 }];
 const FOLDS_FOR_ROLE_TEST = [{ id: 'middle', startLine: 2, endLine: 3, label: 'Middle' }];
 
 const WrapProbe = () => {
-  const { wrapLines } = useCodeSnippetChrome();
+  const { wrapLines } = useCodeSnippetFrame();
   return <output data-testid='wrap-probe'>{String(wrapLines)}</output>;
 };
 

@@ -3,7 +3,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
-import { useCodeSnippetChrome } from '../CodeSnippet/hooks';
+import { useCodeSnippetFrame } from '../CodeSnippet/hooks';
 import { useCodeEditorContext } from './CodeEditorContext';
 import {
   codeEditorContentVariants,
@@ -90,7 +90,7 @@ export const CodeEditorContent: FC<CodeEditorContentProps> = ({
   const fallbackTestId = useTestId('fallback');
   const fallbackGuttersTestId = useTestId('fallback-gutters');
   const { options, callbacks, setHandle } = useCodeEditorContext();
-  const { isFullscreen } = useCodeSnippetChrome();
+  const { isFullscreen } = useCodeSnippetFrame();
   const [registry] = useState(createPortalRegistry);
   const [handle, setLocalHandle] = useState<EditorHandle | null>(null);
   const [loadFailed, setLoadFailed] = useState(false);
@@ -160,8 +160,8 @@ export const CodeEditorContent: FC<CodeEditorContentProps> = ({
     handle?.update(engineOptions);
   }, [handle, engineOptions]);
 
-  // Re-measure after mount and after ChromeFrame moves its host in/out of fullscreen (spec §7.9).
-  // A passive effect runs after ChromeFrame's layout effect has attached/moved the host, so the
+  // Re-measure after mount and after CodeSnippetFrame moves its host in/out of fullscreen (spec §7.9).
+  // A passive effect runs after CodeSnippetFrame's layout effect has attached/moved the host, so the
   // measure (scheduled for the next frame) never reads a detached or stale geometry.
   // biome-ignore lint/correctness/useExhaustiveDependencies: isFullscreen is the trigger, not an input.
   useEffect(() => {

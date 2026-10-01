@@ -6,15 +6,15 @@ import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { plainAdapter } from '../CodeSnippet/adapters/plain';
 import type { SyntaxAdapter } from '../CodeSnippet/adapters/types';
-import {
-  CodeSnippetChromeContext,
-  type CodeSnippetChromeContextValue,
-} from '../CodeSnippet/CodeSnippetChromeContext';
 import type { CodeSnippetSize, LineConfig } from '../CodeSnippet/CodeSnippetContext';
+import {
+  CodeSnippetFrameContext,
+  type CodeSnippetFrameContextValue,
+} from '../CodeSnippet/CodeSnippetFrameContext';
 import { CodeSnippetShowMoreButton } from '../CodeSnippet/CodeSnippetShowMoreButton';
 import { codeSnippetRootVariants } from '../CodeSnippet/classes';
 import { useAdapter } from '../CodeSnippet/hooks';
-import { ChromeFrame } from '../CodeSnippet/internal/ChromeFrame';
+import { CodeSnippetFrame } from '../CodeSnippet/internal/CodeSnippetFrame';
 import {
   getHiddenLineCount,
   hasExplicitShowMoreButton,
@@ -254,7 +254,7 @@ export const CodeEditorRoot = ({
     : null;
   const resolvedSize: CodeSnippetSize = size ?? 'sm';
 
-  const chromeValue = useMemo<CodeSnippetChromeContextValue>(
+  const frameValue = useMemo<CodeSnippetFrameContextValue>(
     () => ({
       size: resolvedSize,
       getCode,
@@ -327,9 +327,9 @@ export const CodeEditorRoot = ({
 
   return (
     <TestIdProvider value={testId}>
-      <CodeSnippetChromeContext.Provider value={chromeValue}>
+      <CodeSnippetFrameContext.Provider value={frameValue}>
         <CodeEditorContext.Provider value={editorContext}>
-          <ChromeFrame
+          <CodeSnippetFrame
             {...props}
             ref={ref}
             data-slot='code-editor'
@@ -344,9 +344,9 @@ export const CodeEditorRoot = ({
           >
             {children}
             {maxLines > 0 && !hasExplicitShowMoreButton(children) && <CodeSnippetShowMoreButton />}
-          </ChromeFrame>
+          </CodeSnippetFrame>
         </CodeEditorContext.Provider>
-      </CodeSnippetChromeContext.Provider>
+      </CodeSnippetFrameContext.Provider>
     </TestIdProvider>
   );
 };

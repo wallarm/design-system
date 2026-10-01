@@ -27,7 +27,7 @@ An editable code surface that is visually the same component as `CodeSnippet` �
 | D2 | Engine: CodeMirror 6, lazy-loaded as one chunk from `CodeEditorContent`. No Web Workers. |
 | D3 | **Colours come from the same `SyntaxAdapter` as CodeSnippet** (`CodeSnippetAdapterProvider` → `useAdapter()`, fallback `plainAdapter`). Adapter tokens are painted as CM mark decorations with the existing `TOKEN_CLASSES`. With Prism the editor looks like CodeSnippet+Prism, with Shiki like CodeSnippet+Shiki, with no provider it is plain — exactly as CodeSnippet. No Lezer `HighlightStyle` is used for colour. |
 | D4 | Lezer parsers are used **for structure only** (no colour): a custom HTTP grammar nesting `@lezer/json` through `parseMixed`, `@codemirror/lang-json`, `@codemirror/lang-yaml`. `bash` and `text` have no parser. |
-| D5 | Chrome is shared: phase 0 adds a `CodeSnippetChromeContext` to CodeSnippet; the chrome buttons read only that context; `CodeEditorRoot` provides it. Header/Title/Tabs/Tab/Actions are reused unchanged. |
+| D5 | Chrome is shared: phase 0 adds a `CodeSnippetFrameContext` to CodeSnippet; the chrome buttons read only that context; `CodeEditorRoot` provides it. Header/Title/Tabs/Tab/Actions are reused unchanged. |
 | D6 | `lines` and `folds` are **static**: the props are the source of truth and are re-applied by (absolute) line number after every change. Decorations do not travel with edited text. Consumers who want anchored decorations recompute them from `value`. |
 | D7 | Diff = prop `original` on `CodeEditorRoot`. Rendered unified, one column, the CodeSnippet way: inserted lines are `success` lines with a `+` prefix, deleted lines are `danger` rows with a `-` prefix and no line number. Built on `@codemirror/merge` `unifiedMergeView`. No split view, no accept/reject controls. |
 | D8 | JSON Schema support is our own code on `json-schema-library` 11 (drafts 04 → 2020-12, no `eval`, ~32 KB gz, loaded only when `schema` is set). `codemirror-json-schema` is **not** used (Draft-04 only, unmaintained since 2025-04, bundles shiki v1 + markdown-it, broken ESM). |
@@ -232,9 +232,9 @@ Also exported as `CodeEditorProps = CodeEditorRootProps` so `scripts/metadata` p
 
 No public behaviour of CodeSnippet changes except the listed bug fixes. All existing unit tests and the 30 screenshot baselines must pass unchanged.
 
-1. **`CodeSnippetChromeContext`** (new, additive; `useCodeSnippet` and `CodeSnippetContextValue` stay untouched):
+1. **`CodeSnippetFrameContext`** (new, additive; `useCodeSnippet` and `CodeSnippetContextValue` stay untouched):
    ```ts
-   export type CodeSnippetChromeContextValue = {
+   export type CodeSnippetFrameContextValue = {
      size: CodeSnippetSize;
      /** Lazily reads the current text (snippet: code prop; editor: live document) */
      getCode: () => string;
@@ -250,12 +250,12 @@ No public behaviour of CodeSnippet changes except the listed bug fixes. All exis
      hiddenLineCount: number;
    };
    ```
-   Plus `useCodeSnippetChrome()` (throws outside a provider). Exported from `CodeSnippet/index.ts`.
-2. **Chrome buttons** switch to `useCodeSnippetChrome()`: `CodeSnippetCopyButton`, `CodeSnippetWrapButton`, `CodeSnippetFullscreenButton`, `CodeSnippetShowMoreButton` (uses `hiddenLineCount` instead of `displayItems.length - maxLines`).
+   Plus `useCodeSnippetFrame()` (throws outside a provider). Exported from `CodeSnippet/index.ts`.
+2. **Chrome buttons** switch to `useCodeSnippetFrame()`: `CodeSnippetCopyButton`, `CodeSnippetWrapButton`, `CodeSnippetFullscreenButton`, `CodeSnippetShowMoreButton` (uses `hiddenLineCount` instead of `displayItems.length - maxLines`).
 3. **`Copyable`** gets `text: string | (() => string)` (non-breaking), so the editor root never re-renders per keystroke for copy.
 4. **Bug fix — `onCopy`:** `CodeSnippetCopyButton` passes `onCopied={notifyCopied}`; Root's `notifyCopied` calls `onCopy?.(code)`. Currently `onCopy` never fires.
 5. **Bug fix — Escape:** the fullscreen Escape listener ignores `event.defaultPrevented` (so closing an editor popup does not exit fullscreen).
-6. **Fullscreen without remount:** `internal/ChromeFrame.tsx` renders the root into a persistent host element via `createPortal`; a layout effect moves that host between an inline placeholder and `document.body`. The subtree is never remounted, consumer props and `ref` are kept in fullscreen (fullscreen classes are merged, not substituted). Backdrop click and Escape behave as today.
+6. **Fullscreen without remount:** `internal/CodeSnippetFrame.tsx` renders the root into a persistent host element via `createPortal`; a layout effect moves that host between an inline placeholder and `document.body`. The subtree is never remounted, consumer props and `ref` are kept in fullscreen (fullscreen classes are merged, not substituted). Backdrop click and Escape behave as today.
 7. **`classes.ts`:** the Root CVA moves out of `CodeSnippetRoot.tsx` (rule: CVA in `classes.ts`) and is exported for `CodeEditorRoot`, because the floating-actions selector lives in it.
 8. **ShowMore auto-render detection** moves to `lib/showMore.ts` (shared by both roots). `CodeSnippetShowMoreButton` gets `useTestId('show-more-button')`.
 9. **New tests pinning phase 0:** `onCopy` fires; fullscreen keeps consumer props/ref and does not remount (a child's state survives toggle); Escape with `defaultPrevented` does not exit; backdrop click exits; `hiddenLineCount` drives ShowMore identically.
@@ -265,7 +265,7 @@ No public behaviour of CodeSnippet changes except the listed bug fixes. All exis
 ```
 src/components/CodeEditor/
   index.ts
-  CodeEditorRoot.tsx            chrome provider (ChromeFrame from CodeSnippet), state, lazy engine bridge
+  CodeEditorRoot.tsx            chrome provider (CodeSnippetFrame from CodeSnippet), state, lazy engine bridge
   CodeEditorContent.tsx         wrapper div, Suspense-less loader, fallback, portal outlet
   CodeEditorContext.ts          internal context: api, options snapshot, portal registry
   classes.ts                    content wrapper CVA (root reuses CodeSnippet classes.ts)
@@ -370,7 +370,7 @@ Order and widths match `CodeSnippetContent`: colour stick (`border-l-2 pl-12`) �
 
 - Wrap: `EditorView.lineWrapping` + `.cm-line { word-break: break-all }` (CodeSnippet uses `whitespace-pre-wrap break-all`).
 - Size: root CVA sets font size; the theme fixes `line-height: 20px` and content padding `8px 0`; font is inherited (`font-mono` → Geist Mono), overriding CM's base theme (`monospace`, `1.4`, `4px 0`).
-- Fullscreen: `ChromeFrame` (phase 0) moves the host without remount; after the move `view.requestMeasure()`. `.cm-editor` gets `h-full` inside the fullscreen flex column.
+- Fullscreen: `CodeSnippetFrame` (phase 0) moves the host without remount; after the move `view.requestMeasure()`. `.cm-editor` gets `h-full` inside the fullscreen flex column.
 
 ### 7.10 Theme (no new syntax tokens)
 
