@@ -1,5 +1,6 @@
 import type { ComponentProps } from 'react';
 import { fireEvent, screen } from '@testing-library/react';
+import { createRequire } from 'node:module';
 import { FileUpload } from './FileUpload';
 import { FileUploadDropzone } from './FileUploadDropzone';
 import { FileUploadError } from './FileUploadError';
@@ -15,11 +16,19 @@ export const makeFile = (
   lastModified?: number,
 ) => new File(['x'.repeat(size)], name, { type, lastModified });
 
-/** jsdom keeps each wrapper's implementation under an own `Symbol(impl)`. */
-const implOf = (wrapper: object): unknown => {
-  const symbol = Object.getOwnPropertySymbols(wrapper).find(s => s.description === 'impl');
-  return symbol ? (wrapper as Record<symbol, unknown>)[symbol] : undefined;
-};
+interface JsdomIdlUtils {
+  implForWrapper: (wrapper: object) => unknown;
+}
+
+/**
+ * Since jsdom 30.1 each wrapper's implementation sits in a private field that only jsdom's own
+ * idl utils can read. Resolve them through the test runner so it is the very jsdom instance the
+ * test environment runs on (jsdom is the runner's peer, not a direct dependency of this package).
+ */
+const requireFromRunner = createRequire(createRequire(import.meta.url).resolve('vitest'));
+const jsdomIdlUtils = requireFromRunner('jsdom/lib/generated/idl/utils.js') as JsdomIdlUtils;
+
+const implOf = (wrapper: object): unknown => jsdomIdlUtils.implForWrapper(wrapper);
 
 /**
  * jsdom has no `DataTransfer`, so nothing can write `input.files` the way a browser (and zag's
