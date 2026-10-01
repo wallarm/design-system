@@ -43,6 +43,9 @@ export const useWindowScrollRoot = (
       return;
     }
 
+    // An arrow keeps the null-check narrowing; the hoisted `function`s below don't.
+    const isLaidOut = () => container.clientHeight > 0;
+
     // Scroll events do not bubble, so ancestors are only heard in the capture
     // phase. The table's own horizontal scroller is the container, and a
     // sideways scroll of an ancestor leaves its `scrollTop` at 0 — both skipped.
@@ -82,7 +85,7 @@ export const useWindowScrollRoot = (
 
     function trySettle() {
       resolve();
-      if (hasRowsRef.current && container.clientHeight > 0) setIsSettled(true);
+      if (hasRowsRef.current && isLaidOut()) setIsSettled(true);
     }
     trySettleRef.current = trySettle;
 
