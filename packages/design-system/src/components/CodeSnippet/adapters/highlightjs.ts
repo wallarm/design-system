@@ -22,6 +22,7 @@ const SUPPORTED_LANGUAGES = [
   'python',
   'go',
   'sql',
+  'lua',
   'http',
 ] as const satisfies readonly HighlightJsLanguage[];
 

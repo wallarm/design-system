@@ -13,6 +13,7 @@ async function loadAdditionalLanguages() {
     languagesPromise = Promise.all([
       import('prismjs/components/prism-bash'),
       import('prismjs/components/prism-http'),
+      import('prismjs/components/prism-lua'),
     ]) as Promise<unknown> as Promise<void>;
   }
   return languagesPromise;
@@ -34,6 +35,7 @@ const SUPPORTED_LANGUAGES = [
   'sql',
   'yaml',
   'markdown',
+  'lua',
   'http',
 ] as const satisfies readonly PrismLanguage[];
 

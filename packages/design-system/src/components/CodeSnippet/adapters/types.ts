@@ -15,6 +15,7 @@ export type PrismLanguage =
   | 'sql'
   | 'yaml'
   | 'markdown'
+  | 'lua'
   | 'http';
 
 export type ShikiLanguage =
@@ -33,6 +34,7 @@ export type ShikiLanguage =
   | 'sql'
   | 'yaml'
   | 'markdown'
+  | 'lua'
   | 'rust'
   | 'java'
   | 'c'
@@ -50,6 +52,7 @@ export type HighlightJsLanguage =
   | 'python'
   | 'go'
   | 'sql'
+  | 'lua'
   | 'http';
 
 export type PlainLanguage = 'text' | 'plain';

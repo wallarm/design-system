@@ -3,6 +3,22 @@ import { highlightJsAdapter } from './highlightjs';
 import { plainAdapter } from './plain';
 import { prismAdapter } from './prism';
 
+const LUA_CODE = 'local x = "s" -- c\nreturn 42';
+
+const expectLuaTokens = (tokens: { content: string; type: string }[][]) => {
+  expect(tokens).toHaveLength(2);
+  const all = tokens.flat();
+  const typeOf = (content: string) => all.find(t => t.content.trim() === content)?.type;
+  expect(typeOf('local')).toBe('keyword');
+  expect(typeOf('return')).toBe('keyword');
+  expect(all.find(t => t.content.includes('"s"') || t.content === 's')?.type).toBe('string');
+  expect(all.find(t => t.content.includes('-- c') || t.content.trim() === 'c')?.type).toBe(
+    'comment',
+  );
+  expect(typeOf('42')).toBe('number');
+  expect(all.map(t => t.content).join('')).toBe(LUA_CODE.replace('\n', ''));
+};
+
 describe('plainAdapter', () => {
   it('returns one plain token per line', async () => {
     const result = await plainAdapter.highlight('hello\nworld', 'text');
@@ -26,6 +42,10 @@ describe('plainAdapter', () => {
 });
 
 describe('prismAdapter', () => {
+  it('highlights Lua with keyword, string, comment and number tokens', async () => {
+    expectLuaTokens((await prismAdapter.highlight(LUA_CODE, 'lua')).tokens);
+  });
+
   it('highlights known language with correct token types', async () => {
     const code = 'const x = 42;';
     const result = await prismAdapter.highlight(code, 'javascript');
@@ -93,6 +113,11 @@ describe('prismAdapter', () => {
 });
 
 describe('shikiAdapter', () => {
+  it('highlights Lua with keyword, string, comment and number tokens', async () => {
+    const { shikiAdapter } = await import('./shiki');
+    expectLuaTokens((await shikiAdapter.highlight(LUA_CODE, 'lua')).tokens);
+  });
+
   it('highlights code with correct token types', async () => {
     const { shikiAdapter } = await import('./shiki');
     const code = 'const x = 42;';
@@ -162,6 +187,10 @@ describe('shikiAdapter', () => {
 });
 
 describe('highlightJsAdapter', () => {
+  it('highlights Lua with keyword, string, comment and number tokens', async () => {
+    expectLuaTokens((await highlightJsAdapter.highlight(LUA_CODE, 'lua')).tokens);
+  });
+
   it('highlights code with correct token types', async () => {
     const code = 'const x = 42;';
     const result = await highlightJsAdapter.highlight(code, 'javascript');
