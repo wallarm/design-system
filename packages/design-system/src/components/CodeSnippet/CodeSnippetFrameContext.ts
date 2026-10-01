@@ -2,13 +2,13 @@ import { createContext } from 'react';
 import type { CodeSnippetSize } from './CodeSnippetContext';
 
 /**
- * Chrome-level state shared by the toolbar/show-more buttons.
+ * Frame-level state shared by the toolbar/show-more buttons.
  *
- * Provided by `CodeSnippetRoot` (and by `CodeEditorRoot`), so the chrome
+ * Provided by `CodeSnippetRoot` (and by `CodeEditorRoot`), so the frame
  * buttons work under either root without depending on the snippet's
  * render pipeline (`CodeSnippetContext`).
  */
-export type CodeSnippetChromeContextValue = {
+export type CodeSnippetFrameContextValue = {
   size: CodeSnippetSize;
   /** Lazily reads the current text (snippet: `code` prop; editor: live document) */
   getCode: () => string;
@@ -25,4 +25,4 @@ export type CodeSnippetChromeContextValue = {
   hiddenLineCount: number;
 };
 
-export const CodeSnippetChromeContext = createContext<CodeSnippetChromeContextValue | null>(null);
+export const CodeSnippetFrameContext = createContext<CodeSnippetFrameContextValue | null>(null);

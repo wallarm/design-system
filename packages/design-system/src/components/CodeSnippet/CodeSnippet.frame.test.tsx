@@ -8,7 +8,7 @@ import { CodeSnippetContent } from './CodeSnippetContent';
 import { CodeSnippetCopyButton } from './CodeSnippetCopyButton';
 import { CodeSnippetRoot } from './CodeSnippetRoot';
 import { CodeSnippetShowMoreButton } from './CodeSnippetShowMoreButton';
-import { useCodeSnippetChrome } from './hooks';
+import { useCodeSnippetFrame } from './hooks';
 
 vi.mock('../../utils/copyText', () => ({
   copyText: vi.fn(() => Promise.resolve()),
@@ -17,18 +17,18 @@ vi.mock('../../utils/copyText', () => ({
 const makeCode = (lineCount: number) =>
   Array.from({ length: lineCount }, (_, index) => `line ${index + 1}`).join('\n');
 
-const ChromeProbe = () => {
-  const chrome = useCodeSnippetChrome();
+const FrameProbe = () => {
+  const frame = useCodeSnippetFrame();
   return (
     <output data-testid='probe'>
       {JSON.stringify({
-        code: chrome.getCode(),
-        size: chrome.size,
-        maxLines: chrome.maxLines,
-        hiddenLineCount: chrome.hiddenLineCount,
-        isExpanded: chrome.isExpanded,
-        wrapLines: chrome.wrapLines,
-        isFullscreen: chrome.isFullscreen,
+        code: frame.getCode(),
+        size: frame.size,
+        maxLines: frame.maxLines,
+        hiddenLineCount: frame.hiddenLineCount,
+        isExpanded: frame.isExpanded,
+        wrapLines: frame.wrapLines,
+        isFullscreen: frame.isFullscreen,
       })}
     </output>
   );
@@ -38,21 +38,21 @@ afterEach(() => {
   vi.mocked(copyText).mockClear();
 });
 
-describe('CodeSnippet chrome context', () => {
-  it('useCodeSnippetChrome throws outside a provider', () => {
+describe('CodeSnippet frame context', () => {
+  it('useCodeSnippetFrame throws outside a provider', () => {
     const consoleError = vi.spyOn(console, 'error').mockImplementation(() => undefined);
 
-    expect(() => render(<ChromeProbe />)).toThrow(
-      'useCodeSnippetChrome must be used within CodeSnippetRoot or CodeEditorRoot',
+    expect(() => render(<FrameProbe />)).toThrow(
+      'useCodeSnippetFrame must be used within CodeSnippetRoot or CodeEditorRoot',
     );
 
     consoleError.mockRestore();
   });
 
-  it('exposes chrome state from CodeSnippetRoot', () => {
+  it('exposes frame state from CodeSnippetRoot', () => {
     render(
       <CodeSnippetRoot code={makeCode(10)} size='md' maxLines={4} wrapLines>
-        <ChromeProbe />
+        <FrameProbe />
       </CodeSnippetRoot>,
     );
 
@@ -70,7 +70,7 @@ describe('CodeSnippet chrome context', () => {
   it('keeps hiddenLineCount independent of isExpanded', async () => {
     render(
       <CodeSnippetRoot code={makeCode(10)} maxLines={4}>
-        <ChromeProbe />
+        <FrameProbe />
         <CodeSnippetShowMoreButton data-testid='show-more-btn' />
       </CodeSnippetRoot>,
     );
@@ -85,7 +85,7 @@ describe('CodeSnippet chrome context', () => {
   it('reports hiddenLineCount 0 when maxLines is disabled', () => {
     render(
       <CodeSnippetRoot code={makeCode(10)}>
-        <ChromeProbe />
+        <FrameProbe />
       </CodeSnippetRoot>,
     );
 

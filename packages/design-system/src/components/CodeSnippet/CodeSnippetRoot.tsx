@@ -7,19 +7,19 @@ import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { plainAdapter } from './adapters/plain';
 import type { SyntaxAdapter, Token } from './adapters/types';
 import {
-  CodeSnippetChromeContext,
-  type CodeSnippetChromeContextValue,
-} from './CodeSnippetChromeContext';
-import {
   CodeSnippetContext,
   type CodeSnippetContextValue,
   type CodeSnippetSize,
   type LineConfig,
 } from './CodeSnippetContext';
+import {
+  CodeSnippetFrameContext,
+  type CodeSnippetFrameContextValue,
+} from './CodeSnippetFrameContext';
 import { CodeSnippetShowMoreButton } from './CodeSnippetShowMoreButton';
 import { codeSnippetRootVariants } from './classes';
 import { useAdapter } from './hooks';
-import { ChromeFrame } from './internal/ChromeFrame';
+import { CodeSnippetFrame } from './internal/CodeSnippetFrame';
 import { buildDisplayItems, type FoldRegion, validateFolds } from './lib/foldUtils';
 import { getHiddenLineCount, hasExplicitShowMoreButton, isClamped } from './lib/showMore';
 
@@ -241,7 +241,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     ],
   );
 
-  const chromeValue = useMemo<CodeSnippetChromeContextValue>(
+  const frameValue = useMemo<CodeSnippetFrameContextValue>(
     () => ({
       size: (size ?? 'sm') as CodeSnippetSize,
       getCode,
@@ -259,7 +259,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   );
 
   const snippet = (
-    <ChromeFrame
+    <CodeSnippetFrame
       data-slot='code-snippet'
       data-testid={testId}
       {...props}
@@ -270,16 +270,16 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     >
       {children}
       {maxLines > 0 && !hasExplicitShowMore && <CodeSnippetShowMoreButton />}
-    </ChromeFrame>
+    </CodeSnippetFrame>
   );
 
   return (
     <TestIdProvider value={testId}>
-      <CodeSnippetChromeContext.Provider value={chromeValue}>
+      <CodeSnippetFrameContext.Provider value={frameValue}>
         <CodeSnippetContext.Provider value={contextValue as unknown as CodeSnippetContextValue}>
           {snippet}
         </CodeSnippetContext.Provider>
-      </CodeSnippetChromeContext.Provider>
+      </CodeSnippetFrameContext.Provider>
     </TestIdProvider>
   );
 };

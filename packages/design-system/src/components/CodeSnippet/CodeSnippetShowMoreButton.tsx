@@ -4,7 +4,7 @@ import { ChevronUp } from '../../icons/ChevronUp';
 import { useTestId } from '../../utils/testId';
 import { Button, type ButtonProps } from '../Button';
 import { MIN_HIDDEN_LINES_THRESHOLD } from './CodeSnippetContext';
-import { useCodeSnippetChrome } from './hooks';
+import { useCodeSnippetFrame } from './hooks';
 
 export type CodeSnippetShowMoreButtonProps = Omit<ButtonProps, 'children'> & {
   ref?: Ref<HTMLButtonElement>;
@@ -22,7 +22,7 @@ export const CodeSnippetShowMoreButton: FC<CodeSnippetShowMoreButtonProps> = ({
   ...props
 }) => {
   const testId = useTestId('show-more-button');
-  const { maxLines, isExpanded, setIsExpanded, hiddenLineCount } = useCodeSnippetChrome();
+  const { maxLines, isExpanded, setIsExpanded, hiddenLineCount } = useCodeSnippetFrame();
 
   if (maxLines <= 0 || hiddenLineCount < MIN_HIDDEN_LINES_THRESHOLD) return null;
 

@@ -22,7 +22,6 @@ export {
   CodeSnippetAdapterProvider,
   type CodeSnippetAdapterProviderProps,
 } from './CodeSnippetAdapterProvider';
-export { type CodeSnippetChromeContextValue } from './CodeSnippetChromeContext';
 export { CodeSnippetCode, type CodeSnippetCodeProps } from './CodeSnippetCode';
 export { CodeSnippetContent, type CodeSnippetContentProps } from './CodeSnippetContent';
 // Context types
@@ -35,6 +34,7 @@ export {
   type LineTextStyle,
 } from './CodeSnippetContext';
 export { CodeSnippetCopyButton, type CodeSnippetCopyButtonProps } from './CodeSnippetCopyButton';
+export { type CodeSnippetFrameContextValue } from './CodeSnippetFrameContext';
 export {
   CodeSnippetFullscreenButton,
   type CodeSnippetFullscreenButtonProps,
@@ -51,7 +51,7 @@ export { CodeSnippetTabs, type CodeSnippetTabsProps } from './CodeSnippetTabs';
 export { CodeSnippetTitle, type CodeSnippetTitleProps } from './CodeSnippetTitle';
 export { CodeSnippetWrapButton, type CodeSnippetWrapButtonProps } from './CodeSnippetWrapButton';
 // Hooks
-export { useAdapter, useCodeSnippet, useCodeSnippetChrome } from './hooks';
+export { useAdapter, useCodeSnippet, useCodeSnippetFrame } from './hooks';
 // Inline variant
 export { InlineCodeSnippet, type InlineCodeSnippetProps } from './InlineCodeSnippet';
 // Fold types and utilities
