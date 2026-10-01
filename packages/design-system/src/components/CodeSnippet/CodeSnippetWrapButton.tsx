@@ -3,7 +3,7 @@ import { WrapText } from '../../icons/WrapText';
 import { useTestId } from '../../utils/testId';
 import { ToggleButton, type ToggleButtonProps } from '../ToggleButton';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
-import { useCodeSnippet } from './hooks';
+import { useCodeSnippetFrame } from './hooks';
 
 export type CodeSnippetWrapButtonProps = Omit<ToggleButtonProps, 'children'> & {
   ref?: Ref<HTMLButtonElement>;
@@ -15,7 +15,7 @@ export const CodeSnippetWrapButton: FC<CodeSnippetWrapButtonProps> = ({
   ...props
 }) => {
   const testId = useTestId('wrap-button');
-  const { wrapLines, setWrapLines } = useCodeSnippet();
+  const { wrapLines, setWrapLines } = useCodeSnippetFrame();
 
   const handleToggle = (active: boolean, event: MouseEvent<HTMLButtonElement>) => {
     setWrapLines(active);

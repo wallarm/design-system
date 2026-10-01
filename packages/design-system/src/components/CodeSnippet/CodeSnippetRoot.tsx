@@ -1,7 +1,6 @@
-import type { HTMLAttributes, ReactElement, ReactNode, Ref } from 'react';
-import { Children, isValidElement, useCallback, useEffect, useMemo, useState } from 'react';
-import { createPortal } from 'react-dom';
-import { cva, type VariantProps } from 'class-variance-authority';
+import type { HTMLAttributes, ReactNode, Ref } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import type { VariantProps } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { copyText } from '../../utils/copyText';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
@@ -12,40 +11,17 @@ import {
   type CodeSnippetContextValue,
   type CodeSnippetSize,
   type LineConfig,
-  MIN_HIDDEN_LINES_THRESHOLD,
 } from './CodeSnippetContext';
+import {
+  CodeSnippetFrameContext,
+  type CodeSnippetFrameContextValue,
+} from './CodeSnippetFrameContext';
 import { CodeSnippetShowMoreButton } from './CodeSnippetShowMoreButton';
+import { codeSnippetRootVariants } from './classes';
 import { useAdapter } from './hooks';
+import { CodeSnippetFrame } from './internal/CodeSnippetFrame';
 import { buildDisplayItems, type FoldRegion, validateFolds } from './lib/foldUtils';
-
-const codeSnippetRootVariants = cva(
-  [
-    'relative',
-    'code-snippet-bg',
-    'rounded-6',
-    'font-mono',
-    'text-syntax-no-syntax',
-    'overflow-hidden',
-    'flex flex-col',
-    '[&::selection]:bg-[var(--color-syntax-highlight-selected-highlight)]',
-    '[&::selection]:text-[var(--color-syntax-highlight-selected-code)]',
-    '[&_*::selection]:bg-[var(--color-syntax-highlight-selected-highlight)]',
-    '[&_*::selection]:text-[var(--color-syntax-highlight-selected-code)]',
-    '[&>[data-slot=code-snippet-actions]]:absolute [&>[data-slot=code-snippet-actions]]:right-0 [&>[data-slot=code-snippet-actions]]:top-0 [&>[data-slot=code-snippet-actions]]:z-30 [&>[data-slot=code-snippet-actions]]:p-6 [&>[data-slot=code-snippet-actions]]:rounded-br-6 [&>[data-slot=code-snippet-actions]]:rounded-tl-6',
-  ].join(' '),
-  {
-    variants: {
-      size: {
-        sm: 'text-xs leading-sm',
-        md: 'text-sm',
-        lg: 'text-base leading-sm',
-      },
-    },
-    defaultVariants: {
-      size: 'sm',
-    },
-  },
-);
+import { getHiddenLineCount, hasExplicitShowMoreButton, isClamped } from './lib/showMore';
 
 type CodeSnippetRootVariantProps = VariantProps<typeof codeSnippetRootVariants>;
 
@@ -81,12 +57,14 @@ export type CodeSnippetRootProps<TLanguage extends string = string> = CodeSnippe
 
 const EMPTY_LINES: Record<number, LineConfig> = {};
 
-const isCodeSnippetShowMoreButton = (child: ReactNode): child is ReactElement =>
-  isValidElement(child) &&
-  (child.type as { displayName?: string })?.displayName === CodeSnippetShowMoreButton.displayName;
-
 /**
  * Code block with syntax highlighting, actions, line numbers, folding, and maxLines collapse.
+ *
+ * @remarks Layout: the root renders inside a `display: contents` wrapper
+ * (`data-slot='code-snippet-frame'`, the persistent fullscreen portal host), so a parent's
+ * `space-*` / `divide-*` utilities and child selectors (`first:`, `last:`, `[&>*]:`) reach the
+ * wrapper, not the snippet. Put spacing on the snippet's own `className` (e.g. `mt-16`) or use
+ * `gap` on the parent.
  */
 export const CodeSnippetRoot = <TLanguage extends string = string>({
   code,
@@ -100,6 +78,7 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
   onCopy,
   className,
   children,
+  ref,
   'data-testid': testId,
   ...props
 }: CodeSnippetRootProps<TLanguage>) => {
@@ -149,18 +128,14 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     };
   }, [normalizedCode, language, adapter]);
 
-  // Close fullscreen on Escape
-  useEffect(() => {
-    if (!isFullscreen) return;
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') setIsFullscreen(false);
-    };
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isFullscreen]);
-
   const copyToClipboard = useCallback(async () => {
     await copyText(code);
+    onCopy?.(code);
+  }, [code, onCopy]);
+
+  const getCode = useCallback(() => code, [code]);
+
+  const notifyCopied = useCallback(() => {
     onCopy?.(code);
   }, [code, onCopy]);
 
@@ -205,13 +180,14 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     [totalLines, validatedFolds, collapsedFolds, startingLineNumber],
   );
 
-  const hasExplicitShowMoreButton = Children.toArray(children).some(isCodeSnippetShowMoreButton);
+  const hasExplicitShowMore = hasExplicitShowMoreButton(children);
 
-  const visibleDisplayItems = useMemo(() => {
-    const hiddenRows = displayItems.length - maxLines;
-    const shouldClip = maxLines > 0 && !isExpanded && hiddenRows >= MIN_HIDDEN_LINES_THRESHOLD;
-    return shouldClip ? displayItems.slice(0, maxLines) : displayItems;
-  }, [displayItems, maxLines, isExpanded]);
+  const hiddenLineCount = getHiddenLineCount(displayItems.length, maxLines);
+
+  const visibleDisplayItems = useMemo(
+    () => (isClamped(hiddenLineCount, isExpanded) ? displayItems.slice(0, maxLines) : displayItems),
+    [displayItems, hiddenLineCount, maxLines, isExpanded],
+  );
 
   const contextValue = useMemo<CodeSnippetContextValue<TLanguage>>(
     () => ({
@@ -265,37 +241,45 @@ export const CodeSnippetRoot = <TLanguage extends string = string>({
     ],
   );
 
+  const frameValue = useMemo<CodeSnippetFrameContextValue>(
+    () => ({
+      size: (size ?? 'sm') as CodeSnippetSize,
+      getCode,
+      notifyCopied,
+      wrapLines,
+      setWrapLines,
+      isFullscreen,
+      setIsFullscreen,
+      maxLines,
+      isExpanded,
+      setIsExpanded,
+      hiddenLineCount,
+    }),
+    [size, getCode, notifyCopied, wrapLines, isFullscreen, maxLines, isExpanded, hiddenLineCount],
+  );
+
   const snippet = (
-    <div
+    <CodeSnippetFrame
       data-slot='code-snippet'
       data-testid={testId}
-      className={cn(
-        codeSnippetRootVariants({ size }),
-        isFullscreen ? 'fixed inset-16 z-50' : className,
-      )}
-      {...(!isFullscreen ? props : {})}
+      {...props}
+      ref={ref}
+      className={cn(codeSnippetRootVariants({ size }), className)}
+      isFullscreen={isFullscreen}
+      setIsFullscreen={setIsFullscreen}
     >
       {children}
-      {maxLines > 0 && !hasExplicitShowMoreButton && <CodeSnippetShowMoreButton />}
-    </div>
+      {maxLines > 0 && !hasExplicitShowMore && <CodeSnippetShowMoreButton />}
+    </CodeSnippetFrame>
   );
 
   return (
     <TestIdProvider value={testId}>
-      <CodeSnippetContext.Provider value={contextValue as unknown as CodeSnippetContextValue}>
-        {isFullscreen
-          ? createPortal(
-              <>
-                <div
-                  className='fixed inset-0 z-40 backdrop-blur-xs bg-component-dialog-overlay'
-                  onClick={() => setIsFullscreen(false)}
-                />
-                {snippet}
-              </>,
-              document.body,
-            )
-          : snippet}
-      </CodeSnippetContext.Provider>
+      <CodeSnippetFrameContext.Provider value={frameValue}>
+        <CodeSnippetContext.Provider value={contextValue as unknown as CodeSnippetContextValue}>
+          {snippet}
+        </CodeSnippetContext.Provider>
+      </CodeSnippetFrameContext.Provider>
     </TestIdProvider>
   );
 };
