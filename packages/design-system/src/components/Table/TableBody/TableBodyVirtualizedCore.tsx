@@ -1,3 +1,8 @@
+// React Compiler opt-out: `virtualizer` is a mutable @tanstack/react-virtual
+// instance (a known React Compiler-incompatible library) passed in as a prop;
+// getVirtualItems()/getTotalSize() must be re-read on every render.
+'use no memo';
+
 import type { FC, RefObject } from 'react';
 import type { Virtualizer } from '@tanstack/react-virtual';
 import { useTestId } from '../../../utils/testId';

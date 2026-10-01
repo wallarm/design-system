@@ -27,5 +27,7 @@ export default defineConfig({
     },
     tsconfigPath: './tsconfig.app.json',
   },
-  plugins: [pluginReact()],
+  // Ship React Compiler output in the published package (target React 19,
+  // per peerDependencies). See packages/configs/rsbuild-config for details.
+  plugins: [pluginReact({ reactCompiler: true })],
 });
