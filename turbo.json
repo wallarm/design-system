@@ -1,6 +1,7 @@
 {
   "$schema": "https://v2-7-6.turborepo.dev/schema.json",
   "ui": "tui",
+  "agentGuidance": false,
   "globalPassThroughEnv": ["STORYBOOK_URL"],
   "tasks": {
     "dev": {
