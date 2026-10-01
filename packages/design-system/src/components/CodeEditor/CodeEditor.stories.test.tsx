@@ -59,7 +59,14 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
   ReadOnly: { editors: ['code-editor-read-only'] },
   Tabs: { editors: ['code-editor-tabs'] },
   Languages: {
-    editors: ['lang-python', 'lang-json', 'lang-javascript', 'lang-typescript', 'lang-yaml'],
+    editors: [
+      'lang-python',
+      'lang-json',
+      'lang-javascript',
+      'lang-typescript',
+      'lang-yaml',
+      'lang-lua',
+    ],
   },
   SyntaxErrors: {
     editors: [
@@ -68,6 +75,7 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
       'syntax-javascript',
       'syntax-typescript',
       'syntax-python',
+      'syntax-lua',
       'syntax-http',
     ],
   },
@@ -249,7 +257,7 @@ describe('CodeEditor stories', () => {
     const { SyntaxErrors } = composed;
     render(<SyntaxErrors />);
 
-    for (const language of ['json', 'yaml', 'javascript', 'typescript', 'python', 'http']) {
+    for (const language of ['json', 'yaml', 'javascript', 'typescript', 'python', 'lua', 'http']) {
       const count = screen.getByTestId(`syntax-${language}--count`);
       await waitFor(() => expect(count).not.toHaveTextContent(/^0 diagnostics$/), LINT);
     }

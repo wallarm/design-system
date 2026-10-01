@@ -66,6 +66,7 @@ describe('CodeEditor Storybook docs', () => {
     expect(jsdoc).toContain('`JSON.parse`');
     expect(jsdoc).toContain('Babel');
     expect(jsdoc).toMatch(/YAML and Python .*Lezer/);
+    expect(jsdoc).toMatch(/Lua .*luaparse/);
     expect(source).toMatch(/language: 'http',\s*label: 'HTTP'/);
   });
 

@@ -9,7 +9,8 @@ export type CodeEditorLanguage =
   | 'text'
   | 'javascript'
   | 'typescript'
-  | 'python';
+  | 'python'
+  | 'lua';
 
 /** Imperative handle exposed through `apiRef` and `useCodeEditor()`. */
 export interface CodeEditorApi {

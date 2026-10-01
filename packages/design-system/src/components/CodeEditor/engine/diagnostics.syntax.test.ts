@@ -16,6 +16,7 @@ import {
   syntaxErrorDiagnostics,
 } from './diagnostics';
 import { languageExtension, loadLanguageExtension } from './languages';
+import { loadLuaParser } from './luaSyntax';
 
 const HTTP_JSON = 'POST /users HTTP/1.1\nContent-Type: application/json\n\n{"a": 1,}';
 const HTTP_TEXT = 'POST /users HTTP/1.1\nContent-Type: text/plain\n\n{"a": 1,}';
@@ -26,6 +27,7 @@ const stateOf = (doc: string, language: 'json' | 'http' | 'yaml' | 'text') =>
 // JS/TS lint results wait on the Babel chunk; load it once so `flushLint`'s single tick suffices.
 beforeAll(async () => {
   await loadBabelParser();
+  await loadLuaParser();
 });
 
 afterEach(() => {
@@ -202,17 +204,37 @@ const STORY_YAML = `rules:
     enabled: false
 `;
 
+const STORY_LUA = `local cjson = require("cjson")
+
+local BLOCKED = { "10.0.0.1", "10.0.0.2" }
+
+local function check(ctx)
+  local ip = ngx.var.remote_addr
+  for _, blocked in pairs(BLOCKED) do
+    if ip ~= blocked then goto continue end
+    ngx.log(ngx.WARN, "blocked ", ip)
+    ngx.exit(403)
+    ::continue::
+  end
+  ngx.say(cjson.encode({ ok = true, count = #BLOCKED }))
+end
+
+return { check = check }
+`;
+
 const BROKEN: readonly { language: CodeEditorLanguage; doc: string; near: number }[] = [
   { language: 'json', doc: '{"a": 1 "b": 2}', near: 8 },
   { language: 'yaml', doc: 'a: [1, 2', near: 3 },
   { language: 'javascript', doc: 'function f( {', near: 11 },
   { language: 'typescript', doc: 'let a: = 1;', near: 6 },
   { language: 'python', doc: 'def f(:\n  pass', near: 6 },
+  { language: 'lua', doc: 'local x = = 1', near: 10 },
 ];
 
 const VALID: readonly { name: string; language: CodeEditorLanguage; doc: string }[] = [
   { name: 'json', language: 'json', doc: '{"a": 1, "b": [true, null]}' },
   { name: 'yaml', language: 'yaml', doc: 'a: [1, 2]\nb:\n  - c\n' },
+  { name: 'Languages story lua', language: 'lua', doc: STORY_LUA },
   {
     name: 'javascript',
     language: 'javascript',

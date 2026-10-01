@@ -1,3 +1,4 @@
+import { StreamLanguage } from '@codemirror/language';
 import type { Extension } from '@codemirror/state';
 import type { CodeEditorLanguage } from '../../types';
 import { http } from './http';
@@ -18,6 +19,7 @@ const LANGUAGE_EXTENSIONS: Record<CodeEditorLanguage, () => Extension> = {
   javascript: noLanguage,
   typescript: noLanguage,
   python: noLanguage,
+  lua: noLanguage,
 };
 
 const LAZY_LANGUAGES: Partial<Record<CodeEditorLanguage, () => Promise<Extension>>> = {
@@ -25,6 +27,7 @@ const LAZY_LANGUAGES: Partial<Record<CodeEditorLanguage, () => Promise<Extension
   typescript: () =>
     import('@codemirror/lang-javascript').then(m => m.javascript({ typescript: true })),
   python: () => import('@codemirror/lang-python').then(m => m.python()),
+  lua: () => import('@codemirror/legacy-modes/mode/lua').then(m => StreamLanguage.define(m.lua)),
 };
 
 const lazyCache = new Map<CodeEditorLanguage, Promise<Extension>>();

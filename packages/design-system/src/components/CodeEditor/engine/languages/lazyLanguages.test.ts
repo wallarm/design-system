@@ -4,10 +4,11 @@ import { describe, expect, it } from 'vitest';
 import { isLazyLanguage, languageExtension, loadLanguageExtension } from './index';
 
 describe('lazy languages', () => {
-  it('marks javascript, typescript and python as lazy', () => {
+  it('marks javascript, typescript, python and lua as lazy', () => {
     expect(isLazyLanguage('javascript')).toBe(true);
     expect(isLazyLanguage('typescript')).toBe(true);
     expect(isLazyLanguage('python')).toBe(true);
+    expect(isLazyLanguage('lua')).toBe(true);
     expect(isLazyLanguage('json')).toBe(false);
     expect(isLazyLanguage('text')).toBe(false);
   });
@@ -24,6 +25,7 @@ describe('lazy languages', () => {
     ['javascript', 'const a = 1;', 'javascript'],
     ['typescript', 'let a: number = 1;', 'typescript'],
     ['python', 'def f():\n    return 1\n', 'python'],
+    ['lua', 'local function f()\n  return 1\nend\n', 'lua'],
   ] as const)('loads %s', async (lang, doc, name) => {
     const ext = await loadLanguageExtension(lang);
     const state = EditorState.create({ doc, extensions: ext });

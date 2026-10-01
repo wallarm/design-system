@@ -38,7 +38,7 @@ const DESCRIPTION = [
   'The adapter re-tokenizes the whole document after each pause in typing, which stays within a frame up to about 2 000 lines with Prism; longer documents still edit smoothly, their colours just settle a moment later.',
   'Like the snippet, the editor sits inside a `display: contents` wrapper that keeps it mounted across fullscreen, so space editors with their own `className` (for example `mt-16`) or a `gap` on the parent — not `space-*`, `divide-*` or child selectors on the parent.',
   '`lines`, `folds`, `completions` and `schema` are compared by identity, so memoise them or hoist them to module constants — a new value on every render reconfigures the editor.',
-  'Syntax errors are best-effort: JSON reports the `JSON.parse` message, JavaScript and TypeScript use Babel, YAML and Python use their Lezer parsers, which still flag a few valid Python forms such as `lambda a, /, b` and parenthesised `with` items.',
+  'Syntax errors are best-effort: JSON reports the `JSON.parse` message, JavaScript and TypeScript use Babel, Lua uses luaparse (first error only), YAML and Python use their Lezer parsers, which still flag a few valid Python forms such as `lambda a, /, b` and parenthesised `with` items.',
   '`lines` and `folds` stay on their line numbers while typing; to keep a decoration on a piece of text, recompute it from `value` (for example `useMemo(() => linesFor(value), [value])`, or a `folds` function such as `getHttpFolds`).',
   'The editor injects `<style>` tags, so under a strict Content Security Policy pass `cspNonce`.',
   'Tab indents, so keyboard users leave with Escape, then Tab, or press Ctrl+M (Alt+Shift+M on macOS) to switch Tab between indenting and moving focus — point `aria-describedby` at text holding `CODE_EDITOR_KEYBOARD_HINT` to tell screen-reader users.',
@@ -969,6 +969,23 @@ class Rule:
 def active(rules: list[Rule]) -> list[Rule]:
     return [r for r in rules if r.enabled]
 `;
+const LUA_SAMPLE = `local cjson = require("cjson")
+
+local BLOCKED = { "10.0.0.1", "10.0.0.2" }
+
+local function check(ctx)
+  local ip = ngx.var.remote_addr
+  for _, blocked in pairs(BLOCKED) do
+    if ip ~= blocked then goto continue end
+    ngx.log(ngx.WARN, "blocked ", ip)
+    ngx.exit(403)
+    ::continue::
+  end
+  ngx.say(cjson.encode({ ok = true, count = #BLOCKED }))
+end
+
+return { check = check }
+`;
 const JSON_SAMPLE = `{
   "action": "block",
   "point": ["header", "X-Forwarded-For"],
@@ -1012,6 +1029,7 @@ const LANGUAGE_SAMPLES = [
   { id: 'javascript', label: 'JavaScript', language: 'javascript', value: JAVASCRIPT_SAMPLE },
   { id: 'typescript', label: 'TypeScript', language: 'typescript', value: TYPESCRIPT_SAMPLE },
   { id: 'yaml', label: 'YAML', language: 'yaml', value: YAML_SAMPLE },
+  { id: 'lua', label: 'Lua', language: 'lua', value: LUA_SAMPLE },
 ] as const satisfies readonly LanguageSample[];
 
 const LanguageExample = ({ sample }: { sample: LanguageSample }) => {
@@ -1041,8 +1059,8 @@ const LanguageExample = ({ sample }: { sample: LanguageSample }) => {
 };
 
 /**
- * Colours come from the adapter (Shiki here); JavaScript, TypeScript and Python parsers load on
- * first use.
+ * Colours come from the adapter (Shiki here); JavaScript, TypeScript, Python and Lua parsers load
+ * on first use.
  */
 export const Languages: StoryFn<typeof meta> = () => (
   <CodeSnippetAdapterProvider adapter={loadShikiAdapter}>
@@ -1073,6 +1091,7 @@ const SYNTAX_ERROR_SAMPLES = [
   },
   { language: 'typescript', label: 'TypeScript', value: 'let limit: = 50;\n' },
   { language: 'python', label: 'Python', value: 'def active(:\n    pass\n' },
+  { language: 'lua', label: 'Lua', value: 'local function active(rules)\n  return rules[1]\n' },
   {
     language: 'http',
     label: 'HTTP',
@@ -1108,8 +1127,8 @@ const SyntaxErrorExample = ({ sample }: { sample: SyntaxErrorSample }) => {
 
 /**
  * Syntax errors for every language with a structure parser: JSON and an HTTP JSON body use the
- * precise `JSON.parse` message, JavaScript and TypeScript use Babel, YAML and Python report Lezer
- * error nodes. Hover an underline to read the message; the count below each editor comes from
+ * precise `JSON.parse` message, JavaScript and TypeScript use Babel, Lua uses luaparse (first error only), YAML and Python report
+ * Lezer error nodes. Hover an underline to read the message; the count below each editor comes from
  * `onDiagnosticsChange`. Bash and plain text have no syntax diagnostics.
  */
 export const SyntaxErrors: StoryFn<typeof meta> = () => (

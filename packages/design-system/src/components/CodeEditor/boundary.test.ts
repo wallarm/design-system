@@ -31,6 +31,8 @@ const LAZY_CHUNKS: ReadonlyArray<{ pattern: RegExp; loader: string }> = [
   { pattern: /^@babel\/parser(\/|$)/, loader: 'engine/babelSyntax.ts' },
   { pattern: /^@codemirror\/lang-javascript$/, loader: 'engine/languages/index.ts' },
   { pattern: /^@codemirror\/lang-python$/, loader: 'engine/languages/index.ts' },
+  { pattern: /^@codemirror\/legacy-modes(\/|$)/, loader: 'engine/languages/index.ts' },
+  { pattern: /^luaparse$/, loader: 'engine/luaSyntax.ts' },
 ];
 
 /** Files the Global Constraints name explicitly; the scan below must find them all. */
@@ -257,6 +259,19 @@ describe('CodeEditor import boundary', () => {
       expect(
         findLazyChunkViolations(babel, "import type { ParserOptions } from '@babel/parser';"),
       ).toEqual([]);
+      const lua = path.join(ENGINE_DIR, 'luaSyntax.ts');
+      expect(findLazyChunkViolations(languages, dyn('@codemirror/legacy-modes/mode/lua'))).toEqual(
+        [],
+      );
+      expect(findLazyChunkViolations(lua, dyn('luaparse'))).toEqual([]);
+      expect(findLazyChunkViolations(lua, "import { parse } from 'luaparse';")).toHaveLength(1);
+      expect(findLazyChunkViolations(babel, dyn('luaparse'))).toHaveLength(1);
+      expect(
+        findLazyChunkViolations(
+          languages,
+          "import { lua } from '@codemirror/legacy-modes/mode/lua';",
+        ),
+      ).toHaveLength(1);
     });
 
     it('ignores imports mentioned inside JSDoc comments', () => {
@@ -304,7 +319,7 @@ describe('CodeEditor import boundary', () => {
       expect(source).toMatch(/\bimport\s*\(\s*['"]\.\.\/engine['"]\s*\)/);
     });
 
-    it('imports @babel/parser, lang-javascript and lang-python only dynamically from their loaders', () => {
+    it('imports @babel/parser, luaparse, legacy-modes, lang-javascript and lang-python only dynamically from their loaders', () => {
       const violations = allSourceFiles.flatMap(file => findLazyChunkViolations(file, read(file)));
       expect(violations).toEqual([]);
       const babel = read(path.join(ENGINE_DIR, 'babelSyntax.ts'));
@@ -312,6 +327,11 @@ describe('CodeEditor import boundary', () => {
       const languages = read(path.join(ENGINE_DIR, 'languages', 'index.ts'));
       expect(languages).toMatch(/\bimport\s*\(\s*['"]@codemirror\/lang-javascript['"]\s*\)/);
       expect(languages).toMatch(/\bimport\s*\(\s*['"]@codemirror\/lang-python['"]\s*\)/);
+      expect(languages).toMatch(
+        /\bimport\s*\(\s*['"]@codemirror\/legacy-modes\/mode\/lua['"]\s*\)/,
+      );
+      const lua = read(path.join(ENGINE_DIR, 'luaSyntax.ts'));
+      expect(lua).toMatch(/\bimport\s*\(\s*['"]luaparse['"]\s*\)/);
     });
 
     it('imports json-schema-library only dynamically from engine/schema/loadSchema.ts', () => {

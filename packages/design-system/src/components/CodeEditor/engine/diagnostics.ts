@@ -6,6 +6,7 @@ import type { Tree } from '@lezer/common';
 import type { CodeEditorDiagnostic, CodeEditorLanguage, JsonSchema } from '../types';
 import { type BabelLanguage, babelSyntaxDiagnostics } from './babelSyntax';
 import { findJsonBodyRange } from './languages';
+import { luaSyntaxDiagnostics } from './luaSyntax';
 import { offsetToPosition, positionToOffset } from './positions';
 
 /** Absolute document range holding JSON (whole doc for `json`, the JSON body for `http`). */
@@ -332,6 +333,17 @@ const lintSource =
         },
       );
     }
+    if (config.language === 'lua') {
+      return luaSyntaxDiagnostics(state.doc.toString()).then(
+        syntax => (isCurrent() ? [...syntax, ...external] : superseded()),
+        (error: unknown) => {
+          if (!isCurrent()) return superseded();
+          // biome-ignore lint/suspicious/noConsole: a parser that fails to load must not hide consumer diagnostics
+          console.error('[CodeEditor] failed to load the Lua syntax checker', error);
+          return external;
+        },
+      );
+    }
     // JSON regions (json, http body): the precise JSON.parse message only — error nodes inside
     // the region would duplicate it. yaml/python: Lezer error nodes. bash/text: none.
     const syntax = region
@@ -442,7 +454,7 @@ export const diagnosticsTheme: Extension = EditorView.theme({
 
 /**
  * Diagnostics (spec §7.12, §14 A3 + A5): one debounced linter merging syntax errors (JSON.parse for
- * json / the http JSON body, `@babel/parser` for javascript / typescript, Lezer error nodes for
+ * json / the http JSON body, `@babel/parser` for javascript / typescript, `luaparse` for lua (A6), Lezer error nodes for
  * yaml / python), schema errors (via `schemaSource`, T13) and the consumer `diagnostics` prop.
  * Underlines + hover tooltip only — no lint gutter, panel or lint keymap.
  */
