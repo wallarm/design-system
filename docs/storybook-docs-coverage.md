@@ -4,7 +4,7 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-09-30, against main at v1.27.0 (plus `FileUpload` on `feat/WDS-185` and `Avatar` on `feat-avatar-component`). **97 of 98 pages are written** (`FilterDropdown` left).
+> **Last updated:** 2026-09-30, against main at v1.27.0 (plus `FileUpload` on `feat/WDS-185`, `Avatar` on `feat-avatar-component` and `Stepper` on `feat/stepper`). **97 of 99 pages are written** (`FilterDropdown` and `Stepper` left).
 >
 > `SearchModal` landed in v1.7.0 with no stories file, so it is not a page yet — it becomes an
 > unticked row the moment one is added.
@@ -42,7 +42,7 @@ check**, not a queue:
 
 ## Snapshot
 
-- **97 written to the standard · 1 left** (`FilterDropdown`, new on `feat/WDS-180`), across 98 story pages.
+- **97 written to the standard · 2 left** (`FilterDropdown`, new on `feat/WDS-180`; `Stepper`, new on `feat/stepper`), across 99 story pages.
 - Levelling was usually cutting, not filling — and often correcting. Five pages
   claimed behaviour their own code contradicted: `Slider`, `Dialog`,
   `CodeSnippet` (its `Sizes` story labelled the wrong default), `BarList`
@@ -122,6 +122,7 @@ check**, not a queue:
 | ✅ | Navigation/Link | 5 | 5 | `components/Link/Link.stories.tsx` |
 | ✅ | Navigation/Pagination | 9 | 9 | `components/Pagination/Pagination.stories.tsx` |
 | ✅ | Navigation/SegmentedTabs | 9 | 9 | `components/SegmentedTabs/SegmentedTabs.stories.tsx` |
+| ☐ | Navigation/Stepper | 10 | 10 | `components/Stepper/Stepper.stories.tsx` |
 | ✅ | Navigation/Tabs | 11 | 11 | `components/Tabs/Tabs.stories.tsx` |
 | ✅ | Navigation/Tree | 6 | 6 | `components/Tree/Tree.stories.tsx` |
 | ✅ | Navigation/TreeView | 8 | 8 | `components/TreeView/TreeView.stories.tsx` |
