@@ -6,7 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 import { CODE_EDITOR_KEYBOARD_HINT } from './lib/keyboardHint';
 
-const COMPONENT_ID = 'data-display-codeeditor-codeeditor';
+const COMPONENT_ID = 'data-display-codeeditor';
 
 const storiesSource = readFileSync(
   join(dirname(fileURLToPath(import.meta.url)), 'CodeEditor.stories.tsx'),

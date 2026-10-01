@@ -45,7 +45,7 @@ const DESCRIPTION = [
 ].join(' ');
 
 const meta = {
-  title: 'Data display/CodeEditor/CodeEditor',
+  title: 'Data display/CodeEditor',
   component: CodeEditorRoot,
   parameters: {
     layout: 'padded',

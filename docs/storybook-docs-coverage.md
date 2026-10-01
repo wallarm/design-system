@@ -77,7 +77,7 @@ check**, not a queue:
 | ✅ | Data Display/Selection | 10 | 10 | `components/Selection/Selection.stories.tsx` |
 | ✅ | Data Display/Table | 33 | 33 | `components/Table/Table.stories.tsx` |
 | ✅ | Data Display/Timeline | 3 | 3 | `components/Timeline/Timeline.stories.tsx` |
-| ✅ | Data display/CodeEditor/CodeEditor | 26 | 26 | `components/CodeEditor/CodeEditor.stories.tsx` |
+| ✅ | Data display/CodeEditor | 31 | 31 | `components/CodeEditor/CodeEditor.stories.tsx` |
 | ✅ | Data display/CodeSnippet/CodeSnippet | 25 | 25 | `components/CodeSnippet/CodeSnippet.stories.tsx` |
 | ✅ | Data display/SimpleCharts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
 | ✅ | Data display/SimpleCharts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |

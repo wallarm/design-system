@@ -469,7 +469,7 @@ Read-only look of `CodeEditor` with the same props must be indistinguishable fro
   - Interactions: type/undo/redo, multi-cursor edit, find/replace all, fold toggle + summary, show more, wrap toggle, fullscreen keeps undo history and Escape closes an autocomplete without leaving fullscreen, copy returns the edited value, tab switch keeps per-tab history.
   - Accessibility: axe on default/readOnly/diff, Escape→Tab leaves the editor, labels present.
   - Baselines are generated in CI only (`[update-screenshots]`); check the bot commit for unrelated flaky baselines.
-- **Storybook:** `Data display/CodeEditor/CodeEditor`, Overview page via the `storybook-docs` skill (keyboard section, adapter note, performance envelope, accepted visual differences).
+- **Storybook:** `Data display/CodeEditor`, Overview page via the `storybook-docs` skill (keyboard section, adapter note, performance envelope, accepted visual differences).
 
 ## 11. Packaging and dependencies
 
