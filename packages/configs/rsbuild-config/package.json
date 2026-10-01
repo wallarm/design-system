@@ -10,7 +10,7 @@
   "devDependencies": {
     "@rsbuild/core": "catalog:",
     "@rsbuild/plugin-react": "catalog:",
-    "@rsdoctor/rspack-plugin": "1.6.1",
+    "@rsdoctor/rspack-plugin": "1.6.4",
     "@rspack/core": "catalog:"
   }
 }
