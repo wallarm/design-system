@@ -13,6 +13,36 @@ const openValueMenu = async (page: Page) => {
   await page.getByRole('menuitem', { name: /^is any of IN$/ }).click();
 };
 
+/**
+ * Resolves once exactly `count` menus are mounted and their positions and scroll
+ * offsets stay unchanged across two animation frames (open/close transitions,
+ * scrollIntoView and floating-ui repositioning have all landed).
+ */
+const waitForSettledMenus = async (page: Page, count: number) => {
+  const read = () =>
+    page.evaluate(() =>
+      JSON.stringify(
+        [...document.querySelectorAll('[role="menu"]')].map(menu => {
+          const rect = menu.getBoundingClientRect();
+          const scrolls = [menu, ...menu.querySelectorAll('*')]
+            .filter(el => el.scrollHeight > el.clientHeight)
+            .map(el => el.scrollTop);
+          return [rect.x, rect.y, ...scrolls];
+        }),
+      ),
+    );
+  await expect
+    .poll(async () => {
+      const before = await read();
+      await page.evaluate(
+        () => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))),
+      );
+      const after = await read();
+      return before === after && (JSON.parse(after) as unknown[]).length === count;
+    })
+    .toBe(true);
+};
+
 test.describe('Component: FilterInput', () => {
   test.describe('Interactions', () => {
     test('opens a parent category submenu on hover', async ({ page }) => {
@@ -101,15 +131,17 @@ test.describe('Component: FilterInput', () => {
     test('renders the two-panel nested value menu', async ({ page }) => {
       await story.goto(page, 'Nested Value Submenu');
       await openValueMenu(page);
+      // The value menu animates in while the operator menu animates out. Hovering
+      // mid-transition lands on a still-moving row and leaves the left list at a
+      // different scroll offset than a settled hover — the source of this
+      // screenshot's flakiness. Wait for exactly one settled menu first.
+      await waitForSettledMenus(page, 1);
       await page.getByRole('menuitem', { name: /^SQL injection$/ }).hover();
       await expect(page.getByRole('menuitem', { name: /^All SQL injection$/ })).toBeVisible();
-      // "Visible" only means the submenu mounted — it races two async settles:
-      // the hover-highlight's scrollIntoView on the left list (useKeyboardNav's
-      // onHighlightChange), and floating-ui's autoUpdate repositioning the right
-      // panel in response to that same scroll (its anchor rect tracks the left
-      // row live). Give both one paint to land before capturing, same as the
-      // floating-ui settle wait in FilterInputMenuPositioning.e2e.ts.
-      await page.waitForTimeout(100);
+      // Then wait for both menus to settle: the hover-highlight's scrollIntoView
+      // on the left list and floating-ui's autoUpdate repositioning the submenu
+      // (its anchor tracks the left row) both land asynchronously.
+      await waitForSettledMenus(page, 2);
       // Capture the viewport (not the `body` element): the two panels render in
       // fixed-positioned portals that overflow `body`'s small bounding box, so an
       // element screenshot of `body` crops the menu. The viewport includes both.
