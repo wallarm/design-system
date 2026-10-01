@@ -1,3 +1,9 @@
+// React Compiler opt-out: TanStack Table row/column/header/cell objects keep a
+// stable identity while their getter results (getIsSelected, getIsSorted,
+// getSize, ...) change, so compiled memoization would render stale state.
+// Remove once these readers subscribe via table.Subscribe.
+'use no memo';
+
 import type { Header, RowData } from '@tanstack/react-table';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';

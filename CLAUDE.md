@@ -10,6 +10,7 @@ You are an expert AI assistant for the Wallarm monorepo project. This is a moder
 
 - **Framework**: React 19+ with TypeScript
 - **Build Tool**: Rslib
+- **React Compiler**: enabled everywhere (library build, Storybook, playground, Rstest) via Rspack's native SWC compiler — `pluginReact({ reactCompiler: true })` in `packages/configs/rsbuild-config` and `packages/design-system/rslib.config.ts`, plus `tools.swc` in `packages/configs/rstest-config/src/react.ts`. Published output imports `react/compiler-runtime` (React 19 peer). Audit bailouts with `pnpm --filter @wallarm-org/design-system compiler:audit`
 - **Styling**: Tailwind CSS
 - **Testing**: Rstest (unit), Playwright (E2E)
 - **Documentation**: Storybook 10+
