@@ -1091,7 +1091,7 @@ const SYNTAX_ERROR_SAMPLES = [
   },
   { language: 'typescript', label: 'TypeScript', value: 'let limit: = 50;\n' },
   { language: 'python', label: 'Python', value: 'def active(:\n    pass\n' },
-  { language: 'lua', label: 'Lua', value: 'local function active(rules)\n  return rules[1]\n' },
+  { language: 'lua', label: 'Lua', value: 'local limit = = 50\nreturn limit\n' },
   {
     language: 'http',
     label: 'HTTP',
