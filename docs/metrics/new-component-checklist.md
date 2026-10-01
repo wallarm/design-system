@@ -29,6 +29,6 @@ Run this before marking any new (or newly-interactive) design-system component c
 
 ## 5. Documentation & tests
 
-- [ ] **Gaps & exceptions are explicit** — any wrapper-level decision or unreachable (closed) target is recorded in the **component folder** (test comments or an `ANALYTICS_GAPS.md`, per the `CodeSnippet/ANALYTICS_GAPS.md` precedent), each with its workaround, owner, and next decision point; the wrapper-level conditions in [contract.md](./contract.md) are met.
+- [ ] **Gaps & exceptions are explicit** — any wrapper-level decision or unreachable (closed) target is recorded in the **component folder** (test comments or an `ANALYTICS_GAPS.md`, per the [`Table/ANALYTICS_GAPS.md`](../../packages/design-system/src/components/Table/ANALYTICS_GAPS.md) precedent; [`CodeEditor/ANALYTICS_GAPS.md`](../../packages/design-system/src/components/CodeEditor/ANALYTICS_GAPS.md) shows closed targets inside a third-party engine), each with its workaround, owner, and next decision point; the wrapper-level conditions in [contract.md](./contract.md) are met.
 - [ ] **Storybook** shows where `data-analytics-id` goes (consumer ergonomics — target obvious without reading source).
 - [ ] **Tests** copied from [testing-examples.md](./testing-examples.md): id on the real node, verbatim `data-analytics-props`, plus polymorphic / label-root / negative / state-persistence coverage as applicable. Locator hygiene observed.

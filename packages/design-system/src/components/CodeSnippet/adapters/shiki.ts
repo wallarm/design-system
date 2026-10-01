@@ -20,6 +20,7 @@ const SUPPORTED_LANGUAGES = [
   'sql',
   'yaml',
   'markdown',
+  'lua',
   'rust',
   'java',
   'c',

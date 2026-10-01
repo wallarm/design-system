@@ -14,6 +14,6 @@ Every interactive design-system component must be analytics-ready: arbitrary con
 - No allowlisting or shaping props — the full attribute surface forwards to the real target.
 - Never parse, normalize, or reserialize `data-analytics-props`.
 - Never silently replace consumer handlers, and never add a blanket `stopPropagation()` that blocks document-level click capture.
-- Never place analytics on a wrapper when the target is internal — unless the component's own folder documents a wrapper-level decision (the `CodeSnippet/ANALYTICS_GAPS.md` precedent).
+- Never place analytics on a wrapper when the target is internal — unless the component's own folder documents a wrapper-level decision (the `Table/ANALYTICS_GAPS.md` precedent; see also `CodeEditor/ANALYTICS_GAPS.md`).
 
 > During an active rollout an ephemeral `docs/metrics/plan/` directory may exist; it is deleted when the rollout completes.
