@@ -57,10 +57,9 @@ export const useSplashPhase = (
       // clip-path: inset(0 0 round 0px) set by 'content-fading'.
       return doubleRaf(() => setPhase('shrinking'));
     }
-    // Start content fade during shrinking (not after settled)
-    // This eliminates the blank card flicker
-    if (phase === 'shrinking') {
-      return doubleRaf(() => setChildrenRevealed(true));
+    // Reveal children only after shrink animation completes
+    if (phase === 'settled') {
+      setChildrenRevealed(true);
     }
   }, [phase]);
 
