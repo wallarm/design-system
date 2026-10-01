@@ -63,8 +63,18 @@ test.describe('Component: Stepper', () => {
 
     test('Should render overflow tooltip correctly', async ({ page }) => {
       await stepperStory.goto(page, 'Long Label');
-      await page.getByTestId('stepper-long--title').hover();
-      await expect(page.getByRole('tooltip')).toBeVisible();
+      const title = page.getByTestId('stepper-long--title');
+      await title.hover();
+      // OverflowTooltipTrigger only starts measuring on the first pointer-enter, and the
+      // tooltip stays disabled until that measurement re-renders — so nudge the pointer
+      // inside the title until a pointer-move lands on the enabled trigger.
+      const box = await title.boundingBox();
+      if (!box) throw new Error('stepper title has no bounding box');
+      await expect(async () => {
+        await page.mouse.move(box.x + 5, box.y + 5);
+        await page.mouse.move(box.x + 6, box.y + 5);
+        await expect(page.getByRole('tooltip')).toBeVisible({ timeout: 1_000 });
+      }).toPass({ timeout: 10_000 });
       await expect(page).toHaveScreenshot();
     });
   });
