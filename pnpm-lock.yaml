@@ -328,6 +328,9 @@ importers:
       '@codemirror/language':
         specifier: 6.12.4
         version: 6.12.4
+      '@codemirror/legacy-modes':
+        specifier: 6.5.4
+        version: 6.5.4
       '@codemirror/lint':
         specifier: 6.9.7
         version: 6.9.7
@@ -409,6 +412,9 @@ importers:
       json-schema-library:
         specifier: 11.6.2
         version: 11.6.2
+      luaparse:
+        specifier: 0.3.1
+        version: 0.3.1
       prism-react-renderer:
         specifier: 2.4.1
         version: 2.4.1(react@19.2.8)
@@ -476,6 +482,9 @@ importers:
       '@testing-library/user-event':
         specifier: 'catalog:'
         version: 14.6.3(@testing-library/dom@10.4.1)
+      '@types/luaparse':
+        specifier: 0.2.13
+        version: 0.2.13
       '@types/node':
         specifier: 'catalog:'
         version: 24.10.4
@@ -887,6 +896,9 @@ packages:
 
   '@codemirror/language@6.12.4':
     resolution: {integrity: sha512-1q4PaT+o6PbgpkJt4Q8Fv5XJxTy4FUZ4MWETtyiDw3J0Pyr9E2vqcKL+k9wcvjNTIsauxvE7OfmWj3FRPHQ76A==}
+
+  '@codemirror/legacy-modes@6.5.4':
+    resolution: {integrity: sha512-/cZr6qZyl08iYNLGsJ862CXXNI51LryRFRE40ejgoIjXZz0C1rGkD3/Ek5jM/8w1ceRjqtt4qx/KLMh4zBTgew==}
 
   '@codemirror/lint@6.9.7':
     resolution: {integrity: sha512-28/+iWLYxKxsvGYhSYL7zaCZqLz5+FFFDq9tVsvGv9kv8RY4fFAchJ5WX9M3YrrRlTIsECjsXPqeNgnSmNP2dg==}
@@ -2971,6 +2983,9 @@ packages:
 
   '@types/json-schema@7.0.15':
     resolution: {integrity: sha512-5+fP8P8MFNC+AyZCDxrB2pkZFPGzqQWUzpSeuuVLvm8VMcorNYavBqoFcxK8bQz4Qsbn4oUEEem4wDLfcysGHA==}
+
+  '@types/luaparse@0.2.13':
+    resolution: {integrity: sha512-nWs2m9b/zrMcAA2Rs+wTxdIsBkSYMo0+6ko8mpeqS5dhchU3hQN9kZGcSw96n497Vc7kGpDLtSicjdpaUrRAkw==}
 
   '@types/mdast@4.0.4':
     resolution: {integrity: sha512-kGaNbPh1k7AFzgpud/gMdvIm5xuECykRR+JnWKQno9TAXVa6WIVCGTPvYGekIDL4uwCZQSYbUxNBSb1aUo79oA==}
@@ -5367,6 +5382,10 @@ packages:
   lru-cache@5.1.1:
     resolution: {integrity: sha512-KpNARQA3Iwv+jTA0utUVVbrh+Jlrr1Fv0e56GGzAFOXN7dk/FviaDW8LHmK52DlcH4WP2n6gI8vN1aesBFgo9w==}
 
+  luaparse@0.3.1:
+    resolution: {integrity: sha512-b21h2bFEbtGXmVqguHogbyrMAA0wOHyp9u/rx+w6Yc9pW1t9YjhGUsp87lYcp7pFRqSWN/PhFkrdIqKEUzRjjQ==}
+    hasBin: true
+
   lz-string@1.5.0:
     resolution: {integrity: sha512-h5bgJWpxJNswbU7qCrV0tIKQCaS3blPDrqKWx+QxzuzL1zGUzij9XCWLrSLsJPu5t+eWA/ycetzYAO5IOMcWAQ==}
     hasBin: true
@@ -7720,6 +7739,10 @@ snapshots:
       '@lezer/lr': 1.4.10
       style-mod: 4.1.4
 
+  '@codemirror/legacy-modes@6.5.4':
+    dependencies:
+      '@codemirror/language': 6.12.4
+
   '@codemirror/lint@6.9.7':
     dependencies:
       '@codemirror/state': 6.7.6
@@ -9810,6 +9833,8 @@ snapshots:
   '@types/html-minifier-terser@7.0.2': {}
 
   '@types/json-schema@7.0.15': {}
+
+  '@types/luaparse@0.2.13': {}
 
   '@types/mdast@4.0.4':
     dependencies:
@@ -12538,6 +12563,8 @@ snapshots:
   lru-cache@5.1.1:
     dependencies:
       yallist: 3.1.1
+
+  luaparse@0.3.1: {}
 
   lz-string@1.5.0: {}
 
