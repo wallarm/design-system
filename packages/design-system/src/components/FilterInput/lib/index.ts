@@ -38,7 +38,13 @@ export {
   VARIANT_LABELS,
 } from './constants';
 export { COUNTRY_OPTIONS } from './country';
-export { type AnchorBounds, buildAnchoredRect, isMenuRelated, toAnchorBounds } from './dom';
+export {
+  type AnchorBounds,
+  buildAnchoredRect,
+  isMenuRelated,
+  keepOpenOnMenuHandoff,
+  toAnchorBounds,
+} from './dom';
 export {
   collectLeaves,
   findOptionByValue,

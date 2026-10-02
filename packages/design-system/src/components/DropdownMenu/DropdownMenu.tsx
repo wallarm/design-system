@@ -20,6 +20,11 @@ interface DropdownMenuProps extends TestableProps {
   /** Whether selecting an item closes the menu (default true) */
   closeOnSelect?: boolean;
   /**
+   * Called when another layer asks this menu to dismiss — e.g. a layer below it in the stack is
+   * removed. Call `event.preventDefault()` to keep the menu open.
+   */
+  onRequestDismiss?: Menu.RootProps['onRequestDismiss'];
+  /**
    * Override the trigger element's id. Pass the same id to another
    * compound component's `ids.trigger` (e.g. `Tooltip`, `Popover`) to
    * compose their triggers on one element via nested `asChild` without an
