@@ -70,6 +70,24 @@ describe('createEditor — search wiring', () => {
     expect(screen.queryByTestId('editor--replace-input')).not.toBeInTheDocument();
   });
 
+  it.each(['button', 'Escape'] as const)(
+    'does not focus readOnly content when search closes via %s',
+    async method => {
+      const user = userEvent.setup();
+      const { handle } = mountWithPortals({ readOnly: true });
+      act(() => handle.api.openSearch());
+
+      if (method === 'button') {
+        await user.click(screen.getByTestId('editor--search-close'));
+      } else {
+        await user.keyboard('{Escape}');
+      }
+
+      expect(searchPanelOpen(handle.view.state)).toBe(false);
+      expect(document.activeElement).not.toBe(handle.view.contentDOM);
+    },
+  );
+
   it('a testId change re-derives the panel test ids', () => {
     const { handle, rerender } = mountWithPortals();
     act(() => handle.api.openSearch());

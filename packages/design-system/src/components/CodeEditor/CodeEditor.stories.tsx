@@ -705,7 +705,7 @@ export const Sizes: StoryFn<typeof meta> = () => (
 );
 
 /**
- * `readOnly` still lets you focus, select, search and copy, but not type. Use it when the value
+ * `readOnly` lets you select, search and copy without focusing the code or showing a caret. Use it when the value
  * can change elsewhere but not here. If it never changes, use `CodeSnippet`.
  */
 export const ReadOnly: StoryFn<typeof meta> = () => (
@@ -1281,6 +1281,6 @@ export const TabsKeepHistory: StoryFn<typeof meta> = () => <TabsKeepHistoryDemo 
 
 /**
  * 2 000 read-only lines clamped by `maxLines` — the top of the envelope the colour painter is
- * built for, where `readOnly` still lets the text be focused, searched and copied.
+ * built for, where `readOnly` still lets the text be selected, searched and copied.
  */
 export const LongDocument: StoryFn<typeof meta> = () => <LongDocumentDemo />;

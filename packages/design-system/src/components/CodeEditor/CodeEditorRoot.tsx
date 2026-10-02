@@ -57,7 +57,7 @@ export interface CodeEditorRootProps
    * document would be seeded with the previous document's text.
    */
   documentId?: string;
-  /** Focusable, selectable, searchable, copyable — but not editable by the user */
+  /** Non-editable and unfocusable content; text remains selectable, searchable and copyable */
   readOnly?: boolean;
   /** Offsets gutter numbers; `lines`, `folds`, `diagnostics` use absolute numbers */
   startingLineNumber?: number;

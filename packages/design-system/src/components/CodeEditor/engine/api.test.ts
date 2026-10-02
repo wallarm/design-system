@@ -54,6 +54,14 @@ describe('createEditor — api', () => {
     expect(document.activeElement).toBe(handle.view.contentDOM);
   });
 
+  it('focus does nothing in readOnly mode', () => {
+    const { handle } = mountEngine({ value: 'abc', readOnly: true });
+
+    handle.api.focus();
+
+    expect(document.activeElement).not.toBe(handle.view.contentDOM);
+  });
+
   it('openSearch opens the DS panel, not the built-in CodeMirror one', () => {
     const { handle } = mountEngine({ value: 'abc' });
 

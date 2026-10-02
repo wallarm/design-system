@@ -514,14 +514,16 @@ test.describe('Component: CodeEditor', () => {
       await expect(editor).toHaveAttribute('aria-multiline', 'true');
     });
 
-    test('Should be announced as read-only via aria-readonly', async ({ page }) => {
+    test('Should remain unfocused without a caret when read-only', async ({ page }) => {
       await interactionStory.goto(page, 'Long Document');
       await waitForEngine(page);
       const editor = editorOf(page, 'long-document');
       await expect(editor).toHaveAttribute('aria-readonly', 'true');
+      await expect(editor).toHaveAttribute('contenteditable', 'false');
+      await expect(editor).not.toHaveAttribute('tabindex');
 
       await editor.click({ position: EDITOR_CLICK_POSITION });
-      await expect(editor).toBeFocused();
+      await expect(editor).not.toBeFocused();
       const before = await editorText(editor);
       await page.keyboard.type('x');
       // Let CodeMirror flush its DOM observer (two frames), then require the text to stay put.
@@ -532,6 +534,15 @@ test.describe('Component: CodeEditor', () => {
           ),
       );
       await expect.poll(() => editorText(editor), { intervals: [100, 200, 300] }).toBe(before);
+
+      const line = await editor.locator('.cm-line').nth(2).boundingBox();
+      if (!line) throw new Error('The read-only line is not visible');
+      await page.mouse.move(line.x + 40, line.y + line.height / 2);
+      await page.mouse.down();
+      await page.mouse.move(line.x + 170, line.y + line.height / 2, { steps: 8 });
+      await page.mouse.up();
+      await expect.poll(() => page.evaluate(() => window.getSelection()?.toString())).not.toBe('');
+      await expect(editor).not.toBeFocused();
     });
 
     test('Should keep focus in the editor via Tab key', async ({ page }) => {
