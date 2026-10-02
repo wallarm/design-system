@@ -840,7 +840,7 @@ const ParityPair = ({
 );
 
 /** Header with tabs, a title-less tab strip and header actions — the same element in both roots. */
-const PARITY_HEADER_CHROME = (
+const PARITY_HEADER_FRAME = (
   <CodeSnippetHeader>
     <CodeSnippetTabs defaultValue='request'>
       <CodeSnippetTab value='request'>Request</CodeSnippetTab>
@@ -855,7 +855,7 @@ const PARITY_HEADER_CHROME = (
 );
 
 /** Floating actions (no header) — the same element in both roots. */
-const PARITY_FLOATING_CHROME = (
+const PARITY_FLOATING_FRAME = (
   <CodeSnippetActions>
     <CodeSnippetWrapButton />
     <CodeSnippetCopyButton />
@@ -934,16 +934,16 @@ export const ParitySizes: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Parity check for the shared chrome: a header with tabs and actions, and floating actions
+ * Parity check for the shared frame: a header with tabs and actions, and floating actions
  * without a header, sit in the same place with the same spacing.
  */
-export const ParityChrome: StoryFn<typeof meta> = () => (
+export const ParityFrame: StoryFn<typeof meta> = () => (
   <VStack gap={24}>
-    <ParityPair testId='parity-chrome-header' code={sampleCode} language='text'>
-      {PARITY_HEADER_CHROME}
+    <ParityPair testId='parity-frame-header' code={sampleCode} language='text'>
+      {PARITY_HEADER_FRAME}
     </ParityPair>
-    <ParityPair testId='parity-chrome-floating' code={sampleCode} language='text'>
-      {PARITY_FLOATING_CHROME}
+    <ParityPair testId='parity-frame-floating' code={sampleCode} language='text'>
+      {PARITY_FLOATING_FRAME}
     </ParityPair>
   </VStack>
 );

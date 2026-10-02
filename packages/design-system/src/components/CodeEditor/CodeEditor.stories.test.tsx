@@ -98,9 +98,9 @@ const STORY_ROOTS: Record<StoryName, StoryRoots> = {
     editors: ['parity-size-sm-editor', 'parity-size-md-editor', 'parity-size-lg-editor'],
     snippets: ['parity-size-sm-snippet', 'parity-size-md-snippet', 'parity-size-lg-snippet'],
   },
-  ParityChrome: {
-    editors: ['parity-chrome-header-editor', 'parity-chrome-floating-editor'],
-    snippets: ['parity-chrome-header-snippet', 'parity-chrome-floating-snippet'],
+  ParityFrame: {
+    editors: ['parity-frame-header-editor', 'parity-frame-floating-editor'],
+    snippets: ['parity-frame-header-snippet', 'parity-frame-floating-snippet'],
   },
   ParityShowMore: {
     editors: ['parity-show-more-editor'],
@@ -242,12 +242,12 @@ describe('CodeEditor stories', () => {
     expect(editorButton.textContent).toBe(snippetButton.textContent);
   });
 
-  it('ParityChrome renders the same header tabs and actions in both roots', async () => {
-    const { ParityChrome } = composed;
-    render(<ParityChrome />);
-    await screen.findByTestId('parity-chrome-header-editor--editor', {}, ENGINE);
+  it('ParityFrame renders the same header tabs and actions in both roots', async () => {
+    const { ParityFrame } = composed;
+    render(<ParityFrame />);
+    await screen.findByTestId('parity-frame-header-editor--editor', {}, ENGINE);
 
-    for (const id of ['parity-chrome-header-snippet', 'parity-chrome-header-editor']) {
+    for (const id of ['parity-frame-header-snippet', 'parity-frame-header-editor']) {
       expect(screen.getByTestId(`${id}--header`)).toHaveTextContent('Request');
       expect(screen.getByTestId(`${id}--copy-button`)).toBeInTheDocument();
     }
