@@ -7,7 +7,7 @@ import {
   DropdownMenuGroup,
 } from '../../../DropdownMenu';
 import { Loader } from '../../../Loader';
-import { filterAndSort } from '../../lib';
+import { filterAndSort, keepOpenOnMenuHandoff } from '../../lib';
 import { MenuEmptyState } from '../MenuEmptyState';
 import type { FilterInputValueMenuProps } from './FilterInputValueMenu';
 import { useValueMenuDisplayValues } from './useValueMenuDisplayValues';
@@ -88,6 +88,7 @@ export const FlatValueMenu: FC<FilterInputValueMenuProps> = ({
     <DropdownMenu
       open={open}
       onOpenChange={onOpenChange}
+      onRequestDismiss={keepOpenOnMenuHandoff}
       closeOnSelect={false}
       positioning={positioning}
       highlightedValue={highlightedValue}

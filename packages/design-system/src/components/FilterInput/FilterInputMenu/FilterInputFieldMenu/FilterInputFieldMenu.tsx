@@ -3,7 +3,7 @@ import { cn } from '../../../../utils/cn';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuFooter } from '../../../DropdownMenu';
 import { Kbd } from '../../../Kbd/Kbd';
 import { KbdGroup } from '../../../Kbd/KbdGroup';
-import { buildFieldMenuSections } from '../../lib';
+import { buildFieldMenuSections, keepOpenOnMenuHandoff } from '../../lib';
 import type { Condition, FieldGroup, FieldMetadata, FilterInputDropdownItem } from '../../types';
 import { useFieldMenuNavItems } from '../hooks/useFieldMenuNavItems';
 import { useKeyboardNav } from '../hooks/useKeyboardNav';
@@ -141,6 +141,7 @@ export const FilterInputFieldMenu: FC<FilterInputFieldMenuProps> = ({
       <DropdownMenu
         open={open && hasResults}
         onOpenChange={onOpenChange}
+        onRequestDismiss={keepOpenOnMenuHandoff}
         closeOnSelect={false}
         positioning={positioning}
         highlightedValue={highlightedValue}
