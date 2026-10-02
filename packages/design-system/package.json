@@ -76,7 +76,7 @@
     "publish:local": "pnpm build && yalc publish --push",
     "lint": "biome check",
     "lint:fix": "biome check --fix",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc --noEmit && tsc -p tsconfig.figma.json",
     "test": "rstest watch",
     "test:coverage": "rstest run --coverage",
     "test:run": "rstest run",
