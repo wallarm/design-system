@@ -15,7 +15,6 @@ import {
 import { Ip, IpAddress, IpCountry, IpList, IpProvider } from '../Ip';
 import { Link } from '../Link';
 import { OverflowList } from '../OverflowList';
-import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Tag } from '../Tag';
 import { Text } from '../Text';
 import { Attribute, type AttributeProps } from './Attribute';
@@ -59,23 +58,6 @@ const meta = {
 } satisfies Meta<typeof Attribute>;
 
 export default meta;
-
-const renderOverflowPopover = (items: string[]) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <Tag>+{items.length}</Tag>
-    </PopoverTrigger>
-    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
-      <div className='flex flex-col gap-4'>
-        {items.map(item => (
-          <Text key={item} size='sm'>
-            {item}
-          </Text>
-        ))}
-      </div>
-    </PopoverContent>
-  </Popover>
-);
 
 const renderActionsItems = () => (
   <AttributeActionsContent>
@@ -274,7 +256,7 @@ export const Composition: StoryFn<AttributeProps> = () => (
           className='gap-4'
           items={['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR']}
           itemRenderer={item => <Tag key={item}>{item}</Tag>}
-          overflowRenderer={renderOverflowPopover}
+          overflowHeaderLabel='items'
         />
       </AttributeValue>
     </Attribute>
@@ -299,7 +281,7 @@ export const Composition: StoryFn<AttributeProps> = () => (
             'admin@acme.com',
           ]}
           itemRenderer={item => <Tag key={item}>{item}</Tag>}
-          overflowRenderer={renderOverflowPopover}
+          overflowHeaderLabel='items'
         />
       </AttributeValue>
     </Attribute>
@@ -429,7 +411,7 @@ export const WithActions: StoryFn<AttributeProps> = () => (
                 'IDOR',
               ]}
               itemRenderer={item => <Tag key={item}>{item}</Tag>}
-              overflowRenderer={renderOverflowPopover}
+              overflowHeaderLabel='items'
             />
           </AttributeActionsTarget>
           {renderActionsItems()}
@@ -464,7 +446,7 @@ export const WithActions: StoryFn<AttributeProps> = () => (
                 'admin@acme.com',
               ]}
               itemRenderer={item => <Tag key={item}>{item}</Tag>}
-              overflowRenderer={renderOverflowPopover}
+              overflowHeaderLabel='items'
             />
           </AttributeActionsTarget>
           {renderActionsItems()}
@@ -653,7 +635,7 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
           className='gap-4'
           items={['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR']}
           itemRenderer={item => <Tag key={item}>{item}</Tag>}
-          overflowRenderer={renderOverflowPopover}
+          overflowHeaderLabel='items'
         />
       </AttributeValue>
     </Attribute>
@@ -685,7 +667,7 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
             'admin@acme.com',
           ]}
           itemRenderer={item => <Tag key={item}>{item}</Tag>}
-          overflowRenderer={renderOverflowPopover}
+          overflowHeaderLabel='items'
         />
       </AttributeValue>
     </Attribute>
@@ -877,7 +859,7 @@ const renderActionsAttributes = (disableNestedInteractive: boolean) => (
               className='gap-4'
               items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
               itemRenderer={item => <Tag key={item}>{item}</Tag>}
-              overflowRenderer={renderOverflowPopover}
+              overflowHeaderLabel='items'
             />
           </AttributeActionsTarget>
           {renderActionsItems()}

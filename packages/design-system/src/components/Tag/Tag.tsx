@@ -49,6 +49,7 @@ export const Tag: FC<TagProps> = ({
   asChild = false,
   children,
   onClick,
+  ref,
   'data-testid': testIdProp,
   ...props
 }) => {
@@ -71,6 +72,7 @@ export const Tag: FC<TagProps> = ({
     <TestIdProvider value={testId}>
       <Comp
         {...props}
+        ref={ref}
         className={cn(
           tagVariants({ disabled }),
           badgeVariants({

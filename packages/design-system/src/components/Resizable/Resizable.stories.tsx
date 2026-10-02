@@ -1,6 +1,5 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { OverflowList } from '../OverflowList';
-import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Tag } from '../Tag';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { ResizableHandle } from './ResizableHandle';
@@ -171,21 +170,6 @@ const OVERFLOW_TAGS = [
   'data-exfiltration',
 ];
 
-const renderOverflow = (items: string[]) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <Tag>+{items.length}</Tag>
-    </PopoverTrigger>
-    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
-      <div className='flex flex-col gap-4'>
-        {items.map(item => (
-          <Tag key={item}>{item}</Tag>
-        ))}
-      </div>
-    </PopoverContent>
-  </Popover>
-);
-
 /** A "Drag to resize" tooltip appears on hover, like the Drawer resize handle. */
 export const WithTooltip: StoryFn<ResizablePanelGroupProps> = () => (
   <div className='h-[320px] w-[600px] rounded-8 border border-border-primary'>
@@ -220,7 +204,7 @@ export const WithOverflowList: StoryFn<ResizablePanelGroupProps> = () => (
             className='gap-4'
             items={OVERFLOW_TAGS}
             itemRenderer={item => <Tag key={item}>{item}</Tag>}
-            overflowRenderer={renderOverflow}
+            overflowHeaderLabel='attack types'
           />
         </div>
       </ResizablePanel>

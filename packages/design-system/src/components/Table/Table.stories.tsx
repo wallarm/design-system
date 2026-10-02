@@ -44,7 +44,6 @@ import {
   PaginationPrevious,
   useClientPagination,
 } from '../Pagination';
-import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import type { SelectDataItem } from '../Select';
 import { HStack, VStack } from '../Stack';
 import { Tag } from '../Tag';
@@ -691,21 +690,6 @@ export const ColumnResizing: StoryFn<typeof meta> = () => {
   );
 };
 
-const renderTableTagsOverflow = (items: string[]) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <Tag>+{items.length}</Tag>
-    </PopoverTrigger>
-    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
-      <div className='flex flex-col gap-4'>
-        {items.map(item => (
-          <Tag key={item}>{item}</Tag>
-        ))}
-      </div>
-    </PopoverContent>
-  </Popover>
-);
-
 /**
  * A resizable column whose cell holds an `OverflowList`: the tags re-measure as the column
  * narrows instead of being clipped by it.
@@ -725,7 +709,7 @@ export const ColumnResizingWithOverflowList: StoryFn<typeof meta> = () => {
             className='gap-4'
             items={row.original.tags}
             itemRenderer={(item: string) => <Tag key={item}>{item}</Tag>}
-            overflowRenderer={renderTableTagsOverflow}
+            overflowHeaderLabel='tags'
           />
         ),
       }),

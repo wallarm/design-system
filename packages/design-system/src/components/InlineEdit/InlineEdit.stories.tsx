@@ -27,7 +27,6 @@ import {
   DialogTitle,
 } from '../Dialog';
 import { OverflowList } from '../OverflowList';
-import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import {
   SelectButton,
   SelectContent,
@@ -157,26 +156,6 @@ function renderSelectOptions(items: SelectDataItem[]) {
       <SelectOptionIndicator />
     </SelectOption>
   ));
-}
-
-// Same "+N in a popover" pattern as Attribute.stories.tsx's OverflowList usage.
-function renderOverflowPopover(items: string[]) {
-  return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Tag>+{items.length}</Tag>
-      </PopoverTrigger>
-      <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
-        <div className='flex flex-col gap-4'>
-          {items.map(item => (
-            <Text key={item} size='sm'>
-              {item}
-            </Text>
-          ))}
-        </div>
-      </PopoverContent>
-    </Popover>
-  );
 }
 
 // SelectInput does not self-cascade its testid (unlike SelectButton) — derive
@@ -392,7 +371,7 @@ export const TagsEditor: StoryFn<typeof meta> = args => {
                   className='gap-4'
                   items={tags}
                   itemRenderer={tag => <Tag key={tag}>{tag}</Tag>}
-                  overflowRenderer={renderOverflowPopover}
+                  overflowHeaderLabel='tags'
                 />
               </InlineEditPreviewValue>
               <InlineEditPreviewIcon>
