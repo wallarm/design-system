@@ -129,7 +129,6 @@
     "glob": "13.0.6",
     "jsdom": "catalog:",
     "postcss": "8.5.28",
-    "postcss-import": "17.0.0",
     "react": "catalog:",
     "react-dom": "catalog:",
     "storybook": "catalog:",
