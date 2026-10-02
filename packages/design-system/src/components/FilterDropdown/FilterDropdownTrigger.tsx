@@ -127,7 +127,9 @@ export const FilterDropdownTrigger: FC<FilterDropdownTriggerProps> = ({
         <TruncatedText text={label} emphasis='name' />
         <Separator />
         <span aria-hidden className='inline-flex shrink-0'>
-          <NumericBadge type='primary'>{value.length}</NumericBadge>
+          <NumericBadge type='secondary' color='neutral'>
+            {value.length}
+          </NumericBadge>
         </span>
       </>
     );

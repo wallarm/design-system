@@ -127,6 +127,24 @@ describe('Stepper', () => {
     expect(screen.getByTestId('ps--item-3--indicator')).toHaveTextContent('4');
   });
 
+  it('maps step status to shared NumericBadge variants without adding interactive indicators', () => {
+    render(<FigmaExample step={2} />);
+    const variants = [
+      ['secondary', 'neutral'],
+      ['secondary', 'danger'],
+      ['secondary', 'brand'],
+      ['outline', 'neutral'],
+    ];
+    for (const [index, [type, color]] of variants.entries()) {
+      const indicator = screen.getByTestId(`ps--item-${index}--indicator`);
+      expect(indicator).toHaveAttribute('data-type', type);
+      expect(indicator).toHaveAttribute('data-color', color);
+      expect(indicator).toHaveAttribute('aria-hidden', 'true');
+      expect(indicator).not.toHaveAttribute('tabindex');
+    }
+    expect(screen.getAllByRole('button')).toHaveLength(4);
+  });
+
   it('lets StepperIndicator children replace the default content', () => {
     render(
       <FigmaExample

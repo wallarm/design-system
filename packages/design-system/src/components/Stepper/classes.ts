@@ -23,22 +23,20 @@ export const stepperTriggerVariants = cva(
   ),
 );
 
-// TODO(WDS-188): replace with the reworked NumericBadge. Upcoming mirrors NumericBadge `outline`
-// colour tokens; its padding is px-3 (not NumericBadge's px-4) so the badge stays 16px wide.
+// Stepper keeps its compact 16px indicator and 12px check within NumericBadge's 20px height.
 export const stepperIndicatorVariants = cva(
-  "col-start-1 row-span-2 row-start-1 inline-flex h-20 min-w-16 shrink-0 items-center justify-center rounded-full font-mono font-medium text-xs [font-feature-settings:'liga'_0]",
+  "col-start-1 row-span-2 row-start-1 min-w-16 [font-feature-settings:'liga'_0] [&_svg]:icon-sm",
   {
     variants: {
       // Padding lives on each status, not the base: cva does not merge classes, so a base
       // `px-4 py-2` would beat upcoming's `px-3 py-1` in Tailwind's CSS order.
       status: {
-        active: 'bg-states-brand-active px-4 py-2 text-text-brand',
-        danger: 'bg-states-danger-active px-4 py-2 text-text-danger',
+        active: 'px-4 py-2',
+        danger: 'px-4 py-2',
         // Figma keeps the badge 16px wide: the 12px check sits 2px from each edge.
-        completed: 'bg-states-primary-active px-2 py-2 text-icon-primary',
+        completed: 'px-2 py-2 text-icon-primary',
         // 16×20 including the border: the 1px border takes the place of 1px of padding.
-        upcoming:
-          'border-1 border-border-primary bg-component-outline-button-bg px-3 py-1 text-text-primary',
+        upcoming: 'px-3 py-1',
       },
     },
     defaultVariants: { status: 'upcoming' },

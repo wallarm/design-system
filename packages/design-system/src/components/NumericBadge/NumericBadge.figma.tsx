@@ -7,14 +7,27 @@ const figmaNodeUrl =
 figma.connect(NumericBadge, figmaNodeUrl, {
   props: {
     type: figma.enum('Type', {
-      Primary: 'primary',
-      'Primary-alt': 'primary-alt',
-      Brand: 'brand',
-      Destructive: 'destructive',
+      Solid: 'solid',
+      Secondary: 'secondary',
       Outline: 'outline',
-      'New / Info': 'info',
+    }),
+    color: figma.enum('Color', {
+      Neutral: 'neutral',
+      'Neutral-alt': 'neutral-alt',
+      Brand: 'brand',
+      Danger: 'danger',
+      Info: 'info',
+      Success: 'success',
+    }),
+    size: figma.enum('Size', {
+      Medium: 'default',
+      Small: 'small',
     }),
     children: figma.string('#'),
   },
-  example: ({ type, children }) => <NumericBadge type={type}>{children}</NumericBadge>,
+  example: ({ type, color, size, children }) => (
+    <NumericBadge type={type} color={color} size={size}>
+      {children}
+    </NumericBadge>
+  ),
 });

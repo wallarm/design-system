@@ -3,6 +3,7 @@ import { Steps as ArkSteps } from '@ark-ui/react/steps';
 import { Check } from '../../icons';
 import { cn } from '../../utils/cn';
 import { type TestableProps, useTestId } from '../../utils/testId';
+import { NumericBadge } from '../NumericBadge';
 import { stepperIndicatorVariants } from './classes';
 import { useStepperItemContext } from './StepperContext';
 import type { StepperVisualStatus } from './types';
@@ -20,7 +21,6 @@ const renderDefault = (status: StepperVisualStatus, index: number) => {
 };
 
 /** The step badge. Decorative: Ark marks it `aria-hidden`, the title names the step. */
-// TODO(WDS-188): switch to reworked NumericBadge.
 export const StepperIndicator: FC<StepperIndicatorProps> = ({
   children,
   className,
@@ -34,16 +34,17 @@ export const StepperIndicator: FC<StepperIndicatorProps> = ({
   return (
     // Ark adds aria-hidden="true": the step number is decoration next to the title.
     <ArkSteps.Indicator asChild>
-      <span
-        {...rest}
-        ref={ref}
+      <NumericBadge
+        asChild
+        type={status === 'upcoming' ? 'outline' : 'secondary'}
+        color={status === 'active' ? 'brand' : status === 'danger' ? 'danger' : 'neutral'}
         data-slot='stepper-indicator'
-        data-status={status}
-        data-testid={testId}
         className={cn(stepperIndicatorVariants({ status }), className)}
       >
-        {children ?? renderDefault(status, index)}
-      </span>
+        <span {...rest} ref={ref} data-status={status} data-testid={testId}>
+          {children ?? renderDefault(status, index)}
+        </span>
+      </NumericBadge>
     </ArkSteps.Indicator>
   );
 };
