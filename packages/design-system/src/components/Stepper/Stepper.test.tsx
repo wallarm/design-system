@@ -217,14 +217,13 @@ describe('Stepper', () => {
   it('puts the bar styles on the list and keeps the root a plain container', () => {
     render(<FigmaExample />);
     expect(screen.getByTestId('ps--list')).toHaveClass(
-      'border-b-1',
-      'border-border-primary-light',
       'px-24',
-      'py-8',
+      'pb-12',
       'flex',
       'items-start',
       'list-none',
     );
+    expect(screen.getByTestId('ps--list')).not.toHaveClass('border-b-1');
     expect(screen.getByTestId('ps')).not.toHaveClass('border-b-1');
     expect(screen.getByTestId('ps')).not.toHaveClass('px-24');
   });

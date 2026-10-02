@@ -110,7 +110,7 @@ const STEP_TYPES = [
   { type: 'upcoming', status: 'upcoming' },
 ] as const;
 
-const SINGLE_STEP_CLASSES = 'border-b-0 p-0';
+const SINGLE_STEP_CLASSES = 'p-0';
 
 /**
  * The four step types: the page sets `completed`, `danger` or `upcoming`, and the current step is
@@ -259,8 +259,9 @@ const BodyPlaceholder = ({ label }: { label: string }) => (
  * Inside a create drawer: the step list sits under the header, `StepperContent` shows the current
  * step's body (every body stays mounted, so fields keep their values) and the footer moves with
  * Back / Next. Steps never submit the form; only the last step's own submit button does. Focus
- * stays on the footer when Back or Next unmounts. Drawer parts inside the `Stepper` root take its
- * test ids (`stepper--body`, `stepper--footer`), not the Drawer's.
+ * stays on the footer when Back or Next unmounts. The list sits directly below the header,
+ * with 24px side insets, 12px bottom padding and no divider. Drawer parts inside the `Stepper`
+ * root take its test ids (`stepper--body`, `stepper--footer`), not the Drawer's.
  */
 export const InDrawer: StoryFn<StepperProps> = () => {
   const { step, statuses, goTo } = usePolicyFlow();
