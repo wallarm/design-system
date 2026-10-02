@@ -1,5 +1,4 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import { Tag } from '../Tag';
 import { OverflowList } from './OverflowList';
 
@@ -21,21 +20,6 @@ export default meta;
 
 const TAGS = ['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR'];
 
-const renderOverflowPopover = (items: string[]) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <Tag>+{items.length}</Tag>
-    </PopoverTrigger>
-    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
-      <div className='flex flex-col gap-4'>
-        {items.map(item => (
-          <Tag key={item}>{item}</Tag>
-        ))}
-      </div>
-    </PopoverContent>
-  </Popover>
-);
-
 /** All nine tags fit in 640px, so the overflow renderer is never called at all. */
 export const Basic: StoryFn = () => (
   <div className='w-640'>
@@ -43,7 +27,7 @@ export const Basic: StoryFn = () => (
       className='gap-4'
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowRenderer={renderOverflowPopover}
+      overflowHeaderLabel='tags'
     />
   </div>
 );
@@ -55,7 +39,7 @@ export const Collapsed: StoryFn = () => (
       className='gap-4'
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowRenderer={renderOverflowPopover}
+      overflowHeaderLabel='tags'
     />
   </div>
 );
@@ -71,25 +55,9 @@ export const CollapseFromStart: StoryFn = () => (
       collapseFrom='start'
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowRenderer={renderOverflowPopover}
+      overflowHeaderLabel='tags'
     />
   </div>
-);
-
-/** Overflow popover that lays hidden items out in a single row. */
-const renderOverflowPopoverInline = (items: string[]) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <Tag>+{items.length}</Tag>
-    </PopoverTrigger>
-    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='unset'>
-      <div className='flex flex-row flex-nowrap gap-4'>
-        {items.map(item => (
-          <Tag key={item}>{item}</Tag>
-        ))}
-      </div>
-    </PopoverContent>
-  </Popover>
 );
 
 /**
@@ -103,7 +71,7 @@ export const MinVisibleItems: StoryFn = () => (
       minVisibleItems={1}
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowRenderer={renderOverflowPopoverInline}
+      overflowHeaderLabel='tags'
     />
   </div>
 );
@@ -122,7 +90,59 @@ export const ResizableContainer: StoryFn = () => (
       className='gap-4'
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowRenderer={renderOverflowPopover}
+      overflowHeaderLabel='tags'
+    />
+  </div>
+);
+
+const ATTACK_TYPES = ['RCE', 'XSS', 'SQL Injection', 'CSRF'];
+
+/**
+ * Shows all items (visible + hidden) in the popover with a total count header.
+ * This is the recommended pattern for read-only contexts.
+ *
+ * @see docs/chip-overflow-pattern.md
+ */
+export const ShowAllInPopover: StoryFn = () => (
+  <div className='w-120'>
+    <OverflowList
+      className='gap-4'
+      items={ATTACK_TYPES}
+      itemRenderer={item => <Tag key={item}>{item}</Tag>}
+      overflowHeaderLabel='attack types'
+      showAll
+    />
+  </div>
+);
+
+/**
+ * Shows only hidden items in the popover (legacy pattern).
+ * Use only for editable contexts like multi-select inputs.
+ */
+export const HiddenOnlyInPopover: StoryFn = () => (
+  <div className='w-120'>
+    <OverflowList
+      className='gap-4'
+      items={ATTACK_TYPES}
+      itemRenderer={item => <Tag key={item}>{item}</Tag>}
+      showAll={false}
+    />
+  </div>
+);
+
+/**
+ * Popover overlays the origin (visible items + trigger).
+ * Use when the popover should cover the entire row.
+ */
+export const OverlayOrigin: StoryFn = () => (
+  <div className='w-120'>
+    <OverflowList
+      className='gap-4'
+      items={ATTACK_TYPES}
+      itemRenderer={item => <Tag key={item}>{item}</Tag>}
+      overflowHeaderLabel='attack types'
+      showAll
+      overlayOrigin
     />
   </div>
 );

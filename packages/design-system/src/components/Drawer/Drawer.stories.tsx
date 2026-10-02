@@ -19,7 +19,6 @@ import {
   DropdownMenuTrigger,
 } from '../DropdownMenu';
 import { OverflowList } from '../OverflowList';
-import { Popover, PopoverContent, PopoverTrigger } from '../Popover';
 import {
   Select,
   SelectButton,
@@ -447,21 +446,6 @@ const DRAWER_TAGS = [
   'data-exfiltration',
 ];
 
-const renderDrawerOverflow = (items: string[]) => (
-  <Popover>
-    <PopoverTrigger asChild>
-      <Tag>+{items.length}</Tag>
-    </PopoverTrigger>
-    <PopoverContent minWidth='auto' minHeight='auto' maxWidth='240px'>
-      <div className='flex flex-col gap-4'>
-        {items.map(item => (
-          <Tag key={item}>{item}</Tag>
-        ))}
-      </div>
-    </PopoverContent>
-  </Popover>
-);
-
 /**
  * Resizing with content that reflows, which is the case worth testing: the panel is only useful
  * at its new width if what is inside adapts.
@@ -490,7 +474,7 @@ export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
                 className='gap-4'
                 items={DRAWER_TAGS}
                 itemRenderer={item => <Tag key={item}>{item}</Tag>}
-                overflowRenderer={renderDrawerOverflow}
+                overflowHeaderLabel='attack types'
               />
             </AttributeValue>
           </Attribute>
