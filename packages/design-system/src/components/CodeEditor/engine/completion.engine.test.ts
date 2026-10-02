@@ -24,8 +24,8 @@ describe('createEditor completion compartment', () => {
     const source: CodeEditorCompletionSource = () => [{ label: 'tenant-a' }];
     const engine = mountEngine({ value: 'ten', language: 'text' });
     engine.handle.view.dispatch({ selection: EditorSelection.cursor(3) });
-    // No source for `text` → no autocompletion extension at all.
-    expect(startCompletion(engine.handle.view)).toBe(false);
+    // The built-in local-word source has no matches in this document yet.
+    expect(startCompletion(engine.handle.view)).toBe(true);
 
     engine.rerender({ completions: [source] });
     expect(await labelsAfterStart(engine.handle.view)).toEqual(['tenant-a']);

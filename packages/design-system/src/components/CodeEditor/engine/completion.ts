@@ -4,6 +4,8 @@ import {
   type CompletionContext,
   type CompletionResult,
   type CompletionSource,
+  completeAnyWord,
+  completeFromList,
 } from '@codemirror/autocomplete';
 import type { Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
@@ -156,10 +158,132 @@ const adaptSource = (
 const reopensAfter = (completion: Completion): boolean =>
   typeof completion.apply === 'string' && completion.apply.endsWith(': ');
 
+const LANGUAGE_KEYWORDS: Partial<Record<CodeEditorLanguage, readonly string[]>> = {
+  json: ['true', 'false', 'null'],
+  yaml: ['true', 'false', 'null'],
+  bash: ['echo', 'export', 'if', 'then', 'else', 'fi', 'for', 'in', 'do', 'done', 'function'],
+  javascript: [
+    'const',
+    'let',
+    'var',
+    'function',
+    'return',
+    'if',
+    'else',
+    'for',
+    'while',
+    'class',
+    'import',
+    'export',
+    'from',
+    'async',
+    'await',
+    'true',
+    'false',
+    'null',
+    'undefined',
+  ],
+  typescript: [
+    'const',
+    'let',
+    'function',
+    'return',
+    'if',
+    'else',
+    'class',
+    'import',
+    'export',
+    'from',
+    'async',
+    'await',
+    'interface',
+    'type',
+    'enum',
+    'extends',
+    'implements',
+    'public',
+    'private',
+    'readonly',
+    'true',
+    'false',
+    'null',
+    'undefined',
+  ],
+  python: [
+    'def',
+    'class',
+    'return',
+    'if',
+    'elif',
+    'else',
+    'for',
+    'while',
+    'in',
+    'import',
+    'from',
+    'as',
+    'async',
+    'await',
+    'try',
+    'except',
+    'with',
+    'True',
+    'False',
+    'None',
+  ],
+  lua: [
+    'function',
+    'local',
+    'return',
+    'if',
+    'then',
+    'elseif',
+    'else',
+    'end',
+    'for',
+    'while',
+    'do',
+    'repeat',
+    'until',
+    'true',
+    'false',
+    'nil',
+  ],
+};
+
+const isInsideQuotedString = (text: string): boolean => {
+  let quoted = false;
+  for (let i = 0; i < text.length; i++) {
+    if (text[i] === '\\') {
+      i++;
+    } else if (text[i] === '"') {
+      quoted = !quoted;
+    }
+  }
+  return quoted;
+};
+
+const builtInSources = (language: CodeEditorLanguage): CompletionSource[] => {
+  const keywords = LANGUAGE_KEYWORDS[language];
+  if (!keywords) return [completeAnyWord];
+  const completeKeywords = completeFromList(keywords.map(label => ({ label, type: 'keyword' })));
+  if (language === 'json') {
+    return [
+      ctx => {
+        const line = ctx.state.doc.lineAt(ctx.pos);
+        const before = line.text.slice(0, ctx.pos - line.from);
+        if (isInsideQuotedString(before)) return completeAnyWord(ctx);
+        return /(?:^|[:,\[])[\s\w]*$/.test(before) ? completeKeywords(ctx) : null;
+      },
+    ];
+  }
+  return [completeKeywords, completeAnyWord];
+};
+
 /**
- * Autocomplete (spec §7.14): built-in HTTP source for `http`, the JSON Schema source when
- * `schema` is set, then consumer sources, all through `override` (language-data sources are
- * off). `completionKeymap` comes with `defaultKeymap: true` at `Prec.highest`, so Enter,
+ * Autocomplete: HTTP and JSON Schema sources, consumer sources, then language keywords and
+ * document words, all through `override` (language-data sources are off).
+ * `completionKeymap` comes with `defaultKeymap: true` at `Prec.highest`, so Enter,
  * arrows and Escape reach the open list before `indentWithTab` / fullscreen Escape.
  */
 export const completionExtension = (config: {
@@ -184,7 +308,7 @@ export const completionExtension = (config: {
   for (const source of sources) {
     override.push(adaptSource(source, language, startingLineNumber));
   }
-  if (override.length === 0) return [];
+  override.push(...builtInSources(language));
 
   return [
     autocompletion({

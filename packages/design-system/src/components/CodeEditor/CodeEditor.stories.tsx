@@ -38,6 +38,7 @@ const DESCRIPTION = [
   'The adapter re-tokenizes the whole document after each pause in typing, which stays within a frame up to about 2 000 lines with Prism; longer documents still edit smoothly, their colours just settle a moment later.',
   'Like the snippet, the editor sits inside a `display: contents` wrapper that keeps it mounted across fullscreen, so space editors with their own `className` (for example `mt-16`) or a `gap` on the parent — not `space-*`, `divide-*` or child selectors on the parent.',
   '`lines`, `folds`, `completions` and `schema` are compared by identity, so memoise them or hoist them to module constants — a new value on every render reconfigures the editor.',
+  'Autocomplete suggests language keywords and words already in the document for every language; HTTP methods and headers and JSON Schema values have their own contextual suggestions. Pass `completions` to add application-specific results.',
   'Syntax errors are best-effort: JSON reports the `JSON.parse` message, JavaScript and TypeScript use Babel, Lua uses luaparse (first error only), YAML and Python use their Lezer parsers, which still flag a few valid Python forms such as `lambda a, /, b` and parenthesised `with` items.',
   '`lines` and `folds` stay on their line numbers while typing; to keep a decoration on a piece of text, recompute it from `value` (for example `useMemo(() => linesFor(value), [value])`, or a `folds` function such as `getHttpFolds`).',
   'The editor injects `<style>` tags, so under a strict Content Security Policy pass `cspNonce`.',

@@ -74,15 +74,28 @@ const openCompletions = async (view: EditorView, timeout = 1000): Promise<string
 };
 
 describe('completionExtension', () => {
-  it('adds nothing when there is no source', () => {
-    expect(
-      completionExtension({
-        language: 'text',
-        schema: undefined,
-        sources: [],
-        startingLineNumber: 1,
-      }),
-    ).toEqual([]);
+  it.each([
+    ['json', '{"enabled": tr|}', 'true'],
+    ['yaml', 'enabled: tr|', 'true'],
+    ['bash', 'ec|', 'echo'],
+    ['javascript', 'ret|', 'return'],
+    ['typescript', 'inter|', 'interface'],
+    ['python', 'def|', 'def'],
+    ['lua', 'funct|', 'function'],
+  ] as const)('completes built-in %s keywords', async (language, doc, keyword) => {
+    const view = mount(doc, { language });
+    expect(await openCompletions(view)).toContain(keyword);
+  });
+
+  it('completes words already in a plain-text document', async () => {
+    const view = mount('customerAccount\ncustomerAc|', { language: 'text' });
+    expect(await openCompletions(view)).toContain('customerAccount');
+  });
+
+  it('reuses JSON property names inside a quoted key', async () => {
+    const view = mount('{"customerAccount": 1, "customerAc|": 2}', { language: 'json' });
+    expect(await openCompletions(view)).toContain('customerAccount');
+    await accept(view, 1, '{"customerAccount": 1, "customerAccount": 2}');
   });
 
   it('completes HTTP methods on the start line', async () => {
