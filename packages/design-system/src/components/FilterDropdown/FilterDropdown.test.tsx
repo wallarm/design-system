@@ -312,9 +312,12 @@ describe('Search', () => {
     render(<Harness items={many} />);
     await userEvent.click(trigger());
     const input = within(await screen.findByTestId('type-filter--search')).getByRole('combobox');
+    // The menu takes focus (and starts listening for Escape) on the frame after it opens.
+    await waitFor(() => expect(input).toHaveFocus());
     await userEvent.type(input, 'item b');
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(trigger()).toHaveAttribute('aria-expanded', 'false'));
+    await waitFor(() => expect(trigger()).toHaveFocus());
 
     await userEvent.click(trigger());
     const again = within(await screen.findByTestId('type-filter--search')).getByRole('combobox');
@@ -561,7 +564,8 @@ describe('Keyboard and focus', () => {
 
     await userEvent.keyboard('{Escape}');
     await waitFor(() => expect(trigger()).toHaveAttribute('aria-expanded', 'false'));
-    expect(trigger()).toHaveFocus();
+    // aria-expanded flips with the state change; zag moves focus back on the next animation frame.
+    await waitFor(() => expect(trigger()).toHaveFocus());
   });
 
   it('focuses the list when there is no search', async () => {
@@ -976,6 +980,10 @@ describe('Footer Clear from the keyboard', () => {
     await waitFor(() =>
       expect(screen.getByTestId('option-lua')).toHaveAttribute('data-highlighted', ''),
     );
+    // The highlight is set with the state change, but the menu's initial focus lands on the next
+    // animation frame; move to Clear only after it, as Tab would, so that frame cannot pull focus
+    // back to the list between the key's keydown and keyup.
+    await waitFor(() => expect(screen.getByTestId('type-filter--content')).toHaveFocus());
     const clearButton = screen.getByTestId('type-filter--footer-clear');
     clearButton.focus();
     await userEvent.keyboard(key);

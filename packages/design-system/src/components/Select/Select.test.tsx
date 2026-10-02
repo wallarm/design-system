@@ -302,6 +302,9 @@ describe('SelectSearchInput keyboard', () => {
     render(<SearchableSelect onKeyDown={onKeyDown} />);
     await userEvent.click(screen.getByTestId('trigger'));
     const input = within(await screen.findByTestId('search')).getByRole('textbox');
+    // The menu moves focus to the list on the frame after it opens; focus the search after that
+    // frame, as a user would, so it cannot pull focus back to the list mid-test.
+    await waitFor(() => expect(screen.getByRole('listbox')).toHaveFocus());
     input.focus();
     await userEvent.keyboard('{ArrowDown}');
     await userEvent.type(input, 'a b');
@@ -337,6 +340,9 @@ describe('SelectSearchInput keyboard', () => {
     render(<Wrapped />);
     await userEvent.click(screen.getByTestId('trigger'));
     const input = within(await screen.findByTestId('search')).getByRole('textbox');
+    // The menu moves focus to the list on the frame after it opens; focus the search after that
+    // frame, as a user would, so it cannot pull focus back to the list mid-test.
+    await waitFor(() => expect(screen.getByRole('listbox')).toHaveFocus());
     input.focus();
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() =>
@@ -354,6 +360,9 @@ describe('SelectSearchInput keyboard', () => {
     render(<SearchableSelect />);
     await userEvent.click(screen.getByTestId('trigger'));
     const input = within(await screen.findByTestId('search')).getByRole('textbox');
+    // The menu moves focus to the list on the frame after it opens; focus the search after that
+    // frame, as a user would, so it cannot pull focus back to the list mid-test.
+    await waitFor(() => expect(screen.getByRole('listbox')).toHaveFocus());
     input.focus();
     await userEvent.keyboard('{ArrowDown}');
     await waitFor(() =>
@@ -388,6 +397,9 @@ describe('SelectSearchInput keyboard', () => {
     );
     await userEvent.click(screen.getByTestId('trigger'));
     const input = within(await screen.findByTestId('search')).getByRole('textbox');
+    // The menu moves focus to the list on the frame after it opens; focus the search after that
+    // frame, as a user would, so it cannot pull focus back to the list mid-test.
+    await waitFor(() => expect(screen.getByRole('listbox')).toHaveFocus());
     input.focus();
     await userEvent.keyboard('{ArrowDown}{ArrowDown}');
     await waitFor(() =>

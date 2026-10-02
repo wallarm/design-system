@@ -1,7 +1,7 @@
 import type { FC, ReactNode } from 'react';
 import { createRef, useState } from 'react';
 import { afterEach, describe, expect, it, rs } from '@rstest/core';
-import { render, screen, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import {
@@ -1287,6 +1287,8 @@ describe('TableSettingsMenu: onSettingsOpenChange', () => {
 
     await userEvent.click(trigger);
     expect(onSettingsOpenChange).toHaveBeenLastCalledWith(true);
+    // The menu takes focus and registers its Escape listener on the frame after it opens.
+    await waitFor(() => expect(screen.getByRole('menu')).toHaveFocus());
 
     await userEvent.keyboard('{Escape}');
     expect(onSettingsOpenChange).toHaveBeenLastCalledWith(false);
