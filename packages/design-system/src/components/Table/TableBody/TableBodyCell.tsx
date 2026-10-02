@@ -1,9 +1,3 @@
-// React Compiler opt-out: TanStack Table row/column/header/cell objects keep a
-// stable identity while their getter results (getIsSelected, getIsSorted,
-// getSize, ...) change, so compiled memoization would render stale state.
-// Remove once these readers subscribe via table.Subscribe.
-'use no memo';
-
 import type { useSortable } from '@dnd-kit/sortable';
 import { type Cell, flexRender, type RowData } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
@@ -15,10 +9,11 @@ import {
   type DSTableFeatures,
   getAlignClass,
   getExpandBorderClass,
-  getPinningStyles,
-  isLastPinnedLeft,
   TABLE_EXPAND_COLUMN_ID,
   useColumnDnd,
+  useColumnPinning,
+  useRenderEveryTime,
+  useTableValue,
 } from '../lib';
 import { Td } from '../primitives';
 import { useTableContext } from '../TableContext';
@@ -47,22 +42,30 @@ export const TableBodyCell = <T extends RowData>({
   dragAttributes,
   dropIndicator,
 }: TableBodyCellProps<T>) => {
-  const { allLeafColumns, masterColumnId } = useTableContext<T>();
+  const { masterColumnId } = useTableContext<T>();
   const testId = useTestId('body-cell');
   const column = cell.column;
-  const isPinned = column.getIsPinned();
   const meta = column.columnDef.meta;
   const isExpandColumn = column.id === TABLE_EXPAND_COLUMN_ID;
-  const isExpandedToggle = isExpandColumn && (cell.row.getIsExpanded() || cell.row.depth > 0);
+  const isRowExpanded = useTableValue(() => cell.row.getIsExpanded());
+  const isExpandedToggle = isExpandColumn && (isRowExpanded || cell.row.depth > 0);
+  const size = useTableValue(() => column.getSize());
 
   const { canDnd, setNodeRef, dndStyle } = useColumnDnd(column);
-  const pinningStyles = getPinningStyles(column);
-  const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
+  const { isPinned, pinningStyles, lastPinnedLeft: lastLeft } = useColumnPinning(column);
   const { isMasterTrigger, handleClick, tooltipText } = useMasterCell<T>(column.id, cell.row.id);
 
   const isCut = column.id === masterColumnId || meta?.resizeType === 'cut';
-  const content = flexRender(cell.column.columnDef.cell, cell.getContext());
+  // Column `cell` renderers and `renderMenuAction` are consumer code that may
+  // call hooks, read context or read any row/column getter — run them on every
+  // render, as before the React Compiler (see useRenderEveryTime).
+  const content = useRenderEveryTime(() =>
+    flexRender(cell.column.columnDef.cell, cell.getContext()),
+  );
   const hasActions = !!meta?.renderMenuAction;
+  const menuAction = useRenderEveryTime(() =>
+    isCut ? meta?.renderMenuAction?.(cell.row) : undefined,
+  );
 
   const renderContent = () => {
     const wrappedContent = tooltipText ? (
@@ -80,7 +83,7 @@ export const TableBodyCell = <T extends RowData>({
       return (
         <div className='flex items-center justify-between gap-2'>
           {wrappedContent}
-          <TableMasterCellActions>{meta?.renderMenuAction?.(cell.row)}</TableMasterCellActions>
+          <TableMasterCellActions>{menuAction}</TableMasterCellActions>
         </div>
       );
     }
@@ -119,7 +122,7 @@ export const TableBodyCell = <T extends RowData>({
       onClick={isMasterTrigger ? handleClick : undefined}
       style={{
         ...pinningStyles,
-        width: cell.column.getSize(),
+        width: size,
         ...dndStyle,
         ...(isCut && { overflow: 'hidden' }),
         // Force overflow:visible so the ::after indicator line extends past

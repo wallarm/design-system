@@ -1,16 +1,10 @@
-// React Compiler opt-out: TanStack Table row/column/header/cell objects keep a
-// stable identity while their getter results (getIsSelected, getIsSorted,
-// getSize, ...) change, so compiled memoization would render stale state.
-// Remove once these readers subscribe via table.Subscribe.
-'use no memo';
-
 import { type MouseEvent, useCallback } from 'react';
 import type { Header, RowData } from '@tanstack/react-table';
 import { MoveDown, MoveUp, MoveVertical } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { tableHeaderButtonClass } from './classes';
-import { type DSTableFeatures, SORT_LABELS } from './lib';
+import { type DSTableFeatures, SORT_LABELS, useTableValue } from './lib';
 import { useTableContext } from './TableContext';
 
 interface TableSortHandler<T extends RowData> {
@@ -35,7 +29,7 @@ export const TableSortHandler = <T extends RowData>({ header }: TableSortHandler
   const { sortingEnabled } = ctx;
   const testId = useTestId('sort');
 
-  const canSort = sortingEnabled && column.getCanSort();
+  const canSort = useTableValue(() => sortingEnabled && column.getCanSort());
 
   const handleSort = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -46,7 +40,7 @@ export const TableSortHandler = <T extends RowData>({ header }: TableSortHandler
     [canSort, column],
   );
 
-  const sortDirection = column.getIsSorted();
+  const sortDirection = useTableValue(() => column.getIsSorted());
   const sortType = column.columnDef.meta?.sortType;
   const tooltipText = getSortTooltip(sortType, sortDirection);
 

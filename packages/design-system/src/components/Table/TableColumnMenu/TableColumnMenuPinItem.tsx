@@ -1,12 +1,7 @@
-// React Compiler opt-out: TanStack Table row/column/header/cell objects keep a
-// stable identity while their getter results (getIsSelected, getIsSorted,
-// getSize, ...) change, so compiled memoization would render stale state.
-// Remove once these readers subscribe via table.Subscribe.
-'use no memo';
-
 import type { FC } from 'react';
 import { Pin, PinOff } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
+import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 import { useTableColumnMenuContext } from './TableColumnMenu';
 
@@ -26,9 +21,9 @@ export const TableColumnMenuPinItem: FC<TableColumnMenuPinItemProps> = ({
   const { column } = useTableColumnMenuContext();
   const ctx = useTableContext();
 
-  const isPinned = column.getIsPinned();
+  const isPinned = useTableValue(() => column.getIsPinned());
   const isAlwaysPinned = ctx.alwaysPinnedLeft.includes(column.id);
-  const canPin = ctx.pinningEnabled && column.getCanPin() && !isAlwaysPinned;
+  const canPin = useTableValue(() => ctx.pinningEnabled && column.getCanPin()) && !isAlwaysPinned;
 
   if (!canPin) return null;
 

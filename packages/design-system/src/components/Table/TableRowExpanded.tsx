@@ -1,14 +1,14 @@
-// React Compiler opt-out: TanStack Table row/column/header/cell objects keep a
-// stable identity while their getter results (getIsSelected, getIsSorted,
-// getSize, ...) change, so compiled memoization would render stale state.
-// Remove once these readers subscribe via table.Subscribe.
-'use no memo';
-
 import type { CSSProperties } from 'react';
 import type { Row, RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import { type DSTableFeatures, TABLE_EXPAND_COLUMN_ID } from './lib';
+import {
+  type DSTableFeatures,
+  RenderCallback,
+  TABLE_EXPAND_COLUMN_ID,
+  useRenderEveryTime,
+  useTableValue,
+} from './lib';
 import { Td, Tr } from './primitives';
 import { useTableContext } from './TableContext';
 
@@ -28,9 +28,19 @@ export const TableRowExpanded = <T extends RowData>({
   const { table, stretch, renderExpandedRow } = useTableContext<T>();
   const testId = useTestId('row-expanded');
 
-  if (!row.getIsExpanded() || !renderExpandedRow) return null;
+  const isExpanded = useTableValue(() => row.getIsExpanded());
+  const visibleColumns = useTableValue(() => table.getVisibleLeafColumns());
+  // Consumer renderer — may call hooks, read context or read any row getter,
+  // so it runs on every render (see useRenderEveryTime), as its own component
+  // so its hooks do not join this component's hook list only while expanded.
+  const content = useRenderEveryTime(() =>
+    isExpanded && renderExpandedRow ? (
+      <RenderCallback render={renderExpandedRow} arg={row} />
+    ) : null,
+  );
 
-  const visibleColumns = table.getVisibleLeafColumns();
+  if (!isExpanded || !renderExpandedRow) return null;
+
   const hasExpandColumn = visibleColumns.some(col => col.id === TABLE_EXPAND_COLUMN_ID);
   const fillerOffset = stretch ? 0 : 1;
 
@@ -50,7 +60,7 @@ export const TableRowExpanded = <T extends RowData>({
           lastRow && 'border-b-0',
         )}
       >
-        <div className='px-16 py-12'>{renderExpandedRow(row)}</div>
+        <div className='px-16 py-12'>{content}</div>
       </Td>
     </Tr>
   );

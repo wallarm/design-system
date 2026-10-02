@@ -25,7 +25,6 @@ export { createTableColumnHelper } from './createTableColumnHelper';
 export { detectDataChange } from './detectDataChange';
 export { type DSTableFeatures, dsTableFeatures } from './dsTableFeatures';
 export { getDndStyles } from './getDndStyles';
-export { getPinningStyles } from './getPinningStyles';
 export { getRowKey } from './getRowKey';
 export { isLastPinnedLeft } from './isLastPinnedLeft';
 export {
@@ -36,6 +35,8 @@ export {
   type ScrollRoot,
   scrollRootBy,
 } from './scrollRoot';
+export { useColumnPinning, useTableValue, withTableState } from './tableReactivity';
 export { useColumnDnd } from './useColumnDnd';
 export { useContainerWidth } from './useContainerWidth';
+export { RenderCallback, useRenderEveryTime } from './useRenderEveryTime';
 export { useRowDnd } from './useRowDnd';

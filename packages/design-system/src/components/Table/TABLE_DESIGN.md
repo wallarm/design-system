@@ -90,6 +90,36 @@ Table (root)
 TableCellContextMenu        — cell wrapper, right-click → Copy, Show only, Exclude
 ```
 
+### React Compiler
+
+The whole Table tree is compiled by the React Compiler. TanStack Table v9 keeps
+`row` / `column` / `header` / `cell` objects at a stable identity while their
+getter results (`getIsSelected()`, `getIsSorted()`, `getSize()`, ...) change, so
+a compiled component must never call a getter on those objects directly in
+render — it would memoize the first result. `lib/tableReactivity.ts` and
+`lib/useRenderEveryTime.ts` provide the sanctioned reads:
+
+- `useTableValue(() => column.getIsSorted())` — scalar reads (or references
+  TanStack memoizes, like `row.getVisibleCells()`); subscribes to the table
+  store, the documented v9 pattern.
+- `useRenderEveryTime(() => ...)` — consumer callbacks: the `cell` renderer,
+  a function `header` (called inline, not as an element), `meta.renderMenuAction`
+  and `renderExpandedRow`. They may call hooks or read context, so they run on
+  every render, exactly as before the compiler. The hook lives in its own file
+  with a file-level `'use no memo'`; a compiled caller never skips a hook call,
+  so the callback cannot be cached (a cached call would break the consumer's
+  hook order and leave context reads stale).
+- `withTableState(table.state, () => ...)` — internal output that cannot be
+  compared by value: lists whose items read getters (filler cells, skeleton
+  rows, the drag overlay, the settings menu column lists). Re-runs on every
+  table state change.
+
+Getter calls inside event handlers and effects run at call time and need
+neither. Components that create a `@tanstack/react-virtual` instance are left
+uncompiled by the compiler itself; they pass plain values
+(`getVirtualItems()`, `getTotalSize()`) to `TableBodyVirtualizedCore`. Check
+for bailouts with `pnpm compiler:audit`.
+
 ---
 
 ## API

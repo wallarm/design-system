@@ -1,9 +1,3 @@
-// React Compiler opt-out: TanStack Table row/column/header/cell objects keep a
-// stable identity while their getter results (getIsSelected, getIsSorted,
-// getSize, ...) change, so compiled memoization would render stale state.
-// Remove once these readers subscribe via table.Subscribe.
-'use no memo';
-
 import type { ComponentType, ReactNode } from 'react';
 import { flexRender, type Header, type RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
@@ -16,11 +10,12 @@ import {
   containsDirectChild,
   type DSTableFeatures,
   getAlignClass,
-  getPinningStyles,
-  isLastPinnedLeft,
   TABLE_EXPAND_COLUMN_ID,
   TABLE_SELECT_COLUMN_ID,
   useColumnDnd,
+  useColumnPinning,
+  useRenderEveryTime,
+  useTableValue,
 } from './lib';
 import { Th } from './primitives';
 import { TableColumnMenu } from './TableColumnMenu';
@@ -47,33 +42,33 @@ export const TableHeadCell = <T extends RowData>({
     pinningEnabled,
     visibilityEnabled,
     columnDndEnabled,
-    allLeafColumns,
     masterColumnId,
     containerRef,
   } = ctx;
 
   const { column } = header;
-  const isPinned = column.getIsPinned();
   const isMasterColumn = column.id === masterColumnId;
   const meta = column.columnDef.meta;
 
-  const isLastColumn = column.getIsLastColumn();
+  const isLastColumn = useTableValue(() => column.getIsLastColumn());
   const hasSettingsMenu = visibilityEnabled || columnDndEnabled;
-  const canSort = sortingEnabled && column.getCanSort();
-  const canResize = resizingEnabled && column.getCanResize() && !isLastColumn;
+  const canSort = useTableValue(() => sortingEnabled && column.getCanSort());
+  const canResize = useTableValue(
+    () => resizingEnabled && column.getCanResize() && !column.getIsLastColumn(),
+  );
   const isNotBasicColumn =
     column.columnDef.id === TABLE_SELECT_COLUMN_ID ||
     column.columnDef.id === TABLE_EXPAND_COLUMN_ID;
 
-  const canPin = pinningEnabled && column.getCanPin();
-  const canHide = visibilityEnabled && column.getCanHide();
+  const canPin = useTableValue(() => pinningEnabled && column.getCanPin());
+  const canHide = useTableValue(() => visibilityEnabled && column.getCanHide());
   const hasMenu =
     isNotBasicColumn || isMasterColumn ? false : canPin || canHide || columnDndEnabled;
 
-  const sortDirection = column.getIsSorted();
+  const sortDirection = useTableValue(() => column.getIsSorted());
+  const size = useTableValue(() => header.getSize());
 
-  const pinningStyles = getPinningStyles(column);
-  const lastLeft = isLastPinnedLeft(column, allLeafColumns, column.id);
+  const { isPinned, pinningStyles, lastPinnedLeft: lastLeft } = useColumnPinning(column);
 
   const { canDnd, isDragging, setNodeRef, dndStyle, attributes, listeners } = useColumnDnd(column);
   const { hasOverflow } = useHorizontalScrollState(containerRef, isMasterColumn);
@@ -84,10 +79,16 @@ export const TableHeadCell = <T extends RowData>({
   // component layer and would defeat the `<TableSortTrigger>` opt-out scan.
   // Header functions in TanStack are pure (props in, ReactNode out), so an
   // inline call has no side effects.
-  const headerDef = header.column.columnDef.header;
-  const headerCtx = header.getContext();
-  const content: ReactNode =
-    typeof headerDef === 'function' ? headerDef(headerCtx) : flexRender(headerDef, headerCtx);
+  //
+  // The header renderer is consumer code that may call hooks, read context or
+  // read any column getter, so it runs on every render (see useRenderEveryTime).
+  const content: ReactNode = useRenderEveryTime(() => {
+    const headerDef = header.column.columnDef.header;
+    const headerCtx = header.getContext();
+    return typeof headerDef === 'function'
+      ? headerDef(headerCtx)
+      : flexRender(headerDef, headerCtx);
+  });
   const hasCustomSortTrigger = containsDirectChild(
     content,
     TableSortTrigger as ComponentType<unknown>,
@@ -137,7 +138,7 @@ export const TableHeadCell = <T extends RowData>({
       style={{
         ...pinningStyles,
         ...dndStyle,
-        width: header.getSize(),
+        width: size,
       }}
       colSpan={header.colSpan}
       aria-sort={ariaSort}

@@ -1,13 +1,8 @@
-// React Compiler opt-out: TanStack Table row/column/header/cell objects keep a
-// stable identity while their getter results (getIsSelected, getIsSorted,
-// getSize, ...) change, so compiled memoization would render stale state.
-// Remove once these readers subscribe via table.Subscribe.
-'use no memo';
-
 import type { FC } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { ArrowLeft } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
+import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 import { useTableColumnMenuContext } from './TableColumnMenu';
 
@@ -25,10 +20,10 @@ export const TableColumnMenuMoveLeftItem: FC<TableColumnMenuMoveLeftItemProps> =
   const { column } = useTableColumnMenuContext();
   const ctx = useTableContext();
 
-  const isPinned = column.getIsPinned();
+  const isPinned = useTableValue(() => column.getIsPinned());
   const isAlwaysPinned = ctx.alwaysPinnedLeft.includes(column.id);
   const canReorder = ctx.columnDndEnabled && !isAlwaysPinned;
-  const visibleColumns = ctx.table.getVisibleLeafColumns();
+  const visibleColumns = useTableValue(() => ctx.table.getVisibleLeafColumns());
   const columnIdx = visibleColumns.findIndex(c => c.id === column.id);
   const canMoveLeft = canReorder && columnIdx > 0 && !isPinned;
 
