@@ -1,5 +1,5 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { Field } from '../Field';
 import { FileUpload } from './FileUpload';
 import { byTestId, hiddenInput, makeFile, pick } from './FileUpload.test.helpers';
@@ -26,7 +26,7 @@ describe('FileUpload — root', () => {
   });
 
   it('holds a picked file in the hidden input (nothing is uploaded) and reports it', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     const { container } = render(<FileUpload name='artifact' onValueChange={onValueChange} />);
     const file = makeFile();
     pick(container, file);
@@ -36,7 +36,7 @@ describe('FileUpload — root', () => {
   });
 
   it('works controlled: rows follow `value`, and a re-render with an equal new array does not re-fire onValueChange', async () => {
-    const onValueChange = vi.fn();
+    const onValueChange = rs.fn();
     const Controlled = ({ value }: { value: File[] }) => (
       <FileUpload data-testid='fu' value={value} onValueChange={onValueChange}>
         <FileUploadItemGroup>{file => <FileUploadItem file={file} />}</FileUploadItemGroup>
@@ -52,7 +52,7 @@ describe('FileUpload — root', () => {
   });
 
   it('forwards consumer attributes and ref to the root div', () => {
-    const ref = vi.fn();
+    const ref = rs.fn();
     render(<FileUpload data-testid='fu' id='x' aria-label='Artifact' ref={ref} />);
     expect(byTestId('fu')).toHaveAttribute('id', 'x');
     expect(byTestId('fu')).toHaveAttribute('aria-label', 'Artifact');

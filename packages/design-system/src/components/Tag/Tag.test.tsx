@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Tag } from './Tag';
 import { TagClose } from './TagClose';
@@ -55,7 +55,7 @@ describe('Attribute pass-through', () => {
 
 describe('Handler composition', () => {
   it('consumer onClick on TagClose fires on click', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
 
     render(
       <Tag>
@@ -70,8 +70,8 @@ describe('Handler composition', () => {
   });
 
   it('clicking TagClose does NOT fire Tag onClick (nested-interactive gating)', async () => {
-    const tagOnClick = vi.fn();
-    const closeOnClick = vi.fn();
+    const tagOnClick = rs.fn();
+    const closeOnClick = rs.fn();
 
     render(
       <Tag data-testid='tag' onClick={tagOnClick}>
@@ -87,7 +87,7 @@ describe('Handler composition', () => {
   });
 
   it('clicking the Tag body still fires Tag onClick', async () => {
-    const tagOnClick = vi.fn();
+    const tagOnClick = rs.fn();
 
     render(
       <Tag data-testid='tag' onClick={tagOnClick}>

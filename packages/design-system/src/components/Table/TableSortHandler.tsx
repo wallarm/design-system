@@ -4,7 +4,7 @@ import { MoveDown, MoveUp, MoveVertical } from '../../icons';
 import { useTestId } from '../../utils/testId';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { tableHeaderButtonClass } from './classes';
-import { type DSTableFeatures, SORT_LABELS } from './lib';
+import { type DSTableFeatures, SORT_LABELS, useTableValue } from './lib';
 import { useTableContext } from './TableContext';
 
 interface TableSortHandler<T extends RowData> {
@@ -29,7 +29,7 @@ export const TableSortHandler = <T extends RowData>({ header }: TableSortHandler
   const { sortingEnabled } = ctx;
   const testId = useTestId('sort');
 
-  const canSort = sortingEnabled && column.getCanSort();
+  const canSort = useTableValue(() => sortingEnabled && column.getCanSort());
 
   const handleSort = useCallback(
     (e: MouseEvent<HTMLButtonElement>) => {
@@ -40,7 +40,7 @@ export const TableSortHandler = <T extends RowData>({ header }: TableSortHandler
     [canSort, column],
   );
 
-  const sortDirection = column.getIsSorted();
+  const sortDirection = useTableValue(() => column.getIsSorted());
   const sortType = column.columnDef.meta?.sortType;
   const tooltipText = getSortTooltip(sortType, sortDirection);
 

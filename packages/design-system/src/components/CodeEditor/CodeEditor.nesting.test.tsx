@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Card } from '../Card';
 import {
@@ -40,7 +40,7 @@ const HEADERS_FOLD: FoldRegion[] = [
 
 describe('CodeEditor inside a clickable Card', () => {
   it('toolbar button clicks resolve analytics without firing the Card onClick', async () => {
-    const cardClick = vi.fn();
+    const cardClick = rs.fn();
     const captured = captureAnalyticsClicks();
 
     render(
@@ -70,7 +70,7 @@ describe('CodeEditor inside a clickable Card', () => {
   });
 
   it('clicking into the editor or its gutter does not activate the Card', async () => {
-    const cardClick = vi.fn();
+    const cardClick = rs.fn();
     const captured = captureAnalyticsClicks();
 
     render(
@@ -93,7 +93,7 @@ describe('CodeEditor inside a clickable Card', () => {
   });
 
   it('fold toggle clicks resolve analytics without firing the Card onClick', async () => {
-    const cardClick = vi.fn();
+    const cardClick = rs.fn();
     const captured = captureAnalyticsClicks();
 
     render(
@@ -112,7 +112,7 @@ describe('CodeEditor inside a clickable Card', () => {
   });
 
   it('still activates the Card for clicks outside the editor', async () => {
-    const cardClick = vi.fn();
+    const cardClick = rs.fn();
 
     render(
       <Card onClick={cardClick}>
@@ -134,7 +134,7 @@ describe('CodeEditor inside a clickable Card', () => {
 describe('CodeEditor inside an open Popover', () => {
   it('editor and toolbar clicks resolve analytics and do not dismiss the Popover', async () => {
     // Controlled `open` keeps the content mounted; the spy detects any dismissal.
-    const onOpenChange = vi.fn();
+    const onOpenChange = rs.fn();
 
     render(
       <Popover open onOpenChange={onOpenChange}>

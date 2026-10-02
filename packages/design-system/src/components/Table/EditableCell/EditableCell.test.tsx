@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../../testUtils/captureAnalyticsClicks';
 import { EditableSelectCell } from './EditableSelectCell';
 import { EditableTextCell } from './EditableTextCell';
@@ -13,7 +13,7 @@ const statusItems = [
 describe('EditableTextCell', () => {
   describe('Interactions', () => {
     it('enters edit mode on click and focuses the input', async () => {
-      render(<EditableTextCell value='hello' onCommit={vi.fn()} aria-label='Name' />);
+      render(<EditableTextCell value='hello' onCommit={rs.fn()} aria-label='Name' />);
 
       await userEvent.click(screen.getByRole('button'));
 
@@ -23,7 +23,7 @@ describe('EditableTextCell', () => {
     });
 
     it('commits the new value on Enter', async () => {
-      const onCommit = vi.fn();
+      const onCommit = rs.fn();
       render(<EditableTextCell value='hello' onCommit={onCommit} aria-label='Name' />);
 
       await userEvent.click(screen.getByRole('button'));
@@ -34,7 +34,7 @@ describe('EditableTextCell', () => {
     });
 
     it('commits on blur', async () => {
-      const onCommit = vi.fn();
+      const onCommit = rs.fn();
       render(<EditableTextCell value='hello' onCommit={onCommit} aria-label='Name' />);
 
       await userEvent.click(screen.getByRole('button'));
@@ -45,7 +45,7 @@ describe('EditableTextCell', () => {
     });
 
     it('reverts on Escape without committing', async () => {
-      const onCommit = vi.fn();
+      const onCommit = rs.fn();
       render(<EditableTextCell value='hello' onCommit={onCommit} aria-label='Name' />);
 
       await userEvent.click(screen.getByRole('button'));
@@ -56,7 +56,7 @@ describe('EditableTextCell', () => {
     });
 
     it('does not fire onCommit when the value is unchanged', async () => {
-      const onCommit = vi.fn();
+      const onCommit = rs.fn();
       render(<EditableTextCell value='hello' onCommit={onCommit} aria-label='Name' />);
 
       await userEvent.click(screen.getByRole('button'));
@@ -71,7 +71,7 @@ describe('EditableTextCell', () => {
       render(
         <EditableTextCell
           value='hello'
-          onCommit={vi.fn()}
+          onCommit={rs.fn()}
           aria-label='Name'
           data-testid='cell'
           data-analytics-id='EDIT_NAME'
@@ -89,7 +89,7 @@ describe('EditableTextCell', () => {
       render(
         <EditableTextCell
           value='hello'
-          onCommit={vi.fn()}
+          onCommit={rs.fn()}
           aria-label='Name'
           data-testid='cell'
           data-analytics-id='EDIT_NAME'
@@ -105,9 +105,9 @@ describe('EditableTextCell', () => {
     });
 
     it('composes a consumer onClick with the enter-edit behaviour', async () => {
-      const onClick = vi.fn();
+      const onClick = rs.fn();
       render(
-        <EditableTextCell value='hello' onCommit={vi.fn()} aria-label='Name' onClick={onClick} />,
+        <EditableTextCell value='hello' onCommit={rs.fn()} aria-label='Name' onClick={onClick} />,
       );
 
       await userEvent.click(screen.getByRole('button'));
@@ -118,7 +118,7 @@ describe('EditableTextCell', () => {
 
     it('derives a --input testid for the editor', async () => {
       render(
-        <EditableTextCell value='hello' onCommit={vi.fn()} aria-label='Name' data-testid='cell' />,
+        <EditableTextCell value='hello' onCommit={rs.fn()} aria-label='Name' data-testid='cell' />,
       );
 
       await userEvent.click(screen.getByRole('button'));
@@ -132,7 +132,7 @@ describe('EditableSelectCell', () => {
   describe('Empty state', () => {
     it('renders the default placeholder when nothing is selected', () => {
       render(
-        <EditableSelectCell value={null} items={statusItems} onCommit={vi.fn()}>
+        <EditableSelectCell value={null} items={statusItems} onCommit={rs.fn()}>
           unused
         </EditableSelectCell>,
       );
@@ -142,7 +142,7 @@ describe('EditableSelectCell', () => {
 
     it('renders a custom placeholder set from outside', () => {
       render(
-        <EditableSelectCell value='' items={statusItems} onCommit={vi.fn()} placeholder='Pick one'>
+        <EditableSelectCell value='' items={statusItems} onCommit={rs.fn()} placeholder='Pick one'>
           unused
         </EditableSelectCell>,
       );
@@ -152,7 +152,7 @@ describe('EditableSelectCell', () => {
 
     it('renders children (not the placeholder) once a value is set', () => {
       render(
-        <EditableSelectCell value='Blocked' items={statusItems} onCommit={vi.fn()}>
+        <EditableSelectCell value='Blocked' items={statusItems} onCommit={rs.fn()}>
           Blocked badge
         </EditableSelectCell>,
       );
@@ -165,7 +165,7 @@ describe('EditableSelectCell', () => {
 
   describe('Interactions', () => {
     it('commits the picked option', async () => {
-      const onCommit = vi.fn();
+      const onCommit = rs.fn();
       render(
         <EditableSelectCell value='Blocked' items={statusItems} onCommit={onCommit}>
           Blocked
@@ -185,7 +185,7 @@ describe('EditableSelectCell', () => {
         <EditableSelectCell
           value='Blocked'
           items={statusItems}
-          onCommit={vi.fn()}
+          onCommit={rs.fn()}
           data-analytics-id='EDIT_STATUS'
         >
           Blocked

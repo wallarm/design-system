@@ -1,6 +1,6 @@
 import { ensureSyntaxTree, foldable, getIndentation, language } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { httpLanguage, languageExtension } from './index';
 import { jsonEditorLanguage } from './json';
 import { yamlEditorLanguage } from './yaml';

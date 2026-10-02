@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Card } from './Card';
 
@@ -49,7 +49,7 @@ describe('Attribute pass-through', () => {
     const captured = captureAnalyticsClicks();
 
     render(
-      <Card onClick={vi.fn()} data-testid='card' data-analytics-id='CARD_OPEN'>
+      <Card onClick={rs.fn()} data-testid='card' data-analytics-id='CARD_OPEN'>
         Content
       </Card>,
     );

@@ -1,5 +1,5 @@
 import type { EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it } from '@rstest/core';
 import { mountEngine, unmountAllEngines } from '../../../testUtils/codeEditorEngine';
 import { toggleFoldRegion } from './folds';
 

@@ -1,9 +1,9 @@
 // InlineEditControl.test.tsx
 
 import { StrictMode, useState } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
 import {
   type InlineEditSubmitMode,
@@ -42,7 +42,7 @@ describe('InlineEditControl', () => {
   });
 
   it('submits on Enter', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(
       <InlineEdit defaultEdit onValueCommit={onCommit} data-testid='attr'>
         <InlineEditControl>
@@ -55,7 +55,7 @@ describe('InlineEditControl', () => {
   });
 
   it('cancels on Escape', async () => {
-    const onRevert = vi.fn();
+    const onRevert = rs.fn();
     render(
       <InlineEdit defaultEdit onValueRevert={onRevert} data-testid='attr'>
         <InlineEditControl>
@@ -81,7 +81,7 @@ describe('InlineEditControl', () => {
   });
 
   it('does not cancel on blur when submitMode is "none"', async () => {
-    const onRevert = vi.fn();
+    const onRevert = rs.fn();
     render(
       <InlineEdit defaultEdit submitMode='none' onValueRevert={onRevert} data-testid='attr'>
         <InlineEditControl>
@@ -209,7 +209,7 @@ describe('submit-mode override', () => {
   });
 
   it('Control submitMode prop beats editor registration', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(
       <InlineEdit
         defaultValue='v'
@@ -242,7 +242,7 @@ describe('submit-mode override', () => {
   });
 
   it('keeps cancel gated on defaultPrevented for Escape (popover guard is load-bearing)', () => {
-    const onEditChange = vi.fn();
+    const onEditChange = rs.fn();
     render(
       <InlineEdit defaultValue='v' defaultEdit onEditChange={onEditChange}>
         <InlineEditControl

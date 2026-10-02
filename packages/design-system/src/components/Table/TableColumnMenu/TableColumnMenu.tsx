@@ -20,7 +20,7 @@ import {
   DropdownMenuTriggerItem,
 } from '../../DropdownMenu';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../../Tooltip';
-import { type DSTableFeatures, SORT_LABELS } from '../lib';
+import { type DSTableFeatures, SORT_LABELS, useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 import { TableColumnMenuHideItem } from './TableColumnMenuHideItem';
 import { TableColumnMenuMoveLeftItem } from './TableColumnMenuMoveLeftItem';
@@ -83,9 +83,9 @@ export const TableColumnMenu = <T extends RowData = Record<string, unknown>>({
   const triggerId = useId();
 
   const isAlwaysPinned = ctx.alwaysPinnedLeft.includes(column.id);
-  const canSort = ctx.sortingEnabled && column.getCanSort();
-  const canPin = ctx.pinningEnabled && column.getCanPin() && !isAlwaysPinned;
-  const canHide = ctx.visibilityEnabled && column.getCanHide();
+  const canSort = useTableValue(() => ctx.sortingEnabled && column.getCanSort());
+  const canPin = useTableValue(() => ctx.pinningEnabled && column.getCanPin()) && !isAlwaysPinned;
+  const canHide = useTableValue(() => ctx.visibilityEnabled && column.getCanHide());
   const canReorder = ctx.columnDndEnabled && !isAlwaysPinned;
 
   if (!canSort && !canPin && !canHide && !canReorder) return null;
@@ -135,14 +135,14 @@ const DefaultTableColumnMenuItems = () => {
   const { column } = useTableColumnMenuContext();
   const ctx = useTableContext();
 
-  const isPinned = column.getIsPinned();
+  const isPinned = useTableValue(() => column.getIsPinned());
   const isAlwaysPinned = ctx.alwaysPinnedLeft.includes(column.id);
   const canReorder = ctx.columnDndEnabled && !isAlwaysPinned;
-  const canSort = ctx.sortingEnabled && column.getCanSort();
-  const canPin = ctx.pinningEnabled && column.getCanPin() && !isAlwaysPinned;
-  const canHide = ctx.visibilityEnabled && column.getCanHide();
+  const canSort = useTableValue(() => ctx.sortingEnabled && column.getCanSort());
+  const canPin = useTableValue(() => ctx.pinningEnabled && column.getCanPin()) && !isAlwaysPinned;
+  const canHide = useTableValue(() => ctx.visibilityEnabled && column.getCanHide());
 
-  const visibleColumns = ctx.table.getVisibleLeafColumns();
+  const visibleColumns = useTableValue(() => ctx.table.getVisibleLeafColumns());
   const columnIdx = visibleColumns.findIndex(c => c.id === column.id);
   const isFirst = columnIdx === 0;
   const isLast = columnIdx === visibleColumns.length - 1;
@@ -152,7 +152,7 @@ const DefaultTableColumnMenuItems = () => {
 
   const sortType = column.columnDef.meta?.sortType;
   const [ascLabel, descLabel] = (sortType && SORT_LABELS[sortType]) || SORT_LABELS.text!;
-  const sortDirection = column.getIsSorted();
+  const sortDirection = useTableValue(() => column.getIsSorted());
 
   return (
     <>

@@ -22,7 +22,7 @@ This project uses specialized Claude Code agents for domain-specific tasks. Agen
 **Trigger:** Writing or updating unit tests, component tests, E2E tests.
 
 **Capabilities:**
-- Write Vitest unit and component tests
+- Write Rstest unit and component tests
 - Write Playwright E2E tests (visual, interaction, accessibility)
 - Follow strict E2E naming conventions from `docs/e2e-test-rules.md`
 - Screenshot testing with Docker

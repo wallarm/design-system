@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { TabsContent, TabsList } from '../Tabs';
 import { CodeSnippetActions } from './CodeSnippetActions';
@@ -64,7 +64,7 @@ describe('Attribute pass-through', () => {
   });
 
   it('composes consumer onClick alongside the internal copy handler', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
 
     render(
       <CodeSnippetRoot code='hello'>
@@ -84,7 +84,7 @@ describe('Attribute pass-through', () => {
   });
 
   it('composes consumer onToggle alongside the internal wrap handler', async () => {
-    const onToggle = vi.fn();
+    const onToggle = rs.fn();
 
     render(
       <CodeSnippetRoot code='hello'>
@@ -309,8 +309,8 @@ describe('Attribute pass-through', () => {
   });
 
   it('composes FoldRegion button handlers with the internal fold toggle handler', async () => {
-    const onToggleClick = vi.fn();
-    const onSummaryClick = vi.fn();
+    const onToggleClick = rs.fn();
+    const onSummaryClick = rs.fn();
 
     render(
       <CodeSnippetRoot

@@ -1,5 +1,5 @@
 import { Text } from '@codemirror/state';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { lineNumberToDocLine, offsetToPosition, positionToOffset } from './positions';
 
 // Offsets: "GET / HTTP/1.1" 0..14, "\n" 14, "Host: a" 15..22, "\n" 22, "" 23, "\n" 23, "{}" 24..26

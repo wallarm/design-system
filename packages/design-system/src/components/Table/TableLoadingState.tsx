@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
 import { Skeleton } from '../Skeleton';
+import { withTableState } from './lib';
 import { Td, Tr } from './primitives';
 import { useTableContext } from './TableContext';
 
@@ -19,10 +20,10 @@ interface TableLoadingStateProps {
 export const TableLoadingState: FC<TableLoadingStateProps> = ({ position = 'end', count }) => {
   const { table, skeletonCount, stretch } = useTableContext();
   const testId = useTestId(position === 'start' ? 'loading-start' : 'loading');
-  const columns = table.getVisibleLeafColumns();
   const lastRowIdx = (count ?? skeletonCount) - 1;
 
-  return (
+  // Skeleton cells read their column widths — rebuilt on every table state change.
+  return withTableState(table.state, () => (
     <>
       {Array.from({ length: count ?? skeletonCount }, (_, rowIdx) => {
         const key = `skeleton-${rowIdx}`;
@@ -33,7 +34,7 @@ export const TableLoadingState: FC<TableLoadingStateProps> = ({ position = 'end'
             data-testid={rowIdx === 0 ? testId : undefined}
             data-loading-position={position}
           >
-            {columns.map(column => (
+            {table.getVisibleLeafColumns().map(column => (
               <Td
                 key={column.id}
                 className={cn(
@@ -50,7 +51,7 @@ export const TableLoadingState: FC<TableLoadingStateProps> = ({ position = 'end'
         );
       })}
     </>
-  );
+  ));
 };
 
 TableLoadingState.displayName = 'TableLoadingState';

@@ -12,6 +12,7 @@ import { Checkbox, CheckboxIndicator } from '../../Checkbox';
 import { useTableContext } from '../TableContext';
 import { TABLE_SELECT_COLUMN_ID, TABLE_SELECT_COLUMN_WIDTH } from './constants';
 import type { DSTableFeatures } from './dsTableFeatures';
+import { useTableValue } from './tableReactivity';
 
 /**
  * Selects or deselects a range of rows between two indices.
@@ -57,7 +58,7 @@ const SelectionCell = <T extends RowData>({
 }: CellContext<DSTableFeatures, T, unknown>) => {
   const { lastSelectedRowIndexRef } = useTableContext<T>();
   const shiftRef = useIsKeyPressed('Shift');
-  const hasSubRows = row.subRows.length > 0;
+  const hasSubRows = useTableValue(() => row.subRows.length > 0);
 
   const handleCheckedChange = () => {
     if (hasSubRows) {
@@ -80,18 +81,21 @@ const SelectionCell = <T extends RowData>({
   };
 
   // Parent row: derive checked state from sub-rows
-  const checked = hasSubRows
-    ? row.getIsAllSubRowsSelected()
-      ? true
-      : row.getIsSomeSelected()
-        ? 'indeterminate'
-        : false
-    : row.getIsSelected();
+  const checked = useTableValue(() =>
+    row.subRows.length > 0
+      ? row.getIsAllSubRowsSelected()
+        ? true
+        : row.getIsSomeSelected()
+          ? 'indeterminate'
+          : false
+      : row.getIsSelected(),
+  );
+  const canSelect = useTableValue(() => row.getCanSelect());
 
   return (
     <Checkbox
       checked={checked}
-      disabled={!hasSubRows && !row.getCanSelect()}
+      disabled={!hasSubRows && !canSelect}
       onCheckedChange={handleCheckedChange}
     >
       <CheckboxIndicator />
@@ -152,25 +156,30 @@ const SelectionCell = <T extends RowData>({
  * `getIsSomeRowsSelected()` would keep seeing a non-empty `rowSelection`
  * object forever, permanently stuck on indeterminate even after "deselect
  * all". Instead, `indeterminate` is derived from the same
- * `getFilteredRowModel().flatRows` pass used for the `disabled` state below,
- * counted together in one reduce to avoid a third full pass over `flatRows`.
+ * `getFilteredRowModel().flatRows` the `disabled` state below scans. Both are
+ * read in a single short-circuiting scan through `useTableValue`,
+ * so the React Compiler sees them change with the selection.
  */
 const SelectAllHeaderCell = <T extends RowData>(
   _props: HeaderContext<DSTableFeatures, T, unknown>,
 ) => {
   const { table, selectAllRowsEnabled, onSelectAllRows } = useTableContext<T>();
 
-  const checked = table.getIsAllRowsSelected();
-  const { selectableCount, selectedCount } = table.getFilteredRowModel().flatRows.reduce(
-    (acc, row) => {
-      if (!row.getCanSelect()) return acc;
-      acc.selectableCount++;
-      if (row.getIsSelected()) acc.selectedCount++;
-      return acc;
-    },
-    { selectableCount: 0, selectedCount: 0 },
-  );
-  const indeterminate = !checked && selectedCount > 0;
+  const checked = useTableValue(() => table.getIsAllRowsSelected());
+  // One pass, one primitive: 0 — nothing selectable, 1 — selectable but none
+  // selected, 2 — at least one selectable row selected.
+  const selectableState = useTableValue(() => {
+    let state = 0;
+    for (const row of table.getFilteredRowModel().flatRows) {
+      if (!row.getCanSelect()) continue;
+      if (row.getIsSelected()) return 2;
+      state = 1;
+    }
+    return state;
+  });
+  const hasSelectable = selectableState > 0;
+  const hasSelected = selectableState === 2;
+  const indeterminate = !checked && hasSelected;
 
   // The column keeps its width so the header does not shift against the rows,
   // which still carry their own checkboxes.
@@ -187,7 +196,7 @@ const SelectAllHeaderCell = <T extends RowData>(
     <Checkbox
       checked={indeterminate ? 'indeterminate' : checked}
       onCheckedChange={handleCheckedChange}
-      disabled={selectableCount === 0}
+      disabled={!hasSelectable}
     >
       <CheckboxIndicator />
     </Checkbox>

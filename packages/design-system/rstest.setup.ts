@@ -1,6 +1,19 @@
-import '@testing-library/jest-dom/vitest';
+import { afterEach, expect } from '@rstest/core';
+import * as matchers from '@testing-library/jest-dom/matchers';
+import { cleanup } from '@testing-library/react';
 
-// Element is absent under `@vitest-environment node` (SSR tests).
+// jest-dom ships a Vitest-only entry (`@testing-library/jest-dom/vitest`), so
+// register its matchers on Rstest's `expect` directly. Their types come from
+// `src/testUtils/rstest-env.d.ts`.
+expect.extend(matchers);
+
+// Testing Library only auto-registers cleanup when it finds a global `afterEach`
+// at import time; unmount explicitly so the DOM never leaks between tests.
+afterEach(() => {
+  cleanup();
+});
+
+// Element is absent under `@rstest-environment node` (SSR tests).
 if (typeof Element !== 'undefined') {
   // Mock scrollIntoView which is not implemented in jsdom
   // biome-ignore lint/suspicious/noEmptyBlockStatements: intentional no-op mock
@@ -97,4 +110,34 @@ if (typeof document !== 'undefined' && typeof document.createRange === 'function
   if (typeof rangePrototype.getBoundingClientRect !== 'function') {
     rangePrototype.getBoundingClientRect = emptyRect;
   }
+}
+
+// user-event dispatches every jsdom pointer event at (0, 0). zag-js (>= 1.43.1) highlights a menu
+// item on pointermove only while its focus-visible tracker reports the "pointer" modality, and that
+// tracker ignores a move that repeats the last position — so once a focus change has flipped the
+// modality to "virtual", a bare `user.click(menuItem)` never highlights the item and the click
+// selects nothing. A real mouse always reaches a new position before it clicks: ahead of each move
+// at the origin, show the document-level trackers a move at a fresh position. It is dispatched on
+// `document`, so element handlers (React's root listener included) never see it. Registered at
+// setup, so this capture listener runs before zag's own.
+if (typeof document !== 'undefined' && typeof PointerEvent === 'function') {
+  let freshPosition = 0;
+  let dispatching = false;
+  document.addEventListener(
+    'pointermove',
+    event => {
+      if (dispatching || event.clientX !== 0 || event.clientY !== 0) return;
+      dispatching = true;
+      freshPosition += 1;
+      document.dispatchEvent(
+        new PointerEvent('pointermove', {
+          clientX: freshPosition,
+          clientY: freshPosition,
+          pointerType: event.pointerType,
+        }),
+      );
+      dispatching = false;
+    },
+    true,
+  );
 }

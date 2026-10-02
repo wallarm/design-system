@@ -18,7 +18,7 @@ COPY packages/configs/playwright-config/package.json ./packages/configs/playwrig
 COPY packages/configs/rsbuild-config/package.json ./packages/configs/rsbuild-config/
 COPY packages/configs/tailwind-config/package.json ./packages/configs/tailwind-config/
 COPY packages/configs/typescript-config/package.json ./packages/configs/typescript-config/
-COPY packages/configs/vitest-config/package.json ./packages/configs/vitest-config/
+COPY packages/configs/rstest-config/package.json ./packages/configs/rstest-config/
 
 # Install dependencies
 RUN pnpm install --frozen-lockfile --filter=@wallarm/design-system...

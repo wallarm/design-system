@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import type { SyntaxAdapter } from '../../CodeSnippet/adapters/types';
 import { createPortalRegistry } from '../lib/portalRegistry';
 import { PREFIX_GUTTER_CLASS, STICK_GUTTER_CLASS } from './gutters';
@@ -46,9 +46,9 @@ const mount = (options: EngineOptions): EditorHandle => {
   const parent = document.createElement('div');
   document.body.append(parent);
   handle = createEditor(parent, options, {
-    onChange: vi.fn(),
-    onDiagnosticsChange: vi.fn(),
-    onVisibleRowCountChange: vi.fn(),
+    onChange: rs.fn(),
+    onDiagnosticsChange: rs.fn(),
+    onVisibleRowCountChange: rs.fn(),
     portals: createPortalRegistry(),
   });
   return handle;

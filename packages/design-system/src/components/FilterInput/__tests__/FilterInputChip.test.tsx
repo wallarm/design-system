@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react';
 import { createRef } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { FilterInputProvider } from '../FilterInputContext/FilterInputProvider';
 import type { FilterInputContextValue } from '../FilterInputContext/types';
 import { FilterInputChip, FilterInputConnectorChip } from '../FilterInputField';
@@ -20,23 +20,23 @@ const mockContextValue: FilterInputContextValue = {
   menuOpen: false,
   insertIndex: 0,
   insertAfterConnector: false,
-  onInputChange: vi.fn(),
-  onInputKeyDown: vi.fn(),
-  onInputClick: vi.fn(),
-  onGapClick: vi.fn(),
-  onChipClick: vi.fn(),
-  onConnectorChange: vi.fn(),
-  onChipRemove: vi.fn(),
-  onClear: vi.fn(),
+  onInputChange: rs.fn(),
+  onInputKeyDown: rs.fn(),
+  onInputClick: rs.fn(),
+  onGapClick: rs.fn(),
+  onChipClick: rs.fn(),
+  onConnectorChange: rs.fn(),
+  onChipRemove: rs.fn(),
+  onClear: rs.fn(),
   editingChipId: null,
   editingSegment: null,
   segmentFilterText: '',
-  onSegmentFilterChange: vi.fn(),
-  onCancelSegmentEdit: vi.fn(),
-  onCustomValueCommit: vi.fn(),
-  onCustomAttributeCommit: vi.fn(),
+  onSegmentFilterChange: rs.fn(),
+  onCancelSegmentEdit: rs.fn(),
+  onCustomValueCommit: rs.fn(),
+  onCustomAttributeCommit: rs.fn(),
   menuRef: createRef(),
-  closeAutocompleteMenu: vi.fn(),
+  closeAutocompleteMenu: rs.fn(),
 };
 
 const FilterInputWrapper = ({ children }: { children: ReactNode }) => (
@@ -66,7 +66,7 @@ describe('FilterInputChip', () => {
   });
 
   it('renders delete button when onRemove is provided', () => {
-    const onRemove = vi.fn();
+    const onRemove = rs.fn();
     render(<FilterInputChip attribute='Test' onRemove={onRemove} />);
     const deleteButton = screen.getByRole('button', { name: /remove filter/i });
     expect(deleteButton).toBeInTheDocument();
@@ -74,7 +74,7 @@ describe('FilterInputChip', () => {
 
   it('calls onRemove when delete button is clicked', async () => {
     const user = userEvent.setup();
-    const onRemove = vi.fn();
+    const onRemove = rs.fn();
     render(<FilterInputChip attribute='Test' onRemove={onRemove} />);
     const deleteButton = screen.getByRole('button', { name: /remove filter/i });
     await user.click(deleteButton);
@@ -85,7 +85,7 @@ describe('FilterInputChip', () => {
   // field area next to it. Without pointer-events gating it silently eats clicks
   // meant for the chip/input and deletes the chip (AS-1179).
   it('does not capture pointer events while hidden (only on hover/focus)', () => {
-    const onRemove = vi.fn();
+    const onRemove = rs.fn();
     render(<FilterInputChip attribute='Test' onRemove={onRemove} />);
     const deleteButton = screen.getByRole('button', { name: /remove filter/i });
     expect(deleteButton.className).toContain('pointer-events-none');
@@ -154,7 +154,7 @@ describe('FilterInputChip', () => {
 
   describe('accessibility', () => {
     it('has correct aria-label for delete button', () => {
-      const onRemove = vi.fn();
+      const onRemove = rs.fn();
       render(<FilterInputChip attribute='Test' onRemove={onRemove} />);
       const deleteButton = screen.getByRole('button', { name: /remove filter/i });
       expect(deleteButton).toHaveAttribute('aria-label', 'Remove filter');
@@ -164,14 +164,14 @@ describe('FilterInputChip', () => {
 
 describe('FilterInputConnectorChip', () => {
   it('renders AND text', () => {
-    render(<FilterInputConnectorChip variant='and' chipId='c-1' onChange={vi.fn()} />, {
+    render(<FilterInputConnectorChip variant='and' chipId='c-1' onChange={rs.fn()} />, {
       wrapper: FilterInputWrapper,
     });
     expect(screen.getByText('AND')).toBeInTheDocument();
   });
 
   it('renders OR text', () => {
-    render(<FilterInputConnectorChip variant='or' chipId='c-1' onChange={vi.fn()} />, {
+    render(<FilterInputConnectorChip variant='or' chipId='c-1' onChange={rs.fn()} />, {
       wrapper: FilterInputWrapper,
     });
     expect(screen.getByText('OR')).toBeInTheDocument();
@@ -179,7 +179,7 @@ describe('FilterInputConnectorChip', () => {
 
   it('applies normal styling', () => {
     const { container } = render(
-      <FilterInputConnectorChip variant='and' chipId='c-1' onChange={vi.fn()} />,
+      <FilterInputConnectorChip variant='and' chipId='c-1' onChange={rs.fn()} />,
       { wrapper: FilterInputWrapper },
     );
     const chip = container.querySelector('[data-slot="filter-input-connector-chip"]');
@@ -271,7 +271,7 @@ describe('FilterInputChip building mode', () => {
 
     it('makes the fixed "Value" label clickable and resumes at the first missing pair segment (AS-1179/AS-1192)', async () => {
       const user = userEvent.setup();
-      const onPairSegmentClick = vi.fn();
+      const onPairSegmentClick = rs.fn();
       const { container, rerender } = render(
         <FilterInputChip
           attribute='Context Param'
@@ -335,7 +335,7 @@ describe('FilterInputChip building mode', () => {
       // the trailing × sits where the user clicks to fill it, deleting the chip.
       // A placeholder value segment must render and be clickable to resume entry.
       const user = userEvent.setup();
-      const onSegmentClick = vi.fn();
+      const onSegmentClick = rs.fn();
       const { container } = render(
         <FilterInputChip
           attribute='Application ID'
@@ -368,7 +368,7 @@ describe('FilterInputChip building mode', () => {
 
     it('calls onPairSegmentClick when a paired value is clicked', async () => {
       const user = userEvent.setup();
-      const onPairSegmentClick = vi.fn();
+      const onPairSegmentClick = rs.fn();
       render(
         <FilterInputChip
           attribute='Context Param'

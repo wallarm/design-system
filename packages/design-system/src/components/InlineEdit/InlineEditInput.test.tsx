@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditInput } from './InlineEditInput';
@@ -9,7 +9,7 @@ import { InlineEditTextarea } from './InlineEditTextarea';
 
 describe('InlineEditInput', () => {
   it('binds the draft value and updates it on typing', async () => {
-    const onChange = vi.fn();
+    const onChange = rs.fn();
     render(
       <InlineEdit defaultEdit defaultValue='ab' onValueChange={onChange} data-testid='attr'>
         <InlineEditControl>

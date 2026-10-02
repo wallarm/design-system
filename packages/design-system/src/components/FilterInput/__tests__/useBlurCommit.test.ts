@@ -1,6 +1,6 @@
 import { useRef } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import type { BuildingBase } from '../hooks/useFilterInputAutocomplete/useAutocompleteState';
 import { useBlurCommit } from '../hooks/useFilterInputAutocomplete/useBlurCommit';
 import type { FieldMetadata, FilterOperator } from '../types';
@@ -16,18 +16,18 @@ const setupHook = (
     editingChipId?: string | null;
     buildingSide?: 0 | 1;
     buildingBase?: BuildingBase | null;
-    upsertCondition?: ReturnType<typeof vi.fn>;
-    handleCustomValueCommit?: ReturnType<typeof vi.fn>;
-    resetState?: ReturnType<typeof vi.fn>;
-    setBuildingSide?: ReturnType<typeof vi.fn>;
-    setBuildingBase?: ReturnType<typeof vi.fn>;
+    upsertCondition?: ReturnType<typeof rs.fn>;
+    handleCustomValueCommit?: ReturnType<typeof rs.fn>;
+    resetState?: ReturnType<typeof rs.fn>;
+    setBuildingSide?: ReturnType<typeof rs.fn>;
+    setBuildingBase?: ReturnType<typeof rs.fn>;
   } = {},
 ) => {
-  const upsertCondition = overrides.upsertCondition ?? vi.fn();
-  const handleCustomValueCommit = overrides.handleCustomValueCommit ?? vi.fn();
-  const resetState = overrides.resetState ?? vi.fn();
-  const setBuildingSide = overrides.setBuildingSide ?? vi.fn();
-  const setBuildingBase = overrides.setBuildingBase ?? vi.fn();
+  const upsertCondition = overrides.upsertCondition ?? rs.fn();
+  const handleCustomValueCommit = overrides.handleCustomValueCommit ?? rs.fn();
+  const resetState = overrides.resetState ?? rs.fn();
+  const setBuildingSide = overrides.setBuildingSide ?? rs.fn();
+  const setBuildingBase = overrides.setBuildingBase ?? rs.fn();
 
   // Use `in` so that explicit `null` overrides win over the default —
   // `?? default` would silently coerce the explicit `null` back to default.
@@ -87,8 +87,8 @@ describe('useBlurCommit', () => {
   });
 
   it('commits as custom value when operator + text are present', () => {
-    const handleCustomValueCommit = vi.fn();
-    const upsertCondition = vi.fn();
+    const handleCustomValueCommit = rs.fn();
+    const upsertCondition = rs.fn();
     const { commit } = setupHook({
       selectedOperator: operator,
       inputText: 'foo',
@@ -107,8 +107,8 @@ describe('useBlurCommit', () => {
   // selectedOperator stay), and resetState is skipped by the caller because
   // `hasIncompleteBuilding()` is true.
   it('returns false and preserves state when there is no operator or no text', () => {
-    const upsertCondition = vi.fn();
-    const resetState = vi.fn();
+    const upsertCondition = rs.fn();
+    const resetState = rs.fn();
     const { commit, hasIncompleteBuilding } = setupHook({
       selectedOperator: null,
       inputText: '',
@@ -127,8 +127,8 @@ describe('useBlurCommit', () => {
   // just attribute + operator, so blur commits them cleanly (the chip shows
   // a value-placeholder for the third slot).
   it('commits cleanly when the operator is a no-value operator', () => {
-    const upsertCondition = vi.fn();
-    const resetState = vi.fn();
+    const upsertCondition = rs.fn();
+    const resetState = rs.fn();
     const { commit } = setupHook({
       selectedOperator: 'is_null',
       inputText: '',
@@ -166,10 +166,10 @@ describe('useBlurCommit', () => {
     };
 
     it('commits the base and flags the missing paired value as an error', () => {
-      const upsertCondition = vi.fn();
-      const resetState = vi.fn();
-      const setBuildingSide = vi.fn();
-      const setBuildingBase = vi.fn();
+      const upsertCondition = rs.fn();
+      const resetState = rs.fn();
+      const setBuildingSide = rs.fn();
+      const setBuildingBase = rs.fn();
       const { commit } = setupHook({
         selectedField: pairedField,
         selectedOperator: '=',
@@ -203,8 +203,8 @@ describe('useBlurCommit', () => {
     });
 
     it('still commits a typed paired value as a custom value (no error flag)', () => {
-      const handleCustomValueCommit = vi.fn();
-      const upsertCondition = vi.fn();
+      const handleCustomValueCommit = rs.fn();
+      const upsertCondition = rs.fn();
       const { commit } = setupHook({
         selectedField: pairedField,
         selectedOperator: '=',

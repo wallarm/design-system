@@ -2,7 +2,13 @@ import { type FC, useEffect, useRef } from 'react';
 import type { RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useStickyGroupParent } from './hooks';
-import { TABLE_DRAG_HANDLE_COLUMN_ID, TABLE_EXPAND_COLUMN_ID, TABLE_SELECT_COLUMN_ID } from './lib';
+import {
+  TABLE_DRAG_HANDLE_COLUMN_ID,
+  TABLE_EXPAND_COLUMN_ID,
+  TABLE_SELECT_COLUMN_ID,
+  useTableValue,
+  withTableState,
+} from './lib';
 import { Td, Tr } from './primitives';
 import { TableBodyCell } from './TableBody/TableBodyCell';
 import { TableColGroup } from './TableColGroup';
@@ -76,11 +82,11 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
     prevStickyIdRef.current = stickyRow.id;
   }, [stickyRow, containerRef, tbodyRef, useWindowScroll, headerHeight]);
 
-  const cells = stickyRow?.getVisibleCells();
+  const cells = useTableValue(() => stickyRow?.getVisibleCells());
   const systemCells = cells?.filter(c => SYSTEM_COLUMN_IDS.has(c.column.id));
   const dataCells = cells?.filter(c => !SYSTEM_COLUMN_IDS.has(c.column.id));
   const firstDataCell = dataCells?.[0];
-  const isSelected = stickyRow?.getIsAllSubRowsSelected();
+  const isSelected = useTableValue(() => stickyRow?.getIsAllSubRowsSelected());
 
   // Always render the sticky anchor to avoid DOM insertion/removal during
   // scroll which causes a brief layout reflow (the "jump" glitch).
@@ -110,18 +116,23 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
                       disablePinnedShadow
                     />
                   )}
-                  {dataCells!.slice(1).map(cell => (
-                    <Td
-                      key={cell.id}
-                      className={cn(
-                        'border-b border-border-primary-light bg-bg-surface-2 overlay',
-                        'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
-                        'group-data-[preview-active]/row:overlay-states-primary-hover group-has-[[data-state=open]]/row:overlay-states-primary-hover',
-                      )}
-                      style={{ width: cell.column.getSize() }}
-                      aria-hidden='true'
-                    />
-                  ))}
+                  {/* Filler cells read their column width — recreated on every table state change. */}
+                  {withTableState(table.state, () =>
+                    dataCells!
+                      .slice(1)
+                      .map(cell => (
+                        <Td
+                          key={cell.id}
+                          className={cn(
+                            'border-b border-border-primary-light bg-bg-surface-2 overlay',
+                            'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
+                            'group-data-[preview-active]/row:overlay-states-primary-hover group-has-[[data-state=open]]/row:overlay-states-primary-hover',
+                          )}
+                          style={{ width: cell.column.getSize() }}
+                          aria-hidden='true'
+                        />
+                      )),
+                  )}
                 </Tr>
               </tbody>
             </table>

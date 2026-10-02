@@ -13,6 +13,7 @@ import {
   type DateValue,
 } from '../../../Calendar';
 import { DropdownMenu, DropdownMenuContent } from '../../../DropdownMenu';
+import { keepOpenOnMenuHandoff } from '../../lib';
 import { ApplyButton } from './ApplyButton';
 import { dateValueToIso, tryParseDateValue } from './utils';
 
@@ -85,6 +86,7 @@ export const FilterInputDateValueMenu: FC<FilterInputDateValueMenuProps> = ({
     <DropdownMenu
       open={open}
       onOpenChange={isOpen => onOpenChange?.(isOpen)}
+      onRequestDismiss={keepOpenOnMenuHandoff}
       closeOnSelect={false}
       positioning={positioning}
     >

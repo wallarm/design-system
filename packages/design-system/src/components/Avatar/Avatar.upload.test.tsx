@@ -1,7 +1,7 @@
 import { useState } from 'react';
+import { afterEach, beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { FileUpload, FileUploadError, FileUploadTrigger, useFilePreviewUrl } from '../FileUpload';
 import { byTestId, makeFile, nextFrame, pick } from '../FileUpload/FileUpload.test.helpers';
 import { Avatar, AvatarFallback, AvatarImage, AvatarOverlay } from '.';
@@ -33,11 +33,11 @@ describe('Avatar as a FileUpload trigger', () => {
   const originalRevoke = URL.revokeObjectURL;
 
   beforeEach(() => {
-    URL.createObjectURL = vi.fn(() => 'blob:preview');
-    URL.revokeObjectURL = vi.fn();
+    URL.createObjectURL = rs.fn(() => 'blob:preview');
+    URL.revokeObjectURL = rs.fn();
   });
   afterEach(() => {
-    vi.restoreAllMocks();
+    rs.restoreAllMocks();
     URL.createObjectURL = originalCreate;
     URL.revokeObjectURL = originalRevoke;
   });
@@ -75,7 +75,7 @@ describe('Avatar as a FileUpload trigger', () => {
   });
 
   it('opens the picker on click', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
     render(<ClickToUpload />);
     await userEvent.click(screen.getByRole('button', { name: 'Change avatar' }));
     await waitFor(() => expect(click).toHaveBeenCalled());
@@ -106,7 +106,7 @@ describe('Avatar as a FileUpload trigger', () => {
   });
 
   it('a disabled trigger reaches the button and does not open the picker', async () => {
-    const click = vi.spyOn(HTMLInputElement.prototype, 'click');
+    const click = rs.spyOn(HTMLInputElement.prototype, 'click');
     render(<ClickToUpload disabled />);
     const button = screen.getByRole('button', { name: 'Change avatar' });
     expect(button).toBeDisabled();

@@ -1,7 +1,7 @@
 import { CalendarDateTime } from '@internationalized/date';
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Button } from '../Button';
 import { Calendar } from './Calendar';
@@ -129,7 +129,7 @@ describe('Click resolution', () => {
 
 describe('Handler composition', () => {
   it('preserves consumer onClick on CalendarPresetItem (runs after preset selection)', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     render(
       <Calendar type='range' defaultOpen closeOnSelect={false}>
         <CalendarTrigger>
@@ -155,7 +155,7 @@ describe('Handler composition', () => {
   });
 
   it('preserves consumer onClick on CalendarApplyButton', async () => {
-    const onApplyClick = vi.fn();
+    const onApplyClick = rs.fn();
     renderCalendar({ onApplyClick });
     await userEvent.click(screen.getByTestId('apply'));
     expect(onApplyClick).toHaveBeenCalledTimes(1);
@@ -211,7 +211,7 @@ describe('showTime promotion', () => {
   };
 
   it('emits a CalendarDateTime carrying the tracked time when a grid day is picked', async () => {
-    const onChange = vi.fn();
+    const onChange = rs.fn();
     renderWithTime(onChange);
 
     // The grid produces a date-only value; Calendar promotes it to a

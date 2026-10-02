@@ -1,6 +1,6 @@
 import { syntaxTree } from '@codemirror/language';
 import { Compartment, EditorState, type Extension } from '@codemirror/state';
-import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, rs } from '@rstest/core';
 import {
   activeDiagnostics,
   destroyLintedViews,
@@ -420,7 +420,7 @@ describe('diagnosticsExtension — syntax errors for every parsed language', () 
 
     // No forceLinting: the reconfigure alone must schedule a lint run (needsRefresh).
     view.dispatch({ effects: language.reconfigure(await loadLanguageExtension('python')) });
-    await vi.waitFor(() => expect(activeDiagnostics(view.state).length).toBeGreaterThan(0), {
+    await rs.waitFor(() => expect(activeDiagnostics(view.state).length).toBeGreaterThan(0), {
       timeout: LINT_DELAY * 5,
     });
   });

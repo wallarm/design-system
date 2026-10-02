@@ -1,8 +1,8 @@
 import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { FoldRegion } from '../../CodeSnippet/lib/foldUtils';
 import { PortalOutlet } from '../lib/PortalOutlet';
 import { createPortalRegistry } from '../lib/portalRegistry';
@@ -68,7 +68,7 @@ describe('folds — portal-rendered toggle and summary', () => {
   });
 
   it('forwards toggleProps to the real toggle button and composes onClick', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     const payload = '{"feature":"code","target":"fold-toggle"}';
     const { view } = setup([
       {
@@ -96,7 +96,7 @@ describe('folds — portal-rendered toggle and summary', () => {
   });
 
   it('forwards summaryProps to the real summary button and composes onClick', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     const payload = '{"feature":"code","target":"fold-summary"}';
     const { view } = setup([
       {

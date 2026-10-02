@@ -420,7 +420,7 @@ If the component has utility functions, hooks, or complex logic — add unit tes
 
 ```ts
 // lib/helpers.test.ts
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { parseValue } from './helpers';
 
 describe('parseValue', () => {

@@ -1,3 +1,5 @@
+import type { Menu } from '@ark-ui/react/menu';
+
 /**
  * True if element belongs to a FilterInput-owned menu overlay. Marked by
  * `data-filter-input-menu` on DropdownMenuContent — generic Ark UI selectors
@@ -6,6 +8,21 @@
  */
 export const isMenuRelated = (el: HTMLElement | null): boolean =>
   !!el?.closest('[data-filter-input-menu]');
+
+type MenuDismissRequest = Parameters<NonNullable<Menu.RootProps['onRequestDismiss']>>[0];
+
+/**
+ * `onRequestDismiss` for FilterInput's chained menus (field → operator → value).
+ *
+ * Since zag-js 1.43.1 a menu that mounts while its content node already exists registers its
+ * dismissable layer synchronously. During a hand-off the next menu therefore lands on the layer
+ * stack above the menu that is closing, and removing that closing layer dismisses every layer above
+ * it — the freshly opened menu closes immediately. FilterInput owns its menus' open state, so a
+ * dismiss request coming from another FilterInput menu is ignored.
+ */
+export const keepOpenOnMenuHandoff = (event: MenuDismissRequest) => {
+  if (isMenuRelated(event.detail.targetLayer ?? null)) event.preventDefault();
+};
 
 export interface AnchorBounds {
   top: number;

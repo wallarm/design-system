@@ -7,7 +7,7 @@ import { HStack } from '../Stack';
 import { Text } from '../Text';
 import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { tableHeaderButtonClass } from './classes';
-import { type DSTableFeatures, getAlignClass, SORT_LABELS } from './lib';
+import { type DSTableFeatures, getAlignClass, SORT_LABELS, useTableValue } from './lib';
 import { useTableContext } from './TableContext';
 
 export interface TableSortTriggerProps<T extends RowData = Record<string, unknown>>
@@ -77,8 +77,8 @@ export const TableSortTrigger = <T extends RowData = Record<string, unknown>>({
   const ctx = useTableContext<T>();
   const testId = useTestId('sort', testIdProp);
 
-  const canSort = ctx.sortingEnabled && column.getCanSort();
-  const sortDirection = column.getIsSorted();
+  const canSort = useTableValue(() => ctx.sortingEnabled && column.getCanSort());
+  const sortDirection = useTableValue(() => column.getIsSorted());
   const sortType = column.columnDef.meta?.sortType;
   const tooltipText = getSortTooltip(sortType, sortDirection);
   const isRightAligned = getAlignClass(column.columnDef.meta) === 'text-right';

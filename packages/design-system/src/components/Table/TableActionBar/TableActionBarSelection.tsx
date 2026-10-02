@@ -17,6 +17,7 @@ import {
   type BulkBarSummarySelectAllProps,
   BulkBarSummarySeparator,
 } from '../../BulkBar';
+import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 
 export interface TableActionBarSelectionProps {
@@ -50,7 +51,7 @@ export const TableActionBarSelection: FC<TableActionBarSelectionProps> = ({ chil
   const { table } = useTableContext();
 
   const count = Object.keys(table.state.rowSelection).length;
-  const isAllSelected = table.getIsAllRowsSelected();
+  const isAllSelected = useTableValue(() => table.getIsAllRowsSelected());
 
   const selectAll = () => table.toggleAllRowsSelected(true);
   const clear = () => table.resetRowSelection();

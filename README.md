@@ -72,7 +72,7 @@ wallarm-design-system/
 │       ├── rsbuild-config/  # Rsbuild bundler configuration
 │       ├── tailwind-config/ # Tailwind CSS configuration
 │       ├── typescript-config/ # TypeScript configuration
-│       └── vitest-config/   # Vitest test configuration
+│       └── rstest-config/   # Rstest test configuration
 ├── .github/                 # GitHub configuration
 │   ├── workflows/           # CI/CD pipelines
 │   └── PULL_REQUEST_TEMPLATE.md
@@ -92,7 +92,7 @@ wallarm-design-system/
 - `@wallarm-org/eslint-config` - Shared ESLint configurations
 - `@wallarm-org/typescript-config` - Shared TypeScript configurations
 - `@wallarm-org/playwright-config` - Shared Playwright test configurations
-- `@wallarm-org/vitest-config` - Shared Vitest test configurations
+- `@wallarm-org/rstest-config` - Shared Rstest test configurations
 - `@wallarm-org/rsbuild-config` - Shared Rsbuild bundler configurations
 - `@wallarm-org/tailwind-config` - Shared Tailwind CSS configurations
 
@@ -114,7 +114,7 @@ wallarm-design-system/
 - **Turborepo** - High-performance monorepo build system
 - **pnpm** - Fast, disk space efficient package manager
 - **Storybook v10** - Component documentation and development
-- **Vitest** - Fast unit testing framework
+- **Rstest** - Rspack-based unit testing framework
 - **Playwright** - Cross-browser E2E testing
 - **ESLint + Prettier** - Code quality and formatting
 - **Husky** - Git hooks for code quality
@@ -260,7 +260,7 @@ Comprehensive GitHub Actions pipeline with multiple stages:
 
 - **Node.js**: v24+
 - **pnpm**: v10.33.2
-- **Playwright**: v1.62.1
+- **Playwright**: v1.63.0
 
 ## 🤝 Contributing
 

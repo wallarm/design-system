@@ -2,6 +2,7 @@ import type { FC } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { ArrowRight } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
+import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 import { useTableColumnMenuContext } from './TableColumnMenu';
 
@@ -19,10 +20,10 @@ export const TableColumnMenuMoveRightItem: FC<TableColumnMenuMoveRightItemProps>
   const { column } = useTableColumnMenuContext();
   const ctx = useTableContext();
 
-  const isPinned = column.getIsPinned();
+  const isPinned = useTableValue(() => column.getIsPinned());
   const isAlwaysPinned = ctx.alwaysPinnedLeft.includes(column.id);
   const canReorder = ctx.columnDndEnabled && !isAlwaysPinned;
-  const visibleColumns = ctx.table.getVisibleLeafColumns();
+  const visibleColumns = useTableValue(() => ctx.table.getVisibleLeafColumns());
   const columnIdx = visibleColumns.findIndex(c => c.id === column.id);
   const isLast = columnIdx === visibleColumns.length - 1;
   const canMoveRight = canReorder && !isLast && !isPinned;

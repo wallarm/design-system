@@ -1,5 +1,5 @@
 import { EditorState } from '@codemirror/state';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { findJsonBodyRange, http } from './http';
 import { json } from './json';
 import { getJsonPointers, pointerAt, readRegionData } from './jsonPointers';

@@ -16,7 +16,7 @@ import {
   type StepperTriggerProps,
 } from '../components/Stepper';
 
-// Test-only fixture shared by the Stepper vitest files: the full compound anatomy from data.
+// Test-only fixture shared by the Stepper unit test files: the full compound anatomy from data.
 
 type DataAttributes = { [key: `data-${string}`]: string | undefined };
 

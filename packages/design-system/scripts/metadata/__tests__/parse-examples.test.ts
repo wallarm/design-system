@@ -1,7 +1,7 @@
+import { describe, expect, it } from '@rstest/core';
 import path from 'path';
 import { Project } from 'ts-morph';
 import { fileURLToPath } from 'url';
-import { describe, expect, it } from 'vitest';
 import { parseExamples } from '../parse-examples.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

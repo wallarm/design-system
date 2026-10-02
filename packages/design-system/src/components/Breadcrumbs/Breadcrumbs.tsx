@@ -31,8 +31,6 @@ export type BreadcrumbsProps = HTMLAttributes<HTMLElement> &
  * </Breadcrumbs>
  * ```
  */
-let separatorId = 0;
-
 export const Breadcrumbs: FC<BreadcrumbsProps> = ({
   className,
   children,
@@ -52,12 +50,10 @@ export const Breadcrumbs: FC<BreadcrumbsProps> = ({
     childrenWithSeparators.push(clonedChild);
 
     if (index < childrenArray.length - 1) {
-      /**
-       * @todo Should be fixed
-       */
-      // eslint-disable-next-line react-hooks/globals
-      separatorId += 1;
-      childrenWithSeparators.push(<BreadcrumbsSeparator key={`separator-${separatorId}`} />);
+      // Keyed by position: render stays pure (React Compiler skips components
+      // that mutate module state) and separators keep a stable identity.
+      // biome-ignore lint/suspicious/noArrayIndexKey: separators have no identity besides their position
+      childrenWithSeparators.push(<BreadcrumbsSeparator key={`separator-${index}`} />);
     }
   });
 

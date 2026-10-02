@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import {
   collectLeaves,
   findOptionByValue,
@@ -138,7 +138,7 @@ describe('fields.ts helpers', () => {
     });
 
     it('invokes getSuggestions with empty string by default', () => {
-      const spy = vi.fn(() => [{ value: 'x', label: 'X' }]);
+      const spy = rs.fn(() => [{ value: 'x', label: 'X' }]);
       const field = baseField({ getSuggestions: spy });
       const result = getFieldValues(field);
       expect(spy).toHaveBeenCalledTimes(1);
@@ -147,7 +147,7 @@ describe('fields.ts helpers', () => {
     });
 
     it('passes inputText to getSuggestions', () => {
-      const spy = vi.fn((t: string) => [{ value: `${t}XX`, label: `${t}XX` }]);
+      const spy = rs.fn((t: string) => [{ value: `${t}XX`, label: `${t}XX` }]);
       const field = baseField({ getSuggestions: spy });
       const result = getFieldValues(field, '4');
       expect(spy).toHaveBeenCalledWith('4', undefined);
@@ -155,7 +155,7 @@ describe('fields.ts helpers', () => {
     });
 
     it('forwards context.selectedValues to getSuggestions', () => {
-      const spy = vi.fn(() => [{ value: 'x', label: 'X' }]);
+      const spy = rs.fn(() => [{ value: 'x', label: 'X' }]);
       const field = baseField({ getSuggestions: spy });
       getFieldValues(field, '4', { selectedValues: ['234'] });
       expect(spy).toHaveBeenCalledWith('4', { selectedValues: ['234'] });
@@ -163,14 +163,14 @@ describe('fields.ts helpers', () => {
 
     it('prefers getSuggestions over values when both are defined', () => {
       const values = [{ value: 'fromValues', label: 'From Values' }];
-      const spy = vi.fn(() => [{ value: 'fromCallback', label: 'From Callback' }]);
+      const spy = rs.fn(() => [{ value: 'fromCallback', label: 'From Callback' }]);
       const field = baseField({ values, getSuggestions: spy });
       expect(getFieldValues(field)).toEqual([{ value: 'fromCallback', label: 'From Callback' }]);
       expect(spy).toHaveBeenCalledWith('', undefined);
     });
 
     it('prefers getSuggestions over options when both are defined', () => {
-      const spy = vi.fn(() => [{ value: 'fromCallback', label: 'From Callback' }]);
+      const spy = rs.fn(() => [{ value: 'fromCallback', label: 'From Callback' }]);
       const field = baseField({ options: ['fromOptions'], getSuggestions: spy });
       expect(getFieldValues(field)).toEqual([{ value: 'fromCallback', label: 'From Callback' }]);
     });

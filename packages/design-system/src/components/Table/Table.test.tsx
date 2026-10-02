@@ -1,8 +1,8 @@
 import type { FC, ReactNode } from 'react';
 import { createRef, useState } from 'react';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { render, screen, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import {
   BulkBarSummaryClear,
@@ -152,7 +152,7 @@ describe('Sort handler: default (auto-render) — no per-button analytics seam',
     // button is intentionally not a public seam. Use `<TableSortTrigger>` or
     // `onSortingChange` instead.
     render(
-      <Table data={data} columns={baseColumns} onSortingChange={vi.fn()} data-testid='table' />,
+      <Table data={data} columns={baseColumns} onSortingChange={rs.fn()} data-testid='table' />,
     );
 
     const sortButton = screen.getByLabelText(/Sort column|Sorted /i);
@@ -161,7 +161,7 @@ describe('Sort handler: default (auto-render) — no per-button analytics seam',
   });
 
   it('exposes a callback seam (onSortingChange) for consumer-side analytics', async () => {
-    const onSortingChange = vi.fn();
+    const onSortingChange = rs.fn();
     render(
       <Table<Row>
         data={data}
@@ -212,7 +212,7 @@ describe('TableSortTrigger: per-column compound seam', () => {
       <Table
         data={data}
         columns={columnsWithCustomSort}
-        onSortingChange={vi.fn()}
+        onSortingChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -228,7 +228,7 @@ describe('TableSortTrigger: per-column compound seam', () => {
       <Table
         data={data}
         columns={columnsWithCustomSort}
-        onSortingChange={vi.fn()}
+        onSortingChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -247,7 +247,7 @@ describe('TableSortTrigger: per-column compound seam', () => {
       <Table
         data={data}
         columns={columnsWithCustomSort}
-        onSortingChange={vi.fn()}
+        onSortingChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -283,8 +283,8 @@ describe('TableSortTrigger: per-column compound seam', () => {
   });
 
   it('composes consumer onClick with internal toggleSorting (both fire)', async () => {
-    const consumerClick = vi.fn();
-    const onSortingChange = vi.fn();
+    const consumerClick = rs.fn();
+    const onSortingChange = rs.fn();
 
     render(
       <Table<Row>
@@ -315,7 +315,7 @@ describe('TableSortTrigger: per-column compound seam', () => {
   });
 
   it('lets consumer onClick short-circuit toggleSorting via preventDefault', async () => {
-    const onSortingChange = vi.fn();
+    const onSortingChange = rs.fn();
 
     render(
       <Table<Row>
@@ -363,7 +363,7 @@ describe('TableSortTrigger: per-column compound seam', () => {
     ];
 
     render(
-      <Table data={data} columns={mixedColumns} onSortingChange={vi.fn()} data-testid='table' />,
+      <Table data={data} columns={mixedColumns} onSortingChange={rs.fn()} data-testid='table' />,
     );
 
     // Two sort buttons total: one from the consumer (with id), one auto-rendered (without).
@@ -412,9 +412,9 @@ describe('TableColumnMenu: default auto-render (legacy behavior)', () => {
       <Table<MenuRow>
         data={menuData}
         columns={defaultMenuColumns}
-        onSortingChange={vi.fn()}
-        onColumnPinningChange={vi.fn()}
-        onColumnVisibilityChange={vi.fn()}
+        onSortingChange={rs.fn()}
+        onColumnPinningChange={rs.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -429,7 +429,7 @@ describe('TableColumnMenu: default auto-render (legacy behavior)', () => {
   });
 
   it('exposes onColumnVisibilityChange when the default Hide item is selected', async () => {
-    const onColumnVisibilityChange = vi.fn();
+    const onColumnVisibilityChange = rs.fn();
     render(
       <Table<MenuRow>
         data={menuData}
@@ -508,10 +508,10 @@ describe('TableColumnMenu: per-item compound seam (consumer-supplied children)',
       <Table<MenuRow>
         data={menuData}
         columns={renderColumnsWithMenu()}
-        onSortingChange={vi.fn()}
-        onColumnPinningChange={vi.fn()}
-        onColumnVisibilityChange={vi.fn()}
-        onColumnOrderChange={vi.fn()}
+        onSortingChange={rs.fn()}
+        onColumnPinningChange={rs.fn()}
+        onColumnVisibilityChange={rs.fn()}
+        onColumnOrderChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -527,9 +527,9 @@ describe('TableColumnMenu: per-item compound seam (consumer-supplied children)',
       <Table<MenuRow>
         data={menuData}
         columns={renderColumnsWithMenu()}
-        onSortingChange={vi.fn()}
-        onColumnPinningChange={vi.fn()}
-        onColumnVisibilityChange={vi.fn()}
+        onSortingChange={rs.fn()}
+        onColumnPinningChange={rs.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -545,9 +545,9 @@ describe('TableColumnMenu: per-item compound seam (consumer-supplied children)',
       <Table<MenuRow>
         data={menuData}
         columns={renderColumnsWithMenu()}
-        onSortingChange={vi.fn()}
-        onColumnPinningChange={vi.fn()}
-        onColumnVisibilityChange={vi.fn()}
+        onSortingChange={rs.fn()}
+        onColumnPinningChange={rs.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -561,10 +561,10 @@ describe('TableColumnMenu: per-item compound seam (consumer-supplied children)',
       <Table<MenuRow>
         data={menuData}
         columns={renderColumnsWithMenu({ withSortItems: true })}
-        onSortingChange={vi.fn()}
-        onColumnPinningChange={vi.fn()}
-        onColumnVisibilityChange={vi.fn()}
-        onColumnOrderChange={vi.fn()}
+        onSortingChange={rs.fn()}
+        onColumnPinningChange={rs.fn()}
+        onColumnVisibilityChange={rs.fn()}
+        onColumnOrderChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -621,7 +621,7 @@ describe('TableColumnMenu: per-item compound seam (consumer-supplied children)',
       <Table<MenuRow>
         data={menuData}
         columns={renderColumnsWithMenu()}
-        onColumnOrderChange={vi.fn()}
+        onColumnOrderChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -632,8 +632,8 @@ describe('TableColumnMenu: per-item compound seam (consumer-supplied children)',
   });
 
   it('composes consumer onSelect with internal action and fires the matching callback', async () => {
-    const consumerSelect = vi.fn();
-    const onColumnVisibilityChange = vi.fn();
+    const consumerSelect = rs.fn();
+    const onColumnVisibilityChange = rs.fn();
 
     const cols = [
       menuColumnHelper.accessor('name', { header: 'Name' }),
@@ -678,7 +678,7 @@ describe('TableSettingsMenu: trigger analytics seam', () => {
       <Table<Row>
         data={data}
         columns={baseColumns}
-        onColumnVisibilityChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       >
         <TableSettingsMenu
@@ -699,7 +699,7 @@ describe('TableSettingsMenu: trigger analytics seam', () => {
       <Table<Row>
         data={data}
         columns={baseColumns}
-        onColumnVisibilityChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       >
         <TableSettingsMenu data-analytics-id='SECURITY_TABLE_SETTINGS' />
@@ -715,7 +715,7 @@ describe('TableSettingsMenu: trigger analytics seam', () => {
       <Table<Row>
         data={data}
         columns={baseColumns}
-        onColumnVisibilityChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       >
         <TableSettingsMenu data-analytics-id='SECURITY_TABLE_SETTINGS' />
@@ -732,7 +732,7 @@ describe('TableSettingsMenu: trigger analytics seam', () => {
       <Table<Row>
         data={data}
         columns={baseColumns}
-        onColumnVisibilityChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       >
         <TableSettingsMenu data-analytics-id='SECURITY_TABLE_SETTINGS' />
@@ -751,7 +751,7 @@ describe('TableSettingsMenu: trigger analytics seam', () => {
       <Table<Row>
         data={data}
         columns={baseColumns}
-        onColumnVisibilityChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       >
         <TableSettingsMenu data-analytics-id='SECURITY_TABLE_SETTINGS' />
@@ -774,7 +774,7 @@ describe('TableSettingsMenu: trigger analytics seam', () => {
       <Table<Row>
         data={data}
         columns={baseColumns}
-        onColumnVisibilityChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       >
         <TableSettingsMenu ref={ref} data-analytics-id='SETTINGS_TABLE_SETTINGS' />
@@ -790,7 +790,7 @@ describe('TableSettingsMenu: trigger analytics seam', () => {
       <Table<Row>
         data={data}
         columns={baseColumns}
-        onColumnVisibilityChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -822,8 +822,8 @@ describe('TableSettingsMenu items: partial-override analytics', () => {
       <Table<ItemRow>
         data={itemData}
         columns={itemColumns}
-        onColumnVisibilityChange={vi.fn()}
-        onColumnOrderChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
+        onColumnOrderChange={rs.fn()}
         data-testid='table'
       >
         <TableSettingsMenu data-analytics-id='SETTINGS_TRIGGER'>{children}</TableSettingsMenu>
@@ -917,8 +917,8 @@ describe('TableSettingsMenu items: partial-override analytics', () => {
       <Table<ItemRow>
         data={itemData}
         columns={itemColumns}
-        onColumnVisibilityChange={vi.fn()}
-        onColumnOrderChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
+        onColumnOrderChange={rs.fn()}
         data-testid='table'
       />,
     );
@@ -960,7 +960,7 @@ describe('TableSettingsMenu: columnGroups (labeled sections)', () => {
       <Table<GroupRow>
         data={groupData}
         columns={groupColumns}
-        onColumnVisibilityChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
         columnGroups={columnGroups}
         data-testid='table'
       />,
@@ -1150,7 +1150,7 @@ describe('TableActionBarSelection: bulk action-bar composition analytics', () =>
   });
 
   it('composes the consumer onClick before the DS action; preventDefault opts out', async () => {
-    const consumerClick = vi.fn();
+    const consumerClick = rs.fn();
     render(
       <SelectionHarness>
         <TableActionBarSelection>
@@ -1272,12 +1272,12 @@ describe('SelectAllHeaderCell: header checkbox states', () => {
 
 describe('TableSettingsMenu: onSettingsOpenChange', () => {
   it('fires with true when the settings menu opens and false when it closes', async () => {
-    const onSettingsOpenChange = vi.fn();
+    const onSettingsOpenChange = rs.fn();
     render(
       <Table
         data={data}
         columns={baseColumns}
-        onColumnVisibilityChange={vi.fn()}
+        onColumnVisibilityChange={rs.fn()}
         onSettingsOpenChange={onSettingsOpenChange}
         data-testid='table'
       />,

@@ -1,7 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { designSystemMetadataSchema } from '@wallarm-org/mcp-core';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));

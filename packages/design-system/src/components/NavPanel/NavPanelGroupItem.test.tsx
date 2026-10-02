@@ -1,5 +1,5 @@
+import { describe, expect, it } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 import { NavPanelDepthProvider } from './NavPanelContext';
 import { NavPanelGroupItem } from './NavPanelGroupItem';
 

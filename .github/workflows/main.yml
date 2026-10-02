@@ -22,7 +22,7 @@ env:
   HUSKY: "0"
   NODE_VERSION: "24"
   PNPM_VERSION: "10.33.2"
-  PLAYWRIGHT_VERSION: "1.62.1"
+  PLAYWRIGHT_VERSION: "1.63.0"
   SCREENSHOT_COMMIT_MESSAGE: "🖼️ Update screenshots"
 
 jobs:
@@ -156,7 +156,8 @@ jobs:
       - name: Run ${{ matrix.check }}
         run: |
           if [ "${{ matrix.check }}" = "test" ]; then
-            pnpm test:run -- --reporter=default --reporter=junit --outputFile=./test-results/junit.xml
+            # JUnit (packages/*/test-results/junit.xml) comes from @wallarm-org/rstest-config when CI is set
+            pnpm test:run
           else
             pnpm ${{ matrix.check }}
           fi

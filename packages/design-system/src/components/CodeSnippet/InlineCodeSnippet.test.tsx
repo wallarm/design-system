@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { InlineCodeSnippet } from './InlineCodeSnippet';
 
@@ -78,7 +78,7 @@ describe('Attribute pass-through', () => {
   });
 
   it('composes consumer onClick alongside the internal copy handler', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
 
     render(
       <InlineCodeSnippet
@@ -96,7 +96,7 @@ describe('Attribute pass-through', () => {
 
   it('does not attach click behaviour when copyable=false', async () => {
     const captured = captureAnalyticsClicks();
-    const onClick = vi.fn();
+    const onClick = rs.fn();
 
     render(
       <InlineCodeSnippet
