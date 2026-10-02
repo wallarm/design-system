@@ -5,6 +5,7 @@ const filterChipStory = createStoryHelper('patterns-filterinput-filterinputchip'
   'Default',
   'With Error',
   'With Long Text',
+  'With Value Max Width',
   'Realistic Example',
   'And Operator',
   'Or Operator',
@@ -14,6 +15,9 @@ const filterChipStory = createStoryHelper('patterns-filterinput-filterinputchip'
   'Error With Delete',
   'Interactive Delete Example',
   'All States Showcase',
+  'Paired',
+  'Paired With Error',
+  'Paired With Long Text',
 ] as const);
 
 test.describe('Component: FilterInputChip', () => {
@@ -30,6 +34,26 @@ test.describe('Component: FilterInputChip', () => {
 
     test('Should render chip with long text truncation correctly', async ({ page }) => {
       await filterChipStory.goto(page, 'With Long Text');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render chip with custom valueMaxWidth correctly', async ({ page }) => {
+      await filterChipStory.goto(page, 'With Value Max Width');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render paired chip correctly', async ({ page }) => {
+      await filterChipStory.goto(page, 'Paired');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render paired chip with error correctly', async ({ page }) => {
+      await filterChipStory.goto(page, 'Paired With Error');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render paired chip with long text truncation correctly', async ({ page }) => {
+      await filterChipStory.goto(page, 'Paired With Long Text');
       await expect(page).toHaveScreenshot();
     });
 
