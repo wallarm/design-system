@@ -21,6 +21,25 @@ test.describe('Component: Stepper', () => {
   test.describe('Visual', () => {
     test('Should render step types correctly', async ({ page }) => {
       await stepperStory.goto(page, 'Step Types');
+      const completed = page.getByTestId('stepper--item-0--indicator');
+      await expect(completed).toHaveCSS('width', '16px');
+      await expect(completed).toHaveCSS('height', '20px');
+      await expect(completed.locator('svg')).toHaveCSS('width', '12px');
+      await expect(completed.locator('svg')).toHaveCSS('height', '12px');
+      await expect(page).toHaveScreenshot();
+    });
+
+    test('Should render in drawer correctly', async ({ page }) => {
+      await stepperStory.goto(page, 'In Drawer');
+      await page.getByTestId('drawer-open').click();
+      const list = page.getByTestId('stepper--list');
+      await expect(list).toBeVisible();
+      await expect(list).toHaveCSS('padding-top', '0px');
+      await expect(list).toHaveCSS('padding-bottom', '12px');
+      await expect(list).toHaveCSS('padding-left', '24px');
+      await expect(list).toHaveCSS('padding-right', '24px');
+      await expect(list).toHaveCSS('border-bottom-width', '0px');
+      await expect(list).toHaveCSS('height', '32px');
       await expect(page).toHaveScreenshot();
     });
 

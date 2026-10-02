@@ -13,8 +13,8 @@ export interface StepperListProps extends OlHTMLAttributes<HTMLOListElement>, Te
 }
 
 /**
- * The step bar: an `<ol>` with the Figma bottom border and padding. Name it with `aria-label` or
- * `aria-labelledby`.
+ * The step bar: an `<ol>` with 24px side insets and 12px bottom padding, as in Figma.
+ * Name it with `aria-label` or `aria-labelledby`.
  */
 export const StepperList: FC<StepperListProps> = ({
   children,

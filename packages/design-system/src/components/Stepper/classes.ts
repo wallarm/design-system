@@ -5,9 +5,7 @@ import { cn } from '../../utils/cn';
 // and the Back / Next footer.
 export const stepperVariants = cva('min-w-0');
 
-export const stepperListVariants = cva(
-  'm-0 flex min-w-0 list-none items-start border-b-1 border-border-primary-light px-24 py-8',
-);
+export const stepperListVariants = cva('m-0 flex min-w-0 list-none items-start px-24 pb-12');
 
 export const stepperItemVariants = cva('flex min-w-0 items-start');
 
