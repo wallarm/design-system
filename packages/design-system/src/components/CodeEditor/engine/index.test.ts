@@ -151,15 +151,16 @@ describe('createEditor — visible rows', () => {
   });
 });
 
-describe('createEditor — readOnly (EditorState.readOnly, D11)', () => {
-  it('blocks editing commands but keeps the content focusable', () => {
+describe('createEditor — readOnly', () => {
+  it('blocks editing commands and removes the caret and focus target', () => {
     const { handle } = mountEngine({ value: 'abc', readOnly: true });
     handle.view.dispatch({ selection: { anchor: 3 } });
 
     expect(handle.view.state.readOnly).toBe(true);
     expect(insertNewlineAndIndent(handle.view)).toBe(false);
     expect(handle.view.state.doc.toString()).toBe('abc');
-    expect(handle.view.contentDOM.getAttribute('contenteditable')).toBe('true');
+    expect(handle.view.contentDOM.getAttribute('contenteditable')).toBe('false');
+    expect(handle.view.contentDOM).not.toHaveAttribute('tabindex');
     expect(handle.view.contentDOM.getAttribute('aria-readonly')).toBe('true');
   });
 
@@ -169,10 +170,24 @@ describe('createEditor — readOnly (EditorState.readOnly, D11)', () => {
 
     rerender({ readOnly: true });
     expect(view.state.readOnly).toBe(true);
+    expect(view.contentDOM).toHaveAttribute('contenteditable', 'false');
+    expect(view.contentDOM).not.toHaveAttribute('tabindex');
 
     rerender({ readOnly: false });
     expect(view.state.readOnly).toBe(false);
+    expect(view.contentDOM).toHaveAttribute('contenteditable', 'true');
+    expect(view.contentDOM).not.toHaveAttribute('tabindex');
     expect(handle.view).toBe(view);
+  });
+
+  it('blurs the content when readOnly turns on', () => {
+    const { handle, rerender } = mountEngine({ value: 'abc' });
+    handle.api.focus();
+    expect(document.activeElement).toBe(handle.view.contentDOM);
+
+    rerender({ readOnly: true });
+
+    expect(document.activeElement).not.toBe(handle.view.contentDOM);
   });
 });
 

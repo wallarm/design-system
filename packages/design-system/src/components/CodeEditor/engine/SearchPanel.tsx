@@ -74,6 +74,15 @@ export const SearchPanel: FC<SearchPanelProps> = ({
     view.dispatch({ effects: [...effects, ...announce] });
   };
 
+  const blurReadOnlyContent = () => {
+    if (view.state.readOnly && view.hasFocus) view.contentDOM.blur();
+  };
+
+  const closeSearch = () => {
+    closeSearchPanel(view);
+    blurReadOnlyContent();
+  };
+
   const handleKeyDown = (event: KeyboardEvent<HTMLElement>, onEnter: (shift: boolean) => void) => {
     // Enter / Escape while an IME composes text confirm the composition, not a search command.
     if (event.nativeEvent.isComposing || event.keyCode === 229) return;
@@ -81,6 +90,7 @@ export const SearchPanel: FC<SearchPanelProps> = ({
     // preventDefault marks Escape as handled, so an enclosing fullscreen stays open.
     if (runScopeHandlers(view, event.nativeEvent, 'search-panel')) {
       event.preventDefault();
+      blurReadOnlyContent();
       return;
     }
     if (event.key === 'Enter') {
@@ -98,7 +108,10 @@ export const SearchPanel: FC<SearchPanelProps> = ({
   const handlePanelKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
     // Inputs handle their own keys; this covers the buttons.
     if (event.target instanceof HTMLInputElement) return;
-    if (runScopeHandlers(view, event.nativeEvent, 'search-panel')) event.preventDefault();
+    if (runScopeHandlers(view, event.nativeEvent, 'search-panel')) {
+      event.preventDefault();
+      blurReadOnlyContent();
+    }
   };
 
   const canSearch = query.valid;
@@ -203,7 +216,7 @@ export const SearchPanel: FC<SearchPanelProps> = ({
           className='ml-auto'
           aria-label='Close search'
           data-testid={slot('search-close')}
-          onClick={() => closeSearchPanel(view)}
+          onClick={closeSearch}
         >
           <X />
         </Button>

@@ -117,7 +117,7 @@ const SLOT_DEPS: Record<SlotKey, readonly DepKey[]> = {
   readOnly: ['readOnly'],
   wrap: ['wrapLines'],
   maxHeight: ['maxHeight'],
-  contentAttributes: ['contentAttributes', 'testId'],
+  contentAttributes: ['contentAttributes', 'testId', 'readOnly'],
   cspNonce: ['cspNonce'],
   painter: ['adapter', 'language'],
   lines: ['lines', 'startingLineNumber', 'lineNumbers', 'testId', 'folds', 'diffEnabled'],
@@ -208,6 +208,7 @@ const featureExtensions = (
 
 const contentAttributesFor = (options: EngineOptions): Record<string, string> => {
   const attrs = sanitizeContentAttributes(options.contentAttributes);
+  if (options.readOnly) delete attrs.tabindex;
   if (options.testId) attrs['data-testid'] = `${options.testId}--editor`;
   return attrs;
 };
@@ -274,7 +275,10 @@ const slotExtensions = (
   callbacks: EngineCallbacks,
 ): SlotBuilders<SlotKey> => ({
   language: () => languageExtension(options.language),
-  readOnly: () => EditorState.readOnly.of(options.readOnly),
+  readOnly: () => [
+    EditorState.readOnly.of(options.readOnly),
+    EditorView.editable.of(!options.readOnly),
+  ],
   wrap: () => (options.wrapLines ? EditorView.lineWrapping : []),
   maxHeight: () => maxHeightTheme(options.maxHeight),
   contentAttributes: () => EditorView.contentAttributes.of(contentAttributesFor(options)),
@@ -382,6 +386,19 @@ export const createEditor = (
 
   const view = new EditorView({ state: createState(initialOptions.value, initialOptions), parent });
 
+  // CodeMirror focuses its content on mousedown even when `editable` is false. Let the
+  // browser handle read-only text selection without running that focus handler.
+  const preventReadOnlyMouseFocus = (event: MouseEvent) => {
+    if (
+      view.state.readOnly &&
+      event.target instanceof Node &&
+      view.contentDOM.contains(event.target)
+    ) {
+      event.stopPropagation();
+    }
+  };
+  view.dom.addEventListener('mousedown', preventReadOnlyMouseFocus, true);
+
   /** Loads a lazy parser and reconfigures the language compartment from the promise callback (never inside a CM update). */
   const ensureLazyLanguage = (lang: CodeEditorLanguage) => {
     if (!isLazyLanguage(lang)) return;
@@ -439,15 +456,19 @@ export const createEditor = (
     options = next;
     if (next.documentId !== prev.documentId) {
       swapDocument(prev, next);
+      if (next.readOnly && view.hasFocus) view.contentDOM.blur();
       return;
     }
     reconfigure(prev, next);
+    if (next.readOnly && view.hasFocus) view.contentDOM.blur();
     if (next.language !== prev.language) ensureLazyLanguage(next.language);
     syncValue(next.value);
   };
 
   const api: CodeEditorApi = {
-    focus: () => view.focus(),
+    focus: () => {
+      if (!view.state.readOnly) view.focus();
+    },
     getValue: () => view.state.doc.toString(),
     insertText: text => {
       if (view.state.readOnly) return;
@@ -477,6 +498,7 @@ export const createEditor = (
     destroy: () => {
       destroyed = true;
       cache.clear();
+      view.dom.removeEventListener('mousedown', preventReadOnlyMouseFocus, true);
       view.destroy();
     },
   };

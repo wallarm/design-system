@@ -38,6 +38,7 @@ const DESCRIPTION = [
   'The adapter re-tokenizes the whole document after each pause in typing, which stays within a frame up to about 2 000 lines with Prism; longer documents still edit smoothly, their colours just settle a moment later.',
   'Like the snippet, the editor sits inside a `display: contents` wrapper that keeps it mounted across fullscreen, so space editors with their own `className` (for example `mt-16`) or a `gap` on the parent — not `space-*`, `divide-*` or child selectors on the parent.',
   '`lines`, `folds`, `completions` and `schema` are compared by identity, so memoise them or hoist them to module constants — a new value on every render reconfigures the editor.',
+  'Autocomplete suggests language keywords and words already in the document for every language; HTTP methods and headers and JSON Schema values have their own contextual suggestions. Pass `completions` to add application-specific results.',
   'Syntax errors are best-effort: JSON reports the `JSON.parse` message, JavaScript and TypeScript use Babel, Lua uses luaparse (first error only), YAML and Python use their Lezer parsers, which still flag a few valid Python forms such as `lambda a, /, b` and parenthesised `with` items.',
   '`lines` and `folds` stay on their line numbers while typing; to keep a decoration on a piece of text, recompute it from `value` (for example `useMemo(() => linesFor(value), [value])`, or a `folds` function such as `getHttpFolds`).',
   'The editor injects `<style>` tags, so under a strict Content Security Policy pass `cspNonce`.',
@@ -704,7 +705,7 @@ export const Sizes: StoryFn<typeof meta> = () => (
 );
 
 /**
- * `readOnly` still lets you focus, select, search and copy, but not type. Use it when the value
+ * `readOnly` lets you select, search and copy without focusing the code or showing a caret. Use it when the value
  * can change elsewhere but not here. If it never changes, use `CodeSnippet`.
  */
 export const ReadOnly: StoryFn<typeof meta> = () => (
@@ -839,7 +840,7 @@ const ParityPair = ({
 );
 
 /** Header with tabs, a title-less tab strip and header actions — the same element in both roots. */
-const PARITY_HEADER_CHROME = (
+const PARITY_HEADER_FRAME = (
   <CodeSnippetHeader>
     <CodeSnippetTabs defaultValue='request'>
       <CodeSnippetTab value='request'>Request</CodeSnippetTab>
@@ -854,7 +855,7 @@ const PARITY_HEADER_CHROME = (
 );
 
 /** Floating actions (no header) — the same element in both roots. */
-const PARITY_FLOATING_CHROME = (
+const PARITY_FLOATING_FRAME = (
   <CodeSnippetActions>
     <CodeSnippetWrapButton />
     <CodeSnippetCopyButton />
@@ -933,16 +934,16 @@ export const ParitySizes: StoryFn<typeof meta> = () => (
 );
 
 /**
- * Parity check for the shared chrome: a header with tabs and actions, and floating actions
+ * Parity check for the shared frame: a header with tabs and actions, and floating actions
  * without a header, sit in the same place with the same spacing.
  */
-export const ParityChrome: StoryFn<typeof meta> = () => (
+export const ParityFrame: StoryFn<typeof meta> = () => (
   <VStack gap={24}>
-    <ParityPair testId='parity-chrome-header' code={sampleCode} language='text'>
-      {PARITY_HEADER_CHROME}
+    <ParityPair testId='parity-frame-header' code={sampleCode} language='text'>
+      {PARITY_HEADER_FRAME}
     </ParityPair>
-    <ParityPair testId='parity-chrome-floating' code={sampleCode} language='text'>
-      {PARITY_FLOATING_CHROME}
+    <ParityPair testId='parity-frame-floating' code={sampleCode} language='text'>
+      {PARITY_FLOATING_FRAME}
     </ParityPair>
   </VStack>
 );
@@ -1280,6 +1281,6 @@ export const TabsKeepHistory: StoryFn<typeof meta> = () => <TabsKeepHistoryDemo 
 
 /**
  * 2 000 read-only lines clamped by `maxLines` — the top of the envelope the colour painter is
- * built for, where `readOnly` still lets the text be focused, searched and copied.
+ * built for, where `readOnly` still lets the text be selected, searched and copied.
  */
 export const LongDocument: StoryFn<typeof meta> = () => <LongDocumentDemo />;
