@@ -7,10 +7,12 @@ import {
   useEffect,
   useMemo,
   useRef,
+  useState,
 } from 'react';
 import { useOverflowItems } from '../../hooks';
 import { cn } from '../../utils/cn';
 import type { TestableProps } from '../../utils/testId';
+import { DefaultOverflowRenderer } from './DefaultOverflowRenderer';
 import {
   areItemsShallowEqual,
   OVERFLOW_RESERVE_SPACE,
@@ -19,10 +21,20 @@ import {
 
 type CollapseDirection = 'start' | 'end';
 
+export interface ShowAllOverflowData<T> {
+  allItems: T[];
+  visibleCount: number;
+  hiddenCount: number;
+}
+
 export interface OverflowListProps<T> extends HTMLAttributes<HTMLDivElement>, TestableProps {
   items: T[];
   itemRenderer: (item: T, index: number) => ReactNode;
-  overflowRenderer: (items: T[]) => ReactNode;
+  overflowRenderer?: (data: ShowAllOverflowData<T>) => ReactNode;
+  overflowHeaderLabel?: string;
+  showAll?: boolean;
+  overlayOrigin?: boolean;
+  dimVisibleItems?: boolean;
   minVisibleItems?: number;
   onOverflow?: (items: T[]) => void;
   collapseFrom?: CollapseDirection;
@@ -33,6 +45,10 @@ const OverflowListComponent = <T,>({
   items,
   itemRenderer,
   overflowRenderer,
+  overflowHeaderLabel,
+  showAll = true,
+  overlayOrigin = false,
+  dimVisibleItems = true,
   className,
   collapseFrom = 'end',
   minVisibleItems = 0,
@@ -61,12 +77,76 @@ const OverflowListComponent = <T,>({
     [indexMap, itemRenderer],
   );
 
+  // Track the offset from trigger to container left edge for overlay positioning
+  const [overlayOffset, setOverlayOffset] = useState<number>(0);
+  const triggerRef = useRef<HTMLDivElement>(null);
+
+  // Built-in default overflow renderer.
+  // This wrapper exists for backwards compatibility with the renderer function API.
+  // Ideally, consumers should use DefaultOverflowRenderer directly, but we need this
+  // callback wrapper to maintain the overflowRenderer function signature contract.
+  const defaultOverflowRenderer = useCallback(
+    (data: ShowAllOverflowData<T>) => (
+      <DefaultOverflowRenderer
+        data={data}
+        itemRenderer={itemRenderer}
+        overflowHeaderLabel={overflowHeaderLabel}
+        showAll={showAll}
+        overlayOrigin={overlayOrigin}
+        dimVisibleItems={dimVisibleItems}
+        overlayOffset={overlayOffset}
+        triggerRef={triggerRef}
+      />
+    ),
+    [overflowHeaderLabel, showAll, overlayOrigin, dimVisibleItems, itemRenderer, overlayOffset],
+  );
+
+  // Use custom renderer if provided, otherwise use built-in default
+  const finalOverflowRenderer = overflowRenderer ?? defaultOverflowRenderer;
+
+  // Wrapper to convert old API (array) to new API (ShowAllOverflowData)
+  const wrappedOverflowRenderer = useCallback(
+    (hiddenItems: T[]) => {
+      const data: ShowAllOverflowData<T> = {
+        allItems: items,
+        visibleCount: items.length - hiddenItems.length,
+        hiddenCount: hiddenItems.length,
+      };
+      return finalOverflowRenderer(data) as ReactElement;
+    },
+    [items, finalOverflowRenderer],
+  );
+
   const { containerRef, visibleItems, hiddenItems, MeasurementContainer } = useOverflowItems({
     items,
     renderItem: memoizedMeasurementRenderer,
-    overflowRenderer: items => overflowRenderer(items) as ReactElement,
+    overflowRenderer: wrappedOverflowRenderer,
     reserveSpace: OVERFLOW_RESERVE_SPACE,
   });
+
+  useEffect(() => {
+    if (!overlayOrigin || !containerRef.current || !triggerRef.current) return;
+
+    const updateOffset = () => {
+      if (containerRef.current && triggerRef.current) {
+        const containerRect = containerRef.current.getBoundingClientRect();
+        const triggerRect = triggerRef.current.getBoundingClientRect();
+        // Calculate the horizontal distance from trigger left edge to container left edge
+        const offset = -(triggerRect.left - containerRect.left);
+        setOverlayOffset(offset);
+      }
+    };
+
+    updateOffset();
+
+    const resizeObserver = new ResizeObserver(updateOffset);
+    resizeObserver.observe(containerRef.current);
+    if (triggerRef.current) {
+      resizeObserver.observe(triggerRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, [overlayOrigin, containerRef]);
 
   // Apply the minVisibleItems floor to the engine's split.
   const { visibleItems: finalVisibleItems, hiddenItems: finalHiddenItems } = useMemo(
@@ -97,8 +177,20 @@ const OverflowListComponent = <T,>({
     if (finalHiddenCount === 0 && !alwaysRenderOverflow) {
       return null;
     }
-    return overflowRenderer(finalHiddenItems);
-  }, [finalHiddenCount, alwaysRenderOverflow, overflowRenderer, finalHiddenItems]);
+
+    const overflowData: ShowAllOverflowData<T> = {
+      allItems: items,
+      visibleCount: finalVisibleItems.length,
+      hiddenCount: finalHiddenCount,
+    };
+    return finalOverflowRenderer(overflowData);
+  }, [
+    finalHiddenCount,
+    alwaysRenderOverflow,
+    finalOverflowRenderer,
+    items,
+    finalVisibleItems.length,
+  ]);
 
   // Render visible items
   const visibleElements = useMemo(
