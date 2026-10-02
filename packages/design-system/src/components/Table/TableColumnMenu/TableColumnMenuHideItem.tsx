@@ -1,12 +1,7 @@
-// React Compiler opt-out: TanStack Table row/column/header/cell objects keep a
-// stable identity while their getter results (getIsSelected, getIsSorted,
-// getSize, ...) change, so compiled memoization would render stale state.
-// Remove once these readers subscribe via table.Subscribe.
-'use no memo';
-
 import type { FC } from 'react';
 import { EyeOff } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
+import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 import { useTableColumnMenuContext } from './TableColumnMenu';
 
@@ -24,7 +19,7 @@ export const TableColumnMenuHideItem: FC<TableColumnMenuHideItemProps> = ({
   const { column } = useTableColumnMenuContext();
   const ctx = useTableContext();
 
-  const canHide = ctx.visibilityEnabled && column.getCanHide();
+  const canHide = useTableValue(() => ctx.visibilityEnabled && column.getCanHide());
   if (!canHide) return null;
 
   const handleSelect = () => {

@@ -1,9 +1,3 @@
-// React Compiler opt-out: TanStack Table row/column/header/cell objects keep a
-// stable identity while their getter results (getIsSelected, getIsSorted,
-// getSize, ...) change, so compiled memoization would render stale state.
-// Remove once these readers subscribe via table.Subscribe.
-'use no memo';
-
 import {
   Children,
   cloneElement,
@@ -23,6 +17,7 @@ import {
   type BulkBarSummarySelectAllProps,
   BulkBarSummarySeparator,
 } from '../../BulkBar';
+import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 
 export interface TableActionBarSelectionProps {
@@ -56,7 +51,7 @@ export const TableActionBarSelection: FC<TableActionBarSelectionProps> = ({ chil
   const { table } = useTableContext();
 
   const count = Object.keys(table.state.rowSelection).length;
-  const isAllSelected = table.getIsAllRowsSelected();
+  const isAllSelected = useTableValue(() => table.getIsAllRowsSelected());
 
   const selectAll = () => table.toggleAllRowsSelected(true);
   const clear = () => table.resetRowSelection();
