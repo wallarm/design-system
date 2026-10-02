@@ -1,2 +1,2 @@
-export type { OverflowListProps } from './OverflowList';
+export type { OverflowListProps, ShowAllOverflowData } from './OverflowList';
 export { OverflowList } from './OverflowList';

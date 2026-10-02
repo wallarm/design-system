@@ -14,6 +14,10 @@ export interface PopoverProps extends TestableProps {
    * other component can't find its own anchor.
    */
   ids?: ArkUiPopover.RootProps['ids'];
+  /**
+   * Custom positioning configuration. When provided, overrides the default positioning.
+   */
+  positioning?: ArkUiPopover.RootProps['positioning'];
 }
 
 const POPOVER_POSITIONING_DEFAULT: ArkUiPopover.RootProps['positioning'] = {
@@ -28,6 +32,7 @@ export const Popover: FC<PopoverProps> = ({
   open,
   onOpenChange,
   ids,
+  positioning,
   'data-testid': testIdProp,
 }) => {
   const inheritedTestId = useTestId();
@@ -40,7 +45,7 @@ export const Popover: FC<PopoverProps> = ({
   return (
     <TestIdProvider value={testId}>
       <ArkUiPopover.Root
-        positioning={POPOVER_POSITIONING_DEFAULT}
+        positioning={positioning ?? POPOVER_POSITIONING_DEFAULT}
         open={open}
         onOpenChange={handleOpenChange}
         ids={ids}
