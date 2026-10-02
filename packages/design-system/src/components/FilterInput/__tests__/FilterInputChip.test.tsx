@@ -23,20 +23,31 @@ const mockContextValue: FilterInputContextValue = {
   onInputChange: vi.fn(),
   onInputKeyDown: vi.fn(),
   onInputClick: vi.fn(),
+  onAreaClick: vi.fn(),
   onGapClick: vi.fn(),
   onChipClick: vi.fn(),
+  onPairChipClick: vi.fn(),
+  onBuildingChipClick: vi.fn(),
+  onSwitchEditSegment: vi.fn(() => false),
+  onRemoveEditingChip: vi.fn(),
   onConnectorChange: vi.fn(),
   onChipRemove: vi.fn(),
   onClear: vi.fn(),
   editingChipId: null,
   editingSegment: null,
+  editingSide: 0,
   segmentFilterText: '',
   onSegmentFilterChange: vi.fn(),
   onCancelSegmentEdit: vi.fn(),
   onCustomValueCommit: vi.fn(),
   onCustomAttributeCommit: vi.fn(),
+  onCustomOperatorCommit: vi.fn(),
   menuRef: createRef(),
   closeAutocompleteMenu: vi.fn(),
+  registerChipRef: vi.fn(),
+  segmentAttributeInputRef: createRef(),
+  segmentOperatorInputRef: createRef(),
+  segmentValueInputRef: createRef(),
 };
 
 const FilterInputWrapper = ({ children }: { children: ReactNode }) => (
@@ -262,11 +273,11 @@ describe('FilterInputChip building mode', () => {
           pair={{ attribute: 'Value', operator: 'is', value: 'x' }}
         />,
       );
-      // The first value segment is the base "key"; it is capped + non-shrinking
-      // so the paired value keeps its share of the row.
+      // The first value segment is the base "key"; it is capped at 90px max and sizes
+      // to content, shrinking when space is tight so all segments remain visible.
       const baseValue = container.querySelector('[data-slot="segment-value"]');
       expect(baseValue?.className).toContain('max-w-[90px]');
-      expect(baseValue?.className).toContain('shrink-0');
+      expect(baseValue?.className).toContain('shrink');
     });
 
     it('makes the fixed "Value" label clickable and resumes at the first missing pair segment (AS-1179/AS-1192)', async () => {

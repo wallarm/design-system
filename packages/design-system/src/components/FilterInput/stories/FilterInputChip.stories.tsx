@@ -71,13 +71,14 @@ WithError.args = {
   error: true,
 };
 
-/** Long text in both segments against the chip's 320px cap. Only the value segment can shrink, so a long field label fills the chip and the value collapses to nothing — one reason to keep field labels short. */
+/** Long text in both segments. The chip caps at 320px; segments size to their content, with the attribute capped at 180px and the value guaranteed 60px minimum. When space is tight, the attribute shrinks first (since the value is what the filter matches on), both truncating with ellipsis rather than one segment collapsing to zero. */
 export const WithLongText = Template.bind({});
 WithLongText.args = {
   attribute: 'Very Long Attribute Name That Should Truncate',
   operator: 'is',
   value: 'Very Long Value That Should Also Truncate With Ellipsis',
   error: false,
+  valueMaxWidth: 180,
 };
 
 /** A field with its own `valueMaxWidth` (here 500px) lifts the chip's blanket cap and lets the value segment run wide, truncating with an ellipsis only past that width — for long freeform values like parameter-path expressions (AS-1064). The full value is preserved for matching. */
