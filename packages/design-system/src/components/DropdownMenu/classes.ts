@@ -11,7 +11,10 @@ export const dropdownMenuClassNames = cn(
   // and dialogs share one global stack), so a menu opened inside a nested
   // drawer/dialog lands above that dialog's positioner
   // (50 + layer-index * 20). The ,0 fallback keeps the calc valid while
-  // the node is closed / not yet registered in the stack.
+  // the node is closed / not yet registered in the stack. Popper reads the
+  // z-index only once, possibly before the layer registers, so every content
+  // using this re-syncs the positioner via useLayerZIndexRef
+  // (utils/syncLayerZIndex.ts).
   'z-[calc(var(--drawer-positioner-z-index)+(var(--layer-index,0)*var(--drawer-level-ratio)))]',
   // Scrolling. overscroll-none stops the macOS rubber-band bounce / scroll
   // chaining when the menu is scrolled to its end — applied to the content and

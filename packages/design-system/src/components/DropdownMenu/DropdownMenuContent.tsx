@@ -9,6 +9,7 @@ import {
 import { Menu } from '@ark-ui/react/menu';
 import { Portal } from '@ark-ui/react/portal';
 import { cn } from '../../utils/cn';
+import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 import { TestIdProvider, useTestId } from '../../utils/testId';
 import {
   ScrollArea,
@@ -33,6 +34,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
   ...props
 }) => {
   const testId = useTestId('content');
+  const contentRef = useLayerZIndexRef(ref);
   // ScrollArea wraps menu items in its own TestIdProvider (value scoped to ScrollArea's
   // own data-testid prop, which is unset here) — that blocks DropdownMenu's cascade
   // from reaching menu items. Re-establish the cascade explicitly for the children.
@@ -62,7 +64,7 @@ export const DropdownMenuContent: FC<DropdownMenuContentProps> = ({
     <Portal>
       <Menu.Positioner>
         <Menu.Content
-          ref={ref}
+          ref={contentRef}
           data-testid={testId}
           className={cn(
             dropdownMenuClassNames,
