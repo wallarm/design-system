@@ -1,33 +1,42 @@
 import type { FC, RefObject } from 'react';
-import type { Virtualizer } from '@tanstack/react-virtual';
+import type { VirtualItem } from '@tanstack/react-virtual';
 import { useTestId } from '../../../utils/testId';
-import { TABLE_PREPEND_SKELETON_ROWS } from '../lib';
+import { TABLE_PREPEND_SKELETON_ROWS, useTableValue } from '../lib';
 import { TBody, Td, Tr } from '../primitives';
 import { useTableContext } from '../TableContext';
 import { TableLoadingState } from '../TableLoadingState';
 import { TableRow } from '../TableRow';
 import { TableBodyRowDndContext } from './TableBodyRowDndContext';
 
+/**
+ * The virtualizer is a mutable @tanstack/react-virtual instance (a React
+ * Compiler-incompatible library — its callers are left uncompiled), so the
+ * hosts read it on every render and pass plain values down: this component
+ * stays compilable and memoizes against inputs that actually change.
+ */
 export interface TableBodyVirtualizedCoreProps {
   tbodyRef: RefObject<HTMLTableSectionElement | null>;
-  virtualizer:
-    | Virtualizer<Window, Element>
-    | Virtualizer<HTMLElement, Element>
-    | Virtualizer<Element, Element>;
+  /** `virtualizer.getVirtualItems()` — a new array whenever the visible range or measurements change. */
+  virtualRows: VirtualItem[];
+  /** `virtualizer.getTotalSize()` */
+  totalSize: number;
+  /** `virtualizer.options.scrollMargin` */
+  scrollMargin: number;
+  /** `virtualizer.measureElement` (stable for the instance's lifetime) */
+  measureElement: (node: Element | null) => void;
 }
 
 export const TableBodyVirtualizedCore: FC<TableBodyVirtualizedCoreProps> = ({
   tbodyRef,
-  virtualizer,
+  virtualRows,
+  totalSize,
+  scrollMargin,
+  measureElement,
 }) => {
   const { table, isLoading, isLoadingPrevious } = useTableContext();
   const testId = useTestId('body');
-  const virtualRows = virtualizer.getVirtualItems();
-  const totalSize = virtualizer.getTotalSize();
-  const measureElement = virtualizer.measureElement;
-  const rows = table.getRowModel().rows;
-  const colSpan = table.getVisibleLeafColumns().length;
-  const scrollMargin = virtualizer.options.scrollMargin;
+  const rows = useTableValue(() => table.getRowModel().rows);
+  const colSpan = useTableValue(() => table.getVisibleLeafColumns().length);
 
   return (
     <TableBodyRowDndContext>

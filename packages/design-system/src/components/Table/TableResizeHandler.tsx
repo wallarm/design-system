@@ -2,7 +2,7 @@ import type { Header, RowData } from '@tanstack/react-table';
 import { cva } from 'class-variance-authority';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
-import type { DSTableFeatures } from './lib';
+import { type DSTableFeatures, useTableValue } from './lib';
 
 const tableResizeHandlerVariants = cva(
   cn(
@@ -24,6 +24,7 @@ interface TableResizeHandlerProps<T extends RowData> {
 
 export const TableResizeHandler = <T extends RowData>({ header }: TableResizeHandlerProps<T>) => {
   const testId = useTestId('resize');
+  const isResizing = useTableValue(() => header.column.getIsResizing());
 
   return (
     <div
@@ -32,7 +33,7 @@ export const TableResizeHandler = <T extends RowData>({ header }: TableResizeHan
       className={cn(tableResizeHandlerVariants())}
       data-slot='resize-handle'
       data-testid={testId}
-      data-resizing={header.column.getIsResizing() || undefined}
+      data-resizing={isResizing || undefined}
       tabIndex={-1}
     />
   );

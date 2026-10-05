@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import { applyKnownFieldHelpers, getKnownFieldSerializer } from '../lib/applyKnownFieldHelpers';
 import { getInvalidValueIndices } from '../lib/validation';
 import type { FieldMetadata } from '../types';
@@ -69,7 +69,7 @@ describe('applyKnownFieldHelpers', () => {
     });
 
     it('wraps a consumer `getSuggestions` so its lead leads under "Most frequent"', () => {
-      const consumerSuggest = vi.fn(() => [{ value: 'US', label: 'United States' }]);
+      const consumerSuggest = rs.fn(() => [{ value: 'US', label: 'United States' }]);
       const [field] = applyKnownFieldHelpers([
         {
           name: 'country',
@@ -90,7 +90,7 @@ describe('applyKnownFieldHelpers', () => {
 
     it('falls back to the flat, unsectioned bundled list when the lead is empty', () => {
       // A lazy consumer returns undefined before its fetch lands.
-      const consumerSuggest = vi.fn(() => undefined as never);
+      const consumerSuggest = rs.fn(() => undefined as never);
       const [field] = applyKnownFieldHelpers([
         { name: 'country', label: 'Country', type: 'string', getSuggestions: consumerSuggest },
       ]);
@@ -142,8 +142,8 @@ describe('applyKnownFieldHelpers', () => {
   });
 
   it('overrides consumer-supplied callbacks for reserved names', () => {
-    const customValidate = vi.fn(() => false);
-    const customSuggestions = vi.fn(() => [{ value: '200', label: '200' }]);
+    const customValidate = rs.fn(() => false);
+    const customSuggestions = rs.fn(() => [{ value: '200', label: '200' }]);
     const [field] = applyKnownFieldHelpers([
       {
         name: 'status_code',

@@ -1,5 +1,5 @@
 import { EditorState } from '@codemirror/state';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { findJsonBodyRange, http } from '../languages/http';
 import { json } from '../languages/json';
 import { validateAgainstSchema } from './validate';

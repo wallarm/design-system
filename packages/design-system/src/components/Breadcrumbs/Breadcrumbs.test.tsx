@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Breadcrumbs } from './Breadcrumbs';
 import { BreadcrumbsItem } from './BreadcrumbsItem';
@@ -25,7 +25,7 @@ describe('Attribute pass-through', () => {
   it('forwards data-analytics-id to the button branch <button>', () => {
     render(
       <Breadcrumbs>
-        <BreadcrumbsItem data-testid='item-button' data-analytics-id='NAV_ROOT' onClick={vi.fn()}>
+        <BreadcrumbsItem data-testid='item-button' data-analytics-id='NAV_ROOT' onClick={rs.fn()}>
           Root
         </BreadcrumbsItem>
         <BreadcrumbsItem data-testid='item-current'>Current</BreadcrumbsItem>
@@ -87,7 +87,7 @@ describe('Attribute pass-through', () => {
   });
 
   it('composes consumer onClick on the link branch', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
 
     render(
       <Breadcrumbs>
@@ -124,7 +124,7 @@ describe('Attribute pass-through', () => {
           Products
         </BreadcrumbsItem>
         <BreadcrumbsItem
-          onClick={vi.fn()}
+          onClick={rs.fn()}
           data-testid='item-category'
           data-analytics-id='NAV_CATEGORY'
         >

@@ -1,6 +1,6 @@
 import { type ReactElement, useState } from 'react';
+import { afterAll, beforeEach, describe, expect, it } from '@rstest/core';
 import { act, render } from '@testing-library/react';
-import { afterAll, beforeEach, describe, expect, it } from 'vitest';
 import { useOverflowItems } from '../useOverflowItems';
 
 // Guards the imperative measurement-layer display toggle. jsdom has no layout,

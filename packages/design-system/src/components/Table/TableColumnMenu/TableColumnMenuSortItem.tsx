@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { Check } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
-import { SORT_LABELS } from '../lib';
+import { SORT_LABELS, useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 import { useTableColumnMenuContext } from './TableColumnMenu';
 
@@ -29,9 +29,11 @@ export const TableColumnMenuSortItem: FC<TableColumnMenuSortItemProps> = ({
   const { column } = useTableColumnMenuContext();
   const ctx = useTableContext();
 
-  if (!ctx.sortingEnabled || !column.getCanSort()) return null;
+  const canSort = useTableValue(() => ctx.sortingEnabled && column.getCanSort());
+  const sortDirection = useTableValue(() => column.getIsSorted());
 
-  const sortDirection = column.getIsSorted();
+  if (!canSort) return null;
+
   const sortType = column.columnDef.meta?.sortType;
   const [ascLabel, descLabel] = (sortType && SORT_LABELS[sortType]) || SORT_LABELS.text!;
   const label = direction === 'asc' ? ascLabel : descLabel;

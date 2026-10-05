@@ -1,7 +1,7 @@
+import { describe, expect, it } from '@rstest/core';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { describe, expect, it } from 'vitest';
 
 /**
  * Main-chunk import boundary (spec §3 / plan Global Constraints).

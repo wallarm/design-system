@@ -9,6 +9,7 @@ import {
   DropdownMenuSeparator,
 } from '../../../DropdownMenu';
 import { useFloatingRecomputeOn } from '../../hooks/useFloatingRecomputeOn';
+import { keepOpenOnMenuHandoff } from '../../lib';
 import { buildValueMenuSections, type ValueMenuRow } from '../../lib/buildValueMenuSections';
 import { MenuEmptyState } from '../MenuEmptyState';
 import type { FilterInputValueMenuProps } from './FilterInputValueMenu';
@@ -132,6 +133,7 @@ export const NestedValueMenu: FC<FilterInputValueMenuProps> = ({
       <DropdownMenu
         open={open}
         onOpenChange={onOpenChange}
+        onRequestDismiss={keepOpenOnMenuHandoff}
         closeOnSelect={false}
         positioning={positioning}
         highlightedValue={state.topHighlightedValue}

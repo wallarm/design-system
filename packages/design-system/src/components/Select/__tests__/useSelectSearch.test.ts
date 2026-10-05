@@ -1,6 +1,6 @@
 import { createListCollection } from '@ark-ui/react/collection';
+import { describe, expect, it } from '@rstest/core';
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it } from 'vitest';
 import { useSelectSearch } from '../useSelectSearch';
 
 interface Item {

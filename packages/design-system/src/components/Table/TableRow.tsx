@@ -9,6 +9,8 @@ import {
   TABLE_EXPAND_COLUMN_ID,
   TABLE_SELECT_COLUMN_ID,
   useRowDnd,
+  useTableValue,
+  withTableState,
 } from './lib';
 import { Td, Tr } from './primitives';
 import { TableBodyCell } from './TableBody/TableBodyCell';
@@ -46,17 +48,26 @@ const TableRowInner = <T extends RowData>({
   const testId = useTestId('row');
   const { canDnd, isDragging, setNodeRef, style: dndStyle, attributes, listeners } = useRowDnd(row);
   const { activeId, overId } = useRowDndIndicator();
-  const isGroupParent = row.subRows.length > 0;
-  const isSelected = isGroupParent ? row.getIsAllSubRowsSelected() : row.getIsSelected();
+  const isGroupParent = useTableValue(() => row.subRows.length > 0);
+  const isSelected = useTableValue(() =>
+    row.subRows.length > 0 ? row.getIsAllSubRowsSelected() : row.getIsSelected(),
+  );
+  const isExpanded = useTableValue(() => row.getIsExpanded());
+  const cells = useTableValue(() => row.getVisibleCells());
+  // A primitive, so a sort / selection change does not re-render every row
+  // just because the row-model array changed identity.
+  const isLastModelRow = useTableValue(() => {
+    const rows = table.getRowModel().rows;
+    return rows[rows.length - 1]?.id === row.id;
+  });
   const isPreviewActive = activeRowId === row.id;
 
   // The container frame draws the table's bottom edge, so the last row must
   // not draw its own bottom border (otherwise 1px + 1px stack into a 2px line).
   // Not "last" while a loading skeleton follows, and when the last row is
   // expanded the edge belongs to its expanded content, not to the row itself.
-  const flatRows = table.getRowModel().rows;
-  const isLastTableRow = !isLoading && flatRows[flatRows.length - 1]?.id === row.id;
-  const hasExpandedContent = expandingEnabled && !!renderExpandedRow && row.getIsExpanded();
+  const isLastTableRow = !isLoading && isLastModelRow;
+  const hasExpandedContent = expandingEnabled && !!renderExpandedRow && isExpanded;
   const isLastRow = isLastTableRow && !hasExpandedContent;
   const isLastRowExpanded = isLastTableRow && hasExpandedContent;
 
@@ -71,7 +82,6 @@ const TableRowInner = <T extends RowData>({
   );
 
   if (isGroupParent) {
-    const cells = row.getVisibleCells();
     const systemCells = cells.filter(c => SYSTEM_COLUMN_IDS.has(c.column.id));
     const dataCells = cells.filter(c => !SYSTEM_COLUMN_IDS.has(c.column.id));
     const firstDataCell = dataCells[0];
@@ -80,7 +90,7 @@ const TableRowInner = <T extends RowData>({
     // frame delay). The JS overlay (StickyGroupParent, z-[21]) layers on top
     // for the push-up animation and virtualization fallback.
     const stickyStyle =
-      hasSubRowGrouping && row.getIsExpanded()
+      hasSubRowGrouping && isExpanded
         ? {
             position: 'sticky' as const,
             top: allLeafColumns.some(c => c.columnDef.meta?.description?.type === 'text') ? 48 : 32,
@@ -112,19 +122,24 @@ const TableRowInner = <T extends RowData>({
               lastRow={isLastRow}
             />
           )}
-          {dataCells.slice(1).map(cell => (
-            <Td
-              key={cell.id}
-              className={cn(
-                'border-b border-border-primary-light bg-bg-surface-2 overlay',
-                'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
-                'group-data-[preview-active]/row:overlay-states-primary-hover group-has-[[data-state=open]]/row:overlay-states-primary-hover',
-                isLastRow && 'border-b-0',
-              )}
-              style={{ width: cell.column.getSize() }}
-              aria-hidden='true'
-            />
-          ))}
+          {/* Filler cells read their column width — recreated on every table state change. */}
+          {withTableState(table.state, () =>
+            dataCells
+              .slice(1)
+              .map(cell => (
+                <Td
+                  key={cell.id}
+                  className={cn(
+                    'border-b border-border-primary-light bg-bg-surface-2 overlay',
+                    'group-hover/row:overlay-states-primary-hover group-data-[selected]/row:overlay-states-primary-active',
+                    'group-data-[preview-active]/row:overlay-states-primary-hover group-has-[[data-state=open]]/row:overlay-states-primary-hover',
+                    isLastRow && 'border-b-0',
+                  )}
+                  style={{ width: cell.column.getSize() }}
+                  aria-hidden='true'
+                />
+              )),
+          )}
           {!stretch && <Td pinned={false} aria-hidden />}
         </Tr>
         {expandingEnabled && <TableRowExpanded row={row} lastRow={isLastRowExpanded} />}
@@ -138,8 +153,10 @@ const TableRowInner = <T extends RowData>({
   // below if dragging upward-to-here.
   let dropIndicator: 'above' | 'below' | undefined;
   if (overId === row.id && activeId != null && activeId !== row.id) {
-    const activeIndex = flatRows.findIndex(r => r.id === activeId);
-    const overIndex = flatRows.findIndex(r => r.id === row.id);
+    // `table` is a new value on every state change, so this read stays fresh.
+    const modelRows = table.getRowModel().rows;
+    const activeIndex = modelRows.findIndex(r => r.id === activeId);
+    const overIndex = modelRows.findIndex(r => r.id === row.id);
     if (activeIndex !== -1 && overIndex !== -1) {
       dropIndicator = activeIndex < overIndex ? 'below' : 'above';
     }
@@ -160,7 +177,7 @@ const TableRowInner = <T extends RowData>({
         data-depth={row.depth > 0 ? row.depth : undefined}
         style={dndStyle}
       >
-        {row.getVisibleCells().map(cell => {
+        {cells.map(cell => {
           const isDragHandle = cell.column.id === TABLE_DRAG_HANDLE_COLUMN_ID;
           return (
             <TableBodyCell

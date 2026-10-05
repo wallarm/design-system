@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import { highlightJsAdapter } from './highlightjs';
 import { plainAdapter } from './plain';
 import { prismAdapter } from './prism';
@@ -150,12 +150,12 @@ describe('shikiAdapter', () => {
   });
 
   it('lazy-loads highlighter on first use', async () => {
-    vi.resetModules();
+    rs.resetModules();
 
-    const createHighlighter = vi.fn().mockResolvedValue({
+    const createHighlighter = rs.fn().mockResolvedValue({
       codeToTokensBase: () => [[{ content: 'test', explanation: [] }]],
     });
-    vi.doMock('shiki', () => ({ createHighlighter }));
+    rs.doMock('shiki', () => ({ createHighlighter }));
 
     const { shikiAdapter } = await import('./shiki');
 
@@ -165,14 +165,14 @@ describe('shikiAdapter', () => {
     // Highlighter created only once despite two highlight calls
     expect(createHighlighter).toHaveBeenCalledTimes(1);
 
-    vi.restoreAllMocks();
+    rs.restoreAllMocks();
   });
 
   it('falls back to plain tokens on error', async () => {
-    vi.resetModules();
+    rs.resetModules();
 
-    vi.doMock('shiki', () => ({
-      createHighlighter: vi.fn().mockRejectedValue(new Error('shiki load failed')),
+    rs.doMock('shiki', () => ({
+      createHighlighter: rs.fn().mockRejectedValue(new Error('shiki load failed')),
     }));
 
     const { shikiAdapter } = await import('./shiki');
@@ -182,7 +182,7 @@ describe('shikiAdapter', () => {
     expect(result.tokens[0]).toEqual([{ content: 'hello', type: 'plain' }]);
     expect(result.tokens[1]).toEqual([{ content: 'world', type: 'plain' }]);
 
-    vi.restoreAllMocks();
+    rs.restoreAllMocks();
   });
 });
 
@@ -233,9 +233,9 @@ describe('highlightJsAdapter', () => {
   });
 
   it('falls back to plain tokens on error', async () => {
-    vi.resetModules();
+    rs.resetModules();
 
-    vi.doMock('highlight.js', () => ({
+    rs.doMock('highlight.js', () => ({
       default: {
         highlight: () => {
           throw new Error('hljs failed');
@@ -250,6 +250,6 @@ describe('highlightJsAdapter', () => {
     expect(result.tokens[0]).toEqual([{ content: 'hello', type: 'plain' }]);
     expect(result.tokens[1]).toEqual([{ content: 'world', type: 'plain' }]);
 
-    vi.restoreAllMocks();
+    rs.restoreAllMocks();
   });
 });

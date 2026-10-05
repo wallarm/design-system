@@ -1,6 +1,6 @@
 import { type ComponentProps, createRef } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Field, FieldLabel } from '../Field';
 import { Slider } from './Slider';
@@ -517,7 +517,7 @@ describe('Slider — accessible naming (no dangling aria-labelledby)', () => {
 
 describe('Slider — dev thumb-count guard', () => {
   it('warns when the rendered thumb count does not match the value length', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => {});
     render(
       <Slider defaultValue={[20, 80]}>
         <SliderControl>
@@ -530,7 +530,7 @@ describe('Slider — dev thumb-count guard', () => {
   });
 
   it('stays silent when thumb count matches', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => {});
     render(<Range />);
     expect(warn).not.toHaveBeenCalled();
     warn.mockRestore();

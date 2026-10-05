@@ -2,6 +2,7 @@ import type { FC, Ref } from 'react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { Select as ArkUiSelect } from '@ark-ui/react/select';
 import { cn } from '../../utils/cn';
+import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 import { dropdownMenuClassNames } from '../DropdownMenu';
 
 export interface SelectPositionerProps extends ArkUiSelect.PositionerProps {
@@ -22,27 +23,32 @@ export const SelectPositioner: FC<SelectPositionerProps> = ({
   children,
   contentProps,
   ...props
-}) => (
-  <ArkUiPortal>
-    <ArkUiSelect.Positioner {...props} className='outline-none'>
-      <ArkUiSelect.Content
-        {...contentProps}
-        className={cn(
-          dropdownMenuClassNames,
-          'flex flex-col',
-          'h-full',
-          'min-w-240',
-          'max-w-320',
-          'max-h-(--available-height)',
-          'p-0',
-          'origin-[--transform-origin]',
-          className,
-        )}
-      >
-        {children}
-      </ArkUiSelect.Content>
-    </ArkUiSelect.Positioner>
-  </ArkUiPortal>
-);
+}) => {
+  const contentRef = useLayerZIndexRef(contentProps?.ref);
+
+  return (
+    <ArkUiPortal>
+      <ArkUiSelect.Positioner {...props} className='outline-none'>
+        <ArkUiSelect.Content
+          {...contentProps}
+          ref={contentRef}
+          className={cn(
+            dropdownMenuClassNames,
+            'flex flex-col',
+            'h-full',
+            'min-w-240',
+            'max-w-320',
+            'max-h-(--available-height)',
+            'p-0',
+            'origin-[--transform-origin]',
+            className,
+          )}
+        >
+          {children}
+        </ArkUiSelect.Content>
+      </ArkUiSelect.Positioner>
+    </ArkUiPortal>
+  );
+};
 
 SelectPositioner.displayName = 'SelectPositioner';

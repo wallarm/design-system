@@ -1,6 +1,6 @@
 import { EditorState, Text } from '@codemirror/state';
 import { type DecorationSet, EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { plainAdapter } from '../../CodeSnippet/adapters/plain';
 import type { HighlightResult, SyntaxAdapter, Token } from '../../CodeSnippet/adapters/types';
 import { adapterPainter, buildTokenDecorations, getPaintedDecorations } from './adapterPainter';
@@ -28,7 +28,7 @@ const wordTokens = (code: string): HighlightResult => ({
 });
 
 const wordAdapter = () => {
-  const highlight = vi.fn<SyntaxAdapter<string>['highlight']>(async code => wordTokens(code));
+  const highlight = rs.fn<SyntaxAdapter<string>['highlight']>(async code => wordTokens(code));
   const adapter: SyntaxAdapter<string> = {
     name: 'words',
     highlight,
@@ -109,19 +109,19 @@ describe('buildTokenDecorations', () => {
 
 describe('adapterPainter — initial paint', () => {
   afterEach(() => {
-    vi.useRealTimers();
+    rs.useRealTimers();
     document.body.innerHTML = '';
   });
 
   it('highlights on create and applies classes to the right ranges', async () => {
-    vi.useFakeTimers();
+    rs.useFakeTimers();
     const { adapter, highlight } = wordAdapter();
     const view = mount('GET /a\nHost: x', adapterPainter({ adapter, language: 'http' }));
 
     expect(highlight).toHaveBeenCalledTimes(1);
     expect(highlight).toHaveBeenCalledWith('GET /a\nHost: x', 'http');
 
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
 
     expect(collect(getPaintedDecorations(view))).toEqual([
       { from: 0, to: 3, className: 'text-syntax-keyword' },
@@ -134,13 +134,13 @@ describe('adapterPainter — initial paint', () => {
   });
 
   it('plainAdapter produces no marks', async () => {
-    vi.useFakeTimers();
-    const highlight = vi.spyOn(plainAdapter, 'highlight');
+    rs.useFakeTimers();
+    const highlight = rs.spyOn(plainAdapter, 'highlight');
     // Same cast CodeSnippetRoot applies to its plainAdapter fallback.
     const adapter = plainAdapter as SyntaxAdapter<string>;
     const view = mount('line one\nline two', adapterPainter({ adapter, language: 'text' }));
 
-    await vi.advanceTimersByTimeAsync(0);
+    await rs.advanceTimersByTimeAsync(0);
 
     expect(highlight).toHaveBeenCalledTimes(1);
     expect(getPaintedDecorations(view).size).toBe(0);

@@ -1,20 +1,16 @@
-import '@testing-library/jest-dom/vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { composeStories } from 'storybook-react-rsbuild';
-import { describe, expect, it, vi } from 'vitest';
+import * as plain from '../CodeSnippet/adapters/plain' with { rstest: 'importActual' };
 import * as stories from './CodeEditor.stories';
 
 // Highlighting is covered by the adapter painter tests (T6). Here the heavy
 // adapters are swapped for the plain one, so Shiki's WASM never loads in jsdom.
-vi.mock('../CodeSnippet/adapters/shiki', async () => {
-  const { plainAdapter } = await import('../CodeSnippet/adapters/plain');
-  return { shikiAdapter: plainAdapter };
-});
-vi.mock('../CodeSnippet/adapters/prism', async () => {
-  const { plainAdapter } = await import('../CodeSnippet/adapters/plain');
-  return { prismAdapter: plainAdapter };
-});
+// Rstest mock factories are synchronous, so the plain adapter comes from the
+// `importActual` import above.
+rs.mock('../CodeSnippet/adapters/shiki', () => ({ shikiAdapter: plain.plainAdapter }));
+rs.mock('../CodeSnippet/adapters/prism', () => ({ prismAdapter: plain.plainAdapter }));
 
 const composed = composeStories(stories);
 type StoryName = keyof typeof composed;

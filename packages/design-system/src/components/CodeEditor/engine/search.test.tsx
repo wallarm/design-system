@@ -1,9 +1,9 @@
 import { closeSearchPanel, openSearchPanel, searchPanelOpen } from '@codemirror/search';
 import { Compartment, EditorState } from '@codemirror/state';
 import { EditorView, runScopeHandlers } from '@codemirror/view';
+import { afterEach, describe, expect, it } from '@rstest/core';
 import { act, fireEvent, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { afterEach, describe, expect, it } from 'vitest';
 import { PortalOutlet } from '../lib/PortalOutlet';
 import { createPortalRegistry } from '../lib/portalRegistry';
 import { searchExtension } from './search';

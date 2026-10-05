@@ -1,7 +1,7 @@
 import { foldable } from '@codemirror/language';
 import { EditorState } from '@codemirror/state';
 import { EditorView, runScopeHandlers } from '@codemirror/view';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import type { FoldRegion } from '../../CodeSnippet/lib/foldUtils';
 import { getHttpFolds, HTTP_FOLD_ID } from '../../CodeSnippet/lib/httpFolds';
 import { createPortalRegistry } from '../lib/portalRegistry';
@@ -54,8 +54,8 @@ afterEach(() => {
     view.dom.parentElement?.remove();
     view.destroy();
   }
-  vi.useRealTimers();
-  vi.restoreAllMocks();
+  rs.useRealTimers();
+  rs.restoreAllMocks();
 });
 
 describe('foldsExtension — static folds', () => {
@@ -108,7 +108,7 @@ describe('foldsExtension — static folds', () => {
   });
 
   it('drops invalid regions with the CodeSnippet warning', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     const view = mount(FIVE_LINES, [
       { id: 'reversed', startLine: 3, endLine: 2 },
       { id: 'outside', startLine: 4, endLine: 9 },
@@ -123,7 +123,7 @@ describe('foldsExtension — static folds', () => {
   });
 
   it('re-applies static regions by line number after edits, silently (D6)', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     const view = mount(FIVE_LINES, [
       { id: 'tail', startLine: 4, endLine: 5, defaultCollapsed: true },
     ]);
@@ -157,8 +157,8 @@ describe('foldsExtension — function folds', () => {
     getHttpFolds(value, { startingLineNumber });
 
   it('re-runs the function after the debounce and keeps collapsed ids', () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-    const folds = vi.fn(httpFolds);
+    rs.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const folds = rs.fn(httpFolds);
     const view = mount(REQUEST, folds);
     expect(folds).toHaveBeenCalledTimes(1);
 
@@ -167,7 +167,7 @@ describe('foldsExtension — function folds', () => {
     view.dispatch({ changes: { from: view.state.doc.line(3).to, insert: '\nX-Other: 2' } });
     expect(folds).toHaveBeenCalledTimes(1);
 
-    vi.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
+    rs.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
 
     expect(folds).toHaveBeenCalledTimes(2);
     expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.body]);
@@ -177,7 +177,7 @@ describe('foldsExtension — function folds', () => {
   });
 
   it('keeps a collapsed body that ends at the last line when a line above it is deleted', () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    rs.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     const folds: CodeEditorFolds = (value, { startingLineNumber }) =>
       getHttpFolds(value, { startingLineNumber, body: { defaultCollapsed: true } });
     const view = mount(REQUEST, folds);
@@ -201,61 +201,61 @@ describe('foldsExtension — function folds', () => {
     ]);
     expect(view.contentDOM.querySelectorAll('.cm-ds-fold-summary')).toHaveLength(1);
 
-    vi.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
+    rs.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
 
     expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.body]);
     expect(getVisibleRowCount(view.state)).toBe(4);
   });
 
   it('keeps a collapsed body when an external change shortens the document', () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    rs.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     const view = mount(REQUEST, httpFolds);
     toggleFoldRegion(view, HTTP_FOLD_ID.body);
 
     view.dispatch({ changes: { from: 0, to: view.state.doc.line(2).from } });
     expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.body]);
-    vi.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
+    rs.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
     expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.body]);
   });
 
   it('drops a region whose id disappears', () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    rs.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     const view = mount(REQUEST, httpFolds);
     toggleFoldRegion(view, HTTP_FOLD_ID.headers);
     toggleFoldRegion(view, HTTP_FOLD_ID.body);
 
     // Remove the blank separator and the body.
     view.dispatch({ changes: { from: view.state.doc.line(3).to, to: view.state.doc.length } });
-    vi.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
+    rs.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
 
     expect([...getCollapsedFoldIds(view.state)]).toEqual([HTTP_FOLD_ID.headers]);
     expect(toggleFoldRegion(view, HTTP_FOLD_ID.body)).toBe(false);
   });
 
   it('applies defaultCollapsed only the first time an id appears', () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    rs.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     const folds: CodeEditorFolds = (value, { startingLineNumber }) =>
       getHttpFolds(value, { startingLineNumber, body: { defaultCollapsed: true } });
     const view = mount('GET / HTTP/1.1\nHost: a', folds);
     expect(getCollapsedFoldIds(view.state).size).toBe(0);
 
     view.dispatch({ changes: { from: view.state.doc.length, insert: '\n\nbody' } });
-    vi.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
+    rs.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
     expect(getCollapsedFoldIds(view.state).has(HTTP_FOLD_ID.body)).toBe(true);
 
     toggleFoldRegion(view, HTTP_FOLD_ID.body);
     view.dispatch({ changes: { from: 0, insert: ' ' }, selection: { anchor: 0 } });
-    vi.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
+    rs.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
     expect(getCollapsedFoldIds(view.state).has(HTTP_FOLD_ID.body)).toBe(false);
   });
 
   it('stops the debounce timer on destroy', () => {
-    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
-    const folds = vi.fn(httpFolds);
+    rs.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    const folds = rs.fn(httpFolds);
     const view = mount(REQUEST, folds);
     view.dispatch({ changes: { from: 0, insert: ' ' } });
     view.destroy();
-    vi.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
+    rs.advanceTimersByTime(FOLDS_DEBOUNCE_MS);
     expect(folds).toHaveBeenCalledTimes(1);
   });
 });

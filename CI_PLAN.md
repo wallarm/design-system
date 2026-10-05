@@ -74,7 +74,7 @@ Parallel execution of code quality validations.
 
 - **Lint**: ESLint validation across all packages
 - **TypeCheck**: TypeScript strict mode checking
-- **Unit Tests**: Vitest test execution with coverage
+- **Unit Tests**: Rstest test execution (JUnit report via `@wallarm-org/rstest-config` on CI)
 
 **Performance**: ~2-3 minutes total (parallel execution)
 

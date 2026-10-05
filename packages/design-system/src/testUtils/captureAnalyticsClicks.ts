@@ -1,4 +1,4 @@
-import { onTestFinished, vi } from 'vitest';
+import { onTestFinished, rs } from '@rstest/core';
 
 /**
  * Mirrors how analytics SDKs (GTM, Amplitude, in-house) capture clicks: a
@@ -7,8 +7,8 @@ import { onTestFinished, vi } from 'vitest';
  * resolved id every time a user click registers under one. Auto-cleans up
  * after the current test via `onTestFinished`.
  */
-export const captureAnalyticsClicks = (): ReturnType<typeof vi.fn<(id: string) => void>> => {
-  const spy = vi.fn<(id: string) => void>();
+export const captureAnalyticsClicks = (): ReturnType<typeof rs.fn<(id: string) => void>> => {
+  const spy = rs.fn<(id: string) => void>();
   const listener: EventListener = e => {
     const id = (e.target as Element)
       .closest('[data-analytics-id]')

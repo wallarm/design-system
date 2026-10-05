@@ -1,9 +1,9 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import { splitContentProps } from './splitContentProps';
 
 describe('splitContentProps', () => {
   it('routes data-*, aria-*, id, title and tabIndex to the typing surface', () => {
-    const onKeyDown = vi.fn();
+    const onKeyDown = rs.fn();
     const style = { color: 'red' };
     const { contentAttributes, wrapperProps } = splitContentProps({
       'data-analytics-id': 'editor',

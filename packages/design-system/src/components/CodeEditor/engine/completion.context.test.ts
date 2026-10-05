@@ -1,6 +1,6 @@
 import { CompletionContext } from '@codemirror/autocomplete';
 import { EditorState } from '@codemirror/state';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import type { CodeEditorLanguage } from '../types';
 import { buildCompletionContext } from './completion';
 import { languageExtension } from './languages';

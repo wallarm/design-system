@@ -1,9 +1,9 @@
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { RESERVED_CONTENT_ATTRIBUTES, sanitizeContentAttributes } from './contentAttributes';
 
 describe('sanitizeContentAttributes', () => {
   afterEach(() => {
-    vi.restoreAllMocks();
+    rs.restoreAllMocks();
   });
 
   it('lists every attribute CodeMirror owns on .cm-content', () => {
@@ -21,7 +21,7 @@ describe('sanitizeContentAttributes', () => {
   });
 
   it('drops writingsuggestions, which CodeMirror sets to "false" on .cm-content', () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     expect(sanitizeContentAttributes({ writingsuggestions: 'true', 'aria-label': 'Code' })).toEqual(
       { 'aria-label': 'Code' },
     );
@@ -40,7 +40,7 @@ describe('sanitizeContentAttributes', () => {
   });
 
   it('drops reserved keys (any casing) with a development warning', () => {
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
 
     const result = sanitizeContentAttributes({
       role: 'presentation',
@@ -55,7 +55,7 @@ describe('sanitizeContentAttributes', () => {
   });
 
   it('does not mutate the input', () => {
-    vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+    rs.spyOn(console, 'warn').mockImplementation(() => undefined);
     const attrs = { role: 'presentation', title: 'Body' };
 
     sanitizeContentAttributes(attrs);

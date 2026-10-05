@@ -1,0 +1,19 @@
+{
+  "name": "@wallarm-org/rstest-config",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "@rsbuild/plugin-react": "catalog:"
+  },
+  "peerDependencies": {
+    "@rstest/core": "catalog:"
+  },
+  "devDependencies": {
+    "@rstest/core": "catalog:",
+    "@types/node": "catalog:"
+  }
+}

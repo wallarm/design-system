@@ -1,8 +1,9 @@
 // TODO: These tests render DropdownMenu (Ark UI Portal + state machine) which does not
 // work reliably in jsdom. Migrate to Playwright e2e tests for full interaction coverage.
+
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { FilterInputFieldMenu } from '../FilterInputMenu';
 import type { FieldMetadata } from '../types';
 
@@ -17,7 +18,7 @@ const mockFields: FieldMetadata[] = [
 describe.skip('FilterInputFieldMenu', () => {
   describe('field list display', () => {
     it('displays all fields by label', () => {
-      render(<FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />);
 
       for (const field of mockFields) {
         expect(screen.getByText(field.label)).toBeInTheDocument();
@@ -26,7 +27,7 @@ describe.skip('FilterInputFieldMenu', () => {
 
     it('returns null when open is false', () => {
       const { container } = render(
-        <FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={false} />,
+        <FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={false} />,
       );
 
       expect(container.firstChild).toBeNull();
@@ -37,7 +38,7 @@ describe.skip('FilterInputFieldMenu', () => {
     it('filters fields by label (case-insensitive)', async () => {
       const user = userEvent.setup();
 
-      render(<FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />);
 
       const searchInput = screen.getByPlaceholderText('Search fields...');
       await user.type(searchInput, 'count');
@@ -54,7 +55,7 @@ describe.skip('FilterInputFieldMenu', () => {
     it('filters fields by name (case-insensitive)', async () => {
       const user = userEvent.setup();
 
-      render(<FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />);
 
       const searchInput = screen.getByPlaceholderText('Search fields...');
       await user.type(searchInput, 'ip_add');
@@ -66,7 +67,7 @@ describe.skip('FilterInputFieldMenu', () => {
     it('shows empty state when no matches found', async () => {
       const user = userEvent.setup();
 
-      render(<FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />);
 
       const searchInput = screen.getByPlaceholderText('Search fields...');
       await user.type(searchInput, 'nonexistent');
@@ -76,7 +77,7 @@ describe.skip('FilterInputFieldMenu', () => {
 
     it('resets search query after field selection', async () => {
       const user = userEvent.setup();
-      const onSelect = vi.fn();
+      const onSelect = rs.fn();
 
       render(<FilterInputFieldMenu fields={mockFields} onSelect={onSelect} open={true} />);
 
@@ -93,7 +94,7 @@ describe.skip('FilterInputFieldMenu', () => {
   describe('field selection', () => {
     it('calls onSelect when field is clicked', async () => {
       const user = userEvent.setup();
-      const onSelect = vi.fn();
+      const onSelect = rs.fn();
 
       render(<FilterInputFieldMenu fields={mockFields} onSelect={onSelect} open={true} />);
 
@@ -106,8 +107,8 @@ describe.skip('FilterInputFieldMenu', () => {
 
     it('calls onOpenChange(false) after selection', async () => {
       const user = userEvent.setup();
-      const onSelect = vi.fn();
-      const onOpenChange = vi.fn();
+      const onSelect = rs.fn();
+      const onOpenChange = rs.fn();
 
       render(
         <FilterInputFieldMenu
@@ -135,7 +136,7 @@ describe.skip('FilterInputFieldMenu', () => {
       render(
         <FilterInputFieldMenu
           fields={mockFields}
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           open={true}
           recentFields={recentFields}
         />,
@@ -152,7 +153,7 @@ describe.skip('FilterInputFieldMenu', () => {
       render(
         <FilterInputFieldMenu
           fields={mockFields}
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           open={true}
           recentFields={manyRecentFields}
         />,
@@ -170,7 +171,7 @@ describe.skip('FilterInputFieldMenu', () => {
       render(
         <FilterInputFieldMenu
           fields={mockFields}
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           open={true}
           recentFields={recentFields}
         />,
@@ -192,7 +193,7 @@ describe.skip('FilterInputFieldMenu', () => {
       render(
         <FilterInputFieldMenu
           fields={mockFields}
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           open={true}
           recentFields={[mockFields[0]]} // Only IP Address
         />,
@@ -215,7 +216,7 @@ describe.skip('FilterInputFieldMenu', () => {
       render(
         <FilterInputFieldMenu
           fields={mockFields}
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           open={true}
           suggestedFields={suggestedFields}
         />,
@@ -232,7 +233,7 @@ describe.skip('FilterInputFieldMenu', () => {
       render(
         <FilterInputFieldMenu
           fields={mockFields}
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           open={true}
           suggestedFields={suggestedFields}
         />,
@@ -249,7 +250,7 @@ describe.skip('FilterInputFieldMenu', () => {
 
   describe('keyboard navigation hints', () => {
     it('displays keyboard navigation hints', () => {
-      render(<FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />);
 
       expect(screen.getByText('to navigate')).toBeInTheDocument();
       expect(screen.getByText('to select')).toBeInTheDocument();
@@ -261,7 +262,7 @@ describe.skip('FilterInputFieldMenu', () => {
 
   describe('accessibility', () => {
     it('has correct ARIA attributes', () => {
-      render(<FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />);
 
       const menu = screen.getByRole('menu');
       expect(menu).toHaveAttribute('aria-label', 'Filter fields');
@@ -269,14 +270,14 @@ describe.skip('FilterInputFieldMenu', () => {
     });
 
     it('has correct role attributes for menu items', () => {
-      render(<FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />);
 
       const menuItems = screen.getAllByRole('menuitem');
       expect(menuItems.length).toBe(mockFields.length);
     });
 
     it('search input is rendered', () => {
-      render(<FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />);
+      render(<FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />);
 
       const searchInput = screen.getByPlaceholderText('Search fields...');
       // Verify search input is in the document
@@ -290,7 +291,7 @@ describe.skip('FilterInputFieldMenu', () => {
       const { container } = render(
         <FilterInputFieldMenu
           fields={mockFields}
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           open={true}
           className='custom-class'
         />,
@@ -302,7 +303,7 @@ describe.skip('FilterInputFieldMenu', () => {
 
     it('has correct base styling', () => {
       const { container } = render(
-        <FilterInputFieldMenu fields={mockFields} onSelect={vi.fn()} open={true} />,
+        <FilterInputFieldMenu fields={mockFields} onSelect={rs.fn()} open={true} />,
       );
 
       const menu = container.querySelector('[data-slot="filter-input-field-menu"]');

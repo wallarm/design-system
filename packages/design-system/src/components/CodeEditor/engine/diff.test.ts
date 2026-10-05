@@ -1,6 +1,6 @@
 import { EditorState, type Extension } from '@codemirror/state';
 import { EditorView } from '@codemirror/view';
-import { afterEach, describe, expect, it, onTestFinished } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished } from '@rstest/core';
 import type { LineConfig } from '../../CodeSnippet/CodeSnippetContext';
 import { LINE_COLOR_STYLES } from '../../CodeSnippet/lib/lineStyles';
 import { createPortalRegistry } from '../lib/portalRegistry';

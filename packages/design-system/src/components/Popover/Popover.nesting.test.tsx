@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Button } from '../Button';
 import { Card } from '../Card';
@@ -18,8 +18,8 @@ import { PopoverTrigger } from './PopoverTrigger';
  */
 describe('PopoverTrigger inside a clickable Card', () => {
   it('trigger click resolves analytics and opens the popover without firing the Card onClick', async () => {
-    const cardClick = vi.fn();
-    const onOpenChange = vi.fn();
+    const cardClick = rs.fn();
+    const onOpenChange = rs.fn();
     const captured = captureAnalyticsClicks();
 
     render(
@@ -46,8 +46,8 @@ describe('PopoverTrigger inside a clickable Card', () => {
 
 describe('Button inside PopoverContent', () => {
   it('inner button click resolves analytics and does not dismiss the Popover', async () => {
-    const onOpenChange = vi.fn();
-    const onClick = vi.fn();
+    const onOpenChange = rs.fn();
+    const onClick = rs.fn();
 
     render(
       <Popover open onOpenChange={onOpenChange}>
@@ -75,8 +75,8 @@ describe('Button inside PopoverContent', () => {
 
 describe('Nested Popovers', () => {
   it('clicking the inner trigger does not dismiss the outer Popover', async () => {
-    const outerOpenChange = vi.fn();
-    const innerOpenChange = vi.fn();
+    const outerOpenChange = rs.fn();
+    const innerOpenChange = rs.fn();
     const captured = captureAnalyticsClicks();
 
     render(

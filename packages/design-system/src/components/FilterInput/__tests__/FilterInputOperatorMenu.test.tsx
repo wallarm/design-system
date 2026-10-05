@@ -1,15 +1,16 @@
 // TODO: These tests render DropdownMenu (Ark UI Portal + state machine) which does not
 // work reliably in jsdom. Migrate to Playwright e2e tests for full interaction coverage.
+
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { FilterInputOperatorMenu } from '../FilterInputMenu';
 import { OPERATOR_LABELS, OPERATORS_BY_TYPE } from '../lib';
 
 describe.skip('FilterInputOperatorMenu', () => {
   describe('operator filtering by field type', () => {
     it('displays operators for string field type', () => {
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={vi.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
 
       const stringOperators = OPERATORS_BY_TYPE.string;
       for (const operator of stringOperators) {
@@ -18,7 +19,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     });
 
     it('displays operators for integer field type', () => {
-      render(<FilterInputOperatorMenu fieldType='integer' onSelect={vi.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='integer' onSelect={rs.fn()} open={true} />);
 
       const integerOperators = OPERATORS_BY_TYPE.integer;
       // Check for numeric operators
@@ -33,7 +34,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     });
 
     it('displays operators for boolean field type', () => {
-      render(<FilterInputOperatorMenu fieldType='boolean' onSelect={vi.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='boolean' onSelect={rs.fn()} open={true} />);
 
       const booleanOperators = OPERATORS_BY_TYPE.boolean;
       const allButtons = screen.getAllByRole('menuitem');
@@ -41,7 +42,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     });
 
     it('displays operators for date field type', () => {
-      render(<FilterInputOperatorMenu fieldType='date' onSelect={vi.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='date' onSelect={rs.fn()} open={true} />);
 
       const dateOperators = OPERATORS_BY_TYPE.date;
       const allButtons = screen.getAllByRole('menuitem');
@@ -52,7 +53,7 @@ describe.skip('FilterInputOperatorMenu', () => {
   describe('operator selection', () => {
     it('calls onSelect when operator is clicked', async () => {
       const user = userEvent.setup();
-      const onSelect = vi.fn();
+      const onSelect = rs.fn();
 
       render(<FilterInputOperatorMenu fieldType='string' onSelect={onSelect} open={true} />);
 
@@ -65,8 +66,8 @@ describe.skip('FilterInputOperatorMenu', () => {
 
     it('calls onOpenChange(false) after selection', async () => {
       const user = userEvent.setup();
-      const onSelect = vi.fn();
-      const onOpenChange = vi.fn();
+      const onSelect = rs.fn();
+      const onOpenChange = rs.fn();
 
       render(
         <FilterInputOperatorMenu
@@ -88,7 +89,7 @@ describe.skip('FilterInputOperatorMenu', () => {
         <FilterInputOperatorMenu
           fieldType='string'
           selectedOperator='='
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           open={true}
         />,
       );
@@ -103,14 +104,14 @@ describe.skip('FilterInputOperatorMenu', () => {
   describe('open/closed state', () => {
     it('returns null when open is false', () => {
       const { container } = render(
-        <FilterInputOperatorMenu fieldType='string' onSelect={vi.fn()} open={false} />,
+        <FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={false} />,
       );
 
       expect(container.firstChild).toBeNull();
     });
 
     it('renders menu when open is true', () => {
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={vi.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
 
       const menu = screen.getByRole('menu');
       expect(menu).toBeInTheDocument();
@@ -121,7 +122,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     it('navigates down with ArrowDown key', async () => {
       const user = userEvent.setup();
 
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={vi.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
 
       const menu = screen.getByRole('menu');
       menu.focus();
@@ -136,7 +137,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     it('navigates up with ArrowUp key', async () => {
       const user = userEvent.setup();
 
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={vi.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
 
       const menu = screen.getByRole('menu');
       menu.focus();
@@ -150,7 +151,7 @@ describe.skip('FilterInputOperatorMenu', () => {
 
     it('selects highlighted item with Enter key', async () => {
       const user = userEvent.setup();
-      const onSelect = vi.fn();
+      const onSelect = rs.fn();
 
       render(<FilterInputOperatorMenu fieldType='string' onSelect={onSelect} open={true} />);
 
@@ -165,12 +166,12 @@ describe.skip('FilterInputOperatorMenu', () => {
 
     it('closes menu with Escape key', async () => {
       const user = userEvent.setup();
-      const onOpenChange = vi.fn();
+      const onOpenChange = rs.fn();
 
       render(
         <FilterInputOperatorMenu
           fieldType='string'
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           onOpenChange={onOpenChange}
           open={true}
         />,
@@ -187,7 +188,7 @@ describe.skip('FilterInputOperatorMenu', () => {
 
   describe('accessibility', () => {
     it('has correct ARIA attributes', () => {
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={vi.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
 
       const menu = screen.getByRole('menu');
       expect(menu).toHaveAttribute('aria-label', 'Filter operators');
@@ -195,7 +196,7 @@ describe.skip('FilterInputOperatorMenu', () => {
     });
 
     it('has correct role attributes for menu items', () => {
-      render(<FilterInputOperatorMenu fieldType='string' onSelect={vi.fn()} open={true} />);
+      render(<FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />);
 
       const menuItems = screen.getAllByRole('menuitem');
       expect(menuItems.length).toBeGreaterThan(0);
@@ -207,7 +208,7 @@ describe.skip('FilterInputOperatorMenu', () => {
       const { container } = render(
         <FilterInputOperatorMenu
           fieldType='string'
-          onSelect={vi.fn()}
+          onSelect={rs.fn()}
           open={true}
           className='custom-class'
         />,
@@ -219,7 +220,7 @@ describe.skip('FilterInputOperatorMenu', () => {
 
     it('has correct base styling', () => {
       const { container } = render(
-        <FilterInputOperatorMenu fieldType='string' onSelect={vi.fn()} open={true} />,
+        <FilterInputOperatorMenu fieldType='string' onSelect={rs.fn()} open={true} />,
       );
 
       const menu = container.querySelector('[data-slot="filter-operator-menu"]');

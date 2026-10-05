@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { captureAnalyticsClicks } from '../../testUtils/captureAnalyticsClicks';
 import { Tour } from './Tour';
 import { TourClose } from './TourClose';
@@ -124,7 +124,7 @@ describe('Auto-render opt-out', () => {
 
 describe('Handler composition', () => {
   it('fires consumer onClick on an action without blocking the tour transition', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     const steps: TourStepDetails[] = [
       {
         id: 'only',
@@ -174,7 +174,7 @@ describe('Auto-start lifecycle', () => {
   // useTour wiring drifted, every other test in this file would silently never
   // render the popover.
   it('renders the first step popover content', async () => {
-    const onMount = vi.fn();
+    const onMount = rs.fn();
     const Harness = () => {
       const tour = useTour({ steps: twoStepSteps, autoStart: true });
       useEffect(() => {

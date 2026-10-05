@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, rs } from '@rstest/core';
 import { adjustTextareaHeight } from './useAutoResize';
 
 function makeTextarea({
@@ -17,7 +17,7 @@ function makeTextarea({
   scrollHeight?: number;
 } = {}) {
   const textarea = document.createElement('textarea');
-  vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+  rs.spyOn(window, 'getComputedStyle').mockReturnValue({
     lineHeight,
     paddingTop,
     paddingBottom,

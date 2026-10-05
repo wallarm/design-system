@@ -23,6 +23,8 @@ These rules apply when creating or modifying any component file in `packages/des
 
 8. **Story imports** — Use `import type { Meta, StoryFn } from 'storybook-react-rsbuild'`.
 
+9. **React Compiler** — Components are compiled by React Compiler (all builds and unit tests). Follow the [Rules of React](https://react.dev/reference/rules): keep render pure — no reading or writing `ref.current` during render, no mutating props/state/module variables. `'use no memo'` (first statement of the file) is an escape hatch only — add it with a comment explaining why. In `src/components/Table/`, TanStack row/column/header/cell objects stay stable while their getters change: read getters in render only through `useTableValue` / `withTableState` (`Table/lib/tableReactivity.ts`), and call consumer callbacks that run inline in render (function `header`, `cell`, `renderMenuAction`, `renderExpandedRow`) only through `useRenderEveryTime` (`Table/lib/useRenderEveryTime.ts`) — see `TABLE_DESIGN.md` → React Compiler. Check bailouts with `pnpm compiler:audit` in `packages/design-system`.
+
 ## Forbidden Patterns
 
 - ❌ `any` type — use proper TypeScript types

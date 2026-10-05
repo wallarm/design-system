@@ -1,9 +1,9 @@
 import { type ReactElement, useState } from 'react';
+import { beforeEach, describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
 
-vi.mock('../../../hooks', () => ({
-  useOverflowItems: vi.fn(),
+rs.mock('../../../hooks', () => ({
+  useOverflowItems: rs.fn(),
 }));
 
 import { useOverflowItems } from '../../../hooks';
@@ -20,7 +20,7 @@ const mockHook = (visibleItems: string[], hiddenItems: string[]) => {
     hiddenCount: hiddenItems.length,
     MeasurementContainer: () => null as unknown as ReactElement,
   };
-  vi.mocked(useOverflowItems).mockReturnValue(value as never);
+  rs.mocked(useOverflowItems).mockReturnValue(value as never);
 };
 
 const items = ['a', 'b', 'c', 'd'];
@@ -29,7 +29,7 @@ const overflowRenderer = (hidden: string[]) => <span>+{hidden.length}</span>;
 
 describe('OverflowList', () => {
   beforeEach(() => {
-    vi.mocked(useOverflowItems).mockReset();
+    rs.mocked(useOverflowItems).mockReset();
   });
 
   it('renders visible items and the overflow indicator for hidden items', () => {
@@ -90,7 +90,7 @@ describe('OverflowList', () => {
 
   it('calls onOverflow with hidden items', () => {
     mockHook(['a'], ['b', 'c', 'd']);
-    const onOverflow = vi.fn();
+    const onOverflow = rs.fn();
     render(
       <OverflowList
         items={items}
@@ -107,7 +107,7 @@ describe('OverflowList', () => {
     // changes every render. Without the shallow-equality guard, a parent that
     // sets state in onOverflow would cause an infinite render loop.
     mockHook(['a'], ['b', 'c', 'd']);
-    const onOverflow = vi.fn();
+    const onOverflow = rs.fn();
 
     // OverflowList is memoized; force re-render via parent state and pass a new
     // `items` array each time so the memo's shallow-equality check on `items` is
@@ -139,7 +139,7 @@ describe('OverflowList', () => {
 
   it('fires onOverflow again when the hidden set actually changes', () => {
     mockHook(['a'], ['b', 'c', 'd']);
-    const onOverflow = vi.fn();
+    const onOverflow = rs.fn();
 
     let trigger: (() => void) | null = null;
     const Harness = () => {

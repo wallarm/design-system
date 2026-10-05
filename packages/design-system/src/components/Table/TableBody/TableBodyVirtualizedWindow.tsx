@@ -107,7 +107,15 @@ export const TableBodyVirtualizedWindow: FC = () => {
 
   useSmoothScrollOnSort(table, getScrollElement);
 
-  return <TableBodyVirtualizedCore tbodyRef={tbodyRef} virtualizer={virtualizer} />;
+  return (
+    <TableBodyVirtualizedCore
+      tbodyRef={tbodyRef}
+      virtualRows={virtualizer.getVirtualItems()}
+      totalSize={virtualizer.getTotalSize()}
+      scrollMargin={virtualizer.options.scrollMargin}
+      measureElement={virtualizer.measureElement}
+    />
+  );
 };
 
 TableBodyVirtualizedWindow.displayName = 'TableBodyVirtualizedWindow';

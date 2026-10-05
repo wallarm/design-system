@@ -12,7 +12,12 @@ import {
 } from '../../DropdownMenu';
 import { Kbd } from '../../Kbd/Kbd';
 import { KbdGroup } from '../../Kbd/KbdGroup';
-import { getOperatorLabel, OPERATOR_SYMBOLS, OPERATORS_BY_TYPE } from '../lib';
+import {
+  getOperatorLabel,
+  keepOpenOnMenuHandoff,
+  OPERATOR_SYMBOLS,
+  OPERATORS_BY_TYPE,
+} from '../lib';
 import type { FieldType, FilterInputDropdownItem, FilterOperator } from '../types';
 import { useKeyboardNav } from './hooks/useKeyboardNav';
 import { MenuEmptyState } from './MenuEmptyState';
@@ -148,6 +153,7 @@ export const FilterInputOperatorMenu: FC<FilterInputOperatorMenuProps> = ({
     <DropdownMenu
       open={open}
       onOpenChange={onOpenChange}
+      onRequestDismiss={keepOpenOnMenuHandoff}
       closeOnSelect={false}
       positioning={positioning}
       highlightedValue={highlightedValue}

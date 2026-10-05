@@ -686,7 +686,8 @@ export const createLargeSecurityEvents = (count = 1000): SecurityEvent[] =>
     return {
       ...base,
       id: String(i + 1),
-      requests: Math.round(Math.random() * 100_000),
+      // Deterministic pseudo-random spread so visual snapshots are stable across runs.
+      requests: (i * 2_654_435_761) % 100_000,
       firstDetected: `2026-01-${String((i % 28) + 1).padStart(2, '0')}T${String(i % 24).padStart(2, '0')}:00:00`,
     };
   });

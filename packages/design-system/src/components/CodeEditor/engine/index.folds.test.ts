@@ -1,5 +1,5 @@
 import { runScopeHandlers } from '@codemirror/view';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import type { SyntaxAdapter } from '../../CodeSnippet/adapters';
 import type { FoldRegion } from '../../CodeSnippet/lib/foldUtils';
 import { createPortalRegistry } from '../lib/portalRegistry';
@@ -38,9 +38,9 @@ const handles: EditorHandle[] = [];
 
 const create = (folds: FoldRegion[] | undefined) => {
   const callbacks: EngineCallbacks = {
-    onChange: vi.fn(),
-    onDiagnosticsChange: vi.fn(),
-    onVisibleRowCountChange: vi.fn(),
+    onChange: rs.fn(),
+    onDiagnosticsChange: rs.fn(),
+    onVisibleRowCountChange: rs.fn(),
     portals: createPortalRegistry(),
   };
   const parent = document.body.appendChild(document.createElement('div'));

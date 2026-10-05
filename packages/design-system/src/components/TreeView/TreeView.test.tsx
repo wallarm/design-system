@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { TreeView } from './TreeView';
 import { TreeViewItem } from './TreeViewItem';
 
@@ -146,7 +146,7 @@ describe('Analytics-readiness', () => {
   });
 
   it('calls the consumer onClick', async () => {
-    const onClick = vi.fn();
+    const onClick = rs.fn();
     render(
       <TreeView>
         <TreeViewItem onClick={onClick}>Item</TreeViewItem>
@@ -194,7 +194,7 @@ describe('Expand / collapse', () => {
   });
 
   it('calls onOpenChange when toggled', async () => {
-    const onOpenChange = vi.fn();
+    const onOpenChange = rs.fn();
     const { container } = render(
       <TreeView>
         <TreeViewItem defaultOpen={false} onOpenChange={onOpenChange}>
@@ -228,7 +228,7 @@ describe('Expand / collapse', () => {
 
 describe('Selection', () => {
   it('selects a row on click and marks aria-selected', async () => {
-    const onSelectionChange = vi.fn();
+    const onSelectionChange = rs.fn();
     render(
       <TreeView selectable onSelectionChange={onSelectionChange}>
         <TreeViewItem id='a'>Alpha</TreeViewItem>
@@ -246,7 +246,7 @@ describe('Selection', () => {
   });
 
   it('replaces selection in single-select mode', async () => {
-    const onSelectionChange = vi.fn();
+    const onSelectionChange = rs.fn();
     render(
       <TreeView selectable onSelectionChange={onSelectionChange}>
         <TreeViewItem id='a'>Alpha</TreeViewItem>
@@ -261,7 +261,7 @@ describe('Selection', () => {
   });
 
   it('accumulates selection in multi-select mode', async () => {
-    const onSelectionChange = vi.fn();
+    const onSelectionChange = rs.fn();
     render(
       <TreeView selectable multiSelect onSelectionChange={onSelectionChange}>
         <TreeViewItem id='a'>Alpha</TreeViewItem>
@@ -276,7 +276,7 @@ describe('Selection', () => {
   });
 
   it('does not select the row when the toggle is clicked', async () => {
-    const onSelectionChange = vi.fn();
+    const onSelectionChange = rs.fn();
     const { container } = render(
       <TreeView selectable onSelectionChange={onSelectionChange}>
         <TreeViewItem id='a'>
@@ -295,7 +295,7 @@ describe('Selection', () => {
 
 describe('Disabled', () => {
   it('marks the row aria-disabled and does not select on click', async () => {
-    const onSelectionChange = vi.fn();
+    const onSelectionChange = rs.fn();
     render(
       <TreeView selectable onSelectionChange={onSelectionChange}>
         <TreeViewItem id='a' disabled>
@@ -353,7 +353,7 @@ describe('Keyboard', () => {
   });
 
   it('selects a row with Enter', async () => {
-    const onSelectionChange = vi.fn();
+    const onSelectionChange = rs.fn();
     render(
       <TreeView selectable onSelectionChange={onSelectionChange}>
         <TreeViewItem id='a'>Alpha</TreeViewItem>

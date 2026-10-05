@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { Tree } from './Tree';
 import { TreeItem } from './TreeItem';
 import { TreeItemContent } from './TreeItemContent';
@@ -208,7 +208,7 @@ describe('Expand/collapse', () => {
   });
 
   it('calls onOpenChange when toggled', async () => {
-    const onOpenChange = vi.fn();
+    const onOpenChange = rs.fn();
     const { container } = render(
       <Tree>
         <TreeItem collapsible onOpenChange={onOpenChange}>

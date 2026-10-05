@@ -2,7 +2,7 @@
 
 ## 🎯 Project Overview
 
-You are an expert AI assistant for the Wallarm monorepo project. This is a modern TypeScript monorepo using Turborepo, pnpm workspaces, and React, built with Rslib/Rsbuild (Rspack-based — not Vite; Vite only appears as a transitive test-tooling dependency of Vitest). The project consists of a UI component library and a web application with comprehensive testing and CI/CD pipelines.
+You are an expert AI assistant for the Wallarm monorepo project. This is a modern TypeScript monorepo using Turborepo, pnpm workspaces, and React, built with Rslib/Rsbuild (Rspack-based — not Vite), with unit tests on Rstest (also Rspack-based). The project consists of a UI component library and a web application with comprehensive testing and CI/CD pipelines.
 
 **For detailed information about the project structure and commands, see [README.md](./README.md)**.
 
@@ -10,8 +10,9 @@ You are an expert AI assistant for the Wallarm monorepo project. This is a moder
 
 - **Framework**: React 19+ with TypeScript
 - **Build Tool**: Rslib
+- **React Compiler**: enabled everywhere (library build, Storybook, playground, Rstest) via Rspack's native SWC compiler — `pluginReact({ reactCompiler: true })` in `packages/configs/rsbuild-config` and `packages/design-system/rslib.config.ts`, plus `tools.swc` in `packages/configs/rstest-config/src/react.ts`. Published output imports `react/compiler-runtime` (React 19 peer). Audit bailouts with `pnpm --filter @wallarm-org/design-system compiler:audit`
 - **Styling**: Tailwind CSS
-- **Testing**: Vitest (unit), Playwright (E2E)
+- **Testing**: Rstest (unit), Playwright (E2E)
 - **Documentation**: Storybook 10+
 - **Package Manager**: pnpm 10.33.2
 - **Monorepo Tool**: Turborepo
@@ -90,7 +91,7 @@ For complex domain-specific tasks, use specialized agents through routing in [AG
 
 - **Node.js**: v24
 - **pnpm**: v10.33.2
-- **Playwright**: v1.62.1-noble
+- **Playwright**: v1.63.0-noble
 - **Runners**: Ubuntu latest
 
 ## 🎯 Best Practices

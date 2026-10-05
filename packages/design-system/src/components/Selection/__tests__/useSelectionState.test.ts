@@ -1,5 +1,5 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { act, renderHook } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { useSelectionState } from '../useSelectionState';
 
 interface Item {
@@ -10,7 +10,7 @@ const items: Item[] = [{ id: 'a' }, { id: 'b' }, { id: 'c' }, { id: 'd' }];
 const getItemId = (item: Item) => item.id;
 
 const setup = (initial: string[] = []) => {
-  const onChange = vi.fn();
+  const onChange = rs.fn();
   let currentValue: string[] = initial;
   const { result, rerender } = renderHook(
     ({ value }: { value: string[] }) =>
@@ -96,7 +96,7 @@ describe('useSelectionState', () => {
     });
 
     it('isAllSelected false / isIndeterminate false when items is empty', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const { result } = renderHook(() =>
         useSelectionState({ items: [] as Item[], getItemId, value: [], onChange }),
       );
@@ -114,7 +114,7 @@ describe('useSelectionState', () => {
 
   describe('disabled support', () => {
     const setupWithDisabled = (initial: string[], disabled: string[]) => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       let currentValue: string[] = initial;
       const disabledIds = new Set(disabled);
       const { result, rerender } = renderHook(
@@ -212,7 +212,7 @@ describe('useSelectionState', () => {
     });
 
     it('range skips disabled ids', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const value: string[] = [];
       const { result, rerender } = renderHook(
         ({ value, disabledIds }) =>
@@ -236,7 +236,7 @@ describe('useSelectionState', () => {
     });
 
     it('does not update lastToggledId on a no-op (disabled)', () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const value: string[] = [];
       const { result, rerender } = renderHook(
         ({ value, disabledIds }) =>

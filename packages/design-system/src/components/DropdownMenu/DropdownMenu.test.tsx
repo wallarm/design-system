@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { Button } from '../Button';
 import { DropdownMenu } from './DropdownMenu';
 import { DropdownMenuCheckboxItem } from './DropdownMenuCheckboxItem';
@@ -147,7 +147,7 @@ describe('Attribute pass-through', () => {
 
 describe('Handler composition', () => {
   it('consumer onSelect on DropdownMenuItem fires when item is selected', async () => {
-    const onSelect = vi.fn();
+    const onSelect = rs.fn();
 
     render(
       <DropdownMenu defaultOpen>

@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { act, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import { InlineEdit } from './InlineEdit';
 import { InlineEditControl } from './InlineEditControl';
 import { InlineEditError } from './InlineEditError';
@@ -32,7 +32,7 @@ function Example({
 
 describe('InlineEdit standalone integration', () => {
   it('click → type → Enter commits the new value', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(<Example onCommit={onCommit} />);
     await userEvent.click(screen.getByTestId('ie--preview'));
     const input = screen.getByTestId('ie--input') as HTMLInputElement;
@@ -43,8 +43,8 @@ describe('InlineEdit standalone integration', () => {
   });
 
   it('Escape reverts, calls onValueRevert, and does not commit', async () => {
-    const onCommit = vi.fn();
-    const onRevert = vi.fn();
+    const onCommit = rs.fn();
+    const onRevert = rs.fn();
     render(<Example onCommit={onCommit} onRevert={onRevert} />);
     await userEvent.click(screen.getByTestId('ie--preview'));
     await userEvent.type(screen.getByTestId('ie--input'), 'x');
@@ -54,7 +54,7 @@ describe('InlineEdit standalone integration', () => {
   });
 
   it('render-prop editor commits through the same lifecycle', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(
       <InlineEdit defaultValue='v' onValueCommit={onCommit} data-testid='rp'>
         <InlineEditPreview>v</InlineEditPreview>
@@ -77,7 +77,7 @@ describe('InlineEdit standalone integration', () => {
 
 describe('InlineEdit action buttons', () => {
   it('clicking Save commits the value', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(<Example onCommit={onCommit} />);
     await userEvent.click(screen.getByTestId('ie--preview'));
     const input = screen.getByTestId('ie--input') as HTMLInputElement;
@@ -89,8 +89,8 @@ describe('InlineEdit action buttons', () => {
   });
 
   it('clicking Cancel reverts without committing', async () => {
-    const onCommit = vi.fn();
-    const onRevert = vi.fn();
+    const onCommit = rs.fn();
+    const onRevert = rs.fn();
     render(<Example onCommit={onCommit} onRevert={onRevert} />);
     await userEvent.click(screen.getByTestId('ie--preview'));
     await userEvent.type(screen.getByTestId('ie--input'), 'x');
@@ -109,7 +109,7 @@ describe('InlineEdit action buttons', () => {
   });
 
   it('Enter on a focused action button does not double-fire submit', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(<Example onCommit={onCommit} />);
     await userEvent.click(screen.getByTestId('ie--preview'));
     screen.getByRole('button', { name: 'Save' }).focus();
@@ -162,9 +162,9 @@ describe('InlineEdit commit guard integration', () => {
 
   it('ignores focus loss while the guard is pending (submitMode enter would cancel)', async () => {
     const d = deferredBoolean();
-    const guard = vi.fn(() => d.promise);
-    const onCommit = vi.fn();
-    const onRevert = vi.fn();
+    const guard = rs.fn(() => d.promise);
+    const onCommit = rs.fn();
+    const onRevert = rs.fn();
     render(
       <GuardedExample guard={guard} onCommit={onCommit} onRevert={onRevert} submitMode='enter' />,
     );
@@ -185,8 +185,8 @@ describe('InlineEdit commit guard integration', () => {
 
   it('does not re-submit on blur while the guard is pending (submitMode both)', async () => {
     const d = deferredBoolean();
-    const guard = vi.fn(() => d.promise);
-    const onCommit = vi.fn();
+    const guard = rs.fn(() => d.promise);
+    const onCommit = rs.fn();
     render(<GuardedExample guard={guard} onCommit={onCommit} submitMode='both' />);
     await userEvent.click(screen.getByTestId('g--preview'));
     const input = screen.getByTestId('g--input');
@@ -209,7 +209,7 @@ describe('InlineEdit commit guard integration', () => {
     // is a non-restoring surface, so focus stays where it left — the field
     // simply remains in edit mode with the draft intact.
     const d = deferredBoolean();
-    const guard = vi.fn(() => d.promise);
+    const guard = rs.fn(() => d.promise);
     render(<GuardedExample guard={guard} />);
     await userEvent.click(screen.getByTestId('g--preview'));
     const input = screen.getByTestId('g--input');
@@ -231,7 +231,7 @@ describe('InlineEdit commit guard integration', () => {
     // focus inside its own invocation — the resulting blur-submit fires in
     // the same tick, before any re-render. The token is set before the guard
     // runs, so the re-entrant submit must be a no-op.
-    const guard = vi.fn(() => {
+    const guard = rs.fn(() => {
       screen.getByText('outside').focus();
       return new Promise<boolean>(() => {}); // never settles
     });
@@ -246,9 +246,9 @@ describe('InlineEdit commit guard integration', () => {
 
   it('Escape during a pending guard cancels and defuses the resolution', async () => {
     const d = deferredBoolean();
-    const guard = vi.fn(() => d.promise);
-    const onCommit = vi.fn();
-    const onRevert = vi.fn();
+    const guard = rs.fn(() => d.promise);
+    const onCommit = rs.fn();
+    const onRevert = rs.fn();
     render(<GuardedExample guard={guard} onCommit={onCommit} onRevert={onRevert} />);
     await userEvent.click(screen.getByTestId('g--preview'));
     const input = screen.getByTestId('g--input');

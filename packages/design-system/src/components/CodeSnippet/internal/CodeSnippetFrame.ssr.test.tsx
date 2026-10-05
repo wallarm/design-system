@@ -1,7 +1,7 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { act } from '@testing-library/react';
 import { hydrateRoot } from 'react-dom/client';
 import { renderToString } from 'react-dom/server';
-import { describe, expect, it, vi } from 'vitest';
 import { CodeSnippetFrame } from './CodeSnippetFrame';
 
 const noop = () => {
@@ -26,7 +26,7 @@ describe('CodeSnippetFrame SSR', () => {
     const container = document.createElement('div');
     container.innerHTML = renderToString(<Frame />);
     document.body.appendChild(container);
-    const onRecoverableError = vi.fn();
+    const onRecoverableError = rs.fn();
 
     const root = await act(async () => hydrateRoot(container, <Frame />, { onRecoverableError }));
 

@@ -5,5 +5,5 @@
     "noEmit": false,
     "outDir": "dist"
   },
-  "include": ["vitest.config.ts", "**/*.test.*", "**/*.spec.*"]
+  "include": ["rstest.config.ts", "**/*.test.*", "**/*.spec.*"]
 }

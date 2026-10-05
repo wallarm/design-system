@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it } from '@rstest/core';
 import { detectDataChange } from '../detectDataChange';
 
 const rows = (...ids: string[]) => ids.map(id => ({ id }));

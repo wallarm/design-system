@@ -1,8 +1,8 @@
 import { act, createRef, StrictMode } from 'react';
 import { EditorView } from '@codemirror/view';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { afterEach, describe, expect, it, vi } from 'vitest';
 import { copyText } from '../../utils/copyText';
 import {
   CodeSnippetActions,
@@ -16,8 +16,8 @@ import {
 import { type CodeEditorApi, CodeEditorContent, CodeEditorRoot, useCodeEditor } from './index';
 import { loadEngine } from './lib/loadEngine';
 
-vi.mock('../../utils/copyText', () => ({
-  copyText: vi.fn(() => Promise.resolve()),
+rs.mock('../../utils/copyText', () => ({
+  copyText: rs.fn(() => Promise.resolve()),
 }));
 
 const makeValue = (lineCount: number) =>
@@ -34,8 +34,8 @@ const WrapProbe = () => {
 };
 
 afterEach(() => {
-  vi.mocked(copyText).mockClear();
-  vi.restoreAllMocks();
+  rs.mocked(copyText).mockClear();
+  rs.restoreAllMocks();
 });
 
 describe('CodeEditor', () => {
@@ -129,7 +129,7 @@ describe('CodeEditor', () => {
     });
 
     it('leaves exactly one editor under StrictMode, logs no errors and cleans up on unmount', async () => {
-      const consoleError = vi.spyOn(console, 'error');
+      const consoleError = rs.spyOn(console, 'error');
       const { unmount } = render(
         <StrictMode>
           <CodeEditorRoot data-testid='s' defaultValue='x'>
@@ -147,8 +147,8 @@ describe('CodeEditor', () => {
     });
 
     it('does not throw or warn when unmounted before the engine resolves', async () => {
-      const consoleError = vi.spyOn(console, 'error');
-      const consoleWarn = vi.spyOn(console, 'warn');
+      const consoleError = rs.spyOn(console, 'error');
+      const consoleWarn = rs.spyOn(console, 'warn');
       const { unmount } = render(
         <CodeEditorRoot data-testid='ed' defaultValue='x'>
           <CodeEditorContent aria-label='Code' />
@@ -166,7 +166,7 @@ describe('CodeEditor', () => {
     });
 
     it('warns in development when the editor has no accessible name', async () => {
-      const consoleWarn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const consoleWarn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
       render(
         <CodeEditorRoot data-testid='ed' defaultValue='x'>
           <CodeEditorContent />
@@ -178,7 +178,7 @@ describe('CodeEditor', () => {
     });
 
     it('throws when CodeEditorContent is rendered outside CodeEditorRoot', () => {
-      vi.spyOn(console, 'error').mockImplementation(() => undefined);
+      rs.spyOn(console, 'error').mockImplementation(() => undefined);
       expect(() => render(<CodeEditorContent aria-label='Code' />)).toThrow(
         'CodeEditor components must be used within CodeEditorRoot',
       );
@@ -187,7 +187,7 @@ describe('CodeEditor', () => {
 
   describe('value', () => {
     it('fires onChange for edits made through apiRef and keeps the uncontrolled value', async () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const apiRef = createRef<CodeEditorApi>();
       render(
         <CodeEditorRoot data-testid='ed' defaultValue='abc' onChange={onChange} apiRef={apiRef}>
@@ -205,7 +205,7 @@ describe('CodeEditor', () => {
     });
 
     it('syncs a new controlled value into the document without firing onChange', async () => {
-      const onChange = vi.fn();
+      const onChange = rs.fn();
       const apiRef = createRef<CodeEditorApi>();
       const { rerender } = render(
         <CodeEditorRoot data-testid='ed' value='first' onChange={onChange} apiRef={apiRef}>
@@ -260,7 +260,7 @@ describe('CodeEditor', () => {
 
   describe('chrome', () => {
     it('copies the edited document and calls onCopy with it', async () => {
-      const onCopy = vi.fn();
+      const onCopy = rs.fn();
       const apiRef = createRef<CodeEditorApi>();
       render(
         <CodeEditorRoot data-testid='ed' defaultValue='abc' onCopy={onCopy} apiRef={apiRef}>
@@ -282,7 +282,7 @@ describe('CodeEditor', () => {
     });
 
     it('toggles uncontrolled wrapping and reports it through onWrapLinesChange', async () => {
-      const onWrapLinesChange = vi.fn();
+      const onWrapLinesChange = rs.fn();
       render(
         <CodeEditorRoot data-testid='ed' defaultValue='x' onWrapLinesChange={onWrapLinesChange}>
           <CodeSnippetHeader>
@@ -302,7 +302,7 @@ describe('CodeEditor', () => {
     });
 
     it('respects controlled wrapLines', async () => {
-      const onWrapLinesChange = vi.fn();
+      const onWrapLinesChange = rs.fn();
       render(
         <CodeEditorRoot
           data-testid='ed'
@@ -349,7 +349,7 @@ describe('CodeEditor', () => {
     });
 
     it('re-measures the editor when fullscreen toggles', async () => {
-      const requestMeasure = vi.spyOn(EditorView.prototype, 'requestMeasure');
+      const requestMeasure = rs.spyOn(EditorView.prototype, 'requestMeasure');
       render(
         <CodeEditorRoot data-testid='ed' defaultValue='x'>
           <CodeSnippetHeader>
@@ -450,7 +450,7 @@ describe('CodeEditor', () => {
     });
 
     it('keeps className and handlers on the wrapper, which receives bubbled keydown', async () => {
-      const onKeyDown = vi.fn();
+      const onKeyDown = rs.fn();
       render(
         <CodeEditorRoot data-testid='ed' defaultValue='x'>
           <CodeEditorContent aria-label='Code' className='custom-wrapper' onKeyDown={onKeyDown} />
@@ -481,7 +481,7 @@ describe('CodeEditor', () => {
     });
 
     it('warns once when documentId is used without a controlled value', async () => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
       const { rerender } = render(
         <CodeEditorRoot data-testid='ed' defaultValue='a' documentId='one'>
           <CodeEditorContent aria-label='Code' />
@@ -502,7 +502,7 @@ describe('CodeEditor', () => {
     });
 
     it('does not warn about documentId with a controlled value', async () => {
-      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
+      const warn = rs.spyOn(console, 'warn').mockImplementation(() => undefined);
       render(
         <CodeEditorRoot data-testid='ed' value='a' documentId='one'>
           <CodeEditorContent aria-label='Code' />

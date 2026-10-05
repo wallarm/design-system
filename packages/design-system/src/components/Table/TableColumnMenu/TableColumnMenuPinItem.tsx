@@ -1,6 +1,7 @@
 import type { FC } from 'react';
 import { Pin, PinOff } from '../../../icons';
 import { DropdownMenuItem, type DropdownMenuItemProps } from '../../DropdownMenu';
+import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 import { useTableColumnMenuContext } from './TableColumnMenu';
 
@@ -20,9 +21,9 @@ export const TableColumnMenuPinItem: FC<TableColumnMenuPinItemProps> = ({
   const { column } = useTableColumnMenuContext();
   const ctx = useTableContext();
 
-  const isPinned = column.getIsPinned();
+  const isPinned = useTableValue(() => column.getIsPinned());
   const isAlwaysPinned = ctx.alwaysPinnedLeft.includes(column.id);
-  const canPin = ctx.pinningEnabled && column.getCanPin() && !isAlwaysPinned;
+  const canPin = useTableValue(() => ctx.pinningEnabled && column.getCanPin()) && !isAlwaysPinned;
 
   if (!canPin) return null;
 

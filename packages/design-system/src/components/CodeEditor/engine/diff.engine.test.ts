@@ -1,5 +1,5 @@
 import { getChunks, getOriginalDoc } from '@codemirror/merge';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, rs } from '@rstest/core';
 import type { SyntaxAdapter } from '../../CodeSnippet/adapters/types';
 import { createPortalRegistry } from '../lib/portalRegistry';
 import { DIFF_INSERTED_CLASS } from './diff';
@@ -52,9 +52,9 @@ const mount = (overrides: Partial<EngineOptions>) => {
   document.body.append(parent);
   let options = baseOptions(overrides);
   const handle = createEditor(parent, options, {
-    onChange: vi.fn(),
-    onDiagnosticsChange: vi.fn(),
-    onVisibleRowCountChange: vi.fn(),
+    onChange: rs.fn(),
+    onDiagnosticsChange: rs.fn(),
+    onVisibleRowCountChange: rs.fn(),
     portals: createPortalRegistry(),
   });
   handles.push(handle);
@@ -145,14 +145,14 @@ describe('createEditor — diff compartment', () => {
   });
 
   it('counts deleted rows in the visible row count', () => {
-    const onVisibleRowCountChange = vi.fn();
+    const onVisibleRowCountChange = rs.fn();
     const parent = document.body.appendChild(document.createElement('div'));
     const handle = createEditor(
       parent,
       baseOptions({ value: 'a\nb', original: 'a\n1\n2\n3\n4\n5\n6\nb' }),
       {
-        onChange: vi.fn(),
-        onDiagnosticsChange: vi.fn(),
+        onChange: rs.fn(),
+        onDiagnosticsChange: rs.fn(),
         onVisibleRowCountChange,
         portals: createPortalRegistry(),
       },
@@ -166,7 +166,7 @@ describe('createEditor — diff compartment', () => {
   });
 
   it('does not count deleted rows hidden inside a collapsed fold', () => {
-    const onVisibleRowCountChange = vi.fn();
+    const onVisibleRowCountChange = rs.fn();
     const parent = document.body.appendChild(document.createElement('div'));
     const handle = createEditor(
       parent,
@@ -176,8 +176,8 @@ describe('createEditor — diff compartment', () => {
         folds: [{ id: 'middle', startLine: 2, endLine: 4, defaultCollapsed: true }],
       }),
       {
-        onChange: vi.fn(),
-        onDiagnosticsChange: vi.fn(),
+        onChange: rs.fn(),
+        onDiagnosticsChange: rs.fn(),
         onVisibleRowCountChange,
         portals: createPortalRegistry(),
       },
@@ -193,7 +193,7 @@ describe('createEditor — diff compartment', () => {
     const { handle, rerender } = mount({ value: 'a\nb\nc', original: 'a\nc' });
     const gutters = handle.view.dom.querySelector('.cm-gutters');
     const numbers = handle.view.dom.querySelector('.cm-lineNumbers');
-    const spy = vi.spyOn(handle.view, 'dispatch');
+    const spy = rs.spyOn(handle.view, 'dispatch');
     rerender({ original: 'b\nc' });
     const effects = spy.mock.calls.flatMap(([spec]) =>
       spec && 'effects' in spec && spec.effects ? [spec.effects].flat() : [],

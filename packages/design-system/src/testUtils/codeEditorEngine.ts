@@ -1,5 +1,5 @@
 import type { EditorView } from '@codemirror/view';
-import { type Mock, vi } from 'vitest';
+import { type Mock, rs } from '@rstest/core';
 import { createEditor } from '../components/CodeEditor/engine';
 import type {
   EditorHandle,
@@ -59,9 +59,9 @@ export const mountEngine = (overrides: Partial<EngineOptions> = {}): MountedEngi
   const parent = document.createElement('div');
   document.body.append(parent);
   const callbacks = {
-    onChange: vi.fn<EngineCallbacks['onChange']>(),
-    onDiagnosticsChange: vi.fn<EngineCallbacks['onDiagnosticsChange']>(),
-    onVisibleRowCountChange: vi.fn<EngineCallbacks['onVisibleRowCountChange']>(),
+    onChange: rs.fn<EngineCallbacks['onChange']>(),
+    onDiagnosticsChange: rs.fn<EngineCallbacks['onDiagnosticsChange']>(),
+    onVisibleRowCountChange: rs.fn<EngineCallbacks['onVisibleRowCountChange']>(),
   };
   let options = engineOptions(overrides);
   const handle = createEditor(parent, options, { ...callbacks, portals: createPortalRegistry() });

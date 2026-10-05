@@ -4,6 +4,7 @@ import { GripVertical } from '../../../icons';
 import { cn } from '../../../utils/cn';
 import { useTestId } from '../../../utils/testId';
 import { Switch, SwitchControl, SwitchLabel, type SwitchProps } from '../../Switch';
+import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
 
 export interface TableSettingsMenuItemProps
@@ -26,6 +27,8 @@ export const TableSettingsMenuItem = ({
   const switchTestId = useTestId(`settings-menu-item-${columnId}`, testIdProp);
 
   const column = table.getColumn(columnId);
+  const isVisible = useTableValue(() => column?.getIsVisible() ?? false);
+  const canHide = useTableValue(() => column?.getCanHide() ?? false);
 
   const isMasterColumn = column?.id === masterColumnId;
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -36,8 +39,6 @@ export const TableSettingsMenuItem = ({
   // Guard against a consumer-supplied override that targets a non-existent column.
   if (!column) return null;
 
-  const isVisible = column.getIsVisible();
-  const canHide = column.getCanHide();
   const header = typeof column.columnDef.header === 'string' ? column.columnDef.header : column.id;
 
   const style = {

@@ -2,6 +2,7 @@ import { type CSSProperties, type FC, type HTMLAttributes, type ReactNode, useMe
 import { Popover as ArkUiPopover, usePopoverContext } from '@ark-ui/react';
 import { Portal as ArkUiPortal } from '@ark-ui/react/portal';
 import { cn } from '../../utils/cn';
+import { useLayerZIndexRef } from '../../utils/syncLayerZIndex';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import { POPOVER_MAX_HEIGHT, POPOVER_MAX_WIDTH, POPOVER_MIN_WIDTH } from './constants';
 import type { PopoverSizeDimension } from './types';
@@ -29,6 +30,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
   const testId = useTestId('content', testIdProp);
   const { getContentProps } = usePopoverContext();
   const { id } = getContentProps();
+  const contentRef = useLayerZIndexRef<HTMLDivElement>();
 
   const style = useMemo(
     () =>
@@ -46,6 +48,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
       <ArkUiPopover.Positioner>
         <ArkUiPopover.Content
           {...rest}
+          ref={contentRef}
           id={id}
           data-testid={testId}
           style={style}

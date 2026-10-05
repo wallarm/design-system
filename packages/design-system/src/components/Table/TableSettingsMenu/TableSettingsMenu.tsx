@@ -44,6 +44,7 @@ import {
   TABLE_DRAG_HANDLE_COLUMN_ID,
   TABLE_EXPAND_COLUMN_ID,
   TABLE_SELECT_COLUMN_ID,
+  withTableState,
 } from '../lib';
 import { useTableContext } from '../TableContext';
 import { TableSettingsMenuContentProvider } from './TableSettingsMenuContentContext';
@@ -156,8 +157,9 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
     return { sections, ungrouped };
   }, [columnGroups, filteredColumns]);
 
-  // Split into pinned (including master) and unpinned groups
-  const { pinnedColumns, unpinnedColumns } = useMemo(() => {
+  // Split into pinned (including master) and unpinned groups. Reads
+  // `getIsPinned()`, so it re-runs on every table state change.
+  const { pinnedColumns, unpinnedColumns } = withTableState(table.state, () => {
     const pinned: typeof filteredColumns = [];
     const unpinned: typeof filteredColumns = [];
     for (const col of filteredColumns) {
@@ -168,7 +170,7 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
       }
     }
     return { pinnedColumns: pinned, unpinnedColumns: unpinned };
-  }, [filteredColumns]);
+  });
 
   // Override map: collect consumer-supplied sub-component overrides from children
   const { searchOverride, resetOverride, itemOverrides } = useMemo(() => {

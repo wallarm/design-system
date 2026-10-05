@@ -1,6 +1,6 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { describe, expect, it, vi } from 'vitest';
 import {
   InlineEdit,
   InlineEditControl,
@@ -36,7 +36,7 @@ function Example({
 
 describe('InlineEdit integration', () => {
   it('click → type → Enter commits the new value', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(<Example onCommit={onCommit} />);
     await userEvent.click(screen.getByTestId('attr--preview'));
     const input = screen.getByTestId('attr--input') as HTMLInputElement;
@@ -47,7 +47,7 @@ describe('InlineEdit integration', () => {
   });
 
   it('Escape reverts without committing', async () => {
-    const onCommit = vi.fn();
+    const onCommit = rs.fn();
     render(<Example onCommit={onCommit} />);
     await userEvent.click(screen.getByTestId('attr--preview'));
     await userEvent.type(screen.getByTestId('attr--input'), 'x');

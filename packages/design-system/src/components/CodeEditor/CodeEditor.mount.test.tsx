@@ -1,10 +1,10 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { render, screen } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { CodeEditorContent, CodeEditorRoot } from './index';
 
 type EngineModule = typeof import('./engine');
 
-const deferred = vi.hoisted(() => {
+const deferred = rs.hoisted(() => {
   let resolve: (engine: EngineModule) => void = () => undefined;
   const promise = new Promise<EngineModule>(done => {
     resolve = done;
@@ -12,11 +12,11 @@ const deferred = vi.hoisted(() => {
   return { promise, resolve: (engine: EngineModule) => resolve(engine) };
 });
 
-vi.mock('./lib/loadEngine', () => ({ loadEngine: () => deferred.promise }));
+rs.mock('./lib/loadEngine', () => ({ loadEngine: () => deferred.promise }));
 
 describe('CodeEditor mount', () => {
   it('removes the fallback in the same task that mounts the editor (no double-height frame)', async () => {
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
+    rs.spyOn(console, 'error').mockImplementation(() => undefined);
     render(
       <CodeEditorRoot data-testid='ed' defaultValue={'a\nb'}>
         <CodeEditorContent aria-label='Code' />

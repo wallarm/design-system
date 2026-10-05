@@ -1,14 +1,14 @@
+import { describe, expect, it, rs } from '@rstest/core';
 import { fireEvent, render, screen, within } from '@testing-library/react';
-import { describe, expect, it, vi } from 'vitest';
 import { ParameterPath } from '../ParameterPath';
+import * as actualTruncation from '../useParameterPathTruncation' with { rstest: 'importActual' };
 
-vi.mock('../useParameterPathTruncation', async importOriginal => {
-  const mod = await importOriginal<typeof import('../useParameterPathTruncation')>();
-  return {
-    ...mod,
-    useParameterPathTruncation: vi.fn(() => ({ isTruncated: false, visibleSegmentIndices: [] })),
-  };
-});
+// Rstest mock factories are synchronous; the real module comes from the
+// `importActual` import above instead of an async `importOriginal`.
+rs.mock('../useParameterPathTruncation', () => ({
+  ...actualTruncation,
+  useParameterPathTruncation: rs.fn(() => ({ isTruncated: false, visibleSegmentIndices: [] })),
+}));
 
 import { useParameterPathTruncation } from '../useParameterPathTruncation';
 
@@ -73,7 +73,7 @@ describe('ParameterPath', () => {
 
 describe('ParameterPath truncation rendering', () => {
   it('renders ellipsis between first and last segment when isTruncated', () => {
-    vi.mocked(useParameterPathTruncation).mockReturnValue({
+    rs.mocked(useParameterPathTruncation).mockReturnValue({
       isTruncated: true,
       visibleSegmentIndices: [0, 5],
     });
@@ -95,7 +95,7 @@ describe('ParameterPath truncation rendering', () => {
   });
 
   it('renders all segments inline when not truncated', () => {
-    vi.mocked(useParameterPathTruncation).mockReturnValue({
+    rs.mocked(useParameterPathTruncation).mockReturnValue({
       isTruncated: false,
       visibleSegmentIndices: [0, 1, 2],
     });
@@ -112,7 +112,7 @@ describe('ParameterPath expandable', () => {
   const longSegments = ['multipart', 'a', 'b', 'c', 'd', 'get'];
 
   const mockTruncated = () =>
-    vi.mocked(useParameterPathTruncation).mockReturnValue({
+    rs.mocked(useParameterPathTruncation).mockReturnValue({
       isTruncated: true,
       visibleSegmentIndices: [0, 5],
     });
@@ -127,7 +127,7 @@ describe('ParameterPath expandable', () => {
   });
 
   it('is not interactive when the path fits (not truncated)', () => {
-    vi.mocked(useParameterPathTruncation).mockReturnValue({
+    rs.mocked(useParameterPathTruncation).mockReturnValue({
       isTruncated: false,
       visibleSegmentIndices: [0, 1, 2],
     });
@@ -184,7 +184,7 @@ describe('ParameterPath expandable', () => {
 
   it('does not toggle when the click ends a text selection', () => {
     mockTruncated();
-    const getSelection = vi
+    const getSelection = rs
       .spyOn(window, 'getSelection')
       .mockReturnValue({ toString: () => 'multipart' } as unknown as Selection);
     render(<ParameterPath method='POST' segments={longSegments} expandable data-testid='pp' />);
@@ -199,7 +199,7 @@ describe('ParameterPath expandable', () => {
   describe('controlled', () => {
     it('reflects the controlled expanded prop and does not self-manage state', () => {
       mockTruncated();
-      const onExpandedChange = vi.fn();
+      const onExpandedChange = rs.fn();
       const { rerender } = render(
         <ParameterPath
           method='POST'
@@ -248,7 +248,7 @@ describe('ParameterPath copy', () => {
       />,
     );
 
-    const setData = vi.fn();
+    const setData = rs.fn();
     const event = new Event('copy', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'clipboardData', { value: { setData }, writable: false });
 
@@ -262,7 +262,7 @@ describe('ParameterPath copy', () => {
   });
 
   it('uses custom copyFormat callback when provided', () => {
-    const copyFormat = vi.fn(() => 'CUSTOM');
+    const copyFormat = rs.fn(() => 'CUSTOM');
     const { container } = render(
       <ParameterPath
         method='GET'
@@ -271,7 +271,7 @@ describe('ParameterPath copy', () => {
         data-testid='pp'
       />,
     );
-    const setData = vi.fn();
+    const setData = rs.fn();
     const event = new Event('copy', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'clipboardData', { value: { setData }, writable: false });
     container.querySelector('[data-slot="parameter-path"]')!.dispatchEvent(event);
@@ -285,11 +285,11 @@ describe('ParameterPath copy', () => {
   });
 
   it('falls through to native copy when copyFormat returns an empty string', () => {
-    const copyFormat = vi.fn(() => '');
+    const copyFormat = rs.fn(() => '');
     const { container } = render(
       <ParameterPath segments={['a']} copyFormat={copyFormat} data-testid='pp' />,
     );
-    const setData = vi.fn();
+    const setData = rs.fn();
     const event = new Event('copy', { bubbles: true, cancelable: true });
     Object.defineProperty(event, 'clipboardData', { value: { setData }, writable: false });
     container.querySelector('[data-slot="parameter-path"]')!.dispatchEvent(event);
@@ -322,7 +322,7 @@ describe('ParameterPath edge cases', () => {
   });
 
   it('cascades data-testid to method, encoding, and ellipsis sub-components', () => {
-    vi.mocked(useParameterPathTruncation).mockReturnValue({
+    rs.mocked(useParameterPathTruncation).mockReturnValue({
       isTruncated: true,
       visibleSegmentIndices: [0, 3],
     });
