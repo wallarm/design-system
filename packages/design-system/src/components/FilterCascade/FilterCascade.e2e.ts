@@ -29,6 +29,7 @@ test.describe('Component: FilterCascade', () => {
     test('Should render the menu with the next level open correctly', async ({ page }) => {
       await filterCascadeStory.goto(page, 'Default');
       await page.getByTestId('filter-cascade--trigger').click();
+      await page.waitForFunction(() => document.getAnimations().length === 0);
       await page.getByText('Production US', { exact: true }).hover();
       await expect(page.getByTestId('filter-cascade--level')).toHaveCount(2);
       await expect(page).toHaveScreenshot();
@@ -39,6 +40,8 @@ test.describe('Component: FilterCascade', () => {
     }) => {
       await filterCascadeStory.goto(page, 'Composed');
       await page.getByTestId('filter-cascade-composed--trigger').click();
+      // Hover only once the open animation is over: Playwright scrolls a moving target into view.
+      await page.waitForFunction(() => document.getAnimations().length === 0);
       await page.getByText('Production US', { exact: true }).hover();
       await expect(page.getByText('Applications')).toBeVisible();
       await expect(page).toHaveScreenshot();
