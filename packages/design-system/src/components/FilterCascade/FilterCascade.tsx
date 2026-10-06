@@ -1,10 +1,24 @@
-import { type FC, type HTMLAttributes, type ReactNode, useId, useRef } from 'react';
+import {
+  type FC,
+  type HTMLAttributes,
+  type ReactNode,
+  useId,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import * as cascadeSelect from '@zag-js/cascade-select';
 import { normalizeProps, useMachine } from '@zag-js/react';
 import { cn } from '../../utils/cn';
 import { type TestableProps, TestIdProvider } from '../../utils/testId';
 import { FilterCascadeContext, type FilterCascadeContextValue } from './FilterCascadeContext';
-import { type FilterCascadeCollection, type FilterCascadeNode, pathNodes } from './lib';
+import {
+  type FilterCascadeCollection,
+  type FilterCascadeNode,
+  pathNodes,
+  searchTopLevel,
+  topLevel,
+} from './lib';
 
 export interface FilterCascadeValueChangeDetails {
   /** The picked path, root first; `[]` once cleared. */
@@ -32,9 +46,16 @@ export interface FilterCascadeProps
    * @default true
    */
   allowParentSelection?: boolean;
+  /**
+   * Top-level option count from which `FilterCascadeSearch` renders.
+   * @default 8
+   */
+  searchThreshold?: number;
   disabled?: boolean;
   children?: ReactNode;
 }
+
+const DEFAULT_SEARCH_THRESHOLD = 8;
 
 const toPaths = (value: string[] | undefined) =>
   value === undefined ? undefined : value.length ? [value] : [];
@@ -54,15 +75,20 @@ export const FilterCascade: FC<FilterCascadeProps> = ({
   defaultOpen,
   onOpenChange,
   allowParentSelection = true,
-  disabled,
+  searchThreshold = DEFAULT_SEARCH_THRESHOLD,
+  disabled = false,
   className,
   children,
   'data-testid': testId,
   ...props
 }) => {
+  const [query, setQuery] = useState('');
+  // Search narrows the top level only: find the deployment, then open it.
+  const visible = useMemo(() => searchTopLevel(collection, query), [collection, query]);
+
   const service = useMachine(cascadeSelect.machine, {
     id: useId(),
-    collection,
+    collection: visible,
     value: toPaths(value),
     defaultValue: toPaths(defaultValue),
     open,
@@ -74,7 +100,11 @@ export const FilterCascade: FC<FilterCascadeProps> = ({
     positioning: { placement: 'bottom-start', gutter: 4 },
     onValueChange: details =>
       onValueChange?.({ value: details.value[0] ?? [], items: details.items[0] ?? [] }),
-    onOpenChange: details => onOpenChange?.(details.open),
+    onOpenChange: details => {
+      // Every session starts from the full list.
+      if (!details.open) setQuery('');
+      onOpenChange?.(details.open);
+    },
   });
   const api = cascadeSelect.connect(service, normalizeProps);
   const triggerRef = useRef<HTMLButtonElement>(null);
@@ -87,6 +117,10 @@ export const FilterCascade: FC<FilterCascadeProps> = ({
     path,
     clear: () => api.clearValue(),
     triggerRef,
+    query,
+    setQuery,
+    isSearchable: topLevel(collection).length >= searchThreshold,
+    disabled,
   };
 
   return (

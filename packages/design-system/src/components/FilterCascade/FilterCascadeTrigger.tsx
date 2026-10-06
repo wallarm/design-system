@@ -1,27 +1,31 @@
 import {
   type ButtonHTMLAttributes,
+  Children,
   type FC,
   Fragment,
+  isValidElement,
   type KeyboardEvent,
-  type MouseEvent,
+  type ReactNode,
   type Ref,
 } from 'react';
-import { ChevronDown, ChevronRight, X } from '../../icons';
+import { ChevronDown, ChevronRight } from '../../icons';
 import { cn } from '../../utils/cn';
 import { mergeRefs } from '../../utils/mergeRefs';
 import { type TestableProps, useTestId } from '../../utils/testId';
 import {
-  filterDropdownClearClassName,
   filterDropdownControlVariants,
   filterDropdownLabelVariants,
   filterDropdownTriggerVariants,
 } from '../FilterDropdown/classes';
+import { FilterCascadeClear } from './FilterCascadeClear';
 import { useFilterCascadeContext } from './FilterCascadeContext';
 
 export interface FilterCascadeTriggerProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children'>,
     TestableProps {
   ref?: Ref<HTMLButtonElement>;
+  /** Only a `<FilterCascadeClear />`, to replace the default ✕ (for example to add attributes). */
+  children?: ReactNode;
 }
 
 const CLEAR_KEYS = new Set(['Backspace', 'Delete']);
@@ -34,6 +38,7 @@ const CLEAR_KEYS = new Set(['Backspace', 'Delete']);
 export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
   ref,
   className,
+  children,
   onKeyDown,
   'aria-label': ariaLabel,
   'data-testid': testIdProp,
@@ -42,7 +47,6 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
   const { api, label, path, clear, triggerRef } = useFilterCascadeContext();
   const testId = useTestId('trigger', testIdProp);
   const controlTestId = useTestId('control');
-  const clearTestId = useTestId('clear');
   const isSet = path.length > 0;
 
   const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
@@ -52,12 +56,9 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
     clear();
   };
 
-  const handleClear = (event: MouseEvent<HTMLButtonElement>) => {
-    event.stopPropagation();
-    // The ✕ unmounts once the path is empty; move focus first so it is not dropped on <body>.
-    triggerRef.current?.focus();
-    clear();
-  };
+  const customClear = Children.toArray(children).find(
+    child => isValidElement(child) && child.type === FilterCascadeClear,
+  );
 
   return (
     <div
@@ -119,19 +120,7 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
           />
         )}
       </button>
-      {isSet && (
-        <button
-          type='button'
-          data-slot='filter-cascade-clear'
-          data-testid={clearTestId}
-          aria-label={`Clear ${label}`}
-          disabled={api.disabled}
-          onClick={handleClear}
-          className={filterDropdownClearClassName}
-        >
-          <X size='md' />
-        </button>
-      )}
+      {customClear ?? <FilterCascadeClear />}
     </div>
   );
 };

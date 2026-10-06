@@ -1,20 +1,23 @@
 # FilterCascade — Analytics Gaps
 
-Per [`docs/metrics/contract.md`](../../../../../docs/metrics/contract.md):
+Per [`docs/metrics/contract.md`](../../../../../docs/metrics/contract.md). Every interactive target
+is an exported part whose `{...rest}` lands on the real DOM node:
 
 | Target | Part | Node |
 |---|---|---|
 | Trigger (open / close, Backspace / Delete clears) | `FilterCascadeTrigger` | `button` |
-| ✕ on the trigger | rendered by `FilterCascadeTrigger` | `button` |
-| Option (any level) | rendered by `FilterCascadeContent` | `div[role=treeitem]` |
+| ✕ on the trigger | `FilterCascadeClear` (pass as the trigger's child to replace the default) | `button` |
+| Option (any level) | `FilterCascadeItem` | `div[role=treeitem]` |
+| Search field | `FilterCascadeSearch` | `input` |
+| Toggle row under the levels | `FilterCascadeCheckboxItem` | `button[role=menuitemcheckbox]` |
 
-The root and `FilterCascadeContent` are containers, not click targets.
+The root, `FilterCascadeContent`, `FilterCascadeLevel`, `FilterCascadeSection`,
+`FilterCascadeGroupLabel` and `FilterCascadeEmpty` are containers, not click targets. With no
+children, `FilterCascadeContent` renders default `FilterCascadeItem`s — compose the levels to put
+attributes on them.
 
 ## Known gaps (closed targets)
 
-- **The ✕ and the options.** First version: both are rendered by the component, so consumer
-  attributes cannot reach them.
-  - **Workaround:** `onValueChange` reports every pick and the clear (`value: []`).
-  - **Owner:** Design System team.
-  - **Next decision point:** when a consumer needs per-option or clear-click analytics — export
-    `FilterCascadeClear` and an item part, as `FilterDropdown` does.
+- **The search field's built-in clear button** — the same `SearchInput` gap as `FilterDropdown`
+  (see its ANALYTICS_GAPS.md). **Workaround:** `onClear` / `onChange('')` on `FilterCascadeSearch`.
+  **Owner:** Design System team; fixed together with `SearchInput`.
