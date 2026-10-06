@@ -86,8 +86,9 @@ export const FilterCascade: FC<FilterCascadeProps> = ({
   // Search narrows the top level only: find the deployment, then open it.
   const visible = useMemo(() => searchTopLevel(collection, query), [collection, query]);
 
+  const id = useId();
   const service = useMachine(cascadeSelect.machine, {
-    id: useId(),
+    id,
     collection: visible,
     value: toPaths(value),
     defaultValue: toPaths(defaultValue),
@@ -98,6 +99,17 @@ export const FilterCascade: FC<FilterCascadeProps> = ({
     // Levels open as the pointer moves, like nested menus do.
     highlightTrigger: 'hover',
     positioning: { placement: 'bottom-start', gutter: 4 },
+    // Zag's own scroll brings the *deepest* highlighted item into view inside every level, so a
+    // level whose item sits in the next column scrolls for nothing. Scroll each level's own item.
+    scrollToIndexFn: ({ index, depth }) => {
+      const content = document.getElementById(`cascade-select:${id}:content`);
+      const item = [
+        ...(content?.querySelectorAll<HTMLElement>(
+          `[data-slot=filter-cascade-item][data-depth="${depth + 1}"]`,
+        ) ?? []),
+      ].find(node => node.dataset.indexPath?.split(',').at(-1) === String(index));
+      item?.scrollIntoView({ block: 'nearest' });
+    },
     onValueChange: details =>
       onValueChange?.({ value: details.value[0] ?? [], items: details.items[0] ?? [] }),
     onOpenChange: details => {
