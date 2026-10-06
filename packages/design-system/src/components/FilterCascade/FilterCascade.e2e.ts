@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { expect, type Page, test } from '@playwright/test';
 import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const filterCascadeStory = createStoryHelper('patterns-filtercascade', [
@@ -8,6 +8,16 @@ const filterCascadeStory = createStoryHelper('patterns-filtercascade', [
   'Disabled',
   'Composed',
 ] as const);
+
+/**
+ * Moves the pointer onto an option without `locator.hover()`, which scrolls its target into view
+ * first — and scrolled the level in the baselines. A real pointer never scrolls a level on hover.
+ */
+const pointAt = async (page: Page, text: string) => {
+  const box = await page.getByText(text, { exact: true }).boundingBox();
+  if (!box) throw new Error(`"${text}" is not on screen`);
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+};
 
 test.describe('Component: FilterCascade', () => {
   test.describe('Visual', () => {
@@ -30,7 +40,7 @@ test.describe('Component: FilterCascade', () => {
       await filterCascadeStory.goto(page, 'Default');
       await page.getByTestId('filter-cascade--trigger').click();
       await page.waitForFunction(() => document.getAnimations().length === 0);
-      await page.getByText('Production US', { exact: true }).hover();
+      await pointAt(page, 'Production US');
       await expect(page.getByTestId('filter-cascade--level')).toHaveCount(2);
       await expect(page).toHaveScreenshot();
     });
@@ -40,9 +50,8 @@ test.describe('Component: FilterCascade', () => {
     }) => {
       await filterCascadeStory.goto(page, 'Composed');
       await page.getByTestId('filter-cascade-composed--trigger').click();
-      // Hover only once the open animation is over: Playwright scrolls a moving target into view.
       await page.waitForFunction(() => document.getAnimations().length === 0);
-      await page.getByText('Production US', { exact: true }).hover();
+      await pointAt(page, 'Production US');
       await expect(page.getByText('Applications')).toBeVisible();
       await expect(page).toHaveScreenshot();
     });
