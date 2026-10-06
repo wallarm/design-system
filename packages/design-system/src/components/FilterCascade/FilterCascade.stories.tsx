@@ -1,0 +1,125 @@
+import { useState } from 'react';
+import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { FilterCascade } from './FilterCascade';
+import { FilterCascadeContent } from './FilterCascadeContent';
+import { FilterCascadeTrigger } from './FilterCascadeTrigger';
+import { createFilterCascadeCollection, type FilterCascadeNode } from './lib';
+
+const DESCRIPTION = [
+  'A filter over a hierarchy — organization › deployment › application, region › zone. The same 36px pill as `FilterDropdown`; its menu opens each level beside the previous one, and a node at any depth can be picked.',
+  'The trigger reads the picked path: «Scope · ● a › ● b». The ✕ (or Backspace on the trigger) clears it.',
+  'Reach for `FilterDropdown` when the values are flat.',
+].join(' ');
+
+/** The level dots from the Flow management Scope marker. */
+const Dot = ({ color }: { color: string }) => (
+  <span aria-hidden className={`inline-block size-6 shrink-0 rounded-full ${color}`} />
+);
+const deploymentDot = <Dot color='bg-badge-sky-strong' />;
+const applicationDot = <Dot color='bg-badge-teal-strong' />;
+
+const applications = (deployment: string, names: string[]): FilterCascadeNode[] =>
+  names.map((name, index) => ({
+    value: `${deployment}/${name}`,
+    label: name,
+    icon: applicationDot,
+    description: index === 0 ? '2 policies' : 'No policies',
+  }));
+
+const scopes: FilterCascadeNode[] = [
+  { value: 'org', label: 'Organization only', icon: <Dot color='bg-badge-violet-strong' /> },
+  {
+    value: 'production-us',
+    label: 'Production US',
+    icon: deploymentDot,
+    description: '4 policies',
+    children: [
+      { value: 'production-us/level', label: 'Deployment level', icon: deploymentDot },
+      ...applications('production-us', ['api', 'checkout', 'mobile-gateway']),
+    ],
+  },
+  {
+    value: 'staging-us',
+    label: 'Staging US',
+    icon: deploymentDot,
+    description: 'No policies',
+    children: [
+      { value: 'staging-us/level', label: 'Deployment level', icon: deploymentDot },
+      ...applications('staging-us', ['api']),
+    ],
+  },
+  {
+    value: 'production-eu',
+    label: 'production-eu-central-1-cluster',
+    icon: deploymentDot,
+    description: '1 policy',
+    children: applications('production-eu', ['checkout-api']),
+  },
+];
+
+const collection = createFilterCascadeCollection(scopes);
+
+const meta = {
+  title: 'Patterns/FilterCascade',
+  component: FilterCascade,
+  parameters: {
+    layout: 'padded',
+    docs: { description: { component: DESCRIPTION } },
+  },
+  args: { label: 'Scope', collection },
+} satisfies Meta<typeof FilterCascade>;
+
+export default meta;
+
+export const Default: StoryFn<typeof FilterCascade> = () => (
+  <FilterCascade label='Scope' collection={collection} data-testid='filter-cascade'>
+    <FilterCascadeTrigger />
+    <FilterCascadeContent />
+  </FilterCascade>
+);
+
+/** A picked path reads in the trigger; only the earlier segments truncate. */
+export const Picked: StoryFn<typeof FilterCascade> = () => {
+  const [value, setValue] = useState<string[]>(['production-eu', 'production-eu/checkout-api']);
+  return (
+    <div className='flex flex-col gap-12'>
+      <FilterCascade
+        label='Scope'
+        collection={collection}
+        value={value}
+        onValueChange={details => setValue(details.value)}
+        data-testid='filter-cascade-picked'
+      >
+        <FilterCascadeTrigger />
+        <FilterCascadeContent />
+      </FilterCascade>
+      <code className='text-xs text-text-secondary'>value: {JSON.stringify(value)}</code>
+    </div>
+  );
+};
+
+/** Picking a node that opens a level — «this deployment, any application». */
+export const ParentPicked: StoryFn<typeof FilterCascade> = () => (
+  <FilterCascade
+    label='Scope'
+    collection={collection}
+    defaultValue={['staging-us']}
+    data-testid='filter-cascade-parent'
+  >
+    <FilterCascadeTrigger />
+    <FilterCascadeContent />
+  </FilterCascade>
+);
+
+export const Disabled: StoryFn<typeof FilterCascade> = () => (
+  <FilterCascade
+    label='Scope'
+    collection={collection}
+    defaultValue={['production-us', 'production-us/api']}
+    disabled
+    data-testid='filter-cascade-disabled'
+  >
+    <FilterCascadeTrigger />
+    <FilterCascadeContent />
+  </FilterCascade>
+);

@@ -336,6 +336,18 @@ export {
   useFilePreviewUrl,
 } from './components/FileUpload';
 export {
+  createFilterCascadeCollection,
+  FilterCascade,
+  type FilterCascadeCollection,
+  FilterCascadeContent,
+  type FilterCascadeContentProps,
+  type FilterCascadeNode,
+  type FilterCascadeProps,
+  FilterCascadeTrigger,
+  type FilterCascadeTriggerProps,
+  type FilterCascadeValueChangeDetails,
+} from './components/FilterCascade';
+export {
   FilterDropdown,
   FilterDropdownAllOption,
   type FilterDropdownAllOptionProps,

@@ -372,9 +372,15 @@ importers:
       '@tanstack/react-virtual':
         specifier: 3.14.13
         version: 3.14.13(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
+      '@zag-js/cascade-select':
+        specifier: 1.43.3
+        version: 1.43.3
       '@zag-js/file-utils':
         specifier: 1.43.3
         version: 1.43.3
+      '@zag-js/react':
+        specifier: 1.43.3
+        version: 1.43.3(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
