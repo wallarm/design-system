@@ -13,8 +13,7 @@ const switchToDarkTheme = (page: Page) =>
 
 test.describe('Component: AppShell', () => {
   test.beforeEach(async ({ page }) => {
-    // Baselines were captured under reduced motion; without it the second-rail shot shifts
-    // the page header (cause not isolated; the Ambient is static).
+    // Settle every motion-aware transition before the screenshots.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await seedBrandedFrame(page);
   });
