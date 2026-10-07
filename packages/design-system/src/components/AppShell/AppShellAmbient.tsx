@@ -4,7 +4,7 @@ import { useTestId } from '../../utils/testId';
 /**
  * The Frame's ambient layer. The Frame is the shell's gray zone — the header
  * bar plus the rail, everything around the canvas — and Ambient is the life in
- * it: slow-drifting blooms, grain and a dot cluster pooled bottom-left of the
+ * it: soft blooms, grain and a dot cluster pooled bottom-left of the
  * rail. Purely decorative, painted under every region (see
  * `theme/components/app-shell.css`). Internal to `AppShell`; toggled with its
  * `ambient` prop.

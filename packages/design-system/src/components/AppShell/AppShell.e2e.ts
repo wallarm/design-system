@@ -13,7 +13,7 @@ const switchToDarkTheme = (page: Page) =>
 
 test.describe('Component: AppShell', () => {
   test.beforeEach(async ({ page }) => {
-    // The Ambient drifts on 60–90 s loops and stills itself under reduced motion.
+    // Settle every motion-aware transition before the screenshots.
     await page.emulateMedia({ reducedMotion: 'reduce' });
     await seedBrandedFrame(page);
   });
