@@ -13,6 +13,8 @@ const switchToDarkTheme = (page: Page) =>
 
 test.describe('Component: AppShell', () => {
   test.beforeEach(async ({ page }) => {
+    // The second rail's slide-in (RemoteShellPanel) stops under reduced motion.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await seedBrandedFrame(page);
   });
 
