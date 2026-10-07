@@ -50,6 +50,7 @@ export const PopoverContent: FC<PopoverContentProps> = ({
           {...rest}
           ref={contentRef}
           id={id}
+          data-slot='popover-content'
           data-testid={testId}
           style={style}
           className={cn(
