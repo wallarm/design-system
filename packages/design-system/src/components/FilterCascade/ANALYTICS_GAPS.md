@@ -7,7 +7,8 @@ is an exported part whose `{...rest}` lands on the real DOM node:
 |---|---|---|
 | Trigger (open / close, Backspace / Delete clears) | `FilterCascadeTrigger` | `button` |
 | ✕ on the trigger | `FilterCascadeClear` (pass as the trigger's child to replace the default) | `button` |
-| Option (any level) | `FilterCascadeItem` | `div[role=treeitem]` |
+| Option (any level) | `FilterCascadeItem` — `FilterCascadeItems` takes a render function, `FilterCascadeParentItem` its props | `div[role=treeitem]` |
+| Retry on a level that failed to load | rendered by `FilterCascadeLevel` | `button` |
 | Search field | `FilterCascadeSearch` | `input` |
 | Toggle row under the levels | `FilterCascadeCheckboxItem` | `button[role=menuitemcheckbox]` |
 
@@ -17,6 +18,10 @@ children, `FilterCascadeContent` renders default `FilterCascadeItem`s — compos
 attributes on them.
 
 ## Known gaps (closed targets)
+
+- **Retry on a failed level.** Rendered by `FilterCascadeLevel` in place of the options.
+  **Workaround:** `loadChildren` runs again on retry — count calls per item there.
+  **Next decision point:** export a `FilterCascadeLevelError` part when a consumer needs the click.
 
 - **The search field's built-in clear button** — the same `SearchInput` gap as `FilterDropdown`
   (see its ANALYTICS_GAPS.md). **Workaround:** `onClear` / `onChange('')` on `FilterCascadeSearch`.

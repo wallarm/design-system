@@ -17,6 +17,7 @@ import {
   filterDropdownLabelVariants,
   filterDropdownTriggerVariants,
 } from '../FilterDropdown/classes';
+import { Tooltip, TooltipContent, TooltipTrigger } from '../Tooltip';
 import { FilterCascadeClear } from './FilterCascadeClear';
 import { useFilterCascadeContext } from './FilterCascadeContext';
 
@@ -44,7 +45,8 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
   'data-testid': testIdProp,
   ...props
 }) => {
-  const { api, label, path, clear, triggerRef } = useFilterCascadeContext();
+  const { api, accessors, label, path, clear, triggerRef } = useFilterCascadeContext();
+  const fullPath = path.map(node => node.label).join(' › ');
   const testId = useTestId('trigger', testIdProp);
   const controlTestId = useTestId('control');
   const isSet = path.length > 0;
@@ -60,7 +62,7 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
     child => isValidElement(child) && child.type === FilterCascadeClear,
   );
 
-  return (
+  const control = (
     <div
       {...api.getControlProps()}
       data-slot='filter-cascade-control'
@@ -81,37 +83,39 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
         data-testid={testId}
         // No label part: the name is ours, so drop Zag's pointer to a missing <label>.
         aria-labelledby={undefined}
-        aria-label={
-          ariaLabel ?? (isSet ? `${label}, ${path.map(n => n.label).join(' › ')}` : label)
-        }
+        aria-label={ariaLabel ?? (isSet ? `${label}, ${fullPath}` : label)}
         onKeyDown={handleKeyDown}
         className={cn(filterDropdownTriggerVariants({ clearable: isSet }), className)}
       >
         <span className='flex min-w-0 items-center gap-4 overflow-hidden'>
           <span className={filterDropdownLabelVariants({ emphasis: 'name' })}>{label}</span>
-          {isSet && (
-            <span aria-hidden className='shrink-0 text-xs text-text-tertiary'>
-              •
+          {/* Figma: each level is a dotted text badge (xs medium, 20px), › between them. Only the
+              earlier segments truncate, at 120px; the last one never does. */}
+          {path.length > 0 && (
+            <span className='flex min-w-0 items-center'>
+              {path.map((node, index) => {
+                const last = index === path.length - 1;
+                const icon = node.data === undefined ? null : accessors.getIcon?.(node.data);
+                return (
+                  <Fragment key={node.value}>
+                    {index > 0 && (
+                      <ChevronRight size='sm' className='shrink-0 text-icon-secondary' />
+                    )}
+                    <span
+                      data-slot='filter-cascade-segment'
+                      className={cn(
+                        'inline-flex h-20 min-w-0 items-center gap-4 px-6 text-xs font-medium',
+                        last ? 'shrink-0' : 'max-w-120',
+                      )}
+                    >
+                      {icon}
+                      <span className='truncate'>{node.label}</span>
+                    </span>
+                  </Fragment>
+                );
+              })}
             </span>
           )}
-          {path.map((node, index) => {
-            const last = index === path.length - 1;
-            return (
-              <Fragment key={node.value}>
-                {index > 0 && <ChevronRight size='sm' className='shrink-0 text-icon-secondary' />}
-                {node.icon}
-                <span
-                  className={cn(
-                    filterDropdownLabelVariants({ emphasis: 'value' }),
-                    last ? 'shrink-0' : 'max-w-120',
-                  )}
-                  title={node.label}
-                >
-                  {node.label}
-                </span>
-              </Fragment>
-            );
-          })}
         </span>
         {!isSet && (
           <ChevronDown
@@ -122,6 +126,17 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
       </button>
       {customClear ?? <FilterCascadeClear />}
     </div>
+  );
+
+  // Figma: the tooltip carries the whole chain, whatever the pill truncated.
+  if (!isSet) return control;
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>{control}</TooltipTrigger>
+      <TooltipContent>
+        {label} — {fullPath}
+      </TooltipContent>
+    </Tooltip>
   );
 };
 

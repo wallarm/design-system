@@ -23,15 +23,16 @@ const useItem = (part: string): FilterCascadeEntry => {
 
 export interface FilterCascadeItemProps extends HTMLAttributes<HTMLDivElement>, TestableProps {
   ref?: Ref<HTMLDivElement>;
-  /** An entry of `level.items` from `useFilterCascade`. */
+  /** An entry of a level's `items` (or its `parentItem`) from `useFilterCascade`. */
   item: FilterCascadeEntry;
-  /** Defaults to the node's icon, label and description. */
+  /** Defaults to the icon, label and description the collection's accessors give. */
   children?: ReactNode;
 }
 
 /**
- * One option. Hovering a branch opens its level beside this one; clicking picks the node. The
- * end of the row is the item's own: › on a branch, ✓ on the picked leaf.
+ * One option (Figma `_select-item`): 32px on one line, 48px with a description. Hovering a branch
+ * opens its level beside this panel; clicking picks the item. The end of the row is the item's
+ * own: › on a branch, ✓ on the picked option.
  */
 export const FilterCascadeItem: FC<FilterCascadeItemProps> = ({
   ref,
@@ -41,10 +42,15 @@ export const FilterCascadeItem: FC<FilterCascadeItemProps> = ({
   'data-testid': testIdProp,
   ...props
 }) => {
-  const { api } = useFilterCascadeContext();
+  const { api, accessors } = useFilterCascadeContext();
   const testId = useTestId('item', testIdProp);
   const itemProps = { item: item.node, indexPath: item.indexPath, value: item.value };
   const state = api.getItemState(itemProps);
+  const data = item.node.data;
+  const hasIcon = data !== undefined && accessors.getIcon?.(data) != null;
+  const hasDescription =
+    Boolean(item.node.trail?.length) ||
+    (data !== undefined && !item.node.isParent && accessors.getDescription?.(data) != null);
 
   return (
     <ItemContext.Provider value={item}>
@@ -53,27 +59,32 @@ export const FilterCascadeItem: FC<FilterCascadeItemProps> = ({
         {...api.getItemProps(itemProps)}
         ref={ref}
         data-slot='filter-cascade-item'
+        data-parent={item.node.isParent || undefined}
         data-testid={testId}
         className={cn(
           dropdownMenuItemVariants({ variant: 'default' }),
-          'items-start data-[state=checked]:bg-states-primary-active',
+          'items-start gap-4 data-[state=checked]:bg-states-primary-active',
           className,
         )}
       >
-        {children ?? (
-          <>
-            {item.node.icon && <FilterCascadeItemIcon />}
-            <span className='flex min-w-0 flex-1 flex-col'>
-              <FilterCascadeItemText />
-              {item.node.description && <FilterCascadeItemDescription />}
-            </span>
-          </>
-        )}
+        <span className='flex min-w-0 flex-1 items-start gap-8'>
+          {children ?? (
+            <>
+              {hasIcon && <FilterCascadeItemIcon />}
+              <span className='flex min-w-0 flex-1 flex-col'>
+                <FilterCascadeItemText />
+                {hasDescription && <FilterCascadeItemDescription />}
+              </span>
+            </>
+          )}
+        </span>
         <span className={cn(dropdownMenuItemIndicatorClassName, 'h-20')}>
           {state.hasChildren ? (
-            <ChevronRight className='text-icon-secondary' />
+            <ChevronRight />
           ) : (
-            <span {...api.getItemIndicatorProps(itemProps)}>{state.selected && <Check />}</span>
+            <span {...api.getItemIndicatorProps(itemProps)} className='flex'>
+              {state.selected && <Check />}
+            </span>
           )}
         </span>
       </div>
@@ -87,7 +98,7 @@ export interface FilterCascadeItemPartProps extends HTMLAttributes<HTMLSpanEleme
   ref?: Ref<HTMLSpanElement>;
 }
 
-/** The label. Defaults to the node's `label`; it is what typeahead and the trigger read. */
+/** The label. Defaults to the item's label; it is what typeahead and the trigger read. */
 export const FilterCascadeItemText: FC<FilterCascadeItemPartProps> = ({
   className,
   children,
@@ -109,40 +120,53 @@ export const FilterCascadeItemText: FC<FilterCascadeItemPartProps> = ({
 
 FilterCascadeItemText.displayName = 'FilterCascadeItemText';
 
-/** The second line. Defaults to the node's `description`. */
+/**
+ * The second line. Defaults to the accessors' description; in the search list, to where the match
+ * sits — «Production US › checkout».
+ */
 export const FilterCascadeItemDescription: FC<FilterCascadeItemPartProps> = ({
   className,
   children,
   ...props
 }) => {
+  const { accessors } = useFilterCascadeContext();
   const item = useItem('FilterCascadeItemDescription');
+  const data = item.node.data;
+  const fallback = item.node.trail?.length
+    ? item.node.trail.join(' › ')
+    : data === undefined
+      ? null
+      : accessors.getDescription?.(data);
+
   return (
     <span
       {...props}
       data-slot='filter-cascade-item-description'
-      className={cn('text-xs text-text-secondary', className)}
+      className={cn('truncate text-xs text-text-secondary', className)}
     >
-      {children ?? item.node.description}
+      {children ?? fallback}
     </span>
   );
 };
 
 FilterCascadeItemDescription.displayName = 'FilterCascadeItemDescription';
 
-/** Before the label, level with its first line. Defaults to the node's `icon`. */
+/** Before the label, level with its first line (a 16px slot). Defaults to the accessors' icon. */
 export const FilterCascadeItemIcon: FC<FilterCascadeItemPartProps> = ({
   className,
   children,
   ...props
 }) => {
+  const { accessors } = useFilterCascadeContext();
   const item = useItem('FilterCascadeItemIcon');
+  const data = item.node.data;
   return (
     <span
       {...props}
       data-slot='filter-cascade-item-icon'
-      className={cn('flex h-20 shrink-0 items-center', className)}
+      className={cn('flex h-20 w-16 shrink-0 items-center justify-center', className)}
     >
-      {children ?? item.node.icon}
+      {children ?? (data === undefined ? null : accessors.getIcon?.(data))}
     </span>
   );
 };

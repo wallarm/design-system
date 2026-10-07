@@ -3,77 +3,113 @@ import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { FilterCascade } from './FilterCascade';
 import { FilterCascadeClear } from './FilterCascadeClear';
 import { FilterCascadeContent } from './FilterCascadeContent';
-import { useFilterCascade } from './FilterCascadeContext';
 import {
-  FilterCascadeItem,
-  FilterCascadeItemDescription,
-  FilterCascadeItemIcon,
-  FilterCascadeItemText,
-} from './FilterCascadeItem';
-import {
-  FilterCascadeEmpty,
   FilterCascadeGroupLabel,
-  FilterCascadeLevel,
+  FilterCascadeItems,
+  FilterCascadeLevels,
+  FilterCascadeParentItem,
 } from './FilterCascadeLevel';
 import { FilterCascadeSearch } from './FilterCascadeSearch';
 import { FilterCascadeCheckboxItem, FilterCascadeSection } from './FilterCascadeSection';
 import { FilterCascadeTrigger } from './FilterCascadeTrigger';
-import { createFilterCascadeCollection, type FilterCascadeNode } from './lib';
+import { createFilterCascadeCollection } from './lib';
 
 const DESCRIPTION = [
-  'A filter over a hierarchy — organization › deployment › application, region › zone. The same 36px pill as `FilterDropdown`; its menu opens each level beside the previous one, and a node at any depth can be picked.',
-  'The trigger reads the picked path: «Scope · ● a › ● b». The ✕ (or Backspace on the trigger) clears it.',
-  'Compose the menu from parts — `useFilterCascade` gives the open levels — to add group labels, a search over the top level and rows that are not part of the path; with no children, `FilterCascadeContent` renders every level by itself.',
-  'Reach for `FilterDropdown` when the values are flat.',
+  'A filter over a hierarchy — organization › deployment › application, region › zone. The same 36px pill as `FilterDropdown`; each level opens as its own panel beside the option that opened it, and an item at any depth can be picked. The trigger reads the path: «Scope ● a › ● b», the tooltip carries it whole.',
+  'Items are the consumer’s own objects, read through accessors; a level can load when it is first opened (`loadChildren`), and `parentLabel` adds the option that picks the level’s parent — «Deployment level». The search finds items at every depth.',
+  'Compose the panels with `FilterCascadeLevels` to add group labels and options set apart; with no children, `FilterCascadeContent` renders the levels by itself. Reach for `FilterDropdown` when the values are flat.',
 ].join(' ');
 
-/** The level dots from the Flow management Scope marker. */
-const Dot = ({ color }: { color: string }) => (
-  <span aria-hidden className={`inline-block size-6 shrink-0 rounded-full ${color}`} />
-);
-const deploymentDot = <Dot color='bg-badge-sky-strong' />;
-const applicationDot = <Dot color='bg-badge-teal-strong' />;
+type Kind = 'organization' | 'deployment' | 'application';
 
-const applications = (deployment: string, names: string[]): FilterCascadeNode[] =>
-  names.map((name, index) => ({
-    value: `${deployment}/${name}`,
-    label: name,
-    icon: applicationDot,
-    description: index === 0 ? '2 policies' : 'No policies',
+interface Scope {
+  kind: Kind;
+  uid: string;
+  name: string;
+  policies?: number;
+}
+
+/** The Flow management Scope marker: 6px dots, violet · sky · teal by level. */
+const DOT: Record<Kind, string> = {
+  organization: 'bg-badge-violet-strong',
+  deployment: 'bg-badge-sky-strong',
+  application: 'bg-badge-teal-strong',
+};
+const Dot = ({ kind }: { kind: Kind }) => (
+  <span aria-hidden className={`inline-block size-6 shrink-0 rounded-full ${DOT[kind]}`} />
+);
+
+const policies = (count?: number) =>
+  count === undefined
+    ? undefined
+    : count === 0
+      ? 'No policies'
+      : `${count} ${count === 1 ? 'policy' : 'policies'}`;
+
+const organizationOnly: Scope = { kind: 'organization', uid: 'org', name: 'Organization only' };
+
+const deploymentNames = [
+  'Production US',
+  'Production EU',
+  'Staging US',
+  'Staging EU',
+  'Sandbox',
+  'QA',
+  'Load test',
+  'Canary',
+];
+const deployments: Scope[] = deploymentNames.map((name, index) => ({
+  kind: 'deployment',
+  uid: name.toLowerCase().replace(/ /g, '-'),
+  name,
+  policies: index % 3 === 0 ? index + 2 : 0,
+}));
+
+const applicationsOf = (deployment: Scope): Scope[] =>
+  ['api', 'checkout', 'mobile-gateway'].map((name, index) => ({
+    kind: 'application',
+    uid: `${deployment.uid}-${name}`,
+    name,
+    policies: index === 0 ? 2 : 0,
   }));
 
-const scopes: FilterCascadeNode[] = [
-  { value: 'org', label: 'Organization only', icon: <Dot color='bg-badge-violet-strong' /> },
-  {
-    value: 'production-us',
-    label: 'Production US',
-    icon: deploymentDot,
-    description: '4 policies',
-    children: [
-      { value: 'production-us/level', label: 'Deployment level', icon: deploymentDot },
-      ...applications('production-us', ['api', 'checkout', 'mobile-gateway']),
-    ],
-  },
-  {
-    value: 'staging-us',
-    label: 'Staging US',
-    icon: deploymentDot,
-    description: 'No policies',
-    children: [
-      { value: 'staging-us/level', label: 'Deployment level', icon: deploymentDot },
-      ...applications('staging-us', ['api']),
-    ],
-  },
-  {
-    value: 'production-eu',
-    label: 'production-eu-central-1-cluster',
-    icon: deploymentDot,
-    description: '1 policy',
-    children: applications('production-eu', ['checkout-api']),
-  },
-];
+/** The applications arrive a moment after a deployment is first opened. */
+const loadApplications = (deployment: Scope) =>
+  new Promise<Scope[]>(resolve => setTimeout(() => resolve(applicationsOf(deployment)), 400));
 
-const collection = createFilterCascadeCollection(scopes);
+const scopeAccessors = {
+  getValue: (scope: Scope) => scope.uid,
+  getLabel: (scope: Scope) => scope.name,
+  hasChildren: (scope: Scope) => scope.kind === 'deployment',
+  getIcon: (scope: Scope) => <Dot kind={scope.kind} />,
+  getDescription: (scope: Scope) => policies(scope.policies),
+};
+
+const scopes = createFilterCascadeCollection<Scope>(
+  [organizationOnly, ...deployments],
+  scopeAccessors,
+);
+
+/** Plain `{ value, label, children }` items need no accessors. */
+const regions = createFilterCascadeCollection([
+  {
+    value: 'eu',
+    label: 'Europe',
+    children: [
+      { value: 'fra', label: 'Frankfurt' },
+      { value: 'ams', label: 'Amsterdam' },
+    ],
+  },
+  {
+    value: 'us',
+    label: 'United States',
+    children: [
+      { value: 'iad', label: 'North Virginia' },
+      { value: 'sfo', label: 'San Francisco' },
+    ],
+  },
+  { value: 'sg', label: 'Singapore' },
+]);
 
 const meta = {
   title: 'Patterns/FilterCascade',
@@ -82,56 +118,134 @@ const meta = {
     layout: 'padded',
     docs: { description: { component: DESCRIPTION } },
   },
-  args: { label: 'Scope', collection },
+  args: { label: 'Region', collection: regions },
 } satisfies Meta<typeof FilterCascade>;
 
 export default meta;
 
+/** The minimal form: plain items, every level rendered by `FilterCascadeContent`. */
 export const Default: StoryFn<typeof FilterCascade> = () => (
-  <FilterCascade label='Scope' collection={collection} data-testid='filter-cascade'>
+  <FilterCascade label='Region' collection={regions} data-testid='filter-cascade'>
     <FilterCascadeTrigger />
     <FilterCascadeContent />
   </FilterCascade>
 );
 
-/** A picked path reads in the trigger; only the earlier segments truncate. */
-export const Picked: StoryFn<typeof FilterCascade> = () => {
-  const [value, setValue] = useState<string[]>(['production-eu', 'production-eu/checkout-api']);
+/** The Flow management Scope menu, as in Figma. */
+const ScopeMenu = ({ withToggle = true }: { withToggle?: boolean }) => {
+  const [showOrganization, setShowOrganization] = useState(true);
+  return (
+    <FilterCascadeContent>
+      <FilterCascadeSearch placeholder='Search' />
+      <FilterCascadeLevels>
+        {level =>
+          level.depth === 0 ? (
+            <>
+              <FilterCascadeItems filter={item => item.node.value === organizationOnly.uid} />
+              <FilterCascadeGroupLabel>Deployments</FilterCascadeGroupLabel>
+              <FilterCascadeItems filter={item => item.node.value !== organizationOnly.uid} />
+            </>
+          ) : (
+            <>
+              <FilterCascadeParentItem />
+              <FilterCascadeGroupLabel>Applications</FilterCascadeGroupLabel>
+              <FilterCascadeItems />
+            </>
+          )
+        }
+      </FilterCascadeLevels>
+      {withToggle && (
+        <FilterCascadeSection>
+          <FilterCascadeCheckboxItem
+            icon={<Dot kind='organization' />}
+            checked={showOrganization}
+            onCheckedChange={setShowOrganization}
+          >
+            Show organization policies
+          </FilterCascadeCheckboxItem>
+        </FilterCascadeSection>
+      )}
+    </FilterCascadeContent>
+  );
+};
+
+/** The Scope filter of Flow management: lazy applications, «Deployment level», search, toggle. */
+export const ScopeFilter: StoryFn<typeof FilterCascade> = () => {
+  const [value, setValue] = useState<string[]>([]);
   return (
     <div className='flex flex-col gap-12'>
       <FilterCascade
         label='Scope'
-        collection={collection}
+        collection={scopes}
+        loadChildren={loadApplications}
+        parentLabel='Deployment level'
         value={value}
         onValueChange={details => setValue(details.value)}
-        data-testid='filter-cascade-picked'
+        data-testid='filter-cascade-scope'
       >
-        <FilterCascadeTrigger />
-        <FilterCascadeContent />
+        <FilterCascadeTrigger>
+          <FilterCascadeClear data-analytics-id='SCOPE_CLEAR' />
+        </FilterCascadeTrigger>
+        <ScopeMenu />
       </FilterCascade>
       <code className='text-xs text-text-secondary'>value: {JSON.stringify(value)}</code>
     </div>
   );
 };
 
-/** Picking a node that opens a level — «this deployment, any application». */
-export const ParentPicked: StoryFn<typeof FilterCascade> = () => (
+const longCollection = createFilterCascadeCollection<Scope>(
+  [{ kind: 'deployment', uid: 'eu1', name: 'production-eu-central-1-cluster' }],
+  scopeAccessors,
+);
+
+/** A picked application: the trigger reads the path; only the deployment segment truncates. */
+export const Picked: StoryFn<typeof FilterCascade> = () => (
   <FilterCascade
     label='Scope'
-    collection={collection}
-    defaultValue={['staging-us']}
-    data-testid='filter-cascade-parent'
+    collection={longCollection}
+    loadChildren={async () => [{ kind: 'application', uid: 'checkout', name: 'checkout-api' }]}
+    defaultValue={['eu1', 'checkout']}
+    data-testid='filter-cascade-picked'
   >
     <FilterCascadeTrigger />
     <FilterCascadeContent />
   </FilterCascade>
 );
 
-export const Disabled: StoryFn<typeof FilterCascade> = () => (
+/** The deployment itself, picked through «Deployment level». */
+export const ParentPicked: StoryFn<typeof FilterCascade> = () => (
   <FilterCascade
     label='Scope'
-    collection={collection}
-    defaultValue={['production-us', 'production-us/api']}
+    collection={scopes}
+    loadChildren={loadApplications}
+    parentLabel='Deployment level'
+    defaultValue={['staging-us']}
+    data-testid='filter-cascade-parent'
+  >
+    <FilterCascadeTrigger />
+    <ScopeMenu withToggle={false} />
+  </FilterCascade>
+);
+
+/** A level that fails to load offers a retry. */
+export const LoadError: StoryFn<typeof FilterCascade> = () => (
+  <FilterCascade
+    label='Scope'
+    collection={scopes}
+    loadChildren={() => Promise.reject(new Error('Unavailable'))}
+    parentLabel='Deployment level'
+    data-testid='filter-cascade-error'
+  >
+    <FilterCascadeTrigger />
+    <ScopeMenu withToggle={false} />
+  </FilterCascade>
+);
+
+export const Disabled: StoryFn<typeof FilterCascade> = () => (
+  <FilterCascade
+    label='Region'
+    collection={regions}
+    defaultValue={['eu', 'fra']}
     disabled
     data-testid='filter-cascade-disabled'
   >
@@ -139,85 +253,3 @@ export const Disabled: StoryFn<typeof FilterCascade> = () => (
     <FilterCascadeContent />
   </FilterCascade>
 );
-
-/** Many deployments: the search over the top level appears from eight. */
-const manyDeployments: FilterCascadeNode[] = [
-  scopes[0] as FilterCascadeNode,
-  ...[
-    'Production US',
-    'Production EU',
-    'Staging US',
-    'Staging EU',
-    'Sandbox',
-    'QA',
-    'Load test',
-    'Canary',
-  ].map((name, index) => ({
-    value: name.toLowerCase().replace(/ /g, '-'),
-    label: name,
-    icon: deploymentDot,
-    description: index % 3 === 0 ? `${index + 2} policies` : 'No policies',
-    children: [
-      { value: `${name}/level`, label: 'Deployment level', icon: deploymentDot },
-      ...applications(name, ['api', 'checkout']),
-    ],
-  })),
-];
-const manyCollection = createFilterCascadeCollection(manyDeployments);
-
-/**
- * The Flow management Scope filter, composed: «Organization only» above the «Deployments» group,
- * «Applications» in the next level, a search over deployments, and a toggle row under the levels.
- */
-const ScopeLevels = () => {
-  const { levels, isEmpty } = useFilterCascade();
-  if (isEmpty) return <FilterCascadeEmpty />;
-  return levels.map(level => {
-    const [first, ...rest] = level.items;
-    const top = level.depth === 0 && first?.node.value === 'org';
-    return (
-      <FilterCascadeLevel key={level.depth} level={level}>
-        {top && first && <FilterCascadeItem item={first} />}
-        <FilterCascadeGroupLabel>
-          {level.depth === 0 ? 'Deployments' : 'Applications'}
-        </FilterCascadeGroupLabel>
-        {(top ? rest : level.items).map(item => (
-          <FilterCascadeItem key={item.node.value} item={item}>
-            <FilterCascadeItemIcon />
-            <span className='flex min-w-0 flex-1 flex-col'>
-              <FilterCascadeItemText />
-              <FilterCascadeItemDescription />
-            </span>
-          </FilterCascadeItem>
-        ))}
-      </FilterCascadeLevel>
-    );
-  });
-};
-
-export const Composed: StoryFn<typeof FilterCascade> = () => {
-  const [value, setValue] = useState<string[]>([]);
-  const [showOrg, setShowOrg] = useState(true);
-  return (
-    <FilterCascade
-      label='Scope'
-      collection={manyCollection}
-      value={value}
-      onValueChange={details => setValue(details.value)}
-      data-testid='filter-cascade-composed'
-    >
-      <FilterCascadeTrigger>
-        <FilterCascadeClear data-analytics-id='SCOPE_CLEAR' />
-      </FilterCascadeTrigger>
-      <FilterCascadeContent>
-        <FilterCascadeSearch placeholder='Search' />
-        <ScopeLevels />
-        <FilterCascadeSection>
-          <FilterCascadeCheckboxItem checked={showOrg} onCheckedChange={setShowOrg}>
-            Show organization policies
-          </FilterCascadeCheckboxItem>
-        </FilterCascadeSection>
-      </FilterCascadeContent>
-    </FilterCascade>
-  );
-};

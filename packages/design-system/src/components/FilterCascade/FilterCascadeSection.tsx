@@ -4,6 +4,7 @@ import type {
   HTMLAttributes,
   KeyboardEvent,
   MouseEvent,
+  ReactNode,
   Ref,
 } from 'react';
 import { Check } from '../../icons';
@@ -17,8 +18,8 @@ export interface FilterCascadeSectionProps extends HTMLAttributes<HTMLDivElement
 }
 
 /**
- * Rows under the levels that are not part of the path — «Show organization policies». Spans the
- * whole menu, divided from the levels above.
+ * Rows at the bottom of the top-level panel that are not part of the path — «Show organization
+ * policies» — under a divider.
  */
 export const FilterCascadeSection: FC<FilterCascadeSectionProps> = ({
   className,
@@ -32,7 +33,11 @@ export const FilterCascadeSection: FC<FilterCascadeSectionProps> = ({
       {...props}
       data-slot='filter-cascade-section'
       data-testid={testId}
-      className={cn('flex flex-col gap-1 border-t border-border-primary-light p-8', className)}
+      className={cn(
+        // The divider is the `DropdownMenuSeparator` line.
+        'flex flex-col gap-1 before:mx-8 before:my-4 before:h-px before:bg-border-primary',
+        className,
+      )}
     />
   );
 };
@@ -45,6 +50,8 @@ export interface FilterCascadeCheckboxItemProps
   ref?: Ref<HTMLButtonElement>;
   checked: boolean;
   onCheckedChange?: (checked: boolean) => void;
+  /** Before the label, in the options' 16px icon slot — a status dot. */
+  icon?: ReactNode;
 }
 
 /** A toggle row in a `FilterCascadeSection`. The menu stays open; ✓ at the end when on. */
@@ -53,6 +60,7 @@ export const FilterCascadeCheckboxItem: FC<FilterCascadeCheckboxItemProps> = ({
   onCheckedChange,
   onClick,
   onKeyDown,
+  icon,
   className,
   children,
   'data-testid': testIdProp,
@@ -86,9 +94,12 @@ export const FilterCascadeCheckboxItem: FC<FilterCascadeCheckboxItemProps> = ({
       className={cn(
         dropdownMenuItemVariants({ variant: 'default' }),
         'w-full text-left focus-visible:bg-states-primary-hover',
+        // Figma: a row that is on reads as picked.
+        'data-[state=checked]:bg-states-primary-active',
         className,
       )}
     >
+      {icon && <span className='flex h-20 w-16 shrink-0 items-center justify-center'>{icon}</span>}
       <span className='min-w-0 flex-1 truncate'>{children}</span>
       <span className={dropdownMenuItemIndicatorClassName}>{checked && <Check />}</span>
     </button>

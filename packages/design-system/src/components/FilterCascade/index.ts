@@ -24,9 +24,14 @@ export {
   type FilterCascadeEmptyProps,
   FilterCascadeGroupLabel,
   type FilterCascadeGroupLabelProps,
+  FilterCascadeItems,
+  type FilterCascadeItemsProps,
   FilterCascadeLevel,
   type FilterCascadeLevelProps,
   FilterCascadeLevels,
+  type FilterCascadeLevelsProps,
+  FilterCascadeParentItem,
+  type FilterCascadeParentItemProps,
 } from './FilterCascadeLevel';
 export { FilterCascadeSearch, type FilterCascadeSearchProps } from './FilterCascadeSearch';
 export {
@@ -38,6 +43,7 @@ export {
 export { FilterCascadeTrigger, type FilterCascadeTriggerProps } from './FilterCascadeTrigger';
 export {
   createFilterCascadeCollection,
+  type FilterCascadeAccessors,
   type FilterCascadeCollection,
   type FilterCascadeNode,
 } from './lib';

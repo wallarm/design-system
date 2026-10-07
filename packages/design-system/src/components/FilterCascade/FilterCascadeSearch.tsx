@@ -50,7 +50,8 @@ export const FilterCascadeSearch: FC<FilterCascadeSearchProps> = ({
   };
 
   return (
-    <div data-slot='filter-cascade-search' className='border-b border-border-primary-light p-8'>
+    // Figma: the field is the panel's first row, 4px above the options.
+    <div data-slot='filter-cascade-search' className='pb-4'>
       <SelectSearchInput
         {...props}
         ref={mergeRefs(ref, inputRef)}
