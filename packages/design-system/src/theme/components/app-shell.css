@@ -141,7 +141,6 @@
     top: -350px;
 }
 
-
 @utility app-shell-ambient-grain {
     position: absolute;
     inset: 0;
@@ -181,8 +180,4 @@
         400px 400px;
     mask-repeat: no-repeat, repeat, repeat;
     mask-composite: intersect;
-    mask-position:
-        0 0,
-        0 0,
-        0 0;
 }
