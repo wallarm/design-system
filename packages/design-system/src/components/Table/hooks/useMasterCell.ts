@@ -15,6 +15,8 @@ export const useMasterCell = <T extends RowData>(columnId: string, rowId: string
 
   const handleClick = useCallback(
     (e: MouseEvent) => {
+      // Portaled content (a row menu, a confirm dialog) bubbles through the React tree, not the DOM.
+      if (!e.currentTarget.contains(e.target as Node)) return;
       // Skip when the click originates from the action area so the drawer
       // doesn't open while still letting the event propagate for analytics.
       if ((e.target as HTMLElement).closest('[data-master-cell-action]')) return;
