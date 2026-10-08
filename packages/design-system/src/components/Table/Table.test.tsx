@@ -11,6 +11,12 @@ import {
   BulkBarSummarySeparator,
 } from '../BulkBar';
 import { Button } from '../Button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '../DropdownMenu';
 import { createTableColumnHelper } from './lib';
 import { Table } from './Table';
 import { TableActionBar, TableActionBarSelection } from './TableActionBar';
@@ -142,6 +148,49 @@ describe('Click resolution', () => {
 
     await userEvent.click(screen.getByTestId('row-menu-1'));
     expect(captured).toHaveBeenCalledWith('ROW_MENU');
+  });
+});
+
+describe('Master cell click', () => {
+  // The row menu's content is portaled to <body>, but React still bubbles its clicks up the React
+  // tree to the master cell's onClick — a menu item must not also open the row's details.
+  it('ignores clicks bubbling from a portaled row menu', async () => {
+    const user = userEvent.setup();
+    const onMasterCellClick = rs.fn();
+    const onSelect = rs.fn();
+    const columns = [
+      columnHelper.accessor('name', {
+        header: 'Name',
+        meta: {
+          renderMenuAction: row => (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant='ghost' size='small' data-testid={`row-menu-${row.id}`}>
+                  ⋯
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem value='delete' onSelect={onSelect}>
+                  Delete
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          ),
+        },
+        cell: ctx => ctx.getValue<string>(),
+      }),
+    ];
+
+    render(<Table data={data} columns={columns} onMasterCellClick={onMasterCellClick} />);
+
+    await user.click(screen.getByTestId('row-menu-1'));
+    await user.click(await screen.findByRole('menuitem', { name: 'Delete' }));
+
+    expect(onSelect).toHaveBeenCalled();
+    expect(onMasterCellClick).not.toHaveBeenCalled();
+
+    await user.click(screen.getByText('Alpha'));
+    expect(onMasterCellClick).toHaveBeenCalledWith('0');
   });
 });
 

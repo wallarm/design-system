@@ -5,6 +5,8 @@ export interface DrawerContextValue {
   closeOnEscape: boolean;
   overlay: boolean;
   modal: boolean;
+  /** Id of the Ark dialog content node — this overlay's layer in zag's layer stack */
+  contentId: string;
 
   // Size management
   width: number | string;
