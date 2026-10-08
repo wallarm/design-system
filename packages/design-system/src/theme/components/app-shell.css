@@ -21,15 +21,17 @@
  * Performance (ENG-911). Everything that moves animates `transform` /
  * `opacity` only, so the compositor shifts already-rasterised layers and
  * nothing is repainted. The dots used to animate `mask-position`, which Chrome
- * repaints on the main thread every frame (about a third of the old idle CPU);
+ * repaints on the main thread every frame (over a third of the old idle CPU);
  * the masks now ride on their own layers instead. Softness is baked into the
  * gradient stops rather than `filter: blur()`: a blur on a moving layer is
  * re-run by the GPU every frame, a gradient is rasterised once.
  *
  * Motion is opt-in: it runs only under `prefers-reduced-motion:
- * no-preference`, set on each `bloom-N` itself (a shared rule would lose to
- * the equally specific, later `bloom-N`). Otherwise the ambient is the
- * still first frame.
+ * no-preference`, set on each animated utility itself (`bloom-N`,
+ * `dots-noise-*`, `dots-grid`) — a shared rule would lose to the equally
+ * specific, later `bloom-N`. Otherwise the ambient holds still at its resting
+ * layout. No `will-change`: running animations promote their layers anyway,
+ * and a still ambient keeps no idle composited layers.
  *
  * The canvas (`AppShellRemote`) sits on top, so none of this shows under page
  * content. Colours are theme tokens in semantic.css (light and dark), derived
@@ -327,15 +329,21 @@
    The noise tiles move by `transform`, not `mask-position`, so the compositor
    slides them and nothing repaints. Each layer carries its mask with it, and
    the grid counter-moves by the sum of the two, so the dots themselves stay
-   put. The noise layers overhang the box by 1200px (a multiple of both the
-   400px tile and the 12px grid) so their edges never show mid-loop. */
+   put.
+
+   The overhang is only what the loop needs, so the layers stay small: noise A
+   travels (400, -400) and noise B (-800, 400) in total, so
+   the shared noise box overhangs 400px top, bottom and left and 800px right
+   (multiples of the 400px tile, so the noise phase is unchanged). The grid's
+   total travel is zero, so it is inset back to exactly the dots box and keeps
+   its 6px phase. No `overflow` clip is needed: the fade mask already clips
+   the overhang to the box. */
 @utility app-shell-ambient-dots {
     position: absolute;
     left: 0;
     bottom: 0;
     width: min(100%, 480px);
     height: min(560px, 64vh);
-    overflow: hidden;
     mask-image: linear-gradient(
         to top,
         #000 0,
@@ -348,7 +356,7 @@
 
 @utility app-shell-ambient-dots-noise-a {
     position: absolute;
-    inset: -1200px;
+    inset: -400px -800px -400px -400px;
     mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.011' numOctaves='2' seed='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 5 5 5 0 -6.2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
     mask-size: 400px 400px;
 
@@ -370,7 +378,7 @@
 
 @utility app-shell-ambient-dots-grid {
     position: absolute;
-    inset: 0;
+    inset: 400px 800px 400px 400px;
     background-image: radial-gradient(circle at center, var(--color-component-app-shell-ambient-dot) 0.9px, transparent 1.1px);
     background-size: 12px 12px;
     background-position: 6px 6px;
