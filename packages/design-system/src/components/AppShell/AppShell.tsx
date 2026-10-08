@@ -22,9 +22,8 @@ export interface AppShellProps extends HTMLAttributes<HTMLDivElement>, TestableP
   onRevealed?: () => void;
   appeared?: boolean;
   /**
-   * The Frame's ambient layer — drifting blooms, grain and a dot cluster behind the header and
-   * rail. On by default; `false` leaves the flat Frame token fill. Still under
-   * `prefers-reduced-motion: reduce`.
+   * The Frame's ambient layer — soft blooms, grain and a dot cluster behind the header and
+   * rail. On by default; `false` leaves the flat Frame token fill.
    */
   ambient?: boolean;
 }

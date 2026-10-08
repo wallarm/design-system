@@ -58,7 +58,7 @@ import {
 const DESCRIPTION = [
   'The platform’s outermost frame — global top bar, product rail, and the content surface products mount into. There is exactly one, at the app root, and it persists while the content swaps.',
   'Do not wrap a page in it: a single product screen renders `RemoteShell` and its own content, blind to the shell. In-product navigation is `NavPanel`, and laying out a page’s insides is `Stack` and `Flex`.',
-  'The gray surround — header bar plus rail, everything that is not the canvas — is the **Frame**. It carries **Ambient**, a faint layer of slowly drifting blooms, grain and a dot cluster pooled bottom-left, painted under everything; it holds still under reduced motion. Ambient is on by default; `ambient={false}` leaves the flat Frame fill.',
+  'The gray surround — header bar plus rail, everything that is not the canvas — is the **Frame**. It carries **Ambient**, a faint still layer of soft blooms, grain and a dot cluster pooled bottom-left, painted under everything. Ambient is on by default; `ambient={false}` leaves the flat Frame fill.',
   'The Frame comes in two styles, **Neutral** and **Branded**: a user preference next to light/dark, set with `useTheme().setFrameStyle` (from `ThemeProvider`) and written on `<html>` so every micro-frontend follows it. Branded warms the Frame and turns active navigation to the brand colour; try it from the account item → Appearance.',
 ].join(' ');
 
