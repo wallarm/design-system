@@ -62,9 +62,10 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
     child => isValidElement(child) && child.type === FilterCascadeClear,
   );
 
+  const controlProps = api.getControlProps();
   const control = (
     <div
-      {...api.getControlProps()}
+      {...controlProps}
       data-slot='filter-cascade-control'
       data-testid={controlTestId}
       // A path is wider than one value: lift the 180px cap (`max-w-none` is the 0 spacing token
@@ -131,7 +132,9 @@ export const FilterCascadeTrigger: FC<FilterCascadeTriggerProps> = ({
   // Figma: the tooltip carries the whole chain, whatever the pill truncated.
   if (!isSet) return control;
   return (
-    <Tooltip>
+    // The control keeps Zag's id over the tooltip's: anchor the tooltip by that id, or it loses
+    // its trigger and opens in the page corner.
+    <Tooltip ids={{ trigger: controlProps.id }}>
       <TooltipTrigger asChild>{control}</TooltipTrigger>
       <TooltipContent>
         {label} — {fullPath}
