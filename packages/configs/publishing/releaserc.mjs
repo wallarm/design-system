@@ -26,6 +26,9 @@ export function defineConfig({
   const isMainBranch = process.env.GITHUB_REF_NAME === 'main';
 
   return {
+    // SSH so pushes go through the DEPLOY_KEY (the only bot allowed to push to
+    // main), not GITHUB_TOKEN
+    repositoryUrl: 'git@github.com:wallarm/design-system.git',
     tagFormat,
     branches: [
       'main',
