@@ -93,7 +93,14 @@ test.describe('Component: OverflowList', () => {
       const row = await page.getByTestId('attacks').boundingBox();
       await page.getByTestId('attacks--more--trigger').click();
 
-      const popover = await page.getByTestId('attacks--more--content').boundingBox();
+      const content = page.getByTestId('attacks--more--content');
+      await expect(content).toBeVisible();
+      // The opening zoom/slide animation changes the bounding box until it finishes.
+      await content.evaluate(el =>
+        Promise.all(el.getAnimations().map(animation => animation.finished)),
+      );
+
+      const popover = await content.boundingBox();
       expect(row && popover).toBeTruthy();
       if (!row || !popover) return;
       expect(Math.abs(popover.x - row.x)).toBeLessThanOrEqual(1);
