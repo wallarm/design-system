@@ -1,4 +1,4 @@
-import { type FC, type ReactNode, useState } from 'react';
+import { type FC, type ReactNode, useId, useState } from 'react';
 import { useControlled } from '../../../hooks';
 import { DRAWER_SIZES, DRAWER_WIDTH_CONSTRAINTS } from '../constants';
 import { type DrawerKind, DrawerNestingProvider } from '../DrawerNestingContext';
@@ -42,6 +42,8 @@ export const DrawerProvider: FC<DrawerContextProviderProps> = ({
     default: false,
   });
 
+  const contentId = useId();
+
   // Content state
   const [width, setWidth] = useState(initialWidth);
   const [isResizing, setIsResizing] = useState(false);
@@ -58,6 +60,7 @@ export const DrawerProvider: FC<DrawerContextProviderProps> = ({
     closeOnEscape,
     overlay,
     modal,
+    contentId,
 
     // Size management
     width,

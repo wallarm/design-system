@@ -1,7 +1,9 @@
+import { useState } from 'react';
 import { describe, expect, it, rs } from '@rstest/core';
-import { fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
+import { act, fireEvent, render, screen, waitForElementToBeRemoved } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { Button } from '../Button';
+import { Dialog, DialogBody, DialogContent } from '../Dialog';
 import { Drawer } from './Drawer';
 import { DrawerBody } from './DrawerBody';
 import { DrawerClose } from './DrawerClose';
@@ -10,6 +12,7 @@ import { DrawerDescription } from './DrawerDescription';
 import { DrawerFooter } from './DrawerFooter';
 import { DrawerHeader } from './DrawerHeader';
 import { DrawerResizeHandle } from './DrawerResizeHandle';
+import { keepOpenUnlessAncestorCloses } from './DrawerRoot';
 import { DrawerTitle } from './DrawerTitle';
 import { DrawerTrigger } from './DrawerTrigger';
 
@@ -348,5 +351,201 @@ describe('DrawerHeader grouping of DrawerTitle / DrawerDescription', () => {
     const describedBy = screen.getByRole('dialog').getAttribute('aria-describedby');
     const descriptionEl = describedBy ? document.getElementById(describedBy) : null;
     expect(descriptionEl).toBeNull();
+  });
+});
+
+// zag registers a dismissable layer through raf / nextTick / setTimeout(0); give every one a turn.
+const flushLayers = async () => {
+  for (let i = 0; i < 10; i++) {
+    await act(() => new Promise(resolve => setTimeout(resolve, 20)));
+  }
+};
+
+describe('Overlay handoff', () => {
+  // A Dialog that closes while a sibling Drawer mounts in the same commit (zag >= 1.43.1 registers
+  // the drawer's layer synchronously, above the closing dialog). The drawer must be mounted
+  // conditionally — an always-mounted Drawer does not hit the race.
+  it('keeps a freshly mounted Drawer open when a closing Dialog hands off to it', async () => {
+    const user = userEvent.setup();
+    const onDrawerOpenChange = rs.fn();
+
+    const Flow = () => {
+      const [dialogOpen, setDialogOpen] = useState(true);
+      const [drawerOpen, setDrawerOpen] = useState(false);
+      return (
+        <>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogContent>
+              <DialogBody>
+                <Button
+                  onClick={() => {
+                    setDialogOpen(false);
+                    setDrawerOpen(true);
+                  }}
+                >
+                  Continue
+                </Button>
+              </DialogBody>
+            </DialogContent>
+          </Dialog>
+          {drawerOpen && (
+            <Drawer
+              open
+              onOpenChange={open => {
+                onDrawerOpenChange(open);
+                setDrawerOpen(open);
+              }}
+            >
+              <DrawerContent>
+                <DrawerBody>Drawer body</DrawerBody>
+              </DrawerContent>
+            </Drawer>
+          )}
+        </>
+      );
+    };
+
+    render(<Flow />);
+    await flushLayers();
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await flushLayers();
+
+    expect(onDrawerOpenChange).not.toHaveBeenCalledWith(false);
+    expect(screen.getByText('Drawer body')).toBeInTheDocument();
+  });
+
+  // Ark's Dialog.Root renders no DOM, so a follow-up Drawer can sit next to DialogContent inside the
+  // closing Dialog's root. Only overlays rendered inside the content are its descendants.
+  it('keeps a Drawer rendered beside the closing DialogContent open', async () => {
+    const user = userEvent.setup();
+    const onDrawerOpenChange = rs.fn();
+
+    const Flow = () => {
+      const [step, setStep] = useState<'create' | 'continue'>('create');
+      return (
+        <Dialog open={step === 'create'}>
+          <DialogContent>
+            <DialogBody>
+              <Button onClick={() => setStep('continue')}>Continue</Button>
+            </DialogBody>
+          </DialogContent>
+          {step === 'continue' && (
+            <Drawer open onOpenChange={onDrawerOpenChange}>
+              <DrawerContent>
+                <DrawerBody>Drawer body</DrawerBody>
+              </DrawerContent>
+            </Drawer>
+          )}
+        </Dialog>
+      );
+    };
+
+    render(<Flow />);
+    await flushLayers();
+    await user.click(screen.getByRole('button', { name: 'Continue' }));
+    await flushLayers();
+
+    expect(onDrawerOpenChange).not.toHaveBeenCalledWith(false);
+    expect(screen.getByText('Drawer body')).toBeInTheDocument();
+  });
+
+  // jsdom has no exit animation, so a nested Drawer unmounts before its parent's layer leaves the
+  // stack and the cascade never reaches it — exercise the ancestry check directly.
+  it('lets only a React-ancestor layer dismiss a Drawer', () => {
+    const request = (targetLayer?: HTMLElement) =>
+      new CustomEvent('layer:request-dismiss', {
+        cancelable: true,
+        detail: { originalLayer: document.body, targetLayer, originalIndex: 1, targetIndex: 0 },
+      });
+    const layer = (id: string) => Object.assign(document.createElement('div'), { id });
+    const handler = keepOpenUnlessAncestorCloses(['grandparent', 'parent']);
+
+    const fromParent = request(layer('parent'));
+    handler(fromParent);
+    expect(fromParent.defaultPrevented).toBe(false);
+
+    const fromGrandparent = request(layer('grandparent'));
+    handler(fromGrandparent);
+    expect(fromGrandparent.defaultPrevented).toBe(false);
+
+    const fromSibling = request(layer('sibling-dialog'));
+    handler(fromSibling);
+    expect(fromSibling.defaultPrevented).toBe(true);
+
+    const withoutTarget = request();
+    handler(withoutTarget);
+    expect(withoutTarget.defaultPrevented).toBe(true);
+  });
+
+  // The closing dialog's focus trap returns focus to the page button that opened it.
+  // A modal drawer can't lose focus by user action, so that move must not dismiss it.
+  it('keeps a modal Drawer open when focus is moved outside programmatically', async () => {
+    const onOpenChange = rs.fn();
+
+    render(
+      <>
+        <button type='button'>Add</button>
+        <Drawer open onOpenChange={onOpenChange}>
+          <DrawerContent>
+            <DrawerBody>Body</DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      </>,
+    );
+
+    await screen.findByText('Body');
+    await flushLayers();
+    act(() => screen.getByRole('button', { name: 'Add', hidden: true }).focus());
+    await flushLayers();
+
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
+  });
+
+  it('still closes a non-modal Drawer when focus moves outside', async () => {
+    const onOpenChange = rs.fn();
+
+    render(
+      <>
+        <button type='button'>Elsewhere</button>
+        <Drawer open modal={false} onOpenChange={onOpenChange}>
+          <DrawerContent>
+            <DrawerBody>Body</DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      </>,
+    );
+
+    await screen.findByText('Body');
+    await flushLayers();
+    act(() => screen.getByRole('button', { name: 'Elsewhere' }).focus());
+    await flushLayers();
+
+    expect(onOpenChange).toHaveBeenCalledWith(false);
+  });
+
+  // A nested dialog's exit animation keeps its content mounted for a moment; focus that lands on
+  // one of its buttons is not the user leaving the non-modal parent.
+  it('keeps a non-modal Drawer open when focus lands inside an exiting dialog layer', async () => {
+    const onOpenChange = rs.fn();
+
+    render(
+      <>
+        <div data-scope='dialog' data-part='content' data-state='closed'>
+          <button type='button'>Leave without saving</button>
+        </div>
+        <Drawer open modal={false} onOpenChange={onOpenChange}>
+          <DrawerContent>
+            <DrawerBody>Body</DrawerBody>
+          </DrawerContent>
+        </Drawer>
+      </>,
+    );
+
+    await screen.findByText('Body');
+    await flushLayers();
+    act(() => screen.getByRole('button', { name: 'Leave without saving' }).focus());
+    await flushLayers();
+
+    expect(onOpenChange).not.toHaveBeenCalledWith(false);
   });
 });
