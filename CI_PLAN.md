@@ -230,6 +230,7 @@ Required GitHub Secrets:
 
 - `GITHUB_TOKEN`: Auto-provided by GitHub Actions
 - `NPM_TOKEN`: Required by the `release` job to publish `@wallarm-org/design-system` and `@wallarm-org/mcp` to npm
+- `DEPLOY_KEY`: Private half of a write deploy key. `main` is guarded by a repository ruleset (restrict updates, deletion, force push) that only repo admins and deploy keys bypass — `GITHUB_TOKEN` cannot bypass it — so the `release` job (semantic-release, over SSH via `repositoryUrl` in `packages/configs/publishing/releaserc.mjs`) and `commit-screenshots` (on `main` only) push with this key
 
 There is no container registry push in this pipeline, so no registry credential is needed.
 
