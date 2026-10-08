@@ -119,6 +119,25 @@ test.describe('Component: FilterCascade', () => {
       );
     });
 
+    test('Should open the path tooltip at the trigger', async ({ page }) => {
+      await filterCascadeStory.goto(page, 'Picked');
+      const trigger = page.getByTestId('filter-cascade-picked--trigger');
+      await trigger.hover();
+      const tooltip = page.getByText('Scope — production-eu-central-1-cluster › checkout-api');
+      await expect(tooltip).toBeVisible();
+      const [anchor, tip] = await Promise.all([
+        page.getByTestId('filter-cascade-picked--control').boundingBox(),
+        tooltip.boundingBox(),
+      ]);
+      if (!anchor || !tip) throw new Error('no boxes');
+      // Right above or below the trigger, centred on it; unanchored, it opens at the page corner.
+      const above = anchor.y - (tip.y + tip.height);
+      const below = tip.y - (anchor.y + anchor.height);
+      expect(Math.max(above, below)).toBeGreaterThanOrEqual(0);
+      expect(Math.max(above, below)).toBeLessThan(24);
+      expect(Math.abs(tip.x + tip.width / 2 - (anchor.x + anchor.width / 2))).toBeLessThan(4);
+    });
+
     test('Should clear the path with the ✕', async ({ page }) => {
       await filterCascadeStory.goto(page, 'Scope Filter');
       await openMenu(page, 'filter-cascade-scope');
