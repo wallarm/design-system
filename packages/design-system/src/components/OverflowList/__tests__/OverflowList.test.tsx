@@ -7,7 +7,7 @@ rs.mock('../../../hooks', () => ({
 }));
 
 import { useOverflowItems } from '../../../hooks';
-import { OverflowList, type ShowAllOverflowData } from '../OverflowList';
+import { OverflowList } from '../OverflowList';
 
 type HookReturn = ReturnType<typeof useOverflowItems<string>>;
 
@@ -25,7 +25,7 @@ const mockHook = (visibleItems: string[], hiddenItems: string[]) => {
 
 const items = ['a', 'b', 'c', 'd'];
 const itemRenderer = (item: string) => <span key={item}>{item}</span>;
-const overflowRenderer = (data: ShowAllOverflowData<string>) => <span>+{data.hiddenCount}</span>;
+const overflowRenderer = (hidden: string[]) => <span>+{hidden.length}</span>;
 
 describe('OverflowList', () => {
   beforeEach(() => {
@@ -181,5 +181,15 @@ describe('OverflowList', () => {
     expect(screen.getByText('a')).toBeInTheDocument();
     expect(screen.getByText('b')).toBeInTheDocument();
     expect(screen.getByText('c')).toBeInTheDocument();
+  });
+
+  it('passes hidden items first and the split as meta to overflowRenderer', () => {
+    mockHook(['a', 'b'], ['c', 'd']);
+    const renderer = rs.fn((hidden: string[]) => <span>+{hidden.length}</span>);
+    render(<OverflowList items={items} itemRenderer={itemRenderer} overflowRenderer={renderer} />);
+    expect(renderer).toHaveBeenCalledWith(['c', 'd'], {
+      allItems: items,
+      visibleItems: ['a', 'b'],
+    });
   });
 });

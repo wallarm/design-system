@@ -204,7 +204,6 @@ export const WithOverflowList: StoryFn<ResizablePanelGroupProps> = () => (
             className='gap-4'
             items={OVERFLOW_TAGS}
             itemRenderer={item => <Tag key={item}>{item}</Tag>}
-            overflowHeaderLabel='attack types'
           />
         </div>
       </ResizablePanel>

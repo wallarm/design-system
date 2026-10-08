@@ -371,7 +371,6 @@ export const TagsEditor: StoryFn<typeof meta> = args => {
                   className='gap-4'
                   items={tags}
                   itemRenderer={tag => <Tag key={tag}>{tag}</Tag>}
-                  overflowHeaderLabel='tags'
                 />
               </InlineEditPreviewValue>
               <InlineEditPreviewIcon>

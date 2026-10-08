@@ -474,7 +474,6 @@ export const ResizableWithOverflowList: StoryFn<DrawerProps> = () => {
                 className='gap-4'
                 items={DRAWER_TAGS}
                 itemRenderer={item => <Tag key={item}>{item}</Tag>}
-                overflowHeaderLabel='attack types'
               />
             </AttributeValue>
           </Attribute>

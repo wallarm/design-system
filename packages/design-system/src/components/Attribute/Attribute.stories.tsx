@@ -256,7 +256,6 @@ export const Composition: StoryFn<AttributeProps> = () => (
           className='gap-4'
           items={['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR']}
           itemRenderer={item => <Tag key={item}>{item}</Tag>}
-          overflowHeaderLabel='items'
         />
       </AttributeValue>
     </Attribute>
@@ -281,7 +280,6 @@ export const Composition: StoryFn<AttributeProps> = () => (
             'admin@acme.com',
           ]}
           itemRenderer={item => <Tag key={item}>{item}</Tag>}
-          overflowHeaderLabel='items'
         />
       </AttributeValue>
     </Attribute>
@@ -411,7 +409,6 @@ export const WithActions: StoryFn<AttributeProps> = () => (
                 'IDOR',
               ]}
               itemRenderer={item => <Tag key={item}>{item}</Tag>}
-              overflowHeaderLabel='items'
             />
           </AttributeActionsTarget>
           {renderActionsItems()}
@@ -446,7 +443,6 @@ export const WithActions: StoryFn<AttributeProps> = () => (
                 'admin@acme.com',
               ]}
               itemRenderer={item => <Tag key={item}>{item}</Tag>}
-              overflowHeaderLabel='items'
             />
           </AttributeActionsTarget>
           {renderActionsItems()}
@@ -635,7 +631,6 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
           className='gap-4'
           items={['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR']}
           itemRenderer={item => <Tag key={item}>{item}</Tag>}
-          overflowHeaderLabel='items'
         />
       </AttributeValue>
     </Attribute>
@@ -667,7 +662,6 @@ export const HorizontalComposition: StoryFn<AttributeProps> = () => (
             'admin@acme.com',
           ]}
           itemRenderer={item => <Tag key={item}>{item}</Tag>}
-          overflowHeaderLabel='items'
         />
       </AttributeValue>
     </Attribute>
@@ -859,7 +853,6 @@ const renderActionsAttributes = (disableNestedInteractive: boolean) => (
               className='gap-4'
               items={['production', 'us-east-1', 'critical', 'tier-1', 'public', 'monitored']}
               itemRenderer={item => <Tag key={item}>{item}</Tag>}
-              overflowHeaderLabel='items'
             />
           </AttributeActionsTarget>
           {renderActionsItems()}

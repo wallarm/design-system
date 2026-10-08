@@ -1,10 +1,18 @@
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
 import { Tag } from '../Tag';
 import { OverflowList } from './OverflowList';
+import { OverflowListMore } from './OverflowListMore';
+import { OverflowListMoreContent } from './OverflowListMoreContent';
+import { OverflowListMoreCount } from './OverflowListMoreCount';
+import { OverflowListMoreHeader } from './OverflowListMoreHeader';
+import { OverflowListMoreItems } from './OverflowListMoreItems';
+import { OverflowListMoreTrigger } from './OverflowListMoreTrigger';
+import { useOverflowListMore } from './useOverflowListMore';
 
 const DESCRIPTION = [
   'Lays a set of items out in one row and folds whatever will not fit into an overflow control — reach for `OverflowTooltip` instead when the thing overrunning is a single run of text rather than a set.',
-  'It renders nothing of its own: both the item and the `+N` are your renderers, so the popover behind the count is your composition, and it re-measures whenever the container changes width.',
+  'By default the overflow is a `+N more` chip opening a popover of every item; compose it yourself from the `OverflowListMore` parts (`Trigger`, `Content`, `Header`, `Items`, `Count`), or pass any `overflowRenderer(hiddenItems, { allItems, visibleItems })` of your own.',
+  'It re-measures whenever the container changes width.',
 ].join(' ');
 
 const meta = {
@@ -20,14 +28,13 @@ export default meta;
 
 const TAGS = ['XSS', 'BOLA', 'SQL Injection', 'Scanner', 'CSRF', 'XXE', 'RCE', 'LFI', 'IDOR'];
 
-/** All nine tags fit in 640px, so the overflow renderer is never called at all. */
+/** All nine tags fit in 640px, so the overflow chip never appears. */
 export const Basic: StoryFn = () => (
   <div className='w-640'>
     <OverflowList
       className='gap-4'
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowHeaderLabel='tags'
     />
   </div>
 );
@@ -39,7 +46,6 @@ export const Collapsed: StoryFn = () => (
       className='gap-4'
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowHeaderLabel='tags'
     />
   </div>
 );
@@ -55,7 +61,6 @@ export const CollapseFromStart: StoryFn = () => (
       collapseFrom='start'
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowHeaderLabel='tags'
     />
   </div>
 );
@@ -71,7 +76,6 @@ export const MinVisibleItems: StoryFn = () => (
       minVisibleItems={1}
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowHeaderLabel='tags'
     />
   </div>
 );
@@ -88,9 +92,9 @@ export const ResizableContainer: StoryFn = () => (
   >
     <OverflowList
       className='gap-4'
+      data-testid='tags'
       items={TAGS}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowHeaderLabel='tags'
     />
   </div>
 );
@@ -98,51 +102,113 @@ export const ResizableContainer: StoryFn = () => (
 const ATTACK_TYPES = ['RCE', 'XSS', 'SQL Injection', 'CSRF'];
 
 /**
- * Shows all items (visible + hidden) in the popover with a total count header.
- * This is the recommended pattern for read-only contexts.
- *
- * @see docs/chip-overflow-pattern.md
+ * The full composition: a header counting every item over the popover list, built from
+ * `OverflowListMoreHeader` and `OverflowListMoreCount` in plain JSX. Items already in the
+ * row are listed first and faded.
  */
-export const ShowAllInPopover: StoryFn = () => (
+export const WithHeader: StoryFn = () => (
   <div className='w-120'>
     <OverflowList
       className='gap-4'
+      data-testid='attacks'
       items={ATTACK_TYPES}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowHeaderLabel='attack types'
-      showAll
+      overflowRenderer={() => (
+        <OverflowListMore>
+          <OverflowListMoreTrigger />
+          <OverflowListMoreContent>
+            <OverflowListMoreHeader>
+              <OverflowListMoreCount of='total' /> attack types
+            </OverflowListMoreHeader>
+            <OverflowListMoreItems />
+          </OverflowListMoreContent>
+        </OverflowListMore>
+      )}
     />
   </div>
 );
 
 /**
- * Shows only hidden items in the popover (legacy pattern).
- * Use only for editable contexts like multi-select inputs.
+ * `show='hidden'` lists only what the row folded away — the pattern for editable
+ * contexts such as a multi-select input, where the visible chips are right there.
  */
-export const HiddenOnlyInPopover: StoryFn = () => (
+export const HiddenOnly: StoryFn = () => (
+  <div className='w-120'>
+    <OverflowList
+      className='gap-4'
+      data-testid='attacks'
+      items={ATTACK_TYPES}
+      itemRenderer={item => <Tag key={item}>{item}</Tag>}
+      overflowRenderer={() => (
+        <OverflowListMore>
+          <OverflowListMoreTrigger>
+            +<OverflowListMoreCount />
+          </OverflowListMoreTrigger>
+          <OverflowListMoreContent>
+            <OverflowListMoreItems show='hidden' />
+          </OverflowListMoreContent>
+        </OverflowListMore>
+      )}
+    />
+  </div>
+);
+
+/** `placement='cover'` opens the popover over the row itself, from its left edge. */
+export const CoverPlacement: StoryFn = () => (
+  <div className='w-120'>
+    <OverflowList
+      className='gap-4'
+      data-testid='attacks'
+      items={ATTACK_TYPES}
+      itemRenderer={item => <Tag key={item}>{item}</Tag>}
+      overflowRenderer={() => <OverflowListMore placement='cover' />}
+    />
+  </div>
+);
+
+const PluralHeader = () => {
+  const { totalCount } = useOverflowListMore();
+  return (
+    <OverflowListMoreHeader>
+      {totalCount} {totalCount === 1 ? 'attack type' : 'attack types'}
+    </OverflowListMoreHeader>
+  );
+};
+
+/**
+ * When the header needs the number as a value — pluralization, i18n — read it with
+ * `useOverflowListMore()` inside your own component instead of `OverflowListMoreCount`.
+ */
+export const PluralizedHeader: StoryFn = () => (
   <div className='w-120'>
     <OverflowList
       className='gap-4'
       items={ATTACK_TYPES}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      showAll={false}
+      overflowRenderer={() => (
+        <OverflowListMore>
+          <OverflowListMoreTrigger />
+          <OverflowListMoreContent>
+            <PluralHeader />
+            <OverflowListMoreItems />
+          </OverflowListMoreContent>
+        </OverflowListMore>
+      )}
     />
   </div>
 );
 
 /**
- * Popover overlays the origin (visible items + trigger).
- * Use when the popover should cover the entire row.
+ * `overflowRenderer` is just a function of the hidden items — anything goes, no popover
+ * required.
  */
-export const OverlayOrigin: StoryFn = () => (
+export const CustomRenderer: StoryFn = () => (
   <div className='w-120'>
     <OverflowList
       className='gap-4'
       items={ATTACK_TYPES}
       itemRenderer={item => <Tag key={item}>{item}</Tag>}
-      overflowHeaderLabel='attack types'
-      showAll
-      overlayOrigin
+      overflowRenderer={hidden => <Tag>and {hidden.length} others</Tag>}
     />
   </div>
 );

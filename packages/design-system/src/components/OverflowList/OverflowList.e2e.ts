@@ -3,9 +3,9 @@ import { createStoryHelper } from '@wallarm-org/playwright-config/storybook';
 
 const overflowStory = createStoryHelper('data-display-overflowlist', [
   'Resizable Container',
-  'Show All In Popover',
-  'Hidden Only In Popover',
-  'Overlay Origin',
+  'With Header',
+  'Hidden Only',
+  'Cover Placement',
 ] as const);
 
 const setWrapperWidth = (page: Page, width: number) =>
@@ -13,38 +13,29 @@ const setWrapperWidth = (page: Page, width: number) =>
     (el as HTMLElement).style.width = `${w}px`;
   }, width);
 
-// Count only the visible item tags inside the overflow list, excluding the
-// "+N more" overflow indicator tag.
-const getVisibleItemTagCount = (page: Page) =>
-  page
-    .locator('[data-slot="overflow-list"] [data-slot="tag"]')
-    .filter({ hasNotText: /^\+\d+ more$/ })
-    .count();
+// Row items are the row's children minus the "+N more" trigger.
+const getVisibleItemTagCount = async (page: Page) =>
+  (await page.getByTestId('tags').locator('> *').count()) -
+  (await page.getByTestId('tags--more--trigger').count());
 
-// The overflow indicator lives inside the overflow-list, not in the hidden
-// measurement container, so scope the locator to avoid strict-mode failures.
-const getOverflowIndicator = (page: Page) =>
-  page
-    .locator('[data-slot="overflow-list"]')
-    .getByText(/^\+\d+ more$/)
-    .first();
+const getOverflowIndicator = (page: Page) => page.getByTestId('tags--more--trigger');
 
 test.describe('Component: OverflowList', () => {
   test.describe('Visual', () => {
-    test('Should render chip overflow popover correctly', async ({ page }) => {
-      await overflowStory.goto(page, 'Show All In Popover');
+    test('Should render the overflow popover with header correctly', async ({ page }) => {
+      await overflowStory.goto(page, 'With Header');
+      await page.getByTestId('attacks--more--trigger').click();
+      await expect(page.getByTestId('attacks--more--header')).toHaveText('4 attack types');
 
-      // Take screenshot of the trigger
-      await expect(page).toHaveScreenshot('chip-overflow-trigger.png');
+      await expect(page).toHaveScreenshot();
+    });
 
-      // Click the overflow trigger to open popover
-      await getOverflowIndicator(page).click();
+    test('Should render the cover placement popover correctly', async ({ page }) => {
+      await overflowStory.goto(page, 'Cover Placement');
+      await page.getByTestId('attacks--more--trigger').click();
+      await expect(page.getByTestId('attacks--more--content')).toBeVisible();
 
-      // Wait for popover to be visible
-      await expect(page.getByText('4 attack types')).toBeVisible();
-
-      // Take screenshot of the open popover
-      await expect(page).toHaveScreenshot('chip-overflow-popover-open.png');
+      await expect(page).toHaveScreenshot();
     });
   });
 
@@ -73,119 +64,61 @@ test.describe('Component: OverflowList', () => {
 
       await expect.poll(() => getVisibleItemTagCount(page)).toBeGreaterThan(narrow);
     });
+
+    test('Should dim the row items when the popover lists every item', async ({ page }) => {
+      await overflowStory.goto(page, 'With Header');
+      await page.getByTestId('attacks--more--trigger').click();
+
+      const list = page.getByTestId('attacks--more--items');
+      for (const name of ['RCE', 'XSS', 'SQL Injection', 'CSRF']) {
+        await expect(list.getByText(name, { exact: true })).toBeVisible();
+      }
+      await expect(list.getByTestId('attacks--more--items--item').first()).toHaveClass(
+        /opacity-60/,
+      );
+    });
+
+    test('Should list only the hidden items when show is hidden', async ({ page }) => {
+      await overflowStory.goto(page, 'Hidden Only');
+      const trigger = page.getByTestId('attacks--more--trigger');
+      const hiddenCount = Number((await trigger.textContent())?.replace(/\D/g, ''));
+      await trigger.click();
+
+      const list = page.getByTestId('attacks--more--items');
+      await expect(list.getByTestId('attacks--more--items--item')).toHaveCount(hiddenCount);
+    });
+
+    test('Should open over the row when placement is cover', async ({ page }) => {
+      await overflowStory.goto(page, 'Cover Placement');
+      const row = await page.getByTestId('attacks').boundingBox();
+      await page.getByTestId('attacks--more--trigger').click();
+
+      const content = page.getByTestId('attacks--more--content');
+      await expect(content).toBeVisible();
+      // The opening zoom/slide animation changes the bounding box until it finishes.
+      await content.evaluate(el =>
+        Promise.all(el.getAnimations().map(animation => animation.finished)),
+      );
+
+      const popover = await content.boundingBox();
+      expect(row && popover).toBeTruthy();
+      if (!row || !popover) return;
+      expect(Math.abs(popover.x - row.x)).toBeLessThanOrEqual(1);
+      expect(Math.abs(popover.y - row.y)).toBeLessThanOrEqual(1);
+    });
   });
 
-  test.describe('ChipOverflowPopover - Show All Pattern', () => {
-    test('Should show header with total count', async ({ page }) => {
-      await overflowStory.goto(page, 'Show All In Popover');
+  test.describe('Accessibility', () => {
+    test('Should be openable and closable via keyboard Enter and Escape', async ({ page }) => {
+      await overflowStory.goto(page, 'With Header');
+      const trigger = page.getByTestId('attacks--more--trigger');
 
-      // Click the overflow trigger
-      await getOverflowIndicator(page).click();
+      await trigger.focus();
+      await page.keyboard.press('Enter');
+      await expect(page.getByTestId('attacks--more--content')).toBeVisible();
 
-      // Verify header shows total count
-      await expect(page.getByText('4 attack types')).toBeVisible();
-    });
-
-    test('Should show all items (visible + hidden) in popover', async ({ page }) => {
-      await overflowStory.goto(page, 'Show All In Popover');
-
-      // Click the overflow trigger
-      await getOverflowIndicator(page).click();
-
-      // Verify all 4 attack types are shown in the popover
-      const popover = page.locator('[data-slot="popover-content"]');
-      await expect(popover.getByText('RCE')).toBeVisible();
-      await expect(popover.getByText('XSS')).toBeVisible();
-      await expect(popover.getByText('SQL Injection')).toBeVisible();
-      await expect(popover.getByText('CSRF')).toBeVisible();
-    });
-
-    test('Should dim visible items in popover', async ({ page }) => {
-      await overflowStory.goto(page, 'Show All In Popover');
-
-      // Click the overflow trigger
-      await getOverflowIndicator(page).click();
-
-      // Verify visible item has opacity-60 class
-      const visibleItem = page.locator('[data-visible="true"]').first();
-      await expect(visibleItem).toHaveClass(/opacity-60/);
-    });
-
-    test('Should close popover on Escape key', async ({ page }) => {
-      await overflowStory.goto(page, 'Show All In Popover');
-
-      // Click the overflow trigger
-      await getOverflowIndicator(page).click();
-
-      // Verify popover is open
-      await expect(page.getByText('4 attack types')).toBeVisible();
-
-      // Press Escape
       await page.keyboard.press('Escape');
-
-      // Verify popover is closed
-      await expect(page.getByText('4 attack types')).not.toBeVisible();
-    });
-  });
-
-  test.describe('ChipOverflowPopover - Hidden Only Pattern', () => {
-    test('Should not show header when showAll is false', async ({ page }) => {
-      await overflowStory.goto(page, 'Hidden Only In Popover');
-
-      // Click the overflow trigger
-      await getOverflowIndicator(page).click();
-
-      // Verify header is NOT shown
-      await expect(page.getByText('attack types')).not.toBeVisible();
-    });
-
-    test('Should show only hidden items in popover', async ({ page }) => {
-      await overflowStory.goto(page, 'Hidden Only In Popover');
-
-      // Click the overflow trigger
-      await getOverflowIndicator(page).click();
-
-      // Verify only hidden items are shown (not the visible one)
-      const popover = page.locator('[data-slot="popover-content"]');
-
-      // Should NOT have data-visible="true" items
-      await expect(popover.locator('[data-visible="true"]')).toHaveCount(0);
-
-      // Should have hidden items (3 out of 4 in this story with w-120)
-      await expect(popover.locator('[data-visible="false"]')).toHaveCount(3);
-    });
-  });
-
-  test.describe('ChipOverflowPopover - Overlay Origin', () => {
-    test('Should overlay the origin when overlayOrigin is true', async ({ page }) => {
-      await overflowStory.goto(page, 'Overlay Origin');
-
-      // Click the overflow trigger
-      await getOverflowIndicator(page).click();
-
-      // Verify popover has overlay positioning attribute
-      const popover = page.locator('[data-slot="popover-content"]');
-      await expect(popover).toBeVisible();
-      await expect(popover).toHaveAttribute('data-overlay-origin', 'true');
-    });
-
-    test('Should show all items with header when overlayOrigin is combined with showAll', async ({
-      page,
-    }) => {
-      await overflowStory.goto(page, 'Overlay Origin');
-
-      // Click the overflow trigger
-      await getOverflowIndicator(page).click();
-
-      // Verify header shows total count
-      await expect(page.getByText('4 attack types')).toBeVisible();
-
-      // Verify all items are shown
-      const popover = page.locator('[data-slot="popover-content"]');
-      await expect(popover.getByText('RCE')).toBeVisible();
-      await expect(popover.getByText('XSS')).toBeVisible();
-      await expect(popover.getByText('SQL Injection')).toBeVisible();
-      await expect(popover.getByText('CSRF')).toBeVisible();
+      await expect(page.getByTestId('attacks--more--content')).toBeHidden();
     });
   });
 });

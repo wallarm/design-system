@@ -709,7 +709,6 @@ export const ColumnResizingWithOverflowList: StoryFn<typeof meta> = () => {
             className='gap-4'
             items={row.original.tags}
             itemRenderer={(item: string) => <Tag key={item}>{item}</Tag>}
-            overflowHeaderLabel='tags'
           />
         ),
       }),
