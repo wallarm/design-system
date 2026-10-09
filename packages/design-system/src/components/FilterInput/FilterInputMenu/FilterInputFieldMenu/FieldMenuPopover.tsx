@@ -80,6 +80,9 @@ export const FieldMenuPopover: FC<FieldMenuPopoverProps> = ({
         maxWidth='340px'
         // pointer-events-none: a stray hover over the panel must not affect the menu.
         className='gap-6 pointer-events-none'
+        // Its layer sits between the field menu and the operator menu it hands off to; the
+        // marker lets `keepOpenOnMenuHandoff` ignore the dismiss it sends when it closes.
+        data-filter-input-menu='true'
         data-testid='field-menu-popover'
       >
         <p className='font-mono text-sm leading-sm text-text-primary'>{title}</p>
