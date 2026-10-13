@@ -9,6 +9,7 @@ import {
   ArrowDownRight,
   ArrowLeft,
   ArrowRight,
+  ArrowRightAlt,
   ArrowUp,
   ArrowUpLeft,
   ArrowUpRight,
@@ -64,6 +65,7 @@ import {
   GitCommitVertical,
   GitCompare,
   GitCompareArrows,
+  GitCompareArrowsAlt,
   GitFork,
   GitGraph,
   GitMerge,
@@ -396,6 +398,14 @@ figma.connect(
   'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6018-1086',
   {
     example: () => <ArrowRight />,
+  },
+);
+
+figma.connect(
+  ArrowRightAlt,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=7001-266',
+  {
+    example: () => <ArrowRightAlt />,
   },
 );
 
@@ -760,6 +770,14 @@ figma.connect(
   'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=6029-1134',
   {
     example: () => <GitCompareArrows />,
+  },
+);
+
+figma.connect(
+  GitCompareArrowsAlt,
+  'https://www.figma.com/design/ezgUqbCqEBXqC4ViRausYIAN/ICONS?node-id=7000-257',
+  {
+    example: () => <GitCompareArrowsAlt />,
   },
 );
 
