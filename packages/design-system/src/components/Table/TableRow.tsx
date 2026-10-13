@@ -1,4 +1,4 @@
-import { memo, type Ref, useCallback } from 'react';
+import { memo, type ReactNode, type Ref, useCallback } from 'react';
 import type { Row, RowData } from '@tanstack/react-table';
 import { cn } from '../../utils/cn';
 import { useTestId } from '../../utils/testId';
@@ -9,6 +9,7 @@ import {
   TABLE_DRAG_HANDLE_COLUMN_ID,
   TABLE_EXPAND_COLUMN_ID,
   TABLE_SELECT_COLUMN_ID,
+  useRenderEveryTime,
   useRowDnd,
   useTableValue,
   withTableState,
@@ -24,6 +25,39 @@ const SYSTEM_COLUMN_IDS = new Set([
   TABLE_SELECT_COLUMN_ID,
   TABLE_DRAG_HANDLE_COLUMN_ID,
 ]);
+
+interface TableFullWidthCellProps {
+  colSpan: number;
+  lastRow?: boolean;
+  dropIndicator?: 'above' | 'below';
+  children: ReactNode;
+}
+
+/**
+ * One cell spanning every data column — the body of a full-width row
+ * (`renderFullWidthRow`) or of a full-width group row (`groupRowSpan: 'full'`).
+ */
+export const TableFullWidthCell = ({
+  colSpan,
+  lastRow,
+  dropIndicator,
+  children,
+}: TableFullWidthCellProps) => (
+  <Td
+    pinned={false}
+    lastRow={lastRow}
+    colSpan={colSpan}
+    className={cn(
+      'align-middle',
+      dropIndicator && DROP_INDICATOR_BASE,
+      dropIndicator === 'above' && 'after:top-0',
+      dropIndicator === 'below' && 'after:-bottom-px',
+    )}
+    style={dropIndicator ? { overflow: 'visible' } : undefined}
+  >
+    {children}
+  </Td>
+);
 
 interface TableRowProps<T extends RowData> {
   row: Row<DSTableFeatures, T>;
@@ -46,6 +80,8 @@ const TableRowInner = <T extends RowData>({
     hasSubRowGrouping,
     showEmptyGroups,
     allLeafColumns,
+    renderFullWidthGroupRow,
+    renderFullWidthRow,
   } = useTableContext<T>();
   const testId = useTestId('row');
   const { canDnd, isDragging, setNodeRef, style: dndStyle, attributes, listeners } = useRowDnd(row);
@@ -63,6 +99,11 @@ const TableRowInner = <T extends RowData>({
     return rows[rows.length - 1]?.id === row.id;
   });
   const isPreviewActive = activeRowId === row.id;
+  // Consumer callbacks — run on every render (see useRenderEveryTime).
+  const fullWidthContent = useRenderEveryTime(() =>
+    isGroupParent ? renderFullWidthGroupRow?.(row) : renderFullWidthRow?.(row),
+  );
+  const isFullWidth = fullWidthContent !== undefined;
 
   // The container frame draws the table's bottom edge, so the last row must
   // not draw its own bottom border (otherwise 1px + 1px stack into a 2px line).
@@ -116,7 +157,12 @@ const TableRowInner = <T extends RowData>({
           {systemCells.map(cell => (
             <TableBodyCell key={cell.id} cell={cell} disablePinnedShadow lastRow={isLastRow} />
           ))}
-          {firstDataCell && (
+          {isFullWidth && (
+            <TableFullWidthCell colSpan={dataCells.length} lastRow={isLastRow}>
+              {fullWidthContent}
+            </TableFullWidthCell>
+          )}
+          {!isFullWidth && firstDataCell && (
             <TableBodyCell
               cell={firstDataCell}
               className='border-r-0'
@@ -126,7 +172,7 @@ const TableRowInner = <T extends RowData>({
           )}
           {/* Filler cells read their column width — recreated on every table state change. */}
           {withTableState(table.state, () =>
-            dataCells
+            (isFullWidth ? [] : dataCells)
               .slice(1)
               .map(cell => (
                 <Td
@@ -179,19 +225,29 @@ const TableRowInner = <T extends RowData>({
         data-depth={row.depth > 0 ? row.depth : undefined}
         style={dndStyle}
       >
-        {cells.map(cell => {
-          const isDragHandle = cell.column.id === TABLE_DRAG_HANDLE_COLUMN_ID;
+        {(isFullWidth ? cells.filter(c => SYSTEM_COLUMN_IDS.has(c.column.id)) : cells).map(cell => {
+          const isDragHandle = canDnd && cell.column.id === TABLE_DRAG_HANDLE_COLUMN_ID;
           return (
             <TableBodyCell
               key={cell.id}
               cell={cell}
               dragListeners={isDragHandle ? listeners : undefined}
               dragAttributes={isDragHandle ? attributes : undefined}
+              disablePinnedShadow={isFullWidth}
               lastRow={isLastRow}
               dropIndicator={dropIndicator}
             />
           );
         })}
+        {isFullWidth && (
+          <TableFullWidthCell
+            colSpan={cells.filter(c => !SYSTEM_COLUMN_IDS.has(c.column.id)).length}
+            lastRow={isLastRow}
+            dropIndicator={dropIndicator}
+          >
+            {fullWidthContent}
+          </TableFullWidthCell>
+        )}
         {!stretch && (
           <Td
             pinned={false}

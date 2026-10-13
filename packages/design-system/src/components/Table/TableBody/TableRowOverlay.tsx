@@ -1,7 +1,7 @@
 import type { FC } from 'react';
 import { flexRender, type Row, type RowData } from '@tanstack/react-table';
 import { cn } from '../../../utils/cn';
-import { type DSTableFeatures, getAlignClass, withTableState } from '../lib';
+import { type DSTableFeatures, getAlignClass, useRenderEveryTime, withTableState } from '../lib';
 import { Td, Tr } from '../primitives';
 import { useTableContext } from '../TableContext';
 
@@ -10,7 +10,8 @@ interface TableRowOverlayProps<T extends RowData> {
 }
 
 const TableRowOverlayInner = <T extends RowData>({ row }: TableRowOverlayProps<T>) => {
-  const { table } = useTableContext<T>();
+  const { table, renderFullWidthRow } = useTableContext<T>();
+  const fullWidthContent = useRenderEveryTime(() => renderFullWidthRow?.(row));
 
   // Cells read column widths and consumer renderers — rebuilt on every table state change.
   return withTableState(table.state, () => {
@@ -23,7 +24,12 @@ const TableRowOverlayInner = <T extends RowData>({ row }: TableRowOverlayProps<T
       >
         <tbody>
           <Tr className='pointer-events-none shadow-lg opacity-90 bg-bg-primary'>
-            {row.getVisibleCells().map(cell => {
+            {fullWidthContent !== undefined && (
+              <Td pinned={false} colSpan={row.getVisibleCells().length}>
+                {fullWidthContent}
+              </Td>
+            )}
+            {(fullWidthContent === undefined ? row.getVisibleCells() : []).map(cell => {
               const column = visibleColumns.find(c => c.id === cell.column.id);
               const meta = cell.column.columnDef.meta;
               return (

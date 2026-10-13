@@ -6,6 +6,7 @@ import {
   TABLE_DRAG_HANDLE_COLUMN_ID,
   TABLE_EXPAND_COLUMN_ID,
   TABLE_SELECT_COLUMN_ID,
+  useRenderEveryTime,
   useTableValue,
   withTableState,
 } from './lib';
@@ -13,6 +14,7 @@ import { Td, Tr } from './primitives';
 import { TableBodyCell } from './TableBody/TableBodyCell';
 import { TableColGroup } from './TableColGroup';
 import { useTableContext } from './TableContext';
+import { TableFullWidthCell } from './TableRow';
 
 const SYSTEM_COLUMN_IDS = new Set([
   TABLE_EXPAND_COLUMN_ID,
@@ -26,7 +28,8 @@ interface StickyGroupParentProps {
 }
 
 export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, headerHeight }) => {
-  const { table, containerRef, tbodyRef, virtualizerRef, virtualized } = useTableContext();
+  const { table, containerRef, tbodyRef, virtualizerRef, virtualized, renderFullWidthGroupRow } =
+    useTableContext();
 
   const useWindowScroll = virtualized === 'window';
 
@@ -87,6 +90,10 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
   const dataCells = cells?.filter(c => !SYSTEM_COLUMN_IDS.has(c.column.id));
   const firstDataCell = dataCells?.[0];
   const isSelected = useTableValue(() => stickyRow?.getIsAllSubRowsSelected());
+  const fullWidthContent = useRenderEveryTime(() =>
+    stickyRow ? renderFullWidthGroupRow?.(stickyRow) : undefined,
+  );
+  const isFullWidth = fullWidthContent !== undefined;
 
   // Always render the sticky anchor to avoid DOM insertion/removal during
   // scroll which causes a brief layout reflow (the "jump" glitch).
@@ -109,7 +116,12 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
                   {systemCells!.map(cell => (
                     <TableBodyCell key={cell.id} cell={cell} disablePinnedShadow />
                   ))}
-                  {firstDataCell && (
+                  {isFullWidth && (
+                    <TableFullWidthCell colSpan={dataCells!.length}>
+                      {fullWidthContent}
+                    </TableFullWidthCell>
+                  )}
+                  {!isFullWidth && firstDataCell && (
                     <TableBodyCell
                       cell={firstDataCell}
                       className='border-r-0'
@@ -118,7 +130,7 @@ export const StickyGroupParent: FC<StickyGroupParentProps> = ({ tableWidth, head
                   )}
                   {/* Filler cells read their column width — recreated on every table state change. */}
                   {withTableState(table.state, () =>
-                    dataCells!
+                    (isFullWidth ? [] : dataCells!)
                       .slice(1)
                       .map(cell => (
                         <Td

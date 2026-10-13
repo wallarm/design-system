@@ -17,11 +17,19 @@ export interface UseRowDndResult {
   listeners: UseSortableReturn['listeners'];
 }
 
-export const useRowDnd = <T extends RowData>(row: Row<DSTableFeatures, T>): UseRowDndResult => {
-  const { rowDndEnabled, showEmptyGroups } = useTableContext<T>();
-  const isGroup = useTableValue(() => isGroupRow(row, showEmptyGroups));
-  const canDnd = rowDndEnabled && !isGroup;
+/** Whether the row can be dragged: never a group row, and only if `getRowCanDrag` allows it. */
+export const useRowCanDrag = <T extends RowData>(row: Row<DSTableFeatures, T>): boolean => {
+  const { rowDndEnabled, showEmptyGroups, getRowCanDrag } = useTableContext<T>();
+  const canDrag = useTableValue(
+    () => !isGroupRow(row, showEmptyGroups) && (getRowCanDrag?.(row) ?? true),
+  );
+  return rowDndEnabled && canDrag;
+};
 
+export const useRowDnd = <T extends RowData>(row: Row<DSTableFeatures, T>): UseRowDndResult => {
+  const canDnd = useRowCanDrag(row);
+
+  // `disabled` also takes the row out of collision detection: it is no drop target.
   const { attributes, listeners, setNodeRef, isDragging } = useSortable({
     id: row.id,
     disabled: !canDnd,

@@ -108,6 +108,13 @@ export interface TableContextValue<T extends RowData> {
 
   // Row reorder callback
   onRowReorder?: (event: TableRowReorderEvent) => void;
+  getRowCanDrag?: (row: Row<DSTableFeatures, T>) => boolean;
+
+  // Content of a row rendered as one cell spanning the data columns:
+  // `renderGroupRow` for group rows (only with `groupRowSpan: 'full'`) and
+  // `renderFullWidthRow` for the rest.
+  renderFullWidthGroupRow?: (row: Row<DSTableFeatures, T>) => ReactNode;
+  renderFullWidthRow?: (row: Row<DSTableFeatures, T>) => ReactNode | undefined;
 
   // Master cell click
   onMasterCellClick?: (rowId: string) => void;

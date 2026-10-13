@@ -3,7 +3,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { arrayMove } from '@dnd-kit/sortable';
 import { fn } from 'storybook/test';
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
-import { Copy, Database, Ellipsis, Filter, FilterX, SearchX, Trash2 } from '../../icons';
+import {
+  ChevronDown,
+  ChevronRight,
+  Copy,
+  Database,
+  Ellipsis,
+  Filter,
+  FilterX,
+  Lock,
+  Plus,
+  SearchX,
+  Shield,
+  Trash2,
+} from '../../icons';
 import { Badge } from '../Badge';
 import {
   BulkBarSummaryClear,
@@ -2072,6 +2085,104 @@ export const RowReorderingInGroups: StoryFn<typeof meta> = () => {
       onExpandedChange={setExpanded}
       onRowReorder={handleRowReorder}
       data-testid='row-reorder-groups-table'
+    />
+  );
+};
+
+const BANNER_ROW_PREFIX = 'banner-';
+const LOCKED_ROW_IDS = new Set(['csp-1']);
+
+/**
+ * `groupRowSpan: 'full'` draws `renderGroupRow` across every data column — title on the left,
+ * actions on the right edge; the content owns the collapse toggle. `renderFullWidthRow` turns a
+ * regular row into a single spanning banner, and `getRowCanDrag` keeps the banner and the locked
+ * first header in place while the other rows of the group reorder around them.
+ */
+export const GroupedWithFullWidthRows: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState<SecurityHeaderEntry[]>(() => [
+    {
+      ...groupedHeaderData[0]!,
+      children: [
+        { ...groupedHeaderData[0]!, id: `${BANNER_ROW_PREFIX}csp`, children: undefined },
+        ...(groupedHeaderData[0]!.children ?? []),
+      ],
+    },
+    ...groupedHeaderData.slice(1, 3),
+    { ...groupedHeaderData[0]!, id: 'group-empty', objectName: 'Nothing here yet', children: [] },
+  ]);
+  const [expanded, setExpanded] = useState<TableExpandedState>(true);
+
+  const handleRowReorder = useCallback((event: TableRowReorderEvent) => {
+    setData(prev =>
+      prev.map(group => {
+        const children = group.children ?? [];
+        const oldIndex = children.findIndex(row => row.id === event.activeRowId);
+        const newIndex = children.findIndex(row => row.id === event.overRowId);
+        if (oldIndex === -1 || newIndex === -1) return group;
+        return { ...group, children: arrayMove(children, oldIndex, newIndex) };
+      }),
+    );
+  }, []);
+
+  return (
+    <Table<SecurityHeaderEntry>
+      data={data}
+      columns={headerColumns}
+      getRowId={row => row.id}
+      getSubRows={row => row.children}
+      showEmptyGroups
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      onRowReorder={handleRowReorder}
+      groupRowSpan='full'
+      renderGroupRow={row => {
+        const isExpanded = row.getIsExpanded();
+        return (
+          <HStack gap={8} align='center'>
+            <Button
+              variant='ghost'
+              color='neutral'
+              size='small'
+              aria-expanded={isExpanded}
+              aria-label={isExpanded ? 'Collapse group' : 'Expand group'}
+              onClick={row.getToggleExpandedHandler()}
+            >
+              {isExpanded ? <ChevronDown /> : <ChevronRight />}
+            </Button>
+            <Text weight='medium'>{row.original.objectName}</Text>
+            <Badge color='gray' type='secondary' size='medium'>
+              {row.subRows.filter(r => !r.id.startsWith(BANNER_ROW_PREFIX)).length}
+            </Badge>
+            <HStack gap={4} className='ml-auto'>
+              <Button variant='ghost' color='neutral' size='small'>
+                <Plus />
+                Add header
+              </Button>
+              <Button variant='ghost' color='neutral' size='small' aria-label='More actions'>
+                <Ellipsis />
+              </Button>
+            </HStack>
+          </HStack>
+        );
+      }}
+      renderFullWidthRow={row =>
+        row.id.startsWith(BANNER_ROW_PREFIX) ? (
+          <HStack gap={8} align='center'>
+            <Shield size='sm' />
+            <Text size='sm' weight='medium'>
+              Wallarm baseline headers
+            </Text>
+            <Text size='sm' color='secondary'>
+              · applied first · built-in, always on
+            </Text>
+            <Button variant='ghost' color='neutral' size='small' className='ml-auto'>
+              Manage baseline →
+            </Button>
+          </HStack>
+        ) : undefined
+      }
+      getRowCanDrag={row => !row.id.startsWith(BANNER_ROW_PREFIX) && !LOCKED_ROW_IDS.has(row.id)}
+      data-testid='grouped-full-width-table'
     />
   );
 };

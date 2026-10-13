@@ -265,7 +265,27 @@ export interface TableProps<T> extends TestableProps {
   // --- Grouping ---
   grouping?: TableGroupingState;
   onGroupingChange?: TableOnChangeFn<TableGroupingState>;
+  /**
+   * Group row content for `getSubRows` grouping. Passing it switches the table
+   * to sub-row grouping mode: the auto-injected expand column is dropped, so
+   * the content is responsible for its own expand/collapse toggle
+   * (`row.getToggleExpandedHandler()`).
+   *
+   * Rendered only with `groupRowSpan: 'full'`. With the default `'master'` the
+   * group row shows its master (first data) column cell, as before.
+   */
   renderGroupRow?: (row: TableRow<T>) => ReactNode;
+  /**
+   * How a group row lays out its content.
+   *
+   * - `'master'` (default): the master column's cell, then empty filler cells —
+   *   the content is confined to the master column width.
+   * - `'full'`: `renderGroupRow(row)` in a single cell spanning every data
+   *   column (system cells — selection, drag handle — keep their own cells).
+   *   Use for a group header with a title on the left and actions pinned to the
+   *   right edge of the table. Requires `renderGroupRow`.
+   */
+  groupRowSpan?: 'master' | 'full';
   /** Sub-row accessor for hierarchical/tree data (used with renderGroupRow) */
   getSubRows?: (row: T) => T[] | undefined;
   /**
@@ -342,6 +362,27 @@ export interface TableProps<T> extends TestableProps {
    * among the rows of its own group.
    */
   onRowReorder?: (event: TableRowReorderEvent) => void;
+  /**
+   * Per-row drag control for `onRowReorder`. A row for which it returns
+   * `false` shows no grip, cannot be dragged and is not a drop target — the
+   * other rows of its group move around it. Group rows never move regardless.
+   *
+   * Default: every non-group row can be dragged.
+   */
+  getRowCanDrag?: (row: TableRow<T>) => boolean;
+
+  // --- Full-width rows ---
+  /**
+   * Renders a non-group row as a single cell spanning every data column — a
+   * banner or notice row among regular rows. Return `undefined` to render the
+   * row normally, with a cell per column. System cells (selection, drag
+   * handle) keep their own cells. Pair with `getRowCanDrag` to keep such a row
+   * in place in a reorderable table.
+   *
+   * Called on every render of the row: return elements, do not call hooks in
+   * the callback itself (components it returns may).
+   */
+  renderFullWidthRow?: (row: TableRow<T>) => ReactNode | undefined;
 
   // --- Master cell click ---
   /** Callback fired when the master cell is clicked. Receives the row ID. */

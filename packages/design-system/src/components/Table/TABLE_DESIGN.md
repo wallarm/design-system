@@ -190,7 +190,20 @@ Enabled by passing `grouping` or `onGroupingChange`.
 |------|------|-------------|
 | `grouping` | `GroupingState` | Columns for grouping (controlled) |
 | `onGroupingChange` | `OnChangeFn<GroupingState>` | Callback on grouping change |
-| `renderGroupRow` | `(group: GroupRow<T>) => ReactNode` | Custom group row renderer |
+| `getSubRows` | `(row: T) => T[] \| undefined` | Sub-row grouping: top-level rows with sub-rows render as group rows |
+| `showEmptyGroups` | `boolean` | Render a top-level row whose `getSubRows` returns `[]` as an empty group row |
+| `renderGroupRow` | `(row: TableRow<T>) => ReactNode` | Sub-row grouping mode (with `getSubRows`): drops the expand column; the content owns its expand toggle (`row.getToggleExpandedHandler()`). Rendered only with `groupRowSpan: 'full'` |
+| `groupRowSpan` | `'master' \| 'full'` | `'master'` (default): group row shows the master column cell + fillers. `'full'`: `renderGroupRow` in one cell spanning every data column |
+| `renderFullWidthRow` | `(row: TableRow<T>) => ReactNode \| undefined` | Render a non-group row as one cell spanning the data columns (banner rows); `undefined` renders the row normally |
+
+### Row Reordering (Drag & Drop)
+
+Enabled by passing `onRowReorder` (auto-injects a drag-handle column). Under `getSubRows` grouping a row moves only within its own group; group rows never move.
+
+| Prop | Type | Description |
+|------|------|-------------|
+| `onRowReorder` | `(event: TableRowReorderEvent) => void` | Called with `{ activeRowId, overRowId }` on drop |
+| `getRowCanDrag` | `(row: TableRow<T>) => boolean` | Per-row lock: `false` → no grip, not draggable, not a drop target. Default: every non-group row |
 
 ### Row Expanding
 

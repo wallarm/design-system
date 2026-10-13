@@ -1524,4 +1524,76 @@ describe('Row reordering inside sub-row groups', () => {
     expect(isGroupRow(rowById('g2'))).toBe(true);
     expect(isSortable(rowById('g2'))).toBe(false);
   });
+
+  // Two data columns (Name, Status) behind the drag-handle system column.
+  const DATA_COLUMN_COUNT = 2;
+
+  it('locks a row for which getRowCanDrag returns false: no grip, not sortable', () => {
+    render(
+      <Table<GroupedRow>
+        data={groupedData}
+        columns={baseColumns as never}
+        getRowId={row => row.id}
+        getSubRows={row => row.children}
+        expanded={true}
+        onRowReorder={rs.fn()}
+        getRowCanDrag={row => row.original.id !== 'a'}
+        data-testid='tbl'
+      />,
+    );
+
+    const locked = rowById('a');
+    expect(isSortable(locked)).toBe(false);
+    expect(locked.querySelector('svg')).toBeNull();
+    expect(locked.querySelector('.cursor-grab')).toBeNull();
+    expect(isSortable(rowById('b'))).toBe(true);
+    expect(rowById('b').querySelector('svg')).not.toBeNull();
+  });
+
+  it("renders renderGroupRow across the data columns with groupRowSpan 'full'", () => {
+    render(
+      <Table<GroupedRow>
+        data={groupedData}
+        columns={baseColumns as never}
+        getRowId={row => row.id}
+        getSubRows={row => row.children}
+        renderGroupRow={row => <span data-testid={`group-${row.id}`}>{row.original.name}</span>}
+        groupRowSpan='full'
+        showEmptyGroups
+        expanded={true}
+        onRowReorder={rs.fn()}
+        data-testid='tbl'
+      />,
+    );
+
+    for (const id of ['g1', 'g2']) {
+      const cell = screen.getByTestId(`group-${id}`).closest('td');
+      expect(cell).toHaveAttribute('colspan', String(DATA_COLUMN_COUNT));
+      // Drag-handle cell + the spanning cell — no filler cells.
+      expect(rowById(id).querySelectorAll('td')).toHaveLength(2);
+    }
+  });
+
+  it('renders a row as one spanning cell when renderFullWidthRow returns content', () => {
+    render(
+      <Table<GroupedRow>
+        data={groupedData}
+        columns={baseColumns as never}
+        getRowId={row => row.id}
+        getSubRows={row => row.children}
+        renderGroupRow={row => row.original.name}
+        expanded={true}
+        onRowReorder={rs.fn()}
+        renderFullWidthRow={row =>
+          row.original.id === 'a' ? <span data-testid='banner'>Banner</span> : undefined
+        }
+        data-testid='tbl'
+      />,
+    );
+
+    const cell = screen.getByTestId('banner').closest('td');
+    expect(cell).toHaveAttribute('colspan', String(DATA_COLUMN_COUNT));
+    expect(rowById('a').querySelectorAll('td')).toHaveLength(2);
+    expect(rowById('b').querySelectorAll('td')).toHaveLength(1 + DATA_COLUMN_COUNT);
+  });
 });
