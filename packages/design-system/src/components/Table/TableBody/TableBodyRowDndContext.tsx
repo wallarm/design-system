@@ -7,6 +7,7 @@ import {
   useMemo,
   useState,
 } from 'react';
+import { createPortal } from 'react-dom';
 import {
   type CollisionDetection,
   closestCenter,
@@ -164,6 +165,9 @@ const TableBodyRowDndContextInner: FC<TableBodyRowDndContextInnerProps> = ({
       <DndContext
         sensors={sensors}
         collisionDetection={collisionDetection}
+        // The context sits inside <table>; its screen-reader nodes are <div>s,
+        // which a table cannot hold — render them in <body> instead.
+        accessibility={{ container: document.body }}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
@@ -172,9 +176,13 @@ const TableBodyRowDndContextInner: FC<TableBodyRowDndContextInnerProps> = ({
         <SortableContext items={rowIds} strategy={verticalListSortingStrategy}>
           {children}
         </SortableContext>
-        <DragOverlay style={{ cursor: 'grabbing' }}>
-          {activeRow ? <TableRowOverlay row={activeRow} /> : null}
-        </DragOverlay>
+        {/* Same reason: the overlay is a <div>, portalled out of the table. */}
+        {createPortal(
+          <DragOverlay style={{ cursor: 'grabbing' }}>
+            {activeRow ? <TableRowOverlay row={activeRow} /> : null}
+          </DragOverlay>,
+          document.body,
+        )}
       </DndContext>
     </RowDndIndicatorContext.Provider>
   );
