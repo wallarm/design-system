@@ -5,6 +5,7 @@ import { useTestId } from '../../utils/testId';
 import { DROP_INDICATOR_BASE } from './classes';
 import {
   type DSTableFeatures,
+  isGroupRow,
   TABLE_DRAG_HANDLE_COLUMN_ID,
   TABLE_EXPAND_COLUMN_ID,
   TABLE_SELECT_COLUMN_ID,
@@ -43,12 +44,13 @@ const TableRowInner = <T extends RowData>({
     renderExpandedRow,
     stretch,
     hasSubRowGrouping,
+    showEmptyGroups,
     allLeafColumns,
   } = useTableContext<T>();
   const testId = useTestId('row');
   const { canDnd, isDragging, setNodeRef, style: dndStyle, attributes, listeners } = useRowDnd(row);
   const { activeId, overId } = useRowDndIndicator();
-  const isGroupParent = useTableValue(() => row.subRows.length > 0);
+  const isGroupParent = useTableValue(() => isGroupRow(row, showEmptyGroups));
   const isSelected = useTableValue(() =>
     row.subRows.length > 0 ? row.getIsAllSubRowsSelected() : row.getIsSelected(),
   );

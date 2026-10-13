@@ -3,6 +3,7 @@ import { useSortable } from '@dnd-kit/sortable';
 import type { Row, RowData } from '@tanstack/react-table';
 import { useTableContext } from '../TableContext/useTableContext';
 import type { DSTableFeatures } from './dsTableFeatures';
+import { isGroupRow } from './isGroupRow';
 import { useTableValue } from './tableReactivity';
 
 type UseSortableReturn = ReturnType<typeof useSortable>;
@@ -17,9 +18,9 @@ export interface UseRowDndResult {
 }
 
 export const useRowDnd = <T extends RowData>(row: Row<DSTableFeatures, T>): UseRowDndResult => {
-  const { rowDndEnabled } = useTableContext<T>();
-  const hasSubRows = useTableValue(() => row.subRows.length > 0);
-  const canDnd = rowDndEnabled && !hasSubRows;
+  const { rowDndEnabled, showEmptyGroups } = useTableContext<T>();
+  const isGroup = useTableValue(() => isGroupRow(row, showEmptyGroups));
+  const canDnd = rowDndEnabled && !isGroup;
 
   const { attributes, listeners, setNodeRef, isDragging } = useSortable({
     id: row.id,

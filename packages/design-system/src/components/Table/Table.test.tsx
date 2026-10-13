@@ -1462,3 +1462,66 @@ describe('Column widths follow the rendered order', () => {
     });
   });
 });
+
+describe('Row reordering inside sub-row groups', () => {
+  interface GroupedRow extends Row {
+    children?: GroupedRow[];
+  }
+
+  const groupedData: GroupedRow[] = [
+    {
+      id: 'g1',
+      name: 'Group 1',
+      status: '',
+      children: [
+        { id: 'a', name: 'Alpha', status: 'active' },
+        { id: 'b', name: 'Bravo', status: 'active' },
+      ],
+    },
+    { id: 'g2', name: 'Group 2', status: '', children: [] },
+  ];
+
+  const renderGrouped = (showEmptyGroups?: boolean) =>
+    render(
+      <Table<GroupedRow>
+        data={groupedData}
+        columns={baseColumns as never}
+        getRowId={row => row.id}
+        getSubRows={row => row.children}
+        renderGroupRow={row => row.original.name}
+        expanded={true}
+        onRowReorder={rs.fn()}
+        showEmptyGroups={showEmptyGroups}
+        data-testid='tbl'
+      />,
+    );
+
+  const rowById = (id: string) =>
+    screen
+      .getAllByTestId('tbl--container--row')
+      .find(row => row.getAttribute('data-row-id') === id) as HTMLElement;
+  const isSortable = (row: HTMLElement) => !!row.querySelector('[aria-roledescription="sortable"]');
+  const isGroupRow = (row: HTMLElement) => !!row.querySelector('td[aria-hidden="true"]');
+
+  it('lets the rows inside a group move, but not the group row', () => {
+    renderGrouped();
+
+    expect(isGroupRow(rowById('g1'))).toBe(true);
+    expect(isSortable(rowById('g1'))).toBe(false);
+    expect(isSortable(rowById('a'))).toBe(true);
+    expect(isSortable(rowById('b'))).toBe(true);
+  });
+
+  it('renders a group with no rows as a plain row by default', () => {
+    renderGrouped();
+
+    expect(isGroupRow(rowById('g2'))).toBe(false);
+  });
+
+  it('renders a group with no rows as a group row with showEmptyGroups', () => {
+    renderGrouped(true);
+
+    expect(isGroupRow(rowById('g2'))).toBe(true);
+    expect(isSortable(rowById('g2'))).toBe(false);
+  });
+});

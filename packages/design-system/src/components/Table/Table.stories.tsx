@@ -2039,6 +2039,44 @@ export const RowReordering: StoryFn<typeof meta> = () => {
 };
 
 /**
+ * With `getSubRows` grouping, a row moves only among the rows of its own group; group rows stay
+ * put. `showEmptyGroups` keeps a group whose `getSubRows` returns `[]` on screen as a group row.
+ */
+export const RowReorderingInGroups: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState<SecurityHeaderEntry[]>(() => [
+    ...groupedHeaderData,
+    { ...groupedHeaderData[0]!, id: 'group-empty', objectName: 'Nothing here yet', children: [] },
+  ]);
+  const [expanded, setExpanded] = useState<TableExpandedState>(true);
+
+  const handleRowReorder = useCallback((event: TableRowReorderEvent) => {
+    setData(prev =>
+      prev.map(group => {
+        const children = group.children ?? [];
+        const oldIndex = children.findIndex(row => row.id === event.activeRowId);
+        const newIndex = children.findIndex(row => row.id === event.overRowId);
+        if (oldIndex === -1 || newIndex === -1) return group;
+        return { ...group, children: arrayMove(children, oldIndex, newIndex) };
+      }),
+    );
+  }, []);
+
+  return (
+    <Table<SecurityHeaderEntry>
+      data={data}
+      columns={headerColumns}
+      getRowId={row => row.id}
+      getSubRows={row => row.children}
+      showEmptyGroups
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      onRowReorder={handleRowReorder}
+      data-testid='row-reorder-groups-table'
+    />
+  );
+};
+
+/**
  * Row reordering coexists with row selection — each feature has its own column and they
  * don't interfere with each other.
  */

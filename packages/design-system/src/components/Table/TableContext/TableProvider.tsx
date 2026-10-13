@@ -93,6 +93,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     onExpandedChange,
     renderGroupRow,
     getSubRows,
+    showEmptyGroups = false,
     renderExpandedRow,
     columnVisibility: columnVisibilityProp,
     onColumnVisibilityChange,
@@ -124,7 +125,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
   const columnDndEnabled = !!onColumnOrderChange;
   const groupingEnabled = !!groupingProp || !!onGroupingChange;
   const subRowGroupingEnabled = !!renderGroupRow && !!getSubRows;
-  const rowDndEnabled = !!onRowReorder && !subRowGroupingEnabled;
+  const rowDndEnabled = !!onRowReorder;
   const expandingEnabled = !!renderExpandedRow || !!onExpandedChange || subRowGroupingEnabled;
   const visibilityEnabled = !!onColumnVisibilityChange;
 
@@ -349,6 +350,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       expandingEnabled,
       visibilityEnabled,
       hasSubRowGrouping: !!getSubRows,
+      showEmptyGroups,
       virtualized,
       stretch,
       renderExpandedRow: renderExpandedRow as
@@ -395,6 +397,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       expandingEnabled,
       visibilityEnabled,
       getSubRows,
+      showEmptyGroups,
       virtualized,
       stretch,
       renderExpandedRow,

@@ -42,6 +42,7 @@ export interface TableContextValue<T extends RowData> {
   expandingEnabled: boolean;
   visibilityEnabled: boolean;
   hasSubRowGrouping: boolean;
+  showEmptyGroups: boolean;
   virtualized: TableVirtualized | undefined;
   stretch: boolean;
 

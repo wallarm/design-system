@@ -26,6 +26,7 @@ export { detectDataChange } from './detectDataChange';
 export { type DSTableFeatures, dsTableFeatures } from './dsTableFeatures';
 export { getDndStyles } from './getDndStyles';
 export { getRowKey } from './getRowKey';
+export { isGroupRow } from './isGroupRow';
 export { isLastPinnedLeft } from './isLastPinnedLeft';
 export {
   getOffsetTopInScrollRoot,

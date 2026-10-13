@@ -268,6 +268,12 @@ export interface TableProps<T> extends TestableProps {
   renderGroupRow?: (row: TableRow<T>) => ReactNode;
   /** Sub-row accessor for hierarchical/tree data (used with renderGroupRow) */
   getSubRows?: (row: T) => T[] | undefined;
+  /**
+   * Render a top-level row whose `getSubRows` returns an empty array as an
+   * (empty) group row instead of a plain row — for groups that stay visible
+   * with nothing in them yet. Return `undefined` for rows that are not groups.
+   */
+  showEmptyGroups?: boolean;
 
   // --- Row Expanding ---
   expanded?: TableExpandedState;
@@ -332,7 +338,8 @@ export interface TableProps<T> extends TestableProps {
   /**
    * Callback fired when a row is dragged to a new position. When provided,
    * a drag-handle column is auto-injected and row DnD is enabled.
-   * Disabled when `getSubRows` grouping is active.
+   * With `getSubRows` grouping, group rows stay put and a row moves only
+   * among the rows of its own group.
    */
   onRowReorder?: (event: TableRowReorderEvent) => void;
 

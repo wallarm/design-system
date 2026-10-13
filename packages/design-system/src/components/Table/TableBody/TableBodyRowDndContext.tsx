@@ -8,6 +8,7 @@ import {
   useState,
 } from 'react';
 import {
+  type CollisionDetection,
   closestCenter,
   DndContext,
   type DragEndEvent,
@@ -103,6 +104,20 @@ const TableBodyRowDndContextInner: FC<TableBodyRowDndContextInnerProps> = ({
     [activeId, overId],
   );
 
+  // A row moves only among its siblings: within its group under `getSubRows`
+  // grouping, among the top-level rows otherwise.
+  const parentOf = useMemo(() => new Map(rows.map(r => [r.id, r.parentId])), [rows]);
+  const collisionDetection = useCallback<CollisionDetection>(
+    args =>
+      closestCenter({
+        ...args,
+        droppableContainers: args.droppableContainers.filter(
+          c => parentOf.get(String(c.id)) === parentOf.get(String(args.active.id)),
+        ),
+      }),
+    [parentOf],
+  );
+
   const sensors = useSensors(
     useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
     useSensor(KeyboardSensor),
@@ -131,9 +146,10 @@ const TableBodyRowDndContextInner: FC<TableBodyRowDndContextInnerProps> = ({
       resetCursor();
       const { active, over } = event;
       if (!over || active.id === over.id) return;
+      if (parentOf.get(String(active.id)) !== parentOf.get(String(over.id))) return;
       onRowReorder?.({ activeRowId: String(active.id), overRowId: String(over.id) });
     },
-    [onRowReorder],
+    [onRowReorder, parentOf],
   );
 
   const handleDragCancel = useCallback(() => {
@@ -147,7 +163,7 @@ const TableBodyRowDndContextInner: FC<TableBodyRowDndContextInnerProps> = ({
     <RowDndIndicatorContext.Provider value={indicatorState}>
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={collisionDetection}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
