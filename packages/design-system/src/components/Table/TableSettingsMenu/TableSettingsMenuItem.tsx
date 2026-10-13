@@ -6,6 +6,7 @@ import { useTestId } from '../../../utils/testId';
 import { Switch, SwitchControl, SwitchLabel, type SwitchProps } from '../../Switch';
 import { useTableValue } from '../lib';
 import { useTableContext } from '../TableContext';
+import { useTableSettingsMenuContentContext } from './TableSettingsMenuContentContext';
 
 export interface TableSettingsMenuItemProps
   extends Omit<SwitchProps, 'checked' | 'onCheckedChange' | 'disabled' | 'children'> {
@@ -19,7 +20,15 @@ export const TableSettingsMenuItem = ({
   'data-testid': testIdProp,
   ...rest
 }: TableSettingsMenuItemProps) => {
-  const { masterColumnId, columnDndEnabled, columnGroups, table } = useTableContext();
+  const {
+    masterColumnId,
+    columnDndEnabled,
+    columnGroups,
+    table,
+    deferColumnVisibility,
+    defaultColumnVisibility,
+  } = useTableContext();
+  const { visibilityDraft, setVisibilityDraft } = useTableSettingsMenuContentContext();
   // Labeled-group mode is a flat, non-reorderable list (FilterInput pattern):
   // no drag handle, so the row loses the grip's left gutter.
   const grouped = !!columnGroups;
@@ -27,7 +36,10 @@ export const TableSettingsMenuItem = ({
   const switchTestId = useTestId(`settings-menu-item-${columnId}`, testIdProp);
 
   const column = table.getColumn(columnId);
-  const isVisible = useTableValue(() => column?.getIsVisible() ?? false);
+  const isTableVisible = useTableValue(() => column?.getIsVisible() ?? false);
+  const isVisible =
+    visibilityDraft.toggles[columnId] ??
+    (visibilityDraft.fromDefault ? defaultColumnVisibility?.[columnId] !== false : isTableVisible);
   const canHide = useTableValue(() => column?.getCanHide() ?? false);
 
   const isMasterColumn = column?.id === masterColumnId;
@@ -78,7 +90,14 @@ export const TableSettingsMenuItem = ({
         data-testid={switchTestId}
         className={cn('flex-1', className)}
         checked={isVisible}
-        onCheckedChange={details => column.toggleVisibility(details.checked)}
+        onCheckedChange={details =>
+          deferColumnVisibility
+            ? setVisibilityDraft({
+                ...visibilityDraft,
+                toggles: { ...visibilityDraft.toggles, [columnId]: details.checked },
+              })
+            : column.toggleVisibility(details.checked)
+        }
         disabled={isMasterColumn || !canHide}
       >
         <SwitchLabel className={cn('flex-1 truncate')}>{header}</SwitchLabel>

@@ -117,6 +117,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     onMasterCellClick,
     activeRowId: activeRowIdProp,
     onSettingsOpenChange,
+    deferColumnVisibility = false,
   } = props;
 
   const masterCellActiveRowId = activeRowIdProp ?? null;
@@ -392,6 +393,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       onMasterCellClick,
       activeRowId: masterCellActiveRowId,
       onSettingsOpenChange,
+      deferColumnVisibility,
     }),
     [
       table,
@@ -434,6 +436,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
       masterCellActiveRowId,
       onMasterCellClick,
       onSettingsOpenChange,
+      deferColumnVisibility,
       enableSelectAllRows,
       onSelectAllRows,
     ],

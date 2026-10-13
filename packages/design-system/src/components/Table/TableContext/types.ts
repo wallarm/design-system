@@ -122,6 +122,8 @@ export interface TableContextValue<T extends RowData> {
 
   // Fired when the built-in column-settings menu opens/closes
   onSettingsOpenChange?: (open: boolean) => void;
+  // Apply settings-menu visibility toggles on close instead of per toggle
+  deferColumnVisibility: boolean;
 }
 
 export interface TableProviderProps<T extends RowData>

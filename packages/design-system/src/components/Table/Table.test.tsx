@@ -1344,6 +1344,91 @@ describe('TableSettingsMenu: onSettingsOpenChange', () => {
   });
 });
 
+describe('TableSettingsMenu: deferColumnVisibility', () => {
+  const DeferHarness: FC<{ onChange: (v: Record<string, boolean>) => void }> = ({ onChange }) => {
+    const [visibility, setVisibility] = useState<Record<string, boolean>>({});
+    return (
+      <Table
+        data={data}
+        columns={baseColumns}
+        columnVisibility={visibility}
+        onColumnVisibilityChange={updater => {
+          const next = typeof updater === 'function' ? updater(visibility) : updater;
+          setVisibility(next);
+          onChange(next);
+        }}
+        defaultColumnVisibility={{}}
+        deferColumnVisibility
+        data-testid='table'
+      />
+    );
+  };
+
+  const statusHeader = () => screen.queryByRole('columnheader', { name: /Status/ });
+
+  it('holds a toggle in the menu and applies it once, on close', async () => {
+    const onChange = rs.fn();
+    render(<DeferHarness onChange={onChange} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Table settings' }));
+    await waitFor(() => expect(screen.getByRole('menu')).toHaveFocus());
+
+    const item = screen.getByTestId('table--settings-menu-item-status');
+    await userEvent.click(item);
+
+    // The switch reflects the choice; the table does not, yet.
+    expect(within(item).getByRole('checkbox')).not.toBeChecked();
+    expect(statusHeader()).toBeInTheDocument();
+    expect(onChange).not.toHaveBeenCalled();
+
+    await userEvent.keyboard('{Escape}');
+    expect(onChange).toHaveBeenCalledTimes(1);
+    expect(onChange).toHaveBeenLastCalledWith(expect.objectContaining({ status: false }));
+    expect(statusHeader()).not.toBeInTheDocument();
+  });
+
+  it('holds Reset to default in the draft too, then applies it on close', async () => {
+    const onChange = rs.fn();
+    render(<DeferHarness onChange={onChange} />);
+    const trigger = screen.getByRole('button', { name: 'Table settings' });
+    await userEvent.click(trigger);
+    await waitFor(() => expect(screen.getByRole('menu')).toHaveFocus());
+    await userEvent.click(screen.getByTestId('table--settings-menu-item-status'));
+    await userEvent.keyboard('{Escape}');
+    expect(statusHeader()).not.toBeInTheDocument();
+
+    await userEvent.click(trigger);
+    await waitFor(() => expect(screen.getByRole('menu')).toHaveFocus());
+    const reset = screen.getByRole('button', { name: 'Reset to default' });
+    await userEvent.click(reset);
+
+    const item = screen.getByTestId('table--settings-menu-item-status');
+    expect(within(item).getByRole('checkbox')).toBeChecked();
+    // Already at default once drafted, though the table still hides the column.
+    expect(reset).toBeDisabled();
+    expect(statusHeader()).not.toBeInTheDocument();
+
+    await userEvent.keyboard('{Escape}');
+    expect(statusHeader()).toBeInTheDocument();
+    // Exactly the default, not an explicit entry per column: consumers compare
+    // the object (a saved view would otherwise read as modified).
+    expect(onChange).toHaveBeenLastCalledWith({});
+  });
+
+  it('writes nothing when a toggle is switched back before close', async () => {
+    const onChange = rs.fn();
+    render(<DeferHarness onChange={onChange} />);
+    await userEvent.click(screen.getByRole('button', { name: 'Table settings' }));
+    await waitFor(() => expect(screen.getByRole('menu')).toHaveFocus());
+
+    const item = screen.getByTestId('table--settings-menu-item-status');
+    await userEvent.click(item);
+    await userEvent.click(item);
+    await userEvent.keyboard('{Escape}');
+
+    expect(onChange).not.toHaveBeenCalled();
+  });
+});
+
 describe('Last row bottom border (container frame owns the bottom edge)', () => {
   const getRows = () => screen.getAllByTestId('tbl--container--row');
 

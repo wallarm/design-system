@@ -47,7 +47,11 @@ import {
   withTableState,
 } from '../lib';
 import { useTableContext } from '../TableContext';
-import { TableSettingsMenuContentProvider } from './TableSettingsMenuContentContext';
+import {
+  EMPTY_VISIBILITY_DRAFT,
+  TableSettingsMenuContentProvider,
+  type VisibilityDraft,
+} from './TableSettingsMenuContentContext';
 import { useTableSettingsMenuContext } from './TableSettingsMenuContext';
 import { TableSettingsMenuItem } from './TableSettingsMenuItem';
 import { TableSettingsMenuReset } from './TableSettingsMenuReset';
@@ -82,7 +86,15 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
   const testId = useTestId('settings-menu', testIdProp);
   const { anchorNode } = useTableSettingsMenuContext();
   const ctx = useTableContext();
-  const { table, alwaysPinnedLeft, masterColumnId, columnGroups, onSettingsOpenChange } = ctx;
+  const {
+    table,
+    alwaysPinnedLeft,
+    masterColumnId,
+    columnGroups,
+    onSettingsOpenChange,
+    deferColumnVisibility,
+    defaultColumnVisibility,
+  } = ctx;
 
   const hasTextDescription = table
     .getAllLeafColumns()
@@ -90,6 +102,7 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
 
   const [search, setSearch] = useState('');
   const [menuOpen, setMenuOpen] = useState(false);
+  const [visibilityDraft, setVisibilityDraft] = useState<VisibilityDraft>(EMPTY_VISIBILITY_DRAFT);
 
   // Lock the menu to its unfiltered width on open so typing in the search field
   // (which drops rows and changes the widest visible one) never resizes it —
@@ -102,7 +115,24 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
     // Fresh search each open, so the lock below always measures the full list.
     if (open) setSearch('');
     else setLockedWidth(undefined);
+    // Apply the held draft before announcing the close, so a consumer reacting
+    // to the close edge already sees the final visibility.
+    if (!open && deferColumnVisibility) applyVisibilityDraft();
+    setVisibilityDraft(EMPTY_VISIBILITY_DRAFT);
     onSettingsOpenChange?.(open);
+  };
+
+  // Only what actually changed is written: a column switched off and back on, or
+  // a reset that is undone, leaves the consumer's visibility object untouched —
+  // the same object a non-deferred reset would leave (`defaultColumnVisibility`).
+  const applyVisibilityDraft = () => {
+    const { fromDefault, toggles } = visibilityDraft;
+    const base = fromDefault ? (defaultColumnVisibility ?? {}) : table.atoms.columnVisibility.get();
+    const changed = Object.entries(toggles).filter(
+      ([id, visible]) => (base[id] !== false) !== visible,
+    );
+    if (!fromDefault && changed.length === 0) return;
+    table.setColumnVisibility({ ...base, ...Object.fromEntries(changed) });
   };
 
   // Measure the natural (full-list) width once the portaled content has mounted,
@@ -217,7 +247,9 @@ export const TableSettingsMenu: FC<TableSettingsMenuProps> = ({
   };
 
   const content = (
-    <TableSettingsMenuContentProvider value={{ search, setSearch }}>
+    <TableSettingsMenuContentProvider
+      value={{ search, setSearch, visibilityDraft, setVisibilityDraft }}
+    >
       <div
         data-testid={testId}
         className={cn(

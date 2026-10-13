@@ -3,6 +3,7 @@ import { isEqual } from '../../../utils/isEqual';
 import { type TestableProps, useTestId } from '../../../utils/testId';
 import { Button } from '../../Button';
 import { useTableContext } from '../TableContext';
+import { useTableSettingsMenuContentContext } from './TableSettingsMenuContentContext';
 
 export interface TableSettingsMenuResetProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, 'children' | 'color' | 'type'>,
@@ -21,13 +22,16 @@ export const TableSettingsMenuReset: FC<TableSettingsMenuResetProps> = ({
     defaultColumnVisibility,
     defaultColumnOrder,
     setColumnOrder,
+    deferColumnVisibility,
   } = useTableContext();
+  const { visibilityDraft, setVisibilityDraft } = useTableSettingsMenuContentContext();
 
   const handleClick = (event: MouseEvent<HTMLButtonElement>) => {
     onClick?.(event);
     if (event.defaultPrevented) return;
     if (defaultColumnVisibility && visibilityEnabled) {
-      table.setColumnVisibility(defaultColumnVisibility);
+      if (deferColumnVisibility) setVisibilityDraft({ fromDefault: true, toggles: {} });
+      else table.setColumnVisibility(defaultColumnVisibility);
     }
     if (defaultColumnOrder && columnDndEnabled) {
       setColumnOrder(defaultColumnOrder);
@@ -36,8 +40,18 @@ export const TableSettingsMenuReset: FC<TableSettingsMenuResetProps> = ({
 
   const { columnVisibility: currentVisibility, columnOrder: currentOrder } = table.state;
   const effectiveOrder = currentOrder.length === 0 ? defaultColumnOrder : currentOrder;
+  const { fromDefault, toggles } = visibilityDraft;
+  const hasDraft = fromDefault || Object.keys(toggles).length > 0;
+  // A held draft is compared column by column, by what the switches show.
   const visibilityMatch =
-    !defaultColumnVisibility || isEqual(currentVisibility, defaultColumnVisibility);
+    !defaultColumnVisibility ||
+    (hasDraft
+      ? table.getAllLeafColumns().every(column => {
+          const base = fromDefault ? defaultColumnVisibility : currentVisibility;
+          const shown = toggles[column.id] ?? base[column.id] !== false;
+          return shown === (defaultColumnVisibility[column.id] !== false);
+        })
+      : isEqual(currentVisibility, defaultColumnVisibility));
   const orderMatch = !defaultColumnOrder || isEqual(effectiveOrder, defaultColumnOrder);
   const isDefaultState = visibilityMatch && orderMatch;
 

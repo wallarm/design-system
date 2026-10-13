@@ -327,6 +327,13 @@ export interface TableProps<T> extends TestableProps {
    * the close edge here.
    */
   onSettingsOpenChange?: (open: boolean) => void;
+  /**
+   * Hold column-visibility toggles in the built-in settings menu until it
+   * closes, then apply them as one `columnVisibility` change. Without it each
+   * switch shows or hides its column at once — a column whose data the consumer
+   * only fetches on close then sits empty while the menu is open.
+   */
+  deferColumnVisibility?: boolean;
 
   // --- Virtualization ---
   /**
