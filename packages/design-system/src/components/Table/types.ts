@@ -286,6 +286,13 @@ export interface TableProps<T> extends TestableProps {
    *   right edge of the table. Requires `renderGroupRow`.
    */
   groupRowSpan?: 'master' | 'full';
+  /**
+   * Keep the expand column in sub-row grouping mode (`renderGroupRow`), which
+   * otherwise drops it and leaves the toggle to the group row's content. The
+   * column comes first, ahead of the drag handle, and shows a toggle on group
+   * rows only — so the rows of a group, drag handle included, sit inside it.
+   */
+  groupExpandColumn?: boolean;
   /** Sub-row accessor for hierarchical/tree data (used with renderGroupRow) */
   getSubRows?: (row: T) => T[] | undefined;
   /**

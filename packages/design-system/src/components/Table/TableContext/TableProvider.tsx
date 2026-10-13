@@ -93,6 +93,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     onExpandedChange,
     renderGroupRow,
     groupRowSpan = 'master',
+    groupExpandColumn = false,
     getSubRows,
     showEmptyGroups = false,
     renderExpandedRow,
@@ -131,6 +132,8 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
   const rowDndEnabled = !!onRowReorder;
   const expandingEnabled = !!renderExpandedRow || !!onExpandedChange || subRowGroupingEnabled;
   const visibilityEnabled = !!onColumnVisibilityChange;
+  // Sub-row grouping hands the toggle to `renderGroupRow` unless asked to keep the column.
+  const expandColumnEnabled = expandingEnabled && (!subRowGroupingEnabled || groupExpandColumn);
 
   // Auto-inject selection / expand columns based on enabled features
   // Also mark first user column as master column: non-pinnable, non-hideable
@@ -139,8 +142,8 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
     const cols = columns as ColumnDef<DSTableFeatures, T, any>[];
     const prefix: ColumnDef<DSTableFeatures, T, any>[] = [];
 
-    if (expandingEnabled && !subRowGroupingEnabled) {
-      prefix.push(createExpandColumn<T>());
+    if (expandColumnEnabled) {
+      prefix.push(createExpandColumn<T>({ groupsOnly: subRowGroupingEnabled }));
     }
 
     if (selectionEnabled) {
@@ -183,7 +186,7 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
         : withAutoMeta;
 
     return [...prefix, ...userCols] as ColumnDef<DSTableFeatures, T, any>[];
-  }, [columns, data, selectionEnabled, expandingEnabled, subRowGroupingEnabled, rowDndEnabled]);
+  }, [columns, data, selectionEnabled, expandColumnEnabled, subRowGroupingEnabled, rowDndEnabled]);
 
   // Master column ID — first data column (not _selection or _expand)
   const masterColumnId = useMemo<string | null>(() => {
@@ -196,12 +199,12 @@ export const TableProvider = <T extends RowData>(props: TableProviderProps<T>) =
   // IDs of columns that must always stay pinned left
   const alwaysPinnedLeft = useMemo(() => {
     const ids: string[] = [];
-    if (expandingEnabled && !subRowGroupingEnabled) ids.push(TABLE_EXPAND_COLUMN_ID);
+    if (expandColumnEnabled) ids.push(TABLE_EXPAND_COLUMN_ID);
     if (selectionEnabled) ids.push(TABLE_SELECT_COLUMN_ID);
     if (rowDndEnabled) ids.push(TABLE_DRAG_HANDLE_COLUMN_ID);
     if (masterColumnId) ids.push(masterColumnId);
     return ids;
-  }, [masterColumnId, expandingEnabled, selectionEnabled, subRowGroupingEnabled, rowDndEnabled]);
+  }, [masterColumnId, expandColumnEnabled, selectionEnabled, rowDndEnabled]);
 
   // Combined controlled/uncontrolled state + TanStack updater handlers
   const [sorting, handleSortingChange] = useTableState<SortingState>(

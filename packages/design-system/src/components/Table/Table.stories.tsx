@@ -2188,6 +2188,59 @@ export const GroupedWithFullWidthRows: StoryFn<typeof meta> = () => {
 };
 
 /**
+ * `groupExpandColumn` keeps the expand column in grouping mode: the toggle sits in its own column,
+ * first, and every row of a group — drag handle included — sits to the right of it, while
+ * `renderGroupRow` keeps the title and the actions.
+ */
+export const GroupedWithExpandColumn: StoryFn<typeof meta> = () => {
+  const [data, setData] = useState<SecurityHeaderEntry[]>(() => [
+    ...groupedHeaderData,
+    { ...groupedHeaderData[0]!, id: 'group-empty', objectName: 'Nothing here yet', children: [] },
+  ]);
+  const [expanded, setExpanded] = useState<TableExpandedState>(true);
+
+  const handleRowReorder = useCallback((event: TableRowReorderEvent) => {
+    setData(prev =>
+      prev.map(group => {
+        const children = group.children ?? [];
+        const oldIndex = children.findIndex(row => row.id === event.activeRowId);
+        const newIndex = children.findIndex(row => row.id === event.overRowId);
+        if (oldIndex === -1 || newIndex === -1) return group;
+        return { ...group, children: arrayMove(children, oldIndex, newIndex) };
+      }),
+    );
+  }, []);
+
+  return (
+    <Table<SecurityHeaderEntry>
+      data={data}
+      columns={headerColumns}
+      getRowId={row => row.id}
+      getSubRows={row => row.children}
+      showEmptyGroups
+      expanded={expanded}
+      onExpandedChange={setExpanded}
+      onRowReorder={handleRowReorder}
+      groupRowSpan='full'
+      groupExpandColumn
+      renderGroupRow={row => (
+        <HStack gap={8} align='center'>
+          <Text weight='medium'>{row.original.objectName}</Text>
+          <Badge color='gray' type='secondary' size='medium'>
+            {row.subRows.length}
+          </Badge>
+          <Button variant='ghost' color='neutral' size='small' className='ml-auto'>
+            <Plus />
+            Add header
+          </Button>
+        </HStack>
+      )}
+      data-testid='grouped-expand-column-table'
+    />
+  );
+};
+
+/**
  * Row reordering coexists with row selection — each feature has its own column and they
  * don't interfere with each other.
  */

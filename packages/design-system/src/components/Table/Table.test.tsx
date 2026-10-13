@@ -1574,6 +1574,40 @@ describe('Row reordering inside sub-row groups', () => {
     }
   });
 
+  it('keeps the expand column ahead of the drag handle with groupExpandColumn', () => {
+    render(
+      <Table<GroupedRow>
+        data={groupedData}
+        columns={baseColumns as never}
+        getRowId={row => row.id}
+        getSubRows={row => row.children}
+        renderGroupRow={row => <span data-testid={`group-${row.id}`}>{row.original.name}</span>}
+        groupRowSpan='full'
+        groupExpandColumn
+        showEmptyGroups
+        expanded={true}
+        onExpandedChange={rs.fn()}
+        onRowReorder={rs.fn()}
+        data-testid='tbl'
+      />,
+    );
+
+    // Expand + drag-handle cells, then the spanning cell.
+    const group = rowById('g1');
+    expect(group.querySelectorAll('td')).toHaveLength(3);
+    expect(group.querySelector('td')?.querySelector('[aria-expanded="true"]')).not.toBeNull();
+    expect(screen.getByTestId('group-g1').closest('td')).toHaveAttribute(
+      'colspan',
+      String(DATA_COLUMN_COUNT),
+    );
+
+    // The toggle is for groups with rows only; the rows inside keep their grip in the second cell.
+    expect(rowById('g2').querySelector('[aria-expanded]')).toBeNull();
+    const row = rowById('a');
+    expect(row.querySelector('[aria-expanded]')).toBeNull();
+    expect(row.querySelectorAll('td')[1]).toHaveAttribute('aria-roledescription', 'sortable');
+  });
+
   it('renders a row as one spanning cell when renderFullWidthRow returns content', () => {
     render(
       <Table<GroupedRow>

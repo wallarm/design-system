@@ -7,9 +7,15 @@ import type { DSTableFeatures } from './dsTableFeatures';
 
 /**
  * Creates an expand/collapse column for use in Table.
- * Automatically injected by Table when `renderExpandedRow` is provided.
+ * Automatically injected by Table when `renderExpandedRow` is provided, or
+ * with `groupExpandColumn` in sub-row grouping mode — where every row can
+ * expand, so `groupsOnly` limits the toggle to rows that have sub-rows.
  */
-export const createExpandColumn = <T extends RowData>(): ColumnDef<DSTableFeatures, T, unknown> => {
+export const createExpandColumn = <T extends RowData>({
+  groupsOnly = false,
+}: {
+  groupsOnly?: boolean;
+} = {}): ColumnDef<DSTableFeatures, T, unknown> => {
   return {
     id: TABLE_EXPAND_COLUMN_ID,
     size: TABLE_EXPAND_COLUMN_WIDTH,
@@ -25,7 +31,7 @@ export const createExpandColumn = <T extends RowData>(): ColumnDef<DSTableFeatur
     },
     header: () => null,
     cell: ({ row }) => {
-      if (!row.getCanExpand()) return null;
+      if (!row.getCanExpand() || (groupsOnly && row.subRows.length === 0)) return null;
 
       const expanded = row.getIsExpanded();
 

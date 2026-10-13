@@ -194,6 +194,7 @@ Enabled by passing `grouping` or `onGroupingChange`.
 | `showEmptyGroups` | `boolean` | Render a top-level row whose `getSubRows` returns `[]` as an empty group row |
 | `renderGroupRow` | `(row: TableRow<T>) => ReactNode` | Sub-row grouping mode (with `getSubRows`): drops the expand column; the content owns its expand toggle (`row.getToggleExpandedHandler()`). Rendered only with `groupRowSpan: 'full'` |
 | `groupRowSpan` | `'master' \| 'full'` | `'master'` (default): group row shows the master column cell + fillers. `'full'`: `renderGroupRow` in one cell spanning every data column |
+| `groupExpandColumn` | `boolean` | Sub-row grouping mode: keep the expand column (first, ahead of the drag handle) with a toggle on group rows only, instead of leaving the toggle to `renderGroupRow` |
 | `renderFullWidthRow` | `(row: TableRow<T>) => ReactNode \| undefined` | Render a non-group row as one cell spanning the data columns (banner rows); `undefined` renders the row normally |
 
 ### Row Reordering (Drag & Drop)
