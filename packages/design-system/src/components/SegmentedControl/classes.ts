@@ -7,7 +7,7 @@ export const segmentedControlVariants = cva(
     variants: {
       fullWidth: {
         true: 'w-full [&_label]:flex-1',
-        false: '',
+        false: 'w-fit',
       },
     },
     defaultVariants: {

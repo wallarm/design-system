@@ -104,3 +104,26 @@ describe('Attribute pass-through', () => {
     expect(screen.getByTestId('more')).toHaveAttribute('data-analytics-id', 'VIEW_MORE');
   });
 });
+
+describe('fullWidth', () => {
+  const renderWithWidth = (fullWidth?: boolean) =>
+    render(
+      <SegmentedControl defaultValue='list' fullWidth={fullWidth} data-testid='seg'>
+        <SegmentedControlItem value='list'>List</SegmentedControlItem>
+      </SegmentedControl>,
+    );
+
+  it('hugs its content by default', () => {
+    renderWithWidth();
+
+    expect(screen.getByTestId('seg')).toHaveClass('w-fit');
+    expect(screen.getByTestId('seg')).not.toHaveClass('w-full');
+  });
+
+  it('stretches only when fullWidth is true', () => {
+    renderWithWidth(true);
+
+    expect(screen.getByTestId('seg')).toHaveClass('w-full');
+    expect(screen.getByTestId('seg')).not.toHaveClass('w-fit');
+  });
+});
