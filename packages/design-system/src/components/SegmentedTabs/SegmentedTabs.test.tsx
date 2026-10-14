@@ -109,3 +109,27 @@ describe('Attribute pass-through', () => {
     expect(triggerButton).toHaveAttribute('data-analytics-id', 'SEG_TAB_ONE_MENU');
   });
 });
+
+describe('fullWidth', () => {
+  const renderWithWidth = (fullWidth?: boolean) =>
+    render(
+      <SegmentedTabs defaultValue='one' fullWidth={fullWidth} data-testid='seg'>
+        <SegmentedTabsList>
+          <SegmentedTabsTrigger value='one'>One</SegmentedTabsTrigger>
+        </SegmentedTabsList>
+      </SegmentedTabs>,
+    );
+
+  it('hugs its content by default', () => {
+    renderWithWidth();
+
+    expect(screen.getByTestId('seg--list')).toHaveClass('w-fit');
+    expect(screen.getByTestId('seg').className).not.toContain('[data-part=list]]:w-full');
+  });
+
+  it('stretches the list only when fullWidth is true', () => {
+    renderWithWidth(true);
+
+    expect(screen.getByTestId('seg').className).toContain('[&_[data-part=list]]:w-full');
+  });
+});

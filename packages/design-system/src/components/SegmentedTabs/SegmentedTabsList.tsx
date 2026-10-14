@@ -8,7 +8,7 @@ export const SegmentedTabsList: FC<PropsWithChildren> = ({ children }) => {
   const testId = useTestId('list');
 
   return (
-    <ArkUiTabs.List className={cn(segmentedControlVariants())} data-testid={testId}>
+    <ArkUiTabs.List className={cn(segmentedControlVariants(), 'w-fit')} data-testid={testId}>
       {children}
       <ArkUiTabs.Indicator className={cn(segmentedControlIndicatorClassNames)} />
     </ArkUiTabs.List>

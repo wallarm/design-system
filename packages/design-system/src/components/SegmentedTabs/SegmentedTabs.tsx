@@ -8,7 +8,7 @@ import { type TestableProps, TestIdProvider } from '../../utils/testId';
 const segmentedControlVariants = cva('relative', {
   variants: {
     fullWidth: {
-      true: 'w-full [&_[data-part=trigger]]:w-full',
+      true: '[&_[data-part=list]]:w-full [&_[data-part=trigger]]:w-full',
       false: '',
     },
   },
