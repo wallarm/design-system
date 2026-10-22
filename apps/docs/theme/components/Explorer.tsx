@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import { BrowserOnly } from '@rspress/core/runtime';
+import { cn } from '@wallarm-org/design-system/utils/cn';
 import { collectSlots } from './collectSlots';
 import { StoryError, StoryPlaceholder } from './StoryPreview';
 import { useInView } from './useInView';
@@ -37,12 +38,20 @@ function Anatomy({ load, name }: ExplorerProps) {
   const [hovered, setHovered] = useState<string | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
   const [boxes, setBoxes] = useState<Box[]>([]);
+  const [hasPortal, setHasPortal] = useState(false);
   const active = hovered ?? pinned;
 
   useEffect(() => {
     const container = containerRef.current;
     if (!container) return;
-    const rescan = () => setSlots(collectSlots(scanRoots(container, overlayRef.current)));
+    const rescan = () => {
+      setSlots(collectSlots(scanRoots(container, overlayRef.current)));
+      setHasPortal(
+        portalRoots(overlayRef.current).some(
+          n => n.matches('[data-slot]') || n.querySelector('[data-slot]'),
+        ),
+      );
+    };
     rescan();
     const observer = new MutationObserver(records => {
       // Our own outline updates are not story changes.
@@ -84,8 +93,14 @@ function Anatomy({ load, name }: ExplorerProps) {
       <div ref={containerRef} className='flex min-h-120 flex-1 items-center justify-center'>
         {error ? <StoryError error={error} /> : Story && <Story />}
       </div>
-      {/* Modal stories cover the page and set `pointer-events: none` on <body>: lift the list above them. */}
-      <ul className='pointer-events-auto relative z-[2147483646] flex w-200 shrink-0 flex-col gap-2 border-l border-border-primary-light pl-16'>
+      {/* Modal stories cover the page and set `pointer-events: none` on <body>: lift the list above
+          their portals — only while one is open, so it stays under the navbar and search otherwise. */}
+      <ul
+        className={cn(
+          'pointer-events-auto flex w-200 shrink-0 flex-col gap-2 border-l border-border-primary-light pl-16',
+          hasPortal && 'relative z-[2147483646]',
+        )}
+      >
         {slots.map(slot => (
           <li key={slot}>
             <button
