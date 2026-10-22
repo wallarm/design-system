@@ -495,8 +495,9 @@ Runs together with Task 14 (same dispatch, separate commit).
 - It must look right in light and dark mode. The DS `Logo` either follows `data-theme` itself, or exposes a variant you select from `useDark()`; check which.
 - `Layout` stays the original with only `navTitle` added. Keep all other existing overrides (`Root`, `EditLink`).
 - Rspress `title` stays `Wallarm Design System` (used for `<title>` and llms.txt).
+- **Home hero (user request):** the hero title on `apps/docs/docs/index.mdx` uses the same brand: the DS `Logo` (larger, hero-sized) plus `Design System`, in place of the plain text "Wallarm Design System". Reuse `NavBrand` with a `size` prop (`'nav' | 'hero'`) rather than duplicating markup. Wire it through the Layout home slot that replaces or prepends the hero title (check the Layout/HomeHero props in `node_modules/@rspress/core/dist`, e.g. `beforeHero`, or a `HomeHero` override). Keep the hero tagline and actions from frontmatter.
 
 - [ ] **Step 1:** Implement. If `navTitle` is not the right slot in Rspress 2.0.23, check the Layout props in `node_modules/@rspress/core/dist` and use the documented slot or prop that replaces the title.
 - [ ] **Step 2: Run** `pnpm --filter @wallarm-org/docs typecheck` and `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success.
-- [ ] **Step 3: Manual check** in `preview`: the navbar shows the logo and "Design System", clicking it goes to `/design-system/`, and both themes look right. Take screenshots if the browser tools allow.
+- [ ] **Step 3: Manual check** in `preview`: the navbar and the home hero show the logo and "Design System", clicking it goes to `/design-system/`, and both themes look right. Take screenshots if the browser tools allow.
 - [ ] **Step 4: Commit** `feat(docs): Wallarm logo in the navbar`
