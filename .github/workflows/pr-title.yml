@@ -6,6 +6,7 @@ on:
     types: [opened, edited, synchronize, reopened]
 
 permissions:
+  contents: read
   pull-requests: read
 
 jobs:
@@ -18,3 +19,24 @@ jobs:
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           configuration_path: .github/pr-title-checker-config.json
+
+  require-migration:
+    name: Require migration for breaking changes
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Require a migration for breaking changes
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          BODY: ${{ github.event.pull_request.body }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+          HEAD: ${{ github.event.pull_request.head.sha }}
+        run: |
+          if [[ "$TITLE" =~ ^[a-z]+(\(.+\))?!: ]] || grep -qE '^BREAKING CHANGES?:' <<< "$BODY"; then
+            if [ -z "$(git diff --name-only --diff-filter=A "$BASE...$HEAD" -- ':(glob)packages/migrator/src/migrations/*.ts' ':!packages/migrator/src/migrations/index.ts')" ]; then
+              echo "::error::Breaking change without a migration — see docs/superpowers/specs/2026-10-22-migrator-design.md §8"
+              exit 1
+            fi
+          fi
