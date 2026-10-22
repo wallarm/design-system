@@ -50,6 +50,7 @@ export async function main(
   argv: string[],
   cwd: string,
   versions: VersionsFile,
+  // biome-ignore lint/suspicious/noConsole: CLI output
   io: IO = { log: console.log, error: console.error },
 ): Promise<number> {
   try {
