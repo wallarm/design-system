@@ -4,9 +4,6 @@ import { baseConfig } from './base.js';
 export const dockerConfig = defineConfig({
   ...baseConfig,
 
-  snapshotPathTemplate:
-    '{testDir}/{testFileDir}/{testFileName}-snapshots/{testName}-{projectName}{ext}',
-
   // Docker-specific configuration
   use: {
     ...baseConfig.use,
@@ -15,7 +12,6 @@ export const dockerConfig = defineConfig({
     navigationTimeout: 30000,
     // Artifacts configuration for Docker
     video: 'retain-on-failure',
-    screenshot: 'only-on-failure',
     trace: 'retain-on-failure',
   },
 
@@ -27,12 +23,9 @@ export const dockerConfig = defineConfig({
   },
 
   // Configure test execution for Docker
-  workers: 1, // Optimized for sharding - each shard can run tests in parallel
+  workers: 1, // One worker per container; parallelism comes from sharding
   retries: 2, // More retries in Docker due to potential network latency
-  fullyParallel: true, // Enable full parallelization within each shard
-
-  // Web server configuration
-  webServer: undefined, // Rely on external services
+  fullyParallel: true,
 
   // Output configuration
   outputDir: './test-results',
@@ -42,6 +35,5 @@ export const dockerConfig = defineConfig({
     ['list'],
   ],
 
-  // Global setup/teardown
-  globalTimeout: 600000, // 10 minutes total timeout
+  globalTimeout: 600000, // Hard cap on total run time
 });

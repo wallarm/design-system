@@ -148,14 +148,16 @@ export const FilterInput: FC<FilterInputProps> = ({
   });
 
   // Dismiss paste error when expression changes (chip created/removed/cleared)
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs only when the chip count changes, not on every pasteError/handler change
   useEffect(() => {
     if (pasteError) dismissPasteError();
-  }, [conditions.length]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [conditions.length]);
 
   // Re-parse input text while user edits after a failed paste
+  // biome-ignore lint/correctness/useExhaustiveDependencies: runs only when the input text changes, not on every pasteError/handler change
   useEffect(() => {
     if (pasteError) retryParse(autocomplete.inputText);
-  }, [autocomplete.inputText]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [autocomplete.inputText]);
 
   const fieldErrors = useMemo(
     () => parseFilterInputErrors(conditions, fields),

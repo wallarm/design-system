@@ -44,5 +44,4 @@ export const baseConfig = defineConfig({
   expect: {
     toHaveScreenshot: { maxDiffPixelRatio: 0.005, threshold: 0.1 },
   },
-  // webServer will be overridden in specific projects
 });

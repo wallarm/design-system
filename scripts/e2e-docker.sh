@@ -41,7 +41,7 @@ Run Playwright E2E tests locally or in Docker
 
 COMPONENT:
     design-system   Run Design System (Storybook) E2E tests
-    all             Run all E2E tests (default)
+    all             Alias for design-system (default)
 
     Note: Component will be auto-detected from test file paths if not specified
 
@@ -71,8 +71,8 @@ EXAMPLES:
     $0 design-system -- --project=chromium  # Run tests only in chromium browser
 
 PREREQUISITES:
-    Local mode: Apps must be running (pnpm dev)
-    Docker mode: Docker must be available
+    Storybook must be running on the host in both modes (pnpm storybook);
+    Docker mode reaches it via host.docker.internal:6006 and also needs Docker
 
 EOF
 }
@@ -204,11 +204,9 @@ cleanup() {
     if [[ "$USE_DOCKER" == "true" && "$CLEANUP" == "true" ]]; then
         echo -e "${YELLOW}🧹 Cleaning up containers...${NC}"
         # Determine profile based on mode
-        local profile="$COMPONENT"
+        local profile="design-system"
         if [[ "$UPDATE_SNAPSHOTS" == "true" ]]; then
-            if [[ "$COMPONENT" == "design-system" || "$COMPONENT" == "all" ]]; then
-                profile="design-system-update"
-            fi
+            profile="design-system-update"
         fi
         docker-compose -f "$DOCKER_COMPOSE_FILE" --profile "$profile" down --volumes --remove-orphans 2>/dev/null || true
     elif [[ "$USE_DOCKER" == "true" ]]; then
@@ -227,7 +225,7 @@ check_local_services() {
         echo -e "${BLUE}Checking Storybook on http://localhost:6006...${NC}"
         if ! curl -f http://localhost:6006 >/dev/null 2>&1; then
             echo -e "${RED}❌ Storybook is not running on http://localhost:6006${NC}"
-            echo -e "${YELLOW}Please start it with: pnpm --filter=@wallarm-org/design-system dev${NC}"
+            echo -e "${YELLOW}Please start it with: pnpm storybook${NC}"
             exit 1
         fi
         echo -e "${GREEN}✅ Storybook is running${NC}"
@@ -264,12 +262,10 @@ run_docker_tests() {
         echo -e "${BLUE}🐳 Running $component E2E tests in Docker...${NC}"
     fi
 
-    # Determine profile based on mode and component
-    local profile="$component"
+    # Determine profile based on mode ("all" maps to design-system, the only E2E target)
+    local profile="design-system"
     if [[ "$UPDATE_SNAPSHOTS" == "true" ]]; then
-        if [[ "$component" == "design-system" || "$component" == "all" ]]; then
-            profile="design-system-update"
-        fi
+        profile="design-system-update"
     fi
 
     # Set Docker Compose command with appropriate profile

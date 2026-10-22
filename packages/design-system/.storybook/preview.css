@@ -32,7 +32,7 @@ html,
 /* Story annotations — the labels inside a story canvas that name what a group of examples shows
    ("Brand" / "Neutral", "Default" / "Disabled" / "Error"). They are scaffolding around the
    specimen, not component surface, so they should never be mistaken for part of the design: they
-   take Figma's own annotation style, handwritten and pink, where Caveat stands in for Figma Hand.
+   take Figma's own annotation style, handwritten, with Kalam standing in for Figma Hand.
 
    The handwritten face comes from Figma's `annotation/md` style. The colour deliberately does not:
    Figma's annotation pink earns its loudness on a canvas full of other people's notes, but on a

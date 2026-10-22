@@ -77,7 +77,6 @@ overrides:
   ajv: '>=8.20.0'
   qs: '>=6.15.3'
   rollup: '>=4.62.2'
-  happy-dom: '>=20.10.6'
   picomatch@>=4.0.0 <4.0.4: '>=4.0.5'
   ws: '>=8.21.0'
   postcss: '>=8.5.28'
@@ -122,9 +121,6 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 24.19.0
-      chalk:
-        specifier: 6.0.1
-        version: 6.0.1
       commitizen:
         specifier: 4.3.2
         version: 4.3.2(@types/node@24.19.0)(typescript@7.0.2)
@@ -2550,7 +2546,7 @@ packages:
     engines: {node: ^20.19.0 || >=22.12.0}
     hasBin: true
     peerDependencies:
-      happy-dom: '>=20.10.6'
+      happy-dom: ^20.8.3
       jsdom: '>=15.0.0'
     peerDependenciesMeta:
       happy-dom:
@@ -3955,10 +3951,6 @@ packages:
   chalk@5.6.2:
     resolution: {integrity: sha512-7NzBL0rN6fMUW+f7A6Io4h40qQlG+xGmtMxfbnH/K7TAtt8JQWVQK+6g0UXKMeVJoyV5EkkNsErQ8pVD3bLHbA==}
     engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
-
-  chalk@6.0.1:
-    resolution: {integrity: sha512-/Ce6KNm3vIbWdMlNna6RVIZ/ICQxnJxCicet5LBKK9ZffBkqzDw0xh9EiKSljdRtiIQ1S1z4YgcscUUGzNCWrA==}
-    engines: {node: '>=22'}
 
   char-regex@1.0.2:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
@@ -11042,8 +11034,6 @@ snapshots:
       supports-color: 7.2.0
 
   chalk@5.6.2: {}
-
-  chalk@6.0.1: {}
 
   char-regex@1.0.2: {}
 

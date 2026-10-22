@@ -15,7 +15,7 @@ export const rsbuildConfig = defineConfig({
           failOnError: true,
           exclude: /node_modules/,
         }),
-      ].filter(Boolean),
+      ],
     },
   },
 });

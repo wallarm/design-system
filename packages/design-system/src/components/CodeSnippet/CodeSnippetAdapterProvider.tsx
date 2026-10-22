@@ -34,7 +34,6 @@ export function CodeSnippetAdapterProvider<TLanguage extends string>({
 
   useEffect(() => {
     if (typeof adapter !== 'function') {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setResolvedAdapter(adapter);
       return;
     }

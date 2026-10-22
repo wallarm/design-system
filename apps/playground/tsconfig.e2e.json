@@ -6,9 +6,5 @@
     "types": ["node"],
     "outDir": "dist"
   },
-  "include": [
-    "tests/**/*",
-    "playwright.config.ts",
-    "playwright.config.docker.ts"
-  ]
+  "include": ["tests/**/*", "playwright.config.ts"]
 }

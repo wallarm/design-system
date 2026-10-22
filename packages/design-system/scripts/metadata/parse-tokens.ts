@@ -5,7 +5,7 @@ import type { TokenCategory, TokenMetadata } from '@wallarm-org/mcp-core';
 /**
  * Parse @theme { ... } blocks from CSS files.
  * Extracts CSS custom property declarations (--name: value).
- * Also handles .dark { ... } overrides in semantic.css.
+ * Also handles [data-theme="dark"] { ... } overrides in semantic.css.
  */
 
 const THEME_BLOCK_REGEX = /@theme\s*\{([^}]*(?:\{[^}]*\}[^}]*)*)\}/gs;
@@ -112,7 +112,7 @@ export function parseTokens({ themeDir }: ParseTokensOptions): TokenCategory[] {
       });
     }
 
-    // Handle .dark overrides in semantic.css
+    // Handle [data-theme="dark"] overrides in semantic.css
     if (file === 'semantic.css') {
       const darkTokens = parseDarkOverrides(css);
       if (darkTokens.length > 0) {

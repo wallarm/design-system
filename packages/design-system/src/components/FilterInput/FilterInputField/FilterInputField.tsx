@@ -102,7 +102,6 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
           className,
         )}
         data-slot='filter-input'
-        // biome-ignore lint/a11y/useKeyWithClickEvents: native input semantics — keyboard reaches the inner combobox; this delegates pointer clicks on the wrapper to the area handler so multi-select commits trigger when users click the field's border/scroll-area.
         onClick={e => {
           // Wrapper-level click delegation for the gaps the inner content
           // doesn't cover — the field's border, the ScrollArea root, the
@@ -126,7 +125,6 @@ export const FilterInputField: FC<FilterInputFieldProps> = ({ className, ...prop
         >
           {/* Inline style overrides h-full in ScrollAreaViewport (className is stripped). */}
           <ScrollAreaViewport style={{ height: 'auto', maxHeight: 'inherit' }}>
-            {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */}
             <div
               ref={innerRef}
               data-filter-input-inner=''

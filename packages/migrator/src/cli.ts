@@ -24,7 +24,7 @@ Options:
   --help            show this help
   --version         show migrator version
 
-Without paths, tracked files of the current git repository are scanned.`;
+Without paths, tracked files under the current directory are scanned.`;
 
 function installedVersion(cwd: string): string {
   for (let dir = cwd; ; dir = path.dirname(dir)) {

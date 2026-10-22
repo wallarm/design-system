@@ -29,9 +29,6 @@
     "e2e:failed": "playwright test --last-failed",
     "e2e:failed:headed": "playwright test --last-failed --headed",
     "e2e:report": "playwright show-report",
-    "e2e:docker": "playwright test --config=playwright.config.docker.ts",
-    "e2e:docker:ui": "playwright test --config=playwright.config.docker.ts --ui",
-    "e2e:docker:failed": "playwright test --config=playwright.config.docker.ts --last-failed",
     "e2e:docker:report": "playwright show-report ./playwright-report --port=9324"
   },
   "dependencies": {

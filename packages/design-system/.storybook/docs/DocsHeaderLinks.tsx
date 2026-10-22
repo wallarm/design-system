@@ -3,9 +3,9 @@ import { useOf } from '@storybook/addon-docs/blocks';
 import { resolveSourceUrl } from './sourceUrl';
 import { DOCS_LINK_CLASS_NAME } from './styles';
 
-// Placeholder on purpose: every component points at the Figma library for now, and the real
-// per-component deep links get filled in later in one bulk pass.
-const FIGMA_URL = 'https://www.figma.com/';
+// Every component page links to the WADS-Components library file (the one the *.figma.ts Code
+// Connect bindings point at); per-component deep links are not wired up yet.
+const FIGMA_URL = 'https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components';
 
 /**
  * The row of links that sits directly under the page title, so the source of truth for the code and

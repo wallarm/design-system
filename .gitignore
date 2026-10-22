@@ -2,8 +2,6 @@
 
 # Dependencies
 node_modules
-.pnp
-.pnp.js
 .pnpm-store
 
 # Local env files
@@ -21,12 +19,7 @@ test-results
 # Turbo
 .turbo
 
-# Vercel
-.vercel
-
 # Build Outputs
-.next/
-out/
 build
 dist
 storybook-static
@@ -35,8 +28,6 @@ storybook-static
 
 # Debug
 npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
 
 # Misc
 .DS_Store
@@ -55,18 +46,9 @@ package.json.backup
 # Claude
 .claude/agent-memory
 .playwright-mcp
-tasks/
 
-# Ralph - ignore runtime files but keep templates
-scripts/ralph/progress.txt
-scripts/ralph/prd.json
-scripts/ralph/archive/
-
-# Superpowers workflow scratch (brainstorm specs + implementation plans) — never repo content
+# Superpowers workflow scratch (brainstorm specs + implementation plans) — ignored by default; commit finished specs/plans with `git add -f`
 docs/superpowers/
 .superpowers/
-
-# Dev notes
-QUERYBAR_NOTES.md
 
 .superset

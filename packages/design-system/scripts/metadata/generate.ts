@@ -20,7 +20,7 @@ const main = () => {
   const tsconfigPath = path.join(ROOT, 'tsconfig.app.json');
   const project = new Project({ tsConfigFilePath: tsconfigPath });
 
-  // Scan components directory (same pattern as generate-exports.ts)
+  // Scan components directory
   const componentsDir = path.join(ROOT, 'src/components');
   const componentDirs = fs
     .readdirSync(componentsDir, { withFileTypes: true })

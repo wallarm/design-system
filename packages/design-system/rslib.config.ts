@@ -19,7 +19,8 @@ export default defineConfig({
       index: [
         './src/**/*.{ts,tsx}',
         // Non-runtime files — never published. Keep in sync with the `exclude`
-        // list in tsconfig.app.json (it drives the emitted .d.ts files).
+        // list in tsconfig.app.json (it drives the emitted .d.ts files) and the
+        // `ignore` list in scripts/compiler-audit.ts.
         '!./src/**/*.test.*', // unit tests and shared helpers (*.test.helpers.tsx)
         '!./src/**/*.spec.*',
         '!./src/**/*.e2e.*',

@@ -82,20 +82,17 @@ export const OverflowTooltipTrigger: FC<OverflowTooltipTriggerProps> = ({
       }
     }
     // Preserve original ref if it exists
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const originalRef = (children as ComponentPropsWithRef<any>).ref;
     if (originalRef) {
       if (typeof originalRef === 'function') {
         originalRef(node);
       } else {
-        // eslint-disable-next-line react-hooks/immutability
         originalRef.current = node;
       }
     }
   };
 
   const mergePointerEnter = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (e: any) => {
       handlePointerEnter();
       (children as ComponentPropsWithRef<any>).props?.onPointerEnter?.(e);

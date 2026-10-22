@@ -19,7 +19,6 @@ export const baseConfig: RstestConfig = defineConfig({
     '**/node_modules/**',
     '**/dist/**',
     '**/build/**',
-    '**/.next/**',
     '**/coverage/**',
     '**/*.e2e.{js,ts,jsx,tsx}',
     '**/*.config.{js,ts,mjs,cjs}',

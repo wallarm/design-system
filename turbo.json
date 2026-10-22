@@ -1,5 +1,5 @@
 {
-  "$schema": "https://v2-7-6.turborepo.dev/schema.json",
+  "$schema": "https://turborepo.com/schema.json",
   "ui": "tui",
   "agentGuidance": false,
   "globalPassThroughEnv": ["STORYBOOK_URL"],
@@ -78,10 +78,6 @@
     },
     "e2e:report": {
       "dependsOn": ["^e2e"],
-      "cache": false,
-      "persistent": true
-    },
-    "e2e:docker": {
       "cache": false,
       "persistent": true
     },

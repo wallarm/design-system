@@ -41,13 +41,20 @@ const firstLine = (text: string | undefined): string => (text ?? '').split('\n')
 
 const ROOT = path.resolve(import.meta.dirname, '..');
 
+// Published source only: mirrors the non-runtime exclusions in rslib.config.ts.
 const files = globSync('src/**/*.{ts,tsx}', {
   cwd: ROOT,
   ignore: [
     '**/*.test.*',
-    '**/*.stories.*',
+    '**/*.spec.*',
     '**/*.e2e.*',
+    '**/*.stories.*',
+    '**/*.figma.*',
+    '**/__tests__/**',
+    '**/stories/**',
     '**/story-content/**',
+    '**/mocks.{ts,tsx}',
+    '**/mocks/**',
     'src/testUtils/**',
     '**/*.d.ts',
   ],

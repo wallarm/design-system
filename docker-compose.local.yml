@@ -86,44 +86,6 @@ services:
     profiles:
       - design-system-update
 
-  playwright-all:
-    image: mcr.microsoft.com/playwright:v${PLAYWRIGHT_VERSION:-1.63.0}-noble
-    platform: linux/amd64
-    working_dir: /app
-    shm_size: '2gb'
-    volumes:
-      - .:/app:cached
-      - node_modules:/app/node_modules
-      - playwright_cache:/ms-playwright
-    environment:
-      - NODE_ENV=test
-      - CI=false
-      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
-      - PLAYWRIGHT_ARGS
-      - STORYBOOK_URL
-    network_mode: host
-    command:
-      - sh
-      - -c
-      - |
-        echo 'Setting up pnpm...' &&
-        npm install -g pnpm@10.33.2 &&
-        echo 'Installing dependencies...' &&
-        pnpm install --frozen-lockfile &&
-        echo 'Building playwright-config...' &&
-        pnpm --filter=@wallarm-org/playwright-config build &&
-        echo 'Installing Playwright browsers...' &&
-        pnpm --filter=@wallarm-org/design-system exec playwright install --with-deps chromium &&
-        echo 'Running all E2E tests...' &&
-        if [ -z "${PLAYWRIGHT_ARGS}" ]; then
-          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts;
-        else
-          echo "Running tests for: ${PLAYWRIGHT_ARGS}" &&
-          pnpm --filter=@wallarm-org/design-system exec playwright test --config=playwright.config.docker.ts ${PLAYWRIGHT_ARGS};
-        fi
-    profiles:
-      - all
-
 volumes:
   node_modules:
     driver: local
