@@ -117,17 +117,45 @@ describe('renderComponentPage', () => {
 });
 
 describe('renderComponentsMeta', () => {
+  const none = { newComponents: new Set<string>() };
+  type Group = {
+    label: string;
+    collapsible: boolean;
+    items: { label: string; link: string; tag?: string }[];
+  };
+
   it('meta omits components without examples', () => {
-    expect(renderComponentsMeta([button, empty])).not.toContain('button-base');
+    expect(renderComponentsMeta([button, empty], none)).not.toContain('button-base');
   });
 
   it('orders categories', () => {
-    const meta = JSON.parse(renderComponentsMeta([input, button]));
-    expect(meta[0]).toBe('index');
-    const labels = meta.map((m: unknown) =>
-      typeof m === 'string' ? m : (m as { label: string }).label,
-    );
+    const meta = JSON.parse(renderComponentsMeta([input, button], none));
+    expect(meta).not.toContain('index');
+    const labels = meta.map((m: Group) => m.label);
     expect(labels.indexOf('Actions')).toBeLessThan(labels.indexOf('Inputs'));
+  });
+
+  it('groups categories as collapsible links', () => {
+    const out = renderComponentsMeta([button, input], { newComponents: new Set(['Input']) });
+    expect(out).toContain('"collapsible": true');
+    const meta = JSON.parse(out) as (string | Group)[];
+    const groups = meta.filter((m): m is Group => typeof m !== 'string');
+    const items = groups.flatMap(g => g.items);
+    const b = items.find(i => i.label === 'Button');
+    expect(b?.link).toBe('/components/button');
+    expect(b && 'tag' in b).toBe(false);
+    expect(items.find(i => i.label === 'Input')?.tag).toBe('new');
+  });
+
+  it('labels the AI component category "AI Assistant"', () => {
+    const ai: ComponentMetadata = {
+      ...button,
+      name: 'Chat',
+      examples: [{ ...basic, storyTitle: 'AI/Chat' }],
+    };
+    const meta = renderComponentsMeta([ai], none);
+    expect(meta).toContain('"label": "AI Assistant"');
+    expect(meta).not.toContain('"label": "AI"');
   });
 });
 

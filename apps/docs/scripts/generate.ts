@@ -2,11 +2,11 @@ import type { DesignSystemMetadata } from '@wallarm-org/mcp-core';
 import { execSync } from 'node:child_process';
 import { copyFileSync, existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
+import { findNewComponents } from './newComponents';
 import {
   kebab,
   renderChangelogPage,
   renderComponentPage,
-  renderComponentsIndex,
   renderComponentsMeta,
   renderTokensPage,
 } from './render';
@@ -39,8 +39,14 @@ for (const c of metadata.components) {
   writeFileSync(path.join(outDir, `${kebab(c.name)}.mdx`), page);
   pages++;
 }
-writeFileSync(path.join(outDir, 'index.mdx'), renderComponentsIndex(metadata.components));
-writeFileSync(path.join(outDir, '_meta.json'), renderComponentsMeta(metadata.components));
+const newComponents = findNewComponents(
+  metadata.components.map(c => c.name),
+  { repoRoot: path.resolve(app, '../..'), windowDays: 30 },
+);
+writeFileSync(
+  path.join(outDir, '_meta.json'),
+  renderComponentsMeta(metadata.components, { newComponents }),
+);
 
 for (const dir of ['foundations', 'get-started', 'public'])
   mkdirSync(path.join(docs, dir), { recursive: true });
@@ -51,4 +57,6 @@ writeFileSync(
 );
 copyFileSync(metadataPath, path.join(docs, 'public/components.json'));
 
-process.stdout.write(`docs: generated ${pages} component pages\n`);
+process.stdout.write(
+  `docs: generated ${pages} component pages, ${newComponents.size} marked new\n`,
+);

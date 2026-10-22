@@ -97,7 +97,11 @@ const exampleBlock = (e: ExampleMetadata, level: string, base: string): string =
 
 const lastSegment = (title: string | undefined): string => title?.split('/').at(-1) ?? '';
 
+const CATEGORY_LABELS: Record<string, string> = { AI: 'AI Assistant' };
+
 const category = (c: ComponentMetadata): string => c.examples[0]?.storyTitle?.split('/')[0] ?? '';
+
+const categoryLabel = (cat: string): string => CATEGORY_LABELS[cat] ?? cat;
 
 const usageImports = (c: ComponentMetadata, first: ExampleMetadata): string => {
   const imports = [...first.code.matchAll(/^import[\s\S]*?from '([^']+)';?$/gm)]
@@ -172,31 +176,23 @@ const byCategory = (components: ComponentMetadata[]): [string, ComponentMetadata
     .map(([cat, list]) => [cat, list.sort((a, b) => a.name.localeCompare(b.name))]);
 };
 
-export function renderComponentsMeta(components: ComponentMetadata[]): string {
-  const items: (string | { type: 'section-header'; label: string })[] = ['index'];
-  for (const [cat, list] of byCategory(components)) {
-    items.push({ type: 'section-header', label: cat }, ...list.map(c => kebab(c.name)));
-  }
-  return `${JSON.stringify(items, null, 2)}\n`;
-}
-
-const firstSentence = (text: string): string =>
-  text.replace(/\s*\n\s*/g, ' ').split(/(?<=[.!?])\s/)[0] ?? '';
-
-export function renderComponentsIndex(components: ComponentMetadata[]): string {
-  const out = ['# Components'];
-  for (const [cat, list] of byCategory(components)) {
-    out.push(`## ${cat}`);
-    out.push(
-      list
-        .map(c => {
-          const desc = c.description ? ` — ${escapeMdx(firstSentence(c.description))}` : '';
-          return `- [${c.name}](./${kebab(c.name)})${desc}`;
-        })
-        .join('\n'),
-    );
-  }
-  return `${out.join('\n\n')}\n`;
+export function renderComponentsMeta(
+  components: ComponentMetadata[],
+  opts: { newComponents: Set<string> },
+): string {
+  const groups = byCategory(components).map(([cat, list]) => ({
+    type: 'custom-link',
+    label: categoryLabel(cat),
+    collapsible: true,
+    collapsed: false,
+    items: list.map(c => ({
+      type: 'custom-link',
+      label: c.name,
+      link: `/components/${kebab(c.name)}`,
+      ...(opts.newComponents.has(c.name) && { tag: 'new' }),
+    })),
+  }));
+  return `${JSON.stringify(groups, null, 2)}\n`;
 }
 
 export function renderTokensPage(tokens: TokenCategory[]): string {
