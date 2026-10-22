@@ -7,6 +7,8 @@ export interface Token {
 }
 
 export interface TokenTableProps {
+  /** Token category from the metadata (`semantic`, `semantic-dark`, `colors-primary`, …). */
+  category: string;
   tokens: Token[];
   /** The Markdown table the generator emits; it is all the .md / llms output gets. */
   children: ReactNode;
@@ -16,6 +18,21 @@ const COLOR_VALUE = /^(#|rgb|hsl|oklch|oklab|lab|lch|color-mix\()/i;
 
 export const isColorToken = (name: string, value: string): boolean =>
   name.startsWith('--color-') || COLOR_VALUE.test(value);
+
+const THEMED_CATEGORIES = new Set(['semantic', 'semantic-dark']);
+const TW_ALPHA = /^--alpha\((.+?)\s*\/\s*([\d.]+%?)\)$/;
+
+/**
+ * Swatch color. Semantic tokens are redefined per theme, so `var(name)` would paint both the
+ * light and dark sections in the active theme; paint their own value instead (a hex or palette
+ * `var(--color-*)`, the same in both themes). Tailwind's build-time `--alpha()` is not valid at
+ * runtime, so it becomes the `color-mix()` Tailwind compiles it to.
+ */
+export const swatchColor = (category: string, { name, value }: Token): string => {
+  if (!THEMED_CATEGORIES.has(category)) return `var(${name})`;
+  const alpha = TW_ALPHA.exec(value);
+  return alpha ? `color-mix(in oklab, ${alpha[1]} ${alpha[2]}, transparent)` : value;
+};
 
 function CopyCell({ text }: { text: string }) {
   return (
@@ -30,7 +47,7 @@ function CopyCell({ text }: { text: string }) {
   );
 }
 
-function Table({ tokens }: { tokens: Token[] }) {
+function Table({ category, tokens }: Omit<TokenTableProps, 'children'>) {
   return (
     <div className='rp-not-doc my-16 overflow-x-auto'>
       <table className='w-full border-collapse text-sm'>
@@ -55,7 +72,7 @@ function Table({ tokens }: { tokens: Token[] }) {
                   <span
                     data-slot='token-swatch'
                     className='inline-block size-24 rounded-4 border border-border-primary-light'
-                    style={{ background: `var(${t.name})` }}
+                    style={{ background: swatchColor(category, t) }}
                   />
                 )}
               </td>
@@ -68,10 +85,10 @@ function Table({ tokens }: { tokens: Token[] }) {
 }
 
 /** Copyable token table with color swatches; the markdown (llms.txt) output keeps the plain table. */
-export function TokenTable({ tokens, children }: TokenTableProps) {
+export function TokenTable({ category, tokens, children }: TokenTableProps) {
   // Truthy check: a boolean define in builds, a string env var under Rstest.
   if (import.meta.env.SSG_MD) return <>{children}</>;
-  return <Table tokens={tokens} />;
+  return <Table category={category} tokens={tokens} />;
 }
 
 // Rspress injects markdown.globalComponents as default imports.

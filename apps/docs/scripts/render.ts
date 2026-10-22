@@ -225,7 +225,7 @@ export function renderTokensPage(tokens: TokenCategory[]): string {
       .replace(/\u2028/g, '\\u2028')
       .replace(/\u2029/g, '\\u2029');
     out.push(
-      `<TokenTable tokens={${json}}>\n\n${table}\n\n</TokenTable>`,
+      `<TokenTable category=${JSON.stringify(cat.name)} tokens={${json}}>\n\n${table}\n\n</TokenTable>`,
     );
   }
   return `${out.join('\n\n')}\n`;

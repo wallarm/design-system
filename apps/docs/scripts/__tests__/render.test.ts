@@ -237,7 +237,7 @@ describe('renderTokensPage', () => {
     const out = renderTokensPage([
       { name: 'colors', tokens: [{ name: '--color-a', value: '#fff' }] },
     ]);
-    expect(out).toContain('<TokenTable tokens={[');
+    expect(out).toContain('<TokenTable category="colors" tokens={[');
     expect(out).toContain('| Token | Value |');
     expect(out).toContain('</TokenTable>');
   });
