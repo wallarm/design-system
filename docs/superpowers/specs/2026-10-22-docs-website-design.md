@@ -92,7 +92,7 @@ Rspress' dark mode toggles a class on `<html>`. The site's theme switch must als
 - Tokens — generated from `components.json` tokens / `src/theme/*.css`. Each row offers copy-to-clipboard for the variable name and its value, and color tokens show a swatch painted with `var(<token>)` so it reflects the active theme **(user, 2026-10-22)**. The `.md`/llms output stays a plain Markdown table. Excludes nothing, but `--color-syntax-*` mappings are shown read-only (code-managed).
 - Icons — searchable gallery generated from `src/icons/index.ts`, plus import/size/color usage.
 
-**Components** — one page per component folder (~114), grouped by the existing Storybook categories (fix the "Data display"/"Data Display" duplicate).
+**Components** — one page per component folder (~114), grouped by the existing Storybook categories as collapsible sidebar groups (fix the "Data display"/"Data Display" duplicate). A "new" badge is set automatically when the component first shipped in a stable release ≤30 days before the latest stable release **(user, 2026-10-22)**. Section order: Get Started, AI, Guides, Foundations, Components **(user)**.
 
 Header: search, theme toggle, GitHub, Storybook link. Footer of each page: "Edit on GitHub" (reuse logic of `.storybook/docs/sourceUrl.ts`).
 

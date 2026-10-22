@@ -352,7 +352,7 @@ Changes:
       fi
   ```
 - Remove the `deploy-storybook` job.
-- `deploy-site.yml`: `on: workflow_dispatch: inputs: tag: { required: true, type: string }`; `concurrency: { group: pages, cancel-in-progress: false }` (a later push to main can't cancel a deploy); `permissions: { contents: read, pages: write, id-token: write }`; one job `deploy` with `environment: { name: github-pages, url: ${{ steps.deployment.outputs.page_url }} }`. Steps: checkout `ref: ${{ inputs.tag }}`; pnpm (`10.33.2`) + node (`24`) setup; `pnpm install --frozen-lockfile`; `pnpm turbo run build --filter=@wallarm-org/docs...`; `pnpm --filter @wallarm-org/docs check:build`; `pnpm --filter @wallarm-org/design-system build-storybook`; assemble `site/` = `apps/docs/doc_build/*` + `site/storybook/` = `packages/design-system/storybook-static/*`; `actions/configure-pages@v4`; `actions/upload-pages-artifact@v3` (`path: ./site`); `actions/deploy-pages@v4` (`id: deployment`). Manual re-deploys use the same dispatch with any existing tag.
+- `deploy-site.yml`: `on: workflow_dispatch: inputs: tag: { required: true, type: string }`; `concurrency: { group: pages, cancel-in-progress: false }` (a later push to main can't cancel a deploy); `permissions: { contents: read, pages: write, id-token: write }`; one job `deploy` with `environment: { name: github-pages, url: ${{ steps.deployment.outputs.page_url }} }`. Steps: checkout `ref: ${{ inputs.tag }}` with `fetch-depth: 0` (Task 13's "new" badges need tag history); pnpm (`10.33.2`) + node (`24`) setup; `pnpm install --frozen-lockfile`; `pnpm turbo run build --filter=@wallarm-org/docs...`; `pnpm --filter @wallarm-org/docs check:build`; `pnpm --filter @wallarm-org/design-system build-storybook`; assemble `site/` = `apps/docs/doc_build/*` + `site/storybook/` = `packages/design-system/storybook-static/*`; `actions/configure-pages@v4`; `actions/upload-pages-artifact@v3` (`path: ./site`); `actions/deploy-pages@v4` (`id: deployment`). Manual re-deploys use the same dispatch with any existing tag.
 - `.storybook/main.ts:33`: `config.output.assetPrefix = '/design-system/storybook/';`
 - `SelectionBulkBar.e2e.ts:29-30`: `https://wallarm.github.io/design-system/storybook/` and `STORYBOOK_URL=https://wallarm.github.io/design-system/storybook`.
 
@@ -428,15 +428,40 @@ Runs after Task 7.
 
 ---
 
-### Task 13: Section order and the duplicate "AI" label (user request, 2026-10-22)
+### Task 13: Sidebar order, collapsible component groups, auto "new" badges (user request, 2026-10-22)
 
 Runs after Task 12.
 
 **Files:**
 - Modify: `apps/docs/docs/_meta.json` (order: get-started, ai, guides, foundations, components), `apps/docs/docs/_nav.json` (order: Get Started, AI, Guides, Foundations, Components, Storybook)
-- Modify: `apps/docs/scripts/render.ts`: the generated component category label for `AI` becomes `AI Assistant` in both `_meta.json` section headers and `components/index.mdx`. Its position in the category order is unchanged.
-- Test: `apps/docs/scripts/__tests__/render.test.ts`: `labels the AI component category "AI Assistant"`.
+- Modify: `apps/docs/scripts/render.ts`, `apps/docs/scripts/generate.ts`
+- Create: `apps/docs/scripts/newComponents.ts` (git IO)
+- Test: `apps/docs/scripts/__tests__/render.test.ts`, `apps/docs/scripts/__tests__/newComponents.test.ts`
+- Modify: `.github/workflows/deploy-site.yml` (if it already exists from Task 10; otherwise Task 10 must apply this): checkout with `fetch-depth: 0` and fetch tags, so badge computation has history
 
-- [ ] **Step 1:** Write the failing test and run `pnpm --filter @wallarm-org/docs test:run` (expected FAIL), then implement and re-run (expected PASS).
-- [ ] **Step 2: Run** `pnpm turbo run build --filter=@wallarm-org/docs...` (expected success). In `preview`, the sidebar order is Get Started, AI, Guides, Foundations, Components; the nav order matches; no duplicate "AI" header.
-- [ ] **Step 3: Commit** `feat(docs): put AI and Guides after Get Started`
+**Interfaces:**
+- Sidebar (`renderComponentsMeta`): `"index"` first, then one collapsible group per category: `{ "type": "custom-link", "label": <category label>, "collapsible": true, "collapsed": false, "items": [{ "type": "custom-link", "label": <Name>, "link": "/components/<kebab>", "tag"?: "new" }] }`. Category order is unchanged. The generated `AI` category is labelled `AI Assistant` (in the sidebar and in `components/index.mdx`), so it no longer duplicates the top-level AI section. Check the actual Rspress 2.0.23 `_meta.json` schema (`@rspress/core/meta-json-schema.json`) for `custom-link` `items`/`collapsible`/`tag`. If nested `custom-link` items can't carry `tag`, use the closest supported shape and report it.
+- `renderComponentsMeta(components, opts: { newComponents: Set<string> })`: items whose name is in the set get `"tag": "new"`.
+- `newComponents.ts`:
+  - `findNewComponents(componentNames: string[], opts: { repoRoot: string; windowDays: number }): Set<string>`:
+    - the latest stable tag = the newest tag matching `^v\d+\.\d+\.\d+$` reachable from HEAD;
+    - its date is the reference;
+    - for each component, its first-introducing commit is `git log --diff-filter=A --format=%H -- packages/design-system/src/components/<Name>/index.ts`, last line;
+    - its first stable release is the earliest tag (by creator date) matching the same pattern that contains that commit;
+    - "new" when that release's date is ≥ reference − `windowDays`;
+    - components not yet in any stable tag are not "new";
+    - if git or tags are unavailable (shallow clone, no tags), return an empty set and print one warning line — never fail the build.
+  - `isWithinWindow(releaseDate: Date, referenceDate: Date, windowDays: number): boolean` — the pure part, unit-tested.
+- `generate.ts` calls `findNewComponents(names, { repoRoot, windowDays: 30 })`.
+
+- [ ] **Step 1: Write failing tests:**
+  - `isWithinWindow`: 29 days before the reference → true; exactly 30 → true; 31 → false; after the reference → true.
+  - `renderComponentsMeta groups categories as collapsible links`: output contains `"collapsible": true`; the item for `Button` has `"link": "/components/button"`; a component in `newComponents` has `"tag": "new"`; others have no `tag`.
+  - `labels the AI component category "AI Assistant"`.
+- [ ] **Step 2: Run** `pnpm --filter @wallarm-org/docs test:run` — expected: FAIL. **Step 3:** implement. **Step 4:** run — PASS.
+- [ ] **Step 5: Run** `pnpm turbo run build --filter=@wallarm-org/docs...` — expected: success, and the generator prints how many components were marked new. In `preview`:
+  - the sidebar order is Get Started, AI, Guides, Foundations, Components;
+  - categories are collapsible groups;
+  - "new" badges appear on recent components (e.g. the AI Assistant ones from `feat(ai): add Wally AI assistant components`, if they fall in the window);
+  - there is no duplicate "AI" header.
+- [ ] **Step 6: Commit** `feat(docs): collapsible component groups with auto "new" badges`
