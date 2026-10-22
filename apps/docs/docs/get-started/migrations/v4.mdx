@@ -1,0 +1,49 @@
+---
+description: Upgrade to v4.0.0, where the unused TreeBase subpath is removed.
+---
+
+# Migrating to v4
+
+v4.0.0 removes one module: **TreeBase**.
+
+**Codemod:** `tree-base-removed`, run by `migrator --from 3.x.y` (see [Migration guides](/get-started/migrations/)).
+It only reports: it changes no code.
+
+## TreeBase is removed
+
+TreeBase was a thin styled wrapper around Ark UI's tree view. It was never exported from the
+package root, only from the `@wallarm-org/design-system/TreeBase` subpath, and that subpath no
+longer exists. The removed names:
+
+- the components `TreeBaseRoot`, `TreeBaseTree`, `TreeBaseLabel`, `TreeBaseItem`,
+  `TreeBaseItemText`, `TreeBaseBranch`, `TreeBaseBranchControl`, `TreeBaseBranchText`,
+  `TreeBaseBranchIndicator`, `TreeBaseBranchTrigger`, `TreeBaseBranchContent`,
+  `TreeBaseBranchIndentGuide`, `TreeBaseNodeProvider`, `TreeBaseContext`, and the type
+  `TreeBaseRootProps`;
+- the Ark UI re-exports `createTreeCollection`, `TreeCollection`, `TreeNode` and
+  `TreeViewExpandedChangeDetails`. If you still need them, import them from
+  `@ark-ui/react/tree-view` and add `@ark-ui/react` to your own dependencies.
+
+Rebuild the tree with [TreeView](/components/tree-view) (selectable rows) or
+[Tree](/components/tree). Both take nested children instead of a collection:
+
+```tsx
+// Before
+import { createTreeCollection, TreeBaseRoot, TreeBaseTree } from '@wallarm-org/design-system/TreeBase';
+
+// After
+import { TreeView, TreeViewItem } from '@wallarm-org/design-system/TreeView';
+
+export const Files = () => (
+  <TreeView>
+    <TreeViewItem defaultOpen>
+      Components
+      <TreeViewItem>Button.tsx</TreeViewItem>
+    </TreeViewItem>
+  </TreeView>
+);
+```
+
+The codemod marks every import from `@wallarm-org/design-system/TreeBase` (named, aliased,
+namespace and type-only) and lists it in `wds-migration.md`. Imports of `Tree`, `TreeView` and a
+local `./TreeBase` are left alone.

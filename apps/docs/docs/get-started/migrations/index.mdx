@@ -8,12 +8,15 @@ import { PackageManagerTabs } from '@rspress/core/theme';
 
 Every major release of `@wallarm-org/design-system` has a guide:
 
+- [v4.0.0](/get-started/migrations/v4): TreeBase is removed.
 - [v3.0.0](/get-started/migrations/v3): Avatar sizes and the user-item composition.
 - [v2.0.0](/get-started/migrations/v2): NumericBadge `type` splits into `type` and `color`.
 - [v1.0.0](/get-started/migrations/v1): Table moves to TanStack Table v9.
 
-Most breaking changes come with a codemod in [`@wallarm-org/migrator`](https://www.npmjs.com/package/@wallarm-org/migrator).
-Renovate can run it after a design-system upgrade, and you can run it by hand.
+Since v2.0.0, every breaking change ships a codemod in [`@wallarm-org/migrator`](https://www.npmjs.com/package/@wallarm-org/migrator)
+(v1.0.0 has none). Some codemods only report what to change by hand. Renovate can run it after a design-system upgrade, and you can run it by hand. The
+[Storybook upgrade guide](https://wallarm.github.io/design-system/storybook/?path=/docs/documentation-upgrading--overview)
+has the same instructions and lists every codemod with its version.
 
 ## Run it by hand
 
