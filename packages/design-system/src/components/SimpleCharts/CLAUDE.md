@@ -8,7 +8,7 @@ All chart designs live in the WADS-Components Figma file:
 
 - **Root node**: https://www.figma.com/design/VKb5gW46uSGw0rqrhZsbXT/WADS-Components?node-id=7490-121720&m=dev
 
-Always reference this file (or a child node of it) when implementing or updating a chart. Put the specific child node URL into both the component's `*.figma.tsx` Code Connect binding and the story's `parameters.design.url`.
+Always reference this file (or a child node of it) when implementing or updating a chart. Put the specific child node URL into the story's `parameters.design.url` and, when the chart has a Code Connect template, into its `*.figma.ts` `// url=` header.
 
 ## Folder Layout
 
@@ -17,33 +17,22 @@ Every chart lives in its own subfolder. File names mirror the chart's PascalCase
 ```
 SimpleCharts/
 ├── CLAUDE.md                      # this file
-├── docs/                          # living docs — one .md per chart component
-│   ├── BarList.md
-│   ├── PieChart.md
-│   └── Chart.md
+├── docs/                          # living docs — one .md per chart (see Documentation)
 ├── index.ts                       # barrel: re-exports every chart + shared types
-├── BarList/
-│   ├── BarList.tsx                # root component
-│   ├── BarList.stories.tsx
-│   ├── BarList.e2e.ts
-│   ├── BarList.e2e.ts-snapshots/  # Playwright screenshots (generated)
-│   ├── BarList.figma.tsx          # Code Connect binding
-│   ├── classes.ts                 # CVA variants (if any)
-│   ├── internal/                  # chart-local building blocks (optional)
-│   ├── hooks/                     # chart-local hooks (optional)
-│   ├── lib/                       # chart-local utilities (optional)
-│   └── index.ts                   # local barrel
-├── PieChart/
-│   └── …same layout…
-├── Chart/
-│   └── …same layout…
-├── internal/                      # shared, non-exported building blocks (optional)
-│   └── …
-├── hooks/                         # shared React hooks used by multiple charts (optional)
-│   └── …
-├── lib/                           # shared pure utilities (math, formatters, scales) (optional)
-│   └── …
-└── types.ts                       # cross-chart shared types (ChartColor, DataItem, …)
+├── types.ts                       # cross-chart shared types (ChartColor, …)
+├── internal/  hooks/  lib/        # shared code (see rule 3)
+├── Overview/                      # Overview.stories.tsx only — a showcase page, not a chart
+└── ChartName/                     # one folder per chart (Chart, BarList, PieChart, LineChart, …)
+    ├── ChartName.tsx              # root component
+    ├── ChartNameItem.tsx, …       # sub-components, one file each
+    ├── ChartNameContext.ts        # context shared by the sub-components (optional)
+    ├── ChartName.stories.tsx
+    ├── ChartName.e2e.ts
+    ├── ChartName.e2e.ts-snapshots/  # Playwright screenshots (generated)
+    ├── ChartName.figma.ts         # Code Connect template (optional)
+    ├── classes.ts                 # shared CVA / class strings (optional)
+    ├── internal/  hooks/  lib/    # chart-local code (optional)
+    └── index.ts                   # local barrel
 ```
 
 ### Rules for the layout
@@ -64,12 +53,12 @@ Each chart folder **must** contain:
 - `ChartName.tsx` — Root component + sub-components (or split into more `.tsx` files if large).
 - `ChartName.stories.tsx` — Storybook stories, one per visual/interactive state that needs coverage.
 - `ChartName.e2e.ts` — Playwright E2E tests: screenshots + interaction + a11y checks.
-- `ChartName.figma.tsx` — `@figma/code-connect` binding tying the component to its Figma node.
 - `index.ts` — Named re-exports of the component(s) and their `*Props` types.
 
 Optional, added only when needed:
 
-- `classes.ts` — CVA variant definitions (required if the component has variants).
+- `ChartName.figma.ts` — Code Connect template, when the chart (or a sub-component) has its own Figma component. See *Code Connect Rules*.
+- `classes.ts` — CVA variants / class strings shared between several files of the chart. A cva used by one file only may stay inline in that file.
 - `constants.ts` — component-local constants (colors palette, default sizes, …).
 - `types.ts` — chart-local types not shared with other charts.
 
@@ -87,42 +76,31 @@ Follow [`docs/e2e-test-rules.md`](../../../../../docs/e2e-test-rules.md). In sho
 
 - Tests live next to the component as `ChartName.e2e.ts`.
 - Use `createStoryHelper('data-display-simplecharts-<chartname>', [...stories] as const)` — the id is derived from the story `title`.
-- Group tests:
-  ```ts
-  test.describe('ChartName', () => {
-    test.describe('Screenshots', () => { /* toHaveScreenshot per story */ });
-    test.describe('Interactions', () => { /* hover / click / keyboard */ });
-    test.describe('Accessibility', () => { /* roles, aria, focus order */ });
-  });
-  ```
+- Group tests as the rules describe (`Visual` / `Interactions` / `Accessibility`). Existing chart specs still use a `Screenshots` group — rename it when you touch the file.
+- Locate elements by `data-testid` (`getByTestId`); `getByRole` is fine for accessibility assertions. Never locate by `data-slot` — existing `data-slot` locators in chart specs are legacy to migrate.
 - **Required screenshot coverage per chart**: `Default`, `Hover`, `Selected`, `Focus`. Add more states (`Filtered`, `Empty`, `Loading`, …) when the chart supports them.
 - Interaction tests should assert the visible effect, not intermediate state (e.g., a filtered row renders at 100%, a tooltip becomes visible).
 
-## Code Connect Rules (`*.figma.tsx`)
+## Code Connect Rules (`*.figma.ts`)
 
-- Import `figma` from `@figma/code-connect`.
-- Store the figma URL in a top-level `figmaNodeUrl` const.
-- Map every Figma variant/boolean via `figma.enum` / `figma.boolean` / `figma.string`.
-- The `example` function renders the real component with those props — no placeholders, no mock data.
+Templates use the Code Connect template format (picked up by `figma.config.json` → `src/**/*.figma.ts`):
 
-Look at [`../CodeSnippet/CodeSnippet.figma.tsx`](../CodeSnippet/CodeSnippet.figma.tsx) for a reference implementation.
+- Header comments: `// url=<figma node url>`, `// source=<GitHub url of the component file>`, `// component=<ComponentName>`.
+- `import figma from 'figma'` — the only import allowed in a template.
+- Read Figma properties from `figma.selectedInstance` (`getEnum`, `getBoolean`, `getString`, `findInstance`, `findText`, …).
+- `export default { example: figma.code`…`, imports: [...] }` — the example renders the real component with those props.
 
-## Component Rules (reminder)
+Reference implementations: [`./Chart/Chart.figma.ts`](./Chart/Chart.figma.ts), [`./Metric/MetricDelta.figma.ts`](./Metric/MetricDelta.figma.ts).
 
-All charts follow the repo-wide component rules — these still apply here:
+## Component Rules
 
-- **CVA** in `classes.ts` for every set of variants.
-- **`cn()`** from `../../utils/cn` to merge class names.
-- **`data-slot='chart-name'`** on the root element (kebab-case).
-- **`displayName`** set at the bottom of every component file.
-- **Named exports only**; re-export `{ Component, type ComponentProps }` from `index.ts`.
-- **Ref** accepted via the `ref` prop (React 19+) and forwarded to the root element.
-- **No `any`**, **no inline styles**, **no hardcoded colors** — use the design tokens defined in the design system.
-- **`TestableProps` + `TestIdProvider`** for any chart that has sub-components (`ChartBar`, `ChartLegend`, …). Follow [`../../../../../.claude/rules/test-id.md`](../../../../../.claude/rules/test-id.md).
+Charts follow the repo-wide rules in [`.claude/rules/component-development.md`](../../../../../.claude/rules/component-development.md) and [`.claude/rules/test-id.md`](../../../../../.claude/rules/test-id.md).
 
 ## Documentation
 
 Each chart has a living doc file at `SimpleCharts/docs/<ChartName>.md`. This is the human-readable source of truth for *how the chart behaves*, not just how its API is shaped — stories cover visual states, these docs cover the **why** and the **gotchas**.
+
+`AreaChart` has no doc yet — it reuses the `LineChart` plot primitives (`LineChartGrid`, axes, `LineChartTooltip`); add `docs/AreaChart.md` when its behaviour diverges.
 
 ### What each doc must contain
 
@@ -152,7 +130,7 @@ Docs live next to the code in `docs/`, not in Storybook MDX or README files. Sto
 
 ## Reuse Before Inventing
 
-Before adding a chart, check whether a similar implementation already exists in `../Chart/` (the general-purpose Chart family: `BarList`, `Pie`, `Line`, `Legend`, `ChartHeader`). If so, reuse its primitives and tokens rather than copying. If behaviour has to diverge, document *why* in the chart's own file.
+Before adding a chart, check the sibling folders — `./Chart` (card container, header, empty state), `./BarList`, `./PieChart`, `./LineChart`, `./AreaChart`, `./HorizontalBarStack`, `./Metric` — and the shared `./lib`, `./internal`, `./hooks`. Reuse their primitives and tokens rather than copying. If behaviour has to diverge, document *why* in the chart's own file.
 
 ## Design Tokens
 
@@ -162,6 +140,6 @@ Charts must use design-system tokens:
 - Text: `text-text-primary`, `text-text-secondary`, `text-text-tertiary`
 - Borders: `border-border-primary-light`
 - States: `bg-states-primary-pressed`, `bg-states-primary-hover`
-- Chart colors: reuse `CHART_COLORS` / `CHART_BADGE_COLORS` from `../Chart/constants.ts` when possible.
+- Chart colors: use the `ChartColor` palette — `CHART_PALETTE_FILL` / `resolveChartColor` from `./lib/chartPalette.ts`.
 
 Never hardcode hex values.

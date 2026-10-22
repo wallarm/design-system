@@ -116,7 +116,7 @@ Loading state, Apply footer, touch layout, disabled-reason tooltip, «+ Filter»
 
 ## Testing
 
-- Unit (Vitest + Testing Library): label forms, aria-label, clear via ✕ / footer / Backspace, focus returns to trigger,
+- Unit (Rstest + Testing Library): label forms, aria-label, clear via ✕ / footer / Backspace, focus returns to trigger,
   threshold for search and Selected, alias mapping (onValueChange only base values, unticking copy unticks original),
   single `All` ↔ `[]`, empty state, search keys (Space types a space), metrics attribute forwarding per target, testId cascade.
 - E2E (Playwright, per `docs/e2e-test-rules.md`): screenshots of the trigger matrix and menu variants, interactions, a11y.

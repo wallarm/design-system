@@ -30,13 +30,13 @@ The library requires the following packages:
 
 ```bash
 # npm
-npm install react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0
+npm install react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0 @internationalized/date@^3.12.0
 
 # yarn
-yarn add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0
+yarn add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0 @internationalized/date@^3.12.0
 
 # pnpm
-pnpm add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0
+pnpm add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.0 @internationalized/date@^3.12.0
 ```
 
 **Important**: All peer dependencies are required for the library to work correctly:
@@ -44,6 +44,7 @@ pnpm add react@^19.0.0 react-dom@^19.0.0 tailwindcss@^4.0.0 tw-animate-css@^1.0.
 - `react` and `react-dom` - foundation for React components
 - `tailwindcss` - styling system
 - `tw-animate-css` - animations
+- `@internationalized/date` - date values for Calendar, DateInput, DateRangeInput and InlineEdit
 
 ## Project Setup
 

@@ -41,4 +41,4 @@ pnpm typecheck   # Type-check without emitting
 ## Consumers
 
 - `@wallarm-org/design-system` — devDependency, uses schemas in metadata generator
-- `@wallarm-org/mcp` — dependency, uses schemas for runtime validation + types for server code
+- `@wallarm-org/mcp` — devDependency, bundled into `dist/index.js` (mcp-core itself is not published to npm); uses schemas for runtime validation + types for server code

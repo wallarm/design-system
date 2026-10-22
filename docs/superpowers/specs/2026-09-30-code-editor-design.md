@@ -455,7 +455,7 @@ Read-only look of `CodeEditor` with the same props must be indistinguishable fro
 
 ## 10. Testing
 
-- **Unit (Vitest, jsdom):** add `Range.prototype.getClientRects` / `getBoundingClientRect` stubs to `vitest.setup.ts`. Engine logic is tested through `EditorState` / a headless `EditorView`:
+- **Unit (Rstest, jsdom):** `Range.prototype.getClientRects` / `getBoundingClientRect` stubs live in `packages/design-system/rstest.setup.ts`. Engine logic is tested through `EditorState` / a headless `EditorView`:
   - value sync (controlled, uncontrolled, minimal external change keeps cursor, no `onChange` echo), `documentId` swap keeps per-document history;
   - HTTP grammar trees (request, response, no body, blank-only lines, charset content-type, body sniffing) and stale-parser check;
   - JSON pointers on whole doc and mounted body; schema validate/complete on both;

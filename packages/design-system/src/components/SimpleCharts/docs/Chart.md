@@ -90,5 +90,5 @@ Children (buttons, tooltips, dropdowns) own their own interactions and can use t
 
 ## Open questions / known limitations
 
-- The container has no baked-in loading/error/empty states. Those live one level down (per chart type: `ChartBarList`, `ChartPie`, …) — revisit if a shared pattern emerges.
+- The container draws no states of its own. Empty is the optional `ChartEmpty` body (plus `LineChartEmpty` for line/area plots); each chart ships its own skeleton (`BarListSkeleton`, `PieChartSkeleton`, …); there is no shared error state.
 - The hover-reveal relies on `group/chart` on the root. If a caller wraps `ChartActions` in another `group/chart`, the nearest group wins — document this once a real collision shows up.

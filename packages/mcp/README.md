@@ -40,9 +40,9 @@ For local development or custom setups:
 
 ## 🤖 Supported AI Assistants
 
-- [Claude Code](https://docs.anthropic.com/en/docs/claude-code) — `~/.claude.json` or project `mcp.json`
-- [Cursor](https://cursor.sh) — `.cursor/mcp.json`
-- [Windsurf](https://codeium.com/windsurf) — `~/.windsurf/mcp.json`
+- [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
+- [Cursor](https://cursor.com)
+- [Windsurf](https://windsurf.com)
 - Any MCP-compatible client using stdio transport
 
 ## 🔧 MCP Capabilities
@@ -53,6 +53,8 @@ For local development or custom setups:
 |---|---|---|
 | `search_component` | `{ query: string }` | Search by name, description, props, or variants. Returns top 10 results sorted by relevance |
 | `get_component` | `{ name: string }` | Full component details: props, variants, sub-components, and import path |
+| `search_token` | `{ query: string }` | Search design tokens by name, value, or category. Returns top 20 results sorted by relevance |
+| `get_token_category` | `{ name: string }` | All tokens in a category (case-insensitive), e.g. `spacing`, `colors-primary` |
 
 ### Resources
 

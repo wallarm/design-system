@@ -25,10 +25,4 @@ Guide for [creating new components](/docs/documentation-adding-components--docs)
 
 ## Important Information
 
-**Peer Dependencies are required!**
-
-The library requires installation of:
-
-- `react` and `react-dom` (^19.0.0)
-- `tailwindcss` (^4.0.0) - styling system
-- `tw-animate-css` (^1.0.0) - animations
+**Peer Dependencies are required!** See the list in [Installation](/docs/documentation-installation--docs).

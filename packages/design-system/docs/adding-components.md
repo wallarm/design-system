@@ -11,7 +11,6 @@ All components live in `packages/design-system/src/components/`. The structure d
 ```
 ComponentName/
 ├── ComponentName.tsx         # Component implementation
-├── classes.ts                # CVA variants (if has variants)
 ├── types.ts                  # Type definitions (if complex)
 ├── constants.ts              # Constants (if needed)
 ├── index.ts                  # Barrel export
@@ -37,7 +36,7 @@ ComponentName/
 ├── lib/                        # Utilities and helpers
 │   ├── helpers.ts
 │   └── index.ts
-├── classes.ts
+├── classes.ts                  # Only when sub-components share a CVA recipe (see Step 2)
 ├── types.ts
 ├── constants.ts
 ├── index.ts
@@ -100,6 +99,7 @@ export const ComponentName: FC<ComponentNameProps> = ({
     <div
       {...props}
       ref={ref}
+      data-slot='component-name'
       className={cn(componentVariants({ size, color }), className)}
     >
       {children}
@@ -126,15 +126,21 @@ className={cn(componentVariants({ size }), className)}
 
 **Always set `displayName`** — helps with React DevTools and error messages.
 
-**Use `data-*` attributes for state** — enables CSS targeting and testing:
+**Set `data-slot` on the root** — `data-slot='component-name'` (kebab-case) on every component and sub-component root. It is a CSS hook only; tests never select by it.
+
+**Use `data-*` attributes for state** — enables CSS targeting:
 
 ```tsx
 <div data-color={color} data-state={isOpen ? 'open' : 'closed'}>
 ```
 
-## Step 2: Separate Variants (optional)
+**Keep render pure** — the library is compiled by React Compiler: no reading or writing `ref.current` during render, no mutating props, state or module variables. Check for compiler bailouts with `pnpm --filter @wallarm-org/design-system compiler:audit`.
 
-For components with many variants, extract styles into `classes.ts`:
+**Make interactive targets analytics-ready** — consumer `data-*` / `aria-*` / event props must reach the real interactive DOM node. Use the element-specific attribute type (`ButtonHTMLAttributes<HTMLButtonElement>`, etc.) and spread `...props` onto that node. See the [metrics contract](https://github.com/wallarm/design-system/blob/main/docs/metrics/contract.md) and the [new-component checklist](https://github.com/wallarm/design-system/blob/main/docs/metrics/new-component-checklist.md).
+
+## Step 2: Move Shared Variants to `classes.ts` (when shared)
+
+Keep the `cva()` definition in the component file by default, as in Step 1. Move it to `classes.ts` only when the styles are shared — several sub-components or files import the same recipe:
 
 ```ts
 // classes.ts
@@ -257,13 +263,16 @@ import { mergeProps } from '@ark-ui/react/utils';
 
 Ark UI provides accessible keyboard navigation, ARIA attributes, and focus management out of the box.
 
+### Test IDs for Compound Components
+
+Compound components cascade `data-testid` to their sub-components. The root takes `'data-testid': testId` (props extend `TestableProps` from `../../utils/testId`), puts it on its root element and wraps `children` in `<TestIdProvider value={testId}>`. Each sub-component calls `useTestId('slot-name')` and renders `data-testid={testId}`, which produces `{testId}--{slot-name}`. Full pattern: [test-id-pattern.md](https://github.com/wallarm/design-system/blob/main/docs/test-id-pattern.md).
+
 ### Accessibility Checklist
 
 - Add semantic `role` attributes (`role="alert"`, `role="dialog"`)
 - Set `aria-invalid`, `aria-disabled` where applicable
 - Ensure keyboard navigation (focus, Enter, Escape)
 - Support `closeOnEscape` for overlay components
-- Use `data-slot` for sub-component identification
 
 ## Step 6: Create Barrel Export
 
@@ -297,6 +306,7 @@ The exports are sorted alphabetically by component name. Types are always export
 ```tsx
 // ComponentName.stories.tsx
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
+import { HStack } from '../Stack';
 import { ComponentName } from './ComponentName';
 
 const meta = {
@@ -329,7 +339,7 @@ export const Basic: StoryFn<typeof meta> = ({ ...args }) => (
 
 // All variants
 export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack spacing={8}>
+  <HStack gap={8}>
     <ComponentName {...args} color="primary">Primary</ComponentName>
     <ComponentName {...args} color="neutral">Neutral</ComponentName>
   </HStack>
@@ -337,7 +347,7 @@ export const Variants: StoryFn<typeof meta> = ({ ...args }) => (
 
 // All sizes
 export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
-  <HStack align="end" spacing={8}>
+  <HStack align="end" gap={8}>
     <ComponentName {...args} size="small">Small</ComponentName>
     <ComponentName {...args} size="medium">Medium</ComponentName>
     <ComponentName {...args} size="large">Large</ComponentName>
@@ -349,21 +359,30 @@ export const Sizes: StoryFn<typeof meta> = ({ ...args }) => (
 
 Use the appropriate category for the `title` field:
 
-| Category             | Use For                          | Examples        |
-| -------------------- | -------------------------------- | --------------- |
-| `Actions`            | Clickable elements               | Button, Toggle  |
-| `Inputs`             | Form controls                    | Input, Checkbox |
-| `Layout`             | Structural components            | Stack, ScrollArea |
-| `Navigation`         | Navigation elements              | Tabs, Breadcrumb |
-| `Overlay`            | Floating elements                | Dialog, Tooltip |
-| `Messaging`          | Feedback messages                | Alert, Toast    |
-| `Status Indication`  | Status display                   | Badge, Tag      |
-| `Typography`         | Text display                     | Heading, Text   |
-| `Loading`            | Loading states                   | Skeleton, Loader |
-| `Primitives`         | Low-level building blocks        | Separator, Icons |
-| `Data`               | Data display                     | Table, CodeSnippet |
+| Category            | Use For                                | Examples                         |
+| ------------------- | -------------------------------------- | -------------------------------- |
+| `Actions`           | Clickable elements                     | Button, ToggleButton, DropdownMenu |
+| `AI`                | Wally assistant                        | Chat, AssistantMessage, ChainOfThought |
+| `Brand`             | Brand marks                            | Logo, WallyIcon                  |
+| `Data Display`      | Displaying data                        | Table, Card, Avatar, CodeSnippet |
+| `Inputs`            | Form controls                          | Input, Checkbox, Select          |
+| `Inputs Date`       | Date and time controls                 | Calendar, DateInput, TimeInput   |
+| `Layout`            | Structural components                  | Stack, Flex, ScrollArea          |
+| `Loading`           | Loading states                         | Loader, Skeleton, Progress       |
+| `Messaging`         | Feedback messages                      | Alert, Banner, Toast             |
+| `Navigation`        | Navigation elements                    | Tabs, Breadcrumbs, Pagination    |
+| `Overlay`           | Floating elements                      | Dialog, Drawer, Tooltip          |
+| `Pages`             | Full-page states                       | EmptyState, UtilityPage          |
+| `Patterns`          | Composite patterns built from components | FilterInput, FilterDropdown    |
+| `Primitives`        | Low-level building blocks              | Separator, Kbd, Icons            |
+| `Status Indication` | Status display                         | Badge, Tag, Indicator            |
+| `Typography`        | Text display                           | Heading, Text, Code              |
+
+A few existing stories still use `Data display` (lowercase `d`); use `Data Display` for new ones.
 
 ## Step 9: Write E2E Tests
+
+Follow the naming and locator rules in [e2e-test-rules.md](https://github.com/wallarm/design-system/blob/main/docs/e2e-test-rules.md): a `Component: {Name}` suite, `Visual` / `Interactions` / `Accessibility` groups, `Should …` titles, and `data-testid` locators (`getByRole` is fine for accessibility assertions).
 
 ```ts
 // ComponentName.e2e.ts
@@ -376,43 +395,43 @@ const componentStory = createStoryHelper('category-componentname', [
   'Sizes',
 ] as const);
 
-test.describe('ComponentName', () => {
-  test.describe('View', () => {
-    test('Basic view', async ({ page }) => {
+test.describe('Component: ComponentName', () => {
+  test.describe('Visual', () => {
+    test('Should render basic view correctly', async ({ page }) => {
       await componentStory.goto(page, 'Basic');
       await expect(page).toHaveScreenshot();
     });
 
-    test('All variants', async ({ page }) => {
+    test('Should render all variants correctly', async ({ page }) => {
       await componentStory.goto(page, 'Variants');
       await expect(page).toHaveScreenshot();
     });
   });
 
-  test.describe('Interaction', () => {
-    test('Click behavior', async ({ page }) => {
+  test.describe('Interactions', () => {
+    test('Should become active when clicked', async ({ page }) => {
       await componentStory.goto(page, 'Basic');
 
-      const component = page.getByRole('button');
+      const component = page.getByTestId('component-name');
       await component.click();
 
       await expect(component).toHaveAttribute('data-state', 'active');
     });
+  });
 
-    test('Keyboard accessible', async ({ page }) => {
+  test.describe('Accessibility', () => {
+    test('Should be focusable via Tab key', async ({ page }) => {
       await componentStory.goto(page, 'Basic');
 
-      const component = page.getByRole('button');
-      await component.focus();
-      await page.keyboard.press('Enter');
+      await page.keyboard.press('Tab');
 
-      await expect(component).toBeFocused();
+      await expect(page.getByTestId('component-name')).toBeFocused();
     });
   });
 });
 ```
 
-The `createStoryHelper` ID format is `category-componentname` (lowercase, hyphen-separated), matching the Storybook `title` field.
+The `createStoryHelper` ID format is `category-componentname` (lowercase, hyphen-separated), matching the Storybook `title` field. Pass the `data-testid` the test uses in the story (`<ComponentName data-testid='component-name' />`).
 
 ## Step 10: Write Unit Tests (for logic)
 
@@ -467,8 +486,12 @@ Before submitting a PR, make sure:
 - [ ] Props extend native HTML attributes
 - [ ] `className` is merged via `cn()` and passed to root element
 - [ ] `displayName` is set
+- [ ] `data-slot` is set on the root (and on each sub-component root)
 - [ ] `ref` forwarding works
 - [ ] `...props` are spread on the root element
+- [ ] Compound components cascade `data-testid` (`TestIdProvider` / `useTestId`)
+- [ ] Interactive targets are analytics-ready ([new-component checklist](https://github.com/wallarm/design-system/blob/main/docs/metrics/new-component-checklist.md))
+- [ ] `pnpm --filter @wallarm-org/design-system compiler:audit` lists no bailouts in the new component
 - [ ] Barrel export (`index.ts`) is created
 - [ ] Component is added to `src/index.ts`
 - [ ] Storybook stories cover all variants and states

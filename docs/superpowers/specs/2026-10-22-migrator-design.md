@@ -126,35 +126,9 @@ A new job in **`.github/workflows/pr-title.yml`** (`pull_request` event). On `ma
 
 Breaking changes that need nothing from consumers (e.g. a dropped Node version) still ship a **report-only** migration whose message explains it. That keeps the rule mechanical. The same rule goes into `CLAUDE.md` → Commit Conventions and `.claude/agents/design-system.md`.
 
-## 9. Consumer setup (documented in `packages/migrator/README.md`, not built here)
+## 9. Consumer setup
 
-Renovate repository config (or a shared preset in the GitLab Renovate runner repo):
-
-```json
-{
-  "packageRules": [
-    {
-      "matchPackageNames": ["@wallarm-org/design-system"],
-      "minimumReleaseAge": "1 hour",
-      "prBodyNotes": ["⚠️ The design-system migrator may have left manual steps: search this MR for `wds-migration` comments and the `wds-migration.md` report, fix them, then delete the report."],
-      "postUpgradeTasks": {
-        "commands": ["npx --yes @wallarm-org/migrator@latest --from {{{currentVersion}}} --to {{{newVersion}}}"],
-        "fileFilters": ["**/*.{ts,tsx,js,jsx,mts,cts}", "**/wds-migration.md"],
-        "workingDirTemplate": "{{{packageFileDir}}}",
-        "installTools": { "node": {} }
-      }
-    }
-  ]
-}
-```
-
-- `workingDirTemplate` runs the migrator from each upgraded `package.json`'s directory, so each package's tasks run with its own `--from` and only touch files under it. From the repo root, one package's `--from` would rewrite every package (e.g. turn an already-migrated `sm` into `lg`). In a monorepo each package gets its own `wds-migration.md`, hence the recursive filter and CI check.
-- `currentVersion` is the **locked** version when a lockfile exists (Renovate has no separate `lockedVersion` template). Consumers must commit their lockfile, which they already do with Yarn/pnpm.
-- `installTools.node` is needed on the default slim Renovate image (`binarySource=install`), where `npx` isn't on PATH. The `-full` image already has it. With `binarySource=global` the runner image has to provide node/npm.
-- Self-hosted runner admin config: `allowedCommands: ["^npx --yes @wallarm-org/migrator@latest --from \\d+\\.\\d+\\.\\d+\\S* --to \\d+\\.\\d+\\.\\d+\\S*$"]`.
-- `prBodyNotes` must not contain the literal `@wds-migration` (the tracked Renovate config would trip the gate).
-- Consumer CI: one job `if git grep -n '@wds-migration'; then echo 'Design-system migration left manual steps: fix the @wds-migration markers and delete wds-migration.md'; exit 1; fi` (fails on leftover markers or an undeleted report, prints the hits).
-- Manual run after an upgrade: `pnpm dlx @wallarm-org/migrator --from 2.9.0` (or `yarn dlx` / `npx`).
+The Renovate `postUpgradeTasks` config, self-hosted runner `allowedCommands`, consumer CI check and manual-run instructions live in [`packages/migrator/README.md` → Consumer setup](../../../packages/migrator/README.md#consumer-setup).
 
 ## 10. Testing
 

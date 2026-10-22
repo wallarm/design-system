@@ -2,7 +2,7 @@
 
 ## Overview
 
-`PieChart` is a composable donut chart paired with a vertical legend, designed for compact "share-of-total" breakdowns inside a `Chart` card — response codes, traffic origins, error categories. The donut is drawn by [`recharts@3.8`](https://recharts.org/), the legend is hand-rolled JSX, and the two are synced through React context: hovering a slice highlights its legend row and vice versa.
+`PieChart` is a composable donut chart paired with a vertical legend, designed for compact "share-of-total" breakdowns inside a `Chart` card — response codes, traffic origins, error categories. The donut is drawn by [`recharts`](https://recharts.org/), the legend is hand-rolled JSX, and the two are synced through React context: hovering a slice highlights its legend row and vice versa.
 
 The root accepts `data` as the single source of truth. The donut renders the slices; the legend is composed by the caller (`PieChartLegendItem` rows are referenced by `name`). This keeps the badge/label/value layout fully flexible while preserving the hover and percent calculations.
 

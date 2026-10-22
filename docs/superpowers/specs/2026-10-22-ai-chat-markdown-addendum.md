@@ -1,6 +1,6 @@
 # AI chat architecture v2, Addendum A: built-in markdown (`AssistantMessageMarkdown`)
 
-> Status: proposed, 2026-10-22.
+> Status: implemented in #370 (41bf6370); proposed 2026-10-22.
 > - **Extends** `docs/superpowers/specs/2026-10-21-ai-chat-architecture-v2.md`.
 > - **Reverses** its decision 14 ("no new dependencies… the markdown engine stays in the app").
 > - **Prototype:** everything here was built outside the repo and checked there:

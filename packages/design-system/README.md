@@ -6,7 +6,7 @@ Modern React component library for building user interfaces.
 
 All documentation is available in:
 
-- [Storybook](https://wallarm.github.io/wallarm-design-system/) - Interactive component examples
+- [Storybook](https://wallarm.github.io/design-system/) - Interactive component examples
 - [Installation Guide](docs/installation.md) - Setup instructions
 - [Getting Started](docs/getting-started.md) - Introduction and overview
 
@@ -52,7 +52,7 @@ body {
 
 ## ✨ Features
 
-- **40+ components** - Complete set of UI elements
+- **100+ components** - Complete set of UI elements
 - **React 19** - Latest React version
 - **TypeScript** - Full type safety
 - **Tailwind CSS v4** - Modern styling system
@@ -77,7 +77,7 @@ body {
 ```bash
 # Clone repository
 git clone https://github.com/wallarm/design-system.git
-cd wallarm-design-system
+cd design-system
 
 # Install dependencies
 pnpm install
@@ -113,6 +113,8 @@ pnpm --filter @wallarm-org/design-system icons:sync --only Bell,BellOff    # ref
 ```
 
 The command writes the component files, `src/icons/index.ts`, the gallery category (`module/const.ts`) and Code Connect (`module/Icons.figma.batch.json` + its `Icons.figma.batch.ts` template). `scripts/icons/manifest.json` maps Figma nodes to component names, and also holds excluded nodes and the `keep` list of hand-maintained icons. When a new layer's name collides with an existing icon, map it there. Brand icons without a Neutral variant in Figma get a generated `*Neutral` twin. Commit with `[update-screenshots]` so CI refreshes the icon gallery baselines.
+
+## 📖 Resources
 
 - [Storybook](https://wallarm.github.io/design-system/) - Interactive examples
 - [NPM](https://www.npmjs.com/package/@wallarm-org/design-system) - NPM package

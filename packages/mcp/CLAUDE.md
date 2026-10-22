@@ -23,32 +23,7 @@ src/
     └── resources.test.ts
 ```
 
-## MCP Capabilities
-
-### Tools (registered via `server.registerTool`)
-
-| Tool | Input | Description |
-|---|---|---|
-| `search_component` | `{ query: string }` | Search by name, description, props, variants. Returns top 10 sorted by relevance score |
-| `get_component` | `{ name: string }` | Full component details as markdown: props, variants, sub-components, examples, import path |
-| `search_token` | `{ query: string }` | Search tokens by name, value, or category. Returns top 20 sorted by relevance score |
-| `get_token_category` | `{ name: string }` | All tokens in a category as markdown table with token count |
-
-### Resources (registered via `server.registerResource`)
-
-| URI | Description |
-|---|---|
-| `ds://components` | Markdown table listing all components with import paths |
-| `ds://tokens` | All design tokens organized by category |
-| `ds://components/{name}` | ResourceTemplate — detailed metadata for a specific component |
-
-## Metadata Resolution
-
-The server resolves `components.json` in this order (see `metadata.ts`):
-
-1. `--metadata-path <path>` CLI argument (explicit)
-2. `import.meta.resolve('@wallarm-org/design-system/metadata')` (installed package)
-3. Walk up from `cwd` looking for `node_modules/@wallarm-org/design-system/dist/metadata/components.json`
+Tools, resources, metadata resolution, client setup and commands are documented in [README.md](./README.md).
 
 ## MCP SDK API
 
@@ -58,16 +33,6 @@ Uses `@modelcontextprotocol/sdk` v1.12+. The server uses the **non-deprecated** 
 - `StdioServerTransport` for stdio communication
 
 **Important**: All non-protocol output MUST go to `stderr` — this is critical for stdio transport. Use the `log()` helper in `index.ts`.
-
-## Commands
-
-```bash
-pnpm build       # Build with rslib
-pnpm dev         # Build in watch mode
-pnpm test        # Run tests in watch mode
-pnpm test:run    # Run tests once
-pnpm typecheck   # Type-check without emitting
-```
 
 ## Search Scoring (search-component.ts)
 
@@ -96,36 +61,6 @@ pnpm typecheck   # Type-check without emitting
 ## Dependencies
 
 - `@modelcontextprotocol/sdk` — MCP server SDK
-- `@wallarm-org/mcp-core` — shared Zod schemas and types
+- `@wallarm-org/mcp-core` — devDependency (not published to npm), shared Zod schemas and types, bundled into `dist/index.js`
 - `@wallarm-org/design-system` — peerDependency (optional), source of `components.json`
 - `zod` — devDependency, used for tool input schemas in `index.ts`
-
-## Usage
-
-```json
-{
-  "mcpServers": {
-    "wallarm-ds": {
-      "command": "npx",
-      "args": ["@wallarm-org/mcp"]
-    }
-  }
-}
-```
-
-With custom metadata path (e.g. local development):
-
-```json
-{
-  "mcpServers": {
-    "wallarm-ds": {
-      "command": "node",
-      "args": [
-        "./packages/mcp/dist/index.js",
-        "--metadata-path",
-        "./packages/design-system/dist/metadata/components.json"
-      ]
-    }
-  }
-}
-```

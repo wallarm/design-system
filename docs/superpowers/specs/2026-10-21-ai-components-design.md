@@ -1,8 +1,10 @@
 # Wally AI components: final spec (v1)
 
+> **Superseded in part by** [`2026-10-21-ai-chat-architecture-v2.md`](./2026-10-21-ai-chat-architecture-v2.md) and [`2026-10-22-ai-chat-markdown-addendum.md`](./2026-10-22-ai-chat-markdown-addendum.md). Where they disagree, the later doc wins.
+
 **Winner:** P1, the composition-first proposal. Pieces from P2 and P3 are grafted on, along with fixes found by checking the repo and the CopilotKit 1.79.1 tarballs.
 
-**Size:** 8 folders, 29 exported parts, one new CSS utility, no new dependencies. There are no CopilotKit or AG-UI types in the DS.
+**Size:** 8 folders, 29 exported parts, one new CSS utility, no new dependencies *(Amended by addendum A: `marked`, `remend`)*. There are no CopilotKit or AG-UI types in the DS.
 
 **Integration model:** CopilotKit is used **only through its headless hooks, in the app**. The app reads data and callbacks from the hooks and passes them into these presentational components as props (section 5).
 
@@ -1124,7 +1126,7 @@ Subpath exports (`@wallarm-org/design-system/Chat` and the rest) work automatica
   - tool → icon and tool → label mapping
   - the session allow-list and auto-respond
   - persisting feedback
-- **Rendering and scrolling.** No markdown renderer (app), no virtualization. *(Amended by v2 §14: stick-to-bottom and the scroll-to-bottom button now ship in `Conversation`.)*
+- **Rendering and scrolling.** No markdown renderer (app), no virtualization. *(Amended by v2 §14: stick-to-bottom and the scroll-to-bottom button now ship in `Conversation`. Amended by addendum A: `AssistantMessageMarkdown` ships a built-in renderer.)*
 - **Features not designed in Figma:**
   - attachments and file upload, voice and transcription
   - edit, branch, regenerate and read-aloud

@@ -34,7 +34,7 @@ Compound component:
 - **`value`** (per item, number) — raw magnitude.
   - Non-finite → treated as `0`.
   - Ratio is clamped to `[0, 1]`; values above `max` cap the bar at 100% but the percent label also caps at `100%`.
-- **`selected`** (per item, boolean) — purely visual: applies the hover background and `aria-current="true"`. The bar width and the percent label are driven entirely by `value / max`; selection never changes the fill.
+- **`selected`** (per item, boolean) — purely visual: applies the active background (`bg-states-primary-active`) and `aria-current="true"`. The bar width and the percent label are driven entirely by `value / max`; selection never changes the fill.
 
 `BarList` does not sort, slice, or aggregate its input — callers already have `data`, they pass it in whatever order they want to display it.
 
@@ -45,7 +45,7 @@ Compound component:
 | Default     | —                                                        | Grey bar (`bg-states-primary-pressed`) at `value / max` width.                                |
 | Hover       | Pointer over a row                                       | Row background shifts to `bg-states-primary-hover`. Pure CSS; no JS.                          |
 | Focus       | Keyboard focus on a clickable row                        | Same hover background + `ring-focus-primary` inset ring via `focus-visible`.                  |
-| Selected    | `<BarListItem selected />`                               | Row gets the hover background + `aria-current="true"`. Bar and percent label stay at `value / max`. |
+| Selected    | `<BarListItem selected />`                               | Row gets the active background (`bg-states-primary-active`) + `aria-current="true"`. Bar and percent label stay at `value / max`. |
 | Loading     | Render `<BarListSkeleton rows={n} />` instead of `BarList` | Five (or `rows`) pulse bars using the design system's `Skeleton`.                             |
 | Empty       | Render `<ChartEmpty />` instead of `BarList`             | Shared chart empty-state body with a centered "No data" message. Pass children to override.   |
 
@@ -60,9 +60,9 @@ Compound component:
 - **Ratio clamping** — `value > max` renders the bar at 100% but the percent label also caps at `100%`. There is no special rendering for "overflow".
 - **Selection and fill are orthogonal** — `selected` is purely a visual state (background + `aria-current`). The bar width and percent label are always `value / max`. To show a row "filling to 100%" when filtered, recompute `max` from the filtered set (e.g. `max={Math.max(...visibleRows.map(r => r.value))}`) instead of relying on `selected`.
 - **Invalid `max`** — `NaN`, `Infinity`, `-Infinity`, `0`, negative, or non-number: every row renders empty with a `0%` label, and a single `console.warn` fires in development. Production stays silent.
-- **Label overlap** — the label is absolutely positioned on top of the bar by design; they share the same row. Labels truncate with ellipsis and reserve `80px` on the right for the value.
+- **Label overlap** — the bar is absolutely positioned; the label sits in the row's flex flow on top of it (`flex-1 min-w-0`) and truncates with an ellipsis before the value.
 - **Zero values** — `value = 0` renders an empty bar and `0%`. No special "no data" treatment.
-- **Mount animation** — bars transition their width (`duration-300 ease-out`). React mounts them with their final inline style, so without opt-in the first paint would already show the end state; the transition still runs for subsequent width changes (e.g. filtering).
+- **Mount animation** — bars transition their width (`duration-300 ease-out`). On mount they grow from zero via `starting:w-0` (`@starting-style`); the same transition runs for subsequent width changes (e.g. filtering).
 - **`BarListPercent` without a parent `BarListItem`** — renders `0%`. There is no runtime error.
 - **`BarListPercent` color variants** — `split` (default, matches Figma) colors the numeric value with `text-text-primary` and the `%` symbol with `text-text-secondary`, giving the row a "value > unit" hierarchy. `muted` pulls both tokens down to `text-text-secondary` when the percent should read as a single de-emphasized label. `inherit` drops both colors so the percent follows whatever color `BarListValue` (or any ancestor) sets — useful when a row needs to read as a single colored token.
 
