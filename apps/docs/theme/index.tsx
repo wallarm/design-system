@@ -2,10 +2,15 @@ import './reactAriaPolyfill';
 
 import { useLayoutEffect } from 'react';
 import { BrowserOnly, useDark, usePage } from '@rspress/core/runtime';
-import { EditLink as OriginalEditLink, type RootProps } from '@rspress/core/theme-original';
+import {
+  EditLink as OriginalEditLink,
+  Layout as OriginalLayout,
+  type RootProps,
+} from '@rspress/core/theme-original';
 import { DateFormatProvider } from '@wallarm-org/design-system/DateFormatProvider';
 import { ThemeProvider, useTheme } from '@wallarm-org/design-system/ThemeProvider';
 import { Toaster } from '@wallarm-org/design-system/Toast';
+import { NavBrand } from './NavBrand';
 
 export * from '@rspress/core/theme-original';
 
@@ -33,5 +38,11 @@ export function Root({ children }: RootProps) {
       <DateFormatProvider order='day-first'>{children}</DateFormatProvider>
       <BrowserOnly fallback={null}>{() => <Toaster />}</BrowserOnly>
     </ThemeProvider>
+  );
+}
+
+export function Layout(props: Parameters<typeof OriginalLayout>[0]) {
+  return (
+    <OriginalLayout {...props} navTitle={<NavBrand />} beforeHero={<NavBrand size='hero' />} />
   );
 }
