@@ -12,7 +12,6 @@ concurrency:
 
 permissions:
   contents: write
-  packages: write
   pull-requests: write
   checks: write
   id-token: write
@@ -46,16 +45,8 @@ jobs:
       - name: Check screenshot update trigger
         id: check-screenshots
         env:
-          COMMIT_MSG_PUSH: ${{ github.event.head_commit.message }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          EVENT_NAME: ${{ github.event_name }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          if [[ "$EVENT_NAME" == "pull_request" ]]; then
-            COMMIT_MSG=$(git log "$PR_HEAD_SHA" -1 --pretty=%B)
-          else
-            COMMIT_MSG="$COMMIT_MSG_PUSH"
-          fi
-
           if [[ "$COMMIT_MSG" == *"[update-screenshots]"* ]]; then
             echo "should_update=true" >> $GITHUB_OUTPUT
             echo "✅ [update-screenshots] trigger found"
@@ -66,16 +57,8 @@ jobs:
       - name: Check E2E skip trigger
         id: check-e2e-skip
         env:
-          COMMIT_MSG_PUSH: ${{ github.event.head_commit.message }}
-          PR_HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-          EVENT_NAME: ${{ github.event_name }}
+          COMMIT_MSG: ${{ github.event.head_commit.message }}
         run: |
-          if [[ "$EVENT_NAME" == "pull_request" ]]; then
-            COMMIT_MSG=$(git log "$PR_HEAD_SHA" -1 --pretty=%B)
-          else
-            COMMIT_MSG="$COMMIT_MSG_PUSH"
-          fi
-
           if [[ "$COMMIT_MSG" == *"[skip-e2e]"* ]]; then
             echo "should_skip=true" >> $GITHUB_OUTPUT
             echo "✅ [skip-e2e] trigger found - will skip E2E tests"
@@ -130,8 +113,8 @@ jobs:
 
           echo "Checking range: $RANGE"
 
-          # Detect breaking changes (feat!:, fix!:, BREAKING CHANGE in body)
-          if git log "$RANGE" --pretty="%B" | grep -qE "^(feat|fix|refactor|perf)(\(.+\))?!:|BREAKING CHANGE"; then
+          # Detect breaking changes (any type with !:, BREAKING CHANGE(S): footer) — same rule as pr-title.yml
+          if git log "$RANGE" --pretty="%B" | grep -qE '^[a-z]+(\(.+\))?!:|^BREAKING CHANGES?:'; then
             echo "🔥 Breaking change detected — MCP release triggered"
             SHOULD_RELEASE="true"
           fi
@@ -540,7 +523,6 @@ jobs:
     if: always() && needs.e2e-update-screenshots.result == 'success'
     permissions:
       contents: write
-      pull-requests: write
       actions: write
     steps:
       - name: Checkout code
@@ -548,8 +530,8 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           # main only accepts pushes from repo admins and this deploy key (ruleset)
-          ssh-key: ${{ (github.head_ref || github.ref_name) == 'main' && secrets.DEPLOY_KEY || '' }}
-          ref: ${{ github.head_ref || github.ref_name }}
+          ssh-key: ${{ github.ref_name == 'main' && secrets.DEPLOY_KEY || '' }}
+          ref: ${{ github.ref_name }}
           fetch-depth: 0
 
       - name: Download all screenshot artifacts
@@ -583,7 +565,7 @@ jobs:
 
       - name: Trigger verification run against updated screenshots
         # A deploy-key push to main triggers its own run, so dispatch only elsewhere
-        if: steps.changes.outputs.has_changes == 'true' && (github.head_ref || github.ref_name) != 'main'
+        if: steps.changes.outputs.has_changes == 'true' && github.ref_name != 'main'
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
@@ -594,7 +576,7 @@ jobs:
           # resolves to false and the normal `e2e` job verifies against the
           # baselines just committed, instead of the update job's --update-snapshots
           # run whose exit code is deliberately ignored.
-          gh workflow run main.yml --ref "${{ github.head_ref || github.ref_name }}"
+          gh workflow run main.yml --ref "${{ github.ref_name }}"
 
   # ========================================
   # Deploy Storybook to GitHub Pages

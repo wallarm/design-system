@@ -4,25 +4,12 @@
     "color": "EEEEEE"
   },
   "CHECKS": {
-    "prefixes": [
-      "feat: ",
-      "fix: ",
-      "docs: ",
-      "style: ",
-      "refactor: ",
-      "perf: ",
-      "test: ",
-      "build: ",
-      "chore: ",
-      "ci: ",
-      "revert: "
-    ],
-    "regexp": "^(#)?(feat|fix|docs|style|refactor|perf|test|build|chore|ci|revert)(\\(.*\\))?!?:?\\s.+",
+    "regexp": "^(feat|fix|docs|style|refactor|perf|test|build|chore|ci|revert)(\\([^)]+\\))?!?: .+",
     "ignoreLabels": ["skip-title-check"]
   },
   "MESSAGES": {
     "success": "PR title follows the convention!",
-    "failure": "PR title does not follow the convention. Please use format: 'type: description' or '#type(scope): description'",
+    "failure": "PR title must follow Conventional Commits: 'type(scope): description' (scope optional, '!' before ':' marks a breaking change)",
     "notice": ""
   }
 }
