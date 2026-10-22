@@ -19,6 +19,7 @@
     "lint": "biome check",
     "test": "rstest watch",
     "test:run": "rstest run",
+    "check:build": "tsx scripts/check-build.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
