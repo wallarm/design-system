@@ -205,7 +205,12 @@ export function renderTokensPage(tokens: TokenCategory[]): string {
     out.push(`## ${cat.name}`);
     if (cat.name.includes('syntax')) out.push('Code-managed mapping — do not override.');
     const rows = cat.tokens.map(t => `| ${escapeCell(t.name)} | ${escapeCell(t.value)} |`);
-    out.push(['| Token | Value |', '| --- | --- |', ...rows].join('\n'));
+    const table = ['| Token | Value |', '| --- | --- |', ...rows].join('\n');
+    // JSON is a valid JS expression; only the line separators need escaping.
+    const json = JSON.stringify(cat.tokens.map(({ name, value }) => ({ name, value })))
+      .replace(/\u2028/g, '\\u2028')
+      .replace(/\u2029/g, '\\u2029');
+    out.push(`<TokenTable tokens={${json}}>\n\n${table}\n\n</TokenTable>`);
   }
   return `${out.join('\n\n')}\n`;
 }

@@ -5,6 +5,7 @@ import {
   renderComponentPage,
   renderComponentsMeta,
   renderPropsTable,
+  renderTokensPage,
   toStoryId,
 } from '../render';
 
@@ -135,5 +136,16 @@ describe('renderChangelogPage', () => {
     expect(renderChangelogPage('## [3.3.0](x) (2026-10-22)\n')).toMatch(
       /# Changelog\n+## \[3\.3\.0\]/,
     );
+  });
+});
+
+describe('renderTokensPage', () => {
+  it('renderTokensPage wraps tables in TokenTable', () => {
+    const out = renderTokensPage([
+      { name: 'colors', tokens: [{ name: '--color-a', value: '#fff' }] },
+    ]);
+    expect(out).toContain('<TokenTable tokens={[');
+    expect(out).toContain('| Token | Value |');
+    expect(out).toContain('</TokenTable>');
   });
 });

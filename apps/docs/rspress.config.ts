@@ -19,6 +19,7 @@ export default defineConfig({
     globalComponents: [
       path.join(dir, 'theme/components/StoryPreview.tsx'),
       path.join(dir, 'theme/components/Explorer.tsx'),
+      path.join(dir, 'theme/components/TokenTable.tsx'),
     ],
   },
   themeConfig: {

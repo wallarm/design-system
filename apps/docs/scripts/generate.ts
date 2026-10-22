@@ -44,7 +44,7 @@ writeFileSync(path.join(outDir, '_meta.json'), renderComponentsMeta(metadata.com
 
 for (const dir of ['foundations', 'get-started', 'public'])
   mkdirSync(path.join(docs, dir), { recursive: true });
-writeFileSync(path.join(docs, 'foundations/tokens.md'), renderTokensPage(metadata.tokens));
+writeFileSync(path.join(docs, 'foundations/tokens.mdx'), renderTokensPage(metadata.tokens));
 writeFileSync(
   path.join(docs, 'get-started/changelog.md'),
   renderChangelogPage(readFileSync(path.join(ds, 'CHANGELOG.md'), 'utf8')),
