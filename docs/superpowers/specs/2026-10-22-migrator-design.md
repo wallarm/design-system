@@ -26,8 +26,8 @@ Both run the same non-interactive CLI. No prompts, ever.
 | D4 | Migrations exist **only for breaking changes**, so every migration belongs to a major (`X.0.0`). A migration ships **in the same PR as its breaking change** (D12) — never later, never on its own. |
 | D5 | Migration → version mapping lives in **`packages/migrator/versions.json`**: `{ "latest": "3.0.0", "migrations": { "numeric-badge-type-color": "2.0.0", "avatar-size-rename": "3.0.0" } }`. Seeded by hand for history (those two values exactly). From then on it's written only by the release stamp (§7). `latest` = the newest design-system **major** the migrator knows about. |
 | D6 | Version range: `--from` is **required** — the exact version before the upgrade. `--to` defaults to the version installed in `node_modules/@wallarm-org/design-system/package.json` (walk up from cwd, like `packages/mcp/src/metadata.ts`). Renovate passes both (§9). |
-| D7 | No journal of applied migrations. Renovate always re-applies onto a fresh branch from base, so `from` always describes the code being migrated. Transforms are idempotent for one `from→to` run (a rename map is applied in one pass, never chained) — Renovate's `executionMode: update` may run the task once per `package.json` in a consumer monorepo. |
-| D8 | Anything the migrator can't rewrite safely goes to a **report file `wds-migration.md`** at the cwd root (and stdout). The consumer CI blocks merge while the file exists (`test ! -f wds-migration.md`); the team fixes the listed spots and deletes the file in the MR. No file is written when nothing needs a human; an existing file is overwritten. |
+| D7 | No journal of applied migrations. Renovate always re-applies onto a fresh branch from base, so `from` always describes the code being migrated. Transforms are idempotent for one `from→to` run (a rename map is applied in one pass, never chained) — Renovate's `executionMode: update` may run the task once per `package.json` in a consumer monorepo. **Scoping rule:** the migrator only touches files under its cwd; Renovate must run it per package file dir (`workingDirTemplate: "{{{packageFileDir}}}"`, §9), so each package is migrated with its own `--from`. |
+| D8 | Anything the migrator can't rewrite safely goes to a **report file `wds-migration.md`** at the cwd root (and stdout). The consumer CI blocks merge while any such file exists (`! git ls-files --others --cached --exclude-standard -- '*wds-migration.md' | grep -q .`); the team fixes the listed spots and deletes the file in the MR. No file is written when nothing needs a human; an existing file is overwritten. |
 | D9 | Files to scan: `git ls-files` for `*.{ts,tsx,js,jsx,mts,cts}` from cwd (respects `.gitignore`, works in monorepos), pre-filtered to files whose text contains `@wallarm-org/design-system`. Positional path args override the list. Not a git repo and no paths → exit 1. A file that fails to parse is skipped with a warning and listed in the report. |
 | D10 | Supported floor: `--from ≥ 1.0.0`. Lower → exit 1 with "upgrade to 1.x manually first". |
 | D11 | First two migrations, from real history: `avatar-size-rename` (3.0.0) and `numeric-badge-type-color` (2.0.0) — §6. |
@@ -137,7 +137,8 @@ Renovate repository config (or a shared preset in the GitLab Renovate runner rep
       "minimumReleaseAge": "1 hour",
       "postUpgradeTasks": {
         "commands": ["npx --yes @wallarm-org/migrator@latest --from {{{currentVersion}}} --to {{{newVersion}}}"],
-        "fileFilters": ["**/*.{ts,tsx,js,jsx,mts,cts}", "wds-migration.md"],
+        "fileFilters": ["**/*.{ts,tsx,js,jsx,mts,cts}", "**/wds-migration.md"],
+        "workingDirTemplate": "{{{packageFileDir}}}",
         "installTools": { "node": {} }
       }
     }
@@ -145,10 +146,11 @@ Renovate repository config (or a shared preset in the GitLab Renovate runner rep
 }
 ```
 
+- `workingDirTemplate` runs the migrator from each upgraded `package.json`'s directory, so each package's tasks run with its own `--from` and only touch files under it. From the repo root, one package's `--from` would rewrite every package (e.g. turn an already-migrated `sm` into `lg`). In a monorepo each package gets its own `wds-migration.md`, hence the recursive filter and CI check.
 - `currentVersion` is the **locked** version when a lockfile exists (Renovate has no separate `lockedVersion` template). Consumers must commit their lockfile, which they already do with Yarn/pnpm.
 - `installTools.node` is needed on the default slim Renovate image (`binarySource=install`), where `npx` isn't on PATH. The `-full` image already has it. With `binarySource=global` the runner image has to provide node/npm.
 - Self-hosted runner admin config: `allowedCommands: ["^npx --yes @wallarm-org/migrator@latest --from \\d+\\.\\d+\\.\\d+\\S* --to \\d+\\.\\d+\\.\\d+\\S*$"]`.
-- Consumer CI: one job `test ! -f wds-migration.md`.
+- Consumer CI: one job `! git ls-files --others --cached --exclude-standard -- '*wds-migration.md' | grep -q .` (fails while any `wds-migration.md` exists in the repo).
 - Manual run after an upgrade: `pnpm dlx @wallarm-org/migrator --from 2.9.0` (or `yarn dlx` / `npx`).
 
 ## 10. Testing

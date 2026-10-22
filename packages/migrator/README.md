@@ -13,7 +13,7 @@ migrator --from <version> [--to <version>] [--dry-run] [paths...]
 - `--dry-run`: print changes, write nothing.
 - `--help`, `--version`.
 
-Without paths, tracked files of the current git repository are scanned. Exit code is `0` for completed runs (even with manual items) and `1` for usage/version errors. When something needs a manual change, or a file could not be parsed, `wds-migration.md` is written.
+Without paths, tracked files under the current directory are scanned. Exit code is `0` for completed runs (even with manual items) and `1` for usage/version errors. When something needs a manual change, or a file could not be parsed, `wds-migration.md` is written.
 
 ## Consumer setup
 
@@ -27,7 +27,8 @@ Renovate repository config (or a shared preset in the GitLab Renovate runner rep
       "minimumReleaseAge": "1 hour",
       "postUpgradeTasks": {
         "commands": ["npx --yes @wallarm-org/migrator@latest --from {{{currentVersion}}} --to {{{newVersion}}}"],
-        "fileFilters": ["**/*.{ts,tsx,js,jsx,mts,cts}", "wds-migration.md"],
+        "fileFilters": ["**/*.{ts,tsx,js,jsx,mts,cts}", "**/wds-migration.md"],
+        "workingDirTemplate": "{{{packageFileDir}}}",
         "installTools": { "node": {} }
       }
     }
@@ -35,10 +36,11 @@ Renovate repository config (or a shared preset in the GitLab Renovate runner rep
 }
 ```
 
+- `workingDirTemplate` runs the migrator from each upgraded `package.json`'s directory, so each package's tasks run with its own `--from` and only touch files under it. From the repo root, one package's `--from` would rewrite every package (e.g. turn an already-migrated `sm` into `lg`). In a monorepo each package gets its own `wds-migration.md`, hence the recursive filter and CI check.
 - `currentVersion` is the **locked** version when a lockfile exists (Renovate has no separate `lockedVersion` template). Consumers must commit their lockfile.
 - `installTools.node` is needed on the default slim Renovate image (`binarySource=install`), where `npx` isn't on PATH. The `-full` image already has it. With `binarySource=global` the runner image has to provide node/npm.
 - Self-hosted runner admin config: `allowedCommands: ["^npx --yes @wallarm-org/migrator@latest --from \\d+\\.\\d+\\.\\d+\\S* --to \\d+\\.\\d+\\.\\d+\\S*$"]`.
-- Consumer CI: one job `test ! -f wds-migration.md`, so a PR with manual items cannot merge until they are handled and the report is deleted.
+- Consumer CI: one job `! git ls-files --others --cached --exclude-standard -- '*wds-migration.md' | grep -q .`, so a PR with manual items cannot merge until they are handled and the report is deleted.
 - Manual run after an upgrade: `pnpm dlx @wallarm-org/migrator --from 2.9.0` (or `yarn dlx` / `npx`).
 
 ## Adding a migration
