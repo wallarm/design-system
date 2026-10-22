@@ -560,3 +560,16 @@ Runs after Task 8. One dispatch, two commits.
 - [ ] **Step 2:** Part B with TDD; run `pnpm --filter @wallarm-org/design-system exec rstest run scripts/metadata`, `pnpm --filter @wallarm-org/mcp test:run` and docs `test:run` (RED → GREEN); `generate-metadata`; `pnpm --filter @wallarm-org/design-system build-storybook` (expected: success).
 - [ ] **Step 3: Run** `pnpm turbo run build --filter=@wallarm-org/docs...`, then in `preview` open `/design-system/components/table`. Expected: the page scrolls smoothly top to bottom with no hang. Measure with the Playwright MCP — e.g. time to load plus scroll to bottom, and the long-task count via `PerformanceObserver` — before (on the previous commit, if practical) and after, and report the numbers. `!autodocs` examples show code + an "Open in Storybook" link.
 - [ ] **Step 4: Commit** `perf(table): keep heavy stories off the docs pages`.
+
+---
+
+### Task 18: Static home feature cards (user request, 2026-10-22)
+
+Runs after Task 17.
+
+**Files:** Modify `apps/docs/styles/global.css`.
+
+Home feature cards must not move on hover. Find the Rspress 2.0.23 hover rule for the home feature cards in `node_modules/@rspress/core/dist` (class names like `.rp-home-feature__card` and a `:hover` `transform`/`translate`/`box-shadow` transition). Neutralize only the movement (`transform: none`, plus the transition on transform if there is one). Keep any non-movement hover feedback such as a border color. Scope the rule to the home feature cards.
+
+- [ ] **Step 1:** Implement. **Step 2: Run** `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success. In `preview`, hover a card: its `getBoundingClientRect()` and computed `transform` are unchanged (check with Playwright `page.evaluate` before and after `hover`).
+- [ ] **Step 3: Commit** `style(docs): keep home feature cards static on hover`
