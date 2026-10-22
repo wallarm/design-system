@@ -11,6 +11,7 @@ import { SliderValue } from './SliderValue';
 const DESCRIPTION = [
   'Sets an approximate, bounded value by dragging along a track — reach for `NumberInput` when the exact figure matters, since a slider is faster to move than it is to land.',
   'A slider should always show its value: pair it with `SliderInput` for entry, or `SliderValue` for a readout.',
+  'It implies a continuum, so a few fixed choices belong in `SegmentedControl`, `Radio` or `Select`, and on/off in `Switch`.',
 ].join(' ');
 
 const meta = {
@@ -57,8 +58,9 @@ const meta = {
 export default meta;
 
 /**
- * One handle on a track. Arrow keys move by `step`, Page keys jump further, and Home and End go
- * to the bounds — worth knowing before reaching for a paired input.
+ * One handle on a track: arrow keys move by `step`, Page keys jump further, and Home and End go
+ * to the bounds. `SliderThumb` is the real interactive node, so `aria-label` and analytics
+ * attributes go on it, and its focus reuses the hover emphasis instead of drawing a ring.
  */
 export const Basic: StoryFn<SliderProps> = args => (
   <Slider {...args}>
@@ -125,7 +127,8 @@ export const TicksWithoutSnapping: StoryFn<SliderProps> = args => (
 
 /**
  * Marks carrying text, for a scale whose steps are named rather than numeric. The handle snaps
- * to the labelled positions, so this is a choice among rungs rather than a magnitude.
+ * to the labelled positions and announces the label rather than the number, so keep it to a
+ * handful of rungs.
  */
 export const Labeled: StoryFn<SliderProps> = args => (
   <Slider {...args} min={0} max={100} step={50} defaultValue={[50]}>
@@ -144,7 +147,8 @@ export const Labeled: StoryFn<SliderProps> = args => (
 
 /**
  * `tooltip` on a `SliderThumb` shows the value while dragging, then hides it. It suits a value
- * only checked mid-gesture; anything needed afterwards wants a persistent readout.
+ * only checked mid-gesture; anything needed afterwards wants a persistent readout instead,
+ * never both.
  */
 export const WithTooltip: StoryFn<SliderProps> = args => (
   <Slider {...args}>

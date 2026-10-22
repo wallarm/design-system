@@ -5,7 +5,7 @@ export const feedbackPulseVariants = cva(
   cn(
     // Fixed bottom-right — deliberately apart from the bottom-CENTER Toast; must not block CTAs.
     'fixed bottom-24 right-24 z-50 w-[400px] max-w-[calc(100vw-32px)]',
-    // Surface — mirrors the Popover card recipe (ces-survey-architecture.md card spec).
+    // Surface — mirrors the Popover card recipe.
     // NB: no `relative` here — `fixed` above already establishes the containing block for the
     // absolute-positioned timeout bar, and `relative` would override `fixed` (Tailwind cascade).
     'flex flex-col gap-8 overflow-hidden p-12',
