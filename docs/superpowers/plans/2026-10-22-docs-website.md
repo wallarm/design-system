@@ -646,3 +646,22 @@ Base-relative links go through `withBase` from `@rspress/core/runtime`.
 - [ ] **Step 2:** Wire it in. Run `typecheck`, biome, and `pnpm turbo run build --filter=@wallarm-org/docs...`.
 - [ ] **Step 3: Manual check** in `preview`. Opening search with ⌘K shows the sections. Typing shows results. Clicking "AI" navigates to `/design-system/ai/mcp` and closes the dialog. Keyboard: Tab reaches the links.
 - [ ] **Step 4: Commit** `feat(docs): section shortcuts in the empty search dialog`
+
+---
+
+### Task 20: BlurBackground behind the home hero (user request, 2026-10-22)
+
+Runs after Tasks 18+19.
+
+**Files:** Modify `apps/docs/theme/HomeHero.tsx` (or the home Layout slot it uses), and `apps/docs/styles/global.css`.
+
+**Behavior:**
+- The home page's top area (hero and feature cards) sits on the DS `BlurBackground`, imported from `@wallarm-org/design-system/AnimatedBackground` (read its props and stories first). Use the default palette unless a story shows a better fit.
+- The background is decorative. It is positioned absolutely behind the content, carries `aria-hidden`, uses `pointer-events: none` and `-z-10` or an isolated stacking context, and never covers text or receives clicks. It must not cause horizontal scroll (`overflow-hidden` on its wrapper).
+- In dark mode (`html.rp-dark` / `[data-theme='dark']`) the pastel palette is dimmed to about 12% opacity through CSS on the wrapper, so it doesn't glare. Controller call: the component has no dark variant, and its own docs suggest hosts dim it.
+- Under `prefers-reduced-motion: reduce`, blob animations are paused via CSS scoped to the wrapper (`animation: none`).
+- Keep the Task 15 hero (plain-text `<h1>`) and the Task 18 static cards. Text contrast over the background must stay readable in both themes.
+
+- [ ] **Step 1:** Implement. **Step 2: Run** `typecheck`, biome, `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success.
+- [ ] **Step 3: Manual check** in `preview`, with screenshots `home-blur-light.png`, `home-blur-dark.png` and `home-blur-mobile.png` (390px) in the SDD folder. The background is visible, text is readable, there is no horizontal scrollbar, and with emulated reduced motion the blobs don't animate (Playwright `emulateMedia({ reducedMotion: 'reduce' })`).
+- [ ] **Step 4: Commit** `feat(docs): blur background on the home page`
