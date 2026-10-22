@@ -64,8 +64,8 @@ Private workspace app depending on `@wallarm-org/design-system: workspace:*`, re
 - Update `SelectionBulkBar.e2e.ts` and any `STORYBOOK_URL` defaults to the new `/storybook/` path. E2E jobs that serve `storybook-static` locally keep working; only their serve path may need adjusting.
 - Old Storybook deep links (`/design-system/?path=/docs/...`) redirect client-side to `/design-system/storybook/?path=...` (the docs root page or `404.html` checks for `?path=` / `iframe.html`). **(call)**
 
-### 4.4 Rendering mode **(call, builder may revisit)**
-Prefer SSG with SSG-MD (`llms: true`). This requires DS rendering under prerender: make `ThemeProvider` SSR-safe (read `localStorage` in an effect or lazily, default to light on the server, plus an inline pre-paint script on the site to avoid theme flash). If that turns out larger than ~1 day, fall back to `ssg: false` for HTML while keeping `.md`/llms output, and note it.
+### 4.4 Rendering mode **(call, revised 2026-10-22)**
+SSG (Rspress default) with SSG-MD (`llms: true`). Live story previews and the Explorer render client-only (`BrowserOnly`), so prerender never executes story code; in `.md` output a preview degrades to its code block. The only DS component that runs on the server is `ThemeProvider` (site root), which is made SSR-safe (guard `localStorage` access in its `useState` initializers). A pre-paint inline script sets `data-theme` from Rspress' stored appearance to avoid a flash.
 
 ### 4.5 Theme sync **(call)**
 Rspress' dark mode toggles a class on `<html>`. The site's theme switch must also set `data-theme` (and keep `data-frame-style` default) so DS components and the site chrome agree. Map Rspress theme CSS variables to DS tokens so chrome and previews share colors and Geist fonts.
@@ -77,7 +77,7 @@ Rspress' dark mode toggles a class on `<html>`. The site's theme switch must als
 - Installation — from `packages/design-system/docs/installation.md` (fix "Node 18+").
 - Theming — light/dark, `frameStyle`, token customisation.
 - Routing — `asChild` pattern (`Link`, `Button`, `NavPanelItem`, `NavPanelGroupItem`, `NavRailItem`, `TopHeaderLogo`, `Card`, `TabsTrigger`), `BreadcrumbsItem` `href`+`onClick`, `RemoteShell` `pathname`/`onNavigate` (source: `docs/tech-design-global-navigation.md:572-616`). Examples for TanStack Router, React Router, `next/link`. Written from scratch.
-- Migration guides — one page per major with breaking changes. Sources: breaking commits (`eee46ba1` avatar v3.0.0, `b63f6419` numeric-badge, `6c15857d` Table → TanStack v9, `60dc5025` filter-input). Written from scratch.
+- Migration guides — an overview page for the `@wallarm-org/migrator` codemod CLI (`packages/migrator/README.md`: manual run + Renovate setup), then one page per major: v1.0.0 (Table → TanStack Table v9, `6c15857d`, no codemod), v2.0.0 (NumericBadge `type`/`color` split, `b63f6419`, codemod `numeric-badge-type-color`), v3.0.0 (Avatar sizes, `eee46ba1`, codemod `avatar-size-rename`). Pre-1.0 changes are not covered **(call)**.
 - Changelog — rendered from `packages/design-system/CHANGELOG.md` (and the MCP changelog once it exists) at build time. Empty entries stay empty until the separate generator fix.
 
 **AI**
@@ -101,9 +101,9 @@ Header: search, theme toggle, GitHub, Storybook link. Footer of each page: "Edit
 Section order (mirrors Chakra):
 1. **Header** — name, one-line description (from `DESCRIPTION` / `components.json`), links: Source, Storybook (story URL). No Figma link while the file is private **(user)**.
 2. **Preview / Code** — first story rendered live, toggle to its code.
-3. **Usage** — import line (`@wallarm-org/design-system/<Comp>`) and the compound skeleton.
+3. **Usage** — import line (`@wallarm-org/design-system/<Comp>`) naming the component and its sub-components. No separate generated skeleton: the first example already shows the composition **(call)**.
 4. **Examples** — every other story: JSDoc description, live preview, code.
-5. **Props** — table from `components.json` props; one table per sub-component for compound components.
+5. **Props** — Markdown tables generated from `components.json` props (so they are searchable and land in `.md`/llms output); one table per detected sub-component.
 6. **Explorer** — compound components only (those with `subComponents`).
 
 **Pages are generated, not hand-written** **(call)**: a build step emits one MDX per component from `components.json` + the story module. Optional hand-written `apps/docs/docs/components/<name>.extra.mdx` (or similar) can be appended for extra prose (e.g. migrated public parts of `SimpleCharts/docs/*.md`, `Table/TABLE_DESIGN.md`, `Slider.llm.md`). Exact mechanism is the builder's.
@@ -125,9 +125,10 @@ Keep `components.json` the single source for both MCP and site.
 
 ### 6.4 Explorer
 Modelled on Chakra: a live preview of a representative story next to a list of parts. Hover a part → highlight it in the preview; click → pin selection.
-- Parts list = the component's `subComponents` from `components.json` plus the root.
-- Highlighting finds elements by `data-slot` inside the preview container. **No DS slot renames or additions for the Explorer (call):** slots don't always match the sub-component name (e.g. `DialogHeader` renders `DrawerHeader` → `data-slot="drawer-header"`), and ~255 component `.tsx` files have no `data-slot`. The metadata generator records each sub-component's actual root `data-slot` value in `components.json` (extend `mcp-core` schema `subComponents`); parts without a resolvable slot are omitted from the parts list. Renaming slots would break consumer CSS selectors and screenshots.
-- Portaled parts (Ark `<Portal>` content) live outside the preview box; the explorer must also search the portal root, or the story chosen for the explorer must render content open. Builder's call.
+- **Parts are discovered at runtime, not from metadata (call, revised 2026-10-22).** `components.json` `subComponents` misses whole compound components (Dialog, Tabs, Field, Toast… — `parse-props.ts` only sees sub-components whose `*Props` type is exported), and static "root slot" resolution needs AST unwrapping of aliases/Tooltip wrappers. So the parts list = the distinct `data-slot` values present in the rendered explorer preview, in DOM order — exactly what Chakra shows (slot names like `root`, `legend`, `content`).
+- **No DS slot renames or additions for the Explorer (call):** slots don't always match sub-component names (e.g. `DialogHeader` renders `DrawerHeader` → `drawer-header`), and some parts have no slot; those simply don't appear. Renaming slots would break consumer CSS selectors and screenshots.
+- Portaled parts (Ark `<Portal>` content, appended to `document.body`) are included: the explorer scans its preview container plus body-level nodes outside the site's app root, and rescans on DOM mutations (so opening a Dialog adds its parts).
+- Shown for components whose story `meta` declares `subcomponents` (52 story files today).
 - Which story feeds the explorer: default = the first story; overridable per component. **(call)**
 - Hidden for components without sub-components.
 
@@ -139,7 +140,9 @@ Modelled on Chakra: a live preview of a representative story next to a list of p
 
 ## 8. CI changes
 - `build` job: build docs after DS build (docs needs `components.json`); upload docs output as an artifact. Add docs outputs to `turbo.json` and docs paths to Biome `files.includes`.
-- `deploy-storybook` → `deploy-site` (main only, same permissions/environment), combining docs output + `storybook-static` under `storybook/`. Gated on a stable DS release and ordered after `release` (see 4.3).
+- `deploy-storybook` is replaced by a separate `deploy-site.yml` workflow (`workflow_dispatch` with a `tag` input, `concurrency: pages` without cancel-in-progress). The `release` job dispatches it only when it created a stable `v*` tag on main; it rebuilds docs + Storybook from that tag. A separate workflow is needed because `main.yml` cancels in-progress runs on every push, which could otherwise drop a deploy for a release that already shipped. **(call, 2026-10-22)**
+- Docs are built and smoke-checked in their own `docs` job on every push, parallel to E2E. **(call)**
+- "Edit on GitHub" is hidden on generated pages (component pages, tokens, changelog); component pages link Source instead. **(call)**
 - Storybook build switches `assetPrefix` to `/design-system/storybook/`.
 - Keep pipeline under the 10-minute goal; docs build runs in parallel with E2E where possible.
 - No PR previews (Pages can't); acceptable for now. **(call)**
