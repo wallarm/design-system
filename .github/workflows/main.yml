@@ -322,10 +322,10 @@ jobs:
           cp -r packages/design-system/storybook-static/* storybook-serve/design-system/
 
           # Start HTTP server for Storybook
-          npx http-server storybook-serve -p 6006 &
+          pnpm exec http-server storybook-serve -p 6006 &
 
           # Wait for server to be ready
-          timeout 30 bash -c 'until curl -f http://localhost:6006/design-system/iframe.html; do sleep 1; done'
+          timeout 60 bash -c 'until curl -fs http://localhost:6006/design-system/iframe.html; do sleep 1; done'
 
           # Run E2E tests
           cd packages/design-system
@@ -457,10 +457,10 @@ jobs:
           cp -r packages/design-system/storybook-static/* storybook-serve/design-system/
 
           # Start HTTP server for Storybook
-          npx http-server storybook-serve -p 6006 &
+          pnpm exec http-server storybook-serve -p 6006 &
 
           # Wait for server to be ready
-          timeout 30 bash -c 'until curl -f http://localhost:6006/design-system/iframe.html; do sleep 1; done'
+          timeout 60 bash -c 'until curl -fs http://localhost:6006/design-system/iframe.html; do sleep 1; done'
 
           # Unset CI to allow snapshot creation
           unset CI
