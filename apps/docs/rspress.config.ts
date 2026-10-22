@@ -3,6 +3,7 @@ import { defineConfig } from '@rspress/core';
 import path from 'node:path';
 import { rsbuildConfig } from '@wallarm-org/rsbuild-config/rsbuild.config';
 import { postcssConfig } from '@wallarm-org/tailwind-config/postcss';
+import { cleanSearchIndex } from './plugins/cleanSearchIndex';
 import { THEME_SCRIPT } from './theme/themeScript';
 
 const dir = import.meta.dirname;
@@ -19,6 +20,9 @@ export default defineConfig({
   title: 'Wallarm Design System',
   description: 'React components, tokens and AI tooling for Wallarm products',
   llms: true,
+  plugins: [cleanSearchIndex()],
+  // Example code is noise in search results; headings, prose and prop tables stay.
+  search: { codeBlocks: false },
   globalStyles: path.join(dir, 'styles/global.css'),
   globalUIComponents: [path.join(dir, 'theme/StorybookRedirect.tsx')],
   markdown: {
