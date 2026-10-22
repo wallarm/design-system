@@ -327,41 +327,93 @@ Prints `docs build OK` on success.
 
 ### Task 10: CI — docs check on every push, release-dispatched deploy
 
+**Requires Task 9** (`check:build`) committed first.
+
 **Files:**
 - Create: `.github/workflows/deploy-site.yml`
-- Modify: `.github/workflows/main.yml`, `packages/design-system/.storybook/main.ts:33`, `packages/design-system/src/components/Selection/SelectionBulkBar/SelectionBulkBar.e2e.ts:29-30`
-- Modify docs: `CLAUDE.md` (pipeline list: item 3 no longer builds docs, item 8 becomes deploy via `deploy-site.yml`; "Deployment" line), `CI_PLAN.md` (§8 lines 133-140: trigger and URL `https://wallarm.github.io/design-system/`), `README.md:257`, `packages/design-system/README.md:9,117` + its "40+ components" line, `packages/mcp/README.md` (4 tools, key `@wallarm-org/mcp`, link to `https://wallarm.github.io/design-system/ai/mcp`), `.mcp.json` (remove dead `storybook-addon-mcp` entry, lines 15-21)
+- Modify: `.github/workflows/main.yml`, `packages/design-system/.storybook/main.ts` (`assetPrefix`), `packages/design-system/src/components/Selection/SelectionBulkBar/SelectionBulkBar.e2e.ts` (Storybook URLs), `packages/design-system/nginx.conf` (`location /design-system/` → `location /design-system/storybook/`)
+- Modify docs:
+  - `CLAUDE.md`: "Deployment" line; Pipeline Jobs item 4 (readiness URL), item 8 (`deploy-storybook` → `deploy-site.yml` dispatched by `release`), new `docs` item, the separate-workflows sentence (add `deploy-site.yml`); Success Criteria item 6
+  - `README.md:132,231`; `RELEASE.md:136,156,224`; `.claude/agents/ci.md:25,39,78`
+  - `.claude/skills/storybook-docs/references/frame.md:74-81` (serve `storybook-static` at `design-system/storybook/`)
+  - `packages/design-system/README.md:9,119` + its "40+ components" line
+  - `packages/mcp/README.md` (4 tools, key `@wallarm-org/mcp`, link `https://wallarm.github.io/design-system/ai/mcp`)
+  - `.mcp.json` (remove dead `storybook-addon-mcp` entry)
 
-Changes:
-- `main.yml` top-level `permissions`: add `actions: write` (release job dispatches a workflow; same mechanism as `commit-screenshots`, `main.yml:566`).
-- `build` job: `pnpm build` → `pnpm build --filter='!@wallarm-org/docs'` (docs must not delay E2E).
-- New `docs` job: `needs: [setup, build]`, same checkout/pnpm/node/cache/install steps as `build`, download `built-packages` artifact to `packages`, then `pnpm --filter @wallarm-org/docs build` and `pnpm --filter @wallarm-org/docs check:build`. Runs in parallel with `e2e`.
-- `e2e` (≈ lines 281-304) and `e2e-update-screenshots` (≈ 416-443): serve dir `storybook-serve/design-system/storybook`, readiness URL `http://localhost:6006/design-system/storybook/iframe.html`, `STORYBOOK_URL: http://localhost:6006/design-system/storybook`.
-- `release` job: after "Release design-system" (before "Check migrator release") add:
+**`main.yml` changes** (refer to jobs/steps by name, not line numbers):
+- Top-level `permissions`: add `actions: write`. `release` has no job-level `permissions` and inherits it; a job-level block would replace the whole set.
+- `build` → "Build all packages": `pnpm build --filter='!@wallarm-org/docs'`.
+- New `docs` job: `needs: [setup, build]`, no `if`. Same checkout/pnpm/node/cache/install steps as `build`. Download `built-packages` to `packages`, then `pnpm --filter @wallarm-org/docs build` and `pnpm --filter @wallarm-org/docs check:build`. Shallow checkout is fine: Task 13 logs one warning and shows no "new" badges. Never set `DOCS_SITE_ORIGIN` / `DOCS_OUT_DIR` in CI.
+- `e2e` "Serve Storybook & Run E2E tests" and `e2e-update-screenshots` "Update screenshots": keep `pnpm exec http-server` / `timeout 60` / `curl -fs`; change only:
+  ```bash
+  mkdir -p storybook-serve/design-system/storybook
+  cp -r packages/design-system/storybook-static/* storybook-serve/design-system/storybook/
+  pnpm exec http-server storybook-serve -p 6006 &
+  timeout 60 bash -c 'until curl -fs http://localhost:6006/design-system/storybook/iframe.html; do sleep 1; done'
+  ```
+  and `STORYBOOK_URL: http://localhost:6006/design-system/storybook`.
+- `release`: `needs: [setup, build, e2e, docs]`; add `needs.docs.result == 'success' &&` to `if`. A tag is published only if its site builds.
+- `release`: between "Release design-system" and "Check migrator release". It must sit there, because the migrator and mcp releases add commits that move HEAD off the `v*` tag:
   ```yaml
   - name: Deploy site for stable release
+    if: github.ref_name == 'main'
+    continue-on-error: true   # design-system is already on npm; never block migrator/mcp
     env:
       PRE_RELEASE_SHA: ${{ steps.pre-release.outputs.sha }}
       GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     run: |
       TAG=$(git tag --points-at HEAD | grep -E '^v[0-9]+\.[0-9]+\.[0-9]+$' || true)
-      if [ "${{ github.ref_name }}" = "main" ] && [ -n "$TAG" ] && [ "$(git rev-parse HEAD)" != "$PRE_RELEASE_SHA" ]; then
-        gh workflow run deploy-site.yml --ref main -f tag="$TAG"
+      if [ -n "$TAG" ] && [ "$(git rev-parse HEAD)" != "$PRE_RELEASE_SHA" ]; then
+        gh workflow run deploy-site.yml --ref main -f tag="$TAG" \
+          || echo "::warning::site deploy dispatch failed; run: gh workflow run deploy-site.yml --ref main -f tag=$TAG"
       else
         echo "No stable design-system release in this run; skipping site deploy"
       fi
   ```
 - Remove the `deploy-storybook` job.
-- `deploy-site.yml`: `on: workflow_dispatch: inputs: tag: { required: true, type: string }`; `concurrency: { group: pages, cancel-in-progress: false }` (a later push to main can't cancel a deploy); `permissions: { contents: read, pages: write, id-token: write }`; one job `deploy` with `environment: { name: github-pages, url: ${{ steps.deployment.outputs.page_url }} }`. Steps: checkout `ref: ${{ inputs.tag }}` with `fetch-depth: 0` (Task 13's "new" badges need tag history); pnpm (`10.33.2`) + node (`24`) setup; `pnpm install --frozen-lockfile`; `pnpm turbo run build --filter=@wallarm-org/docs...`; `pnpm --filter @wallarm-org/docs check:build`; `pnpm --filter @wallarm-org/design-system build-storybook`; assemble `site/` = `apps/docs/doc_build/*` + `site/storybook/` = `packages/design-system/storybook-static/*`; `actions/configure-pages@v4`; `actions/upload-pages-artifact@v3` (`path: ./site`); `actions/deploy-pages@v4` (`id: deployment`). Manual re-deploys use the same dispatch with any existing tag.
-- `.storybook/main.ts:33`: `config.output.assetPrefix = '/design-system/storybook/';`
-- `SelectionBulkBar.e2e.ts:29-30`: `https://wallarm.github.io/design-system/storybook/` and `STORYBOOK_URL=https://wallarm.github.io/design-system/storybook`.
 
+**`deploy-site.yml`:**
+- `on: workflow_dispatch: inputs: tag: { required: true, type: string }`
+- `concurrency: { group: pages, cancel-in-progress: false }`
+- `permissions: { contents: read, pages: write, id-token: write }`
+- One job `deploy`, `environment: { name: github-pages, url: ${{ steps.deployment.outputs.page_url }} }`. Always dispatch with `--ref main`: the environment policy allows only `main`, while `inputs.tag` selects the code.
+- Steps:
+  1. Checkout `ref: ${{ inputs.tag }}`, `fetch-depth: 0` (Task 13 needs tags).
+  2. Guard:
+     ```yaml
+     - name: Check tag is deployable
+       env: { TAG: "${{ inputs.tag }}" }
+       run: |
+         [[ "$TAG" =~ ^v[0-9]+\.[0-9]+\.[0-9]+$ ]] && test -f apps/docs/scripts/check-build.ts \
+           || { echo "::error::$TAG is not a stable tag with the docs site"; exit 1; }
+     ```
+  3. pnpm `10.33.2` + node `24`; `pnpm install --frozen-lockfile`.
+  4. `pnpm turbo run build --filter=@wallarm-org/docs...`; `pnpm --filter @wallarm-org/docs check:build`; `pnpm --filter @wallarm-org/design-system build-storybook`.
+  5. Assemble `site/` = `apps/docs/doc_build/*`, plus `site/storybook/` = `packages/design-system/storybook-static/*`.
+  6. `actions/configure-pages@v4`, `actions/upload-pages-artifact@v3` (`path: ./site`), `actions/deploy-pages@v4` (`id: deployment`).
+- This file always runs from `main` against older tags: keep its steps compatible with every deployable tag.
+
+**Other edits:**
+- `.storybook/main.ts`: `config.output.assetPrefix = '/design-system/storybook/';`
+- `SelectionBulkBar.e2e.ts`: `https://wallarm.github.io/design-system/storybook/` and `STORYBOOK_URL=https://wallarm.github.io/design-system/storybook`.
+
+**Rollout:**
+- Merge with a releasing title (`feat(docs): … (WDS-xxx)`). That release dispatches the first site deploy. Until it runs, Pages keeps the old Storybook at `/design-system/`.
+- Deployable tags: the first release after this merge, and every later one. Older tags fail the guard.
+- Manual redeploy, rollback, or recovery after a cancelled or failed dispatch: `gh workflow run deploy-site.yml --ref main -f tag=vX.Y.Z`.
+- Docs PRs get no preview: Pages hosts one site per repo (see Follow-ups).
+
+- [ ] **Step 0:** `git fetch origin && git rebase origin/main`. Resolve `main.yml`, keeping main's `E2E_PATHS` and http-server recipe plus the branch's `apps/*` cache and junit lines. Expected: `git merge-base --is-ancestor origin/main HEAD && echo OK` → `OK`.
 - [ ] **Step 1:** Make the edits.
-- [ ] **Step 2: Run** `npx --yes actionlint .github/workflows/main.yml .github/workflows/deploy-site.yml` (fallback: `npx --yes @action-validator/cli <file>` per file) — expected: no errors.
-- [ ] **Step 3: Run** `pnpm --filter @wallarm-org/design-system build-storybook && rm -rf /private/tmp/sbserve && mkdir -p /private/tmp/sbserve/design-system/storybook && cp -r packages/design-system/storybook-static/* /private/tmp/sbserve/design-system/storybook/`, start `npx http-server /private/tmp/sbserve -p 6007` in the background, `curl -sf http://localhost:6007/design-system/storybook/iframe.html >/dev/null && echo OK` — expected: `OK`; stop the server.
-- [ ] **Step 4: Run** `pnpm lint` and `pnpm --filter @wallarm-org/docs test:run` — expected: PASS.
-- [ ] **Step 5: Commit** `ci: build docs on every push, deploy docs and Storybook after stable releases`
-- [ ] **Step 6:** Push the branch. E2E is verified in CI only (project rule: never run e2e:docker locally). Expected: `build`, `docs` (incl. `check:build`), `e2e` green; the release step prints "skipping site deploy" (not main).
+- [ ] **Step 2: Run** `npx --yes actionlint .github/workflows/main.yml .github/workflows/deploy-site.yml` — expected: no errors.
+- [ ] **Step 3: Run** `pnpm --filter @wallarm-org/design-system build-storybook && rm -rf /private/tmp/sbserve && mkdir -p /private/tmp/sbserve/design-system/storybook && cp -r packages/design-system/storybook-static/* /private/tmp/sbserve/design-system/storybook/`. Start `pnpm exec http-server /private/tmp/sbserve -p 6007` in the background, then `curl -fs http://localhost:6007/design-system/storybook/iframe.html >/dev/null && echo OK` — expected: `OK`. Stop the server.
+- [ ] **Step 4: Run** `git cat-file -e v3.4.0:apps/docs/scripts/check-build.ts; echo $?` — expected: non-zero, confirming that old tags fail the guard.
+- [ ] **Step 5: Run** `pnpm lint` and `pnpm --filter @wallarm-org/docs test:run` — expected: PASS.
+- [ ] **Step 6: Commit** `ci: build docs on every push, deploy docs and Storybook after stable releases`
+- [ ] **Step 7:** Push the branch. E2E runs in CI only (project rule).
+  - Expected: `build`, `docs` (including `check:build`) and `e2e` green, with `e2e` actually run, not skipped (`.storybook/main.ts` is in `E2E_PATHS`).
+  - The deploy step is skipped by its `if` (not `main`).
+  - Record the `docs` job duration.
 
 ---
 
