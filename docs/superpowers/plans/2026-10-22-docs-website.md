@@ -573,3 +573,25 @@ Home feature cards must not move on hover. Find the Rspress 2.0.23 hover rule fo
 
 - [ ] **Step 1:** Implement. **Step 2: Run** `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success. In `preview`, hover a card: its `getBoundingClientRect()` and computed `transform` are unchanged (check with Playwright `page.evaluate` before and after `hover`).
 - [ ] **Step 3: Commit** `style(docs): keep home feature cards static on hover`
+
+---
+
+### Task 19: Section shortcuts in the empty search dialog (user request, 2026-10-22)
+
+Runs after Task 18.
+
+**Files:** Modify `apps/docs/theme/index.tsx`. Create `apps/docs/theme/SearchSections.tsx` and its test.
+
+**Behavior:** When the search dialog is open and the query is empty, it shows a "Sections" list with Get Started, AI, Guides, Foundations, Components and Storybook (external, opens the Storybook URL). Labels and links come from `apps/docs/docs/_nav.json`, imported as JSON, so the list stays in sync with the navbar. Each item is a link that closes the dialog on navigation. Once the user types, Rspress's normal results replace the list.
+
+**Approach:** In `node_modules/@rspress/core/dist`, check how the Rspress 2.0.23 search UI is composed (`Search`, `SearchPanel`, any empty-state or `beforeSearchResult`-style slot) and use the least invasive hook:
+1. a documented slot or prop for empty-state content;
+2. otherwise, wrap the exported `SearchPanel` from `@rspress/core/theme-original` and render `SearchSections` when the input is empty. Read the input value from the panel's own state if it's exposed, or listen to the input element;
+3. a full panel replacement only as a last resort. If it comes to that, report DONE_WITH_CONCERNS.
+
+Base-relative links go through `withBase` from `@rspress/core/runtime`.
+
+- [ ] **Step 1:** TDD for `SearchSections` (renders six items in `_nav.json` order; Storybook link is external with `target`/`rel`). Mock `@rspress/core/runtime` in the test. Run `pnpm --filter @wallarm-org/docs test:run`: RED, then GREEN.
+- [ ] **Step 2:** Wire it in. Run `typecheck`, biome, and `pnpm turbo run build --filter=@wallarm-org/docs...`.
+- [ ] **Step 3: Manual check** in `preview`. Opening search with ⌘K shows the sections. Typing shows results. Clicking "AI" navigates to `/design-system/ai/mcp` and closes the dialog. Keyboard: Tab reaches the links.
+- [ ] **Step 4: Commit** `feat(docs): section shortcuts in the empty search dialog`
