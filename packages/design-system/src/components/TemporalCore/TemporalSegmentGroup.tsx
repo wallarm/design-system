@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode } from 'react';
+import type { FC, ReactNode, Ref } from 'react';
 import type { DateFieldState, DateSegment, TimeFieldState } from '@react-stately/datepicker';
 import type { GroupDOMAttributes } from '@react-types/shared';
 import { cva } from 'class-variance-authority';
@@ -12,6 +12,7 @@ export interface TemporalSegmentGroupProps extends GroupDOMAttributes {
   readOnly?: boolean;
   className?: string;
   segmentKeyPrefix?: string;
+  ref?: Ref<HTMLDivElement>;
 }
 
 const literalVariants = cva(
@@ -160,17 +161,23 @@ function buildParts(
   return parts;
 }
 
-export const TemporalSegmentGroup = forwardRef<HTMLDivElement, TemporalSegmentGroupProps>(
-  ({ state, disabled, readOnly, className, segmentKeyPrefix = '', ...props }, ref) => {
-    const { order } = useDateFormat();
-    const parts = buildParts(state.segments, state, order, disabled, readOnly, segmentKeyPrefix);
+export const TemporalSegmentGroup: FC<TemporalSegmentGroupProps> = ({
+  ref,
+  state,
+  disabled,
+  readOnly,
+  className,
+  segmentKeyPrefix = '',
+  ...props
+}) => {
+  const { order } = useDateFormat();
+  const parts = buildParts(state.segments, state, order, disabled, readOnly, segmentKeyPrefix);
 
-    return (
-      <div {...props} ref={ref} className={cn('flex items-center gap-0.5', className)}>
-        {parts}
-      </div>
-    );
-  },
-);
+  return (
+    <div {...props} ref={ref} className={cn('flex items-center gap-0.5', className)}>
+      {parts}
+    </div>
+  );
+};
 
 TemporalSegmentGroup.displayName = 'TemporalSegmentGroup';

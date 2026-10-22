@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode } from 'react';
+import type { FC, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 
 export interface CalendarBodyProps {
@@ -6,18 +6,17 @@ export interface CalendarBodyProps {
   children: ReactNode;
   /** Additional className for styling */
   className?: string;
+  ref?: Ref<HTMLDivElement>;
 }
 
 /**
  * Container for the main calendar body content.
  * Wraps InputHeader, Grid(s), and optionally Footer.
  */
-export const CalendarBody = forwardRef<HTMLDivElement, CalendarBodyProps>(
-  ({ children, className }, ref) => (
-    <div ref={ref} className={cn('flex flex-col', className)}>
-      {children}
-    </div>
-  ),
+export const CalendarBody: FC<CalendarBodyProps> = ({ ref, children, className }) => (
+  <div ref={ref} className={cn('flex flex-col', className)}>
+    {children}
+  </div>
 );
 
 CalendarBody.displayName = 'CalendarBody';

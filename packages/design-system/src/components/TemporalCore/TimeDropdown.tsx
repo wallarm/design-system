@@ -1,6 +1,7 @@
 import {
-  forwardRef,
+  type FC,
   type KeyboardEvent,
+  type Ref,
   useCallback,
   useEffect,
   useImperativeHandle,
@@ -34,6 +35,8 @@ export interface TimeDropdownProps {
   onSelect: (time: TimeValue) => void;
   /** Callback when dropdown should close */
   onClose: () => void;
+  /** Imperative handle for forwarding keyboard events from the input */
+  ref?: Ref<TimeDropdownHandle>;
 }
 
 export interface TimeDropdownHandle {
@@ -100,143 +103,149 @@ const findClosestIndex = (options: TimeValue[], value: TimeValue | null | undefi
  * Time dropdown component with keyboard navigation.
  * Stops event propagation to prevent interference with parent components.
  */
-export const TimeDropdown = forwardRef<TimeDropdownHandle, TimeDropdownProps>(
-  ({ isOpen, timeStep = 30, value, hourCycle = 24, onSelect, onClose }, ref) => {
-    const allOptions = useMemo(() => generateTimeOptions(timeStep), [timeStep]);
+export const TimeDropdown: FC<TimeDropdownProps> = ({
+  ref,
+  isOpen,
+  timeStep = 30,
+  value,
+  hourCycle = 24,
+  onSelect,
+  onClose,
+}) => {
+  const allOptions = useMemo(() => generateTimeOptions(timeStep), [timeStep]);
 
-    const [selectedIndex, setSelectedIndex] = useState(() => findClosestIndex(allOptions, value));
-    const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
-    const listRef = useRef<HTMLDivElement>(null);
-    const selectedItemRef = useRef<HTMLButtonElement>(null);
+  const [selectedIndex, setSelectedIndex] = useState(() => findClosestIndex(allOptions, value));
+  const [isKeyboardNavigating, setIsKeyboardNavigating] = useState(false);
+  const listRef = useRef<HTMLDivElement>(null);
+  const selectedItemRef = useRef<HTMLButtonElement>(null);
 
-    // Update selected index when value or options change
-    useEffect(() => {
-      setSelectedIndex(findClosestIndex(allOptions, value));
-    }, [value, allOptions]);
+  // Update selected index when value or options change
+  useEffect(() => {
+    setSelectedIndex(findClosestIndex(allOptions, value));
+  }, [value, allOptions]);
 
-    // Scroll to selected item when dropdown opens
-    useEffect(() => {
-      if (isOpen && selectedIndex >= 0 && selectedItemRef.current) {
-        selectedItemRef.current.scrollIntoView({ block: 'nearest' });
-      }
-    }, [isOpen, selectedIndex]);
+  // Scroll to selected item when dropdown opens
+  useEffect(() => {
+    if (isOpen && selectedIndex >= 0 && selectedItemRef.current) {
+      selectedItemRef.current.scrollIntoView({ block: 'nearest' });
+    }
+  }, [isOpen, selectedIndex]);
 
-    const handleKeyDown = useCallback(
-      (e: KeyboardEvent) => {
-        // Stop propagation to prevent calendar navigation
-        e.stopPropagation();
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      // Stop propagation to prevent calendar navigation
+      e.stopPropagation();
 
-        switch (e.key) {
-          case 'ArrowUp':
-            e.preventDefault();
-            setIsKeyboardNavigating(true);
-            setSelectedIndex(prev => {
-              if (prev <= 0) return allOptions.length - 1;
-              return prev - 1;
-            });
-            break;
-          case 'ArrowDown':
-            e.preventDefault();
-            setIsKeyboardNavigating(true);
-            setSelectedIndex(prev => {
-              if (prev < 0) return 0;
-              if (prev >= allOptions.length - 1) return 0;
-              return prev + 1;
-            });
-            break;
-          case 'Enter':
-            e.preventDefault();
-            if (selectedIndex >= 0 && allOptions[selectedIndex]) {
-              onSelect(allOptions[selectedIndex]);
-              onClose();
-            }
-            break;
-          case 'Escape':
-            e.preventDefault();
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault();
+          setIsKeyboardNavigating(true);
+          setSelectedIndex(prev => {
+            if (prev <= 0) return allOptions.length - 1;
+            return prev - 1;
+          });
+          break;
+        case 'ArrowDown':
+          e.preventDefault();
+          setIsKeyboardNavigating(true);
+          setSelectedIndex(prev => {
+            if (prev < 0) return 0;
+            if (prev >= allOptions.length - 1) return 0;
+            return prev + 1;
+          });
+          break;
+        case 'Enter':
+          e.preventDefault();
+          if (selectedIndex >= 0 && allOptions[selectedIndex]) {
+            onSelect(allOptions[selectedIndex]);
             onClose();
-            break;
-          default:
-            // No action for other keys
-            break;
-        }
-      },
-      [allOptions, selectedIndex, onSelect, onClose],
-    );
+          }
+          break;
+        case 'Escape':
+          e.preventDefault();
+          onClose();
+          break;
+        default:
+          // No action for other keys
+          break;
+      }
+    },
+    [allOptions, selectedIndex, onSelect, onClose],
+  );
 
-    useImperativeHandle(ref, () => ({ handleKeyDown }), [handleKeyDown]);
+  useImperativeHandle(ref, () => ({ handleKeyDown }), [handleKeyDown]);
 
-    const handleSelect = useCallback(
-      (time: TimeValue) => {
-        onSelect(time);
-        onClose();
-      },
-      [onSelect, onClose],
-    );
+  const handleSelect = useCallback(
+    (time: TimeValue) => {
+      onSelect(time);
+      onClose();
+    },
+    [onSelect, onClose],
+  );
 
-    const handleMouseMove = useCallback(() => {
-      if (isKeyboardNavigating) setIsKeyboardNavigating(false);
-    }, [isKeyboardNavigating]);
+  const handleMouseMove = useCallback(() => {
+    if (isKeyboardNavigating) setIsKeyboardNavigating(false);
+  }, [isKeyboardNavigating]);
 
-    if (!isOpen) return null;
+  if (!isOpen) return null;
 
-    return (
-      <div
-        className={cn(
-          dropdownMenuClassNames,
-          'absolute left-1/2 -translate-x-1/2 top-full mt-4 z-50',
-          'h-240 min-w-full p-0',
-        )}
-        onMouseDown={e => e.preventDefault()}
-        onMouseMove={handleMouseMove}
-        onKeyDown={handleKeyDown}
-        role='listbox'
-        aria-label='Time selection'
-        ref={listRef}
-      >
-        <ScrollArea>
-          <ScrollAreaViewport>
-            <ScrollAreaContent className='flex flex-col gap-1 p-8'>
-              {allOptions.map((option, index) => {
-                const isKeyboardSelected = index === selectedIndex;
-                const isCurrentValue = value
-                  ? option.hour === value.hour && option.minute === value.minute
-                  : false;
-                return (
-                  <button
-                    key={`${option.hour}:${option.minute}`}
-                    ref={isKeyboardSelected ? selectedItemRef : undefined}
-                    type='button'
-                    className={cn(
-                      dropdownMenuItemVariants({ variant: 'default' }),
-                      'gap-4',
-                      isCurrentValue && !isKeyboardSelected && 'bg-states-primary-active',
-                      isKeyboardSelected && 'bg-states-primary-hover',
-                      isKeyboardNavigating &&
-                        !isKeyboardSelected &&
-                        'hover:!bg-transparent focus:!bg-transparent',
-                    )}
-                    onClick={() => handleSelect(option)}
-                    onMouseDown={e => e.preventDefault()} // Prevent blur
-                    role='option'
-                    aria-selected={isCurrentValue}
-                  >
-                    <span className='flex-1 text-left whitespace-nowrap'>
-                      {formatTime(option, hourCycle)}
-                    </span>
-                    <div className='size-20 flex items-center justify-center shrink-0 text-icon-primary'>
-                      {isCurrentValue && <Check className='size-16' />}
-                    </div>
-                  </button>
-                );
-              })}
-            </ScrollAreaContent>
-          </ScrollAreaViewport>
-          <ScrollAreaScrollbar />
-          <ScrollAreaCorner />
-        </ScrollArea>
-      </div>
-    );
-  },
-);
+  return (
+    <div
+      className={cn(
+        dropdownMenuClassNames,
+        'absolute left-1/2 -translate-x-1/2 top-full mt-4 z-50',
+        'h-240 min-w-full p-0',
+      )}
+      onMouseDown={e => e.preventDefault()}
+      onMouseMove={handleMouseMove}
+      onKeyDown={handleKeyDown}
+      role='listbox'
+      aria-label='Time selection'
+      ref={listRef}
+    >
+      <ScrollArea>
+        <ScrollAreaViewport>
+          <ScrollAreaContent className='flex flex-col gap-1 p-8'>
+            {allOptions.map((option, index) => {
+              const isKeyboardSelected = index === selectedIndex;
+              const isCurrentValue = value
+                ? option.hour === value.hour && option.minute === value.minute
+                : false;
+              return (
+                <button
+                  key={`${option.hour}:${option.minute}`}
+                  ref={isKeyboardSelected ? selectedItemRef : undefined}
+                  type='button'
+                  className={cn(
+                    dropdownMenuItemVariants({ variant: 'default' }),
+                    'gap-4',
+                    isCurrentValue && !isKeyboardSelected && 'bg-states-primary-active',
+                    isKeyboardSelected && 'bg-states-primary-hover',
+                    isKeyboardNavigating &&
+                      !isKeyboardSelected &&
+                      'hover:!bg-transparent focus:!bg-transparent',
+                  )}
+                  onClick={() => handleSelect(option)}
+                  onMouseDown={e => e.preventDefault()} // Prevent blur
+                  role='option'
+                  aria-selected={isCurrentValue}
+                >
+                  <span className='flex-1 text-left whitespace-nowrap'>
+                    {formatTime(option, hourCycle)}
+                  </span>
+                  <div className='size-20 flex items-center justify-center shrink-0 text-icon-primary'>
+                    {isCurrentValue && <Check className='size-16' />}
+                  </div>
+                </button>
+              );
+            })}
+          </ScrollAreaContent>
+        </ScrollAreaViewport>
+        <ScrollAreaScrollbar />
+        <ScrollAreaCorner />
+      </ScrollArea>
+    </div>
+  );
+};
 
 TimeDropdown.displayName = 'TimeDropdown';

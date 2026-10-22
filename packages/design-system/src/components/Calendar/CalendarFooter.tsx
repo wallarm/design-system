@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode } from 'react';
+import type { FC, ReactNode, Ref } from 'react';
 import { cn } from '../../utils/cn';
 
 export interface CalendarFooterProps {
@@ -6,6 +6,7 @@ export interface CalendarFooterProps {
   children: ReactNode;
   /** Additional className for styling */
   className?: string;
+  ref?: Ref<HTMLDivElement>;
 }
 
 /**
@@ -19,20 +20,18 @@ export interface CalendarFooterProps {
  *   <CalendarApplyButton />
  * </CalendarFooter>
  */
-export const CalendarFooter = forwardRef<HTMLDivElement, CalendarFooterProps>(
-  ({ children, className }, ref) => (
-    <div
-      ref={ref}
-      className={cn(
-        'flex items-center justify-between',
-        'h-48 px-12',
-        'border-t border-border-primary-light',
-        className,
-      )}
-    >
-      {children}
-    </div>
-  ),
+export const CalendarFooter: FC<CalendarFooterProps> = ({ ref, children, className }) => (
+  <div
+    ref={ref}
+    className={cn(
+      'flex items-center justify-between',
+      'h-48 px-12',
+      'border-t border-border-primary-light',
+      className,
+    )}
+  >
+    {children}
+  </div>
 );
 
 CalendarFooter.displayName = 'CalendarFooter';

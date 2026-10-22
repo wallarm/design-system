@@ -1,4 +1,4 @@
-import { forwardRef, type ReactNode } from 'react';
+import type { FC, ReactNode, Ref } from 'react';
 import { useTestId } from '../../utils/testId';
 import {
   OverflowTooltip,
@@ -9,6 +9,7 @@ import { Text } from '../Text';
 
 export interface ToastDescriptionProps {
   children: ReactNode;
+  ref?: Ref<HTMLDivElement>;
 }
 
 /**
@@ -18,21 +19,19 @@ export interface ToastDescriptionProps {
  * Supports text truncation with configurable max lines.
  * Shows a tooltip with full text when content is truncated.
  */
-export const ToastDescription = forwardRef<HTMLDivElement, ToastDescriptionProps>(
-  ({ children }, ref) => {
-    const testId = useTestId('description');
+export const ToastDescription: FC<ToastDescriptionProps> = ({ ref, children }) => {
+  const testId = useTestId('description');
 
-    return (
-      <OverflowTooltip>
-        <OverflowTooltipTrigger>
-          <Text ref={ref} size='sm' color='secondary-alt' lineClamp={4} data-testid={testId}>
-            {children}
-          </Text>
-        </OverflowTooltipTrigger>
-        <OverflowTooltipContent>{children}</OverflowTooltipContent>
-      </OverflowTooltip>
-    );
-  },
-);
+  return (
+    <OverflowTooltip>
+      <OverflowTooltipTrigger>
+        <Text ref={ref} size='sm' color='secondary-alt' lineClamp={4} data-testid={testId}>
+          {children}
+        </Text>
+      </OverflowTooltipTrigger>
+      <OverflowTooltipContent>{children}</OverflowTooltipContent>
+    </OverflowTooltip>
+  );
+};
 
 ToastDescription.displayName = 'ToastDescription';

@@ -1,7 +1,7 @@
-import { type ComponentPropsWithRef, forwardRef } from 'react';
+import type { ComponentPropsWithRef, FC } from 'react';
 import { cn } from '../../../utils/cn';
 
-export const THead = forwardRef<HTMLTableSectionElement, ComponentPropsWithRef<'thead'>>(
-  ({ className, ...props }, ref) => <thead ref={ref} className={cn(className)} {...props} />,
+export const THead: FC<ComponentPropsWithRef<'thead'>> = ({ ref, className, ...props }) => (
+  <thead ref={ref} className={cn(className)} {...props} />
 );
 THead.displayName = 'THead';
