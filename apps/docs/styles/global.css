@@ -78,3 +78,16 @@ html.rp-dark {
 .rp-home-hero__title {
     margin: 0;
 }
+
+/* Home feature cards stay still on hover: Rspress tilts them (3D rotate/perspective) and slides a
+   shine overlay via inline styles from mouse position, so !important is the only override. The
+   brand border/text colour hover from Rspress is kept. */
+.rp-home-feature__item,
+.rp-home-feature__item-wrapper,
+.rp-home-feature__item__shine {
+    transform: none !important;
+}
+
+.rp-home-feature__item__shine {
+    display: none;
+}
