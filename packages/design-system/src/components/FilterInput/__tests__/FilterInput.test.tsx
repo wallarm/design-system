@@ -696,6 +696,38 @@ describe('FilterInput', () => {
       expect(onChange).not.toHaveBeenCalled();
     });
 
+    it('commits a multi-select on outside click without reopening the field menu or keeping focus', async () => {
+      const user = userEvent.setup();
+      const onChange = rs.fn();
+      render(
+        <div>
+          <FilterInput data-testid='fi' fields={fields} onChange={onChange} />
+          <div data-testid='outside'>outside</div>
+        </div>,
+      );
+
+      await user.click(screen.getByRole('combobox'));
+      await user.click(await findMenuitem('Status'));
+      await user.click(await findMenuitem(/^is any of IN$/));
+      await user.click(await findMenuitem(/^Active$/));
+      await user.click(await findMenuitem(/^Pending$/));
+
+      // Non-focusable target: focus falls to <body> and the blur commits.
+      await user.click(screen.getByTestId('outside'));
+
+      await waitFor(() =>
+        expect(onChange).toHaveBeenLastCalledWith(
+          expect.objectContaining({
+            field: 'status',
+            operator: 'in',
+            value: ['active', 'pending'],
+          }),
+        ),
+      );
+      expect(screen.queryByRole('menu')).toBeNull();
+      expect(screen.getByRole('combobox')).not.toHaveFocus();
+    });
+
     it('auto-commits when the third (value) segment is chosen', async () => {
       const user = userEvent.setup();
       const onChange = rs.fn();
