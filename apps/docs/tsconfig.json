@@ -3,7 +3,10 @@
   "compilerOptions": {
     "types": ["node", "@rstest/core/globals"],
     "customConditions": ["development"],
-    "allowJs": true
+    "allowJs": true,
+    // customConditions pulls DS src into this program; Biome already flags unused code here.
+    "noUnusedLocals": false,
+    "noUnusedParameters": false
   },
   "include": ["env.d.ts", "rspress.config.ts", "rstest.config.ts", "theme", "docs/**/*.ts", "docs/**/*.tsx", "scripts"]
 }

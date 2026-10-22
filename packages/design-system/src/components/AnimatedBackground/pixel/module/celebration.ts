@@ -691,8 +691,8 @@ export function celDotEffect(
   dotX: number,
   dotY: number,
   p: CelDotParams,
-  _w: number,
-  _h: number,
+  w: number,
+  h: number,
 ): { celBoost: number; celCol: string | null } | null {
   let boost = 0;
   let col: string | null = null;
