@@ -465,3 +465,17 @@ Runs after Task 12.
   - "new" badges appear on recent components (e.g. the AI Assistant ones from `feat(ai): add Wally AI assistant components`, if they fall in the window);
   - there is no duplicate "AI" header.
 - [ ] **Step 6: Commit** `feat(docs): collapsible component groups with auto "new" badges`
+
+---
+
+### Task 14: Human-readable token section titles (user request, 2026-10-22)
+
+Runs after Task 13.
+
+**Files:** Modify `apps/docs/scripts/render.ts` (`renderTokensPage`). Test: `apps/docs/scripts/__tests__/render.test.ts`.
+
+**Interfaces:** `titleCase(kebab: string): string` exported from `render.ts`. It splits on `-`, capitalizes the first letter of each word, and joins with a space: `colors-primary` → `Colors Primary`, `semantic-dark` → `Semantic Dark`, `shadow` → `Shadow`. `renderTokensPage` uses `## <titleCase(name)>`. The `syntax` read-only note check and the `TokenTable` data keep the raw name.
+
+- [ ] **Step 1:** Write the failing tests `titleCase` (the three cases above) and `renderTokensPage uses title-case headings` (contains `## Colors Primary`, not `## colors-primary`), then run `pnpm --filter @wallarm-org/docs test:run`. Expected: FAIL.
+- [ ] **Step 2:** Implement, then re-run. Expected: PASS. Run `pnpm turbo run build --filter=@wallarm-org/docs...`. Expected: success.
+- [ ] **Step 3: Commit** `feat(docs): human-readable token section titles`
