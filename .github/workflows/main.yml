@@ -259,7 +259,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -312,7 +312,7 @@ jobs:
 
           # Run E2E tests
           cd packages/design-system
-          pnpm exec playwright test --shard=${{ matrix.shard }}/3 --project=chromium
+          pnpm exec playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }} --project=chromium
         env:
           CI: true
           STORYBOOK_URL: http://localhost:6006/design-system
@@ -394,7 +394,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        shard: [1, 2, 3]
+        shard: [1, 2, 3, 4]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -450,7 +450,7 @@ jobs:
 
           # Update screenshots (exit code ignored - new snapshots cause non-zero exit)
           pnpm --filter=@wallarm-org/design-system exec playwright test \
-            --shard=${{ matrix.shard }}/3 \
+            --shard=${{ matrix.shard }}/${{ strategy.job-total }} \
             --project=chromium \
             --update-snapshots || true
         env:
@@ -463,10 +463,10 @@ jobs:
           # Only this shard's own new/modified snapshots get uploaded.
           # Uploading the full **/*.png glob (old behavior) makes every shard's
           # artifact overlap on files it never touched; when commit-screenshots
-          # merges the 3 artifacts with merge-multiple, a differing-size
+          # merges the shard artifacts with merge-multiple, a differing-size
           # duplicate can overwrite a file without truncating it, corrupting
           # the PNG (trailing garbage after IEND). Staging only this shard's
-          # actual changes keeps the 3 artifacts disjoint by construction
+          # actual changes keeps the shard artifacts disjoint by construction
           # (Playwright shards by spec file, so two shards can't touch the
           # same snapshot). Paths are staged relative to packages/design-system
           # so the artifact layout matches what commit-screenshots expects.

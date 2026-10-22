@@ -183,7 +183,7 @@ New compound component workflow: `component-architect` → `design-system` → `
 1. **setup** - Detects triggers only (no install): `[update-screenshots]`, `[skip-e2e]` / no `E2E_PATHS` change (branch vs `main` merge-base, or `HEAD~1` on `main`), whether to release MCP, and the Playwright container tag
 2. **quality** - Lint (Biome), typecheck and Rstest unit tests in parallel
 3. **build** - Builds all packages and the Storybook static site as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
-4. **e2e** - 3 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/iframe.html`
+4. **e2e** - 4 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/iframe.html`
 5. **unit-test-report** / **e2e-report** - Publish JUnit results
 6. **e2e-update-screenshots** - On any branch whose head commit has `[update-screenshots]` (sharded); `workflow_dispatch` never updates screenshots
 7. **commit-screenshots** - Commits the new baselines back to the branch (on `main` via `DEPLOY_KEY`); the bot commit then gets a full verification `e2e` run

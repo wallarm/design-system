@@ -19,8 +19,8 @@ The canonical job list is [`CLAUDE.md` → Pipeline Jobs](../../CLAUDE.md#pipeli
 The main CI/CD pipeline lives in `.github/workflows/main.yml`, triggered on `push` to any branch (`branches: ['**']`) plus `workflow_dispatch`, and consists of 11 jobs:
 
 ```
-setup → quality (lint | typecheck | test) → build → e2e (3 shards) → unit-test-report / e2e-report
-                                                  → e2e-update-screenshots (3 shards) → commit-screenshots
+setup → quality (lint | typecheck | test) → build → e2e (4 shards) → unit-test-report / e2e-report
+                                                  → e2e-update-screenshots (4 shards) → commit-screenshots
                                                   → release (stable on main, RC on feature/*, feat/*, fix/*)
 main only:                                        → deploy-storybook, publish-code-connect
 ```
@@ -32,9 +32,9 @@ main only:                                        → deploy-storybook, publish-
 | `setup` | Trigger detection only (screenshots, E2E skip, MCP release) — no dependency install | Always |
 | `quality` | Matrix: `lint`, `typecheck`, `test` (parallel) | Always |
 | `build` | Builds all packages + Storybook static site, uploaded as plain GitHub Actions artifacts — **no Docker image, no ghcr.io** | After quality |
-| `e2e` | Sharded Playwright tests (3 shards), run inside the public `mcr.microsoft.com/playwright` container against the Storybook static build served via `http-server` | After build |
+| `e2e` | Sharded Playwright tests (4 shards), run inside the public `mcr.microsoft.com/playwright` container against the Storybook static build served via `http-server` | After build |
 | `unit-test-report` / `e2e-report` | Publish JUnit results via `dorny/test-reporter` | After quality / e2e |
-| `e2e-update-screenshots` | Auto-update visual snapshots (3 shards) | Any branch, `[update-screenshots]` in head commit |
+| `e2e-update-screenshots` | Auto-update visual snapshots (4 shards) | Any branch, `[update-screenshots]` in head commit |
 | `commit-screenshots` | Commits updated screenshots back to the branch | After e2e-update-screenshots |
 | `deploy-storybook` | Deploy the Storybook static artifact to GitHub Pages | main branch |
 | `release` | Runs `semantic-release` for design-system, mcp, and migrator, publishes to npm | Stable on main, RC on `feature/*`/`feat/*`/`fix/*` |
