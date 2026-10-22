@@ -23,11 +23,12 @@ export const parseExamples = (
   componentDir: string,
   componentName: string,
 ): ExampleMetadata[] => {
-  const componentsRoot = path.dirname(componentDir);
+  const dir = path.resolve(componentDir);
+  const componentsRoot = path.dirname(dir);
   const srcDir = path.dirname(componentsRoot);
   const examples: ExampleMetadata[] = [];
 
-  for (const storiesPath of findStoryFiles(project, componentDir)) {
+  for (const storiesPath of findStoryFiles(project, dir)) {
     const sourceFile =
       project.getSourceFile(storiesPath) ??
       storiesProject.addSourceFileAtPathIfExists(storiesPath);

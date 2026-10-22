@@ -37,6 +37,24 @@ describe('toCopyableCode', () => {
     expect(out).not.toContain('args');
   });
 
+  it('keeps params still referenced', () => {
+    const f = '/src/components/Button/Button.stories.tsx';
+    const destructured = convert(f, '', 'A', '({ size }) => <Button size={size} />');
+    expect(destructured).toContain('export const A = ({ size }) => <Button size={size} />;');
+    const named = convert(f, '', 'B', '(args) => <X a={args.a} />');
+    expect(named).toContain('export const B = (args) => <X a={args.a} />;');
+  });
+
+  it('strips unused function-expression params', () => {
+    const out = convert(
+      '/src/components/Button/Button.stories.tsx',
+      '',
+      'A',
+      'function (args) { return <Button {...args} /> }',
+    );
+    expect(out).toContain('export const A = function () { return <Button /> };');
+  });
+
   it('emits only used imports, merged and ordered', () => {
     const file = '/src/components/Button/Button.stories.tsx';
     const text = `import { Button } from './index';

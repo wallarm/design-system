@@ -143,6 +143,39 @@ export const HasNeither: StoryFn = () => null;
     });
   });
 
+  describe('multiple story files (fixture)', () => {
+    const fixtureProject = new Project({ useInMemoryFileSystem: true });
+    fixtureProject.createSourceFile('/src/components/Foo/index.ts', "export { Foo } from './Foo';");
+    fixtureProject.createSourceFile('/src/components/Foo/Foo.ts', 'export const Foo = 1;');
+    fixtureProject.createSourceFile(
+      '/src/components/Foo/stories/Extra.stories.tsx',
+      `import { Foo } from '../Foo';
+const meta = { title: 'Patterns/Foo/Extra' };
+export default meta;
+export const Second = () => <Foo />;
+export const Third = () => <Foo />;`,
+    );
+    fixtureProject.createSourceFile(
+      '/src/components/Foo/Foo.stories.tsx',
+      `import { Foo } from './Foo';
+const meta = { title: 'Components/Foo' };
+export default meta;
+export const First = () => <Foo />;`,
+    );
+
+    for (const dir of ['/src/components/Foo', '/src/components/Foo/']) {
+      it(`sets storyFile/storyTitle and orders main file first (${dir})`, () => {
+        const examples = parseExamples(fixtureProject, dir, 'Foo');
+        expect(examples.map(e => [e.name, e.storyFile, e.storyTitle])).toEqual([
+          ['First', 'Foo/Foo.stories.tsx', 'Components/Foo'],
+          ['Second', 'Foo/stories/Extra.stories.tsx', 'Patterns/Foo/Extra'],
+          ['Third', 'Foo/stories/Extra.stories.tsx', 'Patterns/Foo/Extra'],
+        ]);
+        expect(examples[1]!.code).toContain("from '@wallarm-org/design-system/Foo'");
+      });
+    }
+  });
+
   describe('Alert (WithCloseButton uses useState)', () => {
     const examples = parseExamples(project, path.join(componentsDir, 'Alert'), 'Alert');
 

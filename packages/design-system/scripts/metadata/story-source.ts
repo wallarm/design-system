@@ -101,6 +101,51 @@ const toPublicSpecifier = (
 const rank = (spec: string) =>
   spec === 'react' ? 0 : spec.startsWith('.') ? 3 : spec.startsWith(PKG) ? 2 : 1;
 
+const hasWord = (text: string, name: string) =>
+  new RegExp(`(?<![\\w$])${name.replace(/\$/g, '\\$')}(?![\\w$])`).test(text);
+
+/**
+ * For a function/arrow expression, drop the parameter list unless a bound
+ * identifier is still referenced in the body. Returns undefined when the code
+ * is not a function expression.
+ */
+const stripUnusedParams = (project: Project, code: string): string | undefined => {
+  const tmp = project.createSourceFile('/__story_tmp__.tsx', `const x = ${code};`, {
+    overwrite: true,
+  });
+  try {
+    const fn = tmp.getVariableDeclarationOrThrow('x').getInitializer();
+    if (!fn?.isKind(SyntaxKind.ArrowFunction) && !fn?.isKind(SyntaxKind.FunctionExpression)) {
+      return undefined;
+    }
+    const params = fn.getParameters();
+    if (params.length === 0) return fn.getText();
+
+    const body = fn.getBody().getText();
+    const bound = params.flatMap(p =>
+      p.getNameNode().isKind(SyntaxKind.Identifier)
+        ? [p.getName()]
+        : p
+            .getNameNode()
+            .getDescendantsOfKind(SyntaxKind.BindingElement)
+            .map(e => e.getNameNode())
+            .filter(n => n.isKind(SyntaxKind.Identifier))
+            .map(n => n.getText()),
+    );
+    if (bound.some(n => hasWord(body, n))) return fn.getText();
+
+    const open = fn.getFirstChildByKind(SyntaxKind.OpenParenToken);
+    const close = fn.getFirstChildByKind(SyntaxKind.CloseParenToken);
+    const from = open ? open.getStart() : params[0].getStart();
+    const to = close ? close.getEnd() : params[params.length - 1].getEnd();
+    const text = fn.getText();
+    const base = fn.getStart();
+    return `${text.slice(0, from - base)}()${text.slice(to - base)}`;
+  } finally {
+    project.removeSourceFile(tmp);
+  }
+};
+
 /** Paste-ready source: story code without args plus a public-import header. */
 export const toCopyableCode = (
   sourceFile: SourceFile,
@@ -108,14 +153,11 @@ export const toCopyableCode = (
   storyCode: string,
   srcDir: string,
 ): string => {
-  const isFn = /^(async\s+)?(function\b|\()/.test(storyCode.trim());
-  const body = storyCode
-    .replace(/^(\s*(?:async\s+)?)\((?:[^()]|\([^()]*\))*\)\s*(?::[^=]+)?=>/, '$1() =>')
-    .replace(/\s*\{\.\.\.args\}/g, '');
-  const code = isFn ? `export const ${exportName} = ${body};` : body;
+  const noSpread = storyCode.replace(/\s*\{\.\.\.args\}/g, '');
+  const fn = stripUnusedParams(sourceFile.getProject(), noSpread);
+  const code = fn ? `export const ${exportName} = ${fn};` : noSpread;
 
-  const used = (name: string) =>
-    new RegExp(`(?<![\\w$])${name.replace(/\$/g, '\\$')}(?![\\w$])`).test(code);
+  const used = (name: string) => hasWord(code, name);
   const imports = new Map<string, ImportEntry>();
 
   for (const decl of sourceFile.getImportDeclarations()) {
