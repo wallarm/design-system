@@ -181,7 +181,7 @@ New compound component workflow: `component-architect` → `design-system` → `
 `check-pr-title` (Conventional Commits) and `require-migration` (a `!` title or `BREAKING CHANGE:` body must add a file under `packages/migrator/src/migrations/`) live in a **separate** workflow ([`pr-title.yml`](./.github/workflows/pr-title.yml), triggered on `pull_request`). Everything else is a job inside [`main.yml`](./.github/workflows/main.yml), triggered on `push` to any branch (plus manual `workflow_dispatch`):
 
 1. **setup** - Detects triggers only (no install): `[update-screenshots]`, `[skip-e2e]` / no `E2E_PATHS` change (branch vs `main` merge-base, or `HEAD~1` on `main`), whether to release MCP, and the Playwright container tag
-2. **quality** - Lint (Biome), typecheck and Rstest unit tests in parallel
+2. **quality** - Lint (Biome), typecheck and Rstest unit tests (3 shards) in parallel
 3. **build** - Builds all packages and the Storybook static site as GitHub Actions artifacts (`built-packages`, `storybook-static`) — no Docker image is built or pushed
 4. **e2e** - 4 shards inside the public `mcr.microsoft.com/playwright` container; Storybook is served by `http-server` and a `curl` loop waits up to 60s for `/design-system/iframe.html`
 5. **unit-test-report** / **e2e-report** - Publish JUnit results

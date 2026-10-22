@@ -19,7 +19,7 @@ The canonical job list is [`CLAUDE.md` → Pipeline Jobs](../../CLAUDE.md#pipeli
 The main CI/CD pipeline lives in `.github/workflows/main.yml`, triggered on `push` to any branch (`branches: ['**']`) plus `workflow_dispatch`, and consists of 11 jobs:
 
 ```
-setup → quality (lint | typecheck | test) → build → e2e (4 shards) → unit-test-report / e2e-report
+setup → quality (lint | typecheck | test ×3) → build → e2e (4 shards) → unit-test-report / e2e-report
                                                   → e2e-update-screenshots (4 shards) → commit-screenshots
                                                   → release (stable on main, RC on feature/*, feat/*, fix/*)
 main only:                                        → deploy-storybook, publish-code-connect
@@ -30,7 +30,7 @@ main only:                                        → deploy-storybook, publish-
 | Job | Purpose | Runs On |
 |-----|---------|---------|
 | `setup` | Trigger detection only (screenshots, E2E skip, MCP release) — no dependency install | Always |
-| `quality` | Matrix: `lint`, `typecheck`, `test` (parallel) | Always |
+| `quality` | Matrix: `lint`, `typecheck`, `test` (3 Rstest shards), all parallel | Always |
 | `build` | Builds all packages + Storybook static site, uploaded as plain GitHub Actions artifacts — **no Docker image, no ghcr.io** | After quality |
 | `e2e` | Sharded Playwright tests (4 shards), run inside the public `mcr.microsoft.com/playwright` container against the Storybook static build served via `http-server` | After build |
 | `unit-test-report` / `e2e-report` | Publish JUnit results via `dorny/test-reporter` | After quality / e2e |
@@ -79,7 +79,7 @@ PLAYWRIGHT_VERSION: "1.63.0"
 
 ## Artifacts
 
-- `unit-test-results` — unit test JUnit reports
+- `unit-test-results-*` — unit test JUnit reports (one per shard)
 - `storybook-static` — Storybook static build
 - `built-packages` — `packages/*/dist` and `packages/configs/*/dist`
 - `e2e-results-shard-N` — test reports per shard
