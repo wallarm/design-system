@@ -97,7 +97,9 @@ describe('main', () => {
     expect(await run('--from', '0.9.0')).toBe(1);
     expect(err.join('\n')).toContain('upgrade to 1.x manually first');
     err = [];
-    expect(await run('--from', '2.9.0', '--to', '4.0.0')).toBe(1);
+    // One major past what the migrator knows — derived, so a release doesn't make it known.
+    const nextMajor = `${Number(versions.latest.split('.')[0]) + 1}.0.0`;
+    expect(await run('--from', '2.9.0', '--to', nextMajor)).toBe(1);
     expect(err.join('\n')).toContain('newer than this migrator knows');
     err = [];
     expect(await run('--from', '3.0.0-rc.avatar.1', '--to', '3.0.0')).toBe(1);
