@@ -6,12 +6,16 @@ import { postcssConfig } from '@wallarm-org/tailwind-config/postcss';
 import { THEME_SCRIPT } from './theme/themeScript';
 
 const dir = import.meta.dirname;
+const siteOrigin = process.env.DOCS_SITE_ORIGIN ?? 'https://wallarm.github.io';
+// `preview:local` builds elsewhere so it never overwrites the production `doc_build`.
+const outDir = process.env.DOCS_OUT_DIR ?? 'doc_build';
 
 export default defineConfig({
   root: 'docs',
   base: '/design-system/',
-  // Only affects absolute URLs in llms.txt / llms-full.txt. `preview:local` overrides it.
-  siteOrigin: process.env.DOCS_SITE_ORIGIN ?? 'https://wallarm.github.io',
+  // Baked into llms.txt / llms-full.txt and the per-page "For AI agents" hint.
+  siteOrigin,
+  outDir,
   title: 'Wallarm Design System',
   description: 'React components, tokens and AI tooling for Wallarm products',
   llms: true,
@@ -39,6 +43,8 @@ export default defineConfig({
     { plugins: rsbuildConfig.plugins },
     {
       // Not Rspress `head`: its tuple form can't carry inline script content.
+      // The origin is compiled into modules; without it in the key a local build poisons the cache.
+      performance: { buildCache: { cacheDigest: [siteOrigin] } },
       html: { tags: [{ tag: 'script', children: THEME_SCRIPT, head: true, append: false }] },
       tools: {
         postcss: { postcssOptions: { plugins: postcssConfig.plugins } },

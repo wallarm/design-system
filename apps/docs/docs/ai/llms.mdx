@@ -35,6 +35,6 @@ your installed package, `@wallarm-org/design-system/metadata`, matches the versi
 
 `llms.txt`, `llms-full.txt`, the `.md` pages and `components.json` exist only in a production
 build, not in `rspress dev`. To see them with local URLs, run `pnpm --filter @wallarm-org/docs
-preview:local`. It builds the site with `DOCS_SITE_ORIGIN=http://localhost:4173` and serves it at
-`http://localhost:4173/design-system/`. A plain `build` keeps the production origin,
-`https://wallarm.github.io`.
+preview:local`. It builds the site with a local origin (`localhost`, port 4173) into
+`doc_build_local`, so the production `doc_build` is untouched, and serves it from there. A plain
+`build` keeps the production origin, `https://wallarm.github.io`.
