@@ -4,7 +4,7 @@
 > [`storybook-docs` skill](../.claude/skills/storybook-docs/SKILL.md); problems found along
 > the way go in [findings](./storybook-docs-findings.md).
 
-> **Last updated:** 2026-10-22, against main at v3.3.0. **98 of 117 pages are written**; 19 are left (see the ☐ rows).
+> **Last updated:** 2026-10-22, against main at v3.3.0. **98 of 118 pages are written**; 20 are left (see the ☐ rows).
 
 ## How to use this
 
@@ -39,7 +39,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 
 ## Snapshot
 
-- **98 written to the standard · 19 left**, across 117 story pages. `Table` has grown a story without a sentence (`InlineCellEditing`) since it was levelled.
+- **98 written to the standard · 20 left**, across 118 story pages. `Table` has grown a story without a sentence (`InlineCellEditing`) since it was levelled.
 - Levelling was usually cutting, not filling — and often correcting. Five pages
   claimed behaviour their own code contradicted: `Slider`, `Dialog`,
   `CodeSnippet` (its `Sizes` story labelled the wrong default), `BarList`
@@ -89,6 +89,7 @@ The first pass is done; the ☐ rows are components that arrived after it. The t
 | ☐ | Data Display/SimpleCharts/AreaChart | 7 | 7 | `components/SimpleCharts/AreaChart/AreaChart.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/BarList | 13 | 13 | `components/SimpleCharts/BarList/BarList.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/Chart | 6 | 6 | `components/SimpleCharts/Chart/Chart.stories.tsx` |
+| ☐ | Data Display/SimpleCharts/ColumnChart | 5 | 5 | `components/SimpleCharts/ColumnChart/ColumnChart.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/HorizontalBarStack | 8 | 8 | `components/SimpleCharts/HorizontalBarStack/HorizontalBarStack.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/LineChart | 15 | 15 | `components/SimpleCharts/LineChart/LineChart.stories.tsx` |
 | ✅ | Data Display/SimpleCharts/Metric | 4 | 4 | `components/SimpleCharts/Metric/Metric.stories.tsx` |

@@ -36,6 +36,15 @@ export {
   type ChartTitleProps,
 } from './Chart';
 export {
+  ColumnChart,
+  ColumnChartBody,
+  type ColumnChartBodyProps,
+  type ColumnChartProps,
+  ColumnChartStack,
+  ColumnChartXAxis,
+  type ColumnChartXAxisProps,
+} from './ColumnChart';
+export {
   HorizontalBarStack,
   type HorizontalBarStackDatum,
   type HorizontalBarStackProps,

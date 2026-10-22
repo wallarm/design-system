@@ -18,6 +18,7 @@ const type = instance.getEnum('Type', {
   'Horizontal bar (stacked)': 'horizontal-bar-stack',
   'Empty (Common)': 'empty',
   'Area (Stacked)': 'area',
+  'Vertical stacked columns': 'column',
 });
 
 const asInstance = (layer: LayerHandle | null | undefined) =>
@@ -63,9 +64,9 @@ ${indent}  <MetricValue>${value}</MetricValue>${delta}
 ${indent}</MetricHeader>${caption ? `\n${indent}<MetricCaption>${caption}</MetricCaption>` : ''}`;
 };
 
-// Line/Area: the "Slot" toggle shows the private _line-chart-slot (metric headline + line-legend).
+// Line/Area/Column: the "Slot" toggle shows the private _line-chart-slot (metric headline + line-legend).
 const lineSlot =
-  (type === 'line' || type === 'area') && instance.getBoolean('Slot')
+  (type === 'line' || type === 'area' || type === 'column') && instance.getBoolean('Slot')
     ? asInstance(instance.findInstance('_line-chart-slot', { traverseInstances: true }))
     : undefined;
 const slotMetric = lineSlot?.getBoolean('Metric')
@@ -193,22 +194,32 @@ const body =
       <LineChartTooltip />
     </AreaChartBody>
   </AreaChart>`
-          : type === 'metric'
-            ? figma.code`<Metric>
+          : type === 'column'
+            ? figma.code`<ColumnChart data={${lineData}} series={${seriesProp}} xKey='timestamp'>${slotBlock}
+    <ColumnChartBody>
+      <LineChartGrid />
+      <ColumnChartXAxis />
+      <LineChartYAxis />
+      <ColumnChartStack />
+      <LineChartTooltip />
+    </ColumnChartBody>
+  </ColumnChart>`
+            : type === 'metric'
+              ? figma.code`<Metric>
     ${metricHeader(hbarMetric, '    ')}
   </Metric>`
-            : type === 'metric-sparkline'
-              ? figma.code`<Metric>
+              : type === 'metric-sparkline'
+                ? figma.code`<Metric>
     ${metricHeader(hbarMetric, '    ')}
   </Metric>
   <MetricSparkline data={${sparklineData}} label='Attribute' />`
-              : type === 'horizontal-bar-stack'
-                ? figma.code`<HorizontalBarStack data={${pieData}}>
+                : type === 'horizontal-bar-stack'
+                  ? figma.code`<HorizontalBarStack data={${pieData}}>
     ${metricHeader(hbarMetric, '    ')}
   </HorizontalBarStack>`
-                : emptyText && emptyText !== 'No data'
-                  ? figma.code`<ChartEmpty>${emptyText}</ChartEmpty>`
-                  : figma.code`<ChartEmpty />`;
+                  : emptyText && emptyText !== 'No data'
+                    ? figma.code`<ChartEmpty>${emptyText}</ChartEmpty>`
+                    : figma.code`<ChartEmpty />`;
 
 const bodyImports: Record<string, string[]> = {
   'bar-list': [
@@ -247,6 +258,15 @@ const bodyImports: Record<string, string[]> = {
     'LineChartGrid',
     'LineChartTooltip',
     'LineChartXAxis',
+    'LineChartYAxis',
+  ],
+  column: [
+    'ColumnChart',
+    'ColumnChartBody',
+    'ColumnChartStack',
+    'ColumnChartXAxis',
+    'LineChartGrid',
+    'LineChartTooltip',
     'LineChartYAxis',
   ],
   metric: ['Metric'],

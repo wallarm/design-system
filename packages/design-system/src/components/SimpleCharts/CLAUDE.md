@@ -100,7 +100,7 @@ Charts follow the repo-wide rules in [`.claude/rules/component-development.md`](
 
 Each chart has a living doc file at `SimpleCharts/docs/<ChartName>.md`. This is the human-readable source of truth for *how the chart behaves*, not just how its API is shaped — stories cover visual states, these docs cover the **why** and the **gotchas**.
 
-`AreaChart` has no doc yet — it reuses the `LineChart` plot primitives (`LineChartGrid`, axes, `LineChartTooltip`); add `docs/AreaChart.md` when its behaviour diverges.
+`AreaChart` has no doc yet — it reuses the `LineChart` plot primitives (`LineChartGrid`, axes, `LineChartTooltip`); add `docs/AreaChart.md` when its behaviour diverges. `ColumnChart` reuses them too, but its doc exists — columns diverge (width, stacking order, ruler).
 
 ### What each doc must contain
 
@@ -130,7 +130,7 @@ Docs live next to the code in `docs/`, not in Storybook MDX or README files. Sto
 
 ## Reuse Before Inventing
 
-Before adding a chart, check the sibling folders — `./Chart` (card container, header, empty state), `./BarList`, `./PieChart`, `./LineChart`, `./AreaChart`, `./HorizontalBarStack`, `./Metric` — and the shared `./lib`, `./internal`, `./hooks`. Reuse their primitives and tokens rather than copying. If behaviour has to diverge, document *why* in the chart's own file.
+Before adding a chart, check the sibling folders — `./Chart` (card container, header, empty state), `./BarList`, `./PieChart`, `./LineChart`, `./AreaChart`, `./ColumnChart`, `./HorizontalBarStack`, `./Metric` — and the shared `./lib`, `./internal`, `./hooks`. Reuse their primitives and tokens rather than copying. If behaviour has to diverge, document *why* in the chart's own file.
 
 ## Design Tokens
 
