@@ -1,0 +1,34 @@
+version: 2
+updates:
+  # pnpm workspace (Dependabot has no separate `pnpm` ecosystem — `npm` detects pnpm-lock.yaml): root lockfile covers apps/* and packages/*, incl. the catalog in pnpm-workspace.yaml
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: daily
+      time: "06:00"
+      timezone: Europe/Berlin # CET/CEST
+    cooldown:
+      default-days: 7
+    open-pull-requests-limit: 10
+    commit-message:
+      prefix: chore
+      include: scope
+    # minor/patch go into one grouped PR; majors stay ungrouped, so each gets its own PR
+    groups:
+      minor-and-patch:
+        update-types: [minor, patch]
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: daily
+      time: "06:00"
+      timezone: Europe/Berlin # CET/CEST
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: ci
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: [minor, patch]
