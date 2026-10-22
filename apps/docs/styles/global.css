@@ -73,3 +73,8 @@ html.rp-dark {
     opacity: 1;
     background: var(--rp-c-brand-dark);
 }
+
+/* Solid title instead of Rspress's gradient text. */
+.rp-home-hero__title {
+    margin: 0;
+}

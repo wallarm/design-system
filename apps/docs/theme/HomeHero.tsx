@@ -3,7 +3,6 @@
 import '@rspress/core/dist/theme/components/HomeHero/index.css';
 import { useFrontmatter } from '@rspress/core/runtime';
 import { Button, renderHtmlOrText } from '@rspress/core/theme-original';
-import { NavBrand } from './NavBrand';
 
 interface HeroAction {
   theme?: 'brand' | 'alt';
@@ -11,17 +10,21 @@ interface HeroAction {
   link: string;
 }
 
-// Replaces the original HomeHero only to render the name as a branded <h1>; the tagline and
-// actions reuse its markup and classes. Frontmatter hero.name stays the text fallback (SEO, llms).
+// Replaces the original HomeHero only to render the name as a plain-text <h1> (the built-in one is a div); the tagline and
+// actions reuse its markup and classes.
 // ponytail: no hero image/badge/text support (unused here); copy them from the original if needed.
 export function HomeHero() {
   const { frontmatter } = useFrontmatter();
-  const hero = (frontmatter?.hero ?? {}) as { tagline?: string; actions?: HeroAction[] };
+  const hero = (frontmatter?.hero ?? {}) as {
+    name?: string;
+    tagline?: string;
+    actions?: HeroAction[];
+  };
   return (
     <div className='rp-home-hero rp-home-hero--no-image'>
       <div className='rp-home-hero__container items-center text-center'>
         <div className='rp-home-hero__content'>
-          <NavBrand size='hero' />
+          <h1 className='rp-home-hero__title text-text-primary'>{hero.name}</h1>
         </div>
         <p className='rp-home-hero__tagline' {...renderHtmlOrText(hero.tagline)} />
         <div className='rp-home-hero__actions'>
