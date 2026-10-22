@@ -1,7 +1,7 @@
 @import '../../../packages/design-system/.storybook/fonts/kalam.css';
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import '@wallarm-org/design-system/theme';
+@import '../../../packages/design-system/src/theme/index.css';
 
 /* Rspress chrome on DS tokens. Rspress declares its vars under :where(), so :root wins; the DS
    tokens themselves flip on <html data-theme>, which themeScript/ThemeSync keep in step with the
