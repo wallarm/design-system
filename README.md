@@ -253,7 +253,7 @@ Comprehensive GitHub Actions pipeline with multiple stages:
 - **Smart Caching** - Dependencies cached across all workflow runs
 - **Auto Screenshot Updates** - Commit with `[update-screenshots]` to update visual snapshots
 - **E2E Skip Trigger** - Commit with `[skip-e2e]` to skip E2E tests when needed
-- **E2E Optimization** - Skips E2E tests for bot screenshot commits
+- **E2E Optimization** - Skips E2E tests for bot screenshot commits and when no E2E-relevant files changed (`E2E_PATHS` in `main.yml`: src, configs, dependency versions)
 - **Deployment**: Storybook documentation published to GitHub Pages at `https://wallarm.github.io/wallarm-design-system/`. There is no Docker image build/push step in CI today — the `Dockerfile`s under `packages/design-system/` and `apps/playground/` are for manual/local use only (see [🐳 Docker](#-docker) below).
 
 ### Environment

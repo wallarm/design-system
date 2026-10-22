@@ -42,7 +42,7 @@ Separately: `check-pr-title` (PRs only, `pr-title.yml`) validates conventional-c
 ## Special Triggers
 
 - `[update-screenshots]` in commit message → triggers screenshot update job
-- `[skip-e2e]` in commit message → skips E2E tests
+- `[skip-e2e]` in commit message → skips E2E tests; also auto-skipped when nothing in `E2E_PATHS` (setup job) changed
 - Bot screenshot commits (author: `github-actions[bot]`) → skip E2E
 
 ## Release Flow

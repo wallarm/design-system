@@ -203,7 +203,7 @@ Full detail: [CI_PLAN.md](./CI_PLAN.md).
 - **Readiness Check**: An HTTP polling loop waits for the Storybook static server to respond — there is no Docker `services:` health check in this pipeline
 - **Artifact Upload**: Test results and reports preserved
 - **Concurrency Control**: Cancel in-progress runs on new pushes
-- **E2E Skip Optimization**: Skips E2E for bot screenshot commits
+- **E2E Skip Optimization**: Skips E2E for bot screenshot commits and when no E2E-relevant path changed — `src`, Storybook/Playwright/build configs, `package.json`, `pnpm-workspace.yaml`, `pnpm-lock.yaml` (list: `E2E_PATHS` in `main.yml`; range: branch vs `main` merge-base, or last commit on `main`)
 - **E2E Skip Trigger**: Manual E2E skip with `[skip-e2e]` commit message trigger
 - **GitHub Pages Deployment**: Automatic Storybook deployment on main branch (static artifact, not a Docker image)
 

@@ -79,6 +79,37 @@ jobs:
           if [[ "$COMMIT_MSG" == *"[skip-e2e]"* ]]; then
             echo "should_skip=true" >> $GITHUB_OUTPUT
             echo "✅ [skip-e2e] trigger found - will skip E2E tests"
+            exit 0
+          fi
+
+          # Same range as the MCP check: whole branch vs main, or last commit on main
+          MERGE_BASE=$(git merge-base origin/main HEAD 2>/dev/null || echo "")
+          if [ -n "$MERGE_BASE" ] && [ "$MERGE_BASE" != "$(git rev-parse HEAD)" ]; then
+            RANGE="${MERGE_BASE}..HEAD"
+          else
+            RANGE="HEAD~1..HEAD"
+          fi
+
+          # Anything that changes the built Storybook or the test run. Dependency
+          # versions (incl. catalog and pnpm.overrides) all land in pnpm-lock.yaml.
+          E2E_PATHS=(
+            packages/design-system/src
+            packages/design-system/.storybook
+            packages/design-system/package.json
+            packages/design-system/playwright.config.ts
+            packages/design-system/rsbuild.config.ts
+            packages/design-system/postcss.config.js
+            packages/configs/playwright-config
+            packages/configs/rsbuild-config
+            packages/configs/tailwind-config
+            package.json
+            pnpm-workspace.yaml
+            pnpm-lock.yaml
+          )
+
+          if git diff --quiet "$RANGE" -- "${E2E_PATHS[@]}"; then
+            echo "should_skip=true" >> $GITHUB_OUTPUT
+            echo "✅ No E2E-relevant changes ($RANGE) - will skip E2E tests"
           else
             echo "should_skip=false" >> $GITHUB_OUTPUT
           fi
