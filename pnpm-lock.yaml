@@ -616,6 +616,40 @@ importers:
         specifier: 'catalog:'
         version: 7.0.2
 
+  packages/migrator:
+    dependencies:
+      semver:
+        specifier: 7.8.5
+        version: 7.8.5
+      ts-morph:
+        specifier: 28.0.0
+        version: 28.0.0
+    devDependencies:
+      '@rslib/core':
+        specifier: 'catalog:'
+        version: 1.0.3(core-js@3.47.0)(typescript@7.0.2)
+      '@rstest/core':
+        specifier: 'catalog:'
+        version: 0.12.3(core-js@3.47.0)(jsdom@30.1.1)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 24.19.0
+      '@types/semver':
+        specifier: 7.8.0
+        version: 7.8.0
+      '@wallarm-org/publish-scripts':
+        specifier: workspace:*
+        version: link:../configs/publishing
+      '@wallarm-org/rstest-config':
+        specifier: workspace:*
+        version: link:../configs/rstest-config
+      '@wallarm-org/typescript-config':
+        specifier: workspace:*
+        version: link:../configs/typescript-config
+      typescript:
+        specifier: 'catalog:'
+        version: 7.0.2
+
 packages:
 
   '@actions/core@3.0.1':
@@ -3100,6 +3134,9 @@ packages:
 
   '@types/resolve@1.20.6':
     resolution: {integrity: sha512-A4STmOXPhMUtHH+S6ymgE2GiBSMqf4oTvcQZMcHzokuTLVYzXTB8ttjcgxOVaAp2lGwEdzZ0J+cRbbeevQj1UQ==}
+
+  '@types/semver@7.8.0':
+    resolution: {integrity: sha512-1mAINjtQCXXeLkJ9ehXkwOcBpqtLxiVtKhpUf83DdRNdQKV0iXZpaHYqRr7nj+wvxuJzoAmAwXI+sCNMv1CzLQ==}
 
   '@types/tapable@2.3.0':
     resolution: {integrity: sha512-oMnbAXeVo+KUnje3hzdORXUbfnzTfqD0H92mLl19NE5hFqH9Q4ktq+xehNSxcNeeLm1COopYwa0zeP6Iz+oIXg==}
@@ -9697,7 +9734,7 @@ snapshots:
 
   '@ts-morph/common@0.29.0':
     dependencies:
-      minimatch: 10.2.5
+      minimatch: 10.2.6
       path-browserify: 1.0.1
       tinyglobby: 0.2.17
 
@@ -9844,6 +9881,8 @@ snapshots:
       csstype: 3.2.3
 
   '@types/resolve@1.20.6': {}
+
+  '@types/semver@7.8.0': {}
 
   '@types/tapable@2.3.0':
     dependencies:
