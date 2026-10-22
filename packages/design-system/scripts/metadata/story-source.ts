@@ -146,6 +146,49 @@ const stripUnusedParams = (project: Project, code: string): string | undefined =
   }
 };
 
+const ANNOTATION = /(?:^|\s)sb-annotation(?:-alt)?(?:\s|$)/;
+
+/** Remove Storybook `sb-annotation` label elements that sit in a JSX children position. */
+const stripAnnotations = (project: Project, code: string): string => {
+  if (!code.includes('sb-annotation')) return code;
+  const prefix = 'const x = ';
+  const tmp = project.createSourceFile('/__story_tmp__.tsx', `${prefix}${code};`, {
+    overwrite: true,
+  });
+  try {
+    const ranges = [
+      ...tmp.getDescendantsOfKind(SyntaxKind.JsxElement),
+      ...tmp.getDescendantsOfKind(SyntaxKind.JsxSelfClosingElement),
+    ]
+      .filter(el => {
+        const parent = el.getParent();
+        if (!parent?.isKind(SyntaxKind.JsxElement) && !parent?.isKind(SyntaxKind.JsxFragment)) {
+          return false;
+        }
+        const opening = el.isKind(SyntaxKind.JsxElement) ? el.getOpeningElement() : el;
+        const init = opening
+          .getAttribute('className')
+          ?.asKind(SyntaxKind.JsxAttribute)
+          ?.getInitializer();
+        const value = init?.isKind(SyntaxKind.JsxExpression) ? init.getExpression() : init;
+        return (
+          (value?.isKind(SyntaxKind.StringLiteral) ||
+            value?.isKind(SyntaxKind.NoSubstitutionTemplateLiteral)) &&
+          ANNOTATION.test(value.getLiteralText())
+        );
+      })
+      .map(el => [el.getStart() - prefix.length, el.getEnd() - prefix.length] as const)
+      .sort((a, b) => b[0] - a[0]);
+    if (ranges.length === 0) return code;
+
+    let out = code;
+    for (const [from, to] of ranges) out = out.slice(0, from) + out.slice(to);
+    return out.replace(/\n[ \t]*(?=\n)/g, '').replace(/^[ \t]*\n/, '');
+  } finally {
+    project.removeSourceFile(tmp);
+  }
+};
+
 /** Paste-ready source: story code without args plus a public-import header. */
 export const toCopyableCode = (
   sourceFile: SourceFile,
@@ -155,7 +198,8 @@ export const toCopyableCode = (
 ): string => {
   const noSpread = storyCode.replace(/\s*\{\.\.\.args\}/g, '');
   const fn = stripUnusedParams(sourceFile.getProject(), noSpread);
-  const code = fn ? `export const ${exportName} = ${fn};` : noSpread;
+  const stripped = stripAnnotations(sourceFile.getProject(), fn ?? noSpread);
+  const code = fn ? `export const ${exportName} = ${stripped};` : stripped;
 
   const used = (name: string) => hasWord(code, name);
   const imports = new Map<string, ImportEntry>();

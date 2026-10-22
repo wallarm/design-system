@@ -141,3 +141,41 @@ describe('findStoryFiles', () => {
     ]);
   });
 });
+
+describe('toCopyableCode annotation labels', () => {
+  const FILE = '/src/components/Stack/Stack.stories.tsx';
+  const HEADER =
+    "import { VStack, HStack } from '../../index';\nimport { Button } from '../Button';\nimport { Text } from '../Text';";
+
+  it('strips annotation labels', () => {
+    const code =
+      "() => (\n  <VStack>\n    <span className='sb-annotation'>Brand</span>\n    <HStack><Button>A</Button></HStack>\n  </VStack>\n)";
+    const out = convert(FILE, HEADER, 'Basic', code);
+    expect(out).not.toContain('sb-annotation');
+    expect(out).not.toContain('Brand');
+    expect(out).toContain('<HStack>');
+    expect(out).not.toMatch(/\n\s*\n\s*<HStack>/);
+  });
+
+  it('strips alt annotations and keeps other classes', () => {
+    const code =
+      '() => (\n  <VStack>\n    <span className="text-sm sb-annotation-alt">x</span>\n    <span className=\'sb-annotations\'>y</span>\n    <Button>A</Button>\n  </VStack>\n)';
+    const out = convert(FILE, HEADER, 'Basic', code);
+    expect(out).not.toContain('>x<');
+    expect(out).toContain("<span className='sb-annotations'>y</span>");
+  });
+
+  it('drops imports only used by annotations', () => {
+    const code =
+      "() => (\n  <VStack>\n    <span className='sb-annotation'><Text>t</Text></span>\n    <Button>A</Button>\n  </VStack>\n)";
+    const out = convert(FILE, HEADER, 'Basic', code);
+    expect(out).not.toContain('Text');
+    expect(out).toContain('Button');
+  });
+
+  it('leaves non-children annotations', () => {
+    const code = "() => <span className='sb-annotation'>only</span>";
+    const out = convert(FILE, HEADER, 'Basic', code);
+    expect(out).toContain("<span className='sb-annotation'>only</span>");
+  });
+});
