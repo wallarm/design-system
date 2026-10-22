@@ -3,6 +3,8 @@ import { execFileSync } from 'node:child_process';
 const DAY_MS = 86_400_000;
 const STABLE = /^v\d+\.\d+\.\d+$/;
 
+export const isShallowOutput = (stdout: string): boolean => stdout.trim() === 'true';
+
 export const isWithinWindow = (
   releaseDate: Date,
   referenceDate: Date,
@@ -22,6 +24,9 @@ export function findNewComponents(
       stdio: ['ignore', 'pipe', 'ignore'],
     }).trim();
   try {
+    // Shallow clones make the boundary commit look like the one that added every component.
+    if (isShallowOutput(git('rev-parse', '--is-shallow-repository')))
+      throw new Error('shallow clone');
     const dates = new Map<string, Date>();
     for (const line of git(
       'for-each-ref',
@@ -55,7 +60,9 @@ export function findNewComponents(
     }
     return result;
   } catch {
-    process.stdout.write('docs: git history/tags unavailable, skipping "new" badges\n');
+    process.stdout.write(
+      'docs: git history/tags unavailable, skipping "new" badges (shallow clone or no tags)\n',
+    );
     return new Set();
   }
 }
