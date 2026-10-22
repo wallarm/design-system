@@ -1,5 +1,5 @@
 import path from 'path';
-import { Project, type SourceFile, SyntaxKind } from 'ts-morph';
+import { type Node, Project, type SourceFile, SyntaxKind } from 'ts-morph';
 import type { ExampleMetadata } from '@wallarm-org/mcp-core';
 import { findStoryFiles, readStoryTitle, toCopyableCode } from './story-source.js';
 
@@ -35,6 +35,7 @@ export const parseExamples = (
     if (!sourceFile) continue;
 
     const descriptions = collectDescriptions(sourceFile);
+    const assignedTags = collectAssignedTags(sourceFile);
     const storyFile = path.relative(componentsRoot, storiesPath).split(path.sep).join('/');
     const storyTitle = readStoryTitle(sourceFile);
 
@@ -69,6 +70,18 @@ export const parseExamples = (
         };
         if (storyTitle) example.storyTitle = storyTitle;
 
+        const tags =
+          assignedTags.get(name) ??
+          (initializer.isKind(SyntaxKind.ObjectLiteralExpression)
+            ? readStringArray(
+                initializer
+                  .getProperty('tags')
+                  ?.asKind(SyntaxKind.PropertyAssignment)
+                  ?.getInitializer(),
+              )
+            : undefined);
+        if (tags) example.tags = tags;
+
         const description = descriptions.get(name);
         if (description) {
           example.description = description;
@@ -80,6 +93,37 @@ export const parseExamples = (
   }
 
   return examples;
+};
+
+/** `['a', 'b']` → `['a', 'b']`; undefined unless every element is a string literal. */
+const readStringArray = (node: Node | undefined): string[] | undefined => {
+  if (!node?.isKind(SyntaxKind.ArrayLiteralExpression)) return undefined;
+  const out: string[] = [];
+  for (const el of node.getElements()) {
+    if (
+      !el.isKind(SyntaxKind.StringLiteral) &&
+      !el.isKind(SyntaxKind.NoSubstitutionTemplateLiteral)
+    ) {
+      return undefined;
+    }
+    out.push(el.getLiteralText());
+  }
+  return out;
+};
+
+/** Post-export `Story.tags = ['!autodocs']` assignments. */
+const collectAssignedTags = (sourceFile: SourceFile): Map<string, string[]> => {
+  const tags = new Map<string, string[]>();
+  for (const statement of sourceFile.getStatements()) {
+    const expr = statement.asKind(SyntaxKind.ExpressionStatement)?.getExpression();
+    const binary = expr?.asKind(SyntaxKind.BinaryExpression);
+    if (binary?.getOperatorToken().getKind() !== SyntaxKind.EqualsToken) continue;
+    const left = binary.getLeft().asKind(SyntaxKind.PropertyAccessExpression);
+    if (left?.getName() !== 'tags') continue;
+    const value = readStringArray(binary.getRight());
+    if (value) tags.set(left.getExpression().getText(), value);
+  }
+  return tags;
 };
 
 /**

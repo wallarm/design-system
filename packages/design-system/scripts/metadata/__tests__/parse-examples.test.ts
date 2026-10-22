@@ -176,6 +176,37 @@ export const First = () => <Foo />;`,
     }
   });
 
+  describe('story tags (fixture)', () => {
+    const fixtureProject = new Project({ useInMemoryFileSystem: true });
+    fixtureProject.createSourceFile(
+      '/src/components/Tag/Tag.stories.tsx',
+      `const meta = { title: 'Components/Tag' };
+export default meta;
+const dynamic = ['x'];
+export const A = () => <div/>;
+A.tags = ['!autodocs'];
+export const B = { tags: ['!autodocs', 'b'], args: {} };
+export const C = () => <div/>;
+export const D = () => <div/>;
+D.tags = dynamic;`,
+    );
+    const examples = parseExamples(fixtureProject, '/src/components/Tag', 'Tag');
+    const byName = (name: string) => examples.find(e => e.name === name)!;
+
+    it('reads story-level tags', () => {
+      expect(byName('A').tags).toEqual(['!autodocs']);
+    });
+
+    it('reads object-literal tags on a StoryObj', () => {
+      expect(byName('B').tags).toEqual(['!autodocs', 'b']);
+    });
+
+    it('leaves tags unset without string-literal tags', () => {
+      expect(byName('C').tags).toBeUndefined();
+      expect(byName('D').tags).toBeUndefined();
+    });
+  });
+
   describe('Alert (WithCloseButton uses useState)', () => {
     const examples = parseExamples(project, path.join(componentsDir, 'Alert'), 'Alert');
 

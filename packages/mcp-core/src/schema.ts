@@ -34,6 +34,8 @@ export const exampleMetadataSchema = z.object({
   storyFile: z.string().optional(),
   /** `meta.title` of the story file. */
   storyTitle: z.string().optional(),
+  /** Story-level Storybook tags, e.g. `!autodocs`. */
+  tags: z.array(z.string()).optional(),
 });
 
 export type ExampleMetadata = z.infer<typeof exampleMetadataSchema>;

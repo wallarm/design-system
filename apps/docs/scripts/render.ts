@@ -26,7 +26,8 @@ const CATEGORY_ORDER = [
 
 const GITHUB_COMPONENTS =
   'https://github.com/wallarm/design-system/tree/main/packages/design-system/src/components';
-const STORYBOOK = 'https://wallarm.github.io/design-system/storybook/?path=/docs';
+const STORYBOOK_ROOT = 'https://wallarm.github.io/design-system/storybook/';
+const STORYBOOK = `${STORYBOOK_ROOT}?path=/docs`;
 
 export const toStoryId = (title: string): string =>
   title
@@ -86,11 +87,17 @@ const loader = (base: string, storyFile: string | undefined): string =>
 const storyPreview = (e: ExampleMetadata, base: string): string =>
   `<StoryPreview load={${loader(base, e.storyFile)}} name='${e.name}'>\n\n${fence(e.code)}\n\n</StoryPreview>`;
 
+/** `!autodocs` stories (heavy, document-scroll driven) are kept off docs pages: code + link only. */
+const isLive = (e: ExampleMetadata): boolean => !e.tags?.includes('!autodocs');
+
+const storyLink = (e: ExampleMetadata): string =>
+  `[Open in Storybook](${STORYBOOK_ROOT}?path=/story/${toStoryId(e.storyTitle ?? '')}--${kebab(e.name)})`;
+
 const exampleBlock = (e: ExampleMetadata, level: string, base: string): string =>
   [
     `${level} ${humanize(e.name)}`,
     e.description ? escapeMdx(e.description) : '',
-    storyPreview(e, base),
+    ...(isLive(e) ? [storyPreview(e, base)] : [fence(e.code), storyLink(e)]),
   ]
     .filter(Boolean)
     .join('\n\n');
@@ -114,8 +121,10 @@ export function renderComponentPage(
   c: ComponentMetadata,
   opts: { storyImportBase: string; hasSubcomponents: boolean },
 ): string | null {
-  const [first, ...rest] = c.examples;
+  const [first] = c.examples;
   if (!first) return null;
+  const lead = c.examples.find(isLive);
+  const rest = c.examples.filter(e => e !== lead);
   const base = opts.storyImportBase;
   const out: string[] = [];
 
@@ -127,8 +136,8 @@ export function renderComponentPage(
   out.push(
     `[Source](${GITHUB_COMPONENTS}/${c.name}) · [Storybook](${STORYBOOK}/${toStoryId(first.storyTitle ?? '')}--overview)`,
   );
-  out.push(storyPreview(first, base));
-  out.push('## Usage', fence(usageImports(c, first)));
+  if (lead) out.push(storyPreview(lead, base));
+  out.push('## Usage', fence(usageImports(c, lead ?? first)));
 
   if (rest.length) {
     out.push('## Examples');
@@ -151,10 +160,10 @@ export function renderComponentPage(
   if (c.props.length) out.push(renderPropsTable(c.props));
   for (const sub of subs) out.push(`### ${sub.name}`, renderPropsTable(sub.props));
 
-  if (opts.hasSubcomponents) {
+  if (opts.hasSubcomponents && lead) {
     out.push(
       '## Explorer',
-      `<Explorer load={${loader(base, first.storyFile)}} name='${first.name}' />`,
+      `<Explorer load={${loader(base, lead.storyFile)}} name='${lead.name}' />`,
     );
   }
 

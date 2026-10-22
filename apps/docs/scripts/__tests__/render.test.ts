@@ -115,6 +115,63 @@ describe('renderComponentPage', () => {
     expect(paths.size).toBe(2);
     expect(page).toContain('### Composition');
   });
+
+  const heavy: ExampleMetadata = {
+    name: 'InfiniteScrollWindow',
+    code: '<Table virtualized="window" />',
+    description: 'Loads rows on scroll.',
+    storyFile: 'Table/Table.stories.tsx',
+    storyTitle: 'Data Display/Table',
+    tags: ['!autodocs'],
+  };
+  const table: ComponentMetadata = {
+    ...button,
+    name: 'Table',
+    examples: [
+      { ...basic, storyFile: 'Table/Table.stories.tsx', storyTitle: 'Data Display/Table' },
+      heavy,
+    ],
+  };
+
+  it('renders !autodocs examples as code with a Storybook link', () => {
+    const page = renderComponentPage(table, opts) ?? '';
+    const block = page.slice(page.indexOf('### Infinite scroll window'));
+    expect(block).not.toContain('<StoryPreview');
+    expect(block).toContain('<Table virtualized="window" />');
+    const [desc, code, link] = ['Loads rows on scroll.', '```tsx', '[Open in Storybook]'].map(s =>
+      block.indexOf(s),
+    );
+    expect(desc).toBeLessThan(code ?? -1);
+    expect(code).toBeLessThan(link ?? -1);
+    expect(block).toContain(
+      '[Open in Storybook](https://wallarm.github.io/design-system/storybook/?path=/story/data-display-table--infinite-scroll-window)',
+    );
+    expect(page.match(/<StoryPreview/g)?.length).toBe(1);
+  });
+
+  it('skips !autodocs for the top preview and explorer', () => {
+    const page =
+      renderComponentPage(
+        { ...table, examples: [heavy, table.examples[0]!] },
+        { ...opts, hasSubcomponents: true },
+      ) ?? '';
+    const top = page.slice(0, page.indexOf('## Usage'));
+    expect(top).toContain(
+      "<StoryPreview load={() => import('../../../../packages/design-system/src/components/Table/Table.stories.tsx')} name='Basic'>",
+    );
+    expect(page).toContain("name='Basic' />");
+    expect(page).not.toContain("name='InfiniteScrollWindow'");
+    expect(page).toContain('### Infinite scroll window');
+    expect(page).not.toContain('### Basic');
+
+    const onlyHeavy = renderComponentPage(
+      { ...table, examples: [heavy] },
+      { ...opts, hasSubcomponents: true },
+    );
+    expect(onlyHeavy).not.toContain('<StoryPreview');
+    expect(onlyHeavy).not.toContain('<Explorer');
+    expect(onlyHeavy).toContain('--infinite-scroll-window)');
+  });
 });
 
 describe('renderComponentsMeta', () => {
