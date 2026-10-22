@@ -9,7 +9,7 @@
       "**/packages/**/*.tsx",
       "**/packages/**/*.js",
       "**/packages/**/*.jsx",
-      "**/apps/**/*.{ts,tsx}",
+      "**/apps/docs/**/*.{ts,tsx}",
       "**/*.d.ts",
       "**/*.css",
       "!**/src/theme/**/*.css",
