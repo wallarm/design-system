@@ -52,6 +52,21 @@ describe('SearchSections', () => {
     input.remove();
   });
 
+  it('leaves Enter on a focused section link to the browser', () => {
+    const onNavigate = rs.fn();
+    render(<SearchSections onNavigate={onNavigate} />);
+    const input = document.createElement('input');
+    input.className = 'rp-search-panel__input';
+    document.body.append(input);
+    const guides = screen.getByRole('link', { name: /^Guides/ });
+    guides.focus();
+    act(() => {
+      guides.dispatchEvent(new KeyboardEvent('keydown', { code: 'Enter', bubbles: true }));
+    });
+    expect(onNavigate).not.toHaveBeenCalled();
+    input.remove();
+  });
+
   it('reports navigation so the dialog can close', () => {
     const onNavigate = rs.fn();
     render(<SearchSections onNavigate={onNavigate} />);

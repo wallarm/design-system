@@ -19,7 +19,9 @@ export function SearchSections({ onNavigate }: SearchSectionsProps) {
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       const input = document.querySelector<HTMLInputElement>('.rp-search-panel__input');
-      if (!input || input.value || e.isComposing) return;
+      // A focused section link handles Enter natively; acting here too would navigate twice.
+      if (!input || input.value || e.isComposing || listRef.current?.contains(e.target as Node))
+        return;
       if (e.code === 'ArrowDown') setCurrent(i => (i + 1) % nav.length);
       else if (e.code === 'ArrowUp') setCurrent(i => (i - 1 + nav.length) % nav.length);
       else if (e.code === 'Enter') listRef.current?.querySelectorAll('a')[current]?.click();
