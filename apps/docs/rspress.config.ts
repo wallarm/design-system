@@ -20,6 +20,7 @@ export default defineConfig({
   description: 'React components, tokens and AI tooling for Wallarm products',
   llms: true,
   globalStyles: path.join(dir, 'styles/global.css'),
+  globalUIComponents: [path.join(dir, 'theme/StorybookRedirect.tsx')],
   markdown: {
     globalComponents: [
       path.join(dir, 'theme/components/StoryPreview.tsx'),
