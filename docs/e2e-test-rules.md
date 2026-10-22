@@ -8,34 +8,6 @@ These rules apply when writing or modifying any E2E test file (`*.e2e.ts`) in th
 - Every test file must import `test` and `expect` from `@playwright/test`
 - Storybook component tests use `createStoryHelper` from `@wallarm-org/playwright-config/storybook`
 
-## Test Hierarchy
-
-The test hierarchy maps directly to Storybook categories:
-
-| Level      | Maps To                      | Example                              |
-| ---------- | ---------------------------- | ------------------------------------ |
-| **Epic**   | Storybook top-level category | `Messaging`, `Data Display`, `Inputs` |
-| **Feature**| Component name               | `Alert`, `Toast`, `CodeSnippet`       |
-| **Story**  | Test scenario group          | `Visual`, `Interactions`, `Accessibility` |
-
-### Storybook Category to Epic Mapping
-
-| Storybook Category   | Epic               |
-| -------------------- | ------------------ |
-| AI                   | AI                 |
-| Actions              | Actions            |
-| Data Display         | Data Display       |
-| Inputs               | Inputs             |
-| Layout               | Layout             |
-| Loading              | Loading            |
-| Messaging            | Messaging          |
-| Navigation           | Navigation         |
-| Overlay              | Overlay            |
-| Primitives           | Primitives         |
-| Status Indication    | Status Indication  |
-| Typography           | Typography         |
-| *(playground app)*   | Application        |
-
 ## Test Naming Rules
 
 ### `test.describe` Structure
@@ -79,14 +51,11 @@ The test hierarchy maps directly to Storybook categories:
   - `"Should be dismissible via keyboard Enter key"`
   - `"Should be focusable via Tab key"`
 
-## Severity Guidelines
+## Locators
 
-| Severity     | Use When                                              |
-| ------------ | ----------------------------------------------------- |
-| `critical`   | Core functionality, rendering of primary variants     |
-| `normal`     | Standard features, secondary variants                 |
-| `minor`      | Edge cases, optional features, cosmetic details       |
-| `trivial`    | Rarely used variants, supplementary visual states     |
+- Locate elements by `data-testid` (`page.getByTestId(...)`); compound components cascade it to sub-components (`{base}--{slot}`) — see [`test-id-pattern.md`](./test-id-pattern.md)
+- `getByRole` is fine for accessibility assertions (role, accessible name)
+- Never use `data-slot` — it is a styling hook. Existing `[data-slot=…]` locators are legacy; migrate them when you touch the file
 
 ## Full Example
 

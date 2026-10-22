@@ -6,5 +6,5 @@ That document is the single source of truth for:
 - File & directory conventions (`*.e2e.ts`, colocated with source)
 - `test.describe` / `test()` naming structure
 - Screenshot / Interaction / Accessibility test grouping
-- Severity guidelines
+- Locators: `data-testid`, never `data-slot` (see [`docs/test-id-pattern.md`](../../docs/test-id-pattern.md))
 - Full annotated example

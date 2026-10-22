@@ -1,6 +1,6 @@
 # New Interactive Component — Analytics-Readiness Checklist
 
-Run this before marking any new (or newly-interactive) design-system component complete. It is the operational form of [contract.md](./contract.md); the enduring rules live in [`.claude/rules/metrics.md`](../../.claude/rules/metrics.md). Non-interactive layout/display components (no click/type/toggle target) are exempt — note that and move on.
+Run this before marking any new (or newly-interactive) design-system component complete. It is the operational form of [contract.md](./contract.md), which holds the rules. Non-interactive layout/display components (no click/type/toggle target) are exempt — note that and move on.
 
 ## 1. Targets
 

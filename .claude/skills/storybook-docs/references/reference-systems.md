@@ -16,7 +16,7 @@ Paths follow each system's own URL shape; swap the component name in.
 |---|---|---|---|
 | **IBM Carbon** | `carbondesignsystem.com/components/<name>/usage/` | Plain `WebFetch` **truncates**. Use the browser pane and `get_page_text`, or the source at `raw.githubusercontent.com/carbon-design-system/carbon-website/main/src/pages/components/<name>/usage.mdx` | **The richest of the seven, and the house inspiration.** Only one with a full behaviours section and explicit do/don'ts |
 | **Nord Health** | `nordhealth.design/components/<name>/` | ✓ | Crisp when-to / when-not-to, hard numbers ("avoid past ten options"), label microcopy |
-| **GitLab Pajamas** | `design.gitlab.com/components/<name>/` | ⚠️ **Currently unreachable** — 302s to a GitLab auth flow, and the browser pane hits bot verification. Don't try to get past it; note it and move on. Its docs are open-source, so `gitlab-org/gitlab-services/design.gitlab.com` is the fallback | Best at control-choice boundaries — checkbox vs radio vs toggle vs combobox, each with a reason |
+| **GitLab Pajamas** | `design.gitlab.com/components/<name>/` | ⚠️ **Unreliable** — has 302'd to a GitLab auth flow (2026-08) and fetched fine with plain `WebFetch` (2026-09-30). Try it; if it walls, don't fight it. Its docs are open-source, so `gitlab-org/gitlab-services/design.gitlab.com` is the fallback | Best at control-choice boundaries — checkbox vs radio vs toggle vs combobox, each with a reason |
 | **Vercel Geist** | `vercel.com/geist/<name>` | ✓ | Lean and modern; sharp on state semantics ("indeterminate is not a third value") |
 | **Elastic EUI** | `eui.elastic.co/docs/components/...` | ✓ | Security and observability UI, data-dense patterns, strongest on label wording |
 | **GitHub Primer** | `primer.style/product/components/<name>/` | ✓ | Thin on usage — validation and grouping notes only. Check it, expect little |
@@ -28,10 +28,11 @@ consult quietly degrade into "announced it, got nothing".
 
 Two honest limits, so nobody burns a run on them:
 
-- **Pajamas is behind an auth wall** as of 2026-08. Note it as unreachable and
-  move on; the browser fallback hits bot verification too.
-- **Not every system ships every component.** Carbon has no layout pages at all,
-  and Primer has no slider. A system with nothing to say is a finding in itself:
+- **Pajamas is intermittently behind an auth wall** (2026-08; reachable again on
+  2026-09-30). If it walls, note it as unreachable and move on; the browser
+  fallback hits bot verification too.
+- **Not every system ships every component.** Carbon has no layout pages and no
+  avatar, and Primer has no slider. A system with nothing to say is a finding in itself:
   when several of them don't document a shape, the guidance has to come from us,
   and that is worth saying out loud rather than treating as a failed lookup.
 

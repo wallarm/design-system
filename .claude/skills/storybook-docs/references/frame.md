@@ -90,15 +90,15 @@ server silently never binds.
 `.sb-annotation` in `preview.css` styles the labels inside a story canvas. Two
 things to know if you touch it:
 
-- **Caveat is loaded from Google Fonts** via an `@import` at the top of
-  `preview.css`. Everything else in the repo self-hosts (see `theme/fonts/`), so
-  if offline dev or CDN independence ever matters, self-hosting it in
-  `.storybook/assets/` is the consistent move — `staticDirs` already serves that
-  folder.
+- **The face is Kalam Light (300)**, self-hosted in `.storybook/fonts/kalam.css`
+  (imported at the top of `preview.css`) with its licence in `Kalam-OFL.txt` —
+  no CDN request.
 - **The lowercasing is CSS, not source.** The story still reads `Neutral Alt` and
   renders `neutral alt`, which keeps the source legible and makes the style
   removable — but it does mean the rendered label and the "Show code" snippet
-  differ in case.
+  differ in case. It also mangles identifiers (`maxLines` → `maxlines`), so
+  reword a camelCase name in a label into plain words and leave the identifier to
+  the story sentence.
 
 ## MDX pages are untouched
 

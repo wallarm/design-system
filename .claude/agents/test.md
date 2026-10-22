@@ -109,8 +109,9 @@ describe('adapter with dependencies', () => {
 ```typescript
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import '@testing-library/jest-dom';
 ```
+
+jest-dom matchers are registered globally in `packages/design-system/rstest.setup.ts` — do not import `@testing-library/jest-dom` in test files.
 
 ## File Structure & Naming
 
@@ -154,7 +155,7 @@ Cover, where applicable: id on the real node (check `tagName`), verbatim `data-a
 
 ## Locator Hygiene
 
-Never query by the same `data-*` attribute you are asserting. Locate the element with `data-testid`, `getByRole`, or `data-slot`, **then** assert the analytics attribute on it.
+Never query by the same `data-*` attribute you are asserting. Locate the element with `data-testid` (or `getByRole`), **then** assert the analytics attribute on it.
 
 ```typescript
 // ✅ locate by role/testid, assert the analytics attr
@@ -179,7 +180,7 @@ expect(screen.getByTestId('save')).toHaveAttribute('data-analytics-id', 'SAVE_CH
 
 ## Rules & Conventions
 
-**IMPORTANT**: Read `docs/e2e-test-rules.md` before writing any E2E test. It is the single source of truth for naming, test grouping, severity guidelines, and the full annotated example.
+**IMPORTANT**: Read `docs/e2e-test-rules.md` before writing any E2E test. It is the single source of truth for naming, test grouping, locators, and the full annotated example.
 
 ## File Structure & Naming
 
@@ -213,10 +214,11 @@ await alertStory.goto(page, 'All Colors');
 
 ## Locator Strategy (priority order)
 
-1. **Semantic roles**: `page.getByRole('button', { name: '...' })`
-2. **Data attributes**: `page.locator('[data-slot="..."]')`, `page.locator('[data-scope="..."][data-part="..."]')`
+1. **Test IDs**: `page.getByTestId('...')` — compound components cascade it to sub-components (`{base}--{slot}`); add `data-testid` to the story if it is missing. See `docs/test-id-pattern.md`
+2. **Semantic roles**: `page.getByRole('button', { name: '...' })` — for accessibility assertions
 3. **Text content**: `page.getByText('...')`
-4. **CSS selectors** (last resort): `page.locator('.class-name')`
+
+Never locate by `data-slot` — it is a styling hook. Existing `[data-slot=…]` locators are legacy; migrate them to `data-testid` when you touch the file.
 
 ## Screenshots
 
@@ -254,25 +256,29 @@ await componentStory.goto(page, 'Story Name');
 - **Isolate tests**: Each test is independent, no shared state between tests
 - **Syntax highlighting**: Wait for highlight tokens before screenshot to ensure async highlighters finished
 
-## Docker vs Local Config Differences
+## Local vs CI vs Docker Config
 
-| Setting            | Local              | Docker (CI)           |
-| ------------------ | ------------------ | --------------------- |
-| Test timeout       | 30s                | 60s                   |
-| Action timeout     | none               | 10s                   |
-| Navigation timeout | none               | 30s                   |
-| Global timeout     | none               | 10 min                |
-| Retries            | 0                  | 2                     |
-| Workers            | auto (CPU cores)   | 1                     |
-| Video              | off                | retain-on-failure     |
-| Trace              | off                | retain-on-failure     |
-| Reporters          | html               | html, junit, list     |
+`pnpm e2e` locally and `playwright test` in CI both use `playwright.config.ts` (`@wallarm-org/playwright-config/base`); CI only adds `CI=true`. `pnpm e2e:docker` uses `playwright.config.docker.ts` (`@wallarm-org/playwright-config/docker`).
 
-Tests that pass locally may fail in CI due to `workers: 1` (slower) or stricter action/navigation timeouts.
+| Setting            | Local (`pnpm e2e`) | CI (`CI=true`)     | Local Docker (`pnpm e2e:docker`) |
+| ------------------ | ------------------ | ------------------ | -------------------------------- |
+| Test timeout       | 30s                | 30s                | 60s                              |
+| Action timeout     | none               | none               | 10s                              |
+| Navigation timeout | none               | none               | 30s                              |
+| Expect timeout     | 5s (default)       | 5s (default)       | 10s                              |
+| Global timeout     | none               | none               | 10 min                           |
+| Retries            | 0                  | 2                  | 2                                |
+| Workers            | auto (CPU cores)   | 1                  | 1                                |
+| `forbidOnly`       | off                | on                 | on (compose sets `CI=false`, a truthy string) |
+| Video              | off                | off                | retain-on-failure                |
+| Trace              | on-first-retry     | on-first-retry     | retain-on-failure                |
+| Reporters          | html, junit        | html, junit        | html, junit, list                |
+
+Tests that pass locally may fail in CI because of `workers: 1` (slower) or `forbidOnly`.
 
 ## Existing Tests Non-Compliance
 
-The existing E2E tests (`Alert.e2e.ts`, `CodeSnippet.e2e.ts`, `Toast.e2e.ts`) were written before `docs/e2e-test-rules.md` was established. They are **not compliant** with current rules:
+Some existing E2E tests (e.g. Alert, Badge, Banner, Card, CodeSnippet, Toast, `SimpleCharts/*`) were written before `docs/e2e-test-rules.md` was established and are **not compliant** with current rules. Find them with `grep -rL "Component: " packages/design-system/src --include='*.e2e.ts'`. Typical gaps:
 
 - Old `test.describe` naming (e.g., `'Alert Component'` instead of `'Component: Alert'`)
 - Old grouping names (`'View'`, `'Screenshots'` instead of `'Visual'`, `'Interactions'`, `'Accessibility'`)
@@ -288,49 +294,3 @@ When modifying these files, **migrate them to current conventions**. When writin
 4. **Check existing tests**: Review existing tests for patterns, but be aware of non-compliance (see above)
 5. **Write tests**: Follow the standards for each test type
 6. **Verify**: Ensure tests are syntactically correct and follow all guidelines
-
----
-
-# Persistent Agent Memory
-
-You have a persistent Persistent Agent Memory directory at
-`.claude/agent-memory/tester/`. Its contents persist across conversations.
-
-As you work, consult your memory files to build on previous experience. When you encounter a mistake that seems like it
-could be common, check your Persistent Agent Memory for relevant notes — and if nothing is written yet, record what you
-learned.
-
-Guidelines:
-
-- `MEMORY.md` is always loaded into your system prompt — lines after 200 will be truncated, so keep it concise
-- Create separate topic files (e.g., `debugging.md`, `patterns.md`) for detailed notes and link to them from MEMORY.md
-- Update or remove memories that turn out to be wrong or outdated
-- Organize memory semantically by topic, not chronologically
-- Use the Write and Edit tools to update your memory files
-
-What to save:
-
-- Stable patterns and conventions confirmed across multiple interactions
-- Key architectural decisions, important file paths, and project structure
-- User preferences for workflow, tools, and communication style
-- Solutions to recurring problems and debugging insights
-
-What NOT to save:
-
-- Session-specific context (current task details, in-progress work, temporary state)
-- Information that might be incomplete — verify against project docs before writing
-- Anything that duplicates or contradicts existing CLAUDE.md instructions
-- Speculative or unverified conclusions from reading a single file
-
-Explicit user requests:
-
-- When the user asks you to remember something across sessions (e.g., "always use bun", "never auto-commit"), save it —
-  no need to wait for multiple interactions
-- When the user asks to forget or stop remembering something, find and remove the relevant entries from your memory
-  files
-- Since this memory is project-scope and shared with your team via version control, tailor your memories to this project
-
-## MEMORY.md
-
-Your MEMORY.md is currently empty. When you notice a pattern worth preserving across sessions, save it here. Anything in
-MEMORY.md will be included in your system prompt next time.

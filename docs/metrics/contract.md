@@ -122,47 +122,8 @@ This contract intentionally does **not** maintain a central per-component list o
 6. Include a verbatim `data-analytics-props` assertion for every component covered by the audit.
 7. Verify attribute persistence across at least one meaningful state change when the component has transitions or internal state.
 
-Locator hygiene: never query by the same `data-*` attribute you are asserting. Use `data-testid`, `getByRole`, or `data-slot` to locate the element, then assert the analytics attribute on it.
+Locator hygiene: never query by the same `data-*` attribute you are asserting. Locate the element by `data-testid` (or `getByRole`) — never by `data-slot` — then assert the analytics attribute on it.
 
-## Shared Examples
+## Examples
 
-```tsx
-render(<Button data-analytics-id="SAVE_CHANGES">Save</Button>);
-expect(screen.getByRole('button')).toHaveAttribute('data-analytics-id', 'SAVE_CHANGES');
-```
-
-```tsx
-const payload = '{"feature":"host","mode":"delete","count":3}';
-
-render(
-  <Button
-    data-analytics-id="HOST_DELETE_SUBMIT"
-    data-analytics-props={payload}
-  >
-    Delete
-  </Button>,
-);
-
-expect(screen.getByRole('button')).toHaveAttribute('data-analytics-props', payload);
-```
-
-```tsx
-render(
-  <Button asChild>
-    <a href="/docs" data-analytics-id="DOCS_NAV">
-      Docs
-    </a>
-  </Button>,
-);
-
-expect(screen.getByRole('link')).toHaveAttribute('data-analytics-id', 'DOCS_NAV');
-```
-
-```tsx
-const captured = captureAnalyticsClicks();
-
-render(<Checkbox data-analytics-id="ACCEPT_TOS">Accept</Checkbox>);
-await userEvent.click(screen.getByTestId('checkbox'));
-
-expect(captured).toHaveBeenCalledWith('ACCEPT_TOS');
-```
+Copy-ready tests per component shape live in [`testing-examples.md`](./testing-examples.md).

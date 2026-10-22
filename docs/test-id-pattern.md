@@ -11,6 +11,8 @@ Manually adding `data-testid` to each sub-component is repetitive and error-pron
 
 A single `data-testid` on the root component automatically cascades to all sub-components via React context.
 
+This is **mandatory for all compound components** (components with sub-components). Simple leaf components (Button, Badge, Text) receive `data-testid` through their `...rest` props spread — no extra work needed.
+
 ```tsx
 <Alert data-testid="login-error">
   <AlertIcon />
@@ -79,7 +81,7 @@ import { TestIdProvider } from '../../utils/testId'
 </TestIdProvider>
 ```
 
-### `useTestId(slot: string): string | undefined`
+### `useTestId(slot?: string, override?: string): string | undefined`
 
 Hook for sub-components. Returns `{baseTestId}--{slot}` or `undefined` if no provider exists.
 
@@ -87,6 +89,8 @@ Hook for sub-components. Returns `{baseTestId}--{slot}` or `undefined` if no pro
 import { useTestId } from '../../utils/testId'
 
 const testId = useTestId('close') // "login-error--close" or undefined
+const testId = useTestId('close', testIdProp) // consumer-passed data-testid wins when defined
+const testId = useTestId() // "login-error" — pass the parent's base through unchanged
 ```
 
 ## Naming convention
@@ -120,6 +124,10 @@ When no `data-testid` is provided to the root component, all derived test IDs ar
 
 These serve different purposes and coexist on the same elements.
 
+### Locating elements in tests
+
+Locate elements by `data-testid` (`getByTestId`) in both unit and E2E tests. `getByRole` is fine for accessibility assertions (role, accessible name). **Never use `data-slot` in tests** — it is a styling hook and may change without notice. Existing tests that query `[data-slot=…]` are legacy: migrate them to `data-testid` when you touch them.
+
 ## How testId is sourced
 
 All compound components support `data-testid` cascading. Most receive it via the standard `data-testid` HTML attribute. Exceptions:
@@ -127,7 +135,6 @@ All compound components support `data-testid` cascading. Most receive it via the
 | Component | Source | Why |
 |-----------|--------|-----|
 | Toast | `toast.id` (automatic) | Data-driven, no JSX props |
-| Tour | `testId` prop | No standard DOM root element |
 
 ## Adding TestId to a new compound component
 
@@ -138,4 +145,30 @@ All compound components support `data-testid` cascading. Most receive it via the
 5. Each sub-component: call `const testId = useTestId('slot-name')`
 6. Each sub-component: add `data-testid={testId}` to its root element
 
-See `.claude/rules/test-id.md` for the full checklist.
+### Root component (e.g. `Alert`)
+
+```tsx
+import { type TestableProps, TestIdProvider } from '../../utils/testId'
+
+export interface AlertProps extends ..., TestableProps {
+  // component-specific props
+}
+
+export const Alert: FC<AlertProps> = ({ 'data-testid': testId, children, ...props }) => (
+  <div {...props} data-testid={testId}>
+    <TestIdProvider value={testId}>{children}</TestIdProvider>
+  </div>
+)
+```
+
+### Sub-component (e.g. `AlertClose`)
+
+```tsx
+import { useTestId } from '../../utils/testId'
+
+export const AlertClose: FC<AlertCloseProps> = ({ ref, ...props }) => {
+  const testId = useTestId('close')
+
+  return <button {...props} ref={ref} data-testid={testId} />
+}
+```

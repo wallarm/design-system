@@ -1,74 +1,15 @@
-# Test ID Pattern (data-testid cascading)
+# Test ID Rules
 
-These rules apply when creating or modifying any compound component that has sub-components.
+**Read and follow [`docs/test-id-pattern.md`](../../docs/test-id-pattern.md)** before creating or modifying a compound component (one with sub-components) or writing a test that locates elements.
 
-## Overview
+That document is the single source of truth for:
+- `data-testid` cascading via `TestableProps` / `TestIdProvider` / `useTestId`
+- Slot naming (`{baseTestId}--{slot}`, kebab-case sub-component suffix)
+- Root and sub-component snippets and the step-by-step checklist
+- Locator rules for unit and E2E tests
 
-`data-testid` cascades through compound components via React context.
-`data-slot` is for CSS selectors only — never use it for testing.
+## Hard nevers
 
-## How It Works
-
-1. **Root component** extracts `data-testid` from props and wraps `children` in `TestIdProvider`
-2. **Sub-components** call `useTestId('slot-name')` to get a derived test ID
-3. Format: `{baseTestId}--{slot}` (double dash separator)
-4. If no `data-testid` is passed — all derived values are `undefined`, DOM stays clean
-
-## Implementation Rules
-
-### Root component (e.g. `Alert`)
-
-```tsx
-import { type TestableProps, TestIdProvider } from '../../utils/testId'
-
-// Extend props with TestableProps
-export interface AlertProps extends ..., TestableProps {
-  // component-specific props
-}
-
-export const Alert: FC<AlertProps> = ({
-  'data-testid': testId,
-  children,
-  ...props
-}) => {
-  return (
-    <div {...props} data-testid={testId}>
-      <TestIdProvider value={testId}>{children}</TestIdProvider>
-    </div>
-  )
-}
-```
-
-### Sub-component (e.g. `AlertClose`)
-
-```tsx
-import { useTestId } from '../../utils/testId'
-
-export const AlertClose: FC<AlertCloseProps> = ({ ref, ...props }) => {
-  const testId = useTestId('close')
-
-  return <button {...props} ref={ref} data-testid={testId} />
-}
-```
-
-## Slot Naming Convention
-
-- Use the sub-component's role in **kebab-case**, without the parent prefix
-- Examples: `close`, `icon`, `title`, `description`, `content`, `controls`, `trigger`, `header`, `footer`, `body`
-- The slot name should match the sub-component suffix: `AlertClose` → `close`, `DialogHeader` → `header`
-
-## When to Apply
-
-- **All compound components** (with sub-components) must implement this pattern — it is a mandatory standard, not opt-in
-- Simple leaf components (Button, Badge, Text) receive `data-testid` via `...rest` props spreading — no extra work needed
-
-## Checklist
-
-When adding TestId support to a compound component:
-
-1. [ ] Root component: extend props type with `TestableProps` (import from `../../utils/testId`)
-2. [ ] Root component: destructure `'data-testid': testId` from props
-3. [ ] Root component: pass `data-testid={testId}` to root element
-4. [ ] Root component: wrap children with `<TestIdProvider value={testId}>`
-5. [ ] Each sub-component: call `useTestId('slot-name')`
-6. [ ] Each sub-component: pass `data-testid={testId}` to its root element
+- Never skip the cascade on a compound component — it is mandatory, not opt-in.
+- Never use `data-slot` in tests — it is for CSS selectors only. Locate by `data-testid` (`getByTestId`); `getByRole` is fine for accessibility assertions. Existing `data-slot` queries are legacy to migrate.
+- Never render a derived `data-testid` when the root received none — `useTestId` returns `undefined` and the DOM stays clean.

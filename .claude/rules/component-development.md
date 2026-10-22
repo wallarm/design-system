@@ -2,13 +2,15 @@
 
 These rules apply when creating or modifying any component file in `packages/design-system/src/components/`.
 
+The full step-by-step guide (file structure, examples, Storybook categories, checklist) is [`packages/design-system/docs/adding-components.md`](../../packages/design-system/docs/adding-components.md). This file keeps only the hard rules.
+
 ## Mandatory Patterns
 
-1. **CVA for variants** — Always use `class-variance-authority` for component variants. Define them in a separate `classes.ts` file.
+1. **CVA for variants** — Always use `class-variance-authority` for component variants. Keep the `cva()` definition in the component file; move it to a `classes.ts` file only when the styles are shared (several sub-components or files reuse the same recipe).
 
 2. **`cn()` for className** — Always merge classes with `cn()` from `../../utils/cn`. Never use template literals for class concatenation.
 
-3. **`data-slot` attribute** — Every component's root element must have `data-slot='component-name'` in kebab-case.
+3. **`data-slot` attribute** — Every component's root element must have `data-slot='component-name'` in kebab-case. It is a CSS hook only — tests locate elements by `data-testid` (see `test-id.md`), never by `data-slot`.
 
 4. **`displayName`** — Set `ComponentName.displayName = 'ComponentName'` at the end of every component file.
 

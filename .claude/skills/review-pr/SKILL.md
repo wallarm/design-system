@@ -30,9 +30,10 @@ For each changed file, evaluate against these categories:
 - [ ] Functions are reasonably sized and focused
 
 #### Design System Compliance (for component changes)
-- [ ] Uses CVA for variant definitions
+- [ ] Uses CVA for variant definitions (`classes.ts` only when the recipe is shared between components)
 - [ ] Uses `cn()` for className merging
-- [ ] Has `data-slot` attribute on root element
+- [ ] Has `data-slot` attribute on root element (CSS hook only)
+- [ ] Compound components cascade `data-testid` (`TestIdProvider` / `useTestId`); tests locate by `data-testid`, never `data-slot`
 - [ ] Has `displayName` set
 - [ ] Supports `ref` forwarding
 - [ ] Supports `className` prop
@@ -86,7 +87,7 @@ Provide a structured review with:
 
 Run quality checks:
 ```bash
-pnpm typecheck
+pnpm --filter @wallarm-org/design-system exec tsc -p tsconfig.app.json --noEmit  # `pnpm typecheck` currently checks nothing
 pnpm lint
 pnpm test:run
 ```

@@ -84,7 +84,7 @@ and delete whatever component it was wrapped in:
 ```
 
 The class lives in `.storybook/preview.css`, so this is Storybook-only styling —
-nothing in `src/` and no product token is involved. Caveat stands in for Figma
+nothing in `src/` and no product token is involved. Kalam Light stands in for Figma
 Hand; the size and leading are set for a documentation page rather than a canvas,
 and the colour sits back at `--color-text-secondary` because Figma's annotation
 pink competes with the specimen it is meant to label.
@@ -224,7 +224,7 @@ not have, or changing which variants it fires, is a different job: park it.
 ### 0 · Verify the target
 
 The unit here is a **story file**, not a component directory — each `*.stories.tsx`
-renders its own Overview page. That differs from `.llm.md` work, and it matters:
+renders its own Overview page, and that matters:
 `FilterInput` has five story files and therefore five pages, while a sub-component
 with no story file has none and can't be documented directly.
 
@@ -267,9 +267,9 @@ Read the component directory. Ground-truth rules, learned the hard way:
 | Source | Read it for |
 |---|---|
 | `{Name}.tsx` | what it is, what it's built on, structural behaviour |
-| `classes.ts` | variants and compound rules — what's locked |
+| `classes.ts` (or the `cva` in `{Name}.tsx`) | variants and compound rules — what's locked |
 | `{Name}.stories.tsx` | **what each story actually renders** |
-| `{Name}.figma.tsx` | sanctioned compositions, and the Figma node ids for step 2 |
+| `{Name}.figma.ts` | sanctioned compositions, and the Figma node ids for step 2 |
 | `index.ts` | sub-components worth naming in prose |
 | sibling components | the alternatives your boundaries will point at |
 
@@ -286,7 +286,7 @@ Read the component directory. Ground-truth rules, learned the hard way:
 Figma carries *intent* the code cannot state, and it is the only source that will
 tell you what a variant is **for**.
 
-**Start with `{Name}.figma.tsx`** — the Code Connect file, if the component has
+**Start with `{Name}.figma.ts`** — the Code Connect file, if the component has
 one. It hard-codes the node URLs, and its `example()` blocks map each variant to
 sanctioned JSX, so it answers two questions at once: which node to read, and
 which compositions are blessed. On `Button` it also settled the variant matrix
@@ -374,10 +374,15 @@ the component, and read it as a stranger would:
 pnpm --filter=@wallarm-org/design-system storybook
 ```
 
+The Overview page's id is `<title-kebab>--overview` (not `--docs`), so a page
+opens headless at `iframe.html?id=inputs-fileupload--overview&viewMode=docs`.
+
 Then check the things that actually go wrong: every story has a description; the
 description doesn't restate the story name; nothing contradicts the props table
-just below; no sentence spills past the budget. `pnpm lint:fix` and `pnpm typecheck`
-before you finish — story files are typechecked like any other source.
+just below; no sentence spills past the budget. `pnpm lint:fix` and
+`pnpm --filter @wallarm-org/design-system exec tsc -p tsconfig.storybook.json --noEmit`
+after **every** file, not per batch — `pnpm typecheck` does not reach story files, and
+a broken story file only shows up as `Unable to index …` in Storybook's output.
 
 **Two things to look at rather than read**, both covered above: are the annotation
 labels in the house style, and **is the scaffolding quieter than the specimen?**
@@ -416,16 +421,16 @@ the only verification that works.
 
 ### 6 · Park what the run surfaced
 
-Three destinations, so nothing is lost and nothing lands in the wrong place:
+Two destinations, so nothing is lost and nothing lands in the wrong place:
 
 - **A real problem in the component** → [`docs/storybook-docs-findings.md`](../../../docs/storybook-docs-findings.md),
   in the format that file defines. Never fixed here.
+  A **microcopy rule that generalises** beyond this component (label case,
+  punctuation, button wording) goes there too, rather than being repeated on
+  ninety-five pages. One page is the wrong home for a house-wide rule.
 - **Friction with this skill** — a missing step, a wrong assumption, a question
   you had to answer off-script → a one-line row in [`REFINEMENTS.md`](REFINEMENTS.md).
   Don't stop the run to fix the skill; park it and finish the component.
-- **A microcopy rule that generalises** beyond this component (label case,
-  punctuation, button wording) → park it rather than repeating it on ninety-five
-  pages. One page is the wrong home for a house-wide rule.
 
 ### 7 · Tick it off and commit
 

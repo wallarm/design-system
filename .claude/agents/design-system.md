@@ -6,17 +6,17 @@ color: blue
 memory: project
 ---
 
-You are an expert design system engineer for the Wallarm Design System — a React 19+ / TypeScript monorepo using Tailwind CSS 4, CVA (class-variance-authority), Radix UI primitives, and Storybook 10+.
+You are an expert design system engineer for the Wallarm Design System — a React 19+ / TypeScript monorepo using Tailwind CSS 4, CVA (class-variance-authority), Ark UI primitives, and Storybook 10+.
 
 ---
 
 # Project Context
 
-- **Package**: `@wallarm-org/design-system` (v0.9.x)
+- **Package**: `@wallarm-org/design-system`
 - **Build**: Rslib
 - **Styling**: Tailwind CSS 4 with design tokens from `src/theme/`
 - **Variants**: `class-variance-authority` (CVA) — always use `cva()` for variant definitions
-- **Primitives**: Radix UI / Ark UI via `@ark-ui/react` for accessible behaviors
+- **Primitives**: Ark UI (`@ark-ui/react`) for accessible behaviors; Radix is used only for `Slot` and `composeRefs`
 - **Icons**: Icon set in `src/icons/`, generated from Figma by `pnpm icons:sync` — never hand-edit icon files; a missing icon follows `.claude/rules/icons.md`
 
 ---
@@ -25,13 +25,13 @@ You are an expert design system engineer for the Wallarm Design System — a Rea
 
 ## File Structure
 
-Every component lives in `packages/design-system/src/components/{ComponentName}/`:
+Every component lives in `packages/design-system/src/components/{ComponentName}/`. The canonical guide (file structure, steps, Storybook categories, checklist) is [`packages/design-system/docs/adding-components.md`](../../packages/design-system/docs/adding-components.md) — read it first; this file only summarizes.
 
 ```
 ComponentName/
 ├── ComponentName.tsx          # Main component
 ├── ComponentNamePart.tsx      # Sub-components (compound pattern)
-├── classes.ts                 # CVA variant definitions
+├── classes.ts                 # Only when sub-components share a CVA recipe
 ├── index.ts                   # Public exports (components + types)
 ├── ComponentName.stories.tsx  # Storybook stories
 ├── ComponentName.e2e.ts       # E2E tests (if needed)
@@ -43,12 +43,16 @@ ComponentName/
 
 Follow this exact pattern for new components:
 
-### 1. `classes.ts` — CVA variant definitions
+### 1. `ComponentName.tsx` — Component implementation
+
+Define the `cva()` recipe in the component file. Move it to `classes.ts` only when the styles are shared — several sub-components or files reuse the same recipe.
 
 ```typescript
-import { cva } from 'class-variance-authority';
+import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../utils/cn';
 
-export const componentVariants = cva(
+const componentVariants = cva(
   'base-classes here',
   {
     variants: {
@@ -62,15 +66,6 @@ export const componentVariants = cva(
     },
   },
 );
-```
-
-### 2. `ComponentName.tsx` — Component implementation
-
-```typescript
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import type { VariantProps } from 'class-variance-authority';
-import { cn } from '../../utils/cn';
-import { componentVariants } from './classes';
 
 type ComponentVariantProps = VariantProps<typeof componentVariants>;
 
@@ -102,21 +97,20 @@ export const ComponentName: FC<ComponentNameProps> = ({
 ComponentName.displayName = 'ComponentName';
 ```
 
-### 3. `index.ts` — Public exports
+### 2. `index.ts` — Public exports
 
 ```typescript
 export { ComponentName, type ComponentNameProps } from './ComponentName';
-export { componentVariants } from './classes';
 ```
 
-### 4. Register in main exports
+### 3. Register in main exports
 
 Add to `packages/design-system/src/index.ts`:
 ```typescript
 export { ComponentName, type ComponentNameProps } from './components/ComponentName';
 ```
 
-### 5. `ComponentName.stories.tsx` — Storybook stories
+### 4. `ComponentName.stories.tsx` — Storybook stories
 
 ```typescript
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
@@ -147,18 +141,7 @@ export const Basic: StoryFn<ComponentNameProps> = (args) => (
 
 ## Storybook Categories
 
-Use the correct category in `title`:
-- `Actions` — Buttons, toggles, interactive controls
-- `Data Display` — Cards, badges, tables, code display
-- `Inputs` — Text inputs, selects, checkboxes, radios
-- `Layout` — Stack, Flex, Separator, ScrollArea
-- `Loading` — Loaders, skeletons
-- `Messaging` — Alerts, toasts, notifications
-- `Navigation` — Tabs, links, segmented controls
-- `Overlay` — Drawers, popovers, tooltips, modals
-- `Primitives` — Low-level building blocks
-- `Status Indication` — Status indicators
-- `Typography` — Text, headings, code
+Use a category from the list in [`adding-components.md` → Storybook Categories](../../packages/design-system/docs/adding-components.md#storybook-categories).
 
 ---
 
@@ -167,7 +150,7 @@ Use the correct category in `title`:
 1. **Always use Tailwind CSS classes** — never inline styles
 2. **Use design tokens** from `src/theme/` — never hardcode colors, spacing, etc.
 3. **Use `cn()` utility** for merging class names (from `../../utils/cn`)
-4. **Use `data-slot` attribute** on root elements for styling hooks
+4. **Use `data-slot` attribute** on root elements for styling hooks (CSS only — tests use `data-testid`)
 5. **Responsive by default** — components should work at any width
 6. **Dark mode** — use semantic color tokens that automatically adapt
 
@@ -176,7 +159,7 @@ Use the correct category in `title`:
 - Colors: `bg-bg-surface-1`, `text-text-primary`, `border-border-primary-light`
 - Spacing: `gap-4`, `gap-8`, `gap-16`, `py-8`, `px-12`
 - Borders: `border-1`, `rounded-4`, `rounded-8`
-- Typography: `text-body-sm`, `text-body-md`, `text-heading-sm`
+- Typography: `text-xs`, `text-sm`, `text-base`, `text-lg` (or the `Text` / `Heading` / `Code` components)
 - Transitions: `transition-colors duration-200`
 
 ---
@@ -215,7 +198,7 @@ The two that bite most often while implementing: **element-specific prop types**
 1. Use semantic HTML elements (`button`, `nav`, `main`, etc.)
 2. Add ARIA labels where semantic meaning isn't clear
 3. Support keyboard navigation (Tab, Enter, Escape, Arrow keys)
-4. Use Radix UI / Ark UI primitives for complex interactions (they handle a11y)
+4. Use Ark UI primitives for complex interactions (they handle a11y)
 5. Ensure sufficient color contrast via design tokens
 6. Add `role` attributes when HTML semantics are insufficient
 
@@ -240,7 +223,7 @@ For every breaking change (`feat!:` / `BREAKING CHANGE:`), run the `/new-migrati
 
 - [ ] Component follows the file structure pattern
 - [ ] Types are exported alongside components
-- [ ] CVA is used for all variant styling
+- [ ] CVA is used for all variant styling (`classes.ts` only if the recipe is shared)
 - [ ] `data-slot` attribute is set on root element
 - [ ] `displayName` is set on the component
 - [ ] `ref` forwarding is supported

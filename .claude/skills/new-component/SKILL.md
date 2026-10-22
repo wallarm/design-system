@@ -2,6 +2,8 @@
 
 Scaffold a new design system component with all required files, proper structure, and registration.
 
+The canonical guide is [`packages/design-system/docs/adding-components.md`](../../../packages/design-system/docs/adding-components.md); the hard rules are in [`.claude/rules/component-development.md`](../../rules/component-development.md). This skill only scaffolds.
+
 ## Usage
 
 ```
@@ -13,20 +15,7 @@ Scaffold a new design system component with all required files, proper structure
 
 ## Storybook Categories
 
-| Category | Components |
-|----------|-----------|
-| AI | Wally assistant: chat panel, messages, chain of thought |
-| Actions | Buttons, toggles, interactive controls |
-| Data Display | Cards, badges, tables, code display |
-| Inputs | Text inputs, selects, checkboxes, radios |
-| Layout | Stack, Flex, Separator, ScrollArea |
-| Loading | Loaders, skeletons |
-| Messaging | Alerts, toasts, notifications |
-| Navigation | Tabs, links, segmented controls |
-| Overlay | Drawers, popovers, tooltips, modals |
-| Primitives | Low-level building blocks |
-| Status Indication | Status indicators |
-| Typography | Text, headings, code |
+Pick the category from [`adding-components.md` → Storybook Categories](../../../packages/design-system/docs/adding-components.md#storybook-categories).
 
 ## Instructions
 
@@ -41,12 +30,16 @@ For scaffolding, the practical fork is the root element type:
 
 When this skill is invoked, create the following files:
 
-### 1. `packages/design-system/src/components/{ComponentName}/classes.ts`
+### 1. `packages/design-system/src/components/{ComponentName}/{ComponentName}.tsx`
+
+The `cva()` recipe lives in the component file. Create a `classes.ts` only when sub-components share the recipe.
 
 ```typescript
-import { cva } from 'class-variance-authority';
+import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
+import { cva, type VariantProps } from 'class-variance-authority';
+import { cn } from '../../utils/cn';
 
-export const {componentName}Variants = cva(
+const {componentName}Variants = cva(
   // Base classes — add appropriate defaults
   '',
   {
@@ -56,15 +49,6 @@ export const {componentName}Variants = cva(
     defaultVariants: {},
   },
 );
-```
-
-### 2. `packages/design-system/src/components/{ComponentName}/{ComponentName}.tsx`
-
-```typescript
-import type { FC, HTMLAttributes, ReactNode, Ref } from 'react';
-import type { VariantProps } from 'class-variance-authority';
-import { cn } from '../../utils/cn';
-import { {componentName}Variants } from './classes';
 
 type {ComponentName}VariantProps = VariantProps<typeof {componentName}Variants>;
 
@@ -98,14 +82,13 @@ export const {ComponentName}: FC<{ComponentName}Props> = ({
 {ComponentName}.displayName = '{ComponentName}';
 ```
 
-### 3. `packages/design-system/src/components/{ComponentName}/index.ts`
+### 2. `packages/design-system/src/components/{ComponentName}/index.ts`
 
 ```typescript
 export { {ComponentName}, type {ComponentName}Props } from './{ComponentName}';
-export { {componentName}Variants } from './classes';
 ```
 
-### 4. `packages/design-system/src/components/{ComponentName}/{ComponentName}.stories.tsx`
+### 3. `packages/design-system/src/components/{ComponentName}/{ComponentName}.stories.tsx`
 
 ```typescript
 import type { Meta, StoryFn } from 'storybook-react-rsbuild';
@@ -136,7 +119,7 @@ export const Basic: StoryFn<{ComponentName}Props> = (args) => (
 );
 ```
 
-### 5. Register in `packages/design-system/src/index.ts`
+### 4. Register in `packages/design-system/src/index.ts`
 
 Add export line in alphabetical order:
 ```typescript
@@ -149,6 +132,6 @@ export { {ComponentName}, type {ComponentName}Props } from './components/{Compon
 2. Implement the actual styling and behavior
 3. If the component is interactive, satisfy the analytics-readiness contract: element-specific typing on each target, `{...rest}` pass-through to the real node, event composition, no analytics-specific props. Walk [`docs/metrics/new-component-checklist.md`](../../../docs/metrics/new-component-checklist.md) and, if the component is wrapper-level or has a closed-target gap, record it in the component folder (test comments or an `ANALYTICS_GAPS.md`).
 4. Add proper Storybook stories showing all variants (and, for interactive components, a story that shows where `data-analytics-id` goes)
-5. Run `pnpm typecheck` to verify no type errors
+5. Run `pnpm --filter @wallarm-org/design-system exec tsc -p tsconfig.app.json --noEmit` to verify no type errors (`pnpm typecheck` currently checks nothing)
 6. Run `pnpm lint` to verify linting passes
 7. Suggest writing tests (unit and/or E2E) based on component complexity — for interactive components, include the metrics tests from [`docs/metrics/testing-examples.md`](../../../docs/metrics/testing-examples.md)

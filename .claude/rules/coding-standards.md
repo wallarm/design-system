@@ -2,7 +2,7 @@
 
 ## TypeScript
 
-- Strict mode is enforced — no `any`, no implicit returns
+- Strict mode is enforced — no `any`
 - Use `type` imports for type-only imports: `import type { FC } from 'react'`
 - Prefer `interface` for props, `type` for unions and intersections
 - Use `satisfies` for type narrowing without widening
@@ -16,7 +16,7 @@
 ## Naming
 
 - Components: `PascalCase`
-- Files: Match the primary export name (`Button.tsx`, `classes.ts`)
+- Files: Match the primary export name (`Button.tsx`, `useTheme.ts`)
 - Types/Interfaces: `PascalCase` with descriptive suffix (`ButtonProps`, `AlertColor`)
 - Hooks: `camelCase` starting with `use` (`useTheme`, `useTour`)
 - Utilities: `camelCase` (`cn`, `formatValue`)

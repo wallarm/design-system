@@ -2,7 +2,7 @@
 
 Copy-ready component tests (Rstest + Testing Library) that prove the [analytics-readiness contract](./contract.md). Pick the snippet matching your component's shape. These are the canonical templates the `test` agent and `/review-pr` expect.
 
-**Locator hygiene (applies to every snippet):** never query by the same `data-*` attribute you are asserting. Locate the element with `data-testid`, `getByRole`, or `data-slot`, then assert the analytics attribute on it.
+**Locator hygiene (applies to every snippet):** never query by the same `data-*` attribute you are asserting. Locate the element by `data-testid` (or `getByRole`) — never by `data-slot` — then assert the analytics attribute on it.
 
 The shared `captureAnalyticsClicks` helper mirrors how analytics SDKs resolve clicks (`closest('[data-analytics-id]')` from `event.target`) and auto-cleans up after each test:
 

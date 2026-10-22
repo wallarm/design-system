@@ -20,7 +20,7 @@ Before designing, understand:
 2. **What are the usage contexts?** — where in the app, what data, what interactions
 3. **What existing components can be composed?** — reuse before creating
 4. **What accessibility requirements exist?** — ARIA pattern, keyboard model
-5. **Are there Ark UI / Radix primitives available?** — always prefer existing primitives
+5. **Are there Ark UI primitives available?** — always prefer existing primitives
 
 Ask the user clarifying questions if requirements are ambiguous. Do not guess — design decisions are expensive to change.
 
@@ -43,7 +43,7 @@ ComponentName
 - No context provider
 - Props flow only through JSX parent-child structure
 - Sub-components use `data-slot` for internal CSS targeting
-- Single `classes.ts` with variants on root only
+- CVA variants on root only, defined in the component file (`classes.ts` only if sub-components share the recipe)
 - `asChild` / `Slot` for polymorphism where valuable
 
 **Choose this when:** Component is a layout container with named slots.
@@ -102,7 +102,7 @@ ComponentName (root — sets up provider)
 ---
 
 ### Pattern 4: Ark UI Wrapper
-**Use when:** An Ark UI / Radix primitive exists and you need to customize its API.
+**Use when:** An Ark UI primitive exists and you need to customize its API.
 **Examples in codebase:** Tour, Field
 
 ```
@@ -291,7 +291,7 @@ Confirm every interactive target is reachable (root or exported sub-component), 
 ComponentName/
   ├── ComponentName.tsx
   ├── ComponentNamePart1.tsx
-  ├── classes.ts
+  ├── classes.ts              (only if sub-components share a CVA recipe)
   ├── index.ts
   ├── ComponentNameContext/ (if needed)
   │   ├── ComponentNameProvider.tsx
@@ -349,7 +349,7 @@ Before designing, review these for consistency:
 | Tour | Ark UI Wrapper | Yes (Tour) | Via Ark UI |
 | Field | Ark UI Wrapper | Yes (Field) | No |
 | FilterInput | Orchestrator | No | Dual context |
-| Toast | Render Prop | Yes (Toaster) | No |
+| Toast | Ark UI Wrapper (render-prop Toaster) | Yes (Toast) | No |
 
 ---
 
