@@ -1,4 +1,4 @@
-import { Node } from 'ts-morph';
+import { Node, type Project, type SourceFile } from 'ts-morph';
 import fs from 'node:fs';
 import path from 'node:path';
 import { createProject, DS_PACKAGE, type JsxElementLike } from './jsx';
@@ -35,17 +35,32 @@ function markerTarget(node: Node): JsxElementLike | undefined {
  * inserted after that migration's transform returns (transforms hold node references).
  * Throws on a syntax error or a failing transform.
  */
-export function migrateSource(args: { text: string; fileName: string; migrations: Migration[] }): {
-  code: string;
-  manual: Omit<ManualItem, 'file'>[];
-} {
-  const project = createProject();
-  const sourceFile = project.createSourceFile(args.fileName, args.text);
+export function migrateSource(args: {
+  text: string;
+  fileName: string;
+  migrations: Migration[];
+  /** Reuse one Project across files: a fresh one reloads the TS lib files on every getProgram(). */
+  project?: Project;
+}): { code: string; manual: Omit<ManualItem, 'file'>[] } {
+  const project = args.project ?? createProject();
+  const sourceFile = project.createSourceFile(args.fileName, args.text, { overwrite: true });
+  try {
+    return applyMigrations(project, sourceFile, args.migrations);
+  } finally {
+    sourceFile.forget();
+  }
+}
+
+function applyMigrations(
+  project: Project,
+  sourceFile: SourceFile,
+  migrations: Migration[],
+): { code: string; manual: Omit<ManualItem, 'file'>[] } {
   if (project.getProgram().getSyntacticDiagnostics(sourceFile).length > 0)
     throw new Error(SYNTAX_ERROR);
 
   const manual: Omit<ManualItem, 'file'>[] = [];
-  for (const migration of args.migrations) {
+  for (const migration of migrations) {
     const token = `@wds-migration(${migration.id})`;
     const pending = new Map<JsxElementLike, string>(); // first message per element wins
     migration.transform(sourceFile, {
@@ -74,6 +89,7 @@ export function runMigrations(args: {
   migrations: Migration[];
 }): RunResult {
   const result: RunResult = { changed: [], manual: [], skipped: [] };
+  const project = createProject();
 
   for (const abs of args.files) {
     const file = path.relative(args.cwd, abs).split(path.sep).join('/');
@@ -84,6 +100,7 @@ export function runMigrations(args: {
         text: before,
         fileName: file,
         migrations: args.migrations,
+        project,
       });
       result.manual.push(...manual.map(m => ({ file, ...m })));
       if (after !== before) result.changed.push({ file, before, after });
